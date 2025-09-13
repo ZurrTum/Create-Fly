@@ -1,0 +1,11 @@
+{
+  "damage": 3,
+  "items": "minecraft:sweet_berries",
+  "knockback": 0.1,
+  "render_mode": {
+    "type": "create:tumble"
+  },
+  "sound_pitch": 1.25,
+  "split": 3,
+  "velocity_multiplier": 1.05
+}

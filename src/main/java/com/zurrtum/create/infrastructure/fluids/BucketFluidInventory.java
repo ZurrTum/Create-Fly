@@ -1,0 +1,130 @@
+package com.zurrtum.create.infrastructure.fluids;
+
+import net.minecraft.fluid.Fluid;
+import net.minecraft.item.BucketItem;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
+
+public class BucketFluidInventory extends FluidItemInventoryWrapper {
+    public static final int CAPACITY = 81000;
+
+    @Override
+    public int getMaxAmountPerStack() {
+        return CAPACITY;
+    }
+
+    public ItemStack toFillBucket(FluidStack stack) {
+        return stack.getFluid().getBucketItem().getDefaultStack();
+    }
+
+    public Fluid toFluid() {
+        return ((BucketItem) this.stack.getItem()).fluid;
+    }
+
+    @Override
+    public boolean canInsert() {
+        Item item = stack.getItem();
+        return item == Items.BUCKET || item == Items.AIR;
+    }
+
+    @Override
+    public boolean canExtract() {
+        Item item = stack.getItem();
+        return item != Items.BUCKET && item != Items.AIR;
+    }
+
+    @Override
+    public int insert(FluidStack stack) {
+        if (!canInsert() || stack.getAmount() < CAPACITY) {
+            return 0;
+        }
+        this.stack = toFillBucket(stack);
+        return CAPACITY;
+    }
+
+    @Override
+    public boolean preciseInsert(FluidStack stack) {
+        return insert(stack) == CAPACITY;
+    }
+
+    @Override
+    public int count(FluidStack stack) {
+        Item item = this.stack.getItem();
+        if (item == Items.BUCKET || item == Items.AIR || stack.getFluid() != toFluid()) {
+            return 0;
+        }
+        return CAPACITY;
+    }
+
+    @Override
+    public int count(FluidStack stack, int maxAmount) {
+        if (maxAmount < CAPACITY) {
+            return 0;
+        }
+        return count(stack);
+    }
+
+    @Override
+    public int countSpace(FluidStack stack) {
+        return canInsert() ? CAPACITY : 0;
+    }
+
+    @Override
+    public int countSpace(FluidStack stack, int maxAmount) {
+        if (maxAmount < CAPACITY) {
+            return 0;
+        }
+        return countSpace(stack);
+    }
+
+    @Override
+    public int extract(FluidStack stack) {
+        if (!canExtract() || stack.getAmount() != CAPACITY) {
+            return 0;
+        }
+        this.stack = Items.BUCKET.getDefaultStack();
+        return CAPACITY;
+    }
+
+    @Override
+    public boolean preciseExtract(FluidStack stack) {
+        return extract(stack) == CAPACITY;
+    }
+
+    @Override
+    public FluidStack getStack() {
+        Item item = stack.getItem();
+        if (item == Items.BUCKET || item == Items.AIR) {
+            return FluidStack.EMPTY;
+        }
+        return new FluidStack(toFluid(), CAPACITY);
+    }
+
+    @Override
+    public void setStack(FluidStack stack) {
+        if (stack.getAmount() >= CAPACITY) {
+            this.stack = toFillBucket(stack);
+        } else {
+            this.stack = Items.BUCKET.getDefaultStack();
+        }
+    }
+
+    @Override
+    public FluidStack removeStack() {
+        Item item = stack.getItem();
+        if (item == Items.BUCKET || item == Items.AIR) {
+            return FluidStack.EMPTY;
+        }
+        stack = Items.BUCKET.getDefaultStack();
+        return new FluidStack(toFluid(), CAPACITY);
+    }
+
+    @Override
+    public FluidStack removeStackWithAmount(int amount) {
+        if (amount != CAPACITY) {
+            return FluidStack.EMPTY;
+        }
+        return removeStack();
+    }
+}

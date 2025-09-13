@@ -1,0 +1,19 @@
+{
+  "type": "create:milling",
+  "ingredient": "minecraft:lilac",
+  "processing_time": 100,
+  "results": [
+    {
+      "count": 3,
+      "id": "minecraft:magenta_dye"
+    },
+    {
+      "chance": 0.25,
+      "id": "minecraft:magenta_dye"
+    },
+    {
+      "chance": 0.25,
+      "id": "minecraft:purple_dye"
+    }
+  ]
+}

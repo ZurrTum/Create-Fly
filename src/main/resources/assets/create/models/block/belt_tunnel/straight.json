@@ -1,0 +1,105 @@
+{
+	"credit": "Made with Blockbench",
+	"parent": "block/block",
+	"textures": {
+		"tunnel": "create:block/tunnel/brass_tunnel",
+		"top": "create:block/tunnel/brass_tunnel_top",
+		"direction": "create:block/funnel/brass_funnel_neutral",
+		"frame": "create:block/funnel/brass_funnel_frame",
+		"particle": "create:block/brass_block"
+	},
+	"elements": [
+		{
+			"name": "outer",
+			"from": [0, -5, 0],
+			"to": [16, 16, 16],
+			"faces": {
+				"north": {"uv": [0, 0, 8, 10.5], "texture": "#tunnel"},
+				"east": {"uv": [0, 0, 8, 10.5], "texture": "#direction"},
+				"south": {"uv": [0, 0, 8, 10.5], "texture": "#tunnel"},
+				"west": {"uv": [0, 0, 8, 10.5], "texture": "#direction"}
+			}
+		},
+		{
+			"name": "inner X",
+			"from": [0, -5, 14.05],
+			"to": [16, 16, 1.95],
+			"faces": {
+				"north": {"uv": [0, 0, 8, 10.5], "texture": "#tunnel"},
+				"south": {"uv": [0, 0, 8, 10.5], "texture": "#tunnel"}
+			}
+		},
+		{
+			"name": "inner Z",
+			"from": [14, -5, 0],
+			"to": [2, 16, 16],
+			"rotation": {"angle": 0, "axis": "y", "origin": [8, 5.5, 24]},
+			"faces": {
+				"east": {"uv": [0, 5.5, 8, 16], "rotation": 180, "texture": "#direction"},
+				"west": {"uv": [0, 5.5, 8, 16], "rotation": 180, "texture": "#direction"}
+			}
+		},
+		{
+			"name": "inner rim",
+			"from": [0, 10.05, 0],
+			"to": [16, 12.05, 16],
+			"faces": {
+				"down": {"uv": [0, 0, 16, 16], "texture": "#frame"}
+			}
+		},
+		{
+			"name": "Top",
+			"from": [0, 13, 0],
+			"to": [16, 16, 16],
+			"faces": {
+				"up": {"uv": [0, 0, 16, 16], "texture": "#top"},
+				"down": {"uv": [0, 0, 16, 16], "texture": "#top"}
+			}
+		}
+	],
+	"display": {
+		"thirdperson_righthand": {
+			"rotation": [75, 45, 0],
+			"translation": [0, 2.5, 0],
+			"scale": [0.375, 0.375, 0.375]
+		},
+		"thirdperson_lefthand": {
+			"rotation": [75, 45, 0],
+			"translation": [0, 2.5, 0],
+			"scale": [0.375, 0.375, 0.375]
+		},
+		"firstperson_righthand": {
+			"rotation": [0, 45, 0],
+			"scale": [0.4, 0.4, 0.4]
+		},
+		"firstperson_lefthand": {
+			"rotation": [0, 225, 0],
+			"scale": [0.4, 0.4, 0.4]
+		},
+		"ground": {
+			"translation": [0, 3.25, 0],
+			"scale": [0.25, 0.25, 0.25]
+		},
+		"gui": {
+			"rotation": [30, 225, 0],
+			"translation": [0, 1, 0],
+			"scale": [0.5, 0.5, 0.5]
+		},
+		"head": {
+			"rotation": [0, 90, 0]
+		},
+		"fixed": {
+			"rotation": [0, 90, 0],
+			"translation": [0, 1.5, 0],
+			"scale": [0.5, 0.5, 0.5]
+		}
+	},
+	"groups": [
+		{
+			"name": "Cover",
+			"origin": [8, 8, 8],
+			"color": 0,
+			"children": [0, 1, 2, 3, 4]
+		}
+	]
+}

@@ -1,0 +1,8 @@
+{
+  "model_part": "head/real_head",
+  "offset": [
+    1.0,
+    2.5,
+    1.0
+  ]
+}

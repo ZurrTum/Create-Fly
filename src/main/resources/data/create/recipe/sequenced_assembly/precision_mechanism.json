@@ -1,0 +1,64 @@
+{
+  "type": "create:sequenced_assembly",
+  "ingredient": "#c:plates/gold",
+  "transitional_item": {
+    "id": "create:incomplete_precision_mechanism"
+  },
+  "result": {
+    "chance": 0.8,
+    "id": "create:precision_mechanism"
+  },
+  "junks": [
+    {
+      "chance": 8.0,
+      "id": "create:golden_sheet"
+    },
+    {
+      "chance": 8.0,
+      "id": "create:andesite_alloy"
+    },
+    {
+      "chance": 5.0,
+      "id": "create:cogwheel"
+    },
+    {
+      "chance": 3.0,
+      "id": "minecraft:gold_nugget"
+    },
+    {
+      "chance": 2.0,
+      "id": "create:shaft"
+    },
+    {
+      "chance": 2.0,
+      "id": "create:crushed_raw_gold"
+    },
+    {
+      "id": "minecraft:iron_ingot"
+    },
+    {
+      "id": "minecraft:clock"
+    }
+  ],
+  "loops": 5,
+  "sequence": [
+    {
+      "type": "create:deploying",
+      "target": "$ingredient",
+      "ingredient": "create:cogwheel",
+      "result": "$result"
+    },
+    {
+      "type": "create:deploying",
+      "target": "$ingredient",
+      "ingredient": "create:large_cogwheel",
+      "result": "$result"
+    },
+    {
+      "type": "create:deploying",
+      "target": "$ingredient",
+      "ingredient": "#c:nuggets/iron",
+      "result": "$result"
+    }
+  ]
+}

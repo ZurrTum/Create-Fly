@@ -1,0 +1,6 @@
+# Blender 4.3.2 MTL File: 'conveyor.blend'
+# www.blender.org
+
+newmtl casing
+illum 2
+map_Kd #conveyor_casing

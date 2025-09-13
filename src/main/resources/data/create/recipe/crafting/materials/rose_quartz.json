@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    "#c:gems/quartz",
+    "#c:dusts/redstone",
+    "#c:dusts/redstone",
+    "#c:dusts/redstone",
+    "#c:dusts/redstone",
+    "#c:dusts/redstone",
+    "#c:dusts/redstone",
+    "#c:dusts/redstone",
+    "#c:dusts/redstone"
+  ],
+  "result": {
+    "count": 1,
+    "id": "create:rose_quartz"
+  }
+}

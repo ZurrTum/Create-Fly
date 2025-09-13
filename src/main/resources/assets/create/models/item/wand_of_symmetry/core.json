@@ -1,0 +1,22 @@
+{
+	"ambientocclusion": false,
+	"parent": "create:item/wand_of_symmetry/item",
+	"textures": {
+		"5": "block/white_concrete_powder"
+    },
+    "elements": [
+        {
+            "name": "Rod Core",
+            "from": [ 7.0, 18.0, 7.0 ], 
+            "to": [ 9.0, 26.0, 9.0 ], 
+            "faces": {
+                "north": { "texture": "#5", "uv": [ 10.0, 3.0, 12.0, 11.0 ] },
+                "east": { "texture": "#5", "uv": [ 13.0, 6.0, 15.0, 14.0 ] },
+                "south": { "texture": "#5", "uv": [ 11.0, 6.0, 13.0, 14.0 ] },
+                "west": { "texture": "#5", "uv": [ 11.0, 4.0, 13.0, 12.0 ] },
+                "up": { "texture": "#5", "uv": [ 14.0, 0.0, 16.0, 2.0 ] },
+                "down": { "texture": "#5", "uv": [ 14.0, 6.0, 16.0, 8.0 ] }
+            }
+        }
+    ]
+}

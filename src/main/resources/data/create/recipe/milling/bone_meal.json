@@ -1,0 +1,15 @@
+{
+  "type": "create:milling",
+  "ingredient": "minecraft:bone_meal",
+  "processing_time": 70,
+  "results": [
+    {
+      "count": 2,
+      "id": "minecraft:white_dye"
+    },
+    {
+      "chance": 0.1,
+      "id": "minecraft:light_gray_dye"
+    }
+  ]
+}

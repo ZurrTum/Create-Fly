@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "building",
+  "ingredients": [
+    "minecraft:light_gray_wool",
+    "#minecraft:wooden_slabs"
+  ],
+  "result": {
+    "count": 1,
+    "id": "create:light_gray_seat"
+  }
+}

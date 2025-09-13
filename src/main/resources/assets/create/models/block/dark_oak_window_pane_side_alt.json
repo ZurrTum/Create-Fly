@@ -1,0 +1,7 @@
+{
+  "parent": "create:block/connected_glass_pane/side_alt",
+  "textures": {
+    "edge": "minecraft:block/dark_oak_planks",
+    "pane": "create:block/palettes/dark_oak_window"
+  }
+}

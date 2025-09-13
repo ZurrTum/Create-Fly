@@ -1,0 +1,14 @@
+{
+  "type": "create:splashing",
+  "ingredient": "minecraft:gravel",
+  "results": [
+    {
+      "chance": 0.25,
+      "id": "minecraft:flint"
+    },
+    {
+      "chance": 0.125,
+      "id": "minecraft:iron_nugget"
+    }
+  ]
+}

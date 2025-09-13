@@ -1,0 +1,9 @@
+{
+  "type": "create:splashing",
+  "ingredient": "#minecraft:wool",
+  "results": [
+    {
+      "id": "minecraft:white_wool"
+    }
+  ]
+}

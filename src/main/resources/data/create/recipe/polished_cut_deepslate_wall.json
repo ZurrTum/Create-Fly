@@ -1,0 +1,15 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "key": {
+    "X": "create:polished_cut_deepslate"
+  },
+  "pattern": [
+    "XXX",
+    "XXX"
+  ],
+  "result": {
+    "count": 6,
+    "id": "create:polished_cut_deepslate_wall"
+  }
+}

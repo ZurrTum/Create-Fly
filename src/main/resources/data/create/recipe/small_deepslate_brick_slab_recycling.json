@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "building",
+  "ingredients": [
+    "create:small_deepslate_brick_slab",
+    "create:small_deepslate_brick_slab"
+  ],
+  "result": {
+    "count": 1,
+    "id": "create:small_deepslate_bricks"
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "damage": 8,
+  "items": "minecraft:melon",
+  "knockback": 2.0,
+  "on_block_hit": {
+    "type": "create:place_block_on_ground",
+    "block": "minecraft:melon"
+  },
+  "reload_ticks": 20,
+  "render_mode": {
+    "type": "create:tumble"
+  },
+  "sound_pitch": 0.9,
+  "velocity_multiplier": 0.95
+}

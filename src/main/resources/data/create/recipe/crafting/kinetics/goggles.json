@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "G": "#c:glass_blocks",
+    "P": "#c:plates/gold",
+    "S": "#c:strings"
+  },
+  "pattern": [
+    " S ",
+    "GPG"
+  ],
+  "result": {
+    "count": 1,
+    "id": "create:goggles"
+  }
+}

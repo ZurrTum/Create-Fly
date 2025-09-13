@@ -1,0 +1,9 @@
+{
+  "type": "create:cutting",
+  "ingredient": "create:andesite_alloy",
+  "processing_time": 200,
+  "result": {
+    "count": 6,
+    "id": "create:shaft"
+  }
+}

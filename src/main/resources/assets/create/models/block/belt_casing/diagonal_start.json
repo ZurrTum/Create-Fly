@@ -1,0 +1,58 @@
+{
+	"credit": "Made with Blockbench",
+	"parent": "block/block",
+	"textures": {
+		"7": "create:block/belt/brass_belt_casing",
+		"8": "create:block/gearbox",
+		"particle": "create:block/brass_casing"
+	},
+	"elements": [
+		{
+			"name": "1",
+			"from": [-0.1, 2, -3.325],
+			"to": [16.1, 11, 4.7],
+			"neoforge_data": {"calculate_normals": true},
+			"rotation": {"angle": 45, "axis": "x", "origin": [-22, 8, 8]},
+			"faces": {
+				"north": {"uv": [8, 2.25, 12, 4.5], "texture": "#7"},
+				"east": {"uv": [8, 0, 10, 2.25], "texture": "#7"},
+				"south": {"uv": [0, 2.75, 4, 5], "rotation": 180, "texture": "#7"},
+				"west": {"uv": [14, 0, 16, 2.25], "texture": "#7"},
+				"up": {"uv": [0, 3, 4, 5], "texture": "#7"},
+				"down": {"uv": [8, 12, 12, 14], "texture": "#7"}
+			}
+		},
+		{
+			"name": "2",
+			"from": [0, 0, 0],
+			"to": [16, 11, 16],
+			"faces": {
+				"north": {"uv": [8, 12, 12, 14.75], "texture": "#7"},
+				"east": {"uv": [0, 0, 4, 2.75], "texture": "#7"},
+				"south": {"uv": [4, 5.25, 8, 8], "texture": "#7"},
+				"west": {"uv": [0, 0, 4, 2.75], "texture": "#7"},
+				"up": {"uv": [0, 4, 4, 8], "texture": "#7"},
+				"down": {"uv": [12, 12, 16, 16], "rotation": 180, "texture": "#7"}
+			}
+		},
+		{
+			"name": "3",
+			"from": [0, 5, 12],
+			"to": [16, 11, 4],
+			"faces": {
+				"north": {"uv": [4, 3.25, 8, 4.75], "texture": "#7"},
+				"south": {"uv": [4, 3.25, 8, 4.75], "texture": "#7"},
+				"down": {"uv": [0, 2.75, 4, 4.75], "texture": "#7"}
+			}
+		},
+		{
+			"name": "4",
+			"from": [1, 5, 4],
+			"to": [15, 11, 12],
+			"faces": {
+				"east": {"uv": [4, 5, 12, 11], "texture": "#8"},
+				"west": {"uv": [4, 5, 12, 11], "texture": "#8"}
+			}
+		}
+	]
+}

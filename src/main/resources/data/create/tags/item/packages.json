@@ -1,0 +1,18 @@
+{
+  "values": [
+    "create:cardboard_package_12x12",
+    "create:cardboard_package_10x12",
+    "create:cardboard_package_10x8",
+    "create:cardboard_package_12x10",
+    "create:rare_creeper_package",
+    "create:rare_darcy_package",
+    "create:rare_evan_package",
+    "create:rare_jinx_package",
+    "create:rare_kryppers_package",
+    "create:rare_simi_package",
+    "create:rare_starlotte_package",
+    "create:rare_thunder_package",
+    "create:rare_up_package",
+    "create:rare_vector_package"
+  ]
+}

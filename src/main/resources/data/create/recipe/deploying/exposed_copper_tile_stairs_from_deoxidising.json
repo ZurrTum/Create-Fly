@@ -1,0 +1,9 @@
+{
+  "type": "create:deploying",
+  "keep_held_item": true,
+  "target": "create:weathered_copper_tile_stairs",
+  "ingredient": "#minecraft:axes",
+  "result": {
+    "id": "create:exposed_copper_tile_stairs"
+  }
+}

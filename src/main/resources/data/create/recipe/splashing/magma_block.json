@@ -1,0 +1,9 @@
+{
+  "type": "create:splashing",
+  "ingredient": "minecraft:magma_block",
+  "results": [
+    {
+      "id": "minecraft:obsidian"
+    }
+  ]
+}

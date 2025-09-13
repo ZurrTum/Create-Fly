@@ -1,0 +1,17 @@
+{
+  "damage": 5,
+  "items": "minecraft:poisonous_potato",
+  "knockback": 0.05,
+  "on_entity_hit": {
+    "type": "create:potion_effect",
+    "effect": "minecraft:poison",
+    "level": 1,
+    "recoverable": true,
+    "ticks": 160
+  },
+  "reload_ticks": 15,
+  "render_mode": {
+    "type": "create:tumble"
+  },
+  "velocity_multiplier": 1.25
+}

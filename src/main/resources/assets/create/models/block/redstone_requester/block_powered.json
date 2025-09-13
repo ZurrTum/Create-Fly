@@ -1,0 +1,7 @@
+{
+	"parent": "create:block/redstone_requester/block",
+	"textures": {
+		"1": "create:block/redstone_requester_powered",
+		"particle": "create:block/redstone_requester_powered"
+	}
+}

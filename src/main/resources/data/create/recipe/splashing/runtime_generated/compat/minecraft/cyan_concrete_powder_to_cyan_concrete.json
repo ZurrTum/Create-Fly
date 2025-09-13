@@ -1,0 +1,10 @@
+{
+  "results": [
+    {
+      "id": "minecraft:cyan_concrete",
+      "count": 1
+    }
+  ],
+  "ingredient": "minecraft:cyan_concrete_powder",
+  "type": "create:splashing"
+}

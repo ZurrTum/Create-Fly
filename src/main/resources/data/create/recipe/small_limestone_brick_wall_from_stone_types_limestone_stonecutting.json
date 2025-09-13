@@ -1,0 +1,8 @@
+{
+  "type": "minecraft:stonecutting",
+  "ingredient": "#create:stone_types/limestone",
+  "result": {
+    "count": 1,
+    "id": "create:small_limestone_brick_wall"
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "type": "create:compacting",
+  "fluid_ingredient": {
+    "type": "fluid_tag",
+    "amount": 81000,
+    "fluid_tag": "#c:honey"
+  },
+  "result": {
+    "id": "minecraft:honey_block"
+  }
+}

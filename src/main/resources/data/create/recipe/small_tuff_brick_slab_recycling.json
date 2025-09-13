@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "building",
+  "ingredients": [
+    "create:small_tuff_brick_slab",
+    "create:small_tuff_brick_slab"
+  ],
+  "result": {
+    "count": 1,
+    "id": "create:small_tuff_bricks"
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "results": [
+    {
+      "id": "minecraft:lime_concrete",
+      "count": 1
+    }
+  ],
+  "ingredient": "minecraft:lime_concrete_powder",
+  "type": "create:splashing"
+}

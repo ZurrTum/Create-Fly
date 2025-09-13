@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "P": "create:redstone_link",
+    "S": "#minecraft:wooden_buttons"
+  },
+  "pattern": [
+    "SSS",
+    " P ",
+    "SSS"
+  ],
+  "result": {
+    "count": 1,
+    "id": "create:linked_controller"
+  }
+}

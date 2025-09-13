@@ -1,0 +1,18 @@
+{
+	"credit": "Made with Blockbench",
+	"textures": {
+		"0": "create:block/factory_panel_connections",
+		"particle": "create:block/factory_panel_connections"
+	},
+	"elements": [
+		{
+			"from": [-8, 0.1, -2],
+			"to": [0, 0.15, 2],
+			"rotation": {"angle": 0, "axis": "y", "origin": [-6, 0, -2]},
+			"faces": {
+				"up": {"uv": [0, 12, 8, 16], "rotation": 180, "texture": "#0"},
+				"down": {"uv": [0, 16, 8, 12], "rotation": 180, "texture": "#0"}
+			}
+		}
+	]
+}

@@ -1,0 +1,13 @@
+{
+  "variants": {
+    "type=bottom": {
+      "model": "create:block/cut_tuff_slab"
+    },
+    "type=double": {
+      "model": "create:block/cut_tuff"
+    },
+    "type=top": {
+      "model": "create:block/cut_tuff_slab_top"
+    }
+  }
+}

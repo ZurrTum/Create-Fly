@@ -1,0 +1,32 @@
+{
+	"credit": "Made with Blockbench",
+	"parent": "create:item/package_transforms",
+	"textures": {
+		"0": "create:item/package/cardboard",
+		"particle": "create:item/package/cardboard_particle"
+	},
+	"elements": [
+		{
+			"name": "box",
+			"from": [2, 0, 2],
+			"to": [14, 12, 14],
+			"rotation": {"angle": 0, "axis": "y", "origin": [8, 8, 8]},
+			"faces": {
+				"north": {"uv": [9, 6.25, 12, 9.25], "texture": "#0"},
+				"east": {"uv": [9, 0.25, 12, 3.25], "texture": "#0"},
+				"south": {"uv": [12, 6.25, 9, 9.25], "texture": "#0"},
+				"west": {"uv": [9, 3.25, 12, 6.25], "texture": "#0"},
+				"up": {"uv": [9, 9.25, 12, 12.25], "rotation": 180, "texture": "#0"},
+				"down": {"uv": [9, 12.25, 12, 15.25], "rotation": 270, "texture": "#0"}
+			}
+		}
+	],
+	"groups": [
+		{
+			"name": "package_4",
+			"origin": [8, 8, 8],
+			"color": 0,
+			"children": [0]
+		}
+	]
+}

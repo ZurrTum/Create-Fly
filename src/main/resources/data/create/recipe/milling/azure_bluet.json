@@ -1,0 +1,16 @@
+{
+  "type": "create:milling",
+  "ingredient": "minecraft:azure_bluet",
+  "processing_time": 50,
+  "results": [
+    {
+      "count": 2,
+      "id": "minecraft:light_gray_dye"
+    },
+    {
+      "chance": 0.1,
+      "count": 2,
+      "id": "minecraft:white_dye"
+    }
+  ]
+}

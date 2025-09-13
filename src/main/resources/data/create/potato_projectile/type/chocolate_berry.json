@@ -1,0 +1,11 @@
+{
+  "damage": 4,
+  "items": "create:chocolate_glazed_berries",
+  "knockback": 0.2,
+  "render_mode": {
+    "type": "create:tumble"
+  },
+  "sound_pitch": 1.25,
+  "split": 3,
+  "velocity_multiplier": 1.05
+}

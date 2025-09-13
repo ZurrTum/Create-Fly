@@ -1,0 +1,9 @@
+{
+  "processing_time": 50,
+  "result": {
+    "id": "minecraft:crimson_planks",
+    "count": 6
+  },
+  "ingredient": "minecraft:stripped_crimson_stem",
+  "type": "create:cutting"
+}

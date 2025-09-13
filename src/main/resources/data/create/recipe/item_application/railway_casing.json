@@ -1,0 +1,8 @@
+{
+  "type": "create:item_application",
+  "target": "create:brass_casing",
+  "ingredient": "#c:plates/obsidian",
+  "result": {
+    "id": "create:railway_casing"
+  }
+}

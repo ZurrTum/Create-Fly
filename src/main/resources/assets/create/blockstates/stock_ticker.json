@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=east": {
+      "model": "create:block/stock_ticker",
+      "y": 90
+    },
+    "facing=north": {
+      "model": "create:block/stock_ticker"
+    },
+    "facing=south": {
+      "model": "create:block/stock_ticker",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "create:block/stock_ticker",
+      "y": 270
+    }
+  }
+}

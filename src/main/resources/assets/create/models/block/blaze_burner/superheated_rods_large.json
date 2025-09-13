@@ -1,0 +1,10 @@
+{
+	"parent": "block/block",
+	"loader": "neoforge:obj",
+	"flip_v": true,
+	"model": "create:models/block/blaze_burner/blaze_rods_large.obj",
+	"textures": {
+		"0": "create:block/blaze_super",
+		"particle": "#0"
+	}
+}

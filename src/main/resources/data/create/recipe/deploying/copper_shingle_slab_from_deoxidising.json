@@ -1,0 +1,9 @@
+{
+  "type": "create:deploying",
+  "keep_held_item": true,
+  "target": "create:exposed_copper_shingle_slab",
+  "ingredient": "#minecraft:axes",
+  "result": {
+    "id": "create:copper_shingle_slab"
+  }
+}

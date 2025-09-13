@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    "#c:plates/obsidian",
+    "minecraft:paper"
+  ],
+  "result": {
+    "count": 4,
+    "id": "create:schedule"
+  }
+}

@@ -1,0 +1,30 @@
+{
+	"credit": "Made with Blockbench",
+	"textures": {
+		"0": "create:block/port2",
+		"particle": "create:block/port2"
+	},
+	"elements": [
+		{
+			"from": [6, 9, 4],
+			"to": [10, 10, 11],
+			"rotation": {"angle": 0, "axis": "y", "origin": [6, 9, 4]},
+			"faces": {
+				"north": {"uv": [6, 3, 8, 3.5], "texture": "#0"},
+				"east": {"uv": [6, 3.5, 6.5, 0], "rotation": 90, "texture": "#0"},
+				"south": {"uv": [6, 0, 8, 0.5], "texture": "#0"},
+				"west": {"uv": [7.5, 0, 8, 3.5], "rotation": 90, "texture": "#0"},
+				"up": {"uv": [6, 0, 8, 3.5], "rotation": 180, "texture": "#0"},
+				"down": {"uv": [6, 0, 8, 3.5], "texture": "#0"}
+			}
+		}
+	],
+	"groups": [
+		{
+			"name": "port_tongue",
+			"origin": [8, 8, 8],
+			"color": 0,
+			"children": [0]
+		}
+	]
+}

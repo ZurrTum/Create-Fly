@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "C": "create:cogwheel",
+    "L": "#c:leathers",
+    "S": "#c:plates/gold",
+    "W": "#c:chests/wooden"
+  },
+  "pattern": [
+    " C ",
+    "SWS",
+    " L "
+  ],
+  "result": {
+    "count": 1,
+    "id": "create:brown_toolbox"
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "A": "create:item_vault",
+    "B": "#c:slime_balls",
+    "C": "create:andesite_alloy"
+  },
+  "pattern": [
+    "B",
+    "A",
+    "C"
+  ],
+  "result": {
+    "count": 1,
+    "id": "create:package_frogport"
+  }
+}

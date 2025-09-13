@@ -1,0 +1,17 @@
+# Blender 4.1.1 MTL File: 'conveyor.blend'
+# www.blender.org
+
+newmtl axis
+map_Kd #axis
+
+newmtl axis_top
+map_Kd #axis_top
+
+newmtl bullwheel
+map_Kd #bullwheel
+
+newmtl casing
+map_Kd #conveyor_casing
+
+newmtl shadow
+map_Kd #conveyor_port

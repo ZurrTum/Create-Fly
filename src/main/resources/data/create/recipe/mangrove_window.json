@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "key": {
+    "#": "minecraft:mangrove_planks",
+    "X": "#c:glass_blocks/colorless"
+  },
+  "pattern": [
+    " # ",
+    "#X#"
+  ],
+  "result": {
+    "count": 2,
+    "id": "create:mangrove_window"
+  }
+}

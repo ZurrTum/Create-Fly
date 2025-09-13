@@ -1,0 +1,9 @@
+{
+  "type": "create:deploying",
+  "keep_held_item": true,
+  "target": "minecraft:copper_grate",
+  "ingredient": "minecraft:honeycomb_block",
+  "result": {
+    "id": "minecraft:waxed_copper_grate"
+  }
+}

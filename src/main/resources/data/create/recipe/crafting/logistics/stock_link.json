@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "B": "create:item_vault",
+    "C": "create:transmitter"
+  },
+  "pattern": [
+    "C",
+    "B"
+  ],
+  "result": {
+    "count": 1,
+    "id": "create:stock_link"
+  }
+}

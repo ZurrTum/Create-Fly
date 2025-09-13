@@ -1,0 +1,8 @@
+{
+  "type": "minecraft:stonecutting",
+  "ingredient": "#create:stone_types/calcite",
+  "result": {
+    "count": 1,
+    "id": "minecraft:calcite"
+  }
+}

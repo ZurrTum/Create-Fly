@@ -1,0 +1,9 @@
+{
+  "processing_time": 50,
+  "result": {
+    "id": "minecraft:stripped_cherry_log",
+    "count": 1
+  },
+  "ingredient": "minecraft:cherry_log",
+  "type": "create:cutting"
+}

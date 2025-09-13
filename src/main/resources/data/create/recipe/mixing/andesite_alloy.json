@@ -1,0 +1,7 @@
+{
+  "type": "create:mixing",
+  "ingredients": ["minecraft:andesite", "#c:nuggets/iron"],
+  "result": {
+    "id": "create:andesite_alloy"
+  }
+}

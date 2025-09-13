@@ -1,0 +1,28 @@
+{
+	"credit": "Made with Blockbench",
+	"parent": "block/block",
+	"textures": {
+		"5": "create:block/brass_casing",
+		"particle": "#5"
+	},
+	"elements": [
+		{
+			"name": "belt",
+			"from": [-0.5, 12, 5],
+			"to": [0.5, 20, 6],
+			"faces": {
+				"north": {"uv": [2, 4, 3, 12], "rotation": 180, "texture": "#5"},
+				"west": {"uv": [2, 4, 3, 12], "texture": "#5"}
+			}
+		},
+		{
+			"name": "belt",
+			"from": [-0.5, 12, 10],
+			"to": [0.5, 20, 11],
+			"faces": {
+				"south": {"uv": [2, 4, 3, 12], "texture": "#5"},
+				"west": {"uv": [13, 4, 14, 12], "texture": "#5"}
+			}
+		}
+	]
+}

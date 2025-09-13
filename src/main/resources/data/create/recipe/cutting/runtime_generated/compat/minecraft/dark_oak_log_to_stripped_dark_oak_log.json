@@ -1,0 +1,9 @@
+{
+  "processing_time": 50,
+  "result": {
+    "id": "minecraft:stripped_dark_oak_log",
+    "count": 1
+  },
+  "ingredient": "minecraft:dark_oak_log",
+  "type": "create:cutting"
+}

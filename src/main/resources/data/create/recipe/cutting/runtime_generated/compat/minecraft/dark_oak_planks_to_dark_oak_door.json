@@ -1,0 +1,9 @@
+{
+  "processing_time": 50,
+  "result": {
+    "id": "minecraft:dark_oak_door",
+    "count": 1
+  },
+  "ingredient": "minecraft:dark_oak_planks",
+  "type": "create:cutting"
+}

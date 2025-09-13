@@ -1,0 +1,7 @@
+{
+  "parent": "create:block/package_postbox/item",
+  "textures": {
+    "0": "create:block/post_box/post_box_green",
+    "1": "create:block/post_box/post_box_green_closed"
+  }
+}

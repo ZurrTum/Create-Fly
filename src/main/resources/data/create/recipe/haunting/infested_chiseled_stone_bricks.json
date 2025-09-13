@@ -1,0 +1,9 @@
+{
+  "type": "create:haunting",
+  "ingredient": "minecraft:chiseled_stone_bricks",
+  "results": [
+    {
+      "id": "minecraft:infested_chiseled_stone_bricks"
+    }
+  ]
+}

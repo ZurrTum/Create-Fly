@@ -1,0 +1,8 @@
+{
+  "type": "minecraft:stonecutting",
+  "ingredient": "create:exposed_copper_tiles",
+  "result": {
+    "count": 1,
+    "id": "create:exposed_copper_tile_stairs"
+  }
+}

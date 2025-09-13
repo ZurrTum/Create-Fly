@@ -1,0 +1,67 @@
+{
+  "items": "minecraft:enchanted_golden_apple",
+  "knockback": 0.05,
+  "on_entity_hit": {
+    "type": "create:food_effects",
+    "food_property": {
+      "can_always_eat": true,
+      "effects": [
+        {
+          "effect": {
+            "amplifier": 1,
+            "duration": 400,
+            "id": "minecraft:regeneration",
+            "neoforge:cures": [
+              "protected_by_totem",
+              "milk"
+            ],
+            "show_icon": true
+          }
+        },
+        {
+          "effect": {
+            "duration": 6000,
+            "id": "minecraft:resistance",
+            "neoforge:cures": [
+              "protected_by_totem",
+              "milk"
+            ],
+            "show_icon": true
+          }
+        },
+        {
+          "effect": {
+            "duration": 6000,
+            "id": "minecraft:fire_resistance",
+            "neoforge:cures": [
+              "protected_by_totem",
+              "milk"
+            ],
+            "show_icon": true
+          }
+        },
+        {
+          "effect": {
+            "amplifier": 3,
+            "duration": 2400,
+            "id": "minecraft:absorption",
+            "neoforge:cures": [
+              "protected_by_totem",
+              "milk"
+            ],
+            "show_icon": true
+          }
+        }
+      ],
+      "nutrition": 4,
+      "saturation": 9.6
+    },
+    "recoverable": false
+  },
+  "reload_ticks": 100,
+  "render_mode": {
+    "type": "create:tumble"
+  },
+  "sound_pitch": 1.1,
+  "velocity_multiplier": 1.45
+}

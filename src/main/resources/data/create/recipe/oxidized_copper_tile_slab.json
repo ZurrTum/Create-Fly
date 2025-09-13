@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "key": {
+    "X": "create:oxidized_copper_tiles"
+  },
+  "pattern": [
+    "XXX"
+  ],
+  "result": {
+    "count": 6,
+    "id": "create:oxidized_copper_tile_slab"
+  }
+}

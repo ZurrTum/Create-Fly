@@ -1,0 +1,21 @@
+{
+	"credit": "Made with Blockbench",
+	"textures": {
+		"0": "create:block/pipes",
+		"particle": "block/copper_block"
+	},
+	"elements": [
+		{
+			"from": [3, 3, 3],
+			"to": [13, 13, 13],
+			"faces": {
+				"north": {"uv": [1, 11, 6, 16], "texture": "#0"},
+				"east": {"uv": [1, 11, 6, 16], "texture": "#0"},
+				"south": {"uv": [1, 11, 6, 16], "texture": "#0"},
+				"west": {"uv": [1, 11, 6, 16], "texture": "#0"},
+				"up": {"uv": [1, 11, 6, 16], "texture": "#0"},
+				"down": {"uv": [1, 11, 6, 16], "texture": "#0"}
+			}
+		}
+	]
+}

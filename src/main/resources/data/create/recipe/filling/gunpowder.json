@@ -1,0 +1,18 @@
+{
+  "type": "create:filling",
+  "ingredient": "create:cinder_flour",
+  "fluid_ingredient": {
+    "type": "fluid_stack",
+    "amount": 2700,
+    "components": {
+      "create:potion_fluid_bottle_type": "regular",
+      "minecraft:potion_contents": {
+        "potion": "minecraft:harming"
+      }
+    },
+    "fluid": "create:potion"
+  },
+  "result": {
+    "id": "minecraft:gunpowder"
+  }
+}

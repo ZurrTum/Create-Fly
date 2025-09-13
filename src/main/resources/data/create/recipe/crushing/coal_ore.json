@@ -1,0 +1,22 @@
+{
+  "type": "create:crushing",
+  "ingredient": "minecraft:coal_ore",
+  "processing_time": 150,
+  "results": [
+    {
+      "id": "minecraft:coal"
+    },
+    {
+      "chance": 0.75,
+      "id": "minecraft:coal"
+    },
+    {
+      "chance": 0.75,
+      "id": "create:experience_nugget"
+    },
+    {
+      "chance": 0.125,
+      "id": "minecraft:cobblestone"
+    }
+  ]
+}

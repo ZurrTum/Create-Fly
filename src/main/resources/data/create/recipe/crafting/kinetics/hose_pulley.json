@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "B": "create:copper_casing",
+    "C": "minecraft:dried_kelp_block",
+    "I": "#c:plates/copper"
+  },
+  "pattern": [
+    "B",
+    "C",
+    "I"
+  ],
+  "result": {
+    "count": 1,
+    "id": "create:hose_pulley"
+  }
+}

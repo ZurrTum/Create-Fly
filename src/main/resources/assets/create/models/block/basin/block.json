@@ -1,0 +1,58 @@
+{
+	"credit": "Made with Blockbench",
+	"parent": "block/block",
+	"textures": {
+		"12": "create:block/basin",
+		"particle": "create:block/industrial_iron_block"
+	},
+	"elements": [
+		{
+			"name": "Basin",
+			"from": [0, 2, 0],
+			"to": [16, 16, 16],
+			"faces": {
+				"north": {"uv": [0, 0, 8, 7], "texture": "#12"},
+				"east": {"uv": [0, 0, 8, 7], "texture": "#12"},
+				"south": {"uv": [0, 0, 8, 7], "texture": "#12"},
+				"west": {"uv": [0, 0, 8, 7], "texture": "#12"},
+				"up": {"uv": [0, 8, 8, 16], "texture": "#12"},
+				"down": {"uv": [0, 8, 8, 16], "texture": "#12"}
+			}
+		},
+		{
+			"name": "Basin Interior",
+			"from": [1.95, 16, 1.95],
+			"to": [14.05, 2, 14.05],
+			"faces": {
+				"north": {"uv": [9, 0, 15, 7], "rotation": 180, "texture": "#12"},
+				"east": {"uv": [9, 0, 15, 7], "rotation": 180, "texture": "#12"},
+				"south": {"uv": [9, 0, 15, 7], "rotation": 180, "texture": "#12"},
+				"west": {"uv": [9, 0, 15, 7], "rotation": 180, "texture": "#12"},
+				"up": {"uv": [9, 9, 15, 15], "rotation": 90, "texture": "#12"}
+			}
+		},
+		{
+			"name": "Basin Base",
+			"from": [2, 0, 2],
+			"to": [14, 2, 14],
+			"faces": {
+				"north": {"uv": [1, 7, 7, 8], "texture": "#12"},
+				"east": {"uv": [1, 7, 7, 8], "texture": "#12"},
+				"south": {"uv": [1, 7, 7, 8], "texture": "#12"},
+				"west": {"uv": [1, 7, 7, 8], "texture": "#12"},
+				"down": {"uv": [9, 9, 15, 15], "texture": "#12"}
+			}
+		}
+	],
+	"groups": [
+		{
+			"name": "Basin",
+			"origin": [8, 8, 8],
+			"color": 0,
+			"children": []
+		},
+		0,
+		1,
+		2
+	]
+}

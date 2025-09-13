@@ -1,0 +1,734 @@
+{
+  "blaze_munch": {
+    "sounds": [
+      {
+        "type": "event",
+        "name": "minecraft:entity.generic.eat"
+      }
+    ],
+    "subtitle": "create.subtitle.blaze_munch"
+  },
+  "cardboard_bonk": {
+    "sounds": [
+      {
+        "type": "file",
+        "name": "create:cardboard_bonk"
+      }
+    ],
+    "subtitle": "create.subtitle.cardboard_bonk"
+  },
+  "chiff": {
+    "sounds": [
+      {
+        "type": "file",
+        "name": "create:chiff"
+      }
+    ]
+  },
+  "clipboard_check": {
+    "sounds": [
+      {
+        "type": "file",
+        "name": "create:clipboard_check"
+      }
+    ]
+  },
+  "clipboard_erase": {
+    "sounds": [
+      {
+        "type": "file",
+        "name": "create:clipboard_erase"
+      }
+    ]
+  },
+  "cogs": {
+    "sounds": [
+      {
+        "type": "file",
+        "name": "create:cogs"
+      }
+    ],
+    "subtitle": "create.subtitle.cogs"
+  },
+  "confirm": {
+    "sounds": [
+      {
+        "type": "event",
+        "name": "minecraft:block.note_block.bell"
+      }
+    ],
+    "subtitle": "create.subtitle.confirm"
+  },
+  "confirm_2": {
+    "sounds": [
+      {
+        "type": "file",
+        "name": "create:confirm_2"
+      }
+    ],
+    "subtitle": "create.subtitle.confirm_2"
+  },
+  "contraption_assemble": {
+    "sounds": [
+      {
+        "type": "event",
+        "name": "minecraft:block.wooden_trapdoor.open"
+      }
+    ],
+    "subtitle": "create.subtitle.contraption_assemble"
+  },
+  "contraption_assemble_compounded_1": {
+    "sounds": [
+      {
+        "type": "event",
+        "name": "minecraft:block.chest.open"
+      }
+    ]
+  },
+  "contraption_disassemble": {
+    "sounds": [
+      {
+        "type": "event",
+        "name": "minecraft:block.iron_trapdoor.close"
+      }
+    ],
+    "subtitle": "create.subtitle.contraption_disassemble"
+  },
+  "controller_click": {
+    "sounds": [
+      {
+        "type": "event",
+        "name": "minecraft:entity.item_frame.add_item"
+      }
+    ],
+    "subtitle": "create.subtitle.controller_click"
+  },
+  "controller_put": {
+    "sounds": [
+      {
+        "type": "event",
+        "name": "minecraft:item.book.put"
+      }
+    ],
+    "subtitle": "create.subtitle.controller_put"
+  },
+  "controller_take": {
+    "sounds": [
+      {
+        "type": "event",
+        "name": "minecraft:entity.item_frame.remove_item"
+      }
+    ],
+    "subtitle": "create.subtitle.controller_take"
+  },
+  "copper_armor_equip": {
+    "sounds": [
+      {
+        "type": "event",
+        "name": "minecraft:item.armor.equip_gold"
+      }
+    ],
+    "subtitle": "create.subtitle.copper_armor_equip"
+  },
+  "crafter_click": {
+    "sounds": [
+      {
+        "type": "event",
+        "name": "minecraft:block.netherite_block.hit"
+      }
+    ],
+    "subtitle": "create.subtitle.crafter_click"
+  },
+  "crafter_click_compounded_1": {
+    "sounds": [
+      {
+        "type": "event",
+        "name": "minecraft:block.wooden_trapdoor.open"
+      }
+    ]
+  },
+  "crafter_craft": {
+    "sounds": [
+      {
+        "type": "event",
+        "name": "minecraft:entity.item.break"
+      }
+    ],
+    "subtitle": "create.subtitle.crafter_craft"
+  },
+  "cranking": {
+    "sounds": [
+      {
+        "type": "event",
+        "name": "minecraft:block.wood.place"
+      }
+    ],
+    "subtitle": "create.subtitle.cranking"
+  },
+  "cranking_compounded_1": {
+    "sounds": [
+      {
+        "type": "event",
+        "name": "minecraft:block.wooden_button.click_off"
+      }
+    ]
+  },
+  "crushing_1": {
+    "sounds": [
+      {
+        "type": "event",
+        "name": "minecraft:block.netherrack.hit"
+      }
+    ],
+    "subtitle": "create.subtitle.crushing_1"
+  },
+  "crushing_2": {
+    "sounds": [
+      {
+        "type": "event",
+        "name": "minecraft:block.gravel.place"
+      }
+    ]
+  },
+  "crushing_3": {
+    "sounds": [
+      {
+        "type": "event",
+        "name": "minecraft:block.netherite_block.break"
+      }
+    ]
+  },
+  "deny": {
+    "sounds": [
+      {
+        "type": "event",
+        "name": "minecraft:block.note_block.bass"
+      }
+    ],
+    "subtitle": "create.subtitle.deny"
+  },
+  "depot_plop": {
+    "sounds": [
+      {
+        "type": "event",
+        "name": "minecraft:entity.item_frame.add_item"
+      }
+    ],
+    "subtitle": "create.subtitle.depot_plop"
+  },
+  "depot_slide": {
+    "sounds": [
+      {
+        "type": "event",
+        "name": "minecraft:block.sand.break"
+      }
+    ],
+    "subtitle": "create.subtitle.depot_slide"
+  },
+  "desk_bell": {
+    "sounds": [
+      {
+        "type": "file",
+        "attenuation_distance": 64,
+        "name": "create:desk_bell"
+      }
+    ],
+    "subtitle": "create.subtitle.desk_bell"
+  },
+  "frogport_catch": {
+    "sounds": [
+      {
+        "type": "file",
+        "name": "create:frogport_catch"
+      },
+      {
+        "type": "file",
+        "name": "create:frogport_catch_1"
+      },
+      {
+        "type": "file",
+        "name": "create:frogport_catch_2"
+      },
+      {
+        "type": "file",
+        "name": "create:frogport_catch_3"
+      }
+    ],
+    "subtitle": "create.subtitle.frogport_catch"
+  },
+  "frogport_close": {
+    "sounds": [
+      {
+        "type": "file",
+        "name": "create:frogport_close"
+      }
+    ],
+    "subtitle": "create.subtitle.frogport_close"
+  },
+  "frogport_deposit": {
+    "sounds": [
+      {
+        "type": "event",
+        "name": "minecraft:entity.frog.tongue"
+      }
+    ],
+    "subtitle": "create.subtitle.frogport_deposit"
+  },
+  "frogport_open": {
+    "sounds": [
+      {
+        "type": "event",
+        "name": "minecraft:entity.warden.tendril_clicks"
+      }
+    ],
+    "subtitle": "create.subtitle.frogport_open"
+  },
+  "funnel_flap": {
+    "sounds": [
+      {
+        "type": "event",
+        "name": "minecraft:entity.item_frame.rotate_item"
+      }
+    ],
+    "subtitle": "create.subtitle.funnel_flap"
+  },
+  "funnel_flap_compounded_1": {
+    "sounds": [
+      {
+        "type": "event",
+        "name": "minecraft:block.wool.break"
+      }
+    ]
+  },
+  "fwoomp": {
+    "sounds": [
+      {
+        "type": "file",
+        "name": "create:fwoomp"
+      }
+    ],
+    "subtitle": "create.subtitle.fwoomp"
+  },
+  "haunted_bell_convert": {
+    "sounds": [
+      {
+        "type": "file",
+        "name": "create:haunted_bell_convert"
+      }
+    ],
+    "subtitle": "create.subtitle.haunted_bell_convert"
+  },
+  "haunted_bell_use": {
+    "sounds": [
+      {
+        "type": "file",
+        "name": "create:haunted_bell_use"
+      }
+    ],
+    "subtitle": "create.subtitle.haunted_bell_use"
+  },
+  "item_hatch": {
+    "sounds": [
+      {
+        "type": "event",
+        "name": "minecraft:block.barrel.open"
+      }
+    ],
+    "subtitle": "create.subtitle.item_hatch"
+  },
+  "item_hatch_compounded_1": {
+    "sounds": [
+      {
+        "type": "event",
+        "name": "minecraft:block.netherite_block.place"
+      }
+    ]
+  },
+  "mechanical_press_activation": {
+    "sounds": [
+      {
+        "type": "event",
+        "name": "minecraft:block.anvil.land"
+      }
+    ],
+    "subtitle": "create.subtitle.mechanical_press_activation"
+  },
+  "mechanical_press_activation_belt": {
+    "sounds": [
+      {
+        "type": "event",
+        "name": "minecraft:block.wool.hit"
+      }
+    ],
+    "subtitle": "create.subtitle.mechanical_press_activation_belt"
+  },
+  "mechanical_press_activation_belt_compounded_1": {
+    "sounds": [
+      {
+        "type": "event",
+        "name": "minecraft:entity.item.break"
+      }
+    ]
+  },
+  "mechanical_press_activation_compounded_1": {
+    "sounds": [
+      {
+        "type": "event",
+        "name": "minecraft:entity.item.break"
+      }
+    ]
+  },
+  "mixing": {
+    "sounds": [
+      {
+        "type": "event",
+        "name": "minecraft:block.gilded_blackstone.break"
+      }
+    ],
+    "subtitle": "create.subtitle.mixing"
+  },
+  "mixing_compounded_1": {
+    "sounds": [
+      {
+        "type": "event",
+        "name": "minecraft:block.netherrack.break"
+      }
+    ]
+  },
+  "package_pop": {
+    "sounds": [
+      {
+        "type": "event",
+        "name": "minecraft:block.chiseled_bookshelf.break"
+      }
+    ],
+    "subtitle": "create.subtitle.package_pop"
+  },
+  "package_pop_compounded_1": {
+    "sounds": [
+      {
+        "type": "event",
+        "name": "minecraft:block.wool.break"
+      }
+    ]
+  },
+  "packager": {
+    "sounds": [
+      {
+        "type": "event",
+        "name": "minecraft:entity.shulker.open"
+      }
+    ],
+    "subtitle": "create.subtitle.packager"
+  },
+  "peculiar_bell_use": {
+    "sounds": [
+      {
+        "type": "event",
+        "name": "minecraft:block.bell.use"
+      }
+    ],
+    "subtitle": "create.subtitle.peculiar_bell_use"
+  },
+  "potato_hit": {
+    "sounds": [
+      {
+        "type": "event",
+        "name": "minecraft:entity.item_frame.break"
+      }
+    ],
+    "subtitle": "create.subtitle.potato_hit"
+  },
+  "potato_hit_compounded_1": {
+    "sounds": [
+      {
+        "type": "event",
+        "name": "minecraft:block.weeping_vines.break"
+      }
+    ]
+  },
+  "sanding_long": {
+    "sounds": [
+      {
+        "type": "file",
+        "name": "create:sanding_long"
+      }
+    ],
+    "subtitle": "create.subtitle.sanding_long"
+  },
+  "sanding_short": {
+    "sounds": [
+      {
+        "type": "file",
+        "name": "create:sanding_short"
+      },
+      {
+        "type": "file",
+        "name": "create:sanding_short_1"
+      }
+    ],
+    "subtitle": "create.subtitle.sanding_short"
+  },
+  "saw_activate_stone": {
+    "sounds": [
+      {
+        "type": "event",
+        "name": "minecraft:ui.stonecutter.take_result"
+      }
+    ],
+    "subtitle": "create.subtitle.saw_activate_stone"
+  },
+  "saw_activate_wood": {
+    "sounds": [
+      {
+        "type": "event",
+        "name": "minecraft:entity.boat.paddle_land"
+      }
+    ],
+    "subtitle": "create.subtitle.saw_activate_wood"
+  },
+  "schematicannon_finish": {
+    "sounds": [
+      {
+        "type": "event",
+        "name": "minecraft:block.note_block.bell"
+      }
+    ],
+    "subtitle": "create.subtitle.schematicannon_finish"
+  },
+  "schematicannon_launch_block": {
+    "sounds": [
+      {
+        "type": "event",
+        "name": "minecraft:entity.generic.explode"
+      }
+    ],
+    "subtitle": "create.subtitle.schematicannon_launch_block"
+  },
+  "scroll_value": {
+    "sounds": [
+      {
+        "type": "event",
+        "name": "minecraft:block.note_block.hat"
+      }
+    ],
+    "subtitle": "create.subtitle.scroll_value"
+  },
+  "slime_added": {
+    "sounds": [
+      {
+        "type": "event",
+        "name": "minecraft:block.slime_block.place"
+      }
+    ],
+    "subtitle": "create.subtitle.slime_added"
+  },
+  "spout": {
+    "sounds": [
+      {
+        "type": "file",
+        "name": "create:spout"
+      },
+      {
+        "type": "file",
+        "name": "create:spout_1"
+      },
+      {
+        "type": "file",
+        "name": "create:spout_2"
+      },
+      {
+        "type": "file",
+        "name": "create:spout_3"
+      }
+    ],
+    "subtitle": "create.subtitle.spout"
+  },
+  "steam": {
+    "sounds": [
+      {
+        "type": "file",
+        "attenuation_distance": 32,
+        "name": "create:steam"
+      }
+    ],
+    "subtitle": "create.subtitle.steam"
+  },
+  "stock_link": {
+    "sounds": [
+      {
+        "type": "file",
+        "name": "create:stock_link"
+      }
+    ],
+    "subtitle": "create.subtitle.stock_link"
+  },
+  "stock_ticker_request": {
+    "sounds": [
+      {
+        "type": "file",
+        "name": "create:stock_ticker_request"
+      }
+    ],
+    "subtitle": "create.subtitle.stock_ticker_request"
+  },
+  "stock_ticker_trade": {
+    "sounds": [
+      {
+        "type": "file",
+        "name": "create:stock_ticker_trade"
+      }
+    ],
+    "subtitle": "create.subtitle.stock_ticker_trade"
+  },
+  "train": {
+    "sounds": [
+      {
+        "type": "file",
+        "attenuation_distance": 128,
+        "name": "create:train"
+      }
+    ],
+    "subtitle": "create.subtitle.train"
+  },
+  "train2": {
+    "sounds": [
+      {
+        "type": "file",
+        "attenuation_distance": 128,
+        "name": "create:train2"
+      }
+    ]
+  },
+  "train3": {
+    "sounds": [
+      {
+        "type": "file",
+        "attenuation_distance": 16,
+        "name": "create:train3"
+      }
+    ],
+    "subtitle": "create.subtitle.train3"
+  },
+  "whistle": {
+    "sounds": [
+      {
+        "type": "file",
+        "attenuation_distance": 64,
+        "name": "create:whistle"
+      }
+    ],
+    "subtitle": "create.subtitle.whistle"
+  },
+  "whistle_high": {
+    "sounds": [
+      {
+        "type": "file",
+        "attenuation_distance": 64,
+        "name": "create:whistle_high"
+      }
+    ],
+    "subtitle": "create.subtitle.whistle_high"
+  },
+  "whistle_low": {
+    "sounds": [
+      {
+        "type": "file",
+        "attenuation_distance": 64,
+        "name": "create:whistle_low"
+      }
+    ],
+    "subtitle": "create.subtitle.whistle_low"
+  },
+  "whistle_train": {
+    "sounds": [
+      {
+        "type": "file",
+        "name": "create:whistle_train"
+      }
+    ],
+    "subtitle": "create.subtitle.whistle_train"
+  },
+  "whistle_train_low": {
+    "sounds": [
+      {
+        "type": "file",
+        "name": "create:whistle_train_low"
+      }
+    ],
+    "subtitle": "create.subtitle.whistle_train_low"
+  },
+  "whistle_train_manual": {
+    "sounds": [
+      {
+        "type": "file",
+        "attenuation_distance": 64,
+        "name": "create:whistle_train_manual"
+      }
+    ],
+    "subtitle": "create.subtitle.whistle_train_manual"
+  },
+  "whistle_train_manual_end": {
+    "sounds": [
+      {
+        "type": "file",
+        "attenuation_distance": 64,
+        "name": "create:whistle_train_manual_end"
+      }
+    ]
+  },
+  "whistle_train_manual_low": {
+    "sounds": [
+      {
+        "type": "file",
+        "attenuation_distance": 64,
+        "name": "create:whistle_train_manual_low"
+      }
+    ],
+    "subtitle": "create.subtitle.whistle_train_manual_low"
+  },
+  "whistle_train_manual_low_end": {
+    "sounds": [
+      {
+        "type": "file",
+        "attenuation_distance": 64,
+        "name": "create:whistle_train_manual_low_end"
+      }
+    ]
+  },
+  "worldshaper_place": {
+    "sounds": [
+      {
+        "type": "event",
+        "name": "minecraft:block.note_block.basedrum"
+      }
+    ],
+    "subtitle": "create.subtitle.worldshaper_place"
+  },
+  "wrench_remove": {
+    "sounds": [
+      {
+        "type": "event",
+        "name": "minecraft:entity.item.pickup"
+      }
+    ],
+    "subtitle": "create.subtitle.wrench_remove"
+  },
+  "wrench_remove_compounded_1": {
+    "sounds": [
+      {
+        "type": "event",
+        "name": "minecraft:block.netherite_block.hit"
+      }
+    ]
+  },
+  "wrench_rotate": {
+    "sounds": [
+      {
+        "type": "event",
+        "name": "minecraft:block.wooden_trapdoor.close"
+      }
+    ],
+    "subtitle": "create.subtitle.wrench_rotate"
+  }
+}

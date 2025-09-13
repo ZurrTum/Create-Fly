@@ -1,0 +1,22 @@
+{
+	"credit": "Made with Blockbench",
+	"parent": "block/block",
+	"textures": {
+		"0": "create:block/spout_nozzle",
+		"particle": "create:block/spout_nozzle"
+	},
+	"elements": [
+		{
+			"from": [5, -4, 5],
+			"to": [11, -2, 11],
+			"rotation": {"angle": 0, "axis": "y", "origin": [16.5, 3.5, 16.5]},
+			"faces": {
+				"north": {"uv": [5, 14, 11, 16], "texture": "#0"},
+				"east": {"uv": [5, 14, 11, 16], "texture": "#0"},
+				"south": {"uv": [5, 14, 11, 16], "texture": "#0"},
+				"west": {"uv": [5, 14, 11, 16], "texture": "#0"},
+				"down": {"uv": [5, 5, 11, 11], "texture": "#0"}
+			}
+		}
+	]
+}

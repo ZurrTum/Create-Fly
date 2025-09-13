@@ -1,0 +1,107 @@
+{
+  "sources": [
+    {
+      "type": "single",
+      "resource": "create:block/factory_panel"
+    },
+    {
+      "type": "single",
+      "resource": "create:block/factory_panel_connections"
+    },
+    {
+      "type": "single",
+      "resource": "create:block/factory_panel_connections_animated"
+    },
+    {
+      "type": "single",
+      "resource": "create:entity/blueprint_large"
+    },
+    {
+      "type": "single",
+      "resource": "create:entity/blueprint_medium"
+    },
+    {
+      "type": "single",
+      "resource": "create:entity/blueprint_small"
+    },
+    {
+      "type": "single",
+      "resource": "create:entity/coupling"
+    },
+    {
+      "type": "single",
+      "resource": "create:entity/train_hat"
+    },
+    {
+      "type": "single",
+      "resource": "create:entity/logistics_hat"
+    },
+    {
+      "type": "single",
+      "resource": "create:fluid/chocolate_flow"
+    },
+    {
+      "type": "single",
+      "resource": "create:fluid/chocolate_still"
+    },
+    {
+      "type": "single",
+      "resource": "create:fluid/honey_flow"
+    },
+    {
+      "type": "single",
+      "resource": "create:fluid/honey_still"
+    },
+    {
+      "type": "single",
+      "resource": "create:fluid/potion_flow"
+    },
+    {
+      "type": "single",
+      "resource": "create:fluid/potion_still"
+    },
+    {
+      "type": "single",
+      "resource": "create:fluid/tea_flow"
+    },
+    {
+      "type": "single",
+      "resource": "create:fluid/tea_still"
+    },
+    {
+      "type": "single",
+      "resource": "create:fluid/milk_flow"
+    },
+    {
+      "type": "single",
+      "resource": "create:fluid/milk_still"
+    },
+    {
+      "type": "paletted_permutations",
+      "textures": [
+        "create:trims/items/card_leggings_trim",
+        "create:trims/items/card_chestplate_trim",
+        "create:trims/items/card_helmet_trim",
+        "create:trims/items/card_boots_trim"
+      ],
+      "palette_key": "minecraft:trims/color_palettes/trim_palette",
+      "permutations": {
+        "quartz": "minecraft:trims/color_palettes/quartz",
+        "iron": "minecraft:trims/color_palettes/iron",
+        "gold": "minecraft:trims/color_palettes/gold",
+        "diamond": "minecraft:trims/color_palettes/diamond",
+        "netherite": "minecraft:trims/color_palettes/netherite",
+        "redstone": "minecraft:trims/color_palettes/redstone",
+        "copper": "minecraft:trims/color_palettes/copper",
+        "emerald": "minecraft:trims/color_palettes/emerald",
+        "lapis": "minecraft:trims/color_palettes/lapis",
+        "amethyst": "minecraft:trims/color_palettes/amethyst",
+        "iron_darker": "minecraft:trims/color_palettes/iron_darker",
+        "gold_darker": "minecraft:trims/color_palettes/gold_darker",
+        "diamond_darker": "minecraft:trims/color_palettes/diamond_darker",
+        "netherite_darker": "minecraft:trims/color_palettes/netherite_darker",
+        "resin": "minecraft:trims/color_palettes/resin"
+      }
+    }
+  ]
+}

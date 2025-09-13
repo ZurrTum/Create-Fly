@@ -1,0 +1,9 @@
+{
+  "processing_time": 50,
+  "result": {
+    "id": "minecraft:stripped_cherry_wood",
+    "count": 1
+  },
+  "ingredient": "minecraft:cherry_wood",
+  "type": "create:cutting"
+}

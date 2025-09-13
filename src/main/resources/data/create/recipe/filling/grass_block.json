@@ -1,0 +1,12 @@
+{
+  "type": "create:filling",
+  "ingredient": "minecraft:dirt",
+  "fluid_ingredient": {
+    "type": "fluid_stack",
+    "amount": 40500,
+    "fluid": "minecraft:water"
+  },
+  "result": {
+    "id": "minecraft:grass_block"
+  }
+}

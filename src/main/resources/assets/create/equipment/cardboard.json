@@ -1,0 +1,14 @@
+{
+  "layers": {
+    "humanoid": [
+      {
+        "texture": "create:cardboard"
+      }
+    ],
+    "humanoid_leggings": [
+      {
+        "texture": "create:cardboard"
+      }
+    ]
+  }
+}

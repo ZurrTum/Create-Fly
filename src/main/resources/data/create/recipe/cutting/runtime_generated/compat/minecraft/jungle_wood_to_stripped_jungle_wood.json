@@ -1,0 +1,9 @@
+{
+  "processing_time": 50,
+  "result": {
+    "id": "minecraft:stripped_jungle_wood",
+    "count": 1
+  },
+  "ingredient": "minecraft:jungle_wood",
+  "type": "create:cutting"
+}

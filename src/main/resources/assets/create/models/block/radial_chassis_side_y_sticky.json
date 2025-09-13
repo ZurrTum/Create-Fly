@@ -1,0 +1,7 @@
+{
+  "parent": "create:block/radial_chassis/side_y",
+  "textures": {
+    "side": "create:block/radial_chassis_side_sticky",
+    "particle": "create:block/radial_chassis_side_sticky"
+  }
+}

@@ -1,0 +1,51 @@
+package com.zurrtum.create.client.flywheel.lib.memory;
+
+import java.nio.ByteBuffer;
+
+public sealed interface MemoryBlock permits AbstractMemoryBlockImpl {
+    long ptr();
+
+    long size();
+
+    boolean isFreed();
+
+    boolean isTracked();
+
+    void copyTo(MemoryBlock block);
+
+    void copyTo(long ptr, long bytes);
+
+    void copyTo(long ptr);
+
+    void clear();
+
+    ByteBuffer asBuffer();
+
+    MemoryBlock realloc(long size);
+
+    void free();
+
+    static MemoryBlock malloc(long size) {
+        if (MemoryBlockImpl.DEBUG_MEMORY_SAFETY) {
+            return DebugMemoryBlockImpl.malloc(size);
+        } else {
+            return MemoryBlockImpl.malloc(size);
+        }
+    }
+
+    static MemoryBlock mallocTracked(long size) {
+        return TrackedMemoryBlockImpl.malloc(size);
+    }
+
+    static MemoryBlock calloc(long num, long size) {
+        if (MemoryBlockImpl.DEBUG_MEMORY_SAFETY) {
+            return DebugMemoryBlockImpl.calloc(num, size);
+        } else {
+            return MemoryBlockImpl.calloc(num, size);
+        }
+    }
+
+    static MemoryBlock callocTracked(long num, long size) {
+        return TrackedMemoryBlockImpl.calloc(num, size);
+    }
+}

@@ -1,0 +1,11 @@
+# Blender 4.3.2 MTL File: 'Bogey.blend'
+# www.blender.org
+
+newmtl Bogey_Body
+map_Kd #bogey
+
+newmtl Bogey_Piston
+map_Kd #piston
+
+newmtl wheel_Large
+map_Kd #wheel

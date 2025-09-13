@@ -1,0 +1,20 @@
+{
+	"credit": "Made with Blockbench",
+	"textures": {
+		"0": "create:block/hat_test",
+		"particle": "create:block/hat_test"
+	},
+  "render_type": "minecraft:cutout",
+	"elements": [
+		{
+			"from": [3.95, 0, 3.95],
+			"to": [12.05, 4, 12.05],
+			"faces": {
+				"north": {"uv": [8, 2, 16, 6], "texture": "#0"},
+				"east": {"uv": [0, 2, 8, 6], "texture": "#0"},
+				"south": {"uv": [8, 10, 16, 14], "texture": "#0"},
+				"west": {"uv": [0, 10, 8, 14], "texture": "#0"}
+			}
+		}
+	]
+}

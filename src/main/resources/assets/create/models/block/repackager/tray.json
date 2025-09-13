@@ -1,0 +1,31 @@
+{
+	"credit": "Made with Blockbench",
+	"render_type": "cutout",
+	"textures": {
+		"1": "create:block/packager_details",
+		"particle": "#1"
+	},
+	"elements": [
+		{
+			"from": [2, 2, 2],
+			"to": [14, 4, 14],
+			"rotation": {"angle": 0, "axis": "y", "origin": [2, 2, 2]},
+			"faces": {
+				"north": {"uv": [1, 14.5, 7, 15.5], "texture": "#1"},
+				"east": {"uv": [1, 14.5, 7, 15.5], "texture": "#1"},
+				"south": {"uv": [1, 14.5, 7, 15.5], "texture": "#1"},
+				"west": {"uv": [1, 14.5, 7, 15.5], "texture": "#1"},
+				"up": {"uv": [1, 9, 7, 15], "texture": "#1"},
+				"down": {"uv": [1, 1, 7, 7], "texture": "#1"}
+			}
+		}
+	],
+	"groups": [
+		{
+			"name": "sled",
+			"origin": [8, 8, 8],
+			"color": 0,
+			"children": [0]
+		}
+	]
+}

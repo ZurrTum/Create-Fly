@@ -1,0 +1,24 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:mod_loaded",
+      "modid": "neapolitan"
+    }
+  ],
+  "type": "create:filling",
+  "ingredients": [
+    {
+      "item": "minecraft:glass_bottle"
+    },
+    {
+      "type": "fluid_tag",
+      "amount": 27000,
+      "fluid_tag": "c:milk"
+    }
+  ],
+  "results": [
+    {
+      "id": "neapolitan:milk_bottle"
+    }
+  ]
+}

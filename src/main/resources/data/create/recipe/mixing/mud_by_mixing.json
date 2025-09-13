@@ -1,0 +1,16 @@
+{
+  "type": "create:mixing",
+  "ingredients": [
+    "#create:convertable_to_mud"
+  ],
+  "fluid_ingredients": [
+    {
+      "type": "fluid_stack",
+      "amount": 20250,
+      "fluid": "minecraft:water"
+    }
+  ],
+  "result": {
+    "id": "minecraft:mud"
+  }
+}

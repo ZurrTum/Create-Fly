@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "building",
+  "ingredients": [
+    "#c:dyes/pink",
+    "#create:dyed_table_cloths"
+  ],
+  "result": {
+    "count": 1,
+    "id": "create:pink_table_cloth"
+  }
+}

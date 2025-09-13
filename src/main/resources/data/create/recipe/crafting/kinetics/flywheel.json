@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "A": "create:shaft",
+    "C": "#c:ingots/brass"
+  },
+  "pattern": [
+    "CCC",
+    "CAC",
+    "CCC"
+  ],
+  "result": {
+    "count": 1,
+    "id": "create:flywheel"
+  }
+}

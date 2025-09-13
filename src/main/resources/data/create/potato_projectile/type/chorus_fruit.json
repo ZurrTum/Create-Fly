@@ -1,0 +1,14 @@
+{
+  "damage": 3,
+  "items": "minecraft:chorus_fruit",
+  "knockback": 0.05,
+  "on_entity_hit": {
+    "type": "create:chorus_teleport",
+    "teleport_diameter": 20.0
+  },
+  "reload_ticks": 15,
+  "render_mode": {
+    "type": "create:tumble"
+  },
+  "velocity_multiplier": 1.2
+}

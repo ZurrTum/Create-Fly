@@ -1,0 +1,110 @@
+package com.zurrtum.create.client.flywheel.backend.engine.uniform;
+
+import com.zurrtum.create.client.flywheel.lib.util.ExtraMemoryOps;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
+import net.minecraft.fluid.FluidState;
+import net.minecraft.registry.tag.FluidTags;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.World;
+import org.joml.Matrix4f;
+import org.joml.Vector3fc;
+import org.lwjgl.system.MemoryUtil;
+
+class UniformWriter {
+    static long writeInt(long ptr, int value) {
+        MemoryUtil.memPutInt(ptr, value);
+        return ptr + 4;
+    }
+
+    static long writeFloat(long ptr, float value) {
+        MemoryUtil.memPutFloat(ptr, value);
+        return ptr + 4;
+    }
+
+    static long writeVec2(long ptr, float x, float y) {
+        MemoryUtil.memPutFloat(ptr, x);
+        MemoryUtil.memPutFloat(ptr + 4, y);
+        return ptr + 8;
+    }
+
+    static long writeVec3(long ptr, float x, float y, float z) {
+        MemoryUtil.memPutFloat(ptr, x);
+        MemoryUtil.memPutFloat(ptr + 4, y);
+        MemoryUtil.memPutFloat(ptr + 8, z);
+        MemoryUtil.memPutFloat(ptr + 12, 0f); // empty component of vec4 because we don't trust std140
+        return ptr + 16;
+    }
+
+    static long writeVec3(long ptr, Vector3fc vec) {
+        return writeVec3(ptr, vec.x(), vec.y(), vec.z());
+    }
+
+    static long writeVec4(long ptr, float x, float y, float z, float w) {
+        MemoryUtil.memPutFloat(ptr, x);
+        MemoryUtil.memPutFloat(ptr + 4, y);
+        MemoryUtil.memPutFloat(ptr + 8, z);
+        MemoryUtil.memPutFloat(ptr + 12, w);
+        return ptr + 16;
+    }
+
+    static long writeIVec2(long ptr, int x, int y) {
+        MemoryUtil.memPutInt(ptr, x);
+        MemoryUtil.memPutInt(ptr + 4, y);
+        return ptr + 8;
+    }
+
+    static long writeIVec3(long ptr, int x, int y, int z) {
+        MemoryUtil.memPutInt(ptr, x);
+        MemoryUtil.memPutInt(ptr + 4, y);
+        MemoryUtil.memPutInt(ptr + 8, z);
+        MemoryUtil.memPutInt(ptr + 12, 0); // empty component of vec4 because we don't trust std140
+        return ptr + 16;
+    }
+
+    static long writeIVec4(long ptr, int x, int y, int z, int w) {
+        MemoryUtil.memPutInt(ptr, x);
+        MemoryUtil.memPutInt(ptr + 4, y);
+        MemoryUtil.memPutInt(ptr + 8, z);
+        MemoryUtil.memPutInt(ptr + 12, w);
+        return ptr + 16;
+    }
+
+    static long writeMat4(long ptr, Matrix4f mat) {
+        ExtraMemoryOps.putMatrix4f(ptr, mat);
+        return ptr + 64;
+    }
+
+    static long writeInFluidAndBlock(long ptr, World level, BlockPos blockPos, Vec3d pos) {
+        FluidState fluidState = level.getFluidState(blockPos);
+        BlockState blockState = level.getBlockState(blockPos);
+        float height = fluidState.getHeight(level, blockPos);
+
+        if (fluidState.isEmpty()) {
+            MemoryUtil.memPutInt(ptr, 0);
+        } else if (pos.y < blockPos.getY() + height) {
+            // TODO: handle custom fluids via defines
+            if (fluidState.isIn(FluidTags.WATER)) {
+                MemoryUtil.memPutInt(ptr, 1);
+            } else if (fluidState.isIn(FluidTags.LAVA)) {
+                MemoryUtil.memPutInt(ptr, 2);
+            } else {
+                MemoryUtil.memPutInt(ptr, -1);
+            }
+        }
+
+        if (blockState.isAir()) {
+            MemoryUtil.memPutInt(ptr + 4, 0);
+        } else {
+            // TODO: handle custom blocks via defines
+            if (blockState.isOf(Blocks.POWDER_SNOW)) {
+                MemoryUtil.memPutInt(ptr + 4, 0);
+            } else {
+                MemoryUtil.memPutInt(ptr + 4, -1);
+            }
+        }
+
+        return ptr + 8;
+    }
+}

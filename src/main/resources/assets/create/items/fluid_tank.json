@@ -1,0 +1,6 @@
+{
+  "model": {
+    "type": "minecraft:model",
+    "model": "create:block/fluid_tank/block_single_window"
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "processing_time": 50,
+  "result": {
+    "id": "minecraft:acacia_door",
+    "count": 1
+  },
+  "ingredient": "minecraft:acacia_planks",
+  "type": "create:cutting"
+}

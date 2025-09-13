@@ -1,0 +1,12 @@
+{
+  "type": "create:filling",
+  "ingredient": "minecraft:bread",
+  "fluid_ingredient": {
+    "type": "fluid_tag",
+    "amount": 20250,
+    "fluid_tag": "#c:milk"
+  },
+  "result": {
+    "id": "create:sweet_roll"
+  }
+}

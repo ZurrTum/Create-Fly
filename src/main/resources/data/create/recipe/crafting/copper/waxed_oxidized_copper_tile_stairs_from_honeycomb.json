@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "building",
+  "ingredients": [
+    "create:oxidized_copper_tile_stairs",
+    "minecraft:honeycomb"
+  ],
+  "result": {
+    "count": 1,
+    "id": "create:waxed_oxidized_copper_tile_stairs"
+  }
+}

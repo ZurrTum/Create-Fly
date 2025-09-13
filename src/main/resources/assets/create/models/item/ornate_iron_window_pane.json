@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "create:block/palettes/ornate_iron_window"
+  }
+}

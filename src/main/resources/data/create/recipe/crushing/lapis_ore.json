@@ -1,0 +1,23 @@
+{
+  "type": "create:crushing",
+  "ingredient": "minecraft:lapis_ore",
+  "processing_time": 250,
+  "results": [
+    {
+      "count": 10,
+      "id": "minecraft:lapis_lazuli"
+    },
+    {
+      "chance": 0.5,
+      "id": "minecraft:lapis_lazuli"
+    },
+    {
+      "chance": 0.75,
+      "id": "create:experience_nugget"
+    },
+    {
+      "chance": 0.125,
+      "id": "minecraft:cobblestone"
+    }
+  ]
+}

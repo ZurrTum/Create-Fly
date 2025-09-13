@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "L": "#c:plates/copper",
+    "N": "minecraft:lightning_rod",
+    "R": "#c:dusts/redstone"
+  },
+  "pattern": [
+    " N ",
+    "LLL",
+    " R "
+  ],
+  "result": {
+    "count": 1,
+    "id": "create:transmitter"
+  }
+}

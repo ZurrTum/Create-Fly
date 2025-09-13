@@ -1,0 +1,79 @@
+{
+  "textures": {
+    "torch": "minecraft:block/redstone_torch"
+  },
+  "elements": [
+    {
+      "from": [2.75, 4.25, 4.25],
+      "to": [4.25, 5.75, 5.75],
+      "shade": false,
+      "faces": {
+        "up": { "uv": [6, 5, 7, 6], "texture": "#torch" }
+      }
+    },
+    {
+      "from": [2.75, 7.25, 4.25],
+      "to": [4.25, 8.75, 5.75],
+      "shade": false,
+      "faces": {
+        "down": { "uv": [6, 5, 7, 6], "texture": "#torch" }
+      }
+    },
+    {
+      "from": [2.75, 5.75, 2.75],
+      "to": [4.25, 7.25, 4.25],
+      "shade": false,
+      "faces": {
+        "south": { "uv": [6, 5, 7, 6], "texture": "#torch" }
+      }
+    },
+    {
+      "from": [2.75, 5.75, 5.75],
+      "to": [4.25, 7.25, 7.25],
+      "shade": false,
+      "faces": {
+        "north": { "uv": [6, 5, 7, 6], "texture": "#torch" }
+      }
+    },
+    {
+      "from": [1.25, 5.75, 4.25],
+      "to": [2.75, 7.25, 5.75],
+      "shade": false,
+      "faces": {
+        "east": { "uv": [6, 5, 7, 6], "texture": "#torch" }
+      }
+    },
+    {
+      "from": [4.25, 5.75, 4.25],
+      "to": [5.75, 7.25, 5.75],
+      "shade": false,
+      "faces": {
+        "west": { "uv": [6, 5, 7, 6], "texture": "#torch" }
+      }
+    },
+    {
+      "from": [3, 0, 4.5],
+      "to": [4, 3.5, 5.5],
+      "shade": false,
+      "faces": {
+        "north": { "uv": [7, 9, 9, 16], "texture": "#torch" },
+        "east": { "uv": [7, 9, 9, 16], "texture": "#torch" },
+        "south": { "uv": [7, 9, 9, 16], "texture": "#torch" },
+        "west": { "uv": [7, 9, 9, 16], "texture": "#torch" },
+        "down": { "uv": [7, 13, 9, 15], "texture": "#torch" }
+      }
+    },
+    {
+      "from": [3, 3.5, 4.5],
+      "to": [4, 7, 5.5],
+      "shade": false,
+      "faces": {
+        "north": { "uv": [7, 6, 9, 13], "texture": "#torch" },
+        "east": { "uv": [7, 6, 9, 13], "texture": "#torch" },
+        "south": { "uv": [7, 6, 9, 13], "texture": "#torch" },
+        "west": { "uv": [7, 6, 9, 13], "texture": "#torch" },
+        "up": { "uv": [7, 6, 9, 8], "texture": "#torch" }
+      }
+    }
+  ]
+}

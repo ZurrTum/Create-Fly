@@ -1,0 +1,31 @@
+{
+	"credit": "Made with Blockbench",
+	"textures": {
+		"1": "create:block/packager_details",
+		"3": "create:block/packager_iris_closed",
+		"particle": "create:block/vault/vault_front_small"
+	},
+	"elements": [
+		{
+			"from": [1.05, 1.05, 7],
+			"to": [14.95, 14.95, 10.05],
+			"rotation": {"angle": 0, "axis": "y", "origin": [1, 1, -2]},
+			"faces": {
+				"north": {"uv": [1, 1, 15, 15], "texture": "#3"},
+				"east": {"uv": [8, 8.5, 9.5, 15.5], "texture": "#1"},
+				"south": {"uv": [1, 1, 15, 15], "texture": "#3"},
+				"west": {"uv": [8, 8.5, 9.5, 15.5], "texture": "#1"},
+				"up": {"uv": [8, 8.5, 9.5, 15.5], "rotation": 90, "texture": "#1"},
+				"down": {"uv": [8, 8.5, 9.5, 15.5], "rotation": 90, "texture": "#1"}
+			}
+		}
+	],
+	"groups": [
+		{
+			"name": "door",
+			"origin": [8, 8, 8],
+			"color": 0,
+			"children": [0]
+		}
+	]
+}

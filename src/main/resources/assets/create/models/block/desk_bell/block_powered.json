@@ -1,0 +1,43 @@
+{
+	"credit": "Made with Blockbench",
+	"parent": "block/block",
+	"textures": {
+		"0": "create:block/desk_bell",
+		"particle": "create:block/desk_bell"
+	},
+	"elements": [
+		{
+			"from": [3, 0, 3],
+			"to": [13, 3, 13],
+			"rotation": {"angle": 0, "axis": "y", "origin": [3, 0, 3]},
+			"faces": {
+				"north": {"uv": [1.5, 6.5, 6.5, 8], "texture": "#0"},
+				"east": {"uv": [1.5, 6.5, 6.5, 8], "texture": "#0"},
+				"south": {"uv": [1.5, 6.5, 6.5, 8], "texture": "#0"},
+				"west": {"uv": [1.5, 6.5, 6.5, 8], "texture": "#0"},
+				"up": {"uv": [1.5, 9.5, 6.5, 14.5], "texture": "#0"},
+				"down": {"uv": [9.5, 9.5, 14.5, 14.5], "texture": "#0"}
+			}
+		}
+	],
+	"groups": [
+		{
+			"name": "plunger",
+			"origin": [8, 8, 8],
+			"color": 0,
+			"children": []
+		},
+		{
+			"name": "base",
+			"origin": [3, 0, 3],
+			"color": 0,
+			"children": [0]
+		},
+		{
+			"name": "bell",
+			"origin": [8, 8, 8],
+			"color": 0,
+			"children": []
+		}
+	]
+}

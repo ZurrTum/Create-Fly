@@ -1,0 +1,22 @@
+{
+	"credit": "Made with Blockbench",
+	"textures": {
+		"0": "create:block/factory_panel",
+		"particle": "create:block/factory_panel"
+	},
+	"elements": [
+		{
+			"from": [0, 1, 6],
+			"to": [2, 3, 8],
+			"rotation": {"angle": 0, "axis": "y", "origin": [8, 8, 8]},
+			"faces": {
+				"north": {"uv": [9, 8, 11, 10], "texture": "#0"},
+				"east": {"uv": [9, 8, 11, 10], "rotation": 90, "texture": "#0"},
+				"south": {"uv": [9, 8, 11, 10], "rotation": 270, "texture": "#0"},
+				"west": {"uv": [9, 8, 11, 10], "texture": "#0"},
+				"up": {"uv": [9, 8, 11, 10], "rotation": 180, "texture": "#0"},
+				"down": {"uv": [9, 8, 11, 10], "texture": "#0"}
+			}
+		}
+	]
+}

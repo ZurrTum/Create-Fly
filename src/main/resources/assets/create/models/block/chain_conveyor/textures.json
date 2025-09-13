@@ -1,0 +1,12 @@
+{
+	"parent": "block/block",
+	"ambientocclusion": false,
+	"textures": {
+		"axis": "create:block/axis",
+		"axis_top": "create:block/axis_top",
+		"conveyor_casing": "create:block/conveyor_casing",
+		"conveyor_port": "create:block/conveyor_port",
+		"bullwheel": "create:block/bullwheel",
+		"particle": "create:block/andesite_casing"
+	}
+}

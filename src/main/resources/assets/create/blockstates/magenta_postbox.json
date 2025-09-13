@@ -1,0 +1,64 @@
+{
+  "variants": {
+    "facing=east,open=false,waterlogged=false": {
+      "model": "create:block/magenta_postbox_closed",
+      "y": 90
+    },
+    "facing=east,open=false,waterlogged=true": {
+      "model": "create:block/magenta_postbox_closed",
+      "y": 90
+    },
+    "facing=east,open=true,waterlogged=false": {
+      "model": "create:block/magenta_postbox_open",
+      "y": 90
+    },
+    "facing=east,open=true,waterlogged=true": {
+      "model": "create:block/magenta_postbox_open",
+      "y": 90
+    },
+    "facing=north,open=false,waterlogged=false": {
+      "model": "create:block/magenta_postbox_closed"
+    },
+    "facing=north,open=false,waterlogged=true": {
+      "model": "create:block/magenta_postbox_closed"
+    },
+    "facing=north,open=true,waterlogged=false": {
+      "model": "create:block/magenta_postbox_open"
+    },
+    "facing=north,open=true,waterlogged=true": {
+      "model": "create:block/magenta_postbox_open"
+    },
+    "facing=south,open=false,waterlogged=false": {
+      "model": "create:block/magenta_postbox_closed",
+      "y": 180
+    },
+    "facing=south,open=false,waterlogged=true": {
+      "model": "create:block/magenta_postbox_closed",
+      "y": 180
+    },
+    "facing=south,open=true,waterlogged=false": {
+      "model": "create:block/magenta_postbox_open",
+      "y": 180
+    },
+    "facing=south,open=true,waterlogged=true": {
+      "model": "create:block/magenta_postbox_open",
+      "y": 180
+    },
+    "facing=west,open=false,waterlogged=false": {
+      "model": "create:block/magenta_postbox_closed",
+      "y": 270
+    },
+    "facing=west,open=false,waterlogged=true": {
+      "model": "create:block/magenta_postbox_closed",
+      "y": 270
+    },
+    "facing=west,open=true,waterlogged=false": {
+      "model": "create:block/magenta_postbox_open",
+      "y": 270
+    },
+    "facing=west,open=true,waterlogged=true": {
+      "model": "create:block/magenta_postbox_open",
+      "y": 270
+    }
+  }
+}

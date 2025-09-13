@@ -1,0 +1,15 @@
+{
+  "damage": 15,
+  "items": "create:blaze_cake",
+  "knockback": 0.3,
+  "pre_entity_hit": {
+    "type": "create:set_on_fire",
+    "ticks": 240
+  },
+  "reload_ticks": 20,
+  "render_mode": {
+    "type": "create:tumble"
+  },
+  "sticky": true,
+  "velocity_multiplier": 1.1
+}

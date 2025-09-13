@@ -1,0 +1,11 @@
+{
+  "damage": 3,
+  "items": "minecraft:melon_slice",
+  "knockback": 0.1,
+  "reload_ticks": 8,
+  "render_mode": {
+    "type": "create:tumble"
+  },
+  "sound_pitch": 1.5,
+  "velocity_multiplier": 1.45
+}

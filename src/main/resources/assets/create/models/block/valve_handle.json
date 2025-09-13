@@ -1,0 +1,29 @@
+{
+	"parent": "block/block",
+	"loader": "neoforge:obj",
+	"flip_v": true,
+	"model": "create:models/block/valve_handle/valve_handle.obj",
+	"textures": {
+		"3": "create:block/valve_handle/valve_handle_copper",
+		"particle": "#3"
+	},
+	"display": {
+		"fixed": {
+			"rotation": [
+				270,
+				0,
+				0
+			],
+			"translation": [
+				0,
+				0,
+				-2
+			],
+			"scale": [
+				0.5,
+				0.5,
+				0.5
+			]
+		}
+	}
+}

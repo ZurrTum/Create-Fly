@@ -1,0 +1,29 @@
+{
+  "type": "create:sequenced_assembly",
+  "ingredient": "#create:sleepers",
+  "transitional_item": {
+    "id": "create:incomplete_track"
+  },
+  "result": {
+    "id": "create:track"
+  },
+  "sequence": [
+    {
+      "type": "create:deploying",
+      "target": "$ingredient",
+      "ingredient": "#create:track_nuggets",
+      "result": "$result"
+    },
+    {
+      "type": "create:deploying",
+      "target": "$ingredient",
+      "ingredient": "#create:track_nuggets",
+      "result": "$result"
+    },
+    {
+      "type": "create:pressing",
+      "ingredient": "$ingredient",
+      "result": "$result"
+    }
+  ]
+}

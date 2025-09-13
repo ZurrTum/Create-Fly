@@ -1,0 +1,18 @@
+{
+	"credit": "Made with Blockbench",
+	"textures": {
+		"stonecutter_saw": "block/stonecutter_saw",
+		"particle": "#stonecutter_saw"
+	},
+	"elements": [
+		{
+			"name": "Blade",
+			"from": [1, 8, 11],
+			"to": [15, 8.062, 18],
+			"faces": {
+				"up": {"uv": [1, 9, 15, 16], "rotation": 180, "texture": "#stonecutter_saw"},
+				"down": {"uv": [15, 9, 1, 16], "texture": "#stonecutter_saw"}
+			}
+		}
+	]
+}

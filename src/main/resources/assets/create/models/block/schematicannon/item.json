@@ -1,0 +1,206 @@
+{
+	"credit": "Made with Blockbench",
+	"parent": "block/block",
+	"textures": {
+		"0": "create:block/andesite_casing_short",
+		"2": "block/stonecutter_bottom",
+		"3": "block/anvil",
+		"4": "create:block/schematicannon",
+		"5": "block/spruce_log",
+		"6": "block/spruce_log_top",
+		"8": "block/stone",
+		"particle": "block/spruce_log"
+	},
+	"elements": [
+		{
+			"name": "Cube",
+			"from": [4, 30, 4],
+			"to": [12, 32, 12],
+			"neoforge_data": {"calculate_normals": true},
+			"rotation": {"angle": 45, "axis": "z", "origin": [8, 15, 0]},
+			"faces": {
+				"north": {"uv": [6, 0, 14, 2], "texture": "#3"},
+				"east": {"uv": [3, 0, 11, 2], "texture": "#3"},
+				"south": {"uv": [5, 0, 13, 2], "texture": "#3"},
+				"west": {"uv": [2, 0, 10, 2], "texture": "#3"},
+				"up": {"uv": [0, 8, 8, 16], "texture": "#4"},
+				"down": {"uv": [4, 4, 12, 12], "texture": "#3"}
+			}
+		},
+		{
+			"name": "Cube",
+			"from": [4.5, 20, 4.5],
+			"to": [11.5, 31, 11.5],
+			"neoforge_data": {"calculate_normals": true},
+			"rotation": {"angle": 45, "axis": "z", "origin": [8, 15, 0]},
+			"faces": {
+				"north": {"uv": [8, 1, 15, 12], "texture": "#3"},
+				"east": {"uv": [1, 1, 8, 12], "texture": "#3"},
+				"south": {"uv": [8, 1, 15, 12], "texture": "#3"},
+				"west": {"uv": [1, 1, 8, 12], "texture": "#3"},
+				"up": {"uv": [4, 7, 11, 14], "texture": "#3"},
+				"down": {"uv": [0, 0, 7, 7], "texture": "#3"}
+			}
+		},
+		{
+			"name": "Cube",
+			"from": [6, 13, -1.5],
+			"to": [10, 17, 17.5],
+			"neoforge_data": {"calculate_normals": true},
+			"rotation": {"angle": 45, "axis": "z", "origin": [8, 15, 0]},
+			"faces": {
+				"north": {"uv": [10, 8, 14, 12], "texture": "#3"},
+				"east": {"uv": [0, 0, 16, 4], "texture": "#3"},
+				"south": {"uv": [10, 8, 14, 12], "texture": "#3"},
+				"west": {"uv": [0, 8, 16, 12], "texture": "#3"},
+				"up": {"uv": [3, 0, 7, 16], "texture": "#3"},
+				"down": {"uv": [12, 0, 16, 16], "texture": "#3"}
+			}
+		},
+		{
+			"name": "Cube",
+			"from": [3.5, 10, 3.5],
+			"to": [12.5, 20, 12.5],
+			"neoforge_data": {"calculate_normals": true},
+			"rotation": {"angle": 45, "axis": "z", "origin": [8, 15, 0]},
+			"faces": {
+				"north": {"uv": [4, 6, 13, 16], "texture": "#3"},
+				"east": {"uv": [4, 6, 13, 16], "texture": "#3"},
+				"south": {"uv": [4, 6, 13, 16], "texture": "#3"},
+				"west": {"uv": [4, 6, 13, 16], "texture": "#3"},
+				"up": {"uv": [4, 7, 13, 16], "texture": "#3"},
+				"down": {"uv": [4, 7, 13, 16], "texture": "#3"}
+			}
+		},
+		{
+			"name": "Cube",
+			"from": [3, 11, 0],
+			"to": [13, 20, 3],
+			"faces": {
+				"north": {"uv": [3, 3, 13, 12], "texture": "#6"},
+				"east": {"uv": [0, 3, 3, 12], "texture": "#6"},
+				"south": {"uv": [3, 2, 13, 11], "texture": "#5"},
+				"west": {"uv": [13, 3, 16, 12], "texture": "#6"},
+				"up": {"uv": [3, 0, 13, 3], "rotation": 180, "texture": "#6"}
+			}
+		},
+		{
+			"name": "Cube",
+			"from": [3, 11, 13],
+			"to": [13, 20, 16],
+			"faces": {
+				"north": {"uv": [3, 2, 13, 11], "texture": "#5"},
+				"east": {"uv": [3, 3, 0, 12], "texture": "#6"},
+				"south": {"uv": [13, 3, 3, 12], "texture": "#6"},
+				"west": {"uv": [16, 3, 13, 12], "texture": "#6"},
+				"up": {"uv": [3, 3, 13, 0], "rotation": 180, "texture": "#6"}
+			}
+		},
+		{
+			"name": "Cube",
+			"from": [1, 7, 0],
+			"to": [15, 11, 16],
+			"faces": {
+				"north": {"uv": [12, 1, 16, 15], "rotation": 90, "texture": "#6"},
+				"east": {"uv": [6, 0, 10, 16], "rotation": 90, "texture": "#5"},
+				"south": {"uv": [12, 1, 16, 15], "rotation": 90, "texture": "#6"},
+				"west": {"uv": [8, 0, 12, 16], "rotation": 90, "texture": "#5"},
+				"up": {"uv": [1, 0, 15, 16], "texture": "#5"},
+				"down": {"uv": [1, 0, 15, 16], "texture": "#5"}
+			}
+		},
+		{
+			"name": "Cube",
+			"from": [-2, -0.2, 5],
+			"to": [18, 3, 11],
+			"neoforge_data": {"calculate_normals": true},
+			"rotation": {"angle": -45, "axis": "y", "origin": [8, 8, 8]},
+			"faces": {
+				"north": {"uv": [0, 0, 16, 3], "texture": "#0"},
+				"east": {"uv": [5, 0, 11, 3], "texture": "#0"},
+				"south": {"uv": [0, 0, 16, 3], "texture": "#0"},
+				"west": {"uv": [5, 0, 11, 3], "texture": "#0"},
+				"up": {"uv": [0, 4, 16, 10], "texture": "#8"},
+				"down": {"uv": [0, 4, 16, 10], "texture": "#8"}
+			}
+		},
+		{
+			"name": "Cube",
+			"from": [-2, -0.1, 5],
+			"to": [18, 3, 11],
+			"neoforge_data": {"calculate_normals": true},
+			"rotation": {"angle": 45, "axis": "y", "origin": [8, 8, 8]},
+			"faces": {
+				"north": {"uv": [0, 0, 16, 3], "texture": "#0"},
+				"east": {"uv": [5, 0, 11, 3], "texture": "#0"},
+				"south": {"uv": [0, 0, 16, 3], "texture": "#0"},
+				"west": {"uv": [5, 0, 11, 3], "texture": "#0"},
+				"up": {"uv": [0, 4, 16, 10], "texture": "#8"},
+				"down": {"uv": [0, 4, 16, 10], "texture": "#8"}
+			}
+		},
+		{
+			"name": "Cube",
+			"from": [2, 0, 2],
+			"to": [14, 7, 14],
+			"faces": {
+				"north": {"uv": [0, 0, 12, 7], "texture": "#4"},
+				"east": {"uv": [0, 0, 12, 7], "texture": "#4"},
+				"south": {"uv": [0, 0, 12, 7], "texture": "#4"},
+				"west": {"uv": [0, 0, 12, 7], "texture": "#4"},
+				"up": {"uv": [2, 2, 14, 14], "texture": "#2"},
+				"down": {"uv": [0, 4, 12, 16], "texture": "#8"}
+			}
+		}
+	],
+	"display": {
+		"thirdperson_righthand": {
+			"rotation": [75, -47, 0],
+			"translation": [0, 2.5, 1.5],
+			"scale": [0.375, 0.375, 0.375]
+		},
+		"thirdperson_lefthand": {
+			"rotation": [75, -47, 0],
+			"translation": [0, 2.5, 1.5],
+			"scale": [0.375, 0.375, 0.375]
+		},
+		"firstperson_righthand": {
+			"rotation": [0, -69, 0],
+			"scale": [0.4, 0.4, 0.4]
+		},
+		"firstperson_lefthand": {
+			"rotation": [0, 97, 0],
+			"scale": [0.4, 0.4, 0.4]
+		},
+		"ground": {
+			"translation": [0, 3, 0],
+			"scale": [0.25, 0.25, 0.25]
+		},
+		"gui": {
+			"rotation": [30, 135, 0],
+			"scale": [0.625, 0.625, 0.625]
+		},
+		"fixed": {
+			"rotation": [0, -90, 0],
+			"translation": [0, -1.5, 0],
+			"scale": [0.5, 0.5, 0.5]
+		}
+	},
+	"groups": [
+		{
+			"name": "Pipe",
+			"origin": [8.5, 14.5, 8],
+			"children": [0, 1, 2, 3]
+		},
+		{
+			"name": "Connector",
+			"origin": [8, 8, 8],
+			"children": [4, 5, 6]
+		},
+		{
+			"name": "Base",
+			"origin": [8, 8, 8],
+			"children": [7, 8, 9]
+		}
+	]
+}

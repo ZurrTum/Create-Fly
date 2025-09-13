@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "A": "#c:ingots/brass",
+    "E": "create:electron_tube",
+    "K": "minecraft:dried_kelp"
+  },
+  "pattern": [
+    "E ",
+    "AA",
+    "KK"
+  ],
+  "result": {
+    "count": 2,
+    "id": "create:brass_tunnel"
+  }
+}

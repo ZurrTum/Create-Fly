@@ -1,0 +1,10 @@
+{
+  "results": [
+    {
+      "id": "minecraft:blue_concrete",
+      "count": 1
+    }
+  ],
+  "ingredient": "minecraft:blue_concrete_powder",
+  "type": "create:splashing"
+}

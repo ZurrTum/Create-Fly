@@ -1,0 +1,6 @@
+{
+	"parent": "create:block/package_postbox/block_closed",
+	"textures": {
+		"1": "create:block/post_box/post_box_white_open"
+	}
+}

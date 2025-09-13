@@ -1,0 +1,14 @@
+{
+  "type": "create:mixing",
+  "ingredients": ["#c:flours/wheat"],
+  "fluid_ingredients": [
+    {
+      "type": "fluid_stack",
+      "amount": 81000,
+      "fluid": "minecraft:water"
+    }
+  ],
+  "result": {
+    "id": "create:dough"
+  }
+}

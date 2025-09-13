@@ -1,0 +1,7 @@
+{
+  "parent": "create:block/connected_glass_pane/noside",
+  "textures": {
+    "edge": "minecraft:block/birch_planks",
+    "pane": "create:block/palettes/birch_window"
+  }
+}

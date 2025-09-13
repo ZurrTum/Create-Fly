@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "E": "create:andesite_alloy",
+    "O": "#c:plates/iron"
+  },
+  "pattern": [
+    "  E",
+    " O ",
+    "E  "
+  ],
+  "result": {
+    "count": 1,
+    "id": "create:minecart_coupling"
+  }
+}

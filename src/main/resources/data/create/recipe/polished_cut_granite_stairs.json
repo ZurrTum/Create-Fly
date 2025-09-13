@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "group": "polished_cut_granite_stairs",
+  "key": {
+    "X": "create:polished_cut_granite"
+  },
+  "pattern": [
+    "X  ",
+    "XX ",
+    "XXX"
+  ],
+  "result": {
+    "count": 4,
+    "id": "create:polished_cut_granite_stairs"
+  }
+}

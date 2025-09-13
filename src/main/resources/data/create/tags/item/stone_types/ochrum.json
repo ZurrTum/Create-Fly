@@ -1,0 +1,19 @@
+{
+  "values": [
+    "create:cut_ochrum",
+    "create:cut_ochrum_stairs",
+    "create:cut_ochrum_wall",
+    "create:polished_cut_ochrum",
+    "create:polished_cut_ochrum_stairs",
+    "create:polished_cut_ochrum_wall",
+    "create:cut_ochrum_bricks",
+    "create:cut_ochrum_brick_stairs",
+    "create:cut_ochrum_brick_wall",
+    "create:small_ochrum_bricks",
+    "create:small_ochrum_brick_stairs",
+    "create:small_ochrum_brick_wall",
+    "create:layered_ochrum",
+    "create:ochrum_pillar",
+    "create:ochrum"
+  ]
+}

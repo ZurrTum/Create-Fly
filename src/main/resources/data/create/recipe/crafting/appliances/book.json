@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    "create:cardboard",
+    "minecraft:paper",
+    "minecraft:paper",
+    "minecraft:paper"
+  ],
+  "result": {
+    "count": 1,
+    "id": "minecraft:book"
+  }
+}

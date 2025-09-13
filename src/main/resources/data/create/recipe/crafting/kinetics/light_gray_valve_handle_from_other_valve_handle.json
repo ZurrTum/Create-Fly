@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    "#c:dyes/light_gray",
+    "#create:valve_handles"
+  ],
+  "result": {
+    "count": 1,
+    "id": "create:light_gray_valve_handle"
+  }
+}

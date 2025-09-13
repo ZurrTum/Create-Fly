@@ -1,0 +1,22 @@
+{
+	"credit": "Made with Blockbench",
+	"texture_size": [32, 32],
+	"textures": {
+		"0": "create:block/pipes",
+		"particle": "create:block/pipes"
+	},
+	"elements": [
+		{
+			"name": "connection_west",
+			"from": [0, 4, 4],
+			"to": [4, 12, 12],
+			"rotation": {"angle": 0, "axis": "y", "origin": [16, 0, -16]},
+			"faces": {
+				"north": {"uv": [0, 0, 4, 2], "rotation": 90, "texture": "#0"},
+				"south": {"uv": [0, 2, 4, 0], "rotation": 90, "texture": "#0"},
+				"up": {"uv": [0, 2, 4, 0], "rotation": 90, "texture": "#0"},
+				"down": {"uv": [0, 0, 4, 2], "rotation": 270, "texture": "#0"}
+			}
+		}
+	]
+}

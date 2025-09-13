@@ -1,0 +1,7 @@
+{
+	"parent": "create:block/cart_assembler/block",
+    "textures": {
+        "6": "create:block/cart_assembler_side_on",
+        "rail": "block/powered_rail_on"
+    }
+}

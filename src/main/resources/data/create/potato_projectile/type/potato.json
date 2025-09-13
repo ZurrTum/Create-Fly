@@ -1,0 +1,14 @@
+{
+  "damage": 5,
+  "items": "minecraft:potato",
+  "knockback": 1.5,
+  "on_block_hit": {
+    "type": "create:plant_crop",
+    "block": "minecraft:potatoes"
+  },
+  "reload_ticks": 15,
+  "render_mode": {
+    "type": "create:tumble"
+  },
+  "velocity_multiplier": 1.25
+}

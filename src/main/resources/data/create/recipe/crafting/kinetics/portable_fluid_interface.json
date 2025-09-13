@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    "create:copper_casing",
+    "create:chute"
+  ],
+  "result": {
+    "count": 1,
+    "id": "create:portable_fluid_interface"
+  }
+}

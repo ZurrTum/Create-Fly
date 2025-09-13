@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    "create:cogwheel",
+    "#minecraft:planks"
+  ],
+  "result": {
+    "count": 1,
+    "id": "create:large_cogwheel"
+  }
+}

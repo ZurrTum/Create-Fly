@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    "#c:dyes/orange",
+    "#create:valve_handles"
+  ],
+  "result": {
+    "count": 1,
+    "id": "create:orange_valve_handle"
+  }
+}

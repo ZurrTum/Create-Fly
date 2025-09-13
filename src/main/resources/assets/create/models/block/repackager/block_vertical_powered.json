@@ -1,0 +1,6 @@
+{
+	"parent": "create:block/repackager/block_vertical",
+	"textures": {
+		"5": "create:block/packager_vertical_powered"
+	}
+}

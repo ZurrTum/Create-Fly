@@ -1,0 +1,9 @@
+{
+  "processing_time": 50,
+  "result": {
+    "id": "minecraft:spruce_sign",
+    "count": 1
+  },
+  "ingredient": "minecraft:spruce_planks",
+  "type": "create:cutting"
+}

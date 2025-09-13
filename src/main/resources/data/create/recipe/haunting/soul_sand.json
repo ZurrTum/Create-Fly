@@ -1,0 +1,9 @@
+{
+  "type": "create:haunting",
+  "ingredient": "#minecraft:sand",
+  "results": [
+    {
+      "id": "minecraft:soul_sand"
+    }
+  ]
+}

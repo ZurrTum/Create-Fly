@@ -1,0 +1,11 @@
+{
+  "type": "create:compacting",
+  "fluid_ingredient": {
+    "type": "fluid_stack",
+    "amount": 20250,
+    "fluid": "create:chocolate"
+  },
+  "result": {
+    "id": "create:bar_of_chocolate"
+  }
+}

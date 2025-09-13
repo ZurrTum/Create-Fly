@@ -1,0 +1,56 @@
+{
+	"credit": "Made with Blockbench",
+	"parent": "block/block",
+	"textures": {
+		"5": "create:block/chute_large",
+		"7": "create:block/chute_smart",
+		"8": "create:block/funnel/funnel_open",
+		"9": "create:block/chute_smart_top",
+		"13": "create:block/chute",
+		"particle": "create:block/chute_smart"
+	},
+	"elements": [
+		{
+			"from": [0, 0, 0],
+			"to": [16, 16, 16],
+			"faces": {
+				"north": {"uv": [0, 0, 16, 16], "texture": "#7"},
+				"east": {"uv": [0, 0, 16, 16], "texture": "#7"},
+				"south": {"uv": [0, 0, 16, 16], "texture": "#7"},
+				"west": {"uv": [0, 0, 16, 16], "texture": "#7"},
+				"up": {"uv": [0, 0, 16, 16], "texture": "#9"},
+				"down": {"uv": [0, 0, 8, 8], "texture": "#5"}
+			}
+		},
+		{
+			"from": [2.95, 14, 13.05],
+			"to": [13.05, 16, 2.95],
+			"faces": {
+				"north": {"uv": [3, 1, 13, 3], "texture": "#9"},
+				"east": {"uv": [3, 1, 13, 3], "texture": "#9"},
+				"south": {"uv": [3, 1, 13, 3], "texture": "#9"},
+				"west": {"uv": [3, 1, 13, 3], "texture": "#9"},
+				"down": {"uv": [3, 3, 13, 13], "texture": "#8"}
+			}
+		},
+		{
+			"from": [2.95, 0, 13.05],
+			"to": [13.05, 2, 2.95],
+			"faces": {
+				"north": {"uv": [9.5, 7, 14.5, 8], "texture": "#13"},
+				"east": {"uv": [9.5, 7, 14.5, 8], "texture": "#13"},
+				"south": {"uv": [9.5, 7, 14.5, 8], "texture": "#13"},
+				"west": {"uv": [9.5, 7, 14.5, 8], "texture": "#13"},
+				"up": {"uv": [3, 3, 13, 13], "texture": "#8"}
+			}
+		}
+	],
+	"groups": [
+		{
+			"name": "group",
+			"origin": [8, 8, 8],
+			"color": 0,
+			"children": [0, 1, 2]
+		}
+	]
+}

@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "A": "create:andesite_alloy",
+    "B": "#c:storage_blocks/copper",
+    "G": "create:shaft",
+    "P": "#c:ingots/copper"
+  },
+  "pattern": [
+    "AGA",
+    "PBP",
+    " P "
+  ],
+  "result": {
+    "count": 1,
+    "id": "create:copper_backtank"
+  }
+}

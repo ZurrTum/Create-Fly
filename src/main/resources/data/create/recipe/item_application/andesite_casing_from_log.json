@@ -1,0 +1,8 @@
+{
+  "type": "create:item_application",
+  "target": "#c:stripped_logs",
+  "ingredient": "create:andesite_alloy",
+  "result": {
+    "id": "create:andesite_casing"
+  }
+}

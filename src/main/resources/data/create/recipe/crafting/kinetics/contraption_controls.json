@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "B": "#minecraft:buttons",
+    "C": "create:andesite_casing",
+    "I": "create:electron_tube"
+  },
+  "pattern": [
+    "B",
+    "C",
+    "I"
+  ],
+  "result": {
+    "count": 1,
+    "id": "create:contraption_controls"
+  }
+}

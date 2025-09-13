@@ -1,0 +1,7 @@
+{
+	"parent": "create:block/factory_gauge/panel",
+	"textures": {
+		"0": "create:block/factory_panel_packager_mode",
+		"particle": "create:block/factory_panel_packager_mode"
+	}
+}

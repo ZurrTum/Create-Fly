@@ -1,0 +1,85 @@
+{
+  "multipart": [
+    {
+      "apply": {
+        "model": "create:block/steam_whistle/extension/small_top_rim"
+      },
+      "when": {
+        "shape": "double",
+        "size": "small"
+      }
+    },
+    {
+      "apply": {
+        "model": "create:block/steam_whistle/extension/small_single"
+      },
+      "when": {
+        "shape": "single",
+        "size": "small"
+      }
+    },
+    {
+      "apply": {
+        "model": "create:block/steam_whistle/extension/small_double"
+      },
+      "when": {
+        "shape": "double|double_connected",
+        "size": "small"
+      }
+    },
+    {
+      "apply": {
+        "model": "create:block/steam_whistle/extension/medium_top_rim"
+      },
+      "when": {
+        "shape": "double",
+        "size": "medium"
+      }
+    },
+    {
+      "apply": {
+        "model": "create:block/steam_whistle/extension/medium_single"
+      },
+      "when": {
+        "shape": "single",
+        "size": "medium"
+      }
+    },
+    {
+      "apply": {
+        "model": "create:block/steam_whistle/extension/medium_double"
+      },
+      "when": {
+        "shape": "double|double_connected",
+        "size": "medium"
+      }
+    },
+    {
+      "apply": {
+        "model": "create:block/steam_whistle/extension/large_top_rim"
+      },
+      "when": {
+        "shape": "double",
+        "size": "large"
+      }
+    },
+    {
+      "apply": {
+        "model": "create:block/steam_whistle/extension/large_single"
+      },
+      "when": {
+        "shape": "single",
+        "size": "large"
+      }
+    },
+    {
+      "apply": {
+        "model": "create:block/steam_whistle/extension/large_double"
+      },
+      "when": {
+        "shape": "double|double_connected",
+        "size": "large"
+      }
+    }
+  ]
+}

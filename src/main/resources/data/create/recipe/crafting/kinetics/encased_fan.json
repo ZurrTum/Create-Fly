@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "A": "create:andesite_casing",
+    "P": "create:propeller",
+    "S": "create:shaft"
+  },
+  "pattern": [
+    "S",
+    "A",
+    "P"
+  ],
+  "result": {
+    "count": 1,
+    "id": "create:encased_fan"
+  }
+}

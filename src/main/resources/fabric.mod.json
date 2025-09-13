@@ -1,0 +1,48 @@
+{
+  "schemaVersion": 1,
+  "id": "create",
+  "version": "${version}",
+  "name": "Create",
+  "description": "Creators-of-Create/Create port to fabric",
+  "authors": [
+    "ZurrTum"
+  ],
+  "contact": {
+    "homepage": "https://github.com/ZurrTum/Create",
+    "sources": "https://github.com/ZurrTum/Create"
+  },
+  "license": "CC0-1.0",
+  "icon": "assets/pack.png",
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "com.zurrtum.create.Create"
+    ],
+    "client": [
+      "com.zurrtum.create.client.Create"
+    ]
+  },
+  "custom": {
+    "loom:injected_interfaces": {
+      "net/minecraft/class_1263": [
+        "com/zurrtum/create/infrastructure/items/BaseInventory"
+      ],
+      "net/minecraft/class_1278": [
+        "com/zurrtum/create/infrastructure/items/SidedItemInventory"
+      ]
+    }
+  },
+  "accessWidener": "create.accesswidener",
+  "mixins": [
+    "create.mixins.json",
+    {
+      "config": "create.client.mixins.json",
+      "environment": "client"
+    }
+  ],
+  "depends": {
+    "fabricloader": ">=0.16.14",
+    "minecraft": ">=1.21.8- <1.21.9-",
+    "java": ">=21"
+  }
+}

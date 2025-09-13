@@ -1,0 +1,18 @@
+{
+	"parent": "create:block/chain_conveyor/textures",
+	"loader": "neoforge:obj",
+	"flip_v": true,
+	"model": "create:models/block/chain_conveyor/item.obj",
+	"display": {
+        "gui": {
+        	"rotation": [ 30, 45, 0 ],
+            "translation": [ -1, 0, 0],
+            "scale":[ 0.4, 0.4, 0.4 ]
+        },
+		"fixed": {
+            "rotation": [ 270, 180, 0 ],
+            "translation": [ 0, 0, 0],
+            "scale":[ 0.375, 0.375, 0.375 ]
+        }
+    }
+}

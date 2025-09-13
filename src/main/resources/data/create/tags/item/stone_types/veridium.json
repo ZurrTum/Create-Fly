@@ -1,0 +1,19 @@
+{
+  "values": [
+    "create:cut_veridium",
+    "create:cut_veridium_stairs",
+    "create:cut_veridium_wall",
+    "create:polished_cut_veridium",
+    "create:polished_cut_veridium_stairs",
+    "create:polished_cut_veridium_wall",
+    "create:cut_veridium_bricks",
+    "create:cut_veridium_brick_stairs",
+    "create:cut_veridium_brick_wall",
+    "create:small_veridium_bricks",
+    "create:small_veridium_brick_stairs",
+    "create:small_veridium_brick_wall",
+    "create:layered_veridium",
+    "create:veridium_pillar",
+    "create:veridium"
+  ]
+}

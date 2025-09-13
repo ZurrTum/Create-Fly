@@ -1,0 +1,9 @@
+{
+  "type": "create:splashing",
+  "ingredient": "create:industrial_iron_block",
+  "results": [
+    {
+      "id": "create:weathered_iron_block"
+    }
+  ]
+}

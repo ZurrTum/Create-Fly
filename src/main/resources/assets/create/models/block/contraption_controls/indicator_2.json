@@ -1,0 +1,17 @@
+{
+	"credit": "Made with Blockbench",
+	"textures": {
+		"4": "create:block/contraption_controls_indicator",
+		"particle": "#4"
+	},
+	"elements": [
+		{
+			"from": [2, 11.125, 8],
+			"to": [14, 12.125, 14],
+			"rotation": {"angle": -22.5, "axis": "x", "origin": [8, 12.1, 7]},
+			"faces": {
+				"up": {"uv": [1, 8.5, 7, 11.5], "rotation": 180, "texture": "#4"}
+			}
+		}
+	]
+}

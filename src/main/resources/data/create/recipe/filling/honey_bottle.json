@@ -1,0 +1,12 @@
+{
+  "type": "create:filling",
+  "ingredient": "minecraft:glass_bottle",
+  "fluid_ingredient": {
+    "type": "fluid_tag",
+    "amount": 27000,
+    "fluid_tag": "#c:honey"
+  },
+  "result": {
+    "id": "minecraft:honey_bottle"
+  }
+}

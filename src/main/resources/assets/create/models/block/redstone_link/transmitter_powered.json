@@ -1,0 +1,125 @@
+{
+	"ambientocclusion": false,
+	"credit": "Made with Blockbench",
+	"parent": "block/block",
+	"textures": {
+		"particle": "create:block/redstone_bridge_powered",
+		"redstone_bridge": "create:block/redstone_bridge_powered",
+		"torch": "minecraft:block/redstone_torch"
+	},
+	"elements": [
+		{
+			"name": "Controller",
+			"from": [2, 0, 2],
+			"to": [14, 3, 14],
+			"faces": {
+				"north": {"uv": [6, 7, 7.5, 13], "rotation": 90, "texture": "#redstone_bridge"},
+				"east": {"uv": [0, 13, 6, 14.5], "texture": "#redstone_bridge"},
+				"south": {"uv": [6, 7, 7.5, 13], "rotation": 90, "texture": "#redstone_bridge"},
+				"west": {"uv": [0, 13, 6, 14.5], "texture": "#redstone_bridge"},
+				"up": {"uv": [0, 7, 6, 13], "rotation": 270, "texture": "#redstone_bridge"},
+				"down": {"uv": [5, 0, 11, 6], "rotation": 90, "texture": "#redstone_bridge"}
+			}
+		},
+		{
+			"from": [6, 2.5, 3.5],
+			"to": [10, 3.5, 7.5],
+			"faces": {
+				"north": {"uv": [11, 2, 13, 2.5], "texture": "#redstone_bridge"},
+				"east": {"uv": [11, 2, 13, 2.5], "texture": "#redstone_bridge"},
+				"south": {"uv": [11, 2, 13, 2.5], "texture": "#redstone_bridge"},
+				"west": {"uv": [11, 2, 13, 2.5], "texture": "#redstone_bridge"},
+				"up": {"uv": [11, 0, 13, 2], "texture": "#redstone_bridge"}
+			}
+		},
+		{
+			"from": [6, 2.5, 8.5],
+			"to": [10, 3.5, 12.5],
+			"faces": {
+				"north": {"uv": [11, 2, 13, 2.5], "texture": "#redstone_bridge"},
+				"east": {"uv": [11, 2, 13, 2.5], "texture": "#redstone_bridge"},
+				"south": {"uv": [11, 2, 13, 2.5], "texture": "#redstone_bridge"},
+				"west": {"uv": [11, 2, 13, 2.5], "texture": "#redstone_bridge"},
+				"up": {"uv": [13, 0, 15, 2], "texture": "#redstone_bridge"}
+			}
+		},
+		{
+			"from": [1, 5, 4],
+			"to": [2, 10, 5],
+			"shade": false,
+			"faces": {
+				"north": {"uv": [7, 6, 9, 16], "texture": "#torch"},
+				"east": {"uv": [7, 6, 9, 16], "texture": "#torch"},
+				"south": {"uv": [7, 6, 9, 16], "texture": "#torch"},
+				"west": {"uv": [7, 6, 9, 16], "texture": "#torch"},
+				"up": {"uv": [7, 6, 9, 8], "texture": "#torch"}
+			}
+		},
+		{
+			"from": [1, 1.5, 4],
+			"to": [2, 5, 5],
+			"shade": false,
+			"faces": {
+				"north": {"uv": [7, 9, 9, 16], "texture": "#torch"},
+				"east": {"uv": [7, 9, 9, 16], "texture": "#torch"},
+				"south": {"uv": [7, 9, 9, 16], "texture": "#torch"},
+				"west": {"uv": [7, 9, 9, 16], "texture": "#torch"},
+				"down": {"uv": [7, 13, 9, 15], "texture": "#torch"}
+			}
+		},
+		{
+			"from": [2.25, 8.75, 3.75],
+			"to": [3.75, 10.25, 5.25],
+			"shade": false,
+			"faces": {
+				"west": {"uv": [6, 5, 7, 6], "texture": "#torch"}
+			}
+		},
+		{
+			"from": [-0.75, 8.75, 3.75],
+			"to": [0.75, 10.25, 5.25],
+			"shade": false,
+			"faces": {
+				"east": {"uv": [6, 5, 7, 6], "texture": "#torch"}
+			}
+		},
+		{
+			"from": [0.75, 8.75, 5.25],
+			"to": [2.25, 10.25, 6.75],
+			"shade": false,
+			"faces": {
+				"north": {"uv": [6, 5, 7, 6], "texture": "#torch"}
+			}
+		},
+		{
+			"from": [0.75, 8.75, 2.25],
+			"to": [2.25, 10.25, 3.75],
+			"shade": false,
+			"faces": {
+				"south": {"uv": [6, 5, 7, 6], "texture": "#torch"}
+			}
+		},
+		{
+			"from": [0.75, 10.25, 3.75],
+			"to": [2.25, 11.75, 5.25],
+			"shade": false,
+			"faces": {
+				"down": {"uv": [6, 5, 7, 6], "texture": "#torch"}
+			}
+		},
+		{
+			"from": [0.75, 7.25, 3.75],
+			"to": [2.25, 8.75, 5.25],
+			"shade": false,
+			"faces": {
+				"up": {"uv": [6, 5, 7, 6], "texture": "#torch"}
+			}
+		}
+	],
+	"display": {
+		"gui": {
+			"rotation": [30, 45, 0],
+			"scale": [0.625, 0.625, 0.625]
+		}
+	}
+}

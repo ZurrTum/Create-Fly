@@ -1,0 +1,18 @@
+{
+  "variants": {
+    "axis=x,powered=false": {
+      "model": "create:block/redstone_requester/block",
+      "y": 90
+    },
+    "axis=x,powered=true": {
+      "model": "create:block/redstone_requester/block_powered",
+      "y": 90
+    },
+    "axis=z,powered=false": {
+      "model": "create:block/redstone_requester/block"
+    },
+    "axis=z,powered=true": {
+      "model": "create:block/redstone_requester/block_powered"
+    }
+  }
+}

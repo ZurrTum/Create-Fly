@@ -1,0 +1,54 @@
+{
+	"credit": "Made with Blockbench",
+	"textures": {
+		"3": "create:block/industrial_iron_block",
+		"4": "create:block/chute_large",
+		"5": "create:block/chute",
+		"6": "create:block/chute_hole",
+		"particle": "create:block/industrial_iron_block"
+	},
+	"elements": [
+		{
+			"from": [0, 0, 0],
+			"to": [16, 16, 16],
+			"faces": {
+				"north": {"uv": [0, 0, 16, 16], "texture": "#3"},
+				"east": {"uv": [0, 0, 16, 16], "texture": "#3"},
+				"south": {"uv": [0, 0, 16, 16], "texture": "#3"},
+				"west": {"uv": [0, 0, 16, 16], "texture": "#3"},
+				"up": {"uv": [0, 0, 8, 8], "texture": "#4"},
+				"down": {"uv": [0, 0, 8, 8], "texture": "#4"}
+			}
+		},
+		{
+			"from": [2.95, 14, 13.05],
+			"to": [13.05, 16, 2.95],
+			"faces": {
+				"north": {"uv": [9.5, 0, 14.5, 1], "texture": "#5"},
+				"east": {"uv": [9.5, 0, 14.5, 1], "texture": "#5"},
+				"south": {"uv": [9.5, 0, 14.5, 1], "texture": "#5"},
+				"west": {"uv": [9.5, 0, 14.5, 1], "texture": "#5"},
+				"down": {"uv": [3, 3, 13, 13], "texture": "#6"}
+			}
+		},
+		{
+			"from": [2.95, 0, 13.05],
+			"to": [13.05, 2, 2.95],
+			"faces": {
+				"north": {"uv": [9.5, 7, 14.5, 8], "texture": "#5"},
+				"east": {"uv": [9.5, 7, 14.5, 8], "texture": "#5"},
+				"south": {"uv": [9.5, 7, 14.5, 8], "texture": "#5"},
+				"west": {"uv": [9.5, 7, 14.5, 8], "texture": "#5"},
+				"up": {"uv": [3, 3, 13, 13], "texture": "#6"}
+			}
+		}
+	],
+	"groups": [
+		{
+			"name": "group",
+			"origin": [8, 8, 8],
+			"color": 0,
+			"children": [0, 1, 2]
+		}
+	]
+}

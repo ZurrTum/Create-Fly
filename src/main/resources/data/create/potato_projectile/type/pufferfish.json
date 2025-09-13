@@ -1,0 +1,59 @@
+{
+  "damage": 4,
+  "items": "minecraft:pufferfish",
+  "knockback": 0.4,
+  "on_entity_hit": {
+    "type": "create:food_effects",
+    "food_property": {
+      "effects": [
+        {
+          "effect": {
+            "amplifier": 1,
+            "duration": 1200,
+            "id": "minecraft:poison",
+            "neoforge:cures": [
+              "protected_by_totem",
+              "milk",
+              "honey"
+            ],
+            "show_icon": true
+          }
+        },
+        {
+          "effect": {
+            "amplifier": 2,
+            "duration": 300,
+            "id": "minecraft:hunger",
+            "neoforge:cures": [
+              "protected_by_totem",
+              "milk"
+            ],
+            "show_icon": true
+          }
+        },
+        {
+          "effect": {
+            "duration": 300,
+            "id": "minecraft:nausea",
+            "neoforge:cures": [
+              "protected_by_totem",
+              "milk"
+            ],
+            "show_icon": true
+          }
+        }
+      ],
+      "nutrition": 1,
+      "saturation": 0.2
+    },
+    "recoverable": false
+  },
+  "render_mode": {
+    "type": "create:toward_motion",
+    "spin": 1.0,
+    "sprite_angle_offset": 140
+  },
+  "sound_pitch": 1.1,
+  "sticky": true,
+  "velocity_multiplier": 1.1
+}

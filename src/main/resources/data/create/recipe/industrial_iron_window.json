@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "key": {
+    "#": "create:industrial_iron_block",
+    "X": "#c:glass_blocks/colorless"
+  },
+  "pattern": [
+    " # ",
+    "#X#"
+  ],
+  "result": {
+    "count": 2,
+    "id": "create:industrial_iron_window"
+  }
+}

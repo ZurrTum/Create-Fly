@@ -1,0 +1,58 @@
+{
+	"credit": "Made with Blockbench",
+	"parent": "block/block",
+	"textures": {
+		"3": "create:block/mechanical_arm",
+		"7": "create:block/brass_block",
+		"particle": "create:block/brass_casing"
+	},
+	"elements": [
+		{
+			"name": "Base",
+			"from": [0, 0, 0],
+			"to": [16, 6, 16],
+			"faces": {
+				"north": {"uv": [0, 8, 8, 11], "texture": "#3"},
+				"east": {"uv": [0, 8, 8, 11], "texture": "#3"},
+				"south": {"uv": [0, 8, 8, 11], "texture": "#3"},
+				"west": {"uv": [0, 8, 8, 11], "texture": "#3"},
+				"up": {"uv": [0, 0, 16, 16], "texture": "#7"},
+				"down": {"uv": [0, 0, 16, 16], "texture": "#particle"}
+			}
+		}
+	],
+	"display": {
+		"thirdperson_righthand": {
+			"rotation": [75, -149, 0],
+			"translation": [0, 2.5, 0],
+			"scale": [0.375, 0.375, 0.375]
+		},
+		"thirdperson_lefthand": {
+			"rotation": [75, -149, 0],
+			"translation": [0, 2.5, 0],
+			"scale": [0.375, 0.375, 0.375]
+		},
+		"firstperson_righthand": {
+			"rotation": [0, -55, 0],
+			"scale": [0.4, 0.4, 0.4]
+		},
+		"firstperson_lefthand": {
+			"rotation": [0, -55, 0],
+			"scale": [0.4, 0.4, 0.4]
+		},
+		"ground": {
+			"translation": [0, 1, 1.25],
+			"scale": [0.25, 0.25, 0.25]
+		},
+		"gui": {
+			"rotation": [30, 45, 0],
+			"translation": [2.5, -0.5, 0],
+			"scale": [0.625, 0.625, 0.625]
+		},
+		"fixed": {
+			"rotation": [0, 180, 0],
+			"translation": [0, 1.75, -4.5],
+			"scale": [0.5, 0.5, 0.5]
+		}
+	}
+}

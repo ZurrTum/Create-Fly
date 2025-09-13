@@ -1,0 +1,14 @@
+{
+  "damage": 5,
+  "items": "minecraft:baked_potato",
+  "knockback": 0.5,
+  "pre_entity_hit": {
+    "type": "create:set_on_fire",
+    "ticks": 60
+  },
+  "reload_ticks": 15,
+  "render_mode": {
+    "type": "create:tumble"
+  },
+  "velocity_multiplier": 1.25
+}

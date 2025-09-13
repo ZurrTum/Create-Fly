@@ -1,0 +1,86 @@
+{
+	"credit": "Made with Blockbench",
+	"parent": "create:item/potato_cannon/item",
+	"texture_size": [32, 32],
+	"textures": {
+		"1": "create:item/potato_cannon",
+		"particle": "create:block/copper_casing"
+	},
+	"elements": [
+		{
+			"name": "Cog",
+			"from": [7.5, 6, 6.5],
+			"to": [8.5, 11, 9.5],
+			"neoforge_data": {"calculate_normals": true},
+			"rotation": {"angle": 0, "axis": "z", "origin": [8, 8.5, 8]},
+			"faces": {
+				"north": {"uv": [0.25, 13.25, 2.75, 13.75], "rotation": 90, "texture": "#1"},
+				"east": {"uv": [0.25, 14, 2.75, 15.5], "rotation": 270, "texture": "#1"},
+				"south": {"uv": [0.25, 13.25, 2.75, 13.75], "rotation": 270, "texture": "#1"},
+				"west": {"uv": [0.25, 14, 2.75, 15.5], "rotation": 90, "texture": "#1"},
+				"up": {"uv": [1.75, 12.25, 0.25, 12.75], "rotation": 90, "texture": "#1"},
+				"down": {"uv": [0.25, 12.5, 1.75, 13], "rotation": 90, "texture": "#1"}
+			}
+		},
+		{
+			"name": "Cog",
+			"from": [7.5, 6, 6.5],
+			"to": [8.5, 11, 9.5],
+			"neoforge_data": {"calculate_normals": true},
+			"rotation": {"angle": 45, "axis": "z", "origin": [8, 8.5, 8]},
+			"faces": {
+				"north": {"uv": [0.25, 13.25, 2.75, 13.75], "rotation": 90, "texture": "#1"},
+				"east": {"uv": [0.25, 14, 2.75, 15.5], "rotation": 270, "texture": "#1"},
+				"south": {"uv": [0.25, 13.25, 2.75, 13.75], "rotation": 270, "texture": "#1"},
+				"west": {"uv": [0.25, 14, 2.75, 15.5], "rotation": 90, "texture": "#1"},
+				"up": {"uv": [1.75, 12.25, 0.25, 12.75], "rotation": 90, "texture": "#1"},
+				"down": {"uv": [0.25, 12.5, 1.75, 13], "rotation": 90, "texture": "#1"}
+			}
+		},
+		{
+			"name": "Cog",
+			"from": [5.5, 8, 6.5],
+			"to": [10.5, 9, 9.5],
+			"neoforge_data": {"calculate_normals": true},
+			"rotation": {"angle": 0, "axis": "z", "origin": [8, 8.5, 8]},
+			"faces": {
+				"north": {"uv": [0.25, 13.25, 2.75, 13.75], "rotation": 180, "texture": "#1"},
+				"east": {"uv": [0.25, 12.5, 1.75, 13], "texture": "#1"},
+				"south": {"uv": [0.25, 13.25, 2.75, 13.75], "rotation": 180, "texture": "#1"},
+				"west": {"uv": [1.75, 12.25, 0.25, 12.75], "texture": "#1"},
+				"up": {"uv": [0.25, 14, 2.75, 15.5], "rotation": 180, "texture": "#1"},
+				"down": {"uv": [0.25, 14, 2.75, 15.5], "texture": "#1"}
+			}
+		},
+		{
+			"name": "Cog",
+			"from": [5.5, 8, 6.5],
+			"to": [10.5, 9, 9.5],
+			"neoforge_data": {"calculate_normals": true},
+			"rotation": {"angle": 45, "axis": "z", "origin": [8, 8.5, 8]},
+			"faces": {
+				"north": {"uv": [0.25, 13.25, 2.75, 13.75], "rotation": 180, "texture": "#1"},
+				"east": {"uv": [0.25, 12.5, 1.75, 13], "texture": "#1"},
+				"south": {"uv": [0.25, 13.25, 2.75, 13.75], "rotation": 180, "texture": "#1"},
+				"west": {"uv": [1.75, 12.25, 0.25, 12.75], "texture": "#1"},
+				"up": {"uv": [0.25, 14, 2.75, 15.5], "rotation": 180, "texture": "#1"},
+				"down": {"uv": [0.25, 14, 2.75, 15.5], "texture": "#1"}
+			}
+		}
+	],
+	"groups": [
+		{
+			"name": "cog",
+			"origin": [8, 8, 8],
+			"color": 0,
+			"children": [
+				{
+					"name": "accelerator",
+					"origin": [8, 8, 8],
+					"color": 0,
+					"children": [0, 1, 2, 3]
+				}
+			]
+		}
+	]
+}

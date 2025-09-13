@@ -1,0 +1,60 @@
+{
+	"credit": "Made with Blockbench",
+	"parent": "block/block",
+	"textures": {
+		"0": "create:block/schematic_table_side",
+		"1": "create:block/schematic_table_top",
+		"particle": "create:block/schematic_table_side"
+	},
+	"elements": [
+		{
+			"name": "base",
+			"from": [5, 0, 5],
+			"to": [11, 12, 11],
+			"faces": {
+				"north": {"uv": [0, 3, 6, 15], "texture": "#0"},
+				"east": {"uv": [0, 3, 6, 15], "texture": "#0"},
+				"south": {"uv": [0, 3, 6, 15], "texture": "#0"},
+				"west": {"uv": [0, 3, 6, 15], "texture": "#0"}
+			}
+		},
+		{
+			"name": "Top",
+			"from": [0, 11, 2],
+			"to": [16, 14, 14],
+			"faces": {
+				"north": {"uv": [0, 0, 16, 3], "texture": "#0"},
+				"east": {"uv": [0, 0, 12, 3], "texture": "#0"},
+				"south": {"uv": [0, 0, 16, 3], "texture": "#0"},
+				"west": {"uv": [0, 0, 12, 3], "texture": "#0"},
+				"up": {"uv": [0, 2, 16, 14], "texture": "#1"},
+				"down": {"uv": [0, 2, 16, 14], "texture": "#1"}
+			}
+		},
+		{
+			"name": "Cube",
+			"from": [4, 9, 4],
+			"to": [12, 11, 12],
+			"faces": {
+				"north": {"uv": [4, 2, 12, 4], "texture": "#1"},
+				"east": {"uv": [4, 2, 12, 4], "texture": "#1"},
+				"south": {"uv": [4, 2, 12, 4], "texture": "#1"},
+				"west": {"uv": [4, 2, 12, 4], "texture": "#1"},
+				"down": {"uv": [4, 4, 12, 12], "texture": "#1"}
+			}
+		},
+		{
+			"name": "Cube",
+			"from": [4, 0, 4],
+			"to": [12, 2, 12],
+			"faces": {
+				"north": {"uv": [5, 14, 13, 16], "texture": "#0"},
+				"east": {"uv": [6, 14, 14, 16], "texture": "#0"},
+				"south": {"uv": [1, 14, 9, 16], "texture": "#0"},
+				"west": {"uv": [4, 14, 12, 16], "texture": "#0"},
+				"up": {"uv": [6, 5, 14, 13], "texture": "#0"},
+				"down": {"uv": [6, 5, 14, 13], "texture": "#0"}
+			}
+		}
+	]
+}

@@ -1,0 +1,88 @@
+{
+  "variants": {
+    "facing=down,linked=false,powered=false": {
+      "model": "create:block/packager/block_vertical"
+    },
+    "facing=down,linked=false,powered=true": {
+      "model": "create:block/packager/block_vertical_powered"
+    },
+    "facing=down,linked=true,powered=false": {
+      "model": "create:block/packager/block_vertical_linked"
+    },
+    "facing=down,linked=true,powered=true": {
+      "model": "create:block/packager/block_vertical_linked"
+    },
+    "facing=east,linked=false,powered=false": {
+      "model": "create:block/packager/block",
+      "y": 270
+    },
+    "facing=east,linked=false,powered=true": {
+      "model": "create:block/packager/block_powered",
+      "y": 270
+    },
+    "facing=east,linked=true,powered=false": {
+      "model": "create:block/packager/block_linked",
+      "y": 270
+    },
+    "facing=east,linked=true,powered=true": {
+      "model": "create:block/packager/block_linked",
+      "y": 270
+    },
+    "facing=north,linked=false,powered=false": {
+      "model": "create:block/packager/block",
+      "y": 180
+    },
+    "facing=north,linked=false,powered=true": {
+      "model": "create:block/packager/block_powered",
+      "y": 180
+    },
+    "facing=north,linked=true,powered=false": {
+      "model": "create:block/packager/block_linked",
+      "y": 180
+    },
+    "facing=north,linked=true,powered=true": {
+      "model": "create:block/packager/block_linked",
+      "y": 180
+    },
+    "facing=south,linked=false,powered=false": {
+      "model": "create:block/packager/block"
+    },
+    "facing=south,linked=false,powered=true": {
+      "model": "create:block/packager/block_powered"
+    },
+    "facing=south,linked=true,powered=false": {
+      "model": "create:block/packager/block_linked"
+    },
+    "facing=south,linked=true,powered=true": {
+      "model": "create:block/packager/block_linked"
+    },
+    "facing=up,linked=false,powered=false": {
+      "model": "create:block/packager/block_vertical"
+    },
+    "facing=up,linked=false,powered=true": {
+      "model": "create:block/packager/block_vertical_powered"
+    },
+    "facing=up,linked=true,powered=false": {
+      "model": "create:block/packager/block_vertical_linked"
+    },
+    "facing=up,linked=true,powered=true": {
+      "model": "create:block/packager/block_vertical_linked"
+    },
+    "facing=west,linked=false,powered=false": {
+      "model": "create:block/packager/block",
+      "y": 90
+    },
+    "facing=west,linked=false,powered=true": {
+      "model": "create:block/packager/block_powered",
+      "y": 90
+    },
+    "facing=west,linked=true,powered=false": {
+      "model": "create:block/packager/block_linked",
+      "y": 90
+    },
+    "facing=west,linked=true,powered=true": {
+      "model": "create:block/packager/block_linked",
+      "y": 90
+    }
+  }
+}

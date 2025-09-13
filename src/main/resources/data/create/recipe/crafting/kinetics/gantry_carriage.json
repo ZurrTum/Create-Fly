@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "B": "#minecraft:wooden_slabs",
+    "C": "create:andesite_casing",
+    "I": "create:cogwheel"
+  },
+  "pattern": [
+    "B",
+    "C",
+    "I"
+  ],
+  "result": {
+    "count": 1,
+    "id": "create:gantry_carriage"
+  }
+}

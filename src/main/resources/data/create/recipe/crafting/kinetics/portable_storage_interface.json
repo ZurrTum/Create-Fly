@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    "create:andesite_casing",
+    "create:chute"
+  ],
+  "result": {
+    "count": 1,
+    "id": "create:portable_storage_interface"
+  }
+}

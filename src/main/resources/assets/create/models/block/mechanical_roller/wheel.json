@@ -1,0 +1,10 @@
+{
+	"parent": "block/block",
+	"loader": "neoforge:obj",
+	"flip_v": true,
+	"model": "create:models/block/mechanical_roller/wheel.obj",
+	"textures": {
+		"wheel": "create:block/roller_wheel",
+		"particle": "#wheel"
+	}
+}

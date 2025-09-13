@@ -1,0 +1,6 @@
+{
+  "parent": "create:item/package/custom_12x10",
+  "textures": {
+    "2": "create:item/package/rare_evan"
+  }
+}

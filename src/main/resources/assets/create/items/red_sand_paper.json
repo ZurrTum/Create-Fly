@@ -1,0 +1,6 @@
+{
+  "model": {
+    "type": "create:model/sand_paper",
+    "model": "create:item/red_sand_paper"
+  }
+}

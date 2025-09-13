@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "group": "small_scorchia_brick_stairs",
+  "key": {
+    "X": "create:small_scorchia_bricks"
+  },
+  "pattern": [
+    "X  ",
+    "XX ",
+    "XXX"
+  ],
+  "result": {
+    "count": 4,
+    "id": "create:small_scorchia_brick_stairs"
+  }
+}

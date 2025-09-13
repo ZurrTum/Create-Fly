@@ -1,0 +1,9 @@
+{
+  "type": "create:deploying",
+  "keep_held_item": true,
+  "target": "minecraft:oxidized_cut_copper_slab",
+  "ingredient": "minecraft:honeycomb_block",
+  "result": {
+    "id": "minecraft:waxed_oxidized_cut_copper_slab"
+  }
+}

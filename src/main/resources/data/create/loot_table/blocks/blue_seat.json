@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:block",
+  "pools": [
+    {
+      "bonus_rolls": 0.0,
+      "conditions": [
+        {
+          "condition": "minecraft:survives_explosion"
+        }
+      ],
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "create:blue_seat"
+        }
+      ],
+      "rolls": 1.0
+    }
+  ],
+  "random_sequence": "create:blocks/blue_seat"
+}

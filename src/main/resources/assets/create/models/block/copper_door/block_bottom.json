@@ -1,0 +1,22 @@
+{
+	"credit": "Made with Blockbench",
+	"parent": "block/block",
+	"textures": {
+		"0": "create:block/copper_door_side",
+		"2": "create:block/copper_door_bottom",
+		"particle": "create:block/copper_casing"
+	},
+	"elements": [
+		{
+			"from": [0, 0, 0],
+			"to": [3, 16, 16],
+			"faces": {
+				"north": {"uv": [16, 9, 0, 12], "rotation": 270, "texture": "#0"},
+				"east": {"uv": [16, 0, 0, 16], "texture": "#2"},
+				"south": {"uv": [16, 15, 0, 12], "rotation": 270, "texture": "#0"},
+				"west": {"uv": [0, 0, 16, 16], "texture": "#2"},
+				"down": {"uv": [16, 3, 0, 6], "rotation": 90, "texture": "#0"}
+			}
+		}
+	]
+}

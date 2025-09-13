@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "building",
+  "ingredients": [
+    "create:cut_granite_slab",
+    "create:cut_granite_slab"
+  ],
+  "result": {
+    "count": 1,
+    "id": "create:cut_granite"
+  }
+}

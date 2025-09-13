@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    "create:andesite_casing",
+    "#c:plates/gold"
+  ],
+  "result": {
+    "count": 1,
+    "id": "create:desk_bell"
+  }
+}

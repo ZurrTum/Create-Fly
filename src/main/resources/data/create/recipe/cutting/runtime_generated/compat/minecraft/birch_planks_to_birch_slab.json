@@ -1,0 +1,9 @@
+{
+  "processing_time": 50,
+  "result": {
+    "id": "minecraft:birch_slab",
+    "count": 2
+  },
+  "ingredient": "minecraft:birch_planks",
+  "type": "create:cutting"
+}

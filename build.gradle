@@ -1,0 +1,56 @@
+plugins {
+    id 'fabric-loom' version '1.11-SNAPSHOT'
+}
+
+version = project.mod_version
+group = project.maven_group
+
+base {
+    archivesName = project.archives_base_name
+}
+
+loom {
+    splitEnvironmentSourceSets()
+    accessWidenerPath = file("src/main/resources/create.accesswidener")
+    mods {
+        create {
+            sourceSet sourceSets.main
+            sourceSet sourceSets.client
+        }
+    }
+}
+
+dependencies {
+    minecraft "com.mojang:minecraft:${project.minecraft_version}"
+    mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
+    modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
+    modCompileOnly fabricApi.module("fabric-rendering-fluids-v1", project.fabric_version)
+    modCompileOnly fabricApi.module("fabric-transfer-api-v1", project.fabric_version)
+    modCompileOnly fabricApi.module("fabric-events-interaction-v0", project.fabric_version)
+}
+
+processResources {
+    inputs.property "version", project.version
+
+    filesMatching("fabric.mod.json") {
+        expand "version": inputs.properties.version
+    }
+}
+
+tasks.withType(JavaCompile).configureEach {
+    it.options.release = 21
+}
+
+java {
+    withSourcesJar()
+    sourceCompatibility = JavaVersion.VERSION_21
+    targetCompatibility = JavaVersion.VERSION_21
+}
+
+jar {
+    inputs.property "archivesName", project.base.archivesName
+
+    from("LICENSE") {
+        rename { "${it}_${inputs.properties.archivesName}" }
+    }
+}

@@ -1,0 +1,12 @@
+{
+  "values": [
+    {
+      "id": "#c:nuggets/iron",
+      "required": false
+    },
+    {
+      "id": "#c:nuggets/gold",
+      "required": false
+    }
+  ]
+}

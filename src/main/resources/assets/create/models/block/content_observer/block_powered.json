@@ -1,0 +1,8 @@
+{
+	"parent": "create:block/content_observer/block",
+	"textures": {
+		"0": "create:block/smart_observer_powered",
+		"7": "create:block/smart_observer_side_powered",
+		"particle": "create:block/smart_observer_powered"
+	}
+}

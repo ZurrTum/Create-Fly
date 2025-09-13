@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "B": "create:electron_tube",
+    "C": "create:brass_casing",
+    "R": "minecraft:crafting_table"
+  },
+  "pattern": [
+    "B",
+    "C",
+    "R"
+  ],
+  "result": {
+    "count": 3,
+    "id": "create:mechanical_crafter"
+  }
+}

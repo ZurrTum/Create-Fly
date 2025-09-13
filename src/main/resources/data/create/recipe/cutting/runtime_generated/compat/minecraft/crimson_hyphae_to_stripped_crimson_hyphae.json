@@ -1,0 +1,9 @@
+{
+  "processing_time": 50,
+  "result": {
+    "id": "minecraft:stripped_crimson_hyphae",
+    "count": 1
+  },
+  "ingredient": "minecraft:crimson_hyphae",
+  "type": "create:cutting"
+}

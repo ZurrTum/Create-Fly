@@ -1,0 +1,15 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "group": "small_andesite_brick_slab",
+  "key": {
+    "X": "create:small_andesite_bricks"
+  },
+  "pattern": [
+    "XXX"
+  ],
+  "result": {
+    "count": 6,
+    "id": "create:small_andesite_brick_slab"
+  }
+}

@@ -1,0 +1,35 @@
+package com.zurrtum.create.infrastructure.packet.c2s;
+
+import net.minecraft.network.NetworkSide;
+import net.minecraft.network.RegistryByteBuf;
+import net.minecraft.network.codec.PacketCodec;
+import net.minecraft.network.listener.ServerPlayPacketListener;
+import net.minecraft.network.packet.Packet;
+import net.minecraft.network.packet.PacketType;
+import net.minecraft.server.network.ServerPlayNetworkHandler;
+import net.minecraft.util.Identifier;
+
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
+
+import static com.zurrtum.create.Create.MOD_ID;
+
+public record C2SHoldPacket(PacketType<Packet<ServerPlayPacketListener>> type, Consumer<ServerPlayNetworkHandler> consumer) implements C2SPacket {
+    public C2SHoldPacket(String id, Consumer<ServerPlayNetworkHandler> callback) {
+        this(new PacketType<>(NetworkSide.SERVERBOUND, Identifier.of(MOD_ID, id)), callback);
+    }
+
+    public PacketCodec<RegistryByteBuf, Packet<ServerPlayPacketListener>> codec() {
+        return PacketCodec.unit(this);
+    }
+
+    @Override
+    public PacketType<Packet<ServerPlayPacketListener>> getPacketType() {
+        return type;
+    }
+
+    @Override
+    public BiConsumer<ServerPlayNetworkHandler, C2SHoldPacket> callback() {
+        return (listener, packet) -> consumer.accept(listener);
+    }
+}

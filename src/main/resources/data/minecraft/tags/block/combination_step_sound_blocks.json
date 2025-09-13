@@ -1,0 +1,20 @@
+{
+  "values": [
+    "create:white_table_cloth",
+    "create:orange_table_cloth",
+    "create:magenta_table_cloth",
+    "create:light_blue_table_cloth",
+    "create:yellow_table_cloth",
+    "create:lime_table_cloth",
+    "create:pink_table_cloth",
+    "create:gray_table_cloth",
+    "create:light_gray_table_cloth",
+    "create:cyan_table_cloth",
+    "create:purple_table_cloth",
+    "create:blue_table_cloth",
+    "create:brown_table_cloth",
+    "create:green_table_cloth",
+    "create:red_table_cloth",
+    "create:black_table_cloth"
+  ]
+}

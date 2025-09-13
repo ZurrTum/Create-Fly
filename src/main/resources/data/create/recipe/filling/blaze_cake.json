@@ -1,0 +1,12 @@
+{
+  "type": "create:filling",
+  "ingredient": "create:blaze_cake_base",
+  "fluid_ingredient": {
+    "type": "fluid_stack",
+    "amount": 20250,
+    "fluid": "minecraft:lava"
+  },
+  "result": {
+    "id": "create:blaze_cake"
+  }
+}

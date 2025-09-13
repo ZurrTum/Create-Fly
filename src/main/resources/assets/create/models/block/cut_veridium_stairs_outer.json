@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/outer_stairs",
+  "textures": {
+    "bottom": "create:block/palettes/stone_types/cut/veridium_cut",
+    "side": "create:block/palettes/stone_types/cut/veridium_cut",
+    "top": "create:block/palettes/stone_types/cut/veridium_cut"
+  }
+}

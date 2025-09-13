@@ -1,0 +1,44 @@
+{
+	"credit": "Made with Blockbench",
+	"parent": "block/block",
+	"ambientocclusion": false,
+	"textures": {
+		"6": "create:block/mixer_head",
+		"particle": "#6"
+	},
+  "render_type": "minecraft:cutout",
+  "elements": [
+		{
+			"name": "MixerCenter",
+			"from": [7, -4, 7],
+			"to": [9, 8, 9],
+			"rotation": {"angle": 0, "axis": "y", "origin": [8, 7, 8]},
+			"faces": {
+				"north": {"uv": [12, 0, 14, 12], "texture": "#6"},
+				"east": {"uv": [12, 0, 14, 12], "texture": "#6"},
+				"south": {"uv": [12, 0, 14, 12], "texture": "#6"},
+				"west": {"uv": [12, 0, 14, 12], "texture": "#6"},
+				"down": {"uv": [12, 12, 14, 14], "texture": "#6"}
+			}
+		},
+		{
+			"name": "Mixer wire 1",
+			"from": [2.5, -4, 8],
+			"to": [13.5, 6, 8],
+			"faces": {
+				"north": {"uv": [0, 0, 11, 10], "texture": "#6"},
+				"south": {"uv": [0, 0, 11, 10], "texture": "#6"}
+			}
+		},
+		{
+			"name": "Mixer wire 2",
+			"from": [8, -4, 2.5],
+			"to": [8, 6, 13.5],
+			"rotation": {"angle": 0, "axis": "y", "origin": [8, 1, 8]},
+			"faces": {
+				"east": {"uv": [0, 0, 11, 10], "texture": "#6"},
+				"west": {"uv": [0, 0, 11, 10], "texture": "#6"}
+			}
+		}
+	]
+}
