@@ -44,7 +44,7 @@ public class BeltDeployerCallbacks {
             return ProcessingResult.PASS;
 
         DeployerPlayer player = blockEntity.getPlayer();
-        ItemStack held = player == null ? ItemStack.EMPTY : player.getMainHandStack();
+        ItemStack held = player == null ? ItemStack.EMPTY : player.cast().getMainHandStack();
 
         if (held.isEmpty())
             return ProcessingResult.HOLD;
@@ -64,7 +64,7 @@ public class BeltDeployerCallbacks {
             return ProcessingResult.PASS;
 
         DeployerPlayer player = blockEntity.getPlayer();
-        ItemStack held = player == null ? ItemStack.EMPTY : player.getMainHandStack();
+        ItemStack held = player == null ? ItemStack.EMPTY : player.cast().getMainHandStack();
         if (held.isEmpty())
             return ProcessingResult.HOLD;
 
@@ -96,7 +96,7 @@ public class BeltDeployerCallbacks {
         TransportedItemStack result = null;
         ItemStack resultItem = null;
         boolean keepHeld = false;
-        ItemStack heldItem = blockEntity.player.getMainHandStack();
+        ItemStack heldItem = blockEntity.player.cast().getMainHandStack();
         if (recipe instanceof SandPaperPolishingRecipe polishingRecipe) {
             resultItem = polishingRecipe.craft(new SingleStackRecipeInput(transported.stack), world.getRegistryManager());
         } else if (recipe instanceof ItemApplicationRecipe itemApplicationRecipe) {

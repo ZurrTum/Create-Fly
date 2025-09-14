@@ -65,7 +65,7 @@ public class DeployerMovementBehaviour extends MovementBehaviour {
         tryGrabbingItem(context);
         DeployerPlayer player = getPlayer(context);
         Mode mode = getMode(context);
-        if (mode == Mode.USE && !DeployerHandler.shouldActivate(player.getMainHandStack(), context.world, pos, null))
+        if (mode == Mode.USE && !DeployerHandler.shouldActivate(player.cast().getMainHandStack(), context.world, pos, null))
             return;
 
         activate(context, pos, player, mode);
@@ -99,8 +99,9 @@ public class DeployerMovementBehaviour extends MovementBehaviour {
             facingVec = context.rotation.apply(initial);
         }
 
-        player.setYaw(AbstractContraptionEntity.yawFromVector(facingVec));
-        player.setPitch(xRot);
+        ServerPlayerEntity serverPlayer = player.cast();
+        serverPlayer.setYaw(AbstractContraptionEntity.yawFromVector(facingVec));
+        serverPlayer.setPitch(xRot);
 
         DeployerHandler.activate(player, vec, pos, facingVec, mode);
     }
@@ -198,7 +199,7 @@ public class DeployerMovementBehaviour extends MovementBehaviour {
             return;
         if (player.getBlockBreakingProgress() == null)
             return;
-        context.world.setBlockBreakingInfo(player.getId(), player.getBlockBreakingProgress().getKey(), -1);
+        context.world.setBlockBreakingInfo(player.cast().getId(), player.getBlockBreakingProgress().getKey(), -1);
         player.setBlockBreakingProgress(null);
     }
 
@@ -211,25 +212,27 @@ public class DeployerMovementBehaviour extends MovementBehaviour {
         if (player == null)
             return;
 
+        ServerPlayerEntity serverPlayer = player.cast();
         cancelStall(context);
         try (ErrorReporter.Logging logging = new ErrorReporter.Logging(context.contraption.entity.getErrorReporterContext(), LOGGER)) {
             NbtWriteView view = NbtWriteView.create(logging, context.world.getRegistryManager());
-            player.getInventory().writeData(view.getListAppender("Inventory", StackWithSlot.CODEC));
+            serverPlayer.getInventory().writeData(view.getListAppender("Inventory", StackWithSlot.CODEC));
             context.blockEntityData.put("Inventory", NbtCompound.CODEC, view.getNbt());
         }
-        player.discard();
+        serverPlayer.discard();
     }
 
     private void tryGrabbingItem(MovementContext context) {
         DeployerPlayer player = getPlayer(context);
         if (player == null)
             return;
-        if (player.getMainHandStack().isEmpty()) {
+        ServerPlayerEntity serverPlayer = player.cast();
+        if (serverPlayer.getMainHandStack().isEmpty()) {
             FilterItemStack filter = context.getFilterFromBE();
             if (filter.item().isOf(AllItems.SCHEMATIC))
                 return;
             ItemStack held = context.contraption.getStorage().getAllItems().extract(stack -> filter.test(context.world, stack), 1);
-            player.setStackInHand(Hand.MAIN_HAND, held);
+            serverPlayer.setStackInHand(Hand.MAIN_HAND, held);
         }
     }
 
@@ -237,7 +240,7 @@ public class DeployerMovementBehaviour extends MovementBehaviour {
         DeployerPlayer player = getPlayer(context);
         if (player == null)
             return;
-        PlayerInventory inv = player.getInventory();
+        PlayerInventory inv = player.cast().getInventory();
         FilterItemStack filter = context.getFilterFromBE();
 
         DefaultedList<ItemStack> main = inv.getMainStacks();
@@ -264,7 +267,7 @@ public class DeployerMovementBehaviour extends MovementBehaviour {
         DeployerPlayer player = getPlayer(context);
         if (player == null)
             return;
-        ItemStack stack = player.getMainHandStack();
+        ItemStack stack = player.cast().getMainHandStack();
         if (stack.isEmpty()) {
             return;
         }
@@ -283,11 +286,11 @@ public class DeployerMovementBehaviour extends MovementBehaviour {
             try (ErrorReporter.Logging logging = new ErrorReporter.Logging(context.contraption.entity.getErrorReporterContext(), LOGGER)) {
                 NbtCompound inventory = context.blockEntityData.get("Inventory", NbtCompound.CODEC).orElseGet(NbtCompound::new);
                 ReadView view = NbtReadView.create(logging, registryManager, inventory);
-                player.getInventory().readData(view.getTypedListView("Inventory", StackWithSlot.CODEC));
+                player.cast().getInventory().readData(view.getTypedListView("Inventory", StackWithSlot.CODEC));
             }
 
             if (context.data.contains("HeldItem"))
-                player.setStackInHand(
+                player.cast().setStackInHand(
                     Hand.MAIN_HAND,
                     context.data.get("HeldItem", ItemStack.CODEC, registryManager.getOps(NbtOps.INSTANCE)).orElse(ItemStack.EMPTY)
                 );

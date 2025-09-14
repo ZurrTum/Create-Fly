@@ -110,27 +110,28 @@ public class DeployerHandler {
     }
 
     static void activate(DeployerPlayer player, Vec3d vec, BlockPos clickedPos, Vec3d extensionVector, Mode mode) {
+        ServerPlayerEntity serverPlayer = player.cast();
         HashMultimap<RegistryEntry<EntityAttribute>, EntityAttributeModifier> attributeModifiers = HashMultimap.create();
-        ItemStack stack = player.getMainHandStack();
+        ItemStack stack = serverPlayer.getMainHandStack();
         stack.getOrDefault(DataComponentTypes.ATTRIBUTE_MODIFIERS, AttributeModifiersComponent.DEFAULT).modifiers()
             .forEach(e -> attributeModifiers.put(e.attribute(), e.modifier()));
 
-        player.getAttributes().addTemporaryModifiers(attributeModifiers);
+        serverPlayer.getAttributes().addTemporaryModifiers(attributeModifiers);
         activateInner(player, vec, clickedPos, extensionVector, mode);
-        player.getAttributes().removeModifiers(attributeModifiers);
+        serverPlayer.getAttributes().removeModifiers(attributeModifiers);
     }
 
     private static void activateInner(DeployerPlayer player, Vec3d vec, BlockPos clickedPos, Vec3d extensionVector, Mode mode) {
+        ServerPlayerEntity serverPlayer = player.cast();
         Vec3d rayOrigin = vec.add(extensionVector.multiply(3 / 2f + 1 / 64f));
         Vec3d rayTarget = vec.add(extensionVector.multiply(5 / 2f - 1 / 64f));
-        player.setPosition(rayOrigin.x, rayOrigin.y, rayOrigin.z);
+        serverPlayer.setPosition(rayOrigin.x, rayOrigin.y, rayOrigin.z);
         BlockPos pos = BlockPos.ofFloored(vec);
-        ItemStack stack = player.getMainHandStack();
+        ItemStack stack = serverPlayer.getMainHandStack();
         Item item = stack.getItem();
 
         // Check for entities
-        final ServerWorld level = player.getWorld();
-        ServerPlayerEntity serverPlayer = player.cast();
+        final ServerWorld level = serverPlayer.getWorld();
         List<Entity> entities = level.getNonSpectatingEntities(Entity.class, new Box(clickedPos)).stream()
             .filter(e -> !(e instanceof AbstractContraptionEntity)).toList();
         Hand hand = Hand.MAIN_HAND;
@@ -164,14 +165,14 @@ public class DeployerHandler {
                         FoodComponent foodProperties = stack.get(DataComponentTypes.FOOD);
                         if (foodProperties != null && playerEntity.canConsume(foodProperties.canAlwaysEat())) {
                             ItemStack copy = stack.copy();
-                            player.setStackInHand(hand, stack.finishUsing(level, playerEntity));
+                            serverPlayer.setStackInHand(hand, stack.finishUsing(level, playerEntity));
                             player.setSpawnedItemEffects(copy);
                             success = true;
                         }
                     }
                     if (!success && stack.isIn(AllItemTags.DEPLOYABLE_DRINK)) {
                         player.setSpawnedItemEffects(stack.copy());
-                        player.setStackInHand(hand, stack.finishUsing(level, playerEntity));
+                        serverPlayer.setStackInHand(hand, stack.finishUsing(level, playerEntity));
                         success = true;
                     }
                 }
@@ -179,13 +180,13 @@ public class DeployerHandler {
 
             // Punch entity
             if (mode == Mode.PUNCH) {
-                player.resetLastAttackedTicks();
-                player.attack(entity);
+                serverPlayer.resetLastAttackedTicks();
+                serverPlayer.attack(entity);
                 success = true;
             }
 
             AllSynchedDatas.CAPTURE_DROPS.set(entity, Optional.empty());
-            capturedDrops.forEach(e -> player.getInventory().offerOrDrop(e));
+            capturedDrops.forEach(e -> serverPlayer.getInventory().offerOrDrop(e));
             if (success)
                 return;
         }
@@ -230,7 +231,7 @@ public class DeployerHandler {
 
             if (progress >= 1) {
                 tryHarvestBlock(player, player.getInteractionManager(), clickedPos);
-                level.setBlockBreakingInfo(player.getId(), clickedPos, -1);
+                level.setBlockBreakingInfo(serverPlayer.getId(), clickedPos, -1);
                 player.setBlockBreakingProgress(null);
                 return;
             }
@@ -240,7 +241,7 @@ public class DeployerHandler {
             }
 
             if ((int) (before * 10) != (int) (progress * 10))
-                level.setBlockBreakingInfo(player.getId(), clickedPos, (int) (progress * 10));
+                level.setBlockBreakingInfo(serverPlayer.getId(), clickedPos, (int) (progress * 10));
             player.setBlockBreakingProgress(Pair.of(clickedPos, progress));
             return;
         }
@@ -263,8 +264,8 @@ public class DeployerHandler {
         //                return;
         //        }
 
-        boolean holdingSomething = !player.getMainHandStack().isEmpty();
-        boolean flag1 = !(player.isSneaking() && holdingSomething) || !player.getMainHandStack().isEmpty();
+        boolean holdingSomething = !serverPlayer.getMainHandStack().isEmpty();
+        boolean flag1 = !(serverPlayer.isSneaking() && holdingSomething) || !serverPlayer.getMainHandStack().isEmpty();
 
         // Use on block
         if (flag1 && safeOnUse(clickedState, level, clickedPos, player, hand, result).isAccepted())
@@ -312,7 +313,7 @@ public class DeployerHandler {
         if (onItemRightClick instanceof ActionResult.Success success) {
             ItemStack resultStack = success.getNewHandStack();
             if (resultStack != null && resultStack != stack || resultStack.getCount() != stack.getCount() || resultStack.getMaxUseTime(serverPlayer) > 0 || resultStack.getDamage() != stack.getDamage()) {
-                player.setStackInHand(hand, resultStack);
+                serverPlayer.setStackInHand(hand, resultStack);
             }
         }
 
@@ -324,16 +325,17 @@ public class DeployerHandler {
             }
         }
 
-        if (!player.getActiveItem().isEmpty())
-            player.setStackInHand(hand, stack.finishUsing(level, serverPlayer));
+        if (!serverPlayer.getActiveItem().isEmpty())
+            serverPlayer.setStackInHand(hand, stack.finishUsing(level, serverPlayer));
 
-        player.clearActiveItem();
+        serverPlayer.clearActiveItem();
     }
 
     public static boolean tryHarvestBlock(DeployerPlayer player, ServerPlayerInteractionManager interactionManager, BlockPos pos) {
         // <> PlayerInteractionManager#tryHarvestBlock
 
-        ServerWorld world = player.getWorld();
+        ServerPlayerEntity serverPlayer = player.cast();
+        ServerWorld world = serverPlayer.getWorld();
         BlockState blockstate = world.getBlockState(pos);
         GameMode gameType = interactionManager.getGameMode();
 
@@ -342,13 +344,13 @@ public class DeployerHandler {
         //            return false;
 
         BlockEntity blockEntity = world.getBlockEntity(pos);
-        if (player.isBlockBreakingRestricted(world, pos, gameType))
+        if (serverPlayer.isBlockBreakingRestricted(world, pos, gameType))
             return false;
 
-        ItemStack prevHeldItem = player.getMainHandStack();
+        ItemStack prevHeldItem = serverPlayer.getMainHandStack();
         ItemStack heldItem = prevHeldItem.copy();
 
-        boolean canHarvest = player.canHarvest(blockstate) && player.canModifyBlocks();
+        boolean canHarvest = serverPlayer.canHarvest(blockstate) && serverPlayer.canModifyBlocks();
         prevHeldItem.postMine(world, blockstate, pos, player.cast());
 
         BlockPos posUp = pos.up();
@@ -369,7 +371,7 @@ public class DeployerHandler {
             return true;
 
         Block.getDroppedStacks(blockstate, world, pos, blockEntity, player.cast(), prevHeldItem)
-            .forEach(item -> player.getInventory().offerOrDrop(item));
+            .forEach(item -> serverPlayer.getInventory().offerOrDrop(item));
         blockstate.onStacksDropped(world, pos, prevHeldItem, true);
         return true;
     }
@@ -380,7 +382,7 @@ public class DeployerHandler {
         try {
             ActionResult result = BlockHelper.invokeUse(state, world, player.cast(), hand, ray);
             for (ItemEntity itemEntity : drops)
-                player.getInventory().offerOrDrop(itemEntity.getStack());
+                player.cast().getInventory().offerOrDrop(itemEntity.getStack());
             return result;
         } finally {
             CAPTURED_BLOCK_DROPS.remove(pos);

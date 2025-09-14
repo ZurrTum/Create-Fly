@@ -43,7 +43,7 @@ public class DeployerItemHandler implements SidedInventory {
         if (be.filtering.getFilter().isEmpty()) {
             return true;
         }
-        return !be.filtering.test(player.getMainHandStack());
+        return !be.filtering.test(player.cast().getMainHandStack());
     }
 
     @Override
@@ -58,7 +58,7 @@ public class DeployerItemHandler implements SidedInventory {
             return ItemStack.EMPTY;
         }
         if (slot == 0) {
-            return player == null ? ItemStack.EMPTY : player.getMainHandStack();
+            return player == null ? ItemStack.EMPTY : player.cast().getMainHandStack();
         }
         return be.overflowItems.get(slot - 1);
     }
@@ -70,7 +70,7 @@ public class DeployerItemHandler implements SidedInventory {
             return;
         }
         if (slot == 0) {
-            player.setStackInHand(Hand.MAIN_HAND, stack);
+            player.cast().setStackInHand(Hand.MAIN_HAND, stack);
         } else {
             be.overflowItems.set(slot - 1, stack);
         }

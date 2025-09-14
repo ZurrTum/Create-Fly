@@ -147,7 +147,7 @@ public abstract class LivingEntityMixin extends Entity {
         switch (handler.get()) {
             case 1 -> AllSynchedDatas.CRUSH_DROP.set(this, false);
             case 2 -> AllSynchedDatas.CAPTURE_DROPS.get(this).ifPresent(drops -> {
-                PlayerInventory inventory = ((DeployerPlayer) damageSource.getAttacker()).getInventory();
+                PlayerInventory inventory = ((DeployerPlayer) damageSource.getAttacker()).cast().getInventory();
                 drops.forEach(inventory::offerOrDrop);
                 AllSynchedDatas.CAPTURE_DROPS.set(this, Optional.empty());
             });

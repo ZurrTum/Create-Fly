@@ -14,6 +14,7 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.registry.RegistryOps;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.storage.NbtReadView;
 import net.minecraft.storage.ReadView;
@@ -55,7 +56,7 @@ public class DeployerMovingInteraction extends MovingInteractionBehaviour {
                 try (ErrorReporter.Logging logging = new ErrorReporter.Logging(contraptionEntity.getErrorReporterContext(), LOGGER)) {
                     NbtCompound inventory = ctx.blockEntityData.get("Inventory", NbtCompound.CODEC).orElseGet(NbtCompound::new);
                     ReadView view = NbtReadView.create(logging, ctx.world.getRegistryManager(), inventory);
-                    deployerFakePlayer.getInventory().readData(view.getTypedListView("Inventory", StackWithSlot.CODEC));
+                    deployerFakePlayer.cast().getInventory().readData(view.getTypedListView("Inventory", StackWithSlot.CODEC));
                 }
                 ctx.temporaryData = fake = deployerFakePlayer;
                 ctx.blockEntityData.remove("Inventory");
@@ -65,9 +66,10 @@ public class DeployerMovingInteraction extends MovingInteractionBehaviour {
             if (fake == null)
                 return false;
 
-            ItemStack deployerItem = fake.getMainHandStack();
+            ServerPlayerEntity serverPlayer = fake.cast();
+            ItemStack deployerItem = serverPlayer.getMainHandStack();
             player.setStackInHand(activeHand, deployerItem.copy());
-            fake.setStackInHand(Hand.MAIN_HAND, heldStack.copy());
+            serverPlayer.setStackInHand(Hand.MAIN_HAND, heldStack.copy());
             if (!heldStack.isEmpty()) {
                 RegistryOps<NbtElement> ops = player.getRegistryManager().getOps(NbtOps.INSTANCE);
                 ctx.blockEntityData.put("HeldItem", ItemStack.CODEC, ops, heldStack);

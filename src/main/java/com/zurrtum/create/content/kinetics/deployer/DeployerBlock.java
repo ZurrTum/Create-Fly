@@ -121,12 +121,13 @@ public class DeployerBlock extends DirectionalAxisKineticBlock implements IBE<De
 
         withBlockEntityDo(
             level, pos, be -> {
-                ItemStack heldByDeployer = be.player.getMainHandStack().copy();
+                ServerPlayerEntity serverPlayer = be.player.cast();
+                ItemStack heldByDeployer = serverPlayer.getMainHandStack().copy();
                 if (heldByDeployer.isEmpty() && heldByPlayer.isEmpty())
                     return;
 
                 player.setStackInHand(hand, heldByDeployer);
-                be.player.setStackInHand(Hand.MAIN_HAND, heldByPlayer);
+                serverPlayer.setStackInHand(Hand.MAIN_HAND, heldByPlayer);
                 be.sendData();
             }
         );

@@ -27,6 +27,7 @@ import net.minecraft.recipe.RecipeEntry;
 import net.minecraft.recipe.ServerRecipeManager;
 import net.minecraft.recipe.input.RecipeInput;
 import net.minecraft.recipe.input.SingleStackRecipeInput;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
@@ -146,23 +147,24 @@ public class DeployerBlockEntity extends KineticBlockEntity {
             return;
         if (world instanceof ServerWorld sLevel) {
             player = DeployerPlayer.create(sLevel, owner, ownerName);
+            ServerPlayerEntity serverPlayer = player.cast();
             if (deferredInventoryList != null) {
                 try (ErrorReporter.Logging logging = new ErrorReporter.Logging(getReporterContext(), LOGGER)) {
                     ReadView view = NbtReadView.create(logging, world.getRegistryManager(), deferredInventoryList);
-                    player.getInventory().readData(view.getTypedListView("Inventory", StackWithSlot.CODEC));
+                    serverPlayer.getInventory().readData(view.getTypedListView("Inventory", StackWithSlot.CODEC));
                 }
                 deferredInventoryList = null;
-                heldItem = player.getMainHandStack();
+                heldItem = serverPlayer.getMainHandStack();
                 sendData();
             }
             Vec3d initialPos = VecHelper.getCenterOf(pos.offset(getCachedState().get(FACING)));
-            player.setPosition(initialPos.x, initialPos.y, initialPos.z);
+            serverPlayer.setPosition(initialPos.x, initialPos.y, initialPos.z);
         }
         invHandler = createHandler();
     }
 
     protected void onExtract(ItemStack stack) {
-        player.setStackInHand(Hand.MAIN_HAND, stack.copy());
+        player.cast().setStackInHand(Hand.MAIN_HAND, stack.copy());
         sendData();
         markDirty();
     }
@@ -179,7 +181,7 @@ public class DeployerBlockEntity extends KineticBlockEntity {
             return;
         if (!world.isClient && player != null && player.getBlockBreakingProgress() != null) {
             if (world.isAir(player.getBlockBreakingProgress().getKey())) {
-                world.setBlockBreakingInfo(player.getId(), player.getBlockBreakingProgress().getKey(), -1);
+                world.setBlockBreakingInfo(player.cast().getId(), player.getBlockBreakingProgress().getKey(), -1);
                 player.setBlockBreakingProgress(null);
             }
         }
@@ -192,7 +194,8 @@ public class DeployerBlockEntity extends KineticBlockEntity {
         if (player == null)
             return;
 
-        ItemStack stack = player.getMainHandStack();
+        ServerPlayerEntity serverPlayer = player.cast();
+        ItemStack stack = serverPlayer.getMainHandStack();
         if (state == State.WAITING) {
             if (!overflowItems.isEmpty()) {
                 timer = getTimerSpeed() * 10;
@@ -200,7 +203,7 @@ public class DeployerBlockEntity extends KineticBlockEntity {
             }
 
             boolean changed = false;
-            PlayerInventory inventory = player.getInventory();
+            PlayerInventory inventory = serverPlayer.getInventory();
             for (int i = 0, size = inventory.size(); i < size; i++) {
                 if (overflowItems.size() > 10)
                     break;
@@ -338,8 +341,9 @@ public class DeployerBlockEntity extends KineticBlockEntity {
         Direction direction = getCachedState().get(Properties.FACING);
         Vec3d center = VecHelper.getCenterOf(pos);
         BlockPos clickedPos = pos.offset(direction, 2);
-        player.setPitch(direction == Direction.UP ? -90 : direction == Direction.DOWN ? 90 : 0);
-        player.setYaw(direction.getPositiveHorizontalDegrees());
+        ServerPlayerEntity serverPlayer = player.cast();
+        serverPlayer.setPitch(direction == Direction.UP ? -90 : direction == Direction.DOWN ? 90 : 0);
+        serverPlayer.setYaw(direction.getPositiveHorizontalDegrees());
 
         if (direction == Direction.DOWN && BlockEntityBehaviour.get(world, clickedPos, TransportedItemStackHandlerBehaviour.TYPE) != null)
             return; // Belt processing handled in BeltDeployerCallbacks
@@ -349,7 +353,7 @@ public class DeployerBlockEntity extends KineticBlockEntity {
 
         if (player != null) {
             int count = heldItem.getCount();
-            heldItem = player.getMainHandStack();
+            heldItem = serverPlayer.getMainHandStack();
             if (count != heldItem.getCount())
                 markDirty();
         }
@@ -398,12 +402,13 @@ public class DeployerBlockEntity extends KineticBlockEntity {
         }
 
         if (player != null) {
+            ServerPlayerEntity serverPlayer = player.cast();
             try (ErrorReporter.Logging logging = new ErrorReporter.Logging(getReporterContext(), LOGGER)) {
                 NbtWriteView writeView = NbtWriteView.create(logging, world.getRegistryManager());
-                player.getInventory().writeData(writeView.getListAppender("Inventory", StackWithSlot.CODEC));
+                serverPlayer.getInventory().writeData(writeView.getListAppender("Inventory", StackWithSlot.CODEC));
                 view.put("Inventory", NbtCompound.CODEC, writeView.getNbt());
             }
-            ItemStack stack = player.getMainHandStack();
+            ItemStack stack = serverPlayer.getMainHandStack();
             if (!stack.isEmpty()) {
                 view.put("HeldItem", ItemStack.CODEC, stack);
             }
@@ -457,9 +462,10 @@ public class DeployerBlockEntity extends KineticBlockEntity {
     public void discardPlayer() {
         if (player == null)
             return;
-        player.getInventory().dropAll();
-        overflowItems.forEach(itemstack -> player.dropItem(itemstack, true, false));
-        player.discard();
+        ServerPlayerEntity serverPlayer = player.cast();
+        serverPlayer.getInventory().dropAll();
+        overflowItems.forEach(itemstack -> serverPlayer.dropItem(itemstack, true, false));
+        serverPlayer.discard();
         player = null;
     }
 
@@ -478,7 +484,7 @@ public class DeployerBlockEntity extends KineticBlockEntity {
         if (player == null || world == null)
             return null;
 
-        ItemStack heldItemMainhand = player.getMainHandStack();
+        ItemStack heldItemMainhand = player.cast().getMainHandStack();
         ServerRecipeManager recipeManager = ((ServerWorld) world).getRecipeManager();
         if (heldItemMainhand.getItem() instanceof SandPaperItem) {
             return recipeManager.getFirstMatch(AllRecipeTypes.SANDPAPER_POLISHING, new SingleStackRecipeInput(stack), world).map(RecipeEntry::value)
