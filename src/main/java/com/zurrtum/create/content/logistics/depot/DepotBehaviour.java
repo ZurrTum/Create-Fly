@@ -141,18 +141,18 @@ public class DepotBehaviour extends BlockEntityBehaviour<SmartBlockEntity> {
     }
 
     protected boolean tick(TransportedItemStack heldItem) {
+        heldItem.prevSideOffset = heldItem.sideOffset;
         if (heldItem.beltPosition == .5f) {
             return true;
         }
         heldItem.prevBeltPosition = heldItem.beltPosition;
-        heldItem.prevSideOffset = heldItem.sideOffset;
         float diff = .5f - heldItem.beltPosition;
         if (diff > 1 / 512f) {
             if (diff > 1 / 32f && !BeltHelper.isItemUpright(heldItem.stack))
                 heldItem.angle += 1;
             heldItem.beltPosition += diff / 4f;
         } else {
-            heldItem.beltPosition = .5f;
+            heldItem.prevBeltPosition = heldItem.beltPosition = .5f;
         }
         return diff < 1 / 16f;
     }
@@ -379,21 +379,23 @@ public class DepotBehaviour extends BlockEntityBehaviour<SmartBlockEntity> {
             setCenteredHeldItem(result.getHeldOutput());
 
         List<TransportedItemStack> outputs = result.getOutputs();
-        int skip = 0;
-        if (getHeldItemStack().isEmpty()) {
-            setCenteredHeldItem(outputs.getFirst());
-            skip = 1;
-        }
-        List<ItemStack> items = outputs.stream().skip(skip).map(t -> t.stack).toList();
-        items = processingOutputBuffer.insert(items);
-        if (!items.isEmpty()) {
-            World world = blockEntity.getWorld();
-            Vec3d vec = VecHelper.getCenterOf(blockEntity.getPos()).add(0, .5f, 0);
-            double x = vec.x;
-            double y = vec.y + .5f;
-            double z = vec.z;
-            for (ItemStack stack : items) {
-                ItemScatterer.spawn(world, x, y, z, stack);
+        if (!outputs.isEmpty()) {
+            int skip = 0;
+            if (getHeldItemStack().isEmpty()) {
+                setCenteredHeldItem(outputs.getFirst());
+                skip = 1;
+            }
+            List<ItemStack> items = outputs.stream().skip(skip).map(t -> t.stack).toList();
+            items = processingOutputBuffer.insert(items);
+            if (!items.isEmpty()) {
+                World world = blockEntity.getWorld();
+                Vec3d vec = VecHelper.getCenterOf(blockEntity.getPos()).add(0, .5f, 0);
+                double x = vec.x;
+                double y = vec.y + .5f;
+                double z = vec.z;
+                for (ItemStack stack : items) {
+                    ItemScatterer.spawn(world, x, y, z, stack);
+                }
             }
         }
 
