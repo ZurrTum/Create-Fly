@@ -83,7 +83,7 @@ public class SteamEngineVisual extends AbstractBlockEntityVisual<SteamEngineBloc
         transformed(this.piston, facing, roll90).translate(0, piston + 20 / 16f, 0).setChanged();
 
         transformed(linkage, facing, roll90).center().translate(0, 1, 0).uncenter().translate(0, piston + 20 / 16f, 0).translate(0, 4 / 16f, 8 / 16f)
-            .rotateXDegrees(angle2).translate(0, -4 / 16f, -8 / 16f).setChanged();
+            .rotateX(angle2).translate(0, -4 / 16f, -8 / 16f).setChanged();
 
         transformed(connector, facing, roll90).translate(0, 2, 0).center().rotateX(-(angle + MathHelper.HALF_PI)).uncenter().setChanged();
     }
