@@ -7,6 +7,7 @@ import com.zurrtum.create.foundation.block.NeighborUpdateListeningBlock;
 import com.zurrtum.create.infrastructure.config.AllConfigs;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
 import net.minecraft.block.ShapeContext;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.entity.player.PlayerEntity;
@@ -114,12 +115,41 @@ public class MechanicalPistonBlock extends DirectionalAxisKineticBlock implement
     public void scheduledTick(BlockState state, ServerWorld worldIn, BlockPos pos, Random r) {
         Direction direction = state.get(FACING);
         BlockState pole = worldIn.getBlockState(pos.offset(direction.getOpposite()));
-        if (!pole.isOf(AllBlocks.PISTON_EXTENSION_POLE))
+        if (!pole.isOf(AllBlocks.PISTON_EXTENSION_POLE)) {
+            if (pole.isOf(Blocks.AIR)) {
+                withBlockEntityDo(
+                    worldIn, pos, be -> {
+                        if (be.running) {
+                            return;
+                        }
+                        float speed = be.getSpeed();
+                        if (speed == 0) {
+                            return;
+                        }
+                        Direction positive = Direction.get(Direction.AxisDirection.POSITIVE, direction.getAxis());
+                        Direction movementOppositeDirection = speed > 0 ^ direction.getAxis() != Direction.Axis.Z ? positive.getOpposite() : positive;
+                        if (movementOppositeDirection == direction) {
+                            be.assembleNextTick = true;
+                        }
+                    }
+                );
+            }
             return;
+        }
         if (pole.get(PistonExtensionPoleBlock.FACING).getAxis() != direction.getAxis())
             return;
         withBlockEntityDo(
             worldIn, pos, be -> {
+                if (!be.running) {
+                    float speed = be.getSpeed();
+                    if (speed != 0) {
+                        Direction positive = Direction.get(Direction.AxisDirection.POSITIVE, direction.getAxis());
+                        Direction movementDirection = speed > 0 ^ direction.getAxis() != Direction.Axis.Z ? positive : positive.getOpposite();
+                        if (movementDirection == direction) {
+                            be.assembleNextTick = true;
+                        }
+                    }
+                }
                 if (be.lastException == null)
                     return;
                 be.lastException = null;
