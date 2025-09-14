@@ -12,7 +12,6 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.ShapeContext;
 import net.minecraft.block.Waterloggable;
-import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.ai.pathing.NavigationType;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.fluid.FluidState;
@@ -82,9 +81,7 @@ public class PistonExtensionPoleBlock extends WrenchableDirectionalBlock impleme
                 .forEach(p -> worldIn.breakBlock(p, !player.isCreative()));
             worldIn.setBlockState(basePos, worldIn.getBlockState(basePos).with(MechanicalPistonBlock.STATE, PistonState.RETRACTED));
 
-            BlockEntity be = worldIn.getBlockEntity(basePos);
-            if (be instanceof MechanicalPistonBlockEntity baseBE) {
-                baseBE.offset = 0;
+            if (worldIn.getBlockEntity(basePos) instanceof MechanicalPistonBlockEntity baseBE) {
                 baseBE.onLengthBroken();
             }
         }

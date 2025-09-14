@@ -73,6 +73,9 @@ public class MechanicalPistonHeadBlock extends WrenchableDirectionalBlock implem
             BlockPos.stream(pistonBase, pistonHead).filter(p -> !p.equals(pos) && !p.equals(basePos))
                 .forEach(p -> worldIn.breakBlock(p, !player.isCreative()));
             worldIn.setBlockState(basePos, worldIn.getBlockState(basePos).with(MechanicalPistonBlock.STATE, PistonState.RETRACTED));
+            if (worldIn.getBlockEntity(basePos) instanceof MechanicalPistonBlockEntity baseBE) {
+                baseBE.onLengthBroken();
+            }
         }
 
         return super.onBreak(worldIn, pos, state, player);
