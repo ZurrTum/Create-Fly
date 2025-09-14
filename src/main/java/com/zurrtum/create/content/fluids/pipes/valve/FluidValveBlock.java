@@ -32,6 +32,7 @@ import net.minecraft.world.WorldView;
 import net.minecraft.world.block.WireOrientation;
 import net.minecraft.world.tick.ScheduledTickView;
 import net.minecraft.world.tick.TickPriority;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class FluidValveBlock extends DirectionalAxisKineticBlock implements IAxisPipe, IBE<FluidValveBlockEntity>, ProperWaterloggedBlock, NeighborUpdateListeningBlock {
@@ -63,6 +64,7 @@ public class FluidValveBlock extends DirectionalAxisKineticBlock implements IAxi
         return super.prefersConnectionTo(reader, pos, facing, shaftAxis);
     }
 
+    @NotNull
     public static Axis getPipeAxis(BlockState state) {
         if (!(state.getBlock() instanceof FluidValveBlock))
             throw new IllegalStateException("Provided BlockState is for a different block.");

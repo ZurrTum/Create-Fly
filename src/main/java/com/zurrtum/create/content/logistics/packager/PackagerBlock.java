@@ -8,10 +8,9 @@ import com.zurrtum.create.api.entity.FakePlayerHandler;
 import com.zurrtum.create.content.equipment.wrench.IWrenchable;
 import com.zurrtum.create.content.logistics.box.PackageItem;
 import com.zurrtum.create.foundation.advancement.AdvancementBehaviour;
-import com.zurrtum.create.foundation.block.IBE;
-import com.zurrtum.create.foundation.block.NeighborChangeListeningBlock;
-import com.zurrtum.create.foundation.block.WeakPowerControlBlock;
-import com.zurrtum.create.foundation.block.WrenchableDirectionalBlock;
+import com.zurrtum.create.foundation.block.*;
+import com.zurrtum.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
+import com.zurrtum.create.foundation.blockEntity.behaviour.inventory.InvManipulationBehaviour;
 import com.zurrtum.create.foundation.item.ItemHelper;
 import com.zurrtum.create.infrastructure.items.ItemInventoryProvider;
 import net.minecraft.block.Block;
@@ -42,7 +41,7 @@ import net.minecraft.world.WorldView;
 import net.minecraft.world.block.WireOrientation;
 import org.jetbrains.annotations.Nullable;
 
-public class PackagerBlock extends WrenchableDirectionalBlock implements IBE<PackagerBlockEntity>, IWrenchable, ItemInventoryProvider<PackagerBlockEntity>, NeighborChangeListeningBlock, WeakPowerControlBlock {
+public class PackagerBlock extends WrenchableDirectionalBlock implements IBE<PackagerBlockEntity>, IWrenchable, ItemInventoryProvider<PackagerBlockEntity>, NeighborChangeListeningBlock, WeakPowerControlBlock, NeighborUpdateListeningBlock {
 
     public static final BooleanProperty POWERED = Properties.POWERED;
     public static final BooleanProperty LINKED = BooleanProperty.of("linked");
@@ -169,6 +168,15 @@ public class PackagerBlock extends WrenchableDirectionalBlock implements IBE<Pac
     public void onNeighborChange(BlockState state, WorldView level, BlockPos pos, BlockPos neighbor) {
         if (neighbor.offset(state.get(FACING, Direction.UP)).equals(pos))
             withBlockEntityDo(level, pos, PackagerBlockEntity::triggerStockCheck);
+    }
+
+    @Override
+    public void neighborUpdate(BlockState state, World worldIn, BlockPos pos, Block sourceBlock, BlockPos fromPos, boolean isMoving) {
+        if (worldIn.isClient)
+            return;
+        InvManipulationBehaviour behaviour = BlockEntityBehaviour.get(worldIn, pos, InvManipulationBehaviour.TYPE);
+        if (behaviour != null)
+            behaviour.onNeighborChanged(fromPos);
     }
 
     @Override

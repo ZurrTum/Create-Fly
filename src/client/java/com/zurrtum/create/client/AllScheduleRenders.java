@@ -3,9 +3,7 @@ package com.zurrtum.create.client;
 import com.zurrtum.create.AllSchedules;
 import com.zurrtum.create.client.content.trains.schedule.IScheduleInput;
 import com.zurrtum.create.client.content.trains.schedule.condition.*;
-import com.zurrtum.create.client.content.trains.schedule.destination.ChangeThrottleInstructionRender;
-import com.zurrtum.create.client.content.trains.schedule.destination.ChangeTitleInstructionRender;
-import com.zurrtum.create.client.content.trains.schedule.destination.DestinationInstructionRender;
+import com.zurrtum.create.client.content.trains.schedule.destination.*;
 import com.zurrtum.create.content.trains.schedule.ScheduleDataEntry;
 import net.minecraft.util.Identifier;
 
@@ -27,6 +25,8 @@ public class AllScheduleRenders {
 
     public static void register() {
         register(AllSchedules.DESTINATION, DestinationInstructionRender::new);
+        register(AllSchedules.PACKAGE_DELIVERY, DeliverPackagesInstructionRender::new);
+        register(AllSchedules.PACKAGE_RETRIEVAL, FetchPackagesInstructionRender::new);
         register(AllSchedules.RENAME, ChangeTitleInstructionRender::new);
         register(AllSchedules.THROTTLE, ChangeThrottleInstructionRender::new);
         register(AllSchedules.DELAY, ScheduledDelayRender::new);

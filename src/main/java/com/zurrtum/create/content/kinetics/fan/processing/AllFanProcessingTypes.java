@@ -116,7 +116,7 @@ public class AllFanProcessingTypes {
             ).filter(AllRecipeTypes.CAN_BE_AUTOMATED);
 
             if (smeltingRecipe.isEmpty()) {
-                smeltingRecipe = recipeManager.getFirstMatch(RecipeType.BLASTING, input, level);
+                smeltingRecipe = recipeManager.getFirstMatch(RecipeType.BLASTING, input, level).filter(AllRecipeTypes.CAN_BE_AUTOMATED);
             }
 
             if (smeltingRecipe.isPresent()) {

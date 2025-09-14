@@ -34,6 +34,16 @@ public class TrackBlockItem extends BlockItem {
     }
 
     @Override
+    public ActionResult use(World world, PlayerEntity player, Hand usedHand) {
+        ItemStack stack = player.getStackInHand(usedHand);
+        if (player.isSneaking() && hasGlint(stack)) {
+            return clearSelection(stack, world, player);
+        } else {
+            return super.use(world, player, usedHand);
+        }
+    }
+
+    @Override
     public ActionResult useOnBlock(ItemUsageContext pContext) {
         ItemStack stack = pContext.getStack();
         BlockPos pos = pContext.getBlockPos();
@@ -68,12 +78,7 @@ public class TrackBlockItem extends BlockItem {
             return super.useOnBlock(pContext);
 
         } else if (player.isSneaking()) {
-            if (!level.isClient) {
-                player.sendMessage(Text.translatable("create.track.selection_cleared"), true);
-                stack.remove(AllDataComponents.TRACK_CONNECTING_FROM);
-            } else
-                level.playSound(player, pos, SoundEvents.ENTITY_ITEM_FRAME_REMOVE_ITEM, SoundCategory.BLOCKS, 0.75f, 1);
-            return ActionResult.SUCCESS;
+            return clearSelection(stack, level, player);
         }
 
         boolean placing = !(state.getBlock() instanceof ITrackBlock);
@@ -121,6 +126,16 @@ public class TrackBlockItem extends BlockItem {
             );
 
         return ActionResult.SUCCESS;
+    }
+
+    public static ActionResult clearSelection(ItemStack stack, World level, PlayerEntity player) {
+        if (level.isClient) {
+            level.playSound(player, player.getBlockPos(), SoundEvents.ENTITY_ITEM_FRAME_REMOVE_ITEM, SoundCategory.BLOCKS, 0.75f, 1.0f);
+        } else {
+            player.sendMessage(Text.translatable("create.track.selection_cleared"), true);
+            stack.remove(AllDataComponents.TRACK_CONNECTING_FROM);
+        }
+        return ActionResult.SUCCESS.withNewHandStack(stack);
     }
 
     public BlockState getPlacementState(ItemUsageContext pContext) {

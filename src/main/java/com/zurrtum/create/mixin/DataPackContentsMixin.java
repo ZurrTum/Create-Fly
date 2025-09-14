@@ -2,6 +2,8 @@ package com.zurrtum.create.mixin;
 
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import com.zurrtum.create.content.kinetics.belt.BeltHelper;
+import com.zurrtum.create.foundation.recipe.RecipeFinder;
+import com.zurrtum.create.foundation.recipe.trie.RecipeTrieFinder;
 import net.minecraft.resource.ResourceReloader;
 import net.minecraft.server.DataPackContents;
 import org.spongepowered.asm.mixin.Mixin;
@@ -16,6 +18,8 @@ public class DataPackContentsMixin {
     @ModifyReturnValue(method = "getContents()Ljava/util/List;", at = @At("RETURN"))
     private List<ResourceReloader> add(List<ResourceReloader> original) {
         List<ResourceReloader> list = new ArrayList<>(original);
+        list.add(RecipeFinder.LISTENER);
+        list.add(RecipeTrieFinder.LISTENER);
         list.add(BeltHelper.LISTENER);
         return Collections.unmodifiableList(list);
     }

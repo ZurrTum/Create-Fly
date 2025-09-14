@@ -246,3 +246,4 @@ accessible field net/minecraft/world/biome/GenerationSettings features Ljava/uti
 mutable field net/minecraft/world/biome/GenerationSettings features Ljava/util/List;
 accessible field net/minecraft/block/ConcretePowderBlock hardenedState Lnet/minecraft/block/Block;
 accessible method net/minecraft/registry/RegistryOps <init> (Lcom/mojang/serialization/DynamicOps;Lnet/minecraft/registry/RegistryOps$RegistryInfoGetter;)V
+accessible method net/minecraft/entity/decoration/ItemFrameEntity getAsItemStack ()Lnet/minecraft/item/ItemStack;

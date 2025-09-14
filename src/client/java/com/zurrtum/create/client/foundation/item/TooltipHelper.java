@@ -122,7 +122,7 @@ public class TooltipHelper {
         boolean currentlyHighlighted = false;
         for (String string : lines) {
             MutableText currentComponent = lineStart.copyContentOnly();
-            String[] split = string.split("_");
+            String[] split = string.split("_", -1);
             for (String part : split) {
                 currentComponent.append(Text.literal(part).fillStyle(styles.get(currentlyHighlighted)));
                 currentlyHighlighted = !currentlyHighlighted;

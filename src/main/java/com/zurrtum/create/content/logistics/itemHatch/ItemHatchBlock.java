@@ -118,7 +118,7 @@ public class ItemHatchBlock extends HorizontalFacingBlock implements IBE<ItemHat
         boolean anyInserted = false;
         boolean depositItemInHand = !player.isSneaking();
 
-        if (!depositItemInHand && stack.isIn(AllItemTags.WRENCH))
+        if (!depositItemInHand && stack.isIn(AllItemTags.TOOLS_WRENCH))
             return ActionResult.PASS_TO_DEFAULT_BLOCK_ACTION;
 
         int start, end;

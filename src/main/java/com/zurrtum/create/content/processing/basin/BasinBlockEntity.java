@@ -36,6 +36,8 @@ import net.minecraft.storage.WriteView;
 import net.minecraft.util.ItemScatterer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 
@@ -63,6 +65,8 @@ public class BasinBlockEntity extends SmartBlockEntity {
     public static final int OUTPUT_ANIMATION_TIME = 10;
     public List<IntAttached<ItemStack>> visualizedOutputItems;
     public List<IntAttached<FluidStack>> visualizedOutputFluids;
+
+    private @Nullable HeatLevel cachedHeatLevel;
 
     public BasinBlockEntity(BlockPos pos, BlockState state) {
         super(AllBlockEntityTypes.BASIN, pos, state);
@@ -261,6 +265,8 @@ public class BasinBlockEntity extends SmartBlockEntity {
 
     @Override
     public void tick() {
+        cachedHeatLevel = null;
+
         super.tick();
         if (world.isClient) {
             AllClientHandle.INSTANCE.createBasinFluidParticles(world, this);
@@ -591,5 +597,15 @@ public class BasinBlockEntity extends SmartBlockEntity {
             tank.setFluid(stack);
             tank.markDirty();
         }
+    }
+
+    @NotNull HeatLevel getHeatLevel() {
+        if (cachedHeatLevel == null) {
+            if (world == null)
+                return HeatLevel.NONE;
+
+            cachedHeatLevel = getHeatLevelOf(world.getBlockState(getPos().down(1)));
+        }
+        return cachedHeatLevel;
     }
 }

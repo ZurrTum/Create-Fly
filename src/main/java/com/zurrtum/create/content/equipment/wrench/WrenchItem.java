@@ -16,6 +16,7 @@ import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import org.jetbrains.annotations.NotNull;
 
 public class WrenchItem extends Item {
 
@@ -24,6 +25,7 @@ public class WrenchItem extends Item {
     }
 
     @Override
+    @NotNull
     public ActionResult useOnBlock(ItemUsageContext context) {
         PlayerEntity player = context.getPlayer();
         if (player == null || !player.canModifyBlocks())

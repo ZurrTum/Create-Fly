@@ -15,6 +15,7 @@ import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import org.jetbrains.annotations.NotNull;
 
 public class ClipboardBlockItem extends BlockItem implements SupportsItemCopying {
 
@@ -23,6 +24,7 @@ public class ClipboardBlockItem extends BlockItem implements SupportsItemCopying
     }
 
     @Override
+    @NotNull
     public ActionResult useOnBlock(ItemUsageContext context) {
         PlayerEntity player = context.getPlayer();
         if (player == null)

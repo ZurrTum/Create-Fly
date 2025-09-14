@@ -33,8 +33,18 @@ public record MixingRecipe(
     }
 
     @Override
+    public List<SizedIngredient> getIngredients() {
+        return ingredients;
+    }
+
+    @Override
+    public List<FluidIngredient> getFluidIngredients() {
+        return fluidIngredients;
+    }
+
+    @Override
     public boolean matches(BasinInput input, World world) {
-        if (!heat.testBlazeBurner(input.getHeatLevel())) {
+        if (!heat.testBlazeBurner(input.heat())) {
             return false;
         }
         List<ItemStack> outputs = BasinRecipe.tryCraft(input, ingredients);
@@ -53,7 +63,7 @@ public record MixingRecipe(
 
     @Override
     public boolean apply(BasinInput input) {
-        if (!heat.testBlazeBurner(input.getHeatLevel())) {
+        if (!heat.testBlazeBurner(input.heat())) {
             return false;
         }
         Deque<Runnable> changes = new ArrayDeque<>();

@@ -23,7 +23,7 @@ public class EdgeInteractionHandler {
         EdgeInteractionBehaviour behaviour = BlockEntityBehaviour.get(world, pos, EdgeInteractionBehaviour.TYPE);
         if (behaviour == null)
             return null;
-        if (behaviour.requiredItem != null && heldItem.getItem() != behaviour.requiredItem)
+        if (!behaviour.requiredItem.test(heldItem.getItem()))
             return null;
 
         Direction activatedDirection = getActivatedDirection(world, pos, ray.getSide(), ray.getPos(), behaviour);

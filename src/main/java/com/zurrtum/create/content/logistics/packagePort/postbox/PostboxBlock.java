@@ -3,6 +3,7 @@ package com.zurrtum.create.content.logistics.packagePort.postbox;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.zurrtum.create.AllBlockEntityTypes;
+import com.zurrtum.create.AllBlocks;
 import com.zurrtum.create.AllShapes;
 import com.zurrtum.create.content.equipment.wrench.IWrenchable;
 import com.zurrtum.create.content.logistics.packagePort.PackagePortBlockEntity;
@@ -61,6 +62,27 @@ public class PostboxBlock extends HorizontalFacingBlock implements IBE<PostboxBl
 
     public static Function<Settings, PostboxBlock> dyed(DyeColor color) {
         return settings -> new PostboxBlock(settings, color);
+    }
+
+    public static PostboxBlock getColorBlock(DyeColor color) {
+        return switch (color) {
+            case WHITE -> AllBlocks.WHITE_POSTBOX;
+            case ORANGE -> AllBlocks.ORANGE_POSTBOX;
+            case MAGENTA -> AllBlocks.MAGENTA_POSTBOX;
+            case LIGHT_BLUE -> AllBlocks.LIGHT_BLUE_POSTBOX;
+            case YELLOW -> AllBlocks.YELLOW_POSTBOX;
+            case LIME -> AllBlocks.LIME_POSTBOX;
+            case PINK -> AllBlocks.PINK_POSTBOX;
+            case GRAY -> AllBlocks.GRAY_POSTBOX;
+            case LIGHT_GRAY -> AllBlocks.LIGHT_GRAY_POSTBOX;
+            case CYAN -> AllBlocks.CYAN_POSTBOX;
+            case PURPLE -> AllBlocks.PURPLE_POSTBOX;
+            case BLUE -> AllBlocks.BLUE_POSTBOX;
+            case BROWN -> AllBlocks.BROWN_POSTBOX;
+            case GREEN -> AllBlocks.GREEN_POSTBOX;
+            case RED -> AllBlocks.RED_POSTBOX;
+            case BLACK -> AllBlocks.BLACK_POSTBOX;
+        };
     }
 
     public DyeColor getColor() {

@@ -1,10 +1,12 @@
 package com.zurrtum.create.content.kinetics.crafter;
 
 import com.zurrtum.create.*;
+import com.zurrtum.create.api.contraption.transformable.TransformableBlockEntity;
 import com.zurrtum.create.catnip.data.Pair;
 import com.zurrtum.create.catnip.math.BlockFace;
 import com.zurrtum.create.catnip.math.Pointing;
 import com.zurrtum.create.catnip.math.VecHelper;
+import com.zurrtum.create.content.contraptions.StructureTransform;
 import com.zurrtum.create.content.kinetics.base.KineticBlockEntity;
 import com.zurrtum.create.content.kinetics.belt.behaviour.DirectBeltInputBehaviour;
 import com.zurrtum.create.content.kinetics.crafter.ConnectedInputHandler.ConnectedInput;
@@ -14,6 +16,7 @@ import com.zurrtum.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.foundation.blockEntity.behaviour.edgeInteraction.EdgeInteractionBehaviour;
 import com.zurrtum.create.foundation.blockEntity.behaviour.inventory.InvManipulationBehaviour;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.inventory.SidedInventory;
@@ -36,7 +39,7 @@ import java.util.*;
 
 import static com.zurrtum.create.content.kinetics.base.HorizontalKineticBlock.HORIZONTAL_FACING;
 
-public class MechanicalCrafterBlockEntity extends KineticBlockEntity {
+public class MechanicalCrafterBlockEntity extends KineticBlockEntity implements TransformableBlockEntity {
 
     public enum Phase {
         IDLE,
@@ -170,8 +173,9 @@ public class MechanicalCrafterBlockEntity extends KineticBlockEntity {
         super.addBehaviours(behaviours);
         inserting = new InvManipulationBehaviour(this, this::getTargetFace);
         behaviours.add(inserting);
+        //noinspection deprecation
         behaviours.add(new EdgeInteractionBehaviour(this, ConnectedInputHandler::toggleConnection).connectivity(ConnectedInputHandler::shouldConnect)
-            .require(AllItems.WRENCH));
+            .require(item -> item.getRegistryEntry().isIn(AllItemTags.TOOLS_WRENCH)));
     }
 
     @Override
@@ -573,5 +577,11 @@ public class MechanicalCrafterBlockEntity extends KineticBlockEntity {
 
     public ConnectedInput getInput() {
         return input;
+    }
+
+    @Override
+    public void transform(BlockEntity be, StructureTransform transform) {
+        input.data.replaceAll(transform::applyWithoutOffset);
+        notifyUpdate();
     }
 }

@@ -19,6 +19,7 @@ import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.projectile.ExplosiveProjectileEntity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.listener.ClientPlayPacketListener;
 import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.s2c.play.EntitySpawnS2CPacket;
@@ -348,8 +349,12 @@ public class PotatoProjectileEntity extends ExplosiveProjectileEntity {
     @Override
     public void onSpawnPacket(EntitySpawnS2CPacket packet) {
         super.onSpawnPacket(packet);
+        NbtCompound nbt = ((NbtSpawnPacket) packet).getNbt();
+        if (nbt == null) {
+            return;
+        }
         try (ErrorReporter.Logging logging = new ErrorReporter.Logging(getErrorReporterContext(), Create.LOGGER)) {
-            readCustomData(NbtReadView.create(logging, getRegistryManager(), ((NbtSpawnPacket) packet).getNbt()));
+            readCustomData(NbtReadView.create(logging, getRegistryManager(), nbt));
         }
     }
 }

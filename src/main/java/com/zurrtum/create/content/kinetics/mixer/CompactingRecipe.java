@@ -33,6 +33,16 @@ public record CompactingRecipe(
     }
 
     @Override
+    public List<SizedIngredient> getIngredients() {
+        return ingredients;
+    }
+
+    @Override
+    public List<FluidIngredient> getFluidIngredients() {
+        return fluidIngredient == null ? List.of() : List.of(fluidIngredient);
+    }
+
+    @Override
     public boolean matches(BasinInput input, World world) {
         List<ItemStack> outputs = BasinRecipe.tryCraft(input, ingredients);
         if (outputs == null) {

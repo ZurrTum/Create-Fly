@@ -13,9 +13,12 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemUsageContext;
 import net.minecraft.item.tooltip.TooltipType;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.sound.SoundCategory;
+import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Formatting;
+import net.minecraft.util.Hand;
 import net.minecraft.util.Uuids;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
@@ -63,6 +66,22 @@ public class LogisticallyLinkedBlockItem extends BlockItem {
         textConsumer.accept(Text.translatable("create.logistically_linked.tooltip").formatted(Formatting.GOLD));
 
         textConsumer.accept(Text.translatable("create.logistically_linked.tooltip_clear").formatted(Formatting.GRAY));
+    }
+
+    @Override
+    public ActionResult use(World world, PlayerEntity player, Hand usedHand) {
+        ItemStack stack = player.getStackInHand(usedHand);
+        if (isTuned(stack)) {
+            if (world.isClient) {
+                world.playSound(player, player.getBlockPos(), SoundEvents.ENTITY_ITEM_FRAME_REMOVE_ITEM, SoundCategory.BLOCKS, 0.75f, 1.0f);
+            } else {
+                player.sendMessage(Text.translatable("create.logistically_linked.cleared"), true);
+                stack.remove(DataComponentTypes.BLOCK_ENTITY_DATA);
+            }
+            return ActionResult.SUCCESS;
+        } else {
+            return super.use(world, player, usedHand);
+        }
     }
 
     @Override

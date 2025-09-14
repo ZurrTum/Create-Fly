@@ -249,13 +249,9 @@ public class FactoryPanelBlock extends WallMountedBlock implements ProperWaterlo
 
     @Override
     public boolean canReplace(BlockState pState, ItemPlacementContext pUseContext) {
-        if (pUseContext.shouldCancelInteraction())
-            return false;
         if (!pUseContext.getStack().isOf(AllItems.FACTORY_GAUGE))
             return false;
         Vec3d location = pUseContext.getHitPos();
-        if (location == null)
-            return false;
 
         BlockPos pos = pUseContext.getBlockPos();
         PanelSlot slot = getTargetedSlot(pos, pState, location);

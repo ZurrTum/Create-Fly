@@ -2,6 +2,7 @@ package com.zurrtum.create.foundation.fluid;
 
 import com.mojang.serialization.Codec;
 import com.zurrtum.create.infrastructure.fluids.FluidStack;
+import net.minecraft.fluid.Fluid;
 import net.minecraft.network.RegistryByteBuf;
 import net.minecraft.network.codec.PacketCodec;
 
@@ -18,6 +19,8 @@ public interface FluidIngredient extends Predicate<FluidStack> {
     int amount();
 
     boolean test(FluidStack stack);
+
+    List<Fluid> getMatchingFluids();
 
     List<FluidStack> getMatchingFluidStacks();
 

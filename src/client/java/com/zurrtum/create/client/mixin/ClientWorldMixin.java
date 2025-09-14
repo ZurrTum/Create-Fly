@@ -3,7 +3,6 @@ package com.zurrtum.create.client.mixin;
 import com.llamalad7.mixinextras.sugar.Local;
 import com.zurrtum.create.client.Create;
 import com.zurrtum.create.client.content.contraptions.ContraptionHandlerClient;
-import com.zurrtum.create.client.content.contraptions.render.ContraptionRenderInfoManager;
 import com.zurrtum.create.client.flywheel.api.visualization.VisualizationManager;
 import com.zurrtum.create.client.flywheel.impl.visualization.VisualizationEventHandler;
 import com.zurrtum.create.client.flywheel.lib.visualization.VisualizationHelper;
@@ -33,7 +32,6 @@ public class ClientWorldMixin {
     @Inject(method = "<init>", at = @At("TAIL"))
     private void onLoadWorld(CallbackInfo ci) {
         Create.SCHEMATIC_HANDLER.updateRenderers();
-        ContraptionRenderInfoManager.resetAll();
         REDSTONE_LINK_NETWORK_HANDLER.onLoadWorld((World) (Object) this);
     }
 

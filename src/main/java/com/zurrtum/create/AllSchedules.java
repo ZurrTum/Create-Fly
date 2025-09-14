@@ -2,10 +2,7 @@ package com.zurrtum.create;
 
 import com.zurrtum.create.catnip.data.Pair;
 import com.zurrtum.create.content.trains.schedule.condition.*;
-import com.zurrtum.create.content.trains.schedule.destination.ChangeThrottleInstruction;
-import com.zurrtum.create.content.trains.schedule.destination.ChangeTitleInstruction;
-import com.zurrtum.create.content.trains.schedule.destination.DestinationInstruction;
-import com.zurrtum.create.content.trains.schedule.destination.ScheduleInstruction;
+import com.zurrtum.create.content.trains.schedule.destination.*;
 import net.minecraft.util.Identifier;
 
 import java.util.ArrayList;
@@ -18,6 +15,8 @@ public class AllSchedules {
     public static List<Pair<Identifier, Function<Identifier, ? extends ScheduleInstruction>>> INSTRUCTION_TYPES = new ArrayList<>();
     public static List<Pair<Identifier, Function<Identifier, ? extends ScheduleWaitCondition>>> CONDITION_TYPES = new ArrayList<>();
     public static final Identifier DESTINATION = registerInstruction("destination", DestinationInstruction::new);
+    public static final Identifier PACKAGE_DELIVERY = registerInstruction("package_delivery", DeliverPackagesInstruction::new);
+    public static final Identifier PACKAGE_RETRIEVAL = registerInstruction("package_retrieval", FetchPackagesInstruction::new);
     public static final Identifier RENAME = registerInstruction("rename", ChangeTitleInstruction::new);
     public static final Identifier THROTTLE = registerInstruction("throttle", ChangeThrottleInstruction::new);
     public static final Identifier DELAY = registerCondition("delay", ScheduledDelay::new);

@@ -196,11 +196,13 @@ public class CartAssemblerBlock extends AbstractRailBlock implements IBE<CartAss
     }
 
     @Override
+    @NotNull
     public Property<RailShape> getShapeProperty() {
         return RAIL_SHAPE;
     }
 
     @Override
+    @NotNull
     public VoxelShape getOutlineShape(BlockState state, BlockView worldIn, BlockPos pos, ShapeContext context) {
         return AllShapes.CART_ASSEMBLER.get(getRailAxis(state));
     }
@@ -210,6 +212,7 @@ public class CartAssemblerBlock extends AbstractRailBlock implements IBE<CartAss
     }
 
     @Override
+    @NotNull
     public VoxelShape getCollisionShape(BlockState state, BlockView worldIn, BlockPos pos, ShapeContext context) {
         if (context instanceof EntityShapeContext entityShapeContext) {
             Entity entity = entityShapeContext.getEntity();
@@ -245,6 +248,7 @@ public class CartAssemblerBlock extends AbstractRailBlock implements IBE<CartAss
     }
 
     @Override
+    @NotNull
     public List<ItemStack> getDroppedStacks(BlockState state, LootWorldContext.Builder builder) {
         List<ItemStack> drops = super.getDroppedStacks(state, builder);
         drops.addAll(getRailBlock(state).getDroppedStacks(builder));
@@ -301,6 +305,7 @@ public class CartAssemblerBlock extends AbstractRailBlock implements IBE<CartAss
         }
 
         @Override
+        @NotNull
         public VoxelShape getOutlineShape(BlockState p_220053_1_, BlockView p_220053_2_, BlockPos p_220053_3_, ShapeContext p_220053_4_) {
             return VoxelShapes.empty();
         }

@@ -14,6 +14,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
@@ -30,7 +31,7 @@ public class TreeCutter {
     //        return Mods.DYNAMICTREES.runIfInstalled(() -> () -> DynamicTree.isDynamicBranch(startBlock)).orElse(false);
     //    }
     //
-    //    @Nonnull
+    //    @NotNull
     //    public static Optional<AbstractBlockBreakQueue> findDynamicTree(Block startBlock, BlockPos pos) {
     //        if (canDynamicTreeCutFrom(startBlock))
     //            return Mods.DYNAMICTREES.runIfInstalled(() -> () -> new DynamicTree(pos));
@@ -44,6 +45,7 @@ public class TreeCutter {
      * @param pos         position that the saw cut at
      * @param brokenState block state what was broken by the saw
      */
+    @NotNull
     public static Tree findTree(@Nullable BlockView reader, BlockPos pos, BlockState brokenState) {
         if (reader == null)
             return NO_TREE;

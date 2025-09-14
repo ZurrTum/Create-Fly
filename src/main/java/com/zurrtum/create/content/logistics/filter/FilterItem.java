@@ -65,6 +65,7 @@ public class FilterItem extends Item implements MenuProvider, SupportsItemCopyin
         this.type = type;
     }
 
+    @NotNull
     @Override
     public ActionResult useOnBlock(ItemUsageContext context) {
         if (context.getPlayer() == null)

@@ -29,13 +29,12 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 public class MechanicalPressBlockEntity extends BasinOperatingBlockEntity implements PressingBehaviourSpecifics {
 
-    private static List<Recipe<?>> compressingRecipes;
+    private static final Object compressingRecipesKey = new Object();
 
     public PressingBehaviour pressingBehaviour;
     private int tracksCreated;
@@ -206,38 +205,9 @@ public class MechanicalPressBlockEntity extends BasinOperatingBlockEntity implem
     }
 
     @Override
-    protected List<Recipe<?>> getBasinRecipes() {
-        if (compressingRecipes != null) {
-            return compressingRecipes;
-        }
-        compressingRecipes = new ArrayList<>();
-        PreparedRecipes allRecipes = ((ServerWorld) world).getRecipeManager().preparedRecipes;
-        allRecipes.getAll(AllRecipeTypes.COMPACTING).stream().map(RecipeEntry::value).forEach(compressingRecipes::add);
-        if (AllConfigs.server().recipes.allowShapedSquareInPress.get()) {
-            allRecipes.byType.asMap().forEach((type, recipes) -> {
-                if (recipes.isEmpty()) {
-                    return;
-                }
-                if (type != RecipeType.CRAFTING) {
-                    RecipeEntry<?> first = recipes.iterator().next();
-                    Recipe<?> recipe = first.value();
-                    if (!(recipe instanceof ShapedRecipe || recipe instanceof ShapelessRecipe) || AllRecipeTypes.AUTOMATION_IGNORE.test(first)) {
-                        return;
-                    }
-                }
-                recipes.forEach(entry -> {
-                    if (!AllRecipeTypes.CAN_BE_AUTOMATED.test(entry)) {
-                        return;
-                    }
-                    Recipe<?> recipe = entry.value();
-                    if ((recipe instanceof ShapedRecipe shapedRecipe && canCompress(shapedRecipe)) || (recipe instanceof ShapelessRecipe shapelessRecipe && canCompress(
-                        shapelessRecipe))) {
-                        compressingRecipes.add(recipe);
-                    }
-                });
-            });
-        }
-        return compressingRecipes;
+    protected boolean matchStaticFilters(RecipeEntry<? extends Recipe<?>> recipe) {
+        Recipe<?> value = recipe.value();
+        return value instanceof CraftingRecipe && canCompress(value) && !AllRecipeTypes.shouldIgnoreInAutomation(recipe) || value.getType() == AllRecipeTypes.COMPACTING;
     }
 
     @Override
@@ -248,6 +218,11 @@ public class MechanicalPressBlockEntity extends BasinOperatingBlockEntity implem
     @Override
     public boolean canProcessInBulk() {
         return AllConfigs.server().recipes.bulkPressing.get();
+    }
+
+    @Override
+    protected Object getRecipeCacheKey() {
+        return compressingRecipesKey;
     }
 
     @Override

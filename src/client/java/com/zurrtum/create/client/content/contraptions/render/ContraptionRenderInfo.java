@@ -26,40 +26,35 @@ import net.minecraft.world.World;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class ContraptionRenderInfo {
     public static final SuperByteBufferCache.Compartment<Pair<Contraption, BlockRenderLayer>> CONTRAPTION = new SuperByteBufferCache.Compartment<>();
     private static final ThreadLocal<ThreadLocalObjects> THREAD_LOCAL_OBJECTS = ThreadLocal.withInitial(ThreadLocalObjects::new);
 
-    private final Contraption contraption;
     private final VirtualRenderWorld renderWorld;
     private final ContraptionMatrices matrices = new ContraptionMatrices();
 
     ContraptionRenderInfo(World level, Contraption contraption) {
-        this.contraption = contraption;
         this.renderWorld = setupRenderWorld(level, contraption);
     }
 
+    @SuppressWarnings("unchecked")
     public static ContraptionRenderInfo get(Contraption contraption) {
-        return ContraptionRenderInfoManager.MANAGERS.get(contraption.entity.getWorld()).getRenderInfo(contraption);
-    }
+        AtomicReference<ContraptionRenderInfo> renderInfo = (AtomicReference<ContraptionRenderInfo>) contraption.renderInfo;
+        var out = renderInfo.getAcquire();
+        if (out == null) {
+            // Another thread may hit this block in the same moment.
+            // One thread will win and the ContraptionRenderInfo that
+            // it generated will become canonical. It's important that
+            // we only maintain one RenderInfo instance, specifically
+            // for the VirtualRenderWorld inside.
+            renderInfo.compareAndExchangeRelease(null, new ContraptionRenderInfo(contraption.entity.getWorld(), contraption));
 
-    /**
-     * Reset a contraption's renderer.
-     *
-     * @param contraption The contraption to invalidate.
-     * @return true if there was a renderer associated with the given contraption.
-     */
-    public static boolean invalidate(Contraption contraption) {
-        return ContraptionRenderInfoManager.MANAGERS.get(contraption.entity.getWorld()).invalidate(contraption);
-    }
-
-    public boolean isDead() {
-        return !contraption.entity.isAliveOrStale();
-    }
-
-    public Contraption getContraption() {
-        return contraption;
+            // Must get again to ensure we have the canonical instance.
+            out = renderInfo.getAcquire();
+        }
+        return out;
     }
 
     public VirtualRenderWorld getRenderWorld() {
@@ -70,11 +65,12 @@ public class ContraptionRenderInfo {
         return matrices;
     }
 
-    public SuperByteBuffer getBuffer(BlockRenderLayer renderType) {
-        return SuperByteBufferCache.getInstance().get(CONTRAPTION, Pair.of(contraption, renderType), () -> buildStructureBuffer(renderType));
+    public static SuperByteBuffer getBuffer(Contraption contraption, VirtualRenderWorld renderWorld, BlockRenderLayer renderType) {
+        return SuperByteBufferCache.getInstance()
+            .get(CONTRAPTION, Pair.of(contraption, renderType), () -> buildStructureBuffer(contraption, renderWorld, renderType));
     }
 
-    public void invalidate() {
+    public static void invalidate(Contraption contraption) {
         for (BlockRenderLayer renderType : BlockRenderLayer.values()) {
             SuperByteBufferCache.getInstance().invalidate(CONTRAPTION, Pair.of(contraption, renderType));
         }
@@ -102,7 +98,7 @@ public class ContraptionRenderInfo {
     }
 
     @SuppressWarnings("removal")
-    private SuperByteBuffer buildStructureBuffer(BlockRenderLayer layer) {
+    private static SuperByteBuffer buildStructureBuffer(Contraption contraption, VirtualRenderWorld renderWorld, BlockRenderLayer layer) {
         BlockRenderManager dispatcher = MinecraftClient.getInstance().getBlockRenderManager();
         BlockModelRenderer renderer = dispatcher.getModelRenderer();
         ThreadLocalObjects objects = THREAD_LOCAL_OBJECTS.get();

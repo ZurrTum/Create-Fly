@@ -349,9 +349,11 @@ public class SchematicHandler {
         transformation = new SchematicTransformation();
 
         deployed = blueprint.getOrDefault(AllDataComponents.SCHEMATIC_DEPLOYED, false);
-        if (deployed)
-            anchor = blueprint.get(AllDataComponents.SCHEMATIC_ANCHOR);
+        anchor = blueprint.getOrDefault(AllDataComponents.SCHEMATIC_ANCHOR, BlockPos.ORIGIN);
         Vec3i size = blueprint.get(AllDataComponents.SCHEMATIC_BOUNDS);
+        if (size == null) {
+            return;
+        }
 
         bounds = new Box(0, 0, 0, size.getX(), size.getY(), size.getZ());
         outline = new AABBOutline(bounds);

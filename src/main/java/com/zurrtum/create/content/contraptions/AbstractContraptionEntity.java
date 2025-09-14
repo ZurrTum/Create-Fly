@@ -594,8 +594,12 @@ public abstract class AbstractContraptionEntity extends Entity {
     @Override
     public void onSpawnPacket(EntitySpawnS2CPacket packet) {
         super.onSpawnPacket(packet);
+        NbtCompound nbt = ((NbtSpawnPacket) packet).getNbt();
+        if (nbt == null) {
+            return;
+        }
         try (ErrorReporter.Logging logging = new ErrorReporter.Logging(getErrorReporterContext(), Create.LOGGER)) {
-            readAdditional(NbtReadView.create(logging, getRegistryManager(), ((NbtSpawnPacket) packet).getNbt()), true);
+            readAdditional(NbtReadView.create(logging, getRegistryManager(), nbt), true);
         }
     }
 

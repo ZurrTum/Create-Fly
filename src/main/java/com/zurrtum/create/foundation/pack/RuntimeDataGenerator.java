@@ -127,7 +127,10 @@ public class RuntimeDataGenerator {
             int planksCount = type.contains("block") ? 3 : 6;
 
             if (!noStrippedVariant) {
-                simpleWoodRecipe(typeId, nonStrippedId, itemId);
+                // Catch mods like JNE that have a non-stripped log prefixed but not the stripped log
+                if (Registries.ITEM.containsId(nonStrippedId)) {
+                    simpleWoodRecipe(typeId, nonStrippedId, itemId);
+                }
                 simpleWoodRecipe(typeId, itemId, planksId, planksCount);
             } else if (Registries.ITEM.containsId(planksId)) {
                 Identifier tag = Identifier.of(MOD_ID, "runtime_generated/compat/" + itemId.getNamespace() + "/" + base.getPath());

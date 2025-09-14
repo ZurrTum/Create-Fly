@@ -13,6 +13,7 @@ import net.minecraft.particle.ParticleEffect;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class AirFlowParticle extends AnimatedParticle {
@@ -36,6 +37,7 @@ public class AirFlowParticle extends AnimatedParticle {
         setAlpha(.25f);
     }
 
+    @NotNull
     public ParticleTextureSheet getRenderType() {
         return ParticleTextureSheet.PARTICLE_SHEET_TRANSLUCENT;
     }

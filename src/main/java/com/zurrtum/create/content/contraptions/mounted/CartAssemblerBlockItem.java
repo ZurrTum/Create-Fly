@@ -18,6 +18,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Direction.AxisDirection;
 import net.minecraft.world.World;
+import org.jetbrains.annotations.NotNull;
 
 public class CartAssemblerBlockItem extends BlockItem {
 
@@ -25,6 +26,7 @@ public class CartAssemblerBlockItem extends BlockItem {
         super(block, properties);
     }
 
+    @NotNull
     @Override
     public ActionResult useOnBlock(ItemUsageContext context) {
         if (tryPlaceAssembler(context)) {

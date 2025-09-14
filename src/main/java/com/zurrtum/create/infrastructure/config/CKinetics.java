@@ -74,6 +74,11 @@ public class CKinetics extends ConfigBase {
         Comments.syncPlayerPickupHitboxWithContraptionHitbox,
         "[Technical]"
     );
+    public final ConfigBool noDropWhenContraptionReplaceBlocks = b(
+        false,
+        "noDropWhenContraptionReplaceBlocks",
+        Comments.noDropWhenContraptionReplaceBlocks
+    );
 
     public final ConfigGroup stats = group(1, "stats", Comments.stats);
     public final ConfigFloat mediumSpeed = f(30, 0, 4096, "mediumSpeed", Comments.rpm, Comments.mediumSpeed);
@@ -143,6 +148,7 @@ public class CKinetics extends ConfigBase {
         static String minecartContraptionInContainers = "Whether minecart contraptions can be placed into container items.";
         static String stabiliseStableContraptions = "Whether stabilised bearings create a separated entity even on non-rotating contraptions.";
         static String syncPlayerPickupHitboxWithContraptionHitbox = "Whether the players hitbox should be expanded to the size of the contraption hitbox.";
+        static String noDropWhenContraptionReplaceBlocks = "Whether to prevent block dropping when contraption is placed inside in-world blocks.";
     }
 
 }

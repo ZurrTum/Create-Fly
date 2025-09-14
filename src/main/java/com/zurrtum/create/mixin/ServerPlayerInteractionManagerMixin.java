@@ -7,6 +7,7 @@ import com.zurrtum.create.content.equipment.clipboard.ClipboardValueSettingsHand
 import com.zurrtum.create.content.equipment.extendoGrip.ExtendoGripItem;
 import com.zurrtum.create.content.equipment.symmetryWand.SymmetryHandler;
 import com.zurrtum.create.content.equipment.tool.CardboardSwordItem;
+import com.zurrtum.create.content.equipment.wrench.WrenchEventHandler;
 import com.zurrtum.create.content.equipment.zapper.ZapperInteractionHandler;
 import com.zurrtum.create.content.kinetics.crank.HandCrankBlock;
 import com.zurrtum.create.content.kinetics.deployer.ManualApplicationHelper;
@@ -65,6 +66,7 @@ public class ServerPlayerInteractionManagerMixin {
         @Local BlockPos pos
     ) {
         Stream.<ServerRightClickHandle>of(
+                WrenchEventHandler::useOwnWrenchLogicForCreateBlocks,
                 ClipboardValueSettingsHandler::rightClickToCopy,
                 ManualApplicationHelper::manualApplicationRecipesApplyInWorld,
                 EdgeInteractionHandler::onBlockActivated,

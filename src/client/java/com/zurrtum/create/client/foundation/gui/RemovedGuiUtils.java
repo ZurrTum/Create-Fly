@@ -10,6 +10,7 @@ import net.minecraft.text.StringVisitable;
 import net.minecraft.text.Style;
 import net.minecraft.text.Text;
 import net.minecraft.util.Language;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,9 +19,10 @@ public class RemovedGuiUtils {
     public static final int DEFAULT_BACKGROUND_COLOR = 0xF0100010;
     public static final int DEFAULT_BORDER_COLOR_START = 0x505000FF;
     public static final int DEFAULT_BORDER_COLOR_END = (DEFAULT_BORDER_COLOR_START & 0xFEFEFE) >> 1 | DEFAULT_BORDER_COLOR_START & 0xFF000000;
+    @NotNull
     private static ItemStack cachedTooltipStack = ItemStack.EMPTY;
 
-    public static void preItemToolTip(ItemStack stack) {
+    public static void preItemToolTip(@NotNull ItemStack stack) {
         cachedTooltipStack = stack;
     }
 
@@ -83,7 +85,7 @@ public class RemovedGuiUtils {
     }
 
     public static void drawHoveringText(
-        final ItemStack stack,
+        @NotNull final ItemStack stack,
         DrawContext graphics,
         List<? extends StringVisitable> textLines,
         int mouseX,
@@ -110,7 +112,7 @@ public class RemovedGuiUtils {
     }
 
     public static void drawHoveringText(
-        final ItemStack stack,
+        @NotNull final ItemStack stack,
         DrawContext graphics,
         List<? extends StringVisitable> textLines,
         int mouseX,

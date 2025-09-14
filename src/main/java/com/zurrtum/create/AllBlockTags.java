@@ -21,7 +21,6 @@ public class AllBlockTags {
     public static final TagKey<Block> MOVABLE_EMPTY_COLLIDER = register("movable_empty_collider");
     public static final TagKey<Block> NON_MOVABLE = register("non_movable");
     public static final TagKey<Block> NON_BREAKABLE = register("non_breakable");
-    public static final TagKey<Block> ORE_OVERRIDE_STONE = register("ore_override_stone");
     public static final TagKey<Block> PASSIVE_BOILER_HEATERS = register("passive_boiler_heaters");
     public static final TagKey<Block> SAFE_NBT = register("safe_nbt");
     public static final TagKey<Block> SEATS = register("seats");
@@ -44,6 +43,8 @@ public class AllBlockTags {
     public static final TagKey<Block> CORALS = register("corals");
 
     public static final TagKey<Block> RELOCATION_NOT_SUPPORTED = register("c", "relocation_not_supported");
+    public static final TagKey<Block> CARDBOARD_STORAGE_BLOCKS = register("c", "storage_blocks/cardboard");
+    public static final TagKey<Block> ANDESITE_ALLOY_STORAGE_BLOCKS = register("c", "storage_blocks/andesite_alloy");
 
     public static final TagKey<Block> SLIMY_LOGS = register("tconstruct", "slimy_logs");
     public static final TagKey<Block> NON_DOUBLE_DOOR = register("quark", "non_double_door");

@@ -14,6 +14,7 @@ import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.storage.ReadView;
 import net.minecraft.storage.WriteView;
 import net.minecraft.util.collection.DefaultedList;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
@@ -98,7 +99,7 @@ public class ToolboxInventory implements ItemInventory {
         }
     }
 
-    public int distributeToCompartment(ItemStack stack, int compartment, boolean simulate) {
+    public int distributeToCompartment(@NotNull ItemStack stack, int compartment, boolean simulate) {
         if (stack.isEmpty() || !stack.getItem().canBeNested()) {
             return 0;
         }

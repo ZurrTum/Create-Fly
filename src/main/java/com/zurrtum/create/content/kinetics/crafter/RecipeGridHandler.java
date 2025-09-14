@@ -163,9 +163,7 @@ public class RecipeGridHandler {
                 return false;
             }
         }
-        if (AllRecipeTypes.AUTOMATION_IGNORE.test(recipe))
-            return false;
-        return AllRecipeTypes.CAN_BE_AUTOMATED.test(recipe);
+        return !AllRecipeTypes.shouldIgnoreInAutomation(recipe);
     }
 
     public static class GroupedItems {

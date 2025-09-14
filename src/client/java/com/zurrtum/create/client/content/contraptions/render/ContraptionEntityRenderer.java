@@ -56,7 +56,7 @@ public class ContraptionEntityRenderer<C extends AbstractContraptionEntity, S ex
 
         if (!VisualizationManager.supportsVisualization(state.world)) {
             for (BlockRenderLayer renderType : BlockRenderLayer.values()) {
-                SuperByteBuffer sbb = renderInfo.getBuffer(renderType);
+                SuperByteBuffer sbb = ContraptionRenderInfo.getBuffer(state.contraption, renderWorld, renderType);
                 if (!sbb.isEmpty()) {
                     VertexConsumer vc = buffers.getBuffer(getRenderLayer(renderType));
                     sbb.transform(matrices.getModel()).useLevelLight(state.world, matrices.getWorld()).renderInto(poseStack, vc);
@@ -64,7 +64,14 @@ public class ContraptionEntityRenderer<C extends AbstractContraptionEntity, S ex
             }
         }
 
-        renderBlockEntities(state.world, renderWorld, state.contraption, matrices, buffers);
+        BlockEntityRenderHelper.renderBlockEntities(
+            state.world,
+            renderWorld,
+            state.contraption.getRenderedBEs(),
+            matrices.getModelViewProjection(),
+            matrices.getLight(),
+            buffers
+        );
         renderActors(state.world, renderWorld, state.contraption, matrices, buffers);
 
         matrices.clear();
@@ -93,23 +100,6 @@ public class ContraptionEntityRenderer<C extends AbstractContraptionEntity, S ex
         state.entityX = entity.getX();
         state.entityY = entity.getY();
         state.entityZ = entity.getZ();
-    }
-
-    private static void renderBlockEntities(
-        World level,
-        VirtualRenderWorld renderWorld,
-        Contraption c,
-        ContraptionMatrices matrices,
-        VertexConsumerProvider buffer
-    ) {
-        BlockEntityRenderHelper.renderBlockEntities(
-            level,
-            renderWorld,
-            c.getRenderedBEs(),
-            matrices.getModelViewProjection(),
-            matrices.getLight(),
-            buffer
-        );
     }
 
     private static void renderActors(

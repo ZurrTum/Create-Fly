@@ -54,9 +54,14 @@ public class AllRecipeTypes {
         RegistryKeys.RECIPE_SERIALIZER,
         Identifier.of(MOD_ID, "automation_ignore")
     );
-    public static final Predicate<RecipeEntry<?>> AUTOMATION_IGNORE = r -> Registries.RECIPE_SERIALIZER.getEntry(r.value().getSerializer())
-        .isIn(AllRecipeTypes.AUTOMATION_IGNORE_TAG);
     public static final Predicate<RecipeEntry<?>> CAN_BE_AUTOMATED = r -> !r.id().getValue().getPath().endsWith("_manual_only");
+
+    public static boolean shouldIgnoreInAutomation(RecipeEntry<?> recipe) {
+        RecipeSerializer<?> serializer = recipe.value().getSerializer();
+        if (serializer != null && Registries.RECIPE_SERIALIZER.getEntry(serializer).isIn(AllRecipeTypes.AUTOMATION_IGNORE_TAG))
+            return true;
+        return !CAN_BE_AUTOMATED.test(recipe);
+    }
 
     private static <T extends Recipe<?>> RecipeType<T> register(String name) {
         Identifier id = Identifier.of(MOD_ID, name);

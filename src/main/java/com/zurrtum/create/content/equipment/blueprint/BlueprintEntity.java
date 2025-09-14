@@ -312,8 +312,12 @@ public class BlueprintEntity extends AbstractDecorationEntity implements Special
     @Override
     public void onSpawnPacket(EntitySpawnS2CPacket packet) {
         super.onSpawnPacket(packet);
+        NbtCompound nbt = ((NbtSpawnPacket) packet).getNbt();
+        if (nbt == null) {
+            return;
+        }
         try (ErrorReporter.Logging logging = new ErrorReporter.Logging(getErrorReporterContext(), Create.LOGGER)) {
-            readCustomData(NbtReadView.create(logging, getRegistryManager(), ((NbtSpawnPacket) packet).getNbt()));
+            readCustomData(NbtReadView.create(logging, getRegistryManager(), nbt));
         }
     }
 

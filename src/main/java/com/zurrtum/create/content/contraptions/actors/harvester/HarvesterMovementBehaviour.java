@@ -130,6 +130,9 @@ public class HarvesterMovementBehaviour extends MovementBehaviour {
                 return false;
             }
 
+            if (state.getBlock() instanceof PlantBlock) {
+                return true;
+            }
             //TODO
             //            if (state.getBlock() instanceof SpecialPlantable)
             //                return true;

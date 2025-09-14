@@ -30,6 +30,7 @@ import net.minecraft.world.RaycastContext;
 import net.minecraft.world.RaycastContext.FluidHandling;
 import net.minecraft.world.RaycastContext.ShapeType;
 import net.minecraft.world.World;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.function.Consumer;
 
@@ -69,6 +70,7 @@ public abstract class ZapperItem extends Item implements SwingControlItem {
     }
 
     @Override
+    @NotNull
     public ActionResult useOnBlock(ItemUsageContext context) {
         // Shift -> open GUI
         if (context.getPlayer() != null && context.getPlayer().isSneaking()) {

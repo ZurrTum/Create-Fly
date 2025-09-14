@@ -98,6 +98,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 
@@ -140,6 +141,8 @@ public abstract class Contraption {
     // Client
     public Map<BlockPos, BlockEntity> presentBlockEntities;
     public List<BlockEntity> renderedBlockEntities;
+    // Must be atomic as this is accessed from both the render thread and flywheel executors.
+    public final AtomicReference<?> renderInfo = new AtomicReference<>();
 
     protected ContraptionWorld world;
     public boolean deferInvalidate;
@@ -1034,6 +1037,8 @@ public abstract class Contraption {
             return;
         disassembled = true;
 
+        boolean shouldDropBlocks = !AllConfigs.server().kinetics.noDropWhenContraptionReplaceBlocks.get();
+
         translateMultiblockControllers(transform);
 
         for (boolean nonBrittles : Iterate.trueAndFalse) {
@@ -1065,7 +1070,9 @@ public abstract class Contraption {
                     if (targetPos.getY() == world.getBottomY())
                         targetPos = targetPos.up();
                     world.syncWorldEvent(WorldEvents.BLOCK_BROKEN, targetPos, Block.getRawIdFromState(state));
-                    Block.dropStacks(state, world, targetPos, null);
+                    if (shouldDropBlocks) {
+                        Block.dropStacks(state, world, targetPos, null);
+                    }
                     continue;
                 }
                 if (state.getBlock() instanceof Waterloggable && state.contains(Properties.WATERLOGGED)) {
@@ -1073,7 +1080,7 @@ public abstract class Contraption {
                     state = state.with(Properties.WATERLOGGED, FluidState.getFluid() == Fluids.WATER);
                 }
 
-                world.breakBlock(targetPos, true);
+                world.breakBlock(targetPos, shouldDropBlocks);
 
                 if (state.isOf(AllBlocks.SHAFT))
                     state = ShaftBlock.pickCorrectShaftType(state, world, targetPos);
@@ -1090,7 +1097,7 @@ public abstract class Contraption {
                 verticalRotation = verticalRotation && transform.rotation != BlockRotation.NONE;
                 if (verticalRotation) {
                     if (state.getBlock() instanceof RopeBlock || state.getBlock() instanceof MagnetBlock || state.getBlock() instanceof DoorBlock)
-                        world.breakBlock(targetPos, true);
+                        world.breakBlock(targetPos, shouldDropBlocks);
                 }
 
                 BlockEntity blockEntity = world.getBlockEntity(targetPos);

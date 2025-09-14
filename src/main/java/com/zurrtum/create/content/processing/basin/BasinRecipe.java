@@ -509,6 +509,10 @@ public interface BasinRecipe extends Recipe<BasinInput> {
 
     int getIngredientSize();
 
+    List<SizedIngredient> getIngredients();
+
+    List<FluidIngredient> getFluidIngredients();
+
     boolean apply(BasinInput input);
 
     @Override

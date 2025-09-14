@@ -1,7 +1,6 @@
 package com.zurrtum.create.foundation;
 
 import com.zurrtum.create.AllBlockEntityTypes;
-import com.zurrtum.create.catnip.nbt.NBTHelper;
 import com.zurrtum.create.catnip.nbt.NBTProcessors;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.item.Items;
@@ -11,8 +10,6 @@ import net.minecraft.nbt.NbtList;
 import net.minecraft.nbt.NbtString;
 import net.minecraft.registry.Registries;
 import net.minecraft.util.Identifier;
-
-import java.util.List;
 
 public class CreateNBTProcessors {
     public static void register() {
@@ -51,20 +48,28 @@ public class CreateNBTProcessors {
     public static NbtCompound clipboardProcessor(NbtCompound data) {
         if (!data.contains("Item"))
             return data;
-        NbtCompound book = data.getCompoundOrEmpty("Item");
+        NbtCompound item = data.getCompoundOrEmpty("Item");
 
-        if (!book.contains("tag"))
+        if (!item.contains("components"))
             return data;
-        NbtCompound itemData = book.getCompoundOrEmpty("tag");
+        NbtCompound itemComponents = item.getCompoundOrEmpty("components");
 
-        for (List<String> entries : NBTHelper.readCompoundList(
-            itemData.getListOrEmpty("Pages"),
-            pageTag -> NBTHelper.readCompoundList(pageTag.getListOrEmpty("Entries"), tag -> tag.getString("Text", ""))
-        )) {
-            for (String entry : entries)
-                if (NBTProcessors.textComponentHasClickEvent(entry))
+        if (!itemComponents.contains("create:clipboard_pages"))
+            return data;
+        NbtList pages = itemComponents.getListOrEmpty("create:clipboard_pages");
+
+        for (NbtElement page : pages) {
+            if (!(page instanceof NbtList entries))
+                return data;
+
+            for (int i = 0; i < entries.size(); i++) {
+                NbtCompound entry = entries.getCompoundOrEmpty(i);
+
+                if (NBTProcessors.textComponentHasClickEvent(entry.getCompoundOrEmpty("text").asString().orElse("")))
                     return null;
+            }
         }
+
         return data;
     }
 }

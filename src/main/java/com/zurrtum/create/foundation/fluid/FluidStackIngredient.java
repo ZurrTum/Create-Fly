@@ -26,6 +26,11 @@ public record FluidStackIngredient(Fluid fluid, ComponentChanges components, int
     }
 
     @Override
+    public List<Fluid> getMatchingFluids() {
+        return List.of(fluid);
+    }
+
+    @Override
     public List<FluidStack> getMatchingFluidStacks() {
         return List.of(new FluidStack(fluid, amount, components));
     }

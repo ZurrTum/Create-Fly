@@ -17,7 +17,6 @@ import com.zurrtum.create.client.content.contraptions.actors.trainControls.Contr
 import com.zurrtum.create.client.content.contraptions.chassis.ChassisRangeDisplay;
 import com.zurrtum.create.client.content.contraptions.minecart.CouplingHandlerClient;
 import com.zurrtum.create.client.content.contraptions.minecart.CouplingRenderer;
-import com.zurrtum.create.client.content.contraptions.render.ContraptionRenderInfoManager;
 import com.zurrtum.create.client.content.decoration.girder.GirderWrenchBehaviorHandler;
 import com.zurrtum.create.client.content.equipment.armor.CardboardArmorStealthOverlay;
 import com.zurrtum.create.client.content.equipment.blueprint.BlueprintOverlayRenderer;
@@ -202,7 +201,6 @@ public class MinecraftClientMixin {
         ExtendoGripRenderHandler.tick(mc);
         ArmInteractionPointHandler.tick(mc);
         EjectorTargetHandler.tick(mc);
-        ContraptionRenderInfoManager.tickFor(mc);
         BlueprintOverlayRenderer.tick(mc);
         ToolboxHandlerClient.clientTick();
         TrackTargetingClient.clientTick(mc);
@@ -285,7 +283,6 @@ public class MinecraftClientMixin {
     @Inject(method = "disconnect(Lnet/minecraft/client/gui/screen/Screen;Z)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/hud/InGameHud;clear()V"))
     private void onUnloadWorld(CallbackInfo ci) {
         Create.SCHEMATIC_HANDLER.updateRenderers();
-        ContraptionRenderInfoManager.resetAll();
         Create.SOUL_PULSE_EFFECT_HANDLER.refresh();
         AnimationTickHolder.reset();
         ControlsHandler.levelUnloaded();

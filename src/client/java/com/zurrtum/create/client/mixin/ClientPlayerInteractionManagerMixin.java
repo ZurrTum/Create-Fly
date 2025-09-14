@@ -15,6 +15,7 @@ import com.zurrtum.create.content.contraptions.glue.SuperGlueItem;
 import com.zurrtum.create.content.equipment.clipboard.ClipboardValueSettingsHandler;
 import com.zurrtum.create.content.equipment.extendoGrip.ExtendoGripItem;
 import com.zurrtum.create.content.equipment.tool.CardboardSwordItem;
+import com.zurrtum.create.content.equipment.wrench.WrenchEventHandler;
 import com.zurrtum.create.content.kinetics.crank.HandCrankBlock;
 import com.zurrtum.create.content.kinetics.deployer.ManualApplicationHelper;
 import com.zurrtum.create.content.kinetics.simpleRelays.CogwheelBlockItem;
@@ -89,6 +90,7 @@ public class ClientPlayerInteractionManagerMixin {
         @Local ItemStack stack
     ) {
         Stream.<ClientRightClickHandle>of(
+                WrenchEventHandler::useOwnWrenchLogicForCreateBlocks,
                 ClipboardValueSettingsHandler::rightClickToCopy,
                 ManualApplicationHelper::manualApplicationRecipesApplyInWorld,
                 EdgeInteractionHandler::onBlockActivated,

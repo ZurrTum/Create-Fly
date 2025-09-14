@@ -20,8 +20,9 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.particle.ItemStackParticleEffect;
 import net.minecraft.particle.ParticleEffect;
 import net.minecraft.particle.ParticleTypes;
-import net.minecraft.recipe.*;
-import net.minecraft.server.world.ServerWorld;
+import net.minecraft.recipe.Recipe;
+import net.minecraft.recipe.RecipeEntry;
+import net.minecraft.recipe.ShapelessRecipe;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.storage.ReadView;
@@ -32,13 +33,12 @@ import net.minecraft.util.math.Direction.Axis;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 public class MechanicalMixerBlockEntity extends BasinOperatingBlockEntity {
 
-    private static List<Recipe<?>> shapelessOrMixingRecipes;
+    private static final Object shapelessOrMixingRecipesKey = new Object();
 
     public int runningTicks;
     public int processingTicks;
@@ -237,34 +237,12 @@ public class MechanicalMixerBlockEntity extends BasinOperatingBlockEntity {
     //        return matchingRecipes;
     //    }
 
+
     @Override
-    protected List<Recipe<?>> getBasinRecipes() {
-        if (shapelessOrMixingRecipes != null) {
-            return shapelessOrMixingRecipes;
-        }
-        shapelessOrMixingRecipes = new ArrayList<>();
-        PreparedRecipes allRecipes = ((ServerWorld) world).getRecipeManager().preparedRecipes;
-        allRecipes.getAll(AllRecipeTypes.MIXING).stream().map(RecipeEntry::value).forEach(shapelessOrMixingRecipes::add);
-        if (AllConfigs.server().recipes.allowShapelessInMixer.get()) {
-            allRecipes.byType.asMap().forEach((type, recipes) -> {
-                if (recipes.isEmpty()) {
-                    return;
-                }
-                if (type != RecipeType.CRAFTING) {
-                    RecipeEntry<?> first = recipes.iterator().next();
-                    if (!(first.value() instanceof ShapelessRecipe) || AllRecipeTypes.AUTOMATION_IGNORE.test(first)) {
-                        return;
-                    }
-                }
-                recipes.forEach(entry -> {
-                    if (entry.value() instanceof ShapelessRecipe recipe && recipe.ingredients.size() > 1 && AllRecipeTypes.CAN_BE_AUTOMATED.test(entry) && !MechanicalPressBlockEntity.canCompress(
-                        recipe)) {
-                        shapelessOrMixingRecipes.add(recipe);
-                    }
-                });
-            });
-        }
-        return shapelessOrMixingRecipes;
+    protected boolean matchStaticFilters(RecipeEntry<? extends Recipe<?>> recipe) {
+        Recipe<?> r = recipe.value();
+        return ((r instanceof ShapelessRecipe shapelessRecipe && AllConfigs.server().recipes.allowShapelessInMixer.get() && shapelessRecipe.ingredients.size() > 1 && !MechanicalPressBlockEntity.canCompress(
+            r)) && !AllRecipeTypes.shouldIgnoreInAutomation(recipe) || r.getType() == AllRecipeTypes.MIXING);
     }
 
     @Override
@@ -288,6 +266,11 @@ public class MechanicalMixerBlockEntity extends BasinOperatingBlockEntity {
             return;
         runningTicks = 40;
         running = false;
+    }
+
+    @Override
+    protected Object getRecipeCacheKey() {
+        return shapelessOrMixingRecipesKey;
     }
 
     @Override

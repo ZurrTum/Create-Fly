@@ -127,10 +127,10 @@ public class ItemRequirement {
         }
 
         if (entity instanceof ItemFrameEntity itemFrame) {
-            ItemStack frame = new ItemStack(Items.ITEM_FRAME);
+            ItemStack frame = itemFrame.getAsItemStack();
             ItemStack displayedItem = ComponentProcessors.withUnsafeComponentsDiscarded(itemFrame.getHeldItemStack());
             if (displayedItem.isEmpty())
-                return new ItemRequirement(ItemUseType.CONSUME, Items.ITEM_FRAME);
+                return new ItemRequirement(ItemUseType.CONSUME, frame);
             return new ItemRequirement(List.of(
                 new ItemRequirement.StackRequirement(frame, ItemUseType.CONSUME),
                 new ItemRequirement.StrictNbtStackRequirement(displayedItem, ItemUseType.CONSUME)

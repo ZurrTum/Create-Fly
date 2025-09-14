@@ -71,7 +71,7 @@ public class PackagePortTargetSelectionHandler {
         ClientPlayerEntity player = mc.player;
         ItemStack stack = player.getMainHandStack();
         boolean isPostbox = stack.isIn(AllItemTags.POSTBOXES);
-        boolean isWrench = stack.isIn(AllItemTags.WRENCH);
+        boolean isWrench = stack.isIn(AllItemTags.TOOLS_WRENCH);
 
         if (!isWrench) {
             if (activePackageTarget == null)

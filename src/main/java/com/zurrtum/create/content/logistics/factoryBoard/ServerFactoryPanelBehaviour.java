@@ -553,7 +553,7 @@ public class ServerFactoryPanelBehaviour extends ServerFilteringBehaviour implem
 
         // Wrench cycles through arrow bending
         ItemStack heldItem = player.getStackInHand(hand);
-        if (targeting.size() + targetedByLinks.size() > 0 && heldItem.isIn(AllItemTags.WRENCH)) {
+        if (targeting.size() + targetedByLinks.size() > 0 && heldItem.isIn(AllItemTags.TOOLS_WRENCH)) {
             int sharedMode = -1;
             boolean notifySelf = false;
 
@@ -920,7 +920,7 @@ public class ServerFactoryPanelBehaviour extends ServerFilteringBehaviour implem
                 } else {
                     return false;
                 }
-                if (AllRecipeTypes.AUTOMATION_IGNORE.test(entry) || !AllRecipeTypes.CAN_BE_AUTOMATED.test(entry))
+                if (AllRecipeTypes.shouldIgnoreInAutomation(entry))
                     return false;
 
                 Set<Item> itemsUsed = new HashSet<>();

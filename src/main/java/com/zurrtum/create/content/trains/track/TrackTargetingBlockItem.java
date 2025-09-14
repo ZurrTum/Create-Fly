@@ -9,6 +9,7 @@ import com.zurrtum.create.content.trains.signal.TrackEdgePoint;
 import com.zurrtum.create.foundation.block.IBE;
 import com.zurrtum.create.foundation.codec.CreateCodecs;
 import com.zurrtum.create.infrastructure.component.BezierTrackPointLocation;
+import com.zurrtum.create.infrastructure.config.AllConfigs;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.component.DataComponentTypes;
@@ -112,7 +113,7 @@ public class TrackTargetingBlockItem extends BlockItem {
 
         boolean bezier = stack.contains(AllDataComponents.TRACK_TARGETING_ITEM_BEZIER);
 
-        if (!selectedPos.isWithinDistance(placedPos, bezier ? 64 + 16 : 16)) {
+        if (!selectedPos.isWithinDistance(placedPos, bezier ? AllConfigs.server().trains.maxTrackPlacementLength.get() + 16 : 16)) {
             player.sendMessage(Text.translatable("create.track_target.too_far").formatted(Formatting.RED), true);
             return ActionResult.FAIL;
         }

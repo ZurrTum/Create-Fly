@@ -45,9 +45,26 @@ public class AllItemTags {
 
     public static final TagKey<Item> PLATES = register("c", "plates");
     public static final TagKey<Item> OBSIDIAN_DUST = register("c", "dusts/obsidian");
-    public static final TagKey<Item> WRENCH = register("c", "tools/wrench");
     public static final TagKey<Item> DYES = register("c", "dyes");
     public static final TagKey<Item> SLIME_BALLS = register("c", "slime_balls");
+    public static final TagKey<Item> TOOLS_WRENCH = register("c", "tools/wrench");
+    public static final TagKey<Item> OBSIDIAN_PLATES = register("c", "plates/obsidian");
+    public static final TagKey<Item> CARDBOARD_PLATES = register("c", "plates/cardboard");
+    public static final TagKey<Item> CERTUS_QUARTZ = register("c", "gems/certus_quartz");
+    public static final TagKey<Item> AMETRINE_ORES = register("c", "ores/ametrine");
+    public static final TagKey<Item> ANTHRACITE_ORES = register("c", "ores/anthracite");
+    public static final TagKey<Item> EMERALDITE_ORES = register("c", "ores/emeraldite");
+    public static final TagKey<Item> LIGNITE_ORES = register("c", "ores/lignite");
+    public static final TagKey<Item> CARDBOARD_STORAGE_BLOCKS = register("c", "storage_blocks/cardboard");
+    public static final TagKey<Item> ANDESITE_ALLOY_STORAGE_BLOCKS = register("c", "storage_blocks/andesite_alloy");
+    public static final TagKey<Item> CHOCOLATE_BUCKETS = register("c", "buckets/chocolate");
+    public static final TagKey<Item> HONEY_BUCKETS = register("c", "buckets/honey");
+    public static final TagKey<Item> FOODS_CHOCOLATE = register("c", "foods/chocolate");
+    public static final TagKey<Item> DRINKS_TEA = register("c", "drinks/tea");
+    public static final TagKey<Item> FLOURS = register("c", "flours");
+    public static final TagKey<Item> WHEAT_FLOURS = register("c", "flours/wheat");
+    public static final TagKey<Item> DOUGHS = register("c", "doughs");
+    public static final TagKey<Item> WHEAT_DOUGHS = register("c", "doughs/wheat");
 
     public static final TagKey<Item> ALLURITE = register("stone_types/galosphere/allurite");
     public static final TagKey<Item> AMETHYST = register("stone_types/galosphere/amethyst");

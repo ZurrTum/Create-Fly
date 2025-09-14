@@ -1,19 +1,27 @@
 package com.zurrtum.create.content.processing.basin;
 
+import com.zurrtum.create.Create;
 import com.zurrtum.create.content.kinetics.base.KineticBlockEntity;
 import com.zurrtum.create.foundation.advancement.CreateTrigger;
 import com.zurrtum.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.foundation.blockEntity.behaviour.simple.DeferralBehaviour;
+import com.zurrtum.create.foundation.recipe.RecipeFinder;
+import com.zurrtum.create.foundation.recipe.trie.AbstractVariant;
+import com.zurrtum.create.foundation.recipe.trie.RecipeTrie;
+import com.zurrtum.create.foundation.recipe.trie.RecipeTrieFinder;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.recipe.Recipe;
+import net.minecraft.recipe.RecipeEntry;
 import net.minecraft.recipe.ShapedRecipe;
 import net.minecraft.recipe.ShapelessRecipe;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Consumer;
 
 public abstract class BasinOperatingBlockEntity extends KineticBlockEntity {
@@ -38,8 +46,6 @@ public abstract class BasinOperatingBlockEntity extends KineticBlockEntity {
     @Override
     public void onSpeedChanged(float prevSpeed) {
         super.onSpeedChanged(prevSpeed);
-        if (getSpeed() == 0)
-            basinRemoved = true;
         basinRemoved = false;
         basinChecker.scheduleUpdate();
     }
@@ -91,9 +97,9 @@ public abstract class BasinOperatingBlockEntity extends KineticBlockEntity {
         if (recipe == null)
             return false;
         return getBasin().map(blockEntity -> switch (recipe) {
-            case BasinRecipe basinRecipe -> basinRecipe.matches(new BasinInput(blockEntity, world), world);
-            case ShapedRecipe shapedRecipe -> BasinRecipe.matchCraftingRecipe(new BasinInput(blockEntity, world), shapedRecipe, world);
-            case ShapelessRecipe shapelessRecipe -> BasinRecipe.matchCraftingRecipe(new BasinInput(blockEntity, world), shapelessRecipe, world);
+            case BasinRecipe basinRecipe -> basinRecipe.matches(new BasinInput(blockEntity), world);
+            case ShapedRecipe shapedRecipe -> BasinRecipe.matchCraftingRecipe(new BasinInput(blockEntity), shapedRecipe, world);
+            case ShapelessRecipe shapelessRecipe -> BasinRecipe.matchCraftingRecipe(new BasinInput(blockEntity), shapelessRecipe, world);
             default -> false;
         }).orElse(false);
 
@@ -110,15 +116,15 @@ public abstract class BasinOperatingBlockEntity extends KineticBlockEntity {
         boolean wasEmpty = basin.canContinueProcessing();
         switch (currentRecipe) {
             case BasinRecipe basinRecipe -> {
-                if (!basinRecipe.apply(new BasinInput(basin, world)))
+                if (!basinRecipe.apply(new BasinInput(basin)))
                     return;
             }
             case ShapedRecipe shapedRecipe -> {
-                if (!BasinRecipe.applyCraftingRecipe(new BasinInput(basin, world), shapedRecipe, world))
+                if (!BasinRecipe.applyCraftingRecipe(new BasinInput(basin), shapedRecipe, world))
                     return;
             }
             case ShapelessRecipe shapelessRecipe -> {
-                if (!BasinRecipe.applyCraftingRecipe(new BasinInput(basin, world), shapelessRecipe, world))
+                if (!BasinRecipe.applyCraftingRecipe(new BasinInput(basin), shapelessRecipe, world))
                     return;
             }
             default -> {
@@ -138,14 +144,25 @@ public abstract class BasinOperatingBlockEntity extends KineticBlockEntity {
     }
 
     protected Recipe<?> getMatchingRecipes() {
-        Optional<BasinBlockEntity> findBasin = getBasin();
-        if (findBasin.map(BasinBlockEntity::isEmpty).orElse(true))
+        Optional<BasinBlockEntity> $basin = getBasin();
+        BasinBlockEntity basin;
+        if ($basin.isEmpty() || (basin = $basin.get()).isEmpty())
             return null;
-        List<Recipe<?>> recipes = getBasinRecipes();
-        if (recipes.isEmpty()) {
+        if (basin.itemCapability == null && basin.fluidCapability == null) {
             return null;
         }
-        return finder.match(findBasin.get(), recipes);
+        try {
+            RecipeTrie<Recipe<?>> trie = RecipeTrieFinder.get(getRecipeCacheKey(), (ServerWorld) world, this::matchStaticFilters);
+            Set<AbstractVariant> availableVariants = RecipeTrie.getVariants(basin.itemCapability, basin.fluidCapability);
+            return finder.match(basin, trie.lookup(availableVariants));
+        } catch (Exception e) {
+            Create.LOGGER.error("Failed to get recipe trie, falling back to slow logic", e);
+            List<RecipeEntry<? extends Recipe<?>>> recipes = RecipeFinder.get(getRecipeCacheKey(), (ServerWorld) world, this::matchStaticFilters);
+            if (recipes.isEmpty()) {
+                return null;
+            }
+            return finder.matchEntry(basin, recipes);
+        }
     }
 
     protected abstract void onBasinRemoved();
@@ -163,7 +180,9 @@ public abstract class BasinOperatingBlockEntity extends KineticBlockEntity {
         return Optional.empty();
     }
 
-    protected abstract List<Recipe<?>> getBasinRecipes();
+    protected abstract boolean matchStaticFilters(RecipeEntry<? extends Recipe<?>> recipe);
+
+    protected abstract Object getRecipeCacheKey();
 
     private class BasinRecipeFinder {
         private BasinInput basinInput;
@@ -174,9 +193,19 @@ public abstract class BasinOperatingBlockEntity extends KineticBlockEntity {
         public Recipe<?> match(BasinBlockEntity basin, List<Recipe<?>> recipes) {
             matchedRecipe = null;
             matchingStrategy = this::firstMatchStrategy;
-            basinInput = new BasinInput(basin, world);
+            basinInput = new BasinInput(basin);
             for (Recipe<?> recipe : recipes) {
                 matchingStrategy.accept(recipe);
+            }
+            return matchedRecipe;
+        }
+
+        public Recipe<?> matchEntry(BasinBlockEntity basin, List<RecipeEntry<? extends Recipe<?>>> recipes) {
+            matchedRecipe = null;
+            matchingStrategy = this::firstMatchStrategy;
+            basinInput = new BasinInput(basin);
+            for (RecipeEntry<? extends Recipe<?>> recipe : recipes) {
+                matchingStrategy.accept(recipe.value());
             }
             return matchedRecipe;
         }

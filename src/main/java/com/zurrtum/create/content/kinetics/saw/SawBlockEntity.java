@@ -14,6 +14,7 @@ import com.zurrtum.create.foundation.advancement.CreateTrigger;
 import com.zurrtum.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.foundation.blockEntity.behaviour.filtering.ServerFilteringBehaviour;
 import com.zurrtum.create.foundation.item.ItemHelper;
+import com.zurrtum.create.foundation.recipe.RecipeFinder;
 import com.zurrtum.create.infrastructure.config.AllConfigs;
 import net.minecraft.block.*;
 import net.minecraft.component.type.ContainerComponent;
@@ -24,11 +25,11 @@ import net.minecraft.particle.BlockStateParticleEffect;
 import net.minecraft.particle.ItemStackParticleEffect;
 import net.minecraft.particle.ParticleEffect;
 import net.minecraft.particle.ParticleTypes;
-import net.minecraft.recipe.PreparedRecipes;
 import net.minecraft.recipe.Recipe;
 import net.minecraft.recipe.RecipeEntry;
 import net.minecraft.recipe.RecipeType;
 import net.minecraft.recipe.input.SingleStackRecipeInput;
+import net.minecraft.registry.DynamicRegistryManager;
 import net.minecraft.registry.tag.BlockTags;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.storage.ReadView;
@@ -38,11 +39,10 @@ import net.minecraft.util.math.*;
 import net.minecraft.util.math.random.Random;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class SawBlockEntity extends BlockBreakingKineticBlockEntity {
-    private static List<Recipe<SingleStackRecipeInput>> cuttingRecipes;
+    private static final Object cuttingRecipesKey = new Object();
 
     public ProcessingInventory inventory;
     private int recipeIndex;
@@ -303,23 +303,30 @@ public class SawBlockEntity extends BlockBreakingKineticBlockEntity {
         award(AllAdvancements.SAW_PROCESSING);
     }
 
+    private static boolean matchCuttingRecipe(RecipeEntry<? extends Recipe<?>> entry) {
+        return entry.value().getType() == AllRecipeTypes.CUTTING && !AllRecipeTypes.shouldIgnoreInAutomation(entry);
+    }
+
+    private static boolean matchAllRecipe(RecipeEntry<? extends Recipe<?>> entry) {
+        RecipeType<? extends Recipe<?>> type = entry.value().getType();
+        return (type == AllRecipeTypes.CUTTING || type == RecipeType.STONECUTTING) && !AllRecipeTypes.shouldIgnoreInAutomation(entry);
+    }
+
     @Nullable
+    @SuppressWarnings("unchecked")
     private Pair<Recipe<SingleStackRecipeInput>, ItemStack> updateRecipe(SingleStackRecipeInput input, boolean plus) {
-        if (cuttingRecipes == null) {
-            PreparedRecipes allRecipes = ((ServerWorld) world).getRecipeManager().preparedRecipes;
-            cuttingRecipes = new ArrayList<>();
-            allRecipes.getAll(AllRecipeTypes.CUTTING).stream().map(RecipeEntry::value).forEach(cuttingRecipes::add);
-            if (AllConfigs.server().recipes.allowStonecuttingOnSaw.get()) {
-                allRecipes.getAll(RecipeType.STONECUTTING).stream().map(RecipeEntry::value).forEach(cuttingRecipes::add);
-            }
-        }
+        List<RecipeEntry<?>> startedSearch = RecipeFinder.get(
+            cuttingRecipesKey,
+            (ServerWorld) world,
+            AllConfigs.server().recipes.allowStonecuttingOnSaw.get() ? SawBlockEntity::matchAllRecipe : SawBlockEntity::matchCuttingRecipe
+        );
         int index = 0;
 
         Recipe<SingleStackRecipeInput> first = null;
-        boolean nofilter = filtering.getFilter().isEmpty();
-        for (Recipe<SingleStackRecipeInput> recipe : cuttingRecipes) {
-            if (recipe.matches(input, world)) {
-                if (nofilter) {
+        if (filtering.getFilter().isEmpty()) {
+            for (RecipeEntry<?> entry : startedSearch) {
+                Recipe<SingleStackRecipeInput> recipe = (Recipe<SingleStackRecipeInput>) entry.value();
+                if (recipe.matches(input, world)) {
                     if (first == null) {
                         first = recipe;
                     }
@@ -330,8 +337,14 @@ public class SawBlockEntity extends BlockBreakingKineticBlockEntity {
                         return Pair.of(recipe, null);
                     }
                     index++;
-                } else {
-                    ItemStack output = recipe.craft(input, world.getRegistryManager());
+                }
+            }
+        } else {
+            DynamicRegistryManager registryManager = world.getRegistryManager();
+            for (RecipeEntry<? extends Recipe<?>> entry : startedSearch) {
+                Recipe<SingleStackRecipeInput> recipe = (Recipe<SingleStackRecipeInput>) entry.value();
+                if (recipe.matches(input, world)) {
+                    ItemStack output = recipe.craft(input, registryManager);
                     if (filtering.test(output)) {
                         return Pair.of(recipe, output);
                     }

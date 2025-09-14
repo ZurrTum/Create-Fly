@@ -24,6 +24,18 @@ public record FluidTagIngredient(TagKey<Fluid> tag, int amount) implements Fluid
     }
 
     @Override
+    public List<Fluid> getMatchingFluids() {
+        ImmutableList.Builder<Fluid> builder = ImmutableList.builder();
+        for (RegistryEntry<Fluid> holder : Registries.FLUID.iterateEntries(tag)) {
+            Fluid fluid = holder.value();
+            if (fluid instanceof FlowableFluid flowing)
+                fluid = flowing.getStill();
+            builder.add(fluid);
+        }
+        return builder.build();
+    }
+
+    @Override
     public List<FluidStack> getMatchingFluidStacks() {
         ImmutableList.Builder<FluidStack> builder = ImmutableList.builder();
         for (RegistryEntry<Fluid> holder : Registries.FLUID.iterateEntries(tag)) {

@@ -33,6 +33,7 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldEvents;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 
@@ -42,6 +43,7 @@ public class SymmetryWandItem extends Item {
         super(properties);
     }
 
+    @NotNull
     @Override
     public ActionResult useOnBlock(ItemUsageContext context) {
         PlayerEntity player = context.getPlayer();

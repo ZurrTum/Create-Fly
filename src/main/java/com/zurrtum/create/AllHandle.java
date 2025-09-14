@@ -323,7 +323,7 @@ public class AllHandle {
     public static void onCurvedTrackDestroy(ServerPlayNetworkHandler listener, CurvedTrackDestroyPacket packet) {
         BlockPos pos = packet.pos();
         onBlockEntityConfiguration(
-            listener, pos, 64, blockEntity -> {
+            listener, pos, AllConfigs.server().trains.maxTrackPlacementLength.get() + 16, blockEntity -> {
                 if (blockEntity instanceof TrackBlockEntity be) {
                     ServerPlayerEntity player = listener.player;
                     ServerWorld world = player.getWorld();
@@ -373,7 +373,7 @@ public class AllHandle {
     public static void onCurvedTrackSelection(ServerPlayNetworkHandler listener, CurvedTrackSelectionPacket packet) {
         BlockPos pos = packet.pos();
         onBlockEntityConfiguration(
-            listener, pos, 64, blockEntity -> {
+            listener, pos, AllConfigs.server().trains.maxTrackPlacementLength.get() + 16, blockEntity -> {
                 if (blockEntity instanceof TrackBlockEntity be) {
                     ServerPlayerEntity player = listener.player;
                     ServerWorld world = player.getWorld();
