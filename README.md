@@ -16,7 +16,8 @@
 
 - Please do not use old game saves.
 - Please do not report issues with this mod to simibubi and NeoForge Create.
-- Do not install the Fabric API yet (not yet compatible)
+- Do not install the Fabric API yet (maybe compatible)
+- (The code uses a lot of mixins and has not yet been tested against the Fabric API, so it is very unstable.)
 
 ### Donate
 
