@@ -12,7 +12,7 @@ import net.minecraft.network.packet.PacketType;
 import net.minecraft.server.network.ServerPlayNetworkHandler;
 import net.minecraft.util.Identifier;
 
-import java.util.IdentityHashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
@@ -20,8 +20,8 @@ import java.util.function.Consumer;
 import static com.zurrtum.create.Create.MOD_ID;
 
 public class AllPackets {
-    public static final Map<PacketType<Packet<ServerPlayPacketListener>>, PacketCodec<? super RegistryByteBuf, Packet<ServerPlayPacketListener>>> C2S = new IdentityHashMap<>();
-    public static final Map<PacketType<Packet<ClientPlayPacketListener>>, PacketCodec<? super RegistryByteBuf, Packet<ClientPlayPacketListener>>> S2C = new IdentityHashMap<>();
+    public static final Map<PacketType<Packet<ServerPlayPacketListener>>, PacketCodec<? super RegistryByteBuf, Packet<ServerPlayPacketListener>>> C2S = new LinkedHashMap<>();
+    public static final Map<PacketType<Packet<ClientPlayPacketListener>>, PacketCodec<? super RegistryByteBuf, Packet<ClientPlayPacketListener>>> S2C = new LinkedHashMap<>();
     public static final PacketType<ConfigureSchematicannonPacket> CONFIGURE_SCHEMATICANNON = c2s(
         "configure_schematicannon",
         ConfigureSchematicannonPacket.CODEC
