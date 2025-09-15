@@ -77,7 +77,11 @@ public class AllTransfer {
         if (DISABLE) {
             return;
         }
-        for (Function<? extends SmartBlockEntity, BlockEntityBehaviour<?>> factory : ALL.get(blockEntity.getClass())) {
+        List<Function<? extends SmartBlockEntity, BlockEntityBehaviour<?>>> list = ALL.get(blockEntity.getClass());
+        if (list == null) {
+            return;
+        }
+        for (Function<? extends SmartBlockEntity, BlockEntityBehaviour<?>> factory : list) {
             behaviours.add(((Function<T, BlockEntityBehaviour<?>>) factory).apply(blockEntity));
         }
     }
