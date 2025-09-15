@@ -56,6 +56,8 @@ processResources {
     filesMatching("fabric.mod.json") {
         expand "version": inputs.properties.version
     }
+
+    exclude "_data"
 }
 
 tasks.withType(JavaCompile).configureEach {
@@ -71,7 +73,8 @@ java {
 jar {
     inputs.property "archivesName", project.base.archivesName
 
-    from("LICENSE") {
-        rename { "${it}_${inputs.properties.archivesName}" }
+    from("LICENSE")
+    from("licenses") {
+        into "licenses"
     }
 }
