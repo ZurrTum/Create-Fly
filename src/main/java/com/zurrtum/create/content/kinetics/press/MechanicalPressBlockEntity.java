@@ -29,6 +29,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -188,7 +189,14 @@ public class MechanicalPressBlockEntity extends BasinOperatingBlockEntity implem
     }
 
     public static boolean canCompress(ShapedRecipe recipe) {
-        List<Ingredient> ingredients = recipe.getIngredients().stream().filter(Optional::isPresent).map(Optional::get).toList();
+        List<Ingredient> ingredients = new ArrayList<>();
+        for (Optional<Ingredient> ingredient : recipe.getIngredients()) {
+            if (ingredient.isPresent()) {
+                ingredients.add(ingredient.get());
+            } else {
+                return false;
+            }
+        }
         int size = ingredients.size();
         if (size != 4 && size != 9) {
             return false;
