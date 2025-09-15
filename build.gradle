@@ -24,9 +24,14 @@ dependencies {
     minecraft "com.mojang:minecraft:${project.minecraft_version}"
     mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
     modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
-    modCompileOnly fabricApi.module("fabric-rendering-fluids-v1", project.fabric_version)
-    modCompileOnly fabricApi.module("fabric-transfer-api-v1", project.fabric_version)
-    modCompileOnly fabricApi.module("fabric-events-interaction-v0", project.fabric_version)
+    if (project.compile_only_fabric_api) {
+        modCompileOnly fabricApi.module("fabric-rendering-fluids-v1", project.fabric_version)
+        modCompileOnly fabricApi.module("fabric-transfer-api-v1", project.fabric_version)
+        modCompileOnly fabricApi.module("fabric-events-interaction-v0", project.fabric_version)
+        modCompileOnly fabricApi.module("fabric-renderer-api-v1", project.fabric_version)
+    } else {
+        modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
+    }
 }
 
 processResources {

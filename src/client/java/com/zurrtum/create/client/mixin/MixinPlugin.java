@@ -30,7 +30,7 @@ public class MixinPlugin implements IMixinConfigPlugin {
     @Override
     public List<String> getMixins() {
         if (Create.Lazy) {
-            return null;
+            return List.of("FabricBlockStateModelMixin");
         }
         return List.of("CreativeInventoryScreenMixin", "DefaultClientResourcePackProviderMixin");
     }
