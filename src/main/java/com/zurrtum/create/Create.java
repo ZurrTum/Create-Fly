@@ -54,10 +54,10 @@ public class Create implements ModInitializer {
 
     @Override
     public void onInitialize() {
-        AllConfigs.register();
         if (Lazy) {
             register();
         }
+        AllConfigs.register();
     }
 
     public static void register() {
