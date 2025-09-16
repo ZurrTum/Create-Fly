@@ -1,5 +1,9 @@
 ## Higher version Create mod port to Fabric
 
+### Download the latest version of Create-Fly:
+
+https://www.curseforge.com/minecraft/mc-mods/create-fly/files/all?page=1&pageSize=20
+
 ### 1. What the project specifically does or adds
 
 - This is a Fabric fork of [Create](https://github.com/Creators-of-Create/Create).
@@ -26,7 +30,7 @@
 
 - Minecraft will always release new versions, and old versions will always become obsolete. If they cannot be ported in
   time, the accumulated modifications will be huge.
-- This project can provide higher version Create content that does not exist in the original Fabric branch.
+- This project can provide higher version Create content that does not exist in the original Fabric fork.
 
 ### 3. Any other critical information the user must know before downloading
 
@@ -38,7 +42,9 @@
 
 ### 4. TODO List
 
+- Create Commands
 - Create Mechanical Mixer Potion Recipe
+- Create Server Config Sync
 - Recipe Viewer Plugin
 - Create Ponder
 - Compat Fabric API
