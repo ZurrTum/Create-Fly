@@ -43,7 +43,7 @@ public class CompactingCategory implements DisplayCategory<CompactingDisplay> {
     public List<Widget> setupDisplay(CompactingDisplay display, Rectangle bounds) {
         List<Widget> widgets = new ArrayList<>();
         widgets.add(Widgets.createRecipeBase(bounds));
-        List<EntryIngredient> ingredients = display.getInputEntries();
+        List<EntryIngredient> ingredients = display.inputs();
         List<Point> points = new ArrayList<>();
         for (int i = 0, size = ingredients.size(), xOffset = size < 3 ? (3 - size) * 19 / 2 : 0; i < size; i++) {
             points.add(new Point(bounds.x + 17 + xOffset + (i % 3) * 19, bounds.y + 56 - (i / 3) * 19));
@@ -61,7 +61,7 @@ public class CompactingCategory implements DisplayCategory<CompactingDisplay> {
         for (int i = 0, size = points.size(); i < size; i++) {
             widgets.add(Widgets.createSlot(points.get(i)).markInput().disableBackground().entries(getRenderEntryStack(ingredients.get(i))));
         }
-        widgets.add(Widgets.createSlot(output).markOutput().disableBackground().entries(display.getOutputEntries().getFirst()));
+        widgets.add(Widgets.createSlot(output).markOutput().disableBackground().entries(display.output()));
         return widgets;
     }
 

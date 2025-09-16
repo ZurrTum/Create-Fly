@@ -18,19 +18,19 @@ import java.util.Optional;
 import static com.zurrtum.create.compat.rei.IngredientHelper.getEntryIngredient;
 import static com.zurrtum.create.compat.rei.IngredientHelper.getEntryIngredients;
 
-public record CompactingDisplay(List<EntryIngredient> inputs, List<EntryIngredient> outputs, Optional<Identifier> location) implements Display {
+public record CompactingDisplay(List<EntryIngredient> inputs, EntryIngredient output, Optional<Identifier> location) implements Display {
     public static final DisplaySerializer<CompactingDisplay> SERIALIZER = DisplaySerializer.of(
         RecordCodecBuilder.mapCodec(instance -> instance.group(
-            EntryIngredient.codec().listOf().fieldOf("inputs").forGetter(Display::getInputEntries),
-            EntryIngredient.codec().listOf().fieldOf("outputs").forGetter(Display::getOutputEntries),
-            Identifier.CODEC.optionalFieldOf("location").forGetter(Display::getDisplayLocation)
+            EntryIngredient.codec().listOf().fieldOf("inputs").forGetter(CompactingDisplay::inputs),
+            EntryIngredient.codec().fieldOf("output").forGetter(CompactingDisplay::output),
+            Identifier.CODEC.optionalFieldOf("location").forGetter(CompactingDisplay::location)
         ).apply(instance, CompactingDisplay::new)), PacketCodec.tuple(
             EntryIngredient.streamCodec().collect(PacketCodecs.toList()),
-            Display::getInputEntries,
-            EntryIngredient.streamCodec().collect(PacketCodecs.toList()),
-            Display::getOutputEntries,
+            CompactingDisplay::inputs,
+            EntryIngredient.streamCodec(),
+            CompactingDisplay::output,
             PacketCodecs.optional(Identifier.PACKET_CODEC),
-            Display::getDisplayLocation,
+            CompactingDisplay::location,
             CompactingDisplay::new
         )
     );
@@ -42,7 +42,7 @@ public record CompactingDisplay(List<EntryIngredient> inputs, List<EntryIngredie
     public CompactingDisplay(Identifier id, CompactingRecipe recipe) {
         this(
             getEntryIngredients(getEntryIngredients(recipe.ingredients()), getEntryIngredient(recipe.fluidIngredient())),
-            List.of(EntryIngredients.of(recipe.result())),
+            EntryIngredients.of(recipe.result()),
             Optional.of(id)
         );
     }
@@ -54,7 +54,7 @@ public record CompactingDisplay(List<EntryIngredient> inputs, List<EntryIngredie
 
     @Override
     public List<EntryIngredient> getOutputEntries() {
-        return outputs;
+        return List.of(output);
     }
 
     @Override
