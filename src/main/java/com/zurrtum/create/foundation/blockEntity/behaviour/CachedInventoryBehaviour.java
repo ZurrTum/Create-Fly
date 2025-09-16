@@ -33,6 +33,9 @@ public class CachedInventoryBehaviour<T extends SmartBlockEntity> extends BlockE
     @SuppressWarnings("unchecked")
     private Storage<ItemVariant> firstGet(Direction direction) {
         Inventory inventory = factory.apply(blockEntity);
+        if (inventory == null) {
+            return null;
+        }
         Storage<ItemVariant> storage = InventoryStorage.of(inventory, null);
         if (inventory instanceof SidedInventory) {
             Storage<ItemVariant>[] sides = new Storage[6];
