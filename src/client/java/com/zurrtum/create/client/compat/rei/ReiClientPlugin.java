@@ -15,5 +15,11 @@ public class ReiClientPlugin implements REIClientPlugin {
                 config.setPlusButtonArea(bounds -> new Rectangle(bounds.getMaxX() - 16, bounds.getMaxY() - 16, 10, 10));
             }
         );
+        registry.add(
+            new CompactingCategory(), config -> {
+                config.addWorkstations(EntryStacks.of(AllItems.MECHANICAL_PRESS.getDefaultStack()), EntryStacks.of(AllItems.BASIN));
+                config.setPlusButtonArea(bounds -> new Rectangle(bounds.getMaxX() - 16, bounds.getMaxY() - 16, 10, 10));
+            }
+        );
     }
 }

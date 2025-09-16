@@ -80,7 +80,7 @@ public interface AutoCompactingDisplay {
 
         @Override
         public CategoryIdentifier<?> getCategoryIdentifier() {
-            return ReiCommonPlugin.AUTO_COMPACTING;
+            return ReiCommonPlugin.AUTOMATIC_PACKING;
         }
 
         @Override
@@ -128,7 +128,7 @@ public interface AutoCompactingDisplay {
 
         @Override
         public CategoryIdentifier<?> getCategoryIdentifier() {
-            return ReiCommonPlugin.AUTO_COMPACTING;
+            return ReiCommonPlugin.AUTOMATIC_PACKING;
         }
 
         @Override
@@ -177,7 +177,7 @@ public interface AutoCompactingDisplay {
 
         @Override
         public CategoryIdentifier<?> getCategoryIdentifier() {
-            return ReiCommonPlugin.AUTO_COMPACTING;
+            return ReiCommonPlugin.AUTOMATIC_PACKING;
         }
 
         @Override
@@ -214,7 +214,7 @@ public interface AutoCompactingDisplay {
 
         @Override
         public CategoryIdentifier<?> getCategoryIdentifier() {
-            return ReiCommonPlugin.AUTO_COMPACTING;
+            return ReiCommonPlugin.AUTOMATIC_PACKING;
         }
 
         @Override
