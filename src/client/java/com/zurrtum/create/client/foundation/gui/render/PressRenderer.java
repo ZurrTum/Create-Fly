@@ -20,19 +20,19 @@ import net.minecraft.util.math.RotationAxis;
 
 import java.util.List;
 
-public class PressBasinRenderer extends SpecialGuiElementRenderer<PressBasinRenderState> {
-    public PressBasinRenderer(VertexConsumerProvider.Immediate vertexConsumers) {
+public class PressRenderer extends SpecialGuiElementRenderer<PressRenderState> {
+    public PressRenderer(VertexConsumerProvider.Immediate vertexConsumers) {
         super(vertexConsumers);
     }
 
     @Override
-    protected void render(PressBasinRenderState state, MatrixStack matrices) {
+    protected void render(PressRenderState state, MatrixStack matrices) {
         MinecraftClient mc = MinecraftClient.getInstance();
         mc.gameRenderer.getDiffuseLighting().setShaderLights(DiffuseLighting.Type.LEVEL);
         matrices.scale(1, 1, -1);
         matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(-15.5f));
         matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(22.5f));
-        matrices.translate(-0.5f, -1.8f, -0.5f);
+        matrices.translate(-0.5f, -1.14f, -0.5f);
         matrices.scale(1, -1, 1);
 
         BlockState blockState;
@@ -84,20 +84,6 @@ public class PressBasinRenderer extends SpecialGuiElementRenderer<PressBasinRend
             parts
         );
         matrices.pop();
-
-        matrices.translate(0, -1.65f, 0);
-        blockState = AllBlocks.BASIN.getDefaultState();
-        world.blockState(blockState);
-        parts = mc.getBlockRenderManager().getModel(blockState).getParts(mc.world.random);
-        mc.getBlockRenderManager().renderBlock(
-            blockState,
-            BlockPos.ORIGIN,
-            world,
-            matrices,
-            vertexConsumers.getBuffer(TexturedRenderLayers.getEntityCutout()),
-            false,
-            parts
-        );
     }
 
     private static float getShaftAngle(float time) {
@@ -119,11 +105,11 @@ public class PressBasinRenderer extends SpecialGuiElementRenderer<PressBasinRend
 
     @Override
     protected String getName() {
-        return "Press Basin";
+        return "Press";
     }
 
     @Override
-    public Class<PressBasinRenderState> getElementClass() {
-        return PressBasinRenderState.class;
+    public Class<PressRenderState> getElementClass() {
+        return PressRenderState.class;
     }
 }

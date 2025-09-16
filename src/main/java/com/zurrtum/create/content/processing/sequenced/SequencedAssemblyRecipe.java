@@ -114,13 +114,10 @@ public record SequencedAssemblyRecipe(
 
                     ItemStack transitional = transitionalItem.copy();
                     Ingredient transitionalIngredient = Ingredient.ofItem(transitionalItem.getItem());
-                    Supplier<JsonElement> transitionalJsonIngredient = () -> {
-                        transitional.set(DataComponentTypes.LORE, LoreComponent.DEFAULT);
-                        return ComponentsIngredient.CODEC.encodeStart(
-                            ops,
-                            new ComponentsIngredient(transitionalIngredient, transitional.getComponentChanges())
-                        ).getOrThrow();
-                    };
+                    Supplier<JsonElement> transitionalJsonIngredient = () -> ComponentsIngredient.CODEC.encodeStart(
+                        ops,
+                        new ComponentsIngredient(transitionalIngredient, transitional.getComponentChanges())
+                    ).getOrThrow();
 
                     List<BiFunction<JsonElement, JsonElement, JsonObject>> sequenceJsonFactory = new ArrayList<>(size);
                     for (int i = 0; i < sequenceSize; i++) {

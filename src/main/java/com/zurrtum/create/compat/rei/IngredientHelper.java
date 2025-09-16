@@ -7,8 +7,14 @@ import me.shedaniel.rei.api.common.entry.EntryIngredient;
 import me.shedaniel.rei.api.common.entry.EntryStack;
 import me.shedaniel.rei.api.common.entry.type.EntryDefinition;
 import me.shedaniel.rei.api.common.entry.type.VanillaEntryTypes;
+import me.shedaniel.rei.api.common.util.EntryIngredients;
+import net.fabricmc.fabric.api.recipe.v1.ingredient.CustomIngredient;
+import net.fabricmc.fabric.api.recipe.v1.ingredient.FabricIngredient;
+import net.fabricmc.fabric.impl.recipe.ingredient.builtin.ComponentsIngredient;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.item.ItemStack;
+import net.minecraft.recipe.Ingredient;
+import net.minecraft.recipe.display.SlotDisplay;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
@@ -46,5 +52,22 @@ public interface IngredientHelper {
 
     static List<EntryIngredient> getEntryIngredients(Stream<EntryIngredient> ingredients, Stream<EntryIngredient> fluidIngredients) {
         return Stream.concat(ingredients, fluidIngredients).toList();
+    }
+
+    @SuppressWarnings("UnstableApiUsage")
+    static EntryIngredient getInputEntryIngredient(Ingredient ingredient) {
+        CustomIngredient customIngredient = ((FabricIngredient) ingredient).getCustomIngredient();
+        if (customIngredient instanceof ComponentsIngredient) {
+            EntryDefinition<ItemStack> definition = VanillaEntryTypes.ITEM.getDefinition();
+            List<SlotDisplay> contents = ((SlotDisplay.CompositeSlotDisplay) customIngredient.toDisplay()).contents();
+            EntryIngredient.Builder builder = EntryIngredient.builder(contents.size());
+            for (SlotDisplay content : contents) {
+                SlotDisplay.StackSlotDisplay display = (SlotDisplay.StackSlotDisplay) content;
+                builder.add(EntryStack.of(definition, display.stack()));
+            }
+            return builder.build();
+        } else {
+            return EntryIngredients.ofIngredient(ingredient);
+        }
     }
 }
