@@ -33,5 +33,6 @@ public class ReiClientPlugin implements REIClientPlugin {
         registry.add(new PressingCategory(), config(AllItems.MECHANICAL_PRESS));
         registry.add(new AutoMixingCategory(), config(AllItems.MECHANICAL_MIXER, AllItems.BASIN));
         registry.add(new MixingCategory(), config(AllItems.MECHANICAL_MIXER, AllItems.BASIN));
+        registry.add(new MillingCategory(), config(AllItems.MILLSTONE));
     }
 }

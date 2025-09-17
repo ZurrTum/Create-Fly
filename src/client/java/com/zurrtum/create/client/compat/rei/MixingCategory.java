@@ -14,7 +14,6 @@ import me.shedaniel.math.Rectangle;
 import me.shedaniel.rei.api.client.gui.Renderer;
 import me.shedaniel.rei.api.client.gui.widgets.Widget;
 import me.shedaniel.rei.api.client.gui.widgets.Widgets;
-import me.shedaniel.rei.api.client.registry.display.DisplayCategory;
 import me.shedaniel.rei.api.common.category.CategoryIdentifier;
 import me.shedaniel.rei.api.common.entry.EntryIngredient;
 import me.shedaniel.rei.api.common.util.EntryIngredients;
@@ -26,10 +25,7 @@ import org.joml.Matrix3x2f;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.zurrtum.create.client.compat.rei.IngredientHelper.condenseIngredients;
-import static com.zurrtum.create.client.compat.rei.IngredientHelper.getRenderEntryStack;
-
-public class MixingCategory implements DisplayCategory<MixingDisplay> {
+public class MixingCategory extends CreateCategory<MixingDisplay> {
     @Override
     public CategoryIdentifier<? extends MixingDisplay> getCategoryIdentifier() {
         return ReiCommonPlugin.MIXING;
@@ -42,13 +38,11 @@ public class MixingCategory implements DisplayCategory<MixingDisplay> {
 
     @Override
     public Renderer getIcon() {
-        return new TwoIconRenderer(AllItems.MECHANICAL_MIXER.getDefaultStack(), AllItems.BASIN.getDefaultStack());
+        return new TwoIconRenderer(AllItems.MECHANICAL_MIXER, AllItems.BASIN);
     }
 
     @Override
-    public List<Widget> setupDisplay(MixingDisplay display, Rectangle bounds) {
-        List<Widget> widgets = new ArrayList<>();
-        widgets.add(Widgets.createRecipeBase(bounds));
+    void addWidgets(List<Widget> widgets, MixingDisplay display, Rectangle bounds) {
         List<EntryIngredient> ingredients = condenseIngredients(display.inputs());
         List<Point> points = new ArrayList<>();
         for (int i = 0, size = ingredients.size(), xOffset = size < 3 ? (3 - size) * 19 / 2 : 0; i < size; i++) {
@@ -57,10 +51,7 @@ public class MixingCategory implements DisplayCategory<MixingDisplay> {
         Point output = new Point(bounds.x + 147, bounds.y + 56);
         HeatCondition requiredHeat = display.heat();
         widgets.add(Widgets.createDrawableWidget((DrawContext graphics, int mouseX, int mouseY, float delta) -> {
-            for (Point point : points) {
-                AllGuiTextures.JEI_SLOT.render(graphics, point.x - 1, point.y - 1);
-            }
-            AllGuiTextures.JEI_SLOT.render(graphics, output.x - 1, output.y - 1);
+            drawSlotBackground(graphics, points, output);
             AllGuiTextures.JEI_DOWN_ARROW.render(graphics, bounds.x + 141, bounds.y + 37);
             Matrix3x2f pose = new Matrix3x2f(graphics.getMatrices());
             if (requiredHeat == HeatCondition.NONE) {
@@ -87,23 +78,15 @@ public class MixingCategory implements DisplayCategory<MixingDisplay> {
             );
         }));
         for (int i = 0, size = points.size(); i < size; i++) {
-            widgets.add(Widgets.createSlot(points.get(i)).markInput().disableBackground().entries(getRenderEntryStack(ingredients.get(i))));
+            widgets.add(createInputSlot(points.get(i)).entries(getRenderEntryStack(ingredients.get(i))));
         }
-        widgets.add(Widgets.createSlot(output).markOutput().disableBackground().entries(getRenderEntryStack(display.output())));
+        widgets.add(createOutputSlot(output).entries(getRenderEntryStack(display.output())));
         if (!requiredHeat.testBlazeBurner(HeatLevel.NONE)) {
-            widgets.add(Widgets.createSlot(new Point(bounds.x + 139, bounds.y + 86)).disableBackground()
-                .entries(EntryIngredients.of(AllItems.BLAZE_BURNER)));
+            widgets.add(createSlot(new Point(bounds.x + 139, bounds.y + 86)).entries(EntryIngredients.of(AllItems.BLAZE_BURNER)));
         }
         if (!requiredHeat.testBlazeBurner(HeatLevel.KINDLED)) {
-            widgets.add(Widgets.createSlot(new Point(bounds.x + 158, bounds.y + 86)).disableBackground()
-                .entries(EntryIngredients.of(AllItems.BLAZE_CAKE)));
+            widgets.add(createSlot(new Point(bounds.x + 158, bounds.y + 86)).entries(EntryIngredients.of(AllItems.BLAZE_CAKE)));
         }
-        return widgets;
-    }
-
-    @Override
-    public int getDisplayWidth(MixingDisplay display) {
-        return 187;
     }
 
     @Override

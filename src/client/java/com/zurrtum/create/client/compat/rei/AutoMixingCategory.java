@@ -10,7 +10,6 @@ import me.shedaniel.math.Rectangle;
 import me.shedaniel.rei.api.client.gui.Renderer;
 import me.shedaniel.rei.api.client.gui.widgets.Widget;
 import me.shedaniel.rei.api.client.gui.widgets.Widgets;
-import me.shedaniel.rei.api.client.registry.display.DisplayCategory;
 import me.shedaniel.rei.api.common.category.CategoryIdentifier;
 import me.shedaniel.rei.api.common.entry.EntryIngredient;
 import me.shedaniel.rei.plugin.common.displays.crafting.CraftingDisplay;
@@ -22,9 +21,7 @@ import org.joml.Matrix3x2f;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.zurrtum.create.client.compat.rei.IngredientHelper.condenseIngredients;
-
-public class AutoMixingCategory implements DisplayCategory<CraftingDisplay> {
+public class AutoMixingCategory extends CreateCategory<CraftingDisplay> {
     @Override
     public CategoryIdentifier<? extends CraftingDisplay> getCategoryIdentifier() {
         return ReiCommonPlugin.AUTOMATIC_SHAPELESS;
@@ -37,13 +34,11 @@ public class AutoMixingCategory implements DisplayCategory<CraftingDisplay> {
 
     @Override
     public Renderer getIcon() {
-        return new TwoIconRenderer(AllItems.MECHANICAL_MIXER.getDefaultStack(), Items.CRAFTING_TABLE.getDefaultStack());
+        return new TwoIconRenderer(AllItems.MECHANICAL_MIXER, Items.CRAFTING_TABLE);
     }
 
     @Override
-    public List<Widget> setupDisplay(CraftingDisplay display, Rectangle bounds) {
-        List<Widget> widgets = new ArrayList<>();
-        widgets.add(Widgets.createRecipeBase(bounds));
+    void addWidgets(List<Widget> widgets, CraftingDisplay display, Rectangle bounds) {
         List<EntryIngredient> ingredients = condenseIngredients(display.getInputEntries());
         List<Point> points = new ArrayList<>();
         for (int i = 0, size = ingredients.size(), xOffset = size < 3 ? (3 - size) * 19 / 2 : 0; i < size; i++) {
@@ -51,24 +46,15 @@ public class AutoMixingCategory implements DisplayCategory<CraftingDisplay> {
         }
         Point output = new Point(bounds.x + 147, bounds.y + 56);
         widgets.add(Widgets.createDrawableWidget((DrawContext graphics, int mouseX, int mouseY, float delta) -> {
-            for (Point point : points) {
-                AllGuiTextures.JEI_SLOT.render(graphics, point.x - 1, point.y - 1);
-            }
-            AllGuiTextures.JEI_SLOT.render(graphics, output.x - 1, output.y - 1);
+            drawSlotBackground(graphics, points, output);
             AllGuiTextures.JEI_DOWN_ARROW.render(graphics, bounds.x + 141, bounds.y + 37);
             AllGuiTextures.JEI_SHADOW.render(graphics, bounds.x + 86, bounds.y + 73);
             graphics.state.addSpecialElement(new MixingBasinRenderState(new Matrix3x2f(graphics.getMatrices()), bounds.x + 96, bounds.y));
         }));
         for (int i = 0, size = points.size(); i < size; i++) {
-            widgets.add(Widgets.createSlot(points.get(i)).markInput().disableBackground().entries(ingredients.get(i)));
+            widgets.add(createInputSlot(points.get(i)).entries(ingredients.get(i)));
         }
-        widgets.add(Widgets.createSlot(output).markOutput().disableBackground().entries(display.getOutputEntries().getFirst()));
-        return widgets;
-    }
-
-    @Override
-    public int getDisplayWidth(CraftingDisplay display) {
-        return 187;
+        widgets.add(createOutputSlot(output).entries(display.getOutputEntries().getFirst()));
     }
 
     @Override

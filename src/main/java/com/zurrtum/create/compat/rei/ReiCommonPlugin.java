@@ -1,6 +1,7 @@
 package com.zurrtum.create.compat.rei;
 
 import com.zurrtum.create.AllRecipeTypes;
+import com.zurrtum.create.content.kinetics.millstone.MillingRecipe;
 import com.zurrtum.create.content.kinetics.mixer.CompactingRecipe;
 import com.zurrtum.create.content.kinetics.mixer.MixingRecipe;
 import com.zurrtum.create.content.kinetics.press.PressingRecipe;
@@ -20,6 +21,7 @@ public class ReiCommonPlugin implements REICommonPlugin {
     public static final CategoryIdentifier<PressingDisplay> PRESSING = CategoryIdentifier.of(MOD_ID, "pressing");
     public static final CategoryIdentifier<CraftingDisplay> AUTOMATIC_SHAPELESS = CategoryIdentifier.of(MOD_ID, "automatic_shapeless");
     public static final CategoryIdentifier<MixingDisplay> MIXING = CategoryIdentifier.of(MOD_ID, "mixing");
+    public static final CategoryIdentifier<MillingDisplay> MILLING = CategoryIdentifier.of(MOD_ID, "milling");
 
     @Override
     public void registerDisplays(ServerDisplayRegistry registry) {
@@ -28,6 +30,7 @@ public class ReiCommonPlugin implements REICommonPlugin {
         registry.beginRecipeFiller(PressingRecipe.class).filterType(AllRecipeTypes.PRESSING).fill(PressingDisplay::new);
         registry.beginRecipeFiller(ShapelessRecipe.class).fill(AutoMixingDisplay::of);
         registry.beginRecipeFiller(MixingRecipe.class).fill(MixingDisplay::new);
+        registry.beginRecipeFiller(MillingRecipe.class).fill(MillingDisplay::new);
     }
 
     @Override
@@ -53,5 +56,6 @@ public class ReiCommonPlugin implements REICommonPlugin {
             AutoMixingDisplay.CraftingDisplayShapeless.SERIALIZER
         );
         registry.register(MIXING.getIdentifier(), MixingDisplay.SERIALIZER);
+        registry.register(MILLING.getIdentifier(), MillingDisplay.SERIALIZER);
     }
 }
