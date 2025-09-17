@@ -1,6 +1,7 @@
 package com.zurrtum.create.compat.rei;
 
 import com.zurrtum.create.AllRecipeTypes;
+import com.zurrtum.create.content.equipment.sandPaper.SandPaperPolishingRecipe;
 import com.zurrtum.create.content.fluids.transfer.EmptyingRecipe;
 import com.zurrtum.create.content.fluids.transfer.FillingRecipe;
 import com.zurrtum.create.content.kinetics.crafter.MechanicalCraftingRecipe;
@@ -36,6 +37,7 @@ public class ReiCommonPlugin implements REICommonPlugin {
     public static final CategoryIdentifier<DrainingDisplay> DRAINING = CategoryIdentifier.of(MOD_ID, "draining");
     public static final CategoryIdentifier<MechanicalCraftingDisplay> MECHANICAL_CRAFTING = CategoryIdentifier.of(MOD_ID, "mechanical_crafting");
     public static final CategoryIdentifier<SpoutFillingDisplay> SPOUT_FILLING = CategoryIdentifier.of(MOD_ID, "spout_filling");
+    public static final CategoryIdentifier<SandpaperPolishingDisplay> SANDPAPER_POLISHING = CategoryIdentifier.of(MOD_ID, "sandpaper_polishing");
 
     @Override
     public void registerDisplays(ServerDisplayRegistry registry) {
@@ -52,6 +54,7 @@ public class ReiCommonPlugin implements REICommonPlugin {
         registry.beginRecipeFiller(EmptyingRecipe.class).fill(DrainingDisplay::new);
         registry.beginRecipeFiller(MechanicalCraftingRecipe.class).fill(MechanicalCraftingDisplay::new);
         registry.beginRecipeFiller(FillingRecipe.class).fill(SpoutFillingDisplay::new);
+        registry.beginRecipeFiller(SandPaperPolishingRecipe.class).fill(SandpaperPolishingDisplay::new);
     }
 
     @Override
@@ -85,5 +88,6 @@ public class ReiCommonPlugin implements REICommonPlugin {
         registry.register(DRAINING.getIdentifier(), DrainingDisplay.SERIALIZER);
         registry.register(MECHANICAL_CRAFTING.getIdentifier(), MechanicalCraftingDisplay.SERIALIZER);
         registry.register(SPOUT_FILLING.getIdentifier(), SpoutFillingDisplay.SERIALIZER);
+        registry.register(SANDPAPER_POLISHING.getIdentifier(), SandpaperPolishingDisplay.SERIALIZER);
     }
 }
