@@ -5,6 +5,8 @@ import me.shedaniel.math.Rectangle;
 import me.shedaniel.rei.api.client.plugins.REIClientPlugin;
 import me.shedaniel.rei.api.client.registry.category.CategoryRegistry;
 import me.shedaniel.rei.api.client.registry.category.CategoryRegistry.CategoryConfiguration;
+import me.shedaniel.rei.api.client.registry.display.DisplayRegistry;
+import me.shedaniel.rei.api.common.category.CategoryIdentifier;
 import me.shedaniel.rei.api.common.display.Display;
 import me.shedaniel.rei.api.common.entry.EntryStack;
 import me.shedaniel.rei.api.common.util.EntryStacks;
@@ -13,7 +15,11 @@ import net.minecraft.item.ItemStack;
 
 import java.util.function.Consumer;
 
+import static com.zurrtum.create.Create.MOD_ID;
+
 public class ReiClientPlugin implements REIClientPlugin {
+    public static final CategoryIdentifier<MysteriousItemConversionDisplay> MYSTERY_CONVERSION = CategoryIdentifier.of(MOD_ID, "mystery_conversion");
+
     @SuppressWarnings("unchecked")
     private <T extends Display> Consumer<CategoryConfiguration<T>> config(ItemConvertible... item) {
         EntryStack<ItemStack>[] workstations = new EntryStack[item.length];
@@ -35,5 +41,12 @@ public class ReiClientPlugin implements REIClientPlugin {
         registry.add(new MixingCategory(), config(AllItems.MECHANICAL_MIXER, AllItems.BASIN));
         registry.add(new MillingCategory(), config(AllItems.MILLSTONE));
         registry.add(new SawingCategory(), config(AllItems.MECHANICAL_SAW));
+        registry.add(new MysteriousItemConversionCategory());
+    }
+
+    @Override
+    public void registerDisplays(DisplayRegistry registry) {
+        registry.add(new MysteriousItemConversionDisplay(AllItems.EMPTY_BLAZE_BURNER, AllItems.BLAZE_BURNER));
+        registry.add(new MysteriousItemConversionDisplay(AllItems.PECULIAR_BELL, AllItems.HAUNTED_BELL));
     }
 }
