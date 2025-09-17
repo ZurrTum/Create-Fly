@@ -31,6 +31,7 @@ public class GuiRendererMixin {
         builder.put(BasinBlazeBurnerRenderState.class, new BasinBlazeBurnerRenderer(vertexConsumers));
         builder.put(MillstoneRenderState.class, new MillstoneRenderer(vertexConsumers));
         builder.put(SawRenderState.class, new SawRenderer(vertexConsumers));
+        builder.put(CrushWheelRenderState.class, new CrushWheelRenderer(vertexConsumers));
         return builder;
     }
 }

@@ -1,6 +1,7 @@
 package com.zurrtum.create.compat.rei;
 
 import com.zurrtum.create.AllRecipeTypes;
+import com.zurrtum.create.content.kinetics.crusher.CrushingRecipe;
 import com.zurrtum.create.content.kinetics.millstone.MillingRecipe;
 import com.zurrtum.create.content.kinetics.mixer.CompactingRecipe;
 import com.zurrtum.create.content.kinetics.mixer.MixingRecipe;
@@ -24,6 +25,7 @@ public class ReiCommonPlugin implements REICommonPlugin {
     public static final CategoryIdentifier<MixingDisplay> MIXING = CategoryIdentifier.of(MOD_ID, "mixing");
     public static final CategoryIdentifier<MillingDisplay> MILLING = CategoryIdentifier.of(MOD_ID, "milling");
     public static final CategoryIdentifier<SawingDisplay> SAWING = CategoryIdentifier.of(MOD_ID, "sawing");
+    public static final CategoryIdentifier<CrushingDisplay> CRUSHING = CategoryIdentifier.of(MOD_ID, "crushing");
 
     @Override
     public void registerDisplays(ServerDisplayRegistry registry) {
@@ -34,6 +36,7 @@ public class ReiCommonPlugin implements REICommonPlugin {
         registry.beginRecipeFiller(MixingRecipe.class).fill(MixingDisplay::new);
         registry.beginRecipeFiller(MillingRecipe.class).fill(MillingDisplay::new);
         registry.beginRecipeFiller(CuttingRecipe.class).fill(SawingDisplay::new);
+        registry.beginRecipeFiller(CrushingRecipe.class).fill(CrushingDisplay::new);
     }
 
     @Override
@@ -61,5 +64,6 @@ public class ReiCommonPlugin implements REICommonPlugin {
         registry.register(MIXING.getIdentifier(), MixingDisplay.SERIALIZER);
         registry.register(MILLING.getIdentifier(), MillingDisplay.SERIALIZER);
         registry.register(SAWING.getIdentifier(), SawingDisplay.SERIALIZER);
+        registry.register(CRUSHING.getIdentifier(), CrushingDisplay.SERIALIZER);
     }
 }

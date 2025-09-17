@@ -1,6 +1,7 @@
 package com.zurrtum.create.client.compat.rei;
 
 import com.zurrtum.create.client.foundation.gui.AllGuiTextures;
+import com.zurrtum.create.content.processing.recipe.ChanceOutput;
 import dev.architectury.fluid.FluidStack;
 import me.shedaniel.math.Point;
 import me.shedaniel.math.Rectangle;
@@ -12,6 +13,7 @@ import me.shedaniel.rei.api.common.display.Display;
 import me.shedaniel.rei.api.common.entry.EntryIngredient;
 import me.shedaniel.rei.api.common.entry.EntryStack;
 import me.shedaniel.rei.api.common.util.EntryIngredients;
+import me.shedaniel.rei.api.common.util.EntryStacks;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.item.ItemStack;
 
@@ -90,6 +92,28 @@ public abstract class CreateCategory<T extends Display> implements DisplayCatego
             result.add(EntryIngredients.of(stack));
         }
         return result;
+    }
+
+    public static void addOutputData(
+        ChanceOutput output,
+        int x,
+        int y,
+        List<Point> outputs,
+        List<EntryIngredient> outputIngredients,
+        List<Point> chances,
+        List<EntryIngredient> chanceIngredients
+    ) {
+        float chance = output.chance();
+        Point point = new Point(x, y);
+        if (chance == 1) {
+            outputs.add(point);
+            outputIngredients.add(EntryIngredients.of(output.stack()));
+        } else {
+            chances.add(point);
+            EntryStack<ItemStack> stack = EntryStacks.of(output.stack());
+            stack.withRenderer(new ChanceItemRender(chance, stack.getRenderer()));
+            chanceIngredients.add(EntryIngredient.of(stack));
+        }
     }
 
     @Override
