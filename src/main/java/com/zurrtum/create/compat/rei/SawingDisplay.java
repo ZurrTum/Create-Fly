@@ -18,7 +18,7 @@ import java.util.Optional;
 public record SawingDisplay(EntryIngredient input, EntryIngredient output, Optional<Identifier> location) implements Display {
     public static final DisplaySerializer<SawingDisplay> SERIALIZER = DisplaySerializer.of(
         RecordCodecBuilder.mapCodec(instance -> instance.group(
-            EntryIngredient.codec().fieldOf("inputs").forGetter(SawingDisplay::input),
+            EntryIngredient.codec().fieldOf("input").forGetter(SawingDisplay::input),
             EntryIngredient.codec().fieldOf("output").forGetter(SawingDisplay::output),
             Identifier.CODEC.optionalFieldOf("location").forGetter(SawingDisplay::location)
         ).apply(instance, SawingDisplay::new)), PacketCodec.tuple(

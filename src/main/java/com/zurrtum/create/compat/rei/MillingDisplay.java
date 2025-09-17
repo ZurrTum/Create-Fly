@@ -20,8 +20,8 @@ import java.util.Optional;
 public record MillingDisplay(EntryIngredient input, List<ChanceOutput> outputs, Optional<Identifier> location) implements Display {
     public static final DisplaySerializer<MillingDisplay> SERIALIZER = DisplaySerializer.of(
         RecordCodecBuilder.mapCodec(instance -> instance.group(
-            EntryIngredient.codec().fieldOf("inputs").forGetter(MillingDisplay::input),
-            ChanceOutput.CODEC.listOf().fieldOf("output").forGetter(MillingDisplay::outputs),
+            EntryIngredient.codec().fieldOf("input").forGetter(MillingDisplay::input),
+            ChanceOutput.CODEC.listOf().fieldOf("outputs").forGetter(MillingDisplay::outputs),
             Identifier.CODEC.optionalFieldOf("location").forGetter(MillingDisplay::location)
         ).apply(instance, MillingDisplay::new)), PacketCodec.tuple(
             EntryIngredient.streamCodec(),

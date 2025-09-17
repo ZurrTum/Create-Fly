@@ -49,6 +49,7 @@ public class ReiClientPlugin implements REIClientPlugin {
         registry.add(new DeployingCategory(), config(AllItems.DEPLOYER, AllItems.DEPOT, AllItems.BELT_CONNECTOR));
         registry.add(new DrainingCategory(), config(AllItems.ITEM_DRAIN));
         registry.add(new MechanicalCraftingCategory(), config(AllItems.MECHANICAL_CRAFTER));
+        registry.add(new SpoutFillingCategory(), config(AllItems.SPOUT));
     }
 
     @Override

@@ -20,8 +20,8 @@ import java.util.Optional;
 public record CrushingDisplay(EntryIngredient input, List<ChanceOutput> outputs, Optional<Identifier> location) implements Display {
     public static final DisplaySerializer<CrushingDisplay> SERIALIZER = DisplaySerializer.of(
         RecordCodecBuilder.mapCodec(instance -> instance.group(
-            EntryIngredient.codec().fieldOf("inputs").forGetter(CrushingDisplay::input),
-            ChanceOutput.CODEC.listOf().fieldOf("output").forGetter(CrushingDisplay::outputs),
+            EntryIngredient.codec().fieldOf("input").forGetter(CrushingDisplay::input),
+            ChanceOutput.CODEC.listOf().fieldOf("outputs").forGetter(CrushingDisplay::outputs),
             Identifier.CODEC.optionalFieldOf("location").forGetter(CrushingDisplay::location)
         ).apply(instance, CrushingDisplay::new)), PacketCodec.tuple(
             EntryIngredient.streamCodec(),
