@@ -27,7 +27,9 @@ public class ReiClientPlugin implements REIClientPlugin {
             workstations[i] = EntryStacks.of(item[i]);
         }
         return config -> {
-            config.addWorkstations(workstations);
+            if (workstations.length > 0) {
+                config.addWorkstations(workstations);
+            }
             config.setPlusButtonArea(bounds -> new Rectangle(bounds.getMaxX() - 16, bounds.getMinY() + 6, 10, 10));
         };
     }
@@ -42,7 +44,8 @@ public class ReiClientPlugin implements REIClientPlugin {
         registry.add(new MillingCategory(), config(AllItems.MILLSTONE));
         registry.add(new SawingCategory(), config(AllItems.MECHANICAL_SAW));
         registry.add(new CrushingCategory(), config(AllItems.CRUSHING_WHEEL));
-        registry.add(new MysteriousItemConversionCategory());
+        registry.add(new MysteriousItemConversionCategory(), config());
+        registry.add(new ManualApplicationCategory(), config());
     }
 
     @Override
