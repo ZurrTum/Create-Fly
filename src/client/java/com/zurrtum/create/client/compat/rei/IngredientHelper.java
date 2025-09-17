@@ -7,19 +7,16 @@ import me.shedaniel.rei.api.common.util.EntryIngredients;
 import net.minecraft.item.ItemStack;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 public interface IngredientHelper {
-    static Collection<? extends EntryStack<?>> getRenderEntryStack(EntryIngredient ingredient) {
+    static EntryIngredient getRenderEntryStack(EntryIngredient ingredient) {
         if (ingredient.getFirst().getValue() instanceof FluidStack) {
             for (EntryStack<FluidStack> stack : ingredient.<FluidStack>castAsList()) {
                 stack.withRenderer(new FluidStackRenderer(stack.getRenderer()));
             }
-            return ingredient;
-        } else {
-            return ingredient;
         }
+        return ingredient;
     }
 
     static List<EntryIngredient> condenseIngredients(List<EntryIngredient> ingredients) {

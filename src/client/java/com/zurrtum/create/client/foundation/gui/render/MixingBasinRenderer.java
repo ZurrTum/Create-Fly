@@ -12,6 +12,7 @@ import net.minecraft.client.render.DiffuseLighting;
 import net.minecraft.client.render.TexturedRenderLayers;
 import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.render.VertexConsumerProvider;
+import net.minecraft.client.render.block.BlockRenderManager;
 import net.minecraft.client.render.model.BlockModelPart;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.BlockPos;
@@ -37,6 +38,7 @@ public class MixingBasinRenderer extends SpecialGuiElementRenderer<MixingBasinRe
 
         BlockState blockState;
         List<BlockModelPart> parts;
+        BlockRenderManager blockRenderManager = mc.getBlockRenderManager();
         SinglePosVirtualBlockGetter world = SinglePosVirtualBlockGetter.createFullBright();
         VertexConsumer buffer = vertexConsumers.getBuffer(TexturedRenderLayers.getEntityCutout());
         float time = AnimationTickHolder.getRenderTime();
@@ -44,8 +46,8 @@ public class MixingBasinRenderer extends SpecialGuiElementRenderer<MixingBasinRe
 
         blockState = AllBlocks.MECHANICAL_MIXER.getDefaultState();
         world.blockState(blockState);
-        parts = mc.getBlockRenderManager().getModel(blockState).getParts(mc.world.random);
-        mc.getBlockRenderManager().renderBlock(blockState, BlockPos.ORIGIN, world, matrices, buffer, false, parts);
+        parts = blockRenderManager.getModel(blockState).getParts(mc.world.random);
+        blockRenderManager.renderBlock(blockState, BlockPos.ORIGIN, world, matrices, buffer, false, parts);
 
         blockState = Blocks.AIR.getDefaultState();
         world.blockState(blockState);
@@ -54,25 +56,25 @@ public class MixingBasinRenderer extends SpecialGuiElementRenderer<MixingBasinRe
         matrices.translate(0.5f, 0.5f, 0.5f);
         matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(angle * 2));
         matrices.translate(-0.5f, -0.5f, -0.5f);
-        mc.getBlockRenderManager().renderBlock(blockState, BlockPos.ORIGIN, world, matrices, buffer, false, parts);
+        blockRenderManager.renderBlock(blockState, BlockPos.ORIGIN, world, matrices, buffer, false, parts);
         matrices.pop();
 
         matrices.push();
         matrices.translate(0, getAnimatedHeadOffset(time), 0);
         parts = List.of(AllPartialModels.MECHANICAL_MIXER_POLE.get());
-        mc.getBlockRenderManager().renderBlock(blockState, BlockPos.ORIGIN, world, matrices, buffer, false, parts);
+        blockRenderManager.renderBlock(blockState, BlockPos.ORIGIN, world, matrices, buffer, false, parts);
         matrices.translate(0.5f, 0.5f, 0.5f);
         matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(angle * 4));
         matrices.translate(-0.5f, -0.5f, -0.5f);
         parts = List.of(AllPartialModels.MECHANICAL_MIXER_HEAD.get());
-        mc.getBlockRenderManager().renderBlock(blockState, BlockPos.ORIGIN, world, matrices, buffer, false, parts);
+        blockRenderManager.renderBlock(blockState, BlockPos.ORIGIN, world, matrices, buffer, false, parts);
         matrices.pop();
 
         matrices.translate(0, -1.65f, 0);
         blockState = AllBlocks.BASIN.getDefaultState();
         world.blockState(blockState);
-        parts = mc.getBlockRenderManager().getModel(blockState).getParts(mc.world.random);
-        mc.getBlockRenderManager().renderBlock(blockState, BlockPos.ORIGIN, world, matrices, buffer, false, parts);
+        parts = blockRenderManager.getModel(blockState).getParts(mc.world.random);
+        blockRenderManager.renderBlock(blockState, BlockPos.ORIGIN, world, matrices, buffer, false, parts);
     }
 
     private static float getCurrentAngle(float time) {

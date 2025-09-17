@@ -11,7 +11,11 @@ import me.shedaniel.rei.api.common.entry.EntryStack;
 import net.minecraft.client.gl.RenderPipelines;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.fluid.Fluid;
-import org.jetbrains.annotations.Nullable;
+import net.minecraft.registry.Registries;
+import net.minecraft.text.Text;
+import net.minecraft.util.Util;
+
+import java.util.List;
 
 public record FluidStackRenderer(EntryRenderer<FluidStack> origin) implements EntryRenderer<FluidStack> {
     @Override
@@ -26,7 +30,23 @@ public record FluidStackRenderer(EntryRenderer<FluidStack> origin) implements En
     }
 
     @Override
-    public @Nullable Tooltip getTooltip(EntryStack<FluidStack> entry, TooltipContext context) {
-        return origin.getTooltip(entry, context);
+    public Tooltip getTooltip(EntryStack<FluidStack> entry, TooltipContext context) {
+        Tooltip tooltip = origin.getTooltip(entry, context);
+        if (tooltip == null) {
+            return null;
+        }
+        List<Tooltip.Entry> entries = tooltip.entries();
+        Tooltip.Entry first = entries.getFirst();
+        if (first.isText()) {
+            Text name = first.getAsText();
+            if (name.getString().startsWith("block.")) {
+                entries.removeFirst();
+                entries.addFirst(Tooltip.entry(Text.translatable(Util.createTranslationKey(
+                    "fluid",
+                    Registries.FLUID.getId(entry.getValue().getFluid())
+                ))));
+            }
+        }
+        return tooltip;
     }
 }

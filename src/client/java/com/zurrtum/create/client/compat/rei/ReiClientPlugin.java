@@ -22,7 +22,7 @@ public class ReiClientPlugin implements REIClientPlugin {
         }
         return config -> {
             config.addWorkstations(workstations);
-            config.setPlusButtonArea(bounds -> new Rectangle(bounds.getMaxX() - 16, bounds.getMaxY() - 16, 10, 10));
+            config.setPlusButtonArea(bounds -> new Rectangle(bounds.getMaxX() - 16, bounds.getMinY() + 6, 10, 10));
         };
     }
 
@@ -32,5 +32,6 @@ public class ReiClientPlugin implements REIClientPlugin {
         registry.add(new CompactingCategory(), config(AllItems.MECHANICAL_PRESS, AllItems.BASIN));
         registry.add(new PressingCategory(), config(AllItems.MECHANICAL_PRESS));
         registry.add(new AutoMixingCategory(), config(AllItems.MECHANICAL_MIXER, AllItems.BASIN));
+        registry.add(new MixingCategory(), config(AllItems.MECHANICAL_MIXER, AllItems.BASIN));
     }
 }

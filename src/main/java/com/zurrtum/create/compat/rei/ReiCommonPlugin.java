@@ -2,6 +2,7 @@ package com.zurrtum.create.compat.rei;
 
 import com.zurrtum.create.AllRecipeTypes;
 import com.zurrtum.create.content.kinetics.mixer.CompactingRecipe;
+import com.zurrtum.create.content.kinetics.mixer.MixingRecipe;
 import com.zurrtum.create.content.kinetics.press.PressingRecipe;
 import me.shedaniel.rei.api.common.category.CategoryIdentifier;
 import me.shedaniel.rei.api.common.display.DisplaySerializerRegistry;
@@ -18,6 +19,7 @@ public class ReiCommonPlugin implements REICommonPlugin {
     public static final CategoryIdentifier<CompactingDisplay> PACKING = CategoryIdentifier.of(MOD_ID, "packing");
     public static final CategoryIdentifier<PressingDisplay> PRESSING = CategoryIdentifier.of(MOD_ID, "pressing");
     public static final CategoryIdentifier<CraftingDisplay> AUTOMATIC_SHAPELESS = CategoryIdentifier.of(MOD_ID, "automatic_shapeless");
+    public static final CategoryIdentifier<MixingDisplay> MIXING = CategoryIdentifier.of(MOD_ID, "mixing");
 
     @Override
     public void registerDisplays(ServerDisplayRegistry registry) {
@@ -25,6 +27,7 @@ public class ReiCommonPlugin implements REICommonPlugin {
         registry.beginRecipeFiller(CompactingRecipe.class).filterType(AllRecipeTypes.COMPACTING).fill(CompactingDisplay::new);
         registry.beginRecipeFiller(PressingRecipe.class).filterType(AllRecipeTypes.PRESSING).fill(PressingDisplay::new);
         registry.beginRecipeFiller(ShapelessRecipe.class).fill(AutoMixingDisplay::of);
+        registry.beginRecipeFiller(MixingRecipe.class).fill(MixingDisplay::new);
     }
 
     @Override
@@ -49,5 +52,6 @@ public class ReiCommonPlugin implements REICommonPlugin {
             AUTOMATIC_SHAPELESS.getIdentifier().withSuffixedPath("/client/shapeless"),
             AutoMixingDisplay.CraftingDisplayShapeless.SERIALIZER
         );
+        registry.register(MIXING.getIdentifier(), MixingDisplay.SERIALIZER);
     }
 }

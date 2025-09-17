@@ -28,6 +28,7 @@ public class GuiRendererMixin {
         builder.put(PressBasinRenderState.class, new PressBasinRenderer(vertexConsumers));
         builder.put(PressRenderState.class, new PressRenderer(vertexConsumers));
         builder.put(MixingBasinRenderState.class, new MixingBasinRenderer(vertexConsumers));
+        builder.put(BasinBlazeBurnerRenderState.class, new BasinBlazeBurnerRenderer(vertexConsumers));
         return builder;
     }
 }

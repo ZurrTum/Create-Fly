@@ -15,8 +15,8 @@ import net.minecraft.util.Identifier;
 import java.util.List;
 import java.util.Optional;
 
-import static com.zurrtum.create.compat.rei.IngredientHelper.getEntryIngredient;
 import static com.zurrtum.create.compat.rei.IngredientHelper.getEntryIngredients;
+import static com.zurrtum.create.compat.rei.IngredientHelper.getFluidIngredientStream;
 
 public record CompactingDisplay(List<EntryIngredient> inputs, EntryIngredient output, Optional<Identifier> location) implements Display {
     public static final DisplaySerializer<CompactingDisplay> SERIALIZER = DisplaySerializer.of(
@@ -41,7 +41,7 @@ public record CompactingDisplay(List<EntryIngredient> inputs, EntryIngredient ou
 
     public CompactingDisplay(Identifier id, CompactingRecipe recipe) {
         this(
-            getEntryIngredients(getEntryIngredients(recipe.ingredients()), getEntryIngredient(recipe.fluidIngredient())),
+            getEntryIngredients(IngredientHelper.getSizedIngredientStream(recipe.ingredients()), getFluidIngredientStream(recipe.fluidIngredient())),
             EntryIngredients.of(recipe.result()),
             Optional.of(id)
         );

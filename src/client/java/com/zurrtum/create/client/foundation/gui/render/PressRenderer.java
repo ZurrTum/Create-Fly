@@ -12,6 +12,7 @@ import net.minecraft.client.render.DiffuseLighting;
 import net.minecraft.client.render.TexturedRenderLayers;
 import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.render.VertexConsumerProvider;
+import net.minecraft.client.render.block.BlockRenderManager;
 import net.minecraft.client.render.model.BlockModelPart;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.state.property.Properties;
@@ -38,23 +39,24 @@ public class PressRenderer extends SpecialGuiElementRenderer<PressRenderState> {
 
         BlockState blockState;
         List<BlockModelPart> parts;
+        BlockRenderManager blockRenderManager = mc.getBlockRenderManager();
         SinglePosVirtualBlockGetter world = SinglePosVirtualBlockGetter.createFullBright();
         VertexConsumer buffer = vertexConsumers.getBuffer(TexturedRenderLayers.getEntityCutout());
         float time = AnimationTickHolder.getRenderTime();
 
         blockState = AllBlocks.MECHANICAL_PRESS.getDefaultState();
         world.blockState(blockState);
-        parts = mc.getBlockRenderManager().getModel(blockState).getParts(mc.world.random);
-        mc.getBlockRenderManager().renderBlock(blockState, BlockPos.ORIGIN, world, matrices, buffer, false, parts);
+        parts = blockRenderManager.getModel(blockState).getParts(mc.world.random);
+        blockRenderManager.renderBlock(blockState, BlockPos.ORIGIN, world, matrices, buffer, false, parts);
 
         matrices.push();
         blockState = AllBlocks.SHAFT.getDefaultState().with(Properties.AXIS, Axis.Z);
         world.blockState(blockState);
-        parts = mc.getBlockRenderManager().getModel(blockState).getParts(mc.world.random);
+        parts = blockRenderManager.getModel(blockState).getParts(mc.world.random);
         matrices.translate(0.5f, 0.5f, 0.5f);
         matrices.multiply(RotationAxis.POSITIVE_Z.rotationDegrees(getShaftAngle(time)));
         matrices.translate(-0.5f, -0.5f, -0.5f);
-        mc.getBlockRenderManager().renderBlock(blockState, BlockPos.ORIGIN, world, matrices, buffer, false, parts);
+        blockRenderManager.renderBlock(blockState, BlockPos.ORIGIN, world, matrices, buffer, false, parts);
         matrices.pop();
 
         matrices.push();
@@ -62,7 +64,7 @@ public class PressRenderer extends SpecialGuiElementRenderer<PressRenderState> {
         world.blockState(blockState);
         parts = List.of(AllPartialModels.MECHANICAL_PRESS_HEAD.get());
         matrices.translate(0, getAnimatedHeadOffset(time), 0);
-        mc.getBlockRenderManager().renderBlock(blockState, BlockPos.ORIGIN, world, matrices, buffer, false, parts);
+        blockRenderManager.renderBlock(blockState, BlockPos.ORIGIN, world, matrices, buffer, false, parts);
         matrices.pop();
     }
 

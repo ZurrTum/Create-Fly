@@ -12,9 +12,9 @@ import java.util.Locale;
 
 public enum HeatCondition implements StringIdentifiable {
 
-    NONE(0xffffff),
-    HEATED(0xE88300),
-    SUPERHEATED(0x5C93E8);
+    NONE(0xffffffff),
+    HEATED(0xFFE88300),
+    SUPERHEATED(0xFF5C93E8);
 
     private final int color;
 
