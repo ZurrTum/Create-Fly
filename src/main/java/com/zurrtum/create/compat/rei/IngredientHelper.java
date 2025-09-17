@@ -21,6 +21,10 @@ import java.util.List;
 import java.util.stream.Stream;
 
 public interface IngredientHelper {
+    static EntryIngredient createEntryIngredient(com.zurrtum.create.infrastructure.fluids.FluidStack stack) {
+        return EntryIngredients.of(stack.getFluid(), stack.getAmount());
+    }
+
     static EntryIngredient createEntryIngredient(FluidIngredient ingredient) {
         EntryDefinition<FluidStack> definition = VanillaEntryTypes.FLUID.getDefinition();
         List<Fluid> fluids = ingredient.getMatchingFluids();
