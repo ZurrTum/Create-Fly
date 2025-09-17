@@ -2,6 +2,7 @@ package com.zurrtum.create.compat.rei;
 
 import com.zurrtum.create.AllRecipeTypes;
 import com.zurrtum.create.content.kinetics.crusher.CrushingRecipe;
+import com.zurrtum.create.content.kinetics.deployer.ItemApplicationRecipe;
 import com.zurrtum.create.content.kinetics.deployer.ManualApplicationRecipe;
 import com.zurrtum.create.content.kinetics.millstone.MillingRecipe;
 import com.zurrtum.create.content.kinetics.mixer.CompactingRecipe;
@@ -28,6 +29,7 @@ public class ReiCommonPlugin implements REICommonPlugin {
     public static final CategoryIdentifier<SawingDisplay> SAWING = CategoryIdentifier.of(MOD_ID, "sawing");
     public static final CategoryIdentifier<CrushingDisplay> CRUSHING = CategoryIdentifier.of(MOD_ID, "crushing");
     public static final CategoryIdentifier<ManualApplicationDisplay> ITEM_APPLICATION = CategoryIdentifier.of(MOD_ID, "item_application");
+    public static final CategoryIdentifier<DeployingDisplay> DEPLOYING = CategoryIdentifier.of(MOD_ID, "deploying");
 
     @Override
     public void registerDisplays(ServerDisplayRegistry registry) {
@@ -40,6 +42,7 @@ public class ReiCommonPlugin implements REICommonPlugin {
         registry.beginRecipeFiller(CuttingRecipe.class).fill(SawingDisplay::new);
         registry.beginRecipeFiller(CrushingRecipe.class).fill(CrushingDisplay::new);
         registry.beginRecipeFiller(ManualApplicationRecipe.class).fill(ManualApplicationDisplay::new);
+        registry.beginRecipeFiller(ItemApplicationRecipe.class).fill(DeployingDisplay::new);
     }
 
     @Override
@@ -69,5 +72,6 @@ public class ReiCommonPlugin implements REICommonPlugin {
         registry.register(SAWING.getIdentifier(), SawingDisplay.SERIALIZER);
         registry.register(CRUSHING.getIdentifier(), CrushingDisplay.SERIALIZER);
         registry.register(ITEM_APPLICATION.getIdentifier(), ManualApplicationDisplay.SERIALIZER);
+        registry.register(DEPLOYING.getIdentifier(), DeployingDisplay.SERIALIZER);
     }
 }

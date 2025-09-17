@@ -14,7 +14,6 @@ import me.shedaniel.rei.api.client.gui.widgets.Widget;
 import me.shedaniel.rei.api.client.gui.widgets.Widgets;
 import me.shedaniel.rei.api.common.category.CategoryIdentifier;
 import me.shedaniel.rei.api.common.entry.EntryIngredient;
-import me.shedaniel.rei.api.common.util.EntryStacks;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.text.Text;
 import org.joml.Matrix3x2f;
@@ -35,7 +34,7 @@ public class CrushingCategory extends CreateCategory<CrushingDisplay> {
 
     @Override
     public Renderer getIcon() {
-        return EntryStacks.of(AllItems.CRUSHING_WHEEL);
+        return new TwoIconRenderer(AllItems.CRUSHING_WHEEL, AllItems.CRUSHED_GOLD);
     }
 
     @Override
