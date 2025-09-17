@@ -14,20 +14,19 @@ import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.model.BlockModelPart;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.state.property.Properties;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction.Axis;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.RotationAxis;
 
 import java.util.List;
 
-public class PressBasinRenderer extends SpecialGuiElementRenderer<PressBasinRenderState> {
-    public PressBasinRenderer(VertexConsumerProvider.Immediate vertexConsumers) {
+public class MixingBasinRenderer extends SpecialGuiElementRenderer<MixingBasinRenderState> {
+    public MixingBasinRenderer(VertexConsumerProvider.Immediate vertexConsumers) {
         super(vertexConsumers);
     }
 
     @Override
-    protected void render(PressBasinRenderState state, MatrixStack matrices) {
+    protected void render(MixingBasinRenderState state, MatrixStack matrices) {
         MinecraftClient mc = MinecraftClient.getInstance();
         mc.gameRenderer.getDiffuseLighting().setShaderLights(DiffuseLighting.Type.ENTITY_IN_UI);
         matrices.scale(1, 1, -1);
@@ -41,27 +40,31 @@ public class PressBasinRenderer extends SpecialGuiElementRenderer<PressBasinRend
         SinglePosVirtualBlockGetter world = SinglePosVirtualBlockGetter.createFullBright();
         VertexConsumer buffer = vertexConsumers.getBuffer(TexturedRenderLayers.getEntityCutout());
         float time = AnimationTickHolder.getRenderTime();
+        float angle = getCurrentAngle(time);
 
-        blockState = AllBlocks.MECHANICAL_PRESS.getDefaultState();
+        blockState = AllBlocks.MECHANICAL_MIXER.getDefaultState();
         world.blockState(blockState);
         parts = mc.getBlockRenderManager().getModel(blockState).getParts(mc.world.random);
         mc.getBlockRenderManager().renderBlock(blockState, BlockPos.ORIGIN, world, matrices, buffer, false, parts);
 
-        matrices.push();
-        blockState = AllBlocks.SHAFT.getDefaultState().with(Properties.AXIS, Axis.Z);
+        blockState = Blocks.AIR.getDefaultState();
         world.blockState(blockState);
-        parts = mc.getBlockRenderManager().getModel(blockState).getParts(mc.world.random);
+        matrices.push();
+        parts = List.of(AllPartialModels.SHAFTLESS_COGWHEEL.get());
         matrices.translate(0.5f, 0.5f, 0.5f);
-        matrices.multiply(RotationAxis.POSITIVE_Z.rotationDegrees(getShaftAngle(time)));
+        matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(angle * 2));
         matrices.translate(-0.5f, -0.5f, -0.5f);
         mc.getBlockRenderManager().renderBlock(blockState, BlockPos.ORIGIN, world, matrices, buffer, false, parts);
         matrices.pop();
 
         matrices.push();
-        blockState = Blocks.AIR.getDefaultState();
-        world.blockState(blockState);
-        parts = List.of(AllPartialModels.MECHANICAL_PRESS_HEAD.get());
         matrices.translate(0, getAnimatedHeadOffset(time), 0);
+        parts = List.of(AllPartialModels.MECHANICAL_MIXER_POLE.get());
+        mc.getBlockRenderManager().renderBlock(blockState, BlockPos.ORIGIN, world, matrices, buffer, false, parts);
+        matrices.translate(0.5f, 0.5f, 0.5f);
+        matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(angle * 4));
+        matrices.translate(-0.5f, -0.5f, -0.5f);
+        parts = List.of(AllPartialModels.MECHANICAL_MIXER_HEAD.get());
         mc.getBlockRenderManager().renderBlock(blockState, BlockPos.ORIGIN, world, matrices, buffer, false, parts);
         matrices.pop();
 
@@ -72,30 +75,21 @@ public class PressBasinRenderer extends SpecialGuiElementRenderer<PressBasinRend
         mc.getBlockRenderManager().renderBlock(blockState, BlockPos.ORIGIN, world, matrices, buffer, false, parts);
     }
 
-    private static float getShaftAngle(float time) {
+    private static float getCurrentAngle(float time) {
         return (time * 4f) % 360;
     }
 
     private static float getAnimatedHeadOffset(float time) {
-        float cycle = time % 30;
-        if (cycle < 10) {
-            float progress = cycle / 10;
-            return -(progress * progress * progress);
-        }
-        if (cycle < 15)
-            return -1;
-        if (cycle < 20)
-            return -1 + (1 - ((20 - cycle) / 5));
-        return 0;
+        return -(((MathHelper.sin(time / 32f) + 1) / 5) + .5f);
     }
 
     @Override
     protected String getName() {
-        return "Press Basin";
+        return "Mixing Basin";
     }
 
     @Override
-    public Class<PressBasinRenderState> getElementClass() {
-        return PressBasinRenderState.class;
+    public Class<MixingBasinRenderState> getElementClass() {
+        return MixingBasinRenderState.class;
     }
 }

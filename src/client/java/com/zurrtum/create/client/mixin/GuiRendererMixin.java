@@ -5,10 +5,7 @@ import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
 import com.zurrtum.create.client.catnip.gui.render.*;
-import com.zurrtum.create.client.foundation.gui.render.PressBasinRenderState;
-import com.zurrtum.create.client.foundation.gui.render.PressBasinRenderer;
-import com.zurrtum.create.client.foundation.gui.render.PressRenderState;
-import com.zurrtum.create.client.foundation.gui.render.PressRenderer;
+import com.zurrtum.create.client.foundation.gui.render.*;
 import net.minecraft.client.gui.render.GuiRenderer;
 import net.minecraft.client.gui.render.SpecialGuiElementRenderer;
 import net.minecraft.client.gui.render.state.special.SpecialGuiElementRenderState;
@@ -30,6 +27,7 @@ public class GuiRendererMixin {
         builder.put(BlazeBurnerRenderState.class, new BlazeBurnerElementRenderer(vertexConsumers));
         builder.put(PressBasinRenderState.class, new PressBasinRenderer(vertexConsumers));
         builder.put(PressRenderState.class, new PressRenderer(vertexConsumers));
+        builder.put(MixingBasinRenderState.class, new MixingBasinRenderer(vertexConsumers));
         return builder;
     }
 }

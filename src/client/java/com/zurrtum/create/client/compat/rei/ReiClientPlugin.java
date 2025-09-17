@@ -31,5 +31,6 @@ public class ReiClientPlugin implements REIClientPlugin {
         registry.add(new AutoCompactingCategory(), config(AllItems.MECHANICAL_PRESS, AllItems.BASIN));
         registry.add(new CompactingCategory(), config(AllItems.MECHANICAL_PRESS, AllItems.BASIN));
         registry.add(new PressingCategory(), config(AllItems.MECHANICAL_PRESS));
+        registry.add(new AutoMixingCategory(), config(AllItems.MECHANICAL_MIXER, AllItems.BASIN));
     }
 }

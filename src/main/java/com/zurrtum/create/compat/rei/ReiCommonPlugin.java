@@ -9,7 +9,7 @@ import me.shedaniel.rei.api.common.plugins.REICommonPlugin;
 import me.shedaniel.rei.api.common.registry.display.ServerDisplayRegistry;
 import me.shedaniel.rei.plugin.common.displays.crafting.CraftingDisplay;
 import net.minecraft.recipe.CraftingRecipe;
-import net.minecraft.recipe.RecipeType;
+import net.minecraft.recipe.ShapelessRecipe;
 
 import static com.zurrtum.create.Create.MOD_ID;
 
@@ -17,12 +17,14 @@ public class ReiCommonPlugin implements REICommonPlugin {
     public static final CategoryIdentifier<CraftingDisplay> AUTOMATIC_PACKING = CategoryIdentifier.of(MOD_ID, "automatic_packing");
     public static final CategoryIdentifier<CompactingDisplay> PACKING = CategoryIdentifier.of(MOD_ID, "packing");
     public static final CategoryIdentifier<PressingDisplay> PRESSING = CategoryIdentifier.of(MOD_ID, "pressing");
+    public static final CategoryIdentifier<CraftingDisplay> AUTOMATIC_SHAPELESS = CategoryIdentifier.of(MOD_ID, "automatic_shapeless");
 
     @Override
     public void registerDisplays(ServerDisplayRegistry registry) {
-        registry.beginRecipeFiller(CraftingRecipe.class).filterType(RecipeType.CRAFTING).fill(AutoCompactingDisplay::of);
+        registry.beginRecipeFiller(CraftingRecipe.class).fill(AutoCompactingDisplay::of);
         registry.beginRecipeFiller(CompactingRecipe.class).filterType(AllRecipeTypes.COMPACTING).fill(CompactingDisplay::new);
         registry.beginRecipeFiller(PressingRecipe.class).filterType(AllRecipeTypes.PRESSING).fill(PressingDisplay::new);
+        registry.beginRecipeFiller(ShapelessRecipe.class).fill(AutoMixingDisplay::of);
     }
 
     @Override
@@ -42,5 +44,10 @@ public class ReiCommonPlugin implements REICommonPlugin {
         );
         registry.register(PACKING.getIdentifier(), CompactingDisplay.SERIALIZER);
         registry.register(PRESSING.getIdentifier(), PressingDisplay.SERIALIZER);
+        registry.register(AUTOMATIC_SHAPELESS.getIdentifier().withSuffixedPath("/default/shapeless"), AutoMixingDisplay.ShapelessDisplay.SERIALIZER);
+        registry.register(
+            AUTOMATIC_SHAPELESS.getIdentifier().withSuffixedPath("/client/shapeless"),
+            AutoMixingDisplay.CraftingDisplayShapeless.SERIALIZER
+        );
     }
 }
