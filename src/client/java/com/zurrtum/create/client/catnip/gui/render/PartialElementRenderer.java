@@ -51,7 +51,7 @@ public class PartialElementRenderer extends SpecialGuiElementRenderer<PartialRen
             float size = partial.size * windowScaleFactor;
             if (partial.dirty) {
                 partial.clearDirty();
-                if (texture != null && texture.size() != size) {
+                if (texture != null && texture.width() != size) {
                     texture.close();
                     texture = null;
                 }

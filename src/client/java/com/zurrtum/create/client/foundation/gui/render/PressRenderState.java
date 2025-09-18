@@ -5,9 +5,13 @@ import net.minecraft.client.gui.render.state.special.SpecialGuiElementRenderStat
 import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix3x2f;
 
-public record PressRenderState(Matrix3x2f pose, int x1, int y1, ScreenRect bounds) implements SpecialGuiElementRenderState {
+public record PressRenderState(int id, Matrix3x2f pose, int x1, int y1, int offset, ScreenRect bounds) implements SpecialGuiElementRenderState {
     public PressRenderState(Matrix3x2f pose, int x, int y) {
-        this(pose, x, y, new ScreenRect(x, y, 30, 64).transformEachVertex(pose));
+        this(0, pose, x, y, 0);
+    }
+
+    public PressRenderState(int id, Matrix3x2f pose, int x, int y, int offset) {
+        this(id, pose, x, y, offset, new ScreenRect(x, y, 30, 64).transformEachVertex(pose));
     }
 
     @Override

@@ -48,7 +48,7 @@ public class BlockTransformElementRenderer extends SpecialGuiElementRenderer<Blo
             float size = block.size * windowScaleFactor;
             if (block.dirty) {
                 block.clearDirty();
-                if (texture != null && texture.size() != size) {
+                if (texture != null && texture.width() != size) {
                     texture.close();
                     texture = null;
                 }

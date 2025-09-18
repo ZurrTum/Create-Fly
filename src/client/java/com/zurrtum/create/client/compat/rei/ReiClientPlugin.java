@@ -1,6 +1,8 @@
 package com.zurrtum.create.client.compat.rei;
 
 import com.zurrtum.create.AllItems;
+import com.zurrtum.create.client.compat.rei.category.*;
+import com.zurrtum.create.client.compat.rei.display.MysteriousItemConversionDisplay;
 import me.shedaniel.math.Rectangle;
 import me.shedaniel.rei.api.client.plugins.REIClientPlugin;
 import me.shedaniel.rei.api.client.registry.category.CategoryRegistry;
@@ -51,6 +53,7 @@ public class ReiClientPlugin implements REIClientPlugin {
         registry.add(new MechanicalCraftingCategory(), config(AllItems.MECHANICAL_CRAFTER));
         registry.add(new SpoutFillingCategory(), config(AllItems.SPOUT));
         registry.add(new SandpaperPolishingCategory(), config(AllItems.SAND_PAPER, AllItems.RED_SAND_PAPER));
+        registry.add(new SequencedAssemblyCategory(), config());
     }
 
     @Override

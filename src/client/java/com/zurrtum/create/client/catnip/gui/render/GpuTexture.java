@@ -6,18 +6,22 @@ import com.mojang.blaze3d.textures.FilterMode;
 import com.mojang.blaze3d.textures.GpuTextureView;
 import com.mojang.blaze3d.textures.TextureFormat;
 
-record GpuTexture(
-    int size, com.mojang.blaze3d.textures.GpuTexture texture, GpuTextureView textureView, com.mojang.blaze3d.textures.GpuTexture depthTexture,
-    GpuTextureView depthTextureView
+public record GpuTexture(
+    int width, int height, com.mojang.blaze3d.textures.GpuTexture texture, GpuTextureView textureView,
+    com.mojang.blaze3d.textures.GpuTexture depthTexture, GpuTextureView depthTextureView
 ) {
     public static GpuTexture create(int size) {
+        return create(size, size);
+    }
+
+    public static GpuTexture create(int width, int height) {
         GpuDevice gpuDevice = RenderSystem.getDevice();
         com.mojang.blaze3d.textures.GpuTexture texture = gpuDevice.createTexture(
             () -> "UI Item Transform texture",
             12,
             TextureFormat.RGBA8,
-            size,
-            size,
+            width,
+            height,
             1,
             1
         );
@@ -27,13 +31,13 @@ record GpuTexture(
             () -> "UI Item Transform depth texture",
             8,
             TextureFormat.DEPTH32,
-            size,
-            size,
+            width,
+            height,
             1,
             1
         );
         GpuTextureView depthTextureView = gpuDevice.createTextureView(depthTexture);
-        return new GpuTexture(size, texture, textureView, depthTexture, depthTextureView);
+        return new GpuTexture(width, height, texture, textureView, depthTexture, depthTextureView);
     }
 
     public void prepare() {

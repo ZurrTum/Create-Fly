@@ -1,5 +1,7 @@
 package com.zurrtum.create.client.compat.rei;
 
+import com.zurrtum.create.client.compat.rei.renderer.ChanceItemRenderer;
+import com.zurrtum.create.client.compat.rei.renderer.FluidStackRenderer;
 import com.zurrtum.create.client.foundation.gui.AllGuiTextures;
 import com.zurrtum.create.content.processing.recipe.ChanceOutput;
 import dev.architectury.fluid.FluidStack;
@@ -21,7 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public abstract class CreateCategory<T extends Display> implements DisplayCategory<T> {
-    abstract void addWidgets(List<Widget> widgets, T display, Rectangle bounds);
+    public abstract void addWidgets(List<Widget> widgets, T display, Rectangle bounds);
 
     public static void drawSlotBackground(DrawContext graphics, List<Point> points1, Point... points2) {
         for (Point point : points1) {
@@ -37,6 +39,12 @@ public abstract class CreateCategory<T extends Display> implements DisplayCatego
     }
 
     public static void drawChanceSlotBackground(DrawContext graphics, List<Point> points) {
+        for (Point point : points) {
+            AllGuiTextures.JEI_CHANCE_SLOT.render(graphics, point.x - 1, point.y - 1);
+        }
+    }
+
+    public static void drawChanceSlotBackground(DrawContext graphics, Point... points) {
         for (Point point : points) {
             AllGuiTextures.JEI_CHANCE_SLOT.render(graphics, point.x - 1, point.y - 1);
         }
@@ -61,6 +69,17 @@ public abstract class CreateCategory<T extends Display> implements DisplayCatego
             }
         }
         return ingredient;
+    }
+
+    public static EntryIngredient getRenderEntryStack(ChanceOutput output) {
+        float chance = output.chance();
+        if (chance == 1) {
+            return EntryIngredients.of(output.stack());
+        } else {
+            EntryStack<ItemStack> stack = EntryStacks.of(output.stack());
+            stack.withRenderer(new ChanceItemRenderer(chance, stack.getRenderer()));
+            return EntryIngredient.of(stack);
+        }
     }
 
     public static List<EntryIngredient> condenseIngredients(List<EntryIngredient> ingredients) {
@@ -105,14 +124,13 @@ public abstract class CreateCategory<T extends Display> implements DisplayCatego
     ) {
         float chance = output.chance();
         Point point = new Point(x, y);
+        EntryIngredient ingredient = getRenderEntryStack(output);
         if (chance == 1) {
             outputs.add(point);
-            outputIngredients.add(EntryIngredients.of(output.stack()));
+            outputIngredients.add(ingredient);
         } else {
             chances.add(point);
-            EntryStack<ItemStack> stack = EntryStacks.of(output.stack());
-            stack.withRenderer(new ChanceItemRender(chance, stack.getRenderer()));
-            chanceIngredients.add(EntryIngredient.of(stack));
+            chanceIngredients.add(ingredient);
         }
     }
 

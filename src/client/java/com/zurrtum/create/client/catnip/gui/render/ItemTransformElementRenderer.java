@@ -48,7 +48,7 @@ public class ItemTransformElementRenderer extends SpecialGuiElementRenderer<Item
             size = item.size * windowScaleFactor;
             if (item.dirty) {
                 item.clearDirty();
-                if (texture != null && texture.size() != size) {
+                if (texture != null && texture.width() != size) {
                     texture.close();
                     texture = null;
                 }

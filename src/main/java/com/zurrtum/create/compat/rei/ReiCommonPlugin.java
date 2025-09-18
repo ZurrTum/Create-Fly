@@ -1,6 +1,7 @@
 package com.zurrtum.create.compat.rei;
 
 import com.zurrtum.create.AllRecipeTypes;
+import com.zurrtum.create.compat.rei.display.*;
 import com.zurrtum.create.content.equipment.sandPaper.SandPaperPolishingRecipe;
 import com.zurrtum.create.content.fluids.transfer.EmptyingRecipe;
 import com.zurrtum.create.content.fluids.transfer.FillingRecipe;
@@ -13,6 +14,7 @@ import com.zurrtum.create.content.kinetics.mixer.CompactingRecipe;
 import com.zurrtum.create.content.kinetics.mixer.MixingRecipe;
 import com.zurrtum.create.content.kinetics.press.PressingRecipe;
 import com.zurrtum.create.content.kinetics.saw.CuttingRecipe;
+import com.zurrtum.create.content.processing.sequenced.SequencedAssemblyRecipe;
 import me.shedaniel.rei.api.common.category.CategoryIdentifier;
 import me.shedaniel.rei.api.common.display.DisplaySerializerRegistry;
 import me.shedaniel.rei.api.common.plugins.REICommonPlugin;
@@ -38,6 +40,7 @@ public class ReiCommonPlugin implements REICommonPlugin {
     public static final CategoryIdentifier<MechanicalCraftingDisplay> MECHANICAL_CRAFTING = CategoryIdentifier.of(MOD_ID, "mechanical_crafting");
     public static final CategoryIdentifier<SpoutFillingDisplay> SPOUT_FILLING = CategoryIdentifier.of(MOD_ID, "spout_filling");
     public static final CategoryIdentifier<SandpaperPolishingDisplay> SANDPAPER_POLISHING = CategoryIdentifier.of(MOD_ID, "sandpaper_polishing");
+    public static final CategoryIdentifier<SequencedAssemblyDisplay> SEQUENCED_ASSEMBLY = CategoryIdentifier.of(MOD_ID, "sequenced_assembly");
 
     @Override
     public void registerDisplays(ServerDisplayRegistry registry) {
@@ -55,6 +58,7 @@ public class ReiCommonPlugin implements REICommonPlugin {
         registry.beginRecipeFiller(MechanicalCraftingRecipe.class).fill(MechanicalCraftingDisplay::new);
         registry.beginRecipeFiller(FillingRecipe.class).fill(SpoutFillingDisplay::new);
         registry.beginRecipeFiller(SandPaperPolishingRecipe.class).fill(SandpaperPolishingDisplay::new);
+        registry.beginRecipeFiller(SequencedAssemblyRecipe.class).fill(SequencedAssemblyDisplay::new);
     }
 
     @Override
@@ -89,5 +93,6 @@ public class ReiCommonPlugin implements REICommonPlugin {
         registry.register(MECHANICAL_CRAFTING.getIdentifier(), MechanicalCraftingDisplay.SERIALIZER);
         registry.register(SPOUT_FILLING.getIdentifier(), SpoutFillingDisplay.SERIALIZER);
         registry.register(SANDPAPER_POLISHING.getIdentifier(), SandpaperPolishingDisplay.SERIALIZER);
+        registry.register(SEQUENCED_ASSEMBLY.getIdentifier(), SequencedAssemblyDisplay.SERIALIZER);
     }
 }
