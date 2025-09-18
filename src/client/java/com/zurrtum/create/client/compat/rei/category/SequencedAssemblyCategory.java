@@ -7,6 +7,7 @@ import com.zurrtum.create.client.compat.rei.widget.JunkWidget;
 import com.zurrtum.create.client.compat.rei.widget.TooltipWidget;
 import com.zurrtum.create.client.foundation.gui.AllGuiTextures;
 import com.zurrtum.create.client.foundation.gui.AllIcons;
+import com.zurrtum.create.client.foundation.gui.render.DeployerRenderState;
 import com.zurrtum.create.client.foundation.gui.render.PressRenderState;
 import com.zurrtum.create.client.foundation.utility.CreateLang;
 import com.zurrtum.create.compat.rei.ReiCommonPlugin;
@@ -48,6 +49,18 @@ public class SequencedAssemblyCategory extends CreateCategory<SequencedAssemblyD
                 matrices.scale(scale, scale);
                 matrices.translate(-point.x, -point.y);
                 graphics.state.addSpecialElement(new PressRenderState(i, new Matrix3x2f(matrices), point.x - 3, point.y + 18, i));
+                matrices.popMatrix();
+            }
+        );
+        DRAW.put(
+            AllRecipeTypes.DEPLOYING, (graphics, i, point) -> {
+                float scale = 59 / 78f;
+                Matrix3x2fStack matrices = graphics.getMatrices();
+                matrices.pushMatrix();
+                matrices.translate(point.x, point.y);
+                matrices.scale(scale, scale);
+                matrices.translate(-point.x, -point.y);
+                graphics.state.addSpecialElement(new DeployerRenderState(i, new Matrix3x2f(matrices), point.x - 3, point.y + 18, i));
                 matrices.popMatrix();
             }
         );
@@ -94,31 +107,12 @@ public class SequencedAssemblyCategory extends CreateCategory<SequencedAssemblyD
             }
         }
         widgets.add(Widgets.createDrawableWidget((DrawContext graphics, int mouseX, int mouseY, float delta) -> {
-            TextRenderer textRenderer = graphics.client.textRenderer;
             for (int i = 0; i < size; i++) {
-                Point point = points.get(i);
-                String text = ROMANS[Math.min(i, ROMANS.length)];
-                graphics.drawText(textRenderer, text, point.x + 8 - textRenderer.getWidth(text) / 2, point.y - 13, 0xff888888, false);
-                TriConsumer<DrawContext, Integer, Point> draw = DRAW.get(types.get(i));
-                if (draw != null) {
-                    draw.accept(graphics, i, point);
-                }
                 if (noBackground[i]) {
                     continue;
                 }
+                Point point = points.get(i);
                 AllGuiTextures.JEI_SLOT.render(graphics, point.x - 1, point.y - 1);
-            }
-            drawSlotBackground(graphics, input);
-            if (randomOutput) {
-                drawChanceSlotBackground(graphics, output);
-            } else {
-                drawSlotBackground(graphics, output);
-            }
-            AllGuiTextures.JEI_LONG_ARROW.render(graphics, xOffset + 57, bounds.y + 99);
-            if (willRepeat) {
-                AllIcons.I_SEQ_REPEAT.render(graphics, xOffset + 70, bounds.y + 104);
-                Text repeat = Text.literal("x" + display.loop());
-                graphics.drawText(textRenderer, repeat, xOffset + 86, bounds.y + 109, 0xff888888, false);
             }
         }));
         for (int i = 0; i < size; i++) {
@@ -151,6 +145,30 @@ public class SequencedAssemblyCategory extends CreateCategory<SequencedAssemblyD
                 widgets.add(slot);
             }
         }
+        widgets.add(Widgets.createDrawableWidget((DrawContext graphics, int mouseX, int mouseY, float delta) -> {
+            TextRenderer textRenderer = graphics.client.textRenderer;
+            for (int i = 0; i < size; i++) {
+                Point point = points.get(i);
+                String text = ROMANS[Math.min(i, ROMANS.length)];
+                graphics.drawText(textRenderer, text, point.x + 8 - textRenderer.getWidth(text) / 2, point.y - 13, 0xff888888, false);
+                TriConsumer<DrawContext, Integer, Point> draw = DRAW.get(types.get(i));
+                if (draw != null) {
+                    draw.accept(graphics, i, point);
+                }
+            }
+            drawSlotBackground(graphics, input);
+            if (randomOutput) {
+                drawChanceSlotBackground(graphics, output);
+            } else {
+                drawSlotBackground(graphics, output);
+            }
+            AllGuiTextures.JEI_LONG_ARROW.render(graphics, xOffset + 57, bounds.y + 99);
+            if (willRepeat) {
+                AllIcons.I_SEQ_REPEAT.render(graphics, xOffset + 70, bounds.y + 104);
+                Text repeat = Text.literal("x" + display.loop());
+                graphics.drawText(textRenderer, repeat, xOffset + 86, bounds.y + 109, 0xff888888, false);
+            }
+        }));
         widgets.add(createInputSlot(input).entries(display.input()));
         widgets.add(createOutputSlot(output).entries(getRenderEntryStack(chanceOutput)));
         if (randomOutput) {

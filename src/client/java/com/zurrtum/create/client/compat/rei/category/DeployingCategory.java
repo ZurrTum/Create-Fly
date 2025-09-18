@@ -3,6 +3,7 @@ package com.zurrtum.create.client.compat.rei.category;
 import com.zurrtum.create.AllItems;
 import com.zurrtum.create.client.compat.rei.CreateCategory;
 import com.zurrtum.create.client.foundation.gui.AllGuiTextures;
+import com.zurrtum.create.client.foundation.gui.render.DeployerRenderState;
 import com.zurrtum.create.client.foundation.utility.CreateLang;
 import com.zurrtum.create.compat.rei.ReiCommonPlugin;
 import com.zurrtum.create.compat.rei.display.DeployingDisplay;
@@ -15,6 +16,7 @@ import me.shedaniel.rei.api.common.category.CategoryIdentifier;
 import me.shedaniel.rei.api.common.util.EntryStacks;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.text.Text;
+import org.joml.Matrix3x2f;
 
 import java.util.List;
 
@@ -43,6 +45,7 @@ public class DeployingCategory extends CreateCategory<DeployingDisplay> {
             drawSlotBackground(graphics, input, target, output);
             AllGuiTextures.JEI_SHADOW.render(graphics, bounds.x + 67, bounds.y + 62);
             AllGuiTextures.JEI_DOWN_ARROW.render(graphics, bounds.x + 131, bounds.y + 34);
+            graphics.state.addSpecialElement(new DeployerRenderState(new Matrix3x2f(graphics.getMatrices()), bounds.x + 80, bounds.y - 5));
         }));
         widgets.add(createInputSlot(input).entries(display.input()));
         widgets.add(createInputSlot(target).entries(display.target()));
