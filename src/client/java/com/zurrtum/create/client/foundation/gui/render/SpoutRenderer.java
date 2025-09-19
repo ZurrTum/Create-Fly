@@ -126,7 +126,7 @@ public class SpoutRenderer extends SpecialGuiElementRenderer<SpoutRenderState> {
                 vertexConsumers,
                 matrices,
                 LightmapTextureManager.MAX_LIGHT_COORDINATE,
-                true,
+                false,
                 true
             );
             matrices.pop();
@@ -151,7 +151,7 @@ public class SpoutRenderer extends SpecialGuiElementRenderer<SpoutRenderState> {
                 vertexConsumers,
                 matrices,
                 LightmapTextureManager.MAX_LIGHT_COORDINATE,
-                true,
+                false,
                 true
             );
             matrices.pop();

@@ -36,6 +36,7 @@ public class GuiRendererMixin {
         builder.put(ManualBlockRenderState.class, new ManualBlockRenderer(vertexConsumers));
         builder.put(SpoutRenderState.class, new SpoutRenderer(vertexConsumers));
         builder.put(CrafterRenderState.class, new CrafterRenderer(vertexConsumers));
+        builder.put(DrainRenderState.class, new DrainRenderer(vertexConsumers));
         return builder;
     }
 }
