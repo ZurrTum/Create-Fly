@@ -3,6 +3,7 @@ package com.zurrtum.create.client.compat.rei.category;
 import com.zurrtum.create.AllItems;
 import com.zurrtum.create.client.compat.rei.CreateCategory;
 import com.zurrtum.create.client.foundation.gui.AllGuiTextures;
+import com.zurrtum.create.client.foundation.gui.render.CrafterRenderState;
 import com.zurrtum.create.client.foundation.utility.CreateLang;
 import com.zurrtum.create.compat.rei.ReiCommonPlugin;
 import com.zurrtum.create.compat.rei.display.MechanicalCraftingDisplay;
@@ -19,6 +20,7 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.recipe.Ingredient;
 import net.minecraft.text.Text;
+import org.joml.Matrix3x2f;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -70,6 +72,7 @@ public class MechanicalCraftingCategory extends CreateCategory<MechanicalCraftin
             drawSlotBackground(graphics, inputs, output);
             AllGuiTextures.JEI_DOWN_ARROW.render(graphics, bounds.x + 133, bounds.y + 64);
             AllGuiTextures.JEI_SHADOW.render(graphics, bounds.x + 118, bounds.y + 43);
+            graphics.state.addSpecialElement(new CrafterRenderState(new Matrix3x2f(graphics.getMatrices()), bounds.x + 129, bounds.y + 23));
             graphics.drawText(
                 MinecraftClient.getInstance().textRenderer,
                 String.valueOf(ingredients.size()),
