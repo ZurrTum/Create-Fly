@@ -3,18 +3,25 @@ package com.zurrtum.create.client.compat.rei.category;
 import com.zurrtum.create.AllItems;
 import com.zurrtum.create.client.compat.rei.CreateCategory;
 import com.zurrtum.create.client.foundation.gui.AllGuiTextures;
+import com.zurrtum.create.client.foundation.gui.render.ManualBlockRenderState;
 import com.zurrtum.create.client.foundation.utility.CreateLang;
 import com.zurrtum.create.compat.rei.ReiCommonPlugin;
 import com.zurrtum.create.compat.rei.display.ManualApplicationDisplay;
 import me.shedaniel.math.Point;
 import me.shedaniel.math.Rectangle;
 import me.shedaniel.rei.api.client.gui.Renderer;
+import me.shedaniel.rei.api.client.gui.widgets.Slot;
 import me.shedaniel.rei.api.client.gui.widgets.Widget;
 import me.shedaniel.rei.api.client.gui.widgets.Widgets;
 import me.shedaniel.rei.api.common.category.CategoryIdentifier;
+import me.shedaniel.rei.api.common.entry.EntryStack;
 import me.shedaniel.rei.api.common.util.EntryStacks;
+import net.minecraft.block.BlockState;
 import net.minecraft.client.gui.DrawContext;
+import net.minecraft.item.BlockItem;
+import net.minecraft.item.ItemStack;
 import net.minecraft.text.Text;
+import org.joml.Matrix3x2f;
 
 import java.util.List;
 
@@ -39,13 +46,25 @@ public class ManualApplicationCategory extends CreateCategory<ManualApplicationD
         Point input = new Point(bounds.x + 56, bounds.y + 10);
         Point target = new Point(bounds.x + 32, bounds.y + 43);
         Point output = new Point(bounds.x + 137, bounds.y + 43);
+        Slot targetSlot = createInputSlot(target).entries(display.target());
         widgets.add(Widgets.createDrawableWidget((DrawContext graphics, int mouseX, int mouseY, float delta) -> {
             drawSlotBackground(graphics, input, target, output);
             AllGuiTextures.JEI_SHADOW.render(graphics, bounds.x + 67, bounds.y + 52);
             AllGuiTextures.JEI_DOWN_ARROW.render(graphics, bounds.x + 79, bounds.y + 15);
+            EntryStack<ItemStack> slot = targetSlot.getCurrentEntry().cast();
+            ItemStack stack = slot.getValue();
+            if (stack.getItem() instanceof BlockItem blockItem) {
+                BlockState block = blockItem.getBlock().getDefaultState();
+                graphics.state.addSpecialElement(new ManualBlockRenderState(
+                    new Matrix3x2f(graphics.getMatrices()),
+                    block,
+                    bounds.x + 79,
+                    bounds.y + 34
+                ));
+            }
         }));
         widgets.add(createInputSlot(input).entries(display.input()));
-        widgets.add(createInputSlot(target).entries(display.target()));
+        widgets.add(targetSlot);
         widgets.add(createOutputSlot(output).entries(display.output()));
     }
 
