@@ -59,9 +59,12 @@ public class ExtendoGripItem extends Item {
         AttributeModifiersComponent modifiers = stack.get(DataComponentTypes.ATTRIBUTE_MODIFIERS);
         if (slot == EquipmentSlot.MAINHAND) {
             if (entity instanceof LivingEntity livingEntity && livingEntity.getEquippedStack(EquipmentSlot.OFFHAND).isOf(AllItems.EXTENDO_GRIP)) {
-                applyAttributeModifiers(stack, modifiers, doubleRangeModifier);
-                if (modifiers != doubleRangeModifier && entity instanceof ServerPlayerEntity serverPlayer) {
-                    AllAdvancements.EXTENDO_GRIP_DUAL.trigger(serverPlayer);
+                if (modifiers != doubleRangeModifier) {
+                    stack.set(DataComponentTypes.ATTRIBUTE_MODIFIERS, doubleRangeModifier);
+                    livingEntity.lastEquipmentStacks.get(slot).remove(DataComponentTypes.ATTRIBUTE_MODIFIERS);
+                    if (entity instanceof ServerPlayerEntity serverPlayer) {
+                        AllAdvancements.EXTENDO_GRIP_DUAL.trigger(serverPlayer);
+                    }
                 }
             } else {
                 applyAttributeModifiers(stack, modifiers, rangeModifier);

@@ -249,3 +249,4 @@ accessible method net/minecraft/registry/RegistryOps <init> (Lcom/mojang/seriali
 accessible method net/minecraft/entity/decoration/ItemFrameEntity getAsItemStack ()Lnet/minecraft/item/ItemStack;
 accessible field net/minecraft/recipe/ShapelessRecipe result Lnet/minecraft/item/ItemStack;
 accessible field net/minecraft/recipe/ShapedRecipe result Lnet/minecraft/item/ItemStack;
+accessible field net/minecraft/entity/LivingEntity lastEquipmentStacks Ljava/util/Map;
