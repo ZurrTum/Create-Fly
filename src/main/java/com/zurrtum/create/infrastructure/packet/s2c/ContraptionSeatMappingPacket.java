@@ -18,7 +18,7 @@ public record ContraptionSeatMappingPacket(int entityId, Map<UUID, Integer> mapp
         PacketCodecs.INTEGER,
         ContraptionSeatMappingPacket::entityId,
         PacketCodecs.map(HashMap::new, Uuids.PACKET_CODEC, PacketCodecs.INTEGER),
-        ContraptionSeatMappingPacket::mapping,
+        p -> new HashMap<>(p.mapping),
         PacketCodecs.INTEGER,
         ContraptionSeatMappingPacket::dismountedId,
         ContraptionSeatMappingPacket::new
