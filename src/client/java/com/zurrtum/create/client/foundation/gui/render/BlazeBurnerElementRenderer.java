@@ -1,4 +1,4 @@
-package com.zurrtum.create.client.catnip.gui.render;
+package com.zurrtum.create.client.foundation.gui.render;
 
 import com.zurrtum.create.catnip.math.AngleHelper;
 import com.zurrtum.create.client.AllPartialModels;
@@ -48,11 +48,6 @@ public class BlazeBurnerElementRenderer extends SpecialGuiElementRenderer<BlazeB
             drawHat,
             state.hash()
         );
-    }
-
-    @Override
-    protected boolean shouldBypassScaling(BlazeBurnerRenderState specialGuiElementRenderState) {
-        return false;
     }
 
     @Override

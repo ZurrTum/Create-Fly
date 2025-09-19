@@ -1,4 +1,4 @@
-package com.zurrtum.create.client.catnip.gui.render;
+package com.zurrtum.create.client.foundation.gui.render;
 
 import com.zurrtum.create.content.processing.burner.BlazeBurnerBlock;
 import net.minecraft.block.BlockState;
