@@ -9,24 +9,29 @@ import com.zurrtum.create.client.foundation.gui.AllGuiTextures;
 import com.zurrtum.create.client.foundation.gui.AllIcons;
 import com.zurrtum.create.client.foundation.gui.render.DeployerRenderState;
 import com.zurrtum.create.client.foundation.gui.render.PressRenderState;
+import com.zurrtum.create.client.foundation.gui.render.SpoutRenderState;
 import com.zurrtum.create.client.foundation.utility.CreateLang;
 import com.zurrtum.create.compat.rei.ReiCommonPlugin;
 import com.zurrtum.create.compat.rei.display.SequencedAssemblyDisplay;
 import com.zurrtum.create.compat.rei.display.SequencedAssemblyDisplay.SequenceData;
 import com.zurrtum.create.content.processing.recipe.ChanceOutput;
+import dev.architectury.fluid.FluidStack;
 import me.shedaniel.math.Point;
 import me.shedaniel.math.Rectangle;
 import me.shedaniel.rei.api.client.gui.Renderer;
 import me.shedaniel.rei.api.client.gui.widgets.*;
 import me.shedaniel.rei.api.common.category.CategoryIdentifier;
 import me.shedaniel.rei.api.common.entry.EntryIngredient;
+import me.shedaniel.rei.api.common.entry.EntryStack;
 import me.shedaniel.rei.api.common.util.EntryStacks;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
+import net.minecraft.fluid.Fluid;
+import net.minecraft.fluid.Fluids;
 import net.minecraft.item.Item;
 import net.minecraft.recipe.RecipeType;
 import net.minecraft.text.Text;
-import org.apache.logging.log4j.util.TriConsumer;
+import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix3x2f;
 import org.joml.Matrix3x2fStack;
 
@@ -37,11 +42,11 @@ import java.util.Map;
 
 public class SequencedAssemblyCategory extends CreateCategory<SequencedAssemblyDisplay> {
     public static String[] ROMANS = {"I", "II", "III", "IV", "V", "VI", "-"};
-    public static Map<RecipeType<?>, TriConsumer<DrawContext, Integer, Point>> DRAW = new IdentityHashMap<>();
+    public static Map<RecipeType<?>, SequencedRenderer> DRAW = new IdentityHashMap<>();
 
     static {
         DRAW.put(
-            AllRecipeTypes.PRESSING, (graphics, i, point) -> {
+            AllRecipeTypes.PRESSING, (graphics, i, point, stack) -> {
                 float scale = 19 / 30f;
                 Matrix3x2fStack matrices = graphics.getMatrices();
                 matrices.pushMatrix();
@@ -53,7 +58,7 @@ public class SequencedAssemblyCategory extends CreateCategory<SequencedAssemblyD
             }
         );
         DRAW.put(
-            AllRecipeTypes.DEPLOYING, (graphics, i, point) -> {
+            AllRecipeTypes.DEPLOYING, (graphics, i, point, stack) -> {
                 float scale = 59 / 78f;
                 Matrix3x2fStack matrices = graphics.getMatrices();
                 matrices.pushMatrix();
@@ -64,9 +69,26 @@ public class SequencedAssemblyCategory extends CreateCategory<SequencedAssemblyD
                 matrices.popMatrix();
             }
         );
+        DRAW.put(
+            AllRecipeTypes.FILLING, (graphics, i, point, stack) -> {
+                float scale = 35 / 46f;
+                Matrix3x2fStack matrices = graphics.getMatrices();
+                matrices.pushMatrix();
+                matrices.translate(point.x, point.y);
+                matrices.scale(scale, scale);
+                matrices.translate(-point.x, -point.y);
+                Fluid fluid = Fluids.EMPTY;
+                if (stack != null) {
+                    FluidStack fluidStack = stack.castValue();
+                    fluid = fluidStack.getFluid();
+                }
+                graphics.state.addSpecialElement(new SpoutRenderState(i, new Matrix3x2f(matrices), fluid, point.x - 2, point.y + 24, i));
+                matrices.popMatrix();
+            }
+        );
     }
 
-    public static void registerDraw(RecipeType<?> type, TriConsumer<DrawContext, Integer, Point> draw) {
+    public static void registerDraw(RecipeType<?> type, SequencedRenderer draw) {
         DRAW.put(type, draw);
     }
 
@@ -115,11 +137,13 @@ public class SequencedAssemblyCategory extends CreateCategory<SequencedAssemblyD
                 AllGuiTextures.JEI_SLOT.render(graphics, point.x - 1, point.y - 1);
             }
         }));
+        List<Slot> slots = new ArrayList<>();
         for (int i = 0; i < size; i++) {
             Point point = points.get(i);
             List<Text> step = tooltips.get(i);
             if (noBackground[i]) {
                 widgets.add(new TooltipWidget(point.x, point.y - 14, 16, 86, step));
+                slots.add(null);
             } else {
                 Slot slot = createInputSlot(point).disableTooltips().entries(getRenderEntryStack(ingredients.get(i)));
                 widgets.add(new TooltipWidget(
@@ -143,6 +167,7 @@ public class SequencedAssemblyCategory extends CreateCategory<SequencedAssemblyD
                 }
                 ));
                 widgets.add(slot);
+                slots.add(slot);
             }
         }
         widgets.add(Widgets.createDrawableWidget((DrawContext graphics, int mouseX, int mouseY, float delta) -> {
@@ -151,9 +176,14 @@ public class SequencedAssemblyCategory extends CreateCategory<SequencedAssemblyD
                 Point point = points.get(i);
                 String text = ROMANS[Math.min(i, ROMANS.length)];
                 graphics.drawText(textRenderer, text, point.x + 8 - textRenderer.getWidth(text) / 2, point.y - 13, 0xff888888, false);
-                TriConsumer<DrawContext, Integer, Point> draw = DRAW.get(types.get(i));
+                SequencedRenderer draw = DRAW.get(types.get(i));
                 if (draw != null) {
-                    draw.accept(graphics, i, point);
+                    Slot slot = slots.get(i);
+                    EntryStack<?> stack = null;
+                    if (slot != null) {
+                        stack = slot.getCurrentEntry();
+                    }
+                    draw.render(graphics, i, point, stack);
                 }
             }
             drawSlotBackground(graphics, input);
@@ -182,5 +212,9 @@ public class SequencedAssemblyCategory extends CreateCategory<SequencedAssemblyD
     @Override
     public int getDisplayHeight() {
         return 125;
+    }
+
+    public interface SequencedRenderer {
+        void render(DrawContext graphics, int i, Point point, @Nullable EntryStack<?> stack);
     }
 }

@@ -34,6 +34,7 @@ public class GuiRendererMixin {
         builder.put(CrushWheelRenderState.class, new CrushWheelRenderer(vertexConsumers));
         builder.put(DeployerRenderState.class, new DeployerRenderer(vertexConsumers));
         builder.put(ManualBlockRenderState.class, new ManualBlockRenderer(vertexConsumers));
+        builder.put(SpoutRenderState.class, new SpoutRenderer(vertexConsumers));
         return builder;
     }
 }
