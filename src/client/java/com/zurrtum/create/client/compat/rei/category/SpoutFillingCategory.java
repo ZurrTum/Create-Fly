@@ -23,8 +23,12 @@ import net.minecraft.text.Text;
 import org.joml.Matrix3x2f;
 
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class SpoutFillingCategory extends CreateCategory<SpoutFillingDisplay> {
+    public static final int MAX = 3;
+    public static AtomicInteger idGenerator = new AtomicInteger();
+
     @Override
     public CategoryIdentifier<? extends SpoutFillingDisplay> getCategoryIdentifier() {
         return ReiCommonPlugin.SPOUT_FILLING;
@@ -51,11 +55,17 @@ public class SpoutFillingCategory extends CreateCategory<SpoutFillingDisplay> {
             AllGuiTextures.JEI_SHADOW.render(graphics, bounds.x + 67, bounds.y + 62);
             AllGuiTextures.JEI_DOWN_ARROW.render(graphics, bounds.x + 131, bounds.y + 34);
             EntryStack<FluidStack> slot = fluidSlot.getCurrentEntry().cast();
+            int i = idGenerator.getAndIncrement();
+            if (i >= MAX) {
+                idGenerator.set(0);
+            }
             graphics.state.addSpecialElement(new SpoutRenderState(
+                i,
                 new Matrix3x2f(graphics.getMatrices()),
                 slot.getValue().getFluid(),
                 bounds.x + 80,
-                bounds.y + 6
+                bounds.y + 6,
+                0
             ));
         }));
         widgets.add(createInputSlot(input).entries(display.input()));
