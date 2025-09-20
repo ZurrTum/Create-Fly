@@ -32,7 +32,7 @@ public interface BaseInventory extends Clearable {
         for (int i = 0, size = create$size(); i < size; i++) {
             create$setStack(i, ItemStack.EMPTY);
         }
-        markDirty();
+        create$markDirty();
     }
 
     default int count(ItemStack stack, Direction side) {
@@ -54,7 +54,7 @@ public interface BaseInventory extends Clearable {
     default int count(ItemStack stack, int maxAmount) {
         int count = 0;
         for (int i = 0, size = create$size(); i < size; i++) {
-            ItemStack target = getStack(i);
+            ItemStack target = create$getStack(i);
             if (target.isEmpty()) {
                 continue;
             }
@@ -74,7 +74,7 @@ public interface BaseInventory extends Clearable {
 
     default ItemStack count(Predicate<ItemStack> predicate) {
         for (int i = 0, size = create$size(); i < size; i++) {
-            ItemStack stack = getStack(i);
+            ItemStack stack = create$getStack(i);
             if (stack.isEmpty()) {
                 continue;
             }
@@ -94,7 +94,7 @@ public interface BaseInventory extends Clearable {
             return ItemStack.EMPTY;
         }
         for (int i = 0, size = create$size(); i < size; i++) {
-            ItemStack findStack = getStack(i);
+            ItemStack findStack = create$getStack(i);
             if (findStack.isEmpty()) {
                 continue;
             }
@@ -104,7 +104,7 @@ public interface BaseInventory extends Clearable {
                     return onExtract(directCopy(findStack, maxAmount));
                 }
                 for (i = i + 1; i < size; i++) {
-                    ItemStack stack = getStack(i);
+                    ItemStack stack = create$getStack(i);
                     if (stack.isEmpty()) {
                         continue;
                     }
@@ -132,7 +132,7 @@ public interface BaseInventory extends Clearable {
         }
         int count = 0;
         for (int i = 0, size = create$size(); i < size; i++) {
-            ItemStack stack = getStack(i);
+            ItemStack stack = create$getStack(i);
             if (stack.isEmpty()) {
                 continue;
             }
@@ -152,7 +152,7 @@ public interface BaseInventory extends Clearable {
 
     default ItemStack countAny() {
         for (int i = 0, size = create$size(); i < size; i++) {
-            ItemStack target = getStack(i);
+            ItemStack target = create$getStack(i);
             if (target.isEmpty()) {
                 continue;
             }
@@ -170,7 +170,7 @@ public interface BaseInventory extends Clearable {
             return ItemStack.EMPTY;
         }
         for (int i = 0, size = create$size(); i < size; i++) {
-            ItemStack findStack = getStack(i);
+            ItemStack findStack = create$getStack(i);
             if (findStack.isEmpty()) {
                 continue;
             }
@@ -179,7 +179,7 @@ public interface BaseInventory extends Clearable {
                 return onExtract(directCopy(findStack, maxAmount));
             }
             for (i = i + 1; i < size; i++) {
-                ItemStack stack = getStack(i);
+                ItemStack stack = create$getStack(i);
                 if (stack.isEmpty()) {
                     continue;
                 }
@@ -215,10 +215,10 @@ public interface BaseInventory extends Clearable {
     default int countSpace(ItemStack stack, int maxAmount) {
         int count = 0;
         for (int i = 0, size = create$size(); i < size; i++) {
-            if (isValid(i, stack)) {
-                ItemStack target = getStack(i);
+            if (create$isValid(i, stack)) {
+                ItemStack target = create$getStack(i);
                 if (target.isEmpty()) {
-                    count += getMaxCount(stack);
+                    count += create$getMaxCount(stack);
                     if (count >= maxAmount) {
                         return maxAmount;
                     }
@@ -240,10 +240,10 @@ public interface BaseInventory extends Clearable {
     default int countSpace(ItemStack stack, int maxAmount, int start, int end) {
         int count = 0;
         for (int i = start; i <= end; i++) {
-            if (isValid(i, stack)) {
-                ItemStack target = getStack(i);
+            if (create$isValid(i, stack)) {
+                ItemStack target = create$getStack(i);
                 if (target.isEmpty()) {
-                    count += getMaxCount(stack);
+                    count += create$getMaxCount(stack);
                     if (count >= maxAmount) {
                         return maxAmount;
                     }
@@ -284,16 +284,16 @@ public interface BaseInventory extends Clearable {
             return countSpace(stack, count) == count;
         }
         for (int i = 0, size = create$size(); i < size; i++) {
-            ItemStack target = getStack(i);
+            ItemStack target = create$getStack(i);
             boolean empty = target.isEmpty();
             ObjectIterator<Object2IntMap.Entry<ItemStack>> iterator = entries.fastIterator();
             do {
                 Object2IntMap.Entry<ItemStack> entry = iterator.next();
                 ItemStack stack = entry.getKey();
-                if (isValid(i, stack)) {
+                if (create$isValid(i, stack)) {
                     if (empty) {
                         int remaining = entry.getIntValue();
-                        int insert = Math.min(remaining, getMaxCount(stack));
+                        int insert = Math.min(remaining, create$getMaxCount(stack));
                         if (remaining == insert) {
                             iterator.remove();
                             if (entries.isEmpty()) {
@@ -350,16 +350,16 @@ public interface BaseInventory extends Clearable {
             return countSpace(stack, count, start, end) == count;
         }
         for (int i = start; i <= end; i++) {
-            ItemStack target = getStack(i);
+            ItemStack target = create$getStack(i);
             boolean empty = target.isEmpty();
             ObjectIterator<Object2IntMap.Entry<ItemStack>> iterator = entries.fastIterator();
             do {
                 Object2IntMap.Entry<ItemStack> entry = iterator.next();
                 ItemStack stack = entry.getKey();
-                if (isValid(i, stack)) {
+                if (create$isValid(i, stack)) {
                     if (empty) {
                         int remaining = entry.getIntValue();
-                        int insert = Math.min(remaining, getMaxCount(stack));
+                        int insert = Math.min(remaining, create$getMaxCount(stack));
                         if (remaining == insert) {
                             iterator.remove();
                             if (entries.isEmpty()) {
@@ -417,7 +417,7 @@ public interface BaseInventory extends Clearable {
     default int extract(ItemStack stack, int maxAmount) {
         int remaining = maxAmount;
         for (int i = 0, size = create$size(); i < size; i++) {
-            ItemStack target = getStack(i);
+            ItemStack target = create$getStack(i);
             if (target.isEmpty()) {
                 continue;
             }
@@ -425,12 +425,12 @@ public interface BaseInventory extends Clearable {
                 int count = target.getCount();
                 if (count > remaining) {
                     target.setCount(count - remaining);
-                    markDirty();
+                    create$markDirty();
                     return maxAmount;
                 }
                 create$setStack(i, ItemStack.EMPTY);
                 if (count == remaining) {
-                    markDirty();
+                    create$markDirty();
                     return maxAmount;
                 }
                 remaining -= count;
@@ -439,7 +439,7 @@ public interface BaseInventory extends Clearable {
         if (remaining == maxAmount) {
             return 0;
         }
-        markDirty();
+        create$markDirty();
         return maxAmount - remaining;
     }
 
@@ -449,13 +449,13 @@ public interface BaseInventory extends Clearable {
 
     default ItemStack extract(Predicate<ItemStack> predicate) {
         for (int i = 0, size = create$size(); i < size; i++) {
-            ItemStack target = getStack(i);
+            ItemStack target = create$getStack(i);
             if (target.isEmpty()) {
                 continue;
             }
             if (predicate.test(target)) {
                 create$setStack(i, ItemStack.EMPTY);
-                markDirty();
+                create$markDirty();
                 return onExtract(target);
             }
         }
@@ -471,7 +471,7 @@ public interface BaseInventory extends Clearable {
             return ItemStack.EMPTY;
         }
         for (int i = 0, size = create$size(); i < size; i++) {
-            ItemStack findStack = getStack(i);
+            ItemStack findStack = create$getStack(i);
             if (findStack.isEmpty()) {
                 continue;
             }
@@ -479,17 +479,17 @@ public interface BaseInventory extends Clearable {
                 int count = findStack.getCount();
                 if (count > maxAmount) {
                     findStack.setCount(count - maxAmount);
-                    markDirty();
+                    create$markDirty();
                     return onExtract(directCopy(findStack, maxAmount));
                 }
                 create$setStack(i, ItemStack.EMPTY);
                 if (count == maxAmount) {
-                    markDirty();
+                    create$markDirty();
                     return onExtract(findStack);
                 }
                 int remaining = maxAmount - count;
                 for (i = i + 1; i < size; i++) {
-                    ItemStack stack = getStack(i);
+                    ItemStack stack = create$getStack(i);
                     if (stack.isEmpty()) {
                         continue;
                     }
@@ -505,12 +505,12 @@ public interface BaseInventory extends Clearable {
                         } else {
                             stack.setCount(count - remaining);
                         }
-                        markDirty();
+                        create$markDirty();
                         findStack.setCount(maxAmount);
                         return onExtract(findStack);
                     }
                 }
-                markDirty();
+                create$markDirty();
                 findStack.setCount(maxAmount - remaining);
                 return onExtract(findStack);
             }
@@ -559,7 +559,7 @@ public interface BaseInventory extends Clearable {
         }
         boolean dirty = false;
         for (int i = 0, size = create$size(); i < size; i++) {
-            ItemStack target = getStack(i);
+            ItemStack target = create$getStack(i);
             if (target.isEmpty()) {
                 continue;
             }
@@ -582,7 +582,7 @@ public interface BaseInventory extends Clearable {
                     }
                     iterator.remove();
                     if (entries.isEmpty()) {
-                        markDirty();
+                        create$markDirty();
                         return List.of();
                     }
                     dirty = true;
@@ -600,7 +600,7 @@ public interface BaseInventory extends Clearable {
                     result.add(directCopy(stack, count));
                 }
             }
-            markDirty();
+            create$markDirty();
             return result;
         } else {
             return stacks;
@@ -617,7 +617,7 @@ public interface BaseInventory extends Clearable {
         }
         int remaining = maxAmount;
         for (int i = 0, size = create$size(); i < size; i++) {
-            ItemStack stack = getStack(i);
+            ItemStack stack = create$getStack(i);
             if (stack.isEmpty()) {
                 continue;
             }
@@ -633,14 +633,14 @@ public interface BaseInventory extends Clearable {
                 } else {
                     stack.setCount(count - remaining);
                 }
-                markDirty();
+                create$markDirty();
                 return maxAmount;
             }
         }
         if (remaining == maxAmount) {
             return 0;
         }
-        markDirty();
+        create$markDirty();
         return maxAmount - remaining;
     }
 
@@ -650,12 +650,12 @@ public interface BaseInventory extends Clearable {
 
     default ItemStack extractAny() {
         for (int i = 0, size = create$size(); i < size; i++) {
-            ItemStack target = getStack(i);
+            ItemStack target = create$getStack(i);
             if (target.isEmpty()) {
                 continue;
             }
             create$setStack(i, ItemStack.EMPTY);
-            markDirty();
+            create$markDirty();
             return onExtract(target);
         }
         return ItemStack.EMPTY;
@@ -670,24 +670,24 @@ public interface BaseInventory extends Clearable {
             return ItemStack.EMPTY;
         }
         for (int i = 0, size = create$size(); i < size; i++) {
-            ItemStack findStack = getStack(i);
+            ItemStack findStack = create$getStack(i);
             if (findStack.isEmpty()) {
                 continue;
             }
             int count = findStack.getCount();
             if (count > maxAmount) {
                 findStack.setCount(count - maxAmount);
-                markDirty();
+                create$markDirty();
                 return onExtract(directCopy(findStack, maxAmount));
             }
             create$setStack(i, ItemStack.EMPTY);
             if (count == maxAmount) {
-                markDirty();
+                create$markDirty();
                 return onExtract(findStack);
             }
             int remaining = maxAmount - count;
             for (i = i + 1; i < size; i++) {
-                ItemStack stack = getStack(i);
+                ItemStack stack = create$getStack(i);
                 if (stack.isEmpty()) {
                     continue;
                 }
@@ -703,12 +703,12 @@ public interface BaseInventory extends Clearable {
                     } else {
                         stack.setCount(count - remaining);
                     }
-                    markDirty();
+                    create$markDirty();
                     findStack.setCount(maxAmount);
                     return onExtract(findStack);
                 }
             }
-            markDirty();
+            create$markDirty();
             findStack.setCount(maxAmount - remaining);
             return onExtract(findStack);
         }
@@ -731,10 +731,6 @@ public interface BaseInventory extends Clearable {
         return BaseInventory.this.preciseInsert(stack, maxAmount);
     }
 
-    int getMaxCount(ItemStack stack);
-
-    ItemStack getStack(int slot);
-
     default int insert(ItemStack stack, Direction side) {
         return insert(stack);
     }
@@ -754,13 +750,13 @@ public interface BaseInventory extends Clearable {
     default int insert(ItemStack stack, int maxAmount) {
         int remaining = maxAmount;
         for (int i = 0, size = create$size(); i < size; i++) {
-            if (isValid(i, stack)) {
-                ItemStack target = getStack(i);
+            if (create$isValid(i, stack)) {
+                ItemStack target = create$getStack(i);
                 if (target.isEmpty()) {
-                    int insert = Math.min(remaining, getMaxCount(stack));
+                    int insert = Math.min(remaining, create$getMaxCount(stack));
                     create$setStack(i, directCopy(stack, insert));
                     if (remaining == insert) {
-                        markDirty();
+                        create$markDirty();
                         return maxAmount;
                     }
                     remaining -= insert;
@@ -771,7 +767,7 @@ public interface BaseInventory extends Clearable {
                         int insert = Math.min(remaining, maxCount - count);
                         target.setCount(count + insert);
                         if (remaining == insert) {
-                            markDirty();
+                            create$markDirty();
                             return maxAmount;
                         }
                         remaining -= insert;
@@ -782,7 +778,7 @@ public interface BaseInventory extends Clearable {
         if (remaining == maxAmount) {
             return 0;
         }
-        markDirty();
+        create$markDirty();
         return maxAmount - remaining;
     }
 
@@ -793,13 +789,13 @@ public interface BaseInventory extends Clearable {
     default int insert(ItemStack stack, int maxAmount, int start, int end) {
         int remaining = maxAmount;
         for (int i = start; i < end; i++) {
-            if (isValid(i, stack)) {
-                ItemStack target = getStack(i);
+            if (create$isValid(i, stack)) {
+                ItemStack target = create$getStack(i);
                 if (target.isEmpty()) {
-                    int insert = Math.min(remaining, getMaxCount(stack));
+                    int insert = Math.min(remaining, create$getMaxCount(stack));
                     create$setStack(i, directCopy(stack, insert));
                     if (remaining == insert) {
-                        markDirty();
+                        create$markDirty();
                         return maxAmount;
                     }
                     remaining -= insert;
@@ -810,7 +806,7 @@ public interface BaseInventory extends Clearable {
                         int insert = Math.min(remaining, maxCount - count);
                         target.setCount(count + insert);
                         if (remaining == insert) {
-                            markDirty();
+                            create$markDirty();
                             return maxAmount;
                         }
                         remaining -= insert;
@@ -821,7 +817,7 @@ public interface BaseInventory extends Clearable {
         if (remaining == maxAmount) {
             return 0;
         }
-        markDirty();
+        create$markDirty();
         return maxAmount - remaining;
     }
 
@@ -866,21 +862,21 @@ public interface BaseInventory extends Clearable {
         }
         boolean dirty = false;
         for (int i = 0, size = create$size(); i < size; i++) {
-            ItemStack target = getStack(i);
+            ItemStack target = create$getStack(i);
             boolean empty = target.isEmpty();
             ObjectIterator<Object2IntMap.Entry<ItemStack>> iterator = entries.fastIterator();
             do {
                 Object2IntMap.Entry<ItemStack> entry = iterator.next();
                 ItemStack stack = entry.getKey();
-                if (isValid(i, stack)) {
+                if (create$isValid(i, stack)) {
                     if (empty) {
                         int remaining = entry.getIntValue();
-                        int insert = Math.min(remaining, getMaxCount(stack));
+                        int insert = Math.min(remaining, create$getMaxCount(stack));
                         create$setStack(i, directCopy(stack, insert));
                         if (remaining == insert) {
                             iterator.remove();
                             if (entries.isEmpty()) {
-                                markDirty();
+                                create$markDirty();
                                 return List.of();
                             }
                         } else {
@@ -898,7 +894,7 @@ public interface BaseInventory extends Clearable {
                             if (remaining == insert) {
                                 iterator.remove();
                                 if (entries.isEmpty()) {
-                                    markDirty();
+                                    create$markDirty();
                                     return List.of();
                                 }
                             } else {
@@ -922,7 +918,7 @@ public interface BaseInventory extends Clearable {
                     result.add(directCopy(stack, count));
                 }
             }
-            markDirty();
+            create$markDirty();
             return result;
         } else {
             return stacks;
@@ -970,21 +966,21 @@ public interface BaseInventory extends Clearable {
         }
         boolean dirty = false;
         for (int i = start; i < end; i++) {
-            ItemStack target = getStack(i);
+            ItemStack target = create$getStack(i);
             boolean empty = target.isEmpty();
             ObjectIterator<Object2IntMap.Entry<ItemStack>> iterator = entries.fastIterator();
             do {
                 Object2IntMap.Entry<ItemStack> entry = iterator.next();
                 ItemStack stack = entry.getKey();
-                if (isValid(i, stack)) {
+                if (create$isValid(i, stack)) {
                     if (empty) {
                         int remaining = entry.getIntValue();
-                        int insert = Math.min(remaining, getMaxCount(stack));
+                        int insert = Math.min(remaining, create$getMaxCount(stack));
                         create$setStack(i, directCopy(stack, insert));
                         if (remaining == insert) {
                             iterator.remove();
                             if (entries.isEmpty()) {
-                                markDirty();
+                                create$markDirty();
                                 return List.of();
                             }
                         } else {
@@ -1002,7 +998,7 @@ public interface BaseInventory extends Clearable {
                             if (remaining == insert) {
                                 iterator.remove();
                                 if (entries.isEmpty()) {
-                                    markDirty();
+                                    create$markDirty();
                                     return List.of();
                                 }
                             } else {
@@ -1026,7 +1022,7 @@ public interface BaseInventory extends Clearable {
                     result.add(directCopy(stack, count));
                 }
             }
-            markDirty();
+            create$markDirty();
             return result;
         } else {
             return stacks;
@@ -1053,8 +1049,8 @@ public interface BaseInventory extends Clearable {
         int remaining = maxAmount;
         List<Integer> emptys = new ArrayList<>();
         for (int i = 0, size = create$size(); i < size; i++) {
-            if (isValid(i, stack)) {
-                ItemStack target = getStack(i);
+            if (create$isValid(i, stack)) {
+                ItemStack target = create$getStack(i);
                 if (target.isEmpty()) {
                     emptys.add(i);
                 } else if (matches(target, stack)) {
@@ -1064,7 +1060,7 @@ public interface BaseInventory extends Clearable {
                         int insert = Math.min(remaining, maxCount - count);
                         target.setCount(count + insert);
                         if (remaining == insert) {
-                            markDirty();
+                            create$markDirty();
                             return maxAmount;
                         }
                         remaining -= insert;
@@ -1073,10 +1069,10 @@ public interface BaseInventory extends Clearable {
             }
         }
         for (int i : emptys) {
-            int insert = Math.min(remaining, getMaxCount(stack));
+            int insert = Math.min(remaining, create$getMaxCount(stack));
             create$setStack(i, directCopy(stack, insert));
             if (remaining == insert) {
-                markDirty();
+                create$markDirty();
                 return maxAmount;
             }
             remaining -= insert;
@@ -1084,20 +1080,14 @@ public interface BaseInventory extends Clearable {
         if (remaining == maxAmount) {
             return 0;
         }
-        markDirty();
+        create$markDirty();
         return maxAmount - remaining;
     }
 
-    boolean isValid(int slot, ItemStack stack);
-
-    Iterator<ItemStack> iterator();
-
     @NotNull
     default Iterator<ItemStack> iterator(Direction side) {
-        return iterator();
+        return create$iterator();
     }
-
-    void markDirty();
 
     default boolean matches(ItemStack stack, ItemStack otherStack) {
         if (stack.isOf(otherStack.getItem())) {
@@ -1153,7 +1143,7 @@ public interface BaseInventory extends Clearable {
         int remaining = stack.getCount();
         List<Runnable> changes = new ArrayList<>();
         for (int i = 0, size = create$size(); i < size; i++) {
-            ItemStack target = getStack(i);
+            ItemStack target = create$getStack(i);
             if (target.isEmpty()) {
                 continue;
             }
@@ -1162,13 +1152,13 @@ public interface BaseInventory extends Clearable {
                 if (count > remaining) {
                     changes.forEach(Runnable::run);
                     target.setCount(count - remaining);
-                    markDirty();
+                    create$markDirty();
                     return true;
                 }
                 if (count == remaining) {
                     changes.forEach(Runnable::run);
                     create$setStack(i, ItemStack.EMPTY);
-                    markDirty();
+                    create$markDirty();
                     return true;
                 }
                 int slot = i;
@@ -1190,7 +1180,7 @@ public interface BaseInventory extends Clearable {
         int size = create$size();
         List<Integer> buffer = new ArrayList<>(size);
         for (int i = 0; i < size; i++) {
-            ItemStack findStack = getStack(i);
+            ItemStack findStack = create$getStack(i);
             if (findStack.isEmpty()) {
                 continue;
             }
@@ -1198,18 +1188,18 @@ public interface BaseInventory extends Clearable {
                 int count = findStack.getCount();
                 if (count > maxAmount) {
                     findStack.setCount(count - maxAmount);
-                    markDirty();
+                    create$markDirty();
                     return onExtract(directCopy(findStack, maxAmount));
                 }
                 if (count == maxAmount) {
                     create$setStack(i, ItemStack.EMPTY);
-                    markDirty();
+                    create$markDirty();
                     return onExtract(findStack);
                 }
                 buffer.add(i);
                 int remaining = maxAmount - count;
                 for (i = i + 1; i < size; i++) {
-                    ItemStack stack = getStack(i);
+                    ItemStack stack = create$getStack(i);
                     if (stack.isEmpty()) {
                         continue;
                     }
@@ -1226,7 +1216,7 @@ public interface BaseInventory extends Clearable {
                         } else {
                             stack.setCount(count - remaining);
                         }
-                        markDirty();
+                        create$markDirty();
                         findStack.setCount(maxAmount);
                         return onExtract(findStack);
                     }
@@ -1255,14 +1245,14 @@ public interface BaseInventory extends Clearable {
     default boolean preciseInsert(ItemStack stack, int maxAmount) {
         List<Runnable> changes = new ArrayList<>();
         for (int i = 0, size = create$size(); i < size; i++) {
-            if (isValid(i, stack)) {
-                ItemStack target = getStack(i);
+            if (create$isValid(i, stack)) {
+                ItemStack target = create$getStack(i);
                 if (target.isEmpty()) {
-                    int insert = Math.min(maxAmount, getMaxCount(stack));
+                    int insert = Math.min(maxAmount, create$getMaxCount(stack));
                     if (maxAmount == insert) {
                         changes.forEach(Runnable::run);
                         create$setStack(i, directCopy(stack, insert));
-                        markDirty();
+                        create$markDirty();
                         return true;
                     }
                     int slot = i;
@@ -1276,7 +1266,7 @@ public interface BaseInventory extends Clearable {
                         if (maxAmount == insert) {
                             changes.forEach(Runnable::run);
                             target.setCount(count + insert);
-                            markDirty();
+                            create$markDirty();
                             return true;
                         }
                         changes.add(() -> target.setCount(count + insert));
@@ -1311,22 +1301,22 @@ public interface BaseInventory extends Clearable {
         }
         List<Runnable> changes = new ArrayList<>();
         for (int i = 0, size = create$size(); i < size; i++) {
-            ItemStack target = getStack(i);
+            ItemStack target = create$getStack(i);
             boolean empty = target.isEmpty();
             ObjectIterator<Object2IntMap.Entry<ItemStack>> iterator = entries.fastIterator();
             do {
                 Object2IntMap.Entry<ItemStack> entry = iterator.next();
                 ItemStack stack = entry.getKey();
-                if (isValid(i, stack)) {
+                if (create$isValid(i, stack)) {
                     if (empty) {
                         int remaining = entry.getIntValue();
-                        int insert = Math.min(remaining, getMaxCount(stack));
+                        int insert = Math.min(remaining, create$getMaxCount(stack));
                         if (remaining == insert) {
                             iterator.remove();
                             if (entries.isEmpty()) {
                                 changes.forEach(Runnable::run);
                                 create$setStack(i, directCopy(stack, insert));
-                                markDirty();
+                                create$markDirty();
                                 return true;
                             }
                         } else {
@@ -1345,7 +1335,7 @@ public interface BaseInventory extends Clearable {
                                 if (entries.isEmpty()) {
                                     changes.forEach(Runnable::run);
                                     target.setCount(count + insert);
-                                    markDirty();
+                                    create$markDirty();
                                     return true;
                                 }
                             } else {
@@ -1366,7 +1356,7 @@ public interface BaseInventory extends Clearable {
 
     default boolean update(Predicate<ItemStack> predicate, Function<ItemStack, ItemStack> update) {
         for (int i = 0, size = create$size(); i < size; i++) {
-            ItemStack stack = getStack(i);
+            ItemStack stack = create$getStack(i);
             if (stack.isEmpty()) {
                 continue;
             }
@@ -1375,7 +1365,7 @@ public interface BaseInventory extends Clearable {
                 if (replace != stack) {
                     create$setStack(i, replace);
                 }
-                markDirty();
+                create$markDirty();
                 return true;
             }
         }
@@ -1395,6 +1385,14 @@ public interface BaseInventory extends Clearable {
         components.changedComponents.put(DataComponentTypes.MAX_STACK_SIZE, max);
     }
 
+    default Stream<ItemStack> stream(Direction side) {
+        return StreamSupport.stream(Spliterators.spliteratorUnknownSize(iterator(side), Spliterator.ORDERED), false);
+    }
+
+    default Stream<ItemStack> stream() {
+        return StreamSupport.stream(Spliterators.spliteratorUnknownSize(create$iterator(), Spliterator.ORDERED), false);
+    }
+
     default void create$setStack(int slot, ItemStack stack) {
         throw new RuntimeException("Implemented via Mixin");
     }
@@ -1403,11 +1401,23 @@ public interface BaseInventory extends Clearable {
         throw new RuntimeException("Implemented via Mixin");
     }
 
-    default Stream<ItemStack> stream(Direction side) {
-        return StreamSupport.stream(Spliterators.spliteratorUnknownSize(iterator(side), Spliterator.ORDERED), false);
+    default int create$getMaxCount(ItemStack stack) {
+        throw new RuntimeException("Implemented via Mixin");
     }
 
-    default Stream<ItemStack> stream() {
-        return StreamSupport.stream(Spliterators.spliteratorUnknownSize(iterator(), Spliterator.ORDERED), false);
+    default ItemStack create$getStack(int slot) {
+        throw new RuntimeException("Implemented via Mixin");
+    }
+
+    default boolean create$isValid(int slot, ItemStack stack) {
+        throw new RuntimeException("Implemented via Mixin");
+    }
+
+    default Iterator<ItemStack> create$iterator() {
+        throw new RuntimeException("Implemented via Mixin");
+    }
+
+    default void create$markDirty() {
+        throw new RuntimeException("Implemented via Mixin");
     }
 }
