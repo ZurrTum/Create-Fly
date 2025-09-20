@@ -18,7 +18,7 @@ public class DeployerItemHandler implements SidedInventory {
 
     @Override
     public int[] getAvailableSlots(Direction side) {
-        return SlotRangeCache.get(be.overflowItems.size());
+        return SlotRangeCache.get(be.overflowItems.size() + 1);
     }
 
     @Override
