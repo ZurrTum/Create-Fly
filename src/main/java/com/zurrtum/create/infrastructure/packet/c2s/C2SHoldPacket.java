@@ -14,7 +14,7 @@ import java.util.function.Consumer;
 
 import static com.zurrtum.create.Create.MOD_ID;
 
-public record C2SHoldPacket(PacketType<Packet<ServerPlayPacketListener>> type, Consumer<ServerPlayNetworkHandler> consumer) implements C2SPacket {
+public record C2SHoldPacket(PacketType<Packet<ServerPlayPacketListener>> id, Consumer<ServerPlayNetworkHandler> consumer) implements C2SPacket {
     public C2SHoldPacket(String id, Consumer<ServerPlayNetworkHandler> callback) {
         this(new PacketType<>(NetworkSide.SERVERBOUND, Identifier.of(MOD_ID, id)), callback);
     }
@@ -25,7 +25,7 @@ public record C2SHoldPacket(PacketType<Packet<ServerPlayPacketListener>> type, C
 
     @Override
     public PacketType<Packet<ServerPlayPacketListener>> getPacketType() {
-        return type;
+        return id;
     }
 
     @Override

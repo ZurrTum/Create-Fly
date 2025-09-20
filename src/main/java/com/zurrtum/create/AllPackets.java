@@ -267,7 +267,7 @@ public class AllPackets {
 
     private static C2SHoldPacket c2s(String id, Consumer<ServerPlayNetworkHandler> callback) {
         C2SHoldPacket packet = new C2SHoldPacket(id, callback);
-        C2S.put(packet.type(), packet.codec());
+        C2S.put(packet.id(), packet.codec());
         return packet;
     }
 
