@@ -28,7 +28,11 @@ import net.minecraft.entity.Entity;
 import net.minecraft.util.DyeColor;
 import net.minecraft.util.math.Direction;
 
+import java.util.Random;
+
 public class ContraptionControlsMovementRender implements MovementRenderBehaviour {
+    private static final ThreadLocal<Random> RANDOM = ThreadLocal.withInitial(Random::new);
+
     @Override
     public void renderInContraption(
         MovementContext ctx,
@@ -46,7 +50,7 @@ public class ContraptionControlsMovementRender implements MovementRenderBehaviou
         Entity cameraEntity = mc.getCameraEntity();
         float playerDistance = (float) (ctx.position == null || cameraEntity == null ? 0 : ctx.position.squaredDistanceTo(cameraEntity.getEyePos()));
 
-        float flicker = renderWorld.random.nextFloat();
+        float flicker = RANDOM.get().nextFloat();
         Couple<Integer> couple = DyeHelper.getDyeColors(efs.targetYEqualsSelection ? DyeColor.WHITE : DyeColor.ORANGE);
         int brightColor = couple.getFirst();
         int darkColor = couple.getSecond();
