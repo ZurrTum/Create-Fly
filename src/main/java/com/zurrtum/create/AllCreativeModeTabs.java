@@ -690,7 +690,6 @@ public class AllCreativeModeTabs {
         entries.add(AllItems.BROWN_SEAT, ItemGroup.StackVisibility.SEARCH_TAB_ONLY);
         entries.add(AllItems.GREEN_SEAT, ItemGroup.StackVisibility.SEARCH_TAB_ONLY);
         entries.add(AllItems.BLACK_SEAT, ItemGroup.StackVisibility.SEARCH_TAB_ONLY);
-        entries.add(AllItems.BLAZE_CAKE_BASE, ItemGroup.StackVisibility.SEARCH_TAB_ONLY);
         entries.add(AllItems.WHITE_TABLE_CLOTH, ItemGroup.StackVisibility.SEARCH_TAB_ONLY);
         entries.add(AllItems.ORANGE_TABLE_CLOTH, ItemGroup.StackVisibility.SEARCH_TAB_ONLY);
         entries.add(AllItems.MAGENTA_TABLE_CLOTH, ItemGroup.StackVisibility.SEARCH_TAB_ONLY);
