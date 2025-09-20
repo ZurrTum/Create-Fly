@@ -96,7 +96,7 @@ public class FilterItemStack {
             return false;
         if (!matchNBT)
             return filterFluidStack.getFluid().matchesType(stack.getFluid());
-        return FluidStack.areFluidsAndComponentsEqual(filterFluidStack, stack);
+        return FluidStack.areFluidsAndComponentsEqualIgnoreCapacity(filterFluidStack, stack);
     }
 
     //

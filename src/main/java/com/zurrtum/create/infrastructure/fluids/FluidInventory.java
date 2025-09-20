@@ -2,8 +2,10 @@ package com.zurrtum.create.infrastructure.fluids;
 
 import com.zurrtum.create.AllDataComponents;
 import it.unimi.dsi.fastutil.Hash;
-import it.unimi.dsi.fastutil.objects.*;
-import net.minecraft.component.ComponentType;
+import it.unimi.dsi.fastutil.objects.Object2IntLinkedOpenCustomHashMap;
+import it.unimi.dsi.fastutil.objects.Object2IntMap;
+import it.unimi.dsi.fastutil.objects.Object2IntSortedMap;
+import it.unimi.dsi.fastutil.objects.ObjectIterator;
 import net.minecraft.component.MergedComponentMap;
 import net.minecraft.util.Clearable;
 import net.minecraft.util.math.Direction;
@@ -719,42 +721,7 @@ public interface FluidInventory extends Clearable, Iterable<FluidStack> {
     }
 
     default boolean matches(FluidStack stack, FluidStack otherStack) {
-        if (stack.isOf(otherStack.getFluid())) {
-            MergedComponentMap stackComponents = stack.directComponents();
-            MergedComponentMap otherStackComponents = otherStack.directComponents();
-            if (stackComponents == otherStackComponents) {
-                return true;
-            }
-            Reference2ObjectMap<ComponentType<?>, Optional<?>> stackComponentMap = stackComponents.changedComponents;
-            Reference2ObjectMap<ComponentType<?>, Optional<?>> otherStackComponentMap = otherStackComponents.changedComponents;
-            if (stackComponentMap == otherStackComponentMap) {
-                return true;
-            }
-            int stackComponentCount = stackComponentMap.size();
-            if (stackComponentMap.containsKey(AllDataComponents.FLUID_MAX_CAPACITY)) {
-                stackComponentCount--;
-            }
-            int otherStackComponentCount = otherStackComponentMap.size();
-            boolean hasMaxCapacityComponent = false;
-            if (otherStackComponentMap.containsKey(AllDataComponents.FLUID_MAX_CAPACITY)) {
-                otherStackComponentCount--;
-                hasMaxCapacityComponent = true;
-            }
-            if (stackComponentCount != otherStackComponentCount) {
-                return false;
-            }
-            if (hasMaxCapacityComponent) {
-                ObjectSet<Reference2ObjectMap.Entry<ComponentType<?>, Optional<?>>> stackComponentSet = stackComponentMap.reference2ObjectEntrySet();
-                for (Reference2ObjectMap.Entry<ComponentType<?>, Optional<?>> componentEntry : otherStackComponentMap.reference2ObjectEntrySet()) {
-                    if (!stackComponentSet.contains(componentEntry) && componentEntry.getKey() != AllDataComponents.FLUID_MAX_CAPACITY) {
-                        return false;
-                    }
-                }
-                return true;
-            }
-            return stackComponentMap.reference2ObjectEntrySet().containsAll(otherStackComponentMap.reference2ObjectEntrySet());
-        }
-        return false;
+        return FluidStack.areFluidsAndComponentsEqualIgnoreCapacity(stack, otherStack);
     }
 
     default FluidStack onExtract(FluidStack stack) {

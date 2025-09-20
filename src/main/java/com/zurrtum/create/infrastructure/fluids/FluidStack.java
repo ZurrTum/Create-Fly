@@ -7,6 +7,8 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.zurrtum.create.AllDataComponents;
 import io.netty.handler.codec.DecoderException;
 import io.netty.handler.codec.EncoderException;
+import it.unimi.dsi.fastutil.objects.ObjectSet;
+import it.unimi.dsi.fastutil.objects.Reference2ObjectMap;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
 import net.minecraft.component.*;
@@ -127,6 +129,45 @@ public class FluidStack implements ComponentHolder {
         } else {
             return stack.isEmpty() && otherStack.isEmpty() || Objects.equals(stack.components, otherStack.components);
         }
+    }
+
+    public static boolean areFluidsAndComponentsEqualIgnoreCapacity(FluidStack stack, FluidStack otherStack) {
+        if (stack.isOf(otherStack.getFluid())) {
+            MergedComponentMap stackComponents = stack.directComponents();
+            MergedComponentMap otherStackComponents = otherStack.directComponents();
+            if (stackComponents == otherStackComponents) {
+                return true;
+            }
+            Reference2ObjectMap<ComponentType<?>, Optional<?>> stackComponentMap = stackComponents.changedComponents;
+            Reference2ObjectMap<ComponentType<?>, Optional<?>> otherStackComponentMap = otherStackComponents.changedComponents;
+            if (stackComponentMap == otherStackComponentMap) {
+                return true;
+            }
+            int stackComponentCount = stackComponentMap.size();
+            if (stackComponentMap.containsKey(AllDataComponents.FLUID_MAX_CAPACITY)) {
+                stackComponentCount--;
+            }
+            int otherStackComponentCount = otherStackComponentMap.size();
+            boolean hasMaxCapacityComponent = false;
+            if (otherStackComponentMap.containsKey(AllDataComponents.FLUID_MAX_CAPACITY)) {
+                otherStackComponentCount--;
+                hasMaxCapacityComponent = true;
+            }
+            if (stackComponentCount != otherStackComponentCount) {
+                return false;
+            }
+            if (hasMaxCapacityComponent) {
+                ObjectSet<Reference2ObjectMap.Entry<ComponentType<?>, Optional<?>>> stackComponentSet = stackComponentMap.reference2ObjectEntrySet();
+                for (Reference2ObjectMap.Entry<ComponentType<?>, Optional<?>> componentEntry : otherStackComponentMap.reference2ObjectEntrySet()) {
+                    if (!stackComponentSet.contains(componentEntry) && componentEntry.getKey() != AllDataComponents.FLUID_MAX_CAPACITY) {
+                        return false;
+                    }
+                }
+                return true;
+            }
+            return stackComponentMap.reference2ObjectEntrySet().containsAll(otherStackComponentMap.reference2ObjectEntrySet());
+        }
+        return false;
     }
 
     public static Optional<FluidStack> fromNbt(RegistryWrapper.WrapperLookup registries, NbtElement nbt) {
