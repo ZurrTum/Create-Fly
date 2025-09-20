@@ -16,7 +16,7 @@ import static com.zurrtum.create.Create.MOD_ID;
 
 @SuppressWarnings("unchecked")
 public record S2CHoldPacket<T extends ClientPlayPacketListener>(
-    PacketType<Packet<ClientPlayPacketListener>> type, BiConsumer<AllClientHandle<T>, T> consumer
+    PacketType<Packet<ClientPlayPacketListener>> id, BiConsumer<AllClientHandle<T>, T> consumer
 ) implements S2CPacket {
     public S2CHoldPacket(String id, BiConsumer<AllClientHandle<T>, T> callback) {
         this(new PacketType<>(NetworkSide.CLIENTBOUND, Identifier.of(MOD_ID, id)), callback);
@@ -28,7 +28,7 @@ public record S2CHoldPacket<T extends ClientPlayPacketListener>(
 
     @Override
     public PacketType<Packet<ClientPlayPacketListener>> getPacketType() {
-        return type();
+        return id();
     }
 
     @Override

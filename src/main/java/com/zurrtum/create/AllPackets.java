@@ -273,7 +273,7 @@ public class AllPackets {
 
     private static <T extends ClientPlayPacketListener> S2CHoldPacket<T> s2c(String id, BiConsumer<AllClientHandle<T>, T> callback) {
         S2CHoldPacket<T> packet = new S2CHoldPacket<>(id, callback);
-        S2C.put(packet.type(), packet.codec());
+        S2C.put(packet.id(), packet.codec());
         return packet;
     }
 
