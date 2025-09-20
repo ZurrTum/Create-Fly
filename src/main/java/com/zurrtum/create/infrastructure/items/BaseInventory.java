@@ -16,7 +16,7 @@ import java.util.function.Predicate;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
-public interface BaseInventory extends Clearable {
+public interface BaseInventory extends Clearable, Iterable<ItemStack> {
     Hash.Strategy<ItemStack> ITEM_STACK_HASH_STRATEGY = new Hash.Strategy<>() {
         public boolean equals(ItemStack stack, ItemStack other) {
             return stack == other || stack != null && other != null && ItemStack.areItemsAndComponentsEqual(stack, other);
@@ -1086,7 +1086,7 @@ public interface BaseInventory extends Clearable {
 
     @NotNull
     default Iterator<ItemStack> iterator(Direction side) {
-        return create$iterator();
+        return iterator();
     }
 
     default boolean matches(ItemStack stack, ItemStack otherStack) {
@@ -1390,7 +1390,7 @@ public interface BaseInventory extends Clearable {
     }
 
     default Stream<ItemStack> stream() {
-        return StreamSupport.stream(Spliterators.spliteratorUnknownSize(create$iterator(), Spliterator.ORDERED), false);
+        return StreamSupport.stream(Spliterators.spliteratorUnknownSize(iterator(), Spliterator.ORDERED), false);
     }
 
     default void create$setStack(int slot, ItemStack stack) {
@@ -1410,10 +1410,6 @@ public interface BaseInventory extends Clearable {
     }
 
     default boolean create$isValid(int slot, ItemStack stack) {
-        throw new RuntimeException("Implemented via Mixin");
-    }
-
-    default Iterator<ItemStack> create$iterator() {
         throw new RuntimeException("Implemented via Mixin");
     }
 
