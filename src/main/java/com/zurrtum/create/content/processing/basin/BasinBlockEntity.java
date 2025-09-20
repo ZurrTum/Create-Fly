@@ -558,12 +558,12 @@ public class BasinBlockEntity extends SmartBlockEntity {
             if (slot < 2) {
                 return false;
             }
-            for (TankSegment handler : input) {
-                FluidStack fluid = handler.getFluid();
+            for (int i = 0, size = input.length, current = slot - 2; i < size; i++) {
+                FluidStack fluid = input[i].getFluid();
                 if (fluid.isEmpty()) {
                     continue;
                 }
-                if (FluidStack.areFluidsAndComponentsEqual(fluid, stack)) {
+                if (matches(fluid, stack) && i != current) {
                     return false;
                 }
             }
@@ -595,7 +595,16 @@ public class BasinBlockEntity extends SmartBlockEntity {
                 tank = input[slot - 2];
             }
             tank.setFluid(stack);
-            tank.markDirty();
+        }
+
+        @Override
+        public void markDirty() {
+            for (TankSegment tank : input) {
+                tank.markDirty();
+            }
+            for (TankSegment tank : output) {
+                tank.markDirty();
+            }
         }
     }
 
