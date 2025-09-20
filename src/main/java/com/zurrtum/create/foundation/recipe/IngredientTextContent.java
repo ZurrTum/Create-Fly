@@ -113,4 +113,25 @@ public class IngredientTextContent implements TextContent {
         }
         return Optional.empty();
     }
+
+    public Optional<Text> getName() {
+        if (name != null) {
+            return Optional.of(name);
+        }
+        return findName();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof IngredientTextContent other) {
+            Optional<Text> name = getName();
+            Optional<Text> otherName = other.getName();
+            if (name.isPresent() && otherName.isPresent()) {
+                return name.get().equals(otherName.get());
+            } else {
+                return true;
+            }
+        }
+        return false;
+    }
 }
