@@ -114,7 +114,6 @@ public class AllBlockEntityBehaviours {
         add(ChainConveyorBlockEntity.class, KineticTooltipBehaviour::new, KineticAudioBehaviour::new, ChainConveyorClientBehaviour::new);
         add(HandCrankBlockEntity.class, GeneratingKineticTooltipBehaviour::new, HandCrankAudioBehaviour::new);
         add(ValveHandleBlockEntity.class, GeneratingKineticTooltipBehaviour::new, KineticAudioBehaviour::new, ValveHandleScrollValueBehaviour::new);
-        add(ArmBlockEntity.class, KineticAudioBehaviour::new);
         add(BacktankBlockEntity.class, KineticAudioBehaviour::new);
         add(BeltBlockEntity.class, KineticAudioBehaviour::new);
         add(BracketedKineticBlockEntity.class, KineticAudioBehaviour::new);
