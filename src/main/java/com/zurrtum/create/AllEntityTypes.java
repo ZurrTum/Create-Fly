@@ -12,9 +12,7 @@ import com.zurrtum.create.content.logistics.depot.EjectorItemEntity;
 import com.zurrtum.create.content.trains.entity.CarriageContraptionEntity;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
-import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.SpawnGroup;
-import net.minecraft.entity.attribute.DefaultAttributeContainer;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
 import net.minecraft.registry.RegistryKey;
@@ -22,16 +20,12 @@ import net.minecraft.registry.RegistryKeys;
 import net.minecraft.util.Identifier;
 
 import java.util.HashSet;
-import java.util.IdentityHashMap;
-import java.util.Map;
 import java.util.Set;
-import java.util.function.Supplier;
 
 import static com.zurrtum.create.Create.MOD_ID;
 
 public class AllEntityTypes {
     public static final Set<EntityType<?>> NOT_SEND_VELOCITY = new HashSet<>();
-    public static final Map<EntityType<? extends LivingEntity>, Supplier<DefaultAttributeContainer.Builder>> ATTRIBUTES = new IdentityHashMap<>();
     public static final EntityType<EjectorItemEntity> EJECTOR_ITEM = register(
         "ejector_item",
         EntityType.Builder.<EjectorItemEntity>create(EjectorItemEntity::new, SpawnGroup.MISC).dropsNothing().dimensions(0.25F, 0.25F)
@@ -90,6 +84,5 @@ public class AllEntityTypes {
         NOT_SEND_VELOCITY.add(GANTRY_CONTRAPTION);
         NOT_SEND_VELOCITY.add(SEAT);
         NOT_SEND_VELOCITY.add(CRAFTING_BLUEPRINT);
-        ATTRIBUTES.put(PACKAGE, PackageEntity::createPackageAttributes);
     }
 }
