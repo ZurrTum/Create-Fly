@@ -148,10 +148,10 @@ public class ConnectedInputHandler {
     }
 
     public static class ConnectedInput {
-        private static final Comparator<BlockPos> Y_COMPARATOR = Comparator.comparingInt(BlockPos::getY);
-        private static final Comparator<BlockPos> NORTH_COMPARATOR = Y_COMPARATOR.thenComparingInt(BlockPos::getX).reversed();
+        private static final Comparator<BlockPos> Y_COMPARATOR = Comparator.comparingInt(BlockPos::getY).reversed();
+        private static final Comparator<BlockPos> NORTH_COMPARATOR = Y_COMPARATOR.thenComparing(Comparator.comparingInt(BlockPos::getX).reversed());
         private static final Comparator<BlockPos> SOUTH_COMPARATOR = Y_COMPARATOR.thenComparingInt(BlockPos::getX);
-        private static final Comparator<BlockPos> EAST_COMPARATOR = Y_COMPARATOR.thenComparingInt(BlockPos::getZ).reversed();
+        private static final Comparator<BlockPos> EAST_COMPARATOR = Y_COMPARATOR.thenComparing(Comparator.comparingInt(BlockPos::getZ).reversed());
         private static final Comparator<BlockPos> WEST_COMPARATOR = Y_COMPARATOR.thenComparingInt(BlockPos::getZ);
 
         boolean isController;
