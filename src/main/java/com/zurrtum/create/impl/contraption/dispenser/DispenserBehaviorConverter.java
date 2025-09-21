@@ -58,6 +58,7 @@ public enum DispenserBehaviorConverter implements SimpleRegistry.Provider<Item, 
     @Override
     @Nullable
     public MountedDispenseBehavior get(Item item) {
+        Create.LOGGER.warn("Requires World parameter");
         return null;
     }
 

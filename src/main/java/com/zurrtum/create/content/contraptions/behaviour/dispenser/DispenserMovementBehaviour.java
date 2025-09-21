@@ -9,7 +9,7 @@ import net.minecraft.util.math.BlockPos;
 public class DispenserMovementBehaviour extends DropperMovementBehaviour {
     @Override
     protected MountedDispenseBehavior getDispenseBehavior(MovementContext context, BlockPos pos, ItemStack stack) {
-        MountedDispenseBehavior behavior = MountedDispenseBehavior.REGISTRY.get(stack.getItem());
+        MountedDispenseBehavior behavior = MountedDispenseBehavior.REGISTRY.get(stack.getItem(), context.world);
         return behavior != null ? behavior : DefaultMountedDispenseBehavior.INSTANCE;
     }
 }
