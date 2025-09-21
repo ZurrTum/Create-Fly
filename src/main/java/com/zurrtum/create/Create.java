@@ -132,5 +132,6 @@ public class Create implements ModInitializer {
         AllConfiguredFeatures.register();
         AllPlacedFeatures.register();
         AllPlacementModifiers.register();
+        AllMountedDispenseItemBehaviors.register();
     }
 }
