@@ -35,10 +35,11 @@ https://www.curseforge.com/minecraft/mc-mods/create-fly/files/all?page=1&pageSiz
 ### 3. Any other critical information the user must know before downloading
 
 - Please do not report issues with this mod to simibubi and NeoForge Create.
-- Because it uses a lot of mixins, it may be incompatible with other mods. Recommended not to install the Fabric API to
-  play the game.
+- Because it uses a lot of mixins, it may be incompatible with other mods.
+- If you experience rendering issues, try removing the Rendering Optimization Mod, which is currently not compatible.
 - Please do not use old game saves. Because data loading changes, data may be lost.
 - This project is under development and may be unstable and contain many errors.
+- Recommended to use REI to view recipes, and please report any game crashes.
 
 ### 4. TODO List
 
@@ -47,7 +48,7 @@ https://www.curseforge.com/minecraft/mc-mods/create-fly/files/all?page=1&pageSiz
 - Create Server Config Sync
 - Recipe Viewer Plugin
 - Create Ponder
-- Compat Fabric API
+- Compat Fabric Events
 - Compat Other Mod
 
 ## This project modifies and includes code from the following projects:
