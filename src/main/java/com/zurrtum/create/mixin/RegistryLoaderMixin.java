@@ -17,6 +17,7 @@ public class RegistryLoaderMixin {
     @WrapOperation(method = "<clinit>", at = @At(value = "INVOKE", target = "Ljava/util/List;of([Ljava/lang/Object;)Ljava/util/List;"))
     private static <E> List<RegistryLoader.Entry<?>> addEntry(@NotNull E[] list, Operation<List<RegistryLoader.Entry<?>>> original) {
         int listSize = list.length;
+        AllDynamicRegistries.registerIfNeeded();
         int size = listSize + AllDynamicRegistries.ALL.size();
         RegistryLoader.Entry<?>[] replaceList = new RegistryLoader.Entry<?>[size];
         System.arraycopy(list, 0, replaceList, 0, listSize);

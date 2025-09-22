@@ -7,20 +7,20 @@ import net.minecraft.entity.attribute.DefaultAttributeContainer;
 
 import java.util.IdentityHashMap;
 import java.util.Map;
-import java.util.function.BiConsumer;
 import java.util.function.Supplier;
 
 public class AllEntityAttributes {
+    public static boolean INITIALIZED = false;
     public static final Map<EntityType<? extends LivingEntity>, Supplier<DefaultAttributeContainer.Builder>> ATTRIBUTES = new IdentityHashMap<>();
 
-    public static void forEach(BiConsumer<EntityType<? extends LivingEntity>, Supplier<DefaultAttributeContainer.Builder>> consumer) {
-        if (ATTRIBUTES.isEmpty()) {
+    public static void registerIfNeeded() {
+        if (!INITIALIZED) {
             register();
         }
-        ATTRIBUTES.forEach(consumer);
     }
 
     public static void register() {
         ATTRIBUTES.put(AllEntityTypes.PACKAGE, PackageEntity::createPackageAttributes);
+        INITIALIZED = true;
     }
 }

@@ -16,7 +16,8 @@ public class DefaultAttributeRegistryMixin {
     @WrapOperation(method = "<clinit>", at = @At(value = "INVOKE", target = "com/google/common/collect/ImmutableMap.builder()Lcom/google/common/collect/ImmutableMap$Builder;"), remap = false)
     private static ImmutableMap.Builder<EntityType<? extends LivingEntity>, DefaultAttributeContainer> addAttributes(Operation<ImmutableMap.Builder<EntityType<? extends LivingEntity>, DefaultAttributeContainer>> original) {
         ImmutableMap.Builder<EntityType<? extends LivingEntity>, DefaultAttributeContainer> builder = original.call();
-        AllEntityAttributes.forEach((type, factory) -> {
+        AllEntityAttributes.registerIfNeeded();
+        AllEntityAttributes.ATTRIBUTES.forEach((type, factory) -> {
             builder.put(type, factory.get().build());
         });
         return builder;
