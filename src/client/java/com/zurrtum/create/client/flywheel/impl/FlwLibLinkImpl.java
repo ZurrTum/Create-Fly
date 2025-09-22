@@ -1,5 +1,6 @@
 package com.zurrtum.create.client.flywheel.impl;
 
+import com.zurrtum.create.client.flywheel.impl.compat.IrisCompat;
 import com.zurrtum.create.client.flywheel.impl.extension.PoseStackExtension;
 import com.zurrtum.create.client.flywheel.lib.internal.FlwLibLink;
 import com.zurrtum.create.client.flywheel.lib.transform.PoseTransformStack;
@@ -39,8 +40,7 @@ public class FlwLibLinkImpl implements FlwLibLink {
 
     @Override
     public boolean isIrisLoaded() {
-        //        return IrisCompat.ACTIVE;
-        return false;
+        return IrisCompat.ACTIVE;
     }
 
     @Override
@@ -51,25 +51,23 @@ public class FlwLibLinkImpl implements FlwLibLink {
 
     @Override
     public boolean isShaderPackInUse() {
-        //TODO
-        //        if (IrisCompat.ACTIVE) {
-        //            return IrisCompat.isShaderPackInUse();
-        //        } else if (OptifineCompat.IS_INSTALLED) {
-        //            return OptifineCompat.isShaderPackInUse();
-        //        } else {
-        return false;
-        //        }
+        if (IrisCompat.ACTIVE) {
+            return IrisCompat.isShaderPackInUse();
+        } /*else if (OptifineCompat.IS_INSTALLED) {
+            return OptifineCompat.isShaderPackInUse();
+        }*/ else {
+            return false;
+        }
     }
 
     @Override
     public boolean isRenderingShadowPass() {
-        //TODO
-        //        if (IrisCompat.ACTIVE) {
-        //            return IrisCompat.isRenderingShadowPass();
-        //        } else if (OptifineCompat.IS_INSTALLED) {
-        //            return OptifineCompat.isRenderingShadowPass();
-        //        } else {
-        return false;
-        //        }
+        if (IrisCompat.ACTIVE) {
+            return IrisCompat.isRenderingShadowPass();
+        } /*else if (OptifineCompat.IS_INSTALLED) {
+            return OptifineCompat.isRenderingShadowPass();
+        }*/ else {
+            return false;
+        }
     }
 }

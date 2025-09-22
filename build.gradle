@@ -60,6 +60,7 @@ dependencies {
         modClientRuntimeOnly "me.shedaniel:RoughlyEnoughItems-fabric:${project.rei_version}"
     }
     modCompileOnly "maven.modrinth:sodium:${project.sodium_version}"
+    modCompileOnly "maven.modrinth:iris:${project.iris_version}"
 }
 
 processResources {

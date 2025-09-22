@@ -1,19 +1,14 @@
 package com.zurrtum.create.client.infrastructure.particle;
 
-import com.mojang.blaze3d.pipeline.BlendFunction;
-import com.mojang.blaze3d.pipeline.RenderPipeline;
-import com.mojang.blaze3d.platform.DestFactor;
-import com.mojang.blaze3d.platform.SourceFactor;
+import com.zurrtum.create.client.foundation.render.AllRenderPipelines;
 import com.zurrtum.create.client.ponder.enums.PonderSpecialTextures;
 import com.zurrtum.create.infrastructure.particle.CubeParticleData;
-import net.minecraft.client.gl.RenderPipelines;
 import net.minecraft.client.particle.Particle;
 import net.minecraft.client.particle.ParticleFactory;
 import net.minecraft.client.particle.ParticleTextureSheet;
 import net.minecraft.client.render.*;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.client.world.ClientWorld;
-import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
@@ -26,12 +21,7 @@ public class CubeParticle extends Particle {
         1536,
         false,
         false,
-        RenderPipeline.builder(RenderPipelines.PARTICLE_SNIPPET).withLocation(Identifier.of(MOD_ID, "pipeline/cube")).withBlend(new BlendFunction(
-            SourceFactor.SRC_ALPHA,
-            DestFactor.ONE_MINUS_SRC_ALPHA,
-            SourceFactor.SRC_ALPHA,
-            DestFactor.ONE_MINUS_SRC_ALPHA
-        )).withDepthWrite(false).build(),
+        AllRenderPipelines.CUBE,
         RenderLayer.MultiPhaseParameters.builder().texture(new RenderPhase.Texture(PonderSpecialTextures.BLANK.getLocation(), false))
             .target(RenderLayer.PARTICLES_TARGET).lightmap(RenderLayer.ENABLE_LIGHTMAP).build(false)
     );

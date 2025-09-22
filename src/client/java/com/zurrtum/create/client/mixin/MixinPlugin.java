@@ -12,10 +12,12 @@ import java.util.Set;
 
 public class MixinPlugin implements IMixinConfigPlugin {
     public static boolean SODIUM = false;
+    public static boolean IRIS = false;
 
     @Override
     public void onLoad(String mixinPackage) {
         SODIUM = FabricLoader.getInstance().isModLoaded("sodium");
+        IRIS = FabricLoader.getInstance().isModLoaded("iris");
     }
 
     @Override
@@ -37,6 +39,9 @@ public class MixinPlugin implements IMixinConfigPlugin {
         List<String> mixins = new ArrayList<>();
         if (SODIUM) {
             mixins.add("FabricModelAccessMixin");
+        }
+        if (IRIS) {
+            mixins.add("IrisPipelinesMixin");
         }
         if (Create.Lazy) {
             mixins.add("FabricBlockStateModelMixin");

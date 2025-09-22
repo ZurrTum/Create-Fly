@@ -1,16 +1,10 @@
 package com.zurrtum.create.client.foundation.render;
 
-import com.mojang.blaze3d.pipeline.BlendFunction;
-import com.mojang.blaze3d.pipeline.RenderPipeline;
-import com.mojang.blaze3d.platform.DestFactor;
-import com.mojang.blaze3d.platform.SourceFactor;
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.VertexFormat;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gl.RenderPipelines;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.RenderPhase;
-import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.texture.AbstractTexture;
 import net.minecraft.client.texture.TextureManager;
 import net.minecraft.util.Identifier;
@@ -23,11 +17,6 @@ import java.util.function.Function;
 import static com.zurrtum.create.Create.MOD_ID;
 
 public class RenderTypes extends RenderPhase {
-    public static final Identifier GLOWING_ID = Identifier.of(MOD_ID, "core/glowing_shader");
-    public static final RenderPipeline.Snippet GLOWING_SNIPPET = RenderPipeline.builder(RenderPipelines.TRANSFORMS_PROJECTION_FOG_SNIPPET)
-        .withVertexShader(GLOWING_ID).withFragmentShader(GLOWING_ID).withSampler("Sampler0").withSampler("Sampler2")
-        .withVertexFormat(VertexFormats.POSITION_COLOR_TEXTURE_OVERLAY_LIGHT_NORMAL, VertexFormat.DrawMode.QUADS).buildSnippet();
-
     private static final RenderLayer ENTITY_SOLID_BLOCK_MIPPED = RenderLayer.of(
         createLayerName("entity_solid_block_mipped"),
         256,
@@ -63,8 +52,7 @@ public class RenderTypes extends RenderPhase {
         256,
         true,
         true,
-        RenderPipeline.builder(RenderPipelines.TERRAIN_SNIPPET).withLocation(Identifier.of(MOD_ID, "pipeline/additive"))
-            .withBlend(BlendFunction.ADDITIVE).withCull(false).build(),
+        AllRenderPipelines.ADDITIVE,
         RenderLayer.MultiPhaseParameters.builder().texture(BLOCK_ATLAS_TEXTURE).lightmap(ENABLE_LIGHTMAP).overlay(ENABLE_OVERLAY_COLOR).build(true)
     );
 
@@ -73,13 +61,7 @@ public class RenderTypes extends RenderPhase {
         256,
         true,
         false,
-        RenderPipeline.builder(GLOWING_SNIPPET).withLocation(Identifier.of(MOD_ID, "pipeline/glowing"))
-            .withBlend(new BlendFunction(
-                SourceFactor.SRC_ALPHA,
-                DestFactor.ONE_MINUS_SRC_ALPHA,
-                SourceFactor.SRC_ALPHA,
-                DestFactor.ONE_MINUS_SRC_ALPHA
-            )).build(),
+        AllRenderPipelines.GLOWING,
         RenderLayer.MultiPhaseParameters.builder().texture(BLOCK_ATLAS_TEXTURE).lightmap(ENABLE_LIGHTMAP).overlay(ENABLE_OVERLAY_COLOR).build(true)
     );
 
@@ -88,7 +70,7 @@ public class RenderTypes extends RenderPhase {
         256,
         true,
         true,
-        RenderPipeline.builder(GLOWING_SNIPPET).withLocation(Identifier.of(MOD_ID, "pipeline/glowing")).withBlend(BlendFunction.TRANSLUCENT).build(),
+        AllRenderPipelines.GLOWING_TRANSLUCENT,
         RenderLayer.MultiPhaseParameters.builder().texture(BLOCK_ATLAS_TEXTURE).lightmap(ENABLE_LIGHTMAP).overlay(ENABLE_OVERLAY_COLOR).build(true)
     );
 
