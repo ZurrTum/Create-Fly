@@ -12,6 +12,17 @@ repositories {
             includeGroup "dev.architectury"
         }
     }
+    exclusiveContent {
+        forRepository {
+            maven {
+                name = "Modrinth"
+                url = "https://api.modrinth.com/maven"
+            }
+        }
+        filter {
+            includeGroup "maven.modrinth"
+        }
+    }
 }
 
 version = project.mod_version
@@ -48,6 +59,7 @@ dependencies {
     if (project.compile_only_rei.equals("false")) {
         modClientRuntimeOnly "me.shedaniel:RoughlyEnoughItems-fabric:${project.rei_version}"
     }
+    modCompileOnly "maven.modrinth:sodium:${project.sodium_version}"
 }
 
 processResources {

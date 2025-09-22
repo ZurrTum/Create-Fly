@@ -1,16 +1,21 @@
 package com.zurrtum.create.client.mixin;
 
 import com.zurrtum.create.Create;
+import net.fabricmc.loader.api.FabricLoader;
 import org.objectweb.asm.tree.ClassNode;
 import org.spongepowered.asm.mixin.extensibility.IMixinConfigPlugin;
 import org.spongepowered.asm.mixin.extensibility.IMixinInfo;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
 public class MixinPlugin implements IMixinConfigPlugin {
+    public static boolean SODIUM = false;
+
     @Override
     public void onLoad(String mixinPackage) {
+        SODIUM = FabricLoader.getInstance().isModLoaded("sodium");
     }
 
     @Override
@@ -29,10 +34,17 @@ public class MixinPlugin implements IMixinConfigPlugin {
 
     @Override
     public List<String> getMixins() {
-        if (Create.Lazy) {
-            return List.of("FabricBlockStateModelMixin");
+        List<String> mixins = new ArrayList<>();
+        if (SODIUM) {
+            mixins.add("FabricModelAccessMixin");
         }
-        return List.of("CreativeInventoryScreenMixin", "DefaultClientResourcePackProviderMixin");
+        if (Create.Lazy) {
+            mixins.add("FabricBlockStateModelMixin");
+        } else {
+            mixins.add("CreativeInventoryScreenMixin");
+            mixins.add("DefaultClientResourcePackProviderMixin");
+        }
+        return mixins;
     }
 
     @Override

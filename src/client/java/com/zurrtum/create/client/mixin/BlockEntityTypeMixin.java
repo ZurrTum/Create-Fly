@@ -1,6 +1,7 @@
 package com.zurrtum.create.client.mixin;
 
 import com.zurrtum.create.client.flywheel.api.visualization.BlockEntityVisualizer;
+import com.zurrtum.create.client.flywheel.impl.compat.SodiumCompat;
 import com.zurrtum.create.client.flywheel.impl.extension.BlockEntityTypeExtension;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityType;
@@ -14,9 +15,9 @@ abstract class BlockEntityTypeMixin<T extends BlockEntity> implements BlockEntit
     @Nullable
     private BlockEntityVisualizer<? super T> flywheel$visualizer;
 
-    //    @Unique
-    //    @Nullable
-    //    private Object flywheel$sodiumPredicate;
+    @Unique
+    @Nullable
+    private Object flywheel$sodiumPredicate;
 
     @Override
     @Nullable
@@ -26,10 +27,14 @@ abstract class BlockEntityTypeMixin<T extends BlockEntity> implements BlockEntit
 
     @Override
     public void flywheel$setVisualizer(@Nullable BlockEntityVisualizer<? super T> visualizer) {
-        //TODO
-        //        if (SodiumCompat.USE_0_6_COMPAT) {
-        //            flywheel$sodiumPredicate = SodiumCompat.onSetBlockEntityVisualizer((BlockEntityType<T>) (Object) this, flywheel$visualizer, visualizer, flywheel$sodiumPredicate);
-        //        }
+        if (SodiumCompat.ACTIVE) {
+            flywheel$sodiumPredicate = SodiumCompat.onSetBlockEntityVisualizer(
+                (BlockEntityType<T>) (Object) this,
+                flywheel$visualizer,
+                visualizer,
+                flywheel$sodiumPredicate
+            );
+        }
 
         flywheel$visualizer = visualizer;
     }

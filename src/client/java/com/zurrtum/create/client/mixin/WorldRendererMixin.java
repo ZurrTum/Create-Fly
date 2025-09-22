@@ -11,6 +11,7 @@ import com.zurrtum.create.client.catnip.ghostblock.GhostBlocks;
 import com.zurrtum.create.client.catnip.outliner.Outliner;
 import com.zurrtum.create.client.catnip.render.DefaultSuperRenderTypeBuffer;
 import com.zurrtum.create.client.catnip.render.SuperRenderTypeBuffer;
+import com.zurrtum.create.client.compat.sodium.SodiumCompat;
 import com.zurrtum.create.client.content.contraptions.actors.seat.ContraptionPlayerPassengerRotation;
 import com.zurrtum.create.client.content.contraptions.minecart.CouplingRenderer;
 import com.zurrtum.create.client.content.equipment.clipboard.ClipboardValueSettingsClientHandler;
@@ -173,5 +174,10 @@ public class WorldRendererMixin {
             return block.getLuminance(world, pos);
         }
         return original.call(state);
+    }
+
+    @Inject(method = "renderBlockEntities(Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider$Immediate;Lnet/minecraft/client/render/VertexConsumerProvider$Immediate;Lnet/minecraft/client/render/Camera;F)V", at = @At("HEAD"))
+    private void markSpriteActive(CallbackInfo ci) {
+        SodiumCompat.markSpriteActive(client);
     }
 }
