@@ -28,7 +28,7 @@ public class FabricModelAccessMixin {
         @Local(argsOnly = true) BlockPos pos,
         @Local(argsOnly = true) BlockState state
     ) {
-        if (model instanceof WrapperBlockStateModel wrapper) {
+        if (WrapperBlockStateModel.unwrapCompat(model) instanceof WrapperBlockStateModel wrapper) {
             wrapper.addPartsWithInfo(world, pos, state, random, parts);
         } else {
             original.call(model, random, parts);

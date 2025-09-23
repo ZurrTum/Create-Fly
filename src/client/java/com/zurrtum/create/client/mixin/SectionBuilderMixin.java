@@ -43,7 +43,7 @@ public class SectionBuilderMixin {
         @Local(ordinal = 2) BlockPos pos,
         @Local BlockState state
     ) {
-        if (model instanceof WrapperBlockStateModel wrapper) {
+        if (WrapperBlockStateModel.unwrapCompat(model) instanceof WrapperBlockStateModel wrapper) {
             wrapper.addPartsWithInfo(world, pos, state, random, parts);
         } else {
             original.call(model, random, parts);

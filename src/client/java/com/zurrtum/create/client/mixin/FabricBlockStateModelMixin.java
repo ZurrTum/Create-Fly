@@ -28,7 +28,7 @@ public interface FabricBlockStateModelMixin {
         @Local(argsOnly = true) BlockPos pos,
         @Local(argsOnly = true) BlockState state
     ) {
-        if (instance instanceof WrapperBlockStateModel wrapper) {
+        if (WrapperBlockStateModel.unwrapCompat(instance) instanceof WrapperBlockStateModel wrapper) {
             List<BlockModelPart> list = new ObjectArrayList<>();
             wrapper.addPartsWithInfo(world, pos, state, random, list);
             return list;

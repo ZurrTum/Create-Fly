@@ -199,7 +199,7 @@ public final class BakedModelBuffererImpl {
                 poseStack.push();
                 poseStack.translate(pos.getX(), pos.getY(), pos.getZ());
                 List<BlockModelPart> parts = new ObjectArrayList<>();
-                if (model instanceof WrapperBlockStateModel wrapper) {
+                if (WrapperBlockStateModel.unwrapCompat(model) instanceof WrapperBlockStateModel wrapper) {
                     wrapper.addPartsWithInfo(level, pos, state, random, parts);
                 } else {
                     model.addParts(random, parts);

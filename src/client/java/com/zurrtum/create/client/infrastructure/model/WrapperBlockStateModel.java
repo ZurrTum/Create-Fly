@@ -1,5 +1,7 @@
 package com.zurrtum.create.client.infrastructure.model;
 
+import com.zurrtum.create.client.compat.fabric.WrapperModel;
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.render.model.Baker;
 import net.minecraft.client.render.model.BlockModelPart;
@@ -13,6 +15,7 @@ import java.util.List;
 import java.util.function.Function;
 
 public abstract class WrapperBlockStateModel implements BlockStateModel, BlockStateModel.UnbakedGrouped {
+    private static final boolean FABRIC = FabricLoader.getInstance().isModLoaded("fabric-model-loading-api-v1");
     protected BlockStateModel model;
     protected Function<Baker, BlockStateModel> bake;
 
@@ -57,5 +60,12 @@ public abstract class WrapperBlockStateModel implements BlockStateModel, BlockSt
     @Override
     public Object getEqualityGroup(BlockState state) {
         return this;
+    }
+
+    public static BlockStateModel unwrapCompat(BlockStateModel model) {
+        if (FABRIC && model instanceof WrapperModel wrapper) {
+            return wrapper.create$getWrapped();
+        }
+        return model;
     }
 }

@@ -28,7 +28,7 @@ public class BlockRenderManagerMixin {
         @Local(argsOnly = true) BlockPos pos,
         @Local(argsOnly = true) BlockRenderView world
     ) {
-        if (model instanceof WrapperBlockStateModel wrapper) {
+        if (WrapperBlockStateModel.unwrapCompat(model) instanceof WrapperBlockStateModel wrapper) {
             wrapper.addPartsWithInfo(world, pos, state, random, parts);
         } else {
             original.call(model, random, parts);

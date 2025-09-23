@@ -63,7 +63,7 @@ public abstract class BlockDustParticleMixin {
         @Share("pos") LocalRef<BlockPos> blockPos
     ) {
         BlockStateModel model = models.getModel(state);
-        if (model instanceof WrapperBlockStateModel wrapper) {
+        if (WrapperBlockStateModel.unwrapCompat(model) instanceof WrapperBlockStateModel wrapper) {
             blockPos.set(findPos(world, pos, state));
             return wrapper.particleSpriteWithInfo(world, blockPos.get(), state);
         } else {

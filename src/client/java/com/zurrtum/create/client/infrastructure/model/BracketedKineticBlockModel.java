@@ -28,7 +28,7 @@ public class BracketedKineticBlockModel extends WrapperBlockStateModel {
             return;
         }
         BlockStateModel model = MinecraftClient.getInstance().getBlockRenderManager().getModel(bracket);
-        if (model instanceof WrapperBlockStateModel wrapper) {
+        if (WrapperBlockStateModel.unwrapCompat(model) instanceof WrapperBlockStateModel wrapper) {
             wrapper.addPartsWithInfo(world, pos, state, random, parts);
         } else {
             model.addParts(random, parts);

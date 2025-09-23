@@ -116,7 +116,7 @@ public class SchematicRenderer {
                 poseStack.push();
                 poseStack.translate(localPos.getX(), localPos.getY(), localPos.getZ());
                 List<BlockModelPart> parts = new ObjectArrayList<>();
-                if (model instanceof WrapperBlockStateModel wrapper) {
+                if (WrapperBlockStateModel.unwrapCompat(model) instanceof WrapperBlockStateModel wrapper) {
                     wrapper.addPartsWithInfo(renderWorld, pos, state, random, parts);
                 } else {
                     model.addParts(random, parts);
