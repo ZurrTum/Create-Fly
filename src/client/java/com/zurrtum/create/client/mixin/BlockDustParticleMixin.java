@@ -80,7 +80,10 @@ public abstract class BlockDustParticleMixin {
         @Share("pos") LocalRef<BlockPos> blockPos
     ) {
         if (state.getBlock() instanceof CopycatBlock) {
-            state = CopycatBlock.getMaterial(world, blockPos.get());
+            BlockPos pos = blockPos.get();
+            if (pos != null) {
+                state = CopycatBlock.getMaterial(world, pos);
+            }
         }
         return original.call(state, block);
     }
