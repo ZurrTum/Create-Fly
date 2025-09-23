@@ -5,9 +5,11 @@ import com.zurrtum.create.client.catnip.render.SuperByteBuffer;
 import com.zurrtum.create.client.catnip.render.SuperByteBufferCache;
 import com.zurrtum.create.client.flywheel.api.visualization.VisualizationManager;
 import com.zurrtum.create.client.foundation.virtualWorld.VirtualRenderWorld;
+import com.zurrtum.create.client.infrastructure.model.WrapperBlockStateModel;
 import com.zurrtum.create.content.contraptions.Contraption;
 import com.zurrtum.create.content.contraptions.Contraption.RenderedBlocks;
 import com.zurrtum.create.content.contraptions.ContraptionWorld;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.minecraft.block.BlockRenderType;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.MinecraftClient;
@@ -120,7 +122,12 @@ public class ContraptionRenderInfo {
                 if (RenderLayers.getBlockLayer(state) == layer) {
                     poseStack.push();
                     poseStack.translate(pos.getX(), pos.getY(), pos.getZ());
-                    List<BlockModelPart> parts = model.getParts(random);
+                    List<BlockModelPart> parts = new ObjectArrayList<>();
+                    if (WrapperBlockStateModel.unwrapCompat(model) instanceof WrapperBlockStateModel wrapper) {
+                        wrapper.addPartsWithInfo(renderWorld, pos, state, random, parts);
+                    } else {
+                        model.addParts(random, parts);
+                    }
                     renderer.render(renderWorld, parts, state, pos, poseStack, sbbBuilder, true, OverlayTexture.DEFAULT_UV);
                     poseStack.pop();
                 }
