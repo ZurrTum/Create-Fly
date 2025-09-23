@@ -49,8 +49,8 @@ public class VirtualChunk extends Chunk {
         int sectionCount = world.countVerticalSections();
         this.sections = new VirtualChunkSection[sectionCount];
 
-        for (int i = 0; i < sectionCount; i++) {
-            sections[i] = new VirtualChunkSection(this, i << 4);
+        for (int i = 0, bottom = world.getBottomSectionCoord(); i < sectionCount; i++) {
+            sections[i] = new VirtualChunkSection(this, (i + bottom) << 4);
         }
 
         this.needsLight = true;

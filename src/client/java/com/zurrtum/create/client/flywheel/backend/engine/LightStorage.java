@@ -8,6 +8,7 @@ import com.zurrtum.create.client.flywheel.api.visualization.VisualizationManager
 import com.zurrtum.create.client.flywheel.backend.BackendDebugFlags;
 import com.zurrtum.create.client.flywheel.backend.engine.indirect.StagingBuffer;
 import com.zurrtum.create.client.flywheel.backend.gl.buffer.GlBuffer;
+import com.zurrtum.create.client.flywheel.impl.compat.CompatMod;
 import com.zurrtum.create.client.flywheel.lib.instance.InstanceTypes;
 import com.zurrtum.create.client.flywheel.lib.instance.TransformedInstance;
 import com.zurrtum.create.client.flywheel.lib.math.MoreMath;
@@ -313,6 +314,10 @@ public class LightStorage implements Effect {
             }
         }
 
+        if (CompatMod.SCALABLELUX.isLoaded) {
+            return Objects.requireNonNullElse(layerListener.getLightSection(ChunkSectionPos.from(section)), ALWAYS_15);
+        }
+
         // FIXME: We're likely in some exotic dimension that needs special handling.
         return ALWAYS_0;
     }
@@ -328,6 +333,10 @@ public class LightStorage implements Effect {
             var out = accessor.lightStorage.getLightSection(section);
 
             return Objects.requireNonNullElse(out, ALWAYS_0);
+        }
+
+        if (CompatMod.SCALABLELUX.isLoaded) {
+            return Objects.requireNonNullElse(layerListener.getLightSection(ChunkSectionPos.from(section)), ALWAYS_0);
         }
 
         // FIXME: We're likely in some exotic dimension that needs special handling.

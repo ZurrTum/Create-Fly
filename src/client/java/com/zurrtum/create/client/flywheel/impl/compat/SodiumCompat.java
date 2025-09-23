@@ -5,13 +5,12 @@ import com.zurrtum.create.client.flywheel.impl.FlwImpl;
 import com.zurrtum.create.client.flywheel.lib.visualization.VisualizationHelper;
 import net.caffeinemc.mods.sodium.api.blockentity.BlockEntityRenderHandler;
 import net.caffeinemc.mods.sodium.api.blockentity.BlockEntityRenderPredicate;
-import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityType;
 import org.jetbrains.annotations.Nullable;
 
 public final class SodiumCompat {
-    public static final boolean ACTIVE = FabricLoader.getInstance().isModLoaded("sodium");
+    public static final boolean ACTIVE = CompatMod.SODIUM.isLoaded;
 
     static {
         if (ACTIVE) {

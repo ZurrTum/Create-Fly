@@ -3,6 +3,7 @@ package com.zurrtum.create.client.foundation.virtualWorld;
 import net.minecraft.block.BlockState;
 import net.minecraft.fluid.FluidState;
 import net.minecraft.registry.RegistryKeys;
+import net.minecraft.util.math.ChunkSectionPos;
 import net.minecraft.world.chunk.ChunkSection;
 
 public class VirtualChunkSection extends ChunkSection {
@@ -35,5 +36,11 @@ public class VirtualChunkSection extends ChunkSection {
     @Override
     public BlockState setBlockState(int x, int y, int z, BlockState state, boolean useLocks) {
         throw new UnsupportedOperationException("Chunk sections cannot be mutated in a fake world.");
+    }
+
+    @Override
+    public boolean isEmpty() {
+        ChunkSectionPos sectionPos = ChunkSectionPos.from(xStart >> 4, yStart >> 4, zStart >> 4);
+        return owner.world.nonEmptyBlockCounts.getShort(sectionPos) == 0;
     }
 }

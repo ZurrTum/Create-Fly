@@ -92,7 +92,7 @@ public class VirtualRenderWorld extends World implements VisualizationLevel {
         this.biomeOffset = biomeOffset;
 
         this.chunkSource = new VirtualChunkSource(this);
-        this.lightEngine = new LightingProvider(chunkSource, true, true);
+        this.lightEngine = new LightingProvider(chunkSource, true, false);
     }
 
     /**

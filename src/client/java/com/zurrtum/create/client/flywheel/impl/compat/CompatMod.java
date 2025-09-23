@@ -3,9 +3,9 @@ package com.zurrtum.create.client.flywheel.impl.compat;
 import com.zurrtum.create.client.flywheel.impl.FlwImplXplat;
 
 public enum CompatMod {
-    EMBEDDIUM("embeddium"),
     IRIS("iris"),
-    SODIUM("sodium");
+    SODIUM("sodium"),
+    SCALABLELUX("scalablelux");
 
     public final String id;
     public final boolean isLoaded;
