@@ -13,7 +13,6 @@ import net.minecraft.util.Util;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.random.Random;
 import net.minecraft.world.WorldEvents;
-import org.jetbrains.annotations.Nullable;
 
 public class DropperMovementBehaviour extends MovementBehaviour {
     @Override
@@ -54,10 +53,10 @@ public class DropperMovementBehaviour extends MovementBehaviour {
                 continue;
 
             if (stack.getCount() == 1 && stack.getMaxCount() != 1) {
-                stack = tryTopOff(stack, contraptionInventory);
-                if (stack != null) {
-                    storage.setStack(i, stack);
-                } else {
+                storage.setStack(i, ItemStack.EMPTY);
+                boolean fill = tryTopOff(stack, contraptionInventory);
+                storage.setStack(i, stack);
+                if (!fill) {
                     continue;
                 }
             }
@@ -72,18 +71,14 @@ public class DropperMovementBehaviour extends MovementBehaviour {
         };
     }
 
-    @Nullable
-    private static ItemStack tryTopOff(ItemStack stack, Inventory from) {
-        int maxCount = stack.getMaxCount();
+    private static boolean tryTopOff(ItemStack stack, Inventory from) {
         int count = stack.getCount();
-        ItemStack copy = stack.copy();
-        copy.setCount(maxCount - count);
-        int extract = from.extract(copy);
+        int extract = from.extract(stack, stack.getMaxCount() - count);
         if (extract == 0) {
-            return null;
+            return false;
         }
-        copy.setCount(count + extract);
-        return copy;
+        stack.setCount(count + extract);
+        return true;
     }
 
     private static void failDispense(MovementContext ctx, BlockPos pos) {
