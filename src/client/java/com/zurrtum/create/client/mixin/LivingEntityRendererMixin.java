@@ -1,5 +1,6 @@
 package com.zurrtum.create.client.mixin;
 
+import com.zurrtum.create.AllSynchedDatas;
 import com.zurrtum.create.catnip.data.Iterate;
 import com.zurrtum.create.client.AllPartialModels;
 import com.zurrtum.create.client.content.equipment.armor.BacktankFeatureRenderer;
@@ -24,6 +25,7 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.passive.ParrotEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.BlockPos;
@@ -95,6 +97,9 @@ public class LivingEntityRendererMixin<T extends LivingEntity, S extends LivingE
                     state.create$updateHatInfo(entity);
                 }
             }
+        } else if (entity instanceof ParrotEntity parrot && entity.getEquippedStack(EquipmentSlot.HEAD)
+            .isEmpty() && AllSynchedDatas.PARROT_TRAIN_HAT.get(parrot)) {
+            hat = AllPartialModels.TRAIN_HAT;
         }
         state.create$setHat(hat);
     }

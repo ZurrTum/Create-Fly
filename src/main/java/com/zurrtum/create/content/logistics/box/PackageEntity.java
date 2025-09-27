@@ -152,7 +152,6 @@ public class PackageEntity extends LivingEntity {
             originalEntity = null;
         }
 
-        //TODO
         //        if (getWorld() instanceof PonderLevel) {
         //            setVelocity(getVelocity().add(0, -0.06, 0));
         //            if (getPos().y < 0.125)

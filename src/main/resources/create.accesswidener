@@ -250,3 +250,8 @@ accessible method net/minecraft/entity/decoration/ItemFrameEntity getAsItemStack
 accessible field net/minecraft/recipe/ShapelessRecipe result Lnet/minecraft/item/ItemStack;
 accessible field net/minecraft/recipe/ShapedRecipe result Lnet/minecraft/item/ItemStack;
 accessible field net/minecraft/entity/LivingEntity lastEquipmentStacks Ljava/util/Map;
+accessible field net/minecraft/client/network/ClientPlayNetworkHandler chunkLoadDistance I
+accessible method net/minecraft/entity/passive/ParrotEntity setVariant (Lnet/minecraft/entity/passive/ParrotEntity$Variant;)V
+accessible field net/minecraft/client/particle/ParticleManager factories Lit/unimi/dsi/fastutil/ints/Int2ObjectMap;
+accessible method net/minecraft/client/world/ClientWorld getEntityLookup ()Lnet/minecraft/world/entity/EntityLookup;
+accessible method net/minecraft/client/render/DiffuseLighting updateBuffer (Lnet/minecraft/client/render/DiffuseLighting$Type;Lorg/joml/Vector3f;Lorg/joml/Vector3f;)V

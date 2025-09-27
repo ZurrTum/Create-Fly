@@ -9,7 +9,7 @@ import org.joml.Quaternionf;
 
 public class WiFiParticle extends CustomRotationParticle {
 
-    private boolean downward;
+    private final boolean downward;
 
     public WiFiParticle(
         SimpleParticleType type,

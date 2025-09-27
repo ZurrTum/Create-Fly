@@ -55,7 +55,7 @@ public class GuiGameElement {
 
     public static class GuiItemRenderBuilder extends GuiRenderBuilder<GuiItemRenderBuilder> {
         private final ItemStack stack;
-        private ItemTransformRenderState state;
+        private Object key;
 
         public GuiItemRenderBuilder(ItemStack stack) {
             this.stack = stack;
@@ -80,24 +80,41 @@ public class GuiGameElement {
                 }
                 return;
             }
-            if (state == null) {
-                state = new ItemTransformRenderState();
-            }
-            state.update(graphics, stack, x, y, scale, padding, xRot, yRot, zRot);
+            ItemTransformRenderState state = ItemTransformRenderState.create(graphics, stack, x, y, scale, padding, xRot, yRot, zRot);
+            key = state.getKey();
             graphics.state.addSpecialElement(state);
         }
 
         @Override
+        public GuiItemRenderBuilder scale(float scale) {
+            clear();
+            return super.scale(scale);
+        }
+
+        @Override
+        public GuiItemRenderBuilder padding(int padding) {
+            clear();
+            return super.padding(padding);
+        }
+
+        @Override
+        public GuiItemRenderBuilder rotate(float x, float y, float z) {
+            clear();
+            return super.rotate(x, y, z);
+        }
+
+        @Override
         public void clear() {
-            if (state != null) {
-                ItemTransformElementRenderer.clear(state);
+            if (key != null) {
+                ItemTransformElementRenderer.clear(key);
+                key = null;
             }
         }
     }
 
     public static class GuiBlockStateRenderBuilder extends GuiRenderBuilder<GuiBlockStateRenderBuilder> {
-        private final BlockTransformRenderState state = new BlockTransformRenderState();
         private final BlockState block;
+        boolean rendering = false;
 
         public GuiBlockStateRenderBuilder(BlockState block) {
             this.block = block;
@@ -110,13 +127,34 @@ public class GuiGameElement {
 
         @Override
         public void render(DrawContext graphics) {
-            state.update(graphics, block, x, y, scale, padding, xRot, yRot, zRot);
-            graphics.state.addSpecialElement(state);
+            graphics.state.addSpecialElement(BlockTransformRenderState.create(graphics, block, x, y, scale, padding, xRot, yRot, zRot));
+            rendering = true;
+        }
+
+        @Override
+        public GuiBlockStateRenderBuilder scale(float scale) {
+            clear();
+            return super.scale(scale);
+        }
+
+        @Override
+        public GuiBlockStateRenderBuilder padding(int padding) {
+            clear();
+            return super.padding(padding);
+        }
+
+        @Override
+        public GuiBlockStateRenderBuilder rotate(float x, float y, float z) {
+            clear();
+            return super.rotate(x, y, z);
         }
 
         @Override
         public void clear() {
-            BlockTransformElementRenderer.clear(state);
+            if (rendering) {
+                BlockTransformElementRenderer.clear(BlockTransformRenderState.getKey(block, scale, padding, xRot, yRot, zRot));
+                rendering = false;
+            }
         }
     }
 

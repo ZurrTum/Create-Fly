@@ -6,6 +6,7 @@ import com.zurrtum.create.api.registry.CreateRegistries;
 import com.zurrtum.create.catnip.data.Couple;
 import com.zurrtum.create.client.api.behaviour.display.DisplaySourceRender;
 import com.zurrtum.create.client.catnip.gui.AbstractSimiScreen;
+import com.zurrtum.create.client.catnip.gui.ScreenOpener;
 import com.zurrtum.create.client.catnip.gui.element.GuiGameElement;
 import com.zurrtum.create.client.catnip.gui.widget.AbstractSimiWidget;
 import com.zurrtum.create.client.catnip.gui.widget.ElementWidget;
@@ -18,6 +19,8 @@ import com.zurrtum.create.client.foundation.gui.widget.Label;
 import com.zurrtum.create.client.foundation.gui.widget.ScrollInput;
 import com.zurrtum.create.client.foundation.gui.widget.SelectionScrollInput;
 import com.zurrtum.create.client.foundation.utility.CreateLang;
+import com.zurrtum.create.client.infrastructure.ponder.AllCreatePonderTags;
+import com.zurrtum.create.client.ponder.foundation.ui.PonderTagScreen;
 import com.zurrtum.create.content.redstone.displayLink.DisplayLinkBlock;
 import com.zurrtum.create.content.redstone.displayLink.DisplayLinkBlockEntity;
 import com.zurrtum.create.content.redstone.displayLink.DisplayLinkContext;
@@ -156,11 +159,9 @@ public class DisplayLinkScreen extends AbstractSimiScreen {
             addDrawableChild(targetLineLabel);
         }
 
-        sourceWidget = new ElementWidget(x + 37, y + 26).showingElement(GuiGameElement.of(sourceIcon));
-        //TODO
-        //        .withCallback((mX, mY) -> {
-        //            ScreenOpener.open(new PonderTagScreen(AllCreatePonderTags.DISPLAY_SOURCES));
-        //        });
+        sourceWidget = new ElementWidget(x + 37, y + 26).showingElement(GuiGameElement.of(sourceIcon)).withCallback((mX, mY) -> {
+            ScreenOpener.open(new PonderTagScreen(AllCreatePonderTags.DISPLAY_SOURCES));
+        });
 
         sourceWidget.getToolTip().addAll(List.of(
             CreateLang.translateDirect("display_link.reading_from"),
@@ -171,11 +172,9 @@ public class DisplayLinkScreen extends AbstractSimiScreen {
 
         addDrawableChild(sourceWidget);
 
-        targetWidget = new ElementWidget(x + 37, y + 105).showingElement(GuiGameElement.of(targetIcon));
-        //TODO
-        //        .withCallback((mX, mY) -> {
-        //            ScreenOpener.open(new PonderTagScreen(AllCreatePonderTags.DISPLAY_TARGETS));
-        //        });
+        targetWidget = new ElementWidget(x + 37, y + 105).showingElement(GuiGameElement.of(targetIcon)).withCallback((mX, mY) -> {
+            ScreenOpener.open(new PonderTagScreen(AllCreatePonderTags.DISPLAY_TARGETS));
+        });
 
         targetWidget.getToolTip().addAll(List.of(
             CreateLang.translateDirect("display_link.writing_to"),

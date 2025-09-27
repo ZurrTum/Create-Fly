@@ -15,11 +15,11 @@ import net.minecraft.client.texture.TextureSetup;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.RotationAxis;
 
-import java.util.IdentityHashMap;
+import java.util.HashMap;
 import java.util.Map;
 
 public class ItemTransformElementRenderer extends SpecialGuiElementRenderer<ItemTransformRenderState> {
-    private static final Map<ItemTransformRenderState, GpuTexture> TEXTURES = new IdentityHashMap<>();
+    private static final Map<Object, GpuTexture> TEXTURES = new HashMap<>();
     private final MatrixStack matrices = new MatrixStack();
     private int windowScaleFactor;
 
@@ -27,8 +27,8 @@ public class ItemTransformElementRenderer extends SpecialGuiElementRenderer<Item
         super(vertexConsumers);
     }
 
-    public static void clear(ItemTransformRenderState item) {
-        GpuTexture texture = TEXTURES.remove(item);
+    public static void clear(Object key) {
+        GpuTexture texture = TEXTURES.remove(key);
         if (texture != null) {
             texture.close();
         }
@@ -41,55 +41,41 @@ public class ItemTransformElementRenderer extends SpecialGuiElementRenderer<Item
             TEXTURES.values().forEach(GpuTexture::close);
             TEXTURES.clear();
         }
-        float size = 0;
-        GpuTexture texture = TEXTURES.get(item);
+        float size = item.size() * windowScaleFactor;
+        GpuTexture texture = TEXTURES.get(item.getKey());
         boolean draw;
-        if (texture == null || item.dirty) {
-            size = item.size * windowScaleFactor;
-            if (item.dirty) {
-                item.clearDirty();
-                if (texture != null && texture.width() != size) {
-                    texture.close();
-                    texture = null;
-                }
-            }
-            if (texture == null) {
-                texture = GpuTexture.create((int) size);
-                TEXTURES.put(item, texture);
-            }
+        if (texture == null) {
+            texture = GpuTexture.create((int) size);
             draw = true;
         } else {
-            draw = item.state.isAnimated();
+            draw = item.state().isAnimated();
         }
         if (draw) {
-            if (size == 0) {
-                size = item.size * windowScaleFactor;
-            }
             RenderSystem.setProjectionMatrix(projectionMatrix.set(size, size), ProjectionType.ORTHOGRAPHIC);
             texture.prepare();
             matrices.push();
             matrices.translate(size / 2, size / 2, 0);
-            if (item.padding != 0) {
-                size -= item.padding * windowScaleFactor;
+            if (item.padding() != 0) {
+                size -= item.padding() * windowScaleFactor;
             }
             matrices.scale(size, -size, size);
-            if (item.zRot != 0) {
-                matrices.multiply(RotationAxis.POSITIVE_Z.rotation(item.zRot));
+            if (item.zRot() != 0) {
+                matrices.multiply(RotationAxis.POSITIVE_Z.rotation(item.zRot()));
             }
-            if (item.xRot != 0) {
-                matrices.multiply(RotationAxis.POSITIVE_X.rotation(item.xRot));
+            if (item.xRot() != 0) {
+                matrices.multiply(RotationAxis.POSITIVE_X.rotation(item.xRot()));
             }
-            if (item.yRot != 0) {
-                matrices.multiply(RotationAxis.POSITIVE_Y.rotation(item.yRot));
+            if (item.yRot() != 0) {
+                matrices.multiply(RotationAxis.POSITIVE_Y.rotation(item.yRot()));
             }
-            boolean blockLight = item.state.isSideLit();
+            boolean blockLight = item.state().isSideLit();
             DiffuseLighting lighting = MinecraftClient.getInstance().gameRenderer.getDiffuseLighting();
             if (blockLight) {
                 lighting.setShaderLights(DiffuseLighting.Type.ITEMS_3D);
             } else {
                 lighting.setShaderLights(DiffuseLighting.Type.ITEMS_FLAT);
             }
-            item.state.render(matrices, vertexConsumers, LightmapTextureManager.MAX_LIGHT_COORDINATE, OverlayTexture.DEFAULT_UV);
+            item.state().render(matrices, vertexConsumers, LightmapTextureManager.MAX_LIGHT_COORDINATE, OverlayTexture.DEFAULT_UV);
             vertexConsumers.draw();
             matrices.pop();
             texture.clear();
@@ -97,17 +83,17 @@ public class ItemTransformElementRenderer extends SpecialGuiElementRenderer<Item
         state.addSimpleElementToCurrentLayer(new TexturedQuadGuiElementRenderState(
             RenderPipelines.GUI_TEXTURED_PREMULTIPLIED_ALPHA,
             TextureSetup.withoutGlTexture(texture.textureView()),
-            item.pose,
-            item.x1,
-            item.y1,
-            item.x2,
-            item.y2,
+            item.pose(),
+            item.x1(),
+            item.y1(),
+            item.x2(),
+            item.y2(),
             0.0F,
             1.0F,
             1.0F,
             0.0F,
             -1,
-            item.scissor,
+            item.scissor(),
             null
         ));
     }

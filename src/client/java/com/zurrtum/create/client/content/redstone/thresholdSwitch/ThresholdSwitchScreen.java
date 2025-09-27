@@ -3,6 +3,7 @@ package com.zurrtum.create.client.content.redstone.thresholdSwitch;
 import com.zurrtum.create.AllItems;
 import com.zurrtum.create.catnip.data.Iterate;
 import com.zurrtum.create.client.catnip.gui.AbstractSimiScreen;
+import com.zurrtum.create.client.catnip.gui.ScreenOpener;
 import com.zurrtum.create.client.catnip.gui.element.GuiGameElement;
 import com.zurrtum.create.client.catnip.gui.widget.AbstractSimiWidget;
 import com.zurrtum.create.client.catnip.gui.widget.ElementWidget;
@@ -12,6 +13,8 @@ import com.zurrtum.create.client.foundation.gui.widget.IconButton;
 import com.zurrtum.create.client.foundation.gui.widget.ScrollInput;
 import com.zurrtum.create.client.foundation.gui.widget.SelectionScrollInput;
 import com.zurrtum.create.client.foundation.utility.CreateLang;
+import com.zurrtum.create.client.infrastructure.ponder.AllCreatePonderTags;
+import com.zurrtum.create.client.ponder.foundation.ui.PonderTagScreen;
 import com.zurrtum.create.content.redstone.thresholdSwitch.ThresholdSwitchBlockEntity;
 import com.zurrtum.create.content.redstone.thresholdSwitch.ThresholdSwitchBlockEntity.ThresholdType;
 import com.zurrtum.create.content.redstone.thresholdSwitch.ThresholdSwitchObservable;
@@ -143,8 +146,7 @@ public class ThresholdSwitchScreen extends AbstractSimiScreen {
         int itemX = guiLeft + 13;
         int itemY = guiTop + 80;
         if (mouseX >= itemX && mouseX < itemX + 16 && mouseY >= itemY && mouseY < itemY + 16) {
-            //TODO
-            //            ScreenOpener.open(new PonderTagScreen(AllCreatePonderTags.THRESHOLD_SWITCH_TARGETS));
+            ScreenOpener.open(new PonderTagScreen(AllCreatePonderTags.THRESHOLD_SWITCH_TARGETS));
             return true;
         }
         return super.mouseClicked(mouseX, mouseY, pButton);

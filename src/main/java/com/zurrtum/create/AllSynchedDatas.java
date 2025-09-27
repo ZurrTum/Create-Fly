@@ -11,6 +11,7 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.data.*;
 import net.minecraft.entity.data.DataTracker.SerializedEntry;
 import net.minecraft.entity.passive.HorseEntity;
+import net.minecraft.entity.passive.ParrotEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.vehicle.AbstractMinecartEntity;
 import net.minecraft.item.ItemStack;
@@ -64,6 +65,7 @@ public class AllSynchedDatas {
     public static final Entry<NbtCompound> TOOLBOX = register(PlayerEntity.class, TrackedDataHandlerRegistry.NBT_COMPOUND, new NbtCompound());
     public static final Entry<Integer> LAST_OVERRIDE_LIMB_SWING_UPDATE = register(PlayerEntity.class, TrackedDataHandlerRegistry.INTEGER, -1);
     public static final Entry<Float> OVERRIDE_LIMB_SWING = register(PlayerEntity.class, TrackedDataHandlerRegistry.FLOAT, 0F);
+    public static final Entry<Boolean> PARROT_TRAIN_HAT = register(ParrotEntity.class, TrackedDataHandlerRegistry.BOOLEAN, false);
 
     private static <T> Entry<T> register(Class<? extends DataTracked> type, TrackedDataHandler<T> handler, T def) {
         return register(type, handler, def, null);

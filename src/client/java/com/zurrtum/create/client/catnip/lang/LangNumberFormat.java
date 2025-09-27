@@ -21,11 +21,10 @@ public class LangNumberFormat {
         return format;
     }
 
-    @SuppressWarnings("deprecation")
     public void update() {
         String selected = MinecraftClient.getInstance().getLanguageManager().getLanguage();
         final String[] langSplit = selected.split("_", 2);
-        Locale locale = langSplit.length == 1 ? new Locale(langSplit[0]) : new Locale(langSplit[0], langSplit[1]);
+        Locale locale = langSplit.length == 1 ? Locale.of(langSplit[0]) : Locale.of(langSplit[0], langSplit[1]);
         format = NumberFormat.getInstance(locale);
         format.setMaximumFractionDigits(2);
         format.setMinimumFractionDigits(0);

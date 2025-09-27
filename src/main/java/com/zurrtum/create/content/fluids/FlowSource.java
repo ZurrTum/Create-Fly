@@ -1,6 +1,7 @@
 package com.zurrtum.create.content.fluids;
 
 import com.zurrtum.create.catnip.math.BlockFace;
+import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
 import com.zurrtum.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.foundation.fluid.FluidHelper;
 import com.zurrtum.create.infrastructure.fluids.FluidInventory;
@@ -61,9 +62,8 @@ public abstract class FlowSource {
                     Direction side = location.getOppositeFace();
                     if (world instanceof ServerWorld serverWorld) {
                         fluidHandlerCache = FluidHelper.getFluidInventoryCache(serverWorld, pos, side);
-                        //TODO
-                        //                    } else if (world instanceof PonderLevel) {
-                        //                        fluidHandlerCache = () -> FluidHelper.getFluidInventory(world, pos, side);
+                    } else if (networkBE instanceof SmartBlockEntity smartBE && smartBE.isVirtual()) {
+                        fluidHandlerCache = () -> FluidHelper.getFluidInventory(world, pos, null, blockEntity, side);
                     }
                 }
             }

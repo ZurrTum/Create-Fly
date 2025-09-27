@@ -378,7 +378,7 @@ public class DeployerBlockEntity extends KineticBlockEntity {
         deferredInventoryList = view.read("Inventory", NbtCompound.CODEC).orElseGet(NbtCompound::new);
         overflowItems = new ArrayList<>();
         view.read("Overflow", CreateCodecs.ITEM_LIST_CODEC).ifPresent(overflowItems::addAll);
-        heldItem = view.read("HeldItem", ItemStack.CODEC).orElse(ItemStack.EMPTY);
+        view.read("HeldItem", ItemStack.CODEC).ifPresent(item -> heldItem = item);
         super.read(view, clientPacket);
 
         if (!clientPacket)

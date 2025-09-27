@@ -11,45 +11,43 @@ import org.joml.Matrix3x2f;
 
 import java.util.List;
 
-public class BlockTransformRenderState implements SpecialGuiElementRenderState {
-    public BlockState state;
-    public List<BlockModelPart> parts;
-    public boolean dirty;
-    public Matrix3x2f pose;
-    public ScreenRect bounds;
-    public int x1, y1, x2, y2, padding;
-    public float size, xRot, yRot, zRot;
-    public @Nullable ScreenRect scissor;
-
-    public void update(DrawContext graphics, BlockState block, float x, float y, float scale, int padding, float xRot, float yRot, float zRot) {
+public record BlockTransformRenderState(
+    BlockState state, List<BlockModelPart> parts, Matrix3x2f pose, ScreenRect bounds, int x1, int y1, int x2, int y2, int padding, float size,
+    float xRot, float yRot, float zRot, @Nullable ScreenRect scissor
+) implements SpecialGuiElementRenderState {
+    public static BlockTransformRenderState create(
+        DrawContext graphics,
+        BlockState block,
+        float x,
+        float y,
+        float scale,
+        int padding,
+        float xRot,
+        float yRot,
+        float zRot
+    ) {
         float size = scale * 16 + padding;
-        if (state != block) {
-            dirty = state != null;
-            state = block;
-            MinecraftClient mc = graphics.client;
-            parts = mc.getBlockRenderManager().getModel(state).getParts(mc.world.random);
-        } else if (size != this.size || xRot != this.xRot || yRot != this.yRot || zRot != this.zRot) {
-            dirty = true;
-        }
-        pose = new Matrix3x2f(graphics.getMatrices());
-        x1 = (int) x;
-        y1 = (int) y;
-        x2 = (int) (x + size);
-        y2 = (int) (y + size);
-        bounds = new ScreenRect(x1, y1, (int) size, (int) size).transformEachVertex(pose);
-        scissor = graphics.scissorStack.peekLast();
+        MinecraftClient mc = graphics.client;
+        List<BlockModelPart> parts = mc.getBlockRenderManager().getModel(block).getParts(mc.world.random);
+        Matrix3x2f pose = new Matrix3x2f(graphics.getMatrices());
+        int x1 = (int) x;
+        int y1 = (int) y;
+        int x2 = (int) (x + size);
+        int y2 = (int) (y + size);
+        ScreenRect bounds = new ScreenRect(x1, y1, (int) size, (int) size).transformEachVertex(pose);
+        ScreenRect scissor = graphics.scissorStack.peekLast();
         if (scissor != null) {
             bounds = bounds.intersection(scissor);
         }
-        this.size = size;
-        this.padding = padding;
-        this.xRot = xRot;
-        this.yRot = yRot;
-        this.zRot = zRot;
+        return new BlockTransformRenderState(block, parts, pose, bounds, x1, y1, x2, y2, padding, size, xRot, yRot, zRot, scissor);
     }
 
-    public void clearDirty() {
-        dirty = false;
+    public Object getKey() {
+        return List.of(state, size, padding, xRot, yRot, zRot);
+    }
+
+    public static Object getKey(BlockState state, float scale, int padding, float xRot, float yRot, float zRot) {
+        return List.of(state, scale * 16 + padding, padding, xRot, yRot, zRot);
     }
 
     @Override

@@ -6,6 +6,7 @@ import com.llamalad7.mixinextras.sugar.Share;
 import com.llamalad7.mixinextras.sugar.ref.LocalRef;
 import com.zurrtum.create.client.foundation.item.TooltipModifier;
 import com.zurrtum.create.client.infrastructure.config.AllConfigs;
+import com.zurrtum.create.client.ponder.foundation.PonderTooltipHandler;
 import com.zurrtum.create.content.contraptions.glue.SuperGlueHandler;
 import com.zurrtum.create.content.equipment.symmetryWand.SymmetryHandler;
 import net.minecraft.component.DataComponentTypes;
@@ -31,6 +32,7 @@ public abstract class ItemStackMixin {
 
     @ModifyReturnValue(method = "getTooltip", at = @At("RETURN"))
     private List<Text> appendTooltip(List<Text> tooltip, @Local(argsOnly = true) PlayerEntity player) {
+        PonderTooltipHandler.addToTooltip(tooltip, (ItemStack) (Object) this);
         if (!AllConfigs.client().tooltips.get() || player == null)
             return tooltip;
         TooltipModifier modifier = TooltipModifier.REGISTRY.get(getItem());

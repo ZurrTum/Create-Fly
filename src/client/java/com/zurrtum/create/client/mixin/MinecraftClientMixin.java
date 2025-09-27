@@ -62,6 +62,8 @@ import com.zurrtum.create.client.foundation.blockEntity.behaviour.scrollValue.Sc
 import com.zurrtum.create.client.foundation.sound.SoundScapes;
 import com.zurrtum.create.client.foundation.utility.ServerSpeedProvider;
 import com.zurrtum.create.client.model.obj.ObjLoader;
+import com.zurrtum.create.client.ponder.foundation.PonderIndex;
+import com.zurrtum.create.client.ponder.foundation.PonderTooltipHandler;
 import com.zurrtum.create.content.contraptions.minecart.CouplingPhysics;
 import com.zurrtum.create.content.contraptions.minecart.capability.CapabilityMinecartController;
 import com.zurrtum.create.content.kinetics.drill.CobbleGenOptimisation;
@@ -156,6 +158,7 @@ public class MinecraftClientMixin {
     @Inject(method = "tick()V", at = @At("HEAD"))
     private void tickPre(CallbackInfo ci) {
         AnimationTickHolder.tick();
+        PonderTooltipHandler.tick();
         if (world == null || player == null) {
             return;
         }
@@ -295,5 +298,10 @@ public class MinecraftClientMixin {
         if (ToolboxHandlerClient.onPickItem((MinecraftClient) (Object) this)) {
             ci.cancel();
         }
+    }
+
+    @Inject(method = "run()V", at = @At(value = "INVOKE", target = "Ljava/lang/Runtime;getRuntime()Ljava/lang/Runtime;"))
+    private void run(CallbackInfo ci) {
+        PonderIndex.registerAll();
     }
 }

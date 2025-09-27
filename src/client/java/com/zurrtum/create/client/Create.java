@@ -10,8 +10,10 @@ import com.zurrtum.create.client.content.schematics.client.SchematicAndQuillHand
 import com.zurrtum.create.client.content.schematics.client.SchematicHandler;
 import com.zurrtum.create.client.flywheel.impl.Flywheel;
 import com.zurrtum.create.client.foundation.blockEntity.ValueSettingsClient;
+import com.zurrtum.create.client.foundation.ponder.CreatePonderPlugin;
 import com.zurrtum.create.client.infrastructure.config.AllConfigs;
 import com.zurrtum.create.client.ponder.Ponder;
+import com.zurrtum.create.client.ponder.foundation.PonderIndex;
 import com.zurrtum.create.client.vanillin.Vanillin;
 import com.zurrtum.create.content.trains.GlobalRailwayManager;
 import net.fabricmc.api.ClientModInitializer;
@@ -69,6 +71,7 @@ public class Create implements ClientModInitializer {
         AllScheduleRenders.register();
         AllMenuScreens.register();
         AllPotatoProjectileTransforms.register();
+        PonderIndex.addPlugin(new CreatePonderPlugin());
     }
 
     public static Identifier asResource(String path) {

@@ -1,9 +1,11 @@
 package com.zurrtum.create.client.content.trains.track;
 
+import com.zurrtum.create.catnip.levelWrappers.SchematicLevel;
 import com.zurrtum.create.client.catnip.render.CachedBuffers;
 import com.zurrtum.create.client.flywheel.lib.model.baked.PartialModel;
 import com.zurrtum.create.client.flywheel.lib.transform.Affine;
 import com.zurrtum.create.client.flywheel.lib.transform.TransformStack;
+import com.zurrtum.create.client.ponder.api.level.PonderLevel;
 import com.zurrtum.create.content.trains.track.TrackTargetingBehaviour.RenderedTrackOverlayType;
 import com.zurrtum.create.infrastructure.component.BezierTrackPointLocation;
 import net.minecraft.block.BlockState;
@@ -43,9 +45,8 @@ public interface TrackBlockRenderer {
         RenderedTrackOverlayType type,
         float scale
     ) {
-        //TODO
-        //        if (level instanceof SchematicLevel && !(level instanceof PonderLevel))
-        //            return;
+        if (level instanceof SchematicLevel && !(level instanceof PonderLevel))
+            return;
 
         ms.push();
         var msr = TransformStack.of(ms);

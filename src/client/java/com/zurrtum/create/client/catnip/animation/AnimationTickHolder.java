@@ -1,5 +1,8 @@
 package com.zurrtum.create.client.catnip.animation;
 
+import com.zurrtum.create.client.catnip.levelWrappers.WrappedClientLevel;
+import com.zurrtum.create.client.ponder.api.level.PonderLevel;
+import com.zurrtum.create.client.ponder.foundation.ui.PonderUI;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.RenderTickCounter;
 import net.minecraft.world.WorldAccess;
@@ -31,21 +34,18 @@ public class AnimationTickHolder {
     }
 
     public static int getTicks(WorldAccess level) {
-        //TODO
-        //        if (level instanceof WrappedClientLevel wrappedLevel) {
-        //            return getTicks(wrappedLevel.getWrappedLevel());
-        //        }
-        //        else if (level instanceof PonderLevel) {
-        //            return PonderUI.ponderTicks;
-        //        }
+        if (level instanceof WrappedClientLevel wrappedLevel) {
+            return getTicks(wrappedLevel.getWrappedLevel());
+        } else if (level instanceof PonderLevel) {
+            return PonderUI.ponderTicks;
+        }
         return getTicks();
     }
 
     public static float getPartialTicks(WorldAccess level) {
-        //TODO
-        //        if (level instanceof PonderLevel) {
-        //            return PonderUI.getPartialTicks();
-        //        }
+        if (level instanceof PonderLevel) {
+            return PonderUI.getPartialTicks();
+        }
         return getPartialTicks();
     }
 

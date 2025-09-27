@@ -11,14 +11,12 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.util.Window;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.MathHelper;
 import org.apache.commons.lang3.mutable.MutableBoolean;
 import org.apache.commons.lang3.mutable.MutableInt;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix3x2fStack;
-import org.joml.Matrix4f;
 import org.lwjgl.glfw.GLFW;
 
 import java.util.ArrayList;
@@ -46,6 +44,13 @@ public abstract class NavigatableSimiScreen extends AbstractSimiScreen {
     public void close() {
         ScreenOpener.clearStack();
         super.close();
+    }
+
+    @Override
+    public void removed() {
+        if (backTrack != null) {
+            backTrack.getRenderElement().clear();
+        }
     }
 
     @Override
@@ -100,7 +105,7 @@ public abstract class NavigatableSimiScreen extends AbstractSimiScreen {
 
         Matrix3x2fStack poseStack = graphics.getMatrices();
 
-        int x = (int) MathHelper.lerp(arrowAnimation.getValue(partialTicks), -9, 21);
+        int x = MathHelper.lerp(arrowAnimation.getValue(partialTicks), -9, 21);
         int maxX = backTrack.getX() + backTrack.getWidth();
         Couple<Color> colors = COLOR_NAV_ARROW;
 
@@ -142,11 +147,8 @@ public abstract class NavigatableSimiScreen extends AbstractSimiScreen {
     @Override
     protected void renderWindowBackground(DrawContext graphics, int mouseX, int mouseY, float partialTicks) {
         if (transition.getChaseTarget() == 0 || transition.settled()) {
-            renderBackground(graphics, mouseX, mouseY, partialTicks);
             return;
         }
-
-        renderBackground(graphics, mouseX, mouseY, partialTicks);
 
         Matrix3x2fStack ms = graphics.getMatrices();
 
@@ -159,7 +161,7 @@ public abstract class NavigatableSimiScreen extends AbstractSimiScreen {
         float tValueAbsolute = Math.abs(tValue);
 
         // draw last screen into buffer
-        if (lastScreen != null && lastScreen != this && !transition.settled()) {
+        /*if (lastScreen != null && lastScreen != this && !transition.settled()) {
             currentlyRenderingPreviousScreen = true;
             ms.pushMatrix();
             lastScreen.render(graphics, 0, 0, partialTicks);
@@ -186,7 +188,7 @@ public abstract class NavigatableSimiScreen extends AbstractSimiScreen {
             UIRenderHelper.drawFramebuffer(poseStack2, 1f - tValueAbsolute);
             ms.popMatrix();
             currentlyRenderingPreviousScreen = false;
-        }
+        }*/
 
         // modify current screen as well
         float scale = tValue > 0 ? 1 - 0.5f * (1 - tValueAbsolute) : 1 + .5f * (1 - tValueAbsolute);

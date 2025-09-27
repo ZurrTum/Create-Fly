@@ -3,6 +3,7 @@ package com.zurrtum.create.client.mixin;
 import com.google.common.collect.Lists;
 import com.zurrtum.create.client.AllKeys;
 import com.zurrtum.create.client.flywheel.backend.engine.uniform.OptionsUniforms;
+import com.zurrtum.create.client.ponder.enums.PonderKeybinds;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.option.GameOptions;
 import net.minecraft.client.option.KeyBinding;
@@ -28,9 +29,12 @@ public class GameOptionsMixin {
     private void wrapAddAll(MinecraftClient client, File optionsFile, CallbackInfo ci) {
         int index = KeyBinding.CATEGORY_ORDER_MAP.values().stream().max(Integer::compareTo).orElse(0) + 1;
         KeyBinding.CATEGORY_ORDER_MAP.put(AllKeys.CATEGORY, index);
+        KeyBinding.CATEGORY_ORDER_MAP.put(PonderKeybinds.CATEGORY, index + 1);
         List<KeyBinding> keys = Lists.newArrayList(allKeys);
         keys.removeAll(AllKeys.ALL);
         keys.addAll(AllKeys.ALL);
+        keys.remove(PonderKeybinds.PONDER);
+        keys.add(PonderKeybinds.PONDER);
         allKeys = keys.toArray(KeyBinding[]::new);
     }
 

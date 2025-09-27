@@ -16,11 +16,11 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RotationAxis;
 
-import java.util.IdentityHashMap;
+import java.util.HashMap;
 import java.util.Map;
 
 public class BlockTransformElementRenderer extends SpecialGuiElementRenderer<BlockTransformRenderState> {
-    private static final Map<BlockTransformRenderState, GpuTexture> TEXTURES = new IdentityHashMap<>();
+    private static final Map<Object, GpuTexture> TEXTURES = new HashMap<>();
     private final MatrixStack matrices = new MatrixStack();
     private int windowScaleFactor;
 
@@ -28,8 +28,8 @@ public class BlockTransformElementRenderer extends SpecialGuiElementRenderer<Blo
         super(vertexConsumers);
     }
 
-    public static void clear(BlockTransformRenderState block) {
-        GpuTexture texture = TEXTURES.remove(block);
+    public static void clear(Object key) {
+        GpuTexture texture = TEXTURES.remove(key);
         if (texture != null) {
             texture.close();
         }
@@ -42,51 +42,41 @@ public class BlockTransformElementRenderer extends SpecialGuiElementRenderer<Blo
             TEXTURES.values().forEach(GpuTexture::close);
             TEXTURES.clear();
         }
-        GpuTexture texture = TEXTURES.get(block);
-        boolean draw = texture == null || block.dirty;
-        if (draw) {
-            float size = block.size * windowScaleFactor;
-            if (block.dirty) {
-                block.clearDirty();
-                if (texture != null && texture.width() != size) {
-                    texture.close();
-                    texture = null;
-                }
-            }
-            if (texture == null) {
-                texture = GpuTexture.create((int) size);
-                TEXTURES.put(block, texture);
-            }
+        GpuTexture texture = TEXTURES.get(block.getKey());
+        if (texture == null) {
+            float size = block.size() * windowScaleFactor;
+            texture = GpuTexture.create((int) size);
+            TEXTURES.put(block, texture);
             RenderSystem.setProjectionMatrix(projectionMatrix.set(size, size), ProjectionType.ORTHOGRAPHIC);
             texture.prepare();
             matrices.push();
             matrices.translate(size / 2, size / 2, 0);
-            if (block.padding != 0) {
-                size -= block.padding * windowScaleFactor;
+            if (block.padding() != 0) {
+                size -= block.padding() * windowScaleFactor;
             }
             matrices.scale(size, size, size);
-            if (block.zRot != 0) {
-                matrices.multiply(RotationAxis.POSITIVE_Z.rotation(block.zRot));
+            if (block.zRot() != 0) {
+                matrices.multiply(RotationAxis.POSITIVE_Z.rotation(block.zRot()));
             }
-            if (block.xRot != 0) {
-                matrices.multiply(RotationAxis.POSITIVE_X.rotation(block.xRot));
+            if (block.xRot() != 0) {
+                matrices.multiply(RotationAxis.POSITIVE_X.rotation(block.xRot()));
             }
-            if (block.yRot != 0) {
-                matrices.multiply(RotationAxis.POSITIVE_Y.rotation(block.yRot));
+            if (block.yRot() != 0) {
+                matrices.multiply(RotationAxis.POSITIVE_Y.rotation(block.yRot()));
             }
             matrices.scale(1, -1, 1);
             matrices.translate(-0.5F, -0.5F, -0.5F);
             MinecraftClient mc = MinecraftClient.getInstance();
             RenderLayer layer;
-            if (block.state.isOf(Blocks.REDSTONE_TORCH) && block.state.get(RedstoneTorchBlock.LIT)) {
+            if (block.state().isOf(Blocks.REDSTONE_TORCH) && block.state().get(RedstoneTorchBlock.LIT)) {
                 layer = RenderLayer.getCutout();
             } else {
-                layer = RenderLayers.getBlockLayer(block.state) == BlockRenderLayer.TRANSLUCENT ? TexturedRenderLayers.getItemEntityTranslucentCull() : TexturedRenderLayers.getEntityCutout();
+                layer = RenderLayers.getBlockLayer(block.state()) == BlockRenderLayer.TRANSLUCENT ? TexturedRenderLayers.getItemEntityTranslucentCull() : TexturedRenderLayers.getEntityCutout();
             }
             SinglePosVirtualBlockGetter world = SinglePosVirtualBlockGetter.createFullBright();
-            world.blockState(block.state);
+            world.blockState(block.state());
             mc.getBlockRenderManager()
-                .renderBlock(block.state, BlockPos.ORIGIN, world, matrices, vertexConsumers.getBuffer(layer), false, block.parts);
+                .renderBlock(block.state(), BlockPos.ORIGIN, world, matrices, vertexConsumers.getBuffer(layer), false, block.parts());
             vertexConsumers.draw();
             matrices.pop();
             texture.clear();
@@ -94,17 +84,17 @@ public class BlockTransformElementRenderer extends SpecialGuiElementRenderer<Blo
         state.addSimpleElementToCurrentLayer(new TexturedQuadGuiElementRenderState(
             RenderPipelines.GUI_TEXTURED_PREMULTIPLIED_ALPHA,
             TextureSetup.withoutGlTexture(texture.textureView()),
-            block.pose,
-            block.x1,
-            block.y1,
-            block.x2,
-            block.y2,
+            block.pose(),
+            block.x1(),
+            block.y1(),
+            block.x2(),
+            block.y2(),
             0.0F,
             1.0F,
             1.0F,
             0.0F,
             -1,
-            block.scissor,
+            block.scissor(),
             null
         ));
     }

@@ -5,6 +5,7 @@ import com.zurrtum.create.client.AllPartialModels;
 import com.zurrtum.create.client.flywheel.lib.model.baked.PartialModel;
 import com.zurrtum.create.client.foundation.model.BakedQuadHelper;
 import com.zurrtum.create.client.model.NormalsBakedQuad;
+import com.zurrtum.create.client.ponder.api.level.PonderLevel;
 import com.zurrtum.create.content.logistics.factoryBoard.FactoryPanelBlock;
 import com.zurrtum.create.content.logistics.factoryBoard.FactoryPanelPosition;
 import com.zurrtum.create.content.logistics.factoryBoard.PanelSlot;
@@ -33,7 +34,7 @@ public class FactoryPanelModel extends WrapperBlockStateModel {
     @Override
     public void addPartsWithInfo(BlockRenderView world, BlockPos pos, BlockState state, Random random, List<BlockModelPart> parts) {
         model.addParts(random, parts);
-        boolean ponder = false;//TODO world instanceof PonderLevel;
+        boolean ponder = world instanceof PonderLevel;
         for (PanelSlot slot : PanelSlot.values()) {
             ServerFactoryPanelBehaviour behaviour = ServerFactoryPanelBehaviour.at(world, new FactoryPanelPosition(pos, slot));
             if (behaviour == null)

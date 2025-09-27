@@ -262,7 +262,9 @@ public class UIRenderHelper {
             fc1,
             fc2,
             fc3,
-            fc4
+            fc4,
+            indent + width,
+            height
         ));
     }
 

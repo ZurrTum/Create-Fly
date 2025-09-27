@@ -16,6 +16,7 @@ import com.zurrtum.create.client.flywheel.lib.model.baked.PartialModel;
 import com.zurrtum.create.client.flywheel.lib.transform.TransformStack;
 import com.zurrtum.create.client.foundation.blockEntity.renderer.SafeBlockEntityRenderer;
 import com.zurrtum.create.client.foundation.render.ShadowRenderHelper;
+import com.zurrtum.create.client.ponder.api.level.PonderLevel;
 import com.zurrtum.create.content.kinetics.belt.*;
 import com.zurrtum.create.content.kinetics.belt.transport.BeltInventory;
 import com.zurrtum.create.content.kinetics.belt.transport.TransportedItemStack;
@@ -308,8 +309,7 @@ public class BeltRenderer extends SafeBlockEntityRenderer<BeltBlockEntity> {
         boolean blockItem = itemRenderer.itemRenderState.isSideLit();
 
         int count = 0;
-        //TODO
-        if (/*be.getWorld() instanceof PonderLevel || */mc.player.getCameraPosVec(1.0F).distanceTo(itemPos) < 16)
+        if (be.getWorld() instanceof PonderLevel || mc.player.getCameraPosVec(1.0F).distanceTo(itemPos) < 16)
             count = MathHelper.floorLog2(transported.stack.getCount()) / 2;
 
         Random r = new Random(transported.angle);

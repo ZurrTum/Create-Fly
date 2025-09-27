@@ -1,5 +1,6 @@
 package com.zurrtum.create.client.foundation.blockEntity.renderer;
 
+import com.zurrtum.create.client.ponder.api.level.PonderLevel;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.client.MinecraftClient;
@@ -27,9 +28,8 @@ public abstract class SafeBlockEntityRenderer<T extends BlockEntity> implements 
     }
 
     public boolean shouldCullItem(Vec3d itemPos, World level) {
-        //TODO
-        //        if (level instanceof PonderLevel)
-        //            return false;
+        if (level instanceof PonderLevel)
+            return false;
 
         WorldRenderer accessor = MinecraftClient.getInstance().worldRenderer;
         Frustum frustum = accessor.capturedFrustum != null ? accessor.capturedFrustum : accessor.frustum;

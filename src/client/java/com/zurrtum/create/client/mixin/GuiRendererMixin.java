@@ -6,6 +6,10 @@ import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
 import com.zurrtum.create.client.catnip.gui.render.*;
 import com.zurrtum.create.client.foundation.gui.render.*;
+import com.zurrtum.create.client.ponder.foundation.render.SceneRenderState;
+import com.zurrtum.create.client.ponder.foundation.render.SceneRenderer;
+import com.zurrtum.create.client.ponder.foundation.render.TitleTextRenderState;
+import com.zurrtum.create.client.ponder.foundation.render.TitleTextRenderer;
 import net.minecraft.client.gui.render.GuiRenderer;
 import net.minecraft.client.gui.render.SpecialGuiElementRenderer;
 import net.minecraft.client.gui.render.state.special.SpecialGuiElementRenderState;
@@ -38,6 +42,8 @@ public class GuiRendererMixin {
         builder.put(CrafterRenderState.class, new CrafterRenderer(vertexConsumers));
         builder.put(DrainRenderState.class, new DrainRenderer(vertexConsumers));
         builder.put(SandPaperRenderState.class, new SandPaperRenderer(vertexConsumers));
+        builder.put(TitleTextRenderState.class, new TitleTextRenderer(vertexConsumers));
+        builder.put(SceneRenderState.class, new SceneRenderer(vertexConsumers));
         return builder;
     }
 }
