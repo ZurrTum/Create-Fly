@@ -42,10 +42,12 @@ public class ItemTransformElementRenderer extends SpecialGuiElementRenderer<Item
             TEXTURES.clear();
         }
         float size = item.size() * windowScaleFactor;
-        GpuTexture texture = TEXTURES.get(item.getKey());
+        Object key = item.getKey();
+        GpuTexture texture = TEXTURES.get(key);
         boolean draw;
         if (texture == null) {
             texture = GpuTexture.create((int) size);
+            TEXTURES.put(key, texture);
             draw = true;
         } else {
             draw = item.state().isAnimated();
