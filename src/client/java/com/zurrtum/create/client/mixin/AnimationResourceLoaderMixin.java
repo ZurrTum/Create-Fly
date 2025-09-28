@@ -1,0 +1,96 @@
+package com.zurrtum.create.client.mixin;
+
+import com.holdmyitems.source.Holdmyitems;
+import com.holdmyitems.source.resource_controller.AnimationResourceLoader;
+import com.zurrtum.create.AllItems;
+import net.minecraft.resource.ResourceManager;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+
+@Mixin(AnimationResourceLoader.class)
+public class AnimationResourceLoaderMixin {
+    @Inject(method = "reload(Lnet/minecraft/resource/ResourceManager;)V", at = @At("TAIL"))
+    private void reload(ResourceManager manager, CallbackInfo ci) {
+        Holdmyitems.renderAsBlock.put(AllItems.ADJUSTABLE_CHAIN_GEARSHIFT.toString(), false);
+        Holdmyitems.renderAsBlock.put(AllItems.ANALOG_LEVER.toString(), false);
+        Holdmyitems.renderAsBlock.put(AllItems.BELT_CONNECTOR.toString(), false);
+        Holdmyitems.renderAsBlock.put(AllItems.BLAZE_BURNER.toString(), false);
+        Holdmyitems.renderAsBlock.put(AllItems.WHITE_TOOLBOX.toString(), false);
+        Holdmyitems.renderAsBlock.put(AllItems.ORANGE_TOOLBOX.toString(), false);
+        Holdmyitems.renderAsBlock.put(AllItems.MAGENTA_TOOLBOX.toString(), false);
+        Holdmyitems.renderAsBlock.put(AllItems.LIGHT_BLUE_TOOLBOX.toString(), false);
+        Holdmyitems.renderAsBlock.put(AllItems.YELLOW_TOOLBOX.toString(), false);
+        Holdmyitems.renderAsBlock.put(AllItems.LIME_TOOLBOX.toString(), false);
+        Holdmyitems.renderAsBlock.put(AllItems.PINK_TOOLBOX.toString(), false);
+        Holdmyitems.renderAsBlock.put(AllItems.GRAY_TOOLBOX.toString(), false);
+        Holdmyitems.renderAsBlock.put(AllItems.LIGHT_GRAY_TOOLBOX.toString(), false);
+        Holdmyitems.renderAsBlock.put(AllItems.CYAN_TOOLBOX.toString(), false);
+        Holdmyitems.renderAsBlock.put(AllItems.PURPLE_TOOLBOX.toString(), false);
+        Holdmyitems.renderAsBlock.put(AllItems.BLUE_TOOLBOX.toString(), false);
+        Holdmyitems.renderAsBlock.put(AllItems.BROWN_TOOLBOX.toString(), false);
+        Holdmyitems.renderAsBlock.put(AllItems.GREEN_TOOLBOX.toString(), false);
+        Holdmyitems.renderAsBlock.put(AllItems.RED_TOOLBOX.toString(), false);
+        Holdmyitems.renderAsBlock.put(AllItems.BLACK_TOOLBOX.toString(), false);
+        Holdmyitems.renderAsBlock.put(AllItems.CHAIN_CONVEYOR.toString(), false);
+        Holdmyitems.renderAsBlock.put(AllItems.CLUTCH.toString(), false);
+        Holdmyitems.renderAsBlock.put(AllItems.CLOCKWORK_BEARING.toString(), false);
+        Holdmyitems.renderAsBlock.put(AllItems.COPPER_BACKTANK.toString(), false);
+        Holdmyitems.renderAsBlock.put(AllItems.CREATIVE_MOTOR.toString(), false);
+        Holdmyitems.renderAsBlock.put(AllItems.CUCKOO_CLOCK.toString(), false);
+        Holdmyitems.renderAsBlock.put(AllItems.DEPLOYER.toString(), false);
+        Holdmyitems.renderAsBlock.put(AllItems.DISPLAY_BOARD.toString(), false);
+        Holdmyitems.renderAsBlock.put(AllItems.ENCASED_CHAIN_DRIVE.toString(), false);
+        Holdmyitems.renderAsBlock.put(AllItems.ENCASED_FAN.toString(), false);
+        Holdmyitems.renderAsBlock.put(AllItems.ELEVATOR_PULLEY.toString(), false);
+        Holdmyitems.renderAsBlock.put(AllItems.FACTORY_GAUGE.toString(), false);
+        Holdmyitems.renderAsBlock.put(AllItems.FLUID_PIPE.toString(), false);
+        Holdmyitems.renderAsBlock.put(AllItems.FLUID_VALVE.toString(), false);
+        Holdmyitems.renderAsBlock.put(AllItems.GANTRY_CARRIAGE.toString(), false);
+        Holdmyitems.renderAsBlock.put(AllItems.GEARBOX.toString(), false);
+        Holdmyitems.renderAsBlock.put(AllItems.GEARSHIFT.toString(), false);
+        Holdmyitems.renderAsBlock.put(AllItems.HAUNTED_BELL.toString(), false);
+        Holdmyitems.renderAsBlock.put(AllItems.HAND_CRANK.toString(), false);
+        Holdmyitems.renderAsBlock.put(AllItems.HOSE_PULLEY.toString(), false);
+        Holdmyitems.renderAsBlock.put(AllItems.MECHANICAL_ARM.toString(), false);
+        Holdmyitems.renderAsBlock.put(AllItems.MECHANICAL_BEARING.toString(), false);
+        Holdmyitems.renderAsBlock.put(AllItems.MECHANICAL_CRAFTER.toString(), false);
+        Holdmyitems.renderAsBlock.put(AllItems.MECHANICAL_DRILL.toString(), false);
+        Holdmyitems.renderAsBlock.put(AllItems.MECHANICAL_HARVESTER.toString(), false);
+        Holdmyitems.renderAsBlock.put(AllItems.MECHANICAL_MIXER.toString(), false);
+        Holdmyitems.renderAsBlock.put(AllItems.MECHANICAL_PISTON.toString(), false);
+        Holdmyitems.renderAsBlock.put(AllItems.MECHANICAL_PRESS.toString(), false);
+        Holdmyitems.renderAsBlock.put(AllItems.MECHANICAL_PUMP.toString(), false);
+        Holdmyitems.renderAsBlock.put(AllItems.MECHANICAL_ROLLER.toString(), false);
+        Holdmyitems.renderAsBlock.put(AllItems.MECHANICAL_SAW.toString(), false);
+        Holdmyitems.renderAsBlock.put(AllItems.MILLSTONE.toString(), false);
+        Holdmyitems.renderAsBlock.put(AllItems.NETHERITE_BACKTANK.toString(), false);
+        Holdmyitems.renderAsBlock.put(AllItems.ORANGE_NIXIE_TUBE.toString(), false);
+        Holdmyitems.renderAsBlock.put(AllItems.PACKAGE_FROGPORT.toString(), false);
+        Holdmyitems.renderAsBlock.put(AllItems.PECULIAR_BELL.toString(), false);
+        Holdmyitems.renderAsBlock.put(AllItems.ROPE_PULLEY.toString(), false);
+        Holdmyitems.renderAsBlock.put(AllItems.ROTATION_SPEED_CONTROLLER.toString(), false);
+        Holdmyitems.renderAsBlock.put(AllItems.SCHEMATICANNON.toString(), false);
+        Holdmyitems.renderAsBlock.put(AllItems.SEQUENCED_GEARSHIFT.toString(), false);
+        Holdmyitems.renderAsBlock.put(AllItems.SMART_CHUTE.toString(), false);
+        Holdmyitems.renderAsBlock.put(AllItems.SMART_FLUID_PIPE.toString(), false);
+        Holdmyitems.renderAsBlock.put(AllItems.SPEEDOMETER.toString(), false);
+        Holdmyitems.renderAsBlock.put(AllItems.STEAM_ENGINE.toString(), false);
+        Holdmyitems.renderAsBlock.put(AllItems.STEAM_WHISTLE.toString(), false);
+        Holdmyitems.renderAsBlock.put(AllItems.STICKY_MECHANICAL_PISTON.toString(), false);
+        Holdmyitems.renderAsBlock.put(AllItems.STRESSOMETER.toString(), false);
+        Holdmyitems.renderAsBlock.put(AllItems.TRACK_SIGNAL.toString(), false);
+        Holdmyitems.renderAsBlock.put(AllItems.VERTICAL_GEARBOX.toString(), false);
+        Holdmyitems.renderAsBlock.put(AllItems.WATER_WHEEL.toString(), false);
+        Holdmyitems.renderAsBlock.put(AllItems.WEIGHTED_EJECTOR.toString(), false);
+        Holdmyitems.renderAsBlock.put(AllItems.WINDMILL_BEARING.toString(), false);
+        Holdmyitems.renderAsBlock.put(AllItems.PACKAGER.toString(), false);
+        Holdmyitems.renderAsBlock.put(AllItems.REPACKAGER.toString(), false);
+        Holdmyitems.renderAsBlock.put(AllItems.ANDESITE_FUNNEL.toString(), false);
+        Holdmyitems.renderAsBlock.put(AllItems.BRASS_FUNNEL.toString(), false);
+        Holdmyitems.renderAsBlock.put(AllItems.ANDESITE_TUNNEL.toString(), false);
+        Holdmyitems.renderAsBlock.put(AllItems.BRASS_TUNNEL.toString(), false);
+        Holdmyitems.renderAsBlock.put(AllItems.LINKED_CONTROLLER.toString(), false);
+    }
+}

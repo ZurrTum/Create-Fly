@@ -72,7 +72,7 @@ public class ExtendoGripRenderHandler {
 
         ms.push();
         if (hand == Hand.MAIN_HAND) {
-            if (1 - swingProgress > mainHandAnimation && swingProgress > 0)
+            if (1 - swingProgress > mainHandAnimation && swingProgress > 0 && swingProgress < 0.1)
                 mainHandAnimation = 0.95f;
 
             ms.translate(flip * (0.64000005F - .1f), -0.4F + equipProgress * -0.6F, -0.71999997F + .3f);
