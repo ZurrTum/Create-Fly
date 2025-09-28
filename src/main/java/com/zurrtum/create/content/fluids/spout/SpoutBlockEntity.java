@@ -128,7 +128,9 @@ public class SpoutBlockEntity extends SmartBlockEntity {
                 award(AllAdvancements.FOODS);
         }
 
-        tank.getPrimaryHandler().setFluid(fluid);
+        SmartFluidTankBehaviour.TankSegment primaryHandler = tank.getPrimaryHandler();
+        primaryHandler.setFluid(fluid);
+        primaryHandler.markDirty();
         sendSplash = true;
         notifyUpdate();
         return HOLD;

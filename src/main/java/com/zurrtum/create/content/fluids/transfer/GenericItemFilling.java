@@ -25,7 +25,13 @@ public class GenericItemFilling {
             if (capability == null) {
                 return false;
             }
-            return capability.stream().anyMatch(fluidStack -> fluidStack.getAmount() < capability.getMaxAmount(fluidStack));
+            for (int i = 0, size = capability.size(); i < size; i++) {
+                FluidStack fluidStack = capability.getStack(i);
+                if (fluidStack.getAmount() < capability.getMaxAmount(fluidStack)) {
+                    return true;
+                }
+            }
+            return false;
         }
     }
 
@@ -53,7 +59,6 @@ public class GenericItemFilling {
     public static ItemStack fillItem(World world, int requiredAmount, ItemStack stack, FluidStack availableFluid) {
         FluidStack toFill = availableFluid.copy();
         toFill.setAmount(requiredAmount);
-        availableFluid.decrement(requiredAmount);
 
         if (stack.getItem() == Items.GLASS_BOTTLE && canFillGlassBottleInternally(toFill)) {
             ItemStack fillBottle;
@@ -64,17 +69,22 @@ public class GenericItemFilling {
                 fillBottle = AllItems.BUILDERS_TEA.getDefaultStack();
             else
                 fillBottle = PotionFluidHandler.fillBottle(stack, toFill);
+            availableFluid.decrement(requiredAmount);
             stack.decrement(1);
             return fillBottle;
         }
 
         try (FluidItemInventory capability = FluidHelper.getFluidInventory(stack.copyWithCount(1))) {
-            if (capability == null)
+            if (capability == null) {
                 return ItemStack.EMPTY;
-            capability.insert(toFill);
-            ItemStack container = capability.getContainer();
+            }
+            int insert = capability.insert(toFill);
+            if (insert == 0) {
+                return ItemStack.EMPTY;
+            }
+            availableFluid.decrement(insert);
             stack.decrement(1);
-            return container;
+            return capability.getContainer();
         }
     }
 
