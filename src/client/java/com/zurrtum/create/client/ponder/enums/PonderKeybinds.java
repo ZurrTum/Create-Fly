@@ -13,6 +13,7 @@ public class PonderKeybinds {
     private static KeyBinding register(String name, int code) {
         KeyBinding keyBinding = new KeyBinding(name, GLFW.GLFW_KEY_UNKNOWN, CATEGORY);
         Key key = InputUtil.Type.KEYSYM.createFromCode(code);
+        keyBinding.defaultKey = key;
         keyBinding.setBoundKey(key);
         return keyBinding;
     }

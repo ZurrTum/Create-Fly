@@ -37,6 +37,7 @@
     "ItemStackMixin",
     "JsonUnbakedModelDeserializerMixin",
     "JsonUnbakedModelMixin",
+    "KeyBindingMixin",
     "KeyboardMixin",
     "LivingEntityMixin",
     "LivingEntityRendererMixin",
