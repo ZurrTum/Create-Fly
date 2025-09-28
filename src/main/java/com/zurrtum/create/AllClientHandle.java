@@ -274,7 +274,6 @@ public class AllClientHandle<T> {
     }
 
     public void addBehaviours(SmartBlockEntity blockEntity, ArrayList<BlockEntityBehaviour<?>> behaviours) {
-        warn();
     }
 
     public void addBehaviours(Entity entity, ArrayList<EntityBehaviour<?>> behaviours) {
