@@ -948,7 +948,9 @@ public interface FluidInventory extends Clearable, Iterable<FluidStack> {
 
     @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
     default FluidStack removeMaxSize(FluidStack stack, Optional<Integer> max) {
-        stack.directComponents().changedComponents.remove(AllDataComponents.FLUID_MAX_CAPACITY, max);
+        MergedComponentMap components = stack.directComponents();
+        components.onWrite();
+        components.changedComponents.remove(AllDataComponents.FLUID_MAX_CAPACITY, max);
         return stack;
     }
 

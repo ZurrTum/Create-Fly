@@ -1374,7 +1374,9 @@ public interface BaseInventory extends Clearable, Iterable<ItemStack> {
 
     @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
     default ItemStack removeMaxSize(ItemStack stack, Optional<Integer> max) {
-        stack.components.changedComponents.remove(DataComponentTypes.MAX_STACK_SIZE, max);
+        MergedComponentMap components = stack.components;
+        components.onWrite();
+        components.changedComponents.remove(DataComponentTypes.MAX_STACK_SIZE, max);
         return stack;
     }
 
