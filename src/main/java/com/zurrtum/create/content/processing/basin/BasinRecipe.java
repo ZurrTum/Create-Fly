@@ -156,7 +156,7 @@ public interface BasinRecipe extends Recipe<BasinInput> {
 
     static boolean matchFluidIngredient(BasinInput input, @Nullable FluidIngredient ingredient) {
         if (ingredient == null) {
-            return false;
+            return true;
         }
         int remainder = ingredient.amount();
         for (FluidStack stack : input.fluids()) {
