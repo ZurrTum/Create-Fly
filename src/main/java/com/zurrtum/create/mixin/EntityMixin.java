@@ -87,7 +87,7 @@ public abstract class EntityMixin implements DataTracked {
     @WrapOperation(method = "dropStack(Lnet/minecraft/server/world/ServerWorld;Lnet/minecraft/item/ItemStack;Lnet/minecraft/util/math/Vec3d;)Lnet/minecraft/entity/ItemEntity;", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/world/ServerWorld;spawnEntity(Lnet/minecraft/entity/Entity;)Z"))
     private boolean captureDrops(ServerWorld world, Entity item, Operation<Boolean> original) {
         Entity entity = (Entity) (Object) this;
-        if (entity instanceof PlayerEntity player && AllSynchedDatas.CRUSH_DROP.get(player)) {
+        if (AllSynchedDatas.CRUSH_DROP.get(entity)) {
             item.setVelocity(Vec3d.ZERO);
         } else {
             Optional<List<ItemStack>> value = AllSynchedDatas.CAPTURE_DROPS.get(entity);

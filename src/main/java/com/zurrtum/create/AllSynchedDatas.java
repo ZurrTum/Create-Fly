@@ -56,7 +56,7 @@ public class AllSynchedDatas {
     public static final Entry<Integer> VISUAL_BACKTANK_AIR = register(PlayerEntity.class, TrackedDataHandlerRegistry.INTEGER, 0);
     public static final Entry<Boolean> FIRE_IMMUNE = register(PlayerEntity.class, TrackedDataHandlerRegistry.BOOLEAN, false);
     public static final Entry<Boolean> HEAVY_BOOTS = register(PlayerEntity.class, TrackedDataHandlerRegistry.BOOLEAN, false);
-    public static final Entry<Boolean> CRUSH_DROP = register(PlayerEntity.class, TrackedDataHandlerRegistry.BOOLEAN, false);
+    public static final Entry<Boolean> CRUSH_DROP = register(Entity.class, TrackedDataHandlerRegistry.BOOLEAN, false);
     public static final Entry<Optional<List<ItemStack>>> CAPTURE_DROPS = register(Entity.class, CAPTURE_DROPS_HANDLER, Optional.empty());
     public static final Entry<Boolean> CONTRAPTION_GROUNDED = register(Entity.class, TrackedDataHandlerRegistry.BOOLEAN, false);
     public static final Entry<Optional<Vec3d>> CONTRAPTION_DISMOUNT_LOCATION = register(LivingEntity.class, OPTIONAL_VEC3D_HANDLER, Optional.empty());
