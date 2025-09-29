@@ -3,6 +3,7 @@ package com.zurrtum.create.client.catnip.render;
 import it.unimi.dsi.fastutil.objects.Object2ObjectLinkedOpenHashMap;
 import net.minecraft.client.render.*;
 import net.minecraft.client.render.chunk.BlockBufferAllocatorStorage;
+import net.minecraft.client.render.model.ModelBaker;
 import net.minecraft.client.util.BufferAllocator;
 import net.minecraft.util.Util;
 
@@ -75,6 +76,7 @@ public class DefaultSuperRenderTypeBuffer implements SuperRenderTypeBuffer {
                 put(map, RenderLayer.getGlintTranslucent());
                 put(map, RenderLayer.getEntityGlint());
                 put(map, RenderLayer.getWaterMask());
+                ModelBaker.BLOCK_DESTRUCTION_RENDER_LAYERS.forEach(renderType -> put(map, renderType));
 
                 //extras
                 put(map, PonderRenderTypes.outlineSolid());
