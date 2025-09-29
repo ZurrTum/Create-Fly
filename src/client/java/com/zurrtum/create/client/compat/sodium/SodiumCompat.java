@@ -39,11 +39,9 @@ public class SodiumCompat {
             return;
         }
         Function<Identifier, Sprite> atlas = mc.getSpriteAtlas(SpriteAtlasTexture.BLOCK_ATLAS_TEXTURE);
-        Sprite sawSprite = atlas.apply(SAW_TEXTURE);
-        SpriteUtil.INSTANCE.markSpriteActive(sawSprite);
-
-        Sprite factoryPanelSprite = atlas.apply(FACTORY_PANEL_TEXTURE);
-        SpriteUtil.INSTANCE.markSpriteActive(factoryPanelSprite);
+        SpriteUtil.INSTANCE.markSpriteActive(atlas.apply(SAW_TEXTURE));
+        SpriteUtil.INSTANCE.markSpriteActive(atlas.apply(SAW_VANILLA_TEXTURE));
+        SpriteUtil.INSTANCE.markSpriteActive(atlas.apply(FACTORY_PANEL_TEXTURE));
     }
 
     @SuppressWarnings({"UnstableApiUsage", "deprecation"})
