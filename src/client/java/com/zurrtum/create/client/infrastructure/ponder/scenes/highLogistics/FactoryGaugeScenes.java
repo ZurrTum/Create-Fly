@@ -780,7 +780,7 @@ public class FactoryGaugeScenes {
         scene.overlay().showText(100).text("Outputs should be sent back to a linked inventory to close the loop").attachKeyFrame()
             .colored(PonderPalette.BLUE).placeNearTarget().pointAt(util.vector().blockSurface(util.grid().at(6, 2, 6), Direction.WEST));
 
-        scene.idle(45);
+        scene.idle(48);
         PonderHilo.packageHopsOffBelt(scene, util.grid().at(0, 1, 7), Direction.WEST, box2);
         scene.idle(50);
 

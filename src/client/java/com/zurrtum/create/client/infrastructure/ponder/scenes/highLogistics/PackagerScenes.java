@@ -141,7 +141,7 @@ public class PackagerScenes {
         scene.overlay().showOutlineWithText(util.select().fromTo(1, 2, 3, 1, 2, 4), 90)
             .text("Packagers will not accept packages they cannot fully unpack").colored(PonderPalette.RED).placeNearTarget().attachKeyFrame()
             .pointAt(util.vector().blockSurface(util.grid().at(1, 2, 3), Direction.WEST));
-        scene.idle(40);
+        scene.idle(39);
 
         PonderHilo.packageHopsOffBelt(scene, util.grid().at(0, 1, 2), Direction.WEST, box);
         scene.idle(40);
@@ -272,8 +272,9 @@ public class PackagerScenes {
 
         scene.world().multiplyKineticSpeed(util.select().everywhere(), 32f);
 
-        scene.idle(40);
+        scene.idle(27);
         PonderHilo.packageHopsOffBelt(scene, util.grid().at(4, 1, 0), Direction.NORTH, warehouseBox);
+        scene.idle(13);
         BlockPos sawPos = util.grid().at(2, 1, 4);
         scene.world().modifyBlockEntity(
             sawPos, SawBlockEntity.class, be -> {

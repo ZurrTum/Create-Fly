@@ -5,6 +5,7 @@ import com.zurrtum.create.AllEntityTypes;
 import com.zurrtum.create.AllSoundEvents;
 import com.zurrtum.create.Create;
 import com.zurrtum.create.catnip.math.AngleHelper;
+import com.zurrtum.create.catnip.math.VecHelper;
 import com.zurrtum.create.content.logistics.chute.ChuteBlock;
 import com.zurrtum.create.infrastructure.items.ItemStackHandler;
 import com.zurrtum.create.infrastructure.packet.s2c.PackageDestroyPacket;
@@ -38,11 +39,14 @@ import net.minecraft.util.Arm;
 import net.minecraft.util.ErrorReporter;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
 import java.lang.ref.WeakReference;
+import java.util.List;
 
 public class PackageEntity extends LivingEntity {
 
@@ -110,31 +114,40 @@ public class PackageEntity extends LivingEntity {
         return LivingEntity.createLivingAttributes().add(EntityAttributes.MAX_HEALTH, 5f).add(EntityAttributes.MOVEMENT_SPEED, 1f);
     }
 
-    //TODO
-    //    @Override
-    //    public void travel(Vec3d p_213352_1_) {
-    //        super.travel(p_213352_1_);
-    //
-    //        if (!getWorld().isClient)
-    //            return;
-    //        if (getVelocity().length() < 1 / 128f)
-    //            return;
-    //        if (age >= 20)
-    //            return;
-    //
-    //        Vec3d motion = getVelocity().multiply(.75f);
-    //        Box bb = getBoundingBox();
-    //        List<VoxelShape> entityStream = getWorld().getEntityCollisions(this, bb.stretch(motion));
-    //        motion = adjustMovementForCollisions(this, motion, bb, getWorld(), entityStream);
-    //
-    //        Vec3d clientPos = getPos().add(motion);
-    //        if (lerpSteps != 0)
-    //            clientPos = VecHelper.lerp(Math.min(1, age / 20f), clientPos, new Vec3(lerpX, lerpY, lerpZ));
-    //        if (age < 5)
-    //            setPosition(clientPos.x, clientPos.y, clientPos.z);
-    //        if (age < 20)
-    //            lerpTo(clientPos.x, clientPos.y, clientPos.z, getYaw(), getPitch(), lerpSteps == 0 ? 3 : lerpSteps);
-    //    }
+    @Override
+    public boolean canMoveVoluntarily() {
+        return true;
+    }
+
+    @Override
+    public boolean canActVoluntarily() {
+        return true;
+    }
+
+    @Override
+    public void travel(Vec3d p_213352_1_) {
+        super.travel(p_213352_1_);
+
+        if (!getWorld().isClient)
+            return;
+        if (getVelocity().length() < 1 / 128f)
+            return;
+        if (age >= 20)
+            return;
+
+        Vec3d motion = getVelocity().multiply(.75f);
+        Box bb = getBoundingBox();
+        List<VoxelShape> entityStream = getWorld().getEntityCollisions(this, bb.stretch(motion));
+        motion = adjustMovementForCollisions(this, motion, bb, getWorld(), entityStream);
+
+        Vec3d clientPos = getPos().add(motion);
+        if (isInterpolating())
+            clientPos = VecHelper.lerp(Math.min(1, age / 20f), clientPos, getInterpolator().getLerpedPos());
+        if (age < 5)
+            setPosition(clientPos.x, clientPos.y, clientPos.z);
+        if (age < 20)
+            getInterpolator().refreshPositionAndAngles(clientPos, getYaw(), getPitch());
+    }
 
     @Override
     public void setVelocityClient(double x, double y, double z) {

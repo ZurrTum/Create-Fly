@@ -316,7 +316,7 @@ public class StockTickerScenes {
 
         scene.world().multiplyKineticSpeed(util.select().everywhere(), 32f);
 
-        scene.idle(60);
+        scene.idle(53);
         PonderHilo.packageHopsOffBelt(scene, util.grid().at(2, 1, 4), Direction.WEST, box1);
         scene.idle(40);
 
@@ -345,7 +345,7 @@ public class StockTickerScenes {
 
         scene.world().multiplyKineticSpeed(util.select().everywhere(), 32f);
 
-        scene.idle(90);
+        scene.idle(83);
         PonderHilo.packageHopsOffBelt(scene, util.grid().at(4, 1, 0), Direction.NORTH, box2);
         scene.idle(5);
         scene.world().hideSection(belt1, Direction.WEST);
