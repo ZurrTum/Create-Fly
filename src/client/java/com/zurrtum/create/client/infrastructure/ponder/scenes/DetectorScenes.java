@@ -8,6 +8,7 @@ import com.zurrtum.create.client.ponder.api.element.WorldSectionElement;
 import com.zurrtum.create.client.ponder.api.scene.SceneBuilder;
 import com.zurrtum.create.client.ponder.api.scene.SceneBuildingUtil;
 import com.zurrtum.create.client.ponder.api.scene.Selection;
+import com.zurrtum.create.content.fluids.tank.FluidTankBlockEntity;
 import com.zurrtum.create.content.redstone.smartObserver.SmartObserverBlockEntity;
 import com.zurrtum.create.content.redstone.thresholdSwitch.ThresholdSwitchBlock;
 import net.minecraft.block.Blocks;
@@ -297,6 +298,7 @@ public class DetectorScenes {
         ElementLink<WorldSectionElement> tankLink = scene.world().showIndependentSection(fluidTank, Direction.DOWN);
         scene.world().moveSection(tankLink, util.vector().of(1, 0, -2), 0);
         scene.idle(10);
+        scene.world().modifyBlockEntity(util.grid().at(1, 1, 5), FluidTankBlockEntity.class, tank -> tank.getTankInventory().markDirty());
 
         scene.world().cycleBlockProperty(switchPos, ThresholdSwitchBlock.LEVEL);
         scene.world().cycleBlockProperty(switchPos, ThresholdSwitchBlock.LEVEL);

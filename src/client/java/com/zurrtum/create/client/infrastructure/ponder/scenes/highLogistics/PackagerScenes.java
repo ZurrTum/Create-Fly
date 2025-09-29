@@ -9,8 +9,12 @@ import com.zurrtum.create.client.ponder.api.element.WorldSectionElement;
 import com.zurrtum.create.client.ponder.api.scene.SceneBuilder;
 import com.zurrtum.create.client.ponder.api.scene.SceneBuildingUtil;
 import com.zurrtum.create.client.ponder.api.scene.Selection;
+import com.zurrtum.create.content.kinetics.belt.behaviour.DirectBeltInputBehaviour;
+import com.zurrtum.create.content.kinetics.saw.SawBlockEntity;
 import com.zurrtum.create.content.logistics.box.PackageItem;
 import com.zurrtum.create.content.logistics.box.PackageStyles;
+import com.zurrtum.create.content.processing.recipe.ProcessingInventory;
+import com.zurrtum.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.util.math.BlockPos;
@@ -240,7 +244,8 @@ public class PackagerScenes {
         scene.idle(70);
 
         ItemStack warehouseBox = PackageStyles.getDefaultBox().copy();
-        ItemStack factoryBox = PackageItem.containing(List.of(new ItemStack(Items.IRON_INGOT)));
+        ItemStack iron = new ItemStack(Items.IRON_INGOT);
+        ItemStack factoryBox = PackageItem.containing(List.of(iron));
         PackageItem.addAddress(warehouseBox, "Warehouse");
         PackageItem.addAddress(factoryBox, "Factory");
 
@@ -269,7 +274,34 @@ public class PackagerScenes {
 
         scene.idle(40);
         PonderHilo.packageHopsOffBelt(scene, util.grid().at(4, 1, 0), Direction.NORTH, warehouseBox);
-        scene.idle(40);
+        BlockPos sawPos = util.grid().at(2, 1, 4);
+        scene.world().modifyBlockEntity(
+            sawPos, SawBlockEntity.class, be -> {
+                ProcessingInventory inventory = be.inventory;
+                inventory.remainingTime = inventory.recipeDuration = 10;
+                inventory.appliedRecipe = false;
+            }
+        );
+        scene.idle(6);
+        scene.world().modifyBlockEntity(
+            sawPos, SawBlockEntity.class, be -> {
+                ProcessingInventory inventory = be.inventory;
+                inventory.setStack(0, ItemStack.EMPTY);
+                inventory.setStack(1, iron);
+                inventory.remainingTime = inventory.recipeDuration = 20;
+                inventory.appliedRecipe = true;
+            }
+        );
+        scene.idle(15);
+        scene.world().modifyBlockEntity(
+            sawPos, SawBlockEntity.class, be -> {
+                ProcessingInventory inventory = be.inventory;
+                inventory.setStack(1, ItemStack.EMPTY);
+                DirectBeltInputBehaviour behaviour = BlockEntityBehaviour.get(be.getWorld(), util.grid().at(1, 1, 4), DirectBeltInputBehaviour.TYPE);
+                behaviour.handleInsertion(iron, Direction.WEST, false);
+            }
+        );
+        scene.idle(19);
         scene.world().multiplyKineticSpeed(util.select().everywhere(), 1 / 32f);
         scene.overlay().showText(100).text("For compactness, mechanical saws can unpack straight onto a belt").attachKeyFrame().placeNearTarget()
             .pointAt(util.vector().topOf(util.grid().at(2, 1, 4)));

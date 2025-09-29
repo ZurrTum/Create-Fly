@@ -11,9 +11,11 @@ import com.zurrtum.create.client.ponder.api.element.WorldSectionElement;
 import com.zurrtum.create.client.ponder.api.scene.SceneBuilder;
 import com.zurrtum.create.client.ponder.api.scene.SceneBuildingUtil;
 import com.zurrtum.create.client.ponder.api.scene.Selection;
+import com.zurrtum.create.content.kinetics.saw.SawBlockEntity;
 import com.zurrtum.create.content.logistics.funnel.BeltFunnelBlock;
 import com.zurrtum.create.content.logistics.funnel.FunnelBlock;
 import com.zurrtum.create.content.logistics.funnel.FunnelBlockEntity;
+import com.zurrtum.create.content.processing.recipe.ProcessingInventory;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.LeverBlock;
 import net.minecraft.block.RedstoneWireBlock;
@@ -249,7 +251,24 @@ public class FunnelScenes {
             .pointAt(util.vector().centerOf(sawFunnel.down()));
         scene.idle(8);
         scene.world().createItemOnBeltLike(sawFunnel.down(), Direction.SOUTH, new ItemStack(Blocks.OAK_LOG));
-        scene.idle(40);
+        scene.world().modifyBlockEntity(
+            sawFunnel.down(), SawBlockEntity.class, saw -> {
+                ProcessingInventory inventory = saw.inventory;
+                inventory.remainingTime = inventory.recipeDuration = 50;
+                inventory.appliedRecipe = false;
+            }
+        );
+        scene.idle(34);
+        scene.world().modifyBlockEntity(
+            sawFunnel.down(), SawBlockEntity.class, saw -> {
+                ProcessingInventory inventory = saw.inventory;
+                inventory.setStack(0, ItemStack.EMPTY);
+                inventory.setStack(1, new ItemStack(Items.STRIPPED_OAK_LOG));
+                inventory.remainingTime = inventory.recipeDuration = 20;
+                inventory.appliedRecipe = true;
+            }
+        );
+        scene.idle(6);
 
         scene.world().showSection(util.select().position(depotFunnel), Direction.DOWN);
         scene.overlay().showText(40).text("Depots").colored(PonderPalette.BLUE).placeNearTarget().pointAt(util.vector().centerOf(depotFunnel.down()));

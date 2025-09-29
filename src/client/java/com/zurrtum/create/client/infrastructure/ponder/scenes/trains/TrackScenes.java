@@ -12,8 +12,10 @@ import com.zurrtum.create.client.ponder.api.scene.SceneBuilder;
 import com.zurrtum.create.client.ponder.api.scene.SceneBuildingUtil;
 import com.zurrtum.create.client.ponder.api.scene.Selection;
 import com.zurrtum.create.content.processing.burner.BlazeBurnerBlock;
+import com.zurrtum.create.content.processing.burner.BlazeBurnerBlockEntity;
 import net.minecraft.block.Blocks;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
@@ -286,7 +288,9 @@ public class TrackScenes {
         scene.removeShadow();
         scene.setSceneOffsetY(-1);
 
-        scene.world().cycleBlockProperty(util.grid().at(5, 3, 4), BlazeBurnerBlock.HEAT_LEVEL);
+        BlockPos blazeBurnerPos = util.grid().at(5, 3, 4);
+        scene.world().cycleBlockProperty(blazeBurnerPos, BlazeBurnerBlock.HEAT_LEVEL);
+        scene.world().modifyBlockEntity(blazeBurnerPos, BlazeBurnerBlockEntity.class, be -> be.hat = true);
 
         ElementLink<WorldSectionElement> stationElement = scene.world().showIndependentSection(util.select().fromTo(0, 0, 0, 8, 0, 8), Direction.UP);
         ElementLink<WorldSectionElement> stationTrackElement = scene.world().showIndependentSection(util.select().position(0, 2, 0), Direction.UP);

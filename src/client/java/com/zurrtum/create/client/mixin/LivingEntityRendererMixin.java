@@ -100,6 +100,7 @@ public class LivingEntityRendererMixin<T extends LivingEntity, S extends LivingE
         } else if (entity instanceof ParrotEntity parrot && entity.getEquippedStack(EquipmentSlot.HEAD)
             .isEmpty() && AllSynchedDatas.PARROT_TRAIN_HAT.get(parrot)) {
             hat = AllPartialModels.TRAIN_HAT;
+            state.create$updateHatInfo(entity);
         }
         state.create$setHat(hat);
     }

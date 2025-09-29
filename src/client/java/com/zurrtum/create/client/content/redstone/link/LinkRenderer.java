@@ -88,7 +88,7 @@ public class LinkRenderer {
             return;
 
         LinkBehaviour behaviour = be.getBehaviour(LinkBehaviour.TYPE);
-        if (behaviour == null)
+        if (behaviour == null || !behaviour.isLoad())
             return;
 
         for (boolean first : Iterate.trueAndFalse) {

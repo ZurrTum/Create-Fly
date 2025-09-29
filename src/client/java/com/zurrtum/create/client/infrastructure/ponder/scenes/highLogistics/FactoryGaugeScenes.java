@@ -10,12 +10,16 @@ import com.zurrtum.create.client.ponder.api.element.WorldSectionElement;
 import com.zurrtum.create.client.ponder.api.scene.SceneBuilder;
 import com.zurrtum.create.client.ponder.api.scene.SceneBuildingUtil;
 import com.zurrtum.create.client.ponder.api.scene.Selection;
+import com.zurrtum.create.content.kinetics.belt.behaviour.DirectBeltInputBehaviour;
 import com.zurrtum.create.content.kinetics.crafter.MechanicalCrafterBlockEntity;
 import com.zurrtum.create.content.kinetics.mixer.MechanicalMixerBlockEntity;
+import com.zurrtum.create.content.kinetics.saw.SawBlockEntity;
 import com.zurrtum.create.content.logistics.box.PackageItem;
 import com.zurrtum.create.content.logistics.factoryBoard.*;
 import com.zurrtum.create.content.processing.basin.BasinBlockEntity;
+import com.zurrtum.create.content.processing.recipe.ProcessingInventory;
 import com.zurrtum.create.content.redstone.link.RedstoneLinkBlock;
+import com.zurrtum.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
 import net.minecraft.block.Blocks;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
@@ -406,8 +410,46 @@ public class FactoryGaugeScenes {
         scene.idle(10);
 
         scene.world().createItemOnBelt(util.grid().at(1, 0, 7), Direction.EAST, box);
+        BlockPos sawPos = util.grid().at(4, 0, 1);
         PonderHilo.packagerClear(scene, pack);
-        scene.idle(75);
+        scene.idle(56);
+        scene.world().modifyBlockEntity(
+            sawPos, SawBlockEntity.class, be -> {
+                ProcessingInventory inventory = be.inventory;
+                inventory.remainingTime = inventory.recipeDuration = 10;
+                inventory.appliedRecipe = false;
+            }
+        );
+        scene.idle(2);
+        scene.world().modifyBlockEntity(
+            sawPos, SawBlockEntity.class, be -> {
+                ProcessingInventory inventory = be.inventory;
+                inventory.setStack(0, ItemStack.EMPTY);
+                inventory.setStack(1, andesiteItem);
+                inventory.setStack(2, nuggetItem);
+                inventory.remainingTime = inventory.recipeDuration = 20;
+                inventory.appliedRecipe = true;
+            }
+        );
+        scene.idle(6);
+        scene.world().modifyBlockEntity(
+            sawPos, SawBlockEntity.class, be -> {
+                ProcessingInventory inventory = be.inventory;
+                inventory.setStack(1, ItemStack.EMPTY);
+                DirectBeltInputBehaviour behaviour = BlockEntityBehaviour.get(be.getWorld(), util.grid().at(5, 0, 1), DirectBeltInputBehaviour.TYPE);
+                behaviour.handleInsertion(andesiteItem, Direction.EAST, false);
+            }
+        );
+        scene.idle(8);
+        scene.world().modifyBlockEntity(
+            sawPos, SawBlockEntity.class, be -> {
+                ProcessingInventory inventory = be.inventory;
+                inventory.setStack(2, ItemStack.EMPTY);
+                DirectBeltInputBehaviour behaviour = BlockEntityBehaviour.get(be.getWorld(), util.grid().at(5, 0, 1), DirectBeltInputBehaviour.TYPE);
+                behaviour.handleInsertion(nuggetItem, Direction.EAST, false);
+            }
+        );
+        scene.idle(3);
         scene.world().removeItemsFromBelt(util.grid().at(6, 0, 1));
         scene.world().flapFunnel(util.grid().at(6, 1, 1), false);
         scene.idle(8);

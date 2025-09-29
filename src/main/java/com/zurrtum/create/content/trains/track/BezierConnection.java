@@ -4,6 +4,7 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.zurrtum.create.AllBlocks;
 import com.zurrtum.create.AllItems;
+import com.zurrtum.create.AllTrackMaterials;
 import com.zurrtum.create.catnip.data.Couple;
 import com.zurrtum.create.catnip.data.Iterate;
 import com.zurrtum.create.catnip.data.Pair;
@@ -117,7 +118,10 @@ public class BezierConnection implements Iterable<BezierConnection.Segment> {
         return this == other || (other != null && coupleEquals(this.bePositions, other.bePositions) && coupleEquals(
             this.starts,
             other.starts
-        ) && coupleEquals(this.axes, other.axes) && coupleEquals(this.normals, other.normals) && this.hasGirder == other.hasGirder);
+        ) && coupleEquals(this.axes, other.axes) && coupleEquals(
+            this.normals,
+            other.normals
+        ) && this.hasGirder == other.hasGirder);
     }
 
     @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
@@ -143,7 +147,7 @@ public class BezierConnection implements Iterable<BezierConnection.Segment> {
             view.read("Normals", CreateCodecs.COUPLE_VEC3D_CODEC).orElseThrow(),
             view.getBoolean("Primary", false),
             view.getBoolean("Girder", false),
-            view.read("Material", TrackMaterial.CODEC).orElseThrow()
+            view.read("Material", TrackMaterial.CODEC).orElse(AllTrackMaterials.ANDESITE)
         );
 
         view.read("Smoothing", CreateCodecs.COUPLE_INT_CODEC).ifPresent(couple -> smoothing = couple);

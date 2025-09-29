@@ -445,6 +445,7 @@ public class BeltScenes {
             .pointAt(util.vector().blockSurface(depotPos.up(2), Direction.WEST));
         ItemStack bottle = new ItemStack(Items.BUCKET);
         scene.world().createItemOnBeltLike(depotPos, Direction.NORTH, bottle);
+        scene.world().modifyBlockEntity(depotPos.up(2), SpoutBlockEntity.class, spout -> spout.tank.getCapability().markDirty());
         scene.idle(20);
         scene.world().modifyBlockEntityNBT(util.select().position(depotPos.up(2)), SpoutBlockEntity.class, nbt -> nbt.putInt("ProcessingTicks", 20));
         scene.idle(20);

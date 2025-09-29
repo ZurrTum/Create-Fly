@@ -1,6 +1,7 @@
 package com.zurrtum.create.client.foundation.ponder.element;
 
 import com.zurrtum.create.AllSynchedDatas;
+import com.zurrtum.create.client.ponder.api.element.ParrotElement;
 import com.zurrtum.create.client.ponder.api.element.ParrotPose;
 import com.zurrtum.create.client.ponder.foundation.PonderScene;
 import com.zurrtum.create.client.ponder.foundation.element.ParrotElementImpl;
@@ -14,6 +15,10 @@ public class ExpandedParrotElement extends ParrotElementImpl {
 
     protected ExpandedParrotElement(Vec3d location, Supplier<? extends ParrotPose> pose) {
         super(location, pose);
+    }
+
+    public static ParrotElement create(Vec3d location, Supplier<? extends ParrotPose> pose) {
+        return new ExpandedParrotElement(location, pose);
     }
 
     @Override

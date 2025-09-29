@@ -64,10 +64,7 @@ public class RedstoneScenes {
         scene.world().toggleRedstonePower(redstone);
         scene.world().modifyBlock(stickerPos, s -> s.with(StickerBlock.EXTENDED, true), false);
         scene.effects().indicateRedstone(buttonPos);
-        scene.world().modifyBlockEntityNBT(
-            stickerSelect, StickerBlockEntity.class, nbt -> {
-            }
-        );
+        scene.world().modifyBlockEntity(stickerPos, StickerBlockEntity.class, be -> be.update = true);
         scene.idle(20);
 
         scene.world().toggleRedstonePower(redstone);
@@ -88,10 +85,7 @@ public class RedstoneScenes {
         scene.world().toggleRedstonePower(redstone);
         scene.world().modifyBlock(stickerPos, s -> s.with(StickerBlock.EXTENDED, false), false);
         scene.effects().indicateRedstone(buttonPos);
-        scene.world().modifyBlockEntityNBT(
-            stickerSelect, StickerBlockEntity.class, nbt -> {
-            }
-        );
+        scene.world().modifyBlockEntity(stickerPos, StickerBlockEntity.class, be -> be.update = true);
         scene.idle(20);
 
         scene.world().toggleRedstonePower(redstone);

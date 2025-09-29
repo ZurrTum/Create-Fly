@@ -6,6 +6,7 @@ import com.zurrtum.create.catnip.math.VecHelper;
 import net.minecraft.block.BlockState;
 import net.minecraft.util.math.*;
 import net.minecraft.util.math.Direction.Axis;
+import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.world.World;
 
 import java.lang.ref.WeakReference;
@@ -117,7 +118,7 @@ public class FactoryPanelConnection {
                     testOffset = VecHelper.rotate(testOffset, xRot + 90, Axis.X);
                     testOffset = VecHelper.rotate(testOffset, yRot, Axis.Y);
                     Vec3d v = start.add(testOffset);
-                    if (!level.isSpaceEmpty(new Box(v, v).expand(1 / 128f)))
+                    if (!isSpaceEmpty(level, new Box(v, v).expand(1 / 128f)))
                         continue ModeFinder;
                 }
             }
@@ -126,6 +127,15 @@ public class FactoryPanelConnection {
         }
 
         return path;
+    }
+
+    private static boolean isSpaceEmpty(World world, Box box) {
+        for (VoxelShape voxelShape : world.getBlockCollisions(null, box)) {
+            if (!voxelShape.isEmpty()) {
+                return false;
+            }
+        }
+        return world.getEntityCollisions(null, box).isEmpty();
     }
 
     public Vec3d calculatePathDiff(BlockState state, FactoryPanelPosition to) {

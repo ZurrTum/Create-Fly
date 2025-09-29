@@ -56,6 +56,7 @@ public class SpoutScenes {
         Vec3d spoutSide = util.vector().blockSurface(spoutPos, Direction.WEST);
         scene.overlay().showText(60).pointAt(spoutSide).placeNearTarget().attachKeyFrame()
             .text("The Spout can fill fluid holding items provided beneath it");
+        scene.world().modifyBlockEntity(spoutPos, SpoutBlockEntity.class, spout -> spout.tank.forbidInsertion());
 
         scene.idle(50);
 
@@ -74,6 +75,7 @@ public class SpoutScenes {
             .pointAt(util.vector().blockSurface(util.grid().at(2, 3, 2), Direction.WEST)).attachKeyFrame().colored(PonderPalette.RED)
             .placeNearTarget().text("The content of a Spout cannot be accessed manually");
         scene.idle(60);
+        scene.world().modifyBlockEntity(spoutPos, SpoutBlockEntity.class, spout -> spout.tank.allowInsertion());
         scene.overlay().showText(70).pointAt(util.vector().blockSurface(util.grid().at(2, 3, 3), Direction.WEST)).colored(PonderPalette.GREEN)
             .placeNearTarget().text("Instead, Pipes can be used to supply it with fluids");
 
@@ -88,6 +90,7 @@ public class SpoutScenes {
         scene.idle(10);
 
         scene.idle(20);
+        scene.world().modifyBlockEntity(spoutPos, SpoutBlockEntity.class, spout -> spout.tank.getCapability().extractAny(27000));
         scene.world().modifyBlockEntityNBT(spoutS, SpoutBlockEntity.class, nbt -> nbt.putInt("ProcessingTicks", 20));
         scene.idle(20);
         scene.world().removeItemsFromBelt(depotPos);
@@ -122,6 +125,7 @@ public class SpoutScenes {
         ElementLink<BeltItemElement> ingot2 = scene.world().createItemOnBelt(beltPos, Direction.SOUTH, bottle);
         scene.idle(15);
         scene.world().stallBeltItem(ingot, true);
+        scene.world().modifyBlockEntity(spoutPos, SpoutBlockEntity.class, spout -> spout.tank.getCapability().extractAny(27000));
         scene.world().modifyBlockEntityNBT(spoutS, SpoutBlockEntity.class, nbt -> nbt.putInt("ProcessingTicks", 20));
 
         scene.overlay().showText(50).pointAt(spoutSide).placeNearTarget().attachKeyFrame().text("The Spout will hold and process them automatically");
@@ -142,6 +146,7 @@ public class SpoutScenes {
         scene.world().stallBeltItem(ingot, false);
         scene.idle(15);
         scene.world().stallBeltItem(ingot2, true);
+        scene.world().modifyBlockEntity(spoutPos, SpoutBlockEntity.class, spout -> spout.tank.getCapability().extractAny(27000));
         scene.world().modifyBlockEntityNBT(spoutS, SpoutBlockEntity.class, nbt -> nbt.putInt("ProcessingTicks", 20));
         scene.idle(20);
         for (int i = 0; i < 10; i++) {

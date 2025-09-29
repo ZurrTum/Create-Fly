@@ -4,14 +4,15 @@ import com.zurrtum.create.AllItems;
 import com.zurrtum.create.client.infrastructure.ponder.scenes.*;
 import com.zurrtum.create.client.infrastructure.ponder.scenes.fluid.*;
 import com.zurrtum.create.client.infrastructure.ponder.scenes.highLogistics.*;
-import com.zurrtum.create.client.infrastructure.ponder.scenes.trains.TrackObserverScenes;
-import com.zurrtum.create.client.infrastructure.ponder.scenes.trains.TrainScenes;
-import com.zurrtum.create.client.infrastructure.ponder.scenes.trains.TrainSignalScenes;
-import com.zurrtum.create.client.infrastructure.ponder.scenes.trains.TrainStationScenes;
+import com.zurrtum.create.client.infrastructure.ponder.scenes.trains.*;
 import com.zurrtum.create.client.ponder.api.registration.PonderSceneRegistrationHelper;
+import com.zurrtum.create.content.trains.track.TrackMaterial;
+import net.minecraft.block.Block;
 import net.minecraft.item.Item;
 import net.minecraft.registry.Registries;
 import net.minecraft.util.Identifier;
+
+import java.util.Arrays;
 
 public class AllCreatePonderScenes {
 
@@ -103,9 +104,8 @@ public class AllCreatePonderScenes {
         HELPER.addStoryBoard(AllItems.EMPTY_BLAZE_BURNER, "empty_blaze_burner", ProcessingScenes::emptyBlazeBurner);
         HELPER.addStoryBoard(AllItems.BLAZE_BURNER, "blaze_burner", ProcessingScenes::blazeBurner);
         HELPER.addStoryBoard(AllItems.DEPOT, "depot", BeltScenes::depot);
-        //TODO
-        //        HELPER.forComponents(AllItems.WEIGHTED_EJECTOR).addStoryBoard("weighted_ejector/eject", EjectorScenes::ejector)
-        //            .addStoryBoard("weighted_ejector/split", EjectorScenes::splitY).addStoryBoard("weighted_ejector/redstone", EjectorScenes::redstone);
+        HELPER.forComponents(AllItems.WEIGHTED_EJECTOR).addStoryBoard("weighted_ejector/eject", EjectorScenes::ejector)
+            .addStoryBoard("weighted_ejector/split", EjectorScenes::splitY).addStoryBoard("weighted_ejector/redstone", EjectorScenes::redstone);
 
         // Crafters
         HELPER.forComponents(AllItems.MECHANICAL_CRAFTER).addStoryBoard("mechanical_crafter/setup", CrafterScenes::setup)
@@ -132,9 +132,8 @@ public class AllCreatePonderScenes {
 
         // Tunnels
         HELPER.addStoryBoard(AllItems.ANDESITE_TUNNEL, "tunnels/andesite", TunnelScenes::andesite);
-        //TODO
-        //        HELPER.forComponents(AllItems.BRASS_TUNNEL).addStoryBoard("tunnels/brass", TunnelScenes::brass)
-        //            .addStoryBoard("tunnels/brass_modes", TunnelScenes::brassModes);
+        HELPER.forComponents(AllItems.BRASS_TUNNEL).addStoryBoard("tunnels/brass", TunnelScenes::brass)
+            .addStoryBoard("tunnels/brass_modes", TunnelScenes::brassModes);
 
         // Chassis & Super Glue
         HELPER.forComponents(AllItems.LINEAR_CHASSIS, AllItems.SECONDARY_LINEAR_CHASSIS)
@@ -284,8 +283,7 @@ public class AllCreatePonderScenes {
 
         // Hilo
         HELPER.forComponents(AllItems.CHAIN_CONVEYOR).addStoryBoard("high_logistics/chain_conveyor", FrogAndConveyorScenes::conveyor);
-        //TODO
-        //        HELPER.forComponents(AllItems.PACKAGE_FROGPORT).addStoryBoard("high_logistics/package_frogport", FrogAndConveyorScenes::frogPort);
+        HELPER.forComponents(AllItems.PACKAGE_FROGPORT).addStoryBoard("high_logistics/package_frogport", FrogAndConveyorScenes::frogPort);
         HELPER.forComponents(
             AllItems.WHITE_POSTBOX,
             AllItems.ORANGE_POSTBOX,
@@ -304,16 +302,13 @@ public class AllCreatePonderScenes {
             AllItems.RED_POSTBOX,
             AllItems.BLACK_POSTBOX
         ).addStoryBoard("high_logistics/package_postbox", PostboxScenes::postbox);
-        //TODO
-        //        HELPER.forComponents(AllItems.PACKAGER).addStoryBoard("high_logistics/packager", PackagerScenes::packager)
-        //            .addStoryBoard("high_logistics/packager_address", PackagerScenes::packagerAddress);
+        HELPER.forComponents(AllItems.PACKAGER).addStoryBoard("high_logistics/packager", PackagerScenes::packager)
+            .addStoryBoard("high_logistics/packager_address", PackagerScenes::packagerAddress);
         HELPER.forComponents(AllItems.STOCK_LINK).addStoryBoard("high_logistics/stock_link", StockLinkScenes::stockLink);
-        //TODO
-        //        HELPER.forComponents(AllItems.STOCK_TICKER).addStoryBoard("high_logistics/stock_ticker", StockTickerScenes::stockTicker)
-        //            .addStoryBoard("high_logistics/stock_ticker_address", StockTickerScenes::stockTickerAddress);
+        HELPER.forComponents(AllItems.STOCK_TICKER).addStoryBoard("high_logistics/stock_ticker", StockTickerScenes::stockTicker)
+            .addStoryBoard("high_logistics/stock_ticker_address", StockTickerScenes::stockTickerAddress);
         HELPER.forComponents(AllItems.REDSTONE_REQUESTER).addStoryBoard("high_logistics/redstone_requester", RequesterAndShopScenes::requester);
-        //TODO
-        //        HELPER.forComponents(AllItems.REPACKAGER).addStoryBoard("high_logistics/repackager", RepackagerScenes::repackager);
+        HELPER.forComponents(AllItems.REPACKAGER).addStoryBoard("high_logistics/repackager", RepackagerScenes::repackager);
         HELPER.forComponents(
             AllItems.WHITE_TABLE_CLOTH,
             AllItems.ORANGE_TABLE_CLOTH,
@@ -335,17 +330,15 @@ public class AllCreatePonderScenes {
             AllItems.BRASS_TABLE_CLOTH,
             AllItems.COPPER_TABLE_CLOTH
         ).addStoryBoard("high_logistics/table_cloth", TableClothScenes::tableCloth);
-        //TODO
-        //        HELPER.forComponents(AllItems.FACTORY_GAUGE).addStoryBoard("high_logistics/factory_gauge_restocker", FactoryGaugeScenes::restocker)
-        //            .addStoryBoard("high_logistics/factory_gauge_recipe", FactoryGaugeScenes::recipe)
-        //            .addStoryBoard("high_logistics/factory_gauge_crafting", FactoryGaugeScenes::crafting)
-        //            .addStoryBoard("high_logistics/factory_gauge_links", FactoryGaugeScenes::links);
+        HELPER.forComponents(AllItems.FACTORY_GAUGE).addStoryBoard("high_logistics/factory_gauge_restocker", FactoryGaugeScenes::restocker)
+            .addStoryBoard("high_logistics/factory_gauge_recipe", FactoryGaugeScenes::recipe)
+            .addStoryBoard("high_logistics/factory_gauge_crafting", FactoryGaugeScenes::crafting)
+            .addStoryBoard("high_logistics/factory_gauge_links", FactoryGaugeScenes::links);
 
         // Trains
-        //TODO
-        //        HELPER.forComponents(Arrays.stream(TrackMaterial.allBlocks()).map(Block::asItem).toArray(Item[]::new))
-        //            .addStoryBoard("train_track/placement", TrackScenes::placement).addStoryBoard("train_track/portal", TrackScenes::portal)
-        //            .addStoryBoard("train_track/chunks", TrackScenes::chunks);
+        HELPER.forComponents(Arrays.stream(TrackMaterial.allBlocks()).map(Block::asItem).toArray(Item[]::new))
+            .addStoryBoard("train_track/placement", TrackScenes::placement).addStoryBoard("train_track/portal", TrackScenes::portal)
+            .addStoryBoard("train_track/chunks", TrackScenes::chunks);
 
         HELPER.forComponents(AllItems.TRACK_STATION).addStoryBoard("train_station/assembly", TrainStationScenes::assembly)
             .addStoryBoard("train_station/schedule", TrainStationScenes::autoSchedule);

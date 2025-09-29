@@ -18,7 +18,7 @@ import java.util.List;
 
 public class StickerBlockEntity extends SmartBlockEntity {
     public LerpedFloat piston;
-    boolean update;
+    public boolean update;
 
     public StickerBlockEntity(BlockPos pos, BlockState state) {
         super(AllBlockEntityTypes.STICKER, pos, state);
