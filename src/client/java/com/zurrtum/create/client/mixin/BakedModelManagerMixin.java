@@ -38,16 +38,25 @@ public class BakedModelManagerMixin {
         @Local Reader input
     ) {
         if (identifier.getNamespace().equals(MOD_ID)) {
-            UnbakedModel model = JsonHelper.deserialize(UnbakedModelParser.GSON, input, UnbakedModel.class);
-            if (model instanceof JsonUnbakedModel jsonModel) {
-                UnbakedGeometry geometry = (UnbakedGeometry) jsonModel.geometry();
-                if (geometry != null) {
-                    geometry.elements().forEach(NormalsModelElement::markFacingNormals);
+            try {
+                UnbakedModel model = JsonHelper.deserialize(UnbakedModelParser.GSON, input, UnbakedModel.class);
+                if (model instanceof JsonUnbakedModel jsonModel) {
+                    UnbakedGeometry geometry = (UnbakedGeometry) jsonModel.geometry();
+                    if (geometry != null) {
+                        geometry.elements().forEach(NormalsModelElement::markFacingNormals);
+                    }
+                    cir.setReturnValue(Pair.of(identifier, jsonModel));
+                } else {
+                    UnbakedModelParser.cache(identifier, model);
+                    cir.setReturnValue(null);
                 }
-                cir.setReturnValue(Pair.of(identifier, jsonModel));
-            } else {
-                UnbakedModelParser.cache(identifier, model);
-                cir.setReturnValue(null);
+            } finally {
+                if (input != null) {
+                    try {
+                        input.close();
+                    } catch (Exception ignore) {
+                    }
+                }
             }
         }
     }
