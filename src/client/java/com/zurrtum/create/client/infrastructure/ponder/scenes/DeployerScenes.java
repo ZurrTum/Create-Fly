@@ -109,7 +109,7 @@ public class DeployerScenes {
         scene.world().moveDeployer(deployerPos, 1, 25);
         scene.idle(26);
         scene.world().restoreBlocks(util.select().position(potPosition));
-        scene.world().modifyBlockEntityNBT(deployerSelection, teType, nbt -> nbt.remove("HeldItem"));
+        scene.world().modifyBlockEntityNBT(deployerSelection, teType, nbt -> nbt.put("HeldItem", ItemStack.OPTIONAL_CODEC, ItemStack.EMPTY));
         scene.world().moveDeployer(deployerPos, -1, 25);
         scene.idle(20);
 
@@ -133,7 +133,7 @@ public class DeployerScenes {
         scene.world().moveDeployer(deployerPos, 1, 25);
         scene.idle(26);
         scene.world().setBlock(potPosition, Blocks.POTTED_RED_TULIP.getDefaultState(), false);
-        scene.world().modifyBlockEntityNBT(deployerSelection, teType, nbt -> nbt.remove("HeldItem"));
+        scene.world().modifyBlockEntityNBT(deployerSelection, teType, nbt -> nbt.put("HeldItem", ItemStack.OPTIONAL_CODEC, ItemStack.EMPTY));
         scene.world().moveDeployer(deployerPos, -1, 25);
         scene.idle(25);
         scene.world().hideSection(util.select().position(potPosition), Direction.UP);

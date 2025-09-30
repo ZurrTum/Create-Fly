@@ -378,7 +378,7 @@ public class DeployerBlockEntity extends KineticBlockEntity {
         deferredInventoryList = view.read("Inventory", NbtCompound.CODEC).orElseGet(NbtCompound::new);
         overflowItems = new ArrayList<>();
         view.read("Overflow", CreateCodecs.ITEM_LIST_CODEC).ifPresent(overflowItems::addAll);
-        view.read("HeldItem", ItemStack.CODEC).ifPresent(item -> heldItem = item);
+        view.read("HeldItem", ItemStack.OPTIONAL_CODEC).ifPresent(item -> heldItem = item);
         super.read(view, clientPacket);
 
         if (!clientPacket)
@@ -409,9 +409,7 @@ public class DeployerBlockEntity extends KineticBlockEntity {
                 view.put("Inventory", NbtCompound.CODEC, writeView.getNbt());
             }
             ItemStack stack = serverPlayer.getMainHandStack();
-            if (!stack.isEmpty()) {
-                view.put("HeldItem", ItemStack.CODEC, stack);
-            }
+            view.put("HeldItem", ItemStack.OPTIONAL_CODEC, stack);
             view.put("Overflow", CreateCodecs.ITEM_LIST_CODEC, overflowItems);
         } else if (deferredInventoryList != null) {
             view.put("Inventory", NbtCompound.CODEC, deferredInventoryList);
