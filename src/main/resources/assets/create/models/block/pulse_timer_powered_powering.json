@@ -1,7 +1,6 @@
 {
-  "parent": "create:block/diodes/pulse_timer",
+  "parent": "create:block/pulse_timer_powering",
   "textures": {
-    "top": "create:block/diodes/pulse_timer/powered_powering",
-    "torch": "minecraft:block/redstone_torch"
+    "top": "create:block/diodes/pulse_timer/powered_powering"
   }
 }

@@ -56,7 +56,6 @@
 		{
 			"from": [4, 3, -4],
 			"to": [5, 4, 1],
-			"shade": false,
 			"rotation": {"angle": 0, "axis": "x", "origin": [1, 1, 5]},
 			"faces": {
 				"north": {"uv": [7, 6, 9, 8], "rotation": 180, "texture": "#torch"},
@@ -69,7 +68,6 @@
 		{
 			"from": [4, 3, 1],
 			"to": [5, 4, 4.5],
-			"shade": false,
 			"rotation": {"angle": 0, "axis": "x", "origin": [1, 1, 5]},
 			"faces": {
 				"east": {"uv": [7, 9, 9, 16], "rotation": 90, "texture": "#torch"},
@@ -77,60 +75,6 @@
 				"west": {"uv": [7, 9, 9, 16], "rotation": 270, "texture": "#torch"},
 				"up": {"uv": [7, 9, 9, 16], "texture": "#torch"},
 				"down": {"uv": [7, 9, 9, 16], "rotation": 180, "texture": "#torch"}
-			}
-		},
-		{
-			"from": [5.25, 2.75, -4.25],
-			"to": [6.75, 4.25, -2.75],
-			"shade": false,
-			"rotation": {"angle": 0, "axis": "x", "origin": [1, 1, 5]},
-			"faces": {
-				"west": {"uv": [6, 5, 7, 6], "rotation": 270, "texture": "#torch"}
-			}
-		},
-		{
-			"from": [2.25, 2.75, -4.25],
-			"to": [3.75, 4.25, -2.75],
-			"shade": false,
-			"rotation": {"angle": 0, "axis": "x", "origin": [1, 1, 5]},
-			"faces": {
-				"east": {"uv": [6, 5, 7, 6], "rotation": 90, "texture": "#torch"}
-			}
-		},
-		{
-			"from": [3.75, 4.25, -4.25],
-			"to": [5.25, 5.75, -2.75],
-			"shade": false,
-			"rotation": {"angle": 0, "axis": "x", "origin": [1, 1, 5]},
-			"faces": {
-				"down": {"uv": [6, 5, 7, 6], "rotation": 180, "texture": "#torch"}
-			}
-		},
-		{
-			"from": [3.75, 1.25, -4.25],
-			"to": [5.25, 2.75, -2.75],
-			"shade": false,
-			"rotation": {"angle": 0, "axis": "x", "origin": [1, 1, 5]},
-			"faces": {
-				"up": {"uv": [6, 5, 7, 6], "texture": "#torch"}
-			}
-		},
-		{
-			"from": [3.75, 2.75, -5.75],
-			"to": [5.25, 4.25, -4.25],
-			"shade": false,
-			"rotation": {"angle": 0, "axis": "x", "origin": [1, 1, 5]},
-			"faces": {
-				"south": {"uv": [6, 5, 7, 6], "texture": "#torch"}
-			}
-		},
-		{
-			"from": [3.75, 2.75, -2.75],
-			"to": [5.25, 4.25, -1.25],
-			"shade": false,
-			"rotation": {"angle": 0, "axis": "x", "origin": [1, 1, 5]},
-			"faces": {
-				"north": {"uv": [6, 5, 7, 6], "rotation": 180, "texture": "#torch"}
 			}
 		}
 	]
