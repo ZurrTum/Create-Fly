@@ -24,6 +24,7 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.render.BlockRenderLayer;
 import net.minecraft.client.render.Camera;
+import net.minecraft.client.render.DiffuseLighting;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.decoration.ArmorStandEntity;
@@ -241,7 +242,10 @@ public class PonderScene {
 
         forEachVisible(PonderSceneElement.class, e -> e.renderLast(world, buffer, ms, pt));
         camera.set(transform.xRotation.getValue(pt) + 90, transform.yRotation.getValue(pt) + 180);
+        DiffuseLighting lighting = mc.gameRenderer.getDiffuseLighting();
+        lighting.setShaderLights(DiffuseLighting.Type.ENTITY_IN_UI);
         world.renderEntities(ms, buffer, camera, pt);
+        lighting.setShaderLights(DiffuseLighting.Type.LEVEL);
         world.renderParticles(ms, buffer, camera, pt);
         outliner.renderOutlines(mc, ms, buffer, Vec3d.ZERO, pt);
 
