@@ -256,8 +256,7 @@ public class InstancedDrawManager extends DrawManager<InstancedInstancer<?>> {
             GroupKey<?> shader = groupEntry.getKey();
 
             for (var progressEntry : byProgress.int2ObjectEntrySet()) {
-                Samplers.CRUMBLING.makeActive();
-                TextureBinder.bind(ModelBaker.BLOCK_DESTRUCTION_STAGE_TEXTURES.get(progressEntry.getIntKey()));
+                TextureBinder.bindCrumbling(ModelBaker.BLOCK_DESTRUCTION_STAGE_TEXTURES.get(progressEntry.getIntKey()));
 
                 for (var instanceHandlePair : progressEntry.getValue()) {
                     InstancedInstancer<?> instancer = instanceHandlePair.getFirst();

@@ -3,7 +3,6 @@ package com.zurrtum.create.client.flywheel.backend.engine.indirect;
 import com.zurrtum.create.client.flywheel.api.backend.Engine;
 import com.zurrtum.create.client.flywheel.api.instance.Instance;
 import com.zurrtum.create.client.flywheel.api.instance.InstanceType;
-import com.zurrtum.create.client.flywheel.backend.Samplers;
 import com.zurrtum.create.client.flywheel.backend.compile.IndirectPrograms;
 import com.zurrtum.create.client.flywheel.backend.compile.PipelineCompiler;
 import com.zurrtum.create.client.flywheel.backend.engine.*;
@@ -238,8 +237,7 @@ public class IndirectDrawManager extends DrawManager<IndirectInstancer<?>> {
             }
 
             for (var progressEntry : byProgress.int2ObjectEntrySet()) {
-                Samplers.CRUMBLING.makeActive();
-                TextureBinder.bind(ModelBaker.BLOCK_DESTRUCTION_STAGE_TEXTURES.get(progressEntry.getIntKey()));
+                TextureBinder.bindCrumbling(ModelBaker.BLOCK_DESTRUCTION_STAGE_TEXTURES.get(progressEntry.getIntKey()));
 
                 for (var instanceHandlePair : progressEntry.getValue()) {
                     IndirectInstancer<?> instancer = instanceHandlePair.getFirst();
