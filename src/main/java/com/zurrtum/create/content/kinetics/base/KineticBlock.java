@@ -1,7 +1,5 @@
 package com.zurrtum.create.content.kinetics.base;
 
-//import com.zurrtum.create.foundation.advancement.AdvancementBehaviour;
-
 import com.zurrtum.create.foundation.advancement.AdvancementBehaviour;
 import net.minecraft.block.AbstractBlock;
 import net.minecraft.block.Block;
