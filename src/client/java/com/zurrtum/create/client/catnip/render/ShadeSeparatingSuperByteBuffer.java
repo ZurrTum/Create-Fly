@@ -109,7 +109,7 @@ public class ShadeSeparatingSuperByteBuffer implements SuperByteBuffer {
                 // Pretend unshaded faces always point up to get the correct max diffuse value for the current level.
                 normal.set(0, invertFakeDiffuseNormal ? -1 : 1, 0);
                 // Don't apply the normal matrix since that would cause upside down objects to be dark.
-                unshadedDiffuse = calculateDiffuse(normal, lightDir0, lightDir1);
+                //                        unshadedDiffuse = calculateDiffuse(normal, lightDir0, lightDir1);
             }
         }
 
