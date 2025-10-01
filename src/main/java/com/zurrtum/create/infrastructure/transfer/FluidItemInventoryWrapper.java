@@ -65,6 +65,14 @@ public class FluidItemInventoryWrapper extends FluidInventoryWrapper<Storage<Flu
     }
 
     @Override
+    public int insert(FluidStack stack, int maxAmount) {
+        if (!storage.supportsInsertion()) {
+            return 0;
+        }
+        return super.insert(stack, maxAmount);
+    }
+
+    @Override
     public boolean preciseInsert(FluidStack stack) {
         if (!storage.supportsInsertion()) {
             return false;
@@ -78,6 +86,22 @@ public class FluidItemInventoryWrapper extends FluidInventoryWrapper<Storage<Flu
             return 0;
         }
         return super.extract(stack);
+    }
+
+    @Override
+    public int extract(FluidStack stack, int maxAmount) {
+        if (!storage.supportsExtraction()) {
+            return 0;
+        }
+        return super.extract(stack, maxAmount);
+    }
+
+    @Override
+    public FluidStack extractAny(int maxAmount) {
+        if (!storage.supportsExtraction()) {
+            return FluidStack.EMPTY;
+        }
+        return super.extractAny(maxAmount);
     }
 
     @Override

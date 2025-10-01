@@ -90,11 +90,21 @@ public class BucketFluidInventory extends FluidItemInventoryWrapper {
 
     @Override
     public int extract(FluidStack stack, int maxAmount) {
-        if (!canExtract() || maxAmount != CAPACITY) {
+        if (!canExtract() || maxAmount != CAPACITY || stack.getFluid() != toFluid()) {
             return 0;
         }
         this.stack = Items.BUCKET.getDefaultStack();
         return CAPACITY;
+    }
+
+    @Override
+    public FluidStack extractAny(int maxAmount) {
+        if (!canExtract() || maxAmount != CAPACITY) {
+            return FluidStack.EMPTY;
+        }
+        FluidStack fluid = new FluidStack(toFluid(), CAPACITY);
+        stack = Items.BUCKET.getDefaultStack();
+        return fluid;
     }
 
     @Override

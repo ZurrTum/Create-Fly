@@ -13,7 +13,6 @@ import me.shedaniel.rei.api.common.category.CategoryIdentifier;
 import me.shedaniel.rei.api.common.display.Display;
 import me.shedaniel.rei.api.common.display.DisplaySerializer;
 import me.shedaniel.rei.api.common.entry.EntryIngredient;
-import me.shedaniel.rei.api.common.entry.EntryStack;
 import me.shedaniel.rei.api.common.entry.type.VanillaEntryTypes;
 import me.shedaniel.rei.api.common.registry.display.ServerDisplayRegistry;
 import me.shedaniel.rei.api.common.util.EntryIngredients;
@@ -73,55 +72,54 @@ public record SpoutFillingDisplay(
                 dev.architectury.fluid.FluidStack stack = entry.castValue();
                 return new FluidStack(stack.getFluid(), stack.getAmount(), stack.getPatch());
             }).toList();
-        EntryRegistry.getInstance().getEntryStacks().filter(stack -> Objects.equals(stack.getType(), VanillaEntryTypes.ITEM))
-            .<EntryStack<ItemStack>>map(EntryStack::cast).forEach(entry -> {
-                ItemStack stack = entry.getValue();
-                if (PotionFluidHandler.isPotionItem(stack)) {
-                    //TODO
-                    //                    registry.add(new SpoutFillingDisplay(
-                    //                        EntryIngredients.of(Items.GLASS_BOTTLE),
-                    //                        IngredientHelper.createEntryIngredient(PotionFluidHandler.getFluidFromPotionItem(stack)),
-                    //                        EntryIngredients.of(stack),
-                    //                        Optional.of(POTIONS)
-                    //                    ));
+        EntryRegistry.getInstance().getEntryStacks().filter(stack -> Objects.equals(stack.getType(), VanillaEntryTypes.ITEM)).forEach(entry -> {
+            ItemStack stack = entry.castValue();
+            if (PotionFluidHandler.isPotionItem(stack)) {
+                //TODO
+                //                    registry.add(new SpoutFillingDisplay(
+                //                        EntryIngredients.of(Items.GLASS_BOTTLE),
+                //                        IngredientHelper.createEntryIngredient(PotionFluidHandler.getFluidFromPotionItem(stack)),
+                //                        EntryIngredients.of(stack),
+                //                        Optional.of(POTIONS)
+                //                    ));
+                return;
+            }
+            try (FluidItemInventory capability = FluidHelper.getFluidInventory(stack.copy())) {
+                if (capability == null) {
                     return;
                 }
-                try (FluidItemInventory capability = FluidHelper.getFluidInventory(stack.copy())) {
-                    if (capability == null) {
-                        return;
+                int size = capability.size();
+                FluidStack existingFluid = size == 1 ? capability.getStack(0) : FluidStack.EMPTY;
+                for (FluidStack fluid : fluids) {
+                    if (size == 1 && !existingFluid.isEmpty() && !FluidStack.areFluidsAndComponentsEqual(existingFluid, fluid)) {
+                        continue;
                     }
-                    int size = capability.size();
-                    FluidStack existingFluid = size == 1 ? capability.getStack(0) : FluidStack.EMPTY;
-                    for (FluidStack fluid : fluids) {
-                        if (size == 1 && !existingFluid.isEmpty() && !FluidStack.areFluidsAndComponentsEqual(existingFluid, fluid)) {
-                            continue;
-                        }
-                        int insert = capability.insert(fluid, 81000);
-                        if (insert == 0) {
-                            continue;
-                        }
-                        ItemStack result = capability.getContainer();
-                        if (!result.isEmpty()) {
-                            Item item = stack.getItem();
-                            if (!result.isOf(item)) {
-                                Identifier itemName = Registries.ITEM.getId(item);
-                                Identifier fluidName = Registries.FLUID.getId(fluid.getFluid());
-                                Identifier id = Identifier.of(
-                                    MOD_ID,
-                                    "fill_" + itemName.getNamespace() + "_" + itemName.getPath() + "_with_" + fluidName.getNamespace() + "_" + fluidName.getPath()
-                                );
-                                registry.add(new SpoutFillingDisplay(
-                                    EntryIngredients.of(stack),
-                                    EntryIngredients.of(dev.architectury.fluid.FluidStack.create(fluid.getFluid(), insert, fluid.getComponentChanges())),
-                                    EntryIngredients.of(result),
-                                    Optional.of(id)
-                                ));
-                            }
-                        }
-                        capability.extract(fluid, insert);
+                    int insert = capability.insert(fluid, 81000);
+                    if (insert == 0) {
+                        continue;
                     }
+                    ItemStack result = capability.getContainer();
+                    if (!result.isEmpty()) {
+                        Item item = stack.getItem();
+                        if (!result.isOf(item)) {
+                            Identifier itemName = Registries.ITEM.getId(item);
+                            Identifier fluidName = Registries.FLUID.getId(fluid.getFluid());
+                            Identifier id = Identifier.of(
+                                MOD_ID,
+                                "fill_" + itemName.getNamespace() + "_" + itemName.getPath() + "_with_" + fluidName.getNamespace() + "_" + fluidName.getPath()
+                            );
+                            registry.add(new SpoutFillingDisplay(
+                                EntryIngredients.of(stack),
+                                EntryIngredients.of(dev.architectury.fluid.FluidStack.create(fluid.getFluid(), insert, fluid.getComponentChanges())),
+                                EntryIngredients.of(result),
+                                Optional.of(id)
+                            ));
+                        }
+                    }
+                    capability.extract(fluid, insert);
                 }
-            });
+            }
+        });
     }
 
     @Override
