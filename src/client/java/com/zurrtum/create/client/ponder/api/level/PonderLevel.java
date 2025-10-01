@@ -10,7 +10,10 @@ import com.zurrtum.create.client.ponder.api.scene.Selection;
 import com.zurrtum.create.client.ponder.foundation.PonderIndex;
 import com.zurrtum.create.client.ponder.foundation.PonderScene;
 import com.zurrtum.create.client.ponder.foundation.PonderWorldParticles;
+import com.zurrtum.create.client.ponder.foundation.level.PonderChunk;
 import com.zurrtum.create.ponder.api.VirtualBlockEntity;
+import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
+import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.BlockEntity;
@@ -46,6 +49,9 @@ import net.minecraft.world.BlockView;
 import net.minecraft.world.LightType;
 import net.minecraft.world.RaycastContext;
 import net.minecraft.world.World;
+import net.minecraft.world.chunk.Chunk;
+import net.minecraft.world.chunk.ChunkStatus;
+import net.minecraft.world.chunk.WorldChunk;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
@@ -61,6 +67,8 @@ public class PonderLevel extends SchematicLevel {
     protected Map<BlockPos, Integer> blockBreakingProgressions;
     protected List<Entity> originalEntities;
     private final Supplier<ClientWorld> asClientWorld = Suppliers.memoize(() -> WrappedClientLevel.of(this));
+    @Nullable
+    private Long2ObjectMap<PonderChunk> chunks;
 
     protected PonderWorldParticles particles;
 
@@ -363,5 +371,18 @@ public class PonderLevel extends SchematicLevel {
                 );
             }
         );
+    }
+
+    @Override
+    public WorldChunk getChunk(int x, int z) {
+        if (chunks == null) {
+            chunks = new Long2ObjectOpenHashMap<>();
+        }
+        return chunks.computeIfAbsent(ChunkPos.toLong(x, z), $ -> new PonderChunk(this, x, z));
+    }
+
+    @Override
+    public Chunk getChunk(int x, int z, ChunkStatus leastStatus, boolean create) {
+        return getChunk(x, z);
     }
 }
