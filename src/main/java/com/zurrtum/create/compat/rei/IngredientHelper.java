@@ -22,7 +22,7 @@ import java.util.stream.Stream;
 
 public interface IngredientHelper {
     static EntryIngredient createEntryIngredient(com.zurrtum.create.infrastructure.fluids.FluidStack stack) {
-        return EntryIngredients.of(stack.getFluid(), stack.getAmount());
+        return EntryIngredients.of(FluidStack.create(stack.getFluid(), stack.getAmount(), stack.getComponentChanges()));
     }
 
     static EntryIngredient createEntryIngredient(FluidIngredient ingredient) {
