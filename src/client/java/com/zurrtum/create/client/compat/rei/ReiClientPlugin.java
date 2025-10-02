@@ -61,6 +61,7 @@ public class ReiClientPlugin implements REIClientPlugin {
         registry.add(new SequencedAssemblyCategory(), config());
         registry.add(new BlockCuttingCategory(), config(AllItems.MECHANICAL_SAW));
         registry.add(new FanBlastingCategory(), config(AllItems.ENCASED_FAN));
+        registry.add(new FanHauntingCategory(), config(AllItems.ENCASED_FAN));
     }
 
     @Override

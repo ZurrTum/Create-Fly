@@ -9,6 +9,7 @@ import com.zurrtum.create.content.kinetics.crafter.MechanicalCraftingRecipe;
 import com.zurrtum.create.content.kinetics.crusher.CrushingRecipe;
 import com.zurrtum.create.content.kinetics.deployer.ItemApplicationRecipe;
 import com.zurrtum.create.content.kinetics.deployer.ManualApplicationRecipe;
+import com.zurrtum.create.content.kinetics.fan.processing.HauntingRecipe;
 import com.zurrtum.create.content.kinetics.millstone.MillingRecipe;
 import com.zurrtum.create.content.kinetics.mixer.CompactingRecipe;
 import com.zurrtum.create.content.kinetics.mixer.MixingRecipe;
@@ -45,6 +46,7 @@ public class ReiCommonPlugin implements REICommonPlugin {
     public static final CategoryIdentifier<SequencedAssemblyDisplay> SEQUENCED_ASSEMBLY = CategoryIdentifier.of(MOD_ID, "sequenced_assembly");
     public static final CategoryIdentifier<BlockCuttingDisplay> BLOCK_CUTTING = CategoryIdentifier.of(MOD_ID, "block_cutting");
     public static final CategoryIdentifier<FanBlastingDisplay> FAN_BLASTING = CategoryIdentifier.of(MOD_ID, "fan_blasting");
+    public static final CategoryIdentifier<FanHauntingDisplay> FAN_HAUNTING = CategoryIdentifier.of(MOD_ID, "fan_haunting");
 
     @Override
     public void registerDisplays(ServerDisplayRegistry registry) {
@@ -66,6 +68,7 @@ public class ReiCommonPlugin implements REICommonPlugin {
         registry.beginRecipeFiller(SequencedAssemblyRecipe.class).fill(SequencedAssemblyDisplay::new);
         registry.beginRecipeFiller(BlastingRecipe.class).fill(FanBlastingDisplay::of);
         registry.beginRecipeFiller(SmeltingRecipe.class).fill(FanBlastingDisplay::of);
+        registry.beginRecipeFiller(HauntingRecipe.class).fill(FanHauntingDisplay::new);
         BlockCuttingDisplay.register(registry);
     }
 
@@ -104,5 +107,6 @@ public class ReiCommonPlugin implements REICommonPlugin {
         registry.register(SEQUENCED_ASSEMBLY.getIdentifier(), SequencedAssemblyDisplay.SERIALIZER);
         registry.register(BLOCK_CUTTING.getIdentifier(), BlockCuttingDisplay.SERIALIZER);
         registry.register(FAN_BLASTING.getIdentifier(), FanBlastingDisplay.SERIALIZER);
+        registry.register(FAN_HAUNTING.getIdentifier(), FanHauntingDisplay.SERIALIZER);
     }
 }
