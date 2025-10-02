@@ -7,6 +7,7 @@
 	"elements": [
 		{
 			"name": "Blade",
+			"shade": false,
 			"from": [1, 8, 11],
 			"to": [15, 8.062, 18],
 			"faces": {
