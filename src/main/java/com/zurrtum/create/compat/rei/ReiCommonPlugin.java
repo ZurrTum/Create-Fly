@@ -20,8 +20,10 @@ import me.shedaniel.rei.api.common.display.DisplaySerializerRegistry;
 import me.shedaniel.rei.api.common.plugins.REICommonPlugin;
 import me.shedaniel.rei.api.common.registry.display.ServerDisplayRegistry;
 import me.shedaniel.rei.plugin.common.displays.crafting.CraftingDisplay;
+import net.minecraft.recipe.BlastingRecipe;
 import net.minecraft.recipe.CraftingRecipe;
 import net.minecraft.recipe.ShapelessRecipe;
+import net.minecraft.recipe.SmeltingRecipe;
 
 import static com.zurrtum.create.Create.MOD_ID;
 
@@ -42,6 +44,7 @@ public class ReiCommonPlugin implements REICommonPlugin {
     public static final CategoryIdentifier<SandpaperPolishingDisplay> SANDPAPER_POLISHING = CategoryIdentifier.of(MOD_ID, "sandpaper_polishing");
     public static final CategoryIdentifier<SequencedAssemblyDisplay> SEQUENCED_ASSEMBLY = CategoryIdentifier.of(MOD_ID, "sequenced_assembly");
     public static final CategoryIdentifier<BlockCuttingDisplay> BLOCK_CUTTING = CategoryIdentifier.of(MOD_ID, "block_cutting");
+    public static final CategoryIdentifier<FanBlastingDisplay> FAN_BLASTING = CategoryIdentifier.of(MOD_ID, "fan_blasting");
 
     @Override
     public void registerDisplays(ServerDisplayRegistry registry) {
@@ -61,6 +64,8 @@ public class ReiCommonPlugin implements REICommonPlugin {
         registry.beginRecipeFiller(FillingRecipe.class).fill(SpoutFillingDisplay::new);
         registry.beginRecipeFiller(SandPaperPolishingRecipe.class).fill(SandpaperPolishingDisplay::new);
         registry.beginRecipeFiller(SequencedAssemblyRecipe.class).fill(SequencedAssemblyDisplay::new);
+        registry.beginRecipeFiller(BlastingRecipe.class).fill(FanBlastingDisplay::of);
+        registry.beginRecipeFiller(SmeltingRecipe.class).fill(FanBlastingDisplay::of);
         BlockCuttingDisplay.register(registry);
     }
 
@@ -98,5 +103,6 @@ public class ReiCommonPlugin implements REICommonPlugin {
         registry.register(SANDPAPER_POLISHING.getIdentifier(), SandpaperPolishingDisplay.SERIALIZER);
         registry.register(SEQUENCED_ASSEMBLY.getIdentifier(), SequencedAssemblyDisplay.SERIALIZER);
         registry.register(BLOCK_CUTTING.getIdentifier(), BlockCuttingDisplay.SERIALIZER);
+        registry.register(FAN_BLASTING.getIdentifier(), FanBlastingDisplay.SERIALIZER);
     }
 }
