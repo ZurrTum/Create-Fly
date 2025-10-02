@@ -8,15 +8,15 @@ import com.zurrtum.create.content.fluids.transfer.EmptyingRecipe;
 import com.zurrtum.create.foundation.fluid.FluidHelper;
 import com.zurrtum.create.infrastructure.fluids.FluidItemInventory;
 import com.zurrtum.create.infrastructure.fluids.FluidStack;
-import me.shedaniel.rei.api.client.registry.entry.EntryRegistry;
 import me.shedaniel.rei.api.common.category.CategoryIdentifier;
 import me.shedaniel.rei.api.common.display.Display;
 import me.shedaniel.rei.api.common.display.DisplaySerializer;
 import me.shedaniel.rei.api.common.entry.EntryIngredient;
-import me.shedaniel.rei.api.common.entry.type.VanillaEntryTypes;
-import me.shedaniel.rei.api.common.registry.display.ServerDisplayRegistry;
+import me.shedaniel.rei.api.common.entry.EntryStack;
+import me.shedaniel.rei.api.common.registry.display.DisplayConsumer;
 import me.shedaniel.rei.api.common.util.EntryIngredients;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.network.codec.PacketCodecs;
 import net.minecraft.recipe.RecipeEntry;
@@ -24,8 +24,8 @@ import net.minecraft.registry.Registries;
 import net.minecraft.util.Identifier;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import static com.zurrtum.create.Create.MOD_ID;
 
@@ -65,17 +65,16 @@ public record DrainingDisplay(
         );
     }
 
-    public static void register(ServerDisplayRegistry registry) {
-        EntryRegistry.getInstance().getEntryStacks().filter(stack -> Objects.equals(stack.getType(), VanillaEntryTypes.ITEM)).forEach(entry -> {
+    public static void register(Stream<EntryStack<?>> itemStream, DisplayConsumer registry) {
+        itemStream.forEach(entry -> {
             ItemStack stack = entry.castValue();
             if (PotionFluidHandler.isPotionItem(stack)) {
-                //TODO
-                //                registry.add(new DrainingDisplay(
-                //                    EntryIngredients.of(stack),
-                //                    IngredientHelper.createEntryIngredient(PotionFluidHandler.getFluidFromPotionItem(stack)),
-                //                    EntryIngredients.of(Items.GLASS_BOTTLE),
-                //                    Optional.of(POTIONS)
-                //                ));
+                registry.add(new DrainingDisplay(
+                    EntryIngredients.of(stack),
+                    IngredientHelper.createEntryIngredient(PotionFluidHandler.getFluidFromPotionItem(stack)),
+                    EntryIngredients.of(Items.GLASS_BOTTLE),
+                    Optional.of(POTIONS)
+                ));
                 return;
             }
             try (FluidItemInventory capability = FluidHelper.getFluidInventory(stack.copy())) {

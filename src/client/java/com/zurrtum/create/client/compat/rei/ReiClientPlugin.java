@@ -3,18 +3,23 @@ package com.zurrtum.create.client.compat.rei;
 import com.zurrtum.create.AllItems;
 import com.zurrtum.create.client.compat.rei.category.*;
 import com.zurrtum.create.client.compat.rei.display.MysteriousItemConversionDisplay;
+import com.zurrtum.create.compat.rei.display.DrainingDisplay;
+import com.zurrtum.create.compat.rei.display.SpoutFillingDisplay;
 import me.shedaniel.math.Rectangle;
 import me.shedaniel.rei.api.client.plugins.REIClientPlugin;
 import me.shedaniel.rei.api.client.registry.category.CategoryRegistry;
 import me.shedaniel.rei.api.client.registry.category.CategoryRegistry.CategoryConfiguration;
 import me.shedaniel.rei.api.client.registry.display.DisplayRegistry;
+import me.shedaniel.rei.api.client.registry.entry.EntryRegistry;
 import me.shedaniel.rei.api.common.category.CategoryIdentifier;
 import me.shedaniel.rei.api.common.display.Display;
 import me.shedaniel.rei.api.common.entry.EntryStack;
+import me.shedaniel.rei.api.common.entry.type.VanillaEntryTypes;
 import me.shedaniel.rei.api.common.util.EntryStacks;
 import net.minecraft.item.ItemConvertible;
 import net.minecraft.item.ItemStack;
 
+import java.util.Objects;
 import java.util.function.Consumer;
 
 import static com.zurrtum.create.Create.MOD_ID;
@@ -60,5 +65,12 @@ public class ReiClientPlugin implements REIClientPlugin {
     public void registerDisplays(DisplayRegistry registry) {
         registry.add(new MysteriousItemConversionDisplay(AllItems.EMPTY_BLAZE_BURNER, AllItems.BLAZE_BURNER));
         registry.add(new MysteriousItemConversionDisplay(AllItems.PECULIAR_BELL, AllItems.HAUNTED_BELL));
+        EntryRegistry entrys = EntryRegistry.getInstance();
+        SpoutFillingDisplay.register(
+            entrys.getEntryStacks().filter(stack -> Objects.equals(stack.getType(), VanillaEntryTypes.ITEM)),
+            entrys.getEntryStacks().filter(stack -> Objects.equals(stack.getType(), VanillaEntryTypes.FLUID)),
+            registry
+        );
+        DrainingDisplay.register(entrys.getEntryStacks().filter(stack -> Objects.equals(stack.getType(), VanillaEntryTypes.ITEM)), registry);
     }
 }

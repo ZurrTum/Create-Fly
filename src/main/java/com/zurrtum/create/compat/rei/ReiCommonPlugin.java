@@ -60,8 +60,6 @@ public class ReiCommonPlugin implements REICommonPlugin {
         registry.beginRecipeFiller(FillingRecipe.class).fill(SpoutFillingDisplay::new);
         registry.beginRecipeFiller(SandPaperPolishingRecipe.class).fill(SandpaperPolishingDisplay::new);
         registry.beginRecipeFiller(SequencedAssemblyRecipe.class).fill(SequencedAssemblyDisplay::new);
-        SpoutFillingDisplay.register(registry);
-        DrainingDisplay.register(registry);
     }
 
     @Override

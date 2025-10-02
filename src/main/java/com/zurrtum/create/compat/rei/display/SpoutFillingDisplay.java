@@ -8,16 +8,16 @@ import com.zurrtum.create.content.fluids.transfer.FillingRecipe;
 import com.zurrtum.create.foundation.fluid.FluidHelper;
 import com.zurrtum.create.infrastructure.fluids.FluidItemInventory;
 import com.zurrtum.create.infrastructure.fluids.FluidStack;
-import me.shedaniel.rei.api.client.registry.entry.EntryRegistry;
 import me.shedaniel.rei.api.common.category.CategoryIdentifier;
 import me.shedaniel.rei.api.common.display.Display;
 import me.shedaniel.rei.api.common.display.DisplaySerializer;
 import me.shedaniel.rei.api.common.entry.EntryIngredient;
-import me.shedaniel.rei.api.common.entry.type.VanillaEntryTypes;
-import me.shedaniel.rei.api.common.registry.display.ServerDisplayRegistry;
+import me.shedaniel.rei.api.common.entry.EntryStack;
+import me.shedaniel.rei.api.common.registry.display.DisplayConsumer;
 import me.shedaniel.rei.api.common.util.EntryIngredients;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.network.codec.PacketCodecs;
 import net.minecraft.recipe.RecipeEntry;
@@ -25,8 +25,8 @@ import net.minecraft.registry.Registries;
 import net.minecraft.util.Identifier;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import static com.zurrtum.create.Create.MOD_ID;
 
@@ -66,22 +66,20 @@ public record SpoutFillingDisplay(
         );
     }
 
-    public static void register(ServerDisplayRegistry registry) {
-        List<FluidStack> fluids = EntryRegistry.getInstance().getEntryStacks()
-            .filter(stack -> Objects.equals(stack.getType(), VanillaEntryTypes.FLUID)).map(entry -> {
-                dev.architectury.fluid.FluidStack stack = entry.castValue();
-                return new FluidStack(stack.getFluid(), stack.getAmount(), stack.getPatch());
-            }).toList();
-        EntryRegistry.getInstance().getEntryStacks().filter(stack -> Objects.equals(stack.getType(), VanillaEntryTypes.ITEM)).forEach(entry -> {
+    public static void register(Stream<EntryStack<?>> itemStream, Stream<EntryStack<?>> fluidStream, DisplayConsumer registry) {
+        List<FluidStack> fluids = fluidStream.map(entry -> {
+            dev.architectury.fluid.FluidStack stack = entry.castValue();
+            return new FluidStack(stack.getFluid(), stack.getAmount(), stack.getPatch());
+        }).toList();
+        itemStream.forEach(entry -> {
             ItemStack stack = entry.castValue();
             if (PotionFluidHandler.isPotionItem(stack)) {
-                //TODO
-                //                    registry.add(new SpoutFillingDisplay(
-                //                        EntryIngredients.of(Items.GLASS_BOTTLE),
-                //                        IngredientHelper.createEntryIngredient(PotionFluidHandler.getFluidFromPotionItem(stack)),
-                //                        EntryIngredients.of(stack),
-                //                        Optional.of(POTIONS)
-                //                    ));
+                registry.add(new SpoutFillingDisplay(
+                    EntryIngredients.of(Items.GLASS_BOTTLE),
+                    IngredientHelper.createEntryIngredient(PotionFluidHandler.getFluidFromPotionItem(stack)),
+                    EntryIngredients.of(stack),
+                    Optional.of(POTIONS)
+                ));
                 return;
             }
             try (FluidItemInventory capability = FluidHelper.getFluidInventory(stack.copy())) {
