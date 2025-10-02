@@ -10,6 +10,7 @@ import com.zurrtum.create.content.kinetics.crusher.CrushingRecipe;
 import com.zurrtum.create.content.kinetics.deployer.ItemApplicationRecipe;
 import com.zurrtum.create.content.kinetics.deployer.ManualApplicationRecipe;
 import com.zurrtum.create.content.kinetics.fan.processing.HauntingRecipe;
+import com.zurrtum.create.content.kinetics.fan.processing.SplashingRecipe;
 import com.zurrtum.create.content.kinetics.millstone.MillingRecipe;
 import com.zurrtum.create.content.kinetics.mixer.CompactingRecipe;
 import com.zurrtum.create.content.kinetics.mixer.MixingRecipe;
@@ -45,6 +46,7 @@ public class ReiCommonPlugin implements REICommonPlugin {
     public static final CategoryIdentifier<FanBlastingDisplay> FAN_BLASTING = CategoryIdentifier.of(MOD_ID, "fan_blasting");
     public static final CategoryIdentifier<FanHauntingDisplay> FAN_HAUNTING = CategoryIdentifier.of(MOD_ID, "fan_haunting");
     public static final CategoryIdentifier<FanSmokingDisplay> FAN_SMOKING = CategoryIdentifier.of(MOD_ID, "fan_smoking");
+    public static final CategoryIdentifier<FanWashingDisplay> FAN_WASHING = CategoryIdentifier.of(MOD_ID, "fan_washing");
 
     @Override
     public void registerDisplays(ServerDisplayRegistry registry) {
@@ -68,6 +70,7 @@ public class ReiCommonPlugin implements REICommonPlugin {
         registry.beginRecipeFiller(SmeltingRecipe.class).fill(FanBlastingDisplay::of);
         registry.beginRecipeFiller(HauntingRecipe.class).fill(FanHauntingDisplay::new);
         registry.beginRecipeFiller(SmokingRecipe.class).fill(FanSmokingDisplay::of);
+        registry.beginRecipeFiller(SplashingRecipe.class).fill(FanWashingDisplay::new);
         BlockCuttingDisplay.register(registry);
     }
 
@@ -108,5 +111,6 @@ public class ReiCommonPlugin implements REICommonPlugin {
         registry.register(FAN_BLASTING.getIdentifier(), FanBlastingDisplay.SERIALIZER);
         registry.register(FAN_HAUNTING.getIdentifier(), FanHauntingDisplay.SERIALIZER);
         registry.register(FAN_SMOKING.getIdentifier(), FanSmokingDisplay.SERIALIZER);
+        registry.register(FAN_WASHING.getIdentifier(), FanWashingDisplay.SERIALIZER);
     }
 }

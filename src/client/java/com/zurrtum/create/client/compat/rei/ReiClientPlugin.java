@@ -63,6 +63,7 @@ public class ReiClientPlugin implements REIClientPlugin {
         registry.add(new FanBlastingCategory(), config(AllItems.ENCASED_FAN));
         registry.add(new FanHauntingCategory(), config(AllItems.ENCASED_FAN));
         registry.add(new FanSmokingCategory(), config(AllItems.ENCASED_FAN));
+        registry.add(new FanWashingCategory(), config(AllItems.ENCASED_FAN));
     }
 
     @Override
