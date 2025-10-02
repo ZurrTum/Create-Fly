@@ -21,10 +21,7 @@ import me.shedaniel.rei.api.common.display.DisplaySerializerRegistry;
 import me.shedaniel.rei.api.common.plugins.REICommonPlugin;
 import me.shedaniel.rei.api.common.registry.display.ServerDisplayRegistry;
 import me.shedaniel.rei.plugin.common.displays.crafting.CraftingDisplay;
-import net.minecraft.recipe.BlastingRecipe;
-import net.minecraft.recipe.CraftingRecipe;
-import net.minecraft.recipe.ShapelessRecipe;
-import net.minecraft.recipe.SmeltingRecipe;
+import net.minecraft.recipe.*;
 
 import static com.zurrtum.create.Create.MOD_ID;
 
@@ -47,6 +44,7 @@ public class ReiCommonPlugin implements REICommonPlugin {
     public static final CategoryIdentifier<BlockCuttingDisplay> BLOCK_CUTTING = CategoryIdentifier.of(MOD_ID, "block_cutting");
     public static final CategoryIdentifier<FanBlastingDisplay> FAN_BLASTING = CategoryIdentifier.of(MOD_ID, "fan_blasting");
     public static final CategoryIdentifier<FanHauntingDisplay> FAN_HAUNTING = CategoryIdentifier.of(MOD_ID, "fan_haunting");
+    public static final CategoryIdentifier<FanSmokingDisplay> FAN_SMOKING = CategoryIdentifier.of(MOD_ID, "fan_smoking");
 
     @Override
     public void registerDisplays(ServerDisplayRegistry registry) {
@@ -69,6 +67,7 @@ public class ReiCommonPlugin implements REICommonPlugin {
         registry.beginRecipeFiller(BlastingRecipe.class).fill(FanBlastingDisplay::of);
         registry.beginRecipeFiller(SmeltingRecipe.class).fill(FanBlastingDisplay::of);
         registry.beginRecipeFiller(HauntingRecipe.class).fill(FanHauntingDisplay::new);
+        registry.beginRecipeFiller(SmokingRecipe.class).fill(FanSmokingDisplay::of);
         BlockCuttingDisplay.register(registry);
     }
 
@@ -108,5 +107,6 @@ public class ReiCommonPlugin implements REICommonPlugin {
         registry.register(BLOCK_CUTTING.getIdentifier(), BlockCuttingDisplay.SERIALIZER);
         registry.register(FAN_BLASTING.getIdentifier(), FanBlastingDisplay.SERIALIZER);
         registry.register(FAN_HAUNTING.getIdentifier(), FanHauntingDisplay.SERIALIZER);
+        registry.register(FAN_SMOKING.getIdentifier(), FanSmokingDisplay.SERIALIZER);
     }
 }
