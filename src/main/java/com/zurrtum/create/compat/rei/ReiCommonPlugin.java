@@ -41,6 +41,7 @@ public class ReiCommonPlugin implements REICommonPlugin {
     public static final CategoryIdentifier<SpoutFillingDisplay> SPOUT_FILLING = CategoryIdentifier.of(MOD_ID, "spout_filling");
     public static final CategoryIdentifier<SandpaperPolishingDisplay> SANDPAPER_POLISHING = CategoryIdentifier.of(MOD_ID, "sandpaper_polishing");
     public static final CategoryIdentifier<SequencedAssemblyDisplay> SEQUENCED_ASSEMBLY = CategoryIdentifier.of(MOD_ID, "sequenced_assembly");
+    public static final CategoryIdentifier<BlockCuttingDisplay> BLOCK_CUTTING = CategoryIdentifier.of(MOD_ID, "block_cutting");
 
     @Override
     public void registerDisplays(ServerDisplayRegistry registry) {
@@ -60,6 +61,7 @@ public class ReiCommonPlugin implements REICommonPlugin {
         registry.beginRecipeFiller(FillingRecipe.class).fill(SpoutFillingDisplay::new);
         registry.beginRecipeFiller(SandPaperPolishingRecipe.class).fill(SandpaperPolishingDisplay::new);
         registry.beginRecipeFiller(SequencedAssemblyRecipe.class).fill(SequencedAssemblyDisplay::new);
+        BlockCuttingDisplay.register(registry);
     }
 
     @Override
@@ -95,5 +97,6 @@ public class ReiCommonPlugin implements REICommonPlugin {
         registry.register(SPOUT_FILLING.getIdentifier(), SpoutFillingDisplay.SERIALIZER);
         registry.register(SANDPAPER_POLISHING.getIdentifier(), SandpaperPolishingDisplay.SERIALIZER);
         registry.register(SEQUENCED_ASSEMBLY.getIdentifier(), SequencedAssemblyDisplay.SERIALIZER);
+        registry.register(BLOCK_CUTTING.getIdentifier(), BlockCuttingDisplay.SERIALIZER);
     }
 }

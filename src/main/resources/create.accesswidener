@@ -257,3 +257,4 @@ accessible method net/minecraft/client/world/ClientWorld getEntityLookup ()Lnet/
 accessible method net/minecraft/client/render/DiffuseLighting updateBuffer (Lnet/minecraft/client/render/DiffuseLighting$Type;Lorg/joml/Vector3f;Lorg/joml/Vector3f;)V
 accessible field net/minecraft/client/option/KeyBinding defaultKey Lnet/minecraft/client/util/InputUtil$Key;
 mutable field net/minecraft/client/option/KeyBinding defaultKey Lnet/minecraft/client/util/InputUtil$Key;
+accessible method net/minecraft/recipe/SingleStackRecipe result ()Lnet/minecraft/item/ItemStack;

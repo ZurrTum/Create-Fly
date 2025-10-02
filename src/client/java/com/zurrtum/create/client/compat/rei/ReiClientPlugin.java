@@ -59,6 +59,7 @@ public class ReiClientPlugin implements REIClientPlugin {
         registry.add(new SpoutFillingCategory(), config(AllItems.SPOUT));
         registry.add(new SandpaperPolishingCategory(), config(AllItems.SAND_PAPER, AllItems.RED_SAND_PAPER));
         registry.add(new SequencedAssemblyCategory(), config());
+        registry.add(new BlockCuttingCategory(), config(AllItems.MECHANICAL_SAW));
     }
 
     @Override
