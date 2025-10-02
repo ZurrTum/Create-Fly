@@ -22,9 +22,9 @@ import net.minecraft.inventory.Inventory;
 import net.minecraft.inventory.StackWithSlot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.recipe.PreparedRecipes;
 import net.minecraft.recipe.Recipe;
 import net.minecraft.recipe.RecipeEntry;
-import net.minecraft.recipe.ServerRecipeManager;
 import net.minecraft.recipe.input.RecipeInput;
 import net.minecraft.recipe.input.SingleStackRecipeInput;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -483,15 +483,15 @@ public class DeployerBlockEntity extends KineticBlockEntity {
             return null;
 
         ItemStack heldItemMainhand = player.cast().getMainHandStack();
-        ServerRecipeManager recipeManager = ((ServerWorld) world).getRecipeManager();
+        PreparedRecipes preparedRecipes = ((ServerWorld) world).getRecipeManager().preparedRecipes;
         if (heldItemMainhand.getItem() instanceof SandPaperItem) {
-            return recipeManager.getFirstMatch(AllRecipeTypes.SANDPAPER_POLISHING, new SingleStackRecipeInput(stack), world).map(RecipeEntry::value)
-                .orElse(null);
+            return preparedRecipes.find(AllRecipeTypes.SANDPAPER_POLISHING, new SingleStackRecipeInput(stack), world)
+                .filter(AllRecipeTypes.CAN_BE_AUTOMATED).map(RecipeEntry::value).findFirst().orElse(null);
         }
 
         ItemApplicationInput input = new ItemApplicationInput(stack, heldItemMainhand);
-        return AllRecipeTypes.DEPLOYER_RECIPES.stream().flatMap(type -> recipeManager.getFirstMatch(type, input, world).stream())
-            .map(RecipeEntry::value).findFirst().orElse(null);
+        return AllRecipeTypes.DEPLOYER_RECIPES.stream().flatMap(type -> preparedRecipes.find(type, input, world))
+            .filter(AllRecipeTypes.CAN_BE_AUTOMATED).map(RecipeEntry::value).findFirst().orElse(null);
     }
 
     public DeployerPlayer getPlayer() {
