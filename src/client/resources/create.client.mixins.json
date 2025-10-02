@@ -12,6 +12,7 @@
     "BlockEntityMixin",
     "BlockEntityTypeMixin",
     "BlockRenderManagerMixin",
+    "BufferBuilderStorageMixin",
     "ClientChunkManagerMixin",
     "ClientEntityHandlerMixin",
     "ClientPlayerEntityMixin",

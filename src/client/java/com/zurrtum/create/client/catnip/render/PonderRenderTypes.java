@@ -21,7 +21,7 @@ public class PonderRenderTypes {
         false,
         false,
         RenderPipelines.GUI_TEXTURED,
-        RenderLayer.MultiPhaseParameters.builder().texture(new RenderPhase.Texture(texture, false)).build(false)
+        MultiPhaseParameters.builder().texture(new RenderPhase.Texture(texture, false)).build(false)
     ));
     private static final RenderLayer GUI = RenderLayer.of(
         createLayerName("gui"),
@@ -29,7 +29,7 @@ public class PonderRenderTypes {
         false,
         false,
         RenderPipelines.GUI,
-        RenderLayer.MultiPhaseParameters.builder().build(false)
+        MultiPhaseParameters.builder().build(false)
     );
     private static final RenderLayer.MultiPhase GUI_INVERT = RenderLayer.of(
         "gui_text_highlight",
@@ -37,7 +37,7 @@ public class PonderRenderTypes {
         false,
         false,
         RenderPipelines.GUI_INVERT,
-        RenderLayer.MultiPhaseParameters.builder().build(false)
+        MultiPhaseParameters.builder().build(false)
     );
     private static final RenderLayer.MultiPhase GUI_TEXT_HIGHLIGHT = RenderLayer.of(
         "gui_text_highlight",
@@ -45,7 +45,7 @@ public class PonderRenderTypes {
         false,
         false,
         RenderPipelines.GUI_TEXT_HIGHLIGHT,
-        RenderLayer.MultiPhaseParameters.builder().build(false)
+        MultiPhaseParameters.builder().build(false)
     );
     private static final RenderLayer TRANSLUCENT = RenderLayer.of(
         createLayerName("translucent"),
@@ -53,8 +53,7 @@ public class PonderRenderTypes {
         true,
         true,
         RenderPipelines.TRANSLUCENT,
-        RenderLayer.MultiPhaseParameters.builder().lightmap(ENABLE_LIGHTMAP).texture(MIPMAP_BLOCK_ATLAS_TEXTURE).target(TRANSLUCENT_TARGET)
-            .build(true)
+        MultiPhaseParameters.builder().lightmap(ENABLE_LIGHTMAP).texture(MIPMAP_BLOCK_ATLAS_TEXTURE).target(TRANSLUCENT_TARGET).build(true)
     );
 
     private static final RenderLayer OUTLINE_SOLID = RenderLayer.of(
@@ -82,7 +81,7 @@ public class PonderRenderTypes {
         false,
         true,
         RenderPipelines.TRANSLUCENT,
-        MultiPhaseParameters.builder().texture(MIPMAP_BLOCK_ATLAS_TEXTURE).lightmap(ENABLE_LIGHTMAP).build(true)
+        MultiPhaseParameters.builder().texture(MIPMAP_BLOCK_ATLAS_TEXTURE).lightmap(ENABLE_LIGHTMAP).target(TRANSLUCENT_TARGET).build(true)
     );
 
     public static RenderLayer getGui() {

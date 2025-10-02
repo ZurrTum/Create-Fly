@@ -80,6 +80,8 @@ public class DefaultSuperRenderTypeBuffer implements SuperRenderTypeBuffer {
 
                 //extras
                 put(map, PonderRenderTypes.outlineSolid());
+                put(map, PonderRenderTypes.translucent());
+                put(map, PonderRenderTypes.fluid());
             }
         );
         private final Immediate bufferSource = VertexConsumerProvider.immediate(fixedBuffers, new BufferAllocator(256));
