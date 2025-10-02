@@ -12,7 +12,7 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
 
 public class BeltCrusherInteractionHandler {
-    public static boolean checkForCrushers(BeltInventory beltInventory, TransportedItemStack currentItem, float nextOffset) {
+    public static boolean checkForCrushers(BeltInventory beltInventory, boolean isClient, TransportedItemStack currentItem, float nextOffset) {
         boolean beltMovementPositive = beltInventory.beltMovementPositive;
         int firstUpcomingSegment = (int) Math.floor(currentItem.beltPosition);
         int step = beltMovementPositive ? 1 : -1;
@@ -38,13 +38,15 @@ public class BeltCrusherInteractionHandler {
                 return false;
             currentItem.beltPosition = crusherEntry;
 
+            if (isClient)
+                return true;
             BlockEntity be = world.getBlockEntity(crusherPos);
             if (!(be instanceof CrushingWheelControllerBlockEntity crusherBE))
                 return true;
 
             ItemStack toInsert = currentItem.stack;
             int count = toInsert.getCount();
-            int insert = crusherBE.inventory.insertExist(toInsert);
+            int insert = crusherBE.inventory.insert(toInsert);
             if (insert == 0) {
                 return true;
             }

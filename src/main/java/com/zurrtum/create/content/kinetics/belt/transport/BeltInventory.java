@@ -164,7 +164,7 @@ public class BeltInventory {
                 continue;
 
             // Horizontal Crushing Wheels
-            if (BeltCrusherInteractionHandler.checkForCrushers(this, currentItem, nextOffset))
+            if (BeltCrusherInteractionHandler.checkForCrushers(this, world.isClient, currentItem, nextOffset))
                 continue;
 
             // Apply Movement
