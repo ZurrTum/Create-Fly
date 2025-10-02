@@ -44,6 +44,7 @@ public class GuiRendererMixin {
         builder.put(SandPaperRenderState.class, new SandPaperRenderer(vertexConsumers));
         builder.put(TitleTextRenderState.class, new TitleTextRenderer(vertexConsumers));
         builder.put(SceneRenderState.class, new SceneRenderer(vertexConsumers));
+        builder.put(FanRenderState.class, new FanRenderer(vertexConsumers));
         return builder;
     }
 }

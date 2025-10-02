@@ -4,6 +4,7 @@ import com.zurrtum.create.AllItems;
 import com.zurrtum.create.client.compat.rei.CreateCategory;
 import com.zurrtum.create.client.compat.rei.renderer.TwoIconRenderer;
 import com.zurrtum.create.client.foundation.gui.AllGuiTextures;
+import com.zurrtum.create.client.foundation.gui.render.FanRenderState;
 import com.zurrtum.create.client.foundation.utility.CreateLang;
 import com.zurrtum.create.compat.rei.ReiCommonPlugin;
 import com.zurrtum.create.compat.rei.display.FanWashingDisplay;
@@ -16,8 +17,10 @@ import me.shedaniel.rei.api.client.gui.widgets.Widgets;
 import me.shedaniel.rei.api.common.category.CategoryIdentifier;
 import me.shedaniel.rei.api.common.entry.EntryIngredient;
 import net.minecraft.client.gui.DrawContext;
+import net.minecraft.fluid.Fluids;
 import net.minecraft.item.Items;
 import net.minecraft.text.Text;
+import org.joml.Matrix3x2f;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -62,9 +65,15 @@ public class FanWashingCategory extends CreateCategory<FanWashingDisplay> {
         widgets.add(Widgets.createDrawableWidget((DrawContext graphics, int mouseX, int mouseY, float delta) -> {
             drawSlotBackground(graphics, outputs, input);
             drawChanceSlotBackground(graphics, chances);
-            AllGuiTextures.JEI_SHADOW.render(graphics, bounds.x + 51, bounds.y + 34);
+            AllGuiTextures.JEI_SHADOW.render(graphics, bounds.x + 51, bounds.y + 32);
             AllGuiTextures.JEI_SHADOW.render(graphics, bounds.x + 70, bounds.y + 44);
             AllGuiTextures.JEI_LONG_ARROW.render(graphics, bounds.x + 59 + 7 * xOffsetAmount, bounds.y + 56);
+            graphics.state.addSpecialElement(new FanRenderState(
+                new Matrix3x2f(graphics.getMatrices()),
+                bounds.x + 61,
+                bounds.y + 10,
+                Fluids.WATER.getDefaultState().getBlockState()
+            ));
         }));
         widgets.add(createInputSlot(input).entries(display.input()));
         for (int i = 0, size = outputs.size(); i < size; i++) {
