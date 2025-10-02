@@ -60,7 +60,8 @@ public class ReiCommonPlugin implements REICommonPlugin {
         registry.beginRecipeFiller(CrushingRecipe.class).fill(CrushingDisplay::of);
         registry.beginRecipeFiller(MillingRecipe.class).fill(CrushingDisplay::of);
         registry.beginRecipeFiller(ManualApplicationRecipe.class).fill(ManualApplicationDisplay::new);
-        registry.beginRecipeFiller(ItemApplicationRecipe.class).fill(DeployingDisplay::new);
+        registry.beginRecipeFiller(ItemApplicationRecipe.class).fill(DeployingDisplay::of);
+        registry.beginRecipeFiller(SandPaperPolishingRecipe.class).fill(DeployingDisplay::of);
         registry.beginRecipeFiller(EmptyingRecipe.class).fill(DrainingDisplay::new);
         registry.beginRecipeFiller(MechanicalCraftingRecipe.class).fill(MechanicalCraftingDisplay::new);
         registry.beginRecipeFiller(FillingRecipe.class).fill(SpoutFillingDisplay::new);

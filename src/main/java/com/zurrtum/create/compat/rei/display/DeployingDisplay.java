@@ -1,8 +1,11 @@
 package com.zurrtum.create.compat.rei.display;
 
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import com.zurrtum.create.AllItemTags;
+import com.zurrtum.create.AllRecipeTypes;
 import com.zurrtum.create.compat.rei.IngredientHelper;
 import com.zurrtum.create.compat.rei.ReiCommonPlugin;
+import com.zurrtum.create.content.equipment.sandPaper.SandPaperPolishingRecipe;
 import com.zurrtum.create.content.kinetics.deployer.ItemApplicationRecipe;
 import me.shedaniel.rei.api.common.category.CategoryIdentifier;
 import me.shedaniel.rei.api.common.display.Display;
@@ -11,6 +14,7 @@ import me.shedaniel.rei.api.common.entry.EntryIngredient;
 import me.shedaniel.rei.api.common.util.EntryIngredients;
 import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.network.codec.PacketCodecs;
+import net.minecraft.recipe.Recipe;
 import net.minecraft.recipe.RecipeEntry;
 import net.minecraft.util.Identifier;
 
@@ -39,14 +43,33 @@ public record DeployingDisplay(
         )
     );
 
-    public DeployingDisplay(RecipeEntry<ItemApplicationRecipe> entry) {
-        this(entry.id().getValue(), entry.value());
+    public static DeployingDisplay of(RecipeEntry<?> entry) {
+        if (!AllRecipeTypes.CAN_BE_AUTOMATED.test(entry)) {
+            return null;
+        }
+        Identifier id = entry.id().getValue();
+        Recipe<?> recipe = entry.value();
+        if (recipe instanceof ItemApplicationRecipe itemApplicationRecipe) {
+            return new DeployingDisplay(id, itemApplicationRecipe);
+        } else if (recipe instanceof SandPaperPolishingRecipe sandPaperPolishingRecipe) {
+            return new DeployingDisplay(id, sandPaperPolishingRecipe);
+        }
+        return null;
     }
 
     public DeployingDisplay(Identifier id, ItemApplicationRecipe recipe) {
         this(
             EntryIngredients.ofIngredient(recipe.ingredient()),
             IngredientHelper.getInputEntryIngredient(recipe.target()),
+            EntryIngredients.of(recipe.result()),
+            Optional.of(id)
+        );
+    }
+
+    public DeployingDisplay(Identifier id, SandPaperPolishingRecipe recipe) {
+        this(
+            EntryIngredients.ofItemTag(AllItemTags.SANDPAPER),
+            EntryIngredients.ofIngredient(recipe.ingredient()),
             EntryIngredients.of(recipe.result()),
             Optional.of(id)
         );
