@@ -9,10 +9,7 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.render.SpecialGuiElementRenderer;
-import net.minecraft.client.render.DiffuseLighting;
-import net.minecraft.client.render.TexturedRenderLayers;
-import net.minecraft.client.render.VertexConsumer;
-import net.minecraft.client.render.VertexConsumerProvider;
+import net.minecraft.client.render.*;
 import net.minecraft.client.render.block.BlockRenderManager;
 import net.minecraft.client.render.model.BlockModelPart;
 import net.minecraft.client.util.math.MatrixStack;
@@ -67,7 +64,15 @@ public class SawRenderer extends SpecialGuiElementRenderer<SawRenderState> {
         matrices.multiply(RotationAxis.POSITIVE_Z.rotationDegrees(-90));
         matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(-90));
         matrices.translate(-0.5f, -0.5f, -0.5f);
-        blockRenderManager.renderBlock(blockState, BlockPos.ORIGIN, world, matrices, buffer, false, parts);
+        blockRenderManager.renderBlock(
+            blockState,
+            BlockPos.ORIGIN,
+            world,
+            matrices,
+            vertexConsumers.getBuffer(RenderLayer.getCutoutMipped()),
+            false,
+            parts
+        );
     }
 
     public static float getCurrentAngle() {
