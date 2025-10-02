@@ -77,11 +77,7 @@ public class SodiumCompat {
                 }
                 Fluid fluid = stack.getFluid();
                 if (fluids.add(fluid)) {
-                    FluidConfig config = AllFluidConfigs.get(fluid);
-                    if (config != null) {
-                        SpriteUtil.INSTANCE.markSpriteActive(config.still().get());
-                        SpriteUtil.INSTANCE.markSpriteActive(config.flowing().get());
-                    }
+                    markFluidSpriteActive(fluid);
                 }
                 continue;
             }
@@ -89,13 +85,21 @@ public class SodiumCompat {
             if (!fluidState.isEmpty()) {
                 Fluid fluid = fluidState.getFluid();
                 if (fluids.add(fluid)) {
-                    FluidConfig config = AllFluidConfigs.get(fluid);
-                    if (config != null) {
-                        SpriteUtil.INSTANCE.markSpriteActive(config.still().get());
-                        SpriteUtil.INSTANCE.markSpriteActive(config.flowing().get());
-                    }
+                    markFluidSpriteActive(fluid);
                 }
             }
+        }
+    }
+
+    @SuppressWarnings("UnstableApiUsage")
+    public static void markFluidSpriteActive(Fluid fluid) {
+        if (DISABLE) {
+            return;
+        }
+        FluidConfig config = AllFluidConfigs.get(fluid);
+        if (config != null) {
+            SpriteUtil.INSTANCE.markSpriteActive(config.still().get());
+            SpriteUtil.INSTANCE.markSpriteActive(config.flowing().get());
         }
     }
 }

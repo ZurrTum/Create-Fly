@@ -4,6 +4,7 @@ import com.zurrtum.create.AllBlocks;
 import com.zurrtum.create.client.AllPartialModels;
 import com.zurrtum.create.client.catnip.animation.AnimationTickHolder;
 import com.zurrtum.create.client.catnip.render.FluidRenderHelper;
+import com.zurrtum.create.client.compat.sodium.SodiumCompat;
 import com.zurrtum.create.client.flywheel.lib.model.baked.SinglePosVirtualBlockGetter;
 import net.minecraft.block.AbstractFireBlock;
 import net.minecraft.block.BlockState;
@@ -14,6 +15,7 @@ import net.minecraft.client.render.*;
 import net.minecraft.client.render.block.BlockRenderManager;
 import net.minecraft.client.render.model.BlockModelPart;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.fluid.Fluid;
 import net.minecraft.fluid.FluidState;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RotationAxis;
@@ -68,8 +70,10 @@ public class FanRenderer extends SpecialGuiElementRenderer<FanRenderState> {
         blockState = state.target();
         FluidState fluidState = blockState.getFluidState();
         if (!fluidState.isEmpty()) {
+            Fluid fluid = fluidState.getFluid();
+            SodiumCompat.markFluidSpriteActive(fluid);
             FluidRenderHelper.renderFluidBox(
-                fluidState.getFluid(),
+                fluid,
                 0,
                 0,
                 0,
