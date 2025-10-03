@@ -15,6 +15,7 @@ import net.minecraft.client.render.*;
 import net.minecraft.client.render.block.BlockRenderManager;
 import net.minecraft.client.render.model.BlockModelPart;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.component.ComponentChanges;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.fluid.FluidState;
 import net.minecraft.util.math.BlockPos;
@@ -74,6 +75,7 @@ public class FanRenderer extends SpecialGuiElementRenderer<FanRenderState> {
             SodiumCompat.markFluidSpriteActive(fluid);
             FluidRenderHelper.renderFluidBox(
                 fluid,
+                ComponentChanges.EMPTY,
                 0,
                 0,
                 0,

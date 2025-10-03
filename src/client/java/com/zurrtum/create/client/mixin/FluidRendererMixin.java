@@ -7,6 +7,7 @@ import com.zurrtum.create.client.AllFluidConfigs;
 import com.zurrtum.create.client.infrastructure.fluid.FluidConfig;
 import net.minecraft.client.render.block.FluidRenderer;
 import net.minecraft.client.texture.Sprite;
+import net.minecraft.component.ComponentChanges;
 import net.minecraft.fluid.FluidState;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -29,7 +30,7 @@ public class FluidRendererMixin {
     private int modTintColor(int tint, @Share("config") LocalRef<FluidConfig> ref) {
         FluidConfig config = ref.get();
         if (config != null) {
-            return config.tint().get();
+            return config.tint().apply(ComponentChanges.EMPTY);
         }
         return tint;
     }

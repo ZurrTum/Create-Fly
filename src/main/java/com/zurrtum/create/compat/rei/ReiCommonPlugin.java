@@ -1,5 +1,6 @@
 package com.zurrtum.create.compat.rei;
 
+import com.zurrtum.create.AllFluids;
 import com.zurrtum.create.AllRecipeTypes;
 import com.zurrtum.create.compat.rei.display.*;
 import com.zurrtum.create.content.equipment.sandPaper.SandPaperPolishingRecipe;
@@ -14,15 +15,19 @@ import com.zurrtum.create.content.kinetics.fan.processing.SplashingRecipe;
 import com.zurrtum.create.content.kinetics.millstone.MillingRecipe;
 import com.zurrtum.create.content.kinetics.mixer.CompactingRecipe;
 import com.zurrtum.create.content.kinetics.mixer.MixingRecipe;
+import com.zurrtum.create.content.kinetics.mixer.PotionRecipe;
 import com.zurrtum.create.content.kinetics.press.PressingRecipe;
 import com.zurrtum.create.content.kinetics.saw.CuttingRecipe;
 import com.zurrtum.create.content.processing.sequenced.SequencedAssemblyRecipe;
 import me.shedaniel.rei.api.common.category.CategoryIdentifier;
 import me.shedaniel.rei.api.common.display.DisplaySerializerRegistry;
+import me.shedaniel.rei.api.common.entry.comparison.FluidComparatorRegistry;
 import me.shedaniel.rei.api.common.plugins.REICommonPlugin;
 import me.shedaniel.rei.api.common.registry.display.ServerDisplayRegistry;
 import me.shedaniel.rei.plugin.common.displays.crafting.CraftingDisplay;
 import net.minecraft.recipe.*;
+
+import java.util.Objects;
 
 import static com.zurrtum.create.Create.MOD_ID;
 
@@ -47,6 +52,7 @@ public class ReiCommonPlugin implements REICommonPlugin {
     public static final CategoryIdentifier<FanHauntingDisplay> FAN_HAUNTING = CategoryIdentifier.of(MOD_ID, "fan_haunting");
     public static final CategoryIdentifier<FanSmokingDisplay> FAN_SMOKING = CategoryIdentifier.of(MOD_ID, "fan_smoking");
     public static final CategoryIdentifier<FanWashingDisplay> FAN_WASHING = CategoryIdentifier.of(MOD_ID, "fan_washing");
+    public static final CategoryIdentifier<PotionDisplay> AUTOMATIC_BREWING = CategoryIdentifier.of(MOD_ID, "automatic_brewing");
 
     @Override
     public void registerDisplays(ServerDisplayRegistry registry) {
@@ -72,6 +78,7 @@ public class ReiCommonPlugin implements REICommonPlugin {
         registry.beginRecipeFiller(HauntingRecipe.class).fill(FanHauntingDisplay::new);
         registry.beginRecipeFiller(SmokingRecipe.class).fill(FanSmokingDisplay::of);
         registry.beginRecipeFiller(SplashingRecipe.class).fill(FanWashingDisplay::new);
+        registry.beginRecipeFiller(PotionRecipe.class).fill(PotionDisplay::new);
         BlockCuttingDisplay.register(registry);
     }
 
@@ -113,5 +120,11 @@ public class ReiCommonPlugin implements REICommonPlugin {
         registry.register(FAN_HAUNTING.getIdentifier(), FanHauntingDisplay.SERIALIZER);
         registry.register(FAN_SMOKING.getIdentifier(), FanSmokingDisplay.SERIALIZER);
         registry.register(FAN_WASHING.getIdentifier(), FanWashingDisplay.SERIALIZER);
+        registry.register(AUTOMATIC_BREWING.getIdentifier(), PotionDisplay.SERIALIZER);
+    }
+
+    @Override
+    public void registerFluidComparators(FluidComparatorRegistry registry) {
+        registry.register((context, stack) -> Objects.hash(stack.getFluid(), stack.getComponents()), AllFluids.POTION);
     }
 }

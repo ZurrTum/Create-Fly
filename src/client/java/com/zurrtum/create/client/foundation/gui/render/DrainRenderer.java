@@ -80,6 +80,7 @@ public class DrainRenderer extends SpecialGuiElementRenderer<DrainRenderState> {
         float to = 1f - from;
         FluidRenderHelper.renderFluidBox(
             element.fluid(),
+            element.components(),
             from,
             from,
             from,

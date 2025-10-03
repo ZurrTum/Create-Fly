@@ -12,6 +12,10 @@ import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.color.world.BiomeColors;
 import net.minecraft.client.render.fog.FogRenderer;
+import net.minecraft.client.texture.SpriteAtlasTexture;
+import net.minecraft.component.ComponentChanges;
+import net.minecraft.component.DataComponentTypes;
+import net.minecraft.component.type.PotionContentsComponent;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.fluid.FluidState;
 import net.minecraft.fluid.Fluids;
@@ -20,6 +24,8 @@ import net.minecraft.util.Identifier;
 
 import java.util.IdentityHashMap;
 import java.util.Map;
+import java.util.Optional;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 public class AllFluidConfigs {
@@ -28,12 +34,12 @@ public class AllFluidConfigs {
     private static final FluidConfig LAVA = new FluidConfig(
         () -> MinecraftClient.getInstance().getBlockRenderManager().fluidRenderer.lavaSprites[0],
         () -> MinecraftClient.getInstance().getBlockRenderManager().fluidRenderer.lavaSprites[1],
-        () -> -1
+        component -> -1
     );
     private static final FluidConfig WATER = new FluidConfig(
         () -> MinecraftClient.getInstance().getBlockRenderManager().fluidRenderer.waterSprites[0],
         () -> MinecraftClient.getInstance().getBlockRenderManager().fluidRenderer.waterSprites[1],
-        () -> {
+        component -> {
             MinecraftClient mc = MinecraftClient.getInstance();
             if (mc.world == null || mc.player == null) {
                 return 0x3f76e4;
@@ -48,8 +54,19 @@ public class AllFluidConfigs {
     }
 
     private static void config(FlowableFluid fluid, int fogColor, Supplier<Float> fogDistance) {
+        config(fluid, fogColor, fogDistance, component -> -1);
+    }
+
+    @SuppressWarnings("deprecation")
+    private static void config(FlowableFluid fluid, int fogColor, Supplier<Float> fogDistance, Function<ComponentChanges, Integer> tint) {
         Identifier id = Registries.FLUID.getId(fluid).withPrefixedPath("fluid/");
-        FluidConfig config = new FluidConfig(id.withSuffixedPath("_still"), id.withSuffixedPath("_flow"), -1, fogDistance, fogColor);
+        FluidConfig config = new FluidConfig(
+            () -> MinecraftClient.getInstance().getSpriteAtlas(SpriteAtlasTexture.BLOCK_ATLAS_TEXTURE).apply(id.withSuffixedPath("_still")),
+            () -> MinecraftClient.getInstance().getSpriteAtlas(SpriteAtlasTexture.BLOCK_ATLAS_TEXTURE).apply(id.withSuffixedPath("_flow")),
+            tint,
+            fogDistance,
+            fogColor
+        );
         ALL.put(fluid, config);
         ALL.put(fluid.getFlowing(), config);
     }
@@ -81,7 +98,7 @@ public class AllFluidConfigs {
         config = new FluidConfig(
             () -> handler.getFluidSprites(client.world, client.player != null ? client.player.getBlockPos() : null, state)[0],
             () -> handler.getFluidSprites(client.world, client.player != null ? client.player.getBlockPos() : null, state)[1],
-            () -> handler.getFluidColor(client.world, client.player != null ? client.player.getBlockPos() : null, state)
+            component -> handler.getFluidColor(client.world, client.player != null ? client.player.getBlockPos() : null, state)
         );
         CACHE.put(fluid, config);
         return config;
@@ -90,7 +107,15 @@ public class AllFluidConfigs {
     public static void register() {
         FogRenderer.FOG_MODIFIERS.addFirst(new DivingLavaFogModifier());
         FogRenderer.FOG_MODIFIERS.addFirst(new FluidFogModifier());
-        config(AllFluids.POTION);
+        config(
+            AllFluids.POTION, -1, () -> 96.0f, component -> {
+                Optional<? extends PotionContentsComponent> potion = component.get(DataComponentTypes.POTION_CONTENTS);
+                if (potion != null && potion.isPresent()) {
+                    return potion.get().getColor() | 0xFF000000;
+                }
+                return PotionContentsComponent.DEFAULT.getColor() | 0xFF000000;
+            }
+        );
         config(AllFluids.TEA);
         config(AllFluids.MILK);
         config(AllFluids.HONEY, 0xEAAE2F, () -> 96.0f * (1f / 8f * AllConfigs.client().honeyTransparencyMultiplier.getF()));

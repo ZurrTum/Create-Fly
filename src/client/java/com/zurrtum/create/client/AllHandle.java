@@ -936,8 +936,9 @@ public class AllHandle extends AllClientHandle<ClientPlayNetworkHandler> {
                     continue;
                 float x = pos.getX() + rim + space * r.nextFloat();
                 float z = pos.getZ() + rim + space * r.nextFloat();
+                FluidStack stack = tankSegment.getRenderedFluid();
                 world.addImportantParticleClient(
-                    new FluidParticleData(AllParticleTypes.BASIN_FLUID, tankSegment.getRenderedFluid().getFluid()),
+                    new FluidParticleData(AllParticleTypes.BASIN_FLUID, stack.getFluid(), stack.getComponentChanges()),
                     x,
                     surface,
                     z,
@@ -985,8 +986,9 @@ public class AllHandle extends AllClientHandle<ClientPlayNetworkHandler> {
                     continue;
                 float angle = interval * (1 + currentSegment) + intervalOffset;
                 Vec3d vec = centerOf.add(VecHelper.rotate(pointer, angle, Axis.Y));
+                FluidStack stack = tankSegment.getRenderedFluid();
                 world.addImportantParticleClient(
-                    new FluidParticleData(AllParticleTypes.BASIN_FLUID, tankSegment.getRenderedFluid().getFluid()),
+                    new FluidParticleData(AllParticleTypes.BASIN_FLUID, stack.getFluid(), stack.getComponentChanges()),
                     vec.getX(),
                     surface,
                     vec.getZ(),

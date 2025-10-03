@@ -26,6 +26,7 @@ import me.shedaniel.rei.api.common.entry.EntryStack;
 import me.shedaniel.rei.api.common.util.EntryStacks;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
+import net.minecraft.component.ComponentChanges;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.fluid.Fluids;
 import net.minecraft.item.Item;
@@ -78,11 +79,13 @@ public class SequencedAssemblyCategory extends CreateCategory<SequencedAssemblyD
                 matrices.scale(scale, scale);
                 matrices.translate(-point.x, -point.y);
                 Fluid fluid = Fluids.EMPTY;
+                ComponentChanges components = ComponentChanges.EMPTY;
                 if (stack != null) {
                     FluidStack fluidStack = stack.castValue();
                     fluid = fluidStack.getFluid();
+                    components = fluidStack.getPatch();
                 }
-                graphics.state.addSpecialElement(new SpoutRenderState(i, new Matrix3x2f(matrices), fluid, point.x - 2, point.y + 24, i));
+                graphics.state.addSpecialElement(new SpoutRenderState(i, new Matrix3x2f(matrices), fluid, components, point.x - 2, point.y + 24, i));
                 matrices.popMatrix();
             }
         );

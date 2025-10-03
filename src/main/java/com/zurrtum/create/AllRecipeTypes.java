@@ -13,6 +13,7 @@ import com.zurrtum.create.content.kinetics.fan.processing.SplashingRecipe;
 import com.zurrtum.create.content.kinetics.millstone.MillingRecipe;
 import com.zurrtum.create.content.kinetics.mixer.CompactingRecipe;
 import com.zurrtum.create.content.kinetics.mixer.MixingRecipe;
+import com.zurrtum.create.content.kinetics.mixer.PotionRecipe;
 import com.zurrtum.create.content.kinetics.press.PressingRecipe;
 import com.zurrtum.create.content.kinetics.saw.CuttingRecipe;
 import com.zurrtum.create.content.processing.sequenced.SequencedAssemblyRecipe;
@@ -49,6 +50,7 @@ public class AllRecipeTypes {
     public static final RecipeType<ManualApplicationRecipe> ITEM_APPLICATION = register("item_application");
     public static final RecipeType<MechanicalCraftingRecipe> MECHANICAL_CRAFTING = register("mechanical_crafting");
     public static final RecipeType<SequencedAssemblyRecipe> SEQUENCED_ASSEMBLY = register("sequenced_assembly");
+    public static final RecipeType<PotionRecipe> POTION = register("potion");
 
     private static final TagKey<RecipeSerializer<?>> AUTOMATION_IGNORE_TAG = TagKey.of(
         RegistryKeys.RECIPE_SERIALIZER,

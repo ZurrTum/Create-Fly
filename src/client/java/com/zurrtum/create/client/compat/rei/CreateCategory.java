@@ -7,6 +7,7 @@ import com.zurrtum.create.content.processing.recipe.ChanceOutput;
 import dev.architectury.fluid.FluidStack;
 import me.shedaniel.math.Point;
 import me.shedaniel.math.Rectangle;
+import me.shedaniel.rei.api.client.entry.renderer.EntryRenderer;
 import me.shedaniel.rei.api.client.gui.widgets.Slot;
 import me.shedaniel.rei.api.client.gui.widgets.Widget;
 import me.shedaniel.rei.api.client.gui.widgets.Widgets;
@@ -65,7 +66,11 @@ public abstract class CreateCategory<T extends Display> implements DisplayCatego
     public static EntryIngredient getRenderEntryStack(EntryIngredient ingredient) {
         if (ingredient.getFirst().getValue() instanceof FluidStack) {
             for (EntryStack<FluidStack> stack : ingredient.<FluidStack>castAsList()) {
-                stack.withRenderer(new FluidStackRenderer(stack.getRenderer()));
+                EntryRenderer<FluidStack> renderer = stack.getRenderer();
+                if (renderer instanceof FluidStackRenderer) {
+                    continue;
+                }
+                stack.withRenderer(new FluidStackRenderer(renderer));
             }
         }
         return ingredient;

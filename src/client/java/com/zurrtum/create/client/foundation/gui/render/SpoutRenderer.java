@@ -22,6 +22,7 @@ import net.minecraft.client.render.block.BlockRenderManager;
 import net.minecraft.client.render.model.BlockModelPart;
 import net.minecraft.client.texture.TextureSetup;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.component.ComponentChanges;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.fluid.Fluids;
 import net.minecraft.util.math.BlockPos;
@@ -107,6 +108,7 @@ public class SpoutRenderer extends SpecialGuiElementRenderer<SpoutRenderState> {
 
         Fluid fluid = item.fluid();
         if (fluid != Fluids.EMPTY) {
+            ComponentChanges components = item.components();
             matrices.push();
             matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(-15.5f));
             matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(22.5f));
@@ -117,6 +119,7 @@ public class SpoutRenderer extends SpecialGuiElementRenderer<SpoutRenderState> {
             float to = 17f / 16f;
             FluidRenderHelper.renderFluidBox(
                 fluid,
+                components,
                 from,
                 from,
                 from,
@@ -142,6 +145,7 @@ public class SpoutRenderer extends SpecialGuiElementRenderer<SpoutRenderState> {
             to = fluidWidth / 2 + 0.5f;
             FluidRenderHelper.renderFluidBox(
                 fluid,
+                components,
                 from,
                 0,
                 from,

@@ -4,6 +4,7 @@ import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
 import com.zurrtum.create.AllRecipeSets;
+import com.zurrtum.create.content.kinetics.mixer.PotionRecipe;
 import com.zurrtum.create.content.processing.sequenced.SequencedAssemblyRecipe;
 import net.minecraft.recipe.PreparedRecipes;
 import net.minecraft.recipe.Recipe;
@@ -34,6 +35,7 @@ public class ServerRecipeManagerMixin {
         @Local SortedMap<Identifier, Recipe<?>> sortedMap
     ) {
         sortedMap.putAll(SequencedAssemblyRecipe.Serializer.GENERATE_RECIPES);
+        PotionRecipe.register(sortedMap);
     }
 
     @WrapOperation(method = "initialize(Lnet/minecraft/resource/featuretoggle/FeatureSet;)V", at = @At(value = "INVOKE", target = "Ljava/util/Set;stream()Ljava/util/stream/Stream;"))

@@ -2,6 +2,7 @@ package com.zurrtum.create.compat.rei;
 
 import com.zurrtum.create.content.processing.recipe.SizedIngredient;
 import com.zurrtum.create.foundation.fluid.FluidIngredient;
+import com.zurrtum.create.foundation.fluid.FluidStackIngredient;
 import dev.architectury.fluid.FluidStack;
 import me.shedaniel.rei.api.common.entry.EntryIngredient;
 import me.shedaniel.rei.api.common.entry.EntryStack;
@@ -11,6 +12,7 @@ import me.shedaniel.rei.api.common.util.EntryIngredients;
 import net.fabricmc.fabric.api.recipe.v1.ingredient.CustomIngredient;
 import net.fabricmc.fabric.api.recipe.v1.ingredient.FabricIngredient;
 import net.fabricmc.fabric.impl.recipe.ingredient.builtin.ComponentsIngredient;
+import net.minecraft.component.ComponentChanges;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.item.ItemStack;
 import net.minecraft.recipe.Ingredient;
@@ -30,8 +32,12 @@ public interface IngredientHelper {
         List<Fluid> fluids = ingredient.getMatchingFluids();
         EntryIngredient.Builder builder = EntryIngredient.builder(fluids.size());
         int amount = ingredient.amount();
+        ComponentChanges patch = ComponentChanges.EMPTY;
+        if (ingredient instanceof FluidStackIngredient stackIngredient) {
+            patch = stackIngredient.components();
+        }
         for (Fluid fluid : fluids) {
-            FluidStack stack = FluidStack.create(fluid, amount);
+            FluidStack stack = FluidStack.create(fluid, amount, patch);
             builder.add(EntryStack.of(definition, stack));
         }
         return builder.build();

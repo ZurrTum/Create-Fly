@@ -218,7 +218,7 @@ public class SpoutBlockEntity extends SmartBlockEntity {
             return;
         Vec3d vec = VecHelper.getCenterOf(pos);
         vec = vec.subtract(0, 8 / 16f, 0);
-        ParticleEffect particle = new FluidParticleData(AllParticleTypes.FLUID_PARTICLE, fluid.getFluid());
+        ParticleEffect particle = new FluidParticleData(AllParticleTypes.FLUID_PARTICLE, fluid.getFluid(), fluid.getComponentChanges());
         world.addImportantParticleClient(particle, vec.x, vec.y, vec.z, 0, -.1f, 0);
     }
 
@@ -229,7 +229,7 @@ public class SpoutBlockEntity extends SmartBlockEntity {
             return;
         Vec3d vec = VecHelper.getCenterOf(pos);
         vec = vec.subtract(0, 2 - 5 / 16f, 0);
-        ParticleEffect particle = new FluidParticleData(AllParticleTypes.FLUID_PARTICLE, fluid.getFluid());
+        ParticleEffect particle = new FluidParticleData(AllParticleTypes.FLUID_PARTICLE, fluid.getFluid(), fluid.getComponentChanges());
         for (int i = 0; i < SPLASH_PARTICLE_COUNT; i++) {
             Vec3d m = VecHelper.offsetRandomly(Vec3d.ZERO, world.random, 0.125f);
             m = new Vec3d(m.x, Math.abs(m.y), m.z);

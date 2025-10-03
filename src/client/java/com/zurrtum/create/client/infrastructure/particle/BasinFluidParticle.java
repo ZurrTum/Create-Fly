@@ -13,6 +13,7 @@ import net.minecraft.client.particle.ParticleFactory;
 import net.minecraft.client.render.Camera;
 import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.world.ClientWorld;
+import net.minecraft.component.ComponentChanges;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
@@ -25,8 +26,19 @@ public class BasinFluidParticle extends FluidParticle {
     Vec3d centerOfBasin;
     float yOffset;
 
-    public BasinFluidParticle(ClientWorld world, Fluid fluid, FluidConfig config, double x, double y, double z, double vx, double vy, double vz) {
-        super(world, fluid, config, x, y, z, vx, vy, vz);
+    public BasinFluidParticle(
+        ClientWorld world,
+        Fluid fluid,
+        ComponentChanges components,
+        FluidConfig config,
+        double x,
+        double y,
+        double z,
+        double vx,
+        double vy,
+        double vz
+    ) {
+        super(world, fluid, components, config, x, y, z, vx, vy, vz);
         gravityStrength = 0;
         velocityX = 0;
         velocityY = 0;
@@ -102,7 +114,7 @@ public class BasinFluidParticle extends FluidParticle {
             if (config == null) {
                 return null;
             }
-            return new BasinFluidParticle(world, data.fluid(), config, x, y, z, vx, vy, vz);
+            return new BasinFluidParticle(world, data.fluid(), data.components(), config, x, y, z, vx, vy, vz);
         }
     }
 }

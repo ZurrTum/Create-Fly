@@ -14,6 +14,7 @@ import com.zurrtum.create.content.kinetics.fan.processing.SplashingRecipe;
 import com.zurrtum.create.content.kinetics.millstone.MillingRecipe;
 import com.zurrtum.create.content.kinetics.mixer.CompactingRecipe;
 import com.zurrtum.create.content.kinetics.mixer.MixingRecipe;
+import com.zurrtum.create.content.kinetics.mixer.PotionRecipe;
 import com.zurrtum.create.content.kinetics.press.PressingRecipe;
 import com.zurrtum.create.content.kinetics.saw.CuttingRecipe;
 import com.zurrtum.create.content.processing.sequenced.SequencedAssemblyRecipe;
@@ -66,6 +67,7 @@ public class AllRecipeSerializers {
         "toolbox_dyeing",
         new SpecialCraftingRecipe.SpecialRecipeSerializer<>(ToolboxDyeingRecipe::new)
     );
+    public static final RecipeSerializer<PotionRecipe> POTION = register("potion", new PotionRecipe.Serializer());
 
     static <S extends RecipeSerializer<T>, T extends Recipe<?>> S register(String id, S serializer) {
         return Registry.register(Registries.RECIPE_SERIALIZER, Identifier.of(MOD_ID, id), serializer);

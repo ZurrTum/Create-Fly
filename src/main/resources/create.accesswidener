@@ -258,3 +258,7 @@ accessible method net/minecraft/client/render/DiffuseLighting updateBuffer (Lnet
 accessible field net/minecraft/client/option/KeyBinding defaultKey Lnet/minecraft/client/util/InputUtil$Key;
 mutable field net/minecraft/client/option/KeyBinding defaultKey Lnet/minecraft/client/util/InputUtil$Key;
 accessible method net/minecraft/recipe/SingleStackRecipe result ()Lnet/minecraft/item/ItemStack;
+accessible method net/minecraft/recipe/BrewingRecipeRegistry isPotionType (Lnet/minecraft/item/ItemStack;)Z
+accessible field net/minecraft/recipe/BrewingRecipeRegistry potionRecipes Ljava/util/List;
+accessible class net/minecraft/recipe/BrewingRecipeRegistry$Recipe
+accessible field net/minecraft/recipe/BrewingRecipeRegistry itemRecipes Ljava/util/List;

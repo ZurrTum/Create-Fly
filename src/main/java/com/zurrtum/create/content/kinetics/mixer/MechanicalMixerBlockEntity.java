@@ -14,6 +14,7 @@ import com.zurrtum.create.foundation.advancement.CreateTrigger;
 import com.zurrtum.create.foundation.blockEntity.behaviour.fluid.SmartFluidTankBehaviour;
 import com.zurrtum.create.foundation.blockEntity.behaviour.fluid.SmartFluidTankBehaviour.TankSegment;
 import com.zurrtum.create.infrastructure.config.AllConfigs;
+import com.zurrtum.create.infrastructure.fluids.FluidStack;
 import com.zurrtum.create.infrastructure.particle.FluidParticleData;
 import net.minecraft.block.BlockState;
 import net.minecraft.item.ItemStack;
@@ -22,6 +23,7 @@ import net.minecraft.particle.ParticleEffect;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.recipe.Recipe;
 import net.minecraft.recipe.RecipeEntry;
+import net.minecraft.recipe.RecipeType;
 import net.minecraft.recipe.ShapelessRecipe;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
@@ -188,7 +190,8 @@ public class MechanicalMixerBlockEntity extends BasinOperatingBlockEntity {
             for (TankSegment tankSegment : behaviour.getTanks()) {
                 if (tankSegment.isEmpty(0))
                     continue;
-                spillParticle(new FluidParticleData(AllParticleTypes.FLUID_PARTICLE, tankSegment.getRenderedFluid().getFluid()));
+                FluidStack stack = tankSegment.getRenderedFluid();
+                spillParticle(new FluidParticleData(AllParticleTypes.FLUID_PARTICLE, stack.getFluid(), stack.getComponentChanges()));
             }
         }
     }
@@ -203,46 +206,18 @@ public class MechanicalMixerBlockEntity extends BasinOperatingBlockEntity {
         world.addParticleClient(data, center.x, center.y - 1.75f, center.z, target.x, target.y, target.z);
     }
 
-    //TODO
-    //    @Override
-    //    protected Optional<Recipe<?>> getMatchingRecipes() {
-    //        Optional<Recipe<?>> matchingRecipes = super.getMatchingRecipes();
-    //
-    //        if (!AllConfigs.server().recipes.allowBrewingInMixer.get())
-    //            return matchingRecipes;
-    //
-    //        Optional<BasinBlockEntity> basin = getBasin();
-    //        if (basin.isEmpty())
-    //            return matchingRecipes;
-    //
-    //        BasinBlockEntity basinBlockEntity = basin.get();
-    //        if (basinBlockEntity.isEmpty())
-    //            return matchingRecipes;
-    //
-    //        Inventory availableItems = basinBlockEntity.itemCapability;
-    //
-    //        for (int i = 0, size = availableItems.size(); i < size; i++) {
-    //            ItemStack stack = availableItems.getStack(i);
-    //            if (stack.isEmpty())
-    //                continue;
-    //
-    //            List<MixingRecipe> list = PotionMixingRecipes.sortRecipesByItem(level).get(stack.getItem());
-    //            if (list == null)
-    //                continue;
-    //            for (MixingRecipe mixingRecipe : list)
-    //                if (matchBasinRecipe(mixingRecipe))
-    //                    matchingRecipes.add(mixingRecipe);
-    //        }
-    //
-    //        return matchingRecipes;
-    //    }
-
-
     @Override
     protected boolean matchStaticFilters(RecipeEntry<? extends Recipe<?>> recipe) {
         Recipe<?> r = recipe.value();
-        return ((r instanceof ShapelessRecipe shapelessRecipe && AllConfigs.server().recipes.allowShapelessInMixer.get() && shapelessRecipe.ingredients.size() > 1 && !MechanicalPressBlockEntity.canCompress(
-            r)) && !AllRecipeTypes.shouldIgnoreInAutomation(recipe) || r.getType() == AllRecipeTypes.MIXING);
+        if ((r instanceof ShapelessRecipe shapelessRecipe && AllConfigs.server().recipes.allowShapelessInMixer.get() && shapelessRecipe.ingredients.size() > 1 && !MechanicalPressBlockEntity.canCompress(
+            r)) && !AllRecipeTypes.shouldIgnoreInAutomation(recipe)) {
+            return true;
+        }
+        RecipeType<?> type = r.getType();
+        if (type == AllRecipeTypes.POTION && AllConfigs.server().recipes.allowBrewingInMixer.get()) {
+            return true;
+        }
+        return type == AllRecipeTypes.MIXING;
     }
 
     @Override

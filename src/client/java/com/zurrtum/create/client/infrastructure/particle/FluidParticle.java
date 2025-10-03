@@ -10,6 +10,7 @@ import net.minecraft.client.particle.ParticleFactory;
 import net.minecraft.client.particle.ParticleTextureSheet;
 import net.minecraft.client.particle.SpriteBillboardParticle;
 import net.minecraft.client.world.ClientWorld;
+import net.minecraft.component.ComponentChanges;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.particle.TintedParticleEffect;
@@ -19,12 +20,25 @@ public class FluidParticle extends SpriteBillboardParticle {
     private final float uo;
     private final float vo;
     private final Fluid fluid;
+    private final ComponentChanges components;
     private final FluidConfig config;
 
-    public FluidParticle(ClientWorld world, Fluid fluid, FluidConfig config, double x, double y, double z, double vx, double vy, double vz) {
+    public FluidParticle(
+        ClientWorld world,
+        Fluid fluid,
+        ComponentChanges components,
+        FluidConfig config,
+        double x,
+        double y,
+        double z,
+        double vx,
+        double vy,
+        double vz
+    ) {
         super(world, x, y, z, vx, vy, vz);
 
         this.fluid = fluid;
+        this.components = components;
         this.config = config;
         this.setSprite(config.still().get());
 
@@ -32,7 +46,7 @@ public class FluidParticle extends SpriteBillboardParticle {
         this.red = 0.8F;
         this.green = 0.8F;
         this.blue = 0.8F;
-        this.multiplyColor(config.tint().get());
+        this.multiplyColor(config.tint().apply(components));
 
         this.velocityX = vx;
         this.velocityY = vy;
@@ -90,7 +104,7 @@ public class FluidParticle extends SpriteBillboardParticle {
         if (!onGround && world.random.nextFloat() < 1 / 8f)
             return;
 
-        Color color = new Color(config.tint().get());
+        Color color = new Color(config.tint().apply(components));
         world.addParticleClient(
             TintedParticleEffect.create(
                 ParticleTypes.ENTITY_EFFECT,
@@ -123,7 +137,7 @@ public class FluidParticle extends SpriteBillboardParticle {
             if (config == null) {
                 return null;
             }
-            return new FluidParticle(world, data.fluid(), config, x, y, z, vx, vy, vz);
+            return new FluidParticle(world, data.fluid(), data.components(), config, x, y, z, vx, vy, vz);
         }
     }
 }

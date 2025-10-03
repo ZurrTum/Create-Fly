@@ -8,6 +8,7 @@ import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.texture.Sprite;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.component.ComponentChanges;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.util.math.*;
 
@@ -19,6 +20,7 @@ public class FluidRenderHelper {
 
     public static void renderFluidBox(
         Fluid fluid,
+        ComponentChanges changes,
         float xMin,
         float yMin,
         float zMin,
@@ -31,7 +33,7 @@ public class FluidRenderHelper {
         boolean renderBottom,
         boolean invertGasses
     ) {
-        renderFluidBox(fluid, xMin, yMin, zMin, xMax, yMax, zMax, getFluidBuilder(buffer), ms, light, renderBottom, invertGasses);
+        renderFluidBox(fluid, changes, xMin, yMin, zMin, xMax, yMax, zMax, getFluidBuilder(buffer), ms, light, renderBottom, invertGasses);
     }
 
     public static void renderFluidBox(
@@ -48,11 +50,26 @@ public class FluidRenderHelper {
         boolean renderBottom,
         boolean invertGasses
     ) {
-        renderFluidBox(stack.getFluid(), xMin, yMin, zMin, xMax, yMax, zMax, getFluidBuilder(buffer), ms, light, renderBottom, invertGasses);
+        renderFluidBox(
+            stack.getFluid(),
+            stack.getComponentChanges(),
+            xMin,
+            yMin,
+            zMin,
+            xMax,
+            yMax,
+            zMax,
+            getFluidBuilder(buffer),
+            ms,
+            light,
+            renderBottom,
+            invertGasses
+        );
     }
 
     public static void renderFluidBox(
         Fluid fluid,
+        ComponentChanges changes,
         float xMin,
         float yMin,
         float zMin,
@@ -71,7 +88,7 @@ public class FluidRenderHelper {
         }
         Sprite fluidTexture = config.still().get();
 
-        int color = config.tint().get() | 0xff000000;
+        int color = config.tint().apply(changes) | 0xff000000;
         int blockLightIn = (light >> 4) & 0xF;
         int luminosity = Math.max(blockLightIn, fluid.getDefaultState().getBlockState().getLuminance());
         light = (light & 0xF00000) | luminosity << 4;

@@ -59,10 +59,12 @@ public class SpoutFillingCategory extends CreateCategory<SpoutFillingDisplay> {
             if (i >= MAX) {
                 idGenerator.set(0);
             }
+            FluidStack stack = slot.getValue();
             graphics.state.addSpecialElement(new SpoutRenderState(
                 i,
                 new Matrix3x2f(graphics.getMatrices()),
-                slot.getValue().getFluid(),
+                stack.getFluid(),
+                stack.getPatch(),
                 bounds.x + 80,
                 bounds.y + 6,
                 0

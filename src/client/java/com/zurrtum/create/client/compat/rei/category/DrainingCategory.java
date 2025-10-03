@@ -51,9 +51,11 @@ public class DrainingCategory extends CreateCategory<DrainingDisplay> {
             AllGuiTextures.JEI_SHADOW.render(graphics, bounds.x + 67, bounds.y + 42);
             AllGuiTextures.JEI_DOWN_ARROW.render(graphics, bounds.x + 78, bounds.y + 9);
             EntryStack<FluidStack> slot = fluidSlot.getCurrentEntry().cast();
+            FluidStack stack = slot.getValue();
             graphics.state.addSpecialElement(new DrainRenderState(
                 new Matrix3x2f(graphics.getMatrices()),
-                slot.getValue().getFluid(),
+                stack.getFluid(),
+                stack.getPatch(),
                 bounds.x + 80,
                 bounds.y + 28
             ));

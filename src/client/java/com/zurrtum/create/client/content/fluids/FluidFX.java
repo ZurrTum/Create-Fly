@@ -42,7 +42,7 @@ public class FluidFX {
     }
 
     public static ParticleEffect getFluidParticle(FluidStack fluid) {
-        return new FluidParticleData(AllParticleTypes.FLUID_PARTICLE, fluid.getFluid());
+        return new FluidParticleData(AllParticleTypes.FLUID_PARTICLE, fluid.getFluid(), fluid.getComponentChanges());
     }
 
     public static ParticleEffect getDrippingParticle(FluidStack fluid) {
@@ -52,7 +52,7 @@ public class FluidFX {
         if (FluidHelper.isLava(fluid.getFluid()))
             particle = ParticleTypes.DRIPPING_LAVA;
         if (particle == null)
-            particle = new FluidParticleData(AllParticleTypes.FLUID_DRIP, fluid.getFluid());
+            particle = new FluidParticleData(AllParticleTypes.FLUID_DRIP, fluid.getFluid(), fluid.getComponentChanges());
         return particle;
     }
 

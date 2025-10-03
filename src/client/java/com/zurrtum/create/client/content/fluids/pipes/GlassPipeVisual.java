@@ -93,7 +93,7 @@ public class GlassPipeVisual extends AbstractBlockEntityVisual<StraightPipeBlock
             }
             Sprite flowTexture = config.flowing().get();
 
-            int color = config.tint().get() | 0xff000000;
+            int color = config.tint().apply(fluidStack.getComponentChanges()) | 0xff000000;
             int blockLightIn = (light >> 4) & 0xF;
             int luminosity = Math.max(blockLightIn, fluid.getDefaultState().getBlockState().getLuminance());
             int light = (this.light & 0xF00000) | luminosity << 4;

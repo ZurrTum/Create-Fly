@@ -4,9 +4,12 @@ import com.zurrtum.create.AllDataComponents;
 import com.zurrtum.create.AllFluids;
 import com.zurrtum.create.AllItemTags;
 import com.zurrtum.create.catnip.data.Pair;
+import com.zurrtum.create.foundation.fluid.FluidIngredient;
+import com.zurrtum.create.foundation.fluid.FluidStackIngredient;
 import com.zurrtum.create.infrastructure.component.BottleType;
 import com.zurrtum.create.infrastructure.fluids.BottleFluidInventory;
 import com.zurrtum.create.infrastructure.fluids.FluidStack;
+import net.minecraft.component.ComponentChanges;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.PotionContentsComponent;
 import net.minecraft.fluid.Fluids;
@@ -46,10 +49,25 @@ public class PotionFluidHandler {
         return fluid;
     }
 
+    public static FluidIngredient getFluidIngredientFromPotion(PotionContentsComponent potionContents, BottleType bottleType, int amount) {
+        if (potionContents.matches(Potions.WATER) && bottleType == BottleType.REGULAR)
+            return new FluidStackIngredient(Fluids.WATER, ComponentChanges.EMPTY, amount);
+        return getFluidIngredient(amount, potionContents, bottleType);
+    }
+
     public static FluidStack getFluidFromPotion(PotionContentsComponent potionContents, BottleType bottleType, int amount) {
         if (potionContents.matches(Potions.WATER) && bottleType == BottleType.REGULAR)
             return new FluidStack(Fluids.WATER, amount);
         return getFluidStack(amount, potionContents, bottleType);
+    }
+
+    public static FluidIngredient getFluidIngredient(int amount, PotionContentsComponent potionContents, BottleType bottleType) {
+        ComponentChanges.Builder builder = ComponentChanges.builder();
+        if (potionContents != PotionContentsComponent.DEFAULT) {
+            builder.add(DataComponentTypes.POTION_CONTENTS, potionContents);
+        }
+        builder.add(AllDataComponents.POTION_FLUID_BOTTLE_TYPE, bottleType);
+        return new FluidStackIngredient(AllFluids.POTION, builder.build(), amount);
     }
 
     public static FluidStack getFluidStack(int amount, PotionContentsComponent potionContents, BottleType bottleType) {

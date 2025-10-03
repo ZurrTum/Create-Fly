@@ -17,7 +17,7 @@ import java.util.List;
 public record FluidStackIngredient(Fluid fluid, ComponentChanges components, int amount) implements FluidIngredient {
     @Override
     public boolean test(FluidStack stack) {
-        if (!FluidHelper.isSame(stack, fluid))
+        if (stack.getFluid() != fluid)
             return false;
         if (components.isEmpty())
             return true;

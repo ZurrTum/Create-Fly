@@ -5,6 +5,9 @@ import com.mojang.serialization.DataResult;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.zurrtum.create.AllDataComponents;
+import com.zurrtum.create.AllFluids;
+import com.zurrtum.create.content.fluids.potion.PotionFluidHandler;
+import com.zurrtum.create.infrastructure.component.BottleType;
 import io.netty.handler.codec.DecoderException;
 import io.netty.handler.codec.EncoderException;
 import it.unimi.dsi.fastutil.objects.ObjectSet;
@@ -12,8 +15,10 @@ import it.unimi.dsi.fastutil.objects.Reference2ObjectMap;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
 import net.minecraft.component.*;
+import net.minecraft.component.type.PotionContentsComponent;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.fluid.Fluids;
+import net.minecraft.item.ItemConvertible;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtOps;
@@ -253,6 +258,14 @@ public class FluidStack implements ComponentHolder {
     }
 
     public Text getName() {
+        if (fluid == AllFluids.POTION) {
+            PotionContentsComponent contents = getOrDefault(DataComponentTypes.POTION_CONTENTS, PotionContentsComponent.DEFAULT);
+            ItemConvertible itemFromBottleType = PotionFluidHandler.itemFromBottleType(getOrDefault(
+                AllDataComponents.POTION_FLUID_BOTTLE_TYPE,
+                BottleType.REGULAR
+            ));
+            return contents.getName(itemFromBottleType.asItem().getTranslationKey() + ".effect.");
+        }
         Block block = fluid.getDefaultState().getBlockState().getBlock();
         if (fluid != Fluids.EMPTY && block == Blocks.AIR) {
             return Text.translatable(Util.createTranslationKey("fluid", Registries.FLUID.getId(fluid)));
