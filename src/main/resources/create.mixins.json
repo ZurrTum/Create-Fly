@@ -26,6 +26,7 @@
     "InventoryMixin",
     "ItemEntityMixin",
     "ItemPlacementContextMixin",
+    "ItemStackMixin",
     "LeashableMixin",
     "LecternBlockEntityMixin",
     "LivingEntityMixin",
