@@ -35,19 +35,13 @@ https://www.curseforge.com/minecraft/mc-mods/create-fly/files/all?page=1&pageSiz
 ### 3. Any other critical information the user must know before downloading
 
 - Please do not report issues with this mod to simibubi and NeoForge Create.
-- Because it uses a lot of mixins, it may be incompatible with other mods.
-- If you experience rendering issues, try removing the Rendering Optimization Mod, which is currently not compatible.
 - Please do not use old game saves. Because data loading changes, data may be lost.
-- This project is under development and may be unstable and contain many errors.
 - Recommended to use REI to view recipes, and please report any game crashes.
+- Using shaders will disable Flywheel optimizations
 
 ### 4. TODO List
 
 - Create Commands
-- Create Mechanical Mixer Potion Recipe
-- Create Server Config Sync
-- Recipe Viewer Plugin
-- Create Ponder
 - Compat Fabric Events
 - Compat Other Mod
 
@@ -56,7 +50,7 @@ https://www.curseforge.com/minecraft/mc-mods/create-fly/files/all?page=1&pageSiz
 - Engine-Room/Flywheel
 - Engine-Room/Flywheel/Vanillin
 - Creators-of-Create/Create
-- Creators-of-Create/Ponder (TODO)
+- Creators-of-Create/Ponder
 
 ### Contains partial code
 
