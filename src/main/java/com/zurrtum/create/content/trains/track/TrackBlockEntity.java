@@ -217,12 +217,14 @@ public class TrackBlockEntity extends SmartBlockEntity implements TransformableB
             world.updateListeners(pos, getCachedState(), getCachedState(), 16);
         }
 
-        AllClientHandle.INSTANCE.queueUpdate(this);
+        if (world.isClient) {
+            AllClientHandle.INSTANCE.queueUpdate(this);
 
-        if (hasInteractableConnections())
-            AllClientHandle.INSTANCE.registerToCurveInteraction(this);
-        else
-            AllClientHandle.INSTANCE.removeFromCurveInteraction(this);
+            if (hasInteractableConnections())
+                AllClientHandle.INSTANCE.registerToCurveInteraction(this);
+            else
+                AllClientHandle.INSTANCE.removeFromCurveInteraction(this);
+        }
 
         view.read("BoundLocation", BlockPos.CODEC)
             .ifPresent(pos -> boundLocation = Pair.of(view.read("BoundDimension", World.CODEC).orElseThrow(), pos));
