@@ -2,6 +2,7 @@ package com.zurrtum.create.compat.rei;
 
 import com.zurrtum.create.AllFluids;
 import com.zurrtum.create.AllRecipeTypes;
+import com.zurrtum.create.Create;
 import com.zurrtum.create.compat.rei.display.*;
 import com.zurrtum.create.content.equipment.sandPaper.SandPaperPolishingRecipe;
 import com.zurrtum.create.content.fluids.transfer.EmptyingRecipe;
@@ -79,7 +80,9 @@ public class ReiCommonPlugin implements REICommonPlugin {
         registry.beginRecipeFiller(SmokingRecipe.class).fill(FanSmokingDisplay::of);
         registry.beginRecipeFiller(SplashingRecipe.class).fill(FanWashingDisplay::new);
         registry.beginRecipeFiller(PotionRecipe.class).fill(PotionDisplay::new);
-        BlockCuttingDisplay.register(registry);
+        if (Create.SERVER != null) {
+            BlockCuttingDisplay.register(registry);
+        }
     }
 
     @Override
