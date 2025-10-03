@@ -277,7 +277,6 @@ public class AllClientHandle<T> {
     }
 
     public void addBehaviours(Entity entity, ArrayList<EntityBehaviour<?>> behaviours) {
-        warn();
     }
 
     public void showWaterBounds(Axis axis, ItemPlacementContext ctx) {

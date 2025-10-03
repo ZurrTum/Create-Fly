@@ -2,7 +2,6 @@ package com.zurrtum.create.content.fluids.transfer;
 
 import com.zurrtum.create.AllRecipeSets;
 import com.zurrtum.create.AllRecipeTypes;
-import com.zurrtum.create.Create;
 import com.zurrtum.create.catnip.data.Pair;
 import com.zurrtum.create.content.fluids.potion.PotionFluidHandler;
 import com.zurrtum.create.foundation.fluid.FluidHelper;
@@ -51,7 +50,8 @@ public class GenericItemEmptying {
                 return Pair.of(emptyingRecipe.fluidResult(), emptyingRecipe.result());
             }
         } else {
-            Create.LOGGER.warn("Client check recipe " + stack.getName().getString());
+            //TODO
+            //            Create.LOGGER.warn("Client check recipe " + stack.getName().getString());
         }
 
         try (FluidItemInventory capability = FluidHelper.getFluidInventory(stack.copyWithCount(1))) {
