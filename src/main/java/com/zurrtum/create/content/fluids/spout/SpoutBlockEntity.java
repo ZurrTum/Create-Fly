@@ -93,7 +93,7 @@ public class SpoutBlockEntity extends SmartBlockEntity {
             return HOLD;
         FluidStack fluid = getCurrentFluidInTank();
         int requiredAmountForItem = FillingBySpout.getRequiredAmountForItem((ServerWorld) world, transported.stack, fluid.copy());
-        if (requiredAmountForItem == -1)
+        if (requiredAmountForItem <= 0)
             return PASS;
         if (requiredAmountForItem > fluid.getAmount())
             return HOLD;

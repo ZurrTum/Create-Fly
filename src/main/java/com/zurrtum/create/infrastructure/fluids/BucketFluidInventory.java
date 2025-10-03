@@ -44,7 +44,11 @@ public class BucketFluidInventory extends FluidItemInventoryWrapper {
         if (!canInsert() || maxAmount < CAPACITY) {
             return 0;
         }
-        this.stack = toFillBucket(stack);
+        ItemStack bucket = toFillBucket(stack);
+        if (bucket.isEmpty()) {
+            return 0;
+        }
+        this.stack = bucket;
         return CAPACITY;
     }
 
@@ -72,6 +76,10 @@ public class BucketFluidInventory extends FluidItemInventoryWrapper {
 
     @Override
     public int countSpace(FluidStack stack) {
+        ItemStack bucket = toFillBucket(stack);
+        if (bucket.isEmpty()) {
+            return 0;
+        }
         return canInsert() ? CAPACITY : 0;
     }
 
