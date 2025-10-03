@@ -5,6 +5,7 @@ import com.zurrtum.create.content.kinetics.belt.BeltHelper;
 import com.zurrtum.create.content.kinetics.mixer.PotionRecipe;
 import com.zurrtum.create.foundation.recipe.RecipeFinder;
 import com.zurrtum.create.foundation.recipe.trie.RecipeTrieFinder;
+import com.zurrtum.create.infrastructure.config.AllConfigs;
 import net.minecraft.registry.ReloadableRegistries;
 import net.minecraft.resource.ResourceManager;
 import net.minecraft.resource.ResourceReloader;
@@ -30,6 +31,7 @@ public class DataPackContentsMixin {
         list.add(RecipeFinder.LISTENER);
         list.add(RecipeTrieFinder.LISTENER);
         list.add(BeltHelper.LISTENER);
+        list.add(AllConfigs.LISTENER);
         return Collections.unmodifiableList(list);
     }
 

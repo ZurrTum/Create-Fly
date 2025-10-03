@@ -22,7 +22,8 @@ public class Builder {
     public final String type;
     private final List<JsonObject> stack = new LinkedList<>();
     private final List<String> comments = new LinkedList<>();
-    private JsonObject object;
+    public JsonObject object;
+    public boolean ignoreComments = false;
 
     Builder(String id, String type, boolean single) {
         if (single) {
@@ -32,14 +33,7 @@ public class Builder {
         }
         this.type = single ? id + "-" + type : type;
         if (configDir.exists()) {
-            File file = new File(configDir, this.type + ".json");
-            try {
-                final String fileContents = FileUtils.readFileToString(file, StandardCharsets.UTF_8);
-                object = GSON.fromJson(fileContents, JsonObject.class);
-            } catch (IOException e) {
-                System.err.println("Failed to read config file: " + file.getAbsolutePath());
-                e.printStackTrace();
-            }
+            read();
         }
         if (object == null) {
             object = new JsonObject();
@@ -54,6 +48,7 @@ public class Builder {
         T config = factory.get();
         Builder builder = new Builder(id, type, single);
         config.registerAll(builder);
+        builder.ignoreComments = true;
         builder.save();
         return config;
     }
@@ -72,11 +67,15 @@ public class Builder {
     }
 
     public Builder comment(String... value) {
+        if (ignoreComments)
+            return this;
         comments.addAll(Arrays.asList(value));
         return this;
     }
 
     public void addComments(JsonObject object) {
+        if (ignoreComments)
+            return;
         switch (comments.size()) {
             case 0:
                 return;
@@ -127,6 +126,17 @@ public class Builder {
 
     public IntValue defineInRange(String name, int defaultValue, int min, int max) {
         return new IntValue(this, object, name, defaultValue, min, max);
+    }
+
+    public void read() {
+        File file = new File(configDir, this.type + ".json");
+        try {
+            final String fileContents = FileUtils.readFileToString(file, StandardCharsets.UTF_8);
+            object = GSON.fromJson(fileContents, JsonObject.class);
+        } catch (IOException e) {
+            System.err.println("Failed to read config file: " + file.getAbsolutePath());
+            e.printStackTrace();
+        }
     }
 
     public void save() {

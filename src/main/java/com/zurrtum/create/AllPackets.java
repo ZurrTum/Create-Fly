@@ -5,6 +5,7 @@ import com.zurrtum.create.infrastructure.packet.s2c.*;
 import net.minecraft.network.NetworkSide;
 import net.minecraft.network.RegistryByteBuf;
 import net.minecraft.network.codec.PacketCodec;
+import net.minecraft.network.listener.ClientConfigurationPacketListener;
 import net.minecraft.network.listener.ClientPlayPacketListener;
 import net.minecraft.network.listener.ServerPlayPacketListener;
 import net.minecraft.network.packet.Packet;
@@ -22,6 +23,7 @@ import static com.zurrtum.create.Create.MOD_ID;
 public class AllPackets {
     public static final Map<PacketType<Packet<ServerPlayPacketListener>>, PacketCodec<? super RegistryByteBuf, Packet<ServerPlayPacketListener>>> C2S = new LinkedHashMap<>();
     public static final Map<PacketType<Packet<ClientPlayPacketListener>>, PacketCodec<? super RegistryByteBuf, Packet<ClientPlayPacketListener>>> S2C = new LinkedHashMap<>();
+    public static final Map<PacketType<Packet<ClientConfigurationPacketListener>>, PacketCodec<? super RegistryByteBuf, Packet<ClientConfigurationPacketListener>>> S2C_CONFIG = new LinkedHashMap<>();
     public static final PacketType<ConfigureSchematicannonPacket> CONFIGURE_SCHEMATICANNON = c2s(
         "configure_schematicannon",
         ConfigureSchematicannonPacket.CODEC
@@ -250,6 +252,20 @@ public class AllPackets {
     public static final PacketType<NbtSpawnPacket> NBT_SPAWN = s2c("nbt_spawn", NbtSpawnPacket.CODEC);
     public static final PacketType<EjectorItemSpawnPacket> EJECTOR_ITEM_SPAWN = s2c("ejector_item_spawn", EjectorItemSpawnPacket.CODEC);
     public static final PacketType<PackageSpawnPacket> PACKAGE_SPAWN = s2c("package_spawn", PackageSpawnPacket.CODEC);
+    public static final PacketType<ServerConfigPacket> SERVER_CONFIG = s2c_config("server_config", ServerConfigPacket.CODEC);
+
+    @SuppressWarnings("unchecked")
+    private static <T extends Packet<ClientConfigurationPacketListener>> PacketType<T> s2c_config(
+        String id,
+        PacketCodec<? super RegistryByteBuf, T> codec
+    ) {
+        PacketType<T> type = new PacketType<>(NetworkSide.CLIENTBOUND, Identifier.of(MOD_ID, id));
+        S2C_CONFIG.put(
+            (PacketType<Packet<ClientConfigurationPacketListener>>) type,
+            (PacketCodec<? super RegistryByteBuf, Packet<ClientConfigurationPacketListener>>) codec
+        );
+        return type;
+    }
 
     @SuppressWarnings("unchecked")
     private static <T extends Packet<ClientPlayPacketListener>> PacketType<T> s2c(String id, PacketCodec<? super RegistryByteBuf, T> codec) {

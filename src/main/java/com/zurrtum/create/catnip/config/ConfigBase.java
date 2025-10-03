@@ -17,16 +17,6 @@ public abstract class ConfigBase {
             cValue.register(builder);
     }
 
-    public void onLoad() {
-        if (!children.isEmpty())
-            children.forEach(ConfigBase::onLoad);
-    }
-
-    public void onReload() {
-        if (!children.isEmpty())
-            children.forEach(ConfigBase::onReload);
-    }
-
     public abstract String getName();
 
     protected ConfigString s(String current, String name, String... comment) {

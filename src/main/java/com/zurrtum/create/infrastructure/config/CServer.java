@@ -1,8 +1,26 @@
 package com.zurrtum.create.infrastructure.config;
 
+import com.google.gson.JsonObject;
+import com.zurrtum.create.catnip.config.Builder;
 import com.zurrtum.create.catnip.config.ConfigBase;
 
 public class CServer extends ConfigBase {
+    public Builder builder;
+
+    public void registerAll(final Builder builder) {
+        super.registerAll(builder);
+        this.builder = builder;
+    }
+
+    public void reload(JsonObject object) {
+        if (object == null) {
+            builder.read();
+        } else {
+            builder.object = object;
+        }
+        depth = 0;
+        super.registerAll(builder);
+    }
 
     public final ConfigGroup infrastructure = group(0, "infrastructure", Comments.infrastructure);
     public final ConfigInt tickrateSyncTimer = i(20, 5, "tickrateSyncTimer", "[in Ticks]", Comments.tickrateSyncTimer, Comments.tickrateSyncTimer2);
