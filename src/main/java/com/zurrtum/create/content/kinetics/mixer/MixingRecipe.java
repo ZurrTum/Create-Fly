@@ -100,13 +100,13 @@ public record MixingRecipe(
             ItemStack.CODEC.optionalFieldOf("result", ItemStack.EMPTY).forGetter(MixingRecipe::result),
             FluidStack.CODEC.optionalFieldOf("fluid_result", FluidStack.EMPTY).forGetter(MixingRecipe::fluidResult),
             HeatCondition.CODEC.optionalFieldOf("heat_requirement", HeatCondition.NONE).forGetter(MixingRecipe::heat),
-            FluidIngredient.CODEC.listOf(0, 2).optionalFieldOf("fluid_ingredients", List.of()).forGetter(MixingRecipe::fluidIngredients),
-            SizedIngredient.getListCodec(0, 4).optionalFieldOf("ingredients", List.of()).forGetter(MixingRecipe::ingredients)
+            FluidIngredient.CODEC.listOf(1, 2).optionalFieldOf("fluid_ingredients", List.of()).forGetter(MixingRecipe::fluidIngredients),
+            SizedIngredient.getListCodec(1, 4).optionalFieldOf("ingredients", List.of()).forGetter(MixingRecipe::ingredients)
         ).apply(instance, MixingRecipe::new)).validate(recipe -> {
             if (recipe.result.isEmpty() && recipe.fluidResult.isEmpty()) {
                 return DataResult.error(() -> "MixingRecipe must have a result or a fluid result");
             } else if (recipe.fluidIngredients.isEmpty() && recipe.ingredients.isEmpty()) {
-                return DataResult.error(() -> "MixingRecipe must have a result or a fluid ingredient");
+                return DataResult.error(() -> "MixingRecipe must have a ingredient or a fluid ingredient");
             }
             return DataResult.success(recipe);
         });

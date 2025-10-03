@@ -90,7 +90,7 @@ public record CompactingRecipe(
             SizedIngredient.getListCodec(1, 9).optionalFieldOf("ingredients", List.of()).forGetter(CompactingRecipe::ingredients)
         ).apply(instance, Serializer::createRecipe)).validate(recipe -> {
             if (recipe.fluidIngredient == null && recipe.ingredients.isEmpty()) {
-                return DataResult.error(() -> "MixingRecipe must have a result or a fluid ingredient");
+                return DataResult.error(() -> "MixingRecipe must have a ingredient or a fluid ingredient");
             }
             return DataResult.success(recipe);
         });
