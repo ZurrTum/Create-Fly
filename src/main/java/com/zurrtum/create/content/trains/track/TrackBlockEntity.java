@@ -217,7 +217,7 @@ public class TrackBlockEntity extends SmartBlockEntity implements TransformableB
             world.updateListeners(pos, getCachedState(), getCachedState(), 16);
         }
 
-        if (world.isClient) {
+        if (world != null && world.isClient) {
             AllClientHandle.INSTANCE.queueUpdate(this);
 
             if (hasInteractableConnections())
