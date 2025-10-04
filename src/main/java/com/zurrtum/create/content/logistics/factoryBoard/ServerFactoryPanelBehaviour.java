@@ -906,25 +906,39 @@ public class ServerFactoryPanelBehaviour extends ServerFilteringBehaviour implem
                 CraftingRecipe recipe = entry.value();
                 List<Ingredient> ingredients;
                 if (recipe instanceof ShapedRecipe shapedRecipe) {
+                    ItemStack result;
                     try {
-                        ItemStack result = recipe.craft(CraftingRecipeInput.EMPTY, registryManager);
-                        if (result.isEmpty() || result.getItem() != item) {
+                        result = recipe.craft(CraftingRecipeInput.EMPTY, registryManager);
+                    } catch (Exception ignore) {
+                        result = ItemStack.EMPTY;
+                    }
+                    if (result.isEmpty()) {
+                        result = shapedRecipe.result;
+                        if (result == null || result.isEmpty()) {
                             return false;
                         }
-                        ingredients = shapedRecipe.getIngredients().stream().flatMap(Optional::stream).toList();
-                    } catch (Exception ignore) {
+                    }
+                    if (result.getItem() != item) {
                         return false;
                     }
+                    ingredients = shapedRecipe.getIngredients().stream().flatMap(Optional::stream).toList();
                 } else if (recipe instanceof ShapelessRecipe shapelessRecipe) {
+                    ItemStack result;
                     try {
-                        ItemStack result = recipe.craft(CraftingRecipeInput.EMPTY, registryManager);
-                        if (result.isEmpty() || result.getItem() != item) {
+                        result = recipe.craft(CraftingRecipeInput.EMPTY, registryManager);
+                    } catch (Exception ignore) {
+                        result = ItemStack.EMPTY;
+                    }
+                    if (result.isEmpty()) {
+                        result = shapelessRecipe.result;
+                        if (result == null || result.isEmpty()) {
                             return false;
                         }
-                        ingredients = shapelessRecipe.ingredients;
-                    } catch (Exception ignore) {
+                    }
+                    if (result.getItem() != item) {
                         return false;
                     }
+                    ingredients = shapelessRecipe.ingredients;
                 } else {
                     return false;
                 }
