@@ -906,17 +906,25 @@ public class ServerFactoryPanelBehaviour extends ServerFilteringBehaviour implem
                 CraftingRecipe recipe = entry.value();
                 List<Ingredient> ingredients;
                 if (recipe instanceof ShapedRecipe shapedRecipe) {
-                    ItemStack result = recipe.craft(CraftingRecipeInput.EMPTY, registryManager);
-                    if (result.isEmpty() || result.getItem() != item) {
+                    try {
+                        ItemStack result = recipe.craft(CraftingRecipeInput.EMPTY, registryManager);
+                        if (result.isEmpty() || result.getItem() != item) {
+                            return false;
+                        }
+                        ingredients = shapedRecipe.getIngredients().stream().flatMap(Optional::stream).toList();
+                    } catch (Exception ignore) {
                         return false;
                     }
-                    ingredients = shapedRecipe.getIngredients().stream().flatMap(Optional::stream).toList();
                 } else if (recipe instanceof ShapelessRecipe shapelessRecipe) {
-                    ItemStack result = recipe.craft(CraftingRecipeInput.EMPTY, registryManager);
-                    if (result.isEmpty() || result.getItem() != item) {
+                    try {
+                        ItemStack result = recipe.craft(CraftingRecipeInput.EMPTY, registryManager);
+                        if (result.isEmpty() || result.getItem() != item) {
+                            return false;
+                        }
+                        ingredients = shapelessRecipe.ingredients;
+                    } catch (Exception ignore) {
                         return false;
                     }
-                    ingredients = shapelessRecipe.ingredients;
                 } else {
                     return false;
                 }
