@@ -20,11 +20,11 @@ import net.minecraft.registry.DynamicRegistryManager;
 import net.minecraft.resource.ResourcePackManager;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.SaveLoader;
-import net.minecraft.server.WorldGenerationProgressListenerFactory;
 import net.minecraft.server.dedicated.MinecraftDedicatedServer;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.ApiServices;
 import net.minecraft.world.World;
+import net.minecraft.world.chunk.ChunkLoadProgress;
 import net.minecraft.world.level.storage.LevelStorage;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -105,7 +105,7 @@ public abstract class MinecraftServerMixin {
         Proxy proxy,
         DataFixer dataFixer,
         ApiServices apiServices,
-        WorldGenerationProgressListenerFactory worldGenerationProgressListenerFactory,
+        ChunkLoadProgress chunkLoadProgress,
         CallbackInfo ci
     ) {
         if ((Object) this instanceof MinecraftDedicatedServer) {
