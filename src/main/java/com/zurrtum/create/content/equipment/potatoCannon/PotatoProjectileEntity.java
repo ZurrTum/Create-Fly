@@ -208,7 +208,7 @@ public class PotatoProjectileEntity extends ExplosiveProjectileEntity {
 
         pop(hit);
 
-        if (target instanceof WitherEntity wither && wither.shouldRenderOverlay())
+        if (target instanceof WitherEntity wither && wither.isArmored())
             return;
         if (type.preEntityHit(stack, ray))
             return;
