@@ -11,6 +11,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.item.FuelRegistry;
 import net.minecraft.item.map.MapState;
+import net.minecraft.particle.BlockParticleEffect;
 import net.minecraft.particle.ParticleEffect;
 import net.minecraft.recipe.BrewingRecipeRegistry;
 import net.minecraft.recipe.RecipeManager;
@@ -20,6 +21,7 @@ import net.minecraft.resource.featuretoggle.FeatureSet;
 import net.minecraft.scoreboard.Scoreboard;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvent;
+import net.minecraft.util.collection.Pool;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkSectionPos;
 import net.minecraft.util.math.Direction;
@@ -201,6 +203,7 @@ public class WrappedLevel extends World {
         ExplosionSourceType explosionSourceType,
         ParticleEffect smallParticle,
         ParticleEffect largeParticle,
+        Pool<BlockParticleEffect> blockParticles,
         RegistryEntry<SoundEvent> soundEvent
     ) {
         level.createExplosion(
@@ -215,6 +218,7 @@ public class WrappedLevel extends World {
             explosionSourceType,
             smallParticle,
             largeParticle,
+            blockParticles,
             soundEvent
         );
     }

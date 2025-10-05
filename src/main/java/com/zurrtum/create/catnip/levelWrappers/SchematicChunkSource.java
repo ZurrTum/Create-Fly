@@ -14,6 +14,7 @@ import net.minecraft.fluid.FluidState;
 import net.minecraft.fluid.Fluids;
 import net.minecraft.item.FuelRegistry;
 import net.minecraft.item.map.MapState;
+import net.minecraft.particle.BlockParticleEffect;
 import net.minecraft.particle.ParticleEffect;
 import net.minecraft.recipe.BrewingRecipeRegistry;
 import net.minecraft.recipe.RecipeManager;
@@ -25,6 +26,7 @@ import net.minecraft.scoreboard.Scoreboard;
 import net.minecraft.server.world.ChunkLevelType;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvent;
+import net.minecraft.util.collection.Pool;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.Direction;
@@ -211,6 +213,7 @@ public class SchematicChunkSource extends ChunkManager {
                 ExplosionSourceType explosionSourceType,
                 ParticleEffect smallParticle,
                 ParticleEffect largeParticle,
+                Pool<BlockParticleEffect> blockParticles,
                 RegistryEntry<SoundEvent> soundEvent
             ) {
             }
