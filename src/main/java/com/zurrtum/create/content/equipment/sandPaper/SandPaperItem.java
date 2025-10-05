@@ -136,7 +136,7 @@ public class SandPaperItem extends Item {
         });
 
         stack.remove(AllDataComponents.SAND_PAPER_POLISHING);
-        stack.damage(1, entityLiving, LivingEntity.getSlotForHand(entityLiving.getActiveHand()));
+        stack.damage(1, entityLiving, entityLiving.getActiveHand().getEquipmentSlot());
 
         return stack;
     }
@@ -194,7 +194,7 @@ public class SandPaperItem extends Item {
         if (newState.isPresent()) {
             level.setBlockState(pos, newState.get());
             if (player != null)
-                stack.damage(1, player, LivingEntity.getSlotForHand(player.getActiveHand()));
+                stack.damage(1, player, player.getActiveHand().getEquipmentSlot());
             return ActionResult.SUCCESS;
         }
 

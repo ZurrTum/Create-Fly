@@ -161,7 +161,7 @@ public class PotatoCannonItem extends RangedWeaponItem implements SwingControlIt
         }
 
         if (!BacktankUtil.canAbsorbDamage(player, maxUses()))
-            heldStack.damage(1, player, LivingEntity.getSlotForHand(hand));
+            heldStack.damage(1, player, hand.getEquipmentSlot());
 
         ShootableGadgetItemMethods.applyCooldown(player, heldStack, hand, s -> s.getItem() instanceof PotatoCannonItem, projectileType.reloadTicks());
         ShootableGadgetItemMethods.sendPackets(player, b -> new PotatoCannonPacket(barrelPos, lookVec.normalize(), ammoStack, hand, soundPitch, b));

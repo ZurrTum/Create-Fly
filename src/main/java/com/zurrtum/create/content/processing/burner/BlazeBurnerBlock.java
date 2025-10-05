@@ -21,7 +21,6 @@ import net.minecraft.block.HorizontalFacingBlock;
 import net.minecraft.block.ShapeContext;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.pathing.NavigationType;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.FlintAndSteelItem;
@@ -127,7 +126,7 @@ public class BlazeBurnerBlock extends HorizontalFacingBlock implements IBE<Blaze
                 level.playSound(player, pos, SoundEvents.ITEM_FLINTANDSTEEL_USE, SoundCategory.BLOCKS, 1.0F, level.random.nextFloat() * 0.4F + 0.8F);
                 if (level.isClient())
                     return ActionResult.SUCCESS;
-                stack.damage(1, player, LivingEntity.getSlotForHand(hand));
+                stack.damage(1, player, hand.getEquipmentSlot());
                 level.setBlockState(pos, AllBlocks.LIT_BLAZE_BURNER.getDefaultState());
                 return ActionResult.SUCCESS;
             }
