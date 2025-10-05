@@ -10,6 +10,7 @@ import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.NbtComponent;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.EquipmentSlot;
+import net.minecraft.entity.TypedEntityData;
 import net.minecraft.entity.attribute.EntityAttributeInstance;
 import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.player.PlayerEntity;
@@ -85,7 +86,7 @@ public class SuperGlueHandler {
         SuperGlueEntity entity = new SuperGlueEntity(world, SuperGlueEntity.span(gluePos, gluePos.offset(face)));
         NbtComponent customData = itemstack.get(DataComponentTypes.CUSTOM_DATA);
         if (customData != null)
-            EntityType.loadFromEntityNbt(world, placer, entity, customData);
+            EntityType.loadFromEntityNbt(world, placer, entity, TypedEntityData.create(entity.getType(), customData.copyNbt()));
 
         if (SuperGlueEntity.isValidFace(world, gluePos, face)) {
             world.spawnEntity(entity);

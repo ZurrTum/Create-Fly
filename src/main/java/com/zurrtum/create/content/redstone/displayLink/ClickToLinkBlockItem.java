@@ -3,12 +3,11 @@ package com.zurrtum.create.content.redstone.displayLink;
 import com.zurrtum.create.AllDataComponents;
 import com.zurrtum.create.AllSoundEvents;
 import com.zurrtum.create.foundation.block.IBE;
-import com.zurrtum.create.foundation.codec.CreateCodecs;
 import com.zurrtum.create.infrastructure.component.ClickToLinkData;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.component.DataComponentTypes;
-import net.minecraft.component.type.NbtComponent;
+import net.minecraft.entity.TypedEntityData;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.ItemStack;
@@ -100,8 +99,7 @@ public abstract class ClickToLinkBlockItem extends BlockItem {
         NbtCompound beTag = new NbtCompound();
         beTag.put("TargetOffset", BlockPos.CODEC, selectedPos.subtract(placedPos));
         beTag.put("TargetDimension", Identifier.CODEC, selectedDim);
-        beTag.put("id", CreateCodecs.BLOCK_ENTITY_TYPE_CODEC, ((IBE<?>) getBlock()).getBlockEntityType());
-        stack.set(DataComponentTypes.BLOCK_ENTITY_DATA, NbtComponent.of(beTag));
+        stack.set(DataComponentTypes.BLOCK_ENTITY_DATA, TypedEntityData.create(((IBE<?>) getBlock()).getBlockEntityType(), beTag));
 
         ActionResult useOn = super.useOnBlock(pContext);
         if (level.isClient() || useOn == ActionResult.FAIL)

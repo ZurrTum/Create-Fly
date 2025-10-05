@@ -1,13 +1,15 @@
 package com.zurrtum.create.content.logistics.factoryBoard;
 
+import com.zurrtum.create.AllBlockEntityTypes;
 import com.zurrtum.create.AllSoundEvents;
 import com.zurrtum.create.content.logistics.packagerLink.LogisticallyLinkedBlockItem;
 import com.zurrtum.create.foundation.block.IBE;
 import com.zurrtum.create.foundation.codec.CreateCodecs;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.component.DataComponentTypes;
-import net.minecraft.component.type.NbtComponent;
+import net.minecraft.entity.TypedEntityData;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.ItemPlacementContext;
@@ -50,7 +52,16 @@ public class FactoryPanelBlockItem extends LogisticallyLinkedBlockItem {
     public static ItemStack fixCtrlCopiedStack(ItemStack stack) {
         // Salvage frequency data from one of the panel slots
         if (isTuned(stack) && networkFromStack(stack) == null) {
-            NbtCompound bet = stack.getOrDefault(DataComponentTypes.BLOCK_ENTITY_DATA, NbtComponent.DEFAULT).copyNbt();
+            TypedEntityData<BlockEntityType<?>> data = stack.get(DataComponentTypes.BLOCK_ENTITY_DATA);
+            NbtCompound bet;
+            BlockEntityType<?> type;
+            if (data != null) {
+                bet = data.copyNbtWithoutId();
+                type = data.getType();
+            } else {
+                bet = new NbtCompound();
+                type = AllBlockEntityTypes.PACKAGER_LINK;
+            }
             UUID frequency = UUID.randomUUID();
 
             for (PanelSlot slot : PanelSlot.values()) {
@@ -62,7 +73,7 @@ public class FactoryPanelBlockItem extends LogisticallyLinkedBlockItem {
             bet = new NbtCompound();
             bet.put("Freq", Uuids.INT_STREAM_CODEC, frequency);
             bet.put("id", CreateCodecs.BLOCK_ENTITY_TYPE_CODEC, ((IBE<?>) ((BlockItem) stack.getItem()).getBlock()).getBlockEntityType());
-            stack.set(DataComponentTypes.BLOCK_ENTITY_DATA, NbtComponent.of(bet));
+            stack.set(DataComponentTypes.BLOCK_ENTITY_DATA, TypedEntityData.create(type, bet));
         }
 
         return stack;

@@ -5,13 +5,13 @@ import com.zurrtum.create.AllBlocks;
 import com.zurrtum.create.api.connectivity.ConnectivityHandler;
 import com.zurrtum.create.content.equipment.symmetryWand.SymmetryWandItem;
 import com.zurrtum.create.foundation.block.IBE;
-import com.zurrtum.create.foundation.codec.CreateCodecs;
 import com.zurrtum.create.foundation.item.ItemPlacementSoundContext;
 import com.zurrtum.create.infrastructure.fluids.FluidStack;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.component.DataComponentTypes;
-import net.minecraft.component.type.NbtComponent;
+import net.minecraft.entity.TypedEntityData;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.ItemPlacementContext;
@@ -45,9 +45,9 @@ public class FluidTankItem extends BlockItem {
         MinecraftServer minecraftserver = level.getServer();
         if (minecraftserver == null)
             return false;
-        NbtComponent blockEntityData = itemStack.get(DataComponentTypes.BLOCK_ENTITY_DATA);
-        if (blockEntityData != null) {
-            NbtCompound nbt = blockEntityData.copyNbt();
+        TypedEntityData<BlockEntityType<?>> data = itemStack.get(DataComponentTypes.BLOCK_ENTITY_DATA);
+        if (data != null) {
+            NbtCompound nbt = data.copyNbtWithoutId();
             nbt.remove("Luminosity");
             nbt.remove("Size");
             nbt.remove("Height");
@@ -60,8 +60,7 @@ public class FluidTankItem extends BlockItem {
                     nbt.put("TankContent", fluid.toNbt(minecraftserver.getRegistryManager()));
                 }
             }
-            nbt.put("id", CreateCodecs.BLOCK_ENTITY_TYPE_CODEC, ((IBE<?>) this.getBlock()).getBlockEntityType());
-            itemStack.set(DataComponentTypes.BLOCK_ENTITY_DATA, NbtComponent.of(nbt));
+            itemStack.set(DataComponentTypes.BLOCK_ENTITY_DATA, TypedEntityData.create(((IBE<?>) this.getBlock()).getBlockEntityType(), nbt));
         }
         return super.postPlacement(blockPos, level, player, itemStack, blockState);
     }

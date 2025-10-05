@@ -2,11 +2,11 @@ package com.zurrtum.create.content.logistics.packagerLink;
 
 import com.zurrtum.create.foundation.block.IBE;
 import com.zurrtum.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
-import com.zurrtum.create.foundation.codec.CreateCodecs;
 import net.minecraft.block.Block;
+import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.component.DataComponentTypes;
-import net.minecraft.component.type.NbtComponent;
 import net.minecraft.component.type.TooltipDisplayComponent;
+import net.minecraft.entity.TypedEntityData;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.ItemStack;
@@ -45,11 +45,15 @@ public class LogisticallyLinkedBlockItem extends BlockItem {
 
     @Nullable
     public static UUID networkFromStack(ItemStack pStack) {
-        NbtCompound tag = pStack.getOrDefault(DataComponentTypes.BLOCK_ENTITY_DATA, NbtComponent.DEFAULT).copyNbt();
-        return tag.get("Freq", Uuids.INT_STREAM_CODEC).orElse(null);
+        TypedEntityData<BlockEntityType<?>> data = pStack.get(DataComponentTypes.BLOCK_ENTITY_DATA);
+        if (data == null || !data.contains("Freq")) {
+            return null;
+        }
+        return data.copyNbtWithoutId().get("Freq", Uuids.INT_STREAM_CODEC).orElse(null);
     }
 
     @Override
+    @SuppressWarnings("deprecation")
     public void appendTooltip(
         @NotNull ItemStack stack,
         @NotNull TooltipContext tooltipContext,
@@ -59,8 +63,8 @@ public class LogisticallyLinkedBlockItem extends BlockItem {
     ) {
         super.appendTooltip(stack, tooltipContext, displayComponent, textConsumer, type);
 
-        NbtCompound tag = stack.getOrDefault(DataComponentTypes.BLOCK_ENTITY_DATA, NbtComponent.DEFAULT).copyNbt();
-        if (!tag.contains("Freq"))
+        TypedEntityData<BlockEntityType<?>> data = stack.get(DataComponentTypes.BLOCK_ENTITY_DATA);
+        if (data == null || !data.contains("Freq"))
             return;
 
         textConsumer.accept(Text.translatable("create.logistically_linked.tooltip").formatted(Formatting.GOLD));
@@ -121,13 +125,16 @@ public class LogisticallyLinkedBlockItem extends BlockItem {
     }
 
     public static void assignFrequency(ItemStack stack, PlayerEntity player, UUID frequency) {
-        NbtCompound tag = stack.getOrDefault(DataComponentTypes.BLOCK_ENTITY_DATA, NbtComponent.DEFAULT).copyNbt();
+        TypedEntityData<BlockEntityType<?>> data = stack.get(DataComponentTypes.BLOCK_ENTITY_DATA);
+        NbtCompound tag = data == null ? new NbtCompound() : data.copyNbtWithoutId();
         tag.put("Freq", Uuids.INT_STREAM_CODEC, frequency);
 
         player.sendMessage(Text.translatable("create.logistically_linked.tuned"), true);
 
-        tag.put("id", CreateCodecs.BLOCK_ENTITY_TYPE_CODEC, ((IBE<?>) ((BlockItem) stack.getItem()).getBlock()).getBlockEntityType());
-        stack.set(DataComponentTypes.BLOCK_ENTITY_DATA, NbtComponent.of(tag));
+        stack.set(
+            DataComponentTypes.BLOCK_ENTITY_DATA,
+            TypedEntityData.create(((IBE<?>) ((BlockItem) stack.getItem()).getBlock()).getBlockEntityType(), tag)
+        );
     }
 
 }

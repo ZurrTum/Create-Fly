@@ -16,8 +16,8 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.component.DataComponentTypes;
-import net.minecraft.component.type.NbtComponent;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.TypedEntityData;
 import net.minecraft.entity.ai.pathing.NavigationType;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemPlacementContext;
@@ -100,10 +100,19 @@ public class RedstoneRequesterBlock extends Block implements IBE<RedstoneRequest
         autoRequestData.writeToItem(BlockPos.ORIGIN, stack);
 
         if (isRequester) {
-            NbtCompound beTag = stack.getOrDefault(DataComponentTypes.BLOCK_ENTITY_DATA, NbtComponent.DEFAULT).copyNbt();
+            TypedEntityData<BlockEntityType<?>> data = stack.get(DataComponentTypes.BLOCK_ENTITY_DATA);
+            NbtCompound beTag;
+            BlockEntityType<?> type;
+            if (data != null) {
+                beTag = data.copyNbtWithoutId();
+                type = data.getType();
+            } else {
+                beTag = new NbtCompound();
+                type = AllBlockEntityTypes.PACKAGER_LINK;
+            }
             beTag.put("Freq", Uuids.INT_STREAM_CODEC, be.behaviour.freqId);
             beTag.put("id", CreateCodecs.BLOCK_ENTITY_TYPE_CODEC, AllBlockEntityTypes.REDSTONE_REQUESTER);
-            stack.set(DataComponentTypes.BLOCK_ENTITY_DATA, NbtComponent.of(beTag));
+            stack.set(DataComponentTypes.BLOCK_ENTITY_DATA, TypedEntityData.create(type, beTag));
         }
 
         player.setStackInHand(Hand.MAIN_HAND, stack);

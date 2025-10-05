@@ -7,13 +7,12 @@ import com.zurrtum.create.catnip.data.Couple;
 import com.zurrtum.create.content.trains.graph.*;
 import com.zurrtum.create.content.trains.signal.TrackEdgePoint;
 import com.zurrtum.create.foundation.block.IBE;
-import com.zurrtum.create.foundation.codec.CreateCodecs;
 import com.zurrtum.create.infrastructure.component.BezierTrackPointLocation;
 import com.zurrtum.create.infrastructure.config.AllConfigs;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.component.DataComponentTypes;
-import net.minecraft.component.type.NbtComponent;
+import net.minecraft.entity.TypedEntityData;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.ItemStack;
@@ -127,9 +126,8 @@ public class TrackTargetingBlockItem extends BlockItem {
         }
 
         blockEntityData.put("TargetTrack", BlockPos.CODEC, selectedPos.subtract(placedPos));
-        blockEntityData.put("id", CreateCodecs.BLOCK_ENTITY_TYPE_CODEC, ((IBE<?>) this.getBlock()).getBlockEntityType());
 
-        stack.set(DataComponentTypes.BLOCK_ENTITY_DATA, NbtComponent.of(blockEntityData));
+        stack.set(DataComponentTypes.BLOCK_ENTITY_DATA, TypedEntityData.create(((IBE<?>) this.getBlock()).getBlockEntityType(), blockEntityData));
         stack.remove(AllDataComponents.TRACK_TARGETING_ITEM_SELECTED_POS);
         stack.remove(AllDataComponents.TRACK_TARGETING_ITEM_SELECTED_DIRECTION);
         stack.remove(AllDataComponents.TRACK_TARGETING_ITEM_BEZIER);

@@ -3,6 +3,7 @@ package com.zurrtum.create.content.equipment.blueprint;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.NbtComponent;
 import net.minecraft.entity.EntityType;
+import net.minecraft.entity.TypedEntityData;
 import net.minecraft.entity.decoration.AbstractDecorationEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
@@ -39,7 +40,7 @@ public class BlueprintItem extends Item {
         NbtComponent customData = stack.get(DataComponentTypes.CUSTOM_DATA);
 
         if (customData != null)
-            EntityType.loadFromEntityNbt(world, player, hangingentity, customData);
+            EntityType.loadFromEntityNbt(world, player, hangingentity, TypedEntityData.create(hangingentity.getType(), customData.copyNbt()));
         if (!hangingentity.canStayAttached())
             return ActionResult.CONSUME;
         if (!world.isClient()) {

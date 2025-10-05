@@ -7,10 +7,11 @@ import com.zurrtum.create.client.content.logistics.factoryBoard.FactoryPanelConn
 import com.zurrtum.create.content.logistics.packagerLink.LogisticallyLinkedBehaviour;
 import com.zurrtum.create.content.logistics.packagerLink.LogisticallyLinkedBlockItem;
 import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
+import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.component.DataComponentTypes;
-import net.minecraft.component.type.NbtComponent;
+import net.minecraft.entity.TypedEntityData;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.util.Uuids;
@@ -36,7 +37,11 @@ public class LogisticallyLinkedClientHandler {
         if (!(mainHandItem.getItem() instanceof LogisticallyLinkedBlockItem) || !LogisticallyLinkedBlockItem.isTuned(mainHandItem))
             return;
 
-        NbtCompound tag = mainHandItem.getOrDefault(DataComponentTypes.BLOCK_ENTITY_DATA, NbtComponent.DEFAULT).copyNbt();
+        TypedEntityData<BlockEntityType<?>> data = mainHandItem.get(DataComponentTypes.BLOCK_ENTITY_DATA);
+        if (data == null || !data.contains("Freq")) {
+            return;
+        }
+        NbtCompound tag = data.copyNbtWithoutId();
         Optional<UUID> uuid = tag.get("Freq", Uuids.INT_STREAM_CODEC);
         if (uuid.isEmpty())
             return;
