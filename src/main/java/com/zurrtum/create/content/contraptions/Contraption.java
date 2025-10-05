@@ -71,7 +71,6 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtHelper;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.registry.RegistryEntryLookup;
-import net.minecraft.server.network.DebugInfoSender;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.state.property.Properties;
 import net.minecraft.storage.NbtReadView;
@@ -1023,7 +1022,6 @@ public abstract class Contraption {
             PointOfInterestTypes.getTypeForState(block.state()).ifPresent(poiType -> {
                 world.getServer().execute(() -> {
                     serverWorld.getPointOfInterestStorage().add(add, poiType);
-                    DebugInfoSender.sendPoiAddition(serverWorld, add);
                 });
             });
 

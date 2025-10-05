@@ -29,7 +29,6 @@ import net.minecraft.fluid.Fluids;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemUsageContext;
-import net.minecraft.server.network.DebugInfoSender;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.state.StateManager.Builder;
@@ -189,7 +188,6 @@ public class FluidPipeBlock extends ConnectingBlock implements Waterloggable, IW
         @Nullable WireOrientation wireOrientation,
         boolean isMoving
     ) {
-        DebugInfoSender.sendNeighborUpdate(world, pos);
     }
 
     @Override

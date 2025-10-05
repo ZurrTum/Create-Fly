@@ -20,7 +20,6 @@ import net.minecraft.entity.ai.pathing.NavigationType;
 import net.minecraft.fluid.FluidState;
 import net.minecraft.fluid.Fluids;
 import net.minecraft.item.ItemPlacementContext;
-import net.minecraft.server.network.DebugInfoSender;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.state.StateManager.Builder;
 import net.minecraft.state.property.Properties;
@@ -79,7 +78,6 @@ public class PumpBlock extends DirectionalKineticBlock implements Waterloggable,
         @Nullable WireOrientation wireOrientation,
         boolean isMoving
     ) {
-        DebugInfoSender.sendNeighborUpdate(world, pos);
     }
 
     @Override

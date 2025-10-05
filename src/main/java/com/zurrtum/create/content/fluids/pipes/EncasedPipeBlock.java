@@ -24,7 +24,6 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemUsageContext;
-import net.minecraft.server.network.DebugInfoSender;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.state.StateManager.Builder;
 import net.minecraft.state.property.BooleanProperty;
@@ -113,7 +112,6 @@ public class EncasedPipeBlock extends Block implements IWrenchable, SpecialBlock
         @Nullable WireOrientation wireOrientation,
         boolean isMoving
     ) {
-        DebugInfoSender.sendNeighborUpdate(world, pos);
     }
 
     @Override

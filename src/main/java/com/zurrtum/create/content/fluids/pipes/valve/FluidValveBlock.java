@@ -17,7 +17,6 @@ import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.entity.ai.pathing.NavigationType;
 import net.minecraft.fluid.FluidState;
 import net.minecraft.item.ItemPlacementContext;
-import net.minecraft.server.network.DebugInfoSender;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.state.StateManager.Builder;
 import net.minecraft.state.property.BooleanProperty;
@@ -121,7 +120,6 @@ public class FluidValveBlock extends DirectionalAxisKineticBlock implements IAxi
         @Nullable WireOrientation wireOrientation,
         boolean isMoving
     ) {
-        DebugInfoSender.sendNeighborUpdate(world, pos);
     }
 
     public static boolean isOpenAt(BlockState state, Direction d) {

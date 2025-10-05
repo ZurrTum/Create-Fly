@@ -22,7 +22,6 @@ import net.minecraft.entity.ai.pathing.NavigationType;
 import net.minecraft.fluid.FluidState;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.item.ItemStack;
-import net.minecraft.server.network.DebugInfoSender;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.state.StateManager.Builder;
 import net.minecraft.util.math.BlockPos;
@@ -128,7 +127,6 @@ public class SmartFluidPipeBlock extends WallMountedBlock implements IBE<SmartFl
         @Nullable WireOrientation wireOrientation,
         boolean isMoving
     ) {
-        DebugInfoSender.sendNeighborUpdate(world, pos);
     }
 
     public static boolean isOpenAt(BlockState state, Direction d) {
