@@ -33,8 +33,10 @@ import net.minecraft.util.math.*;
 import net.minecraft.world.LightType;
 import net.minecraft.world.MutableWorldProperties;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldProperties;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.source.BiomeAccess;
+import net.minecraft.world.border.WorldBorder;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.ChunkManager;
 import net.minecraft.world.chunk.ChunkStatus;
@@ -95,6 +97,21 @@ public class VirtualRenderWorld extends World implements VisualizationLevel {
 
         this.chunkSource = new VirtualChunkSource(this);
         this.lightEngine = new LightingProvider(chunkSource, true, false);
+    }
+
+    @Override
+    public void setSpawnPoint(WorldProperties.SpawnPoint spawnPoint) {
+        level.setSpawnPoint(spawnPoint);
+    }
+
+    @Override
+    public WorldProperties.SpawnPoint getSpawnPoint() {
+        return level.getSpawnPoint();
+    }
+
+    @Override
+    public WorldBorder getWorldBorder() {
+        return level.getWorldBorder();
     }
 
     /**

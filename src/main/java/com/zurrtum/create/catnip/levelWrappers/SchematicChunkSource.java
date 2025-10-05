@@ -33,7 +33,9 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.MutableWorldProperties;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldProperties;
 import net.minecraft.world.biome.Biome;
+import net.minecraft.world.border.WorldBorder;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.ChunkManager;
 import net.minecraft.world.chunk.ChunkStatus;
@@ -122,9 +124,24 @@ public class SchematicChunkSource extends ChunkManager {
             }
 
             private final DynamicRegistryManager access;
+            private final WorldBorder border = new WorldBorder();
 
             private DummyLevel(World level) {
                 this(null, null, level.getRegistryManager(), level.getDimensionEntry(), false, false, 0, 0);
+            }
+
+            @Override
+            public void setSpawnPoint(WorldProperties.SpawnPoint spawnPoint) {
+            }
+
+            @Override
+            public WorldProperties.SpawnPoint getSpawnPoint() {
+                return properties.getSpawnPoint();
+            }
+
+            @Override
+            public WorldBorder getWorldBorder() {
+                return border;
             }
 
             @Override
