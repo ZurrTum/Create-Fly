@@ -455,10 +455,10 @@ public class ChainConveyorBlockEntity extends KineticBlockEntity implements Tran
         if (!forPointsAlongChains(
             target,
             chainCount,
-            vec -> world.spawnEntity(new ItemEntity(world, vec.x, vec.y, vec.z, new ItemStack(Items.CHAIN)))
+            vec -> world.spawnEntity(new ItemEntity(world, vec.x, vec.y, vec.z, new ItemStack(Items.IRON_CHAIN)))
         )) {
             while (chainCount > 0) {
-                Block.dropStack(world, pos, new ItemStack(Blocks.CHAIN.asItem(), Math.min(chainCount, 64)));
+                Block.dropStack(world, pos, new ItemStack(Blocks.IRON_CHAIN.asItem(), Math.min(chainCount, 64)));
                 chainCount -= 64;
             }
         }
@@ -505,7 +505,7 @@ public class ChainConveyorBlockEntity extends KineticBlockEntity implements Tran
             blockPos,
             (int) Math.round(Vec3d.of(blockPos).length() * 8),
             vec -> world.addParticleClient(
-                new BlockStateParticleEffect(ParticleTypes.BLOCK, Blocks.CHAIN.getDefaultState()),
+                new BlockStateParticleEffect(ParticleTypes.BLOCK, Blocks.IRON_CHAIN.getDefaultState()),
                 vec.x,
                 vec.y,
                 vec.z,

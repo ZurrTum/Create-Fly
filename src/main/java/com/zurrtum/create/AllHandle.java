@@ -564,7 +564,7 @@ public class AllHandle {
                         if (!player.isCreative()) {
                             int chainCost = ChainConveyorBlockEntity.getChainCost(targetPos.subtract(packet.pos()));
                             while (chainCost > 0) {
-                                player.getInventory().offerOrDrop(new ItemStack(Items.CHAIN, Math.min(chainCost, 64)));
+                                player.getInventory().offerOrDrop(new ItemStack(Items.IRON_CHAIN, Math.min(chainCost, 64)));
                                 chainCost -= 64;
                             }
                         }

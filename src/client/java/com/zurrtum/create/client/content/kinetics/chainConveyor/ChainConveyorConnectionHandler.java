@@ -86,7 +86,7 @@ public class ChainConveyorConnectionHandler {
             return ActionResult.CONSUME;
         }
 
-        BlockSoundGroup soundtype = Blocks.CHAIN.getDefaultState().getSoundGroup();
+        BlockSoundGroup soundtype = Blocks.IRON_CHAIN.getDefaultState().getSoundGroup();
         if (soundtype != null)
             level.playSound(
                 player,
@@ -100,7 +100,7 @@ public class ChainConveyorConnectionHandler {
     }
 
     private static boolean isChain(ItemStack itemStack) {
-        return itemStack.isOf(Items.CHAIN); // Replace with tag? generic renderer?
+        return itemStack.isOf(Items.IRON_CHAIN); // Replace with tag? generic renderer?
     }
 
     public static void clientTick(MinecraftClient mc) {

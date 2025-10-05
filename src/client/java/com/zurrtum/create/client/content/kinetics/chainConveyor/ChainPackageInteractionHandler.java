@@ -22,7 +22,7 @@ public class ChainPackageInteractionHandler {
     public static boolean onUse(MinecraftClient mc) {
         ClientPlayerEntity player = mc.player;
         ItemStack stack = player.getMainHandStack();
-        if (stack.isIn(AllItemTags.TOOLS_WRENCH) || stack.isOf(Items.CHAIN) || stack.isOf(AllItems.PACKAGE_FROGPORT)) {
+        if (stack.isIn(AllItemTags.TOOLS_WRENCH) || stack.isOf(Items.IRON_CHAIN) || stack.isOf(AllItems.PACKAGE_FROGPORT)) {
             return false;
         }
         double range = player.getAttributeValue(EntityAttributes.BLOCK_INTERACTION_RANGE) + 1;

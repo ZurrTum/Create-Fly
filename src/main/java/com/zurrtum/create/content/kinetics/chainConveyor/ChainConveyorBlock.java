@@ -58,7 +58,7 @@ public class ChainConveyorBlock extends KineticBlock implements IBE<ChainConveyo
         Hand hand,
         BlockHitResult hitResult
     ) {
-        if (!level.isClient() && stack.isOf(Items.CHAIN))
+        if (!level.isClient() && stack.isOf(Items.IRON_CHAIN))
             return ActionResult.SUCCESS;
         if (stack.isOf(AllItems.PACKAGE_FROGPORT))
             return ActionResult.SUCCESS;
@@ -95,7 +95,7 @@ public class ChainConveyorBlock extends KineticBlock implements IBE<ChainConveyo
                 for (BlockPos targetPos : be.connections) {
                     int chainCost = ChainConveyorBlockEntity.getChainCost(targetPos);
                     while (chainCost > 0) {
-                        player.getInventory().offerOrDrop(new ItemStack(Items.CHAIN, Math.min(chainCost, 64)));
+                        player.getInventory().offerOrDrop(new ItemStack(Items.IRON_CHAIN, Math.min(chainCost, 64)));
                         chainCost -= 64;
                     }
                 }

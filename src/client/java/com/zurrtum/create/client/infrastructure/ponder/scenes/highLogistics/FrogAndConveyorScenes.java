@@ -84,7 +84,7 @@ public class FrogAndConveyorScenes {
         scene.world().showSection(conv2S, Direction.DOWN);
         scene.idle(20);
 
-        ItemStack chainItem = new ItemStack(Items.CHAIN);
+        ItemStack chainItem = new ItemStack(Items.IRON_CHAIN);
         scene.overlay().showControls(util.vector().topOf(conv1), Pointing.DOWN, 117).rightClick().withItem(chainItem);
 
         Vec3d c1 = util.vector().centerOf(conv1);
