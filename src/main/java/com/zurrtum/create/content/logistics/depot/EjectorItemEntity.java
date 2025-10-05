@@ -131,16 +131,6 @@ public class EjectorItemEntity extends ItemEntity {
     }
 
     @Override
-    public ItemEntity copy() {
-        ItemEntity copy = new ItemEntity(EntityType.ITEM, getEntityWorld());
-        copy.setStack(getStack().copy());
-        copy.copyPositionAndRotation(this);
-        copy.itemAge = itemAge;
-        copy.uniqueOffset = uniqueOffset;
-        return copy;
-    }
-
-    @Override
     public boolean isAlive() {
         return alive;
     }
