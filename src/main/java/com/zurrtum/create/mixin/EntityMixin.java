@@ -62,8 +62,8 @@ public abstract class EntityMixin implements DataTracked {
         ToolboxHandler.entityTick(entity, world);
     }
 
-    @Inject(method = "startRiding(Lnet/minecraft/entity/Entity;Z)Z", at = @At(value = "HEAD"), cancellable = true)
-    private void startRiding(Entity entity, boolean force, CallbackInfoReturnable<Boolean> cir) {
+    @Inject(method = "startRiding(Lnet/minecraft/entity/Entity;ZZ)Z", at = @At(value = "HEAD"), cancellable = true)
+    private void startRiding(Entity entity, boolean force, boolean emitEvent, CallbackInfoReturnable<Boolean> cir) {
         if (CouplingHandler.preventEntitiesFromMoutingOccupiedCart((Entity) (Object) this, entity)) {
             cir.setReturnValue(false);
         }

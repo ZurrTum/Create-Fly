@@ -137,7 +137,7 @@ public abstract class AbstractContraptionEntity extends Entity {
                 entity.stopRiding();
             }
         }
-        passenger.startRiding(this, true);
+        passenger.startRiding(this, true, true);
         if (passenger instanceof TameableEntity ta)
             ta.setInSittingPose(true);
         if (getEntityWorld().isClient())

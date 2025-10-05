@@ -57,7 +57,7 @@ public class FakePlayerEntity extends ServerPlayerEntity {
     }
 
     @Override
-    public boolean startRiding(Entity entity, boolean force) {
+    public boolean startRiding(Entity entity, boolean force, boolean emitEvent) {
         return false;
     }
 
