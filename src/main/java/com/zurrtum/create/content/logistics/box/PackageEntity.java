@@ -150,8 +150,8 @@ public class PackageEntity extends LivingEntity {
     }
 
     @Override
-    public void setVelocityClient(double x, double y, double z) {
-        setVelocity(getVelocity().add(x, y, z).multiply(.5f));
+    public void setVelocityClient(Vec3d clientVelocity) {
+        setVelocity(getVelocity().add(clientVelocity).multiply(.5f));
     }
 
     public String getAddress() {
