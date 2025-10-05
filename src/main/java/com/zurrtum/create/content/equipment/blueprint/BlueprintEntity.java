@@ -222,7 +222,7 @@ public class BlueprintEntity extends AbstractDecorationEntity implements Special
             }
         }
 
-        return world.getOtherEntities(this, getBoundingBox(), PREDICATE).isEmpty();
+        return hasNoIntersectingDecoration(true);
     }
 
     public int getEntityWidth() {
