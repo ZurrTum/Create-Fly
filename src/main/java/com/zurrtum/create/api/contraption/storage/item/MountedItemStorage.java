@@ -6,6 +6,7 @@ import com.zurrtum.create.content.contraptions.Contraption;
 import com.zurrtum.create.infrastructure.items.ItemInventory;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.entity.ContainerUser;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.nbt.NbtOps;
@@ -73,7 +74,7 @@ public abstract class MountedItemStorage implements ItemInventory {
         };
         Text menuName = this.getMenuName(info, contraption);
         Inventory handler = this.getHandlerForMenu(info, contraption);
-        Consumer<PlayerEntity> onClose = p -> {
+        Consumer<ContainerUser> onClose = p -> {
             Vec3d newPos = contraption.entity.toGlobalVector(localPosVec, 0);
             this.playClosingSound(level, newPos);
         };
@@ -121,7 +122,7 @@ public abstract class MountedItemStorage implements ItemInventory {
         Text name,
         Inventory handler,
         Predicate<PlayerEntity> stillValid,
-        Consumer<PlayerEntity> onClose
+        Consumer<ContainerUser> onClose
     ) {
         return MountedStorageMenus.createGeneric(name, handler, stillValid, onClose);
     }

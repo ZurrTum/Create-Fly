@@ -1,6 +1,7 @@
 package com.zurrtum.create.api.contraption.storage.item.menu;
 
 import com.zurrtum.create.infrastructure.items.ItemInventory;
+import net.minecraft.entity.ContainerUser;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemStack;
@@ -11,9 +12,9 @@ import java.util.function.Predicate;
 public class StorageInteractionWrapper implements ItemInventory {
     private final Inventory inv;
     private final Predicate<PlayerEntity> stillValid;
-    private final Consumer<PlayerEntity> onClose;
+    private final Consumer<ContainerUser> onClose;
 
-    public StorageInteractionWrapper(Inventory inv, Predicate<PlayerEntity> stillValid, Consumer<PlayerEntity> onClose) {
+    public StorageInteractionWrapper(Inventory inv, Predicate<PlayerEntity> stillValid, Consumer<ContainerUser> onClose) {
         this.inv = inv;
         this.stillValid = stillValid;
         this.onClose = onClose;
@@ -60,7 +61,7 @@ public class StorageInteractionWrapper implements ItemInventory {
     }
 
     @Override
-    public void onClose(PlayerEntity player) {
+    public void onClose(ContainerUser player) {
         onClose.accept(player);
     }
 }

@@ -1,6 +1,7 @@
 package com.zurrtum.create.infrastructure.items;
 
 import com.zurrtum.create.infrastructure.transfer.SlotRangeCache;
+import net.minecraft.entity.ContainerUser;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.inventory.SidedInventory;
@@ -84,12 +85,12 @@ public record SidedInventoryWrapper(Inventory inventory, int[] slots) implements
     }
 
     @Override
-    public void onOpen(PlayerEntity player) {
+    public void onOpen(ContainerUser player) {
         inventory.onOpen(player);
     }
 
     @Override
-    public void onClose(PlayerEntity player) {
+    public void onClose(ContainerUser player) {
         inventory.onClose(player);
     }
 

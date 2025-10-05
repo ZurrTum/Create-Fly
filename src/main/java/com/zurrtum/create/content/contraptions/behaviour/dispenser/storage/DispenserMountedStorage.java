@@ -5,6 +5,7 @@ import com.zurrtum.create.AllMountedStorageTypes;
 import com.zurrtum.create.api.contraption.storage.item.MountedItemStorageType;
 import com.zurrtum.create.api.contraption.storage.item.menu.MountedStorageMenus;
 import com.zurrtum.create.api.contraption.storage.item.simple.SimpleMountedStorage;
+import net.minecraft.entity.ContainerUser;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.screen.NamedScreenHandlerFactory;
@@ -33,7 +34,7 @@ public class DispenserMountedStorage extends SimpleMountedStorage {
         Text name,
         Inventory handler,
         Predicate<PlayerEntity> stillValid,
-        Consumer<PlayerEntity> onClose
+        Consumer<ContainerUser> onClose
     ) {
         return MountedStorageMenus.createGeneric9x9(name, handler, stillValid, onClose);
     }

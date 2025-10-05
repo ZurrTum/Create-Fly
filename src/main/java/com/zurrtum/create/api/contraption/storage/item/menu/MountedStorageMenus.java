@@ -1,5 +1,6 @@
 package com.zurrtum.create.api.contraption.storage.item.menu;
 
+import net.minecraft.entity.ContainerUser;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.screen.*;
@@ -28,7 +29,7 @@ public class MountedStorageMenus {
         Text menuName,
         Inventory handler,
         Predicate<PlayerEntity> stillValid,
-        Consumer<PlayerEntity> onClose
+        Consumer<ContainerUser> onClose
     ) {
         int size = handler.size();
         int rows = size / 9;
@@ -50,7 +51,7 @@ public class MountedStorageMenus {
         Text name,
         Inventory handler,
         Predicate<PlayerEntity> stillValid,
-        Consumer<PlayerEntity> onClose
+        Consumer<ContainerUser> onClose
     ) {
         if (handler.size() != 9)
             return null;
