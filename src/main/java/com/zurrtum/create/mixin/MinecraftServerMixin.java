@@ -20,7 +20,6 @@ import net.minecraft.registry.DynamicRegistryManager;
 import net.minecraft.resource.ResourcePackManager;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.SaveLoader;
-import net.minecraft.server.WorldGenerationProgressListener;
 import net.minecraft.server.WorldGenerationProgressListenerFactory;
 import net.minecraft.server.dedicated.MinecraftDedicatedServer;
 import net.minecraft.server.world.ServerWorld;
@@ -68,7 +67,7 @@ public abstract class MinecraftServerMixin {
         Create.LOGISTICS.tick(world);
     }
 
-    @WrapOperation(method = "createWorlds(Lnet/minecraft/server/WorldGenerationProgressListener;)V", at = @At(value = "INVOKE", target = "Ljava/util/Map;put(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;"))
+    @WrapOperation(method = "createWorlds()V", at = @At(value = "INVOKE", target = "Ljava/util/Map;put(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;"))
     private <K, V> V onLoad(Map<K, V> map, K key, V value, Operation<V> original) {
         V result = original.call(map, key, value);
         World world = (World) value;
@@ -77,8 +76,8 @@ public abstract class MinecraftServerMixin {
         return result;
     }
 
-    @Inject(method = "createWorlds(Lnet/minecraft/server/WorldGenerationProgressListener;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/ServerWorldProperties;isInitialized()Z"))
-    private void onLoadOverworld(WorldGenerationProgressListener worldGenerationProgressListener, CallbackInfo ci, @Local ServerWorld world) {
+    @Inject(method = "createWorlds()V", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/ServerWorldProperties;isInitialized()Z"))
+    private void onLoadOverworld(CallbackInfo ci, @Local ServerWorld world) {
         MinecraftServer server = (MinecraftServer) (Object) this;
         Create.RAILWAYS.levelLoaded(server);
         Create.LOGISTICS.levelLoaded(server);

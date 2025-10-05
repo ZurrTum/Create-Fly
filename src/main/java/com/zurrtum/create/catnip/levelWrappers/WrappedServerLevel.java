@@ -34,7 +34,6 @@ public class WrappedServerLevel extends ServerWorld {
             (ServerWorldProperties) level.getLevelProperties(),
             level.getRegistryKey(),
             new DimensionOptions(level.getDimensionEntry(), level.getChunkManager().getChunkGenerator()),
-            new DummyStatusListener(),
             level.isDebugWorld(),
             level.getBiomeAccess().seed,
             Collections.emptyList(),
