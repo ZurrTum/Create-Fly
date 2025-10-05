@@ -116,7 +116,7 @@ public class CrushingWheelControllerBlockEntity extends SmartBlockEntity {
             inventory.remainingTime -= processingSpeed;
             spawnParticles(inventory.getStack(0));
 
-            if (world.isClient)
+            if (world.isClient())
                 return;
 
             if (inventory.remainingTime < 20 && !inventory.appliedRecipe) {
@@ -198,7 +198,7 @@ public class CrushingWheelControllerBlockEntity extends SmartBlockEntity {
             , facing.getAxis() == Axis.Z ? movement : zMotion
         )); // Or they'll only get their feet crushed.
 
-        if (world.isClient)
+        if (world.isClient())
             return;
 
         if (!(processingEntity instanceof ItemEntity itemEntity)) {

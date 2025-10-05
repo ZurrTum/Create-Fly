@@ -13,7 +13,7 @@ public class FluidTankMovementBehavior extends MovementBehaviour {
 
     @Override
     public void tick(MovementContext context) {
-        if (context.world.isClient) {
+        if (context.world.isClient()) {
             BlockEntity be = context.contraption.presentBlockEntities.get(context.localPos);
             if (be instanceof FluidTankBlockEntity tank) {
                 tank.getFluidLevel().tickChaser();

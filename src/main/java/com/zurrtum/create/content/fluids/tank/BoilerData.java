@@ -84,7 +84,7 @@ public class BoilerData {
         if (!isActive())
             return;
         World level = controller.getWorld();
-        if (level.isClient) {
+        if (level.isClient()) {
             pools.values().forEach(p -> p.play(level));
             gauge.tickChaser();
             float current = gauge.getValue(1);
@@ -123,7 +123,7 @@ public class BoilerData {
     }
 
     public void updateOcclusion(FluidTankBlockEntity controller) {
-        if (!controller.getWorld().isClient)
+        if (!controller.getWorld().isClient())
             return;
         if (attachedEngines + attachedWhistles == 0)
             return;

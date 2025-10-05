@@ -45,7 +45,7 @@ public class NixieTubeBlockEntity extends SmartBlockEntity {
     @Override
     public void tick() {
         super.tick();
-        if (!world.isClient)
+        if (!world.isClient())
             return;
         signalState = null;
         SignalBlockEntity signalBlockEntity = cachedSignalTE.get();
@@ -65,7 +65,7 @@ public class NixieTubeBlockEntity extends SmartBlockEntity {
 
     @Override
     public void initialize() {
-        if (world.isClient)
+        if (world.isClient())
             updateDisplayedStrings();
     }
 

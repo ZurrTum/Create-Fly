@@ -43,7 +43,7 @@ public class SharedDepotBlockMethods {
     ) {
         if (ray.getSide() != Direction.UP)
             return ActionResult.PASS_TO_DEFAULT_BLOCK_ACTION;
-        if (level.isClient)
+        if (level.isClient())
             return ActionResult.SUCCESS;
 
         DepotBehaviour behaviour = get(level, pos);
@@ -109,7 +109,7 @@ public class SharedDepotBlockMethods {
         ItemStack asItem = ItemHelper.fromItemEntity(entityIn);
         if (asItem.isEmpty())
             return;
-        if (entityIn.getWorld().isClient)
+        if (entityIn.getWorld().isClient())
             return;
 
         BlockPos pos = entityIn.getBlockPos();

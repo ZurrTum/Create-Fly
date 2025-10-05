@@ -148,7 +148,7 @@ public class PumpBlock extends DirectionalKineticBlock implements Waterloggable,
     @Override
     public void onBlockAdded(BlockState state, World world, BlockPos pos, BlockState oldState, boolean isMoving) {
         super.onBlockAdded(state, world, pos, oldState, isMoving);
-        if (world.isClient)
+        if (world.isClient())
             return;
         if (state != oldState)
             world.scheduleBlockTick(pos, this, 1, TickPriority.HIGH);

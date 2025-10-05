@@ -77,7 +77,7 @@ public class ValveHandleBlockEntity extends HandCrankBlockEntity {
             return false;
         if (inUse > 0 || cooldown > 0)
             return false;
-        if (world.isClient)
+        if (world.isClient())
             return true;
 
         // Always overshoot, target will stop early

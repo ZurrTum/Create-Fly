@@ -91,7 +91,7 @@ public class PackageEntity extends LivingEntity {
         packageEntity.setVelocity(originalEntity.getVelocity().multiply(1.5f));
         packageEntity.originalEntity = originalEntity;
 
-        if (world != null && !world.isClient)
+        if (world != null && !world.isClient())
             if (ChuteBlock.isChute(world.getBlockState(BlockPos.ofFloored(position.x, position.y + .5f, position.z))))
                 packageEntity.setYaw(((int) packageEntity.getYaw()) / 90 * 90);
 
@@ -128,7 +128,7 @@ public class PackageEntity extends LivingEntity {
     public void travel(Vec3d p_213352_1_) {
         super.travel(p_213352_1_);
 
-        if (!getWorld().isClient)
+        if (!getWorld().isClient())
             return;
         if (getVelocity().length() < 1 / 128f)
             return;
@@ -243,7 +243,7 @@ public class PackageEntity extends LivingEntity {
     public ActionResult interact(PlayerEntity pPlayer, Hand pHand) {
         if (!pPlayer.getStackInHand(pHand).isEmpty())
             return super.interact(pPlayer, pHand);
-        if (pPlayer.getWorld().isClient)
+        if (pPlayer.getWorld().isClient())
             return ActionResult.SUCCESS;
         pPlayer.setStackInHand(pHand, box);
         getWorld().playSound(null, getBlockPos(), SoundEvents.ENTITY_ITEM_PICKUP, SoundCategory.PLAYERS, .2f, .75f + getWorld().random.nextFloat());
@@ -289,7 +289,7 @@ public class PackageEntity extends LivingEntity {
 
     @Override
     public boolean damage(ServerWorld world, DamageSource source, float amount) {
-        if (getWorld().isClient || !this.isAlive())
+        if (getWorld().isClient() || !this.isAlive())
             return false;
 
         if (source.isIn(DamageTypeTags.BYPASSES_INVULNERABILITY)) {

@@ -65,7 +65,7 @@ public class RoseQuartzLampBlock extends Block implements IWrenchable, WeakPower
         @Nullable WireOrientation wireOrientation,
         boolean pIsMoving
     ) {
-        if (pLevel.isClient)
+        if (pLevel.isClient())
             return;
 
         boolean isPowered = pState.get(POWERED);

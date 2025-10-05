@@ -362,7 +362,7 @@ public class DeployerHandler {
             world.setBlockState(posUp, Blocks.AIR.getDefaultState(), Block.NOTIFY_ALL | Block.SKIP_DROPS);
         } else {
             blockstate.getBlock().onBreak(world, pos, blockstate, player.cast());
-            if (!world.setBlockState(pos, world.getFluidState(pos).getFluid().getDefaultState().getBlockState(), world.isClient ? 11 : 3))
+            if (!world.setBlockState(pos, world.getFluidState(pos).getFluid().getDefaultState().getBlockState(), world.isClient() ? 11 : 3))
                 return true;
         }
 

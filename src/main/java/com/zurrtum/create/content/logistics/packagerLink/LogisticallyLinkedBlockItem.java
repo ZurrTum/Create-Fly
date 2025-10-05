@@ -72,7 +72,7 @@ public class LogisticallyLinkedBlockItem extends BlockItem {
     public ActionResult use(World world, PlayerEntity player, Hand usedHand) {
         ItemStack stack = player.getStackInHand(usedHand);
         if (isTuned(stack)) {
-            if (world.isClient) {
+            if (world.isClient()) {
                 world.playSound(player, player.getBlockPos(), SoundEvents.ENTITY_ITEM_FRAME_REMOVE_ITEM, SoundCategory.BLOCKS, 0.75f, 1.0f);
             } else {
                 player.sendMessage(Text.translatable("create.logistically_linked.cleared"), true);
@@ -100,7 +100,7 @@ public class LogisticallyLinkedBlockItem extends BlockItem {
         boolean tuned = isTuned(stack);
 
         if (link != null) {
-            if (level.isClient)
+            if (level.isClient())
                 return ActionResult.SUCCESS;
             if (!link.mayInteractMessage(player))
                 return ActionResult.SUCCESS;
@@ -110,7 +110,7 @@ public class LogisticallyLinkedBlockItem extends BlockItem {
         }
 
         ActionResult useOn = super.useOnBlock(pContext);
-        if (level.isClient || useOn == ActionResult.FAIL)
+        if (level.isClient() || useOn == ActionResult.FAIL)
             return useOn;
 
         player.sendMessage(

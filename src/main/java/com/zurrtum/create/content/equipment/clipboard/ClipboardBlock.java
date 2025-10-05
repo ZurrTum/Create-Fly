@@ -98,7 +98,7 @@ public class ClipboardBlock extends WallMountedBlock implements IBE<ClipboardBlo
     private void breakAndCollect(BlockState pState, World pLevel, BlockPos pPos, PlayerEntity pPlayer) {
         if (FakePlayerHandler.has(pPlayer))
             return;
-        if (pLevel.isClient)
+        if (pLevel.isClient())
             return;
         ItemStack cloneItemStack = getPickStack(pLevel, pPos, pState, true);
         pLevel.breakBlock(pPos, false);
@@ -117,7 +117,7 @@ public class ClipboardBlock extends WallMountedBlock implements IBE<ClipboardBlo
     public BlockState onBreak(World pLevel, BlockPos pPos, BlockState pState, PlayerEntity pPlayer) {
         if (!(pLevel.getBlockEntity(pPos) instanceof ClipboardBlockEntity cbe))
             return pState;
-        if (pLevel.isClient || pPlayer.isCreative())
+        if (pLevel.isClient() || pPlayer.isCreative())
             return pState;
         Block.dropStack(pLevel, pPos, cbe.dataContainer.copy());
 

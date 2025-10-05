@@ -49,7 +49,7 @@ public class PulleyBlock extends HorizontalAxisKineticBlock implements IBE<Pulle
     @Override
     public void onStateReplaced(BlockState state, ServerWorld worldIn, BlockPos pos, boolean isMoving) {
         super.onStateReplaced(state, worldIn, pos, isMoving);
-        if (worldIn.isClient)
+        if (worldIn.isClient())
             return;
         BlockState below = worldIn.getBlockState(pos.down());
         if (below.getBlock() instanceof RopeBlockBase)
@@ -116,7 +116,7 @@ public class PulleyBlock extends HorizontalAxisKineticBlock implements IBE<Pulle
             }
             if (onBroken) {
                 onRopeBroken(worldIn, pos.up());
-                if (!worldIn.isClient) {
+                if (!worldIn.isClient()) {
                     BlockState above = worldIn.getBlockState(pos.up());
                     BlockState below = worldIn.getBlockState(pos.down());
                     if (above.getBlock() instanceof RopeBlockBase)

@@ -13,7 +13,7 @@ abstract class AudioBehaviour<T extends SmartBlockEntity> extends BlockEntityBeh
 
     @Override
     public void tick() {
-        if (blockEntity.getWorld().isClient) {
+        if (blockEntity.getWorld().isClient()) {
             tickAudio();
         }
     }

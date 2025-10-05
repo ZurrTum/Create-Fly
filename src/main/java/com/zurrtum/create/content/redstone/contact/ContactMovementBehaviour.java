@@ -23,7 +23,7 @@ public class ContactMovementBehaviour extends MovementBehaviour {
         BlockState block = context.state;
         World world = context.world;
 
-        if (world.isClient)
+        if (world.isClient())
             return;
         if (context.firstMovement)
             return;

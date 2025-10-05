@@ -124,7 +124,7 @@ public class SpeedControllerBlockEntity extends KineticBlockEntity {
     }
 
     public void updateBracket() {
-        if (world != null && world.isClient)
+        if (world != null && world.isClient())
             hasBracket = isCogwheelPresent();
     }
 

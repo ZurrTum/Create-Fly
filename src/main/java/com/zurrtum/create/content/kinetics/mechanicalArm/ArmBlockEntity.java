@@ -147,7 +147,7 @@ public class ArmBlockEntity extends KineticBlockEntity implements TransformableB
             }
             return;
         }
-        if (world.isClient)
+        if (world.isClient())
             return;
 
         if (phase == Phase.MOVE_TO_INPUT)
@@ -165,7 +165,7 @@ public class ArmBlockEntity extends KineticBlockEntity implements TransformableB
     public void lazyTick() {
         super.lazyTick();
 
-        if (world.isClient)
+        if (world.isClient())
             return;
         if (chasedPointProgress < .5f)
             return;
@@ -205,7 +205,7 @@ public class ArmBlockEntity extends KineticBlockEntity implements TransformableB
         chasedPointProgress += Math.min(256, Math.abs(getSpeed())) / 1024f;
         if (chasedPointProgress > 1)
             chasedPointProgress = 1;
-        if (!world.isClient)
+        if (!world.isClient())
             return !targetReachedPreviously && chasedPointProgress >= 1;
 
         ArmInteractionPoint targetedInteractionPoint = getTargetedInteractionPoint();
@@ -387,7 +387,7 @@ public class ArmBlockEntity extends KineticBlockEntity implements TransformableB
         sendData();
         markDirty();
 
-        if (!world.isClient)
+        if (!world.isClient())
             award(AllAdvancements.MECHANICAL_ARM);
     }
 
@@ -420,7 +420,7 @@ public class ArmBlockEntity extends KineticBlockEntity implements TransformableB
     }
 
     public void redstoneUpdate() {
-        if (world.isClient)
+        if (world.isClient())
             return;
         boolean blockPowered = world.isReceivingRedstonePower(pos);
         if (blockPowered == redstoneLocked)
@@ -449,7 +449,7 @@ public class ArmBlockEntity extends KineticBlockEntity implements TransformableB
         if (!world.isRegionLoaded(center.add(-range, -range, -range), center.add(range, range, range))) {
             return false;
         }
-        if (world.isClient) {
+        if (world.isClient()) {
             int minY = center.getY() - range;
             int maxY = center.getY() + range;
             if (maxY < world.getBottomY() || minY >= world.getTopYInclusive()) {
@@ -505,7 +505,7 @@ public class ArmBlockEntity extends KineticBlockEntity implements TransformableB
             hasBlazeBurner |= point instanceof AllArmInteractionPointTypes.BlazeBurnerPoint;
         }
 
-        if (!world.isClient) {
+        if (!world.isClient()) {
             if (outputs.size() >= 10)
                 award(AllAdvancements.ARM_MANY_TARGETS);
             if (hasBlazeBurner)
@@ -595,7 +595,7 @@ public class ArmBlockEntity extends KineticBlockEntity implements TransformableB
         if (!clientPacket)
             return;
 
-        if (hadGoggles != goggles && world.isClient)
+        if (hadGoggles != goggles && world.isClient())
             AllClientHandle.INSTANCE.queueUpdate(this);
 
         boolean ceiling = isOnCeiling();

@@ -109,7 +109,7 @@ public class MechanicalPistonBlockEntity extends LinearActuatorBlockEntity {
     @Override
     public float getMovementSpeed() {
         float movementSpeed = MathHelper.clamp(convertToLinear(getSpeed()), -.49f, .49f);
-        if (world.isClient)
+        if (world.isClient())
             movementSpeed *= AllClientHandle.INSTANCE.getServerSpeed();
         Direction pistonDirection = getCachedState().get(Properties.FACING);
         int movementModifier = pistonDirection.getDirection().offset() * (pistonDirection.getAxis() == Axis.Z ? -1 : 1);

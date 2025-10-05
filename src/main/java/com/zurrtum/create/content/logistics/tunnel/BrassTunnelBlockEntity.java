@@ -101,7 +101,7 @@ public class BrassTunnelBlockEntity extends BeltTunnelBlockEntity {
             return;
         if (stackToDistribute.isEmpty() && !syncedOutputActive)
             return;
-        if (world.isClient && !isVirtual())
+        if (world.isClient() && !isVirtual())
             return;
 
         if (distributionProgress == -1) {
@@ -605,7 +605,7 @@ public class BrassTunnelBlockEntity extends BeltTunnelBlockEntity {
             connectedLeft = nowConnectedLeft;
             connectivityChanged = true;
             BrassTunnelBlockEntity adjacent = getAdjacent(true);
-            if (adjacent != null && !world.isClient) {
+            if (adjacent != null && !world.isClient()) {
                 adjacent.updateTunnelConnections();
                 adjacent.selectionMode.setValue(selectionMode.getValue());
             }
@@ -615,7 +615,7 @@ public class BrassTunnelBlockEntity extends BeltTunnelBlockEntity {
             connectedRight = nowConnectedRight;
             connectivityChanged = true;
             BrassTunnelBlockEntity adjacent = getAdjacent(false);
-            if (adjacent != null && !world.isClient) {
+            if (adjacent != null && !world.isClient()) {
                 adjacent.updateTunnelConnections();
                 adjacent.selectionMode.setValue(selectionMode.getValue());
             }

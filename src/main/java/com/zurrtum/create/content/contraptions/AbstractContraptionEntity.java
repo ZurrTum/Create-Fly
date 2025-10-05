@@ -93,7 +93,7 @@ public abstract class AbstractContraptionEntity extends Entity {
         this.contraption = contraption;
         if (contraption == null)
             return;
-        if (getWorld().isClient)
+        if (getWorld().isClient())
             return;
         contraption.onEntityCreated(this);
     }
@@ -140,7 +140,7 @@ public abstract class AbstractContraptionEntity extends Entity {
         passenger.startRiding(this, true);
         if (passenger instanceof TameableEntity ta)
             ta.setInSittingPose(true);
-        if (getWorld().isClient)
+        if (getWorld().isClient())
             return;
         contraption.getSeatMapping().put(passenger.getUuid(), seatIndex);
 
@@ -156,7 +156,7 @@ public abstract class AbstractContraptionEntity extends Entity {
         super.removePassenger(passenger);
         if (passenger instanceof TameableEntity ta)
             ta.setInSittingPose(false);
-        if (getWorld().isClient)
+        if (getWorld().isClient())
             return;
         if (transformedVector != null && passenger instanceof LivingEntity entity) {
             AllSynchedDatas.CONTRAPTION_DISMOUNT_LOCATION.set(entity, Optional.of(transformedVector));
@@ -286,14 +286,14 @@ public abstract class AbstractContraptionEntity extends Entity {
             }
         }
 
-        if (toDismount != null && !getWorld().isClient) {
+        if (toDismount != null && !getWorld().isClient()) {
             Vec3d transformedVector = getPassengerPosition(toDismount, 1);
             toDismount.stopRiding();
             if (transformedVector != null)
                 toDismount.requestTeleport(transformedVector.x, transformedVector.y, transformedVector.z);
         }
 
-        if (getWorld().isClient)
+        if (getWorld().isClient())
             return true;
         addSittingPassenger(SeatBlock.getLeashed(getWorld(), player).or(player), indexOfSeat);
         return true;
@@ -375,7 +375,7 @@ public abstract class AbstractContraptionEntity extends Entity {
         float prevAngle = living.getYaw();
         float angle = AngleHelper.deg(-MathHelper.atan2(motion.x, motion.z));
         angle = AngleHelper.angleLerp(0.4f, prevAngle, angle);
-        if (getWorld().isClient) {
+        if (getWorld().isClient()) {
             PositionInterpolator interpolator = living.getInterpolator();
             if (interpolator != null) {
                 interpolator.data.step = 0;
@@ -408,7 +408,7 @@ public abstract class AbstractContraptionEntity extends Entity {
     public void tickActors() {
         boolean stalledPreviously = contraption.stalled;
 
-        if (!getWorld().isClient)
+        if (!getWorld().isClient())
             contraption.stalled = false;
 
         skipActorStop = true;
@@ -462,7 +462,7 @@ public abstract class AbstractContraptionEntity extends Entity {
             }
         }
 
-        if (!getWorld().isClient) {
+        if (!getWorld().isClient()) {
             if (!stalledPreviously && contraption.stalled)
                 onContraptionStalled();
             dataTracker.set(STALLED, contraption.stalled);
@@ -664,7 +664,7 @@ public abstract class AbstractContraptionEntity extends Entity {
         for (Entity entity : collidingEntities.keySet()) {
             Vec3d localVec = toLocalVector(entity.getPos(), 0);
             Vec3d transformed = transform.apply(localVec);
-            if (getWorld().isClient)
+            if (getWorld().isClient())
                 entity.setPosition(transformed.x, transformed.y + 1 / 16f, transformed.z);
             else
                 entity.requestTeleport(transformed.x, transformed.y + 1 / 16f, transformed.z);
@@ -673,7 +673,7 @@ public abstract class AbstractContraptionEntity extends Entity {
 
     @Override
     public void remove(RemovalReason p_146834_) {
-        if (!getWorld().isClient && !isRemoved() && contraption != null && !skipActorStop)
+        if (!getWorld().isClient() && !isRemoved() && contraption != null && !skipActorStop)
             contraption.stop(getWorld());
         if (contraption != null)
             contraption.onEntityRemoved(this);

@@ -92,7 +92,7 @@ public class SmartFluidPipeBlock extends WallMountedBlock implements IBE<SmartFl
 
     @Override
     public void onStateReplaced(BlockState state, ServerWorld world, BlockPos pos, boolean isMoving) {
-        if (!world.isClient)
+        if (!world.isClient())
             FluidPropagator.propagateChangedPipe(world, pos, state);
     }
 
@@ -103,7 +103,7 @@ public class SmartFluidPipeBlock extends WallMountedBlock implements IBE<SmartFl
 
     @Override
     public void onBlockAdded(BlockState state, World world, BlockPos pos, BlockState oldState, boolean isMoving) {
-        if (world.isClient)
+        if (world.isClient())
             return;
         if (state != oldState)
             world.scheduleBlockTick(pos, this, 1, TickPriority.HIGH);

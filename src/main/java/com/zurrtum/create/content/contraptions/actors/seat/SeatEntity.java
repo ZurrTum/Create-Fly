@@ -74,7 +74,7 @@ public class SeatEntity extends Entity {
 
     @Override
     public void tick() {
-        if (getWorld().isClient)
+        if (getWorld().isClient())
             return;
         boolean blockPresent = getWorld().getBlockState(getBlockPos()).getBlock() instanceof SeatBlock;
         if (hasPassengers() && blockPresent)

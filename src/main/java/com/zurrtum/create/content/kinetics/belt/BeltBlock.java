@@ -170,7 +170,7 @@ public class BeltBlock extends HorizontalKineticBlock implements IBE<BeltBlockEn
             return;
         ItemStack asItem = ItemHelper.fromItemEntity(entityIn);
         if (!asItem.isEmpty()) {
-            if (worldIn.isClient)
+            if (worldIn.isClient())
                 return;
             if (entityIn.getVelocity().y > 0)
                 return;
@@ -267,7 +267,7 @@ public class BeltBlock extends HorizontalKineticBlock implements IBE<BeltBlockEn
             BeltBlockEntity controllerBelt = belt.getControllerBE();
             if (controllerBelt == null)
                 return ActionResult.PASS_TO_DEFAULT_BLOCK_ACTION;
-            if (level.isClient)
+            if (level.isClient())
                 return ActionResult.SUCCESS;
             MutableBoolean success = new MutableBoolean(false);
             controllerBelt.getInventory().applyToEachWithin(
@@ -284,7 +284,7 @@ public class BeltBlock extends HorizontalKineticBlock implements IBE<BeltBlockEn
         if (isShaft) {
             if (state.get(PART) != BeltPart.MIDDLE)
                 return ActionResult.PASS_TO_DEFAULT_BLOCK_ACTION;
-            if (level.isClient)
+            if (level.isClient())
                 return ActionResult.SUCCESS;
             if (!player.isCreative())
                 stack.decrement(1);
@@ -336,14 +336,14 @@ public class BeltBlock extends HorizontalKineticBlock implements IBE<BeltBlockEn
         BlockPos pos = context.getBlockPos();
 
         if (state.get(CASING)) {
-            if (world.isClient)
+            if (world.isClient())
                 return ActionResult.SUCCESS;
             withBlockEntityDo(world, pos, be -> be.setCasingType(CasingType.NONE));
             return ActionResult.SUCCESS;
         }
 
         if (state.get(PART) == BeltPart.PULLEY) {
-            if (world.isClient)
+            if (world.isClient())
                 return ActionResult.SUCCESS;
             KineticBlockEntity.switchToBlockState(world, pos, state.with(PART, BeltPart.MIDDLE));
             if (player != null && !player.isCreative())
@@ -396,7 +396,7 @@ public class BeltBlock extends HorizontalKineticBlock implements IBE<BeltBlockEn
     }
 
     public static void initBelt(World world, BlockPos pos) {
-        if (world.isClient)
+        if (world.isClient())
             return;
         if (world instanceof ServerWorld serverWorld && serverWorld.getChunkManager().getChunkGenerator() instanceof DebugChunkGenerator)
             return;
@@ -456,7 +456,7 @@ public class BeltBlock extends HorizontalKineticBlock implements IBE<BeltBlockEn
     public void onStateReplaced(BlockState state, ServerWorld world, BlockPos pos, boolean isMoving) {
         super.onStateReplaced(state, world, pos, isMoving);
 
-        if (world.isClient)
+        if (world.isClient())
             return;
         if (isMoving)
             return;

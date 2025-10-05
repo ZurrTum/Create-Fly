@@ -62,7 +62,7 @@ public class TrackBlockEntity extends SmartBlockEntity implements TransformableB
     @Override
     public void initialize() {
         super.initialize();
-        if (world.isClient && hasInteractableConnections())
+        if (world.isClient() && hasInteractableConnections())
             AllClientHandle.INSTANCE.registerToCurveInteraction(this);
     }
 
@@ -217,7 +217,7 @@ public class TrackBlockEntity extends SmartBlockEntity implements TransformableB
             world.updateListeners(pos, getCachedState(), getCachedState(), 16);
         }
 
-        if (world != null && world.isClient) {
+        if (world != null && world.isClient()) {
             AllClientHandle.INSTANCE.queueUpdate(this);
 
             if (hasInteractableConnections())
@@ -294,7 +294,7 @@ public class TrackBlockEntity extends SmartBlockEntity implements TransformableB
     @Override
     public void invalidate() {
         super.invalidate();
-        if (world.isClient)
+        if (world.isClient())
             AllClientHandle.INSTANCE.removeFromCurveInteraction(this);
     }
 

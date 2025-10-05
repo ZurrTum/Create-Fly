@@ -120,7 +120,7 @@ public class TrackTargetingBehaviour<T extends TrackEdgePoint> extends BlockEnti
     @SuppressWarnings("unchecked")
     public T createEdgePoint() {
         World level = getWorld();
-        boolean isClientSide = level.isClient;
+        boolean isClientSide = level.isClient();
         if (migrationData == null || isClientSide)
             for (TrackGraph trackGraph : Create.RAILWAYS.sided(level).trackNetworks.values()) {
                 T point = trackGraph.getPoint(edgePointType, id);
@@ -215,7 +215,7 @@ public class TrackTargetingBehaviour<T extends TrackEdgePoint> extends BlockEnti
         super.destroy();
         if (edgePoint != null) {
             World world = getWorld();
-            if (!world.isClient) {
+            if (!world.isClient()) {
                 edgePoint.blockEntityRemoved(world.getServer(), getPos(), getTargetDirection() == AxisDirection.POSITIVE);
             }
         }

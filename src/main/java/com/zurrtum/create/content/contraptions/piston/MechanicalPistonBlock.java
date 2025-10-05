@@ -86,7 +86,7 @@ public class MechanicalPistonBlock extends DirectionalAxisKineticBlock implement
             return ActionResult.PASS_TO_DEFAULT_BLOCK_ACTION;
         if (((MechanicalPistonBlock) state.getBlock()).isSticky)
             return ActionResult.PASS_TO_DEFAULT_BLOCK_ACTION;
-        if (level.isClient) {
+        if (level.isClient()) {
             Vec3d vec = hitResult.getPos();
             level.addParticleClient(ParticleTypes.ITEM_SLIME, vec.x, vec.y, vec.z, 0, 0, 0);
             return ActionResult.SUCCESS;
@@ -107,7 +107,7 @@ public class MechanicalPistonBlock extends DirectionalAxisKineticBlock implement
         Direction direction = state.get(FACING);
         if (!fromPos.equals(pos.offset(direction.getOpposite())))
             return;
-        if (!world.isClient && !world.getBlockTickScheduler().isTicking(pos, this))
+        if (!world.isClient() && !world.getBlockTickScheduler().isTicking(pos, this))
             world.scheduleBlockTick(pos, this, 1);
     }
 

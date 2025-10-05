@@ -28,7 +28,7 @@ public class KineticEffectHandler {
     public void tick() {
         World world = kte.getWorld();
 
-        if (world.isClient) {
+        if (world.isClient()) {
             if (overStressedTime > 0)
                 if (--overStressedTime == 0)
                     if (kte.isOverStressed()) {
@@ -59,7 +59,7 @@ public class KineticEffectHandler {
         World world = kte.getWorld();
         if (world == null)
             return;
-        if (!world.isClient)
+        if (!world.isClient())
             return;
         Random r = world.random;
         for (int i = 0; i < amount; i++) {

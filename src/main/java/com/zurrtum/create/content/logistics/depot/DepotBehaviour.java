@@ -89,7 +89,7 @@ public class DepotBehaviour extends BlockEntityBehaviour<SmartBlockEntity> {
             TransportedItemStack ts = iterator.next();
             if (!tick(ts))
                 continue;
-            if (world.isClient && !blockEntity.isVirtual())
+            if (world.isClient() && !blockEntity.isVirtual())
                 continue;
             if (heldItem == null) {
                 heldItem = ts;
@@ -112,7 +112,7 @@ public class DepotBehaviour extends BlockEntityBehaviour<SmartBlockEntity> {
 
         BlockPos pos = blockEntity.getPos();
 
-        if (world.isClient)
+        if (world.isClient())
             return;
         if (handleBeltFunnelOutput())
             return;

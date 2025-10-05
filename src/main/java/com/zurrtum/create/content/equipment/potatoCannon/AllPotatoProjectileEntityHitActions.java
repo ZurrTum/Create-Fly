@@ -90,7 +90,7 @@ public class AllPotatoProjectileEntityHitActions {
         @Override
         public boolean execute(ItemStack projectile, EntityHitResult ray, Type type) {
             Entity entity = ray.getEntity();
-            if (entity.getWorld().isClient)
+            if (entity.getWorld().isClient())
                 return true;
             if (entity instanceof LivingEntity livingEntity)
                 applyEffect(livingEntity, new StatusEffectInstance(effect, ticks, level - 1));
@@ -116,7 +116,7 @@ public class AllPotatoProjectileEntityHitActions {
         public boolean execute(ItemStack projectile, EntityHitResult ray, Type type) {
             Entity entity = ray.getEntity();
             World world = entity.getWorld();
-            if (world.isClient)
+            if (world.isClient())
                 return true;
 
             if (entity instanceof LivingEntity livingEntity) {
@@ -141,7 +141,7 @@ public class AllPotatoProjectileEntityHitActions {
         public boolean execute(ItemStack projectile, EntityHitResult ray, Type type) {
             Entity entity = ray.getEntity();
             World level = entity.getWorld();
-            if (level.isClient)
+            if (level.isClient())
                 return true;
             if (!(entity instanceof LivingEntity livingEntity))
                 return false;
@@ -205,7 +205,7 @@ public class AllPotatoProjectileEntityHitActions {
 
             if (!(entity instanceof ZombieVillagerEntity zombieVillager) || !zombieVillager.hasStatusEffect(StatusEffects.WEAKNESS))
                 return EFFECT.execute(projectile, ray, type);
-            if (world.isClient)
+            if (world.isClient())
                 return false;
 
             FakePlayerEntity dummy = ZOMBIE_CONVERTERS.get(world);

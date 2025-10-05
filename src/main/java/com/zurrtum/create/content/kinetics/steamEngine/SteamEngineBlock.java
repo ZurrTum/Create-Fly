@@ -210,7 +210,7 @@ public class SteamEngineBlock extends WallMountedBlock implements Waterloggable,
             Axis axis = shaft.get(ShaftBlock.AXIS);
             return PlacementOffset.success(
                 shaftPos,
-                s -> BlockHelper.copyProperties(s, (world.isClient ? AllBlocks.SHAFT : AllBlocks.POWERED_SHAFT).getDefaultState())
+                s -> BlockHelper.copyProperties(s, (world.isClient() ? AllBlocks.SHAFT : AllBlocks.POWERED_SHAFT).getDefaultState())
                     .with(PoweredShaftBlock.AXIS, axis)
             );
         }

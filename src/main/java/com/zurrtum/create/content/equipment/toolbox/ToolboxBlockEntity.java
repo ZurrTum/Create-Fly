@@ -90,7 +90,7 @@ public class ToolboxBlockEntity extends SmartBlockEntity implements MenuProvider
     public void tick() {
         super.tick();
 
-        if (world.isClient) {
+        if (world.isClient()) {
             tickAudio();
         } else {
             tickPlayers();
@@ -194,7 +194,7 @@ public class ToolboxBlockEntity extends SmartBlockEntity implements MenuProvider
     }
 
     public void unequipTracked() {
-        if (world.isClient)
+        if (world.isClient())
             return;
 
         Set<ServerPlayerEntity> affected = new HashSet<>();
@@ -325,7 +325,7 @@ public class ToolboxBlockEntity extends SmartBlockEntity implements MenuProvider
     }
 
     public void connectPlayer(int slot, PlayerEntity player, int hotbarSlot) {
-        if (world.isClient)
+        if (world.isClient())
             return;
         WeakHashMap<PlayerEntity, Integer> map = connectedPlayers.computeIfAbsent(slot, WeakHashMap::new);
         Integer previous = map.get(player);

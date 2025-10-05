@@ -37,10 +37,10 @@ public class BrassTunnelBlock extends BeltTunnelBlock {
             level, pos, be -> {
                 if (!(be instanceof BrassTunnelBlockEntity bte))
                     return ActionResult.PASS;
-                List<ItemStack> stacksOfGroup = bte.grabAllStacksOfGroup(level.isClient);
+                List<ItemStack> stacksOfGroup = bte.grabAllStacksOfGroup(level.isClient());
                 if (stacksOfGroup.isEmpty())
                     return ActionResult.PASS;
-                if (level.isClient)
+                if (level.isClient())
                     return ActionResult.SUCCESS;
                 for (ItemStack itemStack : stacksOfGroup)
                     player.getInventory().offerOrDrop(itemStack.copy());

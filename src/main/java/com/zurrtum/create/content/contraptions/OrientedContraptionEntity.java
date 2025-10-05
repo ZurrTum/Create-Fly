@@ -136,7 +136,7 @@ public class OrientedContraptionEntity extends AbstractContraptionEntity {
 
     @Override
     public void stopRiding() {
-        if (!getWorld().isClient && isAlive())
+        if (!getWorld().isClient() && isAlive())
             disassemble();
         super.stopRiding();
     }
@@ -266,7 +266,7 @@ public class OrientedContraptionEntity extends AbstractContraptionEntity {
         if (!rotating || !pauseWhileRotating)
             tickActors();
         boolean isStalled = isStalled();
-        boolean isClient = getWorld().isClient;
+        boolean isClient = getWorld().isClient();
 
         boolean isUpdate = true;
         if (riding instanceof AbstractMinecartEntity) {

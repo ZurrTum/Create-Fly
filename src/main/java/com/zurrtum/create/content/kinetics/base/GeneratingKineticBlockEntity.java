@@ -49,7 +49,7 @@ public abstract class GeneratingKineticBlockEntity extends KineticBlockEntity {
         float speed = getGeneratedSpeed();
         float prevSpeed = this.speed;
 
-        if (world == null || world.isClient)
+        if (world == null || world.isClient())
             return;
 
         if (prevSpeed != speed) {

@@ -86,7 +86,7 @@ public class BeltInventory {
         boolean horizontal = belt.getCachedState().get(BeltBlock.SLOPE) == BeltSlope.HORIZONTAL;
         float spacing = 1;
         World world = belt.getWorld();
-        boolean onClient = world.isClient && !belt.isVirtual();
+        boolean onClient = world.isClient() && !belt.isVirtual();
 
         // resolve ending only when items will reach it this tick
         Ending ending = Ending.UNRESOLVED;
@@ -109,7 +109,7 @@ public class BeltInventory {
                 movement *= AllClientHandle.INSTANCE.getServerSpeed();
 
             // Don't move if held by processing (client)
-            if (world.isClient && currentItem.locked)
+            if (world.isClient() && currentItem.locked)
                 continue;
 
             // Don't move if held by external components
@@ -164,7 +164,7 @@ public class BeltInventory {
                 continue;
 
             // Horizontal Crushing Wheels
-            if (BeltCrusherInteractionHandler.checkForCrushers(this, world.isClient, currentItem, nextOffset))
+            if (BeltCrusherInteractionHandler.checkForCrushers(this, world.isClient(), currentItem, nextOffset))
                 continue;
 
             // Apply Movement

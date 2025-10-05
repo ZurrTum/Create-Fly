@@ -118,7 +118,7 @@ public class StationBlock extends Block implements IBE<StationBlockEntity>, IWre
         if (stack.getItem() == Items.FILLED_MAP) {
             return onBlockEntityUseItemOn(
                 level, pos, station -> {
-                    if (level.isClient)
+                    if (level.isClient())
                         return ActionResult.SUCCESS;
 
                     if (station.getStation() == null || station.getStation().getId() == null)
@@ -141,7 +141,7 @@ public class StationBlock extends Block implements IBE<StationBlockEntity>, IWre
                 ItemStack autoSchedule = station.getAutoSchedule();
                 if (autoSchedule.isEmpty())
                     return ActionResult.PASS;
-                if (level.isClient)
+                if (level.isClient())
                     return ActionResult.SUCCESS;
                 player.getInventory().offerOrDrop(autoSchedule.copy());
                 station.depotBehaviour.removeHeldItem();

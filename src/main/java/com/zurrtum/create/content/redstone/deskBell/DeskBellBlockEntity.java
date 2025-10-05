@@ -33,7 +33,7 @@ public class DeskBellBlockEntity extends SmartBlockEntity {
         super.tick();
         animation.tickChaser();
 
-        if (world.isClient)
+        if (world.isClient())
             return;
         if (blockStateTimer == 0)
             return;
@@ -63,7 +63,7 @@ public class DeskBellBlockEntity extends SmartBlockEntity {
     }
 
     public void ding() {
-        if (!world.isClient) {
+        if (!world.isClient()) {
             blockStateTimer = 20;
             ding = true;
             sendData();

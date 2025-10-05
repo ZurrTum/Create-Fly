@@ -226,7 +226,7 @@ public class MinecartController {
     public void removeConnection(boolean main) {
         if (hasContraptionCoupling(main)) {
             World world = cart.getWorld();
-            if (world != null && !world.isClient) {
+            if (world != null && !world.isClient()) {
                 List<Entity> passengers = cart().getPassengerList();
                 if (!passengers.isEmpty()) {
                     Entity entity = passengers.getFirst();
@@ -250,7 +250,7 @@ public class MinecartController {
             this.cart = cart;
             needsEntryRefresh = true;
         }
-        if (this.cart.getWorld().isClient) {
+        if (this.cart.getWorld().isClient()) {
             return;
         }
         AllSynchedDatas.MINECART_CONTROLLER.set(this.cart, Optional.of(this), true);
@@ -305,7 +305,7 @@ public class MinecartController {
             internalStall.setValue(internalStall.booleanValue() || otherCart == null || !otherCart.isPresent() || otherCart.isStalled(false));
 
         }));
-        if (!world.isClient) {
+        if (!world.isClient()) {
             setStalled(internalStall.booleanValue(), true);
             disassemble(cart);
         }

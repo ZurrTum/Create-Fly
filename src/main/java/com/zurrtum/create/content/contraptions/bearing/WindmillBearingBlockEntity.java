@@ -108,7 +108,7 @@ public class WindmillBearingBlockEntity extends MechanicalBearingBlockEntity {
     private void onDirectionChanged() {
         if (!running)
             return;
-        if (!world.isClient)
+        if (!world.isClient())
             updateGeneratedRotation();
     }
 

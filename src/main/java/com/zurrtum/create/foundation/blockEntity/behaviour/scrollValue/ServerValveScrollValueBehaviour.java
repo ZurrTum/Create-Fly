@@ -29,7 +29,7 @@ public class ServerValveScrollValueBehaviour extends ServerScrollValueBehaviour 
 
     @Override
     public void onShortInteract(PlayerEntity player, Hand hand, Direction side, BlockHitResult hitResult) {
-        if (getWorld().isClient)
+        if (getWorld().isClient())
             return;
         BlockState blockState = blockEntity.getCachedState();
         if (blockState.getBlock() instanceof ValveHandleBlock vhb)

@@ -108,7 +108,7 @@ public class ItemDrainBlockEntity extends SmartBlockEntity {
             return;
         }
 
-        boolean onClient = world.isClient && !isVirtual();
+        boolean onClient = world.isClient() && !isVirtual();
 
         if (processingTicks > 0) {
             heldItem.prevBeltPosition = .5f;
@@ -211,7 +211,7 @@ public class ItemDrainBlockEntity extends SmartBlockEntity {
     }
 
     protected boolean continueProcessing() {
-        if (world.isClient && !isVirtual())
+        if (world.isClient() && !isVirtual())
             return true;
         if (processingTicks < 5)
             return true;

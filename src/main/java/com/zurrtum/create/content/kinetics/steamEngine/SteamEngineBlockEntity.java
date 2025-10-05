@@ -106,7 +106,7 @@ public class SteamEngineBlockEntity extends SmartBlockEntity {
 
         shaft.update(pos, conveyedSpeedLevel, efficiency);
 
-        if (!world.isClient)
+        if (!world.isClient())
             return;
 
         AllClientHandle.INSTANCE.spawnSteamEngineParticles(this);

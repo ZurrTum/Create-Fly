@@ -51,7 +51,7 @@ public class ClipboardValueSettingsHandler {
             return null;
 
         if (smartBE instanceof ClipboardBlockEntity cbe) {
-            if (!world.isClient) {
+            if (!world.isClient()) {
                 List<List<ClipboardEntry>> listTo = ClipboardEntry.readAll(itemStack);
                 List<List<ClipboardEntry>> listFrom = ClipboardEntry.readAll(cbe.dataContainer);
                 List<ClipboardEntry> toAdd = new ArrayList<>();
@@ -111,9 +111,9 @@ public class ClipboardValueSettingsHandler {
             if (smartBE instanceof ClipboardCloneable cc) {
                 anyValid = true;
                 if (paste) {
-                    anySuccess = paste(cc, player, readView, side, world.isClient);
+                    anySuccess = paste(cc, player, readView, side, world.isClient());
                 } else {
-                    anySuccess = write(cc, registryManager, writeView, side, world.isClient);
+                    anySuccess = write(cc, registryManager, writeView, side, world.isClient());
                     if (anySuccess) {
                         tag = writeView.getNbt();
                     }
@@ -130,9 +130,9 @@ public class ClipboardValueSettingsHandler {
                         continue;
                     anyValid = true;
                     if (paste) {
-                        anySuccess = paste(cc, player, readView, side, world.isClient);
+                        anySuccess = paste(cc, player, readView, side, world.isClient());
                     } else {
-                        anySuccess = write(cc, registryManager, writeView, side, world.isClient);
+                        anySuccess = write(cc, registryManager, writeView, side, world.isClient());
                         if (anySuccess) {
                             tag = writeView.getNbt();
                             break;

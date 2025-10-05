@@ -63,7 +63,7 @@ public class BlazeBurnerBlock extends HorizontalFacingBlock implements IBE<Blaze
 
     @Override
     public void onBlockAdded(BlockState state, World world, BlockPos pos, BlockState p_220082_4_, boolean p_220082_5_) {
-        if (world.isClient)
+        if (world.isClient())
             return;
         BlockEntity blockEntity = world.getBlockEntity(pos.up());
         if (!(blockEntity instanceof BasinBlockEntity basin))
@@ -124,7 +124,7 @@ public class BlazeBurnerBlock extends HorizontalFacingBlock implements IBE<Blaze
         if (heat == HeatLevel.NONE) {
             if (stack.getItem() instanceof FlintAndSteelItem) {
                 level.playSound(player, pos, SoundEvents.ITEM_FLINTANDSTEEL_USE, SoundCategory.BLOCKS, 1.0F, level.random.nextFloat() * 0.4F + 0.8F);
-                if (level.isClient)
+                if (level.isClient())
                     return ActionResult.SUCCESS;
                 stack.damage(1, player, LivingEntity.getSlotForHand(hand));
                 level.setBlockState(pos, AllBlocks.LIT_BLAZE_BURNER.getDefaultState());
@@ -139,7 +139,7 @@ public class BlazeBurnerBlock extends HorizontalFacingBlock implements IBE<Blaze
         ActionResult res = tryInsert(state, level, pos, stack, doNotConsume, forceOverflow, false);
         if (res instanceof ActionResult.Success success) {
             ItemStack leftover = success.getNewHandStack();
-            if (!level.isClient && !doNotConsume && leftover != null && !leftover.isEmpty()) {
+            if (!level.isClient() && !doNotConsume && leftover != null && !leftover.isEmpty()) {
                 if (stack.isEmpty()) {
                     player.setStackInHand(hand, leftover);
                 } else if (!player.getInventory().insertStack(leftover)) {
@@ -179,7 +179,7 @@ public class BlazeBurnerBlock extends HorizontalFacingBlock implements IBE<Blaze
 
         if (!doNotConsume) {
             ItemStack container = stack.getItem().getRecipeRemainder();
-            if (!world.isClient) {
+            if (!world.isClient()) {
                 stack.decrement(1);
             }
             return ActionResult.SUCCESS.withNewHandStack(container);

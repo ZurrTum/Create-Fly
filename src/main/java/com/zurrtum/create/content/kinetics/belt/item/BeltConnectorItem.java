@@ -54,7 +54,7 @@ public class BeltConnectorItem extends BlockItem {
         BlockPos pos = context.getBlockPos();
         boolean validAxis = validateAxis(world, pos);
 
-        if (world.isClient)
+        if (world.isClient())
             return validAxis ? ActionResult.SUCCESS : ActionResult.FAIL;
 
         BlockPos firstPulley = null;

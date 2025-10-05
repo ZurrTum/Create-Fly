@@ -34,9 +34,9 @@ public interface IWrenchableWithBracket extends IWrenchable {
         BlockState blockState = world.getBlockState(pos);
         if (bracket.isPresent()) {
             PlayerEntity player = context.getPlayer();
-            if (!world.isClient && !player.isCreative())
+            if (!world.isClient() && !player.isCreative())
                 player.getInventory().offerOrDrop(bracket.get());
-            if (!world.isClient && blockState.getBlock() == AllBlocks.FLUID_PIPE) {
+            if (!world.isClient() && blockState.getBlock() == AllBlocks.FLUID_PIPE) {
                 Axis preferred = FluidPropagator.getStraightPipeAxis(blockState);
                 Direction preferredDirection = preferred == null ? Direction.UP : Direction.get(AxisDirection.POSITIVE, preferred);
                 BlockState updated = AllBlocks.FLUID_PIPE.updateBlockState(blockState, preferredDirection, null, world, pos);

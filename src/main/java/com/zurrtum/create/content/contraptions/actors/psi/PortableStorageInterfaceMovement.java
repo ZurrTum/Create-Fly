@@ -41,14 +41,14 @@ public class PortableStorageInterfaceMovement extends MovementBehaviour {
 
     @Override
     public void tick(MovementContext context) {
-        if (context.world.isClient)
+        if (context.world.isClient())
             getAnimation(context).tickChaser();
 
         boolean onCarriage = context.contraption instanceof CarriageContraption;
         if (onCarriage && context.motion.length() > 1 / 4f)
             return;
 
-        if (context.world.isClient) {
+        if (context.world.isClient()) {
             BlockPos pos = BlockPos.ofFloored(context.position);
             if (!findInterface(context, pos))
                 reset(context);
@@ -110,7 +110,7 @@ public class PortableStorageInterfaceMovement extends MovementBehaviour {
             return false;
 
         context.data.put(_workingPos_, BlockPos.CODEC, psi.getPos());
-        if (!context.world.isClient) {
+        if (!context.world.isClient()) {
             Vec3d diff = VecHelper.getCenterOf(psi.getPos()).subtract(context.position);
             diff = VecHelper.project(diff, Vec3d.of(currentFacing.getVector()));
             float distance = (float) (diff.length() + 1.85f - 1);

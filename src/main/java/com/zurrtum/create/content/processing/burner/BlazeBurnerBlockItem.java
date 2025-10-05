@@ -89,7 +89,7 @@ public class BlazeBurnerBlockItem extends BlockItem {
                     continue;
 
                 spawnCaptureEffects(world, VecHelper.getCenterOf(pos));
-                if (world.isClient || player == null)
+                if (world.isClient() || player == null)
                     return ActionResult.SUCCESS;
 
                 giveBurnerItemTo(player, context.getStack(), context.getHand());
@@ -109,7 +109,7 @@ public class BlazeBurnerBlockItem extends BlockItem {
 
         World world = player.getWorld();
         spawnCaptureEffects(world, entity.getPos());
-        if (world.isClient)
+        if (world.isClient())
             return ActionResult.FAIL;
 
         giveBurnerItemTo(player, heldItem, hand);
@@ -129,7 +129,7 @@ public class BlazeBurnerBlockItem extends BlockItem {
     }
 
     private void spawnCaptureEffects(World world, Vec3d vec) {
-        if (world.isClient) {
+        if (world.isClient()) {
             for (int i = 0; i < 40; i++) {
                 Vec3d motion = VecHelper.offsetRandomly(Vec3d.ZERO, world.random, .125f);
                 world.addParticleClient(ParticleTypes.FLAME, vec.x, vec.y, vec.z, motion.x, motion.y, motion.z);

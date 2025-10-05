@@ -41,7 +41,7 @@ public class EjectorItemEntity extends ItemEntity {
         BlockPos pos = ejector.getPos();
         setPosition(pos.getX() + 0.5f, pos.getY() + 0.5f, pos.getZ() + 0.5f);
         setStack(stack);
-        if (getWorld().isClient) {
+        if (getWorld().isClient()) {
             data = new RenderData();
         }
         loadLauncher(ejector);
@@ -49,7 +49,7 @@ public class EjectorItemEntity extends ItemEntity {
 
     public EjectorItemEntity(EntityType<? extends EjectorItemEntity> type, World world) {
         super(type, world);
-        if (getWorld().isClient) {
+        if (getWorld().isClient()) {
             data = new RenderData();
         }
     }
@@ -84,7 +84,7 @@ public class EjectorItemEntity extends ItemEntity {
         launcher = ejector.launcher;
         Direction facing = ejector.getFacing();
         direction = facing.getOpposite();
-        if (getWorld().isClient) {
+        if (getWorld().isClient()) {
             data.calcRotate(facing);
         }
     }
@@ -110,7 +110,7 @@ public class EjectorItemEntity extends ItemEntity {
             } else {
                 view.read("Launcher", EntityLauncher.CODEC).ifPresentOrElse(this::setLauncher, this::setIsAlive);
                 view.read("Direction", Direction.CODEC).ifPresentOrElse(this::setDirection, this::setIsAlive);
-                if (!alive && direction != null && getWorld().isClient) {
+                if (!alive && direction != null && getWorld().isClient()) {
                     data.calcRotate(direction.getOpposite());
                 }
             }
@@ -154,7 +154,7 @@ public class EjectorItemEntity extends ItemEntity {
 
     @Override
     public void tick() {
-        boolean isClient = getWorld().isClient;
+        boolean isClient = getWorld().isClient();
         if (alive) {
             if (isClient) {
                 data.tick();

@@ -125,7 +125,7 @@ public class CarriageContraptionEntity extends OrientedContraptionEntity {
     public void onTrackedDataSet(TrackedData<?> key) {
         super.onTrackedDataSet(key);
 
-        if (!getWorld().isClient)
+        if (!getWorld().isClient())
             return;
 
         bindCarriage();
@@ -216,7 +216,7 @@ public class CarriageContraptionEntity extends OrientedContraptionEntity {
             return;
 
         if (carriage == null) {
-            if (getWorld().isClient)
+            if (getWorld().isClient())
                 bindCarriage();
             else
                 discard();
@@ -234,7 +234,7 @@ public class CarriageContraptionEntity extends OrientedContraptionEntity {
 
         CarriageSyncData carriageData = getCarriageData();
 
-        if (!getWorld().isClient) {
+        if (!getWorld().isClient()) {
 
             dataTracker.set(SCHEDULED, carriage.train.runtime.getSchedule() != null);
 
@@ -527,7 +527,7 @@ public class CarriageContraptionEntity extends OrientedContraptionEntity {
             return false;
         if (carriage.train.derailed)
             return false;
-        if (getWorld().isClient)
+        if (getWorld().isClient())
             return true;
         if (player.isSpectator())
             return false;

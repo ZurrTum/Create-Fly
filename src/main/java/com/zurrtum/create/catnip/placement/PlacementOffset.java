@@ -108,7 +108,7 @@ public class PlacementOffset {
         if (!isReplaceable(world))
             return ActionResult.PASS_TO_DEFAULT_BLOCK_ACTION;
 
-        if (world.isClient)
+        if (world.isClient())
             return ActionResult.SUCCESS;
 
         BlockPos newPos = new BlockPos(pos);

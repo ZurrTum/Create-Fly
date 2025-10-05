@@ -81,7 +81,7 @@ public class TrainRelocator {
             blockingIndex.increment();
         });
 
-        if (level.isClient && toVisualise != null && !recordedVecs.isEmpty()) {
+        if (level.isClient() && toVisualise != null && !recordedVecs.isEmpty()) {
             toVisualise.clear();
             toVisualise.add(recordedVecs.getFirst());
         }
@@ -91,7 +91,7 @@ public class TrainRelocator {
             Vec3d vec2 = recordedVecs.get(i + 1);
             boolean blocking = i >= blockingIndex.intValue() - 1;
             boolean collided = !blocked.booleanValue() && train.findCollidingTrain(level, vec1, vec2, level.getRegistryKey()) != null;
-            if (level.isClient && toVisualise != null)
+            if (level.isClient() && toVisualise != null)
                 toVisualise.add(vec2);
             if (collided || blocking)
                 return false;

@@ -178,7 +178,7 @@ public class FactoryPanelBlock extends WallMountedBlock implements ProperWaterlo
     ) {
         if (player == null)
             return ActionResult.PASS_TO_DEFAULT_BLOCK_ACTION;
-        if (level.isClient)
+        if (level.isClient())
             return ActionResult.SUCCESS;
         if (!stack.isOf(AllItems.FACTORY_GAUGE))
             return ActionResult.SUCCESS;

@@ -21,7 +21,7 @@ public abstract class MovingInteractionBehaviour {
     protected void setContraptionActorData(AbstractContraptionEntity contraptionEntity, int index, StructureBlockInfo info, MovementContext ctx) {
         contraptionEntity.getContraption().getActors().remove(index);
         contraptionEntity.getContraption().getActors().add(index, MutablePair.of(info, ctx));
-        if (contraptionEntity.getWorld().isClient)
+        if (contraptionEntity.getWorld().isClient())
             contraptionEntity.getContraption().deferInvalidate = true;
     }
 

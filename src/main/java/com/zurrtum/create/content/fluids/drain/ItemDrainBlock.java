@@ -78,7 +78,7 @@ public class ItemDrainBlock extends Block implements IWrenchable, IBE<ItemDrainB
                 }
 
                 ItemStack heldItemStack = be.getHeldItemStack();
-                if (!level.isClient && !heldItemStack.isEmpty()) {
+                if (!level.isClient() && !heldItemStack.isEmpty()) {
                     player.getInventory().offerOrDrop(heldItemStack);
                     be.heldItem = null;
                     be.notifyUpdate();
@@ -95,7 +95,7 @@ public class ItemDrainBlock extends Block implements IWrenchable, IBE<ItemDrainB
             return;
         if (!entityIn.isAlive())
             return;
-        if (entityIn.getWorld().isClient)
+        if (entityIn.getWorld().isClient())
             return;
 
         DirectBeltInputBehaviour inputBehaviour = BlockEntityBehaviour.get(worldIn, entityIn.getBlockPos(), DirectBeltInputBehaviour.TYPE);

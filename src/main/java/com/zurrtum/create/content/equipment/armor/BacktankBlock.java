@@ -113,7 +113,7 @@ public class BacktankBlock extends HorizontalKineticBlock implements IBE<Backtan
     @Override
     public void onPlaced(World worldIn, BlockPos pos, BlockState state, LivingEntity placer, ItemStack stack) {
         super.onPlaced(worldIn, pos, state, placer, stack);
-        if (worldIn.isClient)
+        if (worldIn.isClient())
             return;
         if (stack == null)
             return;
@@ -167,7 +167,7 @@ public class BacktankBlock extends HorizontalKineticBlock implements IBE<Backtan
             return ActionResult.PASS_TO_DEFAULT_BLOCK_ACTION;
         if (!player.getEquippedStack(EquipmentSlot.CHEST).isEmpty())
             return ActionResult.PASS_TO_DEFAULT_BLOCK_ACTION;
-        if (!level.isClient) {
+        if (!level.isClient()) {
             level.playSound(null, pos, SoundEvents.ENTITY_ITEM_PICKUP, SoundCategory.PLAYERS, .75f, 1);
             player.equipStack(EquipmentSlot.CHEST, getPickStack(level, pos, state, true));
             level.breakBlock(pos, false);

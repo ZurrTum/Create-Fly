@@ -23,7 +23,7 @@ public class ClutchBlock extends GearshiftBlock {
         @Nullable WireOrientation wireOrientation,
         boolean isMoving
     ) {
-        if (worldIn.isClient)
+        if (worldIn.isClient())
             return;
 
         boolean previouslyPowered = state.get(POWERED);

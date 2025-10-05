@@ -70,7 +70,7 @@ public class DeployerBlock extends DirectionalAxisKineticBlock implements IBE<De
         Vec3d normal = Vec3d.of(state.get(FACING).getVector());
         Vec3d location = context.getHitPos().subtract(Vec3d.ofCenter(context.getBlockPos()).subtract(normal.multiply(.5))).multiply(normal);
         if (location.length() > .75f) {
-            if (!context.getWorld().isClient)
+            if (!context.getWorld().isClient())
                 withBlockEntityDo(context.getWorld(), context.getBlockPos(), DeployerBlockEntity::changeMode);
             return ActionResult.SUCCESS;
         }
@@ -116,7 +116,7 @@ public class DeployerBlock extends DirectionalAxisKineticBlock implements IBE<De
         Vec3d location = hitResult.getPos().subtract(Vec3d.ofCenter(pos).subtract(normal.multiply(.5))).multiply(normal);
         if (location.length() < .75f)
             return ActionResult.PASS_TO_DEFAULT_BLOCK_ACTION;
-        if (level.isClient)
+        if (level.isClient())
             return ActionResult.SUCCESS;
 
         withBlockEntityDo(

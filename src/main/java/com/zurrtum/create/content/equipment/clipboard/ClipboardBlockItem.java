@@ -52,7 +52,7 @@ public class ClipboardBlockItem extends BlockItem implements SupportsItemCopying
             return ActionResult.PASS;
 
         player.getItemCooldownManager().set(heldItem, 10);
-        if (world.isClient)
+        if (world.isClient())
             AllClientHandle.INSTANCE.openClipboardScreen(player, heldItem, null);
         heldItem.set(AllDataComponents.CLIPBOARD_TYPE, ClipboardType.EDITING);
 

@@ -133,7 +133,7 @@ public class PlacardBlock extends WallMountedBlock implements ProperWaterloggedB
     ) {
         if (player.isSneaking())
             return ActionResult.PASS_TO_DEFAULT_BLOCK_ACTION;
-        if (level.isClient)
+        if (level.isClient())
             return ActionResult.SUCCESS;
 
         ItemStack inHand = player.getStackInHand(hand);
@@ -195,7 +195,7 @@ public class PlacardBlock extends WallMountedBlock implements ProperWaterloggedB
 
     @Override
     public void onBlockBreakStart(BlockState pState, World pLevel, BlockPos pPos, PlayerEntity pPlayer) {
-        if (pLevel.isClient)
+        if (pLevel.isClient())
             return;
         withBlockEntityDo(
             pLevel, pPos, pte -> {

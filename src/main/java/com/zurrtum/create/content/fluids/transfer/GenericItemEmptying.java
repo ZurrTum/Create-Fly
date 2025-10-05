@@ -22,8 +22,9 @@ public class GenericItemEmptying {
         if (PotionFluidHandler.isPotionItem(stack))
             return true;
 
-        if (world.isClient ? world.getRecipeManager().getPropertySet(AllRecipeSets.EMPTYING).canUse(stack) : ((ServerWorld) world).getRecipeManager()
-            .getFirstMatch(AllRecipeTypes.EMPTYING, new SingleStackRecipeInput(stack), world).isPresent()) {
+        if (world.isClient() ? world.getRecipeManager().getPropertySet(AllRecipeSets.EMPTYING)
+            .canUse(stack) : ((ServerWorld) world).getRecipeManager().getFirstMatch(AllRecipeTypes.EMPTYING, new SingleStackRecipeInput(stack), world)
+            .isPresent()) {
             return true;
         }
 
@@ -40,7 +41,7 @@ public class GenericItemEmptying {
             return PotionFluidHandler.emptyPotion(stack, simulate);
 
         //TODO client check recipe
-        if (!world.isClient) {
+        if (!world.isClient()) {
             Optional<RecipeEntry<EmptyingRecipe>> recipe = ((ServerWorld) world).getRecipeManager()
                 .getFirstMatch(AllRecipeTypes.EMPTYING, new SingleStackRecipeInput(stack), world);
             if (recipe.isPresent()) {

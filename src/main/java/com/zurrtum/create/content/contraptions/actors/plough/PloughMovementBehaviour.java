@@ -42,7 +42,7 @@ public class PloughMovementBehaviour extends BlockBreakingMovementBehaviour {
     public void visitNewPosition(MovementContext context, BlockPos pos) {
         super.visitNewPosition(context, pos);
         World world = context.world;
-        if (world.isClient)
+        if (world.isClient())
             return;
         BlockPos below = pos.down();
         if (!world.isPosLoaded(below))

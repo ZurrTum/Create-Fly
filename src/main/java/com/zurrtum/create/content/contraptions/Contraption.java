@@ -257,7 +257,7 @@ public abstract class Contraption {
     }
 
     public void onEntityInitialize(World world, AbstractContraptionEntity contraptionEntity) {
-        if (world.isClient)
+        if (world.isClient())
             return;
 
         for (OrientedContraptionEntity orientedCE : world.getNonSpectatingEntities(
@@ -876,7 +876,7 @@ public abstract class Contraption {
             // it's very important that empty tags are read here. see writeBlocksCompound
             c.read("UpdateTag", NbtCompound.CODEC).ifPresent(updateTag -> updateTags.put(info.pos(), updateTag));
 
-            if (!world.isClient)
+            if (!world.isClient())
                 return;
 
             // create the BlockEntity client-side for rendering
@@ -1156,7 +1156,7 @@ public abstract class Contraption {
 
         for (Box box : superglue) {
             box = new Box(transform.apply(new Vec3d(box.minX, box.minY, box.minZ)), transform.apply(new Vec3d(box.maxX, box.maxY, box.maxZ)));
-            if (!world.isClient)
+            if (!world.isClient())
                 world.spawnEntity(new SuperGlueEntity(world, box));
         }
     }

@@ -42,7 +42,7 @@ public class BlueprintItem extends Item {
             EntityType.loadFromEntityNbt(world, player, hangingentity, customData);
         if (!hangingentity.canStayAttached())
             return ActionResult.CONSUME;
-        if (!world.isClient) {
+        if (!world.isClient()) {
             hangingentity.onPlace();
             world.spawnEntity(hangingentity);
         }

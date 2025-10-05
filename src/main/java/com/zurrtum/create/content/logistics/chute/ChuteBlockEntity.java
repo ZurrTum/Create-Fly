@@ -122,12 +122,12 @@ public class ChuteBlockEntity extends SmartBlockEntity {
     public void tick() {
         super.tick();
 
-        if (!world.isClient)
+        if (!world.isClient())
             canPickUpItems = canDirectlyInsert();
 
-        boolean clientSide = world != null && world.isClient && !isVirtual();
+        boolean clientSide = world != null && world.isClient() && !isVirtual();
         float itemMotion = getItemMotion();
-        if (itemMotion != 0 && world != null && world.isClient)
+        if (itemMotion != 0 && world != null && world.isClient())
             spawnParticles(itemMotion);
         tickAirStreams(itemMotion);
 
@@ -166,7 +166,7 @@ public class ChuteBlockEntity extends SmartBlockEntity {
 
     private void updateAirFlow(float itemSpeed) {
         updateAirFlow = false;
-        if (itemSpeed > 0 && world != null && !world.isClient) {
+        if (itemSpeed > 0 && world != null && !world.isClient()) {
             float speed = pull - push;
             beltBelow = null;
 
@@ -204,7 +204,7 @@ public class ChuteBlockEntity extends SmartBlockEntity {
     }
 
     private void findEntities(float itemSpeed) {
-        if (bottomPullDistance <= 0 && !getItem().isEmpty() || itemSpeed <= 0 || world == null || world.isClient)
+        if (bottomPullDistance <= 0 && !getItem().isEmpty() || itemSpeed <= 0 || world == null || world.isClient())
             return;
         if (!canActivate())
             return;
@@ -223,7 +223,7 @@ public class ChuteBlockEntity extends SmartBlockEntity {
     }
 
     private void extractFromBelt(float itemSpeed) {
-        if (itemSpeed <= 0 || world == null || world.isClient)
+        if (itemSpeed <= 0 || world == null || world.isClient())
             return;
         if (getItem().isEmpty() && beltBelow != null) {
             beltBelow.handleCenteredProcessingOnAllItems(
@@ -239,7 +239,7 @@ public class ChuteBlockEntity extends SmartBlockEntity {
     }
 
     private void tickAirStreams(float itemSpeed) {
-        if (!world.isClient && airCurrentUpdateCooldown-- <= 0) {
+        if (!world.isClient() && airCurrentUpdateCooldown-- <= 0) {
             airCurrentUpdateCooldown = AllConfigs.server().kinetics.fanBlockCheckRate.get();
             updateAirFlow = true;
         }
@@ -341,7 +341,7 @@ public class ChuteBlockEntity extends SmartBlockEntity {
             return false;
         Inventory capBelow = grabCapability(Direction.DOWN);
         if (capBelow != null) {
-            if (world.isClient && !isVirtual())
+            if (world.isClient() && !isVirtual())
                 return false;
             if (invVersionTracker.stillWaiting(capBelow))
                 return false;
@@ -404,7 +404,7 @@ public class ChuteBlockEntity extends SmartBlockEntity {
         if (AbstractChuteBlock.isOpenChute(getCachedState())) {
             Inventory capAbove = grabCapability(Direction.UP);
             if (capAbove != null) {
-                if (world.isClient && !isVirtual() && !ChuteBlock.isChute(stateAbove))
+                if (world.isClient() && !isVirtual() && !ChuteBlock.isChute(stateAbove))
                     return false;
                 if (invVersionTracker.stillWaiting(capAbove))
                     return false;
@@ -520,7 +520,7 @@ public class ChuteBlockEntity extends SmartBlockEntity {
         item = stack;
         itemPosition.startWithValue(insertionPos);
         invVersionTracker.reset();
-        if (!world.isClient) {
+        if (!world.isClient()) {
             notifyUpdate();
             award(AllAdvancements.CHUTE);
         }
@@ -554,7 +554,7 @@ public class ChuteBlockEntity extends SmartBlockEntity {
         bottomPullDistance = view.getFloat("BottomAirFlowDistance", 0);
         super.read(view, clientPacket);
 
-        if (hasWorld() && world != null && world.isClient && !ItemStack.areEqual(previousItem, item) && !item.isEmpty()) {
+        if (hasWorld() && world != null && world.isClient() && !ItemStack.areEqual(previousItem, item) && !item.isEmpty()) {
             if (world.random.nextInt(3) != 0)
                 return;
             Vec3d p = VecHelper.getCenterOf(pos);

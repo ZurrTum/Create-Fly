@@ -69,7 +69,7 @@ public class CuckooClockBlockEntity extends KineticBlockEntity {
     @Override
     public void tick() {
         super.tick();
-        if (world.isClient || getSpeed() == 0)
+        if (world.isClient() || getSpeed() == 0)
             return;
 
         boolean isNatural = world.getDimension().natural();

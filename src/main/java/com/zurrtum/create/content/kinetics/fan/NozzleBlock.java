@@ -44,7 +44,7 @@ public class NozzleBlock extends WrenchableDirectionalBlock implements IBE<Nozzl
 
     @Override
     public void neighborUpdate(BlockState state, World worldIn, BlockPos pos, Block sourceBlock, BlockPos fromPos, boolean isMoving) {
-        if (worldIn.isClient)
+        if (worldIn.isClient())
             return;
 
         if (fromPos.equals(pos.offset(state.get(FACING).getOpposite())))

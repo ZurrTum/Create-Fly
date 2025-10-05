@@ -13,7 +13,7 @@ public abstract class AnimationBehaviour<T extends SmartBlockEntity> extends Blo
 
     @Override
     public void tick() {
-        if (blockEntity.getWorld().isClient) {
+        if (blockEntity.getWorld().isClient()) {
             tickAnimation();
         }
     }

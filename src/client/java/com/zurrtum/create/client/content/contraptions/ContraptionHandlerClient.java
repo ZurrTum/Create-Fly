@@ -80,7 +80,7 @@ public class ContraptionHandlerClient {
     }
 
     public static void entitiesWhoJustDismountedGetSentToTheRightLocation(LivingEntity entityLiving, World world) {
-        if (!world.isClient)
+        if (!world.isClient())
             return;
 
         AllSynchedDatas.CONTRAPTION_DISMOUNT_LOCATION.get(entityLiving).ifPresent(position -> {

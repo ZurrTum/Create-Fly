@@ -109,12 +109,12 @@ public class LecternControllerBlockEntity extends SmartBlockEntity {
     public void tick() {
         super.tick();
 
-        if (world.isClient) {
+        if (world.isClient()) {
             AllClientHandle.INSTANCE.tryToggleActive(this);
             prevUser = user;
         }
 
-        if (!world.isClient) {
+        if (!world.isClient()) {
             deactivatedThisTick = false;
 
             if (!(world instanceof ServerWorld))

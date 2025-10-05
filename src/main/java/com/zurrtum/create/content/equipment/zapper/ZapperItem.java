@@ -74,7 +74,7 @@ public abstract class ZapperItem extends Item implements SwingControlItem {
     public ActionResult useOnBlock(ItemUsageContext context) {
         // Shift -> open GUI
         if (context.getPlayer() != null && context.getPlayer().isSneaking()) {
-            if (context.getWorld().isClient) {
+            if (context.getWorld().isClient()) {
                 openHandgunGUI(context.getStack(), context.getHand());
                 context.getPlayer().getItemCooldownManager().set(context.getStack(), 10);
             }
@@ -90,7 +90,7 @@ public abstract class ZapperItem extends Item implements SwingControlItem {
 
         // Shift -> Open GUI
         if (player.isSneaking()) {
-            if (world.isClient) {
+            if (world.isClient()) {
                 openHandgunGUI(item, hand);
                 player.getItemCooldownManager().set(item, 10);
             }
@@ -135,7 +135,7 @@ public abstract class ZapperItem extends Item implements SwingControlItem {
         Vec3d barrelPos = ShootableGadgetItemMethods.getGunBarrelVec(player, mainHand, new Vec3d(.35f, -0.1f, 1));
 
         // Client side
-        if (world.isClient) {
+        if (world.isClient()) {
             player.clearActiveItem();
             AllClientHandle.INSTANCE.zapperDontAnimateItem(hand);
             return ActionResult.SUCCESS;

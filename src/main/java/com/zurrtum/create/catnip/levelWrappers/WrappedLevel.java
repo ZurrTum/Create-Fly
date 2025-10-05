@@ -52,7 +52,7 @@ public class WrappedLevel extends World {
             level.getRegistryKey(),
             level.getRegistryManager(),
             level.getDimensionEntry(),
-            level.isClient,
+            level.isClient(),
             level.isDebugWorld(),
             0,
             0

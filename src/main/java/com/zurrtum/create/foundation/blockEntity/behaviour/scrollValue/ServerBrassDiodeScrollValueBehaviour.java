@@ -20,7 +20,7 @@ public class ServerBrassDiodeScrollValueBehaviour extends ServerScrollValueBehav
 
     @Override
     public void onShortInteract(PlayerEntity player, Hand hand, Direction side, BlockHitResult hitResult) {
-        if (getWorld().isClient)
+        if (getWorld().isClient())
             return;
         BlockState blockState = blockEntity.getCachedState();
         if (blockState.getBlock() instanceof BrassDiodeBlock bdb)

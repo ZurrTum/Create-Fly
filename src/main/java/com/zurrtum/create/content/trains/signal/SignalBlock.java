@@ -80,7 +80,7 @@ public class SignalBlock extends Block implements IBE<SignalBlockEntity>, IWrenc
         @Nullable WireOrientation wireOrientation,
         boolean pIsMoving
     ) {
-        if (pLevel.isClient)
+        if (pLevel.isClient())
             return;
         boolean powered = pState.get(POWERED);
         if (powered == pLevel.isReceivingRedstonePower(pPos))
@@ -107,7 +107,7 @@ public class SignalBlock extends Block implements IBE<SignalBlockEntity>, IWrenc
     public ActionResult onWrenched(BlockState state, ItemUsageContext context) {
         World level = context.getWorld();
         BlockPos pos = context.getBlockPos();
-        if (level.isClient)
+        if (level.isClient())
             return ActionResult.SUCCESS;
         withBlockEntityDo(
             level, pos, ste -> {

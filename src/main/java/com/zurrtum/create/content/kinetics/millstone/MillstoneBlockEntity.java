@@ -68,14 +68,14 @@ public class MillstoneBlockEntity extends KineticBlockEntity {
         if (timer > 0) {
             timer -= getProcessingSpeed();
 
-            if (world.isClient) {
+            if (world.isClient()) {
                 spawnParticles();
                 return;
             }
             if (timer <= 0)
                 process();
             return;
-        } else if (world.isClient) {
+        } else if (world.isClient()) {
             return;
         }
 

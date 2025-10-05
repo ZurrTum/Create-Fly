@@ -75,7 +75,7 @@ public abstract class AbstractFunnelBlock extends Block implements IBE<FunnelBlo
 
     @Override
     public void neighborUpdate(BlockState state, World level, BlockPos pos, Block sourceBlock, BlockPos fromPos, boolean isMoving) {
-        if (level.isClient)
+        if (level.isClient())
             return;
         InvManipulationBehaviour behaviour = BlockEntityBehaviour.get(level, pos, InvManipulationBehaviour.TYPE);
         if (behaviour != null)
@@ -91,7 +91,7 @@ public abstract class AbstractFunnelBlock extends Block implements IBE<FunnelBlo
         @Nullable WireOrientation wireOrientation,
         boolean isMoving
     ) {
-        if (level.isClient)
+        if (level.isClient())
             return;
         if (!level.getBlockTickScheduler().isTicking(pos, this))
             level.scheduleBlockTick(pos, this, 1);

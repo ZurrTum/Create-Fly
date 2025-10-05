@@ -82,7 +82,7 @@ public abstract class EntityMixin {
 
     @Unique
     private Stream<AbstractContraptionEntity> create$getIntersectionContraptionsStream() {
-        return (world.isClient ? ContraptionHandlerClient.loadedContraptions : ContraptionHandler.loadedContraptions).get(world).values().stream()
+        return (world.isClient() ? ContraptionHandlerClient.loadedContraptions : ContraptionHandler.loadedContraptions).get(world).values().stream()
             .map(Reference::get).filter(cEntity -> cEntity != null && cEntity.collidingEntities.containsKey((Entity) (Object) this));
     }
 
@@ -138,7 +138,7 @@ public abstract class EntityMixin {
     // involves client-side view bobbing animation on contraptions
     @Inject(method = "move(Lnet/minecraft/entity/MovementType;Lnet/minecraft/util/math/Vec3d;)V", at = @At(value = "TAIL"))
     private void create$onMove(MovementType type, Vec3d movement, CallbackInfo ci) {
-        if (!world.isClient)
+        if (!world.isClient())
             return;
         Entity self = (Entity) (Object) this;
         if (self.isOnGround())

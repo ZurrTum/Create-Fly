@@ -77,7 +77,7 @@ public class EncasedPipeBlock extends Block implements IWrenchable, SpecialBlock
 
     @Override
     public void onStateReplaced(BlockState state, ServerWorld world, BlockPos pos, boolean isMoving) {
-        if (!world.isClient)
+        if (!world.isClient())
             FluidPropagator.propagateChangedPipe(world, pos, state);
         if (state.hasBlockEntity())
             world.removeBlockEntity(pos);
@@ -85,7 +85,7 @@ public class EncasedPipeBlock extends Block implements IWrenchable, SpecialBlock
 
     @Override
     public void onBlockAdded(BlockState state, World world, BlockPos pos, BlockState oldState, boolean isMoving) {
-        if (!world.isClient && state != oldState)
+        if (!world.isClient() && state != oldState)
             world.scheduleBlockTick(pos, this, 1, TickPriority.HIGH);
     }
 
@@ -126,7 +126,7 @@ public class EncasedPipeBlock extends Block implements IWrenchable, SpecialBlock
         World world = context.getWorld();
         BlockPos pos = context.getBlockPos();
 
-        if (world.isClient)
+        if (world.isClient())
             return ActionResult.SUCCESS;
 
         context.getWorld().syncWorldEvent(WorldEvents.BLOCK_BROKEN, context.getBlockPos(), Block.getRawIdFromState(state));

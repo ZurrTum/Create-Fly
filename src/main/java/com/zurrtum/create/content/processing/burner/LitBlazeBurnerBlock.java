@@ -60,7 +60,7 @@ public class LitBlazeBurnerBlock extends Block implements IWrenchable {
     ) {
         if (stack.getItem() instanceof ShovelItem/* || stack.getItem().canPerformAction(stack, EXTINGUISH_FLAME_ACTION)*/) {
             level.playSound(player, pos, SoundEvents.ENTITY_GENERIC_EXTINGUISH_FIRE, SoundCategory.BLOCKS, 0.5f, 2);
-            if (level.isClient)
+            if (level.isClient())
                 return ActionResult.SUCCESS;
             stack.damage(1, player, EquipmentSlot.MAINHAND);
             level.setBlockState(pos, AllBlocks.BLAZE_BURNER.getDefaultState());
@@ -70,7 +70,7 @@ public class LitBlazeBurnerBlock extends Block implements IWrenchable {
         if (state.get(FLAME_TYPE) == FlameType.REGULAR) {
             if (stack.isIn(ItemTags.SOUL_FIRE_BASE_BLOCKS)) {
                 level.playSound(player, pos, SoundEvents.BLOCK_SOUL_SAND_PLACE, SoundCategory.BLOCKS, 1.0f, level.random.nextFloat() * 0.4F + 0.8F);
-                if (level.isClient)
+                if (level.isClient())
                     return ActionResult.SUCCESS;
                 level.setBlockState(pos, getDefaultState().with(FLAME_TYPE, FlameType.SOUL));
                 return ActionResult.SUCCESS;

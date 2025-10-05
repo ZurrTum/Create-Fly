@@ -172,7 +172,7 @@ public class PackagerBlock extends WrenchableDirectionalBlock implements IBE<Pac
 
     @Override
     public void neighborUpdate(BlockState state, World worldIn, BlockPos pos, Block sourceBlock, BlockPos fromPos, boolean isMoving) {
-        if (worldIn.isClient)
+        if (worldIn.isClient())
             return;
         InvManipulationBehaviour behaviour = BlockEntityBehaviour.get(worldIn, pos, InvManipulationBehaviour.TYPE);
         if (behaviour != null)
@@ -188,7 +188,7 @@ public class PackagerBlock extends WrenchableDirectionalBlock implements IBE<Pac
         @Nullable WireOrientation wireOrientation,
         boolean isMoving
     ) {
-        if (worldIn.isClient)
+        if (worldIn.isClient())
             return;
         boolean previouslyPowered = state.get(POWERED);
         if (previouslyPowered == worldIn.isReceivingRedstonePower(pos))

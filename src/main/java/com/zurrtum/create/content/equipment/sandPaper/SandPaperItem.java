@@ -83,7 +83,7 @@ public class SandPaperItem extends Item {
 
         playerIn.setCurrentHand(handIn);
 
-        if (!worldIn.isClient) {
+        if (!worldIn.isClient()) {
             itemstack.set(AllDataComponents.SAND_PAPER_POLISHING, new SandPaperItemComponent(toPolish));
             if (item.isEmpty())
                 pickUp.discard();
@@ -118,7 +118,7 @@ public class SandPaperItem extends Item {
             return stack;
         ItemStack toPolish = component.item();
 
-        if (worldIn.isClient) {
+        if (worldIn.isClient()) {
             spawnParticles(entityLiving.getCameraPosVec(1).add(entityLiving.getRotationVector().multiply(.5f)), toPolish, worldIn);
             return stack;
         }

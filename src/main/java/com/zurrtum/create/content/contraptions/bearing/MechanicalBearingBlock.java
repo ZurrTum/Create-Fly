@@ -33,7 +33,7 @@ public class MechanicalBearingBlock extends BearingBlock implements IBE<Mechanic
         if (player.isSneaking())
             return ActionResult.FAIL;
         if (stack.isEmpty()) {
-            if (level.isClient)
+            if (level.isClient())
                 return ActionResult.SUCCESS;
             withBlockEntityDo(
                 level, pos, be -> {

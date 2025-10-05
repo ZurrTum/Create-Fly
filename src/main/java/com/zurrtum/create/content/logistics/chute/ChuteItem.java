@@ -34,7 +34,7 @@ public class ChuteItem extends BlockItem {
         if (blockState.isReplaceable())
             context = ItemPlacementContext.offset(context, correctPos, face);
         else {
-            if (!(blockState.getBlock() instanceof ChuteBlock block) || world.isClient)
+            if (!(blockState.getBlock() instanceof ChuteBlock block) || world.isClient())
                 return ActionResult.FAIL;
             if (block.getFacing(blockState) == Direction.DOWN) {
                 world.setBlockState(

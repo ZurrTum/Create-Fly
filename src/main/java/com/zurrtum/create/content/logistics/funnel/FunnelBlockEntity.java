@@ -90,7 +90,7 @@ public class FunnelBlockEntity extends SmartBlockEntity {
         super.tick();
         flap.tickChaser();
         Mode mode = determineCurrentMode();
-        if (world.isClient)
+        if (world.isClient())
             return;
 
         // Redstone resets the extraction cooldown
@@ -314,7 +314,7 @@ public class FunnelBlockEntity extends SmartBlockEntity {
     }
 
     public void flap(boolean inward) {
-        if (!world.isClient && world instanceof ServerWorld serverLevel) {
+        if (!world.isClient() && world instanceof ServerWorld serverLevel) {
             FunnelFlapPacket packet = new FunnelFlapPacket(this, inward);
             for (ServerPlayerEntity player : serverLevel.getChunkManager().chunkLoadingManager.getPlayersWatchingChunk(new ChunkPos(pos), false)) {
                 player.networkHandler.sendPacket(packet);

@@ -127,7 +127,7 @@ public class StockTickerBlockEntity extends StockCheckingBlockEntity {
     @Override
     public void tick() {
         super.tick();
-        if (world.isClient) {
+        if (world.isClient()) {
             if (ticksSinceLastUpdate < 100)
                 ticksSinceLastUpdate += 1;
         }

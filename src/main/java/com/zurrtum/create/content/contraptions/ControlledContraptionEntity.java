@@ -153,7 +153,7 @@ public class ControlledContraptionEntity extends AbstractContraptionEntity {
         }
         if (!controller.isAttachedTo(this)) {
             controller.attach(this);
-            if (getWorld().isClient)
+            if (getWorld().isClient())
                 setPosition(getX(), getY(), getZ());
         }
     }

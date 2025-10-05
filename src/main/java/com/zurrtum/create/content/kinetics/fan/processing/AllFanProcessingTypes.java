@@ -153,7 +153,7 @@ public class AllFanProcessingTypes {
 
         @Override
         public void affectEntity(Entity entity, World level) {
-            if (level.isClient)
+            if (level.isClient())
                 return;
 
             if (!entity.isFireImmune()) {
@@ -221,7 +221,7 @@ public class AllFanProcessingTypes {
 
         @Override
         public void affectEntity(Entity entity, World level) {
-            if (level.isClient) {
+            if (level.isClient()) {
                 if (entity instanceof HorseEntity) {
                     Vec3d p = entity.getLerpedPos(0);
                     Vec3d v = p.add(0, 0.5f, 0)
@@ -342,7 +342,7 @@ public class AllFanProcessingTypes {
 
         @Override
         public void affectEntity(Entity entity, World level) {
-            if (level.isClient)
+            if (level.isClient())
                 return;
 
             if (!entity.isFireImmune()) {
@@ -418,7 +418,7 @@ public class AllFanProcessingTypes {
 
         @Override
         public void affectEntity(Entity entity, World level) {
-            if (level.isClient)
+            if (level.isClient())
                 return;
 
             if (entity instanceof EndermanEntity || entity.getType() == EntityType.SNOW_GOLEM || entity.getType() == EntityType.BLAZE) {

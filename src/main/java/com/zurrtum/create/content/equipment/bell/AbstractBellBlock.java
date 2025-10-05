@@ -47,7 +47,7 @@ public abstract class AbstractBellBlock<BE extends AbstractBellBlockEntity> exte
         @Nullable WireOrientation wireOrientation,
         boolean pIsMoving
     ) {
-        if (pLevel.isClient)
+        if (pLevel.isClient())
             return;
         boolean shouldPower = pLevel.isReceivingRedstonePower(pPos);
         if (shouldPower == pState.get(POWERED))
@@ -73,7 +73,7 @@ public abstract class AbstractBellBlock<BE extends AbstractBellBlockEntity> exte
 
     protected boolean ring(World world, BlockPos pos, Direction direction, PlayerEntity player) {
         BE be = getBlockEntity(world, pos);
-        if (world.isClient)
+        if (world.isClient())
             return true;
         if (be == null || !be.ring(world, pos, direction))
             return false;

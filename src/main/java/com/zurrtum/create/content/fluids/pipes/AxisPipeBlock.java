@@ -66,7 +66,7 @@ public class AxisPipeBlock extends PillarBlock implements IWrenchableWithBracket
     ) {
         if (!stack.isOf(AllItems.COPPER_CASING))
             return ActionResult.PASS_TO_DEFAULT_BLOCK_ACTION;
-        if (level.isClient)
+        if (level.isClient())
             return ActionResult.SUCCESS;
         BlockState newState = AllBlocks.ENCASED_FLUID_PIPE.getDefaultState();
         for (Direction d : Iterate.directionsInAxis(getAxis(state)))
@@ -85,7 +85,7 @@ public class AxisPipeBlock extends PillarBlock implements IWrenchableWithBracket
 
     @Override
     public void onBlockAdded(BlockState state, World world, BlockPos pos, BlockState oldState, boolean isMoving) {
-        if (world.isClient)
+        if (world.isClient())
             return;
         if (state != oldState)
             world.scheduleBlockTick(pos, this, 1, TickPriority.HIGH);

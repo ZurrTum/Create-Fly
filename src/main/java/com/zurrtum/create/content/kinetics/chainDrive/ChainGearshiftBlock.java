@@ -55,7 +55,7 @@ public class ChainGearshiftBlock extends ChainDriveBlock {
         @Nullable WireOrientation wireOrientation,
         boolean isMoving
     ) {
-        if (worldIn.isClient)
+        if (worldIn.isClient())
             return;
 
         withBlockEntityDo(worldIn, pos, kbe -> ((ChainGearshiftBlockEntity) kbe).neighbourChanged());

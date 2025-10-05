@@ -98,7 +98,7 @@ public class FluidPipeBlock extends ConnectingBlock implements Waterloggable, IW
 
         if (clickedFace.getAxis() == axis)
             return ActionResult.PASS;
-        if (!world.isClient) {
+        if (!world.isClient()) {
             withBlockEntityDo(
                 world,
                 pos,
@@ -154,7 +154,7 @@ public class FluidPipeBlock extends ConnectingBlock implements Waterloggable, IW
 
     @Override
     public void onStateReplaced(BlockState state, ServerWorld world, BlockPos pos, boolean isMoving) {
-        if (!world.isClient)
+        if (!world.isClient())
             FluidPropagator.propagateChangedPipe(world, pos, state);
         if (!isMoving)
             removeBracket(world, pos, true).ifPresent(stack -> Block.dropStack(world, pos, stack));
@@ -164,7 +164,7 @@ public class FluidPipeBlock extends ConnectingBlock implements Waterloggable, IW
 
     @Override
     public void onBlockAdded(BlockState state, World world, BlockPos pos, BlockState oldState, boolean isMoving) {
-        if (world.isClient)
+        if (world.isClient())
             return;
         if (state != oldState)
             world.scheduleBlockTick(pos, this, 1, TickPriority.HIGH);
@@ -257,13 +257,10 @@ public class FluidPipeBlock extends ConnectingBlock implements Waterloggable, IW
     @Override
     public BlockState getPlacementState(ItemPlacementContext context) {
         FluidState FluidState = context.getWorld().getFluidState(context.getBlockPos());
-        return updateBlockState(
-            getDefaultState(),
-            context.getPlayerLookDirection(),
-            null,
-            context.getWorld(),
-            context.getBlockPos()
-        ).with(Properties.WATERLOGGED, Boolean.valueOf(FluidState.getFluid() == Fluids.WATER));
+        return updateBlockState(getDefaultState(), context.getPlayerLookDirection(), null, context.getWorld(), context.getBlockPos()).with(
+            Properties.WATERLOGGED,
+            Boolean.valueOf(FluidState.getFluid() == Fluids.WATER)
+        );
     }
 
     @Override

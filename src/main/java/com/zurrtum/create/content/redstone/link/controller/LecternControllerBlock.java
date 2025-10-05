@@ -56,13 +56,13 @@ public class LecternControllerBlock extends LecternBlock implements IBE<LecternC
         BlockHitResult hitResult
     ) {
         if (!player.isSneaking() && LecternControllerBlockEntity.playerInRange(player, level, pos)) {
-            if (!level.isClient)
+            if (!level.isClient())
                 withBlockEntityDo(level, pos, be -> be.tryStartUsing(player));
             return ActionResult.SUCCESS;
         }
 
         if (player.isSneaking()) {
-            if (!level.isClient)
+            if (!level.isClient())
                 replaceWithLectern(state, level, pos);
             return ActionResult.SUCCESS;
         }

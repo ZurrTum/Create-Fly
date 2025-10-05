@@ -126,7 +126,7 @@ public class AdvancementBehaviour extends BlockEntityBehaviour<SmartBlockEntity>
     }
 
     public static void setPlacedBy(World worldIn, BlockPos pos, LivingEntity placer) {
-        if (worldIn.isClient)
+        if (worldIn.isClient())
             return;
         if (!(worldIn.getBlockEntity(pos) instanceof SmartBlockEntity blockEntity)) {
             return;

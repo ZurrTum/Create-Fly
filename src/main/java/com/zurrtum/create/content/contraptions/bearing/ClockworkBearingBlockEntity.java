@@ -66,13 +66,13 @@ public class ClockworkBearingBlockEntity extends KineticBlockEntity implements I
     public void tick() {
         super.tick();
 
-        if (world.isClient) {
+        if (world.isClient()) {
             prevForcedAngle = hourAngle;
             clientMinuteAngleDiff /= 2;
             clientHourAngleDiff /= 2;
         }
 
-        if (!world.isClient && assembleNextTick) {
+        if (!world.isClient() && assembleNextTick) {
             assembleNextTick = false;
             if (running) {
                 boolean canDisassemble = true;
@@ -129,7 +129,7 @@ public class ClockworkBearingBlockEntity extends KineticBlockEntity implements I
     @Override
     public void lazyTick() {
         super.lazyTick();
-        if (hourHand != null && !world.isClient)
+        if (hourHand != null && !world.isClient())
             sendData();
     }
 
@@ -186,7 +186,7 @@ public class ClockworkBearingBlockEntity extends KineticBlockEntity implements I
 
     public float getAngularSpeed() {
         float speed = -Math.abs(getSpeed() * 3 / 10f);
-        if (world.isClient)
+        if (world.isClient())
             speed *= AllClientHandle.INSTANCE.getServerSpeed();
         return speed;
     }
@@ -280,7 +280,7 @@ public class ClockworkBearingBlockEntity extends KineticBlockEntity implements I
             this.minuteHand = contraption;
             minuteHand.setPos(anchor.getX(), anchor.getY(), anchor.getZ());
         }
-        if (!world.isClient) {
+        if (!world.isClient()) {
             this.running = true;
             sendData();
         }
@@ -342,13 +342,13 @@ public class ClockworkBearingBlockEntity extends KineticBlockEntity implements I
 
     @Override
     public void onStall() {
-        if (!world.isClient)
+        if (!world.isClient())
             sendData();
     }
 
     @Override
     public void remove() {
-        if (!world.isClient)
+        if (!world.isClient())
             disassemble();
         super.remove();
     }

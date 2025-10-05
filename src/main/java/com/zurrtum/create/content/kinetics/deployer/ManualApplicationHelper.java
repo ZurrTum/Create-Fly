@@ -45,7 +45,7 @@ public class ManualApplicationHelper {
             return null;
 
         ItemStack block = blockState.getBlock().asItem().getDefaultStack();
-        if (level.isClient) {
+        if (level.isClient()) {
             RecipeManager recipeManager = level.getRecipeManager();
             if (recipeManager.getPropertySet(AllRecipeSets.ITEM_APPLICATION_TARGET)
                 .canUse(block) && recipeManager.getPropertySet(AllRecipeSets.ITEM_APPLICATION_INGREDIENT).canUse(heldItem)) {

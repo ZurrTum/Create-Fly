@@ -30,7 +30,7 @@ public class EdgeInteractionHandler {
         if (activatedDirection == null)
             return null;
 
-        if (!world.isClient) {
+        if (!world.isClient()) {
             behaviour.connectionCallback.apply(world, pos, pos.offset(activatedDirection));
         }
         world.playSound(null, pos, SoundEvents.ENTITY_ITEM_FRAME_ADD_ITEM, SoundCategory.BLOCKS, .25f, .1f);

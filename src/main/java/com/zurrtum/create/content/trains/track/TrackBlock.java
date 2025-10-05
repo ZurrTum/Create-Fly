@@ -159,7 +159,7 @@ public class TrackBlock extends Block implements IBE<TrackBlockEntity>, IWrencha
             }
             TrackPropagator.onRailRemoved(pLevel, pPos, pState);
         }
-        if (pLevel.isClient) {
+        if (pLevel.isClient()) {
             return;
         }
         QueryableTickScheduler<Block> blockTicks = pLevel.getBlockTickScheduler();
@@ -390,7 +390,7 @@ public class TrackBlock extends Block implements IBE<TrackBlockEntity>, IWrencha
     @Override
     public void onStateReplaced(BlockState pState, ServerWorld pLevel, BlockPos pPos, boolean pIsMoving) {
         TrackPropagator.onRailRemoved(pLevel, pPos, pState);
-        if (!pLevel.isClient)
+        if (!pLevel.isClient())
             updateGirders(pState, pLevel, pPos, pLevel.getBlockTickScheduler());
     }
 
@@ -404,7 +404,7 @@ public class TrackBlock extends Block implements IBE<TrackBlockEntity>, IWrencha
         Hand hand,
         BlockHitResult hitResult
     ) {
-        if (level.isClient)
+        if (level.isClient())
             return ActionResult.SUCCESS;
         for (Map.Entry<BlockPos, BlockBox> entry : StationBlockEntity.assemblyAreas.get(level).entrySet()) {
             if (!entry.getValue().contains(pos))
@@ -519,7 +519,7 @@ public class TrackBlock extends Block implements IBE<TrackBlockEntity>, IWrencha
     public ActionResult onSneakWrenched(BlockState state, ItemUsageContext context) {
         PlayerEntity player = context.getPlayer();
         World level = context.getWorld();
-        if (!level.isClient && !player.isCreative() && state.get(HAS_BE)) {
+        if (!level.isClient() && !player.isCreative() && state.get(HAS_BE)) {
             BlockEntity blockEntity = level.getBlockEntity(context.getBlockPos());
             if (blockEntity instanceof TrackBlockEntity trackBE) {
                 trackBE.cancelDrops = true;

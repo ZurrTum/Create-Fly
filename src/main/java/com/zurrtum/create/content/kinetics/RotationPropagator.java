@@ -200,7 +200,7 @@ public class RotationPropagator {
      * @param pos
      */
     public static void handleAdded(World worldIn, BlockPos pos, KineticBlockEntity addedTE) {
-        if (worldIn.isClient)
+        if (worldIn.isClient())
             return;
         if (!worldIn.isPosLoaded(pos))
             return;
@@ -301,7 +301,7 @@ public class RotationPropagator {
      * @param removedBE
      */
     public static void handleRemoved(World worldIn, BlockPos pos, KineticBlockEntity removedBE) {
-        if (worldIn.isClient)
+        if (worldIn.isClient())
             return;
         if (removedBE == null)
             return;

@@ -60,7 +60,7 @@ public class KineticBlockEntity extends SmartBlockEntity {
     }
 
     public static void switchToBlockState(World world, BlockPos pos, BlockState state) {
-        if (world.isClient)
+        if (world.isClient())
             return;
 
         BlockEntity blockEntity = world.getBlockEntity(pos);
@@ -103,7 +103,7 @@ public class KineticBlockEntity extends SmartBlockEntity {
 
     @Override
     public void initialize() {
-        if (hasNetwork() && !world.isClient) {
+        if (hasNetwork() && !world.isClient()) {
             KineticNetwork network = getOrCreateNetwork();
             if (!network.initialized)
                 network.initFromTE(capacity, stress, networkSize);
@@ -115,7 +115,7 @@ public class KineticBlockEntity extends SmartBlockEntity {
 
     @Override
     public void tick() {
-        if (!world.isClient && needsSpeedUpdate())
+        if (!world.isClient() && needsSpeedUpdate())
             attachKinetics();
 
         super.tick();
@@ -123,7 +123,7 @@ public class KineticBlockEntity extends SmartBlockEntity {
 
         preventSpeedUpdate = 0;
 
-        if (world.isClient) {
+        if (world.isClient()) {
             return;
         }
 
@@ -211,7 +211,7 @@ public class KineticBlockEntity extends SmartBlockEntity {
 
     @Override
     public void remove() {
-        if (!world.isClient) {
+        if (!world.isClient()) {
             if (hasNetwork())
                 getOrCreateNetwork().remove(this);
             detachKinetics();
@@ -296,7 +296,7 @@ public class KineticBlockEntity extends SmartBlockEntity {
 
     public void setSource(BlockPos source) {
         this.source = source;
-        if (world == null || world.isClient)
+        if (world == null || world.isClient())
             return;
 
         BlockEntity blockEntity = world.getBlockEntity(source);

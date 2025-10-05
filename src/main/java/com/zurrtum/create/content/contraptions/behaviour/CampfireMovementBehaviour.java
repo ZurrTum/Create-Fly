@@ -8,7 +8,7 @@ import net.minecraft.util.math.random.Random;
 public class CampfireMovementBehaviour extends MovementBehaviour {
     @Override
     public void tick(MovementContext context) {
-        if (context.world == null || !context.world.isClient || context.position == null || !context.state.get(CampfireBlock.LIT) || context.disabled)
+        if (context.world == null || !context.world.isClient() || context.position == null || !context.state.get(CampfireBlock.LIT) || context.disabled)
             return;
 
         // Mostly copied from CampfireBlock and CampfireBlockEntity

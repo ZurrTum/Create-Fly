@@ -82,7 +82,7 @@ public class LogisticallyLinkedBehaviour extends BlockEntityBehaviour<SmartBlock
     }
 
     public static void keepAlive(LogisticallyLinkedBehaviour behaviour) {
-        boolean onClient = behaviour.blockEntity.getWorld().isClient;
+        boolean onClient = behaviour.blockEntity.getWorld().isClient();
         if (behaviour.redstonePower == 15)
             return;
         try {
@@ -126,7 +126,7 @@ public class LogisticallyLinkedBehaviour extends BlockEntityBehaviour<SmartBlock
     @Override
     public void initialize() {
         super.initialize();
-        if (getWorld().isClient)
+        if (getWorld().isClient())
             return;
 
         if (!loadedGlobally && global) {

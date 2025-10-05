@@ -107,7 +107,7 @@ public class GirderBlock extends Block implements Waterloggable, IWrenchable {
             );
 
             level.playSound(null, pos, SoundEvents.BLOCK_NETHERITE_BLOCK_HIT, SoundCategory.BLOCKS, 0.5f, 1.25f);
-            if (!level.isClient && !player.isCreative()) {
+            if (!level.isClient() && !player.isCreative()) {
                 stack.decrement(1);
                 if (stack.isEmpty())
                     player.setStackInHand(hand, ItemStack.EMPTY);

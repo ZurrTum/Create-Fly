@@ -94,7 +94,7 @@ public class TrackPlacement {
         int lookAngle = (int) (22.5 + AngleHelper.deg(MathHelper.atan2(lookVec.z, lookVec.x)) % 360) / 8;
         int maxLength = AllConfigs.server().trains.maxTrackPlacementLength.get();
 
-        if (level.isClient && cached != null && pos2.equals(hoveringPos) && stack.equals(lastItem) && hoveringMaxed == maximiseTurn && lookAngle == hoveringAngle)
+        if (level.isClient() && cached != null && pos2.equals(hoveringPos) && stack.equals(lastItem) && hoveringMaxed == maximiseTurn && lookAngle == hoveringAngle)
             return cached;
 
         PlacementInfo info = new PlacementInfo(TrackMaterial.fromItem(stack.getItem()));
@@ -120,7 +120,7 @@ public class TrackPlacement {
         Vec3d normal1 = connectingFrom.normal();
         BlockState state1 = level.getBlockState(pos1);
 
-        if (level.isClient) {
+        if (level.isClient()) {
             info.end1 = end1;
             info.end2 = end2;
             info.normal1 = normal1;
@@ -142,7 +142,7 @@ public class TrackPlacement {
             axis1 = axis1.multiply(-1);
             normedAxis1 = normedAxis1.multiply(-1);
             end1 = track.getCurveStart(level, pos1, state1, axis1);
-            if (level.isClient) {
+            if (level.isClient()) {
                 info.end1 = end1;
                 info.axis1 = axis1;
             }
@@ -156,7 +156,7 @@ public class TrackPlacement {
             axis2 = axis2.multiply(-1);
             normedAxis2 = normedAxis2.multiply(-1);
             end2 = track.getCurveStart(level, pos2, state2, axis2);
-            if (level.isClient) {
+            if (level.isClient()) {
                 info.end2 = end2;
                 info.axis2 = axis2;
             }
@@ -171,7 +171,7 @@ public class TrackPlacement {
         double absAscend = Math.abs(ascend);
         boolean slope = !normal1.equals(normal2);
 
-        if (level.isClient) {
+        if (level.isClient()) {
             Vec3d offset1 = axis1.multiply(info.end1Extent);
             Vec3d offset2 = axis2.multiply(info.end2Extent);
             BlockPos targetPos1 = pos1.add(BlockPos.ofFloored(offset1));
@@ -366,7 +366,7 @@ public class TrackPlacement {
 
         if (!player.isCreative()) {
             for (boolean simulate : Iterate.trueAndFalse) {
-                if (level.isClient && !simulate)
+                if (level.isClient() && !simulate)
                     break;
 
                 int tracks = info.requiredTracks;

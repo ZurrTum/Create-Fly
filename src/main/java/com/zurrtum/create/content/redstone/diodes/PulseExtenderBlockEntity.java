@@ -22,7 +22,7 @@ public class PulseExtenderBlockEntity extends BrassDiodeBlockEntity {
             return;
         }
 
-        if (state == 1 && powering && !world.isClient) {
+        if (state == 1 && powering && !world.isClient()) {
             world.setBlockState(pos, getCachedState().with(POWERING, false));
         }
 

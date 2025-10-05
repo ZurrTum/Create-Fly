@@ -76,7 +76,7 @@ public class AnalogLeverBlock extends WallMountedBlock implements IBE<AnalogLeve
         Hand hand,
         BlockHitResult hitResult
     ) {
-        if (worldIn.isClient) {
+        if (worldIn.isClient()) {
             addParticles(state, worldIn, pos, 1.0F);
             return ActionResult.SUCCESS;
         }

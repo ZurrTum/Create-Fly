@@ -158,7 +158,7 @@ public class FilterItem extends Item implements MenuProvider, SupportsItemCopyin
     @Override
     public ActionResult use(World world, PlayerEntity player, Hand hand) {
         if (!player.isSneaking() && hand == Hand.MAIN_HAND) {
-            if (!world.isClient && player instanceof ServerPlayerEntity serverPlayer)
+            if (!world.isClient() && player instanceof ServerPlayerEntity serverPlayer)
                 openHandledScreen(serverPlayer);
             return ActionResult.SUCCESS;
         }

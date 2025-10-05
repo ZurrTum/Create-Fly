@@ -40,7 +40,7 @@ public class BeltTunnelInteractionHandler {
         }
 
         World world = beltInventory.belt.getWorld();
-        boolean onServer = !world.isClient || beltInventory.belt.isVirtual();
+        boolean onServer = !world.isClient() || beltInventory.belt.isVirtual();
         boolean removed = false;
         BeltTunnelBlockEntity nextTunnel = getTunnelOnSegment(beltInventory, upcomingSegment);
         int transferred = current.stack.getCount();

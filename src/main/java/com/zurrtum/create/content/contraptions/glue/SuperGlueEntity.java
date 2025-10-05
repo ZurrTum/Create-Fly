@@ -170,13 +170,13 @@ public class SuperGlueEntity extends Entity implements SpecialEntityItemRequirem
 
     @Override
     public void move(MovementType typeIn, Vec3d pos) {
-        if (!getWorld().isClient && isAlive() && pos.lengthSquared() > 0.0D)
+        if (!getWorld().isClient() && isAlive() && pos.lengthSquared() > 0.0D)
             discard();
     }
 
     @Override
     public void addVelocity(double x, double y, double z) {
-        if (!getWorld().isClient && isAlive() && x * x + y * y + z * z > 0.0D)
+        if (!getWorld().isClient() && isAlive() && x * x + y * y + z * z > 0.0D)
             discard();
     }
 

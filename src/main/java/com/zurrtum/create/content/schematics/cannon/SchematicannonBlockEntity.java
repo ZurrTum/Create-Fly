@@ -193,7 +193,7 @@ public class SchematicannonBlockEntity extends SmartBlockEntity implements MenuP
             BlockPos readBlockPos = launched.target;
 
             // Always write to Server block entity
-            if (world == null || !world.isClient) {
+            if (world == null || !world.isClient()) {
                 flyingBlocks.add(launched);
                 continue;
             }
@@ -263,7 +263,7 @@ public class SchematicannonBlockEntity extends SmartBlockEntity implements MenuP
         previousTarget = printer.getCurrentTarget();
         tickFlyingBlocks();
 
-        if (world.isClient)
+        if (world.isClient())
             return;
 
         // Update Fuel and Paper

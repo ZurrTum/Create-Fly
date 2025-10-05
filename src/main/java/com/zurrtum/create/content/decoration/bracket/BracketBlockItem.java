@@ -35,7 +35,7 @@ public class BracketBlockItem extends BlockItem {
             return ActionResult.FAIL;
         if (!behaviour.canHaveBracket())
             return ActionResult.FAIL;
-        if (world.isClient)
+        if (world.isClient())
             return ActionResult.SUCCESS;
 
         Optional<BlockState> suitableBracket = bracketBlock.getSuitableBracket(state, context.getSide());

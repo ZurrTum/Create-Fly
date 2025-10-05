@@ -48,7 +48,7 @@ public class AnalogLeverBlockEntity extends SmartBlockEntity {
             if (lastChange == 0)
                 updateOutput();
         }
-        if (world.isClient)
+        if (world.isClient())
             clientState.tickChaser();
     }
 

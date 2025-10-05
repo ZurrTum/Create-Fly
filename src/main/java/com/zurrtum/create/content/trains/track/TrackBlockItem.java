@@ -60,13 +60,13 @@ public class TrackBlockItem extends BlockItem {
 
         if (!hasGlint(stack)) {
             if (state.getBlock() instanceof TrackBlock track && track.getTrackAxes(level, pos, state).size() > 1) {
-                if (!level.isClient)
+                if (!level.isClient())
                     player.sendMessage(Text.translatable("create.track.junction_start").formatted(Formatting.RED), true);
                 return ActionResult.SUCCESS;
             }
 
             if (level.getBlockEntity(pos) instanceof TrackBlockEntity tbe && tbe.isTilted()) {
-                if (!level.isClient)
+                if (!level.isClient())
                     player.sendMessage(Text.translatable("create.track.turn_start").formatted(Formatting.RED), true);
                 return ActionResult.SUCCESS;
             }
@@ -97,14 +97,14 @@ public class TrackBlockItem extends BlockItem {
         boolean hasGirder = offhandItem.isOf(AllItems.METAL_GIRDER);
         PlacementInfo info = TrackPlacement.tryConnect(level, player, pos, state, stack, hasGirder, extend);
 
-        if (info.message != null && !level.isClient)
+        if (info.message != null && !level.isClient())
             player.sendMessage(Text.translatable("create." + info.message), true);
         if (!info.valid) {
             AllSoundEvents.DENY.playFrom(player, 1, 1);
             return ActionResult.FAIL;
         }
 
-        if (level.isClient)
+        if (level.isClient())
             return ActionResult.SUCCESS;
 
         stack = player.getMainHandStack();
@@ -129,7 +129,7 @@ public class TrackBlockItem extends BlockItem {
     }
 
     public static ActionResult clearSelection(ItemStack stack, World level, PlayerEntity player) {
-        if (level.isClient) {
+        if (level.isClient()) {
             level.playSound(player, player.getBlockPos(), SoundEvents.ENTITY_ITEM_FRAME_REMOVE_ITEM, SoundCategory.BLOCKS, 0.75f, 1.0f);
         } else {
             player.sendMessage(Text.translatable("create.track.selection_cleared"), true);

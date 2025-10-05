@@ -42,7 +42,7 @@ public class ElevatorPulleyBlock extends HorizontalKineticBlock implements IBE<E
             return ActionResult.FAIL;
         if (!stack.isEmpty())
             return ActionResult.PASS_TO_DEFAULT_BLOCK_ACTION;
-        if (level.isClient)
+        if (level.isClient())
             return ActionResult.SUCCESS;
         return onBlockEntityUseItemOn(
             level, pos, be -> {

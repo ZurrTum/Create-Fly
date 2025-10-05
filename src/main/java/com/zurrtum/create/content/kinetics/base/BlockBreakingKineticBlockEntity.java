@@ -74,7 +74,7 @@ public abstract class BlockBreakingKineticBlockEntity extends KineticBlockEntity
     @Override
     public void invalidate() {
         super.invalidate();
-        if (!world.isClient && destroyProgress != 0)
+        if (!world.isClient() && destroyProgress != 0)
             world.setBlockBreakingInfo(breakerId, breakingPos, -1);
     }
 
@@ -82,7 +82,7 @@ public abstract class BlockBreakingKineticBlockEntity extends KineticBlockEntity
     public void tick() {
         super.tick();
 
-        if (world.isClient)
+        if (world.isClient())
             return;
         if (!shouldRun())
             return;

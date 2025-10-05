@@ -105,7 +105,7 @@ public class DisplayLinkBlock extends WrenchableDirectionalBlock implements IBE<
 
     @Override
     public void neighborUpdate(BlockState state, World worldIn, BlockPos pos, Block blockIn, BlockPos fromPos, boolean isMoving) {
-        if (worldIn.isClient)
+        if (worldIn.isClient())
             return;
         if (fromPos.equals(pos.offset(state.get(FACING).getOpposite())))
             sendToGatherers(worldIn, fromPos, (dlte, p) -> dlte.tickSource(), RedstonePowerDisplaySource.class);
@@ -120,7 +120,7 @@ public class DisplayLinkBlock extends WrenchableDirectionalBlock implements IBE<
         @Nullable WireOrientation wireOrientation,
         boolean isMoving
     ) {
-        if (worldIn.isClient)
+        if (worldIn.isClient())
             return;
 
         boolean powered = shouldBePowered(state, worldIn, pos);
@@ -156,7 +156,7 @@ public class DisplayLinkBlock extends WrenchableDirectionalBlock implements IBE<
             return ActionResult.PASS;
         if (player.isSneaking())
             return ActionResult.PASS;
-        if (level.isClient) {
+        if (level.isClient()) {
             withBlockEntityDo(level, pos, be -> AllClientHandle.INSTANCE.openDisplayLinkScreen(be, player));
         }
         return ActionResult.SUCCESS;

@@ -36,7 +36,7 @@ public interface EncasableBlock {
                 if (encased.getCasing().asItem() != heldItem.getItem())
                     continue;
 
-                if (level.isClient)
+                if (level.isClient())
                     return ActionResult.SUCCESS;
 
                 encased.handleEncasing(state, level, pos, heldItem, player, hand, ray);

@@ -56,7 +56,7 @@ public abstract class AbstractChassisBlock extends PillarBlock implements IWrenc
             for (Direction face : Iterate.directions) {
                 BooleanProperty glueableSide = getGlueableSide(state, face);
                 if (glueableSide != null && !state.get(glueableSide) && glueAllowedOnSide(level, pos, state, face)) {
-                    if (level.isClient) {
+                    if (level.isClient()) {
                         Vec3d vec = hitResult.getPos();
                         level.addParticleClient(ParticleTypes.ITEM_SLIME, vec.x, vec.y, vec.z, 0, 0, 0);
                         return ActionResult.SUCCESS;
@@ -65,7 +65,7 @@ public abstract class AbstractChassisBlock extends PillarBlock implements IWrenc
                     state = state.with(glueableSide, true);
                 }
             }
-            if (!level.isClient)
+            if (!level.isClient())
                 level.setBlockState(pos, state);
             return ActionResult.SUCCESS;
         }
@@ -76,7 +76,7 @@ public abstract class AbstractChassisBlock extends PillarBlock implements IWrenc
             return ActionResult.PASS_TO_DEFAULT_BLOCK_ACTION;
         if (!glueAllowedOnSide(level, pos, state, hitResult.getSide()))
             return ActionResult.PASS_TO_DEFAULT_BLOCK_ACTION;
-        if (level.isClient) {
+        if (level.isClient()) {
             Vec3d vec = hitResult.getPos();
             level.addParticleClient(ParticleTypes.ITEM_SLIME, vec.x, vec.y, vec.z, 0, 0, 0);
             return ActionResult.SUCCESS;

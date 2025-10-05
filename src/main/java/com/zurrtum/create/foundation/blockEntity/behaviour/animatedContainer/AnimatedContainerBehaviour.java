@@ -53,7 +53,7 @@ public class AnimatedContainerBehaviour<M extends MenuBase<? extends SmartBlockE
 
     void updateOpenCount() {
         World level = getWorld();
-        if (level.isClient)
+        if (level.isClient())
             return;
         if (openCount == 0)
             return;
@@ -77,7 +77,7 @@ public class AnimatedContainerBehaviour<M extends MenuBase<? extends SmartBlockE
     public void startOpen(PlayerEntity player) {
         if (player.isSpectator())
             return;
-        if (getWorld().isClient)
+        if (getWorld().isClient())
             return;
         if (openCount < 0)
             openCount = 0;
@@ -90,7 +90,7 @@ public class AnimatedContainerBehaviour<M extends MenuBase<? extends SmartBlockE
     public void stopOpen(PlayerEntity player) {
         if (player.isSpectator())
             return;
-        if (getWorld().isClient)
+        if (getWorld().isClient())
             return;
         openCount--;
         if (openCount == 0 && openChanged != null)

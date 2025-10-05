@@ -15,7 +15,7 @@ public class LivingEntityMixin {
     private boolean clientTick(LivingEntity entity, Operation<Boolean> original) {
         if (original.call(entity)) {
             World world = entity.getWorld();
-            if (world.isClient && entity instanceof ClientPlayerEntity clientPlayer) {
+            if (world.isClient() && entity instanceof ClientPlayerEntity clientPlayer) {
                 RemainingAirOverlay.update(clientPlayer, world);
             }
             return true;

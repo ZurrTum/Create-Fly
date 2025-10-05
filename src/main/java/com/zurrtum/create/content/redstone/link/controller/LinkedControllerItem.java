@@ -40,20 +40,20 @@ public class LinkedControllerItem extends Item implements MenuProvider {
                 BlockState hitState = world.getBlockState(pos);
                 if (player.isSneaking()) {
                     if (hitState.isOf(AllBlocks.LECTERN_CONTROLLER)) {
-                        if (!world.isClient)
+                        if (!world.isClient())
                             AllBlocks.LECTERN_CONTROLLER.withBlockEntityDo(world, pos, be -> be.swapControllers(stack, player, hand, hitState));
                         return ActionResult.SUCCESS;
                     }
                 } else {
                     if (hitState.isOf(AllBlocks.REDSTONE_LINK)) {
-                        if (world.isClient)
+                        if (world.isClient())
                             AllClientHandle.INSTANCE.toggleLinkedControllerBindMode(pos);
                         player.getItemCooldownManager().set(stack, 2);
                         return ActionResult.SUCCESS;
                     }
 
                     if (hitState.isOf(Blocks.LECTERN) && !hitState.get(LecternBlock.HAS_BOOK)) {
-                        if (!world.isClient) {
+                        if (!world.isClient()) {
                             ItemStack lecternStack = player.isCreative() ? stack.copy() : stack.split(1);
                             AllBlocks.LECTERN_CONTROLLER.replaceLectern(hitState, world, pos, lecternStack);
                         }
@@ -75,13 +75,13 @@ public class LinkedControllerItem extends Item implements MenuProvider {
         ItemStack heldItem = player.getStackInHand(hand);
 
         if (player.isSneaking() && hand == Hand.MAIN_HAND) {
-            if (!world.isClient && player instanceof ServerPlayerEntity serverPlayer && player.canModifyBlocks())
+            if (!world.isClient() && player instanceof ServerPlayerEntity serverPlayer && player.canModifyBlocks())
                 openHandledScreen(serverPlayer);
             return ActionResult.SUCCESS;
         }
 
         if (!player.isSneaking()) {
-            if (world.isClient)
+            if (world.isClient())
                 AllClientHandle.INSTANCE.toggleLinkedControllerActive();
             player.getItemCooldownManager().set(heldItem, 2);
         }

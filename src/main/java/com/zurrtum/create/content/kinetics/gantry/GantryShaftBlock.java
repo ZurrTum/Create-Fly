@@ -199,7 +199,7 @@ public class GantryShaftBlock extends DirectionalKineticBlock implements IBE<Gan
         @Nullable WireOrientation wireOrientation,
         boolean p_220069_6_
     ) {
-        if (worldIn.isClient)
+        if (worldIn.isClient())
             return;
         boolean previouslyPowered = state.get(POWERED);
         boolean shouldPower = worldIn.isReceivingRedstonePower(pos); // shouldBePowered(state, worldIn, pos);

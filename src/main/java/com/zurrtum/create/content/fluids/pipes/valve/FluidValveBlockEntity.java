@@ -41,7 +41,7 @@ public class FluidValveBlockEntity extends KineticBlockEntity {
         super.tick();
         pointer.tickChaser();
 
-        if (world.isClient)
+        if (world.isClient())
             return;
 
         BlockState blockState = getCachedState();

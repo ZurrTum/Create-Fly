@@ -142,7 +142,7 @@ public class SawBlock extends DirectionalAxisKineticBlock implements IBE<SawBloc
 
         return onBlockEntityUseItemOn(
             level, pos, be -> {
-                if (!level.isClient) {
+                if (!level.isClient()) {
                     for (int i = 0, size = be.inventory.size(); i < size; i++) {
                         ItemStack heldItemStack = be.inventory.getStack(i);
                         if (heldItemStack.isEmpty()) {
@@ -160,7 +160,7 @@ public class SawBlock extends DirectionalAxisKineticBlock implements IBE<SawBloc
 
     @Override
     public void onEntityCollision(BlockState state, World worldIn, BlockPos pos, Entity entityIn, EntityCollisionHandler handler) {
-        if (worldIn.isClient || entityIn instanceof ItemEntity)
+        if (worldIn.isClient() || entityIn instanceof ItemEntity)
             return;
         if (!new Box(pos).contract(.1f).intersects(entityIn.getBoundingBox()))
             return;
@@ -178,7 +178,7 @@ public class SawBlock extends DirectionalAxisKineticBlock implements IBE<SawBloc
         super.onEntityLand(worldIn, entityIn);
         if (!(entityIn instanceof ItemEntity))
             return;
-        if (entityIn.getWorld().isClient)
+        if (entityIn.getWorld().isClient())
             return;
 
         BlockPos pos = entityIn.getBlockPos();

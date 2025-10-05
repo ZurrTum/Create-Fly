@@ -47,7 +47,7 @@ public abstract class ClickToLinkBlockItem extends BlockItem {
         int maxDistance = getMaxDistanceFromSelection();
 
         if (player.isSneaking() && stack.contains(AllDataComponents.CLICK_TO_LINK_DATA)) {
-            if (level.isClient)
+            if (level.isClient())
                 return ActionResult.SUCCESS;
             player.sendMessage(Text.translatable("create." + msgKey + ".clear"), true);
             stack.remove(AllDataComponents.CLICK_TO_LINK_DATA);
@@ -61,7 +61,7 @@ public abstract class ClickToLinkBlockItem extends BlockItem {
             if (!isValidTarget(level, pos)) {
                 if (placeWhenInvalid()) {
                     ActionResult useOn = super.useOnBlock(pContext);
-                    if (level.isClient || useOn == ActionResult.FAIL)
+                    if (level.isClient() || useOn == ActionResult.FAIL)
                         return useOn;
 
                     ItemStack itemInHand = player.getStackInHand(pContext.getHand());
@@ -72,13 +72,13 @@ public abstract class ClickToLinkBlockItem extends BlockItem {
                     return useOn;
                 }
 
-                if (level.isClient)
+                if (level.isClient())
                     AllSoundEvents.DENY.playFrom(player);
                 player.sendMessage(Text.translatable("create." + msgKey + ".invalid"), true);
                 return ActionResult.FAIL;
             }
 
-            if (level.isClient)
+            if (level.isClient())
                 return ActionResult.SUCCESS;
 
             player.sendMessage(Text.translatable("create." + msgKey + ".set"), true);
@@ -104,7 +104,7 @@ public abstract class ClickToLinkBlockItem extends BlockItem {
         stack.set(DataComponentTypes.BLOCK_ENTITY_DATA, NbtComponent.of(beTag));
 
         ActionResult useOn = super.useOnBlock(pContext);
-        if (level.isClient || useOn == ActionResult.FAIL)
+        if (level.isClient() || useOn == ActionResult.FAIL)
             return useOn;
 
         ItemStack itemInHand = player.getStackInHand(pContext.getHand());

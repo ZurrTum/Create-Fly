@@ -180,7 +180,7 @@ public class PipeConnection {
         if (flow.fluid.isEmpty())
             return;
 
-        if (world.isClient) {
+        if (world.isClient()) {
             if (!source.isPresent())
                 determineSource(world, pos);
 

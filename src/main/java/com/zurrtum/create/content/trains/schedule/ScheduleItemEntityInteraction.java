@@ -61,7 +61,7 @@ public class ScheduleItemEntityInteraction {
             return null;
 
         World world = player.getWorld();
-        boolean onServer = !world.isClient;
+        boolean onServer = !world.isClient();
 
         if (train.runtime.paused && !train.runtime.completed) {
             if (onServer) {

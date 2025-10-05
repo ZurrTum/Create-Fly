@@ -43,7 +43,7 @@ public class BracketedBlockEntityBehaviour extends BlockEntityBehaviour<SmartBlo
         reRender = true;
         blockEntity.notifyUpdate();
         World world = getWorld();
-        if (world.isClient)
+        if (world.isClient())
             return;
         blockEntity.getCachedState().updateNeighbors(world, getPos(), 3);
     }
@@ -63,7 +63,7 @@ public class BracketedBlockEntityBehaviour extends BlockEntityBehaviour<SmartBlo
 
         BlockState removed = this.bracket;
         World world = getWorld();
-        if (!world.isClient)
+        if (!world.isClient())
             world.syncWorldEvent(WorldEvents.BLOCK_BROKEN, getPos(), Block.getRawIdFromState(bracket));
         this.bracket = null;
         reRender = true;
@@ -72,7 +72,7 @@ public class BracketedBlockEntityBehaviour extends BlockEntityBehaviour<SmartBlo
             return removed;
         }
         blockEntity.notifyUpdate();
-        if (world.isClient)
+        if (world.isClient())
             return removed;
         blockEntity.getCachedState().updateNeighbors(world, getPos(), 3);
         return removed;

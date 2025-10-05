@@ -71,7 +71,7 @@ public class InvManipulationBehaviour extends CapManipulationBehaviourBase<Inven
         boolean shouldSimulate = simulateNext;
         simulateNext = false;
 
-        if (getWorld().isClient)
+        if (getWorld().isClient())
             return ItemStack.EMPTY;
         Inventory inventory = targetCapability;
         if (inventory == null)

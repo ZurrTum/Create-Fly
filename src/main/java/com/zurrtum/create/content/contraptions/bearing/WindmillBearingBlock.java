@@ -33,7 +33,7 @@ public class WindmillBearingBlock extends BearingBlock implements IBE<WindmillBe
         if (player.isSneaking())
             return ActionResult.FAIL;
         if (stack.isEmpty()) {
-            if (level.isClient)
+            if (level.isClient())
                 return ActionResult.SUCCESS;
             withBlockEntityDo(
                 level, pos, be -> {

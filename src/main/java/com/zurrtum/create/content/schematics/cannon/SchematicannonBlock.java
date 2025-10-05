@@ -45,7 +45,7 @@ public class SchematicannonBlock extends Block implements IBE<SchematicannonBloc
 
     @Override
     protected ActionResult onUse(BlockState state, World level, BlockPos pos, PlayerEntity player, BlockHitResult hitResult) {
-        if (level.isClient)
+        if (level.isClient())
             return ActionResult.SUCCESS;
         withBlockEntityDo(level, pos, be -> be.openHandledScreen((ServerPlayerEntity) player));
         return ActionResult.SUCCESS;

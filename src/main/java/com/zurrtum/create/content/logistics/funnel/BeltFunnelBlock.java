@@ -177,7 +177,7 @@ public class BeltFunnelBlock extends AbstractHorizontalFunnelBlock implements Sp
     @Override
     public ActionResult onWrenched(BlockState state, ItemUsageContext context) {
         World world = context.getWorld();
-        if (world.isClient)
+        if (world.isClient())
             return ActionResult.SUCCESS;
 
         Shape shape = state.get(SHAPE);

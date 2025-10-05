@@ -73,7 +73,7 @@ public class BlazeBurnerBlockEntity extends SmartBlockEntity {
     public void tick() {
         super.tick();
 
-        if (world.isClient) {
+        if (world.isClient()) {
             AllClientHandle.INSTANCE.tickBlazeBurnerAnimation(this);
             if (!isVirtual())
                 spawnParticles(getHeatLevelFromBlock(), 1);
@@ -220,7 +220,7 @@ public class BlazeBurnerBlockEntity extends SmartBlockEntity {
         activeFuel = newFuel;
         remainingBurnTime = newBurnTime;
 
-        if (world.isClient) {
+        if (world.isClient()) {
             spawnParticleBurst(activeFuel == FuelType.SPECIAL);
             return true;
         }
@@ -249,7 +249,7 @@ public class BlazeBurnerBlockEntity extends SmartBlockEntity {
 
         HeatLevel next = getHeatLevelFromBlock().nextActiveLevel();
 
-        if (world.isClient) {
+        if (world.isClient()) {
             spawnParticleBurst(next.isAtLeast(HeatLevel.SEETHING));
             return;
         }

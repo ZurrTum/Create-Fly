@@ -48,7 +48,7 @@ public class BlueprintMenu extends GhostItemMenu<BlueprintSection> {
 
     public void onCraftMatrixChanged() {
         World level = contentHolder.getBlueprintWorld();
-        if (level.isClient)
+        if (level.isClient())
             return;
 
         ServerPlayerEntity serverplayerentity = (ServerPlayerEntity) player;
@@ -115,7 +115,7 @@ public class BlueprintMenu extends GhostItemMenu<BlueprintSection> {
             super.markDirty();
             int index = getIndex();
             if (index == 9) {
-                if (hasStack() && !contentHolder.getBlueprintWorld().isClient) {
+                if (hasStack() && !contentHolder.getBlueprintWorld().isClient()) {
                     contentHolder.inferredIcon = false;
                     ServerPlayerEntity serverplayerentity = (ServerPlayerEntity) player;
                     serverplayerentity.networkHandler.sendPacket(new ScreenHandlerSlotUpdateS2CPacket(syncId, nextRevision(), 45, getStack()));

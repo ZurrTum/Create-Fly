@@ -98,7 +98,7 @@ public class PoweredLatchBlock extends ToggleLatchBlock {
     protected ActionResult activated(World worldIn, BlockPos pos, BlockState state) {
         if (state.get(POWERED) != state.get(POWERED_SIDE))
             return ActionResult.PASS_TO_DEFAULT_BLOCK_ACTION;
-        if (!worldIn.isClient) {
+        if (!worldIn.isClient()) {
             float f = !state.get(POWERING) ? 0.6F : 0.5F;
             worldIn.playSound(null, pos, SoundEvents.BLOCK_LEVER_CLICK, SoundCategory.BLOCKS, 0.3F, f);
             worldIn.setBlockState(pos, state.cycle(POWERING), Block.NOTIFY_LISTENERS);

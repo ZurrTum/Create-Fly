@@ -34,7 +34,7 @@ public class ToolboxHandler {
     static int validationTimer = 20;
 
     public static void entityTick(Entity entity, World world) {
-        if (world.isClient)
+        if (world.isClient())
             return;
         if (!(world instanceof ServerWorld))
             return;

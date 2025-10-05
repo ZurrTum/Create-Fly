@@ -239,7 +239,7 @@ public class MinecartContraptionItem extends Item {
         }
 
         World world = player.getWorld();
-        if (world.isClient) {
+        if (world.isClient()) {
             return ActionResult.SUCCESS;
         }
 

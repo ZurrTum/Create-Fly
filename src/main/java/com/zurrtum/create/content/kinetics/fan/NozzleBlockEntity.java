@@ -75,7 +75,7 @@ public class NozzleBlockEntity extends SmartBlockEntity {
             setRange(range);
 
         Vec3d center = VecHelper.getCenterOf(pos);
-        if (world.isClient && range != 0) {
+        if (world.isClient() && range != 0) {
             if (world.random.nextInt(MathHelper.clamp((AllConfigs.server().kinetics.fanPushDistance.get() - (int) range), 1, 10)) == 0) {
                 Vec3d start = VecHelper.offsetRandomly(center, world.random, pushing ? 1 : range / 2);
                 Vec3d motion = center.subtract(start).normalize()
@@ -88,7 +88,7 @@ public class NozzleBlockEntity extends SmartBlockEntity {
             Entity entity = iterator.next();
             Vec3d diff = entity.getPos().subtract(center);
 
-            if (!(entity instanceof PlayerEntity) && world.isClient)
+            if (!(entity instanceof PlayerEntity) && world.isClient())
                 continue;
 
             double distance = diff.length();
@@ -163,7 +163,7 @@ public class NozzleBlockEntity extends SmartBlockEntity {
             iterator.remove();
         }
 
-        if (!pushing && pushingEntities.size() > 256 && !world.isClient) {
+        if (!pushing && pushingEntities.size() > 256 && !world.isClient()) {
             world.createExplosion(null, center.x, center.y, center.z, 2, ExplosionSourceType.NONE);
             for (Iterator<Entity> iterator = pushingEntities.iterator(); iterator.hasNext(); ) {
                 Entity entity = iterator.next();

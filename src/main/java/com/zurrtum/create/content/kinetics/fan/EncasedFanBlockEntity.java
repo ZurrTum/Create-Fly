@@ -112,7 +112,7 @@ public class EncasedFanBlockEntity extends KineticBlockEntity implements IAirCur
     public void tick() {
         super.tick();
 
-        boolean server = !world.isClient || isVirtual();
+        boolean server = !world.isClient() || isVirtual();
 
         if (server && airCurrentUpdateCooldown-- <= 0) {
             airCurrentUpdateCooldown = AllConfigs.server().kinetics.fanBlockCheckRate.get();

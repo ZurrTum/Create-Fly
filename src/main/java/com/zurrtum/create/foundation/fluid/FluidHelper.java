@@ -158,7 +158,7 @@ public class FluidHelper {
         if (capability == null) {
             return false;
         }
-        if (worldIn.isClient)
+        if (worldIn.isClient())
             return true;
         Pair<FluidStack, ItemStack> emptyingResult = GenericItemEmptying.emptyItem(worldIn, heldItem, true);
         FluidStack fluidStack = emptyingResult.getFirst();
@@ -198,7 +198,7 @@ public class FluidHelper {
             if (requiredAmountForItem > fluid.getAmount())
                 continue;
 
-            if (world.isClient)
+            if (world.isClient())
                 return true;
 
             if (player.isCreative() || be instanceof CreativeFluidTankBlockEntity)

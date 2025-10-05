@@ -33,7 +33,7 @@ public class StickerBlockEntity extends SmartBlockEntity {
     @Override
     public void initialize() {
         super.initialize();
-        if (!world.isClient)
+        if (!world.isClient())
             return;
         piston.startWithValue(isBlockStateExtended() ? 1 : 0);
     }
@@ -46,7 +46,7 @@ public class StickerBlockEntity extends SmartBlockEntity {
     @Override
     public void tick() {
         super.tick();
-        if (!world.isClient)
+        if (!world.isClient())
             return;
         piston.tickChaser();
 

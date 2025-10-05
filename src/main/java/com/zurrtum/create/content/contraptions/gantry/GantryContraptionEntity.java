@@ -55,7 +55,7 @@ public class GantryContraptionEntity extends AbstractContraptionEntity {
 
         double prevAxisMotion = axisMotion;
         World world = getWorld();
-        if (world.isClient) {
+        if (world.isClient()) {
             clientOffsetDiff *= .75f;
             updateClientMotion();
         }
@@ -65,7 +65,7 @@ public class GantryContraptionEntity extends AbstractContraptionEntity {
         Vec3d movementVec = getVelocity();
 
         if (ContraptionCollider.collideBlocks(this)) {
-            if (!world.isClient)
+            if (!world.isClient())
                 disassemble();
             return;
         }
@@ -80,7 +80,7 @@ public class GantryContraptionEntity extends AbstractContraptionEntity {
 
         if (Math.signum(prevAxisMotion) != Math.signum(axisMotion) && prevAxisMotion != 0)
             contraption.stop(world);
-        if (!world.isClient && (prevAxisMotion != axisMotion || age % 3 == 0))
+        if (!world.isClient() && (prevAxisMotion != axisMotion || age % 3 == 0))
             sendPacket();
     }
 
@@ -99,7 +99,7 @@ public class GantryContraptionEntity extends AbstractContraptionEntity {
         World world = getWorld();
         BlockEntity be = world.getBlockEntity(gantryShaftPos);
         if (!(be instanceof GantryShaftBlockEntity gantryShaftBlockEntity) || !be.getCachedState().isOf(AllBlocks.GANTRY_SHAFT)) {
-            if (!world.isClient) {
+            if (!world.isClient()) {
                 setContraptionMotion(Vec3d.ZERO);
                 disassemble();
             }
@@ -112,7 +112,7 @@ public class GantryContraptionEntity extends AbstractContraptionEntity {
         float pinionMovementSpeed = gantryShaftBlockEntity.getPinionMovementSpeed();
         if (blockState.get(GantryShaftBlock.POWERED) || pinionMovementSpeed == 0) {
             setContraptionMotion(Vec3d.ZERO);
-            if (!world.isClient)
+            if (!world.isClient())
                 disassemble();
             return;
         }
@@ -128,12 +128,12 @@ public class GantryContraptionEntity extends AbstractContraptionEntity {
         if ((MathHelper.floor(currentCoord) + .5f < nextCoord != (pinionMovementSpeed * direction.getDirection().offset() < 0)))
             if (!gantryShaftBlockEntity.canAssembleOn()) {
                 setContraptionMotion(Vec3d.ZERO);
-                if (!world.isClient)
+                if (!world.isClient())
                     disassemble();
                 return;
             }
 
-        if (world.isClient)
+        if (world.isClient())
             return;
 
         axisMotion = pinionMovementSpeed;

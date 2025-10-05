@@ -112,7 +112,7 @@ public class PotatoCannonItem extends RangedWeaponItem implements SwingControlIt
         ItemStack ammoStack = ammo.stack();
         PotatoCannonProjectileType projectileType = ammo.type();
 
-        if (level.isClient) {
+        if (level.isClient()) {
             player.clearActiveItem();
             AllClientHandle.INSTANCE.cannonDontAnimateItem(hand);
             return ActionResult.CONSUME.withNewHandStack(heldStack);

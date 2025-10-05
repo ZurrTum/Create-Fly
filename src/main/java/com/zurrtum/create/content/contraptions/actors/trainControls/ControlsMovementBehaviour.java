@@ -27,7 +27,7 @@ public class ControlsMovementBehaviour extends MovementBehaviour {
     @Override
     public void tick(MovementContext context) {
         super.tick(context);
-        if (!context.world.isClient)
+        if (!context.world.isClient())
             return;
         if (!(context.temporaryData instanceof LeverAngles))
             context.temporaryData = new LeverAngles();

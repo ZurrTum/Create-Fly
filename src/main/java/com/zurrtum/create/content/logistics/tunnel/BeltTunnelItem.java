@@ -36,7 +36,7 @@ public class BeltTunnelItem extends BlockItem {
     @Override
     protected boolean postPlacement(BlockPos pos, World world, PlayerEntity p_195943_3_, ItemStack p_195943_4_, BlockState state) {
         boolean flag = super.postPlacement(pos, world, p_195943_3_, p_195943_4_, state);
-        if (!world.isClient) {
+        if (!world.isClient()) {
             BeltBlockEntity belt = BeltHelper.getSegmentBE(world, pos.down());
             if (belt != null && belt.casing == CasingType.NONE)
                 belt.setCasingType(state.isOf(AllBlocks.ANDESITE_TUNNEL) ? CasingType.ANDESITE : CasingType.BRASS);

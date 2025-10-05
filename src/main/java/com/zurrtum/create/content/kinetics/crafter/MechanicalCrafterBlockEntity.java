@@ -284,7 +284,7 @@ public class MechanicalCrafterBlockEntity extends KineticBlockEntity implements 
         if (phase == Phase.ACCEPTING)
             return;
 
-        boolean onClient = world.isClient;
+        boolean onClient = world.isClient();
         boolean runLogic = !onClient || isVirtual();
 
         if (wasPoweredBefore != world.isReceivingRedstonePower(pos)) {
@@ -504,7 +504,7 @@ public class MechanicalCrafterBlockEntity extends KineticBlockEntity implements 
     @Override
     public void lazyTick() {
         super.lazyTick();
-        if (world.isClient && !isVirtual())
+        if (world.isClient() && !isVirtual())
             return;
         if (phase == Phase.IDLE && craftingItemPresent())
             checkCompletedRecipe(false);
@@ -523,7 +523,7 @@ public class MechanicalCrafterBlockEntity extends KineticBlockEntity implements 
     public void checkCompletedRecipe(boolean poweredStart) {
         if (getSpeed() == 0)
             return;
-        if (world.isClient && !isVirtual())
+        if (world.isClient() && !isVirtual())
             return;
         List<MechanicalCrafterBlockEntity> chain = RecipeGridHandler.getAllCraftersOfChainIf(
             this,

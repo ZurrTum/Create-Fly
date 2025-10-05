@@ -347,7 +347,7 @@ public class ChainConveyorBlockEntity extends KineticBlockEntity implements Tran
         if (!connections.contains(connection))
             return false;
         travellingPackages.computeIfAbsent(connection, $ -> new ArrayList<>()).add(box);
-        if (world.isClient)
+        if (world.isClient())
             return true;
         notifyUpdate();
         return true;
@@ -630,7 +630,7 @@ public class ChainConveyorBlockEntity extends KineticBlockEntity implements Tran
         updateBoxWorldPositions();
         updateChainShapes();
 
-        if (connections.size() != sizeBefore && world != null && world.isClient)
+        if (connections.size() != sizeBefore && world != null && world.isClient())
             invalidateRenderBoundingBox();
     }
 

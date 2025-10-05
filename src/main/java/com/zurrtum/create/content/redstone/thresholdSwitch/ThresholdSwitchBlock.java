@@ -86,7 +86,7 @@ public class ThresholdSwitchBlock extends DirectedDirectionalBlock implements IB
     ) {
         if (player != null && stack.isOf(AllItems.WRENCH))
             return ActionResult.PASS_TO_DEFAULT_BLOCK_ACTION;
-        if (level.isClient) {
+        if (level.isClient()) {
             withBlockEntityDo(
                 level, pos, be -> {
                     AllClientHandle.INSTANCE.openThresholdSwitchScreen(be, player);

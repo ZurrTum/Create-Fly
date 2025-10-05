@@ -26,7 +26,7 @@ public class CardboardArmorHandler {
             scale = 1.0F;
         }
 
-        if (!entity.getWorld().isClient && entity instanceof ServerPlayerEntity serverPlayer) {
+        if (!entity.getWorld().isClient() && entity instanceof ServerPlayerEntity serverPlayer) {
             AllAdvancements.CARDBOARD_ARMOR.trigger(serverPlayer);
         }
 

@@ -71,7 +71,7 @@ public class MechanicalBearingBlockEntity extends GeneratingKineticBlockEntity i
 
     @Override
     public void remove() {
-        if (!world.isClient)
+        if (!world.isClient())
             disassemble();
         super.remove();
     }
@@ -146,7 +146,7 @@ public class MechanicalBearingBlockEntity extends GeneratingKineticBlockEntity i
         float speed = convertToAngular(isWindmill() ? getGeneratedSpeed() : getSpeed());
         if (getSpeed() == 0)
             speed = 0;
-        if (world.isClient) {
+        if (world.isClient()) {
             speed *= AllClientHandle.INSTANCE.getServerSpeed();
             speed += clientAngleDiff / 3f;
         }
@@ -225,10 +225,10 @@ public class MechanicalBearingBlockEntity extends GeneratingKineticBlockEntity i
         super.tick();
 
         prevAngle = angle;
-        if (world.isClient)
+        if (world.isClient())
             clientAngleDiff /= 2;
 
-        if (!world.isClient && assembleNextTick) {
+        if (!world.isClient() && assembleNextTick) {
             assembleNextTick = false;
             if (running) {
                 boolean canDisassemble = movementMode.get() == RotationMode.ROTATE_PLACE || (isNearInitialAngle() && movementMode.get() == RotationMode.ROTATE_PLACE_RETURNED);
@@ -267,7 +267,7 @@ public class MechanicalBearingBlockEntity extends GeneratingKineticBlockEntity i
     @Override
     public void lazyTick() {
         super.lazyTick();
-        if (movedContraption != null && !world.isClient)
+        if (movedContraption != null && !world.isClient())
             sendData();
     }
 
@@ -292,7 +292,7 @@ public class MechanicalBearingBlockEntity extends GeneratingKineticBlockEntity i
         markDirty();
         BlockPos anchor = pos.offset(blockState.get(BearingBlock.FACING));
         movedContraption.setPosition(anchor.getX(), anchor.getY(), anchor.getZ());
-        if (!world.isClient) {
+        if (!world.isClient()) {
             this.running = true;
             sendData();
         }
@@ -300,7 +300,7 @@ public class MechanicalBearingBlockEntity extends GeneratingKineticBlockEntity i
 
     @Override
     public void onStall() {
-        if (!world.isClient)
+        if (!world.isClient())
             sendData();
     }
 

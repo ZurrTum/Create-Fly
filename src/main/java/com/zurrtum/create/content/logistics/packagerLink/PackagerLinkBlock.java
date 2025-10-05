@@ -92,7 +92,7 @@ public class PackagerLinkBlock extends WallMountedBlock implements IBE<PackagerL
         @Nullable WireOrientation wireOrientation,
         boolean isMoving
     ) {
-        if (worldIn.isClient)
+        if (worldIn.isClient())
             return;
 
         int power = getPower(state, worldIn, pos);

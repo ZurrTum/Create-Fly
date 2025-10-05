@@ -379,7 +379,7 @@ public class PackageItem extends Item implements EntityItem {
         float f = getPackageVelocity(i);
         if (f < 0.1D)
             return false;
-        if (world.isClient)
+        if (world.isClient())
             return false;
 
         world.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.ENTITY_SNOWBALL_THROW, SoundCategory.NEUTRAL, 0.5F, 0.5F);

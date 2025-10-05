@@ -79,7 +79,7 @@ public class RedstoneLinkBlockEntity extends SmartBlockEntity {
 
         receivedSignal = view.getInt("Receive", 0);
         receivedSignalChanged = view.getBoolean("ReceivedChanged", false);
-        if (world == null || world.isClient || !link.newPosition)
+        if (world == null || world.isClient() || !link.newPosition)
             transmittedSignal = view.getInt("Transmit", 0);
     }
 
@@ -98,7 +98,7 @@ public class RedstoneLinkBlockEntity extends SmartBlockEntity {
 
         if (transmitter)
             return;
-        if (world.isClient)
+        if (world.isClient())
             return;
 
         BlockState blockState = getCachedState();

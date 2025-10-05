@@ -56,13 +56,13 @@ public class SymmetryWandItem extends Item {
 
         // Shift -> open GUI
         if (player.isSneaking()) {
-            if (player.getWorld().isClient) {
+            if (player.getWorld().isClient()) {
                 AllClientHandle.INSTANCE.openSymmetryWandScreen(wand, context.getHand());
             }
             return ActionResult.SUCCESS;
         }
 
-        if (context.getWorld().isClient || context.getHand() != Hand.MAIN_HAND)
+        if (context.getWorld().isClient() || context.getHand() != Hand.MAIN_HAND)
             return ActionResult.SUCCESS;
 
         pos = pos.offset(context.getSide());
@@ -107,7 +107,7 @@ public class SymmetryWandItem extends Item {
 
         // Shift -> Open GUI
         if (playerIn.isSneaking()) {
-            if (worldIn.isClient) {
+            if (worldIn.isClient()) {
                 AllClientHandle.INSTANCE.openSymmetryWandScreen(wand, handIn);
                 playerIn.getItemCooldownManager().set(wand, 5);
             }

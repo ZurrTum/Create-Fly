@@ -90,7 +90,7 @@ public class SoulPulseEffect {
     }
 
     public void spawnParticles(World world, BlockPos at) {
-        if (world == null || !world.isClient)
+        if (world == null || !world.isClient())
             return;
 
         Vec3d p = Vec3d.of(at);

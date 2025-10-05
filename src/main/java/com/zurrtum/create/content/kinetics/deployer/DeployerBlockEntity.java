@@ -179,7 +179,7 @@ public class DeployerBlockEntity extends KineticBlockEntity {
 
         if (getSpeed() == 0)
             return;
-        if (!world.isClient && player != null && player.getBlockBreakingProgress() != null) {
+        if (!world.isClient() && player != null && player.getBlockBreakingProgress() != null) {
             if (world.isAir(player.getBlockBreakingProgress().getKey())) {
                 world.setBlockBreakingInfo(player.cast().getId(), player.getBlockBreakingProgress().getKey(), -1);
                 player.setBlockBreakingProgress(null);
@@ -189,7 +189,7 @@ public class DeployerBlockEntity extends KineticBlockEntity {
             timer -= getTimerSpeed();
             return;
         }
-        if (world.isClient)
+        if (world.isClient())
             return;
         if (player == null)
             return;
@@ -443,7 +443,7 @@ public class DeployerBlockEntity extends KineticBlockEntity {
     }
 
     public void redstoneUpdate() {
-        if (world.isClient)
+        if (world.isClient())
             return;
         boolean blockPowered = world.isReceivingRedstonePower(pos);
         if (blockPowered == redstoneLocked)

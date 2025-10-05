@@ -177,7 +177,7 @@ public class BasinBlockEntity extends SmartBlockEntity {
     public void lazyTick() {
         super.lazyTick();
 
-        if (!world.isClient) {
+        if (!world.isClient()) {
             updateSpoutput();
             if (recipeBackupCheck-- > 0)
                 return;
@@ -268,14 +268,14 @@ public class BasinBlockEntity extends SmartBlockEntity {
         cachedHeatLevel = null;
 
         super.tick();
-        if (world.isClient) {
+        if (world.isClient()) {
             AllClientHandle.INSTANCE.createBasinFluidParticles(world, this);
             tickVisualizedOutputs();
             ingredientRotationSpeed.tickChaser();
             ingredientRotation.setValue(ingredientRotation.getValue() + ingredientRotationSpeed.getValue());
         }
 
-        if ((!spoutputBuffer.isEmpty() || !spoutputFluidBuffer.isEmpty()) && !world.isClient)
+        if ((!spoutputBuffer.isEmpty() || !spoutputFluidBuffer.isEmpty()) && !world.isClient())
             tryClearingSpoutputOverflow();
         if (!contentsChanged)
             return;

@@ -387,14 +387,14 @@ public class BlockHelper {
                 world.scheduleBlockRerenderIfNeeded(pos, blockState, blockState2);
             }
 
-            if ((flags & Block.NOTIFY_LISTENERS) != 0 && (!world.isClient || (flags & Block.NO_REDRAW) == 0) && (world.isClient || worldChunk.getLevelType() != null && worldChunk.getLevelType()
+            if ((flags & Block.NOTIFY_LISTENERS) != 0 && (!world.isClient() || (flags & Block.NO_REDRAW) == 0) && (world.isClient() || worldChunk.getLevelType() != null && worldChunk.getLevelType()
                 .isAfter(ChunkLevelType.BLOCK_TICKING))) {
                 world.updateListeners(pos, blockState, state, flags);
             }
 
             if ((flags & Block.NOTIFY_NEIGHBORS) != 0) {
                 world.updateNeighbors(pos, blockState.getBlock());
-                if (!world.isClient && state.hasComparatorOutput()) {
+                if (!world.isClient() && state.hasComparatorOutput()) {
                     world.updateComparators(pos, state.getBlock());
                 }
             }

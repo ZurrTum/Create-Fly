@@ -29,7 +29,7 @@ public class CouplingPhysics {
         Couple<AbstractMinecartEntity> carts = c.map(MinecartController::cart);
         float couplingLength = c.getFirst().getCouplingLength(true);
         softCollisionStep(world, carts, couplingLength);
-        if (world.isClient)
+        if (world.isClient())
             return;
         hardCollisionStep((ServerWorld) world, carts, couplingLength);
     }

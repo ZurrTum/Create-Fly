@@ -40,7 +40,7 @@ public class MetalScaffoldingBlockItem extends ScaffoldingItem {
         BlockPos.Mutable blockpos$mutableblockpos = blockpos.mutableCopy().move(direction);
 
         while (i < 7) {
-            if (!level.isClient && !level.isInBuildLimit(blockpos$mutableblockpos)) {
+            if (!level.isClient() && !level.isInBuildLimit(blockpos$mutableblockpos)) {
                 PlayerEntity player = pContext.getPlayer();
                 int j = level.getTopYInclusive();
                 if (player instanceof ServerPlayerEntity sp && blockpos$mutableblockpos.getY() > j)

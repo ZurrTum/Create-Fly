@@ -46,7 +46,7 @@ public class BeltFunnelInteractionHandler {
             if (blocking)
                 currentItem.beltPosition = funnelEntry;
 
-            if (world.isClient || funnelState.get(BeltFunnelBlock.POWERED, false))
+            if (world.isClient() || funnelState.get(BeltFunnelBlock.POWERED, false))
                 if (blocking)
                     return true;
                 else

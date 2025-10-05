@@ -257,7 +257,7 @@ public class ServerFactoryPanelBehaviour extends ServerFilteringBehaviour implem
 
     private void moveToSlot(PanelSlot slot) {
         this.slot = slot;
-        if (getWorld().isClient) {
+        if (getWorld().isClient()) {
             AllClientHandle.INSTANCE.factoryPanelMoveToSlot(blockEntity, slot);
         }
     }
@@ -354,7 +354,7 @@ public class ServerFactoryPanelBehaviour extends ServerFilteringBehaviour implem
         promisedSatisfied = shouldPromiseSatisfy;
         lastReportedUnloadedLinks = unloadedLinkCount;
         waitingForNetwork = shouldWait;
-        if (!getWorld().isClient)
+        if (!getWorld().isClient())
             blockEntity.sendData();
         if (notifyOutputs)
             notifyRedstoneOutputs();
@@ -549,7 +549,7 @@ public class ServerFactoryPanelBehaviour extends ServerFilteringBehaviour implem
             return;
         }
 
-        boolean isClientSide = player.getWorld().isClient;
+        boolean isClientSide = player.getWorld().isClient();
 
         // Wrench cycles through arrow bending
         ItemStack heldItem = player.getStackInHand(hand);
@@ -1047,7 +1047,7 @@ public class ServerFactoryPanelBehaviour extends ServerFilteringBehaviour implem
         blockEntity.sendData();
         playFeedbackSound(this);
         resetTimerSlightly();
-        if (!getWorld().isClient)
+        if (!getWorld().isClient())
             notifyRedstoneOutputs();
     }
 

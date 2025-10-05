@@ -84,7 +84,7 @@ public class ChuteBlock extends AbstractChuteBlock implements ProperWaterloggedB
         if (shape == Shape.INTERSECTION)
             return ActionResult.PASS;
         World level = context.getWorld();
-        if (level.isClient)
+        if (level.isClient())
             return ActionResult.SUCCESS;
         if (shape == Shape.ENCASED) {
             level.setBlockState(context.getBlockPos(), state.with(SHAPE, Shape.NORMAL));
@@ -115,7 +115,7 @@ public class ChuteBlock extends AbstractChuteBlock implements ProperWaterloggedB
             return super.onUseWithItem(stack, state, level, pos, player, hand, hitResult);
         if (shape == Shape.INTERSECTION || shape == Shape.ENCASED)
             return super.onUseWithItem(stack, state, level, pos, player, hand, hitResult);
-        if (player == null || level.isClient)
+        if (player == null || level.isClient())
             return ActionResult.SUCCESS;
 
         level.setBlockState(pos, state.with(SHAPE, Shape.ENCASED));

@@ -43,7 +43,7 @@ public class EncasedShaftBlock extends AbstractEncasedShaftBlock implements IBE<
 
     @Override
     public ActionResult onSneakWrenched(BlockState state, ItemUsageContext context) {
-        if (context.getWorld().isClient)
+        if (context.getWorld().isClient())
             return ActionResult.SUCCESS;
         context.getWorld().syncWorldEvent(WorldEvents.BLOCK_BROKEN, context.getBlockPos(), Block.getRawIdFromState(state));
         KineticBlockEntity.switchToBlockState(

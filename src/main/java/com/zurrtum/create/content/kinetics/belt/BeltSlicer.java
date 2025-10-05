@@ -72,7 +72,7 @@ public class BeltSlicer {
 
         // Shorten from End
         if (hoveringEnd(state, hit)) {
-            if (world.isClient)
+            if (world.isClient())
                 return ActionResult.SUCCESS;
 
             for (BlockPos blockPos : beltChain) {
@@ -176,7 +176,7 @@ public class BeltSlicer {
                     int count = itemstack.getCount();
 
                     if (itemstack.isOf(AllItems.BELT_CONNECTOR) && !beltFound) {
-                        if (!world.isClient)
+                        if (!world.isClient())
                             itemstack.decrement(1);
                         beltFound = true;
                         continue;
@@ -184,7 +184,7 @@ public class BeltSlicer {
 
                     if (itemstack.isOf(AllItems.SHAFT)) {
                         int taken = Math.min(count, requiredShafts - amountRetrieved);
-                        if (!world.isClient)
+                        if (!world.isClient())
                             if (taken == count)
                                 player.getInventory().setStack(i, ItemStack.EMPTY);
                             else
@@ -193,7 +193,7 @@ public class BeltSlicer {
                     }
                 }
 
-                if (!world.isClient) {
+                if (!world.isClient()) {
                     player.getInventory().offerOrDrop(new ItemStack(AllItems.SHAFT, amountRetrieved));
                     if (beltFound)
                         player.getInventory().offerOrDrop(AllItems.BELT_CONNECTOR.getDefaultStack());
@@ -202,7 +202,7 @@ public class BeltSlicer {
             }
         }
 
-        if (!world.isClient) {
+        if (!world.isClient()) {
             for (BlockPos blockPos : beltChain) {
                 BeltBlockEntity belt = BeltHelper.getSegmentBE(world, blockPos);
                 if (belt == null)
@@ -287,7 +287,7 @@ public class BeltSlicer {
 
             mergedBeltLength = mergedController.beltLength;
 
-            if (!world.isClient) {
+            if (!world.isClient()) {
                 boolean flipBelt = facing != nextState.get(BeltBlock.HORIZONTAL_FACING);
                 Optional<DyeColor> color = controllerBE.color;
                 for (BlockPos blockPos : BeltBlock.getBeltChain(world, mergedController.getPos())) {
@@ -315,7 +315,7 @@ public class BeltSlicer {
             }
         }
 
-        if (!world.isClient) {
+        if (!world.isClient()) {
             for (BlockPos blockPos : beltChain) {
                 BeltBlockEntity belt = BeltHelper.getSegmentBE(world, blockPos);
                 if (belt == null)

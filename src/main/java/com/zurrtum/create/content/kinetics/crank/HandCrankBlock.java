@@ -103,7 +103,7 @@ public class HandCrankBlock extends DirectionalKineticBlock implements IBE<HandC
 
     @Override
     public void neighborUpdate(BlockState state, World worldIn, BlockPos pos, Block sourceBlock, BlockPos fromPos, boolean isMoving) {
-        if (worldIn.isClient)
+        if (worldIn.isClient())
             return;
 
         Direction blockFacing = state.get(FACING);

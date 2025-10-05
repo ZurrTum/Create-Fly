@@ -61,7 +61,7 @@ public class CartAssemblerBlockItem extends BlockItem {
                 newType = type;
         if (newType == null)
             return false;
-        if (world.isClient)
+        if (world.isClient())
             return true;
 
         newState = newState.with(CartAssemblerBlock.RAIL_TYPE, newType);

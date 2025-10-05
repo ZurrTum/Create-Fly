@@ -222,7 +222,7 @@ public class BeltTunnelBlock extends Block implements IBE<BeltTunnelBlockEntity>
         Shape shape = state.get(SHAPE);
         shape = shape == Shape.CLOSED ? Shape.WINDOW : Shape.CLOSED;
         World world = context.getWorld();
-        if (!world.isClient)
+        if (!world.isClient())
             world.setBlockState(context.getBlockPos(), state.with(SHAPE, shape), Block.NOTIFY_LISTENERS);
         return ActionResult.SUCCESS;
     }
@@ -237,7 +237,7 @@ public class BeltTunnelBlock extends Block implements IBE<BeltTunnelBlockEntity>
 
     @Override
     public void neighborUpdate(BlockState state, World worldIn, BlockPos pos, Block sourceBlock, BlockPos fromPos, boolean isMoving) {
-        if (worldIn.isClient)
+        if (worldIn.isClient())
             return;
 
         if (fromPos.equals(pos.down())) {

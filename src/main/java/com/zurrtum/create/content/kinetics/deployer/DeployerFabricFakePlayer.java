@@ -108,7 +108,7 @@ public class DeployerFabricFakePlayer extends FakePlayer implements DeployerPlay
     @Override
     public void remove(RemovalReason reason) {
         ServerWorld world = getWorld();
-        if (blockBreakingProgress != null && !world.isClient)
+        if (blockBreakingProgress != null && !world.isClient())
             world.setBlockBreakingInfo(getId(), blockBreakingProgress.getKey(), -1);
         super.remove(reason);
     }

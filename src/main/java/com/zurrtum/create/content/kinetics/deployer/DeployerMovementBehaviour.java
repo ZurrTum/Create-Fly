@@ -59,7 +59,7 @@ public class DeployerMovementBehaviour extends MovementBehaviour {
 
     @Override
     public void visitNewPosition(MovementContext context, BlockPos pos) {
-        if (context.world.isClient)
+        if (context.world.isClient())
             return;
 
         tryGrabbingItem(context);
@@ -163,7 +163,7 @@ public class DeployerMovementBehaviour extends MovementBehaviour {
 
     @Override
     public void tick(MovementContext context) {
-        if (context.world.isClient)
+        if (context.world.isClient())
             return;
         if (!context.stall)
             return;
@@ -190,7 +190,7 @@ public class DeployerMovementBehaviour extends MovementBehaviour {
 
     @Override
     public void cancelStall(MovementContext context) {
-        if (context.world.isClient)
+        if (context.world.isClient())
             return;
 
         super.cancelStall(context);
@@ -205,7 +205,7 @@ public class DeployerMovementBehaviour extends MovementBehaviour {
 
     @Override
     public void stopMoving(MovementContext context) {
-        if (context.world.isClient)
+        if (context.world.isClient())
             return;
 
         DeployerPlayer player = getPlayer(context);

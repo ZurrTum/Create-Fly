@@ -31,7 +31,7 @@ public class TreeFertilizerItem extends Item {
             if (state.get(Properties.HANGING, false))
                 return ActionResult.PASS;
 
-            if (world.isClient) {
+            if (world.isClient()) {
                 BoneMealItem.createParticles(world, context.getBlockPos(), 100);
                 return ActionResult.SUCCESS;
             }

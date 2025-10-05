@@ -86,7 +86,7 @@ public class FluidTankBlockEntity extends SmartBlockEntity implements IMultiBloc
 
     protected void updateConnectivity() {
         updateConnectivity = false;
-        if (world.isClient)
+        if (world.isClient())
             return;
         if (!isController())
             return;
@@ -142,7 +142,7 @@ public class FluidTankBlockEntity extends SmartBlockEntity implements IMultiBloc
     public void initialize() {
         super.initialize();
         sendData();
-        if (world.isClient)
+        if (world.isClient())
             invalidateRenderBoundingBox();
     }
 
@@ -177,7 +177,7 @@ public class FluidTankBlockEntity extends SmartBlockEntity implements IMultiBloc
             }
         }
 
-        if (!world.isClient) {
+        if (!world.isClient()) {
             markDirty();
             sendData();
         }
@@ -190,7 +190,7 @@ public class FluidTankBlockEntity extends SmartBlockEntity implements IMultiBloc
     }
 
     protected void setLuminosity(int luminosity) {
-        if (world.isClient)
+        if (world.isClient())
             return;
         if (this.luminosity == luminosity)
             return;
@@ -200,7 +200,7 @@ public class FluidTankBlockEntity extends SmartBlockEntity implements IMultiBloc
     }
 
     protected void updateStateLuminosity() {
-        if (world.isClient)
+        if (world.isClient())
             return;
         int actualLuminosity = luminosity;
         FluidTankBlockEntity controllerBE = getControllerBE();
@@ -236,7 +236,7 @@ public class FluidTankBlockEntity extends SmartBlockEntity implements IMultiBloc
     }
 
     public void removeController(boolean keepFluids) {
-        if (world.isClient)
+        if (world.isClient())
             return;
         updateConnectivity = true;
         if (!keepFluids)
@@ -359,7 +359,7 @@ public class FluidTankBlockEntity extends SmartBlockEntity implements IMultiBloc
 
     @Override
     public void setController(BlockPos controller) {
-        if (world.isClient && !isVirtual())
+        if (world.isClient() && !isVirtual())
             return;
         if (controller.equals(this.controller))
             return;

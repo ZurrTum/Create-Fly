@@ -78,7 +78,7 @@ public class DeskBellBlock extends WrenchableDirectionalBlock implements ProperW
     @Override
     protected ActionResult onUse(BlockState state, World level, BlockPos pos, PlayerEntity player, BlockHitResult hitResult) {
         playSound(player, level, pos);
-        if (level.isClient)
+        if (level.isClient())
             return ActionResult.SUCCESS;
         level.setBlockState(pos, state.with(POWERED, true), Block.NOTIFY_ALL);
         updateNeighbours(state, level, pos);

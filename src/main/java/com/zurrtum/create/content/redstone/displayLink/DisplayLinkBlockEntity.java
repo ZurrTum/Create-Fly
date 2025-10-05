@@ -77,7 +77,7 @@ public class DisplayLinkBlockEntity extends LinkWithBulbBlockEntity implements T
             return;
         if (activeSource == null)
             return;
-        if (world.isClient)
+        if (world.isClient())
             return;
 
         refreshTicks++;
@@ -90,7 +90,7 @@ public class DisplayLinkBlockEntity extends LinkWithBulbBlockEntity implements T
         refreshTicks = 0;
         if (getCachedState().get(DisplayLinkBlock.POWERED, true))
             return;
-        if (!world.isClient)
+        if (!world.isClient())
             updateGatheredData();
     }
 

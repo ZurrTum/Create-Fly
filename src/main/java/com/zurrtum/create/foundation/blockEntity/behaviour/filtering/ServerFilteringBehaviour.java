@@ -243,7 +243,7 @@ public class ServerFilteringBehaviour extends BlockEntityBehaviour<SmartBlockEnt
             return upstreamResult;
         if (simulate)
             return true;
-        if (getWorld().isClient)
+        if (getWorld().isClient())
             return true;
 
         ItemStack refund = ItemStack.EMPTY;

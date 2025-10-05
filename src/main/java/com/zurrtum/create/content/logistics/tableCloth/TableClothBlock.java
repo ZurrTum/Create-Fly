@@ -106,7 +106,7 @@ public class TableClothBlock extends Block implements IWrenchable, IBE<TableClot
     ) {
         if (hitResult.getSide() == Direction.DOWN)
             return ActionResult.PASS_TO_DEFAULT_BLOCK_ACTION;
-        if (level.isClient)
+        if (level.isClient())
             return ActionResult.SUCCESS;
 
         ItemStack heldItem = player.getStackInHand(hand);

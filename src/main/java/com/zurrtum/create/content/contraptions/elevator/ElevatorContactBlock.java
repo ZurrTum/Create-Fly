@@ -100,7 +100,7 @@ public class ElevatorContactBlock extends WrenchableDirectionalBlock implements 
         @Nullable WireOrientation wireOrientation,
         boolean pIsMoving
     ) {
-        if (pLevel.isClient)
+        if (pLevel.isClient())
             return;
 
         boolean isPowered = pState.get(POWERED);
@@ -243,7 +243,7 @@ public class ElevatorContactBlock extends WrenchableDirectionalBlock implements 
     ) {
         if (player != null && stack.isOf(AllItems.WRENCH))
             return ActionResult.PASS_TO_DEFAULT_BLOCK_ACTION;
-        if (level.isClient) {
+        if (level.isClient()) {
             withBlockEntityDo(
                 level, pos, be -> {
                     AllClientHandle.INSTANCE.openElevatorContactScreen(be, player);

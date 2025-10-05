@@ -65,7 +65,7 @@ public class FlapDisplayBlockEntity extends KineticBlockEntity implements Displa
     }
 
     public void updateControllerStatus() {
-        if (world.isClient)
+        if (world.isClient())
             return;
 
         BlockState blockState = getCachedState();
@@ -108,7 +108,7 @@ public class FlapDisplayBlockEntity extends KineticBlockEntity implements Displa
     public void tick() {
         super.tick();
         isRunning = super.isSpeedRequirementFulfilled();
-        if ((!world.isClient || !isRunning) && !isVirtual())
+        if ((!world.isClient() || !isRunning) && !isVirtual())
             return;
         int activeFlaps = 0;
         boolean instant = Math.abs(getSpeed()) > 128;

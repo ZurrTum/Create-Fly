@@ -167,7 +167,7 @@ public class PackagerBlockEntity extends SmartBlockEntity {
             return;
         }
 
-        if (world.isClient) {
+        if (world.isClient()) {
             if (animationTicks == CYCLE - (animationInward ? 5 : 1))
                 AllSoundEvents.PACKAGER.playAt(world, pos, 1, 1, true);
             if (animationTicks == (animationInward ? 1 : 5))

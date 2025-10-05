@@ -73,7 +73,7 @@ public abstract class ConductorBlockInteractionBehavior extends MovingInteractio
             Train train = carriageEntity.getCarriage().train;
             if (train == null)
                 return false;
-            if (player.getWorld().isClient)
+            if (player.getWorld().isClient())
                 return true;
 
             if (train.runtime.getSchedule() != null) {

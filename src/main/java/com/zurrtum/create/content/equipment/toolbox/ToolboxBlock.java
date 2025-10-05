@@ -95,7 +95,7 @@ public class ToolboxBlock extends HorizontalFacingBlock implements Waterloggable
     @Override
     public void onPlaced(World worldIn, BlockPos pos, BlockState state, LivingEntity placer, ItemStack stack) {
         super.onPlaced(worldIn, pos, state, placer, stack);
-        if (worldIn.isClient)
+        if (worldIn.isClient())
             return;
         if (stack == null)
             return;
@@ -114,7 +114,7 @@ public class ToolboxBlock extends HorizontalFacingBlock implements Waterloggable
     public void onBlockBreakStart(BlockState state, World world, BlockPos pos, PlayerEntity player) {
         if (FakePlayerHandler.has(player))
             return;
-        if (world.isClient)
+        if (world.isClient())
             return;
         withBlockEntityDo(world, pos, ToolboxBlockEntity::unequipTracked);
         if (world instanceof ServerWorld) {
@@ -178,7 +178,7 @@ public class ToolboxBlock extends HorizontalFacingBlock implements Waterloggable
 
         DyeColor color = AllItemTags.getDyeColor(stack);
         if (color != null && color != this.color) {
-            if (level.isClient)
+            if (level.isClient())
                 return ActionResult.SUCCESS;
             BlockState newState = BlockHelper.copyProperties(state, getColorBlock(color).getDefaultState());
             level.setBlockState(pos, newState);
@@ -187,7 +187,7 @@ public class ToolboxBlock extends HorizontalFacingBlock implements Waterloggable
 
         if (FakePlayerHandler.has(player))
             return ActionResult.PASS_TO_DEFAULT_BLOCK_ACTION;
-        if (level.isClient)
+        if (level.isClient())
             return ActionResult.SUCCESS;
 
         withBlockEntityDo(level, pos, toolbox -> toolbox.openHandledScreen((ServerPlayerEntity) player));

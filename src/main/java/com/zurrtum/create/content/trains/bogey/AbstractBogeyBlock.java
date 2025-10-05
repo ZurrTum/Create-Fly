@@ -171,7 +171,7 @@ public abstract class AbstractBogeyBlock<T extends AbstractBogeyBlockEntity> ext
         Hand hand,
         BlockHitResult hitResult
     ) {
-        if (level.isClient)
+        if (level.isClient())
             return ActionResult.PASS_TO_DEFAULT_BLOCK_ACTION;
 
         if (!player.isSneaking() && stack.isOf(AllItems.WRENCH) && !player.getItemCooldownManager()

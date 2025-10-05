@@ -44,7 +44,7 @@ public class DeployerMovingInteraction extends MovingInteractionBehaviour {
             ctx.blockEntityData.put("Mode", Mode.CODEC, mode == Mode.PUNCH ? Mode.USE : Mode.PUNCH);
 
         } else {
-            if (ctx.world.isClient)
+            if (ctx.world.isClient())
                 return true; // we'll try again on the server side
             DeployerPlayer fake;
 

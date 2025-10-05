@@ -235,7 +235,7 @@ public class BlueprintEntity extends AbstractDecorationEntity implements Special
 
     @Override
     public boolean handleAttack(Entity source) {
-        if (!(source instanceof PlayerEntity player) || getWorld().isClient)
+        if (!(source instanceof PlayerEntity player) || getWorld().isClient())
             return super.handleAttack(source);
 
         double attrib = player.getAttributeValue(EntityAttributes.BLOCK_INTERACTION_RANGE) + (player.isCreative() ? 0 : -0.5F);
@@ -331,7 +331,7 @@ public class BlueprintEntity extends AbstractDecorationEntity implements Special
         ItemStackHandler items = section.getItems();
 
         World world = getWorld();
-        if (!holdingWrench && !world.isClient && !items.getStack(9).isEmpty()) {
+        if (!holdingWrench && !world.isClient() && !items.getStack(9).isEmpty()) {
             DynamicRegistryManager registryManager = world.getRegistryManager();
             PlayerInventory playerInv = player.getInventory();
             int size = playerInv.size();
@@ -447,7 +447,7 @@ public class BlueprintEntity extends AbstractDecorationEntity implements Special
             return ActionResult.SUCCESS;
         }
 
-        if (!world.isClient && player instanceof ServerPlayerEntity serverPlayer) {
+        if (!world.isClient() && player instanceof ServerPlayerEntity serverPlayer) {
             MenuProvider.openHandledScreen(serverPlayer, section);
         }
 
@@ -619,7 +619,7 @@ public class BlueprintEntity extends AbstractDecorationEntity implements Special
 
         public void save(ItemStackHandler inventory) {
             cachedDisplayItems = null;
-            if (!getWorld().isClient) {
+            if (!getWorld().isClient()) {
                 try (ErrorReporter.Logging logging = new ErrorReporter.Logging(getErrorReporterContext(), Create.LOGGER)) {
                     NbtWriteView view = NbtWriteView.create(logging, getRegistryManager());
                     inventory.writeSlots(view);

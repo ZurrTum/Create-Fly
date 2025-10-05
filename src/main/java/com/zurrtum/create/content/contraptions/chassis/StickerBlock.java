@@ -60,7 +60,7 @@ public class StickerBlock extends WrenchableDirectionalBlock implements IBE<Stic
         @Nullable WireOrientation wireOrientation,
         boolean isMoving
     ) {
-        if (worldIn.isClient)
+        if (worldIn.isClient())
             return;
 
         boolean previouslyPowered = state.get(POWERED);

@@ -89,7 +89,7 @@ public class RollerMovementBehaviour extends BlockBreakingMovementBehaviour {
         BlockState stateVisited = world.getBlockState(pos);
         if (!stateVisited.isSolidBlock(world, pos))
             damageEntities(context, pos, world);
-        if (world.isClient)
+        if (world.isClient())
             return;
 
         List<BlockPos> positionsToBreak = getPositionsToBreak(context, pos);

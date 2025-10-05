@@ -23,7 +23,7 @@ public class PulseRepeaterBlockEntity extends BrassDiodeBlockEntity {
         }
 
         state++;
-        if (world.isClient)
+        if (world.isClient())
             return;
 
         if (state == maxState.getValue() - 1 && !powering)

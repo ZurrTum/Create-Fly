@@ -71,12 +71,12 @@ public abstract class LinearActuatorBlockEntity extends KineticBlockEntity imple
         if (isPassive())
             return;
 
-        if (world.isClient)
+        if (world.isClient())
             clientOffsetDiff *= .75f;
 
         if (waitingForSpeedChange) {
             if (movedContraption != null) {
-                if (world.isClient) {
+                if (world.isClient()) {
                     float syncSpeed = clientOffsetDiff / 2f;
                     offset += syncSpeed;
                     movedContraption.setContraptionMotion(toMotionVector(syncSpeed));
@@ -87,7 +87,7 @@ public abstract class LinearActuatorBlockEntity extends KineticBlockEntity imple
             return;
         }
 
-        if (!world.isClient && assembleNextTick) {
+        if (!world.isClient() && assembleNextTick) {
             assembleNextTick = false;
             if (running) {
                 if (getSpeed() == 0)
@@ -147,7 +147,7 @@ public abstract class LinearActuatorBlockEntity extends KineticBlockEntity imple
         int extensionRange = getExtensionRange();
         if (offset <= 0 || offset >= extensionRange) {
             offset = offset <= 0 ? 0 : extensionRange;
-            if (!world.isClient) {
+            if (!world.isClient()) {
                 moveAndCollideContraption();
                 resetContraptionToOffset();
                 tryDisassemble();
@@ -166,7 +166,7 @@ public abstract class LinearActuatorBlockEntity extends KineticBlockEntity imple
     @Override
     public void lazyTick() {
         super.lazyTick();
-        if (movedContraption != null && !world.isClient)
+        if (movedContraption != null && !world.isClient())
             sendData();
     }
 
@@ -205,7 +205,7 @@ public abstract class LinearActuatorBlockEntity extends KineticBlockEntity imple
     @Override
     public void remove() {
         this.removed = true;
-        if (!world.isClient)
+        if (!world.isClient())
             disassemble();
         super.remove();
     }
@@ -307,7 +307,7 @@ public abstract class LinearActuatorBlockEntity extends KineticBlockEntity imple
     }
 
     protected void collided() {
-        if (world.isClient) {
+        if (world.isClient()) {
             waitingForSpeedChange = true;
             return;
         }
@@ -329,7 +329,7 @@ public abstract class LinearActuatorBlockEntity extends KineticBlockEntity imple
 
     public float getMovementSpeed() {
         float movementSpeed = MathHelper.clamp(convertToLinear(getSpeed()), -.49f, .49f) + clientOffsetDiff / 2f;
-        if (world.isClient)
+        if (world.isClient())
             movementSpeed *= AllClientHandle.INSTANCE.getServerSpeed();
         if (sequencedOffsetLimit >= 0)
             movementSpeed = (float) MathHelper.clamp(movementSpeed, -sequencedOffsetLimit, sequencedOffsetLimit);
@@ -342,7 +342,7 @@ public abstract class LinearActuatorBlockEntity extends KineticBlockEntity imple
 
     @Override
     public void onStall() {
-        if (!world.isClient) {
+        if (!world.isClient()) {
             forceMove = true;
             sendData();
         }
@@ -361,7 +361,7 @@ public abstract class LinearActuatorBlockEntity extends KineticBlockEntity imple
     @Override
     public void attach(ControlledContraptionEntity contraption) {
         this.movedContraption = contraption;
-        if (!world.isClient) {
+        if (!world.isClient()) {
             this.running = true;
             sendData();
         }

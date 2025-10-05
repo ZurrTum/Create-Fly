@@ -125,10 +125,10 @@ public class MechanicalMixerBlockEntity extends BasinOperatingBlockEntity {
 
         float speed = Math.abs(getSpeed());
         if (running && world != null) {
-            if (world.isClient && runningTicks == 20)
+            if (world.isClient() && runningTicks == 20)
                 renderParticles();
 
-            if ((!world.isClient || isVirtual()) && runningTicks == 20) {
+            if ((!world.isClient() || isVirtual()) && runningTicks == 20) {
                 if (processingTicks < 0) {
                     float recipeSpeed = 1;
                     //TODO

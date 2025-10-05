@@ -142,7 +142,7 @@ public class BeltBlockEntity extends KineticBlockEntity {
     }
 
     public void initializeItemHandler() {
-        if (world.isClient || itemHandler != null)
+        if (world.isClient() || itemHandler != null)
             return;
         if (beltLength == 0 || controller == null)
             return;
@@ -384,7 +384,7 @@ public class BeltBlockEntity extends KineticBlockEntity {
         BlockState blockState = getCachedState();
         boolean shouldBlockHaveCasing = type != CasingType.NONE;
 
-        if (world.isClient) {
+        if (world.isClient()) {
             casing = type;
             world.setBlockState(pos, blockState.with(BeltBlock.CASING, shouldBlockHaveCasing), 0);
             AllClientHandle.INSTANCE.queueUpdate(this);

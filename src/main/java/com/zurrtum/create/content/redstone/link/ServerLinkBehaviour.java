@@ -95,7 +95,7 @@ public class ServerLinkBehaviour extends BlockEntityBehaviour<SmartBlockEntity> 
     @Override
     public void initialize() {
         super.initialize();
-        if (getWorld().isClient)
+        if (getWorld().isClient())
             return;
         getHandler().addToNetwork(getWorld(), this);
         newPosition = true;
@@ -109,7 +109,7 @@ public class ServerLinkBehaviour extends BlockEntityBehaviour<SmartBlockEntity> 
     @Override
     public void unload() {
         super.unload();
-        if (getWorld().isClient)
+        if (getWorld().isClient())
             return;
         getHandler().removeFromNetwork(getWorld(), this);
     }

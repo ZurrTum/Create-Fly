@@ -17,7 +17,7 @@ import net.minecraft.world.WorldEvents;
 public class DropperMovementBehaviour extends MovementBehaviour {
     @Override
     public void visitNewPosition(MovementContext context, BlockPos pos) {
-        if (context.world.isClient)
+        if (context.world.isClient())
             return;
 
         MountedItemStorage storage = context.getItemStorage();

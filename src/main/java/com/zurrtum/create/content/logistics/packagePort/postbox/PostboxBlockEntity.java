@@ -47,7 +47,7 @@ public class PostboxBlockEntity extends PackagePortBlockEntity {
     @Override
     public void tick() {
         super.tick();
-        if (!world.isClient && !isVirtual()) {
+        if (!world.isClient() && !isVirtual()) {
             if (sendParticles)
                 sendData();
             return;
@@ -99,7 +99,7 @@ public class PostboxBlockEntity extends PackagePortBlockEntity {
 
     @Override
     public void onChunkUnloaded() {
-        if (world == null || world.isClient)
+        if (world == null || world.isClient())
             return;
         GlobalStation station = trackedGlobalStation.get();
         if (station == null)

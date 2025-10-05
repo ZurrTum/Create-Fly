@@ -139,7 +139,7 @@ public class FlapDisplayBlock extends HorizontalKineticBlock implements IBE<Flap
         }
 
         if (stack.getItem() == Items.GLOW_INK_SAC) {
-            if (!level.isClient) {
+            if (!level.isClient()) {
                 level.playSound(null, pos, SoundEvents.ITEM_INK_SAC_USE, SoundCategory.BLOCKS, 1.0F, 1.0F);
                 flapBE.setGlowing(lineIndex);
             }
@@ -153,7 +153,7 @@ public class FlapDisplayBlock extends HorizontalKineticBlock implements IBE<Flap
             return ActionResult.PASS_TO_DEFAULT_BLOCK_ACTION;
         if (dye == null && !flapBE.isSpeedRequirementFulfilled())
             return ActionResult.PASS_TO_DEFAULT_BLOCK_ACTION;
-        if (level.isClient)
+        if (level.isClient())
             return ActionResult.SUCCESS;
 
         Text customName = stack.get(DataComponentTypes.CUSTOM_NAME);

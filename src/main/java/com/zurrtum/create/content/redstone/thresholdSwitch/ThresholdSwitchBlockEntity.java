@@ -262,7 +262,7 @@ public class ThresholdSwitchBlockEntity extends SmartBlockEntity {
     @Override
     public void lazyTick() {
         super.lazyTick();
-        if (world.isClient)
+        if (world.isClient())
             return;
         updateCurrentLevel();
     }

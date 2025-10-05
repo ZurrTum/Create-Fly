@@ -89,14 +89,14 @@ public class FluidValveBlock extends DirectionalAxisKineticBlock implements IAxi
 
     @Override
     public void onStateReplaced(BlockState state, ServerWorld world, BlockPos pos, boolean isMoving) {
-        if (!world.isClient)
+        if (!world.isClient())
             FluidPropagator.propagateChangedPipe(world, pos, state);
     }
 
     @Override
     public void onBlockAdded(BlockState state, World world, BlockPos pos, BlockState oldState, boolean isMoving) {
         super.onBlockAdded(state, world, pos, oldState, isMoving);
-        if (world.isClient)
+        if (world.isClient())
             return;
         if (state != oldState)
             world.scheduleBlockTick(pos, this, 1, TickPriority.HIGH);

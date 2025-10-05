@@ -219,7 +219,7 @@ public class PotatoProjectileEntity extends ExplosiveProjectileEntity {
             target.setOnFireFor(5);
 
         World world = getWorld();
-        boolean onServer = !world.isClient;
+        boolean onServer = !world.isClient();
         DamageSource damageSource = causePotatoDamage();
         if (onServer && !target.damage((ServerWorld) world, damageSource, damage)) {
             target.setFireTicks(k);
@@ -297,7 +297,7 @@ public class PotatoProjectileEntity extends ExplosiveProjectileEntity {
         Vec3d hit = ray.getPos();
         pop(hit);
         World world = getWorld();
-        if (!type.onBlockHit(world, stack, ray) && !world.isClient) {
+        if (!type.onBlockHit(world, stack, ray) && !world.isClient()) {
             if (random.nextDouble() <= recoveryChance) {
                 recoverItem();
             } else {
@@ -329,7 +329,7 @@ public class PotatoProjectileEntity extends ExplosiveProjectileEntity {
                 getWorld().addParticleClient(new ItemStackParticleEffect(ParticleTypes.ITEM, stack), hit.x, hit.y, hit.z, m.x, m.y, m.z);
             }
         }
-        if (!getWorld().isClient)
+        if (!getWorld().isClient())
             playHitSound(getWorld(), getPos());
     }
 

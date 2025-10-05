@@ -116,7 +116,7 @@ public class EjectorBlockEntity extends KineticBlockEntity {
     }
 
     protected boolean cannotLaunch() {
-        return state != State.CHARGED && !(world.isClient && state == State.LAUNCHING);
+        return state != State.CHARGED && !(world.isClient() && state == State.LAUNCHING);
     }
 
     public void activateDeferred() {
@@ -126,7 +126,7 @@ public class EjectorBlockEntity extends KineticBlockEntity {
         List<Entity> entities = world.getNonSpectatingEntities(Entity.class, new Box(pos).expand(-1 / 16f, 0, -1 / 16f));
 
         // Launch Items
-        boolean doLogic = !world.isClient || isVirtual();
+        boolean doLogic = !world.isClient() || isVirtual();
         if (doLogic)
             launchItems();
 
@@ -144,7 +144,7 @@ public class EjectorBlockEntity extends KineticBlockEntity {
 
             entity.setOnGround(false);
 
-            if (isPlayerEntity != world.isClient)
+            if (isPlayerEntity != world.isClient())
                 continue;
 
             entity.setPosition(pos.getX() + .5f, pos.getY() + 1, pos.getZ() + .5f);
@@ -171,7 +171,7 @@ public class EjectorBlockEntity extends KineticBlockEntity {
         if (doLogic) {
             lidProgress.chase(1, .8f, Chaser.EXP);
             state = State.LAUNCHING;
-            if (!world.isClient) {
+            if (!world.isClient()) {
                 world.playSound(null, pos, SoundEvents.BLOCK_WOODEN_TRAPDOOR_CLOSE, SoundCategory.BLOCKS, .35f, 1f);
                 world.playSound(null, pos, SoundEvents.BLOCK_CHEST_OPEN, SoundCategory.BLOCKS, .1f, 1.4f);
             }
@@ -226,7 +226,7 @@ public class EjectorBlockEntity extends KineticBlockEntity {
             return;
         }
 
-        if (!world.isClient)
+        if (!world.isClient())
             for (Direction d : Iterate.directions) {
                 BlockState blockState = world.getBlockState(pos.offset(d));
                 if (!(blockState.getBlock() instanceof ObserverBlock))
@@ -262,7 +262,7 @@ public class EjectorBlockEntity extends KineticBlockEntity {
     }
 
     protected void addToLaunchedItems(ItemStack stack) {
-        if ((!world.isClient || isVirtual()) && trackedItem == null && scanCooldown == 0) {
+        if ((!world.isClient() || isVirtual()) && trackedItem == null && scanCooldown == 0) {
             scanCooldown = AllConfigs.server().kinetics.ejectorScanInterval.get();
             trackedItem = stack;
         }
@@ -282,7 +282,7 @@ public class EjectorBlockEntity extends KineticBlockEntity {
     public void tick() {
         super.tick();
 
-        boolean doLogic = !world.isClient || isVirtual();
+        boolean doLogic = !world.isClient() || isVirtual();
         State prevState = state;
 
         if (scanCooldown > 0)

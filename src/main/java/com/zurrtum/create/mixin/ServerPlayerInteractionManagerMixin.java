@@ -114,7 +114,7 @@ public class ServerPlayerInteractionManagerMixin {
     @WrapOperation(method = "tryBreakBlock(Lnet/minecraft/util/math/BlockPos;)Z", at = @At(value = "INVOKE", target = "Lnet/minecraft/item/ItemStack;postMine(Lnet/minecraft/world/World;Lnet/minecraft/block/BlockState;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/entity/player/PlayerEntity;)V"))
     private void postMine(ItemStack stack, World world, BlockState state, BlockPos pos, PlayerEntity miner, Operation<Void> original) {
         original.call(stack, world, state, pos, miner);
-        if (!world.isClient && state.getHardness(world, pos) != 0) {
+        if (!world.isClient() && state.getHardness(world, pos) != 0) {
             ExtendoGripItem.postMine(miner, stack);
         }
     }

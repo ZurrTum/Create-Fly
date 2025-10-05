@@ -85,7 +85,7 @@ public class FunnelMovementBehaviour extends MovementBehaviour {
         if (extract.isEmpty())
             return;
 
-        if (world.isClient)
+        if (world.isClient())
             return;
 
         ItemEntity entity = new ItemEntity(world, entityPos.x, entityPos.y, entityPos.z, extract);

@@ -24,7 +24,7 @@ public class CarriageEntityHandler {
         if (!entity.isAlive())
             return;
         World level = entity.getWorld();
-        if (level.isClient)
+        if (level.isClient())
             return;
         if (!isActiveChunk(level, entity.getBlockPos()))
             entity.leftTickingChunks = true;

@@ -37,7 +37,7 @@ public class PlacardBlockEntity extends SmartBlockEntity {
     @Override
     public void tick() {
         super.tick();
-        if (world.isClient)
+        if (world.isClient())
             return;
         if (poweredTicks == 0)
             return;

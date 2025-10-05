@@ -122,7 +122,7 @@ public class SawBlockEntity extends BlockBreakingKineticBlockEntity {
             spawnParticles(inventory.getStack(0));
 
         if (inventory.remainingTime < 5 && !inventory.appliedRecipe) {
-            if (world.isClient)
+            if (world.isClient())
                 return;
             playEvent = inventory.getStack(0);
             applyRecipe();
@@ -170,7 +170,7 @@ public class SawBlockEntity extends BlockBreakingKineticBlockEntity {
             boolean changed = false;
             if (!behaviour.canInsertFromSide(itemMovementFacing))
                 return;
-            if (world.isClient)
+            if (world.isClient())
                 return;
             for (int slot = 0, size = inventory.size(); slot < size; slot++) {
                 ItemStack stack = inventory.getStack(slot);
@@ -362,7 +362,7 @@ public class SawBlockEntity extends BlockBreakingKineticBlockEntity {
             return;
         if (!entity.isAlive())
             return;
-        if (world.isClient)
+        if (world.isClient())
             return;
 
         inventory.clear();
@@ -383,7 +383,7 @@ public class SawBlockEntity extends BlockBreakingKineticBlockEntity {
             return;
         if (inventory.isEmpty())
             return;
-        if (world.isClient)
+        if (world.isClient())
             return;
 
         SingleStackRecipeInput input = new SingleStackRecipeInput(inventory.getStack(0));

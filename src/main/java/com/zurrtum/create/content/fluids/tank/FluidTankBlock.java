@@ -153,7 +153,7 @@ public class FluidTankBlock extends Block implements IWrenchable, IBE<FluidTankB
         Hand hand,
         BlockHitResult hitResult
     ) {
-        boolean onClient = level.isClient;
+        boolean onClient = level.isClient();
 
         if (stack.isEmpty())
             return ActionResult.PASS_TO_DEFAULT_BLOCK_ACTION;

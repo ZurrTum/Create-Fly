@@ -28,7 +28,7 @@ public class ItemStackMixin {
     ) {
         if (item instanceof BlockItem) {
             World world = context.getWorld();
-            if (!world.isClient) {
+            if (!world.isClient()) {
                 place.set(new ItemPlacementContext(context));
             }
         }

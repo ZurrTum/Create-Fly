@@ -142,7 +142,7 @@ public class MechanicalCrafterBlock extends HorizontalKineticBlock implements IB
     @Override
     public ActionResult onWrenched(BlockState state, ItemUsageContext context) {
         if (context.getSide() == state.get(HORIZONTAL_FACING)) {
-            if (!context.getWorld().isClient)
+            if (!context.getWorld().isClient())
                 KineticBlockEntity.switchToBlockState(context.getWorld(), context.getBlockPos(), state.cycle(POINTING));
             return ActionResult.SUCCESS;
         }
@@ -178,7 +178,7 @@ public class MechanicalCrafterBlock extends HorizontalKineticBlock implements IB
             }
 
             if (crafter.phase == Phase.IDLE && !isHand && !wrenched) {
-                if (level.isClient)
+                if (level.isClient())
                     return ActionResult.SUCCESS;
 
                 if (stack.isOf(AllItems.CRAFTER_SLOT_COVER)) {
@@ -214,7 +214,7 @@ public class MechanicalCrafterBlock extends HorizontalKineticBlock implements IB
             ItemStack inSlot = handler.getStack();
             if (inSlot.isEmpty()) {
                 if (crafter.covered && !wrenched) {
-                    if (level.isClient)
+                    if (level.isClient())
                         return ActionResult.SUCCESS;
                     crafter.covered = false;
                     crafter.markDirty();
@@ -227,7 +227,7 @@ public class MechanicalCrafterBlock extends HorizontalKineticBlock implements IB
             }
             if (!isHand && !handler.matches(stack, inSlot))
                 return ActionResult.PASS_TO_DEFAULT_BLOCK_ACTION;
-            if (level.isClient)
+            if (level.isClient())
                 return ActionResult.SUCCESS;
             player.getInventory().offerOrDrop(handler.onExtract(inSlot));
             handler.setStack(ItemStack.EMPTY);

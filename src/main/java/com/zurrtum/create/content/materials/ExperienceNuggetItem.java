@@ -28,7 +28,7 @@ public class ExperienceNuggetItem extends Item {
     @Override
     public ActionResult use(World pLevel, PlayerEntity pPlayer, Hand pUsedHand) {
         ItemStack itemInHand = pPlayer.getStackInHand(pUsedHand);
-        if (pLevel.isClient) {
+        if (pLevel.isClient()) {
             pLevel.playSound(pPlayer, pPlayer.getBlockPos(), SoundEvents.BLOCK_AMETHYST_BLOCK_BREAK, SoundCategory.PLAYERS, .5f, 1);
             return ActionResult.CONSUME.withNewHandStack(itemInHand);
         }

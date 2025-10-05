@@ -377,7 +377,7 @@ public class FrogportBlockEntity extends PackagePortBlockEntity {
             ItemStack mainHandItem = player.getMainHandStack();
             if (mainHandItem.isOf(AllItems.GOGGLES)) {
                 goggles = true;
-                if (!world.isClient) {
+                if (!world.isClient()) {
                     notifyUpdate();
                     world.playSound(null, pos, SoundEvents.ITEM_ARMOR_EQUIP_GOLD.value(), SoundCategory.BLOCKS, 0.5f, 1.0f);
                 }

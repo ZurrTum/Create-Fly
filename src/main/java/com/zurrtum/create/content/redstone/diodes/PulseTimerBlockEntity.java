@@ -24,7 +24,7 @@ public class PulseTimerBlockEntity extends BrassDiodeBlockEntity {
         else
             state++;
 
-        if (world.isClient)
+        if (world.isClient())
             return;
 
         boolean shouldPower = !powered && (maxState.getValue() == 2 ? state == 0 : state <= 1);

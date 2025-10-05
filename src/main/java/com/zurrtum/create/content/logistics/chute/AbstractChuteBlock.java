@@ -89,7 +89,7 @@ public abstract class AbstractChuteBlock extends Block implements IWrenchable, I
         ItemStack stack = ItemHelper.fromItemEntity(entityIn);
         if (stack.isEmpty())
             return;
-        if (entityIn.getWorld().isClient)
+        if (entityIn.getWorld().isClient())
             return;
         if (!entityIn.isAlive())
             return;
@@ -203,7 +203,7 @@ public abstract class AbstractChuteBlock extends Block implements IWrenchable, I
     ) {
         if (!stack.isEmpty())
             return ActionResult.PASS_TO_DEFAULT_BLOCK_ACTION;
-        if (level.isClient)
+        if (level.isClient())
             return ActionResult.SUCCESS;
 
         return onBlockEntityUseItemOn(

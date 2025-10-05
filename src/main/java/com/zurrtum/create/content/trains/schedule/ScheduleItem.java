@@ -55,7 +55,7 @@ public class ScheduleItem extends Item implements MenuProvider, SupportsItemCopy
     @Override
     public ActionResult use(World world, PlayerEntity player, Hand hand) {
         if (!player.isSneaking() && hand == Hand.MAIN_HAND) {
-            if (!world.isClient && player instanceof ServerPlayerEntity serverPlayer)
+            if (!world.isClient() && player instanceof ServerPlayerEntity serverPlayer)
                 openHandledScreen(serverPlayer);
             return ActionResult.SUCCESS;
         }
@@ -73,7 +73,7 @@ public class ScheduleItem extends Item implements MenuProvider, SupportsItemCopy
         Entity rootVehicle = pInteractionTarget.getRootVehicle();
         if (!(rootVehicle instanceof CarriageContraptionEntity entity))
             return pass;
-        if (pPlayer.getWorld().isClient)
+        if (pPlayer.getWorld().isClient())
             return ActionResult.SUCCESS;
 
         Contraption contraption = entity.getContraption();

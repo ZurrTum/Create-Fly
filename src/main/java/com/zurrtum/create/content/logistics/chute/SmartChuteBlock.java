@@ -35,7 +35,7 @@ public class SmartChuteBlock extends AbstractChuteBlock {
         boolean isMoving
     ) {
         super.neighborUpdate(state, level, pos, block, wireOrientation, isMoving);
-        if (level.isClient)
+        if (level.isClient())
             return;
         if (!level.getBlockTickScheduler().isTicking(pos, this))
             level.scheduleBlockTick(pos, this, 1);

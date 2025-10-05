@@ -35,7 +35,7 @@ public class SmartFluidPipeBlockEntity extends SmartBlockEntity {
     }
 
     private void onFilterChanged(ItemStack newFilter) {
-        if (!world.isClient)
+        if (!world.isClient())
             FluidPropagator.propagateChangedPipe(world, pos, getCachedState());
     }
 

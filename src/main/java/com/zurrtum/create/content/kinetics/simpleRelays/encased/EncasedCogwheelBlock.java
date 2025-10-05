@@ -85,7 +85,7 @@ public class EncasedCogwheelBlock extends RotatedPillarKineticBlock implements I
             return super.onWrenched(state, context);
 
         World level = context.getWorld();
-        if (level.isClient)
+        if (level.isClient())
             return ActionResult.SUCCESS;
 
         BlockPos pos = context.getBlockPos();
@@ -109,7 +109,7 @@ public class EncasedCogwheelBlock extends RotatedPillarKineticBlock implements I
 
     @Override
     public ActionResult onSneakWrenched(BlockState state, ItemUsageContext context) {
-        if (context.getWorld().isClient)
+        if (context.getWorld().isClient())
             return ActionResult.SUCCESS;
         context.getWorld().syncWorldEvent(WorldEvents.BLOCK_BROKEN, context.getBlockPos(), Block.getRawIdFromState(state));
         KineticBlockEntity.switchToBlockState(

@@ -106,7 +106,7 @@ public class NixieTubeBlock extends DoubleFaceAttachedBlock implements IBE<Nixie
             component = stack.getOrDefault(DataComponentTypes.CUSTOM_NAME, ScreenTexts.EMPTY);
         }
 
-        if (level.isClient)
+        if (level.isClient())
             return ActionResult.SUCCESS;
 
         walkNixies(
@@ -221,7 +221,7 @@ public class NixieTubeBlock extends DoubleFaceAttachedBlock implements IBE<Nixie
         @Nullable WireOrientation wireOrientation,
         boolean isMoving
     ) {
-        if (level.isClient)
+        if (level.isClient())
             return;
         if (!level.getBlockTickScheduler().isTicking(pos, this))
             level.scheduleBlockTick(pos, this, 1);
@@ -240,7 +240,7 @@ public class NixieTubeBlock extends DoubleFaceAttachedBlock implements IBE<Nixie
     }
 
     private void updateDisplayedRedstoneValue(BlockState state, World worldIn, BlockPos pos) {
-        if (worldIn.isClient)
+        if (worldIn.isClient())
             return;
         withBlockEntityDo(
             worldIn, pos, be -> {

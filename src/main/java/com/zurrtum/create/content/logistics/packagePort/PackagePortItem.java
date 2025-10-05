@@ -18,7 +18,7 @@ public class PackagePortItem extends BlockItem {
 
     @Override
     protected boolean postPlacement(BlockPos pos, World world, PlayerEntity player, ItemStack p_195943_4_, BlockState p_195943_5_) {
-        if (!world.isClient && player instanceof ServerPlayerEntity sp)
+        if (!world.isClient() && player instanceof ServerPlayerEntity sp)
             sp.networkHandler.sendPacket(new PackagePortPlacementRequestPacket(pos));
         return super.postPlacement(pos, world, player, p_195943_4_, p_195943_5_);
     }

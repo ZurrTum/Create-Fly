@@ -108,7 +108,7 @@ public class SmartFluidTankBehaviour extends BlockEntityBehaviour<SmartBlockEnti
     @Override
     public void initialize() {
         super.initialize();
-        if (getWorld().isClient)
+        if (getWorld().isClient())
             return;
         forEach(ts -> {
             ts.fluidLevel.forceNextSync();
@@ -365,7 +365,7 @@ public class SmartFluidTankBehaviour extends BlockEntityBehaviour<SmartBlockEnti
             if (!blockEntity.hasWorld())
                 return;
             fluidLevel.chase(fluid.getAmount() / (float) capacity, .25, Chaser.EXP);
-            if (!getWorld().isClient)
+            if (!getWorld().isClient())
                 sendDataLazily();
             if (blockEntity.isVirtual() && !fluid.isEmpty())
                 renderedFluid = fluid;

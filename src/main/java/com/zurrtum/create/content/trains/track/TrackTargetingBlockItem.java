@@ -65,7 +65,7 @@ public class TrackTargetingBlockItem extends BlockItem {
             return ActionResult.FAIL;
 
         if (player.isSneaking() && stack.contains(AllDataComponents.TRACK_TARGETING_ITEM_SELECTED_POS)) {
-            if (level.isClient)
+            if (level.isClient())
                 return ActionResult.SUCCESS;
             player.sendMessage(Text.translatable("create.track_target.clear"), true);
             stack.remove(AllDataComponents.TRACK_TARGETING_ITEM_SELECTED_POS);
@@ -76,7 +76,7 @@ public class TrackTargetingBlockItem extends BlockItem {
         }
 
         if (state.getBlock() instanceof ITrackBlock track) {
-            if (level.isClient)
+            if (level.isClient())
                 return ActionResult.SUCCESS;
 
             Vec3d lookAngle = player.getRotationVector();
@@ -137,7 +137,7 @@ public class TrackTargetingBlockItem extends BlockItem {
         ActionResult useOn = super.useOnBlock(pContext);
         stack.remove(DataComponentTypes.BLOCK_ENTITY_DATA);
 
-        if (level.isClient || useOn == ActionResult.FAIL)
+        if (level.isClient() || useOn == ActionResult.FAIL)
             return useOn;
 
         ItemStack itemInHand = player.getStackInHand(pContext.getHand());

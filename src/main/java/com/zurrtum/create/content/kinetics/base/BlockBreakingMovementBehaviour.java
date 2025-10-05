@@ -27,7 +27,7 @@ public class BlockBreakingMovementBehaviour extends MovementBehaviour {
 
     @Override
     public void startMoving(MovementContext context) {
-        if (context.world.isClient)
+        if (context.world.isClient())
             return;
         context.data.putInt("BreakerId", -BlockBreakingKineticBlockEntity.NEXT_BREAKER_ID.incrementAndGet());
     }
@@ -39,7 +39,7 @@ public class BlockBreakingMovementBehaviour extends MovementBehaviour {
 
         if (!stateVisited.isSolidBlock(world, pos))
             damageEntities(context, pos, world);
-        if (world.isClient)
+        if (world.isClient())
             return;
 
         if (!canBreak(world, pos, stateVisited))
@@ -67,11 +67,11 @@ public class BlockBreakingMovementBehaviour extends MovementBehaviour {
                     if (passenger instanceof AbstractContraptionEntity && ((AbstractContraptionEntity) passenger).getContraption() == context.contraption)
                         continue Entities;
 
-            if (damageSource != null && !world.isClient) {
+            if (damageSource != null && !world.isClient()) {
                 float damage = (float) MathHelper.clamp(6 * Math.pow(context.relativeMotion.length(), 0.4) + 1, 2, 10);
                 entity.damage((ServerWorld) world, damageSource, damage);
             }
-            if (throwsEntities(world) && (world.isClient == (entity instanceof PlayerEntity)))
+            if (throwsEntities(world) && (world.isClient() == (entity instanceof PlayerEntity)))
                 throwEntity(context, entity);
         }
     }
@@ -97,7 +97,7 @@ public class BlockBreakingMovementBehaviour extends MovementBehaviour {
     @Override
     public void cancelStall(MovementContext context) {
         NbtCompound data = context.data;
-        if (context.world.isClient)
+        if (context.world.isClient())
             return;
         if (!data.contains("BreakingPos"))
             return;
@@ -143,7 +143,7 @@ public class BlockBreakingMovementBehaviour extends MovementBehaviour {
 
     public void tickBreaker(MovementContext context) {
         NbtCompound data = context.data;
-        if (context.world.isClient)
+        if (context.world.isClient())
             return;
         if (!data.contains("BreakingPos")) {
             context.stall = false;

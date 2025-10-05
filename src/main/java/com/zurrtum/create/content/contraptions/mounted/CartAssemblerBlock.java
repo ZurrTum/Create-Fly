@@ -105,7 +105,7 @@ public class CartAssemblerBlock extends AbstractRailBlock implements IBE<CartAss
     public void onMinecartPass(BlockState state, World world, BlockPos pos, AbstractMinecartEntity cart) {
         if (!canAssembleTo(cart))
             return;
-        if (world.isClient)
+        if (world.isClient())
             return;
 
         withBlockEntityDo(world, pos, be -> be.assembleNextTick(cart));
@@ -187,7 +187,7 @@ public class CartAssemblerBlock extends AbstractRailBlock implements IBE<CartAss
         @Nullable WireOrientation WireOrientation,
         boolean isMoving
     ) {
-        if (worldIn.isClient)
+        if (worldIn.isClient())
             return;
         boolean previouslyPowered = state.get(POWERED);
         if (previouslyPowered != worldIn.isReceivingRedstonePower(pos))
@@ -275,7 +275,7 @@ public class CartAssemblerBlock extends AbstractRailBlock implements IBE<CartAss
         World world = context.getWorld();
         BlockPos pos = context.getBlockPos();
         PlayerEntity player = context.getPlayer();
-        if (world.isClient)
+        if (world.isClient())
             return ActionResult.SUCCESS;
         if (player != null && !player.isCreative())
             getDropsNoRail(
@@ -319,7 +319,7 @@ public class CartAssemblerBlock extends AbstractRailBlock implements IBE<CartAss
     @Override
     public ActionResult onWrenched(BlockState state, ItemUsageContext context) {
         World world = context.getWorld();
-        if (world.isClient)
+        if (world.isClient())
             return ActionResult.SUCCESS;
         BlockPos pos = context.getBlockPos();
         world.setBlockState(pos, rotate(state, BlockRotation.CLOCKWISE_90), Block.NOTIFY_ALL);

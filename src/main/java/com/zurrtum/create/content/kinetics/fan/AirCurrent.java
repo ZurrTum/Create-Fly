@@ -47,7 +47,7 @@ public class AirCurrent {
         if (direction == null)
             rebuild();
         World world = source.getAirCurrentWorld();
-        if (world != null && world.isClient) {
+        if (world != null && world.isClient()) {
             float offset = pushing ? 0.5f : maxDistance + .5f;
             Vec3d pos = VecHelper.getCenterOf(source.getAirCurrentPos()).add(Vec3d.of(direction.getVector()).multiply(offset));
             AllClientHandle.INSTANCE.addAirFlowParticle(world, source.getAirCurrentPos(), pos.x, pos.y, pos.z);
@@ -82,7 +82,7 @@ public class AirCurrent {
 
             entity.setVelocity(previousMotion.add(new Vec3d(xIn, yIn, zIn).multiply(1 / 8f)));
             entity.fallDistance = 0;
-            if (world != null && world.isClient) {
+            if (world != null && world.isClient()) {
                 AllClientHandle.INSTANCE.enableClientPlayerSound(entity, MathHelper.clamp(speed / 128f * .4f, 0.01f, .4f));
             }
 
@@ -95,7 +95,7 @@ public class AirCurrent {
                 continue;
 
             if (entity instanceof ItemEntity itemEntity) {
-                if (world != null && world.isClient) {
+                if (world != null && world.isClient()) {
                     processingType.spawnProcessingParticles(world, entity.getPos());
                     continue;
                 }
@@ -126,7 +126,7 @@ public class AirCurrent {
                 continue;
 
             handler.handleProcessingOnAllItems(transported -> {
-                if (world.isClient) {
+                if (world.isClient()) {
                     processingType.spawnProcessingParticles(world, handler.getWorldPositionOf(transported));
                     return TransportedResult.doNothing();
                 }

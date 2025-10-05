@@ -50,7 +50,7 @@ public class GearshiftBlock extends AbstractEncasedShaftBlock implements IBE<Spl
         @Nullable WireOrientation wireOrientation,
         boolean isMoving
     ) {
-        if (worldIn.isClient)
+        if (worldIn.isClient())
             return;
 
         boolean previouslyPowered = state.get(POWERED);

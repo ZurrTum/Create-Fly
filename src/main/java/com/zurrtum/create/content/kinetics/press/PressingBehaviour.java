@@ -130,7 +130,7 @@ public class PressingBehaviour extends BeltProcessingBehaviour {
         BlockPos worldPosition = getPos();
 
         if (!running || level == null) {
-            if (level != null && !level.isClient) {
+            if (level != null && !level.isClient()) {
 
                 if (specifics.getKineticSpeed() == 0)
                     return;
@@ -158,7 +158,7 @@ public class PressingBehaviour extends BeltProcessingBehaviour {
             return;
         }
 
-        if (level.isClient && runningTicks == -CYCLE / 2) {
+        if (level.isClient() && runningTicks == -CYCLE / 2) {
             prevRunningTicks = CYCLE / 2;
             return;
         }
@@ -179,11 +179,11 @@ public class PressingBehaviour extends BeltProcessingBehaviour {
                     .75f + (Math.abs(specifics.getKineticSpeed()) / 1024f)
                 );
 
-            if (!level.isClient)
+            if (!level.isClient())
                 blockEntity.sendData();
         }
 
-        if (!level.isClient && runningTicks > CYCLE) {
+        if (!level.isClient() && runningTicks > CYCLE) {
             finished = true;
             running = false;
             particleItems.clear();
@@ -197,14 +197,14 @@ public class PressingBehaviour extends BeltProcessingBehaviour {
         if (prevRunningTicks < CYCLE / 2 && runningTicks >= CYCLE / 2) {
             runningTicks = CYCLE / 2;
             // Pause the ticks until a packet is received
-            if (level.isClient && !blockEntity.isVirtual())
+            if (level.isClient() && !blockEntity.isVirtual())
                 runningTicks = -(CYCLE / 2);
         }
     }
 
     protected void applyOnBasin() {
         World level = getWorld();
-        if (level.isClient)
+        if (level.isClient())
             return;
         particleItems.clear();
         if (specifics.tryProcessInBasin(false))
@@ -219,7 +219,7 @@ public class PressingBehaviour extends BeltProcessingBehaviour {
 
         particleItems.clear();
 
-        if (level.isClient)
+        if (level.isClient())
             return;
 
         for (Entity entity : level.getOtherEntities(null, bb)) {
@@ -265,7 +265,7 @@ public class PressingBehaviour extends BeltProcessingBehaviour {
 
     public void makePressingParticleEffect(Vec3d pos, ItemStack stack, int amount) {
         World level = getWorld();
-        if (level == null || !level.isClient)
+        if (level == null || !level.isClient())
             return;
         for (int i = 0; i < amount; i++) {
             Vec3d motion = VecHelper.offsetRandomly(Vec3d.ZERO, level.random, .125f).multiply(1, 0, 1);
@@ -276,7 +276,7 @@ public class PressingBehaviour extends BeltProcessingBehaviour {
 
     public void makeCompactingParticleEffect(Vec3d pos, ItemStack stack) {
         World level = getWorld();
-        if (level == null || !level.isClient)
+        if (level == null || !level.isClient())
             return;
         for (int i = 0; i < 20; i++) {
             Vec3d motion = VecHelper.offsetRandomly(Vec3d.ZERO, level.random, .175f).multiply(1, 0, 1);

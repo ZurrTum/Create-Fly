@@ -58,7 +58,7 @@ public class SequencedGearshiftBlock extends HorizontalAxisKineticBlock implemen
         @Nullable WireOrientation wireOrientation,
         boolean isMoving
     ) {
-        if (level.isClient)
+        if (level.isClient())
             return;
         if (!level.getBlockTickScheduler().isTicking(pos, this))
             level.scheduleBlockTick(pos, this, 1);
@@ -100,7 +100,7 @@ public class SequencedGearshiftBlock extends HorizontalAxisKineticBlock implemen
                 return ActionResult.PASS_TO_DEFAULT_BLOCK_ACTION;
         }
 
-        if (level.isClient) {
+        if (level.isClient()) {
             withBlockEntityDo(level, pos, be -> AllClientHandle.INSTANCE.openSequencedGearshiftScreen(be));
         }
         return ActionResult.SUCCESS;

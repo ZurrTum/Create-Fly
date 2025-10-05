@@ -121,7 +121,7 @@ public class ControllerRailBlock extends AbstractRailBlock implements IWrenchabl
 
     @Override
     public void onMinecartPass(BlockState state, World world, BlockPos pos, AbstractMinecartEntity cart) {
-        if (world.isClient)
+        if (world.isClient())
             return;
         Vec3d accelerationVec = Vec3d.of(getAccelerationVector(state));
         double targetSpeed = cart.getMaxSpeed((ServerWorld) world) * state.get(POWER) / 15f;
@@ -191,7 +191,7 @@ public class ControllerRailBlock extends AbstractRailBlock implements IWrenchabl
     @Override
     public ActionResult onWrenched(BlockState state, ItemUsageContext context) {
         World world = context.getWorld();
-        if (world.isClient)
+        if (world.isClient())
             return ActionResult.SUCCESS;
         BlockPos pos = context.getBlockPos();
         for (BlockRotation testRotation : WRENCH_ROTATION) {

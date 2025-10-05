@@ -56,7 +56,7 @@ public class PumpBlockEntity extends KineticBlockEntity {
     public void tick() {
         super.tick();
 
-        if (world.isClient && !isVirtual())
+        if (world.isClient() && !isVirtual())
             return;
 
         if (scheduleFlip) {
@@ -80,7 +80,7 @@ public class PumpBlockEntity extends KineticBlockEntity {
             return;
         if (speed != 0)
             award(AllAdvancements.PUMP);
-        if (world.isClient && !isVirtual())
+        if (world.isClient() && !isVirtual())
             return;
 
         updatePressureChange();

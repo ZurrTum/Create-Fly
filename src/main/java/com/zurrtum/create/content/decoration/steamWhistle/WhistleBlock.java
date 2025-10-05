@@ -199,7 +199,7 @@ public class WhistleBlock extends Block implements IBE<WhistleBlockEntity>, IWre
         @Nullable WireOrientation wireOrientation,
         boolean isMoving
     ) {
-        if (worldIn.isClient)
+        if (worldIn.isClient())
             return;
         boolean previouslyPowered = state.get(POWERED);
         if (previouslyPowered != worldIn.isReceivingRedstonePower(pos))

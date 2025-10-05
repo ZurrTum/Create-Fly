@@ -89,7 +89,7 @@ public abstract class FunnelBlock extends AbstractDirectionalFunnelBlock {
             return ActionResult.PASS_TO_DEFAULT_BLOCK_ACTION;
 
         if (hitResult.getSide() == getFunnelFacing(state) && !shouldntInsertItem) {
-            if (!level.isClient)
+            if (!level.isClient())
                 withBlockEntityDo(
                     level, pos, be -> {
                         ItemStack toInsert = stack.copy();
@@ -107,14 +107,14 @@ public abstract class FunnelBlock extends AbstractDirectionalFunnelBlock {
     @Override
     public ActionResult onWrenched(BlockState state, ItemUsageContext context) {
         World world = context.getWorld();
-        if (!world.isClient)
+        if (!world.isClient())
             world.setBlockState(context.getBlockPos(), state.cycle(EXTRACTING));
         return ActionResult.SUCCESS;
     }
 
     @Override
     public void onEntityCollision(BlockState state, World worldIn, BlockPos pos, Entity entityIn, EntityCollisionHandler entityCollisionHandler) {
-        if (worldIn.isClient)
+        if (worldIn.isClient())
             return;
         ItemStack stack = ItemHelper.fromItemEntity(entityIn);
         if (stack.isEmpty())

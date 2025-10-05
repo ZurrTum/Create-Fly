@@ -25,7 +25,7 @@ public class MountedDepotInteractionBehaviour extends MovingInteractionBehaviour
         if (activeHand == Hand.OFF_HAND)
             return false;
         World world = player.getWorld();
-        if (world.isClient)
+        if (world.isClient())
             return true;
 
         ItemStack itemInHand = player.getStackInHand(activeHand);

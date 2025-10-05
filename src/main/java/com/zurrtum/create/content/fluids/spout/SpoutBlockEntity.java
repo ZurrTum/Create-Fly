@@ -208,7 +208,7 @@ public class SpoutBlockEntity extends SmartBlockEntity {
             }
         }
 
-        if (processingTicks >= 8 && world.isClient) {
+        if (processingTicks >= 8 && world.isClient()) {
             spawnProcessingParticles(tank.getPrimaryTank().getRenderedFluid());
         }
     }
