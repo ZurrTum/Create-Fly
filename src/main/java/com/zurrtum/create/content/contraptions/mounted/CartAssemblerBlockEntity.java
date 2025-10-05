@@ -95,7 +95,7 @@ public class CartAssemblerBlockEntity extends SmartBlockEntity {
             cart.setVelocity(Vec3d.of(accelerationVector).multiply(speed));
         }
         if (action == CartAssemblerBlock.CartAssemblerAction.DISASSEMBLE_BRAKE) {
-            Vec3d diff = VecHelper.getCenterOf(pos).subtract(cart.getPos());
+            Vec3d diff = VecHelper.getCenterOf(pos).subtract(cart.getEntityPos());
             cart.setVelocity(diff.x / 16f, 0, diff.z / 16f);
         }
     }
@@ -138,7 +138,7 @@ public class CartAssemblerBlockEntity extends SmartBlockEntity {
         contraption.expandBoundsAroundAxis(Axis.Y);
 
         if (couplingFound) {
-            Vec3d diff = contraption.connectedCart.getPos().subtract(cart.getPos());
+            Vec3d diff = contraption.connectedCart.getEntityPos().subtract(cart.getEntityPos());
             initialOrientation = Direction.fromHorizontalDegrees(MathHelper.atan2(diff.z, diff.x) * 180 / Math.PI);
         }
 

@@ -66,7 +66,7 @@ public class SandPaperItem extends Item {
         for (ItemEntity itemEntity : worldIn.getNonSpectatingEntities(ItemEntity.class, bb)) {
             if (!itemEntity.isAlive())
                 continue;
-            if (itemEntity.getPos().distanceTo(playerIn.getPos()) > 3)
+            if (itemEntity.getEntityPos().distanceTo(playerIn.getEntityPos()) > 3)
                 continue;
             ItemStack stack = itemEntity.getStack();
             if (!recipe.canUse(stack))

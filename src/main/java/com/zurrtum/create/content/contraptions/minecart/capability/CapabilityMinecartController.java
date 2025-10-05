@@ -119,7 +119,7 @@ public class CapabilityMinecartController {
             return;
         if (world.isClient())
             return;
-        handleKilledMinecart(world, carts.get(uniqueID), entity.getPos());
+        handleKilledMinecart(world, carts.get(uniqueID), entity.getEntityPos());
     }
 
     protected static void handleKilledMinecart(World world, MinecartController controller, Vec3d removedPos) {
@@ -138,7 +138,7 @@ public class CapabilityMinecartController {
             if (cart == null)
                 continue;
 
-            Vec3d itemPos = cart.getPos().add(removedPos).multiply(.5f);
+            Vec3d itemPos = cart.getEntityPos().add(removedPos).multiply(.5f);
             ItemEntity itemEntity = new ItemEntity(world, itemPos.x, itemPos.y, itemPos.z, AllItems.MINECART_COUPLING.getDefaultStack());
             itemEntity.setToDefaultPickupDelay();
             world.spawnEntity(itemEntity);

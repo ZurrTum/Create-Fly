@@ -108,7 +108,7 @@ public class BlazeBurnerBlockItem extends BlockItem {
             return ActionResult.PASS;
 
         World world = player.getEntityWorld();
-        spawnCaptureEffects(world, entity.getPos());
+        spawnCaptureEffects(world, entity.getEntityPos());
         if (world.isClient())
             return ActionResult.FAIL;
 

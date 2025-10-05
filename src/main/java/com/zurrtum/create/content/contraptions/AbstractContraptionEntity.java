@@ -528,7 +528,7 @@ public abstract class AbstractContraptionEntity extends Entity {
     }
 
     public Vec3d getAnchorVec() {
-        return getPos();
+        return getEntityPos();
     }
 
     public Vec3d getPrevAnchorVec() {
@@ -662,7 +662,7 @@ public abstract class AbstractContraptionEntity extends Entity {
 
     public void moveCollidedEntitiesOnDisassembly(StructureTransform transform) {
         for (Entity entity : collidingEntities.keySet()) {
-            Vec3d localVec = toLocalVector(entity.getPos(), 0);
+            Vec3d localVec = toLocalVector(entity.getEntityPos(), 0);
             Vec3d transformed = transform.apply(localVec);
             if (getEntityWorld().isClient())
                 entity.setPosition(transformed.x, transformed.y + 1 / 16f, transformed.z);
@@ -722,7 +722,7 @@ public abstract class AbstractContraptionEntity extends Entity {
 
     @Override
     public void writeData(WriteView view) {
-        Vec3d vec = getPos();
+        Vec3d vec = getEntityPos();
         List<Entity> passengers = getPassengerList();
 
         for (Entity entity : passengers) {
@@ -730,7 +730,7 @@ public abstract class AbstractContraptionEntity extends Entity {
             entity.removalReason = RemovalReason.UNLOADED_TO_CHUNK;
 
             // Gather passengers into same chunk when saving
-            Vec3d prevVec = entity.getPos();
+            Vec3d prevVec = entity.getEntityPos();
             entity.setPos(vec.x, prevVec.y, vec.z);
 
             // Super requires all passengers to not be removed in order to write them to the
@@ -766,7 +766,7 @@ public abstract class AbstractContraptionEntity extends Entity {
     }
 
     public Vec3d getPrevPositionVec() {
-        return prevPosInvalid ? getPos() : new Vec3d(lastX, lastY, lastZ);
+        return prevPosInvalid ? getEntityPos() : new Vec3d(lastX, lastY, lastZ);
     }
 
     public abstract ContraptionRotationState getRotationState();
@@ -777,7 +777,7 @@ public abstract class AbstractContraptionEntity extends Entity {
 
         Vec3d contactPoint = toGlobalVector(toLocalVector(globalContactPoint, 0, true), 1, true);
         Vec3d contraptionLocalMovement = contactPoint.subtract(globalContactPoint);
-        Vec3d contraptionAnchorMovement = getPos().subtract(getPrevPositionVec());
+        Vec3d contraptionAnchorMovement = getEntityPos().subtract(getPrevPositionVec());
         return contraptionLocalMovement.add(contraptionAnchorMovement);
     }
 

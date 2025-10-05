@@ -196,13 +196,13 @@ public class SuperGlueEntity extends Entity implements SpecialEntityItemRequirem
 
     @Override
     public void writeCustomData(WriteView view) {
-        Box box = getBoundingBox().offset(getPos().multiply(-1));
+        Box box = getBoundingBox().offset(getEntityPos().multiply(-1));
         view.put("Box", CreateCodecs.BOX_CODEC, box);
     }
 
     @Override
     public void readCustomData(ReadView view) {
-        Box box = view.read("Box", CreateCodecs.BOX_CODEC).orElseThrow().offset(getPos());
+        Box box = view.read("Box", CreateCodecs.BOX_CODEC).orElseThrow().offset(getEntityPos());
         setBoundingBox(box);
     }
 
@@ -235,9 +235,9 @@ public class SuperGlueEntity extends Entity implements SpecialEntityItemRequirem
 
     @Override
     public float applyRotation(BlockRotation transformRotation) {
-        Box bb = getBoundingBox().offset(getPos().multiply(-1));
+        Box bb = getBoundingBox().offset(getEntityPos().multiply(-1));
         if (transformRotation == BlockRotation.CLOCKWISE_90 || transformRotation == BlockRotation.COUNTERCLOCKWISE_90)
-            setBoundingBox(new Box(bb.minZ, bb.minY, bb.minX, bb.maxZ, bb.maxY, bb.maxX).offset(getPos()));
+            setBoundingBox(new Box(bb.minZ, bb.minY, bb.minX, bb.maxZ, bb.maxY, bb.maxX).offset(getEntityPos()));
         return super.applyRotation(transformRotation);
     }
 

@@ -133,7 +133,7 @@ public class DepotRenderer extends SafeBlockEntityRenderer<DepotBlockEntity> {
         if (renderUpright) {
             Entity renderViewEntity = MinecraftClient.getInstance().cameraEntity;
             if (renderViewEntity != null) {
-                Vec3d positionVec = renderViewEntity.getPos();
+                Vec3d positionVec = renderViewEntity.getEntityPos();
                 Vec3d vectorForOffset = itemPosition;
                 Vec3d diff = vectorForOffset.subtract(positionVec);
                 float yRot = (float) (MathHelper.atan2(diff.x, diff.z) + Math.PI);

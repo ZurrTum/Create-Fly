@@ -83,7 +83,7 @@ public class SoundScape {
         Entity renderViewEntity = MinecraftClient.getInstance().cameraEntity;
         float distanceMultiplier = 0;
         if (renderViewEntity != null) {
-            double distanceTo = renderViewEntity.getPos().distanceTo(getMeanPos());
+            double distanceTo = renderViewEntity.getEntityPos().distanceTo(getMeanPos());
             distanceMultiplier = (float) MathHelper.lerp(distanceTo / SoundScapes.MAX_AMBIENT_SOURCE_DISTANCE, 2, 0);
         }
         int soundCount = SoundScapes.getSoundCount(group, pitchGroup);

@@ -961,7 +961,7 @@ public class AllHandle {
             sender.networkHandler.vehicleFloatingTicks = 0;
         }
         sender.getEntityWorld().getChunkManager()
-            .sendToOtherNearbyPlayers(sender, new LimbSwingUpdatePacket(sender.getId(), sender.getPos(), packet.limbSwing()));
+            .sendToOtherNearbyPlayers(sender, new LimbSwingUpdatePacket(sender.getId(), sender.getEntityPos(), packet.limbSwing()));
     }
 
     public static void onArmPlacement(ServerPlayNetworkHandler listener, ArmPlacementPacket packet) {
@@ -1326,11 +1326,11 @@ public class AllHandle {
             return;
 
         int verifyDistance = AllConfigs.server().trains.maxTrackPlacementLength.get() * 2;
-        if (!sender.getPos().isInRange(Vec3d.ofCenter(packet.pos()), verifyDistance)) {
+        if (!sender.getEntityPos().isInRange(Vec3d.ofCenter(packet.pos()), verifyDistance)) {
             Create.LOGGER.warn(messagePrefix + train.name.getString() + ": player too far from clicked pos");
             return;
         }
-        if (!sender.getPos().isInRange(cce.getPos(), verifyDistance + cce.getBoundingBox().getLengthX() / 2)) {
+        if (!sender.getEntityPos().isInRange(cce.getEntityPos(), verifyDistance + cce.getBoundingBox().getLengthX() / 2)) {
             Create.LOGGER.warn(messagePrefix + train.name.getString() + ": player too far from carriage entity");
             return;
         }
@@ -1371,7 +1371,7 @@ public class AllHandle {
             return;
         }
 
-        if (ace.toGlobalVector(Vec3d.ofCenter(packet.controlsPos()), 0).isInRange(player.getPos(), 16))
+        if (ace.toGlobalVector(Vec3d.ofCenter(packet.controlsPos()), 0).isInRange(player.getEntityPos(), 16))
             ControlsServerHandler.receivePressed(world, ace, packet.controlsPos(), uniqueID, packet.activatedButtons(), packet.press());
     }
 
@@ -1417,7 +1417,7 @@ public class AllHandle {
         if (!(entity instanceof SuperGlueEntity superGlue))
             return;
         double range = 32;
-        if (player.squaredDistanceTo(superGlue.getPos()) > range * range)
+        if (player.squaredDistanceTo(superGlue.getEntityPos()) > range * range)
             return;
         AllSoundEvents.SLIME_ADDED.play(world, null, packet.soundSource(), 0.5F, 0.5F);
         superGlue.spawnParticles();

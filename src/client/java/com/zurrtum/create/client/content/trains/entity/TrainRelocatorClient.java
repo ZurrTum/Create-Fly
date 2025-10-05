@@ -60,7 +60,7 @@ public class TrainRelocatorClient {
         if (player.isSpectator())
             return false;
 
-        if (!player.getPos().isInRange(relocatingOrigin, 24) || player.isSneaking()) {
+        if (!player.getEntityPos().isInRange(relocatingOrigin, 24) || player.isSneaking()) {
             relocatingTrain = null;
             player.sendMessage(CreateLang.translateDirect("train.relocate.abort").formatted(Formatting.RED), true);
             return false;
@@ -173,7 +173,7 @@ public class TrainRelocatorClient {
                 return;
             }
 
-            if (!player.getPos().isInRange(relocatingOrigin, 24)) {
+            if (!player.getEntityPos().isInRange(relocatingOrigin, 24)) {
                 player.sendMessage(CreateLang.translateDirect("train.relocate.too_far").formatted(Formatting.RED), true);
                 return;
             }

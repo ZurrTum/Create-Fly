@@ -118,7 +118,7 @@ public abstract class ZapperItem extends Item implements SwingControlItem {
         }
 
         // Raytrace - Find the target
-        Vec3d start = player.getPos().add(0, player.getStandingEyeHeight(), 0);
+        Vec3d start = player.getEntityPos().add(0, player.getStandingEyeHeight(), 0);
         Vec3d range = player.getRotationVector().multiply(getZappingRange(item));
         BlockHitResult raytrace = world.raycast(new RaycastContext(start, start.add(range), ShapeType.OUTLINE, FluidHandling.NONE, player));
         BlockPos pos = raytrace.getBlockPos();

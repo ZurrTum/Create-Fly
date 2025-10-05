@@ -90,7 +90,7 @@ public class ControllerRailBlock extends AbstractRailBlock implements IWrenchabl
     }
 
     private static void decelerateCart(BlockPos pos, AbstractMinecartEntity cart) {
-        Vec3d diff = VecHelper.getCenterOf(pos).subtract(cart.getPos());
+        Vec3d diff = VecHelper.getCenterOf(pos).subtract(cart.getEntityPos());
         cart.setVelocity(diff.x / 16f, 0, diff.z / 16f);
 
         if (cart instanceof FurnaceMinecartEntity fme) {

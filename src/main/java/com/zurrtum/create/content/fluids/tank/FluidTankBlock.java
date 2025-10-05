@@ -236,7 +236,7 @@ public class FluidTankBlock extends Block implements IWrenchable, IBE<FluidTankB
 
                     Vec3d vec = hitResult.getPos();
                     vec = new Vec3d(vec.x, controllerBE.getPos().getY() + fluidLevel * (controllerBE.height - .5f) + .25f, vec.z);
-                    Vec3d motion = player.getPos().subtract(vec).multiply(1 / 20f);
+                    Vec3d motion = player.getEntityPos().subtract(vec).multiply(1 / 20f);
                     vec = vec.add(motion);
                     level.addParticleClient(blockParticleData, vec.x, vec.y, vec.z, motion.x, motion.y, motion.z);
                     return ActionResult.SUCCESS;

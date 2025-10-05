@@ -84,7 +84,8 @@ public class LinkRenderer {
 
         Entity cameraEntity = MinecraftClient.getInstance().cameraEntity;
         float max = AllConfigs.client().filterItemRenderDistance.getF();
-        if (!be.isVirtual() && cameraEntity != null && cameraEntity.getPos().squaredDistanceTo(VecHelper.getCenterOf(be.getPos())) > (max * max))
+        if (!be.isVirtual() && cameraEntity != null && cameraEntity.getEntityPos()
+            .squaredDistanceTo(VecHelper.getCenterOf(be.getPos())) > (max * max))
             return;
 
         LinkBehaviour behaviour = be.getBehaviour(LinkBehaviour.TYPE);

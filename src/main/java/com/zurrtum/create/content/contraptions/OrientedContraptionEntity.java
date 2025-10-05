@@ -321,8 +321,8 @@ public class OrientedContraptionEntity extends AbstractContraptionEntity {
             if (coupledCarts == null)
                 return false;
 
-            Vec3d positionVec = coupledCarts.getFirst().cart().getPos();
-            Vec3d coupledVec = coupledCarts.getSecond().cart().getPos();
+            Vec3d positionVec = coupledCarts.getFirst().cart().getEntityPos();
+            Vec3d coupledVec = coupledCarts.getSecond().cart().getEntityPos();
 
             double diffX = positionVec.x - coupledVec.x;
             double diffY = positionVec.y - coupledVec.y;
@@ -357,7 +357,7 @@ public class OrientedContraptionEntity extends AbstractContraptionEntity {
 
         boolean rotating = false;
         Vec3d movementVector = riding.getVelocity();
-        Vec3d locationDiff = riding.getPos().subtract(riding.lastX, riding.lastY, riding.lastZ);
+        Vec3d locationDiff = riding.getEntityPos().subtract(riding.lastX, riding.lastY, riding.lastZ);
         if (!(riding instanceof AbstractMinecartEntity))
             movementVector = locationDiff;
         Vec3d motion = movementVector.normalize();

@@ -249,7 +249,7 @@ public class BlueprintEntity extends AbstractDecorationEntity implements Special
             return super.handleAttack(source);
 
         Vec3d hitVec = rayTrace.get();
-        BlueprintSection sectionAt = getSectionAt(hitVec.subtract(getPos()));
+        BlueprintSection sectionAt = getSectionAt(hitVec.subtract(getEntityPos()));
         ItemStackHandler items = sectionAt.getItems();
 
         if (items.getStack(9).isEmpty())

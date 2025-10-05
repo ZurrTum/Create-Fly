@@ -81,8 +81,8 @@ public class DeployerFakePlayer extends FakePlayerEntity implements DeployerPlay
     }
 
     @Override
-    public Vec3d getPos() {
-        Vec3d pos = super.getPos();
+    public Vec3d getEntityPos() {
+        Vec3d pos = super.getEntityPos();
         return new Vec3d(pos.x, pos.y, pos.z);
     }
 

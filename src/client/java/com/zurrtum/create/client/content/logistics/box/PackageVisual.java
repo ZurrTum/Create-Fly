@@ -40,7 +40,7 @@ public class PackageVisual extends AbstractEntityVisual<PackageEntity> implement
     private void animate(float partialTick) {
         float yaw = MathHelper.lerp(partialTick, entity.lastYaw, entity.getYaw());
 
-        Vec3d pos = entity.getPos();
+        Vec3d pos = entity.getEntityPos();
         var renderOrigin = renderOrigin();
         var x = (float) (MathHelper.lerp(partialTick, entity.lastX, pos.x) - renderOrigin.getX());
         var y = (float) (MathHelper.lerp(partialTick, entity.lastY, pos.y) - renderOrigin.getY());

@@ -48,7 +48,7 @@ public class ShootableGadgetItemMethods {
     }
 
     public static Vec3d getGunBarrelVec(PlayerEntity player, boolean mainHand, Vec3d rightHandForward) {
-        Vec3d start = player.getPos().add(0, player.getStandingEyeHeight(), 0);
+        Vec3d start = player.getEntityPos().add(0, player.getStandingEyeHeight(), 0);
         float yaw = (float) ((player.getYaw()) / -180 * Math.PI);
         float pitch = (float) ((player.getPitch()) / -180 * Math.PI);
         int flip = mainHand == (player.getMainArm() == Arm.RIGHT) ? -1 : 1;

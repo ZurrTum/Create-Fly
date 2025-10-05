@@ -66,7 +66,7 @@ public class BlockDisplayVisual extends AbstractEntityVisual<DisplayEntity.Block
         int j = i != -1 ? i : computePackedLight(ctx.partialTick());
         AffineTransformation transformation = renderState.transformation().interpolate(f);
 
-        Vec3d pos = entity.getPos();
+        Vec3d pos = entity.getEntityPos();
         var renderOrigin = renderOrigin();
 
         instance.setIdentityTransform()

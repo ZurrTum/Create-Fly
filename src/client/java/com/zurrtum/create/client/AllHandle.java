@@ -176,7 +176,7 @@ public class AllHandle extends AllClientHandle<ClientPlayNetworkHandler> {
     public void onSymmetryEffect(ClientPlayNetworkHandler listener, SymmetryEffectPacket packet) {
         MinecraftClient client = listener.client;
         BlockPos mirror = packet.mirror();
-        if (client.player.getPos().distanceTo(Vec3d.of(mirror)) > 100)
+        if (client.player.getEntityPos().distanceTo(Vec3d.of(mirror)) > 100)
             return;
         for (BlockPos to : packet.positions())
             SymmetryHandlerClient.drawEffect(client, mirror, to);
@@ -284,7 +284,7 @@ public class AllHandle extends AllClientHandle<ClientPlayNetworkHandler> {
         Entity renderViewEntity = listener.client.getCameraEntity();
         if (renderViewEntity == null)
             return;
-        if (renderViewEntity.getPos().distanceTo(location) > 100)
+        if (renderViewEntity.getEntityPos().distanceTo(location) > 100)
             return;
 
         handleAdditional.accept(handler);
@@ -372,7 +372,7 @@ public class AllHandle extends AllClientHandle<ClientPlayNetworkHandler> {
     @Override
     public void onFluidSplash(ClientPlayNetworkHandler listener, FluidSplashPacket packet) {
         BlockPos pos = packet.pos();
-        if (listener.client.player.getPos().distanceTo(new Vec3d(pos.getX(), pos.getY(), pos.getZ())) > 100) {
+        if (listener.client.player.getEntityPos().distanceTo(new Vec3d(pos.getX(), pos.getY(), pos.getZ())) > 100) {
             return;
         }
         FluidFX.splash(pos, packet.fluid());
@@ -800,7 +800,7 @@ public class AllHandle extends AllClientHandle<ClientPlayNetworkHandler> {
         if (renderViewEntity == null)
             return true;
         Vec3d center = VecHelper.getCenterOf(pos);
-        return renderViewEntity.getPos().distanceTo(center) > PipeConnection.MAX_PARTICLE_RENDER_DISTANCE;
+        return renderViewEntity.getEntityPos().distanceTo(center) > PipeConnection.MAX_PARTICLE_RENDER_DISTANCE;
     }
 
     private static void spawnRimParticles(World world, BlockPos pos, FluidStack fluid, Direction side, int amount) {

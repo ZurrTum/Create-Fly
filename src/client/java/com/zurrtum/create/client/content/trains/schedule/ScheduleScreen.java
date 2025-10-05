@@ -362,7 +362,7 @@ public class ScheduleScreen extends AbstractSimiContainerScreen<ScheduleMenu> im
         if (viableGraphs.isEmpty())
             viableGraphs = new HashSet<>(railwayManager.trackNetworks.values());
 
-        Vec3d position = client.player.getPos();
+        Vec3d position = client.player.getEntityPos();
         Set<String> visited = new HashSet<>();
 
         return viableGraphs.stream().flatMap(g -> g.getPoints(EdgePointType.STATION).stream()).filter(station -> station.blockEntityPos != null)

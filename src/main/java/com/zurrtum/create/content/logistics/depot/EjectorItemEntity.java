@@ -240,7 +240,7 @@ public class EjectorItemEntity extends ItemEntity {
     }
 
     public Vec3d getLaunchedItemLocation(float time) {
-        return launcher.getGlobalPos(time, direction, getPos());
+        return launcher.getGlobalPos(time, direction, getEntityPos());
     }
 
     public Vec3d getLaunchedItemMotion(float time) {

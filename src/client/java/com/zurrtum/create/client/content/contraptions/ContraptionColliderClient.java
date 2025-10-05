@@ -56,7 +56,7 @@ public class ContraptionColliderClient {
         if (bounds == null)
             return;
 
-        Vec3d contraptionPosition = contraptionEntity.getPos();
+        Vec3d contraptionPosition = contraptionEntity.getEntityPos();
         Vec3d contraptionMotion = contraptionPosition.subtract(contraptionEntity.getPrevPositionVec());
         Vec3d anchorVec = contraptionEntity.getAnchorVec();
         ContraptionRotationState rotation = null;
@@ -99,7 +99,7 @@ public class ContraptionColliderClient {
             Matrix3d rotationMatrix = rotation.asMatrix();
 
             // Transform entity position and motion to local space
-            Vec3d entityPosition = entity.getPos();
+            Vec3d entityPosition = entity.getEntityPos();
             Box entityBounds = entity.getBoundingBox();
             Vec3d motion = entity.getVelocity();
             float yawOffset = rotation.getYawOffset();
@@ -223,11 +223,11 @@ public class ContraptionColliderClient {
             double slide = 0;
 
             if (!collisionLocation.equals(Vec3d.ZERO)) {
-                collisionLocation = collisionLocation.add(entity.getPos().add(entity.getBoundingBox().getCenter()).multiply(.5f));
+                collisionLocation = collisionLocation.add(entity.getEntityPos().add(entity.getBoundingBox().getCenter()).multiply(.5f));
                 if (temporalCollision)
                     collisionLocation = collisionLocation.add(0, motionResponse.y, 0);
 
-                BlockPos pos = BlockPos.ofFloored(contraptionEntity.toLocalVector(entity.getPos(), 0));
+                BlockPos pos = BlockPos.ofFloored(contraptionEntity.toLocalVector(entity.getEntityPos(), 0));
                 if (contraption.getBlocks().containsKey(pos)) {
                     BlockState blockState = contraption.getBlocks().get(pos).state();
                     if (blockState.isIn(BlockTags.CLIMBABLE)) {
@@ -307,7 +307,7 @@ public class ContraptionColliderClient {
 
             Vec3d allowedMovement = ContraptionCollider.collide(totalResponse, entity);
             entity.setPosition(entityPosition.x + allowedMovement.x, entityPosition.y + allowedMovement.y, entityPosition.z + allowedMovement.z);
-            entityPosition = entity.getPos();
+            entityPosition = entity.getEntityPos();
 
             entityMotion = handleDamageFromTrain(world, contraptionEntity, contraptionMotion, entity, entityMotion, playerType);
 

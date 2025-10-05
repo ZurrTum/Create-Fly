@@ -41,7 +41,7 @@ public class MinecartSim2020 {
     );
 
     public static Vec3d predictNextPositionOf(AbstractMinecartEntity cart) {
-        Vec3d position = cart.getPos();
+        Vec3d position = cart.getEntityPos();
         Vec3d motion = VecHelper.clamp(cart.getVelocity(), 1f);
         return position.add(motion);
     }

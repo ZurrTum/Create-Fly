@@ -117,7 +117,7 @@ public class ToolboxHandlerClient {
             NbtCompound slotCompound = compound.getCompoundOrEmpty(slotKey);
             BlockPos pos = slotCompound.get("Pos", BlockPos.CODEC).orElse(BlockPos.ORIGIN);
             double max = ToolboxHandler.getMaxRange(player);
-            boolean canReachToolbox = ToolboxHandler.distance(player.getPos(), pos) < max * max;
+            boolean canReachToolbox = ToolboxHandler.distance(player.getEntityPos(), pos) < max * max;
 
             if (canReachToolbox) {
                 BlockEntity blockEntity = level.getBlockEntity(pos);
@@ -168,7 +168,7 @@ public class ToolboxHandlerClient {
             boolean selected = slot == selectedSlot;
             int offset = selected ? 1 : 0;
             AllGuiTextures texture = ToolboxHandler.distance(
-                player.getPos(),
+                player.getEntityPos(),
                 pos
             ) < max * max ? selected ? TOOLBELT_SELECTED_ON : TOOLBELT_HOTBAR_ON : selected ? TOOLBELT_SELECTED_OFF : TOOLBELT_HOTBAR_OFF;
             texture.render(guiGraphics, x + 20 * slot - offset, y + offset);

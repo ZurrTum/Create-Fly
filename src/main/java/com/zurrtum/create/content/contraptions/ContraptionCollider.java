@@ -64,7 +64,7 @@ public class ContraptionCollider {
         if (bounds == null)
             return;
 
-        Vec3d contraptionPosition = contraptionEntity.getPos();
+        Vec3d contraptionPosition = contraptionEntity.getEntityPos();
         Vec3d contraptionMotion = contraptionPosition.subtract(contraptionEntity.getPrevPositionVec());
         Vec3d anchorVec = contraptionEntity.getAnchorVec();
         ContraptionRotationState rotation = null;
@@ -93,7 +93,7 @@ public class ContraptionCollider {
             Matrix3d rotationMatrix = rotation.asMatrix();
 
             // Transform entity position and motion to local space
-            Vec3d entityPosition = entity.getPos();
+            Vec3d entityPosition = entity.getEntityPos();
             Box entityBounds = entity.getBoundingBox();
             Vec3d motion = entity.getVelocity();
             float yawOffset = rotation.getYawOffset();
@@ -213,11 +213,11 @@ public class ContraptionCollider {
             double slide = 0;
 
             if (!collisionLocation.equals(Vec3d.ZERO)) {
-                collisionLocation = collisionLocation.add(entity.getPos().add(entity.getBoundingBox().getCenter()).multiply(.5f));
+                collisionLocation = collisionLocation.add(entity.getEntityPos().add(entity.getBoundingBox().getCenter()).multiply(.5f));
                 if (temporalCollision)
                     collisionLocation = collisionLocation.add(0, motionResponse.y, 0);
 
-                BlockPos pos = BlockPos.ofFloored(contraptionEntity.toLocalVector(entity.getPos(), 0));
+                BlockPos pos = BlockPos.ofFloored(contraptionEntity.toLocalVector(entity.getEntityPos(), 0));
                 if (contraption.getBlocks().containsKey(pos)) {
                     BlockState blockState = contraption.getBlocks().get(pos).state();
                     if (blockState.isIn(BlockTags.CLIMBABLE)) {
@@ -289,7 +289,7 @@ public class ContraptionCollider {
 
             Vec3d allowedMovement = collide(totalResponse, entity);
             entity.setPosition(entityPosition.x + allowedMovement.x, entityPosition.y + allowedMovement.y, entityPosition.z + allowedMovement.z);
-            entityPosition = entity.getPos();
+            entityPosition = entity.getEntityPos();
 
             entityMotion = handleDamageFromTrain(world, contraptionEntity, contraptionMotion, entity, entityMotion, playerType);
 
@@ -374,7 +374,7 @@ public class ContraptionCollider {
         if (entity.bypassesLandingEffects())
             return false;
 
-        Vec3d contactPointMotion = contraption.getContactPointMotion(entity.getPos());
+        Vec3d contactPointMotion = contraption.getContactPointMotion(entity.getEntityPos());
         Vec3d motion = entity.getVelocity().subtract(contactPointMotion);
         Vec3d deltav = normal.multiply(factor * 2 * motion.dotProduct(normal));
         if (deltav.dotProduct(deltav) < 0.1f)
@@ -384,7 +384,7 @@ public class ContraptionCollider {
     }
 
     public static Vec3d getWorldToLocalTranslation(Entity entity, Vec3d anchorVec, Matrix3d rotationMatrix, float yawOffset) {
-        Vec3d entityPosition = entity.getPos();
+        Vec3d entityPosition = entity.getEntityPos();
         Vec3d centerY = new Vec3d(0, entity.getBoundingBox().getLengthY() / 2, 0);
         Vec3d position = entityPosition;
         position = position.add(centerY);
@@ -498,7 +498,7 @@ public class ContraptionCollider {
         Vec3d motion = contraptionEntity.getVelocity();
         TranslatingContraption contraption = (TranslatingContraption) contraptionEntity.getContraption();
         Box bounds = contraptionEntity.getBoundingBox();
-        Vec3d position = contraptionEntity.getPos();
+        Vec3d position = contraptionEntity.getEntityPos();
         BlockPos gridPos = BlockPos.ofFloored(position);
 
         if (contraption == null)
@@ -529,7 +529,7 @@ public class ContraptionCollider {
             Vec3d otherMotion = otherContraptionEntity.getVelocity();
             TranslatingContraption otherContraption = (TranslatingContraption) otherContraptionEntity.getContraption();
             Box otherBounds = otherContraptionEntity.getBoundingBox();
-            Vec3d otherPosition = otherContraptionEntity.getPos();
+            Vec3d otherPosition = otherContraptionEntity.getEntityPos();
 
             if (otherContraption == null)
                 return false;

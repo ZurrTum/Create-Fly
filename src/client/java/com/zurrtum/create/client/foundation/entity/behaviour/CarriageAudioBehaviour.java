@@ -88,7 +88,7 @@ public class CarriageAudioBehaviour extends EntityBehaviour<CarriageContraptionE
         tick++;
 
         Vec3d cam = camEntity.getEyePos();
-        Vec3d contraptionMotion = entity.getPos().subtract(entity.getPrevPositionVec());
+        Vec3d contraptionMotion = entity.getEntityPos().subtract(entity.getPrevPositionVec());
         Vec3d combinedMotion = contraptionMotion.subtract(camEntity.getVelocity());
 
         Train train = carriage.train;

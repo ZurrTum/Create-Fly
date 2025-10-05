@@ -79,7 +79,7 @@ public class ToolboxHandler {
     }
 
     public static List<ToolboxBlockEntity> getNearest(WorldAccess world, PlayerEntity player, int maxAmount) {
-        Vec3d location = player.getPos();
+        Vec3d location = player.getEntityPos();
         double maxRange = getMaxRange(player);
         return toolboxes.get(world).keySet().stream().filter(p -> distance(location, p) < maxRange * maxRange)
             .sorted(Comparator.comparingDouble(p -> distance(location, p))).limit(maxAmount).map(toolboxes.get(world)::get)
@@ -108,7 +108,7 @@ public class ToolboxHandler {
         if (player.getEntityWorld() != box.getWorld())
             return false;
         double maxRange = getMaxRange(player);
-        return distance(player.getPos(), box.getPos()) < maxRange * maxRange;
+        return distance(player.getEntityPos(), box.getPos()) < maxRange * maxRange;
     }
 
     public static double distance(Vec3d location, BlockPos p) {

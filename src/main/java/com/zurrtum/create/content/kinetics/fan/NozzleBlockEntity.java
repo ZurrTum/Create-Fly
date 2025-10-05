@@ -86,7 +86,7 @@ public class NozzleBlockEntity extends SmartBlockEntity {
 
         for (Iterator<Entity> iterator = pushingEntities.iterator(); iterator.hasNext(); ) {
             Entity entity = iterator.next();
-            Vec3d diff = entity.getPos().subtract(center);
+            Vec3d diff = entity.getEntityPos().subtract(center);
 
             if (!(entity instanceof PlayerEntity) && world.isClient())
                 continue;
@@ -140,7 +140,7 @@ public class NozzleBlockEntity extends SmartBlockEntity {
         Box bb = new Box(center, center).expand(range / 2f);
 
         for (Entity entity : world.getNonSpectatingEntities(Entity.class, bb)) {
-            Vec3d diff = entity.getPos().subtract(center);
+            Vec3d diff = entity.getEntityPos().subtract(center);
 
             double distance = diff.length();
             if (distance > range || entity.isSneaking() || AirCurrent.isPlayerCreativeFlying(entity))
@@ -175,7 +175,13 @@ public class NozzleBlockEntity extends SmartBlockEntity {
     }
 
     private boolean canSee(Entity entity) {
-        RaycastContext context = new RaycastContext(entity.getPos(), VecHelper.getCenterOf(pos), ShapeType.COLLIDER, FluidHandling.NONE, entity);
+        RaycastContext context = new RaycastContext(
+            entity.getEntityPos(),
+            VecHelper.getCenterOf(pos),
+            ShapeType.COLLIDER,
+            FluidHandling.NONE,
+            entity
+        );
         return pos.equals(world.raycast(context).getBlockPos());
     }
 

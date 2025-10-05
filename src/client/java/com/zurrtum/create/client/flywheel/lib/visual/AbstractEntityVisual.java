@@ -65,7 +65,7 @@ public abstract class AbstractEntityVisual<T extends Entity> extends AbstractVis
      * @return The position this visual should be rendered at to appear in the correct location.
      */
     public Vector3f getVisualPosition() {
-        Vec3d pos = entity.getPos();
+        Vec3d pos = entity.getEntityPos();
         var renderOrigin = renderOrigin();
         return new Vector3f((float) (pos.x - renderOrigin.getX()), (float) (pos.y - renderOrigin.getY()), (float) (pos.z - renderOrigin.getZ()));
     }
@@ -78,7 +78,7 @@ public abstract class AbstractEntityVisual<T extends Entity> extends AbstractVis
      * @return The position this visual should be rendered at to appear in the correct location.
      */
     public Vector3f getVisualPosition(float partialTick) {
-        Vec3d pos = entity.getPos();
+        Vec3d pos = entity.getEntityPos();
         var renderOrigin = renderOrigin();
         return new Vector3f(
             (float) (MathHelper.lerp(partialTick, entity.lastRenderX, pos.x) - renderOrigin.getX()),

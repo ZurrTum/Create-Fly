@@ -71,7 +71,7 @@ public class WorldshaperRenderHandler {
         BlockPos params = zapper.get(AllDataComponents.SHAPER_BRUSH_PARAMS);
         brush.set(params.getX(), params.getY(), params.getZ());
 
-        Vec3d start = player.getPos().add(0, player.getStandingEyeHeight(), 0);
+        Vec3d start = player.getEntityPos().add(0, player.getStandingEyeHeight(), 0);
         Vec3d rotationVector = player.getRotationVector();
         Vec3d range = rotationVector.multiply(128);
         World world = player.getEntityWorld();

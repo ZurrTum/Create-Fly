@@ -85,7 +85,7 @@ public class PackageEntity extends LivingEntity {
     public static PackageEntity fromDroppedItem(World world, Entity originalEntity, ItemStack itemstack) {
         PackageEntity packageEntity = new PackageEntity(AllEntityTypes.PACKAGE, world);
 
-        Vec3d position = originalEntity.getPos();
+        Vec3d position = originalEntity.getEntityPos();
         packageEntity.setPosition(position);
         packageEntity.setBox(itemstack);
         packageEntity.setVelocity(originalEntity.getVelocity().multiply(1.5f));
@@ -140,7 +140,7 @@ public class PackageEntity extends LivingEntity {
         List<VoxelShape> entityStream = getEntityWorld().getEntityCollisions(this, bb.stretch(motion));
         motion = adjustMovementForCollisions(this, motion, bb, getEntityWorld(), entityStream);
 
-        Vec3d clientPos = getPos().add(motion);
+        Vec3d clientPos = getEntityPos().add(motion);
         if (isInterpolating())
             clientPos = VecHelper.lerp(Math.min(1, age / 20f), clientPos, getInterpolator().getLerpedPos());
         if (age < 5)
@@ -215,7 +215,7 @@ public class PackageEntity extends LivingEntity {
     public boolean decreaseInsertionTimer(@Nullable Vec3d targetSpot) {
         if (targetSpot != null) {
             setVelocity(getVelocity().multiply(.75f).multiply(1, .25f, 1));
-            Vec3d pos = getPos().add(targetSpot.subtract(getPos()).multiply(.2f));
+            Vec3d pos = getEntityPos().add(targetSpot.subtract(getEntityPos()).multiply(.2f));
             setPosition(pos.x, pos.y, pos.z);
             float yawTarget = ((int) getYaw()) / 90 * 90;
             setYaw(AngleHelper.angleLerp(.5f, getYaw(), yawTarget));
@@ -275,7 +275,7 @@ public class PackageEntity extends LivingEntity {
 
     @Override
     public Vec3d getPassengerRidingPos(Entity entity) {
-        return getPos().add(0, entity.getDimensions(getPose()).height(), 0);
+        return getEntityPos().add(0, entity.getDimensions(getPose()).height(), 0);
     }
 
     @Override

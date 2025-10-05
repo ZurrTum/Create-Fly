@@ -152,7 +152,7 @@ public class CarriageContraptionEntity extends OrientedContraptionEntity {
     }
 
     public void setServerSidePrevPosition() {
-        serverPrevPos = getPos();
+        serverPrevPos = getEntityPos();
     }
 
     @Override
@@ -260,7 +260,7 @@ public class CarriageContraptionEntity extends OrientedContraptionEntity {
 
             dataTracker.set(TRACK_GRAPH, Optional.ofNullable(carriage.train.graph).map(g -> g.id));
 
-            getEntityWorld().emitGameEvent(this, GameEvent.RESONATE_8, getPos());
+            getEntityWorld().emitGameEvent(this, GameEvent.RESONATE_8, getEntityPos());
 
             return;
         }
@@ -285,7 +285,7 @@ public class CarriageContraptionEntity extends OrientedContraptionEntity {
 
         double distanceTo = 0;
         if (!firstPositionUpdate) {
-            Vec3d diff = getPos().subtract(lastX, lastY, lastZ);
+            Vec3d diff = getEntityPos().subtract(lastX, lastY, lastZ);
             Vec3d relativeDiff = VecHelper.rotate(diff, yaw, Axis.Y);
             double signum = Math.signum(-relativeDiff.x);
             distanceTo = diff.length() * signum;
@@ -389,7 +389,7 @@ public class CarriageContraptionEntity extends OrientedContraptionEntity {
 
     private void spawnDerailParticles(Carriage carriage) {
         if (random.nextFloat() < 1 / 20f) {
-            Vec3d v = getPos().add(derailParticleOffset);
+            Vec3d v = getEntityPos().add(derailParticleOffset);
             getEntityWorld().addParticleClient(ParticleTypes.CAMPFIRE_COSY_SMOKE, v.x, v.y, v.z, 0, .04, 0);
         }
     }
@@ -399,7 +399,7 @@ public class CarriageContraptionEntity extends OrientedContraptionEntity {
         super.addPassenger(pPassenger);
         if (!(pPassenger instanceof PlayerEntity player))
             return;
-        AllSynchedDatas.CONTRAPTION_MOUNT_LOCATION.set(player, Optional.ofNullable(player.getPos()));
+        AllSynchedDatas.CONTRAPTION_MOUNT_LOCATION.set(player, Optional.ofNullable(player.getEntityPos()));
     }
 
     public Set<BlockPos> particleSlice = new HashSet<>();
@@ -414,7 +414,7 @@ public class CarriageContraptionEntity extends OrientedContraptionEntity {
         int extraFlip = Direction.fromHorizontalDegrees(yaw).getDirection().offset();
 
         Vec3d emitter = pivot.add(0, particleAvgY, 0);
-        double speed = getPos().distanceTo(getPrevPositionVec());
+        double speed = getEntityPos().distanceTo(getPrevPositionVec());
         int size = (int) (particleSlice.size() * MathHelper.clamp(4 - speed * 4, 0, 4));
 
         for (BlockPos pos : particleSlice) {
@@ -534,7 +534,7 @@ public class CarriageContraptionEntity extends OrientedContraptionEntity {
             return true;
         if (player.isSpectator())
             return false;
-        if (!toGlobalVector(VecHelper.getCenterOf(controlsLocalPos), 1).isInRange(player.getPos(), 8))
+        if (!toGlobalVector(VecHelper.getCenterOf(controlsLocalPos), 1).isInRange(player.getEntityPos(), 8))
             return false;
         if (heldControls.contains(5))
             return false;

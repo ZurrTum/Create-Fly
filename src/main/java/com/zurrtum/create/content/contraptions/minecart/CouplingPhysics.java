@@ -45,7 +45,7 @@ public class CouplingPhysics {
             AbstractMinecartEntity cart = carts.get(current);
             AbstractMinecartEntity otherCart = carts.get(!current);
 
-            float stress = (float) (couplingLength - cart.getPos().distanceTo(otherCart.getPos()));
+            float stress = (float) (couplingLength - cart.getEntityPos().distanceTo(otherCart.getEntityPos()));
 
             if (Math.abs(stress) < 1 / 8f)
                 continue;
@@ -58,8 +58,8 @@ public class CouplingPhysics {
                 shape = railState.get(block.getShapeProperty());
             }
 
-            Vec3d pos = cart.getPos();
-            Vec3d link = otherCart.getPos().subtract(pos);
+            Vec3d pos = cart.getEntityPos();
+            Vec3d link = otherCart.getEntityPos().subtract(pos);
             float correctionMagnitude = firstLoop ? -stress / 2f : -stress;
 
             if (!MinecartSim2020.canAddMotion(cart))

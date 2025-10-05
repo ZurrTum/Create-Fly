@@ -69,7 +69,7 @@ public class PlayerEntityRenderStateMixin implements CardboardRenderState, UuidR
         lastX = player.lastX;
         lastY = player.lastY;
         lastZ = player.lastZ;
-        pos = player.getPos();
+        pos = player.getEntityPos();
         this.tickProgress = tickProgress;
     }
 

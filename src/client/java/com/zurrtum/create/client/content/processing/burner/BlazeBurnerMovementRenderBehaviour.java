@@ -65,7 +65,7 @@ public class BlazeBurnerMovementRenderBehaviour implements MovementRenderBehavio
 
         Entity player = MinecraftClient.getInstance().cameraEntity;
         if (player != null && !player.isInvisible() && context.position != null) {
-            Vec3d applyRotation = context.contraption.entity.reverseRotation(player.getPos().subtract(context.position), 1);
+            Vec3d applyRotation = context.contraption.entity.reverseRotation(player.getEntityPos().subtract(context.position), 1);
             double dx = applyRotation.x;
             double dz = applyRotation.z;
             return AngleHelper.deg(-MathHelper.atan2(dz, dx)) - 90;

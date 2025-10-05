@@ -296,7 +296,7 @@ public class PackageItem extends Item implements EntityItem {
                         sl,
                         itemstack,
                         null,
-                        BlockPos.ofFloored(playerIn.getPos().add(playerIn.getRotationVector().multiply(1, 0, 1).normalize())),
+                        BlockPos.ofFloored(playerIn.getEntityPos().add(playerIn.getRotationVector().multiply(1, 0, 1).normalize())),
                         SpawnReason.SPAWN_ITEM_USE,
                         false,
                         false
@@ -309,7 +309,7 @@ public class PackageItem extends Item implements EntityItem {
             }
         }
 
-        Vec3d position = playerIn.getPos();
+        Vec3d position = playerIn.getEntityPos();
         AllSoundEvents.PACKAGE_POP.playOnServer(worldIn, playerIn.getBlockPos());
 
         if (worldIn.isClient()) {

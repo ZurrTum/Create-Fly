@@ -70,7 +70,7 @@ public class CouplingHandler {
         String noLoops = "no_loops";
         String tooFar = "too_far";
 
-        int distanceTo = (int) entity1.getPos().distanceTo(entity2.getPos());
+        int distanceTo = (int) entity1.getEntityPos().distanceTo(entity2.getEntityPos());
         boolean contraptionCoupling = player == null;
 
         if (distanceTo < 2) {

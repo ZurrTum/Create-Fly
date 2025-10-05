@@ -58,7 +58,7 @@ public class CouplingRenderer {
 
         Couple<Integer> lightValues = carts.map(c -> WorldRenderer.getLightmapCoordinates(world, BlockPos.ofFloored(c.getBoundingBox().getCenter())));
 
-        Vec3d center = carts.getFirst().getPos().add(carts.getSecond().getPos()).multiply(.5f);
+        Vec3d center = carts.getFirst().getEntityPos().add(carts.getSecond().getEntityPos()).multiply(.5f);
 
         Couple<CartEndpoint> transforms = carts.map(c -> getSuitableCartEndpoint(c, center));
 
@@ -201,8 +201,8 @@ public class CouplingRenderer {
         int yOffset = 1;
         MinecartController first = c.getFirst();
         AbstractMinecartEntity mainCart = first.cart();
-        Vec3d mainCenter = mainCart.getPos().add(0, yOffset, 0);
-        Vec3d connectedCenter = c.getSecond().cart().getPos().add(0, yOffset, 0);
+        Vec3d mainCenter = mainCart.getEntityPos().add(0, yOffset, 0);
+        Vec3d connectedCenter = c.getSecond().cart().getEntityPos().add(0, yOffset, 0);
 
         int color = Color.mixColors(
             0xabf0e9,
@@ -212,7 +212,7 @@ public class CouplingRenderer {
 
         Outliner.getInstance().showLine(mainCart.getId() + "", mainCenter, connectedCenter).colored(color).lineWidth(1 / 8f);
 
-        Vec3d point = mainCart.getPos().add(0, yOffset, 0);
+        Vec3d point = mainCart.getEntityPos().add(0, yOffset, 0);
         Outliner.getInstance().showLine(mainCart.getId() + "_dot", point, point.add(0, 1 / 128f, 0)).colored(0xffffff).lineWidth(1 / 4f);
     }
 

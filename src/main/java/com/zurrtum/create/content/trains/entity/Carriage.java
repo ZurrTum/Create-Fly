@@ -1008,7 +1008,7 @@ public class Carriage {
             entity.prevPitch = entity.pitch;
 
             if (!entity.getEntityWorld().isClient()) {
-                Vec3d lookahead = positionAnchor.add(positionAnchor.subtract(entity.getPos()).normalize().multiply(16));
+                Vec3d lookahead = positionAnchor.add(positionAnchor.subtract(entity.getEntityPos()).normalize().multiply(16));
 
                 for (Entity e : entity.getPassengerList()) {
                     if (!(e instanceof PlayerEntity))

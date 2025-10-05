@@ -32,7 +32,7 @@ public class ZapperInteractionHandler {
             return false;
 
         World world = player.getEntityWorld();
-        Vec3d start = player.getPos().add(0, player.getStandingEyeHeight(), 0);
+        Vec3d start = player.getEntityPos().add(0, player.getStandingEyeHeight(), 0);
         Vec3d range = player.getRotationVector().multiply(getRange(stack));
         BlockHitResult raytrace = world.raycast(new RaycastContext(start, start.add(range), ShapeType.OUTLINE, FluidHandling.NONE, player));
         BlockPos pos = raytrace.getBlockPos();

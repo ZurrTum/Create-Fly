@@ -138,7 +138,7 @@ public class FilteringRenderer {
                 Entity cameraEntity = MinecraftClient.getInstance().cameraEntity;
                 if (cameraEntity != null && level == cameraEntity.getEntityWorld()) {
                     float max = behaviour.getRenderDistance();
-                    if (cameraEntity.getPos().squaredDistanceTo(VecHelper.getCenterOf(blockPos)) > (max * max)) {
+                    if (cameraEntity.getEntityPos().squaredDistanceTo(VecHelper.getCenterOf(blockPos)) > (max * max)) {
                         continue;
                     }
                 }

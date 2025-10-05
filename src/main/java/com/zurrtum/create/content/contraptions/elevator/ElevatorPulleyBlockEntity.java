@@ -92,7 +92,7 @@ public class ElevatorPulleyBlockEntity extends PulleyBlockEntity {
         double diff = targetLevel - y - ec.contactYOffset;
         if (Math.abs(diff) > 1f / 128)
             diff *= 0.25f;
-        movedContraption.setPosition(movedContraption.getPos().add(0, diff, 0));
+        movedContraption.setPosition(movedContraption.getEntityPos().add(0, diff, 0));
     }
 
     @Override

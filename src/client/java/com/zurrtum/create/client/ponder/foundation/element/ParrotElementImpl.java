@@ -103,7 +103,7 @@ public class ParrotElementImpl extends AnimatedSceneElementBase implements Parro
 
     @Override
     public Vec3d getPositionOffset() {
-        return entity != null ? entity.getPos() : Vec3d.ZERO;
+        return entity != null ? entity.getEntityPos() : Vec3d.ZERO;
     }
 
     @Override

@@ -46,7 +46,7 @@ public abstract class ParrotPose {
 
         @Override
         public void tick(PonderScene scene, ParrotEntity entity, Vec3d location) {
-            double length = entity.getPos().subtract(entity.lastRenderX, entity.lastRenderY, entity.lastRenderZ).length();
+            double length = entity.getEntityPos().subtract(entity.lastRenderX, entity.lastRenderY, entity.lastRenderZ).length();
             entity.setOnGround(false);
             double phase = Math.min(length * 15, 8);
             float f = (float) ((PonderUI.ponderTicks % 100) * phase);

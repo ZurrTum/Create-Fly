@@ -68,10 +68,10 @@ public class AirCurrent {
             Vec3i flow = (pushing ? direction : direction.getOpposite()).getVector();
             float speed = Math.abs(source.getSpeed());
             float sneakModifier = entity.isSneaking() ? 4096f : 512f;
-            double entityDistance = VecHelper.alignedDistanceToFace(entity.getPos(), source.getAirCurrentPos(), direction);
+            double entityDistance = VecHelper.alignedDistanceToFace(entity.getEntityPos(), source.getAirCurrentPos(), direction);
             // entityDistanceOld should be removed eventually. Remember that entityDistanceOld cannot be 0 while entityDistance can,
             // so division by 0 must be avoided.
-            double entityDistanceOld = entity.getPos().distanceTo(VecHelper.getCenterOf(source.getAirCurrentPos()));
+            double entityDistanceOld = entity.getEntityPos().distanceTo(VecHelper.getCenterOf(source.getAirCurrentPos()));
             float acceleration = (float) (speed / sneakModifier / (entityDistanceOld / maxDistance));
             Vec3d previousMotion = entity.getVelocity();
             float maxAcceleration = 5;
@@ -96,7 +96,7 @@ public class AirCurrent {
 
             if (entity instanceof ItemEntity itemEntity) {
                 if (world != null && world.isClient()) {
-                    processingType.spawnProcessingParticles(world, entity.getPos());
+                    processingType.spawnProcessingParticles(world, entity.getEntityPos());
                     continue;
                 }
                 if (FanProcessing.canProcess(itemEntity, processingType))

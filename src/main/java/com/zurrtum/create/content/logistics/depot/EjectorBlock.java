@@ -145,7 +145,7 @@ public class EjectorBlock extends HorizontalKineticBlock implements IBE<EjectorB
         if (entityIn.isOnGround()) {
             entityIn.setOnGround(false);
             Vec3d center = VecHelper.getCenterOf(position).add(0, 7 / 16f, 0);
-            Vec3d positionVec = entityIn.getPos();
+            Vec3d positionVec = entityIn.getEntityPos();
             double diff = center.distanceTo(positionVec);
             entityIn.setVelocity(0, -0.125, 0);
             Vec3d vec = center.add(positionVec).multiply(.5f);

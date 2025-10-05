@@ -48,7 +48,7 @@ public class StockKeeperCategoryMenu extends MenuBase<StockTickerBlockEntity> {
 
     @Override
     public boolean canUse(PlayerEntity player) {
-        return !contentHolder.isRemoved() && player.getPos()
+        return !contentHolder.isRemoved() && player.getEntityPos()
             .isInRange(Vec3d.ofCenter(contentHolder.getPos()), player.getAttributeValue(EntityAttributes.BLOCK_INTERACTION_RANGE) + 4);
     }
 

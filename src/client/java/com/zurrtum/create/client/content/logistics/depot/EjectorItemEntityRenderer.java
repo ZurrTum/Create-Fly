@@ -47,7 +47,7 @@ public class EjectorItemEntityRenderer extends ItemEntityRenderer {
             state.rotateY = entity.data.rotateY;
             float time = entity.progress + f;
             state.rotateX = MathHelper.RADIANS_PER_DEGREE * time * 40;
-            state.location = entity.getLaunchedItemLocation(time).subtract(entity.getPos());
+            state.location = entity.getLaunchedItemLocation(time).subtract(entity.getEntityPos());
         }
         itemEntityRenderState.uniqueOffset = entity.data.animateOffset;
     }

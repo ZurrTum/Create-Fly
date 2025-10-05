@@ -58,11 +58,11 @@ public class CarriageParticleBehaviour extends EntityBehaviour<CarriageContrapti
         if (!dce.pointsInitialised)
             return;
         Vec3d leadingAnchor = dce.leadingAnchor();
-        if (leadingAnchor == null || !leadingAnchor.isInRange(camEntity.getPos(), 64))
+        if (leadingAnchor == null || !leadingAnchor.isInRange(camEntity.getEntityPos(), 64))
             return;
 
         Random r = entity.getEntityWorld().random;
-        Vec3d contraptionMotion = entity.getPos().subtract(entity.getPrevPositionVec());
+        Vec3d contraptionMotion = entity.getEntityPos().subtract(entity.getPrevPositionVec());
         double length = contraptionMotion.length();
         if (arrived && length > 0.01f)
             arrived = false;

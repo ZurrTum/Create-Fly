@@ -83,7 +83,7 @@ public class ItemDrainRenderer extends SmartBlockEntityRenderer<ItemDrainBlockEn
         if (renderUpright) {
             Entity renderViewEntity = mc.cameraEntity;
             if (renderViewEntity != null) {
-                Vec3d positionVec = renderViewEntity.getPos();
+                Vec3d positionVec = renderViewEntity.getEntityPos();
                 Vec3d vectorForOffset = itemPosition.add(offsetVec);
                 Vec3d diff = vectorForOffset.subtract(positionVec);
 

@@ -120,7 +120,7 @@ public class PotatoCannonItem extends RangedWeaponItem implements SwingControlIt
 
         Vec3d barrelPos = ShootableGadgetItemMethods.getGunBarrelVec(player, hand == Hand.MAIN_HAND, new Vec3d(.75f, -0.15f, 1.5f));
         Vec3d correction = ShootableGadgetItemMethods.getGunBarrelVec(player, hand == Hand.MAIN_HAND, new Vec3d(-.05f, 0, 0))
-            .subtract(player.getPos().add(0, player.getStandingEyeHeight(), 0));
+            .subtract(player.getEntityPos().add(0, player.getStandingEyeHeight(), 0));
 
         Vec3d lookVec = player.getRotationVector();
         Vec3d motion = lookVec.add(correction).normalize().multiply(2).multiply(projectileType.velocityMultiplier());

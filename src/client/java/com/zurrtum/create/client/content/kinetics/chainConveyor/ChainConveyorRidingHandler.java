@@ -60,7 +60,7 @@ public class ChainConveyorRidingHandler {
         clbe.prepareStats();
 
         float chainYOffset = 0.5f * mc.player.getScale();
-        Vec3d playerPosition = mc.player.getPos().add(0, mc.player.getBoundingBox().getLengthY() + chainYOffset, 0);
+        Vec3d playerPosition = mc.player.getEntityPos().add(0, mc.player.getBoundingBox().getLengthY() + chainYOffset, 0);
 
         updateTargetPosition(mc, clbe);
 

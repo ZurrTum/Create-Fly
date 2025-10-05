@@ -122,7 +122,7 @@ public class PotatoProjectileEntity extends ExplosiveProjectileEntity {
 
     public void setStuckEntity(Entity stuckEntity) {
         this.stuckEntity = stuckEntity;
-        this.stuckOffset = getPos().subtract(stuckEntity.getPos());
+        this.stuckOffset = getEntityPos().subtract(stuckEntity.getEntityPos());
         this.stuckRenderer = new StuckToEntity(stuckOffset);
         this.stuckFallSpeed = 0.0;
         setVelocity(Vec3d.ZERO);
@@ -140,14 +140,14 @@ public class PotatoProjectileEntity extends ExplosiveProjectileEntity {
         Entity stuckEntity = getStuckEntity();
         if (stuckEntity != null) {
             if (getY() < stuckEntity.getY() - 0.1) {
-                pop(getPos());
+                pop(getEntityPos());
                 if (getEntityWorld() instanceof ServerWorld serverWorld) {
                     kill(serverWorld);
                 }
             } else {
                 stuckFallSpeed += 0.007 * type.gravityMultiplier();
                 stuckOffset = stuckOffset.add(0, -stuckFallSpeed, 0);
-                Vec3d pos = stuckEntity.getPos().add(stuckOffset);
+                Vec3d pos = stuckEntity.getEntityPos().add(stuckOffset);
                 setPosition(pos.x, pos.y, pos.z);
             }
         } else {
@@ -239,7 +239,7 @@ public class PotatoProjectileEntity extends ExplosiveProjectileEntity {
         }
 
         if (!(target instanceof LivingEntity livingentity)) {
-            playHitSound(world, getPos());
+            playHitSound(world, getEntityPos());
             if (onServer) {
                 kill((ServerWorld) world);
             }
@@ -317,7 +317,7 @@ public class PotatoProjectileEntity extends ExplosiveProjectileEntity {
             return false;
         if (isAlwaysInvulnerableTo(source))
             return false;
-        pop(getPos());
+        pop(getEntityPos());
         kill(world);
         return true;
     }
@@ -330,7 +330,7 @@ public class PotatoProjectileEntity extends ExplosiveProjectileEntity {
             }
         }
         if (!getEntityWorld().isClient())
-            playHitSound(getEntityWorld(), getPos());
+            playHitSound(getEntityWorld(), getEntityPos());
     }
 
     private DamageSource causePotatoDamage() {

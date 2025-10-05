@@ -53,7 +53,7 @@ public class FrogportBlock extends Block implements IBE<FrogportBlockEntity>, IW
         AdvancementBehaviour.setPlacedBy(pLevel, pPos, pPlacer);
         withBlockEntityDo(
             pLevel, pPos, be -> {
-                Vec3d diff = VecHelper.getCenterOf(pPos).subtract(pPlacer.getPos());
+                Vec3d diff = VecHelper.getCenterOf(pPos).subtract(pPlacer.getEntityPos());
                 be.passiveYaw = (float) (MathHelper.atan2(diff.x, diff.z) * MathHelper.DEGREES_PER_RADIAN);
                 be.passiveYaw = Math.round(be.passiveYaw / 11.25f) * 11.25f;
                 be.notifyUpdate();

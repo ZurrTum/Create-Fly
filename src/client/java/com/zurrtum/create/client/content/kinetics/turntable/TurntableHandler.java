@@ -32,7 +32,7 @@ public class TurntableHandler {
             return;
 
         Vec3d origin = VecHelper.getCenterOf(pos);
-        Vec3d offset = mc.player.getPos().subtract(origin);
+        Vec3d offset = mc.player.getEntityPos().subtract(origin);
 
         if (offset.length() > 1 / 4f)
             speed *= MathHelper.clamp((1 / 2f - offset.length()) * 2, 0, 1);

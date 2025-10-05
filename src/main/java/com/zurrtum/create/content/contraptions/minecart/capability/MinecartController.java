@@ -364,7 +364,7 @@ public class MinecartController {
         );
 
         public StallData(AbstractMinecartEntity entity) {
-            this(entity.getPos(), entity.getVelocity(), entity.getYaw(), entity.getPitch());
+            this(entity.getEntityPos(), entity.getVelocity(), entity.getYaw(), entity.getPitch());
             tick(entity);
         }
 

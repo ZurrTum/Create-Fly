@@ -84,7 +84,7 @@ public class BlueprintOverlayRenderer {
         if (!(entityRay.getEntity() instanceof BlueprintEntity blueprintEntity))
             return;
 
-        BlueprintSection sectionAt = blueprintEntity.getSectionAt(entityRay.getPos().subtract(blueprintEntity.getPos()));
+        BlueprintSection sectionAt = blueprintEntity.getSectionAt(entityRay.getPos().subtract(blueprintEntity.getEntityPos()));
 
         lastTargetedSection = last;
         active = true;
