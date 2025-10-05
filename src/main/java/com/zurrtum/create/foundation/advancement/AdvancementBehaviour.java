@@ -53,7 +53,7 @@ public class AdvancementBehaviour extends BlockEntityBehaviour<SmartBlockEntity>
     private void removeAwarded(ServerPlayerEntity player) {
         if (advancements.isEmpty())
             return;
-        ServerAdvancementLoader loader = player.getServer().getAdvancementLoader();
+        ServerAdvancementLoader loader = player.getEntityWorld().getServer().getAdvancementLoader();
         PlayerAdvancementTracker advancementTracker = player.getAdvancementTracker();
         advancements.removeIf(trigger -> {
             Set<ConditionsContainer<Conditions>> containers = trigger.listeners.get(advancementTracker);

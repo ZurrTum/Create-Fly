@@ -806,7 +806,7 @@ public class Train {
         }
 
         Create.RAILWAYS.removeTrain(id);
-        sender.getServer().getPlayerManager().sendToAll(new RemoveTrainPacket(this));
+        sender.getEntityWorld().getServer().getPlayerManager().sendToAll(new RemoveTrainPacket(this));
         return true;
     }
 
