@@ -130,7 +130,7 @@ public class SignalBlock extends Block implements IBE<SignalBlockEntity>, IWrenc
     }
 
     @Override
-    public int getComparatorOutput(BlockState pState, World blockAccess, BlockPos pPos) {
+    public int getComparatorOutput(BlockState pState, World blockAccess, BlockPos pPos, Direction direction) {
         return getBlockEntityOptional(blockAccess, pPos).filter(SignalBlockEntity::isPowered).map($ -> 15).orElse(0);
     }
 

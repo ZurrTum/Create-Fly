@@ -151,7 +151,7 @@ public class PostboxBlock extends HorizontalFacingBlock implements IBE<PostboxBl
     }
 
     @Override
-    public int getComparatorOutput(BlockState pState, World pLevel, BlockPos pPos) {
+    public int getComparatorOutput(BlockState pState, World pLevel, BlockPos pPos, Direction direction) {
         return getBlockEntityOptional(pLevel, pPos).map(PackagePortBlockEntity::getComparatorOutput).orElse(0);
     }
 

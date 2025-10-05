@@ -74,7 +74,7 @@ public class BacktankBlock extends HorizontalKineticBlock implements IBE<Backtan
     }
 
     @Override
-    public int getComparatorOutput(BlockState state, World world, BlockPos pos) {
+    public int getComparatorOutput(BlockState state, World world, BlockPos pos, Direction direction) {
         return getBlockEntityOptional(world, pos).map(BacktankBlockEntity::getComparatorOutput).orElse(0);
     }
 

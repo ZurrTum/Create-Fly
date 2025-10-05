@@ -196,7 +196,7 @@ public class BasinBlock extends Block implements IBE<BasinBlockEntity>, IWrencha
     }
 
     @Override
-    public int getComparatorOutput(BlockState blockState, World worldIn, BlockPos pos) {
+    public int getComparatorOutput(BlockState blockState, World worldIn, BlockPos pos, Direction direction) {
         Optional<BasinBlockEntity> getter = getBlockEntityOptional(worldIn, pos);
         if (getter.isEmpty()) {
             return 0;

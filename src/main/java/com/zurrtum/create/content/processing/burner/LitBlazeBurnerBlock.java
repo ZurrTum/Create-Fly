@@ -22,6 +22,7 @@ import net.minecraft.util.Hand;
 import net.minecraft.util.StringIdentifiable;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.random.Random;
 import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.world.BlockView;
@@ -152,7 +153,7 @@ public class LitBlazeBurnerBlock extends Block implements IWrenchable {
     }
 
     @Override
-    public int getComparatorOutput(BlockState state, World p_180641_2_, BlockPos p_180641_3_) {
+    public int getComparatorOutput(BlockState state, World p_180641_2_, BlockPos p_180641_3_, Direction direction) {
         return state.get(FLAME_TYPE) == FlameType.REGULAR ? 1 : 2;
     }
 

@@ -77,7 +77,7 @@ public class RedstoneRequesterBlock extends Block implements IBE<RedstoneRequest
     }
 
     @Override
-    public int getComparatorOutput(BlockState pBlockState, World pLevel, BlockPos pPos) {
+    public int getComparatorOutput(BlockState pBlockState, World pLevel, BlockPos pPos, Direction direction) {
         RedstoneRequesterBlockEntity req = getBlockEntity(pLevel, pPos);
         return req != null && req.lastRequestSucceeded ? 15 : 0;
     }

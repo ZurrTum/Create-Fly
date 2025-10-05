@@ -144,7 +144,7 @@ public class ItemDrainBlock extends Block implements IWrenchable, IBE<ItemDrainB
     }
 
     @Override
-    public int getComparatorOutput(BlockState blockState, World worldIn, BlockPos pos) {
+    public int getComparatorOutput(BlockState blockState, World worldIn, BlockPos pos, Direction direction) {
         return ComparatorUtil.levelOfSmartFluidTank(worldIn, pos);
     }
 

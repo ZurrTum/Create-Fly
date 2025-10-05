@@ -224,7 +224,7 @@ public class PackagerBlock extends WrenchableDirectionalBlock implements IBE<Pac
     }
 
     @Override
-    public int getComparatorOutput(BlockState pState, World pLevel, BlockPos pPos) {
+    public int getComparatorOutput(BlockState pState, World pLevel, BlockPos pPos, Direction direction) {
         return getBlockEntityOptional(pLevel, pPos).map(pbe -> {
             boolean empty = pbe.inventory.getStack().isEmpty();
             if (pbe.animationTicks != 0)

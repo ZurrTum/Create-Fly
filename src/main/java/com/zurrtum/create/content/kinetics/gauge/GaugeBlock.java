@@ -150,7 +150,7 @@ public class GaugeBlock extends DirectionalAxisKineticBlock implements IBE<Gauge
     }
 
     @Override
-    public int getComparatorOutput(BlockState blockState, World worldIn, BlockPos pos) {
+    public int getComparatorOutput(BlockState blockState, World worldIn, BlockPos pos, Direction direction) {
         BlockEntity be = worldIn.getBlockEntity(pos);
         if (be instanceof GaugeBlockEntity gaugeBlockEntity) {
             return MathHelper.ceil(MathHelper.clamp(gaugeBlockEntity.dialTarget * 14, 0, 15));

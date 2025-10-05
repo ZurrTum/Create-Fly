@@ -137,7 +137,7 @@ public class PortableStorageInterfaceBlock extends WrenchableDirectionalBlock im
     }
 
     @Override
-    public int getComparatorOutput(BlockState blockState, World worldIn, BlockPos pos) {
+    public int getComparatorOutput(BlockState blockState, World worldIn, BlockPos pos, Direction direction) {
         return getBlockEntityOptional(worldIn, pos).map(be -> be.isConnected() ? 15 : 0).orElse(0);
     }
 

@@ -202,7 +202,7 @@ public class EjectorBlock extends HorizontalKineticBlock implements IBE<EjectorB
     }
 
     @Override
-    public int getComparatorOutput(BlockState blockState, World worldIn, BlockPos pos) {
+    public int getComparatorOutput(BlockState blockState, World worldIn, BlockPos pos, Direction direction) {
         return SharedDepotBlockMethods.getComparatorInputOverride(blockState, worldIn, pos);
     }
 

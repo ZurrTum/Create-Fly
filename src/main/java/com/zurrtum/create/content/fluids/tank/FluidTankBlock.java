@@ -321,7 +321,7 @@ public class FluidTankBlock extends Block implements IWrenchable, IBE<FluidTankB
     }
 
     @Override
-    public int getComparatorOutput(BlockState blockState, World worldIn, BlockPos pos) {
+    public int getComparatorOutput(BlockState blockState, World worldIn, BlockPos pos, Direction direction) {
         return getBlockEntityOptional(worldIn, pos).map(FluidTankBlockEntity::getControllerBE)
             .map(be -> ComparatorUtil.fractionToRedstoneLevel(be.getFillState())).orElse(0);
     }

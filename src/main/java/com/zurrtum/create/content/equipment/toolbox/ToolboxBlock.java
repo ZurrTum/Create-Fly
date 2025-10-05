@@ -221,7 +221,7 @@ public class ToolboxBlock extends HorizontalFacingBlock implements Waterloggable
     }
 
     @Override
-    public int getComparatorOutput(BlockState pState, World pLevel, BlockPos pPos) {
+    public int getComparatorOutput(BlockState pState, World pLevel, BlockPos pPos, Direction direction) {
         return ItemHelper.calcRedstoneFromBlockEntity(this, pLevel, pPos);
     }
 

@@ -50,7 +50,7 @@ public class SpoutBlock extends Block implements IWrenchable, IBE<SpoutBlockEnti
     }
 
     @Override
-    public int getComparatorOutput(BlockState blockState, World worldIn, BlockPos pos) {
+    public int getComparatorOutput(BlockState blockState, World worldIn, BlockPos pos, Direction direction) {
         return ComparatorUtil.levelOfSmartFluidTank(worldIn, pos);
     }
 

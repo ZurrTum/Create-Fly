@@ -95,7 +95,7 @@ public class FrogportBlock extends Block implements IBE<FrogportBlockEntity>, IW
     }
 
     @Override
-    public int getComparatorOutput(BlockState pState, World pLevel, BlockPos pPos) {
+    public int getComparatorOutput(BlockState pState, World pLevel, BlockPos pPos, Direction direction) {
         return getBlockEntityOptional(pLevel, pPos).map(PackagePortBlockEntity::getComparatorOutput).orElse(0);
     }
 

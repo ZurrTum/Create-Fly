@@ -137,7 +137,7 @@ public class ItemVaultBlock extends Block implements IWrenchable, IBE<ItemVaultB
     }
 
     @Override
-    public int getComparatorOutput(BlockState pState, World pLevel, BlockPos pPos) {
+    public int getComparatorOutput(BlockState pState, World pLevel, BlockPos pPos, Direction direction) {
         return ItemHelper.calcRedstoneFromBlockEntity(this, pLevel, pPos);
     }
 
