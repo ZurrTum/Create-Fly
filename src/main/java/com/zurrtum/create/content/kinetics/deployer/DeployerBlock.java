@@ -84,7 +84,7 @@ public class DeployerBlock extends DirectionalAxisKineticBlock implements IBE<De
             withBlockEntityDo(
                 worldIn, pos, dbe -> {
                     dbe.owner = serverPlayer.getUuid();
-                    dbe.ownerName = serverPlayer.getGameProfile().getName();
+                    dbe.ownerName = serverPlayer.getGameProfile().name();
                 }
             );
         }

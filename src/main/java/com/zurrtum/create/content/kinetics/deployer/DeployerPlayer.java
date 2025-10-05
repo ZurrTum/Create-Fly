@@ -2,7 +2,6 @@ package com.zurrtum.create.content.kinetics.deployer;
 
 import com.mojang.authlib.GameProfile;
 import com.zurrtum.create.api.entity.FakePlayerHandler;
-import com.zurrtum.create.infrastructure.player.FakeGameProfile;
 import net.minecraft.item.ItemStack;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.network.ServerPlayerInteractionManager;
@@ -17,7 +16,7 @@ public interface DeployerPlayer {
     UUID FALLBACK_ID = UUID.fromString("9e2faded-cafe-4ec2-c314-dad129ae971d");
 
     static DeployerPlayer create(ServerWorld world, @Nullable UUID owner, @Nullable String name) {
-        GameProfile profile = new FakeGameProfile(FALLBACK_ID, "Deployer", owner, name);
+        GameProfile profile = new GameProfile(owner == null ? FALLBACK_ID : owner, owner == null || name == null ? "Deployer" : name);
         if (FakePlayerHandler.FABRIC) {
             return new DeployerFabricFakePlayer(world, profile);
         } else {

@@ -79,7 +79,7 @@ public class ServerSchematicLoader {
     }
 
     public void handleNewUpload(ServerPlayerEntity player, String schematic, long size, BlockPos pos) {
-        String playerName = player.getGameProfile().getName();
+        String playerName = player.getGameProfile().name();
 
         Path baseDir = CreatePaths.UPLOADED_SCHEMATICS_DIR;
         Path playerPath = baseDir.resolve(playerName).normalize();
@@ -157,7 +157,7 @@ public class ServerSchematicLoader {
     }
 
     public void handleWriteRequest(ServerPlayerEntity player, String schematic, byte[] data) {
-        String playerSchematicId = player.getGameProfile().getName() + "/" + schematic;
+        String playerSchematicId = player.getGameProfile().name() + "/" + schematic;
 
         if (activeUploads.containsKey(playerSchematicId)) {
             SchematicUploadEntry entry = activeUploads.get(playerSchematicId);
@@ -223,7 +223,7 @@ public class ServerSchematicLoader {
     }
 
     public void handleFinishedUpload(ServerPlayerEntity player, String schematic) {
-        String playerSchematicId = player.getGameProfile().getName() + "/" + schematic;
+        String playerSchematicId = player.getGameProfile().name() + "/" + schematic;
 
         if (activeUploads.containsKey(playerSchematicId)) {
             try {
@@ -244,7 +244,7 @@ public class ServerSchematicLoader {
                 if (table == null)
                     return;
                 table.finishUpload();
-                table.inventory.setStack(1, SchematicItem.create(world, schematic, player.getGameProfile().getName()));
+                table.inventory.setStack(1, SchematicItem.create(world, schematic, player.getGameProfile().name()));
 
             } catch (IOException e) {
                 Create.LOGGER.error("Exception Thrown when finishing Upload: {}", playerSchematicId, e);
@@ -253,7 +253,7 @@ public class ServerSchematicLoader {
     }
 
     public void handleInstantSchematic(ServerPlayerEntity player, String schematic, World world, BlockPos pos, BlockPos bounds) {
-        String playerName = player.getGameProfile().getName();
+        String playerName = player.getGameProfile().name();
 
         Path baseDir = CreatePaths.UPLOADED_SCHEMATICS_DIR;
         Path playerPath = baseDir.resolve(playerName).normalize();
