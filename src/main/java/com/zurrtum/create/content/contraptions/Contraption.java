@@ -815,15 +815,15 @@ public abstract class Contraption {
     }
 
     private void writeBlocksCompound(WriteView view, boolean spawnPacket) {
-        BiMapPalette<BlockState> palette = new BiMapPalette<>(
-            Block.STATE_IDS, 16, (i, s) -> {
-            throw new IllegalStateException("Palette Map index exceeded maximum");
-        }
-        );
+        BiMapPalette<BlockState> palette = new BiMapPalette<>(16);
         WriteView.ListView blockList = view.getList("BlockList");
 
         for (StructureBlockInfo block : this.blocks.values()) {
-            int id = palette.index(block.state());
+            int id = palette.index(
+                block.state(), (i, s) -> {
+                    throw new IllegalStateException("Palette Map index exceeded maximum");
+                }
+            );
             BlockPos pos = block.pos();
             WriteView c = blockList.add();
             c.putLong("Pos", pos.asLong());
@@ -862,9 +862,8 @@ public abstract class Contraption {
 
     private void readBlocksCompound(ReadView view, World world) {
         BiMapPalette<BlockState> palette = new BiMapPalette<>(
-            Block.STATE_IDS, 16, (i, s) -> {
-            throw new IllegalStateException("Palette Map index exceeded maximum");
-        }, view.read("Palette", CreateCodecs.BLOCK_STATE_LIST_CODEC).orElseGet(ArrayList::new)
+            16,
+            view.read("Palette", CreateCodecs.BLOCK_STATE_LIST_CODEC).orElseGet(ArrayList::new)
         );
 
         view.getListReadView("BlockList").forEach(c -> {
