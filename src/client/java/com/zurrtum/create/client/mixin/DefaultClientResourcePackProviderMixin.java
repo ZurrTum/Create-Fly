@@ -38,11 +38,10 @@ public abstract class DefaultClientResourcePackProviderMixin {
                 );
                 ResourceType type = ResourceType.CLIENT_RESOURCES;
                 ResourceMetadataMap metadataMap = ResourceMetadataMap.of(
-                    PackResourceMetadata.SERIALIZER,
+                    PackResourceMetadata.CLIENT_RESOURCES_SERIALIZER,
                     new PackResourceMetadata(
                         Text.translatable("advancement.create.root"),
-                        SharedConstants.getGameVersion().packVersion(type),
-                        Optional.empty()
+                        SharedConstants.getGameVersion().packVersion(type).majorRange()
                     )
                 );
                 DefaultResourcePackBuilder builder = new DefaultResourcePackBuilder().withMetadataMap(metadataMap)

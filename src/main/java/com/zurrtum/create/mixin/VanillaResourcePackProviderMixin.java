@@ -77,8 +77,8 @@ public class VanillaResourcePackProviderMixin {
         String... namespace
     ) {
         ResourceMetadataMap metadataMap = ResourceMetadataMap.of(
-            PackResourceMetadata.SERIALIZER,
-            new PackResourceMetadata(title, SharedConstants.getGameVersion().packVersion(ResourceType.SERVER_DATA), Optional.empty())
+            PackResourceMetadata.SERVER_DATA_SERIALIZER,
+            new PackResourceMetadata(title, SharedConstants.getGameVersion().packVersion(ResourceType.SERVER_DATA).majorRange())
         );
         DefaultResourcePackBuilder builder = new DefaultResourcePackBuilder().withMetadataMap(metadataMap).withNamespaces(namespace);
         for (Path path : paths) {

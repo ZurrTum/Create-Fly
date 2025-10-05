@@ -12,7 +12,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
@@ -30,7 +29,7 @@ public class DynamicPack implements ResourcePack {
         this.packId = packId;
         this.packType = packType;
 
-        metadata = new PackResourceMetadata(title, SharedConstants.getGameVersion().packVersion(packType), Optional.empty());
+        metadata = new PackResourceMetadata(title, SharedConstants.getGameVersion().packVersion(packType).majorRange());
         packLocationInfo = new ResourcePackInfo(packId, Text.literal(packId), ResourcePackSource.BUILTIN, Optional.empty());
     }
 
@@ -105,8 +104,8 @@ public class DynamicPack implements ResourcePack {
 
     @SuppressWarnings("unchecked")
     @Override
-    public @Nullable <T> T parseMetadata(@NotNull ResourceMetadataSerializer<T> deserializer) throws IOException {
-        return deserializer == PackResourceMetadata.SERIALIZER ? (T) metadata : null;
+    public @Nullable <T> T parseMetadata(@NotNull ResourceMetadataSerializer<T> deserializer) {
+        return deserializer == PackResourceMetadata.getSerializerFor(packType) ? (T) metadata : null;
     }
 
     @Override
