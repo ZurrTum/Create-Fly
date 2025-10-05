@@ -359,7 +359,7 @@ public class BlockHelper {
         int idx = chunk.getSectionIndex(target.getY());
         ChunkSection chunksection = chunk.getSection(idx);
         if (chunksection == null) {
-            chunksection = new ChunkSection(world.getRegistryManager().getOrThrow(RegistryKeys.BIOME));
+            chunksection = new ChunkSection(world.getPalettesFactory());
             chunk.getSectionArray()[idx] = chunksection;
         }
         BlockState old = chunksection.setBlockState(
