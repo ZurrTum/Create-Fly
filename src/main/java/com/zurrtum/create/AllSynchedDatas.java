@@ -39,6 +39,7 @@ public class AllSynchedDatas {
         .collect(PacketCodecs::optional));
     public static final TrackedDataHandler<CarriageSyncData> CARRIAGE_DATA_HANDLER = register(CarriageSyncDataSerializer::new);
     public static final TrackedDataHandler<Optional<Vec3d>> OPTIONAL_VEC3D_HANDLER = register(Vec3d.PACKET_CODEC.collect(PacketCodecs::optional));
+    public static final TrackedDataHandler<NbtCompound> NBT_COMPOUND_HANDLER = register(PacketCodecs.UNLIMITED_NBT_COMPOUND);
     public static final Entry<Integer> HAUNTING = register(HorseEntity.class, TrackedDataHandlerRegistry.INTEGER, 0);
     public static final Entry<String> ITEM_TYPE = register(ItemEntity.class, TrackedDataHandlerRegistry.STRING, "");
     public static final Entry<Integer> ITEM_TIME = register(ItemEntity.class, TrackedDataHandlerRegistry.INTEGER, 0);
@@ -62,7 +63,7 @@ public class AllSynchedDatas {
     public static final Entry<Optional<Vec3d>> CONTRAPTION_DISMOUNT_LOCATION = register(LivingEntity.class, OPTIONAL_VEC3D_HANDLER, Optional.empty());
     public static final Entry<Optional<Vec3d>> CONTRAPTION_MOUNT_LOCATION = register(PlayerEntity.class, OPTIONAL_VEC3D_HANDLER, Optional.empty());
     public static final Entry<Boolean> IS_USING_LECTERN_CONTROLLER = register(PlayerEntity.class, TrackedDataHandlerRegistry.BOOLEAN, false);
-    public static final Entry<NbtCompound> TOOLBOX = register(PlayerEntity.class, TrackedDataHandlerRegistry.NBT_COMPOUND, new NbtCompound());
+    public static final Entry<NbtCompound> TOOLBOX = register(PlayerEntity.class, NBT_COMPOUND_HANDLER, new NbtCompound());
     public static final Entry<Integer> LAST_OVERRIDE_LIMB_SWING_UPDATE = register(PlayerEntity.class, TrackedDataHandlerRegistry.INTEGER, -1);
     public static final Entry<Float> OVERRIDE_LIMB_SWING = register(PlayerEntity.class, TrackedDataHandlerRegistry.FLOAT, 0F);
     public static final Entry<Boolean> PARROT_TRAIN_HAT = register(ParrotEntity.class, TrackedDataHandlerRegistry.BOOLEAN, false);

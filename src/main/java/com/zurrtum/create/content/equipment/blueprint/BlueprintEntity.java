@@ -3,6 +3,7 @@ package com.zurrtum.create.content.equipment.blueprint;
 import com.google.common.cache.Cache;
 import com.zurrtum.create.AllEntityTypes;
 import com.zurrtum.create.AllItems;
+import com.zurrtum.create.AllSynchedDatas;
 import com.zurrtum.create.Create;
 import com.zurrtum.create.api.entity.FakePlayerHandler;
 import com.zurrtum.create.api.schematic.requirement.SpecialEntityItemRequirement;
@@ -31,7 +32,6 @@ import net.minecraft.entity.EntityType;
 import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.data.DataTracker;
 import net.minecraft.entity.data.TrackedData;
-import net.minecraft.entity.data.TrackedDataHandlerRegistry;
 import net.minecraft.entity.decoration.AbstractDecorationEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
@@ -70,7 +70,7 @@ import java.util.concurrent.ExecutionException;
 
 public class BlueprintEntity extends AbstractDecorationEntity implements SpecialEntityItemRequirement, IInteractionChecker {
     private static final Cache<String, BlueprintPreviewPacket> PREVIEW_CACHE = new TickBasedCache<>(20, true);
-    private static final TrackedData<NbtCompound> RECIPES = DataTracker.registerData(BlueprintEntity.class, TrackedDataHandlerRegistry.NBT_COMPOUND);
+    private static final TrackedData<NbtCompound> RECIPES = DataTracker.registerData(BlueprintEntity.class, AllSynchedDatas.NBT_COMPOUND_HANDLER);
 
     public int size;
     protected Direction verticalOrientation;
