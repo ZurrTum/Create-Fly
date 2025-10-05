@@ -95,7 +95,7 @@ public class ItemDrainBlock extends Block implements IWrenchable, IBE<ItemDrainB
             return;
         if (!entityIn.isAlive())
             return;
-        if (entityIn.getWorld().isClient())
+        if (entityIn.getEntityWorld().isClient())
             return;
 
         DirectBeltInputBehaviour inputBehaviour = BlockEntityBehaviour.get(worldIn, entityIn.getBlockPos(), DirectBeltInputBehaviour.TYPE);

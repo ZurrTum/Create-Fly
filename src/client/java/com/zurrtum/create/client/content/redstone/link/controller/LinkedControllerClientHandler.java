@@ -160,14 +160,14 @@ public class LinkedControllerClientHandler {
             // Released Keys
             if (!releasedKeys.isEmpty()) {
                 player.networkHandler.sendPacket(new LinkedControllerInputPacket(releasedKeys, false, lecternPos));
-                AllSoundEvents.CONTROLLER_CLICK.playAt(player.getWorld(), player.getBlockPos(), 1f, .5f, true);
+                AllSoundEvents.CONTROLLER_CLICK.playAt(player.getEntityWorld(), player.getBlockPos(), 1f, .5f, true);
             }
 
             // Newly Pressed Keys
             if (!newKeys.isEmpty()) {
                 player.networkHandler.sendPacket(new LinkedControllerInputPacket(newKeys, true, lecternPos));
                 packetCooldown = PACKET_RATE;
-                AllSoundEvents.CONTROLLER_CLICK.playAt(player.getWorld(), player.getBlockPos(), 1f, .75f, true);
+                AllSoundEvents.CONTROLLER_CLICK.playAt(player.getEntityWorld(), player.getBlockPos(), 1f, .75f, true);
             }
 
             // Keepalive Pressed Keys

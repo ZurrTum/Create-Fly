@@ -57,7 +57,7 @@ public class PackagePortMenu extends MenuBase<PackagePortBlockEntity> {
     @Override
     public void onClosed(PlayerEntity playerIn) {
         super.onClosed(playerIn);
-        if (!playerIn.getWorld().isClient())
+        if (!playerIn.getEntityWorld().isClient())
             BlockEntityBehaviour.get(contentHolder, AnimatedContainerBehaviour.TYPE).stopOpen(playerIn);
     }
 

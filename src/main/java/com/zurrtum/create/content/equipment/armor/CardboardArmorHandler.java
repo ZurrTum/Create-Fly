@@ -26,7 +26,7 @@ public class CardboardArmorHandler {
             scale = 1.0F;
         }
 
-        if (!entity.getWorld().isClient() && entity instanceof ServerPlayerEntity serverPlayer) {
+        if (!entity.getEntityWorld().isClient() && entity instanceof ServerPlayerEntity serverPlayer) {
             AllAdvancements.CARDBOARD_ARMOR.trigger(serverPlayer);
         }
 
@@ -50,7 +50,7 @@ public class CardboardArmorHandler {
                 }
         }
 
-        if (entity instanceof Angerable nMob && entity.getWorld() instanceof ServerWorld sl) {
+        if (entity instanceof Angerable nMob && entity.getEntityWorld() instanceof ServerWorld sl) {
             UUID uuid = nMob.getAngryAt();
             if (uuid != null && testForStealth(sl.getEntity(uuid)))
                 nMob.stopAnger();

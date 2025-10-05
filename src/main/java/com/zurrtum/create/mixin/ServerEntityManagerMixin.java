@@ -21,7 +21,7 @@ public class ServerEntityManagerMixin {
         if (entity instanceof ItemEntity itemEntity) {
             ItemStack stack = itemEntity.getStack();
             if (stack.getItem() instanceof EntityItem item) {
-                Entity newEntity = item.createEntity(itemEntity.getWorld(), itemEntity, stack);
+                Entity newEntity = item.createEntity(itemEntity.getEntityWorld(), itemEntity, stack);
                 if (newEntity != null) {
                     itemEntity.discard();
                     return newEntity;

@@ -88,7 +88,7 @@ public class ToolboxHandler {
 
     public static void unequip(PlayerEntity player, int hotbarSlot, boolean keepItems) {
         NbtCompound compound = AllSynchedDatas.TOOLBOX.get(player);
-        World world = player.getWorld();
+        World world = player.getEntityWorld();
         String key = String.valueOf(hotbarSlot);
         if (!compound.contains(key))
             return;
@@ -105,7 +105,7 @@ public class ToolboxHandler {
     }
 
     public static boolean withinRange(PlayerEntity player, ToolboxBlockEntity box) {
-        if (player.getWorld() != box.getWorld())
+        if (player.getEntityWorld() != box.getWorld())
             return false;
         double maxRange = getMaxRange(player);
         return distance(player.getPos(), box.getPos()) < maxRange * maxRange;

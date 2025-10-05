@@ -77,7 +77,7 @@ public class LivingEntityRendererMixin<T extends LivingEntity, S extends LivingE
                 }
             }
             if (hat == null && vehicle instanceof SeatEntity) {
-                World level = entity.getWorld();
+                World level = entity.getEntityWorld();
                 BlockPos pos = entity.getBlockPos();
                 boolean find = false;
                 Find:

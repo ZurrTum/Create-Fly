@@ -30,7 +30,7 @@ public class ControlsInteractionBehaviour extends MovingInteractionBehaviour {
             return false;
 
         contraptionEntity.setControllingPlayer(player);
-        if (player.getWorld().isClient())
+        if (player.getEntityWorld().isClient())
             AllClientHandle.INSTANCE.startControlling(player, contraptionEntity, localPos);
         return true;
     }

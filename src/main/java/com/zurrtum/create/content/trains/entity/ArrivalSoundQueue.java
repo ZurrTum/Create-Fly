@@ -140,7 +140,7 @@ public class ArrivalSoundQueue {
     }
 
     private static void playSimple(CarriageContraptionEntity entity, SoundEvent event, float volume, float pitch) {
-        entity.getWorld().playSoundFromEntity(null, entity, event, SoundCategory.NEUTRAL, 5 * volume, pitch);
+        entity.getEntityWorld().playSoundFromEntity(null, entity, event, SoundCategory.NEUTRAL, 5 * volume, pitch);
     }
 
 }

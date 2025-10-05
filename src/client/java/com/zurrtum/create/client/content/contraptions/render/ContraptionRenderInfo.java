@@ -51,7 +51,7 @@ public class ContraptionRenderInfo {
             // it generated will become canonical. It's important that
             // we only maintain one RenderInfo instance, specifically
             // for the VirtualRenderWorld inside.
-            renderInfo.compareAndExchangeRelease(null, new ContraptionRenderInfo(contraption.entity.getWorld(), contraption));
+            renderInfo.compareAndExchangeRelease(null, new ContraptionRenderInfo(contraption.entity.getEntityWorld(), contraption));
 
             // Must get again to ensure we have the canonical instance.
             out = renderInfo.getAcquire();

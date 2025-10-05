@@ -123,7 +123,7 @@ public class CarriageContraptionVisual extends OrientedContraptionVisual<Carriag
         bogeys.forEach(bogey -> {
             if (bogey != null) {
                 int packedLight = CarriageContraptionEntityRenderer.getBogeyLightCoords(
-                    entity.getWorld(),
+                    entity.getEntityWorld(),
                     bogey.bogey,
                     () -> entity.getClientCameraPosVec(partialTick)
                 );

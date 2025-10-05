@@ -87,7 +87,8 @@ public class ToolboxMenu extends MenuBase<ToolboxBlockEntity> {
                 }
             }
 
-            if (type == SlotActionType.PICKUP && carried.isEmpty() && settle(itemInClickedSlot, index).isEmpty() && !player.getWorld().isClient()) {
+            if (type == SlotActionType.PICKUP && carried.isEmpty() && settle(itemInClickedSlot, index).isEmpty() && !player.getEntityWorld()
+                .isClient()) {
                 contentHolder.inventory.filters.set(index / STACKS_PER_COMPARTMENT, ItemStack.EMPTY);
                 contentHolder.sendData();
             }
@@ -147,7 +148,7 @@ public class ToolboxMenu extends MenuBase<ToolboxBlockEntity> {
     @Override
     public void onClosed(PlayerEntity playerIn) {
         super.onClosed(playerIn);
-        if (!playerIn.getWorld().isClient())
+        if (!playerIn.getEntityWorld().isClient())
             BlockEntityBehaviour.get(contentHolder, AnimatedContainerBehaviour.TYPE).stopOpen(playerIn);
     }
 

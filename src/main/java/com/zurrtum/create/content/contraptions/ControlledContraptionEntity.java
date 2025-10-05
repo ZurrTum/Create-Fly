@@ -46,7 +46,7 @@ public class ControlledContraptionEntity extends AbstractContraptionEntity {
     @Override
     public void setPosition(double x, double y, double z) {
         super.setPosition(x, y, z);
-        if (!getWorld().isClient())
+        if (!getEntityWorld().isClient())
             return;
         for (Entity entity : getPassengerList())
             updatePassengerPosition(entity);
@@ -110,7 +110,7 @@ public class ControlledContraptionEntity extends AbstractContraptionEntity {
     public void setAngle(float angle) {
         this.angle = angle;
 
-        if (!getWorld().isClient())
+        if (!getEntityWorld().isClient())
             return;
         for (Entity entity : getPassengerList())
             updatePassengerPosition(entity);
@@ -144,7 +144,7 @@ public class ControlledContraptionEntity extends AbstractContraptionEntity {
 
         if (controllerPos == null)
             return;
-        if (!getWorld().isPosLoaded(controllerPos))
+        if (!getEntityWorld().isPosLoaded(controllerPos))
             return;
         IControlContraption controller = getController();
         if (controller == null) {
@@ -153,7 +153,7 @@ public class ControlledContraptionEntity extends AbstractContraptionEntity {
         }
         if (!controller.isAttachedTo(this)) {
             controller.attach(this);
-            if (getWorld().isClient())
+            if (getEntityWorld().isClient())
                 setPosition(getX(), getY(), getZ());
         }
     }
@@ -193,9 +193,9 @@ public class ControlledContraptionEntity extends AbstractContraptionEntity {
     protected IControlContraption getController() {
         if (controllerPos == null)
             return null;
-        if (!getWorld().isPosLoaded(controllerPos))
+        if (!getEntityWorld().isPosLoaded(controllerPos))
             return null;
-        BlockEntity be = getWorld().getBlockEntity(controllerPos);
+        BlockEntity be = getEntityWorld().getBlockEntity(controllerPos);
         if (!(be instanceof IControlContraption))
             return null;
         return (IControlContraption) be;

@@ -237,8 +237,8 @@ public class SuperGlueSelectionHandler {
 
     public void confirm(ClientPlayerEntity player) {
         player.networkHandler.sendPacket(new SuperGlueSelectionPacket(firstPos, hoveredPos));
-        AllSoundEvents.SLIME_ADDED.playAt(player.clientWorld, hoveredPos, 0.5F, 0.95F, false);
-        player.clientWorld.playSound(player, hoveredPos, SoundEvents.ENTITY_ITEM_FRAME_ADD_ITEM, SoundCategory.BLOCKS, 0.75f, 1);
+        AllSoundEvents.SLIME_ADDED.playAt(player.getEntityWorld(), hoveredPos, 0.5F, 0.95F, false);
+        player.getEntityWorld().playSound(player, hoveredPos, SoundEvents.ENTITY_ITEM_FRAME_ADD_ITEM, SoundCategory.BLOCKS, 0.75f, 1);
 
         if (currentCluster != null)
             Outliner.getInstance().showCluster(clusterOutlineSlot, currentCluster).colored(0xB5F2C6)

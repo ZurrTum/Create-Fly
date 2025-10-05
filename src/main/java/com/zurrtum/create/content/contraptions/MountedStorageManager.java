@@ -195,7 +195,7 @@ public class MountedStorageManager {
 
         if (!items.isEmpty() || !fluids.isEmpty()) {
             Packet<ClientPlayPacketListener> packet = new MountedStorageSyncPacket(entity.getId(), items, fluids);
-            ((ServerChunkManager) entity.getWorld().getChunkManager()).sendToOtherNearbyPlayers(entity, packet);
+            ((ServerChunkManager) entity.getEntityWorld().getChunkManager()).sendToOtherNearbyPlayers(entity, packet);
             syncCooldown = 8;
         }
     }

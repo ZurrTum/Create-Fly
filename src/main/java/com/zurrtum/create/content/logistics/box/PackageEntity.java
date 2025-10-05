@@ -128,7 +128,7 @@ public class PackageEntity extends LivingEntity {
     public void travel(Vec3d p_213352_1_) {
         super.travel(p_213352_1_);
 
-        if (!getWorld().isClient())
+        if (!getEntityWorld().isClient())
             return;
         if (getVelocity().length() < 1 / 128f)
             return;
@@ -137,8 +137,8 @@ public class PackageEntity extends LivingEntity {
 
         Vec3d motion = getVelocity().multiply(.75f);
         Box bb = getBoundingBox();
-        List<VoxelShape> entityStream = getWorld().getEntityCollisions(this, bb.stretch(motion));
-        motion = adjustMovementForCollisions(this, motion, bb, getWorld(), entityStream);
+        List<VoxelShape> entityStream = getEntityWorld().getEntityCollisions(this, bb.stretch(motion));
+        motion = adjustMovementForCollisions(this, motion, bb, getEntityWorld(), entityStream);
 
         Vec3d clientPos = getPos().add(motion);
         if (isInterpolating())
@@ -243,10 +243,17 @@ public class PackageEntity extends LivingEntity {
     public ActionResult interact(PlayerEntity pPlayer, Hand pHand) {
         if (!pPlayer.getStackInHand(pHand).isEmpty())
             return super.interact(pPlayer, pHand);
-        if (pPlayer.getWorld().isClient())
+        if (pPlayer.getEntityWorld().isClient())
             return ActionResult.SUCCESS;
         pPlayer.setStackInHand(pHand, box);
-        getWorld().playSound(null, getBlockPos(), SoundEvents.ENTITY_ITEM_PICKUP, SoundCategory.PLAYERS, .2f, .75f + getWorld().random.nextFloat());
+        getEntityWorld().playSound(
+            null,
+            getBlockPos(),
+            SoundEvents.ENTITY_ITEM_PICKUP,
+            SoundCategory.PLAYERS,
+            .2f,
+            .75f + getEntityWorld().random.nextFloat()
+        );
         remove(RemovalReason.DISCARDED);
         return ActionResult.SUCCESS;
     }
@@ -289,7 +296,7 @@ public class PackageEntity extends LivingEntity {
 
     @Override
     public boolean damage(ServerWorld world, DamageSource source, float amount) {
-        if (getWorld().isClient() || !this.isAlive())
+        if (getEntityWorld().isClient() || !this.isAlive())
             return false;
 
         if (source.isIn(DamageTypeTags.BYPASSES_INVULNERABILITY)) {
@@ -303,7 +310,7 @@ public class PackageEntity extends LivingEntity {
         if (source.isIn(DamageTypeTags.IS_FALL))
             return false;
 
-        if (this.isInvulnerableTo((ServerWorld) getWorld(), source))
+        if (this.isInvulnerableTo((ServerWorld) getEntityWorld(), source))
             return false;
 
         if (source.isIn(DamageTypeTags.IS_EXPLOSION)) {
@@ -348,8 +355,8 @@ public class PackageEntity extends LivingEntity {
     }
 
     private void destroy(DamageSource source) {
-        AllSoundEvents.PACKAGE_POP.playOnServer(getWorld(), getBlockPos());
-        if (getWorld() instanceof ServerWorld serverLevel) {
+        AllSoundEvents.PACKAGE_POP.playOnServer(getEntityWorld(), getBlockPos());
+        if (getEntityWorld() instanceof ServerWorld serverLevel) {
             this.drop(serverLevel, source);
             serverLevel.getChunkManager().sendToOtherNearbyPlayers(this, new PackageDestroyPacket(getBoundingBox().getCenter(), box));
         }

@@ -59,7 +59,7 @@ public class PotatoCannonItem extends RangedWeaponItem implements SwingControlIt
         }
 
         Optional<RegistryEntry.Reference<PotatoCannonProjectileType>> optionalType = PotatoCannonProjectileType.getTypeForItem(
-            player.getWorld().getRegistryManager(), ammoStack.getItem());
+            player.getEntityWorld().getRegistryManager(), ammoStack.getItem());
         if (optionalType.isEmpty()) {
             return null;
         }

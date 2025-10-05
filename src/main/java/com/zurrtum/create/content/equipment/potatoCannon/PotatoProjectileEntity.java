@@ -141,7 +141,7 @@ public class PotatoProjectileEntity extends ExplosiveProjectileEntity {
         if (stuckEntity != null) {
             if (getY() < stuckEntity.getY() - 0.1) {
                 pop(getPos());
-                if (getWorld() instanceof ServerWorld serverWorld) {
+                if (getEntityWorld() instanceof ServerWorld serverWorld) {
                     kill(serverWorld);
                 }
             } else {
@@ -218,7 +218,7 @@ public class PotatoProjectileEntity extends ExplosiveProjectileEntity {
         if (this.isOnFire() && !targetIsEnderman)
             target.setOnFireFor(5);
 
-        World world = getWorld();
+        World world = getEntityWorld();
         boolean onServer = !world.isClient();
         DamageSource damageSource = causePotatoDamage();
         if (onServer && !target.damage((ServerWorld) world, damageSource, damage)) {
@@ -280,7 +280,7 @@ public class PotatoProjectileEntity extends ExplosiveProjectileEntity {
     }
 
     private void recoverItem() {
-        if (!stack.isEmpty() && getWorld() instanceof ServerWorld serverWorld)
+        if (!stack.isEmpty() && getEntityWorld() instanceof ServerWorld serverWorld)
             dropStack(serverWorld, stack.copyWithCount(1));
     }
 
@@ -296,7 +296,7 @@ public class PotatoProjectileEntity extends ExplosiveProjectileEntity {
     protected void onBlockHit(BlockHitResult ray) {
         Vec3d hit = ray.getPos();
         pop(hit);
-        World world = getWorld();
+        World world = getEntityWorld();
         if (!type.onBlockHit(world, stack, ray) && !world.isClient()) {
             if (random.nextDouble() <= recoveryChance) {
                 recoverItem();
@@ -326,15 +326,15 @@ public class PotatoProjectileEntity extends ExplosiveProjectileEntity {
         if (!stack.isEmpty()) {
             for (int i = 0; i < 7; i++) {
                 Vec3d m = VecHelper.offsetRandomly(Vec3d.ZERO, this.random, .25f);
-                getWorld().addParticleClient(new ItemStackParticleEffect(ParticleTypes.ITEM, stack), hit.x, hit.y, hit.z, m.x, m.y, m.z);
+                getEntityWorld().addParticleClient(new ItemStackParticleEffect(ParticleTypes.ITEM, stack), hit.x, hit.y, hit.z, m.x, m.y, m.z);
             }
         }
-        if (!getWorld().isClient())
-            playHitSound(getWorld(), getPos());
+        if (!getEntityWorld().isClient())
+            playHitSound(getEntityWorld(), getPos());
     }
 
     private DamageSource causePotatoDamage() {
-        return AllDamageSources.get(getWorld()).potatoCannon(this, getOwner());
+        return AllDamageSources.get(getEntityWorld()).potatoCannon(this, getOwner());
     }
 
     @Override

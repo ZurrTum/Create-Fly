@@ -47,7 +47,7 @@ public final class FireElement extends AbstractVisual implements SimpleDynamicVi
     private final SmartRecycler<Model, TransformedInstance> recycler;
 
     public FireElement(VisualizationContext ctx, Entity entity, float partialTick) {
-        super(ctx, entity.getWorld(), partialTick);
+        super(ctx, entity.getEntityWorld(), partialTick);
 
         this.entity = entity;
 

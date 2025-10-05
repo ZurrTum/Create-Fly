@@ -20,7 +20,7 @@ public abstract class ItemEntityMixin extends Entity {
     @WrapOperation(method = "tick()V", at = @At(value = "INVOKE", target = "Lnet/minecraft/block/Block;getSlipperiness()F"))
     private float getSlipperiness(Block block, Operation<Float> original) {
         if (block instanceof SlipperinessControlBlock controlBlock) {
-            return controlBlock.getSlipperiness(getWorld(), getVelocityAffectingPos());
+            return controlBlock.getSlipperiness(getEntityWorld(), getVelocityAffectingPos());
         }
         return original.call(block);
     }

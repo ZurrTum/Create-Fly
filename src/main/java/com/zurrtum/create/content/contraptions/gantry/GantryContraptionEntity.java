@@ -54,7 +54,7 @@ public class GantryContraptionEntity extends AbstractContraptionEntity {
             return;
 
         double prevAxisMotion = axisMotion;
-        World world = getWorld();
+        World world = getEntityWorld();
         if (world.isClient()) {
             clientOffsetDiff *= .75f;
             updateClientMotion();
@@ -96,7 +96,7 @@ public class GantryContraptionEntity extends AbstractContraptionEntity {
         Vec3d currentPosition = getAnchorVec().add(.5, .5, .5);
         BlockPos gantryShaftPos = BlockPos.ofFloored(currentPosition).offset(facing.getOpposite());
 
-        World world = getWorld();
+        World world = getEntityWorld();
         BlockEntity be = world.getBlockEntity(gantryShaftPos);
         if (!(be instanceof GantryShaftBlockEntity gantryShaftBlockEntity) || !be.getCachedState().isOf(AllBlocks.GANTRY_SHAFT)) {
             if (!world.isClient()) {
@@ -209,7 +209,7 @@ public class GantryContraptionEntity extends AbstractContraptionEntity {
     }
 
     public void sendPacket() {
-        ServerChunkManager chunkManager = ((ServerWorld) getWorld()).getChunkManager();
+        ServerChunkManager chunkManager = ((ServerWorld) getEntityWorld()).getChunkManager();
         chunkManager.sendToOtherNearbyPlayers(this, new GantryContraptionUpdatePacket(getId(), getAxisCoord(), axisMotion, sequencedOffsetLimit));
     }
 }

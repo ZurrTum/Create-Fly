@@ -134,7 +134,7 @@ public class AllSoundEvents {
 
         public void playFrom(Entity entity, float volume, float pitch) {
             if (!entity.isSilent())
-                play(entity.getWorld(), null, entity.getBlockPos(), volume, pitch);
+                play(entity.getEntityWorld(), null, entity.getBlockPos(), volume, pitch);
         }
 
         public void play(World world, PlayerEntity entity, Vec3i pos, float volume, float pitch) {

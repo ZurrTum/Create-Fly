@@ -178,12 +178,12 @@ public class SawBlock extends DirectionalAxisKineticBlock implements IBE<SawBloc
         super.onEntityLand(worldIn, entityIn);
         if (!(entityIn instanceof ItemEntity))
             return;
-        if (entityIn.getWorld().isClient())
+        if (entityIn.getEntityWorld().isClient())
             return;
 
         BlockPos pos = entityIn.getBlockPos();
         withBlockEntityDo(
-            entityIn.getWorld(), pos, be -> {
+            entityIn.getEntityWorld(), pos, be -> {
                 if (be.getSpeed() == 0)
                     return;
                 be.insertItem((ItemEntity) entityIn);

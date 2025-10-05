@@ -97,7 +97,10 @@ public class SeatBlock extends Block implements ProperWaterloggedBlock {
     @Override
     public void onEntityLand(BlockView reader, Entity entity) {
         BlockPos pos = entity.getBlockPos();
-        if (entity instanceof PlayerEntity || !(entity instanceof LivingEntity) || !canBePickedUp(entity) || isSeatOccupied(entity.getWorld(), pos)) {
+        if (entity instanceof PlayerEntity || !(entity instanceof LivingEntity) || !canBePickedUp(entity) || isSeatOccupied(
+            entity.getEntityWorld(),
+            pos
+        )) {
             if (entity.bypassesLandingEffects()) {
                 super.onEntityLand(reader, entity);
                 return;
@@ -115,7 +118,7 @@ public class SeatBlock extends Block implements ProperWaterloggedBlock {
             return;
         if (entity instanceof Leashable leashable && leashable.isLeashed())
             return;
-        sitDown(entity.getWorld(), pos, entity);
+        sitDown(entity.getEntityWorld(), pos, entity);
     }
 
     //TODO
@@ -217,7 +220,7 @@ public class SeatBlock extends Block implements ProperWaterloggedBlock {
     }
 
     public static Optional<Entity> getLeashed(World level, PlayerEntity player) {
-        List<Entity> entities = player.getWorld().getOtherEntities(null, player.getBoundingBox().expand(10), e -> true);
+        List<Entity> entities = player.getEntityWorld().getOtherEntities(null, player.getBoundingBox().expand(10), e -> true);
         for (Entity e : entities)
             if (e instanceof MobEntity mob && mob.getLeashHolder() == player && SeatBlock.canBePickedUp(e))
                 return Optional.of(mob);

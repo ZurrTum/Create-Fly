@@ -73,7 +73,7 @@ public class TrackPlacementClient {
             return;
 
         TrackBlockItem blockItem = (TrackBlockItem) stack.getItem();
-        World level = player.getWorld();
+        World level = player.getEntityWorld();
         BlockHitResult bhr = (BlockHitResult) hitResult;
         BlockPos pos = bhr.getBlockPos();
         BlockState hitState = level.getBlockState(pos);

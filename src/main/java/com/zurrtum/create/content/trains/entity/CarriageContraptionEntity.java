@@ -125,7 +125,7 @@ public class CarriageContraptionEntity extends OrientedContraptionEntity {
     public void onTrackedDataSet(TrackedData<?> key) {
         super.onTrackedDataSet(key);
 
-        if (!getWorld().isClient())
+        if (!getEntityWorld().isClient())
             return;
 
         bindCarriage();
@@ -157,7 +157,7 @@ public class CarriageContraptionEntity extends OrientedContraptionEntity {
 
     @Override
     public Vec3d getPrevPositionVec() {
-        if (!getWorld().isClient() && serverPrevPos != null)
+        if (!getEntityWorld().isClient() && serverPrevPos != null)
             return serverPrevPos;
         return super.getPrevPositionVec();
     }
@@ -203,7 +203,7 @@ public class CarriageContraptionEntity extends OrientedContraptionEntity {
             return;
         carriage.forEachPresentEntity(cce -> {
             cce.contraption.getBlocks().put(localPos, newInfo);
-            ((ServerWorld) cce.getWorld()).getChunkManager()
+            ((ServerWorld) cce.getEntityWorld()).getChunkManager()
                 .sendToOtherNearbyPlayers(cce, new ContraptionBlockChangedPacket(cce.getId(), localPos, newInfo.state()));
         });
     }
@@ -216,14 +216,14 @@ public class CarriageContraptionEntity extends OrientedContraptionEntity {
             return;
 
         if (carriage == null) {
-            if (getWorld().isClient())
+            if (getEntityWorld().isClient())
                 bindCarriage();
             else
                 discard();
             return;
         }
 
-        if (!Create.RAILWAYS.sided(getWorld()).trains.containsKey(carriage.train.id)) {
+        if (!Create.RAILWAYS.sided(getEntityWorld()).trains.containsKey(carriage.train.id)) {
             discard();
             return;
         }
@@ -234,11 +234,14 @@ public class CarriageContraptionEntity extends OrientedContraptionEntity {
 
         CarriageSyncData carriageData = getCarriageData();
 
-        if (!getWorld().isClient()) {
+        if (!getEntityWorld().isClient()) {
 
             dataTracker.set(SCHEDULED, carriage.train.runtime.getSchedule() != null);
 
-            boolean shouldCarriageSyncThisTick = carriage.train.shouldCarriageSyncThisTick(getWorld().getTime(), getType().getTrackTickInterval());
+            boolean shouldCarriageSyncThisTick = carriage.train.shouldCarriageSyncThisTick(
+                getEntityWorld().getTime(),
+                getType().getTrackTickInterval()
+            );
             if (shouldCarriageSyncThisTick && carriageData.isDirty()) {
                 dataTracker.set(CARRIAGE_DATA, carriageData, true);
                 carriageData.setDirty(false);
@@ -257,12 +260,12 @@ public class CarriageContraptionEntity extends OrientedContraptionEntity {
 
             dataTracker.set(TRACK_GRAPH, Optional.ofNullable(carriage.train.graph).map(g -> g.id));
 
-            getWorld().emitGameEvent(this, GameEvent.RESONATE_8, getPos());
+            getEntityWorld().emitGameEvent(this, GameEvent.RESONATE_8, getPos());
 
             return;
         }
 
-        DimensionalCarriageEntity dce = carriage.getDimensional(getWorld());
+        DimensionalCarriageEntity dce = carriage.getDimensional(getEntityWorld());
         if (age % 10 == 0)
             updateTrackGraph();
 
@@ -305,12 +308,12 @@ public class CarriageContraptionEntity extends OrientedContraptionEntity {
     private void bindCarriage() {
         if (carriage != null)
             return;
-        Train train = Create.RAILWAYS.sided(getWorld()).trains.get(trainId);
+        Train train = Create.RAILWAYS.sided(getEntityWorld()).trains.get(trainId);
         if (train == null || train.carriages.size() <= carriageIndex)
             return;
         carriage = train.carriages.get(carriageIndex);
         if (carriage != null) {
-            DimensionalCarriageEntity dimensional = carriage.getDimensional(getWorld());
+            DimensionalCarriageEntity dimensional = carriage.getDimensional(getEntityWorld());
             dimensional.entity = new WeakReference<>(this);
             dimensional.pivot = null;
             carriage.updateContraptionAnchors();
@@ -329,7 +332,7 @@ public class CarriageContraptionEntity extends OrientedContraptionEntity {
             for (int index = 0; index < carriageCount; index++) {
                 int i = arrivalSoundReversed ? carriageCount - 1 - index : index;
                 Carriage carriage = carriages.get(i);
-                CarriageContraptionEntity entity = carriage.getDimensional(getWorld()).entity.get();
+                CarriageContraptionEntity entity = carriage.getDimensional(getEntityWorld()).entity.get();
                 if (entity == null || !(entity.contraption instanceof CarriageContraption otherCC))
                     break;
                 tick = arrivalSoundReversed ? otherCC.soundQueue.lastTick() : otherCC.soundQueue.firstTick();
@@ -350,7 +353,7 @@ public class CarriageContraptionEntity extends OrientedContraptionEntity {
 
         boolean keepTicking = false;
         for (Carriage c : carriages) {
-            CarriageContraptionEntity entity = c.getDimensional(getWorld()).entity.get();
+            CarriageContraptionEntity entity = c.getDimensional(getEntityWorld()).entity.get();
             if (entity == null || !(entity.contraption instanceof CarriageContraption otherCC))
                 continue;
             keepTicking |= otherCC.soundQueue.tick(entity, arrivalSoundTicks, arrivalSoundReversed);
@@ -375,7 +378,7 @@ public class CarriageContraptionEntity extends OrientedContraptionEntity {
             return false;
         if (!super.isActorActive(context, actor))
             return false;
-        return cc.notInPortal() || getWorld().isClient();
+        return cc.notInPortal() || getEntityWorld().isClient();
     }
 
     @Override
@@ -387,7 +390,7 @@ public class CarriageContraptionEntity extends OrientedContraptionEntity {
     private void spawnDerailParticles(Carriage carriage) {
         if (random.nextFloat() < 1 / 20f) {
             Vec3d v = getPos().add(derailParticleOffset);
-            getWorld().addParticleClient(ParticleTypes.CAMPFIRE_COSY_SMOKE, v.x, v.y, v.z, 0, .04, 0);
+            getEntityWorld().addParticleClient(ParticleTypes.CAMPFIRE_COSY_SMOKE, v.x, v.y, v.z, 0, .04, 0);
         }
     }
 
@@ -424,7 +427,7 @@ public class CarriageContraptionEntity extends OrientedContraptionEntity {
             Vec3d m = v.subtract(emitter).normalize().multiply(.325f);
             m = VecHelper.rotate(m, random.nextFloat() * 360, alongX ? Axis.X : Axis.Z);
             m = m.add(VecHelper.offsetRandomly(Vec3d.ZERO, random, 0.25f));
-            getWorld().addParticleClient(data, v.x, v.y, v.z, m.x, m.y, m.z);
+            getEntityWorld().addParticleClient(data, v.x, v.y, v.z, m.x, m.y, m.z);
         }
 
     }
@@ -434,7 +437,7 @@ public class CarriageContraptionEntity extends OrientedContraptionEntity {
         super.onRemoved();
         dataTracker.set(CARRIAGE_DATA, new CarriageSyncData());
         if (carriage != null) {
-            DimensionalCarriageEntity dce = carriage.getDimensional(getWorld());
+            DimensionalCarriageEntity dce = carriage.getDimensional(getEntityWorld());
             dce.pointsInitialised = false;
             carriage.leadingBogey().couplingAnchors = Couple.create(null, null);
             carriage.trailingBogey().couplingAnchors = Couple.create(null, null);
@@ -527,7 +530,7 @@ public class CarriageContraptionEntity extends OrientedContraptionEntity {
             return false;
         if (carriage.train.derailed)
             return false;
-        if (getWorld().isClient())
+        if (getEntityWorld().isClient())
             return true;
         if (player.isSpectator())
             return false;
@@ -565,7 +568,7 @@ public class CarriageContraptionEntity extends OrientedContraptionEntity {
         }
 
         if (targetSpeed != 0)
-            carriage.train.burnFuel(getWorld());
+            carriage.train.burnFuel(getEntityWorld());
 
         boolean slow = inverted ^ targetSpeed < 0;
         boolean spaceDown = heldControls.contains(4);
@@ -677,7 +680,7 @@ public class CarriageContraptionEntity extends OrientedContraptionEntity {
             return;
         }
 
-        TrackGraph graph = Create.RAILWAYS.sided(getWorld()).trackNetworks.get(optional.get());
+        TrackGraph graph = Create.RAILWAYS.sided(getEntityWorld()).trackNetworks.get(optional.get());
         if (graph == null)
             return;
         carriage.train.graph = graph;
@@ -702,7 +705,7 @@ public class CarriageContraptionEntity extends OrientedContraptionEntity {
         if (carriage.train.graph != null)
             dataTracker.set(TRACK_GRAPH, Optional.of(carriage.train.graph.id));
 
-        DimensionalCarriageEntity dimensional = carriage.getDimensional(getWorld());
+        DimensionalCarriageEntity dimensional = carriage.getDimensional(getEntityWorld());
         dimensional.pivot = null;
         carriage.updateContraptionAnchors();
         dimensional.updateRenderedCutoff();

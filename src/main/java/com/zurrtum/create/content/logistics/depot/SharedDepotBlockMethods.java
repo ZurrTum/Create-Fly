@@ -109,7 +109,7 @@ public class SharedDepotBlockMethods {
         ItemStack asItem = ItemHelper.fromItemEntity(entityIn);
         if (asItem.isEmpty())
             return;
-        if (entityIn.getWorld().isClient())
+        if (entityIn.getEntityWorld().isClient())
             return;
 
         BlockPos pos = entityIn.getBlockPos();

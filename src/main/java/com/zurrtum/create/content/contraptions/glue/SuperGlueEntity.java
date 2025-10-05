@@ -170,13 +170,13 @@ public class SuperGlueEntity extends Entity implements SpecialEntityItemRequirem
 
     @Override
     public void move(MovementType typeIn, Vec3d pos) {
-        if (!getWorld().isClient() && isAlive() && pos.lengthSquared() > 0.0D)
+        if (!getEntityWorld().isClient() && isAlive() && pos.lengthSquared() > 0.0D)
             discard();
     }
 
     @Override
     public void addVelocity(double x, double y, double z) {
-        if (!getWorld().isClient() && isAlive() && x * x + y * y + z * z > 0.0D)
+        if (!getEntityWorld().isClient() && isAlive() && x * x + y * y + z * z > 0.0D)
             discard();
     }
 
@@ -273,7 +273,7 @@ public class SuperGlueEntity extends Entity implements SpecialEntityItemRequirem
         Vec3d origin = new Vec3d(bb.minX, bb.minY, bb.minZ);
         Vec3d extents = new Vec3d(bb.getLengthX(), bb.getLengthY(), bb.getLengthZ());
 
-        if (!(getWorld() instanceof ServerWorld slevel))
+        if (!(getEntityWorld() instanceof ServerWorld slevel))
             return;
 
         for (Axis axis : Iterate.axes) {

@@ -37,7 +37,7 @@ public class SymmetryHandler {
         for (int i = 0, size = PlayerInventory.getHotbarSize(); i < size; i++) {
             ItemStack stack = inv.getStack(i);
             if (stack.isOf(AllItems.WAND_OF_SYMMETRY)) {
-                SymmetryWandItem.remove(player.getWorld(), stack, player, pos, state);
+                SymmetryWandItem.remove(player.getEntityWorld(), stack, player, pos, state);
             }
         }
     }

@@ -108,7 +108,7 @@ public class ChainConveyorConnectionHandler {
             return;
 
         ClientPlayerEntity player = mc.player;
-        ClientWorld level = player.clientWorld;
+        ClientWorld level = mc.world;
         BlockEntity sourceLift = level.getBlockEntity(firstPos);
 
         if (firstDim != level.getRegistryKey() || !(sourceLift instanceof ChainConveyorBlockEntity)) {

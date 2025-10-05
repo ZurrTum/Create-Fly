@@ -140,13 +140,13 @@ public class PackagerBlock extends WrenchableDirectionalBlock implements IBE<Pac
                     return ActionResult.SUCCESS;
                 if (!level.isClient()) {
                     player.getInventory().offerOrDrop(be.heldBox.copy());
-                    player.getWorld().playSound(
+                    player.getEntityWorld().playSound(
                         null,
                         player.getBlockPos(),
                         SoundEvents.ENTITY_ITEM_PICKUP,
                         SoundCategory.PLAYERS,
                         .2f,
-                        1f + player.getWorld().random.nextFloat()
+                        1f + player.getEntityWorld().random.nextFloat()
                     );
                     be.heldBox = ItemStack.EMPTY;
                     be.notifyUpdate();

@@ -96,7 +96,7 @@ public class MillstoneBlock extends KineticBlock implements IBE<MillstoneBlockEn
     public void onEntityLand(BlockView worldIn, Entity entityIn) {
         super.onEntityLand(worldIn, entityIn);
 
-        if (entityIn.getWorld().isClient())
+        if (entityIn.getEntityWorld().isClient())
             return;
         if (!(entityIn instanceof ItemEntity itemEntity))
             return;

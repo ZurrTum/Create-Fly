@@ -94,7 +94,7 @@ public class RedstoneRequesterBlock extends Block implements IBE<RedstoneRequest
         if (!isRequester && !isShopCloth)
             return;
 
-        String targetDim = player.getWorld().getRegistryKey().getValue().toString();
+        String targetDim = player.getEntityWorld().getRegistryKey().getValue().toString();
         AutoRequestData autoRequestData = new AutoRequestData(order, address, be.getPos(), targetDim, false);
 
         autoRequestData.writeToItem(BlockPos.ORIGIN, stack);

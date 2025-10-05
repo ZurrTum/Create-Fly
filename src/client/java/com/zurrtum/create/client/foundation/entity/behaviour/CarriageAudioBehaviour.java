@@ -71,7 +71,7 @@ public class CarriageAudioBehaviour extends EntityBehaviour<CarriageContraptionE
         Entity camEntity = mc.cameraEntity;
         if (camEntity == null)
             return;
-        DimensionalCarriageEntity dce = carriage.getDimensional(entity.getWorld());
+        DimensionalCarriageEntity dce = carriage.getDimensional(entity.getEntityWorld());
         if (!dce.pointsInitialised)
             return;
         Vec3d leadingAnchor = dce.leadingAnchor();
@@ -147,15 +147,15 @@ public class CarriageAudioBehaviour extends EntityBehaviour<CarriageContraptionE
         if (entity.carriageIndex == 0) {
             float v = volume * (1 - seatCrossfade.getValue() * .35f) * .75f;
             if ((3 + tick) % 4 == 0)
-                AllSoundEvents.STEAM.playAt(entity.getWorld(), soundLocation, v * ((tick + 7) % 8 == 0 ? 0.75f : .45f), 1.17f, false);
+                AllSoundEvents.STEAM.playAt(entity.getEntityWorld(), soundLocation, v * ((tick + 7) % 8 == 0 ? 0.75f : .45f), 1.17f, false);
             if (tick % 16 == 0)
-                AllSoundEvents.STEAM.playAt(entity.getWorld(), soundLocation, v * 1.5f, .8f, false);
+                AllSoundEvents.STEAM.playAt(entity.getEntityWorld(), soundLocation, v * 1.5f, .8f, false);
         }
 
         if (!arrived && speedFactor.getValue() < .002f && train.accumulatedSteamRelease > 1) {
             arrived = true;
             float releaseVolume = train.accumulatedSteamRelease / 10f;
-            entity.getWorld().playSoundClient(
+            entity.getEntityWorld().playSoundClient(
                 soundLocation.x,
                 soundLocation.y,
                 soundLocation.z,
@@ -165,7 +165,7 @@ public class CarriageAudioBehaviour extends EntityBehaviour<CarriageContraptionE
                 .78f,
                 false
             );
-            entity.getWorld().playSoundClient(
+            entity.getEntityWorld().playSoundClient(
                 soundLocation.x,
                 soundLocation.y,
                 soundLocation.z,
@@ -175,7 +175,7 @@ public class CarriageAudioBehaviour extends EntityBehaviour<CarriageContraptionE
                 1.5f,
                 false
             );
-            AllSoundEvents.STEAM.playAt(entity.getWorld(), soundLocation, .75f * releaseVolume, .5f, false);
+            AllSoundEvents.STEAM.playAt(entity.getEntityWorld(), soundLocation, .75f * releaseVolume, .5f, false);
         }
 
         float pitchModifier = ((entity.getId() * 10) % 13) / 36f;
@@ -190,7 +190,7 @@ public class CarriageAudioBehaviour extends EntityBehaviour<CarriageContraptionE
         volume = Math.min(volume, distanceFactor.getValue() / 1000);
 
         for (Carriage trainCarriage : train.carriages) {
-            DimensionalCarriageEntity mainDCE = carriage.getDimensionalIfPresent(entity.getWorld().getRegistryKey());
+            DimensionalCarriageEntity mainDCE = carriage.getDimensionalIfPresent(entity.getEntityWorld().getRegistryKey());
             if (mainDCE == null)
                 continue;
             CarriageContraptionEntity mainEntity = mainDCE.entity.get();
@@ -222,7 +222,7 @@ public class CarriageAudioBehaviour extends EntityBehaviour<CarriageContraptionE
         }
 
         train.honkTicks--;
-        train.determineHonk(entity.getWorld());
+        train.determineHonk(entity.getEntityWorld());
 
         if (train.lowHonk == null)
             return;

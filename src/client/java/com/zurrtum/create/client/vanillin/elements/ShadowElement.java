@@ -57,7 +57,7 @@ public final class ShadowElement extends AbstractVisual implements SimpleDynamic
     private float strength = 1.0F;
 
     public ShadowElement(VisualizationContext ctx, Entity entity, float partialTick, Config config) {
-        super(ctx, entity.getWorld(), partialTick);
+        super(ctx, entity.getEntityWorld(), partialTick);
         this.entity = entity;
         radius(config.radius);
         strength(config.strength);

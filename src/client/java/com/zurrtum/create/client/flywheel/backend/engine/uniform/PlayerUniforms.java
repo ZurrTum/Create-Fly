@@ -6,7 +6,6 @@ import net.minecraft.block.Block;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.network.PlayerListEntry;
-import net.minecraft.client.world.ClientWorld;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
 import net.minecraft.scoreboard.Team;
@@ -15,6 +14,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ColorHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.LightType;
+import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
 public final class PlayerUniforms extends UniformWriter {
@@ -75,7 +75,7 @@ public final class PlayerUniforms extends UniformWriter {
     }
 
     private static long writeEyeBrightness(long ptr, ClientPlayerEntity player) {
-        ClientWorld level = player.clientWorld;
+        World level = player.getEntityWorld();
         int blockBrightness = level.getLightLevel(LightType.BLOCK, player.getBlockPos());
         int skyBrightness = level.getLightLevel(LightType.SKY, player.getBlockPos());
         int maxBrightness = 15;
@@ -90,7 +90,7 @@ public final class PlayerUniforms extends UniformWriter {
             Item handItem = player.getStackInHand(hand).getItem();
             if (handItem instanceof BlockItem blockItem) {
                 Block block = blockItem.getBlock();
-                int blockLight = FlwBackendXplat.INSTANCE.getLightEmission(block.getDefaultState(), player.clientWorld, player.getBlockPos());
+                int blockLight = FlwBackendXplat.INSTANCE.getLightEmission(block.getDefaultState(), player.getEntityWorld(), player.getBlockPos());
                 if (heldLight < blockLight) {
                     heldLight = blockLight;
                 }
@@ -101,7 +101,7 @@ public final class PlayerUniforms extends UniformWriter {
     }
 
     private static long writeEyeIn(long ptr, ClientPlayerEntity player) {
-        ClientWorld level = player.clientWorld;
+        World level = player.getEntityWorld();
         Vec3d eyePos = player.getEyePos();
         BlockPos blockPos = BlockPos.ofFloored(eyePos);
         return writeInFluidAndBlock(ptr, level, blockPos, eyePos);

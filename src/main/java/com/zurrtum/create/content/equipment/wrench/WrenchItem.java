@@ -73,7 +73,7 @@ public class WrenchItem extends Item {
             return false;
         if (player.isCreative())
             return false;
-        minecart.damage(player.getWorld(), minecart.getDamageSources().playerAttack(player), 100);
+        minecart.damage(player.getEntityWorld(), minecart.getDamageSources().playerAttack(player), 100);
         return true;
     }
 }

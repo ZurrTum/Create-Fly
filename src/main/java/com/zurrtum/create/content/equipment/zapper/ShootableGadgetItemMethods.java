@@ -25,7 +25,7 @@ public class ShootableGadgetItemMethods {
     public static void sendPackets(PlayerEntity player, Function<Boolean, ? extends ShootGadgetPacket> factory) {
         if (!(player instanceof ServerPlayerEntity serverPlayer))
             return;
-        serverPlayer.getWorld().getChunkManager().sendToOtherNearbyPlayers(player, factory.apply(false));
+        serverPlayer.getEntityWorld().getChunkManager().sendToOtherNearbyPlayers(player, factory.apply(false));
         serverPlayer.networkHandler.sendPacket(factory.apply(true));
     }
 

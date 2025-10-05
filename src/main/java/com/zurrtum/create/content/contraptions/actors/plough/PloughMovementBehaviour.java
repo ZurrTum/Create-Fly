@@ -67,7 +67,7 @@ public class PloughMovementBehaviour extends BlockBreakingMovementBehaviour {
             return;
         if (entity.getVelocity().length() < 0.25f)
             return;
-        entity.getWorld().getNonSpectatingEntities(PlayerEntity.class, new Box(entity.getBlockPos()).expand(32)).stream()
+        entity.getEntityWorld().getNonSpectatingEntities(PlayerEntity.class, new Box(entity.getBlockPos()).expand(32)).stream()
             .map(player -> player instanceof ServerPlayerEntity serverPlayer ? serverPlayer : null).filter(Objects::nonNull)
             .forEach(AllAdvancements.ANVIL_PLOUGH::trigger);
     }

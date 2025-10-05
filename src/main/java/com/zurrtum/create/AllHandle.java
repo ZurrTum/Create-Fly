@@ -176,7 +176,7 @@ public class AllHandle {
         if (player.isSpectator() || !player.canModifyBlocks()) {
             return;
         }
-        ServerWorld world = player.getWorld();
+        ServerWorld world = player.getEntityWorld();
         if (!world.isPosLoaded(pos)) {
             return;
         }
@@ -326,7 +326,7 @@ public class AllHandle {
             listener, pos, AllConfigs.server().trains.maxTrackPlacementLength.get() + 16, blockEntity -> {
                 if (blockEntity instanceof TrackBlockEntity be) {
                     ServerPlayerEntity player = listener.player;
-                    ServerWorld world = player.getWorld();
+                    ServerWorld world = player.getEntityWorld();
                     int verifyDistance = AllConfigs.server().trains.maxTrackPlacementLength.get() * 4;
                     if (!be.getPos().isWithinDistance(player.getBlockPos(), verifyDistance)) {
                         Create.LOGGER.warn(player.getNameForScoreboard() + " too far away from destroyed Curve track");
@@ -376,7 +376,7 @@ public class AllHandle {
             listener, pos, AllConfigs.server().trains.maxTrackPlacementLength.get() + 16, blockEntity -> {
                 if (blockEntity instanceof TrackBlockEntity be) {
                     ServerPlayerEntity player = listener.player;
-                    ServerWorld world = player.getWorld();
+                    ServerWorld world = player.getEntityWorld();
                     if (player.getInventory().getSelectedSlot() != packet.slot())
                         return true;
                     ItemStack stack = player.getInventory().getStack(packet.slot());
@@ -509,7 +509,7 @@ public class AllHandle {
 
     public static void onPackageOrderRequest(ServerPlayNetworkHandler listener, PackageOrderRequestPacket packet) {
         ServerPlayerEntity player = listener.player;
-        ServerWorld world = player.getWorld();
+        ServerWorld world = player.getEntityWorld();
         BlockPos pos = packet.pos();
         onBlockEntityConfiguration(
             listener, pos, 20, blockEntity -> {
@@ -540,7 +540,7 @@ public class AllHandle {
 
     public static void onChainConveyorConnection(ServerPlayNetworkHandler listener, ChainConveyorConnectionPacket packet) {
         ServerPlayerEntity player = listener.player;
-        ServerWorld world = player.getWorld();
+        ServerWorld world = player.getEntityWorld();
         int maxRange = AllConfigs.server().kinetics.maxChainConveyorLength.get() + 16;
         onBlockEntityConfiguration(
             listener, packet.pos(), maxRange, blockEntity -> {
@@ -851,7 +851,7 @@ public class AllHandle {
         if (!player.isCreative()) {
             return;
         }
-        ServerWorld world = player.getWorld();
+        ServerWorld world = player.getEntityWorld();
         SchematicPrinter printer = new SchematicPrinter();
         printer.loadSchematic(packet.stack(), world, !player.isCreativeLevelTwoOp());
         if (!printer.isLoaded() || printer.isErrored()) {
@@ -935,7 +935,7 @@ public class AllHandle {
 
     public static void onContraptionInteraction(ServerPlayNetworkHandler listener, ContraptionInteractionPacket packet) {
         ServerPlayerEntity sender = listener.player;
-        Entity entityByID = sender.getWorld().getEntityById(packet.target());
+        Entity entityByID = sender.getEntityWorld().getEntityById(packet.target());
         if (!(entityByID instanceof AbstractContraptionEntity contraptionEntity))
             return;
         Box bb = contraptionEntity.getBoundingBox();
@@ -960,12 +960,12 @@ public class AllHandle {
             sender.networkHandler.floatingTicks = 0;
             sender.networkHandler.vehicleFloatingTicks = 0;
         }
-        sender.getWorld().getChunkManager()
+        sender.getEntityWorld().getChunkManager()
             .sendToOtherNearbyPlayers(sender, new LimbSwingUpdatePacket(sender.getId(), sender.getPos(), packet.limbSwing()));
     }
 
     public static void onArmPlacement(ServerPlayNetworkHandler listener, ArmPlacementPacket packet) {
-        World world = listener.player.getWorld();
+        World world = listener.player.getEntityWorld();
         if (!world.isPosLoaded(packet.pos()))
             return;
         BlockEntity blockEntity = world.getBlockEntity(packet.pos());
@@ -976,7 +976,7 @@ public class AllHandle {
     }
 
     public static void onPackagePortPlacement(ServerPlayNetworkHandler listener, PackagePortPlacementPacket packet) {
-        World world = listener.player.getWorld();
+        World world = listener.player.getEntityWorld();
         BlockPos pos = packet.pos();
         if (world == null || !world.isPosLoaded(pos))
             return;
@@ -1001,14 +1001,14 @@ public class AllHandle {
     }
 
     public static void onCouplingCreation(ServerPlayNetworkHandler listener, CouplingCreationPacket packet) {
-        CouplingHandler.tryToCoupleCarts(listener.player, listener.player.getWorld(), packet.id1(), packet.id2());
+        CouplingHandler.tryToCoupleCarts(listener.player, listener.player.getEntityWorld(), packet.id1(), packet.id2());
     }
 
     public static void onInstantSchematic(ServerPlayNetworkHandler listener, InstantSchematicPacket packet) {
         Create.SCHEMATIC_RECEIVER.handleInstantSchematic(
             listener.player,
             packet.name(),
-            listener.player.getWorld(),
+            listener.player.getEntityWorld(),
             packet.origin(),
             packet.bounds()
         );
@@ -1041,7 +1041,7 @@ public class AllHandle {
     }
 
     public static void onEjectorPlacement(ServerPlayNetworkHandler listener, EjectorPlacementPacket packet) {
-        ServerWorld world = listener.player.getWorld();
+        ServerWorld world = listener.player.getEntityWorld();
         BlockPos pos = packet.pos();
         if (!world.isPosLoaded(pos))
             return;
@@ -1054,7 +1054,7 @@ public class AllHandle {
     }
 
     public static void onEjectorElytra(ServerPlayNetworkHandler listener, EjectorElytraPacket packet) {
-        ServerWorld world = listener.player.getWorld();
+        ServerWorld world = listener.player.getEntityWorld();
         if (!world.isPosLoaded(packet.pos()))
             return;
         BlockEntity blockEntity = world.getBlockEntity(packet.pos());
@@ -1065,7 +1065,7 @@ public class AllHandle {
     private static void onLinkedController(ServerPlayerEntity player, BlockPos pos, Consumer<BlockEntity> onLectern, Consumer<ItemStack> onStack) {
         if (pos != null) {
             if (onLectern != null) {
-                onLectern.accept(player.getWorld().getBlockEntity(pos));
+                onLectern.accept(player.getEntityWorld().getBlockEntity(pos));
             }
         } else if (onStack != null) {
             ItemStack controller = player.getMainHandStack();
@@ -1081,7 +1081,7 @@ public class AllHandle {
     public static void onLinkedControllerInput(ServerPlayNetworkHandler listener, LinkedControllerInputPacket packet) {
         ServerPlayerEntity player = listener.player;
         Consumer<ItemStack> handleItem = stack -> {
-            ServerWorld world = player.getWorld();
+            ServerWorld world = player.getEntityWorld();
             UUID uniqueID = player.getUuid();
             BlockPos pos = player.getBlockPos();
 
@@ -1114,7 +1114,11 @@ public class AllHandle {
         onLinkedController(
             player, null, null, stack -> {
                 ItemStackHandler frequencyItems = LinkedControllerItem.getFrequencyItems(stack);
-                ServerLinkBehaviour linkBehaviour = BlockEntityBehaviour.get(player.getWorld(), packet.linkLocation(), ServerLinkBehaviour.TYPE);
+                ServerLinkBehaviour linkBehaviour = BlockEntityBehaviour.get(
+                    player.getEntityWorld(),
+                    packet.linkLocation(),
+                    ServerLinkBehaviour.TYPE
+                );
                 if (linkBehaviour == null)
                     return;
 
@@ -1186,7 +1190,7 @@ public class AllHandle {
             ToolboxHandler.syncData(player, AllSynchedDatas.TOOLBOX.get(player));
             return;
         }
-        ServerWorld world = player.getWorld();
+        ServerWorld world = player.getEntityWorld();
         BlockEntity blockEntity = world.getBlockEntity(toolboxPos);
         double maxRange = ToolboxHandler.getMaxRange(player);
         if (player.squaredDistanceTo(toolboxPos.getX() + 0.5, toolboxPos.getY(), toolboxPos.getZ() + 0.5) > maxRange * maxRange)
@@ -1233,7 +1237,7 @@ public class AllHandle {
 
     public static void onToolboxDisposeAll(ServerPlayNetworkHandler listener, ToolboxDisposeAllPacket packet) {
         ServerPlayerEntity player = listener.player;
-        ServerWorld world = player.getWorld();
+        ServerWorld world = player.getEntityWorld();
         BlockPos toolboxPos = packet.toolboxPos();
         BlockEntity blockEntity = world.getBlockEntity(toolboxPos);
 
@@ -1294,7 +1298,7 @@ public class AllHandle {
 
     public static void onTrainEdit(ServerPlayNetworkHandler listener, TrainEditPacket packet) {
         ServerPlayerEntity sender = listener.player;
-        ServerWorld world = sender.getWorld();
+        ServerWorld world = sender.getEntityWorld();
         Train train = Create.RAILWAYS.sided(world).trains.get(packet.id());
         if (train == null)
             return;
@@ -1309,7 +1313,7 @@ public class AllHandle {
     public static void onTrainRelocation(ServerPlayNetworkHandler listener, TrainRelocationPacket packet) {
         ServerPlayerEntity sender = listener.player;
         Train train = Create.RAILWAYS.trains.get(packet.trainId());
-        Entity entity = sender.getWorld().getEntityById(packet.entityId());
+        Entity entity = sender.getEntityWorld().getEntityById(packet.entityId());
 
         String messagePrefix = sender.getName().getString() + " could not relocate Train ";
 
@@ -1331,11 +1335,19 @@ public class AllHandle {
             return;
         }
 
-        if (TrainRelocator.relocate(train, sender.getWorld(), packet.pos(), packet.hoveredBezier(), packet.direction(), packet.lookAngle(), null)) {
+        if (TrainRelocator.relocate(
+            train,
+            sender.getEntityWorld(),
+            packet.pos(),
+            packet.hoveredBezier(),
+            packet.direction(),
+            packet.lookAngle(),
+            null
+        )) {
             sender.sendMessage(Text.translatable("create.train.relocate.success").formatted(Formatting.GREEN), true);
             train.carriages.forEach(c -> c.forEachPresentEntity(e -> {
                 e.nonDamageTicks = 10;
-                listener.player.getWorld().getChunkManager().sendToOtherNearbyPlayers(e, new ContraptionRelocationPacket(e.getId()));
+                listener.player.getEntityWorld().getChunkManager().sendToOtherNearbyPlayers(e, new ContraptionRelocationPacket(e.getId()));
             }));
             return;
         }
@@ -1345,7 +1357,7 @@ public class AllHandle {
 
     public static void onControlsInput(ServerPlayNetworkHandler listener, ControlsInputPacket packet) {
         ServerPlayerEntity player = listener.player;
-        ServerWorld world = player.getWorld();
+        ServerWorld world = player.getEntityWorld();
         UUID uniqueID = player.getUuid();
 
         if (player.isSpectator() && packet.press())
@@ -1372,7 +1384,7 @@ public class AllHandle {
 
     public static void onSuperGlueSelection(ServerPlayNetworkHandler listener, SuperGlueSelectionPacket packet) {
         ServerPlayerEntity player = listener.player;
-        ServerWorld world = player.getWorld();
+        ServerWorld world = player.getEntityWorld();
         double range = player.getAttributeValue(EntityAttributes.BLOCK_INTERACTION_RANGE) + 2;
         BlockPos to = packet.to();
         if (player.squaredDistanceTo(Vec3d.ofCenter(to)) > range * range)
@@ -1400,7 +1412,7 @@ public class AllHandle {
 
     public static void onSuperGlueRemoval(ServerPlayNetworkHandler listener, SuperGlueRemovalPacket packet) {
         ServerPlayerEntity player = listener.player;
-        ServerWorld world = player.getWorld();
+        ServerWorld world = player.getEntityWorld();
         Entity entity = world.getEntityById(packet.entityId());
         if (!(entity instanceof SuperGlueEntity superGlue))
             return;
@@ -1414,7 +1426,7 @@ public class AllHandle {
 
     public static void onTrainCollision(ServerPlayNetworkHandler listener, TrainCollisionPacket packet) {
         ServerPlayerEntity player = listener.player;
-        ServerWorld world = player.getWorld();
+        ServerWorld world = player.getEntityWorld();
         Entity entity = world.getEntityById(packet.contraptionEntityId());
         if (!(entity instanceof CarriageContraptionEntity cce))
             return;
@@ -1425,7 +1437,7 @@ public class AllHandle {
 
     public static void onTrainHUDUpdate(ServerPlayNetworkHandler listener, TrainHUDUpdatePacket packet) {
         ServerPlayerEntity player = listener.player;
-        Train train = Create.RAILWAYS.sided(player.getWorld()).trains.get(packet.trainId());
+        Train train = Create.RAILWAYS.sided(player.getEntityWorld()).trains.get(packet.trainId());
         if (train == null)
             return;
 
@@ -1435,7 +1447,7 @@ public class AllHandle {
 
     public static void onTrainHonk(ServerPlayNetworkHandler listener, HonkPacket packet) {
         ServerPlayerEntity player = listener.player;
-        Train train = Create.RAILWAYS.sided(player.getWorld()).trains.get(packet.trainId());
+        Train train = Create.RAILWAYS.sided(player.getEntityWorld()).trains.get(packet.trainId());
         if (train == null)
             return;
 
@@ -1455,7 +1467,7 @@ public class AllHandle {
     }
 
     public static void onElevatorRequestFloorList(ServerPlayNetworkHandler listener, RequestFloorListPacket packet) {
-        Entity entityByID = listener.player.getWorld().getEntityById(packet.entityId());
+        Entity entityByID = listener.player.getEntityWorld().getEntityById(packet.entityId());
         if (!(entityByID instanceof AbstractContraptionEntity ace))
             return;
         if (!(ace.getContraption() instanceof ElevatorContraption ec))
@@ -1465,7 +1477,7 @@ public class AllHandle {
 
     public static void onElevatorTargetFloor(ServerPlayNetworkHandler listener, ElevatorTargetFloorPacket packet) {
         ServerPlayerEntity sender = listener.player;
-        ServerWorld world = sender.getWorld();
+        ServerWorld world = sender.getEntityWorld();
         Entity entityByID = world.getEntityById(packet.entityId());
         if (!(entityByID instanceof AbstractContraptionEntity ace))
             return;
@@ -1498,7 +1510,7 @@ public class AllHandle {
 
         BlockPos targetedBlock = packet.targetedBlock();
         if (targetedBlock != null) {
-            ServerWorld world = sender.getWorld();
+            ServerWorld world = sender.getEntityWorld();
             if (!world.isPosLoaded(targetedBlock))
                 return;
             if (!targetedBlock.isWithinDistance(sender.getBlockPos(), 20))
@@ -1536,12 +1548,12 @@ public class AllHandle {
 
     public static void onContraptionColliderLockRequest(ServerPlayNetworkHandler listener, ContraptionColliderLockPacketRequest packet) {
         ServerPlayerEntity player = listener.player;
-        player.getWorld().getChunkManager()
+        player.getEntityWorld().getChunkManager()
             .sendToOtherNearbyPlayers(player, new ContraptionColliderLockPacket(packet.contraption(), packet.offset(), player.getId()));
     }
 
     public static void onRadialWrenchMenuSubmit(ServerPlayNetworkHandler listener, RadialWrenchMenuSubmitPacket packet) {
-        ServerWorld world = listener.player.getWorld();
+        ServerWorld world = listener.player.getEntityWorld();
         BlockPos blockPos = packet.blockPos();
         BlockState newState = packet.newState();
         if (!world.getBlockState(blockPos).isOf(newState.getBlock()))
@@ -1572,7 +1584,7 @@ public class AllHandle {
     }
 
     public static void onBlueprintPreviewRequest(ServerPlayNetworkHandler listener, BlueprintPreviewRequestPacket packet) {
-        Entity entity = listener.player.getWorld().getEntityById(packet.entityId());
+        Entity entity = listener.player.getEntityWorld().getEntityById(packet.entityId());
         if (!(entity instanceof BlueprintEntity blueprint)) {
             listener.sendPacket(BlueprintPreviewPacket.EMPTY);
             return;

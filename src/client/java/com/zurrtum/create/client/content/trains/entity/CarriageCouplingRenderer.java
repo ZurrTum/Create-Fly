@@ -110,10 +110,10 @@ public class CarriageCouplingRenderer {
     }
 
     protected static int getSkyLightLevel(Entity pEntity, BlockPos pPos) {
-        return pEntity.getWorld().getLightLevel(LightType.SKY, pPos);
+        return pEntity.getEntityWorld().getLightLevel(LightType.SKY, pPos);
     }
 
     protected static int getBlockLightLevel(Entity pEntity, BlockPos pPos) {
-        return pEntity.isOnFire() ? 15 : pEntity.getWorld().getLightLevel(LightType.BLOCK, pPos);
+        return pEntity.isOnFire() ? 15 : pEntity.getEntityWorld().getLightLevel(LightType.BLOCK, pPos);
     }
 }

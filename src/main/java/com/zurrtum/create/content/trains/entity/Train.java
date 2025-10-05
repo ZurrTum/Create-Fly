@@ -502,7 +502,7 @@ public class Train {
 
             if ((runtime.getSchedule() == null || runtime.paused) && signalEdgeGroup.isOccupiedUnless(this))
                 carriages.forEach(c -> c.forEachPresentEntity(cce -> cce.getControllingPlayer()
-                    .map(uuid -> cce.getWorld().getPlayerByUuid(uuid) instanceof ServerPlayerEntity player ? player : null)
+                    .map(uuid -> cce.getEntityWorld().getPlayerByUuid(uuid) instanceof ServerPlayerEntity player ? player : null)
                     .ifPresent(AllAdvancements.RED_SIGNAL::trigger)));
 
             signalEdgeGroup.reserved = signal;
@@ -769,7 +769,7 @@ public class Train {
             CarriageContraptionEntity entity = carriage.anyAvailableEntity();
             if (entity == null)
                 return false;
-            level = entity.getWorld();
+            level = entity.getEntityWorld();
 
             if (entity.getContraption() instanceof CarriageContraption cc)
                 cc.returnStorageForDisassembly(carriage.storage);

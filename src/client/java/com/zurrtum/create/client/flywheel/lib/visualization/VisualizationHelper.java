@@ -56,7 +56,7 @@ public final class VisualizationHelper {
      * @param entity The entity whose visual you want to update.
      */
     public static void queueUpdate(Entity entity) {
-        World level = entity.getWorld();
+        World level = entity.getEntityWorld();
         VisualizationManager manager = VisualizationManager.get(level);
         if (manager == null) {
             return;

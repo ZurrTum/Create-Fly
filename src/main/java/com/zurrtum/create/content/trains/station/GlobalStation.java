@@ -188,7 +188,7 @@ public class GlobalStation extends SingleBlockEntityEdgePoint {
         for (Carriage carriage : train.carriages) {
             if (level == null) {
                 CarriageContraptionEntity entity = carriage.anyAvailableEntity();
-                if (entity != null && entity.getWorld() instanceof ServerWorld sl)
+                if (entity != null && entity.getEntityWorld() instanceof ServerWorld sl)
                     level = sl.getServer().getWorld(getBlockEntityDimension());
             }
 

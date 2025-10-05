@@ -338,13 +338,13 @@ public class AllHandle extends AllClientHandle<ClientPlayNetworkHandler> {
         ClientPlayerEntity player = listener.client.player;
         if (!player.getBlockPos().isWithinDistance(packet.pos(), 100))
             return;
-        SuperGlueSelectionHandler.spawnParticles(player.clientWorld, packet.pos(), packet.direction(), packet.fullBlock());
+        SuperGlueSelectionHandler.spawnParticles(player.getEntityWorld(), packet.pos(), packet.direction(), packet.fullBlock());
     }
 
     @Override
     public void onContraptionSeatMapping(ClientPlayNetworkHandler listener, ContraptionSeatMappingPacket packet) {
         ClientPlayerEntity player = listener.client.player;
-        Entity entityByID = player.clientWorld.getEntityById(packet.entityId());
+        Entity entityByID = player.getEntityWorld().getEntityById(packet.entityId());
         if (!(entityByID instanceof AbstractContraptionEntity contraptionEntity))
             return;
 

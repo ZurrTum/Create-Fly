@@ -73,7 +73,7 @@ public class ScheduleItem extends Item implements MenuProvider, SupportsItemCopy
         Entity rootVehicle = pInteractionTarget.getRootVehicle();
         if (!(rootVehicle instanceof CarriageContraptionEntity entity))
             return pass;
-        if (pPlayer.getWorld().isClient())
+        if (pPlayer.getEntityWorld().isClient())
             return ActionResult.SUCCESS;
 
         Contraption contraption = entity.getContraption();
@@ -90,25 +90,25 @@ public class ScheduleItem extends Item implements MenuProvider, SupportsItemCopy
             Couple<Boolean> directions = cc.conductorSeats.get(seatPos);
             if (directions == null) {
                 pPlayer.sendMessage(Text.translatable("create.schedule.non_controlling_seat"), true);
-                AllSoundEvents.DENY.playOnServer(pPlayer.getWorld(), pPlayer.getBlockPos(), 1, 1);
+                AllSoundEvents.DENY.playOnServer(pPlayer.getEntityWorld(), pPlayer.getBlockPos(), 1, 1);
                 return ActionResult.SUCCESS;
             }
 
             if (train.runtime.getSchedule() != null) {
-                AllSoundEvents.DENY.playOnServer(pPlayer.getWorld(), pPlayer.getBlockPos(), 1, 1);
+                AllSoundEvents.DENY.playOnServer(pPlayer.getEntityWorld(), pPlayer.getBlockPos(), 1, 1);
                 pPlayer.sendMessage(Text.translatable("create.schedule.remove_with_empty_hand"), true);
                 return ActionResult.SUCCESS;
             }
 
             if (schedule.entries.isEmpty()) {
-                AllSoundEvents.DENY.playOnServer(pPlayer.getWorld(), pPlayer.getBlockPos(), 1, 1);
+                AllSoundEvents.DENY.playOnServer(pPlayer.getEntityWorld(), pPlayer.getBlockPos(), 1, 1);
                 pPlayer.sendMessage(Text.translatable("create.schedule.no_stops"), true);
                 return ActionResult.SUCCESS;
             }
 
             train.runtime.setSchedule(schedule, false);
             AllAdvancements.CONDUCTOR.trigger((ServerPlayerEntity) pPlayer);
-            AllSoundEvents.CONFIRM.playOnServer(pPlayer.getWorld(), pPlayer.getBlockPos(), 1, 1);
+            AllSoundEvents.CONFIRM.playOnServer(pPlayer.getEntityWorld(), pPlayer.getBlockPos(), 1, 1);
             pPlayer.sendMessage(Text.translatable("create.schedule.applied_to_train").formatted(Formatting.GREEN), true);
             pStack.decrement(1);
             pPlayer.setStackInHand(pUsedHand, pStack.isEmpty() ? ItemStack.EMPTY : pStack);

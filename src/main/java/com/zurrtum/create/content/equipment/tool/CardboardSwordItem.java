@@ -36,7 +36,7 @@ public class CardboardSwordItem extends Item implements DamageControlItem, Custo
         if (!stack.isOf(AllItems.CARDBOARD_SWORD)) {
             return;
         }
-        World world = player.getWorld();
+        World world = player.getEntityWorld();
         if (world.isClient()) {
             AllSoundEvents.CARDBOARD_SWORD.playAt(world, pos, 0.5f, 1.85f, false);
         } else {

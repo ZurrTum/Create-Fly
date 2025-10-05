@@ -37,7 +37,7 @@ public class StockTickerInteractionHandler {
         if (targetPos == null)
             return null;
 
-        if (interactWithLogisticsManagerAt(player, player.getWorld(), targetPos)) {
+        if (interactWithLogisticsManagerAt(player, player.getEntityWorld(), targetPos)) {
             return ActionResult.SUCCESS;
         }
         return null;
@@ -174,7 +174,7 @@ public class StockTickerInteractionHandler {
         int stations = 0;
         BlockPos targetPos = null;
 
-        World world = entity.getWorld();
+        World world = entity.getEntityWorld();
         for (Direction d : Iterate.horizontalDirections) {
             for (int y : Iterate.zeroAndOne) {
                 BlockPos workstationPos = pos.offset(d).up(y);

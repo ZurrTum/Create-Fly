@@ -92,8 +92,8 @@ public class BacktankUtil {
         boolean depleted = threshold == 1;
         MutableText component = Text.translatable(depleted ? "create.backtank.depleted" : "create.backtank.low");
 
-        AllSoundEvents.DENY.play(player.getWorld(), null, player.getBlockPos(), 1, 1.25f);
-        AllSoundEvents.STEAM.play(player.getWorld(), null, player.getBlockPos(), .5f, .5f);
+        AllSoundEvents.DENY.play(player.getEntityWorld(), null, player.getBlockPos(), 1, 1.25f);
+        AllSoundEvents.STEAM.play(player.getEntityWorld(), null, player.getBlockPos(), .5f, .5f);
 
         player.networkHandler.sendPacket(new TitleFadeS2CPacket(10, 40, 10));
         player.networkHandler.sendPacket(new SubtitleS2CPacket(Text.literal("\u26A0 ").formatted(depleted ? Formatting.RED : Formatting.GOLD)

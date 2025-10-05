@@ -119,7 +119,7 @@ public class CrushingWheelControllerBlock extends FacingBlock implements IBE<Cru
         if (entityIn instanceof PlayerEntity player) {
             if (player.isCreative())
                 return;
-            if (entityIn.getWorld().getDifficulty() == Difficulty.PEACEFUL)
+            if (entityIn.getEntityWorld().getDifficulty() == Difficulty.PEACEFUL)
                 return;
         }
 

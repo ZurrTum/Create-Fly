@@ -24,7 +24,7 @@ public class MountedDepotInteractionBehaviour extends MovingInteractionBehaviour
     public boolean handlePlayerInteraction(PlayerEntity player, Hand activeHand, BlockPos localPos, AbstractContraptionEntity contraptionEntity) {
         if (activeHand == Hand.OFF_HAND)
             return false;
-        World world = player.getWorld();
+        World world = player.getEntityWorld();
         if (world.isClient())
             return true;
 

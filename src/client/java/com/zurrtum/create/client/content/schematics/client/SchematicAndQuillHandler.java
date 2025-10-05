@@ -134,11 +134,11 @@ public class SchematicAndQuillHandler {
             selectedPos = BlockPos.ofFloored(targetVec);
 
         } else {
-            BlockHitResult trace = RaycastHelper.rayTraceRange(player.getWorld(), player, 75);
+            BlockHitResult trace = RaycastHelper.rayTraceRange(player.getEntityWorld(), player, 75);
             if (trace != null && trace.getType() == Type.BLOCK) {
 
                 BlockPos hit = trace.getBlockPos();
-                boolean replaceable = player.getWorld().getBlockState(hit)
+                boolean replaceable = player.getEntityWorld().getBlockState(hit)
                     .canReplace(new ItemPlacementContext(new ItemUsageContext(player, Hand.MAIN_HAND, trace)));
                 if (trace.getSide().getAxis().isVertical() && !replaceable)
                     hit = hit.offset(trace.getSide());

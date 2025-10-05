@@ -67,7 +67,7 @@ public class ContraptionColliderClient {
         // After death, multiple refs to the client player may show up in the area
         boolean skipClientPlayer = false;
 
-        World world = contraptionEntity.getWorld();
+        World world = contraptionEntity.getEntityWorld();
         List<Entity> entitiesWithinAABB = world.getEntitiesByClass(Entity.class, bounds.expand(2).stretch(0, 32, 0), contraptionEntity::collidesWith);
         for (Entity entity : entitiesWithinAABB) {
             if (!entity.isAlive())
@@ -253,7 +253,7 @@ public class ContraptionColliderClient {
             boolean anyCollision = hardCollision || temporalCollision;
 
             if (bounce > 0 && hasNormal && anyCollision && ContraptionCollider.bounceEntity(entity, collisionNormal, contraptionEntity, bounce)) {
-                entity.getWorld().playSound(
+                entity.getEntityWorld().playSound(
                     playerType == PlayerType.CLIENT ? entity : null,
                     entity.getX(),
                     entity.getY(),

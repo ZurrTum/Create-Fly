@@ -109,7 +109,7 @@ public class ServerSchematicLoader {
 
         try {
             // Validate Referenced Block
-            SchematicTableBlockEntity table = getTable(player.getWorld(), pos);
+            SchematicTableBlockEntity table = getTable(player.getEntityWorld(), pos);
             if (table == null)
                 return;
 
@@ -133,7 +133,7 @@ public class ServerSchematicLoader {
 
             // Open Stream
             OutputStream writer = Files.newOutputStream(uploadPath);
-            activeUploads.put(playerSchematicId, new SchematicUploadEntry(writer, size, player.getWorld(), pos));
+            activeUploads.put(playerSchematicId, new SchematicUploadEntry(writer, size, player.getEntityWorld(), pos));
 
             // Notify Block Entity
             table.startUpload(schematic);

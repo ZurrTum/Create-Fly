@@ -90,7 +90,7 @@ public class AllPotatoProjectileEntityHitActions {
         @Override
         public boolean execute(ItemStack projectile, EntityHitResult ray, Type type) {
             Entity entity = ray.getEntity();
-            if (entity.getWorld().isClient())
+            if (entity.getEntityWorld().isClient())
                 return true;
             if (entity instanceof LivingEntity livingEntity)
                 applyEffect(livingEntity, new StatusEffectInstance(effect, ticks, level - 1));
@@ -115,7 +115,7 @@ public class AllPotatoProjectileEntityHitActions {
         @Override
         public boolean execute(ItemStack projectile, EntityHitResult ray, Type type) {
             Entity entity = ray.getEntity();
-            World world = entity.getWorld();
+            World world = entity.getEntityWorld();
             if (world.isClient())
                 return true;
 
@@ -140,7 +140,7 @@ public class AllPotatoProjectileEntityHitActions {
         @Override
         public boolean execute(ItemStack projectile, EntityHitResult ray, Type type) {
             Entity entity = ray.getEntity();
-            World level = entity.getWorld();
+            World level = entity.getEntityWorld();
             if (level.isClient())
                 return true;
             if (!(entity instanceof LivingEntity livingEntity))
@@ -201,7 +201,7 @@ public class AllPotatoProjectileEntityHitActions {
         @Override
         public boolean execute(ItemStack projectile, EntityHitResult ray, Type type) {
             Entity entity = ray.getEntity();
-            World world = entity.getWorld();
+            World world = entity.getEntityWorld();
 
             if (!(entity instanceof ZombieVillagerEntity zombieVillager) || !zombieVillager.hasStatusEffect(StatusEffects.WEAKNESS))
                 return EFFECT.execute(projectile, ray, type);
@@ -247,7 +247,7 @@ public class AllPotatoProjectileEntityHitActions {
 
     private static void applyEffect(LivingEntity entity, StatusEffectInstance effect) {
         if (effect.getEffectType().value().isInstant()) {
-            if (entity.getWorld() instanceof ServerWorld serverWorld) {
+            if (entity.getEntityWorld() instanceof ServerWorld serverWorld) {
                 effect.getEffectType().value().applyInstantEffect(serverWorld, null, null, entity, effect.getDuration(), 1.0);
             }
         } else {

@@ -40,8 +40,8 @@ public class HauntedBellPulser {
         } catch (ExecutionException ignored) {
         }
 
-        long gameTime = player.getWorld().getTime();
-        if ((firstPulse || gameTime % RECHARGE_TICKS != 0) && player.getWorld() instanceof ServerWorld serverLevel)
+        long gameTime = player.getEntityWorld().getTime();
+        if ((firstPulse || gameTime % RECHARGE_TICKS != 0) && player.getEntityWorld() instanceof ServerWorld serverLevel)
             sendPulse(serverLevel, player.getBlockPos(), DISTANCE, false);
     }
 

@@ -146,7 +146,7 @@ public class SchematicItem extends Item {
             return false;
         if (!player.getStackInHand(hand).contains(AllDataComponents.SCHEMATIC_FILE))
             return false;
-        if (!player.getWorld().isClient())
+        if (!player.getEntityWorld().isClient())
             return true;
         AllClientHandle.INSTANCE.openSchematicEditScreen();
         return true;

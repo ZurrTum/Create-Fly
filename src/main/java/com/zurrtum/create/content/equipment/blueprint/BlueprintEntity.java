@@ -195,7 +195,7 @@ public class BlueprintEntity extends AbstractDecorationEntity implements Special
 
     @Override
     public boolean canStayAttached() {
-        World world = getWorld();
+        World world = getEntityWorld();
         if (!world.isSpaceEmpty(this))
             return false;
 
@@ -235,7 +235,7 @@ public class BlueprintEntity extends AbstractDecorationEntity implements Special
 
     @Override
     public boolean handleAttack(Entity source) {
-        if (!(source instanceof PlayerEntity player) || getWorld().isClient())
+        if (!(source instanceof PlayerEntity player) || getEntityWorld().isClient())
             return super.handleAttack(source);
 
         double attrib = player.getAttributeValue(EntityAttributes.BLOCK_INTERACTION_RANGE) + (player.isCreative() ? 0 : -0.5F);
@@ -330,7 +330,7 @@ public class BlueprintEntity extends AbstractDecorationEntity implements Special
         BlueprintSection section = getSectionAt(vec);
         ItemStackHandler items = section.getItems();
 
-        World world = getWorld();
+        World world = getEntityWorld();
         if (!holdingWrench && !world.isClient() && !items.getStack(9).isEmpty()) {
             DynamicRegistryManager registryManager = world.getRegistryManager();
             PlayerInventory playerInv = player.getInventory();
@@ -472,7 +472,7 @@ public class BlueprintEntity extends AbstractDecorationEntity implements Special
         if (items.isEmpty()) {
             return BlueprintPreviewPacket.EMPTY;
         }
-        ServerWorld world = player.getWorld();
+        ServerWorld world = player.getEntityWorld();
         PlayerInventory playerInv = player.getInventory();
         int size = playerInv.size();
         int[] stacksTaken = new int[size];
@@ -619,7 +619,7 @@ public class BlueprintEntity extends AbstractDecorationEntity implements Special
 
         public void save(ItemStackHandler inventory) {
             cachedDisplayItems = null;
-            if (!getWorld().isClient()) {
+            if (!getEntityWorld().isClient()) {
                 try (ErrorReporter.Logging logging = new ErrorReporter.Logging(getErrorReporterContext(), Create.LOGGER)) {
                     NbtWriteView view = NbtWriteView.create(logging, getRegistryManager());
                     inventory.writeSlots(view);
@@ -634,7 +634,7 @@ public class BlueprintEntity extends AbstractDecorationEntity implements Special
         }
 
         public World getBlueprintWorld() {
-            return getWorld();
+            return getEntityWorld();
         }
 
         @Override

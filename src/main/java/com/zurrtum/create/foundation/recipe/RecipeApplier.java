@@ -16,8 +16,8 @@ import java.util.List;
 
 public class RecipeApplier {
     public static <T extends RecipeInput> void applyCreateRecipeOn(ItemEntity entity, T input, CreateRecipe<T> recipe) {
-        World world = entity.getWorld();
-        List<ItemStack> stacks = applyCreateRecipeOn(entity.getWorld(), entity.getStack().getCount(), input, recipe);
+        World world = entity.getEntityWorld();
+        List<ItemStack> stacks = applyCreateRecipeOn(entity.getEntityWorld(), entity.getStack().getCount(), input, recipe);
         int size = stacks.size();
         if (size == 0) {
             entity.discard();

@@ -55,7 +55,7 @@ public class ContraptionCollider {
     }
 
     static void collideEntities(AbstractContraptionEntity contraptionEntity) {
-        World world = contraptionEntity.getWorld();
+        World world = contraptionEntity.getEntityWorld();
         Contraption contraption = contraptionEntity.getContraption();
         Box bounds = contraptionEntity.getBoundingBox();
 
@@ -243,7 +243,7 @@ public class ContraptionCollider {
             boolean anyCollision = hardCollision || temporalCollision;
 
             if (bounce > 0 && hasNormal && anyCollision && bounceEntity(entity, collisionNormal, contraptionEntity, bounce)) {
-                entity.getWorld()
+                entity.getEntityWorld()
                     .playSound(null, entity.getX(), entity.getY(), entity.getZ(), SoundEvents.BLOCK_SLIME_BLOCK_FALL, SoundCategory.BLOCKS, .5f, 1);
                 continue;
             }
@@ -417,23 +417,24 @@ public class ContraptionCollider {
      **/
     public static Vec3d collide(Vec3d p_20273_, Entity e) {
         Box aabb = e.getBoundingBox();
-        List<VoxelShape> list = e.getWorld().getEntityCollisions(e, aabb.stretch(p_20273_));
-        Vec3d vec3 = p_20273_.lengthSquared() == 0.0D ? p_20273_ : Entity.adjustMovementForCollisions(e, p_20273_, aabb, e.getWorld(), list);
+        World world = e.getEntityWorld();
+        List<VoxelShape> list = world.getEntityCollisions(e, aabb.stretch(p_20273_));
+        Vec3d vec3 = p_20273_.lengthSquared() == 0.0D ? p_20273_ : Entity.adjustMovementForCollisions(e, p_20273_, aabb, world, list);
         boolean flag = p_20273_.x != vec3.x;
         boolean flag1 = p_20273_.y != vec3.y;
         boolean flag2 = p_20273_.z != vec3.z;
         boolean flag3 = flag1 && p_20273_.y < 0.0D;
         if (e.getStepHeight() > 0.0F && flag3 && (flag || flag2)) {
-            Vec3d vec31 = Entity.adjustMovementForCollisions(e, new Vec3d(p_20273_.x, e.getStepHeight(), p_20273_.z), aabb, e.getWorld(), list);
+            Vec3d vec31 = Entity.adjustMovementForCollisions(e, new Vec3d(p_20273_.x, e.getStepHeight(), p_20273_.z), aabb, world, list);
             Vec3d vec32 = Entity.adjustMovementForCollisions(
                 e,
                 new Vec3d(0.0D, e.getStepHeight(), 0.0D),
                 aabb.stretch(p_20273_.x, 0.0D, p_20273_.z),
-                e.getWorld(),
+                world,
                 list
             );
             if (vec32.y < (double) e.getStepHeight()) {
-                Vec3d vec33 = Entity.adjustMovementForCollisions(e, new Vec3d(p_20273_.x, 0.0D, p_20273_.z), aabb.offset(vec32), e.getWorld(), list)
+                Vec3d vec33 = Entity.adjustMovementForCollisions(e, new Vec3d(p_20273_.x, 0.0D, p_20273_.z), aabb.offset(vec32), world, list)
                     .add(vec32);
                 if (vec33.horizontalLengthSquared() > vec31.horizontalLengthSquared()) {
                     vec31 = vec33;
@@ -445,7 +446,7 @@ public class ContraptionCollider {
                     e,
                     new Vec3d(0.0D, -vec31.y + p_20273_.y, 0.0D),
                     aabb.offset(vec31),
-                    e.getWorld(),
+                    world,
                     list
                 ));
             }
@@ -493,7 +494,7 @@ public class ContraptionCollider {
         if (!contraptionEntity.supportsTerrainCollision())
             return false;
 
-        World world = contraptionEntity.getWorld();
+        World world = contraptionEntity.getEntityWorld();
         Vec3d motion = contraptionEntity.getVelocity();
         TranslatingContraption contraption = (TranslatingContraption) contraptionEntity.getContraption();
         Box bounds = contraptionEntity.getBoundingBox();

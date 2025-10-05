@@ -32,7 +32,7 @@ public class RemainingAirOverlay {
         if (timeLeft == 0) {
             return;
         }
-        boolean isAir = !player.isSubmergedIn(FluidTags.WATER) || player.getWorld()
+        boolean isAir = !player.isSubmergedIn(FluidTags.WATER) || player.getEntityWorld()
             .getBlockState(BlockPos.ofFloored(player.getX(), player.getEyeY(), player.getZ())).isOf(Blocks.BUBBLE_COLUMN);
         boolean canBreathe = StatusEffectUtil.hasWaterBreathing(player) || player.getAbilities().invulnerable;
         if ((isAir || canBreathe) && !player.isInLava())

@@ -16,14 +16,14 @@ public class CarriageEntityHandler {
             return;
         if (!(entity instanceof CarriageContraptionEntity cce))
             return;
-        if (!((ServerWorld) entity.getWorld()).shouldTickEntityAt(ChunkSectionPos.from(newPos).getCenterPos()))
+        if (!((ServerWorld) entity.getEntityWorld()).shouldTickEntityAt(ChunkSectionPos.from(newPos).getCenterPos()))
             cce.leftTickingChunks = true;
     }
 
     public static void validateCarriageEntity(CarriageContraptionEntity entity) {
         if (!entity.isAlive())
             return;
-        World level = entity.getWorld();
+        World level = entity.getEntityWorld();
         if (level.isClient())
             return;
         if (!isActiveChunk(level, entity.getBlockPos()))

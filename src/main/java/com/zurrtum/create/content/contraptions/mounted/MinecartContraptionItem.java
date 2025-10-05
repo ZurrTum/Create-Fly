@@ -199,7 +199,12 @@ public class MinecartContraptionItem extends Item {
                     world,
                     mountedContraption,
                     intialOrientation
-                ) : OrientedContraptionEntity.createAtYaw(world, mountedContraption, intialOrientation, newFacing.getPositiveHorizontalDegrees());
+                ) : OrientedContraptionEntity.createAtYaw(
+                    world,
+                    mountedContraption,
+                    intialOrientation,
+                    newFacing.getPositiveHorizontalDegrees()
+                );
 
                 contraptionEntity.startRiding(cart);
                 contraptionEntity.setPosition(cart.getX(), cart.getY(), cart.getZ());
@@ -238,7 +243,7 @@ public class MinecartContraptionItem extends Item {
             return null;
         }
 
-        World world = player.getWorld();
+        World world = player.getEntityWorld();
         if (world.isClient()) {
             return ActionResult.SUCCESS;
         }

@@ -22,7 +22,7 @@ public class ComposableEntityVisual<T extends Entity> extends AbstractVisual imp
     //  time which interfaces to implement. I have a feeling that configured elements will need to know what class
     //  of visual they create.
     public ComposableEntityVisual(VisualizationContext ctx, T entity, float partialTick, Controller<T> controller) {
-        super(ctx, entity.getWorld(), partialTick);
+        super(ctx, entity.getEntityWorld(), partialTick);
         this.entity = entity;
         this.controller = controller;
         this.visuals = new Visual[controller.elements.length];

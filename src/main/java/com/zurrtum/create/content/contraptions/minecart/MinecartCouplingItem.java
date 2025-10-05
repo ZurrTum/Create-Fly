@@ -45,7 +45,7 @@ public class MinecartCouplingItem extends Item {
     }
 
     protected static void onCouplingInteractOnMinecart(AbstractMinecartEntity minecart, PlayerEntity player, MinecartController controller) {
-        World world = player.getWorld();
+        World world = player.getEntityWorld();
         if (controller.isFullyCoupled()) {
             if (!world.isClient())
                 CouplingHandler.status(player, "two_couplings_max");
@@ -55,7 +55,7 @@ public class MinecartCouplingItem extends Item {
     }
 
     private static boolean onWrenchInteractOnMinecart(PlayerEntity player, MinecartController controller) {
-        World world = player.getWorld();
+        World world = player.getEntityWorld();
         int couplings = (controller.isConnectedToCoupling() ? 1 : 0) + (controller.isLeadingCoupling() ? 1 : 0);
         if (couplings == 0)
             return false;

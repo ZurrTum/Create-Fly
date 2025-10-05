@@ -56,7 +56,7 @@ public class SchematicAndQuillItem extends Item {
         for (SuperGlueEntity entity : SuperGlueEntity.collectCropped(level, aabb)) {
             Vec3d vec3 = new Vec3d(entity.getX() - aabb.minX, entity.getY() - aabb.minY, entity.getZ() - aabb.minZ);
             try (ErrorReporter.Logging logging = new ErrorReporter.Logging(entity.getErrorReporterContext(), Create.LOGGER)) {
-                NbtWriteView view = NbtWriteView.create(logging, entity.getWorld().getRegistryManager());
+                NbtWriteView view = NbtWriteView.create(logging, entity.getEntityWorld().getRegistryManager());
                 entity.saveData(view);
                 BlockPos blockpos = BlockPos.ofFloored(vec3);
 

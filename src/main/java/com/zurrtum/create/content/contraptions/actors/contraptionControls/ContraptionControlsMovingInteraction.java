@@ -42,7 +42,7 @@ public class ContraptionControlsMovingInteraction extends MovingInteractionBehav
             return false;
         if (contraption instanceof ElevatorContraption ec)
             return elevatorInteraction(player, localPos, contraptionEntity, ec, ctx);
-        if (contraptionEntity.getWorld().isClient()) {
+        if (contraptionEntity.getEntityWorld().isClient()) {
             if (contraption.presentBlockEntities.get(ctx.localPos) instanceof ContraptionControlsBlockEntity cbe)
                 cbe.pressButton();
             return true;
@@ -97,7 +97,7 @@ public class ContraptionControlsMovingInteraction extends MovingInteractionBehav
         send(contraptionEntity, filter, disable);
 
         AllSoundEvents.CONTROLLER_CLICK.play(
-            player.getWorld(),
+            player.getEntityWorld(),
             null,
             BlockPos.ofFloored(contraptionEntity.toGlobalVector(Vec3d.ofCenter(localPos), 1)),
             1,
@@ -126,7 +126,7 @@ public class ContraptionControlsMovingInteraction extends MovingInteractionBehav
     }
 
     private void send(AbstractContraptionEntity contraptionEntity, ItemStack filter, boolean disable) {
-        ServerWorld world = (ServerWorld) contraptionEntity.getWorld();
+        ServerWorld world = (ServerWorld) contraptionEntity.getEntityWorld();
         world.getChunkManager()
             .sendToOtherNearbyPlayers(contraptionEntity, new ContraptionDisableActorPacket(contraptionEntity.getId(), filter, !disable));
     }
@@ -138,7 +138,7 @@ public class ContraptionControlsMovingInteraction extends MovingInteractionBehav
         ElevatorContraption contraption,
         MovementContext ctx
     ) {
-        World level = contraptionEntity.getWorld();
+        World level = contraptionEntity.getEntityWorld();
         if (!level.isClient()) {
             BlockPos pos = BlockPos.ofFloored(contraptionEntity.toGlobalVector(Vec3d.ofCenter(localPos), 1));
             AllSoundEvents.CONTROLLER_CLICK.play(level, null, pos, 1, 1.5f);

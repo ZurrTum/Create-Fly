@@ -12,7 +12,7 @@ public class TrapdoorMovingInteraction extends SimpleBlockMovingInteraction {
     @Override
     protected BlockState handle(PlayerEntity player, Contraption contraption, BlockPos pos, BlockState currentState) {
         SoundEvent sound = currentState.get(TrapdoorBlock.OPEN) ? SoundEvents.BLOCK_WOODEN_TRAPDOOR_CLOSE : SoundEvents.BLOCK_WOODEN_TRAPDOOR_OPEN;
-        float pitch = player.getWorld().random.nextFloat() * 0.1F + 0.9F;
+        float pitch = player.getEntityWorld().random.nextFloat() * 0.1F + 0.9F;
         playSound(player, sound, pitch);
         return currentState.cycle(TrapdoorBlock.OPEN);
     }

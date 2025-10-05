@@ -181,7 +181,7 @@ public final class FrameUniforms extends UniformWriter {
             return ptr;
         }
 
-        World level = camera.getFocusedEntity().getWorld();
+        World level = camera.getFocusedEntity().getEntityWorld();
         BlockPos blockPos = camera.getBlockPos();
         Vec3d cameraPos = camera.getPos();
         return writeInFluidAndBlock(ptr, level, blockPos, cameraPos);

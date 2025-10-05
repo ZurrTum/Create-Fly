@@ -252,7 +252,7 @@ public class ServerFactoryPanelBehaviour extends ServerFilteringBehaviour implem
 
         // Tell player
         player.sendMessage(Text.translatable("create.factory_panel.relocated").formatted(Formatting.GREEN), true);
-        player.getWorld().playSound(null, newPos.pos(), SoundEvents.BLOCK_COPPER_BREAK, SoundCategory.BLOCKS, 1.0f, 1.0f);
+        player.getEntityWorld().playSound(null, newPos.pos(), SoundEvents.BLOCK_COPPER_BREAK, SoundCategory.BLOCKS, 1.0f, 1.0f);
     }
 
     private void moveToSlot(PanelSlot slot) {
@@ -549,7 +549,7 @@ public class ServerFactoryPanelBehaviour extends ServerFilteringBehaviour implem
             return;
         }
 
-        boolean isClientSide = player.getWorld().isClient();
+        boolean isClientSide = player.getEntityWorld().isClient();
 
         // Wrench cycles through arrow bending
         ItemStack heldItem = player.getStackInHand(hand);

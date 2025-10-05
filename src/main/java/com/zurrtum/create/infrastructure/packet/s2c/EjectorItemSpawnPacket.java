@@ -26,7 +26,7 @@ public class EjectorItemSpawnPacket extends EntitySpawnS2CPacket {
     public EjectorItemSpawnPacket(EjectorItemEntity entity, EntityTrackerEntry entityTrackerEntry) {
         super(entity, entityTrackerEntry);
         alive = entity.isAlive();
-        hasLauncher = !alive && !(entity.getWorld().getBlockEntity(entity.getBlockPos()) instanceof EjectorBlockEntity);
+        hasLauncher = !alive && !(entity.getEntityWorld().getBlockEntity(entity.getBlockPos()) instanceof EjectorBlockEntity);
         if (hasLauncher) {
             progress = entity.progress;
             launcher = entity.launcher;

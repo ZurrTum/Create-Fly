@@ -56,7 +56,7 @@ public class SymmetryWandItem extends Item {
 
         // Shift -> open GUI
         if (player.isSneaking()) {
-            if (player.getWorld().isClient()) {
+            if (player.getEntityWorld().isClient()) {
                 AllClientHandle.INSTANCE.openSymmetryWandScreen(wand, context.getHand());
             }
             return ActionResult.SUCCESS;

@@ -60,7 +60,7 @@ public class ScheduleItemEntityInteraction {
         if (directions == null)
             return null;
 
-        World world = player.getWorld();
+        World world = player.getEntityWorld();
         boolean onServer = !world.isClient();
 
         if (train.runtime.paused && !train.runtime.completed) {

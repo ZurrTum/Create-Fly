@@ -136,7 +136,7 @@ public class OrientedContraptionEntity extends AbstractContraptionEntity {
 
     @Override
     public void stopRiding() {
-        if (!getWorld().isClient() && isAlive())
+        if (!getEntityWorld().isClient() && isAlive())
             disassemble();
         super.stopRiding();
     }
@@ -266,7 +266,7 @@ public class OrientedContraptionEntity extends AbstractContraptionEntity {
         if (!rotating || !pauseWhileRotating)
             tickActors();
         boolean isStalled = isStalled();
-        boolean isClient = getWorld().isClient();
+        boolean isClient = getEntityWorld().isClient();
 
         boolean isUpdate = true;
         if (riding instanceof AbstractMinecartEntity) {
@@ -310,7 +310,7 @@ public class OrientedContraptionEntity extends AbstractContraptionEntity {
         int y = MathHelper.floor(entity.getY());
         int z = MathHelper.floor(entity.getZ());
         BlockPos pos = new BlockPos(x, y, z);
-        if (entity.getWorld().getBlockState(pos.down()).isIn(BlockTags.RAILS))
+        if (entity.getEntityWorld().getBlockState(pos.down()).isIn(BlockTags.RAILS))
             pos = pos.down();
         return pos;
     }
@@ -365,7 +365,7 @@ public class OrientedContraptionEntity extends AbstractContraptionEntity {
         if (!rotationLock) {
             if (riding instanceof AbstractMinecartEntity minecartEntity) {
                 BlockPos railPosition = getCurrentRailPosition(minecartEntity);
-                BlockState blockState = getWorld().getBlockState(railPosition);
+                BlockState blockState = getEntityWorld().getBlockState(railPosition);
                 if (blockState.getBlock() instanceof AbstractRailBlock abstractRailBlock) {
                     RailShape railDirection = blockState.get(abstractRailBlock.getShapeProperty());
                     motion = VecHelper.project(motion, MinecartSim2020.getRailVec(railDirection));
@@ -406,11 +406,11 @@ public class OrientedContraptionEntity extends AbstractContraptionEntity {
         int i = MathHelper.floor(furnaceCart.getX());
         int j = MathHelper.floor(furnaceCart.getY());
         int k = MathHelper.floor(furnaceCart.getZ());
-        if (furnaceCart.getWorld().getBlockState(new BlockPos(i, j - 1, k)).isIn(BlockTags.RAILS))
+        if (furnaceCart.getEntityWorld().getBlockState(new BlockPos(i, j - 1, k)).isIn(BlockTags.RAILS))
             --j;
 
         BlockPos blockpos = new BlockPos(i, j, k);
-        if (getWorld().getBlockState(blockpos).isIn(BlockTags.RAILS))
+        if (getEntityWorld().getBlockState(blockpos).isIn(BlockTags.RAILS))
             if (fuel > 1)
                 riding.setVelocity(riding.getVelocity().normalize().multiply(1));
         if (fuel < 5 && contraption != null) {
@@ -433,11 +433,11 @@ public class OrientedContraptionEntity extends AbstractContraptionEntity {
         UUID couplingId = getCouplingId();
         if (couplingId == null)
             return null;
-        MinecartController controller = CapabilityMinecartController.getIfPresent(getWorld(), couplingId);
+        MinecartController controller = CapabilityMinecartController.getIfPresent(getEntityWorld(), couplingId);
         if (controller == null || !controller.isPresent())
             return null;
         UUID coupledCart = controller.getCoupledCart(true);
-        MinecartController coupledController = CapabilityMinecartController.getIfPresent(getWorld(), coupledCart);
+        MinecartController coupledController = CapabilityMinecartController.getIfPresent(getEntityWorld(), coupledCart);
         if (coupledController == null || !coupledController.isPresent())
             return null;
         return Couple.create(controller, coupledController);

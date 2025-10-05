@@ -60,7 +60,7 @@ public final class ShadowComponent implements EntityComponent {
     public ShadowComponent(VisualizationContext context, Entity entity) {
         this.context = context;
         this.entity = entity;
-        this.level = entity.getWorld();
+        this.level = entity.getEntityWorld();
     }
 
     private ShadowInstance createInstance() {

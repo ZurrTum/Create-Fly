@@ -27,7 +27,7 @@ public class EntityStorage extends Storage<Entity> {
             return false;
         }
 
-        World level = entity.getWorld();
+        World level = entity.getEntityWorld();
         return level != null;
     }
 }

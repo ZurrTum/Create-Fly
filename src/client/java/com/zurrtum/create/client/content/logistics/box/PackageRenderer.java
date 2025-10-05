@@ -34,7 +34,7 @@ public class PackageRenderer extends EntityRenderer<PackageEntity, PackageRender
     @Override
     public void updateRenderState(PackageEntity entity, PackageState state, float tickProgress) {
         super.updateRenderState(entity, state, tickProgress);
-        if (!VisualizationManager.supportsVisualization(entity.getWorld())) {
+        if (!VisualizationManager.supportsVisualization(entity.getEntityWorld())) {
             state.box = entity.box;
         }
         state.id = entity.getId();

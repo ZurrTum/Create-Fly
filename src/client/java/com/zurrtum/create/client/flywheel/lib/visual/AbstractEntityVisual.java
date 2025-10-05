@@ -40,7 +40,7 @@ public abstract class AbstractEntityVisual<T extends Entity> extends AbstractVis
     protected final EntityVisibilityTester visibilityTester;
 
     public AbstractEntityVisual(VisualizationContext ctx, T entity, float partialTick) {
-        super(ctx, entity.getWorld(), partialTick);
+        super(ctx, entity.getEntityWorld(), partialTick);
         this.entity = entity;
         visibilityTester = new EntityVisibilityTester(entity, ctx.renderOrigin(), 1.5f);
     }

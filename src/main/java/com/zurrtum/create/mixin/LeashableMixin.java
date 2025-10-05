@@ -15,7 +15,7 @@ public interface LeashableMixin {
     @WrapOperation(method = "getSlipperiness(Lnet/minecraft/entity/Entity;)F", at = @At(value = "INVOKE", target = "Lnet/minecraft/block/Block;getSlipperiness()F"))
     private static <E extends Entity & Leashable> float getSlipperiness(Block block, Operation<Float> original, @Local(argsOnly = true) E entity) {
         if (block instanceof SlipperinessControlBlock controlBlock) {
-            return controlBlock.getSlipperiness(entity.getWorld(), entity.getVelocityAffectingPos());
+            return controlBlock.getSlipperiness(entity.getEntityWorld(), entity.getVelocityAffectingPos());
         }
         return original.call(block);
     }

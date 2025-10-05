@@ -93,7 +93,7 @@ public abstract class AbstractContraptionEntity extends Entity {
         this.contraption = contraption;
         if (contraption == null)
             return;
-        if (getWorld().isClient())
+        if (getEntityWorld().isClient())
             return;
         contraption.onEntityCreated(this);
     }
@@ -114,7 +114,7 @@ public abstract class AbstractContraptionEntity extends Entity {
     }
 
     protected void contraptionInitialize() {
-        contraption.onEntityInitialize(getWorld(), this);
+        contraption.onEntityInitialize(getEntityWorld(), this);
         initialized = true;
     }
 
@@ -140,11 +140,11 @@ public abstract class AbstractContraptionEntity extends Entity {
         passenger.startRiding(this, true);
         if (passenger instanceof TameableEntity ta)
             ta.setInSittingPose(true);
-        if (getWorld().isClient())
+        if (getEntityWorld().isClient())
             return;
         contraption.getSeatMapping().put(passenger.getUuid(), seatIndex);
 
-        ((ServerChunkManager) getWorld().getChunkManager()).sendToOtherNearbyPlayers(
+        ((ServerChunkManager) getEntityWorld().getChunkManager()).sendToOtherNearbyPlayers(
             this,
             new ContraptionSeatMappingPacket(getId(), contraption.getSeatMapping())
         );
@@ -156,14 +156,14 @@ public abstract class AbstractContraptionEntity extends Entity {
         super.removePassenger(passenger);
         if (passenger instanceof TameableEntity ta)
             ta.setInSittingPose(false);
-        if (getWorld().isClient())
+        if (getEntityWorld().isClient())
             return;
         if (transformedVector != null && passenger instanceof LivingEntity entity) {
             AllSynchedDatas.CONTRAPTION_DISMOUNT_LOCATION.set(entity, Optional.of(transformedVector));
         }
         contraption.getSeatMapping().remove(passenger.getUuid());
 
-        ((ServerChunkManager) getWorld().getChunkManager()).sendToOtherNearbyPlayers(
+        ((ServerChunkManager) getEntityWorld().getChunkManager()).sendToOtherNearbyPlayers(
             this,
             new ContraptionSeatMappingPacket(getId(), contraption.getSeatMapping(), passenger.getId())
         );
@@ -257,7 +257,7 @@ public abstract class AbstractContraptionEntity extends Entity {
     }
 
     public void stopControlling(BlockPos controlsLocalPos) {
-        getControllingPlayer().map(getWorld()::getPlayerByUuid).map(p -> (p instanceof ServerPlayerEntity) ? ((ServerPlayerEntity) p) : null)
+        getControllingPlayer().map(getEntityWorld()::getPlayerByUuid).map(p -> (p instanceof ServerPlayerEntity) ? ((ServerPlayerEntity) p) : null)
             .ifPresent(p -> p.networkHandler.sendPacket(AllPackets.CONTROLS_ABORT));
         setControllingPlayer(null);
     }
@@ -286,16 +286,16 @@ public abstract class AbstractContraptionEntity extends Entity {
             }
         }
 
-        if (toDismount != null && !getWorld().isClient()) {
+        if (toDismount != null && !getEntityWorld().isClient()) {
             Vec3d transformedVector = getPassengerPosition(toDismount, 1);
             toDismount.stopRiding();
             if (transformedVector != null)
                 toDismount.requestTeleport(transformedVector.x, transformedVector.y, transformedVector.z);
         }
 
-        if (getWorld().isClient())
+        if (getEntityWorld().isClient())
             return true;
-        addSittingPassenger(SeatBlock.getLeashed(getWorld(), player).or(player), indexOfSeat);
+        addSittingPassenger(SeatBlock.getLeashed(getEntityWorld(), player).or(player), indexOfSeat);
         return true;
     }
 
@@ -346,11 +346,11 @@ public abstract class AbstractContraptionEntity extends Entity {
         tickContraption();
         super.tick();
 
-        if (getWorld().isClient()) {
+        if (getEntityWorld().isClient()) {
             AllClientHandle.INSTANCE.invalidate(contraption);
         }
 
-        if (!(getWorld() instanceof ServerWorld sl))
+        if (!(getEntityWorld() instanceof ServerWorld sl))
             return;
 
         for (Entity entity : getPassengerList()) {
@@ -375,7 +375,7 @@ public abstract class AbstractContraptionEntity extends Entity {
         float prevAngle = living.getYaw();
         float angle = AngleHelper.deg(-MathHelper.atan2(motion.x, motion.z));
         angle = AngleHelper.angleLerp(0.4f, prevAngle, angle);
-        if (getWorld().isClient()) {
+        if (getEntityWorld().isClient()) {
             PositionInterpolator interpolator = living.getInterpolator();
             if (interpolator != null) {
                 interpolator.data.step = 0;
@@ -393,7 +393,7 @@ public abstract class AbstractContraptionEntity extends Entity {
 
     public void setBlock(BlockPos localPos, StructureBlockInfo newInfo) {
         contraption.blocks.put(localPos, newInfo);
-        ((ServerChunkManager) getWorld().getChunkManager()).sendToOtherNearbyPlayers(
+        ((ServerChunkManager) getEntityWorld().getChunkManager()).sendToOtherNearbyPlayers(
             this,
             new ContraptionBlockChangedPacket(getId(), localPos, newInfo.state())
         );
@@ -408,7 +408,7 @@ public abstract class AbstractContraptionEntity extends Entity {
     public void tickActors() {
         boolean stalledPreviously = contraption.stalled;
 
-        if (!getWorld().isClient())
+        if (!getEntityWorld().isClient())
             contraption.stalled = false;
 
         skipActorStop = true;
@@ -446,7 +446,7 @@ public abstract class AbstractContraptionEntity extends Entity {
             contraption.stalled |= context.stall;
         }
         if (!isAlive()) {
-            contraption.stop(getWorld());
+            contraption.stop(getEntityWorld());
             return;
         }
         skipActorStop = false;
@@ -462,7 +462,7 @@ public abstract class AbstractContraptionEntity extends Entity {
             }
         }
 
-        if (!getWorld().isClient()) {
+        if (!getEntityWorld().isClient()) {
             if (!stalledPreviously && contraption.stalled)
                 onContraptionStalled();
             dataTracker.set(STALLED, contraption.stalled);
@@ -488,7 +488,7 @@ public abstract class AbstractContraptionEntity extends Entity {
     }
 
     protected void onContraptionStalled() {
-        ((ServerChunkManager) getWorld().getChunkManager()).sendToOtherNearbyPlayers(
+        ((ServerChunkManager) getEntityWorld().getChunkManager()).sendToOtherNearbyPlayers(
             this,
             new ContraptionStallPacket(getId(), getX(), getY(), getZ(), getStalledAngle())
         );
@@ -507,7 +507,7 @@ public abstract class AbstractContraptionEntity extends Entity {
 
         context.motion = actorPosition.subtract(previousPosition);
 
-        if (!getWorld().isClient() && context.contraption.entity instanceof CarriageContraptionEntity cce && cce.getCarriage() != null) {
+        if (!getEntityWorld().isClient() && context.contraption.entity instanceof CarriageContraptionEntity cce && cce.getCarriage() != null) {
             Train train = cce.getCarriage().train;
             double actualSpeed = train.speedBeforeStall != null ? train.speedBeforeStall : train.speed;
             context.motion = context.motion.normalize().multiply(Math.abs(actualSpeed));
@@ -620,7 +620,7 @@ public abstract class AbstractContraptionEntity extends Entity {
 
     protected void readAdditional(ReadView view, boolean spawnData) {
         initialized = view.getBoolean("Initialized", false);
-        contraption = Contraption.fromData(getWorld(), view.getReadView("Contraption"), spawnData);
+        contraption = Contraption.fromData(getEntityWorld(), view.getReadView("Contraption"), spawnData);
         contraption.entity = this;
         dataTracker.set(STALLED, view.getBoolean("Stalled", false));
     }
@@ -633,13 +633,13 @@ public abstract class AbstractContraptionEntity extends Entity {
 
         StructureTransform transform = makeStructureTransform();
 
-        contraption.stop(getWorld());
-        if (getWorld().getChunkManager() instanceof ServerChunkManager manager) {
+        contraption.stop(getEntityWorld());
+        if (getEntityWorld().getChunkManager() instanceof ServerChunkManager manager) {
             manager.sendToOtherNearbyPlayers(this, new ContraptionDisassemblyPacket(this.getId(), transform));
         }
 
-        contraption.addBlocksToWorld(getWorld(), transform);
-        contraption.addPassengersToWorld(getWorld(), transform, getPassengerList());
+        contraption.addBlocksToWorld(getEntityWorld(), transform);
+        contraption.addPassengersToWorld(getEntityWorld(), transform, getPassengerList());
 
         for (Entity entity : getPassengerList()) {
             if (!(entity instanceof OrientedContraptionEntity))
@@ -657,14 +657,14 @@ public abstract class AbstractContraptionEntity extends Entity {
 
         removeAllPassengers();
         moveCollidedEntitiesOnDisassembly(transform);
-        AllSoundEvents.CONTRAPTION_DISASSEMBLE.playOnServer(getWorld(), getBlockPos());
+        AllSoundEvents.CONTRAPTION_DISASSEMBLE.playOnServer(getEntityWorld(), getBlockPos());
     }
 
     public void moveCollidedEntitiesOnDisassembly(StructureTransform transform) {
         for (Entity entity : collidingEntities.keySet()) {
             Vec3d localVec = toLocalVector(entity.getPos(), 0);
             Vec3d transformed = transform.apply(localVec);
-            if (getWorld().isClient())
+            if (getEntityWorld().isClient())
                 entity.setPosition(transformed.x, transformed.y + 1 / 16f, transformed.z);
             else
                 entity.requestTeleport(transformed.x, transformed.y + 1 / 16f, transformed.z);
@@ -673,8 +673,8 @@ public abstract class AbstractContraptionEntity extends Entity {
 
     @Override
     public void remove(RemovalReason p_146834_) {
-        if (!getWorld().isClient() && !isRemoved() && contraption != null && !skipActorStop)
-            contraption.stop(getWorld());
+        if (!getEntityWorld().isClient() && !isRemoved() && contraption != null && !skipActorStop)
+            contraption.stop(getEntityWorld());
         if (contraption != null)
             contraption.onEntityRemoved(this);
         super.remove(p_146834_);
@@ -885,7 +885,7 @@ public abstract class AbstractContraptionEntity extends Entity {
     }
 
     public boolean isAliveOrStale() {
-        return isAlive() || getWorld().isClient() ? staleTicks > 0 : false;
+        return isAlive() || getEntityWorld().isClient() ? staleTicks > 0 : false;
     }
 
     public boolean isPrevPosInvalid() {

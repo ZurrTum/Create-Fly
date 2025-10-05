@@ -44,7 +44,7 @@ public class ToolboxHandlerClient {
         ClientPlayerEntity player = mc.player;
         if (player == null)
             return false;
-        World level = player.getWorld();
+        World level = player.getEntityWorld();
         HitResult hitResult = mc.crosshairTarget;
 
         if (hitResult == null || hitResult.getType() == HitResult.Type.MISS)
@@ -53,7 +53,7 @@ public class ToolboxHandlerClient {
             return false;
 
         ItemStack result = ItemStack.EMPTY;
-        List<ToolboxBlockEntity> toolboxes = ToolboxHandler.getNearest(player.getWorld(), player, 8);
+        List<ToolboxBlockEntity> toolboxes = ToolboxHandler.getNearest(player.getEntityWorld(), player, 8);
 
         if (toolboxes.isEmpty())
             return false;
@@ -103,9 +103,9 @@ public class ToolboxHandlerClient {
         ClientPlayerEntity player = mc.player;
         if (player == null)
             return false;
-        World level = player.getWorld();
+        World level = player.getEntityWorld();
 
-        List<ToolboxBlockEntity> toolboxes = ToolboxHandler.getNearest(player.getWorld(), player, 8);
+        List<ToolboxBlockEntity> toolboxes = ToolboxHandler.getNearest(player.getEntityWorld(), player, 8);
         toolboxes.sort(Comparator.comparing(ToolboxBlockEntity::getUniqueId));
 
         NbtCompound compound = AllSynchedDatas.TOOLBOX.get(player);

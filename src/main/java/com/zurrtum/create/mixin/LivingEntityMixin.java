@@ -62,7 +62,7 @@ public abstract class LivingEntityMixin extends Entity {
     @WrapOperation(method = "travelMidAir(Lnet/minecraft/util/math/Vec3d;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/block/Block;getSlipperiness()F"))
     private float getSlipperiness(Block block, Operation<Float> original, @Local BlockPos pos) {
         if (block instanceof SlipperinessControlBlock controlBlock) {
-            return controlBlock.getSlipperiness(getWorld(), pos);
+            return controlBlock.getSlipperiness(getEntityWorld(), pos);
         }
         return original.call(block);
     }
@@ -202,7 +202,7 @@ public abstract class LivingEntityMixin extends Entity {
         @Local(ordinal = 2) int z
     ) {
         if (state.getBlock() instanceof SoundControlBlock block) {
-            return block.getSoundGroup(getWorld(), new BlockPos(x, y, z));
+            return block.getSoundGroup(getEntityWorld(), new BlockPos(x, y, z));
         }
         return original.call(state);
     }

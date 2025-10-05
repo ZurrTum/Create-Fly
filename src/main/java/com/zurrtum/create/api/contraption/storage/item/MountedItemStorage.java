@@ -35,7 +35,12 @@ public abstract class MountedItemStorage implements ItemInventory {
 
     @SuppressWarnings("deprecation")
     public static final PacketCodec<RegistryByteBuf, MountedItemStorage> STREAM_CODEC = PacketCodec.of(
-        (b, t) -> t.encode(RegistryOps.of(NbtOps.INSTANCE, t.getRegistryManager()), CODEC, b),
+        (b, t) -> t.encode(
+            RegistryOps.of(
+                NbtOps.INSTANCE,
+                t.getRegistryManager()
+            ), CODEC, b
+        ),
         b -> b.decode(RegistryOps.of(NbtOps.INSTANCE, b.getRegistryManager()), CODEC)
     );
 
@@ -59,7 +64,7 @@ public abstract class MountedItemStorage implements ItemInventory {
      * @return true if the interaction was successful
      */
     public boolean handleInteraction(ServerPlayerEntity player, Contraption contraption, StructureBlockInfo info) {
-        ServerWorld level = player.getWorld();
+        ServerWorld level = player.getEntityWorld();
         BlockPos localPos = info.pos();
         Vec3d localPosVec = Vec3d.ofCenter(localPos);
         Predicate<PlayerEntity> stillValid = p -> {

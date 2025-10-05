@@ -94,7 +94,7 @@ public class CouplingPhysics {
         int z = MathHelper.floor(cart.getZ());
         BlockPos pos = new BlockPos(x, y, z);
         BlockPos down = pos.down();
-        if (cart.getWorld().getBlockState(down).isIn(BlockTags.RAILS)) {
+        if (cart.getEntityWorld().getBlockState(down).isIn(BlockTags.RAILS)) {
             return down;
         }
         return pos;
@@ -127,7 +127,7 @@ public class CouplingPhysics {
             int y = MathHelper.floor(vec.getY());
             int z = MathHelper.floor(vec.getZ());
             BlockPos pos = new BlockPos(x, y - 1, z);
-            if (minecart.getWorld().getBlockState(pos).isIn(BlockTags.RAILS))
+            if (minecart.getEntityWorld().getBlockState(pos).isIn(BlockTags.RAILS))
                 pos = pos.down();
             BlockPos railPosition = pos;
             BlockState railState = world.getBlockState(railPosition.up());

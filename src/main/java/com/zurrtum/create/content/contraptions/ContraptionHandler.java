@@ -48,7 +48,7 @@ public class ContraptionHandler {
 
     public static void addSpawnedContraptionsToCollisionList(EntityLike entity) {
         if (entity instanceof AbstractContraptionEntity abstractContraptionEntity)
-            queuedAdditions.get(abstractContraptionEntity.getWorld()).add(abstractContraptionEntity);
+            queuedAdditions.get(abstractContraptionEntity.getEntityWorld()).add(abstractContraptionEntity);
     }
 
 }

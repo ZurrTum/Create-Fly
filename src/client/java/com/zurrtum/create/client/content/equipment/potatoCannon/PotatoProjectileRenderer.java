@@ -33,7 +33,7 @@ public class PotatoProjectileRenderer extends EntityRenderer<PotatoProjectileEnt
         super.updateRenderState(entity, state, tickProgress);
         ItemStack stack = entity.getItem();
         MinecraftClient mc = MinecraftClient.getInstance();
-        mc.getItemModelManager().clearAndUpdate(state.item, stack, ItemDisplayContext.GROUND, entity.getWorld(), null, 0);
+        mc.getItemModelManager().clearAndUpdate(state.item, stack, ItemDisplayContext.GROUND, entity.getEntityWorld(), null, 0);
         if (stack.isEmpty()) {
             return;
         }

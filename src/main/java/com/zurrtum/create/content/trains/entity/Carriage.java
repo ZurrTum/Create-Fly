@@ -824,7 +824,7 @@ public class Carriage {
             Entity entity = this.entity.get();
             if (!(entity instanceof CarriageContraptionEntity cce))
                 return;
-            if (!(entity.getWorld() instanceof ServerWorld sLevel))
+            if (!(entity.getEntityWorld() instanceof ServerWorld sLevel))
                 return;
 
             Set<Integer> loadedPassengers = new HashSet<>();
@@ -849,7 +849,7 @@ public class Carriage {
 
                 } else {
                     passenger = EntityType.loadEntityWithPassengers(
-                        tag, entity.getWorld(), SpawnReason.LOAD, e -> {
+                        tag, entity.getEntityWorld(), SpawnReason.LOAD, e -> {
                             e.refreshPositionAfterTeleport(positionAnchor);
                             return e;
                         }
@@ -859,7 +859,7 @@ public class Carriage {
                 }
 
                 if (passenger != null) {
-                    RegistryKey<World> passengerDimension = passenger.getWorld().getRegistryKey();
+                    RegistryKey<World> passengerDimension = passenger.getEntityWorld().getRegistryKey();
                     if (!passengerDimension.equals(sLevel.getRegistryKey()) && passenger instanceof ServerPlayerEntity sp)
                         continue;
                     cce.addSittingPassenger(passenger, seatId);
@@ -910,7 +910,7 @@ public class Carriage {
                 DimensionalCarriageEntity otherDce = other.getValue();
                 if (otherDce == this)
                     continue;
-                if (sp.getWorld().getRegistryKey().equals(other.getKey()))
+                if (sp.getEntityWorld().getRegistryKey().equals(other.getKey()))
                     continue;
                 Vec3d loc = otherDce.pivot == null ? otherDce.positionAnchor : otherDce.pivot.getLocation();
                 if (loc == null)
@@ -931,7 +931,7 @@ public class Carriage {
                 return;
             cc.portalCutoffMin = minAllowedLocalCoord();
             cc.portalCutoffMax = maxAllowedLocalCoord();
-            if (!entity.getWorld().isClient())
+            if (!entity.getEntityWorld().isClient())
                 return;
             AllClientHandle.INSTANCE.invalidateCarriage(cce);
         }
@@ -972,7 +972,7 @@ public class Carriage {
                     Integer seat = mapping.get(passenger.getUuid());
 
                     if (passenger instanceof ServerPlayerEntity sp) {
-                        dismountPlayer(sp.getWorld(), sp, seat, portal);
+                        dismountPlayer(sp.getEntityWorld(), sp, seat, portal);
                         continue;
                     }
 
@@ -1007,7 +1007,7 @@ public class Carriage {
             entity.prevYaw = entity.yaw;
             entity.prevPitch = entity.pitch;
 
-            if (!entity.getWorld().isClient()) {
+            if (!entity.getEntityWorld().isClient()) {
                 Vec3d lookahead = positionAnchor.add(positionAnchor.subtract(entity.getPos()).normalize().multiply(16));
 
                 for (Entity e : entity.getPassengerList()) {
@@ -1015,7 +1015,7 @@ public class Carriage {
                         continue;
                     if (e.squaredDistanceTo(entity) > 32 * 32)
                         continue;
-                    if (CarriageEntityHandler.isActiveChunk(entity.getWorld(), BlockPos.ofFloored(lookahead)))
+                    if (CarriageEntityHandler.isActiveChunk(entity.getEntityWorld(), BlockPos.ofFloored(lookahead)))
                         break;
                     train.carriageWaitingForChunks = id;
                     return;

@@ -33,7 +33,7 @@ public abstract class SimpleBlockMovingInteraction extends MovingInteractionBeha
     }
 
     protected void playSound(PlayerEntity player, SoundEvent sound, float pitch) {
-        player.getWorld().playSound(player, player.getBlockPos(), sound, SoundCategory.BLOCKS, 0.3f, pitch);
+        player.getEntityWorld().playSound(player, player.getBlockPos(), sound, SoundCategory.BLOCKS, 0.3f, pitch);
     }
 
     protected abstract BlockState handle(PlayerEntity player, Contraption contraption, BlockPos pos, BlockState currentState);

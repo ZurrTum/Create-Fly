@@ -41,10 +41,10 @@ public class FactoryPanelSetItemMenu extends GhostItemMenu<ServerFactoryPanelBeh
     protected void saveData(ServerFactoryPanelBehaviour contentHolder) {
         if (!contentHolder.setFilter(ghostInventory.getStack(0))) {
             player.sendMessage(Text.translatable("create.logistics.filter.invalid_item"), true);
-            AllSoundEvents.DENY.playOnServer(player.getWorld(), player.getBlockPos(), 1, 1);
+            AllSoundEvents.DENY.playOnServer(player.getEntityWorld(), player.getBlockPos(), 1, 1);
             return;
         }
-        player.getWorld().playSound(null, contentHolder.getPos(), SoundEvents.ENTITY_ITEM_FRAME_ADD_ITEM, SoundCategory.BLOCKS, .25f, .1f);
+        player.getEntityWorld().playSound(null, contentHolder.getPos(), SoundEvents.ENTITY_ITEM_FRAME_ADD_ITEM, SoundCategory.BLOCKS, .25f, .1f);
     }
 
 }

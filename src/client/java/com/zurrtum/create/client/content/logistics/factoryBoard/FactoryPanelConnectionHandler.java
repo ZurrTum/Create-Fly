@@ -55,7 +55,7 @@ public class FactoryPanelConnectionHandler {
             player.sendMessage(CreateLang.translate(checkForIssues).style(Formatting.RED).component(), true);
             connectingFrom = null;
             connectingFromBox = null;
-            AllSoundEvents.DENY.playAt(player.getWorld(), player.getBlockPos(), 1, 1, false);
+            AllSoundEvents.DENY.playAt(player.getEntityWorld(), player.getBlockPos(), 1, 1, false);
             return true;
         }
 
@@ -71,7 +71,7 @@ public class FactoryPanelConnectionHandler {
 
         connectingFrom = null;
         connectingFromBox = null;
-        player.getWorld()
+        player.getEntityWorld()
             .playSoundAtBlockCenterClient(player.getBlockPos(), SoundEvents.BLOCK_AMETHYST_BLOCK_PLACE, SoundCategory.BLOCKS, 0.5f, 0.5f, false);
 
         return true;
@@ -244,7 +244,7 @@ public class FactoryPanelConnectionHandler {
 
                 connectingFrom = null;
                 connectingFromBox = null;
-                player.getWorld().playSoundAtBlockCenterClient(
+                player.getEntityWorld().playSoundAtBlockCenterClient(
                     player.getBlockPos(),
                     SoundEvents.BLOCK_AMETHYST_BLOCK_PLACE,
                     SoundCategory.BLOCKS,

@@ -93,12 +93,12 @@ public abstract class SchematicToolBase implements ISchematicTool {
 
         // Select targeted Block
         selectedPos = null;
-        BlockHitResult trace = RaycastHelper.rayTraceRange(player.getWorld(), player, 75);
+        BlockHitResult trace = RaycastHelper.rayTraceRange(player.getEntityWorld(), player, 75);
         if (trace == null || trace.getType() != Type.BLOCK)
             return;
 
         BlockPos hit = BlockPos.ofFloored(trace.getPos());
-        boolean replaceable = player.getWorld().getBlockState(hit).isReplaceable();
+        boolean replaceable = player.getEntityWorld().getBlockState(hit).isReplaceable();
         if (trace.getSide().getAxis().isVertical() && !replaceable)
             hit = hit.offset(trace.getSide());
         selectedPos = hit;

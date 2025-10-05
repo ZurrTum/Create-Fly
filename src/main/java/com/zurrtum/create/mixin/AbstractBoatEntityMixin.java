@@ -22,7 +22,7 @@ public abstract class AbstractBoatEntityMixin extends Entity {
     @WrapOperation(method = "getNearbySlipperiness()F", at = @At(value = "INVOKE", target = "Lnet/minecraft/block/Block;getSlipperiness()F"))
     private float getSlipperiness(Block block, Operation<Float> original, @Local BlockPos.Mutable mutable) {
         if (block instanceof SlipperinessControlBlock controlBlock) {
-            return controlBlock.getSlipperiness(getWorld(), mutable);
+            return controlBlock.getSlipperiness(getEntityWorld(), mutable);
         }
         return original.call(block);
     }

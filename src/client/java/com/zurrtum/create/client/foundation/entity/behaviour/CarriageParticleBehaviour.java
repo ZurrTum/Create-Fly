@@ -54,14 +54,14 @@ public class CarriageParticleBehaviour extends EntityBehaviour<CarriageContrapti
         Entity camEntity = mc.cameraEntity;
         if (camEntity == null)
             return;
-        Carriage.DimensionalCarriageEntity dce = carriage.getDimensional(entity.getWorld());
+        Carriage.DimensionalCarriageEntity dce = carriage.getDimensional(entity.getEntityWorld());
         if (!dce.pointsInitialised)
             return;
         Vec3d leadingAnchor = dce.leadingAnchor();
         if (leadingAnchor == null || !leadingAnchor.isInRange(camEntity.getPos(), 64))
             return;
 
-        Random r = entity.getWorld().random;
+        Random r = entity.getEntityWorld().random;
         Vec3d contraptionMotion = entity.getPos().subtract(entity.getPrevPositionVec());
         double length = contraptionMotion.length();
         if (arrived && length > 0.01f)
@@ -84,7 +84,7 @@ public class CarriageParticleBehaviour extends EntityBehaviour<CarriageContrapti
         brakes.tickChaser();
         prevMotion = length;
 
-        World level = entity.getWorld();
+        World level = entity.getEntityWorld();
         Vec3d position = entity.getLerpedPos(0);
         float viewYRot = entity.getViewYRot(0);
         float viewXRot = entity.getViewXRot(0);

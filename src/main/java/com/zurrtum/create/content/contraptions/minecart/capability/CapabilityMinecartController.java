@@ -163,7 +163,7 @@ public class CapabilityMinecartController {
 
         MinecartController controller = new MinecartController(abstractMinecart);
         AllSynchedDatas.MINECART_CONTROLLER.set(abstractMinecart, Optional.of(controller));
-        queuedAdditions.get(abstractMinecart.getWorld()).add(abstractMinecart);
+        queuedAdditions.get(abstractMinecart.getEntityWorld()).add(abstractMinecart);
     }
 
     public static void onEntityDeath(World world, Entity entity) {

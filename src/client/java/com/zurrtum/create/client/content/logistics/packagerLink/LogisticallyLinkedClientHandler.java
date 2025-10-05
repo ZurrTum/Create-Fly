@@ -45,7 +45,7 @@ public class LogisticallyLinkedClientHandler {
 
         for (LogisticallyLinkedBehaviour behaviour : LogisticallyLinkedBehaviour.getAllPresent(previouslyHeldFrequency, false, true)) {
             SmartBlockEntity be = behaviour.blockEntity;
-            VoxelShape shape = be.getCachedState().getOutlineShape(player.getWorld(), be.getPos());
+            VoxelShape shape = be.getCachedState().getOutlineShape(player.getEntityWorld(), be.getPos());
             if (shape.isEmpty())
                 continue;
             if (!player.getBlockPos().isWithinDistance(be.getPos(), 64))

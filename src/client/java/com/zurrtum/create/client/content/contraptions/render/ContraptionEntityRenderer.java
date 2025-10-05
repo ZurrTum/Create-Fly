@@ -92,7 +92,7 @@ public class ContraptionEntityRenderer<C extends AbstractContraptionEntity, S ex
 
     @Override
     public void updateRenderState(C entity, S state, float tickProgress) {
-        state.world = entity.getWorld();
+        state.world = entity.getEntityWorld();
         state.contraption = entity.getContraption();
         state.lastRenderX = entity.lastRenderX;
         state.lastRenderY = entity.lastRenderY;

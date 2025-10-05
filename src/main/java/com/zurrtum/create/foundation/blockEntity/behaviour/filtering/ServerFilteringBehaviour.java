@@ -270,7 +270,7 @@ public class ServerFilteringBehaviour extends BlockEntityBehaviour<SmartBlockEnt
                 Text.translatable("create.logistics.filter.requires_item_in_inventory", copied.getName().copy().formatted(Formatting.WHITE))
                     .formatted(Formatting.RED), true
             );
-            AllSoundEvents.DENY.playOnServer(player.getWorld(), player.getBlockPos(), 1, 1);
+            AllSoundEvents.DENY.playOnServer(player.getEntityWorld(), player.getBlockPos(), 1, 1);
             return false;
         }
 
@@ -304,7 +304,7 @@ public class ServerFilteringBehaviour extends BlockEntityBehaviour<SmartBlockEnt
 
         if (!setFilter(side, toApply)) {
             player.sendMessage(Text.translatable("create.logistics.filter.invalid_item"), true);
-            AllSoundEvents.DENY.playOnServer(player.getWorld(), player.getBlockPos(), 1, 1);
+            AllSoundEvents.DENY.playOnServer(player.getEntityWorld(), player.getBlockPos(), 1, 1);
             return;
         }
 

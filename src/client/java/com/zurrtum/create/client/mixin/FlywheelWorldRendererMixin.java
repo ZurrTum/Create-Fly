@@ -115,7 +115,7 @@ public class FlywheelWorldRendererMixin {
         VertexConsumerProvider vertexConsumers,
         CallbackInfo ci
     ) {
-        if (VisualizationManager.supportsVisualization(entity.getWorld()) && VisualizationHelper.skipVanillaRender(entity)) {
+        if (VisualizationManager.supportsVisualization(entity.getEntityWorld()) && VisualizationHelper.skipVanillaRender(entity)) {
             ci.cancel();
         }
     }

@@ -146,13 +146,13 @@ public class StationBlock extends Block implements IBE<StationBlockEntity>, IWre
                 player.getInventory().offerOrDrop(autoSchedule.copy());
                 station.depotBehaviour.removeHeldItem();
                 station.notifyUpdate();
-                player.getWorld().playSound(
+                player.getEntityWorld().playSound(
                     null,
                     player.getBlockPos(),
                     SoundEvents.ENTITY_ITEM_PICKUP,
                     SoundCategory.PLAYERS,
                     .2f,
-                    1f + player.getWorld().random.nextFloat()
+                    1f + player.getEntityWorld().random.nextFloat()
                 );
                 return ActionResult.SUCCESS;
             }

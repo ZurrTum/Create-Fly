@@ -18,18 +18,18 @@ public class FanProcessing {
         String itemType = AllSynchedDatas.ITEM_TYPE.get(entity);
         if (!itemType.isEmpty()) {
             if (FanProcessingType.parse(itemType) != type) {
-                return type.canProcess(entity.getStack(), entity.getWorld());
+                return type.canProcess(entity.getStack(), entity.getEntityWorld());
             } else {
                 return AllSynchedDatas.ITEM_TIME.get(entity) != -1;
             }
         }
-        return type.canProcess(entity.getStack(), entity.getWorld());
+        return type.canProcess(entity.getStack(), entity.getEntityWorld());
     }
 
     public static boolean applyProcessing(ItemEntity entity, FanProcessingType type) {
         if (decrementProcessingTime(entity, type) != 0)
             return false;
-        List<ItemStack> stacks = type.process(entity.getStack(), entity.getWorld());
+        List<ItemStack> stacks = type.process(entity.getStack(), entity.getEntityWorld());
         if (stacks == null)
             return false;
         if (stacks.isEmpty()) {
@@ -38,9 +38,9 @@ public class FanProcessing {
         }
         entity.setStack(stacks.removeFirst());
         for (ItemStack additional : stacks) {
-            ItemEntity entityIn = new ItemEntity(entity.getWorld(), entity.getX(), entity.getY(), entity.getZ(), additional);
+            ItemEntity entityIn = new ItemEntity(entity.getEntityWorld(), entity.getX(), entity.getY(), entity.getZ(), additional);
             entityIn.setVelocity(entity.getVelocity());
-            entity.getWorld().spawnEntity(entityIn);
+            entity.getEntityWorld().spawnEntity(entityIn);
         }
         return true;
     }

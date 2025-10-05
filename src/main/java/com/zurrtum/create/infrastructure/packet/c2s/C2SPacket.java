@@ -11,7 +11,7 @@ public interface C2SPacket extends Packet<ServerPlayPacketListener> {
     @Override
     default void apply(ServerPlayPacketListener listener) {
         if (runInMain()) {
-            NetworkThreadUtils.forceMainThread(this, listener, ((ServerPlayNetworkHandler) listener).player.getWorld());
+            NetworkThreadUtils.forceMainThread(this, listener, ((ServerPlayNetworkHandler) listener).player.getEntityWorld());
         }
         callback().accept((ServerPlayNetworkHandler) listener, cast());
     }

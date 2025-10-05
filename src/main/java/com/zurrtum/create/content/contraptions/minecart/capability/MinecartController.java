@@ -83,7 +83,7 @@ public class MinecartController {
     public void decouple() {
         couplings.forEachWithContext((opt, main) -> opt.ifPresent(cd -> {
             UUID idOfOther = cd.idOfCart(!main);
-            MinecartController otherCart = CapabilityMinecartController.getIfPresent(cart.getWorld(), idOfOther);
+            MinecartController otherCart = CapabilityMinecartController.getIfPresent(cart.getEntityWorld(), idOfOther);
             if (otherCart == null)
                 return;
 
@@ -100,7 +100,7 @@ public class MinecartController {
         if (passengers.isEmpty() || !(passengers.getFirst() instanceof AbstractContraptionEntity)) {
             return;
         }
-        World world = cart.getWorld();
+        World world = cart.getEntityWorld();
         int i = MathHelper.floor(cart.getX());
         int j = MathHelper.floor(cart.getY());
         int k = MathHelper.floor(cart.getZ());
@@ -180,7 +180,7 @@ public class MinecartController {
             boolean forward = current.isLeadingCoupling();
             int safetyCount = 1000;
 
-            World world = cart.getWorld();
+            World world = cart.getEntityWorld();
             while (safetyCount-- > 0) {
                 Optional<MinecartController> next = CouplingHandler.getNextInCouplingChain(world, current, forward);
                 if (next.isEmpty()) {
@@ -225,7 +225,7 @@ public class MinecartController {
 
     public void removeConnection(boolean main) {
         if (hasContraptionCoupling(main)) {
-            World world = cart.getWorld();
+            World world = cart.getEntityWorld();
             if (world != null && !world.isClient()) {
                 List<Entity> passengers = cart().getPassengerList();
                 if (!passengers.isEmpty()) {
@@ -250,7 +250,7 @@ public class MinecartController {
             this.cart = cart;
             needsEntryRefresh = true;
         }
-        if (this.cart.getWorld().isClient()) {
+        if (this.cart.getEntityWorld().isClient()) {
             return;
         }
         AllSynchedDatas.MINECART_CONTROLLER.set(this.cart, Optional.of(this), true);
@@ -285,7 +285,7 @@ public class MinecartController {
         if (cart == null) {
             return;
         }
-        World world = cart.getWorld();
+        World world = cart.getEntityWorld();
         if (world == null) {
             return;
         }

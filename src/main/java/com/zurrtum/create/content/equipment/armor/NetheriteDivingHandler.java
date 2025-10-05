@@ -20,20 +20,20 @@ public class NetheriteDivingHandler {
 
     private static boolean isValidArmorSet(PlayerEntity player) {
         ItemStack head = player.getEquippedStack(EquipmentSlot.HEAD);
-        if (!(head.getItem() instanceof DivingHelmetItem) || head.takesDamageFrom(player.getWorld().getDamageSources().lava())) {
+        if (!(head.getItem() instanceof DivingHelmetItem) || head.takesDamageFrom(player.getEntityWorld().getDamageSources().lava())) {
             return false;
         }
 
         ItemStack chest = player.getEquippedStack(EquipmentSlot.CHEST);
-        if (!(chest.getItem() instanceof BacktankItem) || chest.takesDamageFrom(player.getWorld().getDamageSources()
+        if (!(chest.getItem() instanceof BacktankItem) || chest.takesDamageFrom(player.getEntityWorld().getDamageSources()
             .lava()) || !BacktankUtil.hasAirRemaining(chest)) {
             return false;
         }
 
-        if (player.getEquippedStack(EquipmentSlot.LEGS).takesDamageFrom(player.getWorld().getDamageSources().lava())) {
+        if (player.getEquippedStack(EquipmentSlot.LEGS).takesDamageFrom(player.getEntityWorld().getDamageSources().lava())) {
             return false;
         }
 
-        return !player.getEquippedStack(EquipmentSlot.FEET).takesDamageFrom(player.getWorld().getDamageSources().lava());
+        return !player.getEquippedStack(EquipmentSlot.FEET).takesDamageFrom(player.getEntityWorld().getDamageSources().lava());
     }
 }

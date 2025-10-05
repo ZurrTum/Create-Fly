@@ -169,7 +169,7 @@ public abstract class Contraption {
 
     public ContraptionWorld getContraptionWorld() {
         if (world == null)
-            world = new ContraptionWorld(entity.getWorld(), this);
+            world = new ContraptionWorld(entity.getEntityWorld(), this);
         return world;
     }
 
@@ -229,7 +229,7 @@ public abstract class Contraption {
         for (BlockFace blockFace : pendingSubContraptions) {
             Direction face = blockFace.getFace();
             StabilizedContraption subContraption = new StabilizedContraption(face);
-            World world = entity.getWorld();
+            World world = entity.getEntityWorld();
             BlockPos pos = blockFace.getPos();
             try {
                 if (!subContraption.assemble(world, pos))

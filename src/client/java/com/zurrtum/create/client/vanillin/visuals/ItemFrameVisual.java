@@ -39,7 +39,7 @@ public class ItemFrameVisual extends AbstractVisual implements EntityVisual<Item
     private ItemStack lastItemStack;
 
     public ItemFrameVisual(VisualizationContext ctx, ItemFrameEntity entity, float partialTick) {
-        super(ctx, entity.getWorld(), partialTick);
+        super(ctx, entity.getEntityWorld(), partialTick);
 
         this.entity = entity;
 

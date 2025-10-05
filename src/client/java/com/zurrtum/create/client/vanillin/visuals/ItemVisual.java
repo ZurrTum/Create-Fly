@@ -92,7 +92,7 @@ public class ItemVisual extends AbstractEntityVisual<ItemEntity> implements Simp
 
         itemRenderState.clear();
         ItemModelManager manager = MinecraftClient.getInstance().getItemModelManager();
-        ClientWorld world = entity.getWorld() instanceof ClientWorld clientWorld ? clientWorld : null;
+        ClientWorld world = entity.getEntityWorld() instanceof ClientWorld clientWorld ? clientWorld : null;
         itemRenderState.displayContext = ItemDisplayContext.GROUND;
         itemModel.update(itemRenderState, itemstack, manager, ItemDisplayContext.GROUND, world, null, entity.getId());
 

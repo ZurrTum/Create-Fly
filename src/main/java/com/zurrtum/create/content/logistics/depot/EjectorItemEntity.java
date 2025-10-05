@@ -41,7 +41,7 @@ public class EjectorItemEntity extends ItemEntity {
         BlockPos pos = ejector.getPos();
         setPosition(pos.getX() + 0.5f, pos.getY() + 0.5f, pos.getZ() + 0.5f);
         setStack(stack);
-        if (getWorld().isClient()) {
+        if (getEntityWorld().isClient()) {
             data = new RenderData();
         }
         loadLauncher(ejector);
@@ -49,7 +49,7 @@ public class EjectorItemEntity extends ItemEntity {
 
     public EjectorItemEntity(EntityType<? extends EjectorItemEntity> type, World world) {
         super(type, world);
-        if (getWorld().isClient()) {
+        if (getEntityWorld().isClient()) {
             data = new RenderData();
         }
     }
@@ -66,7 +66,7 @@ public class EjectorItemEntity extends ItemEntity {
         alive = spawnPacket.getAlive();
         progress = spawnPacket.getProgress();
         if (!alive) {
-            if (getWorld().getBlockEntity(getBlockPos()) instanceof EjectorBlockEntity ejector) {
+            if (getEntityWorld().getBlockEntity(getBlockPos()) instanceof EjectorBlockEntity ejector) {
                 loadLauncher(ejector);
                 return;
             }
@@ -84,7 +84,7 @@ public class EjectorItemEntity extends ItemEntity {
         launcher = ejector.launcher;
         Direction facing = ejector.getFacing();
         direction = facing.getOpposite();
-        if (getWorld().isClient()) {
+        if (getEntityWorld().isClient()) {
             data.calcRotate(facing);
         }
     }
@@ -93,7 +93,7 @@ public class EjectorItemEntity extends ItemEntity {
     public void writeCustomData(WriteView view) {
         view.putBoolean("Alive", alive);
         view.putInt("Progress", progress);
-        if (!alive && !(getWorld().getBlockEntity(getBlockPos()) instanceof EjectorBlockEntity)) {
+        if (!alive && !(getEntityWorld().getBlockEntity(getBlockPos()) instanceof EjectorBlockEntity)) {
             view.put("Launcher", EntityLauncher.CODEC, launcher);
             view.put("Direction", Direction.CODEC, direction);
         }
@@ -105,12 +105,12 @@ public class EjectorItemEntity extends ItemEntity {
         alive = view.getBoolean("Alive", false);
         progress = view.getInt("Progress", 0);
         if (!alive) {
-            if (getWorld().getBlockEntity(getBlockPos()) instanceof EjectorBlockEntity ejector) {
+            if (getEntityWorld().getBlockEntity(getBlockPos()) instanceof EjectorBlockEntity ejector) {
                 loadLauncher(ejector);
             } else {
                 view.read("Launcher", EntityLauncher.CODEC).ifPresentOrElse(this::setLauncher, this::setIsAlive);
                 view.read("Direction", Direction.CODEC).ifPresentOrElse(this::setDirection, this::setIsAlive);
-                if (!alive && direction != null && getWorld().isClient()) {
+                if (!alive && direction != null && getEntityWorld().isClient()) {
                     data.calcRotate(direction.getOpposite());
                 }
             }
@@ -132,7 +132,7 @@ public class EjectorItemEntity extends ItemEntity {
 
     @Override
     public ItemEntity copy() {
-        ItemEntity copy = new ItemEntity(EntityType.ITEM, getWorld());
+        ItemEntity copy = new ItemEntity(EntityType.ITEM, getEntityWorld());
         copy.setStack(getStack().copy());
         copy.copyPositionAndRotation(this);
         copy.itemAge = itemAge;
@@ -154,7 +154,7 @@ public class EjectorItemEntity extends ItemEntity {
 
     @Override
     public void tick() {
-        boolean isClient = getWorld().isClient();
+        boolean isClient = getEntityWorld().isClient();
         if (alive) {
             if (isClient) {
                 data.tick();
@@ -199,7 +199,7 @@ public class EjectorItemEntity extends ItemEntity {
     private DirectBeltInputBehaviour getTargetOpenInv() {
         BlockPos targetPos = earlyTarget != null ? earlyTarget.getSecond() : getBlockPos().up(launcher.getVerticalDistance())
             .offset(getFacing(), Math.max(1, launcher.getHorizontalDistance()));
-        return BlockEntityBehaviour.get(getWorld(), targetPos, DirectBeltInputBehaviour.TYPE);
+        return BlockEntityBehaviour.get(getEntityWorld(), targetPos, DirectBeltInputBehaviour.TYPE);
     }
 
     private boolean scanTrajectoryForObstacles(boolean isClient, float time) {
@@ -209,7 +209,7 @@ public class EjectorItemEntity extends ItemEntity {
             data.calcRenderBox(source, target);
         }
 
-        World world = getWorld();
+        World world = getEntityWorld();
         BlockHitResult rayTraceBlocks = world.raycast(new RaycastContext(
             source,
             target,

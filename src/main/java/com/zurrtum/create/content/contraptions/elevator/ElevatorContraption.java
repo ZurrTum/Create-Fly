@@ -62,7 +62,7 @@ public class ElevatorContraption extends PulleyContraption {
             return;
 
         ColumnCoords coords = getGlobalColumn();
-        ElevatorColumn column = ElevatorColumn.get(entity.getWorld(), coords);
+        ElevatorColumn column = ElevatorColumn.get(entity.getEntityWorld(), coords);
 
         if (column == null)
             return;
@@ -71,7 +71,7 @@ public class ElevatorContraption extends PulleyContraption {
 
         namesList = column.compileNamesList();
         namesListVersion = column.namesListVersion;
-        if (entity.getWorld() instanceof ServerWorld serverWorld) {
+        if (entity.getEntityWorld() instanceof ServerWorld serverWorld) {
             serverWorld.getChunkManager().sendToOtherNearbyPlayers(entity, new ElevatorFloorListPacket(entity, namesList));
         }
     }

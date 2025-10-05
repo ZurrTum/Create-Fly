@@ -32,7 +32,7 @@ public class BlueprintRenderer extends EntityRenderer<BlueprintEntity, Blueprint
     @SuppressWarnings("unchecked")
     public void updateRenderState(BlueprintEntity entity, BlueprintState state, float tickProgress) {
         state.yaw = entity.getLerpedYaw(tickProgress);
-        state.world = entity.getWorld();
+        state.world = entity.getEntityWorld();
         state.pitch = entity.getPitch();
         int size = entity.size;
         Couple<ItemStack>[] sections = new Couple[size * size];

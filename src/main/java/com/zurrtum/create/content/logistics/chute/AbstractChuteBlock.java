@@ -89,12 +89,12 @@ public abstract class AbstractChuteBlock extends Block implements IWrenchable, I
         ItemStack stack = ItemHelper.fromItemEntity(entityIn);
         if (stack.isEmpty())
             return;
-        if (entityIn.getWorld().isClient())
+        if (entityIn.getEntityWorld().isClient())
             return;
         if (!entityIn.isAlive())
             return;
         BlockPos pos = BlockPos.ofFloored(entityIn.getPos().add(0, 0.5f, 0)).down();
-        DirectBeltInputBehaviour input = BlockEntityBehaviour.get(entityIn.getWorld(), pos, DirectBeltInputBehaviour.TYPE);
+        DirectBeltInputBehaviour input = BlockEntityBehaviour.get(entityIn.getEntityWorld(), pos, DirectBeltInputBehaviour.TYPE);
         if (input == null)
             return;
         if (!input.canInsertFromSide(Direction.UP))

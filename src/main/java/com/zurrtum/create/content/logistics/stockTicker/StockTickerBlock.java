@@ -93,13 +93,13 @@ public class StockTickerBlock extends HorizontalFacingBlock implements IBE<Stock
                     }
                     if (anySuccess) {
                         inventory.markDirty();
-                        player.getWorld().playSound(
+                        player.getEntityWorld().playSound(
                             null,
                             player.getBlockPos(),
                             SoundEvents.ENTITY_ITEM_PICKUP,
                             SoundCategory.PLAYERS,
                             .2f,
-                            1f + player.getWorld().random.nextFloat()
+                            1f + player.getEntityWorld().random.nextFloat()
                         );
                         return ActionResult.SUCCESS;
                     }

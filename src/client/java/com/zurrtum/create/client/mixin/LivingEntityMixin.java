@@ -14,7 +14,7 @@ public class LivingEntityMixin {
     @WrapOperation(method = "baseTick()V", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/LivingEntity;isAlive()Z", ordinal = 0))
     private boolean clientTick(LivingEntity entity, Operation<Boolean> original) {
         if (original.call(entity)) {
-            World world = entity.getWorld();
+            World world = entity.getEntityWorld();
             if (world.isClient() && entity instanceof ClientPlayerEntity clientPlayer) {
                 RemainingAirOverlay.update(clientPlayer, world);
             }

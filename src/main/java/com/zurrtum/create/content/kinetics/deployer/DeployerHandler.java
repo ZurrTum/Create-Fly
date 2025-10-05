@@ -131,7 +131,7 @@ public class DeployerHandler {
         Item item = stack.getItem();
 
         // Check for entities
-        final ServerWorld level = serverPlayer.getWorld();
+        final ServerWorld level = serverPlayer.getEntityWorld();
         List<Entity> entities = level.getNonSpectatingEntities(Entity.class, new Box(clickedPos)).stream()
             .filter(e -> !(e instanceof AbstractContraptionEntity)).toList();
         Hand hand = Hand.MAIN_HAND;
@@ -335,7 +335,7 @@ public class DeployerHandler {
         // <> PlayerInteractionManager#tryHarvestBlock
 
         ServerPlayerEntity serverPlayer = player.cast();
-        ServerWorld world = serverPlayer.getWorld();
+        ServerWorld world = serverPlayer.getEntityWorld();
         BlockState blockstate = world.getBlockState(pos);
         GameMode gameType = interactionManager.getGameMode();
 

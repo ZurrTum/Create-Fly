@@ -74,7 +74,7 @@ public class WorldshaperRenderHandler {
         Vec3d start = player.getPos().add(0, player.getStandingEyeHeight(), 0);
         Vec3d rotationVector = player.getRotationVector();
         Vec3d range = rotationVector.multiply(128);
-        World world = player.getWorld();
+        World world = player.getEntityWorld();
         BlockHitResult raytrace = world.raycast(new RaycastContext(start, start.add(range), ShapeType.OUTLINE, FluidHandling.NONE, player));
         if (raytrace == null || raytrace.getType() == Type.MISS) {
             renderedPositions = null;

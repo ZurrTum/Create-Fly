@@ -73,30 +73,30 @@ public abstract class ConductorBlockInteractionBehavior extends MovingInteractio
             Train train = carriageEntity.getCarriage().train;
             if (train == null)
                 return false;
-            if (player.getWorld().isClient())
+            if (player.getEntityWorld().isClient())
                 return true;
 
             if (train.runtime.getSchedule() != null) {
                 if (train.runtime.paused && !train.runtime.completed) {
                     train.runtime.paused = false;
-                    AllSoundEvents.CONFIRM.playOnServer(player.getWorld(), player.getBlockPos(), 1, 1);
+                    AllSoundEvents.CONFIRM.playOnServer(player.getEntityWorld(), player.getBlockPos(), 1, 1);
                     player.sendMessage(Text.translatable("create.schedule.continued"), true);
                     return true;
                 }
 
                 if (!itemInHand.isEmpty()) {
-                    AllSoundEvents.DENY.playOnServer(player.getWorld(), player.getBlockPos(), 1, 1);
+                    AllSoundEvents.DENY.playOnServer(player.getEntityWorld(), player.getBlockPos(), 1, 1);
                     player.sendMessage(Text.translatable("create.schedule.remove_with_empty_hand"), true);
                     return true;
                 }
 
-                player.getWorld().playSound(
+                player.getEntityWorld().playSound(
                     null,
                     player.getBlockPos(),
                     SoundEvents.ENTITY_ITEM_PICKUP,
                     SoundCategory.PLAYERS,
                     .2f,
-                    1f + player.getWorld().random.nextFloat()
+                    1f + player.getEntityWorld().random.nextFloat()
                 );
                 player.sendMessage(
                     Text.translatable(train.runtime.isAutoSchedule ? "create.schedule.auto_removed_from_train" : "create.schedule.removed_from_train"),
@@ -115,14 +115,14 @@ public abstract class ConductorBlockInteractionBehavior extends MovingInteractio
                 return false;
 
             if (schedule.entries.isEmpty()) {
-                AllSoundEvents.DENY.playOnServer(player.getWorld(), player.getBlockPos(), 1, 1);
+                AllSoundEvents.DENY.playOnServer(player.getEntityWorld(), player.getBlockPos(), 1, 1);
                 player.sendMessage(Text.translatable("create.schedule.no_stops"), true);
                 return true;
             }
             this.onScheduleUpdate(true, info.state(), newBlockState -> setBlockState(localPos, contraptionEntity, newBlockState));
             train.runtime.setSchedule(schedule, false);
             AllAdvancements.CONDUCTOR.trigger((ServerPlayerEntity) player);
-            AllSoundEvents.CONFIRM.playOnServer(player.getWorld(), player.getBlockPos(), 1, 1);
+            AllSoundEvents.CONFIRM.playOnServer(player.getEntityWorld(), player.getBlockPos(), 1, 1);
             player.sendMessage(Text.translatable("create.schedule.applied_to_train").formatted(Formatting.GREEN), true);
             itemInHand.decrement(1);
             player.setStackInHand(activeHand, itemInHand.isEmpty() ? ItemStack.EMPTY : itemInHand);
@@ -130,7 +130,7 @@ public abstract class ConductorBlockInteractionBehavior extends MovingInteractio
         }
 
         player.sendMessage(Text.translatable("create.schedule.non_controlling_seat"), true);
-        AllSoundEvents.DENY.playOnServer(player.getWorld(), player.getBlockPos(), 1, 1);
+        AllSoundEvents.DENY.playOnServer(player.getEntityWorld(), player.getBlockPos(), 1, 1);
         return true;
     }
 
