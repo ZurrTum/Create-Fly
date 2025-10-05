@@ -60,13 +60,13 @@ public record RadialSectorRenderState(
     }
 
     @Override
-    public void setupVertices(VertexConsumer vertexConsumer, float depth) {
+    public void setupVertices(VertexConsumer vertexConsumer) {
         for (int i = 0; i < innerPoints.size(); i++) {
             Point2D point = outerPoints.get(i);
-            vertexConsumer.vertex(pose, (float) point.getX(), (float) point.getY(), 0).color(outerRed, outerGreen, outerBlue, outerAlpha);
+            vertexConsumer.vertex(pose, (float) point.getX(), (float) point.getY()).color(outerRed, outerGreen, outerBlue, outerAlpha);
 
             point = innerPoints.get(i);
-            vertexConsumer.vertex(pose, (float) point.getX(), (float) point.getY(), 0).color(innerRed, innerGreen, innerBlue, innerAlpha);
+            vertexConsumer.vertex(pose, (float) point.getX(), (float) point.getY()).color(innerRed, innerGreen, innerBlue, innerAlpha);
         }
     }
 

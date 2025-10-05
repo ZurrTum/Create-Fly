@@ -22,11 +22,11 @@ public record TextureArrowRenderState(
     }
 
     @Override
-    public void setupVertices(VertexConsumer vertexConsumer, float depth) {
-        vertexConsumer.vertex(pose, -1, -1, depth).color(1f, 1f, 1f, alpha).texture(tx, ty);
-        vertexConsumer.vertex(pose, -1, 1, depth).color(1f, 1f, 1f, alpha).texture(tx, ty + th);
-        vertexConsumer.vertex(pose, 1, 1, depth).color(1f, 1f, 1f, alpha).texture(tx + tw, ty + th);
-        vertexConsumer.vertex(pose, 1, -1, depth).color(1f, 1f, 1f, alpha).texture(tx + tw, ty);
+    public void setupVertices(VertexConsumer vertexConsumer) {
+        vertexConsumer.vertex(pose, -1, -1).color(1f, 1f, 1f, alpha).texture(tx, ty);
+        vertexConsumer.vertex(pose, -1, 1).color(1f, 1f, 1f, alpha).texture(tx, ty + th);
+        vertexConsumer.vertex(pose, 1, 1).color(1f, 1f, 1f, alpha).texture(tx + tw, ty + th);
+        vertexConsumer.vertex(pose, 1, -1).color(1f, 1f, 1f, alpha).texture(tx + tw, ty);
     }
 
     @Override

@@ -39,11 +39,11 @@ public record GradientRectRenderState(
     }
 
     @Override
-    public void setupVertices(VertexConsumer vertexConsumer, float depth) {
-        vertexConsumer.vertex(pose, right, top, depth).color(startRed, startGreen, startBlue, startAlpha);
-        vertexConsumer.vertex(pose, left, top, depth).color(startRed, startGreen, startBlue, startAlpha);
-        vertexConsumer.vertex(pose, left, bottom, depth).color(endRed, endGreen, endBlue, endAlpha);
-        vertexConsumer.vertex(pose, right, bottom, depth).color(endRed, endGreen, endBlue, endAlpha);
+    public void setupVertices(VertexConsumer vertexConsumer) {
+        vertexConsumer.vertex(pose, right, top).color(startRed, startGreen, startBlue, startAlpha);
+        vertexConsumer.vertex(pose, left, top).color(startRed, startGreen, startBlue, startAlpha);
+        vertexConsumer.vertex(pose, left, bottom).color(endRed, endGreen, endBlue, endAlpha);
+        vertexConsumer.vertex(pose, right, bottom).color(endRed, endGreen, endBlue, endAlpha);
     }
 
     @Override

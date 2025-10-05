@@ -52,11 +52,11 @@ public record TexturedQuadRenderState(
     }
 
     @Override
-    public void setupVertices(VertexConsumer vertexConsumer, float depth) {
-        vertexConsumer.vertex(pose, left, bot, depth).color(red, green, blue, alpha).texture(u1, v2);
-        vertexConsumer.vertex(pose, right, bot, depth).color(red, green, blue, alpha).texture(u2, v2);
-        vertexConsumer.vertex(pose, right, top, depth).color(red, green, blue, alpha).texture(u2, v1);
-        vertexConsumer.vertex(pose, left, top, depth).color(red, green, blue, alpha).texture(u1, v1);
+    public void setupVertices(VertexConsumer vertexConsumer) {
+        vertexConsumer.vertex(pose, left, bot).color(red, green, blue, alpha).texture(u1, v2);
+        vertexConsumer.vertex(pose, right, bot).color(red, green, blue, alpha).texture(u2, v2);
+        vertexConsumer.vertex(pose, right, top).color(red, green, blue, alpha).texture(u2, v1);
+        vertexConsumer.vertex(pose, left, top).color(red, green, blue, alpha).texture(u1, v1);
     }
 
     @Override

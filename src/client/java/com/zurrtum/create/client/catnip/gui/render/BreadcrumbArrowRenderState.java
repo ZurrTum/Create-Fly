@@ -66,19 +66,19 @@ public record BreadcrumbArrowRenderState(
     }
 
     @Override
-    public void setupVertices(VertexConsumer vertexConsumer, float depth) {
-        vertexConsumer.vertex(pose, x1, y0, depth).color(fc2Red, fc2Green, fc2Blue, fc2Alpha);
-        vertexConsumer.vertex(pose, x0, y1, depth).color(fc1Red, fc1Green, fc1Blue, fc1Alpha);
-        vertexConsumer.vertex(pose, x1, y2, depth).color(fc2Red, fc2Green, fc2Blue, fc2Alpha);
-        vertexConsumer.vertex(pose, x2, y0, depth).color(fc3Red, fc3Green, fc3Blue, fc3Alpha);
-        vertexConsumer.vertex(pose, x2, y0, depth).color(fc3Red, fc3Green, fc3Blue, fc3Alpha);
-        vertexConsumer.vertex(pose, x1, y2, depth).color(fc2Red, fc2Green, fc2Blue, fc2Alpha);
-        vertexConsumer.vertex(pose, x2, y1, depth).color(fc3Red, fc3Green, fc3Blue, fc3Alpha);
-        vertexConsumer.vertex(pose, x3, y0, depth).color(fc4Red, fc4Green, fc4Blue, fc4Alpha);
-        vertexConsumer.vertex(pose, x2, y1, depth).color(fc3Red, fc3Green, fc3Blue, fc3Alpha);
-        vertexConsumer.vertex(pose, x1, y2, depth).color(fc2Red, fc2Green, fc2Blue, fc2Alpha);
-        vertexConsumer.vertex(pose, x2, y2, depth).color(fc3Red, fc3Green, fc3Blue, fc3Alpha);
-        vertexConsumer.vertex(pose, x3, y2, depth).color(fc4Red, fc4Green, fc4Blue, fc4Alpha);
+    public void setupVertices(VertexConsumer vertexConsumer) {
+        vertexConsumer.vertex(pose, x1, y0).color(fc2Red, fc2Green, fc2Blue, fc2Alpha);
+        vertexConsumer.vertex(pose, x0, y1).color(fc1Red, fc1Green, fc1Blue, fc1Alpha);
+        vertexConsumer.vertex(pose, x1, y2).color(fc2Red, fc2Green, fc2Blue, fc2Alpha);
+        vertexConsumer.vertex(pose, x2, y0).color(fc3Red, fc3Green, fc3Blue, fc3Alpha);
+        vertexConsumer.vertex(pose, x2, y0).color(fc3Red, fc3Green, fc3Blue, fc3Alpha);
+        vertexConsumer.vertex(pose, x1, y2).color(fc2Red, fc2Green, fc2Blue, fc2Alpha);
+        vertexConsumer.vertex(pose, x2, y1).color(fc3Red, fc3Green, fc3Blue, fc3Alpha);
+        vertexConsumer.vertex(pose, x3, y0).color(fc4Red, fc4Green, fc4Blue, fc4Alpha);
+        vertexConsumer.vertex(pose, x2, y1).color(fc3Red, fc3Green, fc3Blue, fc3Alpha);
+        vertexConsumer.vertex(pose, x1, y2).color(fc2Red, fc2Green, fc2Blue, fc2Alpha);
+        vertexConsumer.vertex(pose, x2, y2).color(fc3Red, fc3Green, fc3Blue, fc3Alpha);
+        vertexConsumer.vertex(pose, x3, y2).color(fc4Red, fc4Green, fc4Blue, fc4Alpha);
     }
 
     @Override

@@ -33,22 +33,22 @@ public record ArrowRenderState(
     }
 
     @Override
-    public void setupVertices(VertexConsumer vertexConsumer, float depth) {
-        vertexConsumer.vertex(pose, 0, -(10 + length), depth).color(r, g, b, a);
+    public void setupVertices(VertexConsumer vertexConsumer) {
+        vertexConsumer.vertex(pose, 0, -(10 + length)).color(r, g, b, a);
 
-        vertexConsumer.vertex(pose, -10, -3, 0).color(r, g, b, 0f);
-        vertexConsumer.vertex(pose, -4, -7, 0).color(r, g, b, 0f);
-        vertexConsumer.vertex(pose, -0, -8, 0).color(r, g, b, 0f);
+        vertexConsumer.vertex(pose, -10, -3).color(r, g, b, 0f);
+        vertexConsumer.vertex(pose, -4, -7).color(r, g, b, 0f);
+        vertexConsumer.vertex(pose, -0, -8).color(r, g, b, 0f);
 
-        vertexConsumer.vertex(pose, -0, -8, 0).color(r, g, b, 0f);
+        vertexConsumer.vertex(pose, -0, -8).color(r, g, b, 0f);
 
-        vertexConsumer.vertex(pose, 0, -8, 0).color(r, g, b, 0f);
-        vertexConsumer.vertex(pose, 4, -7, 0).color(r, g, b, 0f);
-        vertexConsumer.vertex(pose, 10, -3, 0).color(r, g, b, 0f);
+        vertexConsumer.vertex(pose, 0, -8).color(r, g, b, 0f);
+        vertexConsumer.vertex(pose, 4, -7).color(r, g, b, 0f);
+        vertexConsumer.vertex(pose, 10, -3).color(r, g, b, 0f);
 
-        vertexConsumer.vertex(pose, 10, -3, 0).color(r, g, b, 0f);
-        vertexConsumer.vertex(pose, 10, -3, 0).color(r, g, b, 0f);
-        vertexConsumer.vertex(pose, 10, -3, 0).color(r, g, b, 0f);
+        vertexConsumer.vertex(pose, 10, -3).color(r, g, b, 0f);
+        vertexConsumer.vertex(pose, 10, -3).color(r, g, b, 0f);
+        vertexConsumer.vertex(pose, 10, -3).color(r, g, b, 0f);
     }
 
     @Override
