@@ -70,11 +70,10 @@ public class IngredientTextContent implements TextContent {
 
     public Ingredient ingredient;
     public Text name;
-    public static final Type<IngredientTextContent> TYPE = new Type<>(CODEC, "translatable");
 
     @Override
-    public Type<?> getType() {
-        return TYPE;
+    public MapCodec<? extends TextContent> getCodec() {
+        return CODEC;
     }
 
     public IngredientTextContent(Ingredient ingredient) {
