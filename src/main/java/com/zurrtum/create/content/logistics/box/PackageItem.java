@@ -291,7 +291,7 @@ public class PackageItem extends Item implements EntityItem {
                     continue;
 
                 if (itemstack.getItem() instanceof SpawnEggItem sei && worldIn instanceof ServerWorld sl) {
-                    EntityType<?> entitytype = sei.getEntityType(sl.getRegistryManager(), itemstack);
+                    EntityType<?> entitytype = sei.getEntityType(itemstack);
                     Entity entity = entitytype.spawnFromItemStack(
                         sl,
                         itemstack,

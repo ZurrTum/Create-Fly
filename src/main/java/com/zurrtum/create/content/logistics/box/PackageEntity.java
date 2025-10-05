@@ -370,7 +370,7 @@ public class PackageEntity extends LivingEntity {
             ItemStack itemstack = contents.getStack(i);
 
             if (itemstack.getItem() instanceof SpawnEggItem sei) {
-                EntityType<?> entitytype = sei.getEntityType(getRegistryManager(), itemstack);
+                EntityType<?> entitytype = sei.getEntityType(itemstack);
                 Entity entity = entitytype.spawnFromItemStack(level, itemstack, null, getBlockPos(), SpawnReason.SPAWN_ITEM_USE, false, false);
                 if (entity != null)
                     itemstack.decrement(1);

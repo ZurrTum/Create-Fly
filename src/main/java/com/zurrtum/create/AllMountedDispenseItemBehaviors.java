@@ -46,7 +46,7 @@ public class AllMountedDispenseItemBehaviors {
                 return super.execute(stack, context, pos, facing);
 
             if (context.world instanceof ServerWorld serverLevel) {
-                EntityType<?> type = egg.getEntityType(serverLevel.getRegistryManager(), stack);
+                EntityType<?> type = egg.getEntityType(stack);
                 BlockPos offset = BlockPos.ofFloored(facing.x + .7, facing.y + .7, facing.z + .7);
                 Entity entity = type.spawnFromItemStack(serverLevel, stack, null, pos.add(offset), SpawnReason.DISPENSER, facing.y < .5, false);
                 if (entity != null) {
