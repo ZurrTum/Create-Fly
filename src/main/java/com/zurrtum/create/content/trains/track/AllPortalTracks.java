@@ -133,7 +133,7 @@ public class AllPortalTracks {
         if (dimensiontransition == null)
             return null;
 
-        if (!minecraftServer.isWorldAllowed(dimensiontransition.world()))
+        if (!minecraftServer.isEnterableWithPortal(dimensiontransition.world()))
             return null;
 
         BlockPos otherPortalPos = BlockPos.ofFloored(dimensiontransition.position());
