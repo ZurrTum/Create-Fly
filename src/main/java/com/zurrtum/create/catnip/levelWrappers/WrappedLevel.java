@@ -26,6 +26,7 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.MutableWorldProperties;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldProperties;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.chunk.ChunkManager;
 import net.minecraft.world.chunk.light.LightingProvider;
@@ -58,6 +59,11 @@ public class WrappedLevel extends World {
             0
         );
         this.level = level;
+    }
+
+    @Override
+    public WorldProperties.SpawnPoint getSpawnPoint() {
+        return level.getSpawnPoint();
     }
 
     public Collection<EnderDragonPart> getEnderDragonParts() {
