@@ -96,7 +96,7 @@ public class SlidingDoorRenderer extends SafeBlockEntityRenderer<SlidingDoorBloc
     }
 
     public static Pair<ScrollInput, Label> createWidget(MinecraftClient mc, int x, int y, Consumer<DoorControl> callback, DoorControl initial) {
-        Entity entity = mc.cameraEntity;
+        Entity entity = mc.getCameraEntity();
         DoorControl playerFacing = entity != null ? switch (entity.getHorizontalFacing()) {
             case EAST -> DoorControl.EAST;
             case WEST -> DoorControl.WEST;

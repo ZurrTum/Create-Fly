@@ -135,7 +135,7 @@ public class FilteringRenderer {
 
         for (FilteringBehaviour<?> behaviour : behaviours) {
             if (!be.isVirtual()) {
-                Entity cameraEntity = MinecraftClient.getInstance().cameraEntity;
+                Entity cameraEntity = MinecraftClient.getInstance().getCameraEntity();
                 if (cameraEntity != null && level == cameraEntity.getEntityWorld()) {
                     float max = behaviour.getRenderDistance();
                     if (cameraEntity.getEntityPos().squaredDistanceTo(VecHelper.getCenterOf(blockPos)) > (max * max)) {

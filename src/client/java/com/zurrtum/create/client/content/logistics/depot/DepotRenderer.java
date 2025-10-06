@@ -131,7 +131,7 @@ public class DepotRenderer extends SafeBlockEntityRenderer<DepotBlockEntity> {
         msr.rotateYDegrees(angle);
 
         if (renderUpright) {
-            Entity renderViewEntity = MinecraftClient.getInstance().cameraEntity;
+            Entity renderViewEntity = MinecraftClient.getInstance().getCameraEntity();
             if (renderViewEntity != null) {
                 Vec3d positionVec = renderViewEntity.getEntityPos();
                 Vec3d vectorForOffset = itemPosition;

@@ -135,7 +135,7 @@ public class NixieTubeRenderer extends SafeBlockEntityRenderer<NixieTubeBlockEnt
     ) {
         BlockState blockState = be.getCachedState();
         Direction facing = NixieTubeBlock.getFacing(blockState);
-        Vec3d observerVec = mc.cameraEntity.getCameraPosVec(partialTicks);
+        Vec3d observerVec = mc.getCameraEntity().getCameraPosVec(partialTicks);
         var msr = TransformStack.of(ms);
 
         if (facing == Direction.DOWN)

@@ -93,7 +93,7 @@ public class SoundScapes {
     }
 
     protected static BlockPos getCameraPos() {
-        Entity renderViewEntity = MinecraftClient.getInstance().cameraEntity;
+        Entity renderViewEntity = MinecraftClient.getInstance().getCameraEntity();
         if (renderViewEntity == null)
             return BlockPos.ORIGIN;
         return renderViewEntity.getBlockPos();

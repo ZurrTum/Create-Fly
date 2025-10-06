@@ -231,11 +231,11 @@ public class PonderScene {
     public void renderScene(SuperRenderTypeBuffer buffer, MatrixStack ms, float pt) {
         ms.push();
         MinecraftClient mc = MinecraftClient.getInstance();
-        Entity prevRVE = mc.cameraEntity;
+        Entity prevRVE = mc.getCameraEntity();
 
-        mc.cameraEntity = renderViewEntity;
+        mc.setCameraEntity(renderViewEntity);
         forEachVisible(PonderSceneElement.class, e -> e.renderFirst(world, buffer, ms, pt));
-        mc.cameraEntity = prevRVE;
+        mc.setCameraEntity(prevRVE);
 
         for (BlockRenderLayer type : BlockRenderLayer.values())
             forEachVisible(PonderSceneElement.class, e -> e.renderLayer(world, buffer, type, ms, pt));

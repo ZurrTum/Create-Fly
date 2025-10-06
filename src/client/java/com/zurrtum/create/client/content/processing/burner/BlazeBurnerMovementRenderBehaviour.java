@@ -63,7 +63,7 @@ public class BlazeBurnerMovementRenderBehaviour implements MovementRenderBehavio
             return cce.getInitialOrientation().getAxis() == Direction.Axis.X ? angle + 180 : angle;
         }
 
-        Entity player = MinecraftClient.getInstance().cameraEntity;
+        Entity player = MinecraftClient.getInstance().getCameraEntity();
         if (player != null && !player.isInvisible() && context.position != null) {
             Vec3d applyRotation = context.contraption.entity.reverseRotation(player.getEntityPos().subtract(context.position), 1);
             double dx = applyRotation.x;

@@ -82,7 +82,7 @@ public class LinkRenderer {
         if (be == null || be.isRemoved())
             return;
 
-        Entity cameraEntity = MinecraftClient.getInstance().cameraEntity;
+        Entity cameraEntity = MinecraftClient.getInstance().getCameraEntity();
         float max = AllConfigs.client().filterItemRenderDistance.getF();
         if (!be.isVirtual() && cameraEntity != null && cameraEntity.getEntityPos()
             .squaredDistanceTo(VecHelper.getCenterOf(be.getPos())) > (max * max))

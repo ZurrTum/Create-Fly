@@ -16,7 +16,7 @@ public class BigOutlines {
     static BlockHitResult result = null;
 
     public static void pick(MinecraftClient mc) {
-        if (!(mc.cameraEntity instanceof ClientPlayerEntity player))
+        if (!(mc.getCameraEntity() instanceof ClientPlayerEntity player))
             return;
         if (mc.world == null)
             return;

@@ -41,7 +41,7 @@ public class WhistleAudioBehaviour extends AudioBehaviour<WhistleBlockEntity> {
         float f = (float) Math.pow(2, -blockEntity.pitch / 12.0);
         boolean particle = world.getTime() % 8 == 0;
         MinecraftClient mc = MinecraftClient.getInstance();
-        Vec3d eyePosition = mc.cameraEntity.getEyePos();
+        Vec3d eyePosition = mc.getCameraEntity().getEyePos();
         float maxVolume = (float) MathHelper.clamp((64 - eyePosition.distanceTo(Vec3d.ofCenter(pos))) / 64, 0, 1);
 
         WhistleSize size = blockEntity.getOctave();

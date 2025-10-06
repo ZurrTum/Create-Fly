@@ -41,7 +41,7 @@ public class TrackBlockOutline {
     public static BezierPointSelection result;
 
     public static void pickCurves(MinecraftClient mc) {
-        if (!(mc.cameraEntity instanceof ClientPlayerEntity player))
+        if (!(mc.getCameraEntity() instanceof ClientPlayerEntity player))
             return;
         if (mc.world == null)
             return;

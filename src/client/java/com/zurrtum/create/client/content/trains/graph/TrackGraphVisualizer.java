@@ -24,7 +24,7 @@ import java.util.UUID;
 public class TrackGraphVisualizer {
 
     public static void visualiseSignalEdgeGroups(MinecraftClient mc, TrackGraph graph) {
-        Entity cameraEntity = mc.cameraEntity;
+        Entity cameraEntity = mc.getCameraEntity();
         if (cameraEntity == null)
             return;
         Box box = graph.getBounds(mc.world).box;
@@ -192,7 +192,7 @@ public class TrackGraphVisualizer {
     }
 
     public static void debugViewGraph(MinecraftClient mc, TrackGraph graph, boolean extended) {
-        Entity cameraEntity = mc.cameraEntity;
+        Entity cameraEntity = mc.getCameraEntity();
         if (cameraEntity == null)
             return;
         Box box = graph.getBounds(mc.world).box;

@@ -51,7 +51,7 @@ public class CarriageParticleBehaviour extends EntityBehaviour<CarriageContrapti
         if (carriage == null)
             return;
         MinecraftClient mc = MinecraftClient.getInstance();
-        Entity camEntity = mc.cameraEntity;
+        Entity camEntity = mc.getCameraEntity();
         if (camEntity == null)
             return;
         Carriage.DimensionalCarriageEntity dce = carriage.getDimensional(entity.getEntityWorld());

@@ -68,7 +68,7 @@ public class CarriageAudioBehaviour extends EntityBehaviour<CarriageContraptionE
         if (carriage == null)
             return;
         MinecraftClient mc = MinecraftClient.getInstance();
-        Entity camEntity = mc.cameraEntity;
+        Entity camEntity = mc.getCameraEntity();
         if (camEntity == null)
             return;
         DimensionalCarriageEntity dce = carriage.getDimensional(entity.getEntityWorld());
