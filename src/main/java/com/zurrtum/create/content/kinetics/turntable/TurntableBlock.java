@@ -35,7 +35,7 @@ public class TurntableBlock extends KineticBlock implements IBE<TurntableBlockEn
     }
 
     @Override
-    public void onEntityCollision(BlockState state, World worldIn, BlockPos pos, Entity e, EntityCollisionHandler handler) {
+    public void onEntityCollision(BlockState state, World worldIn, BlockPos pos, Entity e, EntityCollisionHandler handler, boolean bl) {
         if (!e.isOnGround())
             return;
         if (e.getVelocity().y > 0)

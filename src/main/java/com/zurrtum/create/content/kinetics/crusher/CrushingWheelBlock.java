@@ -125,7 +125,7 @@ public class CrushingWheelBlock extends RotatedPillarKineticBlock implements IBE
     }
 
     @Override
-    public void onEntityCollision(BlockState state, World worldIn, BlockPos pos, Entity entityIn, EntityCollisionHandler handler) {
+    public void onEntityCollision(BlockState state, World worldIn, BlockPos pos, Entity entityIn, EntityCollisionHandler handler, boolean bl) {
         if (entityIn.getY() < pos.getY() + 1.25f || !entityIn.isOnGround())
             return;
 

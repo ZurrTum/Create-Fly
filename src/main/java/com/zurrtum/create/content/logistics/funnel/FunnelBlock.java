@@ -113,7 +113,7 @@ public abstract class FunnelBlock extends AbstractDirectionalFunnelBlock {
     }
 
     @Override
-    public void onEntityCollision(BlockState state, World worldIn, BlockPos pos, Entity entityIn, EntityCollisionHandler entityCollisionHandler) {
+    public void onEntityCollision(BlockState state, World worldIn, BlockPos pos, Entity entityIn, EntityCollisionHandler handler, boolean bl) {
         if (worldIn.isClient())
             return;
         ItemStack stack = ItemHelper.fromItemEntity(entityIn);

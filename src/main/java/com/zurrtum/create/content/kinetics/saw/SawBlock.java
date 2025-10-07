@@ -159,7 +159,7 @@ public class SawBlock extends DirectionalAxisKineticBlock implements IBE<SawBloc
     }
 
     @Override
-    public void onEntityCollision(BlockState state, World worldIn, BlockPos pos, Entity entityIn, EntityCollisionHandler handler) {
+    public void onEntityCollision(BlockState state, World worldIn, BlockPos pos, Entity entityIn, EntityCollisionHandler handler, boolean bl) {
         if (worldIn.isClient() || entityIn instanceof ItemEntity)
             return;
         if (!new Box(pos).contract(.1f).intersects(entityIn.getBoundingBox()))

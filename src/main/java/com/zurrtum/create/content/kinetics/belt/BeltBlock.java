@@ -148,11 +148,11 @@ public class BeltBlock extends HorizontalKineticBlock implements IBE<BeltBlockEn
         if (!(worldIn instanceof World world))
             return;
 
-        onEntityCollision(worldIn.getBlockState(beltPos), world, beltPos, entityIn, EntityCollisionHandler.DUMMY);
+        onEntityCollision(worldIn.getBlockState(beltPos), world, beltPos, entityIn, EntityCollisionHandler.DUMMY, false);
     }
 
     @Override
-    public void onEntityCollision(BlockState state, World worldIn, BlockPos pos, Entity entityIn, EntityCollisionHandler handler) {
+    public void onEntityCollision(BlockState state, World worldIn, BlockPos pos, Entity entityIn, EntityCollisionHandler handler, boolean bl) {
         if (!canTransportObjects(state))
             return;
         if (entityIn instanceof PlayerEntity player) {

@@ -76,7 +76,7 @@ public class CrushingWheelControllerBlock extends FacingBlock implements IBE<Cru
     }
 
     @Override
-    public void onEntityCollision(BlockState state, World worldIn, BlockPos pos, Entity entityIn, EntityCollisionHandler handler) {
+    public void onEntityCollision(BlockState state, World worldIn, BlockPos pos, Entity entityIn, EntityCollisionHandler handler, boolean bl) {
         if (!state.get(VALID))
             return;
 
