@@ -22,9 +22,11 @@ import com.zurrtum.create.infrastructure.packet.c2s.StockKeeperCategoryEditPacke
 import com.zurrtum.create.infrastructure.packet.c2s.StockKeeperCategoryRefundPacket;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
+import net.minecraft.client.gui.Click;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.Drawable;
 import net.minecraft.client.gui.widget.TextFieldWidget;
+import net.minecraft.client.input.MouseInput;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.util.math.Rect2i;
 import net.minecraft.component.DataComponentTypes;
@@ -120,7 +122,7 @@ public class StockKeeperCategoryScreen extends AbstractSimiContainerScreen<Stock
         editorEditBox.setEditableColor(0xffeeeeee);
         editorEditBox.setDrawsBackground(false);
         editorEditBox.setFocused(false);
-        editorEditBox.mouseClicked(0, 0, 0);
+        editorEditBox.mouseClicked(new Click(0, 0, new MouseInput(0, 0)), false);
         editorEditBox.setMaxLength(28);
         editorEditBox.setText(index == -1 || schedule.get(index).isEmpty() ? CreateLang.translate("gui.stock_ticker.new_category")
             .string() : schedule.get(index).getName().getString());
@@ -381,18 +383,20 @@ public class StockKeeperCategoryScreen extends AbstractSimiContainerScreen<Stock
     }
 
     @Override
-    public boolean mouseClicked(double pMouseX, double pMouseY, int pButton) {
+    public boolean mouseClicked(Click click, boolean doubled) {
+        double pMouseX = click.x();
+        double pMouseY = click.y();
         if (editorConfirm != null && editorConfirm.isMouseOver(pMouseX, pMouseY)) {
             stopEditing();
             return true;
         }
-        if (action(null, pMouseX, pMouseY, pButton)) {
+        if (action(null, pMouseX, pMouseY, click.button())) {
             playUiSound(SoundEvents.UI_BUTTON_CLICK.value(), 1f, 1f);
             return true;
         }
 
         boolean wasNotFocused = editorEditBox != null && !editorEditBox.isFocused();
-        boolean mouseClicked = super.mouseClicked(pMouseX, pMouseY, pButton);
+        boolean mouseClicked = super.mouseClicked(click, doubled);
 
         if (editorEditBox != null && editorEditBox.isMouseOver(pMouseX, pMouseY) && wasNotFocused) {
             editorEditBox.setCursorToEnd(false);

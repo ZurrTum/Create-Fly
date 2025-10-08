@@ -3,6 +3,7 @@ package com.zurrtum.create.client.catnip.gui.widget;
 import com.zurrtum.create.catnip.data.Couple;
 import com.zurrtum.create.catnip.theme.Color;
 import com.zurrtum.create.client.catnip.gui.TickableGuiEventListener;
+import net.minecraft.client.gui.Click;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.narration.NarrationMessageBuilder;
 import net.minecraft.client.gui.widget.ClickableWidget;
@@ -111,8 +112,8 @@ public abstract class AbstractSimiWidget extends ClickableWidget implements Tick
     }
 
     @Override
-    public void onClick(double mouseX, double mouseY) {
-        runCallback(mouseX, mouseY);
+    public void onClick(Click click, boolean doubled) {
+        runCallback(click.x(), click.y());
     }
 
     @Override

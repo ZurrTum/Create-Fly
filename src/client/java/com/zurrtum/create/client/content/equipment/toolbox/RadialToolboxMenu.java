@@ -13,7 +13,9 @@ import com.zurrtum.create.content.equipment.toolbox.ToolboxBlockEntity;
 import com.zurrtum.create.content.equipment.toolbox.ToolboxInventory;
 import com.zurrtum.create.infrastructure.packet.c2s.ToolboxDisposeAllPacket;
 import com.zurrtum.create.infrastructure.packet.c2s.ToolboxEquipPacket;
+import net.minecraft.client.gui.Click;
 import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.input.MouseInput;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.client.util.Window;
@@ -286,8 +288,9 @@ public class RadialToolboxMenu extends AbstractSimiScreen {
     }
 
     @Override
-    public boolean mouseClicked(double x, double y, int button) {
+    public boolean mouseClicked(Click click, boolean doubled) {
         int selected = scrollMode ? scrollSlot : hoveredSlot;
+        int button = click.button();
 
         if (button == 0) {
             if (selected == DEPOSIT) {
@@ -334,7 +337,7 @@ public class RadialToolboxMenu extends AbstractSimiScreen {
             }
         }
 
-        return super.mouseClicked(x, y, button);
+        return super.mouseClicked(click, doubled);
     }
 
     @Override
@@ -356,7 +359,7 @@ public class RadialToolboxMenu extends AbstractSimiScreen {
 
                 scrollMode = true;
                 scrollSlot = i;
-                mouseClicked(0, 0, 0);
+                mouseClicked(new Click(0, 0, new MouseInput(0, 0)), false);
                 return true;
             }
         }

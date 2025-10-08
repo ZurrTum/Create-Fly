@@ -9,6 +9,7 @@ import com.zurrtum.create.client.catnip.gui.element.GuiGameElement;
 import com.zurrtum.create.client.catnip.gui.widget.BoxWidget;
 import com.zurrtum.create.client.ponder.foundation.PonderTag;
 import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.input.MouseInput;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.MathHelper;
@@ -132,7 +133,7 @@ public class PonderButton extends BoxWidget {
     }
 
     @Override
-    protected boolean isValidClickButton(int i) {
+    protected boolean isValidClickButton(MouseInput input) {
         return isVisible();
     }
 

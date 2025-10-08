@@ -16,8 +16,10 @@ import com.zurrtum.create.client.foundation.gui.widget.TooltipArea;
 import com.zurrtum.create.client.foundation.utility.CreateLang;
 import com.zurrtum.create.content.decoration.slidingDoor.DoorControl;
 import com.zurrtum.create.infrastructure.packet.c2s.ElevatorContactEditPacket;
+import net.minecraft.client.gui.Click;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.widget.TextFieldWidget;
+import net.minecraft.client.input.MouseInput;
 import net.minecraft.screen.ScreenTexts;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.OrderedText;
@@ -124,7 +126,7 @@ public class ElevatorContactScreen extends AbstractSimiScreen {
         editBox.setDrawsBackground(false);
         editBox.setMaxLength(chars);
         editBox.setFocused(false);
-        editBox.mouseClicked(0, 0, 0);
+        editBox.mouseClicked(new Click(0, 0, new MouseInput(0, 0)), false);
         addDrawableChild(editBox);
         return editBox;
     }
@@ -150,8 +152,8 @@ public class ElevatorContactScreen extends AbstractSimiScreen {
     }
 
     @Override
-    public boolean mouseClicked(double pMouseX, double pMouseY, int pButton) {
-        boolean consumed = super.mouseClicked(pMouseX, pMouseY, pButton);
+    public boolean mouseClicked(Click click, boolean doubled) {
+        boolean consumed = super.mouseClicked(click, doubled);
 
         if (!shortNameInput.isFocused()) {
             int length = shortNameInput.getText().length();
@@ -160,9 +162,9 @@ public class ElevatorContactScreen extends AbstractSimiScreen {
         }
 
         if (shortNameInput.isSelected())
-            longNameInput.mouseClicked(0, 0, 0);
+            longNameInput.mouseClicked(new Click(0, 0, new MouseInput(0, 0)), false);
 
-        if (!consumed && pMouseX > guiLeft + 22 && pMouseY > guiTop + 24 && pMouseX < guiLeft + 50 && pMouseY < guiTop + 40) {
+        if (!consumed && click.x() > guiLeft + 22 && click.y() > guiTop + 24 && click.x() < guiLeft + 50 && click.y() < guiTop + 40) {
             setFocused(shortNameInput);
             shortNameInput.setFocused(true);
             return true;

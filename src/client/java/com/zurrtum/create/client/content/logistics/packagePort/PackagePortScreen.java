@@ -16,8 +16,10 @@ import com.zurrtum.create.content.logistics.packagePort.frogport.FrogportBlockEn
 import com.zurrtum.create.foundation.gui.menu.MenuType;
 import com.zurrtum.create.infrastructure.packet.c2s.PackagePortConfigurationPacket;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.Click;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.widget.TextFieldWidget;
+import net.minecraft.client.input.MouseInput;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.client.util.math.Rect2i;
 import net.minecraft.entity.player.PlayerInventory;
@@ -77,7 +79,7 @@ public class PackagePortScreen extends AbstractSimiContainerScreen<PackagePortMe
         addressBox.setEditableColor(0xFF3D3C48);
         addressBox.setText(handler.contentHolder.addressFilter);
         addressBox.setFocused(false);
-        addressBox.mouseClicked(0, 0, 0);
+        addressBox.mouseClicked(new Click(0, 0, new MouseInput(0, 0)), false);
         addressBox.setChangedListener(onTextChanged);
         addressBox.setX(nameBoxX(addressBox.getText(), addressBox));
         addDrawableChild(addressBox);

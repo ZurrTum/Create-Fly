@@ -6,6 +6,7 @@ import com.zurrtum.create.catnip.theme.Color;
 import com.zurrtum.create.client.catnip.gui.UIRenderHelper;
 import com.zurrtum.create.client.catnip.gui.element.BoxElement;
 import com.zurrtum.create.client.catnip.gui.element.FadableScreenElement;
+import net.minecraft.client.gui.Click;
 import net.minecraft.client.gui.DrawContext;
 import org.jetbrains.annotations.Nullable;
 
@@ -114,8 +115,8 @@ public class BoxWidget extends ElementWidget {
     }
 
     @Override
-    public void onClick(double x, double y) {
-        super.onClick(x, y);
+    public void onClick(Click click, boolean doubled) {
+        super.onClick(click, doubled);
 
         gradientColor = getColorClick();
         startGradientAnimation(getColorForState(), 0.15);

@@ -24,8 +24,10 @@ import com.zurrtum.create.content.trains.station.StationBlockEntity;
 import com.zurrtum.create.infrastructure.packet.c2s.StationEditPacket;
 import com.zurrtum.create.infrastructure.packet.c2s.TrainEditPacket;
 import net.minecraft.client.gl.RenderPipelines;
+import net.minecraft.client.gui.Click;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.widget.TextFieldWidget;
+import net.minecraft.client.input.MouseInput;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.screen.ScreenTexts;
 import net.minecraft.text.MutableText;
@@ -86,7 +88,7 @@ public class StationScreen extends AbstractStationScreen {
         nameBox.setEditableColor(0xFF592424);
         nameBox.setText(station.name);
         nameBox.setFocused(false);
-        nameBox.mouseClicked(0, 0, 0);
+        nameBox.mouseClicked(new Click(0, 0, new MouseInput(0, 0)), false);
         nameBox.setChangedListener(onTextChanged);
         nameBox.setX(nameBoxX(nameBox.getText(), nameBox));
         addDrawableChild(nameBox);
@@ -131,7 +133,7 @@ public class StationScreen extends AbstractStationScreen {
         trainNameBox.setMaxLength(35);
         trainNameBox.setEditableColor(0xFFC6C6C6);
         trainNameBox.setFocused(false);
-        trainNameBox.mouseClicked(0, 0, 0);
+        trainNameBox.mouseClicked(new Click(0, 0, new MouseInput(0, 0)), false);
         trainNameBox.setChangedListener(onTextChanged);
         trainNameBox.active = false;
 
@@ -385,7 +387,9 @@ public class StationScreen extends AbstractStationScreen {
     }
 
     @Override
-    public boolean mouseClicked(double pMouseX, double pMouseY, int pButton) {
+    public boolean mouseClicked(Click click, boolean doubled) {
+        double pMouseX = click.x();
+        double pMouseY = click.y();
         if (!nameBox.isFocused() && pMouseY > guiTop && pMouseY < guiTop + 14 && pMouseX > guiLeft && pMouseX < guiLeft + background.getWidth()) {
             nameBox.setFocused(true);
             nameBox.setSelectionEnd(0);
@@ -398,7 +402,7 @@ public class StationScreen extends AbstractStationScreen {
             setFocused(trainNameBox);
             return true;
         }
-        return super.mouseClicked(pMouseX, pMouseY, pButton);
+        return super.mouseClicked(click, doubled);
     }
 
     @Override

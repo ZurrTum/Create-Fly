@@ -23,6 +23,7 @@ import com.zurrtum.create.infrastructure.packet.c2s.ConfigureThresholdSwitchPack
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.RedstoneTorchBlock;
+import net.minecraft.client.gui.Click;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
@@ -142,14 +143,16 @@ public class ThresholdSwitchScreen extends AbstractSimiScreen {
     }
 
     @Override
-    public boolean mouseClicked(double mouseX, double mouseY, int pButton) {
+    public boolean mouseClicked(Click click, boolean doubled) {
         int itemX = guiLeft + 13;
         int itemY = guiTop + 80;
+        double mouseX = click.x();
+        double mouseY = click.y();
         if (mouseX >= itemX && mouseX < itemX + 16 && mouseY >= itemY && mouseY < itemY + 16) {
             ScreenOpener.open(new PonderTagScreen(AllCreatePonderTags.THRESHOLD_SWITCH_TARGETS));
             return true;
         }
-        return super.mouseClicked(mouseX, mouseY, pButton);
+        return super.mouseClicked(click, doubled);
     }
 
     @Override

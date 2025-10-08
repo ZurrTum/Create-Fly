@@ -17,6 +17,7 @@ import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.ints.IntList;
 import net.minecraft.client.font.TextHandler;
 import net.minecraft.client.font.TextRenderer;
+import net.minecraft.client.gui.Click;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.PageTurnWidget;
@@ -545,10 +546,10 @@ public class ClipboardScreen extends AbstractSimiScreen {
         return new Pos2i(pLocalScreenPos.x + (width - 192) / 2 + 36 - 10, pLocalScreenPos.y + 32 + 24 + yOffsetOfEditingEntry() + guiTop - 14);
     }
 
-    public boolean mouseClicked(double pMouseX, double pMouseY, int pButton) {
-        if (super.mouseClicked(pMouseX, pMouseY, pButton))
+    public boolean mouseClicked(Click click, boolean doubled) {
+        if (super.mouseClicked(click, doubled))
             return true;
-        if (pButton != 0)
+        if (click.button() != 0)
             return true;
 
         if (hoveredEntry != -1) {
@@ -588,6 +589,8 @@ public class ClipboardScreen extends AbstractSimiScreen {
         if (editingIndex == -1)
             return false;
 
+        double pMouseX = click.x();
+        double pMouseY = click.y();
         if (pMouseX < guiLeft + 50 || pMouseX > guiLeft + 220 || pMouseY < guiTop + 30 || pMouseY > guiTop + 230) {
             setFocused(null);
             clearDisplayCache();
@@ -622,16 +625,16 @@ public class ClipboardScreen extends AbstractSimiScreen {
         editContext.setSelection(TextHandler.moveCursorByWords(s, -1, pIndex, false), TextHandler.moveCursorByWords(s, 1, pIndex, false));
     }
 
-    public boolean mouseDragged(double pMouseX, double pMouseY, int pButton, double pDragX, double pDragY) {
-        if (super.mouseDragged(pMouseX, pMouseY, pButton, pDragX, pDragY))
+    public boolean mouseDragged(Click click, double pDragX, double pDragY) {
+        if (super.mouseDragged(click, pDragX, pDragY))
             return true;
-        if (pButton != 0)
+        if (click.button() != 0)
             return true;
         if (editingIndex == -1)
             return false;
 
         DisplayCache cache = getDisplayCache();
-        int i = cache.getIndexAtPosition(textRenderer, convertScreenToLocal(new Pos2i((int) pMouseX, (int) pMouseY)));
+        int i = cache.getIndexAtPosition(textRenderer, convertScreenToLocal(new Pos2i((int) click.x(), (int) click.y())));
         editContext.moveCursorTo(i, true);
         clearDisplayCache();
         return true;

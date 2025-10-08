@@ -13,8 +13,10 @@ import com.zurrtum.create.client.foundation.gui.widget.Label;
 import com.zurrtum.create.client.foundation.gui.widget.ScrollInput;
 import com.zurrtum.create.client.foundation.gui.widget.SelectionScrollInput;
 import com.zurrtum.create.client.foundation.utility.CreateLang;
+import net.minecraft.client.gui.Click;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.widget.TextFieldWidget;
+import net.minecraft.client.input.MouseInput;
 import net.minecraft.item.ItemStack;
 import net.minecraft.screen.ScreenTexts;
 import net.minecraft.structure.StructurePlacementData;
@@ -79,7 +81,7 @@ public class SchematicEditScreen extends AbstractSimiScreen {
             widget.setDrawsBackground(false);
             widget.setEditableColor(0xFFFFFFFF);
             widget.setFocused(false);
-            widget.mouseClicked(0, 0, 0);
+            widget.mouseClicked(new Click(0, 0, new MouseInput(0, 0)), false);
             widget.setTextPredicate(s -> {
                 if (s.isEmpty() || s.equals("-"))
                     return true;

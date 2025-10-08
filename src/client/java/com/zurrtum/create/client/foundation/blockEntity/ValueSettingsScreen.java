@@ -10,6 +10,7 @@ import com.zurrtum.create.client.foundation.gui.AllIcons;
 import com.zurrtum.create.client.foundation.utility.CreateLang;
 import com.zurrtum.create.foundation.blockEntity.behaviour.ValueSettings;
 import com.zurrtum.create.infrastructure.packet.c2s.ValueSettingsPacket;
+import net.minecraft.client.gui.Click;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.sound.PositionedSoundInstance;
 import net.minecraft.client.util.Window;
@@ -313,12 +314,12 @@ public class ValueSettingsScreen extends AbstractSimiScreen {
     }
 
     @Override
-    public boolean mouseReleased(double pMouseX, double pMouseY, int pButton) {
-        if (client.options.useKey.matchesMouse(pButton)) {
-            saveAndClose(pMouseX, pMouseY);
+    public boolean mouseReleased(Click click) {
+        if (client.options.useKey.matchesMouse(click)) {
+            saveAndClose(click.x(), click.y());
             return true;
         }
-        return super.mouseReleased(pMouseX, pMouseY, pButton);
+        return super.mouseReleased(click);
     }
 
     protected void saveAndClose(double pMouseX, double pMouseY) {

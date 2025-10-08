@@ -7,7 +7,9 @@ import com.zurrtum.create.client.foundation.gui.widget.ScrollInput;
 import com.zurrtum.create.client.foundation.gui.widget.SelectionScrollInput;
 import com.zurrtum.create.client.foundation.gui.widget.TooltipArea;
 import net.minecraft.client.font.TextRenderer;
+import net.minecraft.client.gui.Click;
 import net.minecraft.client.gui.widget.TextFieldWidget;
+import net.minecraft.client.input.MouseInput;
 import net.minecraft.screen.ScreenTexts;
 
 import java.util.function.BiConsumer;
@@ -77,7 +79,7 @@ public class ModularGuiLineBuilder {
         input.setDrawsBackground(false);
         input.setEditableColor(0xffffffff);
         input.setFocused(false);
-        input.mouseClicked(0, 0, 0);
+        input.mouseClicked(new Click(0, 0, new MouseInput(0, 0)), false);
         TooltipArea tooltipArea = new TooltipArea(this.x + x, y - 4, width, 18);
         inputTransform.accept(input, tooltipArea);
         target.add(Pair.of(input, dataKey));

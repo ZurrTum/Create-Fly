@@ -35,6 +35,7 @@ import com.zurrtum.create.infrastructure.packet.c2s.StockKeeperLockPacket;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gl.RenderPipelines;
+import net.minecraft.client.gui.Click;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.ingame.InventoryScreen;
 import net.minecraft.client.gui.widget.TextFieldWidget;
@@ -1137,7 +1138,10 @@ public class StockKeeperRequestScreen extends AbstractSimiContainerScreen<StockK
     }
 
     @Override
-    public boolean mouseClicked(double pMouseX, double pMouseY, int pButton) {
+    public boolean mouseClicked(Click click, boolean doubled) {
+        double pMouseX = click.x();
+        double pMouseY = click.y();
+        int pButton = click.button();
         boolean lmb = pButton == GLFW.GLFW_MOUSE_BUTTON_LEFT;
         boolean rmb = pButton == GLFW.GLFW_MOUSE_BUTTON_RIGHT;
 
@@ -1153,14 +1157,14 @@ public class StockKeeperRequestScreen extends AbstractSimiContainerScreen<StockK
         }
 
         if (addressBox.isFocused()) {
-            boolean result = addressBox.mouseClicked(pMouseX, pMouseY, pButton);
+            boolean result = addressBox.mouseClicked(click, doubled);
             if (addressBox.isHovered() || result)
                 return result;
             addressBox.setFocused(false);
         }
         if (searchBox.isFocused()) {
             if (searchBox.isHovered())
-                return searchBox.mouseClicked(pMouseX, pMouseY, pButton);
+                return searchBox.mouseClicked(click, doubled);
             searchBox.setFocused(false);
         }
 
@@ -1218,7 +1222,7 @@ public class StockKeeperRequestScreen extends AbstractSimiContainerScreen<StockK
         }
 
         if (hoveredSlot == noneHovered || !lmb && !rmb)
-            return super.mouseClicked(pMouseX, pMouseY, pButton);
+            return super.mouseClicked(click, doubled);
 
         // Items
         boolean orderClicked = hoveredSlot.getFirst() == -1;
@@ -1266,13 +1270,13 @@ public class StockKeeperRequestScreen extends AbstractSimiContainerScreen<StockK
     }
 
     @Override
-    public boolean mouseReleased(double pMouseX, double pMouseY, int pButton) {
-        if (pButton == GLFW.GLFW_MOUSE_BUTTON_LEFT && scrollHandleActive) {
+    public boolean mouseReleased(Click click) {
+        if (click.button() == GLFW.GLFW_MOUSE_BUTTON_LEFT && scrollHandleActive) {
             scrollHandleActive = false;
             if (client.isWindowFocused())
                 GLFW.glfwSetInputMode(client.getWindow().getHandle(), 208897, GLFW.GLFW_CURSOR_NORMAL);
         }
-        return super.mouseReleased(pMouseX, pMouseY, pButton);
+        return super.mouseReleased(click);
     }
 
     @Override
@@ -1360,9 +1364,9 @@ public class StockKeeperRequestScreen extends AbstractSimiContainerScreen<StockK
     }
 
     @Override
-    public boolean mouseDragged(double pMouseX, double pMouseY, int pButton, double pDragX, double pDragY) {
-        if (pButton != GLFW.GLFW_MOUSE_BUTTON_LEFT || !scrollHandleActive)
-            return super.mouseDragged(pMouseX, pMouseY, pButton, pDragX, pDragY);
+    public boolean mouseDragged(Click click, double pDragX, double pDragY) {
+        if (click.button() != GLFW.GLFW_MOUSE_BUTTON_LEFT || !scrollHandleActive)
+            return super.mouseDragged(click, pDragX, pDragY);
 
         Window window = client.getWindow();
         double scaleX = window.getScaledWidth() / (double) window.getWidth();
@@ -1379,12 +1383,12 @@ public class StockKeeperRequestScreen extends AbstractSimiContainerScreen<StockK
             return true;
 
         int barX = itemsX + cols * colWidth;
-        double target = (pMouseY - y - 15 - barSize / 2.0) * totalH / (windowH - 2) / rowHeight;
+        double target = (click.y() - y - 15 - barSize / 2.0) * totalH / (windowH - 2) / rowHeight;
         itemScroll.chase(MathHelper.clamp(target, 0, getMaxScroll()), 0.8, Chaser.EXP);
 
         if (client.isWindowFocused()) {
             double forceX = (barX + 2) / scaleX;
-            double forceY = MathHelper.clamp(pMouseY, minY, maxY) / scaleY;
+            double forceY = MathHelper.clamp(click.y(), minY, maxY) / scaleY;
             GLFW.glfwSetCursorPos(window.getHandle(), forceX, forceY);
         }
 

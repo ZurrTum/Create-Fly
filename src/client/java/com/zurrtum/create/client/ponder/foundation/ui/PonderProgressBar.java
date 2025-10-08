@@ -8,6 +8,7 @@ import com.zurrtum.create.client.catnip.gui.element.BoxElement;
 import com.zurrtum.create.client.catnip.gui.widget.AbstractSimiWidget;
 import com.zurrtum.create.client.ponder.foundation.PonderScene;
 import net.minecraft.client.font.TextRenderer;
+import net.minecraft.client.gui.Click;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.sound.SoundManager;
 import net.minecraft.text.Text;
@@ -46,10 +47,10 @@ public class PonderProgressBar extends AbstractSimiWidget {
     }
 
     @Override
-    public void onClick(double mouseX, double mouseY) {
+    public void onClick(Click click, boolean doubled) {
         PonderScene activeScene = ponder.getActiveScene();
 
-        int keyframeIndex = getHoveredKeyframeIndex(activeScene, mouseX);
+        int keyframeIndex = getHoveredKeyframeIndex(activeScene, click.x());
 
         if (keyframeIndex == -1)
             ponder.seekToTime(0);

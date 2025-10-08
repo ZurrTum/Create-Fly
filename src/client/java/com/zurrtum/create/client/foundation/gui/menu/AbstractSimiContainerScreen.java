@@ -9,10 +9,7 @@ import com.zurrtum.create.client.catnip.gui.widget.AbstractSimiWidget;
 import com.zurrtum.create.client.foundation.gui.AllGuiTextures;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.Drawable;
-import net.minecraft.client.gui.Element;
-import net.minecraft.client.gui.Selectable;
+import net.minecraft.client.gui.*;
 import net.minecraft.client.gui.screen.ingame.GenericContainerScreen;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.gui.widget.ClickableWidget;
@@ -162,10 +159,10 @@ public abstract class AbstractSimiContainerScreen<T extends ScreenHandler> exten
     }
 
     @Override
-    public boolean mouseClicked(double pMouseX, double pMouseY, int pButton) {
-        if (getFocused() != null && !getFocused().isMouseOver(pMouseX, pMouseY))
+    public boolean mouseClicked(Click click, boolean doubled) {
+        if (getFocused() != null && !getFocused().isMouseOver(click.x(), click.y()))
             setFocused(null);
-        return super.mouseClicked(pMouseX, pMouseY, pButton);
+        return super.mouseClicked(click, doubled);
     }
 
     @Override

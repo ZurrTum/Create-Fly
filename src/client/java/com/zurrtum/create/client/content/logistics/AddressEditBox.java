@@ -5,9 +5,11 @@ import com.zurrtum.create.client.content.trains.schedule.DestinationSuggestions;
 import com.zurrtum.create.client.foundation.gui.widget.ScrollInput;
 import com.zurrtum.create.client.foundation.utility.CreateLang;
 import net.minecraft.client.font.TextRenderer;
+import net.minecraft.client.gui.Click;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.TextFieldWidget;
+import net.minecraft.client.input.MouseInput;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.math.MathHelper;
@@ -39,7 +41,7 @@ public class AddressEditBox extends TextFieldWidget {
         setChangedListener(mainResponder);
         setDrawsBackground(false);
         setFocused(false);
-        mouseClicked(0, 0, 0);
+        mouseClicked(new Click(0, 0, new MouseInput(0, 0)), false);
         setMaxLength(25);
     }
 
@@ -50,7 +52,7 @@ public class AddressEditBox extends TextFieldWidget {
         if (isFocused() && pKeyCode == GLFW.GLFW_KEY_ENTER) {
             setFocused(false);
             setCursorToEnd(false);
-            mouseClicked(0, 0, 0);
+            mouseClicked(new Click(0, 0, new MouseInput(0, 0)), false);
             return true;
         }
         return super.keyPressed(pKeyCode, pScanCode, pModifiers);
@@ -64,23 +66,23 @@ public class AddressEditBox extends TextFieldWidget {
     }
 
     @Override
-    public boolean mouseClicked(double pMouseX, double pMouseY, int pButton) {
-        if (pButton == GLFW.GLFW_MOUSE_BUTTON_RIGHT) {
-            if (isMouseOver(pMouseX, pMouseY)) {
+    public boolean mouseClicked(Click click, boolean doubled) {
+        if (click.button() == GLFW.GLFW_MOUSE_BUTTON_RIGHT) {
+            if (isMouseOver(click.x(), click.y())) {
                 setText("");
                 return true;
             }
         }
 
         boolean wasFocused = isFocused();
-        if (super.mouseClicked(pMouseX, pMouseY, pButton)) {
+        if (super.mouseClicked(click, doubled)) {
             if (!wasFocused) {
                 setSelectionEnd(0);
                 setSelectionStart(getText().length());
             }
             return true;
         }
-        return destinationSuggestions.mouseClicked((int) pMouseX, (int) pMouseY, pButton);
+        return destinationSuggestions.mouseClicked(click);
     }
 
     @Override

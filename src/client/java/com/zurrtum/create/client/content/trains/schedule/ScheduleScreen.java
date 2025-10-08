@@ -35,6 +35,7 @@ import com.zurrtum.create.foundation.gui.menu.MenuType;
 import com.zurrtum.create.infrastructure.packet.c2s.GhostItemSubmitPacket;
 import com.zurrtum.create.infrastructure.packet.c2s.ScheduleEditPacket;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.Click;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.Drawable;
 import net.minecraft.client.gui.widget.TextFieldWidget;
@@ -948,9 +949,11 @@ public class ScheduleScreen extends AbstractSimiContainerScreen<ScheduleMenu> im
     }
 
     @Override
-    public boolean mouseClicked(double pMouseX, double pMouseY, int pButton) {
-        if (destinationSuggestions != null && destinationSuggestions.mouseClicked((int) pMouseX, (int) pMouseY, pButton))
+    public boolean mouseClicked(Click click, boolean doubled) {
+        if (destinationSuggestions != null && destinationSuggestions.mouseClicked(click))
             return true;
+        double pMouseX = click.x();
+        double pMouseY = click.y();
         if (editorConfirm != null && editorConfirm.isMouseOver(pMouseX, pMouseY) && onEditorClose != null) {
             onEditorClose.accept(true);
             stopEditing();
@@ -961,10 +964,10 @@ public class ScheduleScreen extends AbstractSimiContainerScreen<ScheduleMenu> im
             stopEditing();
             return true;
         }
-        if (action(null, pMouseX, pMouseY, pButton))
+        if (action(null, pMouseX, pMouseY, click.button()))
             return true;
 
-        return super.mouseClicked(pMouseX, pMouseY, pButton);
+        return super.mouseClicked(click, doubled);
     }
 
     @Override

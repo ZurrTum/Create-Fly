@@ -18,6 +18,7 @@ import com.zurrtum.create.content.logistics.factoryBoard.FactoryPanelPosition;
 import com.zurrtum.create.content.logistics.factoryBoard.ServerFactoryPanelBehaviour;
 import com.zurrtum.create.infrastructure.packet.c2s.FactoryPanelConfigurationPacket;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.Click;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.sound.PositionedSoundInstance;
 import net.minecraft.client.world.ClientWorld;
@@ -420,7 +421,9 @@ public class FactoryPanelScreen extends AbstractSimiScreen {
     //
 
     @Override
-    public boolean mouseClicked(double mouseX, double mouseY, int pButton) {
+    public boolean mouseClicked(Click click, boolean doubled) {
+        double mouseX = click.x();
+        double mouseY = click.y();
         if (getFocused() != null && !getFocused().isMouseOver(mouseX, mouseY))
             setFocused(null);
 
@@ -458,7 +461,7 @@ public class FactoryPanelScreen extends AbstractSimiScreen {
             return true;
         }
 
-        return super.mouseClicked(mouseX, mouseY, pButton);
+        return super.mouseClicked(click, doubled);
     }
 
     public void playButtonSound() {

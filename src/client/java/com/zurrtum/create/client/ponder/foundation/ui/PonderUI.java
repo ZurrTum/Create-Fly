@@ -33,6 +33,7 @@ import com.zurrtum.create.client.ponder.foundation.render.SceneRenderState;
 import com.zurrtum.create.client.ponder.foundation.render.TitleTextRenderState;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
+import net.minecraft.client.gui.Click;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.Element;
 import net.minecraft.client.option.GameOptions;
@@ -851,10 +852,10 @@ public class PonderUI extends AbstractPonderScreen {
     }
 
     @Override
-    public boolean mouseClicked(double x, double y, int button) {
+    public boolean mouseClicked(Click click, boolean doubled) {
         if (identifyMode && hoveredBlockPos != null && PonderIndex.editingModeActive()) {
             long handle = client.getWindow().getHandle();
-            if (copiedBlockPos != null && button == 1) {
+            if (copiedBlockPos != null && click.button() == 1) {
                 clipboardHelper.setClipboard(
                     handle,
                     "util.select().fromTo(" + copiedBlockPos.getX() + ", " + copiedBlockPos.getY() + ", " + copiedBlockPos.getZ() + ", " + hoveredBlockPos.getX() + ", " + hoveredBlockPos.getY() + ", " + hoveredBlockPos.getZ() + ")"
@@ -877,7 +878,7 @@ public class PonderUI extends AbstractPonderScreen {
             return true;
         }
 
-        return super.mouseClicked(x, y, button);
+        return super.mouseClicked(click, doubled);
     }
 
     @Override
