@@ -10,6 +10,7 @@ import com.zurrtum.create.client.flywheel.lib.model.LineModelBuilder;
 import com.zurrtum.create.client.flywheel.lib.visual.SimpleDynamicVisual;
 import com.zurrtum.create.client.flywheel.lib.visual.util.SmartRecycler;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.hud.debug.DebugHudEntries;
 import net.minecraft.client.render.LightmapTextureManager;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
@@ -94,7 +95,7 @@ public final class HitboxElement implements Visual, SimpleDynamicVisual {
     public void animate(float partialTick) {
         recycler.resetCount();
 
-        var shouldRenderHitBoxes = MinecraftClient.getInstance().getEntityRenderDispatcher().shouldRenderHitboxes();
+        var shouldRenderHitBoxes = MinecraftClient.getInstance().debugHudEntryList.isEntryVisible(DebugHudEntries.ENTITY_HITBOXES);
         if (shouldRenderHitBoxes && !entity.isInvisible() && !MinecraftClient.getInstance().hasReducedDebugInfo()) {
             double entityX = MathHelper.lerp(partialTick, entity.lastRenderX, entity.getX());
             double entityY = MathHelper.lerp(partialTick, entity.lastRenderY, entity.getY());
