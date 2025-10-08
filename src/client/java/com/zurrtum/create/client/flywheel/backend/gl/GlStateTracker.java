@@ -1,5 +1,6 @@
 package com.zurrtum.create.client.flywheel.backend.gl;
 
+import com.mojang.blaze3d.opengl.GlConst;
 import com.mojang.blaze3d.opengl.GlStateManager;
 import com.zurrtum.create.client.flywheel.backend.gl.buffer.GlBufferType;
 
@@ -36,7 +37,7 @@ public class GlStateTracker {
     }
 
     public static State getRestoreState() {
-        return new State(BUFFERS.clone(), vao, program, GlStateManager._getActiveTexture());
+        return new State(BUFFERS.clone(), vao, program, GlStateManager.activeTexture + GlConst.GL_TEXTURE0);
     }
 
     public static void bindVao(int vao) {
