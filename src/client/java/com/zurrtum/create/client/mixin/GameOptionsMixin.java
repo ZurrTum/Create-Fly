@@ -27,9 +27,6 @@ public class GameOptionsMixin {
 
     @Inject(method = "<init>(Lnet/minecraft/client/MinecraftClient;Ljava/io/File;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/option/GameOptions;load()V"))
     private void wrapAddAll(MinecraftClient client, File optionsFile, CallbackInfo ci) {
-        int index = KeyBinding.CATEGORY_ORDER_MAP.values().stream().max(Integer::compareTo).orElse(0) + 1;
-        KeyBinding.CATEGORY_ORDER_MAP.put(AllKeys.CATEGORY, index);
-        KeyBinding.CATEGORY_ORDER_MAP.put(PonderKeybinds.CATEGORY, index + 1);
         List<KeyBinding> keys = Lists.newArrayList(allKeys);
         keys.removeAll(AllKeys.ALL);
         keys.addAll(AllKeys.ALL);

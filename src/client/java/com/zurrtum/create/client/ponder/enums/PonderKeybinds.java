@@ -20,4 +20,7 @@ public class PonderKeybinds {
         keyBinding.setBoundKey(key);
         return keyBinding;
     }
+
+    public static void register() {
+    }
 }
