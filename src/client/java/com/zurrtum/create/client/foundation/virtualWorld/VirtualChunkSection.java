@@ -2,7 +2,6 @@ package com.zurrtum.create.client.foundation.virtualWorld;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.fluid.FluidState;
-import net.minecraft.registry.RegistryKeys;
 import net.minecraft.util.math.ChunkSectionPos;
 import net.minecraft.world.chunk.ChunkSection;
 
@@ -14,7 +13,7 @@ public class VirtualChunkSection extends ChunkSection {
     public final int zStart;
 
     public VirtualChunkSection(VirtualChunk owner, int yBase) {
-        super(owner.world.getRegistryManager().getOrThrow(RegistryKeys.BIOME));
+        super(owner.world.getPalettesFactory());
         this.owner = owner;
         this.xStart = owner.getPos().getStartX();
         this.yStart = yBase;

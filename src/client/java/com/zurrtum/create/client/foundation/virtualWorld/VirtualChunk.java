@@ -10,7 +10,6 @@ import net.minecraft.entity.Entity;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.fluid.FluidState;
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.structure.StructureStart;
 import net.minecraft.util.math.BlockPos;
@@ -42,7 +41,7 @@ public class VirtualChunk extends Chunk {
     private boolean needsLight;
 
     public VirtualChunk(VirtualRenderWorld world, int x, int z) {
-        super(new ChunkPos(x, z), UpgradeData.NO_UPGRADE_DATA, world, world.getRegistryManager().getOrThrow(RegistryKeys.BIOME), 0L, null, null);
+        super(new ChunkPos(x, z), UpgradeData.NO_UPGRADE_DATA, world, world.getPalettesFactory(), 0L, null, null);
 
         this.world = world;
 

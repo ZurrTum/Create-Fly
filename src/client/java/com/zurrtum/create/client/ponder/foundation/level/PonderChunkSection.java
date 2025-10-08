@@ -2,7 +2,6 @@ package com.zurrtum.create.client.ponder.foundation.level;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.fluid.FluidState;
-import net.minecraft.registry.RegistryKeys;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.chunk.ChunkSection;
@@ -17,7 +16,7 @@ public class PonderChunkSection extends ChunkSection {
     public boolean empty;
 
     public PonderChunkSection(PonderChunk owner, BlockPos.Mutable scratchPos, ChunkPos pos, int yBase, boolean hasBlock) {
-        super(owner.world.getRegistryManager().getOrThrow(RegistryKeys.BIOME));
+        super(owner.world.getPalettesFactory());
         this.owner = owner;
         this.scratchPos = scratchPos;
         this.xStart = pos.getStartX();
