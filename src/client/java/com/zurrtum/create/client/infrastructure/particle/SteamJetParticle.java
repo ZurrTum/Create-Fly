@@ -36,7 +36,7 @@ public class SteamJetParticle extends AnimatedParticle {
         scale = .375f;
         setMaxAge(21);
         setPos(x, y, z);
-        angle = lastAngle = world.random.nextFloat() * MathHelper.PI;
+        zRotation = lastZRotation = world.random.nextFloat() * MathHelper.PI;
         yaw = (float) MathHelper.atan2(dx, dz) - MathHelper.PI;
         pitch = (float) MathHelper.atan2(dy, Math.sqrt(dx * dx + dz * dz)) - MathHelper.PI / 2;
         this.updateSprite(sprite);
@@ -51,7 +51,7 @@ public class SteamJetParticle extends AnimatedParticle {
         float f = (float) (x - vec3.x);
         float f1 = (float) (y - vec3.y);
         float f2 = (float) (z - vec3.z);
-        float f3 = MathHelper.lerp(pPartialTicks, this.lastAngle, this.angle);
+        float f3 = MathHelper.lerp(pPartialTicks, lastZRotation, zRotation);
         float f7 = this.getMinU();
         float f8 = this.getMaxU();
         float f5 = this.getMinV();
@@ -61,7 +61,7 @@ public class SteamJetParticle extends AnimatedParticle {
         for (int i = 0; i < 4; i++) {
             Quaternionf quaternion = RotationAxis.POSITIVE_Y.rotation(yaw);
             quaternion.mul(RotationAxis.POSITIVE_X.rotation(pitch));
-            quaternion.mul(RotationAxis.POSITIVE_Y.rotation(f3 + MathHelper.PI / 2 * i + angle));
+            quaternion.mul(RotationAxis.POSITIVE_Y.rotation(f3 + MathHelper.PI / 2 * i + zRotation));
             Vector3f vector3f1 = new Vector3f(-1.0F, -1.0F, 0.0F);
             vector3f1.rotate(quaternion);
 

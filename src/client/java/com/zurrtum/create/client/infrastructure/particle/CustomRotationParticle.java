@@ -28,8 +28,8 @@ public class CustomRotationParticle extends AnimatedParticle {
 
     public Quaternionf getCustomRotation(Camera camera, float partialTicks) {
         Quaternionf quaternion = new Quaternionf(camera.getRotation());
-        if (this.angle != 0.0F) {
-            float angle = MathHelper.lerp(partialTicks, this.lastAngle, this.angle);
+        if (zRotation != 0.0F) {
+            float angle = MathHelper.lerp(partialTicks, lastZRotation, zRotation);
             quaternion.mul(RotationAxis.POSITIVE_Z.rotation(angle));
         }
         return quaternion;
