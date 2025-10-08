@@ -84,7 +84,7 @@ public class AirParticle extends AnimatedParticle {
         velocityY = y - this.y;
         velocityZ = z - this.z;
 
-        setSpriteForAge(spriteProvider);
+        updateSprite(spriteProvider);
         this.move(this.velocityX, this.velocityY, this.velocityZ);
     }
 

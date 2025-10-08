@@ -27,14 +27,14 @@ public class WiFiParticle extends CustomRotationParticle {
         this.setBoundingBoxSpacing(this.scale, this.scale);
         this.loopLength = 16;
         this.maxAge = 16;
-        this.setSpriteForAge(spriteSet);
+        this.updateSprite(spriteSet);
         this.stopped = true; // disable movement
         this.downward = vy < 0;
     }
 
     @Override
     public void tick() {
-        setSpriteForAge(spriteProvider);
+        updateSprite(spriteProvider);
         if (age++ >= maxAge)
             markDead();
     }

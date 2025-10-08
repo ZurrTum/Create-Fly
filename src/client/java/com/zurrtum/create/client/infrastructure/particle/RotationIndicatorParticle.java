@@ -50,7 +50,7 @@ public class RotationIndicatorParticle extends AnimatedParticle {
         this.maxAge = lifeSpan + this.random.nextInt(32);
         this.setTargetColor(color);
         this.setColor(Color.mixColors(color, 0xFFFFFF, .5f));
-        this.setSpriteForAge(sprite);
+        this.updateSprite(sprite);
         this.radius1 = radius1;
         this.radius = radius1;
         this.radius2 = radius2;

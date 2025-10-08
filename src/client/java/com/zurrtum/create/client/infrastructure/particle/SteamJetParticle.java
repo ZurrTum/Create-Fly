@@ -39,7 +39,7 @@ public class SteamJetParticle extends AnimatedParticle {
         angle = lastAngle = world.random.nextFloat() * MathHelper.PI;
         yaw = (float) MathHelper.atan2(dx, dz) - MathHelper.PI;
         pitch = (float) MathHelper.atan2(dy, Math.sqrt(dx * dx + dz * dz)) - MathHelper.PI / 2;
-        this.setSpriteForAge(sprite);
+        this.updateSprite(sprite);
     }
 
     public ParticleTextureSheet getType() {
