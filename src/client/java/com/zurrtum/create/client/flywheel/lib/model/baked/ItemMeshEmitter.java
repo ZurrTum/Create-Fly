@@ -133,14 +133,13 @@ public class ItemMeshEmitter implements VertexConsumer {
                 float y = normal.y();
                 float z = normal.z();
                 for (ModelPart.Vertex vertex : quad.vertices()) {
-                    Vector3f pos = vertex.pos();
                     float u = vertex.u();
                     float v = vertex.v();
                     if (hasUV) {
                         u = meshSprite.getFrameU(u);
                         v = meshSprite.getFrameV(v);
                     }
-                    Vector3f position = matrix4f.transformPosition(pos.x() / 16.0F, pos.y() / 16.0F, pos.z() / 16.0F, vector3f);
+                    Vector3f position = matrix4f.transformPosition(vertex.x() / 16.0F, vertex.y() / 16.0F, vertex.z() / 16.0F, vector3f);
                     meshVertices.x(index, position.x());
                     meshVertices.y(index, position.y());
                     meshVertices.z(index, position.z());
