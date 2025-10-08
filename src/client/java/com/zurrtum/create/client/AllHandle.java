@@ -158,7 +158,7 @@ public class AllHandle extends AllClientHandle<ClientPlayNetworkHandler> {
 
     @Override
     protected void forceMainThread(ClientPlayNetworkHandler listener, S2CPacket packet) {
-        NetworkThreadUtils.forceMainThread(packet, listener, listener.client);
+        NetworkThreadUtils.forceMainThread(packet, listener, listener.client.getPacketApplyBatcher());
     }
 
     @Override
