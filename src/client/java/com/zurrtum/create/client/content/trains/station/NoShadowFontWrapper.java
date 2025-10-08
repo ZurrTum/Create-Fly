@@ -11,10 +11,10 @@ import org.joml.Matrix4f;
 import java.util.List;
 
 public class NoShadowFontWrapper extends TextRenderer {
-    private TextRenderer wrapped;
+    private final TextRenderer wrapped;
 
     public NoShadowFontWrapper(TextRenderer wrapped) {
-        super(wrapped.fontStorageAccessor, false);
+        super(wrapped.fonts);
         this.wrapped = wrapped;
     }
 
