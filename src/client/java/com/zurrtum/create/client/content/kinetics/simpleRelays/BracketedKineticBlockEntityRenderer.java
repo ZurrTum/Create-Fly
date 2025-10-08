@@ -7,62 +7,56 @@ import com.zurrtum.create.client.catnip.render.CachedBuffers;
 import com.zurrtum.create.client.catnip.render.SuperByteBuffer;
 import com.zurrtum.create.client.content.kinetics.base.KineticBlockEntityRenderer;
 import com.zurrtum.create.client.content.kinetics.base.KineticBlockEntityVisual;
-import com.zurrtum.create.client.flywheel.api.visualization.VisualizationManager;
 import com.zurrtum.create.content.kinetics.simpleRelays.BracketedKineticBlockEntity;
 import com.zurrtum.create.content.kinetics.simpleRelays.SimpleKineticBlockEntity;
+import net.minecraft.block.BlockState;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.VertexConsumer;
-import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.block.entity.BlockEntityRendererFactory;
+import net.minecraft.client.render.command.ModelCommandRenderer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Direction.Axis;
-import net.minecraft.util.math.Direction.AxisDirection;
+import net.minecraft.util.math.Vec3d;
+import org.jetbrains.annotations.Nullable;
 
-public class BracketedKineticBlockEntityRenderer extends KineticBlockEntityRenderer<BracketedKineticBlockEntity> {
-
+public class BracketedKineticBlockEntityRenderer extends KineticBlockEntityRenderer<BracketedKineticBlockEntity, BracketedKineticBlockEntityRenderer.BracketedKineticRenderState> {
     public BracketedKineticBlockEntityRenderer(BlockEntityRendererFactory.Context context) {
         super(context);
     }
 
     @Override
-    protected void renderSafe(
+    public BracketedKineticRenderState createRenderState() {
+        return new BracketedKineticRenderState();
+    }
+
+    @Override
+    public void updateRenderState(
         BracketedKineticBlockEntity be,
-        float partialTicks,
-        MatrixStack ms,
-        VertexConsumerProvider buffer,
-        int light,
-        int overlay
+        BracketedKineticRenderState state,
+        float tickProgress,
+        Vec3d cameraPos,
+        @Nullable ModelCommandRenderer.CrumblingOverlayCommand crumblingOverlay
     ) {
-
-        if (VisualizationManager.supportsVisualization(be.getWorld()))
-            return;
-
-        if (!be.getCachedState().isOf(AllBlocks.LARGE_COGWHEEL)) {
-            super.renderSafe(be, partialTicks, ms, buffer, light, overlay);
-            return;
+        state.large = be.getCachedState().isOf(AllBlocks.LARGE_COGWHEEL);
+        super.updateRenderState(be, state, tickProgress, cameraPos, crumblingOverlay);
+        if (state.large) {
+            state.shaft = CachedBuffers.partialFacingVertical(AllPartialModels.COGWHEEL_SHAFT, state.blockState, state.direction);
+            state.shaftAngle = getAngleForLargeCogShaft(be, state.axis);
         }
+    }
 
-        // Large cogs sometimes have to offset their teeth by 11.25 degrees in order to
-        // mesh properly
+    @Override
+    protected RenderLayer getRenderType(BracketedKineticBlockEntity be, BlockState state) {
+        return RenderLayer.getSolid();
+    }
 
-        VertexConsumer vc = buffer.getBuffer(RenderLayer.getSolid());
-        Axis axis = getRotationAxisOf(be);
-        Direction facing = Direction.from(axis, AxisDirection.POSITIVE);
-        renderRotatingBuffer(
-            be,
-            CachedBuffers.partialFacingVertical(AllPartialModels.SHAFTLESS_LARGE_COGWHEEL, be.getCachedState(), facing),
-            ms,
-            vc,
-            light
-        );
-
-        float angle = getAngleForLargeCogShaft(be, axis);
-        SuperByteBuffer shaft = CachedBuffers.partialFacingVertical(AllPartialModels.COGWHEEL_SHAFT, be.getCachedState(), facing);
-        kineticRotationTransform(shaft, be, axis, angle, light);
-        shaft.renderInto(ms, vc);
-
+    @Override
+    protected SuperByteBuffer getRotatedModel(BracketedKineticBlockEntity be, BracketedKineticRenderState state) {
+        if (state.large) {
+            return CachedBuffers.partialFacingVertical(AllPartialModels.SHAFTLESS_LARGE_COGWHEEL, state.blockState, state.direction);
+        }
+        return super.getRotatedModel(be, state);
     }
 
     public static float getAngleForLargeCogShaft(SimpleKineticBlockEntity be, Axis axis) {
@@ -80,4 +74,20 @@ public class BracketedKineticBlockEntityRenderer extends KineticBlockEntityRende
         }
     }
 
+    public static class BracketedKineticRenderState extends KineticRenderState {
+        public boolean large;
+        public SuperByteBuffer shaft;
+        public float shaftAngle;
+
+        @Override
+        public void render(MatrixStack.Entry matricesEntry, VertexConsumer vertexConsumer) {
+            super.render(matricesEntry, vertexConsumer);
+            if (shaft != null) {
+                shaft.light(lightmapCoordinates);
+                shaft.rotateCentered(shaftAngle, direction);
+                shaft.color(color);
+                shaft.renderInto(matricesEntry, vertexConsumer);
+            }
+        }
+    }
 }
