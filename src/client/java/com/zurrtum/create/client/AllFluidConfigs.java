@@ -13,6 +13,7 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.color.world.BiomeColors;
 import net.minecraft.client.render.fog.FogRenderer;
 import net.minecraft.client.texture.SpriteAtlasTexture;
+import net.minecraft.client.util.SpriteIdentifier;
 import net.minecraft.component.ComponentChanges;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.PotionContentsComponent;
@@ -61,8 +62,10 @@ public class AllFluidConfigs {
     private static void config(FlowableFluid fluid, int fogColor, Supplier<Float> fogDistance, Function<ComponentChanges, Integer> tint) {
         Identifier id = Registries.FLUID.getId(fluid).withPrefixedPath("fluid/");
         FluidConfig config = new FluidConfig(
-            () -> MinecraftClient.getInstance().getSpriteAtlas(SpriteAtlasTexture.BLOCK_ATLAS_TEXTURE).apply(id.withSuffixedPath("_still")),
-            () -> MinecraftClient.getInstance().getSpriteAtlas(SpriteAtlasTexture.BLOCK_ATLAS_TEXTURE).apply(id.withSuffixedPath("_flow")),
+            () -> MinecraftClient.getInstance().getAtlasManager()
+                .getSprite(new SpriteIdentifier(SpriteAtlasTexture.BLOCK_ATLAS_TEXTURE, id.withSuffixedPath("_still"))),
+            () -> MinecraftClient.getInstance().getAtlasManager()
+                .getSprite(new SpriteIdentifier(SpriteAtlasTexture.BLOCK_ATLAS_TEXTURE, id.withSuffixedPath("_flow"))),
             tint,
             fogDistance,
             fogColor

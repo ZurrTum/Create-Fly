@@ -6,6 +6,7 @@ import com.zurrtum.create.client.flywheel.api.model.Model;
 import com.zurrtum.create.client.flywheel.lib.model.RetexturedMesh;
 import com.zurrtum.create.client.flywheel.lib.model.SingleMeshModel;
 import com.zurrtum.create.client.flywheel.lib.util.RendererReloadCache;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.entity.model.EntityModelLayer;
 import net.minecraft.client.texture.Sprite;
 import net.minecraft.client.util.SpriteIdentifier;
@@ -18,7 +19,13 @@ import java.util.Set;
 
 public final class ModelTrees {
     private static final RendererReloadCache<ModelTreeKey, ModelTree> CACHE = new RendererReloadCache<>(k -> {
-        ModelTree tree = convert("", MeshTree.of(k.layer), k.pathsToPrune, k.texture != null ? k.texture.getSprite() : null, k.material);
+        ModelTree tree = convert(
+            "",
+            MeshTree.of(k.layer),
+            k.pathsToPrune,
+            k.texture != null ? MinecraftClient.getInstance().getAtlasManager().getSprite(k.texture) : null,
+            k.material
+        );
 
         if (tree == null) {
             throw new IllegalArgumentException("Cannot prune root node!");

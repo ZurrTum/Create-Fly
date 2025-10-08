@@ -13,8 +13,9 @@ import net.caffeinemc.mods.sodium.api.texture.SpriteUtil;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.texture.Sprite;
+import net.minecraft.client.texture.AtlasManager;
 import net.minecraft.client.texture.SpriteAtlasTexture;
+import net.minecraft.client.util.SpriteIdentifier;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.fluid.FluidState;
 import net.minecraft.util.Identifier;
@@ -22,29 +23,38 @@ import net.minecraft.util.math.BlockPos;
 
 import java.util.HashSet;
 import java.util.Set;
-import java.util.function.Function;
 
 /**
  * Fixes the Mechanical Saw's sprite and Factory Gauge's sprite
  */
+@SuppressWarnings("deprecation")
 public class SodiumCompat {
     private static final boolean DISABLE = !FabricLoader.getInstance().isModLoaded("sodium");
-    public static final Identifier SAW_TEXTURE = Create.asResource("block/saw_reversed");
-    public static final Identifier FACTORY_PANEL_TEXTURE = Create.asResource("block/factory_panel_connections_animated");
-    public static final Identifier SAW_VANILLA_TEXTURE = Identifier.ofVanilla("block/stonecutter_saw");
+    public static final SpriteIdentifier SAW_TEXTURE = new SpriteIdentifier(
+        SpriteAtlasTexture.BLOCK_ATLAS_TEXTURE,
+        Create.asResource("block/saw_reversed")
+    );
+    public static final SpriteIdentifier FACTORY_PANEL_TEXTURE = new SpriteIdentifier(
+        SpriteAtlasTexture.BLOCK_ATLAS_TEXTURE,
+        Create.asResource("block/factory_panel_connections_animated")
+    );
+    public static final SpriteIdentifier SAW_VANILLA_TEXTURE = new SpriteIdentifier(
+        SpriteAtlasTexture.BLOCK_ATLAS_TEXTURE,
+        Identifier.ofVanilla("block/stonecutter_saw")
+    );
 
-    @SuppressWarnings({"UnstableApiUsage", "deprecation"})
+    @SuppressWarnings("UnstableApiUsage")
     public static void markSpriteActive(MinecraftClient mc) {
         if (DISABLE) {
             return;
         }
-        Function<Identifier, Sprite> atlas = mc.getSpriteAtlas(SpriteAtlasTexture.BLOCK_ATLAS_TEXTURE);
-        SpriteUtil.INSTANCE.markSpriteActive(atlas.apply(SAW_TEXTURE));
-        SpriteUtil.INSTANCE.markSpriteActive(atlas.apply(SAW_VANILLA_TEXTURE));
-        SpriteUtil.INSTANCE.markSpriteActive(atlas.apply(FACTORY_PANEL_TEXTURE));
+        AtlasManager atlasManager = mc.getAtlasManager();
+        SpriteUtil.INSTANCE.markSpriteActive(atlasManager.getSprite(SAW_TEXTURE));
+        SpriteUtil.INSTANCE.markSpriteActive(atlasManager.getSprite(SAW_VANILLA_TEXTURE));
+        SpriteUtil.INSTANCE.markSpriteActive(atlasManager.getSprite(FACTORY_PANEL_TEXTURE));
     }
 
-    @SuppressWarnings({"UnstableApiUsage", "deprecation"})
+    @SuppressWarnings("UnstableApiUsage")
     public static void markPonderSpriteActive(PonderLevel world, Selection section) {
         if (DISABLE) {
             return;
@@ -58,15 +68,14 @@ public class SodiumCompat {
                 continue;
             }
             if (saw && state.isOf(AllBlocks.MECHANICAL_SAW)) {
-                Function<Identifier, Sprite> atlas = MinecraftClient.getInstance().getSpriteAtlas(SpriteAtlasTexture.BLOCK_ATLAS_TEXTURE);
-                SpriteUtil.INSTANCE.markSpriteActive(atlas.apply(SAW_TEXTURE));
-                SpriteUtil.INSTANCE.markSpriteActive(atlas.apply(SAW_VANILLA_TEXTURE));
+                AtlasManager atlasManager = MinecraftClient.getInstance().getAtlasManager();
+                SpriteUtil.INSTANCE.markSpriteActive(atlasManager.getSprite(SAW_TEXTURE));
+                SpriteUtil.INSTANCE.markSpriteActive(atlasManager.getSprite(SAW_VANILLA_TEXTURE));
                 saw = false;
                 continue;
             }
             if (panel && state.isOf(AllBlocks.FACTORY_GAUGE)) {
-                SpriteUtil.INSTANCE.markSpriteActive(MinecraftClient.getInstance().getSpriteAtlas(SpriteAtlasTexture.BLOCK_ATLAS_TEXTURE)
-                    .apply(FACTORY_PANEL_TEXTURE));
+                SpriteUtil.INSTANCE.markSpriteActive(MinecraftClient.getInstance().getAtlasManager().getSprite(FACTORY_PANEL_TEXTURE));
                 panel = false;
                 continue;
             }
