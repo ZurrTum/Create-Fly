@@ -9,6 +9,7 @@ import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.Selectable;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ClickableWidget;
+import net.minecraft.client.input.KeyInput;
 import net.minecraft.screen.ScreenTexts;
 import net.minecraft.text.Text;
 import org.joml.Matrix3x2fStack;
@@ -118,12 +119,12 @@ public abstract class AbstractSimiScreen extends Screen {
     }
 
     @Override
-    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-        boolean keyPressed = super.keyPressed(keyCode, scanCode, modifiers);
+    public boolean keyPressed(KeyInput input) {
+        boolean keyPressed = super.keyPressed(input);
         if (keyPressed || getFocused() != null)
             return keyPressed;
 
-        if (this.client.options.inventoryKey.matchesKey(keyCode, scanCode)) {
+        if (this.client.options.inventoryKey.matchesKey(input)) {
             this.close();
             return true;
         }
@@ -132,7 +133,7 @@ public abstract class AbstractSimiScreen extends Screen {
 
         for (Element widget : children()) {
             if (widget instanceof AbstractSimiWidget simiWidget) {
-                if (simiWidget.keyPressed(keyCode, scanCode, modifiers))
+                if (simiWidget.keyPressed(input))
                     consumed = true;
             }
         }

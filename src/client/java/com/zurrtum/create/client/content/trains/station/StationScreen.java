@@ -27,6 +27,7 @@ import net.minecraft.client.gl.RenderPipelines;
 import net.minecraft.client.gui.Click;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.widget.TextFieldWidget;
+import net.minecraft.client.input.KeyInput;
 import net.minecraft.client.input.MouseInput;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.screen.ScreenTexts;
@@ -406,7 +407,8 @@ public class StationScreen extends AbstractStationScreen {
     }
 
     @Override
-    public boolean keyPressed(int pKeyCode, int pScanCode, int pModifiers) {
+    public boolean keyPressed(KeyInput input) {
+        int pKeyCode = input.key();
         boolean hitEnter = getFocused() instanceof TextFieldWidget && (pKeyCode == InputUtil.GLFW_KEY_ENTER || pKeyCode == InputUtil.GLFW_KEY_KP_ENTER);
 
         if (hitEnter && nameBox.isFocused()) {
@@ -421,7 +423,7 @@ public class StationScreen extends AbstractStationScreen {
             return true;
         }
 
-        return super.keyPressed(pKeyCode, pScanCode, pModifiers);
+        return super.keyPressed(input);
     }
 
     private void syncTrainNameAndColor() {

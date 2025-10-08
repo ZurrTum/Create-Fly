@@ -1,6 +1,7 @@
 package com.zurrtum.create.client.content.schematics.client.tools;
 
 import com.zurrtum.create.catnip.math.VecHelper;
+import com.zurrtum.create.client.AllKeys;
 import com.zurrtum.create.client.AllSpecialTextures;
 import com.zurrtum.create.client.Create;
 import com.zurrtum.create.client.catnip.animation.AnimationTickHolder;
@@ -13,7 +14,6 @@ import com.zurrtum.create.client.foundation.utility.RaycastHelper.PredicateTrace
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.hud.InGameHud;
-import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.hit.BlockHitResult;
@@ -124,7 +124,7 @@ public abstract class SchematicToolBase implements ISchematicTool {
         if (renderSelectedFace) {
             outline.getParams().highlightFace(selectedFace).withFaceTextures(
                 AllSpecialTextures.CHECKERED,
-                Screen.hasControlDown() ? AllSpecialTextures.HIGHLIGHT_CHECKERED : AllSpecialTextures.CHECKERED
+                AllKeys.hasControlDown() ? AllSpecialTextures.HIGHLIGHT_CHECKERED : AllSpecialTextures.CHECKERED
             );
         }
         outline.getParams().colored(0x6886c5).withFaceTexture(AllSpecialTextures.CHECKERED).lineWidth(1 / 16f);

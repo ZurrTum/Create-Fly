@@ -4,6 +4,7 @@ import com.google.common.collect.ImmutableList;
 import com.zurrtum.create.AllItems;
 import com.zurrtum.create.catnip.animation.LerpedFloat;
 import com.zurrtum.create.catnip.animation.LerpedFloat.Chaser;
+import com.zurrtum.create.client.AllKeys;
 import com.zurrtum.create.client.catnip.animation.AnimationTickHolder;
 import com.zurrtum.create.client.catnip.gui.element.GuiGameElement;
 import com.zurrtum.create.client.catnip.gui.widget.ElementWidget;
@@ -26,6 +27,8 @@ import net.minecraft.client.gui.Click;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.Drawable;
 import net.minecraft.client.gui.widget.TextFieldWidget;
+import net.minecraft.client.input.AbstractInput;
+import net.minecraft.client.input.KeyInput;
 import net.minecraft.client.input.MouseInput;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.util.math.Rect2i;
@@ -271,7 +274,7 @@ public class StockKeeperCategoryScreen extends AbstractSimiContainerScreen<Stock
 
     private final Text clickToEdit = CreateLang.translateDirect("gui.schedule.lmb_edit").formatted(Formatting.DARK_GRAY, Formatting.ITALIC);
 
-    public boolean action(@Nullable DrawContext graphics, double mouseX, double mouseY, int click) {
+    public boolean action(@Nullable AbstractInput input, @Nullable DrawContext graphics, double mouseX, double mouseY, int click) {
         // Prevent actions outside the window for them
         if (mouseX < this.x || mouseX >= this.x + backgroundWidth || mouseY < this.y + 15 || mouseY >= this.y + 99)
             return false;
@@ -335,7 +338,7 @@ public class StockKeeperCategoryScreen extends AbstractSimiContainerScreen<Stock
                     );
                     if (click == 0) {
                         entries.remove(entry);
-                        entries.add(hasShiftDown() ? 0 : i - 1, entry);
+                        entries.add((input != null ? input.hasShift() : AllKeys.hasShiftDown()) ? 0 : i - 1, entry);
                         renderedItem.getRenderElement().clear();
                         init();
                     }
@@ -351,7 +354,7 @@ public class StockKeeperCategoryScreen extends AbstractSimiContainerScreen<Stock
                     );
                     if (click == 0) {
                         entries.remove(entry);
-                        entries.add(hasShiftDown() ? entries.size() : i + 1, entry);
+                        entries.add((input != null ? input.hasShift() : AllKeys.hasShiftDown()) ? entries.size() : i + 1, entry);
                         renderedItem.getRenderElement().clear();
                         init();
                     }
@@ -390,7 +393,7 @@ public class StockKeeperCategoryScreen extends AbstractSimiContainerScreen<Stock
             stopEditing();
             return true;
         }
-        if (action(null, pMouseX, pMouseY, click.button())) {
+        if (action(click, null, pMouseX, pMouseY, click.button())) {
             playUiSound(SoundEvents.UI_BUTTON_CLICK.value(), 1f, 1f);
             return true;
         }
@@ -407,19 +410,20 @@ public class StockKeeperCategoryScreen extends AbstractSimiContainerScreen<Stock
     }
 
     @Override
-    public boolean keyPressed(int pKeyCode, int pScanCode, int pModifiers) {
+    public boolean keyPressed(KeyInput input) {
         if (editingItem == null)
-            return super.keyPressed(pKeyCode, pScanCode, pModifiers);
+            return super.keyPressed(input);
 
+        int pKeyCode = input.key();
         boolean hitEscape = pKeyCode == GLFW.GLFW_KEY_ESCAPE;
         boolean hitEnter = getFocused() instanceof TextFieldWidget && (pKeyCode == 257 || pKeyCode == 335);
-        boolean hitE = getFocused() == null && client.options.inventoryKey.matchesKey(pKeyCode, pScanCode);
+        boolean hitE = getFocused() == null && client.options.inventoryKey.matchesKey(input);
         if (hitE || hitEnter || hitEscape) {
             stopEditing();
             return true;
         }
 
-        return super.keyPressed(pKeyCode, pScanCode, pModifiers);
+        return super.keyPressed(input);
     }
 
     @Override
@@ -444,7 +448,7 @@ public class StockKeeperCategoryScreen extends AbstractSimiContainerScreen<Stock
     protected void renderForeground(DrawContext graphics, int mouseX, int mouseY, float partialTicks) {
         super.renderForeground(graphics, mouseX, mouseY, partialTicks);
 
-        action(graphics, mouseX, mouseY, -1);
+        action(click, graphics, mouseX, mouseY, -1);
 
         if (editingItem == null)
             return;

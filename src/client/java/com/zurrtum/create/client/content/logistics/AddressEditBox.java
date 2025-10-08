@@ -9,6 +9,7 @@ import net.minecraft.client.gui.Click;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.TextFieldWidget;
+import net.minecraft.client.input.KeyInput;
 import net.minecraft.client.input.MouseInput;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
@@ -46,16 +47,16 @@ public class AddressEditBox extends TextFieldWidget {
     }
 
     @Override
-    public boolean keyPressed(int pKeyCode, int pScanCode, int pModifiers) {
-        if (destinationSuggestions.keyPressed(pKeyCode, pScanCode, pModifiers))
+    public boolean keyPressed(KeyInput input) {
+        if (destinationSuggestions.keyPressed(input))
             return true;
-        if (isFocused() && pKeyCode == GLFW.GLFW_KEY_ENTER) {
+        if (isFocused() && input.key() == GLFW.GLFW_KEY_ENTER) {
             setFocused(false);
             setCursorToEnd(false);
             mouseClicked(new Click(0, 0, new MouseInput(0, 0)), false);
             return true;
         }
-        return super.keyPressed(pKeyCode, pScanCode, pModifiers);
+        return super.keyPressed(input);
     }
 
     @Override

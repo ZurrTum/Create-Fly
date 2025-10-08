@@ -3625,5 +3625,6 @@
   "tag.item.create.upgrade_aquatic.coral": "Upgrade Aquatic Coral",
   "tag.item.create.upright_on_belt": "Upright on Belts",
   "tag.item.create.valve_handles": "Valve Handles",
-  "tag.recipe_serializer.create.automation_ignore": "Non-automatable"
+  "tag.recipe_serializer.create.automation_ignore": "Non-automatable",
+  "key.category.create.create": "Create"
 }

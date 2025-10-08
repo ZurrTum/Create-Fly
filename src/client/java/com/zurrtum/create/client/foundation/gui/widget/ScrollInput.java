@@ -1,11 +1,11 @@
 package com.zurrtum.create.client.foundation.gui.widget;
 
 import com.zurrtum.create.AllSoundEvents;
+import com.zurrtum.create.client.AllKeys;
 import com.zurrtum.create.client.catnip.gui.widget.AbstractSimiWidget;
 import com.zurrtum.create.client.foundation.blockEntity.behaviour.scrollValue.ScrollValueBehaviour.StepContext;
 import com.zurrtum.create.client.foundation.utility.CreateLang;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.sound.PositionedSoundInstance;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
@@ -128,8 +128,8 @@ public class ScrollInput extends AbstractSimiWidget {
             pScrollY *= -1;
 
         StepContext context = new StepContext();
-        context.control = Screen.hasControlDown();
-        context.shift = Screen.hasShiftDown();
+        context.control = AllKeys.hasControlDown();
+        context.shift = AllKeys.hasShiftDown();
         context.currentValue = state;
         context.forward = pScrollY > 0;
 

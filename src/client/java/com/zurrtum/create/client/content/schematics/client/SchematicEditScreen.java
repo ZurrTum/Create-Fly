@@ -16,6 +16,7 @@ import com.zurrtum.create.client.foundation.utility.CreateLang;
 import net.minecraft.client.gui.Click;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.widget.TextFieldWidget;
+import net.minecraft.client.input.KeyInput;
 import net.minecraft.client.input.MouseInput;
 import net.minecraft.item.ItemStack;
 import net.minecraft.screen.ScreenTexts;
@@ -124,8 +125,8 @@ public class SchematicEditScreen extends AbstractSimiScreen {
     }
 
     @Override
-    public boolean keyPressed(int code, int p_keyPressed_2_, int p_keyPressed_3_) {
-        if (isPaste(code)) {
+    public boolean keyPressed(KeyInput input) {
+        if (input.isPaste()) {
             String coords = client.keyboard.getClipboard();
             if (coords != null && !coords.isEmpty()) {
                 coords.replaceAll(" ", "");
@@ -149,7 +150,7 @@ public class SchematicEditScreen extends AbstractSimiScreen {
             }
         }
 
-        return super.keyPressed(code, p_keyPressed_2_, p_keyPressed_3_);
+        return super.keyPressed(input);
     }
 
     @Override

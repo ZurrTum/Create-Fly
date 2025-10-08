@@ -8,6 +8,7 @@ import com.zurrtum.create.catnip.animation.LerpedFloat.Chaser;
 import com.zurrtum.create.catnip.data.Couple;
 import com.zurrtum.create.catnip.data.Iterate;
 import com.zurrtum.create.catnip.theme.Color;
+import com.zurrtum.create.client.AllKeys;
 import com.zurrtum.create.client.catnip.animation.AnimationTickHolder;
 import com.zurrtum.create.client.catnip.gui.UIRenderHelper;
 import com.zurrtum.create.client.content.logistics.AddressEditBox;
@@ -39,6 +40,8 @@ import net.minecraft.client.gui.Click;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.ingame.InventoryScreen;
 import net.minecraft.client.gui.widget.TextFieldWidget;
+import net.minecraft.client.input.CharInput;
+import net.minecraft.client.input.KeyInput;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.util.Window;
@@ -1232,7 +1235,7 @@ public class StockKeeperRequestScreen extends AbstractSimiContainerScreen<StockK
             hoveredSlot.getFirst()).get(hoveredSlot.getSecond());
 
         ItemStack itemStack = entry.stack;
-        int transfer = hasShiftDown() ? itemStack.getMaxCount() : hasControlDown() ? 10 : 1;
+        int transfer = click.hasShift() ? itemStack.getMaxCount() : click.hasCtrl() ? 10 : 1;
 
         //TODO
         //        if (recipeClicked && entry instanceof CraftableBigItemStack cbis) {
@@ -1287,7 +1290,7 @@ public class StockKeeperRequestScreen extends AbstractSimiContainerScreen<StockK
         Couple<Integer> hoveredSlot = getHoveredSlot((int) mouseX, (int) mouseY);
         boolean noHover = hoveredSlot == noneHovered;
 
-        if (noHover || hoveredSlot.getFirst() >= 0 && !hasShiftDown() && getMaxScroll() != 0) {
+        if (noHover || hoveredSlot.getFirst() >= 0 && !AllKeys.hasShiftDown() && getMaxScroll() != 0) {
             int maxScroll = getMaxScroll();
             int direction = (int) (Math.ceil(Math.abs(scrollY)) * -Math.signum(scrollY));
             float newTarget = MathHelper.clamp(Math.round(itemScroll.getChaseTarget() + direction), 0, maxScroll);
@@ -1302,7 +1305,7 @@ public class StockKeeperRequestScreen extends AbstractSimiContainerScreen<StockK
             hoveredSlot.getFirst()).get(hoveredSlot.getSecond());
 
         boolean remove = scrollY < 0;
-        int transfer = MathHelper.ceil(Math.abs(scrollY)) * (hasControlDown() ? 10 : 1);
+        int transfer = MathHelper.ceil(Math.abs(scrollY)) * (AllKeys.hasControlDown() ? 10 : 1);
 
         //TODO
         //        if (recipeClicked && entry instanceof CraftableBigItemStack cbis) {
@@ -1396,11 +1399,11 @@ public class StockKeeperRequestScreen extends AbstractSimiContainerScreen<StockK
     }
 
     @Override
-    public boolean charTyped(char pCodePoint, int pModifiers) {
-        if (addressBox.isFocused() && addressBox.charTyped(pCodePoint, pModifiers))
+    public boolean charTyped(CharInput input) {
+        if (addressBox.isFocused() && addressBox.charTyped(input))
             return true;
         String s = searchBox.getText();
-        if (!searchBox.charTyped(pCodePoint, pModifiers))
+        if (!searchBox.charTyped(input))
             return false;
         if (!Objects.equals(s, searchBox.getText())) {
             refreshSearchNextTick = true;
@@ -1412,23 +1415,24 @@ public class StockKeeperRequestScreen extends AbstractSimiContainerScreen<StockK
     }
 
     @Override
-    public boolean keyPressed(int pKeyCode, int pScanCode, int pModifiers) {
+    public boolean keyPressed(KeyInput input) {
+        int pKeyCode = input.key();
         if (pKeyCode == GLFW.GLFW_KEY_ENTER && searchBox.isFocused()) {
             searchBox.setFocused(false);
             return true;
         }
 
-        if (pKeyCode == GLFW.GLFW_KEY_ENTER && hasShiftDown()) {
+        if (pKeyCode == GLFW.GLFW_KEY_ENTER && input.hasShift()) {
             sendIt();
             return true;
         }
 
-        if (addressBox.isFocused() && addressBox.keyPressed(pKeyCode, pScanCode, pModifiers))
+        if (addressBox.isFocused() && addressBox.keyPressed(input))
             return true;
 
         String s = searchBox.getText();
-        if (!searchBox.keyPressed(pKeyCode, pScanCode, pModifiers))
-            return searchBox.isFocused() && searchBox.isVisible() && pKeyCode != 256 ? true : super.keyPressed(pKeyCode, pScanCode, pModifiers);
+        if (!searchBox.keyPressed(input))
+            return searchBox.isFocused() && searchBox.isVisible() && pKeyCode != 256 ? true : super.keyPressed(input);
         if (!Objects.equals(s, searchBox.getText())) {
             refreshSearchNextTick = true;
             moveToTopNextTick = true;
@@ -1525,11 +1529,6 @@ public class StockKeeperRequestScreen extends AbstractSimiContainerScreen<StockK
 
         if (isSchematicListMode())
             client.player.closeHandledScreen();
-    }
-
-    @Override
-    public boolean keyReleased(int pKeyCode, int pScanCode, int pModifiers) {
-        return super.keyReleased(pKeyCode, pScanCode, pModifiers);
     }
 
     @Override

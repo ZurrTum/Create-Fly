@@ -1,6 +1,7 @@
 package com.zurrtum.create.client.content.logistics.redstoneRequester;
 
 import com.zurrtum.create.AllItems;
+import com.zurrtum.create.client.AllKeys;
 import com.zurrtum.create.client.catnip.gui.element.GuiGameElement;
 import com.zurrtum.create.client.catnip.gui.widget.ElementWidget;
 import com.zurrtum.create.client.content.logistics.AddressEditBox;
@@ -178,7 +179,7 @@ public class RedstoneRequesterScreen extends AbstractSimiContainerScreen<Redston
                 ItemStack itemStack = handler.ghostInventory.getStack(i);
                 if (itemStack.isEmpty())
                     return true;
-                amounts.set(i, MathHelper.clamp((int) (amounts.get(i) + Math.signum(scrollY) * (hasShiftDown() ? 10 : 1)), 1, 256));
+                amounts.set(i, MathHelper.clamp((int) (amounts.get(i) + Math.signum(scrollY) * (AllKeys.hasShiftDown() ? 10 : 1)), 1, 256));
                 return true;
             }
         }

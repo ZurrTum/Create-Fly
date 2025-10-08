@@ -1,6 +1,7 @@
 package com.zurrtum.create.client.foundation.blockEntity.behaviour.scrollValue;
 
 import com.google.common.collect.ImmutableList;
+import com.zurrtum.create.client.AllKeys;
 import com.zurrtum.create.client.content.contraptions.chassis.ChassisRangeDisplay;
 import com.zurrtum.create.client.foundation.blockEntity.ValueSettingsBoard;
 import com.zurrtum.create.client.foundation.blockEntity.ValueSettingsFormatter;
@@ -11,7 +12,6 @@ import com.zurrtum.create.content.contraptions.chassis.RadialChassisBlock;
 import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
 import com.zurrtum.create.foundation.blockEntity.behaviour.ValueSettings;
 import com.zurrtum.create.foundation.blockEntity.behaviour.scrollValue.ServerBulkScrollValueBehaviour;
-import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.text.Text;
 import net.minecraft.util.hit.BlockHitResult;
@@ -41,7 +41,7 @@ public class ChassisScrollValueBehaviour extends ScrollValueBehaviour<ChassisBlo
 
     @Override
     public void newSettingHovered(ValueSettings valueSetting) {
-        if (!Screen.hasControlDown()) {
+        if (!AllKeys.hasControlDown()) {
             blockEntity.currentlySelectedRange = valueSetting.value() + 1;
         } else
             for (SmartBlockEntity be : behaviour.getBulk())

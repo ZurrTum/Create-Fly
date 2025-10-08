@@ -2,12 +2,12 @@ package com.zurrtum.create.client.content.contraptions.chassis;
 
 import com.mojang.datafixers.util.Pair;
 import com.zurrtum.create.AllItems;
+import com.zurrtum.create.client.AllKeys;
 import com.zurrtum.create.client.AllSpecialTextures;
 import com.zurrtum.create.client.catnip.outliner.Outliner;
 import com.zurrtum.create.content.contraptions.chassis.ChassisBlockEntity;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
@@ -112,7 +112,7 @@ public class ChassisRangeDisplay {
         if (!(blockEntity instanceof ChassisBlockEntity chassisBlockEntity))
             return;
 
-        boolean ctrl = Screen.hasControlDown();
+        boolean ctrl = AllKeys.hasControlDown();
 
         if (ctrl) {
             GroupEntry existingGroupForPos = getExistingGroupForPos(pos);
@@ -154,7 +154,7 @@ public class ChassisRangeDisplay {
     public static void display(ChassisBlockEntity chassis) {
 
         // Display a group and kill any selections of its contained chassis blocks
-        if (Screen.hasControlDown()) {
+        if (AllKeys.hasControlDown()) {
             GroupEntry hoveredGroup = new GroupEntry(chassis);
 
             for (ChassisBlockEntity included : hoveredGroup.includedBEs)

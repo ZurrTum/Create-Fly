@@ -24,7 +24,6 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.render.RenderTickCounter;
 import net.minecraft.client.util.InputUtil;
@@ -294,7 +293,7 @@ public class SchematicHandler {
             selectionScreen.cycle((int) Math.signum(delta));
             return true;
         }
-        if (Screen.hasControlDown())
+        if (AllKeys.hasControlDown())
             return currentTool.getTool().handleMouseWheel(delta);
         return false;
     }

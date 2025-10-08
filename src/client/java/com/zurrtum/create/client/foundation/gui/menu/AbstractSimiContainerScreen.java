@@ -14,6 +14,7 @@ import net.minecraft.client.gui.screen.ingame.GenericContainerScreen;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.gui.widget.ClickableWidget;
 import net.minecraft.client.gui.widget.TextFieldWidget;
+import net.minecraft.client.input.KeyInput;
 import net.minecraft.client.sound.PositionedSoundInstance;
 import net.minecraft.client.util.math.Rect2i;
 import net.minecraft.client.world.ClientWorld;
@@ -152,10 +153,10 @@ public abstract class AbstractSimiContainerScreen<T extends ScreenHandler> exten
     }
 
     @Override
-    public boolean keyPressed(int pKeyCode, int pScanCode, int pModifiers) {
-        if (getFocused() instanceof TextFieldWidget && pKeyCode != GLFW.GLFW_KEY_ESCAPE)
-            return getFocused().keyPressed(pKeyCode, pScanCode, pModifiers);
-        return super.keyPressed(pKeyCode, pScanCode, pModifiers);
+    public boolean keyPressed(KeyInput input) {
+        if (getFocused() instanceof TextFieldWidget && input.key() != GLFW.GLFW_KEY_ESCAPE)
+            return getFocused().keyPressed(input);
+        return super.keyPressed(input);
     }
 
     @Override

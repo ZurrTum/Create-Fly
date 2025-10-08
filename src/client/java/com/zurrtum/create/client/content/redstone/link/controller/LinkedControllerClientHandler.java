@@ -138,7 +138,7 @@ public class LinkedControllerClientHandler {
             return;
         }
 
-        if (InputUtil.isKeyPressed(mc.getWindow().getHandle(), GLFW.GLFW_KEY_ESCAPE)) {
+        if (InputUtil.isKeyPressed(mc.getWindow(), GLFW.GLFW_KEY_ESCAPE)) {
             MODE = Mode.IDLE;
             onReset(player);
             return;

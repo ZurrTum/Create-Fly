@@ -30,7 +30,7 @@ public class DeployTool extends PlacementToolBase {
             selectionRange = (int) (schematicHandler.getBounds().getCenter().length() / 2);
             selectionRange = MathHelper.clamp(selectionRange, 1, 100);
         }
-        selectIgnoreBlocks = InputUtil.isKeyPressed(mc.getWindow().getHandle(), GLFW.GLFW_KEY_LEFT_CONTROL);
+        selectIgnoreBlocks = InputUtil.isKeyPressed(mc.getWindow(), GLFW.GLFW_KEY_LEFT_CONTROL);
         super.updateSelection(mc);
     }
 

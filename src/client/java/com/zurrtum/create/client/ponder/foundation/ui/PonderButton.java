@@ -9,6 +9,7 @@ import com.zurrtum.create.client.catnip.gui.element.GuiGameElement;
 import com.zurrtum.create.client.catnip.gui.widget.BoxWidget;
 import com.zurrtum.create.client.ponder.foundation.PonderTag;
 import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.input.KeyInput;
 import net.minecraft.client.input.MouseInput;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.item.ItemStack;
@@ -120,8 +121,8 @@ public class PonderButton extends BoxWidget {
     }
 
     @Override
-    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-        if (shortcut != null && shortcut.matchesKey(keyCode, scanCode)) {
+    public boolean keyPressed(KeyInput input) {
+        if (shortcut != null && shortcut.matchesKey(input)) {
             gradientColor = getColorClick();
             startGradientAnimation(getColorForState(), 0.15);
 
@@ -129,7 +130,7 @@ public class PonderButton extends BoxWidget {
             return true;
         }
 
-        return super.keyPressed(keyCode, scanCode, modifiers);
+        return super.keyPressed(input);
     }
 
     @Override

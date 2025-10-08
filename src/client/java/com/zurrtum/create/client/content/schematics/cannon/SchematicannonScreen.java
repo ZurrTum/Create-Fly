@@ -2,6 +2,7 @@ package com.zurrtum.create.client.content.schematics.cannon;
 
 import com.google.common.collect.ImmutableList;
 import com.zurrtum.create.AllItems;
+import com.zurrtum.create.client.AllKeys;
 import com.zurrtum.create.client.catnip.gui.element.GuiGameElement;
 import com.zurrtum.create.client.catnip.gui.widget.ElementWidget;
 import com.zurrtum.create.client.catnip.lang.FontHelper.Palette;
@@ -264,15 +265,16 @@ public class SchematicannonScreen extends AbstractSimiContainerScreen<Schematica
         if (placementSettingsHidden())
             return;
 
+        boolean hasShiftDown = AllKeys.hasShiftDown();
         for (ClickableWidget w : placementSettingWidgets)
             if (w instanceof IconButton button) {
                 if (!button.getToolTip().isEmpty()) {
                     button.setToolTip(button.getToolTip().getFirst());
-                    button.getToolTip().add(TooltipHelper.holdShift(Palette.BLUE, hasShiftDown()));
+                    button.getToolTip().add(TooltipHelper.holdShift(Palette.BLUE, hasShiftDown));
                 }
             }
 
-        if (hasShiftDown()) {
+        if (hasShiftDown) {
             fillToolTip(skipMissingButton, skipMissingIndicator, "skipMissing");
             fillToolTip(skipBlockEntitiesButton, skipBlockEntitiesIndicator, "skipBlockEntities");
             fillToolTip(replaceLevelButtons.get(0), replaceLevelIndicators.get(0), "dontReplaceSolid");

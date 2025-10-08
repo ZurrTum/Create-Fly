@@ -1,6 +1,7 @@
 package com.zurrtum.create.client.foundation.blockEntity;
 
 import com.zurrtum.create.AllSoundEvents;
+import com.zurrtum.create.client.AllKeys;
 import com.zurrtum.create.client.catnip.gui.AbstractSimiScreen;
 import com.zurrtum.create.client.catnip.gui.UIRenderHelper;
 import com.zurrtum.create.client.foundation.blockEntity.ValueSettingsFormatter.ScrollOptionSettingsFormatter;
@@ -12,6 +13,7 @@ import com.zurrtum.create.foundation.blockEntity.behaviour.ValueSettings;
 import com.zurrtum.create.infrastructure.packet.c2s.ValueSettingsPacket;
 import net.minecraft.client.gui.Click;
 import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.input.KeyInput;
 import net.minecraft.client.sound.PositionedSoundInstance;
 import net.minecraft.client.util.Window;
 import net.minecraft.text.Text;
@@ -80,7 +82,7 @@ public class ValueSettingsScreen extends AbstractSimiScreen {
     public ValueSettings getClosestCoordinate(int mouseX, int mouseY) {
         int row = 0;
         int column = 0;
-        boolean milestonesOnly = hasShiftDown();
+        boolean milestonesOnly = AllKeys.hasShiftDown();
 
         double bestDiff = Double.MAX_VALUE;
         for (; row < board.rows().size(); row++) {
@@ -293,7 +295,7 @@ public class ValueSettingsScreen extends AbstractSimiScreen {
     @Override
     public boolean mouseScrolled(double pMouseX, double pMouseY, double pScrollX, double pScrollY) {
         ValueSettings closest = getClosestCoordinate((int) pMouseX, (int) pMouseY);
-        int column = closest.value() + ((int) Math.signum(pScrollY)) * (hasShiftDown() ? board.milestoneInterval() : 1);
+        int column = closest.value() + ((int) Math.signum(pScrollY)) * (AllKeys.hasShiftDown() ? board.milestoneInterval() : 1);
         column = MathHelper.clamp(column, 0, board.maxValue());
         if (column == closest.value())
             return false;
@@ -302,15 +304,15 @@ public class ValueSettingsScreen extends AbstractSimiScreen {
     }
 
     @Override
-    public boolean keyReleased(int pKeyCode, int pScanCode, int pModifiers) {
-        if (client.options.useKey.matchesKey(pKeyCode, pScanCode)) {
+    public boolean keyReleased(KeyInput input) {
+        if (client.options.useKey.matchesKey(input)) {
             Window window = client.getWindow();
             double x = client.mouse.getX() * window.getScaledWidth() / window.getWidth();
             double y = client.mouse.getY() * window.getScaledHeight() / window.getHeight();
             saveAndClose(x, y);
             return true;
         }
-        return super.keyReleased(pKeyCode, pScanCode, pModifiers);
+        return super.keyReleased(input);
     }
 
     @Override
@@ -331,7 +333,7 @@ public class ValueSettingsScreen extends AbstractSimiScreen {
             null,
             null,
             Direction.UP,
-            hasControlDown(),
+            AllKeys.hasControlDown(),
             netId
         ));
         close();

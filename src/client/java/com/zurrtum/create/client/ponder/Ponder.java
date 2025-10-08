@@ -11,7 +11,6 @@ import org.slf4j.Logger;
 
 public class Ponder {
     public static final String MOD_ID = "ponder";
-    public static final String MOD_NAME = "Ponder";
     public static final Logger LOGGER = LogUtils.getLogger();
 
     public static LangBuilder lang() {

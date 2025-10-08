@@ -3,6 +3,7 @@ package com.zurrtum.create.client.content.schematics.client;
 import com.zurrtum.create.AllItems;
 import com.zurrtum.create.Create;
 import com.zurrtum.create.catnip.math.VecHelper;
+import com.zurrtum.create.client.AllKeys;
 import com.zurrtum.create.client.AllSpecialTextures;
 import com.zurrtum.create.client.catnip.animation.AnimationTickHolder;
 import com.zurrtum.create.client.catnip.gui.ScreenOpener;
@@ -15,7 +16,6 @@ import com.zurrtum.create.content.schematics.SchematicExport.SchematicExportResu
 import com.zurrtum.create.foundation.utility.CreatePaths;
 import com.zurrtum.create.infrastructure.packet.c2s.InstantSchematicPacket;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.item.ItemPlacementContext;
@@ -45,7 +45,7 @@ public class SchematicAndQuillHandler {
     public boolean mouseScrolled(MinecraftClient mc, double delta) {
         if (!isActive(mc))
             return false;
-        if (!Screen.hasControlDown())
+        if (!AllKeys.hasControlDown())
             return false;
         if (secondPos == null)
             range = (int) MathHelper.clamp(range + delta, 1, 100);
@@ -128,7 +128,7 @@ public class SchematicAndQuillHandler {
             return;
 
         ClientPlayerEntity player = mc.player;
-        if (InputUtil.isKeyPressed(mc.getWindow().getHandle(), GLFW.GLFW_KEY_LEFT_CONTROL)) {
+        if (InputUtil.isKeyPressed(mc.getWindow(), GLFW.GLFW_KEY_LEFT_CONTROL)) {
             float pt = AnimationTickHolder.getPartialTicks();
             Vec3d targetVec = player.getCameraPosVec(pt).add(player.getRotationVector().multiply(range));
             selectedPos = BlockPos.ofFloored(targetVec);

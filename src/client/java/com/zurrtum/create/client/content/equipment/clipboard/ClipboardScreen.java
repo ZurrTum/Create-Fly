@@ -19,8 +19,9 @@ import net.minecraft.client.font.TextHandler;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.Click;
 import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.PageTurnWidget;
+import net.minecraft.client.input.CharInput;
+import net.minecraft.client.input.KeyInput;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.client.sound.PositionedSoundInstance;
 import net.minecraft.client.util.SelectionManager;
@@ -31,7 +32,6 @@ import net.minecraft.text.MutableText;
 import net.minecraft.text.OrderedText;
 import net.minecraft.text.Style;
 import net.minecraft.text.Text;
-import net.minecraft.util.StringHelper;
 import net.minecraft.util.Util;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
@@ -367,59 +367,60 @@ public class ClipboardScreen extends AbstractSimiScreen {
     }
 
     @Override
-    public boolean keyPressed(int pKeyCode, int pScanCode, int pModifiers) {
+    public boolean keyPressed(KeyInput input) {
+        int pKeyCode = input.key();
         if (pKeyCode == 266) {
-            backward.onPress();
+            backward.onPress(input);
             return true;
         }
         if (pKeyCode == 267) {
-            forward.onPress();
+            forward.onPress(input);
             return true;
         }
         if (editingIndex != -1 && pKeyCode != 256) {
-            keyPressedWhileEditing(pKeyCode, pScanCode, pModifiers);
+            keyPressedWhileEditing(input);
             clearDisplayCache();
             return true;
         }
-        if (super.keyPressed(pKeyCode, pScanCode, pModifiers))
+        if (super.keyPressed(input))
             return true;
         return true;
     }
 
     @Override
-    public boolean charTyped(char pCodePoint, int pModifiers) {
-        if (super.charTyped(pCodePoint, pModifiers))
+    public boolean charTyped(CharInput input) {
+        if (super.charTyped(input))
             return true;
-        if (!StringHelper.isValidChar(pCodePoint))
+        if (!input.isValidChar())
             return false;
         if (editingIndex == -1)
             return false;
-        editContext.insert(Character.toString(pCodePoint));
+        editContext.insert(input.asString());
         clearDisplayCache();
         return true;
     }
 
-    private boolean keyPressedWhileEditing(int pKeyCode, int pScanCode, int pModifiers) {
-        if (Screen.isSelectAll(pKeyCode)) {
+    private boolean keyPressedWhileEditing(KeyInput input) {
+        if (input.isSelectAll()) {
             editContext.selectAll();
             return true;
-        } else if (Screen.isCopy(pKeyCode)) {
+        } else if (input.isCopy()) {
             editContext.copy();
             return true;
-        } else if (Screen.isPaste(pKeyCode)) {
+        } else if (input.isPaste()) {
             editContext.paste();
             return true;
-        } else if (Screen.isCut(pKeyCode)) {
+        } else if (input.isCut()) {
             editContext.cut();
             return true;
         } else {
-            switch (pKeyCode) {
+            switch (input.key()) {
                 case 257:
                 case 335:
-                    if (hasShiftDown()) {
+                    if (input.hasShift()) {
                         editContext.insert("\n");
                         return true;
-                    } else if (!hasControlDown()) {
+                    } else if (!input.hasCtrl()) {
                         if (currentEntries.size() <= editingIndex + 1 || !currentEntries.get(editingIndex + 1).text.getString().isEmpty())
                             currentEntries.add(editingIndex + 1, new ClipboardEntry(false, Text.empty()));
                         editingIndex += 1;
@@ -439,7 +440,7 @@ public class ClipboardScreen extends AbstractSimiScreen {
                         editingIndex = Math.max(0, editingIndex - 1);
                         editContext.putCursorAtEnd();
                         return true;
-                    } else if (hasControlDown()) {
+                    } else if (input.hasCtrl()) {
                         int prevPos = editContext.getSelectionStart();
                         editContext.moveCursorPastWord(-1);
                         if (prevPos != editContext.getSelectionStart())
@@ -449,7 +450,7 @@ public class ClipboardScreen extends AbstractSimiScreen {
                     editContext.delete(-1);
                     return true;
                 case 261:
-                    if (hasControlDown()) {
+                    if (input.hasCtrl()) {
                         int prevPos = editContext.getSelectionStart();
                         editContext.moveCursorPastWord(1);
                         if (prevPos != editContext.getSelectionStart())
@@ -459,30 +460,30 @@ public class ClipboardScreen extends AbstractSimiScreen {
                     editContext.delete(1);
                     return true;
                 case 262:
-                    if (hasControlDown()) {
-                        editContext.moveCursorPastWord(1, Screen.hasShiftDown());
+                    if (input.hasCtrl()) {
+                        editContext.moveCursorPastWord(1, input.hasShift());
                         return true;
                     }
-                    editContext.moveCursor(1, Screen.hasShiftDown());
+                    editContext.moveCursor(1, input.hasShift());
                     return true;
                 case 263:
-                    if (hasControlDown()) {
-                        editContext.moveCursorPastWord(-1, Screen.hasShiftDown());
+                    if (input.hasCtrl()) {
+                        editContext.moveCursorPastWord(-1, input.hasShift());
                         return true;
                     }
-                    editContext.moveCursor(-1, Screen.hasShiftDown());
+                    editContext.moveCursor(-1, input.hasShift());
                     return true;
                 case 264:
-                    keyDown();
+                    keyDown(input);
                     return true;
                 case 265:
-                    keyUp();
+                    keyUp(input);
                     return true;
                 case 268:
-                    keyHome();
+                    keyHome(input);
                     return true;
                 case 269:
-                    keyEnd();
+                    keyEnd(input);
                     return true;
                 default:
                     return false;
@@ -490,31 +491,31 @@ public class ClipboardScreen extends AbstractSimiScreen {
         }
     }
 
-    private void keyUp() {
-        changeLine(-1);
+    private void keyUp(KeyInput input) {
+        changeLine(input, -1);
     }
 
-    private void keyDown() {
-        changeLine(1);
+    private void keyDown(KeyInput input) {
+        changeLine(input, 1);
     }
 
-    private void changeLine(int pYChange) {
+    private void changeLine(KeyInput input, int pYChange) {
         int i = editContext.getSelectionStart();
         int j = getDisplayCache().changeLine(i, pYChange);
-        editContext.moveCursorTo(j, Screen.hasShiftDown());
+        editContext.moveCursorTo(j, input.hasShift());
     }
 
-    private void keyHome() {
+    private void keyHome(KeyInput input) {
         int i = editContext.getSelectionStart();
         int j = getDisplayCache().findLineStart(i);
-        editContext.moveCursorTo(j, Screen.hasShiftDown());
+        editContext.moveCursorTo(j, input.hasShift());
     }
 
-    private void keyEnd() {
+    private void keyEnd(KeyInput input) {
         DisplayCache cache = getDisplayCache();
         int i = editContext.getSelectionStart();
         int j = cache.findLineEnd(i);
-        editContext.moveCursorTo(j, Screen.hasShiftDown());
+        editContext.moveCursorTo(j, input.hasShift());
     }
 
     private void renderCursor(DrawContext graphics, Pos2i pCursorPos, boolean pIsEndOfText) {
@@ -609,7 +610,7 @@ public class ClipboardScreen extends AbstractSimiScreen {
                     editContext.selectAll();
                 }
             } else {
-                editContext.moveCursorTo(j, Screen.hasShiftDown());
+                editContext.moveCursorTo(j, click.hasShift());
             }
 
             clearDisplayCache();

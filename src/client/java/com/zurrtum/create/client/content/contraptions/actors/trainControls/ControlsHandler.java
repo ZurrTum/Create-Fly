@@ -63,7 +63,7 @@ public class ControlsHandler {
         if (packetCooldown > 0)
             packetCooldown--;
 
-        if (entity.isRemoved() || InputUtil.isKeyPressed(mc.getWindow().getHandle(), GLFW.GLFW_KEY_ESCAPE)) {
+        if (entity.isRemoved() || InputUtil.isKeyPressed(mc.getWindow(), GLFW.GLFW_KEY_ESCAPE)) {
             BlockPos pos = controlsPos;
             stopControlling(mc.player);
             mc.player.networkHandler.sendPacket(new ControlsInputPacket(currentlyPressed, false, entity.getId(), pos, true));

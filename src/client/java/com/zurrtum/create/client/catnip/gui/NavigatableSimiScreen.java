@@ -10,6 +10,7 @@ import com.zurrtum.create.client.ponder.enums.PonderGuiTextures;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.input.KeyInput;
 import net.minecraft.client.util.Window;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.MathHelper;
@@ -202,12 +203,12 @@ public abstract class NavigatableSimiScreen extends AbstractSimiScreen {
     }
 
     @Override
-    public boolean keyPressed(int code, int p_keyPressed_2_, int p_keyPressed_3_) {
-        if (code == GLFW.GLFW_KEY_BACKSPACE) {
+    public boolean keyPressed(KeyInput input) {
+        if (input.key() == GLFW.GLFW_KEY_BACKSPACE) {
             ScreenOpener.openPreviousScreen(this, null);
             return true;
         }
-        return super.keyPressed(code, p_keyPressed_2_, p_keyPressed_3_);
+        return super.keyPressed(input);
     }
 
     public void centerScalingOn(int x, int y) {

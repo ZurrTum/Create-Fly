@@ -119,7 +119,6 @@ import io.netty.buffer.Unpooled;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.world.ClientWorld;
@@ -169,7 +168,7 @@ public class AllHandle extends AllClientHandle<ClientPlayNetworkHandler> {
 
     @Override
     public boolean shiftDown() {
-        return Screen.hasShiftDown();
+        return AllKeys.hasShiftDown();
     }
 
     @Override

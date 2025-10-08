@@ -22,6 +22,7 @@ import com.zurrtum.create.infrastructure.itemGroup.FabricItemGroupImpl;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.ingame.CreativeInventoryScreen;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
+import net.minecraft.client.input.KeyInput;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemGroups;
@@ -93,7 +94,8 @@ public abstract class CreativeInventoryScreenMixin extends HandledScreen<Creativ
     }
 
     @Inject(method = "keyPressed", at = @At("HEAD"), cancellable = true)
-    private void keyPressed(int keyCode, int scanCode, int modifiers, CallbackInfoReturnable<Boolean> cir) {
+    private void keyPressed(KeyInput input, CallbackInfoReturnable<Boolean> cir) {
+        int keyCode = input.key();
         if (keyCode == GLFW.GLFW_KEY_PAGE_UP) {
             if (fabric_switchToPreviousPage()) {
                 cir.setReturnValue(true);

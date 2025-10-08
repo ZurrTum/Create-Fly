@@ -7,6 +7,7 @@ import com.zurrtum.create.catnip.animation.LerpedFloat;
 import com.zurrtum.create.catnip.animation.LerpedFloat.Chaser;
 import com.zurrtum.create.catnip.data.IntAttached;
 import com.zurrtum.create.catnip.data.Pair;
+import com.zurrtum.create.client.AllKeys;
 import com.zurrtum.create.client.AllScheduleRenders;
 import com.zurrtum.create.client.Create;
 import com.zurrtum.create.client.catnip.animation.AnimationTickHolder;
@@ -39,6 +40,7 @@ import net.minecraft.client.gui.Click;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.Drawable;
 import net.minecraft.client.gui.widget.TextFieldWidget;
+import net.minecraft.client.input.KeyInput;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.util.math.Rect2i;
 import net.minecraft.entity.player.PlayerInventory;
@@ -971,19 +973,20 @@ public class ScheduleScreen extends AbstractSimiContainerScreen<ScheduleMenu> im
     }
 
     @Override
-    public boolean keyPressed(int pKeyCode, int pScanCode, int pModifiers) {
-        if (destinationSuggestions != null && destinationSuggestions.keyPressed(pKeyCode, pScanCode, pModifiers))
+    public boolean keyPressed(KeyInput input) {
+        if (destinationSuggestions != null && destinationSuggestions.keyPressed(input))
             return true;
         if (editingCondition == null && editingDestination == null)
-            return super.keyPressed(pKeyCode, pScanCode, pModifiers);
+            return super.keyPressed(input);
+        int pKeyCode = input.key();
         boolean hitEnter = getFocused() instanceof TextFieldWidget && (pKeyCode == 257 || pKeyCode == 335);
-        boolean hitE = getFocused() == null && client.options.inventoryKey.matchesKey(pKeyCode, pScanCode);
+        boolean hitE = getFocused() == null && client.options.inventoryKey.matchesKey(input);
         if (hitE || hitEnter) {
             onEditorClose.accept(true);
             stopEditing();
             return true;
         }
-        return super.keyPressed(pKeyCode, pScanCode, pModifiers);
+        return super.keyPressed(input);
     }
 
     @Override
@@ -993,7 +996,7 @@ public class ScheduleScreen extends AbstractSimiContainerScreen<ScheduleMenu> im
         if (editingCondition != null || editingDestination != null)
             return hoveredElement(pMouseX, pMouseY).filter(element -> element.mouseScrolled(pMouseX, pMouseY, pScrollX, pScrollY)).isPresent();
 
-        if (hasShiftDown()) {
+        if (AllKeys.hasShiftDown()) {
             List<ScheduleEntry> entries = schedule.entries;
             int y = (int) (pMouseY - this.y - 25 + scroll.getValue());
             for (int i = 0; i < entries.size(); i++) {

@@ -1,6 +1,7 @@
 package com.zurrtum.create.client.foundation.blockEntity.behaviour.scrollValue;
 
 import com.zurrtum.create.AllItems;
+import com.zurrtum.create.client.AllKeys;
 import com.zurrtum.create.client.Create;
 import com.zurrtum.create.client.catnip.outliner.Outliner;
 import com.zurrtum.create.client.foundation.blockEntity.behaviour.ValueBox;
@@ -9,7 +10,6 @@ import com.zurrtum.create.client.foundation.blockEntity.behaviour.ValueBox.TextV
 import com.zurrtum.create.client.foundation.utility.CreateLang;
 import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.item.ItemStack;
 import net.minecraft.text.MutableText;
@@ -59,7 +59,7 @@ public class ScrollValueRenderer {
             return;
         boolean highlight = behaviour.testHit(target.getPos()) && !clipboard;
 
-        if (Screen.hasControlDown()) {
+        if (AllKeys.hasControlDown()) {
             List<? extends SmartBlockEntity> bulks = behaviour.getBulk();
             if (bulks != null) {
                 for (SmartBlockEntity smartBlockEntity : bulks) {

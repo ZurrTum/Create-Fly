@@ -11,6 +11,7 @@ import com.zurrtum.create.client.foundation.gui.widget.IconButton;
 import com.zurrtum.create.client.foundation.utility.CreateLang;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.widget.TextFieldWidget;
+import net.minecraft.client.input.KeyInput;
 import net.minecraft.screen.ScreenTexts;
 import net.minecraft.text.Text;
 import org.lwjgl.glfw.GLFW;
@@ -96,7 +97,8 @@ public class SchematicPromptScreen extends AbstractSimiScreen {
     }
 
     @Override
-    public boolean keyPressed(int keyCode, int p_keyPressed_2_, int p_keyPressed_3_) {
+    public boolean keyPressed(KeyInput input) {
+        int keyCode = input.key();
         if (keyCode == GLFW.GLFW_KEY_ENTER) {
             confirm(false);
             return true;
@@ -105,7 +107,7 @@ public class SchematicPromptScreen extends AbstractSimiScreen {
             close();
             return true;
         }
-        return nameField.keyPressed(keyCode, p_keyPressed_2_, p_keyPressed_3_);
+        return nameField.keyPressed(input);
     }
 
     private void confirm(boolean convertImmediately) {

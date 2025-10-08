@@ -15,6 +15,7 @@ import com.zurrtum.create.infrastructure.packet.c2s.ToolboxDisposeAllPacket;
 import com.zurrtum.create.infrastructure.packet.c2s.ToolboxEquipPacket;
 import net.minecraft.client.gui.Click;
 import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.input.KeyInput;
 import net.minecraft.client.input.MouseInput;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.util.InputUtil;
@@ -341,10 +342,10 @@ public class RadialToolboxMenu extends AbstractSimiScreen {
     }
 
     @Override
-    public boolean keyPressed(int code, int scanCode, int modifiers) {
+    public boolean keyPressed(KeyInput input) {
         KeyBinding[] hotbarBinds = client.options.hotbarKeys;
         for (int i = 0; i < hotbarBinds.length && i < 8; i++) {
-            if (hotbarBinds[i].matchesKey(code, scanCode)) {
+            if (hotbarBinds[i].matchesKey(input)) {
 
                 if (state == State.SELECT_ITEM || state == State.SELECT_ITEM_UNEQUIP) {
                     ToolboxInventory inv = selectedBox.inventory;
@@ -364,17 +365,17 @@ public class RadialToolboxMenu extends AbstractSimiScreen {
             }
         }
 
-        return super.keyPressed(code, scanCode, modifiers);
+        return super.keyPressed(input);
     }
 
     @Override
-    public boolean keyReleased(int code, int scanCode, int modifiers) {
-        InputUtil.Key mouseKey = InputUtil.fromKeyCode(code, scanCode);
+    public boolean keyReleased(KeyInput input) {
+        InputUtil.Key mouseKey = InputUtil.fromKeyCode(input);
         if (mouseKey == AllKeys.TOOLBELT.boundKey) {
             close();
             return true;
         }
-        return super.keyReleased(code, scanCode, modifiers);
+        return super.keyReleased(input);
     }
 
     public enum State {

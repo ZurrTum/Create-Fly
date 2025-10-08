@@ -10,6 +10,7 @@ import com.zurrtum.create.catnip.data.Pair;
 import com.zurrtum.create.catnip.math.Pointing;
 import com.zurrtum.create.catnip.registry.RegisteredObjectsHelper;
 import com.zurrtum.create.catnip.theme.Color;
+import com.zurrtum.create.client.AllKeys;
 import com.zurrtum.create.client.catnip.animation.AnimationTickHolder;
 import com.zurrtum.create.client.catnip.gui.NavigatableSimiScreen;
 import com.zurrtum.create.client.catnip.gui.ScreenOpener;
@@ -481,7 +482,7 @@ public class PonderUI extends AbstractPonderScreen {
         identifyMode = false;
         PonderScene scene = scenes.get(index);
 
-        if (hasShiftDown()) {
+        if (AllKeys.hasShiftDown()) {
             PonderIndex.reload();
             this.scenes.clear();
             this.scenes.addAll(PonderIndex.getSceneAccess().compile(scene.getLocation()));
@@ -864,7 +865,7 @@ public class PonderUI extends AbstractPonderScreen {
                 return true;
             }
 
-            if (hasShiftDown())
+            if (AllKeys.hasShiftDown())
                 clipboardHelper.setClipboard(
                     handle,
                     "util.select().position(" + hoveredBlockPos.getX() + ", " + hoveredBlockPos.getY() + ", " + hoveredBlockPos.getZ() + ")"

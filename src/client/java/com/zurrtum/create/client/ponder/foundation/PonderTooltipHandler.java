@@ -59,7 +59,7 @@ public class PonderTooltipHandler {
 
         float value = holdKeyProgress.getValue();
 
-        if (!subject && InputUtil.isKeyPressed(instance.getWindow().getHandle(), ponderKeybind().boundKey.getCode()) && currentScreen != null) {
+        if (!subject && InputUtil.isKeyPressed(instance.getWindow(), ponderKeybind().boundKey.getCode()) && currentScreen != null) {
             if (value >= 1) {
                 if (currentScreen instanceof NavigatableSimiScreen)
                     ((NavigatableSimiScreen) currentScreen).centerScalingOnMouse();
