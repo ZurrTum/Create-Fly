@@ -9,32 +9,53 @@ import com.zurrtum.create.content.kinetics.crank.HandCrankBlock;
 import com.zurrtum.create.content.kinetics.crank.HandCrankBlockEntity;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.render.RenderLayer;
-import net.minecraft.client.render.VertexConsumerProvider;
+import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.render.block.entity.BlockEntityRendererFactory;
+import net.minecraft.client.render.command.ModelCommandRenderer;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.state.property.Properties;
 import net.minecraft.util.math.Direction;
+import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.World;
+import org.jetbrains.annotations.Nullable;
 
-public class HandCrankRenderer extends KineticBlockEntityRenderer<HandCrankBlockEntity> {
-
+public class HandCrankRenderer extends KineticBlockEntityRenderer<HandCrankBlockEntity, HandCrankRenderer.HandCrankRenderState> {
     public HandCrankRenderer(BlockEntityRendererFactory.Context context) {
         super(context);
     }
 
     @Override
-    protected void renderSafe(HandCrankBlockEntity be, float partialTicks, MatrixStack ms, VertexConsumerProvider buffer, int light, int overlay) {
-        if (shouldRenderShaft())
-            super.renderSafe(be, partialTicks, ms, buffer, light, overlay);
+    public HandCrankRenderState createRenderState() {
+        return new HandCrankRenderState();
+    }
 
-        if (VisualizationManager.supportsVisualization(be.getWorld()))
-            return;
+    @Override
+    public void updateRenderState(
+        HandCrankBlockEntity be,
+        HandCrankRenderState state,
+        float tickProgress,
+        Vec3d cameraPos,
+        ModelCommandRenderer.@Nullable CrumblingOverlayCommand crumblingOverlay
+    ) {
+        if (shouldRenderShaft()) {
+            super.updateRenderState(be, state, tickProgress, cameraPos, crumblingOverlay);
+            if (state.support) {
+                return;
+            }
+        } else {
+            World world = be.getWorld();
+            state.support = VisualizationManager.supportsVisualization(world);
+            if (state.support) {
+                return;
+            }
+            updateBaseRenderState(be, state, world, crumblingOverlay);
+        }
+        state.handle = getRenderedHandle(state.blockState);
+        state.handleAngle = getIndependentAngle(be, tickProgress);
+    }
 
-        BlockState state = be.getCachedState();
-        Direction facing = state.get(Properties.FACING);
-        kineticRotationTransform(getRenderedHandle(state), be, facing.getAxis(), getIndependentAngle(be, partialTicks), light).renderInto(
-            ms,
-            buffer.getBuffer(RenderLayer.getSolid())
-        );
+    @Override
+    protected RenderLayer getRenderType(HandCrankBlockEntity be, BlockState state) {
+        return RenderLayer.getSolid();
     }
 
     public float getIndependentAngle(HandCrankBlockEntity be, float partialTicks) {
@@ -52,5 +73,21 @@ public class HandCrankRenderer extends KineticBlockEntityRenderer<HandCrankBlock
 
     public boolean shouldRenderShaft() {
         return true;
+    }
+
+    public static class HandCrankRenderState extends KineticRenderState {
+        public SuperByteBuffer handle;
+        public float handleAngle;
+
+        @Override
+        public void render(MatrixStack.Entry matricesEntry, VertexConsumer vertexConsumer) {
+            if (model != null) {
+                super.render(matricesEntry, vertexConsumer);
+            }
+            handle.light(lightmapCoordinates);
+            handle.rotateCentered(handleAngle, direction);
+            handle.color(color);
+            handle.renderInto(matricesEntry, vertexConsumer);
+        }
     }
 }

@@ -55,6 +55,12 @@ public class KineticBlockEntityRenderer<T extends KineticBlockEntity, S extends 
         if (state.support) {
             return;
         }
+        updateBaseRenderState(be, state, world, crumblingOverlay);
+        state.model = getRotatedModel(be, state);
+        state.angle = getAngleForBe(be, state.pos, state.axis);
+    }
+
+    public void updateBaseRenderState(T be, S state, World world, @Nullable ModelCommandRenderer.CrumblingOverlayCommand crumblingOverlay) {
         state.pos = be.getPos();
         state.blockState = getRenderedBlockState(be);
         state.type = be.getType();
@@ -66,8 +72,6 @@ public class KineticBlockEntityRenderer<T extends KineticBlockEntity, S extends 
         state.layer = getRenderType(be, state.blockState);
         state.axis = ((IRotate) state.blockState.getBlock()).getRotationAxis(state.blockState);
         state.direction = Direction.from(state.axis, AxisDirection.POSITIVE);
-        state.model = getRotatedModel(be, state);
-        state.angle = getAngleForBe(be, state.pos, state.axis);
         state.color = getColor(be);
     }
 
