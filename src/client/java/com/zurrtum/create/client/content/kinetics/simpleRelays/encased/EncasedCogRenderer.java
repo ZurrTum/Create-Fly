@@ -1,29 +1,24 @@
 package com.zurrtum.create.client.content.kinetics.simpleRelays.encased;
 
-import com.zurrtum.create.catnip.data.Iterate;
 import com.zurrtum.create.client.AllPartialModels;
 import com.zurrtum.create.client.catnip.render.CachedBuffers;
 import com.zurrtum.create.client.catnip.render.SuperByteBuffer;
 import com.zurrtum.create.client.content.kinetics.base.KineticBlockEntityRenderer;
 import com.zurrtum.create.client.content.kinetics.simpleRelays.BracketedKineticBlockEntityRenderer;
-import com.zurrtum.create.client.flywheel.api.visualization.VisualizationManager;
-import com.zurrtum.create.content.kinetics.base.IRotate;
 import com.zurrtum.create.content.kinetics.simpleRelays.SimpleKineticBlockEntity;
 import com.zurrtum.create.content.kinetics.simpleRelays.encased.EncasedCogwheelBlock;
-import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.render.RenderLayer;
-import net.minecraft.client.render.VertexConsumerProvider;
+import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.render.block.entity.BlockEntityRendererFactory;
+import net.minecraft.client.render.command.ModelCommandRenderer;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Direction.Axis;
-import net.minecraft.util.math.Direction.AxisDirection;
+import net.minecraft.util.math.Vec3d;
+import org.jetbrains.annotations.Nullable;
 
-public class EncasedCogRenderer extends KineticBlockEntityRenderer<SimpleKineticBlockEntity> {
-
-    private boolean large;
+public class EncasedCogRenderer extends KineticBlockEntityRenderer<SimpleKineticBlockEntity, EncasedCogRenderer.EncasedCogRenderState> {
+    private final boolean large;
 
     public static EncasedCogRenderer small(BlockEntityRendererFactory.Context context) {
         return new EncasedCogRenderer(context, false);
@@ -39,43 +34,74 @@ public class EncasedCogRenderer extends KineticBlockEntityRenderer<SimpleKinetic
     }
 
     @Override
-    protected void renderSafe(
+    public EncasedCogRenderState createRenderState() {
+        return new EncasedCogRenderState();
+    }
+
+    @Override
+    public void updateRenderState(
         SimpleKineticBlockEntity be,
-        float partialTicks,
-        MatrixStack ms,
-        VertexConsumerProvider buffer,
-        int light,
-        int overlay
+        EncasedCogRenderState state,
+        float tickProgress,
+        Vec3d cameraPos,
+        ModelCommandRenderer.@Nullable CrumblingOverlayCommand crumblingOverlay
     ) {
-        super.renderSafe(be, partialTicks, ms, buffer, light, overlay);
-        if (VisualizationManager.supportsVisualization(be.getWorld()))
-            return;
-
-        BlockState blockState = be.getCachedState();
-        Block block = blockState.getBlock();
-        if (!(block instanceof IRotate def))
-            return;
-
-        Axis axis = getRotationAxisOf(be);
-        BlockPos pos = be.getPos();
-        float angle = large ? BracketedKineticBlockEntityRenderer.getAngleForLargeCogShaft(be, axis) : getAngleForBe(be, pos, axis);
-
-        for (Direction d : Iterate.directionsInAxis(getRotationAxisOf(be))) {
-            if (!def.hasShaftTowards(be.getWorld(), be.getPos(), blockState, d))
-                continue;
-            SuperByteBuffer shaft = CachedBuffers.partialFacing(AllPartialModels.SHAFT_HALF, be.getCachedState(), d);
-            kineticRotationTransform(shaft, be, axis, angle, light);
-            shaft.renderInto(ms, buffer.getBuffer(RenderLayer.getSolid()));
+        super.updateRenderState(be, state, tickProgress, cameraPos, crumblingOverlay);
+        state.shaftAngle = large ? BracketedKineticBlockEntityRenderer.getAngleForLargeCogShaft(be, state.axis) : state.angle;
+        if (state.blockState.get(EncasedCogwheelBlock.TOP_SHAFT, false)) {
+            state.top = CachedBuffers.partialFacing(
+                AllPartialModels.SHAFT_HALF, state.blockState, switch (state.axis) {
+                    case Y -> Direction.UP;
+                    case Z -> Direction.SOUTH;
+                    case X -> Direction.EAST;
+                }
+            );
+        }
+        if (state.blockState.get(EncasedCogwheelBlock.BOTTOM_SHAFT, false)) {
+            state.bottom = CachedBuffers.partialFacing(
+                AllPartialModels.SHAFT_HALF, state.blockState, switch (state.axis) {
+                    case Y -> Direction.DOWN;
+                    case Z -> Direction.NORTH;
+                    case X -> Direction.WEST;
+                }
+            );
         }
     }
 
     @Override
-    protected SuperByteBuffer getRotatedModel(SimpleKineticBlockEntity be, BlockState state) {
+    protected RenderLayer getRenderType(SimpleKineticBlockEntity be, BlockState state) {
+        return RenderLayer.getSolid();
+    }
+
+    @Override
+    protected SuperByteBuffer getRotatedModel(SimpleKineticBlockEntity be, EncasedCogRenderState state) {
         return CachedBuffers.partialFacingVertical(
             large ? AllPartialModels.SHAFTLESS_LARGE_COGWHEEL : AllPartialModels.SHAFTLESS_COGWHEEL,
-            state,
-            Direction.from(state.get(EncasedCogwheelBlock.AXIS), AxisDirection.POSITIVE)
+            state.blockState,
+            state.direction
         );
     }
 
+    public static class EncasedCogRenderState extends KineticRenderState {
+        public float shaftAngle;
+        public SuperByteBuffer top;
+        public SuperByteBuffer bottom;
+
+        @Override
+        public void render(MatrixStack.Entry matricesEntry, VertexConsumer vertexConsumer) {
+            super.render(matricesEntry, vertexConsumer);
+            if (top != null) {
+                top.light(lightmapCoordinates);
+                top.rotateCentered(shaftAngle, direction);
+                top.color(color);
+                top.renderInto(matricesEntry, vertexConsumer);
+            }
+            if (bottom != null) {
+                bottom.light(lightmapCoordinates);
+                bottom.rotateCentered(shaftAngle, direction);
+                bottom.color(color);
+                bottom.renderInto(matricesEntry, vertexConsumer);
+            }
+        }
+    }
 }
