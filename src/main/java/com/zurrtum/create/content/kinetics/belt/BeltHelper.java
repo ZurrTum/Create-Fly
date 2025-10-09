@@ -72,13 +72,27 @@ public class BeltHelper {
 
     public static Vec3d getVectorForOffset(BeltBlockEntity controller, float offset) {
         BeltSlope slope = controller.getCachedState().get(BeltBlock.SLOPE);
-        int verticality = slope == BeltSlope.DOWNWARD ? -1 : slope == BeltSlope.UPWARD ? 1 : 0;
-        float verticalMovement = verticality;
+        float verticalMovement = slope == BeltSlope.DOWNWARD ? -1 : slope == BeltSlope.UPWARD ? 1 : 0;
         if (offset < .5)
             verticalMovement = 0;
         verticalMovement = verticalMovement * (Math.min(offset, controller.beltLength - .5f) - .5f);
         Vec3d vec = VecHelper.getCenterOf(controller.getPos());
         Vec3d horizontalMovement = Vec3d.of(controller.getBeltFacing().getVector()).multiply(offset - .5f);
+
+        if (slope == BeltSlope.VERTICAL)
+            horizontalMovement = Vec3d.ZERO;
+
+        vec = vec.add(horizontalMovement).add(0, verticalMovement, 0);
+        return vec;
+    }
+
+    public static Vec3d getVectorForOffset(BlockPos pos, BeltSlope slope, int verticality, int beltLength, Vec3i directionVec, float offset) {
+        float verticalMovement = verticality;
+        if (offset < .5)
+            verticalMovement = 0;
+        verticalMovement = verticalMovement * (Math.min(offset, beltLength - .5f) - .5f);
+        Vec3d vec = VecHelper.getCenterOf(pos);
+        Vec3d horizontalMovement = Vec3d.of(directionVec).multiply(offset - .5f);
 
         if (slope == BeltSlope.VERTICAL)
             horizontalMovement = Vec3d.ZERO;

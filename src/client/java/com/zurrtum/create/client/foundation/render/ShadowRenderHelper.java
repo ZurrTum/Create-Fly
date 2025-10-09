@@ -3,6 +3,7 @@ package com.zurrtum.create.client.foundation.render;
 import net.minecraft.block.BlockRenderType;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.render.*;
+import net.minecraft.client.render.command.OrderedRenderCommandQueue;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
@@ -17,17 +18,10 @@ import net.minecraft.world.WorldView;
  */
 public class ShadowRenderHelper {
 
-    private static final RenderLayer SHADOW_LAYER = RenderLayer.getEntityNoOutline(Identifier.of("textures/misc/shadow.png"));
+    private static final RenderLayer SHADOW_LAYER = RenderLayer.getEntityShadow(Identifier.ofVanilla("textures/misc/shadow.png"));
 
-    public static void renderShadow(MatrixStack matrixStack, VertexConsumerProvider buffer, float opacity, float radius) {
-        MatrixStack.Entry entry = matrixStack.peek();
-        VertexConsumer builder = buffer.getBuffer(SHADOW_LAYER);
-
-        opacity /= 2;
-        shadowVertex(entry, builder, opacity, -1 * radius, 0, -1 * radius, 0, 0);
-        shadowVertex(entry, builder, opacity, -1 * radius, 0, 1 * radius, 0, 1);
-        shadowVertex(entry, builder, opacity, 1 * radius, 0, 1 * radius, 1, 1);
-        shadowVertex(entry, builder, opacity, 1 * radius, 0, -1 * radius, 1, 0);
+    public static void renderShadow(MatrixStack matrixStack, OrderedRenderCommandQueue queue, float opacity, float radius) {
+        queue.submitCustom(matrixStack, SHADOW_LAYER, new ShadowRenderState(opacity / 2, radius, -1 * radius));
     }
 
     public static void renderShadow(MatrixStack matrixStack, VertexConsumerProvider buffer, WorldView world, Vec3d pos, float opacity, float radius) {
@@ -101,7 +95,16 @@ public class ShadowRenderHelper {
 
     private static void shadowVertex(MatrixStack.Entry entry, VertexConsumer builder, float alpha, float x, float y, float z, float u, float v) {
         builder.vertex(entry.getPositionMatrix(), x, y, z).color(1.0F, 1.0F, 1.0F, alpha).texture(u, v).overlay(OverlayTexture.DEFAULT_UV)
-            .light(LightmapTextureManager.MAX_LIGHT_COORDINATE).normal(entry.copy(), 0.0F, 1.0F, 0.0F);
+            .light(LightmapTextureManager.MAX_LIGHT_COORDINATE).normal(entry, 0.0F, 1.0F, 0.0F);
     }
 
+    public record ShadowRenderState(float opacity, float radius, float negativeRadius) implements OrderedRenderCommandQueue.Custom {
+        @Override
+        public void render(MatrixStack.Entry entry, VertexConsumer builder) {
+            shadowVertex(entry, builder, opacity, negativeRadius, 0, negativeRadius, 0, 0);
+            shadowVertex(entry, builder, opacity, negativeRadius, 0, radius, 0, 1);
+            shadowVertex(entry, builder, opacity, radius, 0, radius, 1, 1);
+            shadowVertex(entry, builder, opacity, radius, 0, negativeRadius, 1, 0);
+        }
+    }
 }
