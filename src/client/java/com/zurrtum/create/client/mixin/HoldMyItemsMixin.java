@@ -1,6 +1,6 @@
 package com.zurrtum.create.client.mixin;
 
-import com.holdmyitems.source.Holdmyitems;
+import com.holdmylua.source.LuaTestHMI;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.zurrtum.create.AllItems;
@@ -40,7 +40,7 @@ public class HoldMyItemsMixin {
         Operation<Void> original
     ) {
         Item item = stack.getItem();
-        if (!Holdmyitems.renderAsBlock.getOrDefault(item.toString(), true) && Registries.ITEM.getId(item).getNamespace().equals(MOD_ID)) {
+        if (!LuaTestHMI.renderAsBlock.getOrDefault(item.toString(), true) && Registries.ITEM.getId(item).getNamespace().equals(MOD_ID)) {
             if (item == AllItems.LINKED_CONTROLLER) {
                 displayContext = switch (displayContext) {
                     case THIRD_PERSON_LEFT_HAND -> ItemDisplayContext.FIRST_PERSON_LEFT_HAND;
