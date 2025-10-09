@@ -80,6 +80,16 @@ tasks.withType(JavaCompile).configureEach {
 
 java {
     withSourcesJar()
+    tasks.named("sourcesJar", Jar) {
+        from sourceSets.main.allSource
+        from("LICENSE")
+        from("licenses") {
+            into "licenses"
+        }
+        exclude '_data'
+        exclude 'assets'
+        exclude 'data'
+    }
     sourceCompatibility = JavaVersion.VERSION_21
     targetCompatibility = JavaVersion.VERSION_21
 }
