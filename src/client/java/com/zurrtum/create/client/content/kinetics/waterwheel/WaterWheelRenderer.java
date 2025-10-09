@@ -4,6 +4,7 @@ import com.zurrtum.create.catnip.registry.RegisteredObjectsHelper;
 import com.zurrtum.create.client.AllPartialModels;
 import com.zurrtum.create.client.catnip.render.*;
 import com.zurrtum.create.client.content.kinetics.base.KineticBlockEntityRenderer;
+import com.zurrtum.create.client.content.kinetics.base.KineticBlockEntityRenderer.KineticRenderState;
 import com.zurrtum.create.client.flywheel.lib.model.baked.PartialModel;
 import com.zurrtum.create.client.foundation.model.BakedModelHelper;
 import com.zurrtum.create.content.kinetics.waterwheel.LargeWaterWheelBlock;
@@ -35,7 +36,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-public class WaterWheelRenderer<T extends WaterWheelBlockEntity> extends KineticBlockEntityRenderer<T> {
+public class WaterWheelRenderer<T extends WaterWheelBlockEntity> extends KineticBlockEntityRenderer<T, KineticRenderState> {
     public static final SuperByteBufferCache.Compartment<ModelKey> WATER_WHEEL = new SuperByteBufferCache.Compartment<>();
 
     public static final StitchedSprite OAK_PLANKS_TEMPLATE = new StitchedSprite(Identifier.of("block/oak_planks"));
@@ -58,8 +59,8 @@ public class WaterWheelRenderer<T extends WaterWheelBlockEntity> extends Kinetic
     }
 
     @Override
-    protected SuperByteBuffer getRotatedModel(T be, BlockState state) {
-        ModelKey key = new ModelKey(large, state, be.material);
+    protected SuperByteBuffer getRotatedModel(T be, KineticRenderState state) {
+        ModelKey key = new ModelKey(large, state.blockState, be.material);
         return SuperByteBufferCache.getInstance().get(
             WATER_WHEEL, key, () -> {
                 GeometryBakedModel model = generateModel(key);
