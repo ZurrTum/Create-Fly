@@ -4,44 +4,62 @@ import com.zurrtum.create.catnip.math.AngleHelper;
 import com.zurrtum.create.client.AllPartialModels;
 import com.zurrtum.create.client.catnip.render.CachedBuffers;
 import com.zurrtum.create.client.catnip.render.SuperByteBuffer;
-import com.zurrtum.create.client.foundation.blockEntity.renderer.SafeBlockEntityRenderer;
 import com.zurrtum.create.content.equipment.bell.AbstractBellBlockEntity;
 import com.zurrtum.create.content.equipment.bell.PeculiarBellBlockEntity;
 import net.minecraft.block.BellBlock;
-import net.minecraft.block.BlockState;
 import net.minecraft.block.enums.Attachment;
 import net.minecraft.client.render.RenderLayer;
-import net.minecraft.client.render.VertexConsumerProvider;
+import net.minecraft.client.render.VertexConsumer;
+import net.minecraft.client.render.block.entity.BlockEntityRenderer;
 import net.minecraft.client.render.block.entity.BlockEntityRendererFactory;
+import net.minecraft.client.render.block.entity.state.BlockEntityRenderState;
+import net.minecraft.client.render.command.ModelCommandRenderer;
+import net.minecraft.client.render.command.OrderedRenderCommandQueue;
+import net.minecraft.client.render.state.CameraRenderState;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.Vec3d;
+import org.jetbrains.annotations.Nullable;
 
-public class BellRenderer<BE extends AbstractBellBlockEntity> extends SafeBlockEntityRenderer<BE> {
-
+public class BellRenderer<BE extends AbstractBellBlockEntity> implements BlockEntityRenderer<BE, BellRenderer.BellRenderState> {
     public BellRenderer(BlockEntityRendererFactory.Context context) {
     }
 
     @Override
-    protected void renderSafe(BE be, float partialTicks, MatrixStack ms, VertexConsumerProvider buffer, int light, int overlay) {
-        BlockState state = be.getCachedState();
-        Direction facing = state.get(BellBlock.FACING);
-        Attachment attachment = state.get(BellBlock.ATTACHMENT);
+    public BellRenderState createRenderState() {
+        return new BellRenderState();
+    }
 
-        SuperByteBuffer bell = CachedBuffers.partial(
+    @Override
+    public void updateRenderState(
+        BE be,
+        BellRenderState state,
+        float tickProgress,
+        Vec3d cameraPos,
+        @Nullable ModelCommandRenderer.CrumblingOverlayCommand crumblingOverlay
+    ) {
+        BlockEntityRenderState.updateBlockEntityRenderState(be, state, crumblingOverlay);
+        state.layer = RenderLayer.getCutout();
+        state.model = CachedBuffers.partial(
             be instanceof PeculiarBellBlockEntity ? AllPartialModels.PECULIAR_BELL : AllPartialModels.HAUNTED_BELL,
-            state
+            state.blockState
         );
-
-        if (be.isRinging)
-            bell.rotateCentered(getSwingAngle(be.ringingTicks + partialTicks), be.ringDirection.rotateYCounterclockwise());
-
+        if (be.isRinging) {
+            state.direction = be.ringDirection.rotateYCounterclockwise();
+            state.angle = getSwingAngle(be.ringingTicks + tickProgress);
+        }
+        Direction facing = state.blockState.get(BellBlock.FACING);
+        Attachment attachment = state.blockState.get(BellBlock.ATTACHMENT);
         float rY = AngleHelper.horizontalAngle(facing);
         if (attachment == Attachment.SINGLE_WALL || attachment == Attachment.DOUBLE_WALL)
             rY += 90;
-        bell.rotateCentered(AngleHelper.rad(rY), Direction.UP);
+        state.upAngle = AngleHelper.rad(rY);
+    }
 
-        bell.light(light).renderInto(ms, buffer.getBuffer(RenderLayer.getCutout()));
+    @Override
+    public void render(BellRenderState state, MatrixStack matrices, OrderedRenderCommandQueue queue, CameraRenderState cameraState) {
+        queue.submitCustom(matrices, state.layer, state);
     }
 
     public static float getSwingAngle(float time) {
@@ -49,4 +67,21 @@ public class BellRenderer<BE extends AbstractBellBlockEntity> extends SafeBlockE
         return 1.2f * MathHelper.sin(t / (float) Math.PI) / (2.5f + t / 3.0f);
     }
 
+    public static class BellRenderState extends BlockEntityRenderState implements OrderedRenderCommandQueue.Custom {
+        public RenderLayer layer;
+        public SuperByteBuffer model;
+        public float upAngle;
+        public Direction direction;
+        public float angle;
+
+        @Override
+        public void render(MatrixStack.Entry matricesEntry, VertexConsumer vertexConsumer) {
+            if (direction != null) {
+                model.rotateCentered(angle, direction);
+            }
+            model.rotateCentered(upAngle, Direction.UP);
+            model.light(lightmapCoordinates);
+            model.renderInto(matricesEntry, vertexConsumer);
+        }
+    }
 }
