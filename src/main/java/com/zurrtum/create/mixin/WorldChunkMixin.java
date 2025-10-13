@@ -3,6 +3,7 @@ package com.zurrtum.create.mixin;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
+import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
 import com.zurrtum.create.foundation.blockEntity.SyncedBlockEntity;
 import com.zurrtum.create.foundation.fluid.FluidHelper;
 import com.zurrtum.create.foundation.item.ItemHelper;
@@ -18,10 +19,15 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+import java.util.Map;
+
 @Mixin(WorldChunk.class)
 public abstract class WorldChunkMixin {
     @Shadow
     public abstract World getWorld();
+
+    @Shadow
+    public abstract Map<BlockPos, BlockEntity> getBlockEntities();
 
     @Inject(method = "setBlockEntity", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/chunk/WorldChunk;getBlockState(Lnet/minecraft/util/math/BlockPos;)Lnet/minecraft/block/BlockState;"))
     private void setBlockEntity(BlockEntity blockEntity, CallbackInfo info, @Local BlockPos pos) {
@@ -54,5 +60,14 @@ public abstract class WorldChunkMixin {
         } else {
             original.call(blockEntity, view);
         }
+    }
+
+    @Inject(method = "clear()V", at = @At("HEAD"))
+    private void clear(CallbackInfo ci) {
+        getBlockEntities().values().forEach(blockEntity -> {
+            if (blockEntity instanceof SmartBlockEntity sbe) {
+                sbe.onChunkUnloaded();
+            }
+        });
     }
 }
