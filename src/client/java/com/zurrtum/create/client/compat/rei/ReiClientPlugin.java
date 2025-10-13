@@ -1,10 +1,12 @@
 package com.zurrtum.create.client.compat.rei;
 
+import com.zurrtum.create.AllItemTags;
 import com.zurrtum.create.AllItems;
 import com.zurrtum.create.client.compat.rei.category.*;
 import com.zurrtum.create.client.compat.rei.display.MysteriousItemConversionDisplay;
 import com.zurrtum.create.compat.rei.display.DrainingDisplay;
 import com.zurrtum.create.compat.rei.display.SpoutFillingDisplay;
+import com.zurrtum.create.content.equipment.toolbox.ToolboxBlock;
 import me.shedaniel.math.Rectangle;
 import me.shedaniel.rei.api.client.plugins.REIClientPlugin;
 import me.shedaniel.rei.api.client.registry.category.CategoryRegistry;
@@ -13,13 +15,20 @@ import me.shedaniel.rei.api.client.registry.display.DisplayRegistry;
 import me.shedaniel.rei.api.client.registry.entry.EntryRegistry;
 import me.shedaniel.rei.api.common.category.CategoryIdentifier;
 import me.shedaniel.rei.api.common.display.Display;
+import me.shedaniel.rei.api.common.entry.EntryIngredient;
 import me.shedaniel.rei.api.common.entry.EntryStack;
 import me.shedaniel.rei.api.common.entry.type.VanillaEntryTypes;
+import me.shedaniel.rei.api.common.util.EntryIngredients;
 import me.shedaniel.rei.api.common.util.EntryStacks;
+import me.shedaniel.rei.plugin.client.displays.ClientsidedCraftingDisplay;
+import net.minecraft.item.DyeItem;
 import net.minecraft.item.ItemConvertible;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.DyeColor;
 
+import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.function.Consumer;
 
 import static com.zurrtum.create.Create.MOD_ID;
@@ -71,6 +80,7 @@ public class ReiClientPlugin implements REIClientPlugin {
     public void registerDisplays(DisplayRegistry registry) {
         registry.add(new MysteriousItemConversionDisplay(AllItems.EMPTY_BLAZE_BURNER, AllItems.BLAZE_BURNER));
         registry.add(new MysteriousItemConversionDisplay(AllItems.PECULIAR_BELL, AllItems.HAUNTED_BELL));
+        registerToolboxRecipes(registry);
         EntryRegistry entrys = EntryRegistry.getInstance();
         SpoutFillingDisplay.register(
             entrys.getEntryStacks().filter(stack -> Objects.equals(stack.getType(), VanillaEntryTypes.ITEM)),
@@ -78,5 +88,16 @@ public class ReiClientPlugin implements REIClientPlugin {
             registry
         );
         DrainingDisplay.register(entrys.getEntryStacks().filter(stack -> Objects.equals(stack.getType(), VanillaEntryTypes.ITEM)), registry);
+    }
+
+    private static void registerToolboxRecipes(DisplayRegistry registry) {
+        EntryIngredient ingredient = EntryIngredients.ofItemTag(AllItemTags.TOOLBOXES);
+        for (DyeColor color : DyeColor.values()) {
+            registry.add(new ClientsidedCraftingDisplay.Shapeless(
+                List.of(ingredient, EntryIngredients.of(DyeItem.byColor(color))),
+                List.of(EntryIngredients.of(ToolboxBlock.getColorBlock(color))),
+                Optional.empty()
+            ));
+        }
     }
 }
