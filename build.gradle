@@ -1,3 +1,5 @@
+import net.fabricmc.loom.task.RemapJarTask
+
 plugins {
     id 'fabric-loom' version '1.11-SNAPSHOT'
 }
@@ -25,11 +27,11 @@ repositories {
     }
 }
 
-version = project.mod_version
+version = "$project.mod_version-$project.mod_id"
 group = project.maven_group
 
 base {
-    archivesName = project.archives_base_name
+    archivesName = "$project.archives_base_name-$project.minecraft_version"
 }
 
 loom {
@@ -74,6 +76,26 @@ processResources {
     exclude "_data"
 }
 
+tasks.register("serverJar", Jar) {
+    archiveClassifier = "server-dev"
+    destinationDirectory = layout.buildDirectory.dir("tmp/serverJar")
+    from sourceSets.main.output
+    from("LICENSE")
+    from("licenses") {
+        into "licenses"
+    }
+}
+
+tasks.register('remapServerJar', RemapJarTask) {
+    dependsOn tasks.serverJar
+    inputFile = tasks.serverJar.archiveFile
+    archiveClassifier = "server"
+}
+
+tasks.build {
+    dependsOn tasks.remapServerJar
+}
+
 tasks.withType(JavaCompile).configureEach {
     it.options.release = 21
 }
@@ -81,7 +103,6 @@ tasks.withType(JavaCompile).configureEach {
 java {
     withSourcesJar()
     tasks.named("sourcesJar", Jar) {
-        from sourceSets.main.allSource
         from("LICENSE")
         from("licenses") {
             into "licenses"
