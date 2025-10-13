@@ -101,7 +101,8 @@ public class AirFlowParticle extends AnimatedParticle {
         return source.getAirCurrent().getTypeAt((float) distance);
     }
 
-    public int getLightColor(float partialTick) {
+    @Override
+    public int getBrightness(float partialTick) {
         BlockPos blockpos = BlockPos.ofFloored(this.x, this.y, this.z);
         return this.world.isPosLoaded(blockpos) ? WorldRenderer.getLightmapCoordinates(world, blockpos) : 0;
     }
