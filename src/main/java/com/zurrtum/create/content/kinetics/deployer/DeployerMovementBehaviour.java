@@ -283,7 +283,7 @@ public class DeployerMovementBehaviour extends MovementBehaviour {
             DeployerPlayer player = DeployerPlayer.create((ServerWorld) context.world, owner, ownerName);
             player.setOnMinecartContraption(context.contraption instanceof MountedContraption);
 
-            try (ErrorReporter.Logging logging = new ErrorReporter.Logging(context.contraption.entity.getErrorReporterContext(), LOGGER)) {
+            try (ErrorReporter.Logging logging = new ErrorReporter.Logging(() -> "DeployerMovementBehaviour", LOGGER)) {
                 NbtCompound inventory = context.blockEntityData.get("Inventory", NbtCompound.CODEC).orElseGet(NbtCompound::new);
                 ReadView view = NbtReadView.create(logging, registryManager, inventory);
                 player.cast().getInventory().readData(view.getTypedListView("Inventory", StackWithSlot.CODEC));
