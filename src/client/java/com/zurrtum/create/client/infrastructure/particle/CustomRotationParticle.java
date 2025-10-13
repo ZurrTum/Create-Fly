@@ -1,5 +1,6 @@
 package com.zurrtum.create.client.infrastructure.particle;
 
+import com.zurrtum.create.client.flywheel.lib.util.ShadersModHelper;
 import net.minecraft.client.particle.AnimatedParticle;
 import net.minecraft.client.particle.SpriteProvider;
 import net.minecraft.client.render.Camera;
@@ -61,8 +62,7 @@ public class CustomRotationParticle extends AnimatedParticle {
         float maxU = mirror ? getMinU() : getMaxU();
         float minV = getMinV();
         float maxV = getMaxV();
-        //TODO ShadersModHelper.isShaderPackInUse()
-        int brightness = false ? LightmapTextureManager.pack(12, 15) : getBrightness(partialTicks);
+        int brightness = ShadersModHelper.isShaderPackInUse() ? LightmapTextureManager.pack(12, 15) : getBrightness(partialTicks);
         builder.vertex(vertices[0].x(), vertices[0].y(), vertices[0].z()).texture(maxU, maxV).color(red, green, blue, alpha).light(brightness);
         builder.vertex(vertices[1].x(), vertices[1].y(), vertices[1].z()).texture(maxU, minV).color(red, green, blue, alpha).light(brightness);
         builder.vertex(vertices[2].x(), vertices[2].y(), vertices[2].z()).texture(minU, minV).color(red, green, blue, alpha).light(brightness);
