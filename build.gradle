@@ -14,6 +14,12 @@ repositories {
             includeGroup "dev.architectury"
         }
     }
+    maven {
+        url "https://maven.squiddev.cc"
+        content {
+            includeGroup("cc.tweaked")
+        }
+    }
     exclusiveContent {
         forRepository {
             maven {
@@ -61,6 +67,7 @@ dependencies {
     if (project.compile_only_rei.equals("false")) {
         modClientRuntimeOnly "me.shedaniel:RoughlyEnoughItems-fabric:${project.rei_version}"
     }
+    modCompileOnly "cc.tweaked:cc-tweaked-${project.cct_version}"
     modClientCompileOnly "maven.modrinth:sodium:${project.sodium_version}"
     modClientCompileOnly "maven.modrinth:iris:${project.iris_version}"
     modClientCompileOnly "maven.modrinth:hold-my-items:${project.hmi_version}"
