@@ -10,7 +10,6 @@ import com.zurrtum.create.client.catnip.render.SuperByteBuffer;
 import com.zurrtum.create.client.content.contraptions.render.ContraptionMatrices;
 import com.zurrtum.create.client.flywheel.api.visualization.VisualizationManager;
 import com.zurrtum.create.client.flywheel.lib.model.baked.PartialModel;
-import com.zurrtum.create.client.foundation.blockEntity.renderer.SafeBlockEntityRenderer;
 import com.zurrtum.create.client.foundation.virtualWorld.VirtualRenderWorld;
 import com.zurrtum.create.content.contraptions.actors.psi.PortableStorageInterfaceBlock;
 import com.zurrtum.create.content.contraptions.actors.psi.PortableStorageInterfaceBlockEntity;
@@ -22,34 +21,61 @@ import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.WorldRenderer;
+import net.minecraft.client.render.block.entity.BlockEntityRenderer;
 import net.minecraft.client.render.block.entity.BlockEntityRendererFactory;
+import net.minecraft.client.render.block.entity.state.BlockEntityRenderState;
+import net.minecraft.client.render.command.ModelCommandRenderer;
+import net.minecraft.client.render.command.OrderedRenderCommandQueue;
+import net.minecraft.client.render.state.CameraRenderState;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
+import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.Vec3d;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Consumer;
 
-public class PortableStorageInterfaceRenderer extends SafeBlockEntityRenderer<PortableStorageInterfaceBlockEntity> {
-
+public class PortableStorageInterfaceRenderer implements BlockEntityRenderer<PortableStorageInterfaceBlockEntity, PortableStorageInterfaceRenderer.PortableStorageInterfaceRenderState> {
     public PortableStorageInterfaceRenderer(BlockEntityRendererFactory.Context context) {
     }
 
     @Override
-    protected void renderSafe(
-        PortableStorageInterfaceBlockEntity be,
-        float partialTicks,
-        MatrixStack ms,
-        VertexConsumerProvider buffer,
-        int light,
-        int overlay
-    ) {
-        if (VisualizationManager.supportsVisualization(be.getWorld()))
-            return;
+    public PortableStorageInterfaceRenderState createRenderState() {
+        return new PortableStorageInterfaceRenderState();
+    }
 
-        BlockState blockState = be.getCachedState();
-        float progress = be.getExtensionDistance(partialTicks);
-        VertexConsumer vb = buffer.getBuffer(RenderLayer.getSolid());
-        render(blockState, be.isConnected(), progress, null, sbb -> sbb.light(light).renderInto(ms, vb));
+    @Override
+    public void updateRenderState(
+        PortableStorageInterfaceBlockEntity be,
+        PortableStorageInterfaceRenderState state,
+        float tickProgress,
+        Vec3d cameraPos,
+        @Nullable ModelCommandRenderer.CrumblingOverlayCommand crumblingOverlay
+    ) {
+        if (VisualizationManager.supportsVisualization(be.getWorld())) {
+            return;
+        }
+        BlockEntityRenderState.updateBlockEntityRenderState(be, state, crumblingOverlay);
+        float progress = be.getExtensionDistance(tickProgress);
+        state.layer = RenderLayer.getSolid();
+        state.middle = CachedBuffers.partial(getMiddleForState(state.blockState, be.isConnected()), state.blockState);
+        state.top = CachedBuffers.partial(getTopForState(state.blockState), state.blockState);
+        Direction facing = state.blockState.get(PortableStorageInterfaceBlock.FACING);
+        state.yRot = MathHelper.RADIANS_PER_DEGREE * AngleHelper.horizontalAngle(facing);
+        state.xRot = MathHelper.RADIANS_PER_DEGREE * (facing == Direction.UP ? 0 : facing == Direction.DOWN ? 180 : 90);
+        state.middleOffset = progress * 0.5f + 0.375f;
+        state.topOffset = progress;
+    }
+
+    @Override
+    public void render(
+        PortableStorageInterfaceRenderState state,
+        MatrixStack matrices,
+        OrderedRenderCommandQueue queue,
+        CameraRenderState cameraState
+    ) {
+        queue.submitCustom(matrices, state.layer, state);
     }
 
     public static void renderInContraption(
@@ -71,7 +97,7 @@ public class PortableStorageInterfaceRenderer extends SafeBlockEntityRenderer<Po
             progress,
             matrices.getModel(),
             sbb -> sbb.light(WorldRenderer.getLightmapCoordinates(renderWorld, context.localPos)).useLevelLight(context.world, matrices.getWorld())
-                .renderInto(matrices.getViewProjection(), vb)
+                .renderInto(matrices.getViewProjection().peek(), vb)
         );
     }
 
@@ -125,4 +151,21 @@ public class PortableStorageInterfaceRenderer extends SafeBlockEntityRenderer<Po
         return AllPartialModels.PORTABLE_STORAGE_INTERFACE_TOP;
     }
 
+    public static class PortableStorageInterfaceRenderState extends BlockEntityRenderState implements OrderedRenderCommandQueue.Custom {
+        public RenderLayer layer;
+        public SuperByteBuffer middle;
+        public SuperByteBuffer top;
+        public float yRot;
+        public float xRot;
+        public float middleOffset;
+        public float topOffset;
+
+        @Override
+        public void render(MatrixStack.Entry matricesEntry, VertexConsumer vertexConsumer) {
+            middle.center().rotateY(yRot).rotateX(xRot).uncenter().translate(0, middleOffset, 0).light(lightmapCoordinates)
+                .renderInto(matricesEntry, vertexConsumer);
+            top.center().rotateY(yRot).rotateX(xRot).uncenter().translate(0, topOffset, 0).light(lightmapCoordinates)
+                .renderInto(matricesEntry, vertexConsumer);
+        }
+    }
 }
