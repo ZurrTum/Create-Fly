@@ -8,14 +8,12 @@ import com.zurrtum.create.client.flywheel.api.instance.InstancerProvider;
 import com.zurrtum.create.client.flywheel.api.model.Model;
 import com.zurrtum.create.client.flywheel.lib.instance.InstanceTypes;
 import com.zurrtum.create.client.flywheel.lib.instance.TransformedInstance;
-import com.zurrtum.create.client.flywheel.lib.transform.TransformStack;
 import com.zurrtum.create.client.flywheel.lib.transform.Translate;
+import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.VertexConsumer;
+import net.minecraft.client.render.command.OrderedRenderCommandQueue;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.*;
 import org.joml.Matrix4f;
 import org.joml.Matrix4fc;
 
@@ -28,9 +26,7 @@ public class FlapStuffs {
     public static final Vec3d TUNNEL_PIVOT = VecHelper.voxelSpace(0, 10, 1f);
     public static final Vec3d FUNNEL_PIVOT = VecHelper.voxelSpace(0, 10, 9.5f);
 
-    public static void renderFlaps(
-        MatrixStack ms,
-        VertexConsumer vb,
+    public static FlapsRenderState getFlapsRenderState(
         SuperByteBuffer flapBuffer,
         Vec3d pivot,
         Direction funnelFacing,
@@ -38,24 +34,13 @@ public class FlapStuffs {
         float zOffset,
         int light
     ) {
-        float horizontalAngle = AngleHelper.horizontalAngle(funnelFacing.getOpposite());
-
-        var msr = TransformStack.of(ms);
-        ms.push();
-        msr.center().rotateYDegrees(horizontalAngle).uncenter();
-        ms.translate(X_OFFSET, 0, zOffset);
-
+        float horizontalAngle = MathHelper.RADIANS_PER_DEGREE * AngleHelper.horizontalAngle(funnelFacing.getOpposite());
+        float[] angles = new float[FLAP_COUNT];
         for (int segment = 0; segment < FLAP_COUNT; segment++) {
-            ms.push();
-
-            msr.translate(pivot).rotateXDegrees(flapAngle(flapness, segment)).translateBack(pivot);
-
-            flapBuffer.light(light).renderInto(ms, vb);
-
-            ms.pop();
-            ms.translate(SEGMENT_STEP, 0, 0);
+            angles[segment] = MathHelper.RADIANS_PER_DEGREE * flapAngle(flapness, segment);
         }
-        ms.pop();
+        MatrixStack.Entry[] entries = new MatrixStack.Entry[FLAP_COUNT];
+        return new FlapsRenderState(flapBuffer, pivot, zOffset, light, horizontalAngle, angles, entries);
     }
 
     public static float flapAngle(float flapness, int segment) {
@@ -114,6 +99,36 @@ public class FlapStuffs {
         public void collectCrumblingInstances(Consumer<Instance> consumer) {
             for (TransformedInstance flap : flaps) {
                 consumer.accept(flap);
+            }
+        }
+    }
+
+    public record FlapsRenderState(
+        SuperByteBuffer model, Vec3d pivot, float zOffset, int light, float horizontalAngle, float[] angles, MatrixStack.Entry[] entries
+    ) implements OrderedRenderCommandQueue.Custom {
+        public void render(RenderLayer layer, MatrixStack matrices, OrderedRenderCommandQueue queue) {
+            matrices.push();
+            matrices.translate(0.5f, 0.5f, 0.5f);
+            matrices.multiply(RotationAxis.POSITIVE_Y.rotation(horizontalAngle));
+            matrices.translate(-0.5f, -0.5f, -0.5f);
+            matrices.translate(X_OFFSET, 0, zOffset);
+            for (int segment = 0; segment < FLAP_COUNT; segment++) {
+                matrices.push();
+                matrices.translate(pivot.x, pivot.y, pivot.z);
+                matrices.multiply(RotationAxis.POSITIVE_X.rotation(angles[segment]));
+                matrices.translate(-pivot.x, -pivot.y, -pivot.z);
+                entries[segment] = matrices.peek().copy();
+                matrices.pop();
+                matrices.translate(SEGMENT_STEP, 0, 0);
+            }
+            matrices.pop();
+            queue.submitCustom(matrices, layer, this);
+        }
+
+        @Override
+        public void render(MatrixStack.Entry matricesEntry, VertexConsumer vertexConsumer) {
+            for (int segment = 0; segment < FLAP_COUNT; segment++) {
+                model.light(light).renderInto(entries[segment], vertexConsumer);
             }
         }
     }
