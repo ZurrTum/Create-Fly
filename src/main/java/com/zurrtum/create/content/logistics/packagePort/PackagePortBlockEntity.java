@@ -11,13 +11,13 @@ import com.zurrtum.create.foundation.gui.menu.MenuBase;
 import com.zurrtum.create.foundation.gui.menu.MenuProvider;
 import com.zurrtum.create.infrastructure.component.ClipboardEntry;
 import com.zurrtum.create.infrastructure.component.ClipboardType;
+import com.zurrtum.create.infrastructure.items.SidedItemInventory;
 import com.zurrtum.create.infrastructure.transfer.SlotRangeCache;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.inventory.SidedInventory;
 import net.minecraft.inventory.StackWithSlot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.RegistryByteBuf;
@@ -214,7 +214,7 @@ public abstract class PackagePortBlockEntity extends SmartBlockEntity implements
         }
     }
 
-    public class PackagePortInventory implements SidedInventory {
+    public class PackagePortInventory implements SidedItemInventory {
         public static final int[] SLOTS = SlotRangeCache.get(18);
         public final DefaultedList<ItemStack> stacks = DefaultedList.ofSize(18, ItemStack.EMPTY);
         private boolean receive = true;

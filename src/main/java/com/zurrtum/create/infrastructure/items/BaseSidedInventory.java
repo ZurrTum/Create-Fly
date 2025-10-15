@@ -1,129 +1,122 @@
 package com.zurrtum.create.infrastructure.items;
 
-import it.unimi.dsi.fastutil.Hash;
-import it.unimi.dsi.fastutil.objects.*;
-import net.minecraft.component.ComponentType;
-import net.minecraft.component.DataComponentTypes;
-import net.minecraft.component.MergedComponentMap;
+import it.unimi.dsi.fastutil.objects.Object2IntLinkedOpenCustomHashMap;
+import it.unimi.dsi.fastutil.objects.Object2IntMap;
+import it.unimi.dsi.fastutil.objects.Object2IntSortedMap;
+import it.unimi.dsi.fastutil.objects.ObjectIterator;
+import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.Direction;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.function.Function;
 import java.util.function.Predicate;
-import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
 
-public interface BaseInventory extends Iterable<ItemStack> {
-    Hash.Strategy<ItemStack> ITEM_STACK_HASH_STRATEGY = new Hash.Strategy<>() {
-        public boolean equals(ItemStack stack, ItemStack other) {
-            return stack == other || stack != null && other != null && ItemStack.areItemsAndComponentsEqual(stack, other);
-        }
-
-        public int hashCode(ItemStack stack) {
-            return ItemStack.hashCode(stack);
-        }
-    };
-
-    default void create$setStack(int slot, ItemStack stack) {
+public interface BaseSidedInventory extends Inventory {
+    default int[] create$getAvailableSlots(Direction side) {
         throw new RuntimeException("Implemented via Mixin");
     }
 
-    default int create$size() {
+    default boolean create$canInsert(int slot, ItemStack stack, @Nullable Direction dir) {
         throw new RuntimeException("Implemented via Mixin");
     }
 
-    default int create$getMaxCount(ItemStack stack) {
+
+    default boolean create$canExtract(int slot, ItemStack stack, Direction dir) {
         throw new RuntimeException("Implemented via Mixin");
     }
 
-    default ItemStack create$getStack(int slot) {
-        throw new RuntimeException("Implemented via Mixin");
-    }
-
-    default boolean create$isValid(int slot, ItemStack stack) {
-        throw new RuntimeException("Implemented via Mixin");
-    }
-
-    default void create$markDirty() {
-        throw new RuntimeException("Implemented via Mixin");
-    }
-
-    default int count(ItemStack stack, Direction side) {
-        return count(stack);
-    }
-
+    @Override
     default int count(ItemStack stack) {
+        return count(stack, null);
+    }
+
+    @Override
+    default int count(ItemStack stack, Direction side) {
         int maxAmount = stack.getCount();
         if (maxAmount == 0) {
             return 0;
         }
-        return count(stack, maxAmount);
+        return count(stack, maxAmount, side);
     }
 
-    default int count(ItemStack stack, int maxAmount, Direction side) {
-        return count(stack, maxAmount);
-    }
-
+    @Override
     default int count(ItemStack stack, int maxAmount) {
+        return count(stack, maxAmount, null);
+    }
+
+    @Override
+    default int count(ItemStack stack, int maxAmount, Direction side) {
         int count = 0;
-        for (int i = 0, size = create$size(); i < size; i++) {
-            ItemStack target = create$getStack(i);
-            if (target.isEmpty()) {
-                continue;
-            }
-            if (matches(target, stack)) {
-                count += target.getCount();
-                if (count >= maxAmount) {
-                    return maxAmount;
+        for (int slot : create$getAvailableSlots(side)) {
+            if (create$canExtract(slot, stack, side)) {
+                ItemStack target = getStack(slot);
+                if (target.isEmpty()) {
+                    continue;
+                }
+                if (matches(target, stack)) {
+                    count += target.getCount();
+                    if (count >= maxAmount) {
+                        return maxAmount;
+                    }
                 }
             }
         }
         return count;
     }
 
-    default ItemStack count(Predicate<ItemStack> predicate, Direction side) {
-        return count(predicate);
+    @Override
+    default ItemStack count(Predicate<ItemStack> predicate) {
+        return count(predicate, null);
     }
 
-    default ItemStack count(Predicate<ItemStack> predicate) {
-        for (int i = 0, size = create$size(); i < size; i++) {
-            ItemStack stack = create$getStack(i);
+    @Override
+    default ItemStack count(Predicate<ItemStack> predicate, Direction side) {
+        for (int slot : create$getAvailableSlots(side)) {
+            ItemStack stack = getStack(slot);
             if (stack.isEmpty()) {
                 continue;
             }
-            if (predicate.test(stack)) {
+            if (create$canExtract(slot, stack, side) && predicate.test(stack)) {
                 return onExtract(stack);
             }
         }
         return ItemStack.EMPTY;
     }
 
-    default ItemStack count(Predicate<ItemStack> predicate, int maxAmount, Direction side) {
-        return count(predicate, maxAmount);
+    @Override
+    default ItemStack count(Predicate<ItemStack> predicate, int maxAmount) {
+        return count(predicate, maxAmount, null);
     }
 
-    default ItemStack count(Predicate<ItemStack> predicate, int maxAmount) {
+    @Override
+    default ItemStack count(Predicate<ItemStack> predicate, int maxAmount, Direction side) {
         if (maxAmount == 0) {
             return ItemStack.EMPTY;
         }
-        for (int i = 0, size = create$size(); i < size; i++) {
-            ItemStack findStack = create$getStack(i);
+        int[] slots = create$getAvailableSlots(side);
+        for (int i = 0, size = slots.length; i < size; i++) {
+            int slot = slots[i];
+            ItemStack findStack = getStack(slot);
             if (findStack.isEmpty()) {
                 continue;
             }
-            if (predicate.test(findStack)) {
+            if (create$canExtract(slot, findStack, side) && predicate.test(findStack)) {
                 int count = findStack.getCount();
                 if (count >= maxAmount) {
                     return onExtract(directCopy(findStack, maxAmount));
                 }
                 for (i = i + 1; i < size; i++) {
-                    ItemStack stack = create$getStack(i);
+                    slot = slots[i];
+                    ItemStack stack = getStack(slot);
                     if (stack.isEmpty()) {
                         continue;
                     }
-                    if (matches(stack, findStack)) {
+                    if (create$canExtract(slot, stack, side) && matches(stack, findStack)) {
                         count += stack.getCount();
                         if (count < maxAmount) {
                             continue;
@@ -137,21 +130,23 @@ public interface BaseInventory extends Iterable<ItemStack> {
         return ItemStack.EMPTY;
     }
 
-    default int countAll(Predicate<ItemStack> predicate, int maxAmount, Direction side) {
-        return countAll(predicate, maxAmount);
+    @Override
+    default int countAll(Predicate<ItemStack> predicate, int maxAmount) {
+        return countAll(predicate, maxAmount, null);
     }
 
-    default int countAll(Predicate<ItemStack> predicate, int maxAmount) {
+    @Override
+    default int countAll(Predicate<ItemStack> predicate, int maxAmount, Direction side) {
         if (maxAmount == 0) {
             return 0;
         }
         int count = 0;
-        for (int i = 0, size = create$size(); i < size; i++) {
-            ItemStack stack = create$getStack(i);
+        for (int slot : create$getAvailableSlots(side)) {
+            ItemStack stack = getStack(slot);
             if (stack.isEmpty()) {
                 continue;
             }
-            if (predicate.test(stack)) {
+            if (predicate.test(stack) && create$canExtract(slot, stack, side)) {
                 count += stack.getCount();
                 if (count >= maxAmount) {
                     return maxAmount;
@@ -161,79 +156,94 @@ public interface BaseInventory extends Iterable<ItemStack> {
         return count;
     }
 
-    default ItemStack countAny(Direction side) {
-        return countAny();
+    @Override
+    default ItemStack countAny() {
+        return countAny(null);
     }
 
-    default ItemStack countAny() {
-        for (int i = 0, size = create$size(); i < size; i++) {
-            ItemStack target = create$getStack(i);
+    @Override
+    default ItemStack countAny(Direction side) {
+        for (int slot : create$getAvailableSlots(side)) {
+            ItemStack target = getStack(slot);
             if (target.isEmpty()) {
                 continue;
             }
-            return onExtract(directCopy(target, target.getCount()));
+            if (create$canExtract(slot, target, side)) {
+                return onExtract(directCopy(target, target.getCount()));
+            }
         }
         return ItemStack.EMPTY;
     }
 
-    default ItemStack countAny(int maxAmount, Direction side) {
-        return extractAny(maxAmount);
+    @Override
+    default ItemStack countAny(int maxAmount) {
+        return extractAny(maxAmount, null);
     }
 
-    default ItemStack countAny(int maxAmount) {
+    @Override
+    default ItemStack countAny(int maxAmount, Direction side) {
         if (maxAmount == 0) {
             return ItemStack.EMPTY;
         }
-        for (int i = 0, size = create$size(); i < size; i++) {
-            ItemStack findStack = create$getStack(i);
+        int[] slots = create$getAvailableSlots(side);
+        for (int i = 0, size = slots.length; i < size; i++) {
+            int slot = slots[i];
+            ItemStack findStack = getStack(slot);
             if (findStack.isEmpty()) {
                 continue;
             }
-            int count = findStack.getCount();
-            if (count >= maxAmount) {
-                return onExtract(directCopy(findStack, maxAmount));
-            }
-            for (i = i + 1; i < size; i++) {
-                ItemStack stack = create$getStack(i);
-                if (stack.isEmpty()) {
-                    continue;
-                }
-                if (matches(stack, findStack)) {
-                    count += stack.getCount();
-                    if (count < maxAmount) {
-                        continue;
-                    }
+            if (create$canExtract(slot, findStack, side)) {
+                int count = findStack.getCount();
+                if (count >= maxAmount) {
                     return onExtract(directCopy(findStack, maxAmount));
                 }
+                for (i = i + 1; i < size; i++) {
+                    slot = slots[i];
+                    ItemStack stack = getStack(slot);
+                    if (stack.isEmpty()) {
+                        continue;
+                    }
+                    if (create$canExtract(slot, stack, side) && matches(stack, findStack)) {
+                        count += stack.getCount();
+                        if (count < maxAmount) {
+                            continue;
+                        }
+                        return onExtract(directCopy(findStack, maxAmount));
+                    }
+                }
+                return onExtract(directCopy(findStack, count));
             }
-            return onExtract(directCopy(findStack, count));
         }
         return ItemStack.EMPTY;
     }
 
-    default int countSpace(ItemStack stack, Direction side) {
-        return countSpace(stack);
-    }
-
+    @Override
     default int countSpace(ItemStack stack) {
+        return countSpace(stack, null);
+    }
+
+    @Override
+    default int countSpace(ItemStack stack, Direction side) {
         int maxAmount = stack.getCount();
         if (maxAmount == 0) {
             return 0;
         }
-        return countSpace(stack, maxAmount);
+        return countSpace(stack, maxAmount, side);
     }
 
-    default int countSpace(ItemStack stack, int maxAmount, Direction side) {
-        return countSpace(stack, maxAmount);
-    }
-
+    @Override
     default int countSpace(ItemStack stack, int maxAmount) {
+        return countSpace(stack, maxAmount, null);
+    }
+
+    @Override
+    default int countSpace(ItemStack stack, int maxAmount, Direction side) {
         int count = 0;
-        for (int i = 0, size = create$size(); i < size; i++) {
-            if (create$isValid(i, stack)) {
-                ItemStack target = create$getStack(i);
+        for (int slot : create$getAvailableSlots(side)) {
+            if (create$canInsert(slot, stack, side) && isValid(slot, stack)) {
+                ItemStack target = getStack(slot);
                 if (target.isEmpty()) {
-                    count += create$getMaxCount(stack);
+                    count += getMaxCount(stack) - target.getCount();
                     if (count >= maxAmount) {
                         return maxAmount;
                     }
@@ -248,17 +258,29 @@ public interface BaseInventory extends Iterable<ItemStack> {
         return count;
     }
 
-    default int countSpace(ItemStack stack, int maxAmount, int start, int end, Direction side) {
-        return countSpace(stack, maxAmount, start, end);
-    }
-
+    @Override
     default int countSpace(ItemStack stack, int maxAmount, int start, int end) {
+        return countSpace(stack, maxAmount, start, end, null);
+    }
+
+    @Override
+    default int countSpace(ItemStack stack, int maxAmount, int start, int end, Direction side) {
         int count = 0;
+        int[] slots = create$getAvailableSlots(side);
+        start = findStartIndex(slots, start);
+        if (start == -1) {
+            return 0;
+        }
+        end = findEndIndex(slots, start, end);
+        if (end == -1) {
+            return 0;
+        }
         for (int i = start; i <= end; i++) {
-            if (create$isValid(i, stack)) {
-                ItemStack target = create$getStack(i);
+            int slot = slots[i];
+            if (create$canInsert(slot, stack, side) && isValid(slot, stack)) {
+                ItemStack target = getStack(slot);
                 if (target.isEmpty()) {
-                    count += create$getMaxCount(stack);
+                    count += getMaxCount(stack) - target.getCount();
                     if (count >= maxAmount) {
                         return maxAmount;
                     }
@@ -273,11 +295,13 @@ public interface BaseInventory extends Iterable<ItemStack> {
         return count;
     }
 
-    default boolean countSpace(List<ItemStack> stacks, Direction side) {
-        return countSpace(stacks);
+    @Override
+    default boolean countSpace(List<ItemStack> stacks) {
+        return countSpace(stacks, null);
     }
 
-    default boolean countSpace(List<ItemStack> stacks) {
+    @Override
+    default boolean countSpace(List<ItemStack> stacks, Direction side) {
         int listSize = stacks.size();
         if (listSize == 0) {
             return true;
@@ -285,7 +309,7 @@ public interface BaseInventory extends Iterable<ItemStack> {
         if (listSize == 1) {
             ItemStack stack = stacks.getFirst();
             int count = stack.getCount();
-            return countSpace(stack, count) == count;
+            return countSpace(stack, count, side) == count;
         }
         Object2IntLinkedOpenCustomHashMap<ItemStack> map = new Object2IntLinkedOpenCustomHashMap<>(ITEM_STACK_HASH_STRATEGY);
         for (ItemStack stack : stacks) {
@@ -296,19 +320,19 @@ public interface BaseInventory extends Iterable<ItemStack> {
             Object2IntMap.Entry<ItemStack> entry = entries.first();
             ItemStack stack = entry.getKey();
             int count = entry.getIntValue();
-            return countSpace(stack, count) == count;
+            return countSpace(stack, count, side) == count;
         }
-        for (int i = 0, size = create$size(); i < size; i++) {
-            ItemStack target = create$getStack(i);
+        for (int slot : create$getAvailableSlots(side)) {
+            ItemStack target = getStack(slot);
             boolean empty = target.isEmpty();
             ObjectIterator<Object2IntMap.Entry<ItemStack>> iterator = entries.fastIterator();
             do {
                 Object2IntMap.Entry<ItemStack> entry = iterator.next();
                 ItemStack stack = entry.getKey();
-                if (create$isValid(i, stack)) {
+                if (create$canInsert(slot, stack, side) && isValid(slot, stack)) {
                     if (empty) {
                         int remaining = entry.getIntValue();
-                        int insert = Math.min(remaining, create$getMaxCount(stack));
+                        int insert = Math.min(remaining, getMaxCount(stack));
                         if (remaining == insert) {
                             iterator.remove();
                             if (entries.isEmpty()) {
@@ -339,11 +363,13 @@ public interface BaseInventory extends Iterable<ItemStack> {
         return false;
     }
 
-    default boolean countSpace(List<ItemStack> stacks, int start, int end, Direction side) {
-        return countSpace(stacks, start, end);
+    @Override
+    default boolean countSpace(List<ItemStack> stacks, int start, int end) {
+        return countSpace(stacks, start, end, null);
     }
 
-    default boolean countSpace(List<ItemStack> stacks, int start, int end) {
+    @Override
+    default boolean countSpace(List<ItemStack> stacks, int start, int end, Direction side) {
         int listSize = stacks.size();
         if (listSize == 0) {
             return true;
@@ -351,7 +377,7 @@ public interface BaseInventory extends Iterable<ItemStack> {
         if (listSize == 1) {
             ItemStack stack = stacks.getFirst();
             int count = stack.getCount();
-            return countSpace(stack, count, start, end) == count;
+            return countSpace(stack, count, start, end, side) == count;
         }
         Object2IntLinkedOpenCustomHashMap<ItemStack> map = new Object2IntLinkedOpenCustomHashMap<>(ITEM_STACK_HASH_STRATEGY);
         for (ItemStack stack : stacks) {
@@ -362,19 +388,29 @@ public interface BaseInventory extends Iterable<ItemStack> {
             Object2IntMap.Entry<ItemStack> entry = entries.first();
             ItemStack stack = entry.getKey();
             int count = entry.getIntValue();
-            return countSpace(stack, count, start, end) == count;
+            return countSpace(stack, count, start, end, side) == count;
+        }
+        int[] slots = create$getAvailableSlots(side);
+        start = findStartIndex(slots, start);
+        if (start == -1) {
+            return false;
+        }
+        end = findEndIndex(slots, start, end);
+        if (end == -1) {
+            return false;
         }
         for (int i = start; i <= end; i++) {
-            ItemStack target = create$getStack(i);
+            int slot = slots[i];
+            ItemStack target = getStack(slot);
             boolean empty = target.isEmpty();
             ObjectIterator<Object2IntMap.Entry<ItemStack>> iterator = entries.fastIterator();
             do {
                 Object2IntMap.Entry<ItemStack> entry = iterator.next();
                 ItemStack stack = entry.getKey();
-                if (create$isValid(i, stack)) {
+                if (create$canInsert(slot, stack, side) && isValid(slot, stack)) {
                     if (empty) {
                         int remaining = entry.getIntValue();
-                        int insert = Math.min(remaining, create$getMaxCount(stack));
+                        int insert = Math.min(remaining, getMaxCount(stack));
                         if (remaining == insert) {
                             iterator.remove();
                             if (entries.isEmpty()) {
@@ -405,127 +441,111 @@ public interface BaseInventory extends Iterable<ItemStack> {
         return false;
     }
 
-    @SuppressWarnings("deprecation")
-    default ItemStack directCopy(ItemStack stack, int count) {
-        assert stack.item != null;
-        ItemStack copy = new ItemStack(stack.item, count, stack.components.copy());
-        copy.setBobbingAnimationTime(stack.getBobbingAnimationTime());
-        return copy;
-    }
-
-    default int extract(ItemStack stack, Direction side) {
-        return extract(stack);
-    }
-
+    @Override
     default int extract(ItemStack stack) {
+        return extract(stack, null);
+    }
+
+    @Override
+    default int extract(ItemStack stack, Direction side) {
         int maxAmount = stack.getCount();
         if (maxAmount == 0) {
             return 0;
         }
-        return extract(stack, maxAmount);
+        return extract(stack, maxAmount, side);
     }
 
-    default int extract(ItemStack stack, int maxAmount, Direction side) {
-        return extract(stack, maxAmount);
-    }
-
+    @Override
     default int extract(ItemStack stack, int maxAmount) {
+        return extract(stack, maxAmount, null);
+    }
+
+    @Override
+    default int extract(ItemStack stack, int maxAmount, Direction side) {
         int remaining = maxAmount;
-        for (int i = 0, size = create$size(); i < size; i++) {
-            ItemStack target = create$getStack(i);
-            if (target.isEmpty()) {
-                continue;
-            }
-            if (matches(target, stack)) {
-                int count = target.getCount();
-                if (count > remaining) {
-                    target.setCount(count - remaining);
-                    create$markDirty();
-                    return maxAmount;
+        for (int slot : create$getAvailableSlots(side)) {
+            if (create$canExtract(slot, stack, side)) {
+                ItemStack target = getStack(slot);
+                if (target.isEmpty()) {
+                    continue;
                 }
-                create$setStack(i, ItemStack.EMPTY);
-                if (count == remaining) {
-                    create$markDirty();
-                    return maxAmount;
+                if (matches(target, stack)) {
+                    int count = target.getCount();
+                    if (count > remaining) {
+                        target.setCount(count - remaining);
+                        markDirty();
+                        return maxAmount;
+                    }
+                    setStack(slot, ItemStack.EMPTY);
+                    if (count == remaining) {
+                        markDirty();
+                        return maxAmount;
+                    }
+                    remaining -= count;
                 }
-                remaining -= count;
             }
         }
         if (remaining == maxAmount) {
             return 0;
         }
-        create$markDirty();
+        markDirty();
         return maxAmount - remaining;
     }
 
-    default ItemStack extract(Predicate<ItemStack> predicate, Direction side) {
-        return extract(predicate);
-    }
-
-    default ItemStack extract(Predicate<ItemStack> predicate) {
-        for (int i = 0, size = create$size(); i < size; i++) {
-            ItemStack target = create$getStack(i);
-            if (target.isEmpty()) {
-                continue;
-            }
-            if (predicate.test(target)) {
-                create$setStack(i, ItemStack.EMPTY);
-                create$markDirty();
-                return onExtract(target);
-            }
-        }
-        return ItemStack.EMPTY;
-    }
-
-    default ItemStack extract(Predicate<ItemStack> predicate, int maxAmount, Direction side) {
-        return extract(predicate, maxAmount);
-    }
-
+    @Override
     default ItemStack extract(Predicate<ItemStack> predicate, int maxAmount) {
+        return extract(predicate, maxAmount, null);
+    }
+
+    @Override
+    default ItemStack extract(Predicate<ItemStack> predicate, int maxAmount, Direction side) {
         if (maxAmount == 0) {
             return ItemStack.EMPTY;
         }
-        for (int i = 0, size = create$size(); i < size; i++) {
-            ItemStack findStack = create$getStack(i);
+        int[] slots = create$getAvailableSlots(side);
+        for (int i = 0, size = slots.length; i < size; i++) {
+            int slot = slots[i];
+            ItemStack findStack = getStack(slot);
             if (findStack.isEmpty()) {
                 continue;
             }
-            if (predicate.test(findStack)) {
+            if (create$canExtract(slot, findStack, side) && predicate.test(findStack)) {
                 int count = findStack.getCount();
                 if (count > maxAmount) {
                     findStack.setCount(count - maxAmount);
-                    create$markDirty();
+                    markDirty();
                     return onExtract(directCopy(findStack, maxAmount));
                 }
-                create$setStack(i, ItemStack.EMPTY);
+                setStack(slot, ItemStack.EMPTY);
                 if (count == maxAmount) {
-                    create$markDirty();
+                    markDirty();
                     return onExtract(findStack);
                 }
                 int remaining = maxAmount - count;
                 for (i = i + 1; i < size; i++) {
-                    ItemStack stack = create$getStack(i);
+                    slot = slots[i];
+                    ItemStack stack = getStack(slot);
                     if (stack.isEmpty()) {
                         continue;
                     }
-                    if (matches(stack, findStack)) {
+                    if (create$canExtract(slot, stack, side) && matches(stack, findStack)) {
                         count = stack.getCount();
                         if (count < remaining) {
-                            create$setStack(i, ItemStack.EMPTY);
+                            setStack(slot, ItemStack.EMPTY);
                             remaining -= count;
                             continue;
                         }
                         if (count == remaining) {
-                            create$setStack(i, ItemStack.EMPTY);
+                            setStack(slot, ItemStack.EMPTY);
                         } else {
                             stack.setCount(count - remaining);
                         }
-                        create$markDirty();
+                        markDirty();
                         findStack.setCount(maxAmount);
                         return onExtract(findStack);
                     }
                 }
-                create$markDirty();
+                markDirty();
                 findStack.setCount(maxAmount - remaining);
                 return onExtract(findStack);
             }
@@ -533,11 +553,34 @@ public interface BaseInventory extends Iterable<ItemStack> {
         return ItemStack.EMPTY;
     }
 
-    default List<ItemStack> extract(List<ItemStack> stacks, Direction side) {
-        return extract(stacks);
+    @Override
+    default ItemStack extract(Predicate<ItemStack> predicate) {
+        return extract(predicate, null);
     }
 
+    @Override
+    default ItemStack extract(Predicate<ItemStack> predicate, Direction side) {
+        for (int slot : create$getAvailableSlots(side)) {
+            ItemStack stack = getStack(slot);
+            if (stack.isEmpty()) {
+                continue;
+            }
+            if (create$canExtract(slot, stack, side) && predicate.test(stack)) {
+                setStack(slot, ItemStack.EMPTY);
+                markDirty();
+                return onExtract(stack);
+            }
+        }
+        return ItemStack.EMPTY;
+    }
+
+    @Override
     default List<ItemStack> extract(List<ItemStack> stacks) {
+        return extract(stacks, null);
+    }
+
+    @Override
+    default List<ItemStack> extract(List<ItemStack> stacks, Direction side) {
         int listSize = stacks.size();
         if (listSize == 0) {
             return stacks;
@@ -545,7 +588,7 @@ public interface BaseInventory extends Iterable<ItemStack> {
         if (listSize == 1) {
             ItemStack stack = stacks.getFirst();
             int count = stack.getCount();
-            int extract = extract(stack);
+            int extract = extract(stack, side);
             if (count == extract) {
                 return List.of();
             }
@@ -563,7 +606,7 @@ public interface BaseInventory extends Iterable<ItemStack> {
             Object2IntMap.Entry<ItemStack> entry = entries.first();
             ItemStack stack = entry.getKey();
             int count = entry.getIntValue();
-            int extract = extract(stack, count);
+            int extract = extract(stack, count, side);
             if (count == extract) {
                 return List.of();
             }
@@ -573,36 +616,38 @@ public interface BaseInventory extends Iterable<ItemStack> {
             return List.of(directCopy(stack, count - extract));
         }
         boolean dirty = false;
-        for (int i = 0, size = create$size(); i < size; i++) {
-            ItemStack target = create$getStack(i);
+        for (int slot : create$getAvailableSlots(side)) {
+            ItemStack target = getStack(slot);
             if (target.isEmpty()) {
                 continue;
             }
-            ObjectIterator<Object2IntMap.Entry<ItemStack>> iterator = entries.fastIterator();
-            do {
-                Object2IntMap.Entry<ItemStack> entry = iterator.next();
-                ItemStack stack = entry.getKey();
-                if (matches(target, stack)) {
-                    int count = target.getCount();
-                    int remaining = entry.getIntValue();
-                    if (count < remaining) {
-                        create$setStack(i, ItemStack.EMPTY);
-                        entry.setValue(remaining - count);
-                        break;
+            if (create$canExtract(slot, target, side)) {
+                ObjectIterator<Object2IntMap.Entry<ItemStack>> iterator = entries.fastIterator();
+                do {
+                    Object2IntMap.Entry<ItemStack> entry = iterator.next();
+                    ItemStack stack = entry.getKey();
+                    if (matches(target, stack)) {
+                        int count = target.getCount();
+                        int remaining = entry.getIntValue();
+                        if (count < remaining) {
+                            setStack(slot, ItemStack.EMPTY);
+                            entry.setValue(remaining - count);
+                            break;
+                        }
+                        if (count == remaining) {
+                            setStack(slot, ItemStack.EMPTY);
+                        } else {
+                            target.setCount(count - remaining);
+                        }
+                        iterator.remove();
+                        if (entries.isEmpty()) {
+                            markDirty();
+                            return List.of();
+                        }
+                        dirty = true;
                     }
-                    if (count == remaining) {
-                        create$setStack(i, ItemStack.EMPTY);
-                    } else {
-                        target.setCount(count - remaining);
-                    }
-                    iterator.remove();
-                    if (entries.isEmpty()) {
-                        create$markDirty();
-                        return List.of();
-                    }
-                    dirty = true;
-                }
-            } while (iterator.hasNext());
+                } while (iterator.hasNext());
+            }
         }
         if (dirty) {
             List<ItemStack> result = new ArrayList<>(entries.size());
@@ -615,459 +660,509 @@ public interface BaseInventory extends Iterable<ItemStack> {
                     result.add(directCopy(stack, count));
                 }
             }
-            create$markDirty();
+            markDirty();
             return result;
         } else {
             return stacks;
         }
     }
 
-    default int extractAll(Predicate<ItemStack> predicate, int maxAmount, Direction side) {
-        return extractAll(predicate, maxAmount);
+    @Override
+    default int extractAll(Predicate<ItemStack> predicate, int maxAmount) {
+        return extractAll(predicate, maxAmount, null);
     }
 
-    default int extractAll(Predicate<ItemStack> predicate, int maxAmount) {
+    @Override
+    default int extractAll(Predicate<ItemStack> predicate, int maxAmount, Direction side) {
         if (maxAmount == 0) {
             return 0;
         }
         int remaining = maxAmount;
-        for (int i = 0, size = create$size(); i < size; i++) {
-            ItemStack stack = create$getStack(i);
+        for (int slot : create$getAvailableSlots(side)) {
+            ItemStack stack = getStack(slot);
             if (stack.isEmpty()) {
                 continue;
             }
-            if (predicate.test(stack)) {
+            if (predicate.test(stack) && create$canExtract(slot, stack, side)) {
                 int count = stack.getCount();
                 if (count < remaining) {
-                    create$setStack(i, ItemStack.EMPTY);
+                    setStack(slot, ItemStack.EMPTY);
                     remaining -= count;
                     continue;
                 }
                 if (count == remaining) {
-                    create$setStack(i, ItemStack.EMPTY);
+                    setStack(slot, ItemStack.EMPTY);
                 } else {
                     stack.setCount(count - remaining);
                 }
-                create$markDirty();
+                markDirty();
                 return maxAmount;
             }
         }
         if (remaining == maxAmount) {
             return 0;
         }
-        create$markDirty();
+        markDirty();
         return maxAmount - remaining;
     }
 
-    default ItemStack extractAny(Direction side) {
-        return extractAny();
+    @Override
+    default ItemStack extractAny() {
+        return extractAny(null);
     }
 
-    default ItemStack extractAny() {
-        for (int i = 0, size = create$size(); i < size; i++) {
-            ItemStack target = create$getStack(i);
+    @Override
+    default ItemStack extractAny(Direction side) {
+        for (int slot : create$getAvailableSlots(side)) {
+            ItemStack target = getStack(slot);
             if (target.isEmpty()) {
                 continue;
             }
-            create$setStack(i, ItemStack.EMPTY);
-            create$markDirty();
-            return onExtract(target);
+            if (create$canExtract(slot, target, side)) {
+                setStack(slot, ItemStack.EMPTY);
+                markDirty();
+                return onExtract(target);
+            }
         }
         return ItemStack.EMPTY;
     }
 
-    default ItemStack extractAny(int maxAmount, Direction side) {
-        return extractAny(maxAmount);
+    @Override
+    default ItemStack extractAny(int maxAmount) {
+        return extractAny(maxAmount, null);
     }
 
-    default ItemStack extractAny(int maxAmount) {
+    @Override
+    default ItemStack extractAny(int maxAmount, Direction side) {
         if (maxAmount == 0) {
             return ItemStack.EMPTY;
         }
-        for (int i = 0, size = create$size(); i < size; i++) {
-            ItemStack findStack = create$getStack(i);
+        int[] slots = create$getAvailableSlots(side);
+        int size = slots.length;
+        for (int i = 0; i < size; i++) {
+            int slot = slots[i];
+            ItemStack findStack = getStack(slot);
             if (findStack.isEmpty()) {
                 continue;
             }
-            int count = findStack.getCount();
-            if (count > maxAmount) {
-                findStack.setCount(count - maxAmount);
-                create$markDirty();
-                return onExtract(directCopy(findStack, maxAmount));
-            }
-            create$setStack(i, ItemStack.EMPTY);
-            if (count == maxAmount) {
-                create$markDirty();
-                return onExtract(findStack);
-            }
-            int remaining = maxAmount - count;
-            for (i = i + 1; i < size; i++) {
-                ItemStack stack = create$getStack(i);
-                if (stack.isEmpty()) {
-                    continue;
+            if (create$canExtract(slot, findStack, side)) {
+                int count = findStack.getCount();
+                if (count > maxAmount) {
+                    findStack.setCount(count - maxAmount);
+                    markDirty();
+                    return onExtract(directCopy(findStack, maxAmount));
                 }
-                if (matches(stack, findStack)) {
-                    count = stack.getCount();
-                    if (count < remaining) {
-                        create$setStack(i, ItemStack.EMPTY);
-                        remaining -= count;
-                        continue;
-                    }
-                    if (count == remaining) {
-                        create$setStack(i, ItemStack.EMPTY);
-                    } else {
-                        stack.setCount(count - remaining);
-                    }
-                    create$markDirty();
-                    findStack.setCount(maxAmount);
+                setStack(slot, ItemStack.EMPTY);
+                if (count == maxAmount) {
+                    markDirty();
                     return onExtract(findStack);
                 }
+                int remaining = maxAmount - count;
+                for (i = i + 1; i < size; i++) {
+                    slot = slots[i];
+                    ItemStack stack = getStack(slot);
+                    if (stack.isEmpty()) {
+                        continue;
+                    }
+                    if (create$canExtract(slot, stack, side) && matches(stack, findStack)) {
+                        count = stack.getCount();
+                        if (count < remaining) {
+                            setStack(slot, ItemStack.EMPTY);
+                            remaining -= count;
+                            continue;
+                        }
+                        if (count == remaining) {
+                            setStack(slot, ItemStack.EMPTY);
+                        } else {
+                            stack.setCount(count - remaining);
+                        }
+                        markDirty();
+                        findStack.setCount(maxAmount);
+                        return onExtract(findStack);
+                    }
+                }
+                markDirty();
+                findStack.setCount(maxAmount - remaining);
+                return onExtract(findStack);
             }
-            create$markDirty();
-            findStack.setCount(maxAmount - remaining);
-            return onExtract(findStack);
         }
         return ItemStack.EMPTY;
     }
 
-    default int forceInsert(ItemStack stack) {
-        return BaseInventory.this.insert(stack);
+    private int findEndIndex(int[] slots, int start, int end) {
+        for (int i = slots.length - 1; i >= start; i--) {
+            if (slots[i] <= end) {
+                return i;
+            }
+        }
+        return -1;
     }
 
-    default int forceInsert(ItemStack stack, int maxAmount) {
-        return BaseInventory.this.insert(stack, maxAmount);
+    private int findStartIndex(int[] slots, int start) {
+        for (int i = 0, size = slots.length; i < size; i++) {
+            if (slots[i] >= start) {
+                return i;
+            }
+        }
+        return -1;
     }
 
-    default boolean forcePreciseInsert(ItemStack stack) {
-        return BaseInventory.this.preciseInsert(stack);
-    }
-
-    default boolean forcePreciseInsert(ItemStack stack, int maxAmount) {
-        return BaseInventory.this.preciseInsert(stack, maxAmount);
-    }
-
-    default int insert(ItemStack stack, Direction side) {
-        return insert(stack);
-    }
-
+    @Override
     default int insert(ItemStack stack) {
-        int maxAmount = stack.getCount();
-        if (maxAmount == 0) {
-            return 0;
-        }
-        return insert(stack, maxAmount);
+        return insert(stack, null);
     }
 
-    default int insert(ItemStack stack, int maxAmount, Direction side) {
-        return insert(stack, maxAmount);
-    }
-
+    @Override
     default int insert(ItemStack stack, int maxAmount) {
-        int remaining = maxAmount;
-        for (int i = 0, size = create$size(); i < size; i++) {
-            if (create$isValid(i, stack)) {
-                ItemStack target = create$getStack(i);
-                if (target.isEmpty()) {
-                    int insert = Math.min(remaining, create$getMaxCount(stack));
-                    create$setStack(i, directCopy(stack, insert));
-                    if (remaining == insert) {
-                        create$markDirty();
-                        return maxAmount;
-                    }
-                    remaining -= insert;
-                } else if (matches(target, stack)) {
-                    int maxCount = target.getMaxCount();
-                    int count = target.getCount();
-                    if (count != maxCount) {
-                        int insert = Math.min(remaining, maxCount - count);
-                        target.setCount(count + insert);
-                        if (remaining == insert) {
-                            create$markDirty();
-                            return maxAmount;
-                        }
-                        remaining -= insert;
-                    }
-                }
-            }
-        }
-        if (remaining == maxAmount) {
-            return 0;
-        }
-        create$markDirty();
-        return maxAmount - remaining;
+        return insert(stack, maxAmount, null);
     }
 
-    default int insert(ItemStack stack, int maxAmount, int start, int end, Direction side) {
-        return insert(stack, maxAmount, start, end);
-    }
-
-    default int insert(ItemStack stack, int maxAmount, int start, int end) {
-        int remaining = maxAmount;
-        for (int i = start; i < end; i++) {
-            if (create$isValid(i, stack)) {
-                ItemStack target = create$getStack(i);
-                if (target.isEmpty()) {
-                    int insert = Math.min(remaining, create$getMaxCount(stack));
-                    create$setStack(i, directCopy(stack, insert));
-                    if (remaining == insert) {
-                        create$markDirty();
-                        return maxAmount;
-                    }
-                    remaining -= insert;
-                } else if (matches(target, stack)) {
-                    int maxCount = target.getMaxCount();
-                    int count = target.getCount();
-                    if (count != maxCount) {
-                        int insert = Math.min(remaining, maxCount - count);
-                        target.setCount(count + insert);
-                        if (remaining == insert) {
-                            create$markDirty();
-                            return maxAmount;
-                        }
-                        remaining -= insert;
-                    }
-                }
-            }
-        }
-        if (remaining == maxAmount) {
-            return 0;
-        }
-        create$markDirty();
-        return maxAmount - remaining;
-    }
-
-    default List<ItemStack> insert(List<ItemStack> stacks, Direction side) {
-        return insert(stacks);
-    }
-
-    default List<ItemStack> insert(List<ItemStack> stacks) {
-        int listSize = stacks.size();
-        if (listSize == 0) {
-            return stacks;
-        }
-        if (listSize == 1) {
-            ItemStack stack = stacks.getFirst();
-            int count = stack.getCount();
-            int insert = insert(stack);
-            if (count == insert) {
-                return List.of();
-            }
-            if (insert == 0) {
-                return stacks;
-            }
-            return List.of(directCopy(stack, count - insert));
-        }
-        Object2IntLinkedOpenCustomHashMap<ItemStack> map = new Object2IntLinkedOpenCustomHashMap<>(ITEM_STACK_HASH_STRATEGY);
-        for (ItemStack stack : stacks) {
-            map.merge(stack, stack.getCount(), Integer::sum);
-        }
-        Object2IntSortedMap.FastSortedEntrySet<ItemStack> entries = map.object2IntEntrySet();
-        if (entries.size() == 1) {
-            Object2IntMap.Entry<ItemStack> entry = entries.first();
-            ItemStack stack = entry.getKey();
-            int count = entry.getIntValue();
-            int insert = insert(stack, count);
-            if (count == insert) {
-                return List.of();
-            }
-            if (insert == 0) {
-                return stacks;
-            }
-            return List.of(directCopy(stack, count - insert));
-        }
-        boolean dirty = false;
-        for (int i = 0, size = create$size(); i < size; i++) {
-            ItemStack target = create$getStack(i);
-            boolean empty = target.isEmpty();
-            ObjectIterator<Object2IntMap.Entry<ItemStack>> iterator = entries.fastIterator();
-            do {
-                Object2IntMap.Entry<ItemStack> entry = iterator.next();
-                ItemStack stack = entry.getKey();
-                if (create$isValid(i, stack)) {
-                    if (empty) {
-                        int remaining = entry.getIntValue();
-                        int insert = Math.min(remaining, create$getMaxCount(stack));
-                        create$setStack(i, directCopy(stack, insert));
-                        if (remaining == insert) {
-                            iterator.remove();
-                            if (entries.isEmpty()) {
-                                create$markDirty();
-                                return List.of();
-                            }
-                        } else {
-                            entry.setValue(remaining - insert);
-                        }
-                        dirty = true;
-                        break;
-                    } else if (matches(target, stack)) {
-                        int maxCount = target.getMaxCount();
-                        int count = target.getCount();
-                        if (count != maxCount) {
-                            int remaining = entry.getIntValue();
-                            int insert = Math.min(remaining, maxCount - count);
-                            target.setCount(count + insert);
-                            if (remaining == insert) {
-                                iterator.remove();
-                                if (entries.isEmpty()) {
-                                    create$markDirty();
-                                    return List.of();
-                                }
-                            } else {
-                                entry.setValue(remaining - insert);
-                            }
-                            dirty = true;
-                        }
-                        break;
-                    }
-                }
-            } while (iterator.hasNext());
-        }
-        if (dirty) {
-            List<ItemStack> result = new ArrayList<>(entries.size());
-            for (Object2IntMap.Entry<ItemStack> entry : entries) {
-                ItemStack stack = entry.getKey();
-                int count = entry.getIntValue();
-                if (stack.getCount() == count) {
-                    result.add(stack);
-                } else {
-                    result.add(directCopy(stack, count));
-                }
-            }
-            create$markDirty();
-            return result;
-        } else {
-            return stacks;
-        }
-    }
-
-    default List<ItemStack> insert(List<ItemStack> stacks, int start, int end, Direction side) {
-        return insert(stacks, start, end);
-    }
-
-    default List<ItemStack> insert(List<ItemStack> stacks, int start, int end) {
-        int listSize = stacks.size();
-        if (listSize == 0) {
-            return stacks;
-        }
-        if (listSize == 1) {
-            ItemStack stack = stacks.getFirst();
-            int count = stack.getCount();
-            int insert = insert(stack, count, start, end);
-            if (count == insert) {
-                return List.of();
-            }
-            if (insert == 0) {
-                return stacks;
-            }
-            return List.of(directCopy(stack, count - insert));
-        }
-        Object2IntLinkedOpenCustomHashMap<ItemStack> map = new Object2IntLinkedOpenCustomHashMap<>(ITEM_STACK_HASH_STRATEGY);
-        for (ItemStack stack : stacks) {
-            map.merge(stack, stack.getCount(), Integer::sum);
-        }
-        Object2IntSortedMap.FastSortedEntrySet<ItemStack> entries = map.object2IntEntrySet();
-        if (entries.size() == 1) {
-            Object2IntMap.Entry<ItemStack> entry = entries.first();
-            ItemStack stack = entry.getKey();
-            int count = entry.getIntValue();
-            int insert = insert(stack, count, start, end);
-            if (count == insert) {
-                return List.of();
-            }
-            if (insert == 0) {
-                return stacks;
-            }
-            return List.of(directCopy(stack, count - insert));
-        }
-        boolean dirty = false;
-        for (int i = start; i < end; i++) {
-            ItemStack target = create$getStack(i);
-            boolean empty = target.isEmpty();
-            ObjectIterator<Object2IntMap.Entry<ItemStack>> iterator = entries.fastIterator();
-            do {
-                Object2IntMap.Entry<ItemStack> entry = iterator.next();
-                ItemStack stack = entry.getKey();
-                if (create$isValid(i, stack)) {
-                    if (empty) {
-                        int remaining = entry.getIntValue();
-                        int insert = Math.min(remaining, create$getMaxCount(stack));
-                        create$setStack(i, directCopy(stack, insert));
-                        if (remaining == insert) {
-                            iterator.remove();
-                            if (entries.isEmpty()) {
-                                create$markDirty();
-                                return List.of();
-                            }
-                        } else {
-                            entry.setValue(remaining - insert);
-                        }
-                        dirty = true;
-                        break;
-                    } else if (matches(target, stack)) {
-                        int maxCount = target.getMaxCount();
-                        int count = target.getCount();
-                        if (count != maxCount) {
-                            int remaining = entry.getIntValue();
-                            int insert = Math.min(remaining, maxCount - count);
-                            target.setCount(count + insert);
-                            if (remaining == insert) {
-                                iterator.remove();
-                                if (entries.isEmpty()) {
-                                    create$markDirty();
-                                    return List.of();
-                                }
-                            } else {
-                                entry.setValue(remaining - insert);
-                            }
-                            dirty = true;
-                        }
-                        break;
-                    }
-                }
-            } while (iterator.hasNext());
-        }
-        if (dirty) {
-            List<ItemStack> result = new ArrayList<>(entries.size());
-            for (Object2IntMap.Entry<ItemStack> entry : entries) {
-                ItemStack stack = entry.getKey();
-                int count = entry.getIntValue();
-                if (stack.getCount() == count) {
-                    result.add(stack);
-                } else {
-                    result.add(directCopy(stack, count));
-                }
-            }
-            create$markDirty();
-            return result;
-        } else {
-            return stacks;
-        }
-    }
-
-    default int insertExist(ItemStack stack, Direction side) {
-        return insertExist(stack);
-    }
-
-    default int insertExist(ItemStack stack, int maxAmount, Direction side) {
-        return insertExist(stack);
-    }
-
-    default int insertExist(ItemStack stack) {
+    @Override
+    default int insert(ItemStack stack, Direction side) {
         int maxAmount = stack.getCount();
         if (maxAmount == 0) {
             return 0;
         }
-        return insertExist(stack, maxAmount);
+        return insert(stack, maxAmount, side);
     }
 
+    @Override
+    default int insert(ItemStack stack, int maxAmount, Direction side) {
+        int remaining = maxAmount;
+        for (int slot : create$getAvailableSlots(side)) {
+            if (create$canInsert(slot, stack, side) && isValid(slot, stack)) {
+                ItemStack target = getStack(slot);
+                if (target.isEmpty()) {
+                    int insert = Math.min(remaining, getMaxCount(stack));
+                    setStack(slot, directCopy(stack, insert));
+                    if (remaining == insert) {
+                        markDirty();
+                        return maxAmount;
+                    }
+                    remaining -= insert;
+                } else if (matches(target, stack)) {
+                    int maxCount = target.getMaxCount();
+                    int count = target.getCount();
+                    if (count != maxCount) {
+                        int insert = Math.min(remaining, maxCount - count);
+                        target.setCount(count + insert);
+                        if (remaining == insert) {
+                            markDirty();
+                            return maxAmount;
+                        }
+                        remaining -= insert;
+                    }
+                }
+            }
+        }
+        if (remaining == maxAmount) {
+            return 0;
+        }
+        markDirty();
+        return maxAmount - remaining;
+    }
+
+    @Override
+    default int insert(ItemStack stack, int maxAmount, int start, int end) {
+        return insert(stack, maxAmount, start, end, null);
+    }
+
+    @Override
+    default int insert(ItemStack stack, int maxAmount, int start, int end, Direction side) {
+        int remaining = maxAmount;
+        int[] slots = create$getAvailableSlots(side);
+        start = findStartIndex(slots, start);
+        if (start == -1) {
+            return 0;
+        }
+        end = findEndIndex(slots, start, end);
+        if (end == -1) {
+            return 0;
+        }
+        for (int i = start; i <= end; i++) {
+            int slot = slots[i];
+            if (create$canInsert(slot, stack, side) && isValid(slot, stack)) {
+                ItemStack target = getStack(slot);
+                if (target.isEmpty()) {
+                    int insert = Math.min(remaining, getMaxCount(stack));
+                    setStack(slot, directCopy(stack, insert));
+                    if (remaining == insert) {
+                        markDirty();
+                        return maxAmount;
+                    }
+                    remaining -= insert;
+                } else if (matches(target, stack)) {
+                    int maxCount = target.getMaxCount();
+                    int count = target.getCount();
+                    if (count != maxCount) {
+                        int insert = Math.min(remaining, maxCount - count);
+                        target.setCount(count + insert);
+                        if (remaining == insert) {
+                            markDirty();
+                            return maxAmount;
+                        }
+                        remaining -= insert;
+                    }
+                }
+            }
+        }
+        if (remaining == maxAmount) {
+            return 0;
+        }
+        markDirty();
+        return maxAmount - remaining;
+    }
+
+    @Override
+    default List<ItemStack> insert(List<ItemStack> stacks) {
+        return insert(stacks, null);
+    }
+
+    @Override
+    default List<ItemStack> insert(List<ItemStack> stacks, Direction side) {
+        int listSize = stacks.size();
+        if (listSize == 0) {
+            return stacks;
+        }
+        if (listSize == 1) {
+            ItemStack stack = stacks.getFirst();
+            int count = stack.getCount();
+            int insert = insert(stack, side);
+            if (count == insert) {
+                return List.of();
+            }
+            if (insert == 0) {
+                return stacks;
+            }
+            return List.of(directCopy(stack, count - insert));
+        }
+        Object2IntLinkedOpenCustomHashMap<ItemStack> map = new Object2IntLinkedOpenCustomHashMap<>(ITEM_STACK_HASH_STRATEGY);
+        for (ItemStack stack : stacks) {
+            map.merge(stack, stack.getCount(), Integer::sum);
+        }
+        Object2IntSortedMap.FastSortedEntrySet<ItemStack> entries = map.object2IntEntrySet();
+        if (entries.size() == 1) {
+            Object2IntMap.Entry<ItemStack> entry = entries.first();
+            ItemStack stack = entry.getKey();
+            int count = entry.getIntValue();
+            int insert = insert(stack, count, side);
+            if (count == insert) {
+                return List.of();
+            }
+            if (insert == 0) {
+                return stacks;
+            }
+            return List.of(directCopy(stack, count - insert));
+        }
+        boolean dirty = false;
+        for (int slot : create$getAvailableSlots(side)) {
+            ItemStack target = getStack(slot);
+            boolean empty = target.isEmpty();
+            ObjectIterator<Object2IntMap.Entry<ItemStack>> iterator = entries.fastIterator();
+            do {
+                Object2IntMap.Entry<ItemStack> entry = iterator.next();
+                ItemStack stack = entry.getKey();
+                if (create$canInsert(slot, stack, side) && isValid(slot, stack)) {
+                    if (empty) {
+                        int remaining = entry.getIntValue();
+                        int insert = Math.min(remaining, getMaxCount(stack));
+                        setStack(slot, directCopy(stack, insert));
+                        if (remaining == insert) {
+                            iterator.remove();
+                            if (entries.isEmpty()) {
+                                markDirty();
+                                return List.of();
+                            }
+                        } else {
+                            entry.setValue(remaining - insert);
+                        }
+                        dirty = true;
+                        break;
+                    } else if (matches(target, stack)) {
+                        int maxCount = target.getMaxCount();
+                        int count = target.getCount();
+                        if (count != maxCount) {
+                            int remaining = entry.getIntValue();
+                            int insert = Math.min(remaining, maxCount - count);
+                            target.setCount(count + insert);
+                            if (remaining == insert) {
+                                iterator.remove();
+                                if (entries.isEmpty()) {
+                                    markDirty();
+                                    return List.of();
+                                }
+                            } else {
+                                entry.setValue(remaining - insert);
+                            }
+                            dirty = true;
+                        }
+                        break;
+                    }
+                }
+            } while (iterator.hasNext());
+        }
+        if (dirty) {
+            List<ItemStack> result = new ArrayList<>(entries.size());
+            for (Object2IntMap.Entry<ItemStack> entry : entries) {
+                ItemStack stack = entry.getKey();
+                int count = entry.getIntValue();
+                if (stack.getCount() == count) {
+                    result.add(stack);
+                } else {
+                    result.add(directCopy(stack, count));
+                }
+            }
+            markDirty();
+            return result;
+        } else {
+            return stacks;
+        }
+    }
+
+    @Override
+    default List<ItemStack> insert(List<ItemStack> stacks, int start, int end) {
+        return insert(stacks, start, end, null);
+    }
+
+    @Override
+    default List<ItemStack> insert(List<ItemStack> stacks, int start, int end, Direction side) {
+        int listSize = stacks.size();
+        if (listSize == 0) {
+            return stacks;
+        }
+        if (listSize == 1) {
+            ItemStack stack = stacks.getFirst();
+            int count = stack.getCount();
+            int insert = insert(stack, count, start, end, side);
+            if (count == insert) {
+                return List.of();
+            }
+            if (insert == 0) {
+                return stacks;
+            }
+            return List.of(directCopy(stack, count - insert));
+        }
+        Object2IntLinkedOpenCustomHashMap<ItemStack> map = new Object2IntLinkedOpenCustomHashMap<>(ITEM_STACK_HASH_STRATEGY);
+        for (ItemStack stack : stacks) {
+            map.merge(stack, stack.getCount(), Integer::sum);
+        }
+        Object2IntSortedMap.FastSortedEntrySet<ItemStack> entries = map.object2IntEntrySet();
+        if (entries.size() == 1) {
+            Object2IntMap.Entry<ItemStack> entry = entries.first();
+            ItemStack stack = entry.getKey();
+            int count = entry.getIntValue();
+            int insert = insert(stack, count, start, end, side);
+            if (count == insert) {
+                return List.of();
+            }
+            if (insert == 0) {
+                return stacks;
+            }
+            return List.of(directCopy(stack, count - insert));
+        }
+        boolean dirty = false;
+        int[] slots = create$getAvailableSlots(side);
+        start = findStartIndex(slots, start);
+        if (start == -1) {
+            return stacks;
+        }
+        end = findEndIndex(slots, start, end);
+        if (end == -1) {
+            return stacks;
+        }
+        for (int i = start; i <= end; i++) {
+            int slot = slots[i];
+            ItemStack target = getStack(slot);
+            boolean empty = target.isEmpty();
+            ObjectIterator<Object2IntMap.Entry<ItemStack>> iterator = entries.fastIterator();
+            do {
+                Object2IntMap.Entry<ItemStack> entry = iterator.next();
+                ItemStack stack = entry.getKey();
+                if (create$canInsert(slot, stack, side) && isValid(slot, stack)) {
+                    if (empty) {
+                        int remaining = entry.getIntValue();
+                        int insert = Math.min(remaining, getMaxCount(stack));
+                        setStack(slot, directCopy(stack, insert));
+                        if (remaining == insert) {
+                            iterator.remove();
+                            if (entries.isEmpty()) {
+                                markDirty();
+                                return List.of();
+                            }
+                        } else {
+                            entry.setValue(remaining - insert);
+                        }
+                        dirty = true;
+                        break;
+                    } else if (matches(target, stack)) {
+                        int maxCount = target.getMaxCount();
+                        int count = target.getCount();
+                        if (count != maxCount) {
+                            int remaining = entry.getIntValue();
+                            int insert = Math.min(remaining, maxCount - count);
+                            target.setCount(count + insert);
+                            if (remaining == insert) {
+                                iterator.remove();
+                                if (entries.isEmpty()) {
+                                    markDirty();
+                                    return List.of();
+                                }
+                            } else {
+                                entry.setValue(remaining - insert);
+                            }
+                            dirty = true;
+                        }
+                        break;
+                    }
+                }
+            } while (iterator.hasNext());
+        }
+        if (dirty) {
+            List<ItemStack> result = new ArrayList<>(entries.size());
+            for (Object2IntMap.Entry<ItemStack> entry : entries) {
+                ItemStack stack = entry.getKey();
+                int count = entry.getIntValue();
+                if (stack.getCount() == count) {
+                    result.add(stack);
+                } else {
+                    result.add(directCopy(stack, count));
+                }
+            }
+            markDirty();
+            return result;
+        } else {
+            return stacks;
+        }
+    }
+
+    @Override
+    default int insertExist(ItemStack stack) {
+        return insertExist(stack, null);
+    }
+
+    @Override
     default int insertExist(ItemStack stack, int maxAmount) {
+        return insertExist(stack, maxAmount, null);
+    }
+
+    @Override
+    default int insertExist(ItemStack stack, Direction side) {
+        int maxAmount = stack.getCount();
+        if (maxAmount == 0) {
+            return 0;
+        }
+        return insertExist(stack, maxAmount, side);
+    }
+
+    @Override
+    default int insertExist(ItemStack stack, int maxAmount, Direction side) {
         int remaining = maxAmount;
         List<Integer> emptys = new ArrayList<>();
-        for (int i = 0, size = create$size(); i < size; i++) {
-            if (create$isValid(i, stack)) {
-                ItemStack target = create$getStack(i);
+        for (int slot : create$getAvailableSlots(side)) {
+            if (create$canInsert(slot, stack, side) && isValid(slot, stack)) {
+                ItemStack target = getStack(slot);
                 if (target.isEmpty()) {
-                    emptys.add(i);
+                    emptys.add(slot);
                 } else if (matches(target, stack)) {
                     int maxCount = target.getMaxCount();
                     int count = target.getCount();
@@ -1075,7 +1170,7 @@ public interface BaseInventory extends Iterable<ItemStack> {
                         int insert = Math.min(remaining, maxCount - count);
                         target.setCount(count + insert);
                         if (remaining == insert) {
-                            create$markDirty();
+                            markDirty();
                             return maxAmount;
                         }
                         remaining -= insert;
@@ -1083,11 +1178,11 @@ public interface BaseInventory extends Iterable<ItemStack> {
                 }
             }
         }
-        for (int i : emptys) {
-            int insert = Math.min(remaining, create$getMaxCount(stack));
-            create$setStack(i, directCopy(stack, insert));
+        for (int slot : emptys) {
+            int insert = Math.min(remaining, getMaxCount(stack));
+            setStack(slot, directCopy(stack, insert));
             if (remaining == insert) {
-                create$markDirty();
+                markDirty();
                 return maxAmount;
             }
             remaining -= insert;
@@ -1095,143 +1190,115 @@ public interface BaseInventory extends Iterable<ItemStack> {
         if (remaining == maxAmount) {
             return 0;
         }
-        create$markDirty();
+        markDirty();
         return maxAmount - remaining;
     }
 
+    @Override
     @NotNull
-    default Iterator<ItemStack> iterator(Direction side) {
-        return iterator();
+    default java.util.Iterator<ItemStack> iterator() {
+        return iterator(null);
     }
 
-    default boolean matches(ItemStack stack, ItemStack otherStack) {
-        if (stack.isOf(otherStack.getItem())) {
-            MergedComponentMap stackComponents = stack.components;
-            MergedComponentMap otherStackComponents = otherStack.components;
-            if (stackComponents == otherStackComponents) {
-                return true;
-            }
-            Reference2ObjectMap<ComponentType<?>, Optional<?>> stackComponentMap = stackComponents.changedComponents;
-            Reference2ObjectMap<ComponentType<?>, Optional<?>> otherStackComponentMap = otherStackComponents.changedComponents;
-            if (stackComponentMap == otherStackComponentMap) {
-                return true;
-            }
-            int stackComponentCount = stackComponentMap.size();
-            if (stackComponentMap.containsKey(DataComponentTypes.MAX_STACK_SIZE)) {
-                stackComponentCount--;
-            }
-            int otherStackComponentCount = otherStackComponentMap.size();
-            boolean hasMaxCapacityComponent = false;
-            if (otherStackComponentMap.containsKey(DataComponentTypes.MAX_STACK_SIZE)) {
-                otherStackComponentCount--;
-                hasMaxCapacityComponent = true;
-            }
-            if (stackComponentCount != otherStackComponentCount) {
-                return false;
-            }
-            if (hasMaxCapacityComponent) {
-                ObjectSet<Reference2ObjectMap.Entry<ComponentType<?>, Optional<?>>> stackComponentSet = stackComponentMap.reference2ObjectEntrySet();
-                for (Reference2ObjectMap.Entry<ComponentType<?>, Optional<?>> componentEntry : otherStackComponentMap.reference2ObjectEntrySet()) {
-                    if (!stackComponentSet.contains(componentEntry) && componentEntry.getKey() != DataComponentTypes.MAX_STACK_SIZE) {
-                        return false;
-                    }
-                }
-                return true;
-            }
-            return stackComponentMap.reference2ObjectEntrySet().containsAll(otherStackComponentMap.reference2ObjectEntrySet());
-        }
-        return false;
+    @Override
+    @NotNull
+    default java.util.Iterator<ItemStack> iterator(Direction side) {
+        return new Iterator(this, side);
     }
 
-    default ItemStack onExtract(ItemStack stack) {
-        return stack;
-    }
-
-    default boolean preciseExtract(ItemStack stack, Direction side) {
-        return preciseExtract(stack);
-    }
-
+    @Override
     default boolean preciseExtract(ItemStack stack) {
+        return preciseExtract(stack, null);
+    }
+
+    @Override
+    default boolean preciseExtract(ItemStack stack, Direction side) {
         if (stack.isEmpty()) {
             return true;
         }
         int remaining = stack.getCount();
         List<Runnable> changes = new ArrayList<>();
-        for (int i = 0, size = create$size(); i < size; i++) {
-            ItemStack target = create$getStack(i);
-            if (target.isEmpty()) {
-                continue;
-            }
-            if (matches(target, stack)) {
-                int count = target.getCount();
-                if (count > remaining) {
-                    changes.forEach(Runnable::run);
-                    target.setCount(count - remaining);
-                    create$markDirty();
-                    return true;
+        for (int slot : create$getAvailableSlots(side)) {
+            if (create$canExtract(slot, stack, side)) {
+                ItemStack target = getStack(slot);
+                if (target.isEmpty()) {
+                    continue;
                 }
-                if (count == remaining) {
-                    changes.forEach(Runnable::run);
-                    create$setStack(i, ItemStack.EMPTY);
-                    create$markDirty();
-                    return true;
+                if (matches(target, stack)) {
+                    int count = target.getCount();
+                    if (count > remaining) {
+                        changes.forEach(Runnable::run);
+                        target.setCount(count - remaining);
+                        markDirty();
+                        return true;
+                    }
+                    if (count == remaining) {
+                        changes.forEach(Runnable::run);
+                        setStack(slot, ItemStack.EMPTY);
+                        markDirty();
+                        return true;
+                    }
+                    changes.add(() -> setStack(slot, ItemStack.EMPTY));
+                    remaining -= count;
                 }
-                int slot = i;
-                changes.add(() -> create$setStack(slot, ItemStack.EMPTY));
-                remaining -= count;
             }
         }
         return false;
     }
 
-    default ItemStack preciseExtract(Predicate<ItemStack> predicate, int maxAmount, Direction side) {
-        return preciseExtract(predicate, maxAmount);
+    @Override
+    default ItemStack preciseExtract(Predicate<ItemStack> predicate, int maxAmount) {
+        return preciseExtract(predicate, maxAmount, null);
     }
 
-    default ItemStack preciseExtract(Predicate<ItemStack> predicate, int maxAmount) {
+    @Override
+    default ItemStack preciseExtract(Predicate<ItemStack> predicate, int maxAmount, Direction side) {
         if (maxAmount == 0) {
             return ItemStack.EMPTY;
         }
-        int size = create$size();
+        int[] slots = create$getAvailableSlots(side);
+        int size = slots.length;
         List<Integer> buffer = new ArrayList<>(size);
         for (int i = 0; i < size; i++) {
-            ItemStack findStack = create$getStack(i);
+            int slot = slots[i];
+            ItemStack findStack = getStack(slot);
             if (findStack.isEmpty()) {
                 continue;
             }
-            if (predicate.test(findStack)) {
+            if (create$canExtract(slot, findStack, side) && predicate.test(findStack)) {
                 int count = findStack.getCount();
                 if (count > maxAmount) {
                     findStack.setCount(count - maxAmount);
-                    create$markDirty();
+                    markDirty();
                     return onExtract(directCopy(findStack, maxAmount));
                 }
                 if (count == maxAmount) {
-                    create$setStack(i, ItemStack.EMPTY);
-                    create$markDirty();
+                    setStack(slot, ItemStack.EMPTY);
+                    markDirty();
                     return onExtract(findStack);
                 }
-                buffer.add(i);
+                buffer.add(slot);
                 int remaining = maxAmount - count;
                 for (i = i + 1; i < size; i++) {
-                    ItemStack stack = create$getStack(i);
+                    slot = slots[i];
+                    ItemStack stack = getStack(slot);
                     if (stack.isEmpty()) {
                         continue;
                     }
-                    if (matches(stack, findStack)) {
+                    if (create$canExtract(slot, stack, side) && matches(stack, findStack)) {
                         count = stack.getCount();
                         if (count < remaining) {
-                            buffer.add(i);
+                            buffer.add(slot);
                             remaining -= count;
                             continue;
                         }
-                        buffer.forEach(slot -> create$setStack(slot, ItemStack.EMPTY));
+                        buffer.forEach(j -> setStack(j, ItemStack.EMPTY));
                         if (count == remaining) {
-                            create$setStack(i, ItemStack.EMPTY);
+                            setStack(slot, ItemStack.EMPTY);
                         } else {
                             stack.setCount(count - remaining);
                         }
-                        create$markDirty();
+                        markDirty();
                         findStack.setCount(maxAmount);
                         return onExtract(findStack);
                     }
@@ -1241,37 +1308,40 @@ public interface BaseInventory extends Iterable<ItemStack> {
         return ItemStack.EMPTY;
     }
 
-    default boolean preciseInsert(ItemStack stack, Direction side) {
-        return preciseInsert(stack);
+    @Override
+    default boolean preciseInsert(ItemStack stack) {
+        return preciseInsert(stack, null);
     }
 
-    default boolean preciseInsert(ItemStack stack) {
+    @Override
+    default boolean preciseInsert(ItemStack stack, Direction side) {
         int maxAmount = stack.getCount();
         if (maxAmount == 0) {
             return true;
         }
-        return preciseInsert(stack, maxAmount);
+        return preciseInsert(stack, maxAmount, side);
     }
 
-    default boolean preciseInsert(ItemStack stack, int maxAmount, Direction side) {
-        return preciseInsert(stack, maxAmount);
-    }
-
+    @Override
     default boolean preciseInsert(ItemStack stack, int maxAmount) {
+        return preciseInsert(stack, maxAmount, null);
+    }
+
+    @Override
+    default boolean preciseInsert(ItemStack stack, int maxAmount, Direction side) {
         List<Runnable> changes = new ArrayList<>();
-        for (int i = 0, size = create$size(); i < size; i++) {
-            if (create$isValid(i, stack)) {
-                ItemStack target = create$getStack(i);
+        for (int slot : create$getAvailableSlots(side)) {
+            if (create$canInsert(slot, stack, side) && isValid(slot, stack)) {
+                ItemStack target = getStack(slot);
                 if (target.isEmpty()) {
-                    int insert = Math.min(maxAmount, create$getMaxCount(stack));
+                    int insert = Math.min(maxAmount, getMaxCount(stack));
                     if (maxAmount == insert) {
                         changes.forEach(Runnable::run);
-                        create$setStack(i, directCopy(stack, insert));
-                        create$markDirty();
+                        setStack(slot, directCopy(stack, insert));
+                        markDirty();
                         return true;
                     }
-                    int slot = i;
-                    changes.add(() -> create$setStack(slot, directCopy(stack, insert)));
+                    changes.add(() -> setStack(slot, directCopy(stack, insert)));
                     maxAmount -= insert;
                 } else if (matches(target, stack)) {
                     int maxCount = target.getMaxCount();
@@ -1281,7 +1351,7 @@ public interface BaseInventory extends Iterable<ItemStack> {
                         if (maxAmount == insert) {
                             changes.forEach(Runnable::run);
                             target.setCount(count + insert);
-                            create$markDirty();
+                            markDirty();
                             return true;
                         }
                         changes.add(() -> target.setCount(count + insert));
@@ -1293,17 +1363,19 @@ public interface BaseInventory extends Iterable<ItemStack> {
         return false;
     }
 
-    default boolean preciseInsert(List<ItemStack> stacks, Direction side) {
-        return preciseInsert(stacks);
+    @Override
+    default boolean preciseInsert(List<ItemStack> stacks) {
+        return preciseInsert(stacks, null);
     }
 
-    default boolean preciseInsert(List<ItemStack> stacks) {
+    @Override
+    default boolean preciseInsert(List<ItemStack> stacks, Direction side) {
         int listSize = stacks.size();
         if (listSize == 0) {
             return true;
         }
         if (listSize == 1) {
-            return preciseInsert(stacks.getFirst());
+            return preciseInsert(stacks.getFirst(), side);
         }
         Object2IntLinkedOpenCustomHashMap<ItemStack> map = new Object2IntLinkedOpenCustomHashMap<>(ITEM_STACK_HASH_STRATEGY);
         for (ItemStack stack : stacks) {
@@ -1312,31 +1384,30 @@ public interface BaseInventory extends Iterable<ItemStack> {
         Object2IntSortedMap.FastSortedEntrySet<ItemStack> entries = map.object2IntEntrySet();
         if (entries.size() == 1) {
             Object2IntMap.Entry<ItemStack> entry = entries.first();
-            return preciseInsert(entry.getKey(), entry.getIntValue());
+            return preciseInsert(entry.getKey(), entry.getIntValue(), side);
         }
         List<Runnable> changes = new ArrayList<>();
-        for (int i = 0, size = create$size(); i < size; i++) {
-            ItemStack target = create$getStack(i);
+        for (int slot : create$getAvailableSlots(side)) {
+            ItemStack target = getStack(slot);
             boolean empty = target.isEmpty();
             ObjectIterator<Object2IntMap.Entry<ItemStack>> iterator = entries.fastIterator();
             do {
                 Object2IntMap.Entry<ItemStack> entry = iterator.next();
                 ItemStack stack = entry.getKey();
-                if (create$isValid(i, stack)) {
+                if (create$canInsert(slot, stack, side) && isValid(slot, stack)) {
                     if (empty) {
                         int remaining = entry.getIntValue();
-                        int insert = Math.min(remaining, create$getMaxCount(stack));
+                        int insert = Math.min(remaining, getMaxCount(stack));
                         if (remaining == insert) {
                             iterator.remove();
                             if (entries.isEmpty()) {
                                 changes.forEach(Runnable::run);
-                                create$setStack(i, directCopy(stack, insert));
-                                create$markDirty();
+                                setStack(slot, directCopy(stack, insert));
+                                markDirty();
                                 return true;
                             }
                         } else {
-                            int slot = i;
-                            changes.add(() -> create$setStack(slot, directCopy(stack, insert)));
+                            changes.add(() -> setStack(slot, directCopy(stack, insert)));
                             entry.setValue(remaining - insert);
                         }
                     } else if (matches(target, stack)) {
@@ -1350,7 +1421,7 @@ public interface BaseInventory extends Iterable<ItemStack> {
                                 if (entries.isEmpty()) {
                                     changes.forEach(Runnable::run);
                                     target.setCount(count + insert);
-                                    create$markDirty();
+                                    markDirty();
                                     return true;
                                 }
                             } else {
@@ -1365,48 +1436,72 @@ public interface BaseInventory extends Iterable<ItemStack> {
         return false;
     }
 
-    default boolean update(Predicate<ItemStack> predicate, Function<ItemStack, ItemStack> update, Direction side) {
-        return update(predicate, update);
+    @Override
+    default boolean update(Predicate<ItemStack> predicate, Function<ItemStack, ItemStack> update) {
+        return update(predicate, update, null);
     }
 
-    default boolean update(Predicate<ItemStack> predicate, Function<ItemStack, ItemStack> update) {
-        for (int i = 0, size = create$size(); i < size; i++) {
-            ItemStack stack = create$getStack(i);
+    @Override
+    default boolean update(Predicate<ItemStack> predicate, Function<ItemStack, ItemStack> update, Direction side) {
+        for (int slot : create$getAvailableSlots(side)) {
+            ItemStack stack = getStack(slot);
             if (stack.isEmpty()) {
                 continue;
             }
-            if (predicate.test(stack)) {
+            if (predicate.test(stack) && create$canExtract(slot, stack, side)) {
                 ItemStack replace = update.apply(stack);
                 if (replace != stack) {
-                    create$setStack(i, replace);
+                    setStack(slot, replace);
                 }
-                create$markDirty();
+                markDirty();
                 return true;
             }
         }
         return false;
     }
 
-    @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
-    default ItemStack removeMaxSize(ItemStack stack, Optional<Integer> max) {
-        MergedComponentMap components = stack.components;
-        components.onWrite();
-        components.changedComponents.remove(DataComponentTypes.MAX_STACK_SIZE, max);
-        return stack;
-    }
+    class Iterator implements java.util.Iterator<ItemStack> {
+        private final BaseSidedInventory inventory;
+        private final Direction side;
+        private final int[] slots;
+        private int index;
+        private int current = -1;
 
-    @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
-    default void setMaxSize(ItemStack stack, Optional<Integer> max) {
-        MergedComponentMap components = stack.components;
-        components.onWrite();
-        components.changedComponents.put(DataComponentTypes.MAX_STACK_SIZE, max);
-    }
+        public Iterator(BaseSidedInventory inventory, Direction side) {
+            this.inventory = inventory;
+            this.side = side;
+            this.slots = inventory.create$getAvailableSlots(side);
+        }
 
-    default Stream<ItemStack> stream(Direction side) {
-        return StreamSupport.stream(Spliterators.spliteratorUnknownSize(iterator(side), Spliterator.ORDERED), false);
-    }
+        @Override
+        public boolean hasNext() {
+            if (current >= 0) {
+                return true;
+            }
+            if (current == -2) {
+                return false;
+            }
+            for (; index < slots.length; index++) {
+                ItemStack stack = inventory.getStack(slots[index]);
+                if (inventory.create$canExtract(index, stack, side)) {
+                    current = index;
+                    index++;
+                    return true;
+                }
+            }
+            current = -2;
+            return false;
+        }
 
-    default Stream<ItemStack> stream() {
-        return StreamSupport.stream(Spliterators.spliteratorUnknownSize(iterator(), Spliterator.ORDERED), false);
+        @Override
+        public ItemStack next() {
+            if (hasNext()) {
+                ItemStack result = inventory.getStack(slots[current]);
+                current = -1;
+                return result;
+            } else {
+                throw new NoSuchElementException();
+            }
+        }
     }
 }

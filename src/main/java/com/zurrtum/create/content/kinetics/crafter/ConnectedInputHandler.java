@@ -4,12 +4,12 @@ import com.zurrtum.create.AllBlocks;
 import com.zurrtum.create.catnip.data.Iterate;
 import com.zurrtum.create.content.kinetics.crafter.MechanicalCrafterBlockEntity.CrafterItemHandler;
 import com.zurrtum.create.foundation.codec.CreateCodecs;
+import com.zurrtum.create.infrastructure.items.SidedItemInventory;
 import com.zurrtum.create.infrastructure.transfer.SlotRangeCache;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.inventory.Inventory;
-import net.minecraft.inventory.SidedInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.storage.ReadView;
 import net.minecraft.storage.WriteView;
@@ -210,7 +210,7 @@ public class ConnectedInputHandler {
         }
     }
 
-    private static class ConnectedInventory implements SidedInventory {
+    private static class ConnectedInventory implements SidedItemInventory {
         private final CrafterItemHandler[] itemHandler;
         private final int[] slots;
         private final int size;

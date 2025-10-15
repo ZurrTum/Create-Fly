@@ -56,6 +56,14 @@ public interface ItemInventory extends Inventory {
     }
 
     @Override
+    default void clear() {
+        for (int i = 0, size = size(); i < size; i++) {
+            setStack(i, ItemStack.EMPTY);
+        }
+        markDirty();
+    }
+
+    @Override
     default void markDirty() {
     }
 }

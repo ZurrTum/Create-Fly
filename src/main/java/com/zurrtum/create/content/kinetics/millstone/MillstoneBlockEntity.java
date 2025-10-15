@@ -8,9 +8,9 @@ import com.zurrtum.create.content.kinetics.base.KineticBlockEntity;
 import com.zurrtum.create.content.kinetics.belt.behaviour.DirectBeltInputBehaviour;
 import com.zurrtum.create.foundation.advancement.CreateTrigger;
 import com.zurrtum.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
+import com.zurrtum.create.infrastructure.items.SidedItemInventory;
 import com.zurrtum.create.infrastructure.transfer.SlotRangeCache;
 import net.minecraft.block.BlockState;
-import net.minecraft.inventory.SidedInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.particle.ItemStackParticleEffect;
 import net.minecraft.particle.ParticleTypes;
@@ -178,7 +178,7 @@ public class MillstoneBlockEntity extends KineticBlockEntity {
         return true;
     }
 
-    public class MillstoneInventoryHandler implements SidedInventory {
+    public class MillstoneInventoryHandler implements SidedItemInventory {
         private static final int[] SLOTS = SlotRangeCache.get(10);
         private final DefaultedList<ItemStack> stacks = DefaultedList.ofSize(10, ItemStack.EMPTY);
         private boolean check = true;

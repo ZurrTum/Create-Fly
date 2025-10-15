@@ -1,7 +1,7 @@
 package com.zurrtum.create.content.processing.recipe;
 
+import com.zurrtum.create.infrastructure.items.SidedItemInventory;
 import com.zurrtum.create.infrastructure.transfer.SlotRangeCache;
-import net.minecraft.inventory.SidedInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.storage.ReadView;
 import net.minecraft.storage.WriteView;
@@ -13,7 +13,7 @@ import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
-public class ProcessingInventory implements SidedInventory {
+public class ProcessingInventory implements SidedItemInventory {
     private static final int[] INPUT_SLOTS = {0};
     private static final int[] ALL_SLOTS = SlotRangeCache.get(32);
     @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
@@ -111,7 +111,7 @@ public class ProcessingInventory implements SidedInventory {
 
     @Override
     public int getMaxCountPerStack() {
-        return limit ? 1 : SidedInventory.super.getMaxCountPerStack();
+        return limit ? 1 : SidedItemInventory.super.getMaxCountPerStack();
     }
 
     @Override
@@ -119,7 +119,7 @@ public class ProcessingInventory implements SidedInventory {
         remainingTime = 0;
         recipeDuration = 0;
         appliedRecipe = false;
-        SidedInventory.super.clear();
+        SidedItemInventory.super.clear();
     }
 
     public void write(WriteView view) {
