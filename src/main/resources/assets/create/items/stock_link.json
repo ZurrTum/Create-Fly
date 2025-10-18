@@ -1,6 +1,6 @@
 {
   "model": {
-    "type": "minecraft:model",
-    "model": "create:block/stock_link/block_vertical"
+    "type": "create:model/translucent",
+    "model": "create:block/stock_link/item"
   }
 }

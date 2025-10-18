@@ -39,6 +39,7 @@ public class AllModels {
         register(SymmetryWandModel.ID, SymmetryWandModel.Unbaked.CODEC);
         register(WorldshaperModel.ID, WorldshaperModel.Unbaked.CODEC);
         register(OversizedModel.ID, OversizedModel.Unbaked.CODEC);
+        register(TranslucentModel.ID, TranslucentModel.Unbaked.CODEC);
 
         BiFunction<BlockState, UnbakedGrouped, UnbakedGrouped> andesiteCasing = CTModel.of(AllCTBehaviours.ANDESITE_CASING);
         BiFunction<BlockState, UnbakedGrouped, UnbakedGrouped> brassCasing = CTModel.of(AllCTBehaviours.BRASS_CASING);

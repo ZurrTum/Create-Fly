@@ -47,6 +47,15 @@ public class RenderTypes extends RenderPhase {
             .build(true)
     );
 
+    private static final RenderLayer TRANSLUCENT = RenderLayer.of(
+        createLayerName("translucent"),
+        256,
+        true,
+        true,
+        RenderPipelines.TRANSLUCENT,
+        RenderLayer.MultiPhaseParameters.builder().lightmap(ENABLE_LIGHTMAP).texture(MIPMAP_BLOCK_ATLAS_TEXTURE).build(true)
+    );
+
     private static final RenderLayer ADDITIVE = RenderLayer.of(
         createLayerName("additive"),
         256,
@@ -94,6 +103,10 @@ public class RenderTypes extends RenderPhase {
 
     public static RenderLayer entityTranslucentBlockMipped() {
         return ENTITY_TRANSLUCENT_BLOCK_MIPPED;
+    }
+
+    public static RenderLayer translucent() {
+        return TRANSLUCENT;
     }
 
     public static RenderLayer additive() {

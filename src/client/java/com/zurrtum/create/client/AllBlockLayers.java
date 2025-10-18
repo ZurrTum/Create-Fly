@@ -146,6 +146,8 @@ public class AllBlockLayers {
         register(COPYCAT_BASE, BlockRenderLayer.CUTOUT_MIPPED);
         register(COPYCAT_STEP, BlockRenderLayer.CUTOUT_MIPPED);
         register(COPYCAT_PANEL, BlockRenderLayer.CUTOUT_MIPPED);
+        register(DISPLAY_LINK, BlockRenderLayer.CUTOUT_MIPPED);
+        register(STOCK_LINK, BlockRenderLayer.CUTOUT_MIPPED);
         register(INDUSTRIAL_IRON_WINDOW, BlockRenderLayer.CUTOUT);
         register(ORNATE_IRON_WINDOW, BlockRenderLayer.CUTOUT);
         register(ANDESITE_LADDER, BlockRenderLayer.CUTOUT);
@@ -160,7 +162,6 @@ public class AllBlockLayers {
         register(VERTICAL_FRAMED_GLASS, BlockRenderLayer.CUTOUT);
         register(WEATHERED_IRON_WINDOW, BlockRenderLayer.TRANSLUCENT);
         register(WEATHERED_IRON_WINDOW_PANE, BlockRenderLayer.TRANSLUCENT);
-        register(DISPLAY_LINK, BlockRenderLayer.TRANSLUCENT);
         register(ORANGE_NIXIE_TUBE, BlockRenderLayer.TRANSLUCENT);
         register(WHITE_NIXIE_TUBE, BlockRenderLayer.TRANSLUCENT);
         register(MAGENTA_NIXIE_TUBE, BlockRenderLayer.TRANSLUCENT);
@@ -177,7 +178,6 @@ public class AllBlockLayers {
         register(GREEN_NIXIE_TUBE, BlockRenderLayer.TRANSLUCENT);
         register(RED_NIXIE_TUBE, BlockRenderLayer.TRANSLUCENT);
         register(BLACK_NIXIE_TUBE, BlockRenderLayer.TRANSLUCENT);
-        register(STOCK_LINK, BlockRenderLayer.TRANSLUCENT);
         register(BIRCH_WINDOW, BlockRenderLayer.TRANSLUCENT);
         register(BIRCH_WINDOW_PANE, BlockRenderLayer.TRANSLUCENT);
     }

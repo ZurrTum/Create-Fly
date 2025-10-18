@@ -1,5 +1,6 @@
 package com.zurrtum.create.client.catnip.render;
 
+import com.zurrtum.create.client.foundation.render.RenderTypes;
 import it.unimi.dsi.fastutil.objects.Object2ObjectLinkedOpenHashMap;
 import net.minecraft.client.render.*;
 import net.minecraft.client.render.chunk.BlockBufferAllocatorStorage;
@@ -82,6 +83,8 @@ public class DefaultSuperRenderTypeBuffer implements SuperRenderTypeBuffer {
                 put(map, PonderRenderTypes.outlineSolid());
                 put(map, PonderRenderTypes.translucent());
                 put(map, PonderRenderTypes.fluid());
+                put(map, RenderTypes.translucent());
+                put(map, RenderTypes.additive());
             }
         );
         private final Immediate bufferSource = VertexConsumerProvider.immediate(fixedBuffers, new BufferAllocator(256));
