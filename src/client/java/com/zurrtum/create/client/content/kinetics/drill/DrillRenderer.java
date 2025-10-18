@@ -8,6 +8,7 @@ import com.zurrtum.create.client.catnip.render.CachedBuffers;
 import com.zurrtum.create.client.catnip.render.SuperByteBuffer;
 import com.zurrtum.create.client.content.contraptions.render.ContraptionMatrices;
 import com.zurrtum.create.client.content.kinetics.base.KineticBlockEntityRenderer;
+import com.zurrtum.create.client.content.kinetics.base.KineticBlockEntityRenderer.KineticRenderState;
 import com.zurrtum.create.client.foundation.virtualWorld.VirtualRenderWorld;
 import com.zurrtum.create.content.contraptions.behaviour.MovementContext;
 import com.zurrtum.create.content.kinetics.drill.DrillBlock;
@@ -19,14 +20,14 @@ import net.minecraft.client.render.WorldRenderer;
 import net.minecraft.client.render.block.entity.BlockEntityRendererFactory;
 import net.minecraft.util.math.Direction;
 
-public class DrillRenderer extends KineticBlockEntityRenderer<DrillBlockEntity> {
+public class DrillRenderer extends KineticBlockEntityRenderer<DrillBlockEntity, KineticRenderState> {
     public DrillRenderer(BlockEntityRendererFactory.Context context) {
         super(context);
     }
 
     @Override
-    protected SuperByteBuffer getRotatedModel(DrillBlockEntity be, BlockState state) {
-        return CachedBuffers.partialFacing(AllPartialModels.DRILL_HEAD, state);
+    protected SuperByteBuffer getRotatedModel(DrillBlockEntity be, KineticRenderState state) {
+        return CachedBuffers.partialFacing(AllPartialModels.DRILL_HEAD, state.blockState);
     }
 
     public static void renderInContraption(
@@ -49,6 +50,6 @@ public class DrillRenderer extends KineticBlockEntityRenderer<DrillBlockEntity> 
         superBuffer.transform(matrices.getModel()).center().rotateYDegrees(AngleHelper.horizontalAngle(facing))
             .rotateXDegrees(AngleHelper.verticalAngle(facing)).rotateZDegrees(angle).uncenter()
             .light(WorldRenderer.getLightmapCoordinates(renderWorld, context.localPos)).useLevelLight(context.world, matrices.getWorld())
-            .renderInto(matrices.getViewProjection(), buffer.getBuffer(RenderLayer.getSolid()));
+            .renderInto(matrices.getViewProjection().peek(), buffer.getBuffer(RenderLayer.getSolid()));
     }
 }
