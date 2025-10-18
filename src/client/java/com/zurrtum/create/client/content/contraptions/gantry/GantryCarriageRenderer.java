@@ -7,67 +7,73 @@ import com.zurrtum.create.client.catnip.animation.AnimationTickHolder;
 import com.zurrtum.create.client.catnip.render.CachedBuffers;
 import com.zurrtum.create.client.catnip.render.SuperByteBuffer;
 import com.zurrtum.create.client.content.kinetics.base.KineticBlockEntityRenderer;
-import com.zurrtum.create.client.flywheel.api.visualization.VisualizationManager;
 import com.zurrtum.create.content.contraptions.gantry.GantryCarriageBlock;
 import com.zurrtum.create.content.contraptions.gantry.GantryCarriageBlockEntity;
 import com.zurrtum.create.content.kinetics.base.KineticBlockEntity;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.render.RenderLayer;
-import net.minecraft.client.render.VertexConsumerProvider;
+import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.render.block.entity.BlockEntityRendererFactory;
+import net.minecraft.client.render.command.ModelCommandRenderer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Direction.Axis;
 import net.minecraft.util.math.Direction.AxisDirection;
+import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.Vec3d;
+import org.jetbrains.annotations.Nullable;
 
-public class GantryCarriageRenderer extends KineticBlockEntityRenderer<GantryCarriageBlockEntity> {
-
+public class GantryCarriageRenderer extends KineticBlockEntityRenderer<GantryCarriageBlockEntity, GantryCarriageRenderer.GantryCarriageRenderState> {
     public GantryCarriageRenderer(BlockEntityRendererFactory.Context context) {
         super(context);
     }
 
     @Override
-    protected void renderSafe(
+    public GantryCarriageRenderState createRenderState() {
+        return new GantryCarriageRenderState();
+    }
+
+    @Override
+    public void updateRenderState(
         GantryCarriageBlockEntity be,
-        float partialTicks,
-        MatrixStack ms,
-        VertexConsumerProvider buffer,
-        int light,
-        int overlay
+        GantryCarriageRenderState state,
+        float tickProgress,
+        Vec3d cameraPos,
+        ModelCommandRenderer.@Nullable CrumblingOverlayCommand crumblingOverlay
     ) {
-        super.renderSafe(be, partialTicks, ms, buffer, light, overlay);
-
-        if (VisualizationManager.supportsVisualization(be.getWorld()))
+        super.updateRenderState(be, state, tickProgress, cameraPos, crumblingOverlay);
+        if (state.support) {
             return;
-
-        BlockState state = be.getCachedState();
-        Direction facing = state.get(GantryCarriageBlock.FACING);
-        Boolean alongFirst = state.get(GantryCarriageBlock.AXIS_ALONG_FIRST_COORDINATE);
-        Axis rotationAxis = getRotationAxisOf(be);
+        }
+        BlockState blockState = be.getCachedState();
+        Direction facing = blockState.get(GantryCarriageBlock.FACING);
+        Boolean alongFirst = blockState.get(GantryCarriageBlock.AXIS_ALONG_FIRST_COORDINATE);
+        Axis rotationAxis = state.axis;
         BlockPos visualPos = facing.getDirection() == AxisDirection.POSITIVE ? be.getPos() : be.getPos().offset(facing.getOpposite());
         float angleForBE = getAngleForBE(be, visualPos, rotationAxis);
-
         Axis gantryAxis = Axis.X;
-        for (Axis axis : Iterate.axes)
-            if (axis != rotationAxis && axis != facing.getAxis())
+        for (Axis axis : Iterate.axes) {
+            if (axis != rotationAxis && axis != facing.getAxis()) {
                 gantryAxis = axis;
+            }
+        }
+        if (gantryAxis == Axis.X && facing == Direction.UP) {
+            angleForBE *= -1;
+        }
+        if (gantryAxis == Axis.Y && (facing == Direction.NORTH || facing == Direction.EAST)) {
+            angleForBE *= -1;
+        }
+        state.cogs = CachedBuffers.partial(AllPartialModels.GANTRY_COGS, blockState);
+        state.yRot = MathHelper.RADIANS_PER_DEGREE * AngleHelper.horizontalAngle(facing);
+        state.xRot = MathHelper.RADIANS_PER_DEGREE * (facing == Direction.UP ? 0 : facing == Direction.DOWN ? 180 : 90);
+        state.yRot2 = MathHelper.RADIANS_PER_DEGREE * (alongFirst ^ facing.getAxis() == Axis.X ? 0 : 90);
+        state.xRot2 = MathHelper.RADIANS_PER_DEGREE * -angleForBE;
+    }
 
-        if (gantryAxis == Axis.X)
-            if (facing == Direction.UP)
-                angleForBE *= -1;
-        if (gantryAxis == Axis.Y)
-            if (facing == Direction.NORTH || facing == Direction.EAST)
-                angleForBE *= -1;
-
-        SuperByteBuffer cogs = CachedBuffers.partial(AllPartialModels.GANTRY_COGS, state);
-        cogs.center().rotateYDegrees(AngleHelper.horizontalAngle(facing))
-            .rotateXDegrees(facing == Direction.UP ? 0 : facing == Direction.DOWN ? 180 : 90)
-            .rotateYDegrees(alongFirst ^ facing.getAxis() == Axis.X ? 0 : 90).translate(0, -9 / 16f, 0).rotateXDegrees(-angleForBE)
-            .translate(0, 9 / 16f, 0).uncenter();
-
-        cogs.light(light).renderInto(ms, buffer.getBuffer(RenderLayer.getSolid()));
-
+    @Override
+    protected RenderLayer getRenderType(GantryCarriageBlockEntity be, BlockState state) {
+        return RenderLayer.getSolid();
     }
 
     public static float getAngleForBE(KineticBlockEntity be, final BlockPos pos, Axis axis) {
@@ -81,4 +87,21 @@ public class GantryCarriageRenderer extends KineticBlockEntityRenderer<GantryCar
         return shaft(getRotationAxisOf(be));
     }
 
+    public static class GantryCarriageRenderState extends KineticRenderState {
+        public SuperByteBuffer cogs;
+        public float yRot;
+        public float xRot;
+        public float yRot2;
+        public float xRot2;
+
+        @Override
+        public void render(MatrixStack.Entry matricesEntry, VertexConsumer vertexConsumer) {
+            super.render(matricesEntry, vertexConsumer);
+            cogs.center().rotateY(yRot).rotateX(xRot).rotateY(yRot2);
+            if (xRot2 != 0) {
+                cogs.translate(0, -0.5625f, 0).rotateX(xRot2).translate(0, 0.5625f, 0);
+            }
+            cogs.uncenter().light(lightmapCoordinates).renderInto(matricesEntry, vertexConsumer);
+        }
+    }
 }
