@@ -5,41 +5,75 @@ import com.zurrtum.create.client.AllPartialModels;
 import com.zurrtum.create.client.catnip.animation.AnimationTickHolder;
 import com.zurrtum.create.client.catnip.render.CachedBuffers;
 import com.zurrtum.create.client.catnip.render.SuperByteBuffer;
-import com.zurrtum.create.client.flywheel.api.visualization.VisualizationManager;
-import com.zurrtum.create.client.foundation.blockEntity.renderer.SafeBlockEntityRenderer;
 import com.zurrtum.create.content.contraptions.chassis.StickerBlock;
 import com.zurrtum.create.content.contraptions.chassis.StickerBlockEntity;
-import net.minecraft.block.BlockState;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.RenderLayer;
-import net.minecraft.client.render.VertexConsumerProvider;
+import net.minecraft.client.render.VertexConsumer;
+import net.minecraft.client.render.block.entity.BlockEntityRenderer;
 import net.minecraft.client.render.block.entity.BlockEntityRendererFactory;
+import net.minecraft.client.render.block.entity.state.BlockEntityRenderState;
+import net.minecraft.client.render.command.ModelCommandRenderer;
+import net.minecraft.client.render.command.OrderedRenderCommandQueue;
+import net.minecraft.client.render.state.CameraRenderState;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.Direction;
+import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.World;
+import org.jetbrains.annotations.Nullable;
 
-public class StickerRenderer extends SafeBlockEntityRenderer<StickerBlockEntity> {
-
+public class StickerRenderer implements BlockEntityRenderer<StickerBlockEntity, StickerRenderer.StickerRenderState> {
     public StickerRenderer(BlockEntityRendererFactory.Context context) {
     }
 
     @Override
-    protected void renderSafe(StickerBlockEntity be, float partialTicks, MatrixStack ms, VertexConsumerProvider buffer, int light, int overlay) {
-
-        if (VisualizationManager.supportsVisualization(be.getWorld()))
-            return;
-
-        BlockState state = be.getCachedState();
-        SuperByteBuffer head = CachedBuffers.partial(AllPartialModels.STICKER_HEAD, state);
-        float offset = be.piston.getValue(AnimationTickHolder.getPartialTicks(be.getWorld()));
-
-        if (be.getWorld() != MinecraftClient.getInstance().world && !be.isVirtual())
-            offset = state.get(StickerBlock.EXTENDED) ? 1 : 0;
-
-        Direction facing = state.get(StickerBlock.FACING);
-        head.nudge(be.hashCode()).center().rotateYDegrees(AngleHelper.horizontalAngle(facing)).rotateXDegrees(AngleHelper.verticalAngle(facing) + 90)
-            .uncenter().translate(0, (offset * offset) * 4 / 16f, 0);
-
-        head.light(light).renderInto(ms, buffer.getBuffer(RenderLayer.getSolid()));
+    public StickerRenderState createRenderState() {
+        return new StickerRenderState();
     }
 
+    @Override
+    public void updateRenderState(
+        StickerBlockEntity be,
+        StickerRenderState state,
+        float tickProgress,
+        Vec3d cameraPos,
+        @Nullable ModelCommandRenderer.CrumblingOverlayCommand crumblingOverlay
+    ) {
+        World world = be.getWorld();
+        BlockEntityRenderState.updateBlockEntityRenderState(be, state, crumblingOverlay);
+        state.layer = RenderLayer.getSolid();
+        state.head = CachedBuffers.partial(AllPartialModels.STICKER_HEAD, state.blockState);
+        state.seed = be.hashCode();
+        Direction facing = state.blockState.get(StickerBlock.FACING);
+        state.yRot = MathHelper.RADIANS_PER_DEGREE * AngleHelper.horizontalAngle(facing);
+        state.xRot = MathHelper.RADIANS_PER_DEGREE * (AngleHelper.verticalAngle(facing) + 90);
+        float offset;
+        if (!be.isVirtual() && world != MinecraftClient.getInstance().world) {
+            offset = state.blockState.get(StickerBlock.EXTENDED) ? 1 : 0;
+        } else {
+            offset = be.piston.getValue(AnimationTickHolder.getPartialTicks(world));
+        }
+        state.offset = (offset * offset) * 4 / 16f;
+    }
+
+    @Override
+    public void render(StickerRenderState state, MatrixStack matrices, OrderedRenderCommandQueue queue, CameraRenderState cameraState) {
+        queue.submitCustom(matrices, state.layer, state);
+    }
+
+    public static class StickerRenderState extends BlockEntityRenderState implements OrderedRenderCommandQueue.Custom {
+        public RenderLayer layer;
+        public SuperByteBuffer head;
+        public int seed;
+        public float yRot;
+        public float xRot;
+        public float offset;
+
+        @Override
+        public void render(MatrixStack.Entry matricesEntry, VertexConsumer vertexConsumer) {
+            head.nudge(seed).center().rotateY(yRot).rotateX(xRot).uncenter().translate(0, offset, 0);
+            head.light(lightmapCoordinates).renderInto(matricesEntry, vertexConsumer);
+        }
+    }
 }
