@@ -65,6 +65,15 @@ public class RenderTypes extends RenderPhase {
         RenderLayer.MultiPhaseParameters.builder().texture(BLOCK_ATLAS_TEXTURE).lightmap(ENABLE_LIGHTMAP).overlay(ENABLE_OVERLAY_COLOR).build(true)
     );
 
+    private static final RenderLayer ADDITIVE2 = RenderLayer.of(
+        createLayerName("additive2"),
+        256,
+        true,
+        true,
+        AllRenderPipelines.ADDITIVE2,
+        RenderLayer.MultiPhaseParameters.builder().texture(BLOCK_ATLAS_TEXTURE).lightmap(ENABLE_LIGHTMAP).overlay(ENABLE_OVERLAY_COLOR).build(true)
+    );
+
     private static final RenderLayer ITEM_GLOWING_SOLID = RenderLayer.of(
         createLayerName("item_glowing_solid"),
         256,
@@ -111,6 +120,10 @@ public class RenderTypes extends RenderPhase {
 
     public static RenderLayer additive() {
         return ADDITIVE;
+    }
+
+    public static RenderLayer additive2() {
+        return ADDITIVE2;
     }
 
     public static BiFunction<Identifier, Boolean, RenderLayer> TRAIN_MAP = Util.memoize(RenderTypes::getTrainMap);

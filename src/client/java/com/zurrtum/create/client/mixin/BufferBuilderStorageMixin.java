@@ -20,6 +20,7 @@ public abstract class BufferBuilderStorageMixin {
 
     @Inject(method = "method_54639(Lit/unimi/dsi/fastutil/objects/Object2ObjectLinkedOpenHashMap;)V", at = @At("TAIL"))
     private void registerLayers(Object2ObjectLinkedOpenHashMap<RenderLayer, BufferAllocator> map, CallbackInfo ci) {
+        assignBufferBuilder(map, RenderTypes.additive2());
         assignBufferBuilder(map, PonderRenderTypes.translucent());
         assignBufferBuilder(map, PonderRenderTypes.fluid());
         assignBufferBuilder(map, RenderTypes.translucent());

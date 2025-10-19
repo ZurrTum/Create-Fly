@@ -17,15 +17,13 @@ import net.minecraft.text.Text;
 import net.minecraft.text.TextCodecs;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
+import org.jetbrains.annotations.Nullable;
 
 import java.lang.ref.WeakReference;
 import java.util.List;
 import java.util.Optional;
 
 public class NixieTubeBlockEntity extends SmartBlockEntity {
-
-    private static final Couple<String> EMPTY = Couple.create("", "");
-
     private int redstoneStrength;
     private Optional<Text> customText;
     private int nixieIndex;
@@ -75,9 +73,8 @@ public class NixieTubeBlockEntity extends SmartBlockEntity {
         return customText.isEmpty();
     }
 
+    @Nullable
     public Couple<String> getDisplayedStrings() {
-        if (displayedStrings == null)
-            return EMPTY;
         return displayedStrings;
     }
 

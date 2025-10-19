@@ -164,6 +164,8 @@ public class AllPartialModels {
         "gantry_shaft/block_start"), GANTRY_SHAFT_END = block("gantry_shaft/block_end"), GANTRY_SHAFT_MIDDLE = block("gantry_shaft/block_middle"), GANTRY_SHAFT_SINGLE = block(
         "gantry_shaft/block_single"), POWERED_SHAFT = block("powered_shaft"),
 
+    NIXIE_TUBE = block("nixie_tube/tube"), NIXIE_TUBE_SINGLE = block("nixie_tube/tube_single"),
+
     CRAFTING_BLUEPRINT_1x1 = entity("crafting_blueprint_small"), CRAFTING_BLUEPRINT_2x2 = entity("crafting_blueprint_medium"), CRAFTING_BLUEPRINT_3x3 = entity(
         "crafting_blueprint_large"),
 

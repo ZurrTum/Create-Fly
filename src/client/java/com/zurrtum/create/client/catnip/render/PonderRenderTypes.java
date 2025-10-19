@@ -53,7 +53,7 @@ public class PonderRenderTypes {
         true,
         true,
         RenderPipelines.TRANSLUCENT,
-        MultiPhaseParameters.builder().lightmap(ENABLE_LIGHTMAP).texture(MIPMAP_BLOCK_ATLAS_TEXTURE).target(TRANSLUCENT_TARGET).build(true)
+        MultiPhaseParameters.builder().lightmap(ENABLE_LIGHTMAP).texture(MIPMAP_BLOCK_ATLAS_TEXTURE).target(ITEM_ENTITY_TARGET).build(true)
     );
 
     private static final RenderLayer OUTLINE_SOLID = RenderLayer.of(
@@ -72,7 +72,8 @@ public class PonderRenderTypes {
         false,
         true,
         cull ? PonderRenderPipelines.RENDERTYPE_ITEM_ENTITY_TRANSLUCENT_CULL : PonderRenderPipelines.ENTITY_TRANSLUCENT,
-        MultiPhaseParameters.builder().texture(new Texture(texture, false)).lightmap(ENABLE_LIGHTMAP).overlay(ENABLE_OVERLAY_COLOR).build(false)
+        MultiPhaseParameters.builder().texture(new Texture(texture, false)).lightmap(ENABLE_LIGHTMAP).overlay(ENABLE_OVERLAY_COLOR)
+            .target(ITEM_ENTITY_TARGET).build(false)
     ));
 
     private static final RenderLayer FLUID = RenderLayer.of(
@@ -81,7 +82,7 @@ public class PonderRenderTypes {
         false,
         true,
         RenderPipelines.TRANSLUCENT,
-        MultiPhaseParameters.builder().texture(MIPMAP_BLOCK_ATLAS_TEXTURE).lightmap(ENABLE_LIGHTMAP).target(TRANSLUCENT_TARGET).build(true)
+        MultiPhaseParameters.builder().texture(MIPMAP_BLOCK_ATLAS_TEXTURE).lightmap(ENABLE_LIGHTMAP).target(ITEM_ENTITY_TARGET).build(true)
     );
 
     public static RenderLayer getGui() {
