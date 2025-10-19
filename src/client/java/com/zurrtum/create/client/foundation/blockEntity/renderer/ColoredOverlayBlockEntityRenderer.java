@@ -1,34 +1,59 @@
 package com.zurrtum.create.client.foundation.blockEntity.renderer;
 
 import com.zurrtum.create.client.catnip.render.SuperByteBuffer;
-import com.zurrtum.create.client.flywheel.api.visualization.VisualizationManager;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.client.render.RenderLayer;
-import net.minecraft.client.render.VertexConsumerProvider;
+import net.minecraft.client.render.VertexConsumer;
+import net.minecraft.client.render.block.entity.BlockEntityRenderer;
 import net.minecraft.client.render.block.entity.BlockEntityRendererFactory;
+import net.minecraft.client.render.block.entity.state.BlockEntityRenderState;
+import net.minecraft.client.render.command.ModelCommandRenderer;
+import net.minecraft.client.render.command.OrderedRenderCommandQueue;
+import net.minecraft.client.render.state.CameraRenderState;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.util.math.Vec3d;
+import org.jetbrains.annotations.Nullable;
 
-public abstract class ColoredOverlayBlockEntityRenderer<T extends BlockEntity> extends SafeBlockEntityRenderer<T> {
-
+public abstract class ColoredOverlayBlockEntityRenderer<T extends BlockEntity> implements BlockEntityRenderer<T, ColoredOverlayBlockEntityRenderer.ColoredOverlayRenderState> {
     public ColoredOverlayBlockEntityRenderer(BlockEntityRendererFactory.Context context) {
     }
 
     @Override
-    protected void renderSafe(T be, float partialTicks, MatrixStack ms, VertexConsumerProvider buffer, int light, int overlay) {
+    public ColoredOverlayRenderState createRenderState() {
+        return new ColoredOverlayRenderState();
+    }
 
-        if (VisualizationManager.supportsVisualization(be.getWorld()))
-            return;
+    @Override
+    public void updateRenderState(
+        T be,
+        ColoredOverlayRenderState state,
+        float tickProgress,
+        Vec3d cameraPos,
+        @Nullable ModelCommandRenderer.CrumblingOverlayCommand crumblingOverlay
+    ) {
+        BlockEntityRenderState.updateBlockEntityRenderState(be, state, crumblingOverlay);
+        state.layer = RenderLayer.getSolid();
+        state.model = getOverlayBuffer(be, state);
+        state.color = getColor(be, tickProgress);
+    }
 
-        SuperByteBuffer render = render(getOverlayBuffer(be), getColor(be, partialTicks), light);
-        render.renderInto(ms, buffer.getBuffer(RenderLayer.getSolid()));
+    @Override
+    public void render(ColoredOverlayRenderState state, MatrixStack matrices, OrderedRenderCommandQueue queue, CameraRenderState cameraState) {
+        queue.submitCustom(matrices, state.layer, state);
     }
 
     protected abstract int getColor(T be, float partialTicks);
 
-    protected abstract SuperByteBuffer getOverlayBuffer(T be);
+    protected abstract SuperByteBuffer getOverlayBuffer(T be, ColoredOverlayRenderState state);
 
-    public static SuperByteBuffer render(SuperByteBuffer buffer, int color, int light) {
-        return buffer.color(color).light(light);
+    public static class ColoredOverlayRenderState extends BlockEntityRenderState implements OrderedRenderCommandQueue.Custom {
+        public RenderLayer layer;
+        public SuperByteBuffer model;
+        public int color;
+
+        @Override
+        public void render(MatrixStack.Entry matricesEntry, VertexConsumer vertexConsumer) {
+            model.color(color).light(lightmapCoordinates).renderInto(matricesEntry, vertexConsumer);
+        }
     }
-
 }

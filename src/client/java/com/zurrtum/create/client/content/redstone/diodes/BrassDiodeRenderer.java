@@ -9,7 +9,6 @@ import com.zurrtum.create.content.redstone.diodes.BrassDiodeBlockEntity;
 import net.minecraft.client.render.block.entity.BlockEntityRendererFactory;
 
 public class BrassDiodeRenderer extends ColoredOverlayBlockEntityRenderer<BrassDiodeBlockEntity> {
-
     public BrassDiodeRenderer(BlockEntityRendererFactory.Context context) {
         super(context);
     }
@@ -20,8 +19,7 @@ public class BrassDiodeRenderer extends ColoredOverlayBlockEntityRenderer<BrassD
     }
 
     @Override
-    protected SuperByteBuffer getOverlayBuffer(BrassDiodeBlockEntity be) {
-        return CachedBuffers.partial(AllPartialModels.FLEXPEATER_INDICATOR, be.getCachedState());
+    protected SuperByteBuffer getOverlayBuffer(BrassDiodeBlockEntity be, ColoredOverlayRenderState state) {
+        return CachedBuffers.partial(AllPartialModels.FLEXPEATER_INDICATOR, state.blockState);
     }
-
 }
