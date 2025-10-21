@@ -20,7 +20,6 @@ import com.zurrtum.create.content.kinetics.mechanicalArm.ArmBlock;
 import com.zurrtum.create.content.kinetics.mechanicalArm.ArmBlockEntity;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.item.ItemRenderState;
-import net.minecraft.client.render.item.ItemRenderer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.ItemDisplayContext;
@@ -100,10 +99,7 @@ public class ArmVisual extends SingleAxisRotatingVisual<ArmBlockEntity> implemen
         boolean settled = MathHelper.approximatelyEquals(baseAngle, baseAngleNow) && MathHelper.approximatelyEquals(
             lowerArmAngle,
             lowerArmAngleNow
-        ) && MathHelper.approximatelyEquals(upperArmAngle, upperArmAngleNow) && MathHelper.approximatelyEquals(
-            headAngle,
-            headAngleNow
-        );
+        ) && MathHelper.approximatelyEquals(upperArmAngle, upperArmAngleNow) && MathHelper.approximatelyEquals(headAngle, headAngleNow);
 
         this.baseAngle = baseAngleNow;
         this.lowerArmAngle = lowerArmAngleNow;
@@ -158,12 +154,11 @@ public class ArmVisual extends SingleAxisRotatingVisual<ArmBlockEntity> implemen
             msr.rotateZDegrees(180);
 
         ItemStack item = blockEntity.heldItem;
-        MinecraftClient mc = MinecraftClient.getInstance();
-        ItemRenderer itemRenderer = mc.getItemRenderer();
         boolean hasItem = !item.isEmpty();
         boolean isBlockItem;
         if (hasItem && item.getItem() instanceof BlockItem) {
-            itemRenderer.itemModelManager.clearAndUpdate(itemRenderState, item, ItemDisplayContext.FIXED, mc.world, null, 0);
+            MinecraftClient mc = MinecraftClient.getInstance();
+            mc.getItemModelManager().clearAndUpdate(itemRenderState, item, ItemDisplayContext.FIXED, mc.world, null, 0);
             isBlockItem = itemRenderState.isSideLit();
         } else {
             isBlockItem = false;
