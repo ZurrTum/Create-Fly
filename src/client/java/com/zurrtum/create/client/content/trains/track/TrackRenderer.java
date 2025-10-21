@@ -7,18 +7,23 @@ import com.zurrtum.create.catnip.math.VecHelper;
 import com.zurrtum.create.client.AllPartialModels;
 import com.zurrtum.create.client.AllTrackMaterialModels.TrackModelHolder;
 import com.zurrtum.create.client.catnip.render.CachedBuffers;
+import com.zurrtum.create.client.catnip.render.SuperByteBuffer;
 import com.zurrtum.create.client.flywheel.api.visualization.VisualizationManager;
 import com.zurrtum.create.client.flywheel.lib.transform.TransformStack;
-import com.zurrtum.create.client.foundation.blockEntity.renderer.SafeBlockEntityRenderer;
 import com.zurrtum.create.content.trains.track.BezierConnection;
 import com.zurrtum.create.content.trains.track.TrackBlockEntity;
+import com.zurrtum.create.content.trains.track.TrackMaterial;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.VertexConsumer;
-import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.WorldRenderer;
+import net.minecraft.client.render.block.entity.BlockEntityRenderer;
 import net.minecraft.client.render.block.entity.BlockEntityRendererFactory;
+import net.minecraft.client.render.block.entity.state.BlockEntityRenderState;
+import net.minecraft.client.render.command.ModelCommandRenderer;
+import net.minecraft.client.render.command.OrderedRenderCommandQueue;
+import net.minecraft.client.render.state.CameraRenderState;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.client.util.math.MatrixStack.Entry;
 import net.minecraft.util.math.BlockPos;
@@ -27,72 +32,96 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-public class TrackRenderer extends SafeBlockEntityRenderer<TrackBlockEntity> {
+import java.util.ArrayList;
+import java.util.IdentityHashMap;
+import java.util.List;
+import java.util.Map;
 
+public class TrackRenderer implements BlockEntityRenderer<TrackBlockEntity, TrackRenderer.TrackRenderState> {
     public TrackRenderer(BlockEntityRendererFactory.Context context) {
     }
 
     @Override
-    protected void renderSafe(TrackBlockEntity be, float partialTicks, MatrixStack ms, VertexConsumerProvider buffer, int light, int overlay) {
-        World level = be.getWorld();
-        if (VisualizationManager.supportsVisualization(level))
-            return;
-        VertexConsumer vb = buffer.getBuffer(RenderLayer.getCutoutMipped());
-        be.getConnections().values().forEach(bc -> renderBezierTurn(level, bc, ms, vb));
+    public TrackRenderState createRenderState() {
+        return new TrackRenderState();
     }
 
-    public static void renderBezierTurn(World level, BezierConnection bc, MatrixStack ms, VertexConsumer vb) {
-        if (!bc.isPrimary())
+    @Override
+    public void updateRenderState(
+        TrackBlockEntity be,
+        TrackRenderState state,
+        float tickProgress,
+        Vec3d cameraPos,
+        @Nullable ModelCommandRenderer.CrumblingOverlayCommand crumblingOverlay
+    ) {
+        World world = be.getWorld();
+        if (VisualizationManager.supportsVisualization(world)) {
             return;
-
-        ms.push();
-        BlockPos bePosition = bc.bePositions.getFirst();
-        BlockState air = Blocks.AIR.getDefaultState();
-        SegmentAngles segment = bc.getBakedSegments(SegmentAngles::new);
-
-        renderGirder(level, bc, ms, vb, bePosition);
-
-        for (int i = 1; i < segment.length; i++) {
-            int light = WorldRenderer.getLightmapCoordinates(level, segment.lightPosition[i].add(bePosition));
-
-            TrackModelHolder modelHolder = bc.getMaterial().getModelHolder();
-
-            CachedBuffers.partial(modelHolder.tie(), air).mulPose(segment.tieTransform[i].getPositionMatrix())
-                .mulNormal(segment.tieTransform[i].getNormalMatrix()).light(light).renderInto(ms, vb);
-
-            for (boolean first : Iterate.trueAndFalse) {
-                Entry transform = segment.railTransforms[i].get(first);
-                CachedBuffers.partial(first ? modelHolder.leftSegment() : modelHolder.rightSegment(), air).mulPose(transform.getPositionMatrix())
-                    .mulNormal(transform.getNormalMatrix()).light(light).renderInto(ms, vb);
-            }
         }
-
-        ms.pop();
-    }
-
-    private static void renderGirder(World level, BezierConnection bc, MatrixStack ms, VertexConsumer vb, BlockPos tePosition) {
-        if (!bc.hasGirder)
-            return;
-
-        BlockState air = Blocks.AIR.getDefaultState();
-        GirderAngles segment = bc.getBakedGirders(GirderAngles::new);
-
-        for (int i = 1; i < segment.length; i++) {
-            int light = WorldRenderer.getLightmapCoordinates(level, segment.lightPosition[i].add(tePosition));
-
-            for (boolean first : Iterate.trueAndFalse) {
-                Entry beamTransform = segment.beams[i].get(first);
-                CachedBuffers.partial(AllPartialModels.GIRDER_SEGMENT_MIDDLE, air).mulPose(beamTransform.getPositionMatrix())
-                    .mulNormal(beamTransform.getNormalMatrix()).light(light).renderInto(ms, vb);
-
-                for (boolean top : Iterate.trueAndFalse) {
-                    Entry beamCapTransform = segment.beamCaps[i].get(top).get(first);
-                    CachedBuffers.partial(top ? AllPartialModels.GIRDER_SEGMENT_TOP : AllPartialModels.GIRDER_SEGMENT_BOTTOM, air)
-                        .mulPose(beamCapTransform.getPositionMatrix()).mulNormal(beamCapTransform.getNormalMatrix()).light(light).renderInto(ms, vb);
+        GirderRenderState girder = null;
+        Map<TrackMaterial, TrackSegmentRenderState> tracks = null;
+        for (BezierConnection bc : be.getConnections().values()) {
+            if (!bc.isPrimary()) {
+                continue;
+            }
+            BlockPos bePosition = bc.bePositions.getFirst();
+            if (bc.hasGirder) {
+                GirderAngles segment = bc.getBakedGirders(GirderAngles::new);
+                int length = segment.length;
+                if (length > 1) {
+                    if (girder == null) {
+                        girder = GirderRenderState.create();
+                    }
+                    for (int i = 1; i < length; i++) {
+                        girder.add(
+                            WorldRenderer.getLightmapCoordinates(world, segment.lightPosition[i].add(bePosition)),
+                            segment.beams[i],
+                            segment.beamCaps[i]
+                        );
+                    }
+                }
+            }
+            SegmentAngles segment = bc.getBakedSegments(SegmentAngles::new);
+            int length = segment.length;
+            if (length > 1) {
+                if (tracks == null) {
+                    tracks = new IdentityHashMap<>();
+                }
+                TrackSegmentRenderState renderState = tracks.computeIfAbsent(bc.getMaterial(), TrackSegmentRenderState::create);
+                for (int i = 1; i < length; i++) {
+                    renderState.add(
+                        WorldRenderer.getLightmapCoordinates(world, segment.lightPosition[i].add(bePosition)),
+                        segment.tieTransform[i],
+                        segment.railTransforms[i]
+                    );
                 }
             }
         }
+        if (tracks == null && girder == null) {
+            return;
+        }
+        state.pos = be.getPos();
+        state.type = be.getType();
+        state.layer = RenderLayer.getCutoutMipped();
+        state.girder = girder;
+        state.tracks = tracks;
+    }
+
+    @Override
+    public void render(TrackRenderState state, MatrixStack matrices, OrderedRenderCommandQueue queue, CameraRenderState cameraState) {
+        queue.submitCustom(matrices, state.layer, state);
+    }
+
+    @Override
+    public boolean rendersOutsideBoundingBox() {
+        return true;
+    }
+
+    @Override
+    public int getRenderDistance() {
+        return 96 * 2;
     }
 
     public static Vec3d getModelAngles(Vec3d normal, Vec3d diff) {
@@ -112,17 +141,6 @@ public class TrackRenderer extends SafeBlockEntityRenderer<TrackBlockEntity> {
         double roll = Math.acos(MathHelper.clamp(dot, -1, 1)) * signum;
         return new Vec3d(pitch, yaw, roll);
     }
-
-    @Override
-    public boolean rendersOutsideBoundingBox() {
-        return true;
-    }
-
-    @Override
-    public int getRenderDistance() {
-        return 96 * 2;
-    }
-
 
     public static class SegmentAngles {
         public final int length;
@@ -265,5 +283,91 @@ public class TrackRenderer extends SafeBlockEntityRenderer<TrackBlockEntity> {
             }
         }
 
+    }
+
+    public static class TrackRenderState extends BlockEntityRenderState implements OrderedRenderCommandQueue.Custom {
+        public RenderLayer layer;
+        public GirderRenderState girder;
+        public Map<TrackMaterial, TrackSegmentRenderState> tracks;
+
+        @Override
+        public void render(Entry matricesEntry, VertexConsumer vertexConsumer) {
+            if (girder != null) {
+                girder.render(matricesEntry, vertexConsumer);
+            }
+            if (tracks != null) {
+                for (TrackSegmentRenderState track : tracks.values()) {
+                    track.render(matricesEntry, vertexConsumer);
+                }
+            }
+        }
+    }
+
+    public record GirderRenderState(
+        SuperByteBuffer girderMiddle, SuperByteBuffer girderTop, SuperByteBuffer girderBottom, List<GirderSegmentData> girders
+    ) {
+        public static GirderRenderState create() {
+            BlockState air = Blocks.AIR.getDefaultState();
+            SuperByteBuffer middle = CachedBuffers.partial(AllPartialModels.GIRDER_SEGMENT_MIDDLE, air);
+            SuperByteBuffer top = CachedBuffers.partial(AllPartialModels.GIRDER_SEGMENT_TOP, air);
+            SuperByteBuffer bottom = CachedBuffers.partial(AllPartialModels.GIRDER_SEGMENT_BOTTOM, air);
+            return new GirderRenderState(middle, top, bottom, new ArrayList<>());
+        }
+
+        public void add(int light, Couple<Entry> beam, Couple<Couple<Entry>> beamCap) {
+            girders.add(new GirderSegmentData(light, beam, beamCap));
+        }
+
+        public void render(Entry matricesEntry, VertexConsumer vertexConsumer) {
+            for (GirderSegmentData girder : girders) {
+                for (boolean first : Iterate.trueAndFalse) {
+                    Entry beamTransform = girder.beam.get(first);
+                    girderMiddle.mulPose(beamTransform.getPositionMatrix()).mulNormal(beamTransform.getNormalMatrix()).light(girder.light)
+                        .renderInto(matricesEntry, vertexConsumer);
+                    for (boolean top : Iterate.trueAndFalse) {
+                        Entry beamCapTransform = girder.beamCaps.get(top).get(first);
+                        (top ? girderTop : girderBottom).mulPose(beamCapTransform.getPositionMatrix()).mulNormal(beamCapTransform.getNormalMatrix())
+                            .light(girder.light).renderInto(matricesEntry, vertexConsumer);
+                    }
+                }
+            }
+        }
+
+        public record GirderSegmentData(
+            int light, Couple<Entry> beam, Couple<Couple<Entry>> beamCaps
+        ) {
+        }
+    }
+
+    public record TrackSegmentRenderState(SuperByteBuffer tie, SuperByteBuffer left, SuperByteBuffer right, List<TrackSegmentData> tracks) {
+        public static TrackSegmentRenderState create(TrackMaterial material) {
+            TrackModelHolder modelHolder = material.getModelHolder();
+            BlockState air = Blocks.AIR.getDefaultState();
+            SuperByteBuffer tie = CachedBuffers.partial(modelHolder.tie(), air);
+            SuperByteBuffer left = CachedBuffers.partial(modelHolder.leftSegment(), air);
+            SuperByteBuffer right = CachedBuffers.partial(modelHolder.rightSegment(), air);
+            return new TrackSegmentRenderState(tie, left, right, new ArrayList<>());
+        }
+
+        public void add(int light, Entry tieTransform, Couple<Entry> railTransforms) {
+            tracks.add(new TrackSegmentData(light, tieTransform, railTransforms));
+        }
+
+        public void render(Entry matricesEntry, VertexConsumer vertexConsumer) {
+            for (TrackSegmentData track : tracks) {
+                tie.mulPose(track.tieTransform.getPositionMatrix()).mulNormal(track.tieTransform.getNormalMatrix()).light(track.light)
+                    .renderInto(matricesEntry, vertexConsumer);
+                for (boolean first : Iterate.trueAndFalse) {
+                    Entry transform = track.railTransforms.get(first);
+                    (first ? left : right).mulPose(transform.getPositionMatrix()).mulNormal(transform.getNormalMatrix()).light(track.light)
+                        .renderInto(matricesEntry, vertexConsumer);
+                }
+            }
+        }
+
+        public record TrackSegmentData(
+            int light, Entry tieTransform, Couple<Entry> railTransforms
+        ) {
+        }
     }
 }
