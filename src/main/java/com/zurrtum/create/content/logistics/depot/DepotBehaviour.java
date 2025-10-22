@@ -219,7 +219,8 @@ public class DepotBehaviour extends BlockEntityBehaviour<SmartBlockEntity> {
         heldItem = view.read("HeldItem", TransportedItemStack.CODEC).orElse(null);
         processingOutputBuffer.read(view);
         if (canMergeItems()) {
-            view.read("Incoming", CreateCodecs.TRANSPORTED_ITEM_LIST_CODEC).ifPresent(list -> incoming = list);
+            incoming.clear();
+            view.read("Incoming", CreateCodecs.TRANSPORTED_ITEM_LIST_CODEC).ifPresent(incoming::addAll);
         }
     }
 
