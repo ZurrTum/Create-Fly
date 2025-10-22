@@ -69,7 +69,7 @@ public record SpoutFillingDisplay(
     public static void register(Stream<EntryStack<?>> itemStream, Stream<EntryStack<?>> fluidStream, DisplayConsumer registry) {
         List<FluidStack> fluids = fluidStream.map(entry -> {
             dev.architectury.fluid.FluidStack stack = entry.castValue();
-            return new FluidStack(stack.getFluid(), stack.getAmount(), stack.getPatch());
+            return new FluidStack(stack.getFluid(), stack.getAmount(), stack.getComponents().getChanges());
         }).toList();
         itemStream.forEach(entry -> {
             ItemStack stack = entry.castValue();

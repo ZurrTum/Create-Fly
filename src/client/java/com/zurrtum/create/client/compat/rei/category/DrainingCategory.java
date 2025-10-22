@@ -55,7 +55,7 @@ public class DrainingCategory extends CreateCategory<DrainingDisplay> {
             graphics.state.addSpecialElement(new DrainRenderState(
                 new Matrix3x2f(graphics.getMatrices()),
                 stack.getFluid(),
-                stack.getPatch(),
+                stack.getComponents().getChanges(),
                 bounds.x + 80,
                 bounds.y + 28
             ));
