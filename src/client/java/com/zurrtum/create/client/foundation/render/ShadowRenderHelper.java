@@ -17,7 +17,7 @@ import net.minecraft.world.WorldView;
  */
 public class ShadowRenderHelper {
 
-    private static final RenderLayer SHADOW_LAYER = RenderLayer.getEntityNoOutline(Identifier.of("textures/misc/shadow.png"));
+    public static final RenderLayer SHADOW_LAYER = RenderLayer.getEntityNoOutline(Identifier.of("textures/misc/shadow.png"));
 
     public static void renderShadow(MatrixStack matrixStack, VertexConsumerProvider buffer, float opacity, float radius) {
         MatrixStack.Entry entry = matrixStack.peek();

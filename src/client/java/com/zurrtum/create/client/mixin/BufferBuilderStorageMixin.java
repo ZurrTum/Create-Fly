@@ -1,6 +1,7 @@
 package com.zurrtum.create.client.mixin;
 
 import com.zurrtum.create.client.catnip.render.PonderRenderTypes;
+import com.zurrtum.create.client.foundation.render.ShadowRenderHelper;
 import it.unimi.dsi.fastutil.objects.Object2ObjectLinkedOpenHashMap;
 import net.minecraft.client.render.BufferBuilderStorage;
 import net.minecraft.client.render.RenderLayer;
@@ -14,6 +15,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public class BufferBuilderStorageMixin {
     @Inject(method = "method_54639(Lit/unimi/dsi/fastutil/objects/Object2ObjectLinkedOpenHashMap;)V", at = @At("TAIL"))
     private void registerLayers(Object2ObjectLinkedOpenHashMap<RenderLayer, BufferAllocator> map, CallbackInfo ci) {
+        map.put(ShadowRenderHelper.SHADOW_LAYER, new BufferAllocator(ShadowRenderHelper.SHADOW_LAYER.getExpectedBufferSize()));
         map.put(PonderRenderTypes.translucent(), new BufferAllocator(PonderRenderTypes.translucent().getExpectedBufferSize()));
         map.put(PonderRenderTypes.fluid(), new BufferAllocator(PonderRenderTypes.fluid().getExpectedBufferSize()));
     }
