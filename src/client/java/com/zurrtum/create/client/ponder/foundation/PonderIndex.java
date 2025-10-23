@@ -10,6 +10,7 @@ import com.zurrtum.create.client.ponder.foundation.registration.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.Set;
 import java.util.TreeSet;
@@ -22,8 +23,8 @@ public class PonderIndex {
     private static final PonderSceneRegistry SCENES = new PonderSceneRegistry(LOCALIZATION);
     private static final PonderTagRegistry TAGS = new PonderTagRegistry(LOCALIZATION);
 
-    private static final Set<PonderPlugin> plugins = new TreeSet<>(Comparator.comparing((PonderPlugin plugin) -> !plugin.getModId().equals("create"))
-        .thenComparing(PonderPlugin::getModId));
+    private static final Set<PonderPlugin> plugins = Collections.synchronizedSet(new TreeSet<>(Comparator.comparing((PonderPlugin plugin) -> !plugin.getModId()
+        .equals("create")).thenComparing(PonderPlugin::getModId)));
 
     private static final Logger LOGGER = LogManager.getLogger("PonderIndex");
 

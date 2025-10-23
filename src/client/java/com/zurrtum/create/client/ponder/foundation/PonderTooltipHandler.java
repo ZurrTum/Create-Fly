@@ -22,8 +22,10 @@ import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Consumer;
 
 public class PonderTooltipHandler {
 
@@ -38,6 +40,8 @@ public class PonderTooltipHandler {
     static ItemStack trackingStack = ItemStack.EMPTY;
     static boolean subject = false;
     static boolean deferTick = false;
+
+    static final List<Consumer<ItemStack>> hoveredStackCallbacks = new ArrayList<>();
 
     public static final String HOLD_TO_PONDER = PonderLocalization.UI_PREFIX + "hold_to_ponder";
     public static final String SUBJECT = PonderLocalization.UI_PREFIX + "subject";
@@ -127,6 +131,9 @@ public class PonderTooltipHandler {
 
         hoveredStack = stack;
         trackingStack = stack;
+
+        for (Consumer<ItemStack> hoveredStackCallback : hoveredStackCallbacks)
+            hoveredStackCallback.accept(hoveredStack.copy());
     }
 
     public static Optional<Couple<Color>> handleTooltipColor(ItemStack stack) {
@@ -157,8 +164,7 @@ public class PonderTooltipHandler {
     }
 
     private static Text makeProgressBar(float progress) {
-        MutableText holdW = Ponder.lang()
-            .translate(HOLD_TO_PONDER, ((MutableText) ponderKeybind().getBoundKeyLocalizedText()).formatted(Formatting.GRAY))
+        MutableText holdW = Ponder.lang().translate(HOLD_TO_PONDER, ponderKeybind().getBoundKeyLocalizedText().copy().formatted(Formatting.GRAY))
             .style(Formatting.DARK_GRAY).component();
 
         TextRenderer fontRenderer = MinecraftClient.getInstance().textRenderer;
@@ -183,4 +189,11 @@ public class PonderTooltipHandler {
         return PonderKeybinds.PONDER;
     }
 
+    public synchronized static void registerHoveredPonderStackCallback(Consumer<ItemStack> consumer) {
+        hoveredStackCallbacks.add(consumer);
+    }
+
+    public synchronized static void removeHoveredPonderStackCallback(Consumer<ItemStack> consumer) {
+        hoveredStackCallbacks.remove(consumer);
+    }
 }

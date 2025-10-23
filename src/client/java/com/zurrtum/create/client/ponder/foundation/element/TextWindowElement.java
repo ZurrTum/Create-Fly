@@ -76,14 +76,31 @@ public class TextWindowElement extends AnimatedOverlayElementBase {
         }
 
         @Override
+        public TextElementBuilder text(String defaultText, Object... params) {
+            textGetter = scene.registerText(defaultText, params);
+            return this;
+        }
+
+        @Override
         public Builder sharedText(Identifier key) {
             textGetter = () -> PonderIndex.getLangAccess().getShared(key);
             return this;
         }
 
         @Override
+        public TextElementBuilder sharedText(Identifier key, Object... params) {
+            textGetter = () -> PonderIndex.getLangAccess().getShared(key, params);
+            return this;
+        }
+
+        @Override
         public Builder sharedText(String key) {
             return sharedText(Identifier.of(scene.getNamespace(), key));
+        }
+
+        @Override
+        public TextElementBuilder sharedText(String key, Object... params) {
+            return sharedText(Identifier.of(scene.getNamespace(), key), params);
         }
 
         @Override

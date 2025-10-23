@@ -67,6 +67,13 @@ public class PonderLocalization implements LangRegistryAccess {
     }
 
     @Override
+    public String getShared(Identifier key, Object... params) {
+        if (PonderIndex.editingModeActive())
+            return shared.containsKey(key) ? String.format(shared.get(key), params) : ("unregistered shared entry: " + key);
+        return I18n.translate(langKeyForShared(key), params);
+    }
+
+    @Override
     public String getTagName(Identifier key) {
         if (PonderIndex.editingModeActive())
             return tag.containsKey(key) ? tag.get(key).getFirst() : ("unregistered tag entry: " + key);
@@ -89,5 +96,16 @@ public class PonderLocalization implements LangRegistryAccess {
                 return "MISSING_SPECIFIC";
             }
         return I18n.translate(langKeyForSpecific(sceneId, k));
+    }
+
+    @Override
+    public String getSpecific(Identifier sceneId, String k, Object... params) {
+        if (PonderIndex.editingModeActive())
+            try {
+                return String.format(specific.get(sceneId).get(k), params);
+            } catch (Exception e) {
+                return "MISSING_SPECIFIC";
+            }
+        return I18n.translate(langKeyForSpecific(sceneId, k), params);
     }
 }

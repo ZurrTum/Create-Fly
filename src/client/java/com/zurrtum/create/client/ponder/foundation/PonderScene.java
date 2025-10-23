@@ -382,6 +382,14 @@ public class PonderScene {
         return supplier;
     }
 
+    public Supplier<String> registerText(String defaultText, Object... params) {
+        final String key = "text_" + textIndex;
+        localization.registerSpecific(sceneId, key, defaultText);
+        Supplier<String> supplier = () -> localization.getSpecific(sceneId, key, params);
+        textIndex++;
+        return supplier;
+    }
+
     public SceneBuilder builder() {
         return new PonderSceneBuilder(this);
     }
