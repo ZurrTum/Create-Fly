@@ -4,7 +4,6 @@ import com.mojang.serialization.Codec;
 import com.zurrtum.create.catnip.codecs.stream.CatnipStreamCodecBuilders;
 import com.zurrtum.create.catnip.codecs.stream.CatnipStreamCodecs;
 import com.zurrtum.create.content.equipment.toolbox.ToolboxInventory;
-import com.zurrtum.create.content.logistics.stockTicker.PackageOrderWithCrafts;
 import com.zurrtum.create.infrastructure.component.*;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -19,6 +18,7 @@ import net.minecraft.util.*;
 import net.minecraft.util.dynamic.Codecs;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3i;
+import org.jetbrains.annotations.ApiStatus;
 
 import java.util.List;
 import java.util.UUID;
@@ -113,30 +113,9 @@ public class AllDataComponents {
         builder -> builder.codec(ItemAttributeEntry.CODEC.listOf()).packetCodec(CatnipStreamCodecBuilders.list(ItemAttributeEntry.STREAM_CODEC))
     );
 
-    public static final ComponentType<ClipboardType> CLIPBOARD_TYPE = register(
-        "clipboard_type",
-        builder -> builder.codec(ClipboardType.CODEC).packetCodec(ClipboardType.STREAM_CODEC)
-    );
-
-    public static final ComponentType<List<List<ClipboardEntry>>> CLIPBOARD_PAGES = register(
-        "clipboard_pages",
-        builder -> builder.codec(ClipboardEntry.CODEC.listOf().listOf())
-            .packetCodec(CatnipStreamCodecBuilders.list(CatnipStreamCodecBuilders.list(ClipboardEntry.STREAM_CODEC)))
-    );
-
-    public static final ComponentType<Unit> CLIPBOARD_READ_ONLY = register(
-        "clipboard_read_only",
-        builder -> builder.codec(Unit.CODEC).packetCodec(PacketCodec.unit(Unit.INSTANCE))
-    );
-
-    public static final ComponentType<NbtCompound> CLIPBOARD_COPIED_VALUES = register(
-        "clipboard_copied_values",
-        builder -> builder.codec(NbtCompound.CODEC).packetCodec(PacketCodecs.NBT_COMPOUND)
-    );
-
-    public static final ComponentType<Integer> CLIPBOARD_PREVIOUSLY_OPENED_PAGE = register(
-        "clipboard_previously_opened_page",
-        builder -> builder.codec(Codec.INT).packetCodec(PacketCodecs.INTEGER)
+    public static final ComponentType<ClipboardContent> CLIPBOARD_CONTENT = register(
+        "clipboard_content",
+        builder -> builder.codec(ClipboardContent.CODEC).packetCodec(ClipboardContent.STREAM_CODEC)
     );
 
     public static final ComponentType<ConnectingFrom> TRACK_CONNECTING_FROM = register(
@@ -318,6 +297,57 @@ public class AllDataComponents {
     public static final ComponentType<ClickToLinkData> CLICK_TO_LINK_DATA = register(
         "click_to_link_data",
         builder -> builder.codec(ClickToLinkData.CODEC).packetCodec(ClickToLinkData.STREAM_CODEC)
+    );
+
+    /**
+     * @deprecated Use {@link AllDataComponents#CLIPBOARD_CONTENT} instead.
+     */
+    @ApiStatus.ScheduledForRemoval(inVersion = "1.21.1+ Port")
+    @Deprecated(since = "6.0.7", forRemoval = true)
+    public static final ComponentType<ClipboardType> CLIPBOARD_TYPE = register(
+        "clipboard_type",
+        builder -> builder.codec(ClipboardType.CODEC).packetCodec(ClipboardType.STREAM_CODEC)
+    );
+
+    /**
+     * @deprecated Use {@link AllDataComponents#CLIPBOARD_CONTENT} instead.
+     */
+    @ApiStatus.ScheduledForRemoval(inVersion = "1.21.1+ Port")
+    @Deprecated(since = "6.0.7", forRemoval = true)
+    public static final ComponentType<List<List<ClipboardEntry>>> CLIPBOARD_PAGES = register(
+        "clipboard_pages",
+        builder -> builder.codec(ClipboardEntry.CODEC.listOf().listOf())
+            .packetCodec(CatnipStreamCodecBuilders.list(CatnipStreamCodecBuilders.list(ClipboardEntry.STREAM_CODEC)))
+    );
+
+    /**
+     * @deprecated Use {@link AllDataComponents#CLIPBOARD_CONTENT} instead.
+     */
+    @ApiStatus.ScheduledForRemoval(inVersion = "1.21.1+ Port")
+    @Deprecated(since = "6.0.7", forRemoval = true)
+    public static final ComponentType<Unit> CLIPBOARD_READ_ONLY = register(
+        "clipboard_read_only",
+        builder -> builder.codec(Unit.CODEC).packetCodec(PacketCodec.unit(Unit.INSTANCE))
+    );
+
+    /**
+     * @deprecated Use {@link AllDataComponents#CLIPBOARD_CONTENT} instead.
+     */
+    @ApiStatus.ScheduledForRemoval(inVersion = "1.21.1+ Port")
+    @Deprecated(since = "6.0.7", forRemoval = true)
+    public static final ComponentType<NbtCompound> CLIPBOARD_COPIED_VALUES = register(
+        "clipboard_copied_values",
+        builder -> builder.codec(NbtCompound.CODEC).packetCodec(PacketCodecs.NBT_COMPOUND)
+    );
+
+    /**
+     * @deprecated Use {@link AllDataComponents#CLIPBOARD_CONTENT} instead.
+     */
+    @ApiStatus.ScheduledForRemoval(inVersion = "1.21.1+ Port")
+    @Deprecated(since = "6.0.7", forRemoval = true)
+    public static final ComponentType<Integer> CLIPBOARD_PREVIOUSLY_OPENED_PAGE = register(
+        "clipboard_previously_opened_page",
+        builder -> builder.codec(Codec.INT).packetCodec(PacketCodecs.INTEGER)
     );
 
     private static <T> ComponentType<T> register(String id, UnaryOperator<ComponentType.Builder<T>> builderOperator) {

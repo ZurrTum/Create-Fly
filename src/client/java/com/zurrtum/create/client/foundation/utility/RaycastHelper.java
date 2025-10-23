@@ -15,40 +15,31 @@ import net.minecraft.world.World;
 import java.util.function.Predicate;
 
 public class RaycastHelper {
-
-    public static BlockHitResult rayTraceRange(World worldIn, PlayerEntity playerIn, double range) {
-        Vec3d origin = getTraceOrigin(playerIn);
-        Vec3d target = getTraceTarget(playerIn, range, origin);
-        RaycastContext context = new RaycastContext(origin, target, ShapeType.COLLIDER, FluidHandling.NONE, playerIn);
-        return worldIn.raycast(context);
+    public static BlockHitResult rayTraceRange(World level, PlayerEntity player, double range) {
+        Vec3d origin = player.getEyePos();
+        Vec3d target = getTraceTarget(player, range, origin);
+        RaycastContext context = new RaycastContext(origin, target, ShapeType.COLLIDER, FluidHandling.NONE, player);
+        return level.raycast(context);
     }
 
-    public static PredicateTraceResult rayTraceUntil(PlayerEntity playerIn, double range, Predicate<BlockPos> predicate) {
-        Vec3d origin = getTraceOrigin(playerIn);
-        Vec3d target = getTraceTarget(playerIn, range, origin);
+    public static PredicateTraceResult rayTraceUntil(PlayerEntity player, double range, Predicate<BlockPos> predicate) {
+        Vec3d origin = player.getEyePos();
+        Vec3d target = getTraceTarget(player, range, origin);
         return rayTraceUntil(origin, target, predicate);
     }
 
-    public static Vec3d getTraceTarget(PlayerEntity playerIn, double range, Vec3d origin) {
-        float f = playerIn.getPitch();
-        float f1 = playerIn.getYaw();
-        float f2 = MathHelper.cos(-f1 * 0.017453292F - (float) Math.PI);
-        float f3 = MathHelper.sin(-f1 * 0.017453292F - (float) Math.PI);
-        float f4 = -MathHelper.cos(-f * 0.017453292F);
-        float f5 = MathHelper.sin(-f * 0.017453292F);
+    public static Vec3d getTraceTarget(PlayerEntity player, double range, Vec3d origin) {
+        float f = player.getPitch();
+        float f1 = player.getYaw();
+        float n1 = -f1 * MathHelper.RADIANS_PER_DEGREE - (float) Math.PI;
+        float n2 = -f * MathHelper.RADIANS_PER_DEGREE;
+        float f2 = MathHelper.cos(n1);
+        float f3 = MathHelper.sin(n1);
+        float f4 = -MathHelper.cos(n2);
+        float f5 = MathHelper.sin(n2);
         float f6 = f3 * f4;
         float f7 = f2 * f4;
-        double d3 = range;
-        Vec3d Vector3d1 = origin.add((double) f6 * d3, (double) f5 * d3, (double) f7 * d3);
-        return Vector3d1;
-    }
-
-    public static Vec3d getTraceOrigin(PlayerEntity playerIn) {
-        double d0 = playerIn.getX();
-        double d1 = playerIn.getY() + (double) playerIn.getStandingEyeHeight();
-        double d2 = playerIn.getZ();
-        Vec3d Vector3d = new Vec3d(d0, d1, d2);
-        return Vector3d;
+        return origin.add((double) f6 * range, (double) f5 * range, (double) f7 * range);
     }
 
     public static PredicateTraceResult rayTraceUntil(Vec3d start, Vec3d end, Predicate<BlockPos> predicate) {
@@ -192,5 +183,4 @@ public class RaycastHelper {
             return this.pos == null;
         }
     }
-
 }

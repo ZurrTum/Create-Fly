@@ -33,7 +33,7 @@ public class ChainPackageInteractionHandler {
                 continue;
             Box bounds = new Box(data.targetPos, data.targetPos).offset(0, -.25, 0).stretch(0, 0.5, 0).expand(0.45);
 
-            Vec3d from = RaycastHelper.getTraceOrigin(player);
+            Vec3d from = player.getEyePos();
             Vec3d to = RaycastHelper.getTraceTarget(player, range, from);
 
             if (bounds.raycast(from, to).isEmpty())

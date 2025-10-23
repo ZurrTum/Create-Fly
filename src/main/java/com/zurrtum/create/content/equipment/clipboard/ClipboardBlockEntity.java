@@ -3,12 +3,13 @@ package com.zurrtum.create.content.equipment.clipboard;
 import com.zurrtum.create.AllBlockEntityTypes;
 import com.zurrtum.create.AllBlocks;
 import com.zurrtum.create.AllClientHandle;
-import com.zurrtum.create.AllItems;
+import com.zurrtum.create.AllDataComponents;
 import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
 import com.zurrtum.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
+import com.zurrtum.create.infrastructure.component.ClipboardContent;
 import net.minecraft.block.BlockState;
+import net.minecraft.component.ComponentMap;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
 import net.minecraft.storage.ReadView;
 import net.minecraft.storage.WriteView;
 import net.minecraft.util.Uuids;
@@ -18,13 +19,10 @@ import java.util.List;
 import java.util.UUID;
 
 public class ClipboardBlockEntity extends SmartBlockEntity {
-
-    public ItemStack dataContainer;
     private UUID lastEdit;
 
     public ClipboardBlockEntity(BlockPos pos, BlockState state) {
         super(AllBlockEntityTypes.CLIPBOARD, pos, state);
-        dataContainer = AllItems.CLIPBOARD.getDefaultStack();
     }
 
     @Override
@@ -53,7 +51,7 @@ public class ClipboardBlockEntity extends SmartBlockEntity {
         if (world.isClient())
             return;
         boolean isWritten = blockState.get(ClipboardBlock.WRITTEN);
-        boolean shouldBeWritten = !dataContainer.getComponentChanges().isEmpty();
+        boolean shouldBeWritten = getComponents().contains(AllDataComponents.CLIPBOARD_CONTENT);
         if (isWritten == shouldBeWritten)
             return;
         world.setBlockState(pos, blockState.with(ClipboardBlock.WRITTEN, shouldBeWritten));
@@ -66,23 +64,24 @@ public class ClipboardBlockEntity extends SmartBlockEntity {
     @Override
     protected void write(WriteView view, boolean clientPacket) {
         super.write(view, clientPacket);
-        if (!dataContainer.isEmpty()) {
-            view.put("Item", ItemStack.CODEC, dataContainer);
+        if (clientPacket) {
+            view.put("components", ComponentMap.CODEC, getComponents());
         }
-        if (clientPacket && lastEdit != null)
+        if (lastEdit != null)
             view.put("LastEdit", Uuids.INT_STREAM_CODEC, lastEdit);
     }
 
     @Override
     protected void read(ReadView view, boolean clientPacket) {
         super.read(view, clientPacket);
-        dataContainer = view.read("Item", ItemStack.CODEC).orElse(ItemStack.EMPTY);
-        if (!dataContainer.isOf(AllItems.CLIPBOARD))
-            dataContainer = AllItems.CLIPBOARD.getDefaultStack();
-
         if (clientPacket) {
+            view.read("components", ComponentMap.CODEC).ifPresent(this::setComponents);
             UUID lastEdit = view.read("LastEdit", Uuids.INT_STREAM_CODEC).orElse(null);
-            AllClientHandle.INSTANCE.updateClipboardScreen(lastEdit, pos, dataContainer);
+            AllClientHandle.INSTANCE.updateClipboardScreen(
+                lastEdit,
+                pos,
+                getComponents().getOrDefault(AllDataComponents.CLIPBOARD_CONTENT, ClipboardContent.EMPTY)
+            );
         }
     }
 }

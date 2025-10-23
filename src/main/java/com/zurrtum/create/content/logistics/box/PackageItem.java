@@ -6,10 +6,10 @@ import com.zurrtum.create.AllSoundEvents;
 import com.zurrtum.create.catnip.data.Glob;
 import com.zurrtum.create.catnip.math.VecHelper;
 import com.zurrtum.create.content.logistics.box.PackageStyles.PackageStyle;
-import com.zurrtum.create.content.logistics.stockTicker.PackageOrderWithCrafts;
 import com.zurrtum.create.foundation.item.EntityItem;
 import com.zurrtum.create.foundation.item.ItemHelper;
 import com.zurrtum.create.infrastructure.component.PackageOrderData;
+import com.zurrtum.create.infrastructure.component.PackageOrderWithCrafts;
 import com.zurrtum.create.infrastructure.items.ItemStackHandler;
 import net.minecraft.component.type.ContainerComponent;
 import net.minecraft.component.type.TooltipDisplayComponent;
@@ -179,9 +179,9 @@ public class PackageItem extends Item implements EntityItem {
             return boxAddress.isBlank();
         if (address.equals("*") || boxAddress.equals("*"))
             return true;
-        String matcher = Glob.toRegexPattern(address, "");
-        String boxMatcher = Glob.toRegexPattern(boxAddress, "");
-        return address.matches(boxMatcher) || boxAddress.matches(matcher);
+        if (address.equals(boxAddress))
+            return true;
+        return address.matches(Glob.toRegexPattern(boxAddress, "")) || boxAddress.matches(Glob.toRegexPattern(address, ""));
     }
 
     public static String getAddress(ItemStack box) {
@@ -227,8 +227,8 @@ public class PackageItem extends Item implements EntityItem {
             textConsumer.accept(Text.literal("→ " + stack.get(AllDataComponents.PACKAGE_ADDRESS)).formatted(Formatting.GOLD));
 
         /*
-         * Debug Fragmentation Data if (compoundnbt.contains("Fragment")) { CompoundTag
-         * fragTag = compoundnbt.getCompound("Fragment");
+         * Debug Fragmentation Data if (tag.contains("Fragment")) { CompoundTag
+         * fragTag = tag.getCompound("Fragment");
          * pTooltipComponents.add(Component.literal("Order Information (Temporary)")
          * .withStyle(ChatFormatting.GREEN)); pTooltipComponents.add(Components
          * .literal(" Link " + fragTag.getInt("LinkIndex") +

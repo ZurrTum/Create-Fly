@@ -3,6 +3,7 @@ package com.zurrtum.create.content.equipment.clipboard;
 import com.zurrtum.create.AllClientHandle;
 import com.zurrtum.create.AllDataComponents;
 import com.zurrtum.create.foundation.recipe.ItemCopyingRecipe.SupportsItemCopying;
+import com.zurrtum.create.infrastructure.component.ClipboardContent;
 import com.zurrtum.create.infrastructure.component.ClipboardType;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -40,7 +41,6 @@ public class ClipboardBlockItem extends BlockItem implements SupportsItemCopying
             return false;
         if (!(pLevel.getBlockEntity(pPos) instanceof ClipboardBlockEntity cbe))
             return false;
-        cbe.dataContainer = pStack.copyWithCount(1);
         cbe.notifyUpdate();
         return true;
     }
@@ -53,15 +53,16 @@ public class ClipboardBlockItem extends BlockItem implements SupportsItemCopying
 
         player.getItemCooldownManager().set(heldItem, 10);
         if (world.isClient)
-            AllClientHandle.INSTANCE.openClipboardScreen(player, heldItem, null);
-        heldItem.set(AllDataComponents.CLIPBOARD_TYPE, ClipboardType.EDITING);
+            AllClientHandle.INSTANCE.openClipboardScreen(player, heldItem.getComponents(), null);
+        ClipboardContent content = heldItem.getOrDefault(AllDataComponents.CLIPBOARD_CONTENT, ClipboardContent.EMPTY);
+        heldItem.set(AllDataComponents.CLIPBOARD_CONTENT, content.setType(ClipboardType.EDITING));
 
         return ActionResult.SUCCESS.withNewHandStack(heldItem);
     }
 
     @Override
     public ComponentType<?> getComponentType() {
-        return AllDataComponents.CLIPBOARD_PAGES;
+        return AllDataComponents.CLIPBOARD_CONTENT;
     }
 
 }

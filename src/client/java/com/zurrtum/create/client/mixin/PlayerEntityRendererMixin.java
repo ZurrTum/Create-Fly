@@ -2,7 +2,7 @@ package com.zurrtum.create.client.mixin;
 
 import com.zurrtum.create.client.AllExtensions;
 import com.zurrtum.create.client.content.equipment.armor.CardboardRenderState;
-import com.zurrtum.create.client.foundation.render.UuidRenderState;
+import com.zurrtum.create.client.foundation.render.SkyhookRenderState;
 import net.minecraft.client.network.AbstractClientPlayerEntity;
 import net.minecraft.client.render.entity.PlayerEntityRenderer;
 import net.minecraft.client.render.entity.model.BipedEntityModel.ArmPose;
@@ -31,6 +31,8 @@ public class PlayerEntityRendererMixin {
     @Inject(method = "updateRenderState(Lnet/minecraft/client/network/AbstractClientPlayerEntity;Lnet/minecraft/client/render/entity/state/PlayerEntityRenderState;F)V", at = @At("TAIL"))
     private void updateRenderState(AbstractClientPlayerEntity player, PlayerEntityRenderState state, float tickProgress, CallbackInfo ci) {
         ((CardboardRenderState) state).create$update(player, tickProgress);
-        ((UuidRenderState) state).create$setUuid(player.getUuid());
+        SkyhookRenderState skyhookRenderState = (SkyhookRenderState) state;
+        skyhookRenderState.create$setUuid(player.getUuid());
+        skyhookRenderState.create$setMainStack(player.getMainHandStack());
     }
 }

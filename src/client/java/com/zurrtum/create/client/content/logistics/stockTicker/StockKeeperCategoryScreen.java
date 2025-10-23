@@ -52,9 +52,9 @@ public class StockKeeperCategoryScreen extends AbstractSimiContainerScreen<Stock
 
     private List<Rect2i> extraAreas = Collections.emptyList();
 
-    private LerpedFloat scroll = LerpedFloat.linear().startWithValue(0);
+    private final LerpedFloat scroll = LerpedFloat.linear().startWithValue(0);
 
-    private List<ItemStack> schedule;
+    private final List<ItemStack> schedule;
     private IconButton confirmButton;
     private ItemStack editingItem;
     private int editingIndex;

@@ -1,7 +1,7 @@
 package com.zurrtum.create.api.packager.unpacking;
 
 import com.zurrtum.create.api.registry.SimpleRegistry;
-import com.zurrtum.create.content.logistics.stockTicker.PackageOrderWithCrafts;
+import com.zurrtum.create.infrastructure.component.PackageOrderWithCrafts;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.item.ItemStack;

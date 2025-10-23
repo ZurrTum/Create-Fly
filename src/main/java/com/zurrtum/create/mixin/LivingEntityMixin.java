@@ -92,6 +92,7 @@ public abstract class LivingEntityMixin extends Entity {
     @Inject(method = "getEquipmentChanges()Ljava/util/Map;", at = @At(value = "INVOKE", target = "Ljava/util/Map;entrySet()Ljava/util/Set;"))
     private void onLivingEquipmentChange(CallbackInfoReturnable<Map<EquipmentSlot, ItemStack>> cir) {
         if (((Object) this) instanceof PlayerEntity player) {
+            CardboardArmorHandler.playerChangesEquipment(player);
             NetheriteDivingHandler.onEquipmentChange(player);
         }
     }

@@ -80,7 +80,7 @@ public class BlueprintItem extends Item {
     //            return convertIItemListToFilter(acceptedItems[0], isCompoundIngredient);
     //
     //        ItemStack result = AllItems.FILTER.asStack();
-    //        ItemStackHandler filterItems = FilterItem.getFilterItems(result);
+    //        ItemStackHandler filterItems = AllItems.FILTER.getFilterItemHandler(result);
     //        for (int i = 0; i < acceptedItems.length; i++)
     //            filterItems.setStackInSlot(i, convertIItemListToFilter(acceptedItems[i], isCompoundIngredient));
     //        result.set(AllDataComponents.FILTER_ITEMS, ItemHelper.containerContentsFromHandler(filterItems));
@@ -106,7 +106,7 @@ public class BlueprintItem extends Item {
     //
     //        if (isCompoundIngredient) {
     //            ItemStack result = AllItems.FILTER.asStack();
-    //            ItemStackHandler filterItems = FilterItem.getFilterItems(result);
+    //            ItemStackHandler filterItems = AllItems.FILTER.getFilterItemHandler(result);
     //            int i = 0;
     //            for (ItemStack itemStack : stacks) {
     //                if (i >= 18)

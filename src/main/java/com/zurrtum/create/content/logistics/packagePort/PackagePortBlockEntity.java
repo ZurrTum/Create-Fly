@@ -9,6 +9,7 @@ import com.zurrtum.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.foundation.blockEntity.behaviour.animatedContainer.AnimatedContainerBehaviour;
 import com.zurrtum.create.foundation.gui.menu.MenuBase;
 import com.zurrtum.create.foundation.gui.menu.MenuProvider;
+import com.zurrtum.create.infrastructure.component.ClipboardContent;
 import com.zurrtum.create.infrastructure.component.ClipboardEntry;
 import com.zurrtum.create.infrastructure.component.ClipboardType;
 import com.zurrtum.create.infrastructure.items.SidedItemInventory;
@@ -156,7 +157,8 @@ public abstract class PackagePortBlockEntity extends SmartBlockEntity implements
         if (addressFilter == null || addressFilter.isBlank())
             return;
 
-        List<List<ClipboardEntry>> list = ClipboardEntry.readAll(mainHandItem);
+        ClipboardContent clipboard = mainHandItem.getOrDefault(AllDataComponents.CLIPBOARD_CONTENT, ClipboardContent.EMPTY);
+        List<List<ClipboardEntry>> list = ClipboardEntry.readAll(clipboard);
         for (List<ClipboardEntry> page : list) {
             for (ClipboardEntry entry : page) {
                 String existing = entry.text.getString();
@@ -182,8 +184,8 @@ public abstract class PackagePortBlockEntity extends SmartBlockEntity implements
         page.add(new ClipboardEntry(false, Text.literal("#" + addressFilter)));
         player.sendMessage(Text.translatable("create.clipboard.address_added", addressFilter), true);
 
-        ClipboardEntry.saveAll(list, mainHandItem);
-        mainHandItem.set(AllDataComponents.CLIPBOARD_TYPE, ClipboardType.WRITTEN);
+        clipboard = clipboard.setPages(list).setType(ClipboardType.WRITTEN);
+        mainHandItem.set(AllDataComponents.CLIPBOARD_CONTENT, clipboard);
     }
 
     @Override

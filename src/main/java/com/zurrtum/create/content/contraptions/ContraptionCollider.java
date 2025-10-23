@@ -69,9 +69,6 @@ public class ContraptionCollider {
         Vec3d anchorVec = contraptionEntity.getAnchorVec();
         ContraptionRotationState rotation = null;
 
-        // After death, multiple refs to the client player may show up in the area
-        boolean skipClientPlayer = false;
-
         List<Entity> entitiesWithinAABB = world.getEntitiesByClass(Entity.class, bounds.expand(2).stretch(0, 32, 0), contraptionEntity::collidesWith);
         for (Entity entity : entitiesWithinAABB) {
             if (!entity.isAlive())

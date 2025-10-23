@@ -10,7 +10,6 @@ import java.util.List;
 import java.util.function.Predicate;
 
 public class GogglesItem extends Item {
-
     private static final List<Predicate<PlayerEntity>> IS_WEARING_PREDICATES = new ArrayList<>();
 
     static {
@@ -34,7 +33,7 @@ public class GogglesItem extends Item {
      * Use this method to add custom entry points to the goggles overlay, e.g. custom
      * armor, handheld alternatives, etc.
      */
-    public static void addIsWearingPredicate(Predicate<PlayerEntity> predicate) {
+    public static synchronized void addIsWearingPredicate(Predicate<PlayerEntity> predicate) {
         IS_WEARING_PREDICATES.add(predicate);
     }
 }

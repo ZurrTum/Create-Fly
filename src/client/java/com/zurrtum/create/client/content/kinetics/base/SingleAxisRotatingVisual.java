@@ -1,5 +1,6 @@
 package com.zurrtum.create.client.content.kinetics.base;
 
+import com.zurrtum.create.catnip.theme.Color;
 import com.zurrtum.create.client.AllPartialModels;
 import com.zurrtum.create.client.content.equipment.armor.BacktankRenderer;
 import com.zurrtum.create.client.flywheel.api.instance.Instance;
@@ -7,6 +8,7 @@ import com.zurrtum.create.client.flywheel.api.model.Model;
 import com.zurrtum.create.client.flywheel.api.visualization.VisualizationContext;
 import com.zurrtum.create.client.flywheel.lib.model.Models;
 import com.zurrtum.create.client.flywheel.lib.model.baked.PartialModel;
+import com.zurrtum.create.client.flywheel.lib.visual.SimpleTickableVisual;
 import com.zurrtum.create.client.flywheel.lib.visualization.SimpleBlockEntityVisualizer;
 import com.zurrtum.create.client.foundation.render.AllInstanceTypes;
 import com.zurrtum.create.content.kinetics.base.KineticBlockEntity;
@@ -14,7 +16,8 @@ import net.minecraft.util.math.Direction;
 
 import java.util.function.Consumer;
 
-public class SingleAxisRotatingVisual<T extends KineticBlockEntity> extends KineticBlockEntityVisual<T> {
+public class SingleAxisRotatingVisual<T extends KineticBlockEntity> extends KineticBlockEntityVisual<T> implements SimpleTickableVisual {
+    public static boolean rainbowMode = false;
 
     protected final RotatingInstance rotatingModel;
 
@@ -67,6 +70,22 @@ public class SingleAxisRotatingVisual<T extends KineticBlockEntity> extends Kine
     @Override
     public void update(float pt) {
         rotatingModel.setup(blockEntity).setChanged();
+    }
+
+    @Override
+    public void tick(Context context) {
+        float overStressedEffect = blockEntity.effects.overStressedEffect;
+        if (overStressedEffect != 0) {
+            boolean overstressed = overStressedEffect > 0;
+            Color color = overstressed ? Color.RED : Color.SPRING_GREEN;
+            float weight = overstressed ? overStressedEffect : -overStressedEffect;
+
+            rotatingModel.setColor(Color.WHITE.mixWith(color, weight));
+        } else {
+            rotatingModel.setColor(Color.WHITE);
+        }
+
+        rotatingModel.setChanged();
     }
 
     @Override

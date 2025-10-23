@@ -71,7 +71,7 @@ public abstract class SchematicToolBase implements ISchematicTool {
             SchematicTransformation transformation = schematicHandler.getTransformation();
             Box localBounds = schematicHandler.getBounds();
 
-            Vec3d traceOrigin = RaycastHelper.getTraceOrigin(player);
+            Vec3d traceOrigin = player.getEyePos();
             Vec3d start = transformation.toLocalSpace(traceOrigin);
             Vec3d end = transformation.toLocalSpace(RaycastHelper.getTraceTarget(player, 70, traceOrigin));
             PredicateTraceResult result = RaycastHelper.rayTraceUntil(start, end, pos -> localBounds.contains(VecHelper.getCenterOf(pos)));

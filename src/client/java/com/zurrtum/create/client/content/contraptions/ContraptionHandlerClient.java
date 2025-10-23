@@ -175,7 +175,7 @@ public class ContraptionHandlerClient {
     }
 
     public static Couple<Vec3d> getRayInputs(MinecraftClient mc, ClientPlayerEntity player) {
-        Vec3d origin = RaycastHelper.getTraceOrigin(player);
+        Vec3d origin = player.getEyePos();
         double reach = player.getBlockInteractionRange();
         if (mc.crosshairTarget != null && mc.crosshairTarget.getPos() != null)
             reach = Math.min(mc.crosshairTarget.getPos().distanceTo(origin), reach);

@@ -1,5 +1,6 @@
 package com.zurrtum.create.content.decoration.slidingDoor;
 
+import com.zurrtum.create.AllClientHandle;
 import com.zurrtum.create.api.behaviour.movement.MovementBehaviour;
 import com.zurrtum.create.catnip.animation.LerpedFloat.Chaser;
 import com.zurrtum.create.content.contraptions.Contraption;
@@ -13,7 +14,6 @@ import com.zurrtum.create.content.trains.station.GlobalStation;
 import com.zurrtum.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.DoorBlock;
-import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.enums.DoubleBlockHalf;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.server.MinecraftServer;
@@ -28,7 +28,6 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 
 import java.lang.ref.WeakReference;
-import java.util.Map;
 
 public class SlidingDoorMovementBehaviour extends MovementBehaviour {
     @Override
@@ -43,11 +42,12 @@ public class SlidingDoorMovementBehaviour extends MovementBehaviour {
             return;
         boolean open = SlidingDoorBlockEntity.isOpen(structureBlockInfo.state());
 
-        if (!context.world.isClient())
+        if (!context.world.isClient()) {
             tickOpen(context, open);
+            return;
+        }
 
-        Map<BlockPos, BlockEntity> tes = context.contraption.presentBlockEntities;
-        if (!(tes.get(context.localPos) instanceof SlidingDoorBlockEntity sdbe))
+        if (!(AllClientHandle.INSTANCE.getBlockEntityClientSide(context.contraption, context.localPos) instanceof SlidingDoorBlockEntity sdbe))
             return;
         boolean wasSettled = sdbe.animation.settled();
         sdbe.animation.chase(open ? 1 : 0, .15f, Chaser.LINEAR);

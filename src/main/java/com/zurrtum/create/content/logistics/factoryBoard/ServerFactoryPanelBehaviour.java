@@ -20,7 +20,6 @@ import com.zurrtum.create.content.logistics.packagerLink.LogisticsManager;
 import com.zurrtum.create.content.logistics.packagerLink.RequestPromise;
 import com.zurrtum.create.content.logistics.packagerLink.RequestPromiseQueue;
 import com.zurrtum.create.content.logistics.stockTicker.PackageOrder;
-import com.zurrtum.create.content.logistics.stockTicker.PackageOrderWithCrafts;
 import com.zurrtum.create.content.schematics.requirement.ItemRequirement;
 import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
 import com.zurrtum.create.foundation.blockEntity.behaviour.BehaviourType;
@@ -29,14 +28,17 @@ import com.zurrtum.create.foundation.blockEntity.behaviour.ValueSettings;
 import com.zurrtum.create.foundation.blockEntity.behaviour.filtering.ServerFilteringBehaviour;
 import com.zurrtum.create.foundation.codec.CreateCodecs;
 import com.zurrtum.create.foundation.gui.menu.MenuProvider;
+import com.zurrtum.create.infrastructure.component.PackageOrderWithCrafts;
 import com.zurrtum.create.infrastructure.config.AllConfigs;
 import com.zurrtum.create.infrastructure.packet.s2c.FactoryPanelEffectPacket;
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenCustomHashMap;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.ItemStackSet;
 import net.minecraft.network.RegistryByteBuf;
 import net.minecraft.recipe.*;
 import net.minecraft.recipe.input.CraftingRecipeInput;
@@ -360,6 +362,15 @@ public class ServerFactoryPanelBehaviour extends ServerFilteringBehaviour implem
             notifyRedstoneOutputs();
     }
 
+    public static class ItemStackConnections extends ArrayList<FactoryPanelConnection> {
+        public ItemStack item;
+        public int totalAmount;
+
+        public ItemStackConnections(ItemStack item) {
+            this.item = item;
+        }
+    }
+
     private void tickRequests() {
         FactoryPanelBlockEntity panelBE = panelBE();
         if (targetedBy.isEmpty() && !panelBE.restocker)
@@ -386,8 +397,7 @@ public class ServerFactoryPanelBehaviour extends ServerFilteringBehaviour implem
 
         boolean failed = false;
 
-        Multimap<UUID, BigItemStack> toRequest = HashMultimap.create();
-        List<BigItemStack> toRequestAsList = new ArrayList<>();
+        Map<UUID, Map<ItemStack, ItemStackConnections>> consolidated = new HashMap<>();
 
         for (FactoryPanelConnection connection : targetedBy.values()) {
             ServerFactoryPanelBehaviour source = at(getWorld(), connection);
@@ -395,18 +405,36 @@ public class ServerFactoryPanelBehaviour extends ServerFilteringBehaviour implem
                 return;
 
             ItemStack item = source.getFilter();
-            int amount = connection.amount;
-            InventorySummary summary = LogisticsManager.getSummaryOfNetwork(source.network, true);
-            if (amount == 0 || item.isEmpty() || summary.getCountOf(item) < amount) {
-                sendEffect(connection.from, false);
-                failed = true;
-                continue;
-            }
 
-            BigItemStack stack = new BigItemStack(item, amount);
-            toRequest.put(source.network, stack);
-            toRequestAsList.add(stack);
-            sendEffect(connection.from, true);
+            Map<ItemStack, ItemStackConnections> networkItemCounts = consolidated.computeIfAbsent(
+                source.network,
+                $ -> new Object2ObjectOpenCustomHashMap<>(ItemStackSet.HASH_STRATEGY)
+            );
+            networkItemCounts.computeIfAbsent(item, $ -> new ItemStackConnections(item));
+            ItemStackConnections existingConnections = networkItemCounts.get(item);
+            existingConnections.add(connection);
+            existingConnections.totalAmount += connection.amount;
+        }
+
+        Multimap<UUID, BigItemStack> toRequest = HashMultimap.create();
+
+        for (Map.Entry<UUID, Map<ItemStack, ItemStackConnections>> entry : consolidated.entrySet()) {
+            UUID network = entry.getKey();
+            InventorySummary summary = LogisticsManager.getSummaryOfNetwork(network, true);
+
+            for (ItemStackConnections connections : entry.getValue().values()) {
+                if (connections.totalAmount == 0 || connections.item.isEmpty() || summary.getCountOf(connections.item) < connections.totalAmount) {
+                    for (FactoryPanelConnection connection : connections)
+                        sendEffect(connection.from, false);
+                    failed = true;
+                    continue;
+                }
+
+                BigItemStack stack = new BigItemStack(connections.item, connections.totalAmount);
+                toRequest.put(network, stack);
+                for (FactoryPanelConnection connection : connections)
+                    sendEffect(connection.from, true);
+            }
         }
 
         if (failed)

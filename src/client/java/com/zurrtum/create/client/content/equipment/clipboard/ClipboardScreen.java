@@ -9,7 +9,7 @@ import com.zurrtum.create.client.foundation.gui.AllGuiTextures;
 import com.zurrtum.create.client.foundation.gui.AllIcons;
 import com.zurrtum.create.client.foundation.gui.widget.IconButton;
 import com.zurrtum.create.client.foundation.utility.CreateLang;
-import com.zurrtum.create.content.equipment.clipboard.ClipboardOverrides;
+import com.zurrtum.create.infrastructure.component.ClipboardContent;
 import com.zurrtum.create.infrastructure.component.ClipboardEntry;
 import com.zurrtum.create.infrastructure.component.ClipboardType;
 import com.zurrtum.create.infrastructure.packet.c2s.ClipboardEditPacket;
@@ -25,7 +25,7 @@ import net.minecraft.client.sound.PositionedSoundInstance;
 import net.minecraft.client.util.SelectionManager;
 import net.minecraft.client.util.Window;
 import net.minecraft.client.util.math.Rect2i;
-import net.minecraft.item.ItemStack;
+import net.minecraft.component.ComponentMap;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.OrderedText;
 import net.minecraft.text.Style;
@@ -44,7 +44,7 @@ import java.util.Arrays;
 import java.util.List;
 
 public class ClipboardScreen extends AbstractSimiScreen {
-    public ItemStack item;
+    public ClipboardContent content;
     public BlockPos targetedBlock;
 
     List<List<ClipboardEntry>> pages;
@@ -53,7 +53,7 @@ public class ClipboardScreen extends AbstractSimiScreen {
     int frameTick;
     PageTurnWidget forward;
     PageTurnWidget backward;
-    int currentPage;
+    int currentPage = 0;
     long lastClickTime;
     int lastIndex = -1;
 
@@ -67,21 +67,23 @@ public class ClipboardScreen extends AbstractSimiScreen {
     IconButton closeBtn;
     IconButton clearBtn;
 
-    private int targetSlot;
+    private final int targetSlot;
 
-    public ClipboardScreen(int targetSlot, ItemStack item, @Nullable BlockPos pos) {
+    public ClipboardScreen(int targetSlot, ComponentMap components, @Nullable BlockPos pos) {
         this.targetSlot = targetSlot;
         this.targetedBlock = pos;
-        reopenWith(item);
+        reopenWith(components.getOrDefault(AllDataComponents.CLIPBOARD_CONTENT, ClipboardContent.EMPTY));
     }
 
-    public void reopenWith(ItemStack clipboard) {
-        item = clipboard;
-        pages = ClipboardEntry.readAll(item);
+    public void reopenWith(ClipboardContent content) {
+        this.content = content;
+        pages = ClipboardEntry.readAll(content);
         if (pages.isEmpty())
             pages.add(new ArrayList<>());
         if (clearBtn == null) {
-            currentPage = item.getOrDefault(AllDataComponents.CLIPBOARD_PREVIOUSLY_OPENED_PAGE, 0);
+            if (content != null) {
+                currentPage = content.previouslyOpenedPage();
+            }
             currentPage = MathHelper.clamp(currentPage, 0, pages.size() - 1);
         }
         currentEntries = pages.get(currentPage);
@@ -97,7 +99,7 @@ public class ClipboardScreen extends AbstractSimiScreen {
             this::validateTextForEntry
         );
         editingIndex = startEmpty ? 0 : -1;
-        readonly = item.contains(AllDataComponents.CLIPBOARD_READ_ONLY);
+        readonly = content != null && content.readOnly();
         if (readonly)
             editingIndex = -1;
         if (clearBtn != null)
@@ -321,12 +323,11 @@ public class ClipboardScreen extends AbstractSimiScreen {
         pages.forEach(list -> list.removeIf(ce -> ce.text.getString().isBlank()));
         pages.removeIf(List::isEmpty);
 
-        for (int i = 0; i < pages.size(); i++)
+        for (int i = 0; i < pages.size(); i++) {
             if (pages.get(i) == currentEntries) {
-                item.set(AllDataComponents.CLIPBOARD_PREVIOUSLY_OPENED_PAGE, i);
-                if (i == 0)
-                    item.remove(AllDataComponents.CLIPBOARD_PREVIOUSLY_OPENED_PAGE);
+                content = content.setPreviouslyOpenedPage(i);
             }
+        }
 
         send();
 
@@ -340,23 +341,14 @@ public class ClipboardScreen extends AbstractSimiScreen {
     }
 
     private void send() {
-        ClipboardEntry.saveAll(pages, item);
-        ClipboardOverrides.switchTo(ClipboardType.WRITTEN, item);
+        content = content.setPages(pages);
+        content = content.setType(ClipboardType.WRITTEN);
 
         if (pages.isEmpty()) {
-            item.remove(AllDataComponents.CLIPBOARD_PAGES);
-            item.remove(AllDataComponents.CLIPBOARD_PREVIOUSLY_OPENED_PAGE);
-            item.remove(AllDataComponents.CLIPBOARD_READ_ONLY);
-            item.remove(AllDataComponents.CLIPBOARD_TYPE);
-            item.remove(AllDataComponents.CLIPBOARD_COPIED_VALUES);
+            content = null;
         }
 
-        client.player.networkHandler.sendPacket(new ClipboardEditPacket(targetSlot, item.getComponentChanges(), targetedBlock));
-    }
-
-    @Override
-    public boolean shouldPause() {
-        return false;
+        client.player.networkHandler.sendPacket(new ClipboardEditPacket(targetSlot, content, targetedBlock));
     }
 
     @Override
@@ -380,8 +372,7 @@ public class ClipboardScreen extends AbstractSimiScreen {
             clearDisplayCache();
             return true;
         }
-        if (super.keyPressed(pKeyCode, pScanCode, pModifiers))
-            return true;
+        super.keyPressed(pKeyCode, pScanCode, pModifiers);
         return true;
     }
 
@@ -829,14 +820,7 @@ public class ClipboardScreen extends AbstractSimiScreen {
         }
     }
 
-    static class Pos2i {
-        public final int x;
-        public final int y;
-
-        Pos2i(int pX, int pY) {
-            x = pX;
-            y = pY;
-        }
+    record Pos2i(int x, int y) {
     }
 
 }

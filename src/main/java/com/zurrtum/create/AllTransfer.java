@@ -27,6 +27,7 @@ import com.zurrtum.create.content.logistics.packager.repackager.RepackagerBlockE
 import com.zurrtum.create.content.logistics.tunnel.BeltTunnelBlockEntity;
 import com.zurrtum.create.content.logistics.tunnel.BrassTunnelBlockEntity;
 import com.zurrtum.create.content.processing.basin.BasinBlockEntity;
+import com.zurrtum.create.content.trains.station.StationBlockEntity;
 import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
 import com.zurrtum.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.foundation.blockEntity.behaviour.CachedDirectionInventoryBehaviour;
@@ -294,6 +295,7 @@ public class AllTransfer {
         registerItemSide(PostboxBlockEntity.class, AllBlockEntityTypes.PACKAGE_POSTBOX, be -> be.inventory);
         registerItemSide(FrogportBlockEntity.class, AllBlockEntityTypes.PACKAGE_FROGPORT, be -> be.inventory);
         registerItemSide(ToolboxBlockEntity.class, AllBlockEntityTypes.TOOLBOX, be -> be.inventory);
+        registerItemSide(StationBlockEntity.class, AllBlockEntityTypes.TRACK_STATION, be -> be.depotBehaviour.itemHandler);
         registerFluidSide(
             FluidTankBlockEntity.class, AllBlockEntityTypes.FLUID_TANK, be -> {
                 if (be.fluidCapability == null)

@@ -2,11 +2,14 @@ package com.zurrtum.create.client.content.trains.entity;
 
 import com.zurrtum.create.catnip.data.Couple;
 import com.zurrtum.create.client.AllBogeyStyleRenders;
+import com.zurrtum.create.client.content.contraptions.render.ClientContraption;
 import com.zurrtum.create.client.content.contraptions.render.OrientedContraptionEntityRenderer;
 import com.zurrtum.create.client.flywheel.api.visualization.VisualizationManager;
 import com.zurrtum.create.client.flywheel.lib.transform.TransformStack;
+import com.zurrtum.create.content.contraptions.Contraption;
 import com.zurrtum.create.content.trains.entity.Carriage;
 import com.zurrtum.create.content.trains.entity.CarriageBogey;
+import com.zurrtum.create.content.trains.entity.CarriageContraption;
 import com.zurrtum.create.content.trains.entity.CarriageContraptionEntity;
 import net.minecraft.client.render.Frustum;
 import net.minecraft.client.render.LightmapTextureManager;
@@ -18,7 +21,6 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.LightType;
 import net.minecraft.world.World;
 
-import java.util.Objects;
 import java.util.function.Supplier;
 
 public class CarriageContraptionEntityRenderer extends OrientedContraptionEntityRenderer<CarriageContraptionEntity, CarriageContraptionEntityRenderer.CarriageContraptionState> {
@@ -67,6 +69,11 @@ public class CarriageContraptionEntityRenderer extends OrientedContraptionEntity
     }
 
     @Override
+    protected ClientContraption createClientContraption(Contraption contraption) {
+        return new CarriageClientContraption((CarriageContraption) contraption);
+    }
+
+    @Override
     public void render(CarriageContraptionState state, MatrixStack ms, VertexConsumerProvider buffers, int overlay) {
         if (state.pass)
             return;
@@ -84,7 +91,7 @@ public class CarriageContraptionEntityRenderer extends OrientedContraptionEntity
 
             float yaw = state.yaw.get(first);
             float pitch = state.pitch.get(first);
-            if (!VisualizationManager.supportsVisualization(state.world) && !state.contraption.isHiddenInPortal(bogeyPos)) {
+            if (!VisualizationManager.supportsVisualization(state.world) && !state.contraption.getContraption().isHiddenInPortal(bogeyPos)) {
 
                 ms.push();
                 translateBogey(ms, bogey, state.bogeySpacing, state.viewYRot, state.viewXRot, yaw, pitch);
@@ -124,7 +131,8 @@ public class CarriageContraptionEntityRenderer extends OrientedContraptionEntity
     }
 
     public static int getBogeyLightCoords(World world, CarriageBogey bogey, Supplier<Vec3d> cameraPos) {
-        var lightPos = BlockPos.ofFloored(Objects.requireNonNullElseGet(bogey.getAnchorPosition(), cameraPos));
+        var anchorPosition = bogey.getAnchorPosition();
+        var lightPos = BlockPos.ofFloored(anchorPosition == null ? cameraPos.get() : anchorPosition);
         return LightmapTextureManager.pack(world.getLightLevel(LightType.BLOCK, lightPos), world.getLightLevel(LightType.SKY, lightPos));
     }
 

@@ -1,7 +1,6 @@
 package com.zurrtum.create.client.content.logistics.filter;
 
 import com.google.common.collect.ImmutableList;
-import com.zurrtum.create.AllItems;
 import com.zurrtum.create.AllPackets;
 import com.zurrtum.create.client.catnip.gui.element.GuiGameElement;
 import com.zurrtum.create.client.catnip.gui.widget.ElementWidget;
@@ -81,14 +80,11 @@ public abstract class AbstractFilterScreen<F extends AbstractFilterMenu> extends
         renderPlayerInventory(graphics, invX, invY);
 
         background.render(graphics, x, y);
-        graphics.drawText(
-            textRenderer,
-            title,
-            x + (background.getWidth() - 8) / 2 - textRenderer.getWidth(title) / 2,
-            y + 4,
-            handler.contentHolder.isOf(AllItems.PACKAGE_FILTER) ? 0xFF3D3C48 : handler.contentHolder.isOf(AllItems.FILTER) ? 0xFF303030 : 0xFF592424,
-            false
-        );
+        graphics.drawText(textRenderer, title, x + (background.getWidth() - 8) / 2 - textRenderer.getWidth(title) / 2, y + 4, getTitleColor(), false);
+    }
+
+    protected int getTitleColor() {
+        return 0xFF592424;
     }
 
     @Override

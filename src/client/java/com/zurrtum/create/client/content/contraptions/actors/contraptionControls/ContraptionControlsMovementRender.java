@@ -8,6 +8,7 @@ import com.zurrtum.create.client.AllPartialModels;
 import com.zurrtum.create.client.api.behaviour.movement.MovementRenderBehaviour;
 import com.zurrtum.create.client.catnip.animation.AnimationTickHolder;
 import com.zurrtum.create.client.catnip.render.CachedBuffers;
+import com.zurrtum.create.client.content.contraptions.render.ClientContraption;
 import com.zurrtum.create.client.content.contraptions.render.ContraptionMatrices;
 import com.zurrtum.create.client.content.redstone.nixieTube.NixieTubeRenderer;
 import com.zurrtum.create.client.flywheel.lib.transform.TransformStack;
@@ -64,7 +65,7 @@ public class ContraptionControlsMovementRender implements MovementRenderBehaviou
         var msr = TransformStack.of(ms);
 
         float buttondepth = 0;
-        if (ctx.contraption.presentBlockEntities.get(ctx.localPos) instanceof ContraptionControlsBlockEntity cbe)
+        if (ClientContraption.getBlockEntityClientSide(ctx.contraption, ctx.localPos) instanceof ContraptionControlsBlockEntity cbe)
             buttondepth = -1 / 24f * cbe.button.getValue(AnimationTickHolder.getPartialTicks(renderWorld));
 
         ms.push();

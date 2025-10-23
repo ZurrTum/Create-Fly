@@ -46,7 +46,6 @@ import net.minecraft.world.GameMode;
 import net.minecraft.world.World;
 
 import java.util.List;
-import java.util.Vector;
 
 public class SchematicHandler {
 
@@ -63,15 +62,11 @@ public class SchematicHandler {
     private ItemStack activeSchematicItem;
     private AABBOutline outline;
 
-    private Vector<SchematicRenderer> renderers;
-    private SchematicHotbarSlotOverlay overlay;
+    private final SchematicRenderer[] renderers = new SchematicRenderer[3];
+    private final SchematicHotbarSlotOverlay overlay;
     private ToolSelectionScreen selectionScreen;
 
     public SchematicHandler() {
-        renderers = new Vector<>(3);
-        for (int i = 0; i < renderers.capacity(); i++)
-            renderers.add(new SchematicRenderer());
-
         overlay = new SchematicHotbarSlotOverlay();
         currentTool = ToolType.DEPLOY;
         selectionScreen = new ToolSelectionScreen(MinecraftClient.getInstance(), ImmutableList.of(ToolType.DEPLOY), this::equip);
@@ -85,7 +80,6 @@ public class SchematicHandler {
                 syncCooldown = 0;
                 activeHotbarSlot = 0;
                 activeSchematicItem = null;
-                renderers.forEach(r -> r.setActive(false));
             }
             return;
         }
@@ -101,13 +95,11 @@ public class SchematicHandler {
             if (activeSchematicItem != null && itemLost(player)) {
                 activeHotbarSlot = 0;
                 activeSchematicItem = null;
-                renderers.forEach(r -> r.setActive(false));
             }
             return;
         }
 
         if (!active || !stack.get(AllDataComponents.SCHEMATIC_FILE).equals(displayedSchematic)) {
-            renderers.forEach(r -> r.setActive(false));
             init(mc, stack);
         }
         if (!active)
@@ -182,9 +174,9 @@ public class SchematicHandler {
             transform.apply(be);
         fixControllerBlockEntities(wMirroredLR);
 
-        renderers.get(0).display(w);
-        renderers.get(1).display(wMirroredFB);
-        renderers.get(2).display(wMirroredLR);
+        renderers[0] = new SchematicRenderer(w);
+        renderers[1] = new SchematicRenderer(wMirroredFB);
+        renderers[2] = new SchematicRenderer(wMirroredLR);
     }
 
     private void fixControllerBlockEntities(SchematicLevel level) {
@@ -207,41 +199,42 @@ public class SchematicHandler {
     }
 
     public void render(MinecraftClient mc, MatrixStack ms, SuperRenderTypeBuffer buffer, Vec3d camera) {
-        boolean present = activeSchematicItem != null;
-        if (!active && !present)
+        if (!active) {
             return;
-
-        if (active) {
-            ms.push();
-            currentTool.getTool().renderTool(mc, ms, buffer, camera);
-            ms.pop();
         }
+        boolean present = activeSchematicItem != null;
+        if (!present) {
+            return;
+        }
+
+        ms.push();
+        currentTool.getTool().renderTool(mc, ms, buffer, camera);
+        ms.pop();
 
         ms.push();
         transformation.applyTransformations(ms, camera);
 
-        if (!renderers.isEmpty()) {
-            float pt = AnimationTickHolder.getPartialTicks();
-            boolean lr = transformation.getScaleLR().getValue(pt) < 0;
-            boolean fb = transformation.getScaleFB().getValue(pt) < 0;
-            if (lr && !fb)
-                renderers.get(2).render(mc, ms, buffer);
-            else if (fb && !lr)
-                renderers.get(1).render(mc, ms, buffer);
-            else
-                renderers.get(0).render(mc, ms, buffer);
+        float pt = AnimationTickHolder.getPartialTicks();
+        boolean lr = transformation.getScaleLR().getValue(pt) < 0;
+        boolean fb = transformation.getScaleFB().getValue(pt) < 0;
+        if (lr && !fb && renderers[2] != null) {
+            renderers[2].render(mc, ms, buffer);
+        } else if (fb && !lr && renderers[1] != null) {
+            renderers[1].render(mc, ms, buffer);
+        } else if (renderers[0] != null) {
+            renderers[0].render(mc, ms, buffer);
         }
 
-        if (active)
-            currentTool.getTool().renderOnSchematic(mc, ms, buffer);
+        currentTool.getTool().renderOnSchematic(mc, ms, buffer);
 
         ms.pop();
-
     }
 
     public void updateRenderers() {
         for (SchematicRenderer renderer : renderers) {
-            renderer.update();
+            if (renderer != null) {
+                renderer.update();
+            }
         }
     }
 
@@ -378,7 +371,6 @@ public class SchematicHandler {
         mc.player.networkHandler.sendPacket(new SchematicPlacePacket(activeSchematicItem.copy()));
         activeSchematicItem.set(AllDataComponents.SCHEMATIC_DEPLOYED, false);
         SchematicInstances.clearHash(activeSchematicItem);
-        renderers.forEach(r -> r.setActive(false));
         active = false;
         markDirty();
     }

@@ -1,6 +1,7 @@
 package com.zurrtum.create.client.infrastructure.ponder.scenes;
 
 import com.zurrtum.create.AllBlocks;
+import com.zurrtum.create.AllDataComponents;
 import com.zurrtum.create.AllItems;
 import com.zurrtum.create.catnip.math.Pointing;
 import com.zurrtum.create.client.foundation.ponder.CreateSceneBuilder;
@@ -13,13 +14,13 @@ import com.zurrtum.create.client.ponder.api.scene.SceneBuildingUtil;
 import com.zurrtum.create.client.ponder.api.scene.Selection;
 import com.zurrtum.create.content.contraptions.chassis.StickerBlock;
 import com.zurrtum.create.content.contraptions.chassis.StickerBlockEntity;
-import com.zurrtum.create.content.equipment.clipboard.ClipboardOverrides;
 import com.zurrtum.create.content.redstone.analogLever.AnalogLeverBlockEntity;
 import com.zurrtum.create.content.redstone.diodes.*;
 import com.zurrtum.create.content.redstone.link.RedstoneLinkBlock;
 import com.zurrtum.create.content.redstone.link.RedstoneLinkBlockEntity;
 import com.zurrtum.create.content.redstone.nixieTube.NixieTubeBlock;
 import com.zurrtum.create.content.redstone.nixieTube.NixieTubeBlockEntity;
+import com.zurrtum.create.infrastructure.component.ClipboardContent;
 import com.zurrtum.create.infrastructure.component.ClipboardType;
 import net.minecraft.block.RedstoneWireBlock;
 import net.minecraft.item.ItemStack;
@@ -532,7 +533,7 @@ public class RedstoneScenes {
         scene.idle(20);
 
         ItemStack clipboard = AllItems.CLIPBOARD.getDefaultStack();
-        ClipboardOverrides.switchTo(ClipboardType.WRITTEN, clipboard);
+        clipboard.set(AllDataComponents.CLIPBOARD_CONTENT, ClipboardContent.EMPTY.setType(ClipboardType.WRITTEN));
         scene.overlay().showControls(centerTube.add(1, .35, 0), Pointing.DOWN, 40).rightClick().withItem(clipboard);
         scene.idle(7);
 

@@ -1,5 +1,6 @@
 package com.zurrtum.create.client.infrastructure.ponder.scenes;
 
+import com.zurrtum.create.AllDataComponents;
 import com.zurrtum.create.AllItems;
 import com.zurrtum.create.catnip.math.Pointing;
 import com.zurrtum.create.client.foundation.ponder.CreateSceneBuilder;
@@ -10,7 +11,7 @@ import com.zurrtum.create.client.ponder.api.element.WorldSectionElement;
 import com.zurrtum.create.client.ponder.api.scene.SceneBuilder;
 import com.zurrtum.create.client.ponder.api.scene.SceneBuildingUtil;
 import com.zurrtum.create.client.ponder.api.scene.Selection;
-import com.zurrtum.create.content.equipment.clipboard.ClipboardOverrides;
+import com.zurrtum.create.infrastructure.component.ClipboardContent;
 import com.zurrtum.create.infrastructure.component.ClipboardType;
 import net.minecraft.block.Blocks;
 import net.minecraft.item.ItemStack;
@@ -243,7 +244,7 @@ public class DisplayScenes {
 
         Vec3d target = util.vector().of(3.95, 2.75, 3.25);
         ItemStack clipboard = AllItems.CLIPBOARD.getDefaultStack();
-        ClipboardOverrides.switchTo(ClipboardType.WRITTEN, clipboard);
+        clipboard.set(AllDataComponents.CLIPBOARD_CONTENT, ClipboardContent.EMPTY.setType(ClipboardType.WRITTEN));
         scene.overlay().showControls(target, Pointing.RIGHT, 40).withItem(clipboard).rightClick();
         scene.idle(6);
         scene.world().setDisplayBoardText(board, 0, Text.literal("Create"));

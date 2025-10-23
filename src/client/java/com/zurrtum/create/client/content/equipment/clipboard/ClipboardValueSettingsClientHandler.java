@@ -11,6 +11,7 @@ import com.zurrtum.create.content.redstone.link.ServerLinkBehaviour;
 import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
 import com.zurrtum.create.foundation.blockEntity.behaviour.filtering.ServerFilteringBehaviour;
 import com.zurrtum.create.foundation.blockEntity.behaviour.scrollValue.ServerScrollValueBehaviour;
+import com.zurrtum.create.infrastructure.component.ClipboardContent;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayerEntity;
@@ -110,7 +111,11 @@ public class ClipboardValueSettingsClientHandler {
             )) || smartBE instanceof ClipboardCloneable ccbe && ccbe.canWrite(world.getRegistryManager(), side);
 
         boolean canPaste;
-        NbtCompound tagElement = stack.get(AllDataComponents.CLIPBOARD_COPIED_VALUES);
+        ClipboardContent content = stack.get(AllDataComponents.CLIPBOARD_CONTENT);
+        if (content == null) {
+            return;
+        }
+        NbtCompound tagElement = content.copiedValues().orElse(null);
         if (tagElement == null) {
             canPaste = false;
         } else {

@@ -2,6 +2,7 @@ package com.zurrtum.create.content.fluids.tank.storage;
 
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import com.zurrtum.create.AllClientHandle;
 import com.zurrtum.create.AllMountedStorageTypes;
 import com.zurrtum.create.api.contraption.storage.SyncedMountedStorage;
 import com.zurrtum.create.api.contraption.storage.fluid.MountedFluidStorageType;
@@ -69,7 +70,7 @@ public class FluidTankMountedStorage extends WrapperMountedFluidStorage<FluidTan
 
     @Override
     public void afterSync(Contraption contraption, BlockPos localPos) {
-        BlockEntity be = contraption.presentBlockEntities.get(localPos);
+        BlockEntity be = AllClientHandle.INSTANCE.getBlockEntityClientSide(contraption, localPos);
         if (!(be instanceof FluidTankBlockEntity tank))
             return;
 

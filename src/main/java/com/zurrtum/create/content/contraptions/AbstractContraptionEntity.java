@@ -11,14 +11,12 @@ import com.zurrtum.create.content.contraptions.behaviour.MovementContext;
 import com.zurrtum.create.content.contraptions.elevator.ElevatorContraption;
 import com.zurrtum.create.content.contraptions.glue.SuperGlueEntity;
 import com.zurrtum.create.content.contraptions.mounted.MountedContraption;
-import com.zurrtum.create.content.decoration.slidingDoor.SlidingDoorBlock;
 import com.zurrtum.create.content.trains.entity.CarriageContraption;
 import com.zurrtum.create.content.trains.entity.CarriageContraptionEntity;
 import com.zurrtum.create.content.trains.entity.Train;
 import com.zurrtum.create.foundation.collision.Matrix3d;
 import com.zurrtum.create.infrastructure.packet.s2c.*;
 import io.netty.handler.codec.DecoderException;
-import net.minecraft.block.BlockState;
 import net.minecraft.block.piston.PistonBehavior;
 import net.minecraft.entity.*;
 import net.minecraft.entity.damage.DamageSource;
@@ -345,10 +343,6 @@ public abstract class AbstractContraptionEntity extends Entity {
         contraption.tickStorage(this);
         tickContraption();
         super.tick();
-
-        if (getWorld().isClient()) {
-            AllClientHandle.INSTANCE.invalidate(contraption);
-        }
 
         if (!(getWorld() instanceof ServerWorld sl))
             return;
@@ -709,16 +703,6 @@ public abstract class AbstractContraptionEntity extends Entity {
     protected abstract float getStalledAngle();
 
     public abstract void handleStallInformation(double x, double y, double z, float angle);
-
-    public void handleBlockChange(BlockPos localPos, BlockState newState) {
-        if (contraption == null || !contraption.blocks.containsKey(localPos))
-            return;
-        StructureBlockInfo info = contraption.blocks.get(localPos);
-        contraption.blocks.put(localPos, new StructureBlockInfo(info.pos(), newState, info.nbt()));
-        if (info.state() != newState && !(newState.getBlock() instanceof SlidingDoorBlock))
-            contraption.deferInvalidate = true;
-        contraption.invalidateColliders();
-    }
 
     @Override
     public void writeData(WriteView view) {

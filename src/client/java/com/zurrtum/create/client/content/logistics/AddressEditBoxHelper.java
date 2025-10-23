@@ -10,6 +10,7 @@ import com.zurrtum.create.infrastructure.component.ClipboardEntry;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.TextFieldWidget;
+import net.minecraft.component.ComponentMap;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
@@ -69,7 +70,7 @@ public class AddressEditBoxHelper {
         for (WeakReference<ClipboardBlockEntity> wr : NEARBY_CLIPBOARDS.asMap().values()) {
             ClipboardBlockEntity cbe = wr.get();
             if (cbe != null)
-                appendAddresses(options, alreadyAdded, cbe.dataContainer);
+                appendAddresses(options, alreadyAdded, cbe.getComponents());
         }
 
         return destinationSuggestions;
@@ -79,12 +80,16 @@ public class AddressEditBoxHelper {
         if (item == null || !item.isOf(AllItems.CLIPBOARD))
             return;
 
-        List<List<ClipboardEntry>> pages = ClipboardEntry.readAll(item);
+        appendAddresses(options, alreadyAdded, item.getComponents());
+    }
+
+    private static void appendAddresses(List<IntAttached<String>> options, Set<String> alreadyAdded, ComponentMap components) {
+        List<List<ClipboardEntry>> pages = ClipboardEntry.readAll(components);
         pages.forEach(page -> page.forEach(entry -> {
             String string = entry.text.getString();
             if (entry.checked)
                 return;
-            if (!string.startsWith("#") || string.length() <= 1)
+            if (!string.startsWith("#") || string.length() == 1)
                 return;
             String address = string.substring(1);
             if (address.isBlank())

@@ -1,41 +1,54 @@
 package com.zurrtum.create.client.content.trains.entity;
 
-import com.zurrtum.create.catnip.data.Couple;
-import com.zurrtum.create.catnip.data.Iterate;
 import com.zurrtum.create.client.AllBogeyStyleRenders;
+import com.zurrtum.create.client.content.contraptions.render.ClientContraption;
 import com.zurrtum.create.client.content.contraptions.render.OrientedContraptionVisual;
 import com.zurrtum.create.client.content.trains.bogey.BogeyVisual;
 import com.zurrtum.create.client.flywheel.api.visual.DynamicVisual;
 import com.zurrtum.create.client.flywheel.api.visualization.VisualizationContext;
 import com.zurrtum.create.client.flywheel.lib.transform.TransformStack;
-import com.zurrtum.create.client.foundation.entity.behaviour.PortalCutoffBehaviour;
+import com.zurrtum.create.client.foundation.virtualWorld.VirtualRenderWorld;
+import com.zurrtum.create.content.contraptions.Contraption;
+import com.zurrtum.create.content.contraptions.behaviour.MovementContext;
 import com.zurrtum.create.content.trains.entity.CarriageBogey;
+import com.zurrtum.create.content.trains.entity.CarriageContraption;
 import com.zurrtum.create.content.trains.entity.CarriageContraptionEntity;
+import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.nbt.NbtCompound;
-import org.jetbrains.annotations.Nullable;
+import net.minecraft.structure.StructureTemplate.StructureBlockInfo;
+import org.apache.commons.lang3.tuple.MutablePair;
 import org.joml.Vector3f;
 
 public class CarriageContraptionVisual extends OrientedContraptionVisual<CarriageContraptionEntity> {
+    public static final int MAX_NUM_BOGEYS = 2;
+
     private final MatrixStack poseStack = new MatrixStack();
 
-    @Nullable
-    private Couple<@Nullable VisualizedBogey> bogeys;
-    private final Couple<Boolean> bogeyHidden = Couple.create(() -> false);
+    private final CarriageContraption contraption;
+
+    // The number of bogeys actually populated in the below arrays.
+    private int numBogeys;
+    private final CarriageBogey[] bogeys = new CarriageBogey[MAX_NUM_BOGEYS];
+    private final BogeyVisual[] visuals = new BogeyVisual[MAX_NUM_BOGEYS];
+    // The position (in blocks) of each bogey along the carriage, relative to the carriage's origin.
+    // Used to check if a bogey is hidden in a portal.
+    private final int[] bogeyPos = new int[MAX_NUM_BOGEYS];
 
     public CarriageContraptionVisual(VisualizationContext context, CarriageContraptionEntity entity, float partialTick) {
         super(context, entity, partialTick);
-        PortalCutoffBehaviour behaviour = entity.getBehaviour(PortalCutoffBehaviour.TYPE);
-        if (behaviour != null) {
-            behaviour.setVisual(this);
-            behaviour.updateRenderedPortalCutoff();
-        }
+
+        // An extra block because bogeys are always slightly outside the contraption bounds.
+        this.lightPaddingBlocks = DEFAULT_LIGHT_PADDING + 1;
+
+        this.contraption = (CarriageContraption) entity.getContraption();
 
         animate(partialTick);
     }
 
-    public void setBogeyVisibility(boolean first, boolean visible) {
-        bogeyHidden.set(first, !visible);
+    @Override
+    protected ClientContraption createClientContraption(Contraption contraption) {
+        return new CarriageClientContraption((CarriageContraption) contraption);
     }
 
     @Override
@@ -45,19 +58,45 @@ public class CarriageContraptionVisual extends OrientedContraptionVisual<Carriag
         animate(ctx.partialTick());
     }
 
+    @Override
+    protected <T extends BlockEntity> void setupVisualizer(T be, float partialTicks) {
+        if (entity.getContraption() instanceof CarriageContraption cc && cc.isHiddenInPortal(be.getPos())) {
+            return;
+        }
+        super.setupVisualizer(be, partialTicks);
+    }
+
+    @Override
+    protected void setupActor(MutablePair<StructureBlockInfo, MovementContext> actor, VirtualRenderWorld renderLevel) {
+        if (entity.getContraption() instanceof CarriageContraption cc && cc.isHiddenInPortal(actor.left.pos())) {
+            return;
+        }
+        super.setupActor(actor, renderLevel);
+    }
+
     /**
      * @return True if we're ready to actually animate.
      */
     private boolean checkCarriage(float pt) {
-        if (bogeys != null) {
+        if (numBogeys > 0) {
             return true;
         }
 
         var carriage = entity.getCarriage();
 
         if (entity.validForRender && carriage != null) {
-            bogeys = carriage.bogeys.mapNotNull(bogey -> VisualizedBogey.of(visualizationContext, bogey, pt));
-            updateLight(pt);
+            numBogeys = 0;
+
+            for (var bogey : carriage.bogeys) {
+                if (bogey != null) {
+                    visuals[numBogeys] = AllBogeyStyleRenders.createVisual(bogey.getStyle(), bogey.getSize(), visualizationContext, pt, true);
+                    bogeys[numBogeys] = bogey;
+                    bogeyPos[numBogeys] = bogey.isLeading ? 0 : carriage.bogeySpacing * contraption.getAssemblyDirection().rotateYCounterclockwise()
+                        .getDirection().offset();
+                    numBogeys++;
+                }
+            }
+
             return true;
         }
 
@@ -71,25 +110,23 @@ public class CarriageContraptionVisual extends OrientedContraptionVisual<Carriag
 
         float viewYRot = entity.getViewYRot(partialTick);
         float viewXRot = entity.getViewXRot(partialTick);
-        int bogeySpacing = entity.getCarriage().bogeySpacing;
+        var carriage = entity.getCarriage();
+        int bogeySpacing = carriage.bogeySpacing;
 
         poseStack.push();
 
         Vector3f visualPosition = getVisualPosition(partialTick);
         TransformStack.of(poseStack).translate(visualPosition);
 
-        for (boolean current : Iterate.trueAndFalse) {
-            VisualizedBogey visualizedBogey = bogeys.get(current);
-            if (visualizedBogey == null)
-                continue;
-
-            if (bogeyHidden.get(current)) {
-                visualizedBogey.visual.hide();
+        for (int bogeyIdx = 0; bogeyIdx < numBogeys; bogeyIdx++) {
+            if (contraption.isHiddenInPortal(bogeyPos[bogeyIdx])) {
+                visuals[bogeyIdx].hide();
                 continue;
             }
 
             poseStack.push();
-            CarriageBogey bogey = visualizedBogey.bogey;
+
+            CarriageBogey bogey = bogeys[bogeyIdx];
 
             CarriageContraptionEntityRenderer.translateBogey(
                 poseStack,
@@ -106,7 +143,7 @@ public class CarriageContraptionVisual extends OrientedContraptionVisual<Carriag
             if (bogeyData == null) {
                 bogeyData = new NbtCompound();
             }
-            visualizedBogey.visual.update(bogeyData, bogey.wheelAngle.getValue(partialTick), poseStack);
+            visuals[bogeyIdx].update(bogeyData, bogey.wheelAngle.getValue(partialTick), poseStack);
             poseStack.pop();
         }
 
@@ -114,46 +151,13 @@ public class CarriageContraptionVisual extends OrientedContraptionVisual<Carriag
     }
 
     @Override
-    public void updateLight(float partialTick) {
-        super.updateLight(partialTick);
-
-        if (bogeys == null)
-            return;
-
-        bogeys.forEach(bogey -> {
-            if (bogey != null) {
-                int packedLight = CarriageContraptionEntityRenderer.getBogeyLightCoords(
-                    entity.getWorld(),
-                    bogey.bogey,
-                    () -> entity.getClientCameraPosVec(partialTick)
-                );
-                bogey.visual.updateLight(packedLight);
-            }
-        });
-    }
-
-    @Override
     public void _delete() {
         super._delete();
 
-        if (bogeys == null)
-            return;
-
-        bogeys.forEach(bogey -> {
-            if (bogey != null) {
-                bogey.visual.delete();
+        for (var visual : visuals) {
+            if (visual != null) {
+                visual.delete();
             }
-        });
-    }
-
-    private record VisualizedBogey(CarriageBogey bogey, BogeyVisual visual) {
-        @Nullable
-        static VisualizedBogey of(VisualizationContext ctx, CarriageBogey bogey, float partialTick) {
-            BogeyVisual visual = AllBogeyStyleRenders.createVisual(bogey.getStyle(), bogey.getSize(), ctx, partialTick, true);
-            if (visual == null) {
-                return null;
-            }
-            return new VisualizedBogey(bogey, visual);
         }
     }
 }

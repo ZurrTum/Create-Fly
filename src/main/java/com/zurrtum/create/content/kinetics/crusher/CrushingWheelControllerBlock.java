@@ -4,6 +4,7 @@ import com.mojang.serialization.MapCodec;
 import com.zurrtum.create.*;
 import com.zurrtum.create.catnip.data.Iterate;
 import com.zurrtum.create.foundation.block.IBE;
+import com.zurrtum.create.infrastructure.config.AllConfigs;
 import com.zurrtum.create.infrastructure.items.ItemInventoryProvider;
 import net.minecraft.block.*;
 import net.minecraft.block.entity.BlockEntity;
@@ -183,7 +184,7 @@ public class CrushingWheelControllerBlock extends FacingBlock implements IBE<Cru
                     be.sendData();
 
                     cwbe.award(AllAdvancements.CRUSHING_WHEEL);
-                    if (Math.abs(cwbe.getSpeed()) > 255)
+                    if (Math.abs(cwbe.getSpeed()) > AllConfigs.server().kinetics.maxRotationSpeed.get() - 1)
                         cwbe.award(AllAdvancements.CRUSHER_MAXED);
 
                     break;

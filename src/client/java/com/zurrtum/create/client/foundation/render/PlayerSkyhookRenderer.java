@@ -1,10 +1,12 @@
 package com.zurrtum.create.client.foundation.render;
 
+import com.zurrtum.create.AllItemTags;
 import com.zurrtum.create.catnip.math.AngleHelper;
 import com.zurrtum.create.client.catnip.animation.AnimationTickHolder;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.model.ModelPart;
 import net.minecraft.client.render.entity.model.PlayerEntityModel;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.Arm;
 import net.minecraft.util.math.MathHelper;
 
@@ -22,9 +24,9 @@ public class PlayerSkyhookRenderer {
         hangingPlayers.addAll(uuids);
     }
 
-    public static void afterSetupAnim(UUID uuid, Arm mainArm, PlayerEntityModel model) {
+    public static void afterSetupAnim(UUID uuid, Arm mainArm, ItemStack stack, PlayerEntityModel model) {
         if (hangingPlayers.contains(uuid))
-            setHangingPose(mainArm == Arm.LEFT, model);
+            setHangingPose(mainArm == Arm.LEFT ^ !stack.isIn(AllItemTags.CHAIN_RIDEABLE), model);
     }
 
     private static void setHangingPose(boolean isLeftArmMain, PlayerEntityModel model) {

@@ -1,6 +1,7 @@
 package com.zurrtum.create.client.content.schematics.client;
 
 import com.zurrtum.create.catnip.levelWrappers.SchematicLevel;
+import com.zurrtum.create.client.catnip.animation.AnimationTickHolder;
 import com.zurrtum.create.client.catnip.render.ShadedBlockSbbBuilder;
 import com.zurrtum.create.client.catnip.render.SuperByteBuffer;
 import com.zurrtum.create.client.catnip.render.SuperRenderTypeBuffer;
@@ -9,6 +10,7 @@ import com.zurrtum.create.client.infrastructure.model.WrapperBlockStateModel;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.minecraft.block.BlockRenderType;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.BlockRenderLayer;
 import net.minecraft.client.render.OverlayTexture;
@@ -22,33 +24,29 @@ import net.minecraft.util.math.BlockBox;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.random.Random;
 
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class SchematicRenderer {
 
     private static final ThreadLocal<ThreadLocalObjects> THREAD_LOCAL_OBJECTS = ThreadLocal.withInitial(ThreadLocalObjects::new);
 
     private final Map<BlockRenderLayer, SuperByteBuffer> bufferCache = new LinkedHashMap<>(BlockRenderLayer.values().length);
-    private boolean active;
     private boolean changed;
-    protected SchematicLevel schematic;
-    private BlockPos anchor;
+    protected final SchematicLevel schematic;
+    private final BlockPos anchor;
+    private final List<BlockEntity> renderedBlockEntities = new ArrayList<>();
+    private final BitSet shouldRenderBlockEntities = new BitSet();
+    private final BitSet scratchErroredBlockEntities = new BitSet();
 
-    public SchematicRenderer() {
-        changed = false;
-    }
-
-    public void display(SchematicLevel world) {
+    public SchematicRenderer(SchematicLevel world) {
         this.anchor = world.anchor;
         this.schematic = world;
-        this.active = true;
         this.changed = true;
-    }
 
-    public void setActive(boolean active) {
-        this.active = active;
+        for (var renderedBlockEntity : schematic.getRenderedBlockEntities()) {
+            renderedBlockEntities.add(renderedBlockEntity);
+        }
+        shouldRenderBlockEntities.set(0, renderedBlockEntities.size());
     }
 
     public void update() {
@@ -56,9 +54,6 @@ public class SchematicRenderer {
     }
 
     public void render(MinecraftClient mc, MatrixStack ms, SuperRenderTypeBuffer buffers) {
-        if (!active)
-            return;
-
         if (mc.world == null || mc.player == null)
             return;
         if (changed)
@@ -68,7 +63,21 @@ public class SchematicRenderer {
         bufferCache.forEach((layer, buffer) -> {
             buffer.renderInto(ms, buffers.getBuffer(layer));
         });
-        BlockEntityRenderHelper.renderBlockEntities(schematic, schematic.getRenderedBlockEntities(), ms, buffers);
+        scratchErroredBlockEntities.clear();
+        BlockEntityRenderHelper.renderBlockEntities(
+            renderedBlockEntities,
+            shouldRenderBlockEntities,
+            scratchErroredBlockEntities,
+            null,
+            schematic,
+            ms,
+            null,
+            buffers,
+            AnimationTickHolder.getPartialTicks()
+        );
+
+        // Don't bother looping over errored BEs again.
+        shouldRenderBlockEntities.andNot(scratchErroredBlockEntities);
     }
 
     protected void redraw(MinecraftClient mc) {

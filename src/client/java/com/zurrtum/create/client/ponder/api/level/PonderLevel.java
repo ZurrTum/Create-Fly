@@ -378,7 +378,10 @@ public class PonderLevel extends SchematicLevel {
         if (chunks == null) {
             chunks = new Long2ObjectOpenHashMap<>();
         }
-        return chunks.computeIfAbsent(ChunkPos.toLong(x, z), $ -> new PonderChunk(this, x, z));
+        return chunks.computeIfAbsent(
+            ChunkPos.toLong(x, z),
+            packedPos -> new PonderChunk(this, ChunkPos.getPackedX(packedPos), ChunkPos.getPackedZ(packedPos))
+        );
     }
 
     @Override

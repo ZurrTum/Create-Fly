@@ -43,7 +43,7 @@ public class ChainConveyorRidingHandler {
             return;
         if (mc.isPaused())
             return;
-        if (!mc.player.getMainHandStack().isIn(AllItemTags.CHAIN_RIDEABLE)) {
+        if (!mc.player.isHolding(i -> i.isIn(AllItemTags.CHAIN_RIDEABLE))) {
             stopRiding(mc);
             return;
         }

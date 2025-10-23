@@ -15,7 +15,6 @@ import com.zurrtum.create.content.contraptions.actors.trainControls.ControlsBloc
 import com.zurrtum.create.content.contraptions.minecart.TrainCargoManager;
 import com.zurrtum.create.content.trains.bogey.AbstractBogeyBlock;
 import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.storage.ReadView;
 import net.minecraft.storage.WriteView;
@@ -172,14 +171,6 @@ public class CarriageContraption extends Contraption {
     }
 
     @Override
-    protected BlockEntity readBlockEntity(World level, StructureBlockInfo info, ReadView view) {
-        if (info.state().getBlock() instanceof AbstractBogeyBlock<?> bogey && !bogey.captureBlockEntityForTrain())
-            return null; // Bogeys are typically rendered by the carriage contraption, not the BE
-
-        return super.readBlockEntity(level, info, view);
-    }
-
-    @Override
     public void write(WriteView view, boolean spawnPacket) {
         super.write(view, spawnPacket);
         view.put("AssemblyDirection", Direction.CODEC, getAssemblyDirection());
@@ -241,34 +232,6 @@ public class CarriageContraption extends Contraption {
         return secondBogeyPos;
     }
 
-    private Collection<BlockEntity> renderedBEsOutsidePortal = new ArrayList<>();
-
-    @Override
-    public RenderedBlocks getRenderedBlocks() {
-        if (notInPortal())
-            return super.getRenderedBlocks();
-
-        renderedBEsOutsidePortal = new ArrayList<>();
-        renderedBlockEntities.stream().filter(be -> !isHiddenInPortal(be.getPos())).forEach(renderedBEsOutsidePortal::add);
-
-        Map<BlockPos, BlockState> values = new HashMap<>();
-        blocks.forEach((pos, info) -> {
-            if (withinVisible(pos)) {
-                values.put(pos, info.state());
-            } else if (atSeam(pos)) {
-                values.put(pos, Blocks.PURPLE_STAINED_GLASS.getDefaultState());
-            }
-        });
-        return new RenderedBlocks(pos -> values.getOrDefault(pos, Blocks.AIR.getDefaultState()), values.keySet());
-    }
-
-    @Override
-    public Collection<BlockEntity> getRenderedBEs() {
-        if (notInPortal())
-            return super.getRenderedBEs();
-        return renderedBEsOutsidePortal;
-    }
-
     @Override
     public Optional<List<Box>> getSimplifiedEntityColliders() {
         if (notInPortal())
@@ -280,7 +243,16 @@ public class CarriageContraption extends Contraption {
     public boolean isHiddenInPortal(BlockPos localPos) {
         if (notInPortal())
             return super.isHiddenInPortal(localPos);
-        return !withinVisible(localPos) || atSeam(localPos);
+        Direction facing = assemblyDirection;
+        Axis axis = facing.rotateYClockwise().getAxis();
+        int coord = axis.choose(localPos.getZ(), localPos.getY(), localPos.getX()) * -facing.getDirection().offset();
+        return !withinVisible(coord) || atSeam(coord);
+    }
+
+    public boolean isHiddenInPortal(int posAlongMovementAxis) {
+        if (notInPortal())
+            return false;
+        return !withinVisible(posAlongMovementAxis) || atSeam(posAlongMovementAxis);
     }
 
     public boolean notInPortal() {
@@ -298,7 +270,15 @@ public class CarriageContraption extends Contraption {
         Direction facing = assemblyDirection;
         Axis axis = facing.rotateYClockwise().getAxis();
         int coord = axis.choose(localPos.getZ(), localPos.getY(), localPos.getX()) * -facing.getDirection().offset();
-        return coord > portalCutoffMin && coord < portalCutoffMax;
+        return withinVisible(coord);
+    }
+
+    public boolean atSeam(int posAlongMovementAxis) {
+        return posAlongMovementAxis == portalCutoffMin || posAlongMovementAxis == portalCutoffMax;
+    }
+
+    public boolean withinVisible(int posAlongMovementAxis) {
+        return posAlongMovementAxis > portalCutoffMin && posAlongMovementAxis < portalCutoffMax;
     }
 
     @Override

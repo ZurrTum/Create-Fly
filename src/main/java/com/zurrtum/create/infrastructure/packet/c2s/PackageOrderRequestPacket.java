@@ -2,7 +2,7 @@ package com.zurrtum.create.infrastructure.packet.c2s;
 
 import com.zurrtum.create.AllHandle;
 import com.zurrtum.create.AllPackets;
-import com.zurrtum.create.content.logistics.stockTicker.PackageOrderWithCrafts;
+import com.zurrtum.create.infrastructure.component.PackageOrderWithCrafts;
 import net.minecraft.network.RegistryByteBuf;
 import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.network.codec.PacketCodecs;

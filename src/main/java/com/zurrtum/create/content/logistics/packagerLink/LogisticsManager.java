@@ -11,8 +11,8 @@ import com.zurrtum.create.content.logistics.packager.InventorySummary;
 import com.zurrtum.create.content.logistics.packager.PackagerBlockEntity;
 import com.zurrtum.create.content.logistics.packager.PackagingRequest;
 import com.zurrtum.create.content.logistics.packagerLink.LogisticallyLinkedBehaviour.RequestType;
-import com.zurrtum.create.content.logistics.stockTicker.PackageOrderWithCrafts;
 import com.zurrtum.create.foundation.utility.TickBasedCache;
+import com.zurrtum.create.infrastructure.component.PackageOrderWithCrafts;
 import net.minecraft.item.ItemStack;
 import org.apache.commons.lang3.mutable.MutableBoolean;
 import org.jetbrains.annotations.Nullable;
@@ -101,7 +101,31 @@ public class LogisticsManager {
         Multimap<PackagerBlockEntity, PackagingRequest> requests = HashMultimap.create();
 
         // Packages need to track their index and successors for successful defrag
-        Iterable<LogisticallyLinkedBehaviour> availableLinks = LogisticallyLinkedBehaviour.getAllPresent(freqId, true);
+        Iterable<LogisticallyLinkedBehaviour> allAvailableLinks = LogisticallyLinkedBehaviour.getAllPresent(freqId, true);
+
+        // Group links by InventoryIdentifier and randomly select one from each group
+        Map<InventoryIdentifier, List<LogisticallyLinkedBehaviour>> linksByInventory = new HashMap<>();
+        List<LogisticallyLinkedBehaviour> availableLinks = new ArrayList<>();
+
+        // Group links by their inventory identifier
+        for (LogisticallyLinkedBehaviour link : allAvailableLinks) {
+            InventoryIdentifier inventoryId = getInventoryIdentifierFromLink(link);
+            if (inventoryId != null) {
+                linksByInventory.computeIfAbsent(inventoryId, k -> new ArrayList<>()).add(link);
+            } else {
+                // Links without inventory identifier are added directly
+                availableLinks.add(link);
+            }
+        }
+
+        // Randomly select one link from each inventory group
+        for (List<LogisticallyLinkedBehaviour> linkGroup : linksByInventory.values()) {
+            if (!linkGroup.isEmpty()) {
+                LogisticallyLinkedBehaviour selectedLink = linkGroup.get(r.nextInt(linkGroup.size()));
+                availableLinks.add(selectedLink);
+            }
+        }
+
         List<LogisticallyLinkedBehaviour> usedLinks = new ArrayList<>();
         MutableBoolean finalLinkTracker = new MutableBoolean(false);
 

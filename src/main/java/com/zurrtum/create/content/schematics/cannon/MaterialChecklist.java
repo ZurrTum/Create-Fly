@@ -3,9 +3,9 @@ package com.zurrtum.create.content.schematics.cannon;
 import com.google.common.collect.Sets;
 import com.zurrtum.create.AllDataComponents;
 import com.zurrtum.create.AllItems;
-import com.zurrtum.create.content.equipment.clipboard.ClipboardOverrides;
 import com.zurrtum.create.content.schematics.requirement.ItemRequirement;
 import com.zurrtum.create.content.schematics.requirement.ItemRequirement.ItemUseType;
+import com.zurrtum.create.infrastructure.component.ClipboardContent;
 import com.zurrtum.create.infrastructure.component.ClipboardEntry;
 import com.zurrtum.create.infrastructure.component.ClipboardType;
 import it.unimi.dsi.fastutil.objects.Object2IntArrayMap;
@@ -17,7 +17,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.text.*;
 import net.minecraft.util.Formatting;
-import net.minecraft.util.Unit;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -147,7 +146,6 @@ public class MaterialChecklist {
     }
 
     public ItemStack createWrittenClipboard() {
-        ItemStack clipboard = AllItems.CLIPBOARD.getDefaultStack();
         int itemsWritten = 0;
 
         List<List<ClipboardEntry>> pages = new ArrayList<>();
@@ -203,17 +201,17 @@ public class MaterialChecklist {
         }
 
         pages.add(currentPage);
-        ClipboardEntry.saveAll(pages, clipboard);
-        ClipboardOverrides.switchTo(ClipboardType.WRITTEN, clipboard);
+
+        ItemStack clipboard = AllItems.CLIPBOARD.getDefaultStack();
+        clipboard.set(AllDataComponents.CLIPBOARD_CONTENT, new ClipboardContent(ClipboardType.WRITTEN, pages, true));
         clipboard.set(DataComponentTypes.CUSTOM_NAME, Text.translatable("create.materialChecklist").setStyle(Style.EMPTY.withItalic(false)));
-        clipboard.set(AllDataComponents.CLIPBOARD_READ_ONLY, Unit.INSTANCE);
         return clipboard;
     }
 
     public int getRequiredAmount(Item item) {
         int amount = required.getOrDefault(item, 0);
         if (damageRequired.containsKey(item))
-            amount += Math.ceil(damageRequired.getInt(item) / (float) new ItemStack(item).getMaxDamage());
+            amount += (int) Math.ceil(damageRequired.getInt(item) / (float) new ItemStack(item).getMaxDamage());
         return amount;
     }
 

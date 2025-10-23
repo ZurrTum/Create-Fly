@@ -1,6 +1,7 @@
 package com.zurrtum.create.content.logistics.filter;
 
 import com.zurrtum.create.AllDataComponents;
+import com.zurrtum.create.AllItems;
 import com.zurrtum.create.AllMenuTypes;
 import com.zurrtum.create.infrastructure.items.ItemStackHandler;
 import net.minecraft.entity.player.PlayerInventory;
@@ -37,7 +38,7 @@ public class FilterMenu extends AbstractFilterMenu {
 
     @Override
     protected ItemStackHandler createGhostInventory() {
-        return FilterItem.getFilterItems(contentHolder);
+        return AllItems.FILTER.getFilterItemHandler(contentHolder);
     }
 
     @Override

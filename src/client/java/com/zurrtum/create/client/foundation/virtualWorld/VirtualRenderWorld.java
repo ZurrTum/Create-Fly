@@ -65,17 +65,11 @@ public class VirtualRenderWorld extends World implements VisualizationLevel {
 
     protected final BlockPos.Mutable scratchPos = new BlockPos.Mutable();
 
+    protected final Runnable onBlockUpdated;
+
     private int externalPackedLight = 0;
 
-    public VirtualRenderWorld(World level) {
-        this(level, Vec3i.ZERO);
-    }
-
-    public VirtualRenderWorld(World level, Vec3i biomeOffset) {
-        this(level, level.getBottomY(), level.getHeight(), biomeOffset);
-    }
-
-    public VirtualRenderWorld(World level, int minBuildHeight, int height, Vec3i biomeOffset) {
+    public VirtualRenderWorld(World level, int minBuildHeight, int height, Vec3i biomeOffset, Runnable onBlockUpdated) {
         super(
             (MutableWorldProperties) level.getLevelProperties(),
             level.getRegistryKey(),
@@ -93,6 +87,7 @@ public class VirtualRenderWorld extends World implements VisualizationLevel {
 
         this.chunkSource = new VirtualChunkSource(this);
         this.lightEngine = new LightingProvider(chunkSource, true, false);
+        this.onBlockUpdated = onBlockUpdated;
     }
 
     /**
@@ -122,6 +117,11 @@ public class VirtualRenderWorld extends World implements VisualizationLevel {
     }
 
     @Override
+    public void updateListeners(BlockPos pos, BlockState oldState, BlockState newState, int flags) {
+        onBlockUpdated.run();
+    }
+
+    @Override
     public int getLightLevel(LightType lightType, BlockPos blockPos) {
         var selfBrightness = super.getLightLevel(lightType, blockPos);
 
@@ -143,8 +143,6 @@ public class VirtualRenderWorld extends World implements VisualizationLevel {
         });
 
         nonEmptyBlockCounts.clear();
-
-        runLightEngine();
     }
 
     public void setBlockEntities(Collection<BlockEntity> blockEntities) {
@@ -386,10 +384,6 @@ public class VirtualRenderWorld extends World implements VisualizationLevel {
     }
 
     // UNIMPORTANT IMPLEMENTATIONS
-
-    @Override
-    public void updateListeners(BlockPos pos, BlockState oldState, BlockState newState, int flags) {
-    }
 
     @Override
     public void playSound(
