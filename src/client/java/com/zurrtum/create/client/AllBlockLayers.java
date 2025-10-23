@@ -160,22 +160,6 @@ public class AllBlockLayers {
         register(VERTICAL_FRAMED_GLASS, BlockRenderLayer.CUTOUT);
         register(WEATHERED_IRON_WINDOW, BlockRenderLayer.TRANSLUCENT);
         register(WEATHERED_IRON_WINDOW_PANE, BlockRenderLayer.TRANSLUCENT);
-        register(ORANGE_NIXIE_TUBE, BlockRenderLayer.TRANSLUCENT);
-        register(WHITE_NIXIE_TUBE, BlockRenderLayer.TRANSLUCENT);
-        register(MAGENTA_NIXIE_TUBE, BlockRenderLayer.TRANSLUCENT);
-        register(LIGHT_BLUE_NIXIE_TUBE, BlockRenderLayer.TRANSLUCENT);
-        register(YELLOW_NIXIE_TUBE, BlockRenderLayer.TRANSLUCENT);
-        register(LIME_NIXIE_TUBE, BlockRenderLayer.TRANSLUCENT);
-        register(PINK_NIXIE_TUBE, BlockRenderLayer.TRANSLUCENT);
-        register(GRAY_NIXIE_TUBE, BlockRenderLayer.TRANSLUCENT);
-        register(LIGHT_GRAY_NIXIE_TUBE, BlockRenderLayer.TRANSLUCENT);
-        register(CYAN_NIXIE_TUBE, BlockRenderLayer.TRANSLUCENT);
-        register(PURPLE_NIXIE_TUBE, BlockRenderLayer.TRANSLUCENT);
-        register(BLUE_NIXIE_TUBE, BlockRenderLayer.TRANSLUCENT);
-        register(BROWN_NIXIE_TUBE, BlockRenderLayer.TRANSLUCENT);
-        register(GREEN_NIXIE_TUBE, BlockRenderLayer.TRANSLUCENT);
-        register(RED_NIXIE_TUBE, BlockRenderLayer.TRANSLUCENT);
-        register(BLACK_NIXIE_TUBE, BlockRenderLayer.TRANSLUCENT);
         register(BIRCH_WINDOW, BlockRenderLayer.TRANSLUCENT);
         register(BIRCH_WINDOW_PANE, BlockRenderLayer.TRANSLUCENT);
     }

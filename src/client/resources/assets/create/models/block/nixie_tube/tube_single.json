@@ -1,0 +1,20 @@
+{
+  "parent": "block/block",
+  "textures": {
+    "0": "create:block/nixie_tube",
+    "particle": "create:block/nixie_tube"
+  },
+  "elements": [
+    {
+      "from": [-3, -4.5, -3],
+      "to": [3, 4.5, 3],
+      "faces": {
+        "north": { "uv": [0, 1, 6, 10], "texture": "#0" },
+        "east": { "uv": [0, 1, 6, 10], "texture": "#0" },
+        "south": { "uv": [0, 1, 6, 10], "texture": "#0" },
+        "west": { "uv": [0, 1, 6, 10], "texture": "#0" },
+        "up": { "uv": [6, 0, 12, 6], "rotation": 180, "texture": "#0" }
+      }
+    }
+  ]
+}

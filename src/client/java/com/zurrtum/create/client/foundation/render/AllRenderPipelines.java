@@ -18,6 +18,8 @@ public class AllRenderPipelines {
         .withVertexFormat(VertexFormats.POSITION_COLOR_TEXTURE_OVERLAY_LIGHT_NORMAL, VertexFormat.DrawMode.QUADS).buildSnippet();
     public static final RenderPipeline ADDITIVE = RenderPipeline.builder(RenderPipelines.TERRAIN_SNIPPET)
         .withLocation(Identifier.of(MOD_ID, "pipeline/additive")).withBlend(BlendFunction.ADDITIVE).withCull(false).build();
+    public static final RenderPipeline ADDITIVE2 = RenderPipeline.builder(RenderPipelines.TERRAIN_SNIPPET)
+        .withLocation(Identifier.of(MOD_ID, "pipeline/additive2")).withBlend(BlendFunction.ADDITIVE).withCull(false).withDepthWrite(false).build();
     public static final RenderPipeline GLOWING = RenderPipeline.builder(GLOWING_SNIPPET).withLocation(Identifier.of(MOD_ID, "pipeline/glowing"))
         .withBlend(new BlendFunction(SourceFactor.SRC_ALPHA, DestFactor.ONE_MINUS_SRC_ALPHA, SourceFactor.SRC_ALPHA, DestFactor.ONE_MINUS_SRC_ALPHA))
         .build();
