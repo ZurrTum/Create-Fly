@@ -53,7 +53,7 @@ public class PonderRenderTypes {
         true,
         true,
         RenderPipelines.TRANSLUCENT,
-        MultiPhaseParameters.builder().lightmap(ENABLE_LIGHTMAP).texture(MIPMAP_BLOCK_ATLAS_TEXTURE).target(TRANSLUCENT_TARGET).build(true)
+        MultiPhaseParameters.builder().lightmap(ENABLE_LIGHTMAP).texture(MIPMAP_BLOCK_ATLAS_TEXTURE).target(ITEM_ENTITY_TARGET).build(true)
     );
 
     private static final RenderLayer OUTLINE_SOLID = RenderLayer.of(
@@ -81,7 +81,7 @@ public class PonderRenderTypes {
         false,
         true,
         RenderPipelines.TRANSLUCENT,
-        MultiPhaseParameters.builder().texture(MIPMAP_BLOCK_ATLAS_TEXTURE).lightmap(ENABLE_LIGHTMAP).target(TRANSLUCENT_TARGET).build(true)
+        MultiPhaseParameters.builder().texture(MIPMAP_BLOCK_ATLAS_TEXTURE).lightmap(ENABLE_LIGHTMAP).target(ITEM_ENTITY_TARGET).build(true)
     );
 
     public static RenderLayer getGui() {
