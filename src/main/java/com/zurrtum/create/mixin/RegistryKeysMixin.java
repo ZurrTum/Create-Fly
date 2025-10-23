@@ -20,4 +20,12 @@ public class RegistryKeysMixin {
             cir.setReturnValue(id.getPath());
         }
     }
+
+    @Inject(method = "getTagPath(Lnet/minecraft/registry/RegistryKey;)Ljava/lang/String;", at = @At("HEAD"), cancellable = true)
+    private static void getTagPath(RegistryKey<? extends Registry<?>> registryRef, CallbackInfoReturnable<String> cir) {
+        Identifier id = registryRef.getValue();
+        if (id.getNamespace().equals(MOD_ID)) {
+            cir.setReturnValue("tags/" + id.getPath());
+        }
+    }
 }
