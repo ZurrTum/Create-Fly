@@ -10,6 +10,7 @@ import com.zurrtum.create.client.foundation.render.RenderTypes;
 import com.zurrtum.create.content.redstone.displayLink.LinkWithBulbBlockEntity;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.render.LightmapTextureManager;
+import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.block.entity.BlockEntityRendererFactory;
 import net.minecraft.client.util.math.MatrixStack;
@@ -23,15 +24,6 @@ public class LinkBulbRenderer extends SafeBlockEntityRenderer<LinkWithBulbBlockE
 
     @Override
     protected void renderSafe(LinkWithBulbBlockEntity be, float partialTicks, MatrixStack ms, VertexConsumerProvider buffer, int light, int overlay) {
-        float glow = be.getGlow(partialTicks);
-        if (glow < .125f)
-            return;
-
-        glow = (float) (1 - (2 * Math.pow(glow - .75f, 2)));
-        glow = MathHelper.clamp(glow, -1, 1);
-
-        int color = (int) (200 * glow);
-
         BlockState blockState = be.getCachedState();
         var msr = TransformStack.of(ms);
 
@@ -41,12 +33,21 @@ public class LinkBulbRenderer extends SafeBlockEntityRenderer<LinkWithBulbBlockE
 
         msr.center().rotateYDegrees(AngleHelper.horizontalAngle(face) + 180).rotateXDegrees(-AngleHelper.verticalAngle(face) - 90).uncenter();
 
+        RenderLayer translucent;
+        float glow = be.getGlow(partialTicks);
+        if (glow >= .125f) {
+            translucent = RenderTypes.translucent();
+            glow = (float) (1 - (2 * Math.pow(glow - .75f, 2)));
+            glow = MathHelper.clamp(glow, -1, 1);
+            int color = (int) (200 * glow);
+            CachedBuffers.partial(AllPartialModels.DISPLAY_LINK_GLOW, blockState).translate(be.getBulbOffset(blockState))
+                .light(LightmapTextureManager.MAX_LIGHT_COORDINATE).color(color, color, color, 255).disableDiffuse()
+                .renderInto(ms, buffer.getBuffer(RenderTypes.additive()));
+        } else {
+            translucent = PonderRenderTypes.translucent();
+        }
         CachedBuffers.partial(AllPartialModels.DISPLAY_LINK_TUBE, blockState).translate(be.getBulbOffset(blockState))
-            .light(LightmapTextureManager.MAX_LIGHT_COORDINATE).renderInto(ms, buffer.getBuffer(PonderRenderTypes.translucent()));
-
-        CachedBuffers.partial(AllPartialModels.DISPLAY_LINK_GLOW, blockState).translate(be.getBulbOffset(blockState))
-            .light(LightmapTextureManager.MAX_LIGHT_COORDINATE).color(color, color, color, 255).disableDiffuse()
-            .renderInto(ms, buffer.getBuffer(RenderTypes.additive()));
+            .light(LightmapTextureManager.MAX_LIGHT_COORDINATE).renderInto(ms, buffer.getBuffer(translucent));
 
         ms.pop();
     }
