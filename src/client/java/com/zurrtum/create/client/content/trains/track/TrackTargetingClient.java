@@ -6,7 +6,6 @@ import com.zurrtum.create.client.AllTrackRenders;
 import com.zurrtum.create.client.catnip.render.SuperRenderTypeBuffer;
 import com.zurrtum.create.client.content.trains.GlobalRailwayManagerClient;
 import com.zurrtum.create.client.content.trains.track.TrackBlockOutline.BezierPointSelection;
-import com.zurrtum.create.client.flywheel.lib.transform.TransformStack;
 import com.zurrtum.create.content.trains.graph.EdgePointType;
 import com.zurrtum.create.content.trains.graph.TrackGraphLocation;
 import com.zurrtum.create.content.trains.track.ITrackBlock;
@@ -17,8 +16,6 @@ import com.zurrtum.create.infrastructure.component.BezierTrackPointLocation;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.client.render.OverlayTexture;
-import net.minecraft.client.render.WorldRenderer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.hit.BlockHitResult;
@@ -117,7 +114,6 @@ public class TrackTargetingClient {
             return;
 
         BlockPos pos = lastHovered;
-        int light = WorldRenderer.getLightmapCoordinates(mc.world, pos);
         AxisDirection direction = lastDirection ? AxisDirection.POSITIVE : AxisDirection.NEGATIVE;
 
         RenderedTrackOverlayType type = lastType == EdgePointType.SIGNAL ? RenderedTrackOverlayType.SIGNAL : lastType == EdgePointType.OBSERVER ? RenderedTrackOverlayType.OBSERVER : RenderedTrackOverlayType.STATION;
@@ -128,20 +124,8 @@ public class TrackTargetingClient {
         TrackBlockRenderer renderer = AllTrackRenders.get(track);
         if (renderer != null) {
             ms.push();
-            TransformStack.of(ms).translate(Vec3d.of(pos).subtract(camera));
-            renderer.render(
-                mc.world,
-                state,
-                pos,
-                direction,
-                lastHoveredBezierSegment,
-                ms,
-                buffer,
-                light,
-                OverlayTexture.DEFAULT_UV,
-                type,
-                1 + 1 / 16f
-            );
+            ms.translate(Vec3d.of(pos).subtract(camera));
+            renderer.getRenderState(mc.world, state, pos, direction, lastHoveredBezierSegment, type, 1 + 1 / 16f).render(ms, buffer);
             ms.pop();
         }
     }
