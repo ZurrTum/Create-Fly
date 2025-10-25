@@ -1,66 +1,58 @@
 package com.zurrtum.create.client.content.trains.bogey;
 
 import com.zurrtum.create.AllBlocks;
-import com.zurrtum.create.catnip.data.Iterate;
 import com.zurrtum.create.catnip.math.AngleHelper;
 import com.zurrtum.create.client.AllPartialModels;
 import com.zurrtum.create.client.AllSpriteShifts;
 import com.zurrtum.create.client.catnip.render.CachedBuffers;
-import com.zurrtum.create.client.catnip.render.SuperByteBuffer;
+import com.zurrtum.create.client.content.trains.bogey.BogeyBlockEntityRenderer.BogeyBlockEntityRenderState;
+import com.zurrtum.create.client.content.trains.bogey.BogeyBlockEntityRenderer.BogeyRenderState;
 import com.zurrtum.create.content.kinetics.simpleRelays.ShaftBlock;
+import com.zurrtum.create.content.trains.bogey.AbstractBogeyBlockEntity;
+import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.client.render.RenderLayer;
-import net.minecraft.client.render.VertexConsumer;
-import net.minecraft.client.render.VertexConsumerProvider;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.nbt.NbtCompound;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.Vec3d;
 
 public class StandardBogeyRenderer implements BogeyRenderer {
+    public static void updateRenderState(StandardBogeyRenderState data, BogeyBlockEntityRenderState state) {
+        data.layer = RenderLayer.getCutoutMipped();
+        data.shaft = CachedBuffers.block(AllBlocks.SHAFT.getDefaultState().with(ShaftBlock.AXIS, Direction.Axis.Z));
+        data.angle = MathHelper.RADIANS_PER_DEGREE * state.angle;
+        data.light = state.lightmapCoordinates;
+        data.offset = -1.5 - 1 / 128f;
+    }
+
     @Override
-    public void render(
-        NbtCompound bogeyData,
-        float wheelAngle,
-        float partialTick,
-        MatrixStack poseStack,
-        VertexConsumerProvider bufferSource,
-        int light,
-        int overlay,
+    public BogeyRenderState getRenderData(
+        AbstractBogeyBlockEntity be,
+        BogeyBlockEntityRenderState state,
+        float tickProgress,
+        Vec3d cameraPos,
         boolean inContraption
     ) {
-        VertexConsumer buffer = bufferSource.getBuffer(RenderLayer.getCutoutMipped());
-
-        SuperByteBuffer shaft = CachedBuffers.block(AllBlocks.SHAFT.getDefaultState().with(ShaftBlock.AXIS, Direction.Axis.Z));
-        for (int i : Iterate.zeroAndOne) {
-            shaft.translate(-.5f, .25f, i * -1).center().rotateZDegrees(wheelAngle).uncenter().light(light).overlay(overlay)
-                .renderInto(poseStack, buffer);
-        }
+        StandardBogeyRenderState data = new StandardBogeyRenderState();
+        updateRenderState(data, state);
+        return data;
     }
 
     public static class Small extends StandardBogeyRenderer {
         @Override
-        public void render(
-            NbtCompound bogeyData,
-            float wheelAngle,
-            float partialTick,
-            MatrixStack poseStack,
-            VertexConsumerProvider bufferSource,
-            int light,
-            int overlay,
+        public BogeyRenderState getRenderData(
+            AbstractBogeyBlockEntity be,
+            BogeyBlockEntityRenderState state,
+            float tickProgress,
+            Vec3d cameraPos,
             boolean inContraption
         ) {
-            super.render(bogeyData, wheelAngle, partialTick, poseStack, bufferSource, light, overlay, inContraption);
-
-            VertexConsumer buffer = bufferSource.getBuffer(RenderLayer.getCutoutMipped());
-
-            CachedBuffers.partial(AllPartialModels.BOGEY_FRAME, Blocks.AIR.getDefaultState()).scale(1 - 1 / 512f).light(light).overlay(overlay)
-                .renderInto(poseStack, buffer);
-
-            SuperByteBuffer wheels = CachedBuffers.partial(AllPartialModels.SMALL_BOGEY_WHEELS, Blocks.AIR.getDefaultState());
-            for (int side : Iterate.positiveAndNegative) {
-                wheels.translate(0, 12 / 16f, side).rotateXDegrees(wheelAngle).light(light).overlay(overlay).renderInto(poseStack, buffer);
-            }
+            SmallBogeyRenderState data = new SmallBogeyRenderState();
+            updateRenderState(data, state);
+            BlockState air = Blocks.AIR.getDefaultState();
+            data.frame = CachedBuffers.partial(AllPartialModels.BOGEY_FRAME, air);
+            data.wheels = CachedBuffers.partial(AllPartialModels.SMALL_BOGEY_WHEELS, air);
+            return data;
         }
     }
 
@@ -69,46 +61,28 @@ public class StandardBogeyRenderer implements BogeyRenderer {
         public static final float BELT_RADIUS_IN_UV_SPACE = BELT_RADIUS_PX / 16f;
 
         @Override
-        public void render(
-            NbtCompound bogeyData,
-            float wheelAngle,
-            float partialTick,
-            MatrixStack poseStack,
-            VertexConsumerProvider bufferSource,
-            int light,
-            int overlay,
+        public BogeyRenderState getRenderData(
+            AbstractBogeyBlockEntity be,
+            BogeyBlockEntityRenderState state,
+            float tickProgress,
+            Vec3d cameraPos,
             boolean inContraption
         ) {
-            super.render(bogeyData, wheelAngle, partialTick, poseStack, bufferSource, light, overlay, inContraption);
-
-            VertexConsumer buffer = bufferSource.getBuffer(RenderLayer.getCutoutMipped());
-
-            SuperByteBuffer secondaryShaft = CachedBuffers.block(AllBlocks.SHAFT.getDefaultState().with(ShaftBlock.AXIS, Direction.Axis.X));
-            for (int i : Iterate.zeroAndOne) {
-                secondaryShaft.translate(-.5f, .25f, .5f + i * -2).center().rotateXDegrees(wheelAngle).uncenter().light(light).overlay(overlay)
-                    .renderInto(poseStack, buffer);
-            }
-
-            CachedBuffers.partial(AllPartialModels.BOGEY_DRIVE, Blocks.AIR.getDefaultState()).scale(1 - 1 / 512f).light(light).overlay(overlay)
-                .renderInto(poseStack, buffer);
-
+            LargeBogeyRenderState data = new LargeBogeyRenderState();
+            updateRenderState(data, state);
+            data.secondaryShaft = CachedBuffers.block(AllBlocks.SHAFT.getDefaultState().with(ShaftBlock.AXIS, Direction.Axis.X));
+            BlockState air = Blocks.AIR.getDefaultState();
+            data.drive = CachedBuffers.partial(AllPartialModels.BOGEY_DRIVE, air);
+            data.belt = CachedBuffers.partial(AllPartialModels.BOGEY_DRIVE_BELT, air);
             float spriteSize = AllSpriteShifts.BOGEY_BELT.getTarget().getMaxV() - AllSpriteShifts.BOGEY_BELT.getTarget().getMinV();
-
-            float scroll = BELT_RADIUS_IN_UV_SPACE * MathHelper.RADIANS_PER_DEGREE * wheelAngle;
+            float scroll = BELT_RADIUS_IN_UV_SPACE * MathHelper.RADIANS_PER_DEGREE * state.angle;
             scroll = scroll - MathHelper.floor(scroll);
-            scroll = scroll * spriteSize * 0.5f;
-
-            CachedBuffers.partial(AllPartialModels.BOGEY_DRIVE_BELT, Blocks.AIR.getDefaultState()).scale(1 - 1 / 512f).light(light).overlay(overlay)
-                .shiftUVScrolling(AllSpriteShifts.BOGEY_BELT, scroll).renderInto(poseStack, buffer);
-
-            CachedBuffers.partial(AllPartialModels.BOGEY_PISTON, Blocks.AIR.getDefaultState())
-                .translate(0, 0, 1 / 4f * Math.sin(AngleHelper.rad(wheelAngle))).light(light).overlay(overlay).renderInto(poseStack, buffer);
-
-            CachedBuffers.partial(AllPartialModels.LARGE_BOGEY_WHEELS, Blocks.AIR.getDefaultState()).translate(0, 1, 0).rotateXDegrees(wheelAngle)
-                .light(light).overlay(overlay).renderInto(poseStack, buffer);
-
-            CachedBuffers.partial(AllPartialModels.BOGEY_PIN, Blocks.AIR.getDefaultState()).translate(0, 1, 0).rotateXDegrees(wheelAngle)
-                .translate(0, 1 / 4f, 0).rotateXDegrees(-wheelAngle).light(light).overlay(overlay).renderInto(poseStack, buffer);
+            data.scroll = scroll * spriteSize * 0.5f;
+            data.piston = CachedBuffers.partial(AllPartialModels.BOGEY_PISTON, air);
+            data.pistonOffset = (float) (1 / 4f * Math.sin(AngleHelper.rad(state.angle)));
+            data.wheels = CachedBuffers.partial(AllPartialModels.LARGE_BOGEY_WHEELS, air);
+            data.pin = CachedBuffers.partial(AllPartialModels.BOGEY_PIN, air);
+            return data;
         }
     }
 }

@@ -1,18 +1,16 @@
 package com.zurrtum.create.client.content.trains.bogey;
 
-import net.minecraft.client.render.VertexConsumerProvider;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.nbt.NbtCompound;
+import com.zurrtum.create.client.content.trains.bogey.BogeyBlockEntityRenderer.BogeyBlockEntityRenderState;
+import com.zurrtum.create.client.content.trains.bogey.BogeyBlockEntityRenderer.BogeyRenderState;
+import com.zurrtum.create.content.trains.bogey.AbstractBogeyBlockEntity;
+import net.minecraft.util.math.Vec3d;
 
 public interface BogeyRenderer {
-    void render(
-        NbtCompound bogeyData,
-        float wheelAngle,
-        float partialTick,
-        MatrixStack poseStack,
-        VertexConsumerProvider bufferSource,
-        int packedLight,
-        int packedOverlay,
+    BogeyRenderState getRenderData(
+        AbstractBogeyBlockEntity be,
+        BogeyBlockEntityRenderState state,
+        float tickProgress,
+        Vec3d cameraPos,
         boolean inContraption
     );
 }

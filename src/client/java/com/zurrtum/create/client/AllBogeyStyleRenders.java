@@ -1,15 +1,16 @@
 package com.zurrtum.create.client;
 
 import com.zurrtum.create.AllBogeyStyles;
+import com.zurrtum.create.client.content.trains.bogey.BogeyBlockEntityRenderer.BogeyBlockEntityRenderState;
+import com.zurrtum.create.client.content.trains.bogey.BogeyBlockEntityRenderer.BogeyRenderState;
 import com.zurrtum.create.client.content.trains.bogey.BogeyVisual;
 import com.zurrtum.create.client.content.trains.bogey.SizeRenderer;
 import com.zurrtum.create.client.flywheel.api.visualization.VisualizationContext;
+import com.zurrtum.create.content.trains.bogey.AbstractBogeyBlockEntity;
 import com.zurrtum.create.content.trains.bogey.BogeySize;
 import com.zurrtum.create.content.trains.bogey.BogeyStyle;
-import net.minecraft.client.render.VertexConsumerProvider;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.nbt.NbtCompound;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.math.Vec3d;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
@@ -21,26 +22,18 @@ import java.util.function.Supplier;
 public class AllBogeyStyleRenders {
     public static final Map<Identifier, Map<BogeySize, SizeRenderer>> ALL = new HashMap<>();
 
-    public static void render(
-        BogeyStyle style,
-        BogeySize size,
-        float partialTick,
-        MatrixStack poseStack,
-        VertexConsumerProvider buffers,
-        int light,
-        int overlay,
-        float wheelAngle,
-        @Nullable NbtCompound bogeyData,
+    public static BogeyRenderState getRenderData(
+        AbstractBogeyBlockEntity be,
+        BogeyBlockEntityRenderState state,
+        float tickProgress,
+        Vec3d cameraPos,
         boolean inContraption
     ) {
-        Map<BogeySize, SizeRenderer> sizeRenderers = ALL.get(style.id);
+        Map<BogeySize, SizeRenderer> sizeRenderers = ALL.get(state.style.id);
         if (sizeRenderers == null) {
-            return;
+            return null;
         }
-        if (bogeyData == null)
-            bogeyData = new NbtCompound();
-        poseStack.translate(0, -1.5 - 1 / 128f, 0);
-        sizeRenderers.get(size).renderer().render(bogeyData, wheelAngle, partialTick, poseStack, buffers, light, overlay, inContraption);
+        return sizeRenderers.get(state.size).renderer().getRenderData(be, state, tickProgress, cameraPos, inContraption);
     }
 
     @Nullable
