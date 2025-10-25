@@ -81,9 +81,21 @@ public class SignalRenderer implements BlockEntityRenderer<SignalBlockEntity, Si
         }
         TrackBlockRenderer renderer = AllTrackRenders.get(trackBlock);
         if (renderer != null) {
-            state.offset = targetPosition.subtract(state.pos);
             RenderedTrackOverlayType type = overlayState == OverlayState.DUAL ? RenderedTrackOverlayType.DUAL_SIGNAL : RenderedTrackOverlayType.SIGNAL;
-            state.block = renderer.getRenderState(world, trackState, targetPosition, target.getTargetDirection(), target.getTargetBezier(), type, 1);
+            state.block = renderer.getRenderState(
+                world,
+                new Vec3d(
+                    targetPosition.getX() - state.pos.getX(),
+                    targetPosition.getY() - state.pos.getY(),
+                    targetPosition.getZ() - state.pos.getZ()
+                ),
+                trackState,
+                targetPosition,
+                target.getTargetDirection(),
+                target.getTargetBezier(),
+                type,
+                1
+            );
         }
     }
 
@@ -91,8 +103,6 @@ public class SignalRenderer implements BlockEntityRenderer<SignalBlockEntity, Si
     public void render(SignalRenderState state, MatrixStack matrices, OrderedRenderCommandQueue queue, CameraRenderState cameraState) {
         queue.submitCustom(matrices, state.layer, state);
         if (state.block != null) {
-            BlockPos offset = state.offset;
-            matrices.translate(offset.getX(), offset.getY(), offset.getZ());
             state.block.render(matrices, queue);
         }
     }
@@ -100,7 +110,6 @@ public class SignalRenderer implements BlockEntityRenderer<SignalBlockEntity, Si
     public static class SignalRenderState extends BlockEntityRenderState implements OrderedRenderCommandQueue.Custom {
         public RenderLayer layer;
         public SuperByteBuffer model;
-        public BlockPos offset;
         TrackBlockRenderState block;
 
         @Override

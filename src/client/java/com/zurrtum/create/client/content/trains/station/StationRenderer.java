@@ -5,11 +5,12 @@ import com.zurrtum.create.client.AllTrackRenders;
 import com.zurrtum.create.client.catnip.render.CachedBuffers;
 import com.zurrtum.create.client.catnip.render.SuperByteBuffer;
 import com.zurrtum.create.client.content.logistics.depot.DepotRenderer;
+import com.zurrtum.create.client.content.logistics.depot.DepotRenderer.DepotItemState;
+import com.zurrtum.create.client.content.logistics.depot.DepotRenderer.DepotOutputItemState;
+import com.zurrtum.create.client.content.trains.track.TrackBlockRenderState;
 import com.zurrtum.create.client.content.trains.track.TrackBlockRenderer;
 import com.zurrtum.create.client.flywheel.lib.model.baked.PartialModel;
-import com.zurrtum.create.client.flywheel.lib.transform.Transform;
-import com.zurrtum.create.client.flywheel.lib.transform.TransformStack;
-import com.zurrtum.create.client.foundation.blockEntity.renderer.SafeBlockEntityRenderer;
+import com.zurrtum.create.content.logistics.depot.DepotBehaviour;
 import com.zurrtum.create.content.trains.station.GlobalStation;
 import com.zurrtum.create.content.trains.station.StationBlock;
 import com.zurrtum.create.content.trains.station.StationBlockEntity;
@@ -18,151 +19,138 @@ import com.zurrtum.create.content.trains.track.TrackTargetingBehaviour;
 import com.zurrtum.create.content.trains.track.TrackTargetingBehaviour.RenderedTrackOverlayType;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
+import net.minecraft.client.item.ItemModelManager;
+import net.minecraft.client.render.LightmapTextureManager;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.VertexConsumer;
-import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.WorldRenderer;
+import net.minecraft.client.render.block.entity.BlockEntityRenderer;
 import net.minecraft.client.render.block.entity.BlockEntityRendererFactory;
+import net.minecraft.client.render.block.entity.state.BlockEntityRenderState;
+import net.minecraft.client.render.command.ModelCommandRenderer;
+import net.minecraft.client.render.command.OrderedRenderCommandQueue;
+import net.minecraft.client.render.state.CameraRenderState;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
+import org.jetbrains.annotations.Nullable;
 
-public class StationRenderer extends SafeBlockEntityRenderer<StationBlockEntity> {
+import java.util.List;
+
+public class StationRenderer implements BlockEntityRenderer<StationBlockEntity, StationRenderer.StationRenderState> {
+    protected final ItemModelManager itemModelManager;
 
     public StationRenderer(BlockEntityRendererFactory.Context context) {
+        itemModelManager = context.itemModelManager();
     }
 
     @Override
-    protected void renderSafe(StationBlockEntity be, float partialTicks, MatrixStack ms, VertexConsumerProvider buffer, int light, int overlay) {
+    public StationRenderState createRenderState() {
+        return new StationRenderState();
+    }
 
-        BlockPos pos = be.getPos();
+    @Override
+    public void updateRenderState(
+        StationBlockEntity be,
+        StationRenderState state,
+        float tickProgress,
+        Vec3d cameraPos,
+        @Nullable ModelCommandRenderer.CrumblingOverlayCommand crumblingOverlay
+    ) {
+        state.pos = be.getPos();
+        state.type = be.getType();
+        World world = be.getWorld();
+        state.lightmapCoordinates = world != null ? WorldRenderer.getLightmapCoordinates(
+            world,
+            state.pos
+        ) : LightmapTextureManager.MAX_LIGHT_COORDINATE;
+        DepotBehaviour depotBehaviour = be.depotBehaviour;
+        state.incoming = DepotRenderer.createIncomingStateList(depotBehaviour, itemModelManager, tickProgress, world);
+        state.outputs = DepotRenderer.createOutputStateList(depotBehaviour, itemModelManager, world);
         TrackTargetingBehaviour<GlobalStation> target = be.edgePoint;
         BlockPos targetPosition = target.getGlobalPosition();
-        World level = be.getWorld();
-
-        DepotRenderer.renderItemsOf(be, partialTicks, ms, buffer, light, overlay, be.depotBehaviour);
-
-        BlockState trackState = level.getBlockState(targetPosition);
+        BlockState trackState = world.getBlockState(targetPosition);
         Block block = trackState.getBlock();
-        if (!(block instanceof ITrackBlock track))
+        if (!(block instanceof ITrackBlock track)) {
             return;
-
+        }
         GlobalStation station = be.getStation();
         boolean isAssembling = be.getCachedState().get(StationBlock.ASSEMBLING);
-
         if (!isAssembling || (station == null || station.getPresentTrain() != null) && !be.isVirtual()) {
-            renderFlag(
-                be.flag.getValue(partialTicks) > 0.75f ? AllPartialModels.STATION_ON : AllPartialModels.STATION_OFF,
+            updateFlagState(
+                be.flag.getValue(tickProgress) > 0.75f ? AllPartialModels.STATION_ON : AllPartialModels.STATION_OFF,
                 be,
-                partialTicks,
-                ms,
-                buffer,
-                light,
-                overlay
+                state,
+                tickProgress
             );
             TrackBlockRenderer renderer = AllTrackRenders.get(track);
             if (renderer != null) {
-                ms.push();
-                TransformStack.of(ms).translate(targetPosition.subtract(pos));
-                renderer.render(
-                    level,
+                state.block = renderer.getRenderState(
+                    world,
+                    new Vec3d(
+                        targetPosition.getX() - state.pos.getX(),
+                        targetPosition.getY() - state.pos.getY(),
+                        targetPosition.getZ() - state.pos.getZ()
+                    ),
                     trackState,
                     targetPosition,
                     target.getTargetDirection(),
                     target.getTargetBezier(),
-                    ms,
-                    buffer,
-                    light,
-                    overlay,
                     RenderedTrackOverlayType.STATION,
                     1
                 );
-                ms.pop();
             }
             return;
         }
-
-        renderFlag(AllPartialModels.STATION_ASSEMBLE, be, partialTicks, ms, buffer, light, overlay);
-
-        Direction direction = be.assemblyDirection;
-
-        if (be.isVirtual() && be.bogeyLocations == null)
+        updateFlagState(AllPartialModels.STATION_ASSEMBLE, be, state, tickProgress);
+        if (be.isVirtual() && be.bogeyLocations == null) {
             be.refreshAssemblyInfo();
-
-        if (direction == null || be.assemblyLength == 0 || be.bogeyLocations == null)
-            return;
-
-        ms.push();
-        BlockPos offset = targetPosition.subtract(pos);
-        ms.translate(offset.getX(), offset.getY(), offset.getZ());
-
-        BlockPos.Mutable currentPos = targetPosition.mutableCopy();
-
-        PartialModel assemblyOverlay = null;
+        }
         TrackBlockRenderer renderer = AllTrackRenders.get(track);
-        if (renderer != null) {
-            assemblyOverlay = renderer.prepareAssemblyOverlay(level, targetPosition, trackState, direction, ms);
-        }
-        int colorWhenValid = 0x96B5FF;
-        int colorWhenCarriage = 0xCAFF96;
-        VertexConsumer vb = buffer.getBuffer(RenderLayer.getCutoutMipped());
-
-        currentPos.move(direction, 1);
-        ms.translate(0, 0, 1);
-
-        for (int i = 0; i < be.assemblyLength; i++) {
-            int valid = be.isValidBogeyOffset(i) ? colorWhenValid : -1;
-
-            for (int j : be.bogeyLocations)
-                if (i == j) {
-                    valid = colorWhenCarriage;
-                    break;
-                }
-
-            if (valid != -1 && assemblyOverlay != null) {
-                int lightColor = WorldRenderer.getLightmapCoordinates(level, currentPos);
-                SuperByteBuffer sbb = CachedBuffers.partial(assemblyOverlay, trackState);
-                sbb.color(valid);
-                sbb.light(lightColor);
-                sbb.renderInto(ms, vb);
-            }
-            ms.translate(0, 0, 1);
-            currentPos.move(direction);
-        }
-
-        ms.pop();
-    }
-
-    public static void renderFlag(
-        PartialModel flag,
-        StationBlockEntity be,
-        float partialTicks,
-        MatrixStack ms,
-        VertexConsumerProvider buffer,
-        int light,
-        int overlay
-    ) {
-        if (!be.resolveFlagAngle())
+        if (renderer == null) {
             return;
-        SuperByteBuffer flagBB = CachedBuffers.partial(flag, be.getCachedState());
-        transformFlag(flagBB, be, partialTicks, be.flagYRot, be.flagFlipped);
-        flagBB.translate(0.5f / 16, 0, 0).rotateYDegrees(be.flagFlipped ? 0 : 180).translate(-0.5f / 16, 0, 0).light(light)
-            .renderInto(ms, buffer.getBuffer(RenderLayer.getCutoutMipped()));
+        }
+        state.block = renderer.getAssemblyRenderState(
+            be,
+            new Vec3d(targetPosition.getX() - state.pos.getX(), targetPosition.getY() - state.pos.getY(), targetPosition.getZ() - state.pos.getZ()),
+            world,
+            targetPosition,
+            trackState
+        );
     }
 
-    public static void transformFlag(Transform<?> flag, StationBlockEntity be, float partialTicks, int yRot, boolean flipped) {
-        float value = be.flag.getValue(partialTicks);
-        float progress = (float) (Math.pow(Math.min(value * 5, 1), 2));
-        if (be.flag.getChaseTarget() > 0 && !be.flag.settled() && progress == 1) {
-            float wiggleProgress = (value - .2f) / .8f;
-            progress += (Math.sin(wiggleProgress * (2 * MathHelper.PI) * 4) / 8f) / Math.max(1, 8f * wiggleProgress);
+    public void updateFlagState(PartialModel flag, StationBlockEntity be, StationRenderState state, float tickProgress) {
+        if (be.resolveFlagAngle()) {
+            state.layer = RenderLayer.getCutoutMipped();
+            state.flag = CachedBuffers.partial(flag, be.getCachedState());
+            float value = be.flag.getValue(tickProgress);
+            float progress = (float) (Math.pow(Math.min(value * 5, 1), 2));
+            if (be.flag.getChaseTarget() > 0 && !be.flag.settled() && progress == 1) {
+                float wiggleProgress = (value - .2f) / .8f;
+                progress += (float) ((Math.sin(wiggleProgress * (2 * MathHelper.PI) * 4) / 8f) / Math.max(1, 8f * wiggleProgress));
+            }
+            float nudge = 1 / 512f;
+            state.flagYRot = MathHelper.RADIANS_PER_DEGREE * be.flagYRot;
+            boolean flipped = be.flagFlipped;
+            state.flagOffsetZ = flipped ? 14f / 16f - nudge : 2f / 16f + nudge;
+            state.flagXRot = MathHelper.RADIANS_PER_DEGREE * (flipped ? 1 : -1) * (progress * 90 + 270);
+            state.flagYRot2 = flipped ? 0 : MathHelper.RADIANS_PER_DEGREE * 180;
         }
+    }
 
-        float nudge = 1 / 512f;
-        flag.center().rotateYDegrees(yRot).translate(nudge, 9.5f / 16f, flipped ? 14f / 16f - nudge : 2f / 16f + nudge).uncenter()
-            .rotateXDegrees((flipped ? 1 : -1) * (progress * 90 + 270));
+    @Override
+    public void render(StationRenderState state, MatrixStack matrices, OrderedRenderCommandQueue queue, CameraRenderState cameraState) {
+        if (state.incoming != null || state.outputs != null) {
+            DepotRenderer.renderItemsOf(state.incoming, state.outputs, state.pos, cameraState.pos, queue, matrices, state.lightmapCoordinates);
+        }
+        if (state.layer != null) {
+            queue.submitCustom(matrices, state.layer, state);
+        }
+        if (state.block != null) {
+            state.block.render(matrices, queue);
+        }
     }
 
     @Override
@@ -175,4 +163,24 @@ public class StationRenderer extends SafeBlockEntityRenderer<StationBlockEntity>
         return 96 * 2;
     }
 
+    public static class StationRenderState extends BlockEntityRenderState implements OrderedRenderCommandQueue.Custom {
+        public DepotItemState[] incoming;
+        public List<DepotOutputItemState> outputs;
+        public RenderLayer layer;
+        public SuperByteBuffer flag;
+        public float flagYRot;
+        public float flagOffsetZ;
+        public float flagXRot;
+        public float flagYRot2;
+        public TrackBlockRenderState block;
+
+        @Override
+        public void render(MatrixStack.Entry matricesEntry, VertexConsumer vertexConsumer) {
+            if (flag != null) {
+                flag.center().rotateY(flagYRot).translate(0.001953125f, 0.59375f, flagOffsetZ).uncenter();
+                flag.rotateX(flagXRot).translate(0.03125f, 0, 0).rotateY(flagYRot2).translate(-0.03125f, 0, 0);
+                flag.light(lightmapCoordinates).renderInto(matricesEntry, vertexConsumer);
+            }
+        }
+    }
 }

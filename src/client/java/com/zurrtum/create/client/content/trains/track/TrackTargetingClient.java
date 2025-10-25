@@ -123,10 +123,16 @@ public class TrackTargetingClient {
             return;
         TrackBlockRenderer renderer = AllTrackRenders.get(track);
         if (renderer != null) {
-            ms.push();
-            ms.translate(Vec3d.of(pos).subtract(camera));
-            renderer.getRenderState(mc.world, state, pos, direction, lastHoveredBezierSegment, type, 1 + 1 / 16f).render(ms, buffer);
-            ms.pop();
+            renderer.getRenderState(
+                mc.world,
+                new Vec3d(pos.getX() - camera.getX(), pos.getY() - camera.getY(), pos.getZ() - camera.getZ()),
+                state,
+                pos,
+                direction,
+                lastHoveredBezierSegment,
+                type,
+                1 + 1 / 16f
+            ).render(ms, buffer);
         }
     }
 

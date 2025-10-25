@@ -7,8 +7,8 @@ import com.zurrtum.create.client.catnip.render.CachedBuffers;
 import com.zurrtum.create.client.catnip.render.SuperByteBuffer;
 import com.zurrtum.create.client.flywheel.lib.model.baked.PartialModel;
 import com.zurrtum.create.client.flywheel.lib.transform.Affine;
-import com.zurrtum.create.client.flywheel.lib.transform.TransformStack;
 import com.zurrtum.create.client.ponder.api.level.PonderLevel;
+import com.zurrtum.create.content.trains.station.StationBlockEntity;
 import com.zurrtum.create.content.trains.track.BezierConnection;
 import com.zurrtum.create.content.trains.track.TrackBlock;
 import com.zurrtum.create.content.trains.track.TrackBlockEntity;
@@ -26,12 +26,6 @@ import net.minecraft.world.World;
 import org.joml.Quaternionf;
 
 public class StandardTrackBlockRenderer implements TrackBlockRenderer {
-    @Override
-    public PartialModel prepareAssemblyOverlay(BlockView world, BlockPos pos, BlockState state, Direction direction, MatrixStack ms) {
-        TransformStack.of(ms).rotateCentered(AngleHelper.rad(AngleHelper.horizontalAngle(direction)), Direction.UP);
-        return AllPartialModels.TRACK_ASSEMBLING_OVERLAY;
-    }
-
     @Override
     public <Self extends Affine<Self>> void prepareTrackOverlay(
         Affine<Self> affine,
@@ -93,6 +87,7 @@ public class StandardTrackBlockRenderer implements TrackBlockRenderer {
     @Override
     public TrackBlockRenderState getRenderState(
         World world,
+        Vec3d offset,
         BlockState trackState,
         BlockPos pos,
         AxisDirection direction,
@@ -106,7 +101,6 @@ public class StandardTrackBlockRenderer implements TrackBlockRenderer {
         Vec3d axis = null;
         Vec3d diff = null;
         Vec3d normal = null;
-        Vec3d offset = null;
         if (bezier != null && world.getBlockEntity(pos) instanceof TrackBlockEntity trackBE) {
             BezierConnection bc = trackBE.getConnections().get(bezier.curveTarget());
             if (bc != null) {
@@ -115,7 +109,7 @@ public class StandardTrackBlockRenderer implements TrackBlockRenderer {
                 double t = seg / length;
                 double tpre = (seg - 1) / length;
                 double tpost = (seg + 1) / length;
-                offset = bc.getPosition(t).subtract(Vec3d.ofBottomCenter(pos)).add(0, -4 / 16f, 0);
+                offset = bc.getPosition(t).subtract(Vec3d.ofBottomCenter(pos)).add(offset).add(0, -4 / 16f, 0);
                 normal = bc.getNormal(t);
                 diff = bc.getPosition(tpost).subtract(bc.getPosition(tpre)).normalize();
             } else {
@@ -158,6 +152,52 @@ public class StandardTrackBlockRenderer implements TrackBlockRenderer {
         return state;
     }
 
+    @Override
+    public TrackBlockRenderState getAssemblyRenderState(StationBlockEntity be, Vec3d offset, World world, BlockPos pos, BlockState blockState) {
+        Direction direction = be.assemblyDirection;
+        if (direction == null) {
+            return null;
+        }
+        int length = be.assemblyLength;
+        if (length == 0) {
+            return null;
+        }
+        int[] locations = be.bogeyLocations;
+        if (locations == null) {
+            return null;
+        }
+        StandardTrackAssemblyRenderState state = new StandardTrackAssemblyRenderState();
+        state.layer = RenderLayer.getCutoutMipped();
+        state.offset = offset;
+        state.angle = AngleHelper.rad(AngleHelper.horizontalAngle(direction));
+        state.model = CachedBuffers.partial(AllPartialModels.TRACK_ASSEMBLING_OVERLAY, blockState);
+        int colorWhenValid = 0x96B5FF;
+        int colorWhenCarriage = 0xCAFF96;
+        BlockPos.Mutable currentPos = pos.mutableCopy();
+        int[][] data = state.data = new int[length][];
+        int index = 0;
+        for (int location : locations) {
+            if (location == -1) {
+                break;
+            }
+            int i = index;
+            index = location;
+            for (; i < index; i++) {
+                if (be.isValidBogeyOffset(i)) {
+                    data[i] = new int[]{colorWhenValid, WorldRenderer.getLightmapCoordinates(world, currentPos.move(direction, 1))};
+                }
+            }
+            data[i] = new int[]{colorWhenCarriage, WorldRenderer.getLightmapCoordinates(world, currentPos.move(direction, 1))};
+            index++;
+        }
+        for (; index < length; index++) {
+            if (be.isValidBogeyOffset(index)) {
+                data[index] = new int[]{colorWhenValid, WorldRenderer.getLightmapCoordinates(world, currentPos.move(direction, 1))};
+            }
+        }
+        return state;
+    }
+
     public static class StandardTrackBlockRenderState extends TrackBlockRenderState {
         public Vec3d offset;
         public float yRot;
@@ -172,9 +212,7 @@ public class StandardTrackBlockRenderer implements TrackBlockRenderer {
 
         @Override
         public void transform(MatrixStack matrices) {
-            if (offset != null) {
-                matrices.translate(offset);
-            }
+            matrices.translate(offset);
             matrices.translate(0.5f, 0.5f, 0.5f);
             matrices.multiply(RotationAxis.POSITIVE_Y.rotation(yRot));
             matrices.multiply(RotationAxis.POSITIVE_X.rotation(xRot));
@@ -200,6 +238,29 @@ public class StandardTrackBlockRenderer implements TrackBlockRenderer {
         @Override
         public void render(MatrixStack.Entry matricesEntry, VertexConsumer vertexConsumer) {
             model.translate(.5f, 0, .5f).scale(scale).translate(-.5f, 0, -.5f).light(light).renderInto(matricesEntry, vertexConsumer);
+        }
+    }
+
+    public static class StandardTrackAssemblyRenderState extends TrackBlockRenderState {
+        public Vec3d offset;
+        public float angle;
+        public SuperByteBuffer model;
+        public int[][] data;
+
+        @Override
+        public void transform(MatrixStack matrices) {
+            matrices.translate(offset);
+            matrices.multiply(new Quaternionf().setAngleAxis(angle, 0, 1, 0), 0.5f, 0.5f, 0.5f);
+        }
+
+        @Override
+        public void render(MatrixStack.Entry matricesEntry, VertexConsumer vertexConsumer) {
+            for (int[] pair : data) {
+                matricesEntry.translate(0, 0, 1);
+                if (pair != null) {
+                    model.color(pair[0]).light(pair[1]).renderInto(matricesEntry, vertexConsumer);
+                }
+            }
         }
     }
 }
