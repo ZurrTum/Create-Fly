@@ -158,7 +158,7 @@ public class PonderTagScreen extends AbstractPonderScreen {
 
         graphics.drawText(
             textRenderer,
-            Ponder.lang().translate(AbstractPonderScreen.PONDERING).component(),
+            Ponder.lang().translate(AbstractPonderScreen.PONDERING_TAG).component(),
             x,
             y - 6,
             UIRenderHelper.COLOR_TEXT_DARKER.getFirst().getRGB(),

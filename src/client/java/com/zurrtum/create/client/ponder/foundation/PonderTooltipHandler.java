@@ -15,7 +15,6 @@ import com.zurrtum.create.client.ponder.foundation.ui.PonderUI;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.item.ItemStack;
 import net.minecraft.text.MutableText;
@@ -63,7 +62,7 @@ public class PonderTooltipHandler {
 
         float value = holdKeyProgress.getValue();
 
-        if (!subject && InputUtil.isKeyPressed(instance.getWindow().getHandle(), ponderKeybind().boundKey.getCode()) && currentScreen != null) {
+        if (!subject && InputUtil.isKeyPressed(instance.getWindow().getHandle(), PonderKeybinds.PONDER.boundKey.getCode()) && currentScreen != null) {
             if (value >= 1) {
                 if (currentScreen instanceof NavigatableSimiScreen)
                     ((NavigatableSimiScreen) currentScreen).centerScalingOnMouse();
@@ -164,8 +163,9 @@ public class PonderTooltipHandler {
     }
 
     private static Text makeProgressBar(float progress) {
-        MutableText holdW = Ponder.lang().translate(HOLD_TO_PONDER, ponderKeybind().getBoundKeyLocalizedText().copy().formatted(Formatting.GRAY))
-            .style(Formatting.DARK_GRAY).component();
+        MutableText holdW = Ponder.lang()
+            .translate(HOLD_TO_PONDER, PonderKeybinds.PONDER.getBoundKeyLocalizedText().copy().formatted(Formatting.GRAY)).style(Formatting.DARK_GRAY)
+            .component();
 
         TextRenderer fontRenderer = MinecraftClient.getInstance().textRenderer;
         float charWidth = fontRenderer.getWidth("|");
@@ -183,10 +183,6 @@ public class PonderTooltipHandler {
         }
 
         return holdW;
-    }
-
-    protected static KeyBinding ponderKeybind() {
-        return PonderKeybinds.PONDER;
     }
 
     public synchronized static void registerHoveredPonderStackCallback(Consumer<ItemStack> consumer) {

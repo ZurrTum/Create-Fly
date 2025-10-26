@@ -2,6 +2,7 @@
   "ponder.ui.hold_to_ponder": "Halte [%1$s] für die Vorschau",
   "ponder.ui.subject": "Zielgegenstand",
   "ponder.ui.pondering": "Vorschau für...",
+  "ponder.ui.pondering_tag": "Vorschau für...",
   "ponder.ui.identify_mode": "Identifiziere den aktiven Modus.\nStarten mit [%1$s]",
   "ponder.ui.associated": "Verknüpfte Vorschau",
   "ponder.ui.close": "Schließen",
@@ -19,5 +20,5 @@
   "ponder.ui.index_title": "Vorschau-Index",
   "ponder.ponder.shared.sneak_and": "Schleichen +",
   "ponder.ponder.shared.ctrl_and": "Strg +",
-  "ponder.keyinfo.ponder": "Nachgrübeln"
+  "key.ponder.ponder": "Nachgrübeln"
 }
