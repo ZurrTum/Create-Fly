@@ -17,8 +17,10 @@ import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.recipe.Recipe;
 import net.minecraft.recipe.input.SingleStackRecipeInput;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
+import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
@@ -96,7 +98,8 @@ public class BeltDeployerCallbacks {
         TransportedItemStack result = null;
         ItemStack resultItem = null;
         boolean keepHeld = false;
-        ItemStack heldItem = blockEntity.player.cast().getMainHandStack();
+        ServerPlayerEntity player = blockEntity.player.cast();
+        ItemStack heldItem = player.getMainHandStack();
         if (recipe instanceof SandPaperPolishingRecipe polishingRecipe) {
             resultItem = polishingRecipe.craft(new SingleStackRecipeInput(transported.stack), world.getRegistryManager());
         } else if (recipe instanceof ItemApplicationRecipe itemApplicationRecipe) {
@@ -129,9 +132,17 @@ public class BeltDeployerCallbacks {
 
         if (!keepHeld) {
             if (heldItem.getMaxDamage() > 0) {
-                heldItem.damage(1, blockEntity.player.cast(), EquipmentSlot.MAINHAND);
+                heldItem.damage(1, player, EquipmentSlot.MAINHAND);
             } else {
+                ItemStack leftover = heldItem.getItem().getRecipeRemainder();
                 heldItem.decrement(1);
+                if (!leftover.isEmpty()) {
+                    if (heldItem.isEmpty()) {
+                        player.setStackInHand(Hand.MAIN_HAND, leftover);
+                    } else if (!player.getInventory().insertStack(leftover)) {
+                        player.dropItem(leftover, false);
+                    }
+                }
             }
         }
 

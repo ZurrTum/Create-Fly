@@ -45,7 +45,7 @@ public class BlazeBurnerRenderer extends SafeBlockEntityRenderer<BlazeBurnerBloc
         int light,
         int overlay
     ) {
-        HeatLevel heatLevel = be.getHeatLevelFromBlock();
+        HeatLevel heatLevel = be.getHeatLevelForRender();
         if (heatLevel == HeatLevel.NONE)
             return;
 

@@ -3,6 +3,7 @@ package com.zurrtum.create.content.redstone.nixieTube;
 import com.zurrtum.create.*;
 import com.zurrtum.create.api.schematic.requirement.SpecialBlockItemRequirement;
 import com.zurrtum.create.catnip.data.Iterate;
+import com.zurrtum.create.compat.Mods;
 import com.zurrtum.create.content.equipment.wrench.IWrenchable;
 import com.zurrtum.create.content.schematics.requirement.ItemRequirement;
 import com.zurrtum.create.content.schematics.requirement.ItemRequirement.ItemUseType;
@@ -41,6 +42,7 @@ import net.minecraft.world.WorldAccess;
 import net.minecraft.world.WorldView;
 import net.minecraft.world.block.WireOrientation;
 import net.minecraft.world.tick.ScheduledTickView;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
@@ -81,8 +83,13 @@ public class NixieTubeBlock extends DoubleFaceAttachedBlock implements IBE<Nixie
 
         NixieTubeBlockEntity nixie = getBlockEntity(level, pos);
 
-        if (nixie == null)
+        if (nixie == null) {
             return ActionResult.PASS_TO_DEFAULT_BLOCK_ACTION;
+        }
+        // Refuse interaction if nixie tube is in a computer-controlled row
+        if (isInComputerControlledRow(level, pos)) {
+            return ActionResult.PASS_TO_DEFAULT_BLOCK_ACTION;
+        }
         if (stack.isEmpty()) {
             if (nixie.reactsToRedstone())
                 return ActionResult.PASS_TO_DEFAULT_BLOCK_ACTION;
@@ -109,8 +116,9 @@ public class NixieTubeBlock extends DoubleFaceAttachedBlock implements IBE<Nixie
         if (level.isClient)
             return ActionResult.SUCCESS;
 
+        // Skip computer check in this walk since it was already performed at the start.
         walkNixies(
-            level, pos, (currentPos, rowPosition) -> {
+            level, pos, true, (currentPos, rowPosition) -> {
                 if (display)
                     withBlockEntityDo(level, currentPos, be -> be.displayCustomText(component, rowPosition));
                 if (dye != null)
@@ -121,39 +129,103 @@ public class NixieTubeBlock extends DoubleFaceAttachedBlock implements IBE<Nixie
         return ActionResult.SUCCESS;
     }
 
-    public static void walkNixies(WorldAccess world, BlockPos start, BiConsumer<BlockPos, Integer> callback) {
-        BlockState state = world.getBlockState(start);
-        if (!(state.getBlock() instanceof NixieTubeBlock))
-            return;
-
-        BlockPos currentPos = start;
+    public static Direction getLeftNixieDirection(@NotNull BlockState state) {
         Direction left = state.get(FACING).getOpposite();
-
         if (state.get(FACE) == DoubleAttachFace.WALL)
             left = Direction.UP;
         if (state.get(FACE) == DoubleAttachFace.WALL_REVERSED)
             left = Direction.DOWN;
+        return left;
+    }
 
+    public static Direction getRightNixieDirection(@NotNull BlockState state) {
+        return getLeftNixieDirection(state).getOpposite();
+    }
+
+    public static boolean isInComputerControlledRow(@NotNull WorldAccess world, @NotNull BlockPos pos) {
+        return Mods.COMPUTERCRAFT.isLoaded() && !walkNixies(world, pos, false, null);
+    }
+
+    /**
+     * Walk down a nixie tube row and execute a callback on each tube in said row.
+     *
+     * @param world                   The world the tubes are in.
+     * @param start                   Start position for the walk.
+     * @param allowComputerControlled Allow or disallow running callbacks if the row is computer-controlled.
+     * @param callback                Callback to run for each tube.
+     * @return True if the row was walked, false if the walk was aborted because it is computer-controlled.
+     */
+    public static boolean walkNixies(
+        @NotNull WorldAccess world,
+        @NotNull BlockPos start,
+        boolean allowComputerControlled,
+        @Nullable BiConsumer<BlockPos, Integer> callback
+    ) {
+        BlockState state = world.getBlockState(start);
+        if (!(state.getBlock() instanceof NixieTubeBlock))
+            return false;
+
+        // If ComputerCraft is not installed, ignore allowComputerControlled since
+        // nixies can't be computer-controlled
+        if (!Mods.COMPUTERCRAFT.isLoaded())
+            allowComputerControlled = true;
+
+        BlockPos currentPos = start;
+        Direction left = getLeftNixieDirection(state);
         Direction right = left.getOpposite();
 
         while (true) {
             BlockPos nextPos = currentPos.offset(left);
             if (!areNixieBlocksEqual(world.getBlockState(nextPos), state))
                 break;
+            // If computer-controlled nixie walking is disallowed, presence of any (same-color)
+            // controlled nixies aborts the entire nixie walk.
+            //TODO
+            //            if (!allowComputerControlled && world.getBlockEntity(nextPos) instanceof NixieTubeBlockEntity ntbe &&
+            //                ntbe.computerBehaviour.hasAttachedComputer()) {
+            //                return false;
+            //            }
             currentPos = nextPos;
+        }
+
+        // As explained above, a controlled nixie in the row aborts the walk if they are disallowed,
+        // and that includes those down the chain too.
+        if (!allowComputerControlled) {
+            // Check the start block itself
+            //TODO
+            //            if (world.getBlockEntity(start) instanceof NixieTubeBlockEntity ntbe && ntbe.computerBehaviour.hasAttachedComputer()) {
+            //                return false;
+            //            }
+            BlockPos leftmostPos = currentPos;
+            // No need to iterate over the nixies to the left again
+            currentPos = start;
+            while (true) {
+                BlockPos nextPos = currentPos.offset(right);
+                if (!areNixieBlocksEqual(world.getBlockState(nextPos), state))
+                    break;
+                //TODO
+                //                if (world.getBlockEntity(nextPos) instanceof NixieTubeBlockEntity ntbe && ntbe.computerBehaviour.hasAttachedComputer()) {
+                //                    return false;
+                //                }
+                currentPos = nextPos;
+            }
+            currentPos = leftmostPos;
         }
 
         int index = 0;
 
         while (true) {
             final int rowPosition = index;
-            callback.accept(currentPos, rowPosition);
+            if (callback != null)
+                callback.accept(currentPos, rowPosition);
             BlockPos nextPos = currentPos.offset(right);
             if (!areNixieBlocksEqual(world.getBlockState(nextPos), state))
                 break;
             currentPos = nextPos;
             index++;
         }
+
+        return true;
     }
 
     @Override
@@ -234,20 +306,32 @@ public class NixieTubeBlock extends DoubleFaceAttachedBlock implements IBE<Nixie
 
     @Override
     public void onBlockAdded(BlockState state, World worldIn, BlockPos pos, BlockState oldState, boolean isMoving) {
-        if (state.getBlock() == oldState.getBlock() || isMoving)
+        if (state.getBlock() == oldState.getBlock() || isMoving || oldState.getBlock() instanceof NixieTubeBlock)
             return;
+        if (Mods.COMPUTERCRAFT.isLoaded() && isInComputerControlledRow(worldIn, pos)) {
+            // The nixie tube has been placed in a computer-controlled row.
+            walkNixies(
+                worldIn, pos, true, (currentPos, rowPosition) -> {
+                    if (worldIn.getBlockEntity(currentPos) instanceof NixieTubeBlockEntity ntbe)
+                        ntbe.displayEmptyText(rowPosition);
+                }
+            );
+            return;
+        }
         updateDisplayedRedstoneValue(state, worldIn, pos);
+    }
+
+    public static void updateDisplayedRedstoneValue(NixieTubeBlockEntity be, boolean force) {
+        if (be.getWorld() == null || be.getWorld().isClient)
+            return;
+        if (be.reactsToRedstone() || force)
+            be.updateRedstoneStrength(getPower(be.getWorld(), be.getPos()));
     }
 
     private void updateDisplayedRedstoneValue(BlockState state, World worldIn, BlockPos pos) {
         if (worldIn.isClient)
             return;
-        withBlockEntityDo(
-            worldIn, pos, be -> {
-                if (be.reactsToRedstone())
-                    be.updateRedstoneStrength(getPower(worldIn, pos));
-            }
-        );
+        withBlockEntityDo(worldIn, pos, be -> NixieTubeBlock.updateDisplayedRedstoneValue(be, false));
     }
 
     static boolean isValidBlock(BlockView world, BlockPos pos, boolean above) {
@@ -255,7 +339,7 @@ public class NixieTubeBlock extends DoubleFaceAttachedBlock implements IBE<Nixie
         return !state.getOutlineShape(world, pos).isEmpty();
     }
 
-    private int getPower(World worldIn, BlockPos pos) {
+    private static int getPower(World worldIn, BlockPos pos) {
         int power = 0;
         for (Direction direction : Iterate.directions)
             power = Math.max(worldIn.getEmittedRedstonePower(pos.offset(direction), direction), power);

@@ -17,7 +17,7 @@ public class NixieTubeDisplayTarget extends SingleLineDisplayTarget {
     @Override
     protected void acceptLine(MutableText text, DisplayLinkContext context) {
         NixieTubeBlock.walkNixies(
-            context.level(), context.getTargetPos(), (currentPos, rowPosition) -> {
+            context.level(), context.getTargetPos(), false, (currentPos, rowPosition) -> {
                 BlockEntity blockEntity = context.level().getBlockEntity(currentPos);
                 if (blockEntity instanceof NixieTubeBlockEntity nixie)
                     nixie.displayCustomText(text, rowPosition);
@@ -28,7 +28,7 @@ public class NixieTubeDisplayTarget extends SingleLineDisplayTarget {
     @Override
     protected int getWidth(DisplayLinkContext context) {
         MutableInt count = new MutableInt(0);
-        NixieTubeBlock.walkNixies(context.level(), context.getTargetPos(), (currentPos, rowPosition) -> count.add(2));
+        NixieTubeBlock.walkNixies(context.level(), context.getTargetPos(), false, (currentPos, rowPosition) -> count.add(2));
         return count.intValue();
     }
 
@@ -36,7 +36,7 @@ public class NixieTubeDisplayTarget extends SingleLineDisplayTarget {
         MutableObject<BlockPos> start = new MutableObject<>(null);
         MutableObject<BlockPos> end = new MutableObject<>(null);
         NixieTubeBlock.walkNixies(
-            level, pos, (currentPos, rowPosition) -> {
+            level, pos, true, (currentPos, rowPosition) -> {
                 end.setValue(currentPos);
                 if (start.getValue() == null)
                     start.setValue(currentPos);

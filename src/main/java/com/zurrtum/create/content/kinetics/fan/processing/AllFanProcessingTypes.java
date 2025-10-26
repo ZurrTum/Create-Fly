@@ -127,7 +127,7 @@ public class AllFanProcessingTypes {
                     smokingRecipe.get().value().craft(input, registryAccess),
                     smeltingRecipe.get().value().craft(input, registryAccess)
                 )) {
-                    return RecipeApplier.applyRecipeOn(level, stack.getCount(), input, smeltingRecipe.get());
+                    return RecipeApplier.applyRecipeOn(level, stack.getCount(), input, smeltingRecipe.get(), false);
                 }
             }
 
@@ -196,7 +196,7 @@ public class AllFanProcessingTypes {
             SingleStackRecipeInput input = new SingleStackRecipeInput(stack);
             Optional<RecipeEntry<HauntingRecipe>> recipe = ((ServerWorld) level).getRecipeManager()
                 .getFirstMatch(AllRecipeTypes.HAUNTING, input, level);
-            return recipe.map(entry -> RecipeApplier.applyCreateRecipeOn(level, stack.getCount(), input, entry.value())).orElse(null);
+            return recipe.map(entry -> RecipeApplier.applyCreateRecipeOn(level, stack.getCount(), input, entry.value(), true)).orElse(null);
         }
 
         @Override
@@ -317,10 +317,8 @@ public class AllFanProcessingTypes {
         @Nullable
         public List<ItemStack> process(ItemStack stack, World level) {
             SingleStackRecipeInput input = new SingleStackRecipeInput(stack);
-            Optional<RecipeEntry<SmokingRecipe>> smokingRecipe = ((ServerWorld) level).getRecipeManager()
-                .getFirstMatch(RecipeType.SMOKING, input, level).filter(AllRecipeTypes.CAN_BE_AUTOMATED);
-
-            return smokingRecipe.map(entry -> RecipeApplier.applyRecipeOn(level, stack.getCount(), input, entry)).orElse(null);
+            return ((ServerWorld) level).getRecipeManager().getFirstMatch(RecipeType.SMOKING, input, level).filter(AllRecipeTypes.CAN_BE_AUTOMATED)
+                .map(entry -> RecipeApplier.applyRecipeOn(level, stack.getCount(), input, entry, false)).orElse(null);
         }
 
         @Override
@@ -377,9 +375,8 @@ public class AllFanProcessingTypes {
         @Nullable
         public List<ItemStack> process(ItemStack stack, World level) {
             SingleStackRecipeInput input = new SingleStackRecipeInput(stack);
-            Optional<RecipeEntry<SplashingRecipe>> recipe = ((ServerWorld) level).getRecipeManager()
-                .getFirstMatch(AllRecipeTypes.SPLASHING, input, level);
-            return recipe.map(entry -> RecipeApplier.applyCreateRecipeOn(level, stack.getCount(), input, entry.value())).orElse(null);
+            return ((ServerWorld) level).getRecipeManager().getFirstMatch(AllRecipeTypes.SPLASHING, input, level)
+                .map(entry -> RecipeApplier.applyCreateRecipeOn(level, stack.getCount(), input, entry.value(), true)).orElse(null);
         }
 
         @Override

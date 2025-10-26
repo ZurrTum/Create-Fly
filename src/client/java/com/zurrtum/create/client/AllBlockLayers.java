@@ -146,6 +146,7 @@ public class AllBlockLayers {
         register(COPYCAT_BASE, BlockRenderLayer.CUTOUT_MIPPED);
         register(COPYCAT_STEP, BlockRenderLayer.CUTOUT_MIPPED);
         register(COPYCAT_PANEL, BlockRenderLayer.CUTOUT_MIPPED);
+        register(STOCK_LINK, BlockRenderLayer.CUTOUT_MIPPED);
         register(INDUSTRIAL_IRON_WINDOW, BlockRenderLayer.CUTOUT);
         register(ORNATE_IRON_WINDOW, BlockRenderLayer.CUTOUT);
         register(ANDESITE_LADDER, BlockRenderLayer.CUTOUT);

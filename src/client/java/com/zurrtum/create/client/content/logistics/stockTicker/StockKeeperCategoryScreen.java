@@ -9,7 +9,6 @@ import com.zurrtum.create.client.catnip.gui.element.GuiGameElement;
 import com.zurrtum.create.client.catnip.gui.widget.ElementWidget;
 import com.zurrtum.create.client.foundation.gui.AllGuiTextures;
 import com.zurrtum.create.client.foundation.gui.AllIcons;
-import com.zurrtum.create.client.foundation.gui.ScreenWithStencils;
 import com.zurrtum.create.client.foundation.gui.menu.AbstractSimiContainerScreen;
 import com.zurrtum.create.client.foundation.gui.widget.IconButton;
 import com.zurrtum.create.client.foundation.gui.widget.ScrollInput;
@@ -25,7 +24,6 @@ import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.Drawable;
 import net.minecraft.client.gui.widget.TextFieldWidget;
-import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.util.math.Rect2i;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.entity.player.PlayerInventory;
@@ -45,7 +43,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-public class StockKeeperCategoryScreen extends AbstractSimiContainerScreen<StockKeeperCategoryMenu> implements ScreenWithStencils {
+public class StockKeeperCategoryScreen extends AbstractSimiContainerScreen<StockKeeperCategoryMenu> {
 
     private static final int CARD_HEADER = 20;
     private static final int CARD_WIDTH = 160;
@@ -198,67 +196,53 @@ public class StockKeeperCategoryScreen extends AbstractSimiContainerScreen<Stock
 
     protected void renderCategories(DrawContext graphics, int mouseX, int mouseY, float partialTicks) {
         Matrix3x2fStack matrixStack = graphics.getMatrices();
-        VertexConsumerProvider.Immediate vertexConsumers = client.getBufferBuilders().getEntityVertexConsumers();
-        prepareFrameBuffer(client, vertexConsumers);
-
         int yOffset = 25;
         List<ItemStack> entries = schedule;
         float scrollOffset = -scroll.getValue(partialTicks);
 
-        startStencil(client, vertexConsumers, matrixStack, x + 3, y + 16, 184, 3 + AllGuiTextures.STOCK_KEEPER_CATEGORY.getHeight() * slices);
+        graphics.enableScissor(x + 3, y + 16, x + 187, y + 19 + (AllGuiTextures.STOCK_KEEPER_CATEGORY.getHeight() * slices));
         for (int i = 0; i <= entries.size(); i++) {
             matrixStack.pushMatrix();
             matrixStack.translate(0, scrollOffset);
 
             if (i == entries.size()) {
-                drawTexture(vertexConsumers, matrixStack, x + 7, y + yOffset, 100, AllGuiTextures.STOCK_KEEPER_CATEGORY_NEW);
+                AllGuiTextures.STOCK_KEEPER_CATEGORY_NEW.render(graphics, x + 7, y + yOffset);
                 matrixStack.popMatrix();
                 break;
             }
 
             ItemStack scheduleEntry = entries.get(i);
             int cardY = yOffset;
-            int cardHeight = renderScheduleEntry(vertexConsumers, matrixStack, i, scheduleEntry, cardY);
+            int cardHeight = renderScheduleEntry(graphics, matrixStack, i, scheduleEntry, cardY);
             yOffset += cardHeight;
 
             matrixStack.popMatrix();
         }
-        endStencil(client, vertexConsumers, matrixStack, x + 3, y + 16, 184, 3 + AllGuiTextures.STOCK_KEEPER_CATEGORY.getHeight() * slices);
-
-        endFrameBuffer(client, vertexConsumers, graphics);
+        graphics.disableScissor();
     }
 
-    public int renderScheduleEntry(
-        VertexConsumerProvider.Immediate vertexConsumers,
-        Matrix3x2fStack matrixStack,
-        int i,
-        ItemStack entry,
-        int yOffset
-    ) {
+    public int renderScheduleEntry(DrawContext graphics, Matrix3x2fStack matrixStack, int i, ItemStack entry, int yOffset) {
         int cardWidth = CARD_WIDTH;
         int cardHeader = CARD_HEADER;
 
         matrixStack.pushMatrix();
         matrixStack.translate(x + 7, y + yOffset);
 
-        drawTexture(vertexConsumers, matrixStack, 0, 0, 100, AllGuiTextures.STOCK_KEEPER_CATEGORY_ENTRY);
+        AllGuiTextures.STOCK_KEEPER_CATEGORY_ENTRY.render(graphics, 0, 0);
 
         if (i > 0)
-            drawTexture(vertexConsumers, matrixStack, cardWidth + 12, cardHeader - 18, 100, AllGuiTextures.STOCK_KEEPER_CATEGORY_UP);
+            AllGuiTextures.STOCK_KEEPER_CATEGORY_UP.render(graphics, cardWidth + 12, cardHeader - 18);
         if (i < schedule.size() - 1)
-            drawTexture(vertexConsumers, matrixStack, cardWidth + 12, cardHeader - 9, 100, AllGuiTextures.STOCK_KEEPER_CATEGORY_DOWN);
+            AllGuiTextures.STOCK_KEEPER_CATEGORY_DOWN.render(graphics, cardWidth + 12, cardHeader - 9);
 
-        drawItem(client, vertexConsumers, matrixStack, entry, 14, 1, null);
+        graphics.drawItem(entry, 14, 1);
         Text name = entry.getName();
-        drawText(
-            vertexConsumers,
-            matrixStack,
+        graphics.drawText(
             textRenderer,
             entry.isEmpty() ? CreateLang.translate("gui.stock_ticker.empty_category_name_placeholder").string() : name.asTruncatedString(20)
                 .stripTrailing() + (name.getString().length() > 20 ? "..." : ""),
             35,
             5,
-            100,
             0xFF656565,
             false
         );
@@ -490,10 +474,11 @@ public class StockKeeperCategoryScreen extends AbstractSimiContainerScreen<Stock
             0xFF3D3C48,
             false
         );
-        renderCategories(graphics, pMouseX, pMouseY, pPartialTick);
 
-        if (editingItem == null)
+        if (editingItem == null) {
+            renderCategories(graphics, pMouseX, pMouseY, pPartialTick);
             return;
+        }
 
         graphics.fillGradient(0, 0, this.width, this.height, -1072689136, -804253680);
 

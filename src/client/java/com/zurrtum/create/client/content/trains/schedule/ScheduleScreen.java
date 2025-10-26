@@ -10,9 +10,13 @@ import com.zurrtum.create.catnip.data.Pair;
 import com.zurrtum.create.client.AllScheduleRenders;
 import com.zurrtum.create.client.Create;
 import com.zurrtum.create.client.catnip.animation.AnimationTickHolder;
+import com.zurrtum.create.client.catnip.gui.UIRenderHelper;
 import com.zurrtum.create.client.catnip.gui.element.GuiGameElement;
 import com.zurrtum.create.client.catnip.gui.widget.ElementWidget;
-import com.zurrtum.create.client.foundation.gui.*;
+import com.zurrtum.create.client.foundation.gui.AllGuiTextures;
+import com.zurrtum.create.client.foundation.gui.AllIcons;
+import com.zurrtum.create.client.foundation.gui.ModularGuiLine;
+import com.zurrtum.create.client.foundation.gui.ModularGuiLineBuilder;
 import com.zurrtum.create.client.foundation.gui.menu.AbstractSimiContainerScreen;
 import com.zurrtum.create.client.foundation.gui.widget.IconButton;
 import com.zurrtum.create.client.foundation.gui.widget.Indicator;
@@ -38,7 +42,6 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.Drawable;
 import net.minecraft.client.gui.widget.TextFieldWidget;
-import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.util.math.Rect2i;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
@@ -66,7 +69,7 @@ import java.util.function.Function;
 
 import static com.zurrtum.create.Create.LOGGER;
 
-public class ScheduleScreen extends AbstractSimiContainerScreen<ScheduleMenu> implements ScreenWithStencils {
+public class ScheduleScreen extends AbstractSimiContainerScreen<ScheduleMenu> {
     private static final int CARD_HEADER = 22;
     private static final int CARD_WIDTH = 195;
 
@@ -400,13 +403,13 @@ public class ScheduleScreen extends AbstractSimiContainerScreen<ScheduleMenu> im
 
     protected void renderSchedule(DrawContext graphics, int mouseX, int mouseY, float partialTicks) {
         Matrix3x2fStack matrixStack = graphics.getMatrices();
-        VertexConsumerProvider.Immediate vertexConsumers = client.getBufferBuilders().getEntityVertexConsumers();
-        prepareFrameBuffer(client, vertexConsumers);
-        drawStretched(vertexConsumers, matrixStack, x + 33, y + 16, 3, 173, 0, AllGuiTextures.SCHEDULE_STRIP_DARK);
+        UIRenderHelper.drawStretched(graphics, x + 33, y + 16, 3, 173, AllGuiTextures.SCHEDULE_STRIP_DARK);
 
         int yOffset = 25;
         List<ScheduleEntry> entries = schedule.entries;
         float scrollOffset = -scroll.getValue(partialTicks);
+
+        graphics.enableScissor(x, y + 16, x + 236, y + 189);
 
         for (int i = 0; i <= entries.size(); i++) {
 
@@ -415,45 +418,35 @@ public class ScheduleScreen extends AbstractSimiContainerScreen<ScheduleMenu> im
                 float expectedY = scrollOffset + y + yOffset + 4;
                 float actualY = MathHelper.clamp(expectedY, y + 18, y + 170);
                 matrixStack.translate(0, actualY);
-                drawTexture(
-                    vertexConsumers,
-                    matrixStack,
-                    x,
-                    0,
-                    100,
-                    expectedY == actualY ? AllGuiTextures.SCHEDULE_POINTER : AllGuiTextures.SCHEDULE_POINTER_OFFSCREEN
-                );
+                (expectedY == actualY ? AllGuiTextures.SCHEDULE_POINTER : AllGuiTextures.SCHEDULE_POINTER_OFFSCREEN).render(graphics, x, 0);
                 matrixStack.popMatrix();
             }
 
-            startStencil(client, vertexConsumers, matrixStack, x + 16, y + 16, 220, 173);
             matrixStack.pushMatrix();
             matrixStack.translate(0, scrollOffset);
             if (i == 0 || entries.size() == 0)
-                drawStretched(vertexConsumers, matrixStack, x + 33, y + 16, 3, 10, 100, AllGuiTextures.SCHEDULE_STRIP_LIGHT);
+                UIRenderHelper.drawStretched(graphics, x + 33, y + 16, 3, 10, AllGuiTextures.SCHEDULE_STRIP_LIGHT);
 
             if (i == entries.size()) {
                 if (i > 0)
                     yOffset += 9;
-                drawTexture(vertexConsumers, matrixStack, x + 29, y + yOffset, 100, AllGuiTextures.SCHEDULE_STRIP_END);
-                drawTexture(vertexConsumers, matrixStack, x + 43, y + yOffset, 100, AllGuiTextures.SCHEDULE_CARD_NEW);
+                AllGuiTextures.SCHEDULE_STRIP_END.render(graphics, x + 29, y + yOffset);
+                AllGuiTextures.SCHEDULE_CARD_NEW.render(graphics, x + 43, y + yOffset);
                 matrixStack.popMatrix();
-                endStencil(client, vertexConsumers, matrixStack, x + 16, y + 16, 220, 173);
                 break;
             }
 
             ScheduleEntry scheduleEntry = entries.get(i);
             int cardY = yOffset;
-            int cardHeight = renderScheduleEntry(graphics, vertexConsumers, scheduleEntry, cardY);
+            int cardHeight = renderScheduleEntry(graphics, scheduleEntry, cardY, mouseX, mouseY, partialTicks);
             yOffset += cardHeight;
 
             if (i + 1 < entries.size()) {
-                drawTexture(vertexConsumers, matrixStack, x + 29, y + yOffset - 3, 100, AllGuiTextures.SCHEDULE_STRIP_DOTTED);
+                AllGuiTextures.SCHEDULE_STRIP_DOTTED.render(graphics, x + 29, y + yOffset - 3);
                 yOffset += 10;
             }
 
             matrixStack.popMatrix();
-            endStencil(client, vertexConsumers, matrixStack, x + 16, y + 16, 220, 173);
 
             if (!scheduleEntry.instruction.supportsConditions())
                 continue;
@@ -472,36 +465,33 @@ public class ScheduleScreen extends AbstractSimiContainerScreen<ScheduleMenu> im
             if (h <= 0)
                 continue;
 
-            startStencil(client, vertexConsumers, matrixStack, x + 43, y + y1, 161, h);
+            graphics.enableScissor(x + 43, 0, x + 204, 400);
             matrixStack.pushMatrix();
             matrixStack.translate(0, scrollOffset);
-            renderScheduleConditions(graphics, vertexConsumers, scheduleEntry, cardY, partialTicks, cardHeight, i);
+            renderScheduleConditions(graphics, scheduleEntry, cardY, mouseX, mouseY, partialTicks, cardHeight, i);
             matrixStack.popMatrix();
-            endStencil(client, vertexConsumers, matrixStack, x + 43, y + y1, 161, h);
+            graphics.disableScissor();
 
             if (isConditionAreaScrollable(scheduleEntry)) {
-                startStencil(client, vertexConsumers, matrixStack, x + 16, y + 16, 220, 173);
                 matrixStack.pushMatrix();
                 matrixStack.translate(0, scrollOffset);
                 int center = (cardHeight - 8 + CARD_HEADER) / 2;
                 float chaseTarget = horizontalScrolls.get(i).getChaseTarget();
                 if (!MathHelper.approximatelyEquals(chaseTarget, 0))
-                    drawTexture(vertexConsumers, matrixStack, x + 40, y + cardY + center, 100, AllGuiTextures.SCHEDULE_SCROLL_LEFT);
+                    AllGuiTextures.SCHEDULE_SCROLL_LEFT.render(graphics, x + 40, y + cardY + center);
                 if (!MathHelper.approximatelyEquals(chaseTarget, scheduleEntry.conditions.size() - 1))
-                    drawTexture(vertexConsumers, matrixStack, x + 203, y + cardY + center, 100, AllGuiTextures.SCHEDULE_SCROLL_RIGHT);
+                    AllGuiTextures.SCHEDULE_SCROLL_RIGHT.render(graphics, x + 203, y + cardY + center);
                 matrixStack.popMatrix();
-                endStencil(client, vertexConsumers, matrixStack, x + 16, y + 16, 220, 173);
             }
         }
 
-        int zLevel = 101;
-        fillGradient(vertexConsumers, matrixStack, x + 16, y + 16, x + 16 + 220, y + 16 + 10, zLevel, 0x77000000, 0x00000000);
-        fillGradient(vertexConsumers, matrixStack, x + 16, y + 179, x + 16 + 220, y + 179 + 10, zLevel, 0x00000000, 0x77000000);
-        endFrameBuffer(client, vertexConsumers, graphics);
+        graphics.disableScissor();
+
+        graphics.fillGradient(x + 16, y + 16, x + 16 + 220, y + 16 + 10, 0x77000000, 0x00000000);
+        graphics.fillGradient(x + 16, y + 179, x + 16 + 220, y + 179 + 10, 0x00000000, 0x77000000);
     }
 
-    public int renderScheduleEntry(DrawContext graphics, VertexConsumerProvider.Immediate vertexConsumers, ScheduleEntry entry, int yOffset) {
-        int zLevel = 100;
+    public int renderScheduleEntry(DrawContext graphics, ScheduleEntry entry, int yOffset, int mouseX, int mouseY, float partialTicks) {
         AllGuiTextures light = AllGuiTextures.SCHEDULE_CARD_LIGHT;
         AllGuiTextures medium = AllGuiTextures.SCHEDULE_CARD_MEDIUM;
         AllGuiTextures dark = AllGuiTextures.SCHEDULE_CARD_DARK;
@@ -519,38 +509,31 @@ public class ScheduleScreen extends AbstractSimiContainerScreen<ScheduleMenu> im
         matrixStack.pushMatrix();
         matrixStack.translate(x + 25, y + yOffset);
 
-        drawStretched(vertexConsumers, matrixStack, 0, 1, cardWidth, cardHeight - 2, zLevel, light);
-        drawStretched(vertexConsumers, matrixStack, 1, 0, cardWidth - 2, cardHeight, zLevel, light);
-        drawStretched(vertexConsumers, matrixStack, 1, 1, cardWidth - 2, cardHeight - 2, zLevel, dark);
-        drawStretched(vertexConsumers, matrixStack, 2, 2, cardWidth - 4, cardHeight - 4, zLevel, medium);
-        drawStretched(vertexConsumers, matrixStack, 2, 2, cardWidth - 4, cardHeader, zLevel, supportsConditions ? light : medium);
+        UIRenderHelper.drawStretched(graphics, 0, 1, cardWidth, cardHeight - 2, light);
+        UIRenderHelper.drawStretched(graphics, 1, 0, cardWidth - 2, cardHeight, light);
+        UIRenderHelper.drawStretched(graphics, 1, 1, cardWidth - 2, cardHeight - 2, dark);
+        UIRenderHelper.drawStretched(graphics, 2, 2, cardWidth - 4, cardHeight - 4, medium);
+        UIRenderHelper.drawStretched(graphics, 2, 2, cardWidth - 4, cardHeader, supportsConditions ? light : medium);
 
-        drawTexture(vertexConsumers, matrixStack, cardWidth - 14, 2, zLevel, AllGuiTextures.SCHEDULE_CARD_REMOVE);
-        drawTexture(vertexConsumers, matrixStack, cardWidth - 14, cardHeight - 14, zLevel, AllGuiTextures.SCHEDULE_CARD_DUPLICATE);
+        AllGuiTextures.SCHEDULE_CARD_REMOVE.render(graphics, cardWidth - 14, 2);
+        AllGuiTextures.SCHEDULE_CARD_DUPLICATE.render(graphics, cardWidth - 14, cardHeight - 14);
 
         int i = schedule.entries.indexOf(entry);
         if (i > 0)
-            drawTexture(vertexConsumers, matrixStack, cardWidth, cardHeader - 14, zLevel, AllGuiTextures.SCHEDULE_CARD_MOVE_UP);
+            AllGuiTextures.SCHEDULE_CARD_MOVE_UP.render(graphics, cardWidth, cardHeader - 14);
         if (i < schedule.entries.size() - 1)
-            drawTexture(vertexConsumers, matrixStack, cardWidth, cardHeader, zLevel, AllGuiTextures.SCHEDULE_CARD_MOVE_DOWN);
+            AllGuiTextures.SCHEDULE_CARD_MOVE_DOWN.render(graphics, cardWidth, cardHeader);
 
-        drawStretched(vertexConsumers, matrixStack, 8, 0, 3, cardHeight + 10, zLevel, AllGuiTextures.SCHEDULE_STRIP_LIGHT);
-        drawTexture(
-            vertexConsumers,
-            matrixStack,
-            4,
-            6,
-            zLevel,
-            supportsConditions ? AllGuiTextures.SCHEDULE_STRIP_TRAVEL : AllGuiTextures.SCHEDULE_STRIP_ACTION
-        );
+        UIRenderHelper.drawStretched(graphics, 8, 0, 3, cardHeight + 10, AllGuiTextures.SCHEDULE_STRIP_LIGHT);
+        (supportsConditions ? AllGuiTextures.SCHEDULE_STRIP_TRAVEL : AllGuiTextures.SCHEDULE_STRIP_ACTION).render(graphics, 4, 6);
 
         if (supportsConditions)
-            drawTexture(vertexConsumers, matrixStack, 4, 28, zLevel, AllGuiTextures.SCHEDULE_STRIP_WAIT);
+            AllGuiTextures.SCHEDULE_STRIP_WAIT.render(graphics, 4, 28);
 
         IScheduleInput<ScheduleInstruction> scheduleInput = AllScheduleRenders.get(instruction);
         Pair<ItemStack, Text> destination = scheduleInput.getSummary(instruction);
-        renderInput(graphics, vertexConsumers, destination, 26, 5, zLevel, false, 100);
-        scheduleInput.renderStencilSpecialIcon(instruction, graphics, vertexConsumers, this, 30, 5);
+        renderInput(graphics, destination, 26, 5, false, 100);
+        scheduleInput.renderSpecialIcon(instruction, graphics, 30, 5);
 
         matrixStack.popMatrix();
 
@@ -559,9 +542,10 @@ public class ScheduleScreen extends AbstractSimiContainerScreen<ScheduleMenu> im
 
     public void renderScheduleConditions(
         DrawContext graphics,
-        VertexConsumerProvider.Immediate vertexConsumers,
         ScheduleEntry entry,
         int yOffset,
+        int mouseX,
+        int mouseY,
         float partialTicks,
         int cardHeight,
         int entryIndex
@@ -583,51 +567,21 @@ public class ScheduleScreen extends AbstractSimiContainerScreen<ScheduleMenu> im
             for (int i = 0; i < list.size(); i++) {
                 ScheduleWaitCondition scheduleWaitCondition = list.get(i);
                 IScheduleInput<ScheduleWaitCondition> scheduleInput = AllScheduleRenders.get(scheduleWaitCondition);
-                Math.max(
-                    maxWidth,
-                    renderInput(
-                        graphics,
-                        vertexConsumers,
-                        scheduleInput.getSummary(scheduleWaitCondition),
-                        xOffset,
-                        29 + i * 18,
-                        100,
-                        i != 0,
-                        maxWidth
-                    )
-                );
-                scheduleInput.renderStencilSpecialIcon(scheduleWaitCondition, graphics, vertexConsumers, this, xOffset + 4, 29 + i * 18);
+                Math.max(maxWidth, renderInput(graphics, scheduleInput.getSummary(scheduleWaitCondition), xOffset, 29 + i * 18, i != 0, maxWidth));
+                scheduleInput.renderSpecialIcon(scheduleWaitCondition, graphics, xOffset + 4, 29 + i * 18);
             }
 
-            drawTexture(
-                vertexConsumers,
-                matrixStack,
-                xOffset + (maxWidth - 10) / 2,
-                29 + list.size() * 18,
-                100,
-                AllGuiTextures.SCHEDULE_CONDITION_APPEND
-            );
+            AllGuiTextures.SCHEDULE_CONDITION_APPEND.render(graphics, xOffset + (maxWidth - 10) / 2, 29 + list.size() * 18);
             xOffset += maxWidth + 10;
         }
 
-        drawTexture(vertexConsumers, matrixStack, xOffset - 3, 29, 100, AllGuiTextures.SCHEDULE_CONDITION_NEW);
+        AllGuiTextures.SCHEDULE_CONDITION_NEW.render(graphics, xOffset - 3, 29);
         matrixStack.popMatrix();
 
         if (xOffset + 16 > cardWidth - 26) {
             matrixStack.rotate(MathHelper.RADIANS_PER_DEGREE * -90);
-            int zLevel = 101;
-            fillGradient(vertexConsumers, matrixStack, -cardHeight + 2, 18, -2 - cardHeader, 28, zLevel, 0x44000000, 0x00000000);
-            fillGradient(
-                vertexConsumers,
-                matrixStack,
-                -cardHeight + 2,
-                cardWidth - 26,
-                -2 - cardHeader,
-                cardWidth - 16,
-                zLevel,
-                0x00000000,
-                0x44000000
-            );
+            graphics.fillGradient(-cardHeight + 2, 18, -2 - cardHeader, 28, 0x44000000, 0x00000000);
+            graphics.fillGradient(-cardHeight + 2, cardWidth - 26, -2 - cardHeader, cardWidth - 16, 0x00000000, 0x44000000);
         }
 
         matrixStack.popMatrix();
@@ -661,16 +615,7 @@ public class ScheduleScreen extends AbstractSimiContainerScreen<ScheduleMenu> im
         return maxWidth;
     }
 
-    protected int renderInput(
-        DrawContext graphics,
-        VertexConsumerProvider.Immediate vertexConsumers,
-        Pair<ItemStack, Text> pair,
-        int x,
-        int y,
-        int z,
-        boolean clean,
-        int minSize
-    ) {
+    protected int renderInput(DrawContext graphics, Pair<ItemStack, Text> pair, int x, int y, boolean clean, int minSize) {
         ItemStack stack = pair.getFirst();
         Text text = pair.getSecond();
         boolean hasItem = !stack.isEmpty();
@@ -684,27 +629,17 @@ public class ScheduleScreen extends AbstractSimiContainerScreen<ScheduleMenu> im
         AllGuiTextures right = AllGuiTextures.SCHEDULE_CONDITION_RIGHT;
 
         matrixStack.translate(x, y);
-        drawStretched(vertexConsumers, matrixStack, 0, 0, fieldSize, 16, z, middle);
-        drawTexture(vertexConsumers, matrixStack, clean ? 0 : -3, 0, z, left);
-        drawTexture(vertexConsumers, matrixStack, fieldSize - 2, 0, z, right);
+        UIRenderHelper.drawStretched(graphics, 0, 0, fieldSize, 16, middle);
+        left.render(graphics, clean ? 0 : -3, 0);
+        right.render(graphics, fieldSize - 2, 0);
         if (hasItem) {
-            drawTexture(vertexConsumers, matrixStack, 3, 0, z, item);
+            item.render(graphics, 3, 0);
             if (stack.getItem() != Items.STRUCTURE_VOID)
-                drawItem(client, vertexConsumers, matrixStack, stack, 4, 0, null);
+                graphics.drawItem(stack, 4, 0);
         }
 
         if (text != null)
-            drawText(
-                vertexConsumers,
-                matrixStack,
-                textRenderer,
-                textRenderer.trimToWidth(text, 120).getString(),
-                hasItem ? 28 : 8,
-                4,
-                z,
-                0xff_f2f2ee,
-                true
-            );
+            graphics.drawText(textRenderer, textRenderer.trimToWidth(text, 120).getString(), hasItem ? 28 : 8, 4, 0xff_f2f2ee, true);
 
         matrixStack.popMatrix();
         return fieldSize;

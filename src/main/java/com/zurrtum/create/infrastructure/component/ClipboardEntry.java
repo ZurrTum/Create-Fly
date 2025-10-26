@@ -5,11 +5,9 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.zurrtum.create.AllDataComponents;
 import net.minecraft.component.ComponentMap;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.RegistryByteBuf;
 import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.network.codec.PacketCodecs;
-import net.minecraft.screen.ScreenTexts;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.TextCodecs;
 import org.jetbrains.annotations.Nullable;
@@ -98,27 +96,6 @@ public class ClipboardEntry {
         int previouslyOpenedPage = heldItem.getOrDefault(AllDataComponents.CLIPBOARD_CONTENT, ClipboardContent.EMPTY).previouslyOpenedPage();
         int page = Math.min(previouslyOpenedPage, pages.size() - 1);
         return pages.get(page);
-    }
-
-    public NbtCompound writeNBT() {
-        NbtCompound nbt = new NbtCompound();
-        nbt.putBoolean("Checked", checked);
-        nbt.put("Text", TextCodecs.CODEC, text);
-        if (icon.isEmpty())
-            return nbt;
-        nbt.put("Icon", ItemStack.CODEC, icon);
-        nbt.putInt("ItemAmount", itemAmount);
-        return nbt;
-    }
-
-    public static ClipboardEntry readNBT(NbtCompound tag) {
-        ClipboardEntry clipboardEntry = new ClipboardEntry(
-            tag.getBoolean("Checked", false),
-            tag.get("Text", TextCodecs.CODEC).orElse(ScreenTexts.EMPTY).copy()
-        );
-        if (tag.contains("Icon"))
-            clipboardEntry.displayItem(tag.get("Icon", ItemStack.CODEC).orElse(ItemStack.EMPTY), tag.getInt("ItemAmount", 0));
-        return clipboardEntry;
     }
 
     @Override

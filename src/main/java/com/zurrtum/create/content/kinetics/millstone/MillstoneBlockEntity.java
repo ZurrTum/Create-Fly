@@ -120,10 +120,15 @@ public class MillstoneBlockEntity extends KineticBlockEntity {
             lastRecipe = recipe.get().value();
         }
 
+        ItemStack recipeRemainder = stack.getItem().getRecipeRemainder();
         stack.decrement(1);
         capability.setStack(0, stack);
         capability.outputAllowInsertion();
-        capability.insert(lastRecipe.craft(input, world.random));
+        List<ItemStack> list = lastRecipe.craft(input, world.random);
+        if (!recipeRemainder.isEmpty()) {
+            list.add(recipeRemainder);
+        }
+        capability.insert(list);
         capability.outputForbidInsertion();
 
         award(AllAdvancements.MILLSTONE);

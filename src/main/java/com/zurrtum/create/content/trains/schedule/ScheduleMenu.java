@@ -27,9 +27,9 @@ public class ScheduleMenu extends GhostItemMenu<ItemStack> {
     }
 
     @Override
-    public void onSlotClick(int slotId, int dragType, SlotActionType clickTypeIn, PlayerEntity player) {
-        if (slotId != playerInventory.getSelectedSlot() || clickTypeIn == SlotActionType.THROW)
-            super.onSlotClick(slotId, dragType, clickTypeIn, player);
+    public void onSlotClick(int index, int dragType, SlotActionType clickType, PlayerEntity player) {
+        if (index != playerInventory.getSelectedSlot() || clickType == SlotActionType.THROW || clickType == SlotActionType.CLONE)
+            super.onSlotClick(index, dragType, clickType, player);
     }
 
     @Override
@@ -60,6 +60,17 @@ public class ScheduleMenu extends GhostItemMenu<ItemStack> {
     @Override
     public boolean canUse(PlayerEntity player) {
         return playerInventory.getSelectedStack() == contentHolder;
+    }
+
+    @Override
+    public boolean canInsertIntoSlot(ItemStack stack, Slot slot) {
+        // prevent pick-all from taking this schedule out of its slot
+        return super.canInsertIntoSlot(stack, slot) && !this.isInSlot(slot.id);
+    }
+
+    protected boolean isInSlot(int index) {
+        // Inventory has the hotbar as 0-8, but menus put the hotbar at 27-35
+        return index >= 27 && index - 27 == playerInventory.getSelectedSlot();
     }
 
     class InactiveSlot extends Slot {

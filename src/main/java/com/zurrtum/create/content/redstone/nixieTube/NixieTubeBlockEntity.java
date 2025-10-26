@@ -10,6 +10,7 @@ import com.zurrtum.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.foundation.utility.DynamicComponent;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.screen.ScreenTexts;
 import net.minecraft.storage.ReadView;
 import net.minecraft.storage.WriteView;
 import net.minecraft.text.MutableText;
@@ -102,6 +103,10 @@ public class NixieTubeBlockEntity extends SmartBlockEntity {
         nixieIndex = nixiePositionInRow;
         DisplayLinkBlock.notifyGatherers(world, pos);
         notifyUpdate();
+    }
+
+    public void displayEmptyText(int nixiePositionInRow) {
+        displayCustomText(ScreenTexts.EMPTY, nixiePositionInRow);
     }
 
     public void updateDisplayedStrings() {

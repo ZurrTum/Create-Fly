@@ -1,8 +1,5 @@
 package com.zurrtum.create.client.foundation.gui.menu;
 
-import com.mojang.blaze3d.buffers.GpuBufferSlice;
-import com.mojang.blaze3d.systems.ProjectionType;
-import com.mojang.blaze3d.systems.RenderSystem;
 import com.zurrtum.create.client.catnip.animation.AnimationTickHolder;
 import com.zurrtum.create.client.catnip.gui.TickableGuiEventListener;
 import com.zurrtum.create.client.catnip.gui.widget.AbstractSimiWidget;
@@ -33,18 +30,6 @@ import java.util.Collections;
 import java.util.List;
 
 public abstract class AbstractSimiContainerScreen<T extends ScreenHandler> extends HandledScreen<T> {
-    public static GpuBufferSlice projectionMatrixBuffer;
-    public static ProjectionType projectionType;
-
-    public static void backupProjectionMatrix() {
-        projectionMatrixBuffer = RenderSystem.getProjectionMatrixBuffer();
-        projectionType = RenderSystem.getProjectionType();
-    }
-
-    public static void restoreProjectionMatrix() {
-        RenderSystem.setProjectionMatrix(projectionMatrixBuffer, projectionType);
-    }
-
     protected int windowXOffset, windowYOffset;
 
     public AbstractSimiContainerScreen(T container, PlayerInventory inv, Text title) {
