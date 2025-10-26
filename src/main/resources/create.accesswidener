@@ -264,3 +264,4 @@ accessible class net/minecraft/recipe/BrewingRecipeRegistry$Recipe
 accessible field net/minecraft/recipe/BrewingRecipeRegistry itemRecipes Ljava/util/List;
 accessible field net/minecraft/item/ItemStackSet HASH_STRATEGY Lit/unimi/dsi/fastutil/Hash$Strategy;
 accessible field net/minecraft/entity/Entity POSE Lnet/minecraft/entity/data/TrackedData;
+accessible method net/minecraft/world/chunk/light/LightStorage getLightSection (JZ)Lnet/minecraft/world/chunk/ChunkNibbleArray;

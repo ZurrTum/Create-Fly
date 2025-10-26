@@ -12,6 +12,7 @@ import com.zurrtum.create.client.flywheel.api.visual.TickableVisual;
 import com.zurrtum.create.client.flywheel.api.visualization.VisualManager;
 import com.zurrtum.create.client.flywheel.api.visualization.VisualizationLevel;
 import com.zurrtum.create.client.flywheel.api.visualization.VisualizationManager;
+import com.zurrtum.create.client.flywheel.backend.engine.EngineImpl;
 import com.zurrtum.create.client.flywheel.impl.FlwConfig;
 import com.zurrtum.create.client.flywheel.impl.task.Flag;
 import com.zurrtum.create.client.flywheel.impl.task.FlwTaskExecutor;
@@ -341,6 +342,22 @@ public class VisualizationManagerImpl implements VisualizationManager {
         if (lateInit != null) {
             lateInit.engine.delete();
         }
+    }
+
+    /**
+     * Expose the raw engine, iff it has been initialized and is a default Flywheel engine.
+     * <p>For debug information gathering only.
+     */
+    @Nullable
+    public EngineImpl getEngineImpl() {
+        if (lateInit == null) {
+            return null;
+        }
+        var engine = lateInit.engine;
+        if (engine instanceof EngineImpl engineImpl) {
+            return engineImpl;
+        }
+        return null;
     }
 
     private class RenderDispatcherImpl implements RenderDispatcher {

@@ -1,5 +1,6 @@
 package com.zurrtum.create.client.flywheel.lib.model;
 
+import com.zurrtum.create.client.flywheel.api.material.CardinalLightingMode;
 import com.zurrtum.create.client.flywheel.api.material.Material;
 import com.zurrtum.create.client.flywheel.api.model.IndexSequence;
 import com.zurrtum.create.client.flywheel.api.model.Mesh;
@@ -18,8 +19,8 @@ import org.joml.Vector4fc;
 import org.lwjgl.system.MemoryUtil;
 
 public final class LineModelBuilder {
-    private static final Material MATERIAL = SimpleMaterial.builder().shaders(StandardMaterialShaders.LINE).backfaceCulling(false).diffuse(false)
-        .build();
+    private static final Material MATERIAL = SimpleMaterial.builder().shaders(StandardMaterialShaders.LINE).backfaceCulling(false)
+        .cardinalLightingMode(CardinalLightingMode.OFF).build();
 
     @UnknownNullability
     private VertexView vertexView;
