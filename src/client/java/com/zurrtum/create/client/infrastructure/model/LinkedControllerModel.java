@@ -13,20 +13,19 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.item.ItemModelManager;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.TexturedRenderLayers;
-import net.minecraft.client.render.VertexConsumerProvider;
+import net.minecraft.client.render.command.OrderedRenderCommandQueue;
 import net.minecraft.client.render.item.ItemRenderState;
 import net.minecraft.client.render.item.ItemRenderState.LayerRenderState;
-import net.minecraft.client.render.item.ItemRenderer;
 import net.minecraft.client.render.item.model.BasicItemModel;
 import net.minecraft.client.render.item.model.ItemModel;
 import net.minecraft.client.render.item.model.special.SpecialModelRenderer;
 import net.minecraft.client.render.model.*;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.client.world.ClientWorld;
-import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.ItemDisplayContext;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Arm;
+import net.minecraft.util.HeldItemContext;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Util;
 import net.minecraft.util.math.MathHelper;
@@ -111,7 +110,7 @@ public class LinkedControllerModel implements ItemModel, SpecialModelRenderer<Li
         ItemModelManager resolver,
         ItemDisplayContext displayContext,
         @Nullable ClientWorld world,
-        @Nullable LivingEntity user,
+        @Nullable HeldItemContext user,
         int seed
     ) {
         state.addModelKey(this);
@@ -145,31 +144,32 @@ public class LinkedControllerModel implements ItemModel, SpecialModelRenderer<Li
         LinkedControllerModel.RenderData data,
         ItemDisplayContext displayContext,
         MatrixStack matrices,
-        VertexConsumerProvider vertexConsumers,
+        OrderedRenderCommandQueue queue,
         int light,
         int overlay,
-        boolean glint
+        boolean glint,
+        int i
     ) {
         assert data != null;
-        render(displayContext, matrices, vertexConsumers, light, overlay, RenderType.NORMAL, data.equip, data.active, true);
+        render(displayContext, matrices, queue, light, overlay, RenderType.NORMAL, data.equip, data.active, true);
     }
 
     public void renderInLectern(
         ItemDisplayContext displayContext,
         MatrixStack matrices,
-        VertexConsumerProvider vertexConsumers,
+        OrderedRenderCommandQueue queue,
         int light,
         int overlay,
         boolean active,
         boolean renderDepression
     ) {
-        render(displayContext, matrices, vertexConsumers, light, overlay, RenderType.LECTERN, false, active, renderDepression);
+        render(displayContext, matrices, queue, light, overlay, RenderType.LECTERN, false, active, renderDepression);
     }
 
     private void render(
         ItemDisplayContext displayContext,
         MatrixStack matrices,
-        VertexConsumerProvider vertexConsumers,
+        OrderedRenderCommandQueue queue,
         int light,
         int overlay,
         RenderType renderType,
@@ -191,13 +191,13 @@ public class LinkedControllerModel implements ItemModel, SpecialModelRenderer<Li
             matrices.translate(-0.5f, -0.5f, -0.5f);
         }
 
-        renderQuads(displayContext, matrices, vertexConsumers, light, overlay, itemLayer, active ? powered : item);
+        renderQuads(displayContext, matrices, queue, light, overlay, itemLayer, active ? powered : item);
 
         if (!active) {
             matrices.pop();
             return;
         }
-        renderQuads(displayContext, matrices, vertexConsumers, light, overlay, cutoutLayer, torch);
+        renderQuads(displayContext, matrices, queue, light, overlay, cutoutLayer, torch);
         if (renderType == RenderType.NORMAL) {
             if (LinkedControllerClientHandler.MODE == Mode.BIND) {
                 int i = MathHelper.lerp((MathHelper.sin(AnimationTickHolder.getRenderTime() / 4f) + 1) / 2, 5, 15);
@@ -212,19 +212,19 @@ public class LinkedControllerModel implements ItemModel, SpecialModelRenderer<Li
         }
         matrices.push();
         matrices.translate(2 * s, 0, 8 * s);
-        renderButton(displayContext, matrices, vertexConsumers, light, overlay, button, pt, b, index++, renderDepression);
+        renderButton(displayContext, matrices, queue, light, overlay, button, pt, b, index++, renderDepression);
         matrices.translate(4 * s, 0, 0);
-        renderButton(displayContext, matrices, vertexConsumers, light, overlay, button, pt, b, index++, renderDepression);
+        renderButton(displayContext, matrices, queue, light, overlay, button, pt, b, index++, renderDepression);
         matrices.translate(-2 * s, 0, 2 * s);
-        renderButton(displayContext, matrices, vertexConsumers, light, overlay, button, pt, b, index++, renderDepression);
+        renderButton(displayContext, matrices, queue, light, overlay, button, pt, b, index++, renderDepression);
         matrices.translate(0, 0, -4 * s);
-        renderButton(displayContext, matrices, vertexConsumers, light, overlay, button, pt, b, index++, renderDepression);
+        renderButton(displayContext, matrices, queue, light, overlay, button, pt, b, index++, renderDepression);
         matrices.pop();
 
         matrices.translate(3 * s, 0, 3 * s);
-        renderButton(displayContext, matrices, vertexConsumers, light, overlay, button, pt, b, index++, renderDepression);
+        renderButton(displayContext, matrices, queue, light, overlay, button, pt, b, index++, renderDepression);
         matrices.translate(2 * s, 0, 0);
-        renderButton(displayContext, matrices, vertexConsumers, light, overlay, button, pt, b, index, renderDepression);
+        renderButton(displayContext, matrices, queue, light, overlay, button, pt, b, index, renderDepression);
 
         matrices.pop();
     }
@@ -232,7 +232,7 @@ public class LinkedControllerModel implements ItemModel, SpecialModelRenderer<Li
     private void renderButton(
         ItemDisplayContext displayContext,
         MatrixStack matrices,
-        VertexConsumerProvider vertexConsumers,
+        OrderedRenderCommandQueue queue,
         int light,
         int overlay,
         List<BakedQuad> button,
@@ -246,20 +246,20 @@ public class LinkedControllerModel implements ItemModel, SpecialModelRenderer<Li
             float depression = b * buttons.get(index).getValue(pt);
             matrices.translate(0, depression, 0);
         }
-        renderQuads(displayContext, matrices, vertexConsumers, light, overlay, itemLayer, button);
+        renderQuads(displayContext, matrices, queue, light, overlay, itemLayer, button);
         matrices.pop();
     }
 
     private void renderQuads(
         ItemDisplayContext displayContext,
         MatrixStack matrices,
-        VertexConsumerProvider vertexConsumers,
+        OrderedRenderCommandQueue queue,
         int light,
         int overlay,
         RenderLayer layer,
         List<BakedQuad> quads
     ) {
-        ItemRenderer.renderItem(displayContext, matrices, vertexConsumers, light, overlay, tints, quads, layer, ItemRenderState.Glint.NONE);
+        queue.submitItem(matrices, displayContext, light, overlay, 0, tints, quads, layer, ItemRenderState.Glint.NONE);
     }
 
     public static class RenderData {
@@ -294,7 +294,7 @@ public class LinkedControllerModel implements ItemModel, SpecialModelRenderer<Li
         }
 
         @Override
-        public ItemModel bake(BakeContext context) {
+        public ItemModel bake(ItemModel.BakeContext context) {
             Baker baker = context.blockModelBaker();
             BakedSimpleModel model = baker.getModel(ITEM_ID);
             ModelTextures textures = model.getTextures();
