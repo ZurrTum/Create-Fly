@@ -265,3 +265,6 @@ accessible field net/minecraft/recipe/BrewingRecipeRegistry itemRecipes Ljava/ut
 accessible field net/minecraft/item/ItemStackSet HASH_STRATEGY Lit/unimi/dsi/fastutil/Hash$Strategy;
 accessible field net/minecraft/entity/Entity POSE Lnet/minecraft/entity/data/TrackedData;
 accessible method net/minecraft/world/chunk/light/LightStorage getLightSection (JZ)Lnet/minecraft/world/chunk/ChunkNibbleArray;
+accessible class net/minecraft/client/gui/render/GuiRenderer$Draw
+accessible method com/mojang/blaze3d/pipeline/RenderPipeline$Builder withSnippet (Lcom/mojang/blaze3d/pipeline/RenderPipeline$Snippet;)V
+accessible method com/mojang/blaze3d/pipeline/RenderPipeline$Builder <init> ()V

@@ -1,6 +1,7 @@
 package com.zurrtum.create.client.mixin;
 
 import com.zurrtum.create.client.Create;
+import com.zurrtum.create.client.content.contraptions.wrench.RadialWrenchHandler;
 import com.zurrtum.create.client.content.equipment.toolbox.ToolboxHandlerClient;
 import net.minecraft.client.Keyboard;
 import net.minecraft.client.MinecraftClient;
@@ -33,6 +34,9 @@ public class KeyboardMixin {
         if (Create.SCHEMATIC_HANDLER.onKeyInput(key, pressed)) {
             return;
         }
-        ToolboxHandlerClient.onKeyInput(client, key);
+        if (ToolboxHandlerClient.onKeyInput(client, key)) {
+            return;
+        }
+        RadialWrenchHandler.onKeyInput(client, key, pressed);
     }
 }
