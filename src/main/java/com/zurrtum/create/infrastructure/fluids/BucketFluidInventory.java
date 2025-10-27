@@ -1,5 +1,6 @@
 package com.zurrtum.create.infrastructure.fluids;
 
+import com.zurrtum.create.AllFluids;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.item.BucketItem;
 import net.minecraft.item.Item;
@@ -15,6 +16,9 @@ public class BucketFluidInventory extends FluidItemInventoryWrapper {
     }
 
     public ItemStack toFillBucket(FluidStack stack) {
+        if (stack.isOf(AllFluids.MILK)) {
+            return Items.MILK_BUCKET.getDefaultStack();
+        }
         return stack.getFluid().getBucketItem().getDefaultStack();
     }
 
