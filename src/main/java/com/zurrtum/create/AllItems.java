@@ -1,5 +1,6 @@
 package com.zurrtum.create;
 
+import com.zurrtum.create.content.contraptions.actors.roller.RollerBlockItem;
 import com.zurrtum.create.content.contraptions.bearing.BlankSailBlockItem;
 import com.zurrtum.create.content.contraptions.glue.SuperGlueItem;
 import com.zurrtum.create.content.contraptions.minecart.MinecartCouplingItem;
@@ -255,7 +256,7 @@ public class AllItems {
     public static final BlockItem GREEN_SEAT = register(AllBlocks.GREEN_SEAT);
     public static final BlockItem RED_SEAT = register(AllBlocks.RED_SEAT);
     public static final BlockItem BLACK_SEAT = register(AllBlocks.BLACK_SEAT);
-    public static final BlockItem MECHANICAL_ROLLER = register(AllBlocks.MECHANICAL_ROLLER);
+    public static final RollerBlockItem MECHANICAL_ROLLER = register(AllBlocks.MECHANICAL_ROLLER, RollerBlockItem::new);
     public static final BlockItem PACKAGER = register(AllBlocks.PACKAGER);
     public static final BlockItem CARDBOARD_BLOCK = register(AllBlocks.CARDBOARD_BLOCK);
     public static final LogisticallyLinkedBlockItem STOCK_LINK = register(AllBlocks.STOCK_LINK, LogisticallyLinkedBlockItem::new);
