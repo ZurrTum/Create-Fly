@@ -6,8 +6,8 @@ import com.zurrtum.create.client.content.redstone.link.LinkRenderer.LinkRenderSt
 import com.zurrtum.create.client.foundation.blockEntity.behaviour.filtering.FilteringRenderer;
 import com.zurrtum.create.client.foundation.blockEntity.behaviour.filtering.FilteringRenderer.FilterRenderState;
 import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.item.ItemModelManager;
-import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.block.entity.BlockEntityRenderer;
 import net.minecraft.client.render.block.entity.BlockEntityRendererFactory;
 import net.minecraft.client.render.block.entity.state.BlockEntityRenderState;
@@ -16,6 +16,10 @@ import net.minecraft.client.render.command.OrderedRenderCommandQueue;
 import net.minecraft.client.render.state.CameraRenderState;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
+import net.minecraft.util.hit.BlockHitResult;
+import net.minecraft.util.hit.HitResult;
+import net.minecraft.util.hit.HitResult.Type;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import org.jetbrains.annotations.Nullable;
 
@@ -59,34 +63,37 @@ public class SmartBlockEntityRenderer<T extends SmartBlockEntity, S extends Smar
         }
     }
 
-    protected void renderNameplateOnHover(T blockEntity, Text tag, float yOffset, MatrixStack ms, VertexConsumerProvider buffer, int light) {
-        //TODO
-        //        MinecraftClient mc = MinecraftClient.getInstance();
-        //        if (blockEntity.isVirtual())
-        //            return;
-        //        if (mc.player.squaredDistanceTo(Vec3d.ofCenter(blockEntity.getPos())) > 4096.0f)
-        //            return;
-        //        HitResult hitResult = mc.crosshairTarget;
-        //        if (!(hitResult instanceof BlockHitResult bhr) || bhr.getType() == Type.MISS || !bhr.getBlockPos().equals(blockEntity.getPos()))
-        //            return;
-        //
-        //        float f = yOffset + 0.25f;
-        //        ms.push();
-        //        ms.translate(0.5, f, 0.5);
-        //        ms.multiply(mc.getEntityRenderDispatcher().getRotation());
-        //        ms.scale(0.025F, -0.025F, 0.025F);
-        //        Matrix4f matrix4f = ms.peek().getPositionMatrix();
-        //        float f2 = mc.options.getTextBackgroundOpacity(0.25F);
-        //        int j = (int) (f2 * 255.0F) << 24;
-        //        TextRenderer font = mc.textRenderer;
-        //        float f1 = (float) (-font.getWidth(tag) / 2);
-        //        font.draw(tag, f1, (float) 0, 553648127, false, matrix4f, buffer, TextRenderer.TextLayerType.SEE_THROUGH, j, light);
-        //        font.draw(tag, f1, (float) 0, -1, false, matrix4f, buffer, TextRenderer.TextLayerType.NORMAL, 0, light);
-        //        ms.pop();
+    public static NameplateRenderState getNameplateRenderState(
+        SmartBlockEntity blockEntity,
+        BlockPos pos,
+        Vec3d cameraPos,
+        Text tag,
+        float yOffset,
+        int light
+    ) {
+        if (blockEntity.isVirtual()) {
+            return null;
+        }
+        double distance = cameraPos.squaredDistanceTo(Vec3d.ofCenter(pos));
+        if (distance > 4096.0f) {
+            return null;
+        }
+        HitResult hitResult = MinecraftClient.getInstance().crosshairTarget;
+        if (!(hitResult instanceof BlockHitResult bhr) || bhr.getType() == Type.MISS || !bhr.getBlockPos().equals(pos)) {
+            return null;
+        }
+        Vec3d labelPos = new Vec3d(0.5, yOffset - 0.25, 0.5);
+        return new NameplateRenderState(labelPos, tag, light, distance);
     }
 
     public static class SmartRenderState extends BlockEntityRenderState {
         public FilterRenderState filter;
         public LinkRenderState link;
+    }
+
+    public record NameplateRenderState(Vec3d pos, Text label, int light, double distance) {
+        public void render(MatrixStack matrices, OrderedRenderCommandQueue queue, CameraRenderState cameraState) {
+            queue.submitLabel(matrices, pos, 0, label, true, light, distance, cameraState);
+        }
     }
 }
