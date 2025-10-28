@@ -5,77 +5,149 @@ import com.zurrtum.create.client.AllPartialModels;
 import com.zurrtum.create.client.catnip.render.CachedBuffers;
 import com.zurrtum.create.client.catnip.render.SuperByteBuffer;
 import com.zurrtum.create.client.flywheel.api.visualization.VisualizationManager;
-import com.zurrtum.create.client.foundation.blockEntity.renderer.SafeBlockEntityRenderer;
 import com.zurrtum.create.content.schematics.cannon.LaunchedItem;
 import com.zurrtum.create.content.schematics.cannon.LaunchedItem.ForBelt;
 import com.zurrtum.create.content.schematics.cannon.LaunchedItem.ForBlockState;
 import com.zurrtum.create.content.schematics.cannon.LaunchedItem.ForEntity;
 import com.zurrtum.create.content.schematics.cannon.SchematicannonBlockEntity;
 import net.minecraft.block.BlockState;
-import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.item.ItemModelManager;
+import net.minecraft.client.render.OverlayTexture;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.VertexConsumer;
-import net.minecraft.client.render.VertexConsumerProvider;
-import net.minecraft.client.render.block.BlockRenderManager;
+import net.minecraft.client.render.block.entity.BlockEntityRenderer;
 import net.minecraft.client.render.block.entity.BlockEntityRendererFactory;
-import net.minecraft.client.render.item.ItemRenderer;
+import net.minecraft.client.render.block.entity.state.BlockEntityRenderState;
+import net.minecraft.client.render.command.ModelCommandRenderer;
+import net.minecraft.client.render.command.OrderedRenderCommandQueue;
+import net.minecraft.client.render.item.ItemRenderState;
+import net.minecraft.client.render.state.CameraRenderState;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.ItemDisplayContext;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.util.math.*;
 import net.minecraft.util.math.random.Random;
+import net.minecraft.world.World;
+import org.jetbrains.annotations.Nullable;
 
-public class SchematicannonRenderer extends SafeBlockEntityRenderer<SchematicannonBlockEntity> {
+import java.util.ArrayList;
+import java.util.List;
+
+public class SchematicannonRenderer implements BlockEntityRenderer<SchematicannonBlockEntity, SchematicannonRenderer.SchematicannonRenderState> {
+    protected final ItemModelManager itemModelManager;
 
     public SchematicannonRenderer(BlockEntityRendererFactory.Context context) {
+        itemModelManager = context.itemModelManager();
     }
 
     @Override
-    protected void renderSafe(
-        SchematicannonBlockEntity blockEntity,
-        float partialTicks,
-        MatrixStack ms,
-        VertexConsumerProvider buffer,
-        int light,
-        int overlay
+    public SchematicannonRenderState createRenderState() {
+        return new SchematicannonRenderState();
+    }
+
+    @Override
+    public void updateRenderState(
+        SchematicannonBlockEntity be,
+        SchematicannonRenderState state,
+        float tickProgress,
+        Vec3d cameraPos,
+        @Nullable ModelCommandRenderer.CrumblingOverlayCommand crumblingOverlay
     ) {
-
-        boolean blocksLaunching = !blockEntity.flyingBlocks.isEmpty();
-        if (blocksLaunching)
-            renderLaunchedBlocks(blockEntity, partialTicks, ms, buffer, light, overlay);
-
-        if (VisualizationManager.supportsVisualization(blockEntity.getWorld()))
+        World world = be.getWorld();
+        boolean support = VisualizationManager.supportsVisualization(world);
+        boolean empty = be.flyingBlocks.isEmpty();
+        if (support && empty) {
             return;
+        }
+        BlockEntityRenderState.updateBlockEntityRenderState(be, state, crumblingOverlay);
+        if (!empty) {
+            state.blocks = getFlyBlocksRenderState(be, world, state.pos, tickProgress);
+        }
+        if (support) {
+            return;
+        }
+        SchematicannonRenderData data = state.data = new SchematicannonRenderData();
+        data.layer = RenderLayer.getSolid();
+        double[] cannonAngles = getCannonAngles(be, state.pos, tickProgress);
+        double recoil = getRecoil(be, tickProgress);
+        data.connector = CachedBuffers.partial(AllPartialModels.SCHEMATICANNON_CONNECTOR, state.blockState);
+        data.yaw = (float) (MathHelper.RADIANS_PER_DEGREE * (cannonAngles[0] + 90));
+        data.pipe = CachedBuffers.partial(AllPartialModels.SCHEMATICANNON_PIPE, state.blockState);
+        data.pitch = (float) (MathHelper.RADIANS_PER_DEGREE * cannonAngles[1]);
+        data.offset = (float) (-recoil / 100);
+        data.light = state.lightmapCoordinates;
+    }
 
-        BlockPos pos = blockEntity.getPos();
-        BlockState state = blockEntity.getCachedState();
+    @Override
+    public void render(SchematicannonRenderState state, MatrixStack matrices, OrderedRenderCommandQueue queue, CameraRenderState cameraState) {
+        if (state.blocks != null) {
+            for (LaunchedRenderState block : state.blocks) {
+                block.render(matrices, queue, state.lightmapCoordinates);
+            }
+        }
+        if (state.data != null) {
+            queue.submitCustom(matrices, state.data.layer, state.data);
+        }
+    }
 
-        double[] cannonAngles = getCannonAngles(blockEntity, pos, partialTicks);
-
-        double yaw = cannonAngles[0];
-        double pitch = cannonAngles[1];
-
-        double recoil = getRecoil(blockEntity, partialTicks);
-
-        ms.push();
-
-        VertexConsumer vb = buffer.getBuffer(RenderLayer.getSolid());
-
-        SuperByteBuffer connector = CachedBuffers.partial(AllPartialModels.SCHEMATICANNON_CONNECTOR, state);
-        connector.translate(.5f, 0, .5f);
-        connector.rotate((float) ((yaw + 90) / 180 * Math.PI), Direction.UP);
-        connector.translate(-.5f, 0, -.5f);
-        connector.light(light).renderInto(ms, vb);
-
-        SuperByteBuffer pipe = CachedBuffers.partial(AllPartialModels.SCHEMATICANNON_PIPE, state);
-        pipe.translate(.5f, 15 / 16f, .5f);
-        pipe.rotate((float) ((yaw + 90) / 180 * Math.PI), Direction.UP);
-        pipe.rotate((float) (pitch / 180 * Math.PI), Direction.SOUTH);
-        pipe.translate(-.5f, -15 / 16f, -.5f);
-        pipe.translate(0, -recoil / 100, 0);
-        pipe.light(light).renderInto(ms, vb);
-
-        ms.pop();
+    @Nullable
+    public List<LaunchedRenderState> getFlyBlocksRenderState(SchematicannonBlockEntity be, World world, BlockPos pos, float partialTicks) {
+        List<LaunchedRenderState> blocks = new ArrayList<>();
+        Vec3d position = Vec3d.ofCenter(pos.up());
+        for (LaunchedItem launched : be.flyingBlocks) {
+            if (launched.ticksRemaining == 0) {
+                continue;
+            }
+            // Calculate position of flying block
+            Vec3d target = Vec3d.ofCenter(launched.target);
+            Vec3d distance = target.subtract(position);
+            double yDifference = target.y - position.y;
+            double throwHeight = Math.sqrt(distance.lengthSquared()) * .6f + yDifference;
+            Vec3d cannonOffset = distance.add(0, throwHeight, 0).normalize().multiply(2);
+            Vec3d start = position.add(cannonOffset);
+            yDifference = target.y - start.y;
+            float t = ((float) launched.totalTicks - (launched.ticksRemaining + 1 - partialTicks)) / launched.totalTicks;
+            Vec3d blockLocationXZ = target.subtract(start).multiply(t).multiply(1, 0, 1);
+            // Height is determined through a bezier curve
+            double yOffset = 2 * (1 - t) * t * throwHeight + t * t * yDifference;
+            Vec3d blockLocation = blockLocationXZ.add(0.5, yOffset + 1.5, 0.5).add(cannonOffset);
+            float angle = MathHelper.RADIANS_PER_DEGREE * 360 * t;
+            if (launched instanceof ForBlockState forBlockState) {
+                // Render the Block
+                BlockState state;
+                if (launched instanceof ForBelt) {
+                    // Render a shaft instead of the belt
+                    state = AllBlocks.SHAFT.getDefaultState();
+                } else {
+                    state = forBlockState.state;
+                }
+                blocks.add(new LaunchedBlockRenderState(blockLocation, angle, 0.3f, state));
+            } else if (launched instanceof ForEntity) {
+                ItemRenderState item = new ItemRenderState();
+                item.displayContext = ItemDisplayContext.GROUND;
+                itemModelManager.update(item, launched.stack, item.displayContext, world, null, 0);
+                blocks.add(new LaunchedEntityRenderState(blockLocation, angle, 1.2f, item));
+            }
+            // Render particles for launch
+            if (launched.ticksRemaining == launched.totalTicks && be.firstRenderTick) {
+                start = start.subtract(.5, .5, .5);
+                be.firstRenderTick = false;
+                Random r = world.getRandom();
+                for (int i = 0; i < 10; i++) {
+                    double sX = cannonOffset.x * .01f;
+                    double sY = (cannonOffset.y + 1) * .01f;
+                    double sZ = cannonOffset.z * .01f;
+                    double rX = r.nextFloat() - sX * 40;
+                    double rY = r.nextFloat() - sY * 40;
+                    double rZ = r.nextFloat() - sZ * 40;
+                    world.addParticleClient(ParticleTypes.CLOUD, start.x + rX, start.y + rY, start.z + rZ, sX, sY, sZ);
+                }
+            }
+        }
+        if (blocks.isEmpty()) {
+            return null;
+        }
+        return blocks;
     }
 
     public static double[] getCannonAngles(SchematicannonBlockEntity blockEntity, BlockPos pos, float partialTicks) {
@@ -126,90 +198,6 @@ public class SchematicannonRenderer extends SafeBlockEntityRenderer<Schematicann
         return recoil;
     }
 
-    private static void renderLaunchedBlocks(
-        SchematicannonBlockEntity blockEntity,
-        float partialTicks,
-        MatrixStack ms,
-        VertexConsumerProvider buffer,
-        int light,
-        int overlay
-    ) {
-        MinecraftClient mc = MinecraftClient.getInstance();
-        BlockRenderManager blockRenderManager = mc.getBlockRenderManager();
-        ItemRenderer itemRenderer = mc.getItemRenderer();
-        for (LaunchedItem launched : blockEntity.flyingBlocks) {
-
-            if (launched.ticksRemaining == 0)
-                continue;
-
-            // Calculate position of flying block
-            Vec3d start = Vec3d.ofCenter(blockEntity.getPos().up());
-            Vec3d target = Vec3d.ofCenter(launched.target);
-            Vec3d distance = target.subtract(start);
-
-            double yDifference = target.y - start.y;
-            double throwHeight = Math.sqrt(distance.lengthSquared()) * .6f + yDifference;
-            Vec3d cannonOffset = distance.add(0, throwHeight, 0).normalize().multiply(2);
-            start = start.add(cannonOffset);
-            yDifference = target.y - start.y;
-
-            float progress = ((float) launched.totalTicks - (launched.ticksRemaining + 1 - partialTicks)) / launched.totalTicks;
-            Vec3d blockLocationXZ = target.subtract(start).multiply(progress).multiply(1, 0, 1);
-
-            // Height is determined through a bezier curve
-            float t = progress;
-            double yOffset = 2 * (1 - t) * t * throwHeight + t * t * yDifference;
-            Vec3d blockLocation = blockLocationXZ.add(0.5, yOffset + 1.5, 0.5).add(cannonOffset);
-
-            // Offset to position
-            ms.push();
-            ms.translate(blockLocation.x, blockLocation.y, blockLocation.z);
-
-            ms.translate(.125f, .125f, .125f);
-            ms.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(360 * t));
-            ms.multiply(RotationAxis.POSITIVE_X.rotationDegrees(360 * t));
-            ms.translate(-.125f, -.125f, -.125f);
-
-            if (launched instanceof ForBlockState) {
-                // Render the Block
-                BlockState state;
-                if (launched instanceof ForBelt) {
-                    // Render a shaft instead of the belt
-                    state = AllBlocks.SHAFT.getDefaultState();
-                } else {
-                    state = ((ForBlockState) launched).state;
-                }
-                float scale = .3f;
-                ms.scale(scale, scale, scale);
-                blockRenderManager.renderBlockAsEntity(state, ms, buffer, light, overlay);
-            } else if (launched instanceof ForEntity) {
-                // Render the item
-                float scale = 1.2f;
-                ms.scale(scale, scale, scale);
-                itemRenderer.renderItem(launched.stack, ItemDisplayContext.GROUND, light, overlay, ms, buffer, blockEntity.getWorld(), 0);
-            }
-
-            ms.pop();
-
-            // Render particles for launch
-            if (launched.ticksRemaining == launched.totalTicks && blockEntity.firstRenderTick) {
-                start = start.subtract(.5, .5, .5);
-                blockEntity.firstRenderTick = false;
-                for (int i = 0; i < 10; i++) {
-                    Random r = blockEntity.getWorld().getRandom();
-                    double sX = cannonOffset.x * .01f;
-                    double sY = (cannonOffset.y + 1) * .01f;
-                    double sZ = cannonOffset.z * .01f;
-                    double rX = r.nextFloat() - sX * 40;
-                    double rY = r.nextFloat() - sY * 40;
-                    double rZ = r.nextFloat() - sZ * 40;
-                    blockEntity.getWorld().addParticleClient(ParticleTypes.CLOUD, start.x + rX, start.y + rY, start.z + rZ, sX, sY, sZ);
-                }
-            }
-
-        }
-    }
-
     @Override
     public boolean rendersOutsideBoundingBox() {
         return true;
@@ -220,4 +208,80 @@ public class SchematicannonRenderer extends SafeBlockEntityRenderer<Schematicann
         return 128;
     }
 
+    public static class SchematicannonRenderState extends BlockEntityRenderState {
+        public List<LaunchedRenderState> blocks;
+        public SchematicannonRenderData data;
+    }
+
+    public static class SchematicannonRenderData implements OrderedRenderCommandQueue.Custom {
+        public RenderLayer layer;
+        public SuperByteBuffer connector;
+        public float yaw;
+        public SuperByteBuffer pipe;
+        public float pitch;
+        public float offset;
+        public int light;
+
+        @Override
+        public void render(MatrixStack.Entry matricesEntry, VertexConsumer vertexConsumer) {
+            connector.translate(0.5f, 0, 0.5f).rotate(yaw, Direction.UP).translate(-0.5f, 0, -0.5f).light(light)
+                .renderInto(matricesEntry, vertexConsumer);
+            pipe.translate(0.5f, 0.9375f, 0.5f).rotate(yaw, Direction.UP).rotate(pitch, Direction.SOUTH).translate(-0.5f, -0.9375f, -0.5f)
+                .translate(0, offset, 0).light(light).renderInto(matricesEntry, vertexConsumer);
+        }
+    }
+
+    public static abstract class LaunchedRenderState {
+        public Vec3d offset;
+        public float angle;
+        public float scale;
+
+        public LaunchedRenderState(Vec3d offset, float angle, float scale) {
+            this.offset = offset;
+            this.angle = angle;
+            this.scale = scale;
+        }
+
+        public void render(MatrixStack matrices, OrderedRenderCommandQueue queue, int light) {
+            matrices.push();
+            matrices.translate(offset);
+            matrices.translate(.125f, .125f, .125f);
+            matrices.multiply(RotationAxis.POSITIVE_Y.rotation(angle));
+            matrices.multiply(RotationAxis.POSITIVE_X.rotation(angle));
+            matrices.translate(-.125f, -.125f, -.125f);
+            matrices.scale(scale, scale, scale);
+            submit(queue, matrices, light);
+            matrices.pop();
+        }
+
+        public abstract void submit(OrderedRenderCommandQueue queue, MatrixStack matrices, int light);
+    }
+
+    public static class LaunchedBlockRenderState extends LaunchedRenderState {
+        public BlockState state;
+
+        public LaunchedBlockRenderState(Vec3d offset, float angle, float scale, BlockState state) {
+            super(offset, angle, scale);
+            this.state = state;
+        }
+
+        @Override
+        public void submit(OrderedRenderCommandQueue queue, MatrixStack matrices, int light) {
+            queue.submitBlock(matrices, state, light, OverlayTexture.DEFAULT_UV, 0);
+        }
+    }
+
+    public static class LaunchedEntityRenderState extends LaunchedRenderState {
+        public ItemRenderState item;
+
+        public LaunchedEntityRenderState(Vec3d offset, float angle, float scale, ItemRenderState item) {
+            super(offset, angle, scale);
+            this.item = item;
+        }
+
+        @Override
+        public void submit(OrderedRenderCommandQueue queue, MatrixStack matrices, int light) {
+            item.render(matrices, queue, light, OverlayTexture.DEFAULT_UV, 0);
+        }
+    }
 }
