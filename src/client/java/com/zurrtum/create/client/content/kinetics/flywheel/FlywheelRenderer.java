@@ -4,41 +4,44 @@ import com.zurrtum.create.catnip.math.AngleHelper;
 import com.zurrtum.create.client.catnip.render.CachedBuffers;
 import com.zurrtum.create.client.catnip.render.SuperByteBuffer;
 import com.zurrtum.create.client.content.kinetics.base.KineticBlockEntityRenderer;
-import com.zurrtum.create.client.flywheel.api.visualization.VisualizationManager;
 import com.zurrtum.create.content.kinetics.flywheel.FlywheelBlockEntity;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.VertexConsumer;
-import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.block.entity.BlockEntityRendererFactory;
+import net.minecraft.client.render.command.ModelCommandRenderer;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.util.math.Vec3d;
+import org.jetbrains.annotations.Nullable;
 
-public class FlywheelRenderer extends KineticBlockEntityRenderer<FlywheelBlockEntity> {
-
+public class FlywheelRenderer extends KineticBlockEntityRenderer<FlywheelBlockEntity, FlywheelRenderer.FlywheelRenderState> {
     public FlywheelRenderer(BlockEntityRendererFactory.Context context) {
         super(context);
     }
 
     @Override
-    protected void renderSafe(FlywheelBlockEntity be, float partialTicks, MatrixStack ms, VertexConsumerProvider buffer, int light, int overlay) {
-        super.renderSafe(be, partialTicks, ms, buffer, light, overlay);
-
-        if (VisualizationManager.supportsVisualization(be.getWorld()))
-            return;
-
-        BlockState blockState = be.getCachedState();
-
-        float speed = be.visualSpeed.getValue(partialTicks) * 3 / 10f;
-        float angle = be.angle + speed * partialTicks;
-
-        VertexConsumer vb = buffer.getBuffer(RenderLayer.getSolid());
-        renderFlywheel(be, ms, light, blockState, angle, vb);
+    public FlywheelRenderState createRenderState() {
+        return new FlywheelRenderState();
     }
 
-    private void renderFlywheel(FlywheelBlockEntity be, MatrixStack ms, int light, BlockState blockState, float angle, VertexConsumer vb) {
-        SuperByteBuffer wheel = CachedBuffers.block(blockState);
-        kineticRotationTransform(wheel, be, getRotationAxisOf(be), AngleHelper.rad(angle), light);
-        wheel.renderInto(ms, vb);
+    @Override
+    public void updateRenderState(
+        FlywheelBlockEntity be,
+        FlywheelRenderState state,
+        float tickProgress,
+        Vec3d cameraPos,
+        ModelCommandRenderer.@Nullable CrumblingOverlayCommand crumblingOverlay
+    ) {
+        super.updateRenderState(be, state, tickProgress, cameraPos, crumblingOverlay);
+        BlockState blockState = be.getCachedState();
+        state.wheel = CachedBuffers.block(blockState);
+        float speed = be.visualSpeed.getValue(tickProgress) * 3 / 10f;
+        state.wheelAngle = AngleHelper.rad(be.angle + speed * tickProgress);
+    }
+
+    @Override
+    protected RenderLayer getRenderType(FlywheelBlockEntity be, BlockState state) {
+        return RenderLayer.getSolid();
     }
 
     @Override
@@ -46,4 +49,14 @@ public class FlywheelRenderer extends KineticBlockEntityRenderer<FlywheelBlockEn
         return shaft(getRotationAxisOf(be));
     }
 
+    public static class FlywheelRenderState extends KineticRenderState {
+        public SuperByteBuffer wheel;
+        public float wheelAngle;
+
+        @Override
+        public void render(MatrixStack.Entry matricesEntry, VertexConsumer vertexConsumer) {
+            super.render(matricesEntry, vertexConsumer);
+            wheel.light(lightmapCoordinates).rotateCentered(wheelAngle, direction).color(color).renderInto(matricesEntry, vertexConsumer);
+        }
+    }
 }
