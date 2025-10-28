@@ -14,162 +14,315 @@ import com.zurrtum.create.content.redstone.displayLink.DisplayLinkBlockEntity;
 import com.zurrtum.create.content.redstone.link.RedstoneLinkBlockEntity;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.render.LightmapTextureManager;
+import net.minecraft.client.render.OverlayTexture;
 import net.minecraft.client.render.RenderLayer;
-import net.minecraft.client.render.VertexConsumerProvider;
+import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.render.block.entity.BlockEntityRendererFactory;
+import net.minecraft.client.render.command.ModelCommandRenderer;
+import net.minecraft.client.render.command.OrderedRenderCommandQueue;
+import net.minecraft.client.render.state.CameraRenderState;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
+import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
-public class FactoryPanelRenderer extends SmartBlockEntityRenderer<FactoryPanelBlockEntity> {
-
+public class FactoryPanelRenderer extends SmartBlockEntityRenderer<FactoryPanelBlockEntity, FactoryPanelRenderer.FactoryPanelRenderState> {
     public FactoryPanelRenderer(BlockEntityRendererFactory.Context context) {
         super(context);
     }
 
     @Override
-    protected void renderSafe(FactoryPanelBlockEntity be, float partialTicks, MatrixStack ms, VertexConsumerProvider buffer, int light, int overlay) {
-        super.renderSafe(be, partialTicks, ms, buffer, light, overlay);
+    public FactoryPanelRenderState createRenderState() {
+        return new FactoryPanelRenderState();
+    }
+
+    @Override
+    public void updateRenderState(
+        FactoryPanelBlockEntity be,
+        FactoryPanelRenderState state,
+        float tickProgress,
+        Vec3d cameraPos,
+        ModelCommandRenderer.@Nullable CrumblingOverlayCommand crumblingOverlay
+    ) {
+        super.updateRenderState(be, state, tickProgress, cameraPos, crumblingOverlay);
+        List<SingleFactoryPanelRenderState> panels = new ArrayList<>();
+        boolean[] layers = new boolean[3];
         for (ServerFactoryPanelBehaviour behaviour : be.panels.values()) {
-            if (!behaviour.isActive())
-                continue;
-            if (behaviour.getAmount() > 0)
-                renderBulb(behaviour, partialTicks, ms, buffer, light, overlay);
-            for (FactoryPanelConnection connection : behaviour.targetedBy.values())
-                renderPath(behaviour, connection, partialTicks, ms, buffer, light, overlay);
-            for (FactoryPanelConnection connection : behaviour.targetedByLinks.values())
-                renderPath(behaviour, connection, partialTicks, ms, buffer, light, overlay);
+            if (behaviour.isActive()) {
+                boolean bulb = behaviour.getAmount() > 0;
+                boolean target = !behaviour.targetedBy.isEmpty() || !behaviour.targetedByLinks.isEmpty();
+                if (!target && !bulb) {
+                    continue;
+                }
+                SingleFactoryPanelRenderState panel = new SingleFactoryPanelRenderState();
+                boolean missingAddress = behaviour.isMissingAddress();
+                float offsetX = behaviour.slot.xOffset * .5f;
+                float offsetY = behaviour.slot.yOffset * .5f;
+                float glow = behaviour.bulb.getValue(tickProgress);
+                if (target) {
+                    layers[0] = true;
+                    panel.offsetX = offsetX + 0.25f;
+                    panel.offsetY = offsetY + 0.25f;
+                    List<PathRenderState> paths = panel.paths = new ArrayList<>();
+                    World world = behaviour.getWorld();
+                    FactoryPanelPosition to = behaviour.getPanelPosition();
+                    FactoryPanelBehaviour fromBehaviour = be.getBehaviour(FactoryPanelBehaviour.getTypeForSlot(behaviour.slot));
+                    Vec3d start = fromBehaviour.getSlotPositioning().getLocalOffset(state.blockState).add(Vec3d.of(state.pos));
+                    for (FactoryPanelConnection connection : behaviour.targetedBy.values()) {
+                        List<Direction> path = connection.getPath(world, state.blockState, to, start);
+                        if (path.isEmpty()) {
+                            continue;
+                        }
+                        paths.add(getPathRenderState(behaviour, connection, path, world, state.blockState, missingAddress, glow));
+                    }
+                    for (FactoryPanelConnection connection : behaviour.targetedByLinks.values()) {
+                        List<Direction> path = connection.getPath(world, state.blockState, to, start);
+                        if (path.isEmpty()) {
+                            continue;
+                        }
+                        paths.add(getPathRenderState(behaviour, connection, path, world, state.blockState, missingAddress, glow));
+                    }
+                }
+                if (bulb) {
+                    panel.bulb = getBulbRenderState(behaviour, state.blockState, missingAddress, offsetX, offsetY, glow, layers);
+                }
+                panels.add(panel);
+            }
+        }
+        if (panels.isEmpty()) {
+            return;
+        }
+        state.xRot = FactoryPanelBlock.getXRot(state.blockState) + MathHelper.PI / 2;
+        state.yRot = FactoryPanelBlock.getYRot(state.blockState);
+        state.panels = panels;
+        if (layers[0]) {
+            state.cutout = RenderLayer.getCutoutMipped();
+        }
+        if (layers[1]) {
+            state.translucent1 = PonderRenderTypes.translucent();
+        }
+        if (layers[2]) {
+            state.translucent2 = RenderTypes.translucent();
+            state.additive = RenderTypes.additive();
         }
     }
 
-    public static void renderBulb(
-        ServerFactoryPanelBehaviour behaviour,
-        float partialTicks,
-        MatrixStack ms,
-        VertexConsumerProvider buffer,
-        int light,
-        int overlay
-    ) {
-        BlockState blockState = behaviour.blockEntity.getCachedState();
-
-        float xRot = FactoryPanelBlock.getXRot(blockState) + MathHelper.PI / 2;
-        float yRot = FactoryPanelBlock.getYRot(blockState);
-        float glow = behaviour.bulb.getValue(partialTicks);
-
-        boolean missingAddress = behaviour.isMissingAddress();
-        PartialModel partial = behaviour.redstonePowered || missingAddress ? AllPartialModels.FACTORY_PANEL_RED_LIGHT : AllPartialModels.FACTORY_PANEL_LIGHT;
-
-        CachedBuffers.partial(partial, blockState).rotateCentered(yRot, Direction.UP).rotateCentered(xRot, Direction.EAST)
-            .rotateCentered(MathHelper.PI, Direction.UP).translate(behaviour.slot.xOffset * .5, 0, behaviour.slot.yOffset * .5)
-            .light(glow > 0.125f ? LightmapTextureManager.MAX_LIGHT_COORDINATE : light).overlay(overlay)
-            .renderInto(ms, buffer.getBuffer(PonderRenderTypes.translucent()));
-
-        if (glow < .125f)
-            return;
-
-        glow = (float) (1 - (2 * Math.pow(glow - .75f, 2)));
-        glow = MathHelper.clamp(glow, -1, 1);
-        int color = (int) (200 * glow);
-
-        CachedBuffers.partial(partial, blockState).rotateCentered(yRot, Direction.UP).rotateCentered(xRot, Direction.EAST)
-            .rotateCentered(MathHelper.PI, Direction.UP).translate(behaviour.slot.xOffset * .5, 0, behaviour.slot.yOffset * .5)
-            .light(LightmapTextureManager.MAX_LIGHT_COORDINATE).color(color, color, color, 255).overlay(overlay)
-            .renderInto(ms, buffer.getBuffer(RenderTypes.additive()));
+    @Override
+    public void render(FactoryPanelRenderState state, MatrixStack matrices, OrderedRenderCommandQueue queue, CameraRenderState cameraState) {
+        super.render(state, matrices, queue, cameraState);
+        if (state.panels != null) {
+            if (state.cutout != null) {
+                queue.submitCustom(matrices, state.cutout, state::renderCutout);
+            }
+            if (state.translucent1 != null) {
+                queue.submitCustom(matrices, state.translucent1, state::renderTranslucent1);
+            }
+            if (state.additive != null) {
+                queue.submitCustom(matrices, state.translucent2, state::renderTranslucent2);
+                queue.submitCustom(matrices, state.additive, state::renderAdditive);
+            }
+        }
     }
 
-    public static void renderPath(
+    public static BulbRenderState getBulbRenderState(
+        ServerFactoryPanelBehaviour behaviour,
+        BlockState blockState,
+        boolean missingAddress,
+        float offsetX,
+        float offsetY,
+        float glow,
+        boolean[] layers
+    ) {
+        BulbRenderState state = new BulbRenderState();
+        PartialModel partial = behaviour.redstonePowered || missingAddress ? AllPartialModels.FACTORY_PANEL_RED_LIGHT : AllPartialModels.FACTORY_PANEL_LIGHT;
+        state.model = CachedBuffers.partial(partial, blockState);
+        state.offsetX = offsetX;
+        state.offsetY = offsetY;
+        if (glow < 0.125f) {
+            layers[1] = true;
+            return state;
+        }
+        layers[2] = true;
+        state.glow = true;
+        glow = (float) (1 - (2 * Math.pow(glow - .75f, 2)));
+        glow = MathHelper.clamp(glow, -1, 1);
+        state.color = (int) (200 * glow);
+        return state;
+    }
+
+    public static PathRenderState getPathRenderState(
         ServerFactoryPanelBehaviour behaviour,
         FactoryPanelConnection connection,
-        float partialTicks,
-        MatrixStack ms,
-        VertexConsumerProvider buffer,
-        int light,
-        int overlay
+        List<Direction> path,
+        World world,
+        BlockState blockState,
+        boolean missingAddress,
+        float glow
     ) {
-        BlockState blockState = behaviour.blockEntity.getCachedState();
-        World world = behaviour.getWorld();
-        FactoryPanelPosition to = behaviour.getPanelPosition();
-        FactoryPanelBehaviour fromBehaviour = FactoryPanelBehaviour.at(world, to);
-        List<Direction> path = connection.getPath(
-            world,
-            blockState,
-            to,
-            fromBehaviour != null ? fromBehaviour.getSlotPositioning().getLocalOffset(world, to.pos(), blockState)
-                .add(Vec3d.of(to.pos())) : Vec3d.ZERO
-        );
-
-        float xRot = FactoryPanelBlock.getXRot(blockState) + MathHelper.PI / 2;
-        float yRot = FactoryPanelBlock.getYRot(blockState);
-        float glow = behaviour.bulb.getValue(partialTicks);
-
+        PathRenderState state = new PathRenderState();
         FactoryPanelSupportBehaviour sbe = ServerFactoryPanelBehaviour.linkAt(world, connection);
         boolean displayLinkMode = sbe != null && sbe.blockEntity instanceof DisplayLinkBlockEntity;
         boolean redstoneLinkMode = sbe != null && sbe.blockEntity instanceof RedstoneLinkBlockEntity;
         boolean pathReversed = sbe != null && !sbe.isOutput();
-
-        int color = 0;
-        float yOffset = 0;
-        boolean success = connection.success;
-        boolean dots = false;
-
+        int color;
+        float yOffset;
+        boolean dots;
         if (displayLinkMode) {
             // Display status
             color = 0x3C9852;
             dots = true;
-
+            yOffset = 0;
         } else if (redstoneLinkMode) {
             // Link status
             color = pathReversed ? (behaviour.count == 0 ? 0x888898 : behaviour.satisfied ? 0xEF0000 : 0x580101) : (behaviour.redstonePowered ? 0xEF0000 : 0x580101);
+            dots = false;
             yOffset = 0.5f;
-
         } else {
             // Regular ingredient status
             color = behaviour.getIngredientStatusColor();
-
-            yOffset = 1;
-            yOffset += behaviour.promisedSatisfied ? 1 : behaviour.satisfied ? 0 : 2;
-
+            dots = false;
+            yOffset = 1 + (behaviour.promisedSatisfied ? 1 : behaviour.satisfied ? 0 : 2);
             if (!behaviour.redstonePowered && !behaviour.waitingForNetwork && glow > 0 && !behaviour.satisfied) {
                 float p = (1 - (1 - glow) * (1 - glow));
+                boolean success = connection.success;
                 color = Color.mixColors(color, success ? 0xEAF2EC : 0xE5654B, p);
-                if (!behaviour.satisfied && !behaviour.promisedSatisfied)
+                if (!behaviour.promisedSatisfied) {
                     yOffset += (success ? 1 : 2) * p;
+                }
+            }
+        }
+        state.shiftUV = !displayLinkMode && !redstoneLinkMode && !missingAddress && !behaviour.waitingForNetwork && !behaviour.satisfied && !behaviour.redstonePowered;
+        state.color = color;
+        float currentX = 0;
+        float currentZ = 0;
+        List<LineRenderData> lines = state.lines = new ArrayList<>();
+        for (int i = 0, size = path.size(), end = size - 1; i < size; i++) {
+            Direction direction = path.get(i);
+            if (!pathReversed) {
+                currentX += direction.getOffsetX() * .5f;
+                currentZ += direction.getOffsetZ() * .5f;
+            }
+            Map<Direction, PartialModel> group = dots ? AllPartialModels.FACTORY_PANEL_DOTTED : (pathReversed ? i == end : i == 0) ? AllPartialModels.FACTORY_PANEL_ARROWS : AllPartialModels.FACTORY_PANEL_LINES;
+            PartialModel partial = group.get(pathReversed ? direction : direction.getOpposite());
+            SuperByteBuffer model = CachedBuffers.partial(partial, blockState);
+            float currentY = (yOffset + (direction.getHorizontalQuarterTurns() % 2) * 0.125f) / 512f;
+            lines.add(new LineRenderData(model, currentX, currentY, currentZ));
+            if (pathReversed) {
+                currentX += direction.getOffsetX() * .5f;
+                currentZ += direction.getOffsetZ() * .5f;
+            }
+        }
+        return state;
+    }
+
+    public static class FactoryPanelRenderState extends SmartRenderState {
+        public RenderLayer cutout;
+        public RenderLayer translucent1;
+        public RenderLayer translucent2;
+        public RenderLayer additive;
+        public float xRot;
+        public float yRot;
+        public List<SingleFactoryPanelRenderState> panels;
+
+        public void renderCutout(MatrixStack.Entry matricesEntry, VertexConsumer vertexConsumer) {
+            for (SingleFactoryPanelRenderState panel : panels) {
+                panel.renderPaths(matricesEntry, vertexConsumer, xRot, yRot, lightmapCoordinates);
             }
         }
 
-        float currentX = 0;
-        float currentZ = 0;
-
-        for (int i = 0; i < path.size(); i++) {
-            Direction direction = path.get(i);
-
-            if (!pathReversed) {
-                currentX += direction.getOffsetX() * .5;
-                currentZ += direction.getOffsetZ() * .5;
+        public void renderTranslucent1(MatrixStack.Entry matricesEntry, VertexConsumer vertexConsumer) {
+            for (SingleFactoryPanelRenderState panel : panels) {
+                panel.renderBulb(false, matricesEntry, vertexConsumer, xRot, yRot, lightmapCoordinates);
             }
+        }
 
-            boolean isArrowSegment = pathReversed ? i == path.size() - 1 : i == 0;
-            PartialModel partial = (dots ? AllPartialModels.FACTORY_PANEL_DOTTED : isArrowSegment ? AllPartialModels.FACTORY_PANEL_ARROWS : AllPartialModels.FACTORY_PANEL_LINES).get(
-                pathReversed ? direction : direction.getOpposite());
-            SuperByteBuffer connectionSprite = CachedBuffers.partial(partial, blockState).rotateCentered(yRot, Direction.UP)
-                .rotateCentered(xRot, Direction.EAST).rotateCentered(MathHelper.PI, Direction.UP)
-                .translate(behaviour.slot.xOffset * .5 + .25, 0, behaviour.slot.yOffset * .5 + .25)
-                .translate(currentX, (yOffset + (direction.getHorizontalQuarterTurns() % 2) * 0.125f) / 512f, currentZ);
+        public void renderTranslucent2(MatrixStack.Entry matricesEntry, VertexConsumer vertexConsumer) {
+            for (SingleFactoryPanelRenderState panel : panels) {
+                panel.renderBulb(true, matricesEntry, vertexConsumer, xRot, yRot, lightmapCoordinates);
+            }
+        }
 
-            if (!displayLinkMode && !redstoneLinkMode && !behaviour.isMissingAddress() && !behaviour.waitingForNetwork && !behaviour.satisfied && !behaviour.redstonePowered)
-                connectionSprite.shiftUV(AllSpriteShifts.FACTORY_PANEL_CONNECTIONS);
-
-            connectionSprite.color(color).light(light).overlay(overlay).renderInto(ms, buffer.getBuffer(RenderLayer.getCutoutMipped()));
-
-            if (pathReversed) {
-                currentX += direction.getOffsetX() * .5;
-                currentZ += direction.getOffsetZ() * .5;
+        public void renderAdditive(MatrixStack.Entry matricesEntry, VertexConsumer vertexConsumer) {
+            for (SingleFactoryPanelRenderState panel : panels) {
+                panel.renderGlow(matricesEntry, vertexConsumer, xRot, yRot);
             }
         }
     }
 
+    public static class SingleFactoryPanelRenderState {
+        public float offsetX;
+        public float offsetY;
+        public List<PathRenderState> paths;
+        public BulbRenderState bulb;
+
+        public void renderPaths(MatrixStack.Entry matricesEntry, VertexConsumer vertexConsumer, float xRot, float yRot, int light) {
+            if (paths != null) {
+                for (PathRenderState path : paths) {
+                    path.render(matricesEntry, vertexConsumer, xRot, yRot, offsetX, offsetY, light);
+                }
+            }
+        }
+
+        public void renderBulb(boolean glow, MatrixStack.Entry matricesEntry, VertexConsumer vertexConsumer, float xRot, float yRot, int light) {
+            if (bulb != null) {
+                bulb.renderBulb(glow, matricesEntry, vertexConsumer, xRot, yRot, light);
+            }
+        }
+
+        public void renderGlow(MatrixStack.Entry matricesEntry, VertexConsumer vertexConsumer, float xRot, float yRot) {
+            if (bulb != null) {
+                bulb.renderGlow(matricesEntry, vertexConsumer, xRot, yRot);
+            }
+        }
+    }
+
+    public static class BulbRenderState {
+        public SuperByteBuffer model;
+        public float offsetX;
+        public float offsetY;
+        public boolean glow;
+        public int color;
+
+        public void renderBulb(boolean glow, MatrixStack.Entry entry, VertexConsumer vertexConsumer, float xRot, float yRot, int light) {
+            if (glow == this.glow) {
+                model.rotateCentered(yRot, Direction.UP).rotateCentered(xRot, Direction.EAST).rotateCentered(MathHelper.PI, Direction.UP)
+                    .translate(offsetX, 0, offsetY).light(glow ? LightmapTextureManager.MAX_LIGHT_COORDINATE : light)
+                    .overlay(OverlayTexture.DEFAULT_UV).renderInto(entry, vertexConsumer);
+            }
+        }
+
+        private void renderGlow(MatrixStack.Entry entry, VertexConsumer vertexConsumer, float xRot, float yRot) {
+            if (glow) {
+                model.rotateCentered(yRot, Direction.UP).rotateCentered(xRot, Direction.EAST).rotateCentered(MathHelper.PI, Direction.UP)
+                    .translate(offsetX, 0, offsetY).light(LightmapTextureManager.MAX_LIGHT_COORDINATE).color(color, color, color, 255)
+                    .overlay(OverlayTexture.DEFAULT_UV).renderInto(entry, vertexConsumer);
+            }
+        }
+    }
+
+    public static class PathRenderState {
+        public boolean shiftUV;
+        public int color;
+        public List<LineRenderData> lines;
+
+        public void render(MatrixStack.Entry entry, VertexConsumer vertexConsumer, float xRot, float yRot, float offsetX, float offsetY, int light) {
+            for (LineRenderData line : lines) {
+                line.model.rotateCentered(yRot, Direction.UP).rotateCentered(xRot, Direction.EAST).rotateCentered(MathHelper.PI, Direction.UP)
+                    .translate(offsetX, 0, offsetY).translate(line.x, line.y, line.z);
+                if (shiftUV) {
+                    line.model.shiftUV(AllSpriteShifts.FACTORY_PANEL_CONNECTIONS);
+                }
+                line.model.color(color).light(light).overlay(OverlayTexture.DEFAULT_UV).renderInto(entry, vertexConsumer);
+            }
+        }
+    }
+
+    public record LineRenderData(SuperByteBuffer model, float x, float y, float z) {
+    }
 }
