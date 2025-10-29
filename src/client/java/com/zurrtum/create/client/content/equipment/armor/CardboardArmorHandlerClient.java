@@ -8,7 +8,7 @@ import com.zurrtum.create.client.flywheel.lib.model.baked.PartialModel;
 import com.zurrtum.create.content.equipment.armor.CardboardArmorHandler;
 import com.zurrtum.create.foundation.utility.TickBasedCache;
 import net.minecraft.client.network.AbstractClientPlayerEntity;
-import net.minecraft.client.render.VertexConsumerProvider;
+import net.minecraft.client.render.command.OrderedRenderCommandQueue;
 import net.minecraft.client.render.entity.PlayerEntityRenderer;
 import net.minecraft.client.render.entity.state.PlayerEntityRenderState;
 import net.minecraft.client.util.math.MatrixStack;
@@ -34,11 +34,10 @@ public class CardboardArmorHandlerClient {
     }
 
     public static boolean playerRendersAsBoxWhenSneaking(
-        PlayerEntityRenderer renderer,
+        PlayerEntityRenderer<?> renderer,
         PlayerEntityRenderState state,
         MatrixStack ms,
-        VertexConsumerProvider vertexConsumerProvider,
-        int light
+        OrderedRenderCommandQueue queue
     ) {
         if (state.pose != EntityPose.CROUCHING || !CardboardArmorHandler.isCardboardArmor(state.equippedHeadStack) || !CardboardArmorHandler.isCardboardArmor(
             state.equippedChestStack) || !CardboardArmorHandler.isCardboardArmor(state.equippedLegsStack) || !CardboardArmorHandler.isCardboardArmor(
@@ -72,7 +71,9 @@ public class CardboardArmorHandlerClient {
 
         try {
             PartialModel model = AllPartialModels.PACKAGES_TO_HIDE_AS.get(getCurrentBoxIndex(state.id));
-            PackageRenderer.renderBox(state.id, renderState.create$getInterpolatedYaw(), ms, vertexConsumerProvider, light, model);
+            if (model != null) {
+                PackageRenderer.getBoxRenderState(state.id, renderState.create$getInterpolatedYaw(), state.light, model).render(ms, queue);
+            }
         } catch (ExecutionException e) {
             e.printStackTrace();
         }
