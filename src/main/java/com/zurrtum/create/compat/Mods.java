@@ -8,7 +8,8 @@ import java.util.Locale;
  * For compatibility with and without another mod present, we have to define load conditions of the specific code
  */
 public enum Mods {
-    COMPUTERCRAFT;
+    COMPUTERCRAFT,
+    TRINKETS;
 
     private final String id;
     private final boolean loaded;
