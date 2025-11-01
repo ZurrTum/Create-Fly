@@ -1,11 +1,12 @@
 package com.zurrtum.create.client.content.logistics.depot;
 
 import com.zurrtum.create.content.logistics.depot.EjectorItemEntity;
-import net.minecraft.client.render.VertexConsumerProvider;
+import net.minecraft.client.render.command.OrderedRenderCommandQueue;
 import net.minecraft.client.render.entity.EntityRendererFactory;
 import net.minecraft.client.render.entity.ItemEntityRenderer;
 import net.minecraft.client.render.entity.state.EntityRenderState;
 import net.minecraft.client.render.entity.state.ItemEntityRenderState;
+import net.minecraft.client.render.state.CameraRenderState;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.util.math.Box;
@@ -63,10 +64,15 @@ public class EjectorItemEntityRenderer extends ItemEntityRenderer {
     }
 
     @Override
-    public void render(ItemEntityRenderState itemEntityRenderState, MatrixStack matrixStack, VertexConsumerProvider vertexConsumerProvider, int i) {
+    public void render(
+        ItemEntityRenderState itemEntityRenderState,
+        MatrixStack matrixStack,
+        OrderedRenderCommandQueue queue,
+        CameraRenderState cameraRenderState
+    ) {
         if (!itemEntityRenderState.itemRenderState.isEmpty()) {
             RenderState state = (RenderState) itemEntityRenderState;
-            Box box = itemEntityRenderState.itemRenderState.getModelBoundingBox();
+            Box box = state.itemRenderState.getModelBoundingBox();
             matrixStack.push();
             float f = -((float) box.minY) + 0.0625F;
             matrixStack.translate(0, state.uniqueOffset + f, -0.0625f);
@@ -78,24 +84,22 @@ public class EjectorItemEntityRenderer extends ItemEntityRenderer {
                 }
                 matrixStack.multiply(RotationAxis.POSITIVE_X.rotation(state.rotateX));
                 matrixStack.translate(0, -0.25f, 0);
-            } else if (itemEntityRenderState.age > 0) {
-                float g = MathHelper.sin(itemEntityRenderState.age) * 0.1F + 0.1F;
+            } else if (state.age > 0) {
+                float g = MathHelper.sin(state.age) * 0.1F + 0.1F;
                 matrixStack.translate(0, g, 0);
-                matrixStack.multiply(RotationAxis.POSITIVE_Y.rotation(itemEntityRenderState.age / 2F));
+                matrixStack.multiply(RotationAxis.POSITIVE_Y.rotation(state.age / 2F));
             }
-            renderStack(matrixStack, vertexConsumerProvider, i, itemEntityRenderState, random, box);
+            render(matrixStack, queue, state.light, state, random, box);
             matrixStack.pop();
 
             if (state.alive) {
                 if (state.leashDatas != null) {
                     for (EntityRenderState.LeashData leashData : state.leashDatas) {
-                        renderLeash(matrixStack, vertexConsumerProvider, leashData);
+                        queue.submitLeash(matrixStack, leashData);
                     }
                 }
 
-                if (state.displayName != null) {
-                    this.renderLabelIfPresent(state, state.displayName, matrixStack, vertexConsumerProvider, i);
-                }
+                renderLabelIfPresent(state, matrixStack, queue, cameraRenderState);
             }
         }
     }
