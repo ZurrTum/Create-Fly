@@ -102,6 +102,7 @@ public class FluidRenderHelper {
             ms.translate(-center.x, -center.y, -center.z);
         }
 
+        MatrixStack.Entry entry = ms.peek();
         for (Direction side : Iterate.directions) {
             if (side == Direction.DOWN && !renderBottom)
                 continue;
@@ -109,16 +110,67 @@ public class FluidRenderHelper {
             boolean positive = side.getDirection() == Direction.AxisDirection.POSITIVE;
             if (side.getAxis().isHorizontal()) {
                 if (side.getAxis() == Direction.Axis.X) {
-                    renderStillTiledFace(side, zMin, yMin, zMax, yMax, positive ? xMax : xMin, builder, ms, light, color, fluidTexture);
+                    renderStillTiledFace(side, zMin, yMin, zMax, yMax, positive ? xMax : xMin, builder, entry, light, color, fluidTexture);
                 } else {
-                    renderStillTiledFace(side, xMin, yMin, xMax, yMax, positive ? zMax : zMin, builder, ms, light, color, fluidTexture);
+                    renderStillTiledFace(side, xMin, yMin, xMax, yMax, positive ? zMax : zMin, builder, entry, light, color, fluidTexture);
                 }
             } else {
-                renderStillTiledFace(side, xMin, zMin, xMax, zMax, positive ? yMax : yMin, builder, ms, light, color, fluidTexture);
+                renderStillTiledFace(side, xMin, zMin, xMax, zMax, positive ? yMax : yMin, builder, entry, light, color, fluidTexture);
             }
         }
 
         ms.pop();
+    }
+
+    public static void renderFluidBox(
+        Fluid fluid,
+        ComponentChanges changes,
+        float xMin,
+        float yMin,
+        float zMin,
+        float xMax,
+        float yMax,
+        float zMax,
+        VertexConsumer builder,
+        MatrixStack.Entry entry,
+        int light,
+        boolean renderBottom,
+        boolean invertGasses
+    ) {
+        FluidConfig config = AllFluidConfigs.get(fluid);
+        if (config == null) {
+            return;
+        }
+        Sprite fluidTexture = config.still().get();
+
+        int color = config.tint().apply(changes) | 0xff000000;
+        int blockLightIn = (light >> 4) & 0xF;
+        int luminosity = Math.max(blockLightIn, fluid.getDefaultState().getBlockState().getLuminance());
+        light = (light & 0xF00000) | luminosity << 4;
+
+        Vec3d center = new Vec3d(xMin + (xMax - xMin) / 2, yMin + (yMax - yMin) / 2, zMin + (zMax - zMin) / 2);
+        //TODO
+        if (invertGasses && false) {
+            entry.translate((float) center.x, (float) center.y, (float) center.z);
+            entry.rotate(RotationAxis.POSITIVE_X.rotationDegrees(180));
+            entry.translate((float) -center.x, (float) -center.y, (float) -center.z);
+        }
+
+        for (Direction side : Iterate.directions) {
+            if (side == Direction.DOWN && !renderBottom)
+                continue;
+
+            boolean positive = side.getDirection() == Direction.AxisDirection.POSITIVE;
+            if (side.getAxis().isHorizontal()) {
+                if (side.getAxis() == Direction.Axis.X) {
+                    renderStillTiledFace(side, zMin, yMin, zMax, yMax, positive ? xMax : xMin, builder, entry, light, color, fluidTexture);
+                } else {
+                    renderStillTiledFace(side, xMin, yMin, xMax, yMax, positive ? zMax : zMin, builder, entry, light, color, fluidTexture);
+                }
+            } else {
+                renderStillTiledFace(side, xMin, zMin, xMax, zMax, positive ? yMax : yMin, builder, entry, light, color, fluidTexture);
+            }
+        }
     }
 
     public static void renderStillTiledFace(
@@ -129,12 +181,12 @@ public class FluidRenderHelper {
         float up,
         float depth,
         VertexConsumer builder,
-        MatrixStack ms,
+        MatrixStack.Entry entry,
         int light,
         int color,
         Sprite texture
     ) {
-        renderTiledFace(dir, left, down, right, up, depth, builder, ms, light, color, texture, 1);
+        renderTiledFace(dir, left, down, right, up, depth, builder, entry, light, color, texture, 1);
     }
 
     public static void renderTiledFace(
@@ -145,7 +197,7 @@ public class FluidRenderHelper {
         float up,
         float depth,
         VertexConsumer builder,
-        MatrixStack ms,
+        MatrixStack.Entry entry,
         int light,
         int color,
         Sprite texture,
@@ -160,8 +212,8 @@ public class FluidRenderHelper {
         float centerV = texture.getMinV() + (texture.getMaxV() - texture.getMinV()) * 0.5f * textureScale;
 
         float f;
-        float x2 = 0;
-        float y2 = 0;
+        float x2;
+        float y2;
         float u1, u2;
         float v1, v2;
         for (float x1 = left; x1 < right; x1 = x2) {
@@ -193,21 +245,21 @@ public class FluidRenderHelper {
 
                 if (horizontal) {
                     if (x) {
-                        putVertex(builder, ms, depth, y2, positive ? x2 : x1, color, u1, v1, dir, light);
-                        putVertex(builder, ms, depth, y1, positive ? x2 : x1, color, u1, v2, dir, light);
-                        putVertex(builder, ms, depth, y1, positive ? x1 : x2, color, u2, v2, dir, light);
-                        putVertex(builder, ms, depth, y2, positive ? x1 : x2, color, u2, v1, dir, light);
+                        putVertex(builder, entry, depth, y2, positive ? x2 : x1, color, u1, v1, dir, light);
+                        putVertex(builder, entry, depth, y1, positive ? x2 : x1, color, u1, v2, dir, light);
+                        putVertex(builder, entry, depth, y1, positive ? x1 : x2, color, u2, v2, dir, light);
+                        putVertex(builder, entry, depth, y2, positive ? x1 : x2, color, u2, v1, dir, light);
                     } else {
-                        putVertex(builder, ms, positive ? x1 : x2, y2, depth, color, u1, v1, dir, light);
-                        putVertex(builder, ms, positive ? x1 : x2, y1, depth, color, u1, v2, dir, light);
-                        putVertex(builder, ms, positive ? x2 : x1, y1, depth, color, u2, v2, dir, light);
-                        putVertex(builder, ms, positive ? x2 : x1, y2, depth, color, u2, v1, dir, light);
+                        putVertex(builder, entry, positive ? x1 : x2, y2, depth, color, u1, v1, dir, light);
+                        putVertex(builder, entry, positive ? x1 : x2, y1, depth, color, u1, v2, dir, light);
+                        putVertex(builder, entry, positive ? x2 : x1, y1, depth, color, u2, v2, dir, light);
+                        putVertex(builder, entry, positive ? x2 : x1, y2, depth, color, u2, v1, dir, light);
                     }
                 } else {
-                    putVertex(builder, ms, x1, depth, positive ? y1 : y2, color, u1, v1, dir, light);
-                    putVertex(builder, ms, x1, depth, positive ? y2 : y1, color, u1, v2, dir, light);
-                    putVertex(builder, ms, x2, depth, positive ? y2 : y1, color, u2, v2, dir, light);
-                    putVertex(builder, ms, x2, depth, positive ? y1 : y2, color, u2, v1, dir, light);
+                    putVertex(builder, entry, x1, depth, positive ? y1 : y2, color, u1, v1, dir, light);
+                    putVertex(builder, entry, x1, depth, positive ? y2 : y1, color, u1, v2, dir, light);
+                    putVertex(builder, entry, x2, depth, positive ? y2 : y1, color, u2, v2, dir, light);
+                    putVertex(builder, entry, x2, depth, positive ? y1 : y2, color, u2, v1, dir, light);
                 }
             }
         }
@@ -215,7 +267,7 @@ public class FluidRenderHelper {
 
     protected static void putVertex(
         VertexConsumer builder,
-        MatrixStack ms,
+        MatrixStack.Entry entry,
         float x,
         float y,
         float z,
@@ -227,15 +279,14 @@ public class FluidRenderHelper {
     ) {
 
         Vec3i normal = face.getVector();
-        MatrixStack.Entry peek = ms.peek();
         int a = color >> 24 & 0xff;
         int r = color >> 16 & 0xff;
         int g = color >> 8 & 0xff;
         int b = color & 0xff;
 
-        builder.vertex(peek.getPositionMatrix(), x, y, z).color(r, g, b, a).texture(u, v)
+        builder.vertex(entry.getPositionMatrix(), x, y, z).color(r, g, b, a).texture(u, v)
             //.overlayCoords(OverlayTexture.NO_OVERLAY)
-            .light(light).normal(peek.copy(), normal.getX(), normal.getY(), normal.getZ());
+            .light(light).normal(entry, normal.getX(), normal.getY(), normal.getZ());
     }
 
 }
