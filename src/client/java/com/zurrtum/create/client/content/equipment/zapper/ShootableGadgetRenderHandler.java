@@ -3,8 +3,8 @@ package com.zurrtum.create.client.content.equipment.zapper;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.AbstractClientPlayerEntity;
 import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.client.render.VertexConsumerProvider;
-import net.minecraft.client.render.entity.EntityRenderDispatcher;
+import net.minecraft.client.render.command.OrderedRenderCommandQueue;
+import net.minecraft.client.render.entity.EntityRenderManager;
 import net.minecraft.client.render.entity.PlayerEntityRenderer;
 import net.minecraft.client.render.item.HeldItemRenderer;
 import net.minecraft.client.util.math.MatrixStack;
@@ -70,10 +70,10 @@ public abstract class ShootableGadgetRenderHandler {
     public boolean onRenderPlayerHand(
         ItemStack heldItem,
         MinecraftClient mc,
-        EntityRenderDispatcher entityRenderDispatcher,
+        EntityRenderManager entityRenderDispatcher,
         HeldItemRenderer firstPersonRenderer,
         MatrixStack ms,
-        VertexConsumerProvider buffer,
+        OrderedRenderCommandQueue queue,
         int light,
         float pt,
         Hand hand,
@@ -84,7 +84,7 @@ public abstract class ShootableGadgetRenderHandler {
             return false;
 
         AbstractClientPlayerEntity player = mc.player;
-        PlayerEntityRenderer playerrenderer = (PlayerEntityRenderer) entityRenderDispatcher.getRenderer(player);
+        PlayerEntityRenderer<AbstractClientPlayerEntity> playerrenderer = entityRenderDispatcher.getPlayerRenderer(player);
 
         boolean rightHand = hand == Hand.MAIN_HAND ^ player.getMainArm() == Arm.LEFT;
         float recoil = rightHand ? MathHelper.lerp(pt, lastRightHandAnimation, rightHandAnimation) : MathHelper.lerp(
@@ -119,11 +119,11 @@ public abstract class ShootableGadgetRenderHandler {
         ms.translate(flip * 5.6F, 0.0F, 0.0F);
         ms.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(flip * 40.0F));
         transformHand(ms, flip, equipProgress, recoil, pt);
-        Identifier texture = player.getSkinTextures().texture();
+        Identifier texture = player.getSkin().body().texturePath();
         if (rightHand)
-            playerrenderer.renderRightArm(ms, buffer, light, texture, player.isPartVisible(PlayerModelPart.RIGHT_SLEEVE));
+            playerrenderer.renderRightArm(ms, queue, light, texture, player.isModelPartVisible(PlayerModelPart.RIGHT_SLEEVE));
         else
-            playerrenderer.renderLeftArm(ms, buffer, light, texture, player.isPartVisible(PlayerModelPart.LEFT_SLEEVE));
+            playerrenderer.renderLeftArm(ms, queue, light, texture, player.isModelPartVisible(PlayerModelPart.LEFT_SLEEVE));
         ms.pop();
 
         // Render gadget
@@ -137,7 +137,7 @@ public abstract class ShootableGadgetRenderHandler {
             heldItem,
             rightHand ? ItemDisplayContext.FIRST_PERSON_RIGHT_HAND : ItemDisplayContext.FIRST_PERSON_LEFT_HAND,
             ms,
-            buffer,
+            queue,
             light
         );
         ms.pop();

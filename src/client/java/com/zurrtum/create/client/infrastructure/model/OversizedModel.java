@@ -13,9 +13,9 @@ import net.minecraft.client.render.item.tint.TintSource;
 import net.minecraft.client.render.item.tint.TintSourceTypes;
 import net.minecraft.client.render.model.*;
 import net.minecraft.client.world.ClientWorld;
-import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.ItemDisplayContext;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.HeldItemContext;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Box;
 import org.jetbrains.annotations.Nullable;
@@ -44,7 +44,7 @@ public class OversizedModel implements ItemModel {
         boolean bl = false;
 
         for (BakedQuad bakedQuad : quads) {
-            if (bakedQuad.sprite().isAnimated()) {
+            if (bakedQuad.sprite().getContents().isAnimated()) {
                 bl = true;
                 break;
             }
@@ -60,7 +60,7 @@ public class OversizedModel implements ItemModel {
         ItemModelManager resolver,
         ItemDisplayContext displayContext,
         @Nullable ClientWorld world,
-        @Nullable LivingEntity user,
+        @Nullable HeldItemContext heldItemContext,
         int seed
     ) {
         state.addModelKey(this);
@@ -75,7 +75,7 @@ public class OversizedModel implements ItemModel {
         int[] is = layerRenderState.initTints(i);
 
         for (int j = 0; j < i; j++) {
-            int k = tints.get(j).getTint(stack, world, user);
+            int k = tints.get(j).getTint(stack, world, heldItemContext == null ? null : heldItemContext.getEntity());
             is[j] = k;
             state.addModelKey(k);
         }

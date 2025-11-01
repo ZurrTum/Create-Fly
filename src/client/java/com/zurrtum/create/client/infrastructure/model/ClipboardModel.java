@@ -12,9 +12,9 @@ import net.minecraft.client.render.item.model.BasicItemModel;
 import net.minecraft.client.render.item.model.ItemModel;
 import net.minecraft.client.render.model.*;
 import net.minecraft.client.world.ClientWorld;
-import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.ItemDisplayContext;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.HeldItemContext;
 import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
@@ -43,7 +43,7 @@ public class ClipboardModel implements ItemModel {
         ItemModelManager resolver,
         ItemDisplayContext displayContext,
         @Nullable ClientWorld world,
-        @Nullable LivingEntity user,
+        @Nullable HeldItemContext user,
         int seed
     ) {
         ClipboardType type = stack.getOrDefault(AllDataComponents.CLIPBOARD_TYPE, ClipboardType.EMPTY);

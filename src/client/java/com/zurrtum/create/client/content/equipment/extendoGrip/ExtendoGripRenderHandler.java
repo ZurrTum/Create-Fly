@@ -3,10 +3,11 @@ package com.zurrtum.create.client.content.equipment.extendoGrip;
 import com.zurrtum.create.AllItems;
 import com.zurrtum.create.client.flywheel.lib.transform.TransformStack;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.network.AbstractClientPlayerEntity;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.render.OverlayTexture;
-import net.minecraft.client.render.VertexConsumerProvider;
-import net.minecraft.client.render.entity.EntityRenderDispatcher;
+import net.minecraft.client.render.command.OrderedRenderCommandQueue;
+import net.minecraft.client.render.entity.EntityRenderManager;
 import net.minecraft.client.render.entity.PlayerEntityRenderer;
 import net.minecraft.client.render.item.ItemRenderState;
 import net.minecraft.client.render.item.model.ItemModel;
@@ -49,9 +50,9 @@ public class ExtendoGripRenderHandler {
     public static boolean onRenderPlayerHand(
         ItemStack heldItem,
         MinecraftClient mc,
-        EntityRenderDispatcher entityRenderDispatcher,
+        EntityRenderManager entityRenderDispatcher,
         MatrixStack ms,
-        VertexConsumerProvider buffer,
+        OrderedRenderCommandQueue queue,
         int light,
         Hand hand,
         float equipProgress,
@@ -85,12 +86,12 @@ public class ExtendoGripRenderHandler {
             msr.rotateYDegrees(flip * 40.0F);
             ms.translate(flip * 0.05f, -0.3f, -0.3f);
 
-            PlayerEntityRenderer playerrenderer = (PlayerEntityRenderer) entityRenderDispatcher.getRenderer(player);
-            Identifier texture = player.getSkinTextures().texture();
+            PlayerEntityRenderer<AbstractClientPlayerEntity> playerrenderer = entityRenderDispatcher.getPlayerRenderer(player);
+            Identifier texture = player.getSkin().body().texturePath();
             if (rightHand)
-                playerrenderer.renderRightArm(ms, buffer, light, texture, player.isPartVisible(PlayerModelPart.RIGHT_SLEEVE));
+                playerrenderer.renderRightArm(ms, queue, light, texture, player.isModelPartVisible(PlayerModelPart.RIGHT_SLEEVE));
             else
-                playerrenderer.renderLeftArm(ms, buffer, light, texture, player.isPartVisible(PlayerModelPart.LEFT_SLEEVE));
+                playerrenderer.renderLeftArm(ms, queue, light, texture, player.isModelPartVisible(PlayerModelPart.LEFT_SLEEVE));
             ms.pop();
 
             // Render gun
@@ -100,7 +101,7 @@ public class ExtendoGripRenderHandler {
             state.displayContext = rightHand ? ItemDisplayContext.FIRST_PERSON_RIGHT_HAND : ItemDisplayContext.FIRST_PERSON_LEFT_HAND;
             ItemModel model = mc.getBakedModelManager().getItemModel((inOffhand ? offhandItem : heldItem).get(DataComponentTypes.ITEM_MODEL));
             model.update(state, inHeldItem && inOffhand ? null : heldItem, mc.getItemModelManager(), state.displayContext, mc.world, player, 0);
-            state.render(ms, buffer, light, OverlayTexture.DEFAULT_UV);
+            state.render(ms, queue, light, OverlayTexture.DEFAULT_UV, 0);
             ms.pop();
         }
         ms.pop();

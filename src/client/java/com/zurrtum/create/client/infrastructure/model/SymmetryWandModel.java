@@ -8,19 +8,18 @@ import net.minecraft.client.item.ItemModelManager;
 import net.minecraft.client.render.LightmapTextureManager;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.TexturedRenderLayers;
-import net.minecraft.client.render.VertexConsumerProvider;
+import net.minecraft.client.render.command.OrderedRenderCommandQueue;
 import net.minecraft.client.render.item.ItemRenderState;
 import net.minecraft.client.render.item.ItemRenderState.Glint;
 import net.minecraft.client.render.item.ItemRenderState.LayerRenderState;
-import net.minecraft.client.render.item.ItemRenderer;
 import net.minecraft.client.render.item.model.ItemModel;
 import net.minecraft.client.render.item.model.special.SpecialModelRenderer;
 import net.minecraft.client.render.model.*;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.client.world.ClientWorld;
-import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.ItemDisplayContext;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.HeldItemContext;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.RotationAxis;
@@ -79,7 +78,7 @@ public class SymmetryWandModel implements ItemModel, SpecialModelRenderer<Object
         ItemModelManager resolver,
         ItemDisplayContext displayContext,
         @Nullable ClientWorld world,
-        @Nullable LivingEntity user,
+        @Nullable HeldItemContext user,
         int seed
     ) {
         state.addModelKey(this);
@@ -95,17 +94,18 @@ public class SymmetryWandModel implements ItemModel, SpecialModelRenderer<Object
         @Nullable Object data,
         ItemDisplayContext displayContext,
         MatrixStack matrices,
-        VertexConsumerProvider vertexConsumers,
+        OrderedRenderCommandQueue queue,
         int light,
         int overlay,
-        boolean glint
+        boolean glint,
+        int i
     ) {
         int maxLight = LightmapTextureManager.MAX_LIGHT_COORDINATE;
         RenderLayer translucent = RenderTypes.itemGlowingTranslucent();
 
-        renderItem(matrices, vertexConsumers, light, overlay, item, TexturedRenderLayers.getItemEntityTranslucentCull());
-        renderItem(matrices, vertexConsumers, maxLight, overlay, core, RenderTypes.itemGlowingSolid());
-        renderItem(matrices, vertexConsumers, maxLight, overlay, coreGlow, translucent);
+        renderItem(displayContext, matrices, queue, light, overlay, item, TexturedRenderLayers.getItemEntityTranslucentCull());
+        renderItem(displayContext, matrices, queue, maxLight, overlay, core, RenderTypes.itemGlowingSolid());
+        renderItem(displayContext, matrices, queue, maxLight, overlay, coreGlow, translucent);
 
         matrices.push();
         float worldTime = AnimationTickHolder.getRenderTime() / 20;
@@ -114,19 +114,20 @@ public class SymmetryWandModel implements ItemModel, SpecialModelRenderer<Object
         matrices.translate(0.5f, 0.5f, 0.5f);
         matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(angle));
         matrices.translate(-0.5f, floating - 0.5f, -0.5f);
-        renderItem(matrices, vertexConsumers, maxLight, overlay, bits, translucent);
+        renderItem(displayContext, matrices, queue, maxLight, overlay, bits, translucent);
         matrices.pop();
     }
 
     private static void renderItem(
+        ItemDisplayContext displayContext,
         MatrixStack matrices,
-        VertexConsumerProvider vertexConsumers,
+        OrderedRenderCommandQueue queue,
         int light,
         int overlay,
         List<BakedQuad> item,
         RenderLayer layer
     ) {
-        ItemRenderer.renderItem(null, matrices, vertexConsumers, light, overlay, TINTS, item, layer, Glint.NONE);
+        queue.submitItem(matrices, displayContext, light, overlay, 0, TINTS, item, layer, Glint.NONE);
     }
 
     @Override
@@ -156,7 +157,7 @@ public class SymmetryWandModel implements ItemModel, SpecialModelRenderer<Object
         }
 
         @Override
-        public ItemModel bake(BakeContext context) {
+        public ItemModel bake(ItemModel.BakeContext context) {
             Baker baker = context.blockModelBaker();
             BakedSimpleModel model = baker.getModel(ITEM_ID);
             ModelTextures textures = model.getTextures();

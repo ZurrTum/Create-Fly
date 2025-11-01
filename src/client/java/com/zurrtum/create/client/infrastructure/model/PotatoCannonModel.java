@@ -4,32 +4,34 @@ import com.google.common.base.Suppliers;
 import com.mojang.serialization.MapCodec;
 import com.zurrtum.create.client.Create;
 import com.zurrtum.create.client.catnip.animation.AnimationTickHolder;
-import com.zurrtum.create.client.catnip.render.PonderRenderTypes;
 import com.zurrtum.create.content.equipment.potatoCannon.PotatoCannonItem;
 import com.zurrtum.create.content.equipment.potatoCannon.PotatoCannonItem.Ammo;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.item.ItemModelManager;
 import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.client.render.*;
+import net.minecraft.client.render.RenderLayer;
+import net.minecraft.client.render.TexturedRenderLayers;
+import net.minecraft.client.render.VertexConsumer;
+import net.minecraft.client.render.command.OrderedRenderCommandQueue;
 import net.minecraft.client.render.item.ItemRenderState;
 import net.minecraft.client.render.item.ItemRenderState.LayerRenderState;
-import net.minecraft.client.render.item.ItemRenderer;
 import net.minecraft.client.render.item.model.BasicItemModel;
 import net.minecraft.client.render.item.model.ItemModel;
 import net.minecraft.client.render.item.model.special.SpecialModelRenderer;
 import net.minecraft.client.render.model.*;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.client.world.ClientWorld;
-import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.ItemDisplayContext;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Arm;
+import net.minecraft.util.HeldItemContext;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Pair;
-import net.minecraft.util.math.ColorHelper;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.RotationAxis;
 import org.jetbrains.annotations.Nullable;
+import org.joml.Matrix3x2fStack;
 import org.joml.Vector3f;
 
 import java.util.List;
@@ -38,7 +40,7 @@ import java.util.function.Supplier;
 
 import static com.zurrtum.create.Create.MOD_ID;
 
-public class PotatoCannonModel implements ItemModel, SpecialModelRenderer<PotatoCannonModel.RenderData> {
+public class PotatoCannonModel implements ItemModel, SpecialModelRenderer<PotatoCannonModel.CogRenderData> {
     public static final Identifier ID = Identifier.of(MOD_ID, "model/potato_cannon");
     public static final Identifier ITEM_ID = Identifier.of(MOD_ID, "item/potato_cannon/item");
     public static final Identifier COG_ID = Identifier.of(MOD_ID, "item/potato_cannon/cog");
@@ -67,7 +69,7 @@ public class PotatoCannonModel implements ItemModel, SpecialModelRenderer<Potato
         ItemModelManager resolver,
         ItemDisplayContext displayContext,
         @Nullable ClientWorld world,
-        @Nullable LivingEntity user,
+        @Nullable HeldItemContext user,
         int seed
     ) {
         state.addModelKey(this);
@@ -96,35 +98,6 @@ public class PotatoCannonModel implements ItemModel, SpecialModelRenderer<Potato
         }
         cog.rotation %= 360;
         cog.state.setSpecialModel(this, cog);
-
-        if (displayContext != ItemDisplayContext.GUI) {
-            return;
-        }
-        DecoratorRenderData decorator = new DecoratorRenderData();
-        state.newLayer().setSpecialModel(this, decorator);
-        if (stack.getItem() instanceof PotatoCannonItem potatoCannonItem) {
-            decorator.barVisible = potatoCannonItem.isModelBarVisible(stack);
-        } else {
-            decorator.barVisible = stack.isItemBarVisible();
-        }
-        state.addModelKey(decorator.barVisible);
-        if (decorator.barVisible) {
-            decorator.barStep = stack.getItemBarStep();
-            decorator.barColor = stack.getItemBarColor();
-            state.addModelKey(decorator.barStep);
-            state.addModelKey(decorator.barColor);
-        }
-        ClientPlayerEntity player = MinecraftClient.getInstance().player;
-        if (player == null) {
-            return;
-        }
-        Ammo ammo = PotatoCannonItem.getAmmo(player, stack);
-        if (ammo == null) {
-            return;
-        }
-        decorator.item = new ItemRenderState();
-        decorator.item.displayContext = displayContext;
-        resolver.update(decorator.item, ammo.stack(), displayContext, world, user, seed);
     }
 
     private LayerRenderState update(
@@ -146,70 +119,35 @@ public class PotatoCannonModel implements ItemModel, SpecialModelRenderer<Potato
 
     @Override
     public void render(
-        RenderData data,
+        CogRenderData data,
         ItemDisplayContext displayContext,
         MatrixStack matrices,
-        VertexConsumerProvider vertexConsumers,
+        OrderedRenderCommandQueue queue,
         int light,
         int overlay,
-        boolean glint
+        boolean glint,
+        int i
     ) {
         assert data != null;
-        if (data instanceof CogRenderData cog) {
-            matrices.translate(0.5f, 0.53125f, 0.5f);
-            matrices.multiply(RotationAxis.POSITIVE_Z.rotationDegrees(cog.rotation));
-            matrices.translate(-0.5f, -0.53125f, -0.5f);
-            LayerRenderState state = cog.state;
-            ItemRenderer.renderItem(
-                displayContext,
-                matrices,
-                vertexConsumers,
-                light,
-                overlay,
-                state.tints,
-                state.quads,
-                state.renderLayer,
-                state.glint
-            );
-        } else if (data instanceof DecoratorRenderData decorator) {
-            if (decorator.barVisible) {
-                matrices.push();
-                matrices.translate(0, 1f, 0.5f);
-                matrices.scale(0.0625f, -0.0625f, 0.0625f);
-                MatrixStack.Entry entry = matrices.peek();
-                VertexConsumer vertexConsumer = vertexConsumers.getBuffer(PonderRenderTypes.getGui());
-                fill(vertexConsumer, entry, 2, 15, 13, 15, 4, 0, 0, 0, 255);
-                fill(
-                    vertexConsumer,
-                    entry,
-                    2,
-                    2 + decorator.barStep,
-                    13,
-                    14,
-                    4,
-                    ColorHelper.getRed(decorator.barColor),
-                    ColorHelper.getGreen(decorator.barColor),
-                    ColorHelper.getBlue(decorator.barColor),
-                    255
-                );
-                matrices.pop();
-            }
-            if (decorator.item != null) {
-                boolean flat = !decorator.item.isSideLit();
-                if (flat && vertexConsumers instanceof VertexConsumerProvider.Immediate immediate) {
-                    immediate.draw();
-                }
-                matrices.push();
-                matrices.translate(0.5f, 0.5f, 0.5f);
-                matrices.scale(0.5f, 0.5f, 0.5f);
-                matrices.translate(-0.5f, -0.5f, -0.5f);
-                if (flat) {
-                    MinecraftClient.getInstance().gameRenderer.getDiffuseLighting().setShaderLights(DiffuseLighting.Type.ITEMS_FLAT);
-                }
-                decorator.item.render(matrices, vertexConsumers, light, overlay);
-                matrices.pop();
-            }
+        matrices.translate(0.5f, 0.53125f, 0.5f);
+        matrices.multiply(RotationAxis.POSITIVE_Z.rotationDegrees(data.rotation));
+        matrices.translate(-0.5f, -0.53125f, -0.5f);
+        LayerRenderState state = data.state;
+        queue.submitItem(matrices, displayContext, light, overlay, 0, state.tints, state.quads, state.renderLayer, state.glint);
+    }
+
+    public static void renderDecorator(MinecraftClient client, DrawContext drawContext, ItemStack stack, int x, int y) {
+        if (client.player == null) {
+            return;
         }
+        Ammo ammo = PotatoCannonItem.getAmmo(client.player, stack);
+        if (ammo == null) {
+            return;
+        }
+        Matrix3x2fStack matrices = drawContext.getMatrices();
+        matrices.translate(x, y + 8);
+        matrices.scale(0.5f);
+        drawContext.drawItem(ammo.stack(), 0, 0);
     }
 
     private void fill(
@@ -231,19 +169,9 @@ public class PotatoCannonModel implements ItemModel, SpecialModelRenderer<Potato
         vertexConsumer.vertex(entry, x2, y1, depth).color(red, green, blue, alpha);
     }
 
-    public interface RenderData {
-    }
-
-    private static class CogRenderData implements RenderData {
+    public static class CogRenderData {
         LayerRenderState state;
         float rotation;
-    }
-
-    private static class DecoratorRenderData implements RenderData {
-        ItemRenderState item;
-        boolean barVisible;
-        int barStep;
-        int barColor;
     }
 
     @Override
@@ -252,7 +180,7 @@ public class PotatoCannonModel implements ItemModel, SpecialModelRenderer<Potato
     }
 
     @Override
-    public RenderData getData(ItemStack stack) {
+    public CogRenderData getData(ItemStack stack) {
         throw new UnsupportedOperationException();
     }
 
@@ -271,7 +199,7 @@ public class PotatoCannonModel implements ItemModel, SpecialModelRenderer<Potato
         }
 
         @Override
-        public ItemModel bake(BakeContext context) {
+        public ItemModel bake(ItemModel.BakeContext context) {
             Baker baker = context.blockModelBaker();
             return new PotatoCannonModel(bake(baker, ITEM_ID), bake(baker, COG_ID));
         }

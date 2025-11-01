@@ -260,10 +260,6 @@ public class PotatoCannonItem extends RangedWeaponItem implements SwingControlIt
 
     @Override
     public boolean isItemBarVisible(ItemStack stack) {
-        return false;
-    }
-
-    public boolean isModelBarVisible(ItemStack stack) {
         return BacktankUtil.isBarVisible(stack, maxUses());
     }
 

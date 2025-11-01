@@ -9,21 +9,22 @@ import com.zurrtum.create.client.catnip.animation.AnimationTickHolder;
 import com.zurrtum.create.infrastructure.component.SandPaperItemComponent;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.item.ItemModelManager;
+import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.TexturedRenderLayers;
-import net.minecraft.client.render.VertexConsumerProvider;
+import net.minecraft.client.render.command.OrderedRenderCommandQueue;
 import net.minecraft.client.render.item.ItemRenderState;
 import net.minecraft.client.render.item.ItemRenderState.LayerRenderState;
-import net.minecraft.client.render.item.ItemRenderer;
 import net.minecraft.client.render.item.model.BasicItemModel;
 import net.minecraft.client.render.item.model.ItemModel;
 import net.minecraft.client.render.item.model.special.SpecialModelRenderer;
 import net.minecraft.client.render.model.*;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.client.world.ClientWorld;
-import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemDisplayContext;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.HeldItemContext;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.RotationAxis;
@@ -56,7 +57,7 @@ public class SandPaperModel implements ItemModel, SpecialModelRenderer<SandPaper
         ItemModelManager resolver,
         ItemDisplayContext displayContext,
         @Nullable ClientWorld world,
-        @Nullable LivingEntity user,
+        @Nullable HeldItemContext ctx,
         int seed
     ) {
         state.addModelKey(this);
@@ -69,16 +70,19 @@ public class SandPaperModel implements ItemModel, SpecialModelRenderer<SandPaper
 
         RenderData data = new RenderData();
         data.state = layerRenderState;
-        if (user == null) {
-            user = MinecraftClient.getInstance().player;
-        }
-        if (user != null) {
-            data.itemInUseCount = user.getItemUseTimeLeft();
+        PlayerEntity entity;
+        if (ctx instanceof PlayerEntity player) {
+            data.itemInUseCount = player.getItemUseTimeLeft();
+            entity = player;
+        } else {
+            ClientPlayerEntity player = MinecraftClient.getInstance().player;
+            data.itemInUseCount = player.getItemUseTimeLeft();
+            entity = player;
         }
 
         SandPaperItemComponent component = stack.get(AllDataComponents.SAND_PAPER_POLISHING);
         if (component != null) {
-            int maxUseTime = stack.getMaxUseTime(user);
+            int maxUseTime = stack.getMaxUseTime(entity);
             boolean jeiMode = stack.contains(AllDataComponents.SAND_PAPER_JEI);
             float partialTicks = AnimationTickHolder.getPartialTicks();
             float time = (float) (!jeiMode ? data.itemInUseCount : (-AnimationTickHolder.getTicks()) % maxUseTime) - partialTicks + 1.0F;
@@ -90,7 +94,7 @@ public class SandPaperModel implements ItemModel, SpecialModelRenderer<SandPaper
             ItemStack toPolish = component.item();
             data.item = new ItemRenderState();
             data.item.displayContext = displayContext;
-            resolver.update(data.item, toPolish, ItemDisplayContext.GUI, world, user, seed);
+            resolver.update(data.item, toPolish, ItemDisplayContext.GUI, world, ctx, seed);
         }
 
         layerRenderState.setSpecialModel(this, data);
@@ -101,10 +105,11 @@ public class SandPaperModel implements ItemModel, SpecialModelRenderer<SandPaper
         RenderData data,
         ItemDisplayContext displayContext,
         MatrixStack matrices,
-        VertexConsumerProvider vertexConsumers,
+        OrderedRenderCommandQueue queue,
         int light,
         int overlay,
-        boolean glint
+        boolean glint,
+        int i
     ) {
         assert data != null;
         LayerRenderState state = data.state;
@@ -121,17 +126,7 @@ public class SandPaperModel implements ItemModel, SpecialModelRenderer<SandPaper
             matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(modifier * 90));
             matrices.translate(-0.5F, -0.5F, -0.5F);
         }
-        ItemRenderer.renderItem(
-            ItemDisplayContext.NONE,
-            matrices,
-            vertexConsumers,
-            light,
-            overlay,
-            state.tints,
-            state.quads,
-            state.renderLayer,
-            state.glint
-        );
+        queue.submitItem(matrices, displayContext, light, overlay, 0, state.tints, state.quads, state.renderLayer, state.glint);
         matrices.pop();
 
         if (data.item == null) {
@@ -154,7 +149,7 @@ public class SandPaperModel implements ItemModel, SpecialModelRenderer<SandPaper
                 matrices.translate(0.0F, data.bobbing, 0.0F);
             }
         }
-        data.item.render(matrices, vertexConsumers, light, overlay);
+        data.item.render(matrices, queue, light, overlay, 0);
         matrices.pop();
     }
 
@@ -191,7 +186,7 @@ public class SandPaperModel implements ItemModel, SpecialModelRenderer<SandPaper
         }
 
         @Override
-        public ItemModel bake(BakeContext context) {
+        public ItemModel bake(ItemModel.BakeContext context) {
             Baker baker = context.blockModelBaker();
             BakedSimpleModel model = baker.getModel(this.model);
             ModelTextures textures = model.getTextures();

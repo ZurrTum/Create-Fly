@@ -7,19 +7,18 @@ import com.zurrtum.create.client.foundation.blockEntity.behaviour.scrollValue.Sc
 import net.minecraft.client.item.ItemModelManager;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.TexturedRenderLayers;
-import net.minecraft.client.render.VertexConsumerProvider;
+import net.minecraft.client.render.command.OrderedRenderCommandQueue;
 import net.minecraft.client.render.item.ItemRenderState;
 import net.minecraft.client.render.item.ItemRenderState.LayerRenderState;
-import net.minecraft.client.render.item.ItemRenderer;
 import net.minecraft.client.render.item.model.BasicItemModel;
 import net.minecraft.client.render.item.model.ItemModel;
 import net.minecraft.client.render.item.model.special.SpecialModelRenderer;
 import net.minecraft.client.render.model.*;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.client.world.ClientWorld;
-import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.ItemDisplayContext;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.HeldItemContext;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Pair;
 import net.minecraft.util.math.RotationAxis;
@@ -61,7 +60,7 @@ public class WrenchModel implements ItemModel, SpecialModelRenderer<LayerRenderS
         ItemModelManager resolver,
         ItemDisplayContext displayContext,
         @Nullable ClientWorld world,
-        @Nullable LivingEntity user,
+        @Nullable HeldItemContext user,
         int seed
     ) {
         state.addModelKey(this);
@@ -93,17 +92,18 @@ public class WrenchModel implements ItemModel, SpecialModelRenderer<LayerRenderS
         LayerRenderState layer,
         ItemDisplayContext displayContext,
         MatrixStack matrices,
-        VertexConsumerProvider vertexConsumers,
+        OrderedRenderCommandQueue queue,
         int light,
         int overlay,
-        boolean glint
+        boolean glint,
+        int i
     ) {
         assert layer != null;
         matrices.push();
         matrices.translate(0.5625f, 0.5f, 0.5f);
         matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(ScrollValueHandler.getScroll(AnimationTickHolder.getPartialTicks())));
         matrices.translate(-0.5625f, -0.5f, -0.5f);
-        ItemRenderer.renderItem(displayContext, matrices, vertexConsumers, light, overlay, layer.tints, layer.quads, layer.renderLayer, layer.glint);
+        queue.submitItem(matrices, displayContext, light, overlay, 0, layer.tints, layer.quads, layer.renderLayer, layer.glint);
         matrices.pop();
     }
 
@@ -132,7 +132,7 @@ public class WrenchModel implements ItemModel, SpecialModelRenderer<LayerRenderS
         }
 
         @Override
-        public ItemModel bake(BakeContext context) {
+        public ItemModel bake(ItemModel.BakeContext context) {
             Baker baker = context.blockModelBaker();
             return new WrenchModel(bake(baker, ITEM_ID), bake(baker, GEAR_ID));
         }
