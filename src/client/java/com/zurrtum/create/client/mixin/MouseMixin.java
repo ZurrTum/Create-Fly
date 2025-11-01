@@ -6,6 +6,7 @@ import com.zurrtum.create.client.content.contraptions.elevator.ElevatorControlsH
 import com.zurrtum.create.client.content.trains.TrainHUD;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.Mouse;
+import net.minecraft.client.input.MouseInput;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -19,11 +20,12 @@ public class MouseMixin {
     @Final
     private MinecraftClient client;
 
-    @Inject(method = "onMouseButton(JIII)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/MinecraftClient;getOverlay()Lnet/minecraft/client/gui/screen/Overlay;", ordinal = 0), cancellable = true)
-    private void onMouseButton(long window, int button, int action, int mods, CallbackInfo ci) {
+    @Inject(method = "onMouseButton(JLnet/minecraft/client/input/MouseInput;I)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/MinecraftClient;getOverlay()Lnet/minecraft/client/gui/screen/Overlay;", ordinal = 0), cancellable = true)
+    private void onMouseButton(long window, MouseInput input, int action, CallbackInfo ci) {
         if (action == 0) {
             return;
         }
+        int button = input.button();
         if (Create.SCHEMATIC_HANDLER.onMouseInput(client, button) || Create.SCHEMATIC_AND_QUILL_HANDLER.onMouseInput(client, button)) {
             ci.cancel();
         }

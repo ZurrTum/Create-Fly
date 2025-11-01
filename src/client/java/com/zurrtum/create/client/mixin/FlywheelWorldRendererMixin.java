@@ -1,14 +1,18 @@
 package com.zurrtum.create.client.mixin;
 
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.mojang.blaze3d.buffers.GpuBufferSlice;
 import com.zurrtum.create.client.flywheel.api.visualization.VisualizationManager;
 import com.zurrtum.create.client.flywheel.impl.FlwImplXplat;
 import com.zurrtum.create.client.flywheel.impl.event.RenderContextImpl;
 import com.zurrtum.create.client.flywheel.lib.visualization.VisualizationHelper;
 import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
-import net.minecraft.client.render.*;
+import net.minecraft.client.render.BufferBuilderStorage;
+import net.minecraft.client.render.Camera;
+import net.minecraft.client.render.RenderTickCounter;
+import net.minecraft.client.render.WorldRenderer;
 import net.minecraft.client.util.ObjectAllocator;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.BlockBreakingInfo;
@@ -23,6 +27,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+import java.util.Iterator;
 import java.util.SortedSet;
 
 @Mixin(value = WorldRenderer.class, priority = 1001) // Higher priority to go after Sodium
@@ -50,6 +55,7 @@ public class FlywheelWorldRendererMixin {
         boolean renderBlockOutline,
         Camera camera,
         Matrix4f positionMatrix,
+        Matrix4f matrix4f,
         Matrix4f projectionMatrix,
         GpuBufferSlice fog,
         Vector4f fogColor,
@@ -61,7 +67,7 @@ public class FlywheelWorldRendererMixin {
             world,
             bufferBuilders,
             positionMatrix,
-            projectionMatrix,
+            matrix4f,
             camera,
             tickCounter.getTickProgress(false)
         );
@@ -104,19 +110,8 @@ public class FlywheelWorldRendererMixin {
         }
     }
 
-    @Inject(method = "renderEntity", at = @At("HEAD"), cancellable = true)
-    private void flywheel$decideNotToRenderEntity(
-        Entity entity,
-        double cameraX,
-        double cameraY,
-        double cameraZ,
-        float tickProgress,
-        MatrixStack matrices,
-        VertexConsumerProvider vertexConsumers,
-        CallbackInfo ci
-    ) {
-        if (VisualizationManager.supportsVisualization(entity.getEntityWorld()) && VisualizationHelper.skipVanillaRender(entity)) {
-            ci.cancel();
-        }
+    @WrapOperation(method = "fillEntityRenderStates(Lnet/minecraft/client/render/Camera;Lnet/minecraft/client/render/Frustum;Lnet/minecraft/client/render/RenderTickCounter;Lnet/minecraft/client/render/state/WorldRenderState;)V", at = @At(value = "INVOKE", target = "Ljava/lang/Iterable;iterator()Ljava/util/Iterator;", remap = false))
+    private Iterator<Entity> flywheel$decideNotToRenderEntity(Iterable<Entity> instance, Operation<Iterator<Entity>> original) {
+        return VisualizationHelper.skipVanillaRender(world, original.call(instance));
     }
 }

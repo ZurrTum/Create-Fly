@@ -13,8 +13,8 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.input.KeyInput;
 import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.client.util.InputUtil;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
@@ -93,8 +93,8 @@ public class ToolboxHandlerClient {
         return false;
     }
 
-    public static boolean onKeyInput(MinecraftClient mc, InputUtil.Key key) {
-        if (key != AllKeys.TOOLBELT.boundKey)
+    public static boolean onKeyInput(MinecraftClient mc, KeyInput input) {
+        if (!AllKeys.TOOLBELT.matchesKey(input))
             return false;
         if (mc.interactionManager == null || mc.interactionManager.getCurrentGameMode() == GameMode.SPECTATOR)
             return false;

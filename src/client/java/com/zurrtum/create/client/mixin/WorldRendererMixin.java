@@ -29,13 +29,17 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.*;
+import net.minecraft.client.render.state.OutlineRenderState;
+import net.minecraft.client.render.state.WorldRenderState;
+import net.minecraft.client.util.ObjectAllocator;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.player.BlockBreakingInfo;
-import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.BlockRenderView;
+import org.joml.Matrix4f;
+import org.joml.Vector4f;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -88,8 +92,22 @@ public class WorldRendererMixin {
         }
     }
 
-    @Inject(method = "renderParticles(Lnet/minecraft/client/render/FrameGraphBuilder;Lnet/minecraft/client/render/Camera;FLcom/mojang/blaze3d/buffers/GpuBufferSlice;)V", at = @At("TAIL"))
-    private void renderAfterParticles(FrameGraphBuilder frameGraphBuilder, Camera camera, float tickProgress, GpuBufferSlice fog, CallbackInfo ci) {
+    @Inject(method = "render(Lnet/minecraft/client/util/ObjectAllocator;Lnet/minecraft/client/render/RenderTickCounter;ZLnet/minecraft/client/render/Camera;Lorg/joml/Matrix4f;Lorg/joml/Matrix4f;Lorg/joml/Matrix4f;Lcom/mojang/blaze3d/buffers/GpuBufferSlice;Lorg/joml/Vector4f;Z)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/option/GameOptions;getCloudRenderModeValue()Lnet/minecraft/client/option/CloudRenderMode;"))
+    private void renderAfterParticles(
+        ObjectAllocator allocator,
+        RenderTickCounter tickCounter,
+        boolean renderBlockOutline,
+        Camera camera,
+        Matrix4f positionMatrix,
+        Matrix4f matrix4f,
+        Matrix4f projectionMatrix,
+        GpuBufferSlice fogBuffer,
+        Vector4f fogColor,
+        boolean renderSky,
+        CallbackInfo ci,
+        @Local FrameGraphBuilder frameGraphBuilder,
+        @Local float tickProgress
+    ) {
         FramePass framePass = frameGraphBuilder.createPass("after_particles");
         this.framebufferSet.mainFramebuffer = framePass.transfer(this.framebufferSet.mainFramebuffer);
         framePass.setRenderer(() -> {
@@ -106,6 +124,7 @@ public class WorldRendererMixin {
             ChainConveyorInteractionHandler.drawCustomBlockSelection(ms, buffer, cameraPos);
             SymmetryHandlerClient.onRenderWorld(client, ms, buffer, cameraPos);
             buffer.draw();
+            client.gameRenderer.getEntityRenderDispatcher().render();
             ContraptionPlayerPassengerRotation.frame(client);
         });
     }
@@ -143,22 +162,23 @@ public class WorldRendererMixin {
         }
     }
 
-    @Inject(method = "renderTargetBlockOutline(Lnet/minecraft/client/render/Camera;Lnet/minecraft/client/render/VertexConsumerProvider$Immediate;Lnet/minecraft/client/util/math/MatrixStack;Z)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/Camera;getPos()Lnet/minecraft/util/math/Vec3d;"), cancellable = true)
+    @Inject(method = "renderTargetBlockOutline(Lnet/minecraft/client/render/VertexConsumerProvider$Immediate;Lnet/minecraft/client/util/math/MatrixStack;ZLnet/minecraft/client/render/state/WorldRenderState;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/state/OutlineRenderState;highContrast()Z", ordinal = 0), cancellable = true)
     private void onRenderBlockOutline(
-        Camera camera,
         VertexConsumerProvider.Immediate vertexConsumers,
         MatrixStack matrices,
-        boolean translucent,
+        boolean renderBlockOutline,
+        WorldRenderState renderStates,
         CallbackInfo ci,
-        @Local BlockHitResult target
+        @Local Vec3d cameraPos,
+        @Local OutlineRenderState state
     ) {
         if (ChainConveyorInteractionHandler.hideVanillaBlockSelection() || ClipboardValueSettingsClientHandler.drawCustomBlockSelection(
             client,
-            target,
+            state.pos(),
             vertexConsumers,
-            camera,
+            cameraPos,
             matrices
-        ) || TrackBlockOutline.drawCustomBlockSelection(client, target, vertexConsumers, camera, matrices)) {
+        ) || TrackBlockOutline.drawCustomBlockSelection(client, state.pos(), vertexConsumers, cameraPos, matrices)) {
             ci.cancel();
         }
     }
@@ -176,7 +196,7 @@ public class WorldRendererMixin {
         return original.call(state);
     }
 
-    @Inject(method = "renderBlockEntities(Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider$Immediate;Lnet/minecraft/client/render/VertexConsumerProvider$Immediate;Lnet/minecraft/client/render/Camera;F)V", at = @At("HEAD"))
+    @Inject(method = "renderBlockEntities(Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/state/WorldRenderState;Lnet/minecraft/client/render/command/OrderedRenderCommandQueueImpl;)V", at = @At("HEAD"))
     private void markSpriteActive(CallbackInfo ci) {
         SodiumCompat.markSpriteActive(client);
     }

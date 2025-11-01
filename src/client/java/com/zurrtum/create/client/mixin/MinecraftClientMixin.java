@@ -276,10 +276,10 @@ public class MinecraftClientMixin {
         player.networkHandler.sendPacket(AllPackets.LEFT_CLICK);
     }
 
-    @Inject(method = "joinWorld(Lnet/minecraft/client/world/ClientWorld;Lnet/minecraft/client/gui/screen/DownloadingTerrainScreen$WorldEntryReason;)V", at = @At("HEAD"))
+    @Inject(method = "joinWorld(Lnet/minecraft/client/world/ClientWorld;)V", at = @At("HEAD"))
     private void onJoinWorld(CallbackInfo ci) {
         if (world != null) {
-            onUnloadWorld(ci);
+            onUnloadWorld(null);
         }
     }
 
@@ -293,7 +293,7 @@ public class MinecraftClientMixin {
         CobbleGenOptimisation.invalidateWorld(world);
     }
 
-    @Inject(method = "doItemPick()V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screen/Screen;hasControlDown()Z"), cancellable = true)
+    @Inject(method = "doItemPick()V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/MinecraftClient;isCtrlPressed()Z"), cancellable = true)
     private void doItemPick(CallbackInfo ci) {
         if (ToolboxHandlerClient.onPickItem((MinecraftClient) (Object) this)) {
             ci.cancel();

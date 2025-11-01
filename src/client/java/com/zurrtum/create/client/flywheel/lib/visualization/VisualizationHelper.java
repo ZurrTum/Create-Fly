@@ -8,10 +8,14 @@ import com.zurrtum.create.client.flywheel.api.visualization.VisualizationManager
 import com.zurrtum.create.client.flywheel.api.visualization.VisualizerRegistry;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityType;
+import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.Iterator;
+import java.util.NoSuchElementException;
 
 public final class VisualizationHelper {
     private VisualizationHelper() {
@@ -143,6 +147,13 @@ public final class VisualizationHelper {
         return visualizer.skipVanillaRender(entity);
     }
 
+    public static Iterator<Entity> skipVanillaRender(ClientWorld world, Iterator<Entity> iterator) {
+        if (VisualizationManager.supportsVisualization(world)) {
+            return new EntitySkipIterator(iterator);
+        }
+        return iterator;
+    }
+
     public static <T extends BlockEntity> boolean tryAddBlockEntity(T blockEntity) {
         World level = blockEntity.getWorld();
         VisualizationManager manager = VisualizationManager.get(level);
@@ -157,5 +168,40 @@ public final class VisualizationHelper {
 
         manager.blockEntities().queueAdd(blockEntity);
         return visualizer.skipVanillaRender(blockEntity);
+    }
+
+    public static class EntitySkipIterator implements Iterator<Entity> {
+        private final Iterator<Entity> iterator;
+        private Entity next;
+
+        public EntitySkipIterator(Iterator<Entity> iterator) {
+            this.iterator = iterator;
+        }
+
+        @Override
+        public boolean hasNext() {
+            if (next != null) {
+                return true;
+            }
+            while (iterator.hasNext()) {
+                Entity entity = iterator.next();
+                if (skipVanillaRender(entity)) {
+                    continue;
+                }
+                next = entity;
+                return true;
+            }
+            return false;
+        }
+
+        @Override
+        public Entity next() {
+            if (hasNext()) {
+                Entity entity = next;
+                next = null;
+                return entity;
+            }
+            throw new NoSuchElementException();
+        }
     }
 }

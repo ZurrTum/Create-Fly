@@ -19,7 +19,7 @@ import org.spongepowered.asm.mixin.injection.At;
 
 @Mixin(GuiRenderer.class)
 public class GuiRendererMixin {
-    @WrapOperation(method = "<init>", at = @At(value = "INVOKE", target = "Lcom/google/common/collect/ImmutableMap;builder()Lcom/google/common/collect/ImmutableMap$Builder;"), remap = false)
+    @WrapOperation(method = "<init>", at = @At(value = "INVOKE", target = "Lcom/google/common/collect/ImmutableMap;builder()Lcom/google/common/collect/ImmutableMap$Builder;", remap = false))
     private ImmutableMap.Builder<Class<? extends SpecialGuiElementRenderState>, SpecialGuiElementRenderer<?>> addRenderer(
         Operation<ImmutableMap.Builder<Class<? extends SpecialGuiElementRenderState>, SpecialGuiElementRenderer<?>>> original,
         @Local(argsOnly = true) Immediate vertexConsumers

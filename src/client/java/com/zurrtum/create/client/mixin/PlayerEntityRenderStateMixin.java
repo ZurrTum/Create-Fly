@@ -4,8 +4,10 @@ import com.zurrtum.create.client.content.equipment.armor.CardboardRenderState;
 import com.zurrtum.create.client.foundation.render.UuidRenderState;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.AbstractClientPlayerEntity;
+import net.minecraft.client.network.ClientPlayerLikeEntity;
 import net.minecraft.client.option.Perspective;
 import net.minecraft.client.render.entity.state.PlayerEntityRenderState;
+import net.minecraft.entity.PlayerLikeEntity;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import org.spongepowered.asm.mixin.Mixin;
@@ -49,8 +51,8 @@ public class PlayerEntityRenderStateMixin implements CardboardRenderState, UuidR
     }
 
     @Override
-    public void create$update(AbstractClientPlayerEntity player, float tickProgress) {
-        if (player.getAbilities().flying) {
+    public <T extends PlayerLikeEntity & ClientPlayerLikeEntity> void create$update(T player, float tickProgress) {
+        if (player instanceof AbstractClientPlayerEntity clientPlayer && clientPlayer.getAbilities().flying) {
             flying = true;
             return;
         } else {

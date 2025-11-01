@@ -14,20 +14,6 @@ import static com.zurrtum.create.client.flywheel.lib.model.baked.BakedItemModelB
 
 @Mixin(ItemRenderer.class)
 public class ItemRendererMixin {
-    @WrapOperation(method = "getArmorGlintConsumer(Lnet/minecraft/client/render/VertexConsumerProvider;Lnet/minecraft/client/render/RenderLayer;Z)Lnet/minecraft/client/render/VertexConsumer;", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/VertexConsumers;union(Lnet/minecraft/client/render/VertexConsumer;Lnet/minecraft/client/render/VertexConsumer;)Lnet/minecraft/client/render/VertexConsumer;"))
-    private static VertexConsumer getArmorGlintConsumer(
-        VertexConsumer first,
-        VertexConsumer second,
-        Operation<VertexConsumer> original,
-        @Local(argsOnly = true) VertexConsumerProvider provider
-    ) {
-        if (provider instanceof ItemMeshEmitterProvider) {
-            return new DualVertexConsumer(first, second);
-        } else {
-            return original.call(first, second);
-        }
-    }
-
     @WrapOperation(method = "getSpecialItemGlintConsumer(Lnet/minecraft/client/render/VertexConsumerProvider;Lnet/minecraft/client/render/RenderLayer;Lnet/minecraft/client/util/math/MatrixStack$Entry;)Lnet/minecraft/client/render/VertexConsumer;", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/VertexConsumers;union(Lnet/minecraft/client/render/VertexConsumer;Lnet/minecraft/client/render/VertexConsumer;)Lnet/minecraft/client/render/VertexConsumer;"))
     private static VertexConsumer getSpecialItemGlintConsumer(
         VertexConsumer first,

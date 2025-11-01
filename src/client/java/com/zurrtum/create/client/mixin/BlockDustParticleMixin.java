@@ -27,15 +27,15 @@ public abstract class BlockDustParticleMixin {
         -1,
         0,
         -1
-    ), new Vec3i(1, 0, -1), new Vec3i(1, 0, 1), new Vec3i(-1, 0, 1), new Vec3i(0, -1, 0), new Vec3i(0, 1, 0), new Vec3i(
+    ), new Vec3i(1, 0, -1), new Vec3i(1, 0, 1), new Vec3i(-1, 0, 1), new Vec3i(0, -1, 0), new Vec3i(0, 1, 0), new Vec3i(0, -1, -1), new Vec3i(
         0,
         -1,
-        -1
-    ), new Vec3i(0, -1, 1), new Vec3i(-1, -1, 0), new Vec3i(1, -1, 0), new Vec3i(-1, -1, -1), new Vec3i(1, -1, -1), new Vec3i(1, -1, 1), new Vec3i(
-        -1,
+        1
+    ), new Vec3i(-1, -1, 0), new Vec3i(1, -1, 0), new Vec3i(-1, -1, -1), new Vec3i(1, -1, -1), new Vec3i(
+        1,
         -1,
         1
-    )};
+    ), new Vec3i(-1, -1, 1)};
 
     @Unique
     private static BlockPos findPos(ClientWorld world, BlockPos pos, BlockState state) {
@@ -54,7 +54,7 @@ public abstract class BlockDustParticleMixin {
     }
 
     @WrapOperation(method = "<init>(Lnet/minecraft/client/world/ClientWorld;DDDDDDLnet/minecraft/block/BlockState;Lnet/minecraft/util/math/BlockPos;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/block/BlockModels;getModelParticleSprite(Lnet/minecraft/block/BlockState;)Lnet/minecraft/client/texture/Sprite;"))
-    private Sprite onParticle(
+    private static Sprite onParticle(
         BlockModels models,
         BlockState state,
         Operation<Sprite> original,

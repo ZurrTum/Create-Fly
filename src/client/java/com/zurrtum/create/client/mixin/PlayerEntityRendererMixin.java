@@ -3,10 +3,11 @@ package com.zurrtum.create.client.mixin;
 import com.zurrtum.create.client.AllExtensions;
 import com.zurrtum.create.client.content.equipment.armor.CardboardRenderState;
 import com.zurrtum.create.client.foundation.render.UuidRenderState;
-import net.minecraft.client.network.AbstractClientPlayerEntity;
+import net.minecraft.client.network.ClientPlayerLikeEntity;
 import net.minecraft.client.render.entity.PlayerEntityRenderer;
 import net.minecraft.client.render.entity.model.BipedEntityModel.ArmPose;
 import net.minecraft.client.render.entity.state.PlayerEntityRenderState;
+import net.minecraft.entity.PlayerLikeEntity;
 import net.minecraft.item.Item;
 import net.minecraft.util.Arm;
 import net.minecraft.util.Hand;
@@ -17,9 +18,9 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(PlayerEntityRenderer.class)
-public class PlayerEntityRendererMixin {
-    @Inject(method = "getArmPose(Lnet/minecraft/client/network/AbstractClientPlayerEntity;Lnet/minecraft/util/Arm;)Lnet/minecraft/client/render/entity/model/BipedEntityModel$ArmPose;", at = @At(value = "HEAD"), cancellable = true)
-    private static void getArmPose(AbstractClientPlayerEntity player, Arm arm, CallbackInfoReturnable<ArmPose> cir) {
+public class PlayerEntityRendererMixin<AvatarlikeEntity extends PlayerLikeEntity & ClientPlayerLikeEntity> {
+    @Inject(method = "getArmPose(Lnet/minecraft/entity/PlayerLikeEntity;Lnet/minecraft/util/Arm;)Lnet/minecraft/client/render/entity/model/BipedEntityModel$ArmPose;", at = @At(value = "HEAD"), cancellable = true)
+    private static void getArmPose(PlayerLikeEntity player, Arm arm, CallbackInfoReturnable<ArmPose> cir) {
         Hand hand = player.getMainArm() == arm ? Hand.MAIN_HAND : Hand.OFF_HAND;
         Item item = player.getStackInHand(hand).getItem();
         ArmPose pose = AllExtensions.ARM_POSE.get(item);
@@ -28,8 +29,8 @@ public class PlayerEntityRendererMixin {
         }
     }
 
-    @Inject(method = "updateRenderState(Lnet/minecraft/client/network/AbstractClientPlayerEntity;Lnet/minecraft/client/render/entity/state/PlayerEntityRenderState;F)V", at = @At("TAIL"))
-    private void updateRenderState(AbstractClientPlayerEntity player, PlayerEntityRenderState state, float tickProgress, CallbackInfo ci) {
+    @Inject(method = "updateRenderState(Lnet/minecraft/entity/PlayerLikeEntity;Lnet/minecraft/client/render/entity/state/PlayerEntityRenderState;F)V", at = @At("TAIL"))
+    private void updateRenderState(AvatarlikeEntity player, PlayerEntityRenderState state, float tickProgress, CallbackInfo ci) {
         ((CardboardRenderState) state).create$update(player, tickProgress);
         ((UuidRenderState) state).create$setUuid(player.getUuid());
     }

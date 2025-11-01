@@ -6,8 +6,8 @@ import com.zurrtum.create.client.Create;
 import com.zurrtum.create.client.content.equipment.extendoGrip.ExtendoGripRenderHandler;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.AbstractClientPlayerEntity;
-import net.minecraft.client.render.VertexConsumerProvider;
-import net.minecraft.client.render.entity.EntityRenderDispatcher;
+import net.minecraft.client.render.command.OrderedRenderCommandQueue;
+import net.minecraft.client.render.entity.EntityRenderManager;
 import net.minecraft.client.render.item.HeldItemRenderer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.ItemStack;
@@ -25,9 +25,9 @@ public class HeldItemRendererMixin {
 
     @Shadow
     @Final
-    private EntityRenderDispatcher entityRenderDispatcher;
+    private EntityRenderManager entityRenderDispatcher;
 
-    @WrapOperation(method = "renderItem(FLnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider$Immediate;Lnet/minecraft/client/network/ClientPlayerEntity;I)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/item/HeldItemRenderer;renderFirstPersonItem(Lnet/minecraft/client/network/AbstractClientPlayerEntity;FFLnet/minecraft/util/Hand;FLnet/minecraft/item/ItemStack;FLnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;I)V"))
+    @WrapOperation(method = "renderItem(FLnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/command/OrderedRenderCommandQueue;Lnet/minecraft/client/network/ClientPlayerEntity;I)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/item/HeldItemRenderer;renderFirstPersonItem(Lnet/minecraft/client/network/AbstractClientPlayerEntity;FFLnet/minecraft/util/Hand;FLnet/minecraft/item/ItemStack;FLnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/command/OrderedRenderCommandQueue;I)V"))
     private void renderItem(
         HeldItemRenderer instance,
         AbstractClientPlayerEntity player,
@@ -38,7 +38,7 @@ public class HeldItemRendererMixin {
         ItemStack item,
         float equipProgress,
         MatrixStack matrices,
-        VertexConsumerProvider vertexConsumers,
+        OrderedRenderCommandQueue queue,
         int light,
         Operation<Void> original
     ) {
@@ -48,7 +48,7 @@ public class HeldItemRendererMixin {
             entityRenderDispatcher,
             instance,
             matrices,
-            vertexConsumers,
+            queue,
             light,
             tickProgress,
             hand,
@@ -60,7 +60,7 @@ public class HeldItemRendererMixin {
             entityRenderDispatcher,
             instance,
             matrices,
-            vertexConsumers,
+            queue,
             light,
             tickProgress,
             hand,
@@ -71,7 +71,7 @@ public class HeldItemRendererMixin {
             client,
             entityRenderDispatcher,
             matrices,
-            vertexConsumers,
+            queue,
             light,
             hand,
             equipProgress,
@@ -79,6 +79,6 @@ public class HeldItemRendererMixin {
         )) {
             return;
         }
-        original.call(instance, player, tickProgress, pitch, hand, swingProgress, item, equipProgress, matrices, vertexConsumers, light);
+        original.call(instance, player, tickProgress, pitch, hand, swingProgress, item, equipProgress, matrices, queue, light);
     }
 }

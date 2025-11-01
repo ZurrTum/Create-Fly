@@ -13,7 +13,7 @@ import org.spongepowered.asm.mixin.injection.At;
 
 @Mixin(DefaultAttributeRegistry.class)
 public class DefaultAttributeRegistryMixin {
-    @WrapOperation(method = "<clinit>", at = @At(value = "INVOKE", target = "com/google/common/collect/ImmutableMap.builder()Lcom/google/common/collect/ImmutableMap$Builder;"), remap = false)
+    @WrapOperation(method = "<clinit>", at = @At(value = "INVOKE", target = "com/google/common/collect/ImmutableMap.builder()Lcom/google/common/collect/ImmutableMap$Builder;", remap = false))
     private static ImmutableMap.Builder<EntityType<? extends LivingEntity>, DefaultAttributeContainer> addAttributes(Operation<ImmutableMap.Builder<EntityType<? extends LivingEntity>, DefaultAttributeContainer>> original) {
         ImmutableMap.Builder<EntityType<? extends LivingEntity>, DefaultAttributeContainer> builder = original.call();
         AllEntityAttributes.registerIfNeeded();

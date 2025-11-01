@@ -4,18 +4,17 @@ import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.zurrtum.create.client.ponder.enums.PonderKeybinds;
 import net.minecraft.client.option.KeyBinding;
+import net.minecraft.client.util.InputUtil;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 
-import java.util.Map;
-
 @Mixin(KeyBinding.class)
 public class KeyBindingMixin {
-    @WrapOperation(method = "updateKeysByCode()V", at = @At(value = "INVOKE", target = "Ljava/util/Map;put(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;"))
-    private static <K, V> V skip(Map<K, V> map, K k, V v, Operation<V> original) {
-        if (v == PonderKeybinds.PONDER) {
-            return null;
+    @WrapOperation(method = "updateKeysByCode()V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/option/KeyBinding;registerBinding(Lnet/minecraft/client/util/InputUtil$Key;)V"))
+    private static void skip(KeyBinding instance, InputUtil.Key key, Operation<Void> original) {
+        if (instance == PonderKeybinds.PONDER) {
+            return;
         }
-        return original.call(map, k, v);
+        original.call(instance, key);
     }
 }
