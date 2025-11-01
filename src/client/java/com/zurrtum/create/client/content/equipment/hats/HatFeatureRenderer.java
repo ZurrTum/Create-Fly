@@ -1,6 +1,7 @@
 package com.zurrtum.create.client.content.equipment.hats;
 
 import com.zurrtum.create.client.catnip.render.CachedBuffers;
+import com.zurrtum.create.client.catnip.render.SuperByteBuffer;
 import com.zurrtum.create.client.content.trains.schedule.hat.TrainHatInfo;
 import com.zurrtum.create.client.content.trains.schedule.hat.TrainHatInfoReloadListener;
 import com.zurrtum.create.client.flywheel.lib.model.baked.PartialModel;
@@ -9,7 +10,8 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.client.model.ModelPart;
 import net.minecraft.client.render.TexturedRenderLayers;
-import net.minecraft.client.render.VertexConsumerProvider;
+import net.minecraft.client.render.VertexConsumer;
+import net.minecraft.client.render.command.OrderedRenderCommandQueue;
 import net.minecraft.client.render.entity.feature.FeatureRenderer;
 import net.minecraft.client.render.entity.feature.FeatureRendererContext;
 import net.minecraft.client.render.entity.model.EntityModel;
@@ -26,9 +28,9 @@ public class HatFeatureRenderer<S extends LivingEntityRenderState, M extends Ent
     }
 
     @Override
-    public void render(MatrixStack ms, VertexConsumerProvider buffer, int light, S renderState, float limbAngle, float limbDistance) {
-        HatState state = (HatState) renderState;
-        PartialModel hat = state.create$getHat();
+    public void render(MatrixStack ms, OrderedRenderCommandQueue queue, int light, S renderState, float limbAngle, float limbDistance) {
+        HatState hatState = (HatState) renderState;
+        PartialModel hat = hatState.create$getHat();
         if (hat == null)
             return;
 
@@ -36,7 +38,7 @@ public class HatFeatureRenderer<S extends LivingEntityRenderState, M extends Ent
         ms.push();
 
         var msr = TransformStack.of(ms);
-        TrainHatInfo info = state.create$getHatInfo();
+        TrainHatInfo info = hatState.create$getHatInfo();
         List<ModelPart> partsToHead;
         if (entityModel instanceof ModelWithHead model) {
             partsToHead = TrainHatInfo.getAdjustedPart(info, model.getHead(), "");
@@ -63,9 +65,17 @@ public class HatFeatureRenderer<S extends LivingEntityRenderState, M extends Ent
             ms.translate(0, -2.25F / 16.0F, 0);
             msr.rotateXDegrees(-8.5F);
             BlockState air = Blocks.AIR.getDefaultState();
-            CachedBuffers.partial(hat, air).disableDiffuse().light(light).renderInto(ms, buffer.getBuffer(TexturedRenderLayers.getEntityCutout()));
+            HatRenderState state = new HatRenderState(CachedBuffers.partial(hat, air), light);
+            queue.submitCustom(ms, TexturedRenderLayers.getEntityCutout(), state);
         }
 
         ms.pop();
+    }
+
+    public record HatRenderState(SuperByteBuffer hat, int light) implements OrderedRenderCommandQueue.Custom {
+        @Override
+        public void render(MatrixStack.Entry matricesEntry, VertexConsumer vertexConsumer) {
+            hat.disableDiffuse().light(light).renderInto(matricesEntry, vertexConsumer);
+        }
     }
 }
