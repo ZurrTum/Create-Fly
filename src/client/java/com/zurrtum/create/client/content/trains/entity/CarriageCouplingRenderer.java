@@ -37,7 +37,7 @@ public class CarriageCouplingRenderer {
 
         for (Train train : trains) {
             List<Carriage> carriages = train.carriages;
-            for (int i = 0; i < carriages.size() - 1; i++) {
+            for (int i = 0, end = carriages.size() - 1; i < end; i++) {
                 Carriage carriage = carriages.get(i);
                 CarriageContraptionEntity entity = carriage.getDimensional(level).entity.get();
                 Carriage carriage2 = carriages.get(i + 1);
@@ -74,7 +74,7 @@ public class CarriageCouplingRenderer {
                     ms.push();
                     ms.translate(anchor.x - camera.x, anchor.y - camera.y, anchor.z - camera.z);
                     CachedBuffers.partial(AllPartialModels.TRAIN_COUPLING_HEAD, air).rotateYDegrees(-yRot).rotateXDegrees(xRot).light(lightCoords)
-                        .renderInto(ms, vb);
+                        .renderInto(ms.peek(), vb);
 
                     float margin = 3 / 16f;
                     double couplingDistance = train.carriageSpacing.get(i) - 2 * margin - bogey1.type.getConnectorAnchorOffset(bogey1.isUpsideDown()).z - bogey2.type.getConnectorAnchorOffset(
@@ -84,7 +84,7 @@ public class CarriageCouplingRenderer {
                     for (int j = 0; j < couplingSegments; j++) {
                         CachedBuffers.partial(AllPartialModels.TRAIN_COUPLING_CABLE, air).rotateYDegrees(-yRot + 180).rotateXDegrees(-xRot)
                             .translate(0, 0, margin + 2 / 16f).scale(1, 1, (float) stretch).translate(0, 0, j / 4f).light(lightCoords)
-                            .renderInto(ms, vb);
+                            .renderInto(ms.peek(), vb);
                     }
                     ms.pop();
                 }
@@ -94,7 +94,7 @@ public class CarriageCouplingRenderer {
                     Vec3d translation = position2.subtract(position).add(anchor2).subtract(camera);
                     ms.translate(translation.x, translation.y, translation.z);
                     CachedBuffers.partial(AllPartialModels.TRAIN_COUPLING_HEAD, air).rotateYDegrees(-yRot + 180).rotateXDegrees(-xRot)
-                        .light(lightCoords2).renderInto(ms, vb);
+                        .light(lightCoords2).renderInto(ms.peek(), vb);
                     ms.pop();
                 }
 

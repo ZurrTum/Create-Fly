@@ -3,14 +3,12 @@ package com.zurrtum.create.content.contraptions;
 import com.zurrtum.create.catnip.levelWrappers.WrappedLevel;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
-import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.structure.StructureTemplate;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
-import org.jetbrains.annotations.Nullable;
 
 public class ContraptionWorld extends WrappedLevel {
     final Contraption contraption;
@@ -41,11 +39,6 @@ public class ContraptionWorld extends WrappedLevel {
             return blockInfo.state();
 
         return Blocks.AIR.getDefaultState();
-    }
-
-    @Override
-    public @Nullable BlockEntity getBlockEntity(BlockPos pos) {
-        return contraption.presentBlockEntities.get(pos);
     }
 
     @Override

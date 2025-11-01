@@ -4,23 +4,31 @@ import com.zurrtum.create.catnip.animation.LerpedFloat;
 import com.zurrtum.create.catnip.data.Iterate;
 import com.zurrtum.create.catnip.math.AngleHelper;
 import com.zurrtum.create.catnip.math.VecHelper;
+import com.zurrtum.create.client.AllPartialModels;
 import com.zurrtum.create.client.api.behaviour.movement.MovementRenderBehaviour;
-import com.zurrtum.create.client.content.contraptions.render.ContraptionMatrices;
+import com.zurrtum.create.client.api.behaviour.movement.MovementRenderState;
+import com.zurrtum.create.client.catnip.animation.AnimationTickHolder;
 import com.zurrtum.create.client.foundation.virtualWorld.VirtualRenderWorld;
 import com.zurrtum.create.content.contraptions.Contraption;
 import com.zurrtum.create.content.contraptions.behaviour.MovementContext;
 import com.zurrtum.create.content.processing.burner.BlazeBurnerBlock;
 import com.zurrtum.create.content.trains.entity.CarriageContraption;
 import com.zurrtum.create.content.trains.entity.CarriageContraptionEntity;
+import net.minecraft.block.BlockState;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.render.VertexConsumerProvider;
+import net.minecraft.client.font.TextRenderer;
+import net.minecraft.client.render.command.OrderedRenderCommandQueue;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.particle.ParticleTypes;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.random.Random;
+import net.minecraft.world.World;
+import org.joml.Matrix4f;
 
 public class BlazeBurnerMovementRenderBehaviour implements MovementRenderBehaviour {
     public void tick(MovementContext context) {
@@ -92,14 +100,54 @@ public class BlazeBurnerMovementRenderBehaviour implements MovementRenderBehavio
     }
 
     @Override
-    public void renderInContraption(
+    public MovementRenderState getRenderState(
+        Vec3d camera,
+        TextRenderer textRenderer,
         MovementContext context,
         VirtualRenderWorld renderWorld,
-        ContraptionMatrices matrices,
-        VertexConsumerProvider buffer
+        Matrix4f worldMatrix4f
     ) {
-        if (!shouldRender(context))
-            return;
-        BlazeBurnerRenderer.renderInContraption(context, renderWorld, matrices, buffer, getHeadAngle(context), shouldRenderHat(context));
+        if (!shouldRender(context)) {
+            return null;
+        }
+        BlockState blockState = context.state;
+        BlazeBurnerBlock.HeatLevel heatLevel = BlazeBurnerBlock.getHeatLevelOf(blockState);
+        if (heatLevel == BlazeBurnerBlock.HeatLevel.NONE) {
+            return null;
+        }
+        if (!heatLevel.isAtLeast(BlazeBurnerBlock.HeatLevel.FADING)) {
+            heatLevel = BlazeBurnerBlock.HeatLevel.FADING;
+        }
+        BlazeBurnerMovementRenderState state = new BlazeBurnerMovementRenderState(context.localPos);
+        World level = context.world;
+        float horizontalAngle = AngleHelper.rad(getHeadAngle(context).getValue(AnimationTickHolder.getPartialTicks(level)));
+        boolean drawGoggles = context.blockEntityData.contains("Goggles");
+        boolean drawHat = shouldRenderHat(context) || context.blockEntityData.contains("TrainHat");
+        int hashCode = context.hashCode();
+        state.data = BlazeBurnerRenderer.getBlazeBurnerRenderData(
+            level,
+            blockState,
+            heatLevel,
+            0,
+            horizontalAngle,
+            false,
+            drawGoggles,
+            drawHat ? AllPartialModels.TRAIN_HAT : null,
+            hashCode
+        );
+        return state;
+    }
+
+    public static class BlazeBurnerMovementRenderState extends MovementRenderState {
+        public BlazeBurnerRenderer.BlazeBurnerRenderData data;
+
+        public BlazeBurnerMovementRenderState(BlockPos pos) {
+            super(pos);
+        }
+
+        @Override
+        public void render(MatrixStack matrices, OrderedRenderCommandQueue queue) {
+            data.render(matrices, queue);
+        }
     }
 }

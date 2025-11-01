@@ -29,7 +29,6 @@ import java.util.Iterator;
 import java.util.List;
 
 public class ContraptionControlsMovingInteraction extends MovingInteractionBehaviour {
-
     @Override
     public boolean handlePlayerInteraction(PlayerEntity player, Hand activeHand, BlockPos localPos, AbstractContraptionEntity contraptionEntity) {
         Contraption contraption = contraptionEntity.getContraption();
@@ -43,7 +42,7 @@ public class ContraptionControlsMovingInteraction extends MovingInteractionBehav
         if (contraption instanceof ElevatorContraption ec)
             return elevatorInteraction(player, localPos, contraptionEntity, ec, ctx);
         if (contraptionEntity.getEntityWorld().isClient()) {
-            if (contraption.presentBlockEntities.get(ctx.localPos) instanceof ContraptionControlsBlockEntity cbe)
+            if (AllClientHandle.INSTANCE.getBlockEntityClientSide(contraption, ctx.localPos) instanceof ContraptionControlsBlockEntity cbe)
                 cbe.pressButton();
             return true;
         }
@@ -151,7 +150,7 @@ public class ContraptionControlsMovingInteraction extends MovingInteractionBehav
             return true;
 
         AllClientHandle.INSTANCE.sendPacket(player, new ElevatorTargetFloorPacket(contraptionEntity, efs.currentTargetY));
-        if (contraption.presentBlockEntities.get(ctx.localPos) instanceof ContraptionControlsBlockEntity cbe)
+        if (AllClientHandle.INSTANCE.getBlockEntityClientSide(contraption, ctx.localPos) instanceof ContraptionControlsBlockEntity cbe)
             cbe.pressButton();
         return true;
     }

@@ -10,6 +10,8 @@ import net.minecraft.client.render.entity.EntityRendererFactory;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.vehicle.AbstractMinecartEntity;
+import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.Vec3d;
 
 
 public class OrientedContraptionEntityRenderer<C extends OrientedContraptionEntity, S extends OrientedContraptionEntityRenderer.OrientedContraptionState> extends ContraptionEntityRenderer<C, S> {
@@ -32,57 +34,43 @@ public class OrientedContraptionEntityRenderer<C extends OrientedContraptionEnti
 
     @Override
     public void updateRenderState(C entity, S state, float tickProgress) {
-        super.updateRenderState(entity, state, tickProgress);
-        state.seed = entity.getId();
-        state.angleInitialYaw = entity.getInitialYaw();
-        state.prevYaw = entity.prevYaw;
-        state.yaw = entity.yaw;
-        state.prevPitch = entity.prevPitch;
-        state.pitch = entity.pitch;
         Entity ridingEntity = entity.getVehicle();
         if (ridingEntity instanceof AbstractMinecartEntity cart) {
-            state.cart = cart;
+            state.offset = OrientedContraptionVisual.getCartOffset(tickProgress, cart);
         } else if (ridingEntity instanceof AbstractContraptionEntity be) {
             if (ridingEntity.getVehicle() instanceof AbstractMinecartEntity cart) {
-                state.cart = cart;
+                state.offset = OrientedContraptionVisual.getCartOffset(tickProgress, cart);
             } else {
-                state.cart = null;
-                state.entity = entity;
-                state.riding = be;
-                return;
+                state.offset = OrientedContraptionVisual.getContraptionOffset(entity, tickProgress, be);
             }
-        } else {
-            state.cart = null;
         }
-        state.entity = null;
-        state.riding = null;
+        state.seed = entity.getId();
+        boolean done = tickProgress == 1.0F;
+        state.angleYaw = MathHelper.RADIANS_PER_DEGREE * (done ? -entity.yaw : -AngleHelper.angleLerp(tickProgress, entity.prevYaw, entity.yaw));
+        state.anglePitch = MathHelper.RADIANS_PER_DEGREE * (done ? entity.pitch : AngleHelper.angleLerp(
+            tickProgress,
+            entity.prevPitch,
+            entity.pitch
+        ));
+        state.angleInitialYaw = MathHelper.RADIANS_PER_DEGREE * entity.getInitialYaw();
+        super.updateRenderState(entity, state, tickProgress);
     }
 
     @Override
-    public void transform(OrientedContraptionState state, MatrixStack matrixStack, float partialTicks) {
-        float angleYaw = -(partialTicks == 1.0F ? state.yaw : AngleHelper.angleLerp(partialTicks, state.prevYaw, state.yaw));
-        float anglePitch = partialTicks == 1.0F ? state.pitch : AngleHelper.angleLerp(partialTicks, state.prevPitch, state.pitch);
+    public void transform(OrientedContraptionState state, MatrixStack matrixStack) {
         matrixStack.translate(-.5f, 0, -.5f);
-
-        if (state.cart != null) {
-            OrientedContraptionVisual.repositionOnCart(matrixStack, partialTicks, state.cart);
-        } else if (state.riding != null) {
-            OrientedContraptionVisual.repositionOnContraption(state.entity, matrixStack, partialTicks, state.riding);
+        if (state.offset != null) {
+            matrixStack.translate(state.offset);
         }
-
-        TransformStack.of(matrixStack).nudge(state.seed).center().rotateYDegrees(angleYaw).rotateZDegrees(anglePitch)
-            .rotateYDegrees(state.angleInitialYaw).uncenter();
+        TransformStack.of(matrixStack).nudge(state.seed).center().rotateY(state.angleYaw).rotateZ(state.anglePitch).rotateY(state.angleInitialYaw)
+            .uncenter();
     }
 
     public static class OrientedContraptionState extends AbstractContraptionState {
+        public float angleYaw;
+        public float anglePitch;
+        public float angleInitialYaw;
         int seed;
-        float angleInitialYaw;
-        float prevYaw;
-        float yaw;
-        float prevPitch;
-        float pitch;
-        AbstractMinecartEntity cart = null;
-        OrientedContraptionEntity entity = null;
-        AbstractContraptionEntity riding = null;
+        Vec3d offset;
     }
 }

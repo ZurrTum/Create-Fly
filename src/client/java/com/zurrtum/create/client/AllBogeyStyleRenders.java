@@ -1,16 +1,14 @@
 package com.zurrtum.create.client;
 
 import com.zurrtum.create.AllBogeyStyles;
-import com.zurrtum.create.client.content.trains.bogey.BogeyBlockEntityRenderer.BogeyBlockEntityRenderState;
 import com.zurrtum.create.client.content.trains.bogey.BogeyBlockEntityRenderer.BogeyRenderState;
 import com.zurrtum.create.client.content.trains.bogey.BogeyVisual;
 import com.zurrtum.create.client.content.trains.bogey.SizeRenderer;
 import com.zurrtum.create.client.flywheel.api.visualization.VisualizationContext;
-import com.zurrtum.create.content.trains.bogey.AbstractBogeyBlockEntity;
 import com.zurrtum.create.content.trains.bogey.BogeySize;
 import com.zurrtum.create.content.trains.bogey.BogeyStyle;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.math.Vec3d;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
@@ -23,17 +21,19 @@ public class AllBogeyStyleRenders {
     public static final Map<Identifier, Map<BogeySize, SizeRenderer>> ALL = new HashMap<>();
 
     public static BogeyRenderState getRenderData(
-        AbstractBogeyBlockEntity be,
-        BogeyBlockEntityRenderState state,
+        BogeyStyle style,
+        BogeySize size,
         float tickProgress,
-        Vec3d cameraPos,
+        int light,
+        float wheelAngle,
+        @Nullable NbtCompound bogeyData,
         boolean inContraption
     ) {
-        Map<BogeySize, SizeRenderer> sizeRenderers = ALL.get(state.style.id);
+        Map<BogeySize, SizeRenderer> sizeRenderers = ALL.get(style.id);
         if (sizeRenderers == null) {
             return null;
         }
-        return sizeRenderers.get(state.size).renderer().getRenderData(be, state, tickProgress, cameraPos, inContraption);
+        return sizeRenderers.get(size).renderer().getRenderData(bogeyData, wheelAngle, tickProgress, light, inContraption);
     }
 
     @Nullable

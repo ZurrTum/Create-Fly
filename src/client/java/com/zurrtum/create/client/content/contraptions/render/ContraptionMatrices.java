@@ -1,12 +1,8 @@
 package com.zurrtum.create.client.content.contraptions.render;
 
-import com.zurrtum.create.client.catnip.animation.AnimationTickHolder;
 import com.zurrtum.create.client.content.contraptions.render.ContraptionEntityRenderer.AbstractContraptionState;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.util.math.MathHelper;
 import org.joml.Matrix4f;
-
-import java.util.function.BiConsumer;
 
 /**
  * <p>
@@ -21,19 +17,17 @@ public class ContraptionMatrices {
     private final Matrix4f world = new Matrix4f();
     private final Matrix4f light = new Matrix4f();
 
-    void setup(BiConsumer<MatrixStack, Float> transform, MatrixStack viewProjection, AbstractContraptionState state) {
-        float partialTicks = AnimationTickHolder.getPartialTicks();
-
+    <S extends AbstractContraptionState> void setup(ContraptionEntityRenderer<?, S> renderer, MatrixStack viewProjection, S state) {
         this.viewProjection.push();
         transform(this.viewProjection, viewProjection);
         model.push();
-        transform.accept(model, partialTicks);
+        renderer.transform(state, model);
 
         modelViewProjection.push();
         transform(modelViewProjection, viewProjection);
         transform(modelViewProjection, model);
 
-        translateToEntity(world, state, partialTicks);
+        translateToEntity(world, state);
 
         light.set(world);
         light.mul(model.peek().getPositionMatrix());
@@ -72,11 +66,8 @@ public class ContraptionMatrices {
         ms.peek().getNormalMatrix().mul(transform.peek().getNormalMatrix());
     }
 
-    public static void translateToEntity(Matrix4f matrix, AbstractContraptionState state, float partialTicks) {
-        double x = MathHelper.lerp(partialTicks, state.lastRenderX, state.entityX);
-        double y = MathHelper.lerp(partialTicks, state.lastRenderY, state.entityY);
-        double z = MathHelper.lerp(partialTicks, state.lastRenderZ, state.entityZ);
-        matrix.setTranslation((float) x, (float) y, (float) z);
+    public static void translateToEntity(Matrix4f matrix, AbstractContraptionState state) {
+        matrix.setTranslation((float) state.x, (float) state.y, (float) state.z);
     }
 
     public static void clearStack(MatrixStack ms) {

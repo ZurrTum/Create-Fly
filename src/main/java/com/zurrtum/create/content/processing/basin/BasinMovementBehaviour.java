@@ -1,5 +1,6 @@
 package com.zurrtum.create.content.processing.basin;
 
+import com.zurrtum.create.AllClientHandle;
 import com.zurrtum.create.api.behaviour.movement.MovementBehaviour;
 import com.zurrtum.create.content.contraptions.behaviour.MovementContext;
 import net.minecraft.block.entity.BlockEntity;
@@ -55,9 +56,12 @@ public class BasinMovementBehaviour extends MovementBehaviour {
             world.spawnEntity(item);
         }
         context.blockEntityData.remove("Inventory");
-        BlockEntity blockEntity = context.contraption.presentBlockEntities.get(context.localPos);
-        if (blockEntity instanceof BasinBlockEntity basin) {
-            basin.itemCapability.clear();
+        // FIXME: Why are we setting client-side data here?
+        if (context.contraption.entity.getEntityWorld().isClient()) {
+            BlockEntity blockEntity = AllClientHandle.INSTANCE.getBlockEntityClientSide(context.contraption, context.localPos);
+            if (blockEntity instanceof BasinBlockEntity basin) {
+                basin.itemCapability.clear();
+            }
         }
         context.temporaryData = Boolean.TRUE;
     }

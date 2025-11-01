@@ -1,30 +1,26 @@
 package com.zurrtum.create.client.content.kinetics.deployer;
 
-import com.zurrtum.create.AllBlocks;
 import com.zurrtum.create.catnip.math.AngleHelper;
 import com.zurrtum.create.catnip.math.VecHelper;
-import com.zurrtum.create.catnip.nbt.NBTHelper;
 import com.zurrtum.create.catnip.theme.Color;
 import com.zurrtum.create.client.AllPartialModels;
 import com.zurrtum.create.client.catnip.animation.AnimationTickHolder;
 import com.zurrtum.create.client.catnip.render.CachedBuffers;
 import com.zurrtum.create.client.catnip.render.SuperByteBuffer;
-import com.zurrtum.create.client.content.contraptions.render.ContraptionMatrices;
 import com.zurrtum.create.client.content.kinetics.base.KineticBlockEntityRenderer;
 import com.zurrtum.create.client.flywheel.api.visualization.VisualizationManager;
 import com.zurrtum.create.client.flywheel.lib.model.baked.PartialModel;
-import com.zurrtum.create.client.flywheel.lib.transform.TransformStack;
 import com.zurrtum.create.client.foundation.blockEntity.behaviour.filtering.FilteringRenderer;
 import com.zurrtum.create.client.foundation.blockEntity.behaviour.filtering.FilteringRenderer.FilterRenderState;
-import com.zurrtum.create.client.foundation.virtualWorld.VirtualRenderWorld;
-import com.zurrtum.create.content.contraptions.behaviour.MovementContext;
 import com.zurrtum.create.content.kinetics.base.IRotate;
 import com.zurrtum.create.content.kinetics.deployer.DeployerBlockEntity;
 import com.zurrtum.create.content.kinetics.deployer.DeployerBlockEntity.Mode;
 import com.zurrtum.create.content.kinetics.deployer.DeployerBlockEntity.State;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.item.ItemModelManager;
-import net.minecraft.client.render.*;
+import net.minecraft.client.render.OverlayTexture;
+import net.minecraft.client.render.RenderLayer;
+import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.render.block.entity.BlockEntityRenderer;
 import net.minecraft.client.render.block.entity.BlockEntityRendererFactory;
 import net.minecraft.client.render.block.entity.state.BlockEntityRenderState;
@@ -192,73 +188,6 @@ public class DeployerRenderer implements BlockEntityRenderer<DeployerBlockEntity
         buffer.rotateCentered((float) ((xRot) / 180 * Math.PI), Direction.EAST);
         buffer.rotateCentered((float) ((zRot) / 180 * Math.PI), Direction.SOUTH);
         return buffer;
-    }
-
-    public static void renderInContraption(
-        MovementContext context,
-        VirtualRenderWorld renderWorld,
-        ContraptionMatrices matrices,
-        VertexConsumerProvider buffer
-    ) {
-        VertexConsumer builder = buffer.getBuffer(RenderLayer.getSolid());
-        BlockState blockState = context.state;
-        Mode mode = NBTHelper.readEnum(context.blockEntityData, "Mode", Mode.class);
-        PartialModel handPose = getHandPose(mode);
-
-        float speed = context.getAnimationSpeed();
-        if (context.contraption.stalled)
-            speed = 0;
-
-        SuperByteBuffer shaft = CachedBuffers.block(AllBlocks.SHAFT.getDefaultState());
-        SuperByteBuffer pole = CachedBuffers.partial(AllPartialModels.DEPLOYER_POLE, blockState);
-        SuperByteBuffer hand = CachedBuffers.partial(handPose, blockState);
-
-        double factor;
-        if (context.contraption.stalled || context.position == null || context.data.contains("StationaryTimer")) {
-            factor = MathHelper.sin(AnimationTickHolder.getRenderTime() * .5f) * .25f + .25f;
-        } else {
-            Vec3d center = VecHelper.getCenterOf(BlockPos.ofFloored(context.position));
-            double distance = context.position.distanceTo(center);
-            double nextDistance = context.position.add(context.motion).distanceTo(center);
-            factor = .5f - MathHelper.clamp(MathHelper.lerp(AnimationTickHolder.getPartialTicks(), distance, nextDistance), 0, 1);
-        }
-
-        Vec3d offset = Vec3d.of(blockState.get(FACING).getVector()).multiply(factor);
-
-        MatrixStack m = matrices.getModel();
-        m.push();
-
-        m.push();
-        Axis axis = Axis.Y;
-        if (context.state.getBlock() instanceof IRotate def) {
-            axis = def.getRotationAxis(context.state);
-        }
-
-        float time = AnimationTickHolder.getRenderTime(context.world) / 20;
-        float angle = (time * speed) % 360;
-
-        TransformStack.of(m).center().rotateYDegrees(axis == Axis.Z ? 90 : 0).rotateZDegrees(axis.isHorizontal() ? 90 : 0).uncenter();
-        shaft.transform(m);
-        shaft.rotateCentered(angle, Direction.get(AxisDirection.POSITIVE, Axis.Y));
-        m.pop();
-
-        if (!context.disabled)
-            m.translate(offset.x, offset.y, offset.z);
-        pole.transform(m);
-        hand.transform(m);
-
-        transform(pole, blockState, true);
-        transform(hand, blockState, false);
-
-        MatrixStack.Entry entry = matrices.getViewProjection().peek();
-        shaft.light(WorldRenderer.getLightmapCoordinates(renderWorld, context.localPos)).useLevelLight(context.world, matrices.getWorld())
-            .renderInto(entry, builder);
-        pole.light(WorldRenderer.getLightmapCoordinates(renderWorld, context.localPos)).useLevelLight(context.world, matrices.getWorld())
-            .renderInto(entry, builder);
-        hand.light(WorldRenderer.getLightmapCoordinates(renderWorld, context.localPos)).useLevelLight(context.world, matrices.getWorld())
-            .renderInto(entry, builder);
-
-        m.pop();
     }
 
     static PartialModel getHandPose(Mode mode) {

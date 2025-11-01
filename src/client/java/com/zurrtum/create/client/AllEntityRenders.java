@@ -12,8 +12,8 @@ import com.zurrtum.create.client.content.logistics.depot.EjectorItemEntityRender
 import com.zurrtum.create.client.content.trains.entity.CarriageContraptionEntityRenderer;
 import com.zurrtum.create.client.content.trains.entity.CarriageContraptionVisual;
 import com.zurrtum.create.client.flywheel.lib.visualization.SimpleEntityVisualizer;
+import net.minecraft.client.render.entity.EntityRendererFactories;
 import net.minecraft.client.render.entity.EntityRendererFactory;
-import net.minecraft.client.render.entity.EntityRenderers;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 
@@ -23,12 +23,12 @@ public class AllEntityRenders {
         EntityRendererFactory<T> rendererFactory,
         SimpleEntityVisualizer.Factory<P> visualizerFactory
     ) {
-        EntityRenderers.RENDERER_FACTORIES.put(type, rendererFactory);
+        EntityRendererFactories.register(type, rendererFactory);
         SimpleEntityVisualizer.builder(type).factory(visualizerFactory).skipVanillaRender(blockEntity -> false).apply();
     }
 
     public static <T extends Entity> void render(EntityType<? extends T> type, EntityRendererFactory<T> factory) {
-        EntityRenderers.RENDERER_FACTORIES.put(type, factory);
+        EntityRendererFactories.register(type, factory);
     }
 
     public static void register() {

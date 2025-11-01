@@ -37,6 +37,7 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Direction.Axis;
 import net.minecraft.world.World;
 import org.apache.logging.log4j.util.TriConsumer;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.UUID;
@@ -288,8 +289,16 @@ public class AllClientHandle<T> {
         return 1;
     }
 
-    public void invalidate(Contraption contraption) {
+    public void resetClientContraption(Contraption contraption) {
+    }
+
+    public void invalidateClientContraptionChildren(Contraption contraption) {
+    }
+
+    @Nullable
+    public BlockEntity getBlockEntityClientSide(Contraption contraption, BlockPos localPos) {
         warn();
+        return null;
     }
 
     public void spawnPipeParticles(World world, BlockPos pos, PipeConnection.Flow flow, boolean openEnd, Direction side, int amount) {

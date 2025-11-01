@@ -6,7 +6,6 @@ import com.zurrtum.create.catnip.theme.Color;
 import com.zurrtum.create.client.AllPartialModels;
 import com.zurrtum.create.client.catnip.render.CachedBuffers;
 import com.zurrtum.create.client.catnip.render.SuperByteBuffer;
-import com.zurrtum.create.client.content.contraptions.render.ContraptionMatrices;
 import com.zurrtum.create.client.content.kinetics.base.KineticBlockEntityRenderer;
 import com.zurrtum.create.client.flywheel.api.visualization.VisualizationManager;
 import com.zurrtum.create.client.flywheel.lib.model.baked.PartialModel;
@@ -14,8 +13,6 @@ import com.zurrtum.create.client.flywheel.lib.transform.PoseTransformStack;
 import com.zurrtum.create.client.flywheel.lib.transform.TransformStack;
 import com.zurrtum.create.client.foundation.blockEntity.behaviour.filtering.FilteringRenderer;
 import com.zurrtum.create.client.foundation.blockEntity.behaviour.filtering.FilteringRenderer.FilterRenderState;
-import com.zurrtum.create.client.foundation.virtualWorld.VirtualRenderWorld;
-import com.zurrtum.create.content.contraptions.behaviour.MovementContext;
 import com.zurrtum.create.content.kinetics.base.IRotate;
 import com.zurrtum.create.content.kinetics.saw.SawBlock;
 import com.zurrtum.create.content.kinetics.saw.SawBlockEntity;
@@ -25,7 +22,9 @@ import it.unimi.dsi.fastutil.booleans.BooleanArrayList;
 import it.unimi.dsi.fastutil.booleans.BooleanList;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.item.ItemModelManager;
-import net.minecraft.client.render.*;
+import net.minecraft.client.render.OverlayTexture;
+import net.minecraft.client.render.RenderLayer;
+import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.render.block.entity.BlockEntityRenderer;
 import net.minecraft.client.render.block.entity.BlockEntityRendererFactory;
 import net.minecraft.client.render.block.entity.state.BlockEntityRenderState;
@@ -247,50 +246,6 @@ public class SawRenderer implements BlockEntityRenderer<SawBlockEntity, SawRende
         if (state.get(FACING).getAxis().isHorizontal())
             return CachedBuffers.partialFacing(AllPartialModels.SHAFT_HALF, state.getBlock().rotate(state, BlockRotation.CLOCKWISE_180));
         return CachedBuffers.block(KineticBlockEntityRenderer.KINETIC_BLOCK, KineticBlockEntityRenderer.shaft(axis));
-    }
-
-    public static void renderInContraption(
-        MovementContext context,
-        VirtualRenderWorld renderWorld,
-        ContraptionMatrices matrices,
-        VertexConsumerProvider buffer
-    ) {
-        BlockState state = context.state;
-        Direction facing = state.get(SawBlock.FACING);
-
-        Vec3d facingVec = Vec3d.of(context.state.get(SawBlock.FACING).getVector());
-        facingVec = context.rotation.apply(facingVec);
-
-        Direction closestToFacing = Direction.getFacing(facingVec.x, facingVec.y, facingVec.z);
-
-        boolean horizontal = closestToFacing.getAxis().isHorizontal();
-        boolean backwards = VecHelper.isVecPointingTowards(context.relativeMotion, facing.getOpposite());
-        boolean moving = context.getAnimationSpeed() != 0;
-        boolean shouldAnimate = (context.contraption.stalled && horizontal) || (!context.contraption.stalled && !backwards && moving);
-
-        SuperByteBuffer superBuffer;
-        if (SawBlock.isHorizontal(state)) {
-            if (shouldAnimate)
-                superBuffer = CachedBuffers.partial(AllPartialModels.SAW_BLADE_HORIZONTAL_ACTIVE, state);
-            else
-                superBuffer = CachedBuffers.partial(AllPartialModels.SAW_BLADE_HORIZONTAL_INACTIVE, state);
-        } else {
-            if (shouldAnimate)
-                superBuffer = CachedBuffers.partial(AllPartialModels.SAW_BLADE_VERTICAL_ACTIVE, state);
-            else
-                superBuffer = CachedBuffers.partial(AllPartialModels.SAW_BLADE_VERTICAL_INACTIVE, state);
-        }
-
-        superBuffer.transform(matrices.getModel()).center().rotateYDegrees(AngleHelper.horizontalAngle(facing))
-            .rotateXDegrees(AngleHelper.verticalAngle(facing));
-
-        if (!SawBlock.isHorizontal(state)) {
-            superBuffer.rotateZDegrees(state.get(SawBlock.AXIS_ALONG_FIRST_COORDINATE) ? 90 : 0);
-        }
-
-        superBuffer.uncenter().light(WorldRenderer.getLightmapCoordinates(renderWorld, context.localPos))
-            .useLevelLight(context.world, matrices.getWorld())
-            .renderInto(matrices.getViewProjection().peek(), buffer.getBuffer(RenderLayer.getCutoutMipped()));
     }
 
     public static class SawRenderState extends BlockEntityRenderState implements OrderedRenderCommandQueue.Custom {

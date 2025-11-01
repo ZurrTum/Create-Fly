@@ -1,5 +1,6 @@
 package com.zurrtum.create.content.contraptions.actors.contraptionControls;
 
+import com.zurrtum.create.AllClientHandle;
 import com.zurrtum.create.api.behaviour.movement.MovementBehaviour;
 import com.zurrtum.create.catnip.animation.LerpedFloat;
 import com.zurrtum.create.catnip.animation.LerpedFloat.Chaser;
@@ -8,6 +9,7 @@ import com.zurrtum.create.catnip.data.IntAttached;
 import com.zurrtum.create.content.contraptions.Contraption;
 import com.zurrtum.create.content.contraptions.behaviour.MovementContext;
 import com.zurrtum.create.content.contraptions.elevator.ElevatorContraption;
+import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
@@ -63,8 +65,10 @@ public class ContraptionControlsMovement extends MovementBehaviour {
             return;
 
         Contraption contraption = ctx.contraption;
+        BlockEntity blockEntity = AllClientHandle.INSTANCE.getBlockEntityClientSide(contraption, ctx.localPos);
+
         if (!(contraption instanceof ElevatorContraption ec)) {
-            if (!(contraption.presentBlockEntities.get(ctx.localPos) instanceof ContraptionControlsBlockEntity cbe))
+            if (!(blockEntity instanceof ContraptionControlsBlockEntity cbe))
                 return;
             ItemStack filter = getFilter(ctx);
             int value = contraption.isActorTypeDisabled(filter) || contraption.isActorTypeDisabled(ItemStack.EMPTY) ? 4 * 45 : 0;
@@ -80,7 +84,7 @@ public class ContraptionControlsMovement extends MovementBehaviour {
         ElevatorFloorSelection efs = (ElevatorFloorSelection) ctx.temporaryData;
         tickFloorSelection(efs, ec);
 
-        if (!(contraption.presentBlockEntities.get(ctx.localPos) instanceof ContraptionControlsBlockEntity cbe))
+        if (!(blockEntity instanceof ContraptionControlsBlockEntity cbe))
             return;
 
         cbe.tickAnimations();

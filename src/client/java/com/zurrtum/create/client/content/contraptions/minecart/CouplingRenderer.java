@@ -81,9 +81,9 @@ public class CouplingRenderer {
 
             ms.push();
             cartTransform.apply(ms, camera);
-            attachment.light(lightValues.get(isFirst)).renderInto(ms, builder);
+            attachment.light(lightValues.get(isFirst)).renderInto(ms.peek(), builder);
             msr.rotateYDegrees((float) connectorYaw - cartTransform.yaw);
-            ring.light(lightValues.get(isFirst)).renderInto(ms, builder);
+            ring.light(lightValues.get(isFirst)).renderInto(ms.peek(), builder);
             ms.pop();
         });
 
@@ -96,7 +96,7 @@ public class CouplingRenderer {
         msr.translate(firstEndpoint.subtract(camera)).rotateYDegrees((float) connectorYaw).rotateZDegrees((float) connectorPitch);
         ms.scale((float) endPointDiff.length(), 1, 1);
 
-        connector.light(meanSkyLight << 20 | meanBlockLight << 4).renderInto(ms, builder);
+        connector.light(meanSkyLight << 20 | meanBlockLight << 4).renderInto(ms.peek(), builder);
         ms.pop();
     }
 

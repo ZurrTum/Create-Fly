@@ -3,8 +3,6 @@ package com.zurrtum.create.client.content.trains.bogey;
 import com.zurrtum.create.client.AllBogeyStyleRenders;
 import com.zurrtum.create.content.trains.bogey.AbstractBogeyBlock;
 import com.zurrtum.create.content.trains.bogey.AbstractBogeyBlockEntity;
-import com.zurrtum.create.content.trains.bogey.BogeySize;
-import com.zurrtum.create.content.trains.bogey.BogeyStyle;
 import net.minecraft.client.render.LightmapTextureManager;
 import net.minecraft.client.render.WorldRenderer;
 import net.minecraft.client.render.block.entity.BlockEntityRenderer;
@@ -50,17 +48,22 @@ public class BogeyBlockEntityRenderer<T extends AbstractBogeyBlockEntity> implem
             world,
             state.pos
         ) : LightmapTextureManager.MAX_LIGHT_COORDINATE;
-        state.angle = be.getVirtualAngle(tickProgress);
         if (state.blockState.get(AbstractBogeyBlock.AXIS) == Direction.Axis.X) {
             state.yRot = MathHelper.RADIANS_PER_DEGREE * 90;
         }
-        state.style = be.getStyle();
-        state.size = bogey.getSize();
         state.bogeyData = be.getBogeyData();
         if (state.bogeyData == null) {
             state.bogeyData = new NbtCompound();
         }
-        state.data = AllBogeyStyleRenders.getRenderData(be, state, tickProgress, cameraPos, false);
+        state.data = AllBogeyStyleRenders.getRenderData(
+            be.getStyle(),
+            bogey.getSize(),
+            tickProgress,
+            state.lightmapCoordinates,
+            be.getVirtualAngle(tickProgress),
+            be.getBogeyData(),
+            false
+        );
     }
 
     @Override
@@ -73,20 +76,17 @@ public class BogeyBlockEntityRenderer<T extends AbstractBogeyBlockEntity> implem
         if (state.yRot != 0) {
             matrices.multiply(RotationAxis.POSITIVE_Y.rotation(state.yRot));
         }
-        state.data.render(matrices, queue, cameraState);
+        state.data.render(matrices, queue);
         matrices.pop();
     }
 
     public static class BogeyBlockEntityRenderState extends BlockEntityRenderState {
-        public float angle;
         public float yRot;
-        public BogeyStyle style;
-        public BogeySize size;
         public NbtCompound bogeyData;
         public BogeyRenderState data;
     }
 
     public interface BogeyRenderState {
-        void render(MatrixStack matrices, OrderedRenderCommandQueue queue, CameraRenderState cameraState);
+        void render(MatrixStack matrices, OrderedRenderCommandQueue queue);
     }
 }

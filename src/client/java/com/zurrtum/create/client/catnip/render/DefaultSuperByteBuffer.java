@@ -77,17 +77,17 @@ public class DefaultSuperByteBuffer implements SuperByteBuffer {
     }
 
     @Override
-    public void renderInto(MatrixStack ms, VertexConsumer consumer) {
+    public void renderInto(MatrixStack.Entry entry, VertexConsumer consumer) {
         if (isEmpty())
             return;
 
-        Matrix4f modelMatrix = new Matrix4f(ms.peek().getPositionMatrix());
+        Matrix4f modelMatrix = new Matrix4f(entry.getPositionMatrix());
         Matrix4f localTransforms = transforms.peek().getPositionMatrix();
         modelMatrix.mul(localTransforms);
 
         Matrix3f normalMatrix;
         if (fullNormalTransform) {
-            normalMatrix = new Matrix3f(ms.peek().getNormalMatrix());
+            normalMatrix = new Matrix3f(entry.getNormalMatrix());
             normalMatrix.mul(transforms.peek().getNormalMatrix());
         } else {
             normalMatrix = new Matrix3f(transforms.peek().getNormalMatrix());

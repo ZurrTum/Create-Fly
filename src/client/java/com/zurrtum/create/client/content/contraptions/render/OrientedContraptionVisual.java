@@ -86,7 +86,7 @@ public class OrientedContraptionVisual<T extends OrientedContraptionEntity> exte
         matrixStack.translate(pos.x, pos.y, pos.z);
     }
 
-    private static Vec3d getContraptionOffset(OrientedContraptionEntity entity, float partialTicks, AbstractContraptionEntity parent) {
+    public static Vec3d getContraptionOffset(OrientedContraptionEntity entity, float partialTicks, AbstractContraptionEntity parent) {
         Vec3d passengerPosition = parent.getPassengerPosition(entity, partialTicks);
         if (passengerPosition == null)
             return Vec3d.ZERO;

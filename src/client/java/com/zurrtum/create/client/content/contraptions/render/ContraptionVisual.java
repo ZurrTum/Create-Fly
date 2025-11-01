@@ -2,11 +2,14 @@ package com.zurrtum.create.client.content.contraptions.render;
 
 import com.zurrtum.create.api.behaviour.movement.MovementBehaviour;
 import com.zurrtum.create.client.api.behaviour.movement.MovementRenderBehaviour;
+import com.zurrtum.create.client.content.contraptions.render.ClientContraption.RenderedBlocks;
 import com.zurrtum.create.client.flywheel.api.material.CardinalLightingMode;
 import com.zurrtum.create.client.flywheel.api.material.Material;
-import com.zurrtum.create.client.flywheel.api.model.Model;
 import com.zurrtum.create.client.flywheel.api.task.Plan;
-import com.zurrtum.create.client.flywheel.api.visual.*;
+import com.zurrtum.create.client.flywheel.api.visual.BlockEntityVisual;
+import com.zurrtum.create.client.flywheel.api.visual.DynamicVisual;
+import com.zurrtum.create.client.flywheel.api.visual.ShaderLightVisual;
+import com.zurrtum.create.client.flywheel.api.visual.TickableVisual;
 import com.zurrtum.create.client.flywheel.api.visualization.BlockEntityVisualizer;
 import com.zurrtum.create.client.flywheel.api.visualization.VisualEmbedding;
 import com.zurrtum.create.client.flywheel.api.visualization.VisualizationContext;
@@ -25,7 +28,6 @@ import com.zurrtum.create.client.foundation.utility.worldWrappers.WrappedBlockAn
 import com.zurrtum.create.client.foundation.virtualWorld.VirtualRenderWorld;
 import com.zurrtum.create.content.contraptions.AbstractContraptionEntity;
 import com.zurrtum.create.content.contraptions.Contraption;
-import com.zurrtum.create.content.contraptions.Contraption.RenderedBlocks;
 import com.zurrtum.create.content.contraptions.behaviour.MovementContext;
 import it.unimi.dsi.fastutil.longs.LongArraySet;
 import it.unimi.dsi.fastutil.longs.LongSet;
@@ -38,26 +40,28 @@ import net.minecraft.util.math.ChunkSectionPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.BlockRenderView;
-import net.minecraft.world.World;
 import org.apache.commons.lang3.tuple.MutablePair;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 
-public class ContraptionVisual<E extends AbstractContraptionEntity> extends AbstractEntityVisual<E> implements DynamicVisual, TickableVisual, LightUpdatedVisual, ShaderLightVisual {
-    protected static final int LIGHT_PADDING = 1;
+public class ContraptionVisual<E extends AbstractContraptionEntity> extends AbstractEntityVisual<E> implements DynamicVisual, TickableVisual, ShaderLightVisual {
+    protected static final int DEFAULT_LIGHT_PADDING = 1;
 
     protected final VisualEmbedding embedding;
     protected final List<BlockEntityVisual<?>> children = new ArrayList<>();
     protected final List<ActorVisual> actors = new ArrayList<>();
     protected final PlanMap<DynamicVisual, DynamicVisual.Context> dynamicVisuals = new PlanMap<>();
     protected final PlanMap<TickableVisual, TickableVisual.Context> tickableVisuals = new PlanMap<>();
-    protected VirtualRenderWorld virtualRenderWorld;
-    protected Model model;
     protected TransformedInstance structure;
     protected SectionCollector sectionCollector;
     protected long minSection, maxSection;
-    protected long minBlock, maxBlock;
+    /// The number of blocks around the contraption's bounding box to include when capturing sections for shader light.
+    protected int lightPaddingBlocks = DEFAULT_LIGHT_PADDING;
+
+    protected int lastStructureVersion;
+    protected int lastVersionChildren;
 
     private final MatrixStack contraptionMatrix = new MatrixStack();
 
@@ -72,26 +76,25 @@ public class ContraptionVisual<E extends AbstractContraptionEntity> extends Abst
         if (contraption == null)
             return;
 
-        setupModel(contraption);
+        var clientContraption = getOrCreateClientContraptionLazy(contraption);
 
-        setupChildren(partialTick, contraption);
-
-        setupActors(partialTick, contraption);
+        setupStructure(clientContraption);
+        setupChildren(contraption, clientContraption, partialTick);
     }
 
-    // Must be called before setup children or setup actors as this creates the render world
-    private void setupModel(Contraption contraption) {
-        virtualRenderWorld = ContraptionRenderInfo.get(contraption).getRenderWorld();
+    private void setupStructure(ClientContraption clientContraption) {
+        var renderLevel = clientContraption.getRenderLevel();
 
-        RenderedBlocks blocks = contraption.getRenderedBlocks();
-        BlockRenderView modelWorld = new WrappedBlockAndTintGetter(virtualRenderWorld) {
+        RenderedBlocks blocks = clientContraption.getRenderedBlocks();
+        // Must wrap the render level so that the differences between the contraption's actual structure and the rendered blocks are accounted for in e.g. ambient occlusion.
+        BlockRenderView modelWorld = new WrappedBlockAndTintGetter(renderLevel) {
             @Override
             public BlockState getBlockState(BlockPos pos) {
                 return blocks.lookup().apply(pos);
             }
         };
 
-        model = new BlockModelBuilder(modelWorld, blocks.positions()).materialFunc((renderType, shaded) -> {
+        var model = new BlockModelBuilder(modelWorld, blocks.positions()).materialFunc((renderType, shaded) -> {
             Material material = ModelUtil.getMaterial(renderType, shaded);
             if (material != null && material.cardinalLightingMode() == CardinalLightingMode.ENTITY) {
                 return SimpleMaterial.builderOf(material).cardinalLightingMode(CardinalLightingMode.CHUNK).build();
@@ -112,22 +115,51 @@ public class ContraptionVisual<E extends AbstractContraptionEntity> extends Abst
 
         structure.setChanged();
 
+        lastStructureVersion = clientContraption.structureVersion();
     }
 
-    private void setupChildren(float partialTick, Contraption contraption) {
+    @SuppressWarnings("unchecked")
+    public ClientContraption getOrCreateClientContraptionLazy(Contraption contraption) {
+        AtomicReference<ClientContraption> clientContraption = (AtomicReference<ClientContraption>) contraption.clientContraption;
+        var out = clientContraption.getAcquire();
+        if (out == null) {
+            // Another thread may hit this block in the same moment.
+            // One thread will win and the ContraptionRenderInfo that
+            // it generated will become canonical. It's important that
+            // we only maintain one RenderInfo instance, specifically
+            // for the VirtualRenderWorld inside.
+            clientContraption.compareAndExchangeRelease(null, createClientContraption(contraption));
+
+            // Must get again to ensure we have the canonical instance.
+            out = clientContraption.getAcquire();
+        }
+        return out;
+    }
+
+    protected ClientContraption createClientContraption(Contraption contraption) {
+        return new ClientContraption(contraption);
+    }
+
+    private void setupChildren(Contraption contraption, ClientContraption clientContraption, float partialTick) {
+        // Setup child visuals.
         children.forEach(BlockEntityVisual::delete);
         children.clear();
-        for (BlockEntity be : contraption.getRenderedBEs()) {
+        dynamicVisuals.clear();
+        tickableVisuals.clear();
+        for (BlockEntity be : clientContraption.renderedBlockEntityView) {
             setupVisualizer(be, partialTick);
         }
-    }
 
-    private void setupActors(float partialTick, Contraption contraption) {
+        var renderLevel = clientContraption.getRenderLevel();
+
+        // Setup actor visuals.
         actors.forEach(ActorVisual::delete);
         actors.clear();
         for (var actor : contraption.getActors()) {
-            setupActor(actor, partialTick);
+            setupActor(actor, renderLevel);
         }
+
+        lastVersionChildren = clientContraption.childrenVersion();
     }
 
     @SuppressWarnings("unchecked")
@@ -137,8 +169,6 @@ public class ContraptionVisual<E extends AbstractContraptionEntity> extends Abst
             return;
         }
 
-        World level = be.getWorld();
-        be.setWorld(virtualRenderWorld);
         BlockEntityVisual<? super T> visual = visualizer.createVisual(this.embedding, be, partialTicks);
 
         children.add(visual);
@@ -150,11 +180,9 @@ public class ContraptionVisual<E extends AbstractContraptionEntity> extends Abst
         if (visual instanceof TickableVisual tickable) {
             tickableVisuals.add(tickable, tickable.planTick());
         }
-
-        be.setWorld(level);
     }
 
-    private void setupActor(MutablePair<StructureTemplate.StructureBlockInfo, MovementContext> actor, float partialTick) {
+    protected void setupActor(MutablePair<StructureTemplate.StructureBlockInfo, MovementContext> actor, VirtualRenderWorld renderLevel) {
         MovementContext context = actor.getRight();
         if (context == null) {
             return;
@@ -170,7 +198,7 @@ public class ContraptionVisual<E extends AbstractContraptionEntity> extends Abst
             return;
         }
         MovementRenderBehaviour render = (MovementRenderBehaviour) movementBehaviour.attachRender;
-        var visual = render.createVisual(this.embedding, virtualRenderWorld, context);
+        var visual = render.createVisual(this.embedding, renderLevel, context);
 
         if (visual == null) {
             return;
@@ -186,28 +214,25 @@ public class ContraptionVisual<E extends AbstractContraptionEntity> extends Abst
 
     @Override
     public Plan<DynamicVisual.Context> planFrame() {
-        return NestedPlan.of(RunnablePlan.of(this::beginFrame), ForEachPlan.of(() -> actors, ActorVisual::beginFrame), dynamicVisuals);
+        // Must run beginFrame first to ensure changes to child visuals are picked up.
+        return RunnablePlan.of(this::beginFrame).then(NestedPlan.of(ForEachPlan.of(() -> actors, ActorVisual::beginFrame), dynamicVisuals));
     }
 
     protected void beginFrame(DynamicVisual.Context context) {
         var partialTick = context.partialTick();
         setEmbeddingMatrices(partialTick);
 
-        if (hasMovedSections()) {
-            sectionCollector.sections(collectLightSections());
-        }
-
-        if (hasMovedBlocks()) {
-            updateLight(partialTick);
-        }
+        checkAndUpdateLightSections();
 
         var contraption = entity.getContraption();
-        if (contraption.deferInvalidate) {
-            setupModel(contraption);
-            setupChildren(partialTick, contraption);
-            setupActors(partialTick, contraption);
+        var clientContraption = getOrCreateClientContraptionLazy(contraption);
+        if (this.lastStructureVersion != clientContraption.structureVersion()) {
+            // The contraption has changed, we need to set up everything again.
+            setupStructure(clientContraption);
+        }
 
-            contraption.deferInvalidate = false;
+        if (this.lastVersionChildren != clientContraption.childrenVersion()) {
+            setupChildren(contraption, clientContraption, partialTick);
         }
     }
 
@@ -239,68 +264,43 @@ public class ContraptionVisual<E extends AbstractContraptionEntity> extends Abst
     }
 
     @Override
-    public void updateLight(float partialTick) {
+    public void setSectionCollector(SectionCollector collector) {
+        this.sectionCollector = collector;
+        checkAndUpdateLightSections();
     }
 
-    public LongSet collectLightSections() {
+    private void checkAndUpdateLightSections() {
         var boundingBox = entity.getBoundingBox();
 
-        var minSectionX = minLightSection(boundingBox.minX);
-        var minSectionY = minLightSection(boundingBox.minY);
-        var minSectionZ = minLightSection(boundingBox.minZ);
-        int maxSectionX = maxLightSection(boundingBox.maxX);
-        int maxSectionY = maxLightSection(boundingBox.maxY);
-        int maxSectionZ = maxLightSection(boundingBox.maxZ);
+        var minSectionX = ChunkSectionPos.getSectionCoord(MathHelper.floor(boundingBox.minX) - lightPaddingBlocks);
+        var minSectionY = ChunkSectionPos.getSectionCoord(MathHelper.floor(boundingBox.minY) - lightPaddingBlocks);
+        var minSectionZ = ChunkSectionPos.getSectionCoord(MathHelper.floor(boundingBox.minZ) - lightPaddingBlocks);
+        int maxSectionX = ChunkSectionPos.getSectionCoord(MathHelper.ceil(boundingBox.maxX) + lightPaddingBlocks);
+        int maxSectionY = ChunkSectionPos.getSectionCoord(MathHelper.ceil(boundingBox.maxY) + lightPaddingBlocks);
+        int maxSectionZ = ChunkSectionPos.getSectionCoord(MathHelper.ceil(boundingBox.maxZ) + lightPaddingBlocks);
+
+        if (minSection == ChunkSectionPos.asLong(minSectionX, minSectionY, minSectionZ) && maxSection == ChunkSectionPos.asLong(
+            maxSectionX,
+            maxSectionY,
+            maxSectionZ
+        )) {
+            return;
+        }
 
         minSection = ChunkSectionPos.asLong(minSectionX, minSectionY, minSectionZ);
         maxSection = ChunkSectionPos.asLong(maxSectionX, maxSectionY, maxSectionZ);
 
         LongSet longSet = new LongArraySet();
 
-        for (int x = 0; x <= maxSectionX - minSectionX; x++) {
-            for (int y = 0; y <= maxSectionY - minSectionY; y++) {
-                for (int z = 0; z <= maxSectionZ - minSectionZ; z++) {
-                    longSet.add(ChunkSectionPos.offset(minSection, x, y, z));
+        for (int x = minSectionX; x <= maxSectionX; x++) {
+            for (int y = minSectionY; y <= maxSectionY; y++) {
+                for (int z = minSectionZ; z <= maxSectionZ; z++) {
+                    longSet.add(ChunkSectionPos.asLong(x, y, z));
                 }
             }
         }
 
-        return longSet;
-    }
-
-    protected boolean hasMovedBlocks() {
-        var boundingBox = entity.getBoundingBox();
-
-        int minX = minLight(boundingBox.minX);
-        int minY = minLight(boundingBox.minY);
-        int minZ = minLight(boundingBox.minZ);
-        int maxX = maxLight(boundingBox.maxX);
-        int maxY = maxLight(boundingBox.maxY);
-        int maxZ = maxLight(boundingBox.maxZ);
-
-        return minBlock != BlockPos.asLong(minX, minY, minZ) || maxBlock != BlockPos.asLong(maxX, maxY, maxZ);
-    }
-
-    protected boolean hasMovedSections() {
-        var boundingBox = entity.getBoundingBox();
-
-        var minSectionX = minLightSection(boundingBox.minX);
-        var minSectionY = minLightSection(boundingBox.minY);
-        var minSectionZ = minLightSection(boundingBox.minZ);
-        int maxSectionX = maxLightSection(boundingBox.maxX);
-        int maxSectionY = maxLightSection(boundingBox.maxY);
-        int maxSectionZ = maxLightSection(boundingBox.maxZ);
-
-        return minSection != ChunkSectionPos.asLong(minSectionX, minSectionY, minSectionZ) || maxSection != ChunkSectionPos.asLong(
-            maxSectionX,
-            maxSectionY,
-            maxSectionZ
-        );
-    }
-
-    @Override
-    public void setSectionCollector(SectionCollector collector) {
-        this.sectionCollector = collector;
+        sectionCollector.sections(longSet);
     }
 
     @Override
@@ -314,21 +314,5 @@ public class ContraptionVisual<E extends AbstractContraptionEntity> extends Abst
         }
 
         embedding.delete();
-    }
-
-    public static int minLight(double aabbPos) {
-        return MathHelper.floor(aabbPos) - LIGHT_PADDING;
-    }
-
-    public static int maxLight(double aabbPos) {
-        return MathHelper.ceil(aabbPos) + LIGHT_PADDING;
-    }
-
-    public static int minLightSection(double aabbPos) {
-        return ChunkSectionPos.getSectionCoord(minLight(aabbPos));
-    }
-
-    public static int maxLightSection(double aabbPos) {
-        return ChunkSectionPos.getSectionCoord(maxLight(aabbPos));
     }
 }

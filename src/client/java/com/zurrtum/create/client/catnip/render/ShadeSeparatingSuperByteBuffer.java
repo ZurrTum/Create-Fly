@@ -72,7 +72,7 @@ public class ShadeSeparatingSuperByteBuffer implements SuperByteBuffer {
         this(template, new int[0]);
     }
 
-    public void renderInto(MatrixStack input, VertexConsumer builder) {
+    public void renderInto(MatrixStack.Entry entry, VertexConsumer builder) {
         if (isEmpty()) {
             return;
         }
@@ -81,11 +81,11 @@ public class ShadeSeparatingSuperByteBuffer implements SuperByteBuffer {
             WORLD_LIGHT_CACHE.clear();
         }
 
-        Matrix4f modelMat = this.modelMat.set(input.peek().getPositionMatrix());
+        Matrix4f modelMat = this.modelMat.set(entry.getPositionMatrix());
         Matrix4f localTransforms = transforms.peek().getPositionMatrix();
         modelMat.mul(localTransforms);
 
-        Matrix3f normalMat = this.normalMat.set(input.peek().getNormalMatrix());
+        Matrix3f normalMat = this.normalMat.set(entry.getNormalMatrix());
         Matrix3f localNormalTransforms = transforms.peek().getNormalMatrix();
         normalMat.mul(localNormalTransforms);
 

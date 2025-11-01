@@ -1,21 +1,18 @@
 package com.zurrtum.create.client.foundation.render;
 
 import com.zurrtum.create.Create;
-import com.zurrtum.create.catnip.levelWrappers.SchematicLevel;
 import com.zurrtum.create.catnip.registry.RegisteredObjectsHelper;
-import com.zurrtum.create.client.catnip.animation.AnimationTickHolder;
-import com.zurrtum.create.client.flywheel.api.visualization.VisualizationManager;
-import com.zurrtum.create.client.flywheel.lib.transform.TransformStack;
 import com.zurrtum.create.client.flywheel.lib.visualization.VisualizationHelper;
 import com.zurrtum.create.client.foundation.virtualWorld.VirtualRenderWorld;
 import com.zurrtum.create.client.infrastructure.config.AllConfigs;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.render.OverlayTexture;
-import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.WorldRenderer;
-import net.minecraft.client.render.block.entity.BlockEntityRenderDispatcher;
+import net.minecraft.client.render.block.entity.BlockEntityRenderManager;
 import net.minecraft.client.render.block.entity.BlockEntityRenderer;
+import net.minecraft.client.render.block.entity.state.BlockEntityRenderState;
+import net.minecraft.client.render.command.OrderedRenderCommandQueue;
+import net.minecraft.client.render.state.CameraRenderState;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
@@ -24,95 +21,66 @@ import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix4f;
 import org.joml.Vector4f;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.BitSet;
+import java.util.List;
 
 public class BlockEntityRenderHelper {
-
-    public static void renderBlockEntities(World world, Iterable<BlockEntity> customRenderBEs, MatrixStack ms, VertexConsumerProvider buffer) {
-        renderBlockEntities(world, null, customRenderBEs, ms, null, buffer);
-    }
-
-    public static void renderBlockEntities(
-        World world,
-        Iterable<BlockEntity> customRenderBEs,
-        MatrixStack ms,
-        VertexConsumerProvider buffer,
-        float pt
-    ) {
-        renderBlockEntities(world, null, customRenderBEs, ms, null, buffer, pt);
-    }
-
-    public static void renderBlockEntities(
-        World world,
-        @Nullable VirtualRenderWorld renderWorld,
-        Iterable<BlockEntity> customRenderBEs,
-        MatrixStack ms,
-        @Nullable Matrix4f lightTransform,
-        VertexConsumerProvider buffer
-    ) {
-        renderBlockEntities(world, renderWorld, customRenderBEs, ms, lightTransform, buffer, AnimationTickHolder.getPartialTicks());
-    }
-
-    public static void renderBlockEntities(
-        World realLevel,
+    /**
+     * Renders the given list of BlockEntities, skipping those not marked in shouldRenderBEs,
+     * and marking those that error in erroredBEsOut.
+     *
+     * @param blockEntities   The list of BlockEntities to render.
+     * @param shouldRenderBEs A BitSet marking which BlockEntities in the list should be rendered. This will not be modified.
+     * @param erroredBEsOut   A BitSet to mark BlockEntities that error during rendering. This will be modified.
+     */
+    @Nullable
+    public static BlockEntityListRenderState getBlockEntitiesRenderState(
+        boolean supportsVisualization,
+        List<BlockEntity> blockEntities,
+        BitSet shouldRenderBEs,
+        BitSet erroredBEsOut,
         @Nullable VirtualRenderWorld renderLevel,
-        Iterable<BlockEntity> customRenderBEs,
+        World realLevel,
         MatrixStack ms,
         @Nullable Matrix4f lightTransform,
-        VertexConsumerProvider buffer,
+        Vec3d camera,
         float pt
     ) {
-        // First, make sure all BEs have the render level.
-        // Need to do this outside of the main loop in case BEs query the level from other virtual BEs.
-        // e.g. double chests specifically fetch light from both their own and their neighbor's level,
-        // which is honestly kind of silly, but easy to work around here.
-        if (renderLevel != null) {
-            for (var be : customRenderBEs) {
-                be.setWorld(renderLevel);
-            }
+        int size = blockEntities.size();
+        if (size == 0) {
+            return null;
         }
-
-        Set<BlockEntity> toRemove = new HashSet<>();
-
-        // Main loop, time to render.
         MinecraftClient mc = MinecraftClient.getInstance();
-        BlockEntityRenderDispatcher dispatcher = mc.getBlockEntityRenderDispatcher();
-        Vec3d camera = mc.gameRenderer.getCamera().getPos();
-        for (BlockEntity blockEntity : customRenderBEs) {
-            if (VisualizationManager.supportsVisualization(realLevel) && VisualizationHelper.skipVanillaRender(blockEntity))
+        BlockEntityRenderManager dispatcher = mc.getBlockEntityRenderDispatcher();
+        List<BlockEntityRenderState> states = new ArrayList<>();
+        for (int i = shouldRenderBEs.nextSetBit(0); i >= 0 && i < size; i = shouldRenderBEs.nextSetBit(i + 1)) {
+            BlockEntity blockEntity = blockEntities.get(i);
+            if (supportsVisualization && VisualizationHelper.skipVanillaRender(blockEntity)) {
                 continue;
+            }
 
-            BlockEntityRenderer<BlockEntity> renderer = dispatcher.get(blockEntity);
+            BlockEntityRenderer<BlockEntity, BlockEntityRenderState> renderer = dispatcher.get(blockEntity);
             if (renderer == null) {
                 // Don't bother looping over it again if we can't do anything with it.
-                toRemove.add(blockEntity);
+                erroredBEsOut.set(i);
                 continue;
             }
 
-            if (renderLevel == null && !renderer.isInRenderDistance(blockEntity, realLevel instanceof SchematicLevel ? Vec3d.ZERO : camera))
-                continue;
-
-            BlockPos pos = blockEntity.getPos();
-            ms.push();
-            TransformStack.of(ms).translate(pos);
-
             try {
-                int realLevelLight = WorldRenderer.getLightmapCoordinates(realLevel, getLightPos(lightTransform, pos));
-
-                int light;
+                BlockEntityRenderState renderState = renderer.createRenderState();
+                int realLevelLight = WorldRenderer.getLightmapCoordinates(realLevel, getLightPos(lightTransform, blockEntity.getPos()));
                 if (renderLevel != null) {
                     renderLevel.setExternalLight(realLevelLight);
-                    light = WorldRenderer.getLightmapCoordinates(renderLevel, pos);
-                } else {
-                    light = realLevelLight;
                 }
-
-                renderer.render(blockEntity, pt, ms, buffer, light, OverlayTexture.DEFAULT_UV, camera);
-
+                renderer.updateRenderState(blockEntity, renderState, pt, camera, null);
+                if (renderLevel == null) {
+                    renderState.lightmapCoordinates = realLevelLight;
+                }
+                states.add(renderState);
             } catch (Exception e) {
                 // Prevent this BE from causing more issues in the future.
-                toRemove.add(blockEntity);
+                erroredBEsOut.set(i);
 
                 String message = "BlockEntity " + RegisteredObjectsHelper.getKeyOrThrow(blockEntity.getType()) + " could not be rendered virtually.";
                 if (AllConfigs.client().explainRenderErrors.get())
@@ -120,28 +88,15 @@ public class BlockEntityRenderHelper {
                 else
                     Create.LOGGER.error(message);
             }
-
-            ms.pop();
         }
 
-        // Now reset all the BEs' levels.
         if (renderLevel != null) {
             renderLevel.resetExternalLight();
-
-            for (var be : customRenderBEs) {
-                be.setWorld(realLevel);
-            }
         }
-
-        // And finally, cull any BEs that misbehaved.
-        if (!toRemove.isEmpty()) {
-            var it = customRenderBEs.iterator();
-            while (it.hasNext()) {
-                if (toRemove.contains(it.next())) {
-                    it.remove();
-                }
-            }
+        if (states.isEmpty()) {
+            return null;
         }
+        return new BlockEntityListRenderState(dispatcher, ms, camera, BlockPos.ofFloored(camera), states);
     }
 
     private static BlockPos getLightPos(@Nullable Matrix4f lightTransform, BlockPos contraptionPos) {
@@ -154,4 +109,34 @@ public class BlockEntityRenderHelper {
         }
     }
 
+    public record BlockEntityListRenderState(
+        BlockEntityRenderManager dispatcher, MatrixStack matrices, Vec3d camera, BlockPos cameraPos, List<BlockEntityRenderState> states
+    ) {
+        public void render(OrderedRenderCommandQueue queue, CameraRenderState cameraRenderState) {
+            Vec3d prevPos = cameraRenderState.pos;
+            BlockPos prevBlockPos = cameraRenderState.blockPos;
+            Vec3d prevEntityPos = cameraRenderState.entityPos;
+            cameraRenderState.pos = camera;
+            cameraRenderState.blockPos = cameraPos;
+            cameraRenderState.entityPos = new Vec3d(
+                prevEntityPos.x - prevPos.x + camera.x,
+                prevEntityPos.y - prevPos.y + camera.y,
+                prevEntityPos.z - prevPos.z + camera.z
+            );
+            for (BlockEntityRenderState state : states) {
+                BlockEntityRenderer<BlockEntity, BlockEntityRenderState> renderer = dispatcher.getByRenderState(state);
+                if (renderer == null) {
+                    continue;
+                }
+                BlockPos pos = state.pos;
+                matrices.push();
+                matrices.translate(pos.getX(), pos.getY(), pos.getZ());
+                renderer.render(state, matrices, queue, cameraRenderState);
+                matrices.pop();
+            }
+            cameraRenderState.pos = prevPos;
+            cameraRenderState.blockPos = prevBlockPos;
+            cameraRenderState.entityPos = prevEntityPos;
+        }
+    }
 }

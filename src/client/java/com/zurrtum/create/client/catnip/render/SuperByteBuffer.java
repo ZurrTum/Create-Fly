@@ -20,7 +20,7 @@ public interface SuperByteBuffer extends TransformStack<SuperByteBuffer> {
         return LightmapTextureManager.pack(Math.max(blockLight1, blockLight2), Math.max(skyLight1, skyLight2));
     }
 
-    void renderInto(MatrixStack ms, VertexConsumer consumer);
+    void renderInto(MatrixStack.Entry entry, VertexConsumer consumer);
 
     boolean isEmpty();
 

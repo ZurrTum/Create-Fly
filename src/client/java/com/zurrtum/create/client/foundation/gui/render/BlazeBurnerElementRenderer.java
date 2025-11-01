@@ -9,6 +9,8 @@ import com.zurrtum.create.content.processing.burner.BlazeBurnerBlock.HeatLevel;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.render.SpecialGuiElementRenderer;
 import net.minecraft.client.render.*;
+import net.minecraft.client.render.command.OrderedRenderCommandQueueImpl;
+import net.minecraft.client.render.command.RenderDispatcher;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
@@ -32,12 +34,11 @@ public class BlazeBurnerElementRenderer extends SpecialGuiElementRenderer<BlazeB
 
         VertexConsumer cutout = vertexConsumers.getBuffer(RenderLayer.getCutoutMipped());
         CachedBuffers.partial(AllPartialModels.BLAZE_CAGE, state.block()).rotateCentered(horizontalAngle + MathHelper.PI, Direction.UP)
-            .light(LightmapTextureManager.MAX_LIGHT_COORDINATE).renderInto(matrices, cutout);
+            .light(LightmapTextureManager.MAX_LIGHT_COORDINATE).renderInto(matrices.peek(), cutout);
 
-        BlazeBurnerRenderer.renderShared(
-            matrices,
-            null,
-            vertexConsumers,
+        RenderDispatcher renderDispatcher = MinecraftClient.getInstance().gameRenderer.getEntityRenderDispatcher();
+        OrderedRenderCommandQueueImpl queue = renderDispatcher.getQueue();
+        BlazeBurnerRenderer.getBlazeBurnerRenderData(
             state.world(),
             state.block(),
             state.heatLevel(),
@@ -47,7 +48,8 @@ public class BlazeBurnerElementRenderer extends SpecialGuiElementRenderer<BlazeB
             state.drawGoggles(),
             drawHat,
             state.hash()
-        );
+        ).render(matrices, queue);
+        renderDispatcher.render();
     }
 
     @Override

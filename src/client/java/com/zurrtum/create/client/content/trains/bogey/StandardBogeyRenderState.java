@@ -6,7 +6,6 @@ import net.minecraft.client.render.OverlayTexture;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.render.command.OrderedRenderCommandQueue;
-import net.minecraft.client.render.state.CameraRenderState;
 import net.minecraft.client.util.math.MatrixStack;
 
 public class StandardBogeyRenderState implements BogeyRenderState, OrderedRenderCommandQueue.Custom {
@@ -17,7 +16,7 @@ public class StandardBogeyRenderState implements BogeyRenderState, OrderedRender
     public double offset;
 
     @Override
-    public void render(MatrixStack matrices, OrderedRenderCommandQueue queue, CameraRenderState cameraState) {
+    public void render(MatrixStack matrices, OrderedRenderCommandQueue queue) {
         matrices.translate(0, offset, 0);
         queue.submitCustom(matrices, layer, this);
     }

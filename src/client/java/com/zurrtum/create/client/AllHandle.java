@@ -16,7 +16,7 @@ import com.zurrtum.create.client.content.contraptions.actors.trainControls.Contr
 import com.zurrtum.create.client.content.contraptions.elevator.ElevatorContactScreen;
 import com.zurrtum.create.client.content.contraptions.glue.SuperGlueSelectionHandler;
 import com.zurrtum.create.client.content.contraptions.minecart.CouplingHandlerClient;
-import com.zurrtum.create.client.content.contraptions.render.ContraptionRenderInfo;
+import com.zurrtum.create.client.content.contraptions.render.ClientContraption;
 import com.zurrtum.create.client.content.equipment.bell.SoulPulseEffect;
 import com.zurrtum.create.client.content.equipment.blueprint.BlueprintOverlayRenderer;
 import com.zurrtum.create.client.content.equipment.clipboard.ClipboardScreen;
@@ -53,7 +53,6 @@ import com.zurrtum.create.client.flywheel.api.visualization.VisualizationManager
 import com.zurrtum.create.client.flywheel.impl.Flywheel;
 import com.zurrtum.create.client.flywheel.lib.visualization.VisualizationHelper;
 import com.zurrtum.create.client.foundation.blockEntity.behaviour.filtering.FilteringBehaviour;
-import com.zurrtum.create.client.foundation.entity.behaviour.PortalCutoffBehaviour;
 import com.zurrtum.create.client.foundation.render.PlayerSkyhookRenderer;
 import com.zurrtum.create.client.foundation.utility.CreateLang;
 import com.zurrtum.create.client.foundation.utility.DyeHelper;
@@ -67,6 +66,7 @@ import com.zurrtum.create.content.contraptions.behaviour.MovementContext;
 import com.zurrtum.create.content.contraptions.elevator.ElevatorContactBlockEntity;
 import com.zurrtum.create.content.contraptions.elevator.ElevatorContraption;
 import com.zurrtum.create.content.contraptions.gantry.GantryContraptionEntity;
+import com.zurrtum.create.content.decoration.slidingDoor.SlidingDoorBlock;
 import com.zurrtum.create.content.equipment.clipboard.ClipboardBlockEntity;
 import com.zurrtum.create.content.fluids.PipeConnection;
 import com.zurrtum.create.content.fluids.tank.FluidTankBlockEntity;
@@ -134,6 +134,7 @@ import net.minecraft.network.packet.Packet;
 import net.minecraft.particle.ItemStackParticleEffect;
 import net.minecraft.particle.ParticleEffect;
 import net.minecraft.particle.ParticleTypes;
+import net.minecraft.structure.StructureTemplate;
 import net.minecraft.text.Text;
 import net.minecraft.util.DyeColor;
 import net.minecraft.util.Hand;
@@ -143,9 +144,11 @@ import net.minecraft.util.math.Direction.AxisDirection;
 import net.minecraft.util.math.random.Random;
 import net.minecraft.util.shape.VoxelShapes;
 import net.minecraft.world.World;
+import org.jetbrains.annotations.Nullable;
 import org.lwjgl.opengl.GL11;
 
 import java.util.*;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 
 import static com.zurrtum.create.Create.LOGGER;
@@ -328,7 +331,22 @@ public class AllHandle extends AllClientHandle<ClientPlayNetworkHandler> {
     @Override
     public void onContraptionBlockChanged(ClientPlayNetworkHandler listener, ContraptionBlockChangedPacket packet) {
         if (listener.world.getEntityById(packet.entityId()) instanceof AbstractContraptionEntity ce) {
-            ce.handleBlockChange(packet.localPos(), packet.newState());
+            Contraption contraption = ce.getContraption();
+            if (contraption == null) {
+                return;
+            }
+            Map<BlockPos, StructureTemplate.StructureBlockInfo> blocks = contraption.getBlocks();
+            BlockPos localPos = packet.localPos();
+            if (!blocks.containsKey(localPos)) {
+                return;
+            }
+            StructureTemplate.StructureBlockInfo info = blocks.get(localPos);
+            BlockState newState = packet.newState();
+            blocks.put(localPos, new StructureTemplate.StructureBlockInfo(info.pos(), newState, info.nbt()));
+            if (info.state() != newState && !(newState.getBlock() instanceof SlidingDoorBlock)) {
+                ClientContraption.resetClientContraption(contraption);
+            }
+            contraption.invalidateColliders();
         }
     }
 
@@ -774,12 +792,19 @@ public class AllHandle extends AllClientHandle<ClientPlayNetworkHandler> {
     }
 
     @Override
-    public void invalidate(Contraption contraption) {
-        // The visual will handle this with flywheel on.
-        if (!contraption.deferInvalidate || BackendManager.isBackendOn())
-            return;
-        contraption.deferInvalidate = false;
-        ContraptionRenderInfo.invalidate(contraption);
+    public void resetClientContraption(Contraption contraption) {
+        ClientContraption.resetClientContraption(contraption);
+    }
+
+    @Override
+    public void invalidateClientContraptionChildren(Contraption contraption) {
+        ClientContraption.invalidateClientContraptionChildren(contraption);
+    }
+
+    @Override
+    @Nullable
+    public BlockEntity getBlockEntityClientSide(Contraption contraption, BlockPos localPos) {
+        return ClientContraption.getBlockEntityClientSide(contraption, localPos);
     }
 
     @Override
@@ -1038,11 +1063,16 @@ public class AllHandle extends AllClientHandle<ClientPlayNetworkHandler> {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public void invalidateCarriage(CarriageContraptionEntity entity) {
-        entity.getContraption().deferInvalidate = true;
-        PortalCutoffBehaviour behaviour = entity.getBehaviour(PortalCutoffBehaviour.TYPE);
-        if (behaviour != null) {
-            behaviour.updateRenderedPortalCutoff();
+        // Update the portal cutoff first to ensure it's reflected in the updated mesh.
+        entity.updateRenderedPortalCutoff();
+        AtomicReference<ClientContraption> clientContraption = (AtomicReference<ClientContraption>) entity.getContraption().clientContraption;
+        ClientContraption maybeNullClientContraption = clientContraption.getAcquire();
+        // Nothing to invalidate if it hasn't been created yet.
+        if (maybeNullClientContraption != null) {
+            maybeNullClientContraption.invalidateStructure();
+            maybeNullClientContraption.invalidateChildren();
         }
     }
 

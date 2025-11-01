@@ -2,7 +2,6 @@ package com.zurrtum.create.client;
 
 import com.zurrtum.create.client.foundation.entity.behaviour.CarriageAudioBehaviour;
 import com.zurrtum.create.client.foundation.entity.behaviour.CarriageParticleBehaviour;
-import com.zurrtum.create.client.foundation.entity.behaviour.PortalCutoffBehaviour;
 import com.zurrtum.create.content.trains.entity.CarriageContraptionEntity;
 import com.zurrtum.create.foundation.entity.behaviour.EntityBehaviour;
 import it.unimi.dsi.fastutil.objects.Reference2ObjectArrayMap;
@@ -31,6 +30,6 @@ public class AllEntityBehaviours {
     }
 
     public static void register() {
-        add(CarriageContraptionEntity.class, PortalCutoffBehaviour::new, CarriageAudioBehaviour::new, CarriageParticleBehaviour::new);
+        add(CarriageContraptionEntity.class, CarriageAudioBehaviour::new, CarriageParticleBehaviour::new);
     }
 }

@@ -710,4 +710,33 @@ public class CarriageContraptionEntity extends OrientedContraptionEntity {
         carriage.updateContraptionAnchors();
         dimensional.updateRenderedCutoff();
     }
+
+    public void updateRenderedPortalCutoff() {
+        if (carriage == null)
+            return;
+
+        // update portal slice
+        particleSlice.clear();
+        particleAvgY = 0;
+
+        if (contraption instanceof CarriageContraption cc) {
+            Direction forward = cc.getAssemblyDirection().rotateYClockwise();
+            Axis axis = forward.getAxis();
+            boolean x = axis == Axis.X;
+            boolean flip = true;
+
+            for (BlockPos pos : contraption.getBlocks().keySet()) {
+                if (!cc.atSeam(pos))
+                    continue;
+                int pX = x ? pos.getX() : pos.getZ();
+                pX *= forward.getDirection().offset() * (flip ? 1 : -1);
+                pos = new BlockPos(pX, pos.getY(), 0);
+                particleSlice.add(pos);
+                particleAvgY += pos.getY();
+            }
+
+        }
+        if (particleSlice.size() > 0)
+            particleAvgY /= particleSlice.size();
+    }
 }

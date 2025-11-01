@@ -4,7 +4,6 @@ import com.zurrtum.create.catnip.data.Couple;
 import com.zurrtum.create.catnip.data.Iterate;
 import com.zurrtum.create.client.AllPartialModels;
 import com.zurrtum.create.client.AllTrackMaterialModels.TrackModelHolder;
-import com.zurrtum.create.client.content.contraptions.render.ContraptionVisual;
 import com.zurrtum.create.client.content.trains.track.TrackRenderer.GirderAngles;
 import com.zurrtum.create.client.content.trains.track.TrackRenderer.SegmentAngles;
 import com.zurrtum.create.client.flywheel.api.instance.Instance;
@@ -110,12 +109,12 @@ public class TrackVisual extends AbstractVisual implements BlockEntityVisual<Tra
             maxZ = Math.max(maxZ, MathHelper.ceil(bounds.maxZ) + 1);
         }
 
-        var minSectionX = ContraptionVisual.minLightSection(minX);
-        var minSectionY = ContraptionVisual.minLightSection(minY);
-        var minSectionZ = ContraptionVisual.minLightSection(minZ);
-        int maxSectionX = ContraptionVisual.maxLightSection(maxX);
-        int maxSectionY = ContraptionVisual.maxLightSection(maxY);
-        int maxSectionZ = ContraptionVisual.maxLightSection(maxZ);
+        var minSectionX = ChunkSectionPos.getSectionCoord(minX);
+        var minSectionY = ChunkSectionPos.getSectionCoord(minY);
+        var minSectionZ = ChunkSectionPos.getSectionCoord(minZ);
+        int maxSectionX = ChunkSectionPos.getSectionCoord(maxX);
+        int maxSectionY = ChunkSectionPos.getSectionCoord(maxY);
+        int maxSectionZ = ChunkSectionPos.getSectionCoord(maxZ);
 
         LongSet out = new LongArraySet();
 

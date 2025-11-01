@@ -1,6 +1,7 @@
 package com.zurrtum.create.content.logistics.depot.storage;
 
 import com.mojang.serialization.MapCodec;
+import com.zurrtum.create.AllClientHandle;
 import com.zurrtum.create.AllMountedStorageTypes;
 import com.zurrtum.create.api.contraption.storage.SyncedMountedStorage;
 import com.zurrtum.create.api.contraption.storage.item.WrapperMountedItemStorage;
@@ -61,7 +62,7 @@ public class DepotMountedStorage extends WrapperMountedItemStorage<DepotMountedS
 
     @Override
     public void afterSync(Contraption contraption, BlockPos localPos) {
-        BlockEntity be = contraption.presentBlockEntities.get(localPos);
+        BlockEntity be = AllClientHandle.INSTANCE.getBlockEntityClientSide(contraption, localPos);
         if (be instanceof DepotBlockEntity depot) {
             getHeld().ifPresentOrElse(depot::setHeldItem, depot::removeHeldItem);
         }

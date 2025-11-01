@@ -14,7 +14,6 @@ import com.zurrtum.create.infrastructure.component.BezierTrackPointLocation;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.client.render.Camera;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.render.VertexConsumerProvider;
@@ -146,12 +145,11 @@ public class TrackBlockOutline {
 
     public static boolean drawCustomBlockSelection(
         MinecraftClient mc,
-        BlockHitResult target,
+        BlockPos pos,
         VertexConsumerProvider vertexConsumers,
-        Camera camera,
+        Vec3d camPos,
         MatrixStack ms
     ) {
-        BlockPos pos = target.getBlockPos();
         BlockState blockstate = mc.world.getBlockState(pos);
 
         if (!(blockstate.getBlock() instanceof TrackBlock))
@@ -160,7 +158,6 @@ public class TrackBlockOutline {
             return false;
 
         VertexConsumer vb = vertexConsumers.getBuffer(RenderLayer.getLines());
-        Vec3d camPos = camera.getPos();
 
         ms.push();
         ms.translate(pos.getX() - camPos.x, pos.getY() - camPos.y, pos.getZ() - camPos.z);

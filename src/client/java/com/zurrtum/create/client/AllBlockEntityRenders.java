@@ -126,38 +126,42 @@ import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.client.render.block.entity.BlockEntityRendererFactories;
 import net.minecraft.client.render.block.entity.BlockEntityRendererFactory;
+import net.minecraft.client.render.block.entity.state.BlockEntityRenderState;
 
 import java.util.function.Predicate;
 
 public class AllBlockEntityRenders {
-    private static <T extends BlockEntity, P extends T> void visual(
+    public static <T extends BlockEntity, P extends T, S extends BlockEntityRenderState> void visual(
         BlockEntityType<P> type,
-        BlockEntityRendererFactory<T> rendererFactory,
+        BlockEntityRendererFactory<T, S> rendererFactory,
         SimpleBlockEntityVisualizer.Factory<P> visualizerFactory
     ) {
         visual(type, rendererFactory, visualizerFactory, blockEntity -> true);
     }
 
-    private static <T extends BlockEntity, P extends T> void normal(
+    public static <T extends BlockEntity, P extends T, S extends BlockEntityRenderState> void normal(
         BlockEntityType<P> type,
-        BlockEntityRendererFactory<T> rendererFactory,
+        BlockEntityRendererFactory<T, S> rendererFactory,
         SimpleBlockEntityVisualizer.Factory<P> visualizerFactory
     ) {
         visual(type, rendererFactory, visualizerFactory, blockEntity -> false);
     }
 
-    private static <T extends BlockEntity, P extends T> void visual(
+    public static <T extends BlockEntity, P extends T, S extends BlockEntityRenderState> void visual(
         BlockEntityType<P> type,
-        BlockEntityRendererFactory<T> rendererFactory,
+        BlockEntityRendererFactory<T, S> rendererFactory,
         SimpleBlockEntityVisualizer.Factory<P> visualizerFactory,
         Predicate<P> skipVanillaRender
     ) {
-        BlockEntityRendererFactories.FACTORIES.put(type, rendererFactory);
+        BlockEntityRendererFactories.register(type, rendererFactory);
         SimpleBlockEntityVisualizer.builder(type).factory(visualizerFactory).skipVanillaRender(skipVanillaRender).apply();
     }
 
-    private static <T extends BlockEntity, P extends T> void render(BlockEntityType<P> type, BlockEntityRendererFactory<T> rendererFactory) {
-        BlockEntityRendererFactories.FACTORIES.put(type, rendererFactory);
+    public static <T extends BlockEntity, P extends T, S extends BlockEntityRenderState> void render(
+        BlockEntityType<P> type,
+        BlockEntityRendererFactory<T, S> rendererFactory
+    ) {
+        BlockEntityRendererFactories.register(type, rendererFactory);
     }
 
     public static void register() {

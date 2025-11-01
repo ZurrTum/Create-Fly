@@ -1,5 +1,6 @@
 package com.zurrtum.create.api.behaviour.interaction;
 
+import com.zurrtum.create.AllClientHandle;
 import com.zurrtum.create.api.registry.SimpleRegistry;
 import com.zurrtum.create.content.contraptions.AbstractContraptionEntity;
 import com.zurrtum.create.content.contraptions.behaviour.MovementContext;
@@ -21,8 +22,9 @@ public abstract class MovingInteractionBehaviour {
     protected void setContraptionActorData(AbstractContraptionEntity contraptionEntity, int index, StructureBlockInfo info, MovementContext ctx) {
         contraptionEntity.getContraption().getActors().remove(index);
         contraptionEntity.getContraption().getActors().add(index, MutablePair.of(info, ctx));
-        if (contraptionEntity.getEntityWorld().isClient())
-            contraptionEntity.getContraption().deferInvalidate = true;
+        if (contraptionEntity.getEntityWorld().isClient()) {
+            AllClientHandle.INSTANCE.invalidateClientContraptionChildren(contraptionEntity.getContraption());
+        }
     }
 
     protected void setContraptionBlockData(AbstractContraptionEntity contraptionEntity, BlockPos pos, StructureBlockInfo info) {

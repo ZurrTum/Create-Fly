@@ -83,7 +83,7 @@ public class BasinBlazeBurnerRenderer extends SpecialGuiElementRenderer<BasinBla
 
         CachedBuffers.partial(AllPartialModels.BLAZE_BURNER_FLAME, Blocks.AIR.getDefaultState())
             .shiftUVScrolling(spriteShift, (float) uScroll, (float) vScroll).light(LightmapTextureManager.MAX_LIGHT_COORDINATE)
-            .renderInto(matrices, vertexConsumers.getBuffer(RenderLayer.getCutoutMipped()));
+            .renderInto(matrices.peek(), vertexConsumers.getBuffer(RenderLayer.getCutoutMipped()));
     }
 
     @Override
