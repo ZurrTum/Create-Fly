@@ -1,5 +1,6 @@
 package com.zurrtum.create.client.content.redstone.displayLink;
 
+import com.zurrtum.create.AllItems;
 import com.zurrtum.create.api.behaviour.display.DisplaySource;
 import com.zurrtum.create.api.behaviour.display.DisplayTarget;
 import com.zurrtum.create.api.registry.CreateRegistries;
@@ -21,7 +22,6 @@ import com.zurrtum.create.client.foundation.gui.widget.SelectionScrollInput;
 import com.zurrtum.create.client.foundation.utility.CreateLang;
 import com.zurrtum.create.client.infrastructure.ponder.AllCreatePonderTags;
 import com.zurrtum.create.client.ponder.foundation.ui.PonderTagScreen;
-import com.zurrtum.create.content.redstone.displayLink.DisplayLinkBlock;
 import com.zurrtum.create.content.redstone.displayLink.DisplayLinkBlockEntity;
 import com.zurrtum.create.content.redstone.displayLink.DisplayLinkContext;
 import com.zurrtum.create.content.redstone.displayLink.source.SingleLineDisplaySource;
@@ -40,7 +40,6 @@ import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.math.Direction;
 import org.joml.Matrix3x2fStack;
 
 import java.util.Collections;
@@ -94,10 +93,9 @@ public class DisplayLinkScreen extends AbstractSimiScreen {
         addDrawableChild(confirmButton);
 
         renderedItem = new ElementWidget(
-            x + background.getWidth() + 2,
-            y + background.getHeight() - 46
-        ).showingElement(GuiGameElement.of(blockEntity.getCachedState().with(DisplayLinkBlock.FACING, Direction.UP)).scale(2.5F).rotate(-22, 63, 0)
-            .padding(17));
+            x + background.getWidth() - 11,
+            y + background.getHeight() - 55
+        ).showingElement(GuiGameElement.of(AllItems.DISPLAY_LINK.getDefaultStack()).scale(4).rotate(50, 207, -14).padding(17));
         addDrawableChild(renderedItem);
     }
 

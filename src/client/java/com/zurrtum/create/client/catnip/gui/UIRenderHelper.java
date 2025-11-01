@@ -37,7 +37,6 @@ import net.minecraft.util.math.MathHelper;
 import org.jetbrains.annotations.Nullable;
 import org.joml.*;
 import org.lwjgl.opengl.GL12;
-import org.lwjgl.opengl.GL20;
 import org.lwjgl.opengl.GL30;
 
 import java.awt.geom.Point2D;
@@ -86,30 +85,6 @@ public class UIRenderHelper {
     public static void drawFramebuffer(MatrixStack poseStack, float alpha) {
         if (framebuffer != null)
             framebuffer.renderWithAlpha(poseStack, alpha);
-    }
-
-    /**
-     * Switch from src to dst, after copying the contents of src to dst.
-     */
-    public static void swapAndBlitColor(Framebuffer src, Framebuffer dst) {
-        int srcId = getFrameBufferId(src);
-        int dstId = getFrameBufferId(dst);
-        GlStateManager._glBindFramebuffer(GL30.GL_READ_FRAMEBUFFER, srcId);
-        GlStateManager._glBindFramebuffer(GL30.GL_DRAW_FRAMEBUFFER, dstId);
-        GlStateManager._glBlitFrameBuffer(
-            0,
-            0,
-            src.viewportWidth,
-            src.viewportHeight,
-            0,
-            0,
-            dst.viewportWidth,
-            dst.viewportHeight,
-            GL30.GL_COLOR_BUFFER_BIT,
-            GL20.GL_LINEAR
-        );
-
-        GlStateManager._glBindFramebuffer(GlConst.GL_FRAMEBUFFER, dstId);
     }
 
     private static int getFrameBufferId(Framebuffer buffer) {
@@ -431,7 +406,8 @@ public class UIRenderHelper {
             u1,
             u2,
             v1,
-            v2
+            v2,
+            graphics.scissorStack.peekLast()
         ));
     }
 
@@ -455,8 +431,6 @@ public class UIRenderHelper {
             GlBackend device = ((GlBackend) RenderSystem.getDevice());
             int i = device.getMaxTextureSize();
             if (width > 0 && width <= i && height > 0 && height <= i) {
-                viewportWidth = width;
-                viewportHeight = height;
                 textureWidth = width;
                 textureHeight = height;
                 colorAttachment = device.createTexture(() -> name + " / Color", 15, TextureFormat.RGBA8, width, height, 1, 1);
@@ -550,8 +524,8 @@ public class UIRenderHelper {
 
             float vx = guiScaledWidth;
             float vy = guiScaledHeight;
-            float tx = (float) viewportWidth / (float) textureWidth;
-            float ty = (float) viewportHeight / (float) textureHeight;
+            float tx = (float) textureWidth;
+            float ty = (float) textureHeight;
 
             MinecraftClient minecraft = MinecraftClient.getInstance();
             Matrix4f matrix4f = poseStack.peek().getPositionMatrix();

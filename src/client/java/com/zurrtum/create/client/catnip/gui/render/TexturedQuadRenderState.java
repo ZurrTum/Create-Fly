@@ -7,12 +7,11 @@ import net.minecraft.client.gui.ScreenRect;
 import net.minecraft.client.gui.render.state.SimpleGuiElementRenderState;
 import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.texture.TextureSetup;
-import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix3x2f;
 
 public record TexturedQuadRenderState(
     Matrix3x2f pose, float left, float right, float top, float bot, int red, int green, int blue, int alpha, float u1, float u2, float v1, float v2,
-    TextureSetup textureSetup, ScreenRect bounds
+    TextureSetup textureSetup, ScreenRect bounds, ScreenRect scissorArea
 ) implements SimpleGuiElementRenderState {
     public TexturedQuadRenderState(
         Matrix3x2f pose,
@@ -25,7 +24,8 @@ public record TexturedQuadRenderState(
         float u1,
         float u2,
         float v1,
-        float v2
+        float v2,
+        ScreenRect scissorArea
     ) {
         this(
             pose,
@@ -42,7 +42,8 @@ public record TexturedQuadRenderState(
             v1,
             v2,
             textureSetup,
-            new ScreenRect(left, top, right - left, bot - top).transformEachVertex(pose)
+            new ScreenRect(left, top, right - left, bot - top).transformEachVertex(pose),
+            scissorArea
         );
     }
 
@@ -57,10 +58,5 @@ public record TexturedQuadRenderState(
         vertexConsumer.vertex(pose, right, bot).color(red, green, blue, alpha).texture(u2, v2);
         vertexConsumer.vertex(pose, right, top).color(red, green, blue, alpha).texture(u2, v1);
         vertexConsumer.vertex(pose, left, top).color(red, green, blue, alpha).texture(u1, v1);
-    }
-
-    @Override
-    public @Nullable ScreenRect scissorArea() {
-        return null;
     }
 }

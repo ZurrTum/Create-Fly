@@ -2,6 +2,7 @@ package com.zurrtum.create.client.catnip.math;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayerEntity;
+import net.minecraft.client.network.ClientPlayerLikeState;
 import net.minecraft.client.render.Camera;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.MathHelper;
@@ -33,22 +34,20 @@ public class VecHelper {
         if (mc.options.getBobView().getValue()) {
             Entity renderViewEntity = mc.getCameraEntity();
             if (renderViewEntity instanceof ClientPlayerEntity playerEntity) {
-                float walkDist_modified = playerEntity.distanceMoved;
-
-                float f = walkDist_modified - playerEntity.lastDistanceMoved;
-                float f1 = -(walkDist_modified + f * partialTicks);
-                float f2 = MathHelper.lerp(partialTicks, playerEntity.lastStrideDistance, playerEntity.strideDistance);
-                Quaternionf q2 = RotationAxis.POSITIVE_X.rotationDegrees(Math.abs(MathHelper.cos(f1 * (float) Math.PI - 0.2F) * f2) * 5.0F);
+                ClientPlayerLikeState clientPlayerLikeState = playerEntity.getState();
+                float f = clientPlayerLikeState.getReverseLerpedDistanceMoved(partialTicks);
+                float g = clientPlayerLikeState.lerpMovement(partialTicks);
+                Quaternionf q2 = RotationAxis.POSITIVE_X.rotationDegrees(Math.abs(MathHelper.cos(f * (float) Math.PI - 0.2F) * g) * 5.0F);
                 q2.conjugate();
                 result3f.rotate(q2);
 
-                Quaternionf q1 = RotationAxis.POSITIVE_Z.rotationDegrees(MathHelper.sin(f1 * (float) Math.PI) * f2 * 3.0F);
+                Quaternionf q1 = RotationAxis.POSITIVE_Z.rotationDegrees(MathHelper.sin(f * (float) Math.PI) * g * 3.0F);
                 q1.conjugate();
                 result3f.rotate(q1);
 
                 Vector3f bob_translation = new Vector3f(
-                    (MathHelper.sin(f1 * (float) Math.PI) * f2 * 0.5F),
-                    (-Math.abs(MathHelper.cos(f1 * (float) Math.PI) * f2)),
+                    MathHelper.sin(f * (float) Math.PI) * g * 0.5F,
+                    -Math.abs(MathHelper.cos(f * (float) Math.PI) * g),
                     0.0f
                 );
                 bob_translation.set(bob_translation.x(), -bob_translation.y(), bob_translation.z());// this is weird but hey, if it works

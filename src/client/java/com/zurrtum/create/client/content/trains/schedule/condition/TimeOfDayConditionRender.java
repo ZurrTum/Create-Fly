@@ -4,14 +4,12 @@ import com.google.common.collect.ImmutableList;
 import com.zurrtum.create.catnip.data.Pair;
 import com.zurrtum.create.client.content.trains.schedule.IScheduleInput;
 import com.zurrtum.create.client.foundation.gui.ModularGuiLineBuilder;
-import com.zurrtum.create.client.foundation.gui.ScreenWithStencils;
 import com.zurrtum.create.client.foundation.gui.widget.Label;
 import com.zurrtum.create.client.foundation.gui.widget.ScrollInput;
 import com.zurrtum.create.client.foundation.utility.CreateLang;
 import com.zurrtum.create.content.trains.schedule.condition.TimeOfDayCondition;
 import net.minecraft.client.gl.RenderPipelines;
 import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
@@ -63,19 +61,6 @@ public class TimeOfDayConditionRender implements IScheduleInput<TimeOfDayConditi
     @Override
     public boolean renderSpecialIcon(TimeOfDayCondition input, DrawContext graphics, int x, int y) {
         graphics.drawTexture(RenderPipelines.GUI_TEXTURED, getClockTextureId(input), x, y, 0, 0, 16, 16, 16, 16);
-        return true;
-    }
-
-    @Override
-    public boolean renderStencilSpecialIcon(
-        TimeOfDayCondition input,
-        DrawContext graphics,
-        VertexConsumerProvider.Immediate vertexConsumers,
-        ScreenWithStencils screen,
-        int x,
-        int y
-    ) {
-        screen.drawTexture(vertexConsumers, graphics.getMatrices(), getClockTextureId(input), x, y, 100, 0, 0, 16, 16, 16, 16);
         return true;
     }
 

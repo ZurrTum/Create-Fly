@@ -42,11 +42,12 @@ public class BlockTransformElementRenderer extends SpecialGuiElementRenderer<Blo
             TEXTURES.values().forEach(GpuTexture::close);
             TEXTURES.clear();
         }
-        GpuTexture texture = TEXTURES.get(block.getKey());
+        Object key = block.getKey();
+        GpuTexture texture = TEXTURES.get(key);
         if (texture == null) {
             float size = block.size() * windowScaleFactor;
             texture = GpuTexture.create((int) size);
-            TEXTURES.put(block, texture);
+            TEXTURES.put(key, texture);
             RenderSystem.setProjectionMatrix(projectionMatrix.set(size, size), ProjectionType.ORTHOGRAPHIC);
             texture.prepare();
             matrices.push();

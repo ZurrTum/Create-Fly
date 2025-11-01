@@ -14,7 +14,6 @@ import com.zurrtum.create.client.catnip.gui.UIRenderHelper;
 import com.zurrtum.create.client.content.logistics.AddressEditBox;
 import com.zurrtum.create.client.content.trains.station.NoShadowFontWrapper;
 import com.zurrtum.create.client.foundation.gui.AllGuiTextures;
-import com.zurrtum.create.client.foundation.gui.ScreenWithStencils;
 import com.zurrtum.create.client.foundation.gui.menu.AbstractSimiContainerScreen;
 import com.zurrtum.create.client.foundation.gui.render.BlazeBurnerRenderState;
 import com.zurrtum.create.client.foundation.gui.widget.ScrollInput;
@@ -43,7 +42,6 @@ import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.input.CharInput;
 import net.minecraft.client.input.KeyInput;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
-import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.util.Window;
 import net.minecraft.client.util.math.Rect2i;
 import net.minecraft.entity.LivingEntity;
@@ -56,7 +54,10 @@ import net.minecraft.text.MutableText;
 import net.minecraft.text.OrderedText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
-import net.minecraft.util.math.*;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Box;
+import net.minecraft.util.math.Direction;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix3x2f;
@@ -66,7 +67,7 @@ import org.lwjgl.glfw.GLFW;
 import java.lang.ref.WeakReference;
 import java.util.*;
 
-public class StockKeeperRequestScreen extends AbstractSimiContainerScreen<StockKeeperRequestMenu> implements ScreenWithStencils {
+public class StockKeeperRequestScreen extends AbstractSimiContainerScreen<StockKeeperRequestMenu> {
 
     public static class CategoryEntry {
         boolean hidden;
@@ -497,7 +498,6 @@ public class StockKeeperRequestScreen extends AbstractSimiContainerScreen<StockK
             ms.popMatrix();
         }
 
-        VertexConsumerProvider.Immediate vertexConsumers = client.getBufferBuilders().getEntityVertexConsumers();
         BlazeBurnerBlockEntity keeperBE = blaze.get();
         if (keeperBE != null && !keeperBE.isRemoved()) {
             int entityX = x - 69;
@@ -539,7 +539,7 @@ public class StockKeeperRequestScreen extends AbstractSimiContainerScreen<StockK
 
             ms.pushMatrix();
             ms.translate(itemsX + index * colWidth, orderY);
-            renderItemEntry(graphics, entry, isStackHovered);
+            renderItemEntry(graphics, entry, isStackHovered, true);
             ms.popMatrix();
         }
 
@@ -609,8 +609,7 @@ public class StockKeeperRequestScreen extends AbstractSimiContainerScreen<StockK
         int itemWindowY = y + 17;
         int itemWindowY2 = y + windowHeight - 80;
 
-        prepareFrameBuffer(client, vertexConsumers);
-        startStencil(client, vertexConsumers, ms, itemWindowX - 5, itemWindowY, itemWindowX2 - itemWindowX + 10, itemWindowY2 - itemWindowY);
+        graphics.enableScissor(itemWindowX - 5, itemWindowY, itemWindowX2 + 10, itemWindowY2);
 
         ms.pushMatrix();
         ms.translate(0, -currentScroll * rowHeight);
@@ -621,21 +620,18 @@ public class StockKeeperRequestScreen extends AbstractSimiContainerScreen<StockK
                 continue;
             if (sliceY - currentScroll * rowHeight > windowHeight - 72)
                 continue;
-            drawTexture(vertexConsumers, ms, x + 22, y + sliceY + 18, 100, AllGuiTextures.STOCK_KEEPER_REQUEST_BG);
+            AllGuiTextures.STOCK_KEEPER_REQUEST_BG.render(graphics, x + 22, y + sliceY + 18);
         }
 
         // Search bar
-        drawTexture(vertexConsumers, ms, x + 42, searchBox.getY() - 5, 100, AllGuiTextures.STOCK_KEEPER_REQUEST_SEARCH);
-        renderWidget(searchBox, vertexConsumers, ms, 100);
+        AllGuiTextures.STOCK_KEEPER_REQUEST_SEARCH.render(graphics, x + 42, searchBox.getY() - 5);
+        searchBox.render(graphics, mouseX, mouseY, partialTicks);
         if (searchBox.getText().isBlank() && !searchBox.isFocused())
-            drawText(
-                vertexConsumers,
-                ms,
+            graphics.drawText(
                 textRenderer,
                 searchBox.getMessage(),
                 x + windowWidth / 2 - textRenderer.getWidth(searchBox.getMessage()) / 2,
                 searchBox.getY(),
-                100,
                 0xff4A2D31,
                 false
             );
@@ -652,25 +648,19 @@ public class StockKeeperRequestScreen extends AbstractSimiContainerScreen<StockK
                 for (int i = 0; i < split.size(); i++) {
                     OrderedText sequence = split.get(i);
                     int lineWidth = textRenderer.getWidth(sequence);
-                    drawText(
-                        vertexConsumers,
-                        ms,
+                    graphics.drawText(
                         textRenderer,
                         sequence,
                         x + windowWidth / 2 - lineWidth / 2 + 1,
                         itemsY + 20 + 1 + i * (textRenderer.fontHeight + 1),
-                        100,
                         new Color(0x4A2D31).setAlpha(alpha).getRGB(),
                         false
                     );
-                    drawText(
-                        vertexConsumers,
-                        ms,
+                    graphics.drawText(
                         textRenderer,
                         sequence,
                         x + windowWidth / 2 - lineWidth / 2,
                         itemsY + 20 + i * (textRenderer.fontHeight + 1),
-                        100,
                         new Color(0xF8F8EC).setAlpha(alpha).getRGB(),
                         false
                     );
@@ -687,16 +677,13 @@ public class StockKeeperRequestScreen extends AbstractSimiContainerScreen<StockK
                 continue;
 
             if (!categories.isEmpty()) {
-                drawTexture(
-                    vertexConsumers,
-                    ms,
+                (categoryEntry.hidden ? AllGuiTextures.STOCK_KEEPER_CATEGORY_HIDDEN : AllGuiTextures.STOCK_KEEPER_CATEGORY_SHOWN).render(
+                    graphics,
                     itemsX,
-                    itemsY + categoryY + 6,
-                    100,
-                    categoryEntry.hidden ? AllGuiTextures.STOCK_KEEPER_CATEGORY_HIDDEN : AllGuiTextures.STOCK_KEEPER_CATEGORY_SHOWN
+                    itemsY + categoryY + 6
                 );
-                drawText(vertexConsumers, ms, textRenderer, categoryEntry.name, itemsX + 10, itemsY + categoryY + 8, 100, 0xFF4A2D31, false);
-                drawText(vertexConsumers, ms, textRenderer, categoryEntry.name, itemsX + 9, itemsY + categoryY + 7, 100, 0xFFF8F8EC, false);
+                graphics.drawText(textRenderer, categoryEntry.name, itemsX + 10, itemsY + categoryY + 8, 0xFF4A2D31, false);
+                graphics.drawText(textRenderer, categoryEntry.name, itemsX + 9, itemsY + categoryY + 7, 0xFFF8F8EC, false);
                 if (categoryEntry.hidden)
                     continue;
             }
@@ -715,24 +702,17 @@ public class StockKeeperRequestScreen extends AbstractSimiContainerScreen<StockK
 
                 ms.pushMatrix();
                 ms.translate(itemsX + (index % cols) * colWidth, pY);
-                renderItemEntry(vertexConsumers, ms, entry, isStackHovered);
+                renderItemEntry(graphics, entry, isStackHovered, false);
                 ms.popMatrix();
             }
         }
 
         // Render lock option
         if (isAdmin)
-            drawTexture(
-                vertexConsumers,
-                ms,
-                lockX,
-                lockY,
-                100,
-                isLocked ? AllGuiTextures.STOCK_KEEPER_REQUEST_LOCKED : AllGuiTextures.STOCK_KEEPER_REQUEST_UNLOCKED
-            );
+            (isLocked ? AllGuiTextures.STOCK_KEEPER_REQUEST_LOCKED : AllGuiTextures.STOCK_KEEPER_REQUEST_UNLOCKED).render(graphics, lockX, lockY);
 
         ms.popMatrix();
-        endStencil(client, vertexConsumers, ms, itemWindowX - 5, itemWindowY, itemWindowX2 - itemWindowX + 10, itemWindowY2 - itemWindowY);
+        graphics.disableScissor();
 
         // Scroll bar
         int windowH = windowHeight - 92;
@@ -744,13 +724,11 @@ public class StockKeeperRequestScreen extends AbstractSimiContainerScreen<StockK
             ms.pushMatrix();
             ms.translate(0, (currentScroll * rowHeight) / totalH * (windowH - 2));
             AllGuiTextures pad = AllGuiTextures.STOCK_KEEPER_REQUEST_SCROLL_PAD;
-            drawTexturedQuad(
-                vertexConsumers,
-                ms,
+            graphics.drawTexture(
+                RenderPipelines.GUI_TEXTURED,
                 pad.location,
                 barX,
                 barY,
-                0,
                 pad.getStartX(),
                 pad.getStartY(),
                 pad.getWidth(),
@@ -760,10 +738,10 @@ public class StockKeeperRequestScreen extends AbstractSimiContainerScreen<StockK
                 256,
                 256
             );
-            drawTexture(vertexConsumers, ms, barX, barY, 100, AllGuiTextures.STOCK_KEEPER_REQUEST_SCROLL_TOP);
+            AllGuiTextures.STOCK_KEEPER_REQUEST_SCROLL_TOP.render(graphics, barX, barY);
             if (barSize > 16)
-                drawTexture(vertexConsumers, ms, barX, barY + barSize / 2 - 4, 100, AllGuiTextures.STOCK_KEEPER_REQUEST_SCROLL_MID);
-            drawTexture(vertexConsumers, ms, barX, barY + barSize - 5, 100, AllGuiTextures.STOCK_KEEPER_REQUEST_SCROLL_BOT);
+                AllGuiTextures.STOCK_KEEPER_REQUEST_SCROLL_MID.render(graphics, barX, barY + barSize / 2 - 4);
+            AllGuiTextures.STOCK_KEEPER_REQUEST_SCROLL_BOT.render(graphics, barX, barY + barSize - 5);
             ms.popMatrix();
         }
 
@@ -794,8 +772,6 @@ public class StockKeeperRequestScreen extends AbstractSimiContainerScreen<StockK
         //
         //            ms.popMatrix();
         //        }
-
-        endFrameBuffer(client, vertexConsumers, graphics);
     }
 
     @Override
@@ -850,8 +826,20 @@ public class StockKeeperRequestScreen extends AbstractSimiContainerScreen<StockK
         }
     }
 
-    private void renderItemEntry(DrawContext graphics, BigItemStack entry, boolean isStackHovered) {
+    private void renderItemEntry(DrawContext graphics, BigItemStack entry, boolean isStackHovered, boolean isRenderingOrders) {
         int customCount = entry.count;
+        if (!isRenderingOrders) {
+            BigItemStack order = getOrderForItem(entry.stack);
+            if (entry.count < BigItemStack.INF) {
+                int forcedCount = forcedEntries.getCountOf(entry.stack);
+                if (forcedCount != 0)
+                    customCount = Math.min(customCount, -forcedCount - 1);
+                if (order != null)
+                    customCount -= order.count;
+                customCount = Math.max(0, customCount);
+            }
+            AllGuiTextures.STOCK_KEEPER_REQUEST_SLOT.render(graphics, 0, 0);
+        }
         boolean craftable = false;//TODO entry instanceof CraftableBigItemStack;
         Matrix3x2fStack ms = graphics.getMatrices();
         ms.pushMatrix();
@@ -862,7 +850,6 @@ public class StockKeeperRequestScreen extends AbstractSimiContainerScreen<StockK
 
         ms.translate((float) ((colWidth - 18) / 2.0), (float) ((rowHeight - 18) / 2.0));
         ms.translate((float) (18 / 2.0), (float) (18 / 2.0));
-        ms.scale((float) 1, (float) 1);
         ms.scale(scaleFromHover, scaleFromHover);
         ms.translate((float) (-18 / 2.0), (float) (-18 / 2.0));
         if (customCount != 0 || craftable)
@@ -918,119 +905,6 @@ public class StockKeeperRequestScreen extends AbstractSimiContainerScreen<StockK
                 NUMBERS.location,
                 14 + x,
                 10,
-                NUMBERS.getStartX() + xOffset,
-                NUMBERS.getStartY(),
-                spriteWidth,
-                NUMBERS.getHeight(),
-                256,
-                256
-            );
-            x += spriteWidth - 1;
-        }
-    }
-
-    private void renderItemEntry(VertexConsumerProvider.Immediate vertexConsumers, Matrix3x2fStack ms, BigItemStack entry, boolean isStackHovered) {
-        int customCount = entry.count;
-        BigItemStack order = getOrderForItem(entry.stack);
-        if (entry.count < BigItemStack.INF) {
-            int forcedCount = forcedEntries.getCountOf(entry.stack);
-            if (forcedCount != 0)
-                customCount = Math.min(customCount, -forcedCount - 1);
-            if (order != null)
-                customCount -= order.count;
-            customCount = Math.max(0, customCount);
-        }
-        drawTexture(vertexConsumers, ms, 0, 0, 100, AllGuiTextures.STOCK_KEEPER_REQUEST_SLOT);
-
-        boolean craftable = false;//TODO entry instanceof CraftableBigItemStack;
-
-        float scaleFromHover = 1;
-        if (isStackHovered)
-            scaleFromHover += .075f;
-
-        if (customCount != 0 || craftable) {
-            ms.pushMatrix();
-            boolean itemBarVisible = entry.stack.isItemBarVisible();
-            boolean itemCountVisible = customCount > 1 || craftable;
-            Runnable after = null;
-            Matrix3x2f barPose, countPose;
-            if (itemCountVisible) {
-                countPose = new Matrix3x2f(ms);
-                int finalCustomCount = customCount;
-                after = () -> drawItemCount(vertexConsumers, countPose, finalCustomCount);
-            }
-            ms.translate((float) ((colWidth - 18) / 2.0), (float) ((rowHeight - 18) / 2.0));
-            if (itemBarVisible) {
-                barPose = new Matrix3x2f(ms);
-                Runnable drawCount = after;
-                after = () -> {
-                    fill(vertexConsumers, barPose, 2, 13, 15, 15, 200, 0xFF000000);
-                    fill(
-                        vertexConsumers,
-                        barPose,
-                        2,
-                        13,
-                        2 + entry.stack.getItemBarStep(),
-                        14,
-                        200,
-                        ColorHelper.fullAlpha(entry.stack.getItemBarColor())
-                    );
-                    if (drawCount != null) {
-                        drawCount.run();
-                    }
-                };
-            }
-            ms.translate(9, 9);
-            ms.scale(scaleFromHover, scaleFromHover);
-            ms.translate(-9, -9);
-            drawItem(client, vertexConsumers, ms, entry.stack, 0, 0, after);
-            ms.popMatrix();
-        }
-    }
-
-    private void drawItemCount(VertexConsumerProvider.Immediate vertexConsumers, Matrix3x2f ms, int customCount) {
-        String text = customCount >= 1000000 ? (customCount / 1000000) + "m" : customCount >= 10000 ? (customCount / 1000) + "k" : customCount >= 1000 ? ((customCount * 10) / 1000) / 10f + "k" : customCount >= 100 ? customCount + "" : " " + customCount;
-
-        if (customCount >= BigItemStack.INF)
-            text = "+";
-
-        if (text.isBlank())
-            return;
-
-        int x = (int) Math.floor(-text.length() * 2.5);
-        for (char c : text.toCharArray()) {
-            int index = c - '0';
-            int xOffset = index * 6;
-            int spriteWidth = NUMBERS.getWidth();
-
-            switch (c) {
-                case ' ':
-                    x += 4;
-                    continue;
-                case '.':
-                    spriteWidth = 3;
-                    xOffset = 60;
-                    break;
-                case 'k':
-                    xOffset = 64;
-                    break;
-                case 'm':
-                    spriteWidth = 7;
-                    xOffset = 70;
-                    break;
-                case '+':
-                    spriteWidth = 9;
-                    xOffset = 84;
-                    break;
-            }
-
-            drawTexture(
-                vertexConsumers,
-                ms,
-                NUMBERS.location,
-                14 + x,
-                10,
-                200,
                 NUMBERS.getStartX() + xOffset,
                 NUMBERS.getStartY(),
                 spriteWidth,

@@ -11,6 +11,8 @@ import net.minecraft.client.render.DiffuseLighting;
 import net.minecraft.client.render.LightmapTextureManager;
 import net.minecraft.client.render.OverlayTexture;
 import net.minecraft.client.render.VertexConsumerProvider;
+import net.minecraft.client.render.command.OrderedRenderCommandQueueImpl;
+import net.minecraft.client.render.command.RenderDispatcher;
 import net.minecraft.client.texture.TextureSetup;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.RotationAxis;
@@ -77,7 +79,10 @@ public class ItemTransformElementRenderer extends SpecialGuiElementRenderer<Item
             } else {
                 lighting.setShaderLights(DiffuseLighting.Type.ITEMS_FLAT);
             }
-            item.state().render(matrices, vertexConsumers, LightmapTextureManager.MAX_LIGHT_COORDINATE, OverlayTexture.DEFAULT_UV);
+            RenderDispatcher renderDispatcher = MinecraftClient.getInstance().gameRenderer.getEntityRenderDispatcher();
+            OrderedRenderCommandQueueImpl queue = renderDispatcher.getQueue();
+            item.state().render(matrices, queue, LightmapTextureManager.MAX_LIGHT_COORDINATE, OverlayTexture.DEFAULT_UV, 0);
+            renderDispatcher.render();
             vertexConsumers.draw();
             matrices.pop();
             texture.clear();
