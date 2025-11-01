@@ -15,7 +15,7 @@ import net.minecraft.world.WorldAccess;
 public class HatchFilterSlot extends ValueBoxTransform {
 
     @Override
-    public Vec3d getLocalOffset(WorldAccess level, BlockPos pos, BlockState state) {
+    public Vec3d getLocalOffset(BlockState state) {
         return VecHelper.rotateCentered(VecHelper.voxelSpace(8, 5.15, 9.5), angle(state), Direction.Axis.Y);
     }
 
@@ -25,11 +25,11 @@ public class HatchFilterSlot extends ValueBoxTransform {
     }
 
     public boolean testHit(WorldAccess level, BlockPos pos, BlockState state, Vec3d localHit) {
-        return localHit.distanceTo(getLocalOffset(level, pos, state).subtract(0, 0.125, 0)) < scale / 2;
+        return localHit.distanceTo(getLocalOffset(state).subtract(0, 0.125, 0)) < scale / 2;
     }
 
     @Override
-    public void rotate(WorldAccess level, BlockPos pos, BlockState state, MatrixStack ms) {
+    public void rotate(BlockState state, MatrixStack ms) {
         ms.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(angle(state)));
         ms.multiply(RotationAxis.POSITIVE_X.rotationDegrees(-45));
     }

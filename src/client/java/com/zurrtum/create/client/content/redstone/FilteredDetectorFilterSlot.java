@@ -7,11 +7,9 @@ import com.zurrtum.create.client.foundation.blockEntity.behaviour.ValueBoxTransf
 import com.zurrtum.create.content.redstone.DirectedDirectionalBlock;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Direction.Axis;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.WorldAccess;
 
 public class FilteredDetectorFilterSlot extends ValueBoxTransform.Sided {
 
@@ -40,8 +38,8 @@ public class FilteredDetectorFilterSlot extends ValueBoxTransform.Sided {
     }
 
     @Override
-    public void rotate(WorldAccess level, BlockPos pos, BlockState state, MatrixStack ms) {
-        super.rotate(level, pos, state, ms);
+    public void rotate(BlockState state, MatrixStack ms) {
+        super.rotate(state, ms);
         Direction facing = state.get(DirectedDirectionalBlock.FACING);
         if (facing.getAxis() == Axis.Y)
             return;

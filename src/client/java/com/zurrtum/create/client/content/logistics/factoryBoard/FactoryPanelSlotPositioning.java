@@ -23,7 +23,7 @@ public class FactoryPanelSlotPositioning extends ValueBoxTransform {
     }
 
     @Override
-    public Vec3d getLocalOffset(WorldAccess level, BlockPos pos, BlockState state) {
+    public Vec3d getLocalOffset(BlockState state) {
         return getCenterOfSlot(state, slot);
     }
 
@@ -37,7 +37,7 @@ public class FactoryPanelSlotPositioning extends ValueBoxTransform {
 
     @Override
     public boolean testHit(WorldAccess level, BlockPos pos, BlockState state, Vec3d localHit) {
-        Vec3d offset = getLocalOffset(level, pos, state);
+        Vec3d offset = getLocalOffset(state);
         if (offset == null)
             return false;
         return localHit.distanceTo(offset) < scale / 2;
@@ -49,7 +49,7 @@ public class FactoryPanelSlotPositioning extends ValueBoxTransform {
     }
 
     @Override
-    public void rotate(WorldAccess level, BlockPos pos, BlockState state, MatrixStack ms) {
+    public void rotate(BlockState state, MatrixStack ms) {
         TransformStack.of(ms).rotate(FactoryPanelBlock.getYRot(state) + MathHelper.PI, Direction.UP)
             .rotate(-FactoryPanelBlock.getXRot(state), Direction.EAST);
     }

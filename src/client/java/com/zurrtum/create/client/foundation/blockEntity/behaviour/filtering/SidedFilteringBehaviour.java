@@ -14,7 +14,7 @@ import java.util.Map;
 public class SidedFilteringBehaviour extends FilteringBehaviour<ServerSidedFilteringBehaviour> {
     Map<Direction, FilteringBehaviour<ServerFilteringBehaviour>> sidedFilters = new EnumMap<>(Direction.class);
 
-    public SidedFilteringBehaviour(SmartBlockEntity be, ValueBoxTransform slot) {
+    public SidedFilteringBehaviour(SmartBlockEntity be, ValueBoxTransform.Sided slot) {
         super(be, slot);
     }
 
@@ -22,6 +22,11 @@ public class SidedFilteringBehaviour extends FilteringBehaviour<ServerSidedFilte
     public void initialize() {
         super.initialize();
         behaviour.setRemoveListener(this::removeFilter);
+    }
+
+    @Override
+    public ValueBoxTransform.Sided getSlotPositioning() {
+        return (ValueBoxTransform.Sided) super.getSlotPositioning();
     }
 
     private void removeFilter(Direction side) {

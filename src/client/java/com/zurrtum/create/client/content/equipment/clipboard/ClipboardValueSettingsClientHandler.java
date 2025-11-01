@@ -14,7 +14,6 @@ import com.zurrtum.create.foundation.blockEntity.behaviour.scrollValue.ServerScr
 import net.minecraft.block.BlockState;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.client.render.Camera;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.render.VertexConsumerProvider;
@@ -22,6 +21,7 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.registry.DynamicRegistryManager;
 import net.minecraft.storage.NbtReadView;
 import net.minecraft.storage.ReadView;
 import net.minecraft.text.MutableText;
@@ -42,9 +42,9 @@ import static com.zurrtum.create.Create.LOGGER;
 public class ClipboardValueSettingsClientHandler {
     public static boolean drawCustomBlockSelection(
         MinecraftClient mc,
-        BlockHitResult target,
+        BlockPos pos,
         VertexConsumerProvider vertexConsumerProvider,
-        Camera camera,
+        Vec3d camPos,
         MatrixStack ms
     ) {
         ClientPlayerEntity player = mc.player;
@@ -52,7 +52,6 @@ public class ClipboardValueSettingsClientHandler {
             return false;
         if (!player.getMainHandStack().isOf(AllItems.CLIPBOARD))
             return false;
-        BlockPos pos = target.getBlockPos();
         ClientWorld world = mc.world;
         if (!world.getWorldBorder().contains(pos))
             return false;
@@ -60,19 +59,22 @@ public class ClipboardValueSettingsClientHandler {
 
         if (!(world.getBlockEntity(pos) instanceof SmartBlockEntity smartBE))
             return false;
-        if (!(smartBE instanceof ClipboardBlockEntity) && !(smartBE instanceof ClipboardCloneable) && Stream.of(
-            ServerScrollValueBehaviour.TYPE,
-            ServerFilteringBehaviour.TYPE,
-            ServerLinkBehaviour.TYPE
-        ).noneMatch(type -> smartBE.getBehaviour(type) instanceof ClipboardCloneable cc && cc.canWrite(world.getRegistryManager(), target.getSide())))
-            return false;
+        if (!(smartBE instanceof ClipboardBlockEntity) && !(smartBE instanceof ClipboardCloneable)) {
+            if (mc.crosshairTarget instanceof BlockHitResult target) {
+                DynamicRegistryManager registryManager = world.getRegistryManager();
+                Direction side = target.getSide();
+                if (Stream.of(ServerScrollValueBehaviour.TYPE, ServerFilteringBehaviour.TYPE, ServerLinkBehaviour.TYPE)
+                    .noneMatch(type -> smartBE.getBehaviour(type) instanceof ClipboardCloneable cc && cc.canWrite(registryManager, side))) {
+                    return false;
+                }
+            }
+        }
 
         VoxelShape shape = blockstate.getOutlineShape(world, pos);
         if (shape.isEmpty())
             return false;
 
         VertexConsumer vb = vertexConsumerProvider.getBuffer(RenderLayer.getLines());
-        Vec3d camPos = camera.getPos();
 
         ms.push();
         ms.translate(pos.getX() - camPos.x, pos.getY() - camPos.y, pos.getZ() - camPos.z);

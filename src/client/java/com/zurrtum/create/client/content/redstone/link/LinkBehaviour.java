@@ -2,6 +2,7 @@ package com.zurrtum.create.client.content.redstone.link;
 
 import com.zurrtum.create.catnip.data.Couple;
 import com.zurrtum.create.client.foundation.blockEntity.behaviour.ValueBoxTransform;
+import com.zurrtum.create.client.infrastructure.config.AllConfigs;
 import com.zurrtum.create.content.redstone.link.RedstoneLinkNetworkHandler;
 import com.zurrtum.create.content.redstone.link.ServerLinkBehaviour;
 import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
@@ -15,16 +16,12 @@ public class LinkBehaviour extends BlockEntityBehaviour<SmartBlockEntity> {
     public static final BehaviourType<LinkBehaviour> TYPE = new BehaviourType<>();
     ValueBoxTransform firstSlot;
     ValueBoxTransform secondSlot;
-    private ServerLinkBehaviour behaviour;
+    ServerLinkBehaviour behaviour;
 
     public LinkBehaviour(SmartBlockEntity be) {
         super(be);
         firstSlot = new RedstoneLinkFrequencySlot(true);
         secondSlot = new RedstoneLinkFrequencySlot(false);
-    }
-
-    public boolean isLoad() {
-        return behaviour != null;
     }
 
     @Override
@@ -64,5 +61,9 @@ public class LinkBehaviour extends BlockEntityBehaviour<SmartBlockEntity> {
     @Override
     public BehaviourType<?> getType() {
         return TYPE;
+    }
+
+    public float getRenderDistance() {
+        return AllConfigs.client().filterItemRenderDistance.getF();
     }
 }

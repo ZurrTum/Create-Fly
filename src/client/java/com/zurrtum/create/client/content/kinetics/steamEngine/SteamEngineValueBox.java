@@ -8,11 +8,9 @@ import com.zurrtum.create.client.foundation.blockEntity.behaviour.ValueBoxTransf
 import com.zurrtum.create.content.kinetics.steamEngine.SteamEngineBlock;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Direction.Axis;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.WorldAccess;
 
 public class SteamEngineValueBox extends ValueBoxTransform.Sided {
 
@@ -37,7 +35,7 @@ public class SteamEngineValueBox extends ValueBoxTransform.Sided {
     }
 
     @Override
-    public Vec3d getLocalOffset(WorldAccess level, BlockPos pos, BlockState state) {
+    public Vec3d getLocalOffset(BlockState state) {
         Direction side = getSide();
         Direction engineFacing = SteamEngineBlock.getFacing(state);
 
@@ -60,11 +58,11 @@ public class SteamEngineValueBox extends ValueBoxTransform.Sided {
     }
 
     @Override
-    public void rotate(WorldAccess level, BlockPos pos, BlockState state, MatrixStack ms) {
+    public void rotate(BlockState state, MatrixStack ms) {
         Direction facing = SteamEngineBlock.getFacing(state);
 
         if (facing.getAxis() == Axis.Y) {
-            super.rotate(level, pos, state, ms);
+            super.rotate(state, ms);
             return;
         }
 

@@ -5,37 +5,27 @@ import com.zurrtum.create.content.kinetics.simpleRelays.AbstractSimpleShaftBlock
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.FenceBlock;
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.OverlayTexture;
-import net.minecraft.client.render.VertexConsumerProvider;
-import net.minecraft.client.render.item.ItemRenderer;
+import net.minecraft.client.render.command.OrderedRenderCommandQueue;
+import net.minecraft.client.render.item.ItemRenderState;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
-import net.minecraft.item.ItemDisplayContext;
-import net.minecraft.item.ItemStack;
 import net.minecraft.registry.tag.BlockTags;
 import net.minecraft.util.math.MathHelper;
 import org.joml.Matrix3f;
 
 public class ValueBoxRenderer {
-
-    public static void renderItemIntoValueBox(ItemStack filter, MatrixStack ms, VertexConsumerProvider buffer, int light, int overlay) {
-        MinecraftClient mc = MinecraftClient.getInstance();
-        ItemRenderer itemRenderer = mc.getItemRenderer();
-        itemRenderer.itemModelManager.clearAndUpdate(itemRenderer.itemRenderState, filter, ItemDisplayContext.FIXED, null, null, 0);
-        boolean blockItem = itemRenderer.itemRenderState.isSideLit();
+    public static void renderItemIntoValueBox(ItemRenderState state, OrderedRenderCommandQueue queue, MatrixStack ms, int light, float offset) {
+        boolean blockItem = state.isSideLit();
         float scale = (!blockItem ? .5f : 1f) + 1 / 64f;
-        float zOffset = (!blockItem ? -.15f : 0) + customZOffset(filter.getItem());
+        float zOffset = (!blockItem ? -.15f : 0) + offset;
         ms.scale(scale, scale, scale);
         ms.translate(0, 0, zOffset);
-        itemRenderer.itemRenderState.render(ms, buffer, light, overlay);
+        state.render(ms, queue, light, OverlayTexture.DEFAULT_UV, 0);
     }
 
-    public static void renderFlatItemIntoValueBox(ItemStack filter, MatrixStack ms, VertexConsumerProvider buffer, int light, int overlay) {
-        if (filter.isEmpty())
-            return;
-
+    public static void renderFlatItemIntoValueBox(ItemRenderState state, OrderedRenderCommandQueue queue, MatrixStack ms, int light) {
         int bl = light >> 4 & 0xf;
         int sl = light >> 20 & 0xf;
         int itemLight = MathHelper.floor(sl + .5) << 20 | (MathHelper.floor(bl + .5) & 0xf) << 4;
@@ -52,14 +42,13 @@ public class ValueBoxRenderer {
         squashedMS.peek().getPositionMatrix().mul(ms.peek().getPositionMatrix());
         squashedMS.scale(.5f, .5f, 1 / 1024f);
         squashedMS.peek().getNormalMatrix().set(copy);
-        MinecraftClient mc = MinecraftClient.getInstance();
-        mc.getItemRenderer().renderItem(filter, ItemDisplayContext.GUI, itemLight, OverlayTexture.DEFAULT_UV, squashedMS, buffer, mc.world, 0);
+        state.render(squashedMS, queue, itemLight, OverlayTexture.DEFAULT_UV, 0);
 
         ms.pop();
     }
 
     @SuppressWarnings("deprecation")
-    private static float customZOffset(Item item) {
+    public static float customZOffset(Item item) {
         float nudge = -.1f;
         if (item instanceof BlockItem) {
             Block block = ((BlockItem) item).getBlock();
@@ -74,5 +63,4 @@ public class ValueBoxRenderer {
         }
         return 0;
     }
-
 }

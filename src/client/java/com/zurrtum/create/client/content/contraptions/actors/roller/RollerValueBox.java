@@ -22,7 +22,7 @@ public class RollerValueBox extends ValueBoxTransform {
     }
 
     @Override
-    public void rotate(WorldAccess level, BlockPos pos, BlockState state, MatrixStack ms) {
+    public void rotate(BlockState state, MatrixStack ms) {
         Direction facing = state.get(RollerBlock.FACING);
         float yRot = AngleHelper.horizontalAngle(facing) + 180;
         TransformStack.of(ms).rotateYDegrees(yRot).rotateXDegrees(90);
@@ -30,14 +30,14 @@ public class RollerValueBox extends ValueBoxTransform {
 
     @Override
     public boolean testHit(WorldAccess level, BlockPos pos, BlockState state, Vec3d localHit) {
-        Vec3d offset = getLocalOffset(level, pos, state);
+        Vec3d offset = getLocalOffset(state);
         if (offset == null)
             return false;
         return localHit.distanceTo(offset) < scale / 3;
     }
 
     @Override
-    public Vec3d getLocalOffset(WorldAccess level, BlockPos pos, BlockState state) {
+    public Vec3d getLocalOffset(BlockState state) {
         Direction facing = state.get(RollerBlock.FACING);
         float stateAngle = AngleHelper.horizontalAngle(facing) + 180;
         return VecHelper.rotateCentered(VecHelper.voxelSpace(8 + hOffset, 15.5f, 11), stateAngle, Axis.Y);

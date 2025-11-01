@@ -9,9 +9,10 @@ import com.zurrtum.create.content.logistics.filter.FilterItem;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
+import net.minecraft.client.item.ItemModelManager;
 import net.minecraft.client.render.LightmapTextureManager;
 import net.minecraft.client.render.VertexConsumerProvider;
-import net.minecraft.client.render.item.ItemRenderer;
+import net.minecraft.client.render.item.ItemRenderState;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.ItemDisplayContext;
 import net.minecraft.item.ItemStack;
@@ -20,9 +21,6 @@ import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.WorldAccess;
-
-import java.lang.ref.WeakReference;
 
 public class ValueBox extends ChasingAABBOutline {
     protected Text label;
@@ -32,9 +30,9 @@ public class ValueBox extends ChasingAABBOutline {
 
     protected ValueBoxTransform transform;
 
-    protected WeakReference<WorldAccess> level;
     protected BlockPos pos;
     protected BlockState blockState;
+    protected ItemRenderState state;
 
     protected AllIcons outline = AllIcons.VALUE_BOX_HOVER_4PX;
 
@@ -47,7 +45,7 @@ public class ValueBox extends ChasingAABBOutline {
         this.label = label;
         this.pos = pos;
         this.blockState = state;
-        this.level = new WeakReference<>(MinecraftClient.getInstance().world);
+        this.state = new ItemRenderState();
     }
 
     public ValueBox transform(ValueBoxTransform transform) {
@@ -76,14 +74,13 @@ public class ValueBox extends ChasingAABBOutline {
         if (transform instanceof Sided && params.getHighlightedFace() != null)
             ((Sided) transform).fromSide(params.getHighlightedFace());
 
-        WorldAccess levelAccessor = level.get();
-        if (hasTransform && !transform.shouldRender(levelAccessor, pos, blockState))
+        if (hasTransform && !transform.shouldRender(blockState))
             return;
 
         ms.push();
         ms.translate(pos.getX() - camera.x, pos.getY() - camera.y, pos.getZ() - camera.z);
         if (hasTransform)
-            transform.transform(levelAccessor, pos, blockState, ms);
+            transform.transform(blockState, ms);
 
         if (!isPassive) {
             ms.push();
@@ -135,9 +132,9 @@ public class ValueBox extends ChasingAABBOutline {
             boolean isFilter = stack.getItem() instanceof FilterItem;
             boolean isEmpty = stack.isEmpty();
 
-            ItemRenderer renderer = mc.getItemRenderer();
-            renderer.itemModelManager.clearAndUpdate(renderer.itemRenderState, stack, ItemDisplayContext.GUI, mc.world, mc.player, 0);
-            boolean blockItem = renderer.itemRenderState.isSideLit();
+            ItemModelManager itemModelManager = mc.getItemModelManager();
+            itemModelManager.clearAndUpdate(state, stack, ItemDisplayContext.GUI, mc.world, mc.player, 0);
+            boolean blockItem = state.isSideLit();
 
             float scale = 1.5f;
             ms.translate(-font.getWidth(count), 0, 0);

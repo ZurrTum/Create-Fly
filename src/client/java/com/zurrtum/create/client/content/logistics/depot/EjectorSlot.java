@@ -9,11 +9,9 @@ import com.zurrtum.create.content.logistics.depot.EjectorBlock;
 import com.zurrtum.create.content.logistics.depot.EjectorBlockEntity;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Direction.Axis;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.WorldAccess;
 
 public class EjectorSlot extends ValueBoxTransform.Sided {
     private final EjectorBlockEntity blockEntity;
@@ -23,16 +21,16 @@ public class EjectorSlot extends ValueBoxTransform.Sided {
     }
 
     @Override
-    public Vec3d getLocalOffset(WorldAccess level, BlockPos pos, BlockState state) {
+    public Vec3d getLocalOffset(BlockState state) {
         if (direction != Direction.UP)
-            return super.getLocalOffset(level, pos, state);
+            return super.getLocalOffset(state);
         return new Vec3d(.5, 10.5 / 16f, .5).add(VecHelper.rotate(VecHelper.voxelSpace(0, 0, -5), angle(state), Axis.Y));
     }
 
     @Override
-    public void rotate(WorldAccess level, BlockPos pos, BlockState state, MatrixStack ms) {
+    public void rotate(BlockState state, MatrixStack ms) {
         if (direction != Direction.UP) {
-            super.rotate(level, pos, state, ms);
+            super.rotate(state, ms);
             return;
         }
         TransformStack.of(ms).rotateYDegrees(angle(state)).rotateXDegrees(90);

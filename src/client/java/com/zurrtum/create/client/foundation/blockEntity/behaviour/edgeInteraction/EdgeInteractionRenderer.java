@@ -24,7 +24,6 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.WorldAccess;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -99,13 +98,13 @@ public class EdgeInteractionRenderer {
         }
 
         @Override
-        public Vec3d getLocalOffset(WorldAccess level, BlockPos pos, BlockState state) {
+        public Vec3d getLocalOffset(BlockState state) {
             return add;
         }
 
         @Override
-        public void rotate(WorldAccess level, BlockPos pos, BlockState state, MatrixStack ms) {
-            super.rotate(level, pos, state, ms);
+        public void rotate(BlockState state, MatrixStack ms) {
+            super.rotate(state, ms);
         }
 
     }

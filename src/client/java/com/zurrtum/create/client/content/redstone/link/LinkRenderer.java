@@ -2,21 +2,22 @@ package com.zurrtum.create.client.content.redstone.link;
 
 import com.mojang.datafixers.util.Pair;
 import com.zurrtum.create.catnip.data.Iterate;
-import com.zurrtum.create.catnip.math.VecHelper;
 import com.zurrtum.create.client.Create;
 import com.zurrtum.create.client.catnip.outliner.Outliner;
 import com.zurrtum.create.client.foundation.blockEntity.behaviour.ValueBox;
 import com.zurrtum.create.client.foundation.blockEntity.behaviour.ValueBoxRenderer;
 import com.zurrtum.create.client.foundation.blockEntity.behaviour.ValueBoxTransform;
 import com.zurrtum.create.client.foundation.utility.CreateLang;
-import com.zurrtum.create.client.infrastructure.config.AllConfigs;
 import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
 import com.zurrtum.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
+import net.minecraft.block.BlockState;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.render.VertexConsumerProvider;
+import net.minecraft.client.item.ItemModelManager;
+import net.minecraft.client.render.command.OrderedRenderCommandQueue;
+import net.minecraft.client.render.item.ItemRenderState;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.client.world.ClientWorld;
-import net.minecraft.entity.Entity;
+import net.minecraft.item.ItemDisplayContext;
 import net.minecraft.item.ItemStack;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
@@ -25,15 +26,16 @@ import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.World;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class LinkRenderer {
-
     public static void tick(MinecraftClient mc) {
         HitResult target = mc.crosshairTarget;
-        if (target == null || !(target instanceof BlockHitResult result))
+        if (!(target instanceof BlockHitResult result))
             return;
 
         ClientWorld world = mc.world;
@@ -70,38 +72,61 @@ public class LinkRenderer {
         }
     }
 
-    public static void renderOnBlockEntity(
-        SmartBlockEntity be,
-        float partialTicks,
-        MatrixStack ms,
-        VertexConsumerProvider buffer,
-        int light,
-        int overlay
-    ) {
-
-        if (be == null || be.isRemoved())
-            return;
-
-        Entity cameraEntity = MinecraftClient.getInstance().getCameraEntity();
-        float max = AllConfigs.client().filterItemRenderDistance.getF();
-        if (!be.isVirtual() && cameraEntity != null && cameraEntity.getEntityPos()
-            .squaredDistanceTo(VecHelper.getCenterOf(be.getPos())) > (max * max))
-            return;
-
+    @Nullable
+    public static LinkRenderState getLinkRenderState(SmartBlockEntity be, ItemModelManager itemModelManager, double distance) {
         LinkBehaviour behaviour = be.getBehaviour(LinkBehaviour.TYPE);
-        if (behaviour == null || !behaviour.isLoad())
-            return;
-
-        for (boolean first : Iterate.trueAndFalse) {
-            ValueBoxTransform transform = first ? behaviour.firstSlot : behaviour.secondSlot;
-            ItemStack stack = first ? behaviour.getFirstStack() : behaviour.getLastStack();
-
-            ms.push();
-            transform.transform(be.getWorld(), be.getPos(), be.getCachedState(), ms);
-            ValueBoxRenderer.renderItemIntoValueBox(stack, ms, buffer, light, overlay);
-            ms.pop();
+        if (behaviour == null || behaviour.behaviour == null) {
+            return null;
         }
-
+        float max = behaviour.getRenderDistance();
+        if (max * max < distance) {
+            return null;
+        }
+        return LinkRenderState.create(
+            behaviour.firstSlot,
+            behaviour.secondSlot,
+            itemModelManager,
+            behaviour.getFirstStack(),
+            behaviour.getLastStack(),
+            be.getWorld()
+        );
     }
 
+    public record LinkRenderState(
+        ValueBoxTransform firstSlot, ItemRenderState firstState, float firstOffset, ValueBoxTransform secondSlot, ItemRenderState secondState,
+        float secondOffset
+    ) {
+        public static LinkRenderState create(
+            ValueBoxTransform firstSlot,
+            ValueBoxTransform secondSlot,
+            ItemModelManager itemModelManager,
+            ItemStack firstStack,
+            ItemStack secondStack,
+            World world
+        ) {
+            ItemRenderState firstState = new ItemRenderState(), secondState = new ItemRenderState();
+            firstState.displayContext = secondState.displayContext = ItemDisplayContext.FIXED;
+            itemModelManager.update(firstState, firstStack, firstState.displayContext, world, null, 0);
+            itemModelManager.update(secondState, secondStack, secondState.displayContext, world, null, 0);
+            return new LinkRenderState(
+                firstSlot,
+                firstState,
+                ValueBoxRenderer.customZOffset(firstStack.getItem()),
+                secondSlot,
+                secondState,
+                ValueBoxRenderer.customZOffset(secondStack.getItem())
+            );
+        }
+
+        public void render(BlockState blockState, OrderedRenderCommandQueue queue, MatrixStack ms, int light) {
+            ms.push();
+            firstSlot.transform(blockState, ms);
+            ValueBoxRenderer.renderItemIntoValueBox(firstState, queue, ms, light, firstOffset);
+            ms.pop();
+            ms.push();
+            secondSlot.transform(blockState, ms);
+            ValueBoxRenderer.renderItemIntoValueBox(secondState, queue, ms, light, secondOffset);
+            ms.pop();
+        }
+    }
 }

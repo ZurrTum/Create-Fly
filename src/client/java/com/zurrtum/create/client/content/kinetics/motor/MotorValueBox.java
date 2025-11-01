@@ -8,10 +8,8 @@ import com.zurrtum.create.client.foundation.blockEntity.behaviour.ValueBoxTransf
 import com.zurrtum.create.content.kinetics.motor.CreativeMotorBlock;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.WorldAccess;
 
 public class MotorValueBox extends ValueBoxTransform.Sided {
     @Override
@@ -20,14 +18,14 @@ public class MotorValueBox extends ValueBoxTransform.Sided {
     }
 
     @Override
-    public Vec3d getLocalOffset(WorldAccess level, BlockPos pos, BlockState state) {
+    public Vec3d getLocalOffset(BlockState state) {
         Direction facing = state.get(CreativeMotorBlock.FACING);
-        return super.getLocalOffset(level, pos, state).add(Vec3d.of(facing.getVector()).multiply(-1 / 16f));
+        return super.getLocalOffset(state).add(Vec3d.of(facing.getVector()).multiply(-1 / 16f));
     }
 
     @Override
-    public void rotate(WorldAccess level, BlockPos pos, BlockState state, MatrixStack ms) {
-        super.rotate(level, pos, state, ms);
+    public void rotate(BlockState state, MatrixStack ms) {
+        super.rotate(state, ms);
         Direction facing = state.get(CreativeMotorBlock.FACING);
         if (facing.getAxis() == Direction.Axis.Y)
             return;

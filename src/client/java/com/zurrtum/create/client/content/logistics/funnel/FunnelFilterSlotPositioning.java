@@ -10,16 +10,14 @@ import com.zurrtum.create.content.logistics.funnel.BeltFunnelBlock.Shape;
 import com.zurrtum.create.content.logistics.funnel.FunnelBlock;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Direction.Axis;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.WorldAccess;
 
 public class FunnelFilterSlotPositioning extends ValueBoxTransform.Sided {
 
     @Override
-    public Vec3d getLocalOffset(WorldAccess level, BlockPos pos, BlockState state) {
+    public Vec3d getLocalOffset(BlockState state) {
         Direction side = getSide();
         float horizontalAngle = AngleHelper.horizontalAngle(side);
         Direction funnelFacing = FunnelBlock.getFunnelFacing(state);
@@ -48,25 +46,25 @@ public class FunnelFilterSlotPositioning extends ValueBoxTransform.Sided {
     }
 
     @Override
-    public void rotate(WorldAccess level, BlockPos pos, BlockState state, MatrixStack ms) {
+    public void rotate(BlockState state, MatrixStack ms) {
         Direction facing = FunnelBlock.getFunnelFacing(state);
 
         if (facing.getAxis().isVertical()) {
-            super.rotate(level, pos, state, ms);
+            super.rotate(state, ms);
             return;
         }
 
         boolean isBeltFunnel = state.getBlock() instanceof BeltFunnelBlock;
         if (isBeltFunnel && state.get(BeltFunnelBlock.SHAPE) != Shape.EXTENDED) {
             Shape shape = state.get(BeltFunnelBlock.SHAPE);
-            super.rotate(level, pos, state, ms);
+            super.rotate(state, ms);
             if (shape == Shape.PULLING || shape == Shape.PUSHING)
                 TransformStack.of(ms).rotateXDegrees(-22.5f);
             return;
         }
 
         if (state.getBlock() instanceof FunnelBlock) {
-            super.rotate(level, pos, state, ms);
+            super.rotate(state, ms);
             TransformStack.of(ms).rotateXDegrees(-22.5f);
             return;
         }

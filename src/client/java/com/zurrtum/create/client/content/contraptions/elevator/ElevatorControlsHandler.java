@@ -35,7 +35,7 @@ public class ElevatorControlsHandler {
 
         @Override
         public boolean testHit(WorldAccess level, BlockPos pos, BlockState state, Vec3d localHit) {
-            Vec3d offset = getLocalOffset(level, pos, state);
+            Vec3d offset = getLocalOffset(state);
             if (offset == null)
                 return false;
             return localHit.distanceTo(offset) < scale * .85;
