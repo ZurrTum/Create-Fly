@@ -12,6 +12,7 @@ import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.GameMode;
 import org.apache.commons.lang3.tuple.Pair;
 
 public class DeployerFabricFakePlayer extends FakePlayer implements DeployerPlayer {
@@ -22,6 +23,7 @@ public class DeployerFabricFakePlayer extends FakePlayer implements DeployerPlay
 
     protected DeployerFabricFakePlayer(ServerWorld world, GameProfile profile) {
         super(world, profile);
+        changeGameMode(GameMode.SURVIVAL);
     }
 
     @Override

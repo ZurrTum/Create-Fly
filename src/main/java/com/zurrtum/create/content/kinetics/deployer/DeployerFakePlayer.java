@@ -13,6 +13,7 @@ import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.GameMode;
 import org.apache.commons.lang3.tuple.Pair;
 
 public class DeployerFakePlayer extends FakePlayerEntity implements DeployerPlayer {
@@ -23,6 +24,7 @@ public class DeployerFakePlayer extends FakePlayerEntity implements DeployerPlay
 
     public DeployerFakePlayer(ServerWorld world, GameProfile profile) {
         super(world, profile);
+        changeGameMode(GameMode.SURVIVAL);
     }
 
     @Override
