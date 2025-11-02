@@ -5,6 +5,7 @@ import net.minecraft.client.particle.ParticleFactory;
 import net.minecraft.client.particle.SpriteProvider;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.particle.SimpleParticleType;
+import net.minecraft.util.math.random.Random;
 
 public class BasicParticleFactory implements ParticleFactory<SimpleParticleType> {
     @FunctionalInterface
@@ -18,7 +19,8 @@ public class BasicParticleFactory implements ParticleFactory<SimpleParticleType>
             double z,
             double velocityX,
             double velocityY,
-            double velocityZ
+            double velocityZ,
+            Random random
         );
     }
 
@@ -51,8 +53,9 @@ public class BasicParticleFactory implements ParticleFactory<SimpleParticleType>
         double z,
         double velocityX,
         double velocityY,
-        double velocityZ
+        double velocityZ,
+        Random random
     ) {
-        return factory.createParticle(parameters, spriteSet, world, x, y, z, velocityX, velocityY, velocityZ);
+        return factory.createParticle(parameters, spriteSet, world, x, y, z, velocityX, velocityY, velocityZ, random);
     }
 }

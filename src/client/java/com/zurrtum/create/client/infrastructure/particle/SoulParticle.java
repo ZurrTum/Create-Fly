@@ -2,14 +2,14 @@ package com.zurrtum.create.client.infrastructure.particle;
 
 import com.zurrtum.create.AllParticleTypes;
 import com.zurrtum.create.client.content.equipment.bell.SoulPulseEffect;
+import net.minecraft.client.particle.BillboardParticleSubmittable;
 import net.minecraft.client.particle.SpriteProvider;
 import net.minecraft.client.render.Camera;
-import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.particle.SimpleParticleType;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.RotationAxis;
+import net.minecraft.util.math.random.Random;
 import org.joml.Quaternionf;
 
 public class SoulParticle extends CustomRotationParticle {
@@ -46,23 +46,24 @@ public class SoulParticle extends CustomRotationParticle {
         double z,
         double vx,
         double vy,
-        double vz
+        double vz,
+        Random random
     ) {
         super(worldIn, x, y, z, spriteSet, 0);
         this.scale = 0.5f;
         this.setBoundingBoxSpacing(this.scale, this.scale);
 
-        this.loopLength = loopFrames + (int) (this.random.nextFloat() * 5f - 4f);
-        this.startTicks = startFrames + (int) (this.random.nextFloat() * 5f - 4f);
-        this.endTicks = endFrames + (int) (this.random.nextFloat() * 5f - 4f);
-        this.numLoops = (int) (1f + this.random.nextFloat() * 2f);
+        this.loopLength = loopFrames + (int) (random.nextFloat() * 5f - 4f);
+        this.startTicks = startFrames + (int) (random.nextFloat() * 5f - 4f);
+        this.endTicks = endFrames + (int) (random.nextFloat() * 5f - 4f);
+        this.numLoops = (int) (1f + random.nextFloat() * 2f);
 
         this.setFrame(0);
         this.stopped = true; // disable movement
-        this.mirror = this.random.nextBoolean();
+        this.mirror = random.nextBoolean();
 
-        this.isPerimeter = type == AllParticleTypes.SOUL_PERIMETER;
         this.isExpandingPerimeter = type == AllParticleTypes.SOUL_EXPANDING_PERIMETER;
+        this.isPerimeter = type == AllParticleTypes.SOUL_PERIMETER || isExpandingPerimeter;
         this.animationStage = !isPerimeter ? new StartAnimation(this) : new PerimeterAnimation(this);
         if (isPerimeter) {
             lastY = y -= .5f - 1 / 128f;
@@ -88,10 +89,10 @@ public class SoulParticle extends CustomRotationParticle {
     }
 
     @Override
-    public void render(VertexConsumer builder, Camera camera, float partialTicks) {
+    public void render(BillboardParticleSubmittable submittable, Camera camera, float partialTicks) {
         if (!isVisible)
             return;
-        super.render(builder, camera, partialTicks);
+        super.render(submittable, camera, partialTicks);
     }
 
     public void setFrame(int frame) {
@@ -101,9 +102,11 @@ public class SoulParticle extends CustomRotationParticle {
 
     @Override
     public Quaternionf getCustomRotation(Camera camera, float partialTicks) {
-        if (isPerimeter)
-            return RotationAxis.POSITIVE_X.rotationDegrees(90);
-        return new Quaternionf().rotationXYZ(0, -camera.getYaw() * MathHelper.RADIANS_PER_DEGREE, 0);
+        if (isPerimeter) {
+            return RotationAxis.POSITIVE_X.rotationDegrees(-90);
+        }
+        Quaternionf rotation = camera.getRotation();
+        return new Quaternionf(0, rotation.y, 0, rotation.w);
     }
 
     public static abstract class AnimationStage {

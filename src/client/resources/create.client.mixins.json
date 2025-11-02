@@ -52,6 +52,7 @@
     "ModelPartMixin",
     "MouseMixin",
     "OtherClientPlayerEntityMixin",
+    "ParticleManagerMixin",
     "ParticleSpriteManagerMixin",
     "PlayerEntityModelMixin",
     "PlayerEntityRendererMixin",

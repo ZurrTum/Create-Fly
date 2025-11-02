@@ -114,7 +114,6 @@ import com.zurrtum.create.infrastructure.packet.c2s.TrackGraphRequestPacket;
 import com.zurrtum.create.infrastructure.packet.s2c.*;
 import com.zurrtum.create.infrastructure.particle.AirFlowParticleData;
 import com.zurrtum.create.infrastructure.particle.FluidParticleData;
-import com.zurrtum.create.infrastructure.particle.SteamJetParticleData;
 import io.netty.buffer.Unpooled;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
@@ -885,7 +884,7 @@ public class AllHandle extends AllClientHandle<ClientPlayNetworkHandler> {
         offset = VecHelper.rotate(offset, AngleHelper.horizontalAngle(facing), Axis.Y);
         Vec3d v = offset.multiply(.5f).add(Vec3d.ofCenter(be.getPos()));
         Vec3d m = offset.subtract(Vec3d.of(facing.getVector()).multiply(.75f));
-        world.addParticleClient(new SteamJetParticleData(1), v.x, v.y, v.z, m.x, m.y, m.z);
+        world.addParticleClient(AllParticleTypes.STEAM_JET, v.x, v.y, v.z, m.x, m.y, m.z);
 
         be.prevAngle = angle;
     }
@@ -941,7 +940,7 @@ public class AllHandle extends AllClientHandle<ClientPlayNetworkHandler> {
         float totalUnits = blockEntity.getTotalFluidUnits(0);
         if (totalUnits == 0)
             return;
-        float fluidLevel = MathHelper.clamp(totalUnits / 2000, 0, 1);
+        float fluidLevel = MathHelper.clamp(totalUnits / 162000, 0, 1);
         float rim = 2 / 16f;
         float space = 12 / 16f;
         BlockPos pos = blockEntity.getPos();

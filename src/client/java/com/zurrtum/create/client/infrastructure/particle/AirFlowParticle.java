@@ -6,14 +6,17 @@ import com.zurrtum.create.content.kinetics.fan.IAirCurrentSource;
 import com.zurrtum.create.content.kinetics.fan.processing.FanProcessingType;
 import com.zurrtum.create.infrastructure.particle.AirFlowParticleData;
 import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.client.particle.*;
+import net.minecraft.client.particle.AnimatedParticle;
+import net.minecraft.client.particle.Particle;
+import net.minecraft.client.particle.ParticleFactory;
+import net.minecraft.client.particle.SpriteProvider;
 import net.minecraft.client.render.WorldRenderer;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.particle.ParticleEffect;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
-import org.jetbrains.annotations.NotNull;
+import net.minecraft.util.math.random.Random;
 import org.jetbrains.annotations.Nullable;
 
 public class AirFlowParticle extends AnimatedParticle {
@@ -21,8 +24,8 @@ public class AirFlowParticle extends AnimatedParticle {
     private final IAirCurrentSource source;
     private final Access access = new Access();
 
-    protected AirFlowParticle(ClientWorld world, IAirCurrentSource source, double x, double y, double z, SpriteProvider sprite) {
-        super(world, x, y, z, sprite, world.random.nextFloat() * .5f);
+    protected AirFlowParticle(ClientWorld world, IAirCurrentSource source, double x, double y, double z, SpriteProvider sprite, Random random) {
+        super(world, x, y, z, sprite, random.nextFloat() * .5f);
         this.source = source;
         this.scale *= 0.75F;
         this.maxAge = 40;
@@ -35,11 +38,6 @@ public class AirFlowParticle extends AnimatedParticle {
         this.lastZ = this.z;
         setColor(0xEEEEEE);
         setAlpha(.25f);
-    }
-
-    @NotNull
-    public ParticleTextureSheet getRenderType() {
-        return ParticleTextureSheet.PARTICLE_SHEET_TRANSLUCENT;
     }
 
     @Override
@@ -101,7 +99,8 @@ public class AirFlowParticle extends AnimatedParticle {
         return source.getAirCurrent().getTypeAt((float) distance);
     }
 
-    public int getLightColor(float partialTick) {
+    @Override
+    public int getBrightness(float partialTick) {
         BlockPos blockpos = BlockPos.ofFloored(this.x, this.y, this.z);
         return this.world.isPosLoaded(blockpos) ? WorldRenderer.getLightmapCoordinates(world, blockpos) : 0;
     }
@@ -126,12 +125,13 @@ public class AirFlowParticle extends AnimatedParticle {
             double z,
             double xSpeed,
             double ySpeed,
-            double zSpeed
+            double zSpeed,
+            Random random
         ) {
             BlockEntity be = worldIn.getBlockEntity(new BlockPos(data.posX(), data.posY(), data.posZ()));
             if (!(be instanceof IAirCurrentSource))
                 be = null;
-            return new AirFlowParticle(worldIn, (IAirCurrentSource) be, x, y, z, this.spriteSet);
+            return new AirFlowParticle(worldIn, (IAirCurrentSource) be, x, y, z, this.spriteSet, random);
         }
     }
 

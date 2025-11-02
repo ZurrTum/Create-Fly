@@ -8,16 +8,18 @@ import com.zurrtum.create.content.processing.basin.BasinBlock;
 import com.zurrtum.create.content.processing.basin.BasinBlockEntity;
 import com.zurrtum.create.infrastructure.particle.FluidParticleData;
 import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.client.particle.BillboardParticleSubmittable;
 import net.minecraft.client.particle.Particle;
 import net.minecraft.client.particle.ParticleFactory;
 import net.minecraft.client.render.Camera;
-import net.minecraft.client.render.VertexConsumer;
+import net.minecraft.client.render.LightmapTextureManager;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.component.ComponentChanges;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.random.Random;
 import org.joml.Quaternionf;
 
 public class BasinFluidParticle extends FluidParticle {
@@ -36,14 +38,15 @@ public class BasinFluidParticle extends FluidParticle {
         double z,
         double vx,
         double vy,
-        double vz
+        double vz,
+        Random random
     ) {
-        super(world, fluid, components, config, x, y, z, vx, vy, vz);
+        super(world, fluid, components, config, x, y, z, vx, vy, vz, random);
         gravityStrength = 0;
         velocityX = 0;
         velocityY = 0;
         velocityZ = 0;
-        yOffset = world.random.nextFloat() * 1 / 32f;
+        yOffset = random.nextFloat() * 1 / 32f;
         y += yOffset;
         scale = 0;
         maxAge = 60;
@@ -77,7 +80,7 @@ public class BasinFluidParticle extends FluidParticle {
                 float totalUnits = ((BasinBlockEntity) blockEntity).getTotalFluidUnits(0);
                 if (totalUnits < 1)
                     totalUnits = 0;
-                float fluidLevel = MathHelper.clamp(totalUnits / 2000, 0, 1);
+                float fluidLevel = MathHelper.clamp(totalUnits / 162000, 0, 1);
                 y = 2 / 16f + basinPos.getY() + 12 / 16f * fluidLevel + yOffset;
             }
 
@@ -92,12 +95,22 @@ public class BasinFluidParticle extends FluidParticle {
     }
 
     @Override
-    public void render(VertexConsumer vb, Camera info, float pt) {
+    protected void updateColor() {
+        this.alpha = 0.9F;
+    }
+
+    @Override
+    protected int getBrightness(float p_189214_1_) {
+        return LightmapTextureManager.MAX_LIGHT_COORDINATE;
+    }
+
+    @Override
+    public void render(BillboardParticleSubmittable submittable, Camera info, float pt) {
         Quaternionf rotation = info.getRotation();
         Quaternionf prevRotation = new Quaternionf(rotation);
-        rotation.set(1, 0, 0, 1);
+        rotation.set(-1, 0, 0, 1);
         rotation.normalize();
-        super.render(vb, info, pt);
+        super.render(submittable, info, pt);
         rotation.set(0, 0, 0, 1);
         rotation.mul(prevRotation);
     }
@@ -109,12 +122,22 @@ public class BasinFluidParticle extends FluidParticle {
 
     public static class Factory implements ParticleFactory<FluidParticleData> {
         @Override
-        public Particle createParticle(FluidParticleData data, ClientWorld world, double x, double y, double z, double vx, double vy, double vz) {
+        public Particle createParticle(
+            FluidParticleData data,
+            ClientWorld world,
+            double x,
+            double y,
+            double z,
+            double vx,
+            double vy,
+            double vz,
+            Random random
+        ) {
             FluidConfig config = AllFluidConfigs.get(data.fluid());
             if (config == null) {
                 return null;
             }
-            return new BasinFluidParticle(world, data.fluid(), data.components(), config, x, y, z, vx, vy, vz);
+            return new BasinFluidParticle(world, data.fluid(), data.components(), config, x, y, z, vx, vy, vz, random);
         }
     }
 }

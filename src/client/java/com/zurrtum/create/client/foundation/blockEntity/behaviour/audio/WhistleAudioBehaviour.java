@@ -1,5 +1,6 @@
 package com.zurrtum.create.client.foundation.blockEntity.behaviour.audio;
 
+import com.zurrtum.create.AllParticleTypes;
 import com.zurrtum.create.AllSoundEvents;
 import com.zurrtum.create.catnip.math.AngleHelper;
 import com.zurrtum.create.catnip.math.VecHelper;
@@ -8,7 +9,6 @@ import com.zurrtum.create.content.decoration.steamWhistle.WhistleBlock;
 import com.zurrtum.create.content.decoration.steamWhistle.WhistleBlock.WhistleSize;
 import com.zurrtum.create.content.decoration.steamWhistle.WhistleBlockEntity;
 import com.zurrtum.create.content.fluids.tank.FluidTankBlockEntity;
-import com.zurrtum.create.infrastructure.particle.SteamJetParticleData;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
@@ -63,6 +63,6 @@ public class WhistleAudioBehaviour extends AudioBehaviour<WhistleBlockEntity> {
         Vec3d offset = VecHelper.rotate(new Vec3d(0, 1, 0.75f), angle, Axis.Y);
         Vec3d v = offset.multiply(.45f).add(sizeOffset).add(Vec3d.ofCenter(pos));
         Vec3d m = offset.subtract(Vec3d.of(facing.getVector()).multiply(.75f));
-        world.addParticleClient(new SteamJetParticleData(1), v.x, v.y, v.z, m.x, m.y, m.z);
+        world.addParticleClient(AllParticleTypes.STEAM_JET, v.x, v.y, v.z, m.x, m.y, m.z);
     }
 }

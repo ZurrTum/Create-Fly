@@ -5,10 +5,10 @@ import net.minecraft.client.render.Camera;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.particle.SimpleParticleType;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.random.Random;
 import org.joml.Quaternionf;
 
 public class WiFiParticle extends CustomRotationParticle {
-
     private final boolean downward;
 
     public WiFiParticle(
@@ -20,7 +20,8 @@ public class WiFiParticle extends CustomRotationParticle {
         double z,
         double vx,
         double vy,
-        double vz
+        double vz,
+        Random random
     ) {
         super(worldIn, x, y + (vy < 0 ? -1 : 1), z, spriteSet, 0);
         this.scale = 0.5f;
@@ -41,7 +42,11 @@ public class WiFiParticle extends CustomRotationParticle {
 
     @Override
     public Quaternionf getCustomRotation(Camera camera, float partialTicks) {
-        return new Quaternionf().rotateY(-camera.getYaw() * MathHelper.RADIANS_PER_DEGREE)
-            .mul(new Quaternionf().rotateZ(downward ? MathHelper.PI : 0));
+        Quaternionf rotation = camera.getRotation();
+        Quaternionf quaternionf = new Quaternionf(0, rotation.y, 0, rotation.w);
+        if (downward) {
+            quaternionf.rotateZ(MathHelper.PI);
+        }
+        return quaternionf;
     }
 }

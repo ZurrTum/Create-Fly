@@ -5,18 +5,17 @@ import com.zurrtum.create.catnip.theme.Color;
 import com.zurrtum.create.client.AllFluidConfigs;
 import com.zurrtum.create.client.infrastructure.fluid.FluidConfig;
 import com.zurrtum.create.infrastructure.particle.FluidParticleData;
+import net.minecraft.client.particle.BillboardParticle;
 import net.minecraft.client.particle.Particle;
 import net.minecraft.client.particle.ParticleFactory;
-import net.minecraft.client.particle.ParticleTextureSheet;
-import net.minecraft.client.particle.SpriteBillboardParticle;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.component.ComponentChanges;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.particle.TintedParticleEffect;
-import org.jetbrains.annotations.NotNull;
+import net.minecraft.util.math.random.Random;
 
-public class FluidParticle extends SpriteBillboardParticle {
+public class FluidParticle extends BillboardParticle {
     private final float uo;
     private final float vo;
     private final Fluid fluid;
@@ -33,19 +32,17 @@ public class FluidParticle extends SpriteBillboardParticle {
         double z,
         double vx,
         double vy,
-        double vz
+        double vz,
+        Random random
     ) {
-        super(world, x, y, z, vx, vy, vz);
+        super(world, x, y, z, vx, vy, vz, config.still().get());
 
         this.fluid = fluid;
         this.components = components;
         this.config = config;
-        this.setSprite(config.still().get());
 
         this.gravityStrength = 1.0F;
-        this.red = 0.8F;
-        this.green = 0.8F;
-        this.blue = 0.8F;
+        this.updateColor();
         this.multiplyColor(config.tint().apply(components));
 
         this.velocityX = vx;
@@ -53,8 +50,8 @@ public class FluidParticle extends SpriteBillboardParticle {
         this.velocityZ = vz;
 
         this.scale /= 2.0F;
-        this.uo = this.random.nextFloat() * 3.0F;
-        this.vo = this.random.nextFloat() * 3.0F;
+        this.uo = random.nextFloat() * 3.0F;
+        this.vo = random.nextFloat() * 3.0F;
     }
 
     @Override
@@ -64,6 +61,12 @@ public class FluidParticle extends SpriteBillboardParticle {
         int blockLight = (brightnessForRender >> 4) & 0xf;
         blockLight = Math.max(blockLight, fluid.getDefaultState().getBlockState().getLuminance());
         return (skyLight << 20) | (blockLight << 4);
+    }
+
+    protected void updateColor() {
+        this.red = 0.8F;
+        this.green = 0.8F;
+        this.blue = 0.8F;
     }
 
     protected void multiplyColor(int color) {
@@ -101,7 +104,7 @@ public class FluidParticle extends SpriteBillboardParticle {
             markDead();
         if (!dead)
             return;
-        if (!onGround && world.random.nextFloat() < 1 / 8f)
+        if (!onGround && random.nextFloat() < 1 / 8f)
             return;
 
         Color color = new Color(config.tint().apply(components));
@@ -126,18 +129,28 @@ public class FluidParticle extends SpriteBillboardParticle {
     }
 
     @Override
-    public @NotNull ParticleTextureSheet getType() {
-        return ParticleTextureSheet.TERRAIN_SHEET;
+    protected RenderType getRenderType() {
+        return BillboardParticle.RenderType.BLOCK_ATLAS_TRANSLUCENT;
     }
 
     public static class Factory implements ParticleFactory<FluidParticleData> {
         @Override
-        public Particle createParticle(FluidParticleData data, ClientWorld world, double x, double y, double z, double vx, double vy, double vz) {
+        public Particle createParticle(
+            FluidParticleData data,
+            ClientWorld world,
+            double x,
+            double y,
+            double z,
+            double vx,
+            double vy,
+            double vz,
+            Random random
+        ) {
             FluidConfig config = AllFluidConfigs.get(data.fluid());
             if (config == null) {
                 return null;
             }
-            return new FluidParticle(world, data.fluid(), data.components(), config, x, y, z, vx, vy, vz);
+            return new FluidParticle(world, data.fluid(), data.components(), config, x, y, z, vx, vy, vz, random);
         }
     }
 }

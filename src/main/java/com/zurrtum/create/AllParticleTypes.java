@@ -25,11 +25,7 @@ public class AllParticleTypes {
         AirFlowParticleData.STREAM_CODEC
     );
     public static final ParticleType<AirParticleData> AIR = register("air", AirParticleData.CODEC, AirParticleData.STREAM_CODEC);
-    public static final ParticleType<SteamJetParticleData> STEAM_JET = register(
-        "steam_jet",
-        SteamJetParticleData.CODEC,
-        SteamJetParticleData.STREAM_CODEC
-    );
+    public static final SimpleParticleType STEAM_JET = register("steam_jet");
     public static final ParticleType<CubeParticleData> CUBE = register("cube", CubeParticleData.CODEC, CubeParticleData.STREAM_CODEC);
     public static final ParticleType<FluidParticleData> FLUID_PARTICLE = register(
         "fluid_particle",

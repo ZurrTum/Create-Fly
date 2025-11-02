@@ -7,6 +7,7 @@ import net.minecraft.client.world.ClientWorld;
 import net.minecraft.particle.SimpleParticleType;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RotationAxis;
+import net.minecraft.util.math.random.Random;
 import org.joml.Quaternionf;
 
 public class SoulBaseParticle extends CustomRotationParticle {
@@ -20,13 +21,14 @@ public class SoulBaseParticle extends CustomRotationParticle {
         double z,
         double vx,
         double vy,
-        double vz
+        double vz,
+        Random random
     ) {
         super(worldIn, x, y, z, spriteSet, 0);
         this.scale = 0.5f;
         this.setBoundingBoxSpacing(this.scale, this.scale);
-        this.loopLength = 16 + (int) (this.random.nextFloat() * 2f - 1f);
-        this.maxAge = (int) (90.0F / (this.random.nextFloat() * 0.36F + 0.64F));
+        this.loopLength = 16 + (int) (random.nextFloat() * 2f - 1f);
+        this.maxAge = (int) (90.0F / (random.nextFloat() * 0.36F + 0.64F));
         this.selectSpriteLoopingWithAge(spriteProvider);
         this.stopped = true; // disable movement
     }
@@ -42,6 +44,6 @@ public class SoulBaseParticle extends CustomRotationParticle {
 
     @Override
     public Quaternionf getCustomRotation(Camera camera, float partialTicks) {
-        return RotationAxis.POSITIVE_X.rotationDegrees(90);
+        return RotationAxis.POSITIVE_X.rotationDegrees(-90);
     }
 }

@@ -12,6 +12,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.random.Random;
 
 public class AirParticle extends AnimatedParticle {
 
@@ -31,9 +32,10 @@ public class AirParticle extends AnimatedParticle {
         double dx,
         double dy,
         double dz,
-        SpriteProvider sprite
+        SpriteProvider sprite,
+        Random random
     ) {
-        super(world, x, y, z, sprite, world.random.nextFloat() * .5f);
+        super(world, x, y, z, sprite, random.nextFloat() * .5f);
         scale *= 0.75F;
         collidesWithWorld = false;
 
@@ -46,9 +48,9 @@ public class AirParticle extends AnimatedParticle {
         targetZ = (float) (z + dz);
         drag = data.drag();
 
-        twirlRadius = world.random.nextFloat() / 6;
-        twirlAngleOffset = world.random.nextFloat() * 360;
-        twirlAxis = world.random.nextBoolean() ? Direction.Axis.X : Direction.Axis.Z;
+        twirlRadius = random.nextFloat() / 6;
+        twirlAngleOffset = random.nextFloat() * 360;
+        twirlAxis = random.nextBoolean() ? Direction.Axis.X : Direction.Axis.Z;
 
         // speed in m/ticks
         double length = new Vec3d(dx, dy, dz).length();
@@ -112,9 +114,10 @@ public class AirParticle extends AnimatedParticle {
             double z,
             double xSpeed,
             double ySpeed,
-            double zSpeed
+            double zSpeed,
+            Random random
         ) {
-            return new AirParticle(worldIn, data, x, y, z, xSpeed, ySpeed, zSpeed, this.spriteSet);
+            return new AirParticle(worldIn, data, x, y, z, xSpeed, ySpeed, zSpeed, this.spriteSet, random);
         }
     }
 

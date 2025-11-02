@@ -12,11 +12,10 @@ import net.minecraft.client.particle.AnimatedParticle;
 import net.minecraft.client.particle.Particle;
 import net.minecraft.client.particle.ParticleFactory;
 import net.minecraft.client.particle.SpriteProvider;
-import net.minecraft.client.render.Camera;
-import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.util.math.Direction.Axis;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.random.Random;
 
 public class RotationIndicatorParticle extends AnimatedParticle {
 
@@ -39,7 +38,8 @@ public class RotationIndicatorParticle extends AnimatedParticle {
         float speed,
         Axis axis,
         int lifeSpan,
-        SpriteProvider sprite
+        SpriteProvider sprite,
+        Random random
     ) {
         super(world, x, y, z, sprite, 0);
         this.velocityX = 0;
@@ -47,7 +47,7 @@ public class RotationIndicatorParticle extends AnimatedParticle {
         this.velocityZ = 0;
         this.origin = new Vec3d(x, y, z);
         this.scale *= 0.75F;
-        this.maxAge = lifeSpan + this.random.nextInt(32);
+        this.maxAge = lifeSpan + random.nextInt(32);
         this.setTargetColor(color);
         this.setColor(Color.mixColors(color, 0xFFFFFF, .5f));
         this.updateSprite(sprite);
@@ -67,11 +67,6 @@ public class RotationIndicatorParticle extends AnimatedParticle {
     public void tick() {
         super.tick();
         radius += (radius2 - radius) * .1f;
-    }
-
-    @Override
-    public void render(VertexConsumer buffer, Camera renderInfo, float partialTicks) {
-        super.render(buffer, renderInfo, partialTicks);
     }
 
     public void move(double x, double y, double z) {
@@ -100,7 +95,8 @@ public class RotationIndicatorParticle extends AnimatedParticle {
             double z,
             double xSpeed,
             double ySpeed,
-            double zSpeed
+            double zSpeed,
+            Random random
         ) {
             MinecraftClient mc = MinecraftClient.getInstance();
             ClientPlayerEntity player = mc.player;
@@ -118,7 +114,8 @@ public class RotationIndicatorParticle extends AnimatedParticle {
                 data.speed(),
                 data.axis(),
                 data.lifeSpan(),
-                this.spriteSet
+                this.spriteSet,
+                random
             );
         }
     }

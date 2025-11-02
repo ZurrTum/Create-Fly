@@ -1,60 +1,42 @@
 package com.zurrtum.create.client.infrastructure.particle;
 
-import com.zurrtum.create.client.foundation.render.AllRenderPipelines;
-import com.zurrtum.create.client.ponder.enums.PonderSpecialTextures;
 import com.zurrtum.create.infrastructure.particle.CubeParticleData;
 import net.minecraft.client.particle.Particle;
 import net.minecraft.client.particle.ParticleFactory;
 import net.minecraft.client.particle.ParticleTextureSheet;
-import net.minecraft.client.render.*;
-import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.client.render.Camera;
+import net.minecraft.client.render.Frustum;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.ColorHelper;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
-
-import static com.zurrtum.create.Create.MOD_ID;
+import net.minecraft.util.math.random.Random;
 
 public class CubeParticle extends Particle {
-    private static final RenderLayer LAYER = RenderLayer.of(
-        MOD_ID + ":cube",
-        1536,
-        false,
-        false,
-        AllRenderPipelines.CUBE,
-        RenderLayer.MultiPhaseParameters.builder().texture(new RenderPhase.Texture(PonderSpecialTextures.BLANK.getLocation(), false))
-            .target(RenderLayer.PARTICLES_TARGET).lightmap(RenderLayer.ENABLE_LIGHTMAP).build(false)
-    );
-
-    public static final Vec3d[] CUBE = {
-        // TOP
-        new Vec3d(1, 1, -1), new Vec3d(1, 1, 1), new Vec3d(-1, 1, 1), new Vec3d(-1, 1, -1),
-
-        // BOTTOM
-        new Vec3d(-1, -1, -1), new Vec3d(-1, -1, 1), new Vec3d(1, -1, 1), new Vec3d(1, -1, -1),
-
-        // FRONT
-        new Vec3d(-1, -1, 1), new Vec3d(-1, 1, 1), new Vec3d(1, 1, 1), new Vec3d(1, -1, 1),
-
-        // BACK
-        new Vec3d(1, -1, -1), new Vec3d(1, 1, -1), new Vec3d(-1, 1, -1), new Vec3d(-1, -1, -1),
-
-        // LEFT
-        new Vec3d(-1, -1, -1), new Vec3d(-1, 1, -1), new Vec3d(-1, 1, 1), new Vec3d(-1, -1, 1),
-
-        // RIGHT
-        new Vec3d(1, -1, 1), new Vec3d(1, 1, 1), new Vec3d(1, 1, -1), new Vec3d(1, -1, -1)};
-
     protected float scale;
     protected boolean hot;
+    protected float red = 1.0F;
+    protected float green = 1.0F;
+    protected float blue = 1.0F;
+    protected float alpha = 1.0F;
 
-    public CubeParticle(ClientWorld world, double x, double y, double z, double motionX, double motionY, double motionZ) {
+    public CubeParticle(ClientWorld world, CubeParticleData data, double x, double y, double z, double motionX, double motionY, double motionZ) {
         super(world, x, y, z);
         this.velocityX = motionX;
         this.velocityY = motionY;
         this.velocityZ = motionZ;
 
-        setScale(0.2F);
+        setColor(data.red(), data.green(), data.blue());
+        setScale(data.scale());
+        averageAge(data.avgAge());
+        setHot(data.hot());
+    }
+
+    public void setColor(float red, float green, float blue) {
+        this.red = red;
+        this.green = green;
+        this.blue = blue;
     }
 
     public void setScale(float scale) {
@@ -93,37 +75,24 @@ public class CubeParticle extends Particle {
         super.tick();
     }
 
-    @Override
-    public void render(VertexConsumer vertexConsumer, Camera camera, float tickProgress) {
-    }
-
-    @Override
-    public void renderCustom(MatrixStack matrices, VertexConsumerProvider vertexConsumers, Camera renderInfo, float tickProgress) {
-        VertexConsumer buffer = vertexConsumers.getBuffer(LAYER);
-        Vec3d projectedView = renderInfo.getPos();
+    public void render(CubeParticleSubmittable submittable, Camera camera, float tickProgress) {
+        Vec3d projectedView = camera.getPos();
         float lerpedX = (float) (MathHelper.lerp(tickProgress, this.lastX, this.x) - projectedView.getX());
         float lerpedY = (float) (MathHelper.lerp(tickProgress, this.lastY, this.y) - projectedView.getY());
         float lerpedZ = (float) (MathHelper.lerp(tickProgress, this.lastZ, this.z) - projectedView.getZ());
-
-        // int light = getBrightnessForRender(p_225606_3_);
-        int light = LightmapTextureManager.MAX_LIGHT_COORDINATE;
         double ageMultiplier = 1 - Math.pow(MathHelper.clamp(age + tickProgress, 0, maxAge), 3) / Math.pow(maxAge, 3);
-
-        for (int i = 0; i < 6; i++) {
-            // 6 faces to a cube
-            for (int j = 0; j < 4; j++) {
-                Vec3d vec = CUBE[i * 4 + j].multiply(-1);
-                vec = vec
-                    /* .rotate(?) */.multiply(scale * ageMultiplier).add(lerpedX, lerpedY, lerpedZ);
-
-                buffer.vertex((float) vec.x, (float) vec.y, (float) vec.z).texture((float) j / 2, j % 2).color(red, green, blue, alpha).light(light);
-            }
-        }
+        float scale = (float) (this.scale * ageMultiplier);
+        int color = ColorHelper.fromFloats(alpha, red, green, blue);
+        submittable.render(lerpedX, lerpedY, lerpedZ, scale, color);
     }
 
     @Override
-    public ParticleTextureSheet getType() {
-        return ParticleTextureSheet.CUSTOM;
+    public ParticleTextureSheet textureSheet() {
+        return CubeParticleRenderer.SHEET;
+    }
+
+    public boolean shouldRender(Frustum frustum) {
+        return frustum.intersectPoint(x, y, z);
     }
 
     public static class Factory implements ParticleFactory<CubeParticleData> {
@@ -137,14 +106,10 @@ public class CubeParticle extends Particle {
             double z,
             double motionX,
             double motionY,
-            double motionZ
+            double motionZ,
+            Random random
         ) {
-            CubeParticle particle = new CubeParticle(world, x, y, z, motionX, motionY, motionZ);
-            particle.setColor(data.red(), data.green(), data.blue());
-            particle.setScale(data.scale());
-            particle.averageAge(data.avgAge());
-            particle.setHot(data.hot());
-            return particle;
+            return new CubeParticle(world, data, x, y, z, motionX, motionY, motionZ);
         }
     }
 }
