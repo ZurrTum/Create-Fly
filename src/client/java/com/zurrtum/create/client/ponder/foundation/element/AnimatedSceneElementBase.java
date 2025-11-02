@@ -3,9 +3,16 @@ package com.zurrtum.create.client.ponder.foundation.element;
 import com.zurrtum.create.catnip.animation.LerpedFloat;
 import com.zurrtum.create.client.ponder.api.element.AnimatedSceneElement;
 import com.zurrtum.create.client.ponder.api.level.PonderLevel;
+import net.minecraft.client.item.ItemModelManager;
 import net.minecraft.client.render.BlockRenderLayer;
+import net.minecraft.client.render.Camera;
 import net.minecraft.client.render.LightmapTextureManager;
 import net.minecraft.client.render.VertexConsumerProvider;
+import net.minecraft.client.render.block.BlockRenderManager;
+import net.minecraft.client.render.block.entity.BlockEntityRenderManager;
+import net.minecraft.client.render.command.OrderedRenderCommandQueue;
+import net.minecraft.client.render.entity.EntityRenderManager;
+import net.minecraft.client.render.state.CameraRenderState;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
@@ -35,10 +42,20 @@ public abstract class AnimatedSceneElementBase extends PonderElementBase impleme
     }
 
     @Override
-    public final void renderFirst(PonderLevel world, VertexConsumerProvider buffer, MatrixStack poseStack, float pt) {
+    public final void renderFirst(
+        BlockEntityRenderManager blockEntityRenderDispatcher,
+        BlockRenderManager blockRenderManager,
+        PonderLevel world,
+        VertexConsumerProvider buffer,
+        OrderedRenderCommandQueue queue,
+        Camera camera,
+        CameraRenderState cameraRenderState,
+        MatrixStack poseStack,
+        float pt
+    ) {
         poseStack.push();
         float currentFade = applyFade(poseStack, pt);
-        renderFirst(world, buffer, poseStack, currentFade, pt);
+        renderFirst(blockEntityRenderDispatcher, blockRenderManager, world, buffer, queue, camera, cameraRenderState, poseStack, currentFade, pt);
         poseStack.pop();
     }
 
@@ -51,10 +68,20 @@ public abstract class AnimatedSceneElementBase extends PonderElementBase impleme
     }
 
     @Override
-    public final void renderLast(PonderLevel world, VertexConsumerProvider buffer, MatrixStack poseStack, float pt) {
+    public final void renderLast(
+        EntityRenderManager entityRenderManager,
+        ItemModelManager itemModelManager,
+        PonderLevel world,
+        VertexConsumerProvider buffer,
+        OrderedRenderCommandQueue queue,
+        Camera camera,
+        CameraRenderState cameraRenderState,
+        MatrixStack poseStack,
+        float pt
+    ) {
         poseStack.push();
         float currentFade = applyFade(poseStack, pt);
-        renderLast(world, buffer, poseStack, currentFade, pt);
+        renderLast(entityRenderManager, itemModelManager, world, buffer, queue, camera, cameraRenderState, poseStack, currentFade, pt);
         poseStack.pop();
     }
 
@@ -71,10 +98,32 @@ public abstract class AnimatedSceneElementBase extends PonderElementBase impleme
     protected void renderLayer(PonderLevel world, VertexConsumerProvider buffer, BlockRenderLayer type, MatrixStack ms, float fade, float pt) {
     }
 
-    protected void renderFirst(PonderLevel world, VertexConsumerProvider buffer, MatrixStack ms, float fade, float pt) {
+    protected void renderFirst(
+        BlockEntityRenderManager blockEntityRenderDispatcher,
+        BlockRenderManager blockRenderManager,
+        PonderLevel world,
+        VertexConsumerProvider buffer,
+        OrderedRenderCommandQueue queue,
+        Camera camera,
+        CameraRenderState cameraRenderState,
+        MatrixStack ms,
+        float fade,
+        float pt
+    ) {
     }
 
-    protected void renderLast(PonderLevel world, VertexConsumerProvider buffer, MatrixStack ms, float fade, float pt) {
+    protected void renderLast(
+        EntityRenderManager entityRenderManager,
+        ItemModelManager itemModelManager,
+        PonderLevel world,
+        VertexConsumerProvider buffer,
+        OrderedRenderCommandQueue queue,
+        Camera camera,
+        CameraRenderState cameraRenderState,
+        MatrixStack ms,
+        float fade,
+        float pt
+    ) {
     }
 
     protected int lightCoordsFromFade(float fade) {

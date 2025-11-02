@@ -22,10 +22,18 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.ShapeContext;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityTicker;
+import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.item.ItemModelManager;
 import net.minecraft.client.render.*;
+import net.minecraft.client.render.block.BlockRenderManager;
+import net.minecraft.client.render.block.entity.BlockEntityRenderManager;
 import net.minecraft.client.render.block.entity.BlockEntityRenderer;
+import net.minecraft.client.render.block.entity.state.BlockEntityRenderState;
+import net.minecraft.client.render.command.OrderedRenderCommandQueue;
+import net.minecraft.client.render.entity.EntityRenderManager;
 import net.minecraft.client.render.model.ModelBaker;
+import net.minecraft.client.render.state.CameraRenderState;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
@@ -290,7 +298,18 @@ public class WorldSectionElementImpl extends AnimatedSceneElementBase implements
     }
 
     @Override
-    public void renderFirst(PonderLevel world, VertexConsumerProvider buffer, MatrixStack poseStack, float fade, float pt) {
+    public void renderFirst(
+        BlockEntityRenderManager blockEntityRenderDispatcher,
+        BlockRenderManager blockRenderManager,
+        PonderLevel world,
+        VertexConsumerProvider buffer,
+        OrderedRenderCommandQueue queue,
+        Camera camera,
+        CameraRenderState cameraRenderState,
+        MatrixStack poseStack,
+        float fade,
+        float pt
+    ) {
         int light = -1;
         if (fade != 1)
             light = MathHelper.lerp(fade, 5, 15);
@@ -302,7 +321,7 @@ public class WorldSectionElementImpl extends AnimatedSceneElementBase implements
         poseStack.push();
         transformMS(poseStack, pt);
         world.pushFakeLight(light);
-        renderBlockEntities(world, poseStack, buffer, pt);
+        renderBlockEntities(blockEntityRenderDispatcher, world, poseStack, queue, camera, cameraRenderState, pt);
         world.popLight();
 
         Map<BlockPos, Integer> blockBreakingProgressions = world.getBlockBreakingProgressions();
@@ -328,7 +347,7 @@ public class WorldSectionElementImpl extends AnimatedSceneElementBase implements
 
             poseStack.push();
             poseStack.translate(pos.getX(), pos.getY(), pos.getZ());
-            MinecraftClient.getInstance().getBlockRenderManager().renderDamage(world.getBlockState(pos), pos, world, poseStack, builder);
+            blockRenderManager.renderDamage(world.getBlockState(pos), pos, world, poseStack, builder);
             poseStack.pop();
         }
 
@@ -360,11 +379,22 @@ public class WorldSectionElementImpl extends AnimatedSceneElementBase implements
             case TRANSLUCENT -> PonderRenderTypes.translucent();
             case TRIPWIRE -> RenderLayer.getTripwire();
         };
-        structureBuffer.light(light).renderInto(poseStack, buffer.getBuffer(layer));
+        structureBuffer.light(light).renderInto(poseStack.peek(), buffer.getBuffer(layer));
     }
 
     @Override
-    protected void renderLast(PonderLevel world, VertexConsumerProvider buffer, MatrixStack poseStack, float fade, float pt) {
+    protected void renderLast(
+        EntityRenderManager entityRenderManager,
+        ItemModelManager itemModelManager,
+        PonderLevel world,
+        VertexConsumerProvider buffer,
+        OrderedRenderCommandQueue queue,
+        Camera camera,
+        CameraRenderState cameraRenderState,
+        MatrixStack poseStack,
+        float fade,
+        float pt
+    ) {
         redraw = false;
         if (selectedBlock == null)
             return;
@@ -387,15 +417,22 @@ public class WorldSectionElementImpl extends AnimatedSceneElementBase implements
         poseStack.pop();
     }
 
-    private void renderBlockEntities(PonderLevel world, MatrixStack ms, VertexConsumerProvider buffer, float pt) {
+    private void renderBlockEntities(
+        BlockEntityRenderManager dispatcher,
+        PonderLevel world,
+        MatrixStack ms,
+        OrderedRenderCommandQueue queue,
+        Camera camera,
+        CameraRenderState cameraRenderState,
+        float pt
+    ) {
         loadBEsIfMissing(world);
 
         Iterator<BlockEntity> iterator = renderedBlockEntities.iterator();
-        MinecraftClient mc = MinecraftClient.getInstance();
-        Vec3d cameraPos = mc.gameRenderer.getCamera().getCameraPos();
+        Vec3d cameraPos = camera.getCameraPos();
         while (iterator.hasNext()) {
             BlockEntity tile = iterator.next();
-            BlockEntityRenderer<BlockEntity> renderer = mc.getBlockEntityRenderDispatcher().get(tile);
+            BlockEntityRenderer<BlockEntity, BlockEntityRenderState> renderer = dispatcher.get(tile);
             if (renderer == null) {
                 iterator.remove();
                 continue;
@@ -406,8 +443,11 @@ public class WorldSectionElementImpl extends AnimatedSceneElementBase implements
             ms.translate(pos.getX(), pos.getY(), pos.getZ());
 
             try {
-                renderer.render(tile, pt, ms, buffer, WorldRenderer.getLightmapCoordinates(world, pos), OverlayTexture.DEFAULT_UV, cameraPos);
-
+                BlockEntityRenderState state = renderer.createRenderState();
+                renderer.updateRenderState(tile, state, pt, cameraPos, null);
+                if (state.type != BlockEntityType.TEST_BLOCK) {
+                    renderer.render(state, ms, queue, cameraRenderState);
+                }
             } catch (Exception e) {
                 iterator.remove();
                 String message = "BlockEntity " + RegisteredObjectsHelper.getKeyOrThrow(tile.getType()) + " could not be rendered virtually.";

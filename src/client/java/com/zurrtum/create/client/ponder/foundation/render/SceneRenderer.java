@@ -18,8 +18,11 @@ import net.minecraft.client.gui.render.SpecialGuiElementRenderer;
 import net.minecraft.client.gui.render.state.GuiRenderState;
 import net.minecraft.client.gui.render.state.TexturedQuadGuiElementRenderState;
 import net.minecraft.client.render.DiffuseLighting;
+import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.render.VertexConsumerProvider;
+import net.minecraft.client.render.command.OrderedRenderCommandQueueImpl;
+import net.minecraft.client.render.command.RenderDispatcher;
 import net.minecraft.client.texture.TextureSetup;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.RotationAxis;
@@ -57,13 +60,16 @@ public class SceneRenderer extends SpecialGuiElementRenderer<SceneRenderState> {
         matrices.scale(windowScaleFactor, windowScaleFactor, 1);
 
         MinecraftClient mc = MinecraftClient.getInstance();
-        DiffuseLighting lighting = mc.gameRenderer.getDiffuseLighting();
+        GameRenderer gameRenderer = mc.gameRenderer;
+        DiffuseLighting lighting = gameRenderer.getDiffuseLighting();
+        RenderDispatcher renderDispatcher = gameRenderer.getEntityRenderDispatcher();
         lighting.updateBuffer(DiffuseLighting.Type.LEVEL, DIFFUSE_LIGHT_0, DIFFUSE_LIGHT_1);
         lighting.setShaderLights(DiffuseLighting.Type.LEVEL);
-        renderScene(renderState, matrices);
-        lighting.updateLevelBuffer(mc.world.getDimensionEffects().isDarkened());
-
+        OrderedRenderCommandQueueImpl queue = renderDispatcher.getQueue();
+        renderScene(mc, renderState, matrices, queue);
+        renderDispatcher.render();
         vertexConsumers.draw();
+        lighting.updateLevelBuffer(mc.world.getDimensionEffects().isDarkened());
         matrices.pop();
         texture.clear();
         state.addSimpleElementToCurrentLayer(new TexturedQuadGuiElementRenderState(
@@ -84,7 +90,7 @@ public class SceneRenderer extends SpecialGuiElementRenderer<SceneRenderState> {
         ));
     }
 
-    private void renderScene(SceneRenderState state, MatrixStack poseStack) {
+    private void renderScene(MinecraftClient mc, SceneRenderState state, MatrixStack poseStack, OrderedRenderCommandQueueImpl queue) {
         float partialTicks = state.partialTicks();
         SuperRenderTypeBuffer buffer = DefaultSuperRenderTypeBuffer.getInstance();
         PonderScene scene = state.scene();
@@ -93,8 +99,6 @@ public class SceneRenderer extends SpecialGuiElementRenderer<SceneRenderState> {
         transform.updateScreenParams(state.width(), state.height(), state.slide());
         transform.apply(poseStack, partialTicks);
         transform.updateSceneRVE(partialTicks);
-        scene.renderScene(buffer, poseStack, partialTicks);
-        buffer.draw();
 
         // kool shadow fx
         if (!scene.shouldHidePlatformShadow()) {
@@ -146,6 +150,9 @@ public class SceneRenderer extends SpecialGuiElementRenderer<SceneRenderState> {
             }
             poseStack.pop();
         }
+        vertexConsumers.draw();
+        scene.renderScene(mc, buffer, queue, poseStack, partialTicks);
+        buffer.draw();
 
         //TODO
         // coords for debug

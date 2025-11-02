@@ -1,9 +1,6 @@
 package com.zurrtum.create.client.ponder.api.level;
 
-import com.google.common.base.Suppliers;
 import com.zurrtum.create.catnip.levelWrappers.SchematicLevel;
-import com.zurrtum.create.client.catnip.levelWrappers.WrappedClientLevel;
-import com.zurrtum.create.client.catnip.render.SuperRenderTypeBuffer;
 import com.zurrtum.create.client.ponder.Ponder;
 import com.zurrtum.create.client.ponder.api.element.WorldSectionElement;
 import com.zurrtum.create.client.ponder.api.scene.Selection;
@@ -19,15 +16,13 @@ import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.particle.Particle;
-import net.minecraft.client.particle.ParticleFactory;
 import net.minecraft.client.render.Camera;
-import net.minecraft.client.render.RenderLayer;
-import net.minecraft.client.render.TexturedRenderLayers;
-import net.minecraft.client.render.VertexConsumerProvider;
-import net.minecraft.client.render.entity.EntityRenderDispatcher;
-import net.minecraft.client.texture.SpriteAtlasTexture;
+import net.minecraft.client.render.command.OrderedRenderCommandQueue;
+import net.minecraft.client.render.command.OrderedRenderCommandQueueImpl;
+import net.minecraft.client.render.entity.EntityRenderManager;
+import net.minecraft.client.render.entity.state.EntityRenderState;
+import net.minecraft.client.render.state.CameraRenderState;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.SpawnReason;
@@ -37,7 +32,6 @@ import net.minecraft.particle.BlockStateParticleEffect;
 import net.minecraft.particle.ParticleEffect;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.registry.DynamicRegistryManager;
-import net.minecraft.registry.Registries;
 import net.minecraft.storage.NbtReadView;
 import net.minecraft.storage.NbtWriteView;
 import net.minecraft.storage.ReadView;
@@ -55,7 +49,6 @@ import net.minecraft.world.chunk.WorldChunk;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
-import java.util.function.Supplier;
 
 public class PonderLevel extends SchematicLevel {
 
@@ -66,7 +59,6 @@ public class PonderLevel extends SchematicLevel {
     protected Map<BlockPos, NbtCompound> originalBlockEntities;
     protected Map<BlockPos, Integer> blockBreakingProgressions;
     protected List<Entity> originalEntities;
-    private final Supplier<ClientWorld> asClientWorld = Suppliers.memoize(() -> WrappedClientLevel.of(this));
     @Nullable
     private Long2ObjectMap<PonderChunk> chunks;
 
@@ -184,39 +176,41 @@ public class PonderLevel extends SchematicLevel {
         return this;
     }
 
-    @SuppressWarnings("deprecation")
-    public void renderEntities(MatrixStack ms, SuperRenderTypeBuffer buffer, Camera ari, float pt) {
+    public void renderEntities(MatrixStack ms, OrderedRenderCommandQueue queue, Camera ari, CameraRenderState cameraRenderState, float pt) {
         Vec3d Vector3d = ari.getPos();
         double d0 = Vector3d.getX();
         double d1 = Vector3d.getY();
         double d2 = Vector3d.getZ();
 
+        MinecraftClient mc = MinecraftClient.getInstance();
+        EntityRenderManager renderManager = mc.getEntityRenderDispatcher();
         for (Entity entity : entities) {
             if (entity.age == 0) {
                 entity.lastRenderX = entity.getX();
                 entity.lastRenderY = entity.getY();
                 entity.lastRenderZ = entity.getZ();
             }
-            renderEntity(entity, d0, d1, d2, pt, ms, buffer);
+            renderEntity(renderManager, entity, cameraRenderState, d0, d1, d2, pt, ms, queue);
         }
-
-        buffer.draw(TexturedRenderLayers.getEntitySolid());
-        buffer.draw(TexturedRenderLayers.getEntityCutout());
-        buffer.draw(RenderLayer.getEntityCutoutNoCull(SpriteAtlasTexture.BLOCK_ATLAS_TEXTURE));
-        buffer.draw(RenderLayer.getEntitySmoothCutout(SpriteAtlasTexture.BLOCK_ATLAS_TEXTURE));
     }
 
-    private void renderEntity(Entity entity, double x, double y, double z, float pt, MatrixStack ms, VertexConsumerProvider buffer) {
-        double d0 = MathHelper.lerp(pt, entity.lastRenderX, entity.getX());
-        double d1 = MathHelper.lerp(pt, entity.lastRenderY, entity.getY());
-        double d2 = MathHelper.lerp(pt, entity.lastRenderZ, entity.getZ());
-        EntityRenderDispatcher renderManager = MinecraftClient.getInstance().getEntityRenderDispatcher();
-        int light = renderManager.getRenderer(entity).getLight(entity, pt);
-        renderManager.render(entity, d0 - x, d1 - y, d2 - z, pt, ms, buffer, light);
+    private void renderEntity(
+        EntityRenderManager renderManager,
+        Entity entity,
+        CameraRenderState cameraRenderState,
+        double x,
+        double y,
+        double z,
+        float pt,
+        MatrixStack ms,
+        OrderedRenderCommandQueue queue
+    ) {
+        EntityRenderState state = renderManager.getAndUpdateRenderState(entity, pt);
+        renderManager.render(state, cameraRenderState, state.x - x, state.y - y, state.z - z, ms, queue);
     }
 
-    public void renderParticles(MatrixStack ms, SuperRenderTypeBuffer buffer, Camera ari, float pt) {
-        particles.renderParticles(ms, buffer, ari, pt);
+    public void renderParticles(MatrixStack ms, OrderedRenderCommandQueueImpl queue, Camera ari, CameraRenderState cameraRenderState, float pt) {
+        particles.renderParticles(ms, queue, ari, cameraRenderState, pt);
     }
 
     public void tick() {
@@ -245,20 +239,12 @@ public class PonderLevel extends SchematicLevel {
 
     @Override
     public void addParticleClient(ParticleEffect data, double x, double y, double z, double mx, double my, double mz) {
-        addParticle(makeParticle(data, x, y, z, mx, my, mz));
+        particles.addParticle(data, x, y, z, mx, my, mz);
     }
 
     @Override
     public void addImportantParticleClient(ParticleEffect data, double x, double y, double z, double mx, double my, double mz) {
         addParticleClient(data, x, y, z, mx, my, mz);
-    }
-
-    @Nullable
-    @SuppressWarnings("unchecked")
-    private <T extends ParticleEffect> Particle makeParticle(T data, double x, double y, double z, double mx, double my, double mz) {
-        ParticleFactory<T> particleFactory = (ParticleFactory<T>) MinecraftClient.getInstance().particleManager.factories.get(Registries.PARTICLE_TYPE.getRawId(
-            data.getType()));
-        return particleFactory == null ? null : particleFactory.createParticle(data, asClientWorld.get(), x, y, z, mx, my, mz);
     }
 
     public void addParticle(@Nullable Particle p) {

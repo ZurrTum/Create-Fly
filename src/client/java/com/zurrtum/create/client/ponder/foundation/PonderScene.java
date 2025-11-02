@@ -22,9 +22,15 @@ import it.unimi.dsi.fastutil.ints.IntList;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.item.ItemModelManager;
 import net.minecraft.client.render.BlockRenderLayer;
 import net.minecraft.client.render.Camera;
 import net.minecraft.client.render.DiffuseLighting;
+import net.minecraft.client.render.block.BlockRenderManager;
+import net.minecraft.client.render.block.entity.BlockEntityRenderManager;
+import net.minecraft.client.render.command.OrderedRenderCommandQueueImpl;
+import net.minecraft.client.render.entity.EntityRenderManager;
+import net.minecraft.client.render.state.CameraRenderState;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.decoration.ArmorStandEntity;
@@ -69,6 +75,7 @@ public class PonderScene {
     private final String namespace;
     private final Identifier location;
     private final SceneCamera camera;
+    private final CameraRenderState cameraRenderState;
     private final Outliner outliner;
     private SceneTransform transform;
     //	private String defaultTitle;
@@ -124,6 +131,7 @@ public class PonderScene {
         transform = new SceneTransform();
         basePlateSize = getBounds().getBlockCountX();
         camera = new SceneCamera();
+        cameraRenderState = new CameraRenderState();
         baseWorldSection = new WorldSectionElementImpl();
         keyframeTimes = new IntArrayList(4);
         scaleFactor = 1;
@@ -228,25 +236,39 @@ public class PonderScene {
         activeSchedule.add(new HideAllInstruction(10, null));
     }
 
-    public void renderScene(SuperRenderTypeBuffer buffer, MatrixStack ms, float pt) {
+    public void renderScene(MinecraftClient mc, SuperRenderTypeBuffer buffer, OrderedRenderCommandQueueImpl queue, MatrixStack ms, float pt) {
         ms.push();
-        MinecraftClient mc = MinecraftClient.getInstance();
         Entity prevRVE = mc.getCameraEntity();
 
+        camera.set(transform.xRotation.getValue(pt) + 90, transform.yRotation.getValue(pt) + 180);
+        cameraRenderState.initialized = true;
+        cameraRenderState.pos = camera.getPos();
+        cameraRenderState.blockPos = camera.getBlockPos();
+        cameraRenderState.entityPos = renderViewEntity.getLerpedPos(pt);
+        cameraRenderState.orientation.set(camera.getRotation());
         mc.setCameraEntity(renderViewEntity);
-        forEachVisible(PonderSceneElement.class, e -> e.renderFirst(world, buffer, ms, pt));
+        BlockEntityRenderManager blockEntityRenderManager = mc.getBlockEntityRenderDispatcher();
+        BlockRenderManager blockRenderManager = mc.getBlockRenderManager();
+        EntityRenderManager entityRenderDispatcher = mc.getEntityRenderDispatcher();
+        ItemModelManager itemModelManager = mc.getItemModelManager();
+        forEachVisible(
+            PonderSceneElement.class,
+            e -> e.renderFirst(blockEntityRenderManager, blockRenderManager, world, buffer, queue, camera, cameraRenderState, ms, pt)
+        );
         mc.setCameraEntity(prevRVE);
 
         for (BlockRenderLayer type : BlockRenderLayer.values())
             forEachVisible(PonderSceneElement.class, e -> e.renderLayer(world, buffer, type, ms, pt));
 
-        forEachVisible(PonderSceneElement.class, e -> e.renderLast(world, buffer, ms, pt));
-        camera.set(transform.xRotation.getValue(pt) + 90, transform.yRotation.getValue(pt) + 180);
+        forEachVisible(
+            PonderSceneElement.class,
+            e -> e.renderLast(entityRenderDispatcher, itemModelManager, world, buffer, queue, camera, cameraRenderState, ms, pt)
+        );
         DiffuseLighting lighting = mc.gameRenderer.getDiffuseLighting();
         lighting.setShaderLights(DiffuseLighting.Type.ENTITY_IN_UI);
-        world.renderEntities(ms, buffer, camera, pt);
+        world.renderEntities(ms, queue, camera, cameraRenderState, pt);
         lighting.setShaderLights(DiffuseLighting.Type.LEVEL);
-        world.renderParticles(ms, buffer, camera, pt);
+        world.renderParticles(ms, queue, camera, cameraRenderState, pt);
         outliner.renderOutlines(mc, ms, buffer, Vec3d.ZERO, pt);
 
         ms.pop();

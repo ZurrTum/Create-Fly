@@ -5,9 +5,13 @@ import com.zurrtum.create.client.ponder.api.element.ParrotElement;
 import com.zurrtum.create.client.ponder.api.element.ParrotPose;
 import com.zurrtum.create.client.ponder.api.level.PonderLevel;
 import com.zurrtum.create.client.ponder.foundation.PonderScene;
-import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.item.ItemModelManager;
+import net.minecraft.client.render.Camera;
 import net.minecraft.client.render.VertexConsumerProvider;
-import net.minecraft.client.render.entity.EntityRenderDispatcher;
+import net.minecraft.client.render.command.OrderedRenderCommandQueue;
+import net.minecraft.client.render.entity.EntityRenderManager;
+import net.minecraft.client.render.entity.state.EntityRenderState;
+import net.minecraft.client.render.state.CameraRenderState;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.passive.ParrotEntity;
 import net.minecraft.util.math.MathHelper;
@@ -112,9 +116,18 @@ public class ParrotElementImpl extends AnimatedSceneElementBase implements Parro
     }
 
     @Override
-    protected void renderLast(PonderLevel world, VertexConsumerProvider buffer, MatrixStack poseStack, float fade, float pt) {
-        EntityRenderDispatcher entityrenderermanager = MinecraftClient.getInstance().getEntityRenderDispatcher();
-
+    protected void renderLast(
+        EntityRenderManager entityRenderManager,
+        ItemModelManager itemModelManager,
+        PonderLevel world,
+        VertexConsumerProvider buffer,
+        OrderedRenderCommandQueue queue,
+        Camera camera,
+        CameraRenderState cameraRenderState,
+        MatrixStack poseStack,
+        float fade,
+        float pt
+    ) {
         if (entity == null) {
             entity = pose.create(world);
             entity.setYaw(entity.lastYaw = 180);
@@ -131,7 +144,9 @@ public class ParrotElementImpl extends AnimatedSceneElementBase implements Parro
         float angle = AngleHelper.angleLerp(pt, entity.lastYaw, entity.getYaw());
         poseStack.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(angle));
 
-        entityrenderermanager.render(entity, 0, 0, 0, pt, poseStack, buffer, lightCoordsFromFade(fade));
+        EntityRenderState state = entityRenderManager.getAndUpdateRenderState(entity, pt);
+        state.shadowPieces.clear();
+        entityRenderManager.render(state, cameraRenderState, 0, 0, 0, poseStack, queue);
         poseStack.pop();
     }
 

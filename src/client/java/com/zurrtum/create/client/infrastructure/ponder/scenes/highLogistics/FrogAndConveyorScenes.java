@@ -22,11 +22,15 @@ import com.zurrtum.create.content.logistics.box.PackageItem;
 import com.zurrtum.create.content.logistics.box.PackageStyles;
 import com.zurrtum.create.content.logistics.packagePort.frogport.FrogportBlockEntity;
 import com.zurrtum.create.content.logistics.packager.PackagerBlockEntity;
-import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.item.ItemModelManager;
+import net.minecraft.client.render.Camera;
 import net.minecraft.client.render.OverlayTexture;
 import net.minecraft.client.render.VertexConsumerProvider;
-import net.minecraft.client.render.entity.EntityRenderDispatcher;
-import net.minecraft.client.render.item.ItemRenderer;
+import net.minecraft.client.render.command.OrderedRenderCommandQueue;
+import net.minecraft.client.render.entity.EntityRenderManager;
+import net.minecraft.client.render.entity.state.EntityRenderState;
+import net.minecraft.client.render.item.ItemRenderState;
+import net.minecraft.client.render.state.CameraRenderState;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.item.ItemDisplayContext;
@@ -211,10 +215,18 @@ public class FrogAndConveyorScenes {
         }
 
         @Override
-        protected void renderLast(PonderLevel world, VertexConsumerProvider buffer, MatrixStack poseStack, float fade, float pt) {
-            MinecraftClient mc = MinecraftClient.getInstance();
-            EntityRenderDispatcher entityrenderermanager = mc.getEntityRenderDispatcher();
-
+        protected void renderLast(
+            EntityRenderManager entityRenderManager,
+            ItemModelManager itemModelManager,
+            PonderLevel world,
+            VertexConsumerProvider buffer,
+            OrderedRenderCommandQueue queue,
+            Camera camera,
+            CameraRenderState cameraRenderState,
+            MatrixStack poseStack,
+            float fade,
+            float pt
+        ) {
             if (entity == null) {
                 entity = pose.create(world);
                 entity.setYaw(entity.lastYaw = 180);
@@ -245,13 +257,16 @@ public class FrogAndConveyorScenes {
             poseStack.multiply(RotationAxis.POSITIVE_Z.rotationDegrees(90));
             poseStack.scale(1.5f, 1.5f, 1.5f);
             poseStack.translate(-0.1, 0.2, -0.6);
-            ItemRenderer itemRenderer = mc.getItemRenderer();
-            mc.getItemModelManager().clearAndUpdate(itemRenderer.itemRenderState, wrench.getStack(), ItemDisplayContext.GROUND, world, null, 0);
-            itemRenderer.itemRenderState.render(poseStack, buffer, lightCoordsFromFade(fade), OverlayTexture.DEFAULT_UV);
+            ItemRenderState itemRenderState = new ItemRenderState();
+            itemRenderState.displayContext = ItemDisplayContext.GROUND;
+            itemModelManager.update(itemRenderState, wrench.getStack(), itemRenderState.displayContext, world, null, 0);
+            int light = lightCoordsFromFade(fade);
+            itemRenderState.render(poseStack, queue, light, OverlayTexture.DEFAULT_UV, 0);
             poseStack.pop();
 
             entity.maxWingDeviation = 2;
-            entityrenderermanager.render(entity, 0, 0, 0, pt, poseStack, buffer, lightCoordsFromFade(fade));
+            EntityRenderState entityRenderState = entityRenderManager.getAndUpdateRenderState(entity, pt);
+            entityRenderManager.render(entityRenderState, cameraRenderState, 0, 0, 0, poseStack, queue);
             poseStack.pop();
         }
 

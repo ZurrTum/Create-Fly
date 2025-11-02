@@ -161,14 +161,14 @@ public class PonderTooltipHandler {
             .translate(HOLD_TO_PONDER, ((MutableText) ponderKeybind().getBoundKeyLocalizedText()).formatted(Formatting.GRAY))
             .style(Formatting.DARK_GRAY).component();
 
-        TextRenderer fontRenderer = MinecraftClient.getInstance().textRenderer;
-        float charWidth = fontRenderer.getWidth("|");
-        float tipWidth = fontRenderer.getWidth(holdW);
-
-        int total = (int) (tipWidth / charWidth);
-        int current = (int) (progress * total);
-
         if (progress > 0) {
+            TextRenderer fontRenderer = MinecraftClient.getInstance().textRenderer;
+            float charWidth = fontRenderer.getWidth("|");
+            float tipWidth = fontRenderer.getWidth(holdW);
+
+            int total = (int) (tipWidth / charWidth);
+            int current = (int) (progress * total);
+
             String bars = "";
             bars += Formatting.GRAY + Strings.repeat("|", current);
             if (progress < 1)
