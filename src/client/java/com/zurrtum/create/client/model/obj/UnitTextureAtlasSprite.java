@@ -9,7 +9,6 @@ import net.minecraft.client.texture.NativeImage;
 import net.minecraft.client.texture.Sprite;
 import net.minecraft.client.texture.SpriteContents;
 import net.minecraft.client.texture.SpriteDimensions;
-import net.minecraft.resource.metadata.ResourceMetadata;
 import net.minecraft.util.Identifier;
 
 /**
@@ -22,7 +21,7 @@ public class UnitTextureAtlasSprite extends Sprite {
     public static final UnitTextureAtlasSprite INSTANCE = new UnitTextureAtlasSprite();
 
     private UnitTextureAtlasSprite() {
-        super(LOCATION, new SpriteContents(LOCATION, new SpriteDimensions(1, 1), new NativeImage(1, 1, false), ResourceMetadata.NONE), 1, 1, 0, 0);
+        super(LOCATION, new SpriteContents(LOCATION, new SpriteDimensions(1, 1), new NativeImage(1, 1, false)), 1, 1, 0, 0);
     }
 
     @Override
