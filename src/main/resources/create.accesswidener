@@ -5,13 +5,10 @@ accessible field net/minecraft/item/ItemGroup row Lnet/minecraft/item/ItemGroup$
 mutable field net/minecraft/item/ItemGroup row Lnet/minecraft/item/ItemGroup$Row;
 accessible field net/minecraft/item/ItemGroup special Z
 accessible method net/minecraft/particle/SimpleParticleType <init> (Z)V
-accessible method net/minecraft/client/particle/ParticleManager registerFactory (Lnet/minecraft/particle/ParticleType;Lnet/minecraft/client/particle/ParticleManager$SpriteAwareFactory;)V
-accessible class net/minecraft/client/particle/ParticleManager$SpriteAwareFactory
 accessible method net/minecraft/client/render/GameRenderer getFov (Lnet/minecraft/client/render/Camera;FZ)F
 accessible field net/minecraft/client/render/RenderTickCounter$Dynamic tickProgress F
 accessible field net/minecraft/server/network/ServerPlayNetworkHandler floatingTicks I
 accessible field net/minecraft/client/particle/Particle stopped Z
-accessible field net/minecraft/client/option/KeyBinding CATEGORY_ORDER_MAP Ljava/util/Map;
 accessible field net/minecraft/client/network/ClientCommonNetworkHandler client Lnet/minecraft/client/MinecraftClient;
 accessible field net/minecraft/client/network/ClientPlayNetworkHandler world Lnet/minecraft/client/world/ClientWorld;
 accessible field net/minecraft/server/network/ServerCommonNetworkHandler server Lnet/minecraft/server/MinecraftServer;
@@ -40,17 +37,9 @@ accessible field net/minecraft/client/util/math/MatrixStack stack Ljava/util/Lis
 accessible method net/minecraft/world/World getEntityLookup ()Lnet/minecraft/world/entity/EntityLookup;
 accessible method net/minecraft/server/world/ServerWorld getEntityLookup ()Lnet/minecraft/world/entity/EntityLookup;
 accessible method net/minecraft/client/render/model/ReferencedModelsCollector resolve (Lnet/minecraft/util/Identifier;)Lnet/minecraft/client/render/model/ReferencedModelsCollector$Holder;
-accessible field net/minecraft/client/render/WorldRenderer capturedFrustum Lnet/minecraft/client/render/Frustum;
-accessible field net/minecraft/client/render/WorldRenderer frustum Lnet/minecraft/client/render/Frustum;
 accessible field net/minecraft/client/render/BufferBuilder vertexCount I
-accessible field net/minecraft/client/render/block/entity/BlockEntityRendererFactories FACTORIES Ljava/util/Map;
 accessible class net/minecraft/client/render/model/ReferencedModelsCollector$Holder
 accessible field net/minecraft/client/render/WorldRenderer bufferBuilders Lnet/minecraft/client/render/BufferBuilderStorage;
-accessible class net/minecraft/client/render/RenderPhase$Target
-accessible field net/minecraft/client/render/RenderPhase MAIN_TARGET Lnet/minecraft/client/render/RenderPhase$Target;
-accessible field net/minecraft/client/render/RenderPhase TRANSLUCENT_TARGET Lnet/minecraft/client/render/RenderPhase$Target;
-accessible field net/minecraft/client/render/RenderPhase WEATHER_TARGET Lnet/minecraft/client/render/RenderPhase$Target;
-accessible field net/minecraft/client/render/RenderPhase ITEM_ENTITY_TARGET Lnet/minecraft/client/render/RenderPhase$Target;
 accessible field net/minecraft/client/gui/DrawContext client Lnet/minecraft/client/MinecraftClient;
 extendable method net/minecraft/client/gui/widget/ClickableWidget render (Lnet/minecraft/client/gui/DrawContext;IIF)V
 accessible field net/minecraft/client/gui/screen/Screen drawables Ljava/util/List;
@@ -65,8 +54,6 @@ accessible method net/minecraft/client/render/RenderLayer of (Ljava/lang/String;
 accessible method net/minecraft/client/render/RenderLayer$MultiPhaseParameters$Builder texture (Lnet/minecraft/client/render/RenderPhase$TextureBase;)Lnet/minecraft/client/render/RenderLayer$MultiPhaseParameters$Builder;
 accessible method net/minecraft/client/render/RenderLayer$MultiPhaseParameters$Builder lightmap (Lnet/minecraft/client/render/RenderPhase$Lightmap;)Lnet/minecraft/client/render/RenderLayer$MultiPhaseParameters$Builder;
 accessible method net/minecraft/client/render/RenderLayer$MultiPhaseParameters$Builder overlay (Lnet/minecraft/client/render/RenderPhase$Overlay;)Lnet/minecraft/client/render/RenderLayer$MultiPhaseParameters$Builder;
-accessible field net/minecraft/client/render/item/ItemRenderer itemRenderState Lnet/minecraft/client/render/item/ItemRenderState;
-accessible field net/minecraft/client/render/item/ItemRenderer itemModelManager Lnet/minecraft/client/item/ItemModelManager;
 accessible field net/minecraft/client/render/item/model/ItemModelTypes ID_MAPPER Lnet/minecraft/util/dynamic/Codecs$IdMapper;
 accessible field net/minecraft/client/Mouse x D
 accessible field net/minecraft/client/Mouse y D
@@ -76,8 +63,6 @@ accessible method net/minecraft/item/ItemUsageContext <init> (Lnet/minecraft/wor
 accessible field net/minecraft/client/render/RenderPhase ENABLE_LIGHTMAP Lnet/minecraft/client/render/RenderPhase$Lightmap;
 accessible class net/minecraft/client/render/RenderPhase$Texture
 accessible field net/minecraft/client/render/RenderPhase ENABLE_OVERLAY_COLOR Lnet/minecraft/client/render/RenderPhase$Overlay;
-accessible field net/minecraft/client/render/RenderPhase PARTICLES_TARGET Lnet/minecraft/client/render/RenderPhase$Target;
-accessible method net/minecraft/client/render/RenderLayer$MultiPhaseParameters$Builder target (Lnet/minecraft/client/render/RenderPhase$Target;)Lnet/minecraft/client/render/RenderLayer$MultiPhaseParameters$Builder;
 accessible field net/minecraft/client/gl/RenderPipelines ENTITY_SNIPPET Lcom/mojang/blaze3d/pipeline/RenderPipeline$Snippet;
 accessible field net/minecraft/client/render/model/json/JsonUnbakedModel GSON Lcom/google/gson/Gson;
 accessible field net/minecraft/client/gl/RenderPipelines PIPELINES Ljava/util/Map;
@@ -110,7 +95,6 @@ accessible field net/minecraft/item/ItemGroups INGREDIENTS Lnet/minecraft/regist
 accessible field net/minecraft/item/ItemGroups SPAWN_EGGS Lnet/minecraft/registry/RegistryKey;
 accessible field net/minecraft/client/gl/RenderPipelines TERRAIN_SNIPPET Lcom/mojang/blaze3d/pipeline/RenderPipeline$Snippet;
 accessible field net/minecraft/client/gl/RenderPipelines TRANSFORMS_PROJECTION_FOG_SNIPPET Lcom/mojang/blaze3d/pipeline/RenderPipeline$Snippet;
-accessible field net/minecraft/client/render/entity/EntityRenderers RENDERER_FACTORIES Ljava/util/Map;
 extendable method net/minecraft/network/packet/s2c/play/EntitySpawnS2CPacket write (Lnet/minecraft/network/RegistryByteBuf;)V
 accessible method net/minecraft/network/packet/s2c/play/EntitySpawnS2CPacket <init> (Lnet/minecraft/network/RegistryByteBuf;)V
 accessible class net/minecraft/world/chunk/PaletteResizeListener
@@ -128,10 +112,11 @@ accessible field net/minecraft/client/render/block/FluidRenderer lavaSprites [Ln
 accessible field net/minecraft/client/render/block/FluidRenderer waterSprites [Lnet/minecraft/client/texture/Sprite;
 accessible field net/minecraft/client/render/block/BlockRenderManager fluidRenderer Lnet/minecraft/client/render/block/FluidRenderer;
 accessible field net/minecraft/client/gl/RenderPipelines PARTICLE_SNIPPET Lcom/mojang/blaze3d/pipeline/RenderPipeline$Snippet;
-accessible method net/minecraft/client/particle/ParticleManager registerFactory (Lnet/minecraft/particle/ParticleType;Lnet/minecraft/client/particle/ParticleFactory;)V
+accessible class net/minecraft/client/particle/ParticleSpriteManager$SpriteAwareFactory
+accessible method net/minecraft/client/particle/ParticleSpriteManager register (Lnet/minecraft/particle/ParticleType;Lnet/minecraft/client/particle/ParticleSpriteManager$SpriteAwareFactory;)V
+accessible method net/minecraft/client/particle/ParticleSpriteManager register (Lnet/minecraft/particle/ParticleType;Lnet/minecraft/client/particle/ParticleFactory;)V
 mutable field net/minecraft/entity/ItemEntity uniqueOffset F
 accessible field net/minecraft/client/render/entity/ItemEntityRenderer random Lnet/minecraft/util/math/random/Random;
-extendable method net/minecraft/client/render/entity/EntityRenderer renderLeash (Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;Lnet/minecraft/client/render/entity/state/EntityRenderState$LeashData;)V
 accessible field net/minecraft/entity/ItemEntity itemAge I
 accessible method net/minecraft/block/AbstractBlock rotate (Lnet/minecraft/block/BlockState;Lnet/minecraft/util/BlockRotation;)Lnet/minecraft/block/BlockState;
 accessible field net/minecraft/recipe/ServerRecipeManager preparedRecipes Lnet/minecraft/recipe/PreparedRecipes;
@@ -165,14 +150,11 @@ accessible method net/minecraft/item/ItemStack <init> (Lnet/minecraft/item/ItemC
 accessible field net/minecraft/item/ItemStack item Lnet/minecraft/item/Item;
 accessible class net/minecraft/item/ItemGroup$StackVisibility
 accessible method net/minecraft/item/AxeItem getStrippedState (Lnet/minecraft/block/BlockState;)Ljava/util/Optional;
-accessible method net/minecraft/client/render/item/ItemRenderState$LayerRenderState render (Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;II)V
 accessible field net/minecraft/client/render/item/ItemRenderState layerCount I
 accessible field net/minecraft/client/render/item/ItemRenderState layers [Lnet/minecraft/client/render/item/ItemRenderState$LayerRenderState;
 accessible method net/minecraft/entity/player/PlayerEntity isArmorSlot (Lnet/minecraft/entity/EquipmentSlot;)Z
 accessible field net/minecraft/server/MinecraftServer session Lnet/minecraft/world/level/storage/LevelStorage$Session;
 accessible field net/minecraft/world/biome/source/BiomeAccess seed J
-accessible method net/minecraft/client/font/TextRenderer getFontStorage (Lnet/minecraft/util/Identifier;)Lnet/minecraft/client/font/FontStorage;
-accessible method net/minecraft/client/font/BakedGlyph draw (ZFFFLorg/joml/Matrix4f;Lnet/minecraft/client/render/VertexConsumer;IZI)V
 accessible field net/minecraft/client/gui/screen/ChatInputSuggestor window Lnet/minecraft/client/gui/screen/ChatInputSuggestor$SuggestionWindow;
 accessible method net/minecraft/client/gui/screen/ChatInputSuggestor$SuggestionWindow <init> (Lnet/minecraft/client/gui/screen/ChatInputSuggestor;IIILjava/util/List;Z)V
 accessible field net/minecraft/client/gui/render/state/ItemGuiElementRenderState oversizedBounds Lnet/minecraft/client/gui/ScreenRect;
@@ -189,7 +171,6 @@ accessible field net/minecraft/recipe/RawShapedRecipe data Ljava/util/Optional;
 accessible method net/minecraft/component/MergedComponentMap onWrite ()V
 extendable method net/minecraft/entity/Entity isLogicalSideForUpdatingMovement ()Z
 accessible field net/minecraft/client/gui/hud/InGameHud subtitlesHud Lnet/minecraft/client/gui/hud/SubtitlesHud;
-accessible field net/minecraft/client/font/TextRenderer fontStorageAccessor Ljava/util/function/Function;
 accessible field net/minecraft/client/gui/hud/InGameHud heldItemTooltipFade I
 accessible field net/minecraft/client/option/KeyBinding boundKey Lnet/minecraft/client/util/InputUtil$Key;
 accessible method net/minecraft/storage/NbtWriteView <init> (Lnet/minecraft/util/ErrorReporter;Lcom/mojang/serialization/DynamicOps;Lnet/minecraft/nbt/NbtCompound;)V
@@ -225,7 +206,7 @@ accessible field net/minecraft/client/gui/widget/TextFieldWidget lastSwitchFocus
 accessible field net/minecraft/client/gui/widget/TextFieldWidget textX I
 accessible field net/minecraft/client/gui/widget/TextFieldWidget textY I
 accessible field net/minecraft/client/gui/widget/TextFieldWidget selectionEnd I
-accessible field net/minecraft/client/gui/widget/TextFieldWidget renderTextProvider Ljava/util/function/BiFunction;
+accessible method net/minecraft/client/gui/widget/TextFieldWidget format (Ljava/lang/String;I)Lnet/minecraft/text/OrderedText;
 accessible field net/minecraft/client/gui/widget/TextFieldWidget textShadow Z
 accessible field net/minecraft/client/gui/widget/TextFieldWidget placeholder Lnet/minecraft/text/Text;
 accessible field net/minecraft/client/gui/widget/TextFieldWidget suggestion Ljava/lang/String;
@@ -252,7 +233,6 @@ accessible field net/minecraft/recipe/ShapedRecipe result Lnet/minecraft/item/It
 accessible field net/minecraft/entity/LivingEntity lastEquipmentStacks Ljava/util/Map;
 accessible field net/minecraft/client/network/ClientPlayNetworkHandler chunkLoadDistance I
 accessible method net/minecraft/entity/passive/ParrotEntity setVariant (Lnet/minecraft/entity/passive/ParrotEntity$Variant;)V
-accessible field net/minecraft/client/particle/ParticleManager factories Lit/unimi/dsi/fastutil/ints/Int2ObjectMap;
 accessible method net/minecraft/client/world/ClientWorld getEntityLookup ()Lnet/minecraft/world/entity/EntityLookup;
 accessible method net/minecraft/client/render/DiffuseLighting updateBuffer (Lnet/minecraft/client/render/DiffuseLighting$Type;Lorg/joml/Vector3f;Lorg/joml/Vector3f;)V
 accessible field net/minecraft/client/option/KeyBinding defaultKey Lnet/minecraft/client/util/InputUtil$Key;
@@ -262,3 +242,38 @@ accessible method net/minecraft/recipe/BrewingRecipeRegistry isPotionType (Lnet/
 accessible field net/minecraft/recipe/BrewingRecipeRegistry potionRecipes Ljava/util/List;
 accessible class net/minecraft/recipe/BrewingRecipeRegistry$Recipe
 accessible field net/minecraft/recipe/BrewingRecipeRegistry itemRecipes Ljava/util/List;
+accessible field net/minecraft/client/font/TextRenderer fonts Lnet/minecraft/client/font/TextRenderer$GlyphsProvider;
+accessible field com/mojang/blaze3d/opengl/GlStateManager activeTexture I
+accessible method net/minecraft/client/render/block/entity/ChestBlockEntityRenderer getVariant (Lnet/minecraft/block/entity/BlockEntity;Z)Lnet/minecraft/client/render/block/entity/state/ChestBlockEntityRenderState$Variant;
+accessible method net/minecraft/client/render/item/ItemRenderState$LayerRenderState render (Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/command/OrderedRenderCommandQueue;III)V
+accessible field net/minecraft/client/render/item/ItemRenderState$LayerRenderState transform Lnet/minecraft/client/render/model/json/Transformation;
+accessible field net/minecraft/client/render/item/ItemRenderState$LayerRenderState specialModelType Lnet/minecraft/client/render/item/model/special/SpecialModelRenderer;
+accessible field net/minecraft/client/render/item/ItemRenderState$LayerRenderState data Ljava/lang/Object;
+accessible method net/minecraft/client/font/TextRenderer getGlyph (ILnet/minecraft/text/Style;)Lnet/minecraft/client/font/BakedGlyph;
+accessible method net/minecraft/client/font/TextRenderer getGlyphs (Lnet/minecraft/text/StyleSpriteSource;)Lnet/minecraft/client/font/GlyphProvider;
+accessible field net/minecraft/client/font/TextRenderer random Lnet/minecraft/util/math/random/Random;
+accessible field net/minecraft/client/particle/BillboardParticleRenderer submittable Lnet/minecraft/client/particle/BillboardParticleSubmittable;
+mutable field net/minecraft/client/particle/BillboardParticleRenderer submittable Lnet/minecraft/client/particle/BillboardParticleSubmittable;
+accessible method net/minecraft/client/particle/BillboardParticleSubmittable renderVertex (Lnet/minecraft/client/render/VertexConsumer;Lorg/joml/Quaternionf;FFFFFFFFII)V
+accessible field net/minecraft/client/particle/ParticleManager PARTICLE_TEXTURE_SHEETS Ljava/util/List;
+accessible method net/minecraft/client/particle/ParticleManager createParticleRenderer (Lnet/minecraft/client/particle/ParticleTextureSheet;)Lnet/minecraft/client/particle/ParticleRenderer;
+accessible method net/minecraft/client/particle/ParticleManager createParticle (Lnet/minecraft/particle/ParticleEffect;DDDDDD)Lnet/minecraft/client/particle/Particle;
+accessible field net/minecraft/client/particle/ParticleManager spriteManager Lnet/minecraft/client/particle/ParticleSpriteManager;
+accessible field net/minecraft/client/render/command/ModelCommandRenderer$Commands opaqueModelCommands Ljava/util/Map;
+accessible field net/minecraft/client/render/command/ModelCommandRenderer$Commands blendedModelCommands Ljava/util/List;
+accessible field net/minecraft/client/render/command/ModelPartCommandRenderer$Commands modelPartCommands Ljava/util/Map;
+accessible field net/minecraft/client/render/command/CustomCommandRenderer$Commands customCommands Ljava/util/Map;
+accessible class net/minecraft/client/render/OutlineVertexConsumerProvider$OutlineVertexConsumer
+accessible method net/minecraft/client/render/OutlineVertexConsumerProvider$OutlineVertexConsumer <init> (Lnet/minecraft/client/render/VertexConsumer;I)V
+accessible field net/minecraft/item/ItemStackSet HASH_STRATEGY Lit/unimi/dsi/fastutil/Hash$Strategy;
+accessible field net/minecraft/entity/Entity POSE Lnet/minecraft/entity/data/TrackedData;
+accessible method net/minecraft/world/chunk/light/LightStorage getLightSection (JZ)Lnet/minecraft/world/chunk/ChunkNibbleArray;
+accessible class net/minecraft/client/gui/render/GuiRenderer$Draw
+accessible method com/mojang/blaze3d/pipeline/RenderPipeline$Builder withSnippet (Lcom/mojang/blaze3d/pipeline/RenderPipeline$Snippet;)V
+accessible method com/mojang/blaze3d/pipeline/RenderPipeline$Builder <init> ()V
+accessible method net/minecraft/client/render/entity/EntityRendererFactories register (Lnet/minecraft/entity/EntityType;Lnet/minecraft/client/render/entity/EntityRendererFactory;)V
+accessible method net/minecraft/client/render/block/entity/BlockEntityRendererFactories register (Lnet/minecraft/block/entity/BlockEntityType;Lnet/minecraft/client/render/block/entity/BlockEntityRendererFactory;)V
+accessible field net/minecraft/client/render/RenderPhase ITEM_ENTITY_TARGET Lnet/minecraft/client/render/RenderPhase$Target;
+accessible method net/minecraft/client/render/RenderLayer$MultiPhaseParameters$Builder target (Lnet/minecraft/client/render/RenderPhase$Target;)Lnet/minecraft/client/render/RenderLayer$MultiPhaseParameters$Builder;
+accessible field net/minecraft/client/render/RenderPhase MAIN_TARGET Lnet/minecraft/client/render/RenderPhase$Target;
+accessible field net/minecraft/client/render/RenderPhase WEATHER_TARGET Lnet/minecraft/client/render/RenderPhase$Target;
