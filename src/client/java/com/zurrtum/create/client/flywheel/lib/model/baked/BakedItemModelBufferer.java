@@ -9,7 +9,9 @@ import com.zurrtum.create.client.flywheel.lib.material.Materials;
 import com.zurrtum.create.client.flywheel.lib.material.SimpleMaterial;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.*;
-import net.minecraft.client.render.item.ItemRenderer;
+import net.minecraft.client.render.command.BatchingRenderCommandQueue;
+import net.minecraft.client.render.command.OrderedRenderCommandQueueImpl;
+import net.minecraft.client.render.item.ItemRenderState;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.item.ItemDisplayContext;
@@ -49,10 +51,19 @@ public class BakedItemModelBufferer {
         ThreadLocalObjects objects = THREAD_LOCAL_OBJECTS.get();
         MatrixStack poseStack = objects.identityPoseStack;
         ClientWorld world = level instanceof ClientWorld clientWorld ? clientWorld : null;
-        ItemRenderer itemRenderer = MinecraftClient.getInstance().getItemRenderer();
         ItemMeshEmitterProvider provider = objects.provider;
         provider.setResultConsumer(resultConsumer, meshResultConsumer);
-        itemRenderer.renderItem(stack, displayContext, 0, OverlayTexture.DEFAULT_UV, poseStack, provider, world, 0);
+        ItemRenderState state = objects.state;
+        OrderedRenderCommandQueueImpl queue = objects.queue;
+        MinecraftClient.getInstance().getItemModelManager().clearAndUpdate(state, stack, displayContext, world, null, 0);
+        state.render(poseStack, queue, 0, OverlayTexture.DEFAULT_UV, 0);
+        for (BatchingRenderCommandQueue commandQueue : queue.getBatchingQueues().values()) {
+            ModelCommandRendererHelper.render(poseStack, commandQueue, provider, provider, provider);
+            ModelPartCommandRendererHelper.render(poseStack, commandQueue, provider, provider, provider);
+            ItemCommandRendererHelper.render(poseStack, commandQueue, provider, provider);
+            CustomCommandRendererHelper.render(commandQueue, provider);
+        }
+        queue.clear();
         provider.end();
     }
 
@@ -141,6 +152,8 @@ public class BakedItemModelBufferer {
 
     private static class ThreadLocalObjects {
         public final MatrixStack identityPoseStack = new MatrixStack();
+        public final OrderedRenderCommandQueueImpl queue = new OrderedRenderCommandQueueImpl();
+        public final ItemRenderState state = new ItemRenderState();
         public final ItemMeshEmitterProvider provider = new ItemMeshEmitterProvider(this);
         public final Map<RenderLayer, Material> materials = new HashMap<>();
         public final Map<RenderLayer, Integer> chunkLayers = new HashMap<>();

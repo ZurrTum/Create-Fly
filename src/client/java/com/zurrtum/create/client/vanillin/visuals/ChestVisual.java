@@ -19,9 +19,11 @@ import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.ChestBlockEntity;
 import net.minecraft.block.entity.LidOpenable;
 import net.minecraft.block.enums.ChestType;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.LightmapTextureManager;
 import net.minecraft.client.render.TexturedRenderLayers;
 import net.minecraft.client.render.WorldRenderer;
+import net.minecraft.client.render.block.entity.ChestBlockEntityRenderer;
 import net.minecraft.client.render.entity.model.EntityModelLayer;
 import net.minecraft.client.render.entity.model.EntityModelLayers;
 import net.minecraft.client.util.SpriteIdentifier;
@@ -66,13 +68,16 @@ public class ChestVisual<T extends BlockEntity & LidOpenable> extends AbstractBl
 
     private float lastProgress = Float.NaN;
 
+    @SuppressWarnings("rawtypes")
     public ChestVisual(VisualizationContext ctx, T blockEntity, float partialTick) {
         super(ctx, blockEntity, partialTick);
 
         Block block = blockState.getBlock();
         if (block instanceof AbstractChestBlock<?> chestBlock) {
             ChestType chestType = blockState.contains(ChestBlock.CHEST_TYPE) ? blockState.get(ChestBlock.CHEST_TYPE) : ChestType.SINGLE;
-            SpriteIdentifier texture = TexturedRenderLayers.getChestTextureId(blockEntity, chestType, isChristmas());
+            ChestBlockEntityRenderer<?> renderer = (ChestBlockEntityRenderer) MinecraftClient.getInstance().getBlockEntityRenderDispatcher()
+                .get(blockEntity);
+            SpriteIdentifier texture = TexturedRenderLayers.getChestTextureId(renderer.getVariant(blockEntity, isChristmas()), chestType);
             instances = InstanceTree.create(instancerProvider(), ModelTrees.of(LAYER_LOCATIONS.get(chestType), texture, MATERIAL));
             lid = instances.childOrThrow("lid");
             lock = instances.childOrThrow("lock");

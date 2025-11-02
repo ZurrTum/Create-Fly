@@ -6,7 +6,8 @@ import com.zurrtum.create.client.flywheel.api.material.Transparency;
 import com.zurrtum.create.client.flywheel.api.material.WriteMask;
 import net.minecraft.client.render.item.ItemRenderer;
 
-import static net.minecraft.client.render.RenderPhase.*;
+import static net.minecraft.client.render.RenderPhase.ITEM_ENTITY_TARGET;
+import static net.minecraft.client.render.RenderPhase.WEATHER_TARGET;
 
 public final class Materials {
     public static final Material SOLID_BLOCK = SimpleMaterial.builder().build();
@@ -19,10 +20,9 @@ public final class Materials {
     public static final Material CUTOUT_UNSHADED_BLOCK = SimpleMaterial.builder().cutout(CutoutShaders.ONE_TENTH).mipmap(false).diffuse(false)
         .build();
 
-    public static final Material TRANSLUCENT_BLOCK = SimpleMaterial.builder().transparency(Transparency.ORDER_INDEPENDENT).target(TRANSLUCENT_TARGET)
-        .build();
+    public static final Material TRANSLUCENT_BLOCK = SimpleMaterial.builder().transparency(Transparency.ORDER_INDEPENDENT).build();
     public static final Material TRANSLUCENT_UNSHADED_BLOCK = SimpleMaterial.builder().transparency(Transparency.ORDER_INDEPENDENT).diffuse(false)
-        .target(TRANSLUCENT_TARGET).build();
+        .build();
 
     public static final Material TRIPWIRE_BLOCK = SimpleMaterial.builder().cutout(CutoutShaders.ONE_TENTH)
         .transparency(Transparency.ORDER_INDEPENDENT).target(WEATHER_TARGET).build();
