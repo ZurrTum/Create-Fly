@@ -43,6 +43,9 @@ public class AllModels {
 
         BiFunction<BlockState, UnbakedGrouped, UnbakedGrouped> andesiteCasing = CTModel.of(AllCTBehaviours.ANDESITE_CASING);
         BiFunction<BlockState, UnbakedGrouped, UnbakedGrouped> brassCasing = CTModel.of(AllCTBehaviours.BRASS_CASING);
+        BiFunction<BlockState, UnbakedGrouped, UnbakedGrouped> copperCasing = CTModel.of(AllCTBehaviours.COPPER_CASING);
+        BiFunction<BlockState, UnbakedGrouped, UnbakedGrouped> refinedRadianceCasing = CTModel.of(AllCTBehaviours.REFINED_RADIANCE_CASING);
+        BiFunction<BlockState, UnbakedGrouped, UnbakedGrouped> shadowSteelCasing = CTModel.of(AllCTBehaviours.SHADOW_STEEL_CASING);
         BiFunction<BlockState, UnbakedGrouped, UnbakedGrouped> chassis = CTModel.of(AllCTBehaviours.CHASSIS);
         BiFunction<BlockState, UnbakedGrouped, UnbakedGrouped> copperShingles = CTModel.of(AllCTBehaviours.COPPER_SHINGLES);
         BiFunction<BlockState, UnbakedGrouped, UnbakedGrouped> exposedCopperShingles = CTModel.of(AllCTBehaviours.EXPOSED_COPPER_SHINGLES);
@@ -57,6 +60,9 @@ public class AllModels {
         register(AllBlocks.ANDESITE_ENCASED_SHAFT, andesiteCasing);
         register(AllBlocks.BRASS_CASING, brassCasing);
         register(AllBlocks.BRASS_ENCASED_SHAFT, brassCasing);
+        register(AllBlocks.COPPER_CASING, copperCasing);
+        register(AllBlocks.REFINED_RADIANCE_CASING, refinedRadianceCasing);
+        register(AllBlocks.SHADOW_STEEL_CASING, shadowSteelCasing);
         register(AllBlocks.ANDESITE_ENCASED_COGWHEEL, CTModel.of(AllCTBehaviours.COG_SIDE_ANDESITE_CASING));
         register(AllBlocks.BRASS_ENCASED_COGWHEEL, CTModel.of(AllCTBehaviours.COG_SIDE_BRASS_CASING));
         register(AllBlocks.ANDESITE_ENCASED_LARGE_COGWHEEL, CTModel.of(AllCTBehaviours.COG_ANDESITE_CASING));

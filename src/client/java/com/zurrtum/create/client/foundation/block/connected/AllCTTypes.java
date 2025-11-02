@@ -19,7 +19,7 @@ public enum AllCTTypes implements CTType {
             return !context.right && !context.left ? 0 : !context.right ? 3 : !context.left ? 2 : 1;
         }
     },
-    VERTICAL(2, ContextRequirement.builder().vertical().build()) {
+        VERTICAL(2, ContextRequirement.builder().vertical().build()) {
         @Override
         public int getTextureIndex(CTContext context) {
             return (context.up ? 1 : 0) + (context.down ? 2 : 0);
