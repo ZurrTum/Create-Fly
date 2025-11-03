@@ -6,6 +6,7 @@ import com.zurrtum.create.catnip.math.VecHelper;
 import com.zurrtum.create.client.catnip.animation.AnimationTickHolder;
 import com.zurrtum.create.client.catnip.render.FluidRenderHelper;
 import com.zurrtum.create.client.catnip.render.PonderRenderTypes;
+import com.zurrtum.create.client.flywheel.lib.util.ShadersModHelper;
 import com.zurrtum.create.client.foundation.blockEntity.renderer.SmartBlockEntityRenderer;
 import com.zurrtum.create.content.processing.basin.BasinBlock;
 import com.zurrtum.create.content.processing.basin.BasinBlockEntity;
@@ -130,7 +131,7 @@ public class BasinRenderer extends SmartBlockEntityRenderer<BasinBlockEntity, Ba
         }
         float fluidLevel = MathHelper.clamp(totalUnits / (BucketFluidInventory.CAPACITY * 2), 0, 1);
         fluidLevel = 1 - ((1 - fluidLevel) * (1 - fluidLevel));
-        state.layer = PonderRenderTypes.fluid();
+        state.layer = ShadersModHelper.isShaderPackInUse() ? RenderLayer.getTranslucentMovingBlock() : PonderRenderTypes.fluid();
         state.fluids = fluids;
         state.yMin = 2 / 16f;
         state.yMax = state.yMin + 12 / 16f * fluidLevel;

@@ -4,6 +4,7 @@ import com.zurrtum.create.catnip.math.VecHelper;
 import com.zurrtum.create.client.catnip.render.FluidRenderHelper;
 import com.zurrtum.create.client.catnip.render.PonderRenderTypes;
 import com.zurrtum.create.client.flywheel.lib.transform.TransformStack;
+import com.zurrtum.create.client.flywheel.lib.util.ShadersModHelper;
 import com.zurrtum.create.content.fluids.drain.ItemDrainBlockEntity;
 import com.zurrtum.create.content.fluids.transfer.GenericItemEmptying;
 import com.zurrtum.create.content.kinetics.belt.BeltHelper;
@@ -88,7 +89,7 @@ public class ItemDrainRenderer implements BlockEntityRenderer<ItemDrainBlockEnti
                 float yOffset = (7 / 16f) * level;
                 float yMin = yMax - yOffset;
                 state.fluid = new FluidRenderState(
-                    PonderRenderTypes.fluid(),
+                    ShadersModHelper.isShaderPackInUse() ? RenderLayer.getTranslucentMovingBlock() : PonderRenderTypes.fluid(),
                     fluidStack.getFluid(),
                     fluidStack.getComponentChanges(),
                     min,

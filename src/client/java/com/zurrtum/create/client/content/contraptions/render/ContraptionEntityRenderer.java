@@ -9,6 +9,7 @@ import com.zurrtum.create.client.catnip.render.SuperByteBuffer;
 import com.zurrtum.create.client.catnip.render.SuperByteBufferCache;
 import com.zurrtum.create.client.content.contraptions.render.ClientContraption.RenderedBlocks;
 import com.zurrtum.create.client.flywheel.api.visualization.VisualizationManager;
+import com.zurrtum.create.client.flywheel.lib.util.ShadersModHelper;
 import com.zurrtum.create.client.foundation.render.BlockEntityRenderHelper;
 import com.zurrtum.create.client.foundation.render.BlockEntityRenderHelper.BlockEntityListRenderState;
 import com.zurrtum.create.client.foundation.virtualWorld.VirtualRenderWorld;
@@ -251,7 +252,7 @@ public class ContraptionEntityRenderer<C extends AbstractContraptionEntity, S ex
                 case SOLID -> RenderLayer.getSolid();
                 case CUTOUT_MIPPED -> RenderLayer.getCutoutMipped();
                 case CUTOUT -> RenderLayer.getCutout();
-                case TRANSLUCENT -> PonderRenderTypes.translucent();
+                case TRANSLUCENT -> ShadersModHelper.isShaderPackInUse() ? RenderLayer.getTranslucentMovingBlock() : PonderRenderTypes.translucent();
                 case TRIPWIRE -> RenderLayer.getTripwire();
             };
         }

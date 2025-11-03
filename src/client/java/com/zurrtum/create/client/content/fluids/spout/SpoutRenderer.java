@@ -5,6 +5,7 @@ import com.zurrtum.create.client.catnip.render.CachedBuffers;
 import com.zurrtum.create.client.catnip.render.FluidRenderHelper;
 import com.zurrtum.create.client.catnip.render.PonderRenderTypes;
 import com.zurrtum.create.client.catnip.render.SuperByteBuffer;
+import com.zurrtum.create.client.flywheel.lib.util.ShadersModHelper;
 import com.zurrtum.create.content.fluids.spout.SpoutBlockEntity;
 import com.zurrtum.create.foundation.blockEntity.behaviour.fluid.SmartFluidTankBehaviour;
 import com.zurrtum.create.foundation.blockEntity.behaviour.fluid.SmartFluidTankBehaviour.TankSegment;
@@ -63,7 +64,7 @@ public class SpoutRenderer implements BlockEntityRenderer<SpoutBlockEntity, Spou
                 float yMin = min - yOffset;
                 float offset = top ? max - min : yOffset;
                 state.fluid = new FluidRenderState(
-                    PonderRenderTypes.fluid(),
+                    ShadersModHelper.isShaderPackInUse() ? RenderLayer.getTranslucentMovingBlock() : PonderRenderTypes.fluid(),
                     fluidStack.getFluid(),
                     fluidStack.getComponentChanges(),
                     min,

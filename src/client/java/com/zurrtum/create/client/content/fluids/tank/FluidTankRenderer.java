@@ -6,6 +6,7 @@ import com.zurrtum.create.client.catnip.render.CachedBuffers;
 import com.zurrtum.create.client.catnip.render.FluidRenderHelper;
 import com.zurrtum.create.client.catnip.render.PonderRenderTypes;
 import com.zurrtum.create.client.catnip.render.SuperByteBuffer;
+import com.zurrtum.create.client.flywheel.lib.util.ShadersModHelper;
 import com.zurrtum.create.content.fluids.tank.FluidTankBlockEntity;
 import com.zurrtum.create.infrastructure.fluids.FluidStack;
 import net.minecraft.client.render.RenderLayer;
@@ -72,7 +73,7 @@ public class FluidTankRenderer implements BlockEntityRenderer<FluidTankBlockEnti
             return;
         }
         BlockEntityRenderState.updateBlockEntityRenderState(be, state, crumblingOverlay);
-        state.layer = PonderRenderTypes.fluid();
+        state.layer = ShadersModHelper.isShaderPackInUse() ? RenderLayer.getTranslucentMovingBlock() : PonderRenderTypes.fluid();
         FluidTankRenderData data = new FluidTankRenderData();
         state.data = data;
         float clampedLevel = MathHelper.clamp(level * totalHeight, 0, totalHeight);

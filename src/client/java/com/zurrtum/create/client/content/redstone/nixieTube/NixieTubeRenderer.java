@@ -8,6 +8,7 @@ import com.zurrtum.create.client.catnip.animation.AnimationTickHolder;
 import com.zurrtum.create.client.catnip.render.CachedBuffers;
 import com.zurrtum.create.client.catnip.render.PonderRenderTypes;
 import com.zurrtum.create.client.catnip.render.SuperByteBuffer;
+import com.zurrtum.create.client.flywheel.lib.util.ShadersModHelper;
 import com.zurrtum.create.client.foundation.render.RenderTypes;
 import com.zurrtum.create.client.foundation.utility.DyeHelper;
 import com.zurrtum.create.content.redstone.nixieTube.DoubleFaceAttachedBlock.DoubleAttachFace;
@@ -27,6 +28,7 @@ import net.minecraft.client.render.block.entity.BlockEntityRendererFactory;
 import net.minecraft.client.render.block.entity.state.BlockEntityRenderState;
 import net.minecraft.client.render.command.ModelCommandRenderer;
 import net.minecraft.client.render.command.OrderedRenderCommandQueue;
+import net.minecraft.client.render.command.RenderCommandQueue;
 import net.minecraft.client.render.state.CameraRenderState;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Style;
@@ -75,7 +77,7 @@ public class NixieTubeRenderer implements BlockEntityRenderer<NixieTubeBlockEnti
         if (face == DoubleAttachFace.CEILING || facing == Direction.DOWN) {
             data.zRot2 = MathHelper.RADIANS_PER_DEGREE * 180;
         }
-        data.layer = PonderRenderTypes.translucent();
+        data.layer = ShadersModHelper.isShaderPackInUse() ? RenderLayer.getTranslucentMovingBlock() : PonderRenderTypes.translucent();
         data.light = state.lightmapCoordinates;
         data.tube = CachedBuffers.partial(AllPartialModels.NIXIE_TUBE, state.blockState);
         Couple<String> s = be.getDisplayedStrings();
@@ -267,13 +269,14 @@ public class NixieTubeRenderer implements BlockEntityRenderer<NixieTubeBlockEnti
             matrices.translate(0.5f, 0.5f, 0.5f);
             matrices.multiply(RotationAxis.POSITIVE_Y.rotation(yRot));
             matrices.multiply(RotationAxis.POSITIVE_Z.rotation(zRot));
+            RenderCommandQueue batchingQueue = ShadersModHelper.isShaderPackInUse() ? queue.getBatchingQueue(1) : queue;
             if (zRot2 != 0) {
                 matrices.push();
                 matrices.multiply(RotationAxis.POSITIVE_Z.rotation(zRot2));
-                queue.submitCustom(matrices, layer, this);
+                batchingQueue.submitCustom(matrices, layer, this);
                 matrices.pop();
             } else {
-                queue.submitCustom(matrices, layer, this);
+                batchingQueue.submitCustom(matrices, layer, this);
             }
             if (left != null) {
                 matrices.push();
@@ -358,14 +361,26 @@ public class NixieTubeRenderer implements BlockEntityRenderer<NixieTubeBlockEnti
         public boolean additive;
 
         public void render(MatrixStack matrices, OrderedRenderCommandQueue queue) {
-            if (additive) {
-                queue.submitCustom(matrices, layer, (e, v) -> renderAdditive(e, v, 153));
-                if (cube != null) {
-                    queue.submitCustom(matrices, cubeLayer, this::renderCube);
+            if (ShadersModHelper.isShaderPackInUse()) {
+                if (additive) {
+                    queue.getBatchingQueue(1).submitCustom(matrices, layer, (e, v) -> renderAdditive(e, v, 153));
+                    if (cube != null) {
+                        queue.getBatchingQueue(1).submitCustom(matrices, cubeLayer, this::renderCube);
+                    }
+                    queue.getBatchingQueue(2).submitCustom(matrices, layer2, (e, v) -> renderAdditive(e, v, 102));
+                } else {
+                    queue.getBatchingQueue(1).submitCustom(matrices, layer, this::renderNormal);
                 }
-                queue.submitCustom(matrices, layer2, (e, v) -> renderAdditive(e, v, 102));
             } else {
-                queue.submitCustom(matrices, layer, this::renderNormal);
+                if (additive) {
+                    queue.submitCustom(matrices, layer, (e, v) -> renderAdditive(e, v, 153));
+                    if (cube != null) {
+                        queue.submitCustom(matrices, cubeLayer, this::renderCube);
+                    }
+                    queue.submitCustom(matrices, layer2, (e, v) -> renderAdditive(e, v, 102));
+                } else {
+                    queue.submitCustom(matrices, layer, this::renderNormal);
+                }
             }
         }
 

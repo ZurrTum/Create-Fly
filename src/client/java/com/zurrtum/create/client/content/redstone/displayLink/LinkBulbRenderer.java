@@ -5,6 +5,7 @@ import com.zurrtum.create.client.AllPartialModels;
 import com.zurrtum.create.client.catnip.render.CachedBuffers;
 import com.zurrtum.create.client.catnip.render.PonderRenderTypes;
 import com.zurrtum.create.client.catnip.render.SuperByteBuffer;
+import com.zurrtum.create.client.flywheel.lib.util.ShadersModHelper;
 import com.zurrtum.create.client.foundation.render.RenderTypes;
 import com.zurrtum.create.content.redstone.displayLink.LinkWithBulbBlockEntity;
 import net.minecraft.client.render.LightmapTextureManager;
@@ -15,6 +16,7 @@ import net.minecraft.client.render.block.entity.BlockEntityRendererFactory;
 import net.minecraft.client.render.block.entity.state.BlockEntityRenderState;
 import net.minecraft.client.render.command.ModelCommandRenderer;
 import net.minecraft.client.render.command.OrderedRenderCommandQueue;
+import net.minecraft.client.render.command.RenderCommandQueue;
 import net.minecraft.client.render.state.CameraRenderState;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.Direction;
@@ -48,10 +50,10 @@ public class LinkBulbRenderer implements BlockEntityRenderer<LinkWithBulbBlockEn
         state.tube = CachedBuffers.partial(AllPartialModels.DISPLAY_LINK_TUBE, state.blockState);
         float glow = be.getGlow(tickProgress);
         if (glow < .125f) {
-            state.translucent = PonderRenderTypes.translucent();
+            state.translucent = ShadersModHelper.isShaderPackInUse() ? RenderLayer.getTranslucentMovingBlock() : PonderRenderTypes.translucent();
             return;
         }
-        state.translucent = RenderTypes.translucent();
+        state.translucent = ShadersModHelper.isShaderPackInUse() ? RenderLayer.getTranslucentMovingBlock() : RenderTypes.translucent();
         state.additive = RenderTypes.additive();
         state.glow = CachedBuffers.partial(AllPartialModels.DISPLAY_LINK_GLOW, state.blockState);
         glow = (float) (1 - (2 * Math.pow(glow - .75f, 2)));
@@ -65,9 +67,10 @@ public class LinkBulbRenderer implements BlockEntityRenderer<LinkWithBulbBlockEn
         matrices.multiply(RotationAxis.POSITIVE_Y.rotation(state.yRot));
         matrices.multiply(RotationAxis.POSITIVE_X.rotation(state.xRot));
         matrices.translate(-0.5f, -0.5f, -0.5f);
-        queue.submitCustom(matrices, state.translucent, state::renderTube);
+        RenderCommandQueue batchingQueue = ShadersModHelper.isShaderPackInUse() ? queue.getBatchingQueue(1) : queue;
+        batchingQueue.submitCustom(matrices, state.translucent, state::renderTube);
         if (state.glow != null) {
-            queue.submitCustom(matrices, state.additive, state::renderGlow);
+            batchingQueue.submitCustom(matrices, state.additive, state::renderGlow);
         }
     }
 
