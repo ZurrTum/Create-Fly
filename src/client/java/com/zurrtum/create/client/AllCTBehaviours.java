@@ -26,6 +26,12 @@ public class AllCTBehaviours {
     public static final EncasedCTBehaviour ANDESITE_CASING = new EncasedCTBehaviour(AllSpriteShifts.ANDESITE_CASING);
     public static final EncasedCTBehaviour BRASS_CASING = new EncasedCTBehaviour(AllSpriteShifts.BRASS_CASING);
     public static final EncasedCTBehaviour COPPER_CASING = new EncasedCTBehaviour(AllSpriteShifts.COPPER_CASING);
+    public static final HorizontalCTBehaviour RAILWAY_CASING = new HorizontalCTBehaviour(
+        AllSpriteShifts.RAILWAY_CASING_SIDE,
+        AllSpriteShifts.RAILWAY_CASING
+    );
+    public static final EncasedCTBehaviour SHADOW_STEEL_CASING = new EncasedCTBehaviour(AllSpriteShifts.SHADOW_STEEL_CASING);
+    public static final EncasedCTBehaviour REFINED_RADIANCE_CASING = new EncasedCTBehaviour(AllSpriteShifts.REFINED_RADIANCE_CASING);
     public static final EncasedCogCTBehaviour COG_SIDE_ANDESITE_CASING = new EncasedCogCTBehaviour(
         AllSpriteShifts.ANDESITE_CASING,
         Couple.create(AllSpriteShifts.ANDESITE_ENCASED_COGWHEEL_SIDE, AllSpriteShifts.ANDESITE_ENCASED_COGWHEEL_OTHERSIDE)
