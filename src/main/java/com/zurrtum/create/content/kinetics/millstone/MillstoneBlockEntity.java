@@ -8,9 +8,9 @@ import com.zurrtum.create.content.kinetics.base.KineticBlockEntity;
 import com.zurrtum.create.content.kinetics.belt.behaviour.DirectBeltInputBehaviour;
 import com.zurrtum.create.foundation.advancement.CreateTrigger;
 import com.zurrtum.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
+import com.zurrtum.create.infrastructure.items.SidedItemInventory;
 import com.zurrtum.create.infrastructure.transfer.SlotRangeCache;
 import net.minecraft.block.BlockState;
-import net.minecraft.inventory.SidedInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.particle.ItemStackParticleEffect;
 import net.minecraft.particle.ParticleTypes;
@@ -120,10 +120,15 @@ public class MillstoneBlockEntity extends KineticBlockEntity {
             lastRecipe = recipe.get().value();
         }
 
+        ItemStack recipeRemainder = stack.getItem().getRecipeRemainder();
         stack.decrement(1);
         capability.setStack(0, stack);
         capability.outputAllowInsertion();
-        capability.insert(lastRecipe.craft(input, world.random));
+        List<ItemStack> list = lastRecipe.craft(input, world.random);
+        if (!recipeRemainder.isEmpty()) {
+            list.add(recipeRemainder);
+        }
+        capability.insert(list);
         capability.outputForbidInsertion();
 
         award(AllAdvancements.MILLSTONE);
@@ -178,7 +183,7 @@ public class MillstoneBlockEntity extends KineticBlockEntity {
         return true;
     }
 
-    public class MillstoneInventoryHandler implements SidedInventory {
+    public class MillstoneInventoryHandler implements SidedItemInventory {
         private static final int[] SLOTS = SlotRangeCache.get(10);
         private final DefaultedList<ItemStack> stacks = DefaultedList.ofSize(10, ItemStack.EMPTY);
         private boolean check = true;

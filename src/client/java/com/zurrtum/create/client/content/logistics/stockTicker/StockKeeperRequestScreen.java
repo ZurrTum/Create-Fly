@@ -21,13 +21,13 @@ import com.zurrtum.create.client.foundation.utility.CreateLang;
 import com.zurrtum.create.content.contraptions.actors.seat.SeatEntity;
 import com.zurrtum.create.content.logistics.BigItemStack;
 import com.zurrtum.create.content.logistics.packager.InventorySummary;
-import com.zurrtum.create.content.logistics.stockTicker.PackageOrderWithCrafts;
 import com.zurrtum.create.content.logistics.stockTicker.StockKeeperRequestMenu;
 import com.zurrtum.create.content.logistics.stockTicker.StockTickerBlockEntity;
 import com.zurrtum.create.content.processing.burner.BlazeBurnerBlock.HeatLevel;
 import com.zurrtum.create.content.processing.burner.BlazeBurnerBlockEntity;
 import com.zurrtum.create.foundation.gui.menu.MenuType;
 import com.zurrtum.create.infrastructure.component.ClipboardEntry;
+import com.zurrtum.create.infrastructure.component.PackageOrderWithCrafts;
 import com.zurrtum.create.infrastructure.packet.c2s.LogisticalStockRequestPacket;
 import com.zurrtum.create.infrastructure.packet.c2s.PackageOrderRequestPacket;
 import com.zurrtum.create.infrastructure.packet.c2s.StockKeeperCategoryHidingPacket;
@@ -68,7 +68,6 @@ import java.lang.ref.WeakReference;
 import java.util.*;
 
 public class StockKeeperRequestScreen extends AbstractSimiContainerScreen<StockKeeperRequestMenu> {
-
     public static class CategoryEntry {
         boolean hidden;
         String name;
@@ -89,7 +88,7 @@ public class StockKeeperRequestScreen extends AbstractSimiContainerScreen<StockK
     private static final AllGuiTextures FOOTER = AllGuiTextures.STOCK_KEEPER_REQUEST_FOOTER;
 
     StockTickerBlockEntity blockEntity;
-    public LerpedFloat itemScroll;
+    public LerpedFloat itemScroll = LerpedFloat.linear().startWithValue(0);
 
     final int rows = 9;
     final int cols = 9;
@@ -111,15 +110,16 @@ public class StockKeeperRequestScreen extends AbstractSimiContainerScreen<StockK
     int successTicks = 0;
 
     public List<List<BigItemStack>> currentItemSource;
-    public List<List<BigItemStack>> displayedItems;
-    public List<CategoryEntry> categories;
+    public List<List<BigItemStack>> displayedItems = new ArrayList<>();
+    public List<CategoryEntry> categories = new ArrayList<>();
 
-    public List<BigItemStack> itemsToOrder;
+    public List<BigItemStack> itemsToOrder = new ArrayList<>();
     //TODO
-    //    public List<CraftableBigItemStack> recipesToOrder;
+    //    public List<CraftableBigItemStack> recipesToOrder = new ArrayList<>();
 
-    WeakReference<LivingEntity> stockKeeper;
-    WeakReference<BlazeBurnerBlockEntity> blaze;
+    WeakReference<LivingEntity> stockKeeper = new WeakReference<>(null);
+    WeakReference<BlazeBurnerBlockEntity> blaze = new WeakReference<>(null);
+
 
     boolean encodeRequester; // Redstone requesters
     ItemStack itemToProgram;
@@ -128,37 +128,23 @@ public class StockKeeperRequestScreen extends AbstractSimiContainerScreen<StockK
     private boolean isAdmin;
     private boolean isLocked;
     private boolean scrollHandleActive;
+    private boolean ignoreTextInput;
 
-    public boolean refreshSearchNextTick;
-    public boolean moveToTopNextTick;
+    public boolean refreshSearchNextTick = false;
+    public boolean moveToTopNextTick = false;
     private List<Rect2i> extraAreas = Collections.emptyList();
 
-    private Set<Integer> hiddenCategories;
-    private InventorySummary forcedEntries;
-    private boolean canRequestCraftingPackage;
+    private final Set<Integer> hiddenCategories;
+    private InventorySummary forcedEntries = new InventorySummary();
+    private boolean canRequestCraftingPackage = false;
 
     public StockKeeperRequestScreen(StockKeeperRequestMenu container, PlayerInventory inv, Text title) {
         super(container, inv, title);
-        displayedItems = new ArrayList<>();
-        itemsToOrder = new ArrayList<>();
-        //TODO
-        //        recipesToOrder = new ArrayList<>();
-        categories = new ArrayList<>();
         blockEntity = container.contentHolder;
         blockEntity.lastClientsideStockSnapshot = null;
         blockEntity.ticksSinceLastUpdate = 15;
-        emptyTicks = 0;
-        successTicks = 0;
-        itemScroll = LerpedFloat.linear().startWithValue(0);
-        stockKeeper = new WeakReference<>(null);
-        blaze = new WeakReference<>(null);
-        refreshSearchNextTick = false;
-        moveToTopNextTick = false;
         handler.screenReference = this;
-        canRequestCraftingPackage = false;
         hiddenCategories = new HashSet<>(blockEntity.hiddenCategoriesByPlayer.getOrDefault(handler.player.getUuid(), List.of()));
-
-        forcedEntries = new InventorySummary();
 
         itemToProgram = handler.player.getMainHandStack();
         encodeRequester = itemToProgram.isIn(AllItemTags.TABLE_CLOTHS) || itemToProgram.isOf(AllItems.REDSTONE_REQUESTER);
@@ -186,9 +172,11 @@ public class StockKeeperRequestScreen extends AbstractSimiContainerScreen<StockK
                 int y = seatPos.getY();
                 int z = seatPos.getZ();
                 for (SeatEntity seatEntity : blockEntity.getWorld()
-                    .getNonSpectatingEntities(SeatEntity.class, new Box(x, y - 0.1f, z, x + 1, y + 1, z + 1)))
-                    if (!seatEntity.getPassengerList().isEmpty() && seatEntity.getPassengerList().getFirst() instanceof LivingEntity keeper)
+                    .getNonSpectatingEntities(SeatEntity.class, new Box(x, y - 0.1f, z, x + 1, y + 1, z + 1))) {
+                    if (!seatEntity.getPassengerList().isEmpty() && seatEntity.getPassengerList().getFirst() instanceof LivingEntity keeper) {
                         stockKeeper = new WeakReference<>(keeper);
+                    }
+                }
                 if (yOffset == 0 && blockEntity.getWorld().getBlockEntity(seatPos) instanceof BlazeBurnerBlockEntity bbbe) {
                     blaze = new WeakReference<>(bbbe);
                     return;
@@ -1274,6 +1262,8 @@ public class StockKeeperRequestScreen extends AbstractSimiContainerScreen<StockK
 
     @Override
     public boolean charTyped(CharInput input) {
+        if (ignoreTextInput)
+            return false;
         if (addressBox.isFocused() && addressBox.charTyped(input))
             return true;
         String s = searchBox.getText();
@@ -1290,6 +1280,13 @@ public class StockKeeperRequestScreen extends AbstractSimiContainerScreen<StockK
 
     @Override
     public boolean keyPressed(KeyInput input) {
+        ignoreTextInput = false;
+        if (!addressBox.isFocused() && !searchBox.isFocused() && client.options.chatKey.matchesKey(input)) {
+            ignoreTextInput = true;
+            searchBox.setFocused(true);
+            return true;
+        }
+
         int pKeyCode = input.key();
         if (pKeyCode == GLFW.GLFW_KEY_ENTER && searchBox.isFocused()) {
             searchBox.setFocused(false);
@@ -1305,8 +1302,9 @@ public class StockKeeperRequestScreen extends AbstractSimiContainerScreen<StockK
             return true;
 
         String s = searchBox.getText();
-        if (!searchBox.keyPressed(input))
-            return searchBox.isFocused() && searchBox.isVisible() && pKeyCode != 256 ? true : super.keyPressed(input);
+        if (!searchBox.keyPressed(input)) {
+            return searchBox.isFocused() && searchBox.isVisible() && pKeyCode != 256 || super.keyPressed(input);
+        }
         if (!Objects.equals(s, searchBox.getText())) {
             refreshSearchNextTick = true;
             moveToTopNextTick = true;
@@ -1403,6 +1401,12 @@ public class StockKeeperRequestScreen extends AbstractSimiContainerScreen<StockK
 
         if (isSchematicListMode())
             client.player.closeHandledScreen();
+    }
+
+    @Override
+    public boolean keyReleased(KeyInput input) {
+        ignoreTextInput = false;
+        return super.keyReleased(input);
     }
 
     @Override

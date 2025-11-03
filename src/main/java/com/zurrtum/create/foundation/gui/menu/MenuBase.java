@@ -38,11 +38,15 @@ public abstract class MenuBase<T> extends ScreenHandler {
     protected abstract void saveData(T contentHolder);
 
     protected void addPlayerSlots(int x, int y) {
-        for (int hotbarSlot = 0; hotbarSlot < 9; ++hotbarSlot)
-            this.addSlot(new Slot(playerInventory, hotbarSlot, x + hotbarSlot * 18, y + 58));
         for (int row = 0; row < 3; ++row)
             for (int col = 0; col < 9; ++col)
-                this.addSlot(new Slot(playerInventory, col + row * 9 + 9, x + col * 18, y + row * 18));
+                this.addSlot(this.createPlayerSlot(playerInventory, col + row * 9 + 9, x + col * 18, y + row * 18));
+        for (int hotbarSlot = 0; hotbarSlot < 9; ++hotbarSlot)
+            this.addSlot(this.createPlayerSlot(playerInventory, hotbarSlot, x + hotbarSlot * 18, y + 58));
+    }
+
+    protected Slot createPlayerSlot(PlayerInventory inventory, int index, int x, int y) {
+        return new Slot(inventory, index, x, y);
     }
 
     @Override

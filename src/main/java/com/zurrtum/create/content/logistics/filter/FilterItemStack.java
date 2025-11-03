@@ -2,7 +2,6 @@ package com.zurrtum.create.content.logistics.filter;
 
 import com.mojang.serialization.Codec;
 import com.zurrtum.create.AllDataComponents;
-import com.zurrtum.create.AllItems;
 import com.zurrtum.create.catnip.data.Pair;
 import com.zurrtum.create.content.fluids.transfer.GenericItemEmptying;
 import com.zurrtum.create.content.logistics.box.PackageItem;
@@ -24,19 +23,9 @@ public class FilterItemStack {
     private FluidStack filterFluidStack;
 
     public static FilterItemStack of(ItemStack filter) {
-        if (!filter.getComponentChanges().isEmpty()) {
-            if (filter.isOf(AllItems.FILTER)) {
-                trimFilterComponents(filter);
-                return new ListFilterItemStack(filter);
-            }
-            if (filter.isOf(AllItems.ATTRIBUTE_FILTER)) {
-                trimFilterComponents(filter);
-                return new AttributeFilterItemStack(filter);
-            }
-            if (filter.isOf(AllItems.PACKAGE_FILTER)) {
-                trimFilterComponents(filter);
-                return new PackageFilterItemStack(filter);
-            }
+        if (!filter.getComponentChanges().isEmpty() && filter.getItem() instanceof FilterItem item) {
+            trimFilterComponents(filter);
+            return item.makeStackWrapper(filter);
         }
 
         return new FilterItemStack(filter);
@@ -121,12 +110,12 @@ public class FilterItemStack {
         public boolean shouldRespectNBT;
         public boolean isBlacklist;
 
-        protected ListFilterItemStack(ItemStack filter) {
+        public ListFilterItemStack(ItemStack filter) {
             super(filter);
             boolean hasFilterItems = filter.contains(AllDataComponents.FILTER_ITEMS);
 
             containedItems = new ArrayList<>();
-            for (ItemStack stack : FilterItem.getFilterItems(filter)) {
+            for (ItemStack stack : ((ListFilterItem) filter.getItem()).getFilterItemHandler(filter)) {
                 if (!stack.isEmpty())
                     containedItems.add(FilterItemStack.of(stack));
             }
@@ -137,8 +126,6 @@ public class FilterItemStack {
 
         @Override
         public boolean test(World world, ItemStack stack, boolean matchNBT) {
-            if (containedItems.isEmpty())
-                return super.test(world, stack, matchNBT);
             for (FilterItemStack filterItemStack : containedItems)
                 if (filterItemStack.test(world, stack, shouldRespectNBT))
                     return !isBlacklist;
@@ -159,7 +146,7 @@ public class FilterItemStack {
         public AttributeFilterWhitelistMode whitelistMode;
         public List<Pair<ItemAttribute, Boolean>> attributeTests;
 
-        protected AttributeFilterItemStack(ItemStack filter) {
+        public AttributeFilterItemStack(ItemStack filter) {
             super(filter);
             boolean defaults = !filter.contains(AllDataComponents.ATTRIBUTE_FILTER_MATCHED_ATTRIBUTES);
 
@@ -226,7 +213,7 @@ public class FilterItemStack {
 
         public String filterString;
 
-        protected PackageFilterItemStack(ItemStack filter) {
+        public PackageFilterItemStack(ItemStack filter) {
             super(filter);
             filterString = PackageItem.getAddress(filter);
         }

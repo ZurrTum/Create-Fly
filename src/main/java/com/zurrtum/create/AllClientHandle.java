@@ -21,8 +21,10 @@ import com.zurrtum.create.content.trains.track.TrackBlockEntity;
 import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
 import com.zurrtum.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.foundation.entity.behaviour.EntityBehaviour;
+import com.zurrtum.create.infrastructure.component.ClipboardContent;
 import com.zurrtum.create.infrastructure.packet.s2c.*;
 import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.component.ComponentMap;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.vehicle.AbstractMinecartEntity;
@@ -337,7 +339,7 @@ public class AllClientHandle<T> {
         warn();
     }
 
-    public void updateClipboardScreen(UUID lastEdit, BlockPos pos, ItemStack dataContainer) {
+    public void updateClipboardScreen(UUID lastEdit, BlockPos pos, ClipboardContent content) {
         warn();
     }
 
@@ -399,7 +401,7 @@ public class AllClientHandle<T> {
         warn();
     }
 
-    public void openClipboardScreen(PlayerEntity player, ItemStack stack, BlockPos pos) {
+    public void openClipboardScreen(PlayerEntity player, ComponentMap components, BlockPos pos) {
         warn();
     }
 

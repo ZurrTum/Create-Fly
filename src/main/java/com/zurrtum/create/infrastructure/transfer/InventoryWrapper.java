@@ -1,6 +1,7 @@
 package com.zurrtum.create.infrastructure.transfer;
 
 import com.zurrtum.create.infrastructure.items.ItemInventory;
+import com.zurrtum.create.infrastructure.items.SidedItemInventory;
 import it.unimi.dsi.fastutil.objects.Object2IntLinkedOpenCustomHashMap;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntSortedMap;
@@ -13,7 +14,6 @@ import net.fabricmc.fabric.api.transfer.v1.storage.base.SingleSlotStorage;
 import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
 import net.fabricmc.fabric.impl.transfer.item.ItemVariantImpl;
 import net.minecraft.inventory.Inventory;
-import net.minecraft.inventory.SidedInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.Direction;
 import org.jetbrains.annotations.NotNull;
@@ -881,7 +881,7 @@ public abstract class InventoryWrapper<T extends Storage<ItemVariant>, S extends
         return storage.supportsExtraction() ? ItemInventory.super.stream() : Stream.empty();
     }
 
-    public static class Filter implements SidedInventory {
+    public static class Filter implements SidedItemInventory {
         private final int[] slots;
         private final boolean canInsert;
         private final boolean canExtract;

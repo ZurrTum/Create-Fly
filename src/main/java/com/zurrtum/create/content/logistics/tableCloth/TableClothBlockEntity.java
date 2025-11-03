@@ -1,7 +1,9 @@
 package com.zurrtum.create.content.logistics.tableCloth;
 
 import com.zurrtum.create.*;
+import com.zurrtum.create.api.contraption.transformable.TransformableBlockEntity;
 import com.zurrtum.create.catnip.data.IntAttached;
+import com.zurrtum.create.content.contraptions.StructureTransform;
 import com.zurrtum.create.content.logistics.BigItemStack;
 import com.zurrtum.create.content.logistics.packager.InventorySummary;
 import com.zurrtum.create.content.logistics.stockTicker.StockTickerBlockEntity;
@@ -16,6 +18,7 @@ import com.zurrtum.create.infrastructure.packet.s2c.RemoveBlockEntityPacket;
 import com.zurrtum.create.infrastructure.packet.s2c.ShopUpdatePacket;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.packet.Packet;
@@ -38,7 +41,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-public class TableClothBlockEntity extends SmartBlockEntity {
+public class TableClothBlockEntity extends SmartBlockEntity implements TransformableBlockEntity {
 
     //TODO
     //    public AbstractComputerBehaviour computerBehaviour;
@@ -337,4 +340,11 @@ public class TableClothBlockEntity extends SmartBlockEntity {
     //        super.invalidate();
     //        computerBehaviour.removePeripheral();
     //    }
+
+    public void transform(BlockEntity blockEntity, StructureTransform transform) {
+        facing = transform.mirrorFacing(facing);
+        if (transform.rotationAxis == Direction.Axis.Y)
+            facing = transform.rotateFacing(facing);
+        notifyUpdate();
+    }
 }

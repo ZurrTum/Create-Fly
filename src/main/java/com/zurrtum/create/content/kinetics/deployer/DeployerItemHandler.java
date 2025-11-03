@@ -1,13 +1,13 @@
 package com.zurrtum.create.content.kinetics.deployer;
 
+import com.zurrtum.create.infrastructure.items.SidedItemInventory;
 import com.zurrtum.create.infrastructure.transfer.SlotRangeCache;
-import net.minecraft.inventory.SidedInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.Direction;
 import org.jetbrains.annotations.Nullable;
 
-public class DeployerItemHandler implements SidedInventory {
+public class DeployerItemHandler implements SidedItemInventory {
     private final DeployerBlockEntity be;
     private final DeployerPlayer player;
 

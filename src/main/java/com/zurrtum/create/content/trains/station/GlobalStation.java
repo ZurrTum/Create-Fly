@@ -1,24 +1,21 @@
 package com.zurrtum.create.content.trains.station;
 
 import com.mojang.serialization.*;
-import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.zurrtum.create.Create;
 import com.zurrtum.create.content.logistics.box.PackageItem;
 import com.zurrtum.create.content.logistics.packagePort.postbox.PostboxBlockEntity;
 import com.zurrtum.create.content.trains.entity.Carriage;
-import com.zurrtum.create.content.trains.entity.CarriageContraptionEntity;
 import com.zurrtum.create.content.trains.entity.Train;
 import com.zurrtum.create.content.trains.graph.DimensionPalette;
 import com.zurrtum.create.content.trains.graph.TrackNode;
 import com.zurrtum.create.content.trains.signal.SingleBlockEntityEdgePoint;
 import com.zurrtum.create.foundation.codec.CreateCodecs;
-import com.zurrtum.create.infrastructure.items.ItemStackHandler;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketByteBuf;
-import net.minecraft.server.world.ServerWorld;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.storage.ReadView;
 import net.minecraft.storage.WriteView;
 import net.minecraft.util.math.BlockPos;
@@ -156,42 +153,14 @@ public class GlobalStation extends SingleBlockEntityEdgePoint {
         return this.nearestTrain.get();
     }
 
-    // Package Port integration
-    public static class GlobalPackagePort {
-        public static final Codec<GlobalPackagePort> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-            Codec.STRING.fieldOf("address").forGetter(i -> i.address),
-            ItemStackHandler.CODEC.fieldOf("offlineBuffer").forGetter(i -> i.offlineBuffer),
-            Codec.BOOL.fieldOf("primed").forGetter(i -> i.primed)
-        ).apply(instance, GlobalPackagePort::new));
-
-        public String address;
-        public ItemStackHandler offlineBuffer;
-        public boolean primed;
-
-        public GlobalPackagePort() {
-            this("", new ItemStackHandler(18), false);
-        }
-
-        private GlobalPackagePort(String address, ItemStackHandler offlineBuffer, boolean primed) {
-            this.address = address;
-            this.offlineBuffer = offlineBuffer;
-            this.primed = primed;
-        }
-    }
-
     public void runMailTransfer() {
         Train train = getPresentTrain();
         if (train == null || connectedPorts.isEmpty())
             return;
-        World level = null;
+        MinecraftServer server = Create.SERVER;
+        World level = server.getWorld(getBlockEntityDimension());
 
         for (Carriage carriage : train.carriages) {
-            if (level == null) {
-                CarriageContraptionEntity entity = carriage.anyAvailableEntity();
-                if (entity != null && entity.getEntityWorld() instanceof ServerWorld sl)
-                    level = sl.getServer().getWorld(getBlockEntityDimension());
-            }
-
             Inventory carriageInventory = carriage.storage.getAllItems();
             if (carriageInventory == null)
                 continue;
@@ -223,9 +192,12 @@ public class GlobalStation extends SingleBlockEntityEdgePoint {
                     } else {
                         stack.setCount(count - insert);
                     }
-                    Create.RAILWAYS.markTracksDirty();
-                    if (box != null)
+                    if (box == null) {
+                        port.primed = true;
+                    } else {
                         box.spawnParticles();
+                    }
+                    Create.RAILWAYS.markTracksDirty();
                 }
             }
 
@@ -260,10 +232,12 @@ public class GlobalStation extends SingleBlockEntityEdgePoint {
                     if (extract != insert) {
                         postboxInventory.extract(stack, insert - extract);
                     }
-                    Create.RAILWAYS.markTracksDirty();
-                    if (box != null)
+                    if (box == null) {
+                        port.primed = true;
+                    } else {
                         box.spawnParticles();
-
+                    }
+                    Create.RAILWAYS.markTracksDirty();
                     break;
                 }
             }

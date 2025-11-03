@@ -15,11 +15,11 @@ import com.zurrtum.create.foundation.advancement.CreateTrigger;
 import com.zurrtum.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.foundation.blockEntity.behaviour.edgeInteraction.EdgeInteractionBehaviour;
 import com.zurrtum.create.foundation.blockEntity.behaviour.inventory.InvManipulationBehaviour;
+import com.zurrtum.create.infrastructure.items.SidedItemInventory;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.inventory.Inventory;
-import net.minecraft.inventory.SidedInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.particle.ItemStackParticleEffect;
 import net.minecraft.particle.ParticleTypes;
@@ -51,7 +51,7 @@ public class MechanicalCrafterBlockEntity extends KineticBlockEntity implements 
         INSERTING;
     }
 
-    public class CrafterItemHandler implements SidedInventory {
+    public class CrafterItemHandler implements SidedItemInventory {
         @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
         public static final Optional<Integer> LIMIT = Optional.of(1);
         private static final int[] SLOTS = {0};

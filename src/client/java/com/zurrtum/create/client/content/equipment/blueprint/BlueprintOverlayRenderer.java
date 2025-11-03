@@ -1,6 +1,5 @@
 package com.zurrtum.create.client.content.equipment.blueprint;
 
-import com.zurrtum.create.AllDataComponents;
 import com.zurrtum.create.AllItems;
 import com.zurrtum.create.catnip.data.Couple;
 import com.zurrtum.create.catnip.data.Iterate;
@@ -12,16 +11,10 @@ import com.zurrtum.create.content.equipment.blueprint.BlueprintEntity;
 import com.zurrtum.create.content.equipment.blueprint.BlueprintEntity.BlueprintSection;
 import com.zurrtum.create.content.logistics.BigItemStack;
 import com.zurrtum.create.content.logistics.filter.FilterItem;
-import com.zurrtum.create.content.logistics.item.filter.attribute.ItemAttribute;
-import com.zurrtum.create.content.logistics.item.filter.attribute.attributes.InTagAttribute;
 import com.zurrtum.create.content.logistics.packager.InventorySummary;
 import com.zurrtum.create.content.logistics.tableCloth.TableClothBlockEntity;
 import com.zurrtum.create.content.trains.track.TrackPlacement.PlacementInfo;
-import com.zurrtum.create.foundation.item.ItemHelper;
-import com.zurrtum.create.infrastructure.component.AttributeFilterWhitelistMode;
-import com.zurrtum.create.infrastructure.component.ItemAttributeEntry;
 import com.zurrtum.create.infrastructure.component.ShoppingList;
-import com.zurrtum.create.infrastructure.items.ItemStackHandler;
 import com.zurrtum.create.infrastructure.packet.c2s.BlueprintPreviewRequestPacket;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
@@ -36,9 +29,6 @@ import net.minecraft.item.Item.TooltipContext;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.item.tooltip.TooltipType;
-import net.minecraft.registry.Registries;
-import net.minecraft.registry.entry.RegistryEntry;
-import net.minecraft.registry.tag.TagKey;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.hit.EntityHitResult;
@@ -331,25 +321,8 @@ public class BlueprintOverlayRenderer {
     private static ItemStack[] getItemsMatchingFilter(ItemStack filter) {
         return cachedRenderedFilters.computeIfAbsent(
             filter, itemStack -> {
-                if (itemStack.isOf(AllItems.FILTER) && !itemStack.getOrDefault(AllDataComponents.FILTER_ITEMS_BLACKLIST, false)) {
-                    ItemStackHandler filterItems = FilterItem.getFilterItems(itemStack);
-                    return ItemHelper.getNonEmptyStacks(filterItems).toArray(ItemStack[]::new);
-                }
-
-                if (itemStack.isOf(AllItems.ATTRIBUTE_FILTER)) {
-                    AttributeFilterWhitelistMode whitelistMode = itemStack.get(AllDataComponents.ATTRIBUTE_FILTER_WHITELIST_MODE);
-                    List<ItemAttributeEntry> attributes = itemStack.get(AllDataComponents.ATTRIBUTE_FILTER_MATCHED_ATTRIBUTES);
-                    //noinspection DataFlowIssue
-                    if (whitelistMode == AttributeFilterWhitelistMode.WHITELIST_DISJ && attributes.size() == 1) {
-                        ItemAttribute attribute = attributes.getFirst().attribute();
-                        if (attribute instanceof InTagAttribute(TagKey<Item> tag)) {
-                            List<ItemStack> stacks = new ArrayList<>();
-                            for (RegistryEntry<Item> holder : Registries.ITEM.iterateEntries(tag)) {
-                                stacks.add(new ItemStack(holder.value()));
-                            }
-                            return stacks.toArray(ItemStack[]::new);
-                        }
-                    }
+                if (itemStack.getItem() instanceof FilterItem filterItem) {
+                    return filterItem.getFilterItems(itemStack);
                 }
 
                 return new ItemStack[0];

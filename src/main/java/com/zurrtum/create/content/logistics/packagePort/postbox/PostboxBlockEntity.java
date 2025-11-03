@@ -2,15 +2,13 @@ package com.zurrtum.create.content.logistics.packagePort.postbox;
 
 import com.zurrtum.create.AllBlockEntityTypes;
 import com.zurrtum.create.AllSoundEvents;
-import com.zurrtum.create.Create;
 import com.zurrtum.create.catnip.animation.LerpedFloat;
 import com.zurrtum.create.catnip.animation.LerpedFloat.Chaser;
 import com.zurrtum.create.content.logistics.packagePort.PackagePortBlockEntity;
+import com.zurrtum.create.content.trains.station.GlobalPackagePort;
 import com.zurrtum.create.content.trains.station.GlobalStation;
-import com.zurrtum.create.content.trains.station.GlobalStation.GlobalPackagePort;
 import net.minecraft.block.BlockState;
 import net.minecraft.item.BoneMealItem;
-import net.minecraft.item.ItemStack;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.storage.ReadView;
@@ -98,23 +96,24 @@ public class PostboxBlockEntity extends PackagePortBlockEntity {
     }
 
     @Override
-    public void onChunkUnloaded() {
-        if (world == null || world.isClient())
-            return;
-        GlobalStation station = trackedGlobalStation.get();
-        if (station == null)
-            return;
-        if (!station.connectedPorts.containsKey(pos))
-            return;
-        GlobalPackagePort globalPackagePort = station.connectedPorts.get(pos);
-        for (int i = 0, size = inventory.size(); i < size; i++) {
-            globalPackagePort.offlineBuffer.setStack(i, inventory.getStack(i));
-            inventory.setStack(i, ItemStack.EMPTY);
-        }
+    public void markDirty() {
+        saveOfflineBuffer();
+        super.markDirty();
+    }
 
-        globalPackagePort.primed = true;
-        Create.RAILWAYS.markTracksDirty();
-        super.onChunkUnloaded();
+    private void saveOfflineBuffer() {
+        if (world == null || world.isClient()) {
+            return;
+        }
+        GlobalStation station = trackedGlobalStation.get();
+        if (station == null) {
+            return;
+        }
+        GlobalPackagePort globalPackagePort = station.connectedPorts.get(pos);
+        if (globalPackagePort == null) {
+            return;
+        }
+        globalPackagePort.saveOfflineBuffer(inventory);
     }
 
     //TODO

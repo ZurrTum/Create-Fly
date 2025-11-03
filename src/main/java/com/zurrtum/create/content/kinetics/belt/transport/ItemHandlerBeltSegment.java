@@ -63,8 +63,8 @@ public class ItemHandlerBeltSegment implements ItemInventory {
         if (transported == null)
             return ItemStack.EMPTY;
         beltInventory.toRemove.add(transported);
-        ItemStack stack = transported.stack.copy();
-        transported.stack.setCount(0);
+        ItemStack stack = transported.stack;
+        transported.stack = ItemStack.EMPTY;
         return stack;
     }
 
@@ -78,7 +78,7 @@ public class ItemHandlerBeltSegment implements ItemInventory {
             if (transported == null || transported.stack.isEmpty())
                 return;
             beltInventory.toRemove.add(transported);
-            transported.stack.setCount(0);
+            transported.stack = stack;
         } else {
             TransportedItemStack newStack = new TransportedItemStack(stack);
             newStack.insertedAt = offset;

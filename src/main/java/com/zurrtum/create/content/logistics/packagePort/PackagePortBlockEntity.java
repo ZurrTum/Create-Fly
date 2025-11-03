@@ -9,15 +9,16 @@ import com.zurrtum.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.foundation.blockEntity.behaviour.animatedContainer.AnimatedContainerBehaviour;
 import com.zurrtum.create.foundation.gui.menu.MenuBase;
 import com.zurrtum.create.foundation.gui.menu.MenuProvider;
+import com.zurrtum.create.infrastructure.component.ClipboardContent;
 import com.zurrtum.create.infrastructure.component.ClipboardEntry;
 import com.zurrtum.create.infrastructure.component.ClipboardType;
+import com.zurrtum.create.infrastructure.items.SidedItemInventory;
 import com.zurrtum.create.infrastructure.transfer.SlotRangeCache;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.inventory.SidedInventory;
 import net.minecraft.inventory.StackWithSlot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.RegistryByteBuf;
@@ -156,7 +157,8 @@ public abstract class PackagePortBlockEntity extends SmartBlockEntity implements
         if (addressFilter == null || addressFilter.isBlank())
             return;
 
-        List<List<ClipboardEntry>> list = ClipboardEntry.readAll(mainHandItem);
+        ClipboardContent clipboard = mainHandItem.getOrDefault(AllDataComponents.CLIPBOARD_CONTENT, ClipboardContent.EMPTY);
+        List<List<ClipboardEntry>> list = ClipboardEntry.readAll(clipboard);
         for (List<ClipboardEntry> page : list) {
             for (ClipboardEntry entry : page) {
                 String existing = entry.text.getString();
@@ -182,8 +184,8 @@ public abstract class PackagePortBlockEntity extends SmartBlockEntity implements
         page.add(new ClipboardEntry(false, Text.literal("#" + addressFilter)));
         player.sendMessage(Text.translatable("create.clipboard.address_added", addressFilter), true);
 
-        ClipboardEntry.saveAll(list, mainHandItem);
-        mainHandItem.set(AllDataComponents.CLIPBOARD_TYPE, ClipboardType.WRITTEN);
+        clipboard = clipboard.setPages(list).setType(ClipboardType.WRITTEN);
+        mainHandItem.set(AllDataComponents.CLIPBOARD_CONTENT, clipboard);
     }
 
     @Override
@@ -214,7 +216,7 @@ public abstract class PackagePortBlockEntity extends SmartBlockEntity implements
         }
     }
 
-    public class PackagePortInventory implements SidedInventory {
+    public class PackagePortInventory implements SidedItemInventory {
         public static final int[] SLOTS = SlotRangeCache.get(18);
         public final DefaultedList<ItemStack> stacks = DefaultedList.ofSize(18, ItemStack.EMPTY);
         private boolean receive = true;

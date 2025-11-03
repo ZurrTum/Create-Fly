@@ -29,7 +29,7 @@ public class SchematicTableMenu extends MenuBase<SchematicTableBlockEntity> {
 
         ItemStack stack = clickedSlot.getStack();
         if (index < 2)
-            insertItem(stack, 2, slots.size(), false);
+            insertItem(stack, 2, slots.size(), true);
         else
             insertItem(stack, 0, 1, false);
 

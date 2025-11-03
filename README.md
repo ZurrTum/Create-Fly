@@ -7,10 +7,11 @@ https://www.curseforge.com/minecraft/mc-mods/create-fly/files/all?page=1&pageSiz
 ### 1. What the project specifically does or adds
 
 - This is a Fabric fork of [Create](https://github.com/Creators-of-Create/Create).
-  The official [Create Fabric](https://github.com/Fabricators-of-Create/Create) fork was last released nine
-  months ago, which is a long time ago.
+  The official [Create Fabric](https://github.com/Fabricators-of-Create/Create) fork has not released a version 1.21.1
+  or higher. it has been 8 months since then.
 - Minecraft uses a new rendering method in higher versions: item models use a dedicated rendering folder, rendering uses
-  a rendering pipeline, Entity and GUI rendering is changed to extract the state first and then render, which requires
+  a rendering pipeline, Entity, BlockEntity and GUI rendering is changed to extract the state first and then render,
+  which requires
   creating special rendering for GUI elements.
 - Minecraft uses a new data loading method that can capture error messages, which requires a lot of changes to be
   compatible.
@@ -23,8 +24,7 @@ https://www.curseforge.com/minecraft/mc-mods/create-fly/files/all?page=1&pageSiz
   development.
 - The original Fabric fork used a builder to generate data, which relied on Registrate-Refabricated and made migration
   difficult. This project registers data in a way that's more consistent with vanilla Minecraft.
-- This project implements the full Create feature independently, without the need to install the Fabric API (
-  compatibility is still in progress)
+- This project implements the full Create feature independently, without the need to install the Fabric API.
 
 ### 2. Why someone should want to download the project
 
@@ -37,7 +37,7 @@ https://www.curseforge.com/minecraft/mc-mods/create-fly/files/all?page=1&pageSiz
 - Please do not report issues with this mod to simibubi and NeoForge Create.
 - Please do not use old game saves. Because data loading changes, data may be lost.
 - Recommended to use REI to view recipes, and please report any game crashes.
-- Using shaders will disable Flywheel optimizations
+- Using shaders will disable Flywheel optimizations.
 
 ### 4. TODO List
 

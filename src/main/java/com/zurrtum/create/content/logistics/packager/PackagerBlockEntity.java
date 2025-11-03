@@ -16,7 +16,6 @@ import com.zurrtum.create.content.logistics.packagerLink.LogisticallyLinkedBehav
 import com.zurrtum.create.content.logistics.packagerLink.PackagerLinkBlock;
 import com.zurrtum.create.content.logistics.packagerLink.PackagerLinkBlockEntity;
 import com.zurrtum.create.content.logistics.packagerLink.RequestPromiseQueue;
-import com.zurrtum.create.content.logistics.stockTicker.PackageOrderWithCrafts;
 import com.zurrtum.create.foundation.advancement.CreateTrigger;
 import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
 import com.zurrtum.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
@@ -24,6 +23,7 @@ import com.zurrtum.create.foundation.blockEntity.behaviour.inventory.CapManipula
 import com.zurrtum.create.foundation.blockEntity.behaviour.inventory.InvManipulationBehaviour;
 import com.zurrtum.create.foundation.blockEntity.behaviour.inventory.VersionedInventoryTrackerBehaviour;
 import com.zurrtum.create.foundation.item.ItemHelper;
+import com.zurrtum.create.infrastructure.component.PackageOrderWithCrafts;
 import com.zurrtum.create.infrastructure.items.ItemStackHandler;
 import com.zurrtum.create.infrastructure.packet.s2c.WiFiEffectPacket;
 import net.minecraft.block.BlockState;

@@ -19,7 +19,7 @@ public class MixinPlugin implements IMixinConfigPlugin {
     public void onLoad(String mixinPackage) {
         SODIUM = FabricLoader.getInstance().isModLoaded("sodium");
         IRIS = FabricLoader.getInstance().isModLoaded("iris");
-        HMI = FabricLoader.getInstance().isModLoaded("hold-my-items");
+        HMI = FabricLoader.getInstance().isModLoaded("holdmyitems");
     }
 
     @Override

@@ -2,6 +2,7 @@ package com.zurrtum.create;
 
 import com.zurrtum.create.api.behaviour.display.DisplaySource;
 import com.zurrtum.create.catnip.math.AngleHelper;
+import com.zurrtum.create.catnip.nbt.NBTProcessors;
 import com.zurrtum.create.content.contraptions.AbstractContraptionEntity;
 import com.zurrtum.create.content.contraptions.actors.trainControls.ControlsServerHandler;
 import com.zurrtum.create.content.contraptions.elevator.ElevatorColumn;
@@ -46,7 +47,6 @@ import com.zurrtum.create.content.logistics.packagerLink.LogisticallyLinkedBehav
 import com.zurrtum.create.content.logistics.packagerLink.LogisticsNetwork;
 import com.zurrtum.create.content.logistics.redstoneRequester.RedstoneRequesterBlock;
 import com.zurrtum.create.content.logistics.redstoneRequester.RedstoneRequesterBlockEntity;
-import com.zurrtum.create.content.logistics.stockTicker.PackageOrderWithCrafts;
 import com.zurrtum.create.content.logistics.stockTicker.StockCheckingBlockEntity;
 import com.zurrtum.create.content.logistics.stockTicker.StockKeeperCategoryMenu;
 import com.zurrtum.create.content.logistics.stockTicker.StockTickerBlockEntity;
@@ -85,9 +85,7 @@ import com.zurrtum.create.foundation.gui.menu.GhostItemMenu;
 import com.zurrtum.create.foundation.gui.menu.IClearableMenu;
 import com.zurrtum.create.foundation.item.ItemHelper;
 import com.zurrtum.create.foundation.utility.BlockHelper;
-import com.zurrtum.create.foundation.utility.CreateComponentProcessors;
-import com.zurrtum.create.infrastructure.component.AttributeFilterWhitelistMode;
-import com.zurrtum.create.infrastructure.component.BezierTrackPointLocation;
+import com.zurrtum.create.infrastructure.component.*;
 import com.zurrtum.create.infrastructure.config.AllConfigs;
 import com.zurrtum.create.infrastructure.items.ItemStackHandler;
 import com.zurrtum.create.infrastructure.packet.c2s.*;
@@ -95,7 +93,7 @@ import com.zurrtum.create.infrastructure.packet.s2c.*;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.component.ComponentChanges;
+import net.minecraft.component.MergedComponentMap;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.player.PlayerInventory;
@@ -122,6 +120,7 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import org.apache.commons.lang3.mutable.MutableBoolean;
 import org.apache.commons.lang3.mutable.MutableObject;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.Map;
@@ -1506,7 +1505,7 @@ public class AllHandle {
 
     public static void onClipboardEdit(ServerPlayNetworkHandler listener, ClipboardEditPacket packet) {
         ServerPlayerEntity sender = listener.player;
-        ComponentChanges processedData = CreateComponentProcessors.clipboardProcessor(packet.dataComponentPatch());
+        ClipboardContent processedContent = clipboardProcessor(packet.clipboardContent());
 
         BlockPos targetedBlock = packet.targetedBlock();
         if (targetedBlock != null) {
@@ -1516,12 +1515,13 @@ public class AllHandle {
             if (!targetedBlock.isWithinDistance(sender.getBlockPos(), 20))
                 return;
             if (world.getBlockEntity(targetedBlock) instanceof ClipboardBlockEntity cbe) {
-                if (processedData.isEmpty()) {
-                    clearComponents(cbe.dataContainer);
+                MergedComponentMap map = new MergedComponentMap(cbe.getComponents());
+                if (processedContent == null) {
+                    map.remove(AllDataComponents.CLIPBOARD_CONTENT);
                 } else {
-                    cbe.dataContainer.remove(AllDataComponents.CLIPBOARD_PREVIOUSLY_OPENED_PAGE);
-                    cbe.dataContainer.applyUnvalidatedChanges(processedData);
+                    map.set(AllDataComponents.CLIPBOARD_CONTENT, processedContent);
                 }
+                cbe.setComponents(map);
                 cbe.onEditedBy(sender);
             }
             return;
@@ -1530,20 +1530,25 @@ public class AllHandle {
         ItemStack itemStack = sender.getInventory().getStack(packet.hotbarSlot());
         if (!itemStack.isOf(AllItems.CLIPBOARD))
             return;
-        if (processedData.isEmpty()) {
-            clearComponents(itemStack);
+        if (processedContent == null) {
+            itemStack.remove(AllDataComponents.CLIPBOARD_CONTENT);
         } else {
-            itemStack.remove(AllDataComponents.CLIPBOARD_PREVIOUSLY_OPENED_PAGE);
-            itemStack.applyUnvalidatedChanges(processedData);
+            itemStack.set(AllDataComponents.CLIPBOARD_CONTENT, processedContent);
         }
     }
 
-    private static void clearComponents(ItemStack stack) {
-        stack.remove(AllDataComponents.CLIPBOARD_TYPE);
-        stack.remove(AllDataComponents.CLIPBOARD_PAGES);
-        stack.remove(AllDataComponents.CLIPBOARD_READ_ONLY);
-        stack.remove(AllDataComponents.CLIPBOARD_COPIED_VALUES);
-        stack.remove(AllDataComponents.CLIPBOARD_PREVIOUSLY_OPENED_PAGE);
+    private static ClipboardContent clipboardProcessor(@Nullable ClipboardContent content) {
+        if (content == null)
+            return null;
+
+        for (List<ClipboardEntry> page : content.pages()) {
+            for (ClipboardEntry entry : page) {
+                if (NBTProcessors.textComponentHasClickEvent(entry.text))
+                    return null;
+            }
+        }
+
+        return content;
     }
 
     public static void onContraptionColliderLockRequest(ServerPlayNetworkHandler listener, ContraptionColliderLockPacketRequest packet) {

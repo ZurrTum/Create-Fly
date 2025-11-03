@@ -6,6 +6,8 @@ import com.zurrtum.create.catnip.math.VecHelper;
 import com.zurrtum.create.content.logistics.box.PackageEntity;
 import com.zurrtum.create.foundation.advancement.AdvancementBehaviour;
 import com.zurrtum.create.foundation.block.ProperWaterloggedBlock;
+import com.zurrtum.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
+import com.zurrtum.create.foundation.blockEntity.behaviour.filtering.ServerFilteringBehaviour;
 import com.zurrtum.create.foundation.item.ItemHelper;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -129,7 +131,8 @@ public abstract class FunnelBlock extends AbstractDirectionalFunnelBlock {
         if (projectedDiff < 0 == (direction.getDirection() == AxisDirection.POSITIVE))
             return;
         float yOffset = direction == Direction.UP ? 0.25f : -0.5f;
-        if (!PackageEntity.centerPackage(entityIn, openPos.add(0, yOffset, 0)))
+        ServerFilteringBehaviour filter = BlockEntityBehaviour.get(worldIn, pos, ServerFilteringBehaviour.TYPE);
+        if (filter.test(stack) && !PackageEntity.centerPackage(entityIn, openPos.add(0, yOffset, 0)))
             return;
 
         ItemStack remainder = tryInsert(worldIn, pos, stack, false);

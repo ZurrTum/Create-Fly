@@ -15,13 +15,33 @@ import java.nio.ByteBuffer;
 
 public final class GlCompat {
     public static final @UnknownNullability GLCapabilities CAPABILITIES;
-    public static final Driver DRIVER;
-    public static final int SUBGROUP_SIZE;
+
+    static {
+        GLCapabilities caps;
+        try {
+            caps = GL.getCapabilities();
+        } catch (IllegalStateException var2) {
+            FlwBackend.LOGGER.warn("Failed to get GL capabilities; default Flywheel backends will be disabled.");
+            caps = null;
+        }
+
+        CAPABILITIES = caps;
+    }
+
+    public static final String GL_VENDOR_STRING = safeGetString(GL20C.GL_VENDOR);
+    public static final String GL_RENDERER_STRING = safeGetString(GL20C.GL_RENDERER);
+    public static final String GL_VERSION_STRING = safeGetString(GL20C.GL_VERSION);
+    public static final String GL_SHADING_LANGUAGE_VERSION_STRING = safeGetString(GL20C.GL_SHADING_LANGUAGE_VERSION);
+
+    public static final Driver DRIVER = readVendorString();
+    public static final int SUBGROUP_SIZE = subgroupSize();
     public static final boolean ALLOW_DSA = true;
-    public static final GlslVersion MAX_GLSL_VERSION;
-    public static final boolean SUPPORTS_DSA;
-    public static final boolean SUPPORTS_INSTANCING;
-    public static final boolean SUPPORTS_INDIRECT;
+    public static final GlslVersion MAX_GLSL_VERSION = maxGlslVersion();
+
+    public static final boolean SUPPORTS_DSA = isDsaSupported();
+
+    public static final boolean SUPPORTS_INSTANCING = isInstancingSupported();
+    public static final boolean SUPPORTS_INDIRECT = isIndirectSupported();
 
     private GlCompat() {
     }
@@ -63,22 +83,20 @@ public final class GlCompat {
     private static Driver readVendorString() {
         if (CAPABILITIES == null) {
             return Driver.UNKNOWN;
-        } else {
-            String vendor = GL20C.glGetString(7936);
-            if (vendor == null) {
-                return Driver.UNKNOWN;
-            } else if (!vendor.contains("ATI") && !vendor.contains("AMD")) {
-                if (vendor.contains("NVIDIA")) {
-                    return Driver.NVIDIA;
-                } else if (vendor.contains("Intel")) {
-                    return Driver.INTEL;
-                } else {
-                    return vendor.contains("Mesa") ? Driver.MESA : Driver.UNKNOWN;
-                }
-            } else {
-                return Driver.AMD;
-            }
         }
+
+        // The vendor string I got was "ATI Technologies Inc."
+        if (GL_VENDOR_STRING.contains("ATI") || GL_VENDOR_STRING.contains("AMD")) {
+            return Driver.AMD;
+        } else if (GL_VENDOR_STRING.contains("NVIDIA")) {
+            return Driver.NVIDIA;
+        } else if (GL_VENDOR_STRING.contains("Intel")) {
+            return Driver.INTEL;
+        } else if (GL_VENDOR_STRING.contains("Mesa")) {
+            return Driver.MESA;
+        }
+
+        return Driver.UNKNOWN;
     }
 
     private static int subgroupSize() {
@@ -140,21 +158,14 @@ public final class GlCompat {
         return success;
     }
 
-    static {
-        GLCapabilities caps;
-        try {
-            caps = GL.getCapabilities();
-        } catch (IllegalStateException var2) {
-            FlwBackend.LOGGER.warn("Failed to get GL capabilities; default Flywheel backends will be disabled.");
-            caps = null;
+    /**
+     * Get a non-null string from OpenGL, or "invalid" if no capabilities are available.
+     */
+    private static String safeGetString(int name) {
+        if (CAPABILITIES == null) {
+            return "invalid";
         }
-
-        CAPABILITIES = caps;
-        DRIVER = readVendorString();
-        SUBGROUP_SIZE = subgroupSize();
-        MAX_GLSL_VERSION = maxGlslVersion();
-        SUPPORTS_DSA = isDsaSupported();
-        SUPPORTS_INSTANCING = isInstancingSupported();
-        SUPPORTS_INDIRECT = isIndirectSupported();
+        String str = GL20C.glGetString(name);
+        return str == null ? "null" : str;
     }
 }

@@ -1,15 +1,22 @@
 package com.zurrtum.create.foundation;
 
 import com.zurrtum.create.AllBlockEntityTypes;
+import com.zurrtum.create.AllDataComponents;
+import com.zurrtum.create.catnip.codecs.CatnipCodecUtils;
 import com.zurrtum.create.catnip.nbt.NBTProcessors;
+import com.zurrtum.create.infrastructure.component.ClipboardContent;
+import com.zurrtum.create.infrastructure.component.ClipboardEntry;
 import net.minecraft.block.entity.BlockEntityType;
+import net.minecraft.component.ComponentMap;
+import net.minecraft.component.type.WrittenBookContentComponent;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.nbt.NbtElement;
-import net.minecraft.nbt.NbtList;
-import net.minecraft.nbt.NbtString;
 import net.minecraft.registry.Registries;
+import net.minecraft.text.RawFilteredPair;
+import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
+
+import java.util.List;
 
 public class CreateNBTProcessors {
     public static void register() {
@@ -24,18 +31,15 @@ public class CreateNBTProcessors {
                 if (writableBookResource != Registries.ITEM.getDefaultId() && book.getString("id", "").equals(writableBookResource.toString()))
                     return data;
 
-                if (!book.contains("tag"))
+                WrittenBookContentComponent bookContent = CatnipCodecUtils.decodeOrNull(WrittenBookContentComponent.CODEC, book);
+                if (bookContent == null)
                     return data;
-                NbtCompound tag = book.getCompoundOrEmpty("tag");
 
-                if (!tag.contains("pages"))
-                    return data;
-                NbtList pages = tag.getListOrEmpty("pages");
-
-                for (NbtElement inbt : pages) {
-                    if (NBTProcessors.textComponentHasClickEvent(((NbtString) inbt).value()))
+                for (RawFilteredPair<Text> page : bookContent.pages()) {
+                    if (NBTProcessors.textComponentHasClickEvent(page.get(false)))
                         return null;
                 }
+
                 return data;
             }
         );
@@ -46,26 +50,17 @@ public class CreateNBTProcessors {
     }
 
     public static NbtCompound clipboardProcessor(NbtCompound data) {
-        if (!data.contains("Item"))
+        ComponentMap components = data.getCompound("components").flatMap(c -> CatnipCodecUtils.decode(ComponentMap.CODEC, c)).orElse(null);
+        if (components == null)
             return data;
-        NbtCompound item = data.getCompoundOrEmpty("Item");
 
-        if (!item.contains("components"))
+        ClipboardContent content = components.get(AllDataComponents.CLIPBOARD_CONTENT);
+        if (content == null)
             return data;
-        NbtCompound itemComponents = item.getCompoundOrEmpty("components");
 
-        if (!itemComponents.contains("create:clipboard_pages"))
-            return data;
-        NbtList pages = itemComponents.getListOrEmpty("create:clipboard_pages");
-
-        for (NbtElement page : pages) {
-            if (!(page instanceof NbtList entries))
-                return data;
-
-            for (int i = 0; i < entries.size(); i++) {
-                NbtCompound entry = entries.getCompoundOrEmpty(i);
-
-                if (NBTProcessors.textComponentHasClickEvent(entry.getCompoundOrEmpty("text").asString().orElse("")))
+        for (List<ClipboardEntry> entries : content.pages()) {
+            for (ClipboardEntry entry : entries) {
+                if (NBTProcessors.textComponentHasClickEvent(entry.text))
                     return null;
             }
         }

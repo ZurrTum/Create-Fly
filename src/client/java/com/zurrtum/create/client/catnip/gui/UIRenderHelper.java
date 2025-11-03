@@ -4,8 +4,6 @@ import com.mojang.blaze3d.buffers.GpuBuffer;
 import com.mojang.blaze3d.buffers.GpuBufferSlice;
 import com.mojang.blaze3d.opengl.GlConst;
 import com.mojang.blaze3d.opengl.GlStateManager;
-import com.mojang.blaze3d.pipeline.RenderPipeline;
-import com.mojang.blaze3d.platform.DepthTestFunction;
 import com.mojang.blaze3d.systems.ProjectionType;
 import com.mojang.blaze3d.systems.RenderPass;
 import com.mojang.blaze3d.systems.RenderSystem;
@@ -24,22 +22,23 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gl.DebugLabelManager;
 import net.minecraft.client.gl.Framebuffer;
 import net.minecraft.client.gl.GlBackend;
-import net.minecraft.client.gl.RenderPipelines;
 import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.render.*;
+import net.minecraft.client.render.BufferBuilder;
+import net.minecraft.client.render.BuiltBuffer;
+import net.minecraft.client.render.RawProjectionMatrix;
+import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.texture.GlTexture;
 import net.minecraft.client.texture.TextureSetup;
 import net.minecraft.client.util.TextureAllocationException;
 import net.minecraft.client.util.Window;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.util.Identifier;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.Vec2f;
 import org.jetbrains.annotations.Nullable;
 import org.joml.*;
 import org.lwjgl.opengl.GL12;
 import org.lwjgl.opengl.GL30;
 
-import java.awt.geom.Point2D;
 import java.lang.Math;
 import java.util.ArrayList;
 import java.util.List;
@@ -47,14 +46,10 @@ import java.util.OptionalDouble;
 import java.util.OptionalInt;
 import java.util.function.Supplier;
 
-import static com.zurrtum.create.Create.MOD_ID;
+import static com.zurrtum.create.client.catnip.render.PonderRenderPipelines.BLIT_SCREEN;
 
 public class UIRenderHelper {
     private static final RawProjectionMatrix PROJECTION = new RawProjectionMatrix("UIRenderHelper");
-    public static final RenderPipeline BLIT_SCREEN = RenderPipeline.builder(RenderPipelines.TRANSFORMS_AND_PROJECTION_SNIPPET)
-        .withLocation(Identifier.of(MOD_ID, "pipeline/blit_screen")).withVertexShader("core/blit_screen").withFragmentShader("core/blit_screen")
-        .withSampler("InSampler").withDepthTestFunction(DepthTestFunction.NO_DEPTH_TEST)
-        .withVertexFormat(VertexFormats.POSITION_TEXTURE_COLOR, VertexFormat.DrawMode.QUADS).build();
 
     public static final Couple<Color> COLOR_TEXT = Couple.create(new Color(0xff_eeeeee), new Color(0xff_a3a3a3)).map(Color::setImmutable);
     public static final Couple<Color> COLOR_TEXT_DARKER = Couple.create(new Color(0xff_a3a3a3), new Color(0xff_808080)).map(Color::setImmutable);
@@ -257,13 +252,31 @@ public class UIRenderHelper {
         Color innerColor,
         Color outerColor
     ) {
-        List<Point2D> innerPoints = getPointsForCircleArc(innerRadius, startAngle, arcAngle);
-        List<Point2D> outerPoints = getPointsForCircleArc(outerRadius, startAngle, arcAngle);
+        List<Vec2f> innerPoints = getPointsForCircleArc(innerRadius, startAngle, arcAngle);
+        List<Vec2f> outerPoints = getPointsForCircleArc(outerRadius, startAngle, arcAngle);
+        double minX = Double.POSITIVE_INFINITY;
+        double maxX = Double.NEGATIVE_INFINITY;
+        double minY = Double.POSITIVE_INFINITY;
+        double maxY = Double.NEGATIVE_INFINITY;
+        for (Vec2f point : innerPoints) {
+            minX = Math.min(minX, point.x);
+            maxX = Math.max(maxX, point.x);
+            minY = Math.min(minY, point.y);
+            maxY = Math.max(maxY, point.y);
+        }
+        for (Vec2f point : outerPoints) {
+            minX = Math.min(minX, point.x);
+            maxX = Math.max(maxX, point.x);
+            minY = Math.min(minY, point.y);
+            maxY = Math.max(maxY, point.y);
+        }
 
         graphics.state.addSimpleElement(new RadialSectorRenderState(
             new Matrix3x2f(graphics.getMatrices()),
-            (int) (innerRadius * 2),
-            (int) (outerRadius * 2),
+            minX,
+            maxX,
+            minY,
+            maxY,
             innerPoints,
             outerPoints,
             innerColor,
@@ -271,16 +284,16 @@ public class UIRenderHelper {
         ));
     }
 
-    private static List<Point2D> getPointsForCircleArc(float radius, float startAngle, float arcAngle) {
+    private static List<Vec2f> getPointsForCircleArc(float radius, float startAngle, float arcAngle) {
         int segmentCount = Math.abs(arcAngle) <= 90 ? 16 : 32;
-        List<Point2D> points = new ArrayList<>(segmentCount);
+        List<Vec2f> points = new ArrayList<>(segmentCount);
 
 
         float theta = (MathHelper.RADIANS_PER_DEGREE * arcAngle) / (float) (segmentCount - 1);
         float t = MathHelper.RADIANS_PER_DEGREE * startAngle;
 
         for (int i = 0; i < segmentCount; i++) {
-            points.add(new Point2D.Float((float) (radius * Math.cos(t)), (float) (radius * Math.sin(t))));
+            points.add(new Vec2f((float) (radius * Math.cos(t)), (float) (radius * Math.sin(t))));
 
             t += theta;
         }

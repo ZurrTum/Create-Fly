@@ -1,5 +1,6 @@
 package com.zurrtum.create;
 
+import com.zurrtum.create.content.contraptions.actors.roller.RollerBlockItem;
 import com.zurrtum.create.content.contraptions.bearing.BlankSailBlockItem;
 import com.zurrtum.create.content.contraptions.glue.SuperGlueItem;
 import com.zurrtum.create.content.contraptions.minecart.MinecartCouplingItem;
@@ -31,7 +32,10 @@ import com.zurrtum.create.content.logistics.box.PackageItem;
 import com.zurrtum.create.content.logistics.chute.ChuteItem;
 import com.zurrtum.create.content.logistics.depot.EjectorItem;
 import com.zurrtum.create.content.logistics.factoryBoard.FactoryPanelBlockItem;
+import com.zurrtum.create.content.logistics.filter.AttributeFilterItem;
 import com.zurrtum.create.content.logistics.filter.FilterItem;
+import com.zurrtum.create.content.logistics.filter.ListFilterItem;
+import com.zurrtum.create.content.logistics.filter.PackageFilterItem;
 import com.zurrtum.create.content.logistics.funnel.FunnelItem;
 import com.zurrtum.create.content.logistics.packagePort.PackagePortItem;
 import com.zurrtum.create.content.logistics.packagerLink.LogisticallyLinkedBlockItem;
@@ -252,7 +256,7 @@ public class AllItems {
     public static final BlockItem GREEN_SEAT = register(AllBlocks.GREEN_SEAT);
     public static final BlockItem RED_SEAT = register(AllBlocks.RED_SEAT);
     public static final BlockItem BLACK_SEAT = register(AllBlocks.BLACK_SEAT);
-    public static final BlockItem MECHANICAL_ROLLER = register(AllBlocks.MECHANICAL_ROLLER);
+    public static final RollerBlockItem MECHANICAL_ROLLER = register(AllBlocks.MECHANICAL_ROLLER, RollerBlockItem::new);
     public static final BlockItem PACKAGER = register(AllBlocks.PACKAGER);
     public static final BlockItem CARDBOARD_BLOCK = register(AllBlocks.CARDBOARD_BLOCK);
     public static final LogisticallyLinkedBlockItem STOCK_LINK = register(AllBlocks.STOCK_LINK, LogisticallyLinkedBlockItem::new);
@@ -725,9 +729,9 @@ public class AllItems {
     public static final Item CRUSHED_GOLD = register("crushed_raw_gold");
     public static final Item CRUSHED_COPPER = register("crushed_raw_copper");
     public static final Item CRUSHED_ZINC = register("crushed_raw_zinc");
-    public static final FilterItem FILTER = register("filter", FilterItem::regular);
-    public static final FilterItem ATTRIBUTE_FILTER = register("attribute_filter", FilterItem::attribute);
-    public static final FilterItem PACKAGE_FILTER = register("package_filter", FilterItem::address);
+    public static final ListFilterItem FILTER = register("filter", FilterItem::regular);
+    public static final AttributeFilterItem ATTRIBUTE_FILTER = register("attribute_filter", FilterItem::attribute);
+    public static final PackageFilterItem PACKAGE_FILTER = register("package_filter", FilterItem::address);
     public static final MinecartCouplingItem MINECART_COUPLING = register("minecart_coupling", MinecartCouplingItem::new);
     public static final MinecartContraptionItem MINECART_CONTRAPTION = register("minecart_contraption", MinecartContraptionItem::rideable);
     public static final MinecartContraptionItem FURNACE_MINECART_CONTRAPTION = register(

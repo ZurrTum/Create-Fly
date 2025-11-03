@@ -65,13 +65,13 @@ public class FluidValveBlockEntity extends KineticBlockEntity {
     @Override
     protected void write(WriteView view, boolean clientPacket) {
         super.write(view, clientPacket);
-        pointer.write(view);
+        pointer.write(view.get("Pointer"));
     }
 
     @Override
     protected void read(ReadView view, boolean clientPacket) {
         super.read(view, clientPacket);
-        pointer.read(view, clientPacket);
+        pointer.read(view.getReadView("Pointer"), clientPacket);
     }
 
     @Override

@@ -34,7 +34,7 @@
         "com/zurrtum/create/infrastructure/items/BaseInventory"
       ],
       "net/minecraft/class_1278": [
-        "com/zurrtum/create/infrastructure/items/SidedItemInventory"
+        "com/zurrtum/create/infrastructure/items/BaseSidedInventory"
       ]
     }
   },

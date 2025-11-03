@@ -6,7 +6,7 @@ import com.zurrtum.create.content.kinetics.crafter.ConnectedInputHandler.Connect
 import com.zurrtum.create.content.kinetics.crafter.MechanicalCrafterBlockEntity;
 import com.zurrtum.create.content.kinetics.crafter.MechanicalCrafterBlockEntity.CrafterItemHandler;
 import com.zurrtum.create.content.logistics.BigItemStack;
-import com.zurrtum.create.content.logistics.stockTicker.PackageOrderWithCrafts;
+import com.zurrtum.create.infrastructure.component.PackageOrderWithCrafts;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.item.ItemStack;

@@ -57,7 +57,7 @@ public record FluidContentsAttribute(@Nullable Fluid fluid) implements ItemAttri
         if (fluid != null) {
             Block block = fluid.getDefaultState().getBlockState().getBlock();
             if (fluid != Fluids.EMPTY && block == Blocks.AIR) {
-                parameter = Text.translatable(Util.createTranslationKey("fluid", Registries.FLUID.getId(fluid)));
+                parameter = Text.translatable(Util.createTranslationKey("block", Registries.FLUID.getId(fluid)));
             } else {
                 parameter = block.getName();
             }

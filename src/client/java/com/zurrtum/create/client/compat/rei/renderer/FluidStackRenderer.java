@@ -18,9 +18,7 @@ import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.MergedComponentMap;
 import net.minecraft.component.type.PotionContentsComponent;
 import net.minecraft.fluid.Fluid;
-import net.minecraft.registry.Registries;
 import net.minecraft.text.Text;
-import net.minecraft.util.Util;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -58,15 +56,6 @@ public record FluidStackRenderer(EntryRenderer<FluidStack> origin) implements En
                 contents.appendTooltip(context.vanillaContext(), text -> list.add(Tooltip.entry(text)), context.getFlag(), components);
                 entries.removeFirst();
                 entries.addAll(0, list);
-            } else {
-                Text name = first.getAsText();
-                if (name.getString().startsWith("block.")) {
-                    entries.removeFirst();
-                    entries.addFirst(Tooltip.entry(Text.translatable(Util.createTranslationKey(
-                        "fluid",
-                        Registries.FLUID.getId(entry.getValue().getFluid())
-                    ))));
-                }
             }
         }
         return tooltip;

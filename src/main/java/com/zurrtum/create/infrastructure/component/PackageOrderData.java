@@ -3,7 +3,6 @@ package com.zurrtum.create.infrastructure.component;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.zurrtum.create.catnip.codecs.stream.CatnipStreamCodecBuilders;
-import com.zurrtum.create.content.logistics.stockTicker.PackageOrderWithCrafts;
 import net.minecraft.network.RegistryByteBuf;
 import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.network.codec.PacketCodecs;

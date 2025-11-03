@@ -79,7 +79,15 @@ public class ManualApplicationHelper {
             if (heldItem.getMaxDamage() > 0) {
                 heldItem.damage(1, player, EquipmentSlot.MAINHAND);
             } else {
+                ItemStack leftover = heldItem.getItem().getRecipeRemainder();
                 heldItem.decrement(1);
+                if (!leftover.isEmpty()) {
+                    if (heldItem.isEmpty()) {
+                        player.setStackInHand(hand, leftover);
+                    } else if (!player.getInventory().insertStack(leftover)) {
+                        player.dropItem(leftover, false);
+                    }
+                }
             }
         }
         return ActionResult.SUCCESS;

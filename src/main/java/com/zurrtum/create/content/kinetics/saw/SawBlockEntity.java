@@ -296,7 +296,13 @@ public class SawBlockEntity extends BlockBreakingKineticBlockEntity {
         if (output == null) {
             output = pair.getFirst().craft(input, world.getRegistryManager());
         }
-        List<ItemStack> list = ItemHelper.multipliedOutput(output, stack.getCount());
+        List<ItemStack> list;
+        ItemStack recipeRemainder = stack.getItem().getRecipeRemainder();
+        if (recipeRemainder.isEmpty()) {
+            list = ItemHelper.multipliedOutput(output, stack.getCount());
+        } else {
+            list = ItemHelper.multipliedOutput(List.of(output, recipeRemainder), stack.getCount());
+        }
         for (int slot = 1, listSize = list.size(), invSize = inventory.size(); slot < invSize; slot++) {
             inventory.setStack(slot, slot <= listSize ? list.get(slot - 1) : ItemStack.EMPTY);
         }

@@ -350,7 +350,7 @@ public class Train {
                 int entries = 0;
                 double total = 0;
 
-                if (leadingPoint.node1 != null && trailingPoint.node1 != null) {
+                if (leadingPoint.node1 != null && trailingPoint.node1 != null || leadingPoint.edge == null || trailingPoint.edge == null) {
                     RegistryKey<World> d1 = leadingPoint.node1.getLocation().dimension;
                     RegistryKey<World> d2 = trailingPoint.node1.getLocation().dimension;
                     for (boolean b : Iterate.trueAndFalse) {

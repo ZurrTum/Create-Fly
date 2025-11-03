@@ -8,6 +8,7 @@ import net.minecraft.recipe.input.RecipeInput;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.util.math.random.Random;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public interface CreateRecipe<T extends RecipeInput> extends Recipe<T> {
@@ -31,6 +32,8 @@ public interface CreateRecipe<T extends RecipeInput> extends Recipe<T> {
     }
 
     default List<ItemStack> craft(T input, Random random) {
-        return List.of(craft(input, (RegistryWrapper.WrapperLookup) null));
+        List<ItemStack> list = new ArrayList<>(1);
+        list.add(craft(input, (RegistryWrapper.WrapperLookup) null));
+        return list;
     }
 }

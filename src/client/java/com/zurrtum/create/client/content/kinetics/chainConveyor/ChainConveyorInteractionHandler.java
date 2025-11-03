@@ -45,13 +45,13 @@ public class ChainConveyorInteractionHandler {
             return;
         }
 
-        ItemStack mainHandItem = mc.player.getMainHandStack();
-        boolean isWrench = mainHandItem.isIn(AllItemTags.CHAIN_RIDEABLE);
-        boolean dismantling = isWrench && mc.player.isSneaking();
-        double range = mc.player.getAttributeValue(EntityAttributes.BLOCK_INTERACTION_RANGE) + 1;
+        ClientPlayerEntity player = mc.player;
+        boolean isWrench = player.isHolding(i -> i.isIn(AllItemTags.TOOLS_WRENCH));
+        boolean dismantling = isWrench && player.isSneaking();
+        double range = player.getAttributeValue(EntityAttributes.BLOCK_INTERACTION_RANGE) + 1;
 
-        Vec3d from = RaycastHelper.getTraceOrigin(mc.player);
-        Vec3d to = RaycastHelper.getTraceTarget(mc.player, range, from);
+        Vec3d from = player.getEyePos();
+        Vec3d to = RaycastHelper.getTraceTarget(player, range, from);
         HitResult hitResult = mc.crosshairTarget;
 
         double bestDiff = Float.MAX_VALUE;
@@ -99,7 +99,8 @@ public class ChainConveyorInteractionHandler {
 
     private static boolean isActive(MinecraftClient mc) {
         ItemStack mainHandItem = mc.player.getMainHandStack();
-        return mainHandItem.isIn(AllItemTags.CHAIN_RIDEABLE) || mainHandItem.isOf(AllItems.PACKAGE_FROGPORT) || PackageItem.isPackage(mainHandItem);
+        return mc.player.isHolding(i -> i.isIn(AllItemTags.CHAIN_RIDEABLE)) || mainHandItem.isOf(AllItems.PACKAGE_FROGPORT) || PackageItem.isPackage(
+            mainHandItem);
     }
 
     public static boolean onUse(MinecraftClient mc) {
@@ -109,18 +110,14 @@ public class ChainConveyorInteractionHandler {
         ClientPlayerEntity player = mc.player;
         ItemStack mainHandItem = player.getMainHandStack();
 
-        if (mainHandItem.isIn(AllItemTags.CHAIN_RIDEABLE)) {
+        if (player.isHolding(i -> i.isIn(AllItemTags.CHAIN_RIDEABLE))) {
+            ItemStack usedItem = mainHandItem.isIn(AllItemTags.CHAIN_RIDEABLE) ? mainHandItem : player.getOffHandStack();
             if (!player.isSneaking()) {
                 ChainConveyorRidingHandler.embark(mc, selectedLift, selectedChainPosition, selectedConnection);
                 return true;
             }
 
-            player.networkHandler.sendPacket(new ChainConveyorConnectionPacket(
-                selectedLift,
-                selectedLift.add(selectedConnection),
-                mainHandItem,
-                false
-            ));
+            player.networkHandler.sendPacket(new ChainConveyorConnectionPacket(selectedLift, selectedLift.add(selectedConnection), usedItem, false));
             return true;
         }
 

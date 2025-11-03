@@ -1,13 +1,14 @@
 package com.zurrtum.create.client.mixin;
 
 import com.zurrtum.create.client.content.equipment.armor.CardboardRenderState;
-import com.zurrtum.create.client.foundation.render.UuidRenderState;
+import com.zurrtum.create.client.foundation.render.SkyhookRenderState;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.AbstractClientPlayerEntity;
 import net.minecraft.client.network.ClientPlayerLikeEntity;
 import net.minecraft.client.option.Perspective;
 import net.minecraft.client.render.entity.state.PlayerEntityRenderState;
 import net.minecraft.entity.PlayerLikeEntity;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import org.spongepowered.asm.mixin.Mixin;
@@ -16,7 +17,7 @@ import org.spongepowered.asm.mixin.Unique;
 import java.util.UUID;
 
 @Mixin(PlayerEntityRenderState.class)
-public class PlayerEntityRenderStateMixin implements CardboardRenderState, UuidRenderState {
+public class PlayerEntityRenderStateMixin implements CardboardRenderState, SkyhookRenderState {
     @Unique
     private boolean flying;
     @Unique
@@ -39,6 +40,8 @@ public class PlayerEntityRenderStateMixin implements CardboardRenderState, UuidR
     private float tickProgress;
     @Unique
     private UUID uuid;
+    @Unique
+    private ItemStack mainStack;
 
     @Override
     public void create$setUuid(UUID uuid) {
@@ -48,6 +51,16 @@ public class PlayerEntityRenderStateMixin implements CardboardRenderState, UuidR
     @Override
     public UUID create$getUuid() {
         return uuid;
+    }
+
+    @Override
+    public void create$setMainStack(ItemStack stack) {
+        mainStack = stack;
+    }
+
+    @Override
+    public ItemStack create$getMainStack() {
+        return mainStack;
     }
 
     @Override

@@ -3,7 +3,7 @@ package com.zurrtum.create.client.infrastructure.model;
 import com.google.common.base.Suppliers;
 import com.mojang.serialization.MapCodec;
 import com.zurrtum.create.AllDataComponents;
-import com.zurrtum.create.infrastructure.component.ClipboardType;
+import com.zurrtum.create.infrastructure.component.ClipboardContent;
 import net.minecraft.client.item.ItemModelManager;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.TexturedRenderLayers;
@@ -46,8 +46,7 @@ public class ClipboardModel implements ItemModel {
         @Nullable HeldItemContext user,
         int seed
     ) {
-        ClipboardType type = stack.getOrDefault(AllDataComponents.CLIPBOARD_TYPE, ClipboardType.EMPTY);
-        int index = type.ordinal();
+        int index = stack.getOrDefault(AllDataComponents.CLIPBOARD_CONTENT, ClipboardContent.EMPTY).type().ordinal();
         state.addModelKey(this);
         state.addModelKey(index);
         models[index].update(state, layer, displayContext);

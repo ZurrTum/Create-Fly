@@ -4,13 +4,13 @@ import com.zurrtum.create.AllDataComponents;
 import com.zurrtum.create.AllRecipeSets;
 import com.zurrtum.create.AllRecipeTypes;
 import com.zurrtum.create.AllSoundEvents;
-import com.zurrtum.create.api.entity.FakePlayerHandler;
 import com.zurrtum.create.catnip.math.VecHelper;
 import com.zurrtum.create.infrastructure.component.SandPaperItemComponent;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.*;
 import net.minecraft.item.consume.UseAction;
 import net.minecraft.particle.ItemStackParticleEffect;
@@ -110,7 +110,7 @@ public class SandPaperItem extends Item {
     }
 
     @Override
-    public ItemStack finishUsing(ItemStack stack, World worldIn, LivingEntity entityLiving) {
+    public ItemStack finishUsing(ItemStack stack, World world, LivingEntity entityLiving) {
         if (!(entityLiving instanceof PlayerEntity player))
             return stack;
         SandPaperItemComponent component = stack.get(AllDataComponents.SAND_PAPER_POLISHING);
@@ -118,20 +118,21 @@ public class SandPaperItem extends Item {
             return stack;
         ItemStack toPolish = component.item();
 
-        if (worldIn.isClient()) {
-            spawnParticles(entityLiving.getCameraPosVec(1).add(entityLiving.getRotationVector().multiply(.5f)), toPolish, worldIn);
+        if (world.isClient()) {
+            spawnParticles(entityLiving.getCameraPosVec(1).add(entityLiving.getRotationVector().multiply(.5f)), toPolish, world);
             return stack;
         }
 
         SingleStackRecipeInput input = new SingleStackRecipeInput(toPolish);
-        ((ServerWorld) worldIn).getRecipeManager().getFirstMatch(AllRecipeTypes.SANDPAPER_POLISHING, input, worldIn).ifPresent(recipe -> {
-            ItemStack polished = recipe.value().craft(input, worldIn.getRegistryManager());
+        ((ServerWorld) world).getRecipeManager().getFirstMatch(AllRecipeTypes.SANDPAPER_POLISHING, input, world).ifPresent(recipe -> {
+            ItemStack polished = recipe.value().craft(input, world.getRegistryManager());
+            PlayerInventory playerInv = player.getInventory();
             if (!polished.isEmpty()) {
-                if (FakePlayerHandler.has(player)) {
-                    player.dropItem(polished, false, false);
-                } else {
-                    player.getInventory().offerOrDrop(polished);
-                }
+                playerInv.offerOrDrop(polished);
+            }
+            ItemStack recipeRemainder = toPolish.getItem().getRecipeRemainder();
+            if (!recipeRemainder.isEmpty()) {
+                playerInv.offerOrDrop(recipeRemainder);
             }
         });
 

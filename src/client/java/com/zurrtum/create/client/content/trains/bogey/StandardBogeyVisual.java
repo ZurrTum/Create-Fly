@@ -10,6 +10,7 @@ import com.zurrtum.create.client.flywheel.lib.instance.InstanceTypes;
 import com.zurrtum.create.client.flywheel.lib.instance.TransformedInstance;
 import com.zurrtum.create.client.flywheel.lib.model.Models;
 import com.zurrtum.create.client.foundation.render.AllInstanceTypes;
+import com.zurrtum.create.client.foundation.render.SpecialModels;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.util.math.Direction;
@@ -68,8 +69,10 @@ public class StandardBogeyVisual implements BogeyVisual {
 
         public Small(VisualizationContext ctx, float partialTick, boolean inContraption) {
             super(ctx, partialTick, inContraption);
-            var wheelInstancer = ctx.instancerProvider().instancer(InstanceTypes.TRANSFORMED, Models.partial(AllPartialModels.SMALL_BOGEY_WHEELS));
-            frame = ctx.instancerProvider().instancer(InstanceTypes.TRANSFORMED, Models.partial(AllPartialModels.BOGEY_FRAME)).createInstance();
+            var wheelInstancer = ctx.instancerProvider()
+                .instancer(InstanceTypes.TRANSFORMED, SpecialModels.smoothLit(AllPartialModels.SMALL_BOGEY_WHEELS));
+            frame = ctx.instancerProvider().instancer(InstanceTypes.TRANSFORMED, SpecialModels.smoothLit(AllPartialModels.BOGEY_FRAME))
+                .createInstance();
             wheel1 = wheelInstancer.createInstance();
             wheel2 = wheelInstancer.createInstance();
         }
@@ -126,16 +129,19 @@ public class StandardBogeyVisual implements BogeyVisual {
 
         public Large(VisualizationContext ctx, float partialTick, boolean inContraption) {
             super(ctx, partialTick, inContraption);
-            var secondaryShaftInstancer = ctx.instancerProvider().instancer(InstanceTypes.TRANSFORMED, Models.partial(AllPartialModels.SHAFT));
+            var secondaryShaftInstancer = ctx.instancerProvider()
+                .instancer(InstanceTypes.TRANSFORMED, SpecialModels.smoothLit(AllPartialModels.SHAFT));
             secondaryShaft1 = secondaryShaftInstancer.createInstance();
             secondaryShaft2 = secondaryShaftInstancer.createInstance();
-            drive = ctx.instancerProvider().instancer(InstanceTypes.TRANSFORMED, Models.partial(AllPartialModels.BOGEY_DRIVE)).createInstance();
-            belt = ctx.instancerProvider().instancer(AllInstanceTypes.SCROLLING_TRANSFORMED, Models.partial(AllPartialModels.BOGEY_DRIVE_BELT))
+            drive = ctx.instancerProvider().instancer(InstanceTypes.TRANSFORMED, SpecialModels.smoothLit(AllPartialModels.BOGEY_DRIVE))
                 .createInstance();
-            piston = ctx.instancerProvider().instancer(InstanceTypes.TRANSFORMED, Models.partial(AllPartialModels.BOGEY_PISTON)).createInstance();
-            wheels = ctx.instancerProvider().instancer(InstanceTypes.TRANSFORMED, Models.partial(AllPartialModels.LARGE_BOGEY_WHEELS))
+            belt = ctx.instancerProvider()
+                .instancer(AllInstanceTypes.SCROLLING_TRANSFORMED, SpecialModels.smoothLit(AllPartialModels.BOGEY_DRIVE_BELT)).createInstance();
+            piston = ctx.instancerProvider().instancer(InstanceTypes.TRANSFORMED, SpecialModels.smoothLit(AllPartialModels.BOGEY_PISTON))
                 .createInstance();
-            pin = ctx.instancerProvider().instancer(InstanceTypes.TRANSFORMED, Models.partial(AllPartialModels.BOGEY_PIN)).createInstance();
+            wheels = ctx.instancerProvider().instancer(InstanceTypes.TRANSFORMED, SpecialModels.smoothLit(AllPartialModels.LARGE_BOGEY_WHEELS))
+                .createInstance();
+            pin = ctx.instancerProvider().instancer(InstanceTypes.TRANSFORMED, SpecialModels.smoothLit(AllPartialModels.BOGEY_PIN)).createInstance();
 
             belt.setSpriteShift(AllSpriteShifts.BOGEY_BELT);
         }

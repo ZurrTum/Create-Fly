@@ -83,7 +83,7 @@ public class SequencedAssemblyCategory extends CreateCategory<SequencedAssemblyD
                 if (stack != null) {
                     FluidStack fluidStack = stack.castValue();
                     fluid = fluidStack.getFluid();
-                    components = fluidStack.getPatch();
+                    components = fluidStack.getComponents().getChanges();
                 }
                 graphics.state.addSpecialElement(new SpoutRenderState(i, new Matrix3x2f(matrices), fluid, components, point.x - 2, point.y + 24, i));
                 matrices.popMatrix();

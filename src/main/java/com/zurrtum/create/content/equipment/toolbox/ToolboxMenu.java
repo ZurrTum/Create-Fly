@@ -29,7 +29,7 @@ public class ToolboxMenu extends MenuBase<ToolboxBlockEntity> {
             if (stack.isEmpty()) {
                 return stack;
             }
-            success = !insertItem(stack, size, slots.size(), false);
+            success = !insertItem(stack, size, slots.size(), true);
             contentHolder.inventory.markDirty();
         } else {
             if (stack.isEmpty()) {

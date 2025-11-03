@@ -17,6 +17,7 @@ import com.zurrtum.create.client.content.contraptions.actors.trainControls.Contr
 import com.zurrtum.create.client.content.contraptions.chassis.ChassisRangeDisplay;
 import com.zurrtum.create.client.content.contraptions.minecart.CouplingHandlerClient;
 import com.zurrtum.create.client.content.contraptions.minecart.CouplingRenderer;
+import com.zurrtum.create.client.content.contraptions.wrench.RadialWrenchHandler;
 import com.zurrtum.create.client.content.decoration.girder.GirderWrenchBehaviorHandler;
 import com.zurrtum.create.client.content.equipment.armor.CardboardArmorStealthOverlay;
 import com.zurrtum.create.client.content.equipment.blueprint.BlueprintOverlayRenderer;
@@ -206,6 +207,7 @@ public class MinecraftClientMixin {
         EjectorTargetHandler.tick(mc);
         BlueprintOverlayRenderer.tick(mc);
         ToolboxHandlerClient.clientTick();
+        RadialWrenchHandler.clientTick();
         TrackTargetingClient.clientTick(mc);
         TrackPlacementClient.clientTick(mc);
         TrainRelocatorClient.clientTick(mc);

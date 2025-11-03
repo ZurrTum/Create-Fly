@@ -1,8 +1,8 @@
 package com.zurrtum.create.impl.unpacking;
 
 import com.zurrtum.create.api.packager.unpacking.UnpackingHandler;
-import com.zurrtum.create.content.logistics.stockTicker.PackageOrderWithCrafts;
 import com.zurrtum.create.foundation.item.ItemHelper;
+import com.zurrtum.create.infrastructure.component.PackageOrderWithCrafts;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.inventory.Inventory;

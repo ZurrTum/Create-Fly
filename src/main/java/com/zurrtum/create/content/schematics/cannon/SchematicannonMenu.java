@@ -44,7 +44,7 @@ public class SchematicannonMenu extends MenuBase<SchematicannonBlockEntity> {
         ItemStack stack = clickedSlot.getStack();
 
         if (index < 5) {
-            insertItem(stack, 5, slots.size(), false);
+            insertItem(stack, 5, slots.size(), true);
         } else {
             if (insertItem(stack, 0, 1, false) || insertItem(stack, 2, 3, false) || insertItem(stack, 4, 5, false))
                 ;

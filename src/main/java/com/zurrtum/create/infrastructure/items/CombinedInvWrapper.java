@@ -12,7 +12,7 @@ import java.util.Collections;
 import java.util.NoSuchElementException;
 import java.util.function.Predicate;
 
-public class CombinedInvWrapper implements SidedInventory {
+public class CombinedInvWrapper implements SidedItemInventory {
     protected final Inventory[] itemHandler;
     protected final int[] baseIndex;
     private final boolean[] sideInventory;

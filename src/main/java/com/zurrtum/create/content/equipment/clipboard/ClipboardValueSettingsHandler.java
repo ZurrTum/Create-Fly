@@ -8,6 +8,7 @@ import com.zurrtum.create.foundation.blockEntity.behaviour.BehaviourType;
 import com.zurrtum.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.foundation.blockEntity.behaviour.filtering.ServerFilteringBehaviour;
 import com.zurrtum.create.foundation.blockEntity.behaviour.scrollValue.ServerScrollValueBehaviour;
+import com.zurrtum.create.infrastructure.component.ClipboardContent;
 import com.zurrtum.create.infrastructure.component.ClipboardEntry;
 import com.zurrtum.create.infrastructure.component.ClipboardType;
 import net.minecraft.entity.player.PlayerEntity;
@@ -50,10 +51,12 @@ public class ClipboardValueSettingsHandler {
         if (!(world.getBlockEntity(pos) instanceof SmartBlockEntity smartBE))
             return null;
 
+        ClipboardContent clipboardContent = itemStack.getOrDefault(AllDataComponents.CLIPBOARD_CONTENT, ClipboardContent.EMPTY);
+
         if (smartBE instanceof ClipboardBlockEntity cbe) {
             if (!world.isClient()) {
-                List<List<ClipboardEntry>> listTo = ClipboardEntry.readAll(itemStack);
-                List<List<ClipboardEntry>> listFrom = ClipboardEntry.readAll(cbe.dataContainer);
+                List<List<ClipboardEntry>> listTo = ClipboardEntry.readAll(clipboardContent);
+                List<List<ClipboardEntry>> listFrom = ClipboardEntry.readAll(cbe.getComponents());
                 List<ClipboardEntry> toAdd = new ArrayList<>();
 
                 for (List<ClipboardEntry> page : listFrom) {
@@ -81,10 +84,13 @@ public class ClipboardValueSettingsHandler {
                         listTo.add(page);
                     }
                     page.add(entry);
-                    ClipboardOverrides.switchTo(ClipboardType.WRITTEN, itemStack);
+
+                    clipboardContent = clipboardContent.setType(ClipboardType.WRITTEN);
+                    itemStack.set(AllDataComponents.CLIPBOARD_CONTENT, clipboardContent);
                 }
 
-                ClipboardEntry.saveAll(listTo, itemStack);
+                clipboardContent = clipboardContent.setPages(listTo);
+                itemStack.set(AllDataComponents.CLIPBOARD_CONTENT, clipboardContent);
             }
 
             player.sendMessage(
@@ -96,7 +102,7 @@ public class ClipboardValueSettingsHandler {
 
         NbtCompound tag = null;
         if (paste) {
-            tag = itemStack.get(AllDataComponents.CLIPBOARD_COPIED_VALUES);
+            tag = clipboardContent.copiedValues().orElse(null);
             if (tag == null) {
                 return null;
             }
@@ -156,8 +162,9 @@ public class ClipboardValueSettingsHandler {
         );
 
         if (!paste) {
-            ClipboardOverrides.switchTo(ClipboardType.WRITTEN, itemStack);
-            itemStack.set(AllDataComponents.CLIPBOARD_COPIED_VALUES, tag);
+            clipboardContent = clipboardContent.setType(ClipboardType.WRITTEN);
+            clipboardContent = clipboardContent.setCopiedValues(tag);
+            itemStack.set(AllDataComponents.CLIPBOARD_CONTENT, clipboardContent);
         }
         return ActionResult.SUCCESS;
     }

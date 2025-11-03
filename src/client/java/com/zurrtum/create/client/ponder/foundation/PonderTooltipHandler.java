@@ -1,6 +1,7 @@
 package com.zurrtum.create.client.ponder.foundation;
 
 import com.google.common.base.Strings;
+import com.mojang.blaze3d.systems.RenderSystem;
 import com.zurrtum.create.catnip.animation.LerpedFloat;
 import com.zurrtum.create.catnip.data.Couple;
 import com.zurrtum.create.catnip.registry.RegisteredObjectsHelper;
@@ -15,15 +16,16 @@ import com.zurrtum.create.client.ponder.foundation.ui.PonderUI;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.item.ItemStack;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Consumer;
 
 public class PonderTooltipHandler {
 
@@ -38,6 +40,8 @@ public class PonderTooltipHandler {
     static ItemStack trackingStack = ItemStack.EMPTY;
     static boolean subject = false;
     static boolean deferTick = false;
+
+    static final List<Consumer<ItemStack>> hoveredStackCallbacks = new ArrayList<>();
 
     public static final String HOLD_TO_PONDER = PonderLocalization.UI_PREFIX + "hold_to_ponder";
     public static final String SUBJECT = PonderLocalization.UI_PREFIX + "subject";
@@ -59,7 +63,10 @@ public class PonderTooltipHandler {
 
         float value = holdKeyProgress.getValue();
 
-        if (!subject && InputUtil.isKeyPressed(instance.getWindow(), ponderKeybind().boundKey.getCode()) && currentScreen != null) {
+        if (RenderSystem.isOnRenderThread() && !subject && !PonderKeybinds.PONDER.isUnbound() && InputUtil.isKeyPressed(
+            instance.getWindow(),
+            PonderKeybinds.PONDER.boundKey.getCode()
+        ) && currentScreen != null) {
             if (value >= 1) {
                 if (currentScreen instanceof NavigatableSimiScreen)
                     ((NavigatableSimiScreen) currentScreen).centerScalingOnMouse();
@@ -127,6 +134,9 @@ public class PonderTooltipHandler {
 
         hoveredStack = stack;
         trackingStack = stack;
+
+        for (Consumer<ItemStack> hoveredStackCallback : hoveredStackCallbacks)
+            hoveredStackCallback.accept(hoveredStack.copy());
     }
 
     public static Optional<Couple<Color>> handleTooltipColor(ItemStack stack) {
@@ -158,8 +168,8 @@ public class PonderTooltipHandler {
 
     private static Text makeProgressBar(float progress) {
         MutableText holdW = Ponder.lang()
-            .translate(HOLD_TO_PONDER, ((MutableText) ponderKeybind().getBoundKeyLocalizedText()).formatted(Formatting.GRAY))
-            .style(Formatting.DARK_GRAY).component();
+            .translate(HOLD_TO_PONDER, PonderKeybinds.PONDER.getBoundKeyLocalizedText().copy().formatted(Formatting.GRAY)).style(Formatting.DARK_GRAY)
+            .component();
 
         if (progress > 0) {
             TextRenderer fontRenderer = MinecraftClient.getInstance().textRenderer;
@@ -179,8 +189,11 @@ public class PonderTooltipHandler {
         return holdW;
     }
 
-    protected static KeyBinding ponderKeybind() {
-        return PonderKeybinds.PONDER;
+    public synchronized static void registerHoveredPonderStackCallback(Consumer<ItemStack> consumer) {
+        hoveredStackCallbacks.add(consumer);
     }
 
+    public synchronized static void removeHoveredPonderStackCallback(Consumer<ItemStack> consumer) {
+        hoveredStackCallbacks.remove(consumer);
+    }
 }

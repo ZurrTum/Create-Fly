@@ -4,6 +4,7 @@ import com.zurrtum.create.AllBlockEntityTypes;
 import com.zurrtum.create.content.contraptions.Contraption;
 import com.zurrtum.create.infrastructure.items.CombinedInvWrapper;
 import com.zurrtum.create.infrastructure.items.ItemStackHandler;
+import com.zurrtum.create.infrastructure.items.SidedItemInventory;
 import com.zurrtum.create.infrastructure.transfer.SlotRangeCache;
 import net.minecraft.block.BlockState;
 import net.minecraft.inventory.Inventory;
@@ -35,7 +36,7 @@ public class PortableItemInterfaceBlockEntity extends PortableStorageInterfaceBl
         super.stopTransferring();
     }
 
-    class InterfaceItemHandler implements SidedInventory {
+    class InterfaceItemHandler implements SidedItemInventory {
         private static final Inventory EMPTY = new ItemStackHandler(0);
 
         private int[] slots = SlotRangeCache.EMPTY;

@@ -95,46 +95,10 @@ public class KineticBlockEntityRenderer<T extends KineticBlockEntity, S extends 
         return CachedBuffers.block(KINETIC_BLOCK, state.blockState);
     }
 
-    public static void renderRotatingKineticBlock(KineticBlockEntity be, BlockState renderedState, MatrixStack ms, VertexConsumer buffer, int light) {
-        SuperByteBuffer superByteBuffer = CachedBuffers.block(KINETIC_BLOCK, renderedState);
-        renderRotatingBuffer(be, superByteBuffer, ms, buffer, light);
-    }
-
-    public static void renderRotatingBuffer(KineticBlockEntity be, SuperByteBuffer superBuffer, MatrixStack ms, VertexConsumer buffer, int light) {
-        standardKineticRotationTransform(superBuffer, be, light).renderInto(ms.peek(), buffer);
-    }
-
     public static float getAngleForBe(KineticBlockEntity be, final BlockPos pos, Axis axis) {
         float time = AnimationTickHolder.getRenderTime(be.getWorld());
         float offset = getRotationOffsetForPosition(be, pos, axis);
         return ((time * be.getSpeed() * 3f / 10 + offset) % 360) / 180 * (float) Math.PI;
-    }
-
-    public static SuperByteBuffer standardKineticRotationTransform(SuperByteBuffer buffer, KineticBlockEntity be, int light) {
-        final BlockPos pos = be.getPos();
-        Axis axis = ((IRotate) be.getCachedState().getBlock()).getRotationAxis(be.getCachedState());
-        return kineticRotationTransform(buffer, be, axis, getAngleForBe(be, pos, axis), light);
-    }
-
-    public static SuperByteBuffer kineticRotationTransform(SuperByteBuffer buffer, KineticBlockEntity be, Axis axis, float angle, int light) {
-        buffer.light(light);
-        buffer.rotateCentered(angle, Direction.get(AxisDirection.POSITIVE, axis));
-
-        if (KineticDebugger.isActive()) {
-            rainbowMode = true;
-            buffer.color(be.hasNetwork() ? Color.generateFromLong(be.network) : Color.WHITE);
-        } else {
-            float overStressedEffect = be.effects.overStressedEffect;
-            if (overStressedEffect != 0)
-                if (overStressedEffect > 0)
-                    buffer.color(Color.WHITE.mixWith(Color.RED, overStressedEffect));
-                else
-                    buffer.color(Color.WHITE.mixWith(Color.SPRING_GREEN, -overStressedEffect));
-            else
-                buffer.color(Color.WHITE);
-        }
-
-        return buffer;
     }
 
     public static Color getColor(KineticBlockEntity be) {
@@ -143,13 +107,14 @@ public class KineticBlockEntityRenderer<T extends KineticBlockEntity, S extends 
             return be.network != null ? Color.generateFromLong(be.network) : Color.WHITE;
         } else {
             float overStressedEffect = be.effects.overStressedEffect;
-            if (overStressedEffect == 0) {
+            if (overStressedEffect != 0) {
+                boolean overstressed = overStressedEffect > 0;
+                Color color = overstressed ? Color.RED : Color.SPRING_GREEN;
+                float weight = overstressed ? overStressedEffect : -overStressedEffect;
+                return Color.WHITE.mixWith(color, weight);
+            } else {
                 return Color.WHITE;
             }
-            if (overStressedEffect > 0) {
-                return Color.WHITE.mixWith(Color.RED, overStressedEffect);
-            }
-            return Color.WHITE.mixWith(Color.SPRING_GREEN, -overStressedEffect);
         }
     }
 

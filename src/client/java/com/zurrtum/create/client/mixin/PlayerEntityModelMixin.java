@@ -1,7 +1,7 @@
 package com.zurrtum.create.client.mixin;
 
 import com.zurrtum.create.client.foundation.render.PlayerSkyhookRenderer;
-import com.zurrtum.create.client.foundation.render.UuidRenderState;
+import com.zurrtum.create.client.foundation.render.SkyhookRenderState;
 import net.minecraft.client.render.entity.model.PlayerEntityModel;
 import net.minecraft.client.render.entity.state.PlayerEntityRenderState;
 import org.spongepowered.asm.mixin.Mixin;
@@ -13,6 +13,12 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public class PlayerEntityModelMixin {
     @Inject(method = "setAngles(Lnet/minecraft/client/render/entity/state/PlayerEntityRenderState;)V", at = @At("TAIL"))
     private void afterSetupAnim(PlayerEntityRenderState state, CallbackInfo ci) {
-        PlayerSkyhookRenderer.afterSetupAnim(((UuidRenderState) state).create$getUuid(), state.mainArm, (PlayerEntityModel) (Object) this);
+        SkyhookRenderState skyhookRenderState = (SkyhookRenderState) state;
+        PlayerSkyhookRenderer.afterSetupAnim(
+            skyhookRenderState.create$getUuid(),
+            state.mainArm,
+            skyhookRenderState.create$getMainStack(),
+            (PlayerEntityModel) (Object) this
+        );
     }
 }

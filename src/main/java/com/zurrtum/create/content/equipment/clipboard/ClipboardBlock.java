@@ -10,9 +10,11 @@ import com.zurrtum.create.content.equipment.wrench.IWrenchable;
 import com.zurrtum.create.foundation.block.IBE;
 import com.zurrtum.create.foundation.block.ProperWaterloggedBlock;
 import net.minecraft.block.*;
+import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.block.enums.BlockFace;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.fluid.FluidState;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.item.ItemStack;
@@ -84,7 +86,7 @@ public class ClipboardBlock extends WallMountedBlock implements IBE<ClipboardBlo
         return onBlockEntityUse(
             level, pos, cbe -> {
                 if (level.isClient())
-                    AllClientHandle.INSTANCE.openClipboardScreen(player, cbe.dataContainer, pos);
+                    AllClientHandle.INSTANCE.openClipboardScreen(player, cbe.getComponents(), pos);
                 return ActionResult.SUCCESS;
             }
         );
@@ -102,34 +104,48 @@ public class ClipboardBlock extends WallMountedBlock implements IBE<ClipboardBlo
             return;
         ItemStack cloneItemStack = getPickStack(pLevel, pPos, pState, true);
         pLevel.breakBlock(pPos, false);
-        if (pLevel.getBlockState(pPos) != pState)
-            pPlayer.getInventory().offerOrDrop(cloneItemStack);
+        if (pLevel.getBlockState(pPos) != pState) {
+            PlayerInventory inv = pPlayer.getInventory();
+            ItemStack selected = inv.getSelectedStack();
+            if (selected.isEmpty()) {
+                inv.setSelectedStack(cloneItemStack);
+            } else {
+                inv.offerOrDrop(cloneItemStack);
+            }
+        }
     }
 
     @Override
     protected ItemStack getPickStack(WorldView world, BlockPos pos, BlockState state, boolean includeData) {
-        if (includeData && world.getBlockEntity(pos) instanceof ClipboardBlockEntity cbe)
-            return cbe.dataContainer;
-        return new ItemStack(this);
+        return applyComponentsToDropStack(new ItemStack(this), world.getBlockEntity(pos));
     }
 
     @Override
-    public BlockState onBreak(World pLevel, BlockPos pPos, BlockState pState, PlayerEntity pPlayer) {
-        if (!(pLevel.getBlockEntity(pPos) instanceof ClipboardBlockEntity cbe))
-            return pState;
-        if (pLevel.isClient() || pPlayer.isCreative())
-            return pState;
-        Block.dropStack(pLevel, pPos, cbe.dataContainer.copy());
+    public BlockState onBreak(World level, BlockPos pos, BlockState state, PlayerEntity player) {
+        if (!(level.getBlockEntity(pos) instanceof ClipboardBlockEntity cbe))
+            return state;
+        if (level.isClient() || player.isCreative())
+            return state;
+        Block.dropStack(level, pos, applyComponentsToDropStack(new ItemStack(this), cbe));
 
-        return pState;
+        return state;
     }
 
     @Override
     public List<ItemStack> getDroppedStacks(BlockState pState, LootWorldContext.Builder pBuilder) {
         if (!(pBuilder.getOptional(LootContextParameters.BLOCK_ENTITY) instanceof ClipboardBlockEntity cbe))
             return super.getDroppedStacks(pState, pBuilder);
-        pBuilder.addDynamicDrop(ShulkerBoxBlock.CONTENTS_DYNAMIC_DROP_ID, p_56219_ -> p_56219_.accept(cbe.dataContainer.copy()));
-        return ImmutableList.of(cbe.dataContainer.copy());
+        ItemStack drop = applyComponentsToDropStack(new ItemStack(this), cbe);
+        pBuilder.addDynamicDrop(ShulkerBoxBlock.CONTENTS_DYNAMIC_DROP_ID, c -> c.accept(drop.copy()));
+        return ImmutableList.of(drop);
+    }
+
+    private ItemStack applyComponentsToDropStack(ItemStack stack, BlockEntity blockEntity) {
+        if (blockEntity instanceof ClipboardBlockEntity cbe) {
+            stack.applyComponentsFrom(cbe.getComponents());
+            return stack;
+        }
+        return stack;
     }
 
     @Override

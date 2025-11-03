@@ -85,6 +85,7 @@ public abstract class AbstractSimiWidget extends ClickableWidget implements Tick
         if (visible) {
             hovered = isMouseOver(mouseX, mouseY);
             renderWidget(graphics, mouseX, mouseY, partialTicks);
+            renderTooltip(graphics, mouseX, mouseY, partialTicks);
             wasHovered = isSelected();
         }
     }
@@ -94,6 +95,18 @@ public abstract class AbstractSimiWidget extends ClickableWidget implements Tick
         beforeRender(graphics, mouseX, mouseY, partialTicks);
         doRender(graphics, mouseX, mouseY, partialTicks);
         afterRender(graphics, mouseX, mouseY, partialTicks);
+    }
+
+    protected void renderTooltip(DrawContext graphics, int mouseX, int mouseY, float partialTicks) {
+        if (this.isHovered()) {
+            List<Text> tooltip = this.getToolTip();
+            if (tooltip.isEmpty())
+                return;
+            int ttx = this.lockedTooltipX == -1 ? mouseX : this.lockedTooltipX + this.getX();
+            int tty = this.lockedTooltipY == -1 ? mouseY : this.lockedTooltipY + this.getY();
+
+            graphics.drawTooltip(graphics.client.textRenderer, tooltip, ttx, tty);
+        }
     }
 
     protected void beforeRender(DrawContext graphics, int mouseX, int mouseY, float partialTicks) {

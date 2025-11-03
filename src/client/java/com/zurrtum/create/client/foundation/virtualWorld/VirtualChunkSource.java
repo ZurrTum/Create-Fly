@@ -28,8 +28,10 @@ public class VirtualChunkSource extends ChunkManager {
 
     @Override
     public Chunk getChunk(int x, int z) {
-        long pos = ChunkPos.toLong(x, z);
-        return chunks.computeIfAbsent(pos, $ -> new VirtualChunk(world, x, z));
+        return chunks.computeIfAbsent(
+            ChunkPos.toLong(x, z),
+            packedPos -> new VirtualChunk(world, ChunkPos.getPackedX(packedPos), ChunkPos.getPackedZ(packedPos))
+        );
     }
 
     @Override

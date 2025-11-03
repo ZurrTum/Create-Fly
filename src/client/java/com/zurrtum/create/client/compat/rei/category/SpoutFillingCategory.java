@@ -64,7 +64,7 @@ public class SpoutFillingCategory extends CreateCategory<SpoutFillingDisplay> {
                 i,
                 new Matrix3x2f(graphics.getMatrices()),
                 stack.getFluid(),
-                stack.getPatch(),
+                stack.getComponents().getChanges(),
                 bounds.x + 80,
                 bounds.y + 6,
                 0

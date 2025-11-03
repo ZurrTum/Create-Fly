@@ -4,7 +4,6 @@ import com.zurrtum.create.infrastructure.transfer.SlotRangeCache;
 import net.minecraft.entity.ContainerUser;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.Inventory;
-import net.minecraft.inventory.SidedInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.Direction;
@@ -14,7 +13,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Set;
 import java.util.function.Predicate;
 
-public record SidedInventoryWrapper(Inventory inventory, int[] slots) implements SidedInventory {
+public record SidedInventoryWrapper(Inventory inventory, int[] slots) implements SidedItemInventory {
     public SidedInventoryWrapper(Inventory inventory) {
         this(inventory, SlotRangeCache.get(inventory.size()));
     }

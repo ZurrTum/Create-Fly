@@ -66,10 +66,6 @@ public class ContraptionEntityRenderer<C extends AbstractContraptionEntity, S ex
             .get(CONTRAPTION, Pair.of(contraption, renderType), () -> buildStructureBuffer(clientContraption, renderWorld, renderType));
     }
 
-    protected ClientContraption createClientContraption(Contraption contraption) {
-        return new ClientContraption(contraption);
-    }
-
     @SuppressWarnings("unchecked")
     public ClientContraption getOrCreateClientContraptionLazy(Contraption contraption) {
         AtomicReference<ClientContraption> clientContraption = (AtomicReference<ClientContraption>) contraption.clientContraption;
@@ -86,6 +82,10 @@ public class ContraptionEntityRenderer<C extends AbstractContraptionEntity, S ex
             out = clientContraption.getAcquire();
         }
         return out;
+    }
+
+    protected ClientContraption createClientContraption(Contraption contraption) {
+        return new ClientContraption(contraption);
     }
 
     @SuppressWarnings("removal")

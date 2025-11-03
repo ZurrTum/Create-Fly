@@ -1,5 +1,7 @@
+import net.fabricmc.loom.task.RemapJarTask
+
 plugins {
-    id 'fabric-loom' version '1.11-SNAPSHOT'
+    id 'fabric-loom' version '1.12-SNAPSHOT'
 }
 
 repositories {
@@ -11,6 +13,16 @@ repositories {
             includeGroup "me.shedaniel.cloth"
             includeGroup "dev.architectury"
         }
+    }
+    maven {
+        url "https://maven.squiddev.cc"
+        content {
+            includeGroup("cc.tweaked")
+        }
+    }
+    maven {
+        name = 'Ladysnake Mods'
+        url = 'https://maven.ladysnake.org/releases'
     }
     exclusiveContent {
         forRepository {
@@ -25,11 +37,11 @@ repositories {
     }
 }
 
-version = project.mod_version
+version = "$project.mod_version-$project.mod_id"
 group = project.maven_group
 
 base {
-    archivesName = project.archives_base_name
+    archivesName = "$project.archives_base_name-$project.minecraft_version"
 }
 
 loom {
@@ -41,6 +53,26 @@ loom {
             sourceSet sourceSets.client
         }
     }
+}
+
+tasks.register("serverJar", Jar) {
+    archiveClassifier = "server-dev"
+    destinationDirectory = layout.buildDirectory.dir("tmp/serverJar")
+    from sourceSets.main.output
+    from("LICENSE")
+    from("licenses") {
+        into "licenses"
+    }
+}
+
+tasks.register('remapServerJar', RemapJarTask) {
+    dependsOn tasks.serverJar
+    inputFile = tasks.serverJar.archiveFile
+    archiveClassifier = "server"
+}
+
+tasks.build {
+    dependsOn tasks.remapServerJar
 }
 
 dependencies {
@@ -59,6 +91,9 @@ dependencies {
     if (project.compile_only_rei.equals("false")) {
         modClientRuntimeOnly "me.shedaniel:RoughlyEnoughItems-fabric:${project.rei_version}"
     }
+    modCompileOnly "cc.tweaked:cc-tweaked-${project.cct_version}"
+    modCompileOnly "maven.modrinth:trinkets-canary:${project.trinkets_version}"
+    modCompileOnly "dev.onyxstudios.cardinal-components-api:cardinal-components-base:${project.cca_version}"
     modClientCompileOnly "maven.modrinth:sodium:${project.sodium_version}"
     modClientCompileOnly "maven.modrinth:iris:${project.iris_version}"
     modClientCompileOnly "maven.modrinth:hold-my-items:${project.hmi_version}"
@@ -80,6 +115,15 @@ tasks.withType(JavaCompile).configureEach {
 
 java {
     withSourcesJar()
+    tasks.named("sourcesJar", Jar) {
+        from("LICENSE")
+        from("licenses") {
+            into "licenses"
+        }
+        exclude '_data'
+        exclude 'assets'
+        exclude 'data'
+    }
     sourceCompatibility = JavaVersion.VERSION_21
     targetCompatibility = JavaVersion.VERSION_21
 }

@@ -9,6 +9,7 @@ import com.zurrtum.create.content.logistics.depot.SharedDepotBlockMethods;
 import com.zurrtum.create.foundation.advancement.AdvancementBehaviour;
 import com.zurrtum.create.foundation.block.IBE;
 import com.zurrtum.create.foundation.block.ProperWaterloggedBlock;
+import com.zurrtum.create.infrastructure.items.ItemInventoryProvider;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.ShapeContext;
@@ -18,6 +19,7 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.pathing.NavigationType;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.fluid.FluidState;
+import net.minecraft.inventory.Inventory;
 import net.minecraft.item.FilledMapItem;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.item.ItemStack;
@@ -36,16 +38,22 @@ import net.minecraft.util.math.random.Random;
 import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldAccess;
 import net.minecraft.world.WorldView;
 import net.minecraft.world.tick.ScheduledTickView;
 
-public class StationBlock extends Block implements IBE<StationBlockEntity>, IWrenchable, ProperWaterloggedBlock {
+public class StationBlock extends Block implements IBE<StationBlockEntity>, ItemInventoryProvider<StationBlockEntity>, IWrenchable, ProperWaterloggedBlock {
 
     public static final BooleanProperty ASSEMBLING = BooleanProperty.of("assembling");
 
     public StationBlock(Settings p_54120_) {
         super(p_54120_);
         setDefaultState(getDefaultState().with(ASSEMBLING, false).with(WATERLOGGED, false));
+    }
+
+    @Override
+    public Inventory getInventory(WorldAccess world, BlockPos pos, BlockState state, StationBlockEntity blockEntity, Direction context) {
+        return blockEntity.depotBehaviour.itemHandler;
     }
 
     @Override

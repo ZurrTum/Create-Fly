@@ -92,6 +92,13 @@ public class BlueprintEntity extends AbstractDecorationEntity implements Special
     }
 
     @Override
+    public void onTrackedDataSet(TrackedData<?> data) {
+        if (POSE.equals(data)) {
+            calculateDimensions();
+        }
+    }
+
+    @Override
     protected void initDataTracker(DataTracker.Builder builder) {
         super.initDataTracker(builder);
         builder.add(RECIPES, new NbtCompound());

@@ -6,13 +6,19 @@ import org.objectweb.asm.tree.ClassNode;
 import org.spongepowered.asm.mixin.extensibility.IMixinConfigPlugin;
 import org.spongepowered.asm.mixin.extensibility.IMixinInfo;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
 public class MixinPlugin implements IMixinConfigPlugin {
+    public static boolean CCT = false;
+    public static boolean ARCH = false;
+
     @Override
     public void onLoad(String mixinPackage) {
         Create.Lazy = FabricLoader.getInstance().isModLoaded("fabric-api");
+        CCT = FabricLoader.getInstance().isModLoaded("computercraft");
+        ARCH = FabricLoader.getInstance().isModLoaded("architectury");
     }
 
     @Override
@@ -31,10 +37,20 @@ public class MixinPlugin implements IMixinConfigPlugin {
 
     @Override
     public List<String> getMixins() {
-        if (Create.Lazy) {
-            return null;
+        List<String> mixins = new ArrayList<>();
+        if (CCT) {
+            mixins.add("CreateIntegrationMixin");
         }
-        return List.of("ItemGroupMixin", "ItemGroupsMixin", "PersistentStateManagerMixin", "IngredientMixin");
+        if (ARCH) {
+            mixins.add("ArchitecturyMixin");
+        }
+        if (!Create.Lazy) {
+            mixins.add("ItemGroupMixin");
+            mixins.add("ItemGroupsMixin");
+            mixins.add("PersistentStateManagerMixin");
+            mixins.add("IngredientMixin");
+        }
+        return mixins;
     }
 
     @Override

@@ -278,10 +278,17 @@ public class CrushingWheelControllerBlockEntity extends SmartBlockEntity {
             SingleStackRecipeInput input = new SingleStackRecipeInput(item);
             int rolls = item.getCount();
             inventory.clear();
+            ItemStack recipeRemainder = item.getItem().getRecipeRemainder();
+            if (recipeRemainder.isEmpty()) {
+                recipeRemainder = null;
+            }
             for (int roll = 0; roll < rolls; roll++) {
                 List<ItemStack> rolledResults = recipe.craft(input, world.random);
                 for (ItemStack stack : rolledResults) {
                     ItemHelper.addToList(stack, list);
+                }
+                if (recipeRemainder != null) {
+                    ItemHelper.addToList(recipeRemainder, list);
                 }
             }
             for (int slot = 0, max = Math.min(list.size(), inventory.size() - 1); slot < max; slot++)

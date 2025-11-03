@@ -4,6 +4,10 @@ import com.google.common.collect.ImmutableMap;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
+import com.mojang.blaze3d.buffers.GpuBuffer;
+import com.mojang.blaze3d.systems.RenderPass;
+import com.mojang.blaze3d.vertex.VertexFormat;
+import com.zurrtum.create.client.catnip.gui.IndexRenderPipeline;
 import com.zurrtum.create.client.catnip.gui.render.*;
 import com.zurrtum.create.client.foundation.gui.render.*;
 import com.zurrtum.create.client.ponder.foundation.render.SceneRenderState;
@@ -27,6 +31,7 @@ public class GuiRendererMixin {
         ImmutableMap.Builder<Class<? extends SpecialGuiElementRenderState>, SpecialGuiElementRenderer<?>> builder = original.call();
         builder.put(ItemTransformRenderState.class, new ItemTransformElementRenderer(vertexConsumers));
         builder.put(BlockTransformRenderState.class, new BlockTransformElementRenderer(vertexConsumers));
+        builder.put(EntityBlockRenderState.class, new EntityBlockRenderer(vertexConsumers));
         builder.put(PartialRenderState.class, new PartialElementRenderer(vertexConsumers));
         builder.put(BlazeBurnerRenderState.class, new BlazeBurnerElementRenderer(vertexConsumers));
         builder.put(PressBasinRenderState.class, new PressBasinRenderer(vertexConsumers));
@@ -46,5 +51,20 @@ public class GuiRendererMixin {
         builder.put(SceneRenderState.class, new SceneRenderer(vertexConsumers));
         builder.put(FanRenderState.class, new FanRenderer(vertexConsumers));
         return builder;
+    }
+
+    @WrapOperation(method = "render(Lnet/minecraft/client/gui/render/GuiRenderer$Draw;Lcom/mojang/blaze3d/systems/RenderPass;Lcom/mojang/blaze3d/buffers/GpuBuffer;Lcom/mojang/blaze3d/vertex/VertexFormat$IndexType;)V", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/systems/RenderPass;setIndexBuffer(Lcom/mojang/blaze3d/buffers/GpuBuffer;Lcom/mojang/blaze3d/vertex/VertexFormat$IndexType;)V"))
+    private void setIndexBuffer(
+        RenderPass instance,
+        GpuBuffer gpuBuffer,
+        VertexFormat.IndexType indexType,
+        Operation<Void> original,
+        @Local(argsOnly = true) GuiRenderer.Draw draw
+    ) {
+        if (draw.pipeline() instanceof IndexRenderPipeline pipeline) {
+            original.call(instance, pipeline.getIndexBuffer(draw.indexCount()), pipeline.getIndexType());
+        } else {
+            original.call(instance, gpuBuffer, indexType);
+        }
     }
 }

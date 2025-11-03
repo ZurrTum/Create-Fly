@@ -1,6 +1,7 @@
 package com.zurrtum.create.client.content.contraptions.render;
 
 import com.zurrtum.create.catnip.math.AngleHelper;
+import com.zurrtum.create.client.flywheel.lib.transform.PoseTransformStack;
 import com.zurrtum.create.client.flywheel.lib.transform.TransformStack;
 import com.zurrtum.create.content.contraptions.ControlledContraptionEntity;
 import net.minecraft.client.render.entity.EntityRendererFactory;
@@ -32,8 +33,9 @@ public class ControlledContraptionEntityRenderer extends ContraptionEntityRender
 
     @Override
     public void transform(ControlledContraptionState state, MatrixStack matrixStack) {
+        PoseTransformStack transformStack = TransformStack.of(matrixStack).nudge(state.seed);
         if (state.axis != null) {
-            TransformStack.of(matrixStack).nudge(state.seed).center().rotate(state.angle, state.axis).uncenter();
+            transformStack.center().rotate(state.angle, state.axis).uncenter();
         }
     }
 

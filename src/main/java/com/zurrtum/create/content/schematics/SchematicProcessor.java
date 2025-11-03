@@ -19,9 +19,11 @@ import net.minecraft.world.WorldView;
 import org.jetbrains.annotations.Nullable;
 
 public class SchematicProcessor extends StructureProcessor implements EntityControlStructureProcessor {
-
     public static final SchematicProcessor INSTANCE = new SchematicProcessor();
     public static final MapCodec<SchematicProcessor> CODEC = MapCodec.unit(() -> INSTANCE);
+
+    private SchematicProcessor() {
+    }
 
     @Nullable
     @Override

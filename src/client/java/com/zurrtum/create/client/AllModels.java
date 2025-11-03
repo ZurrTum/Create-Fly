@@ -43,6 +43,7 @@ public class AllModels {
 
         BiFunction<BlockState, UnbakedGrouped, UnbakedGrouped> andesiteCasing = CTModel.of(AllCTBehaviours.ANDESITE_CASING);
         BiFunction<BlockState, UnbakedGrouped, UnbakedGrouped> brassCasing = CTModel.of(AllCTBehaviours.BRASS_CASING);
+        BiFunction<BlockState, UnbakedGrouped, UnbakedGrouped> copperCasing = CTModel.of(AllCTBehaviours.COPPER_CASING);
         BiFunction<BlockState, UnbakedGrouped, UnbakedGrouped> chassis = CTModel.of(AllCTBehaviours.CHASSIS);
         BiFunction<BlockState, UnbakedGrouped, UnbakedGrouped> copperShingles = CTModel.of(AllCTBehaviours.COPPER_SHINGLES);
         BiFunction<BlockState, UnbakedGrouped, UnbakedGrouped> exposedCopperShingles = CTModel.of(AllCTBehaviours.EXPOSED_COPPER_SHINGLES);
@@ -57,13 +58,17 @@ public class AllModels {
         register(AllBlocks.ANDESITE_ENCASED_SHAFT, andesiteCasing);
         register(AllBlocks.BRASS_CASING, brassCasing);
         register(AllBlocks.BRASS_ENCASED_SHAFT, brassCasing);
+        register(AllBlocks.COPPER_CASING, copperCasing);
+        register(AllBlocks.RAILWAY_CASING, CTModel.of(AllCTBehaviours.RAILWAY_CASING));
+        register(AllBlocks.SHADOW_STEEL_CASING, CTModel.of(AllCTBehaviours.SHADOW_STEEL_CASING));
+        register(AllBlocks.REFINED_RADIANCE_CASING, CTModel.of(AllCTBehaviours.REFINED_RADIANCE_CASING));
         register(AllBlocks.ANDESITE_ENCASED_COGWHEEL, CTModel.of(AllCTBehaviours.COG_SIDE_ANDESITE_CASING));
         register(AllBlocks.BRASS_ENCASED_COGWHEEL, CTModel.of(AllCTBehaviours.COG_SIDE_BRASS_CASING));
         register(AllBlocks.ANDESITE_ENCASED_LARGE_COGWHEEL, CTModel.of(AllCTBehaviours.COG_ANDESITE_CASING));
         register(AllBlocks.BRASS_ENCASED_LARGE_COGWHEEL, CTModel.of(AllCTBehaviours.COG_BRASS_CASING));
         register(AllBlocks.LINEAR_CHASSIS, chassis);
         register(AllBlocks.SECONDARY_LINEAR_CHASSIS, chassis);
-        register(AllBlocks.ENCASED_FLUID_PIPE, CTModel.of(AllCTBehaviours.COPPER_CASING));
+        register(AllBlocks.ENCASED_FLUID_PIPE, copperCasing);
         register(AllBlocks.INDUSTRIAL_IRON_WINDOW, CTModel.of(AllCTBehaviours.INDUSTRIAL_IRON_WINDOW));
         register(AllBlocks.INDUSTRIAL_IRON_WINDOW_PANE, CTModel.of(AllCTBehaviours.INDUSTRIAL_IRON_WINDOW_PANE));
         register(AllBlocks.WEATHERED_IRON_WINDOW, CTModel.of(AllCTBehaviours.WEATHERED_IRON_WINDOW));

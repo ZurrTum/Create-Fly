@@ -53,6 +53,10 @@ public class AllCasings {
     public static void register() {
         make(AllBlocks.ANDESITE_CASING, AllSpriteShifts.ANDESITE_CASING);
         make(AllBlocks.BRASS_CASING, AllSpriteShifts.BRASS_CASING);
+        make(AllBlocks.COPPER_CASING, AllSpriteShifts.COPPER_CASING);
+        make(AllBlocks.RAILWAY_CASING, AllSpriteShifts.RAILWAY_CASING_SIDE);
+        make(AllBlocks.SHADOW_STEEL_CASING, AllSpriteShifts.SHADOW_STEEL_CASING);
+        make(AllBlocks.REFINED_RADIANCE_CASING, AllSpriteShifts.REFINED_RADIANCE_CASING);
         make(AllBlocks.GEARBOX, AllSpriteShifts.ANDESITE_CASING, (s, f) -> f.getAxis() == s.get(GearboxBlock.AXIS));
         make(AllBlocks.ANDESITE_ENCASED_SHAFT, AllSpriteShifts.ANDESITE_CASING, (s, f) -> f.getAxis() != s.get(EncasedShaftBlock.AXIS));
         make(AllBlocks.BRASS_ENCASED_SHAFT, AllSpriteShifts.BRASS_CASING, (s, f) -> f.getAxis() != s.get(EncasedShaftBlock.AXIS));

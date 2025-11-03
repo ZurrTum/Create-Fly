@@ -22,6 +22,11 @@ public record RadialWrenchMenuSubmitPacket(BlockPos blockPos, BlockState newStat
     );
 
     @Override
+    public boolean runInMain() {
+        return true;
+    }
+
+    @Override
     public PacketType<RadialWrenchMenuSubmitPacket> getPacketType() {
         return AllPackets.RADIAL_WRENCH_MENU_SUBMIT;
     }

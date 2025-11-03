@@ -107,6 +107,7 @@ import com.zurrtum.create.foundation.blockEntity.SyncedBlockEntity;
 import com.zurrtum.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.foundation.blockEntity.behaviour.fluid.SmartFluidTankBehaviour;
 import com.zurrtum.create.foundation.entity.behaviour.EntityBehaviour;
+import com.zurrtum.create.infrastructure.component.ClipboardContent;
 import com.zurrtum.create.infrastructure.debugInfo.DebugInformation;
 import com.zurrtum.create.infrastructure.debugInfo.element.DebugInfoSection;
 import com.zurrtum.create.infrastructure.fluids.FluidStack;
@@ -121,6 +122,7 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.world.ClientWorld;
+import net.minecraft.component.ComponentMap;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.vehicle.AbstractMinecartEntity;
@@ -1035,7 +1037,7 @@ public class AllHandle extends AllClientHandle<ClientPlayNetworkHandler> {
     }
 
     @Override
-    public void updateClipboardScreen(UUID lastEdit, BlockPos pos, ItemStack dataContainer) {
+    public void updateClipboardScreen(UUID lastEdit, BlockPos pos, ClipboardContent content) {
         MinecraftClient mc = MinecraftClient.getInstance();
         if (!(mc.currentScreen instanceof ClipboardScreen cs))
             return;
@@ -1043,7 +1045,7 @@ public class AllHandle extends AllClientHandle<ClientPlayNetworkHandler> {
             return;
         if (!pos.equals(cs.targetedBlock))
             return;
-        cs.reopenWith(dataContainer);
+        cs.reopenWith(content);
     }
 
     @Override
@@ -1136,9 +1138,9 @@ public class AllHandle extends AllClientHandle<ClientPlayNetworkHandler> {
     }
 
     @Override
-    public void openClipboardScreen(PlayerEntity player, ItemStack stack, BlockPos pos) {
+    public void openClipboardScreen(PlayerEntity player, ComponentMap components, BlockPos pos) {
         if (MinecraftClient.getInstance().player == player)
-            ScreenOpener.open(new ClipboardScreen(player.getInventory().getSelectedSlot(), stack, pos));
+            ScreenOpener.open(new ClipboardScreen(player.getInventory().getSelectedSlot(), components, pos));
     }
 
     @Override

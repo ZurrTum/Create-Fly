@@ -35,6 +35,14 @@ public class CardboardArmorHandler {
         return new EntityDimensions(width, height, width, EntityAttachments.of(width, height), true);
     }
 
+    public static void playerChangesEquipment(PlayerEntity player) {
+        if (player.getPose() == EntityPose.CROUCHING && (isCardboardArmor(player.getEquippedStack(EquipmentSlot.HEAD)) || isCardboardArmor(player.getEquippedStack(
+            EquipmentSlot.CHEST)) || isCardboardArmor(player.getEquippedStack(EquipmentSlot.LEGS)) || isCardboardArmor(player.getEquippedStack(
+            EquipmentSlot.FEET)))) {
+            player.getDataTracker().set(Entity.POSE, EntityPose.CROUCHING, true);
+        }
+    }
+
     public static void mobsMayLoseTargetWhenItIsWearingCardboard(Entity entity) {
         if (!(entity instanceof MobEntity mob))
             return;

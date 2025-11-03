@@ -1,12 +1,12 @@
 package com.zurrtum.create.content.logistics.packager;
 
 import com.zurrtum.create.content.logistics.box.PackageItem;
-import net.minecraft.inventory.SidedInventory;
+import com.zurrtum.create.infrastructure.items.SidedItemInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.Direction;
 import org.jetbrains.annotations.Nullable;
 
-public class PackagerItemHandler implements SidedInventory {
+public class PackagerItemHandler implements SidedItemInventory {
     private final int[] SLOTS = {0};
     private final PackagerBlockEntity blockEntity;
 

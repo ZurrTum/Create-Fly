@@ -15,7 +15,7 @@ import static com.zurrtum.create.Create.MOD_ID;
 
 public class AllKeys {
     public static final List<KeyBinding> ALL = new ArrayList<>();
-    public static final Category CATEGORY = Category.create(Identifier.of(MOD_ID, MOD_ID));
+    public static final Category CATEGORY = Category.create(Identifier.of(MOD_ID, "binding"));
     public static final KeyBinding TOOL_MENU = register("toolmenu", GLFW.GLFW_KEY_LEFT_ALT);
     public static final KeyBinding TOOLBELT = register("toolbelt", GLFW.GLFW_KEY_LEFT_ALT);
     public static final KeyBinding ROTATE_MENU = register("rotate_menu", GLFW.GLFW_KEY_UNKNOWN);
@@ -38,18 +38,17 @@ public class AllKeys {
         return SystemKeycodes.IS_MAC_OS ? InputUtil.isKeyPressed(
             MinecraftClient.getInstance().getWindow(),
             GLFW.GLFW_KEY_LEFT_SUPER
-        ) || InputUtil.isKeyPressed(
+        ) || InputUtil.isKeyPressed(MinecraftClient.getInstance().getWindow(), GLFW.GLFW_KEY_RIGHT_SUPER) : InputUtil.isKeyPressed(
             MinecraftClient.getInstance().getWindow(),
-            GLFW.GLFW_KEY_RIGHT_SUPER
-        ) : InputUtil.isKeyPressed(MinecraftClient.getInstance().getWindow(), GLFW.GLFW_KEY_LEFT_CONTROL) || InputUtil.isKeyPressed(
-            MinecraftClient.getInstance().getWindow(), GLFW.GLFW_KEY_RIGHT_CONTROL);
+            GLFW.GLFW_KEY_LEFT_CONTROL
+        ) || InputUtil.isKeyPressed(MinecraftClient.getInstance().getWindow(), GLFW.GLFW_KEY_RIGHT_CONTROL);
     }
 
     public static boolean hasShiftDown() {
-        return InputUtil.isKeyPressed(
+        return InputUtil.isKeyPressed(MinecraftClient.getInstance().getWindow(), GLFW.GLFW_KEY_LEFT_SHIFT) || InputUtil.isKeyPressed(
             MinecraftClient.getInstance().getWindow(),
-            GLFW.GLFW_KEY_LEFT_SHIFT
-        ) || InputUtil.isKeyPressed(MinecraftClient.getInstance().getWindow(), GLFW.GLFW_KEY_RIGHT_SHIFT);
+            GLFW.GLFW_KEY_RIGHT_SHIFT
+        );
     }
 
     public static void register() {

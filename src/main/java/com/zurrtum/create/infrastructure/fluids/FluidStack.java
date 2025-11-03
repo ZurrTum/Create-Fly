@@ -268,7 +268,7 @@ public class FluidStack implements ComponentHolder {
         }
         Block block = fluid.getDefaultState().getBlockState().getBlock();
         if (fluid != Fluids.EMPTY && block == Blocks.AIR) {
-            return Text.translatable(Util.createTranslationKey("fluid", Registries.FLUID.getId(fluid)));
+            return Text.translatable(Util.createTranslationKey("block", Registries.FLUID.getId(fluid)));
         } else {
             return block.getName();
         }

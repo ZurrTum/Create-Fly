@@ -1,23 +1,17 @@
 package com.zurrtum.create.catnip.nbt;
 
-import com.google.gson.JsonElement;
-import com.google.gson.JsonParseException;
-import com.google.gson.JsonParser;
-import com.mojang.serialization.JsonOps;
+import com.zurrtum.create.catnip.codecs.CatnipCodecUtils;
 import com.zurrtum.create.catnip.components.ComponentProcessors;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.block.entity.MobSpawnerBlockEntity;
+import net.minecraft.block.entity.SignText;
 import net.minecraft.component.ComponentType;
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.nbt.NbtElement;
-import net.minecraft.nbt.NbtString;
-import net.minecraft.registry.DynamicRegistryManager;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.tag.BlockTags;
 import net.minecraft.text.Text;
-import net.minecraft.text.TextCodecs;
 import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.Nullable;
 
@@ -43,20 +37,19 @@ public final class NBTProcessors {
     // Triggered by block tag, not BE type
     private static final UnaryOperator<NbtCompound> signProcessor = data -> {
         for (String key : List.of("front_text", "back_text")) {
-            NbtCompound textTag = data.getCompoundOrEmpty(key);
-            if (!textTag.contains("messages"))
-                continue;
-            for (NbtElement tag : textTag.getListOrEmpty("messages"))
-                if (tag instanceof NbtString stringTag)
-                    if (textComponentHasClickEvent(stringTag.asString().orElse("")))
+            SignText text = data.getCompound(key).flatMap(k -> CatnipCodecUtils.decode(SignText.CODEC, k)).orElse(null);
+            if (text != null) {
+                for (Text component : text.getMessages(false)) {
+                    if (textComponentHasClickEvent(component))
                         return null;
+                }
+            }
         }
         if (data.contains("front_item") || data.contains("back_item"))
             return null; // "Amendments" compat: sign data contains itemstacks
         return data;
     };
 
-    // TODO - Checkover and test
     public static UnaryOperator<NbtCompound> itemProcessor(String tagKey) {
         return data -> {
             NbtCompound compound = data.getCompoundOrEmpty(tagKey);
@@ -75,17 +68,13 @@ public final class NBTProcessors {
         };
     }
 
-    public static boolean textComponentHasClickEvent(String string) {
-        JsonElement json = JsonParser.parseString(string.isEmpty() ? "\"\"" : string);
-        Text text = TextCodecs.CODEC.parse(DynamicRegistryManager.EMPTY.getOps(JsonOps.INSTANCE), json).getOrThrow(JsonParseException::new);
-        return textComponentHasClickEvent(text);
-    }
-
     public static boolean textComponentHasClickEvent(Text component) {
-        for (Text sibling : component.getSiblings())
-            if (textComponentHasClickEvent(sibling))
+        for (Text sibling : component.getSiblings()) {
+            if (textComponentHasClickEvent(sibling)) {
                 return true;
-        return component.getStyle() != null && component.getStyle().getClickEvent() != null;
+            }
+        }
+        return component.getStyle().getClickEvent() != null;
     }
 
     private NBTProcessors() {

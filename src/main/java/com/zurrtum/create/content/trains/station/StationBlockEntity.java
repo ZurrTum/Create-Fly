@@ -22,7 +22,6 @@ import com.zurrtum.create.content.trains.graph.*;
 import com.zurrtum.create.content.trains.graph.TrackNodeLocation.DiscoveredLocation;
 import com.zurrtum.create.content.trains.schedule.Schedule;
 import com.zurrtum.create.content.trains.schedule.ScheduleItem;
-import com.zurrtum.create.content.trains.station.GlobalStation.GlobalPackagePort;
 import com.zurrtum.create.content.trains.track.ITrackBlock;
 import com.zurrtum.create.content.trains.track.TrackTargetingBehaviour;
 import com.zurrtum.create.foundation.advancement.CreateTrigger;
@@ -36,7 +35,6 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.particle.ParticleTypes;
@@ -96,12 +94,6 @@ public class StationBlockEntity extends SmartBlockEntity implements Transformabl
 
     //TODO
     //    public static void registerCapabilities(RegisterCapabilitiesEvent event) {
-    //        event.registerBlockEntity(
-    //            Capabilities.ItemHandler.BLOCK,
-    //            AllBlockEntityTypes.TRACK_STATION.get(),
-    //            (be, context) -> be.depotBehaviour.itemHandler
-    //        );
-    //
     //        //TODO
     //        //        if (Mods.COMPUTERCRAFT.isLoaded()) {
     //        //            event.registerBlockEntity(
@@ -224,13 +216,13 @@ public class StationBlockEntity extends SmartBlockEntity implements Transformabl
                 if (target != currentTarget) {
                     flag.chase(target, 0.1f, Chaser.LINEAR);
                     if (target == 1)
-                        AllSoundEvents.CONTRAPTION_ASSEMBLE.playAt(world, pos, 1, 2, true);
+                        AllSoundEvents.CONTRAPTION_DISASSEMBLE.playAt(world, pos, 1, 2, true);
                 }
             }
             boolean settled = flag.getValue() > .15f;
             flag.tickChaser();
             if (currentTarget == 0 && settled != flag.getValue() > .15f)
-                AllSoundEvents.CONTRAPTION_DISASSEMBLE.playAt(world, pos, 0.75f, 1.5f, true);
+                AllSoundEvents.CONTRAPTION_ASSEMBLE.playAt(world, pos, 0.75f, 1.5f, true);
             return;
         }
 
@@ -955,25 +947,15 @@ public class StationBlockEntity extends SmartBlockEntity implements Transformabl
         if (ppbe instanceof PostboxBlockEntity pbe)
             pbe.trackedGlobalStation = new WeakReference<>(station);
 
-        BlockPos pos = ppbe.getPos();
-        if (station.connectedPorts.containsKey(pos))
-            restoreOfflineBuffer(ppbe, station.connectedPorts.get(pos));
+        GlobalPackagePort globalPackagePort = station.connectedPorts.get(ppbe.getPos());
 
-        GlobalPackagePort globalPackagePort = new GlobalPackagePort();
-        globalPackagePort.address = ppbe.addressFilter;
-        station.connectedPorts.put(pos, globalPackagePort);
-    }
-
-    private void restoreOfflineBuffer(PackagePortBlockEntity ppbe, GlobalPackagePort globalPackagePort) {
-        if (!globalPackagePort.primed)
-            return;
-        Inventory offlineBuffer = globalPackagePort.offlineBuffer;
-        Inventory inventory = ppbe.inventory;
-        for (int i = 0, size = offlineBuffer.size(); i < size; i++) {
-            inventory.setStack(i, offlineBuffer.getStack(i));
-            offlineBuffer.setStack(i, ItemStack.EMPTY);
+        if (globalPackagePort == null) {
+            globalPackagePort = new GlobalPackagePort();
+            globalPackagePort.address = ppbe.addressFilter;
+            station.connectedPorts.put(ppbe.getPos(), globalPackagePort);
+        } else {
+            globalPackagePort.restoreOfflineBuffer(ppbe.inventory);
         }
-        globalPackagePort.primed = false;
     }
 
     public void removePackagePort(PackagePortBlockEntity ppbe) {

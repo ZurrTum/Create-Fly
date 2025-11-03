@@ -1,6 +1,6 @@
 package com.zurrtum.create.client.mixin;
 
-import com.holdmyitems.source.Holdmyitems;
+import com.holdmylua.source.LuaTestHMI;
 import com.zurrtum.create.AllItems;
 import com.zurrtum.create.foundation.item.UncontainableBlockItem;
 import net.minecraft.client.MinecraftClient;
@@ -34,7 +34,7 @@ public class HoldMyItemsMixin {
         CallbackInfo ci
     ) {
         Item item = stack.getItem();
-        if (!Holdmyitems.renderAsBlock.getOrDefault(item.toString(), true) && Registries.ITEM.getId(item).getNamespace().equals(MOD_ID)) {
+        if (!LuaTestHMI.renderAsBlock.getOrDefault(item.toString(), true) && Registries.ITEM.getId(item).getNamespace().equals(MOD_ID)) {
             if (item == AllItems.LINKED_CONTROLLER) {
                 displayContext = switch (displayContext) {
                     case THIRD_PERSON_LEFT_HAND -> ItemDisplayContext.FIRST_PERSON_LEFT_HAND;

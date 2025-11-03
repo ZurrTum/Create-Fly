@@ -5,7 +5,6 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3i;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -104,7 +103,6 @@ public class NBTHelper {
         return new Vec3i(tag.getInt(0, 0), tag.getInt(1, 0), tag.getInt(2, 0));
     }
 
-    @NotNull
     public static NbtElement getINBT(NbtCompound nbt, String id) {
         NbtElement inbt = nbt.get(id);
         if (inbt != null)

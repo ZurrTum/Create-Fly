@@ -6,7 +6,6 @@ import net.minecraft.component.ComponentType;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.MergedComponentMap;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.Clearable;
 import net.minecraft.util.math.Direction;
 import org.jetbrains.annotations.NotNull;
 
@@ -16,7 +15,7 @@ import java.util.function.Predicate;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
-public interface BaseInventory extends Clearable, Iterable<ItemStack> {
+public interface BaseInventory extends Iterable<ItemStack> {
     Hash.Strategy<ItemStack> ITEM_STACK_HASH_STRATEGY = new Hash.Strategy<>() {
         public boolean equals(ItemStack stack, ItemStack other) {
             return stack == other || stack != null && other != null && ItemStack.areItemsAndComponentsEqual(stack, other);
@@ -27,12 +26,28 @@ public interface BaseInventory extends Clearable, Iterable<ItemStack> {
         }
     };
 
-    @Override
-    default void clear() {
-        for (int i = 0, size = create$size(); i < size; i++) {
-            create$setStack(i, ItemStack.EMPTY);
-        }
-        create$markDirty();
+    default void create$setStack(int slot, ItemStack stack) {
+        throw new RuntimeException("Implemented via Mixin");
+    }
+
+    default int create$size() {
+        throw new RuntimeException("Implemented via Mixin");
+    }
+
+    default int create$getMaxCount(ItemStack stack) {
+        throw new RuntimeException("Implemented via Mixin");
+    }
+
+    default ItemStack create$getStack(int slot) {
+        throw new RuntimeException("Implemented via Mixin");
+    }
+
+    default boolean create$isValid(int slot, ItemStack stack) {
+        throw new RuntimeException("Implemented via Mixin");
+    }
+
+    default void create$markDirty() {
+        throw new RuntimeException("Implemented via Mixin");
     }
 
     default int count(ItemStack stack, Direction side) {
@@ -1393,29 +1408,5 @@ public interface BaseInventory extends Clearable, Iterable<ItemStack> {
 
     default Stream<ItemStack> stream() {
         return StreamSupport.stream(Spliterators.spliteratorUnknownSize(iterator(), Spliterator.ORDERED), false);
-    }
-
-    default void create$setStack(int slot, ItemStack stack) {
-        throw new RuntimeException("Implemented via Mixin");
-    }
-
-    default int create$size() {
-        throw new RuntimeException("Implemented via Mixin");
-    }
-
-    default int create$getMaxCount(ItemStack stack) {
-        throw new RuntimeException("Implemented via Mixin");
-    }
-
-    default ItemStack create$getStack(int slot) {
-        throw new RuntimeException("Implemented via Mixin");
-    }
-
-    default boolean create$isValid(int slot, ItemStack stack) {
-        throw new RuntimeException("Implemented via Mixin");
-    }
-
-    default void create$markDirty() {
-        throw new RuntimeException("Implemented via Mixin");
     }
 }
