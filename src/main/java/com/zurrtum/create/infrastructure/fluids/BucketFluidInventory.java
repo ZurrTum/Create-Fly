@@ -23,6 +23,9 @@ public class BucketFluidInventory extends FluidItemInventoryWrapper {
     }
 
     public Fluid toFluid() {
+        if (stack.isOf(Items.MILK_BUCKET)) {
+            return AllFluids.MILK;
+        }
         return ((BucketItem) this.stack.getItem()).fluid;
     }
 
