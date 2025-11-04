@@ -733,7 +733,7 @@ public class ProcessingScenes {
             .pointAt(basinSide).placeNearTarget();
         scene.idle(50);
 
-        ItemStack nugget = AllItems.COPPER_NUGGET.getDefaultStack();
+        ItemStack nugget = Items.COPPER_NUGGET.getDefaultStack();
         scene.overlay().showControls(util.vector().topOf(basinPos), Pointing.RIGHT, 30).withItem(nugget);
         scene.idle(30);
         scene.world().modifyBlockEntity(pressPos, type, pte -> pte.getPressingBehaviour().start(Mode.BASIN));

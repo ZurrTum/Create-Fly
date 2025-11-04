@@ -202,7 +202,6 @@ public class AllCreativeModeTabs {
         entries.add(AllItems.ANDESITE_ALLOY);
         entries.add(AllItems.ZINC_INGOT);
         entries.add(AllItems.BRASS_INGOT);
-        entries.add(AllItems.COPPER_NUGGET);
         entries.add(AllItems.ZINC_NUGGET);
         entries.add(AllItems.BRASS_NUGGET);
         entries.add(AllItems.EXP_NUGGET);

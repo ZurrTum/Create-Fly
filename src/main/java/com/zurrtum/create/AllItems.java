@@ -722,7 +722,6 @@ public class AllItems {
     public static final Item WHEAT_FLOUR = register("wheat_flour");
     public static final Item DOUGH = register("dough");
     public static final Item PROPELLER = register("propeller");
-    public static final Item COPPER_NUGGET = register("copper_nugget");
     public static final Item ZINC_NUGGET = register("zinc_nugget");
     public static final Item BRASS_NUGGET = register("brass_nugget");
     public static final Item CRUSHED_IRON = register("crushed_raw_iron");

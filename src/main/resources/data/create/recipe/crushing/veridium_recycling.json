@@ -9,7 +9,7 @@
     },
     {
       "chance": 0.8,
-      "id": "create:copper_nugget"
+      "id": "minecraft:copper_nugget"
     }
   ]
 }
