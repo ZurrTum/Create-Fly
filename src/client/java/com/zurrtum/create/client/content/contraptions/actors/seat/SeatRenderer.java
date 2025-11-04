@@ -26,6 +26,7 @@ public class SeatRenderer extends EntityRenderer<SeatEntity, EntityRenderState> 
 
     @Override
     public void updateRenderState(SeatEntity entity, EntityRenderState state, float tickProgress) {
+        state.entityType = entity.getType();
     }
 
     @Override
