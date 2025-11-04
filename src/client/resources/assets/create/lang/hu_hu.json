@@ -2624,6 +2624,7 @@
   "fluid.create.honey": "Méz",
   "fluid.create.potion": "Bájital",
   "fluid.create.tea": "Bányásztea",
+  "block.create.tea": "Bányásztea",
   "item.create.andesite_alloy": "Andezitötvözet",
   "item.create.attribute_filter": "Tulajdonságszűrő",
   "item.create.attribute_filter.tooltip.behaviour1": "Megnyitja a _konfigurációs felületet_.",

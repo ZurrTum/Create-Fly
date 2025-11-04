@@ -3155,6 +3155,7 @@
   "fluid.create.honey": "Mel",
   "fluid.create.potion": "Poção",
   "fluid.create.tea": "Chá do Construtor",
+  "block.create.tea": "Chá do Construtor",
   "item.create.andesite_alloy": "Liga de Andesito",
   "item.create.attribute_filter": "Filtro de Atributo",
   "item.create.attribute_filter.tooltip.behaviour1": "Abre a _Interface de Configuração_.",

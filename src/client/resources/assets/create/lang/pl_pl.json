@@ -3155,6 +3155,7 @@
   "fluid.create.honey": "Miód",
   "fluid.create.potion": "Mikstura",
   "fluid.create.tea": "Herbatka Budowniczego",
+  "block.create.tea": "Herbatka Budowniczego",
   "item.create.andesite_alloy": "Stop andezytu",
   "item.create.attribute_filter": "Filtr atrybutowy",
   "item.create.attribute_filter.tooltip.behaviour1": "Otwiera _ustawienia_.",

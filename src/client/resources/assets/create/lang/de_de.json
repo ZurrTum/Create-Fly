@@ -3156,6 +3156,7 @@
   "fluid.create.honey": "Honig",
   "fluid.create.potion": "Trank",
   "fluid.create.tea": "Bauherrentee",
+  "block.create.tea": "Bauherrentee",
   "item.create.andesite_alloy": "Andesitlegierung",
   "item.create.attribute_filter": "Attribut Filter",
   "item.create.attribute_filter.tooltip.behaviour1": "Öffnet das _configuration interface_.",

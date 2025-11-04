@@ -3155,6 +3155,7 @@
   "fluid.create.honey": "Honing",
   "fluid.create.potion": "Drankje",
   "fluid.create.tea": "Bouwer's Thee",
+  "block.create.tea": "Bouwer's Thee",
   "item.create.andesite_alloy": "Andesietlegering",
   "item.create.attribute_filter": "Attributenfilter",
   "item.create.attribute_filter.tooltip.behaviour1": "Opent de _Configuratie Interface_.",

@@ -3052,6 +3052,7 @@
   "fluid.create.honey": "Honung",
   "fluid.create.potion": "Brygd",
   "fluid.create.tea": "Byggmästarens te",
+  "block.create.tea": "Byggmästarens te",
   "item.create.andesite_alloy": "Andesitlegering",
   "item.create.attribute_filter": "Attributfilter",
   "item.create.attribute_filter.tooltip.behaviour1": "Öppnas _konfigurationsgränssnittet_.",

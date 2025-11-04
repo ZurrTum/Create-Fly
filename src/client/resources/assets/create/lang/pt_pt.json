@@ -1905,6 +1905,7 @@
   "fluid.create.milk": "Milk",
   "fluid.create.potion": "Poção",
   "fluid.create.tea": "Chá do Construtor",
+  "block.create.tea": "Chá do Construtor",
   "item.create.andesite_alloy": "Liga de andesito",
   "item.create.attribute_filter": "Filtro de atributos",
   "item.create.bar_of_chocolate": "Barra de chocolate",

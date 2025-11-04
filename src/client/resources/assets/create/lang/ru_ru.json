@@ -3159,6 +3159,7 @@
   "fluid.create.honey": "Мёд",
   "fluid.create.potion": "Зелье",
   "fluid.create.tea": "Чай строителя",
+  "block.create.tea": "Чай строителя",
   "item.create.andesite_alloy": "Андезитовый сплав",
   "item.create.attribute_filter": "Фильтр атрибутов",
   "item.create.attribute_filter.tooltip.behaviour1": "Открывает _интерфейс конфигурации_.",

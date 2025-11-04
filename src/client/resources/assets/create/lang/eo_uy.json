@@ -1108,6 +1108,7 @@
   "fluid.create.honey": "Mielo",
   "fluid.create.potion": "Eliksiro",
   "fluid.create.tea": "Teo de konstruisto",
+  "block.create.tea": "Teo de konstruisto",
   "item.create.andesite_alloy": "Andezita alojo",
   "item.create.attribute_filter": "Atributa filtrilo",
   "item.create.attribute_filter.tooltip.condition1": "Dekstre alklakite",

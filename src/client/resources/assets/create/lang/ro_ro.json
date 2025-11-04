@@ -3155,6 +3155,7 @@
   "fluid.create.honey": "Miere",
   "fluid.create.potion": "Poțiune",
   "fluid.create.tea": "Ceaiul Constructorului",
+  "block.create.tea": "Ceaiul Constructorului",
   "item.create.andesite_alloy": "Aliaj de andezit",
   "item.create.attribute_filter": "Filtru De Atribut",
   "item.create.attribute_filter.tooltip.behaviour1": "Deschide _interfața de configurare_.",

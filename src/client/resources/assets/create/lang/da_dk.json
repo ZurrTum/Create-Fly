@@ -3155,6 +3155,7 @@
   "fluid.create.honey": "Honning",
   "fluid.create.potion": "Eliksir",
   "fluid.create.tea": "Håndværkerens te",
+  "block.create.tea": "Håndværkerens te",
   "item.create.andesite_alloy": "Andesitlegering",
   "item.create.attribute_filter": "Attributfilter",
   "item.create.attribute_filter.tooltip.behaviour1": "Åbner _configuration interface_.",

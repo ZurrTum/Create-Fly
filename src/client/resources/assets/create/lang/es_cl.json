@@ -1742,6 +1742,7 @@
   "entity.create.super_glue": "La Gotita",
   "fluid.create.potion": "Poción",
   "fluid.create.tea": "Té del Constructor",
+  "block.create.tea": "Té del Constructor",
   "item.create.andesite_alloy": "Aleación de Andesita",
   "item.create.attribute_filter": "Filtro de Atributos",
   "item.create.bar_of_chocolate": "Barra de Chocolate",

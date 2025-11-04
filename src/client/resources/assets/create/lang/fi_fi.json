@@ -3153,6 +3153,7 @@
   "fluid.create.honey": "Hunaja",
   "fluid.create.potion": "Taikajuoma",
   "fluid.create.tea": "Rakentajan tee",
+  "block.create.tea": "Rakentajan tee",
   "item.create.andesite_alloy": "Andesiittimetalliseos",
   "item.create.attribute_filter": "Attribuuttisuodatin",
   "item.create.attribute_filter.tooltip.behaviour1": "Avaa _määritysikkunan_.",

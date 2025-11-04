@@ -795,6 +795,7 @@
   "entity.create.super_glue": "Glud Cryf",
   "fluid.create.potion": "Diod",
   "fluid.create.tea": "Te Adeiladwr",
+  "block.create.tea": "Te Adeiladwr",
   "item.create.andesite_alloy": "Aloi Andesit",
   "item.create.attribute_filter": "Hidlydd Priodoledd",
   "item.create.attribute_filter.tooltip.condition1": "Pan y de-gliciwyd",

@@ -716,6 +716,7 @@
   "fluid.create.honey": "Huni",
   "fluid.create.potion": "Poshun",
   "fluid.create.tea": "Buildrz Tee",
+  "block.create.tea": "Buildrz Tee",
   "item.create.andesite_alloy": "Stromk rock",
   "item.create.attribute_filter": "Attribute Filtr",
   "item.create.attribute_filter.tooltip.behaviour1": "Openz teh _configurashun enterfas_.",
