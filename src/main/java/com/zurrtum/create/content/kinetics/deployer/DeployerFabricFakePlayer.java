@@ -23,7 +23,7 @@ public class DeployerFabricFakePlayer extends FakePlayer implements DeployerPlay
 
     protected DeployerFabricFakePlayer(ServerWorld world, GameProfile profile) {
         super(world, profile);
-        changeGameMode(GameMode.SURVIVAL);
+        interactionManager.setGameMode(GameMode.SURVIVAL, null);
     }
 
     @Override

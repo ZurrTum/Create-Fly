@@ -24,7 +24,7 @@ public class DeployerFakePlayer extends FakePlayerEntity implements DeployerPlay
 
     public DeployerFakePlayer(ServerWorld world, GameProfile profile) {
         super(world, profile);
-        changeGameMode(GameMode.SURVIVAL);
+        interactionManager.setGameMode(GameMode.SURVIVAL, null);
     }
 
     @Override
