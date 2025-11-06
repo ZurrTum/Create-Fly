@@ -6,7 +6,8 @@ import dev.emi.trinkets.api.TrinketInventory;
 import dev.emi.trinkets.api.client.TrinketRenderer;
 import dev.emi.trinkets.api.client.TrinketRendererRegistry;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.render.VertexConsumerProvider;
+import net.minecraft.client.render.OverlayTexture;
+import net.minecraft.client.render.command.OrderedRenderCommandQueue;
 import net.minecraft.client.render.entity.model.EntityModel;
 import net.minecraft.client.render.entity.model.PlayerEntityModel;
 import net.minecraft.client.render.entity.state.LivingEntityRenderState;
@@ -28,7 +29,7 @@ public class GoggleTrinketRenderer implements TrinketRenderer {
         SlotReference slotReference,
         EntityModel<? extends LivingEntityRenderState> contextModel,
         MatrixStack matrices,
-        VertexConsumerProvider buffers,
+        OrderedRenderCommandQueue queue,
         int light,
         LivingEntityRenderState state,
         float headYaw,
@@ -49,6 +50,7 @@ public class GoggleTrinketRenderer implements TrinketRenderer {
             item.displayContext = ItemDisplayContext.HEAD;
             MinecraftClient mc = MinecraftClient.getInstance();
             mc.getItemModelManager().update(item, stack, item.displayContext, mc.world, null, 0);
+            item.render(matrices, queue, light, OverlayTexture.DEFAULT_UV, 0);
             matrices.pop();
         }
     }
