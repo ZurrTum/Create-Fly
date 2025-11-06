@@ -3,7 +3,6 @@ package com.zurrtum.create;
 import com.zurrtum.create.infrastructure.fluids.BucketFluidInventory;
 import com.zurrtum.create.infrastructure.fluids.FluidItemInventory;
 import com.zurrtum.create.infrastructure.fluids.FluidItemInventoryWrapper;
-import com.zurrtum.create.infrastructure.fluids.MilkBucketFluidInventory;
 import it.unimi.dsi.fastutil.objects.Reference2ObjectArrayMap;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -37,7 +36,7 @@ public class AllFluidItemInventory {
         register(Items.BUCKET, BucketFluidInventory::new);
         register(Items.WATER_BUCKET, BucketFluidInventory::new);
         register(Items.LAVA_BUCKET, BucketFluidInventory::new);
-        register(Items.MILK_BUCKET, MilkBucketFluidInventory::new);
+        register(Items.MILK_BUCKET, BucketFluidInventory::new);
         register(AllItems.HONEY_BUCKET, BucketFluidInventory::new);
         register(AllItems.CHOCOLATE_BUCKET, BucketFluidInventory::new);
     }

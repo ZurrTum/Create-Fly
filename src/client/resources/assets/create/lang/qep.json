@@ -3161,6 +3161,7 @@
   "fluid.create.chocolate": "Muckfood",
   "fluid.create.honey": "Honey",
   "fluid.create.potion": "Lib",
+  "block.create.potion": "Lib",
   "fluid.create.tea": "Builder's Leafbrew",
   "block.create.tea": "Builder's Leafbrew",
   "item.create.andesite_alloy": "Andestone Bloommix",

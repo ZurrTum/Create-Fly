@@ -71,7 +71,7 @@ public class FanHauntingCategory extends CreateCategory<FanHauntingDisplay> {
             graphics.state.addSpecialElement(new FanRenderState(
                 new Matrix3x2f(graphics.getMatrices()),
                 bounds.x + 61,
-                bounds.y + 10,
+                bounds.y + 9,
                 Blocks.SOUL_FIRE.getDefaultState()
             ));
         }));

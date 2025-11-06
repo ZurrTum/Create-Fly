@@ -34,6 +34,14 @@ public abstract class AbstractSimiContainerScreen<T extends ScreenHandler> exten
         super(container, inv, title);
     }
 
+    public int getGuiLeft() {
+        return x;
+    }
+
+    public int getGuiTop() {
+        return y;
+    }
+
     /**
      * This method must be called before {@code super.init()}!
      */

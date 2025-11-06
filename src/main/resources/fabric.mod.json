@@ -26,6 +26,9 @@
     ],
     "rei_common": [
       "com.zurrtum.create.compat.rei.ReiCommonPlugin"
+    ],
+    "jei_mod_plugin": [
+      "com.zurrtum.create.client.compat.jei.JeiClientPlugin"
     ]
   },
   "custom": {

@@ -3154,6 +3154,7 @@
   "fluid.create.chocolate": "Chocolade",
   "fluid.create.honey": "Honing",
   "fluid.create.potion": "Drankje",
+  "block.create.potion": "Drankje",
   "fluid.create.tea": "Bouwer's Thee",
   "block.create.tea": "Bouwer's Thee",
   "item.create.andesite_alloy": "Andesietlegering",

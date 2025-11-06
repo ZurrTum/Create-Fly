@@ -1107,6 +1107,7 @@
   "fluid.create.chocolate": "Ĉokolado",
   "fluid.create.honey": "Mielo",
   "fluid.create.potion": "Eliksiro",
+  "block.create.potion": "Eliksiro",
   "fluid.create.tea": "Teo de konstruisto",
   "block.create.tea": "Teo de konstruisto",
   "item.create.andesite_alloy": "Andezita alojo",

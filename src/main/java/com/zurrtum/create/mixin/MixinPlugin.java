@@ -13,12 +13,14 @@ import java.util.Set;
 public class MixinPlugin implements IMixinConfigPlugin {
     public static boolean CCT = false;
     public static boolean ARCH = false;
+    public static boolean JEI = false;
 
     @Override
     public void onLoad(String mixinPackage) {
         Create.Lazy = FabricLoader.getInstance().isModLoaded("fabric-api");
         CCT = FabricLoader.getInstance().isModLoaded("computercraft");
         ARCH = FabricLoader.getInstance().isModLoaded("architectury");
+        JEI = FabricLoader.getInstance().isModLoaded("jei");
     }
 
     @Override
@@ -44,7 +46,12 @@ public class MixinPlugin implements IMixinConfigPlugin {
         if (ARCH) {
             mixins.add("ArchitecturyMixin");
         }
-        if (!Create.Lazy) {
+        if (JEI) {
+            mixins.add("JustEnoughItemsMixin");
+        }
+        if (Create.Lazy) {
+            mixins.add("RegistryKeysMixin");
+        } else {
             mixins.add("ItemGroupMixin");
             mixins.add("ItemGroupsMixin");
             mixins.add("PersistentStateManagerMixin");

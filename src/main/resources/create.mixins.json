@@ -44,7 +44,6 @@
     "RedstoneViewMixin",
     "RedstoneWireBlockMixin",
     "RegistriesMixin",
-    "RegistryKeysMixin",
     "RegistryLoaderMixin",
     "ServerChunkLoadingManagerMixin",
     "ServerConfigurationNetworkHandlerMixin",

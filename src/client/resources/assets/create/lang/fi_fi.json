@@ -3152,6 +3152,7 @@
   "fluid.create.chocolate": "Suklaa",
   "fluid.create.honey": "Hunaja",
   "fluid.create.potion": "Taikajuoma",
+  "block.create.potion": "Taikajuoma",
   "fluid.create.tea": "Rakentajan tee",
   "block.create.tea": "Rakentajan tee",
   "item.create.andesite_alloy": "Andesiittimetalliseos",

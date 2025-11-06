@@ -1344,6 +1344,7 @@
   "entity.create.seat": "Tempat Duduk",
   "entity.create.super_glue": "Lem Super",
   "fluid.create.potion": "Ramuan",
+  "block.create.potion": "Ramuan",
   "item.create.andesite_alloy": "Paduan Andesit",
   "item.create.attribute_filter": "Filter Atribut",
   "item.create.belt_connector": "Sabuk Mekanis",

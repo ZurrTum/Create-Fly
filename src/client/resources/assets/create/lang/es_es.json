@@ -3155,6 +3155,7 @@
   "fluid.create.chocolate": "Chocolate",
   "fluid.create.honey": "Miel",
   "fluid.create.potion": "Poción",
+  "block.create.potion": "Poción",
   "fluid.create.tea": "Té del Constructor",
   "block.create.tea": "Té del Constructor",
   "item.create.andesite_alloy": "Aleación de andesita",

@@ -3154,6 +3154,7 @@
   "fluid.create.chocolate": "Czekolada",
   "fluid.create.honey": "Miód",
   "fluid.create.potion": "Mikstura",
+  "block.create.potion": "Mikstura",
   "fluid.create.tea": "Herbatka Budowniczego",
   "block.create.tea": "Herbatka Budowniczego",
   "item.create.andesite_alloy": "Stop andezytu",

@@ -8,7 +8,7 @@ import org.joml.Matrix3x2f;
 
 public record FanRenderState(Matrix3x2f pose, int x1, int y1, BlockState target, ScreenRect bounds) implements SpecialGuiElementRenderState {
     public FanRenderState(Matrix3x2f pose, int x, int y, BlockState target) {
-        this(pose, x, y, target, new ScreenRect(x, y, 50, 43).transformEachVertex(pose));
+        this(pose, x, y, target, new ScreenRect(x, y, 50, 44).transformEachVertex(pose));
     }
 
     @Override
@@ -18,7 +18,7 @@ public record FanRenderState(Matrix3x2f pose, int x1, int y1, BlockState target,
 
     @Override
     public int y2() {
-        return y1 + 43;
+        return y1 + 44;
     }
 
     @Override

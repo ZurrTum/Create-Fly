@@ -2592,6 +2592,7 @@
   "fluid.create.chocolate": "ช็อกโกแลตเหลว",
   "fluid.create.honey": "น้ำผึ้ง",
   "fluid.create.potion": "น้ำยา",
+  "block.create.potion": "น้ำยา",
   "fluid.create.tea": "ชานักประดิษฐ์",
   "block.create.tea": "ชานักประดิษฐ์",
   "item.create.andesite_alloy": "โลหะเจือแอนดีไซต์",

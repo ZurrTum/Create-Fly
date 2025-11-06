@@ -50,7 +50,7 @@ public class FanSmokingCategory extends CreateCategory<FanSmokingDisplay> {
             graphics.state.addSpecialElement(new FanRenderState(
                 new Matrix3x2f(graphics.getMatrices()),
                 bounds.x + 61,
-                bounds.y + 10,
+                bounds.y + 9,
                 Blocks.FIRE.getDefaultState()
             ));
         }));
