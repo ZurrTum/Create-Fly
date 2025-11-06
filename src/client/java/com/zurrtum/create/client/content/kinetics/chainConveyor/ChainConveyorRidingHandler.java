@@ -150,7 +150,7 @@ public class ChainConveyorRidingHandler {
             bestDiff = diff;
         }
 
-        if (nearestLooking == BlockPos.ZERO)
+        if (nearestLooking == BlockPos.ORIGIN)
             return;
 
         float offBranchAngle = clbe.connectionStats.get(nearestLooking).tangentAngle();
