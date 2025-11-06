@@ -36,7 +36,7 @@ https://www.curseforge.com/minecraft/mc-mods/create-fly/files/all?page=1&pageSiz
 
 - Please do not report issues with this mod to simibubi and NeoForge Create.
 - Please do not use old game saves. Because data loading changes, data may be lost.
-- Recommended to use REI to view recipes, and please report any game crashes.
+- Recommended to use REI or JEI to view recipes, and please report any game crashes.
 - Using shaders will disable Flywheel optimizations.
 
 ### 4. TODO List
