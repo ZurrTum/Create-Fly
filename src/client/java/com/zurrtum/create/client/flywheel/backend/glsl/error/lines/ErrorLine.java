@@ -10,8 +10,7 @@ public interface ErrorLine {
     }
 
     default String build() {
-        String var10000 = this.left();
-        return var10000 + String.valueOf(this.divider()) + this.right();
+        return left() + divider() + right();
     }
 
     default String left() {

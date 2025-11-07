@@ -11,14 +11,14 @@ import org.jetbrains.annotations.VisibleForTesting;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class ErrorBuilder {
+    // set to false for testing
     @VisibleForTesting
     public static boolean CONSOLE_COLORS = true;
-    private final List<ErrorLine> lines = new ArrayList();
+    private final List<ErrorLine> lines = new ArrayList<>();
 
     private ErrorBuilder() {
     }
@@ -120,10 +120,10 @@ public class ErrorBuilder {
     public String build() {
         Stream<String> lineStream = this.getLineStream();
         if (CONSOLE_COLORS) {
-            lineStream = lineStream.map((line) -> line + "\u001b[0m");
+            lineStream = lineStream.map((line) -> line + ConsoleColors.RESET);
         }
 
-        return (String) lineStream.collect(Collectors.joining("\n"));
+        return lineStream.collect(Collectors.joining("\n"));
     }
 
     private Stream<String> getLineStream() {
@@ -134,8 +134,7 @@ public class ErrorBuilder {
     private static String addPaddingToLine(int maxMargin, ErrorLine errorLine) {
         int neededMargin = errorLine.neededMargin();
         if (neededMargin >= 0) {
-            String var10000 = StringUtil.repeatChar(' ', maxMargin - neededMargin);
-            return var10000 + errorLine.build();
+            return StringUtil.repeatChar(' ', maxMargin - neededMargin) + errorLine.build();
         } else {
             return errorLine.build();
         }
@@ -155,9 +154,6 @@ public class ErrorBuilder {
     }
 
     public void nested(ErrorBuilder err) {
-        Stream var10000 = err.getLineStream().map(NestedLine::new);
-        List var10001 = this.lines;
-        Objects.requireNonNull(var10001);
-        var10000.forEach(var10001::add);
+        err.getLineStream().map(NestedLine::new).forEach(lines::add);
     }
 }

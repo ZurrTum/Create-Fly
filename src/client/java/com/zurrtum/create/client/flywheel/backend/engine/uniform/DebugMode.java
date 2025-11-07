@@ -6,8 +6,14 @@ import net.minecraft.util.StringIdentifiable;
 import java.util.Locale;
 
 public enum DebugMode implements StringIdentifiable {
-    OFF, NORMALS, INSTANCE_ID, LIGHT_LEVEL, LIGHT_COLOR, OVERLAY, DIFFUSE, MODEL_ID,
-    ;
+    OFF,
+    NORMALS,
+    INSTANCE_ID,
+    LIGHT_LEVEL,
+    LIGHT_COLOR,
+    OVERLAY,
+    DIFFUSE,
+    MODEL_ID;
 
     public static final Codec<DebugMode> CODEC = StringIdentifiable.createCodec(DebugMode::values);
 

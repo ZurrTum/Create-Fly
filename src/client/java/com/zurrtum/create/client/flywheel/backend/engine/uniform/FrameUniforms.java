@@ -101,10 +101,10 @@ public final class FrameUniforms extends UniformWriter {
         ptr = writeCamera(ptr);
 
         var window = MinecraftClient.getInstance().getWindow();
-        ptr = writeVec2(ptr, window.getWidth(), window.getHeight());
-        ptr = writeFloat(ptr, (float) window.getWidth() / (float) window.getHeight());
+        ptr = writeVec2(ptr, window.getFramebufferWidth(), window.getFramebufferHeight());
+        ptr = writeFloat(ptr, (float) window.getFramebufferWidth() / (float) window.getFramebufferHeight());
         // default line width: net.minecraft.client.renderer.RenderStateShard.LineStateShard
-        ptr = writeFloat(ptr, Math.max(2.5F, (float) window.getWidth() / 1920.0F * 2.5F));
+        ptr = writeFloat(ptr, Math.max(2.5F, (float) window.getFramebufferWidth() / 1920.0F * 2.5F));
         ptr = writeFloat(ptr, MinecraftClient.getInstance().gameRenderer.getFarPlaneDistance());
 
         ptr = writeTime(ptr, context);

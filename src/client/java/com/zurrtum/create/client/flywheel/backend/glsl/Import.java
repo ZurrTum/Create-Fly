@@ -7,13 +7,12 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public record Import(Span self, Span file) {
-    public static final Pattern PATTERN = Pattern.compile("^\\s*#\\s*include\\s+\"(.*)\"", 8);
+    public static final Pattern PATTERN = Pattern.compile("^\\s*#\\s*include\\s+\"(.*)\"", Pattern.MULTILINE);
 
-    public Import(Span self, Span file) {
-        this.self = self;
-        this.file = file;
-    }
-
+    /**
+     * Scan the source for {@code #include "..."} directives.
+     * Records the contents of the directive into an {@link Import} object, and marks the directive for elision.
+     */
     public static ImmutableList<Import> parseImports(SourceLines source) {
         Matcher matcher = PATTERN.matcher(source);
         ImmutableList.Builder<Import> imports = ImmutableList.builder();
@@ -25,13 +24,5 @@ public record Import(Span self, Span file) {
         }
 
         return imports.build();
-    }
-
-    public Span self() {
-        return this.self;
-    }
-
-    public Span file() {
-        return this.file;
     }
 }

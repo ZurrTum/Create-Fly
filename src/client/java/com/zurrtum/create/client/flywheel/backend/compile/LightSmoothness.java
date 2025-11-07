@@ -7,8 +7,10 @@ import net.minecraft.util.StringIdentifiable;
 import java.util.Locale;
 
 public enum LightSmoothness implements StringIdentifiable {
-    FLAT(0, false), TRI_LINEAR(1, false), SMOOTH(2, false), SMOOTH_INNER_FACE_CORRECTED(2, true),
-    ;
+    FLAT(0, false),
+    TRI_LINEAR(1, false),
+    SMOOTH(2, false),
+    SMOOTH_INNER_FACE_CORRECTED(2, true);
 
     public static final Codec<LightSmoothness> CODEC = StringIdentifiable.createCodec(LightSmoothness::values);
 

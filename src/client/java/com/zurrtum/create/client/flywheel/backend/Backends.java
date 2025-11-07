@@ -13,10 +13,16 @@ import com.zurrtum.create.client.flywheel.lib.util.ResourceUtil;
 import com.zurrtum.create.client.flywheel.lib.util.ShadersModHelper;
 
 public final class Backends {
+    /**
+     * Use GPU instancing to render everything.
+     */
     public static final Backend INSTANCING = SimpleBackend.builder()
         .engineFactory((level) -> new EngineImpl(level, new InstancedDrawManager(InstancingPrograms.get()), 256)).priority(500)
         .supported(() -> GlCompat.SUPPORTS_INSTANCING && InstancingPrograms.allLoaded() && !ShadersModHelper.isShaderPackInUse())
         .register(ResourceUtil.rl("instancing"));
+    /**
+     * Use Compute shaders to cull instances.
+     */
     public static final Backend INDIRECT = SimpleBackend.builder()
         .engineFactory((level) -> new EngineImpl(level, new IndirectDrawManager(IndirectPrograms.get()), 256))
         .priority(() -> GlCompat.DRIVER == Driver.INTEL ? 1 : 1000)

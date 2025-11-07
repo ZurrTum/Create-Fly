@@ -1,7 +1,11 @@
 package com.zurrtum.create.client.flywheel.backend.glsl.generate;
 
 public enum BinOp {
-    DIVIDE("/"), SUBTRACT("-"), RIGHT_SHIFT(">>"), BITWISE_AND("&"), BITWISE_XOR("^"),
+    DIVIDE("/"),
+    SUBTRACT("-"),
+    RIGHT_SHIFT(">>"),
+    BITWISE_AND("&"),
+    BITWISE_XOR("^"),
     // TODO: add more as we need them
     ;
 

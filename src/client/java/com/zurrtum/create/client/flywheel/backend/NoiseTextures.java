@@ -33,7 +33,7 @@ public class NoiseTextures {
         try (var is = optional.get().getInputStream()) {
             var image = NativeImage.read(NativeImage.Format.LUMINANCE, is);
 
-            BLUE_NOISE = new NativeImageBackedTexture(() -> "noise", image);
+            BLUE_NOISE = new NativeImageBackedTexture(() -> "Flywheel Blue Noise", image);
 
             GlTextureUnit.T0.makeActive();
             GlStateManager._bindTexture(((GlTexture) BLUE_NOISE.getGlTexture()).getGlId());

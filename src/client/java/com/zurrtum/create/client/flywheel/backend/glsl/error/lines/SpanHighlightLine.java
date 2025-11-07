@@ -12,7 +12,6 @@ public class SpanHighlightLine implements ErrorLine {
     }
 
     public static String generateUnderline(int firstCol, int lastCol) {
-        String var10000 = " ".repeat(Math.max(0, firstCol));
-        return var10000 + "^".repeat(Math.max(0, lastCol - firstCol));
+        return " ".repeat(Math.max(0, firstCol)) + "^".repeat(Math.max(0, lastCol - firstCol));
     }
 }

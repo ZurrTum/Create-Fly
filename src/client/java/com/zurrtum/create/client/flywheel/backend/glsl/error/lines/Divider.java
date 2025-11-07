@@ -1,7 +1,9 @@
 package com.zurrtum.create.client.flywheel.backend.glsl.error.lines;
 
 public enum Divider {
-    BAR(" | "), ARROW("-> "), EQUALS(" = ");
+    BAR(" | "),
+    ARROW("-> "),
+    EQUALS(" = ");
 
     private final String s;
 

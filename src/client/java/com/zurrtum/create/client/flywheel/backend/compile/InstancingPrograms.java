@@ -8,7 +8,7 @@ import com.zurrtum.create.client.flywheel.backend.gl.shader.GlProgram;
 import com.zurrtum.create.client.flywheel.backend.glsl.GlslVersion;
 import com.zurrtum.create.client.flywheel.backend.glsl.ShaderSources;
 import com.zurrtum.create.client.flywheel.backend.glsl.SourceComponent;
-import com.zurrtum.create.client.flywheel.lib.util.AtomicReferenceCounted;
+import com.zurrtum.create.client.flywheel.backend.util.AtomicReferenceCounted;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;

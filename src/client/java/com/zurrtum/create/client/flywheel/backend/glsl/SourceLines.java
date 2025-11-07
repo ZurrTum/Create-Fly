@@ -13,7 +13,13 @@ import java.util.regex.Pattern;
 public class SourceLines implements CharSequence {
     private static final Pattern NEW_LINE = Pattern.compile("(\\r\\n|\\r|\\n)");
     public final Identifier name;
+    /**
+     * 0-indexed line to char pos mapping.
+     */
     private final IntList lineStarts;
+    /**
+     * 0-indexed line lookup
+     */
     private final ImmutableList<String> lines;
     public final String raw;
 
@@ -29,7 +35,7 @@ public class SourceLines implements CharSequence {
     }
 
     public String lineString(int lineNo) {
-        return (String) this.lines.get(lineNo);
+        return this.lines.get(lineNo);
     }
 
     public int lineStartIndex(int lineNo) {
@@ -61,12 +67,15 @@ public class SourceLines implements CharSequence {
         return builder.toString();
     }
 
+    /**
+     * Scan the source for line breaks, recording the position of the first character of each line.
+     */
     private static IntList createLineLookup(String source) {
         if (source.isEmpty()) {
             return IntLists.emptyList();
         } else {
             IntList l = new IntArrayList();
-            l.add(0);
+            l.add(0); // first line is always at position 0
             Matcher matcher = NEW_LINE.matcher(source);
 
             while (matcher.find()) {
