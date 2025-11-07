@@ -10,17 +10,17 @@ import java.util.Set;
 
 @ApiStatus.NonExtendable
 public interface IdRegistry<T> extends Iterable<T> {
-    void register(Identifier var1, T var2);
+    void register(Identifier id, T object);
 
-    <S extends T> S registerAndGet(Identifier var1, S var2);
+    <S extends T> S registerAndGet(Identifier id, S object);
 
-    @Nullable T get(Identifier var1);
+    @Nullable T get(Identifier id);
 
-    @Nullable Identifier getId(T var1);
+    @Nullable Identifier getId(T object);
 
-    T getOrThrow(Identifier var1);
+    T getOrThrow(Identifier id);
 
-    Identifier getIdOrThrow(T var1);
+    Identifier getIdOrThrow(T object);
 
     @UnmodifiableView
     Set<Identifier> getAllIds();

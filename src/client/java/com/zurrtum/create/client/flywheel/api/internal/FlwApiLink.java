@@ -29,17 +29,17 @@ public interface FlwApiLink {
 
     LayoutBuilder createLayoutBuilder();
 
-    boolean supportsVisualization(@Nullable WorldAccess var1);
+    boolean supportsVisualization(@Nullable WorldAccess level);
 
-    @Nullable VisualizationManager getVisualizationManager(@Nullable WorldAccess var1);
+    @Nullable VisualizationManager getVisualizationManager(@Nullable WorldAccess level);
 
-    VisualizationManager getVisualizationManagerOrThrow(@Nullable WorldAccess var1);
+    VisualizationManager getVisualizationManagerOrThrow(@Nullable WorldAccess level);
 
-    <T extends BlockEntity> @Nullable BlockEntityVisualizer<? super T> getVisualizer(BlockEntityType<T> var1);
+    <T extends BlockEntity> @Nullable BlockEntityVisualizer<? super T> getVisualizer(BlockEntityType<T> type);
 
-    <T extends Entity> @Nullable EntityVisualizer<? super T> getVisualizer(EntityType<T> var1);
+    <T extends Entity> @Nullable EntityVisualizer<? super T> getVisualizer(EntityType<T> type);
 
-    <T extends BlockEntity> void setVisualizer(BlockEntityType<T> var1, @Nullable BlockEntityVisualizer<? super T> var2);
+    <T extends BlockEntity> void setVisualizer(BlockEntityType<T> type, @Nullable BlockEntityVisualizer<? super T> visualizer);
 
-    <T extends Entity> void setVisualizer(EntityType<T> var1, @Nullable EntityVisualizer<? super T> var2);
+    <T extends Entity> void setVisualizer(EntityType<T> type, @Nullable EntityVisualizer<? super T> visualizer);
 }

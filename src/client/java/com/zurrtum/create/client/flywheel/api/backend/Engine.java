@@ -16,31 +16,95 @@ import java.util.List;
 
 @BackendImplemented
 public interface Engine {
+    /**
+     * Create a visualization context that will be used to create visuals of the given type.
+     *
+     * @return A new visualization context.
+     */
     VisualizationContext createVisualizationContext();
 
+    /**
+     * Create a plan that will start execution after the start of the level render and
+     * finish execution before {@link #render} is called.
+     *
+     * @return A new plan.
+     */
     Plan<RenderContext> createFramePlan();
 
+    /**
+     * @return The current render origin.
+     */
     Vec3i renderOrigin();
 
-    boolean updateRenderOrigin(Camera var1);
+    /**
+     * Maintain the render origin to be within a certain distance from the camera in all directions,
+     * preventing floating point precision issues at high coordinates.
+     *
+     * @return {@code true} if the render origin changed, {@code false} otherwise.
+     */
+    boolean updateRenderOrigin(Camera camera);
 
-    void lightSections(LongSet var1);
+    /**
+     * Assign the set of sections that visuals have requested GPU light for.
+     *
+     * <p> This will be called at most once per frame, and not necessarily every frame.
+     *
+     * @param sections The set of sections.
+     */
+    void lightSections(LongSet sections);
 
-    void onLightUpdate(ChunkSectionPos var1, LightType var2);
+    void onLightUpdate(ChunkSectionPos sectionPos, LightType layer);
 
-    void render(RenderContext var1);
+    /**
+     * Render all instances necessary for the given visual type.
+     *
+     * <p>This method is guaranteed to be called after
+     * {@linkplain #createFramePlan() the frame plan} has finished execution and before
+     * {@link #renderCrumbling} are called. This method is guaranteed to be called on the render thread.
+     *
+     * @param context The context for the current level render.
+     */
+    void render(RenderContext context);
 
-    void renderCrumbling(RenderContext var1, List<CrumblingBlock> var2);
+    /**
+     * Render the given instances as a crumbling overlay.
+     *
+     * <p>This method is guaranteed to be called after {@link #render} for the current
+     * level render. This method is guaranteed to be called on the render thread.
+     *
+     * @param context         The context for the current level render.
+     * @param crumblingBlocks The instances to render. This list is never empty.
+     */
+    void renderCrumbling(RenderContext context, List<CrumblingBlock> crumblingBlocks);
 
+    /**
+     * Free all resources associated with this engine.
+     *
+     * <p>This engine will not be used again after this method is called.
+     *
+     * <p>This method is guaranteed to be called on the render thread.
+     */
     void delete();
 
+    /**
+     * A block to be rendered as a crumbling overlay.
+     */
     @ApiStatus.NonExtendable
-    public interface CrumblingBlock {
+    interface CrumblingBlock {
+        /**
+         * The position of the block.
+         */
         BlockPos pos();
 
+        /**
+         * The progress of the crumbling animation in the range [0, 10).
+         */
         @Range(from = 0L, to = 9L)
         int progress();
 
+        /**
+         * The instances associated with the block entity visual at this position.
+         */
         List<Instance> instances();
     }
 }

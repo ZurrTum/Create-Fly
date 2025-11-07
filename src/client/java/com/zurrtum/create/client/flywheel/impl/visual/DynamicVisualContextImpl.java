@@ -1,5 +1,6 @@
 package com.zurrtum.create.client.flywheel.impl.visual;
 
+import com.zurrtum.create.client.flywheel.api.visual.DistanceUpdateLimiter;
 import com.zurrtum.create.client.flywheel.api.visual.DynamicVisual;
 import net.minecraft.client.render.Camera;
 import org.joml.FrustumIntersection;

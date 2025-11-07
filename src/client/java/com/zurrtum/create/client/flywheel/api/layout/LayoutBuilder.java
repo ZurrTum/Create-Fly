@@ -6,27 +6,27 @@ import org.jetbrains.annotations.Range;
 
 @ApiStatus.NonExtendable
 public interface LayoutBuilder {
-    LayoutBuilder scalar(String var1, ValueRepr var2);
+    LayoutBuilder scalar(String name, ValueRepr repr);
 
-    LayoutBuilder vector(String var1, ValueRepr var2, @Range(from = 2L, to = 4L) int var3);
+    LayoutBuilder vector(String name, ValueRepr repr, @Range(from = 2L, to = 4L) int size);
 
-    LayoutBuilder matrix(String var1, FloatRepr var2, @Range(from = 2L, to = 4L) int var3, @Range(from = 2L, to = 4L) int var4);
+    LayoutBuilder matrix(String name, FloatRepr repr, @Range(from = 2L, to = 4L) int rows, @Range(from = 2L, to = 4L) int columns);
 
-    LayoutBuilder matrix(String var1, FloatRepr var2, @Range(from = 2L, to = 4L) int var3);
+    LayoutBuilder matrix(String name, FloatRepr repr, @Range(from = 2L, to = 4L) int size);
 
-    LayoutBuilder scalarArray(String var1, ValueRepr var2, @Range(from = 1L, to = 256L) int var3);
+    LayoutBuilder scalarArray(String name, ValueRepr repr, @Range(from = 1L, to = 256L) int length);
 
-    LayoutBuilder vectorArray(String var1, ValueRepr var2, @Range(from = 2L, to = 4L) int var3, @Range(from = 1L, to = 256L) int var4);
+    LayoutBuilder vectorArray(String name, ValueRepr repr, @Range(from = 2L, to = 4L) int size, @Range(from = 1L, to = 256L) int length);
 
     LayoutBuilder matrixArray(
-        String var1,
-        FloatRepr var2,
-        @Range(from = 2L, to = 4L) int var3,
-        @Range(from = 2L, to = 4L) int var4,
-        @Range(from = 1L, to = 256L) int var5
+        String name,
+        FloatRepr repr,
+        @Range(from = 2L, to = 4L) int rows,
+        @Range(from = 2L, to = 4L) int columns,
+        @Range(from = 1L, to = 256L) int length
     );
 
-    LayoutBuilder matrixArray(String var1, FloatRepr var2, @Range(from = 2L, to = 4L) int var3, @Range(from = 1L, to = 256L) int var4);
+    LayoutBuilder matrixArray(String name, FloatRepr repr, @Range(from = 2L, to = 4L) int size, @Range(from = 1L, to = 256L) int length);
 
     Layout build();
 

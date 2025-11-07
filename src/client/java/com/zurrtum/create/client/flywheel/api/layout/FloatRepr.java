@@ -1,15 +1,26 @@
 package com.zurrtum.create.client.flywheel.api.layout;
 
 public enum FloatRepr implements ValueRepr {
-    BYTE(1), NORMALIZED_BYTE(1), UNSIGNED_BYTE(1), NORMALIZED_UNSIGNED_BYTE(1), SHORT(2), NORMALIZED_SHORT(2), UNSIGNED_SHORT(2), NORMALIZED_UNSIGNED_SHORT(
-        2), INT(4), NORMALIZED_INT(4), UNSIGNED_INT(4), NORMALIZED_UNSIGNED_INT(4), FLOAT(4);
+    BYTE(Byte.BYTES),
+    NORMALIZED_BYTE(Byte.BYTES),
+    UNSIGNED_BYTE(Byte.BYTES),
+    NORMALIZED_UNSIGNED_BYTE(Byte.BYTES),
+    SHORT(Short.BYTES),
+    NORMALIZED_SHORT(Short.BYTES),
+    UNSIGNED_SHORT(Short.BYTES),
+    NORMALIZED_UNSIGNED_SHORT(Short.BYTES),
+    INT(Integer.BYTES),
+    NORMALIZED_INT(Integer.BYTES),
+    UNSIGNED_INT(Integer.BYTES),
+    NORMALIZED_UNSIGNED_INT(Integer.BYTES),
+    FLOAT(Float.BYTES);
 
     private final int byteSize;
 
-    private FloatRepr(int byteSize) {
+    FloatRepr(int byteSize) {
         this.byteSize = byteSize;
     }
-
+    
     public int byteSize() {
         return this.byteSize;
     }

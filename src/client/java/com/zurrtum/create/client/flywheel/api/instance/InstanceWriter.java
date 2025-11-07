@@ -1,5 +1,11 @@
 package com.zurrtum.create.client.flywheel.api.instance;
 
+/**
+ * InstanceWriters can quickly consume many instances and write them to some memory address.
+ */
 public interface InstanceWriter<I extends Instance> {
-    void write(long var1, I var3);
+    /**
+     * Write the given instance to the given memory address.
+     */
+    void write(final long ptr, final I instance);
 }

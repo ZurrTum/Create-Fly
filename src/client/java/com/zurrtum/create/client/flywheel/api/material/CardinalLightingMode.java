@@ -1,8 +1,24 @@
 package com.zurrtum.create.client.flywheel.api.material;
 
 public enum CardinalLightingMode {
-    OFF, CHUNK, ENTITY;
+    /**
+     * No normal-based darkening will be applied.
+     */
+    OFF,
 
-    private CardinalLightingMode() {
-    }
+    /**
+     * World-space normal based darkening will be applied.
+     *
+     * <p>This mode matches the appearance of chunk geometry.
+     */
+    CHUNK,
+
+    /**
+     * World-space normal based darkening will be applied in accordance to the "light directions" specified in RenderSystem.
+     *
+     * <p>This mode matches the appearance of entities.
+     *
+     * @see com.mojang.blaze3d.systems.RenderSystem#setShaderLights
+     */
+    ENTITY;
 }

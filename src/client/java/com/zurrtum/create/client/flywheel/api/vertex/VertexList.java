@@ -1,33 +1,41 @@
 package com.zurrtum.create.client.flywheel.api.vertex;
 
+/**
+ * A read only view of a vertex buffer.
+ *
+ * <p>
+ * VertexList assumes nothing about the layout of the vertices. Implementations should feel free to return constants
+ * for values that are unused in their layout.
+ * </p>
+ */
 public interface VertexList {
-    float x(int var1);
+    float x(int index);
 
-    float y(int var1);
+    float y(int index);
 
-    float z(int var1);
+    float z(int index);
 
-    float r(int var1);
+    float r(int index);
 
-    float g(int var1);
+    float g(int index);
 
-    float b(int var1);
+    float b(int index);
 
-    float a(int var1);
+    float a(int index);
 
-    float u(int var1);
+    float u(int index);
 
-    float v(int var1);
+    float v(int index);
 
-    int overlay(int var1);
+    int overlay(int index);
 
-    int light(int var1);
+    int light(int index);
 
-    float normalX(int var1);
+    float normalX(int index);
 
-    float normalY(int var1);
+    float normalY(int index);
 
-    float normalZ(int var1);
+    float normalZ(int index);
 
     default void write(MutableVertexList dst, int srcIndex, int dstIndex) {
         dst.x(dstIndex, this.x(srcIndex));

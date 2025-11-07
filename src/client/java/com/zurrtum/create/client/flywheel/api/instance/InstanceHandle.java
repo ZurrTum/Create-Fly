@@ -8,7 +8,7 @@ public interface InstanceHandle {
 
     void setDeleted();
 
-    void setVisible(boolean var1);
+    void setVisible(boolean visible);
 
     boolean isVisible();
 }

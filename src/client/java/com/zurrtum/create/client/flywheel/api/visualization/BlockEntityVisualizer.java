@@ -2,9 +2,28 @@ package com.zurrtum.create.client.flywheel.api.visualization;
 
 import com.zurrtum.create.client.flywheel.api.visual.BlockEntityVisual;
 import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.client.render.block.entity.BlockEntityRenderer;
 
+/**
+ * A visualizer that will be keyed to a block entity type.
+ *
+ * @param <T> The block entity type.
+ */
 public interface BlockEntityVisualizer<T extends BlockEntity> {
-    BlockEntityVisual<? super T> createVisual(VisualizationContext var1, T var2, float var3);
+    /**
+     * Given a block entity and context, constructs a visual for the block entity.
+     *
+     * @param ctx         Context for creating a visual.
+     * @param blockEntity The block entity to construct a visual for.
+     * @return The visual.
+     */
+    BlockEntityVisual<? super T> createVisual(VisualizationContext ctx, T blockEntity, float partialTick);
 
-    boolean skipVanillaRender(T var1);
+    /**
+     * Checks if the given block entity should not be rendered with the vanilla {@link BlockEntityRenderer}.
+     *
+     * @param blockEntity The block entity to check.
+     * @return {@code true} if the block entity should not be rendered with the vanilla {@link BlockEntityRenderer}, {@code false} if it should.
+     */
+    boolean skipVanillaRender(T blockEntity);
 }

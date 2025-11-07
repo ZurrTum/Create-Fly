@@ -36,14 +36,41 @@ public interface VisualizationManager {
 
     VisualManager<Effect> effects();
 
+    /**
+     * Get the render dispatcher, which can be used to invoke rendering.
+     * <b>This should only be used by mods which heavily rewrite rendering to restore compatibility with Flywheel
+     * without mixins.</b>
+     */
     RenderDispatcher renderDispatcher();
 
     @ApiStatus.NonExtendable
-    public interface RenderDispatcher {
+    interface RenderDispatcher {
+        /**
+         * Prepare visuals for render.
+         *
+         * <p>Guaranteed to be called before {@link #afterEntities} and {@link #beforeCrumbling}.
+         * <br>Guaranteed to be called after the render thread has processed all light updates.
+         * <br>The caller is otherwise free to choose an invocation site, but it is recommended to call
+         * this as early as possible to give the VisualizationManager time to process things off-thread.
+         */
         void onStartLevelRender(RenderContext var1);
 
+        /**
+         * Render instances.
+         *
+         * <p>Guaranteed to be called after {@link #onStartLevelRender} and before {@link #beforeCrumbling}.
+         * <br>The caller is otherwise free to choose an invocation site, but it is recommended to call
+         * this between rendering entities and block entities.
+         */
         void afterEntities(RenderContext var1);
 
-        void beforeCrumbling(RenderContext var1, Long2ObjectMap<SortedSet<BlockBreakingInfo>> var2);
+        /**
+         * Render crumbling block entities.
+         *
+         * <p>Guaranteed to be called after {@link #onStartLevelRender} and {@link #afterEntities}
+         *
+         * @param destructionProgress The destruction progress map from {@link net.minecraft.client.render.WorldRenderer LevelRenderer}.
+         */
+        void beforeCrumbling(RenderContext ctx, Long2ObjectMap<SortedSet<BlockBreakingInfo>> destructionProgress);
     }
 }

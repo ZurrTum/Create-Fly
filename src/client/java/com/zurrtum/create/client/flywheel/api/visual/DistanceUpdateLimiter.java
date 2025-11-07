@@ -1,4 +1,4 @@
-package com.zurrtum.create.client.flywheel.impl.visual;
+package com.zurrtum.create.client.flywheel.api.visual;
 
 import org.jetbrains.annotations.ApiStatus;
 

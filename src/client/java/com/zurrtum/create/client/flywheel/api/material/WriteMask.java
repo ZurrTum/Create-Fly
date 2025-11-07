@@ -1,10 +1,18 @@
 package com.zurrtum.create.client.flywheel.api.material;
 
 public enum WriteMask {
-    COLOR_DEPTH, COLOR, DEPTH;
-
-    private WriteMask() {
-    }
+    /**
+     * Write to both the color and depth buffers.
+     */
+    COLOR_DEPTH,
+    /**
+     * Write to the color buffer only.
+     */
+    COLOR,
+    /**
+     * Write to the depth buffer only.
+     */
+    DEPTH;
 
     public boolean color() {
         return this == COLOR_DEPTH || this == COLOR;
