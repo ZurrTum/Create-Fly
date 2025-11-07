@@ -61,7 +61,7 @@ https://www.curseforge.com/minecraft/mc-mods/create-fly/files/all?page=1&pageSiz
 
 ## Modrinth Maven
 
-```
+```gradle
 repositories {
     exclusiveContent {
         forRepository {
@@ -86,7 +86,7 @@ dependencies {
 
 ## Curse Maven
 
-```
+```gradle
 repositories {
     exclusiveContent {
         forRepository {
