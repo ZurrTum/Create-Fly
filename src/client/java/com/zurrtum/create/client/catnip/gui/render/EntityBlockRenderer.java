@@ -3,8 +3,10 @@ package com.zurrtum.create.client.catnip.gui.render;
 import com.mojang.blaze3d.systems.ProjectionType;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.zurrtum.create.client.flywheel.lib.model.baked.SinglePosVirtualBlockGetter;
+import com.zurrtum.create.client.infrastructure.model.WrapperBlockStateModel;
 import it.unimi.dsi.fastutil.ints.Int2ObjectArrayMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.client.MinecraftClient;
@@ -16,11 +18,13 @@ import net.minecraft.client.render.*;
 import net.minecraft.client.render.block.BlockRenderManager;
 import net.minecraft.client.render.block.entity.BlockEntityRenderer;
 import net.minecraft.client.render.model.BlockModelPart;
+import net.minecraft.client.render.model.BlockStateModel;
 import net.minecraft.client.texture.TextureSetup;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RotationAxis;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.random.Random;
 import net.minecraft.world.World;
 
 import java.util.List;
@@ -81,25 +85,34 @@ public class EntityBlockRenderer extends SpecialGuiElementRenderer<EntityBlockRe
         SinglePosVirtualBlockGetter lightWorld = SinglePosVirtualBlockGetter.createFullBright();
         lightWorld.blockState(blockState);
         lightWorld.blockEntity(blockEntity);
-        List<BlockModelPart> parts = blockRenderManager.getModel(blockState).getParts(world.getRandom());
+        BlockStateModel model = blockRenderManager.getModel(blockState);
+        List<BlockModelPart> parts = new ObjectArrayList<>();
+        Random random = world.getRandom();
+        if (WrapperBlockStateModel.unwrapCompat(model) instanceof WrapperBlockStateModel wrapper) {
+            wrapper.addPartsWithInfo(world, block.pos(), blockState, random, parts);
+        } else {
+            model.addParts(random, parts);
+        }
         blockRenderManager.renderBlock(blockState, BlockPos.ORIGIN, lightWorld, matrices, vertexConsumers.getBuffer(layer), false, parts);
-        BlockEntityRenderer<BlockEntity> renderer = mc.getBlockEntityRenderDispatcher().get(blockEntity);
-        if (renderer != null) {
-            World previousLevel = blockEntity.getWorld();
-            BlockState stateBefore = blockEntity.getCachedState();
-            blockEntity.setWorld(world);
-            blockEntity.setCachedState(blockState);
-            renderer.render(
-                blockEntity,
-                0,
-                matrices,
-                vertexConsumers,
-                LightmapTextureManager.MAX_LIGHT_COORDINATE,
-                OverlayTexture.DEFAULT_UV,
-                Vec3d.ZERO
-            );
-            blockEntity.setCachedState(stateBefore);
-            blockEntity.setWorld(previousLevel);
+        if (blockEntity != null) {
+            BlockEntityRenderer<BlockEntity> renderer = mc.getBlockEntityRenderDispatcher().get(blockEntity);
+            if (renderer != null) {
+                World previousLevel = blockEntity.getWorld();
+                BlockState stateBefore = blockEntity.getCachedState();
+                blockEntity.setWorld(world);
+                blockEntity.setCachedState(blockState);
+                renderer.render(
+                    blockEntity,
+                    0,
+                    matrices,
+                    vertexConsumers,
+                    LightmapTextureManager.MAX_LIGHT_COORDINATE,
+                    OverlayTexture.DEFAULT_UV,
+                    Vec3d.ZERO
+                );
+                blockEntity.setCachedState(stateBefore);
+                blockEntity.setWorld(previousLevel);
+            }
         }
         vertexConsumers.draw();
         matrices.pop();

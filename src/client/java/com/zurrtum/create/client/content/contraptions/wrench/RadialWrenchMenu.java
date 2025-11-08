@@ -276,6 +276,7 @@ public class RadialWrenchMenu extends AbstractSimiScreen {
                 i,
                 graphics,
                 nonVisualizationLevel,
+                pos,
                 blockEntity,
                 blockState,
                 -21,
