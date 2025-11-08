@@ -135,6 +135,7 @@ public class IndirectDrawManager extends DrawManager<IndirectInstancer<?>> {
         matrixBuffer.bind();
         Uniforms.bindAll();
 
+        MaterialRenderState.setupFrameBuffer();
         for (var group : cullingGroups.values()) {
             group.submitSolid();
         }
@@ -225,6 +226,8 @@ public class IndirectDrawManager extends DrawManager<IndirectInstancer<?>> {
         // Set up the crumbling program buffers. Nothing changes here between draws.
         GlBufferType.DRAW_INDIRECT_BUFFER.bind(crumblingDrawBuffer.handle());
         glBindBufferRange(GL_SHADER_STORAGE_BUFFER, BufferBindings.DRAW, crumblingDrawBuffer.handle(), 0, IndirectBuffers.DRAW_COMMAND_STRIDE);
+
+        MaterialRenderState.setupFrameBuffer();
 
         for (var groupEntry : byType.entrySet()) {
             var byProgress = groupEntry.getValue();

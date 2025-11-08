@@ -106,6 +106,7 @@ public class InstancedDrawManager extends DrawManager<InstancedInstancer<?>> {
         TextureBinder.bindLightAndOverlay();
         light.bind();
 
+        MaterialRenderState.setupFrameBuffer();
         submitDraws();
 
         if (!oitDraws.isEmpty()) {
@@ -249,6 +250,8 @@ public class InstancedDrawManager extends DrawManager<InstancedInstancer<?>> {
         Uniforms.bindAll();
         vao.bindForDraw();
         TextureBinder.bindLightAndOverlay();
+
+        MaterialRenderState.setupFrameBuffer();
 
         for (var groupEntry : byType.entrySet()) {
             var byProgress = groupEntry.getValue();
