@@ -1,6 +1,5 @@
 package com.zurrtum.create.client.flywheel.api.material;
 
-import net.minecraft.client.render.RenderPhase;
 import net.minecraft.util.Identifier;
 
 public interface Material {
@@ -33,6 +32,4 @@ public interface Material {
     boolean useLight();
 
     CardinalLightingMode cardinalLightingMode();
-
-    RenderPhase.Target target();
 }

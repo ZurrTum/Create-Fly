@@ -11,14 +11,12 @@ import com.zurrtum.create.client.flywheel.backend.Samplers;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gl.Framebuffer;
 import net.minecraft.client.gl.GlBackend;
-import net.minecraft.client.render.RenderPhase;
 import net.minecraft.client.texture.AbstractTexture;
 import net.minecraft.client.texture.GlTexture;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.opengl.GL11;
 
 import java.util.Comparator;
-import java.util.Objects;
 
 import static com.mojang.blaze3d.opengl.GlConst.*;
 
@@ -29,7 +27,6 @@ public final class MaterialRenderState {
     }
 
     public static void setup(Material material) {
-        setupFrameBuffer(material.target());
         setupTexture(material);
         setupBackfaceCulling(material.backfaceCulling());
         setupPolygonOffset(material.polygonOffset());
@@ -47,21 +44,6 @@ public final class MaterialRenderState {
         WriteMask mask = material.writeMask();
         boolean writeColor = mask.color();
         GlStateManager._colorMask(writeColor, writeColor, writeColor, writeColor);
-    }
-
-    private static void setupFrameBuffer(RenderPhase.Target target) {
-        Framebuffer framebuffer = target.get();
-        GlTexture colorAttachment = (GlTexture) framebuffer.getColorAttachment();
-        if (colorAttachment == null) {
-            framebuffer = MinecraftClient.getInstance().getFramebuffer();
-            colorAttachment = (GlTexture) framebuffer.getColorAttachment();
-            Objects.requireNonNull(colorAttachment, "No color attachment for framebuffer");
-        }
-        int i = colorAttachment.getOrCreateFramebuffer(
-            ((GlBackend) RenderSystem.getDevice()).getBufferManager(),
-            framebuffer.useDepthAttachment ? framebuffer.getDepthAttachment() : null
-        );
-        GlStateManager._glBindFramebuffer(GlConst.GL_FRAMEBUFFER, i);
     }
 
     private static void setupTexture(Material material) {
@@ -175,6 +157,15 @@ public final class MaterialRenderState {
         resetDepthTest();
         resetTransparency();
         resetWriteMask();
+    }
+
+    public static void setupFrameBuffer() {
+        Framebuffer framebuffer = MinecraftClient.getInstance().getFramebuffer();
+        int i = ((GlTexture) framebuffer.getColorAttachment()).getOrCreateFramebuffer(
+            ((GlBackend) RenderSystem.getDevice()).getBufferManager(),
+            framebuffer.useDepthAttachment ? framebuffer.getDepthAttachment() : null
+        );
+        GlStateManager._glBindFramebuffer(GlConst.GL_FRAMEBUFFER, i);
     }
 
     private static void resetFrameBuffer() {

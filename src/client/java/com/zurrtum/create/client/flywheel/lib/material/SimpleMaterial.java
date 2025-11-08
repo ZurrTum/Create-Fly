@@ -1,7 +1,6 @@
 package com.zurrtum.create.client.flywheel.lib.material;
 
 import com.zurrtum.create.client.flywheel.api.material.*;
-import net.minecraft.client.render.RenderPhase;
 import net.minecraft.client.texture.SpriteAtlasTexture;
 import net.minecraft.util.Identifier;
 
@@ -25,8 +24,6 @@ public class SimpleMaterial implements Material {
     protected final boolean useLight;
     protected final CardinalLightingMode cardinalLightingMode;
 
-    protected RenderPhase.Target target;
-
     protected SimpleMaterial(Builder builder) {
         shaders = builder.shaders();
         fog = builder.fog();
@@ -43,7 +40,6 @@ public class SimpleMaterial implements Material {
         useOverlay = builder.useOverlay();
         useLight = builder.useLight();
         cardinalLightingMode = builder.cardinalLightingMode();
-        target = builder.target();
     }
 
     public static Builder builder() {
@@ -129,11 +125,6 @@ public class SimpleMaterial implements Material {
         return cardinalLightingMode;
     }
 
-    @Override
-    public RenderPhase.Target target() {
-        return target;
-    }
-
     public static class Builder implements Material {
         protected MaterialShaders shaders;
         protected FogShader fog;
@@ -154,8 +145,6 @@ public class SimpleMaterial implements Material {
         protected boolean useLight;
         protected CardinalLightingMode cardinalLightingMode;
 
-        protected RenderPhase.Target target;
-
         @SuppressWarnings("deprecation")
         public Builder() {
             shaders = StandardMaterialShaders.DEFAULT;
@@ -173,7 +162,6 @@ public class SimpleMaterial implements Material {
             useOverlay = true;
             useLight = true;
             cardinalLightingMode = CardinalLightingMode.ENTITY;
-            target = RenderPhase.MAIN_TARGET;
         }
 
         public Builder(Material material) {
@@ -196,7 +184,6 @@ public class SimpleMaterial implements Material {
             useOverlay = material.useOverlay();
             useLight = material.useLight();
             cardinalLightingMode = material.cardinalLightingMode();
-            target = material.target();
             return this;
         }
 
@@ -283,11 +270,6 @@ public class SimpleMaterial implements Material {
             return this;
         }
 
-        public Builder target(RenderPhase.Target target) {
-            this.target = target;
-            return this;
-        }
-
         @Override
         public MaterialShaders shaders() {
             return shaders;
@@ -361,11 +343,6 @@ public class SimpleMaterial implements Material {
         @Override
         public CardinalLightingMode cardinalLightingMode() {
             return cardinalLightingMode;
-        }
-
-        @Override
-        public RenderPhase.Target target() {
-            return target;
         }
 
         public SimpleMaterial build() {
