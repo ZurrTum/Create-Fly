@@ -1,12 +1,10 @@
 package com.zurrtum.create.client.catnip.gui;
 
-import com.mojang.blaze3d.buffers.GpuBuffer;
 import com.mojang.blaze3d.pipeline.BlendFunction;
 import com.mojang.blaze3d.pipeline.RenderPipeline;
 import com.mojang.blaze3d.platform.DepthTestFunction;
 import com.mojang.blaze3d.platform.LogicOp;
 import com.mojang.blaze3d.platform.PolygonMode;
-import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.VertexFormat;
 import net.minecraft.client.gl.Defines;
 import net.minecraft.util.Identifier;
@@ -15,13 +13,8 @@ import java.util.List;
 import java.util.Optional;
 
 public class IndexRenderPipeline extends RenderPipeline {
-    private final RenderSystem.ShapeIndexBuffer sequentialBuffer;
-    private final VertexFormat.IndexType indexType;
-
     @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
     public IndexRenderPipeline(
-        RenderSystem.ShapeIndexBuffer sequentialBuffer,
-        VertexFormat.IndexType indexType,
         Identifier location,
         Identifier vertexShader,
         Identifier fragmentShader,
@@ -63,16 +56,6 @@ public class IndexRenderPipeline extends RenderPipeline {
             depthBiasConstant,
             sortKey
         );
-        this.sequentialBuffer = sequentialBuffer;
-        this.indexType = indexType;
-    }
-
-    public GpuBuffer getIndexBuffer(int requiredSize) {
-        return sequentialBuffer.getIndexBuffer(requiredSize);
-    }
-
-    public VertexFormat.IndexType getIndexType() {
-        return indexType;
     }
 
     public static IndexBuilder builder(Snippet... snippets) {
@@ -89,11 +72,7 @@ public class IndexRenderPipeline extends RenderPipeline {
         @Override
         public RenderPipeline build() {
             RenderPipeline pipeline = super.build();
-            VertexFormat.DrawMode vertexFormatMode = pipeline.getVertexFormatMode();
-            RenderSystem.ShapeIndexBuffer sequentialBuffer = RenderSystem.getSequentialBuffer(vertexFormatMode);
             return new IndexRenderPipeline(
-                sequentialBuffer,
-                sequentialBuffer.getIndexType(),
                 pipeline.getLocation(),
                 pipeline.getVertexShader(),
                 pipeline.getFragmentShader(),
@@ -109,7 +88,7 @@ public class IndexRenderPipeline extends RenderPipeline {
                 pipeline.isWriteDepth(),
                 pipeline.getColorLogic(),
                 pipeline.getVertexFormat(),
-                vertexFormatMode,
+                pipeline.getVertexFormatMode(),
                 pipeline.getDepthBiasScaleFactor(),
                 pipeline.getDepthBiasConstant(),
                 pipeline.getSortKey()
