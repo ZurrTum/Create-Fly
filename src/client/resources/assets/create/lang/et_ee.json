@@ -389,7 +389,8 @@
   "create.potato_cannon.ammo.knockback": "%1$s Tagasilöök",
   "create.potato_cannon.ammo.reload_ticks": "%1$s Laadi tiksud uuesti",
   "create.subtitle.cogs": "Hammasrattad mürisevad",
-  "fluid.create.milk": "Piim"
+  "fluid.create.milk": "Piim",
+  "block.create.milk": "Piim"
   "death.attack.create.potato_cannon": "%1$s lasti %2$s kartulikahuriga",
   "death.attack.create.potato_cannon.item": "%1$s lasti %2$s poolt kasutades %3$s",
   "enchantment.create.capacity.desc": "Suurendab seljapaagi õhumahutavust.",

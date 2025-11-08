@@ -260,6 +260,7 @@
   "fluid.create.chocolate": "Σοκολάτα",
   "fluid.create.honey": "Μέλι",
   "fluid.create.potion": "Φίλτρο",
+  "block.create.potion": "Φίλτρο",
   "item.create.brass_hand": "Χέρι Ορείχαλκου",
   "item.create.cardboard": "Χαρτόνι",
   "item.create.copper_diving_boots.tooltip.condition1": "Όταν Φοριέται",
