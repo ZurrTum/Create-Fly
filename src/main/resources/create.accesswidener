@@ -278,3 +278,4 @@ accessible method net/minecraft/client/render/RenderLayer$MultiPhaseParameters$B
 accessible field net/minecraft/client/render/RenderPhase MAIN_TARGET Lnet/minecraft/client/render/RenderPhase$Target;
 accessible field net/minecraft/client/render/RenderPhase WEATHER_TARGET Lnet/minecraft/client/render/RenderPhase$Target;
 accessible method net/minecraft/server/network/ServerPlayerInteractionManager setGameMode (Lnet/minecraft/world/GameMode;Lnet/minecraft/world/GameMode;)V
+accessible method net/minecraft/client/render/entity/EntityRenderer canBeCulled (Lnet/minecraft/entity/Entity;)Z
