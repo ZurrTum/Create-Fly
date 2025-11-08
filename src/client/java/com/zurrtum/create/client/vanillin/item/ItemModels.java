@@ -62,7 +62,7 @@ public class ItemModels {
         ItemRenderState state = STATE.get();
         mc.getItemModelManager().clearAndUpdate(state, stack, context, mc.world, null, 0);
         boolean support = !state.isAnimated();
-        SUPPORT_CACHE.put(stack, support);
+        SUPPORT_CACHE.put(stack.copy(), support);
         return support;
     }
 
