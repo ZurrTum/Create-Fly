@@ -52,6 +52,7 @@ public class MixinPlugin implements IMixinConfigPlugin {
         if (Create.Lazy) {
             mixins.add("FabricBlockStateModelMixin");
             mixins.add("WrapperBlockStateModelMixin");
+            mixins.add("FluidVariantRenderHandlerMixin");
         } else {
             mixins.add("CreativeInventoryScreenMixin");
             mixins.add("DefaultClientResourcePackProviderMixin");
