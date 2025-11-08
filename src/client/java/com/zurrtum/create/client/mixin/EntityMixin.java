@@ -1,8 +1,11 @@
 package com.zurrtum.create.client.mixin;
 
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
 import com.zurrtum.create.AllSynchedDatas;
 import com.zurrtum.create.client.content.contraptions.ContraptionHandlerClient;
+import com.zurrtum.create.client.ponder.api.level.PonderLevel;
 import com.zurrtum.create.content.contraptions.AbstractContraptionEntity;
 import com.zurrtum.create.content.contraptions.Contraption;
 import com.zurrtum.create.content.contraptions.ContraptionCollider;
@@ -189,5 +192,13 @@ public abstract class EntityMixin {
                 }
             }
         );
+    }
+
+    @WrapOperation(method = "move(Lnet/minecraft/entity/MovementType;Lnet/minecraft/util/math/Vec3d;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/Entity;canMoveVoluntarily()Z"))
+    private boolean move(Entity instance, Operation<Boolean> original) {
+        if (original.call(instance)) {
+            return true;
+        }
+        return world instanceof PonderLevel;
     }
 }
