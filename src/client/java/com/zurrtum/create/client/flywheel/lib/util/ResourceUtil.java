@@ -7,6 +7,8 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.InvalidIdentifierException;
 
+import static com.zurrtum.create.client.flywheel.impl.Flywheel.MOD_ID;
+
 public final class ResourceUtil {
     private static final SimpleCommandExceptionType ERROR_INVALID = new SimpleCommandExceptionType(Text.translatable("argument.id.invalid"));
 
@@ -14,11 +16,14 @@ public final class ResourceUtil {
     }
 
     public static Identifier rl(String path) {
-        return Identifier.of("flywheel", path);
+        return Identifier.of(MOD_ID, path);
     }
 
+    /**
+     * Same as {@link Identifier#of(String)}, but defaults to Flywheel namespace.
+     */
     public static Identifier parseFlywheelDefault(String location) {
-        String namespace = "flywheel";
+        String namespace = MOD_ID;
         String path = location;
         int i = location.indexOf(58);
         if (i >= 0) {
@@ -31,6 +36,9 @@ public final class ResourceUtil {
         return Identifier.of(namespace, path);
     }
 
+    /**
+     * Same as {@link Identifier#fromCommandInput(StringReader)}, but defaults to Flywheel namespace.
+     */
     public static Identifier readFlywheelDefault(StringReader reader) throws CommandSyntaxException {
         int i = reader.getCursor();
 
@@ -48,8 +56,11 @@ public final class ResourceUtil {
         }
     }
 
+    /**
+     * Same as {@link Identifier#toUnderscoreSeparatedString()}, but also removes the file extension.
+     */
     public static String toDebugFileNameNoExtension(Identifier resourceLocation) {
         String stringLoc = resourceLocation.toUnderscoreSeparatedString();
-        return stringLoc.substring(0, stringLoc.lastIndexOf(46));
+        return stringLoc.substring(0, stringLoc.lastIndexOf('.'));
     }
 }
