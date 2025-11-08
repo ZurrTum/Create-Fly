@@ -2,7 +2,6 @@ package com.zurrtum.create.client.compat.jei.category;
 
 import com.zurrtum.create.AllItems;
 import com.zurrtum.create.AllRecipeTypes;
-import com.zurrtum.create.Create;
 import com.zurrtum.create.client.compat.jei.CreateCategory;
 import com.zurrtum.create.client.compat.jei.JeiClientPlugin;
 import com.zurrtum.create.client.compat.jei.renderer.TwoIconRenderer;
@@ -14,36 +13,45 @@ import mezz.jei.api.gui.drawable.IDrawable;
 import mezz.jei.api.gui.ingredient.IRecipeSlotsView;
 import mezz.jei.api.recipe.IFocusGroup;
 import mezz.jei.api.recipe.types.IRecipeType;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.world.ClientWorld;
 import net.minecraft.fluid.Fluids;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.recipe.*;
 import net.minecraft.recipe.input.SingleStackRecipeInput;
-import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.Text;
-import net.minecraft.world.World;
 import org.jetbrains.annotations.NotNull;
 import org.joml.Matrix3x2f;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
 public class FanBlastingCategory extends CreateCategory<RecipeEntry<? extends SingleStackRecipe>> {
     public static List<RecipeEntry<? extends SingleStackRecipe>> getRecipes(PreparedRecipes preparedRecipes) {
         List<RecipeEntry<? extends SingleStackRecipe>> recipes = new ArrayList<>();
-        for (RecipeEntry<BlastingRecipe> entry : preparedRecipes.getAll(RecipeType.BLASTING)) {
-            addRecipe(recipes, entry);
+        Collection<RecipeEntry<BlastingRecipe>> blastingRecipes = preparedRecipes.getAll(RecipeType.BLASTING);
+        Collection<RecipeEntry<SmokingRecipe>> smokingRecipes = preparedRecipes.getAll(RecipeType.SMOKING);
+        ClientWorld world = MinecraftClient.getInstance().world;
+        for (RecipeEntry<BlastingRecipe> entry : blastingRecipes) {
+            addRecipe(recipes, entry, world, null, smokingRecipes);
         }
         for (RecipeEntry<SmeltingRecipe> entry : preparedRecipes.getAll(RecipeType.SMELTING)) {
-            addRecipe(recipes, entry);
+            addRecipe(recipes, entry, world, blastingRecipes, smokingRecipes);
         }
         return recipes;
     }
 
-    private static void addRecipe(List<RecipeEntry<? extends SingleStackRecipe>> list, RecipeEntry<? extends SingleStackRecipe> entry) {
+    private static void addRecipe(
+        List<RecipeEntry<? extends SingleStackRecipe>> list,
+        RecipeEntry<? extends SingleStackRecipe> entry,
+        ClientWorld world,
+        Collection<RecipeEntry<BlastingRecipe>> blastingRecipes,
+        Collection<RecipeEntry<SmokingRecipe>> smokingRecipes
+    ) {
         if (!AllRecipeTypes.CAN_BE_AUTOMATED.test(entry)) {
             return;
         }
@@ -54,17 +62,14 @@ public class FanBlastingCategory extends CreateCategory<RecipeEntry<? extends Si
             return;
         }
         SingleStackRecipeInput input = new SingleStackRecipeInput(firstInput.get());
-        MinecraftServer server = Create.SERVER;
-        ServerWorld world = server.getWorld(World.OVERWORLD);
-        ServerRecipeManager recipeManager = server.getRecipeManager();
-        if (recipe instanceof SmeltingRecipe) {
-            Optional<RecipeEntry<BlastingRecipe>> blastingRecipe = recipeManager.getFirstMatch(RecipeType.BLASTING, input, world)
+        if (blastingRecipes != null) {
+            Optional<RecipeEntry<BlastingRecipe>> blastingRecipe = blastingRecipes.stream().filter(e -> e.value().matches(input, world)).findFirst()
                 .filter(AllRecipeTypes.CAN_BE_AUTOMATED);
             if (blastingRecipe.isPresent()) {
                 return;
             }
         }
-        Optional<RecipeEntry<SmokingRecipe>> smokingRecipe = recipeManager.getFirstMatch(RecipeType.SMOKING, input, world)
+        Optional<RecipeEntry<SmokingRecipe>> smokingRecipe = smokingRecipes.stream().filter(e -> e.value().matches(input, world)).findFirst()
             .filter(AllRecipeTypes.CAN_BE_AUTOMATED);
         if (smokingRecipe.isPresent()) {
             return;
