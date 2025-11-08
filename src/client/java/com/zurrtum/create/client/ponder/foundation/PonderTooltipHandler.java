@@ -1,6 +1,7 @@
 package com.zurrtum.create.client.ponder.foundation;
 
 import com.google.common.base.Strings;
+import com.mojang.blaze3d.systems.RenderSystem;
 import com.zurrtum.create.catnip.animation.LerpedFloat;
 import com.zurrtum.create.catnip.data.Couple;
 import com.zurrtum.create.catnip.registry.RegisteredObjectsHelper;
@@ -62,7 +63,8 @@ public class PonderTooltipHandler {
 
         float value = holdKeyProgress.getValue();
 
-        if (!subject && InputUtil.isKeyPressed(instance.getWindow().getHandle(), PonderKeybinds.PONDER.boundKey.getCode()) && currentScreen != null) {
+        if (RenderSystem.isOnRenderThread() && !subject && !PonderKeybinds.PONDER.isUnbound() && InputUtil.isKeyPressed(
+            instance.getWindow().getHandle(), PonderKeybinds.PONDER.boundKey.getCode()) && currentScreen != null) {
             if (value >= 1) {
                 if (currentScreen instanceof NavigatableSimiScreen)
                     ((NavigatableSimiScreen) currentScreen).centerScalingOnMouse();
