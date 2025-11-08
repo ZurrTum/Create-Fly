@@ -53,7 +53,7 @@ public class EjectorItemEntityRenderer extends ItemEntityRenderer {
     }
 
     @Override
-    protected Box getBoundingBox(ItemEntity itemEntity) {
+    public Box getBoundingBox(ItemEntity itemEntity) {
         EjectorItemEntity entity = (EjectorItemEntity) itemEntity;
         if (entity.isAlive()) {
             return entity.getBoundingBox();

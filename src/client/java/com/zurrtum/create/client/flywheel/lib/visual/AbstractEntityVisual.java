@@ -4,12 +4,9 @@ import com.zurrtum.create.client.flywheel.api.visual.*;
 import com.zurrtum.create.client.flywheel.api.visualization.VisualizationContext;
 import com.zurrtum.create.client.flywheel.api.visualization.VisualizationManager;
 import com.zurrtum.create.client.flywheel.lib.instance.FlatLit;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.LightmapTextureManager;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.LightningEntity;
-import net.minecraft.entity.boss.dragon.EnderDragonEntity;
-import net.minecraft.entity.decoration.DisplayEntity;
-import net.minecraft.entity.projectile.FishingBobberEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
@@ -88,14 +85,7 @@ public abstract class AbstractEntityVisual<T extends Entity> extends AbstractVis
     }
 
     public boolean isVisible(FrustumIntersection frustum) {
-        return !canBeCulled(entity) || visibilityTester.check(frustum);
-    }
-
-    public boolean canBeCulled(T entity) {
-        if (entity instanceof DisplayEntity displayEntity) {
-            return displayEntity.shouldRender();
-        }
-        return !(entity instanceof EnderDragonEntity) && !(entity instanceof FishingBobberEntity) && !(entity instanceof LightningEntity);
+        return !MinecraftClient.getInstance().getEntityRenderDispatcher().getRenderer(entity).canBeCulled(entity) || visibilityTester.check(frustum);
     }
 
     protected int computePackedLight(float partialTick) {

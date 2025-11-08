@@ -268,3 +268,5 @@ accessible method net/minecraft/world/chunk/light/LightStorage getLightSection (
 accessible class net/minecraft/client/gui/render/GuiRenderer$Draw
 accessible method com/mojang/blaze3d/pipeline/RenderPipeline$Builder withSnippet (Lcom/mojang/blaze3d/pipeline/RenderPipeline$Snippet;)V
 accessible method com/mojang/blaze3d/pipeline/RenderPipeline$Builder <init> ()V
+accessible method net/minecraft/client/render/entity/EntityRenderer canBeCulled (Lnet/minecraft/entity/Entity;)Z
+accessible method net/minecraft/client/render/entity/EntityRenderer getBoundingBox (Lnet/minecraft/entity/Entity;)Lnet/minecraft/util/math/Box;
