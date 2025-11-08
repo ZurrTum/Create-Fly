@@ -37,7 +37,7 @@ public class AllFluidItemInventory {
         register(Items.BUCKET, BucketFluidInventory::new);
         register(Items.WATER_BUCKET, BucketFluidInventory::new);
         register(Items.LAVA_BUCKET, BucketFluidInventory::new);
-        register(Items.MILK_BUCKET, MilkBucketFluidInventory::new);
+        register(Items.MILK_BUCKET, BucketFluidInventory::new);
         register(AllItems.HONEY_BUCKET, BucketFluidInventory::new);
         register(AllItems.CHOCOLATE_BUCKET, BucketFluidInventory::new);
     }
