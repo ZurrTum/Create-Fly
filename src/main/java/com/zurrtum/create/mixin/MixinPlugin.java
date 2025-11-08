@@ -44,7 +44,9 @@ public class MixinPlugin implements IMixinConfigPlugin {
         if (ARCH) {
             mixins.add("ArchitecturyMixin");
         }
-        if (!Create.Lazy) {
+        if (Create.Lazy) {
+            mixins.add("RegistryKeysMixin");
+        } else {
             mixins.add("ItemGroupMixin");
             mixins.add("ItemGroupsMixin");
             mixins.add("PersistentStateManagerMixin");
