@@ -56,7 +56,7 @@ public class GantryContraptionEntity extends AbstractContraptionEntity {
         double prevAxisMotion = axisMotion;
         World world = getWorld();
         if (world.isClient) {
-            clientOffsetDiff *= .75f;
+            clientOffsetDiff *= .75;
             updateClientMotion();
         }
 
@@ -125,7 +125,7 @@ public class GantryContraptionEntity extends AbstractContraptionEntity {
         double currentCoord = direction.getAxis().choose(currentPosition.x, currentPosition.y, currentPosition.z);
         double nextCoord = direction.getAxis().choose(nextPosition.x, nextPosition.y, nextPosition.z);
 
-        if ((MathHelper.floor(currentCoord) + .5f < nextCoord != (pinionMovementSpeed * direction.getDirection().offset() < 0)))
+        if ((MathHelper.floor(currentCoord) + .5 < nextCoord != (pinionMovementSpeed * direction.getDirection().offset() < 0)))
             if (!gantryShaftBlockEntity.canAssembleOn()) {
                 setContraptionMotion(Vec3d.ZERO);
                 if (!world.isClient)
@@ -197,7 +197,7 @@ public class GantryContraptionEntity extends AbstractContraptionEntity {
     public void updateClientMotion() {
         float modifier = movementAxis.getDirection().offset();
         Vec3d motion = Vec3d.of(movementAxis.getVector())
-            .multiply((axisMotion + clientOffsetDiff * modifier / 2f) * AllClientHandle.INSTANCE.getServerSpeed());
+            .multiply((axisMotion + clientOffsetDiff * modifier / 2d) * AllClientHandle.INSTANCE.getServerSpeed());
         if (sequencedOffsetLimit >= 0)
             motion = VecHelper.clampComponentWise(motion, (float) sequencedOffsetLimit);
         setContraptionMotion(motion);

@@ -1,16 +1,14 @@
 package com.zurrtum.create.content.trains.schedule;
 
 import com.zurrtum.create.AllMenuTypes;
-import com.zurrtum.create.foundation.gui.menu.GhostItemMenu;
+import com.zurrtum.create.foundation.gui.menu.HeldItemGhostItemMenu;
 import com.zurrtum.create.infrastructure.items.ItemStackHandler;
-import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.screen.slot.Slot;
-import net.minecraft.screen.slot.SlotActionType;
 
-public class ScheduleMenu extends GhostItemMenu<ItemStack> {
+public class ScheduleMenu extends HeldItemGhostItemMenu {
 
     public boolean slotsActive = true;
     public int targetSlotsActive = 1;
@@ -24,12 +22,6 @@ public class ScheduleMenu extends GhostItemMenu<ItemStack> {
     @Override
     protected ItemStackHandler createGhostInventory() {
         return new ItemStackHandler(slots);
-    }
-
-    @Override
-    public void onSlotClick(int index, int dragType, SlotActionType clickType, PlayerEntity player) {
-        if (index != playerInventory.getSelectedSlot() || clickType == SlotActionType.THROW || clickType == SlotActionType.CLONE)
-            super.onSlotClick(index, dragType, clickType, player);
     }
 
     @Override
@@ -55,11 +47,6 @@ public class ScheduleMenu extends GhostItemMenu<ItemStack> {
 
     @Override
     protected void saveData(ItemStack contentHolder) {
-    }
-
-    @Override
-    public boolean canUse(PlayerEntity player) {
-        return playerInventory.getSelectedStack() == contentHolder;
     }
 
     @Override

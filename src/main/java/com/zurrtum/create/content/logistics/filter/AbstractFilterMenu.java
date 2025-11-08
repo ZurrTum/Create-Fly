@@ -1,24 +1,15 @@
 package com.zurrtum.create.content.logistics.filter;
 
 import com.zurrtum.create.AllDataComponents;
-import com.zurrtum.create.foundation.gui.menu.GhostItemMenu;
+import com.zurrtum.create.foundation.gui.menu.HeldItemGhostItemMenu;
 import com.zurrtum.create.foundation.gui.menu.MenuType;
 import com.zurrtum.create.foundation.item.ItemHelper;
-import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
-import net.minecraft.screen.slot.SlotActionType;
 
-public abstract class AbstractFilterMenu extends GhostItemMenu<ItemStack> {
+public abstract class AbstractFilterMenu extends HeldItemGhostItemMenu {
     protected AbstractFilterMenu(MenuType<ItemStack> type, int id, PlayerInventory inv, ItemStack contentHolder) {
         super(type, id, inv, contentHolder);
-    }
-
-    @Override
-    public void onSlotClick(int slotId, int dragType, SlotActionType clickTypeIn, PlayerEntity player) {
-        if (slotId == playerInventory.getSelectedSlot() && clickTypeIn != SlotActionType.THROW)
-            return;
-        super.onSlotClick(slotId, dragType, clickTypeIn, player);
     }
 
     @Override
@@ -46,10 +37,4 @@ public abstract class AbstractFilterMenu extends GhostItemMenu<ItemStack> {
             contentHolder.remove(AllDataComponents.FILTER_ITEMS);
         }
     }
-
-    @Override
-    public boolean canUse(PlayerEntity player) {
-        return playerInventory.getSelectedStack() == contentHolder;
-    }
-
 }

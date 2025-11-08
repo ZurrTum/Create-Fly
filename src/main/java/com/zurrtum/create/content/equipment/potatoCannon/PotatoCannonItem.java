@@ -26,7 +26,6 @@ import net.minecraft.item.tooltip.TooltipType;
 import net.minecraft.registry.RegistryEntryLookup;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.RegistryWrapper;
-import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.screen.ScreenTexts;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.MutableText;
@@ -42,11 +41,15 @@ import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 public class PotatoCannonItem extends RangedWeaponItem implements SwingControlItem {
+    private static final Predicate<ItemStack> AMMO_PREDICATE = s -> PotatoCannonProjectileType.getTypeForItem(
+        GlobalRegistryAccess.getOrThrow(),
+        s.getItem()
+    ).isPresent();
+
     public PotatoCannonItem(Settings properties) {
         super(properties);
     }
@@ -58,13 +61,8 @@ public class PotatoCannonItem extends RangedWeaponItem implements SwingControlIt
             return null;
         }
 
-        Optional<RegistryEntry.Reference<PotatoCannonProjectileType>> optionalType = PotatoCannonProjectileType.getTypeForItem(
-            player.getWorld().getRegistryManager(), ammoStack.getItem());
-        if (optionalType.isEmpty()) {
-            return null;
-        }
-
-        return new Ammo(ammoStack, optionalType.get().value());
+        return PotatoCannonProjectileType.getTypeForItem(player.getWorld().getRegistryManager(), ammoStack.getItem())
+            .map(r -> new Ammo(ammoStack, r.value())).orElse(null);
     }
 
     @Override
@@ -240,7 +238,7 @@ public class PotatoCannonItem extends RangedWeaponItem implements SwingControlIt
 
     @Override
     public Predicate<ItemStack> getProjectiles() {
-        return stack -> PotatoCannonProjectileType.getTypeForItem(GlobalRegistryAccess.getOrThrow(), stack.getItem()).isPresent();
+        return AMMO_PREDICATE;
     }
 
     @Override

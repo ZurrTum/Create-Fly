@@ -187,9 +187,7 @@ public class AllMountedDispenseItemBehaviors {
     };
 
     public static void register() {
-        for (SpawnEggItem egg : SpawnEggItem.getAll()) {
-            MountedDispenseBehavior.REGISTRY.register(egg, SPAWN_EGG);
-        }
+        MountedDispenseBehavior.REGISTRY.registerProvider(item -> item instanceof SpawnEggItem ? SPAWN_EGG : null);
 
         MountedDispenseBehavior.REGISTRY.register(Items.TNT, TNT);
         MountedDispenseBehavior.REGISTRY.register(Items.FIREWORK_ROCKET, FIREWORK);

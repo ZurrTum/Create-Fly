@@ -2,16 +2,14 @@ package com.zurrtum.create.content.redstone.link.controller;
 
 import com.zurrtum.create.AllDataComponents;
 import com.zurrtum.create.AllMenuTypes;
-import com.zurrtum.create.foundation.gui.menu.GhostItemMenu;
+import com.zurrtum.create.foundation.gui.menu.HeldItemGhostItemMenu;
 import com.zurrtum.create.foundation.item.ItemHelper;
 import com.zurrtum.create.infrastructure.items.ItemStackHandler;
-import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.screen.slot.Slot;
-import net.minecraft.screen.slot.SlotActionType;
 
-public class LinkedControllerMenu extends GhostItemMenu<ItemStack> {
+public class LinkedControllerMenu extends HeldItemGhostItemMenu {
     public LinkedControllerMenu(int id, PlayerInventory inv, ItemStack filterItem) {
         super(AllMenuTypes.LINKED_CONTROLLER, id, inv, filterItem);
     }
@@ -47,17 +45,4 @@ public class LinkedControllerMenu extends GhostItemMenu<ItemStack> {
     protected boolean allowRepeats() {
         return true;
     }
-
-    @Override
-    public void onSlotClick(int slotId, int dragType, SlotActionType clickTypeIn, PlayerEntity player) {
-        if (slotId == playerInventory.getSelectedSlot() && clickTypeIn != SlotActionType.THROW)
-            return;
-        super.onSlotClick(slotId, dragType, clickTypeIn, player);
-    }
-
-    @Override
-    public boolean canUse(PlayerEntity playerIn) {
-        return playerInventory.getSelectedStack() == contentHolder;
-    }
-
 }
