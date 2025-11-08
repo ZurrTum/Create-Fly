@@ -3,7 +3,6 @@ package com.zurrtum.create;
 import com.zurrtum.create.infrastructure.fluids.BucketFluidInventory;
 import com.zurrtum.create.infrastructure.fluids.FluidItemInventory;
 import com.zurrtum.create.infrastructure.fluids.FluidItemInventoryWrapper;
-import com.zurrtum.create.infrastructure.fluids.MilkBucketFluidInventory;
 import it.unimi.dsi.fastutil.objects.Reference2ObjectArrayMap;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
