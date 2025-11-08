@@ -58,6 +58,55 @@ https://www.curseforge.com/minecraft/mc-mods/create-fly/files/all?page=1&pageSiz
 
 ### The license agreement for the open source code used in this project is stored in the licenses directory.
 
+## Modrinth Maven
+
+```gradle
+repositories {
+    exclusiveContent {
+        forRepository {
+            maven {
+                name = "Modrinth"
+                url = "https://api.modrinth.com/maven"
+            }
+        }
+        filter {
+            includeGroup "maven.modrinth"
+        }
+    }
+}
+
+dependencies {
+    // 1.21.10
+    modImplementation "maven.modrinth:create-fly:6.0.8-1.21.10-2"
+    // 1.21.8
+    modImplementation "maven.modrinth:create-fly:6.0.7-1.21.8-19"
+}
+```
+
+## Curse Maven
+
+```gradle
+repositories {
+    exclusiveContent {
+        forRepository {
+            maven {
+                url "https://cursemaven.com"
+            }
+        }
+        filter {
+            includeGroup "curse.maven"
+        }
+    }
+}
+
+dependencies {
+    // 1.21.10
+    modImplementation "curse.maven:create-fly-1346281:7192205-sources-7192208"
+    // 1.21.8
+    modImplementation "curse.maven:create-fly-1346281:7155964-sources-7155990"
+}
+```
+
 ### Donate
 
 - Supporting the Project
