@@ -284,11 +284,11 @@ public class FilteringRenderer {
                 if (flat) {
                     renderState.displayContext = ItemDisplayContext.GUI;
                     itemModelManager.update(renderState, filter, renderState.displayContext, world, null, 0);
-                    boxes.add(new FlatBoxState(side, renderState));
+                    boxes.add(new FlatBoxState(direction, renderState));
                 } else {
                     renderState.displayContext = ItemDisplayContext.FIXED;
                     itemModelManager.update(renderState, filter, renderState.displayContext, world, null, 0);
-                    boxes.add(new BoxState(side, renderState, ValueBoxRenderer.customZOffset(filter.getItem())));
+                    boxes.add(new BoxState(direction, renderState, ValueBoxRenderer.customZOffset(filter.getItem())));
                 }
             }
             sided.fromSide(side);
