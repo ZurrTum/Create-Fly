@@ -78,9 +78,9 @@ repositories {
 
 dependencies {
     // 1.21.10
-    modImplementation "maven.modrinth:create-fly:6.0.8-1.21.10-3"
+    modImplementation "maven.modrinth:create-fly:1.21.10-6.0.8-3"
     // 1.21.8
-    modImplementation "maven.modrinth:create-fly:6.0.8-1.21.8-1"
+    modImplementation "maven.modrinth:create-fly:1.21.8-6.0.8-1"
 }
 ```
 
