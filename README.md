@@ -78,9 +78,9 @@ repositories {
 
 dependencies {
     // 1.21.10
-    modImplementation "maven.modrinth:create-fly:6.0.8-1.21.10-2"
+    modImplementation "maven.modrinth:create-fly:6.0.8-1.21.10-3"
     // 1.21.8
-    modImplementation "maven.modrinth:create-fly:6.0.7-1.21.8-19"
+    modImplementation "maven.modrinth:create-fly:6.0.8-1.21.8-1"
 }
 ```
 
@@ -102,9 +102,9 @@ repositories {
 
 dependencies {
     // 1.21.10
-    modImplementation "curse.maven:create-fly-1346281:7192205-sources-7192208"
+    modImplementation "curse.maven:create-fly-1346281:7200911-sources-7200915"
     // 1.21.8
-    modImplementation "curse.maven:create-fly-1346281:7155964-sources-7155990"
+    modImplementation "curse.maven:create-fly-1346281:7200716-sources-7200719"
 }
 ```
 
