@@ -135,7 +135,7 @@ public class ContraptionControlsMovementRender implements MovementRenderBehaviou
             queue.submitCustom(matrices, layer, this);
             matrices.pop();
             if (text != null || description != null) {
-                matrices.multiply(new Quaternionf().setAngleAxis(upAngle, 0, 1, 0));
+                matrices.multiply(new Quaternionf().setAngleAxis(upAngle, 0, 1, 0), 0.5f, 0.5f, 0.5f);
                 matrices.translate(0.4f, 1.125f, 0.5f);
                 matrices.multiply(new Quaternionf().setAngleAxis(westAngle, -1, 0, 0));
                 if (text != null) {
