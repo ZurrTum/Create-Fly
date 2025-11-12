@@ -8,13 +8,12 @@ import com.zurrtum.create.content.fluids.pipes.valve.FluidValveBlock;
 import com.zurrtum.create.foundation.advancement.CreateTrigger;
 import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
 import com.zurrtum.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
-import net.minecraft.block.BlockState;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Direction.Axis;
-import net.minecraft.world.BlockRenderView;
-
 import java.util.List;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.Direction.Axis;
+import net.minecraft.world.level.BlockAndTintGetter;
+import net.minecraft.world.level.block.state.BlockState;
 
 public class StraightPipeBlockEntity extends SmartBlockEntity {
 
@@ -41,13 +40,13 @@ public class StraightPipeBlockEntity extends SmartBlockEntity {
 
         @Override
         public boolean canHaveFlowToward(BlockState state, Direction direction) {
-            return state.contains(AxisPipeBlock.AXIS) && state.get(AxisPipeBlock.AXIS) == direction.getAxis();
+            return state.hasProperty(AxisPipeBlock.AXIS) && state.getValue(AxisPipeBlock.AXIS) == direction.getAxis();
         }
 
         @Override
-        public AttachmentTypes getRenderedRimAttachment(BlockRenderView world, BlockPos pos, BlockState state, Direction direction) {
+        public AttachmentTypes getRenderedRimAttachment(BlockAndTintGetter world, BlockPos pos, BlockState state, Direction direction) {
             AttachmentTypes attachment = super.getRenderedRimAttachment(world, pos, state, direction);
-            BlockState otherState = world.getBlockState(pos.offset(direction));
+            BlockState otherState = world.getBlockState(pos.relative(direction));
 
             Axis axis = IAxisPipe.getAxisOf(state);
             Axis otherAxis = IAxisPipe.getAxisOf(otherState);

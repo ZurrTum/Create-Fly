@@ -1,20 +1,20 @@
 package com.zurrtum.create.foundation.collision;
 
-import net.minecraft.util.math.Vec3d;
-
 import static java.lang.Math.abs;
 import static java.lang.Math.signum;
 
+import net.minecraft.world.phys.Vec3;
+
 public class OBBCollider {
 
-    static final Vec3d uA0 = new Vec3d(1, 0, 0);
-    static final Vec3d uA1 = new Vec3d(0, 1, 0);
-    static final Vec3d uA2 = new Vec3d(0, 0, 1);
+    static final Vec3 uA0 = new Vec3(1, 0, 0);
+    static final Vec3 uA1 = new Vec3(0, 1, 0);
+    static final Vec3 uA2 = new Vec3(0, 0, 1);
 
-    public static Vec3d separateBBs(Vec3d cA, Vec3d cB, Vec3d eA, Vec3d eB, Matrix3d m) {
+    public static Vec3 separateBBs(Vec3 cA, Vec3 cB, Vec3 eA, Vec3 eB, Matrix3d m) {
         SeparationManifold mf = new SeparationManifold();
 
-        Vec3d t = cB.subtract(cA);
+        Vec3 t = cB.subtract(cA);
 
         double a00 = abs(m.m00);
         double a01 = abs(m.m01);
@@ -26,9 +26,9 @@ public class OBBCollider {
         double a21 = abs(m.m21);
         double a22 = abs(m.m22);
 
-        Vec3d uB0 = new Vec3d(m.m00, m.m10, m.m20);
-        Vec3d uB1 = new Vec3d(m.m01, m.m11, m.m21);
-        Vec3d uB2 = new Vec3d(m.m02, m.m12, m.m22);
+        Vec3 uB0 = new Vec3(m.m00, m.m10, m.m20);
+        Vec3 uB1 = new Vec3(m.m01, m.m11, m.m21);
+        Vec3 uB2 = new Vec3(m.m02, m.m12, m.m22);
 
         checkCount = 0;
 
@@ -62,7 +62,7 @@ public class OBBCollider {
 
     static int checkCount = 0;
 
-    static boolean isSeparatedAlong(SeparationManifold mf, Vec3d axis, double TL, double rA, double rB) {
+    static boolean isSeparatedAlong(SeparationManifold mf, Vec3 axis, double TL, double rA, double rB) {
         checkCount++;
         double distance = abs(TL);
         double diff = distance - (rA + rB);
@@ -82,22 +82,22 @@ public class OBBCollider {
     }
 
     static class SeparationManifold {
-        Vec3d axis;
+        Vec3 axis;
         double separation;
 
         public SeparationManifold() {
-            axis = Vec3d.ZERO;
+            axis = Vec3.ZERO;
             separation = Double.MAX_VALUE;
         }
 
-        public Vec3d asSeparationVec() {
+        public Vec3 asSeparationVec() {
             double sep = separation;
-            Vec3d axis = this.axis;
+            Vec3 axis = this.axis;
             return createSeparationVec(sep, axis);
         }
 
-        protected Vec3d createSeparationVec(double sep, Vec3d axis) {
-            return axis.normalize().multiply(signum(sep) * (abs(sep) + 1E-4));
+        protected Vec3 createSeparationVec(double sep, Vec3 axis) {
+            return axis.normalize().scale(signum(sep) * (abs(sep) + 1E-4));
         }
     }
 

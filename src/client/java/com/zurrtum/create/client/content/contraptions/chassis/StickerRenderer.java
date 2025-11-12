@@ -1,5 +1,7 @@
 package com.zurrtum.create.client.content.contraptions.chassis;
 
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.zurrtum.create.catnip.math.AngleHelper;
 import com.zurrtum.create.client.AllPartialModels;
 import com.zurrtum.create.client.catnip.animation.AnimationTickHolder;
@@ -7,24 +9,22 @@ import com.zurrtum.create.client.catnip.render.CachedBuffers;
 import com.zurrtum.create.client.catnip.render.SuperByteBuffer;
 import com.zurrtum.create.content.contraptions.chassis.StickerBlock;
 import com.zurrtum.create.content.contraptions.chassis.StickerBlockEntity;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.render.RenderLayer;
-import net.minecraft.client.render.VertexConsumer;
-import net.minecraft.client.render.block.entity.BlockEntityRenderer;
-import net.minecraft.client.render.block.entity.BlockEntityRendererFactory;
-import net.minecraft.client.render.block.entity.state.BlockEntityRenderState;
-import net.minecraft.client.render.command.ModelCommandRenderer;
-import net.minecraft.client.render.command.OrderedRenderCommandQueue;
-import net.minecraft.client.render.state.CameraRenderState;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.World;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.SubmitNodeCollector;
+import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
+import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
+import net.minecraft.client.renderer.blockentity.state.BlockEntityRenderState;
+import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
+import net.minecraft.client.renderer.state.CameraRenderState;
+import net.minecraft.core.Direction;
+import net.minecraft.util.Mth;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 
 public class StickerRenderer implements BlockEntityRenderer<StickerBlockEntity, StickerRenderer.StickerRenderState> {
-    public StickerRenderer(BlockEntityRendererFactory.Context context) {
+    public StickerRenderer(BlockEntityRendererProvider.Context context) {
     }
 
     @Override
@@ -33,24 +33,24 @@ public class StickerRenderer implements BlockEntityRenderer<StickerBlockEntity, 
     }
 
     @Override
-    public void updateRenderState(
+    public void extractRenderState(
         StickerBlockEntity be,
         StickerRenderState state,
         float tickProgress,
-        Vec3d cameraPos,
-        @Nullable ModelCommandRenderer.CrumblingOverlayCommand crumblingOverlay
+        Vec3 cameraPos,
+        @Nullable ModelFeatureRenderer.CrumblingOverlay crumblingOverlay
     ) {
-        World world = be.getWorld();
-        BlockEntityRenderState.updateBlockEntityRenderState(be, state, crumblingOverlay);
-        state.layer = RenderLayer.getSolid();
+        Level world = be.getLevel();
+        BlockEntityRenderState.extractBase(be, state, crumblingOverlay);
+        state.layer = RenderType.solid();
         state.head = CachedBuffers.partial(AllPartialModels.STICKER_HEAD, state.blockState);
         state.seed = be.hashCode();
-        Direction facing = state.blockState.get(StickerBlock.FACING);
-        state.yRot = MathHelper.RADIANS_PER_DEGREE * AngleHelper.horizontalAngle(facing);
-        state.xRot = MathHelper.RADIANS_PER_DEGREE * (AngleHelper.verticalAngle(facing) + 90);
+        Direction facing = state.blockState.getValue(StickerBlock.FACING);
+        state.yRot = Mth.DEG_TO_RAD * AngleHelper.horizontalAngle(facing);
+        state.xRot = Mth.DEG_TO_RAD * (AngleHelper.verticalAngle(facing) + 90);
         float offset;
-        if (!be.isVirtual() && world != MinecraftClient.getInstance().world) {
-            offset = state.blockState.get(StickerBlock.EXTENDED) ? 1 : 0;
+        if (!be.isVirtual() && world != Minecraft.getInstance().level) {
+            offset = state.blockState.getValue(StickerBlock.EXTENDED) ? 1 : 0;
         } else {
             offset = be.piston.getValue(AnimationTickHolder.getPartialTicks(world));
         }
@@ -58,12 +58,12 @@ public class StickerRenderer implements BlockEntityRenderer<StickerBlockEntity, 
     }
 
     @Override
-    public void render(StickerRenderState state, MatrixStack matrices, OrderedRenderCommandQueue queue, CameraRenderState cameraState) {
-        queue.submitCustom(matrices, state.layer, state);
+    public void submit(StickerRenderState state, PoseStack matrices, SubmitNodeCollector queue, CameraRenderState cameraState) {
+        queue.submitCustomGeometry(matrices, state.layer, state);
     }
 
-    public static class StickerRenderState extends BlockEntityRenderState implements OrderedRenderCommandQueue.Custom {
-        public RenderLayer layer;
+    public static class StickerRenderState extends BlockEntityRenderState implements SubmitNodeCollector.CustomGeometryRenderer {
+        public RenderType layer;
         public SuperByteBuffer head;
         public int seed;
         public float yRot;
@@ -71,9 +71,9 @@ public class StickerRenderer implements BlockEntityRenderer<StickerBlockEntity, 
         public float offset;
 
         @Override
-        public void render(MatrixStack.Entry matricesEntry, VertexConsumer vertexConsumer) {
+        public void render(PoseStack.Pose matricesEntry, VertexConsumer vertexConsumer) {
             head.nudge(seed).center().rotateY(yRot).rotateX(xRot).uncenter().translate(0, offset, 0);
-            head.light(lightmapCoordinates).renderInto(matricesEntry, vertexConsumer);
+            head.light(lightCoords).renderInto(matricesEntry, vertexConsumer);
         }
     }
 }

@@ -1,48 +1,48 @@
 package com.zurrtum.create.content.decoration.palettes;
 
 import com.zurrtum.create.catnip.data.Iterate;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.item.ItemPlacementContext;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.state.StateManager;
-import net.minecraft.state.property.BooleanProperty;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Direction.Axis;
-import net.minecraft.util.math.Direction.AxisDirection;
-import net.minecraft.util.math.random.Random;
-import net.minecraft.world.World;
-import net.minecraft.world.WorldView;
-import net.minecraft.world.tick.QueryableTickScheduler;
-import net.minecraft.world.tick.ScheduledTickView;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.Direction.Axis;
+import net.minecraft.core.Direction.AxisDirection;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelReader;
+import net.minecraft.world.level.ScheduledTickAccess;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.BooleanProperty;
+import net.minecraft.world.ticks.LevelTickAccess;
 
 public class ConnectedPillarBlock extends LayeredBlock {
 
-    public static final BooleanProperty NORTH = BooleanProperty.of("north");
-    public static final BooleanProperty SOUTH = BooleanProperty.of("south");
-    public static final BooleanProperty EAST = BooleanProperty.of("east");
-    public static final BooleanProperty WEST = BooleanProperty.of("west");
+    public static final BooleanProperty NORTH = BooleanProperty.create("north");
+    public static final BooleanProperty SOUTH = BooleanProperty.create("south");
+    public static final BooleanProperty EAST = BooleanProperty.create("east");
+    public static final BooleanProperty WEST = BooleanProperty.create("west");
 
-    public ConnectedPillarBlock(Settings p_55926_) {
+    public ConnectedPillarBlock(Properties p_55926_) {
         super(p_55926_);
-        setDefaultState(getDefaultState().with(NORTH, false).with(WEST, false).with(EAST, false).with(SOUTH, false));
+        registerDefaultState(defaultBlockState().setValue(NORTH, false).setValue(WEST, false).setValue(EAST, false).setValue(SOUTH, false));
     }
 
     @Override
-    protected void appendProperties(StateManager.Builder<Block, BlockState> pBuilder) {
-        super.appendProperties(pBuilder.add(NORTH, SOUTH, EAST, WEST));
+    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> pBuilder) {
+        super.createBlockStateDefinition(pBuilder.add(NORTH, SOUTH, EAST, WEST));
     }
 
     @Override
-    public BlockState getPlacementState(ItemPlacementContext pContext) {
-        BlockState state = super.getPlacementState(pContext);
-        return updateColumn(pContext.getWorld(), pContext.getBlockPos(), state, true);
+    public BlockState getStateForPlacement(BlockPlaceContext pContext) {
+        BlockState state = super.getStateForPlacement(pContext);
+        return updateColumn(pContext.getLevel(), pContext.getClickedPos(), state, true);
     }
 
-    private BlockState updateColumn(World level, BlockPos pos, BlockState state, boolean present) {
-        BlockPos.Mutable currentPos = new BlockPos.Mutable();
-        Axis axis = state.get(AXIS);
+    private BlockState updateColumn(Level level, BlockPos pos, BlockState state, boolean present) {
+        BlockPos.MutableBlockPos currentPos = new BlockPos.MutableBlockPos();
+        Axis axis = state.getValue(AXIS);
 
         for (Direction connection : Iterate.directions) {
             if (connection.getAxis() == axis)
@@ -53,11 +53,11 @@ public class ConnectedPillarBlock extends LayeredBlock {
             for (Direction movement : Iterate.directionsInAxis(axis)) {
                 currentPos.set(pos);
                 for (int i = 0; i < 1000; i++) {
-                    if (!level.isPosLoaded(currentPos))
+                    if (!level.isLoaded(currentPos))
                         break;
 
                     BlockState other1 = currentPos.equals(pos) ? state : level.getBlockState(currentPos);
-                    BlockState other2 = level.getBlockState(currentPos.offset(connection));
+                    BlockState other2 = level.getBlockState(currentPos.relative(connection));
                     boolean col1 = canConnect(state, other1);
                     boolean col2 = canConnect(state, other2);
                     currentPos.move(movement);
@@ -77,68 +77,68 @@ public class ConnectedPillarBlock extends LayeredBlock {
     }
 
     @Override
-    public void onBlockAdded(BlockState pState, World pLevel, BlockPos pPos, BlockState pOldState, boolean pIsMoving) {
+    public void onPlace(BlockState pState, Level pLevel, BlockPos pPos, BlockState pOldState, boolean pIsMoving) {
         if (pOldState.getBlock() == this)
             return;
-        QueryableTickScheduler<Block> blockTicks = pLevel.getBlockTickScheduler();
-        if (!blockTicks.isQueued(pPos, this))
-            pLevel.scheduleBlockTick(pPos, this, 1);
+        LevelTickAccess<Block> blockTicks = pLevel.getBlockTicks();
+        if (!blockTicks.hasScheduledTick(pPos, this))
+            pLevel.scheduleTick(pPos, this, 1);
     }
 
     @Override
-    public void scheduledTick(BlockState pState, ServerWorld pLevel, BlockPos pPos, Random pRandom) {
+    public void tick(BlockState pState, ServerLevel pLevel, BlockPos pPos, RandomSource pRandom) {
         if (pState.getBlock() != this)
             return;
-        BlockPos belowPos = pPos.offset(Direction.from(pState.get(AXIS), AxisDirection.NEGATIVE));
+        BlockPos belowPos = pPos.relative(Direction.fromAxisAndDirection(pState.getValue(AXIS), AxisDirection.NEGATIVE));
         BlockState belowState = pLevel.getBlockState(belowPos);
         if (!canConnect(pState, belowState))
-            pLevel.setBlockState(pPos, updateColumn(pLevel, pPos, pState, true), Block.NOTIFY_ALL);
+            pLevel.setBlock(pPos, updateColumn(pLevel, pPos, pState, true), Block.UPDATE_ALL);
     }
 
     @Override
-    public BlockState getStateForNeighborUpdate(
+    public BlockState updateShape(
         BlockState state,
-        WorldView pLevel,
-        ScheduledTickView tickView,
+        LevelReader pLevel,
+        ScheduledTickAccess tickView,
         BlockPos pCurrentPos,
         Direction pDirection,
         BlockPos pNeighborPos,
         BlockState pNeighborState,
-        Random random
+        RandomSource random
     ) {
         if (!canConnect(state, pNeighborState))
             return setConnection(state, pDirection, false);
-        if (pDirection.getAxis() == state.get(AXIS))
-            return getStateWithProperties(pNeighborState);
+        if (pDirection.getAxis() == state.getValue(AXIS))
+            return withPropertiesOf(pNeighborState);
 
         return setConnection(state, pDirection, getConnection(pNeighborState, pDirection.getOpposite()));
     }
 
     protected boolean canConnect(BlockState state, BlockState other) {
-        return other.getBlock() == this && state.get(AXIS) == other.get(AXIS);
+        return other.getBlock() == this && state.getValue(AXIS) == other.getValue(AXIS);
     }
 
     @Override
-    public void onStateReplaced(BlockState pState, ServerWorld pLevel, BlockPos pPos, boolean pIsMoving) {
+    public void affectNeighborsAfterRemoval(BlockState pState, ServerLevel pLevel, BlockPos pPos, boolean pIsMoving) {
         if (pIsMoving)
             return;
-        for (Direction d : Iterate.directionsInAxis(pState.get(AXIS))) {
-            BlockPos relative = pPos.offset(d);
+        for (Direction d : Iterate.directionsInAxis(pState.getValue(AXIS))) {
+            BlockPos relative = pPos.relative(d);
             BlockState adjacent = pLevel.getBlockState(relative);
             if (canConnect(pState, adjacent))
-                pLevel.setBlockState(relative, updateColumn(pLevel, relative, adjacent, false), Block.NOTIFY_ALL);
+                pLevel.setBlock(relative, updateColumn(pLevel, relative, adjacent, false), Block.UPDATE_ALL);
         }
     }
 
     public static boolean getConnection(BlockState state, Direction side) {
-        BooleanProperty property = connection(state.get(AXIS), side);
-        return property != null && state.get(property);
+        BooleanProperty property = connection(state.getValue(AXIS), side);
+        return property != null && state.getValue(property);
     }
 
     public static BlockState setConnection(BlockState state, Direction side, boolean connect) {
-        BooleanProperty property = connection(state.get(AXIS), side);
+        BooleanProperty property = connection(state.getValue(AXIS), side);
         if (property != null)
-            state = state.with(property, connect);
+            state = state.setValue(property, connect);
         return state;
     }
 

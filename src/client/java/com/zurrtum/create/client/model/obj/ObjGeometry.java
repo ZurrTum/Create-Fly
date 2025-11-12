@@ -8,19 +8,24 @@ package com.zurrtum.create.client.model.obj;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.MultimapBuilder;
+import com.mojang.math.Transformation;
 import com.zurrtum.create.client.model.ExtendedUnbakedGeometry;
 import com.zurrtum.create.client.model.NeoForgeModelProperties;
 import com.zurrtum.create.client.model.StandardModelParameters;
 import joptsimple.internal.Strings;
-import net.minecraft.client.render.LightmapTextureManager;
-import net.minecraft.client.render.model.*;
-import net.minecraft.client.texture.Sprite;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.context.ContextParameterMap;
-import net.minecraft.util.math.AffineTransformation;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec2f;
+import net.minecraft.client.renderer.LightTexture;
+import net.minecraft.client.renderer.block.model.BakedQuad;
+import net.minecraft.client.renderer.block.model.TextureSlots;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.client.resources.model.ModelBaker;
+import net.minecraft.client.resources.model.ModelDebugName;
+import net.minecraft.client.resources.model.ModelState;
+import net.minecraft.client.resources.model.QuadCollection;
+import net.minecraft.core.Direction;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.Mth;
+import net.minecraft.util.context.ContextMap;
+import net.minecraft.world.phys.Vec2;
 import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix3f;
@@ -33,12 +38,12 @@ import java.util.*;
 
 public class ObjGeometry implements ExtendedUnbakedGeometry {
     private static final Vector4f COLOR_WHITE = new Vector4f(1, 1, 1, 1);
-    private static final Vec2f[] DEFAULT_COORDS = {new Vec2f(0, 0), new Vec2f(0, 1), new Vec2f(1, 1), new Vec2f(1, 0),};
+    private static final Vec2[] DEFAULT_COORDS = {new Vec2(0, 0), new Vec2(0, 1), new Vec2(1, 1), new Vec2(1, 0),};
 
     private final Multimap<String, ModelGroup> parts = MultimapBuilder.linkedHashKeys().arrayListValues().build();
 
     private final List<Vector3f> positions = Lists.newArrayList();
-    private final List<Vec2f> texCoords = Lists.newArrayList();
+    private final List<Vec2> texCoords = Lists.newArrayList();
     private final List<Vector3f> normals = Lists.newArrayList();
     private final List<Vector4f> colors = Lists.newArrayList();
 
@@ -50,7 +55,7 @@ public class ObjGeometry implements ExtendedUnbakedGeometry {
     public final String mtlOverride;
     public final StandardModelParameters parameters;
 
-    public final Identifier modelLocation;
+    public final ResourceLocation modelLocation;
 
     private ObjGeometry(Settings settings) {
         this.modelLocation = settings.modelLocation();
@@ -88,9 +93,9 @@ public class ObjGeometry implements ExtendedUnbakedGeometry {
         if (materialLibraryOverrideLocation != null) {
             String lib = materialLibraryOverrideLocation;
             if (lib.contains(":"))
-                mtllib = ObjLoader.INSTANCE.loadMaterialLibrary(Identifier.of(lib));
+                mtllib = ObjLoader.INSTANCE.loadMaterialLibrary(ResourceLocation.parse(lib));
             else
-                mtllib = ObjLoader.INSTANCE.loadMaterialLibrary(Identifier.of(modelDomain, modelPath + lib));
+                mtllib = ObjLoader.INSTANCE.loadMaterialLibrary(ResourceLocation.fromNamespaceAndPath(modelDomain, modelPath + lib));
         }
 
         String[] line;
@@ -103,9 +108,9 @@ public class ObjGeometry implements ExtendedUnbakedGeometry {
 
                     String lib = line[1];
                     if (lib.contains(":"))
-                        mtllib = ObjLoader.INSTANCE.loadMaterialLibrary(Identifier.of(lib));
+                        mtllib = ObjLoader.INSTANCE.loadMaterialLibrary(ResourceLocation.parse(lib));
                     else
-                        mtllib = ObjLoader.INSTANCE.loadMaterialLibrary(Identifier.of(modelDomain, modelPath + lib));
+                        mtllib = ObjLoader.INSTANCE.loadMaterialLibrary(ResourceLocation.fromNamespaceAndPath(modelDomain, modelPath + lib));
                     break;
                 }
 
@@ -244,11 +249,11 @@ public class ObjGeometry implements ExtendedUnbakedGeometry {
         return new Vector3f(vec4.x() / vec4.w(), vec4.y() / vec4.w(), vec4.z() / vec4.w());
     }
 
-    private static Vec2f parseVector2(String[] line) {
+    private static Vec2 parseVector2(String[] line) {
         return switch (line.length) {
-            case 1 -> new Vec2f(0, 0);
-            case 2 -> new Vec2f(Float.parseFloat(line[1]), 0);
-            default -> new Vec2f(Float.parseFloat(line[1]), Float.parseFloat(line[2]));
+            case 1 -> new Vec2(0, 0);
+            case 2 -> new Vec2(Float.parseFloat(line[1]), 0);
+            default -> new Vec2(Float.parseFloat(line[1]), Float.parseFloat(line[2]));
         };
     }
 
@@ -272,39 +277,39 @@ public class ObjGeometry implements ExtendedUnbakedGeometry {
     }
 
     @Override
-    public BakedGeometry bake(ModelTextures textureSlots, Baker baker, ModelBakeSettings state, SimpleModel debugName) {
-        ContextParameterMap.Builder propertiesBuilder = new ContextParameterMap.Builder();
+    public QuadCollection bake(TextureSlots textureSlots, ModelBaker baker, ModelState state, ModelDebugName debugName) {
+        ContextMap.Builder propertiesBuilder = new ContextMap.Builder();
         NeoForgeModelProperties.fillRootTransformProperty(propertiesBuilder, parameters.rootTransform());
         NeoForgeModelProperties.fillPartVisibilityProperty(propertiesBuilder, parameters.partVisibility());
-        return bake(textureSlots, baker, state, debugName, propertiesBuilder.build(NeoForgeModelProperties.TYPE));
+        return bake(textureSlots, baker, state, debugName, propertiesBuilder.create(NeoForgeModelProperties.TYPE));
     }
 
     @Override
-    public BakedGeometry bake(
-        ModelTextures textureSlots,
-        Baker baker,
-        ModelBakeSettings state,
-        SimpleModel debugName,
-        ContextParameterMap additionalProperties
+    public QuadCollection bake(
+        TextureSlots textureSlots,
+        ModelBaker baker,
+        ModelState state,
+        ModelDebugName debugName,
+        ContextMap additionalProperties
     ) {
         Map<String, Boolean> partVisibility = additionalProperties.getOrDefault(NeoForgeModelProperties.PART_VISIBILITY, Map.of());
-        var builder = new BakedGeometry.Builder();
+        var builder = new QuadCollection.Builder();
         parts.values().stream().filter(part -> partVisibility.getOrDefault(part.name(), true))
             .forEach(part -> part.addQuads(builder, textureSlots, baker, state, debugName, additionalProperties));
         return builder.build();
     }
 
-    private AffineTransformation blockCenterToCorner(AffineTransformation transform) {
-        if (transform.equals(AffineTransformation.identity()))
-            return AffineTransformation.identity();
+    private Transformation blockCenterToCorner(Transformation transform) {
+        if (transform.equals(Transformation.identity()))
+            return Transformation.identity();
 
-        Matrix4f ret = transform.copyMatrix();
+        Matrix4f ret = transform.getMatrixCopy();
         Vector3f origin = new Vector3f(.5f, .5f, .5f);
         Matrix4f tmp = new Matrix4f().translation(origin.x(), origin.y(), origin.z());
         tmp.mul(ret, ret);
         tmp.translation(-origin.x(), -origin.y(), -origin.z());
         ret.mul(tmp);
-        return new AffineTransformation(ret);
+        return new Transformation(ret);
     }
 
     private Pair<BakedQuad, Direction> makeQuad(
@@ -312,8 +317,8 @@ public class ObjGeometry implements ExtendedUnbakedGeometry {
         int tintIndex,
         Vector4f colorTint,
         Vector4f ambientColor,
-        Sprite texture,
-        AffineTransformation transform
+        TextureAtlasSprite texture,
+        Transformation transform
     ) {
         boolean needsNormalRecalculation = false;
         for (int[] ints : indices) {
@@ -341,15 +346,15 @@ public class ObjGeometry implements ExtendedUnbakedGeometry {
         int uv2 = 0;
         if (emissiveAmbient) {
             int fakeLight = (int) ((ambientColor.x() + ambientColor.y() + ambientColor.z()) * 15 / 3.0f);
-            uv2 = LightmapTextureManager.pack(fakeLight, fakeLight);
+            uv2 = LightTexture.pack(fakeLight, fakeLight);
             quadBaker.setShade(fakeLight == 0 && shadeQuads);
         } else {
             quadBaker.setShade(shadeQuads);
         }
 
-        boolean hasTransform = !transform.equals(AffineTransformation.identity());
+        boolean hasTransform = !transform.equals(Transformation.identity());
         // The incoming transform is referenced on the center of the block, but our coords are referenced on the corner
-        AffineTransformation transformation = hasTransform ? blockCenterToCorner(transform) : transform;
+        Transformation transformation = hasTransform ? blockCenterToCorner(transform) : transform;
 
         Vector4f[] pos = new Vector4f[4];
         Vector3f[] norm = new Vector3f[4];
@@ -357,7 +362,7 @@ public class ObjGeometry implements ExtendedUnbakedGeometry {
         for (int i = 0; i < 4; i++) {
             int[] index = indices[Math.min(i, indices.length - 1)];
             Vector4f position = new Vector4f(positions.get(index[0]), 1);
-            Vec2f texCoord = index.length >= 2 && texCoords.size() > 0 ? texCoords.get(index[1]) : DEFAULT_COORDS[i];
+            Vec2 texCoord = index.length >= 2 && texCoords.size() > 0 ? texCoords.get(index[1]) : DEFAULT_COORDS[i];
             Vector3f norm0 = !needsNormalRecalculation && index.length >= 3 && normals.size() > 0 ? normals.get(index[2]) : faceNormal;
             Vector3f normal = norm0;
             Vector4f color = index.length >= 4 && colors.size() > 0 ? colors.get(index[3]) : COLOR_WHITE;
@@ -376,13 +381,13 @@ public class ObjGeometry implements ExtendedUnbakedGeometry {
                 color.z() * colorTint.z(),
                 color.w() * colorTint.w()
             );
-            quadBaker.vertex(position.x(), position.y(), position.z());
-            quadBaker.color(tintedColor.x(), tintedColor.y(), tintedColor.z(), tintedColor.w());
-            quadBaker.texture(texture.getFrameU(texCoord.x), texture.getFrameV((flipV ? 1 - texCoord.y : texCoord.y)));
-            quadBaker.light(uv2);
-            quadBaker.normal(normal.x(), normal.y(), normal.z());
+            quadBaker.addVertex(position.x(), position.y(), position.z());
+            quadBaker.setColor(tintedColor.x(), tintedColor.y(), tintedColor.z(), tintedColor.w());
+            quadBaker.setUv(texture.getU(texCoord.x), texture.getV((flipV ? 1 - texCoord.y : texCoord.y)));
+            quadBaker.setLight(uv2);
+            quadBaker.setNormal(normal.x(), normal.y(), normal.z());
             if (i == 0) {
-                quadBaker.setDirection(Direction.getFacing(normal.x(), normal.y(), normal.z()));
+                quadBaker.setDirection(Direction.getApproximateNearest(normal.x(), normal.y(), normal.z()));
             }
             pos[i] = position;
             norm[i] = normal;
@@ -390,46 +395,28 @@ public class ObjGeometry implements ExtendedUnbakedGeometry {
 
         Direction cull = null;
         if (automaticCulling) {
-            if (MathHelper.approximatelyEquals(pos[0].x(), 0) && // vertex.position.x
-                MathHelper.approximatelyEquals(pos[1].x(), 0) && MathHelper.approximatelyEquals(
-                pos[2].x(),
-                0
-            ) && MathHelper.approximatelyEquals(pos[3].x(), 0) && norm[0].x() < 0) // vertex.normal.x
+            if (Mth.equal(pos[0].x(), 0) && // vertex.position.x
+                Mth.equal(pos[1].x(), 0) && Mth.equal(pos[2].x(), 0) && Mth.equal(pos[3].x(), 0) && norm[0].x() < 0) // vertex.normal.x
             {
                 cull = Direction.WEST;
-            } else if (MathHelper.approximatelyEquals(pos[0].x(), 1) && // vertex.position.x
-                MathHelper.approximatelyEquals(pos[1].x(), 1) && MathHelper.approximatelyEquals(
-                pos[2].x(),
-                1
-            ) && MathHelper.approximatelyEquals(pos[3].x(), 1) && norm[0].x() > 0) // vertex.normal.x
+            } else if (Mth.equal(pos[0].x(), 1) && // vertex.position.x
+                Mth.equal(pos[1].x(), 1) && Mth.equal(pos[2].x(), 1) && Mth.equal(pos[3].x(), 1) && norm[0].x() > 0) // vertex.normal.x
             {
                 cull = Direction.EAST;
-            } else if (MathHelper.approximatelyEquals(pos[0].z(), 0) && // vertex.position.z
-                MathHelper.approximatelyEquals(pos[1].z(), 0) && MathHelper.approximatelyEquals(
-                pos[2].z(),
-                0
-            ) && MathHelper.approximatelyEquals(pos[3].z(), 0) && norm[0].z() < 0) // vertex.normal.z
+            } else if (Mth.equal(pos[0].z(), 0) && // vertex.position.z
+                Mth.equal(pos[1].z(), 0) && Mth.equal(pos[2].z(), 0) && Mth.equal(pos[3].z(), 0) && norm[0].z() < 0) // vertex.normal.z
             {
                 cull = Direction.NORTH; // can never remember
-            } else if (MathHelper.approximatelyEquals(pos[0].z(), 1) && // vertex.position.z
-                MathHelper.approximatelyEquals(pos[1].z(), 1) && MathHelper.approximatelyEquals(
-                pos[2].z(),
-                1
-            ) && MathHelper.approximatelyEquals(pos[3].z(), 1) && norm[0].z() > 0) // vertex.normal.z
+            } else if (Mth.equal(pos[0].z(), 1) && // vertex.position.z
+                Mth.equal(pos[1].z(), 1) && Mth.equal(pos[2].z(), 1) && Mth.equal(pos[3].z(), 1) && norm[0].z() > 0) // vertex.normal.z
             {
                 cull = Direction.SOUTH;
-            } else if (MathHelper.approximatelyEquals(pos[0].y(), 0) && // vertex.position.y
-                MathHelper.approximatelyEquals(pos[1].y(), 0) && MathHelper.approximatelyEquals(
-                pos[2].y(),
-                0
-            ) && MathHelper.approximatelyEquals(pos[3].y(), 0) && norm[0].y() < 0) // vertex.normal.z
+            } else if (Mth.equal(pos[0].y(), 0) && // vertex.position.y
+                Mth.equal(pos[1].y(), 0) && Mth.equal(pos[2].y(), 0) && Mth.equal(pos[3].y(), 0) && norm[0].y() < 0) // vertex.normal.z
             {
                 cull = Direction.DOWN; // can never remember
-            } else if (MathHelper.approximatelyEquals(pos[0].y(), 1) && // vertex.position.y
-                MathHelper.approximatelyEquals(pos[1].y(), 1) && MathHelper.approximatelyEquals(
-                pos[2].y(),
-                1
-            ) && MathHelper.approximatelyEquals(pos[3].y(), 1) && norm[0].y() > 0) // vertex.normal.y
+            } else if (Mth.equal(pos[0].y(), 1) && // vertex.position.y
+                Mth.equal(pos[1].y(), 1) && Mth.equal(pos[2].y(), 1) && Mth.equal(pos[3].y(), 1) && norm[0].y() > 0) // vertex.normal.y
             {
                 cull = Direction.UP;
             }
@@ -452,12 +439,12 @@ public class ObjGeometry implements ExtendedUnbakedGeometry {
         }
 
         public void addQuads(
-            BakedGeometry.Builder builder,
-            ModelTextures slots,
-            Baker baker,
-            ModelBakeSettings state,
-            SimpleModel debugName,
-            ContextParameterMap additionalProperties
+            QuadCollection.Builder builder,
+            TextureSlots slots,
+            ModelBaker baker,
+            ModelState state,
+            ModelDebugName debugName,
+            ContextMap additionalProperties
         ) {
             for (ModelMesh mesh : meshes) {
                 mesh.addQuads(builder, slots, baker, state, debugName, additionalProperties);
@@ -478,12 +465,12 @@ public class ObjGeometry implements ExtendedUnbakedGeometry {
 
         @Override
         public void addQuads(
-            BakedGeometry.Builder builder,
-            ModelTextures slots,
-            Baker baker,
-            ModelBakeSettings state,
-            SimpleModel debugName,
-            ContextParameterMap additionalProperties
+            QuadCollection.Builder builder,
+            TextureSlots slots,
+            ModelBaker baker,
+            ModelState state,
+            ModelDebugName debugName,
+            ContextMap additionalProperties
         ) {
             super.addQuads(builder, slots, baker, state, debugName, additionalProperties);
 
@@ -513,34 +500,34 @@ public class ObjGeometry implements ExtendedUnbakedGeometry {
         }
 
         public void addQuads(
-            BakedGeometry.Builder builder,
-            ModelTextures slots,
-            Baker baker,
-            ModelBakeSettings state,
-            SimpleModel debugName,
-            ContextParameterMap additionalProperties
+            QuadCollection.Builder builder,
+            TextureSlots slots,
+            ModelBaker baker,
+            ModelState state,
+            ModelDebugName debugName,
+            ContextMap additionalProperties
         ) {
             if (mat == null)
                 return;
-            Sprite texture = baker.getSpriteGetter().get(slots, mat.diffuseColorMap, debugName);
+            TextureAtlasSprite texture = baker.sprites().resolveSlot(slots, mat.diffuseColorMap, debugName);
             int tintIndex = mat.diffuseTintIndex;
             Vector4f colorTint = mat.diffuseColor;
 
-            var rootTransform = additionalProperties.getOrDefault(NeoForgeModelProperties.TRANSFORM, AffineTransformation.identity());
-            var transform = rootTransform.equals(AffineTransformation.identity()) ? state.getRotation() : state.getRotation().multiply(rootTransform);
+            var rootTransform = additionalProperties.getOrDefault(NeoForgeModelProperties.TRANSFORM, Transformation.identity());
+            var transform = rootTransform.equals(Transformation.identity()) ? state.transformation() : state.transformation().compose(rootTransform);
             for (int[][] face : faces) {
                 Pair<BakedQuad, Direction> quad = makeQuad(face, tintIndex, colorTint, mat.ambientColor, texture, transform);
                 if (quad.getRight() == null)
-                    builder.add(quad.getLeft());
+                    builder.addUnculledFace(quad.getLeft());
                 else
-                    builder.add(quad.getRight(), quad.getLeft());
+                    builder.addCulledFace(quad.getRight(), quad.getLeft());
             }
         }
     }
 
     public record Settings(
-        Identifier modelLocation, boolean automaticCulling, boolean shadeQuads, boolean flipV, boolean emissiveAmbient, @Nullable String mtlOverride,
-        StandardModelParameters parameters
+        ResourceLocation modelLocation, boolean automaticCulling, boolean shadeQuads, boolean flipV, boolean emissiveAmbient,
+        @Nullable String mtlOverride, StandardModelParameters parameters
     ) {
     }
 }

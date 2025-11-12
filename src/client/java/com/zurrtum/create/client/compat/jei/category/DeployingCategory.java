@@ -17,37 +17,37 @@ import mezz.jei.api.gui.drawable.IDrawable;
 import mezz.jei.api.gui.ingredient.IRecipeSlotsView;
 import mezz.jei.api.recipe.IFocusGroup;
 import mezz.jei.api.recipe.types.IRecipeType;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.item.Item;
-import net.minecraft.recipe.Ingredient;
-import net.minecraft.recipe.PreparedRecipes;
-import net.minecraft.recipe.RecipeEntry;
-import net.minecraft.registry.Registries;
-import net.minecraft.registry.RegistryKey;
-import net.minecraft.registry.RegistryKeys;
-import net.minecraft.registry.entry.RegistryEntry;
-import net.minecraft.registry.entry.RegistryEntryList;
-import net.minecraft.text.Text;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.core.Holder;
+import net.minecraft.core.HolderSet;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.item.crafting.RecipeHolder;
+import net.minecraft.world.item.crafting.RecipeMap;
 import org.jetbrains.annotations.NotNull;
 import org.joml.Matrix3x2f;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class DeployingCategory extends CreateCategory<RecipeEntry<? extends ItemApplicationRecipe>> {
-    public static List<RecipeEntry<? extends ItemApplicationRecipe>> getRecipes(PreparedRecipes preparedRecipes) {
-        List<RecipeEntry<? extends ItemApplicationRecipe>> recipes = new ArrayList<>();
-        recipes.addAll(preparedRecipes.getAll(AllRecipeTypes.DEPLOYING));
-        recipes.addAll(preparedRecipes.getAll(AllRecipeTypes.ITEM_APPLICATION));
-        List<RegistryEntry<Item>> sandpaperList = new ArrayList<>();
-        for (RegistryEntry<Item> entry : Registries.ITEM.iterateEntries(AllItemTags.SANDPAPER)) {
+public class DeployingCategory extends CreateCategory<RecipeHolder<? extends ItemApplicationRecipe>> {
+    public static List<RecipeHolder<? extends ItemApplicationRecipe>> getRecipes(RecipeMap preparedRecipes) {
+        List<RecipeHolder<? extends ItemApplicationRecipe>> recipes = new ArrayList<>();
+        recipes.addAll(preparedRecipes.byType(AllRecipeTypes.DEPLOYING));
+        recipes.addAll(preparedRecipes.byType(AllRecipeTypes.ITEM_APPLICATION));
+        List<Holder<Item>> sandpaperList = new ArrayList<>();
+        for (Holder<Item> entry : BuiltInRegistries.ITEM.getTagOrEmpty(AllItemTags.SANDPAPER)) {
             sandpaperList.add(entry);
         }
-        Ingredient ingredient = Ingredient.ofTag(RegistryEntryList.of(sandpaperList));
-        for (RecipeEntry<SandPaperPolishingRecipe> entry : preparedRecipes.getAll(AllRecipeTypes.SANDPAPER_POLISHING)) {
+        Ingredient ingredient = Ingredient.of(HolderSet.direct(sandpaperList));
+        for (RecipeHolder<SandPaperPolishingRecipe> entry : preparedRecipes.byType(AllRecipeTypes.SANDPAPER_POLISHING)) {
             SandPaperPolishingRecipe recipe = entry.value();
-            recipes.add(new RecipeEntry<>(
-                RegistryKey.of(RegistryKeys.RECIPE, entry.id().getValue().withSuffixedPath("_using_deployer")),
+            recipes.add(new RecipeHolder<>(
+                ResourceKey.create(Registries.RECIPE, entry.id().location().withSuffix("_using_deployer")),
                 new DeployerApplicationRecipe(recipe.result(), true, recipe.ingredient(), ingredient)
             ));
         }
@@ -56,13 +56,13 @@ public class DeployingCategory extends CreateCategory<RecipeEntry<? extends Item
 
     @Override
     @NotNull
-    public IRecipeType<RecipeEntry<? extends ItemApplicationRecipe>> getRecipeType() {
+    public IRecipeType<RecipeHolder<? extends ItemApplicationRecipe>> getRecipeType() {
         return JeiClientPlugin.DEPLOYING;
     }
 
     @Override
     @NotNull
-    public Text getTitle() {
+    public Component getTitle() {
         return CreateLang.translateDirect("recipe.deploying");
     }
 
@@ -77,7 +77,7 @@ public class DeployingCategory extends CreateCategory<RecipeEntry<? extends Item
     }
 
     @Override
-    public void setRecipe(IRecipeLayoutBuilder builder, RecipeEntry<? extends ItemApplicationRecipe> entry, IFocusGroup focuses) {
+    public void setRecipe(IRecipeLayoutBuilder builder, RecipeHolder<? extends ItemApplicationRecipe> entry, IFocusGroup focuses) {
         ItemApplicationRecipe recipe = entry.value();
         builder.addInputSlot(51, 5).setBackground(SLOT, -1, -1).add(recipe.ingredient());
         builder.addInputSlot(27, 51).setBackground(SLOT, -1, -1).add(recipe.target());
@@ -86,14 +86,14 @@ public class DeployingCategory extends CreateCategory<RecipeEntry<? extends Item
 
     @Override
     public void draw(
-        RecipeEntry<? extends ItemApplicationRecipe> entry,
+        RecipeHolder<? extends ItemApplicationRecipe> entry,
         IRecipeSlotsView recipeSlotsView,
-        DrawContext graphics,
+        GuiGraphics graphics,
         double mouseX,
         double mouseY
     ) {
         AllGuiTextures.JEI_SHADOW.render(graphics, 62, 57);
         AllGuiTextures.JEI_DOWN_ARROW.render(graphics, 126, 29);
-        graphics.state.addSpecialElement(new DeployerRenderState(new Matrix3x2f(graphics.getMatrices()), 75, -10));
+        graphics.guiRenderState.submitPicturesInPictureState(new DeployerRenderState(new Matrix3x2f(graphics.pose()), 75, -10));
     }
 }

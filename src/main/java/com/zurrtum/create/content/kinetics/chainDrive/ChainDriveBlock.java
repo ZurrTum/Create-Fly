@@ -9,83 +9,82 @@ import com.zurrtum.create.content.kinetics.base.KineticBlockEntity;
 import com.zurrtum.create.content.kinetics.base.RotatedPillarKineticBlock;
 import com.zurrtum.create.foundation.block.IBE;
 import com.zurrtum.create.foundation.block.WeakPowerControlBlock;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.item.ItemPlacementContext;
-import net.minecraft.item.ItemUsageContext;
-import net.minecraft.state.StateManager.Builder;
-import net.minecraft.state.property.BooleanProperty;
-import net.minecraft.state.property.EnumProperty;
-import net.minecraft.state.property.Properties;
-import net.minecraft.util.BlockMirror;
-import net.minecraft.util.BlockRotation;
-import net.minecraft.util.StringIdentifiable;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Direction.Axis;
-import net.minecraft.util.math.Direction.AxisDirection;
-import net.minecraft.util.math.random.Random;
-import net.minecraft.world.RedstoneView;
-import net.minecraft.world.World;
-import net.minecraft.world.WorldView;
-import net.minecraft.world.tick.ScheduledTickView;
-
 import java.util.Locale;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.Direction.Axis;
+import net.minecraft.core.Direction.AxisDirection;
+import net.minecraft.util.RandomSource;
+import net.minecraft.util.StringRepresentable;
+import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.item.context.UseOnContext;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelReader;
+import net.minecraft.world.level.ScheduledTickAccess;
+import net.minecraft.world.level.SignalGetter;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Mirror;
+import net.minecraft.world.level.block.Rotation;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition.Builder;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.block.state.properties.BooleanProperty;
+import net.minecraft.world.level.block.state.properties.EnumProperty;
 
 public class ChainDriveBlock extends RotatedPillarKineticBlock implements IBE<KineticBlockEntity>, TransformableBlock, WeakPowerControlBlock {
 
-    public static final EnumProperty<Part> PART = EnumProperty.of("part", Part.class);
+    public static final EnumProperty<Part> PART = EnumProperty.create("part", Part.class);
     public static final BooleanProperty CONNECTED_ALONG_FIRST_COORDINATE = DirectionalAxisKineticBlock.AXIS_ALONG_FIRST_COORDINATE;
 
-    public ChainDriveBlock(Settings properties) {
+    public ChainDriveBlock(Properties properties) {
         super(properties);
-        setDefaultState(getDefaultState().with(PART, Part.NONE));
+        registerDefaultState(defaultBlockState().setValue(PART, Part.NONE));
     }
 
     @Override
-    protected void appendProperties(Builder<Block, BlockState> builder) {
-        super.appendProperties(builder.add(PART, CONNECTED_ALONG_FIRST_COORDINATE));
+    protected void createBlockStateDefinition(Builder<Block, BlockState> builder) {
+        super.createBlockStateDefinition(builder.add(PART, CONNECTED_ALONG_FIRST_COORDINATE));
     }
 
     @Override
-    public BlockState getPlacementState(ItemPlacementContext context) {
-        Axis placedAxis = context.getPlayerLookDirection().getAxis();
-        Axis axis = context.getPlayer() != null && context.getPlayer().isSneaking() ? placedAxis : getPreferredAxis(context);
+    public BlockState getStateForPlacement(BlockPlaceContext context) {
+        Axis placedAxis = context.getNearestLookingDirection().getAxis();
+        Axis axis = context.getPlayer() != null && context.getPlayer().isShiftKeyDown() ? placedAxis : getPreferredAxis(context);
         if (axis == null)
             axis = placedAxis;
 
-        BlockState state = getDefaultState().with(AXIS, axis);
+        BlockState state = defaultBlockState().setValue(AXIS, axis);
         for (Direction facing : Iterate.directions) {
             if (facing.getAxis() == axis)
                 continue;
-            BlockPos pos = context.getBlockPos();
-            BlockPos offset = pos.offset(facing);
-            World world = context.getWorld();
-            state = getStateForNeighborUpdate(state, world, world, pos, facing, offset, world.getBlockState(offset), world.getRandom());
+            BlockPos pos = context.getClickedPos();
+            BlockPos offset = pos.relative(facing);
+            Level world = context.getLevel();
+            state = updateShape(state, world, world, pos, facing, offset, world.getBlockState(offset), world.getRandom());
         }
         return state;
     }
 
     @Override
-    public BlockState getStateForNeighborUpdate(
+    public BlockState updateShape(
         BlockState stateIn,
-        WorldView worldIn,
-        ScheduledTickView tickView,
+        LevelReader worldIn,
+        ScheduledTickAccess tickView,
         BlockPos currentPos,
         Direction face,
         BlockPos facingPos,
         BlockState neighbour,
-        Random random
+        RandomSource random
     ) {
-        Part part = stateIn.get(PART);
-        Axis axis = stateIn.get(AXIS);
-        boolean connectionAlongFirst = stateIn.get(CONNECTED_ALONG_FIRST_COORDINATE);
+        Part part = stateIn.getValue(PART);
+        Axis axis = stateIn.getValue(AXIS);
+        boolean connectionAlongFirst = stateIn.getValue(CONNECTED_ALONG_FIRST_COORDINATE);
         Axis connectionAxis = connectionAlongFirst ? (axis == Axis.X ? Axis.Y : Axis.X) : (axis == Axis.Z ? Axis.Y : Axis.Z);
 
         Axis faceAxis = face.getAxis();
         boolean facingAlongFirst = axis == Axis.X ? faceAxis.isVertical() : faceAxis == Axis.X;
-        boolean positive = face.getDirection() == AxisDirection.POSITIVE;
+        boolean positive = face.getAxisDirection() == AxisDirection.POSITIVE;
 
         if (axis == faceAxis)
             return stateIn;
@@ -94,18 +93,18 @@ public class ChainDriveBlock extends RotatedPillarKineticBlock implements IBE<Ki
             if (facingAlongFirst != connectionAlongFirst || part == Part.NONE)
                 return stateIn;
             if (part == Part.MIDDLE)
-                return stateIn.with(PART, positive ? Part.END : Part.START);
+                return stateIn.setValue(PART, positive ? Part.END : Part.START);
             if ((part == Part.START) == positive)
-                return stateIn.with(PART, Part.NONE);
+                return stateIn.setValue(PART, Part.NONE);
             return stateIn;
         }
 
-        Part otherPart = neighbour.get(PART);
-        Axis otherAxis = neighbour.get(AXIS);
-        boolean otherConnection = neighbour.get(CONNECTED_ALONG_FIRST_COORDINATE);
+        Part otherPart = neighbour.getValue(PART);
+        Axis otherAxis = neighbour.getValue(AXIS);
+        boolean otherConnection = neighbour.getValue(CONNECTED_ALONG_FIRST_COORDINATE);
         Axis otherConnectionAxis = otherConnection ? (otherAxis == Axis.X ? Axis.Y : Axis.X) : (otherAxis == Axis.Z ? Axis.Y : Axis.Z);
 
-        if (neighbour.get(AXIS) == faceAxis)
+        if (neighbour.getValue(AXIS) == faceAxis)
             return stateIn;
         if (otherPart != Part.NONE && otherConnectionAxis != faceAxis)
             return stateIn;
@@ -120,53 +119,53 @@ public class ChainDriveBlock extends RotatedPillarKineticBlock implements IBE<Ki
         if ((part == Part.START) != positive)
             part = Part.MIDDLE;
 
-        return stateIn.with(PART, part).with(CONNECTED_ALONG_FIRST_COORDINATE, connectionAlongFirst);
+        return stateIn.setValue(PART, part).setValue(CONNECTED_ALONG_FIRST_COORDINATE, connectionAlongFirst);
     }
 
     @Override
     public BlockState getRotatedBlockState(BlockState originalState, Direction targetedFace) {
-        if (originalState.get(PART) == Part.NONE)
+        if (originalState.getValue(PART) == Part.NONE)
             return super.getRotatedBlockState(originalState, targetedFace);
         return super.getRotatedBlockState(originalState, Direction.get(AxisDirection.POSITIVE, getConnectionAxis(originalState)));
     }
 
     @Override
-    public boolean shouldCheckWeakPower(BlockState state, RedstoneView level, BlockPos pos, Direction side) {
+    public boolean shouldCheckWeakPower(BlockState state, SignalGetter level, BlockPos pos, Direction side) {
         return false;
     }
 
     @Override
-    public BlockState updateAfterWrenched(BlockState newState, ItemUsageContext context) {
+    public BlockState updateAfterWrenched(BlockState newState, UseOnContext context) {
         //		Blocks.AIR.getDefaultState()
         //			.updateNeighbors(context.getWorld(), context.getPos(), 1);
-        Axis axis = newState.get(AXIS);
-        newState = getDefaultState().with(AXIS, axis);
-        if (newState.contains(Properties.POWERED))
-            newState = newState.with(Properties.POWERED, context.getWorld().isReceivingRedstonePower(context.getBlockPos()));
+        Axis axis = newState.getValue(AXIS);
+        newState = defaultBlockState().setValue(AXIS, axis);
+        if (newState.hasProperty(BlockStateProperties.POWERED))
+            newState = newState.setValue(BlockStateProperties.POWERED, context.getLevel().hasNeighborSignal(context.getClickedPos()));
         for (Direction facing : Iterate.directions) {
             if (facing.getAxis() == axis)
                 continue;
-            BlockPos pos = context.getBlockPos();
-            BlockPos offset = pos.offset(facing);
-            World world = context.getWorld();
-            newState = getStateForNeighborUpdate(newState, world, world, pos, facing, offset, world.getBlockState(offset), world.getRandom());
+            BlockPos pos = context.getClickedPos();
+            BlockPos offset = pos.relative(facing);
+            Level world = context.getLevel();
+            newState = updateShape(newState, world, world, pos, facing, offset, world.getBlockState(offset), world.getRandom());
         }
         //		newState.updateNeighbors(context.getWorld(), context.getPos(), 1 | 2);
         return newState;
     }
 
     @Override
-    public boolean hasShaftTowards(WorldView world, BlockPos pos, BlockState state, Direction face) {
-        return face.getAxis() == state.get(AXIS);
+    public boolean hasShaftTowards(LevelReader world, BlockPos pos, BlockState state, Direction face) {
+        return face.getAxis() == state.getValue(AXIS);
     }
 
     @Override
     public Axis getRotationAxis(BlockState state) {
-        return state.get(AXIS);
+        return state.getValue(AXIS);
     }
 
     public static boolean areBlocksConnected(BlockState state, BlockState other, Direction facing) {
-        Part part = state.get(PART);
+        Part part = state.getValue(PART);
         Axis connectionAxis = getConnectionAxis(state);
         Axis otherConnectionAxis = getConnectionAxis(other);
 
@@ -174,17 +173,17 @@ public class ChainDriveBlock extends RotatedPillarKineticBlock implements IBE<Ki
             return false;
         if (facing.getAxis() != connectionAxis)
             return false;
-        if (facing.getDirection() == AxisDirection.POSITIVE && (part == Part.MIDDLE || part == Part.START))
+        if (facing.getAxisDirection() == AxisDirection.POSITIVE && (part == Part.MIDDLE || part == Part.START))
             return true;
-        if (facing.getDirection() == AxisDirection.NEGATIVE && (part == Part.MIDDLE || part == Part.END))
+        if (facing.getAxisDirection() == AxisDirection.NEGATIVE && (part == Part.MIDDLE || part == Part.END))
             return true;
 
         return false;
     }
 
     protected static Axis getConnectionAxis(BlockState state) {
-        Axis axis = state.get(AXIS);
-        boolean connectionAlongFirst = state.get(CONNECTED_ALONG_FIRST_COORDINATE);
+        Axis axis = state.getValue(AXIS);
+        boolean connectionAlongFirst = state.getValue(CONNECTED_ALONG_FIRST_COORDINATE);
         return connectionAlongFirst ? (axis == Axis.X ? Axis.Y : Axis.X) : (axis == Axis.Z ? Axis.Y : Axis.Z);
     }
 
@@ -198,14 +197,14 @@ public class ChainDriveBlock extends RotatedPillarKineticBlock implements IBE<Ki
         return fromMod / toMod;
     }
 
-    public enum Part implements StringIdentifiable {
+    public enum Part implements StringRepresentable {
         START,
         MIDDLE,
         END,
         NONE;
 
         @Override
-        public String asString() {
+        public String getSerializedName() {
             return name().toLowerCase(Locale.ROOT);
         }
     }
@@ -221,43 +220,43 @@ public class ChainDriveBlock extends RotatedPillarKineticBlock implements IBE<Ki
     }
 
     @Override
-    public BlockState rotate(BlockState state, BlockRotation rot) {
+    public BlockState rotate(BlockState state, Rotation rot) {
         return rotate(state, rot, Axis.Y);
     }
 
-    protected BlockState rotate(BlockState pState, BlockRotation rot, Axis rotAxis) {
+    protected BlockState rotate(BlockState pState, Rotation rot, Axis rotAxis) {
         Axis connectionAxis = getConnectionAxis(pState);
-        Direction direction = Direction.from(connectionAxis, AxisDirection.POSITIVE);
-        Direction normal = Direction.from(pState.get(AXIS), AxisDirection.POSITIVE);
+        Direction direction = Direction.fromAxisAndDirection(connectionAxis, AxisDirection.POSITIVE);
+        Direction normal = Direction.fromAxisAndDirection(pState.getValue(AXIS), AxisDirection.POSITIVE);
         for (int i = 0; i < rot.ordinal(); i++) {
-            direction = direction.rotateClockwise(rotAxis);
-            normal = normal.rotateClockwise(rotAxis);
+            direction = direction.getClockWise(rotAxis);
+            normal = normal.getClockWise(rotAxis);
         }
 
-        if (direction.getDirection() == AxisDirection.NEGATIVE)
+        if (direction.getAxisDirection() == AxisDirection.NEGATIVE)
             pState = reversePart(pState);
 
         Axis newAxis = normal.getAxis();
         Axis newConnectingDirection = direction.getAxis();
         boolean alongFirst = newAxis == Axis.X && newConnectingDirection == Axis.Y || newAxis != Axis.X && newConnectingDirection == Axis.X;
 
-        return pState.with(AXIS, newAxis).with(CONNECTED_ALONG_FIRST_COORDINATE, alongFirst);
+        return pState.setValue(AXIS, newAxis).setValue(CONNECTED_ALONG_FIRST_COORDINATE, alongFirst);
     }
 
     @Override
-    public BlockState mirror(BlockState pState, BlockMirror pMirror) {
+    public BlockState mirror(BlockState pState, Mirror pMirror) {
         Axis connectionAxis = getConnectionAxis(pState);
-        if (pMirror.apply(Direction.from(connectionAxis, AxisDirection.POSITIVE)).getDirection() == AxisDirection.POSITIVE)
+        if (pMirror.mirror(Direction.fromAxisAndDirection(connectionAxis, AxisDirection.POSITIVE)).getAxisDirection() == AxisDirection.POSITIVE)
             return pState;
         return reversePart(pState);
     }
 
     protected BlockState reversePart(BlockState pState) {
-        Part part = pState.get(PART);
+        Part part = pState.getValue(PART);
         if (part == Part.START)
-            return pState.with(PART, Part.END);
+            return pState.setValue(PART, Part.END);
         if (part == Part.END)
-            return pState.with(PART, Part.START);
+            return pState.setValue(PART, Part.START);
         return pState;
     }
 

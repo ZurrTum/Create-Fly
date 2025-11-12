@@ -1,90 +1,90 @@
 package com.zurrtum.create.content.equipment;
 
 import com.zurrtum.create.catnip.levelWrappers.PlacementSimulationServerLevel;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.Fertilizable;
-import net.minecraft.item.BoneMealItem;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemUsageContext;
-import net.minecraft.registry.tag.BlockTags;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.state.property.Properties;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.tags.BlockTags;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.item.BoneMealItem;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.context.UseOnContext;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.BonemealableBlock;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 
 public class TreeFertilizerItem extends Item {
 
-    public TreeFertilizerItem(Settings properties) {
+    public TreeFertilizerItem(Properties properties) {
         super(properties);
     }
 
     @Override
-    public ActionResult useOnBlock(ItemUsageContext context) {
-        World world = context.getWorld();
-        BlockState state = world.getBlockState(context.getBlockPos());
+    public InteractionResult useOn(UseOnContext context) {
+        Level world = context.getLevel();
+        BlockState state = world.getBlockState(context.getClickedPos());
         Block block = state.getBlock();
-        if (block instanceof Fertilizable bonemealableBlock && state.isIn(BlockTags.SAPLINGS)) {
+        if (block instanceof BonemealableBlock bonemealableBlock && state.is(BlockTags.SAPLINGS)) {
 
-            if (state.get(Properties.HANGING, false))
-                return ActionResult.PASS;
+            if (state.getValueOrElse(BlockStateProperties.HANGING, false))
+                return InteractionResult.PASS;
 
-            if (world.isClient()) {
-                BoneMealItem.createParticles(world, context.getBlockPos(), 100);
-                return ActionResult.SUCCESS;
+            if (world.isClientSide()) {
+                BoneMealItem.addGrowthParticles(world, context.getClickedPos(), 100);
+                return InteractionResult.SUCCESS;
             }
 
-            BlockPos saplingPos = context.getBlockPos();
-            TreesDreamWorld treesDreamWorld = new TreesDreamWorld((ServerWorld) world, saplingPos);
+            BlockPos saplingPos = context.getClickedPos();
+            TreesDreamWorld treesDreamWorld = new TreesDreamWorld((ServerLevel) world, saplingPos);
 
-            for (BlockPos pos : BlockPos.iterate(-1, 0, -1, 1, 0, 1)) {
-                if (world.getBlockState(saplingPos.add(pos)).getBlock() == block)
-                    treesDreamWorld.setBlockState(pos.up(10), withStage(state, 1));
+            for (BlockPos pos : BlockPos.betweenClosed(-1, 0, -1, 1, 0, 1)) {
+                if (world.getBlockState(saplingPos.offset(pos)).getBlock() == block)
+                    treesDreamWorld.setBlockAndUpdate(pos.above(10), withStage(state, 1));
             }
 
-            bonemealableBlock.grow(treesDreamWorld, treesDreamWorld.getRandom(), BlockPos.ORIGIN.up(10), withStage(state, 1));
+            bonemealableBlock.performBonemeal(treesDreamWorld, treesDreamWorld.getRandom(), BlockPos.ZERO.above(10), withStage(state, 1));
 
             for (BlockPos pos : treesDreamWorld.blocksAdded.keySet()) {
-                BlockPos actualPos = pos.add(saplingPos).down(10);
+                BlockPos actualPos = pos.offset(saplingPos).below(10);
                 BlockState newState = treesDreamWorld.blocksAdded.get(pos);
 
                 // Don't replace Bedrock
-                if (world.getBlockState(actualPos).getHardness(world, actualPos) == -1)
+                if (world.getBlockState(actualPos).getDestroySpeed(world, actualPos) == -1)
                     continue;
                 // Don't replace solid blocks with leaves
-                if (!newState.isSolidBlock(treesDreamWorld, pos) && !world.getBlockState(actualPos).getCollisionShape(world, actualPos).isEmpty())
+                if (!newState.isRedstoneConductor(treesDreamWorld, pos) && !world.getBlockState(actualPos).getCollisionShape(world, actualPos).isEmpty())
                     continue;
 
-                world.setBlockState(actualPos, newState);
+                world.setBlockAndUpdate(actualPos, newState);
             }
 
             if (context.getPlayer() != null && !context.getPlayer().isCreative())
-                context.getStack().decrement(1);
-            return ActionResult.SUCCESS;
+                context.getItemInHand().shrink(1);
+            return InteractionResult.SUCCESS;
 
         }
 
-        return super.useOnBlock(context);
+        return super.useOn(context);
     }
 
     private BlockState withStage(BlockState original, int stage) {
-        if (!original.contains(Properties.STAGE))
+        if (!original.hasProperty(BlockStateProperties.STAGE))
             return original;
-        return original.with(Properties.STAGE, stage);
+        return original.setValue(BlockStateProperties.STAGE, stage);
     }
 
     private static class TreesDreamWorld extends PlacementSimulationServerLevel {
         private final BlockState soil;
 
-        protected TreesDreamWorld(ServerWorld wrapped, BlockPos saplingPos) {
+        protected TreesDreamWorld(ServerLevel wrapped, BlockPos saplingPos) {
             super(wrapped);
-            BlockState stateUnderSapling = wrapped.getBlockState(saplingPos.down());
+            BlockState stateUnderSapling = wrapped.getBlockState(saplingPos.below());
 
             // Tree features don't seem to succeed with mud as soil
-            if (stateUnderSapling.isIn(BlockTags.DIRT))
-                stateUnderSapling = Blocks.DIRT.getDefaultState();
+            if (stateUnderSapling.is(BlockTags.DIRT))
+                stateUnderSapling = Blocks.DIRT.defaultBlockState();
 
             soil = stateUnderSapling;
         }
@@ -97,10 +97,10 @@ public class TreeFertilizerItem extends Item {
         }
 
         @Override
-        public boolean setBlockState(BlockPos pos, BlockState newState, int flags) {
+        public boolean setBlock(BlockPos pos, BlockState newState, int flags) {
             if (newState.getBlock() == Blocks.PODZOL)
                 return true;
-            return super.setBlockState(pos, newState, flags);
+            return super.setBlock(pos, newState, flags);
         }
     }
 

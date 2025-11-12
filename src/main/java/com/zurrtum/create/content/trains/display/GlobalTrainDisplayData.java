@@ -3,9 +3,8 @@ package com.zurrtum.create.content.trains.display;
 import com.zurrtum.create.Create;
 import com.zurrtum.create.catnip.data.Glob;
 import com.zurrtum.create.content.trains.entity.Train;
-import net.minecraft.text.MutableText;
-
 import java.util.*;
+import net.minecraft.network.chat.MutableComponent;
 
 public class GlobalTrainDisplayData {
 
@@ -33,10 +32,10 @@ public class GlobalTrainDisplayData {
     public static class TrainDeparturePrediction implements Comparable<TrainDeparturePrediction> {
         public Train train;
         public int ticks;
-        public MutableText scheduleTitle;
+        public MutableComponent scheduleTitle;
         public String destination;
 
-        public TrainDeparturePrediction(Train train, int ticks, MutableText scheduleTitle, String destination) {
+        public TrainDeparturePrediction(Train train, int ticks, MutableComponent scheduleTitle, String destination) {
             this.scheduleTitle = scheduleTitle;
             this.destination = destination;
             this.train = train;

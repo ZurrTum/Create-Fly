@@ -6,11 +6,10 @@ import com.zurrtum.create.catnip.codecs.stream.CatnipStreamCodecBuilders;
 import com.zurrtum.create.content.logistics.BigItemStack;
 import com.zurrtum.create.content.logistics.packager.InventorySummary;
 import com.zurrtum.create.content.logistics.stockTicker.PackageOrder;
-import net.minecraft.network.RegistryByteBuf;
-import net.minecraft.network.codec.PacketCodec;
-import net.minecraft.network.codec.PacketCodecs;
-
 import java.util.List;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
 
 /**
  * Package ordering context containing additional information of package orders.
@@ -30,7 +29,7 @@ public record PackageOrderWithCrafts(PackageOrder orderedStacks, List<CraftingEn
 
     );
 
-    public static final PacketCodec<RegistryByteBuf, PackageOrderWithCrafts> STREAM_CODEC = PacketCodec.tuple(
+    public static final StreamCodec<RegistryFriendlyByteBuf, PackageOrderWithCrafts> STREAM_CODEC = StreamCodec.composite(
         PackageOrder.STREAM_CODEC,
         s -> s.orderedStacks,
         CatnipStreamCodecBuilders.list(CraftingEntry.STREAM_CODEC),
@@ -57,10 +56,10 @@ public record PackageOrderWithCrafts(PackageOrder orderedStacks, List<CraftingEn
                 .forGetter(CraftingEntry::pattern), Codec.INT.fieldOf("count").forGetter(CraftingEntry::count)
         ).apply(i, CraftingEntry::new));
 
-        public static final PacketCodec<RegistryByteBuf, CraftingEntry> STREAM_CODEC = PacketCodec.tuple(
+        public static final StreamCodec<RegistryFriendlyByteBuf, CraftingEntry> STREAM_CODEC = StreamCodec.composite(
             PackageOrder.STREAM_CODEC,
             CraftingEntry::pattern,
-            PacketCodecs.VAR_INT,
+            ByteBufCodecs.VAR_INT,
             CraftingEntry::count,
             CraftingEntry::new
         );

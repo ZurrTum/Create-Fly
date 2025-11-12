@@ -1,26 +1,26 @@
 package com.zurrtum.create.client.foundation.gui.render;
 
 import com.zurrtum.create.content.processing.burner.BlazeBurnerBlock.HeatLevel;
-import net.minecraft.client.gui.ScreenRect;
-import net.minecraft.client.gui.render.state.special.SpecialGuiElementRenderState;
+import net.minecraft.client.gui.navigation.ScreenRectangle;
+import net.minecraft.client.gui.render.state.pip.PictureInPictureRenderState;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix3x2f;
 
 public record BasinBlazeBurnerRenderState(
-    Matrix3x2f pose, int x1, int y1, ScreenRect bounds, HeatLevel heat
-) implements SpecialGuiElementRenderState {
+    Matrix3x2f pose, int x0, int y0, ScreenRectangle bounds, HeatLevel heat
+) implements PictureInPictureRenderState {
     public BasinBlazeBurnerRenderState(Matrix3x2f pose, int x, int y, HeatLevel heat) {
-        this(pose, x, y, new ScreenRect(x, y, 30, 30).transformEachVertex(pose), heat);
+        this(pose, x, y, new ScreenRectangle(x, y, 30, 30).transformMaxBounds(pose), heat);
     }
 
     @Override
-    public int x2() {
-        return x1 + 30;
+    public int x1() {
+        return x0 + 30;
     }
 
     @Override
-    public int y2() {
-        return y1 + 36;
+    public int y1() {
+        return y0 + 36;
     }
 
     @Override
@@ -29,7 +29,7 @@ public record BasinBlazeBurnerRenderState(
     }
 
     @Override
-    public @Nullable ScreenRect scissorArea() {
+    public @Nullable ScreenRectangle scissorArea() {
         return null;
     }
 }

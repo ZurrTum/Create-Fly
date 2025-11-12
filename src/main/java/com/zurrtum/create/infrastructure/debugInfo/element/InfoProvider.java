@@ -1,9 +1,9 @@
 package com.zurrtum.create.infrastructure.debugInfo.element;
 
-import net.minecraft.entity.player.PlayerEntity;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Objects;
+import net.minecraft.world.entity.player.Player;
 
 /**
  * A supplier of debug information. May be queried on the client or server.
@@ -13,9 +13,9 @@ public interface InfoProvider {
     /**
      * @param player the player requesting the data. May be null
      */
-    @Nullable String getInfo(@Nullable PlayerEntity player);
+    @Nullable String getInfo(@Nullable Player player);
 
-    default String getInfoSafe(PlayerEntity player) {
+    default String getInfoSafe(Player player) {
         try {
             return Objects.toString(getInfo(player));
         } catch (Throwable t) {

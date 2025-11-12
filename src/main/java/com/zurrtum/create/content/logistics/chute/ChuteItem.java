@@ -1,52 +1,52 @@
 package com.zurrtum.create.content.logistics.chute;
 
 import com.zurrtum.create.foundation.block.ProperWaterloggedBlock;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.item.BlockItem;
-import net.minecraft.item.ItemPlacementContext;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
 
 public class ChuteItem extends BlockItem {
 
-    public ChuteItem(Block p_i48527_1_, Settings p_i48527_2_) {
+    public ChuteItem(Block p_i48527_1_, Properties p_i48527_2_) {
         super(p_i48527_1_, p_i48527_2_);
     }
 
     @Override
-    public ActionResult place(ItemPlacementContext context) {
-        Direction face = context.getSide();
-        BlockPos placedOnPos = context.getBlockPos().offset(face.getOpposite());
-        World world = context.getWorld();
+    public InteractionResult place(BlockPlaceContext context) {
+        Direction face = context.getClickedFace();
+        BlockPos placedOnPos = context.getClickedPos().relative(face.getOpposite());
+        Level world = context.getLevel();
         BlockState placedOnState = world.getBlockState(placedOnPos);
 
-        if (!AbstractChuteBlock.isChute(placedOnState) || context.shouldCancelInteraction())
+        if (!AbstractChuteBlock.isChute(placedOnState) || context.isSecondaryUseActive())
             return super.place(context);
         if (face.getAxis().isVertical())
             return super.place(context);
 
-        BlockPos correctPos = context.getBlockPos().up();
+        BlockPos correctPos = context.getClickedPos().above();
 
         BlockState blockState = world.getBlockState(correctPos);
-        if (blockState.isReplaceable())
-            context = ItemPlacementContext.offset(context, correctPos, face);
+        if (blockState.canBeReplaced())
+            context = BlockPlaceContext.at(context, correctPos, face);
         else {
-            if (!(blockState.getBlock() instanceof ChuteBlock block) || world.isClient())
-                return ActionResult.FAIL;
+            if (!(blockState.getBlock() instanceof ChuteBlock block) || world.isClientSide())
+                return InteractionResult.FAIL;
             if (block.getFacing(blockState) == Direction.DOWN) {
-                world.setBlockState(
+                world.setBlockAndUpdate(
                     correctPos, ProperWaterloggedBlock.withWater(
                         world,
-                        block.updateChuteState(blockState.with(ChuteBlock.FACING, face), world.getBlockState(correctPos.up()), world, correctPos),
+                        block.updateChuteState(blockState.setValue(ChuteBlock.FACING, face), world.getBlockState(correctPos.above()), world, correctPos),
                         correctPos
                     )
                 );
-                return ActionResult.SUCCESS;
+                return InteractionResult.SUCCESS;
             }
-            return ActionResult.FAIL;
+            return InteractionResult.FAIL;
         }
 
         return super.place(context);

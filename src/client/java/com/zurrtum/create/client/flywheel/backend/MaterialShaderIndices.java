@@ -7,10 +7,10 @@ import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import it.unimi.dsi.fastutil.objects.ObjectList;
-import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.Unmodifiable;
 
 import java.util.List;
+import net.minecraft.resources.ResourceLocation;
 
 public final class MaterialShaderIndices {
     private static final Index fogSources = new Index();
@@ -36,8 +36,8 @@ public final class MaterialShaderIndices {
     }
 
     public static class Index {
-        private final Object2IntMap<Identifier> sources2Index;
-        private final ObjectList<Identifier> sources;
+        private final Object2IntMap<ResourceLocation> sources2Index;
+        private final ObjectList<ResourceLocation> sources;
 
         private Index() {
             this.sources2Index = new Object2IntOpenHashMap<>();
@@ -45,11 +45,11 @@ public final class MaterialShaderIndices {
             this.sources = new ObjectArrayList<>();
         }
 
-        public Identifier get(int index) {
+        public ResourceLocation get(int index) {
             return sources.get(index);
         }
 
-        public int index(Identifier source) {
+        public int index(ResourceLocation source) {
             var out = sources2Index.getInt(source);
 
             if (out == -1) {
@@ -62,11 +62,11 @@ public final class MaterialShaderIndices {
         }
 
         @Unmodifiable
-        public List<Identifier> all() {
+        public List<ResourceLocation> all() {
             return sources;
         }
 
-        private void add(Identifier source) {
+        private void add(ResourceLocation source) {
             if (sources2Index.putIfAbsent(source, sources.size()) == -1) {
                 sources.add(source);
             }

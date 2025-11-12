@@ -1,13 +1,13 @@
 package com.zurrtum.create.client.flywheel.backend;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.BlockView;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.block.state.BlockState;
 
 
 public class FlwBackendXplatImpl implements FlwBackendXplat {
     @Override
-    public int getLightEmission(BlockState state, BlockView level, BlockPos pos) {
-        return state.getLuminance();
+    public int getLightEmission(BlockState state, BlockGetter level, BlockPos pos) {
+        return state.getLightEmission();
     }
 }

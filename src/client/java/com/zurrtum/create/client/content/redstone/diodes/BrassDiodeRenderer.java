@@ -6,10 +6,10 @@ import com.zurrtum.create.client.catnip.render.CachedBuffers;
 import com.zurrtum.create.client.catnip.render.SuperByteBuffer;
 import com.zurrtum.create.client.foundation.blockEntity.renderer.ColoredOverlayBlockEntityRenderer;
 import com.zurrtum.create.content.redstone.diodes.BrassDiodeBlockEntity;
-import net.minecraft.client.render.block.entity.BlockEntityRendererFactory;
+import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 
 public class BrassDiodeRenderer extends ColoredOverlayBlockEntityRenderer<BrassDiodeBlockEntity> {
-    public BrassDiodeRenderer(BlockEntityRendererFactory.Context context) {
+    public BrassDiodeRenderer(BlockEntityRendererProvider.Context context) {
         super(context);
     }
 

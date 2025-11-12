@@ -1,58 +1,58 @@
 package com.zurrtum.create.mixin;
 
 import com.zurrtum.create.infrastructure.items.BaseInventory;
-import net.minecraft.inventory.Inventory;
-import net.minecraft.item.ItemStack;
+import net.minecraft.world.Container;
+import net.minecraft.world.item.ItemStack;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 
-@Mixin(Inventory.class)
+@Mixin(Container.class)
 public interface InventoryMixin extends BaseInventory {
     @Shadow
-    void setStack(int slot, ItemStack stack);
+    void setItem(int slot, ItemStack stack);
 
     @Shadow
-    int size();
+    int getContainerSize();
 
     @Shadow
-    int getMaxCount(ItemStack stack);
+    int getMaxStackSize(ItemStack stack);
 
     @Shadow
-    ItemStack getStack(int slot);
+    ItemStack getItem(int slot);
 
     @Shadow
-    boolean isValid(int slot, ItemStack stack);
+    boolean canPlaceItem(int slot, ItemStack stack);
 
     @Shadow
-    void markDirty();
+    void setChanged();
 
     @Override
     default void create$setStack(int slot, ItemStack stack) {
-        setStack(slot, stack);
+        setItem(slot, stack);
     }
 
     @Override
     default int create$size() {
-        return size();
+        return getContainerSize();
     }
 
     @Override
     default int create$getMaxCount(ItemStack stack) {
-        return getMaxCount(stack);
+        return getMaxStackSize(stack);
     }
 
     @Override
     default ItemStack create$getStack(int slot) {
-        return getStack(slot);
+        return getItem(slot);
     }
 
     @Override
     default boolean create$isValid(int slot, ItemStack stack) {
-        return isValid(slot, stack);
+        return canPlaceItem(slot, stack);
     }
 
     @Override
     default void create$markDirty() {
-        markDirty();
+        setChanged();
     }
 }

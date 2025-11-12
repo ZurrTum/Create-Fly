@@ -1,21 +1,20 @@
 package com.zurrtum.create.content.trains.graph;
 
 import com.zurrtum.create.content.trains.track.BezierConnection;
-import net.minecraft.registry.RegistryKey;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.World;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
 
 public class TrackGraphBounds {
 
-    public Box box;
+    public AABB box;
     public List<BezierConnection> beziers;
 
-    public TrackGraphBounds(TrackGraph graph, RegistryKey<World> dimension) {
+    public TrackGraphBounds(TrackGraph graph, ResourceKey<Level> dimension) {
         beziers = new ArrayList<>();
         box = null;
 
@@ -30,13 +29,13 @@ public class TrackGraphBounds {
         }
 
         if (box != null)
-            box = box.expand(2);
+            box = box.inflate(2);
     }
 
     private void include(TrackNode node) {
-        Vec3d v = node.location.getLocation();
-        Box aabb = new Box(v, v);
-        box = box == null ? aabb : box.union(aabb);
+        Vec3 v = node.location.getLocation();
+        AABB aabb = new AABB(v, v);
+        box = box == null ? aabb : box.minmax(aabb);
     }
 
 }

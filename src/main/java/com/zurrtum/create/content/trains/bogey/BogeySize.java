@@ -1,10 +1,9 @@
 package com.zurrtum.create.content.trains.bogey;
 
-import net.minecraft.util.Identifier;
-
 import java.util.List;
+import net.minecraft.resources.ResourceLocation;
 
-public record BogeySize(Identifier id, float wheelRadius) {
+public record BogeySize(ResourceLocation id, float wheelRadius) {
     public BogeySize nextBySize() {
         List<BogeySize> values = AllBogeySizes.allSortedIncreasing();
         int ordinal = values.indexOf(this);

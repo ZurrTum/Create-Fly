@@ -1,8 +1,8 @@
 package com.zurrtum.create.client.mixin;
 
 import com.zurrtum.create.client.flywheel.api.visualization.VisualizationManager;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.world.World;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -14,11 +14,11 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public class BlockEntityMixin {
     @Shadow
     @Nullable
-    protected World world;
+    protected Level level;
 
-    @Inject(method = "markRemoved()V", at = @At("TAIL"))
+    @Inject(method = "setRemoved()V", at = @At("TAIL"))
     private void flywheel$removeVisual(CallbackInfo ci) {
-        VisualizationManager manager = VisualizationManager.get(world);
+        VisualizationManager manager = VisualizationManager.get(level);
         if (manager == null) {
             return;
         }

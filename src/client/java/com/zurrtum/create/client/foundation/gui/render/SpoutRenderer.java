@@ -1,7 +1,11 @@
 package com.zurrtum.create.client.foundation.gui.render;
 
-import com.mojang.blaze3d.systems.ProjectionType;
+import com.mojang.blaze3d.ProjectionType;
+import com.mojang.blaze3d.platform.Lighting;
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
+import com.mojang.math.Axis;
 import com.zurrtum.create.AllBlocks;
 import com.zurrtum.create.client.AllPartialModels;
 import com.zurrtum.create.client.catnip.animation.AnimationTickHolder;
@@ -10,38 +14,38 @@ import com.zurrtum.create.client.catnip.render.FluidRenderHelper;
 import com.zurrtum.create.client.flywheel.lib.model.baked.SinglePosVirtualBlockGetter;
 import it.unimi.dsi.fastutil.ints.Int2ObjectArrayMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gl.RenderPipelines;
-import net.minecraft.client.gui.render.SpecialGuiElementRenderer;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.render.TextureSetup;
+import net.minecraft.client.gui.render.pip.PictureInPictureRenderer;
+import net.minecraft.client.gui.render.state.BlitRenderState;
 import net.minecraft.client.gui.render.state.GuiRenderState;
-import net.minecraft.client.gui.render.state.TexturedQuadGuiElementRenderState;
-import net.minecraft.client.render.*;
-import net.minecraft.client.render.block.BlockRenderManager;
-import net.minecraft.client.render.model.BlockModelPart;
-import net.minecraft.client.texture.TextureSetup;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.component.ComponentChanges;
-import net.minecraft.fluid.Fluid;
-import net.minecraft.fluid.Fluids;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.RotationAxis;
+import net.minecraft.client.renderer.LightTexture;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.RenderPipelines;
+import net.minecraft.client.renderer.Sheets;
+import net.minecraft.client.renderer.block.BlockRenderDispatcher;
+import net.minecraft.client.renderer.block.model.BlockModelPart;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.component.DataComponentPatch;
+import net.minecraft.util.Mth;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.material.Fluid;
+import net.minecraft.world.level.material.Fluids;
 
 import java.util.List;
 
-public class SpoutRenderer extends SpecialGuiElementRenderer<SpoutRenderState> {
+public class SpoutRenderer extends PictureInPictureRenderer<SpoutRenderState> {
     private static final Int2ObjectMap<GpuTexture> TEXTURES = new Int2ObjectArrayMap<>();
-    private final MatrixStack matrices = new MatrixStack();
+    private final PoseStack matrices = new PoseStack();
     private int windowScaleFactor;
 
-    public SpoutRenderer(VertexConsumerProvider.Immediate vertexConsumers) {
+    public SpoutRenderer(MultiBufferSource.BufferSource vertexConsumers) {
         super(vertexConsumers);
     }
 
     @Override
-    public void render(SpoutRenderState item, GuiRenderState state, int windowScaleFactor) {
+    public void prepare(SpoutRenderState item, GuiRenderState state, int windowScaleFactor) {
         if (this.windowScaleFactor != windowScaleFactor) {
             this.windowScaleFactor = windowScaleFactor;
             TEXTURES.values().forEach(GpuTexture::close);
@@ -54,64 +58,64 @@ public class SpoutRenderer extends SpecialGuiElementRenderer<SpoutRenderState> {
             texture = GpuTexture.create(width, height);
             TEXTURES.put(item.id(), texture);
         }
-        RenderSystem.setProjectionMatrix(projectionMatrix.set(width, height), ProjectionType.ORTHOGRAPHIC);
+        RenderSystem.setProjectionMatrix(projectionMatrixBuffer.getBuffer(width, height), ProjectionType.ORTHOGRAPHIC);
         texture.prepare();
-        matrices.push();
+        matrices.pushPose();
         matrices.translate(width / 2.0F, height / 2.0F, 0.0F);
         float scale = 20 * windowScaleFactor;
         matrices.scale(scale, scale, scale);
 
-        MinecraftClient mc = MinecraftClient.getInstance();
-        mc.gameRenderer.getDiffuseLighting().setShaderLights(DiffuseLighting.Type.ENTITY_IN_UI);
-        matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(-15.5f));
-        matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(22.5f));
+        Minecraft mc = Minecraft.getInstance();
+        mc.gameRenderer.getLighting().setupFor(Lighting.Entry.ENTITY_IN_UI);
+        matrices.mulPose(Axis.XP.rotationDegrees(-15.5f));
+        matrices.mulPose(Axis.YP.rotationDegrees(22.5f));
         matrices.translate(-0.5f, -0.5f, -0.5f);
         matrices.scale(1, -1, 1);
 
         BlockState blockState;
         List<BlockModelPart> parts;
-        BlockRenderManager blockRenderManager = mc.getBlockRenderManager();
+        BlockRenderDispatcher blockRenderManager = mc.getBlockRenderer();
         SinglePosVirtualBlockGetter world = SinglePosVirtualBlockGetter.createFullBright();
-        VertexConsumer buffer = vertexConsumers.getBuffer(TexturedRenderLayers.getEntityCutout());
+        VertexConsumer buffer = bufferSource.getBuffer(Sheets.cutoutBlockSheet());
         float time = AnimationTickHolder.getRenderTime();
 
-        blockState = AllBlocks.SPOUT.getDefaultState();
+        blockState = AllBlocks.SPOUT.defaultBlockState();
         world.blockState(blockState);
-        parts = blockRenderManager.getModel(blockState).getParts(mc.world.random);
-        blockRenderManager.renderBlock(blockState, BlockPos.ORIGIN, world, matrices, buffer, false, parts);
+        parts = blockRenderManager.getBlockModel(blockState).collectParts(mc.level.random);
+        blockRenderManager.renderBatched(blockState, BlockPos.ZERO, world, matrices, buffer, false, parts);
 
         float cycle = (time - item.offset() * 8) % 30;
-        float squeeze = cycle < 20 ? -MathHelper.sin((float) (cycle / 20f * Math.PI)) : 0;
+        float squeeze = cycle < 20 ? -Mth.sin((float) (cycle / 20f * Math.PI)) : 0;
         float move = -3 * squeeze / 32f;
 
-        blockState = Blocks.AIR.getDefaultState();
+        blockState = Blocks.AIR.defaultBlockState();
         world.blockState(blockState);
         parts = List.of(AllPartialModels.SPOUT_TOP.get());
-        blockRenderManager.renderBlock(blockState, BlockPos.ORIGIN, world, matrices, buffer, false, parts);
-        matrices.push();
+        blockRenderManager.renderBatched(blockState, BlockPos.ZERO, world, matrices, buffer, false, parts);
+        matrices.pushPose();
         parts = List.of(AllPartialModels.SPOUT_MIDDLE.get());
         matrices.translate(0, move, 0);
-        blockRenderManager.renderBlock(blockState, BlockPos.ORIGIN, world, matrices, buffer, false, parts);
+        blockRenderManager.renderBatched(blockState, BlockPos.ZERO, world, matrices, buffer, false, parts);
         parts = List.of(AllPartialModels.SPOUT_BOTTOM.get());
         matrices.translate(0, move, 0);
-        blockRenderManager.renderBlock(blockState, BlockPos.ORIGIN, world, matrices, buffer, false, parts);
-        matrices.pop();
+        blockRenderManager.renderBatched(blockState, BlockPos.ZERO, world, matrices, buffer, false, parts);
+        matrices.popPose();
 
-        matrices.push();
-        blockState = AllBlocks.DEPOT.getDefaultState();
+        matrices.pushPose();
+        blockState = AllBlocks.DEPOT.defaultBlockState();
         world.blockState(blockState);
-        parts = blockRenderManager.getModel(blockState).getParts(mc.world.random);
+        parts = blockRenderManager.getBlockModel(blockState).collectParts(mc.level.random);
         matrices.translate(0.07f, -2, -0.14f);
-        blockRenderManager.renderBlock(blockState, BlockPos.ORIGIN, world, matrices, buffer, false, parts);
-        matrices.pop();
-        matrices.pop();
+        blockRenderManager.renderBatched(blockState, BlockPos.ZERO, world, matrices, buffer, false, parts);
+        matrices.popPose();
+        matrices.popPose();
 
         Fluid fluid = item.fluid();
         if (fluid != Fluids.EMPTY) {
-            ComponentChanges components = item.components();
-            matrices.push();
-            matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(-15.5f));
-            matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(22.5f));
+            DataComponentPatch components = item.components();
+            matrices.pushPose();
+            matrices.mulPose(Axis.XP.rotationDegrees(-15.5f));
+            matrices.mulPose(Axis.YP.rotationDegrees(22.5f));
             float fluidScale = 16 * windowScaleFactor;
             matrices.scale(fluidScale, -fluidScale, fluidScale);
             matrices.translate(0, -1.4f, 0);
@@ -126,17 +130,17 @@ public class SpoutRenderer extends SpecialGuiElementRenderer<SpoutRenderState> {
                 to,
                 to,
                 to,
-                vertexConsumers,
+                bufferSource,
                 matrices,
-                LightmapTextureManager.MAX_LIGHT_COORDINATE,
+                LightTexture.FULL_BRIGHT,
                 false,
                 true
             );
-            matrices.pop();
+            matrices.popPose();
 
-            matrices.push();
-            matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(-15.5f));
-            matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(22.5f));
+            matrices.pushPose();
+            matrices.mulPose(Axis.XP.rotationDegrees(-15.5f));
+            matrices.mulPose(Axis.YP.rotationDegrees(22.5f));
             matrices.translate(scale / 2f, scale * 1.5f, scale / 2f);
             matrices.scale(fluidScale, -fluidScale, fluidScale);
             matrices.translate(-0.5f, -1f, -0.5f);
@@ -152,25 +156,25 @@ public class SpoutRenderer extends SpecialGuiElementRenderer<SpoutRenderState> {
                 to,
                 2,
                 to,
-                vertexConsumers,
+                bufferSource,
                 matrices,
-                LightmapTextureManager.MAX_LIGHT_COORDINATE,
+                LightTexture.FULL_BRIGHT,
                 false,
                 true
             );
-            matrices.pop();
+            matrices.popPose();
         }
 
-        vertexConsumers.draw();
+        bufferSource.endBatch();
         texture.clear();
-        state.addSimpleElementToCurrentLayer(new TexturedQuadGuiElementRenderState(
+        state.submitBlitToCurrentLayer(new BlitRenderState(
             RenderPipelines.GUI_TEXTURED_PREMULTIPLIED_ALPHA,
-            TextureSetup.withoutGlTexture(texture.textureView()),
+            TextureSetup.singleTexture(texture.textureView()),
             item.pose(),
+            item.x0(),
+            item.y0(),
             item.x1(),
             item.y1(),
-            item.x2(),
-            item.y2(),
             0.0F,
             1.0F,
             1.0F,
@@ -182,16 +186,16 @@ public class SpoutRenderer extends SpecialGuiElementRenderer<SpoutRenderState> {
     }
 
     @Override
-    protected void render(SpoutRenderState state, MatrixStack matrices) {
+    protected void renderToTexture(SpoutRenderState state, PoseStack matrices) {
     }
 
     @Override
-    protected String getName() {
+    protected String getTextureLabel() {
         return "Spout";
     }
 
     @Override
-    public Class<SpoutRenderState> getElementClass() {
+    public Class<SpoutRenderState> getRenderStateClass() {
         return SpoutRenderState.class;
     }
 }

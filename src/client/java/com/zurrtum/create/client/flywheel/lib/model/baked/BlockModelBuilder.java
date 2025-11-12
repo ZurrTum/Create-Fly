@@ -1,30 +1,30 @@
 package com.zurrtum.create.client.flywheel.lib.model.baked;
 
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.zurrtum.create.client.flywheel.api.material.Material;
 import com.zurrtum.create.client.flywheel.lib.internal.FlwLibXplat;
 import com.zurrtum.create.client.flywheel.lib.model.ModelUtil;
 import com.zurrtum.create.client.flywheel.lib.model.SimpleModel;
-import net.minecraft.client.render.BlockRenderLayer;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.BlockRenderView;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.function.BiFunction;
+import net.minecraft.client.renderer.chunk.ChunkSectionLayer;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.BlockAndTintGetter;
 
 public final class BlockModelBuilder {
-    final BlockRenderView level;
+    final BlockAndTintGetter level;
     final Iterable<BlockPos> positions;
-    @Nullable MatrixStack poseStack;
+    @Nullable PoseStack poseStack;
     boolean renderFluids = false;
-    @Nullable BiFunction<BlockRenderLayer, Boolean, Material> materialFunc;
+    @Nullable BiFunction<ChunkSectionLayer, Boolean, Material> materialFunc;
 
-    public BlockModelBuilder(BlockRenderView level, Iterable<BlockPos> positions) {
+    public BlockModelBuilder(BlockAndTintGetter level, Iterable<BlockPos> positions) {
         this.level = level;
         this.positions = positions;
     }
 
-    public BlockModelBuilder poseStack(@Nullable MatrixStack poseStack) {
+    public BlockModelBuilder poseStack(@Nullable PoseStack poseStack) {
         this.poseStack = poseStack;
         return this;
     }
@@ -34,7 +34,7 @@ public final class BlockModelBuilder {
         return this;
     }
 
-    public BlockModelBuilder materialFunc(@Nullable BiFunction<BlockRenderLayer, Boolean, Material> materialFunc) {
+    public BlockModelBuilder materialFunc(@Nullable BiFunction<ChunkSectionLayer, Boolean, Material> materialFunc) {
         this.materialFunc = materialFunc;
         return this;
     }

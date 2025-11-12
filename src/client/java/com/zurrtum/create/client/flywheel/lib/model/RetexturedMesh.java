@@ -4,10 +4,10 @@ import com.zurrtum.create.client.flywheel.api.model.IndexSequence;
 import com.zurrtum.create.client.flywheel.api.model.Mesh;
 import com.zurrtum.create.client.flywheel.api.vertex.MutableVertexList;
 import com.zurrtum.create.client.flywheel.lib.vertex.VertexTransformations;
-import net.minecraft.client.texture.Sprite;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import org.joml.Vector4fc;
 
-public record RetexturedMesh(Mesh mesh, Sprite sprite) implements Mesh {
+public record RetexturedMesh(Mesh mesh, TextureAtlasSprite sprite) implements Mesh {
     @Override
     public int vertexCount() {
         return mesh.vertexCount();

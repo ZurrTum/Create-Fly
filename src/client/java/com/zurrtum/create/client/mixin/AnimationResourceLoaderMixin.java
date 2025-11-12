@@ -3,7 +3,7 @@ package com.zurrtum.create.client.mixin;
 import com.holdmylua.source.LuaTestHMI;
 import com.holdmylua.source.resource_controller.LuaAnimationResourceLoader;
 import com.zurrtum.create.AllItems;
-import net.minecraft.resource.ResourceManager;
+import net.minecraft.server.packs.resources.ResourceManager;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -11,7 +11,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(LuaAnimationResourceLoader.class)
 public class AnimationResourceLoaderMixin {
-    @Inject(method = "reload(Lnet/minecraft/resource/ResourceManager;)V", at = @At("TAIL"))
+    @Inject(method = "onResourceManagerReload(Lnet/minecraft/server/packs/resources/ResourceManager;)V", at = @At("TAIL"))
     private void reload(ResourceManager manager, CallbackInfo ci) {
         LuaTestHMI.renderAsBlock.put(AllItems.ADJUSTABLE_CHAIN_GEARSHIFT.toString(), false);
         LuaTestHMI.renderAsBlock.put(AllItems.ANALOG_LEVER.toString(), false);

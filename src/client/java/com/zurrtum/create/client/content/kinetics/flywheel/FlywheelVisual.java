@@ -13,11 +13,11 @@ import com.zurrtum.create.client.flywheel.lib.model.Models;
 import com.zurrtum.create.client.flywheel.lib.visual.SimpleDynamicVisual;
 import com.zurrtum.create.client.foundation.render.AllInstanceTypes;
 import com.zurrtum.create.content.kinetics.flywheel.FlywheelBlockEntity;
-import net.minecraft.util.math.Direction;
 import org.joml.Matrix4f;
 import org.joml.Quaternionf;
 
 import java.util.function.Consumer;
+import net.minecraft.core.Direction;
 
 public class FlywheelVisual extends KineticBlockEntityVisual<FlywheelBlockEntity> implements SimpleDynamicVisual {
 
@@ -38,10 +38,10 @@ public class FlywheelVisual extends KineticBlockEntityVisual<FlywheelBlockEntity
         wheel = instancerProvider().instancer(InstanceTypes.TRANSFORMED, Models.partial(AllPartialModels.FLYWHEEL)).createInstance();
 
 
-        Direction align = Direction.from(axis, Direction.AxisDirection.POSITIVE);
+        Direction align = Direction.fromAxisAndDirection(axis, Direction.AxisDirection.POSITIVE);
 
         wheel.translate(getVisualPosition()).center()
-            .rotate(new Quaternionf().rotateTo(0, 1, 0, align.getOffsetX(), align.getOffsetY(), align.getOffsetZ()));
+            .rotate(new Quaternionf().rotateTo(0, 1, 0, align.getStepX(), align.getStepY(), align.getStepZ()));
 
         baseTransform.set(wheel.pose);
 

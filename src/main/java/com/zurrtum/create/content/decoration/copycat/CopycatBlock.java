@@ -5,123 +5,126 @@ import com.zurrtum.create.AllBlockTags;
 import com.zurrtum.create.AllBlocks;
 import com.zurrtum.create.content.equipment.wrench.IWrenchable;
 import com.zurrtum.create.foundation.block.*;
-import net.minecraft.block.*;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.block.entity.BlockEntityTicker;
-import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.BlockItem;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.ItemUsageContext;
-import net.minecraft.sound.BlockSoundGroup;
-import net.minecraft.sound.SoundCategory;
-import net.minecraft.sound.SoundEvents;
-import net.minecraft.state.property.Properties;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.Hand;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Direction.Axis;
-import net.minecraft.util.shape.VoxelShape;
-import net.minecraft.util.shape.VoxelShapes;
-import net.minecraft.world.*;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.Direction.Axis;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.context.UseOnContext;
+import net.minecraft.world.level.BlockAndTintGetter;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelReader;
+import net.minecraft.world.level.block.*;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityTicker;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.shapes.Shapes;
+import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.Nullable;
 
 public abstract class CopycatBlock extends Block implements IBE<CopycatBlockEntity>, IWrenchable, ResistanceControlBlock, SlipperinessControlBlock, EnchantingControlBlock, AppearanceControlBlock, SoundControlBlock, LightControlBlock {
 
-    public CopycatBlock(Settings pProperties) {
+    public CopycatBlock(Properties pProperties) {
         super(pProperties);
     }
 
     @Nullable
     @Override
-    public <S extends BlockEntity> BlockEntityTicker<S> getTicker(World p_153212_, BlockState p_153213_, BlockEntityType<S> p_153214_) {
+    public <S extends BlockEntity> BlockEntityTicker<S> getTicker(Level p_153212_, BlockState p_153213_, BlockEntityType<S> p_153214_) {
         return null;
     }
 
     @Override
-    public ActionResult onSneakWrenched(BlockState state, ItemUsageContext context) {
+    public InteractionResult onSneakWrenched(BlockState state, UseOnContext context) {
         onWrenched(state, context);
         return IWrenchable.super.onSneakWrenched(state, context);
     }
 
     @Override
-    public ActionResult onWrenched(BlockState state, ItemUsageContext context) {
+    public InteractionResult onWrenched(BlockState state, UseOnContext context) {
         return onBlockEntityUse(
-            context.getWorld(), context.getBlockPos(), ufte -> {
+            context.getLevel(), context.getClickedPos(), ufte -> {
                 ItemStack consumedItem = ufte.getConsumedItem();
                 if (!ufte.hasCustomMaterial())
-                    return ActionResult.PASS;
-                PlayerEntity player = context.getPlayer();
+                    return InteractionResult.PASS;
+                Player player = context.getPlayer();
                 if (!player.isCreative())
-                    player.getInventory().offerOrDrop(consumedItem);
-                context.getWorld().syncWorldEvent(WorldEvents.BLOCK_BROKEN, context.getBlockPos(), Block.getRawIdFromState(ufte.getCachedState()));
-                ufte.setMaterial(AllBlocks.COPYCAT_BASE.getDefaultState());
+                    player.getInventory().placeItemBackInInventory(consumedItem);
+                context.getLevel().levelEvent(LevelEvent.PARTICLES_DESTROY_BLOCK, context.getClickedPos(), Block.getId(ufte.getBlockState()));
+                ufte.setMaterial(AllBlocks.COPYCAT_BASE.defaultBlockState());
                 ufte.setConsumedItem(ItemStack.EMPTY);
-                return ActionResult.SUCCESS;
+                return InteractionResult.SUCCESS;
             }
         );
     }
 
     @Override
-    protected ActionResult onUseWithItem(
+    protected InteractionResult useItemOn(
         ItemStack stack,
         BlockState state,
-        World level,
+        Level level,
         BlockPos pos,
-        PlayerEntity player,
-        Hand hand,
+        Player player,
+        InteractionHand hand,
         BlockHitResult hitResult
     ) {
         if (player == null)
-            return ActionResult.PASS_TO_DEFAULT_BLOCK_ACTION;
+            return InteractionResult.TRY_WITH_EMPTY_HAND;
 
-        Direction face = hitResult.getSide();
+        Direction face = hitResult.getDirection();
         BlockState materialIn = getAcceptedBlockState(level, pos, stack, face);
 
         if (materialIn != null)
             materialIn = prepareMaterial(level, pos, state, player, hand, hitResult, materialIn);
         if (materialIn == null)
-            return ActionResult.PASS_TO_DEFAULT_BLOCK_ACTION;
+            return InteractionResult.TRY_WITH_EMPTY_HAND;
 
         BlockState material = materialIn;
         return onBlockEntityUseItemOn(
             level, pos, ufte -> {
-                if (ufte.getMaterial().isOf(material.getBlock())) {
+                if (ufte.getMaterial().is(material.getBlock())) {
                     if (!ufte.cycleMaterial())
-                        return ActionResult.PASS_TO_DEFAULT_BLOCK_ACTION;
-                    ufte.getWorld().playSound(null, ufte.getPos(), SoundEvents.ENTITY_ITEM_FRAME_ADD_ITEM, SoundCategory.BLOCKS, .75f, .95f);
-                    return ActionResult.SUCCESS;
+                        return InteractionResult.TRY_WITH_EMPTY_HAND;
+                    ufte.getLevel().playSound(null, ufte.getBlockPos(), SoundEvents.ITEM_FRAME_ADD_ITEM, SoundSource.BLOCKS, .75f, .95f);
+                    return InteractionResult.SUCCESS;
                 }
                 if (ufte.hasCustomMaterial())
-                    return ActionResult.PASS_TO_DEFAULT_BLOCK_ACTION;
-                if (level.isClient())
-                    return ActionResult.SUCCESS;
+                    return InteractionResult.TRY_WITH_EMPTY_HAND;
+                if (level.isClientSide())
+                    return InteractionResult.SUCCESS;
 
                 ufte.setMaterial(material);
                 ufte.setConsumedItem(stack);
-                ufte.getWorld().playSound(null, ufte.getPos(), material.getSoundGroup().getPlaceSound(), SoundCategory.BLOCKS, 1, .75f);
+                ufte.getLevel().playSound(null, ufte.getBlockPos(), material.getSoundType().getPlaceSound(), SoundSource.BLOCKS, 1, .75f);
 
                 if (player.isCreative())
-                    return ActionResult.SUCCESS;
+                    return InteractionResult.SUCCESS;
 
-                stack.decrement(1);
+                stack.shrink(1);
                 if (stack.isEmpty())
-                    player.setStackInHand(hand, ItemStack.EMPTY);
-                return ActionResult.SUCCESS;
+                    player.setItemInHand(hand, ItemStack.EMPTY);
+                return InteractionResult.SUCCESS;
             }
         );
     }
 
     @Override
-    public void onPlaced(World pLevel, BlockPos pPos, BlockState pState, LivingEntity pPlacer, ItemStack pStack) {
+    public void setPlacedBy(Level pLevel, BlockPos pPos, BlockState pState, LivingEntity pPlacer, ItemStack pStack) {
         if (pPlacer == null)
             return;
-        ItemStack offhandItem = pPlacer.getStackInHand(Hand.OFF_HAND);
-        BlockState appliedState = getAcceptedBlockState(pLevel, pPos, offhandItem, Direction.getEntityFacingOrder(pPlacer)[0]);
+        ItemStack offhandItem = pPlacer.getItemInHand(InteractionHand.OFF_HAND);
+        BlockState appliedState = getAcceptedBlockState(pLevel, pPos, offhandItem, Direction.orderedByNearest(pPlacer)[0]);
 
         if (appliedState == null)
             return;
@@ -133,17 +136,17 @@ public abstract class CopycatBlock extends Block implements IBE<CopycatBlockEnti
                 ufte.setMaterial(appliedState);
                 ufte.setConsumedItem(offhandItem);
 
-                if (pPlacer instanceof PlayerEntity player && player.isCreative())
+                if (pPlacer instanceof Player player && player.isCreative())
                     return;
-                offhandItem.decrement(1);
+                offhandItem.shrink(1);
                 if (offhandItem.isEmpty())
-                    pPlacer.setStackInHand(Hand.OFF_HAND, ItemStack.EMPTY);
+                    pPlacer.setItemInHand(InteractionHand.OFF_HAND, ItemStack.EMPTY);
             }
         );
     }
 
     @Nullable
-    public BlockState getAcceptedBlockState(World pLevel, BlockPos pPos, ItemStack item, Direction face) {
+    public BlockState getAcceptedBlockState(Level pLevel, BlockPos pPos, ItemStack item, Direction face) {
         if (!(item.getItem() instanceof BlockItem bi))
             return null;
 
@@ -151,21 +154,21 @@ public abstract class CopycatBlock extends Block implements IBE<CopycatBlockEnti
         if (block instanceof CopycatBlock)
             return null;
 
-        BlockState appliedState = block.getDefaultState();
+        BlockState appliedState = block.defaultBlockState();
         boolean hardCodedAllow = isAcceptedRegardless(appliedState);
 
-        if (!appliedState.isIn(AllBlockTags.COPYCAT_ALLOW) && !hardCodedAllow) {
+        if (!appliedState.is(AllBlockTags.COPYCAT_ALLOW) && !hardCodedAllow) {
 
-            if (appliedState.isIn(AllBlockTags.COPYCAT_DENY))
+            if (appliedState.is(AllBlockTags.COPYCAT_DENY))
                 return null;
-            if (block instanceof BlockEntityProvider)
+            if (block instanceof EntityBlock)
                 return null;
-            if (block instanceof StairsBlock)
+            if (block instanceof StairBlock)
                 return null;
 
             if (pLevel != null) {
-                VoxelShape shape = appliedState.getOutlineShape(pLevel, pPos);
-                if (shape.isEmpty() || !shape.getBoundingBox().equals(VoxelShapes.fullCube().getBoundingBox()))
+                VoxelShape shape = appliedState.getShape(pLevel, pPos);
+                if (shape.isEmpty() || !shape.bounds().equals(Shapes.block().bounds()))
                     return null;
 
                 VoxelShape collisionShape = appliedState.getCollisionShape(pLevel, pPos);
@@ -177,14 +180,14 @@ public abstract class CopycatBlock extends Block implements IBE<CopycatBlockEnti
         if (face != null) {
             Axis axis = face.getAxis();
 
-            if (appliedState.contains(Properties.FACING))
-                appliedState = appliedState.with(Properties.FACING, face);
-            if (appliedState.contains(Properties.HORIZONTAL_FACING) && axis != Axis.Y)
-                appliedState = appliedState.with(Properties.HORIZONTAL_FACING, face);
-            if (appliedState.contains(Properties.AXIS))
-                appliedState = appliedState.with(Properties.AXIS, axis);
-            if (appliedState.contains(Properties.HORIZONTAL_AXIS) && axis != Axis.Y)
-                appliedState = appliedState.with(Properties.HORIZONTAL_AXIS, axis);
+            if (appliedState.hasProperty(BlockStateProperties.FACING))
+                appliedState = appliedState.setValue(BlockStateProperties.FACING, face);
+            if (appliedState.hasProperty(BlockStateProperties.HORIZONTAL_FACING) && axis != Axis.Y)
+                appliedState = appliedState.setValue(BlockStateProperties.HORIZONTAL_FACING, face);
+            if (appliedState.hasProperty(BlockStateProperties.AXIS))
+                appliedState = appliedState.setValue(BlockStateProperties.AXIS, axis);
+            if (appliedState.hasProperty(BlockStateProperties.HORIZONTAL_AXIS) && axis != Axis.Y)
+                appliedState = appliedState.setValue(BlockStateProperties.HORIZONTAL_AXIS, axis);
         }
 
         return appliedState;
@@ -195,11 +198,11 @@ public abstract class CopycatBlock extends Block implements IBE<CopycatBlockEnti
     }
 
     public BlockState prepareMaterial(
-        World pLevel,
+        Level pLevel,
         BlockPos pPos,
         BlockState pState,
-        PlayerEntity pPlayer,
-        Hand pHand,
+        Player pPlayer,
+        InteractionHand pHand,
         BlockHitResult pHit,
         BlockState material
     ) {
@@ -207,8 +210,8 @@ public abstract class CopycatBlock extends Block implements IBE<CopycatBlockEnti
     }
 
     @Override
-    public BlockState onBreak(World pLevel, BlockPos pPos, BlockState pState, PlayerEntity pPlayer) {
-        super.onBreak(pLevel, pPos, pState, pPlayer);
+    public BlockState playerWillDestroy(Level pLevel, BlockPos pPos, BlockState pState, Player pPlayer) {
+        super.playerWillDestroy(pLevel, pPos, pState, pPlayer);
         if (pPlayer.isCreative())
             withBlockEntityDo(pLevel, pPos, ufte -> ufte.setConsumedItem(ItemStack.EMPTY));
         return pState;
@@ -229,7 +232,7 @@ public abstract class CopycatBlock extends Block implements IBE<CopycatBlockEnti
     @Override
     public BlockState getAppearance(
         BlockState state,
-        BlockRenderView level,
+        BlockAndTintGetter level,
         BlockPos pos,
         Direction side,
         @Nullable BlockState queryState,
@@ -239,11 +242,11 @@ public abstract class CopycatBlock extends Block implements IBE<CopycatBlockEnti
             return state;
 
         BlockState material = getMaterial(level, pos);
-        return material != null ? material : AllBlocks.COPYCAT_BASE.getDefaultState();
+        return material != null ? material : AllBlocks.COPYCAT_BASE.defaultBlockState();
     }
 
     public boolean isIgnoredConnectivitySide(
-        BlockRenderView reader,
+        BlockAndTintGetter reader,
         BlockState state,
         Direction face,
         @Nullable BlockPos fromPos,
@@ -252,14 +255,14 @@ public abstract class CopycatBlock extends Block implements IBE<CopycatBlockEnti
         return false;
     }
 
-    public abstract boolean canConnectTexturesToward(BlockRenderView reader, BlockPos fromPos, BlockPos toPos, BlockState state);
+    public abstract boolean canConnectTexturesToward(BlockAndTintGetter reader, BlockPos fromPos, BlockPos toPos, BlockState state);
 
     //
 
-    public static BlockState getMaterial(BlockView reader, BlockPos targetPos) {
+    public static BlockState getMaterial(BlockGetter reader, BlockPos targetPos) {
         if (reader.getBlockEntity(targetPos) instanceof CopycatBlockEntity cbe)
             return cbe.getMaterial();
-        return Blocks.AIR.getDefaultState();
+        return Blocks.AIR.defaultBlockState();
     }
 
     public boolean canFaceBeOccluded(BlockState state, Direction face) {
@@ -273,51 +276,51 @@ public abstract class CopycatBlock extends Block implements IBE<CopycatBlockEnti
     // Wrapped properties
 
     @Override
-    public BlockSoundGroup getSoundGroup(WorldView level, BlockPos pos) {
-        return getMaterial(level, pos).getSoundGroup();
+    public SoundType getSoundGroup(LevelReader level, BlockPos pos) {
+        return getMaterial(level, pos).getSoundType();
     }
 
     @Override
-    public float getSlipperiness(WorldView world, BlockPos pos) {
+    public float getSlipperiness(LevelReader world, BlockPos pos) {
         BlockState state = getMaterial(world, pos);
         Block material = state.getBlock();
         if (material instanceof SlipperinessControlBlock block) {
             return block.getSlipperiness(world, pos);
         }
-        return material.getSlipperiness();
+        return material.getFriction();
     }
 
     @Override
-    public int getLuminance(BlockView world, BlockPos pos) {
-        return getMaterial(world, pos).getLuminance();
+    public int getLuminance(BlockGetter world, BlockPos pos) {
+        return getMaterial(world, pos).getLightEmission();
     }
 
     @Override
-    public float getResistance(BlockView level, BlockPos pos) {
-        return getMaterial(level, pos).getBlock().getBlastResistance();
+    public float getResistance(BlockGetter level, BlockPos pos) {
+        return getMaterial(level, pos).getBlock().getExplosionResistance();
     }
 
     @Override
-    protected ItemStack getPickStack(WorldView level, BlockPos pos, BlockState state, boolean includeData) {
+    protected ItemStack getCloneItemStack(LevelReader level, BlockPos pos, BlockState state, boolean includeData) {
         BlockState material = getMaterial(level, pos);
-        if (material.isOf(AllBlocks.COPYCAT_BASE))
+        if (material.is(AllBlocks.COPYCAT_BASE))
             return new ItemStack(this);
-        return material.getPickStack(level, pos, includeData);
+        return material.getCloneItemStack(level, pos, includeData);
     }
 
     @Override
-    public BlockState getEnchantmentPowerProvider(World world, BlockPos pos) {
+    public BlockState getEnchantmentPowerProvider(Level world, BlockPos pos) {
         return getMaterial(world, pos);
     }
 
     @Override
-    public void onLandedUpon(World pLevel, BlockState pState, BlockPos pPos, Entity pEntity, double p_152430_) {
+    public void fallOn(Level pLevel, BlockState pState, BlockPos pPos, Entity pEntity, double p_152430_) {
         BlockState material = getMaterial(pLevel, pPos);
-        material.getBlock().onLandedUpon(pLevel, material, pPos, pEntity, p_152430_);
+        material.getBlock().fallOn(pLevel, material, pPos, pEntity, p_152430_);
     }
 
     @Override
-    public float calcBlockBreakingDelta(BlockState pState, PlayerEntity pPlayer, BlockView pLevel, BlockPos pPos) {
-        return getMaterial(pLevel, pPos).calcBlockBreakingDelta(pPlayer, pLevel, pPos);
+    public float getDestroyProgress(BlockState pState, Player pPlayer, BlockGetter pLevel, BlockPos pPos) {
+        return getMaterial(pLevel, pPos).getDestroyProgress(pPlayer, pLevel, pPos);
     }
 }

@@ -3,19 +3,19 @@ package com.zurrtum.create.infrastructure.packet.s2c;
 import com.zurrtum.create.AllClientHandle;
 import com.zurrtum.create.AllPackets;
 import io.netty.buffer.ByteBuf;
-import net.minecraft.network.codec.PacketCodec;
-import net.minecraft.network.codec.PacketCodecs;
-import net.minecraft.network.packet.PacketType;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.PacketType;
 import org.apache.logging.log4j.util.TriConsumer;
 
 public record SoulPulseEffectPacket(BlockPos pos, int distance, boolean canOverlap) implements S2CPacket {
-    public static final PacketCodec<ByteBuf, SoulPulseEffectPacket> CODEC = PacketCodec.tuple(
-        BlockPos.PACKET_CODEC,
+    public static final StreamCodec<ByteBuf, SoulPulseEffectPacket> CODEC = StreamCodec.composite(
+        BlockPos.STREAM_CODEC,
         SoulPulseEffectPacket::pos,
-        PacketCodecs.INTEGER,
+        ByteBufCodecs.INT,
         SoulPulseEffectPacket::distance,
-        PacketCodecs.BOOLEAN,
+        ByteBufCodecs.BOOL,
         SoulPulseEffectPacket::canOverlap,
         SoulPulseEffectPacket::new
     );
@@ -26,7 +26,7 @@ public record SoulPulseEffectPacket(BlockPos pos, int distance, boolean canOverl
     }
 
     @Override
-    public PacketType<SoulPulseEffectPacket> getPacketType() {
+    public PacketType<SoulPulseEffectPacket> type() {
         return AllPackets.SOUL_PULSE;
     }
 }

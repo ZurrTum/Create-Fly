@@ -1,21 +1,21 @@
 package com.zurrtum.create.client.foundation.blockEntity.renderer;
 
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.zurrtum.create.client.catnip.render.SuperByteBuffer;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.client.render.RenderLayer;
-import net.minecraft.client.render.VertexConsumer;
-import net.minecraft.client.render.block.entity.BlockEntityRenderer;
-import net.minecraft.client.render.block.entity.BlockEntityRendererFactory;
-import net.minecraft.client.render.block.entity.state.BlockEntityRenderState;
-import net.minecraft.client.render.command.ModelCommandRenderer;
-import net.minecraft.client.render.command.OrderedRenderCommandQueue;
-import net.minecraft.client.render.state.CameraRenderState;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.SubmitNodeCollector;
+import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
+import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
+import net.minecraft.client.renderer.blockentity.state.BlockEntityRenderState;
+import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
+import net.minecraft.client.renderer.state.CameraRenderState;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 
 public abstract class ColoredOverlayBlockEntityRenderer<T extends BlockEntity> implements BlockEntityRenderer<T, ColoredOverlayBlockEntityRenderer.ColoredOverlayRenderState> {
-    public ColoredOverlayBlockEntityRenderer(BlockEntityRendererFactory.Context context) {
+    public ColoredOverlayBlockEntityRenderer(BlockEntityRendererProvider.Context context) {
     }
 
     @Override
@@ -24,36 +24,36 @@ public abstract class ColoredOverlayBlockEntityRenderer<T extends BlockEntity> i
     }
 
     @Override
-    public void updateRenderState(
+    public void extractRenderState(
         T be,
         ColoredOverlayRenderState state,
         float tickProgress,
-        Vec3d cameraPos,
-        @Nullable ModelCommandRenderer.CrumblingOverlayCommand crumblingOverlay
+        Vec3 cameraPos,
+        @Nullable ModelFeatureRenderer.CrumblingOverlay crumblingOverlay
     ) {
-        BlockEntityRenderState.updateBlockEntityRenderState(be, state, crumblingOverlay);
-        state.layer = RenderLayer.getSolid();
+        BlockEntityRenderState.extractBase(be, state, crumblingOverlay);
+        state.layer = RenderType.solid();
         state.model = getOverlayBuffer(be, state);
         state.color = getColor(be, tickProgress);
     }
 
     @Override
-    public void render(ColoredOverlayRenderState state, MatrixStack matrices, OrderedRenderCommandQueue queue, CameraRenderState cameraState) {
-        queue.submitCustom(matrices, state.layer, state);
+    public void submit(ColoredOverlayRenderState state, PoseStack matrices, SubmitNodeCollector queue, CameraRenderState cameraState) {
+        queue.submitCustomGeometry(matrices, state.layer, state);
     }
 
     protected abstract int getColor(T be, float partialTicks);
 
     protected abstract SuperByteBuffer getOverlayBuffer(T be, ColoredOverlayRenderState state);
 
-    public static class ColoredOverlayRenderState extends BlockEntityRenderState implements OrderedRenderCommandQueue.Custom {
-        public RenderLayer layer;
+    public static class ColoredOverlayRenderState extends BlockEntityRenderState implements SubmitNodeCollector.CustomGeometryRenderer {
+        public RenderType layer;
         public SuperByteBuffer model;
         public int color;
 
         @Override
-        public void render(MatrixStack.Entry matricesEntry, VertexConsumer vertexConsumer) {
-            model.color(color).light(lightmapCoordinates).renderInto(matricesEntry, vertexConsumer);
+        public void render(PoseStack.Pose matricesEntry, VertexConsumer vertexConsumer) {
+            model.color(color).light(lightCoords).renderInto(matricesEntry, vertexConsumer);
         }
     }
 }

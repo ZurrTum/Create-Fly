@@ -2,29 +2,29 @@ package com.zurrtum.create.content.logistics.item.filter.attribute;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
-import net.minecraft.item.ItemStack;
-import net.minecraft.network.RegistryByteBuf;
-import net.minecraft.network.codec.PacketCodec;
-import net.minecraft.world.World;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 import java.util.function.BiPredicate;
 import java.util.function.Function;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
 
 public final class SingletonItemAttribute implements ItemAttribute {
     private final Type type;
-    private final BiPredicate<ItemStack, World> predicate;
+    private final BiPredicate<ItemStack, Level> predicate;
     private final String translationKey;
 
-    public SingletonItemAttribute(Type type, BiPredicate<ItemStack, World> predicate, String translationKey) {
+    public SingletonItemAttribute(Type type, BiPredicate<ItemStack, Level> predicate, String translationKey) {
         this.type = type;
         this.predicate = predicate;
         this.translationKey = translationKey;
     }
 
     @Override
-    public boolean appliesTo(ItemStack stack, World world) {
+    public boolean appliesTo(ItemStack stack, Level world) {
         return predicate.test(stack, world);
     }
 
@@ -51,7 +51,7 @@ public final class SingletonItemAttribute implements ItemAttribute {
         }
 
         @Override
-        public List<ItemAttribute> getAllAttributes(ItemStack stack, World level) {
+        public List<ItemAttribute> getAllAttributes(ItemStack stack, Level level) {
             if (attribute.appliesTo(stack, level)) {
                 return List.of(attribute);
             }
@@ -64,8 +64,8 @@ public final class SingletonItemAttribute implements ItemAttribute {
         }
 
         @Override
-        public PacketCodec<? super RegistryByteBuf, ? extends ItemAttribute> packetCodec() {
-            return PacketCodec.unit(attribute);
+        public StreamCodec<? super RegistryFriendlyByteBuf, ? extends ItemAttribute> packetCodec() {
+            return StreamCodec.unit(attribute);
         }
     }
 }

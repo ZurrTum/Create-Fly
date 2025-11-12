@@ -29,16 +29,6 @@ import com.zurrtum.create.client.flywheel.lib.task.SimplePlan;
 import com.zurrtum.create.client.flywheel.lib.util.LevelAttached;
 import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
 import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.BlockBreakingInfo;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.ChunkSectionPos;
-import net.minecraft.util.math.Vec3i;
-import net.minecraft.world.LightType;
-import net.minecraft.world.World;
-import net.minecraft.world.WorldAccess;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.Nullable;
 import org.joml.FrustumIntersection;
@@ -47,6 +37,16 @@ import org.joml.Matrix4f;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.SortedSet;
+import net.minecraft.client.Minecraft;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.SectionPos;
+import net.minecraft.core.Vec3i;
+import net.minecraft.server.level.BlockDestructionProgress;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.LightLayer;
+import net.minecraft.world.level.block.entity.BlockEntity;
 
 /**
  * A manager class for a single level where visualization is supported.
@@ -60,7 +60,7 @@ public class VisualizationManagerImpl implements VisualizationManager {
     private final TaskExecutorImpl taskExecutor;
     private final DistanceUpdateLimiterImpl frameLimiter;
     private final RenderDispatcherImpl renderDispatcher = new RenderDispatcherImpl();
-    private final WorldAccess level;
+    private final LevelAccessor level;
 
     // VisualizationManagerImpl can (and should!) be constructed off of the main thread, but it may be
     // difficult for engines to avoid OpenGL calls which would not be safe. Shove all the init logic
@@ -75,7 +75,7 @@ public class VisualizationManagerImpl implements VisualizationManager {
     private final Flag frameFlag = new Flag("frame");
     private final Flag tickFlag = new Flag("tick");
 
-    private VisualizationManagerImpl(WorldAccess level) {
+    private VisualizationManagerImpl(LevelAccessor level) {
         this.level = level;
         taskExecutor = FlwTaskExecutor.get();
         frameLimiter = createUpdateLimiter();
@@ -84,8 +84,8 @@ public class VisualizationManagerImpl implements VisualizationManager {
         entities = new VisualManagerImpl<>(new EntityStorage());
         effects = new VisualManagerImpl<>(new EffectStorage());
 
-        if (level instanceof World l) {
-            l.getEntityLookup().iterate().forEach(entities::queueAdd);
+        if (level instanceof Level l) {
+            l.getEntities().getAll().forEach(entities::queueAdd);
         }
     }
 
@@ -95,7 +95,7 @@ public class VisualizationManagerImpl implements VisualizationManager {
         private final Plan<RenderContext> framePlan;
         private final Plan<TickableVisual.Context> tickPlan;
 
-        private LateInit(WorldAccess level) {
+        private LateInit(LevelAccessor level) {
             engine = BackendManager.currentBackend().createEngine(level);
 
             var visualizationContext = engine.createVisualizationContext();
@@ -132,7 +132,7 @@ public class VisualizationManagerImpl implements VisualizationManager {
 
         private DynamicVisual.Context createVisualFrameContext(RenderContext ctx) {
             Vec3i renderOrigin = engine.renderOrigin();
-            var cameraPos = ctx.camera().getPos();
+            var cameraPos = ctx.camera().getPosition();
 
             Matrix4f viewProjection = new Matrix4f(ctx.viewProjection());
             viewProjection.translate(
@@ -163,7 +163,7 @@ public class VisualizationManagerImpl implements VisualizationManager {
     }
 
     @Contract("null -> false")
-    public static boolean supportsVisualization(@Nullable WorldAccess level) {
+    public static boolean supportsVisualization(@Nullable LevelAccessor level) {
         if (!BackendManager.isBackendOn()) {
             return false;
         }
@@ -172,7 +172,7 @@ public class VisualizationManagerImpl implements VisualizationManager {
             return false;
         }
 
-        if (!level.isClient()) {
+        if (!level.isClientSide()) {
             return false;
         }
 
@@ -180,11 +180,11 @@ public class VisualizationManagerImpl implements VisualizationManager {
             return true;
         }
 
-        return level == MinecraftClient.getInstance().world;
+        return level == Minecraft.getInstance().level;
     }
 
     @Nullable
-    public static VisualizationManagerImpl get(@Nullable WorldAccess level) {
+    public static VisualizationManagerImpl get(@Nullable LevelAccessor level) {
         if (!supportsVisualization(level)) {
             return null;
         }
@@ -192,7 +192,7 @@ public class VisualizationManagerImpl implements VisualizationManager {
         return MANAGERS.get(level);
     }
 
-    public static VisualizationManagerImpl getOrThrow(@Nullable WorldAccess level) {
+    public static VisualizationManagerImpl getOrThrow(@Nullable LevelAccessor level) {
         if (!supportsVisualization(level)) {
             throw new IllegalStateException("Cannot retrieve visualization manager when visualization is not supported by level '" + level + "'!");
         }
@@ -202,7 +202,7 @@ public class VisualizationManagerImpl implements VisualizationManager {
 
     // TODO: Consider making these reset actions reuse the existing game objects instead of re-adding them
     //  potentially by keeping the same VisualizationManagerImpl and deleting the engine and visuals but not the game objects
-    public static void reset(WorldAccess level) {
+    public static void reset(LevelAccessor level) {
         MANAGERS.remove(level);
     }
 
@@ -276,7 +276,7 @@ public class VisualizationManagerImpl implements VisualizationManager {
         lateInit().engine.render(context);
     }
 
-    private void renderCrumbling(RenderContext context, Long2ObjectMap<SortedSet<BlockBreakingInfo>> destructionProgress) {
+    private void renderCrumbling(RenderContext context, Long2ObjectMap<SortedSet<BlockDestructionProgress>> destructionProgress) {
         if (destructionProgress.isEmpty()) {
             return;
         }
@@ -312,7 +312,7 @@ public class VisualizationManagerImpl implements VisualizationManager {
 
             var maxDestruction = set.last();
 
-            crumblingBlocks.add(new CrumblingBlockImpl(maxDestruction.getPos(), maxDestruction.getStage(), instances));
+            crumblingBlocks.add(new CrumblingBlockImpl(maxDestruction.getPos(), maxDestruction.getProgress(), instances));
         }
 
         if (!crumblingBlocks.isEmpty()) {
@@ -320,7 +320,7 @@ public class VisualizationManagerImpl implements VisualizationManager {
         }
     }
 
-    public void onLightUpdate(ChunkSectionPos sectionPos, LightType layer) {
+    public void onLightUpdate(SectionPos sectionPos, LightLayer layer) {
         lateInit().engine.onLightUpdate(sectionPos, layer);
         long longPos = sectionPos.asLong();
         blockEntities.onLightUpdate(longPos);
@@ -372,7 +372,7 @@ public class VisualizationManagerImpl implements VisualizationManager {
         }
 
         @Override
-        public void beforeCrumbling(RenderContext ctx, Long2ObjectMap<SortedSet<BlockBreakingInfo>> destructionProgress) {
+        public void beforeCrumbling(RenderContext ctx, Long2ObjectMap<SortedSet<BlockDestructionProgress>> destructionProgress) {
             renderCrumbling(ctx, destructionProgress);
         }
     }

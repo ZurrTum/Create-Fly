@@ -3,12 +3,12 @@ package com.zurrtum.create.content.kinetics.crank;
 import com.zurrtum.create.AllBlockEntityTypes;
 import com.zurrtum.create.AllBlocks;
 import com.zurrtum.create.content.kinetics.base.GeneratingKineticBlockEntity;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.storage.ReadView;
-import net.minecraft.storage.WriteView;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 
 public class HandCrankBlockEntity extends GeneratingKineticBlockEntity {
 
@@ -33,17 +33,17 @@ public class HandCrankBlockEntity extends GeneratingKineticBlockEntity {
 
         inUse = 10;
         this.backwards = back;
-        if (update && !world.isClient())
+        if (update && !level.isClientSide())
             updateGeneratedRotation();
     }
 
     @Override
     public float getGeneratedSpeed() {
-        Block block = getCachedState().getBlock();
+        Block block = getBlockState().getBlock();
         if (!(block instanceof HandCrankBlock crank))
             return 0;
         int speed = (inUse == 0 ? 0 : clockwise() ? -1 : 1) * crank.getRotationSpeed();
-        return convertToDirection(speed, getCachedState().get(HandCrankBlock.FACING));
+        return convertToDirection(speed, getBlockState().getValue(HandCrankBlock.FACING));
     }
 
     protected boolean clockwise() {
@@ -51,16 +51,16 @@ public class HandCrankBlockEntity extends GeneratingKineticBlockEntity {
     }
 
     @Override
-    public void write(WriteView view, boolean clientPacket) {
+    public void write(ValueOutput view, boolean clientPacket) {
         view.putInt("InUse", inUse);
         view.putBoolean("Backwards", backwards);
         super.write(view, clientPacket);
     }
 
     @Override
-    protected void read(ReadView view, boolean clientPacket) {
-        inUse = view.getInt("InUse", 0);
-        backwards = view.getBoolean("Backwards", false);
+    protected void read(ValueInput view, boolean clientPacket) {
+        inUse = view.getIntOr("InUse", 0);
+        backwards = view.getBooleanOr("Backwards", false);
         super.read(view, clientPacket);
     }
 
@@ -75,7 +75,7 @@ public class HandCrankBlockEntity extends GeneratingKineticBlockEntity {
         if (inUse > 0) {
             inUse--;
 
-            if (inUse == 0 && !world.isClient()) {
+            if (inUse == 0 && !level.isClientSide()) {
                 sequenceContext = null;
                 updateGeneratedRotation();
             }
@@ -84,7 +84,7 @@ public class HandCrankBlockEntity extends GeneratingKineticBlockEntity {
 
     @Override
     protected Block getStressConfigKey() {
-        return getCachedState().isOf(AllBlocks.HAND_CRANK) ? AllBlocks.HAND_CRANK : AllBlocks.COPPER_VALVE_HANDLE;
+        return getBlockState().is(AllBlocks.HAND_CRANK) ? AllBlocks.HAND_CRANK : AllBlocks.COPPER_VALVE_HANDLE;
     }
 
 }

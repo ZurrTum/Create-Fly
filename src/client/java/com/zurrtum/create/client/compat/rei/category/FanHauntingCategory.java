@@ -16,10 +16,10 @@ import me.shedaniel.rei.api.client.gui.widgets.Widget;
 import me.shedaniel.rei.api.client.gui.widgets.Widgets;
 import me.shedaniel.rei.api.common.category.CategoryIdentifier;
 import me.shedaniel.rei.api.common.entry.EntryIngredient;
-import net.minecraft.block.Blocks;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.item.Items;
-import net.minecraft.text.Text;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.level.block.Blocks;
 import org.joml.Matrix3x2f;
 
 import java.util.ArrayList;
@@ -32,7 +32,7 @@ public class FanHauntingCategory extends CreateCategory<FanHauntingDisplay> {
     }
 
     @Override
-    public Text getTitle() {
+    public Component getTitle() {
         return CreateLang.translateDirect("recipe.fan_haunting");
     }
 
@@ -62,17 +62,17 @@ public class FanHauntingCategory extends CreateCategory<FanHauntingDisplay> {
                 addOutputData(results.get(i), left + xOffset, top + yOffset, outputs, outputIngredients, chances, chanceIngredients);
             }
         }
-        widgets.add(Widgets.createDrawableWidget((DrawContext graphics, int mouseX, int mouseY, float delta) -> {
+        widgets.add(Widgets.createDrawableWidget((GuiGraphics graphics, int mouseX, int mouseY, float delta) -> {
             drawSlotBackground(graphics, outputs, input);
             drawChanceSlotBackground(graphics, chances);
             AllGuiTextures.JEI_SHADOW.render(graphics, bounds.x + 51, bounds.y + 32);
             AllGuiTextures.JEI_LIGHT.render(graphics, bounds.x + 70, bounds.y + 44);
             AllGuiTextures.JEI_LONG_ARROW.render(graphics, bounds.x + 59 + 7 * xOffsetAmount, bounds.y + 56);
-            graphics.state.addSpecialElement(new FanRenderState(
-                new Matrix3x2f(graphics.getMatrices()),
+            graphics.guiRenderState.submitPicturesInPictureState(new FanRenderState(
+                new Matrix3x2f(graphics.pose()),
                 bounds.x + 61,
                 bounds.y + 9,
-                Blocks.SOUL_FIRE.getDefaultState()
+                Blocks.SOUL_FIRE.defaultBlockState()
             ));
         }));
         widgets.add(createInputSlot(input).entries(display.input()));

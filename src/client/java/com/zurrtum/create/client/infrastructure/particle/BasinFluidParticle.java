@@ -7,31 +7,31 @@ import com.zurrtum.create.client.infrastructure.fluid.FluidConfig;
 import com.zurrtum.create.content.processing.basin.BasinBlock;
 import com.zurrtum.create.content.processing.basin.BasinBlockEntity;
 import com.zurrtum.create.infrastructure.particle.FluidParticleData;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.client.particle.BillboardParticleSubmittable;
+import net.minecraft.client.Camera;
+import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.particle.Particle;
-import net.minecraft.client.particle.ParticleFactory;
-import net.minecraft.client.render.Camera;
-import net.minecraft.client.render.LightmapTextureManager;
-import net.minecraft.client.world.ClientWorld;
-import net.minecraft.component.ComponentChanges;
-import net.minecraft.fluid.Fluid;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.math.random.Random;
+import net.minecraft.client.particle.ParticleProvider;
+import net.minecraft.client.renderer.LightTexture;
+import net.minecraft.client.renderer.state.QuadParticleRenderState;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.component.DataComponentPatch;
+import net.minecraft.util.Mth;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.material.Fluid;
+import net.minecraft.world.phys.Vec3;
 import org.joml.Quaternionf;
 
 public class BasinFluidParticle extends FluidParticle {
     BlockPos basinPos;
-    Vec3d targetPos;
-    Vec3d centerOfBasin;
+    Vec3 targetPos;
+    Vec3 centerOfBasin;
     float yOffset;
 
     public BasinFluidParticle(
-        ClientWorld world,
+        ClientLevel world,
         Fluid fluid,
-        ComponentChanges components,
+        DataComponentPatch components,
         FluidConfig config,
         double x,
         double y,
@@ -39,56 +39,56 @@ public class BasinFluidParticle extends FluidParticle {
         double vx,
         double vy,
         double vz,
-        Random random
+        RandomSource random
     ) {
         super(world, fluid, components, config, x, y, z, vx, vy, vz, random);
-        gravityStrength = 0;
-        velocityX = 0;
-        velocityY = 0;
-        velocityZ = 0;
+        gravity = 0;
+        xd = 0;
+        yd = 0;
+        zd = 0;
         yOffset = random.nextFloat() * 1 / 32f;
         y += yOffset;
-        scale = 0;
-        maxAge = 60;
-        Vec3d currentPos = new Vec3d(x, y, z);
-        basinPos = BlockPos.ofFloored(currentPos);
+        quadSize = 0;
+        lifetime = 60;
+        Vec3 currentPos = new Vec3(x, y, z);
+        basinPos = BlockPos.containing(currentPos);
         centerOfBasin = VecHelper.getCenterOf(basinPos);
 
         if (vx != 0) {
-            maxAge = 20;
-            Vec3d centerOf = VecHelper.getCenterOf(basinPos);
-            Vec3d diff = currentPos.subtract(centerOf).multiply(1, 0, 1).normalize().multiply(.375);
+            lifetime = 20;
+            Vec3 centerOf = VecHelper.getCenterOf(basinPos);
+            Vec3 diff = currentPos.subtract(centerOf).multiply(1, 0, 1).normalize().scale(.375);
             targetPos = centerOf.add(diff);
-            lastX = this.x = centerOfBasin.x;
-            lastZ = this.z = centerOfBasin.z;
+            xo = this.x = centerOfBasin.x;
+            zo = this.z = centerOfBasin.z;
         }
     }
 
     @Override
     public void tick() {
         super.tick();
-        scale = targetPos != null ? Math.max(1 / 32f, ((1f * age) / maxAge) / 8) : 1 / 8f * (1 - ((Math.abs(age - (maxAge / 2)) / (1f * maxAge))));
+        quadSize = targetPos != null ? Math.max(1 / 32f, ((1f * age) / lifetime) / 8) : 1 / 8f * (1 - ((Math.abs(age - (lifetime / 2)) / (1f * lifetime))));
 
         if (age % 2 == 0) {
-            if (!world.getBlockState(basinPos).isOf(AllBlocks.BASIN) && !BasinBlock.isBasin(world, basinPos)) {
-                markDead();
+            if (!level.getBlockState(basinPos).is(AllBlocks.BASIN) && !BasinBlock.isBasin(level, basinPos)) {
+                remove();
                 return;
             }
 
-            BlockEntity blockEntity = world.getBlockEntity(basinPos);
+            BlockEntity blockEntity = level.getBlockEntity(basinPos);
             if (blockEntity instanceof BasinBlockEntity) {
                 float totalUnits = ((BasinBlockEntity) blockEntity).getTotalFluidUnits(0);
                 if (totalUnits < 1)
                     totalUnits = 0;
-                float fluidLevel = MathHelper.clamp(totalUnits / 162000, 0, 1);
+                float fluidLevel = Mth.clamp(totalUnits / 162000, 0, 1);
                 y = 2 / 16f + basinPos.getY() + 12 / 16f * fluidLevel + yOffset;
             }
 
         }
 
         if (targetPos != null) {
-            float progess = (1f * age) / maxAge;
-            Vec3d currentPos = centerOfBasin.add(targetPos.subtract(centerOfBasin).multiply(progess));
+            float progess = (1f * age) / lifetime;
+            Vec3 currentPos = centerOfBasin.add(targetPos.subtract(centerOfBasin).scale(progess));
             x = currentPos.x;
             z = currentPos.z;
         }
@@ -100,17 +100,17 @@ public class BasinFluidParticle extends FluidParticle {
     }
 
     @Override
-    protected int getBrightness(float p_189214_1_) {
-        return LightmapTextureManager.MAX_LIGHT_COORDINATE;
+    protected int getLightColor(float p_189214_1_) {
+        return LightTexture.FULL_BRIGHT;
     }
 
     @Override
-    public void render(BillboardParticleSubmittable submittable, Camera info, float pt) {
-        Quaternionf rotation = info.getRotation();
+    public void extract(QuadParticleRenderState submittable, Camera info, float pt) {
+        Quaternionf rotation = info.rotation();
         Quaternionf prevRotation = new Quaternionf(rotation);
         rotation.set(-1, 0, 0, 1);
         rotation.normalize();
-        super.render(submittable, info, pt);
+        super.extract(submittable, info, pt);
         rotation.set(0, 0, 0, 1);
         rotation.mul(prevRotation);
     }
@@ -120,18 +120,18 @@ public class BasinFluidParticle extends FluidParticle {
         return false;
     }
 
-    public static class Factory implements ParticleFactory<FluidParticleData> {
+    public static class Factory implements ParticleProvider<FluidParticleData> {
         @Override
         public Particle createParticle(
             FluidParticleData data,
-            ClientWorld world,
+            ClientLevel world,
             double x,
             double y,
             double z,
             double vx,
             double vy,
             double vz,
-            Random random
+            RandomSource random
         ) {
             FluidConfig config = AllFluidConfigs.get(data.fluid());
             if (config == null) {

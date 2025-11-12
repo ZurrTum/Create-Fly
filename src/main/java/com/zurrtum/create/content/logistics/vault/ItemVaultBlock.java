@@ -7,43 +7,43 @@ import com.zurrtum.create.content.equipment.wrench.IWrenchable;
 import com.zurrtum.create.foundation.block.IBE;
 import com.zurrtum.create.foundation.item.ItemHelper;
 import com.zurrtum.create.infrastructure.items.ItemInventoryProvider;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.inventory.Inventory;
-import net.minecraft.item.ItemPlacementContext;
-import net.minecraft.item.ItemUsageContext;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.state.StateManager.Builder;
-import net.minecraft.state.property.BooleanProperty;
-import net.minecraft.state.property.EnumProperty;
-import net.minecraft.state.property.Properties;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.BlockMirror;
-import net.minecraft.util.BlockRotation;
-import net.minecraft.util.ItemScatterer;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Direction.Axis;
-import net.minecraft.util.math.Direction.AxisDirection;
-import net.minecraft.world.World;
-import net.minecraft.world.WorldAccess;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.Direction.Axis;
+import net.minecraft.core.Direction.AxisDirection;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.Container;
+import net.minecraft.world.Containers;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.item.context.UseOnContext;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Mirror;
+import net.minecraft.world.level.block.Rotation;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition.Builder;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.block.state.properties.BooleanProperty;
+import net.minecraft.world.level.block.state.properties.EnumProperty;
 import org.jetbrains.annotations.Nullable;
 
 public class ItemVaultBlock extends Block implements IWrenchable, IBE<ItemVaultBlockEntity>, ItemInventoryProvider<ItemVaultBlockEntity> {
 
-    public static final EnumProperty<Axis> HORIZONTAL_AXIS = Properties.HORIZONTAL_AXIS;
-    public static final BooleanProperty LARGE = BooleanProperty.of("large");
+    public static final EnumProperty<Axis> HORIZONTAL_AXIS = BlockStateProperties.HORIZONTAL_AXIS;
+    public static final BooleanProperty LARGE = BooleanProperty.create("large");
 
-    public ItemVaultBlock(Settings p_i48440_1_) {
+    public ItemVaultBlock(Properties p_i48440_1_) {
         super(p_i48440_1_);
-        setDefaultState(getDefaultState().with(LARGE, false));
+        registerDefaultState(defaultBlockState().setValue(LARGE, false));
     }
 
-    public Inventory getInventory(WorldAccess world, BlockPos pos, BlockState state, ItemVaultBlockEntity blockEntity, Direction context) {
+    public Container getInventory(LevelAccessor world, BlockPos pos, BlockState state, ItemVaultBlockEntity blockEntity, Direction context) {
         if (blockEntity.itemCapability != null) {
-            Inventory inventory = blockEntity.itemCapability.get();
+            Container inventory = blockEntity.itemCapability.get();
             if (inventory != null) {
                 return inventory;
             }
@@ -53,24 +53,24 @@ public class ItemVaultBlock extends Block implements IWrenchable, IBE<ItemVaultB
     }
 
     @Override
-    protected void appendProperties(Builder<Block, BlockState> pBuilder) {
+    protected void createBlockStateDefinition(Builder<Block, BlockState> pBuilder) {
         pBuilder.add(HORIZONTAL_AXIS, LARGE);
-        super.appendProperties(pBuilder);
+        super.createBlockStateDefinition(pBuilder);
     }
 
     @Override
-    public BlockState getPlacementState(ItemPlacementContext pContext) {
-        if (pContext.getPlayer() == null || !pContext.getPlayer().isSneaking()) {
-            BlockState placedOn = pContext.getWorld().getBlockState(pContext.getBlockPos().offset(pContext.getSide().getOpposite()));
+    public BlockState getStateForPlacement(BlockPlaceContext pContext) {
+        if (pContext.getPlayer() == null || !pContext.getPlayer().isShiftKeyDown()) {
+            BlockState placedOn = pContext.getLevel().getBlockState(pContext.getClickedPos().relative(pContext.getClickedFace().getOpposite()));
             Axis preferredAxis = getVaultBlockAxis(placedOn);
             if (preferredAxis != null)
-                return this.getDefaultState().with(HORIZONTAL_AXIS, preferredAxis);
+                return this.defaultBlockState().setValue(HORIZONTAL_AXIS, preferredAxis);
         }
-        return this.getDefaultState().with(HORIZONTAL_AXIS, pContext.getHorizontalPlayerFacing().getAxis());
+        return this.defaultBlockState().setValue(HORIZONTAL_AXIS, pContext.getHorizontalDirection().getAxis());
     }
 
     @Override
-    public void onBlockAdded(BlockState pState, World pLevel, BlockPos pPos, BlockState pOldState, boolean pIsMoving) {
+    public void onPlace(BlockState pState, Level pLevel, BlockPos pPos, BlockState pOldState, boolean pIsMoving) {
         if (pOldState.getBlock() == pState.getBlock())
             return;
         if (pIsMoving)
@@ -79,65 +79,65 @@ public class ItemVaultBlock extends Block implements IWrenchable, IBE<ItemVaultB
     }
 
     @Override
-    public ActionResult onWrenched(BlockState state, ItemUsageContext context) {
-        if (context.getSide().getAxis().isVertical()) {
-            BlockEntity be = context.getWorld().getBlockEntity(context.getBlockPos());
+    public InteractionResult onWrenched(BlockState state, UseOnContext context) {
+        if (context.getClickedFace().getAxis().isVertical()) {
+            BlockEntity be = context.getLevel().getBlockEntity(context.getClickedPos());
             if (be instanceof ItemVaultBlockEntity vault) {
                 ConnectivityHandler.splitMulti(vault);
                 vault.removeController(true);
             }
-            state = state.with(LARGE, false);
+            state = state.setValue(LARGE, false);
         }
         return IWrenchable.super.onWrenched(state, context);
     }
 
     @Override
-    public void onStateReplaced(BlockState state, ServerWorld world, BlockPos pos, boolean pIsMoving) {
+    public void affectNeighborsAfterRemoval(BlockState state, ServerLevel world, BlockPos pos, boolean pIsMoving) {
         if (state.hasBlockEntity()) {
             BlockEntity be = world.getBlockEntity(pos);
             if (!(be instanceof ItemVaultBlockEntity vaultBE))
                 return;
-            ItemScatterer.spawn(world, pos, vaultBE.inventory);
+            Containers.dropContents(world, pos, vaultBE.inventory);
             world.removeBlockEntity(pos);
             ConnectivityHandler.splitMulti(vaultBE);
         }
     }
 
     public static boolean isVault(BlockState state) {
-        return state.isOf(AllBlocks.ITEM_VAULT);
+        return state.is(AllBlocks.ITEM_VAULT);
     }
 
     @Nullable
     public static Axis getVaultBlockAxis(BlockState state) {
         if (!isVault(state))
             return null;
-        return state.get(HORIZONTAL_AXIS);
+        return state.getValue(HORIZONTAL_AXIS);
     }
 
     public static boolean isLarge(BlockState state) {
         if (!isVault(state))
             return false;
-        return state.get(LARGE);
+        return state.getValue(LARGE);
     }
 
     @Override
-    public BlockState rotate(BlockState state, BlockRotation rot) {
-        Axis axis = state.get(HORIZONTAL_AXIS);
-        return state.with(HORIZONTAL_AXIS, rot.rotate(Direction.from(axis, AxisDirection.POSITIVE)).getAxis());
+    public BlockState rotate(BlockState state, Rotation rot) {
+        Axis axis = state.getValue(HORIZONTAL_AXIS);
+        return state.setValue(HORIZONTAL_AXIS, rot.rotate(Direction.fromAxisAndDirection(axis, AxisDirection.POSITIVE)).getAxis());
     }
 
     @Override
-    public BlockState mirror(BlockState state, BlockMirror mirrorIn) {
+    public BlockState mirror(BlockState state, Mirror mirrorIn) {
         return state;
     }
 
     @Override
-    public boolean hasComparatorOutput(BlockState p_149740_1_) {
+    public boolean hasAnalogOutputSignal(BlockState p_149740_1_) {
         return true;
     }
 
     @Override
-    public int getComparatorOutput(BlockState pState, World pLevel, BlockPos pPos, Direction direction) {
+    public int getAnalogOutputSignal(BlockState pState, Level pLevel, BlockPos pPos, Direction direction) {
         return ItemHelper.calcRedstoneFromBlockEntity(this, pLevel, pPos);
     }
 

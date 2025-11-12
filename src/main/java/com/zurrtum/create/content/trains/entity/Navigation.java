@@ -13,18 +13,18 @@ import com.zurrtum.create.content.trains.signal.SignalEdgeGroup;
 import com.zurrtum.create.content.trains.signal.TrackEdgePoint;
 import com.zurrtum.create.content.trains.station.GlobalStation;
 import com.zurrtum.create.content.trains.track.BezierConnection;
-import net.minecraft.storage.ReadView;
-import net.minecraft.storage.WriteView;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.Uuids;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.World;
 import org.apache.commons.lang3.mutable.MutableDouble;
 import org.apache.commons.lang3.mutable.MutableObject;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
+import net.minecraft.core.UUIDUtil;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.Mth;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
+import net.minecraft.world.phys.Vec3;
 
 public class Navigation {
 
@@ -50,7 +50,7 @@ public class Navigation {
         waitingForChainedGroups = new HashMap<>();
     }
 
-    public void tick(World level) {
+    public void tick(Level level) {
         if (destination == null)
             return;
 
@@ -110,7 +110,7 @@ public class Navigation {
                 signalScout.position = leadingPoint.position;
 
                 double brakingDistanceNoFlicker = brakingDistance + 3 - (brakingDistance % 3);
-                double scanDistance = MathHelper.clamp(brakingDistanceNoFlicker, preDepartureLookAhead, distanceToDestination);
+                double scanDistance = Mth.clamp(brakingDistanceNoFlicker, preDepartureLookAhead, distanceToDestination);
 
                 MutableDouble crossSignalDistanceTracker = new MutableDouble(-1);
                 MutableObject<Pair<UUID, Boolean>> trackingCrossSignal = new MutableObject<>(null);
@@ -186,7 +186,7 @@ public class Navigation {
                         // ignore turn if its a straight & mild slope
                         if (turn != null && vDistance > 1 / 16f) {
                             if (turn.axes.getFirst().multiply(1, 0, 1)
-                                .distanceTo(turn.axes.getSecond().multiply(1, 0, 1).multiply(-1)) < 1 / 64f && vDistance / turn.getLength() < .225f)
+                                .distanceTo(turn.axes.getSecond().multiply(1, 0, 1).scale(-1)) < 1 / 64f && vDistance / turn.getLength() < .225f)
                                 return;
                         }
 
@@ -317,13 +317,13 @@ public class Navigation {
 
     public ITrackSelector control(TravellingPoint mp) {
         if (destination == null)
-            return mp.steer(train.manualSteer, new Vec3d(0, 1, 0));
+            return mp.steer(train.manualSteer, new Vec3(0, 1, 0));
         return (graph, pair) -> navigateOptions(currentPath, graph, pair.getSecond());
     }
 
     public ITrackSelector controlSignalScout() {
         if (destination == null)
-            return signalScout.steer(train.manualSteer, new Vec3d(0, 1, 0));
+            return signalScout.steer(train.manualSteer, new Vec3(0, 1, 0));
         List<Couple<TrackNode>> pathCopy = new ArrayList<>(currentPath);
         return (graph, pair) -> navigateOptions(pathCopy, graph, pair.getSecond());
     }
@@ -526,7 +526,7 @@ public class Navigation {
             return;
 
         // Cache the list of track types that the train can travel on
-        Set<Identifier> validTypes = new HashSet<>();
+        Set<ResourceLocation> validTypes = new HashSet<>();
         for (int i = 0; i < train.carriages.size(); i++) {
             Carriage carriage = train.carriages.get(i);
             if (i == 0) {
@@ -578,7 +578,7 @@ public class Navigation {
 
         double distanceToNode2 = forward ? initialEdge.getLength() - startingPoint.position : startingPoint.position;
 
-        int signalWeight = MathHelper.clamp(ticksWaitingForSignal * 2, Train.Penalties.RED_SIGNAL, 200);
+        int signalWeight = Mth.clamp(ticksWaitingForSignal * 2, Train.Penalties.RED_SIGNAL, 200);
 
         // Apply penalties to initial edge
         int initialPenalty = 0;
@@ -748,7 +748,7 @@ public class Navigation {
                 // Calculate remaining distance estimator for next connected edge
                 if (destinations != null && !destinations.isEmpty()) {
                     remainingDist = Double.MAX_VALUE;
-                    Vec3d newNodePosition = newNode.getLocation().getLocation();
+                    Vec3 newNodePosition = newNode.getLocation().getLocation();
                     for (GlobalStation destination : destinations) {
                         TrackNodeLocation destinationNode = destination.edgeLocation.getFirst();
                         double dMin = Math.abs(newNodePosition.x - destinationNode.getLocation().x);
@@ -841,26 +841,26 @@ public class Navigation {
         );
     }
 
-    public void write(WriteView view, DimensionPalette dimensions) {
+    public void write(ValueOutput view, DimensionPalette dimensions) {
         if (destination == null)
             return;
 
         removeBrokenPathEntries();
 
-        view.put("Destination", Uuids.INT_STREAM_CODEC, destination.id);
+        view.store("Destination", UUIDUtil.CODEC, destination.id);
         view.putDouble("DistanceToDestination", distanceToDestination);
         view.putDouble("DistanceStartedAt", distanceStartedAt);
         view.putBoolean("BehindTrain", destinationBehindTrain);
         view.putBoolean("AnnounceArrival", announceArrival);
-        WriteView.ListView list = view.getList("Path");
+        ValueOutput.ValueOutputList list = view.childrenList("Path");
         currentPath.forEach(c -> {
-            WriteView item = list.add();
-            c.getFirst().getLocation().write(item.get("First"), dimensions);
-            c.getSecond().getLocation().write(item.get("Second"), dimensions);
+            ValueOutput item = list.addChild();
+            c.getFirst().getLocation().write(item.child("First"), dimensions);
+            c.getSecond().getLocation().write(item.child("Second"), dimensions);
         });
         if (waitingForSignal == null)
             return;
-        view.put("BlockingSignal", Uuids.INT_STREAM_CODEC, waitingForSignal.getFirst());
+        view.store("BlockingSignal", UUIDUtil.CODEC, waitingForSignal.getFirst());
         view.putBoolean("BlockingSignalSide", waitingForSignal.getSecond());
         view.putDouble("DistanceToSignal", distanceToSignal);
         view.putInt("TicksWaitingForSignal", ticksWaitingForSignal);
@@ -873,7 +873,7 @@ public class Navigation {
 
         input.removeBrokenPathEntries();
 
-        map.add("Destination", input.destination.id, Uuids.INT_STREAM_CODEC);
+        map.add("Destination", input.destination.id, UUIDUtil.CODEC);
         map.add("DistanceToDestination", ops.createDouble(input.distanceToDestination));
         map.add("DistanceStartedAt", ops.createDouble(input.distanceStartedAt));
         map.add("BehindTrain", ops.createBoolean(input.destinationBehindTrain));
@@ -888,19 +888,19 @@ public class Navigation {
         map.add("Path", list.build(empty));
         if (input.waitingForSignal == null)
             return map.build(empty);
-        map.add("BlockingSignal", input.waitingForSignal.getFirst(), Uuids.INT_STREAM_CODEC);
+        map.add("BlockingSignal", input.waitingForSignal.getFirst(), UUIDUtil.CODEC);
         map.add("BlockingSignalSide", ops.createBoolean(input.waitingForSignal.getSecond()));
         map.add("DistanceToSignal", ops.createDouble(input.distanceToSignal));
         map.add("TicksWaitingForSignal", ops.createInt(input.ticksWaitingForSignal));
         return map.build(empty);
     }
 
-    public void read(ReadView view, TrackGraph graph, DimensionPalette dimensions) {
+    public void read(ValueInput view, TrackGraph graph, DimensionPalette dimensions) {
         if (graph == null) {
             destination = null;
             return;
         }
-        Optional<UUID> id = view.read("Destination", Uuids.INT_STREAM_CODEC);
+        Optional<UUID> id = view.read("Destination", UUIDUtil.CODEC);
         if (id.isEmpty()) {
             destination = null;
             return;
@@ -909,26 +909,26 @@ public class Navigation {
         if (destination == null)
             return;
 
-        distanceToDestination = view.getDouble("DistanceToDestination", 0);
-        distanceStartedAt = view.getDouble("DistanceStartedAt", 0);
-        destinationBehindTrain = view.getBoolean("BehindTrain", false);
-        announceArrival = view.getBoolean("AnnounceArrival", false);
+        distanceToDestination = view.getDoubleOr("DistanceToDestination", 0);
+        distanceStartedAt = view.getDoubleOr("DistanceStartedAt", 0);
+        destinationBehindTrain = view.getBooleanOr("BehindTrain", false);
+        announceArrival = view.getBooleanOr("AnnounceArrival", false);
         currentPath.clear();
-        view.getListReadView("Path").forEach(item -> {
+        view.childrenListOrEmpty("Path").forEach(item -> {
             currentPath.add(Couple.create(
-                graph.locateNode(TrackNodeLocation.read(item.getReadView("First"), dimensions)),
-                graph.locateNode(TrackNodeLocation.read(item.getReadView("Second"), dimensions))
+                graph.locateNode(TrackNodeLocation.read(item.childOrEmpty("First"), dimensions)),
+                graph.locateNode(TrackNodeLocation.read(item.childOrEmpty("Second"), dimensions))
             ));
         });
 
         removeBrokenPathEntries();
 
-        waitingForSignal = view.read("BlockingSignal", Uuids.INT_STREAM_CODEC)
-            .map(uuid -> Pair.of(uuid, view.getBoolean("BlockingSignalSide", false))).orElse(null);
+        waitingForSignal = view.read("BlockingSignal", UUIDUtil.CODEC)
+            .map(uuid -> Pair.of(uuid, view.getBooleanOr("BlockingSignalSide", false))).orElse(null);
         if (waitingForSignal == null)
             return;
-        distanceToSignal = view.getDouble("DistanceToSignal", 0);
-        ticksWaitingForSignal = view.getInt("TicksWaitingForSignal", 0);
+        distanceToSignal = view.getDoubleOr("DistanceToSignal", 0);
+        ticksWaitingForSignal = view.getIntOr("TicksWaitingForSignal", 0);
     }
 
     public <T> void decode(DynamicOps<T> ops, T input, TrackGraph graph, DimensionPalette dimensions) {
@@ -937,7 +937,7 @@ public class Navigation {
             return;
         }
         MapLike<T> map = ops.getMap(input).getOrThrow();
-        Optional<UUID> id = Uuids.INT_STREAM_CODEC.parse(ops, map.get("Destination")).result();
+        Optional<UUID> id = UUIDUtil.CODEC.parse(ops, map.get("Destination")).result();
         if (id.isEmpty()) {
             destination = null;
             return;
@@ -961,7 +961,7 @@ public class Navigation {
 
         removeBrokenPathEntries();
 
-        waitingForSignal = Uuids.INT_STREAM_CODEC.parse(ops, map.get("BlockingSignal")).result()
+        waitingForSignal = UUIDUtil.CODEC.parse(ops, map.get("BlockingSignal")).result()
             .map(uuid -> Pair.of(uuid, ops.getBooleanValue(map.get("BlockingSignalSide")).result().orElse(false))).orElse(null);
         if (waitingForSignal == null)
             return;

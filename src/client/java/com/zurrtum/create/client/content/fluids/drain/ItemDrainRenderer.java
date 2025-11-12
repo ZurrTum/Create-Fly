@@ -1,5 +1,7 @@
 package com.zurrtum.create.client.content.fluids.drain;
 
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.zurrtum.create.catnip.math.VecHelper;
 import com.zurrtum.create.client.catnip.render.FluidRenderHelper;
 import com.zurrtum.create.client.catnip.render.PonderRenderTypes;
@@ -12,33 +14,34 @@ import com.zurrtum.create.content.kinetics.belt.transport.TransportedItemStack;
 import com.zurrtum.create.foundation.blockEntity.behaviour.fluid.SmartFluidTankBehaviour;
 import com.zurrtum.create.foundation.blockEntity.behaviour.fluid.SmartFluidTankBehaviour.TankSegment;
 import com.zurrtum.create.infrastructure.fluids.FluidStack;
-import net.minecraft.client.item.ItemModelManager;
-import net.minecraft.client.render.OverlayTexture;
-import net.minecraft.client.render.RenderLayer;
-import net.minecraft.client.render.VertexConsumer;
-import net.minecraft.client.render.block.entity.BlockEntityRenderer;
-import net.minecraft.client.render.block.entity.BlockEntityRendererFactory;
-import net.minecraft.client.render.block.entity.state.BlockEntityRenderState;
-import net.minecraft.client.render.command.ModelCommandRenderer;
-import net.minecraft.client.render.command.OrderedRenderCommandQueue;
-import net.minecraft.client.render.item.ItemRenderState;
-import net.minecraft.client.render.state.CameraRenderState;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.component.ComponentChanges;
-import net.minecraft.fluid.Fluid;
-import net.minecraft.item.ItemDisplayContext;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.math.*;
-import net.minecraft.util.math.Direction.Axis;
+import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.SubmitNodeCollector;
+import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
+import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
+import net.minecraft.client.renderer.blockentity.state.BlockEntityRenderState;
+import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
+import net.minecraft.client.renderer.item.ItemModelResolver;
+import net.minecraft.client.renderer.item.ItemStackRenderState;
+import net.minecraft.client.renderer.state.CameraRenderState;
+import net.minecraft.client.renderer.texture.OverlayTexture;
+import net.minecraft.core.Direction;
+import net.minecraft.core.Direction.Axis;
+import net.minecraft.core.component.DataComponentPatch;
+import net.minecraft.util.Mth;
+import net.minecraft.world.item.ItemDisplayContext;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.material.Fluid;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Random;
 
 public class ItemDrainRenderer implements BlockEntityRenderer<ItemDrainBlockEntity, ItemDrainRenderer.ItemDrainRenderState> {
-    protected final ItemModelManager itemModelManager;
+    protected final ItemModelResolver itemModelManager;
 
-    public ItemDrainRenderer(BlockEntityRendererFactory.Context context) {
-        itemModelManager = context.itemModelManager();
+    public ItemDrainRenderer(BlockEntityRendererProvider.Context context) {
+        itemModelManager = context.itemModelResolver();
     }
 
     @Override
@@ -47,29 +50,29 @@ public class ItemDrainRenderer implements BlockEntityRenderer<ItemDrainBlockEnti
     }
 
     @Override
-    public void updateRenderState(
+    public void extractRenderState(
         ItemDrainBlockEntity be,
         ItemDrainRenderState state,
         float tickProgress,
-        Vec3d cameraPos,
-        @Nullable ModelCommandRenderer.CrumblingOverlayCommand crumblingOverlay
+        Vec3 cameraPos,
+        @Nullable ModelFeatureRenderer.CrumblingOverlay crumblingOverlay
     ) {
-        BlockEntityRenderState.updateBlockEntityRenderState(be, state, crumblingOverlay);
+        BlockEntityRenderState.extractBase(be, state, crumblingOverlay);
         updateFluidRenderState(be, state, tickProgress);
         updateItemRenderState(be, state, itemModelManager, tickProgress);
     }
 
     @Override
-    public void render(ItemDrainRenderState state, MatrixStack matrices, OrderedRenderCommandQueue queue, CameraRenderState cameraState) {
+    public void submit(ItemDrainRenderState state, PoseStack matrices, SubmitNodeCollector queue, CameraRenderState cameraState) {
         if (state.process != null) {
-            queue.submitCustom(matrices, state.process.layer, state.process);
+            queue.submitCustomGeometry(matrices, state.process.layer, state.process);
         }
         if (state.item != null) {
-            state.item.render(matrices, queue, cameraState.pos, state.lightmapCoordinates);
+            state.item.render(matrices, queue, cameraState.pos, state.lightCoords);
         }
         if (state.fluid != null) {
             matrices.translate(0, state.fluid.offset, 0);
-            queue.submitCustom(matrices, state.fluid.layer, state.fluid);
+            queue.submitCustomGeometry(matrices, state.fluid.layer, state.fluid);
         }
     }
 
@@ -89,7 +92,7 @@ public class ItemDrainRenderer implements BlockEntityRenderer<ItemDrainBlockEnti
                 float yOffset = (7 / 16f) * level;
                 float yMin = yMax - yOffset;
                 state.fluid = new FluidRenderState(
-                    ShadersModHelper.isShaderPackInUse() ? RenderLayer.getTranslucentMovingBlock() : PonderRenderTypes.fluid(),
+                    ShadersModHelper.isShaderPackInUse() ? RenderType.translucentMovingBlock() : PonderRenderTypes.fluid(),
                     fluidStack.getFluid(),
                     fluidStack.getComponentChanges(),
                     min,
@@ -97,7 +100,7 @@ public class ItemDrainRenderer implements BlockEntityRenderer<ItemDrainBlockEnti
                     yMin,
                     yMax,
                     yOffset,
-                    state.lightmapCoordinates
+                    state.lightCoords
                 );
             }
         }
@@ -109,7 +112,7 @@ public class ItemDrainRenderer implements BlockEntityRenderer<ItemDrainBlockEnti
         if (processingTicks == -1) {
             return;
         }
-        FluidStack fluidStack2 = GenericItemEmptying.emptyItem(be.getWorld(), heldItemStack, true).getFirst();
+        FluidStack fluidStack2 = GenericItemEmptying.emptyItem(be.getLevel(), heldItemStack, true).getFirst();
         if (fluidStack2.isEmpty()) {
             if (fluidStack.isEmpty()) {
                 return;
@@ -118,22 +121,22 @@ public class ItemDrainRenderer implements BlockEntityRenderer<ItemDrainBlockEnti
         }
         float processingPT = processingTicks - tickProgress;
         float processingProgress = 1 - (processingPT - 5) / 10;
-        processingProgress = MathHelper.clamp(processingProgress, 0, 1);
+        processingProgress = Mth.clamp(processingProgress, 0, 1);
         float radius = (float) (Math.pow(((2 * processingProgress) - 1), 2) - 1);
-        Box box = new Box(0.5, 1.0, 0.5, 0.5, 0.25, 0.5).expand(radius / 32f);
+        AABB box = new AABB(0.5, 1.0, 0.5, 0.5, 0.25, 0.5).inflate(radius / 32f);
         state.process = new ProcessRenderState(
             PonderRenderTypes.fluid(),
             fluidStack2.getFluid(),
             fluidStack2.getComponentChanges(),
             box,
-            state.lightmapCoordinates
+            state.lightCoords
         );
     }
 
     public static void updateItemRenderState(
         ItemDrainBlockEntity be,
         ItemDrainRenderState state,
-        ItemModelManager itemModelManager,
+        ItemModelResolver itemModelManager,
         float tickProgress
     ) {
         TransportedItemStack transported = be.heldItem;
@@ -145,23 +148,23 @@ public class ItemDrainRenderer implements BlockEntityRenderer<ItemDrainBlockEnti
             return;
         }
         HeldItemRenderState item = state.item = new HeldItemRenderState();
-        item.itemPosition = VecHelper.getCenterOf(state.pos);
-        float offset = MathHelper.lerp(tickProgress, transported.prevBeltPosition, transported.beltPosition);
-        float sideOffset = MathHelper.lerp(tickProgress, transported.prevSideOffset, transported.sideOffset);
-        item.offsetVec = Vec3d.of(insertedFrom.getOpposite().getVector()).multiply(.5f - offset);
-        boolean alongX = insertedFrom.rotateYClockwise().getAxis() == Axis.X;
+        item.itemPosition = VecHelper.getCenterOf(state.blockPos);
+        float offset = Mth.lerp(tickProgress, transported.prevBeltPosition, transported.beltPosition);
+        float sideOffset = Mth.lerp(tickProgress, transported.prevSideOffset, transported.sideOffset);
+        item.offsetVec = Vec3.atLowerCornerOf(insertedFrom.getOpposite().getUnitVec3i()).scale(.5f - offset);
+        boolean alongX = insertedFrom.getClockWise().getAxis() == Axis.X;
         if (!alongX)
             sideOffset *= -1;
         item.translate = item.offsetVec.add(alongX ? sideOffset : 0, 0, alongX ? 0 : sideOffset);
         ItemStack itemStack = transported.stack;
-        item.count = MathHelper.floorLog2(itemStack.getCount()) / 2;
+        item.count = Mth.log2(itemStack.getCount()) / 2;
         item.upright = BeltHelper.isItemUpright(itemStack);
-        int positive = insertedFrom.getDirection().offset();
+        int positive = insertedFrom.getAxisDirection().getStep();
         item.axis = insertedFrom.getAxis();
         item.verticalAngle = positive * offset * 360;
-        ItemRenderState renderState = state.item.state = new ItemRenderState();
+        ItemStackRenderState renderState = state.item.state = new ItemStackRenderState();
         renderState.displayContext = ItemDisplayContext.FIXED;
-        itemModelManager.update(renderState, itemStack, renderState.displayContext, be.getWorld(), null, 0);
+        itemModelManager.appendItemLayers(renderState, itemStack, renderState.displayContext, be.getLevel(), null, 0);
     }
 
     public static class ItemDrainRenderState extends BlockEntityRenderState {
@@ -171,19 +174,19 @@ public class ItemDrainRenderer implements BlockEntityRenderer<ItemDrainBlockEnti
     }
 
     public record FluidRenderState(
-        RenderLayer layer, Fluid fluid, ComponentChanges changes, float min, float max, float yMin, float yMax, float offset, int light
-    ) implements OrderedRenderCommandQueue.Custom {
+        RenderType layer, Fluid fluid, DataComponentPatch changes, float min, float max, float yMin, float yMax, float offset, int light
+    ) implements SubmitNodeCollector.CustomGeometryRenderer {
         @Override
-        public void render(MatrixStack.Entry matricesEntry, VertexConsumer vertexConsumer) {
+        public void render(PoseStack.Pose matricesEntry, VertexConsumer vertexConsumer) {
             FluidRenderHelper.renderFluidBox(fluid, changes, min, yMin, min, max, yMax, max, vertexConsumer, matricesEntry, light, false, false);
         }
     }
 
     public record ProcessRenderState(
-        RenderLayer layer, Fluid fluid, ComponentChanges changes, Box box, int light
-    ) implements OrderedRenderCommandQueue.Custom {
+        RenderType layer, Fluid fluid, DataComponentPatch changes, AABB box, int light
+    ) implements SubmitNodeCollector.CustomGeometryRenderer {
         @Override
-        public void render(MatrixStack.Entry matricesEntry, VertexConsumer vertexConsumer) {
+        public void render(PoseStack.Pose matricesEntry, VertexConsumer vertexConsumer) {
             FluidRenderHelper.renderFluidBox(
                 fluid,
                 changes,
@@ -203,18 +206,18 @@ public class ItemDrainRenderer implements BlockEntityRenderer<ItemDrainBlockEnti
     }
 
     public static class HeldItemRenderState {
-        public ItemRenderState state;
-        public Vec3d itemPosition;
-        public Vec3d translate;
-        public Vec3d offsetVec;
+        public ItemStackRenderState state;
+        public Vec3 itemPosition;
+        public Vec3 translate;
+        public Vec3 offsetVec;
         public int count;
         public boolean upright;
         public Axis axis;
         public float verticalAngle;
 
-        public void render(MatrixStack matrices, OrderedRenderCommandQueue queue, Vec3d positionVec, int light) {
+        public void render(PoseStack matrices, SubmitNodeCollector queue, Vec3 positionVec, int light) {
             var msr = TransformStack.of(matrices);
-            matrices.push();
+            matrices.pushPose();
             matrices.translate(.5f, 15 / 16f, .5f);
             msr.nudge(0);
             matrices.translate(translate);
@@ -229,22 +232,22 @@ public class ItemDrainRenderer implements BlockEntityRenderer<ItemDrainBlockEnti
                 msr.rotateZDegrees(-verticalAngle);
             }
             if (renderUpright) {
-                Vec3d vectorForOffset = itemPosition.add(offsetVec);
-                Vec3d diff = vectorForOffset.subtract(positionVec);
+                Vec3 vectorForOffset = itemPosition.add(offsetVec);
+                Vec3 diff = vectorForOffset.subtract(positionVec);
                 if (axis != Axis.X) {
                     diff = VecHelper.rotate(diff, verticalAngle, Axis.X);
                 }
                 if (axis != Axis.Z) {
                     diff = VecHelper.rotate(diff, -verticalAngle, Axis.Z);
                 }
-                float yRot = (float) MathHelper.atan2(diff.z, -diff.x);
-                matrices.multiply(RotationAxis.POSITIVE_Y.rotation((float) (yRot - Math.PI / 2)));
+                float yRot = (float) Mth.atan2(diff.z, -diff.x);
+                matrices.mulPose(com.mojang.math.Axis.YP.rotation((float) (yRot - Math.PI / 2)));
                 matrices.translate(0, 0, -1 / 16f);
             }
             Random r = new Random(0);
-            boolean blockItem = state.isSideLit();
+            boolean blockItem = state.usesBlockLight();
             for (int i = 0; i < count; i++) {
-                matrices.push();
+                matrices.pushPose();
                 if (blockItem) {
                     matrices.translate(r.nextFloat() * .0625f * i, 0, r.nextFloat() * .0625f * i);
                 }
@@ -252,8 +255,8 @@ public class ItemDrainRenderer implements BlockEntityRenderer<ItemDrainBlockEnti
                 if (!blockItem && !renderUpright) {
                     msr.rotateXDegrees(90);
                 }
-                state.render(matrices, queue, light, OverlayTexture.DEFAULT_UV, 0);
-                matrices.pop();
+                state.submit(matrices, queue, light, OverlayTexture.NO_OVERLAY, 0);
+                matrices.popPose();
                 if (!renderUpright) {
                     if (!blockItem) {
                         msr.rotateYDegrees(10);
@@ -263,7 +266,7 @@ public class ItemDrainRenderer implements BlockEntityRenderer<ItemDrainBlockEnti
                     matrices.translate(0, 0, -1 / 16f);
                 }
             }
-            matrices.push();
+            matrices.pushPose();
             if (blockItem) {
                 matrices.translate(r.nextFloat() * .0625f * count, 0, r.nextFloat() * .0625f * count);
             }
@@ -271,9 +274,9 @@ public class ItemDrainRenderer implements BlockEntityRenderer<ItemDrainBlockEnti
             if (!blockItem && !renderUpright) {
                 msr.rotateXDegrees(90);
             }
-            state.render(matrices, queue, light, OverlayTexture.DEFAULT_UV, 0);
-            matrices.pop();
-            matrices.pop();
+            state.submit(matrices, queue, light, OverlayTexture.NO_OVERLAY, 0);
+            matrices.popPose();
+            matrices.popPose();
         }
     }
 }

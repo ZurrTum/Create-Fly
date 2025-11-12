@@ -1,50 +1,50 @@
 package com.zurrtum.create.client.foundation.blockEntity.behaviour;
 
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.zurrtum.create.client.flywheel.lib.transform.TransformStack;
 import com.zurrtum.create.content.kinetics.simpleRelays.AbstractSimpleShaftBlock;
-import net.minecraft.block.Block;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.FenceBlock;
-import net.minecraft.client.render.OverlayTexture;
-import net.minecraft.client.render.command.OrderedRenderCommandQueue;
-import net.minecraft.client.render.item.ItemRenderState;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.item.BlockItem;
-import net.minecraft.item.Item;
-import net.minecraft.registry.tag.BlockTags;
-import net.minecraft.util.math.MathHelper;
+import net.minecraft.client.renderer.SubmitNodeCollector;
+import net.minecraft.client.renderer.item.ItemStackRenderState;
+import net.minecraft.client.renderer.texture.OverlayTexture;
+import net.minecraft.tags.BlockTags;
+import net.minecraft.util.Mth;
+import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.FenceBlock;
 import org.joml.Matrix3f;
 
 public class ValueBoxRenderer {
-    public static void renderItemIntoValueBox(ItemRenderState state, OrderedRenderCommandQueue queue, MatrixStack ms, int light, float offset) {
-        boolean blockItem = state.isSideLit();
+    public static void renderItemIntoValueBox(ItemStackRenderState state, SubmitNodeCollector queue, PoseStack ms, int light, float offset) {
+        boolean blockItem = state.usesBlockLight();
         float scale = (!blockItem ? .5f : 1f) + 1 / 64f;
         float zOffset = (!blockItem ? -.15f : 0) + offset;
         ms.scale(scale, scale, scale);
         ms.translate(0, 0, zOffset);
-        state.render(ms, queue, light, OverlayTexture.DEFAULT_UV, 0);
+        state.submit(ms, queue, light, OverlayTexture.NO_OVERLAY, 0);
     }
 
-    public static void renderFlatItemIntoValueBox(ItemRenderState state, OrderedRenderCommandQueue queue, MatrixStack ms, int light) {
+    public static void renderFlatItemIntoValueBox(ItemStackRenderState state, SubmitNodeCollector queue, PoseStack ms, int light) {
         int bl = light >> 4 & 0xf;
         int sl = light >> 20 & 0xf;
-        int itemLight = MathHelper.floor(sl + .5) << 20 | (MathHelper.floor(bl + .5) & 0xf) << 4;
+        int itemLight = Mth.floor(sl + .5) << 20 | (Mth.floor(bl + .5) & 0xf) << 4;
 
-        ms.push();
+        ms.pushPose();
         TransformStack.of(ms).rotateXDegrees(230);
-        Matrix3f copy = new Matrix3f(ms.peek().getNormalMatrix());
-        ms.pop();
+        Matrix3f copy = new Matrix3f(ms.last().normal());
+        ms.popPose();
 
-        ms.push();
+        ms.pushPose();
         TransformStack.of(ms).translate(0, 0, -1 / 4f).translate(0, 0, 1 / 32f + .001).rotateYDegrees(180);
 
-        MatrixStack squashedMS = new MatrixStack();
-        squashedMS.peek().getPositionMatrix().mul(ms.peek().getPositionMatrix());
+        PoseStack squashedMS = new PoseStack();
+        squashedMS.last().pose().mul(ms.last().pose());
         squashedMS.scale(.5f, .5f, 1 / 1024f);
-        squashedMS.peek().getNormalMatrix().set(copy);
-        state.render(squashedMS, queue, itemLight, OverlayTexture.DEFAULT_UV, 0);
+        squashedMS.last().normal().set(copy);
+        state.submit(squashedMS, queue, itemLight, OverlayTexture.NO_OVERLAY, 0);
 
-        ms.pop();
+        ms.popPose();
     }
 
     @SuppressWarnings("deprecation")
@@ -56,7 +56,7 @@ public class ValueBoxRenderer {
                 return nudge;
             if (block instanceof FenceBlock)
                 return nudge;
-            if (block.getRegistryEntry().isIn(BlockTags.BUTTONS))
+            if (block.builtInRegistryHolder().is(BlockTags.BUTTONS))
                 return nudge;
             if (block == Blocks.END_ROD)
                 return nudge;

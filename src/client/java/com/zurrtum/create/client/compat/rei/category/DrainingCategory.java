@@ -17,9 +17,9 @@ import me.shedaniel.rei.api.client.gui.widgets.Widget;
 import me.shedaniel.rei.api.client.gui.widgets.Widgets;
 import me.shedaniel.rei.api.common.category.CategoryIdentifier;
 import me.shedaniel.rei.api.common.entry.EntryStack;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.item.Items;
-import net.minecraft.text.Text;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.item.Items;
 import org.joml.Matrix3x2f;
 
 import java.util.List;
@@ -31,7 +31,7 @@ public class DrainingCategory extends CreateCategory<DrainingDisplay> {
     }
 
     @Override
-    public Text getTitle() {
+    public Component getTitle() {
         return CreateLang.translateDirect("recipe.draining");
     }
 
@@ -46,16 +46,16 @@ public class DrainingCategory extends CreateCategory<DrainingDisplay> {
         Point output = new Point(bounds.x + 137, bounds.y + 13);
         Point result = new Point(bounds.x + 137, bounds.y + 32);
         Slot fluidSlot = createOutputSlot(output).entries(getRenderEntryStack(display.output()));
-        widgets.add(Widgets.createDrawableWidget((DrawContext graphics, int mouseX, int mouseY, float delta) -> {
+        widgets.add(Widgets.createDrawableWidget((GuiGraphics graphics, int mouseX, int mouseY, float delta) -> {
             drawSlotBackground(graphics, input, output, result);
             AllGuiTextures.JEI_SHADOW.render(graphics, bounds.x + 67, bounds.y + 42);
             AllGuiTextures.JEI_DOWN_ARROW.render(graphics, bounds.x + 78, bounds.y + 9);
             EntryStack<FluidStack> slot = fluidSlot.getCurrentEntry().cast();
             FluidStack stack = slot.getValue();
-            graphics.state.addSpecialElement(new DrainRenderState(
-                new Matrix3x2f(graphics.getMatrices()),
+            graphics.guiRenderState.submitPicturesInPictureState(new DrainRenderState(
+                new Matrix3x2f(graphics.pose()),
                 stack.getFluid(),
-                stack.getComponents().getChanges(),
+                stack.getComponents().asPatch(),
                 bounds.x + 80,
                 bounds.y + 28
             ));

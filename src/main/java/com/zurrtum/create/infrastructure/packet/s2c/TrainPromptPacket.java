@@ -2,19 +2,19 @@ package com.zurrtum.create.infrastructure.packet.s2c;
 
 import com.zurrtum.create.AllClientHandle;
 import com.zurrtum.create.AllPackets;
-import net.minecraft.network.RegistryByteBuf;
-import net.minecraft.network.codec.PacketCodec;
-import net.minecraft.network.codec.PacketCodecs;
-import net.minecraft.network.packet.PacketType;
-import net.minecraft.text.Text;
-import net.minecraft.text.TextCodecs;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.ComponentSerialization;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.PacketType;
 import org.apache.logging.log4j.util.TriConsumer;
 
-public record TrainPromptPacket(Text text, boolean shadow) implements S2CPacket {
-    public static final PacketCodec<RegistryByteBuf, TrainPromptPacket> CODEC = PacketCodec.tuple(
-        TextCodecs.PACKET_CODEC,
+public record TrainPromptPacket(Component text, boolean shadow) implements S2CPacket {
+    public static final StreamCodec<RegistryFriendlyByteBuf, TrainPromptPacket> CODEC = StreamCodec.composite(
+        ComponentSerialization.TRUSTED_CONTEXT_FREE_STREAM_CODEC,
         TrainPromptPacket::text,
-        PacketCodecs.BOOLEAN,
+        ByteBufCodecs.BOOL,
         TrainPromptPacket::shadow,
         TrainPromptPacket::new
     );
@@ -25,7 +25,7 @@ public record TrainPromptPacket(Text text, boolean shadow) implements S2CPacket 
     }
 
     @Override
-    public PacketType<TrainPromptPacket> getPacketType() {
+    public PacketType<TrainPromptPacket> type() {
         return AllPackets.S_TRAIN_PROMPT;
     }
 }

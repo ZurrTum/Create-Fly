@@ -4,8 +4,8 @@ import com.mojang.serialization.Codec;
 import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
 import com.zurrtum.create.foundation.blockEntity.behaviour.BehaviourType;
 import com.zurrtum.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
-import net.minecraft.storage.ReadView;
-import net.minecraft.storage.WriteView;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -48,9 +48,9 @@ public class FactoryPanelSupportBehaviour extends BlockEntityBehaviour<SmartBloc
     @Override
     public void destroy() {
         for (FactoryPanelPosition panelPos : linkedPanels) {
-            if (!getWorld().isPosLoaded(panelPos.pos()))
+            if (!getLevel().isLoaded(panelPos.pos()))
                 continue;
-            ServerFactoryPanelBehaviour behaviour = ServerFactoryPanelBehaviour.at(getWorld(), panelPos);
+            ServerFactoryPanelBehaviour behaviour = ServerFactoryPanelBehaviour.at(getLevel(), panelPos);
             behaviour.targetedByLinks.remove(getPos());
             behaviour.blockEntity.notifyUpdate();
         }
@@ -58,13 +58,13 @@ public class FactoryPanelSupportBehaviour extends BlockEntityBehaviour<SmartBloc
     }
 
     public void notifyPanels() {
-        if (getWorld().isClient())
+        if (getLevel().isClientSide())
             return;
         for (Iterator<FactoryPanelPosition> iterator = linkedPanels.iterator(); iterator.hasNext(); ) {
             FactoryPanelPosition panelPos = iterator.next();
-            if (!getWorld().isPosLoaded(panelPos.pos()))
+            if (!getLevel().isLoaded(panelPos.pos()))
                 continue;
-            ServerFactoryPanelBehaviour behaviour = ServerFactoryPanelBehaviour.at(getWorld(), panelPos);
+            ServerFactoryPanelBehaviour behaviour = ServerFactoryPanelBehaviour.at(getLevel(), panelPos);
             if (behaviour == null) {
                 iterator.remove();
                 changed = true;
@@ -78,9 +78,9 @@ public class FactoryPanelSupportBehaviour extends BlockEntityBehaviour<SmartBloc
     public Boolean shouldBePoweredTristate() {
         for (Iterator<FactoryPanelPosition> iterator = linkedPanels.iterator(); iterator.hasNext(); ) {
             FactoryPanelPosition panelPos = iterator.next();
-            if (!getWorld().isPosLoaded(panelPos.pos()))
+            if (!getLevel().isLoaded(panelPos.pos()))
                 return null;
-            ServerFactoryPanelBehaviour behaviour = ServerFactoryPanelBehaviour.at(getWorld(), panelPos);
+            ServerFactoryPanelBehaviour behaviour = ServerFactoryPanelBehaviour.at(getLevel(), panelPos);
             if (behaviour == null) {
                 iterator.remove();
                 changed = true;
@@ -116,17 +116,17 @@ public class FactoryPanelSupportBehaviour extends BlockEntityBehaviour<SmartBloc
             changed = false;
             if (!isOutput())
                 notifyLink();
-            blockEntity.markDirty();
+            blockEntity.setChanged();
         }
     }
 
     @Override
-    public void write(WriteView view, boolean clientPacket) {
-        view.put("LinkedGauges", LINKED_CODEC, linkedPanels);
+    public void write(ValueOutput view, boolean clientPacket) {
+        view.store("LinkedGauges", LINKED_CODEC, linkedPanels);
     }
 
     @Override
-    public void read(ReadView view, boolean clientPacket) {
+    public void read(ValueInput view, boolean clientPacket) {
         linkedPanels.clear();
         view.read("LinkedGauges", LINKED_CODEC).ifPresent(linkedPanels::addAll);
     }

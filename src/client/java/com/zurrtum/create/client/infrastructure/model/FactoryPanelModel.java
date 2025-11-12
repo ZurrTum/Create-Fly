@@ -10,30 +10,29 @@ import com.zurrtum.create.content.logistics.factoryBoard.FactoryPanelBlock;
 import com.zurrtum.create.content.logistics.factoryBoard.FactoryPanelPosition;
 import com.zurrtum.create.content.logistics.factoryBoard.PanelSlot;
 import com.zurrtum.create.content.logistics.factoryBoard.ServerFactoryPanelBehaviour;
-import net.minecraft.block.BlockState;
-import net.minecraft.client.render.model.BakedGeometry;
-import net.minecraft.client.render.model.BakedQuad;
-import net.minecraft.client.render.model.BlockModelPart;
-import net.minecraft.client.render.model.GeometryBakedModel;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Direction.Axis;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.math.random.Random;
-import net.minecraft.world.BlockRenderView;
-
 import java.util.Arrays;
 import java.util.List;
+import net.minecraft.client.renderer.block.model.BakedQuad;
+import net.minecraft.client.renderer.block.model.BlockModelPart;
+import net.minecraft.client.renderer.block.model.SimpleModelWrapper;
+import net.minecraft.client.resources.model.QuadCollection;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.Direction.Axis;
+import net.minecraft.util.Mth;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.level.BlockAndTintGetter;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.Vec3;
 
 public class FactoryPanelModel extends WrapperBlockStateModel {
-    public FactoryPanelModel(BlockState state, UnbakedGrouped unbaked) {
+    public FactoryPanelModel(BlockState state, UnbakedRoot unbaked) {
         super(state, unbaked);
     }
 
     @Override
-    public void addPartsWithInfo(BlockRenderView world, BlockPos pos, BlockState state, Random random, List<BlockModelPart> parts) {
-        model.addParts(random, parts);
+    public void addPartsWithInfo(BlockAndTintGetter world, BlockPos pos, BlockState state, RandomSource random, List<BlockModelPart> parts) {
+        model.collectParts(random, parts);
         boolean ponder = world instanceof PonderLevel;
         for (PanelSlot slot : PanelSlot.values()) {
             ServerFactoryPanelBehaviour behaviour = ServerFactoryPanelBehaviour.at(world, new FactoryPanelPosition(pos, slot));
@@ -51,22 +50,22 @@ public class FactoryPanelModel extends WrapperBlockStateModel {
             factoryPanel = behaviour.count == 0 ? AllPartialModels.FACTORY_PANEL : AllPartialModels.FACTORY_PANEL_WITH_BULB;
         }
 
-        float xRot = MathHelper.DEGREES_PER_RADIAN * FactoryPanelBlock.getXRot(state);
-        float yRot = MathHelper.DEGREES_PER_RADIAN * FactoryPanelBlock.getYRot(state);
+        float xRot = Mth.RAD_TO_DEG * FactoryPanelBlock.getXRot(state);
+        float yRot = Mth.RAD_TO_DEG * FactoryPanelBlock.getYRot(state);
 
-        GeometryBakedModel model = factoryPanel.get();
-        BakedGeometry.Builder builder = new BakedGeometry.Builder();
-        for (BakedQuad bakedQuad : model.quads().getAllQuads()) {
-            int[] vertices = bakedQuad.vertexData();
+        SimpleModelWrapper model = factoryPanel.get();
+        QuadCollection.Builder builder = new QuadCollection.Builder();
+        for (BakedQuad bakedQuad : model.quads().getAll()) {
+            int[] vertices = bakedQuad.vertices();
             int[] transformedVertices = Arrays.copyOf(vertices, vertices.length);
 
-            Vec3d quadNormal = Vec3d.of(bakedQuad.face().getVector());
+            Vec3 quadNormal = Vec3.atLowerCornerOf(bakedQuad.direction().getUnitVec3i());
             quadNormal = VecHelper.rotate(quadNormal, 180, Axis.Y);
             quadNormal = VecHelper.rotate(quadNormal, xRot + 90, Axis.X);
             quadNormal = VecHelper.rotate(quadNormal, yRot, Axis.Y);
 
             for (int i = 0; i < vertices.length / BakedQuadHelper.VERTEX_STRIDE; i++) {
-                Vec3d vertex = BakedQuadHelper.getXYZ(vertices, i);
+                Vec3 vertex = BakedQuadHelper.getXYZ(vertices, i);
 
                 vertex = vertex.add(slot.xOffset * .5, 0, slot.yOffset * .5);
                 vertex = VecHelper.rotateCentered(vertex, 180, Axis.Y);
@@ -74,10 +73,10 @@ public class FactoryPanelModel extends WrapperBlockStateModel {
                 vertex = VecHelper.rotateCentered(vertex, yRot, Axis.Y);
 
                 BakedQuadHelper.setXYZ(transformedVertices, i, vertex);
-                BakedQuadHelper.setNormalXYZ(transformedVertices, i, new Vec3d(0, 1, 0));
+                BakedQuadHelper.setNormalXYZ(transformedVertices, i, new Vec3(0, 1, 0));
             }
 
-            Direction newNormal = Direction.fromVector(
+            Direction newNormal = Direction.getNearest(
                 (int) Math.round(quadNormal.x),
                 (int) Math.round(quadNormal.y),
                 (int) Math.round(quadNormal.z),
@@ -92,8 +91,8 @@ public class FactoryPanelModel extends WrapperBlockStateModel {
                 bakedQuad.lightEmission()
             );
             NormalsBakedQuad.markNormals(quad);
-            builder.add(quad);
+            builder.addUnculledFace(quad);
         }
-        parts.add(new GeometryBakedModel(builder.build(), model.useAmbientOcclusion(), model.particleSprite()));
+        parts.add(new SimpleModelWrapper(builder.build(), model.useAmbientOcclusion(), model.particleIcon()));
     }
 }

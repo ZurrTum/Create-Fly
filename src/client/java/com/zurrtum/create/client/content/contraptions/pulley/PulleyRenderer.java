@@ -11,19 +11,19 @@ import com.zurrtum.create.content.contraptions.AbstractContraptionEntity;
 import com.zurrtum.create.content.contraptions.pulley.PulleyBlock;
 import com.zurrtum.create.content.contraptions.pulley.PulleyBlockEntity;
 import com.zurrtum.create.content.contraptions.pulley.PulleyContraption;
-import net.minecraft.client.render.block.entity.BlockEntityRendererFactory;
-import net.minecraft.util.math.Direction.Axis;
-import net.minecraft.util.math.MathHelper;
+import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
+import net.minecraft.core.Direction.Axis;
+import net.minecraft.util.Mth;
 
 public class PulleyRenderer extends AbstractPulleyRenderer<PulleyBlockEntity> {
 
-    public PulleyRenderer(BlockEntityRendererFactory.Context context) {
+    public PulleyRenderer(BlockEntityRendererProvider.Context context) {
         super(context, AllPartialModels.ROPE_HALF, AllPartialModels.ROPE_HALF_MAGNET);
     }
 
     @Override
     protected Axis getShaftAxis(PulleyBlockEntity be) {
-        return be.getCachedState().get(PulleyBlock.HORIZONTAL_AXIS);
+        return be.getBlockState().getValue(PulleyBlock.HORIZONTAL_AXIS);
     }
 
     @Override
@@ -33,12 +33,12 @@ public class PulleyRenderer extends AbstractPulleyRenderer<PulleyBlockEntity> {
 
     @Override
     protected SuperByteBuffer renderRope(PulleyBlockEntity be) {
-        return CachedBuffers.block(AllBlocks.ROPE.getDefaultState());
+        return CachedBuffers.block(AllBlocks.ROPE.defaultBlockState());
     }
 
     @Override
     protected SuperByteBuffer renderMagnet(PulleyBlockEntity be) {
-        return CachedBuffers.block(AllBlocks.PULLEY_MAGNET.getDefaultState());
+        return CachedBuffers.block(AllBlocks.PULLEY_MAGNET.defaultBlockState());
     }
 
     @Override
@@ -66,7 +66,7 @@ public class PulleyRenderer extends AbstractPulleyRenderer<PulleyBlockEntity> {
         AbstractContraptionEntity attachedContraption = blockEntity.getAttachedContraption();
         if (attachedContraption != null) {
             PulleyContraption c = (PulleyContraption) attachedContraption.getContraption();
-            double entityPos = MathHelper.lerp(partialTicks, attachedContraption.lastRenderY, attachedContraption.getY());
+            double entityPos = Mth.lerp(partialTicks, attachedContraption.yOld, attachedContraption.getY());
             offset = (float) -(entityPos - c.anchor.getY() - c.getInitialOffset());
         }
 

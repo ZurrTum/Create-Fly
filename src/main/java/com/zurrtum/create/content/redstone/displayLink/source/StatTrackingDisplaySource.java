@@ -2,44 +2,43 @@ package com.zurrtum.create.content.redstone.displayLink.source;
 
 import com.zurrtum.create.catnip.data.IntAttached;
 import com.zurrtum.create.content.redstone.displayLink.DisplayLinkContext;
-import net.minecraft.scoreboard.ScoreHolder;
-import net.minecraft.scoreboard.Scoreboard;
-import net.minecraft.scoreboard.ScoreboardCriterion;
-import net.minecraft.scoreboard.ScoreboardCriterion.RenderType;
-import net.minecraft.scoreboard.ScoreboardObjective;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.text.MutableText;
-import net.minecraft.text.Text;
-import net.minecraft.world.World;
-
 import java.util.stream.Stream;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.scores.Objective;
+import net.minecraft.world.scores.ScoreHolder;
+import net.minecraft.world.scores.Scoreboard;
+import net.minecraft.world.scores.criteria.ObjectiveCriteria;
+import net.minecraft.world.scores.criteria.ObjectiveCriteria.RenderType;
 
 public abstract class StatTrackingDisplaySource extends ScoreboardDisplaySource {
 
     @Override
-    protected Stream<IntAttached<MutableText>> provideEntries(DisplayLinkContext context, int maxRows) {
-        World level = context.blockEntity().getWorld();
-        if (!(level instanceof ServerWorld sLevel))
+    protected Stream<IntAttached<MutableComponent>> provideEntries(DisplayLinkContext context, int maxRows) {
+        Level level = context.blockEntity().getLevel();
+        if (!(level instanceof ServerLevel sLevel))
             return Stream.empty();
 
         String name = "create_auto_" + getObjectiveName();
         Scoreboard scoreboard = level.getScoreboard();
-        if (scoreboard.getNullableObjective(name) == null)
-            scoreboard.addObjective(name, ScoreboardCriterion.DUMMY, getObjectiveDisplayName(), RenderType.INTEGER, false, null);
-        ScoreboardObjective objective = scoreboard.getNullableObjective(name);
+        if (scoreboard.getObjective(name) == null)
+            scoreboard.addObjective(name, ObjectiveCriteria.DUMMY, getObjectiveDisplayName(), RenderType.INTEGER, false, null);
+        Objective objective = scoreboard.getObjective(name);
 
-        sLevel.getServer().getPlayerManager().getPlayerList()
-            .forEach(s -> scoreboard.getOrCreateScore(ScoreHolder.fromName(s.getNameForScoreboard()), objective).setScore(updatedScoreOf(s)));
+        sLevel.getServer().getPlayerList().getPlayers()
+            .forEach(s -> scoreboard.getOrCreatePlayerScore(ScoreHolder.forNameOnly(s.getScoreboardName()), objective).set(updatedScoreOf(s)));
 
         return showScoreboard(sLevel, name, maxRows);
     }
 
     protected abstract String getObjectiveName();
 
-    protected abstract Text getObjectiveDisplayName();
+    protected abstract Component getObjectiveDisplayName();
 
-    protected abstract int updatedScoreOf(ServerPlayerEntity player);
+    protected abstract int updatedScoreOf(ServerPlayer player);
 
     @Override
     protected boolean shortenNumbers(DisplayLinkContext context) {

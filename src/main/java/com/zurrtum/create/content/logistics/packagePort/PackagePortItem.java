@@ -1,26 +1,26 @@
 package com.zurrtum.create.content.logistics.packagePort;
 
 import com.zurrtum.create.infrastructure.packet.s2c.PackagePortPlacementRequestPacket;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.BlockItem;
-import net.minecraft.item.ItemStack;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
 
 public class PackagePortItem extends BlockItem {
 
-    public PackagePortItem(Block pBlock, Settings pProperties) {
+    public PackagePortItem(Block pBlock, Properties pProperties) {
         super(pBlock, pProperties);
     }
 
     @Override
-    protected boolean postPlacement(BlockPos pos, World world, PlayerEntity player, ItemStack p_195943_4_, BlockState p_195943_5_) {
-        if (!world.isClient() && player instanceof ServerPlayerEntity sp)
-            sp.networkHandler.sendPacket(new PackagePortPlacementRequestPacket(pos));
-        return super.postPlacement(pos, world, player, p_195943_4_, p_195943_5_);
+    protected boolean updateCustomBlockEntityTag(BlockPos pos, Level world, Player player, ItemStack p_195943_4_, BlockState p_195943_5_) {
+        if (!world.isClientSide() && player instanceof ServerPlayer sp)
+            sp.connection.send(new PackagePortPlacementRequestPacket(pos));
+        return super.updateCustomBlockEntityTag(pos, world, player, p_195943_4_, p_195943_5_);
     }
 
 }

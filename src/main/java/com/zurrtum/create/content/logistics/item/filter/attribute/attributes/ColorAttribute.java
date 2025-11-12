@@ -6,25 +6,25 @@ import com.zurrtum.create.AllItemTags;
 import com.zurrtum.create.content.logistics.item.filter.attribute.ItemAttribute;
 import com.zurrtum.create.content.logistics.item.filter.attribute.ItemAttributeType;
 import io.netty.buffer.ByteBuf;
-import net.minecraft.component.DataComponentTypes;
-import net.minecraft.component.type.FireworkExplosionComponent;
-import net.minecraft.item.FireworkRocketItem;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.network.RegistryByteBuf;
-import net.minecraft.network.codec.PacketCodec;
-import net.minecraft.registry.Registries;
-import net.minecraft.text.Text;
-import net.minecraft.util.DyeColor;
-import net.minecraft.world.World;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.world.item.DyeColor;
+import net.minecraft.world.item.FireworkRocketItem;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.component.FireworkExplosion;
+import net.minecraft.world.level.Level;
 
 public record ColorAttribute(DyeColor color) implements ItemAttribute {
     public static final MapCodec<ColorAttribute> CODEC = DyeColor.CODEC.xmap(ColorAttribute::new, ColorAttribute::color).fieldOf("value");
 
-    public static final PacketCodec<ByteBuf, ColorAttribute> PACKET_CODEC = DyeColor.PACKET_CODEC.xmap(ColorAttribute::new, ColorAttribute::color);
+    public static final StreamCodec<ByteBuf, ColorAttribute> PACKET_CODEC = DyeColor.STREAM_CODEC.map(ColorAttribute::new, ColorAttribute::color);
 
     private static Collection<DyeColor> findMatchingDyeColors(ItemStack stack) {
         DyeColor color = AllItemTags.getDyeColor(stack);
@@ -32,22 +32,22 @@ public record ColorAttribute(DyeColor color) implements ItemAttribute {
             return Collections.singletonList(color);
 
         Set<DyeColor> colors = new HashSet<>();
-        if (stack.contains(DataComponentTypes.FIREWORKS)) {
-            if (stack.getItem() instanceof FireworkRocketItem || stack.isOf(Items.FIREWORK_STAR)) {
-                List<FireworkExplosionComponent> explosions = stack.get(DataComponentTypes.FIREWORKS).explosions();
-                for (FireworkExplosionComponent explosion : explosions) {
+        if (stack.has(DataComponents.FIREWORKS)) {
+            if (stack.getItem() instanceof FireworkRocketItem || stack.is(Items.FIREWORK_STAR)) {
+                List<FireworkExplosion> explosions = stack.get(DataComponents.FIREWORKS).explosions();
+                for (FireworkExplosion explosion : explosions) {
                     colors.addAll(getFireworkStarColors(explosion));
                 }
             }
         }
 
-        Arrays.stream(DyeColor.values()).filter(c -> Registries.ITEM.getId(stack.getItem()).getPath().startsWith(c.getId() + "_"))
+        Arrays.stream(DyeColor.values()).filter(c -> BuiltInRegistries.ITEM.getKey(stack.getItem()).getPath().startsWith(c.getName() + "_"))
             .forEach(colors::add);
 
         return colors;
     }
 
-    private static Collection<DyeColor> getFireworkStarColors(FireworkExplosionComponent explosion) {
+    private static Collection<DyeColor> getFireworkStarColors(FireworkExplosion explosion) {
         Set<DyeColor> colors = new HashSet<>();
         Arrays.stream(explosion.colors().toIntArray()).mapToObj(DyeColor::byFireworkColor).forEach(colors::add);
         Arrays.stream(explosion.fadeColors().toIntArray()).mapToObj(DyeColor::byFireworkColor).forEach(colors::add);
@@ -55,7 +55,7 @@ public record ColorAttribute(DyeColor color) implements ItemAttribute {
     }
 
     @Override
-    public boolean appliesTo(ItemStack itemStack, World level) {
+    public boolean appliesTo(ItemStack itemStack, Level level) {
         return findMatchingDyeColors(itemStack).stream().anyMatch(color::equals);
     }
 
@@ -66,7 +66,7 @@ public record ColorAttribute(DyeColor color) implements ItemAttribute {
 
     @Override
     public Object[] getTranslationParameters() {
-        return new Object[]{Text.translatable("color.minecraft." + color.getId())};
+        return new Object[]{Component.translatable("color.minecraft." + color.getName())};
     }
 
     @Override
@@ -81,7 +81,7 @@ public record ColorAttribute(DyeColor color) implements ItemAttribute {
         }
 
         @Override
-        public List<ItemAttribute> getAllAttributes(ItemStack stack, World level) {
+        public List<ItemAttribute> getAllAttributes(ItemStack stack, Level level) {
             List<ItemAttribute> list = new ArrayList<>();
 
             for (DyeColor color : ColorAttribute.findMatchingDyeColors(stack)) {
@@ -97,7 +97,7 @@ public record ColorAttribute(DyeColor color) implements ItemAttribute {
         }
 
         @Override
-        public PacketCodec<? super RegistryByteBuf, ? extends ItemAttribute> packetCodec() {
+        public StreamCodec<? super RegistryFriendlyByteBuf, ? extends ItemAttribute> packetCodec() {
             return PACKET_CODEC;
         }
     }

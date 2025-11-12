@@ -10,39 +10,39 @@ import com.zurrtum.create.content.logistics.chute.ChuteBlock;
 import com.zurrtum.create.infrastructure.items.ItemStackHandler;
 import com.zurrtum.create.infrastructure.packet.s2c.PackageDestroyPacket;
 import com.zurrtum.create.infrastructure.packet.s2c.PackageSpawnPacket;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.component.DataComponentTypes;
-import net.minecraft.entity.*;
-import net.minecraft.entity.attribute.DefaultAttributeContainer;
-import net.minecraft.entity.attribute.EntityAttributes;
-import net.minecraft.entity.damage.DamageSource;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.projectile.PersistentProjectileEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.SpawnEggItem;
-import net.minecraft.network.listener.ClientPlayPacketListener;
-import net.minecraft.network.packet.Packet;
-import net.minecraft.network.packet.s2c.play.EntitySpawnS2CPacket;
-import net.minecraft.registry.tag.DamageTypeTags;
-import net.minecraft.server.network.EntityTrackerEntry;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.sound.SoundCategory;
-import net.minecraft.sound.SoundEvent;
-import net.minecraft.sound.SoundEvents;
-import net.minecraft.state.property.Properties;
-import net.minecraft.storage.NbtWriteView;
-import net.minecraft.storage.ReadView;
-import net.minecraft.storage.WriteView;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.Arm;
-import net.minecraft.util.ErrorReporter;
-import net.minecraft.util.Hand;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.shape.VoxelShape;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.network.protocol.Packet;
+import net.minecraft.network.protocol.game.ClientGamePacketListener;
+import net.minecraft.network.protocol.game.ClientboundAddEntityPacket;
+import net.minecraft.server.level.ServerEntity;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.tags.DamageTypeTags;
+import net.minecraft.util.ProblemReporter;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.entity.*;
+import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
+import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.projectile.AbstractArrow;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.SpawnEggItem;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.storage.TagValueOutput;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.Nullable;
 
 import java.lang.ref.WeakReference;
@@ -55,103 +55,103 @@ public class PackageEntity extends LivingEntity {
 
     public int insertionDelay;
 
-    public Vec3d vec2 = Vec3d.ZERO, vec3 = Vec3d.ZERO;
+    public Vec3 vec2 = Vec3.ZERO, vec3 = Vec3.ZERO;
 
-    public WeakReference<PlayerEntity> tossedBy = new WeakReference<>(null);
+    public WeakReference<Player> tossedBy = new WeakReference<>(null);
 
-    public PackageEntity(EntityType<? extends PackageEntity> entityTypeIn, World worldIn) {
+    public PackageEntity(EntityType<? extends PackageEntity> entityTypeIn, Level worldIn) {
         super(entityTypeIn, worldIn);
         box = ItemStack.EMPTY;
-        setYaw(this.random.nextFloat() * 360.0F);
-        setHeadYaw(getYaw());
-        lastYaw = getYaw();
+        setYRot(this.random.nextFloat() * 360.0F);
+        setYHeadRot(getYRot());
+        yRotO = getYRot();
         insertionDelay = 30;
     }
 
-    public PackageEntity(World worldIn, double x, double y, double z) {
+    public PackageEntity(Level worldIn, double x, double y, double z) {
         this(AllEntityTypes.PACKAGE, worldIn);
-        this.setPosition(x, y, z);
-        this.calculateDimensions();
+        this.setPos(x, y, z);
+        this.refreshDimensions();
     }
 
     @Override
-    public void move(MovementType type, Vec3d movement) {
+    public void move(MoverType type, Vec3 movement) {
         super.move(type, movement);
-        if (movement.lengthSquared() >= 0.01f) {
-            velocityDirty = true;
+        if (movement.lengthSqr() >= 0.01f) {
+            hasImpulse = true;
         }
     }
 
-    public static PackageEntity fromDroppedItem(World world, Entity originalEntity, ItemStack itemstack) {
+    public static PackageEntity fromDroppedItem(Level world, Entity originalEntity, ItemStack itemstack) {
         PackageEntity packageEntity = new PackageEntity(AllEntityTypes.PACKAGE, world);
 
-        Vec3d position = originalEntity.getEntityPos();
-        packageEntity.setPosition(position);
+        Vec3 position = originalEntity.position();
+        packageEntity.setPos(position);
         packageEntity.setBox(itemstack);
-        packageEntity.setVelocity(originalEntity.getVelocity().multiply(1.5f));
+        packageEntity.setDeltaMovement(originalEntity.getDeltaMovement().scale(1.5f));
         packageEntity.originalEntity = originalEntity;
 
-        if (world != null && !world.isClient())
-            if (ChuteBlock.isChute(world.getBlockState(BlockPos.ofFloored(position.x, position.y + .5f, position.z))))
-                packageEntity.setYaw(((int) packageEntity.getYaw()) / 90 * 90);
+        if (world != null && !world.isClientSide())
+            if (ChuteBlock.isChute(world.getBlockState(BlockPos.containing(position.x, position.y + .5f, position.z))))
+                packageEntity.setYRot(((int) packageEntity.getYRot()) / 90 * 90);
 
         return packageEntity;
     }
 
-    public static PackageEntity fromItemStack(World world, Vec3d position, ItemStack itemstack) {
+    public static PackageEntity fromItemStack(Level world, Vec3 position, ItemStack itemstack) {
         PackageEntity packageEntity = new PackageEntity(AllEntityTypes.PACKAGE, world);
-        packageEntity.setPosition(position);
+        packageEntity.setPos(position);
         packageEntity.setBox(itemstack);
         return packageEntity;
     }
 
     @Override
-    public ItemStack getPickBlockStack() {
+    public ItemStack getPickResult() {
         return box.copy();
     }
 
-    public static DefaultAttributeContainer.Builder createPackageAttributes() {
-        return LivingEntity.createLivingAttributes().add(EntityAttributes.MAX_HEALTH, 5f).add(EntityAttributes.MOVEMENT_SPEED, 1f);
+    public static AttributeSupplier.Builder createPackageAttributes() {
+        return LivingEntity.createLivingAttributes().add(Attributes.MAX_HEALTH, 5f).add(Attributes.MOVEMENT_SPEED, 1f);
     }
 
     @Override
-    public boolean canMoveVoluntarily() {
+    public boolean canSimulateMovement() {
         return true;
     }
 
     @Override
-    public boolean canActVoluntarily() {
+    public boolean isEffectiveAi() {
         return true;
     }
 
     @Override
-    public void travel(Vec3d p_213352_1_) {
+    public void travel(Vec3 p_213352_1_) {
         super.travel(p_213352_1_);
 
-        if (!getEntityWorld().isClient())
+        if (!level().isClientSide())
             return;
-        if (getVelocity().length() < 1 / 128f)
+        if (getDeltaMovement().length() < 1 / 128f)
             return;
-        if (age >= 20)
+        if (tickCount >= 20)
             return;
 
-        Vec3d motion = getVelocity().multiply(.75f);
-        Box bb = getBoundingBox();
-        List<VoxelShape> entityStream = getEntityWorld().getEntityCollisions(this, bb.stretch(motion));
-        motion = adjustMovementForCollisions(this, motion, bb, getEntityWorld(), entityStream);
+        Vec3 motion = getDeltaMovement().scale(.75f);
+        AABB bb = getBoundingBox();
+        List<VoxelShape> entityStream = level().getEntityCollisions(this, bb.expandTowards(motion));
+        motion = collideBoundingBox(this, motion, bb, level(), entityStream);
 
-        Vec3d clientPos = getEntityPos().add(motion);
+        Vec3 clientPos = position().add(motion);
         if (isInterpolating())
-            clientPos = VecHelper.lerp(Math.min(1, age / 20f), clientPos, getInterpolator().getLerpedPos());
-        if (age < 5)
-            setPosition(clientPos.x, clientPos.y, clientPos.z);
-        if (age < 20)
-            getInterpolator().refreshPositionAndAngles(clientPos, getYaw(), getPitch());
+            clientPos = VecHelper.lerp(Math.min(1, tickCount / 20f), clientPos, getInterpolation().position());
+        if (tickCount < 5)
+            setPos(clientPos.x, clientPos.y, clientPos.z);
+        if (tickCount < 20)
+            getInterpolation().interpolateTo(clientPos, getYRot(), getXRot());
     }
 
     @Override
-    public void setVelocityClient(Vec3d clientVelocity) {
-        setVelocity(getVelocity().add(clientVelocity).multiply(.5f));
+    public void lerpMotion(Vec3 clientVelocity) {
+        setDeltaMovement(getDeltaMovement().add(clientVelocity).scale(.5f));
     }
 
     public String getAddress() {
@@ -160,7 +160,7 @@ public class PackageEntity extends LivingEntity {
 
     @Override
     public void tick() {
-        if (firstUpdate) {
+        if (firstTick) {
             verifyInitialEntity();
             originalEntity = null;
         }
@@ -186,19 +186,19 @@ public class PackageEntity extends LivingEntity {
     protected void verifyInitialEntity() {
         if (!(originalEntity instanceof ItemEntity itemEntity))
             return;
-        try (ErrorReporter.Logging logging = new ErrorReporter.Logging(getErrorReporterContext(), Create.LOGGER)) {
-            NbtWriteView view = NbtWriteView.create(logging, getRegistryManager());
-            itemEntity.writeCustomData(view);
-            if (view.getNbt().getInt("PickupDelay", 0) != 32767) // See: ItemEntity#setDespawnImmediately
+        try (ProblemReporter.ScopedCollector logging = new ProblemReporter.ScopedCollector(problemPath(), Create.LOGGER)) {
+            TagValueOutput view = TagValueOutput.createWithContext(logging, registryAccess());
+            itemEntity.addAdditionalSaveData(view);
+            if (view.buildResult().getIntOr("PickupDelay", 0) != 32767) // See: ItemEntity#setDespawnImmediately
                 return;
             discard();
         }
     }
 
     @Override
-    protected EntityDimensions getBaseDimensions(EntityPose pose) {
+    protected EntityDimensions getDefaultDimensions(Pose pose) {
         if (box == null)
-            return super.getBaseDimensions(pose);
+            return super.getDefaultDimensions(pose);
         return EntityDimensions.fixed(PackageItem.getWidth(box), PackageItem.getHeight(box));
     }
 
@@ -206,19 +206,19 @@ public class PackageEntity extends LivingEntity {
         return box;
     }
 
-    public static boolean centerPackage(Entity entity, Vec3d target) {
+    public static boolean centerPackage(Entity entity, Vec3 target) {
         if (!(entity instanceof PackageEntity packageEntity))
             return true;
         return packageEntity.decreaseInsertionTimer(target);
     }
 
-    public boolean decreaseInsertionTimer(@Nullable Vec3d targetSpot) {
+    public boolean decreaseInsertionTimer(@Nullable Vec3 targetSpot) {
         if (targetSpot != null) {
-            setVelocity(getVelocity().multiply(.75f).multiply(1, .25f, 1));
-            Vec3d pos = getEntityPos().add(targetSpot.subtract(getEntityPos()).multiply(.2f));
-            setPosition(pos.x, pos.y, pos.z);
-            float yawTarget = ((int) getYaw()) / 90 * 90;
-            setYaw(AngleHelper.angleLerp(.5f, getYaw(), yawTarget));
+            setDeltaMovement(getDeltaMovement().scale(.75f).multiply(1, .25f, 1));
+            Vec3 pos = position().add(targetSpot.subtract(position()).scale(.2f));
+            setPos(pos.x, pos.y, pos.z);
+            float yawTarget = ((int) getYRot()) / 90 * 90;
+            setYRot(AngleHelper.angleLerp(.5f, getYRot(), yawTarget));
         }
         insertionDelay = Math.max(insertionDelay - 3, 0);
         return insertionDelay == 0;
@@ -226,7 +226,7 @@ public class PackageEntity extends LivingEntity {
 
     public void setBox(ItemStack box) {
         this.box = box.copy();
-        calculateDimensions();
+        refreshDimensions();
     }
 
     @Override
@@ -235,31 +235,24 @@ public class PackageEntity extends LivingEntity {
     }
 
     @Override
-    public boolean collidesWith(Entity pEntity) {
+    public boolean canCollideWith(Entity pEntity) {
         return pEntity instanceof PackageEntity && pEntity.getBoundingBox().maxY < getBoundingBox().minY + .125f;
     }
 
     @Override
-    public ActionResult interact(PlayerEntity pPlayer, Hand pHand) {
-        if (!pPlayer.getStackInHand(pHand).isEmpty())
+    public InteractionResult interact(Player pPlayer, InteractionHand pHand) {
+        if (!pPlayer.getItemInHand(pHand).isEmpty())
             return super.interact(pPlayer, pHand);
-        if (pPlayer.getEntityWorld().isClient())
-            return ActionResult.SUCCESS;
-        pPlayer.setStackInHand(pHand, box);
-        getEntityWorld().playSound(
-            null,
-            getBlockPos(),
-            SoundEvents.ENTITY_ITEM_PICKUP,
-            SoundCategory.PLAYERS,
-            .2f,
-            .75f + getEntityWorld().random.nextFloat()
-        );
+        if (pPlayer.level().isClientSide())
+            return InteractionResult.SUCCESS;
+        pPlayer.setItemInHand(pHand, box);
+        level().playSound(null, blockPosition(), SoundEvents.ITEM_PICKUP, SoundSource.PLAYERS, .2f, .75f + level().random.nextFloat());
         remove(RemovalReason.DISCARDED);
-        return ActionResult.SUCCESS;
+        return InteractionResult.SUCCESS;
     }
 
     @Override
-    public void pushAwayFrom(Entity entityIn) {
+    public void push(Entity entityIn) {
         boolean isOtherPackage = entityIn instanceof PackageEntity;
 
         if (!isOtherPackage && tossedBy.get() != null)
@@ -267,75 +260,75 @@ public class PackageEntity extends LivingEntity {
 
         if (isOtherPackage) {
             if (entityIn.getBoundingBox().minY < this.getBoundingBox().maxY)
-                super.pushAwayFrom(entityIn);
+                super.push(entityIn);
         } else if (entityIn.getBoundingBox().minY <= this.getBoundingBox().minY) {
-            super.pushAwayFrom(entityIn);
+            super.push(entityIn);
         }
     }
 
     @Override
-    public Vec3d getPassengerRidingPos(Entity entity) {
-        return getEntityPos().add(0, entity.getDimensions(getPose()).height(), 0);
+    public Vec3 getPassengerRidingPosition(Entity entity) {
+        return position().add(0, entity.getDimensions(getPose()).height(), 0);
     }
 
     @Override
-    protected Vec3d getPassengerAttachmentPos(Entity entity, EntityDimensions dimensions, float partialTick) {
-        return super.getPassengerAttachmentPos(entity, dimensions, partialTick).add(0, 2 / 16f, 0);
+    protected Vec3 getPassengerAttachmentPoint(Entity entity, EntityDimensions dimensions, float partialTick) {
+        return super.getPassengerAttachmentPoint(entity, dimensions, partialTick).add(0, 2 / 16f, 0);
     }
 
     @Override
-    protected void onBlockCollision(BlockState state) {
-        super.onBlockCollision(state);
+    protected void onInsideBlock(BlockState state) {
+        super.onInsideBlock(state);
         if (!isAlive())
             return;
-        if (state.getBlock() == Blocks.WATER || (state.contains(Properties.WATERLOGGED) && state.get(Properties.WATERLOGGED))) {
-            destroy(getDamageSources().drown());
+        if (state.getBlock() == Blocks.WATER || (state.hasProperty(BlockStateProperties.WATERLOGGED) && state.getValue(BlockStateProperties.WATERLOGGED))) {
+            destroy(damageSources().drown());
             remove(RemovalReason.KILLED);
         }
     }
 
     @Override
-    public boolean damage(ServerWorld world, DamageSource source, float amount) {
-        if (getEntityWorld().isClient() || !this.isAlive())
+    public boolean hurtServer(ServerLevel world, DamageSource source, float amount) {
+        if (level().isClientSide() || !this.isAlive())
             return false;
 
-        if (source.isIn(DamageTypeTags.BYPASSES_INVULNERABILITY)) {
+        if (source.is(DamageTypeTags.BYPASSES_INVULNERABILITY)) {
             this.remove(RemovalReason.KILLED);
             return false;
         }
 
-        if (source.equals(getDamageSources().inWall()) && (hasVehicle() || insertionDelay < 20))
+        if (source.equals(damageSources().inWall()) && (isPassenger() || insertionDelay < 20))
             return false;
 
-        if (source.isIn(DamageTypeTags.IS_FALL))
+        if (source.is(DamageTypeTags.IS_FALL))
             return false;
 
-        if (this.isInvulnerableTo((ServerWorld) getEntityWorld(), source))
+        if (this.isInvulnerableTo((ServerLevel) level(), source))
             return false;
 
-        if (source.isIn(DamageTypeTags.IS_EXPLOSION)) {
+        if (source.is(DamageTypeTags.IS_EXPLOSION)) {
             this.destroy(source);
             this.remove(RemovalReason.KILLED);
             return false;
         }
 
-        if (source.isIn(DamageTypeTags.IS_FIRE)) {
+        if (source.is(DamageTypeTags.IS_FIRE)) {
             if (this.isOnFire()) {
                 this.takeDamage(source, 0.15F);
             } else {
-                this.setFireTicks(100); // 5 seconds
+                this.setRemainingFireTicks(100); // 5 seconds
             }
             return false;
         }
 
         boolean shotCanPierce;
-        if (source.getSource() instanceof PersistentProjectileEntity persistentProjectileEntity) {
+        if (source.getDirectEntity() instanceof AbstractArrow persistentProjectileEntity) {
             shotCanPierce = persistentProjectileEntity.getPierceLevel() > 0;
         } else {
             shotCanPierce = false;
         }
 
-        if (source.getAttacker() instanceof PlayerEntity player && !player.getAbilities().allowModifyWorld)
+        if (source.getEntity() instanceof Player player && !player.getAbilities().mayBuild)
             return false;
 
         this.destroy(source);
@@ -355,92 +348,92 @@ public class PackageEntity extends LivingEntity {
     }
 
     private void destroy(DamageSource source) {
-        AllSoundEvents.PACKAGE_POP.playOnServer(getEntityWorld(), getBlockPos());
-        if (getEntityWorld() instanceof ServerWorld serverLevel) {
-            this.drop(serverLevel, source);
-            serverLevel.getChunkManager().sendToOtherNearbyPlayers(this, new PackageDestroyPacket(getBoundingBox().getCenter(), box));
+        AllSoundEvents.PACKAGE_POP.playOnServer(level(), blockPosition());
+        if (level() instanceof ServerLevel serverLevel) {
+            this.dropAllDeathLoot(serverLevel, source);
+            serverLevel.getChunkSource().sendToTrackingPlayers(this, new PackageDestroyPacket(getBoundingBox().getCenter(), box));
         }
     }
 
     @Override
-    protected void drop(ServerWorld level, DamageSource pDamageSource) {
-        super.drop(level, pDamageSource);
+    protected void dropAllDeathLoot(ServerLevel level, DamageSource pDamageSource) {
+        super.dropAllDeathLoot(level, pDamageSource);
         ItemStackHandler contents = PackageItem.getContents(box);
-        for (int i = 0, size = contents.size(); i < size; i++) {
-            ItemStack itemstack = contents.getStack(i);
+        for (int i = 0, size = contents.getContainerSize(); i < size; i++) {
+            ItemStack itemstack = contents.getItem(i);
 
             if (itemstack.getItem() instanceof SpawnEggItem sei) {
-                EntityType<?> entitytype = sei.getEntityType(itemstack);
-                Entity entity = entitytype.spawnFromItemStack(level, itemstack, null, getBlockPos(), SpawnReason.SPAWN_ITEM_USE, false, false);
+                EntityType<?> entitytype = sei.getType(itemstack);
+                Entity entity = entitytype.spawn(level, itemstack, null, blockPosition(), EntitySpawnReason.SPAWN_ITEM_USE, false, false);
                 if (entity != null)
-                    itemstack.decrement(1);
+                    itemstack.shrink(1);
             }
 
             if (itemstack.isEmpty())
                 continue;
             ItemEntity entityIn = new ItemEntity(level, getX(), getY(), getZ(), itemstack);
-            level.spawnEntity(entityIn);
+            level.addFreshEntity(entityIn);
         }
     }
 
     @Override
-    protected void readCustomData(ReadView view) {
-        super.readCustomData(view);
+    protected void readAdditionalSaveData(ValueInput view) {
+        super.readAdditionalSaveData(view);
         box = view.read("Box", ItemStack.CODEC).orElse(ItemStack.EMPTY);
-        calculateDimensions();
+        refreshDimensions();
     }
 
     @Override
-    protected void writeCustomData(WriteView view) {
-        super.writeCustomData(view);
+    protected void addAdditionalSaveData(ValueOutput view) {
+        super.addAdditionalSaveData(view);
         if (!box.isEmpty()) {
-            view.put("Box", ItemStack.CODEC, box);
+            view.store("Box", ItemStack.CODEC, box);
         }
     }
 
     @Override
-    public ItemStack getEquippedStack(EquipmentSlot pSlot) {
+    public ItemStack getItemBySlot(EquipmentSlot pSlot) {
         if (pSlot == EquipmentSlot.MAINHAND)
             return getBox();
         return ItemStack.EMPTY;
     }
 
     @Override
-    public void equipStack(EquipmentSlot pSlot, ItemStack pStack) {
+    public void setItemSlot(EquipmentSlot pSlot, ItemStack pStack) {
         if (pSlot == EquipmentSlot.MAINHAND)
             setBox(pStack);
     }
 
     @Override
-    public Arm getMainArm() {
-        return Arm.RIGHT;
+    public HumanoidArm getMainArm() {
+        return HumanoidArm.RIGHT;
     }
 
     @Override
-    public Hand getActiveHand() {
-        return Hand.MAIN_HAND;
+    public InteractionHand getUsedItemHand() {
+        return InteractionHand.MAIN_HAND;
     }
 
     @Override
-    public Packet<ClientPlayPacketListener> createSpawnPacket(EntityTrackerEntry entityTrackerEntry) {
+    public Packet<ClientGamePacketListener> getAddEntityPacket(ServerEntity entityTrackerEntry) {
         return new PackageSpawnPacket(this, entityTrackerEntry);
     }
 
     @Override
-    public void onSpawnPacket(EntitySpawnS2CPacket packet) {
-        super.onSpawnPacket(packet);
+    public void recreateFromPacket(ClientboundAddEntityPacket packet) {
+        super.recreateFromPacket(packet);
         PackageSpawnPacket spawnPacket = (PackageSpawnPacket) packet;
         setBox(spawnPacket.getBox());
     }
 
     @Override
-    public float getSoundPitch() {
+    public float getVoicePitch() {
         return 1.5f;
     }
 
     @Override
-    public FallSounds getFallSounds() {
-        return new FallSounds(SoundEvents.BLOCK_CHISELED_BOOKSHELF_FALL, SoundEvents.BLOCK_CHISELED_BOOKSHELF_FALL);
+    public Fallsounds getFallSounds() {
+        return new Fallsounds(SoundEvents.CHISELED_BOOKSHELF_FALL, SoundEvents.CHISELED_BOOKSHELF_FALL);
     }
 
     @Nullable
@@ -454,12 +447,12 @@ public class PackageEntity extends LivingEntity {
     }
 
     @Override
-    public boolean isAffectedBySplashPotions() {
+    public boolean isAffectedByPotions() {
         return false;
     }
 
     @Override
-    public boolean isFireImmune() {
-        return box.contains(DataComponentTypes.DAMAGE_RESISTANT) || super.isFireImmune();
+    public boolean fireImmune() {
+        return box.has(DataComponents.DAMAGE_RESISTANT) || super.fireImmune();
     }
 }

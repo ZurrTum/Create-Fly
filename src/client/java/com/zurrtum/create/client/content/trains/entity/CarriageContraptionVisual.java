@@ -1,5 +1,6 @@
 package com.zurrtum.create.client.content.trains.entity;
 
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.zurrtum.create.client.AllBogeyStyleRenders;
 import com.zurrtum.create.client.content.contraptions.render.ClientContraption;
 import com.zurrtum.create.client.content.contraptions.render.OrientedContraptionVisual;
@@ -13,17 +14,16 @@ import com.zurrtum.create.content.contraptions.behaviour.MovementContext;
 import com.zurrtum.create.content.trains.entity.CarriageBogey;
 import com.zurrtum.create.content.trains.entity.CarriageContraption;
 import com.zurrtum.create.content.trains.entity.CarriageContraptionEntity;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.structure.StructureTemplate.StructureBlockInfo;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate.StructureBlockInfo;
 import org.apache.commons.lang3.tuple.MutablePair;
 import org.joml.Vector3f;
 
 public class CarriageContraptionVisual extends OrientedContraptionVisual<CarriageContraptionEntity> {
     public static final int MAX_NUM_BOGEYS = 2;
 
-    private final MatrixStack poseStack = new MatrixStack();
+    private final PoseStack poseStack = new PoseStack();
 
     private final CarriageContraption contraption;
 
@@ -60,7 +60,7 @@ public class CarriageContraptionVisual extends OrientedContraptionVisual<Carriag
 
     @Override
     protected <T extends BlockEntity> void setupVisualizer(T be, float partialTicks) {
-        if (entity.getContraption() instanceof CarriageContraption cc && cc.isHiddenInPortal(be.getPos())) {
+        if (entity.getContraption() instanceof CarriageContraption cc && cc.isHiddenInPortal(be.getBlockPos())) {
             return;
         }
         super.setupVisualizer(be, partialTicks);
@@ -91,8 +91,8 @@ public class CarriageContraptionVisual extends OrientedContraptionVisual<Carriag
                 if (bogey != null) {
                     visuals[numBogeys] = AllBogeyStyleRenders.createVisual(bogey.getStyle(), bogey.getSize(), visualizationContext, pt, true);
                     bogeys[numBogeys] = bogey;
-                    bogeyPos[numBogeys] = bogey.isLeading ? 0 : carriage.bogeySpacing * contraption.getAssemblyDirection().rotateYCounterclockwise()
-                        .getDirection().offset();
+                    bogeyPos[numBogeys] = bogey.isLeading ? 0 : carriage.bogeySpacing * contraption.getAssemblyDirection().getCounterClockWise()
+                        .getAxisDirection().getStep();
                     numBogeys++;
                 }
             }
@@ -113,7 +113,7 @@ public class CarriageContraptionVisual extends OrientedContraptionVisual<Carriag
         var carriage = entity.getCarriage();
         int bogeySpacing = carriage.bogeySpacing;
 
-        poseStack.push();
+        poseStack.pushPose();
 
         Vector3f visualPosition = getVisualPosition(partialTick);
         TransformStack.of(poseStack).translate(visualPosition);
@@ -124,7 +124,7 @@ public class CarriageContraptionVisual extends OrientedContraptionVisual<Carriag
                 continue;
             }
 
-            poseStack.push();
+            poseStack.pushPose();
 
             CarriageBogey bogey = bogeys[bogeyIdx];
 
@@ -139,15 +139,15 @@ public class CarriageContraptionVisual extends OrientedContraptionVisual<Carriag
             );
             poseStack.translate(0, -1.5 - 1 / 128f, 0);
 
-            NbtCompound bogeyData = bogey.bogeyData;
+            CompoundTag bogeyData = bogey.bogeyData;
             if (bogeyData == null) {
-                bogeyData = new NbtCompound();
+                bogeyData = new CompoundTag();
             }
             visuals[bogeyIdx].update(bogeyData, bogey.wheelAngle.getValue(partialTick), poseStack);
-            poseStack.pop();
+            poseStack.popPose();
         }
 
-        poseStack.pop();
+        poseStack.popPose();
     }
 
     @Override

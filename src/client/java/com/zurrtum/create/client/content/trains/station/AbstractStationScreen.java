@@ -1,5 +1,6 @@
 package com.zurrtum.create.client.content.trains.station;
 
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.zurrtum.create.client.AllTrainIcons;
 import com.zurrtum.create.client.Create;
 import com.zurrtum.create.client.catnip.gui.AbstractSimiScreen;
@@ -16,10 +17,9 @@ import com.zurrtum.create.content.trains.entity.Carriage;
 import com.zurrtum.create.content.trains.entity.Train;
 import com.zurrtum.create.content.trains.station.GlobalStation;
 import com.zurrtum.create.content.trains.station.StationBlockEntity;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.state.property.Properties;
-import net.minecraft.util.math.MathHelper;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.util.Mth;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 
 import java.lang.ref.WeakReference;
 import java.util.List;
@@ -37,7 +37,7 @@ public abstract class AbstractStationScreen extends AbstractSimiScreen {
     private IconButton confirmButton;
 
     public AbstractStationScreen(StationBlockEntity be, GlobalStation station) {
-        super(be.getCachedState().getBlock().getName());
+        super(be.getBlockState().getBlock().getName());
         this.blockEntity = be;
         this.station = station;
         displayedTrain = new WeakReference<>(null);
@@ -57,30 +57,30 @@ public abstract class AbstractStationScreen extends AbstractSimiScreen {
 
         setWindowSize(background.getWidth(), background.getHeight());
         super.init();
-        clearChildren();
+        clearWidgets();
 
         int x = guiLeft;
         int y = guiTop;
 
         confirmButton = new IconButton(x + background.getWidth() - 33, y + background.getHeight() - 24, AllIcons.I_CONFIRM);
-        confirmButton.withCallback(this::close);
-        addDrawableChild(confirmButton);
+        confirmButton.withCallback(this::onClose);
+        addRenderableWidget(confirmButton);
 
         renderedFlag = new ElementWidget(x + background.getWidth() + 25, y + background.getHeight() - 62).showingElement(GuiGameElement.partial()
             .scale(2.5F).transform(this::transform).padding(13));
-        addDrawableChild(renderedFlag);
+        addRenderableWidget(renderedFlag);
 
         renderedItem = new ElementWidget(
             x + background.getWidth() + 3,
             y + background.getHeight() - 46
-        ).showingElement(GuiGameElement.of(blockEntity.getCachedState().with(Properties.WATERLOGGED, false)).rotate(-22, 63, 0).scale(2.5F)
-            .padding(17));
-        addDrawableChild(renderedItem);
+        ).showingElement(GuiGameElement.of(blockEntity.getBlockState().setValue(BlockStateProperties.WATERLOGGED, false)).rotate(-22, 63, 0)
+            .scale(2.5F).padding(17));
+        addRenderableWidget(renderedItem);
     }
 
     @Override
-    public void close() {
-        super.close();
+    public void onClose() {
+        super.onClose();
         renderedItem.getRenderElement().clear();
     }
 
@@ -119,7 +119,7 @@ public abstract class AbstractStationScreen extends AbstractSimiScreen {
     //    }
 
     @Override
-    protected void renderWindow(DrawContext graphics, int mouseX, int mouseY, float partialTicks) {
+    protected void renderWindow(GuiGraphics graphics, int mouseX, int mouseY, float partialTicks) {
         int x = guiLeft;
         int y = guiTop;
 
@@ -132,13 +132,13 @@ public abstract class AbstractStationScreen extends AbstractSimiScreen {
         }
     }
 
-    private void transform(MatrixStack ms, float partialTicks) {
+    private void transform(PoseStack ms, float partialTicks) {
         ms.scale(1, -1, 1);
         float value = blockEntity.flag.getValue(partialTicks);
         float progress = (float) (Math.pow(Math.min(value * 5, 1), 2));
         if (blockEntity.flag.getChaseTarget() > 0 && !blockEntity.flag.settled() && progress == 1) {
             float wiggleProgress = (value - .2f) / .8f;
-            progress += (Math.sin(wiggleProgress * (2 * MathHelper.PI) * 4) / 8f) / Math.max(1, 8f * wiggleProgress);
+            progress += (Math.sin(wiggleProgress * (2 * Mth.PI) * 4) / 8f) / Math.max(1, 8f * wiggleProgress);
         }
 
         TransformStack.of(ms).rotateXDegrees(24).rotateYDegrees(-210).translate(-0.12F, -0.81F, 0).rotateYDegrees(90)

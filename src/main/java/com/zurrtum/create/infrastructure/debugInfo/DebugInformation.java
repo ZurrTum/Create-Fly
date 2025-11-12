@@ -9,8 +9,8 @@ import com.zurrtum.create.infrastructure.debugInfo.element.InfoEntry;
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.metadata.ModMetadata;
 import net.minecraft.SharedConstants;
-import net.minecraft.util.SystemDetails;
-import net.minecraft.util.Util;
+import net.minecraft.SystemReport;
+import net.minecraft.Util;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -30,8 +30,8 @@ public class DebugInformation {
     private static final List<DebugInfoSection> server = new ArrayList<>();
 
     private static final ImmutableMap<String, String> mcSystemInfo = Util.make(() -> {
-        SystemDetails systemReport = new SystemDetails();
-        return ImmutableMap.copyOf(systemReport.sections);
+        SystemReport systemReport = new SystemReport();
+        return ImmutableMap.copyOf(systemReport.entries);
     });
 
     public static void registerClientInfo(DebugInfoSection section) {
@@ -57,13 +57,13 @@ public class DebugInformation {
 
     static {
         DebugInfoSection.builder(Create.NAME).put("Mod Version", Create.VERSION).put("Ponder Version", getVersionOfMod("ponder"))
-            .put("NeoForge Version", getVersionOfMod("neoforge")).put("Minecraft Version", SharedConstants.getGameVersion().name())
+            .put("NeoForge Version", getVersionOfMod("neoforge")).put("Minecraft Version", SharedConstants.getCurrentVersion().name())
             .buildTo(DebugInformation::registerBothInfo);
 
         AllClientHandle.INSTANCE.buildDebugInfo();
 
-        DebugInfoSection.builder("System Information").put("Operating System", SystemDetails.OPERATING_SYSTEM)
-            .put("Java Version", SystemDetails.JAVA_VERSION).put("JVM Flags", getMcSystemInfo("JVM Flags"))
+        DebugInfoSection.builder("System Information").put("Operating System", SystemReport.OPERATING_SYSTEM)
+            .put("Java Version", SystemReport.JAVA_VERSION).put("JVM Flags", getMcSystemInfo("JVM Flags"))
             .put("Memory", () -> getMcSystemInfo("Memory")).put("Total Memory", getTotalRam()).put("CPU", getCpuInfo()).putAll(listAllGraphicsCards())
             .buildTo(DebugInformation::registerBothInfo);
 
@@ -122,7 +122,7 @@ public class DebugInformation {
 
     /**
      * Get a system attribute provided by Minecraft.
-     * They can be found in the constructor of {@link SystemDetails}.
+     * They can be found in the constructor of {@link SystemReport}.
      */
     @Nullable
     public static String getMcSystemInfo(String key) {

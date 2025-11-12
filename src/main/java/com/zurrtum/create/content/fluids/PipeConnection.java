@@ -8,18 +8,17 @@ import com.zurrtum.create.catnip.math.BlockFace;
 import com.zurrtum.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.foundation.codec.CreateCodecs;
 import com.zurrtum.create.infrastructure.fluids.FluidStack;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.storage.ReadView;
-import net.minecraft.storage.WriteView;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.world.World;
-import net.minecraft.world.chunk.ChunkStatus;
-
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.util.Mth;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.chunk.status.ChunkStatus;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 
 public class PipeConnection {
 
@@ -72,14 +71,14 @@ public class PipeConnection {
         return true;
     }
 
-    public void manageSource(World world, BlockPos pos, BlockEntity blockEntity) {
+    public void manageSource(Level world, BlockPos pos, BlockEntity blockEntity) {
         if (!source.isPresent() && !determineSource(world, pos))
             return;
         FlowSource flowSource = source.get();
         flowSource.manageSource(world, blockEntity);
     }
 
-    public boolean manageFlows(World world, BlockPos pos, FluidStack internalFluid, Predicate<FluidStack> extractionPredicate) {
+    public boolean manageFlows(Level world, BlockPos pos, FluidStack internalFluid, Predicate<FluidStack> extractionPredicate) {
 
         // Only keep network if still valid
         Optional<FluidNetwork> retainedNetwork = network;
@@ -148,8 +147,8 @@ public class PipeConnection {
         return true;
     }
 
-    public boolean determineSource(World world, BlockPos pos) {
-        BlockPos relative = pos.offset(side);
+    public boolean determineSource(Level world, BlockPos pos) {
+        BlockPos relative = pos.relative(side);
         // cannot use world.isLoaded because it always returns true on client
         if (world.getChunk(relative.getX() >> 4, relative.getZ() >> 4, ChunkStatus.FULL, false) == null)
             return false;
@@ -173,14 +172,14 @@ public class PipeConnection {
         return true;
     }
 
-    public void tickFlowProgress(World world, BlockPos pos) {
+    public void tickFlowProgress(Level world, BlockPos pos) {
         if (!hasFlow())
             return;
         Flow flow = this.flow.get();
         if (flow.fluid.isEmpty())
             return;
 
-        if (world.isClient()) {
+        if (world.isClientSide()) {
             if (!source.isPresent())
                 determineSource(world, pos);
 
@@ -193,28 +192,28 @@ public class PipeConnection {
             particleSplashNextTick = false;
         }
 
-        float flowSpeed = 1 / 32f + MathHelper.clamp(pressure.get(flow.inbound) / 128f, 0, 1) * 31 / 32f;
+        float flowSpeed = 1 / 32f + Mth.clamp(pressure.get(flow.inbound) / 128f, 0, 1) * 31 / 32f;
         flow.progress.setValue(Math.min(flow.progress.getValue() + flowSpeed, 1));
         if (flow.progress.getValue() >= 1)
             flow.complete = true;
     }
 
-    public void write(WriteView view, BlockPos blockEntityPos, boolean clientPacket) {
+    public void write(ValueOutput view, BlockPos blockEntityPos, boolean clientPacket) {
         if (hasPressure()) {
-            view.put("Pressure", CreateCodecs.FLOAT_LIST_CODEC, List.of(getInboundPressure(), getOutwardPressure()));
+            view.store("Pressure", CreateCodecs.FLOAT_LIST_CODEC, List.of(getInboundPressure(), getOutwardPressure()));
         }
 
         if (source.orElse(null) instanceof OpenEndedPipe openEndedPipe)
-            view.put("OpenEnd", OpenEndedPipe.codec(blockEntityPos), openEndedPipe);
+            view.store("OpenEnd", OpenEndedPipe.codec(blockEntityPos), openEndedPipe);
 
         flow.ifPresent(flow -> {
-            WriteView flowData = view.get("Flow");
+            ValueOutput flowData = view.child("Flow");
             if (!flow.fluid.isEmpty()) {
-                flowData.put("Fluid", FluidStack.CODEC, flow.fluid);
+                flowData.store("Fluid", FluidStack.CODEC, flow.fluid);
             }
             flowData.putBoolean("In", flow.inbound);
             if (!flow.complete)
-                flow.progress.write(flowData.get("Progress"));
+                flow.progress.write(flowData.child("Progress"));
         });
 
     }
@@ -223,7 +222,7 @@ public class PipeConnection {
         return source.orElse(null) instanceof OpenEndedPipe;
     }
 
-    public void read(ReadView view, BlockPos blockEntityPos, boolean clientPacket) {
+    public void read(ValueInput view, BlockPos blockEntityPos, boolean clientPacket) {
         view.read("Pressure", CreateCodecs.FLOAT_LIST_CODEC).ifPresentOrElse(
             list -> {
                 pressure = Couple.create(list.getFirst(), list.getLast());
@@ -232,9 +231,9 @@ public class PipeConnection {
 
         source = Optional.ofNullable(view.read("OpenEnd", OpenEndedPipe.codec(blockEntityPos)).orElse(null));
 
-        view.getOptionalReadView("Flow").ifPresentOrElse(
+        view.child("Flow").ifPresentOrElse(
             flowData -> {
-                boolean inbound = flowData.getBoolean("In", false);
+                boolean inbound = flowData.getBooleanOr("In", false);
                 FluidStack fluid = flowData.read("Fluid", FluidStack.CODEC).orElse(FluidStack.EMPTY);
                 Flow flow;
                 if (this.flow.isEmpty()) {
@@ -247,7 +246,7 @@ public class PipeConnection {
                     flow.fluid = fluid;
                     flow.inbound = inbound;
                 }
-                flowData.getOptionalReadView("Progress").ifPresentOrElse(
+                flowData.child("Progress").ifPresentOrElse(
                     progress -> {
                         flow.complete = false;
                         flow.progress.read(progress, clientPacket);

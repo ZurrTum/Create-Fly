@@ -11,19 +11,19 @@ import com.zurrtum.create.content.kinetics.base.IRotate.StressImpact;
 import com.zurrtum.create.content.kinetics.steamEngine.SteamEngineBlock;
 import com.zurrtum.create.infrastructure.config.AllConfigs;
 import com.zurrtum.create.infrastructure.config.CKinetics;
-import net.minecraft.block.Block;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.BlockItem;
-import net.minecraft.item.Item;
-import net.minecraft.screen.ScreenTexts;
-import net.minecraft.text.Text;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
+import net.minecraft.network.chat.CommonComponents;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.level.block.Block;
 
-import static net.minecraft.util.Formatting.DARK_GRAY;
-import static net.minecraft.util.Formatting.GRAY;
+import static net.minecraft.ChatFormatting.DARK_GRAY;
+import static net.minecraft.ChatFormatting.GRAY;
 
 public class KineticStats implements TooltipModifier {
     protected final Block block;
@@ -44,16 +44,16 @@ public class KineticStats implements TooltipModifier {
     }
 
     @Override
-    public void modify(List<Text> tooltip, PlayerEntity player) {
-        List<Text> kineticStats = getKineticStats(block, player);
+    public void modify(List<Component> tooltip, Player player) {
+        List<Component> kineticStats = getKineticStats(block, player);
         if (!kineticStats.isEmpty()) {
-            tooltip.add(ScreenTexts.EMPTY);
+            tooltip.add(CommonComponents.EMPTY);
             tooltip.addAll(kineticStats);
         }
     }
 
-    public static List<Text> getKineticStats(Block block, PlayerEntity player) {
-        List<Text> list = new ArrayList<>();
+    public static List<Component> getKineticStats(Block block, Player player) {
+        List<Component> list = new ArrayList<>();
 
         CKinetics config = AllConfigs.server().kinetics;
         LangBuilder rpmUnit = CreateLang.translate("generic.unit.rpm");

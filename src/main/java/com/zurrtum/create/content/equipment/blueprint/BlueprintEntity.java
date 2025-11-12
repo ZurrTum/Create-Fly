@@ -22,143 +22,150 @@ import com.zurrtum.create.infrastructure.packet.s2c.NbtSpawnPacket;
 import it.unimi.dsi.fastutil.objects.Object2IntLinkedOpenCustomHashMap;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.ObjectBidirectionalIterator;
-import net.minecraft.block.AbstractRedstoneGateBlock;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityDimensions;
-import net.minecraft.entity.EntityPose;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.attribute.EntityAttributes;
-import net.minecraft.entity.data.DataTracker;
-import net.minecraft.entity.data.TrackedData;
-import net.minecraft.entity.decoration.AbstractDecorationEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.network.RegistryByteBuf;
-import net.minecraft.network.listener.ClientPlayPacketListener;
-import net.minecraft.network.packet.Packet;
-import net.minecraft.network.packet.s2c.play.EntitySpawnS2CPacket;
-import net.minecraft.recipe.CraftingRecipe;
-import net.minecraft.recipe.RecipeEntry;
-import net.minecraft.recipe.RecipeType;
-import net.minecraft.recipe.input.CraftingRecipeInput;
-import net.minecraft.registry.DynamicRegistryManager;
-import net.minecraft.server.network.EntityTrackerEntry;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.sound.SoundCategory;
-import net.minecraft.sound.SoundEvents;
-import net.minecraft.storage.NbtReadView;
-import net.minecraft.storage.NbtWriteView;
-import net.minecraft.storage.ReadView;
-import net.minecraft.storage.WriteView;
-import net.minecraft.text.Text;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.ErrorReporter;
-import net.minecraft.util.Hand;
-import net.minecraft.util.math.*;
-import net.minecraft.util.math.Direction.Axis;
-import net.minecraft.world.GameRules;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.Direction.Axis;
+import net.minecraft.core.RegistryAccess;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.protocol.Packet;
+import net.minecraft.network.protocol.game.ClientGamePacketListener;
+import net.minecraft.network.protocol.game.ClientboundAddEntityPacket;
+import net.minecraft.network.syncher.EntityDataAccessor;
+import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.server.level.ServerEntity;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.util.Mth;
+import net.minecraft.util.ProblemReporter;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityDimensions;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.Pose;
+import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.entity.decoration.HangingEntity;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.CraftingInput;
+import net.minecraft.world.item.crafting.CraftingRecipe;
+import net.minecraft.world.item.crafting.RecipeHolder;
+import net.minecraft.world.item.crafting.RecipeType;
+import net.minecraft.world.level.GameRules;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.DiodeBlock;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.storage.TagValueInput;
+import net.minecraft.world.level.storage.TagValueOutput;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 import java.util.concurrent.ExecutionException;
 
-public class BlueprintEntity extends AbstractDecorationEntity implements SpecialEntityItemRequirement, IInteractionChecker {
+public class BlueprintEntity extends HangingEntity implements SpecialEntityItemRequirement, IInteractionChecker {
     private static final Cache<String, BlueprintPreviewPacket> PREVIEW_CACHE = new TickBasedCache<>(20, true);
-    private static final TrackedData<NbtCompound> RECIPES = DataTracker.registerData(BlueprintEntity.class, AllSynchedDatas.NBT_COMPOUND_HANDLER);
+    private static final EntityDataAccessor<CompoundTag> RECIPES = SynchedEntityData.defineId(
+        BlueprintEntity.class,
+        AllSynchedDatas.NBT_COMPOUND_HANDLER
+    );
 
     public int size;
     protected Direction verticalOrientation;
 
-    public BlueprintEntity(EntityType<? extends BlueprintEntity> p_i50221_1_, World p_i50221_2_) {
+    public BlueprintEntity(EntityType<? extends BlueprintEntity> p_i50221_1_, Level p_i50221_2_) {
         super(p_i50221_1_, p_i50221_2_);
         size = 1;
     }
 
-    public BlueprintEntity(World world, BlockPos pos, Direction facing, Direction verticalOrientation) {
+    public BlueprintEntity(Level world, BlockPos pos, Direction facing, Direction verticalOrientation) {
         super(AllEntityTypes.CRAFTING_BLUEPRINT, world, pos);
 
         for (int size = 3; size > 0; size--) {
             this.size = size;
             updateFacingWithBoundingBox(facing, verticalOrientation);
-            if (canStayAttached())
+            if (survives())
                 break;
         }
     }
 
     @Override
-    public void onTrackedDataSet(TrackedData<?> data) {
-        if (POSE.equals(data)) {
-            calculateDimensions();
+    public void onSyncedDataUpdated(EntityDataAccessor<?> data) {
+        if (DATA_POSE.equals(data)) {
+            refreshDimensions();
         }
     }
 
     @Override
-    protected void initDataTracker(DataTracker.Builder builder) {
-        super.initDataTracker(builder);
-        builder.add(RECIPES, new NbtCompound());
+    protected void defineSynchedData(SynchedEntityData.Builder builder) {
+        super.defineSynchedData(builder);
+        builder.define(RECIPES, new CompoundTag());
     }
 
     @Override
-    public void writeCustomData(WriteView view) {
-        view.put("Orientation", Direction.CODEC, verticalOrientation);
-        view.put("Facing", Direction.CODEC, getHorizontalFacing());
+    public void addAdditionalSaveData(ValueOutput view) {
+        view.store("Orientation", Direction.CODEC, verticalOrientation);
+        view.store("Facing", Direction.CODEC, getDirection());
         view.putInt("Size", size);
-        view.put("Recipes", NbtCompound.CODEC, dataTracker.get(RECIPES));
-        super.writeCustomData(view);
+        view.store("Recipes", CompoundTag.CODEC, entityData.get(RECIPES));
+        super.addAdditionalSaveData(view);
     }
 
     @Override
-    public void readCustomData(ReadView view) {
+    public void readAdditionalSaveData(ValueInput view) {
         verticalOrientation = view.read("Orientation", Direction.CODEC).orElse(Direction.DOWN);
-        size = view.getInt("Size", 1);
-        view.read("Recipes", NbtCompound.CODEC).ifPresent(nbt -> dataTracker.set(RECIPES, nbt));
-        super.readCustomData(view);
+        size = view.getIntOr("Size", 1);
+        view.read("Recipes", CompoundTag.CODEC).ifPresent(nbt -> entityData.set(RECIPES, nbt));
+        super.readAdditionalSaveData(view);
         Direction direction = view.read("Facing", Direction.CODEC).orElse(Direction.DOWN);
         updateFacingWithBoundingBox(direction, verticalOrientation);
     }
 
     protected void updateFacingWithBoundingBox(Direction facing, Direction verticalOrientation) {
         Objects.requireNonNull(facing);
-        setFacingInternal(facing);
+        setDirectionRaw(facing);
         this.verticalOrientation = verticalOrientation;
         if (facing.getAxis().isHorizontal()) {
-            setPitch(0.0F);
-            setYaw(facing.getHorizontalQuarterTurns() * 90);
+            setXRot(0.0F);
+            setYRot(facing.get2DDataValue() * 90);
         } else {
-            setPitch(-90 * facing.getDirection().offset());
-            setYaw(verticalOrientation.getAxis().isHorizontal() ? 180 + verticalOrientation.getPositiveHorizontalDegrees() : 0);
+            setXRot(-90 * facing.getAxisDirection().getStep());
+            setYRot(verticalOrientation.getAxis().isHorizontal() ? 180 + verticalOrientation.toYRot() : 0);
         }
 
-        lastPitch = getPitch();
-        lastYaw = getYaw();
-        updateAttachmentPosition();
+        xRotO = getXRot();
+        yRotO = getYRot();
+        recalculateBoundingBox();
     }
 
     @Override
-    public EntityDimensions getDimensions(EntityPose pose) {
+    public EntityDimensions getDimensions(Pose pose) {
         return super.getDimensions(pose).withEyeHeight(0);
     }
 
     @Override
-    protected Box calculateBoundingBox(BlockPos blockPos, Direction direction) {
-        Vec3d pos = Vec3d.of(getAttachedBlockPos()).add(.5, .5, .5).subtract(Vec3d.of(direction.getVector()).multiply(0.46875));
+    protected AABB calculateBoundingBox(BlockPos blockPos, Direction direction) {
+        Vec3 pos = Vec3.atLowerCornerOf(getPos()).add(.5, .5, .5).subtract(Vec3.atLowerCornerOf(direction.getUnitVec3i()).scale(0.46875));
         double d1 = pos.x;
         double d2 = pos.y;
         double d3 = pos.z;
-        setPos(d1, d2, d3);
+        setPosRaw(d1, d2, d3);
 
         Axis axis = direction.getAxis();
         if (size == 2)
-            pos = pos.add(Vec3d.of(axis.isHorizontal() ? direction.rotateYCounterclockwise().getVector() : verticalOrientation.rotateYClockwise()
-                    .getVector()).multiply(0.5))
-                .add(Vec3d.of(axis.isHorizontal() ? Direction.UP.getVector() : direction == Direction.UP ? verticalOrientation.getVector() : verticalOrientation.getOpposite()
-                    .getVector()).multiply(0.5));
+            pos = pos.add(Vec3.atLowerCornerOf(axis.isHorizontal() ? direction.getCounterClockWise()
+                    .getUnitVec3i() : verticalOrientation.getClockWise().getUnitVec3i()).scale(0.5))
+                .add(Vec3.atLowerCornerOf(axis.isHorizontal() ? Direction.UP.getUnitVec3i() : direction == Direction.UP ? verticalOrientation.getUnitVec3i() : verticalOrientation.getOpposite()
+                    .getUnitVec3i()).scale(0.5));
 
         d1 = pos.x;
         d2 = pos.y;
@@ -167,7 +174,7 @@ public class BlueprintEntity extends AbstractDecorationEntity implements Special
         double d4 = getEntityWidth();
         double d5 = getEntityHeight();
         double d6 = d4;
-        Axis direction$axis = getHorizontalFacing().getAxis();
+        Axis direction$axis = getDirection().getAxis();
         switch (direction$axis) {
             case X:
                 d4 = 1.0D;
@@ -183,37 +190,37 @@ public class BlueprintEntity extends AbstractDecorationEntity implements Special
         d5 = d5 / 32.0D;
         d6 = d6 / 32.0D;
 
-        return new Box(d1 - d4, d2 - d5, d3 - d6, d1 + d4, d2 + d5, d3 + d6);
+        return new AABB(d1 - d4, d2 - d5, d3 - d6, d1 + d4, d2 + d5, d3 + d6);
     }
 
     @Override
-    protected void updateAttachmentPosition() {
-        Direction direction = getHorizontalFacing();
+    protected void recalculateBoundingBox() {
+        Direction direction = getDirection();
         if (direction != null && verticalOrientation != null) {
-            setBoundingBox(calculateBoundingBox(attachedBlockPos, direction));
+            setBoundingBox(calculateBoundingBox(pos, direction));
         }
     }
 
     @Override
-    public void setPosition(double pX, double pY, double pZ) {
-        setPos(pX, pY, pZ);
-        super.setPosition(pX, pY, pZ);
+    public void setPos(double pX, double pY, double pZ) {
+        setPosRaw(pX, pY, pZ);
+        super.setPos(pX, pY, pZ);
     }
 
     @Override
-    public boolean canStayAttached() {
-        World world = getEntityWorld();
-        if (!world.isSpaceEmpty(this))
+    public boolean survives() {
+        Level world = level();
+        if (!world.noCollision(this))
             return false;
 
         int i = Math.max(1, getEntityWidth() / 16);
         int j = Math.max(1, getEntityHeight() / 16);
-        Direction direction = getHorizontalFacing();
-        BlockPos blockpos = attachedBlockPos.offset(direction.getOpposite());
+        Direction direction = getDirection();
+        BlockPos blockpos = pos.relative(direction.getOpposite());
         Direction upDirection = direction.getAxis()
             .isHorizontal() ? Direction.UP : direction == Direction.UP ? verticalOrientation : verticalOrientation.getOpposite();
-        Direction newDirection = direction.getAxis().isVertical() ? verticalOrientation.rotateYClockwise() : direction.rotateYCounterclockwise();
-        BlockPos.Mutable blockpos$mutable = new BlockPos.Mutable();
+        Direction newDirection = direction.getAxis().isVertical() ? verticalOrientation.getClockWise() : direction.getCounterClockWise();
+        BlockPos.MutableBlockPos blockpos$mutable = new BlockPos.MutableBlockPos();
 
         for (int k = 0; k < i; ++k) {
             for (int l = 0; l < j; ++l) {
@@ -221,15 +228,15 @@ public class BlueprintEntity extends AbstractDecorationEntity implements Special
                 int j1 = (j - 1) / -2;
                 blockpos$mutable.set(blockpos).move(newDirection, k + i1).move(upDirection, l + j1);
                 BlockState blockstate = world.getBlockState(blockpos$mutable);
-                if (Block.sideCoversSmallSquare(world, blockpos$mutable, direction))
+                if (Block.canSupportCenter(world, blockpos$mutable, direction))
                     continue;
-                if (!blockstate.isSolid() && !AbstractRedstoneGateBlock.isRedstoneGate(blockstate)) {
+                if (!blockstate.isSolid() && !DiodeBlock.isDiode(blockstate)) {
                     return false;
                 }
             }
         }
 
-        return hasNoIntersectingDecoration(true);
+        return canCoexist(true);
     }
 
     public int getEntityWidth() {
@@ -241,49 +248,49 @@ public class BlueprintEntity extends AbstractDecorationEntity implements Special
     }
 
     @Override
-    public boolean handleAttack(Entity source) {
-        if (!(source instanceof PlayerEntity player) || getEntityWorld().isClient())
-            return super.handleAttack(source);
+    public boolean skipAttackInteraction(Entity source) {
+        if (!(source instanceof Player player) || level().isClientSide())
+            return super.skipAttackInteraction(source);
 
-        double attrib = player.getAttributeValue(EntityAttributes.BLOCK_INTERACTION_RANGE) + (player.isCreative() ? 0 : -0.5F);
+        double attrib = player.getAttributeValue(Attributes.BLOCK_INTERACTION_RANGE) + (player.isCreative() ? 0 : -0.5F);
 
-        Vec3d eyePos = source.getCameraPosVec(1);
-        Vec3d look = source.getRotationVec(1);
-        Vec3d target = eyePos.add(look.multiply(attrib));
+        Vec3 eyePos = source.getEyePosition(1);
+        Vec3 look = source.getViewVector(1);
+        Vec3 target = eyePos.add(look.scale(attrib));
 
-        Optional<Vec3d> rayTrace = getBoundingBox().raycast(eyePos, target);
+        Optional<Vec3> rayTrace = getBoundingBox().clip(eyePos, target);
         if (!rayTrace.isPresent())
-            return super.handleAttack(source);
+            return super.skipAttackInteraction(source);
 
-        Vec3d hitVec = rayTrace.get();
-        BlueprintSection sectionAt = getSectionAt(hitVec.subtract(getEntityPos()));
+        Vec3 hitVec = rayTrace.get();
+        BlueprintSection sectionAt = getSectionAt(hitVec.subtract(position()));
         ItemStackHandler items = sectionAt.getItems();
 
-        if (items.getStack(9).isEmpty())
-            return super.handleAttack(source);
-        for (int i = 0, size = items.size(); i < size; i++)
-            items.setStack(i, ItemStack.EMPTY);
+        if (items.getItem(9).isEmpty())
+            return super.skipAttackInteraction(source);
+        for (int i = 0, size = items.getContainerSize(); i < size; i++)
+            items.setItem(i, ItemStack.EMPTY);
         sectionAt.save(items);
         return true;
     }
 
     @Override
-    public void onBreak(ServerWorld world, @Nullable Entity p_110128_1_) {
-        if (!world.getGameRules().getBoolean(GameRules.DO_ENTITY_DROPS))
+    public void dropItem(ServerLevel world, @Nullable Entity p_110128_1_) {
+        if (!world.getGameRules().getBoolean(GameRules.RULE_DOENTITYDROPS))
             return;
 
-        playSound(SoundEvents.ENTITY_PAINTING_BREAK, 1.0F, 1.0F);
-        if (p_110128_1_ instanceof PlayerEntity playerentity) {
-            if (playerentity.getAbilities().creativeMode)
+        playSound(SoundEvents.PAINTING_BREAK, 1.0F, 1.0F);
+        if (p_110128_1_ instanceof Player playerentity) {
+            if (playerentity.getAbilities().instabuild)
                 return;
         }
 
-        dropStack(world, AllItems.CRAFTING_BLUEPRINT.getDefaultStack());
+        spawnAtLocation(world, AllItems.CRAFTING_BLUEPRINT.getDefaultInstance());
     }
 
     @Override
-    public @Nullable ItemStack getPickBlockStack() {
-        return AllItems.CRAFTING_BLUEPRINT.getDefaultStack();
+    public @Nullable ItemStack getPickResult() {
+        return AllItems.CRAFTING_BLUEPRINT.getDefaultInstance();
     }
 
     @Override
@@ -292,61 +299,61 @@ public class BlueprintEntity extends AbstractDecorationEntity implements Special
     }
 
     @Override
-    public void onPlace() {
-        this.playSound(SoundEvents.ENTITY_PAINTING_PLACE, 1.0F, 1.0F);
+    public void playPlacementSound() {
+        this.playSound(SoundEvents.PAINTING_PLACE, 1.0F, 1.0F);
     }
 
     @Override
-    public void refreshPositionAndAngles(double p_70012_1_, double p_70012_3_, double p_70012_5_, float p_70012_7_, float p_70012_8_) {
-        this.setPosition(p_70012_1_, p_70012_3_, p_70012_5_);
+    public void snapTo(double p_70012_1_, double p_70012_3_, double p_70012_5_, float p_70012_7_, float p_70012_8_) {
+        this.setPos(p_70012_1_, p_70012_3_, p_70012_5_);
     }
 
     @Override
-    public void updateTrackedPositionAndAngles(Vec3d pos, float yaw, float pitch) {
-        BlockPos blockpos = attachedBlockPos.add(BlockPos.ofFloored(pos.getX() - getX(), pos.getY() - getY(), pos.getZ() - getZ()));
-        this.setPosition(blockpos.getX(), blockpos.getY(), blockpos.getZ());
+    public void moveOrInterpolateTo(Vec3 pos, float yaw, float pitch) {
+        BlockPos blockpos = this.pos.offset(BlockPos.containing(pos.x() - getX(), pos.y() - getY(), pos.z() - getZ()));
+        this.setPos(blockpos.getX(), blockpos.getY(), blockpos.getZ());
     }
 
     @Override
-    public Packet<ClientPlayPacketListener> createSpawnPacket(EntityTrackerEntry entityTrackerEntry) {
-        try (ErrorReporter.Logging logging = new ErrorReporter.Logging(getErrorReporterContext(), Create.LOGGER)) {
-            NbtWriteView view = NbtWriteView.create(logging, getRegistryManager());
-            writeCustomData(view);
-            return new NbtSpawnPacket(this, entityTrackerEntry, view.getNbt());
+    public Packet<ClientGamePacketListener> getAddEntityPacket(ServerEntity entityTrackerEntry) {
+        try (ProblemReporter.ScopedCollector logging = new ProblemReporter.ScopedCollector(problemPath(), Create.LOGGER)) {
+            TagValueOutput view = TagValueOutput.createWithContext(logging, registryAccess());
+            addAdditionalSaveData(view);
+            return new NbtSpawnPacket(this, entityTrackerEntry, view.buildResult());
         }
     }
 
     @Override
-    public void onSpawnPacket(EntitySpawnS2CPacket packet) {
-        super.onSpawnPacket(packet);
-        NbtCompound nbt = ((NbtSpawnPacket) packet).getNbt();
+    public void recreateFromPacket(ClientboundAddEntityPacket packet) {
+        super.recreateFromPacket(packet);
+        CompoundTag nbt = ((NbtSpawnPacket) packet).getNbt();
         if (nbt == null) {
             return;
         }
-        try (ErrorReporter.Logging logging = new ErrorReporter.Logging(getErrorReporterContext(), Create.LOGGER)) {
-            readCustomData(NbtReadView.create(logging, getRegistryManager(), nbt));
+        try (ProblemReporter.ScopedCollector logging = new ProblemReporter.ScopedCollector(problemPath(), Create.LOGGER)) {
+            readAdditionalSaveData(TagValueInput.create(logging, registryAccess(), nbt));
         }
     }
 
     @Override
-    public ActionResult interactAt(PlayerEntity player, Vec3d vec, Hand hand) {
+    public InteractionResult interactAt(Player player, Vec3 vec, InteractionHand hand) {
         if (FakePlayerHandler.has(player))
-            return ActionResult.PASS;
+            return InteractionResult.PASS;
 
-        boolean holdingWrench = player.getStackInHand(hand).isOf(AllItems.WRENCH);
+        boolean holdingWrench = player.getItemInHand(hand).is(AllItems.WRENCH);
         BlueprintSection section = getSectionAt(vec);
         ItemStackHandler items = section.getItems();
 
-        World world = getEntityWorld();
-        if (!holdingWrench && !world.isClient() && !items.getStack(9).isEmpty()) {
-            DynamicRegistryManager registryManager = world.getRegistryManager();
-            PlayerInventory playerInv = player.getInventory();
-            int size = playerInv.size();
+        Level world = level();
+        if (!holdingWrench && !world.isClientSide() && !items.getItem(9).isEmpty()) {
+            RegistryAccess registryManager = world.registryAccess();
+            Inventory playerInv = player.getInventory();
+            int size = playerInv.getContainerSize();
             boolean firstPass = true;
             int amountCrafted = 0;
             //TODO
             //            CommonHooks.setCraftingPlayer(player);
-            RecipeEntry<CraftingRecipe> recipe = null;
+            RecipeHolder<CraftingRecipe> recipe = null;
             List<ItemStack> results = null;
 
             do {
@@ -357,7 +364,7 @@ public class BlueprintEntity extends AbstractDecorationEntity implements Special
 
                 Search:
                 for (int i = 0; i < 9; i++) {
-                    ItemStack filter = items.getStack(i);
+                    ItemStack filter = items.getItem(i);
                     if (filter.isEmpty()) {
                         craftingStacks.add(ItemStack.EMPTY);
                         continue;
@@ -365,7 +372,7 @@ public class BlueprintEntity extends AbstractDecorationEntity implements Special
                     FilterItemStack requestedItem = FilterItemStack.of(filter);
 
                     for (int slot = 0; slot < size; slot++) {
-                        ItemStack stack = playerInv.getStack(slot);
+                        ItemStack stack = playerInv.getItem(slot);
                         if (!requestedItem.test(world, stack))
                             continue;
                         int used = stacksTaken[slot];
@@ -385,24 +392,24 @@ public class BlueprintEntity extends AbstractDecorationEntity implements Special
                 }
 
                 if (success) {
-                    CraftingRecipeInput input = CraftingRecipeInput.create(3, 3, craftingStacks);
-                    recipe = ((ServerWorld) world).getRecipeManager().getFirstMatch(RecipeType.CRAFTING, input, world, recipe).orElse(null);
+                    CraftingInput input = CraftingInput.of(3, 3, craftingStacks);
+                    recipe = ((ServerLevel) world).recipeAccess().getRecipeFor(RecipeType.CRAFTING, input, world, recipe).orElse(null);
                     if (recipe == null) {
                         success = false;
                     } else {
                         CraftingRecipe craftingRecipe = recipe.value();
-                        ItemStack result = craftingRecipe.craft(input, registryManager);
+                        ItemStack result = craftingRecipe.assemble(input, registryManager);
                         if (result.isEmpty() || result.getCount() + amountCrafted > 64) {
                             success = false;
                         } else {
                             amountCrafted += result.getCount();
-                            result.onCraftByPlayer(player, 1);
+                            result.onCraftedBy(player, 1);
                             //TODO
                             //                        EventHooks.firePlayerCraftingEvent(player, result, craftingInventory);
 
                             results = new ArrayList<>();
                             results.add(result);
-                            for (ItemStack stack : craftingRecipe.getRecipeRemainders(input)) {
+                            for (ItemStack stack : craftingRecipe.getRemainingItems(input)) {
                                 if (stack.isEmpty()) {
                                     continue;
                                 }
@@ -412,9 +419,9 @@ public class BlueprintEntity extends AbstractDecorationEntity implements Special
                             if (firstPass) {
                                 world.playSound(
                                     null,
-                                    player.getBlockPos(),
-                                    SoundEvents.ENTITY_ITEM_PICKUP,
-                                    SoundCategory.PLAYERS,
+                                    player.blockPosition(),
+                                    SoundEvents.ITEM_PICKUP,
+                                    SoundSource.PLAYERS,
                                     .2f,
                                     1f + world.getRandom().nextFloat()
                                 );
@@ -430,38 +437,38 @@ public class BlueprintEntity extends AbstractDecorationEntity implements Special
                         if (used == 0) {
                             continue;
                         }
-                        ItemStack stack = playerInv.getStack(slot);
+                        ItemStack stack = playerInv.getItem(slot);
                         int count = stack.getCount();
                         if (count == used) {
                             stack = ItemStack.EMPTY;
                         } else {
                             stack.setCount(count - used);
                         }
-                        playerInv.setStack(slot, stack);
+                        playerInv.setItem(slot, stack);
                     }
-                    playerInv.markDirty();
+                    playerInv.setChanged();
                     for (ItemStack stack : results) {
-                        player.getInventory().offerOrDrop(stack);
+                        player.getInventory().placeItemBackInInventory(stack);
                     }
                 } else {
                     break;
                 }
 
-            } while (player.isSneaking());
+            } while (player.isShiftKeyDown());
             //TODO
             //            CommonHooks.setCraftingPlayer(null);
-            PREVIEW_CACHE.invalidate(getId() + "_" + section.index + "_" + player.getId() + (player.isSneaking() ? "_sneaking" : ""));
-            return ActionResult.SUCCESS;
+            PREVIEW_CACHE.invalidate(getId() + "_" + section.index + "_" + player.getId() + (player.isShiftKeyDown() ? "_sneaking" : ""));
+            return InteractionResult.SUCCESS;
         }
 
-        if (!world.isClient() && player instanceof ServerPlayerEntity serverPlayer) {
+        if (!world.isClientSide() && player instanceof ServerPlayer serverPlayer) {
             MenuProvider.openHandledScreen(serverPlayer, section);
         }
 
-        return ActionResult.SUCCESS;
+        return InteractionResult.SUCCESS;
     }
 
-    public static BlueprintPreviewPacket getPreview(BlueprintEntity be, int index, ServerPlayerEntity player, boolean sneaking) {
+    public static BlueprintPreviewPacket getPreview(BlueprintEntity be, int index, ServerPlayer player, boolean sneaking) {
         try {
             return PREVIEW_CACHE.get(
                 be.getId() + "_" + index + "_" + player.getId() + (sneaking ? "_sneaking" : ""),
@@ -473,15 +480,15 @@ public class BlueprintEntity extends AbstractDecorationEntity implements Special
         }
     }
 
-    private static BlueprintPreviewPacket createPreview(BlueprintEntity be, int index, ServerPlayerEntity player, boolean sneaking) {
+    private static BlueprintPreviewPacket createPreview(BlueprintEntity be, int index, ServerPlayer player, boolean sneaking) {
         BlueprintSection section = be.getSection(index);
         ItemStackHandler items = section.getItems();
         if (items.isEmpty()) {
             return BlueprintPreviewPacket.EMPTY;
         }
-        ServerWorld world = player.getEntityWorld();
-        PlayerInventory playerInv = player.getInventory();
-        int size = playerInv.size();
+        ServerLevel world = player.level();
+        Inventory playerInv = player.getInventory();
+        int size = playerInv.getContainerSize();
         int[] stacksTaken = new int[size];
         List<FilterItemStack> requestedItems = new ArrayList<>(9);
         List<ItemStack> craftingStacks = new ArrayList<>(9);
@@ -489,7 +496,7 @@ public class BlueprintEntity extends AbstractDecorationEntity implements Special
         Object2IntLinkedOpenCustomHashMap<ItemStack> availableStacks = BlueprintPreviewPacket.createMap();
         Search:
         for (int i = 0; i < 9; i++) {
-            FilterItemStack requestedItem = FilterItemStack.of(items.getStack(i));
+            FilterItemStack requestedItem = FilterItemStack.of(items.getItem(i));
             if (requestedItem.isEmpty()) {
                 requestedItems.add(null);
                 craftingStacks.add(ItemStack.EMPTY);
@@ -497,7 +504,7 @@ public class BlueprintEntity extends AbstractDecorationEntity implements Special
             }
             requestedItems.add(requestedItem);
             for (int slot = 0; slot < size; slot++) {
-                ItemStack stack = playerInv.getStack(slot);
+                ItemStack stack = playerInv.getItem(slot);
                 if (!requestedItem.test(world, stack))
                     continue;
                 int used = stacksTaken[slot];
@@ -512,17 +519,17 @@ public class BlueprintEntity extends AbstractDecorationEntity implements Special
             missingStacks.merge(requestedItem.item(), 1, Integer::sum);
         }
         if (!missingStacks.isEmpty()) {
-            return new BlueprintPreviewPacket(availableStacks, missingStacks, items.getStack(9));
+            return new BlueprintPreviewPacket(availableStacks, missingStacks, items.getItem(9));
         }
-        CraftingRecipeInput input = CraftingRecipeInput.create(3, 3, craftingStacks);
-        Optional<ItemStack> result = world.getRecipeManager().getFirstMatch(RecipeType.CRAFTING, input, world)
-            .map(entry -> entry.value().craft(input, world.getRegistryManager())).filter(stack -> !stack.isEmpty());
+        CraftingInput input = CraftingInput.of(3, 3, craftingStacks);
+        Optional<ItemStack> result = world.recipeAccess().getRecipeFor(RecipeType.CRAFTING, input, world)
+            .map(entry -> entry.value().assemble(input, world.registryAccess())).filter(stack -> !stack.isEmpty());
         if (result.isEmpty()) {
             return new BlueprintPreviewPacket(availableStacks, List.of(), ItemStack.EMPTY);
         }
         ItemStack resultStack = result.get();
         if (sneaking) {
-            int max = resultStack.getMaxCount();
+            int max = resultStack.getMaxStackSize();
             int craftingCount = resultStack.getCount();
             if (craftingCount < max) {
                 int count = craftingCount;
@@ -536,7 +543,7 @@ public class BlueprintEntity extends AbstractDecorationEntity implements Special
                             continue;
                         }
                         for (int slot = 0; slot < size; slot++) {
-                            ItemStack stack = playerInv.getStack(slot);
+                            ItemStack stack = playerInv.getItem(slot);
                             if (!requestedItem.test(world, stack))
                                 continue;
                             int used = stacksTaken[slot];
@@ -561,30 +568,30 @@ public class BlueprintEntity extends AbstractDecorationEntity implements Special
         return new BlueprintPreviewPacket(availableStacks, List.of(), resultStack);
     }
 
-    public BlueprintSection getSectionAt(Vec3d vec) {
+    public BlueprintSection getSectionAt(Vec3 vec) {
         int index = 0;
         if (size > 1) {
-            vec = VecHelper.rotate(vec, getYaw(), Axis.Y);
-            vec = VecHelper.rotate(vec, -getPitch(), Axis.X);
+            vec = VecHelper.rotate(vec, getYRot(), Axis.Y);
+            vec = VecHelper.rotate(vec, -getXRot(), Axis.X);
             vec = vec.add(0.5, 0.5, 0);
             if (size == 3)
                 vec = vec.add(1, 1, 0);
-            int x = MathHelper.clamp(MathHelper.floor(vec.x), 0, size - 1);
-            int y = MathHelper.clamp(MathHelper.floor(vec.y), 0, size - 1);
+            int x = Mth.clamp(Mth.floor(vec.x), 0, size - 1);
+            int y = Mth.clamp(Mth.floor(vec.y), 0, size - 1);
             index = x + y * size;
         }
 
         return getSection(index);
     }
 
-    public Optional<NbtCompound> getRecipeCompound(int index) {
-        return dataTracker.get(RECIPES).getCompound(Integer.toString(index));
+    public Optional<CompoundTag> getRecipeCompound(int index) {
+        return entityData.get(RECIPES).getCompound(Integer.toString(index));
     }
 
-    public void putRecipeCompound(int index, NbtCompound compound) {
-        NbtCompound recipes = dataTracker.get(RECIPES);
+    public void putRecipeCompound(int index, CompoundTag compound) {
+        CompoundTag recipes = entityData.get(RECIPES);
         recipes.put(Integer.toString(index), compound);
-        dataTracker.set(RECIPES, recipes, true);
+        entityData.set(RECIPES, recipes, true);
     }
 
     private final Map<Integer, BlueprintSection> sectionCache = new HashMap<>();
@@ -606,7 +613,7 @@ public class BlueprintEntity extends AbstractDecorationEntity implements Special
         public Couple<ItemStack> getDisplayItems() {
             if (cachedDisplayItems != null)
                 return cachedDisplayItems;
-            return getRecipeCompound(index).flatMap(nbt -> nbt.get("Inventory", CreateCodecs.ITEM_LIST_CODEC)
+            return getRecipeCompound(index).flatMap(nbt -> nbt.read("Inventory", CreateCodecs.ITEM_LIST_CODEC)
                 .map(items -> Couple.create(items.get(9), items.get(10)))).orElse(EMPTY_DISPLAY);
         }
 
@@ -614,10 +621,10 @@ public class BlueprintEntity extends AbstractDecorationEntity implements Special
             ItemStackHandler newInv = new ItemStackHandler(11);
             getRecipeCompound(index).ifPresentOrElse(
                 nbt -> {
-                    try (ErrorReporter.Logging logging = new ErrorReporter.Logging(getErrorReporterContext(), Create.LOGGER)) {
-                        ReadView view = NbtReadView.create(logging, getRegistryManager(), nbt);
+                    try (ProblemReporter.ScopedCollector logging = new ProblemReporter.ScopedCollector(problemPath(), Create.LOGGER)) {
+                        ValueInput view = TagValueInput.create(logging, registryAccess(), nbt);
                         newInv.readSlots(view);
-                        inferredIcon = view.getBoolean("InferredIcon", false);
+                        inferredIcon = view.getBooleanOr("InferredIcon", false);
                     }
                 }, () -> inferredIcon = false
             );
@@ -626,12 +633,12 @@ public class BlueprintEntity extends AbstractDecorationEntity implements Special
 
         public void save(ItemStackHandler inventory) {
             cachedDisplayItems = null;
-            if (!getEntityWorld().isClient()) {
-                try (ErrorReporter.Logging logging = new ErrorReporter.Logging(getErrorReporterContext(), Create.LOGGER)) {
-                    NbtWriteView view = NbtWriteView.create(logging, getRegistryManager());
+            if (!level().isClientSide()) {
+                try (ProblemReporter.ScopedCollector logging = new ProblemReporter.ScopedCollector(problemPath(), Create.LOGGER)) {
+                    TagValueOutput view = TagValueOutput.createWithContext(logging, registryAccess());
                     inventory.writeSlots(view);
                     view.putBoolean("InferredIcon", inferredIcon);
-                    putRecipeCompound(index, view.getNbt());
+                    putRecipeCompound(index, view.buildResult());
                 }
             }
         }
@@ -640,32 +647,32 @@ public class BlueprintEntity extends AbstractDecorationEntity implements Special
             return isAlive();
         }
 
-        public World getBlueprintWorld() {
-            return getEntityWorld();
+        public Level getBlueprintWorld() {
+            return level();
         }
 
         @Override
-        public BlueprintMenu createMenu(int id, PlayerInventory inv, PlayerEntity player, RegistryByteBuf extraData) {
+        public BlueprintMenu createMenu(int id, Inventory inv, Player player, RegistryFriendlyByteBuf extraData) {
             extraData.writeVarInt(getId());
             extraData.writeVarInt(index);
             return new BlueprintMenu(id, inv, this);
         }
 
         @Override
-        public Text getDisplayName() {
+        public Component getDisplayName() {
             return AllItems.CRAFTING_BLUEPRINT.getName();
         }
 
         @Override
-        public boolean canPlayerUse(PlayerEntity player) {
+        public boolean canPlayerUse(Player player) {
             return BlueprintEntity.this.canPlayerUse(player);
         }
 
     }
 
     @Override
-    public boolean canPlayerUse(PlayerEntity player) {
-        Box box = getBoundingBox();
+    public boolean canPlayerUse(Player player) {
+        AABB box = getBoundingBox();
 
         double dx = 0;
         if (box.minX > player.getX()) {

@@ -1,43 +1,47 @@
 package com.zurrtum.create.client.foundation.gui.render;
 
+import com.mojang.blaze3d.platform.Lighting;
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
+import com.mojang.math.Axis;
 import com.zurrtum.create.catnip.math.AngleHelper;
 import com.zurrtum.create.client.AllPartialModels;
 import com.zurrtum.create.client.catnip.render.CachedBuffers;
 import com.zurrtum.create.client.content.processing.burner.BlazeBurnerRenderer;
 import com.zurrtum.create.client.flywheel.lib.model.baked.PartialModel;
 import com.zurrtum.create.content.processing.burner.BlazeBurnerBlock.HeatLevel;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.render.SpecialGuiElementRenderer;
-import net.minecraft.client.render.*;
-import net.minecraft.client.render.command.OrderedRenderCommandQueueImpl;
-import net.minecraft.client.render.command.RenderDispatcher;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.RotationAxis;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.render.pip.PictureInPictureRenderer;
+import net.minecraft.client.renderer.LightTexture;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.SubmitNodeStorage;
+import net.minecraft.client.renderer.feature.FeatureRenderDispatcher;
+import net.minecraft.core.Direction;
+import net.minecraft.util.Mth;
 
-public class BlazeBurnerElementRenderer extends SpecialGuiElementRenderer<BlazeBurnerRenderState> {
-    public BlazeBurnerElementRenderer(VertexConsumerProvider.Immediate vertexConsumers) {
+public class BlazeBurnerElementRenderer extends PictureInPictureRenderer<BlazeBurnerRenderState> {
+    public BlazeBurnerElementRenderer(MultiBufferSource.BufferSource vertexConsumers) {
         super(vertexConsumers);
     }
 
     @Override
-    protected void render(BlazeBurnerRenderState state, MatrixStack matrices) {
-        MinecraftClient.getInstance().gameRenderer.getDiffuseLighting().setShaderLights(DiffuseLighting.Type.ENTITY_IN_UI);
+    protected void renderToTexture(BlazeBurnerRenderState state, PoseStack matrices) {
+        Minecraft.getInstance().gameRenderer.getLighting().setupFor(Lighting.Entry.ENTITY_IN_UI);
         matrices.scale(1, 1, -1);
-        matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(-22.5f));
-        matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(-45));
+        matrices.mulPose(Axis.XP.rotationDegrees(-22.5f));
+        matrices.mulPose(Axis.YP.rotationDegrees(-45));
         matrices.scale(1, -1, 1);
         float horizontalAngle = AngleHelper.rad(270);
         boolean canDrawFlame = state.heatLevel().isAtLeast(HeatLevel.FADING);
         PartialModel drawHat = AllPartialModels.LOGISTICS_HAT;
 
-        VertexConsumer cutout = vertexConsumers.getBuffer(RenderLayer.getCutoutMipped());
-        CachedBuffers.partial(AllPartialModels.BLAZE_CAGE, state.block()).rotateCentered(horizontalAngle + MathHelper.PI, Direction.UP)
-            .light(LightmapTextureManager.MAX_LIGHT_COORDINATE).renderInto(matrices.peek(), cutout);
+        VertexConsumer cutout = bufferSource.getBuffer(RenderType.cutoutMipped());
+        CachedBuffers.partial(AllPartialModels.BLAZE_CAGE, state.block()).rotateCentered(horizontalAngle + Mth.PI, Direction.UP)
+            .light(LightTexture.FULL_BRIGHT).renderInto(matrices.last(), cutout);
 
-        RenderDispatcher renderDispatcher = MinecraftClient.getInstance().gameRenderer.getEntityRenderDispatcher();
-        OrderedRenderCommandQueueImpl queue = renderDispatcher.getQueue();
+        FeatureRenderDispatcher renderDispatcher = Minecraft.getInstance().gameRenderer.getFeatureRenderDispatcher();
+        SubmitNodeStorage queue = renderDispatcher.getSubmitNodeStorage();
         BlazeBurnerRenderer.getBlazeBurnerRenderData(
             state.world(),
             state.block(),
@@ -49,21 +53,21 @@ public class BlazeBurnerElementRenderer extends SpecialGuiElementRenderer<BlazeB
             drawHat,
             state.hash()
         ).render(matrices, queue);
-        renderDispatcher.render();
+        renderDispatcher.renderAllFeatures();
     }
 
     @Override
-    protected float getYOffset(int height, int windowScaleFactor) {
+    protected float getTranslateY(int height, int windowScaleFactor) {
         return height / 1.6f;
     }
 
     @Override
-    protected String getName() {
+    protected String getTextureLabel() {
         return "Blaze Burner";
     }
 
     @Override
-    public Class<BlazeBurnerRenderState> getElementClass() {
+    public Class<BlazeBurnerRenderState> getRenderStateClass() {
         return BlazeBurnerRenderState.class;
     }
 }

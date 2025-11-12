@@ -2,18 +2,19 @@ package com.zurrtum.create.client.infrastructure.model;
 
 import com.google.common.base.Suppliers;
 import com.mojang.serialization.MapCodec;
-import net.minecraft.client.item.ItemModelManager;
-import net.minecraft.client.render.RenderLayer;
-import net.minecraft.client.render.TexturedRenderLayers;
-import net.minecraft.client.render.item.ItemRenderState;
-import net.minecraft.client.render.item.model.BasicItemModel;
-import net.minecraft.client.render.item.model.ItemModel;
-import net.minecraft.client.render.model.*;
-import net.minecraft.client.world.ClientWorld;
-import net.minecraft.item.ItemDisplayContext;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.HeldItemContext;
-import net.minecraft.util.Identifier;
+import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.Sheets;
+import net.minecraft.client.renderer.block.model.BakedQuad;
+import net.minecraft.client.renderer.block.model.TextureSlots;
+import net.minecraft.client.renderer.item.*;
+import net.minecraft.client.resources.model.BlockModelRotation;
+import net.minecraft.client.resources.model.ModelBaker;
+import net.minecraft.client.resources.model.ResolvedModel;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.ItemOwner;
+import net.minecraft.world.item.ItemDisplayContext;
+import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
 
@@ -23,36 +24,36 @@ import java.util.function.Supplier;
 import static com.zurrtum.create.Create.MOD_ID;
 
 public class CardboardSwordModel implements ItemModel {
-    public static final Identifier ID = Identifier.of(MOD_ID, "model/cardboard_sword");
-    public static final Identifier ITEM_ID = Identifier.of(MOD_ID, "item/cardboard_sword/item");
-    public static final Identifier BLOCK_ID = Identifier.of(MOD_ID, "item/cardboard_sword/item_in_hand");
+    public static final ResourceLocation ID = ResourceLocation.fromNamespaceAndPath(MOD_ID, "model/cardboard_sword");
+    public static final ResourceLocation ITEM_ID = ResourceLocation.fromNamespaceAndPath(MOD_ID, "item/cardboard_sword/item");
+    public static final ResourceLocation BLOCK_ID = ResourceLocation.fromNamespaceAndPath(MOD_ID, "item/cardboard_sword/item_in_hand");
 
-    private final RenderLayer layer = TexturedRenderLayers.getItemEntityTranslucentCull();
+    private final RenderType layer = Sheets.translucentItemSheet();
     private final List<BakedQuad> itemQuads;
     private final Supplier<Vector3f[]> itemVector;
     private final List<BakedQuad> blockQuads;
     private final Supplier<Vector3f[]> blockVector;
-    private final ModelSettings settings;
+    private final ModelRenderProperties settings;
 
-    public CardboardSwordModel(List<BakedQuad> item, List<BakedQuad> block, ModelSettings settings) {
+    public CardboardSwordModel(List<BakedQuad> item, List<BakedQuad> block, ModelRenderProperties settings) {
         itemQuads = item;
-        itemVector = Suppliers.memoize(() -> BasicItemModel.bakeQuads(itemQuads));
+        itemVector = Suppliers.memoize(() -> BlockModelWrapper.computeExtents(itemQuads));
         blockQuads = block;
-        blockVector = Suppliers.memoize(() -> BasicItemModel.bakeQuads(blockQuads));
+        blockVector = Suppliers.memoize(() -> BlockModelWrapper.computeExtents(blockQuads));
         this.settings = settings;
     }
 
     @Override
     public void update(
-        ItemRenderState state,
+        ItemStackRenderState state,
         ItemStack stack,
-        ItemModelManager resolver,
+        ItemModelResolver resolver,
         ItemDisplayContext displayContext,
-        @Nullable ClientWorld world,
-        @Nullable HeldItemContext user,
+        @Nullable ClientLevel world,
+        @Nullable ItemOwner user,
         int seed
     ) {
-        state.addModelKey(this);
+        state.appendModelIdentityElement(this);
         if (displayContext == ItemDisplayContext.GUI) {
             update(state, displayContext, itemQuads, settings, itemVector);
         } else {
@@ -61,42 +62,42 @@ public class CardboardSwordModel implements ItemModel {
     }
 
     private void update(
-        ItemRenderState state,
+        ItemStackRenderState state,
         ItemDisplayContext displayContext,
         List<BakedQuad> quads,
-        ModelSettings settings,
+        ModelRenderProperties settings,
         Supplier<Vector3f[]> vector
     ) {
-        ItemRenderState.LayerRenderState layerRenderState = state.newLayer();
-        layerRenderState.setRenderLayer(layer);
-        layerRenderState.setVertices(vector);
-        settings.addSettings(layerRenderState, displayContext);
-        layerRenderState.getQuads().addAll(quads);
+        ItemStackRenderState.LayerRenderState layerRenderState = state.newLayer();
+        layerRenderState.setRenderType(layer);
+        layerRenderState.setExtents(vector);
+        settings.applyToLayer(layerRenderState, displayContext);
+        layerRenderState.prepareQuadList().addAll(quads);
     }
 
     public static class Unbaked implements ItemModel.Unbaked {
-        public static final MapCodec<Unbaked> CODEC = MapCodec.unit(Unbaked::new);
+        public static final MapCodec<com.zurrtum.create.client.infrastructure.model.CardboardSwordModel.Unbaked> CODEC = MapCodec.unit(com.zurrtum.create.client.infrastructure.model.CardboardSwordModel.Unbaked::new);
 
         @Override
-        public MapCodec<Unbaked> getCodec() {
+        public MapCodec<com.zurrtum.create.client.infrastructure.model.CardboardSwordModel.Unbaked> type() {
             return CODEC;
         }
 
         @Override
-        public void resolve(Resolver resolver) {
+        public void resolveDependencies(Resolver resolver) {
             resolver.markDependency(ITEM_ID);
             resolver.markDependency(BLOCK_ID);
         }
 
         @Override
-        public ItemModel bake(BakeContext context) {
-            Baker baker = context.blockModelBaker();
-            BakedSimpleModel itemModel = baker.getModel(ITEM_ID);
-            ModelTextures itemTextures = itemModel.getTextures();
-            List<BakedQuad> itemQuads = itemModel.bakeGeometry(itemTextures, baker, ModelRotation.X0_Y0).getAllQuads();
-            ModelSettings settings = ModelSettings.resolveSettings(baker, itemModel, itemTextures);
-            BakedSimpleModel blockModel = baker.getModel(BLOCK_ID);
-            List<BakedQuad> blockQuads = blockModel.bakeGeometry(blockModel.getTextures(), baker, ModelRotation.X0_Y0).getAllQuads();
+        public ItemModel bake(BakingContext context) {
+            ModelBaker baker = context.blockModelBaker();
+            ResolvedModel itemModel = baker.getModel(ITEM_ID);
+            TextureSlots itemTextures = itemModel.getTopTextureSlots();
+            List<BakedQuad> itemQuads = itemModel.bakeTopGeometry(itemTextures, baker, BlockModelRotation.X0_Y0).getAll();
+            ModelRenderProperties settings = ModelRenderProperties.fromResolvedModel(baker, itemModel, itemTextures);
+            ResolvedModel blockModel = baker.getModel(BLOCK_ID);
+            List<BakedQuad> blockQuads = blockModel.bakeTopGeometry(blockModel.getTopTextureSlots(), baker, BlockModelRotation.X0_Y0).getAll();
             return new CardboardSwordModel(itemQuads, blockQuads, settings);
         }
     }

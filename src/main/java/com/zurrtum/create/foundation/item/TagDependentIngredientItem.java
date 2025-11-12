@@ -1,37 +1,36 @@
 package com.zurrtum.create.foundation.item;
 
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemGroup;
-import net.minecraft.registry.Registries;
-import net.minecraft.registry.RegistryKeys;
-import net.minecraft.registry.entry.RegistryEntry;
-import net.minecraft.registry.tag.TagKey;
-import net.minecraft.util.Identifier;
-
 import java.util.function.Function;
+import net.minecraft.core.Holder;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.TagKey;
+import net.minecraft.world.item.CreativeModeTab;
+import net.minecraft.world.item.Item;
 
 public class TagDependentIngredientItem extends Item {
 
     private final TagKey<Item> tag;
 
-    public TagDependentIngredientItem(Settings properties, TagKey<Item> tag) {
+    public TagDependentIngredientItem(Properties properties, TagKey<Item> tag) {
         super(properties);
         this.tag = tag;
     }
 
-    public static Function<Settings, TagDependentIngredientItem> tag(String path) {
-        return settings -> new TagDependentIngredientItem(settings, TagKey.of(RegistryKeys.ITEM, Identifier.of("c", path)));
+    public static Function<Properties, TagDependentIngredientItem> tag(String path) {
+        return settings -> new TagDependentIngredientItem(settings, TagKey.create(Registries.ITEM, ResourceLocation.fromNamespaceAndPath("c", path)));
     }
 
-    public void addTo(ItemGroup.Entries entries) {
+    public void addTo(CreativeModeTab.Output entries) {
         if (shouldHide()) {
             return;
         }
-        entries.add(this);
+        entries.accept(this);
     }
 
     public boolean shouldHide() {
-        for (RegistryEntry<Item> ignored : Registries.ITEM.iterateEntries(tag)) {
+        for (Holder<Item> ignored : BuiltInRegistries.ITEM.getTagOrEmpty(tag)) {
             return false; // at least 1 present
         }
         return true; // none present

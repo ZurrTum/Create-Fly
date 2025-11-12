@@ -1,13 +1,13 @@
 package com.zurrtum.create.api.contraption.storage.item;
 
 import com.zurrtum.create.infrastructure.items.ItemStackHandler;
-import net.minecraft.inventory.Inventory;
-import net.minecraft.item.ItemStack;
+import net.minecraft.world.Container;
+import net.minecraft.world.item.ItemStack;
 
 /**
  * Partial implementation of a MountedItemStorage that wraps an item handler.
  */
-public abstract class WrapperMountedItemStorage<T extends Inventory> extends MountedItemStorage {
+public abstract class WrapperMountedItemStorage<T extends Container> extends MountedItemStorage {
     protected T wrapped;
 
     protected WrapperMountedItemStorage(MountedItemStorageType<?> type) {
@@ -20,28 +20,28 @@ public abstract class WrapperMountedItemStorage<T extends Inventory> extends Mou
     }
 
     @Override
-    public int size() {
-        return wrapped.size();
+    public int getContainerSize() {
+        return wrapped.getContainerSize();
     }
 
     @Override
-    public ItemStack getStack(int slot) {
-        return wrapped.getStack(slot);
+    public ItemStack getItem(int slot) {
+        return wrapped.getItem(slot);
     }
 
     @Override
-    public void setStack(int slot, ItemStack stack) {
-        wrapped.setStack(slot, stack);
+    public void setItem(int slot, ItemStack stack) {
+        wrapped.setItem(slot, stack);
     }
 
     @Override
-    public int getMaxCountPerStack() {
-        return wrapped.getMaxCountPerStack();
+    public int getMaxStackSize() {
+        return wrapped.getMaxStackSize();
     }
 
     @Override
-    public int getMaxCount(ItemStack stack) {
-        return wrapped.getMaxCount(stack);
+    public int getMaxStackSize(ItemStack stack) {
+        return wrapped.getMaxStackSize(stack);
     }
 
     @Override
@@ -54,11 +54,11 @@ public abstract class WrapperMountedItemStorage<T extends Inventory> extends Mou
         return wrapped.extract(stack);
     }
 
-    public static ItemStackHandler copyToItemStackHandler(Inventory handler) {
-        int size = handler.size();
+    public static ItemStackHandler copyToItemStackHandler(Container handler) {
+        int size = handler.getContainerSize();
         ItemStackHandler copy = new ItemStackHandler(size);
         for (int i = 0; i < size; i++) {
-            copy.setStack(i, handler.getStack(i).copy());
+            copy.setItem(i, handler.getItem(i).copy());
         }
         return copy;
     }

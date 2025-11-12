@@ -5,11 +5,6 @@ import com.zurrtum.create.catnip.data.Pair;
 import com.zurrtum.create.content.trains.graph.*;
 import com.zurrtum.create.content.trains.track.ITrackBlock;
 import com.zurrtum.create.infrastructure.component.BezierTrackPointLocation;
-import net.minecraft.block.BlockState;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.World;
 import org.apache.commons.lang3.mutable.MutableBoolean;
 import org.apache.commons.lang3.mutable.MutableInt;
 import org.jetbrains.annotations.Nullable;
@@ -17,22 +12,27 @@ import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.Vec3;
 
 public class TrainRelocator {
     public static boolean relocate(
         Train train,
-        World level,
+        Level level,
         BlockPos pos,
         BezierTrackPointLocation bezier,
         boolean bezierDirection,
-        Vec3d lookAngle,
-        @Nullable List<Vec3d> toVisualise
+        Vec3 lookAngle,
+        @Nullable List<Vec3> toVisualise
     ) {
         BlockState blockState = level.getBlockState(pos);
         if (!(blockState.getBlock() instanceof ITrackBlock track))
             return false;
 
-        Pair<Vec3d, Direction.AxisDirection> nearestTrackAxis = track.getNearestTrackAxis(level, pos, blockState, lookAngle);
+        Pair<Vec3, Direction.AxisDirection> nearestTrackAxis = track.getNearestTrackAxis(level, pos, blockState, lookAngle);
         TrackGraphLocation graphLocation = bezier != null ? TrackGraphHelper.getBezierGraphLocationAt(
             level,
             pos,
@@ -54,7 +54,7 @@ public class TrainRelocator {
         TravellingPoint.IEdgePointListener ignoreSignals = probe.ignoreEdgePoints();
         TravellingPoint.ITurnListener ignoreTurns = probe.ignoreTurns();
         List<Pair<Couple<TrackNode>, Double>> recordedLocations = new ArrayList<>();
-        List<Vec3d> recordedVecs = new ArrayList<>();
+        List<Vec3> recordedVecs = new ArrayList<>();
         Consumer<TravellingPoint> recorder = tp -> {
             recordedLocations.add(Pair.of(Couple.create(tp.node1, tp.node2), tp.position));
             recordedVecs.add(tp.getPosition(graph));
@@ -81,17 +81,17 @@ public class TrainRelocator {
             blockingIndex.increment();
         });
 
-        if (level.isClient() && toVisualise != null && !recordedVecs.isEmpty()) {
+        if (level.isClientSide() && toVisualise != null && !recordedVecs.isEmpty()) {
             toVisualise.clear();
             toVisualise.add(recordedVecs.getFirst());
         }
 
         for (int i = 0; i < recordedVecs.size() - 1; i++) {
-            Vec3d vec1 = recordedVecs.get(i);
-            Vec3d vec2 = recordedVecs.get(i + 1);
+            Vec3 vec1 = recordedVecs.get(i);
+            Vec3 vec2 = recordedVecs.get(i + 1);
             boolean blocking = i >= blockingIndex.intValue() - 1;
-            boolean collided = !blocked.booleanValue() && train.findCollidingTrain(level, vec1, vec2, level.getRegistryKey()) != null;
-            if (level.isClient() && toVisualise != null)
+            boolean collided = !blocked.booleanValue() && train.findCollidingTrain(level, vec1, vec2, level.dimension()) != null;
+            if (level.isClientSide() && toVisualise != null)
                 toVisualise.add(vec2);
             if (collided || blocking)
                 return false;

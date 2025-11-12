@@ -1,9 +1,9 @@
 package com.zurrtum.create.api.contraption.storage.item.chest;
 
 import com.zurrtum.create.api.contraption.storage.item.simple.SimpleMountedStorageType;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.inventory.Inventory;
-import net.minecraft.world.World;
+import net.minecraft.world.Container;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
 
 public class ChestMountedStorageType extends SimpleMountedStorageType<ChestMountedStorage> {
     public ChestMountedStorageType() {
@@ -11,12 +11,12 @@ public class ChestMountedStorageType extends SimpleMountedStorageType<ChestMount
     }
 
     @Override
-    protected Inventory getHandler(World level, BlockEntity be) {
-        return be instanceof Inventory container ? container : null;
+    protected Container getHandler(Level level, BlockEntity be) {
+        return be instanceof Container container ? container : null;
     }
 
     @Override
-    protected ChestMountedStorage createStorage(Inventory handler) {
+    protected ChestMountedStorage createStorage(Container handler) {
         return new ChestMountedStorage(handler);
     }
 }

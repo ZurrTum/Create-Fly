@@ -4,24 +4,24 @@ import com.zurrtum.create.AllClientHandle;
 import com.zurrtum.create.AllPackets;
 import com.zurrtum.create.catnip.codecs.stream.CatnipStreamCodecBuilders;
 import com.zurrtum.create.content.trains.entity.Train;
-import net.minecraft.network.RegistryByteBuf;
-import net.minecraft.network.codec.PacketCodec;
-import net.minecraft.network.codec.PacketCodecs;
-import net.minecraft.network.packet.PacketType;
-import net.minecraft.util.Uuids;
 import org.apache.logging.log4j.util.TriConsumer;
 
 import java.util.UUID;
+import net.minecraft.core.UUIDUtil;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.PacketType;
 
 public record TrainHUDControlUpdatePacket(UUID trainId, Double throttle, double speed, int fuelTicks) implements S2CPacket {
-    public static final PacketCodec<RegistryByteBuf, TrainHUDControlUpdatePacket> CODEC = PacketCodec.tuple(
-        Uuids.PACKET_CODEC,
+    public static final StreamCodec<RegistryFriendlyByteBuf, TrainHUDControlUpdatePacket> CODEC = StreamCodec.composite(
+        UUIDUtil.STREAM_CODEC,
         TrainHUDControlUpdatePacket::trainId,
-        CatnipStreamCodecBuilders.nullable(PacketCodecs.DOUBLE),
+        CatnipStreamCodecBuilders.nullable(ByteBufCodecs.DOUBLE),
         TrainHUDControlUpdatePacket::throttle,
-        PacketCodecs.DOUBLE,
+        ByteBufCodecs.DOUBLE,
         TrainHUDControlUpdatePacket::speed,
-        PacketCodecs.VAR_INT,
+        ByteBufCodecs.VAR_INT,
         TrainHUDControlUpdatePacket::fuelTicks,
         TrainHUDControlUpdatePacket::new
     );
@@ -35,7 +35,7 @@ public record TrainHUDControlUpdatePacket(UUID trainId, Double throttle, double 
     }
 
     @Override
-    public PacketType<TrainHUDControlUpdatePacket> getPacketType() {
+    public PacketType<TrainHUDControlUpdatePacket> type() {
         return AllPackets.S_TRAIN_HUD;
     }
 

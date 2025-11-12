@@ -15,36 +15,36 @@ import com.zurrtum.create.foundation.advancement.CreateTrigger;
 import com.zurrtum.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.foundation.blockEntity.behaviour.filtering.ServerFilteringBehaviour;
 import com.zurrtum.create.foundation.codec.CreateCodecs;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.inventory.Inventory;
-import net.minecraft.inventory.StackWithSlot;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.recipe.PreparedRecipes;
-import net.minecraft.recipe.Recipe;
-import net.minecraft.recipe.RecipeEntry;
-import net.minecraft.recipe.input.RecipeInput;
-import net.minecraft.recipe.input.SingleStackRecipeInput;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.sound.SoundCategory;
-import net.minecraft.sound.SoundEvents;
-import net.minecraft.state.property.Properties;
-import net.minecraft.storage.NbtReadView;
-import net.minecraft.storage.NbtWriteView;
-import net.minecraft.storage.ReadView;
-import net.minecraft.storage.WriteView;
-import net.minecraft.util.ErrorReporter;
-import net.minecraft.util.Hand;
-import net.minecraft.util.StringIdentifiable;
-import net.minecraft.util.Uuids;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.math.*;
-import net.minecraft.world.RaycastContext;
-import net.minecraft.world.RaycastContext.FluidHandling;
-import net.minecraft.world.RaycastContext.ShapeType;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.UUIDUtil;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.util.Mth;
+import net.minecraft.util.ProblemReporter;
+import net.minecraft.util.StringRepresentable;
+import net.minecraft.world.Container;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.ItemStackWithSlot;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.*;
+import net.minecraft.world.level.ClipContext;
+import net.minecraft.world.level.ClipContext.Block;
+import net.minecraft.world.level.ClipContext.Fluid;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.storage.TagValueInput;
+import net.minecraft.world.level.storage.TagValueOutput;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
@@ -65,35 +65,35 @@ public class DeployerBlockEntity extends KineticBlockEntity {
     protected boolean redstoneLocked;
     protected UUID owner;
     protected String ownerName;
-    public Inventory invHandler;
-    private NbtCompound deferredInventoryList;
+    public Container invHandler;
+    private CompoundTag deferredInventoryList;
 
     public LerpedFloat animatedOffset;
 
     public BeltProcessingBehaviour processingBehaviour;
 
-    public enum State implements StringIdentifiable {
+    public enum State implements StringRepresentable {
         WAITING,
         EXPANDING,
         RETRACTING,
         DUMPING;
 
-        public static final Codec<State> CODEC = StringIdentifiable.createCodec(State::values);
+        public static final Codec<State> CODEC = StringRepresentable.fromEnum(State::values);
 
         @Override
-        public String asString() {
+        public String getSerializedName() {
             return name().toLowerCase(Locale.ROOT);
         }
     }
 
-    public enum Mode implements StringIdentifiable {
+    public enum Mode implements StringRepresentable {
         PUNCH,
         USE;
 
-        public static final Codec<Mode> CODEC = StringIdentifiable.createCodec(Mode::values);
+        public static final Codec<Mode> CODEC = StringRepresentable.fromEnum(Mode::values);
 
         @Override
-        public String asString() {
+        public String getSerializedName() {
             return name().toLowerCase(Locale.ROOT);
         }
     }
@@ -108,8 +108,8 @@ public class DeployerBlockEntity extends KineticBlockEntity {
     }
 
     @Override
-    public void onBlockReplaced(BlockPos pos, BlockState oldState) {
-        super.onBlockReplaced(pos, oldState);
+    public void preRemoveSideEffects(BlockPos pos, BlockState oldState) {
+        super.preRemoveSideEffects(pos, oldState);
         discardPlayer();
     }
 
@@ -145,32 +145,32 @@ public class DeployerBlockEntity extends KineticBlockEntity {
     public void initHandler() {
         if (invHandler != null)
             return;
-        if (world instanceof ServerWorld sLevel) {
+        if (level instanceof ServerLevel sLevel) {
             player = DeployerPlayer.create(sLevel, owner, ownerName);
-            ServerPlayerEntity serverPlayer = player.cast();
+            ServerPlayer serverPlayer = player.cast();
             if (deferredInventoryList != null) {
-                try (ErrorReporter.Logging logging = new ErrorReporter.Logging(getReporterContext(), LOGGER)) {
-                    ReadView view = NbtReadView.create(logging, world.getRegistryManager(), deferredInventoryList);
-                    serverPlayer.getInventory().readData(view.getTypedListView("Inventory", StackWithSlot.CODEC));
+                try (ProblemReporter.ScopedCollector logging = new ProblemReporter.ScopedCollector(problemPath(), LOGGER)) {
+                    ValueInput view = TagValueInput.create(logging, level.registryAccess(), deferredInventoryList);
+                    serverPlayer.getInventory().load(view.listOrEmpty("Inventory", ItemStackWithSlot.CODEC));
                 }
                 deferredInventoryList = null;
-                heldItem = serverPlayer.getMainHandStack();
+                heldItem = serverPlayer.getMainHandItem();
                 sendData();
             }
-            Vec3d initialPos = VecHelper.getCenterOf(pos.offset(getCachedState().get(FACING)));
-            serverPlayer.setPosition(initialPos.x, initialPos.y, initialPos.z);
+            Vec3 initialPos = VecHelper.getCenterOf(worldPosition.relative(getBlockState().getValue(FACING)));
+            serverPlayer.setPos(initialPos.x, initialPos.y, initialPos.z);
         }
         invHandler = createHandler();
     }
 
     protected void onExtract(ItemStack stack) {
-        player.cast().setStackInHand(Hand.MAIN_HAND, stack.copy());
+        player.cast().setItemInHand(InteractionHand.MAIN_HAND, stack.copy());
         sendData();
-        markDirty();
+        setChanged();
     }
 
     public int getTimerSpeed() {
-        return (int) (getSpeed() == 0 ? 0 : MathHelper.clamp(Math.abs(getSpeed() * 2), 8, 512));
+        return (int) (getSpeed() == 0 ? 0 : Mth.clamp(Math.abs(getSpeed() * 2), 8, 512));
     }
 
     @Override
@@ -179,9 +179,9 @@ public class DeployerBlockEntity extends KineticBlockEntity {
 
         if (getSpeed() == 0)
             return;
-        if (!world.isClient() && player != null && player.getBlockBreakingProgress() != null) {
-            if (world.isAir(player.getBlockBreakingProgress().getKey())) {
-                world.setBlockBreakingInfo(player.cast().getId(), player.getBlockBreakingProgress().getKey(), -1);
+        if (!level.isClientSide() && player != null && player.getBlockBreakingProgress() != null) {
+            if (level.isEmptyBlock(player.getBlockBreakingProgress().getKey())) {
+                level.destroyBlockProgress(player.cast().getId(), player.getBlockBreakingProgress().getKey(), -1);
                 player.setBlockBreakingProgress(null);
             }
         }
@@ -189,13 +189,13 @@ public class DeployerBlockEntity extends KineticBlockEntity {
             timer -= getTimerSpeed();
             return;
         }
-        if (world.isClient())
+        if (level.isClientSide())
             return;
         if (player == null)
             return;
 
-        ServerPlayerEntity serverPlayer = player.cast();
-        ItemStack stack = serverPlayer.getMainHandStack();
+        ServerPlayer serverPlayer = player.cast();
+        ItemStack stack = serverPlayer.getMainHandItem();
         if (state == State.WAITING) {
             if (!overflowItems.isEmpty()) {
                 timer = getTimerSpeed() * 10;
@@ -203,16 +203,16 @@ public class DeployerBlockEntity extends KineticBlockEntity {
             }
 
             boolean changed = false;
-            PlayerInventory inventory = serverPlayer.getInventory();
-            for (int i = 0, size = inventory.size(); i < size; i++) {
+            Inventory inventory = serverPlayer.getInventory();
+            for (int i = 0, size = inventory.getContainerSize(); i < size; i++) {
                 if (overflowItems.size() > 10)
                     break;
-                ItemStack item = inventory.getStack(i);
+                ItemStack item = inventory.getItem(i);
                 if (item.isEmpty())
                     continue;
                 if (item != stack || !filtering.test(item)) {
                     overflowItems.add(item);
-                    inventory.setStack(i, ItemStack.EMPTY);
+                    inventory.setItem(i, ItemStack.EMPTY);
                     changed = true;
                 }
             }
@@ -223,8 +223,8 @@ public class DeployerBlockEntity extends KineticBlockEntity {
                 return;
             }
 
-            Direction facing = getCachedState().get(FACING);
-            if (mode == Mode.USE && !DeployerHandler.shouldActivate(stack, world, pos.offset(facing, 2), facing)) {
+            Direction facing = getBlockState().getValue(FACING);
+            if (mode == Mode.USE && !DeployerHandler.shouldActivate(stack, level, worldPosition.relative(facing, 2), facing)) {
                 timer = getTimerSpeed() * 10;
                 return;
             }
@@ -261,12 +261,12 @@ public class DeployerBlockEntity extends KineticBlockEntity {
 
     protected void start() {
         state = State.EXPANDING;
-        Vec3d movementVector = getMovementVector();
-        Vec3d rayOrigin = VecHelper.getCenterOf(pos).add(movementVector.multiply(3 / 2f));
-        Vec3d rayTarget = VecHelper.getCenterOf(pos).add(movementVector.multiply(5 / 2f));
-        RaycastContext rayTraceContext = new RaycastContext(rayOrigin, rayTarget, ShapeType.OUTLINE, FluidHandling.NONE, player.cast());
-        BlockHitResult result = world.raycast(rayTraceContext);
-        reach = (float) (.5f + Math.min(result.getPos().subtract(rayOrigin).length(), .75f));
+        Vec3 movementVector = getMovementVector();
+        Vec3 rayOrigin = VecHelper.getCenterOf(worldPosition).add(movementVector.scale(3 / 2f));
+        Vec3 rayTarget = VecHelper.getCenterOf(worldPosition).add(movementVector.scale(5 / 2f));
+        ClipContext rayTraceContext = new ClipContext(rayOrigin, rayTarget, Block.OUTLINE, Fluid.NONE, player.cast());
+        BlockHitResult result = level.clip(rayTraceContext);
+        reach = (float) (.5f + Math.min(result.getLocation().subtract(rayOrigin).length(), .75f));
         timer = 1000;
         sendData();
     }
@@ -276,10 +276,10 @@ public class DeployerBlockEntity extends KineticBlockEntity {
         DeployerBlockEntity partner = null;
 
         for (i = 2; i < 5; i++) {
-            BlockPos otherDeployer = pos.offset(facing, i);
-            if (!world.isPosLoaded(otherDeployer))
+            BlockPos otherDeployer = worldPosition.relative(facing, i);
+            if (!level.isLoaded(otherDeployer))
                 return false;
-            BlockEntity other = world.getBlockEntity(otherDeployer);
+            BlockEntity other = level.getBlockEntity(otherDeployer);
             if (other instanceof DeployerBlockEntity dpe) {
                 partner = dpe;
                 break;
@@ -289,7 +289,7 @@ public class DeployerBlockEntity extends KineticBlockEntity {
         if (partner == null)
             return false;
 
-        if (world.getBlockState(partner.getPos()).get(FACING).getOpposite() != facing || partner.mode != Mode.PUNCH)
+        if (level.getBlockState(partner.getBlockPos()).getValue(FACING).getOpposite() != facing || partner.mode != Mode.PUNCH)
             return false;
         if (partner.getSpeed() == 0)
             return false;
@@ -309,10 +309,10 @@ public class DeployerBlockEntity extends KineticBlockEntity {
         int i = 0;
         DeployerBlockEntity deployerBlockEntity = null;
         for (i = 2; i < 5; i++) {
-            BlockPos pos = this.pos.offset(getCachedState().get(Properties.FACING), i);
-            if (!world.isPosLoaded(pos))
+            BlockPos pos = this.worldPosition.relative(getBlockState().getValue(BlockStateProperties.FACING), i);
+            if (!level.isLoaded(pos))
                 return;
-            if (world.getBlockEntity(pos) instanceof DeployerBlockEntity dpe) {
+            if (level.getBlockEntity(pos) instanceof DeployerBlockEntity dpe) {
                 deployerBlockEntity = dpe;
                 break;
             }
@@ -332,20 +332,21 @@ public class DeployerBlockEntity extends KineticBlockEntity {
         deployerBlockEntity.sendData();
         award(AllAdvancements.FIST_BUMP);
 
-        BlockPos soundLocation = BlockPos.ofFloored(Vec3d.ofCenter(pos).add(Vec3d.ofCenter(deployerBlockEntity.getPos())).multiply(.5f));
-        world.playSound(null, soundLocation, SoundEvents.ENTITY_PLAYER_ATTACK_NODAMAGE, SoundCategory.BLOCKS, .75f, .75f);
+        BlockPos soundLocation = BlockPos.containing(Vec3.atCenterOf(worldPosition).add(Vec3.atCenterOf(deployerBlockEntity.getBlockPos()))
+            .scale(.5f));
+        level.playSound(null, soundLocation, SoundEvents.PLAYER_ATTACK_NODAMAGE, SoundSource.BLOCKS, .75f, .75f);
     }
 
     protected void activate() {
-        Vec3d movementVector = getMovementVector();
-        Direction direction = getCachedState().get(Properties.FACING);
-        Vec3d center = VecHelper.getCenterOf(pos);
-        BlockPos clickedPos = pos.offset(direction, 2);
-        ServerPlayerEntity serverPlayer = player.cast();
-        serverPlayer.setPitch(direction == Direction.UP ? -90 : direction == Direction.DOWN ? 90 : 0);
-        serverPlayer.setYaw(direction.getPositiveHorizontalDegrees());
+        Vec3 movementVector = getMovementVector();
+        Direction direction = getBlockState().getValue(BlockStateProperties.FACING);
+        Vec3 center = VecHelper.getCenterOf(worldPosition);
+        BlockPos clickedPos = worldPosition.relative(direction, 2);
+        ServerPlayer serverPlayer = player.cast();
+        serverPlayer.setXRot(direction == Direction.UP ? -90 : direction == Direction.DOWN ? 90 : 0);
+        serverPlayer.setYRot(direction.toYRot());
 
-        if (direction == Direction.DOWN && BlockEntityBehaviour.get(world, clickedPos, TransportedItemStackHandlerBehaviour.TYPE) != null)
+        if (direction == Direction.DOWN && BlockEntityBehaviour.get(level, clickedPos, TransportedItemStackHandlerBehaviour.TYPE) != null)
             return; // Belt processing handled in BeltDeployerCallbacks
 
         DeployerHandler.activate(player, center, clickedPos, movementVector, mode);
@@ -353,29 +354,29 @@ public class DeployerBlockEntity extends KineticBlockEntity {
 
         if (player != null) {
             int count = heldItem.getCount();
-            heldItem = serverPlayer.getMainHandStack();
+            heldItem = serverPlayer.getMainHandItem();
             if (count != heldItem.getCount())
-                markDirty();
+                setChanged();
         }
     }
 
-    protected Vec3d getMovementVector() {
-        BlockState state = getCachedState();
-        if (!state.isOf(AllBlocks.DEPLOYER))
-            return Vec3d.ZERO;
-        return Vec3d.of(state.get(FACING).getVector());
+    protected Vec3 getMovementVector() {
+        BlockState state = getBlockState();
+        if (!state.is(AllBlocks.DEPLOYER))
+            return Vec3.ZERO;
+        return Vec3.atLowerCornerOf(state.getValue(FACING).getUnitVec3i());
     }
 
     @Override
-    protected void read(ReadView view, boolean clientPacket) {
+    protected void read(ValueInput view, boolean clientPacket) {
         state = view.read("State", State.CODEC).orElse(State.WAITING);
         mode = view.read("Mode", Mode.CODEC).orElse(Mode.PUNCH);
-        timer = view.getInt("Timer", 0);
-        redstoneLocked = view.getBoolean("Powered", false);
-        owner = view.read("Owner", Uuids.INT_STREAM_CODEC).orElse(null);
+        timer = view.getIntOr("Timer", 0);
+        redstoneLocked = view.getBooleanOr("Powered", false);
+        owner = view.read("Owner", UUIDUtil.CODEC).orElse(null);
         ownerName = view.read("OwnerName", Codec.STRING).orElse(null);
 
-        deferredInventoryList = view.read("Inventory", NbtCompound.CODEC).orElseGet(NbtCompound::new);
+        deferredInventoryList = view.read("Inventory", CompoundTag.CODEC).orElseGet(CompoundTag::new);
         overflowItems = new ArrayList<>();
         view.read("Overflow", CreateCodecs.ITEM_LIST_CODEC).ifPresent(overflowItems::addAll);
         view.read("HeldItem", ItemStack.OPTIONAL_CODEC).ifPresent(item -> heldItem = item);
@@ -383,36 +384,36 @@ public class DeployerBlockEntity extends KineticBlockEntity {
 
         if (!clientPacket)
             return;
-        fistBump = view.getBoolean("Fistbump", false);
-        reach = view.getFloat("Reach", 0);
+        fistBump = view.getBooleanOr("Fistbump", false);
+        reach = view.getFloatOr("Reach", 0);
         view.read("Particle", ItemStack.CODEC).ifPresent(particleStack -> {
-            SandPaperItem.spawnParticles(VecHelper.getCenterOf(pos).add(getMovementVector().multiply(reach + 1)), particleStack, world);
+            SandPaperItem.spawnParticles(VecHelper.getCenterOf(worldPosition).add(getMovementVector().scale(reach + 1)), particleStack, level);
         });
     }
 
     @Override
-    public void write(WriteView view, boolean clientPacket) {
-        view.put("Mode", Mode.CODEC, mode);
-        view.put("State", State.CODEC, state);
+    public void write(ValueOutput view, boolean clientPacket) {
+        view.store("Mode", Mode.CODEC, mode);
+        view.store("State", State.CODEC, state);
         view.putInt("Timer", timer);
         view.putBoolean("Powered", redstoneLocked);
         if (owner != null) {
-            view.put("Owner", Uuids.INT_STREAM_CODEC, owner);
-            view.put("OwnerName", Codec.STRING, ownerName);
+            view.store("Owner", UUIDUtil.CODEC, owner);
+            view.store("OwnerName", Codec.STRING, ownerName);
         }
 
         if (player != null) {
-            ServerPlayerEntity serverPlayer = player.cast();
-            try (ErrorReporter.Logging logging = new ErrorReporter.Logging(getReporterContext(), LOGGER)) {
-                NbtWriteView writeView = NbtWriteView.create(logging, world.getRegistryManager());
-                serverPlayer.getInventory().writeData(writeView.getListAppender("Inventory", StackWithSlot.CODEC));
-                view.put("Inventory", NbtCompound.CODEC, writeView.getNbt());
+            ServerPlayer serverPlayer = player.cast();
+            try (ProblemReporter.ScopedCollector logging = new ProblemReporter.ScopedCollector(problemPath(), LOGGER)) {
+                TagValueOutput writeView = TagValueOutput.createWithContext(logging, level.registryAccess());
+                serverPlayer.getInventory().save(writeView.list("Inventory", ItemStackWithSlot.CODEC));
+                view.store("Inventory", CompoundTag.CODEC, writeView.buildResult());
             }
-            ItemStack stack = serverPlayer.getMainHandStack();
-            view.put("HeldItem", ItemStack.OPTIONAL_CODEC, stack);
-            view.put("Overflow", CreateCodecs.ITEM_LIST_CODEC, overflowItems);
+            ItemStack stack = serverPlayer.getMainHandItem();
+            view.store("HeldItem", ItemStack.OPTIONAL_CODEC, stack);
+            view.store("Overflow", CreateCodecs.ITEM_LIST_CODEC, overflowItems);
         } else if (deferredInventoryList != null) {
-            view.put("Inventory", NbtCompound.CODEC, deferredInventoryList);
+            view.store("Inventory", CompoundTag.CODEC, deferredInventoryList);
         }
 
         super.write(view, clientPacket);
@@ -426,26 +427,26 @@ public class DeployerBlockEntity extends KineticBlockEntity {
         if (player.getSpawnedItemEffects() != null) {
             ItemStack stack = player.getSpawnedItemEffects();
             if (!stack.isEmpty()) {
-                view.put("Particle", ItemStack.CODEC, stack);
+                view.store("Particle", ItemStack.CODEC, stack);
             }
             player.setSpawnedItemEffects(null);
         }
     }
 
     @Override
-    public void writeSafe(WriteView view) {
-        view.put("Mode", Mode.CODEC, mode);
+    public void writeSafe(ValueOutput view) {
+        view.store("Mode", Mode.CODEC, mode);
         super.writeSafe(view);
     }
 
-    private Inventory createHandler() {
+    private Container createHandler() {
         return new DeployerItemHandler(this);
     }
 
     public void redstoneUpdate() {
-        if (world.isClient())
+        if (level.isClientSide())
             return;
-        boolean blockPowered = world.isReceivingRedstonePower(pos);
+        boolean blockPowered = level.hasNeighborSignal(worldPosition);
         if (blockPowered == redstoneLocked)
             return;
         redstoneLocked = blockPowered;
@@ -453,23 +454,23 @@ public class DeployerBlockEntity extends KineticBlockEntity {
     }
 
     @Override
-    protected Box createRenderBoundingBox() {
-        return super.createRenderBoundingBox().expand(3);
+    protected AABB createRenderBoundingBox() {
+        return super.createRenderBoundingBox().inflate(3);
     }
 
     public void discardPlayer() {
         if (player == null)
             return;
-        ServerPlayerEntity serverPlayer = player.cast();
+        ServerPlayer serverPlayer = player.cast();
         serverPlayer.getInventory().dropAll();
-        overflowItems.forEach(itemstack -> serverPlayer.dropItem(itemstack, true, false));
+        overflowItems.forEach(itemstack -> serverPlayer.drop(itemstack, true, false));
         serverPlayer.discard();
         player = null;
     }
 
     public void changeMode() {
         mode = mode == Mode.PUNCH ? Mode.USE : Mode.PUNCH;
-        markDirty();
+        setChanged();
         sendData();
     }
 
@@ -479,19 +480,19 @@ public class DeployerBlockEntity extends KineticBlockEntity {
 
     @Nullable
     public Recipe<? extends RecipeInput> getRecipe(ItemStack stack) {
-        if (player == null || world == null)
+        if (player == null || level == null)
             return null;
 
-        ItemStack heldItemMainhand = player.cast().getMainHandStack();
-        PreparedRecipes preparedRecipes = ((ServerWorld) world).getRecipeManager().preparedRecipes;
+        ItemStack heldItemMainhand = player.cast().getMainHandItem();
+        RecipeMap preparedRecipes = ((ServerLevel) level).recipeAccess().recipes;
         if (heldItemMainhand.getItem() instanceof SandPaperItem) {
-            return preparedRecipes.find(AllRecipeTypes.SANDPAPER_POLISHING, new SingleStackRecipeInput(stack), world)
-                .filter(AllRecipeTypes.CAN_BE_AUTOMATED).map(RecipeEntry::value).findFirst().orElse(null);
+            return preparedRecipes.getRecipesFor(AllRecipeTypes.SANDPAPER_POLISHING, new SingleRecipeInput(stack), level)
+                .filter(AllRecipeTypes.CAN_BE_AUTOMATED).map(RecipeHolder::value).findFirst().orElse(null);
         }
 
         ItemApplicationInput input = new ItemApplicationInput(stack, heldItemMainhand);
-        return AllRecipeTypes.DEPLOYER_RECIPES.stream().flatMap(type -> preparedRecipes.find(type, input, world))
-            .filter(AllRecipeTypes.CAN_BE_AUTOMATED).map(RecipeEntry::value).findFirst().orElse(null);
+        return AllRecipeTypes.DEPLOYER_RECIPES.stream().flatMap(type -> preparedRecipes.getRecipesFor(type, input, level))
+            .filter(AllRecipeTypes.CAN_BE_AUTOMATED).map(RecipeHolder::value).findFirst().orElse(null);
     }
 
     public DeployerPlayer getPlayer() {

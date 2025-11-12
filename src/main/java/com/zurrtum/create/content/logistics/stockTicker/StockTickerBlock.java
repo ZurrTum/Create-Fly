@@ -9,116 +9,116 @@ import com.zurrtum.create.content.logistics.stockTicker.StockTickerBlockEntity.S
 import com.zurrtum.create.foundation.block.IBE;
 import com.zurrtum.create.foundation.gui.menu.MenuProvider;
 import com.zurrtum.create.infrastructure.items.ItemInventoryProvider;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.HorizontalFacingBlock;
-import net.minecraft.block.ShapeContext;
-import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.entity.ai.pathing.NavigationType;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.inventory.Inventory;
-import net.minecraft.item.ItemPlacementContext;
-import net.minecraft.item.ItemStack;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.sound.SoundCategory;
-import net.minecraft.sound.SoundEvents;
-import net.minecraft.state.StateManager;
-import net.minecraft.text.Text;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.Hand;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.shape.VoxelShape;
-import net.minecraft.world.BlockView;
-import net.minecraft.world.World;
-import net.minecraft.world.WorldAccess;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.Container;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.HorizontalDirectionalBlock;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.pathfinder.PathComputationType;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.phys.shapes.VoxelShape;
 
-public class StockTickerBlock extends HorizontalFacingBlock implements IBE<StockTickerBlockEntity>, IWrenchable, ItemInventoryProvider<StockTickerBlockEntity> {
+public class StockTickerBlock extends HorizontalDirectionalBlock implements IBE<StockTickerBlockEntity>, IWrenchable, ItemInventoryProvider<StockTickerBlockEntity> {
 
-    public static final MapCodec<StockTickerBlock> CODEC = createCodec(StockTickerBlock::new);
+    public static final MapCodec<StockTickerBlock> CODEC = simpleCodec(StockTickerBlock::new);
 
-    public StockTickerBlock(Settings pProperties) {
+    public StockTickerBlock(Properties pProperties) {
         super(pProperties);
     }
 
     @Override
-    public Inventory getInventory(WorldAccess world, BlockPos pos, BlockState state, StockTickerBlockEntity blockEntity, Direction context) {
+    public Container getInventory(LevelAccessor world, BlockPos pos, BlockState state, StockTickerBlockEntity blockEntity, Direction context) {
         return blockEntity.receivedPayments;
     }
 
     @Override
-    public BlockState getPlacementState(ItemPlacementContext pContext) {
-        Direction facing = pContext.getHorizontalPlayerFacing().getOpposite();
-        boolean reverse = pContext.getPlayer() != null && pContext.getPlayer().isSneaking();
-        return super.getPlacementState(pContext).with(FACING, reverse ? facing.getOpposite() : facing);
+    public BlockState getStateForPlacement(BlockPlaceContext pContext) {
+        Direction facing = pContext.getHorizontalDirection().getOpposite();
+        boolean reverse = pContext.getPlayer() != null && pContext.getPlayer().isShiftKeyDown();
+        return super.getStateForPlacement(pContext).setValue(FACING, reverse ? facing.getOpposite() : facing);
     }
 
     @Override
-    protected void appendProperties(StateManager.Builder<Block, BlockState> pBuilder) {
-        super.appendProperties(pBuilder.add(FACING));
+    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> pBuilder) {
+        super.createBlockStateDefinition(pBuilder.add(FACING));
     }
 
     @Override
-    protected ActionResult onUseWithItem(
+    protected InteractionResult useItemOn(
         ItemStack stack,
         BlockState state,
-        World level,
+        Level level,
         BlockPos pos,
-        PlayerEntity player,
-        Hand hand,
+        Player player,
+        InteractionHand hand,
         BlockHitResult hitResult
     ) {
         if (stack.getItem() instanceof LogisticallyLinkedBlockItem)
-            return ActionResult.PASS_TO_DEFAULT_BLOCK_ACTION;
+            return InteractionResult.TRY_WITH_EMPTY_HAND;
 
         return onBlockEntityUseItemOn(
             level, pos, stbe -> {
                 if (!stbe.behaviour.mayInteractMessage(player))
-                    return ActionResult.SUCCESS;
+                    return InteractionResult.SUCCESS;
 
-                if (!level.isClient()) {
+                if (!level.isClientSide()) {
                     StockTickerInventory inventory = stbe.receivedPayments;
-                    PlayerInventory playerInventory = player.getInventory();
+                    Inventory playerInventory = player.getInventory();
                     boolean anySuccess = false;
-                    for (int i = 0, size = inventory.size(); i < size; i++) {
-                        ItemStack target = inventory.getStack(i);
+                    for (int i = 0, size = inventory.getContainerSize(); i < size; i++) {
+                        ItemStack target = inventory.getItem(i);
                         if (target.isEmpty()) {
                             continue;
                         }
-                        inventory.setStack(i, ItemStack.EMPTY);
-                        playerInventory.offerOrDrop(target);
+                        inventory.setItem(i, ItemStack.EMPTY);
+                        playerInventory.placeItemBackInInventory(target);
                         anySuccess = true;
                     }
                     if (anySuccess) {
-                        inventory.markDirty();
-                        player.getEntityWorld().playSound(
+                        inventory.setChanged();
+                        player.level().playSound(
                             null,
-                            player.getBlockPos(),
-                            SoundEvents.ENTITY_ITEM_PICKUP,
-                            SoundCategory.PLAYERS,
+                            player.blockPosition(),
+                            SoundEvents.ITEM_PICKUP,
+                            SoundSource.PLAYERS,
                             .2f,
-                            1f + player.getEntityWorld().random.nextFloat()
+                            1f + player.level().random.nextFloat()
                         );
-                        return ActionResult.SUCCESS;
+                        return InteractionResult.SUCCESS;
                     }
                 }
 
-                if (player instanceof ServerPlayerEntity sp) {
+                if (player instanceof ServerPlayer sp) {
                     if (stbe.isKeeperPresent())
                         MenuProvider.openHandledScreen(sp, stbe::createCategoryMenu);
                     else
-                        player.sendMessage(Text.translatable("create.stock_ticker.keeper_missing"), true);
+                        player.displayClientMessage(Component.translatable("create.stock_ticker.keeper_missing"), true);
                 }
 
-                return ActionResult.SUCCESS;
+                return InteractionResult.SUCCESS;
             }
         );
     }
 
     @Override
-    public VoxelShape getOutlineShape(BlockState pState, BlockView pLevel, BlockPos pPos, ShapeContext pContext) {
+    public VoxelShape getShape(BlockState pState, BlockGetter pLevel, BlockPos pPos, CollisionContext pContext) {
         return AllShapes.STOCK_TICKER;
     }
 
@@ -133,12 +133,12 @@ public class StockTickerBlock extends HorizontalFacingBlock implements IBE<Stock
     }
 
     @Override
-    protected boolean canPathfindThrough(BlockState state, NavigationType pathComputationType) {
+    protected boolean isPathfindable(BlockState state, PathComputationType pathComputationType) {
         return false;
     }
 
     @Override
-    protected MapCodec<? extends HorizontalFacingBlock> getCodec() {
+    protected MapCodec<? extends HorizontalDirectionalBlock> codec() {
         return CODEC;
     }
 }

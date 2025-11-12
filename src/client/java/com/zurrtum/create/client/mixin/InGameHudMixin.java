@@ -15,13 +15,13 @@ import com.zurrtum.create.client.content.equipment.toolbox.ToolboxHandlerClient;
 import com.zurrtum.create.client.content.redstone.link.controller.LinkedControllerClientHandler;
 import com.zurrtum.create.client.content.trains.TrainHUD;
 import com.zurrtum.create.client.content.trains.track.TrackPlacementOverlay;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.hud.InGameHud;
-import net.minecraft.client.render.RenderTickCounter;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.Identifier;
+import net.minecraft.client.DeltaTracker;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.Gui;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -29,49 +29,49 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-@Mixin(InGameHud.class)
+@Mixin(Gui.class)
 public class InGameHudMixin {
     @Shadow
     @Final
-    private MinecraftClient client;
+    private Minecraft minecraft;
 
-    @Inject(method = "renderCrosshair(Lnet/minecraft/client/gui/DrawContext;Lnet/minecraft/client/render/RenderTickCounter;)V", at = @At("TAIL"))
-    private void renderCrosshair(DrawContext context, RenderTickCounter tickCounter, CallbackInfo ci) {
-        PlacementClient.onRenderCrosshairOverlay(client, context, AnimationTickHolder.getPartialTicksUI(tickCounter));
+    @Inject(method = "renderCrosshair(Lnet/minecraft/client/gui/GuiGraphics;Lnet/minecraft/client/DeltaTracker;)V", at = @At("TAIL"))
+    private void renderCrosshair(GuiGraphics context, DeltaTracker tickCounter, CallbackInfo ci) {
+        PlacementClient.onRenderCrosshairOverlay(minecraft, context, AnimationTickHolder.getPartialTicksUI(tickCounter));
     }
 
-    @Inject(method = "renderHotbar(Lnet/minecraft/client/gui/DrawContext;Lnet/minecraft/client/render/RenderTickCounter;)V", at = @At("TAIL"))
-    private void renderHotbar(DrawContext context, RenderTickCounter tickCounter, CallbackInfo ci) {
-        Create.VALUE_SETTINGS_HANDLER.render(client, context);
-        TrackPlacementOverlay.render(client, context);
-        GoggleOverlayRenderer.renderOverlay(client, context, tickCounter);
-        BlueprintOverlayRenderer.renderOverlay(client, context);
-        LinkedControllerClientHandler.renderOverlay(client, context);
-        Create.SCHEMATIC_HANDLER.render(client, context, tickCounter);
-        ToolboxHandlerClient.renderOverlay(client, context);
+    @Inject(method = "renderItemHotbar(Lnet/minecraft/client/gui/GuiGraphics;Lnet/minecraft/client/DeltaTracker;)V", at = @At("TAIL"))
+    private void renderHotbar(GuiGraphics context, DeltaTracker tickCounter, CallbackInfo ci) {
+        Create.VALUE_SETTINGS_HANDLER.render(minecraft, context);
+        TrackPlacementOverlay.render(minecraft, context);
+        GoggleOverlayRenderer.renderOverlay(minecraft, context, tickCounter);
+        BlueprintOverlayRenderer.renderOverlay(minecraft, context);
+        LinkedControllerClientHandler.renderOverlay(minecraft, context);
+        Create.SCHEMATIC_HANDLER.render(minecraft, context, tickCounter);
+        ToolboxHandlerClient.renderOverlay(minecraft, context);
     }
 
-    @Inject(method = "renderAirBubbles(Lnet/minecraft/client/gui/DrawContext;Lnet/minecraft/entity/player/PlayerEntity;III)V", at = @At("TAIL"))
-    private void renderAirBubbles(DrawContext context, PlayerEntity player, int heartCount, int top, int left, CallbackInfo ci) {
-        RemainingAirOverlay.render(client, context);
+    @Inject(method = "renderAirBubbles(Lnet/minecraft/client/gui/GuiGraphics;Lnet/minecraft/world/entity/player/Player;III)V", at = @At("TAIL"))
+    private void renderAirBubbles(GuiGraphics context, Player player, int heartCount, int top, int left, CallbackInfo ci) {
+        RemainingAirOverlay.render(minecraft, context);
     }
 
-    @Inject(method = "renderMainHud(Lnet/minecraft/client/gui/DrawContext;Lnet/minecraft/client/render/RenderTickCounter;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/hud/InGameHud;renderMountHealth(Lnet/minecraft/client/gui/DrawContext;)V", shift = At.Shift.AFTER))
-    private void renderMainHud(DrawContext context, RenderTickCounter tickCounter, CallbackInfo ci) {
-        TrainHUD.renderOverlay(client, context, tickCounter);
+    @Inject(method = "renderHotbarAndDecorations(Lnet/minecraft/client/gui/GuiGraphics;Lnet/minecraft/client/DeltaTracker;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/Gui;renderVehicleHealth(Lnet/minecraft/client/gui/GuiGraphics;)V", shift = At.Shift.AFTER))
+    private void renderMainHud(GuiGraphics context, DeltaTracker tickCounter, CallbackInfo ci) {
+        TrainHUD.renderOverlay(minecraft, context, tickCounter);
     }
 
-    @WrapOperation(method = "renderMiscOverlays(Lnet/minecraft/client/gui/DrawContext;Lnet/minecraft/client/render/RenderTickCounter;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/hud/InGameHud;renderOverlay(Lnet/minecraft/client/gui/DrawContext;Lnet/minecraft/util/Identifier;F)V", ordinal = 0))
+    @WrapOperation(method = "renderCameraOverlays(Lnet/minecraft/client/gui/GuiGraphics;Lnet/minecraft/client/DeltaTracker;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/Gui;renderTextureOverlay(Lnet/minecraft/client/gui/GuiGraphics;Lnet/minecraft/resources/ResourceLocation;F)V", ordinal = 0))
     private void renderMiscOverlays(
-        InGameHud instance,
-        DrawContext context,
-        Identifier texture,
+        Gui instance,
+        GuiGraphics context,
+        ResourceLocation texture,
         float opacity,
         Operation<Void> original,
-        @Local(argsOnly = true) RenderTickCounter tickCounter,
+        @Local(argsOnly = true) DeltaTracker tickCounter,
         @Local ItemStack stack
     ) {
-        if (stack.isOf(AllItems.CARDBOARD_HELMET)) {
+        if (stack.is(AllItems.CARDBOARD_HELMET)) {
             original.call(instance, context, texture, CardboardArmorStealthOverlay.getOverlayOpacity(tickCounter));
         } else {
             original.call(instance, context, texture, opacity);

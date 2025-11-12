@@ -2,8 +2,8 @@ package com.zurrtum.create.content.trains.track;
 
 import com.zurrtum.create.AllBlockEntityTypes;
 import com.zurrtum.create.foundation.blockEntity.SyncedBlockEntity;
-import net.minecraft.block.BlockState;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.block.state.BlockState;
 
 public class FakeTrackBlockEntity extends SyncedBlockEntity {
 
@@ -18,7 +18,7 @@ public class FakeTrackBlockEntity extends SyncedBlockEntity {
         keepAlive--;
         if (keepAlive > 0)
             return;
-        world.removeBlock(pos, false);
+        level.removeBlock(worldPosition, false);
     }
 
     public void keepAlive() {

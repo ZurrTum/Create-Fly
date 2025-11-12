@@ -1,17 +1,17 @@
 package com.zurrtum.create.client.model;
 
-import net.minecraft.client.render.model.json.ModelElement;
+import net.minecraft.client.renderer.block.model.BlockElement;
 
 public interface NormalsModelElement {
-    static NormalsType getNormalsType(ModelElement element) {
+    static NormalsType getNormalsType(BlockElement element) {
         return ((NormalsModelElement) (Object) element).create$getNormalsType();
     }
 
-    static void markNormals(ModelElement element) {
+    static void markNormals(BlockElement element) {
         ((NormalsModelElement) (Object) element).create$markNormals();
     }
 
-    static void markFacingNormals(ModelElement element) {
+    static void markFacingNormals(BlockElement element) {
         ((NormalsModelElement) (Object) element).create$markFacingNormals();
     }
 

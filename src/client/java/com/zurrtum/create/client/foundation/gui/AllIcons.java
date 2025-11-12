@@ -1,23 +1,23 @@
 package com.zurrtum.create.client.foundation.gui;
 
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.zurrtum.create.catnip.theme.Color;
 import com.zurrtum.create.client.Create;
 import com.zurrtum.create.client.catnip.gui.element.DelegatedStencilElement;
 import com.zurrtum.create.client.catnip.gui.element.ScreenElement;
-import net.minecraft.client.gl.RenderPipelines;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.render.LightmapTextureManager;
-import net.minecraft.client.render.RenderLayer;
-import net.minecraft.client.render.VertexConsumer;
-import net.minecraft.client.render.VertexConsumerProvider;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.renderer.LightTexture;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.RenderPipelines;
+import net.minecraft.client.renderer.RenderType;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.phys.Vec3;
 import org.joml.Matrix4f;
 
 public class AllIcons implements ScreenElement {
 
-    public static final Identifier ICON_ATLAS = Create.asResource("textures/gui/icons.png");
+    public static final ResourceLocation ICON_ATLAS = Create.asResource("textures/gui/icons.png");
     public static final int ICON_ATLAS_SIZE = 256;
 
     private static int x = 0, y = -1;
@@ -70,29 +70,29 @@ public class AllIcons implements ScreenElement {
         return new AllIcons(x = 0, ++y);
     }
 
-    public RenderLayer bind() {
-        return RenderLayer.getText(ICON_ATLAS);
+    public RenderType bind() {
+        return RenderType.text(ICON_ATLAS);
     }
 
     @Override
-    public void render(DrawContext graphics, int x, int y) {
-        graphics.drawTexture(RenderPipelines.GUI_TEXTURED, ICON_ATLAS, x, y, iconX, iconY, 16, 16, 256, 256);
+    public void render(GuiGraphics graphics, int x, int y) {
+        graphics.blit(RenderPipelines.GUI_TEXTURED, ICON_ATLAS, x, y, iconX, iconY, 16, 16, 256, 256);
     }
 
-    public void render(DrawContext graphics, int x, int y, int color) {
-        graphics.drawTexture(RenderPipelines.GUI_TEXTURED, ICON_ATLAS, x, y, iconX, iconY, 16, 16, 16, 16, 256, 256, color);
+    public void render(GuiGraphics graphics, int x, int y, int color) {
+        graphics.blit(RenderPipelines.GUI_TEXTURED, ICON_ATLAS, x, y, iconX, iconY, 16, 16, 16, 16, 256, 256, color);
     }
 
-    public void render(MatrixStack ms, VertexConsumerProvider buffer, int color) {
-        VertexConsumer builder = buffer.getBuffer(RenderLayer.getText(ICON_ATLAS));
-        Matrix4f matrix = ms.peek().getPositionMatrix();
+    public void render(PoseStack ms, MultiBufferSource buffer, int color) {
+        VertexConsumer builder = buffer.getBuffer(RenderType.text(ICON_ATLAS));
+        Matrix4f matrix = ms.last().pose();
         Color rgb = new Color(color);
-        int light = LightmapTextureManager.MAX_LIGHT_COORDINATE;
+        int light = LightTexture.FULL_BRIGHT;
 
-        Vec3d vec1 = new Vec3d(0, 0, 0);
-        Vec3d vec2 = new Vec3d(0, 1, 0);
-        Vec3d vec3 = new Vec3d(1, 1, 0);
-        Vec3d vec4 = new Vec3d(1, 0, 0);
+        Vec3 vec1 = new Vec3(0, 0, 0);
+        Vec3 vec2 = new Vec3(0, 1, 0);
+        Vec3 vec3 = new Vec3(1, 1, 0);
+        Vec3 vec4 = new Vec3(1, 0, 0);
 
         float u1 = iconX * 1f / ICON_ATLAS_SIZE;
         float u2 = (iconX + 16) * 1f / ICON_ATLAS_SIZE;
@@ -105,9 +105,9 @@ public class AllIcons implements ScreenElement {
         vertex(builder, matrix, vec4, rgb, u2, v1, light);
     }
 
-    private void vertex(VertexConsumer builder, Matrix4f matrix, Vec3d vec, Color rgb, float u, float v, int light) {
-        builder.vertex(matrix, (float) vec.x, (float) vec.y, (float) vec.z).color(rgb.getRed(), rgb.getGreen(), rgb.getBlue(), 255).texture(u, v)
-            .light(light);
+    private void vertex(VertexConsumer builder, Matrix4f matrix, Vec3 vec, Color rgb, float u, float v, int light) {
+        builder.addVertex(matrix, (float) vec.x, (float) vec.y, (float) vec.z).setColor(rgb.getRed(), rgb.getGreen(), rgb.getBlue(), 255).setUv(u, v)
+            .setLight(light);
     }
 
     public DelegatedStencilElement asStencil() {

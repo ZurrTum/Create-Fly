@@ -5,107 +5,106 @@ import com.zurrtum.create.AllItems;
 import com.zurrtum.create.AllShapes;
 import com.zurrtum.create.content.decoration.steamWhistle.WhistleBlock.WhistleSize;
 import com.zurrtum.create.content.equipment.wrench.IWrenchable;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.ShapeContext;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.ItemUsageContext;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.state.StateManager.Builder;
-import net.minecraft.state.property.EnumProperty;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.Hand;
-import net.minecraft.util.StringIdentifiable;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Direction.Axis;
-import net.minecraft.util.math.random.Random;
-import net.minecraft.util.shape.VoxelShape;
-import net.minecraft.world.BlockView;
-import net.minecraft.world.World;
-import net.minecraft.world.WorldAccess;
-import net.minecraft.world.WorldView;
-import net.minecraft.world.tick.ScheduledTickView;
-
 import java.util.Locale;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.Direction.Axis;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.util.RandomSource;
+import net.minecraft.util.StringRepresentable;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.context.UseOnContext;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.LevelReader;
+import net.minecraft.world.level.ScheduledTickAccess;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition.Builder;
+import net.minecraft.world.level.block.state.properties.EnumProperty;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.phys.shapes.VoxelShape;
 
 public class WhistleExtenderBlock extends Block implements IWrenchable {
 
-    public static final EnumProperty<WhistleExtenderShape> SHAPE = EnumProperty.of("shape", WhistleExtenderShape.class);
+    public static final EnumProperty<WhistleExtenderShape> SHAPE = EnumProperty.create("shape", WhistleExtenderShape.class);
     public static final EnumProperty<WhistleSize> SIZE = WhistleBlock.SIZE;
 
-    public enum WhistleExtenderShape implements StringIdentifiable {
+    public enum WhistleExtenderShape implements StringRepresentable {
         SINGLE,
         DOUBLE,
         DOUBLE_CONNECTED;
 
         @Override
-        public String asString() {
+        public String getSerializedName() {
             return name().toLowerCase(Locale.ROOT);
         }
     }
 
-    public WhistleExtenderBlock(Settings p_49795_) {
+    public WhistleExtenderBlock(Properties p_49795_) {
         super(p_49795_);
-        setDefaultState(getDefaultState().with(SHAPE, WhistleExtenderShape.SINGLE).with(SIZE, WhistleSize.MEDIUM));
+        registerDefaultState(defaultBlockState().setValue(SHAPE, WhistleExtenderShape.SINGLE).setValue(SIZE, WhistleSize.MEDIUM));
     }
 
     @Override
-    public ActionResult onSneakWrenched(BlockState state, ItemUsageContext context) {
-        World world = context.getWorld();
-        BlockPos pos = context.getBlockPos();
+    public InteractionResult onSneakWrenched(BlockState state, UseOnContext context) {
+        Level world = context.getLevel();
+        BlockPos pos = context.getClickedPos();
 
-        if (context.getHitPos().y < context.getBlockPos().getY() + .5f || state.get(SHAPE) == WhistleExtenderShape.SINGLE)
+        if (context.getClickLocation().y < context.getClickedPos().getY() + .5f || state.getValue(SHAPE) == WhistleExtenderShape.SINGLE)
             return IWrenchable.super.onSneakWrenched(state, context);
-        if (!(world instanceof ServerWorld))
-            return ActionResult.SUCCESS;
-        world.setBlockState(pos, state.with(SHAPE, WhistleExtenderShape.SINGLE), Block.NOTIFY_ALL);
+        if (!(world instanceof ServerLevel))
+            return InteractionResult.SUCCESS;
+        world.setBlock(pos, state.setValue(SHAPE, WhistleExtenderShape.SINGLE), Block.UPDATE_ALL);
         IWrenchable.playRemoveSound(world, pos);
-        return ActionResult.SUCCESS;
+        return InteractionResult.SUCCESS;
     }
 
-    protected ItemUsageContext relocateContext(ItemUsageContext context, BlockPos target) {
-        return new ItemUsageContext(
+    protected UseOnContext relocateContext(UseOnContext context, BlockPos target) {
+        return new UseOnContext(
             context.getPlayer(),
             context.getHand(),
-            new BlockHitResult(context.getHitPos(), context.getSide(), target, context.hitsInsideBlock())
+            new BlockHitResult(context.getClickLocation(), context.getClickedFace(), target, context.isInside())
         );
     }
 
     @Override
-    protected ActionResult onUseWithItem(
+    protected InteractionResult useItemOn(
         ItemStack stack,
         BlockState state,
-        World level,
+        Level level,
         BlockPos pos,
-        PlayerEntity player,
-        Hand hand,
+        Player player,
+        InteractionHand hand,
         BlockHitResult hitResult
     ) {
-        if (player == null || !stack.isOf(AllItems.STEAM_WHISTLE))
-            return ActionResult.PASS_TO_DEFAULT_BLOCK_ACTION;
+        if (player == null || !stack.is(AllItems.STEAM_WHISTLE))
+            return InteractionResult.TRY_WITH_EMPTY_HAND;
         BlockPos findRoot = findRoot(level, pos);
         BlockState blockState = level.getBlockState(findRoot);
         if (blockState.getBlock() instanceof WhistleBlock whistle)
-            return whistle.onUseWithItem(
+            return whistle.useItemOn(
                 stack,
                 blockState,
                 level,
                 findRoot,
                 player,
                 hand,
-                new BlockHitResult(hitResult.getPos(), hitResult.getSide(), findRoot, hitResult.isInsideBlock())
+                new BlockHitResult(hitResult.getLocation(), hitResult.getDirection(), findRoot, hitResult.isInside())
             );
-        return ActionResult.PASS_TO_DEFAULT_BLOCK_ACTION;
+        return InteractionResult.TRY_WITH_EMPTY_HAND;
     }
 
     @Override
-    public ActionResult onWrenched(BlockState state, ItemUsageContext context) {
-        World level = context.getWorld();
-        BlockPos findRoot = findRoot(level, context.getBlockPos());
+    public InteractionResult onWrenched(BlockState state, UseOnContext context) {
+        Level level = context.getLevel();
+        BlockPos findRoot = findRoot(level, context.getClickedPos());
         BlockState blockState = level.getBlockState(findRoot);
         if (blockState.getBlock() instanceof WhistleBlock whistle)
             return whistle.onWrenched(blockState, relocateContext(context, findRoot));
@@ -113,16 +112,16 @@ public class WhistleExtenderBlock extends Block implements IWrenchable {
     }
 
     @Override
-    protected ItemStack getPickStack(WorldView world, BlockPos pos, BlockState state, boolean includeData) {
-        return AllItems.STEAM_WHISTLE.getDefaultStack();
+    protected ItemStack getCloneItemStack(LevelReader world, BlockPos pos, BlockState state, boolean includeData) {
+        return AllItems.STEAM_WHISTLE.getDefaultInstance();
     }
 
-    public static BlockPos findRoot(WorldAccess pLevel, BlockPos pPos) {
-        BlockPos currentPos = pPos.down();
+    public static BlockPos findRoot(LevelAccessor pLevel, BlockPos pPos) {
+        BlockPos currentPos = pPos.below();
         while (true) {
             BlockState blockState = pLevel.getBlockState(currentPos);
-            if (blockState.isOf(AllBlocks.STEAM_WHISTLE_EXTENSION)) {
-                currentPos = currentPos.down();
+            if (blockState.is(AllBlocks.STEAM_WHISTLE_EXTENSION)) {
+                currentPos = currentPos.below();
                 continue;
             }
             return currentPos;
@@ -130,60 +129,60 @@ public class WhistleExtenderBlock extends Block implements IWrenchable {
     }
 
     @Override
-    public boolean canPlaceAt(BlockState pState, WorldView pLevel, BlockPos pPos) {
-        BlockState below = pLevel.getBlockState(pPos.down());
-        return below.isOf(this) && below.get(SHAPE) != WhistleExtenderShape.SINGLE || below.isOf(AllBlocks.STEAM_WHISTLE);
+    public boolean canSurvive(BlockState pState, LevelReader pLevel, BlockPos pPos) {
+        BlockState below = pLevel.getBlockState(pPos.below());
+        return below.is(this) && below.getValue(SHAPE) != WhistleExtenderShape.SINGLE || below.is(AllBlocks.STEAM_WHISTLE);
     }
 
-    public BlockState getStateForNeighborUpdate(
+    public BlockState updateShape(
         BlockState pState,
-        WorldView pLevel,
-        ScheduledTickView tickView,
+        LevelReader pLevel,
+        ScheduledTickAccess tickView,
         BlockPos pCurrentPos,
         Direction pFacing,
         BlockPos pFacingPos,
         BlockState pFacingState,
-        Random random
+        RandomSource random
     ) {
         if (pFacing.getAxis() != Axis.Y)
             return pState;
 
         if (pFacing == Direction.UP) {
-            boolean connected = pState.get(SHAPE) == WhistleExtenderShape.DOUBLE_CONNECTED;
-            boolean shouldConnect = pLevel.getBlockState(pCurrentPos.up()).isOf(this);
+            boolean connected = pState.getValue(SHAPE) == WhistleExtenderShape.DOUBLE_CONNECTED;
+            boolean shouldConnect = pLevel.getBlockState(pCurrentPos.above()).is(this);
             if (!connected && shouldConnect)
-                return pState.with(SHAPE, WhistleExtenderShape.DOUBLE_CONNECTED);
+                return pState.setValue(SHAPE, WhistleExtenderShape.DOUBLE_CONNECTED);
             if (connected && !shouldConnect)
-                return pState.with(SHAPE, WhistleExtenderShape.DOUBLE);
+                return pState.setValue(SHAPE, WhistleExtenderShape.DOUBLE);
             return pState;
         }
 
-        return !pState.canPlaceAt(pLevel, pCurrentPos) ? Blocks.AIR.getDefaultState() : pState.with(
+        return !pState.canSurvive(pLevel, pCurrentPos) ? Blocks.AIR.defaultBlockState() : pState.setValue(
             SIZE,
-            pLevel.getBlockState(pCurrentPos.down()).get(SIZE)
+            pLevel.getBlockState(pCurrentPos.below()).getValue(SIZE)
         );
     }
 
     @Override
-    public void onBlockAdded(BlockState pState, World pLevel, BlockPos pPos, BlockState pOldState, boolean pIsMoving) {
-        if (pOldState.getBlock() != this || pOldState.get(SHAPE) != pState.get(SHAPE))
+    public void onPlace(BlockState pState, Level pLevel, BlockPos pPos, BlockState pOldState, boolean pIsMoving) {
+        if (pOldState.getBlock() != this || pOldState.getValue(SHAPE) != pState.getValue(SHAPE))
             WhistleBlock.queuePitchUpdate(pLevel, findRoot(pLevel, pPos));
     }
 
     @Override
-    public void onStateReplaced(BlockState pState, ServerWorld pLevel, BlockPos pPos, boolean pIsMoving) {
+    public void affectNeighborsAfterRemoval(BlockState pState, ServerLevel pLevel, BlockPos pPos, boolean pIsMoving) {
         WhistleBlock.queuePitchUpdate(pLevel, findRoot(pLevel, pPos));
     }
 
     @Override
-    protected void appendProperties(Builder<Block, BlockState> pBuilder) {
-        super.appendProperties(pBuilder.add(SHAPE, SIZE));
+    protected void createBlockStateDefinition(Builder<Block, BlockState> pBuilder) {
+        super.createBlockStateDefinition(pBuilder.add(SHAPE, SIZE));
     }
 
     @Override
-    public VoxelShape getOutlineShape(BlockState pState, BlockView pLevel, BlockPos pPos, ShapeContext pContext) {
-        WhistleSize size = pState.get(SIZE);
-        return switch (pState.get(SHAPE)) {
+    public VoxelShape getShape(BlockState pState, BlockGetter pLevel, BlockPos pPos, CollisionContext pContext) {
+        WhistleSize size = pState.getValue(SIZE);
+        return switch (pState.getValue(SHAPE)) {
             case DOUBLE ->
                 size == WhistleSize.LARGE ? AllShapes.WHISTLE_EXTENDER_LARGE_DOUBLE : size == WhistleSize.MEDIUM ? AllShapes.WHISTLE_EXTENDER_MEDIUM_DOUBLE : AllShapes.WHISTLE_EXTENDER_SMALL_DOUBLE;
             case DOUBLE_CONNECTED ->

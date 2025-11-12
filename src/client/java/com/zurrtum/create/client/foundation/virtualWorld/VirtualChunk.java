@@ -3,26 +3,6 @@ package com.zurrtum.create.client.foundation.virtualWorld;
 import it.unimi.dsi.fastutil.longs.LongSet;
 import it.unimi.dsi.fastutil.longs.LongSets;
 import it.unimi.dsi.fastutil.shorts.ShortList;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.entity.Entity;
-import net.minecraft.fluid.Fluid;
-import net.minecraft.fluid.FluidState;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.registry.RegistryWrapper;
-import net.minecraft.structure.StructureStart;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.ChunkPos;
-import net.minecraft.util.math.ChunkSectionPos;
-import net.minecraft.world.Heightmap;
-import net.minecraft.world.chunk.Chunk;
-import net.minecraft.world.chunk.ChunkSection;
-import net.minecraft.world.chunk.ChunkStatus;
-import net.minecraft.world.chunk.UpgradeData;
-import net.minecraft.world.gen.structure.Structure;
-import net.minecraft.world.tick.BasicTickScheduler;
-import net.minecraft.world.tick.EmptyTickSchedulers;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -32,8 +12,28 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.BiConsumer;
 import java.util.function.Predicate;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.core.SectionPos;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.level.ChunkPos;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.chunk.ChunkAccess;
+import net.minecraft.world.level.chunk.LevelChunkSection;
+import net.minecraft.world.level.chunk.UpgradeData;
+import net.minecraft.world.level.chunk.status.ChunkStatus;
+import net.minecraft.world.level.levelgen.Heightmap;
+import net.minecraft.world.level.levelgen.structure.Structure;
+import net.minecraft.world.level.levelgen.structure.StructureStart;
+import net.minecraft.world.level.material.Fluid;
+import net.minecraft.world.level.material.FluidState;
+import net.minecraft.world.ticks.BlackholeTickAccess;
+import net.minecraft.world.ticks.TickContainerAccess;
 
-public class VirtualChunk extends Chunk {
+public class VirtualChunk extends ChunkAccess {
     public final VirtualRenderWorld world;
 
     private final VirtualChunkSection[] sections;
@@ -41,14 +41,14 @@ public class VirtualChunk extends Chunk {
     private boolean needsLight;
 
     public VirtualChunk(VirtualRenderWorld world, int x, int z) {
-        super(new ChunkPos(x, z), UpgradeData.NO_UPGRADE_DATA, world, world.getPalettesFactory(), 0L, null, null);
+        super(new ChunkPos(x, z), UpgradeData.EMPTY, world, world.palettedContainerFactory(), 0L, null, null);
 
         this.world = world;
 
-        int sectionCount = world.countVerticalSections();
+        int sectionCount = world.getSectionsCount();
         this.sections = new VirtualChunkSection[sectionCount];
 
-        for (int i = 0, bottom = world.getBottomSectionCoord(); i < sectionCount; i++) {
+        for (int i = 0, bottom = world.getMinSectionY(); i < sectionCount; i++) {
             sections[i] = new VirtualChunkSection(this, (i + bottom) << 4);
         }
 
@@ -76,82 +76,82 @@ public class VirtualChunk extends Chunk {
     }
 
     @Override
-    public Set<BlockPos> getBlockEntityPositions() {
+    public Set<BlockPos> getBlockEntitiesPos() {
         return Collections.emptySet();
     }
 
     @Override
-    public ChunkSection[] getSectionArray() {
+    public LevelChunkSection[] getSections() {
         return sections;
     }
 
     @Override
-    public Collection<Map.Entry<Heightmap.Type, Heightmap>> getHeightmaps() {
+    public Collection<Map.Entry<Heightmap.Types, Heightmap>> getHeightmaps() {
         return Collections.emptySet();
     }
 
     @Override
-    public void setHeightmap(Heightmap.Type type, long[] data) {
+    public void setHeightmap(Heightmap.Types type, long[] data) {
     }
 
     @Override
-    public Heightmap getHeightmap(Heightmap.Type type) {
+    public Heightmap getOrCreateHeightmapUnprimed(Heightmap.Types type) {
         return null;
     }
 
     @Override
-    public int sampleHeightmap(Heightmap.Type type, int x, int z) {
+    public int getHeight(Heightmap.Types type, int x, int z) {
         return 0;
     }
 
     @Override
     @Nullable
-    public StructureStart getStructureStart(Structure structure) {
+    public StructureStart getStartForStructure(Structure structure) {
         return null;
     }
 
     @Override
-    public void setStructureStart(Structure structure, StructureStart structureStart) {
+    public void setStartForStructure(Structure structure, StructureStart structureStart) {
     }
 
     @Override
-    public Map<Structure, StructureStart> getStructureStarts() {
+    public Map<Structure, StructureStart> getAllStarts() {
         return Collections.emptyMap();
     }
 
     @Override
-    public void setStructureStarts(Map<Structure, StructureStart> structureStarts) {
+    public void setAllStarts(Map<Structure, StructureStart> structureStarts) {
     }
 
     @Override
-    public LongSet getStructureReferences(Structure pStructure) {
+    public LongSet getReferencesForStructure(Structure pStructure) {
         return LongSets.emptySet();
     }
 
     @Override
-    public void addStructureReference(Structure structure, long reference) {
+    public void addReferenceForStructure(Structure structure, long reference) {
     }
 
     @Override
-    public Map<Structure, LongSet> getStructureReferences() {
+    public Map<Structure, LongSet> getAllReferences() {
         return Collections.emptyMap();
     }
 
     @Override
-    public void setStructureReferences(Map<Structure, LongSet> structureReferencesMap) {
+    public void setAllReferences(Map<Structure, LongSet> structureReferencesMap) {
     }
 
     @Override
-    public void markNeedsSaving() {
+    public void markUnsaved() {
     }
 
     @Override
-    public boolean needsSaving() {
+    public boolean isUnsaved() {
         return false;
     }
 
     @Override
-    public ChunkStatus getStatus() {
+    public ChunkStatus getPersistedStatus() {
         return ChunkStatus.LIGHT;
     }
 
@@ -160,26 +160,26 @@ public class VirtualChunk extends Chunk {
     }
 
     @Override
-    public ShortList[] getPostProcessingLists() {
+    public ShortList[] getPostProcessing() {
         return new ShortList[0];
     }
 
     @Override
     @Nullable
-    public NbtCompound getBlockEntityNbt(BlockPos pos) {
+    public CompoundTag getBlockEntityNbt(BlockPos pos) {
         return null;
     }
 
     @Override
     @Nullable
-    public NbtCompound getPackedBlockEntityNbt(BlockPos pos, RegistryWrapper.WrapperLookup registries) {
+    public CompoundTag getBlockEntityNbtForSaving(BlockPos pos, HolderLookup.Provider registries) {
         return null;
     }
 
     @Override
-    public void forEachBlockMatchingPredicate(@NotNull Predicate<BlockState> roughFilter, @NotNull BiConsumer<BlockPos, BlockState> output) {
+    public void findBlocks(@NotNull Predicate<BlockState> roughFilter, @NotNull BiConsumer<BlockPos, BlockState> output) {
         world.blockStates.forEach((blockPos, state) -> {
-            if (ChunkSectionPos.getSectionCoord(blockPos.getX()) == pos.x && ChunkSectionPos.getSectionCoord(blockPos.getZ()) == pos.z) {
+            if (SectionPos.blockToSectionCoord(blockPos.getX()) == chunkPos.x && SectionPos.blockToSectionCoord(blockPos.getZ()) == chunkPos.z) {
                 if (roughFilter.test(state)) {
                     output.accept(blockPos, state);
                 }
@@ -188,17 +188,17 @@ public class VirtualChunk extends Chunk {
     }
 
     @Override
-    public BasicTickScheduler<Block> getBlockTickScheduler() {
-        return EmptyTickSchedulers.getReadOnlyTickScheduler();
+    public TickContainerAccess<Block> getBlockTicks() {
+        return BlackholeTickAccess.emptyContainer();
     }
 
     @Override
-    public BasicTickScheduler<Fluid> getFluidTickScheduler() {
-        return EmptyTickSchedulers.getReadOnlyTickScheduler();
+    public TickContainerAccess<Fluid> getFluidTicks() {
+        return BlackholeTickAccess.emptyContainer();
     }
 
     @Override
-    public TickSchedulers getTickSchedulers(long time) {
+    public PackedTicks getTicksForSerialization(long time) {
         throw new UnsupportedOperationException();
     }
 
@@ -212,12 +212,12 @@ public class VirtualChunk extends Chunk {
     }
 
     @Override
-    public boolean isLightOn() {
+    public boolean isLightCorrect() {
         return needsLight;
     }
 
     @Override
-    public void setLightOn(boolean lightCorrect) {
+    public void setLightCorrect(boolean lightCorrect) {
         this.needsLight = lightCorrect;
     }
 

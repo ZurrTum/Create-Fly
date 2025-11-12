@@ -1,28 +1,28 @@
 package com.zurrtum.create.mixin;
 
 import com.zurrtum.create.content.equipment.symmetryWand.SymmetryPlacementContext;
-import net.minecraft.item.ItemPlacementContext;
-import net.minecraft.item.ItemUsageContext;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.item.context.UseOnContext;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-@Mixin(ItemPlacementContext.class)
+@Mixin(BlockPlaceContext.class)
 public class ItemPlacementContextMixin {
     @Shadow
-    protected boolean canReplaceExisting;
+    protected boolean replaceClicked;
 
     @Shadow
-    public BlockPos placementPos;
+    public BlockPos relativePos;
 
-    @Inject(method = "<init>(Lnet/minecraft/item/ItemUsageContext;)V", at = @At("TAIL"))
-    private void init(ItemUsageContext context, CallbackInfo ci) {
+    @Inject(method = "<init>(Lnet/minecraft/world/item/context/UseOnContext;)V", at = @At("TAIL"))
+    private void init(UseOnContext context, CallbackInfo ci) {
         if (context instanceof SymmetryPlacementContext placementContext) {
-            this.canReplaceExisting = placementContext.canReplaceExisting();
-            this.placementPos = placementContext.placementPos;
+            this.replaceClicked = placementContext.replacingClickedOnBlock();
+            this.relativePos = placementContext.relativePos;
         }
     }
 }

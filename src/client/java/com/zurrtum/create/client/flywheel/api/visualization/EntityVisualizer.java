@@ -1,8 +1,8 @@
 package com.zurrtum.create.client.flywheel.api.visualization;
 
 import com.zurrtum.create.client.flywheel.api.visual.EntityVisual;
-import net.minecraft.client.render.entity.EntityRenderer;
-import net.minecraft.entity.Entity;
+import net.minecraft.client.renderer.entity.EntityRenderer;
+import net.minecraft.world.entity.Entity;
 
 /**
  * A visualizer that will be keyed to an entity type.

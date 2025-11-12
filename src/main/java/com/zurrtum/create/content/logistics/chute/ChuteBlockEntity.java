@@ -22,20 +22,24 @@ import com.zurrtum.create.foundation.item.ItemHelper.ExtractionCountMode;
 import com.zurrtum.create.foundation.utility.BlockHelper;
 import com.zurrtum.create.infrastructure.config.AllConfigs;
 import com.zurrtum.create.infrastructure.particle.AirParticleData;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.entity.ItemEntity;
-import net.minecraft.inventory.Inventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.particle.ItemStackParticleEffect;
-import net.minecraft.particle.ParticleTypes;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.storage.ReadView;
-import net.minecraft.storage.WriteView;
-import net.minecraft.util.ItemScatterer;
-import net.minecraft.util.math.*;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.particles.ItemParticleOption;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.util.Mth;
+import net.minecraft.world.Container;
+import net.minecraft.world.Containers;
+import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -63,7 +67,7 @@ public class ChuteBlockEntity extends SmartBlockEntity {
 
     VersionedInventoryTrackerBehaviour invVersionTracker;
 
-    private final EnumMap<Direction, Supplier<Inventory>> capCaches = new EnumMap<>(Direction.class);
+    private final EnumMap<Direction, Supplier<Container>> capCaches = new EnumMap<>(Direction.class);
 
     public ChuteBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         super(type, pos, state);
@@ -96,8 +100,8 @@ public class ChuteBlockEntity extends SmartBlockEntity {
     }
 
     private boolean canDirectlyInsert() {
-        BlockState blockState = getCachedState();
-        BlockState blockStateAbove = world.getBlockState(pos.up());
+        BlockState blockState = getBlockState();
+        BlockState blockStateAbove = level.getBlockState(worldPosition.above());
         if (!AbstractChuteBlock.isChute(blockState))
             return false;
         if (AbstractChuteBlock.getChuteFacing(blockStateAbove) == Direction.DOWN)
@@ -114,20 +118,20 @@ public class ChuteBlockEntity extends SmartBlockEntity {
     }
 
     @Override
-    protected Box createRenderBoundingBox() {
-        return new Box(pos).stretch(0, -3, 0);
+    protected AABB createRenderBoundingBox() {
+        return new AABB(worldPosition).expandTowards(0, -3, 0);
     }
 
     @Override
     public void tick() {
         super.tick();
 
-        if (!world.isClient())
+        if (!level.isClientSide())
             canPickUpItems = canDirectlyInsert();
 
-        boolean clientSide = world != null && world.isClient() && !isVirtual();
+        boolean clientSide = level != null && level.isClientSide() && !isVirtual();
         float itemMotion = getItemMotion();
-        if (itemMotion != 0 && world != null && world.isClient())
+        if (itemMotion != 0 && level != null && level.isClientSide())
             spawnParticles(itemMotion);
         tickAirStreams(itemMotion);
 
@@ -166,7 +170,7 @@ public class ChuteBlockEntity extends SmartBlockEntity {
 
     private void updateAirFlow(float itemSpeed) {
         updateAirFlow = false;
-        if (itemSpeed > 0 && world != null && !world.isClient()) {
+        if (itemSpeed > 0 && level != null && !level.isClientSide()) {
             float speed = pull - push;
             beltBelow = null;
 
@@ -178,18 +182,18 @@ public class ChuteBlockEntity extends SmartBlockEntity {
             else if (speed >= 32)
                 maxPullDistance = 1;
             else
-                maxPullDistance = MathHelper.lerp(speed / 32, 0, 1);
+                maxPullDistance = Mth.lerpInt(speed / 32, 0, 1);
 
-            if (AbstractChuteBlock.isChute(world.getBlockState(pos.down())))
+            if (AbstractChuteBlock.isChute(level.getBlockState(worldPosition.below())))
                 maxPullDistance = 0;
             float flowLimit = maxPullDistance;
             if (flowLimit > 0)
-                flowLimit = AirCurrent.getFlowLimit(world, pos, maxPullDistance, Direction.DOWN);
+                flowLimit = AirCurrent.getFlowLimit(level, worldPosition, maxPullDistance, Direction.DOWN);
 
             for (int i = 1; i <= flowLimit + 1; i++) {
                 TransportedItemStackHandlerBehaviour behaviour = BlockEntityBehaviour.get(
-                    world,
-                    pos.down(i),
+                    level,
+                    worldPosition.below(i),
                     TransportedItemStackHandlerBehaviour.TYPE
                 );
                 if (behaviour == null)
@@ -204,26 +208,26 @@ public class ChuteBlockEntity extends SmartBlockEntity {
     }
 
     private void findEntities(float itemSpeed) {
-        if (bottomPullDistance <= 0 && !getItem().isEmpty() || itemSpeed <= 0 || world == null || world.isClient())
+        if (bottomPullDistance <= 0 && !getItem().isEmpty() || itemSpeed <= 0 || level == null || level.isClientSide())
             return;
         if (!canActivate())
             return;
-        Vec3d center = VecHelper.getCenterOf(pos);
-        Box searchArea = new Box(center.add(0, -bottomPullDistance - 0.5, 0), center.add(0, -0.5, 0)).expand(.45f);
-        for (ItemEntity itemEntity : world.getNonSpectatingEntities(ItemEntity.class, searchArea)) {
+        Vec3 center = VecHelper.getCenterOf(worldPosition);
+        AABB searchArea = new AABB(center.add(0, -bottomPullDistance - 0.5, 0), center.add(0, -0.5, 0)).inflate(.45f);
+        for (ItemEntity itemEntity : level.getEntitiesOfClass(ItemEntity.class, searchArea)) {
             if (!itemEntity.isAlive())
                 continue;
-            ItemStack entityItem = itemEntity.getStack();
+            ItemStack entityItem = itemEntity.getItem();
             if (!canAcceptItem(entityItem))
                 continue;
-            setItem(entityItem.copy(), (float) (itemEntity.getBoundingBox().getCenter().y - pos.getY()));
+            setItem(entityItem.copy(), (float) (itemEntity.getBoundingBox().getCenter().y - worldPosition.getY()));
             itemEntity.discard();
             break;
         }
     }
 
     private void extractFromBelt(float itemSpeed) {
-        if (itemSpeed <= 0 || world == null || world.isClient())
+        if (itemSpeed <= 0 || level == null || level.isClientSide())
             return;
         if (getItem().isEmpty() && beltBelow != null) {
             beltBelow.handleCenteredProcessingOnAllItems(
@@ -239,7 +243,7 @@ public class ChuteBlockEntity extends SmartBlockEntity {
     }
 
     private void tickAirStreams(float itemSpeed) {
-        if (!world.isClient() && airCurrentUpdateCooldown-- <= 0) {
+        if (!level.isClientSide() && airCurrentUpdateCooldown-- <= 0) {
             airCurrentUpdateCooldown = AllConfigs.server().kinetics.fanBlockCheckRate.get();
             updateAirFlow = true;
         }
@@ -262,9 +266,9 @@ public class ChuteBlockEntity extends SmartBlockEntity {
 
     private void spawnParticles(float itemMotion) {
         // todo: reduce the amount of particles
-        if (world == null)
+        if (level == null)
             return;
-        BlockState blockState = getCachedState();
+        BlockState blockState = getBlockState();
         boolean up = itemMotion > 0;
         float absMotion = up ? itemMotion : -itemMotion;
         if (blockState == null || !AbstractChuteBlock.isChute(blockState))
@@ -272,7 +276,7 @@ public class ChuteBlockEntity extends SmartBlockEntity {
         if (push == 0 && pull == 0)
             return;
 
-        if (up && AbstractChuteBlock.isOpenChute(blockState) && BlockHelper.noCollisionInSpace(world, pos.up()))
+        if (up && AbstractChuteBlock.isOpenChute(blockState) && BlockHelper.noCollisionInSpace(level, worldPosition.above()))
             spawnAirFlow(1, 2, absMotion, .5f);
 
         if (AbstractChuteBlock.getChuteFacing(blockState) != Direction.DOWN)
@@ -281,7 +285,7 @@ public class ChuteBlockEntity extends SmartBlockEntity {
         if (AbstractChuteBlock.isTransparentChute(blockState))
             spawnAirFlow(up ? 0 : 1, up ? 1 : 0, absMotion, 1);
 
-        if (!up && BlockHelper.noCollisionInSpace(world, pos.down()))
+        if (!up && BlockHelper.noCollisionInSpace(level, worldPosition.below()))
             spawnAirFlow(0, -1, absMotion, .5f);
 
         if (up && canActivate() && bottomPullDistance > 0) {
@@ -291,16 +295,16 @@ public class ChuteBlockEntity extends SmartBlockEntity {
     }
 
     private void spawnAirFlow(float verticalStart, float verticalEnd, float motion, float drag) {
-        if (world == null)
+        if (level == null)
             return;
         AirParticleData airParticleData = new AirParticleData(drag, motion);
-        Vec3d origin = Vec3d.of(pos);
-        float xOff = world.random.nextFloat() * .5f + .25f;
-        float zOff = world.random.nextFloat() * .5f + .25f;
-        Vec3d v = origin.add(xOff, verticalStart, zOff);
-        Vec3d d = origin.add(xOff, verticalEnd, zOff).subtract(v);
-        if (world.random.nextFloat() < 2 * motion)
-            world.addImportantParticleClient(airParticleData, v.x, v.y, v.z, d.x, d.y, d.z);
+        Vec3 origin = Vec3.atLowerCornerOf(worldPosition);
+        float xOff = level.random.nextFloat() * .5f + .25f;
+        float zOff = level.random.nextFloat() * .5f + .25f;
+        Vec3 v = origin.add(xOff, verticalStart, zOff);
+        Vec3 d = origin.add(xOff, verticalEnd, zOff).subtract(v);
+        if (level.random.nextFloat() < 2 * motion)
+            level.addAlwaysVisibleParticle(airParticleData, v.x, v.y, v.z, d.x, d.y, d.z);
     }
 
     private void handleInputFromAbove() {
@@ -311,7 +315,7 @@ public class ChuteBlockEntity extends SmartBlockEntity {
         handleInput(grabCapability(Direction.DOWN), 0);
     }
 
-    private void handleInput(@Nullable Inventory inv, float startLocation) {
+    private void handleInput(@Nullable Container inv, float startLocation) {
         if (inv == null)
             return;
         if (!canActivate())
@@ -333,15 +337,15 @@ public class ChuteBlockEntity extends SmartBlockEntity {
     }
 
     private boolean handleDownwardOutput(boolean simulate) {
-        BlockState blockState = getCachedState();
+        BlockState blockState = getBlockState();
         ChuteBlockEntity targetChute = getTargetChute(blockState);
         Direction direction = AbstractChuteBlock.getChuteFacing(blockState);
 
-        if (world == null || direction == null || !this.canActivate())
+        if (level == null || direction == null || !this.canActivate())
             return false;
-        Inventory capBelow = grabCapability(Direction.DOWN);
+        Container capBelow = grabCapability(Direction.DOWN);
         if (capBelow != null) {
-            if (world.isClient() && !isVirtual())
+            if (level.isClientSide() && !isVirtual())
                 return false;
             if (invVersionTracker.stillWaiting(capBelow))
                 return false;
@@ -378,17 +382,17 @@ public class ChuteBlockEntity extends SmartBlockEntity {
         if (direction.getAxis().isHorizontal())
             return false;
 
-        if (FunnelBlock.getFunnelFacing(world.getBlockState(pos.down())) == Direction.DOWN)
+        if (FunnelBlock.getFunnelFacing(level.getBlockState(worldPosition.below())) == Direction.DOWN)
             return false;
-        if (Block.hasTopRim(world, pos.down()))
+        if (Block.canSupportRigidBlock(level, worldPosition.below()))
             return false;
 
         if (!simulate) {
-            Vec3d dropVec = VecHelper.getCenterOf(pos).add(0, -12 / 16f, 0);
-            ItemEntity dropped = new ItemEntity(world, dropVec.x, dropVec.y, dropVec.z, item.copy());
-            dropped.setToDefaultPickupDelay();
-            dropped.setVelocity(0, -.25f, 0);
-            world.spawnEntity(dropped);
+            Vec3 dropVec = VecHelper.getCenterOf(worldPosition).add(0, -12 / 16f, 0);
+            ItemEntity dropped = new ItemEntity(level, dropVec.x, dropVec.y, dropVec.z, item.copy());
+            dropped.setDefaultPickUpDelay();
+            dropped.setDeltaMovement(0, -.25f, 0);
+            level.addFreshEntity(dropped);
             setItem(ItemStack.EMPTY);
         }
 
@@ -396,15 +400,15 @@ public class ChuteBlockEntity extends SmartBlockEntity {
     }
 
     private boolean handleUpwardOutput(boolean simulate) {
-        BlockState stateAbove = world.getBlockState(pos.up());
+        BlockState stateAbove = level.getBlockState(worldPosition.above());
 
-        if (world == null || !this.canActivate())
+        if (level == null || !this.canActivate())
             return false;
 
-        if (AbstractChuteBlock.isOpenChute(getCachedState())) {
-            Inventory capAbove = grabCapability(Direction.UP);
+        if (AbstractChuteBlock.isOpenChute(getBlockState())) {
+            Container capAbove = grabCapability(Direction.UP);
             if (capAbove != null) {
-                if (world.isClient() && !isVirtual() && !ChuteBlock.isChute(stateAbove))
+                if (level.isClientSide() && !isVirtual() && !ChuteBlock.isChute(stateAbove))
                     return false;
                 if (invVersionTracker.stillWaiting(capAbove))
                     return false;
@@ -448,19 +452,19 @@ public class ChuteBlockEntity extends SmartBlockEntity {
             return true;
         }
 
-        if (FunnelBlock.getFunnelFacing(world.getBlockState(pos.up())) == Direction.UP)
+        if (FunnelBlock.getFunnelFacing(level.getBlockState(worldPosition.above())) == Direction.UP)
             return false;
-        if (BlockHelper.hasBlockSolidSide(stateAbove, world, pos.up(), Direction.DOWN))
+        if (BlockHelper.hasBlockSolidSide(stateAbove, level, worldPosition.above(), Direction.DOWN))
             return false;
         if (!inputChutes.isEmpty())
             return false;
 
         if (!simulate) {
-            Vec3d dropVec = VecHelper.getCenterOf(pos).add(0, 8 / 16f, 0);
-            ItemEntity dropped = new ItemEntity(world, dropVec.x, dropVec.y, dropVec.z, item.copy());
-            dropped.setToDefaultPickupDelay();
-            dropped.setVelocity(0, getItemMotion() * 2, 0);
-            world.spawnEntity(dropped);
+            Vec3 dropVec = VecHelper.getCenterOf(worldPosition).add(0, 8 / 16f, 0);
+            ItemEntity dropped = new ItemEntity(level, dropVec.x, dropVec.y, dropVec.z, item.copy());
+            dropped.setDefaultPickUpDelay();
+            dropped.setDeltaMovement(0, getItemMotion() * 2, 0);
+            level.addFreshEntity(dropped);
             setItem(ItemStack.EMPTY);
         }
         return true;
@@ -489,21 +493,21 @@ public class ChuteBlockEntity extends SmartBlockEntity {
         return true;
     }
 
-    private @Nullable Inventory grabCapability(@NotNull Direction side) {
-        BlockPos pos = this.pos.offset(side);
-        if (world == null)
+    private @Nullable Container grabCapability(@NotNull Direction side) {
+        BlockPos pos = this.worldPosition.relative(side);
+        if (level == null)
             return null;
-        Supplier<Inventory> supplier = capCaches.get(side);
+        Supplier<Container> supplier = capCaches.get(side);
         if (supplier == null) {
             Direction opposite = side.getOpposite();
-            if (world instanceof ServerWorld serverLevel) {
-                Supplier<Inventory> cache = ItemHelper.getInventoryCache(serverLevel, pos, opposite, this::canAcceptBlockEntity);
+            if (level instanceof ServerLevel serverLevel) {
+                Supplier<Container> cache = ItemHelper.getInventoryCache(serverLevel, pos, opposite, this::canAcceptBlockEntity);
                 capCaches.put(side, cache);
                 return cache.get();
             } else {
-                BlockEntity be = world.getBlockEntity(pos);
+                BlockEntity be = level.getBlockEntity(pos);
                 if (canAcceptBlockEntity(be, side)) {
-                    return ItemHelper.getInventory(world, pos, null, be, opposite);
+                    return ItemHelper.getInventory(level, pos, null, be, opposite);
                 }
                 return null;
             }
@@ -520,7 +524,7 @@ public class ChuteBlockEntity extends SmartBlockEntity {
         item = stack;
         itemPosition.startWithValue(insertionPos);
         invVersionTracker.reset();
-        if (!world.isClient()) {
+        if (!level.isClientSide()) {
             notifyUpdate();
             award(AllAdvancements.CHUTE);
         }
@@ -533,9 +537,9 @@ public class ChuteBlockEntity extends SmartBlockEntity {
     }
 
     @Override
-    public void write(WriteView view, boolean clientPacket) {
+    public void write(ValueOutput view, boolean clientPacket) {
         if (!item.isEmpty()) {
-            view.put("Item", ItemStack.CODEC, item);
+            view.store("Item", ItemStack.CODEC, item);
         }
         view.putFloat("ItemPosition", itemPosition.getValue());
         view.putFloat("Pull", pull);
@@ -545,22 +549,22 @@ public class ChuteBlockEntity extends SmartBlockEntity {
     }
 
     @Override
-    protected void read(ReadView view, boolean clientPacket) {
+    protected void read(ValueInput view, boolean clientPacket) {
         ItemStack previousItem = item;
         item = view.read("Item", ItemStack.CODEC).orElse(ItemStack.EMPTY);
-        itemPosition.startWithValue(view.getFloat("ItemPosition", 0));
-        pull = view.getFloat("Pull", 0);
-        push = view.getFloat("Push", 0);
-        bottomPullDistance = view.getFloat("BottomAirFlowDistance", 0);
+        itemPosition.startWithValue(view.getFloatOr("ItemPosition", 0));
+        pull = view.getFloatOr("Pull", 0);
+        push = view.getFloatOr("Push", 0);
+        bottomPullDistance = view.getFloatOr("BottomAirFlowDistance", 0);
         super.read(view, clientPacket);
 
-        if (hasWorld() && world != null && world.isClient() && !ItemStack.areEqual(previousItem, item) && !item.isEmpty()) {
-            if (world.random.nextInt(3) != 0)
+        if (hasLevel() && level != null && level.isClientSide() && !ItemStack.matches(previousItem, item) && !item.isEmpty()) {
+            if (level.random.nextInt(3) != 0)
                 return;
-            Vec3d p = VecHelper.getCenterOf(pos);
-            p = VecHelper.offsetRandomly(p, world.random, .5f);
-            Vec3d m = Vec3d.ZERO;
-            world.addParticleClient(new ItemStackParticleEffect(ParticleTypes.ITEM, item), p.x, p.y, p.z, m.x, m.y, m.z);
+            Vec3 p = VecHelper.getCenterOf(worldPosition);
+            p = VecHelper.offsetRandomly(p, level.random, .5f);
+            Vec3 m = Vec3.ZERO;
+            level.addParticle(new ItemParticleOption(ParticleTypes.ITEM, item), p.x, p.y, p.z, m.x, m.y, m.z);
         }
     }
 
@@ -571,17 +575,17 @@ public class ChuteBlockEntity extends SmartBlockEntity {
         final float gravity = 4f;
 
         float motion = (push + pull) * fanSpeedModifier;
-        return (MathHelper.clamp(motion, -maxItemSpeed, maxItemSpeed) + (motion <= 0 ? -gravity : 0)) / 20f;
+        return (Mth.clamp(motion, -maxItemSpeed, maxItemSpeed) + (motion <= 0 ? -gravity : 0)) / 20f;
     }
 
     @Override
     public void destroy() {
         super.destroy();
-        ChuteBlockEntity targetChute = getTargetChute(getCachedState());
+        ChuteBlockEntity targetChute = getTargetChute(getBlockState());
         List<ChuteBlockEntity> inputChutes = getInputChutes();
-        if (!item.isEmpty() && world != null)
-            ItemScatterer.spawn(world, pos.getX(), pos.getY(), pos.getZ(), item);
-        markRemoved();
+        if (!item.isEmpty() && level != null)
+            Containers.dropItemStack(level, worldPosition.getX(), worldPosition.getY(), worldPosition.getZ(), item);
+        setRemoved();
         if (targetChute != null) {
             targetChute.updatePull();
             targetChute.propagatePush();
@@ -592,7 +596,7 @@ public class ChuteBlockEntity extends SmartBlockEntity {
     public void onAdded() {
         refreshBlockState();
         updatePull();
-        ChuteBlockEntity targetChute = getTargetChute(getCachedState());
+        ChuteBlockEntity targetChute = getTargetChute(getBlockState());
         if (targetChute != null)
             targetChute.propagatePush();
         else
@@ -606,7 +610,7 @@ public class ChuteBlockEntity extends SmartBlockEntity {
         pull = totalPull;
         updateAirFlow = true;
         sendData();
-        ChuteBlockEntity targetChute = getTargetChute(getCachedState());
+        ChuteBlockEntity targetChute = getTargetChute(getBlockState());
         if (targetChute != null)
             targetChute.updatePull();
     }
@@ -627,9 +631,9 @@ public class ChuteBlockEntity extends SmartBlockEntity {
     }
 
     protected float calculatePull() {
-        BlockState blockStateAbove = world.getBlockState(pos.up());
-        if (blockStateAbove.isOf(AllBlocks.ENCASED_FAN) && blockStateAbove.get(EncasedFanBlock.FACING) == Direction.DOWN) {
-            BlockEntity be = world.getBlockEntity(pos.up());
+        BlockState blockStateAbove = level.getBlockState(worldPosition.above());
+        if (blockStateAbove.is(AllBlocks.ENCASED_FAN) && blockStateAbove.getValue(EncasedFanBlock.FACING) == Direction.DOWN) {
+            BlockEntity be = level.getBlockEntity(worldPosition.above());
             if (be instanceof EncasedFanBlockEntity fan && !be.isRemoved()) {
                 return fan.getSpeed();
             }
@@ -646,17 +650,17 @@ public class ChuteBlockEntity extends SmartBlockEntity {
     }
 
     protected float calculatePush(int branchCount) {
-        if (world == null)
+        if (level == null)
             return 0;
-        BlockState blockStateBelow = world.getBlockState(pos.down());
-        if (blockStateBelow.isOf(AllBlocks.ENCASED_FAN) && blockStateBelow.get(EncasedFanBlock.FACING) == Direction.UP) {
-            BlockEntity be = world.getBlockEntity(pos.down());
+        BlockState blockStateBelow = level.getBlockState(worldPosition.below());
+        if (blockStateBelow.is(AllBlocks.ENCASED_FAN) && blockStateBelow.getValue(EncasedFanBlock.FACING) == Direction.UP) {
+            BlockEntity be = level.getBlockEntity(worldPosition.below());
             if (be instanceof EncasedFanBlockEntity fan && !be.isRemoved()) {
                 return fan.getSpeed();
             }
         }
 
-        ChuteBlockEntity targetChute = getTargetChute(getCachedState());
+        ChuteBlockEntity targetChute = getTargetChute(getBlockState());
         if (targetChute == null)
             return 0;
         return targetChute.push / branchCount;
@@ -664,18 +668,18 @@ public class ChuteBlockEntity extends SmartBlockEntity {
 
     @Nullable
     private ChuteBlockEntity getTargetChute(BlockState state) {
-        if (world == null)
+        if (level == null)
             return null;
         Direction targetDirection = AbstractChuteBlock.getChuteFacing(state);
         if (targetDirection == null)
             return null;
-        BlockPos chutePos = pos.down();
+        BlockPos chutePos = worldPosition.below();
         if (targetDirection.getAxis().isHorizontal())
-            chutePos = chutePos.offset(targetDirection.getOpposite());
-        BlockState chuteState = world.getBlockState(chutePos);
+            chutePos = chutePos.relative(targetDirection.getOpposite());
+        BlockState chuteState = level.getBlockState(chutePos);
         if (!AbstractChuteBlock.isChute(chuteState))
             return null;
-        BlockEntity be = world.getBlockEntity(chutePos);
+        BlockEntity be = level.getBlockEntity(chutePos);
         if (be instanceof ChuteBlockEntity)
             return (ChuteBlockEntity) be;
         return null;
@@ -694,17 +698,17 @@ public class ChuteBlockEntity extends SmartBlockEntity {
 
     @Nullable
     private ChuteBlockEntity getInputChute(Direction direction) {
-        if (world == null || direction == Direction.DOWN)
+        if (level == null || direction == Direction.DOWN)
             return null;
         direction = direction.getOpposite();
-        BlockPos chutePos = pos.up();
+        BlockPos chutePos = worldPosition.above();
         if (direction.getAxis().isHorizontal())
-            chutePos = chutePos.offset(direction);
-        BlockState chuteState = world.getBlockState(chutePos);
+            chutePos = chutePos.relative(direction);
+        BlockState chuteState = level.getBlockState(chutePos);
         Direction chuteFacing = AbstractChuteBlock.getChuteFacing(chuteState);
         if (chuteFacing != direction)
             return null;
-        BlockEntity be = world.getBlockEntity(chutePos);
+        BlockEntity be = level.getBlockEntity(chutePos);
         if (be instanceof ChuteBlockEntity && !be.isRemoved())
             return (ChuteBlockEntity) be;
         return null;

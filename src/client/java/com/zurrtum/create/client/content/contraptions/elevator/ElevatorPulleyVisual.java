@@ -20,8 +20,8 @@ import com.zurrtum.create.content.contraptions.elevator.ElevatorPulleyBlock;
 import com.zurrtum.create.content.contraptions.elevator.ElevatorPulleyBlockEntity;
 import it.unimi.dsi.fastutil.longs.LongArraySet;
 import it.unimi.dsi.fastutil.longs.LongSet;
-import net.minecraft.util.math.ChunkSectionPos;
-import net.minecraft.util.math.MathHelper;
+import net.minecraft.core.SectionPos;
+import net.minecraft.util.Mth;
 import org.joml.Matrix4f;
 import org.joml.Matrix4fc;
 import org.joml.Quaternionf;
@@ -46,11 +46,11 @@ public class ElevatorPulleyVisual extends ShaftVisual<ElevatorPulleyBlockEntity>
     public ElevatorPulleyVisual(VisualizationContext context, ElevatorPulleyBlockEntity blockEntity, float partialTick) {
         super(context, blockEntity, partialTick);
 
-        float blockStateAngle = AngleHelper.horizontalAngle(blockState.get(ElevatorPulleyBlock.HORIZONTAL_FACING));
+        float blockStateAngle = AngleHelper.horizontalAngle(blockState.getValue(ElevatorPulleyBlock.HORIZONTAL_FACING));
 
-        Quaternionfc rotation = new Quaternionf().rotationY(MathHelper.RADIANS_PER_DEGREE * blockStateAngle);
+        Quaternionfc rotation = new Quaternionf().rotationY(Mth.DEG_TO_RAD * blockStateAngle);
 
-        topSection = ChunkSectionPos.from(pos).asLong();
+        topSection = SectionPos.of(pos).asLong();
 
         belt = new InstanceRecycler<>(() -> context.instancerProvider()
             .instancer(AllInstanceTypes.SCROLLING, SpecialModels.flatLit(AllPartialModels.ELEVATOR_BELT)).createInstance().rotation(rotation)
@@ -126,7 +126,7 @@ public class ElevatorPulleyVisual extends ShaftVisual<ElevatorPulleyBlockEntity>
         if (lightSections == null) {
             return;
         }
-        if (lastBottomSection == ChunkSectionPos.offset(topSection, 0, -offset2SectionCount(offset), 0)) {
+        if (lastBottomSection == SectionPos.offset(topSection, 0, -offset2SectionCount(offset), 0)) {
             return;
         }
 
@@ -177,10 +177,10 @@ public class ElevatorPulleyVisual extends ShaftVisual<ElevatorPulleyBlockEntity>
         int sectionCount = offset2SectionCount(offset);
 
         for (int i = 0; i < sectionCount; i++) {
-            out.add(ChunkSectionPos.offset(topSection, 0, -i, 0));
+            out.add(SectionPos.offset(topSection, 0, -i, 0));
         }
 
-        lastBottomSection = ChunkSectionPos.offset(topSection, 0, -sectionCount, 0);
+        lastBottomSection = SectionPos.offset(topSection, 0, -sectionCount, 0);
 
         return out;
     }

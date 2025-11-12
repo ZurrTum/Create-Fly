@@ -1,15 +1,15 @@
 package com.zurrtum.create.client.catnip.gui.element;
 
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.zurrtum.create.client.catnip.gui.render.*;
 import com.zurrtum.create.client.flywheel.lib.model.baked.PartialModel;
-import net.minecraft.block.BlockState;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.math.MathHelper;
 import org.joml.Matrix3x2fStack;
 
 import java.util.function.BiConsumer;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.util.Mth;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.state.BlockState;
 
 public class GuiGameElement {
     public static GuiItemRenderBuilder of(ItemStack stack) {
@@ -41,9 +41,9 @@ public class GuiGameElement {
         }
 
         public T rotate(float x, float y, float z) {
-            xRot = MathHelper.RADIANS_PER_DEGREE * x;
-            yRot = MathHelper.RADIANS_PER_DEGREE * y;
-            zRot = MathHelper.RADIANS_PER_DEGREE * z;
+            xRot = Mth.DEG_TO_RAD * x;
+            yRot = Mth.DEG_TO_RAD * y;
+            zRot = Mth.DEG_TO_RAD * z;
             return self();
         }
 
@@ -67,22 +67,22 @@ public class GuiGameElement {
         }
 
         @Override
-        public void render(DrawContext graphics) {
+        public void render(GuiGraphics graphics) {
             if (scale <= 1 && xRot == 0 && yRot == 0 && zRot == 0) {
                 if (scale == 1) {
-                    graphics.drawItem(stack, (int) x, (int) y);
+                    graphics.renderItem(stack, (int) x, (int) y);
                 } else {
-                    Matrix3x2fStack matrices = graphics.getMatrices();
+                    Matrix3x2fStack matrices = graphics.pose();
                     matrices.pushMatrix();
                     matrices.scale(scale);
-                    graphics.drawItem(stack, (int) x, (int) y);
+                    graphics.renderItem(stack, (int) x, (int) y);
                     matrices.popMatrix();
                 }
                 return;
             }
             ItemTransformRenderState state = ItemTransformRenderState.create(graphics, stack, x, y, scale, padding, xRot, yRot, zRot);
             key = state.getKey();
-            graphics.state.addSpecialElement(state);
+            graphics.guiRenderState.submitPicturesInPictureState(state);
         }
 
         @Override
@@ -126,8 +126,8 @@ public class GuiGameElement {
         }
 
         @Override
-        public void render(DrawContext graphics) {
-            graphics.state.addSpecialElement(BlockTransformRenderState.create(graphics, block, x, y, scale, padding, xRot, yRot, zRot));
+        public void render(GuiGraphics graphics) {
+            graphics.guiRenderState.submitPicturesInPictureState(BlockTransformRenderState.create(graphics, block, x, y, scale, padding, xRot, yRot, zRot));
             rendering = true;
         }
 
@@ -162,7 +162,7 @@ public class GuiGameElement {
         private final PartialRenderState state = new PartialRenderState();
         private PartialModel model;
         private float scale = 1;
-        private BiConsumer<MatrixStack, Float> transform;
+        private BiConsumer<PoseStack, Float> transform;
         private float partialTicks;
         private int padding;
         private float xLocal, yLocal;
@@ -175,12 +175,12 @@ public class GuiGameElement {
         }
 
         @Override
-        public void render(DrawContext graphics) {
+        public void render(GuiGraphics graphics) {
             if (model == null) {
                 return;
             }
             state.update(graphics, model, x, y, xLocal, yLocal, scale, padding, partialTicks, transform);
-            graphics.state.addSpecialElement(state);
+            graphics.guiRenderState.submitPicturesInPictureState(state);
         }
 
         public GuiPartialRenderBuilder scale(float scale) {
@@ -188,7 +188,7 @@ public class GuiGameElement {
             return this;
         }
 
-        public GuiPartialRenderBuilder transform(BiConsumer<MatrixStack, Float> transform) {
+        public GuiPartialRenderBuilder transform(BiConsumer<PoseStack, Float> transform) {
             this.transform = transform;
             return this;
         }

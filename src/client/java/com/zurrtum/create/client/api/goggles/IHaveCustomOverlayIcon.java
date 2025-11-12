@@ -1,8 +1,8 @@
 package com.zurrtum.create.client.api.goggles;
 
 import com.zurrtum.create.AllItems;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.item.ItemStack;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.entity.BlockEntity;
 
 public sealed interface IHaveCustomOverlayIcon permits IHaveGoggleInformation, IHaveHoveringInformation {
     /**

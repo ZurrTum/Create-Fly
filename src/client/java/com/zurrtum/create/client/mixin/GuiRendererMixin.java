@@ -7,7 +7,7 @@ import com.llamalad7.mixinextras.sugar.Local;
 import com.mojang.blaze3d.buffers.GpuBuffer;
 import com.mojang.blaze3d.systems.RenderPass;
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.systems.RenderSystem.ShapeIndexBuffer;
+import com.mojang.blaze3d.systems.RenderSystem.AutoStorageIndexBuffer;
 import com.mojang.blaze3d.vertex.VertexFormat;
 import com.zurrtum.create.client.catnip.gui.IndexRenderPipeline;
 import com.zurrtum.create.client.catnip.gui.render.*;
@@ -17,20 +17,20 @@ import com.zurrtum.create.client.ponder.foundation.render.SceneRenderer;
 import com.zurrtum.create.client.ponder.foundation.render.TitleTextRenderState;
 import com.zurrtum.create.client.ponder.foundation.render.TitleTextRenderer;
 import net.minecraft.client.gui.render.GuiRenderer;
-import net.minecraft.client.gui.render.SpecialGuiElementRenderer;
-import net.minecraft.client.gui.render.state.special.SpecialGuiElementRenderState;
-import net.minecraft.client.render.VertexConsumerProvider.Immediate;
+import net.minecraft.client.gui.render.pip.PictureInPictureRenderer;
+import net.minecraft.client.gui.render.state.pip.PictureInPictureRenderState;
+import net.minecraft.client.renderer.MultiBufferSource.BufferSource;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 
 @Mixin(GuiRenderer.class)
 public class GuiRendererMixin {
     @WrapOperation(method = "<init>", at = @At(value = "INVOKE", target = "Lcom/google/common/collect/ImmutableMap;builder()Lcom/google/common/collect/ImmutableMap$Builder;", remap = false))
-    private ImmutableMap.Builder<Class<? extends SpecialGuiElementRenderState>, SpecialGuiElementRenderer<?>> addRenderer(
-        Operation<ImmutableMap.Builder<Class<? extends SpecialGuiElementRenderState>, SpecialGuiElementRenderer<?>>> original,
-        @Local(argsOnly = true) Immediate vertexConsumers
+    private ImmutableMap.Builder<Class<? extends PictureInPictureRenderState>, PictureInPictureRenderer<?>> addRenderer(
+        Operation<ImmutableMap.Builder<Class<? extends PictureInPictureRenderState>, PictureInPictureRenderer<?>>> original,
+        @Local(argsOnly = true) BufferSource vertexConsumers
     ) {
-        ImmutableMap.Builder<Class<? extends SpecialGuiElementRenderState>, SpecialGuiElementRenderer<?>> builder = original.call();
+        ImmutableMap.Builder<Class<? extends PictureInPictureRenderState>, PictureInPictureRenderer<?>> builder = original.call();
         builder.put(ItemTransformRenderState.class, new ItemTransformElementRenderer(vertexConsumers));
         builder.put(BlockTransformRenderState.class, new BlockTransformElementRenderer(vertexConsumers));
         builder.put(EntityBlockRenderState.class, new EntityBlockRenderer(vertexConsumers));
@@ -55,7 +55,7 @@ public class GuiRendererMixin {
         return builder;
     }
 
-    @WrapOperation(method = "render(Lnet/minecraft/client/gui/render/GuiRenderer$Draw;Lcom/mojang/blaze3d/systems/RenderPass;Lcom/mojang/blaze3d/buffers/GpuBuffer;Lcom/mojang/blaze3d/vertex/VertexFormat$IndexType;)V", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/systems/RenderPass;setIndexBuffer(Lcom/mojang/blaze3d/buffers/GpuBuffer;Lcom/mojang/blaze3d/vertex/VertexFormat$IndexType;)V"))
+    @WrapOperation(method = "executeDraw(Lnet/minecraft/client/gui/render/GuiRenderer$Draw;Lcom/mojang/blaze3d/systems/RenderPass;Lcom/mojang/blaze3d/buffers/GpuBuffer;Lcom/mojang/blaze3d/vertex/VertexFormat$IndexType;)V", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/systems/RenderPass;setIndexBuffer(Lcom/mojang/blaze3d/buffers/GpuBuffer;Lcom/mojang/blaze3d/vertex/VertexFormat$IndexType;)V"))
     private void setIndexBuffer(
         RenderPass instance,
         GpuBuffer gpuBuffer,
@@ -64,8 +64,8 @@ public class GuiRendererMixin {
         @Local(argsOnly = true) GuiRenderer.Draw draw
     ) {
         if (draw.pipeline() instanceof IndexRenderPipeline pipeline) {
-            ShapeIndexBuffer sequentialBuffer = RenderSystem.getSequentialBuffer(pipeline.getVertexFormatMode());
-            original.call(instance, sequentialBuffer.getIndexBuffer(draw.indexCount()), sequentialBuffer.getIndexType());
+            AutoStorageIndexBuffer sequentialBuffer = RenderSystem.getSequentialBuffer(pipeline.getVertexFormatMode());
+            original.call(instance, sequentialBuffer.getBuffer(draw.indexCount()), sequentialBuffer.type());
         } else {
             original.call(instance, gpuBuffer, indexType);
         }

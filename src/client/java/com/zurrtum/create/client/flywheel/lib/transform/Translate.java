@@ -1,7 +1,7 @@
 package com.zurrtum.create.client.flywheel.lib.transform;
 
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.math.Vec3i;
+import net.minecraft.core.Vec3i;
+import net.minecraft.world.phys.Vec3;
 import org.joml.Vector3fc;
 import org.joml.Vector3ic;
 
@@ -42,7 +42,7 @@ public interface Translate<Self extends Translate<Self>> {
         return translate(vec.x(), vec.y(), vec.z());
     }
 
-    default Self translate(Vec3d vec) {
+    default Self translate(Vec3 vec) {
         return translate(vec.x, vec.y, vec.z);
     }
 
@@ -70,7 +70,7 @@ public interface Translate<Self extends Translate<Self>> {
         return translateBack(vec.x(), vec.y(), vec.z());
     }
 
-    default Self translateBack(Vec3d vec) {
+    default Self translateBack(Vec3 vec) {
         return translateBack(vec.x, vec.y, vec.z);
     }
 

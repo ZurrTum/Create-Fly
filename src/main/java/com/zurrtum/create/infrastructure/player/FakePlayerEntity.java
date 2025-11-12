@@ -1,26 +1,26 @@
 package com.zurrtum.create.infrastructure.player;
 
 import com.mojang.authlib.GameProfile;
-import net.minecraft.block.entity.SignBlockEntity;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.damage.DamageSource;
-import net.minecraft.entity.passive.AbstractHorseEntity;
-import net.minecraft.inventory.Inventory;
-import net.minecraft.network.packet.c2s.common.SyncedClientOptions;
-import net.minecraft.scoreboard.Team;
-import net.minecraft.screen.NamedScreenHandlerFactory;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.stat.Stat;
-import net.minecraft.util.math.BlockPos;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.OptionalInt;
+import net.minecraft.core.BlockPos;
+import net.minecraft.server.level.ClientInformation;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.stats.Stat;
+import net.minecraft.world.Container;
+import net.minecraft.world.MenuProvider;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.animal.horse.AbstractHorse;
+import net.minecraft.world.level.block.entity.SignBlockEntity;
+import net.minecraft.world.scores.PlayerTeam;
 
-public class FakePlayerEntity extends ServerPlayerEntity {
-    public FakePlayerEntity(ServerWorld world, GameProfile profile) {
-        super(world.getServer(), world, profile, SyncedClientOptions.createDefault());
-        this.networkHandler = new FakePlayerNetworkHandler(world.getServer(), this);
+public class FakePlayerEntity extends ServerPlayer {
+    public FakePlayerEntity(ServerLevel world, GameProfile profile) {
+        super(world.getServer(), world, profile, ClientInformation.createDefault());
+        this.connection = new FakePlayerNetworkHandler(world.getServer(), this);
     }
 
     @Override
@@ -28,11 +28,11 @@ public class FakePlayerEntity extends ServerPlayerEntity {
     }
 
     @Override
-    public void setClientOptions(SyncedClientOptions settings) {
+    public void updateOptions(ClientInformation settings) {
     }
 
     @Override
-    public void increaseStat(Stat<?> stat, int amount) {
+    public void awardStat(Stat<?> stat, int amount) {
     }
 
     @Override
@@ -40,19 +40,19 @@ public class FakePlayerEntity extends ServerPlayerEntity {
     }
 
     @Override
-    public boolean isInvulnerableTo(ServerWorld world, DamageSource damageSource) {
+    public boolean isInvulnerableTo(ServerLevel world, DamageSource damageSource) {
         return true;
     }
 
     @Nullable
     @Override
-    public Team getScoreboardTeam() {
+    public PlayerTeam getTeam() {
         // Scoreboard team is checked using the gameprofile name by default, which we don't want.
         return null;
     }
 
     @Override
-    public void sleep(BlockPos pos) {
+    public void startSleeping(BlockPos pos) {
         // Don't lock bed forever.
     }
 
@@ -62,15 +62,15 @@ public class FakePlayerEntity extends ServerPlayerEntity {
     }
 
     @Override
-    public void openEditSignScreen(SignBlockEntity sign, boolean front) {
+    public void openTextEdit(SignBlockEntity sign, boolean front) {
     }
 
     @Override
-    public OptionalInt openHandledScreen(@Nullable NamedScreenHandlerFactory factory) {
+    public OptionalInt openMenu(@Nullable MenuProvider factory) {
         return OptionalInt.empty();
     }
 
     @Override
-    public void openHorseInventory(AbstractHorseEntity horse, Inventory inventory) {
+    public void openHorseInventory(AbstractHorse horse, Container inventory) {
     }
 }

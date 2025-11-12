@@ -2,13 +2,13 @@ package com.zurrtum.create.client.content.decoration.steamWhistle;
 
 import com.zurrtum.create.AllSoundEvents;
 import com.zurrtum.create.content.decoration.steamWhistle.WhistleBlock.WhistleSize;
-import net.minecraft.client.sound.MovingSoundInstance;
-import net.minecraft.client.sound.SoundInstance;
-import net.minecraft.sound.SoundCategory;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.client.resources.sounds.AbstractTickableSoundInstance;
+import net.minecraft.client.resources.sounds.SoundInstance;
+import net.minecraft.core.BlockPos;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.phys.Vec3;
 
-public class WhistleSoundInstance extends MovingSoundInstance {
+public class WhistleSoundInstance extends AbstractTickableSoundInstance {
 
     private boolean active;
     private int keepAlive;
@@ -17,16 +17,16 @@ public class WhistleSoundInstance extends MovingSoundInstance {
     public WhistleSoundInstance(WhistleSize size, BlockPos worldPosition) {
         super(
             (size == WhistleSize.SMALL ? AllSoundEvents.WHISTLE_HIGH : size == WhistleSize.MEDIUM ? AllSoundEvents.WHISTLE_MEDIUM : AllSoundEvents.WHISTLE_LOW).getMainEvent(),
-            SoundCategory.RECORDS,
-            SoundInstance.createRandom()
+            SoundSource.RECORDS,
+            SoundInstance.createUnseededRandom()
         );
         this.size = size;
-        repeat = true;
+        looping = true;
         active = true;
         volume = 0.05f;
-        repeatDelay = 0;
+        delay = 0;
         keepAlive();
-        Vec3d v = Vec3d.ofCenter(worldPosition);
+        Vec3 v = Vec3.atCenterOf(worldPosition);
         x = v.x;
         y = v.y;
         z = v.z;
@@ -60,7 +60,7 @@ public class WhistleSoundInstance extends MovingSoundInstance {
         }
         volume = Math.max(0, volume - .25f);
         if (volume == 0)
-            setDone();
+            stop();
     }
 
 }

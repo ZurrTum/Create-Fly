@@ -5,32 +5,32 @@
 
 package com.zurrtum.create.client.model.obj;
 
-import net.minecraft.client.texture.NativeImage;
-import net.minecraft.client.texture.Sprite;
-import net.minecraft.client.texture.SpriteContents;
-import net.minecraft.client.texture.SpriteDimensions;
-import net.minecraft.util.Identifier;
+import com.mojang.blaze3d.platform.NativeImage;
+import net.minecraft.client.renderer.texture.SpriteContents;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.client.resources.metadata.animation.FrameSize;
+import net.minecraft.resources.ResourceLocation;
 
 /**
  * A helper sprite with UVs spanning the entire texture.
  * <p>
  * Useful for baking quads that won't be used with an atlas.
  */
-public class UnitTextureAtlasSprite extends Sprite {
-    public static final Identifier LOCATION = Identifier.of("neoforge", "unit");
+public class UnitTextureAtlasSprite extends TextureAtlasSprite {
+    public static final ResourceLocation LOCATION = ResourceLocation.fromNamespaceAndPath("neoforge", "unit");
     public static final UnitTextureAtlasSprite INSTANCE = new UnitTextureAtlasSprite();
 
     private UnitTextureAtlasSprite() {
-        super(LOCATION, new SpriteContents(LOCATION, new SpriteDimensions(1, 1), new NativeImage(1, 1, false)), 1, 1, 0, 0);
+        super(LOCATION, new SpriteContents(LOCATION, new FrameSize(1, 1), new NativeImage(1, 1, false)), 1, 1, 0, 0);
     }
 
     @Override
-    public float getFrameU(float u) {
+    public float getU(float u) {
         return u;
     }
 
     @Override
-    public float getFrameV(float v) {
+    public float getV(float v) {
         return v;
     }
 }

@@ -1,6 +1,8 @@
 package com.zurrtum.create.client.content.kinetics.chainConveyor;
 
 import com.google.common.cache.Cache;
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.zurrtum.create.AllItemTags;
 import com.zurrtum.create.AllItems;
 import com.zurrtum.create.catnip.data.WorldAttached;
@@ -13,21 +15,18 @@ import com.zurrtum.create.content.logistics.packagePort.PackagePortTarget;
 import com.zurrtum.create.foundation.utility.TickBasedCache;
 import com.zurrtum.create.infrastructure.packet.c2s.ChainConveyorConnectionPacket;
 import com.zurrtum.create.infrastructure.packet.c2s.ChainPackageInteractionPacket;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.client.render.RenderLayer;
-import net.minecraft.client.render.VertexConsumer;
-import net.minecraft.client.render.VertexConsumerProvider;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.entity.attribute.EntityAttributes;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.hit.HitResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.math.Vec3d;
-
 import java.util.List;
 import java.util.Map;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.RenderType;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.HitResult;
+import net.minecraft.world.phys.Vec3;
 
 public class ChainConveyorInteractionHandler {
 
@@ -36,43 +35,43 @@ public class ChainConveyorInteractionHandler {
     public static BlockPos selectedLift;
     public static float selectedChainPosition;
     public static BlockPos selectedConnection;
-    public static Vec3d selectedBakedPosition;
+    public static Vec3 selectedBakedPosition;
     public static ChainConveyorShape selectedShape;
 
-    public static void clientTick(MinecraftClient mc) {
+    public static void clientTick(Minecraft mc) {
         if (!isActive(mc)) {
             selectedLift = null;
             return;
         }
 
-        ClientPlayerEntity player = mc.player;
-        boolean isWrench = player.isHolding(i -> i.isIn(AllItemTags.TOOLS_WRENCH));
-        boolean dismantling = isWrench && player.isSneaking();
-        double range = player.getAttributeValue(EntityAttributes.BLOCK_INTERACTION_RANGE) + 1;
+        LocalPlayer player = mc.player;
+        boolean isWrench = player.isHolding(i -> i.is(AllItemTags.TOOLS_WRENCH));
+        boolean dismantling = isWrench && player.isShiftKeyDown();
+        double range = player.getAttributeValue(Attributes.BLOCK_INTERACTION_RANGE) + 1;
 
-        Vec3d from = player.getEyePos();
-        Vec3d to = RaycastHelper.getTraceTarget(player, range, from);
-        HitResult hitResult = mc.crosshairTarget;
+        Vec3 from = player.getEyePosition();
+        Vec3 to = RaycastHelper.getTraceTarget(player, range, from);
+        HitResult hitResult = mc.hitResult;
 
         double bestDiff = Float.MAX_VALUE;
         if (hitResult != null)
-            bestDiff = hitResult.getPos().squaredDistanceTo(from);
+            bestDiff = hitResult.getLocation().distanceToSqr(from);
 
         BlockPos bestLift = null;
         ChainConveyorShape bestShape = null;
         selectedConnection = null;
 
-        for (Map.Entry<BlockPos, List<ChainConveyorShape>> entry : loadedChains.get(mc.world).asMap().entrySet()) {
+        for (Map.Entry<BlockPos, List<ChainConveyorShape>> entry : loadedChains.get(mc.level).asMap().entrySet()) {
             BlockPos liftPos = entry.getKey();
             for (ChainConveyorShape chainConveyorShape : entry.getValue()) {
                 if (chainConveyorShape instanceof ChainConveyorShape.ChainConveyorBB && dismantling)
                     continue;
-                Vec3d liftVec = Vec3d.of(liftPos);
-                Vec3d intersect = chainConveyorShape.intersect(from.subtract(liftVec), to.subtract(liftVec));
+                Vec3 liftVec = Vec3.atLowerCornerOf(liftPos);
+                Vec3 intersect = chainConveyorShape.intersect(from.subtract(liftVec), to.subtract(liftVec));
                 if (intersect == null)
                     continue;
 
-                double distanceToSqr = intersect.add(liftVec).squaredDistanceTo(from);
+                double distanceToSqr = intersect.add(liftVec).distanceToSqr(from);
                 if (distanceToSqr > bestDiff)
                     continue;
                 bestDiff = distanceToSqr;
@@ -92,36 +91,36 @@ public class ChainConveyorInteractionHandler {
         selectedBakedPosition = bestShape.getVec(bestLift, selectedChainPosition);
 
         if (!isWrench) {
-            Outliner.getInstance().chaseAABB("ChainPointSelection", new Box(selectedBakedPosition, selectedBakedPosition)).colored(Color.WHITE)
+            Outliner.getInstance().chaseAABB("ChainPointSelection", new AABB(selectedBakedPosition, selectedBakedPosition)).colored(Color.WHITE)
                 .lineWidth(1 / 6f).disableLineNormals();
         }
     }
 
-    private static boolean isActive(MinecraftClient mc) {
-        ItemStack mainHandItem = mc.player.getMainHandStack();
-        return mc.player.isHolding(i -> i.isIn(AllItemTags.CHAIN_RIDEABLE)) || mainHandItem.isOf(AllItems.PACKAGE_FROGPORT) || PackageItem.isPackage(
+    private static boolean isActive(Minecraft mc) {
+        ItemStack mainHandItem = mc.player.getMainHandItem();
+        return mc.player.isHolding(i -> i.is(AllItemTags.CHAIN_RIDEABLE)) || mainHandItem.is(AllItems.PACKAGE_FROGPORT) || PackageItem.isPackage(
             mainHandItem);
     }
 
-    public static boolean onUse(MinecraftClient mc) {
+    public static boolean onUse(Minecraft mc) {
         if (selectedLift == null)
             return false;
 
-        ClientPlayerEntity player = mc.player;
-        ItemStack mainHandItem = player.getMainHandStack();
+        LocalPlayer player = mc.player;
+        ItemStack mainHandItem = player.getMainHandItem();
 
-        if (player.isHolding(i -> i.isIn(AllItemTags.CHAIN_RIDEABLE))) {
-            ItemStack usedItem = mainHandItem.isIn(AllItemTags.CHAIN_RIDEABLE) ? mainHandItem : player.getOffHandStack();
-            if (!player.isSneaking()) {
+        if (player.isHolding(i -> i.is(AllItemTags.CHAIN_RIDEABLE))) {
+            ItemStack usedItem = mainHandItem.is(AllItemTags.CHAIN_RIDEABLE) ? mainHandItem : player.getOffhandItem();
+            if (!player.isShiftKeyDown()) {
                 ChainConveyorRidingHandler.embark(mc, selectedLift, selectedChainPosition, selectedConnection);
                 return true;
             }
 
-            player.networkHandler.sendPacket(new ChainConveyorConnectionPacket(selectedLift, selectedLift.add(selectedConnection), usedItem, false));
+            player.connection.send(new ChainConveyorConnectionPacket(selectedLift, selectedLift.offset(selectedConnection), usedItem, false));
             return true;
         }
 
-        if (mainHandItem.isOf(AllItems.PACKAGE_FROGPORT)) {
+        if (mainHandItem.is(AllItems.PACKAGE_FROGPORT)) {
             PackagePortTargetSelectionHandler.exactPositionOfTarget = selectedBakedPosition;
             PackagePortTargetSelectionHandler.activePackageTarget = new PackagePortTarget.ChainConveyorFrogportTarget(
                 selectedLift,
@@ -133,9 +132,9 @@ public class ChainConveyorInteractionHandler {
         }
 
         if (PackageItem.isPackage(mainHandItem)) {
-            player.networkHandler.sendPacket(new ChainPackageInteractionPacket(
+            player.connection.send(new ChainPackageInteractionPacket(
                 selectedLift,
-                selectedConnection == null ? BlockPos.ORIGIN : selectedConnection,
+                selectedConnection == null ? BlockPos.ZERO : selectedConnection,
                 selectedChainPosition,
                 false
             ));
@@ -145,15 +144,15 @@ public class ChainConveyorInteractionHandler {
         return true;
     }
 
-    public static void drawCustomBlockSelection(MatrixStack ms, VertexConsumerProvider buffer, Vec3d camera) {
+    public static void drawCustomBlockSelection(PoseStack ms, MultiBufferSource buffer, Vec3 camera) {
         if (selectedLift == null || selectedShape == null)
             return;
 
-        VertexConsumer vb = buffer.getBuffer(RenderLayer.getLines());
-        ms.push();
+        VertexConsumer vb = buffer.getBuffer(RenderType.lines());
+        ms.pushPose();
         ms.translate(selectedLift.getX() - camera.x, selectedLift.getY() - camera.y, selectedLift.getZ() - camera.z);
         selectedShape.drawOutline(selectedLift, ms, vb);
-        ms.pop();
+        ms.popPose();
     }
 
     public static boolean hideVanillaBlockSelection() {

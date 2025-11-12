@@ -1,6 +1,6 @@
 package com.zurrtum.create.infrastructure.items;
 
-import net.minecraft.inventory.SidedInventory;
+import net.minecraft.world.WorldlyContainer;
 
-public interface SidedItemInventory extends SidedInventory, ItemInventory {
+public interface SidedItemInventory extends WorldlyContainer, ItemInventory {
 }

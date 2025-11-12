@@ -3,7 +3,7 @@ package com.zurrtum.create.client.catnip.gui.element;
 import com.zurrtum.create.catnip.data.Couple;
 import com.zurrtum.create.catnip.theme.Color;
 import com.zurrtum.create.client.catnip.gui.render.BoxRenderState;
-import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.gui.GuiGraphics;
 import org.joml.Matrix3x2f;
 
 public class BoxElement extends AbstractRenderElement {
@@ -65,14 +65,14 @@ public class BoxElement extends AbstractRenderElement {
     }
 
     @Override
-    public void render(DrawContext graphics) {
+    public void render(GuiGraphics graphics) {
         renderBox(graphics);
     }
 
     //total box width = 1 * 2 (outer border) + 1 * 2 (inner color border) + 2 * borderOffset + width
     //defaults to 2 + 2 + 4 + 16 = 24px
     //batch everything together to save a bunch of gl calls over ScreenUtils
-    protected void renderBox(DrawContext graphics) {
+    protected void renderBox(GuiGraphics graphics) {
         /*
          *          _____________
          *        _|_____________|_
@@ -91,7 +91,7 @@ public class BoxElement extends AbstractRenderElement {
         Color c1 = background.copy().scaleAlpha(alpha);
         Color c2 = borderTop.copy().scaleAlpha(alpha);
         Color c3 = borderBot.copy().scaleAlpha(alpha);
-        Matrix3x2f model = new Matrix3x2f(graphics.getMatrices());
-        graphics.state.addSimpleElement(new BoxRenderState(model, x, y, width, height, borderOffset, c1, c2, c3));
+        Matrix3x2f model = new Matrix3x2f(graphics.pose());
+        graphics.guiRenderState.submitGuiElement(new BoxRenderState(model, x, y, width, height, borderOffset, c1, c2, c3));
     }
 }

@@ -1,11 +1,11 @@
 package com.zurrtum.create.client.infrastructure.particle;
 
-import net.minecraft.client.particle.SpriteProvider;
-import net.minecraft.client.render.Camera;
-import net.minecraft.client.world.ClientWorld;
-import net.minecraft.particle.SimpleParticleType;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.random.Random;
+import net.minecraft.client.Camera;
+import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.client.particle.SpriteSet;
+import net.minecraft.core.particles.SimpleParticleType;
+import net.minecraft.util.Mth;
+import net.minecraft.util.RandomSource;
 import org.joml.Quaternionf;
 
 public class WiFiParticle extends CustomRotationParticle {
@@ -13,39 +13,39 @@ public class WiFiParticle extends CustomRotationParticle {
 
     public WiFiParticle(
         SimpleParticleType type,
-        SpriteProvider spriteSet,
-        ClientWorld worldIn,
+        SpriteSet spriteSet,
+        ClientLevel worldIn,
         double x,
         double y,
         double z,
         double vx,
         double vy,
         double vz,
-        Random random
+        RandomSource random
     ) {
         super(worldIn, x, y + (vy < 0 ? -1 : 1), z, spriteSet, 0);
-        this.scale = 0.5f;
-        this.setBoundingBoxSpacing(this.scale, this.scale);
+        this.quadSize = 0.5f;
+        this.setSize(this.quadSize, this.quadSize);
         this.loopLength = 16;
-        this.maxAge = 16;
-        this.updateSprite(spriteSet);
-        this.stopped = true; // disable movement
+        this.lifetime = 16;
+        this.setSpriteFromAge(spriteSet);
+        this.stoppedByCollision = true; // disable movement
         this.downward = vy < 0;
     }
 
     @Override
     public void tick() {
-        updateSprite(spriteProvider);
-        if (age++ >= maxAge)
-            markDead();
+        setSpriteFromAge(sprites);
+        if (age++ >= lifetime)
+            remove();
     }
 
     @Override
     public Quaternionf getCustomRotation(Camera camera, float partialTicks) {
-        Quaternionf rotation = camera.getRotation();
+        Quaternionf rotation = camera.rotation();
         Quaternionf quaternionf = new Quaternionf(0, rotation.y, 0, rotation.w);
         if (downward) {
-            quaternionf.rotateZ(MathHelper.PI);
+            quaternionf.rotateZ(Mth.PI);
         }
         return quaternionf;
     }

@@ -12,11 +12,11 @@ import com.zurrtum.create.client.ponder.api.scene.SceneBuildingUtil;
 import com.zurrtum.create.client.ponder.api.scene.Selection;
 import com.zurrtum.create.content.logistics.box.PackageItem;
 import com.zurrtum.create.content.logistics.packager.PackagerBlock;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
 
 import java.util.List;
 
@@ -64,31 +64,31 @@ public class StockTickerScenes {
         scene.world().moveSection(linkL, util.vector().of(0, -2, 0), 0);
         scene.idle(15);
 
-        ItemStack linkItem = AllItems.STOCK_TICKER.getDefaultStack();
-        scene.overlay().showControls(util.vector().topOf(link1.down(2)), Pointing.DOWN, 50).rightClick().withItem(linkItem);
+        ItemStack linkItem = AllItems.STOCK_TICKER.getDefaultInstance();
+        scene.overlay().showControls(util.vector().topOf(link1.below(2)), Pointing.DOWN, 50).rightClick().withItem(linkItem);
         scene.idle(5);
 
-        Box bb1 = new Box(link1.down(2));
-        scene.overlay().chaseBoundingBoxOutline(PonderPalette.BLUE, link1, bb1.contract(0.45), 10);
+        AABB bb1 = new AABB(link1.below(2));
+        scene.overlay().chaseBoundingBoxOutline(PonderPalette.BLUE, link1, bb1.deflate(0.45), 10);
         scene.idle(1);
-        bb1 = bb1.contract(1 / 16f).shrink(0, 8 / 16f, 0);
+        bb1 = bb1.deflate(1 / 16f).contract(0, 8 / 16f, 0);
         scene.overlay().chaseBoundingBoxOutline(PonderPalette.BLUE, link1, bb1, 50);
         scene.idle(26);
 
         scene.overlay().showText(100).text("Right-click a Stock link before placement to connect to its network").attachKeyFrame()
-            .colored(PonderPalette.BLUE).placeNearTarget().pointAt(util.vector().centerOf(link1.down(2)));
+            .colored(PonderPalette.BLUE).placeNearTarget().pointAt(util.vector().centerOf(link1.below(2)));
 
         scene.idle(40);
 
         scene.world().showSection(tickerS, Direction.DOWN);
         scene.idle(20);
 
-        scene.overlay().chaseBoundingBoxOutline(PonderPalette.GREEN, ticker, new Box(ticker), 40);
+        scene.overlay().chaseBoundingBoxOutline(PonderPalette.GREEN, ticker, new AABB(ticker), 40);
         scene.overlay().chaseBoundingBoxOutline(PonderPalette.GREEN, link1, bb1, 40);
         scene.overlay().showLine(
             PonderPalette.GREEN,
             util.vector().centerOf(ticker).subtract(0, 1 / 4f, 0),
-            util.vector().centerOf(link1.down(2)).subtract(0, 1 / 4f, 0),
+            util.vector().centerOf(link1.below(2)).subtract(0, 1 / 4f, 0),
             40
         );
         scene.idle(60);
@@ -136,7 +136,7 @@ public class StockTickerScenes {
         scene.idle(10);
         scene.special().createBirb(util.vector().centerOf(ticker.east()), FacePointOfInterestPose::new);
 
-        Vec3d keeper = util.vector().blockSurface(ticker.east(), Direction.WEST).add(0, 0.5, 0);
+        Vec3 keeper = util.vector().blockSurface(ticker.east(), Direction.WEST).add(0, 0.5, 0);
         scene.overlay().showText(80).text("Seated mobs or blaze burners in front of it act as the Stock Keeper").attachKeyFrame().placeNearTarget()
             .pointAt(keeper);
         scene.idle(90);
@@ -201,7 +201,7 @@ public class StockTickerScenes {
         scene.world().hideSection(fun2S, Direction.NORTH);
         scene.idle(30);
 
-        ItemStack filterItem = AllItems.ATTRIBUTE_FILTER.getDefaultStack();
+        ItemStack filterItem = AllItems.ATTRIBUTE_FILTER.getDefaultInstance();
         scene.overlay().showControls(util.vector().topOf(ticker), Pointing.DOWN, 100).rightClick().withItem(filterItem);
         scene.idle(10);
 
@@ -219,7 +219,7 @@ public class StockTickerScenes {
             .attachKeyFrame().placeNearTarget().pointAt(util.vector().centerOf(util.grid().at(2, 1, 3)));
         scene.idle(100);
 
-        ItemStack clipboardItem = AllItems.CLIPBOARD.getDefaultStack();
+        ItemStack clipboardItem = AllItems.CLIPBOARD.getDefaultInstance();
         scene.overlay().showControls(keeper, Pointing.DOWN, 100).rightClick().withItem(clipboardItem);
         scene.idle(10);
 
@@ -291,7 +291,7 @@ public class StockTickerScenes {
         scene.rotateCameraY(-15);
         scene.idle(15);
 
-        scene.overlay().showControls(util.vector().of(4, 2.825, 4.5), Pointing.DOWN, 60).withItem(AllItems.PACKAGE_FILTER.getDefaultStack());
+        scene.overlay().showControls(util.vector().of(4, 2.825, 4.5), Pointing.DOWN, 60).withItem(AllItems.PACKAGE_FILTER.getDefaultInstance());
         scene.idle(10);
         scene.overlay().showFilterSlotInput(util.vector().of(4.1, 2.825, 4.5), 50);
         scene.idle(30);

@@ -2,16 +2,16 @@ package com.zurrtum.create.api.packager.unpacking;
 
 import com.zurrtum.create.api.registry.SimpleRegistry;
 import com.zurrtum.create.infrastructure.component.PackageOrderWithCrafts;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.world.World;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
 
 /**
  * Interface for custom handling of box unpacking into storage.
@@ -32,7 +32,7 @@ public interface UnpackingHandler {
      * @return true if all items have been unpacked successfully
      */
     boolean unpack(
-        World level,
+        Level level,
         BlockPos pos,
         BlockState state,
         Direction side,

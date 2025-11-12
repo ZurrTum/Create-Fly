@@ -1,34 +1,33 @@
 package com.zurrtum.create.client.catnip.render;
 
-import net.minecraft.client.texture.Sprite;
-import net.minecraft.client.texture.SpriteAtlasTexture;
-import net.minecraft.util.Identifier;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import net.minecraft.client.renderer.texture.TextureAtlas;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.resources.ResourceLocation;
 
 public class StitchedSprite {
-    private static final Map<Identifier, List<StitchedSprite>> ALL = new HashMap<>();
+    private static final Map<ResourceLocation, List<StitchedSprite>> ALL = new HashMap<>();
 
-    protected final Identifier atlasLocation;
-    protected final Identifier location;
-    protected Sprite sprite;
+    protected final ResourceLocation atlasLocation;
+    protected final ResourceLocation location;
+    protected TextureAtlasSprite sprite;
 
-    public StitchedSprite(Identifier atlas, Identifier location) {
+    public StitchedSprite(ResourceLocation atlas, ResourceLocation location) {
         atlasLocation = atlas;
         this.location = location;
         ALL.computeIfAbsent(atlasLocation, $ -> new ArrayList<>()).add(this);
     }
 
     @SuppressWarnings("deprecation")
-    public StitchedSprite(Identifier location) {
-        this(SpriteAtlasTexture.BLOCK_ATLAS_TEXTURE, location);
+    public StitchedSprite(ResourceLocation location) {
+        this(TextureAtlas.LOCATION_BLOCKS, location);
     }
 
-    public static void onTextureStitchPost(SpriteAtlasTexture atlas) {
-        Identifier atlasLocation = atlas.getId();
+    public static void onTextureStitchPost(TextureAtlas atlas) {
+        ResourceLocation atlasLocation = atlas.location();
         List<StitchedSprite> sprites = ALL.get(atlasLocation);
         if (sprites != null) {
             for (StitchedSprite sprite : sprites) {
@@ -37,19 +36,19 @@ public class StitchedSprite {
         }
     }
 
-    protected void loadSprite(SpriteAtlasTexture atlas) {
+    protected void loadSprite(TextureAtlas atlas) {
         sprite = atlas.getSprite(location);
     }
 
-    public Identifier getAtlasLocation() {
+    public ResourceLocation getAtlasLocation() {
         return atlasLocation;
     }
 
-    public Identifier getLocation() {
+    public ResourceLocation getLocation() {
         return location;
     }
 
-    public Sprite get() {
+    public TextureAtlasSprite get() {
         return sprite;
     }
 }

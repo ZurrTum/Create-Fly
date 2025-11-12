@@ -6,16 +6,16 @@ import com.zurrtum.create.content.kinetics.base.KineticBlockEntity;
 import com.zurrtum.create.content.logistics.chute.ChuteBlockEntity;
 import com.zurrtum.create.foundation.advancement.CreateTrigger;
 import com.zurrtum.create.infrastructure.config.AllConfigs;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.state.property.Properties;
-import net.minecraft.storage.ReadView;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.storage.ValueInput;
 
 public class EncasedFanBlockEntity extends KineticBlockEntity implements IAirCurrentSource {
 
@@ -36,7 +36,7 @@ public class EncasedFanBlockEntity extends KineticBlockEntity implements IAirCur
     }
 
     @Override
-    protected void read(ReadView view, boolean clientPacket) {
+    protected void read(ValueInput view, boolean clientPacket) {
         super.read(view, clientPacket);
         if (clientPacket)
             airCurrent.rebuild();
@@ -49,18 +49,18 @@ public class EncasedFanBlockEntity extends KineticBlockEntity implements IAirCur
 
     @Nullable
     @Override
-    public World getAirCurrentWorld() {
-        return world;
+    public Level getAirCurrentWorld() {
+        return level;
     }
 
     @Override
     public BlockPos getAirCurrentPos() {
-        return pos;
+        return worldPosition;
     }
 
     @Override
     public Direction getAirflowOriginSide() {
-        return getCachedState().get(EncasedFanBlock.FACING);
+        return getBlockState().getValue(EncasedFanBlock.FACING);
     }
 
     @Override
@@ -68,7 +68,7 @@ public class EncasedFanBlockEntity extends KineticBlockEntity implements IAirCur
         float speed = getSpeed();
         if (speed == 0)
             return null;
-        Direction facing = getCachedState().get(Properties.FACING);
+        Direction facing = getBlockState().getValue(BlockStateProperties.FACING);
         speed = convertToDirection(speed, facing);
         return speed > 0 ? facing : facing.getOpposite();
     }
@@ -81,7 +81,7 @@ public class EncasedFanBlockEntity extends KineticBlockEntity implements IAirCur
 
     @Override
     public boolean isSourceRemoved() {
-        return removed;
+        return remove;
     }
 
     @Override
@@ -92,10 +92,10 @@ public class EncasedFanBlockEntity extends KineticBlockEntity implements IAirCur
     }
 
     public void updateChute() {
-        Direction direction = getCachedState().get(EncasedFanBlock.FACING);
+        Direction direction = getBlockState().getValue(EncasedFanBlock.FACING);
         if (!direction.getAxis().isVertical())
             return;
-        BlockEntity poweredChute = world.getBlockEntity(pos.offset(direction));
+        BlockEntity poweredChute = level.getBlockEntity(worldPosition.relative(direction));
         if (!(poweredChute instanceof ChuteBlockEntity chuteBE))
             return;
         if (direction == Direction.DOWN)
@@ -112,7 +112,7 @@ public class EncasedFanBlockEntity extends KineticBlockEntity implements IAirCur
     public void tick() {
         super.tick();
 
-        boolean server = !world.isClient() || isVirtual();
+        boolean server = !level.isClientSide() || isVirtual();
 
         if (server && airCurrentUpdateCooldown-- <= 0) {
             airCurrentUpdateCooldown = AllConfigs.server().kinetics.fanBlockCheckRate.get();

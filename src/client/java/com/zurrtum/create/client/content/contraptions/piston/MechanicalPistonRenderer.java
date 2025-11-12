@@ -3,11 +3,11 @@ package com.zurrtum.create.client.content.contraptions.piston;
 import com.zurrtum.create.client.content.kinetics.base.KineticBlockEntityRenderer;
 import com.zurrtum.create.client.content.kinetics.base.KineticBlockEntityRenderer.KineticRenderState;
 import com.zurrtum.create.content.contraptions.piston.MechanicalPistonBlockEntity;
-import net.minecraft.block.BlockState;
-import net.minecraft.client.render.block.entity.BlockEntityRendererFactory;
+import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
+import net.minecraft.world.level.block.state.BlockState;
 
 public class MechanicalPistonRenderer extends KineticBlockEntityRenderer<MechanicalPistonBlockEntity, KineticRenderState> {
-    public MechanicalPistonRenderer(BlockEntityRendererFactory.Context context) {
+    public MechanicalPistonRenderer(BlockEntityRendererProvider.Context context) {
         super(context);
     }
 

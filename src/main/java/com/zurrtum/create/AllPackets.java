@@ -2,16 +2,16 @@ package com.zurrtum.create;
 
 import com.zurrtum.create.infrastructure.packet.c2s.*;
 import com.zurrtum.create.infrastructure.packet.s2c.*;
-import net.minecraft.network.NetworkSide;
-import net.minecraft.network.RegistryByteBuf;
-import net.minecraft.network.codec.PacketCodec;
-import net.minecraft.network.listener.ClientConfigurationPacketListener;
-import net.minecraft.network.listener.ClientPlayPacketListener;
-import net.minecraft.network.listener.ServerPlayPacketListener;
-import net.minecraft.network.packet.Packet;
-import net.minecraft.network.packet.PacketType;
-import net.minecraft.server.network.ServerPlayNetworkHandler;
-import net.minecraft.util.Identifier;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.Packet;
+import net.minecraft.network.protocol.PacketFlow;
+import net.minecraft.network.protocol.PacketType;
+import net.minecraft.network.protocol.configuration.ClientConfigurationPacketListener;
+import net.minecraft.network.protocol.game.ClientGamePacketListener;
+import net.minecraft.network.protocol.game.ServerGamePacketListener;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.network.ServerGamePacketListenerImpl;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -21,9 +21,9 @@ import java.util.function.Consumer;
 import static com.zurrtum.create.Create.MOD_ID;
 
 public class AllPackets {
-    public static final Map<PacketType<Packet<ServerPlayPacketListener>>, PacketCodec<? super RegistryByteBuf, Packet<ServerPlayPacketListener>>> C2S = new LinkedHashMap<>();
-    public static final Map<PacketType<Packet<ClientPlayPacketListener>>, PacketCodec<? super RegistryByteBuf, Packet<ClientPlayPacketListener>>> S2C = new LinkedHashMap<>();
-    public static final Map<PacketType<Packet<ClientConfigurationPacketListener>>, PacketCodec<? super RegistryByteBuf, Packet<ClientConfigurationPacketListener>>> S2C_CONFIG = new LinkedHashMap<>();
+    public static final Map<PacketType<Packet<ServerGamePacketListener>>, StreamCodec<? super RegistryFriendlyByteBuf, Packet<ServerGamePacketListener>>> C2S = new LinkedHashMap<>();
+    public static final Map<PacketType<Packet<ClientGamePacketListener>>, StreamCodec<? super RegistryFriendlyByteBuf, Packet<ClientGamePacketListener>>> S2C = new LinkedHashMap<>();
+    public static final Map<PacketType<Packet<ClientConfigurationPacketListener>>, StreamCodec<? super RegistryFriendlyByteBuf, Packet<ClientConfigurationPacketListener>>> S2C_CONFIG = new LinkedHashMap<>();
     public static final PacketType<ConfigureSchematicannonPacket> CONFIGURE_SCHEMATICANNON = c2s(
         "configure_schematicannon",
         ConfigureSchematicannonPacket.CODEC
@@ -257,37 +257,43 @@ public class AllPackets {
     @SuppressWarnings("unchecked")
     private static <T extends Packet<ClientConfigurationPacketListener>> PacketType<T> s2c_config(
         String id,
-        PacketCodec<? super RegistryByteBuf, T> codec
+        StreamCodec<? super RegistryFriendlyByteBuf, T> codec
     ) {
-        PacketType<T> type = new PacketType<>(NetworkSide.CLIENTBOUND, Identifier.of(MOD_ID, id));
+        PacketType<T> type = new PacketType<>(PacketFlow.CLIENTBOUND, ResourceLocation.fromNamespaceAndPath(MOD_ID, id));
         S2C_CONFIG.put(
             (PacketType<Packet<ClientConfigurationPacketListener>>) type,
-            (PacketCodec<? super RegistryByteBuf, Packet<ClientConfigurationPacketListener>>) codec
+            (StreamCodec<? super RegistryFriendlyByteBuf, Packet<ClientConfigurationPacketListener>>) codec
         );
         return type;
     }
 
     @SuppressWarnings("unchecked")
-    private static <T extends Packet<ClientPlayPacketListener>> PacketType<T> s2c(String id, PacketCodec<? super RegistryByteBuf, T> codec) {
-        PacketType<T> type = new PacketType<>(NetworkSide.CLIENTBOUND, Identifier.of(MOD_ID, id));
-        S2C.put((PacketType<Packet<ClientPlayPacketListener>>) type, (PacketCodec<? super RegistryByteBuf, Packet<ClientPlayPacketListener>>) codec);
+    private static <T extends Packet<ClientGamePacketListener>> PacketType<T> s2c(String id, StreamCodec<? super RegistryFriendlyByteBuf, T> codec) {
+        PacketType<T> type = new PacketType<>(PacketFlow.CLIENTBOUND, ResourceLocation.fromNamespaceAndPath(MOD_ID, id));
+        S2C.put(
+            (PacketType<Packet<ClientGamePacketListener>>) type,
+            (StreamCodec<? super RegistryFriendlyByteBuf, Packet<ClientGamePacketListener>>) codec
+        );
         return type;
     }
 
     @SuppressWarnings("unchecked")
-    private static <T extends Packet<ServerPlayPacketListener>> PacketType<T> c2s(String id, PacketCodec<? super RegistryByteBuf, T> codec) {
-        PacketType<T> type = new PacketType<>(NetworkSide.SERVERBOUND, Identifier.of(MOD_ID, id));
-        C2S.put((PacketType<Packet<ServerPlayPacketListener>>) type, (PacketCodec<? super RegistryByteBuf, Packet<ServerPlayPacketListener>>) codec);
+    private static <T extends Packet<ServerGamePacketListener>> PacketType<T> c2s(String id, StreamCodec<? super RegistryFriendlyByteBuf, T> codec) {
+        PacketType<T> type = new PacketType<>(PacketFlow.SERVERBOUND, ResourceLocation.fromNamespaceAndPath(MOD_ID, id));
+        C2S.put(
+            (PacketType<Packet<ServerGamePacketListener>>) type,
+            (StreamCodec<? super RegistryFriendlyByteBuf, Packet<ServerGamePacketListener>>) codec
+        );
         return type;
     }
 
-    private static C2SHoldPacket c2s(String id, Consumer<ServerPlayNetworkHandler> callback) {
+    private static C2SHoldPacket c2s(String id, Consumer<ServerGamePacketListenerImpl> callback) {
         C2SHoldPacket packet = new C2SHoldPacket(id, callback);
         C2S.put(packet.id(), packet.codec());
         return packet;
     }
 
-    private static <T extends ClientPlayPacketListener> S2CHoldPacket<T> s2c(String id, BiConsumer<AllClientHandle<T>, T> callback) {
+    private static <T extends ClientGamePacketListener> S2CHoldPacket<T> s2c(String id, BiConsumer<AllClientHandle<T>, T> callback) {
         S2CHoldPacket<T> packet = new S2CHoldPacket<>(id, callback);
         S2C.put(packet.id(), packet.codec());
         return packet;

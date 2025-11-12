@@ -20,31 +20,31 @@ import mezz.jei.api.gui.ingredient.IRecipeSlotsView;
 import mezz.jei.api.recipe.IFocusGroup;
 import mezz.jei.api.recipe.RecipeIngredientRole;
 import mezz.jei.api.recipe.types.IRecipeType;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.item.ItemStack;
-import net.minecraft.recipe.PreparedRecipes;
-import net.minecraft.recipe.RecipeEntry;
-import net.minecraft.text.Text;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.RecipeHolder;
+import net.minecraft.world.item.crafting.RecipeMap;
 import org.jetbrains.annotations.NotNull;
 import org.joml.Matrix3x2f;
 
 import java.util.List;
 
-public class MixingCategory extends CreateCategory<RecipeEntry<MixingRecipe>> {
-    public static List<RecipeEntry<MixingRecipe>> getRecipes(PreparedRecipes preparedRecipes) {
-        return preparedRecipes.getAll(AllRecipeTypes.MIXING).stream().toList();
+public class MixingCategory extends CreateCategory<RecipeHolder<MixingRecipe>> {
+    public static List<RecipeHolder<MixingRecipe>> getRecipes(RecipeMap preparedRecipes) {
+        return preparedRecipes.byType(AllRecipeTypes.MIXING).stream().toList();
     }
 
     @Override
     @NotNull
-    public IRecipeType<RecipeEntry<MixingRecipe>> getRecipeType() {
+    public IRecipeType<RecipeHolder<MixingRecipe>> getRecipeType() {
         return JeiClientPlugin.MIXING;
     }
 
     @Override
     @NotNull
-    public Text getTitle() {
+    public Component getTitle() {
         return CreateLang.translateDirect("recipe.mixing");
     }
 
@@ -59,7 +59,7 @@ public class MixingCategory extends CreateCategory<RecipeEntry<MixingRecipe>> {
     }
 
     @Override
-    public void setRecipe(IRecipeLayoutBuilder builder, RecipeEntry<MixingRecipe> entry, IFocusGroup focuses) {
+    public void setRecipe(IRecipeLayoutBuilder builder, RecipeHolder<MixingRecipe> entry, IFocusGroup focuses) {
         MixingRecipe recipe = entry.value();
         List<SizedIngredient> ingredients = recipe.ingredients();
         List<FluidIngredient> fluidIngredients = recipe.fluidIngredients();
@@ -96,9 +96,9 @@ public class MixingCategory extends CreateCategory<RecipeEntry<MixingRecipe>> {
     }
 
     @Override
-    public void draw(RecipeEntry<MixingRecipe> entry, IRecipeSlotsView recipeSlotsView, DrawContext graphics, double mouseX, double mouseY) {
+    public void draw(RecipeHolder<MixingRecipe> entry, IRecipeSlotsView recipeSlotsView, GuiGraphics graphics, double mouseX, double mouseY) {
         AllGuiTextures.JEI_DOWN_ARROW.render(graphics, 136, 32);
-        Matrix3x2f pose = new Matrix3x2f(graphics.getMatrices());
+        Matrix3x2f pose = new Matrix3x2f(graphics.pose());
         HeatCondition requiredHeat = entry.value().heat();
         if (requiredHeat == HeatCondition.NONE) {
             AllGuiTextures.JEI_NO_HEAT_BAR.render(graphics, 4, 80);
@@ -106,11 +106,11 @@ public class MixingCategory extends CreateCategory<RecipeEntry<MixingRecipe>> {
         } else {
             AllGuiTextures.JEI_HEAT_BAR.render(graphics, 4, 80);
             AllGuiTextures.JEI_LIGHT.render(graphics, 81, 88);
-            graphics.state.addSpecialElement(new BasinBlazeBurnerRenderState(pose, 91, 69, requiredHeat.visualizeAsBlazeBurner()));
+            graphics.guiRenderState.submitPicturesInPictureState(new BasinBlazeBurnerRenderState(pose, 91, 69, requiredHeat.visualizeAsBlazeBurner()));
         }
-        graphics.state.addSpecialElement(new MixingBasinRenderState(pose, 91, -5));
-        graphics.drawText(
-            MinecraftClient.getInstance().textRenderer,
+        graphics.guiRenderState.submitPicturesInPictureState(new MixingBasinRenderState(pose, 91, -5));
+        graphics.drawString(
+            Minecraft.getInstance().font,
             CreateLang.translateDirect(requiredHeat.getTranslationKey()),
             9,
             86,

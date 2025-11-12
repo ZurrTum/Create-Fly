@@ -2,8 +2,6 @@ package com.zurrtum.create.mixin;
 
 import com.llamalad7.mixinextras.sugar.Local;
 import com.zurrtum.create.AllSynchedDatas;
-import net.minecraft.entity.data.DataTracked;
-import net.minecraft.entity.data.DataTracker;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -12,19 +10,21 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.List;
+import net.minecraft.network.syncher.SyncedDataHolder;
+import net.minecraft.network.syncher.SynchedEntityData;
 
-@Mixin(DataTracker.class)
+@Mixin(SynchedEntityData.class)
 public class DataTrackerMixin {
     @Final
     @Shadow
-    private DataTracked trackedEntity;
+    private SyncedDataHolder entity;
 
-    @Inject(method = "writeUpdatedEntries(Ljava/util/List;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/data/DataTracked;onTrackedDataSet(Lnet/minecraft/entity/data/TrackedData;)V"))
+    @Inject(method = "assignValues(Ljava/util/List;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/network/syncher/SyncedDataHolder;onSyncedDataUpdated(Lnet/minecraft/network/syncher/EntityDataAccessor;)V"))
     private void onTrackedDataSet(
-        List<DataTracker.SerializedEntry<?>> entries,
+        List<SynchedEntityData.DataValue<?>> entries,
         CallbackInfo ci,
-        @Local DataTracker.SerializedEntry<?> serializedEntry
+        @Local SynchedEntityData.DataValue<?> serializedEntry
     ) {
-        AllSynchedDatas.onData(trackedEntity, serializedEntry);
+        AllSynchedDatas.onData(entity, serializedEntry);
     }
 }

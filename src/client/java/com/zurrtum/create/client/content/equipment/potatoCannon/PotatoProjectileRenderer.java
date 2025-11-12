@@ -1,30 +1,30 @@
 package com.zurrtum.create.client.content.equipment.potatoCannon;
 
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.zurrtum.create.api.equipment.potatoCannon.PotatoProjectileRenderMode;
 import com.zurrtum.create.client.AllPotatoProjectileTransforms;
 import com.zurrtum.create.content.equipment.potatoCannon.PotatoProjectileEntity;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.item.ItemModelManager;
-import net.minecraft.client.render.OverlayTexture;
-import net.minecraft.client.render.command.OrderedRenderCommandQueue;
-import net.minecraft.client.render.entity.EntityRenderer;
-import net.minecraft.client.render.entity.EntityRendererFactory;
-import net.minecraft.client.render.entity.state.EntityRenderState;
-import net.minecraft.client.render.item.ItemRenderState;
-import net.minecraft.client.render.state.CameraRenderState;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.entity.Entity;
-import net.minecraft.item.ItemDisplayContext;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.SubmitNodeCollector;
+import net.minecraft.client.renderer.entity.EntityRenderer;
+import net.minecraft.client.renderer.entity.EntityRendererProvider;
+import net.minecraft.client.renderer.entity.state.EntityRenderState;
+import net.minecraft.client.renderer.item.ItemModelResolver;
+import net.minecraft.client.renderer.item.ItemStackRenderState;
+import net.minecraft.client.renderer.state.CameraRenderState;
+import net.minecraft.client.renderer.texture.OverlayTexture;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.item.ItemDisplayContext;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
 
 public class PotatoProjectileRenderer extends EntityRenderer<PotatoProjectileEntity, PotatoProjectileRenderer.PotatoProjectileState> {
-    protected final ItemModelManager itemModelManager;
+    protected final ItemModelResolver itemModelManager;
 
-    public PotatoProjectileRenderer(EntityRendererFactory.Context context) {
+    public PotatoProjectileRenderer(EntityRendererProvider.Context context) {
         super(context);
-        itemModelManager = context.getItemModelManager();
+        itemModelManager = context.getItemModelResolver();
     }
 
     @Override
@@ -33,48 +33,48 @@ public class PotatoProjectileRenderer extends EntityRenderer<PotatoProjectileEnt
     }
 
     @Override
-    public void updateRenderState(PotatoProjectileEntity entity, PotatoProjectileState state, float tickProgress) {
-        super.updateRenderState(entity, state, tickProgress);
+    public void extractRenderState(PotatoProjectileEntity entity, PotatoProjectileState state, float tickProgress) {
+        super.extractRenderState(entity, state, tickProgress);
         ItemStack stack = entity.getItem();
         if (stack.isEmpty()) {
             return;
         }
-        ItemRenderState item = state.item = new ItemRenderState();
+        ItemStackRenderState item = state.item = new ItemStackRenderState();
         item.displayContext = ItemDisplayContext.GROUND;
-        itemModelManager.update(item, stack, item.displayContext, entity.getEntityWorld(), null, 0);
+        itemModelManager.appendItemLayers(item, stack, item.displayContext, entity.level(), null, 0);
         state.box = entity.getBoundingBox();
-        state.velocity = entity.getVelocity();
-        state.translateY = (float) (state.box.getLengthY() / 2 - 1 / 8f);
+        state.velocity = entity.getDeltaMovement();
+        state.translateY = (float) (state.box.getYsize() / 2 - 1 / 8f);
         state.mode = entity.getRenderMode();
         state.transformer = AllPotatoProjectileTransforms.get(state.mode);
-        state.camera = MinecraftClient.getInstance().getCameraEntity();
+        state.camera = Minecraft.getInstance().getCameraEntity();
         state.pt = tickProgress;
         state.hash = System.identityHashCode(entity) * 31;
     }
 
     @Override
-    public void render(PotatoProjectileState state, MatrixStack ms, OrderedRenderCommandQueue queue, CameraRenderState cameraState) {
+    public void submit(PotatoProjectileState state, PoseStack ms, SubmitNodeCollector queue, CameraRenderState cameraState) {
         if (state.item.isEmpty()) {
             return;
         }
-        ms.push();
+        ms.pushPose();
         ms.translate(0, state.translateY, 0);
         if (state.transformer != null) {
             state.transformer.transform(state.mode, ms, state);
         }
-        state.item.render(ms, queue, state.light, OverlayTexture.DEFAULT_UV, 0);
-        ms.pop();
+        state.item.submit(ms, queue, state.lightCoords, OverlayTexture.NO_OVERLAY, 0);
+        ms.popPose();
     }
 
     public static class PotatoProjectileState extends EntityRenderState {
-        public ItemRenderState item;
+        public ItemStackRenderState item;
         public float translateY;
         public PotatoProjectileRenderMode mode;
         public PotatoProjectileTransform<PotatoProjectileRenderMode> transformer;
         public float pt;
-        public Box box;
+        public AABB box;
         public Entity camera;
-        public Vec3d velocity;
+        public Vec3 velocity;
         public int hash;
     }
 }

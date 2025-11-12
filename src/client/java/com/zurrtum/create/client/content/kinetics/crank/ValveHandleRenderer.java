@@ -6,13 +6,13 @@ import com.zurrtum.create.client.content.kinetics.base.KineticBlockEntityRendere
 import com.zurrtum.create.content.kinetics.crank.HandCrankBlockEntity;
 import com.zurrtum.create.content.kinetics.crank.ValveHandleBlock;
 import com.zurrtum.create.content.kinetics.crank.ValveHandleBlockEntity;
-import net.minecraft.block.BlockState;
-import net.minecraft.client.render.block.entity.BlockEntityRendererFactory;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.MathHelper;
+import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
+import net.minecraft.core.Direction;
+import net.minecraft.util.Mth;
+import net.minecraft.world.level.block.state.BlockState;
 
 public class ValveHandleRenderer extends HandCrankRenderer {
-    public ValveHandleRenderer(BlockEntityRendererFactory.Context context) {
+    public ValveHandleRenderer(BlockEntityRendererProvider.Context context) {
         super(context);
     }
 
@@ -23,18 +23,18 @@ public class ValveHandleRenderer extends HandCrankRenderer {
 
     public static float getValveHandleIndependentAngle(ValveHandleBlockEntity be, float partialTicks) {
         if (be.inUse == 0 && be.source != null && be.getSpeed() != 0)
-            return KineticBlockEntityRenderer.getAngleForBe(be, be.getPos(), KineticBlockEntityRenderer.getRotationAxisOf(be));
+            return KineticBlockEntityRenderer.getAngleForBe(be, be.getBlockPos(), KineticBlockEntityRenderer.getRotationAxisOf(be));
 
-        int step = be.getCachedState().getOrEmpty(ValveHandleBlock.FACING).orElse(Direction.SOUTH).getDirection().offset();
+        int step = be.getBlockState().getOptionalValue(ValveHandleBlock.FACING).orElse(Direction.SOUTH).getAxisDirection().getStep();
 
-        return (be.inUse > 0 && be.totalUseTicks > 0 ? MathHelper.lerp(
+        return (be.inUse > 0 && be.totalUseTicks > 0 ? Mth.lerpInt(
             Math.min(
                 be.totalUseTicks,
                 be.totalUseTicks - be.inUse + partialTicks
             ) / (float) be.totalUseTicks,
             be.startAngle,
             be.targetAngle
-        ) : be.targetAngle) * MathHelper.RADIANS_PER_DEGREE * (be.backwards ? -1 : 1) * step;
+        ) : be.targetAngle) * Mth.DEG_TO_RAD * (be.backwards ? -1 : 1) * step;
     }
 
     @Override

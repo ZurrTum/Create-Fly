@@ -1,18 +1,18 @@
 package com.zurrtum.create;
 
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.registry.Registries;
-import net.minecraft.registry.Registry;
-import net.minecraft.sound.SoundCategory;
-import net.minecraft.sound.SoundEvent;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.math.Vec3i;
-import net.minecraft.world.World;
-
 import static com.zurrtum.create.Create.MOD_ID;
-import static net.minecraft.sound.SoundCategory.*;
+import static net.minecraft.sounds.SoundSource.*;
+
+import net.minecraft.core.Registry;
+import net.minecraft.core.Vec3i;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.Vec3;
 
 public class AllSoundEvents {
     public static final SoundEntry SCHEMATICANNON_LAUNCH_BLOCK = register("schematicannon_launch_block", BLOCKS, .1f, 1.1f);
@@ -83,48 +83,48 @@ public class AllSoundEvents {
     public static final SoundEntry CLIPBOARD_CHECKMARK = register("clipboard_check", BLOCKS);
     public static final SoundEntry CLIPBOARD_ERASE = register("clipboard_erase", BLOCKS);
 
-    private static SoundEntry register(String name, SoundCategory category, float... data) {
+    private static SoundEntry register(String name, SoundSource category, float... data) {
         if (data.length == 0) {
             data = new float[]{1f, 1f};
         }
-        Identifier id = Identifier.of(MOD_ID, name);
+        ResourceLocation id = ResourceLocation.fromNamespaceAndPath(MOD_ID, name);
         int count = data.length / 2;
         CompiledSoundEvent[] compiledEvents = new CompiledSoundEvent[count];
-        SoundEvent event = Registry.register(Registries.SOUND_EVENT, id, SoundEvent.of(id));
+        SoundEvent event = Registry.register(BuiltInRegistries.SOUND_EVENT, id, SoundEvent.createVariableRangeEvent(id));
         compiledEvents[0] = new CompiledSoundEvent(event, data[0], data[1]);
         for (int i = 2, j = 1; j < count; i += 2, j++) {
-            event = Registry.register(Registries.SOUND_EVENT, id.withSuffixedPath("_compounded_" + j), SoundEvent.of(id));
+            event = Registry.register(BuiltInRegistries.SOUND_EVENT, id.withSuffix("_compounded_" + j), SoundEvent.createVariableRangeEvent(id));
             compiledEvents[j] = new CompiledSoundEvent(event, data[i], data[i + 1]);
         }
         return new SoundEntry(category, compiledEvents);
     }
 
-    public record SoundEntry(SoundCategory category, CompiledSoundEvent[] sounds) {
+    public record SoundEntry(SoundSource category, CompiledSoundEvent[] sounds) {
         public SoundEvent getMainEvent() {
             return sounds[0].event();
         }
 
-        public void play(World world, PlayerEntity entity, double x, double y, double z, float volume, float pitch) {
+        public void play(Level world, Player entity, double x, double y, double z, float volume, float pitch) {
             for (CompiledSoundEvent sound : sounds) {
                 sound.play(world, entity, x, y, z, category, volume, pitch);
             }
         }
 
-        public void playAt(World world, double x, double y, double z, float volume, float pitch, boolean fade) {
+        public void playAt(Level world, double x, double y, double z, float volume, float pitch, boolean fade) {
             for (CompiledSoundEvent sound : sounds) {
                 sound.playAt(world, x, y, z, category, volume, pitch, fade);
             }
         }
 
-        public void playOnServer(World world, Vec3i pos) {
+        public void playOnServer(Level world, Vec3i pos) {
             playOnServer(world, pos, 1, 1);
         }
 
-        public void playOnServer(World world, Vec3i pos, float volume, float pitch) {
+        public void playOnServer(Level world, Vec3i pos, float volume, float pitch) {
             play(world, null, pos, volume, pitch);
         }
 
-        public void play(World world, PlayerEntity entity, Vec3i pos) {
+        public void play(Level world, Player entity, Vec3i pos) {
             play(world, entity, pos, 1, 1);
         }
 
@@ -134,33 +134,33 @@ public class AllSoundEvents {
 
         public void playFrom(Entity entity, float volume, float pitch) {
             if (!entity.isSilent())
-                play(entity.getEntityWorld(), null, entity.getBlockPos(), volume, pitch);
+                play(entity.level(), null, entity.blockPosition(), volume, pitch);
         }
 
-        public void play(World world, PlayerEntity entity, Vec3i pos, float volume, float pitch) {
+        public void play(Level world, Player entity, Vec3i pos, float volume, float pitch) {
             play(world, entity, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, volume, pitch);
         }
 
-        public void play(World world, PlayerEntity entity, Vec3d pos, float volume, float pitch) {
-            play(world, entity, pos.getX(), pos.getY(), pos.getZ(), volume, pitch);
+        public void play(Level world, Player entity, Vec3 pos, float volume, float pitch) {
+            play(world, entity, pos.x(), pos.y(), pos.z(), volume, pitch);
         }
 
-        public void playAt(World world, Vec3i pos, float volume, float pitch, boolean fade) {
+        public void playAt(Level world, Vec3i pos, float volume, float pitch, boolean fade) {
             playAt(world, pos.getX() + .5, pos.getY() + .5, pos.getZ() + .5, volume, pitch, fade);
         }
 
-        public void playAt(World world, Vec3d pos, float volume, float pitch, boolean fade) {
-            playAt(world, pos.getX(), pos.getY(), pos.getZ(), volume, pitch, fade);
+        public void playAt(Level world, Vec3 pos, float volume, float pitch, boolean fade) {
+            playAt(world, pos.x(), pos.y(), pos.z(), volume, pitch, fade);
         }
     }
 
     private record CompiledSoundEvent(SoundEvent event, float volume, float pitch) {
-        public void play(World world, PlayerEntity entity, double x, double y, double z, SoundCategory category, float volume, float pitch) {
+        public void play(Level world, Player entity, double x, double y, double z, SoundSource category, float volume, float pitch) {
             world.playSound(entity, x, y, z, event(), category, volume() * volume, pitch() * pitch);
         }
 
-        public void playAt(World world, double x, double y, double z, SoundCategory category, float volume, float pitch, boolean fade) {
-            world.playSoundClient(x, y, z, event(), category, volume() * volume, pitch() * pitch, fade);
+        public void playAt(Level world, double x, double y, double z, SoundSource category, float volume, float pitch, boolean fade) {
+            world.playLocalSound(x, y, z, event(), category, volume() * volume, pitch() * pitch, fade);
         }
     }
 

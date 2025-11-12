@@ -14,17 +14,21 @@ import com.zurrtum.create.content.redstone.thresholdSwitch.ThresholdSwitchObserv
 import com.zurrtum.create.foundation.advancement.CreateTrigger;
 import com.zurrtum.create.foundation.codec.CreateCodecs;
 import com.zurrtum.create.infrastructure.config.AllConfigs;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.fluid.FluidState;
-import net.minecraft.fluid.Fluids;
-import net.minecraft.state.property.Properties;
-import net.minecraft.storage.ReadView;
-import net.minecraft.storage.WriteView;
-import net.minecraft.text.MutableText;
-import net.minecraft.text.Text;
-import net.minecraft.util.math.*;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.util.Mth;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.material.FluidState;
+import net.minecraft.world.level.material.Fluids;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 
 import java.lang.ref.WeakReference;
@@ -49,14 +53,14 @@ public class PulleyBlockEntity extends LinearActuatorBlockEntity implements Thre
     }
 
     @Override
-    protected Box createRenderBoundingBox() {
+    protected AABB createRenderBoundingBox() {
         double expandY = -offset;
         if (sharedMirrorContraption != null) {
             AbstractContraptionEntity ace = sharedMirrorContraption.get();
             if (ace != null)
-                expandY = ace.getY() - pos.getY();
+                expandY = ace.getY() - worldPosition.getY();
         }
-        return super.createRenderBoundingBox().expand(0, expandY, 0);
+        return super.createRenderBoundingBox().inflate(0, expandY, 0);
     }
 
     @Override
@@ -69,10 +73,10 @@ public class PulleyBlockEntity extends LinearActuatorBlockEntity implements Thre
         float prevOffset = offset;
         super.tick();
 
-        if (world.isClient() && mirrorParent != null)
+        if (level.isClientSide() && mirrorParent != null)
             if (sharedMirrorContraption == null || sharedMirrorContraption.get() == null || !sharedMirrorContraption.get().isAlive()) {
                 sharedMirrorContraption = null;
-                if (world.getBlockEntity(mirrorParent) instanceof PulleyBlockEntity pte && pte.movedContraption != null)
+                if (level.getBlockEntity(mirrorParent) instanceof PulleyBlockEntity pte && pte.movedContraption != null)
                     sharedMirrorContraption = new WeakReference<>(pte.movedContraption);
             }
 
@@ -96,16 +100,16 @@ public class PulleyBlockEntity extends LinearActuatorBlockEntity implements Thre
 
     @Override
     protected void assemble() throws AssemblyException {
-        if (!(world.getBlockState(pos).getBlock() instanceof PulleyBlock))
+        if (!(level.getBlockState(worldPosition).getBlock() instanceof PulleyBlock))
             return;
         if (speed == 0 && mirrorParent == null)
             return;
         int maxLength = AllConfigs.server().kinetics.maxRopeLength.get();
         int i = 1;
         while (i <= maxLength) {
-            BlockPos ropePos = pos.down(i);
-            BlockState ropeState = world.getBlockState(ropePos);
-            if (!ropeState.isOf(AllBlocks.ROPE) && !ropeState.isOf(AllBlocks.PULLEY_MAGNET)) {
+            BlockPos ropePos = worldPosition.below(i);
+            BlockState ropeState = level.getBlockState(ropePos);
+            if (!ropeState.is(AllBlocks.ROPE) && !ropeState.is(AllBlocks.PULLEY_MAGNET)) {
                 break;
             }
             ++i;
@@ -117,16 +121,16 @@ public class PulleyBlockEntity extends LinearActuatorBlockEntity implements Thre
             return;
 
         // Collect Construct
-        if (!world.isClient() && mirrorParent == null) {
+        if (!level.isClientSide() && mirrorParent == null) {
             needsContraption = false;
-            BlockPos anchor = pos.down(MathHelper.floor(offset + 1));
-            initialOffset = MathHelper.floor(offset);
+            BlockPos anchor = worldPosition.below(Mth.floor(offset + 1));
+            initialOffset = Mth.floor(offset);
             PulleyContraption contraption = new PulleyContraption(initialOffset);
-            boolean canAssembleStructure = contraption.assemble(world, anchor);
+            boolean canAssembleStructure = contraption.assemble(level, anchor);
 
             if (canAssembleStructure) {
                 Direction movementDirection = getSpeed() > 0 ? Direction.DOWN : Direction.UP;
-                if (ContraptionCollider.isCollidingWithWorld(world, contraption, anchor.offset(movementDirection), movementDirection))
+                if (ContraptionCollider.isCollidingWithWorld(level, contraption, anchor.relative(movementDirection), movementDirection))
                     canAssembleStructure = false;
             }
 
@@ -136,22 +140,22 @@ public class PulleyBlockEntity extends LinearActuatorBlockEntity implements Thre
             removeRopes();
 
             if (!contraption.getBlocks().isEmpty()) {
-                contraption.removeBlocksFromWorld(world, BlockPos.ORIGIN);
-                movedContraption = ControlledContraptionEntity.create(world, this, contraption);
-                movedContraption.setPosition(anchor.getX(), anchor.getY(), anchor.getZ());
-                world.spawnEntity(movedContraption);
+                contraption.removeBlocksFromWorld(level, BlockPos.ZERO);
+                movedContraption = ControlledContraptionEntity.create(level, this, contraption);
+                movedContraption.setPos(anchor.getX(), anchor.getY(), anchor.getZ());
+                level.addFreshEntity(movedContraption);
                 forceMove = true;
                 needsContraption = true;
 
                 if (contraption.containsBlockBreakers())
                     award(AllAdvancements.CONTRAPTION_ACTORS);
 
-                for (BlockPos pos : contraption.createColliders(world, Direction.UP)) {
+                for (BlockPos pos : contraption.createColliders(level, Direction.UP)) {
                     if (pos.getY() != 0)
                         continue;
-                    pos = pos.add(anchor);
-                    if (world.getBlockEntity(new BlockPos(pos.getX(), this.pos.getY(), pos.getZ())) instanceof PulleyBlockEntity pbe)
-                        pbe.startMirroringOther(this.pos);
+                    pos = pos.offset(anchor);
+                    if (level.getBlockEntity(new BlockPos(pos.getX(), this.worldPosition.getY(), pos.getZ())) instanceof PulleyBlockEntity pbe)
+                        pbe.startMirroringOther(this.worldPosition);
                 }
             }
         }
@@ -166,9 +170,9 @@ public class PulleyBlockEntity extends LinearActuatorBlockEntity implements Thre
 
     private void removeRopes() {
         for (int i = ((int) offset); i > 0; i--) {
-            BlockPos offset = pos.down(i);
-            BlockState oldState = world.getBlockState(offset);
-            world.setBlockState(offset, oldState.getFluidState().getBlockState(), Block.NOTIFY_LISTENERS | Block.MOVED);
+            BlockPos offset = worldPosition.below(i);
+            BlockState oldState = level.getBlockState(offset);
+            level.setBlock(offset, oldState.getFluidState().createLegacyBlock(), Block.UPDATE_CLIENTS | Block.UPDATE_MOVE_BY_PISTON);
         }
     }
 
@@ -180,19 +184,19 @@ public class PulleyBlockEntity extends LinearActuatorBlockEntity implements Thre
         if (movedContraption != null)
             resetContraptionToOffset();
 
-        if (!world.isClient()) {
+        if (!level.isClientSide()) {
             if (shouldCreateRopes()) {
                 if (offset > 0) {
-                    BlockPos magnetPos = pos.down((int) offset);
-                    FluidState ifluidstate = world.getFluidState(magnetPos);
-                    if (world.getBlockState(magnetPos).getHardness(world, magnetPos) != -1) {
+                    BlockPos magnetPos = worldPosition.below((int) offset);
+                    FluidState ifluidstate = level.getFluidState(magnetPos);
+                    if (level.getBlockState(magnetPos).getDestroySpeed(level, magnetPos) != -1) {
 
-                        world.breakBlock(magnetPos, world.getBlockState(magnetPos).getCollisionShape(world, magnetPos).isEmpty());
-                        world.setBlockState(
+                        level.destroyBlock(magnetPos, level.getBlockState(magnetPos).getCollisionShape(level, magnetPos).isEmpty());
+                        level.setBlock(
                             magnetPos,
-                            AllBlocks.PULLEY_MAGNET.getDefaultState()
-                                .with(Properties.WATERLOGGED, Boolean.valueOf(ifluidstate.getFluid() == Fluids.WATER)),
-                            Block.NOTIFY_LISTENERS | Block.MOVED
+                            AllBlocks.PULLEY_MAGNET.defaultBlockState()
+                                .setValue(BlockStateProperties.WATERLOGGED, Boolean.valueOf(ifluidstate.getType() == Fluids.WATER)),
+                            Block.UPDATE_CLIENTS | Block.UPDATE_MOVE_BY_PISTON
                         );
                     }
                 }
@@ -201,21 +205,21 @@ public class PulleyBlockEntity extends LinearActuatorBlockEntity implements Thre
 
                 for (boolean destroyPass : Iterate.trueAndFalse) {
                     for (int i = 1; i <= ((int) offset) - 1; i++) {
-                        BlockPos ropePos = pos.down(i);
-                        if (world.getBlockState(ropePos).getHardness(world, ropePos) == -1)
+                        BlockPos ropePos = worldPosition.below(i);
+                        if (level.getBlockState(ropePos).getDestroySpeed(level, ropePos) == -1)
                             continue;
 
                         if (destroyPass) {
-                            FluidState ifluidstate = world.getFluidState(ropePos);
-                            waterlog[i] = ifluidstate.getFluid() == Fluids.WATER;
-                            world.breakBlock(ropePos, world.getBlockState(ropePos).getCollisionShape(world, ropePos).isEmpty());
+                            FluidState ifluidstate = level.getFluidState(ropePos);
+                            waterlog[i] = ifluidstate.getType() == Fluids.WATER;
+                            level.destroyBlock(ropePos, level.getBlockState(ropePos).getCollisionShape(level, ropePos).isEmpty());
                             continue;
                         }
 
-                        world.setBlockState(
-                            pos.down(i),
-                            AllBlocks.ROPE.getDefaultState().with(Properties.WATERLOGGED, waterlog[i]),
-                            Block.NOTIFY_LISTENERS | Block.MOVED
+                        level.setBlock(
+                            worldPosition.below(i),
+                            AllBlocks.ROPE.defaultBlockState().setValue(BlockStateProperties.WATERLOGGED, waterlog[i]),
+                            Block.UPDATE_CLIENTS | Block.UPDATE_MOVE_BY_PISTON
                         );
                     }
                 }
@@ -237,31 +241,31 @@ public class PulleyBlockEntity extends LinearActuatorBlockEntity implements Thre
     }
 
     protected boolean shouldCreateRopes() {
-        return !removed;
+        return !remove;
     }
 
     @Override
-    protected Vec3d toPosition(float offset) {
+    protected Vec3 toPosition(float offset) {
         if (movedContraption.getContraption() instanceof PulleyContraption contraption) {
-            return Vec3d.of(contraption.anchor).add(0, contraption.getInitialOffset() - offset, 0);
+            return Vec3.atLowerCornerOf(contraption.anchor).add(0, contraption.getInitialOffset() - offset, 0);
 
         }
-        return Vec3d.ZERO;
+        return Vec3.ZERO;
     }
 
     @Override
     protected void visitNewPosition() {
         super.visitNewPosition();
-        if (world.isClient())
+        if (level.isClientSide())
             return;
         if (movedContraption != null)
             return;
         if (getSpeed() <= 0)
             return;
 
-        BlockPos posBelow = pos.down((int) (offset + getMovementSpeed()) + 1);
-        BlockState state = world.getBlockState(posBelow);
-        if (!BlockMovementChecks.isMovementNecessary(state, world, posBelow))
+        BlockPos posBelow = worldPosition.below((int) (offset + getMovementSpeed()) + 1);
+        BlockState state = level.getBlockState(posBelow);
+        if (!BlockMovementChecks.isMovementNecessary(state, level, posBelow))
             return;
         if (BlockMovementChecks.isBrittle(state))
             return;
@@ -271,9 +275,9 @@ public class PulleyBlockEntity extends LinearActuatorBlockEntity implements Thre
     }
 
     @Override
-    protected void read(ReadView view, boolean clientPacket) {
-        initialOffset = view.getInt("InitialOffset", 0);
-        needsContraption = view.getBoolean("NeedsContraption", false);
+    protected void read(ValueInput view, boolean clientPacket) {
+        initialOffset = view.getIntOr("InitialOffset", 0);
+        needsContraption = view.getBooleanOr("NeedsContraption", false);
         super.read(view, clientPacket);
 
         BlockPos prevMirrorParent = mirrorParent;
@@ -291,26 +295,26 @@ public class PulleyBlockEntity extends LinearActuatorBlockEntity implements Thre
     }
 
     @Override
-    public void write(WriteView view, boolean clientPacket) {
+    public void write(ValueOutput view, boolean clientPacket) {
         view.putInt("InitialOffset", initialOffset);
         super.write(view, clientPacket);
 
         if (mirrorParent != null)
-            view.put("MirrorParent", BlockPos.CODEC, mirrorParent);
+            view.store("MirrorParent", BlockPos.CODEC, mirrorParent);
         if (mirrorChildren != null)
-            view.put("MirrorChildren", CreateCodecs.BLOCK_POS_LIST_CODEC, mirrorChildren);
+            view.store("MirrorChildren", CreateCodecs.BLOCK_POS_LIST_CODEC, mirrorChildren);
     }
 
     public void startMirroringOther(BlockPos parent) {
-        if (parent.equals(pos))
+        if (parent.equals(worldPosition))
             return;
-        if (!(world.getBlockEntity(parent) instanceof PulleyBlockEntity pbe))
+        if (!(level.getBlockEntity(parent) instanceof PulleyBlockEntity pbe))
             return;
         if (pbe.getType() != getType())
             return;
         if (pbe.mirrorChildren == null)
             pbe.mirrorChildren = new ArrayList<>();
-        pbe.mirrorChildren.add(pos);
+        pbe.mirrorChildren.add(worldPosition);
         pbe.notifyUpdate();
 
         mirrorParent = parent;
@@ -325,7 +329,7 @@ public class PulleyBlockEntity extends LinearActuatorBlockEntity implements Thre
         if (mirrorChildren == null)
             return;
         for (BlockPos blockPos : mirrorChildren) {
-            if (!(world.getBlockEntity(blockPos) instanceof PulleyBlockEntity pbe))
+            if (!(level.getBlockEntity(blockPos) instanceof PulleyBlockEntity pbe))
                 continue;
             pbe.offset = offset;
             pbe.disassemble();
@@ -338,7 +342,7 @@ public class PulleyBlockEntity extends LinearActuatorBlockEntity implements Thre
 
     @Override
     protected int getExtensionRange() {
-        return Math.max(0, Math.min(AllConfigs.server().kinetics.maxRopeLength.get(), (pos.getY() - 1) - world.getBottomY()));
+        return Math.max(0, Math.min(AllConfigs.server().kinetics.maxRopeLength.get(), (worldPosition.getY() - 1) - level.getMinY()));
     }
 
     @Override
@@ -347,14 +351,14 @@ public class PulleyBlockEntity extends LinearActuatorBlockEntity implements Thre
     }
 
     @Override
-    protected Vec3d toMotionVector(float speed) {
-        return new Vec3d(0, -speed, 0);
+    protected Vec3 toMotionVector(float speed) {
+        return new Vec3(0, -speed, 0);
     }
 
     @Override
     public float getInterpolatedOffset(float partialTicks) {
         if (isVirtual())
-            return MathHelper.lerp(partialTicks, prevAnimatedOffset, offset);
+            return Mth.lerp(partialTicks, prevAnimatedOffset, offset);
         boolean moving = running && (movedContraption == null || !movedContraption.isStalled());
         return super.getInterpolatedOffset(moving ? partialTicks : 0.5f);
     }
@@ -371,22 +375,22 @@ public class PulleyBlockEntity extends LinearActuatorBlockEntity implements Thre
 
     @Override
     public int getCurrentValue() {
-        return pos.getY() - (int) getInterpolatedOffset(.5f);
+        return worldPosition.getY() - (int) getInterpolatedOffset(.5f);
     }
 
     @Override
     public int getMinValue() {
-        return world.getBottomY();
+        return level.getMinY();
     }
 
     @Override
     public int getMaxValue() {
-        return pos.getY();
+        return worldPosition.getY();
     }
 
     @Override
-    public MutableText format(int value) {
-        return Text.translatable("create.gui.threshold_switch.pulley_y_level", value);
+    public MutableComponent format(int value) {
+        return Component.translatable("create.gui.threshold_switch.pulley_y_level", value);
     }
 
 }

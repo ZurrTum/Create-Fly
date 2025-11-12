@@ -3,8 +3,8 @@ package com.zurrtum.create.content.fluids.drain;
 import com.zurrtum.create.content.fluids.transfer.GenericItemEmptying;
 import com.zurrtum.create.content.kinetics.belt.transport.TransportedItemStack;
 import com.zurrtum.create.infrastructure.items.ItemInventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.math.Direction;
+import net.minecraft.core.Direction;
+import net.minecraft.world.item.ItemStack;
 
 public class ItemDrainItemHandler implements ItemInventory {
     private final ItemDrainBlockEntity blockEntity;
@@ -16,26 +16,26 @@ public class ItemDrainItemHandler implements ItemInventory {
     }
 
     @Override
-    public int size() {
+    public int getContainerSize() {
         return 1;
     }
 
     @Override
-    public int getMaxCount(ItemStack stack) {
-        if (GenericItemEmptying.canItemBeEmptied(blockEntity.getWorld(), stack)) {
+    public int getMaxStackSize(ItemStack stack) {
+        if (GenericItemEmptying.canItemBeEmptied(blockEntity.getLevel(), stack)) {
             return 1;
         } else {
-            return stack.getMaxCount();
+            return stack.getMaxStackSize();
         }
     }
 
     @Override
-    public boolean isValid(int slot, ItemStack stack) {
+    public boolean canPlaceItem(int slot, ItemStack stack) {
         return blockEntity.getHeldItemStack().isEmpty();
     }
 
     @Override
-    public ItemStack getStack(int slot) {
+    public ItemStack getItem(int slot) {
         if (slot > 1) {
             return ItemStack.EMPTY;
         }
@@ -43,7 +43,7 @@ public class ItemDrainItemHandler implements ItemInventory {
     }
 
     @Override
-    public void setStack(int slot, ItemStack stack) {
+    public void setItem(int slot, ItemStack stack) {
         if (slot > 1) {
             return;
         }
@@ -57,7 +57,7 @@ public class ItemDrainItemHandler implements ItemInventory {
     }
 
     @Override
-    public void markDirty() {
+    public void setChanged() {
         blockEntity.notifyUpdate();
     }
 }

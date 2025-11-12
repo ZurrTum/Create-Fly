@@ -1,12 +1,12 @@
 package com.zurrtum.create.client.foundation.item;
 
 import com.zurrtum.create.api.registry.SimpleRegistry;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.Item;
-import net.minecraft.text.Text;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
 
 @FunctionalInterface
 public interface TooltipModifier {
@@ -14,7 +14,7 @@ public interface TooltipModifier {
 
     TooltipModifier EMPTY = new TooltipModifier() {
         @Override
-        public void modify(List<Text> tooltip, PlayerEntity player) {
+        public void modify(List<Component> tooltip, Player player) {
         }
 
         @Override
@@ -23,7 +23,7 @@ public interface TooltipModifier {
         }
     };
 
-    void modify(List<Text> tooltip, PlayerEntity player);
+    void modify(List<Component> tooltip, Player player);
 
     default TooltipModifier andThen(TooltipModifier after) {
         if (after == EMPTY) {

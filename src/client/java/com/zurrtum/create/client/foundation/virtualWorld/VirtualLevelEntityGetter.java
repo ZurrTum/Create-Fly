@@ -1,16 +1,15 @@
 package com.zurrtum.create.client.foundation.virtualWorld;
 
-import net.minecraft.util.TypeFilter;
-import net.minecraft.util.function.LazyIterationConsumer;
-import net.minecraft.util.math.Box;
-import net.minecraft.world.entity.EntityLike;
-import net.minecraft.world.entity.EntityLookup;
-
 import java.util.Collections;
 import java.util.UUID;
 import java.util.function.Consumer;
+import net.minecraft.util.AbortableIterationConsumer;
+import net.minecraft.world.level.entity.EntityAccess;
+import net.minecraft.world.level.entity.EntityTypeTest;
+import net.minecraft.world.level.entity.LevelEntityGetter;
+import net.minecraft.world.phys.AABB;
 
-public class VirtualLevelEntityGetter<T extends EntityLike> implements EntityLookup<T> {
+public class VirtualLevelEntityGetter<T extends EntityAccess> implements LevelEntityGetter<T> {
     @Override
     public T get(int id) {
         return null;
@@ -22,19 +21,19 @@ public class VirtualLevelEntityGetter<T extends EntityLike> implements EntityLoo
     }
 
     @Override
-    public Iterable<T> iterate() {
+    public Iterable<T> getAll() {
         return Collections.emptyList();
     }
 
     @Override
-    public <U extends T> void forEach(TypeFilter<T, U> test, LazyIterationConsumer<U> consumer) {
+    public <U extends T> void get(EntityTypeTest<T, U> test, AbortableIterationConsumer<U> consumer) {
     }
 
     @Override
-    public void forEachIntersects(Box boundingBox, Consumer<T> consumer) {
+    public void get(AABB boundingBox, Consumer<T> consumer) {
     }
 
     @Override
-    public <U extends T> void forEachIntersects(TypeFilter<T, U> test, Box bounds, LazyIterationConsumer<U> consumer) {
+    public <U extends T> void get(EntityTypeTest<T, U> test, AABB bounds, AbortableIterationConsumer<U> consumer) {
     }
 }

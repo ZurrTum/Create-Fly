@@ -1,61 +1,61 @@
 package com.zurrtum.create.client.foundation.gui.render;
 
+import com.mojang.blaze3d.platform.Lighting;
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
+import com.mojang.math.Axis;
 import com.zurrtum.create.AllBlocks;
 import com.zurrtum.create.client.AllPartialModels;
 import com.zurrtum.create.client.catnip.animation.AnimationTickHolder;
 import com.zurrtum.create.client.flywheel.lib.model.baked.SinglePosVirtualBlockGetter;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.render.SpecialGuiElementRenderer;
-import net.minecraft.client.render.DiffuseLighting;
-import net.minecraft.client.render.TexturedRenderLayers;
-import net.minecraft.client.render.VertexConsumer;
-import net.minecraft.client.render.VertexConsumerProvider;
-import net.minecraft.client.render.block.BlockRenderManager;
-import net.minecraft.client.render.model.BlockModelPart;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.RotationAxis;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.render.pip.PictureInPictureRenderer;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.Sheets;
+import net.minecraft.client.renderer.block.BlockRenderDispatcher;
+import net.minecraft.client.renderer.block.model.BlockModelPart;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.state.BlockState;
 
 import java.util.List;
 
-public class MillstoneRenderer extends SpecialGuiElementRenderer<MillstoneRenderState> {
-    public MillstoneRenderer(VertexConsumerProvider.Immediate vertexConsumers) {
+public class MillstoneRenderer extends PictureInPictureRenderer<MillstoneRenderState> {
+    public MillstoneRenderer(MultiBufferSource.BufferSource vertexConsumers) {
         super(vertexConsumers);
     }
 
     @Override
-    protected void render(MillstoneRenderState state, MatrixStack matrices) {
-        MinecraftClient mc = MinecraftClient.getInstance();
-        mc.gameRenderer.getDiffuseLighting().setShaderLights(DiffuseLighting.Type.ENTITY_IN_UI);
+    protected void renderToTexture(MillstoneRenderState state, PoseStack matrices) {
+        Minecraft mc = Minecraft.getInstance();
+        mc.gameRenderer.getLighting().setupFor(Lighting.Entry.ENTITY_IN_UI);
         matrices.translate(-0.5f, -0.21f, -0.5f);
         matrices.scale(1, -1, -1);
         BlockState blockState;
         List<BlockModelPart> parts;
-        BlockRenderManager blockRenderManager = mc.getBlockRenderManager();
+        BlockRenderDispatcher blockRenderManager = mc.getBlockRenderer();
         SinglePosVirtualBlockGetter world = SinglePosVirtualBlockGetter.createFullBright();
-        VertexConsumer buffer = vertexConsumers.getBuffer(TexturedRenderLayers.getEntityCutout());
+        VertexConsumer buffer = bufferSource.getBuffer(Sheets.cutoutBlockSheet());
 
-        matrices.push();
-        blockState = Blocks.AIR.getDefaultState();
+        matrices.pushPose();
+        blockState = Blocks.AIR.defaultBlockState();
         world.blockState(blockState);
         parts = List.of(AllPartialModels.MILLSTONE_COG.get());
         matrices.translate(0.5f, 0.5f, 0.5f);
-        matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(22.5f));
-        matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(getCurrentAngle()));
+        matrices.mulPose(Axis.XP.rotationDegrees(22.5f));
+        matrices.mulPose(Axis.YP.rotationDegrees(getCurrentAngle()));
         matrices.translate(-0.5f, -0.5f, -0.5f);
-        blockRenderManager.renderBlock(blockState, BlockPos.ORIGIN, world, matrices, buffer, false, parts);
-        matrices.pop();
+        blockRenderManager.renderBatched(blockState, BlockPos.ZERO, world, matrices, buffer, false, parts);
+        matrices.popPose();
 
-        blockState = AllBlocks.MILLSTONE.getDefaultState();
+        blockState = AllBlocks.MILLSTONE.defaultBlockState();
         world.blockState(blockState);
-        parts = blockRenderManager.getModel(blockState).getParts(mc.world.random);
+        parts = blockRenderManager.getBlockModel(blockState).collectParts(mc.level.random);
         matrices.translate(0.5f, 0.5f, 0.5f);
-        matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(22.5f));
-        matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(22.5f));
+        matrices.mulPose(Axis.XP.rotationDegrees(22.5f));
+        matrices.mulPose(Axis.YP.rotationDegrees(22.5f));
         matrices.translate(-0.5f, -0.5f, -0.5f);
-        blockRenderManager.renderBlock(blockState, BlockPos.ORIGIN, world, matrices, buffer, false, parts);
+        blockRenderManager.renderBatched(blockState, BlockPos.ZERO, world, matrices, buffer, false, parts);
     }
 
     private static float getCurrentAngle() {
@@ -63,12 +63,12 @@ public class MillstoneRenderer extends SpecialGuiElementRenderer<MillstoneRender
     }
 
     @Override
-    protected String getName() {
+    protected String getTextureLabel() {
         return "Millstone";
     }
 
     @Override
-    public Class<MillstoneRenderState> getElementClass() {
+    public Class<MillstoneRenderState> getRenderStateClass() {
         return MillstoneRenderState.class;
     }
 }

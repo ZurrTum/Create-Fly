@@ -1,25 +1,25 @@
 package com.zurrtum.create.content.equipment;
 
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.world.World;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.level.Level;
 
 public class BuildersTeaItem extends Item {
-    public BuildersTeaItem(Settings properties) {
+    public BuildersTeaItem(Properties properties) {
         super(properties);
     }
 
     @Override
-    public ItemStack finishUsing(ItemStack stack, World level, LivingEntity livingEntity) {
-        ItemStack eatResult = super.finishUsing(stack, level, livingEntity);
-        if (livingEntity instanceof PlayerEntity player && !player.getAbilities().creativeMode) {
+    public ItemStack finishUsingItem(ItemStack stack, Level level, LivingEntity livingEntity) {
+        ItemStack eatResult = super.finishUsingItem(stack, level, livingEntity);
+        if (livingEntity instanceof Player player && !player.getAbilities().instabuild) {
             if (eatResult.isEmpty()) {
-                return Items.GLASS_BOTTLE.getDefaultStack();
+                return Items.GLASS_BOTTLE.getDefaultInstance();
             } else {
-                player.getInventory().insertStack(Items.GLASS_BOTTLE.getDefaultStack());
+                player.getInventory().add(Items.GLASS_BOTTLE.getDefaultInstance());
             }
         }
         return eatResult;

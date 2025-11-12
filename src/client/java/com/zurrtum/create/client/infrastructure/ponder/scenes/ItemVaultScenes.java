@@ -10,11 +10,11 @@ import com.zurrtum.create.client.ponder.api.element.WorldSectionElement;
 import com.zurrtum.create.client.ponder.api.scene.SceneBuilder;
 import com.zurrtum.create.client.ponder.api.scene.SceneBuildingUtil;
 import com.zurrtum.create.client.ponder.api.scene.Selection;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.phys.Vec3;
 
 public class ItemVaultScenes {
 
@@ -54,7 +54,7 @@ public class ItemVaultScenes {
         scene.world().hideIndependentSection(chestLink, Direction.DOWN);
         scene.idle(15);
 
-        ItemStack hand = AllItems.BRASS_HAND.getDefaultStack();
+        ItemStack hand = AllItems.BRASS_HAND.getDefaultInstance();
         scene.overlay().showControls(util.vector().blockSurface(frontVault, Direction.NORTH), Pointing.RIGHT, 40).showing(AllIcons.I_MTD_CLOSE)
             .withItem(hand);
         scene.idle(7);
@@ -204,7 +204,7 @@ public class ItemVaultScenes {
         scene.world().showSection(full1, Direction.WEST);
         scene.idle(10);
 
-        Vec3d blockSurface = util.vector().blockSurface(util.grid().at(1, 3, 3), Direction.NORTH);
+        Vec3 blockSurface = util.vector().blockSurface(util.grid().at(1, 3, 3), Direction.NORTH);
         scene.overlay().showText(60).text("...and grow in length up to 3x their diameter").attachKeyFrame().placeNearTarget().pointAt(blockSurface);
         scene.idle(40);
     }

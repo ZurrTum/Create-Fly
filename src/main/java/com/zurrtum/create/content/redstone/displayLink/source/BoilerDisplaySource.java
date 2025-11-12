@@ -9,33 +9,32 @@ import com.zurrtum.create.content.trains.display.FlapDisplayBlockEntity;
 import com.zurrtum.create.content.trains.display.FlapDisplayLayout;
 import com.zurrtum.create.content.trains.display.FlapDisplaySection;
 import joptsimple.internal.Strings;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.block.entity.LecternBlockEntity;
-import net.minecraft.text.MutableText;
-import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
-
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.LecternBlockEntity;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 
 public class BoilerDisplaySource extends DisplaySource {
 
-    public static final List<MutableText> notEnoughSpaceSingle = List.of(Text.translatable("create.display_source.boiler.not_enough_space")
-        .append(Text.translatable("create.display_source.boiler.for_boiler_status")));
+    public static final List<MutableComponent> notEnoughSpaceSingle = List.of(Component.translatable("create.display_source.boiler.not_enough_space")
+        .append(Component.translatable("create.display_source.boiler.for_boiler_status")));
 
-    public static final List<MutableText> notEnoughSpaceDouble = List.of(
-        Text.translatable("create.display_source.boiler.not_enough_space"),
-        Text.translatable("create.display_source.boiler.for_boiler_status")
+    public static final List<MutableComponent> notEnoughSpaceDouble = List.of(
+        Component.translatable("create.display_source.boiler.not_enough_space"),
+        Component.translatable("create.display_source.boiler.for_boiler_status")
     );
 
-    public static final List<List<MutableText>> notEnoughSpaceFlap = List.of(
-        List.of(Text.translatable("create.display_source.boiler.not_enough_space")),
-        List.of(Text.translatable("create.display_source.boiler.for_boiler_status"))
+    public static final List<List<MutableComponent>> notEnoughSpaceFlap = List.of(
+        List.of(Component.translatable("create.display_source.boiler.not_enough_space")),
+        List.of(Component.translatable("create.display_source.boiler.for_boiler_status"))
     );
 
     @Override
-    public List<MutableText> provideText(DisplayLinkContext context, DisplayTargetStats stats) {
+    public List<MutableComponent> provideText(DisplayLinkContext context, DisplayTargetStats stats) {
         if (stats.maxRows() < 2)
             return notEnoughSpaceSingle;
         else if (stats.maxRows() < 4)
@@ -44,30 +43,30 @@ public class BoilerDisplaySource extends DisplaySource {
         boolean isBook = context.getTargetBlockEntity() instanceof LecternBlockEntity;
 
         if (isBook) {
-            Stream<MutableText> componentList = getComponents(context, false).map(components -> {
-                Optional<MutableText> reduce = components.stream().reduce(MutableText::append);
+            Stream<MutableComponent> componentList = getComponents(context, false).map(components -> {
+                Optional<MutableComponent> reduce = components.stream().reduce(MutableComponent::append);
                 return reduce.orElse(EMPTY_LINE);
             });
 
             return List.of(componentList.reduce((comp1, comp2) -> {
-                return comp1.append(Text.literal("\n")).append(comp2);
+                return comp1.append(Component.literal("\n")).append(comp2);
             }).orElse(EMPTY_LINE));
         }
 
         return getComponents(context, false).map(components -> {
-            Optional<MutableText> reduce = components.stream().reduce(MutableText::append);
+            Optional<MutableComponent> reduce = components.stream().reduce(MutableComponent::append);
             return reduce.orElse(EMPTY_LINE);
         }).toList();
     }
 
     @Override
-    public List<List<MutableText>> provideFlapDisplayText(DisplayLinkContext context, DisplayTargetStats stats) {
+    public List<List<MutableComponent>> provideFlapDisplayText(DisplayLinkContext context, DisplayTargetStats stats) {
         if (stats.maxRows() < 4) {
             context.flapDisplayContext = Boolean.FALSE;
             return notEnoughSpaceFlap;
         }
 
-        List<List<MutableText>> components = getComponents(context, true).toList();
+        List<List<MutableComponent>> components = getComponents(context, true).toList();
 
         if (stats.maxColumns() * FlapDisplaySection.MONOSPACE < 6 * FlapDisplaySection.MONOSPACE + components.get(1).get(1).getString()
             .length() * FlapDisplaySection.WIDE_MONOSPACE) {
@@ -100,7 +99,7 @@ public class BoilerDisplaySource extends DisplaySource {
         layout.configure(layoutKey, List.of(label, symbols));
     }
 
-    private Stream<List<MutableText>> getComponents(DisplayLinkContext context, boolean forFlapDisplay) {
+    private Stream<List<MutableComponent>> getComponents(DisplayLinkContext context, boolean forFlapDisplay) {
         BlockEntity sourceBE = context.getSourceBlockEntity();
         if (!(sourceBE instanceof FluidTankBlockEntity tankBlockEntity))
             return Stream.of(EMPTY);
@@ -116,22 +115,22 @@ public class BoilerDisplaySource extends DisplaySource {
         boiler.calcMinMaxForSize(totalTankSize);
 
         String label = forFlapDisplay ? "create.boiler.status" : "create.boiler.status_short";
-        MutableText size = labelOf(forFlapDisplay ? "size" : "");
-        MutableText water = labelOf(forFlapDisplay ? "water" : "");
-        MutableText heat = labelOf(forFlapDisplay ? "heat" : "");
+        MutableComponent size = labelOf(forFlapDisplay ? "size" : "");
+        MutableComponent water = labelOf(forFlapDisplay ? "water" : "");
+        MutableComponent heat = labelOf(forFlapDisplay ? "heat" : "");
 
         int lw = labelWidth();
         if (forFlapDisplay) {
-            size = Text.literal(Strings.repeat(' ', lw - labelWidthOf("size"))).append(size);
-            water = Text.literal(Strings.repeat(' ', lw - labelWidthOf("water"))).append(water);
-            heat = Text.literal(Strings.repeat(' ', lw - labelWidthOf("heat"))).append(heat);
+            size = Component.literal(Strings.repeat(' ', lw - labelWidthOf("size"))).append(size);
+            water = Component.literal(Strings.repeat(' ', lw - labelWidthOf("water"))).append(water);
+            heat = Component.literal(Strings.repeat(' ', lw - labelWidthOf("heat"))).append(heat);
         }
 
         return Stream.of(
-            List.of(Text.translatable(label, boiler.getHeatLevelTextComponent())),
-            List.of(size, boiler.getSizeComponent(!forFlapDisplay, forFlapDisplay, Formatting.RESET)),
-            List.of(water, boiler.getWaterComponent(!forFlapDisplay, forFlapDisplay, Formatting.RESET)),
-            List.of(heat, boiler.getHeatComponent(!forFlapDisplay, forFlapDisplay, Formatting.RESET))
+            List.of(Component.translatable(label, boiler.getHeatLevelTextComponent())),
+            List.of(size, boiler.getSizeComponent(!forFlapDisplay, forFlapDisplay, ChatFormatting.RESET)),
+            List.of(water, boiler.getWaterComponent(!forFlapDisplay, forFlapDisplay, ChatFormatting.RESET)),
+            List.of(heat, boiler.getHeatComponent(!forFlapDisplay, forFlapDisplay, ChatFormatting.RESET))
         );
     }
 
@@ -143,10 +142,10 @@ public class BoilerDisplaySource extends DisplaySource {
         return labelOf(label).getString().length();
     }
 
-    private MutableText labelOf(String label) {
+    private MutableComponent labelOf(String label) {
         if (label.isBlank())
-            return Text.empty();
-        return Text.translatable("create.boiler." + label);
+            return Component.empty();
+        return Component.translatable("create.boiler." + label);
     }
 
     @Override

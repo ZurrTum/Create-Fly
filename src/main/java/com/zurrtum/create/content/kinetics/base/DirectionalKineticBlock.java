@@ -1,37 +1,37 @@
 package com.zurrtum.create.content.kinetics.base;
 
 import com.zurrtum.create.catnip.data.Iterate;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.item.ItemPlacementContext;
-import net.minecraft.state.StateManager.Builder;
-import net.minecraft.state.property.EnumProperty;
-import net.minecraft.state.property.Properties;
-import net.minecraft.util.BlockMirror;
-import net.minecraft.util.BlockRotation;
-import net.minecraft.util.math.Direction;
+import net.minecraft.core.Direction;
+import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Mirror;
+import net.minecraft.world.level.block.Rotation;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition.Builder;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.block.state.properties.EnumProperty;
 
 public abstract class DirectionalKineticBlock extends KineticBlock {
-    public static final EnumProperty<Direction> FACING = Properties.FACING;
+    public static final EnumProperty<Direction> FACING = BlockStateProperties.FACING;
 
-    public DirectionalKineticBlock(Settings settings) {
+    public DirectionalKineticBlock(Properties settings) {
         super(settings);
     }
 
     @Override
-    protected void appendProperties(Builder<Block, BlockState> builder) {
+    protected void createBlockStateDefinition(Builder<Block, BlockState> builder) {
         builder.add(FACING);
-        super.appendProperties(builder);
+        super.createBlockStateDefinition(builder);
     }
 
-    public Direction getPreferredFacing(ItemPlacementContext context) {
+    public Direction getPreferredFacing(BlockPlaceContext context) {
         Direction prefferedSide = null;
         for (Direction side : Iterate.directions) {
-            BlockState blockState = context.getWorld().getBlockState(context.getBlockPos().offset(side));
+            BlockState blockState = context.getLevel().getBlockState(context.getClickedPos().relative(side));
             if (blockState.getBlock() instanceof IRotate) {
                 if (((IRotate) blockState.getBlock()).hasShaftTowards(
-                    context.getWorld(),
-                    context.getBlockPos().offset(side),
+                    context.getLevel(),
+                    context.getClickedPos().relative(side),
                     blockState,
                     side.getOpposite()
                 ))
@@ -47,27 +47,27 @@ public abstract class DirectionalKineticBlock extends KineticBlock {
     }
 
     @Override
-    public BlockState getPlacementState(ItemPlacementContext context) {
+    public BlockState getStateForPlacement(BlockPlaceContext context) {
         Direction preferred = getPreferredFacing(context);
-        if (preferred == null || (context.getPlayer() != null && context.getPlayer().isSneaking())) {
-            Direction nearestLookingDirection = context.getPlayerLookDirection();
-            return getDefaultState().with(
+        if (preferred == null || (context.getPlayer() != null && context.getPlayer().isShiftKeyDown())) {
+            Direction nearestLookingDirection = context.getNearestLookingDirection();
+            return defaultBlockState().setValue(
                 FACING,
-                context.getPlayer() != null && context.getPlayer().isSneaking() ? nearestLookingDirection : nearestLookingDirection.getOpposite()
+                context.getPlayer() != null && context.getPlayer().isShiftKeyDown() ? nearestLookingDirection : nearestLookingDirection.getOpposite()
             );
         }
-        return getDefaultState().with(FACING, preferred.getOpposite());
+        return defaultBlockState().setValue(FACING, preferred.getOpposite());
     }
 
     @Override
-    public BlockState rotate(BlockState state, BlockRotation rot) {
-        return state.with(FACING, rot.rotate(state.get(FACING)));
+    public BlockState rotate(BlockState state, Rotation rot) {
+        return state.setValue(FACING, rot.rotate(state.getValue(FACING)));
     }
 
     @Override
     @SuppressWarnings("deprecation")
-    public BlockState mirror(BlockState state, BlockMirror mirrorIn) {
-        return state.rotate(mirrorIn.getRotation(state.get(FACING)));
+    public BlockState mirror(BlockState state, Mirror mirrorIn) {
+        return state.rotate(mirrorIn.getRotation(state.getValue(FACING)));
     }
 
 }

@@ -4,14 +4,14 @@ import com.zurrtum.create.client.flywheel.api.instance.Instance;
 import com.zurrtum.create.client.flywheel.api.instance.InstanceType;
 import com.zurrtum.create.client.flywheel.backend.gl.shader.GlProgram;
 import com.zurrtum.create.client.flywheel.backend.glsl.SourceComponent;
-import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Objects;
 import java.util.function.Consumer;
+import net.minecraft.resources.ResourceLocation;
 
 public record Pipeline(
-    Identifier vertexMain, Identifier fragmentMain, InstanceAssembler assembler, String compilerMarker, Consumer<GlProgram> onLink
+    ResourceLocation vertexMain, ResourceLocation fragmentMain, InstanceAssembler assembler, String compilerMarker, Consumer<GlProgram> onLink
 ) {
 
     @FunctionalInterface
@@ -30,9 +30,9 @@ public record Pipeline(
 
     public static class Builder {
         @Nullable
-        private Identifier vertexMain;
+        private ResourceLocation vertexMain;
         @Nullable
-        private Identifier fragmentMain;
+        private ResourceLocation fragmentMain;
         @Nullable
         private InstanceAssembler assembler;
         @Nullable
@@ -40,12 +40,12 @@ public record Pipeline(
         @Nullable
         private Consumer<GlProgram> onLink;
 
-        public Builder vertexMain(Identifier shader) {
+        public Builder vertexMain(ResourceLocation shader) {
             this.vertexMain = shader;
             return this;
         }
 
-        public Builder fragmentMain(Identifier shader) {
+        public Builder fragmentMain(ResourceLocation shader) {
             this.fragmentMain = shader;
             return this;
         }

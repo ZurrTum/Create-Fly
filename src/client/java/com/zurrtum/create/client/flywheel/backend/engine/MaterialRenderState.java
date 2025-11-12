@@ -1,22 +1,22 @@
 package com.zurrtum.create.client.flywheel.backend.engine;
 
 import com.mojang.blaze3d.opengl.GlConst;
+import com.mojang.blaze3d.opengl.GlDevice;
 import com.mojang.blaze3d.opengl.GlStateManager;
+import com.mojang.blaze3d.opengl.GlTexture;
+import com.mojang.blaze3d.pipeline.RenderTarget;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.zurrtum.create.client.flywheel.api.material.DepthTest;
 import com.zurrtum.create.client.flywheel.api.material.Material;
 import com.zurrtum.create.client.flywheel.api.material.Transparency;
 import com.zurrtum.create.client.flywheel.api.material.WriteMask;
 import com.zurrtum.create.client.flywheel.backend.Samplers;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gl.Framebuffer;
-import net.minecraft.client.gl.GlBackend;
-import net.minecraft.client.texture.AbstractTexture;
-import net.minecraft.client.texture.GlTexture;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.opengl.GL11;
 
 import java.util.Comparator;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.texture.AbstractTexture;
 
 import static com.mojang.blaze3d.opengl.GlConst.*;
 
@@ -48,13 +48,13 @@ public final class MaterialRenderState {
 
     private static void setupTexture(Material material) {
         Samplers.DIFFUSE.makeActive();
-        AbstractTexture texture = MinecraftClient.getInstance().getTextureManager().getTexture(material.texture());
+        AbstractTexture texture = Minecraft.getInstance().getTextureManager().getTexture(material.texture());
         texture.setFilter(material.blur(), material.mipmap());
-        GlTexture glTexture = (GlTexture) texture.getGlTexture();
-        var textureId = glTexture.getGlId();
-        RenderSystem.setShaderTexture(0, texture.getGlTextureView());
+        GlTexture glTexture = (GlTexture) texture.getTexture();
+        var textureId = glTexture.glId();
+        RenderSystem.setShaderTexture(0, texture.getTextureView());
         GlStateManager._bindTexture(textureId);
-        glTexture.checkDirty(GlConst.GL_TEXTURE_2D);
+        glTexture.flushModeChanges(GlConst.GL_TEXTURE_2D);
     }
 
     private static void setupBackfaceCulling(boolean backfaceCulling) {
@@ -160,10 +160,10 @@ public final class MaterialRenderState {
     }
 
     public static void setupFrameBuffer() {
-        Framebuffer framebuffer = MinecraftClient.getInstance().getFramebuffer();
-        int i = ((GlTexture) framebuffer.getColorAttachment()).getOrCreateFramebuffer(
-            ((GlBackend) RenderSystem.getDevice()).getBufferManager(),
-            framebuffer.useDepthAttachment ? framebuffer.getDepthAttachment() : null
+        RenderTarget framebuffer = Minecraft.getInstance().getMainRenderTarget();
+        int i = ((GlTexture) framebuffer.getColorTexture()).getFbo(
+            ((GlDevice) RenderSystem.getDevice()).directStateAccess(),
+            framebuffer.useDepth ? framebuffer.getDepthTexture() : null
         );
         GlStateManager._glBindFramebuffer(GlConst.GL_FRAMEBUFFER, i);
     }

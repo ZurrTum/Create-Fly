@@ -2,10 +2,10 @@ package com.zurrtum.create.content.kinetics.chainDrive;
 
 import com.zurrtum.create.AllBlockEntityTypes;
 import com.zurrtum.create.content.kinetics.base.KineticBlockEntity;
-import net.minecraft.block.BlockState;
-import net.minecraft.storage.ReadView;
-import net.minecraft.storage.WriteView;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 
 public class ChainGearshiftBlockEntity extends KineticBlockEntity {
 
@@ -19,14 +19,14 @@ public class ChainGearshiftBlockEntity extends KineticBlockEntity {
     }
 
     @Override
-    public void write(WriteView view, boolean clientPacket) {
+    public void write(ValueOutput view, boolean clientPacket) {
         view.putInt("Signal", signal);
         super.write(view, clientPacket);
     }
 
     @Override
-    protected void read(ReadView view, boolean clientPacket) {
-        signal = view.getInt("Signal", 0);
+    protected void read(ValueInput view, boolean clientPacket) {
+        signal = view.getIntOr("Signal", 0);
         super.read(view, clientPacket);
     }
 
@@ -35,9 +35,9 @@ public class ChainGearshiftBlockEntity extends KineticBlockEntity {
     }
 
     public void neighbourChanged() {
-        if (!hasWorld())
+        if (!hasLevel())
             return;
-        int power = world.getReceivedRedstonePower(pos);
+        int power = level.getBestNeighborSignal(worldPosition);
         if (power != signal)
             signalChanged = true;
     }
@@ -51,11 +51,11 @@ public class ChainGearshiftBlockEntity extends KineticBlockEntity {
     @Override
     public void tick() {
         super.tick();
-        if (world.isClient())
+        if (level.isClientSide())
             return;
         if (signalChanged) {
             signalChanged = false;
-            analogSignalChanged(world.getReceivedRedstonePower(pos));
+            analogSignalChanged(level.getBestNeighborSignal(worldPosition));
         }
     }
 

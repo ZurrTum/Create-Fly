@@ -14,17 +14,17 @@ import com.zurrtum.create.content.trains.entity.Train;
 import com.zurrtum.create.infrastructure.config.AllConfigs;
 import com.zurrtum.create.infrastructure.packet.c2s.HonkPacket;
 import com.zurrtum.create.infrastructure.packet.c2s.TrainHUDUpdatePacket;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.font.TextRenderer;
-import net.minecraft.client.gl.RenderPipelines;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.render.RenderTickCounter;
-import net.minecraft.entity.Entity;
-import net.minecraft.structure.StructureTemplate.StructureBlockInfo;
-import net.minecraft.text.Text;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.MathHelper;
+import net.minecraft.client.DeltaTracker;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.renderer.RenderPipelines;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.network.chat.Component;
+import net.minecraft.util.Mth;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate.StructureBlockInfo;
 import org.joml.Matrix3x2fStack;
 
 public class TrainHUD {
@@ -36,19 +36,19 @@ public class TrainHUD {
     static int hudPacketCooldown = 5;
     static int honkPacketCooldown = 5;
 
-    public static Text currentPrompt;
+    public static Component currentPrompt;
     public static boolean currentPromptShadow;
     public static int promptKeepAlive = 0;
 
     static boolean usedToHonk;
 
-    public static void tick(MinecraftClient mc) {
+    public static void tick(Minecraft mc) {
         if (promptKeepAlive > 0)
             promptKeepAlive--;
         else
             currentPrompt = null;
 
-        displayedPromptSize.chase(currentPrompt != null ? mc.textRenderer.getWidth(currentPrompt) + 17 : 0, .5f, Chaser.EXP);
+        displayedPromptSize.chase(currentPrompt != null ? mc.font.width(currentPrompt) + 17 : 0, .5f, Chaser.EXP);
         displayedPromptSize.tickChaser();
 
         Carriage carriage = getCarriage();
@@ -57,40 +57,40 @@ public class TrainHUD {
 
         Train train = carriage.train;
         double value = Math.abs(train.speed) / (train.maxSpeed() * AllConfigs.server().trains.manualTrainSpeedModifier.getF());
-        value = MathHelper.clamp(value + 0.05f, 0, 1);
+        value = Mth.clamp(value + 0.05f, 0, 1);
 
         displayedSpeed.chase((int) (value * 18) / 18f, .5f, Chaser.EXP);
         displayedSpeed.tickChaser();
         displayedThrottle.chase(editedThrottle != null ? editedThrottle : train.throttle, .75f, Chaser.EXP);
         displayedThrottle.tickChaser();
 
-        boolean isSprintKeyPressed = ControlsUtil.isActuallyPressed(mc.options.sprintKey);
+        boolean isSprintKeyPressed = ControlsUtil.isActuallyPressed(mc.options.keySprint);
 
         if (isSprintKeyPressed && honkPacketCooldown-- <= 0) {
-            train.determineHonk(mc.world);
+            train.determineHonk(mc.level);
             if (train.lowHonk != null) {
-                mc.player.networkHandler.sendPacket(new HonkPacket(train, true));
+                mc.player.connection.send(new HonkPacket(train, true));
                 honkPacketCooldown = 5;
                 usedToHonk = true;
             }
         }
 
         if (!isSprintKeyPressed && usedToHonk) {
-            mc.player.networkHandler.sendPacket(new HonkPacket(train, false));
+            mc.player.connection.send(new HonkPacket(train, false));
             honkPacketCooldown = 0;
             usedToHonk = false;
         }
 
         if (editedThrottle == null)
             return;
-        if (MathHelper.approximatelyEquals(editedThrottle, train.throttle)) {
+        if (Mth.equal(editedThrottle, train.throttle)) {
             editedThrottle = null;
             hudPacketCooldown = 5;
             return;
         }
 
         if (hudPacketCooldown-- <= 0) {
-            mc.player.networkHandler.sendPacket(new TrainHUDUpdatePacket(train, editedThrottle));
+            mc.player.connection.send(new TrainHUDUpdatePacket(train, editedThrottle));
             hudPacketCooldown = 5;
         }
     }
@@ -101,8 +101,8 @@ public class TrainHUD {
         return cce.getCarriage();
     }
 
-    public static void renderOverlay(MinecraftClient mc, DrawContext guiGraphics, RenderTickCounter deltaTracker) {
-        float partialTicks = deltaTracker.getTickProgress(false);
+    public static void renderOverlay(Minecraft mc, GuiGraphics guiGraphics, DeltaTracker deltaTracker) {
+        float partialTicks = deltaTracker.getGameTimeDeltaPartialTick(false);
         if (!(ControlsHandler.getContraption() instanceof CarriageContraptionEntity cce))
             return;
         Carriage carriage = cce.getCarriage();
@@ -115,9 +115,9 @@ public class TrainHUD {
         if (localPos == null)
             return;
 
-        Matrix3x2fStack poseStack = guiGraphics.getMatrices();
+        Matrix3x2fStack poseStack = guiGraphics.pose();
         poseStack.pushMatrix();
-        poseStack.translate(guiGraphics.getScaledWindowWidth() / 2 - 91, guiGraphics.getScaledWindowHeight() - 29);
+        poseStack.translate(guiGraphics.guiWidth() / 2 - 91, guiGraphics.guiHeight() - 29);
 
         // Speed, Throttle
 
@@ -127,7 +127,7 @@ public class TrainHUD {
         int w = (int) (AllGuiTextures.TRAIN_HUD_SPEED.getWidth() * displayedSpeed.getValue(partialTicks));
         int h = AllGuiTextures.TRAIN_HUD_SPEED.getHeight();
 
-        guiGraphics.drawTexture(
+        guiGraphics.blit(
             RenderPipelines.GUI_TEXTURED,
             AllGuiTextures.TRAIN_HUD_SPEED.location,
             0,
@@ -148,7 +148,7 @@ public class TrainHUD {
 
             AllGuiTextures.TRAIN_PROMPT_L.render(guiGraphics, -3, 0);
             AllGuiTextures.TRAIN_PROMPT_R.render(guiGraphics, promptSize, 0);
-            guiGraphics.drawTexture(
+            guiGraphics.blit(
                 RenderPipelines.GUI_TEXTURED,
                 AllGuiTextures.TRAIN_PROMPT.location,
                 0,
@@ -163,11 +163,11 @@ public class TrainHUD {
 
             poseStack.popMatrix();
 
-            TextRenderer font = mc.textRenderer;
-            if (currentPrompt != null && font.getWidth(currentPrompt) < promptSize - 10) {
+            Font font = mc.font;
+            if (currentPrompt != null && font.width(currentPrompt) < promptSize - 10) {
                 poseStack.pushMatrix();
-                poseStack.translate(font.getWidth(currentPrompt) / -2f + 82, -27);
-                guiGraphics.drawText(font, currentPrompt, 9, 4, 0xFF544D45, currentPromptShadow);
+                poseStack.translate(font.width(currentPrompt) / -2f + 82, -27);
+                guiGraphics.drawString(font, currentPrompt, 9, 4, 0xFF544D45, currentPromptShadow);
                 poseStack.popMatrix();
             }
         }
@@ -176,7 +176,7 @@ public class TrainHUD {
 
         w = (int) (AllGuiTextures.TRAIN_HUD_THROTTLE.getWidth() * (1 - displayedThrottle.getValue(partialTicks)));
         int invW = AllGuiTextures.TRAIN_HUD_THROTTLE.getWidth() - w;
-        guiGraphics.drawTexture(
+        guiGraphics.blit(
             RenderPipelines.GUI_TEXTURED,
             AllGuiTextures.TRAIN_HUD_THROTTLE.location,
             invW,
@@ -193,10 +193,10 @@ public class TrainHUD {
         // Direction
 
         StructureBlockInfo info = cce.getContraption().getBlocks().get(localPos);
-        Direction initialOrientation = cce.getInitialOrientation().rotateYCounterclockwise();
+        Direction initialOrientation = cce.getInitialOrientation().getCounterClockWise();
         boolean inverted = false;
-        if (info != null && info.state().contains(ControlsBlock.FACING))
-            inverted = !info.state().get(ControlsBlock.FACING).equals(initialOrientation);
+        if (info != null && info.state().hasProperty(ControlsBlock.FACING))
+            inverted = !info.state().getValue(ControlsBlock.FACING).equals(initialOrientation);
 
         boolean reversing = ControlsHandler.currentlyPressed.contains(1);
         inverted ^= reversing;
@@ -205,7 +205,7 @@ public class TrainHUD {
             angleOffset *= -1;
 
         float snapSize = 22.5f;
-        float diff = AngleHelper.getShortestAngleDiff(cameraEntity.getYaw(), cce.yaw) + (inverted ? -90 : 90);
+        float diff = AngleHelper.getShortestAngleDiff(cameraEntity.getYRot(), cce.yaw) + (inverted ? -90 : 90);
         if (Math.abs(diff) < 60)
             diff = 0;
 
@@ -225,7 +225,7 @@ public class TrainHUD {
             return false;
 
         double prevThrottle = editedThrottle == null ? carriage.train.throttle : editedThrottle;
-        editedThrottle = MathHelper.clamp(prevThrottle + (delta > 0 ? 1 : -1) / 18f, 1 / 18f, 1);
+        editedThrottle = Mth.clamp(prevThrottle + (delta > 0 ? 1 : -1) / 18f, 1 / 18f, 1);
         return true;
     }
 

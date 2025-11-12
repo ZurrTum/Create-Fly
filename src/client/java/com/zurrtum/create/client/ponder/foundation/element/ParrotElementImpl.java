@@ -1,39 +1,39 @@
 package com.zurrtum.create.client.ponder.foundation.element;
 
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.math.Axis;
 import com.zurrtum.create.catnip.math.AngleHelper;
 import com.zurrtum.create.client.ponder.api.element.ParrotElement;
 import com.zurrtum.create.client.ponder.api.element.ParrotPose;
 import com.zurrtum.create.client.ponder.api.level.PonderLevel;
 import com.zurrtum.create.client.ponder.foundation.PonderScene;
-import net.minecraft.client.item.ItemModelManager;
-import net.minecraft.client.render.Camera;
-import net.minecraft.client.render.VertexConsumerProvider;
-import net.minecraft.client.render.command.OrderedRenderCommandQueue;
-import net.minecraft.client.render.entity.EntityRenderManager;
-import net.minecraft.client.render.entity.state.EntityRenderState;
-import net.minecraft.client.render.state.CameraRenderState;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.entity.passive.ParrotEntity;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.RotationAxis;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.client.Camera;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.SubmitNodeCollector;
+import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
+import net.minecraft.client.renderer.entity.state.EntityRenderState;
+import net.minecraft.client.renderer.item.ItemModelResolver;
+import net.minecraft.client.renderer.state.CameraRenderState;
+import net.minecraft.util.Mth;
+import net.minecraft.world.entity.animal.Parrot;
+import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Supplier;
 
 public class ParrotElementImpl extends AnimatedSceneElementBase implements ParrotElement {
 
-    protected Vec3d location;
+    protected Vec3 location;
     @Nullable
-    protected ParrotEntity entity;
+    protected Parrot entity;
     protected ParrotPose pose;
     protected Supplier<? extends ParrotPose> initialPose;
 
-    public static ParrotElement create(Vec3d location, Supplier<? extends ParrotPose> pose) {
+    public static ParrotElement create(Vec3 location, Supplier<? extends ParrotPose> pose) {
         return new ParrotElementImpl(location, pose);
     }
 
-    protected ParrotElementImpl(Vec3d location, Supplier<? extends ParrotPose> pose) {
+    protected ParrotElementImpl(Vec3 location, Supplier<? extends ParrotPose> pose) {
         this.location = location;
         initialPose = pose;
         this.pose = initialPose.get();
@@ -43,111 +43,107 @@ public class ParrotElementImpl extends AnimatedSceneElementBase implements Parro
     public void reset(PonderScene scene) {
         super.reset(scene);
         setPose(initialPose.get());
-        entity.setPos(0, 0, 0);
-        entity.lastX = 0;
-        entity.lastY = 0;
-        entity.lastZ = 0;
-        entity.lastRenderX = 0;
-        entity.lastRenderY = 0;
-        entity.lastRenderZ = 0;
-        entity.setPitch(entity.lastPitch = 0);
-        entity.setYaw(entity.lastYaw = 180);
+        entity.setPosRaw(0, 0, 0);
+        entity.xo = 0;
+        entity.yo = 0;
+        entity.zo = 0;
+        entity.xOld = 0;
+        entity.yOld = 0;
+        entity.zOld = 0;
+        entity.setXRot(entity.xRotO = 0);
+        entity.setYRot(entity.yRotO = 180);
     }
 
     @Override
     public void tick(PonderScene scene) {
         super.tick(scene);
         if (entity == null) {
-            entity = pose.create(scene.getWorld());
-            entity.setYaw(entity.lastYaw = 180);
+            entity = pose.create(scene.getLevel());
+            entity.setYRot(entity.yRotO = 180);
         }
 
-        entity.age++;
-        entity.lastHeadYaw = entity.headYaw;
-        entity.lastMaxWingDeviation = entity.maxWingDeviation;
-        entity.lastFlapProgress = entity.flapProgress;
+        entity.tickCount++;
+        entity.yHeadRotO = entity.yHeadRot;
+        entity.oFlapSpeed = entity.flapSpeed;
+        entity.oFlap = entity.flap;
         entity.setOnGround(true);
 
-        entity.lastX = entity.getX();
-        entity.lastY = entity.getY();
-        entity.lastZ = entity.getZ();
-        entity.lastYaw = entity.getYaw();
-        entity.lastPitch = entity.getPitch();
+        entity.xo = entity.getX();
+        entity.yo = entity.getY();
+        entity.zo = entity.getZ();
+        entity.yRotO = entity.getYRot();
+        entity.xRotO = entity.getXRot();
 
         pose.tick(scene, entity, location);
 
-        entity.lastRenderX = entity.getX();
-        entity.lastRenderY = entity.getY();
-        entity.lastRenderZ = entity.getZ();
+        entity.xOld = entity.getX();
+        entity.yOld = entity.getY();
+        entity.zOld = entity.getZ();
     }
 
     @Override
-    public void setPositionOffset(Vec3d position, boolean immediate) {
+    public void setPositionOffset(Vec3 position, boolean immediate) {
         if (entity == null)
             return;
-        entity.setPos(position.x, position.y, position.z);
+        entity.setPosRaw(position.x, position.y, position.z);
         if (!immediate)
             return;
-        entity.lastX = position.x;
-        entity.lastY = position.y;
-        entity.lastZ = position.z;
+        entity.xo = position.x;
+        entity.yo = position.y;
+        entity.zo = position.z;
     }
 
     @Override
-    public void setRotation(Vec3d eulers, boolean immediate) {
+    public void setRotation(Vec3 eulers, boolean immediate) {
         if (entity == null)
             return;
-        entity.setPitch((float) eulers.x);
-        entity.setYaw((float) eulers.y);
+        entity.setXRot((float) eulers.x);
+        entity.setYRot((float) eulers.y);
         if (!immediate)
             return;
-        entity.lastPitch = entity.getPitch();
-        entity.lastY = entity.getYaw();
+        entity.xRotO = entity.getXRot();
+        entity.yo = entity.getYRot();
     }
 
     @Override
-    public Vec3d getPositionOffset() {
-        return entity != null ? entity.getEntityPos() : Vec3d.ZERO;
+    public Vec3 getPositionOffset() {
+        return entity != null ? entity.position() : Vec3.ZERO;
     }
 
     @Override
-    public Vec3d getRotation() {
-        return entity != null ? new Vec3d(entity.getPitch(), entity.getYaw(), 0) : Vec3d.ZERO;
+    public Vec3 getRotation() {
+        return entity != null ? new Vec3(entity.getXRot(), entity.getYRot(), 0) : Vec3.ZERO;
     }
 
     @Override
     protected void renderLast(
-        EntityRenderManager entityRenderManager,
-        ItemModelManager itemModelManager,
+        EntityRenderDispatcher entityRenderManager,
+        ItemModelResolver itemModelManager,
         PonderLevel world,
-        VertexConsumerProvider buffer,
-        OrderedRenderCommandQueue queue,
+        MultiBufferSource buffer,
+        SubmitNodeCollector queue,
         Camera camera,
         CameraRenderState cameraRenderState,
-        MatrixStack poseStack,
+        PoseStack poseStack,
         float fade,
         float pt
     ) {
         if (entity == null) {
             entity = pose.create(world);
-            entity.setYaw(entity.lastYaw = 180);
+            entity.setYRot(entity.yRotO = 180);
         }
 
-        poseStack.push();
+        poseStack.pushPose();
         poseStack.translate(location.x, location.y, location.z);
-        poseStack.translate(
-            MathHelper.lerp(pt, entity.lastX, entity.getX()),
-            MathHelper.lerp(pt, entity.lastY, entity.getY()),
-            MathHelper.lerp(pt, entity.lastZ, entity.getZ())
-        );
+        poseStack.translate(Mth.lerp(pt, entity.xo, entity.getX()), Mth.lerp(pt, entity.yo, entity.getY()), Mth.lerp(pt, entity.zo, entity.getZ()));
 
-        float angle = AngleHelper.angleLerp(pt, entity.lastYaw, entity.getYaw());
-        poseStack.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(angle));
+        float angle = AngleHelper.angleLerp(pt, entity.yRotO, entity.getYRot());
+        poseStack.mulPose(Axis.YP.rotationDegrees(angle));
 
-        EntityRenderState state = entityRenderManager.getAndUpdateRenderState(entity, pt);
+        EntityRenderState state = entityRenderManager.extractEntity(entity, pt);
         state.shadowPieces.clear();
-        entityRenderManager.render(state, cameraRenderState, 0, 0, 0, poseStack, queue);
-        poseStack.pop();
+        entityRenderManager.submit(state, cameraRenderState, 0, 0, 0, poseStack, queue);
+        poseStack.popPose();
     }
 
     @Override

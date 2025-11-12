@@ -1,18 +1,18 @@
 package com.zurrtum.create.client.foundation.utility.worldWrappers;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.fluid.FluidState;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.world.BlockRenderView;
-import net.minecraft.world.biome.ColorResolver;
-import net.minecraft.world.chunk.light.LightingProvider;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.level.BlockAndTintGetter;
+import net.minecraft.world.level.ColorResolver;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.lighting.LevelLightEngine;
+import net.minecraft.world.level.material.FluidState;
 
-public class WrappedBlockAndTintGetter implements BlockRenderView {
-    protected final BlockRenderView wrapped;
+public class WrappedBlockAndTintGetter implements BlockAndTintGetter {
+    protected final BlockAndTintGetter wrapped;
 
-    public WrappedBlockAndTintGetter(BlockRenderView wrapped) {
+    public WrappedBlockAndTintGetter(BlockAndTintGetter wrapped) {
         this.wrapped = wrapped;
     }
 
@@ -37,23 +37,23 @@ public class WrappedBlockAndTintGetter implements BlockRenderView {
     }
 
     @Override
-    public int getBottomY() {
-        return wrapped.getBottomY();
+    public int getMinY() {
+        return wrapped.getMinY();
     }
 
     @Override
-    public float getBrightness(Direction pDirection, boolean pShade) {
-        return wrapped.getBrightness(pDirection, pShade);
+    public float getShade(Direction pDirection, boolean pShade) {
+        return wrapped.getShade(pDirection, pShade);
     }
 
     @Override
-    public LightingProvider getLightingProvider() {
-        return wrapped.getLightingProvider();
+    public LevelLightEngine getLightEngine() {
+        return wrapped.getLightEngine();
     }
 
     @Override
-    public int getColor(BlockPos pBlockPos, ColorResolver pColorResolver) {
-        return wrapped.getColor(pBlockPos, pColorResolver);
+    public int getBlockTint(BlockPos pBlockPos, ColorResolver pColorResolver) {
+        return wrapped.getBlockTint(pBlockPos, pColorResolver);
     }
 
 }

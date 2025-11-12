@@ -7,65 +7,65 @@ import com.zurrtum.create.content.kinetics.base.KineticBlock;
 import com.zurrtum.create.content.kinetics.mechanicalArm.ArmBlockEntity.Phase;
 import com.zurrtum.create.content.kinetics.simpleRelays.ICogWheel;
 import com.zurrtum.create.foundation.block.IBE;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.ShapeContext;
-import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemPlacementContext;
-import net.minecraft.item.ItemStack;
-import net.minecraft.state.StateManager.Builder;
-import net.minecraft.state.property.BooleanProperty;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.Hand;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Direction.Axis;
-import net.minecraft.util.shape.VoxelShape;
-import net.minecraft.world.BlockView;
-import net.minecraft.world.World;
-import net.minecraft.world.block.WireOrientation;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.Direction.Axis;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition.Builder;
+import net.minecraft.world.level.block.state.properties.BooleanProperty;
+import net.minecraft.world.level.redstone.Orientation;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.phys.shapes.VoxelShape;
 import org.apache.commons.lang3.mutable.MutableBoolean;
 import org.jetbrains.annotations.Nullable;
 
 public class ArmBlock extends KineticBlock implements IBE<ArmBlockEntity>, ICogWheel {
 
-    public static final BooleanProperty CEILING = BooleanProperty.of("ceiling");
+    public static final BooleanProperty CEILING = BooleanProperty.create("ceiling");
 
-    public ArmBlock(Settings properties) {
+    public ArmBlock(Properties properties) {
         super(properties);
-        setDefaultState(getDefaultState().with(CEILING, false));
+        registerDefaultState(defaultBlockState().setValue(CEILING, false));
     }
 
     @Override
-    protected void appendProperties(Builder<Block, BlockState> p_206840_1_) {
-        super.appendProperties(p_206840_1_.add(CEILING));
+    protected void createBlockStateDefinition(Builder<Block, BlockState> p_206840_1_) {
+        super.createBlockStateDefinition(p_206840_1_.add(CEILING));
     }
 
     @Override
-    public BlockState getPlacementState(ItemPlacementContext ctx) {
-        return getDefaultState().with(CEILING, ctx.getSide() == Direction.DOWN);
+    public BlockState getStateForPlacement(BlockPlaceContext ctx) {
+        return defaultBlockState().setValue(CEILING, ctx.getClickedFace() == Direction.DOWN);
     }
 
     @Override
-    public VoxelShape getOutlineShape(BlockState state, BlockView p_220053_2_, BlockPos p_220053_3_, ShapeContext p_220053_4_) {
-        return state.get(CEILING) ? AllShapes.MECHANICAL_ARM_CEILING : AllShapes.MECHANICAL_ARM;
+    public VoxelShape getShape(BlockState state, BlockGetter p_220053_2_, BlockPos p_220053_3_, CollisionContext p_220053_4_) {
+        return state.getValue(CEILING) ? AllShapes.MECHANICAL_ARM_CEILING : AllShapes.MECHANICAL_ARM;
     }
 
     @Override
-    public void onBlockAdded(BlockState state, World world, BlockPos pos, BlockState oldState, boolean isMoving) {
-        super.onBlockAdded(state, world, pos, oldState, isMoving);
+    public void onPlace(BlockState state, Level world, BlockPos pos, BlockState oldState, boolean isMoving) {
+        super.onPlace(state, world, pos, oldState, isMoving);
         withBlockEntityDo(world, pos, ArmBlockEntity::redstoneUpdate);
     }
 
     @Override
-    public void neighborUpdate(
+    public void neighborChanged(
         BlockState state,
-        World world,
+        Level world,
         BlockPos pos,
         Block p_220069_4_,
-        @Nullable WireOrientation wireOrientation,
+        @Nullable Orientation wireOrientation,
         boolean p_220069_6_
     ) {
         withBlockEntityDo(world, pos, ArmBlockEntity::redstoneUpdate);
@@ -87,26 +87,26 @@ public class ArmBlock extends KineticBlock implements IBE<ArmBlockEntity>, ICogW
     }
 
     @Override
-    protected ActionResult onUseWithItem(
+    protected InteractionResult useItemOn(
         ItemStack stack,
         BlockState state,
-        World level,
+        Level level,
         BlockPos pos,
-        PlayerEntity player,
-        Hand hand,
+        Player player,
+        InteractionHand hand,
         BlockHitResult hitResult
     ) {
-        if (stack.isOf(AllItems.GOGGLES)) {
-            ActionResult gogglesResult = onBlockEntityUseItemOn(
+        if (stack.is(AllItems.GOGGLES)) {
+            InteractionResult gogglesResult = onBlockEntityUseItemOn(
                 level, pos, ate -> {
                     if (ate.goggles)
-                        return ActionResult.PASS_TO_DEFAULT_BLOCK_ACTION;
+                        return InteractionResult.TRY_WITH_EMPTY_HAND;
                     ate.goggles = true;
                     ate.notifyUpdate();
-                    return ActionResult.SUCCESS;
+                    return InteractionResult.SUCCESS;
                 }
             );
-            if (gogglesResult.isAccepted())
+            if (gogglesResult.consumesAction())
                 return gogglesResult;
         }
 
@@ -116,17 +116,17 @@ public class ArmBlock extends KineticBlock implements IBE<ArmBlockEntity>, ICogW
                 if (be.heldItem.isEmpty())
                     return;
                 success.setTrue();
-                if (level.isClient())
+                if (level.isClientSide())
                     return;
-                player.getInventory().offerOrDrop(be.heldItem);
+                player.getInventory().placeItemBackInInventory(be.heldItem);
                 be.heldItem = ItemStack.EMPTY;
                 be.phase = Phase.SEARCH_INPUTS;
-                be.markDirty();
+                be.setChanged();
                 be.sendData();
             }
         );
 
-        return success.booleanValue() ? ActionResult.SUCCESS : ActionResult.PASS_TO_DEFAULT_BLOCK_ACTION;
+        return success.booleanValue() ? InteractionResult.SUCCESS : InteractionResult.TRY_WITH_EMPTY_HAND;
     }
 
 }

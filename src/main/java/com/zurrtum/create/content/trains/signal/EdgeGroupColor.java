@@ -4,12 +4,11 @@ import com.mojang.serialization.Codec;
 import com.zurrtum.create.catnip.codecs.stream.CatnipStreamCodecBuilders;
 import com.zurrtum.create.catnip.theme.Color;
 import io.netty.buffer.ByteBuf;
-import net.minecraft.network.codec.PacketCodec;
-import net.minecraft.util.StringIdentifiable;
-
 import java.util.Locale;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.util.StringRepresentable;
 
-public enum EdgeGroupColor implements StringIdentifiable {
+public enum EdgeGroupColor implements StringRepresentable {
 
     YELLOW(0xEBC255),
     GREEN(0x51C054),
@@ -22,8 +21,8 @@ public enum EdgeGroupColor implements StringIdentifiable {
 
     WHITE(0xE5E1DC);
 
-    public static final Codec<EdgeGroupColor> CODEC = StringIdentifiable.createCodec(EdgeGroupColor::values);
-    public static final PacketCodec<ByteBuf, EdgeGroupColor> STREAM_CODEC = CatnipStreamCodecBuilders.ofEnum(EdgeGroupColor.class);
+    public static final Codec<EdgeGroupColor> CODEC = StringRepresentable.fromEnum(EdgeGroupColor::values);
+    public static final StreamCodec<ByteBuf, EdgeGroupColor> STREAM_CODEC = CatnipStreamCodecBuilders.ofEnum(EdgeGroupColor.class);
 
     private final Color color;
     private final int mask;
@@ -58,7 +57,7 @@ public enum EdgeGroupColor implements StringIdentifiable {
     }
 
     @Override
-    public String asString() {
+    public String getSerializedName() {
         return name().toLowerCase(Locale.ROOT);
     }
 }

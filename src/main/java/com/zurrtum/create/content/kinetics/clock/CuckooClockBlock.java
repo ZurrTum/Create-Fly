@@ -4,52 +4,52 @@ import com.zurrtum.create.AllBlockEntityTypes;
 import com.zurrtum.create.AllShapes;
 import com.zurrtum.create.content.kinetics.base.HorizontalKineticBlock;
 import com.zurrtum.create.foundation.block.IBE;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.ShapeContext;
-import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.entity.ai.pathing.NavigationType;
-import net.minecraft.item.ItemPlacementContext;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Direction.Axis;
-import net.minecraft.util.shape.VoxelShape;
-import net.minecraft.world.BlockView;
-import net.minecraft.world.WorldView;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.Direction.Axis;
+import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.LevelReader;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.pathfinder.PathComputationType;
+import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.phys.shapes.VoxelShape;
 
 public class CuckooClockBlock extends HorizontalKineticBlock implements IBE<CuckooClockBlockEntity> {
 
     private final boolean mysterious;
 
-    public static CuckooClockBlock regular(Settings properties) {
+    public static CuckooClockBlock regular(Properties properties) {
         return new CuckooClockBlock(false, properties);
     }
 
-    public static CuckooClockBlock mysterious(Settings properties) {
+    public static CuckooClockBlock mysterious(Properties properties) {
         return new CuckooClockBlock(true, properties);
     }
 
-    protected CuckooClockBlock(boolean mysterious, Settings properties) {
+    protected CuckooClockBlock(boolean mysterious, Properties properties) {
         super(properties);
         this.mysterious = mysterious;
     }
 
     @Override
-    public VoxelShape getOutlineShape(BlockState p_220053_1_, BlockView p_220053_2_, BlockPos p_220053_3_, ShapeContext p_220053_4_) {
+    public VoxelShape getShape(BlockState p_220053_1_, BlockGetter p_220053_2_, BlockPos p_220053_3_, CollisionContext p_220053_4_) {
         return AllShapes.CUCKOO_CLOCK;
     }
 
     @Override
-    public BlockState getPlacementState(ItemPlacementContext context) {
+    public BlockState getStateForPlacement(BlockPlaceContext context) {
         Direction preferred = getPreferredHorizontalFacing(context);
         if (preferred != null)
-            return getDefaultState().with(HORIZONTAL_FACING, preferred.getOpposite());
-        return getDefaultState().with(HORIZONTAL_FACING, context.getHorizontalPlayerFacing().getOpposite());
+            return defaultBlockState().setValue(HORIZONTAL_FACING, preferred.getOpposite());
+        return defaultBlockState().setValue(HORIZONTAL_FACING, context.getHorizontalDirection().getOpposite());
     }
 
     @Override
-    public boolean hasShaftTowards(WorldView world, BlockPos pos, BlockState state, Direction face) {
-        return face == state.get(HORIZONTAL_FACING).getOpposite();
+    public boolean hasShaftTowards(LevelReader world, BlockPos pos, BlockState state, Direction face) {
+        return face == state.getValue(HORIZONTAL_FACING).getOpposite();
     }
 
     public static boolean containsSurprise(BlockState state) {
@@ -59,11 +59,11 @@ public class CuckooClockBlock extends HorizontalKineticBlock implements IBE<Cuck
 
     @Override
     public Axis getRotationAxis(BlockState state) {
-        return state.get(HORIZONTAL_FACING).getAxis();
+        return state.getValue(HORIZONTAL_FACING).getAxis();
     }
 
     @Override
-    protected boolean canPathfindThrough(BlockState state, NavigationType pathComputationType) {
+    protected boolean isPathfindable(BlockState state, PathComputationType pathComputationType) {
         return false;
     }
 

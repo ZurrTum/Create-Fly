@@ -2,16 +2,16 @@ package com.zurrtum.create.content.schematics;
 
 import com.zurrtum.create.Create;
 import com.zurrtum.create.foundation.utility.FilesHelper;
-import net.minecraft.block.Blocks;
-import net.minecraft.nbt.NbtCompound;
+import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtIo;
-import net.minecraft.structure.StructureTemplate;
-import net.minecraft.text.Text;
-import net.minecraft.util.math.BlockBox;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.World;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.levelgen.structure.BoundingBox;
+import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
@@ -34,19 +34,19 @@ public class SchematicExport {
      * @return a SchematicExportResult, or null if an error occurred.
      */
     @Nullable
-    public static SchematicExportResult saveSchematic(Path dir, String fileName, boolean overwrite, World level, BlockPos first, BlockPos second) {
-        BlockBox bb = BlockBox.create(first, second);
-        BlockPos origin = new BlockPos(bb.getMinX(), bb.getMinY(), bb.getMinZ());
-        BlockPos bounds = new BlockPos(bb.getBlockCountX(), bb.getBlockCountY(), bb.getBlockCountZ());
+    public static SchematicExportResult saveSchematic(Path dir, String fileName, boolean overwrite, Level level, BlockPos first, BlockPos second) {
+        BoundingBox bb = BoundingBox.fromCorners(first, second);
+        BlockPos origin = new BlockPos(bb.minX(), bb.minY(), bb.minZ());
+        BlockPos bounds = new BlockPos(bb.getXSpan(), bb.getYSpan(), bb.getZSpan());
 
         StructureTemplate structure = new StructureTemplate();
-        structure.saveFromWorld(level, origin, bounds, true, List.of(Blocks.AIR));
-        NbtCompound data = structure.writeNbt(new NbtCompound());
+        structure.fillFromWorld(level, origin, bounds, true, List.of(Blocks.AIR));
+        CompoundTag data = structure.save(new CompoundTag());
         SchematicAndQuillItem.replaceStructureVoidWithAir(data);
-        SchematicAndQuillItem.clampGlueBoxes(level, new Box(Vec3d.of(origin), Vec3d.of(origin.add(bounds))), data);
+        SchematicAndQuillItem.clampGlueBoxes(level, new AABB(Vec3.atLowerCornerOf(origin), Vec3.atLowerCornerOf(origin.offset(bounds))), data);
 
         if (fileName.isEmpty())
-            fileName = Text.translatable("create.schematicAndQuill.fallbackName").getString();
+            fileName = Component.translatable("create.schematicAndQuill.fallbackName").getString();
         if (!overwrite)
             fileName = FilesHelper.findFirstValidFilename(fileName, dir, "nbt");
         if (!fileName.endsWith(".nbt"))

@@ -2,15 +2,15 @@ package com.zurrtum.create.api.boiler;
 
 import com.zurrtum.create.api.registry.SimpleRegistry;
 import com.zurrtum.create.content.fluids.tank.BoilerHeaters;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
 
 /**
  * A BoilerHeater provides heat to boilers.
- * Boilers will query blocks for heaters through the registry, usually with {@link #findHeat(World, BlockPos, BlockState) findHeat}.
- * Heaters can provide a heat level by returning any positive integer from their {@link #getHeat(World, BlockPos, BlockState) getHeat} method.
+ * Boilers will query blocks for heaters through the registry, usually with {@link #findHeat(Level, BlockPos, BlockState) findHeat}.
+ * Heaters can provide a heat level by returning any positive integer from their {@link #getHeat(Level, BlockPos, BlockState) getHeat} method.
  * Returning any negative number counts as no heat - {@link #NO_HEAT} is provided for convenience.
  * <p>
  * Returning {@link #PASSIVE_HEAT} is special - passive heat can be used to provide a small amount of heat, highly limiting
@@ -36,7 +36,7 @@ public interface BoilerHeater {
     /**
      * Gets the heat at the given location. If a heater is present, queries it for heat. If not, returns {@link #NO_HEAT}.
      */
-    static float findHeat(World level, BlockPos pos, BlockState state) {
+    static float findHeat(Level level, BlockPos pos, BlockState state) {
         BoilerHeater heater = REGISTRY.get(state);
         return heater != null ? heater.getHeat(level, pos, state) : NO_HEAT;
     }
@@ -46,5 +46,5 @@ public interface BoilerHeater {
      * @see #NO_HEAT
      * @see #PASSIVE_HEAT
      */
-    float getHeat(World level, BlockPos pos, BlockState state);
+    float getHeat(Level level, BlockPos pos, BlockState state);
 }

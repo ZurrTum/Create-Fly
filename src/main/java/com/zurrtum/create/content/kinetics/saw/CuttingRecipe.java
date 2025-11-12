@@ -6,13 +6,13 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.zurrtum.create.AllRecipeSerializers;
 import com.zurrtum.create.AllRecipeTypes;
 import com.zurrtum.create.foundation.recipe.CreateSingleStackRecipe;
-import net.minecraft.item.ItemStack;
-import net.minecraft.network.RegistryByteBuf;
-import net.minecraft.network.codec.PacketCodec;
-import net.minecraft.network.codec.PacketCodecs;
-import net.minecraft.recipe.Ingredient;
-import net.minecraft.recipe.RecipeSerializer;
-import net.minecraft.recipe.RecipeType;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.item.crafting.RecipeSerializer;
+import net.minecraft.world.item.crafting.RecipeType;
 
 public record CuttingRecipe(int time, ItemStack result, Ingredient ingredient) implements CreateSingleStackRecipe {
     @Override
@@ -32,12 +32,12 @@ public record CuttingRecipe(int time, ItemStack result, Ingredient ingredient) i
             Ingredient.CODEC.fieldOf("ingredient").forGetter(CuttingRecipe::ingredient)
         ).apply(instance, CuttingRecipe::new));
 
-        public static final PacketCodec<RegistryByteBuf, CuttingRecipe> PACKET_CODEC = PacketCodec.tuple(
-            PacketCodecs.INTEGER,
+        public static final StreamCodec<RegistryFriendlyByteBuf, CuttingRecipe> PACKET_CODEC = StreamCodec.composite(
+            ByteBufCodecs.INT,
             CuttingRecipe::time,
-            ItemStack.PACKET_CODEC,
+            ItemStack.STREAM_CODEC,
             CuttingRecipe::result,
-            Ingredient.PACKET_CODEC,
+            Ingredient.CONTENTS_STREAM_CODEC,
             CuttingRecipe::ingredient,
             CuttingRecipe::new
         );
@@ -48,7 +48,7 @@ public record CuttingRecipe(int time, ItemStack result, Ingredient ingredient) i
         }
 
         @Override
-        public PacketCodec<RegistryByteBuf, CuttingRecipe> packetCodec() {
+        public StreamCodec<RegistryFriendlyByteBuf, CuttingRecipe> streamCodec() {
             return PACKET_CODEC;
         }
     }

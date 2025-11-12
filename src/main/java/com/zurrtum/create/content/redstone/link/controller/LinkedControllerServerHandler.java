@@ -8,18 +8,17 @@ import com.zurrtum.create.catnip.data.WorldAttached;
 import com.zurrtum.create.content.redstone.link.IRedstoneLinkable;
 import com.zurrtum.create.content.redstone.link.RedstoneLinkNetworkHandler.Frequency;
 import com.zurrtum.create.content.redstone.link.ServerLinkBehaviour;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.WorldAccess;
-
 import java.util.*;
+import net.minecraft.core.BlockPos;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.level.LevelAccessor;
 
 public class LinkedControllerServerHandler {
 
     public static WorldAttached<Map<UUID, Collection<ManualFrequencyEntry>>> receivedInputs = new WorldAttached<>($ -> new HashMap<>());
     static final int TIMEOUT = 30;
 
-    public static void tick(WorldAccess world) {
+    public static void tick(LevelAccessor world) {
         Map<UUID, Collection<ManualFrequencyEntry>> map = receivedInputs.get(world);
         for (Iterator<Map.Entry<UUID, Collection<ManualFrequencyEntry>>> iterator = map.entrySet().iterator(); iterator.hasNext(); ) {
 
@@ -40,7 +39,7 @@ public class LinkedControllerServerHandler {
         }
     }
 
-    public static void receivePressed(WorldAccess world, BlockPos pos, UUID uniqueID, List<Couple<Frequency>> collect, boolean pressed) {
+    public static void receivePressed(LevelAccessor world, BlockPos pos, UUID uniqueID, List<Couple<Frequency>> collect, boolean pressed) {
         Map<UUID, Collection<ManualFrequencyEntry>> map = receivedInputs.get(world);
         Collection<ManualFrequencyEntry> list = map.computeIfAbsent(uniqueID, $ -> new ArrayList<>());
 
@@ -65,7 +64,7 @@ public class LinkedControllerServerHandler {
 
             for (IRedstoneLinkable linkable : Create.REDSTONE_LINK_NETWORK_HANDLER.getNetworkOf(world, entry))
                 if (linkable instanceof ServerLinkBehaviour lb && lb.isListening()) {
-                    if (world.getPlayerByUuid(uniqueID) instanceof ServerPlayerEntity player) {
+                    if (world.getPlayerByUUID(uniqueID) instanceof ServerPlayer player) {
                         AllAdvancements.LINKED_CONTROLLER.trigger(player);
                     }
                 }

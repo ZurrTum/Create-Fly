@@ -1,7 +1,7 @@
 package com.zurrtum.create.client.catnip.gui;
 
-import net.minecraft.client.gui.Element;
+import net.minecraft.client.gui.components.events.GuiEventListener;
 
-public interface TickableGuiEventListener extends Element {
+public interface TickableGuiEventListener extends GuiEventListener {
     void tick();
 }

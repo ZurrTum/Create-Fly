@@ -5,12 +5,12 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.zurrtum.create.AllRecipeSerializers;
 import com.zurrtum.create.AllRecipeTypes;
 import com.zurrtum.create.foundation.recipe.CreateSingleStackRecipe;
-import net.minecraft.item.ItemStack;
-import net.minecraft.network.RegistryByteBuf;
-import net.minecraft.network.codec.PacketCodec;
-import net.minecraft.recipe.Ingredient;
-import net.minecraft.recipe.RecipeSerializer;
-import net.minecraft.recipe.RecipeType;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.item.crafting.RecipeSerializer;
+import net.minecraft.world.item.crafting.RecipeType;
 
 public record PressingRecipe(ItemStack result, Ingredient ingredient) implements CreateSingleStackRecipe {
     @Override
@@ -30,10 +30,10 @@ public record PressingRecipe(ItemStack result, Ingredient ingredient) implements
             Ingredient.CODEC.fieldOf("ingredient").forGetter(PressingRecipe::ingredient)
         ).apply(instance, PressingRecipe::new));
 
-        public static final PacketCodec<RegistryByteBuf, PressingRecipe> PACKET_CODEC = PacketCodec.tuple(
-            ItemStack.PACKET_CODEC,
+        public static final StreamCodec<RegistryFriendlyByteBuf, PressingRecipe> PACKET_CODEC = StreamCodec.composite(
+            ItemStack.STREAM_CODEC,
             PressingRecipe::result,
-            Ingredient.PACKET_CODEC,
+            Ingredient.CONTENTS_STREAM_CODEC,
             PressingRecipe::ingredient,
             PressingRecipe::new
         );
@@ -44,7 +44,7 @@ public record PressingRecipe(ItemStack result, Ingredient ingredient) implements
         }
 
         @Override
-        public PacketCodec<RegistryByteBuf, PressingRecipe> packetCodec() {
+        public StreamCodec<RegistryFriendlyByteBuf, PressingRecipe> streamCodec() {
             return PACKET_CODEC;
         }
     }

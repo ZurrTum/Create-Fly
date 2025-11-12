@@ -2,13 +2,12 @@ package com.zurrtum.create.catnip.data;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.network.PacketByteBuf;
-import net.minecraft.network.codec.PacketCodec;
-import net.minecraft.network.codec.PacketCodecs;
-
 import java.util.Comparator;
 import java.util.function.Function;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
 
 public class IntAttached<V> extends Pair<Integer, V> {
 
@@ -48,8 +47,8 @@ public class IntAttached<V> extends Pair<Integer, V> {
         return getSecond();
     }
 
-    public NbtCompound serializeNBT(Function<V, NbtCompound> serializer) {
-        NbtCompound nbt = new NbtCompound();
+    public CompoundTag serializeNBT(Function<V, CompoundTag> serializer) {
+        CompoundTag nbt = new CompoundTag();
         nbt.put("Item", serializer.apply(getValue()));
         nbt.putInt("Location", getFirst());
         return nbt;
@@ -59,8 +58,8 @@ public class IntAttached<V> extends Pair<Integer, V> {
         return (i1, i2) -> Integer.compare(i2.getFirst(), i1.getFirst());
     }
 
-    public static <T> IntAttached<T> read(NbtCompound nbt, Function<NbtCompound, T> deserializer) {
-        return IntAttached.with(nbt.getInt("Location", 0), deserializer.apply(nbt.getCompoundOrEmpty("Item")));
+    public static <T> IntAttached<T> read(CompoundTag nbt, Function<CompoundTag, T> deserializer) {
+        return IntAttached.with(nbt.getIntOr("Location", 0), deserializer.apply(nbt.getCompoundOrEmpty("Item")));
     }
 
     public static <T> Codec<IntAttached<T>> codec(Codec<T> codec) {
@@ -70,7 +69,7 @@ public class IntAttached<V> extends Pair<Integer, V> {
         ).apply(instance, IntAttached::new));
     }
 
-    public static <B extends PacketByteBuf, T> PacketCodec<B, IntAttached<T>> streamCodec(PacketCodec<? super B, T> codec) {
-        return PacketCodec.tuple(PacketCodecs.INTEGER, Pair::getFirst, codec, Pair::getSecond, IntAttached::new);
+    public static <B extends FriendlyByteBuf, T> StreamCodec<B, IntAttached<T>> streamCodec(StreamCodec<? super B, T> codec) {
+        return StreamCodec.composite(ByteBufCodecs.INT, Pair::getFirst, codec, Pair::getSecond, IntAttached::new);
     }
 }

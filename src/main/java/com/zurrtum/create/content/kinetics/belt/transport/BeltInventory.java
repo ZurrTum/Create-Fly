@@ -12,15 +12,6 @@ import com.zurrtum.create.content.kinetics.belt.behaviour.TransportedItemStackHa
 import com.zurrtum.create.content.kinetics.belt.behaviour.TransportedItemStackHandlerBehaviour.TransportedResult;
 import com.zurrtum.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.foundation.utility.BlockHelper;
-import net.minecraft.entity.ItemEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.storage.ReadView;
-import net.minecraft.storage.WriteView;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collections;
@@ -28,6 +19,15 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.function.Function;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.util.Mth;
+import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
+import net.minecraft.world.phys.Vec3;
 
 public class BeltInventory {
 
@@ -83,10 +83,10 @@ public class BeltInventory {
         // Useful stuff
         float beltSpeed = belt.getDirectionAwareBeltMovementSpeed();
         Direction movementFacing = belt.getMovementFacing();
-        boolean horizontal = belt.getCachedState().get(BeltBlock.SLOPE) == BeltSlope.HORIZONTAL;
+        boolean horizontal = belt.getBlockState().getValue(BeltBlock.SLOPE) == BeltSlope.HORIZONTAL;
         float spacing = 1;
-        World world = belt.getWorld();
-        boolean onClient = world.isClient() && !belt.isVirtual();
+        Level world = belt.getLevel();
+        boolean onClient = world.isClientSide() && !belt.isVirtual();
 
         // resolve ending only when items will reach it this tick
         Ending ending = Ending.UNRESOLVED;
@@ -109,7 +109,7 @@ public class BeltInventory {
                 movement *= AllClientHandle.INSTANCE.getServerSpeed();
 
             // Don't move if held by processing (client)
-            if (world.isClient() && currentItem.locked)
+            if (world.isClientSide() && currentItem.locked)
                 continue;
 
             // Don't move if held by external components
@@ -164,13 +164,13 @@ public class BeltInventory {
                 continue;
 
             // Horizontal Crushing Wheels
-            if (BeltCrusherInteractionHandler.checkForCrushers(this, world.isClient(), currentItem, nextOffset))
+            if (BeltCrusherInteractionHandler.checkForCrushers(this, world.isClientSide(), currentItem, nextOffset))
                 continue;
 
             // Apply Movement
             currentItem.beltPosition += limitedMovement;
             float diffToMiddle = currentItem.getTargetSideOffset() - currentItem.sideOffset;
-            currentItem.sideOffset += MathHelper.clamp(
+            currentItem.sideOffset += Mth.clamp(
                 diffToMiddle * Math.abs(limitedMovement) * 6f,
                 -Math.abs(diffToMiddle),
                 Math.abs(diffToMiddle)
@@ -196,7 +196,7 @@ public class BeltInventory {
                     continue;
 
                 ItemStack remainder = inputBehaviour.handleInsertion(currentItem, movementFacing, false);
-                if (ItemStack.areEqual(remainder, currentItem.stack))
+                if (ItemStack.matches(remainder, currentItem.stack))
                     continue;
 
                 currentItem.stack = remainder;
@@ -268,7 +268,7 @@ public class BeltInventory {
                     continue;
                 if (stackHandlerBehaviour == null)
                     continue;
-                if (BeltProcessingBehaviour.isBlocked(belt.getWorld(), BeltHelper.getPositionForOffset(belt, segment)))
+                if (BeltProcessingBehaviour.isBlocked(belt.getLevel(), BeltHelper.getPositionForOffset(belt, segment)))
                     continue;
 
                 ProcessingResult result = processingBehaviour.handleReceivedItem(currentItem, stackHandlerBehaviour);
@@ -288,11 +288,11 @@ public class BeltInventory {
     }
 
     protected BeltProcessingBehaviour getBeltProcessingAtSegment(int segment) {
-        return BlockEntityBehaviour.get(belt.getWorld(), BeltHelper.getPositionForOffset(belt, segment).up(2), BeltProcessingBehaviour.TYPE);
+        return BlockEntityBehaviour.get(belt.getLevel(), BeltHelper.getPositionForOffset(belt, segment).above(2), BeltProcessingBehaviour.TYPE);
     }
 
     protected TransportedItemStackHandlerBehaviour getTransportedItemStackHandlerAtSegment(int segment) {
-        return BlockEntityBehaviour.get(belt.getWorld(), BeltHelper.getPositionForOffset(belt, segment), TransportedItemStackHandlerBehaviour.TYPE);
+        return BlockEntityBehaviour.get(belt.getLevel(), BeltHelper.getPositionForOffset(belt, segment), TransportedItemStackHandlerBehaviour.TYPE);
     }
 
     private enum Ending {
@@ -310,7 +310,7 @@ public class BeltInventory {
     }
 
     private Ending resolveEnding() {
-        World world = belt.getWorld();
+        Level world = belt.getLevel();
         BlockPos nextPosition = BeltHelper.getPositionForOffset(belt, beltMovementPositive ? belt.beltLength : -1);
 
         //		if (AllBlocks.BRASS_BELT_FUNNEL.has(world.getBlockState(lastPosition.up())))
@@ -390,33 +390,33 @@ public class BeltInventory {
         return null;
     }
 
-    public void read(ReadView view) {
+    public void read(ValueInput view) {
         items.clear();
-        ReadView.TypedListReadView<TransportedItemStack> list = view.getTypedListView("Items", TransportedItemStack.CODEC);
+        ValueInput.TypedInputList<TransportedItemStack> list = view.listOrEmpty("Items", TransportedItemStack.CODEC);
         list.forEach(items::add);
         lazyClientItem = view.read("LazyItem", TransportedItemStack.CODEC).orElse(null);
-        beltMovementPositive = view.getBoolean("PositiveOrder", false);
+        beltMovementPositive = view.getBooleanOr("PositiveOrder", false);
     }
 
-    public void write(WriteView view) {
-        WriteView.ListAppender<TransportedItemStack> list = view.getListAppender("Items", TransportedItemStack.CODEC);
+    public void write(ValueOutput view) {
+        ValueOutput.TypedOutputList<TransportedItemStack> list = view.list("Items", TransportedItemStack.CODEC);
         items.forEach(list::add);
         if (lazyClientItem != null)
-            view.put("LazyItem", TransportedItemStack.CODEC, lazyClientItem);
+            view.store("LazyItem", TransportedItemStack.CODEC, lazyClientItem);
         view.putBoolean("PositiveOrder", beltMovementPositive);
     }
 
     public void eject(TransportedItemStack stack) {
         ItemStack ejected = stack.stack;
-        Vec3d outPos = BeltHelper.getVectorForOffset(belt, stack.beltPosition);
+        Vec3 outPos = BeltHelper.getVectorForOffset(belt, stack.beltPosition);
         float movementSpeed = Math.max(Math.abs(belt.getBeltMovementSpeed()), 1 / 8f);
-        Vec3d outMotion = Vec3d.of(belt.getBeltChainDirection()).multiply(movementSpeed).add(0, 1 / 8f, 0);
-        outPos = outPos.add(outMotion.normalize().multiply(0.001));
-        ItemEntity entity = new ItemEntity(belt.getWorld(), outPos.x, outPos.y + 6 / 16f, outPos.z, ejected);
-        entity.setVelocity(outMotion);
-        entity.setToDefaultPickupDelay();
-        entity.velocityModified = true;
-        belt.getWorld().spawnEntity(entity);
+        Vec3 outMotion = Vec3.atLowerCornerOf(belt.getBeltChainDirection()).scale(movementSpeed).add(0, 1 / 8f, 0);
+        outPos = outPos.add(outMotion.normalize().scale(0.001));
+        ItemEntity entity = new ItemEntity(belt.getLevel(), outPos.x, outPos.y + 6 / 16f, outPos.z, ejected);
+        entity.setDeltaMovement(outMotion);
+        entity.setDefaultPickUpDelay();
+        entity.hurtMarked = true;
+        belt.getLevel().addFreshEntity(entity);
     }
 
     public void ejectAll() {

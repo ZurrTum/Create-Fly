@@ -1,20 +1,20 @@
 package com.zurrtum.create.content.decoration.encasing;
 
 import com.zurrtum.create.content.equipment.wrench.IWrenchable;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.item.ItemUsageContext;
-import net.minecraft.util.ActionResult;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.item.context.UseOnContext;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
 
 public class CasingBlock extends Block implements IWrenchable {
 
-    public CasingBlock(Settings p_i48440_1_) {
+    public CasingBlock(Properties p_i48440_1_) {
         super(p_i48440_1_);
     }
 
     @Override
-    public ActionResult onWrenched(BlockState state, ItemUsageContext context) {
-        return ActionResult.FAIL;
+    public InteractionResult onWrenched(BlockState state, UseOnContext context) {
+        return InteractionResult.FAIL;
     }
 
 }

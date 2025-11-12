@@ -14,25 +14,24 @@ import com.zurrtum.create.client.flywheel.lib.util.RendererReloadCache;
 import com.zurrtum.create.client.vanillin.Vanillin;
 import it.unimi.dsi.fastutil.Hash;
 import it.unimi.dsi.fastutil.objects.Object2BooleanLinkedOpenCustomHashMap;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.render.item.ItemRenderState;
-import net.minecraft.client.render.item.model.ItemModel;
-import net.minecraft.client.world.ClientWorld;
-import net.minecraft.component.DataComponentTypes;
-import net.minecraft.item.BlockItem;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemDisplayContext;
-import net.minecraft.item.ItemStack;
-import net.minecraft.registry.RegistryKeys;
-import net.minecraft.registry.tag.TagKey;
-import net.minecraft.world.World;
-
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.client.renderer.item.ItemModel;
+import net.minecraft.client.renderer.item.ItemStackRenderState;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.tags.TagKey;
+import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemDisplayContext;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
 
 public class ItemModels {
-    public static final TagKey<Item> NO_INSTANCING = TagKey.of(RegistryKeys.ITEM, Vanillin.rl("no_instancing"));
+    public static final TagKey<Item> NO_INSTANCING = TagKey.create(Registries.ITEM, Vanillin.rl("no_instancing"));
     private static final Model EMPTY_MODEL = new SimpleModel(List.of());
     private static final RendererReloadCache<BakedModelKey, Model> MODEL_CACHE = new RendererReloadCache<>(key -> bakeModel(
         key.world(),
@@ -41,44 +40,44 @@ public class ItemModels {
     ));
     private static final Map<ItemStack, Boolean> SUPPORT_CACHE = new Object2BooleanLinkedOpenCustomHashMap<>(new Hash.Strategy<>() {
         public int hashCode(ItemStack itemStack) {
-            return ItemStack.hashCode(itemStack);
+            return ItemStack.hashItemAndComponents(itemStack);
         }
 
         public boolean equals(ItemStack itemStack, ItemStack itemStack2) {
-            return itemStack == itemStack2 || itemStack != null && itemStack2 != null && ItemStack.areItemsAndComponentsEqual(itemStack, itemStack2);
+            return itemStack == itemStack2 || itemStack != null && itemStack2 != null && ItemStack.isSameItemSameComponents(itemStack, itemStack2);
         }
     });
-    private static final ThreadLocal<ItemRenderState> STATE = ThreadLocal.withInitial(ItemRenderState::new);
+    private static final ThreadLocal<ItemStackRenderState> STATE = ThreadLocal.withInitial(ItemStackRenderState::new);
 
     public static boolean isSupported(ItemStack stack, ItemDisplayContext context) {
-        if (stack.isIn(NO_INSTANCING)) {
+        if (stack.is(NO_INSTANCING)) {
             return false;
         }
         Boolean cache = SUPPORT_CACHE.get(stack);
         if (cache != null) {
             return cache;
         }
-        MinecraftClient mc = MinecraftClient.getInstance();
-        ItemRenderState state = STATE.get();
-        mc.getItemModelManager().clearAndUpdate(state, stack, context, mc.world, null, 0);
+        Minecraft mc = Minecraft.getInstance();
+        ItemStackRenderState state = STATE.get();
+        mc.getItemModelResolver().updateForTopItem(state, stack, context, mc.level, null, 0);
         boolean support = !state.isAnimated();
         SUPPORT_CACHE.put(stack.copy(), support);
         return support;
     }
 
     public static ItemModel getModel(ItemStack stack) {
-        return MinecraftClient.getInstance().getBakedModelManager().getItemModel(stack.get(DataComponentTypes.ITEM_MODEL));
+        return Minecraft.getInstance().getModelManager().getItemModel(stack.get(DataComponents.ITEM_MODEL));
     }
 
-    public static Model get(World world, ItemStack itemStack, ItemDisplayContext displayContext) {
+    public static Model get(Level world, ItemStack itemStack, ItemDisplayContext displayContext) {
         if (itemStack.isEmpty()) {
             return EMPTY_MODEL;
         }
-        ClientWorld clientWorld = world instanceof ClientWorld ? (ClientWorld) world : null;
+        ClientLevel clientWorld = world instanceof ClientLevel ? (ClientLevel) world : null;
         return MODEL_CACHE.get(new BakedModelKey(clientWorld, itemStack, displayContext));
     }
 
-    public static Model bakeModel(ClientWorld world, ItemStack itemStack, ItemDisplayContext displayContext) {
+    public static Model bakeModel(ClientLevel world, ItemStack itemStack, ItemDisplayContext displayContext) {
         var builder = ItemChunkLayerSortedListBuilder.<Model.ConfiguredMesh>getThreadLocal();
         BakedItemModelBufferer.bufferItemStack(
             itemStack, world, displayContext, (renderType, shaded, data) -> {
@@ -101,18 +100,18 @@ public class ItemModels {
         return new SimpleModel(builder.build());
     }
 
-    public record BakedModelKey(ClientWorld world, ItemStack stack, ItemDisplayContext displayContext) {
+    public record BakedModelKey(ClientLevel world, ItemStack stack, ItemDisplayContext displayContext) {
         @Override
         public int hashCode() {
-            return Objects.hash(world, ItemStack.hashCode(stack), displayContext);
+            return Objects.hash(world, ItemStack.hashItemAndComponents(stack), displayContext);
         }
 
         @Override
         public boolean equals(Object obj) {
-            if (!(obj instanceof BakedModelKey(ClientWorld otherWorld, ItemStack otherStack, ItemDisplayContext otherDisplayContext))) {
+            if (!(obj instanceof BakedModelKey(ClientLevel otherWorld, ItemStack otherStack, ItemDisplayContext otherDisplayContext))) {
                 return false;
             }
-            boolean stackEqual = stack == otherStack || ItemStack.areItemsAndComponentsEqual(stack, otherStack);
+            boolean stackEqual = stack == otherStack || ItemStack.isSameItemSameComponents(stack, otherStack);
             return world == otherWorld && stackEqual && displayContext == otherDisplayContext;
         }
     }

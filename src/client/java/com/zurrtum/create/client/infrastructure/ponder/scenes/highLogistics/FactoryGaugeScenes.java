@@ -20,17 +20,17 @@ import com.zurrtum.create.content.processing.basin.BasinBlockEntity;
 import com.zurrtum.create.content.processing.recipe.ProcessingInventory;
 import com.zurrtum.create.content.redstone.link.RedstoneLinkBlock;
 import com.zurrtum.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
-import net.minecraft.block.Blocks;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.nbt.NbtElement;
-import net.minecraft.nbt.NbtList;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.NbtOps;
-import net.minecraft.registry.RegistryOps;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.nbt.Tag;
+import net.minecraft.resources.RegistryOps;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
 
 import java.util.List;
 import java.util.function.Consumer;
@@ -75,25 +75,25 @@ public class FactoryGaugeScenes {
 
         scene.idle(15);
 
-        ItemStack linkItem = AllItems.FACTORY_GAUGE.getDefaultStack();
-        scene.overlay().showControls(util.vector().topOf(link.down(2)), Pointing.DOWN, 50).rightClick().withItem(linkItem);
+        ItemStack linkItem = AllItems.FACTORY_GAUGE.getDefaultInstance();
+        scene.overlay().showControls(util.vector().topOf(link.below(2)), Pointing.DOWN, 50).rightClick().withItem(linkItem);
         scene.idle(5);
 
-        Box bb1 = new Box(link.down(2));
-        scene.overlay().chaseBoundingBoxOutline(PonderPalette.BLUE, link, bb1.contract(0.45), 10);
+        AABB bb1 = new AABB(link.below(2));
+        scene.overlay().chaseBoundingBoxOutline(PonderPalette.BLUE, link, bb1.deflate(0.45), 10);
         scene.idle(1);
-        bb1 = bb1.contract(1 / 16f).shrink(0, 8 / 16f, 0);
+        bb1 = bb1.deflate(1 / 16f).contract(0, 8 / 16f, 0);
         scene.overlay().chaseBoundingBoxOutline(PonderPalette.BLUE, link, bb1, 50);
         scene.idle(26);
 
         scene.overlay().showText(100).text("Right-click a Stock link before placement to connect to its network").attachKeyFrame()
-            .colored(PonderPalette.BLUE).placeNearTarget().pointAt(util.vector().centerOf(link.down(2)));
+            .colored(PonderPalette.BLUE).placeNearTarget().pointAt(util.vector().centerOf(link.below(2)));
 
         scene.idle(60);
         scene.world().showSectionAndMerge(gaugeS, Direction.SOUTH, chestL);
         scene.idle(50);
 
-        Vec3d gaugeMiddle = util.vector().of(1.25, 1.75, 1);
+        Vec3 gaugeMiddle = util.vector().of(1.25, 1.75, 1);
         scene.overlay().showText(100).text("When placed on a packager, factory gauges can monitor items inside the inventory").attachKeyFrame()
             .placeNearTarget().pointAt(gaugeMiddle);
         scene.idle(30);
@@ -139,7 +139,7 @@ public class FactoryGaugeScenes {
 
         scene.overlay().showControls(gaugeMiddle, Pointing.DOWN, 50).rightClick();
         scene.idle(7);
-        Box boundingBox = new Box(gaugeMiddle, gaugeMiddle).expand(0.19, 0.19, 0);
+        AABB boundingBox = new AABB(gaugeMiddle, gaugeMiddle).inflate(0.19, 0.19, 0);
         scene.overlay().chaseBoundingBoxOutline(PonderPalette.BLUE, gauge, boundingBox, 150);
         scene.overlay().showText(70).text("Right-click it again to open its configuration UI").attachKeyFrame().colored(PonderPalette.BLUE)
             .placeNearTarget().pointAt(gaugeMiddle);
@@ -164,7 +164,7 @@ public class FactoryGaugeScenes {
 
         scene.overlay().showControls(gaugeMiddle, Pointing.DOWN, 100).rightClick();
         scene.idle(7);
-        scene.overlay().chaseBoundingBoxOutline(PonderPalette.GREEN, gauge, boundingBox.offset(0, 1, 0), 100);
+        scene.overlay().chaseBoundingBoxOutline(PonderPalette.GREEN, gauge, boundingBox.move(0, 1, 0), 100);
         scene.overlay().showText(100).text("The target amount to maintain can now be set by holding Right-click on the gauge").attachKeyFrame()
             .colored(PonderPalette.GREEN).placeNearTarget().pointAt(gaugeMiddle);
         scene.idle(40);
@@ -261,7 +261,7 @@ public class FactoryGaugeScenes {
         scene.world().showSection(util.select().position(alloyG), Direction.SOUTH);
         scene.idle(25);
 
-        Vec3d panelM = util.vector().of(3.75, 3.25, 4);
+        Vec3 panelM = util.vector().of(3.75, 3.25, 4);
         scene.overlay().showText(60).text("Whenever gauges are not placed on a packager...").attachKeyFrame().placeNearTarget().pointAt(panelM);
         scene.idle(50);
 
@@ -274,7 +274,7 @@ public class FactoryGaugeScenes {
             .colored(PonderPalette.BLUE).placeNearTarget().pointAt(util.vector().of(4, 3, 7));
         scene.idle(110);
 
-        ItemStack monitorItem = AllItems.ANDESITE_ALLOY.getDefaultStack();
+        ItemStack monitorItem = AllItems.ANDESITE_ALLOY.getDefaultInstance();
         scene.overlay().showControls(panelM, Pointing.DOWN, 50).withItem(monitorItem).rightClick();
         scene.idle(7);
 
@@ -314,7 +314,7 @@ public class FactoryGaugeScenes {
 
         scene.overlay().showControls(panelM, Pointing.DOWN, 40).rightClick();
         scene.idle(7);
-        Box boundingBox = new Box(panelM, panelM).expand(0.19, 0.19, 0);
+        AABB boundingBox = new AABB(panelM, panelM).inflate(0.19, 0.19, 0);
         scene.overlay().chaseBoundingBoxOutline(PonderPalette.BLUE, alloyG, boundingBox, 100);
         scene.overlay().showText(70).text("From the target's UI, new connections can be made").attachKeyFrame().placeNearTarget().pointAt(panelM);
         scene.idle(40);
@@ -323,7 +323,7 @@ public class FactoryGaugeScenes {
 
         scene.overlay().showControls(panelM.add(1, -0.5, 0), Pointing.DOWN, 50).rightClick();
         scene.idle(7);
-        scene.overlay().chaseBoundingBoxOutline(PonderPalette.GREEN, nuggG, boundingBox.offset(1, -.5, 0), 40);
+        scene.overlay().chaseBoundingBoxOutline(PonderPalette.GREEN, nuggG, boundingBox.move(1, -.5, 0), 40);
         scene.overlay().chaseBoundingBoxOutline(PonderPalette.GREEN, alloyG, boundingBox, 40);
         scene.idle(10);
 
@@ -335,7 +335,7 @@ public class FactoryGaugeScenes {
         scene.idle(50);
         scene.overlay().showControls(panelM.add(1, 0, 0), Pointing.DOWN, 50).rightClick();
         scene.idle(7);
-        scene.overlay().chaseBoundingBoxOutline(PonderPalette.GREEN, andeG, boundingBox.offset(1, 0, 0), 40);
+        scene.overlay().chaseBoundingBoxOutline(PonderPalette.GREEN, andeG, boundingBox.move(1, 0, 0), 40);
         scene.overlay().chaseBoundingBoxOutline(PonderPalette.GREEN, alloyG, boundingBox, 40);
         scene.idle(10);
 
@@ -346,7 +346,7 @@ public class FactoryGaugeScenes {
             .attachKeyFrame().placeNearTarget().pointAt(panelM.add(1, -0.5, 0));
         scene.idle(80);
 
-        scene.overlay().showControls(panelM.add(1.125, -0.5, 0), Pointing.RIGHT, 50).rightClick().withItem(AllItems.WRENCH.getDefaultStack());
+        scene.overlay().showControls(panelM.add(1.125, -0.5, 0), Pointing.RIGHT, 50).rightClick().withItem(AllItems.WRENCH.getDefaultInstance());
         scene.idle(7);
         setArrowMode(builder, alloyG, PanelSlot.BOTTOM_LEFT, nuggG, PanelSlot.TOP_LEFT, 2);
         scene.idle(60);
@@ -363,19 +363,19 @@ public class FactoryGaugeScenes {
 
         scene.world().showSection(belt1, Direction.DOWN);
         scene.idle(1);
-        scene.world().setBlocks(util.select().fromTo(1, 6, 7, 1, 6, 2), Blocks.AIR.getDefaultState(), false);
+        scene.world().setBlocks(util.select().fromTo(1, 6, 7, 1, 6, 2), Blocks.AIR.defaultBlockState(), false);
         scene.idle(3);
         scene.world().showSection(belt2, Direction.DOWN);
         scene.idle(1);
-        scene.world().setBlocks(util.select().fromTo(1, 6, 1, 3, 6, 1), Blocks.AIR.getDefaultState(), false);
+        scene.world().setBlocks(util.select().fromTo(1, 6, 1, 3, 6, 1), Blocks.AIR.defaultBlockState(), false);
         scene.idle(3);
         scene.world().showSection(saw, Direction.DOWN);
         scene.idle(1);
-        scene.world().setBlocks(util.select().position(4, 6, 1), Blocks.AIR.getDefaultState(), false);
+        scene.world().setBlocks(util.select().position(4, 6, 1), Blocks.AIR.defaultBlockState(), false);
         scene.idle(3);
         scene.world().showSection(belt3, Direction.DOWN);
         scene.idle(1);
-        scene.world().setBlocks(util.select().fromTo(5, 6, 1, 6, 6, 1), Blocks.AIR.getDefaultState(), false);
+        scene.world().setBlocks(util.select().fromTo(5, 6, 1, 6, 6, 1), Blocks.AIR.defaultBlockState(), false);
         scene.idle(20);
 
         scene.overlay().showControls(panelM, Pointing.DOWN, 100).rightClick();
@@ -424,9 +424,9 @@ public class FactoryGaugeScenes {
         scene.world().modifyBlockEntity(
             sawPos, SawBlockEntity.class, be -> {
                 ProcessingInventory inventory = be.inventory;
-                inventory.setStack(0, ItemStack.EMPTY);
-                inventory.setStack(1, andesiteItem);
-                inventory.setStack(2, nuggetItem);
+                inventory.setItem(0, ItemStack.EMPTY);
+                inventory.setItem(1, andesiteItem);
+                inventory.setItem(2, nuggetItem);
                 inventory.remainingTime = inventory.recipeDuration = 20;
                 inventory.appliedRecipe = true;
             }
@@ -435,8 +435,8 @@ public class FactoryGaugeScenes {
         scene.world().modifyBlockEntity(
             sawPos, SawBlockEntity.class, be -> {
                 ProcessingInventory inventory = be.inventory;
-                inventory.setStack(1, ItemStack.EMPTY);
-                DirectBeltInputBehaviour behaviour = BlockEntityBehaviour.get(be.getWorld(), util.grid().at(5, 0, 1), DirectBeltInputBehaviour.TYPE);
+                inventory.setItem(1, ItemStack.EMPTY);
+                DirectBeltInputBehaviour behaviour = BlockEntityBehaviour.get(be.getLevel(), util.grid().at(5, 0, 1), DirectBeltInputBehaviour.TYPE);
                 behaviour.handleInsertion(andesiteItem, Direction.EAST, false);
             }
         );
@@ -444,8 +444,8 @@ public class FactoryGaugeScenes {
         scene.world().modifyBlockEntity(
             sawPos, SawBlockEntity.class, be -> {
                 ProcessingInventory inventory = be.inventory;
-                inventory.setStack(2, ItemStack.EMPTY);
-                DirectBeltInputBehaviour behaviour = BlockEntityBehaviour.get(be.getWorld(), util.grid().at(5, 0, 1), DirectBeltInputBehaviour.TYPE);
+                inventory.setItem(2, ItemStack.EMPTY);
+                DirectBeltInputBehaviour behaviour = BlockEntityBehaviour.get(be.getLevel(), util.grid().at(5, 0, 1), DirectBeltInputBehaviour.TYPE);
                 behaviour.handleInsertion(nuggetItem, Direction.EAST, false);
             }
         );
@@ -465,15 +465,15 @@ public class FactoryGaugeScenes {
 
         scene.world().showSection(basinOut, Direction.DOWN);
         scene.idle(1);
-        scene.world().setBlocks(util.select().fromTo(7, 6, 2, 7, 6, 3), Blocks.AIR.getDefaultState(), false);
+        scene.world().setBlocks(util.select().fromTo(7, 6, 2, 7, 6, 3), Blocks.AIR.defaultBlockState(), false);
         scene.world().showSection(barrelAndPackager, Direction.DOWN);
 
         scene.idle(20);
         scene.world().modifyBlockEntityNBT(
             basin, BasinBlockEntity.class, nbt -> {
-                RegistryOps<NbtElement> ops = builder.world().getHolderLookupProvider().getOps(NbtOps.INSTANCE);
-                NbtList list = new NbtList();
-                list.add(ItemStack.CODEC.encodeStart(ops, AllItems.ANDESITE_ALLOY.getDefaultStack()).getOrThrow());
+                RegistryOps<Tag> ops = builder.world().getHolderLookupProvider().createSerializationContext(NbtOps.INSTANCE);
+                ListTag list = new ListTag();
+                list.add(ItemStack.CODEC.encodeStart(ops, AllItems.ANDESITE_ALLOY.getDefaultInstance()).getOrThrow());
                 nbt.put("VisualizedItems", list);
             }
         );
@@ -487,7 +487,7 @@ public class FactoryGaugeScenes {
 
         scene.world().showSection(belt4, Direction.DOWN);
         scene.idle(1);
-        scene.world().setBlocks(util.select().fromTo(7, 6, 5, 7, 6, 7), Blocks.AIR.getDefaultState(), false);
+        scene.world().setBlocks(util.select().fromTo(7, 6, 5, 7, 6, 7), Blocks.AIR.defaultBlockState(), false);
         scene.world().showSection(pack2S, Direction.DOWN);
         scene.idle(5);
         scene.world().showSection(funnel3, Direction.DOWN);
@@ -630,7 +630,7 @@ public class FactoryGaugeScenes {
         FactoryPanelPosition diaG = new FactoryPanelPosition(util.grid().at(3, 3, 4), PanelSlot.BOTTOM_RIGHT);
 
         BlockPos funnelToDelete = util.grid().at(1, 2, 1);
-        scene.world().setBlock(funnelToDelete, Blocks.AIR.getDefaultState(), false);
+        scene.world().setBlock(funnelToDelete, Blocks.AIR.defaultBlockState(), false);
 
         Selection belt1 = util.select().fromTo(0, 1, 1, 7, 1, 1);
         Selection belt2 = util.select().fromTo(7, 1, 7, 0, 1, 7);
@@ -676,13 +676,13 @@ public class FactoryGaugeScenes {
         addPanelConnection(builder, pickG.pos(), pickG.slot(), stickG.pos(), stickG.slot());
         scene.idle(5);
 
-        Vec3d midl = util.vector().of(1.75, 3.25, 5);
+        Vec3 midl = util.vector().of(1.75, 3.25, 5);
         scene.overlay().showText(60).text("Connect the required ingredients as before").attachKeyFrame().placeNearTarget().pointAt(midl);
         scene.idle(80);
 
         scene.overlay().showControls(midl, Pointing.DOWN, 120).showing(AllIcons.I_3x3);
         scene.idle(7);
-        Box boundingBox = new Box(midl, midl).expand(0.19, 0.19, 0);
+        AABB boundingBox = new AABB(midl, midl).inflate(0.19, 0.19, 0);
         scene.overlay().chaseBoundingBoxOutline(PonderPalette.BLUE, pickG, boundingBox, 100);
         scene.idle(10);
         scene.overlay().showText(90).text("When a valid recipe is detected, a new button appears in the UI").attachKeyFrame()
@@ -700,7 +700,7 @@ public class FactoryGaugeScenes {
         scene.idle(40);
 
         scene.overlay().showControls(util.vector().blockSurface(util.grid().at(6, 3, 4), Direction.EAST), Pointing.RIGHT, 120).rightClick()
-            .withItem(AllItems.WRENCH.getDefaultStack());
+            .withItem(AllItems.WRENCH.getDefaultInstance());
         scene.idle(7);
 
         scene.world().connectCrafterInvs(util.grid().at(6, 4, 4), util.grid().at(6, 4, 3));
@@ -817,8 +817,8 @@ public class FactoryGaugeScenes {
         scene.world().showSection(gaugeS, Direction.SOUTH);
         scene.idle(20);
 
-        Vec3d midl = util.vector().of(2.75, 3.75, 2);
-        Box boundingBox = new Box(midl, midl).expand(0.19, 0.19, 0);
+        Vec3 midl = util.vector().of(2.75, 3.75, 2);
+        AABB boundingBox = new AABB(midl, midl).inflate(0.19, 0.19, 0);
         scene.overlay().showControls(midl, Pointing.DOWN, 60).showing(AllIcons.I_ADD);
         scene.idle(7);
         scene.overlay().chaseBoundingBoxOutline(PonderPalette.BLUE, gauge, boundingBox, 100);
@@ -835,7 +835,7 @@ public class FactoryGaugeScenes {
         scene.overlay().showControls(util.vector().of(4, 2.5, 2), Pointing.RIGHT, 60).rightClick();
 
         scene.idle(7);
-        scene.overlay().chaseBoundingBoxOutline(PonderPalette.GREEN, link, boundingBox.offset(0.75, -1.25, 0).expand(0.15, 0.25, 0), 40);
+        scene.overlay().chaseBoundingBoxOutline(PonderPalette.GREEN, link, boundingBox.move(0.75, -1.25, 0).inflate(0.15, 0.25, 0), 40);
         scene.overlay().chaseBoundingBoxOutline(PonderPalette.GREEN, gauge, boundingBox, 40);
 
         addPanelConnection(builder, gauge, slot, link, PanelSlot.TOP_RIGHT);
@@ -859,7 +859,7 @@ public class FactoryGaugeScenes {
         setPanelNotSatisfied(builder, gauge, slot);
 
         scene.idle(30);
-        scene.overlay().showControls(util.vector().of(4, 2.5, 2), Pointing.RIGHT, 60).withItem(AllItems.WRENCH.getDefaultStack()).rightClick();
+        scene.overlay().showControls(util.vector().of(4, 2.5, 2), Pointing.RIGHT, 60).withItem(AllItems.WRENCH.getDefaultInstance()).rightClick();
         scene.idle(7);
         scene.world().cycleBlockProperty(util.grid().at(3, 2, 1), RedstoneLinkBlock.RECEIVER);
         scene.idle(30);
@@ -933,7 +933,7 @@ public class FactoryGaugeScenes {
     }
 
     private static void insertItemsIntoCrafter(CreateSceneBuilder scene, BlockPos pos, ItemStack stack) {
-        scene.world().modifyBlockEntity(pos, MechanicalCrafterBlockEntity.class, be -> be.getInventory().setStack(0, stack));
+        scene.world().modifyBlockEntity(pos, MechanicalCrafterBlockEntity.class, be -> be.getInventory().setItem(0, stack));
     }
 
     private static void withGaugeDo(SceneBuilder builder, BlockPos gauge, PanelSlot slot, Consumer<ServerFactoryPanelBehaviour> call) {

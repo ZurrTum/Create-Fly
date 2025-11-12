@@ -5,37 +5,37 @@ import com.zurrtum.create.AllItemAttributeTypes;
 import com.zurrtum.create.content.logistics.item.filter.attribute.ItemAttribute;
 import com.zurrtum.create.content.logistics.item.filter.attribute.ItemAttributeType;
 import io.netty.buffer.ByteBuf;
-import net.minecraft.component.DataComponentTypes;
-import net.minecraft.item.ItemStack;
-import net.minecraft.network.RegistryByteBuf;
-import net.minecraft.network.codec.PacketCodec;
-import net.minecraft.network.codec.PacketCodecs;
-import net.minecraft.util.dynamic.Codecs;
-import net.minecraft.world.World;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.util.ExtraCodecs;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
 
 public record BookCopyAttribute(int generation) implements ItemAttribute {
-    public static final MapCodec<BookCopyAttribute> CODEC = Codecs.NON_NEGATIVE_INT.xmap(BookCopyAttribute::new, BookCopyAttribute::generation)
+    public static final MapCodec<BookCopyAttribute> CODEC = ExtraCodecs.NON_NEGATIVE_INT.xmap(BookCopyAttribute::new, BookCopyAttribute::generation)
         .fieldOf("value");
 
-    public static final PacketCodec<ByteBuf, BookCopyAttribute> PACKET_CODEC = PacketCodecs.INTEGER.xmap(
+    public static final StreamCodec<ByteBuf, BookCopyAttribute> PACKET_CODEC = ByteBufCodecs.INT.map(
         BookCopyAttribute::new,
         BookCopyAttribute::generation
     );
 
     private static int extractGeneration(ItemStack stack) {
-        if (stack.contains(DataComponentTypes.WRITTEN_BOOK_CONTENT)) {
-            return stack.get(DataComponentTypes.WRITTEN_BOOK_CONTENT).generation();
+        if (stack.has(DataComponents.WRITTEN_BOOK_CONTENT)) {
+            return stack.get(DataComponents.WRITTEN_BOOK_CONTENT).generation();
         }
 
         return -1;
     }
 
     @Override
-    public boolean appliesTo(ItemStack itemStack, World level) {
+    public boolean appliesTo(ItemStack itemStack, Level level) {
         return extractGeneration(itemStack) == generation;
     }
 
@@ -61,7 +61,7 @@ public record BookCopyAttribute(int generation) implements ItemAttribute {
         }
 
         @Override
-        public List<ItemAttribute> getAllAttributes(ItemStack stack, World level) {
+        public List<ItemAttribute> getAllAttributes(ItemStack stack, Level level) {
             List<ItemAttribute> list = new ArrayList<>();
 
             int generation = BookCopyAttribute.extractGeneration(stack);
@@ -78,7 +78,7 @@ public record BookCopyAttribute(int generation) implements ItemAttribute {
         }
 
         @Override
-        public PacketCodec<? super RegistryByteBuf, ? extends ItemAttribute> packetCodec() {
+        public StreamCodec<? super RegistryFriendlyByteBuf, ? extends ItemAttribute> packetCodec() {
             return PACKET_CODEC;
         }
     }

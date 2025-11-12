@@ -1,27 +1,27 @@
 package com.zurrtum.create.client.content.trains.bogey;
 
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.math.Axis;
 import com.zurrtum.create.client.AllBogeyStyleRenders;
 import com.zurrtum.create.content.trains.bogey.AbstractBogeyBlock;
 import com.zurrtum.create.content.trains.bogey.AbstractBogeyBlockEntity;
-import net.minecraft.client.render.LightmapTextureManager;
-import net.minecraft.client.render.WorldRenderer;
-import net.minecraft.client.render.block.entity.BlockEntityRenderer;
-import net.minecraft.client.render.block.entity.BlockEntityRendererFactory;
-import net.minecraft.client.render.block.entity.state.BlockEntityRenderState;
-import net.minecraft.client.render.command.ModelCommandRenderer;
-import net.minecraft.client.render.command.OrderedRenderCommandQueue;
-import net.minecraft.client.render.state.CameraRenderState;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.RotationAxis;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.World;
+import net.minecraft.client.renderer.LevelRenderer;
+import net.minecraft.client.renderer.LightTexture;
+import net.minecraft.client.renderer.SubmitNodeCollector;
+import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
+import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
+import net.minecraft.client.renderer.blockentity.state.BlockEntityRenderState;
+import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
+import net.minecraft.client.renderer.state.CameraRenderState;
+import net.minecraft.core.Direction;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.util.Mth;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 
 public class BogeyBlockEntityRenderer<T extends AbstractBogeyBlockEntity> implements BlockEntityRenderer<T, BogeyBlockEntityRenderer.BogeyBlockEntityRenderState> {
-    public BogeyBlockEntityRenderer(BlockEntityRendererFactory.Context context) {
+    public BogeyBlockEntityRenderer(BlockEntityRendererProvider.Context context) {
     }
 
     @Override
@@ -30,36 +30,33 @@ public class BogeyBlockEntityRenderer<T extends AbstractBogeyBlockEntity> implem
     }
 
     @Override
-    public void updateRenderState(
+    public void extractRenderState(
         T be,
         BogeyBlockEntityRenderState state,
         float tickProgress,
-        Vec3d cameraPos,
-        @Nullable ModelCommandRenderer.CrumblingOverlayCommand crumblingOverlay
+        Vec3 cameraPos,
+        @Nullable ModelFeatureRenderer.CrumblingOverlay crumblingOverlay
     ) {
-        state.blockState = be.getCachedState();
+        state.blockState = be.getBlockState();
         if (!(state.blockState.getBlock() instanceof AbstractBogeyBlock<?> bogey)) {
             return;
         }
-        state.pos = be.getPos();
-        state.type = be.getType();
-        World world = be.getWorld();
-        state.lightmapCoordinates = world != null ? WorldRenderer.getLightmapCoordinates(
-            world,
-            state.pos
-        ) : LightmapTextureManager.MAX_LIGHT_COORDINATE;
-        if (state.blockState.get(AbstractBogeyBlock.AXIS) == Direction.Axis.X) {
-            state.yRot = MathHelper.RADIANS_PER_DEGREE * 90;
+        state.blockPos = be.getBlockPos();
+        state.blockEntityType = be.getType();
+        Level world = be.getLevel();
+        state.lightCoords = world != null ? LevelRenderer.getLightColor(world, state.blockPos) : LightTexture.FULL_BRIGHT;
+        if (state.blockState.getValue(AbstractBogeyBlock.AXIS) == Direction.Axis.X) {
+            state.yRot = Mth.DEG_TO_RAD * 90;
         }
         state.bogeyData = be.getBogeyData();
         if (state.bogeyData == null) {
-            state.bogeyData = new NbtCompound();
+            state.bogeyData = new CompoundTag();
         }
         state.data = AllBogeyStyleRenders.getRenderData(
             be.getStyle(),
             bogey.getSize(),
             tickProgress,
-            state.lightmapCoordinates,
+            state.lightCoords,
             be.getVirtualAngle(tickProgress),
             be.getBogeyData(),
             false
@@ -67,26 +64,26 @@ public class BogeyBlockEntityRenderer<T extends AbstractBogeyBlockEntity> implem
     }
 
     @Override
-    public void render(BogeyBlockEntityRenderState state, MatrixStack matrices, OrderedRenderCommandQueue queue, CameraRenderState cameraState) {
+    public void submit(BogeyBlockEntityRenderState state, PoseStack matrices, SubmitNodeCollector queue, CameraRenderState cameraState) {
         if (state.data == null) {
             return;
         }
-        matrices.push();
+        matrices.pushPose();
         matrices.translate(.5f, .5f, .5f);
         if (state.yRot != 0) {
-            matrices.multiply(RotationAxis.POSITIVE_Y.rotation(state.yRot));
+            matrices.mulPose(Axis.YP.rotation(state.yRot));
         }
         state.data.render(matrices, queue);
-        matrices.pop();
+        matrices.popPose();
     }
 
     public static class BogeyBlockEntityRenderState extends BlockEntityRenderState {
         public float yRot;
-        public NbtCompound bogeyData;
+        public CompoundTag bogeyData;
         public BogeyRenderState data;
     }
 
     public interface BogeyRenderState {
-        void render(MatrixStack matrices, OrderedRenderCommandQueue queue);
+        void render(PoseStack matrices, SubmitNodeCollector queue);
     }
 }

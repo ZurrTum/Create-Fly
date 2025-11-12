@@ -1,8 +1,8 @@
 package com.zurrtum.create.client.catnip.render;
 
+import com.mojang.blaze3d.vertex.MeshData;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.ints.IntList;
-import net.minecraft.client.render.BuiltBuffer;
 
 public class SuperByteBufferBuilder {
     protected final MutableTemplateMesh mesh = new MutableTemplateMesh();
@@ -16,7 +16,7 @@ public class SuperByteBufferBuilder {
         currentShade = true;
     }
 
-    public void add(BuiltBuffer data, boolean shaded) {
+    public void add(MeshData data, boolean shaded) {
         if (shaded != currentShade) {
             shadeSwapVertices.add(mesh.vertexCount());
             currentShade = shaded;

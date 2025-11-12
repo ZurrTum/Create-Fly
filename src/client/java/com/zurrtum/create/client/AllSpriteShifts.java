@@ -8,20 +8,19 @@ import com.zurrtum.create.client.foundation.block.connected.AllCTTypes;
 import com.zurrtum.create.client.foundation.block.connected.CTSpriteShiftEntry;
 import com.zurrtum.create.client.foundation.block.connected.CTSpriteShifter;
 import com.zurrtum.create.client.foundation.block.connected.CTType;
-import net.minecraft.block.Oxidizable.OxidationLevel;
-import net.minecraft.block.WoodType;
-import net.minecraft.util.DyeColor;
-
 import java.util.Arrays;
 import java.util.EnumMap;
 import java.util.IdentityHashMap;
 import java.util.Map;
+import net.minecraft.world.item.DyeColor;
+import net.minecraft.world.level.block.WeatheringCopper.WeatherState;
+import net.minecraft.world.level.block.state.properties.WoodType;
 
 public class AllSpriteShifts {
 
     private static final Map<WoodType, CTSpriteShiftEntry> WOODEN_WINDOWS = new IdentityHashMap<>();
-    public static final Map<OxidationLevel, CTSpriteShiftEntry> COPPER_SHINGLES = new EnumMap<>(OxidationLevel.class);
-    public static final Map<OxidationLevel, CTSpriteShiftEntry> COPPER_TILES = new EnumMap<>(OxidationLevel.class);
+    public static final Map<WeatherState, CTSpriteShiftEntry> COPPER_SHINGLES = new EnumMap<>(WeatherState.class);
+    public static final Map<WeatherState, CTSpriteShiftEntry> COPPER_TILES = new EnumMap<>(WeatherState.class);
 
     public static final Map<DyeColor, SpriteShiftEntry> DYED_BELTS = new EnumMap<>(DyeColor.class), DYED_OFFSET_BELTS = new EnumMap<>(DyeColor.class), DYED_DIAGONAL_BELTS = new EnumMap<>(
         DyeColor.class);
@@ -116,14 +115,14 @@ public class AllSpriteShifts {
         Arrays.stream(supportedWoodTypes).forEach(woodType -> WOODEN_WINDOWS.put(woodType, vertical("palettes/" + woodType.name() + "_window")));
 
         for (DyeColor color : DyeColor.values()) {
-            String id = color.asString();
+            String id = color.getSerializedName();
             DYED_BELTS.put(color, get("block/belt", "block/belt/" + id + "_scroll"));
             DYED_OFFSET_BELTS.put(color, get("block/belt_offset", "block/belt/" + id + "_scroll"));
             DYED_DIAGONAL_BELTS.put(color, get("block/belt_diagonal", "block/belt/" + id + "_diagonal_scroll"));
         }
 
-        for (OxidationLevel state : OxidationLevel.values()) {
-            String pref = "copper/" + (state == OxidationLevel.UNAFFECTED ? "" : Lang.asId(state.name()) + "_");
+        for (WeatherState state : WeatherState.values()) {
+            String pref = "copper/" + (state == WeatherState.UNAFFECTED ? "" : Lang.asId(state.name()) + "_");
             COPPER_SHINGLES.put(state, getCT(AllCTTypes.ROOF, pref + "copper_roof_top", pref + "copper_shingles_top"));
             COPPER_TILES.put(state, getCT(AllCTTypes.ROOF, pref + "copper_roof_top", pref + "copper_tiles_top"));
         }

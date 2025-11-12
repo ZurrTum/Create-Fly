@@ -14,32 +14,31 @@ import com.zurrtum.create.foundation.blockEntity.IMergeableBE;
 import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
 import com.zurrtum.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.infrastructure.packet.s2c.RemoveBlockEntityPacket;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.fluid.FluidState;
-import net.minecraft.fluid.Fluids;
-import net.minecraft.network.packet.Packet;
-import net.minecraft.registry.RegistryKey;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.storage.ReadView;
-import net.minecraft.storage.WriteView;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.ChunkPos;
-import net.minecraft.util.math.Direction.Axis;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.World;
-
 import java.util.*;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction.Axis;
+import net.minecraft.network.protocol.Packet;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.util.Mth;
+import net.minecraft.world.level.ChunkPos;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.material.FluidState;
+import net.minecraft.world.level.material.Fluids;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
+import net.minecraft.world.phys.Vec3;
 
 public class TrackBlockEntity extends SmartBlockEntity implements TransformableBlockEntity, IMergeableBE {
 
     Map<BlockPos, BezierConnection> connections;
     boolean cancelDrops;
 
-    public Pair<RegistryKey<World>, BlockPos> boundLocation;
+    public Pair<ResourceKey<Level>, BlockPos> boundLocation;
     public TrackBlockEntityTilt tilt;
 
     public TrackBlockEntity(BlockPos pos, BlockState state) {
@@ -50,8 +49,8 @@ public class TrackBlockEntity extends SmartBlockEntity implements TransformableB
     }
 
     @Override
-    public void onBlockReplaced(BlockPos pos, BlockState oldState) {
-        cancelDrops |= world.getBlockState(pos).isOf(AllBlocks.TRACK);
+    public void preRemoveSideEffects(BlockPos pos, BlockState oldState) {
+        cancelDrops |= level.getBlockState(pos).is(AllBlocks.TRACK);
         removeInboundConnections(true);
     }
 
@@ -62,7 +61,7 @@ public class TrackBlockEntity extends SmartBlockEntity implements TransformableB
     @Override
     public void initialize() {
         super.initialize();
-        if (world.isClient() && hasInteractableConnections())
+        if (level.isClientSide() && hasInteractableConnections())
             AllClientHandle.INSTANCE.registerToCurveInteraction(this);
     }
 
@@ -86,26 +85,26 @@ public class TrackBlockEntity extends SmartBlockEntity implements TransformableB
             BlockPos key = entry.getKey();
             BezierConnection bc = entry.getValue();
 
-            if (!key.equals(bc.getKey()) || !pos.equals(bc.bePositions.getFirst())) {
+            if (!key.equals(bc.getKey()) || !worldPosition.equals(bc.bePositions.getFirst())) {
                 invalid.add(key);
                 continue;
             }
 
-            BlockState blockState = world.getBlockState(key);
-            if (blockState.getBlock() instanceof ITrackBlock trackBlock && !blockState.get(TrackBlock.HAS_BE))
-                for (Vec3d v : trackBlock.getTrackAxes(world, key, blockState)) {
-                    Vec3d bcEndAxis = bc.axes.getSecond();
-                    if (v.distanceTo(bcEndAxis) < 1 / 1024f || v.distanceTo(bcEndAxis.multiply(-1)) < 1 / 1024f)
-                        world.setBlockState(key, blockState.with(TrackBlock.HAS_BE, true), Block.NOTIFY_ALL);
+            BlockState blockState = level.getBlockState(key);
+            if (blockState.getBlock() instanceof ITrackBlock trackBlock && !blockState.getValue(TrackBlock.HAS_BE))
+                for (Vec3 v : trackBlock.getTrackAxes(level, key, blockState)) {
+                    Vec3 bcEndAxis = bc.axes.getSecond();
+                    if (v.distanceTo(bcEndAxis) < 1 / 1024f || v.distanceTo(bcEndAxis.scale(-1)) < 1 / 1024f)
+                        level.setBlock(key, blockState.setValue(TrackBlock.HAS_BE, true), Block.UPDATE_ALL);
                 }
 
-            BlockEntity blockEntity = world.getBlockEntity(key);
+            BlockEntity blockEntity = level.getBlockEntity(key);
             if (!(blockEntity instanceof TrackBlockEntity trackBE) || blockEntity.isRemoved()) {
                 invalid.add(key);
                 continue;
             }
 
-            if (!trackBE.connections.containsKey(pos)) {
+            if (!trackBE.connections.containsKey(worldPosition)) {
                 trackBE.addConnection(bc.secondary());
                 trackBE.tilt.tryApplySmoothing();
             }
@@ -120,7 +119,7 @@ public class TrackBlockEntity extends SmartBlockEntity implements TransformableB
         if (connections.containsKey(connection.getKey()) && connection.equalsSansMaterial(connections.get(connection.getKey())))
             return;
         connections.put(connection.getKey(), connection);
-        world.scheduleBlockTick(pos, getCachedState().getBlock(), 1);
+        level.scheduleTick(worldPosition, getBlockState().getBlock(), 1);
         notifyUpdate();
 
         if (connection.isPrimary())
@@ -137,42 +136,42 @@ public class TrackBlockEntity extends SmartBlockEntity implements TransformableB
         if (removed != null)
             manageFakeTracksAlong(removed, true);
 
-        if (!connections.isEmpty() || getCachedState().get(TrackBlock.SHAPE, TrackShape.NONE).isPortal())
+        if (!connections.isEmpty() || getBlockState().getValueOrElse(TrackBlock.SHAPE, TrackShape.NONE).isPortal())
             return;
 
-        BlockState blockState = world.getBlockState(pos);
-        if (blockState.contains(TrackBlock.HAS_BE))
-            world.setBlockState(pos, blockState.with(TrackBlock.HAS_BE, false));
-        if (world instanceof ServerWorld serverLevel) {
-            Packet<?> packet = new RemoveBlockEntityPacket(pos);
-            for (ServerPlayerEntity player : serverLevel.getChunkManager().chunkLoadingManager.getPlayersWatchingChunk(new ChunkPos(pos), false)) {
-                player.networkHandler.sendPacket(packet);
+        BlockState blockState = level.getBlockState(worldPosition);
+        if (blockState.hasProperty(TrackBlock.HAS_BE))
+            level.setBlockAndUpdate(worldPosition, blockState.setValue(TrackBlock.HAS_BE, false));
+        if (level instanceof ServerLevel serverLevel) {
+            Packet<?> packet = new RemoveBlockEntityPacket(worldPosition);
+            for (ServerPlayer player : serverLevel.getChunkSource().chunkMap.getPlayers(new ChunkPos(worldPosition), false)) {
+                player.connection.send(packet);
             }
         }
     }
 
     public void removeInboundConnections(boolean dropAndDiscard) {
         for (BezierConnection bezierConnection : connections.values()) {
-            if (!(world.getBlockEntity(bezierConnection.getKey()) instanceof TrackBlockEntity tbe))
+            if (!(level.getBlockEntity(bezierConnection.getKey()) instanceof TrackBlockEntity tbe))
                 return;
             tbe.removeConnection(bezierConnection.bePositions.getFirst());
             if (!dropAndDiscard)
                 continue;
             if (!cancelDrops)
-                bezierConnection.spawnItems(world);
-            bezierConnection.spawnDestroyParticles(world);
+                bezierConnection.spawnItems(level);
+            bezierConnection.spawnDestroyParticles(level);
         }
-        if (dropAndDiscard && world instanceof ServerWorld serverLevel) {
-            Packet<?> packet = new RemoveBlockEntityPacket(pos);
-            for (ServerPlayerEntity player : serverLevel.getChunkManager().chunkLoadingManager.getPlayersWatchingChunk(new ChunkPos(pos), false)) {
-                player.networkHandler.sendPacket(packet);
+        if (dropAndDiscard && level instanceof ServerLevel serverLevel) {
+            Packet<?> packet = new RemoveBlockEntityPacket(worldPosition);
+            for (ServerPlayer player : serverLevel.getChunkSource().chunkMap.getPlayers(new ChunkPos(worldPosition), false)) {
+                player.connection.send(packet);
             }
         }
     }
 
-    public void bind(RegistryKey<World> boundDimension, BlockPos boundLocation) {
+    public void bind(ResourceKey<Level> boundDimension, BlockPos boundLocation) {
         this.boundLocation = Pair.of(boundDimension, boundLocation);
-        markDirty();
+        setChanged();
     }
 
     public boolean isTilted() {
@@ -180,44 +179,44 @@ public class TrackBlockEntity extends SmartBlockEntity implements TransformableB
     }
 
     @Override
-    public void writeSafe(WriteView view) {
+    public void writeSafe(ValueOutput view) {
         super.writeSafe(view);
         writeTurns(view, true);
     }
 
     @Override
-    protected void write(WriteView view, boolean clientPacket) {
+    protected void write(ValueOutput view, boolean clientPacket) {
         super.write(view, clientPacket);
         writeTurns(view, false);
-        tilt.smoothingAngle.ifPresent(angle -> view.put("Smoothing", Codec.DOUBLE, angle));
+        tilt.smoothingAngle.ifPresent(angle -> view.store("Smoothing", Codec.DOUBLE, angle));
         if (boundLocation == null)
             return;
-        view.put("BoundLocation", BlockPos.CODEC, boundLocation.getSecond());
-        view.put("BoundDimension", World.CODEC, boundLocation.getFirst());
+        view.store("BoundLocation", BlockPos.CODEC, boundLocation.getSecond());
+        view.store("BoundDimension", Level.RESOURCE_KEY_CODEC, boundLocation.getFirst());
     }
 
-    private void writeTurns(WriteView view, boolean restored) {
-        WriteView.ListView list = view.getList("Connections");
+    private void writeTurns(ValueOutput view, boolean restored) {
+        ValueOutput.ValueOutputList list = view.childrenList("Connections");
         for (BezierConnection bezierConnection : connections.values())
-            (restored ? tilt.restoreToOriginalCurve(bezierConnection.clone()) : bezierConnection).write(list.add(), pos);
+            (restored ? tilt.restoreToOriginalCurve(bezierConnection.clone()) : bezierConnection).write(list.addChild(), worldPosition);
     }
 
     @Override
-    protected void read(ReadView view, boolean clientPacket) {
+    protected void read(ValueInput view, boolean clientPacket) {
         super.read(view, clientPacket);
         connections.clear();
-        view.getListReadView("Connections").forEach(item -> {
-            BezierConnection connection = new BezierConnection(item, pos);
+        view.childrenListOrEmpty("Connections").forEach(item -> {
+            BezierConnection connection = new BezierConnection(item, worldPosition);
             connections.put(connection.getKey(), connection);
         });
 
         boolean smoothingPreviously = tilt.smoothingAngle.isPresent();
         tilt.smoothingAngle = view.read("Smoothing", Codec.DOUBLE);
         if (smoothingPreviously != tilt.smoothingAngle.isPresent() && clientPacket) {
-            world.updateListeners(pos, getCachedState(), getCachedState(), 16);
+            level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), 16);
         }
 
-        if (world != null && world.isClient()) {
+        if (level != null && level.isClientSide()) {
             AllClientHandle.INSTANCE.queueUpdate(this);
 
             if (hasInteractableConnections())
@@ -227,7 +226,7 @@ public class TrackBlockEntity extends SmartBlockEntity implements TransformableB
         }
 
         view.read("BoundLocation", BlockPos.CODEC)
-            .ifPresent(pos -> boundLocation = Pair.of(view.read("BoundDimension", World.CODEC).orElseThrow(), pos));
+            .ifPresent(pos -> boundLocation = Pair.of(view.read("BoundDimension", Level.RESOURCE_KEY_CODEC).orElseThrow(), pos));
     }
 
     @Override
@@ -239,7 +238,7 @@ public class TrackBlockEntity extends SmartBlockEntity implements TransformableB
         if (other instanceof TrackBlockEntity track)
             connections.putAll(track.connections);
         validateConnections();
-        world.scheduleBlockTick(pos, getCachedState().getBlock(), 1);
+        level.scheduleTick(worldPosition, getBlockState().getBlock(), 1);
     }
 
     public boolean hasInteractableConnections() {
@@ -270,14 +269,14 @@ public class TrackBlockEntity extends SmartBlockEntity implements TransformableB
             newConnection.axes.replace(transform::applyWithoutOffsetUncentered);
 
             BlockPos diff = newConnection.bePositions.getSecond().subtract(newConnection.bePositions.getFirst());
-            newConnection.bePositions.setSecond(BlockPos.ofFloored(Vec3d.ofCenter(newConnection.bePositions.getFirst())
-                .add(transform.applyWithoutOffsetUncentered(Vec3d.of(diff)))));
+            newConnection.bePositions.setSecond(BlockPos.containing(Vec3.atCenterOf(newConnection.bePositions.getFirst())
+                .add(transform.applyWithoutOffsetUncentered(Vec3.atLowerCornerOf(diff)))));
 
-            Vec3d beVec = Vec3d.of(pos);
-            Vec3d teCenterVec = beVec.add(0.5, 0.5, 0.5);
-            Vec3d start = newConnection.starts.getFirst();
-            Vec3d startToBE = start.subtract(teCenterVec);
-            Vec3d endToStart = newConnection.starts.getSecond().subtract(start);
+            Vec3 beVec = Vec3.atLowerCornerOf(worldPosition);
+            Vec3 teCenterVec = beVec.add(0.5, 0.5, 0.5);
+            Vec3 start = newConnection.starts.getFirst();
+            Vec3 startToBE = start.subtract(teCenterVec);
+            Vec3 endToStart = newConnection.starts.getSecond().subtract(start);
             startToBE = transform.applyWithoutOffsetUncentered(startToBE).add(teCenterVec);
             endToStart = transform.applyWithoutOffsetUncentered(endToStart).add(startToBE);
 
@@ -294,7 +293,7 @@ public class TrackBlockEntity extends SmartBlockEntity implements TransformableB
     @Override
     public void invalidate() {
         super.invalidate();
-        if (world.isClient())
+        if (level.isClientSide())
             AllClientHandle.INSTANCE.removeFromCurveInteraction(this);
     }
 
@@ -305,12 +304,12 @@ public class TrackBlockEntity extends SmartBlockEntity implements TransformableB
         for (BezierConnection connection : connections.values())
             manageFakeTracksAlong(connection, true);
 
-        if (boundLocation != null && world instanceof ServerWorld) {
-            ServerWorld otherLevel = world.getServer().getWorld(boundLocation.getFirst());
+        if (boundLocation != null && level instanceof ServerLevel) {
+            ServerLevel otherLevel = level.getServer().getLevel(boundLocation.getFirst());
             if (otherLevel == null)
                 return;
-            if (otherLevel.getBlockState(boundLocation.getSecond()).isIn(AllBlockTags.TRACKS))
-                otherLevel.breakBlock(boundLocation.getSecond(), false);
+            if (otherLevel.getBlockState(boundLocation.getSecond()).is(AllBlockTags.TRACKS))
+                otherLevel.destroyBlock(boundLocation.getSecond(), false);
         }
     }
 
@@ -319,30 +318,30 @@ public class TrackBlockEntity extends SmartBlockEntity implements TransformableB
 
         for (Map.Entry<Pair<Integer, Integer>, Double> entry : yLevels.entrySet()) {
             double yValue = entry.getValue();
-            int floor = MathHelper.floor(yValue);
+            int floor = Mth.floor(yValue);
             BlockPos targetPos = new BlockPos(entry.getKey().getFirst(), floor, entry.getKey().getSecond());
-            targetPos = targetPos.add(bc.bePositions.getFirst()).up(1);
+            targetPos = targetPos.offset(bc.bePositions.getFirst()).above(1);
 
-            BlockState stateAtPos = world.getBlockState(targetPos);
-            boolean present = stateAtPos.isOf(AllBlocks.FAKE_TRACK);
+            BlockState stateAtPos = level.getBlockState(targetPos);
+            boolean present = stateAtPos.is(AllBlocks.FAKE_TRACK);
 
             if (remove) {
                 if (present)
-                    world.removeBlock(targetPos, false);
+                    level.removeBlock(targetPos, false);
                 continue;
             }
 
             FluidState fluidState = stateAtPos.getFluidState();
-            if (!fluidState.isEmpty() && !fluidState.isEqualAndStill(Fluids.WATER))
+            if (!fluidState.isEmpty() && !fluidState.isSourceOfType(Fluids.WATER))
                 continue;
 
-            if (!present && stateAtPos.isReplaceable())
-                world.setBlockState(
+            if (!present && stateAtPos.canBeReplaced())
+                level.setBlock(
                     targetPos,
-                    ProperWaterloggedBlock.withWater(world, AllBlocks.FAKE_TRACK.getDefaultState(), targetPos),
-                    Block.NOTIFY_ALL
+                    ProperWaterloggedBlock.withWater(level, AllBlocks.FAKE_TRACK.defaultBlockState(), targetPos),
+                    Block.UPDATE_ALL
                 );
-            FakeTrackBlock.keepAlive(world, targetPos);
+            FakeTrackBlock.keepAlive(level, targetPos);
         }
     }
 

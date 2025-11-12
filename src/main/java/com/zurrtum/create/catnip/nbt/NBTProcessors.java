@@ -2,17 +2,6 @@ package com.zurrtum.create.catnip.nbt;
 
 import com.zurrtum.create.catnip.codecs.CatnipCodecUtils;
 import com.zurrtum.create.catnip.components.ComponentProcessors;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.block.entity.MobSpawnerBlockEntity;
-import net.minecraft.block.entity.SignText;
-import net.minecraft.component.ComponentType;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.registry.Registries;
-import net.minecraft.registry.tag.BlockTags;
-import net.minecraft.text.Text;
-import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
@@ -20,26 +9,37 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.function.UnaryOperator;
+import net.minecraft.core.component.DataComponentType;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.BlockTags;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.entity.SignText;
+import net.minecraft.world.level.block.entity.SpawnerBlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
 
 public final class NBTProcessors {
 
-    private static final Map<BlockEntityType<?>, UnaryOperator<NbtCompound>> processors = new HashMap<>();
-    private static final Map<BlockEntityType<?>, UnaryOperator<NbtCompound>> survivalProcessors = new HashMap<>();
+    private static final Map<BlockEntityType<?>, UnaryOperator<CompoundTag>> processors = new HashMap<>();
+    private static final Map<BlockEntityType<?>, UnaryOperator<CompoundTag>> survivalProcessors = new HashMap<>();
 
-    public static synchronized void addProcessor(BlockEntityType<?> type, UnaryOperator<NbtCompound> processor) {
+    public static synchronized void addProcessor(BlockEntityType<?> type, UnaryOperator<CompoundTag> processor) {
         processors.put(type, processor);
     }
 
-    public static synchronized void addSurvivalProcessor(BlockEntityType<?> type, UnaryOperator<NbtCompound> processor) {
+    public static synchronized void addSurvivalProcessor(BlockEntityType<?> type, UnaryOperator<CompoundTag> processor) {
         survivalProcessors.put(type, processor);
     }
 
     // Triggered by block tag, not BE type
-    private static final UnaryOperator<NbtCompound> signProcessor = data -> {
+    private static final UnaryOperator<CompoundTag> signProcessor = data -> {
         for (String key : List.of("front_text", "back_text")) {
-            SignText text = data.getCompound(key).flatMap(k -> CatnipCodecUtils.decode(SignText.CODEC, k)).orElse(null);
+            SignText text = data.getCompound(key).flatMap(k -> CatnipCodecUtils.decode(SignText.DIRECT_CODEC, k)).orElse(null);
             if (text != null) {
-                for (Text component : text.getMessages(false)) {
+                for (Component component : text.getMessages(false)) {
                     if (textComponentHasClickEvent(component))
                         return null;
                 }
@@ -50,15 +50,15 @@ public final class NBTProcessors {
         return data;
     };
 
-    public static UnaryOperator<NbtCompound> itemProcessor(String tagKey) {
+    public static UnaryOperator<CompoundTag> itemProcessor(String tagKey) {
         return data -> {
-            NbtCompound compound = data.getCompoundOrEmpty(tagKey);
+            CompoundTag compound = data.getCompoundOrEmpty(tagKey);
             if (!compound.contains("components"))
                 return data;
-            NbtCompound itemComponents = compound.getCompoundOrEmpty("components");
-            HashSet<String> keys = new HashSet<>(itemComponents.getKeys());
+            CompoundTag itemComponents = compound.getCompoundOrEmpty("components");
+            HashSet<String> keys = new HashSet<>(itemComponents.keySet());
             for (String key : keys) {
-                ComponentType<?> type = Registries.DATA_COMPONENT_TYPE.get(Identifier.of(key));
+                DataComponentType<?> type = BuiltInRegistries.DATA_COMPONENT_TYPE.getValue(ResourceLocation.parse(key));
                 if (type != null && ComponentProcessors.isUnsafeItemComponent(type))
                     itemComponents.remove(key);
             }
@@ -68,8 +68,8 @@ public final class NBTProcessors {
         };
     }
 
-    public static boolean textComponentHasClickEvent(Text component) {
-        for (Text sibling : component.getSiblings()) {
+    public static boolean textComponentHasClickEvent(Component component) {
+        for (Component sibling : component.getSiblings()) {
             if (textComponentHasClickEvent(sibling)) {
                 return true;
             }
@@ -81,7 +81,7 @@ public final class NBTProcessors {
     }
 
     @Nullable
-    public static NbtCompound process(BlockState state, BlockEntity blockEntity, @Nullable NbtCompound compound, boolean survival) {
+    public static CompoundTag process(BlockState state, BlockEntity blockEntity, @Nullable CompoundTag compound, boolean survival) {
         if (compound == null)
             return null;
         BlockEntityType<?> type = blockEntity.getType();
@@ -89,9 +89,9 @@ public final class NBTProcessors {
             compound = survivalProcessors.get(type).apply(compound);
         if (compound != null && processors.containsKey(type))
             return processors.get(type).apply(compound);
-        if (blockEntity instanceof MobSpawnerBlockEntity)
+        if (blockEntity instanceof SpawnerBlockEntity)
             return compound;
-        if (state.isIn(BlockTags.ALL_SIGNS))
+        if (state.is(BlockTags.ALL_SIGNS))
             return signProcessor.apply(compound);
         return compound;
     }

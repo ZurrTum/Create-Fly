@@ -13,12 +13,12 @@ import com.zurrtum.create.client.ponder.api.scene.SceneBuildingUtil;
 import com.zurrtum.create.client.ponder.api.scene.Selection;
 import com.zurrtum.create.content.contraptions.actors.roller.RollerBlockEntity;
 import com.zurrtum.create.content.trains.station.StationBlock;
-import net.minecraft.block.Block;
-import net.minecraft.block.Blocks;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.phys.Vec3;
 
 public class RollerScenes {
 
@@ -127,7 +127,7 @@ public class RollerScenes {
         scene.world().animateTrainStation(stationPos, true);
         scene.world().hideSection(someRubble, Direction.DOWN);
 
-        Vec3d filterSlot = util.vector().of(6.75 - 1 / 16f, 3, 3.25 + 1 / 16f);
+        Vec3 filterSlot = util.vector().of(6.75 - 1 / 16f, 3, 3.25 + 1 / 16f);
         scene.overlay().showFilterSlotInput(filterSlot, Direction.UP, 60);
         scene.overlay().showText(60).pointAt(filterSlot.add(-.125, 0, 0)).attachKeyFrame()
             .text("While disassembled, a suitable paving material can be specified").placeNearTarget();
@@ -159,9 +159,9 @@ public class RollerScenes {
             scene.world().modifyBlockEntity(util.grid().at(6, 2, 3 + i), RollerBlockEntity.class, rte -> rte.setAnimatedSpeed(-100));
         scene.world().animateBogey(bogeyPos, 1.5f, 30);
 
-        scene.world().replaceBlocks(util.select().fromTo(5, 0, 3, 5, 0, 5), paveMaterial.getDefaultState(), true);
+        scene.world().replaceBlocks(util.select().fromTo(5, 0, 3, 5, 0, 5), paveMaterial.defaultBlockState(), true);
         scene.idle(20);
-        scene.world().replaceBlocks(util.select().fromTo(4, 0, 3, 4, 0, 5), paveMaterial.getDefaultState(), true);
+        scene.world().replaceBlocks(util.select().fromTo(4, 0, 3, 4, 0, 5), paveMaterial.defaultBlockState(), true);
         scene.idle(10);
 
         for (int i = 0; i < 3; i++)
@@ -183,7 +183,7 @@ public class RollerScenes {
             scene.world().modifyBlockEntity(util.grid().at(6, 2, 3 + i), RollerBlockEntity.class, rte -> rte.setAnimatedSpeed(-100));
         scene.world().animateBogey(bogeyPos, 1f, 20);
         scene.idle(10);
-        scene.world().replaceBlocks(util.select().fromTo(3, 0, 3, 3, 0, 5), paveMaterial.getDefaultState(), true);
+        scene.world().replaceBlocks(util.select().fromTo(3, 0, 3, 3, 0, 5), paveMaterial.defaultBlockState(), true);
         scene.idle(10);
         for (int i = 0; i < 3; i++)
             scene.world().modifyBlockEntity(util.grid().at(6, 2, 3 + i), RollerBlockEntity.class, rte -> rte.setAnimatedSpeed(0));
@@ -200,11 +200,11 @@ public class RollerScenes {
             scene.world().modifyBlockEntity(util.grid().at(6, 2, 3 + i), RollerBlockEntity.class, rte -> rte.setAnimatedSpeed(-100));
         scene.world().animateBogey(bogeyPos, 3f, 60);
         scene.idle(10);
-        scene.world().replaceBlocks(util.select().fromTo(2, 0, 3, 2, 0, 5), paveMaterial.getDefaultState(), true);
+        scene.world().replaceBlocks(util.select().fromTo(2, 0, 3, 2, 0, 5), paveMaterial.defaultBlockState(), true);
         scene.idle(20);
-        scene.world().replaceBlocks(util.select().fromTo(1, 0, 3, 1, 0, 5), paveMaterial.getDefaultState(), true);
+        scene.world().replaceBlocks(util.select().fromTo(1, 0, 3, 1, 0, 5), paveMaterial.defaultBlockState(), true);
         scene.idle(20);
-        scene.world().replaceBlocks(util.select().fromTo(0, 0, 3, 0, 0, 5), paveMaterial.getDefaultState(), true);
+        scene.world().replaceBlocks(util.select().fromTo(0, 0, 3, 0, 0, 5), paveMaterial.defaultBlockState(), true);
         scene.idle(10);
         for (int i = 0; i < 3; i++)
             scene.world().modifyBlockEntity(util.grid().at(6, 2, 3 + i), RollerBlockEntity.class, rte -> rte.setAnimatedSpeed(0));
@@ -254,10 +254,10 @@ public class RollerScenes {
         for (int i = 0; i < 3; i++)
             scene.world().modifyBlockEntity(util.grid().at(6, 2, 3 + i), RollerBlockEntity.class, rte -> rte.setAnimatedSpeed(-100));
         for (int i = 0; i < 5; i++) {
-            scene.world().replaceBlocks(util.select().fromTo(5 - i, 0, 3, 5 - i, 0, 5), paveMaterial.getDefaultState(), true);
+            scene.world().replaceBlocks(util.select().fromTo(5 - i, 0, 3, 5 - i, 0, 5), paveMaterial.defaultBlockState(), true);
             scene.idle(20);
         }
-        scene.world().replaceBlocks(util.select().fromTo(0, 0, 3, 0, 0, 5), paveMaterial.getDefaultState(), true);
+        scene.world().replaceBlocks(util.select().fromTo(0, 0, 3, 0, 0, 5), paveMaterial.defaultBlockState(), true);
         scene.idle(10);
 
         for (int i = 0; i < 3; i++)
@@ -304,7 +304,7 @@ public class RollerScenes {
         scene.world().showSectionAndMerge(rollers, Direction.EAST, trainLink);
         scene.idle(15);
 
-        Vec3d filterSlot = util.vector().of(6.75 - 1 / 16f, 7, 3.75 - 1 / 16f);
+        Vec3 filterSlot = util.vector().of(6.75 - 1 / 16f, 7, 3.75 - 1 / 16f);
         scene.overlay().showFilterSlotInput(filterSlot, Direction.UP, 60);
         scene.overlay().showText(60).pointAt(filterSlot.add(-.125, 0, 0)).attachKeyFrame()
             .text("While disassembled, rollers can be set to other modes").placeNearTarget();
@@ -421,7 +421,7 @@ public class RollerScenes {
         scene.idle(15);
 
         scene.world().toggleControls(controlsPos);
-        scene.world().replaceBlocks(util.select().fromTo(5, 1, 3, 0, 3, 5), Blocks.COBBLESTONE.getDefaultState(), false);
+        scene.world().replaceBlocks(util.select().fromTo(5, 1, 3, 0, 3, 5), Blocks.COBBLESTONE.defaultBlockState(), false);
         scene.idle(15);
 
         // 3

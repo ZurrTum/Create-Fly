@@ -3,18 +3,18 @@ package com.zurrtum.create.client.content.logistics.chute;
 import com.zurrtum.create.catnip.math.AngleHelper;
 import com.zurrtum.create.catnip.math.VecHelper;
 import com.zurrtum.create.client.foundation.blockEntity.behaviour.ValueBoxTransform;
-import net.minecraft.block.BlockState;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Direction.Axis;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.core.Direction;
+import net.minecraft.core.Direction.Axis;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.Vec3;
 
 public class SmartChuteFilterSlotPositioning extends ValueBoxTransform.Sided {
 
     @Override
-    public Vec3d getLocalOffset(BlockState state) {
+    public Vec3 getLocalOffset(BlockState state) {
         Direction side = getSide();
         float horizontalAngle = AngleHelper.horizontalAngle(side);
-        Vec3d southLocation = VecHelper.voxelSpace(8, 11, 15.5f);
+        Vec3 southLocation = VecHelper.voxelSpace(8, 11, 15.5f);
         return VecHelper.rotateCentered(southLocation, horizontalAngle, Axis.Y);
     }
 
@@ -24,8 +24,8 @@ public class SmartChuteFilterSlotPositioning extends ValueBoxTransform.Sided {
     }
 
     @Override
-    protected Vec3d getSouthLocation() {
-        return Vec3d.ZERO;
+    protected Vec3 getSouthLocation() {
+        return Vec3.ZERO;
     }
 
 }

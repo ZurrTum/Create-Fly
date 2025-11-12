@@ -1,11 +1,11 @@
 package com.zurrtum.create.client.flywheel.lib.visual;
 
 import com.zurrtum.create.client.flywheel.lib.math.MoreMath;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.entity.Entity;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec3i;
+import net.minecraft.client.Minecraft;
+import net.minecraft.core.Vec3i;
+import net.minecraft.util.Mth;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.phys.AABB;
 import org.jetbrains.annotations.Nullable;
 import org.joml.FrustumIntersection;
 
@@ -19,7 +19,7 @@ public class EntityVisibilityTester {
     private final Vec3i renderOrigin;
     private final float scale;
     @Nullable
-    private Box lastVisibleAABB;
+    private AABB lastVisibleAABB;
 
     /**
      * Create a new EntityVisibilityTester.
@@ -42,7 +42,7 @@ public class EntityVisibilityTester {
      * @return {@code true} if the Entity is visible, {@code false} otherwise.
      */
     public boolean check(FrustumIntersection frustum) {
-        Box aabb = MinecraftClient.getInstance().getEntityRenderDispatcher().getRenderer(entity).getBoundingBox(entity);
+        AABB aabb = Minecraft.getInstance().getEntityRenderDispatcher().getRenderer(entity).getBoundingBoxForCulling(entity);
 
         // If we've never seen the entity before assume its visible.
         // Fixes entities freezing when they first spawn.
@@ -65,11 +65,11 @@ public class EntityVisibilityTester {
         return visible;
     }
 
-    private boolean adjustAndTestAABB(FrustumIntersection frustum, Box aabb) {
-        float x = (float) MathHelper.lerp(0.5D, aabb.minX, aabb.maxX) - renderOrigin.getX();
-        float y = (float) MathHelper.lerp(0.5D, aabb.minY, aabb.maxY) - renderOrigin.getY();
-        float z = (float) MathHelper.lerp(0.5D, aabb.minZ, aabb.maxZ) - renderOrigin.getZ();
-        float maxSize = (float) Math.max(aabb.getLengthX(), Math.max(aabb.getLengthY(), aabb.getLengthZ()));
+    private boolean adjustAndTestAABB(FrustumIntersection frustum, AABB aabb) {
+        float x = (float) Mth.lerp(0.5D, aabb.minX, aabb.maxX) - renderOrigin.getX();
+        float y = (float) Mth.lerp(0.5D, aabb.minY, aabb.maxY) - renderOrigin.getY();
+        float z = (float) Mth.lerp(0.5D, aabb.minZ, aabb.maxZ) - renderOrigin.getZ();
+        float maxSize = (float) Math.max(aabb.getXsize(), Math.max(aabb.getYsize(), aabb.getZsize()));
         return frustum.testSphere(x, y, z, maxSize * MoreMath.SQRT_3_OVER_2 * scale);
     }
 }

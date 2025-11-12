@@ -3,14 +3,13 @@ package com.zurrtum.create.api.equipment.potatoCannon;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.zurrtum.create.api.registry.CreateRegistries;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.hit.EntityHitResult;
-
 import java.util.function.Function;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.phys.EntityHitResult;
 
 // TODO: 1.21.7 - Move into api package
 public interface PotatoProjectileEntityHitAction {
-    Codec<PotatoProjectileEntityHitAction> CODEC = CreateRegistries.POTATO_PROJECTILE_ENTITY_HIT_ACTION.getCodec()
+    Codec<PotatoProjectileEntityHitAction> CODEC = CreateRegistries.POTATO_PROJECTILE_ENTITY_HIT_ACTION.byNameCodec()
         .dispatch(PotatoProjectileEntityHitAction::codec, Function.identity());
 
     enum Type {

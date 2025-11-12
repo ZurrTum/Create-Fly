@@ -8,15 +8,15 @@ import com.zurrtum.create.client.flywheel.lib.model.part.InstanceTree;
 import com.zurrtum.create.client.flywheel.lib.model.part.ModelTrees;
 import com.zurrtum.create.client.flywheel.lib.visual.AbstractBlockEntityVisual;
 import com.zurrtum.create.client.flywheel.lib.visual.SimpleDynamicVisual;
-import net.minecraft.block.entity.BellBlockEntity;
-import net.minecraft.client.render.block.entity.BellBlockEntityRenderer;
-import net.minecraft.client.render.entity.model.EntityModelLayers;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.MathHelper;
 import org.joml.Matrix4f;
 import org.joml.Matrix4fc;
 
 import java.util.function.Consumer;
+import net.minecraft.client.model.geom.ModelLayers;
+import net.minecraft.client.renderer.blockentity.BellRenderer;
+import net.minecraft.core.BlockPos;
+import net.minecraft.util.Mth;
+import net.minecraft.world.level.block.entity.BellBlockEntity;
 
 public class BellVisual extends AbstractBlockEntityVisual<BellBlockEntity> implements SimpleDynamicVisual {
     private static final Material MATERIAL = SimpleMaterial.builder().mipmap(false).build();
@@ -33,7 +33,7 @@ public class BellVisual extends AbstractBlockEntityVisual<BellBlockEntity> imple
 
         instances = InstanceTree.create(
             instancerProvider(),
-            ModelTrees.of(EntityModelLayers.BELL, BellBlockEntityRenderer.BELL_BODY_TEXTURE, MATERIAL)
+            ModelTrees.of(ModelLayers.BELL, BellRenderer.BELL_RESOURCE_LOCATION, MATERIAL)
         );
         bellBody = instances.childOrThrow("bell_body");
 
@@ -56,11 +56,11 @@ public class BellVisual extends AbstractBlockEntityVisual<BellBlockEntity> imple
         float xRot = 0;
         float zRot = 0;
 
-        if (blockEntity.ringing) {
-            float ringTime = (float) blockEntity.ringTicks + partialTick;
-            float angle = MathHelper.sin(ringTime / (float) Math.PI) / (4.0F + ringTime / 3.0F);
+        if (blockEntity.shaking) {
+            float ringTime = (float) blockEntity.ticks + partialTick;
+            float angle = Mth.sin(ringTime / (float) Math.PI) / (4.0F + ringTime / 3.0F);
 
-            switch (blockEntity.lastSideHit) {
+            switch (blockEntity.clickDirection) {
                 case NORTH -> xRot = -angle;
                 case SOUTH -> xRot = angle;
                 case EAST -> zRot = -angle;

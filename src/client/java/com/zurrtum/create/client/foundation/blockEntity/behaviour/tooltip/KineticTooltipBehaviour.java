@@ -8,14 +8,14 @@ import com.zurrtum.create.client.foundation.utility.CreateLang;
 import com.zurrtum.create.client.infrastructure.config.AllConfigs;
 import com.zurrtum.create.content.kinetics.base.IRotate.StressImpact;
 import com.zurrtum.create.content.kinetics.base.KineticBlockEntity;
-import net.minecraft.client.resource.language.I18n;
-import net.minecraft.text.MutableText;
-import net.minecraft.text.Text;
-import net.minecraft.util.math.MathHelper;
+import net.minecraft.client.resources.language.I18n;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.util.Mth;
 
 import java.util.List;
 
-import static net.minecraft.util.Formatting.*;
+import static net.minecraft.ChatFormatting.*;
 
 public class KineticTooltipBehaviour<T extends KineticBlockEntity> extends TooltipBehaviour<T> implements IHaveGoggleInformation, IHaveHoveringInformation {
     public KineticTooltipBehaviour(T be) {
@@ -23,26 +23,26 @@ public class KineticTooltipBehaviour<T extends KineticBlockEntity> extends Toolt
     }
 
     @Override
-    public boolean addToTooltip(List<Text> tooltip, boolean isPlayerSneaking) {
+    public boolean addToTooltip(List<Component> tooltip, boolean isPlayerSneaking) {
         boolean notFastEnough = !blockEntity.isSpeedRequirementFulfilled() && blockEntity.getSpeed() != 0;
 
         if (blockEntity.isOverStressed() && AllConfigs.client().enableOverstressedTooltip.get()) {
             CreateLang.translate("gui.stressometer.overstressed").style(GOLD).forGoggles(tooltip);
-            Text hint = CreateLang.translateDirect("gui.contraptions.network_overstressed");
-            List<Text> cutString = TooltipHelper.cutTextComponent(hint, Palette.GRAY_AND_WHITE);
-            for (Text component : cutString)
+            Component hint = CreateLang.translateDirect("gui.contraptions.network_overstressed");
+            List<Component> cutString = TooltipHelper.cutTextComponent(hint, Palette.GRAY_AND_WHITE);
+            for (Component component : cutString)
                 CreateLang.builder().add(component.copy()).forGoggles(tooltip);
             return true;
         }
 
         if (notFastEnough) {
             CreateLang.translate("tooltip.speedRequirement").style(GOLD).forGoggles(tooltip);
-            MutableText hint = CreateLang.translateDirect(
+            MutableComponent hint = CreateLang.translateDirect(
                 "gui.contraptions.not_fast_enough",
-                I18n.translate(blockEntity.getCachedState().getBlock().getTranslationKey())
+                I18n.get(blockEntity.getBlockState().getBlock().getDescriptionId())
             );
-            List<Text> cutString = TooltipHelper.cutTextComponent(hint, Palette.GRAY_AND_WHITE);
-            for (Text component : cutString)
+            List<Component> cutString = TooltipHelper.cutTextComponent(hint, Palette.GRAY_AND_WHITE);
+            for (Component component : cutString)
                 CreateLang.builder().add(component.copy()).forGoggles(tooltip);
             return true;
         }
@@ -51,11 +51,11 @@ public class KineticTooltipBehaviour<T extends KineticBlockEntity> extends Toolt
     }
 
     @Override
-    public boolean addToGoggleTooltip(List<Text> tooltip, boolean isPlayerSneaking) {
+    public boolean addToGoggleTooltip(List<Component> tooltip, boolean isPlayerSneaking) {
         if (!StressImpact.isEnabled())
             return false;
         float stressAtBase = blockEntity.calculateStressApplied();
-        if (MathHelper.approximatelyEquals(stressAtBase, 0))
+        if (Mth.equal(stressAtBase, 0))
             return false;
 
         CreateLang.translate("gui.goggles.kinetic_stats").forGoggles(tooltip);
@@ -65,7 +65,7 @@ public class KineticTooltipBehaviour<T extends KineticBlockEntity> extends Toolt
         return true;
     }
 
-    protected void addStressImpactStats(List<Text> tooltip, float stressAtBase) {
+    protected void addStressImpactStats(List<Component> tooltip, float stressAtBase) {
         CreateLang.translate("tooltip.stressImpact").style(GRAY).forGoggles(tooltip);
 
         float stressTotal = stressAtBase * Math.abs(blockEntity.getTheoreticalSpeed());

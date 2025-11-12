@@ -15,33 +15,33 @@ import mezz.jei.api.gui.drawable.IDrawable;
 import mezz.jei.api.gui.ingredient.IRecipeSlotsView;
 import mezz.jei.api.recipe.IFocusGroup;
 import mezz.jei.api.recipe.types.IRecipeType;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.recipe.PreparedRecipes;
-import net.minecraft.recipe.RecipeEntry;
-import net.minecraft.text.Text;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.item.crafting.RecipeHolder;
+import net.minecraft.world.item.crafting.RecipeMap;
 import org.jetbrains.annotations.NotNull;
 import org.joml.Matrix3x2f;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class CrushingCategory extends CreateCategory<RecipeEntry<? extends AbstractCrushingRecipe>> {
-    public static List<RecipeEntry<? extends AbstractCrushingRecipe>> getRecipes(PreparedRecipes preparedRecipes) {
-        List<RecipeEntry<? extends AbstractCrushingRecipe>> recipes = new ArrayList<>();
-        recipes.addAll(preparedRecipes.getAll(AllRecipeTypes.CRUSHING));
-        recipes.addAll(preparedRecipes.getAll(AllRecipeTypes.MILLING));
+public class CrushingCategory extends CreateCategory<RecipeHolder<? extends AbstractCrushingRecipe>> {
+    public static List<RecipeHolder<? extends AbstractCrushingRecipe>> getRecipes(RecipeMap preparedRecipes) {
+        List<RecipeHolder<? extends AbstractCrushingRecipe>> recipes = new ArrayList<>();
+        recipes.addAll(preparedRecipes.byType(AllRecipeTypes.CRUSHING));
+        recipes.addAll(preparedRecipes.byType(AllRecipeTypes.MILLING));
         return recipes;
     }
 
     @Override
     @NotNull
-    public IRecipeType<RecipeEntry<? extends AbstractCrushingRecipe>> getRecipeType() {
+    public IRecipeType<RecipeHolder<? extends AbstractCrushingRecipe>> getRecipeType() {
         return JeiClientPlugin.CRUSHING;
     }
 
     @Override
     @NotNull
-    public Text getTitle() {
+    public Component getTitle() {
         return CreateLang.translateDirect("recipe.crushing");
     }
 
@@ -56,7 +56,7 @@ public class CrushingCategory extends CreateCategory<RecipeEntry<? extends Abstr
     }
 
     @Override
-    public void setRecipe(IRecipeLayoutBuilder builder, RecipeEntry<? extends AbstractCrushingRecipe> entry, IFocusGroup focuses) {
+    public void setRecipe(IRecipeLayoutBuilder builder, RecipeHolder<? extends AbstractCrushingRecipe> entry, IFocusGroup focuses) {
         AbstractCrushingRecipe recipe = entry.value();
         builder.addInputSlot(51, 3).setBackground(SLOT, -1, -1).add(recipe.ingredient());
         List<ChanceOutput> results = recipe.results();
@@ -67,13 +67,13 @@ public class CrushingCategory extends CreateCategory<RecipeEntry<? extends Abstr
 
     @Override
     public void draw(
-        RecipeEntry<? extends AbstractCrushingRecipe> entry,
+        RecipeHolder<? extends AbstractCrushingRecipe> entry,
         IRecipeSlotsView recipeSlotsView,
-        DrawContext graphics,
+        GuiGraphics graphics,
         double mouseX,
         double mouseY
     ) {
         AllGuiTextures.JEI_DOWN_ARROW.render(graphics, 72, 7);
-        graphics.state.addSpecialElement(new CrushWheelRenderState(new Matrix3x2f(graphics.getMatrices()), 42, 24));
+        graphics.guiRenderState.submitPicturesInPictureState(new CrushWheelRenderState(new Matrix3x2f(graphics.pose()), 42, 24));
     }
 }

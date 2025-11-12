@@ -3,7 +3,7 @@ package com.zurrtum.create.content.processing.burner;
 import com.zurrtum.create.AllClientHandle;
 import com.zurrtum.create.api.behaviour.movement.MovementBehaviour;
 import com.zurrtum.create.content.contraptions.behaviour.MovementContext;
-import net.minecraft.item.ItemStack;
+import net.minecraft.world.item.ItemStack;
 
 public class BlazeBurnerMovementBehaviour extends MovementBehaviour {
 
@@ -14,7 +14,7 @@ public class BlazeBurnerMovementBehaviour extends MovementBehaviour {
 
     @Override
     public void tick(MovementContext context) {
-        if (!context.world.isClient())
+        if (!context.world.isClientSide())
             return;
         AllClientHandle.INSTANCE.tickBlazeBurnerMovement(context);
     }

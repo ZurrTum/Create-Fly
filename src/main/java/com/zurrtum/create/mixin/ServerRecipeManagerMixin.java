@@ -6,15 +6,6 @@ import com.llamalad7.mixinextras.sugar.Local;
 import com.zurrtum.create.AllRecipeSets;
 import com.zurrtum.create.content.kinetics.mixer.PotionRecipe;
 import com.zurrtum.create.content.processing.sequenced.SequencedAssemblyRecipe;
-import net.minecraft.recipe.PreparedRecipes;
-import net.minecraft.recipe.Recipe;
-import net.minecraft.recipe.RecipePropertySet;
-import net.minecraft.recipe.ServerRecipeManager;
-import net.minecraft.recipe.ServerRecipeManager.SoleIngredientGetter;
-import net.minecraft.registry.RegistryKey;
-import net.minecraft.resource.ResourceManager;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.profiler.Profiler;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -24,24 +15,33 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.stream.Stream;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.packs.resources.ResourceManager;
+import net.minecraft.util.profiling.ProfilerFiller;
+import net.minecraft.world.item.crafting.Recipe;
+import net.minecraft.world.item.crafting.RecipeManager;
+import net.minecraft.world.item.crafting.RecipeManager.IngredientExtractor;
+import net.minecraft.world.item.crafting.RecipeMap;
+import net.minecraft.world.item.crafting.RecipePropertySet;
 
-@Mixin(ServerRecipeManager.class)
+@Mixin(RecipeManager.class)
 public class ServerRecipeManagerMixin {
-    @Inject(method = "prepare(Lnet/minecraft/resource/ResourceManager;Lnet/minecraft/util/profiler/Profiler;)Lnet/minecraft/recipe/PreparedRecipes;", at = @At(value = "INVOKE", target = "Ljava/util/SortedMap;size()I"))
+    @Inject(method = "prepare(Lnet/minecraft/server/packs/resources/ResourceManager;Lnet/minecraft/util/profiling/ProfilerFiller;)Lnet/minecraft/world/item/crafting/RecipeMap;", at = @At(value = "INVOKE", target = "Ljava/util/SortedMap;size()I"))
     private void addSequencedAssemblyRecipe(
         ResourceManager resourceManager,
-        Profiler profiler,
-        CallbackInfoReturnable<PreparedRecipes> cir,
-        @Local SortedMap<Identifier, Recipe<?>> sortedMap
+        ProfilerFiller profiler,
+        CallbackInfoReturnable<RecipeMap> cir,
+        @Local SortedMap<ResourceLocation, Recipe<?>> sortedMap
     ) {
         sortedMap.putAll(SequencedAssemblyRecipe.Serializer.GENERATE_RECIPES);
         PotionRecipe.register(sortedMap);
     }
 
-    @WrapOperation(method = "initialize(Lnet/minecraft/resource/featuretoggle/FeatureSet;)V", at = @At(value = "INVOKE", target = "Ljava/util/Set;stream()Ljava/util/stream/Stream;"))
-    public Stream<Entry<RegistryKey<RecipePropertySet>, SoleIngredientGetter>> registerRecipeSet(
-        Set<Entry<RegistryKey<RecipePropertySet>, SoleIngredientGetter>> instance,
-        Operation<Stream<Entry<RegistryKey<RecipePropertySet>, SoleIngredientGetter>>> original
+    @WrapOperation(method = "finalizeRecipeLoading(Lnet/minecraft/world/flag/FeatureFlagSet;)V", at = @At(value = "INVOKE", target = "Ljava/util/Set;stream()Ljava/util/stream/Stream;"))
+    public Stream<Entry<ResourceKey<RecipePropertySet>, IngredientExtractor>> registerRecipeSet(
+        Set<Entry<ResourceKey<RecipePropertySet>, IngredientExtractor>> instance,
+        Operation<Stream<Entry<ResourceKey<RecipePropertySet>, IngredientExtractor>>> original
     ) {
         return Stream.concat(original.call(instance), AllRecipeSets.ALL.entrySet().stream());
     }

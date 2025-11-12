@@ -11,10 +11,9 @@ import com.zurrtum.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.foundation.blockEntity.behaviour.scrollValue.ServerKineticScrollValueBehaviour;
 import com.zurrtum.create.foundation.blockEntity.behaviour.scrollValue.ServerScrollValueBehaviour;
 import com.zurrtum.create.infrastructure.config.AllConfigs;
-import net.minecraft.block.BlockState;
-import net.minecraft.util.math.BlockPos;
-
 import java.util.List;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.block.state.BlockState;
 
 public class SpeedControllerBlockEntity extends KineticBlockEntity {
 
@@ -69,7 +68,7 @@ public class SpeedControllerBlockEntity extends KineticBlockEntity {
     private void updateTargetRotation() {
         if (hasNetwork())
             getOrCreateNetwork().remove(this);
-        RotationPropagator.handleRemoved(world, pos, this);
+        RotationPropagator.handleRemoved(level, worldPosition, this);
         removeSource();
         attachKinetics();
 
@@ -110,7 +109,7 @@ public class SpeedControllerBlockEntity extends KineticBlockEntity {
             return 0;
         }
 
-        boolean wheelPowersController = speedController.source.equals(cogWheel.getPos());
+        boolean wheelPowersController = speedController.source.equals(cogWheel.getBlockPos());
 
         if (wheelPowersController) {
             if (targetingController)
@@ -124,13 +123,13 @@ public class SpeedControllerBlockEntity extends KineticBlockEntity {
     }
 
     public void updateBracket() {
-        if (world != null && world.isClient())
+        if (level != null && level.isClientSide())
             hasBracket = isCogwheelPresent();
     }
 
     private boolean isCogwheelPresent() {
-        BlockState stateAbove = world.getBlockState(pos.up());
-        return ICogWheel.isDedicatedCogWheel(stateAbove.getBlock()) && ICogWheel.isLargeCog(stateAbove) && stateAbove.get(CogWheelBlock.AXIS)
+        BlockState stateAbove = level.getBlockState(worldPosition.above());
+        return ICogWheel.isDedicatedCogWheel(stateAbove.getBlock()) && ICogWheel.isLargeCog(stateAbove) && stateAbove.getValue(CogWheelBlock.AXIS)
             .isHorizontal();
     }
 

@@ -3,18 +3,17 @@ package com.zurrtum.create.infrastructure.packet.c2s;
 import com.zurrtum.create.AllHandle;
 import com.zurrtum.create.AllPackets;
 import io.netty.buffer.ByteBuf;
-import net.minecraft.network.codec.PacketCodec;
-import net.minecraft.network.codec.PacketCodecs;
-import net.minecraft.network.packet.PacketType;
-import net.minecraft.server.network.ServerPlayNetworkHandler;
-
 import java.util.function.BiConsumer;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.PacketType;
+import net.minecraft.server.network.ServerGamePacketListenerImpl;
 
 public record TrainCollisionPacket(int damage, int contraptionEntityId) implements C2SPacket {
-    public static final PacketCodec<ByteBuf, TrainCollisionPacket> CODEC = PacketCodec.tuple(
-        PacketCodecs.INTEGER,
+    public static final StreamCodec<ByteBuf, TrainCollisionPacket> CODEC = StreamCodec.composite(
+        ByteBufCodecs.INT,
         TrainCollisionPacket::damage,
-        PacketCodecs.INTEGER,
+        ByteBufCodecs.INT,
         TrainCollisionPacket::contraptionEntityId,
         TrainCollisionPacket::new
     );
@@ -25,12 +24,12 @@ public record TrainCollisionPacket(int damage, int contraptionEntityId) implemen
     }
 
     @Override
-    public PacketType<TrainCollisionPacket> getPacketType() {
+    public PacketType<TrainCollisionPacket> type() {
         return AllPackets.TRAIN_COLLISION;
     }
 
     @Override
-    public BiConsumer<ServerPlayNetworkHandler, TrainCollisionPacket> callback() {
+    public BiConsumer<ServerGamePacketListenerImpl, TrainCollisionPacket> callback() {
         return AllHandle::onTrainCollision;
     }
 }

@@ -2,20 +2,20 @@ package com.zurrtum.create.infrastructure.packet.s2c;
 
 import com.zurrtum.create.AllClientHandle;
 import com.zurrtum.create.AllPackets;
-import net.minecraft.network.RegistryByteBuf;
-import net.minecraft.network.codec.PacketCodec;
-import net.minecraft.network.codec.PacketCodecs;
-import net.minecraft.network.packet.PacketType;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.PacketType;
+import net.minecraft.world.phys.Vec3;
 import org.apache.logging.log4j.util.TriConsumer;
 
-public record LimbSwingUpdatePacket(int entityId, Vec3d position, float limbSwing) implements S2CPacket {
-    public static final PacketCodec<RegistryByteBuf, LimbSwingUpdatePacket> CODEC = PacketCodec.tuple(
-        PacketCodecs.INTEGER,
+public record LimbSwingUpdatePacket(int entityId, Vec3 position, float limbSwing) implements S2CPacket {
+    public static final StreamCodec<RegistryFriendlyByteBuf, LimbSwingUpdatePacket> CODEC = StreamCodec.composite(
+        ByteBufCodecs.INT,
         LimbSwingUpdatePacket::entityId,
-        Vec3d.PACKET_CODEC,
+        Vec3.STREAM_CODEC,
         LimbSwingUpdatePacket::position,
-        PacketCodecs.FLOAT,
+        ByteBufCodecs.FLOAT,
         LimbSwingUpdatePacket::limbSwing,
         LimbSwingUpdatePacket::new
     );
@@ -26,7 +26,7 @@ public record LimbSwingUpdatePacket(int entityId, Vec3d position, float limbSwin
     }
 
     @Override
-    public PacketType<LimbSwingUpdatePacket> getPacketType() {
+    public PacketType<LimbSwingUpdatePacket> type() {
         return AllPackets.LIMBSWING_UPDATE;
     }
 

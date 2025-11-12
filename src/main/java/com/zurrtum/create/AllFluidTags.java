@@ -1,11 +1,11 @@
 package com.zurrtum.create;
 
-import net.minecraft.fluid.Fluid;
-import net.minecraft.registry.RegistryKeys;
-import net.minecraft.registry.tag.TagKey;
-import net.minecraft.util.Identifier;
-
 import static com.zurrtum.create.Create.MOD_ID;
+
+import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.TagKey;
+import net.minecraft.world.level.material.Fluid;
 
 public class AllFluidTags {
     public static final TagKey<Fluid> BOTTOMLESS_ALLOW = register("bottomless/allow");
@@ -20,11 +20,11 @@ public class AllFluidTags {
     public static final TagKey<Fluid> CREOSOTE = register("c", "creosote");
 
     private static TagKey<Fluid> register(String name) {
-        return TagKey.of(RegistryKeys.FLUID, Identifier.of(MOD_ID, name));
+        return TagKey.create(Registries.FLUID, ResourceLocation.fromNamespaceAndPath(MOD_ID, name));
     }
 
     private static TagKey<Fluid> register(String namespace, String name) {
-        return TagKey.of(RegistryKeys.FLUID, Identifier.of(namespace, name));
+        return TagKey.create(Registries.FLUID, ResourceLocation.fromNamespaceAndPath(namespace, name));
     }
 
     public static void register() {

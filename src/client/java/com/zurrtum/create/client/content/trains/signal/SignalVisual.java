@@ -19,11 +19,11 @@ import com.zurrtum.create.content.trains.signal.SignalBoundary;
 import com.zurrtum.create.content.trains.track.ITrackBlock;
 import com.zurrtum.create.content.trains.track.TrackTargetingBehaviour;
 import com.zurrtum.create.content.trains.track.TrackTargetingBehaviour.RenderedTrackOverlayType;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.client.render.LightmapTextureManager;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.client.renderer.LightTexture;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Consumer;
@@ -71,7 +71,7 @@ public class SignalVisual extends AbstractBlockEntityVisual<SignalBlockEntity> i
         {
             SignalState signalState = blockEntity.getState();
 
-            float renderTime = AnimationTickHolder.getRenderTime(blockEntity.getWorld());
+            float renderTime = AnimationTickHolder.getRenderTime(blockEntity.getLevel());
             boolean isRedLight = signalState.isRedLight(renderTime);
 
             if (isRedLight != previousIsRedLight) {
@@ -82,7 +82,7 @@ public class SignalVisual extends AbstractBlockEntityVisual<SignalBlockEntity> i
             signalLight.setIdentityTransform().translate(getVisualPosition());
 
             if (isRedLight)
-                signalLight.light(LightmapTextureManager.MAX_BLOCK_LIGHT_COORDINATE);
+                signalLight.light(LightTexture.FULL_BLOCK);
 
             signalLight.setChanged();
 
@@ -94,7 +94,7 @@ public class SignalVisual extends AbstractBlockEntityVisual<SignalBlockEntity> i
 
             TrackTargetingBehaviour<SignalBoundary> target = blockEntity.edgePoint;
             BlockPos targetPosition = target.getGlobalPosition();
-            World level = blockEntity.getWorld();
+            Level level = blockEntity.getLevel();
             BlockState trackState = level.getBlockState(targetPosition);
             Block block = trackState.getBlock();
 

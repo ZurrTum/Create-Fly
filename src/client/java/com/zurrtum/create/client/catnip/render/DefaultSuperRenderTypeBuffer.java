@@ -1,12 +1,16 @@
 package com.zurrtum.create.client.catnip.render;
 
+import com.mojang.blaze3d.vertex.ByteBufferBuilder;
+import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.zurrtum.create.client.foundation.render.RenderTypes;
 import it.unimi.dsi.fastutil.objects.Object2ObjectLinkedOpenHashMap;
-import net.minecraft.client.render.*;
-import net.minecraft.client.render.chunk.BlockBufferAllocatorStorage;
-import net.minecraft.client.render.model.ModelBaker;
-import net.minecraft.client.util.BufferAllocator;
-import net.minecraft.util.Util;
+import net.minecraft.Util;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.SectionBufferBuilderPack;
+import net.minecraft.client.renderer.Sheets;
+import net.minecraft.client.renderer.chunk.ChunkSectionLayer;
+import net.minecraft.client.resources.model.ModelBakery;
 
 import java.util.SortedMap;
 
@@ -29,55 +33,55 @@ public class DefaultSuperRenderTypeBuffer implements SuperRenderTypeBuffer {
     }
 
     @Override
-    public VertexConsumer getEarlyBuffer(RenderLayer type) {
+    public VertexConsumer getEarlyBuffer(RenderType type) {
         return earlyBuffer.bufferSource.getBuffer(type);
     }
 
     @Override
-    public VertexConsumer getBuffer(RenderLayer type) {
+    public VertexConsumer getBuffer(RenderType type) {
         return defaultBuffer.bufferSource.getBuffer(type);
     }
 
     @Override
-    public VertexConsumer getLateBuffer(RenderLayer type) {
+    public VertexConsumer getLateBuffer(RenderType type) {
         return lateBuffer.bufferSource.getBuffer(type);
     }
 
     @Override
     public void draw() {
-        earlyBuffer.bufferSource.draw();
-        defaultBuffer.bufferSource.draw();
-        lateBuffer.bufferSource.draw();
+        earlyBuffer.bufferSource.endBatch();
+        defaultBuffer.bufferSource.endBatch();
+        lateBuffer.bufferSource.endBatch();
     }
 
     @Override
-    public void draw(RenderLayer type) {
-        earlyBuffer.bufferSource.draw(type);
-        defaultBuffer.bufferSource.draw(type);
-        lateBuffer.bufferSource.draw(type);
+    public void draw(RenderType type) {
+        earlyBuffer.bufferSource.endBatch(type);
+        defaultBuffer.bufferSource.endBatch(type);
+        lateBuffer.bufferSource.endBatch(type);
     }
 
     public static class SuperRenderTypeBufferPhase {
         // Visible clones from RenderBuffers
-        private final BlockBufferAllocatorStorage fixedBufferPack = new BlockBufferAllocatorStorage();
-        private final SortedMap<RenderLayer, BufferAllocator> fixedBuffers = Util.make(
+        private final SectionBufferBuilderPack fixedBufferPack = new SectionBufferBuilderPack();
+        private final SortedMap<RenderType, ByteBufferBuilder> fixedBuffers = Util.make(
             new Object2ObjectLinkedOpenHashMap<>(), map -> {
-                map.put(TexturedRenderLayers.getEntitySolid(), fixedBufferPack.get(BlockRenderLayer.SOLID));
-                map.put(TexturedRenderLayers.getEntityCutout(), fixedBufferPack.get(BlockRenderLayer.CUTOUT));
-                map.put(TexturedRenderLayers.getBannerPatterns(), fixedBufferPack.get(BlockRenderLayer.CUTOUT_MIPPED));
-                map.put(TexturedRenderLayers.getItemEntityTranslucentCull(), fixedBufferPack.get(BlockRenderLayer.TRANSLUCENT));
-                put(map, TexturedRenderLayers.getShieldPatterns());
-                put(map, TexturedRenderLayers.getBeds());
-                put(map, TexturedRenderLayers.getShulkerBoxes());
-                put(map, TexturedRenderLayers.getSign());
-                put(map, TexturedRenderLayers.getHangingSign());
-                map.put(TexturedRenderLayers.getChest(), new BufferAllocator(786432));
-                put(map, RenderLayer.getArmorEntityGlint());
-                put(map, RenderLayer.getGlint());
-                put(map, RenderLayer.getGlintTranslucent());
-                put(map, RenderLayer.getEntityGlint());
-                put(map, RenderLayer.getWaterMask());
-                ModelBaker.BLOCK_DESTRUCTION_RENDER_LAYERS.forEach(renderType -> put(map, renderType));
+                map.put(Sheets.solidBlockSheet(), fixedBufferPack.buffer(ChunkSectionLayer.SOLID));
+                map.put(Sheets.cutoutBlockSheet(), fixedBufferPack.buffer(ChunkSectionLayer.CUTOUT));
+                map.put(Sheets.bannerSheet(), fixedBufferPack.buffer(ChunkSectionLayer.CUTOUT_MIPPED));
+                map.put(Sheets.translucentItemSheet(), fixedBufferPack.buffer(ChunkSectionLayer.TRANSLUCENT));
+                put(map, Sheets.shieldSheet());
+                put(map, Sheets.bedSheet());
+                put(map, Sheets.shulkerBoxSheet());
+                put(map, Sheets.signSheet());
+                put(map, Sheets.hangingSignSheet());
+                map.put(Sheets.chestSheet(), new ByteBufferBuilder(786432));
+                put(map, RenderType.armorEntityGlint());
+                put(map, RenderType.glint());
+                put(map, RenderType.glintTranslucent());
+                put(map, RenderType.entityGlint());
+                put(map, RenderType.waterMask());
+                ModelBakery.DESTROY_TYPES.forEach(renderType -> put(map, renderType));
 
                 //extras
                 put(map, PonderRenderTypes.outlineSolid());
@@ -87,10 +91,10 @@ public class DefaultSuperRenderTypeBuffer implements SuperRenderTypeBuffer {
                 put(map, RenderTypes.additive());
             }
         );
-        private final Immediate bufferSource = VertexConsumerProvider.immediate(fixedBuffers, new BufferAllocator(256));
+        private final BufferSource bufferSource = MultiBufferSource.immediateWithBuffers(fixedBuffers, new ByteBufferBuilder(256));
 
-        private static void put(Object2ObjectLinkedOpenHashMap<RenderLayer, BufferAllocator> map, RenderLayer type) {
-            map.put(type, new BufferAllocator(type.getExpectedBufferSize()));
+        private static void put(Object2ObjectLinkedOpenHashMap<RenderType, ByteBufferBuilder> map, RenderType type) {
+            map.put(type, new ByteBufferBuilder(type.bufferSize()));
         }
 
     }

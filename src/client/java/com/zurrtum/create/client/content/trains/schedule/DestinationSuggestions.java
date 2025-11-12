@@ -3,32 +3,31 @@ package com.zurrtum.create.client.content.trains.schedule;
 import com.mojang.brigadier.context.StringRange;
 import com.mojang.brigadier.suggestion.Suggestion;
 import com.zurrtum.create.catnip.data.IntAttached;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.font.TextRenderer;
-import net.minecraft.client.gui.screen.ChatInputSuggestor;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.widget.TextFieldWidget;
-import net.minecraft.util.math.MathHelper;
-
 import java.util.ArrayList;
 import java.util.List;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.components.CommandSuggestions;
+import net.minecraft.client.gui.components.EditBox;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.util.Mth;
 
-public class DestinationSuggestions extends ChatInputSuggestor {
+public class DestinationSuggestions extends CommandSuggestions {
 
-    private final TextFieldWidget textBox;
+    private final EditBox textBox;
     private final List<IntAttached<String>> viableStations;
     private String previous = "<>";
-    private final TextRenderer font;
+    private final Font font;
     private boolean active;
 
     List<Suggestion> currentSuggestions;
     private final int yOffset;
 
     public DestinationSuggestions(
-        MinecraftClient pMinecraft,
+        Minecraft pMinecraft,
         Screen pScreen,
-        TextFieldWidget pInput,
-        TextRenderer pFont,
+        EditBox pInput,
+        Font pFont,
         List<IntAttached<String>> viableStations,
         boolean anchorToBottom,
         int yOffset
@@ -43,30 +42,30 @@ public class DestinationSuggestions extends ChatInputSuggestor {
     }
 
     public void tick() {
-        if (window == null)
+        if (suggestions == null)
             textBox.setSuggestion("");
         if (active == textBox.isFocused())
             return;
         active = textBox.isFocused();
-        refresh();
+        updateCommandInfo();
     }
 
     @Override
-    public void refresh() {
-        if (textBox.getText().length() < textBox.getCursor())
+    public void updateCommandInfo() {
+        if (textBox.getValue().length() < textBox.getCursorPosition())
             return;
 
-        String trimmed = textBox.getText().substring(0, textBox.getCursor());
+        String trimmed = textBox.getValue().substring(0, textBox.getCursorPosition());
 
-        if (!textBox.getSelectedText().isBlank())
-            trimmed = trimmed.replace(textBox.getSelectedText(), "");
+        if (!textBox.getHighlighted().isBlank())
+            trimmed = trimmed.replace(textBox.getHighlighted(), "");
 
         final String value = trimmed;
 
         if (value.equals(previous))
             return;
         if (!active) {
-            window = null;
+            suggestions = null;
             return;
         }
 
@@ -81,15 +80,15 @@ public class DestinationSuggestions extends ChatInputSuggestor {
 
     public void showSuggestions(boolean pNarrateFirstSuggestion) {
         if (currentSuggestions.isEmpty()) {
-            window = null;
+            suggestions = null;
             return;
         }
 
         int width = 0;
         for (Suggestion suggestion : currentSuggestions)
-            width = Math.max(width, font.getWidth(suggestion.getText()));
-        int x = MathHelper.clamp(textBox.getCharacterX(0), 0, textBox.getCharacterX(0) + textBox.getInnerWidth() - width);
-        window = new ChatInputSuggestor.SuggestionWindow(x, 72 + yOffset, width, currentSuggestions, false);
+            width = Math.max(width, font.width(suggestion.getText()));
+        int x = Mth.clamp(textBox.getScreenX(0), 0, textBox.getScreenX(0) + textBox.getInnerWidth() - width);
+        suggestions = new CommandSuggestions.SuggestionsList(x, 72 + yOffset, width, currentSuggestions, false);
     }
 
     public boolean isEmpty() {

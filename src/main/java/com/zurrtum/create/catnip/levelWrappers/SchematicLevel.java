@@ -3,54 +3,58 @@ package com.zurrtum.create.catnip.levelWrappers;
 import com.zurrtum.create.Create;
 import com.zurrtum.create.catnip.components.ComponentProcessors;
 import com.zurrtum.create.catnip.math.BBHelper;
-import net.minecraft.block.*;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EquipmentSlot;
-import net.minecraft.entity.decoration.ArmorStandEntity;
-import net.minecraft.entity.decoration.ItemFrameEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.fluid.Fluid;
-import net.minecraft.fluid.FluidState;
-import net.minecraft.registry.RegistryKeys;
-import net.minecraft.registry.entry.RegistryEntry;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.state.property.Properties;
-import net.minecraft.util.math.BlockBox;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.math.Direction;
-import net.minecraft.world.LightType;
-import net.minecraft.world.ServerWorldAccess;
-import net.minecraft.world.World;
-import net.minecraft.world.biome.Biome;
-import net.minecraft.world.biome.BiomeKeys;
-import net.minecraft.world.tick.EmptyTickSchedulers;
-import net.minecraft.world.tick.QueryableTickScheduler;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.Holder;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.decoration.ArmorStand;
+import net.minecraft.world.entity.decoration.ItemFrame;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LightLayer;
+import net.minecraft.world.level.ServerLevelAccessor;
+import net.minecraft.world.level.biome.Biome;
+import net.minecraft.world.level.biome.Biomes;
+import net.minecraft.world.level.block.AbstractFurnaceBlock;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.EntityBlock;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.levelgen.structure.BoundingBox;
+import net.minecraft.world.level.material.Fluid;
+import net.minecraft.world.level.material.FluidState;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.ticks.BlackholeTickAccess;
+import net.minecraft.world.ticks.LevelTickAccess;
 
 import java.util.*;
 import java.util.function.Predicate;
 
-public class SchematicLevel extends WrappedLevel implements ServerWorldAccess, SchematicLevelAccessor {
+public class SchematicLevel extends WrappedLevel implements ServerLevelAccessor, SchematicLevelAccessor {
     protected Map<BlockPos, BlockState> blocks;
     protected Map<BlockPos, BlockEntity> blockEntities;
     protected List<BlockEntity> renderedBlockEntities;
     protected List<Entity> entities;
-    protected BlockBox bounds;
+    protected BoundingBox bounds;
 
     public BlockPos anchor;
     public boolean renderMode;
 
-    public SchematicLevel(World original) {
-        this(BlockPos.ORIGIN, original);
+    public SchematicLevel(Level original) {
+        this(BlockPos.ZERO, original);
     }
 
-    public SchematicLevel(BlockPos anchor, World original) {
+    public SchematicLevel(BlockPos anchor, Level original) {
         super(original);
         setChunkSource(new SchematicChunkSource(this));
         this.blocks = new HashMap<>();
         this.blockEntities = new HashMap<>();
-        this.bounds = new BlockBox(BlockPos.ORIGIN);
+        this.bounds = new BoundingBox(BlockPos.ZERO);
         this.anchor = anchor;
         this.entities = new ArrayList<>();
         this.renderedBlockEntities = new ArrayList<>();
@@ -62,12 +66,12 @@ public class SchematicLevel extends WrappedLevel implements ServerWorldAccess, S
     }
 
     @Override
-    public boolean spawnEntity(Entity entityIn) {
-        if (entityIn instanceof ItemFrameEntity itemFrame)
-            itemFrame.setHeldItemStack(ComponentProcessors.withUnsafeComponentsDiscarded(itemFrame.getHeldItemStack()));
-        if (entityIn instanceof ArmorStandEntity armorStand)
+    public boolean addFreshEntity(Entity entityIn) {
+        if (entityIn instanceof ItemFrame itemFrame)
+            itemFrame.setItem(ComponentProcessors.withUnsafeComponentsDiscarded(itemFrame.getItem()));
+        if (entityIn instanceof ArmorStand armorStand)
             for (EquipmentSlot equipmentSlot : EquipmentSlot.values())
-                armorStand.equipStack(equipmentSlot, ComponentProcessors.withUnsafeComponentsDiscarded(armorStand.getEquippedStack(equipmentSlot)));
+                armorStand.setItemSlot(equipmentSlot, ComponentProcessors.withUnsafeComponentsDiscarded(armorStand.getItemBySlot(equipmentSlot)));
 
         return entities.add(entityIn);
     }
@@ -79,7 +83,7 @@ public class SchematicLevel extends WrappedLevel implements ServerWorldAccess, S
 
     @Override
     public BlockEntity getBlockEntity(BlockPos pos) {
-        if (isOutOfHeightLimit(pos))
+        if (isOutsideBuildHeight(pos))
             return null;
         if (blockEntities.containsKey(pos))
             return blockEntities.get(pos);
@@ -89,7 +93,7 @@ public class SchematicLevel extends WrappedLevel implements ServerWorldAccess, S
         BlockState blockState = getBlockState(pos);
         if (blockState.hasBlockEntity()) {
             try {
-                BlockEntity blockEntity = ((BlockEntityProvider) blockState.getBlock()).createBlockEntity(pos, blockState);
+                BlockEntity blockEntity = ((EntityBlock) blockState.getBlock()).newBlockEntity(pos, blockState);
                 if (blockEntity != null) {
                     onBEadded(blockEntity, pos);
                     blockEntities.put(pos, blockEntity);
@@ -104,18 +108,18 @@ public class SchematicLevel extends WrappedLevel implements ServerWorldAccess, S
     }
 
     protected void onBEadded(BlockEntity blockEntity, BlockPos pos) {
-        blockEntity.setWorld(this);
+        blockEntity.setLevel(this);
     }
 
     @Override
     public BlockState getBlockState(BlockPos globalPos) {
         BlockPos pos = globalPos.subtract(anchor);
 
-        if (pos.getY() - bounds.getMinY() == -1 && !renderMode)
-            return Blocks.DIRT.getDefaultState();
-        if (getBounds().contains(pos) && blocks.containsKey(pos))
+        if (pos.getY() - bounds.minY() == -1 && !renderMode)
+            return Blocks.DIRT.defaultBlockState();
+        if (getBounds().isInside(pos) && blocks.containsKey(pos))
             return processBlockStateForPrinting(blocks.get(pos));
-        return Blocks.AIR.getDefaultState();
+        return Blocks.AIR.defaultBlockState();
     }
 
     @Override
@@ -129,74 +133,74 @@ public class SchematicLevel extends WrappedLevel implements ServerWorldAccess, S
     }
 
     @Override
-    public RegistryEntry<Biome> getBiome(BlockPos pos) {
-        return level.getRegistryManager().getOrThrow(RegistryKeys.BIOME).getOrThrow(BiomeKeys.PLAINS);
+    public Holder<Biome> getBiome(BlockPos pos) {
+        return level.registryAccess().lookupOrThrow(Registries.BIOME).getOrThrow(Biomes.PLAINS);
         //return ForgeRegistries.BIOMES.getHolder(Biomes.PLAINS.location()).orElse(null);
     }
 
     @Override
-    public int getLightLevel(LightType lightLayer, BlockPos pos) {
+    public int getBrightness(LightLayer lightLayer, BlockPos pos) {
         return 15;
     }
 
     @Override
-    public float getBrightness(Direction face, boolean hasShade) {
+    public float getShade(Direction face, boolean hasShade) {
         return 1f;
     }
 
     @Override
-    public QueryableTickScheduler<Block> getBlockTickScheduler() {
-        return EmptyTickSchedulers.getClientTickScheduler();
+    public LevelTickAccess<Block> getBlockTicks() {
+        return BlackholeTickAccess.emptyLevelList();
     }
 
     @Override
-    public QueryableTickScheduler<Fluid> getFluidTickScheduler() {
-        return EmptyTickSchedulers.getClientTickScheduler();
+    public LevelTickAccess<Fluid> getFluidTicks() {
+        return BlackholeTickAccess.emptyLevelList();
     }
 
     @Override
-    public List<Entity> getOtherEntities(Entity arg0, Box arg1, Predicate<? super Entity> arg2) {
+    public List<Entity> getEntities(Entity arg0, AABB arg1, Predicate<? super Entity> arg2) {
         return Collections.emptyList();
     }
 
     @Override
-    public <T extends Entity> List<T> getEntitiesByClass(Class<T> arg0, Box arg1, Predicate<? super T> arg2) {
+    public <T extends Entity> List<T> getEntitiesOfClass(Class<T> arg0, AABB arg1, Predicate<? super T> arg2) {
         return Collections.emptyList();
     }
 
     @Override
-    public List<? extends PlayerEntity> getPlayers() {
+    public List<? extends Player> players() {
         return Collections.emptyList();
     }
 
     @Override
-    public int getAmbientDarkness() {
+    public int getSkyDarken() {
         return 0;
     }
 
     @Override
-    public boolean testBlockState(BlockPos pos, Predicate<BlockState> predicate) {
+    public boolean isStateAtPosition(BlockPos pos, Predicate<BlockState> predicate) {
         return predicate.test(getBlockState(pos));
     }
 
     @Override
-    public boolean breakBlock(BlockPos arg0, boolean arg1) {
-        return setBlockState(arg0, Blocks.AIR.getDefaultState(), 3);
+    public boolean destroyBlock(BlockPos arg0, boolean arg1) {
+        return setBlock(arg0, Blocks.AIR.defaultBlockState(), 3);
     }
 
     @Override
     public boolean removeBlock(BlockPos arg0, boolean arg1) {
-        return setBlockState(arg0, Blocks.AIR.getDefaultState(), 3);
+        return setBlock(arg0, Blocks.AIR.defaultBlockState(), 3);
     }
 
     @Override
-    public boolean setBlockState(BlockPos pos, BlockState arg1, int arg2) {
-        pos = pos.toImmutable().subtract(anchor);
+    public boolean setBlock(BlockPos pos, BlockState arg1, int arg2) {
+        pos = pos.immutable().subtract(anchor);
         bounds = BBHelper.encapsulate(bounds, pos);
         blocks.put(pos, arg1);
         if (blockEntities.containsKey(pos)) {
             BlockEntity blockEntity = blockEntities.get(pos);
-            if (!blockEntity.getType().supports(arg1)) {
+            if (!blockEntity.getType().isValid(arg1)) {
                 blockEntities.remove(pos);
                 renderedBlockEntities.remove(blockEntity);
             }
@@ -210,16 +214,16 @@ public class SchematicLevel extends WrappedLevel implements ServerWorldAccess, S
     }
 
     @Override
-    public void updateListeners(BlockPos pos, BlockState oldState, BlockState newState, int flags) {
+    public void sendBlockUpdated(BlockPos pos, BlockState oldState, BlockState newState, int flags) {
     }
 
     @Override
-    public BlockBox getBounds() {
+    public BoundingBox getBounds() {
         return bounds;
     }
 
     @Override
-    public void setBounds(BlockBox bounds) {
+    public void setBounds(BoundingBox bounds) {
         this.bounds = bounds;
     }
 
@@ -234,14 +238,14 @@ public class SchematicLevel extends WrappedLevel implements ServerWorldAccess, S
     }
 
     protected BlockState processBlockStateForPrinting(BlockState state) {
-        if (state.getBlock() instanceof AbstractFurnaceBlock && state.contains(Properties.LIT))
-            state = state.with(Properties.LIT, false);
+        if (state.getBlock() instanceof AbstractFurnaceBlock && state.hasProperty(BlockStateProperties.LIT))
+            state = state.setValue(BlockStateProperties.LIT, false);
         return state;
     }
 
     @Override
-    public ServerWorld toServerWorld() {
-        if (level instanceof ServerWorld serverWorld) {
+    public ServerLevel getLevel() {
+        if (level instanceof ServerLevel serverWorld) {
             return serverWorld;
         }
         throw new IllegalStateException("Cannot use IServerWorld#getWorld in a client environment");

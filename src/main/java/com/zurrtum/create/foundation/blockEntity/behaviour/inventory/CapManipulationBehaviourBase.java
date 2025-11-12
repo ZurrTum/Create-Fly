@@ -7,12 +7,12 @@ import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
 import com.zurrtum.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.foundation.blockEntity.behaviour.filtering.ServerFilteringBehaviour;
 import com.zurrtum.create.foundation.item.ItemHelper.ExtractionCountMode;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.state.property.Properties;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import org.jetbrains.annotations.Nullable;
 
 public abstract class CapManipulationBehaviourBase<T, S extends CapManipulationBehaviourBase<?, ?>> extends BlockEntityBehaviour<SmartBlockEntity> {
@@ -34,7 +34,7 @@ public abstract class CapManipulationBehaviourBase<T, S extends CapManipulationB
         filter = Predicates.alwaysTrue();
     }
 
-    protected abstract T getCapability(World world, BlockPos pos, BlockEntity blockEntity, @Nullable Direction side);
+    protected abstract T getCapability(Level world, BlockPos pos, BlockEntity blockEntity, @Nullable Direction side);
 
     @Override
     public void initialize() {
@@ -83,7 +83,7 @@ public abstract class CapManipulationBehaviourBase<T, S extends CapManipulationB
      * To get the BlockFace to use for capability lookup, call getOpposite on the result.
      */
     public BlockFace getTarget() {
-        return this.target.getTarget(this.getWorld(), this.blockEntity.getPos(), this.blockEntity.getCachedState());
+        return this.target.getTarget(this.getLevel(), this.blockEntity.getBlockPos(), this.blockEntity.getBlockState());
     }
 
     protected boolean onHandlerInvalidated() {
@@ -105,7 +105,7 @@ public abstract class CapManipulationBehaviourBase<T, S extends CapManipulationB
     @Override
     public void tick() {
         super.tick();
-        if (findNewNextTick || getWorld().getTime() % 64 == 0) {
+        if (findNewNextTick || getLevel().getGameTime() % 64 == 0) {
             findNewNextTick = false;
             findNewCapability();
         }
@@ -128,13 +128,13 @@ public abstract class CapManipulationBehaviourBase<T, S extends CapManipulationB
     }
 
     public void findNewCapability() {
-        World world = getWorld();
+        Level world = getLevel();
         BlockFace targetBlockFace = this.getTarget().getOpposite();
         BlockPos pos = targetBlockFace.getPos();
 
         targetCapability = null;
 
-        if (!world.isPosLoaded(pos))
+        if (!world.isLoaded(pos))
             return;
         BlockEntity invBE = world.getBlockEntity(pos);
         if (!filter.test(invBE))
@@ -146,17 +146,20 @@ public abstract class CapManipulationBehaviourBase<T, S extends CapManipulationB
     public interface InterfaceProvider {
 
         static InterfaceProvider towardBlockFacing() {
-            return (w, p, s) -> new BlockFace(p, s.contains(Properties.FACING) ? s.get(Properties.FACING) : s.get(Properties.HORIZONTAL_FACING));
+            return (w, p, s) -> new BlockFace(
+                p,
+                s.hasProperty(BlockStateProperties.FACING) ? s.getValue(BlockStateProperties.FACING) : s.getValue(BlockStateProperties.HORIZONTAL_FACING)
+            );
         }
 
         static InterfaceProvider oppositeOfBlockFacing() {
             return (w, p, s) -> new BlockFace(
                 p,
-                (s.contains(Properties.FACING) ? s.get(Properties.FACING) : s.get(Properties.HORIZONTAL_FACING)).getOpposite()
+                (s.hasProperty(BlockStateProperties.FACING) ? s.getValue(BlockStateProperties.FACING) : s.getValue(BlockStateProperties.HORIZONTAL_FACING)).getOpposite()
             );
         }
 
-        BlockFace getTarget(World world, BlockPos pos, BlockState blockState);
+        BlockFace getTarget(Level world, BlockPos pos, BlockState blockState);
     }
 
 }

@@ -11,13 +11,12 @@ import com.zurrtum.create.client.flywheel.lib.instance.FlatLit;
 import com.zurrtum.create.client.flywheel.lib.model.Models;
 import com.zurrtum.create.client.foundation.render.AllInstanceTypes;
 import com.zurrtum.create.content.kinetics.gearbox.GearboxBlockEntity;
-import net.minecraft.state.property.Properties;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-
 import java.util.EnumMap;
 import java.util.Map;
 import java.util.function.Consumer;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 
 public class GearboxVisual extends KineticBlockEntityVisual<GearboxBlockEntity> {
 
@@ -27,7 +26,7 @@ public class GearboxVisual extends KineticBlockEntityVisual<GearboxBlockEntity> 
     public GearboxVisual(VisualizationContext context, GearboxBlockEntity blockEntity, float partialTick) {
         super(context, blockEntity, partialTick);
 
-        final Direction.Axis boxAxis = blockState.get(Properties.AXIS);
+        final Direction.Axis boxAxis = blockState.getValue(BlockStateProperties.AXIS);
 
         updateSourceFacing();
 
@@ -54,7 +53,7 @@ public class GearboxVisual extends KineticBlockEntityVisual<GearboxBlockEntity> 
         if (speed != 0 && sourceFacing != null) {
             if (sourceFacing.getAxis() == direction.getAxis())
                 speed *= sourceFacing == direction ? 1 : -1;
-            else if (sourceFacing.getDirection() == direction.getDirection())
+            else if (sourceFacing.getAxisDirection() == direction.getAxisDirection())
                 speed *= -1;
         }
         return speed;
@@ -63,7 +62,7 @@ public class GearboxVisual extends KineticBlockEntityVisual<GearboxBlockEntity> 
     protected void updateSourceFacing() {
         if (blockEntity.hasSource()) {
             BlockPos source = blockEntity.source.subtract(pos);
-            sourceFacing = Direction.getFacing(source.getX(), source.getY(), source.getZ());
+            sourceFacing = Direction.getApproximateNearest(source.getX(), source.getY(), source.getZ());
         } else {
             sourceFacing = null;
         }

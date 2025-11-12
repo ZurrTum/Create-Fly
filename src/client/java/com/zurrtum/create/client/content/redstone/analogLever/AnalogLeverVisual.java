@@ -15,10 +15,9 @@ import com.zurrtum.create.client.flywheel.lib.visual.AbstractBlockEntityVisual;
 import com.zurrtum.create.client.flywheel.lib.visual.SimpleDynamicVisual;
 import com.zurrtum.create.content.redstone.analogLever.AnalogLeverBlock;
 import com.zurrtum.create.content.redstone.analogLever.AnalogLeverBlockEntity;
-import net.minecraft.block.enums.BlockFace;
-import net.minecraft.util.math.Direction;
-
 import java.util.function.Consumer;
+import net.minecraft.core.Direction;
+import net.minecraft.world.level.block.state.properties.AttachFace;
 
 public class AnalogLeverVisual extends AbstractBlockEntityVisual<AnalogLeverBlockEntity> implements SimpleDynamicVisual {
 
@@ -35,9 +34,9 @@ public class AnalogLeverVisual extends AbstractBlockEntityVisual<AnalogLeverBloc
         indicator = instancerProvider().instancer(InstanceTypes.TRANSFORMED, Models.partial(AllPartialModels.ANALOG_LEVER_INDICATOR))
             .createInstance();
 
-        BlockFace face = blockState.get(AnalogLeverBlock.FACE);
-        rX = face == BlockFace.FLOOR ? 0 : face == BlockFace.WALL ? 90 : 180;
-        rY = AngleHelper.horizontalAngle(blockState.get(AnalogLeverBlock.FACING));
+        AttachFace face = blockState.getValue(AnalogLeverBlock.FACE);
+        rX = face == AttachFace.FLOOR ? 0 : face == AttachFace.WALL ? 90 : 180;
+        rY = AngleHelper.horizontalAngle(blockState.getValue(AnalogLeverBlock.FACING));
 
         transform(indicator.setIdentityTransform());
 

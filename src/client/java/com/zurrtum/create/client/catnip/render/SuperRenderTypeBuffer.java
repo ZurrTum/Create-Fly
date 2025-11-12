@@ -1,40 +1,40 @@
 package com.zurrtum.create.client.catnip.render;
 
-import net.minecraft.client.render.BlockRenderLayer;
-import net.minecraft.client.render.RenderLayer;
-import net.minecraft.client.render.VertexConsumer;
-import net.minecraft.client.render.VertexConsumerProvider;
+import com.mojang.blaze3d.vertex.VertexConsumer;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.chunk.ChunkSectionLayer;
 
-public interface SuperRenderTypeBuffer extends VertexConsumerProvider {
-    VertexConsumer getEarlyBuffer(RenderLayer type);
+public interface SuperRenderTypeBuffer extends MultiBufferSource {
+    VertexConsumer getEarlyBuffer(RenderType type);
 
-    VertexConsumer getBuffer(RenderLayer type);
+    VertexConsumer getBuffer(RenderType type);
 
-    VertexConsumer getLateBuffer(RenderLayer type);
+    VertexConsumer getLateBuffer(RenderType type);
 
-    default VertexConsumer getEarlyBuffer(BlockRenderLayer type) {
+    default VertexConsumer getEarlyBuffer(ChunkSectionLayer type) {
         return getEarlyBuffer(getRenderLayer(type));
     }
 
-    default VertexConsumer getBuffer(BlockRenderLayer type) {
+    default VertexConsumer getBuffer(ChunkSectionLayer type) {
         return getBuffer(getRenderLayer(type));
     }
 
-    default VertexConsumer getLateBuffer(BlockRenderLayer type) {
+    default VertexConsumer getLateBuffer(ChunkSectionLayer type) {
         return getLateBuffer(getRenderLayer(type));
     }
 
-    default RenderLayer getRenderLayer(BlockRenderLayer type) {
+    default RenderType getRenderLayer(ChunkSectionLayer type) {
         return switch (type) {
-            case SOLID -> RenderLayer.getSolid();
-            case CUTOUT_MIPPED -> RenderLayer.getCutoutMipped();
-            case CUTOUT -> RenderLayer.getCutout();
+            case SOLID -> RenderType.solid();
+            case CUTOUT_MIPPED -> RenderType.cutoutMipped();
+            case CUTOUT -> RenderType.cutout();
             case TRANSLUCENT -> PonderRenderTypes.translucent();
-            case TRIPWIRE -> RenderLayer.getTripwire();
+            case TRIPWIRE -> RenderType.tripwire();
         };
     }
 
     void draw();
 
-    void draw(RenderLayer type);
+    void draw(RenderType type);
 }

@@ -1,17 +1,16 @@
 package com.zurrtum.create.client.catnip.outliner;
 
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.zurrtum.create.client.catnip.outliner.LineOutline.EndChasingLineOutline;
 import com.zurrtum.create.client.catnip.outliner.Outline.OutlineParams;
 import com.zurrtum.create.client.catnip.render.SuperRenderTypeBuffer;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec3d;
-
 import java.util.*;
+import net.minecraft.client.Minecraft;
+import net.minecraft.core.BlockPos;
+import net.minecraft.util.Mth;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
 
 public class Outliner {
 
@@ -38,7 +37,7 @@ public class Outliner {
         return outline.getParams();
     }
 
-    public OutlineParams showLine(Object slot, Vec3d start, Vec3d end) {
+    public OutlineParams showLine(Object slot, Vec3 start, Vec3 end) {
         if (!outlines.containsKey(slot)) {
             LineOutline outline = new LineOutline();
             addOutline(slot, outline);
@@ -49,7 +48,7 @@ public class Outliner {
         return entry.outline.getParams();
     }
 
-    public OutlineParams endChasingLine(Object slot, Vec3d start, Vec3d end, float chasingProgress, boolean lockStart) {
+    public OutlineParams endChasingLine(Object slot, Vec3 start, Vec3 end, float chasingProgress, boolean lockStart) {
         if (!outlines.containsKey(slot)) {
             EndChasingLineOutline outline = new EndChasingLineOutline(lockStart);
             addOutline(slot, outline);
@@ -60,21 +59,21 @@ public class Outliner {
         return entry.outline.getParams();
     }
 
-    public OutlineParams showAABB(Object slot, Box bb, int ttl) {
+    public OutlineParams showAABB(Object slot, AABB bb, int ttl) {
         createAABBOutlineIfMissing(slot, bb);
         ChasingAABBOutline outline = getAndRefreshAABB(slot, ttl);
         outline.prevBB = outline.targetBB = outline.bb = bb;
         return outline.getParams();
     }
 
-    public OutlineParams showAABB(Object slot, Box bb) {
+    public OutlineParams showAABB(Object slot, AABB bb) {
         createAABBOutlineIfMissing(slot, bb);
         ChasingAABBOutline outline = getAndRefreshAABB(slot);
         outline.prevBB = outline.targetBB = outline.bb = bb;
         return outline.getParams();
     }
 
-    public OutlineParams chaseAABB(Object slot, Box bb) {
+    public OutlineParams chaseAABB(Object slot, AABB bb) {
         createAABBOutlineIfMissing(slot, bb);
         ChasingAABBOutline outline = getAndRefreshAABB(slot);
         outline.targetBB = bb;
@@ -89,7 +88,7 @@ public class Outliner {
 
     //
 
-    public OutlineParams showItem(Object slot, Vec3d pos, ItemStack stack) {
+    public OutlineParams showItem(Object slot, Vec3 pos, ItemStack stack) {
         ItemOutline outline = new ItemOutline(pos, stack);
         OutlineEntry entry = new OutlineEntry(outline);
         outlines.put(slot, entry);
@@ -122,7 +121,7 @@ public class Outliner {
         outlines.put(slot, new OutlineEntry(outline));
     }
 
-    private void createAABBOutlineIfMissing(Object slot, Box bb) {
+    private void createAABBOutlineIfMissing(Object slot, AABB bb) {
         if (!outlines.containsKey(slot) || !(outlines.get(slot).outline instanceof AABBOutline)) {
             ChasingAABBOutline outline = new ChasingAABBOutline(bb);
             addOutline(slot, outline);
@@ -151,7 +150,7 @@ public class Outliner {
         }
     }
 
-    public void renderOutlines(MinecraftClient mc, MatrixStack ms, SuperRenderTypeBuffer buffer, Vec3d camera, float pt) {
+    public void renderOutlines(Minecraft mc, PoseStack ms, SuperRenderTypeBuffer buffer, Vec3 camera, float pt) {
         outlines.forEach((key, entry) -> {
             Outline outline = entry.getOutline();
             OutlineParams params = outline.getParams();
@@ -161,7 +160,7 @@ public class Outliner {
                 float fadeticks = OutlineEntry.FADE_TICKS;
                 float lastAlpha = prevTicks >= 0 ? 1 : 1 + (prevTicks / fadeticks);
                 float currentAlpha = 1 + (entry.ticksTillRemoval / fadeticks);
-                float alpha = MathHelper.lerp(pt, lastAlpha, currentAlpha);
+                float alpha = Mth.lerp(pt, lastAlpha, currentAlpha);
 
                 params.alpha = alpha * alpha * alpha;
                 if (params.alpha < 1 / 8f)

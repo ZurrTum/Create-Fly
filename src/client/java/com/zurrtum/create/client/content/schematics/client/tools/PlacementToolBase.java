@@ -1,6 +1,6 @@
 package com.zurrtum.create.client.content.schematics.client.tools;
 
-import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.Minecraft;
 
 public abstract class PlacementToolBase extends SchematicToolBase {
     @Override
@@ -9,7 +9,7 @@ public abstract class PlacementToolBase extends SchematicToolBase {
     }
 
     @Override
-    public boolean handleRightClick(MinecraftClient mc) {
+    public boolean handleRightClick(Minecraft mc) {
         return false;
     }
 }

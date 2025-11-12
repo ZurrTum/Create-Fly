@@ -7,14 +7,14 @@ import com.zurrtum.create.client.flywheel.api.vertex.VertexList;
 import com.zurrtum.create.client.flywheel.lib.material.Materials;
 import com.zurrtum.create.client.flywheel.lib.memory.MemoryBlock;
 import com.zurrtum.create.client.flywheel.lib.vertex.PosVertexView;
-import net.minecraft.client.render.BlockRenderLayer;
-import net.minecraft.client.render.RenderLayer;
-import net.minecraft.client.render.TexturedRenderLayers;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
 
 import java.util.Collection;
+import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.Sheets;
+import net.minecraft.client.renderer.chunk.ChunkSectionLayer;
 
 public final class ModelUtil {
     private static final float BOUNDING_SPHERE_EPSILON = 1e-4f;
@@ -23,59 +23,59 @@ public final class ModelUtil {
     }
 
     @Nullable
-    public static Material getMaterial(BlockRenderLayer chunkRenderType, boolean shaded) {
-        if (chunkRenderType == BlockRenderLayer.SOLID) {
+    public static Material getMaterial(ChunkSectionLayer chunkRenderType, boolean shaded) {
+        if (chunkRenderType == ChunkSectionLayer.SOLID) {
             return shaded ? Materials.SOLID_BLOCK : Materials.SOLID_UNSHADED_BLOCK;
         }
-        if (chunkRenderType == BlockRenderLayer.CUTOUT_MIPPED) {
+        if (chunkRenderType == ChunkSectionLayer.CUTOUT_MIPPED) {
             return shaded ? Materials.CUTOUT_MIPPED_BLOCK : Materials.CUTOUT_MIPPED_UNSHADED_BLOCK;
         }
-        if (chunkRenderType == BlockRenderLayer.CUTOUT) {
+        if (chunkRenderType == ChunkSectionLayer.CUTOUT) {
             return shaded ? Materials.CUTOUT_BLOCK : Materials.CUTOUT_UNSHADED_BLOCK;
         }
-        if (chunkRenderType == BlockRenderLayer.TRANSLUCENT) {
+        if (chunkRenderType == ChunkSectionLayer.TRANSLUCENT) {
             return shaded ? Materials.TRANSLUCENT_BLOCK : Materials.TRANSLUCENT_UNSHADED_BLOCK;
         }
-        if (chunkRenderType == BlockRenderLayer.TRIPWIRE) {
+        if (chunkRenderType == ChunkSectionLayer.TRIPWIRE) {
             return shaded ? Materials.TRIPWIRE_BLOCK : Materials.TRIPWIRE_UNSHADED_BLOCK;
         }
         return null;
     }
 
     @Nullable
-    public static Material getItemMaterial(RenderLayer renderType) {
-        if (renderType == RenderLayer.getSolid()) {
+    public static Material getItemMaterial(RenderType renderType) {
+        if (renderType == RenderType.solid()) {
             return Materials.SOLID_BLOCK;
         }
-        if (renderType == RenderLayer.getCutoutMipped()) {
+        if (renderType == RenderType.cutoutMipped()) {
             return Materials.CUTOUT_MIPPED_BLOCK;
         }
-        if (renderType == RenderLayer.getCutout()) {
+        if (renderType == RenderType.cutout()) {
             return Materials.CUTOUT_BLOCK;
         }
-        if (renderType == RenderLayer.getTripwire()) {
+        if (renderType == RenderType.tripwire()) {
             return Materials.TRIPWIRE_BLOCK;
         }
 
-        if (renderType == TexturedRenderLayers.getEntityCutout()) {
+        if (renderType == Sheets.cutoutBlockSheet()) {
             return Materials.CUTOUT_BLOCK;
         }
 
-        if (renderType == TexturedRenderLayers.getEntitySolid()) {
+        if (renderType == Sheets.solidBlockSheet()) {
             return Materials.SOLID_BLOCK;
         }
 
-        if (renderType == TexturedRenderLayers.getItemEntityTranslucentCull()) {
+        if (renderType == Sheets.translucentItemSheet()) {
             return Materials.TRANSLUCENT_ENTITY;
         }
 
-        if (renderType == RenderLayer.getGlint()) {
+        if (renderType == RenderType.glint()) {
             return Materials.GLINT;
         }
-        if (renderType == RenderLayer.getGlintTranslucent()) {
+        if (renderType == RenderType.glintTranslucent()) {
             return Materials.TRANSLUCENT_GLINT;
         }
-        if (renderType == RenderLayer.getEntityGlint()) {
+        if (renderType == RenderType.entityGlint()) {
             return Materials.GLINT_ENTITY;
         }
         return null;

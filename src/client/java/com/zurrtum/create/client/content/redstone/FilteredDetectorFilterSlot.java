@@ -1,15 +1,15 @@
 package com.zurrtum.create.client.content.redstone;
 
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.zurrtum.create.catnip.math.AngleHelper;
 import com.zurrtum.create.catnip.math.VecHelper;
 import com.zurrtum.create.client.flywheel.lib.transform.TransformStack;
 import com.zurrtum.create.client.foundation.blockEntity.behaviour.ValueBoxTransform;
 import com.zurrtum.create.content.redstone.DirectedDirectionalBlock;
-import net.minecraft.block.BlockState;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Direction.Axis;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.core.Direction;
+import net.minecraft.core.Direction.Axis;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.Vec3;
 
 public class FilteredDetectorFilterSlot extends ValueBoxTransform.Sided {
 
@@ -32,15 +32,15 @@ public class FilteredDetectorFilterSlot extends ValueBoxTransform.Sided {
         if (targetDirection == Direction.UP)
             direction = direction.getOpposite();
         if (!hasSlotAtBottom)
-            return direction == state.get(DirectedDirectionalBlock.FACING);
+            return direction == state.getValue(DirectedDirectionalBlock.FACING);
 
-        return direction.getAxis() == state.get(DirectedDirectionalBlock.FACING).rotateYClockwise().getAxis();
+        return direction.getAxis() == state.getValue(DirectedDirectionalBlock.FACING).getClockWise().getAxis();
     }
 
     @Override
-    public void rotate(BlockState state, MatrixStack ms) {
+    public void rotate(BlockState state, PoseStack ms) {
         super.rotate(state, ms);
-        Direction facing = state.get(DirectedDirectionalBlock.FACING);
+        Direction facing = state.getValue(DirectedDirectionalBlock.FACING);
         if (facing.getAxis() == Axis.Y)
             return;
         if (getSide() != Direction.UP)
@@ -49,7 +49,7 @@ public class FilteredDetectorFilterSlot extends ValueBoxTransform.Sided {
     }
 
     @Override
-    protected Vec3d getSouthLocation() {
+    protected Vec3 getSouthLocation() {
         return VecHelper.voxelSpace(8f, 8f, 15.5f);
     }
 

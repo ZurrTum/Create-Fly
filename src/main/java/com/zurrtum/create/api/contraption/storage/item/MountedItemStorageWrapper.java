@@ -2,8 +2,8 @@ package com.zurrtum.create.api.contraption.storage.item;
 
 import com.google.common.collect.ImmutableMap;
 import com.zurrtum.create.infrastructure.items.CombinedInvWrapper;
-import net.minecraft.inventory.Inventory;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.Container;
 
 /**
  * Wrapper around many MountedItemStorages, providing access to all of them as one storage.
@@ -13,7 +13,7 @@ public class MountedItemStorageWrapper extends CombinedInvWrapper {
     public final ImmutableMap<BlockPos, MountedItemStorage> storages;
 
     public MountedItemStorageWrapper(ImmutableMap<BlockPos, MountedItemStorage> storages) {
-        super(storages.values().toArray(Inventory[]::new));
+        super(storages.values().toArray(Container[]::new));
         this.storages = storages;
     }
 }

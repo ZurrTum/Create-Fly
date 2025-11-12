@@ -10,17 +10,16 @@ import com.zurrtum.create.catnip.data.Pair;
 import com.zurrtum.create.catnip.math.Pointing;
 import com.zurrtum.create.foundation.codec.CreateCodecs;
 import com.zurrtum.create.infrastructure.config.AllConfigs;
-import net.minecraft.block.BlockState;
-import net.minecraft.item.ItemStack;
-import net.minecraft.recipe.*;
-import net.minecraft.recipe.input.CraftingRecipeInput;
-import net.minecraft.registry.DynamicRegistryManager;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.storage.ReadView;
-import net.minecraft.storage.WriteView;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.RegistryAccess;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.*;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 
 import java.util.*;
 import java.util.function.Predicate;
@@ -80,32 +79,32 @@ public class RecipeGridHandler {
     }
 
     public static MechanicalCrafterBlockEntity getTargetingCrafter(MechanicalCrafterBlockEntity crafter) {
-        BlockState state = crafter.getCachedState();
+        BlockState state = crafter.getBlockState();
         if (!isCrafter(state))
             return null;
 
-        BlockPos targetPos = crafter.getPos().offset(MechanicalCrafterBlock.getTargetDirection(state));
-        MechanicalCrafterBlockEntity targetBE = CrafterHelper.getCrafter(crafter.getWorld(), targetPos);
+        BlockPos targetPos = crafter.getBlockPos().relative(MechanicalCrafterBlock.getTargetDirection(state));
+        MechanicalCrafterBlockEntity targetBE = CrafterHelper.getCrafter(crafter.getLevel(), targetPos);
         if (targetBE == null)
             return null;
 
-        BlockState targetState = targetBE.getCachedState();
+        BlockState targetState = targetBE.getBlockState();
         if (!isCrafter(targetState))
             return null;
-        if (state.get(HORIZONTAL_FACING) != targetState.get(HORIZONTAL_FACING))
+        if (state.getValue(HORIZONTAL_FACING) != targetState.getValue(HORIZONTAL_FACING))
             return null;
         return targetBE;
     }
 
     public static List<MechanicalCrafterBlockEntity> getPrecedingCrafters(MechanicalCrafterBlockEntity crafter) {
-        BlockPos pos = crafter.getPos();
-        World world = crafter.getWorld();
+        BlockPos pos = crafter.getBlockPos();
+        Level world = crafter.getLevel();
         List<MechanicalCrafterBlockEntity> crafters = new ArrayList<>();
-        BlockState blockState = crafter.getCachedState();
+        BlockState blockState = crafter.getBlockState();
         if (!isCrafter(blockState))
             return crafters;
 
-        Direction blockFacing = blockState.get(HORIZONTAL_FACING);
+        Direction blockFacing = blockState.getValue(HORIZONTAL_FACING);
         Direction blockPointing = MechanicalCrafterBlock.getTargetDirection(blockState);
         for (Direction facing : Iterate.directions) {
             if (blockFacing.getAxis() == facing.getAxis())
@@ -113,13 +112,13 @@ public class RecipeGridHandler {
             if (blockPointing == facing)
                 continue;
 
-            BlockPos neighbourPos = pos.offset(facing);
+            BlockPos neighbourPos = pos.relative(facing);
             BlockState neighbourState = world.getBlockState(neighbourPos);
             if (!isCrafter(neighbourState))
                 continue;
             if (MechanicalCrafterBlock.getTargetDirection(neighbourState) != facing.getOpposite())
                 continue;
-            if (blockFacing != neighbourState.get(HORIZONTAL_FACING))
+            if (blockFacing != neighbourState.getValue(HORIZONTAL_FACING))
                 continue;
             MechanicalCrafterBlockEntity be = CrafterHelper.getCrafter(world, neighbourPos);
             if (be == null)
@@ -132,30 +131,30 @@ public class RecipeGridHandler {
     }
 
     private static boolean isCrafter(BlockState state) {
-        return state.isOf(AllBlocks.MECHANICAL_CRAFTER);
+        return state.is(AllBlocks.MECHANICAL_CRAFTER);
     }
 
-    public static ItemStack tryToApplyRecipe(ServerWorld world, GroupedItems items) {
+    public static ItemStack tryToApplyRecipe(ServerLevel world, GroupedItems items) {
         items.calcStats();
-        CraftingRecipeInput craftingInput = items.toCraftingInput();
+        CraftingInput craftingInput = items.toCraftingInput();
         ItemStack result = null;
-        DynamicRegistryManager registryAccess = world.getRegistryManager();
-        ServerRecipeManager recipeManager = world.getRecipeManager();
+        RegistryAccess registryAccess = world.registryAccess();
+        RecipeManager recipeManager = world.recipeAccess();
         if (AllConfigs.server().recipes.allowRegularCraftingInCrafter.get()) {
-            result = recipeManager.preparedRecipes.find(RecipeType.CRAFTING, craftingInput, world).filter(r -> isRecipeAllowed(r, craftingInput))
-                .findFirst().map(r -> r.value().craft(craftingInput, registryAccess)).orElse(null);
+            result = recipeManager.recipes.getRecipesFor(RecipeType.CRAFTING, craftingInput, world).filter(r -> isRecipeAllowed(r, craftingInput))
+                .findFirst().map(r -> r.value().assemble(craftingInput, registryAccess)).orElse(null);
         }
         if (result == null)
-            result = recipeManager.getFirstMatch(AllRecipeTypes.MECHANICAL_CRAFTING, craftingInput, world)
-                .map(r -> r.value().craft(craftingInput, registryAccess)).orElse(null);
+            result = recipeManager.getRecipeFor(AllRecipeTypes.MECHANICAL_CRAFTING, craftingInput, world)
+                .map(r -> r.value().assemble(craftingInput, registryAccess)).orElse(null);
         return result;
     }
 
-    public static boolean isRecipeAllowed(RecipeEntry<CraftingRecipe> recipe, CraftingRecipeInput craftingInput) {
+    public static boolean isRecipeAllowed(RecipeHolder<CraftingRecipe> recipe, CraftingInput craftingInput) {
         if (recipe.value() instanceof FireworkRocketRecipe) {
             int numItems = 0;
             for (int i = 0; i < craftingInput.size(); i++) {
-                if (!craftingInput.getStackInSlot(i).isEmpty()) {
+                if (!craftingInput.getItem(i).isEmpty()) {
                     numItems++;
                 }
             }
@@ -200,22 +199,22 @@ public class RecipeGridHandler {
             other.statsReady = false;
         }
 
-        public void write(WriteView view) {
-            WriteView.ListView list = view.getList("Grid");
+        public void write(ValueOutput view) {
+            ValueOutput.ValueOutputList list = view.childrenList("Grid");
             grid.forEach((pair, stack) -> {
-                WriteView entry = list.add();
+                ValueOutput entry = list.addChild();
                 entry.putInt("x", pair.getFirst());
                 entry.putInt("y", pair.getSecond());
-                entry.put("item", ItemStack.OPTIONAL_CODEC, stack);
+                entry.store("item", ItemStack.OPTIONAL_CODEC, stack);
             });
         }
 
-        public static GroupedItems read(ReadView view) {
+        public static GroupedItems read(ValueInput view) {
             GroupedItems items = new GroupedItems();
-            ReadView.ListReadView list = view.getListReadView("Grid");
+            ValueInput.ValueInputList list = view.childrenListOrEmpty("Grid");
             list.forEach(entry -> {
-                int x = entry.getInt("x", 0);
-                int y = entry.getInt("y", 0);
+                int x = entry.getIntOr("x", 0);
+                int y = entry.getIntOr("y", 0);
                 ItemStack stack = entry.read("item", ItemStack.OPTIONAL_CODEC).orElse(ItemStack.EMPTY);
                 items.grid.put(Pair.of(x, y), stack);
             });
@@ -252,7 +251,7 @@ public class RecipeGridHandler {
             return true;
         }
 
-        public CraftingRecipeInput toCraftingInput() {
+        public CraftingInput toCraftingInput() {
             List<ItemStack> list = new ArrayList<>(width * height);
             int minX = Integer.MAX_VALUE;
             int maxX = Integer.MIN_VALUE;
@@ -283,7 +282,7 @@ public class RecipeGridHandler {
                 }
             }
 
-            return new CraftingRecipeInput(w, h, list);
+            return new CraftingInput(w, h, list);
         }
     }
 

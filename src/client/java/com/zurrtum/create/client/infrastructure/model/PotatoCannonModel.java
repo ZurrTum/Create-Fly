@@ -1,35 +1,36 @@
 package com.zurrtum.create.client.infrastructure.model;
 
 import com.google.common.base.Suppliers;
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
+import com.mojang.math.Axis;
 import com.mojang.serialization.MapCodec;
 import com.zurrtum.create.client.Create;
 import com.zurrtum.create.client.catnip.animation.AnimationTickHolder;
 import com.zurrtum.create.content.equipment.potatoCannon.PotatoCannonItem;
 import com.zurrtum.create.content.equipment.potatoCannon.PotatoCannonItem.Ammo;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.item.ItemModelManager;
-import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.client.render.RenderLayer;
-import net.minecraft.client.render.TexturedRenderLayers;
-import net.minecraft.client.render.VertexConsumer;
-import net.minecraft.client.render.command.OrderedRenderCommandQueue;
-import net.minecraft.client.render.item.ItemRenderState;
-import net.minecraft.client.render.item.ItemRenderState.LayerRenderState;
-import net.minecraft.client.render.item.model.BasicItemModel;
-import net.minecraft.client.render.item.model.ItemModel;
-import net.minecraft.client.render.item.model.special.SpecialModelRenderer;
-import net.minecraft.client.render.model.*;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.client.world.ClientWorld;
-import net.minecraft.item.ItemDisplayContext;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.Arm;
-import net.minecraft.util.HeldItemContext;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.Pair;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.RotationAxis;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.Sheets;
+import net.minecraft.client.renderer.SubmitNodeCollector;
+import net.minecraft.client.renderer.block.model.BakedQuad;
+import net.minecraft.client.renderer.block.model.TextureSlots;
+import net.minecraft.client.renderer.item.*;
+import net.minecraft.client.renderer.item.ItemStackRenderState.LayerRenderState;
+import net.minecraft.client.renderer.special.SpecialModelRenderer;
+import net.minecraft.client.resources.model.BlockModelRotation;
+import net.minecraft.client.resources.model.ModelBaker;
+import net.minecraft.client.resources.model.ResolvedModel;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.Mth;
+import net.minecraft.util.Tuple;
+import net.minecraft.world.entity.HumanoidArm;
+import net.minecraft.world.entity.ItemOwner;
+import net.minecraft.world.item.ItemDisplayContext;
+import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix3x2fStack;
 import org.joml.Vector3f;
@@ -41,88 +42,88 @@ import java.util.function.Supplier;
 import static com.zurrtum.create.Create.MOD_ID;
 
 public class PotatoCannonModel implements ItemModel, SpecialModelRenderer<PotatoCannonModel.CogRenderData> {
-    public static final Identifier ID = Identifier.of(MOD_ID, "model/potato_cannon");
-    public static final Identifier ITEM_ID = Identifier.of(MOD_ID, "item/potato_cannon/item");
-    public static final Identifier COG_ID = Identifier.of(MOD_ID, "item/potato_cannon/cog");
+    public static final ResourceLocation ID = ResourceLocation.fromNamespaceAndPath(MOD_ID, "model/potato_cannon");
+    public static final ResourceLocation ITEM_ID = ResourceLocation.fromNamespaceAndPath(MOD_ID, "item/potato_cannon/item");
+    public static final ResourceLocation COG_ID = ResourceLocation.fromNamespaceAndPath(MOD_ID, "item/potato_cannon/cog");
 
-    private final RenderLayer layer = TexturedRenderLayers.getItemEntityTranslucentCull();
+    private final RenderType layer = Sheets.translucentItemSheet();
     private final List<BakedQuad> itemQuads;
-    private final ModelSettings itemSettings;
+    private final ModelRenderProperties itemSettings;
     private final Supplier<Vector3f[]> itemVector;
     private final List<BakedQuad> cogQuads;
-    private final ModelSettings cogSettings;
+    private final ModelRenderProperties cogSettings;
     private final Supplier<Vector3f[]> cogVector;
 
-    public PotatoCannonModel(Pair<List<BakedQuad>, ModelSettings> item, Pair<List<BakedQuad>, ModelSettings> cog) {
-        itemQuads = item.getLeft();
-        itemSettings = item.getRight();
-        itemVector = Suppliers.memoize(() -> BasicItemModel.bakeQuads(itemQuads));
-        cogQuads = cog.getLeft();
-        cogSettings = cog.getRight();
-        cogVector = Suppliers.memoize(() -> BasicItemModel.bakeQuads(cogQuads));
+    public PotatoCannonModel(Tuple<List<BakedQuad>, ModelRenderProperties> item, Tuple<List<BakedQuad>, ModelRenderProperties> cog) {
+        itemQuads = item.getA();
+        itemSettings = item.getB();
+        itemVector = Suppliers.memoize(() -> BlockModelWrapper.computeExtents(itemQuads));
+        cogQuads = cog.getA();
+        cogSettings = cog.getB();
+        cogVector = Suppliers.memoize(() -> BlockModelWrapper.computeExtents(cogQuads));
     }
 
     @Override
     public void update(
-        ItemRenderState state,
+        ItemStackRenderState state,
         ItemStack stack,
-        ItemModelManager resolver,
+        ItemModelResolver resolver,
         ItemDisplayContext displayContext,
-        @Nullable ClientWorld world,
-        @Nullable HeldItemContext user,
+        @Nullable ClientLevel world,
+        @Nullable ItemOwner user,
         int seed
     ) {
-        state.addModelKey(this);
-        state.markAnimated();
-        ItemRenderState.Glint glint;
-        if (stack.hasGlint()) {
-            state.addModelKey(ItemRenderState.Glint.STANDARD);
-            glint = ItemRenderState.Glint.STANDARD;
+        state.appendModelIdentityElement(this);
+        state.setAnimated();
+        ItemStackRenderState.FoilType glint;
+        if (stack.hasFoil()) {
+            state.appendModelIdentityElement(ItemStackRenderState.FoilType.STANDARD);
+            glint = ItemStackRenderState.FoilType.STANDARD;
         } else {
-            glint = ItemRenderState.Glint.NONE;
+            glint = ItemStackRenderState.FoilType.NONE;
         }
         update(state, displayContext, itemQuads, itemSettings, itemVector, glint);
 
         CogRenderData cog = new CogRenderData();
         cog.state = update(state, displayContext, cogQuads, cogSettings, cogVector, glint);
-        cog.state.setTransform(itemSettings.transforms().getTransformation(displayContext));
+        cog.state.setTransform(itemSettings.transforms().getTransform(displayContext));
         cog.rotation = AnimationTickHolder.getRenderTime() * -2.5f;
         boolean inMainHand = displayContext == ItemDisplayContext.FIRST_PERSON_RIGHT_HAND || displayContext == ItemDisplayContext.THIRD_PERSON_RIGHT_HAND;
         if (inMainHand || displayContext == ItemDisplayContext.FIRST_PERSON_LEFT_HAND || displayContext == ItemDisplayContext.THIRD_PERSON_LEFT_HAND) {
-            ClientPlayerEntity player = MinecraftClient.getInstance().player;
+            LocalPlayer player = Minecraft.getInstance().player;
             if (player != null) {
-                boolean leftHanded = player.getMainArm() == Arm.LEFT;
+                boolean leftHanded = player.getMainArm() == HumanoidArm.LEFT;
                 float speed = Create.POTATO_CANNON_RENDER_HANDLER.getAnimation(inMainHand ^ leftHanded, AnimationTickHolder.getPartialTicks());
-                cog.rotation += 360 * MathHelper.clamp(speed * 5, 0, 1);
+                cog.rotation += 360 * Mth.clamp(speed * 5, 0, 1);
             }
         }
         cog.rotation %= 360;
-        cog.state.setSpecialModel(this, cog);
+        cog.state.setupSpecialModel(this, cog);
     }
 
     private LayerRenderState update(
-        ItemRenderState state,
+        ItemStackRenderState state,
         ItemDisplayContext displayContext,
         List<BakedQuad> quads,
-        ModelSettings settings,
+        ModelRenderProperties settings,
         Supplier<Vector3f[]> vector,
-        ItemRenderState.Glint glint
+        ItemStackRenderState.FoilType glint
     ) {
         LayerRenderState layerRenderState = state.newLayer();
-        layerRenderState.setRenderLayer(layer);
-        layerRenderState.setVertices(vector);
-        settings.addSettings(layerRenderState, displayContext);
-        layerRenderState.getQuads().addAll(quads);
-        layerRenderState.setGlint(glint);
+        layerRenderState.setRenderType(layer);
+        layerRenderState.setExtents(vector);
+        settings.applyToLayer(layerRenderState, displayContext);
+        layerRenderState.prepareQuadList().addAll(quads);
+        layerRenderState.setFoilType(glint);
         return layerRenderState;
     }
 
     @Override
-    public void render(
+    public void submit(
         CogRenderData data,
         ItemDisplayContext displayContext,
-        MatrixStack matrices,
-        OrderedRenderCommandQueue queue,
+        PoseStack matrices,
+        SubmitNodeCollector queue,
         int light,
         int overlay,
         boolean glint,
@@ -130,13 +131,13 @@ public class PotatoCannonModel implements ItemModel, SpecialModelRenderer<Potato
     ) {
         assert data != null;
         matrices.translate(0.5f, 0.53125f, 0.5f);
-        matrices.multiply(RotationAxis.POSITIVE_Z.rotationDegrees(data.rotation));
+        matrices.mulPose(Axis.ZP.rotationDegrees(data.rotation));
         matrices.translate(-0.5f, -0.53125f, -0.5f);
         LayerRenderState state = data.state;
-        queue.submitItem(matrices, displayContext, light, overlay, 0, state.tints, state.quads, state.renderLayer, state.glint);
+        queue.submitItem(matrices, displayContext, light, overlay, 0, state.tintLayers, state.quads, state.renderType, state.foilType);
     }
 
-    public static void renderDecorator(MinecraftClient client, DrawContext drawContext, ItemStack stack, int x, int y) {
+    public static void renderDecorator(Minecraft client, GuiGraphics drawContext, ItemStack stack, int x, int y) {
         if (client.player == null) {
             return;
         }
@@ -144,15 +145,15 @@ public class PotatoCannonModel implements ItemModel, SpecialModelRenderer<Potato
         if (ammo == null) {
             return;
         }
-        Matrix3x2fStack matrices = drawContext.getMatrices();
+        Matrix3x2fStack matrices = drawContext.pose();
         matrices.translate(x, y + 8);
         matrices.scale(0.5f);
-        drawContext.drawItem(ammo.stack(), 0, 0);
+        drawContext.renderItem(ammo.stack(), 0, 0);
     }
 
     private void fill(
         VertexConsumer vertexConsumer,
-        MatrixStack.Entry entry,
+        PoseStack.Pose entry,
         int x1,
         int x2,
         int y1,
@@ -163,10 +164,10 @@ public class PotatoCannonModel implements ItemModel, SpecialModelRenderer<Potato
         int blue,
         int alpha
     ) {
-        vertexConsumer.vertex(entry, x1, y1, depth).color(red, green, blue, alpha);
-        vertexConsumer.vertex(entry, x1, y2, depth).color(red, green, blue, alpha);
-        vertexConsumer.vertex(entry, x2, y2, depth).color(red, green, blue, alpha);
-        vertexConsumer.vertex(entry, x2, y1, depth).color(red, green, blue, alpha);
+        vertexConsumer.addVertex(entry, x1, y1, depth).setColor(red, green, blue, alpha);
+        vertexConsumer.addVertex(entry, x1, y2, depth).setColor(red, green, blue, alpha);
+        vertexConsumer.addVertex(entry, x2, y2, depth).setColor(red, green, blue, alpha);
+        vertexConsumer.addVertex(entry, x2, y1, depth).setColor(red, green, blue, alpha);
     }
 
     public static class CogRenderData {
@@ -175,41 +176,41 @@ public class PotatoCannonModel implements ItemModel, SpecialModelRenderer<Potato
     }
 
     @Override
-    public void collectVertices(Set<Vector3f> vertices) {
+    public void getExtents(Set<Vector3f> vertices) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public CogRenderData getData(ItemStack stack) {
+    public CogRenderData extractArgument(ItemStack stack) {
         throw new UnsupportedOperationException();
     }
 
     public static class Unbaked implements ItemModel.Unbaked {
-        public static final MapCodec<Unbaked> CODEC = MapCodec.unit(Unbaked::new);
+        public static final MapCodec<com.zurrtum.create.client.infrastructure.model.PotatoCannonModel.Unbaked> CODEC = MapCodec.unit(com.zurrtum.create.client.infrastructure.model.PotatoCannonModel.Unbaked::new);
 
         @Override
-        public MapCodec<Unbaked> getCodec() {
+        public MapCodec<com.zurrtum.create.client.infrastructure.model.PotatoCannonModel.Unbaked> type() {
             return CODEC;
         }
 
         @Override
-        public void resolve(Resolver resolver) {
+        public void resolveDependencies(Resolver resolver) {
             resolver.markDependency(ITEM_ID);
             resolver.markDependency(COG_ID);
         }
 
         @Override
-        public ItemModel bake(ItemModel.BakeContext context) {
-            Baker baker = context.blockModelBaker();
+        public ItemModel bake(ItemModel.BakingContext context) {
+            ModelBaker baker = context.blockModelBaker();
             return new PotatoCannonModel(bake(baker, ITEM_ID), bake(baker, COG_ID));
         }
 
-        private static Pair<List<BakedQuad>, ModelSettings> bake(Baker baker, Identifier id) {
-            BakedSimpleModel model = baker.getModel(id);
-            ModelTextures textures = model.getTextures();
-            List<BakedQuad> quads = model.bakeGeometry(textures, baker, ModelRotation.X0_Y0).getAllQuads();
-            ModelSettings settings = ModelSettings.resolveSettings(baker, model, textures);
-            return new Pair<>(quads, settings);
+        private static Tuple<List<BakedQuad>, ModelRenderProperties> bake(ModelBaker baker, ResourceLocation id) {
+            ResolvedModel model = baker.getModel(id);
+            TextureSlots textures = model.getTopTextureSlots();
+            List<BakedQuad> quads = model.bakeTopGeometry(textures, baker, BlockModelRotation.X0_Y0).getAll();
+            ModelRenderProperties settings = ModelRenderProperties.fromResolvedModel(baker, model, textures);
+            return new Tuple<>(quads, settings);
         }
     }
 }

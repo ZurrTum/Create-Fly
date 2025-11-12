@@ -8,18 +8,18 @@ import com.zurrtum.create.catnip.codecs.stream.CatnipStreamCodecBuilders;
 import com.zurrtum.create.foundation.codec.CreateCodecs;
 import com.zurrtum.create.foundation.item.ItemSlots;
 import com.zurrtum.create.infrastructure.items.ItemInventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.network.RegistryByteBuf;
-import net.minecraft.network.codec.PacketCodec;
-import net.minecraft.storage.ReadView;
-import net.minecraft.storage.WriteView;
-import net.minecraft.util.collection.DefaultedList;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Consumer;
+import net.minecraft.core.NonNullList;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 
 public class ToolboxInventory implements ItemInventory {
     public static final int STACKS_PER_COMPARTMENT = 4;
@@ -29,23 +29,23 @@ public class ToolboxInventory implements ItemInventory {
         ItemStack.OPTIONAL_CODEC.listOf().fieldOf("filters").forGetter(toolbox -> toolbox.filters)
     ).apply(instance, ToolboxInventory::deserialize));
 
-    public static final PacketCodec<RegistryByteBuf, ToolboxInventory> STREAM_CODEC = PacketCodec.tuple(
+    public static final StreamCodec<RegistryFriendlyByteBuf, ToolboxInventory> STREAM_CODEC = StreamCodec.composite(
         ItemSlots.STREAM_CODEC,
         ItemSlots::fromHandler,
-        CatnipStreamCodecBuilders.list(ItemStack.OPTIONAL_PACKET_CODEC),
+        CatnipStreamCodecBuilders.list(ItemStack.OPTIONAL_STREAM_CODEC),
         toolbox -> toolbox.filters,
         ToolboxInventory::deserialize
     );
 
-    public DefaultedList<ItemStack> filters;
-    DefaultedList<ItemStack> stacks;
+    public NonNullList<ItemStack> filters;
+    NonNullList<ItemStack> stacks;
     @Nullable
     private final ToolboxBlockEntity blockEntity;
     private boolean limitedMode;
 
     public ToolboxInventory(@Nullable ToolboxBlockEntity be) {
-        filters = DefaultedList.ofSize(8, ItemStack.EMPTY);
-        stacks = DefaultedList.ofSize(SIZE, ItemStack.EMPTY);
+        filters = NonNullList.withSize(8, ItemStack.EMPTY);
+        stacks = NonNullList.withSize(SIZE, ItemStack.EMPTY);
         blockEntity = be;
         limitedMode = false;
     }
@@ -57,12 +57,12 @@ public class ToolboxInventory implements ItemInventory {
     }
 
     @Override
-    public int size() {
+    public int getContainerSize() {
         return SIZE;
     }
 
     @Override
-    public ItemStack getStack(int slot) {
+    public ItemStack getItem(int slot) {
         if (slot >= SIZE) {
             return ItemStack.EMPTY;
         }
@@ -70,8 +70,8 @@ public class ToolboxInventory implements ItemInventory {
     }
 
     @Override
-    public boolean isValid(int slot, ItemStack stack) {
-        if (!stack.getItem().canBeNested()) {
+    public boolean canPlaceItem(int slot, ItemStack stack) {
+        if (!stack.getItem().canFitInsideContainerItems()) {
             return false;
         }
         if (slot >= SIZE) {
@@ -86,7 +86,7 @@ public class ToolboxInventory implements ItemInventory {
     }
 
     @Override
-    public void setStack(int slot, ItemStack stack) {
+    public void setItem(int slot, ItemStack stack) {
         if (slot >= SIZE) {
             return;
         }
@@ -100,7 +100,7 @@ public class ToolboxInventory implements ItemInventory {
     }
 
     public int distributeToCompartment(@NotNull ItemStack stack, int compartment, boolean simulate) {
-        if (stack.isEmpty() || !stack.getItem().canBeNested()) {
+        if (stack.isEmpty() || !stack.getItem().canFitInsideContainerItems()) {
             return 0;
         }
         ItemStack filter = filters.get(compartment);
@@ -108,11 +108,11 @@ public class ToolboxInventory implements ItemInventory {
             return 0;
         }
         int maxAmount = stack.getCount();
-        int stackSize = stack.getMaxCount();
+        int stackSize = stack.getMaxStackSize();
         if (simulate) {
             int count = 0;
             for (int i = compartment * STACKS_PER_COMPARTMENT, end = i + STACKS_PER_COMPARTMENT; i < end; i++) {
-                ItemStack target = getStack(i);
+                ItemStack target = getItem(i);
                 if (target.isEmpty()) {
                     return maxAmount;
                 } else {
@@ -126,10 +126,10 @@ public class ToolboxInventory implements ItemInventory {
         } else {
             int remaining = maxAmount;
             for (int i = compartment * STACKS_PER_COMPARTMENT, end = i + STACKS_PER_COMPARTMENT; i < end; i++) {
-                ItemStack target = getStack(i);
+                ItemStack target = getItem(i);
                 if (target.isEmpty()) {
-                    setStack(i, directCopy(stack, remaining));
-                    markDirty();
+                    setItem(i, directCopy(stack, remaining));
+                    setChanged();
                     return maxAmount;
                 } else {
                     int count = target.getCount();
@@ -137,7 +137,7 @@ public class ToolboxInventory implements ItemInventory {
                         int insert = Math.min(remaining, stackSize - count);
                         target.setCount(count + insert);
                         if (remaining == insert) {
-                            markDirty();
+                            setChanged();
                             return maxAmount;
                         }
                         remaining -= insert;
@@ -147,7 +147,7 @@ public class ToolboxInventory implements ItemInventory {
             if (remaining == maxAmount) {
                 return 0;
             }
-            markDirty();
+            setChanged();
             return maxAmount - remaining;
         }
     }
@@ -168,7 +168,7 @@ public class ToolboxInventory implements ItemInventory {
                     return directCopy(findStack, maxAmount);
                 }
                 for (int j = i - 1; j >= index; j--) {
-                    ItemStack stack = getStack(i);
+                    ItemStack stack = getItem(i);
                     if (stack.isEmpty()) {
                         continue;
                     }
@@ -186,7 +186,7 @@ public class ToolboxInventory implements ItemInventory {
             if (stack == ItemStack.EMPTY) {
                 return stack;
             }
-            markDirty();
+            setChanged();
             return stack;
         }
     }
@@ -202,7 +202,7 @@ public class ToolboxInventory implements ItemInventory {
                 findStack.setCount(count - maxAmount);
                 return directCopy(findStack, maxAmount);
             }
-            setStack(i, ItemStack.EMPTY);
+            setItem(i, ItemStack.EMPTY);
             if (count == maxAmount) {
                 return findStack;
             }
@@ -214,12 +214,12 @@ public class ToolboxInventory implements ItemInventory {
                 }
                 count = stack.getCount();
                 if (count < remaining) {
-                    setStack(i, ItemStack.EMPTY);
+                    setItem(i, ItemStack.EMPTY);
                     remaining -= count;
                     continue;
                 }
                 if (count == remaining) {
-                    setStack(i, ItemStack.EMPTY);
+                    setItem(i, ItemStack.EMPTY);
                 } else {
                     stack.setCount(count - remaining);
                 }
@@ -233,32 +233,32 @@ public class ToolboxInventory implements ItemInventory {
     }
 
     @Override
-    public void markDirty() {
+    public void setChanged() {
         if (blockEntity != null) {
             blockEntity.notifyUpdate();
         }
     }
 
     public static ItemStack cleanItemNBT(ItemStack stack) {
-        if (stack.isOf(AllItems.BELT_CONNECTOR))
+        if (stack.is(AllItems.BELT_CONNECTOR))
             stack.remove(AllDataComponents.BELT_FIRST_SHAFT);
         return stack;
     }
 
     public static boolean canItemsShareCompartment(ItemStack stack1, ItemStack stack2) {
-        if (!stack1.isStackable() && !stack2.isStackable() && stack1.isDamageable() && stack2.isDamageable())
+        if (!stack1.isStackable() && !stack2.isStackable() && stack1.isDamageableItem() && stack2.isDamageableItem())
             return stack1.getItem() == stack2.getItem();
-        if (stack1.isOf(AllItems.BELT_CONNECTOR) && stack2.isOf(AllItems.BELT_CONNECTOR))
+        if (stack1.is(AllItems.BELT_CONNECTOR) && stack2.is(AllItems.BELT_CONNECTOR))
             return true;
-        return ItemStack.areItemsAndComponentsEqual(stack1, stack2);
+        return ItemStack.isSameItemSameComponents(stack1, stack2);
     }
 
-    public void write(WriteView view) {
-        view.put("Items", ItemSlots.CODEC, ItemSlots.fromHandler(this));
-        view.put("Compartments", CreateCodecs.ITEM_LIST_CODEC, filters);
+    public void write(ValueOutput view) {
+        view.store("Items", ItemSlots.CODEC, ItemSlots.fromHandler(this));
+        view.store("Compartments", CreateCodecs.ITEM_LIST_CODEC, filters);
     }
 
-    public void read(ReadView view) {
+    public void read(ValueInput view) {
         view.read("Items", ItemSlots.CODEC).ifPresentOrElse(
             slots -> {
                 boolean[] fill = new boolean[SIZE];

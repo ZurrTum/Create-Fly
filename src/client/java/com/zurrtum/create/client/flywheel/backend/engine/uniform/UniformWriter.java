@@ -1,13 +1,13 @@
 package com.zurrtum.create.client.flywheel.backend.engine.uniform;
 
 import com.zurrtum.create.client.flywheel.lib.util.ExtraMemoryOps;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.fluid.FluidState;
-import net.minecraft.registry.tag.FluidTags;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.tags.FluidTags;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.material.FluidState;
+import net.minecraft.world.phys.Vec3;
 import org.joml.Matrix4f;
 import org.joml.Vector3fc;
 import org.lwjgl.system.MemoryUtil;
@@ -76,7 +76,7 @@ class UniformWriter {
         return ptr + 64;
     }
 
-    static long writeInFluidAndBlock(long ptr, World level, BlockPos blockPos, Vec3d pos) {
+    static long writeInFluidAndBlock(long ptr, Level level, BlockPos blockPos, Vec3 pos) {
         FluidState fluidState = level.getFluidState(blockPos);
         BlockState blockState = level.getBlockState(blockPos);
         float height = fluidState.getHeight(level, blockPos);
@@ -85,9 +85,9 @@ class UniformWriter {
             MemoryUtil.memPutInt(ptr, 0);
         } else if (pos.y < blockPos.getY() + height) {
             // TODO: handle custom fluids via defines
-            if (fluidState.isIn(FluidTags.WATER)) {
+            if (fluidState.is(FluidTags.WATER)) {
                 MemoryUtil.memPutInt(ptr, 1);
-            } else if (fluidState.isIn(FluidTags.LAVA)) {
+            } else if (fluidState.is(FluidTags.LAVA)) {
                 MemoryUtil.memPutInt(ptr, 2);
             } else {
                 MemoryUtil.memPutInt(ptr, -1);
@@ -98,7 +98,7 @@ class UniformWriter {
             MemoryUtil.memPutInt(ptr + 4, 0);
         } else {
             // TODO: handle custom blocks via defines
-            if (blockState.isOf(Blocks.POWDER_SNOW)) {
+            if (blockState.is(Blocks.POWDER_SNOW)) {
                 MemoryUtil.memPutInt(ptr + 4, 0);
             } else {
                 MemoryUtil.memPutInt(ptr + 4, -1);

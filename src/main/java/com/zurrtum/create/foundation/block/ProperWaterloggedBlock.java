@@ -1,15 +1,15 @@
 package com.zurrtum.create.foundation.block;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Waterloggable;
-import net.minecraft.fluid.FluidState;
-import net.minecraft.fluid.Fluids;
-import net.minecraft.item.ItemPlacementContext;
-import net.minecraft.state.property.BooleanProperty;
-import net.minecraft.state.property.Properties;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.WorldView;
-import net.minecraft.world.tick.ScheduledTickView;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.level.LevelReader;
+import net.minecraft.world.level.ScheduledTickAccess;
+import net.minecraft.world.level.block.SimpleWaterloggedBlock;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.block.state.properties.BooleanProperty;
+import net.minecraft.world.level.material.FluidState;
+import net.minecraft.world.level.material.Fluids;
 
 /**
  * Waterlog checklist: <br>
@@ -19,32 +19,32 @@ import net.minecraft.world.tick.ScheduledTickView;
  * 4. getStateForPlacement -> call withWater <br>
  * 5. updateShape -> call updateWater
  */
-public interface ProperWaterloggedBlock extends Waterloggable {
+public interface ProperWaterloggedBlock extends SimpleWaterloggedBlock {
 
-    BooleanProperty WATERLOGGED = Properties.WATERLOGGED;
+    BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
 
     default FluidState fluidState(BlockState state) {
-        return state.get(WATERLOGGED) ? Fluids.WATER.getStill(false) : Fluids.EMPTY.getDefaultState();
+        return state.getValue(WATERLOGGED) ? Fluids.WATER.getSource(false) : Fluids.EMPTY.defaultFluidState();
     }
 
-    default void updateWater(WorldView level, ScheduledTickView tickView, BlockState state, BlockPos pos) {
-        if (state.get(Properties.WATERLOGGED))
-            tickView.scheduleFluidTick(pos, Fluids.WATER, Fluids.WATER.getTickRate(level));
+    default void updateWater(LevelReader level, ScheduledTickAccess tickView, BlockState state, BlockPos pos) {
+        if (state.getValue(BlockStateProperties.WATERLOGGED))
+            tickView.scheduleTick(pos, Fluids.WATER, Fluids.WATER.getTickDelay(level));
     }
 
-    default BlockState withWater(BlockState placementState, ItemPlacementContext ctx) {
-        return withWater(ctx.getWorld(), placementState, ctx.getBlockPos());
+    default BlockState withWater(BlockState placementState, BlockPlaceContext ctx) {
+        return withWater(ctx.getLevel(), placementState, ctx.getClickedPos());
     }
 
-    static BlockState withWater(WorldView level, BlockState placementState, BlockPos pos) {
+    static BlockState withWater(LevelReader level, BlockState placementState, BlockPos pos) {
         if (placementState == null)
             return null;
         FluidState ifluidstate = level.getFluidState(pos);
         if (placementState.isAir())
-            return ifluidstate.getFluid() == Fluids.WATER ? ifluidstate.getBlockState() : placementState;
-        if (!(placementState.getBlock() instanceof Waterloggable))
+            return ifluidstate.getType() == Fluids.WATER ? ifluidstate.createLegacyBlock() : placementState;
+        if (!(placementState.getBlock() instanceof SimpleWaterloggedBlock))
             return placementState;
-        return placementState.with(Properties.WATERLOGGED, ifluidstate.getFluid() == Fluids.WATER);
+        return placementState.setValue(BlockStateProperties.WATERLOGGED, ifluidstate.getType() == Fluids.WATER);
     }
 
 }

@@ -7,29 +7,29 @@ import com.zurrtum.create.client.content.trains.schedule.IScheduleInput;
 import com.zurrtum.create.client.foundation.gui.ModularGuiLineBuilder;
 import com.zurrtum.create.client.foundation.utility.CreateLang;
 import com.zurrtum.create.content.trains.schedule.condition.PlayerPassengerCondition;
-import net.minecraft.item.ItemStack;
-import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.item.ItemStack;
 
 import java.util.List;
 
 public class PlayerPassengerConditionRender implements IScheduleInput<PlayerPassengerCondition> {
     @Override
-    public Pair<ItemStack, Text> getSummary(PlayerPassengerCondition input) {
+    public Pair<ItemStack, Component> getSummary(PlayerPassengerCondition input) {
         int target = input.getTarget();
         return Pair.of(
-            AllItems.YELLOW_SEAT.getDefaultStack(),
+            AllItems.YELLOW_SEAT.getDefaultInstance(),
             CreateLang.translateDirect("schedule.condition.player_count." + (target == 1 ? "summary" : "summary_plural"), target)
         );
     }
 
     @Override
-    public List<Text> getTitleAs(PlayerPassengerCondition input, String type) {
+    public List<Component> getTitleAs(PlayerPassengerCondition input, String type) {
         int target = input.getTarget();
         return ImmutableList.of(CreateLang.translateDirect(
             "schedule.condition.player_count.seated", CreateLang.translateDirect(
                 "schedule.condition.player_count." + (target == 1 ? "summary" : "summary_plural"),
-                Text.literal("" + target).formatted(Formatting.DARK_AQUA)
+                Component.literal("" + target).withStyle(ChatFormatting.DARK_AQUA)
             )
         ));
     }

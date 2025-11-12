@@ -5,42 +5,41 @@ import com.zurrtum.create.AllBlocks;
 import com.zurrtum.create.AllItemTags;
 import com.zurrtum.create.AllShapes;
 import com.zurrtum.create.foundation.utility.BlockHelper;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.ShapeContext;
-import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.DyeColor;
-import net.minecraft.util.Hand;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.shape.VoxelShape;
-import net.minecraft.world.BlockView;
-import net.minecraft.world.World;
-
 import java.util.function.Function;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.DyeColor;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.phys.shapes.VoxelShape;
 
 public class ValveHandleBlock extends HandCrankBlock {
 
     public final DyeColor color;
 
-    public static ValveHandleBlock copper(Settings properties) {
+    public static ValveHandleBlock copper(Properties properties) {
         return new ValveHandleBlock(properties, null);
     }
 
-    public static Function<Settings, ValveHandleBlock> dyed(DyeColor color) {
+    public static Function<Properties, ValveHandleBlock> dyed(DyeColor color) {
         return properties -> new ValveHandleBlock(properties, color);
     }
 
-    private ValveHandleBlock(Settings properties, DyeColor color) {
+    private ValveHandleBlock(Properties properties, DyeColor color) {
         super(properties);
         this.color = color;
     }
 
     @Override
-    public VoxelShape getOutlineShape(BlockState pState, BlockView worldIn, BlockPos pos, ShapeContext context) {
-        return AllShapes.VALVE_HANDLE.get(pState.get(FACING));
+    public VoxelShape getShape(BlockState pState, BlockGetter worldIn, BlockPos pos, CollisionContext context) {
+        return AllShapes.VALVE_HANDLE.get(pState.getValue(FACING));
     }
 
     public static ValveHandleBlock getColorBlock(DyeColor color) {
@@ -65,40 +64,40 @@ public class ValveHandleBlock extends HandCrankBlock {
         };
     }
 
-    public void clicked(World level, BlockPos pos, BlockState state, PlayerEntity player, Hand hand) {
-        ItemStack heldItem = player.getStackInHand(hand);
-        onUseWithItem(heldItem, state, level, pos, player, hand, null);
+    public void clicked(Level level, BlockPos pos, BlockState state, Player player, InteractionHand hand) {
+        ItemStack heldItem = player.getItemInHand(hand);
+        useItemOn(heldItem, state, level, pos, player, hand, null);
     }
 
     @Override
-    protected ActionResult onUseWithItem(
+    protected InteractionResult useItemOn(
         ItemStack heldItem,
         BlockState state,
-        World level,
+        Level level,
         BlockPos pos,
-        PlayerEntity player,
-        Hand hand,
+        Player player,
+        InteractionHand hand,
         BlockHitResult hitResult
     ) {
         DyeColor color = AllItemTags.getDyeColor(heldItem);
 
         if (color != null && color != this.color) {
-            if (!level.isClient())
-                level.setBlockState(pos, BlockHelper.copyProperties(state, getColorBlock(color).getDefaultState()));
-            return ActionResult.SUCCESS;
+            if (!level.isClientSide())
+                level.setBlockAndUpdate(pos, BlockHelper.copyProperties(state, getColorBlock(color).defaultBlockState()));
+            return InteractionResult.SUCCESS;
         }
 
         onBlockEntityUse(
             level,
             pos,
-            hcbe -> (hcbe instanceof ValveHandleBlockEntity vhbe) && vhbe.activate(player.isSneaking()) ? ActionResult.SUCCESS : ActionResult.PASS
+            hcbe -> (hcbe instanceof ValveHandleBlockEntity vhbe) && vhbe.activate(player.isShiftKeyDown()) ? InteractionResult.SUCCESS : InteractionResult.PASS
         );
-        return ActionResult.SUCCESS;
+        return InteractionResult.SUCCESS;
     }
 
     @Override
-    protected ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, BlockHitResult hit) {
-        return super.onUse(state, world, pos, player, hit);
+    protected InteractionResult useWithoutItem(BlockState state, Level world, BlockPos pos, Player player, BlockHitResult hit) {
+        return super.useWithoutItem(state, world, pos, player, hit);
     }
 
     @Override

@@ -7,31 +7,31 @@ import com.zurrtum.create.AllTrackMaterials;
 import com.zurrtum.create.api.schematic.requirement.SpecialBlockItemRequirement;
 import com.zurrtum.create.foundation.block.IBE;
 import com.zurrtum.create.foundation.block.ProperWaterloggedBlock;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.WorldView;
+import net.minecraft.core.BlockPos;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.LevelReader;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.Vec3;
 
 public class StandardBogeyBlock extends AbstractBogeyBlock<StandardBogeyBlockEntity> implements IBE<StandardBogeyBlockEntity>, ProperWaterloggedBlock, SpecialBlockItemRequirement {
 
-    public StandardBogeyBlock(Settings props, BogeySize size) {
+    public StandardBogeyBlock(Properties props, BogeySize size) {
         super(props, size);
-        setDefaultState(getDefaultState().with(WATERLOGGED, false));
+        registerDefaultState(defaultBlockState().setValue(WATERLOGGED, false));
     }
 
-    public static StandardBogeyBlock small(Settings props) {
+    public static StandardBogeyBlock small(Properties props) {
         return new StandardBogeyBlock(props, AllBogeySizes.SMALL);
     }
 
-    public static StandardBogeyBlock large(Settings props) {
+    public static StandardBogeyBlock large(Properties props) {
         return new StandardBogeyBlock(props, AllBogeySizes.LARGE);
     }
 
     @Override
-    public Identifier getTrackType(BogeyStyle style) {
+    public ResourceLocation getTrackType(BogeyStyle style) {
         return AllTrackMaterials.ANDESITE.getId();
     }
 
@@ -46,8 +46,8 @@ public class StandardBogeyBlock extends AbstractBogeyBlock<StandardBogeyBlockEnt
     }
 
     @Override
-    public Vec3d getConnectorAnchorOffset() {
-        return new Vec3d(0, 7 / 32f, 1);
+    public Vec3 getConnectorAnchorOffset() {
+        return new Vec3(0, 7 / 32f, 1);
     }
 
     @Override
@@ -56,8 +56,8 @@ public class StandardBogeyBlock extends AbstractBogeyBlock<StandardBogeyBlockEnt
     }
 
     @Override
-    protected ItemStack getPickStack(WorldView world, BlockPos pos, BlockState state, boolean includeData) {
-        return AllItems.RAILWAY_CASING.getDefaultStack();
+    protected ItemStack getCloneItemStack(LevelReader world, BlockPos pos, BlockState state, boolean includeData) {
+        return AllItems.RAILWAY_CASING.getDefaultInstance();
     }
 
     @Override

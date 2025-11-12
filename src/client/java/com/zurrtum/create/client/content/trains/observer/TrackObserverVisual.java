@@ -15,10 +15,10 @@ import com.zurrtum.create.content.trains.observer.TrackObserverBlockEntity;
 import com.zurrtum.create.content.trains.track.ITrackBlock;
 import com.zurrtum.create.content.trains.track.TrackTargetingBehaviour;
 import com.zurrtum.create.content.trains.track.TrackTargetingBehaviour.RenderedTrackOverlayType;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Consumer;
@@ -59,7 +59,7 @@ public class TrackObserverVisual extends AbstractBlockEntityVisual<TrackObserver
     private void setupVisual() {
         TrackTargetingBehaviour<TrackObserver> target = blockEntity.edgePoint;
         BlockPos targetPosition = target.getGlobalPosition();
-        World level = blockEntity.getWorld();
+        Level level = blockEntity.getLevel();
         BlockState trackState = level.getBlockState(targetPosition);
         Block block = trackState.getBlock();
 

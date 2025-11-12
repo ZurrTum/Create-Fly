@@ -10,10 +10,10 @@ import com.zurrtum.create.content.contraptions.behaviour.LeverMovingInteraction;
 import com.zurrtum.create.content.contraptions.behaviour.TrapdoorMovingInteraction;
 import com.zurrtum.create.content.kinetics.deployer.DeployerMovingInteraction;
 import com.zurrtum.create.content.logistics.depot.MountedDepotInteractionBehaviour;
-import net.minecraft.block.Block;
-import net.minecraft.block.Blocks;
-import net.minecraft.registry.tag.BlockTags;
-import net.minecraft.registry.tag.TagKey;
+import net.minecraft.tags.BlockTags;
+import net.minecraft.tags.TagKey;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
 
 public class AllInteractionBehaviours {
     public static final ConductorBlockInteractionBehavior.BlazeBurner BLAZE_BURNER = new ConductorBlockInteractionBehavior.BlazeBurner();
@@ -34,7 +34,7 @@ public class AllInteractionBehaviours {
 
     @SuppressWarnings("deprecation")
     public static void register(MovingInteractionBehaviour behaviour, TagKey<Block> tag) {
-        MovingInteractionBehaviour.REGISTRY.registerProvider(block -> block.getRegistryEntry().isIn(tag) ? behaviour : null);
+        MovingInteractionBehaviour.REGISTRY.registerProvider(block -> block.builtInRegistryHolder().is(tag) ? behaviour : null);
     }
 
     public static void register() {

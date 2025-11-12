@@ -8,12 +8,12 @@ import com.zurrtum.create.content.logistics.item.filter.attribute.ItemAttributeT
 import io.netty.buffer.ByteBuf;
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.ModContainer;
-import net.minecraft.item.ItemStack;
-import net.minecraft.network.RegistryByteBuf;
-import net.minecraft.network.codec.PacketCodec;
-import net.minecraft.network.codec.PacketCodecs;
-import net.minecraft.registry.Registries;
-import net.minecraft.world.World;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 
@@ -22,17 +22,17 @@ import java.util.List;
 public record AddedByAttribute(String modId) implements ItemAttribute {
     public static final MapCodec<AddedByAttribute> CODEC = Codec.STRING.xmap(AddedByAttribute::new, AddedByAttribute::modId).fieldOf("value");
 
-    public static final PacketCodec<ByteBuf, AddedByAttribute> PACKET_CODEC = PacketCodecs.STRING.xmap(
+    public static final StreamCodec<ByteBuf, AddedByAttribute> PACKET_CODEC = ByteBufCodecs.STRING_UTF8.map(
         AddedByAttribute::new,
         AddedByAttribute::modId
     );
 
     private static String getCreatorModId(ItemStack stack) {
-        return Registries.ITEM.getId(stack.getItem()).getNamespace();
+        return BuiltInRegistries.ITEM.getKey(stack.getItem()).getNamespace();
     }
 
     @Override
-    public boolean appliesTo(ItemStack stack, World world) {
+    public boolean appliesTo(ItemStack stack, Level world) {
         return modId.equals(getCreatorModId(stack));
     }
 
@@ -60,7 +60,7 @@ public record AddedByAttribute(String modId) implements ItemAttribute {
         }
 
         @Override
-        public List<ItemAttribute> getAllAttributes(ItemStack stack, World level) {
+        public List<ItemAttribute> getAllAttributes(ItemStack stack, Level level) {
             return List.of(new AddedByAttribute(getCreatorModId(stack)));
         }
 
@@ -70,7 +70,7 @@ public record AddedByAttribute(String modId) implements ItemAttribute {
         }
 
         @Override
-        public PacketCodec<? super RegistryByteBuf, ? extends ItemAttribute> packetCodec() {
+        public StreamCodec<? super RegistryFriendlyByteBuf, ? extends ItemAttribute> packetCodec() {
             return PACKET_CODEC;
         }
     }

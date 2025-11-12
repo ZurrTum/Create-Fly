@@ -3,13 +3,13 @@ package com.zurrtum.create.content.redstone.displayLink;
 import com.zurrtum.create.catnip.animation.LerpedFloat;
 import com.zurrtum.create.catnip.animation.LerpedFloat.Chaser;
 import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.storage.ReadView;
-import net.minecraft.storage.WriteView;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
+import net.minecraft.world.phys.Vec3;
 
 public abstract class LinkWithBulbBlockEntity extends SmartBlockEntity {
 
@@ -25,7 +25,7 @@ public abstract class LinkWithBulbBlockEntity extends SmartBlockEntity {
     @Override
     public void tick() {
         super.tick();
-        if (isVirtual() || world.isClient())
+        if (isVirtual() || level.isClientSide())
             glow.tickChaser();
     }
 
@@ -42,7 +42,7 @@ public abstract class LinkWithBulbBlockEntity extends SmartBlockEntity {
     }
 
     @Override
-    protected void write(WriteView view, boolean clientPacket) {
+    protected void write(ValueOutput view, boolean clientPacket) {
         super.write(view, clientPacket);
         if (clientPacket && sendPulse) {
             sendPulse = false;
@@ -51,18 +51,18 @@ public abstract class LinkWithBulbBlockEntity extends SmartBlockEntity {
     }
 
     @Override
-    protected void read(ReadView view, boolean clientPacket) {
+    protected void read(ValueInput view, boolean clientPacket) {
         super.read(view, clientPacket);
-        if (clientPacket && view.getBoolean("Pulse", false))
+        if (clientPacket && view.getBooleanOr("Pulse", false))
             pulse();
     }
 
-    public Vec3d getBulbOffset(BlockState state) {
-        return Vec3d.ZERO;
+    public Vec3 getBulbOffset(BlockState state) {
+        return Vec3.ZERO;
     }
 
     public Direction getBulbFacing(BlockState state) {
-        return state.get(DisplayLinkBlock.FACING);
+        return state.getValue(DisplayLinkBlock.FACING);
     }
 
 }

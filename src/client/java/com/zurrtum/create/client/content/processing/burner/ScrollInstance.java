@@ -4,7 +4,7 @@ import com.zurrtum.create.client.catnip.render.SpriteShiftEntry;
 import com.zurrtum.create.client.flywheel.api.instance.InstanceHandle;
 import com.zurrtum.create.client.flywheel.api.instance.InstanceType;
 import com.zurrtum.create.client.flywheel.lib.instance.ColoredLitOverlayInstance;
-import net.minecraft.util.math.Vec3i;
+import net.minecraft.core.Vec3i;
 import org.joml.Quaternionf;
 import org.joml.Quaternionfc;
 
@@ -61,15 +61,15 @@ public class ScrollInstance extends ColoredLitOverlayInstance {
     }
 
     public ScrollInstance setSpriteShift(SpriteShiftEntry spriteShift, float factorU, float factorV) {
-        float spriteWidth = spriteShift.getTarget().getMaxU() - spriteShift.getTarget().getMinU();
+        float spriteWidth = spriteShift.getTarget().getU1() - spriteShift.getTarget().getU0();
 
-        float spriteHeight = spriteShift.getTarget().getMaxV() - spriteShift.getTarget().getMinV();
+        float spriteHeight = spriteShift.getTarget().getV1() - spriteShift.getTarget().getV0();
 
         scaleU = spriteWidth * factorU;
         scaleV = spriteHeight * factorV;
 
-        diffU = spriteShift.getTarget().getMinU() - spriteShift.getOriginal().getMinU();
-        diffV = spriteShift.getTarget().getMinV() - spriteShift.getOriginal().getMinV();
+        diffU = spriteShift.getTarget().getU0() - spriteShift.getOriginal().getU0();
+        diffV = spriteShift.getTarget().getV0() - spriteShift.getOriginal().getV0();
 
         return this;
     }

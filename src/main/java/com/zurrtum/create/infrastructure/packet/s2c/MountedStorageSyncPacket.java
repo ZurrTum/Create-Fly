@@ -4,25 +4,25 @@ import com.zurrtum.create.AllClientHandle;
 import com.zurrtum.create.AllPackets;
 import com.zurrtum.create.api.contraption.storage.fluid.MountedFluidStorage;
 import com.zurrtum.create.api.contraption.storage.item.MountedItemStorage;
-import net.minecraft.network.RegistryByteBuf;
-import net.minecraft.network.codec.PacketCodec;
-import net.minecraft.network.codec.PacketCodecs;
-import net.minecraft.network.packet.PacketType;
-import net.minecraft.util.math.BlockPos;
 import org.apache.logging.log4j.util.TriConsumer;
 
 import java.util.HashMap;
 import java.util.Map;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.PacketType;
 
 public record MountedStorageSyncPacket(
     int contraptionId, Map<BlockPos, MountedItemStorage> items, Map<BlockPos, MountedFluidStorage> fluids
 ) implements S2CPacket {
-    public static final PacketCodec<RegistryByteBuf, MountedStorageSyncPacket> CODEC = PacketCodec.tuple(
-        PacketCodecs.INTEGER,
+    public static final StreamCodec<RegistryFriendlyByteBuf, MountedStorageSyncPacket> CODEC = StreamCodec.composite(
+        ByteBufCodecs.INT,
         MountedStorageSyncPacket::contraptionId,
-        PacketCodecs.map(HashMap::new, BlockPos.PACKET_CODEC, MountedItemStorage.STREAM_CODEC),
+        ByteBufCodecs.map(HashMap::new, BlockPos.STREAM_CODEC, MountedItemStorage.STREAM_CODEC),
         MountedStorageSyncPacket::items,
-        PacketCodecs.map(HashMap::new, BlockPos.PACKET_CODEC, MountedFluidStorage.STREAM_CODEC),
+        ByteBufCodecs.map(HashMap::new, BlockPos.STREAM_CODEC, MountedFluidStorage.STREAM_CODEC),
         MountedStorageSyncPacket::fluids,
         MountedStorageSyncPacket::new
     );
@@ -33,7 +33,7 @@ public record MountedStorageSyncPacket(
     }
 
     @Override
-    public PacketType<MountedStorageSyncPacket> getPacketType() {
+    public PacketType<MountedStorageSyncPacket> type() {
         return AllPackets.MOUNTED_STORAGE_SYNC;
     }
 }

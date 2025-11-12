@@ -1,9 +1,9 @@
 package com.zurrtum.create.client.flywheel.lib.instance;
 
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.zurrtum.create.client.flywheel.api.instance.InstanceHandle;
 import com.zurrtum.create.client.flywheel.api.instance.InstanceType;
 import com.zurrtum.create.client.flywheel.lib.transform.Affine;
-import net.minecraft.client.util.math.MatrixStack;
 import org.joml.AxisAngle4f;
 import org.joml.Matrix4f;
 import org.joml.Matrix4fc;
@@ -39,12 +39,12 @@ public class TransformedInstance extends ColoredLitOverlayInstance implements Af
         return this;
     }
 
-    public TransformedInstance mul(MatrixStack.Entry other) {
-        return mul(other.getPositionMatrix());
+    public TransformedInstance mul(PoseStack.Pose other) {
+        return mul(other.pose());
     }
 
-    public TransformedInstance mul(MatrixStack stack) {
-        return mul(stack.peek());
+    public TransformedInstance mul(PoseStack stack) {
+        return mul(stack.last());
     }
 
     public TransformedInstance setTransform(Matrix4fc pose) {
@@ -52,13 +52,13 @@ public class TransformedInstance extends ColoredLitOverlayInstance implements Af
         return this;
     }
 
-    public TransformedInstance setTransform(MatrixStack.Entry pose) {
-        this.pose.set(pose.getPositionMatrix());
+    public TransformedInstance setTransform(PoseStack.Pose pose) {
+        this.pose.set(pose.pose());
         return this;
     }
 
-    public TransformedInstance setTransform(MatrixStack stack) {
-        return setTransform(stack.peek());
+    public TransformedInstance setTransform(PoseStack stack) {
+        return setTransform(stack.last());
     }
 
     public TransformedInstance setIdentityTransform() {

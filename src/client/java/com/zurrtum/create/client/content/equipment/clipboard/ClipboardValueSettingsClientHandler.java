@@ -1,5 +1,7 @@
 package com.zurrtum.create.client.content.equipment.clipboard;
 
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.zurrtum.create.AllDataComponents;
 import com.zurrtum.create.AllItems;
 import com.zurrtum.create.client.Create;
@@ -12,27 +14,25 @@ import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
 import com.zurrtum.create.foundation.blockEntity.behaviour.filtering.ServerFilteringBehaviour;
 import com.zurrtum.create.foundation.blockEntity.behaviour.scrollValue.ServerScrollValueBehaviour;
 import com.zurrtum.create.infrastructure.component.ClipboardContent;
-import net.minecraft.block.BlockState;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.client.render.RenderLayer;
-import net.minecraft.client.render.VertexConsumer;
-import net.minecraft.client.render.VertexConsumerProvider;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.client.world.ClientWorld;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.registry.DynamicRegistryManager;
-import net.minecraft.storage.NbtReadView;
-import net.minecraft.storage.ReadView;
-import net.minecraft.text.MutableText;
-import net.minecraft.text.Text;
-import net.minecraft.util.ErrorReporter;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.shape.VoxelShape;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.RenderType;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.RegistryAccess;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.util.ProblemReporter;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.storage.TagValueInput;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.phys.shapes.VoxelShape;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -41,29 +41,23 @@ import java.util.stream.Stream;
 import static com.zurrtum.create.Create.LOGGER;
 
 public class ClipboardValueSettingsClientHandler {
-    public static boolean drawCustomBlockSelection(
-        MinecraftClient mc,
-        BlockPos pos,
-        VertexConsumerProvider vertexConsumerProvider,
-        Vec3d camPos,
-        MatrixStack ms
-    ) {
-        ClientPlayerEntity player = mc.player;
+    public static boolean drawCustomBlockSelection(Minecraft mc, BlockPos pos, MultiBufferSource vertexConsumerProvider, Vec3 camPos, PoseStack ms) {
+        LocalPlayer player = mc.player;
         if (player == null || player.isSpectator())
             return false;
-        if (!player.getMainHandStack().isOf(AllItems.CLIPBOARD))
+        if (!player.getMainHandItem().is(AllItems.CLIPBOARD))
             return false;
-        ClientWorld world = mc.world;
-        if (!world.getWorldBorder().contains(pos))
+        ClientLevel world = mc.level;
+        if (!world.getWorldBorder().isWithinBounds(pos))
             return false;
         BlockState blockstate = world.getBlockState(pos);
 
         if (!(world.getBlockEntity(pos) instanceof SmartBlockEntity smartBE))
             return false;
         if (!(smartBE instanceof ClipboardBlockEntity) && !(smartBE instanceof ClipboardCloneable)) {
-            if (mc.crosshairTarget instanceof BlockHitResult target) {
-                DynamicRegistryManager registryManager = world.getRegistryManager();
-                Direction side = target.getSide();
+            if (mc.hitResult instanceof BlockHitResult target) {
+                RegistryAccess registryManager = world.registryAccess();
+                Direction side = target.getDirection();
                 if (Stream.of(ServerScrollValueBehaviour.TYPE, ServerFilteringBehaviour.TYPE, ServerLinkBehaviour.TYPE)
                     .noneMatch(type -> smartBE.getBehaviour(type) instanceof ClipboardCloneable cc && cc.canWrite(registryManager, side))) {
                     return false;
@@ -71,62 +65,62 @@ public class ClipboardValueSettingsClientHandler {
             }
         }
 
-        VoxelShape shape = blockstate.getOutlineShape(world, pos);
+        VoxelShape shape = blockstate.getShape(world, pos);
         if (shape.isEmpty())
             return false;
 
-        VertexConsumer vb = vertexConsumerProvider.getBuffer(RenderLayer.getLines());
+        VertexConsumer vb = vertexConsumerProvider.getBuffer(RenderType.lines());
 
-        ms.push();
+        ms.pushPose();
         ms.translate(pos.getX() - camPos.x, pos.getY() - camPos.y, pos.getZ() - camPos.z);
         TrackBlockOutline.renderShape(shape, ms, vb, true);
-        ms.pop();
+        ms.popPose();
         return true;
     }
 
-    public static void clientTick(MinecraftClient mc) {
-        if (!(mc.crosshairTarget instanceof BlockHitResult target))
+    public static void clientTick(Minecraft mc) {
+        if (!(mc.hitResult instanceof BlockHitResult target))
             return;
-        ClientPlayerEntity player = mc.player;
-        ItemStack stack = player.getMainHandStack();
-        if (!stack.isOf(AllItems.CLIPBOARD))
+        LocalPlayer player = mc.player;
+        ItemStack stack = player.getMainHandItem();
+        if (!stack.is(AllItems.CLIPBOARD))
             return;
         BlockPos pos = target.getBlockPos();
-        ClientWorld world = mc.world;
-        if (!(world.getBlockEntity(pos) instanceof SmartBlockEntity smartBE))
+        ClientLevel level = mc.level;
+        if (!(level.getBlockEntity(pos) instanceof SmartBlockEntity smartBE))
             return;
 
         if (smartBE instanceof ClipboardBlockEntity) {
-            List<MutableText> tip = new ArrayList<>();
+            List<MutableComponent> tip = new ArrayList<>();
             tip.add(CreateLang.translateDirect("clipboard.actions"));
-            tip.add(CreateLang.translateDirect("clipboard.copy_other_clipboard", Text.keybind("key.use")));
+            tip.add(CreateLang.translateDirect("clipboard.copy_other_clipboard", Component.keybind("key.use")));
             Create.VALUE_SETTINGS_HANDLER.showHoverTip(mc, tip);
             return;
         }
 
 
-        Direction side = target.getSide();
+        Direction side = target.getDirection();
         boolean canCopy = Stream.of(ServerScrollValueBehaviour.TYPE, ServerFilteringBehaviour.TYPE, ServerLinkBehaviour.TYPE)
             .anyMatch(type -> smartBE.getBehaviour(type) instanceof ClipboardCloneable cc && cc.canWrite(
-                world.getRegistryManager(),
+                level.registryAccess(),
                 side
-            )) || smartBE instanceof ClipboardCloneable ccbe && ccbe.canWrite(world.getRegistryManager(), side);
+            )) || smartBE instanceof ClipboardCloneable ccbe && ccbe.canWrite(level.registryAccess(), side);
 
         boolean canPaste;
         ClipboardContent content = stack.get(AllDataComponents.CLIPBOARD_CONTENT);
         if (content == null) {
             return;
         }
-        NbtCompound tagElement = content.copiedValues().orElse(null);
+        CompoundTag tagElement = content.copiedValues().orElse(null);
         if (tagElement == null) {
             canPaste = false;
         } else {
-            try (ErrorReporter.Logging logging = new ErrorReporter.Logging(smartBE.getReporterContext(), LOGGER)) {
-                ReadView view = NbtReadView.create(logging, world.getRegistryManager(), tagElement);
+            try (ProblemReporter.ScopedCollector logging = new ProblemReporter.ScopedCollector(smartBE.problemPath(), LOGGER)) {
+                ValueInput view = TagValueInput.create(logging, level.registryAccess(), tagElement);
                 canPaste = (Stream.of(ServerScrollValueBehaviour.TYPE, ServerFilteringBehaviour.TYPE, ServerLinkBehaviour.TYPE)
-                    .anyMatch(type -> smartBE.getBehaviour(type) instanceof ClipboardCloneable cc && view.getOptionalReadView(cc.getClipboardKey())
+                    .anyMatch(type -> smartBE.getBehaviour(type) instanceof ClipboardCloneable cc && view.child(cc.getClipboardKey())
                         .map(v -> cc.readFromClipboard(v, player, side, true))
-                        .orElse(false)) || smartBE instanceof ClipboardCloneable ccbe && view.getOptionalReadView(ccbe.getClipboardKey())
+                        .orElse(false)) || smartBE instanceof ClipboardCloneable ccbe && view.child(ccbe.getClipboardKey())
                     .map(v -> ccbe.readFromClipboard(v, player, side, true)).orElse(false));
             }
         }
@@ -134,12 +128,12 @@ public class ClipboardValueSettingsClientHandler {
         if (!canCopy && !canPaste)
             return;
 
-        List<MutableText> tip = new ArrayList<>();
+        List<MutableComponent> tip = new ArrayList<>();
         tip.add(CreateLang.translateDirect("clipboard.actions"));
         if (canCopy)
-            tip.add(CreateLang.translateDirect("clipboard.to_copy", Text.keybind("key.use")));
+            tip.add(CreateLang.translateDirect("clipboard.to_copy", Component.keybind("key.use")));
         if (canPaste)
-            tip.add(CreateLang.translateDirect("clipboard.to_paste", Text.keybind("key.attack")));
+            tip.add(CreateLang.translateDirect("clipboard.to_paste", Component.keybind("key.attack")));
 
         Create.VALUE_SETTINGS_HANDLER.showHoverTip(mc, tip);
     }

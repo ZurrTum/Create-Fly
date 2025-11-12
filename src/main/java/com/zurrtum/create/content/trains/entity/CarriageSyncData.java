@@ -10,22 +10,22 @@ import com.zurrtum.create.content.trains.entity.TravellingPoint.ITrackSelector;
 import com.zurrtum.create.content.trains.graph.TrackEdge;
 import com.zurrtum.create.content.trains.graph.TrackGraph;
 import com.zurrtum.create.content.trains.graph.TrackNode;
-import net.minecraft.network.PacketByteBuf;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec3d;
 import org.apache.commons.lang3.mutable.MutableBoolean;
 
 import java.util.*;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.util.Mth;
+import net.minecraft.world.phys.Vec3;
 
 public class CarriageSyncData {
 
     public List<Pair<Couple<Integer>, Float>> wheelLocations;
-    public Pair<Vec3d, Couple<Vec3d>> fallbackLocations;
+    public Pair<Vec3, Couple<Vec3>> fallbackLocations;
     public float distanceToDestination;
     public boolean leadingCarriage;
 
     // For Client interpolation
-    private Pair<Vec3d, Couple<Vec3d>> fallbackPointSnapshot;
+    private Pair<Vec3, Couple<Vec3>> fallbackPointSnapshot;
     private TravellingPoint[] pointsToApproach;
     private float[] pointDistanceSnapshot;
     private float destinationDistanceSnapshot;
@@ -46,7 +46,7 @@ public class CarriageSyncData {
         }
     }
 
-    public CarriageSyncData(PacketByteBuf buf) {
+    public CarriageSyncData(FriendlyByteBuf buf) {
         this();
         read(buf);
     }
@@ -62,13 +62,13 @@ public class CarriageSyncData {
         return data;
     }
 
-    public void write(PacketByteBuf buffer) {
+    public void write(FriendlyByteBuf buffer) {
         buffer.writeBoolean(leadingCarriage);
         buffer.writeBoolean(fallbackLocations != null);
 
         if (fallbackLocations != null) {
-            Vec3d contraptionAnchor = fallbackLocations.getFirst();
-            Couple<Vec3d> rotationAnchors = fallbackLocations.getSecond();
+            Vec3 contraptionAnchor = fallbackLocations.getFirst();
+            Couple<Vec3> rotationAnchors = fallbackLocations.getSecond();
             VecHelper.write(contraptionAnchor, buffer);
             VecHelper.write(rotationAnchors.getFirst(), buffer);
             VecHelper.write(rotationAnchors.getSecond(), buffer);
@@ -85,7 +85,7 @@ public class CarriageSyncData {
         buffer.writeFloat(distanceToDestination);
     }
 
-    public void read(PacketByteBuf buffer) {
+    public void read(FriendlyByteBuf buffer) {
         leadingCarriage = buffer.readBoolean();
         boolean fallback = buffer.readBoolean();
         ticksSince = 0;
@@ -105,7 +105,7 @@ public class CarriageSyncData {
     }
 
     public void update(CarriageContraptionEntity entity, Carriage carriage) {
-        DimensionalCarriageEntity dce = carriage.getDimensional(entity.getEntityWorld());
+        DimensionalCarriageEntity dce = carriage.getDimensional(entity.level());
 
         TrackGraph graph = carriage.train.graph;
         if (graph == null) {
@@ -146,7 +146,7 @@ public class CarriageSyncData {
     }
 
     public void apply(CarriageContraptionEntity entity, Carriage carriage) {
-        DimensionalCarriageEntity dce = carriage.getDimensional(entity.getEntityWorld());
+        DimensionalCarriageEntity dce = carriage.getDimensional(entity.level());
 
         fallbackPointSnapshot = null;
         if (fallbackLocations != null) {
@@ -217,9 +217,9 @@ public class CarriageSyncData {
     }
 
     public void approach(CarriageContraptionEntity entity, Carriage carriage, float partialIn) {
-        DimensionalCarriageEntity dce = carriage.getDimensional(entity.getEntityWorld());
+        DimensionalCarriageEntity dce = carriage.getDimensional(entity.level());
 
-        int updateInterval = entity.getType().getTrackTickInterval();
+        int updateInterval = entity.getType().updateInterval();
         if (ticksSince >= updateInterval * 2)
             partialIn /= ticksSince - updateInterval * 2 + 1;
         partialIn *= AllClientHandle.INSTANCE.getServerSpeed();
@@ -251,7 +251,7 @@ public class CarriageSyncData {
             for (boolean firstPoint : Iterate.trueAndFalse) {
                 int index = (first ? 0 : 2) + (firstPoint ? 0 : 1);
                 float f = pointDistanceSnapshot[index];
-                if (MathHelper.approximatelyEquals(f, 0))
+                if (Mth.equal(f, 0))
                     continue;
 
                 TravellingPoint point = bogey.points.get(firstPoint);
@@ -273,10 +273,10 @@ public class CarriageSyncData {
         }
     }
 
-    private Vec3d approachVector(float partial, Vec3d current, Vec3d target, Vec3d snapshot) {
+    private Vec3 approachVector(float partial, Vec3 current, Vec3 target, Vec3 snapshot) {
         if (current == null || snapshot == null)
             return target;
-        return current.add(target.subtract(snapshot).multiply(partial));
+        return current.add(target.subtract(snapshot).scale(partial));
     }
 
     public float getDistanceTo(TrackGraph graph, TravellingPoint current, TravellingPoint target, float maxDistance, boolean forward) {
@@ -327,9 +327,9 @@ public class CarriageSyncData {
             Map<TrackNode, TrackEdge> connectionsFrom = graph.getConnectionsFrom(node2);
             for (Map.Entry<TrackNode, TrackEdge> entry : connectionsFrom.entrySet()) {
                 TrackEdge newEdge = entry.getValue();
-                Vec3d currentDirection = edge.getDirection(false);
-                Vec3d newDirection = newEdge.getDirection(true);
-                if (currentDirection.dotProduct(newDirection) < 7 / 8f)
+                Vec3 currentDirection = edge.getDirection(false);
+                Vec3 newDirection = newEdge.getDirection(true);
+                if (currentDirection.dot(newDirection) < 7 / 8f)
                     continue;
                 if (!visited.add(entry.getValue()))
                     continue;

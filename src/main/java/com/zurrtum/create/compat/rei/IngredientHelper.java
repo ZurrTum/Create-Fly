@@ -12,11 +12,11 @@ import me.shedaniel.rei.api.common.util.EntryIngredients;
 import net.fabricmc.fabric.api.recipe.v1.ingredient.CustomIngredient;
 import net.fabricmc.fabric.api.recipe.v1.ingredient.FabricIngredient;
 import net.fabricmc.fabric.impl.recipe.ingredient.builtin.ComponentsIngredient;
-import net.minecraft.component.ComponentChanges;
-import net.minecraft.fluid.Fluid;
-import net.minecraft.item.ItemStack;
-import net.minecraft.recipe.Ingredient;
-import net.minecraft.recipe.display.SlotDisplay;
+import net.minecraft.core.component.DataComponentPatch;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.item.crafting.display.SlotDisplay;
+import net.minecraft.world.level.material.Fluid;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
@@ -32,7 +32,7 @@ public interface IngredientHelper {
         List<Fluid> fluids = ingredient.getMatchingFluids();
         EntryIngredient.Builder builder = EntryIngredient.builder(fluids.size());
         int amount = ingredient.amount();
-        ComponentChanges patch = ComponentChanges.EMPTY;
+        DataComponentPatch patch = DataComponentPatch.EMPTY;
         if (ingredient instanceof FluidStackIngredient stackIngredient) {
             patch = stackIngredient.components();
         }
@@ -64,7 +64,7 @@ public interface IngredientHelper {
         int size = ingredients.size();
         for (SizedIngredient ingredient : ingredients) {
             EntryIngredient.Builder builder = EntryIngredient.builder(size);
-            ingredient.getIngredient().entries.forEach(stack -> {
+            ingredient.getIngredient().values.forEach(stack -> {
                 builder.add(EntryStack.of(definition, new ItemStack(stack, ingredient.getCount())));
             });
             results.add(builder.build());
@@ -81,10 +81,10 @@ public interface IngredientHelper {
         CustomIngredient customIngredient = ((FabricIngredient) ingredient).getCustomIngredient();
         if (customIngredient instanceof ComponentsIngredient) {
             EntryDefinition<ItemStack> definition = VanillaEntryTypes.ITEM.getDefinition();
-            List<SlotDisplay> contents = ((SlotDisplay.CompositeSlotDisplay) customIngredient.toDisplay()).contents();
+            List<SlotDisplay> contents = ((SlotDisplay.Composite) customIngredient.toDisplay()).contents();
             EntryIngredient.Builder builder = EntryIngredient.builder(contents.size());
             for (SlotDisplay content : contents) {
-                SlotDisplay.StackSlotDisplay display = (SlotDisplay.StackSlotDisplay) content;
+                SlotDisplay.ItemStackSlotDisplay display = (SlotDisplay.ItemStackSlotDisplay) content;
                 builder.add(EntryStack.of(definition, display.stack()));
             }
             return builder.build();

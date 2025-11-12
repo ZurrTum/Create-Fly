@@ -5,18 +5,18 @@ import com.zurrtum.create.client.content.trains.schedule.IScheduleInput;
 import com.zurrtum.create.client.foundation.gui.ModularGuiLineBuilder;
 import com.zurrtum.create.client.foundation.utility.CreateLang;
 import com.zurrtum.create.content.trains.schedule.destination.TextScheduleInstruction;
-import net.minecraft.client.gui.widget.TextFieldWidget;
-import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
+import net.minecraft.ChatFormatting;
+import net.minecraft.client.gui.components.EditBox;
+import net.minecraft.network.chat.Component;
 
 import java.util.List;
 
 public abstract class TextScheduleInstructionRender<T extends TextScheduleInstruction> implements IScheduleInput<T> {
     @Override
-    public List<Text> getTitleAs(T input, String type) {
+    public List<Component> getTitleAs(T input, String type) {
         return ImmutableList.of(
-            CreateLang.translateDirect("schedule." + type + "." + input.getId().getPath() + ".summary").formatted(Formatting.GOLD),
-            CreateLang.translateDirect("generic.in_quotes", Text.literal(input.getLabelText()))
+            CreateLang.translateDirect("schedule." + type + "." + input.getId().getPath() + ".summary").withStyle(ChatFormatting.GOLD),
+            CreateLang.translateDirect("generic.in_quotes", Component.literal(input.getLabelText()))
         );
     }
 
@@ -24,6 +24,6 @@ public abstract class TextScheduleInstructionRender<T extends TextScheduleInstru
         builder.addTextInput(0, 121, (e, t) -> modifyEditBox(e), "Text");
     }
 
-    protected void modifyEditBox(TextFieldWidget box) {
+    protected void modifyEditBox(EditBox box) {
     }
 }

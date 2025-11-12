@@ -4,14 +4,14 @@ import com.google.common.collect.Lists;
 import com.mojang.serialization.Codec;
 import com.zurrtum.create.content.logistics.BigItemStack;
 import com.zurrtum.create.infrastructure.packet.s2c.LogisticalStockResponsePacket;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.util.math.BlockPos;
 import org.apache.commons.lang3.mutable.MutableInt;
 
 import java.util.*;
 import java.util.function.Predicate;
+import net.minecraft.core.BlockPos;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
 
 public class InventorySummary {
     public static Codec<InventorySummary> CODEC = BigItemStack.CODEC.listOf().xmap(
@@ -77,14 +77,14 @@ public class InventorySummary {
         List<BigItemStack> stacks = items.computeIfAbsent(stack.getItem(), $ -> Lists.newArrayList());
         for (BigItemStack existing : stacks) {
             ItemStack existingStack = existing.stack;
-            if (ItemStack.areItemsAndComponentsEqual(existingStack, stack)) {
+            if (ItemStack.isSameItemSameComponents(existingStack, stack)) {
                 if (existing.count < BigItemStack.INF)
                     existing.count += count;
                 return;
             }
         }
 
-        if (stack.getCount() > stack.getMaxCount())
+        if (stack.getCount() > stack.getMaxStackSize())
             stack = stack.copyWithCount(1);
 
         BigItemStack newEntry = new BigItemStack(stack, count);
@@ -98,7 +98,7 @@ public class InventorySummary {
         for (Iterator<BigItemStack> iterator = stacks.iterator(); iterator.hasNext(); ) {
             BigItemStack existing = iterator.next();
             ItemStack existingStack = existing.stack;
-            if (!ItemStack.areItemsAndComponentsEqual(existingStack, stack))
+            if (!ItemStack.isSameItemSameComponents(existingStack, stack))
                 continue;
             totalCount -= existing.count;
             iterator.remove();
@@ -112,7 +112,7 @@ public class InventorySummary {
         if (list == null)
             return 0;
         for (BigItemStack entry : list)
-            if (ItemStack.areItemsAndComponentsEqual(entry.stack, stack))
+            if (ItemStack.isSameItemSameComponents(entry.stack, stack))
                 return entry.count;
         return 0;
     }
@@ -149,14 +149,14 @@ public class InventorySummary {
         return totalCount;
     }
 
-    public void divideAndSendTo(ServerPlayerEntity player, BlockPos pos) {
+    public void divideAndSendTo(ServerPlayer player, BlockPos pos) {
         List<BigItemStack> stacks = getStacksByCount();
         int remaining = stacks.size();
 
         List<BigItemStack> currentList = null;
 
         if (stacks.isEmpty())
-            player.networkHandler.sendPacket(new LogisticalStockResponsePacket(true, pos, Collections.emptyList()));
+            player.connection.send(new LogisticalStockResponsePacket(true, pos, Collections.emptyList()));
 
         for (BigItemStack entry : stacks) {
             if (currentList == null)
@@ -170,12 +170,12 @@ public class InventorySummary {
             if (currentList.size() < 100)
                 continue;
 
-            player.networkHandler.sendPacket(new LogisticalStockResponsePacket(false, pos, currentList));
+            player.connection.send(new LogisticalStockResponsePacket(false, pos, currentList));
             currentList = null;
         }
 
         if (currentList != null)
-            player.networkHandler.sendPacket(new LogisticalStockResponsePacket(true, pos, currentList));
+            player.connection.send(new LogisticalStockResponsePacket(true, pos, currentList));
     }
 
     public boolean isEmpty() {

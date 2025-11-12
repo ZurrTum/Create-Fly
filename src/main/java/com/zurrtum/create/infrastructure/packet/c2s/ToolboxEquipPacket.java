@@ -4,21 +4,20 @@ import com.zurrtum.create.AllHandle;
 import com.zurrtum.create.AllPackets;
 import com.zurrtum.create.catnip.codecs.stream.CatnipStreamCodecBuilders;
 import io.netty.buffer.ByteBuf;
-import net.minecraft.network.codec.PacketCodec;
-import net.minecraft.network.codec.PacketCodecs;
-import net.minecraft.network.packet.PacketType;
-import net.minecraft.server.network.ServerPlayNetworkHandler;
-import net.minecraft.util.math.BlockPos;
-
 import java.util.function.BiConsumer;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.PacketType;
+import net.minecraft.server.network.ServerGamePacketListenerImpl;
 
 public record ToolboxEquipPacket(BlockPos toolboxPos, int slot, int hotbarSlot) implements C2SPacket {
-    public static final PacketCodec<ByteBuf, ToolboxEquipPacket> CODEC = PacketCodec.tuple(
-        CatnipStreamCodecBuilders.nullable(BlockPos.PACKET_CODEC),
+    public static final StreamCodec<ByteBuf, ToolboxEquipPacket> CODEC = StreamCodec.composite(
+        CatnipStreamCodecBuilders.nullable(BlockPos.STREAM_CODEC),
         ToolboxEquipPacket::toolboxPos,
-        PacketCodecs.VAR_INT,
+        ByteBufCodecs.VAR_INT,
         ToolboxEquipPacket::slot,
-        PacketCodecs.VAR_INT,
+        ByteBufCodecs.VAR_INT,
         ToolboxEquipPacket::hotbarSlot,
         ToolboxEquipPacket::new
     );
@@ -29,12 +28,12 @@ public record ToolboxEquipPacket(BlockPos toolboxPos, int slot, int hotbarSlot) 
     }
 
     @Override
-    public PacketType<ToolboxEquipPacket> getPacketType() {
+    public PacketType<ToolboxEquipPacket> type() {
         return AllPackets.TOOLBOX_EQUIP;
     }
 
     @Override
-    public BiConsumer<ServerPlayNetworkHandler, ToolboxEquipPacket> callback() {
+    public BiConsumer<ServerGamePacketListenerImpl, ToolboxEquipPacket> callback() {
         return AllHandle::onToolboxEquip;
     }
 }

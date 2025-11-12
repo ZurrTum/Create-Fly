@@ -1,29 +1,29 @@
 package com.zurrtum.create.catnip.math;
 
-import net.minecraft.util.math.BlockBox;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.levelgen.structure.BoundingBox;
 
 public class BBHelper {
 
-    public static BlockBox encapsulate(BlockBox bb, BlockPos pos) {
-        return new BlockBox(
-            Math.min(bb.getMinX(), pos.getX()),
-            Math.min(bb.getMinY(), pos.getY()),
-            Math.min(bb.getMinZ(), pos.getZ()),
-            Math.max(bb.getMaxX(), pos.getX()),
-            Math.max(bb.getMaxY(), pos.getY()),
-            Math.max(bb.getMaxZ(), pos.getZ())
+    public static BoundingBox encapsulate(BoundingBox bb, BlockPos pos) {
+        return new BoundingBox(
+            Math.min(bb.minX(), pos.getX()),
+            Math.min(bb.minY(), pos.getY()),
+            Math.min(bb.minZ(), pos.getZ()),
+            Math.max(bb.maxX(), pos.getX()),
+            Math.max(bb.maxY(), pos.getY()),
+            Math.max(bb.maxZ(), pos.getZ())
         );
     }
 
-    public static BlockBox encapsulate(BlockBox bb, BlockBox bb2) {
-        return new BlockBox(
-            Math.min(bb.getMinX(), bb2.getMinX()),
-            Math.min(bb.getMinY(), bb2.getMinY()),
-            Math.min(bb.getMinZ(), bb2.getMinZ()),
-            Math.max(bb.getMaxX(), bb2.getMaxX()),
-            Math.max(bb.getMaxY(), bb2.getMaxY()),
-            Math.max(bb.getMaxZ(), bb2.getMaxZ())
+    public static BoundingBox encapsulate(BoundingBox bb, BoundingBox bb2) {
+        return new BoundingBox(
+            Math.min(bb.minX(), bb2.minX()),
+            Math.min(bb.minY(), bb2.minY()),
+            Math.min(bb.minZ(), bb2.minZ()),
+            Math.max(bb.maxX(), bb2.maxX()),
+            Math.max(bb.maxY(), bb2.maxY()),
+            Math.max(bb.maxZ(), bb2.maxZ())
         );
     }
 

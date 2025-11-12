@@ -1,21 +1,21 @@
 package com.zurrtum.create.client.catnip.outliner;
 
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.zurrtum.create.client.catnip.render.BindableTexture;
 import com.zurrtum.create.client.catnip.render.PonderRenderTypes;
 import com.zurrtum.create.client.catnip.render.SuperRenderTypeBuffer;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.render.RenderLayer;
-import net.minecraft.client.render.VertexConsumer;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.RenderType;
+import net.minecraft.core.Direction;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
 
 public class AABBOutline extends Outline {
 
-    protected Box bb;
+    protected AABB bb;
 
     protected final Vector3f minPosTemp1 = new Vector3f();
     protected final Vector3f maxPosTemp1 = new Vector3f();
@@ -28,20 +28,20 @@ public class AABBOutline extends Outline {
     protected final Vector3f normalTemp = new Vector3f();
     protected final Vector3f originTemp = new Vector3f();
 
-    public AABBOutline(Box bb) {
+    public AABBOutline(AABB bb) {
         setBounds(bb);
     }
 
-    public Box getBounds() {
+    public AABB getBounds() {
         return bb;
     }
 
-    public void setBounds(Box bb) {
+    public void setBounds(AABB bb) {
         this.bb = bb;
     }
 
     @Override
-    public void render(MinecraftClient mc, MatrixStack ms, SuperRenderTypeBuffer buffer, Vec3d camera, float pt) {
+    public void render(Minecraft mc, PoseStack ms, SuperRenderTypeBuffer buffer, Vec3 camera, float pt) {
         params.loadColor(colorTemp);
         Vector4f color = colorTemp;
         int lightmap = params.lightmap;
@@ -50,10 +50,10 @@ public class AABBOutline extends Outline {
     }
 
     protected void renderBox(
-        MatrixStack ms,
+        PoseStack ms,
         SuperRenderTypeBuffer buffer,
-        Vec3d camera,
-        Box box,
+        Vec3 camera,
+        AABB box,
         Vector4f color,
         int lightmap,
         boolean disableLineNormals
@@ -65,7 +65,7 @@ public class AABBOutline extends Outline {
         boolean cull = !cameraInside && !params.disableCull;
         float inflate = cameraInside ? -1 / 128f : 1 / 128f;
 
-        box = box.offset(camera.multiply(-1));
+        box = box.move(camera.scale(-1));
         minPos.set((float) box.minX - inflate, (float) box.minY - inflate, (float) box.minZ - inflate);
         maxPos.set((float) box.maxX + inflate, (float) box.maxY + inflate, (float) box.maxZ + inflate);
 
@@ -80,7 +80,7 @@ public class AABBOutline extends Outline {
     }
 
     protected void renderBoxFaces(
-        MatrixStack ms,
+        PoseStack ms,
         SuperRenderTypeBuffer buffer,
         boolean cull,
         Direction highlightedFace,
@@ -89,7 +89,7 @@ public class AABBOutline extends Outline {
         Vector4f color,
         int lightmap
     ) {
-        MatrixStack.Entry pose = ms.peek();
+        PoseStack.Pose pose = ms.last();
         renderBoxFace(pose, buffer, cull, highlightedFace, minPos, maxPos, Direction.DOWN, color, lightmap);
         renderBoxFace(pose, buffer, cull, highlightedFace, minPos, maxPos, Direction.UP, color, lightmap);
         renderBoxFace(pose, buffer, cull, highlightedFace, minPos, maxPos, Direction.NORTH, color, lightmap);
@@ -99,7 +99,7 @@ public class AABBOutline extends Outline {
     }
 
     protected void renderBoxFace(
-        MatrixStack.Entry pose,
+        PoseStack.Pose pose,
         SuperRenderTypeBuffer buffer,
         boolean cull,
         Direction highlightedFace,
@@ -117,7 +117,7 @@ public class AABBOutline extends Outline {
         if (faceTexture == null)
             return;
 
-        RenderLayer renderType = PonderRenderTypes.outlineTranslucent(faceTexture.getLocation(), cull);
+        RenderType renderType = PonderRenderTypes.outlineTranslucent(faceTexture.getLocation(), cull);
         VertexConsumer consumer = buffer.getLateBuffer(renderType);
 
         float alphaMult = highlighted ? 1 : 0.5f;
@@ -128,7 +128,7 @@ public class AABBOutline extends Outline {
     }
 
     protected void renderBoxFace(
-        MatrixStack.Entry pose,
+        PoseStack.Pose pose,
         VertexConsumer consumer,
         Vector3f minPos,
         Vector3f maxPos,
@@ -223,7 +223,7 @@ public class AABBOutline extends Outline {
     }
 
     protected void renderBoxEdges(
-        MatrixStack ms,
+        PoseStack ms,
         VertexConsumer consumer,
         Vector3f minPos,
         Vector3f maxPos,
@@ -234,7 +234,7 @@ public class AABBOutline extends Outline {
     ) {
         Vector3f origin = originTemp;
 
-        MatrixStack.Entry pose = ms.peek();
+        PoseStack.Pose pose = ms.last();
 
         float lineLengthX = maxPos.x() - minPos.x();
         float lineLengthY = maxPos.y() - minPos.y();

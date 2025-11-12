@@ -1,12 +1,12 @@
 package com.zurrtum.create.content.trains.display;
 
-import net.minecraft.storage.ReadView;
-import net.minecraft.storage.WriteView;
 import org.apache.commons.lang3.mutable.MutableInt;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 
 public class FlapDisplayLayout {
     List<FlapDisplaySection> sections;
@@ -29,24 +29,24 @@ public class FlapDisplayLayout {
         this.sections = sections;
     }
 
-    public void write(WriteView view) {
+    public void write(ValueOutput view) {
         view.putString("Key", layoutKey);
-        WriteView.ListView list = view.getList("Sections");
-        sections.forEach(section -> section.write(list.add()));
+        ValueOutput.ValueOutputList list = view.childrenList("Sections");
+        sections.forEach(section -> section.write(list.addChild()));
     }
 
-    public void read(ReadView view) {
+    public void read(ValueInput view) {
         String prevKey = layoutKey;
-        layoutKey = view.getString("Key", "");
+        layoutKey = view.getStringOr("Key", "");
 
         if (!prevKey.equals(layoutKey)) {
             sections = new ArrayList<>();
-            view.getListReadView("Sections").forEach(section -> sections.add(FlapDisplaySection.load(section)));
+            view.childrenListOrEmpty("Sections").forEach(section -> sections.add(FlapDisplaySection.load(section)));
             return;
         }
 
         MutableInt index = new MutableInt(0);
-        view.getListReadView("Sections").forEach(section -> sections.get(index.getAndIncrement()).update(section));
+        view.childrenListOrEmpty("Sections").forEach(section -> sections.get(index.getAndIncrement()).update(section));
     }
 
     public List<FlapDisplaySection> getSections() {

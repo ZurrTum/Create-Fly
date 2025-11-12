@@ -15,8 +15,8 @@ import me.shedaniel.rei.api.client.gui.widgets.Widget;
 import me.shedaniel.rei.api.client.gui.widgets.Widgets;
 import me.shedaniel.rei.api.common.category.CategoryIdentifier;
 import me.shedaniel.rei.api.common.util.EntryStacks;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.text.Text;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.network.chat.Component;
 import org.joml.Matrix3x2f;
 
 import java.util.List;
@@ -28,7 +28,7 @@ public class SandpaperPolishingCategory extends CreateCategory<SandpaperPolishin
     }
 
     @Override
-    public Text getTitle() {
+    public Component getTitle() {
         return CreateLang.translateDirect("recipe.sandpaper_polishing");
     }
 
@@ -42,12 +42,12 @@ public class SandpaperPolishingCategory extends CreateCategory<SandpaperPolishin
         Point input = new Point(bounds.x + 32, bounds.y + 34);
         Point output = new Point(bounds.x + 137, bounds.y + 34);
         Slot inputSlot = createInputSlot(input).entries(display.input());
-        widgets.add(Widgets.createDrawableWidget((DrawContext graphics, int mouseX, int mouseY, float delta) -> {
+        widgets.add(Widgets.createDrawableWidget((GuiGraphics graphics, int mouseX, int mouseY, float delta) -> {
             drawSlotBackground(graphics, input, output);
             AllGuiTextures.JEI_SHADOW.render(graphics, bounds.x + 66, bounds.y + 26);
             AllGuiTextures.JEI_LONG_ARROW.render(graphics, bounds.x + 57, bounds.y + 37);
-            graphics.state.addSpecialElement(new SandPaperRenderState(
-                new Matrix3x2f(graphics.getMatrices()),
+            graphics.guiRenderState.submitPicturesInPictureState(new SandPaperRenderState(
+                new Matrix3x2f(graphics.pose()),
                 inputSlot.getCurrentEntry().castValue(),
                 bounds.x + 79,
                 bounds.y + 3

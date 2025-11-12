@@ -3,35 +3,35 @@ package com.zurrtum.create.content.schematics.table;
 import com.zurrtum.create.AllItems;
 import com.zurrtum.create.AllMenuTypes;
 import com.zurrtum.create.foundation.gui.menu.MenuBase;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.screen.slot.Slot;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.item.ItemStack;
 
 public class SchematicTableMenu extends MenuBase<SchematicTableBlockEntity> {
 
     private Slot inputSlot;
     private Slot outputSlot;
 
-    public SchematicTableMenu(int id, PlayerInventory inv, SchematicTableBlockEntity be) {
+    public SchematicTableMenu(int id, Inventory inv, SchematicTableBlockEntity be) {
         super(AllMenuTypes.SCHEMATIC_TABLE, id, inv, be);
     }
 
     public boolean canWrite() {
-        return inputSlot.hasStack() && !outputSlot.hasStack();
+        return inputSlot.hasItem() && !outputSlot.hasItem();
     }
 
     @Override
-    public ItemStack quickMove(PlayerEntity playerIn, int index) {
+    public ItemStack quickMoveStack(Player playerIn, int index) {
         Slot clickedSlot = getSlot(index);
-        if (!clickedSlot.hasStack())
+        if (!clickedSlot.hasItem())
             return ItemStack.EMPTY;
 
-        ItemStack stack = clickedSlot.getStack();
+        ItemStack stack = clickedSlot.getItem();
         if (index < 2)
-            insertItem(stack, 2, slots.size(), true);
+            moveItemStackTo(stack, 2, slots.size(), true);
         else
-            insertItem(stack, 0, 1, false);
+            moveItemStackTo(stack, 0, 1, false);
 
         return ItemStack.EMPTY;
     }
@@ -44,14 +44,14 @@ public class SchematicTableMenu extends MenuBase<SchematicTableBlockEntity> {
     protected void addSlots() {
         inputSlot = new Slot(contentHolder.inventory, 0, 21, 59) {
             @Override
-            public boolean canInsert(ItemStack stack) {
-                return stack.isOf(AllItems.EMPTY_SCHEMATIC) || stack.isOf(AllItems.SCHEMATIC_AND_QUILL) || stack.isOf(AllItems.SCHEMATIC);
+            public boolean mayPlace(ItemStack stack) {
+                return stack.is(AllItems.EMPTY_SCHEMATIC) || stack.is(AllItems.SCHEMATIC_AND_QUILL) || stack.is(AllItems.SCHEMATIC);
             }
         };
 
         outputSlot = new Slot(contentHolder.inventory, 1, 166, 59) {
             @Override
-            public boolean canInsert(ItemStack stack) {
+            public boolean mayPlace(ItemStack stack) {
                 return false;
             }
         };

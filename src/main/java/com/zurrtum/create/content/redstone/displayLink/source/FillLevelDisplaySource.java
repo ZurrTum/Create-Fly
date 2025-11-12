@@ -2,7 +2,7 @@ package com.zurrtum.create.content.redstone.displayLink.source;
 
 import com.zurrtum.create.content.redstone.displayLink.DisplayLinkContext;
 import com.zurrtum.create.content.redstone.thresholdSwitch.ThresholdSwitchBlockEntity;
-import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntity;
 
 public class FillLevelDisplaySource extends PercentOrProgressBarDisplaySource {
     @Override
@@ -15,7 +15,7 @@ public class FillLevelDisplaySource extends PercentOrProgressBarDisplaySource {
 
     @Override
     protected boolean progressBarActive(DisplayLinkContext context) {
-        return context.sourceConfig().getInt("Mode", 0) != 0;
+        return context.sourceConfig().getIntOr("Mode", 0) != 0;
     }
 
     @Override

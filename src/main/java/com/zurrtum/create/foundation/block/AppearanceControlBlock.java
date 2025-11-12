@@ -1,10 +1,10 @@
 package com.zurrtum.create.foundation.block;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.world.BlockRenderView;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.level.BlockAndTintGetter;
+import net.minecraft.world.level.block.state.BlockState;
 
 public interface AppearanceControlBlock {
-    BlockState getAppearance(BlockState state, BlockRenderView level, BlockPos toPos, Direction face, BlockState reference, BlockPos fromPos);
+    BlockState getAppearance(BlockState state, BlockAndTintGetter level, BlockPos toPos, Direction face, BlockState reference, BlockPos fromPos);
 }

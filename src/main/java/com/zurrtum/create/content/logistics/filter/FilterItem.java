@@ -7,89 +7,89 @@ import com.zurrtum.create.foundation.gui.menu.MenuBase;
 import com.zurrtum.create.foundation.gui.menu.MenuProvider;
 import com.zurrtum.create.foundation.item.ItemHelper;
 import com.zurrtum.create.foundation.recipe.ItemCopyingRecipe.SupportsItemCopying;
-import net.minecraft.component.Component;
-import net.minecraft.component.ComponentType;
-import net.minecraft.component.type.TooltipDisplayComponent;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.ItemUsageContext;
-import net.minecraft.item.tooltip.TooltipType;
-import net.minecraft.network.RegistryByteBuf;
-import net.minecraft.screen.ScreenTexts;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.text.Text;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.Hand;
-import net.minecraft.world.World;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Consumer;
+import net.minecraft.core.component.DataComponentType;
+import net.minecraft.core.component.TypedDataComponent;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.chat.CommonComponents;
+import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.component.TooltipDisplay;
+import net.minecraft.world.item.context.UseOnContext;
+import net.minecraft.world.level.Level;
 
 public abstract class FilterItem extends Item implements MenuProvider, SupportsItemCopying {
-    public static ListFilterItem regular(Settings properties) {
+    public static ListFilterItem regular(Properties properties) {
         return new ListFilterItem(properties);
     }
 
-    public static AttributeFilterItem attribute(Settings properties) {
+    public static AttributeFilterItem attribute(Properties properties) {
         return new AttributeFilterItem(properties);
     }
 
-    public static PackageFilterItem address(Settings properties) {
+    public static PackageFilterItem address(Properties properties) {
         return new PackageFilterItem(properties);
     }
 
-    protected FilterItem(Settings properties) {
+    protected FilterItem(Properties properties) {
         super(properties);
     }
 
     @NotNull
     @Override
-    public ActionResult useOnBlock(ItemUsageContext context) {
+    public InteractionResult useOn(UseOnContext context) {
         if (context.getPlayer() == null)
-            return ActionResult.PASS;
-        return use(context.getWorld(), context.getPlayer(), context.getHand());
+            return InteractionResult.PASS;
+        return use(context.getLevel(), context.getPlayer(), context.getHand());
     }
 
     @Override
     @SuppressWarnings("deprecation")
-    public void appendTooltip(
+    public void appendHoverText(
         ItemStack stack,
         Item.TooltipContext context,
-        TooltipDisplayComponent displayComponent,
-        Consumer<Text> textConsumer,
-        TooltipType type
+        TooltipDisplay displayComponent,
+        Consumer<Component> textConsumer,
+        TooltipFlag type
     ) {
         if (AllClientHandle.INSTANCE.shiftDown())
             return;
-        List<Text> makeSummary = makeSummary(stack);
+        List<Component> makeSummary = makeSummary(stack);
         if (makeSummary.isEmpty())
             return;
-        textConsumer.accept(ScreenTexts.SPACE);
+        textConsumer.accept(CommonComponents.SPACE);
         makeSummary.forEach(textConsumer);
     }
 
-    public abstract List<Text> makeSummary(ItemStack filter);
+    public abstract List<Component> makeSummary(ItemStack filter);
 
     @Override
-    public ActionResult use(World world, PlayerEntity player, Hand hand) {
-        if (!player.isSneaking() && hand == Hand.MAIN_HAND) {
-            if (!world.isClient() && player instanceof ServerPlayerEntity serverPlayer)
+    public InteractionResult use(Level world, Player player, InteractionHand hand) {
+        if (!player.isShiftKeyDown() && hand == InteractionHand.MAIN_HAND) {
+            if (!world.isClientSide() && player instanceof ServerPlayer serverPlayer)
                 openHandledScreen(serverPlayer);
-            return ActionResult.SUCCESS;
+            return InteractionResult.SUCCESS;
         }
-        return ActionResult.PASS;
+        return InteractionResult.PASS;
     }
 
     @Override
-    public abstract @Nullable MenuBase<?> createMenu(int id, PlayerInventory inv, PlayerEntity player, RegistryByteBuf extraData);
+    public abstract @Nullable MenuBase<?> createMenu(int id, Inventory inv, Player player, RegistryFriendlyByteBuf extraData);
 
     @Override
-    public Text getDisplayName() {
+    public Component getDisplayName() {
         return getName();
     }
 
@@ -98,7 +98,7 @@ public abstract class FilterItem extends Item implements MenuProvider, SupportsI
             if (PackageItem.isPackage(filter) && PackageItem.isPackage(stack))
                 return doPackagesHaveSameData(filter, stack);
 
-            return ItemStack.areItemsAndComponentsEqual(filter, stack);
+            return ItemStack.isSameItemSameComponents(filter, stack);
         }
 
         if (PackageItem.isPackage(filter) && PackageItem.isPackage(stack))
@@ -110,10 +110,10 @@ public abstract class FilterItem extends Item implements MenuProvider, SupportsI
     public static boolean doPackagesHaveSameData(@NotNull ItemStack a, @NotNull ItemStack b) {
         if (a.isEmpty())
             return false;
-        if (!ItemStack.areItemsAndComponentsEqual(a, b))
+        if (!ItemStack.isSameItemSameComponents(a, b))
             return false;
-        for (Component<?> component : a.getComponents()) {
-            ComponentType<?> type = component.type();
+        for (TypedDataComponent<?> component : a.getComponents()) {
+            DataComponentType<?> type = component.type();
             if (type.equals(AllDataComponents.PACKAGE_ORDER_DATA) || type.equals(AllDataComponents.PACKAGE_ORDER_CONTEXT))
                 continue;
             if (!Objects.equals(a.get(type), b.get(type)))
@@ -122,7 +122,7 @@ public abstract class FilterItem extends Item implements MenuProvider, SupportsI
         return true;
     }
 
-    public abstract ComponentType<?> getComponentType();
+    public abstract DataComponentType<?> getComponentType();
 
     public abstract FilterItemStack makeStackWrapper(ItemStack filter);
 

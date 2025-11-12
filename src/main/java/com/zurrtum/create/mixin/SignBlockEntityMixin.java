@@ -1,10 +1,10 @@
 package com.zurrtum.create.mixin;
 
 import com.zurrtum.create.api.behaviour.display.DisplayHolder;
-import net.minecraft.block.entity.SignBlockEntity;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.storage.ReadView;
-import net.minecraft.storage.WriteView;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.level.block.entity.SignBlockEntity;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
@@ -14,25 +14,25 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(SignBlockEntity.class)
 public class SignBlockEntityMixin implements DisplayHolder {
     @Unique
-    private NbtCompound displayLink;
+    private CompoundTag displayLink;
 
     @Override
-    public NbtCompound getDisplayLinkData() {
+    public CompoundTag getDisplayLinkData() {
         return displayLink;
     }
 
     @Override
-    public void setDisplayLinkData(NbtCompound data) {
+    public void setDisplayLinkData(CompoundTag data) {
         displayLink = data;
     }
 
-    @Inject(method = "writeData(Lnet/minecraft/storage/WriteView;)V", at = @At("TAIL"))
-    private void writeData(WriteView view, CallbackInfo ci) {
+    @Inject(method = "saveAdditional(Lnet/minecraft/world/level/storage/ValueOutput;)V", at = @At("TAIL"))
+    private void writeData(ValueOutput view, CallbackInfo ci) {
         writeDisplayLink(view);
     }
 
-    @Inject(method = "readData(Lnet/minecraft/storage/ReadView;)V", at = @At("TAIL"))
-    private void readData(ReadView view, CallbackInfo ci) {
+    @Inject(method = "loadAdditional(Lnet/minecraft/world/level/storage/ValueInput;)V", at = @At("TAIL"))
+    private void readData(ValueInput view, CallbackInfo ci) {
         readDisplayLink(view);
     }
 }

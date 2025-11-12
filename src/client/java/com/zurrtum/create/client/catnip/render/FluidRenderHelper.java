@@ -1,34 +1,38 @@
 package com.zurrtum.create.client.catnip.render;
 
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
+import com.mojang.math.Axis;
 import com.zurrtum.create.catnip.data.Iterate;
 import com.zurrtum.create.client.AllFluidConfigs;
 import com.zurrtum.create.client.infrastructure.fluid.FluidConfig;
 import com.zurrtum.create.infrastructure.fluids.FluidStack;
-import net.minecraft.client.render.VertexConsumer;
-import net.minecraft.client.render.VertexConsumerProvider;
-import net.minecraft.client.texture.Sprite;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.component.ComponentChanges;
-import net.minecraft.fluid.Fluid;
-import net.minecraft.util.math.*;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.core.Direction;
+import net.minecraft.core.Vec3i;
+import net.minecraft.core.component.DataComponentPatch;
+import net.minecraft.util.Mth;
+import net.minecraft.world.level.material.Fluid;
+import net.minecraft.world.phys.Vec3;
 
 public class FluidRenderHelper {
 
-    public static VertexConsumer getFluidBuilder(VertexConsumerProvider buffer) {
+    public static VertexConsumer getFluidBuilder(MultiBufferSource buffer) {
         return buffer.getBuffer(PonderRenderTypes.fluid());
     }
 
     public static void renderFluidBox(
         Fluid fluid,
-        ComponentChanges changes,
+        DataComponentPatch changes,
         float xMin,
         float yMin,
         float zMin,
         float xMax,
         float yMax,
         float zMax,
-        VertexConsumerProvider buffer,
-        MatrixStack ms,
+        MultiBufferSource buffer,
+        PoseStack ms,
         int light,
         boolean renderBottom,
         boolean invertGasses
@@ -44,8 +48,8 @@ public class FluidRenderHelper {
         float xMax,
         float yMax,
         float zMax,
-        VertexConsumerProvider buffer,
-        MatrixStack ms,
+        MultiBufferSource buffer,
+        PoseStack ms,
         int light,
         boolean renderBottom,
         boolean invertGasses
@@ -69,7 +73,7 @@ public class FluidRenderHelper {
 
     public static void renderFluidBox(
         Fluid fluid,
-        ComponentChanges changes,
+        DataComponentPatch changes,
         float xMin,
         float yMin,
         float zMin,
@@ -77,7 +81,7 @@ public class FluidRenderHelper {
         float yMax,
         float zMax,
         VertexConsumer builder,
-        MatrixStack ms,
+        PoseStack ms,
         int light,
         boolean renderBottom,
         boolean invertGasses
@@ -86,28 +90,28 @@ public class FluidRenderHelper {
         if (config == null) {
             return;
         }
-        Sprite fluidTexture = config.still().get();
+        TextureAtlasSprite fluidTexture = config.still().get();
 
         int color = config.tint().apply(changes) | 0xff000000;
         int blockLightIn = (light >> 4) & 0xF;
-        int luminosity = Math.max(blockLightIn, fluid.getDefaultState().getBlockState().getLuminance());
+        int luminosity = Math.max(blockLightIn, fluid.defaultFluidState().createLegacyBlock().getLightEmission());
         light = (light & 0xF00000) | luminosity << 4;
 
-        Vec3d center = new Vec3d(xMin + (xMax - xMin) / 2, yMin + (yMax - yMin) / 2, zMin + (zMax - zMin) / 2);
-        ms.push();
+        Vec3 center = new Vec3(xMin + (xMax - xMin) / 2, yMin + (yMax - yMin) / 2, zMin + (zMax - zMin) / 2);
+        ms.pushPose();
         //TODO
         if (invertGasses && false) {
             ms.translate(center.x, center.y, center.z);
-            ms.multiply(RotationAxis.POSITIVE_X.rotationDegrees(180));
+            ms.mulPose(Axis.XP.rotationDegrees(180));
             ms.translate(-center.x, -center.y, -center.z);
         }
 
-        MatrixStack.Entry entry = ms.peek();
+        PoseStack.Pose entry = ms.last();
         for (Direction side : Iterate.directions) {
             if (side == Direction.DOWN && !renderBottom)
                 continue;
 
-            boolean positive = side.getDirection() == Direction.AxisDirection.POSITIVE;
+            boolean positive = side.getAxisDirection() == Direction.AxisDirection.POSITIVE;
             if (side.getAxis().isHorizontal()) {
                 if (side.getAxis() == Direction.Axis.X) {
                     renderStillTiledFace(side, zMin, yMin, zMax, yMax, positive ? xMax : xMin, builder, entry, light, color, fluidTexture);
@@ -119,12 +123,12 @@ public class FluidRenderHelper {
             }
         }
 
-        ms.pop();
+        ms.popPose();
     }
 
     public static void renderFluidBox(
         Fluid fluid,
-        ComponentChanges changes,
+        DataComponentPatch changes,
         float xMin,
         float yMin,
         float zMin,
@@ -132,7 +136,7 @@ public class FluidRenderHelper {
         float yMax,
         float zMax,
         VertexConsumer builder,
-        MatrixStack.Entry entry,
+        PoseStack.Pose entry,
         int light,
         boolean renderBottom,
         boolean invertGasses
@@ -141,18 +145,18 @@ public class FluidRenderHelper {
         if (config == null) {
             return;
         }
-        Sprite fluidTexture = config.still().get();
+        TextureAtlasSprite fluidTexture = config.still().get();
 
         int color = config.tint().apply(changes) | 0xff000000;
         int blockLightIn = (light >> 4) & 0xF;
-        int luminosity = Math.max(blockLightIn, fluid.getDefaultState().getBlockState().getLuminance());
+        int luminosity = Math.max(blockLightIn, fluid.defaultFluidState().createLegacyBlock().getLightEmission());
         light = (light & 0xF00000) | luminosity << 4;
 
-        Vec3d center = new Vec3d(xMin + (xMax - xMin) / 2, yMin + (yMax - yMin) / 2, zMin + (zMax - zMin) / 2);
+        Vec3 center = new Vec3(xMin + (xMax - xMin) / 2, yMin + (yMax - yMin) / 2, zMin + (zMax - zMin) / 2);
         //TODO
         if (invertGasses && false) {
             entry.translate((float) center.x, (float) center.y, (float) center.z);
-            entry.rotate(RotationAxis.POSITIVE_X.rotationDegrees(180));
+            entry.rotate(Axis.XP.rotationDegrees(180));
             entry.translate((float) -center.x, (float) -center.y, (float) -center.z);
         }
 
@@ -160,7 +164,7 @@ public class FluidRenderHelper {
             if (side == Direction.DOWN && !renderBottom)
                 continue;
 
-            boolean positive = side.getDirection() == Direction.AxisDirection.POSITIVE;
+            boolean positive = side.getAxisDirection() == Direction.AxisDirection.POSITIVE;
             if (side.getAxis().isHorizontal()) {
                 if (side.getAxis() == Direction.Axis.X) {
                     renderStillTiledFace(side, zMin, yMin, zMax, yMax, positive ? xMax : xMin, builder, entry, light, color, fluidTexture);
@@ -181,10 +185,10 @@ public class FluidRenderHelper {
         float up,
         float depth,
         VertexConsumer builder,
-        MatrixStack.Entry entry,
+        PoseStack.Pose entry,
         int light,
         int color,
-        Sprite texture
+        TextureAtlasSprite texture
     ) {
         renderTiledFace(dir, left, down, right, up, depth, builder, entry, light, color, texture, 1);
     }
@@ -197,19 +201,19 @@ public class FluidRenderHelper {
         float up,
         float depth,
         VertexConsumer builder,
-        MatrixStack.Entry entry,
+        PoseStack.Pose entry,
         int light,
         int color,
-        Sprite texture,
+        TextureAtlasSprite texture,
         float textureScale
     ) {
-        boolean positive = dir.getDirection() == Direction.AxisDirection.POSITIVE;
+        boolean positive = dir.getAxisDirection() == Direction.AxisDirection.POSITIVE;
         boolean horizontal = dir.getAxis().isHorizontal();
         boolean x = dir.getAxis() == Direction.Axis.X;
 
-        float shrink = texture.getUvScaleDelta() * 0.25f * textureScale;
-        float centerU = texture.getMinU() + (texture.getMaxU() - texture.getMinU()) * 0.5f * textureScale;
-        float centerV = texture.getMinV() + (texture.getMaxV() - texture.getMinV()) * 0.5f * textureScale;
+        float shrink = texture.uvShrinkRatio() * 0.25f * textureScale;
+        float centerU = texture.getU0() + (texture.getU1() - texture.getU0()) * 0.5f * textureScale;
+        float centerV = texture.getV0() + (texture.getV1() - texture.getV0()) * 0.5f * textureScale;
 
         float f;
         float x2;
@@ -217,31 +221,31 @@ public class FluidRenderHelper {
         float u1, u2;
         float v1, v2;
         for (float x1 = left; x1 < right; x1 = x2) {
-            f = MathHelper.floor(x1);
+            f = Mth.floor(x1);
             x2 = Math.min(f + 1, right);
             if (dir == Direction.NORTH || dir == Direction.EAST) {
-                f = MathHelper.ceil(x2);
-                u1 = texture.getFrameU((f - x2) * textureScale);
-                u2 = texture.getFrameU((f - x1) * textureScale);
+                f = Mth.ceil(x2);
+                u1 = texture.getU((f - x2) * textureScale);
+                u2 = texture.getU((f - x1) * textureScale);
             } else {
-                u1 = texture.getFrameU((x1 - f) * textureScale);
-                u2 = texture.getFrameU((x2 - f) * textureScale);
+                u1 = texture.getU((x1 - f) * textureScale);
+                u2 = texture.getU((x2 - f) * textureScale);
             }
-            u1 = MathHelper.lerp(shrink, u1, centerU);
-            u2 = MathHelper.lerp(shrink, u2, centerU);
+            u1 = Mth.lerp(shrink, u1, centerU);
+            u2 = Mth.lerp(shrink, u2, centerU);
             for (float y1 = down; y1 < up; y1 = y2) {
-                f = MathHelper.floor(y1);
+                f = Mth.floor(y1);
                 y2 = Math.min(f + 1, up);
                 if (dir == Direction.UP) {
-                    v1 = texture.getFrameV((y1 - f) * textureScale);
-                    v2 = texture.getFrameV((y2 - f) * textureScale);
+                    v1 = texture.getV((y1 - f) * textureScale);
+                    v2 = texture.getV((y2 - f) * textureScale);
                 } else {
-                    f = MathHelper.ceil(y2);
-                    v1 = texture.getFrameV((f - y2) * textureScale);
-                    v2 = texture.getFrameV((f - y1) * textureScale);
+                    f = Mth.ceil(y2);
+                    v1 = texture.getV((f - y2) * textureScale);
+                    v2 = texture.getV((f - y1) * textureScale);
                 }
-                v1 = MathHelper.lerp(shrink, v1, centerV);
-                v2 = MathHelper.lerp(shrink, v2, centerV);
+                v1 = Mth.lerp(shrink, v1, centerV);
+                v2 = Mth.lerp(shrink, v2, centerV);
 
                 if (horizontal) {
                     if (x) {
@@ -267,7 +271,7 @@ public class FluidRenderHelper {
 
     protected static void putVertex(
         VertexConsumer builder,
-        MatrixStack.Entry entry,
+        PoseStack.Pose entry,
         float x,
         float y,
         float z,
@@ -278,15 +282,15 @@ public class FluidRenderHelper {
         int light
     ) {
 
-        Vec3i normal = face.getVector();
+        Vec3i normal = face.getUnitVec3i();
         int a = color >> 24 & 0xff;
         int r = color >> 16 & 0xff;
         int g = color >> 8 & 0xff;
         int b = color & 0xff;
 
-        builder.vertex(entry.getPositionMatrix(), x, y, z).color(r, g, b, a).texture(u, v)
+        builder.addVertex(entry.pose(), x, y, z).setColor(r, g, b, a).setUv(u, v)
             //.overlayCoords(OverlayTexture.NO_OVERLAY)
-            .light(light).normal(entry, normal.getX(), normal.getY(), normal.getZ());
+            .setLight(light).setNormal(entry, normal.getX(), normal.getY(), normal.getZ());
     }
 
 }

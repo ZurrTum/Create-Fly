@@ -1,27 +1,27 @@
 package com.zurrtum.create.content.decoration.copycat;
 
 import com.zurrtum.create.foundation.block.ProperWaterloggedBlock;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.fluid.FluidState;
-import net.minecraft.item.ItemPlacementContext;
-import net.minecraft.state.StateManager;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.random.Random;
-import net.minecraft.world.WorldView;
-import net.minecraft.world.tick.ScheduledTickView;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.level.LevelReader;
+import net.minecraft.world.level.ScheduledTickAccess;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.material.FluidState;
 
 public abstract class WaterloggedCopycatBlock extends CopycatBlock implements ProperWaterloggedBlock {
 
-    public WaterloggedCopycatBlock(Settings pProperties) {
+    public WaterloggedCopycatBlock(Properties pProperties) {
         super(pProperties);
-        setDefaultState(getDefaultState().with(WATERLOGGED, false));
+        registerDefaultState(defaultBlockState().setValue(WATERLOGGED, false));
     }
 
     @Override
-    protected void appendProperties(StateManager.Builder<Block, BlockState> pBuilder) {
-        super.appendProperties(pBuilder.add(WATERLOGGED));
+    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> pBuilder) {
+        super.createBlockStateDefinition(pBuilder.add(WATERLOGGED));
     }
 
     @Override
@@ -30,20 +30,20 @@ public abstract class WaterloggedCopycatBlock extends CopycatBlock implements Pr
     }
 
     @Override
-    public BlockState getPlacementState(ItemPlacementContext pContext) {
-        return withWater(super.getPlacementState(pContext), pContext);
+    public BlockState getStateForPlacement(BlockPlaceContext pContext) {
+        return withWater(super.getStateForPlacement(pContext), pContext);
     }
 
     @Override
-    public BlockState getStateForNeighborUpdate(
+    public BlockState updateShape(
         BlockState pState,
-        WorldView pLevel,
-        ScheduledTickView tickView,
+        LevelReader pLevel,
+        ScheduledTickAccess tickView,
         BlockPos pCurrentPos,
         Direction pDirection,
         BlockPos pNeighborPos,
         BlockState pNeighborState,
-        Random random
+        RandomSource random
     ) {
         updateWater(pLevel, tickView, pState, pCurrentPos);
         return pState;

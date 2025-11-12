@@ -6,9 +6,9 @@ import com.zurrtum.create.content.logistics.BigItemStack;
 import com.zurrtum.create.content.logistics.packager.InventorySummary;
 import com.zurrtum.create.content.logistics.stockTicker.StockTickerBlockEntity;
 import com.zurrtum.create.content.logistics.stockTicker.StockTickerBlockEntity.StockTickerInventory;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
+import net.minecraft.ChatFormatting;
+import net.minecraft.client.Minecraft;
+import net.minecraft.network.chat.Component;
 
 import java.util.List;
 
@@ -18,22 +18,22 @@ public class StockTickerTooltipBehaviour extends TooltipBehaviour<StockTickerBlo
     }
 
     @Override
-    public boolean addToTooltip(List<Text> tooltip, boolean isPlayerSneaking) {
+    public boolean addToTooltip(List<Component> tooltip, boolean isPlayerSneaking) {
         StockTickerInventory receivedPayments = blockEntity.receivedPayments;
         if (receivedPayments.isEmpty())
             return false;
-        if (!blockEntity.behaviour.mayAdministrate(MinecraftClient.getInstance().player))
+        if (!blockEntity.behaviour.mayAdministrate(Minecraft.getInstance().player))
             return false;
 
-        CreateLang.translate("stock_ticker.contains_payments").style(Formatting.WHITE).forGoggles(tooltip);
+        CreateLang.translate("stock_ticker.contains_payments").style(ChatFormatting.WHITE).forGoggles(tooltip);
 
         InventorySummary summary = new InventorySummary();
-        for (int i = 0, size = receivedPayments.size(); i < size; i++)
-            summary.add(receivedPayments.getStack(i));
+        for (int i = 0, size = receivedPayments.getContainerSize(); i < size; i++)
+            summary.add(receivedPayments.getItem(i));
         for (BigItemStack entry : summary.getStacksByCount())
-            CreateLang.builder().text(entry.stack.getName().getString() + " x" + entry.count).style(Formatting.GREEN).forGoggles(tooltip);
+            CreateLang.builder().text(entry.stack.getHoverName().getString() + " x" + entry.count).style(ChatFormatting.GREEN).forGoggles(tooltip);
 
-        CreateLang.translate("stock_ticker.click_to_retrieve").style(Formatting.GRAY).forGoggles(tooltip);
+        CreateLang.translate("stock_ticker.click_to_retrieve").style(ChatFormatting.GRAY).forGoggles(tooltip);
         return true;
     }
 }

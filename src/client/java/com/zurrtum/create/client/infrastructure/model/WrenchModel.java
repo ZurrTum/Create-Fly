@@ -1,27 +1,28 @@
 package com.zurrtum.create.client.infrastructure.model;
 
 import com.google.common.base.Suppliers;
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.math.Axis;
 import com.mojang.serialization.MapCodec;
 import com.zurrtum.create.client.catnip.animation.AnimationTickHolder;
 import com.zurrtum.create.client.foundation.blockEntity.behaviour.scrollValue.ScrollValueHandler;
-import net.minecraft.client.item.ItemModelManager;
-import net.minecraft.client.render.RenderLayer;
-import net.minecraft.client.render.TexturedRenderLayers;
-import net.minecraft.client.render.command.OrderedRenderCommandQueue;
-import net.minecraft.client.render.item.ItemRenderState;
-import net.minecraft.client.render.item.ItemRenderState.LayerRenderState;
-import net.minecraft.client.render.item.model.BasicItemModel;
-import net.minecraft.client.render.item.model.ItemModel;
-import net.minecraft.client.render.item.model.special.SpecialModelRenderer;
-import net.minecraft.client.render.model.*;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.client.world.ClientWorld;
-import net.minecraft.item.ItemDisplayContext;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.HeldItemContext;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.Pair;
-import net.minecraft.util.math.RotationAxis;
+import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.Sheets;
+import net.minecraft.client.renderer.SubmitNodeCollector;
+import net.minecraft.client.renderer.block.model.BakedQuad;
+import net.minecraft.client.renderer.block.model.TextureSlots;
+import net.minecraft.client.renderer.item.*;
+import net.minecraft.client.renderer.item.ItemStackRenderState.LayerRenderState;
+import net.minecraft.client.renderer.special.SpecialModelRenderer;
+import net.minecraft.client.resources.model.BlockModelRotation;
+import net.minecraft.client.resources.model.ModelBaker;
+import net.minecraft.client.resources.model.ResolvedModel;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.Tuple;
+import net.minecraft.world.entity.ItemOwner;
+import net.minecraft.world.item.ItemDisplayContext;
+import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
 
@@ -32,117 +33,117 @@ import java.util.function.Supplier;
 import static com.zurrtum.create.Create.MOD_ID;
 
 public class WrenchModel implements ItemModel, SpecialModelRenderer<LayerRenderState> {
-    public static final Identifier ID = Identifier.of(MOD_ID, "model/wrench");
-    public static final Identifier ITEM_ID = Identifier.of(MOD_ID, "item/wrench/item");
-    public static final Identifier GEAR_ID = Identifier.of(MOD_ID, "item/wrench/gear");
+    public static final ResourceLocation ID = ResourceLocation.fromNamespaceAndPath(MOD_ID, "model/wrench");
+    public static final ResourceLocation ITEM_ID = ResourceLocation.fromNamespaceAndPath(MOD_ID, "item/wrench/item");
+    public static final ResourceLocation GEAR_ID = ResourceLocation.fromNamespaceAndPath(MOD_ID, "item/wrench/gear");
 
-    private final RenderLayer layer = TexturedRenderLayers.getItemEntityTranslucentCull();
+    private final RenderType layer = Sheets.translucentItemSheet();
     private final List<BakedQuad> itemQuads;
-    private final ModelSettings itemSettings;
+    private final ModelRenderProperties itemSettings;
     private final Supplier<Vector3f[]> itemVector;
     private final List<BakedQuad> gearQuads;
-    private final ModelSettings gearSettings;
+    private final ModelRenderProperties gearSettings;
     private final Supplier<Vector3f[]> gearVector;
 
-    public WrenchModel(Pair<List<BakedQuad>, ModelSettings> item, Pair<List<BakedQuad>, ModelSettings> gear) {
-        itemQuads = item.getLeft();
-        itemSettings = item.getRight();
-        itemVector = Suppliers.memoize(() -> BasicItemModel.bakeQuads(itemQuads));
-        gearQuads = gear.getLeft();
-        gearSettings = gear.getRight();
-        gearVector = Suppliers.memoize(() -> BasicItemModel.bakeQuads(gearQuads));
+    public WrenchModel(Tuple<List<BakedQuad>, ModelRenderProperties> item, Tuple<List<BakedQuad>, ModelRenderProperties> gear) {
+        itemQuads = item.getA();
+        itemSettings = item.getB();
+        itemVector = Suppliers.memoize(() -> BlockModelWrapper.computeExtents(itemQuads));
+        gearQuads = gear.getA();
+        gearSettings = gear.getB();
+        gearVector = Suppliers.memoize(() -> BlockModelWrapper.computeExtents(gearQuads));
     }
 
     @Override
     public void update(
-        ItemRenderState state,
+        ItemStackRenderState state,
         ItemStack stack,
-        ItemModelManager resolver,
+        ItemModelResolver resolver,
         ItemDisplayContext displayContext,
-        @Nullable ClientWorld world,
-        @Nullable HeldItemContext user,
+        @Nullable ClientLevel world,
+        @Nullable ItemOwner user,
         int seed
     ) {
-        state.addModelKey(this);
-        state.markAnimated();
+        state.appendModelIdentityElement(this);
+        state.setAnimated();
         update(state, displayContext, itemQuads, itemSettings, itemVector, false);
         update(state, displayContext, gearQuads, gearSettings, gearVector, true);
     }
 
     private void update(
-        ItemRenderState state,
+        ItemStackRenderState state,
         ItemDisplayContext displayContext,
         List<BakedQuad> quads,
-        ModelSettings settings,
+        ModelRenderProperties settings,
         Supplier<Vector3f[]> vector,
         boolean rotation
     ) {
         LayerRenderState layerRenderState = state.newLayer();
-        layerRenderState.setRenderLayer(layer);
-        layerRenderState.setVertices(vector);
-        settings.addSettings(layerRenderState, displayContext);
-        layerRenderState.getQuads().addAll(quads);
+        layerRenderState.setRenderType(layer);
+        layerRenderState.setExtents(vector);
+        settings.applyToLayer(layerRenderState, displayContext);
+        layerRenderState.prepareQuadList().addAll(quads);
         if (rotation) {
-            layerRenderState.setSpecialModel(this, layerRenderState);
+            layerRenderState.setupSpecialModel(this, layerRenderState);
         }
     }
 
     @Override
-    public void render(
+    public void submit(
         LayerRenderState layer,
         ItemDisplayContext displayContext,
-        MatrixStack matrices,
-        OrderedRenderCommandQueue queue,
+        PoseStack matrices,
+        SubmitNodeCollector queue,
         int light,
         int overlay,
         boolean glint,
         int i
     ) {
         assert layer != null;
-        matrices.push();
+        matrices.pushPose();
         matrices.translate(0.5625f, 0.5f, 0.5f);
-        matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(ScrollValueHandler.getScroll(AnimationTickHolder.getPartialTicks())));
+        matrices.mulPose(Axis.YP.rotationDegrees(ScrollValueHandler.getScroll(AnimationTickHolder.getPartialTicks())));
         matrices.translate(-0.5625f, -0.5f, -0.5f);
-        queue.submitItem(matrices, displayContext, light, overlay, 0, layer.tints, layer.quads, layer.renderLayer, layer.glint);
-        matrices.pop();
+        queue.submitItem(matrices, displayContext, light, overlay, 0, layer.tintLayers, layer.quads, layer.renderType, layer.foilType);
+        matrices.popPose();
     }
 
     @Override
-    public void collectVertices(Set<Vector3f> vertices) {
+    public void getExtents(Set<Vector3f> vertices) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public LayerRenderState getData(ItemStack stack) {
+    public LayerRenderState extractArgument(ItemStack stack) {
         throw new UnsupportedOperationException();
     }
 
     public static class Unbaked implements ItemModel.Unbaked {
-        public static final MapCodec<Unbaked> CODEC = MapCodec.unit(Unbaked::new);
+        public static final MapCodec<com.zurrtum.create.client.infrastructure.model.WrenchModel.Unbaked> CODEC = MapCodec.unit(com.zurrtum.create.client.infrastructure.model.WrenchModel.Unbaked::new);
 
         @Override
-        public MapCodec<Unbaked> getCodec() {
+        public MapCodec<com.zurrtum.create.client.infrastructure.model.WrenchModel.Unbaked> type() {
             return CODEC;
         }
 
         @Override
-        public void resolve(Resolver resolver) {
+        public void resolveDependencies(Resolver resolver) {
             resolver.markDependency(ITEM_ID);
             resolver.markDependency(GEAR_ID);
         }
 
         @Override
-        public ItemModel bake(ItemModel.BakeContext context) {
-            Baker baker = context.blockModelBaker();
+        public ItemModel bake(ItemModel.BakingContext context) {
+            ModelBaker baker = context.blockModelBaker();
             return new WrenchModel(bake(baker, ITEM_ID), bake(baker, GEAR_ID));
         }
 
-        private static Pair<List<BakedQuad>, ModelSettings> bake(Baker baker, Identifier id) {
-            BakedSimpleModel model = baker.getModel(id);
-            ModelTextures textures = model.getTextures();
-            List<BakedQuad> quads = model.bakeGeometry(textures, baker, ModelRotation.X0_Y0).getAllQuads();
-            ModelSettings settings = ModelSettings.resolveSettings(baker, model, textures);
-            return new Pair<>(quads, settings);
+        private static Tuple<List<BakedQuad>, ModelRenderProperties> bake(ModelBaker baker, ResourceLocation id) {
+            ResolvedModel model = baker.getModel(id);
+            TextureSlots textures = model.getTopTextureSlots();
+            List<BakedQuad> quads = model.bakeTopGeometry(textures, baker, BlockModelRotation.X0_Y0).getAll();
+            ModelRenderProperties settings = ModelRenderProperties.fromResolvedModel(baker, model, textures);
+            return new Tuple<>(quads, settings);
         }
     }
 }

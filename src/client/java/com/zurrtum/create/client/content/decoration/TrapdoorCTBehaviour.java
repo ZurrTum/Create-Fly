@@ -4,17 +4,17 @@ import com.zurrtum.create.client.AllSpriteShifts;
 import com.zurrtum.create.client.foundation.block.connected.CTSpriteShiftEntry;
 import com.zurrtum.create.client.foundation.block.connected.ConnectedTextureBehaviour;
 import com.zurrtum.create.content.decoration.TrainTrapdoorBlock;
-import net.minecraft.block.BlockState;
-import net.minecraft.client.texture.Sprite;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.world.BlockRenderView;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.level.BlockAndTintGetter;
+import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.Nullable;
 
 public class TrapdoorCTBehaviour extends ConnectedTextureBehaviour.Base {
 
     @Override
-    public CTSpriteShiftEntry getShift(BlockState state, Direction direction, @Nullable Sprite sprite) {
+    public CTSpriteShiftEntry getShift(BlockState state, Direction direction, @Nullable TextureAtlasSprite sprite) {
         return AllSpriteShifts.FRAMED_GLASS;
     }
 
@@ -22,7 +22,7 @@ public class TrapdoorCTBehaviour extends ConnectedTextureBehaviour.Base {
     public boolean connectsTo(
         BlockState state,
         BlockState other,
-        BlockRenderView reader,
+        BlockAndTintGetter reader,
         BlockPos pos,
         BlockPos otherPos,
         Direction face,

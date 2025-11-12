@@ -5,19 +5,19 @@ import com.zurrtum.create.foundation.advancement.CreateTrigger.Conditions;
 import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
 import com.zurrtum.create.foundation.blockEntity.behaviour.BehaviourType;
 import com.zurrtum.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
-import net.minecraft.advancement.AdvancementEntry;
-import net.minecraft.advancement.PlayerAdvancementTracker;
-import net.minecraft.advancement.criterion.Criterion.ConditionsContainer;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.server.ServerAdvancementLoader;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.storage.ReadView;
-import net.minecraft.storage.WriteView;
-import net.minecraft.util.Uuids;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.BlockView;
-import net.minecraft.world.World;
+import net.minecraft.advancements.AdvancementHolder;
+import net.minecraft.advancements.CriterionTrigger.Listener;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.UUIDUtil;
+import net.minecraft.server.PlayerAdvancements;
+import net.minecraft.server.ServerAdvancementManager;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
+import net.minecraft.world.phys.Vec3;
 
 import java.util.HashSet;
 import java.util.List;
@@ -30,12 +30,12 @@ public class AdvancementBehaviour extends BlockEntityBehaviour<SmartBlockEntity>
     private UUID playerId;
     private final Set<CreateTrigger> advancements;
 
-    public AdvancementBehaviour(SmartBlockEntity be, ServerPlayerEntity player, CreateTrigger... advancements) {
+    public AdvancementBehaviour(SmartBlockEntity be, ServerPlayer player, CreateTrigger... advancements) {
         super(be);
         this.advancements = new HashSet<>(List.of(advancements));
-        playerId = player.getUuid();
+        playerId = player.getUUID();
         removeAwarded(player);
-        blockEntity.markDirty();
+        blockEntity.setChanged();
     }
 
     public boolean isOwnerPresent() {
@@ -44,74 +44,74 @@ public class AdvancementBehaviour extends BlockEntityBehaviour<SmartBlockEntity>
 
     @Override
     public void initialize() {
-        ServerPlayerEntity player = getPlayer();
+        ServerPlayer player = getPlayer();
         if (player != null) {
             removeAwarded(player);
         }
     }
 
-    private void removeAwarded(ServerPlayerEntity player) {
+    private void removeAwarded(ServerPlayer player) {
         if (advancements.isEmpty())
             return;
-        ServerAdvancementLoader loader = player.getEntityWorld().getServer().getAdvancementLoader();
-        PlayerAdvancementTracker advancementTracker = player.getAdvancementTracker();
+        ServerAdvancementManager loader = player.level().getServer().getAdvancements();
+        PlayerAdvancements advancementTracker = player.getAdvancements();
         advancements.removeIf(trigger -> {
-            Set<ConditionsContainer<Conditions>> containers = trigger.listeners.get(advancementTracker);
+            Set<Listener<Conditions>> containers = trigger.listeners.get(advancementTracker);
             if (containers != null) {
-                return containers.stream().allMatch(container -> advancementTracker.getProgress(container.advancement()).isDone());
+                return containers.stream().allMatch(container -> advancementTracker.getOrStartProgress(container.advancement()).isDone());
             }
-            AdvancementEntry advancement = loader.get(trigger.id);
+            AdvancementHolder advancement = loader.get(trigger.id);
             if (advancement == null) {
                 return true;
             }
-            return advancementTracker.getProgress(advancement).isDone();
+            return advancementTracker.getOrStartProgress(advancement).isDone();
         });
         if (advancements.isEmpty()) {
             playerId = null;
-            blockEntity.markDirty();
+            blockEntity.setChanged();
         }
     }
 
     public void awardPlayerIfNear(CreateTrigger advancement, int maxDistance) {
-        ServerPlayerEntity player = getPlayer();
+        ServerPlayer player = getPlayer();
         if (player == null)
             return;
-        if (player.squaredDistanceTo(Vec3d.ofCenter(getPos())) > maxDistance * maxDistance)
+        if (player.distanceToSqr(Vec3.atCenterOf(getPos())) > maxDistance * maxDistance)
             return;
         award(advancement, player);
     }
 
     public void awardPlayer(CreateTrigger advancement) {
-        ServerPlayerEntity player = getPlayer();
+        ServerPlayer player = getPlayer();
         if (player == null)
             return;
         award(advancement, player);
     }
 
-    private void award(CreateTrigger advancement, ServerPlayerEntity player) {
+    private void award(CreateTrigger advancement, ServerPlayer player) {
         if (advancements.contains(advancement)) {
             advancement.trigger(player);
             removeAwarded(player);
         }
     }
 
-    private ServerPlayerEntity getPlayer() {
+    private ServerPlayer getPlayer() {
         if (playerId == null)
             return null;
-        return (ServerPlayerEntity) getWorld().getPlayerByUuid(playerId);
+        return (ServerPlayer) getLevel().getPlayerByUUID(playerId);
     }
 
     @Override
-    public void write(WriteView view, boolean clientPacket) {
+    public void write(ValueOutput view, boolean clientPacket) {
         super.write(view, clientPacket);
         if (playerId != null)
-            view.put("Owner", Uuids.INT_STREAM_CODEC, playerId);
+            view.store("Owner", UUIDUtil.CODEC, playerId);
     }
 
     @Override
-    public void read(ReadView view, boolean clientPacket) {
+    public void read(ValueInput view, boolean clientPacket) {
         super.read(view, clientPacket);
-        playerId = view.read("Owner", Uuids.INT_STREAM_CODEC).orElse(null);
+        playerId = view.read("Owner", UUIDUtil.CODEC).orElse(null);
     }
 
     @Override
@@ -119,19 +119,19 @@ public class AdvancementBehaviour extends BlockEntityBehaviour<SmartBlockEntity>
         return TYPE;
     }
 
-    public static void tryAward(BlockView reader, BlockPos pos, CreateTrigger advancement) {
+    public static void tryAward(BlockGetter reader, BlockPos pos, CreateTrigger advancement) {
         AdvancementBehaviour behaviour = BlockEntityBehaviour.get(reader, pos, AdvancementBehaviour.TYPE);
         if (behaviour != null)
             behaviour.awardPlayer(advancement);
     }
 
-    public static void setPlacedBy(World worldIn, BlockPos pos, LivingEntity placer) {
-        if (worldIn.isClient())
+    public static void setPlacedBy(Level worldIn, BlockPos pos, LivingEntity placer) {
+        if (worldIn.isClientSide())
             return;
         if (!(worldIn.getBlockEntity(pos) instanceof SmartBlockEntity blockEntity)) {
             return;
         }
-        if (placer instanceof ServerPlayerEntity player) {
+        if (placer instanceof ServerPlayer player) {
             if (FakePlayerHandler.has(player))
                 return;
             blockEntity.addAdvancementBehaviour(player);

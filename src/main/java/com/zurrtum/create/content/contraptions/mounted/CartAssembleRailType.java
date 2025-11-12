@@ -1,16 +1,15 @@
 package com.zurrtum.create.content.contraptions.mounted;
 
 import com.zurrtum.create.AllBlocks;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.item.Item;
-import net.minecraft.util.StringIdentifiable;
-
 import java.util.Locale;
 import java.util.function.Supplier;
+import net.minecraft.util.StringRepresentable;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.state.BlockState;
 
-public enum CartAssembleRailType implements StringIdentifiable {
+public enum CartAssembleRailType implements StringRepresentable {
 
     REGULAR(Blocks.RAIL),
     POWERED_RAIL(Blocks.POWERED_RAIL),
@@ -39,7 +38,7 @@ public enum CartAssembleRailType implements StringIdentifiable {
     }
 
     @Override
-    public String asString() {
+    public String getSerializedName() {
         return name().toLowerCase(Locale.ROOT);
     }
 

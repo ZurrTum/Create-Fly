@@ -2,9 +2,8 @@ package com.zurrtum.create.client.foundation.blockEntity.behaviour.tooltip;
 
 import com.zurrtum.create.client.foundation.item.TooltipHelper;
 import com.zurrtum.create.content.kinetics.mechanicalArm.ArmBlockEntity;
-import net.minecraft.text.Text;
-
 import java.util.List;
+import net.minecraft.network.chat.Component;
 
 public class ArmTooltipBehaviour extends KineticTooltipBehaviour<ArmBlockEntity> {
     public ArmTooltipBehaviour(ArmBlockEntity be) {
@@ -12,7 +11,7 @@ public class ArmTooltipBehaviour extends KineticTooltipBehaviour<ArmBlockEntity>
     }
 
     @Override
-    public boolean addToTooltip(List<Text> tooltip, boolean isPlayerSneaking) {
+    public boolean addToTooltip(List<Component> tooltip, boolean isPlayerSneaking) {
         if (super.addToTooltip(tooltip, isPlayerSneaking))
             return true;
         if (isPlayerSneaking)

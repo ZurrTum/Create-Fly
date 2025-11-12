@@ -2,12 +2,11 @@ package com.zurrtum.create.content.equipment.zapper.terrainzapper;
 
 import com.zurrtum.create.infrastructure.component.PlacementOptions;
 import com.zurrtum.create.infrastructure.component.TerrainTools;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.WorldAccess;
-
 import java.util.Collection;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.phys.Vec3;
 
 public abstract class Brush {
 
@@ -54,12 +53,12 @@ public abstract class Brush {
         return paramIndex == 0 ? param0 : paramIndex == 1 ? param1 : param2;
     }
 
-    public BlockPos getOffset(Vec3d ray, Direction face, PlacementOptions option) {
-        return BlockPos.ORIGIN;
+    public BlockPos getOffset(Vec3 ray, Direction face, PlacementOptions option) {
+        return BlockPos.ZERO;
     }
 
     public abstract Collection<BlockPos> addToGlobalPositions(
-        WorldAccess world,
+        LevelAccessor world,
         BlockPos targetPos,
         Direction targetFace,
         Collection<BlockPos> affectedPositions,

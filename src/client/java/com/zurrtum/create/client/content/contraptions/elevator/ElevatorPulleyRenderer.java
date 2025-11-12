@@ -1,5 +1,7 @@
 package com.zurrtum.create.client.content.contraptions.elevator;
 
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.zurrtum.create.catnip.math.AngleHelper;
 import com.zurrtum.create.client.AllPartialModels;
 import com.zurrtum.create.client.AllSpriteShifts;
@@ -12,23 +14,21 @@ import com.zurrtum.create.client.content.kinetics.base.KineticBlockEntityRendere
 import com.zurrtum.create.content.contraptions.elevator.ElevatorPulleyBlock;
 import com.zurrtum.create.content.contraptions.elevator.ElevatorPulleyBlockEntity;
 import com.zurrtum.create.content.kinetics.base.KineticBlockEntity;
-import net.minecraft.block.BlockState;
-import net.minecraft.client.render.RenderLayer;
-import net.minecraft.client.render.VertexConsumer;
-import net.minecraft.client.render.WorldRenderer;
-import net.minecraft.client.render.block.entity.BlockEntityRendererFactory;
-import net.minecraft.client.render.command.ModelCommandRenderer;
-import net.minecraft.client.render.command.OrderedRenderCommandQueue;
-import net.minecraft.client.render.state.CameraRenderState;
-import net.minecraft.client.texture.Sprite;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.World;
+import net.minecraft.client.renderer.LevelRenderer;
+import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.SubmitNodeCollector;
+import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
+import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
+import net.minecraft.client.renderer.state.CameraRenderState;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.util.Mth;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 
 public class ElevatorPulleyRenderer extends KineticBlockEntityRenderer<ElevatorPulleyBlockEntity, ElevatorPulleyRenderer.ElevatorPulleyRenderState> {
-    public ElevatorPulleyRenderer(BlockEntityRendererFactory.Context context) {
+    public ElevatorPulleyRenderer(BlockEntityRendererProvider.Context context) {
         super(context);
     }
 
@@ -38,23 +38,23 @@ public class ElevatorPulleyRenderer extends KineticBlockEntityRenderer<ElevatorP
     }
 
     @Override
-    public void updateRenderState(
+    public void extractRenderState(
         ElevatorPulleyBlockEntity be,
         ElevatorPulleyRenderState state,
         float tickProgress,
-        Vec3d cameraPos,
-        @Nullable ModelCommandRenderer.CrumblingOverlayCommand crumblingOverlay
+        Vec3 cameraPos,
+        @Nullable ModelFeatureRenderer.CrumblingOverlay crumblingOverlay
     ) {
-        super.updateRenderState(be, state, tickProgress, cameraPos, crumblingOverlay);
-        World world = be.getWorld();
-        BlockState blockState = be.getCachedState();
+        super.extractRenderState(be, state, tickProgress, cameraPos, crumblingOverlay);
+        Level world = be.getLevel();
+        BlockState blockState = be.getBlockState();
         float offset = PulleyRenderer.getBlockEntityOffset(tickProgress, be);
         boolean running = PulleyRenderer.isPulleyRunning(be);
-        state.yRot = MathHelper.RADIANS_PER_DEGREE * (180 + AngleHelper.horizontalAngle(blockState.get(ElevatorPulleyBlock.HORIZONTAL_FACING)));
+        state.yRot = Mth.DEG_TO_RAD * (180 + AngleHelper.horizontalAngle(blockState.getValue(ElevatorPulleyBlock.HORIZONTAL_FACING)));
         if (running || offset == 0) {
             state.magnet = CachedBuffers.partial(AllPartialModels.ELEVATOR_MAGNET, blockState);
             state.magnetOffset = -offset;
-            state.magnetLight = WorldRenderer.getLightmapCoordinates(world, state.pos.down((int) offset));
+            state.magnetLight = LevelRenderer.getLightColor(world, state.blockPos.below((int) offset));
         }
         state.rotatedCoil = getRotatedCoil(be);
         if (offset == 0) {
@@ -68,7 +68,7 @@ public class ElevatorPulleyRenderer extends KineticBlockEntityRenderer<ElevatorP
             updateHalfShift(state, offset);
             float down = f > .75f ? f - 1 : f;
             state.halfRopeOffset = -down;
-            state.halfRopeLight = WorldRenderer.getLightmapCoordinates(world, state.pos.down((int) down));
+            state.halfRopeLight = LevelRenderer.getLightColor(world, state.blockPos.below((int) down));
         }
         if (!running) {
             return;
@@ -82,7 +82,7 @@ public class ElevatorPulleyRenderer extends KineticBlockEntityRenderer<ElevatorP
         int[] lights = new int[size];
         for (int i = 0; i < size; i++) {
             float down = offset - i;
-            int light = WorldRenderer.getLightmapCoordinates(world, state.pos.down((int) down));
+            int light = LevelRenderer.getLightColor(world, state.blockPos.below((int) down));
             offsets[i] = -down;
             lights[i] = light;
         }
@@ -91,21 +91,21 @@ public class ElevatorPulleyRenderer extends KineticBlockEntityRenderer<ElevatorP
     }
 
     @Override
-    public void render(ElevatorPulleyRenderState state, MatrixStack matrices, OrderedRenderCommandQueue queue, CameraRenderState cameraState) {
-        queue.submitCustom(matrices, state.layer, state);
+    public void submit(ElevatorPulleyRenderState state, PoseStack matrices, SubmitNodeCollector queue, CameraRenderState cameraState) {
+        queue.submitCustomGeometry(matrices, state.layer, state);
     }
 
     private static void updateHalfShift(ElevatorPulleyRenderState state, float offset) {
         state.halfShift = AllSpriteShifts.ELEVATOR_BELT;
         double beltScroll = (-(offset + .5) - Math.floor(-(offset + .5))) / 2;
-        Sprite target = state.halfShift.getTarget();
-        float spriteSize = target.getMaxV() - target.getMinV();
+        TextureAtlasSprite target = state.halfShift.getTarget();
+        float spriteSize = target.getV1() - target.getV0();
         state.halfScroll = (float) beltScroll * spriteSize;
     }
 
     @Override
-    protected RenderLayer getRenderType(ElevatorPulleyBlockEntity be, BlockState state) {
-        return RenderLayer.getSolid();
+    protected RenderType getRenderType(ElevatorPulleyBlockEntity be, BlockState state) {
+        return RenderType.solid();
     }
 
     @Override
@@ -114,12 +114,12 @@ public class ElevatorPulleyRenderer extends KineticBlockEntityRenderer<ElevatorP
     }
 
     protected SuperByteBuffer getRotatedCoil(KineticBlockEntity be) {
-        BlockState blockState = be.getCachedState();
-        return CachedBuffers.partialFacing(AllPartialModels.ELEVATOR_COIL, blockState, blockState.get(ElevatorPulleyBlock.HORIZONTAL_FACING));
+        BlockState blockState = be.getBlockState();
+        return CachedBuffers.partialFacing(AllPartialModels.ELEVATOR_COIL, blockState, blockState.getValue(ElevatorPulleyBlock.HORIZONTAL_FACING));
     }
 
     @Override
-    public boolean rendersOutsideBoundingBox() {
+    public boolean shouldRenderOffScreen() {
         return true;
     }
 
@@ -141,7 +141,7 @@ public class ElevatorPulleyRenderer extends KineticBlockEntityRenderer<ElevatorP
         public int[] lights;
 
         @Override
-        public void render(MatrixStack.Entry matricesEntry, VertexConsumer vertexConsumer) {
+        public void render(PoseStack.Pose matricesEntry, VertexConsumer vertexConsumer) {
             if (model != null) {
                 super.render(matricesEntry, vertexConsumer);
             }
@@ -151,7 +151,7 @@ public class ElevatorPulleyRenderer extends KineticBlockEntityRenderer<ElevatorP
             if (coilScroll != 0) {
                 rotatedCoil.shiftUVScrolling(coilShift, coilScroll);
             }
-            rotatedCoil.light(lightmapCoordinates).renderInto(matricesEntry, vertexConsumer);
+            rotatedCoil.light(lightCoords).renderInto(matricesEntry, vertexConsumer);
             if (halfRope != null) {
                 halfRope.center().rotateY(yRot).uncenter().translate(0, halfRopeOffset, 0).shiftUVScrolling(halfShift, halfScroll)
                     .light(halfRopeLight).renderInto(matricesEntry, vertexConsumer);

@@ -8,13 +8,13 @@ import com.zurrtum.create.foundation.blockEntity.behaviour.inventory.TankManipul
 import com.zurrtum.create.foundation.utility.FluidFormatter;
 import com.zurrtum.create.infrastructure.fluids.FluidInventory;
 import com.zurrtum.create.infrastructure.fluids.FluidStack;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.text.MutableText;
-import net.minecraft.text.Text;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.world.level.block.entity.BlockEntity;
 
 public class FluidAmountDisplaySource extends SingleLineDisplaySource {
     @Override
-    protected MutableText provideLine(DisplayLinkContext context, DisplayTargetStats stats) {
+    protected MutableComponent provideLine(DisplayLinkContext context, DisplayTargetStats stats) {
         BlockEntity sourceBE = context.getSourceBlockEntity();
         if (!(sourceBE instanceof SmartObserverBlockEntity cobe))
             return EMPTY_LINE;
@@ -36,7 +36,7 @@ public class FluidAmountDisplaySource extends SingleLineDisplaySource {
             collected += stack.getAmount();
         }
 
-        return Text.literal(FluidFormatter.asString(collected, false));
+        return Component.literal(FluidFormatter.asString(collected, false));
     }
 
     @Override

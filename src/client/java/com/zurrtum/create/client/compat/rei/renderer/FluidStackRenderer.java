@@ -12,28 +12,28 @@ import me.shedaniel.rei.api.client.entry.renderer.EntryRenderer;
 import me.shedaniel.rei.api.client.gui.widgets.Tooltip;
 import me.shedaniel.rei.api.client.gui.widgets.TooltipContext;
 import me.shedaniel.rei.api.common.entry.EntryStack;
-import net.minecraft.client.gl.RenderPipelines;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.component.DataComponentTypes;
-import net.minecraft.component.MergedComponentMap;
-import net.minecraft.component.type.PotionContentsComponent;
-import net.minecraft.fluid.Fluid;
-import net.minecraft.text.Text;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.renderer.RenderPipelines;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.core.component.PatchedDataComponentMap;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.item.alchemy.PotionContents;
+import net.minecraft.world.level.material.Fluid;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public record FluidStackRenderer(EntryRenderer<FluidStack> origin) implements EntryRenderer<FluidStack> {
     @Override
-    public void render(EntryStack<FluidStack> entry, DrawContext graphics, Rectangle bounds, int mouseX, int mouseY, float delta) {
+    public void render(EntryStack<FluidStack> entry, GuiGraphics graphics, Rectangle bounds, int mouseX, int mouseY, float delta) {
         FluidStack stack = entry.getValue();
         Fluid fluid = stack.getFluid();
         FluidConfig config = AllFluidConfigs.get(fluid);
         if (config == null) {
             return;
         }
-        int color = config.tint().apply(stack.getComponents().getChanges()) | 0xff000000;
-        graphics.drawSpriteStretched(RenderPipelines.GUI_TEXTURED, config.still().get(), bounds.x, bounds.y, bounds.width, bounds.height, color);
+        int color = config.tint().apply(stack.getComponents().asPatch()) | 0xff000000;
+        graphics.blitSprite(RenderPipelines.GUI_TEXTURED, config.still().get(), bounds.x, bounds.y, bounds.width, bounds.height, color);
     }
 
     @Override
@@ -47,13 +47,13 @@ public record FluidStackRenderer(EntryRenderer<FluidStack> origin) implements En
         if (first.isText()) {
             FluidStack stack = entry.getValue();
             if (stack.getFluid() == AllFluids.POTION) {
-                MergedComponentMap components = stack.getComponents();
-                PotionContentsComponent contents = components.getOrDefault(DataComponentTypes.POTION_CONTENTS, PotionContentsComponent.DEFAULT);
+                PatchedDataComponentMap components = stack.getComponents();
+                PotionContents contents = components.getOrDefault(DataComponents.POTION_CONTENTS, PotionContents.EMPTY);
                 BottleType bottleType = components.getOrDefault(AllDataComponents.POTION_FLUID_BOTTLE_TYPE, BottleType.REGULAR);
-                Text name = contents.getName(PotionFluidHandler.itemFromBottleType(bottleType).getTranslationKey() + ".effect.");
+                Component name = contents.getName(PotionFluidHandler.itemFromBottleType(bottleType).getDescriptionId() + ".effect.");
                 List<Tooltip.Entry> list = new ArrayList<>();
                 list.add(Tooltip.entry(name));
-                contents.appendTooltip(context.vanillaContext(), text -> list.add(Tooltip.entry(text)), context.getFlag(), components);
+                contents.addToTooltip(context.vanillaContext(), text -> list.add(Tooltip.entry(text)), context.getFlag(), components);
                 entries.removeFirst();
                 entries.addAll(0, list);
             }

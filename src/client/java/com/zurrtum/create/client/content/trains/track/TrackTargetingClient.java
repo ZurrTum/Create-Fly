@@ -1,6 +1,7 @@
 package com.zurrtum.create.client.content.trains.track;
 
 import com.google.common.base.Objects;
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.zurrtum.create.AllDataComponents;
 import com.zurrtum.create.client.AllTrackRenders;
 import com.zurrtum.create.client.catnip.render.SuperRenderTypeBuffer;
@@ -13,17 +14,16 @@ import com.zurrtum.create.content.trains.track.TrackTargetingBehaviour.RenderedT
 import com.zurrtum.create.content.trains.track.TrackTargetingBlockItem;
 import com.zurrtum.create.content.trains.track.TrackTargetingBlockItem.OverlapResult;
 import com.zurrtum.create.infrastructure.component.BezierTrackPointLocation;
-import net.minecraft.block.BlockState;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.hit.HitResult;
-import net.minecraft.util.hit.HitResult.Type;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction.AxisDirection;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction.AxisDirection;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.HitResult;
+import net.minecraft.world.phys.HitResult.Type;
+import net.minecraft.world.phys.Vec3;
 
 public class TrackTargetingClient {
 
@@ -35,23 +35,23 @@ public class TrackTargetingClient {
     static OverlapResult lastResult;
     static TrackGraphLocation lastLocation;
 
-    public static void clientTick(MinecraftClient mc) {
-        ClientPlayerEntity player = mc.player;
-        Vec3d lookAngle = player.getRotationVector();
+    public static void clientTick(Minecraft mc) {
+        LocalPlayer player = mc.player;
+        Vec3 lookAngle = player.getLookAngle();
 
         BlockPos hovered = null;
         boolean direction = false;
         EdgePointType<?> type = null;
         BezierTrackPointLocation hoveredBezier = null;
 
-        ItemStack stack = player.getMainHandStack();
+        ItemStack stack = player.getMainHandItem();
         if (stack.getItem() instanceof TrackTargetingBlockItem ttbi)
             type = ttbi.getType(stack);
 
         if (type == EdgePointType.SIGNAL)
             GlobalRailwayManagerClient.tickSignalOverlay(mc);
 
-        boolean alreadySelected = stack.contains(AllDataComponents.TRACK_TARGETING_ITEM_SELECTED_POS);
+        boolean alreadySelected = stack.has(AllDataComponents.TRACK_TARGETING_ITEM_SELECTED_POS);
 
         if (type != null) {
             BezierPointSelection bezierSelection = TrackBlockOutline.result;
@@ -59,23 +59,23 @@ public class TrackTargetingClient {
             if (alreadySelected) {
                 hovered = stack.get(AllDataComponents.TRACK_TARGETING_ITEM_SELECTED_POS);
                 direction = stack.getOrDefault(AllDataComponents.TRACK_TARGETING_ITEM_SELECTED_DIRECTION, false);
-                if (stack.contains(AllDataComponents.TRACK_TARGETING_ITEM_BEZIER)) {
+                if (stack.has(AllDataComponents.TRACK_TARGETING_ITEM_BEZIER)) {
                     hoveredBezier = stack.get(AllDataComponents.TRACK_TARGETING_ITEM_BEZIER);
                 }
 
             } else if (bezierSelection != null) {
-                hovered = bezierSelection.blockEntity().getPos();
+                hovered = bezierSelection.blockEntity().getBlockPos();
                 hoveredBezier = bezierSelection.loc();
-                direction = lookAngle.dotProduct(bezierSelection.direction()) < 0;
+                direction = lookAngle.dot(bezierSelection.direction()) < 0;
 
             } else {
-                HitResult hitResult = mc.crosshairTarget;
+                HitResult hitResult = mc.hitResult;
                 if (hitResult != null && hitResult.getType() == Type.BLOCK) {
                     BlockHitResult blockHitResult = (BlockHitResult) hitResult;
                     BlockPos pos = blockHitResult.getBlockPos();
-                    BlockState blockState = mc.world.getBlockState(pos);
+                    BlockState blockState = mc.level.getBlockState(pos);
                     if (blockState.getBlock() instanceof ITrackBlock track) {
-                        direction = track.getNearestTrackAxis(mc.world, pos, blockState, lookAngle).getSecond() == AxisDirection.POSITIVE;
+                        direction = track.getNearestTrackAxis(mc.level, pos, blockState, lookAngle).getSecond() == AxisDirection.POSITIVE;
                         hovered = pos;
                     }
                 }
@@ -102,14 +102,14 @@ public class TrackTargetingClient {
         lastHoveredBezierSegment = hoveredBezier;
 
         TrackTargetingBlockItem.withGraphLocation(
-            mc.world, hovered, direction, hoveredBezier, type, (result, location) -> {
+            mc.level, hovered, direction, hoveredBezier, type, (result, location) -> {
                 lastResult = result;
                 lastLocation = location;
             }
         );
     }
 
-    public static void render(MinecraftClient mc, MatrixStack ms, SuperRenderTypeBuffer buffer, Vec3d camera) {
+    public static void render(Minecraft mc, PoseStack ms, SuperRenderTypeBuffer buffer, Vec3 camera) {
         if (lastLocation == null || lastResult.feedback != null)
             return;
 
@@ -118,14 +118,14 @@ public class TrackTargetingClient {
 
         RenderedTrackOverlayType type = lastType == EdgePointType.SIGNAL ? RenderedTrackOverlayType.SIGNAL : lastType == EdgePointType.OBSERVER ? RenderedTrackOverlayType.OBSERVER : RenderedTrackOverlayType.STATION;
 
-        BlockState state = mc.world.getBlockState(pos);
+        BlockState state = mc.level.getBlockState(pos);
         if (!(state.getBlock() instanceof ITrackBlock track))
             return;
         TrackBlockRenderer renderer = AllTrackRenders.get(track);
         if (renderer != null) {
             renderer.getRenderState(
-                mc.world,
-                new Vec3d(pos.getX() - camera.getX(), pos.getY() - camera.getY(), pos.getZ() - camera.getZ()),
+                mc.level,
+                new Vec3(pos.getX() - camera.x(), pos.getY() - camera.y(), pos.getZ() - camera.z()),
                 state,
                 pos,
                 direction,

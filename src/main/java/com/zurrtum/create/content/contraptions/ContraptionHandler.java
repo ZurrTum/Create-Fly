@@ -3,11 +3,10 @@ package com.zurrtum.create.content.contraptions;
 import com.zurrtum.create.catnip.data.WorldAttached;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import it.unimi.dsi.fastutil.objects.ObjectLists;
-import net.minecraft.world.World;
-import net.minecraft.world.entity.EntityLike;
-
 import java.lang.ref.WeakReference;
 import java.util.*;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.entity.EntityAccess;
 
 public class ContraptionHandler {
 
@@ -21,7 +20,7 @@ public class ContraptionHandler {
         queuedAdditions = new WorldAttached<>($ -> ObjectLists.synchronize(new ObjectArrayList<>()));
     }
 
-    public static void tick(World world) {
+    public static void tick(Level world) {
         Map<Integer, WeakReference<AbstractContraptionEntity>> map = loadedContraptions.get(world);
         List<AbstractContraptionEntity> queued = queuedAdditions.get(world);
 
@@ -46,9 +45,9 @@ public class ContraptionHandler {
         }
     }
 
-    public static void addSpawnedContraptionsToCollisionList(EntityLike entity) {
+    public static void addSpawnedContraptionsToCollisionList(EntityAccess entity) {
         if (entity instanceof AbstractContraptionEntity abstractContraptionEntity)
-            queuedAdditions.get(abstractContraptionEntity.getEntityWorld()).add(abstractContraptionEntity);
+            queuedAdditions.get(abstractContraptionEntity.level()).add(abstractContraptionEntity);
     }
 
 }

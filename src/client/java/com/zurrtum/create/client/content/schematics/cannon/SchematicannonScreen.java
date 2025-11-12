@@ -19,19 +19,19 @@ import com.zurrtum.create.content.schematics.cannon.SchematicannonMenu;
 import com.zurrtum.create.foundation.gui.menu.MenuType;
 import com.zurrtum.create.infrastructure.packet.c2s.ConfigureSchematicannonPacket;
 import com.zurrtum.create.infrastructure.packet.c2s.ConfigureSchematicannonPacket.Option;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gl.RenderPipelines;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.widget.ClickableWidget;
-import net.minecraft.client.util.math.Rect2i;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.network.RegistryByteBuf;
-import net.minecraft.screen.ScreenTexts;
-import net.minecraft.storage.NbtReadView;
-import net.minecraft.storage.ReadView;
-import net.minecraft.text.Text;
-import net.minecraft.util.ErrorReporter;
-import net.minecraft.util.Formatting;
+import net.minecraft.ChatFormatting;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.AbstractWidget;
+import net.minecraft.client.renderer.Rect2i;
+import net.minecraft.client.renderer.RenderPipelines;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.chat.CommonComponents;
+import net.minecraft.network.chat.Component;
+import net.minecraft.util.ProblemReporter;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.level.storage.TagValueInput;
+import net.minecraft.world.level.storage.ValueInput;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -44,7 +44,7 @@ public class SchematicannonScreen extends AbstractSimiContainerScreen<Schematica
     private static final AllGuiTextures BG_BOTTOM = AllGuiTextures.SCHEMATICANNON_BOTTOM;
     private static final AllGuiTextures BG_TOP = AllGuiTextures.SCHEMATICANNON_TOP;
 
-    private final Text listPrinter = CreateLang.translateDirect("gui.schematicannon.listPrinter");
+    private final Component listPrinter = CreateLang.translateDirect("gui.schematicannon.listPrinter");
     private final String _gunpowderLevel = "gui.schematicannon.gunpowderLevel";
     private final String _shotsRemaining = "gui.schematicannon.shotsRemaining";
     private final String _showSettings = "gui.schematicannon.showOptions";
@@ -54,8 +54,8 @@ public class SchematicannonScreen extends AbstractSimiContainerScreen<Schematica
     private final String _slotListPrinter = "gui.schematicannon.slot.listPrinter";
     private final String _slotSchematic = "gui.schematicannon.slot.schematic";
 
-    private final Text optionEnabled = CreateLang.translateDirect("gui.schematicannon.optionEnabled");
-    private final Text optionDisabled = CreateLang.translateDirect("gui.schematicannon.optionDisabled");
+    private final Component optionEnabled = CreateLang.translateDirect("gui.schematicannon.optionEnabled");
+    private final Component optionDisabled = CreateLang.translateDirect("gui.schematicannon.optionDisabled");
 
     protected List<Indicator> replaceLevelIndicators;
     protected List<IconButton> replaceLevelButtons;
@@ -77,29 +77,29 @@ public class SchematicannonScreen extends AbstractSimiContainerScreen<Schematica
     private Indicator showSettingsIndicator;
     private ElementWidget renderedItem;
 
-    protected List<ClickableWidget> placementSettingWidgets;
+    protected List<AbstractWidget> placementSettingWidgets;
 
     private List<Rect2i> extraAreas = Collections.emptyList();
 
-    public SchematicannonScreen(SchematicannonMenu menu, PlayerInventory inventory, Text title) {
+    public SchematicannonScreen(SchematicannonMenu menu, Inventory inventory, Component title) {
         super(menu, inventory, title);
         placementSettingWidgets = new ArrayList<>();
     }
 
     public static SchematicannonScreen create(
-        MinecraftClient mc,
+        Minecraft mc,
         MenuType<SchematicannonBlockEntity> type,
         int syncId,
-        PlayerInventory inventory,
-        Text title,
-        RegistryByteBuf extraData
+        Inventory inventory,
+        Component title,
+        RegistryFriendlyByteBuf extraData
     ) {
         SchematicannonBlockEntity entity = getBlockEntity(mc, extraData);
         if (entity == null) {
             return null;
         }
-        try (ErrorReporter.Logging logging = new ErrorReporter.Logging(entity.getReporterContext(), LOGGER)) {
-            ReadView view = NbtReadView.create(logging, extraData.getRegistryManager(), extraData.readNbt());
+        try (ProblemReporter.ScopedCollector logging = new ProblemReporter.ScopedCollector(entity.problemPath(), LOGGER)) {
+            ValueInput view = TagValueInput.create(logging, extraData.registryAccess(), extraData.readNbt());
             entity.readClient(view);
             return type.create(SchematicannonScreen::new, syncId, inventory, title, entity);
         }
@@ -112,51 +112,51 @@ public class SchematicannonScreen extends AbstractSimiContainerScreen<Schematica
         super.init();
 
         // Play Pause Stop
-        playButton = new IconButton(x + 75, y + 85, AllIcons.I_PLAY);
+        playButton = new IconButton(leftPos + 75, topPos + 85, AllIcons.I_PLAY);
         playButton.withCallback(() -> {
             sendOptionUpdate(Option.PLAY, true);
         });
-        playIndicator = new Indicator(x + 75, y + 79, ScreenTexts.EMPTY);
-        pauseButton = new IconButton(x + 93, y + 85, AllIcons.I_PAUSE);
+        playIndicator = new Indicator(leftPos + 75, topPos + 79, CommonComponents.EMPTY);
+        pauseButton = new IconButton(leftPos + 93, topPos + 85, AllIcons.I_PAUSE);
         pauseButton.withCallback(() -> {
             sendOptionUpdate(Option.PAUSE, true);
         });
-        pauseIndicator = new Indicator(x + 93, y + 79, ScreenTexts.EMPTY);
-        resetButton = new IconButton(x + 111, y + 85, AllIcons.I_STOP);
+        pauseIndicator = new Indicator(leftPos + 93, topPos + 79, CommonComponents.EMPTY);
+        resetButton = new IconButton(leftPos + 111, topPos + 85, AllIcons.I_STOP);
         resetButton.withCallback(() -> {
             sendOptionUpdate(Option.STOP, true);
         });
-        resetIndicator = new Indicator(x + 111, y + 79, ScreenTexts.EMPTY);
+        resetIndicator = new Indicator(leftPos + 111, topPos + 79, CommonComponents.EMPTY);
         resetIndicator.state = State.RED;
         addRenderableWidgets(playButton, playIndicator, pauseButton, pauseIndicator, resetButton, resetIndicator);
 
-        confirmButton = new IconButton(x + 180, y + 111, AllIcons.I_CONFIRM);
+        confirmButton = new IconButton(leftPos + 180, topPos + 111, AllIcons.I_CONFIRM);
         confirmButton.withCallback(() -> {
-            client.player.closeHandledScreen();
+            minecraft.player.closeContainer();
         });
-        addDrawableChild(confirmButton);
-        showSettingsButton = new IconButton(x + 8, y + 111, AllIcons.I_PLACEMENT_SETTINGS);
+        addRenderableWidget(confirmButton);
+        showSettingsButton = new IconButton(leftPos + 8, topPos + 111, AllIcons.I_PLACEMENT_SETTINGS);
         showSettingsButton.withCallback(() -> {
             showSettingsIndicator.state = placementSettingsHidden() ? State.GREEN : State.OFF;
             initPlacementSettings();
         });
         showSettingsButton.setToolTip(CreateLang.translateDirect(_showSettings));
-        addDrawableChild(showSettingsButton);
-        showSettingsIndicator = new Indicator(x + 9, y + 111, ScreenTexts.EMPTY);
+        addRenderableWidget(showSettingsButton);
+        showSettingsIndicator = new Indicator(leftPos + 9, topPos + 111, CommonComponents.EMPTY);
         //		addRenderableWidget(showSettingsIndicator);
 
-        extraAreas = ImmutableList.of(new Rect2i(x + BG_TOP.getWidth(), y + BG_TOP.getHeight() + BG_BOTTOM.getHeight() - 62, 84, 92));
+        extraAreas = ImmutableList.of(new Rect2i(leftPos + BG_TOP.getWidth(), topPos + BG_TOP.getHeight() + BG_BOTTOM.getHeight() - 62, 84, 92));
 
-        renderedItem = new ElementWidget(x + BG_TOP.getWidth() - 14, y + BG_TOP.getHeight() + BG_BOTTOM.getHeight() - 62).showingElement(
-            GuiGameElement.of(AllItems.SCHEMATICANNON.getDefaultStack()).scale(5).padding(28));
-        addDrawableChild(renderedItem);
+        renderedItem = new ElementWidget(leftPos + BG_TOP.getWidth() - 14, topPos + BG_TOP.getHeight() + BG_BOTTOM.getHeight() - 62).showingElement(
+            GuiGameElement.of(AllItems.SCHEMATICANNON.getDefaultInstance()).scale(5).padding(28));
+        addRenderableWidget(renderedItem);
 
         tick();
     }
 
     @Override
-    public void close() {
-        super.close();
+    public void onClose() {
+        super.onClose();
         renderedItem.getRenderElement().clear();
     }
 
@@ -171,7 +171,7 @@ public class SchematicannonScreen extends AbstractSimiContainerScreen<Schematica
         replaceLevelButtons = new ArrayList<>(4);
         replaceLevelIndicators = new ArrayList<>(4);
         List<AllIcons> icons = ImmutableList.of(AllIcons.I_DONT_REPLACE, AllIcons.I_REPLACE_SOLID, AllIcons.I_REPLACE_ANY, AllIcons.I_REPLACE_EMPTY);
-        List<Text> toolTips = ImmutableList.of(
+        List<Component> toolTips = ImmutableList.of(
             CreateLang.translateDirect("gui.schematicannon.option.dontReplaceSolid"),
             CreateLang.translateDirect("gui.schematicannon.option.replaceWithSolid"),
             CreateLang.translateDirect("gui.schematicannon.option.replaceWithAny"),
@@ -179,11 +179,11 @@ public class SchematicannonScreen extends AbstractSimiContainerScreen<Schematica
         );
 
         for (int i = 0; i < 4; i++) {
-            replaceLevelIndicators.add(new Indicator(x + 33 + i * 18, y + 111, ScreenTexts.EMPTY));
-            IconButton replaceLevelButton = new IconButton(x + 33 + i * 18, y + 111, icons.get(i));
+            replaceLevelIndicators.add(new Indicator(leftPos + 33 + i * 18, topPos + 111, CommonComponents.EMPTY));
+            IconButton replaceLevelButton = new IconButton(leftPos + 33 + i * 18, topPos + 111, icons.get(i));
             int replaceMode = i;
             replaceLevelButton.withCallback(() -> {
-                if (handler.contentHolder.replaceMode != replaceMode)
+                if (menu.contentHolder.replaceMode != replaceMode)
                     sendOptionUpdate(Option.values()[replaceMode], true);
             });
             replaceLevelButton.setToolTip(toolTips.get(i));
@@ -193,20 +193,20 @@ public class SchematicannonScreen extends AbstractSimiContainerScreen<Schematica
         //		placementSettingWidgets.addAll(replaceLevelIndicators);
 
         // Other Settings
-        skipMissingButton = new IconButton(x + 111, y + 111, AllIcons.I_SKIP_MISSING);
+        skipMissingButton = new IconButton(leftPos + 111, topPos + 111, AllIcons.I_SKIP_MISSING);
         skipMissingButton.withCallback(() -> {
-            sendOptionUpdate(Option.SKIP_MISSING, !handler.contentHolder.skipMissing);
+            sendOptionUpdate(Option.SKIP_MISSING, !menu.contentHolder.skipMissing);
         });
         skipMissingButton.setToolTip(CreateLang.translateDirect("gui.schematicannon.option.skipMissing"));
-        skipMissingIndicator = new Indicator(x + 111, y + 111, ScreenTexts.EMPTY);
+        skipMissingIndicator = new Indicator(leftPos + 111, topPos + 111, CommonComponents.EMPTY);
         Collections.addAll(placementSettingWidgets, skipMissingButton);
 
-        skipBlockEntitiesButton = new IconButton(x + 135, y + 111, AllIcons.I_SKIP_BLOCK_ENTITIES);
+        skipBlockEntitiesButton = new IconButton(leftPos + 135, topPos + 111, AllIcons.I_SKIP_BLOCK_ENTITIES);
         skipBlockEntitiesButton.withCallback(() -> {
-            sendOptionUpdate(Option.SKIP_BLOCK_ENTITIES, !handler.contentHolder.replaceBlockEntities);
+            sendOptionUpdate(Option.SKIP_BLOCK_ENTITIES, !menu.contentHolder.replaceBlockEntities);
         });
         skipBlockEntitiesButton.setToolTip(CreateLang.translateDirect("gui.schematicannon.option.skipBlockEntities"));
-        skipBlockEntitiesIndicator = new Indicator(x + 129, y + 111, ScreenTexts.EMPTY);
+        skipBlockEntitiesIndicator = new Indicator(leftPos + 129, topPos + 111, CommonComponents.EMPTY);
         Collections.addAll(placementSettingWidgets, skipBlockEntitiesButton);
 
         addRenderableWidgets(placementSettingWidgets);
@@ -217,10 +217,10 @@ public class SchematicannonScreen extends AbstractSimiContainerScreen<Schematica
     }
 
     @Override
-    protected void handledScreenTick() {
-        super.handledScreenTick();
+    protected void containerTick() {
+        super.containerTick();
 
-        SchematicannonBlockEntity be = handler.contentHolder;
+        SchematicannonBlockEntity be = menu.contentHolder;
 
         if (!placementSettingsHidden()) {
             for (int replaceMode = 0; replaceMode < replaceLevelButtons.size(); replaceMode++) {
@@ -266,7 +266,7 @@ public class SchematicannonScreen extends AbstractSimiContainerScreen<Schematica
             return;
 
         boolean hasShiftDown = AllKeys.hasShiftDown();
-        for (ClickableWidget w : placementSettingWidgets)
+        for (AbstractWidget w : placementSettingWidgets)
             if (w instanceof IconButton button) {
                 if (!button.getToolTip().isEmpty()) {
                     button.setToolTip(button.getToolTip().getFirst());
@@ -288,8 +288,8 @@ public class SchematicannonScreen extends AbstractSimiContainerScreen<Schematica
         if (!button.isHovered())
             return;
         boolean enabled = button.green;
-        List<Text> tip = button.getToolTip();
-        tip.add((enabled ? optionEnabled : optionDisabled).copyContentOnly().formatted(enabled ? Formatting.DARK_GREEN : Formatting.RED));
+        List<Component> tip = button.getToolTip();
+        tip.add((enabled ? optionEnabled : optionDisabled).plainCopy().withStyle(enabled ? ChatFormatting.DARK_GREEN : ChatFormatting.RED));
         tip.addAll(TooltipHelper.cutTextComponent(
             CreateLang.translateDirect("gui.schematicannon.option." + tooltipKey + ".description"),
             Palette.ALL_GRAY
@@ -297,55 +297,55 @@ public class SchematicannonScreen extends AbstractSimiContainerScreen<Schematica
     }
 
     @Override
-    protected void drawBackground(DrawContext graphics, float partialTicks, int mouseX, int mouseY) {
+    protected void renderBg(GuiGraphics graphics, float partialTicks, int mouseX, int mouseY) {
         int invX = getLeftOfCentered(AllGuiTextures.PLAYER_INVENTORY.getWidth());
-        int invY = y + BG_TOP.getHeight() + BG_BOTTOM.getHeight() + 2;
+        int invY = topPos + BG_TOP.getHeight() + BG_BOTTOM.getHeight() + 2;
         renderPlayerInventory(graphics, invX, invY);
 
-        BG_TOP.render(graphics, x, y);
-        BG_BOTTOM.render(graphics, x, y + BG_TOP.getHeight());
-        AllGuiTextures.SCHEMATIC_TITLE.render(graphics, x, y - 2);
+        BG_TOP.render(graphics, leftPos, topPos);
+        BG_BOTTOM.render(graphics, leftPos, topPos + BG_TOP.getHeight());
+        AllGuiTextures.SCHEMATIC_TITLE.render(graphics, leftPos, topPos - 2);
 
-        SchematicannonBlockEntity be = handler.contentHolder;
-        renderPrintingProgress(graphics, x, y, be.schematicProgress);
+        SchematicannonBlockEntity be = menu.contentHolder;
+        renderPrintingProgress(graphics, leftPos, topPos, be.schematicProgress);
         float amount = be.remainingFuel / (float) be.getShotsPerGunpowder();
-        renderFuelBar(graphics, x, y, amount);
-        renderChecklistPrinterProgress(graphics, x, y, be.bookPrintingProgress);
+        renderFuelBar(graphics, leftPos, topPos, amount);
+        renderChecklistPrinterProgress(graphics, leftPos, topPos, be.bookPrintingProgress);
 
-        if (!be.inventory.getStack(0).isEmpty())
-            renderBlueprintHighlight(graphics, x, y);
+        if (!be.inventory.getItem(0).isEmpty())
+            renderBlueprintHighlight(graphics, leftPos, topPos);
 
-        graphics.drawText(textRenderer, title, x + (BG_TOP.getWidth() - 8 - textRenderer.getWidth(title)) / 2, y + 2, 0xFF505050, false);
+        graphics.drawString(font, title, leftPos + (BG_TOP.getWidth() - 8 - font.width(title)) / 2, topPos + 2, 0xFF505050, false);
 
-        Text msg = CreateLang.translateDirect("schematicannon.status." + be.statusMsg);
-        int stringWidth = textRenderer.getWidth(msg);
+        Component msg = CreateLang.translateDirect("schematicannon.status." + be.statusMsg);
+        int stringWidth = font.width(msg);
 
         if (be.missingItem != null) {
             stringWidth += 16;
-            graphics.drawItem(be.missingItem, x + 128, y + 49);
+            graphics.renderItem(be.missingItem, leftPos + 128, topPos + 49);
         }
 
-        graphics.drawText(textRenderer, msg, x + 103 - stringWidth / 2, y + 53, 0xFFDDEEFF, true);
+        graphics.drawString(font, msg, leftPos + 103 - stringWidth / 2, topPos + 53, 0xFFDDEEFF, true);
 
         if ("schematicErrored".equals(be.statusMsg))
-            graphics.drawText(
-                textRenderer,
+            graphics.drawString(
+                font,
                 CreateLang.translateDirect("schematicannon.status.schematicErroredCheckLogs"),
-                x + 103 - stringWidth / 2,
-                y + 65,
+                leftPos + 103 - stringWidth / 2,
+                topPos + 65,
                 0xFFDDEEFF,
                 true
             );
     }
 
-    protected void renderBlueprintHighlight(DrawContext graphics, int x, int y) {
+    protected void renderBlueprintHighlight(GuiGraphics graphics, int x, int y) {
         AllGuiTextures.SCHEMATICANNON_HIGHLIGHT.render(graphics, x + 10, y + 60);
     }
 
-    protected void renderPrintingProgress(DrawContext graphics, int x, int y, float progress) {
+    protected void renderPrintingProgress(GuiGraphics graphics, int x, int y, float progress) {
         progress = Math.min(progress, 1);
         AllGuiTextures sprite = AllGuiTextures.SCHEMATICANNON_PROGRESS;
-        graphics.drawTexture(
+        graphics.blit(
             RenderPipelines.GUI_TEXTURED,
             sprite.location,
             x + 44,
@@ -359,9 +359,9 @@ public class SchematicannonScreen extends AbstractSimiContainerScreen<Schematica
         );
     }
 
-    protected void renderChecklistPrinterProgress(DrawContext graphics, int x, int y, float progress) {
+    protected void renderChecklistPrinterProgress(GuiGraphics graphics, int x, int y, float progress) {
         AllGuiTextures sprite = AllGuiTextures.SCHEMATICANNON_CHECKLIST_PROGRESS;
-        graphics.drawTexture(
+        graphics.blit(
             RenderPipelines.GUI_TEXTURED,
             sprite.location,
             x + 154,
@@ -375,13 +375,13 @@ public class SchematicannonScreen extends AbstractSimiContainerScreen<Schematica
         );
     }
 
-    protected void renderFuelBar(DrawContext graphics, int x, int y, float amount) {
+    protected void renderFuelBar(GuiGraphics graphics, int x, int y, float amount) {
         AllGuiTextures sprite = AllGuiTextures.SCHEMATICANNON_FUEL;
-        if (handler.contentHolder.hasCreativeCrate) {
+        if (menu.contentHolder.hasCreativeCrate) {
             AllGuiTextures.SCHEMATICANNON_FUEL_CREATIVE.render(graphics, x + 36, y + 19);
             return;
         }
-        graphics.drawTexture(
+        graphics.blit(
             RenderPipelines.GUI_TEXTURED,
             sprite.location,
             x + 36,
@@ -396,25 +396,25 @@ public class SchematicannonScreen extends AbstractSimiContainerScreen<Schematica
     }
 
     @Override
-    protected void renderForeground(DrawContext graphics, int mouseX, int mouseY, float partialTicks) {
-        SchematicannonBlockEntity be = handler.contentHolder;
+    protected void renderForeground(GuiGraphics graphics, int mouseX, int mouseY, float partialTicks) {
+        SchematicannonBlockEntity be = menu.contentHolder;
 
-        int fuelX = x + 36, fuelY = y + 19;
+        int fuelX = leftPos + 36, fuelY = topPos + 19;
         if (mouseX >= fuelX && mouseY >= fuelY && mouseX <= fuelX + AllGuiTextures.SCHEMATICANNON_FUEL.getWidth() && mouseY <= fuelY + AllGuiTextures.SCHEMATICANNON_FUEL.getHeight()) {
-            List<Text> tooltip = getFuelLevelTooltip(be);
-            graphics.drawTooltip(textRenderer, tooltip, mouseX, mouseY);
+            List<Component> tooltip = getFuelLevelTooltip(be);
+            graphics.setComponentTooltipForNextFrame(font, tooltip, mouseX, mouseY);
         }
 
-        if (focusedSlot != null && !focusedSlot.hasStack()) {
-            String tooltipKey = switch (focusedSlot.id) {
+        if (hoveredSlot != null && !hoveredSlot.hasItem()) {
+            String tooltipKey = switch (hoveredSlot.index) {
                 case 0 -> _slotSchematic;
                 case 2 -> _slotListPrinter;
                 case 4 -> _slotGunpowder;
                 default -> null;
             };
             if (tooltipKey != null) {
-                graphics.drawTooltip(
-                    textRenderer,
+                graphics.setComponentTooltipForNextFrame(
+                    font,
                     TooltipHelper.cutTextComponent(CreateLang.translateDirect(tooltipKey), Palette.GRAY_AND_BLUE),
                     mouseX,
                     mouseY
@@ -423,46 +423,46 @@ public class SchematicannonScreen extends AbstractSimiContainerScreen<Schematica
         }
 
         if (be.missingItem != null) {
-            int missingBlockX = x + 128, missingBlockY = y + 49;
+            int missingBlockX = leftPos + 128, missingBlockY = topPos + 49;
             if (mouseX >= missingBlockX && mouseY >= missingBlockY && mouseX <= missingBlockX + 16 && mouseY <= missingBlockY + 16) {
-                graphics.drawItemTooltip(textRenderer, be.missingItem, mouseX, mouseY);
+                graphics.setTooltipForNextFrame(font, be.missingItem, mouseX, mouseY);
             }
         }
 
-        int paperX = x + 112, paperY = y + 19;
+        int paperX = leftPos + 112, paperY = topPos + 19;
         if (mouseX >= paperX && mouseY >= paperY && mouseX <= paperX + 16 && mouseY <= paperY + 16)
-            graphics.drawTooltip(textRenderer, listPrinter, mouseX, mouseY);
+            graphics.setTooltipForNextFrame(font, listPrinter, mouseX, mouseY);
 
         super.renderForeground(graphics, mouseX, mouseY, partialTicks);
     }
 
-    protected List<Text> getFuelLevelTooltip(SchematicannonBlockEntity be) {
+    protected List<Component> getFuelLevelTooltip(SchematicannonBlockEntity be) {
         int shotsLeft = be.remainingFuel;
-        int shotsLeftWithItems = shotsLeft + be.inventory.getStack(4).getCount() * be.getShotsPerGunpowder();
-        List<Text> tooltip = new ArrayList<>();
+        int shotsLeftWithItems = shotsLeft + be.inventory.getItem(4).getCount() * be.getShotsPerGunpowder();
+        List<Component> tooltip = new ArrayList<>();
 
         if (be.hasCreativeCrate) {
             tooltip.add(CreateLang.translateDirect(_gunpowderLevel, "" + 100));
-            tooltip.add(Text.literal("(").append(AllItems.CREATIVE_CRATE.getName()).append(")").formatted(Formatting.DARK_PURPLE));
+            tooltip.add(Component.literal("(").append(AllItems.CREATIVE_CRATE.getName()).append(")").withStyle(ChatFormatting.DARK_PURPLE));
             return tooltip;
         }
 
         int fillPercent = (int) ((be.remainingFuel / (float) be.getShotsPerGunpowder()) * 100);
         tooltip.add(CreateLang.translateDirect(_gunpowderLevel, fillPercent));
-        tooltip.add(CreateLang.translateDirect(_shotsRemaining, Text.literal(Integer.toString(shotsLeft)).formatted(Formatting.BLUE))
-            .formatted(Formatting.GRAY));
+        tooltip.add(CreateLang.translateDirect(_shotsRemaining, Component.literal(Integer.toString(shotsLeft)).withStyle(ChatFormatting.BLUE))
+            .withStyle(ChatFormatting.GRAY));
         if (shotsLeftWithItems != shotsLeft) {
             tooltip.add(CreateLang.translateDirect(
                 _shotsRemainingWithBackup,
-                Text.literal(Integer.toString(shotsLeftWithItems)).formatted(Formatting.BLUE)
-            ).formatted(Formatting.GRAY));
+                Component.literal(Integer.toString(shotsLeftWithItems)).withStyle(ChatFormatting.BLUE)
+            ).withStyle(ChatFormatting.GRAY));
         }
 
         return tooltip;
     }
 
     protected void sendOptionUpdate(Option option, boolean set) {
-        client.player.networkHandler.sendPacket(new ConfigureSchematicannonPacket(option, set));
+        minecraft.player.connection.send(new ConfigureSchematicannonPacket(option, set));
     }
 
     @Override

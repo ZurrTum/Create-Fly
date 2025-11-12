@@ -1,22 +1,25 @@
 package com.zurrtum.create.infrastructure.fluids;
 
-import net.minecraft.block.*;
-import net.minecraft.block.FluidBlock;
-import net.minecraft.fluid.Fluid;
-import net.minecraft.fluid.FluidState;
-import net.minecraft.fluid.WaterFluid;
-import net.minecraft.item.Item;
-import net.minecraft.item.Items;
-import net.minecraft.particle.ParticleEffect;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.state.StateManager;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.random.Random;
-import net.minecraft.world.BlockView;
-import net.minecraft.world.World;
-import net.minecraft.world.WorldAccess;
-import net.minecraft.world.WorldView;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.particles.ParticleOptions;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.LevelReader;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.LiquidBlock;
+import net.minecraft.world.level.block.LiquidBlockContainer;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.material.Fluid;
+import net.minecraft.world.level.material.FluidState;
+import net.minecraft.world.level.material.WaterFluid;
 import org.jetbrains.annotations.Nullable;
 
 public abstract class FlowableFluid extends WaterFluid {
@@ -36,12 +39,12 @@ public abstract class FlowableFluid extends WaterFluid {
     }
 
     @Override
-    public Fluid getStill() {
+    public Fluid getSource() {
         return entry.still;
     }
 
     @Override
-    public Item getBucketItem() {
+    public Item getBucket() {
         if (entry.bucket == null) {
             return Items.AIR;
         }
@@ -49,25 +52,25 @@ public abstract class FlowableFluid extends WaterFluid {
     }
 
     @Override
-    public BlockState toBlockState(FluidState state) {
+    public BlockState createLegacyBlock(FluidState state) {
         if (entry.block == null) {
-            return Blocks.AIR.getDefaultState();
+            return Blocks.AIR.defaultBlockState();
         }
-        return entry.block.getDefaultState().with(FluidBlock.LEVEL, getBlockStateLevel(state));
+        return entry.block.defaultBlockState().setValue(LiquidBlock.LEVEL, getLegacyLevel(state));
     }
 
     @Override
-    public void randomDisplayTick(World world, BlockPos pos, FluidState state, Random random) {
+    public void animateTick(Level world, BlockPos pos, FluidState state, RandomSource random) {
     }
 
     @Override
     @Nullable
-    public ParticleEffect getParticle() {
+    public ParticleOptions getDripParticle() {
         return null;
     }
 
     @Override
-    public boolean matchesType(Fluid fluid) {
+    public boolean isSame(Fluid fluid) {
         return fluid == entry.still || fluid == entry.flowing;
     }
 
@@ -77,18 +80,18 @@ public abstract class FlowableFluid extends WaterFluid {
         }
 
         @Override
-        protected void appendProperties(StateManager.Builder<Fluid, FluidState> builder) {
-            super.appendProperties(builder);
+        protected void createFluidStateDefinition(StateDefinition.Builder<Fluid, FluidState> builder) {
+            super.createFluidStateDefinition(builder);
             builder.add(LEVEL);
         }
 
         @Override
-        public int getLevel(FluidState state) {
-            return state.get(LEVEL);
+        public int getAmount(FluidState state) {
+            return state.getValue(LEVEL);
         }
 
         @Override
-        public boolean isStill(FluidState state) {
+        public boolean isSource(FluidState state) {
             return false;
         }
     }
@@ -99,47 +102,47 @@ public abstract class FlowableFluid extends WaterFluid {
         }
 
         @Override
-        public int getLevel(FluidState state) {
+        public int getAmount(FluidState state) {
             return 8;
         }
 
         @Override
-        public boolean isStill(FluidState state) {
+        public boolean isSource(FluidState state) {
             return true;
         }
     }
 
     @Override
-    protected void flow(WorldAccess world, BlockPos pos, BlockState state, Direction direction, FluidState fluidState) {
-        if (state.getBlock() instanceof FluidFillable fluidFillable) {
-            fluidFillable.tryFillWithFluid(world, pos, state, fluidState);
+    protected void spreadTo(LevelAccessor world, BlockPos pos, BlockState state, Direction direction, FluidState fluidState) {
+        if (state.getBlock() instanceof LiquidBlockContainer fluidFillable) {
+            fluidFillable.placeLiquid(world, pos, state, fluidState);
         } else if (state.getFluidState().isEmpty()) {
-            world.setBlockState(pos, fluidState.getBlockState(), Block.NOTIFY_ALL);
+            world.setBlock(pos, fluidState.createLegacyBlock(), Block.UPDATE_ALL);
         }
     }
 
     @Override
-    public int getLevelDecreasePerBlock(WorldView world) {
+    public int getDropOff(LevelReader world) {
         return 2;
     }
 
     @Override
-    public int getMaxFlowDistance(WorldView world) {
+    public int getSlopeFindDistance(LevelReader world) {
         return 3;
     }
 
     @Override
-    public int getTickRate(WorldView world) {
+    public int getTickDelay(LevelReader world) {
         return 25;
     }
 
     @Override
-    protected boolean isInfinite(ServerWorld world) {
+    protected boolean canConvertToSource(ServerLevel world) {
         return false;
     }
 
     @Override
-    public boolean canBeReplacedWith(FluidState state, BlockView world, BlockPos pos, Fluid fluid, Direction direction) {
+    public boolean canBeReplacedWith(FluidState state, BlockGetter world, BlockPos pos, Fluid fluid, Direction direction) {
         return false;
     }
 }

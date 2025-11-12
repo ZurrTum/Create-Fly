@@ -6,7 +6,7 @@ import com.zurrtum.create.infrastructure.fluids.SidedFluidInventory;
 import com.zurrtum.create.infrastructure.transfer.FluidInventoryStorage;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
 import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
-import net.minecraft.util.math.Direction;
+import net.minecraft.core.Direction;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Function;
@@ -40,7 +40,7 @@ public class CachedFluidInventoryBehaviour<T extends SmartBlockEntity> extends B
                 if (side == null) {
                     return storage;
                 } else {
-                    int i = side.getIndex();
+                    int i = side.get3DDataValue();
                     Storage<FluidVariant> sideStorage = sides[i];
                     if (sideStorage == null) {
                         sideStorage = sides[i] = FluidInventoryStorage.of(inventory, side);

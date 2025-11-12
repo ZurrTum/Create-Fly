@@ -1,8 +1,7 @@
 package com.zurrtum.create.foundation.recipe.trie;
 
-import net.minecraft.recipe.Recipe;
-
 import java.util.Set;
+import net.minecraft.world.item.crafting.Recipe;
 
 public class AbstractRecipe<R extends Recipe<?>> {
     final R recipe;

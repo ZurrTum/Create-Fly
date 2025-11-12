@@ -11,42 +11,41 @@ import com.zurrtum.create.foundation.blockEntity.behaviour.scrollValue.ServerScr
 import com.zurrtum.create.infrastructure.component.ClipboardContent;
 import com.zurrtum.create.infrastructure.component.ClipboardEntry;
 import com.zurrtum.create.infrastructure.component.ClipboardType;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.registry.DynamicRegistryManager;
-import net.minecraft.registry.RegistryWrapper;
-import net.minecraft.storage.NbtReadView;
-import net.minecraft.storage.NbtWriteView;
-import net.minecraft.storage.ReadView;
-import net.minecraft.storage.WriteView;
-import net.minecraft.text.Text;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.ErrorReporter;
-import net.minecraft.util.Formatting;
-import net.minecraft.util.Hand;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.world.World;
-
 import java.util.ArrayList;
 import java.util.List;
+import net.minecraft.ChatFormatting;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.core.RegistryAccess;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
+import net.minecraft.util.ProblemReporter;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.storage.TagValueInput;
+import net.minecraft.world.level.storage.TagValueOutput;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
+import net.minecraft.world.phys.BlockHitResult;
 
 import static com.zurrtum.create.Create.LOGGER;
 
 public class ClipboardValueSettingsHandler {
 
-    public static ActionResult rightClickToCopy(World world, PlayerEntity player, ItemStack itemStack, Hand hand, BlockHitResult hit, BlockPos pos) {
-        return interact(world, player, itemStack, hit.getSide(), pos, false);
+    public static InteractionResult rightClickToCopy(Level world, Player player, ItemStack itemStack, InteractionHand hand, BlockHitResult hit, BlockPos pos) {
+        return interact(world, player, itemStack, hit.getDirection(), pos, false);
     }
 
-    public static boolean leftClickToPaste(World world, PlayerEntity player, ItemStack itemStack, Direction side, BlockPos pos) {
-        return interact(world, player, itemStack, side, pos, true) == ActionResult.SUCCESS;
+    public static boolean leftClickToPaste(Level world, Player player, ItemStack itemStack, Direction side, BlockPos pos) {
+        return interact(world, player, itemStack, side, pos, true) == InteractionResult.SUCCESS;
     }
 
-    private static ActionResult interact(World world, PlayerEntity player, ItemStack itemStack, Direction side, BlockPos pos, boolean paste) {
-        if (!itemStack.isOf(AllItems.CLIPBOARD) || player.isSpectator() || player.isSneaking())
+    private static InteractionResult interact(Level world, Player player, ItemStack itemStack, Direction side, BlockPos pos, boolean paste) {
+        if (!itemStack.is(AllItems.CLIPBOARD) || player.isSpectator() || player.isShiftKeyDown())
             return null;
         if (!(world.getBlockEntity(pos) instanceof SmartBlockEntity smartBE))
             return null;
@@ -54,9 +53,9 @@ public class ClipboardValueSettingsHandler {
         ClipboardContent clipboardContent = itemStack.getOrDefault(AllDataComponents.CLIPBOARD_CONTENT, ClipboardContent.EMPTY);
 
         if (smartBE instanceof ClipboardBlockEntity cbe) {
-            if (!world.isClient()) {
+            if (!world.isClientSide()) {
                 List<List<ClipboardEntry>> listTo = ClipboardEntry.readAll(clipboardContent);
-                List<List<ClipboardEntry>> listFrom = ClipboardEntry.readAll(cbe.getComponents());
+                List<List<ClipboardEntry>> listFrom = ClipboardEntry.readAll(cbe.components());
                 List<ClipboardEntry> toAdd = new ArrayList<>();
 
                 for (List<ClipboardEntry> page : listFrom) {
@@ -93,14 +92,14 @@ public class ClipboardValueSettingsHandler {
                 itemStack.set(AllDataComponents.CLIPBOARD_CONTENT, clipboardContent);
             }
 
-            player.sendMessage(
-                Text.translatable("create.clipboard.copied_from_clipboard", world.getBlockState(pos).getBlock().getName().formatted(Formatting.WHITE))
-                    .formatted(Formatting.GREEN), true
+            player.displayClientMessage(
+                Component.translatable("create.clipboard.copied_from_clipboard", world.getBlockState(pos).getBlock().getName().withStyle(ChatFormatting.WHITE))
+                    .withStyle(ChatFormatting.GREEN), true
             );
-            return ActionResult.SUCCESS;
+            return InteractionResult.SUCCESS;
         }
 
-        NbtCompound tag = null;
+        CompoundTag tag = null;
         if (paste) {
             tag = clipboardContent.copiedValues().orElse(null);
             if (tag == null) {
@@ -110,18 +109,18 @@ public class ClipboardValueSettingsHandler {
 
         boolean anySuccess = false;
         boolean anyValid = false;
-        try (ErrorReporter.Logging logging = new ErrorReporter.Logging(smartBE.getReporterContext(), LOGGER)) {
-            DynamicRegistryManager registryManager = world.getRegistryManager();
-            ReadView readView = paste ? NbtReadView.create(logging, registryManager, tag) : null;
-            NbtWriteView writeView = paste ? null : NbtWriteView.create(logging, registryManager);
+        try (ProblemReporter.ScopedCollector logging = new ProblemReporter.ScopedCollector(smartBE.problemPath(), LOGGER)) {
+            RegistryAccess registryManager = world.registryAccess();
+            ValueInput readView = paste ? TagValueInput.create(logging, registryManager, tag) : null;
+            TagValueOutput writeView = paste ? null : TagValueOutput.createWithContext(logging, registryManager);
             if (smartBE instanceof ClipboardCloneable cc) {
                 anyValid = true;
                 if (paste) {
-                    anySuccess = paste(cc, player, readView, side, world.isClient());
+                    anySuccess = paste(cc, player, readView, side, world.isClientSide());
                 } else {
-                    anySuccess = write(cc, registryManager, writeView, side, world.isClient());
+                    anySuccess = write(cc, registryManager, writeView, side, world.isClientSide());
                     if (anySuccess) {
-                        tag = writeView.getNbt();
+                        tag = writeView.buildResult();
                     }
                 }
             }
@@ -136,11 +135,11 @@ public class ClipboardValueSettingsHandler {
                         continue;
                     anyValid = true;
                     if (paste) {
-                        anySuccess = paste(cc, player, readView, side, world.isClient());
+                        anySuccess = paste(cc, player, readView, side, world.isClientSide());
                     } else {
-                        anySuccess = write(cc, registryManager, writeView, side, world.isClient());
+                        anySuccess = write(cc, registryManager, writeView, side, world.isClientSide());
                         if (anySuccess) {
-                            tag = writeView.getNbt();
+                            tag = writeView.buildResult();
                             break;
                         }
                     }
@@ -151,14 +150,14 @@ public class ClipboardValueSettingsHandler {
         if (!anyValid)
             return null;
 
-        if (world.isClient() || !anySuccess)
-            return ActionResult.SUCCESS;
+        if (world.isClientSide() || !anySuccess)
+            return InteractionResult.SUCCESS;
 
-        player.sendMessage(
-            Text.translatable(
+        player.displayClientMessage(
+            Component.translatable(
                 paste ? "create.clipboard.pasted_to" : "create.clipboard.copied_from",
-                world.getBlockState(pos).getBlock().getName().formatted(Formatting.WHITE)
-            ).formatted(Formatting.GREEN), true
+                world.getBlockState(pos).getBlock().getName().withStyle(ChatFormatting.WHITE)
+            ).withStyle(ChatFormatting.GREEN), true
         );
 
         if (!paste) {
@@ -166,17 +165,17 @@ public class ClipboardValueSettingsHandler {
             clipboardContent = clipboardContent.setCopiedValues(tag);
             itemStack.set(AllDataComponents.CLIPBOARD_CONTENT, clipboardContent);
         }
-        return ActionResult.SUCCESS;
+        return InteractionResult.SUCCESS;
     }
 
-    private static boolean paste(ClipboardCloneable cc, PlayerEntity player, ReadView readView, Direction side, boolean simulate) {
-        return readView.getOptionalReadView(cc.getClipboardKey()).map(v -> cc.readFromClipboard(v, player, side, simulate)).orElse(false);
+    private static boolean paste(ClipboardCloneable cc, Player player, ValueInput readView, Direction side, boolean simulate) {
+        return readView.child(cc.getClipboardKey()).map(v -> cc.readFromClipboard(v, player, side, simulate)).orElse(false);
     }
 
     private static boolean write(
         ClipboardCloneable cc,
-        RegistryWrapper.WrapperLookup registryManager,
-        WriteView writeView,
+        HolderLookup.Provider registryManager,
+        ValueOutput writeView,
         Direction side,
         boolean simulate
     ) {
@@ -184,7 +183,7 @@ public class ClipboardValueSettingsHandler {
         if (simulate) {
             return cc.canWrite(registryManager, side);
         } else {
-            return cc.writeToClipboard(writeView.get(clipboardKey), side);
+            return cc.writeToClipboard(writeView.child(clipboardKey), side);
         }
     }
 }

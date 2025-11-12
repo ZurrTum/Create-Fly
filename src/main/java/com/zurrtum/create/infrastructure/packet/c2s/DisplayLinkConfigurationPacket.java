@@ -3,28 +3,27 @@ package com.zurrtum.create.infrastructure.packet.c2s;
 import com.zurrtum.create.AllHandle;
 import com.zurrtum.create.AllPackets;
 import io.netty.buffer.ByteBuf;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.network.codec.PacketCodec;
-import net.minecraft.network.codec.PacketCodecs;
-import net.minecraft.network.packet.PacketType;
-import net.minecraft.server.network.ServerPlayNetworkHandler;
-import net.minecraft.util.math.BlockPos;
-
 import java.util.function.BiConsumer;
+import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.PacketType;
+import net.minecraft.server.network.ServerGamePacketListenerImpl;
 
-public record DisplayLinkConfigurationPacket(BlockPos pos, NbtCompound configData, int targetLine) implements C2SPacket {
-    public static final PacketCodec<ByteBuf, DisplayLinkConfigurationPacket> CODEC = PacketCodec.tuple(
-        BlockPos.PACKET_CODEC,
+public record DisplayLinkConfigurationPacket(BlockPos pos, CompoundTag configData, int targetLine) implements C2SPacket {
+    public static final StreamCodec<ByteBuf, DisplayLinkConfigurationPacket> CODEC = StreamCodec.composite(
+        BlockPos.STREAM_CODEC,
         DisplayLinkConfigurationPacket::pos,
-        PacketCodecs.NBT_COMPOUND,
+        ByteBufCodecs.COMPOUND_TAG,
         DisplayLinkConfigurationPacket::configData,
-        PacketCodecs.VAR_INT,
+        ByteBufCodecs.VAR_INT,
         DisplayLinkConfigurationPacket::targetLine,
         DisplayLinkConfigurationPacket::new
     );
 
     @Override
-    public PacketType<DisplayLinkConfigurationPacket> getPacketType() {
+    public PacketType<DisplayLinkConfigurationPacket> type() {
         return AllPackets.CONFIGURE_DATA_GATHERER;
     }
 
@@ -34,7 +33,7 @@ public record DisplayLinkConfigurationPacket(BlockPos pos, NbtCompound configDat
     }
 
     @Override
-    public BiConsumer<ServerPlayNetworkHandler, DisplayLinkConfigurationPacket> callback() {
+    public BiConsumer<ServerGamePacketListenerImpl, DisplayLinkConfigurationPacket> callback() {
         return AllHandle::onDisplayLinkConfiguration;
     }
 }

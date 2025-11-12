@@ -36,22 +36,22 @@ import com.zurrtum.create.foundation.blockEntity.behaviour.BehaviourType;
 import com.zurrtum.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.foundation.blockEntity.behaviour.ValueSettings;
 import com.zurrtum.create.foundation.blockEntity.behaviour.filtering.ServerFilteringBehaviour;
-import net.minecraft.block.BlockState;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.text.MutableText;
-import net.minecraft.text.Text;
-import net.minecraft.util.Hand;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.core.Direction;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.Vec3;
 
 public class FilteringBehaviour<T extends ServerFilteringBehaviour> extends BlockEntityBehaviour<SmartBlockEntity> implements ValueSettingsBehaviour {
     public static final BehaviourType<FilteringBehaviour<?>> TYPE = new BehaviourType<>();
     protected T behaviour;
     protected ValueBoxTransform slotPositioning;
 
-    public MutableText customLabel;
+    public MutableComponent customLabel;
 
     @SuppressWarnings("unchecked")
     public FilteringBehaviour(SmartBlockEntity be, ValueBoxTransform slot) {
@@ -155,13 +155,13 @@ public class FilteringBehaviour<T extends ServerFilteringBehaviour> extends Bloc
     }
 
     @Override
-    public boolean testHit(Vec3d hit) {
-        BlockState state = blockEntity.getCachedState();
-        Vec3d localHit = hit.subtract(Vec3d.of(blockEntity.getPos()));
-        return slotPositioning.testHit(getWorld(), getPos(), state, localHit);
+    public boolean testHit(Vec3 hit) {
+        BlockState state = blockEntity.getBlockState();
+        Vec3 localHit = hit.subtract(Vec3.atLowerCornerOf(blockEntity.getBlockPos()));
+        return slotPositioning.testHit(getLevel(), getPos(), state, localHit);
     }
 
-    public void setLabel(MutableText label) {
+    public void setLabel(MutableComponent label) {
         this.customLabel = label;
     }
 
@@ -179,22 +179,22 @@ public class FilteringBehaviour<T extends ServerFilteringBehaviour> extends Bloc
         return AllConfigs.client().filterItemRenderDistance.getF();
     }
 
-    public MutableText getLabel() {
+    public MutableComponent getLabel() {
         if (customLabel != null)
             return customLabel;
         return CreateLang.translateDirect(behaviour.isRecipeFilter() ? "logistics.recipe_filter" : behaviour.fluidFilter ? "logistics.fluid_filter" : "logistics.filter");
     }
 
-    public MutableText getTip() {
+    public MutableComponent getTip() {
         return CreateLang.translateDirect(behaviour.getFilter().isEmpty() ? "logistics.filter.click_to_set" : "logistics.filter.click_to_replace");
     }
 
-    public MutableText getAmountTip() {
+    public MutableComponent getAmountTip() {
         return CreateLang.translateDirect("logistics.filter.hold_to_set_amount");
     }
 
-    public MutableText getCountLabelForValueBox() {
-        return Text.literal(behaviour.isCountVisible() ? behaviour.upTo && behaviour.getMaxStackSize() == behaviour.count ? "*" : String.valueOf(
+    public MutableComponent getCountLabelForValueBox() {
+        return Component.literal(behaviour.isCountVisible() ? behaviour.upTo && behaviour.getMaxStackSize() == behaviour.count ? "*" : String.valueOf(
             behaviour.count) : "");
     }
 
@@ -204,8 +204,8 @@ public class FilteringBehaviour<T extends ServerFilteringBehaviour> extends Bloc
     }
 
     @Override
-    public ValueSettingsBoard createBoard(PlayerEntity player, BlockHitResult hitResult) {
-        int maxAmount = behaviour.getMaxStackSize(hitResult.getSide());
+    public ValueSettingsBoard createBoard(Player player, BlockHitResult hitResult) {
+        int maxAmount = behaviour.getMaxStackSize(hitResult.getDirection());
         return new ValueSettingsBoard(
             CreateLang.translateDirect("logistics.filter.extracted_amount"),
             maxAmount,
@@ -215,24 +215,24 @@ public class FilteringBehaviour<T extends ServerFilteringBehaviour> extends Bloc
         );
     }
 
-    public MutableText formatValue(ValueSettings value) {
+    public MutableComponent formatValue(ValueSettings value) {
         if (value.row() == 0 && value.value() == behaviour.getMaxStackSize())
             return CreateLang.translateDirect("logistics.filter.any_amount_short");
-        return Text.literal(((value.row() == 0) ? "≤" : "=") + Math.max(1, value.value()));
+        return Component.literal(((value.row() == 0) ? "≤" : "=") + Math.max(1, value.value()));
     }
 
     @Override
-    public void setValueSettings(PlayerEntity player, ValueSettings valueSettings, boolean ctrlDown) {
+    public void setValueSettings(Player player, ValueSettings valueSettings, boolean ctrlDown) {
         behaviour.setValueSettings(player, valueSettings, ctrlDown);
     }
 
     @Override
-    public boolean mayInteract(PlayerEntity player) {
+    public boolean mayInteract(Player player) {
         return behaviour.mayInteract(player);
     }
 
     @Override
-    public void onShortInteract(PlayerEntity player, Hand hand, Direction side, BlockHitResult hitResult) {
+    public void onShortInteract(Player player, InteractionHand hand, Direction side, BlockHitResult hitResult) {
         behaviour.onShortInteract(player, hand, side, hitResult);
     }
 

@@ -1,23 +1,23 @@
 package com.zurrtum.create.client.flywheel.lib.model.baked;
 
-import net.minecraft.client.render.OutlineVertexConsumerProvider;
-import net.minecraft.client.render.VertexConsumerProvider;
-import net.minecraft.client.render.command.BatchingRenderCommandQueue;
-import net.minecraft.client.render.command.OrderedRenderCommandQueueImpl;
-import net.minecraft.client.render.item.ItemRenderState;
-import net.minecraft.client.render.item.ItemRenderer;
-import net.minecraft.client.util.math.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.OutlineBufferSource;
+import net.minecraft.client.renderer.SubmitNodeCollection;
+import net.minecraft.client.renderer.SubmitNodeStorage;
+import net.minecraft.client.renderer.entity.ItemRenderer;
+import net.minecraft.client.renderer.item.ItemStackRenderState;
 
 public class ItemCommandRendererHelper {
     public static void render(
-        MatrixStack matrices,
-        BatchingRenderCommandQueue queue,
-        VertexConsumerProvider vertexConsumers,
-        VertexConsumerProvider outlineVertexConsumers
+        PoseStack matrices,
+        SubmitNodeCollection queue,
+        MultiBufferSource vertexConsumers,
+        MultiBufferSource outlineVertexConsumers
     ) {
-        for (OrderedRenderCommandQueueImpl.ItemCommand itemCommand : queue.getItemCommands()) {
-            matrices.push();
-            matrices.peek().copy(itemCommand.positionMatrix());
+        for (SubmitNodeStorage.ItemSubmit itemCommand : queue.getItemSubmits()) {
+            matrices.pushPose();
+            matrices.last().set(itemCommand.pose());
             ItemRenderer.renderItem(
                 itemCommand.displayContext(),
                 matrices,
@@ -26,10 +26,10 @@ public class ItemCommandRendererHelper {
                 itemCommand.overlayCoords(),
                 itemCommand.tintLayers(),
                 itemCommand.quads(),
-                itemCommand.renderLayer(),
-                itemCommand.glintType()
+                itemCommand.renderType(),
+                itemCommand.foilType()
             );
-            if (itemCommand.outlineColor() != 0 && outlineVertexConsumers instanceof OutlineVertexConsumerProvider outline) {
+            if (itemCommand.outlineColor() != 0 && outlineVertexConsumers instanceof OutlineBufferSource outline) {
                 outline.setColor(itemCommand.outlineColor());
                 ItemRenderer.renderItem(
                     itemCommand.displayContext(),
@@ -39,12 +39,12 @@ public class ItemCommandRendererHelper {
                     itemCommand.overlayCoords(),
                     itemCommand.tintLayers(),
                     itemCommand.quads(),
-                    itemCommand.renderLayer(),
-                    ItemRenderState.Glint.NONE
+                    itemCommand.renderType(),
+                    ItemStackRenderState.FoilType.NONE
                 );
             }
 
-            matrices.pop();
+            matrices.popPose();
         }
     }
 }

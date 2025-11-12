@@ -9,15 +9,14 @@ import com.zurrtum.create.content.fluids.tank.FluidTankBlockEntity;
 import com.zurrtum.create.foundation.advancement.CreateTrigger;
 import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
 import com.zurrtum.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.storage.ReadView;
-import net.minecraft.storage.WriteView;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-
 import java.lang.ref.WeakReference;
 import java.util.List;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 
 public class WhistleBlockEntity extends SmartBlockEntity {
 
@@ -39,17 +38,17 @@ public class WhistleBlockEntity extends SmartBlockEntity {
     }
 
     public void updatePitch() {
-        BlockPos currentPos = pos.up();
+        BlockPos currentPos = worldPosition.above();
         int newPitch;
         for (newPitch = 0; newPitch <= 24; newPitch += 2) {
-            BlockState blockState = world.getBlockState(currentPos);
-            if (!blockState.isOf(AllBlocks.STEAM_WHISTLE_EXTENSION))
+            BlockState blockState = level.getBlockState(currentPos);
+            if (!blockState.is(AllBlocks.STEAM_WHISTLE_EXTENSION))
                 break;
-            if (blockState.get(WhistleExtenderBlock.SHAPE) == WhistleExtenderShape.SINGLE) {
+            if (blockState.getValue(WhistleExtenderBlock.SHAPE) == WhistleExtenderShape.SINGLE) {
                 newPitch++;
                 break;
             }
-            currentPos = currentPos.up();
+            currentPos = currentPos.above();
         }
         if (pitch == newPitch)
             return;
@@ -65,34 +64,34 @@ public class WhistleBlockEntity extends SmartBlockEntity {
     @Override
     public void tick() {
         super.tick();
-        if (!world.isClient()) {
+        if (!level.isClientSide()) {
             if (isPowered())
                 award(AllAdvancements.STEAM_WHISTLE);
         }
     }
 
     @Override
-    protected void write(WriteView view, boolean clientPacket) {
+    protected void write(ValueOutput view, boolean clientPacket) {
         view.putInt("Pitch", pitch);
         super.write(view, clientPacket);
     }
 
     @Override
-    protected void read(ReadView view, boolean clientPacket) {
-        pitch = view.getInt("Pitch", 0);
+    protected void read(ValueInput view, boolean clientPacket) {
+        pitch = view.getIntOr("Pitch", 0);
         super.read(view, clientPacket);
     }
 
     public boolean isPowered() {
-        return getCachedState().get(WhistleBlock.POWERED, false);
+        return getBlockState().getValueOrElse(WhistleBlock.POWERED, false);
     }
 
     public WhistleSize getOctave() {
-        return getCachedState().get(WhistleBlock.SIZE, WhistleSize.MEDIUM);
+        return getBlockState().getValueOrElse(WhistleBlock.SIZE, WhistleSize.MEDIUM);
     }
 
     public int getPitchId() {
-        return pitch + 100 * getCachedState().get(WhistleBlock.SIZE, WhistleSize.MEDIUM).ordinal();
+        return pitch + 100 * getBlockState().getValueOrElse(WhistleBlock.SIZE, WhistleSize.MEDIUM).ordinal();
     }
 
     public FluidTankBlockEntity getTank() {
@@ -100,8 +99,8 @@ public class WhistleBlockEntity extends SmartBlockEntity {
         if (tank == null || tank.isRemoved()) {
             if (tank != null)
                 source = new WeakReference<>(null);
-            Direction facing = WhistleBlock.getAttachedDirection(getCachedState());
-            BlockEntity be = world.getBlockEntity(pos.offset(facing));
+            Direction facing = WhistleBlock.getAttachedDirection(getBlockState());
+            BlockEntity be = level.getBlockEntity(worldPosition.relative(facing));
             if (be instanceof FluidTankBlockEntity tankBe)
                 source = new WeakReference<>(tank = tankBe);
         }

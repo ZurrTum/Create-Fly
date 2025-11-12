@@ -13,166 +13,166 @@ import com.zurrtum.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.foundation.blockEntity.behaviour.inventory.InvManipulationBehaviour;
 import com.zurrtum.create.foundation.item.ItemHelper;
 import com.zurrtum.create.infrastructure.items.ItemInventoryProvider;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.ai.pathing.NavigationType;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.inventory.Inventory;
-import net.minecraft.item.ItemPlacementContext;
-import net.minecraft.item.ItemStack;
-import net.minecraft.sound.SoundCategory;
-import net.minecraft.sound.SoundEvents;
-import net.minecraft.state.StateManager;
-import net.minecraft.state.property.BooleanProperty;
-import net.minecraft.state.property.Properties;
-import net.minecraft.text.Text;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.Hand;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.world.RedstoneView;
-import net.minecraft.world.World;
-import net.minecraft.world.WorldAccess;
-import net.minecraft.world.WorldView;
-import net.minecraft.world.block.WireOrientation;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.network.chat.Component;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.Container;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.LevelReader;
+import net.minecraft.world.level.SignalGetter;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.block.state.properties.BooleanProperty;
+import net.minecraft.world.level.pathfinder.PathComputationType;
+import net.minecraft.world.level.redstone.Orientation;
+import net.minecraft.world.phys.BlockHitResult;
 import org.jetbrains.annotations.Nullable;
 
 public class PackagerBlock extends WrenchableDirectionalBlock implements IBE<PackagerBlockEntity>, IWrenchable, ItemInventoryProvider<PackagerBlockEntity>, NeighborChangeListeningBlock, WeakPowerControlBlock, NeighborUpdateListeningBlock {
 
-    public static final BooleanProperty POWERED = Properties.POWERED;
-    public static final BooleanProperty LINKED = BooleanProperty.of("linked");
+    public static final BooleanProperty POWERED = BlockStateProperties.POWERED;
+    public static final BooleanProperty LINKED = BooleanProperty.create("linked");
 
-    public PackagerBlock(Settings properties) {
+    public PackagerBlock(Properties properties) {
         super(properties);
-        BlockState defaultBlockState = getDefaultState();
-        if (defaultBlockState.contains(LINKED))
-            defaultBlockState = defaultBlockState.with(LINKED, false);
-        setDefaultState(defaultBlockState.with(POWERED, false));
+        BlockState defaultBlockState = defaultBlockState();
+        if (defaultBlockState.hasProperty(LINKED))
+            defaultBlockState = defaultBlockState.setValue(LINKED, false);
+        registerDefaultState(defaultBlockState.setValue(POWERED, false));
     }
 
     @Override
-    public Inventory getInventory(WorldAccess world, BlockPos pos, BlockState state, PackagerBlockEntity blockEntity, Direction context) {
+    public Container getInventory(LevelAccessor world, BlockPos pos, BlockState state, PackagerBlockEntity blockEntity, Direction context) {
         return blockEntity.inventory;
     }
 
     @Override
-    public void onPlaced(World pLevel, BlockPos pPos, BlockState pState, LivingEntity pPlacer, ItemStack pStack) {
-        super.onPlaced(pLevel, pPos, pState, pPlacer, pStack);
+    public void setPlacedBy(Level pLevel, BlockPos pPos, BlockState pState, LivingEntity pPlacer, ItemStack pStack) {
+        super.setPlacedBy(pLevel, pPos, pState, pPlacer, pStack);
         AdvancementBehaviour.setPlacedBy(pLevel, pPos, pPlacer);
     }
 
     @Override
-    public BlockState getPlacementState(ItemPlacementContext context) {
+    public BlockState getStateForPlacement(BlockPlaceContext context) {
         Direction preferredFacing = null;
-        for (Direction face : context.getPlacementDirections()) {
-            BlockPos pos = context.getBlockPos().offset(face);
-            BlockEntity be = context.getWorld().getBlockEntity(pos);
+        for (Direction face : context.getNearestLookingDirections()) {
+            BlockPos pos = context.getClickedPos().relative(face);
+            BlockEntity be = context.getLevel().getBlockEntity(pos);
             if (be instanceof PackagerBlockEntity)
                 continue;
-            if (be != null && be.hasWorld() && ItemHelper.getInventory(be.getWorld(), pos, null, be, null) != null) {
+            if (be != null && be.hasLevel() && ItemHelper.getInventory(be.getLevel(), pos, null, be, null) != null) {
                 preferredFacing = face.getOpposite();
                 break;
             }
         }
 
-        PlayerEntity player = context.getPlayer();
+        Player player = context.getPlayer();
         if (preferredFacing == null) {
-            Direction facing = context.getPlayerLookDirection();
-            preferredFacing = player != null && player.isSneaking() ? facing : facing.getOpposite();
+            Direction facing = context.getNearestLookingDirection();
+            preferredFacing = player != null && player.isShiftKeyDown() ? facing : facing.getOpposite();
         }
 
         if (player != null && !(FakePlayerHandler.has(player))) {
-            if (context.getWorld().getBlockState(context.getBlockPos().offset(preferredFacing.getOpposite()))
-                .isOf(AllBlocks.PORTABLE_STORAGE_INTERFACE)) {
-                player.sendMessage(Text.translatable("create.packager.no_portable_storage"), true);
+            if (context.getLevel().getBlockState(context.getClickedPos().relative(preferredFacing.getOpposite()))
+                .is(AllBlocks.PORTABLE_STORAGE_INTERFACE)) {
+                player.displayClientMessage(Component.translatable("create.packager.no_portable_storage"), true);
                 return null;
             }
         }
 
-        return super.getPlacementState(context).with(POWERED, context.getWorld().isReceivingRedstonePower(context.getBlockPos()))
-            .with(FACING, preferredFacing);
+        return super.getStateForPlacement(context).setValue(POWERED, context.getLevel().hasNeighborSignal(context.getClickedPos()))
+            .setValue(FACING, preferredFacing);
     }
 
     @Override
-    protected ActionResult onUseWithItem(
+    protected InteractionResult useItemOn(
         ItemStack stack,
         BlockState state,
-        World level,
+        Level level,
         BlockPos pos,
-        PlayerEntity player,
-        Hand hand,
+        Player player,
+        InteractionHand hand,
         BlockHitResult hitResult
     ) {
-        if (stack.isOf(AllItems.WRENCH))
-            return ActionResult.PASS_TO_DEFAULT_BLOCK_ACTION;
-        if (stack.isOf(AllItems.FACTORY_GAUGE))
-            return ActionResult.PASS_TO_DEFAULT_BLOCK_ACTION;
-        if (stack.isOf(AllItems.STOCK_LINK) && !(state.contains(LINKED) && state.get(LINKED)))
-            return ActionResult.PASS_TO_DEFAULT_BLOCK_ACTION;
-        if (stack.isOf(AllItems.PACKAGE_FROGPORT))
-            return ActionResult.PASS_TO_DEFAULT_BLOCK_ACTION;
+        if (stack.is(AllItems.WRENCH))
+            return InteractionResult.TRY_WITH_EMPTY_HAND;
+        if (stack.is(AllItems.FACTORY_GAUGE))
+            return InteractionResult.TRY_WITH_EMPTY_HAND;
+        if (stack.is(AllItems.STOCK_LINK) && !(state.hasProperty(LINKED) && state.getValue(LINKED)))
+            return InteractionResult.TRY_WITH_EMPTY_HAND;
+        if (stack.is(AllItems.PACKAGE_FROGPORT))
+            return InteractionResult.TRY_WITH_EMPTY_HAND;
 
         if (onBlockEntityUseItemOn(
             level, pos, be -> {
                 if (be.heldBox.isEmpty()) {
                     if (be.animationTicks > 0)
-                        return ActionResult.SUCCESS;
+                        return InteractionResult.SUCCESS;
                     if (PackageItem.isPackage(stack)) {
-                        if (level.isClient())
-                            return ActionResult.SUCCESS;
+                        if (level.isClientSide())
+                            return InteractionResult.SUCCESS;
                         if (!be.unwrapBox(stack.copy(), true))
-                            return ActionResult.SUCCESS;
+                            return InteractionResult.SUCCESS;
                         be.unwrapBox(stack.copy(), false);
                         be.triggerStockCheck();
-                        stack.decrement(1);
+                        stack.shrink(1);
                         AllSoundEvents.DEPOT_PLOP.playOnServer(level, pos);
                         if (stack.isEmpty())
-                            player.setStackInHand(hand, ItemStack.EMPTY);
-                        return ActionResult.SUCCESS;
+                            player.setItemInHand(hand, ItemStack.EMPTY);
+                        return InteractionResult.SUCCESS;
                     }
-                    return ActionResult.SUCCESS;
+                    return InteractionResult.SUCCESS;
                 }
                 if (be.animationTicks > 0)
-                    return ActionResult.SUCCESS;
-                if (!level.isClient()) {
-                    player.getInventory().offerOrDrop(be.heldBox.copy());
-                    player.getEntityWorld().playSound(
+                    return InteractionResult.SUCCESS;
+                if (!level.isClientSide()) {
+                    player.getInventory().placeItemBackInInventory(be.heldBox.copy());
+                    player.level().playSound(
                         null,
-                        player.getBlockPos(),
-                        SoundEvents.ENTITY_ITEM_PICKUP,
-                        SoundCategory.PLAYERS,
+                        player.blockPosition(),
+                        SoundEvents.ITEM_PICKUP,
+                        SoundSource.PLAYERS,
                         .2f,
-                        1f + player.getEntityWorld().random.nextFloat()
+                        1f + player.level().random.nextFloat()
                     );
                     be.heldBox = ItemStack.EMPTY;
                     be.notifyUpdate();
                 }
-                return ActionResult.SUCCESS;
+                return InteractionResult.SUCCESS;
             }
-        ).isAccepted())
-            return ActionResult.SUCCESS;
+        ).consumesAction())
+            return InteractionResult.SUCCESS;
 
-        return ActionResult.SUCCESS;
+        return InteractionResult.SUCCESS;
     }
 
     @Override
-    protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
-        super.appendProperties(builder.add(POWERED, LINKED));
+    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
+        super.createBlockStateDefinition(builder.add(POWERED, LINKED));
     }
 
     @Override
-    public void onNeighborChange(BlockState state, WorldView level, BlockPos pos, BlockPos neighbor) {
-        if (neighbor.offset(state.get(FACING, Direction.UP)).equals(pos))
+    public void onNeighborChange(BlockState state, LevelReader level, BlockPos pos, BlockPos neighbor) {
+        if (neighbor.relative(state.getValueOrElse(FACING, Direction.UP)).equals(pos))
             withBlockEntityDo(level, pos, PackagerBlockEntity::triggerStockCheck);
     }
 
     @Override
-    public void neighborUpdate(BlockState state, World worldIn, BlockPos pos, Block sourceBlock, BlockPos fromPos, boolean isMoving) {
-        if (worldIn.isClient())
+    public void neighborUpdate(BlockState state, Level worldIn, BlockPos pos, Block sourceBlock, BlockPos fromPos, boolean isMoving) {
+        if (worldIn.isClientSide())
             return;
         InvManipulationBehaviour behaviour = BlockEntityBehaviour.get(worldIn, pos, InvManipulationBehaviour.TYPE);
         if (behaviour != null)
@@ -180,26 +180,26 @@ public class PackagerBlock extends WrenchableDirectionalBlock implements IBE<Pac
     }
 
     @Override
-    public void neighborUpdate(
+    public void neighborChanged(
         BlockState state,
-        World worldIn,
+        Level worldIn,
         BlockPos pos,
         Block blockIn,
-        @Nullable WireOrientation wireOrientation,
+        @Nullable Orientation wireOrientation,
         boolean isMoving
     ) {
-        if (worldIn.isClient())
+        if (worldIn.isClientSide())
             return;
-        boolean previouslyPowered = state.get(POWERED);
-        if (previouslyPowered == worldIn.isReceivingRedstonePower(pos))
+        boolean previouslyPowered = state.getValue(POWERED);
+        if (previouslyPowered == worldIn.hasNeighborSignal(pos))
             return;
-        worldIn.setBlockState(pos, state.cycle(POWERED), Block.NOTIFY_LISTENERS);
+        worldIn.setBlock(pos, state.cycle(POWERED), Block.UPDATE_CLIENTS);
         if (!previouslyPowered)
             withBlockEntityDo(worldIn, pos, PackagerBlockEntity::activate);
     }
 
     @Override
-    public boolean shouldCheckWeakPower(BlockState state, RedstoneView level, BlockPos pos, Direction side) {
+    public boolean shouldCheckWeakPower(BlockState state, SignalGetter level, BlockPos pos, Direction side) {
         return false;
     }
 
@@ -214,17 +214,17 @@ public class PackagerBlock extends WrenchableDirectionalBlock implements IBE<Pac
     }
 
     @Override
-    protected boolean canPathfindThrough(BlockState state, NavigationType pathComputationType) {
+    protected boolean isPathfindable(BlockState state, PathComputationType pathComputationType) {
         return false;
     }
 
     @Override
-    public boolean hasComparatorOutput(BlockState pState) {
+    public boolean hasAnalogOutputSignal(BlockState pState) {
         return true;
     }
 
     @Override
-    public int getComparatorOutput(BlockState pState, World pLevel, BlockPos pPos, Direction direction) {
+    public int getAnalogOutputSignal(BlockState pState, Level pLevel, BlockPos pPos, Direction direction) {
         return getBlockEntityOptional(pLevel, pPos).map(pbe -> {
             boolean empty = pbe.inventory.getStack().isEmpty();
             if (pbe.animationTicks != 0)

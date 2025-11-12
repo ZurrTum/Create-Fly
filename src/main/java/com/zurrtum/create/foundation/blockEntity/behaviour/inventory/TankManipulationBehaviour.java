@@ -7,13 +7,13 @@ import com.zurrtum.create.foundation.blockEntity.behaviour.filtering.ServerFilte
 import com.zurrtum.create.foundation.fluid.FluidHelper;
 import com.zurrtum.create.infrastructure.fluids.FluidInventory;
 import com.zurrtum.create.infrastructure.fluids.FluidStack;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Predicate;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
 
 public class TankManipulationBehaviour extends CapManipulationBehaviourBase<FluidInventory, TankManipulationBehaviour> {
 
@@ -50,7 +50,7 @@ public class TankManipulationBehaviour extends CapManipulationBehaviourBase<Flui
     }
 
     @Override
-    protected FluidInventory getCapability(World world, BlockPos pos, BlockEntity blockEntity, @Nullable Direction side) {
+    protected FluidInventory getCapability(Level world, BlockPos pos, BlockEntity blockEntity, @Nullable Direction side) {
         return FluidHelper.getFluidInventory(world, pos, null, blockEntity, side);
     }
 

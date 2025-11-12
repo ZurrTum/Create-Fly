@@ -4,18 +4,18 @@ import com.zurrtum.create.AllClientHandle;
 import com.zurrtum.create.AllPackets;
 import com.zurrtum.create.content.logistics.factoryBoard.FactoryPanelPosition;
 import io.netty.buffer.ByteBuf;
-import net.minecraft.network.codec.PacketCodec;
-import net.minecraft.network.codec.PacketCodecs;
-import net.minecraft.network.packet.PacketType;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.PacketType;
 import org.apache.logging.log4j.util.TriConsumer;
 
 public record FactoryPanelEffectPacket(FactoryPanelPosition fromPos, FactoryPanelPosition toPos, boolean success) implements S2CPacket {
-    public static final PacketCodec<ByteBuf, FactoryPanelEffectPacket> CODEC = PacketCodec.tuple(
+    public static final StreamCodec<ByteBuf, FactoryPanelEffectPacket> CODEC = StreamCodec.composite(
         FactoryPanelPosition.PACKET_CODEC,
         FactoryPanelEffectPacket::fromPos,
         FactoryPanelPosition.PACKET_CODEC,
         FactoryPanelEffectPacket::toPos,
-        PacketCodecs.BOOLEAN,
+        ByteBufCodecs.BOOL,
         FactoryPanelEffectPacket::success,
         FactoryPanelEffectPacket::new
     );
@@ -31,7 +31,7 @@ public record FactoryPanelEffectPacket(FactoryPanelPosition fromPos, FactoryPane
     }
 
     @Override
-    public PacketType<FactoryPanelEffectPacket> getPacketType() {
+    public PacketType<FactoryPanelEffectPacket> type() {
         return AllPackets.FACTORY_PANEL_EFFECT;
     }
 }

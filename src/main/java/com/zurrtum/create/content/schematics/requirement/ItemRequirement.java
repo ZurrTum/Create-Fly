@@ -5,18 +5,19 @@ import com.zurrtum.create.api.schematic.requirement.SpecialBlockEntityItemRequir
 import com.zurrtum.create.api.schematic.requirement.SpecialBlockItemRequirement;
 import com.zurrtum.create.api.schematic.requirement.SpecialEntityItemRequirement;
 import com.zurrtum.create.catnip.components.ComponentProcessors;
-import net.minecraft.block.*;
-import net.minecraft.block.entity.BannerBlockEntity;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.block.enums.SlabType;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EquipmentSlot;
-import net.minecraft.entity.decoration.ArmorStandEntity;
-import net.minecraft.entity.decoration.ItemFrameEntity;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.state.property.Properties;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.decoration.ArmorStand;
+import net.minecraft.world.entity.decoration.ItemFrame;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.level.block.*;
+import net.minecraft.world.level.block.entity.BannerBlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.block.state.properties.SlabType;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -89,14 +90,14 @@ public class ItemRequirement {
             return INVALID;
 
         // double slab needs two items
-        if (state.contains(Properties.SLAB_TYPE) && state.get(Properties.SLAB_TYPE) == SlabType.DOUBLE)
+        if (state.hasProperty(BlockStateProperties.SLAB_TYPE) && state.getValue(BlockStateProperties.SLAB_TYPE) == SlabType.DOUBLE)
             return new ItemRequirement(ItemUseType.CONSUME, new ItemStack(item, 2));
         if (block instanceof TurtleEggBlock)
-            return new ItemRequirement(ItemUseType.CONSUME, new ItemStack(item, state.get(TurtleEggBlock.EGGS)));
+            return new ItemRequirement(ItemUseType.CONSUME, new ItemStack(item, state.getValue(TurtleEggBlock.EGGS)));
         if (block instanceof SeaPickleBlock)
-            return new ItemRequirement(ItemUseType.CONSUME, new ItemStack(item, state.get(SeaPickleBlock.PICKLES)));
-        if (block instanceof SnowBlock)
-            return new ItemRequirement(ItemUseType.CONSUME, new ItemStack(item, state.get(SnowBlock.LAYERS).intValue()));
+            return new ItemRequirement(ItemUseType.CONSUME, new ItemStack(item, state.getValue(SeaPickleBlock.PICKLES)));
+        if (block instanceof SnowLayerBlock)
+            return new ItemRequirement(ItemUseType.CONSUME, new ItemStack(item, state.getValue(SnowLayerBlock.LAYERS).intValue()));
         // FD's rich soil extends FarmBlock so this is to make sure the cost is correct (it should be rich soil not dirt)
         //TODO
         //        if (block == BuiltInRegistries.BLOCK.get(Mods.FD.asResource("rich_soil_farmland")))
@@ -104,10 +105,10 @@ public class ItemRequirement {
         //                ItemUseType.CONSUME,
         //                BuiltInRegistries.ITEM.get(Mods.FD.asResource("rich_soil"))
         //            );
-        if (block instanceof FarmlandBlock || block instanceof DirtPathBlock)
+        if (block instanceof FarmBlock || block instanceof DirtPathBlock)
             return new ItemRequirement(ItemUseType.CONSUME, Items.DIRT);
         if (block instanceof AbstractBannerBlock && be instanceof BannerBlockEntity bannerBE)
-            return new ItemRequirement(new StrictNbtStackRequirement(bannerBE.getPickStack(), ItemUseType.CONSUME));
+            return new ItemRequirement(new StrictNbtStackRequirement(bannerBE.getItem(), ItemUseType.CONSUME));
         // Tall grass doesnt exist as a block so use 2 grass blades
         if (block == Blocks.TALL_GRASS)
             return new ItemRequirement(ItemUseType.CONSUME, new ItemStack(Items.SHORT_GRASS, 2));
@@ -126,9 +127,9 @@ public class ItemRequirement {
             return specialEntity.getRequiredItems();
         }
 
-        if (entity instanceof ItemFrameEntity itemFrame) {
-            ItemStack frame = itemFrame.getAsItemStack();
-            ItemStack displayedItem = ComponentProcessors.withUnsafeComponentsDiscarded(itemFrame.getHeldItemStack());
+        if (entity instanceof ItemFrame itemFrame) {
+            ItemStack frame = itemFrame.getFrameItemStack();
+            ItemStack displayedItem = ComponentProcessors.withUnsafeComponentsDiscarded(itemFrame.getItem());
             if (displayedItem.isEmpty())
                 return new ItemRequirement(ItemUseType.CONSUME, frame);
             return new ItemRequirement(List.of(
@@ -137,11 +138,11 @@ public class ItemRequirement {
             ));
         }
 
-        if (entity instanceof ArmorStandEntity armorStand) {
+        if (entity instanceof ArmorStand armorStand) {
             List<StackRequirement> requirements = new ArrayList<>();
             requirements.add(new StackRequirement(new ItemStack(Items.ARMOR_STAND), ItemUseType.CONSUME));
             for (EquipmentSlot equipmentSlot : EquipmentSlot.VALUES) {
-                ItemStack itemStack = armorStand.getEquippedStack(equipmentSlot);
+                ItemStack itemStack = armorStand.getItemBySlot(equipmentSlot);
                 requirements.add(new StrictNbtStackRequirement(ComponentProcessors.withUnsafeComponentsDiscarded(itemStack), ItemUseType.CONSUME));
             }
             return new ItemRequirement(requirements);
@@ -188,7 +189,7 @@ public class ItemRequirement {
         }
 
         public boolean matches(ItemStack other) {
-            return ItemStack.areItemsEqual(stack, other);
+            return ItemStack.isSameItem(stack, other);
         }
     }
 
@@ -199,7 +200,7 @@ public class ItemRequirement {
 
         @Override
         public boolean matches(ItemStack other) {
-            return ItemStack.areItemsAndComponentsEqual(stack, other);
+            return ItemStack.isSameItemSameComponents(stack, other);
         }
     }
 }

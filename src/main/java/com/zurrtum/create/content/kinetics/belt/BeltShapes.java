@@ -2,18 +2,17 @@ package com.zurrtum.create.content.kinetics.belt;
 
 import com.zurrtum.create.AllShapes;
 import com.zurrtum.create.catnip.math.VoxelShaper;
-import net.minecraft.block.BlockState;
-import net.minecraft.util.function.BooleanBiFunction;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Direction.Axis;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.shape.VoxelShape;
-import net.minecraft.util.shape.VoxelShapes;
-
 import java.util.HashMap;
 import java.util.Map;
+import net.minecraft.core.Direction;
+import net.minecraft.core.Direction.Axis;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.phys.shapes.BooleanOp;
+import net.minecraft.world.phys.shapes.Shapes;
+import net.minecraft.world.phys.shapes.VoxelShape;
 
-import static net.minecraft.block.Block.createCuboidShape;
+import static net.minecraft.world.level.block.Block.box;
 
 public class BeltShapes {
 
@@ -69,8 +68,8 @@ public class BeltShapes {
     //Building parts for the shapes
     private static final VoxelShape SLOPE_DESC_PART = makeSlopePart(false), SLOPE_ASC_PART = makeSlopePart(true), SIDEWAYS_FULL_PART = makeSidewaysFull(), SIDEWAYS_END_PART = makeSidewaysEnding(), FLAT_FULL_PART = makeFlatFull(), FLAT_END_PART = makeFlatEnding();
 
-    private static final VoxelShape SOUTH_MASK = createCuboidShape(0, -5, 8, 16, 16 + 5, 16);
-    private static final VoxelShape NORTH_MASK = createCuboidShape(0, -5, 0, 16, 16 + 5, 8);
+    private static final VoxelShape SOUTH_MASK = box(0, -5, 8, 16, 16 + 5, 16);
+    private static final VoxelShape NORTH_MASK = box(0, -5, 0, 16, 16 + 5, 8);
 
     //Vertical Shapes
     private static final VoxelShaper VERTICAL_FULL = VerticalBeltShaper.make(FLAT_FULL_PART), VERTICAL_END = VerticalBeltShaper.make(compose(
@@ -107,29 +106,29 @@ public class BeltShapes {
         Direction.SOUTH
     ), SLOPE_ASC_START = VoxelShaper.forHorizontal(compose(SLOPE_ASC_PART, FLAT_END_PART), Direction.SOUTH);
 
-    private static final VoxelShaper PARTIAL_CASING = VoxelShaper.forHorizontal(createCuboidShape(0, 0, 5, 16, 11, 16), Direction.SOUTH);
+    private static final VoxelShaper PARTIAL_CASING = VoxelShaper.forHorizontal(box(0, 0, 5, 16, 11, 16), Direction.SOUTH);
 
     static Map<BlockState, VoxelShape> cache = new HashMap<>();
     static Map<BlockState, VoxelShape> collisionCache = new HashMap<>();
 
     private static VoxelShape compose(VoxelShape southPart, VoxelShape northPart) {
-        return VoxelShapes.union(
-            VoxelShapes.combine(SOUTH_MASK, southPart, BooleanBiFunction.AND),
-            VoxelShapes.combine(NORTH_MASK, northPart, BooleanBiFunction.AND)
+        return Shapes.or(
+            Shapes.joinUnoptimized(SOUTH_MASK, southPart, BooleanOp.AND),
+            Shapes.joinUnoptimized(NORTH_MASK, northPart, BooleanOp.AND)
         );
     }
 
     private static VoxelShape makeSlopePart(boolean ascendingInstead) {
-        VoxelShape slice = createCuboidShape(1, 0, 15, 15, 11, 16);
-        VoxelShape result = VoxelShapes.empty();
+        VoxelShape slice = box(1, 0, 15, 15, 11, 16);
+        VoxelShape result = Shapes.empty();
 
         for (int i = 0; i < 16; i++) {
 
             int yOffset = ascendingInstead ? 10 - i : i - 5;
 
-            result = VoxelShapes.union(
+            result = Shapes.or(
                 result,//move slice i voxels "right" and i-5 voxels "down"
-                slice.offset(0, yOffset / 16f, -i / 16f)
+                slice.move(0, yOffset / 16f, -i / 16f)
             );
         }
 
@@ -137,25 +136,25 @@ public class BeltShapes {
     }
 
     private static VoxelShape makeFlatEnding() {
-        return VoxelShapes.union(createCuboidShape(1, 4, 0, 15, 12, 16), createCuboidShape(1, 3, 1, 15, 13, 15));
+        return Shapes.or(box(1, 4, 0, 15, 12, 16), box(1, 3, 1, 15, 13, 15));
     }
 
     private static VoxelShape makeFlatFull() {
-        return createCuboidShape(1, 3, 0, 15, 13, 16);
+        return box(1, 3, 0, 15, 13, 16);
     }
 
     private static VoxelShape makeSidewaysEnding() {
-        return VoxelShapes.union(createCuboidShape(4, 1, 0, 12, 15, 16), createCuboidShape(3, 1, 1, 13, 15, 15));
+        return Shapes.or(box(4, 1, 0, 12, 15, 16), box(3, 1, 1, 13, 15, 15));
     }
 
     private static VoxelShape makeSidewaysFull() {
-        return createCuboidShape(3, 1, 0, 13, 15, 16);
+        return box(3, 1, 0, 13, 15, 16);
     }
 
     public static VoxelShape getShape(BlockState state) {
         if (cache.containsKey(state))
             return cache.get(state);
-        VoxelShape createdShape = VoxelShapes.union(getBeltShape(state), getCasingShape(state));
+        VoxelShape createdShape = Shapes.or(getBeltShape(state), getCasingShape(state));
         cache.put(state, createdShape);
         return createdShape;
     }
@@ -163,16 +162,16 @@ public class BeltShapes {
     public static VoxelShape getCollisionShape(BlockState state) {
         if (collisionCache.containsKey(state))
             return collisionCache.get(state);
-        VoxelShape createdShape = VoxelShapes.combine(AllShapes.BELT_COLLISION_MASK, getShape(state), BooleanBiFunction.AND);
+        VoxelShape createdShape = Shapes.joinUnoptimized(AllShapes.BELT_COLLISION_MASK, getShape(state), BooleanOp.AND);
         collisionCache.put(state, createdShape);
         return createdShape;
     }
 
     private static VoxelShape getBeltShape(BlockState state) {
-        Direction facing = state.get(BeltBlock.HORIZONTAL_FACING);
+        Direction facing = state.getValue(BeltBlock.HORIZONTAL_FACING);
         Axis axis = facing.getAxis();
-        BeltPart part = state.get(BeltBlock.PART);
-        BeltSlope slope = state.get(BeltBlock.SLOPE);
+        BeltPart part = state.getValue(BeltBlock.PART);
+        BeltSlope slope = state.getValue(BeltBlock.SLOPE);
 
         //vertical
         if (slope == BeltSlope.VERTICAL) {
@@ -208,21 +207,21 @@ public class BeltShapes {
             return (slope == BeltSlope.DOWNWARD ? SLOPE_DESC_END : SLOPE_ASC_END).get(facing);
 
         //bad state
-        return VoxelShapes.empty();
+        return Shapes.empty();
     }
 
     private static VoxelShape getCasingShape(BlockState state) {
-        if (!state.get(BeltBlock.CASING))
-            return VoxelShapes.empty();
+        if (!state.getValue(BeltBlock.CASING))
+            return Shapes.empty();
 
-        Direction facing = state.get(BeltBlock.HORIZONTAL_FACING);
-        BeltPart part = state.get(BeltBlock.PART);
-        BeltSlope slope = state.get(BeltBlock.SLOPE);
+        Direction facing = state.getValue(BeltBlock.HORIZONTAL_FACING);
+        BeltPart part = state.getValue(BeltBlock.PART);
+        BeltSlope slope = state.getValue(BeltBlock.SLOPE);
 
         if (slope == BeltSlope.VERTICAL)
-            return VoxelShapes.empty();
+            return Shapes.empty();
         if (slope == BeltSlope.SIDEWAYS)
-            return VoxelShapes.empty();
+            return Shapes.empty();
 
         if (slope == BeltSlope.HORIZONTAL) {
             return AllShapes.CASING_11PX.get(Direction.UP);
@@ -237,17 +236,17 @@ public class BeltShapes {
             return slope == BeltSlope.DOWNWARD ? AllShapes.CASING_11PX.get(Direction.UP) : PARTIAL_CASING.get(facing);
 
         //something went wrong
-        return VoxelShapes.fullCube();
+        return Shapes.block();
     }
 
     private static class VerticalBeltShaper extends VoxelShaper {
 
         public static VoxelShaper make(VoxelShape southBeltShape) {
             return forDirectionsWithRotation(
-                rotatedCopy(southBeltShape, new Vec3d(-90, 0, 0)), Direction.SOUTH, Direction.Type.HORIZONTAL,//idk, this can probably be improved :S
-                direction -> new Vec3d(
-                    direction.getDirection() == Direction.AxisDirection.POSITIVE ? 0 : 180,
-                    -direction.getPositiveHorizontalDegrees(),
+                rotatedCopy(southBeltShape, new Vec3(-90, 0, 0)), Direction.SOUTH, Direction.Plane.HORIZONTAL,//idk, this can probably be improved :S
+                direction -> new Vec3(
+                    direction.getAxisDirection() == Direction.AxisDirection.POSITIVE ? 0 : 180,
+                    -direction.toYRot(),
                     0
                 )
             );

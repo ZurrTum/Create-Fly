@@ -1,7 +1,7 @@
 package com.zurrtum.create.client.flywheel.lib.material;
 
 import com.zurrtum.create.client.flywheel.api.material.LightShader;
-import net.minecraft.util.Identifier;
+import net.minecraft.resources.ResourceLocation;
 
-public record SimpleLightShader(@Override Identifier source) implements LightShader {
+public record SimpleLightShader(@Override ResourceLocation source) implements LightShader {
 }

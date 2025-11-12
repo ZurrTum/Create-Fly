@@ -1,16 +1,16 @@
 package com.zurrtum.create.client.flywheel.lib.model.baked;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.util.math.BlockPos;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.function.ToIntFunction;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
 
 public class SinglePosVirtualBlockGetter extends VirtualBlockGetter {
-    protected BlockPos pos = BlockPos.ORIGIN;
-    protected BlockState blockState = Blocks.AIR.getDefaultState();
+    protected BlockPos pos = BlockPos.ZERO;
+    protected BlockState blockState = Blocks.AIR.defaultBlockState();
     @Nullable
     protected BlockEntity blockEntity;
 
@@ -57,7 +57,7 @@ public class SinglePosVirtualBlockGetter extends VirtualBlockGetter {
             return blockState;
         }
 
-        return Blocks.AIR.getDefaultState();
+        return Blocks.AIR.defaultBlockState();
     }
 
     @Override
@@ -66,7 +66,7 @@ public class SinglePosVirtualBlockGetter extends VirtualBlockGetter {
     }
 
     @Override
-    public int getBottomY() {
+    public int getMinY() {
         return pos.getY();
     }
 }

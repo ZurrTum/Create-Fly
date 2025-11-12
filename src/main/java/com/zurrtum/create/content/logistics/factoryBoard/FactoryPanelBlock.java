@@ -15,96 +15,100 @@ import com.zurrtum.create.foundation.advancement.AdvancementBehaviour;
 import com.zurrtum.create.foundation.block.BreakControlBlock;
 import com.zurrtum.create.foundation.block.IBE;
 import com.zurrtum.create.foundation.block.ProperWaterloggedBlock;
-import net.minecraft.block.*;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.block.enums.BlockFace;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.attribute.EntityAttributes;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.fluid.FluidState;
-import net.minecraft.item.ItemPlacementContext;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.ItemUsageContext;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.sound.SoundCategory;
-import net.minecraft.state.StateManager;
-import net.minecraft.state.property.BooleanProperty;
-import net.minecraft.state.property.Properties;
-import net.minecraft.text.Text;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.Hand;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.hit.HitResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Direction.Axis;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.math.random.Random;
-import net.minecraft.util.shape.VoxelShape;
-import net.minecraft.util.shape.VoxelShapes;
-import net.minecraft.world.BlockView;
-import net.minecraft.world.World;
-import net.minecraft.world.WorldView;
-import net.minecraft.world.tick.ScheduledTickView;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.Direction.Axis;
+import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.util.Mth;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.item.context.UseOnContext;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelReader;
+import net.minecraft.world.level.ScheduledTickAccess;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.FaceAttachedHorizontalDirectionalBlock;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.AttachFace;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.block.state.properties.BooleanProperty;
+import net.minecraft.world.level.material.FluidState;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.HitResult;
+import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.phys.shapes.EntityCollisionContext;
+import net.minecraft.world.phys.shapes.Shapes;
+import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.UUID;
 
-public class FactoryPanelBlock extends WallMountedBlock implements ProperWaterloggedBlock, IBE<FactoryPanelBlockEntity>, IWrenchable, SpecialBlockItemRequirement, BreakControlBlock {
-    public static final MapCodec<FactoryPanelBlock> CODEC = createCodec(FactoryPanelBlock::new);
+public class FactoryPanelBlock extends FaceAttachedHorizontalDirectionalBlock implements ProperWaterloggedBlock, IBE<FactoryPanelBlockEntity>, IWrenchable, SpecialBlockItemRequirement, BreakControlBlock {
+    public static final MapCodec<FactoryPanelBlock> CODEC = simpleCodec(FactoryPanelBlock::new);
 
-    public static final BooleanProperty POWERED = Properties.POWERED;
+    public static final BooleanProperty POWERED = BlockStateProperties.POWERED;
 
-    public FactoryPanelBlock(Settings p_53182_) {
+    public FactoryPanelBlock(Properties p_53182_) {
         super(p_53182_);
-        setDefaultState(getDefaultState().with(WATERLOGGED, false).with(POWERED, false));
+        registerDefaultState(defaultBlockState().setValue(WATERLOGGED, false).setValue(POWERED, false));
     }
 
     @Override
-    protected void appendProperties(StateManager.Builder<Block, BlockState> pBuilder) {
-        super.appendProperties(pBuilder.add(FACE, FACING, WATERLOGGED, POWERED));
+    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> pBuilder) {
+        super.createBlockStateDefinition(pBuilder.add(FACE, FACING, WATERLOGGED, POWERED));
     }
 
     @Override
-    public boolean canPlaceAt(BlockState pState, WorldView pLevel, BlockPos pPos) {
-        return canAttachLenient(pLevel, pPos, getDirection(pState).getOpposite());
+    public boolean canSurvive(BlockState pState, LevelReader pLevel, BlockPos pPos) {
+        return canAttachLenient(pLevel, pPos, getConnectedDirection(pState).getOpposite());
     }
 
-    public static boolean canAttachLenient(WorldView pReader, BlockPos pPos, Direction pDirection) {
-        BlockPos blockpos = pPos.offset(pDirection);
+    public static boolean canAttachLenient(LevelReader pReader, BlockPos pPos, Direction pDirection) {
+        BlockPos blockpos = pPos.relative(pDirection);
         return !pReader.getBlockState(blockpos).getCollisionShape(pReader, blockpos).isEmpty();
     }
 
     @Override
-    public BlockState getPlacementState(ItemPlacementContext pContext) {
-        BlockState stateForPlacement = super.getPlacementState(pContext);
+    public BlockState getStateForPlacement(BlockPlaceContext pContext) {
+        BlockState stateForPlacement = super.getStateForPlacement(pContext);
         if (stateForPlacement == null)
             return null;
-        if (stateForPlacement.get(FACE) == BlockFace.FLOOR)
-            stateForPlacement = stateForPlacement.with(FACING, stateForPlacement.get(FACING).getOpposite());
+        if (stateForPlacement.getValue(FACE) == AttachFace.FLOOR)
+            stateForPlacement = stateForPlacement.setValue(FACING, stateForPlacement.getValue(FACING).getOpposite());
 
-        World level = pContext.getWorld();
-        BlockPos pos = pContext.getBlockPos();
+        Level level = pContext.getLevel();
+        BlockPos pos = pContext.getClickedPos();
         BlockState blockState = level.getBlockState(pos);
         FactoryPanelBlockEntity fpbe = getBlockEntity(level, pos);
 
-        Vec3d location = pContext.getHitPos();
-        if (blockState.isOf(this) && location != null && fpbe != null) {
-            if (!level.isClient()) {
+        Vec3 location = pContext.getClickLocation();
+        if (blockState.is(this) && location != null && fpbe != null) {
+            if (!level.isClientSide()) {
                 PanelSlot targetedSlot = getTargetedSlot(pos, blockState, location);
-                ItemStack panelItem = FactoryPanelBlockItem.fixCtrlCopiedStack(pContext.getStack());
+                ItemStack panelItem = FactoryPanelBlockItem.fixCtrlCopiedStack(pContext.getItemInHand());
                 UUID networkFromStack = LogisticallyLinkedBlockItem.networkFromStack(panelItem);
-                PlayerEntity pPlayer = pContext.getPlayer();
+                Player pPlayer = pContext.getPlayer();
 
                 if (fpbe.addPanel(targetedSlot, networkFromStack) && pPlayer != null) {
-                    pPlayer.sendMessage(Text.translatable("create.logistically_linked.connected"), true);
+                    pPlayer.displayClientMessage(Component.translatable("create.logistically_linked.connected"), true);
 
                     if (!pPlayer.isCreative()) {
-                        panelItem.decrement(1);
+                        panelItem.shrink(1);
                         if (panelItem.isEmpty())
-                            pPlayer.setStackInHand(pContext.getHand(), ItemStack.EMPTY);
+                            pPlayer.setItemInHand(pContext.getHand(), ItemStack.EMPTY);
                     }
                 }
             }
@@ -115,20 +119,20 @@ public class FactoryPanelBlock extends WallMountedBlock implements ProperWaterlo
     }
 
     @Override
-    public ActionResult onSneakWrenched(BlockState state, ItemUsageContext context) {
-        World world = context.getWorld();
-        BlockPos pos = context.getBlockPos();
-        PlayerEntity player = context.getPlayer();
-        PanelSlot slot = getTargetedSlot(pos, state, context.getHitPos());
+    public InteractionResult onSneakWrenched(BlockState state, UseOnContext context) {
+        Level world = context.getLevel();
+        BlockPos pos = context.getClickedPos();
+        Player player = context.getPlayer();
+        PanelSlot slot = getTargetedSlot(pos, state, context.getClickLocation());
 
-        if (!(world instanceof ServerWorld))
-            return ActionResult.SUCCESS;
+        if (!(world instanceof ServerLevel))
+            return InteractionResult.SUCCESS;
 
         return onBlockEntityUse(
             world, pos, be -> {
                 ServerFactoryPanelBehaviour behaviour = be.panels.get(slot);
                 if (behaviour == null || !behaviour.isActive())
-                    return ActionResult.SUCCESS;
+                    return InteractionResult.SUCCESS;
 
                 //TODO
                 //                BlockEvent.BreakEvent event = new BlockEvent.BreakEvent(world, pos, world.getBlockState(pos), player);
@@ -137,29 +141,29 @@ public class FactoryPanelBlock extends WallMountedBlock implements ProperWaterlo
                 //                    return ActionResult.SUCCESS;
 
                 if (!be.removePanel(slot))
-                    return ActionResult.SUCCESS;
+                    return InteractionResult.SUCCESS;
 
                 if (!player.isCreative())
-                    player.getInventory().offerOrDrop(AllItems.FACTORY_GAUGE.getDefaultStack());
+                    player.getInventory().placeItemBackInInventory(AllItems.FACTORY_GAUGE.getDefaultInstance());
 
                 IWrenchable.playRemoveSound(world, pos);
                 if (be.activePanels() == 0)
-                    world.breakBlock(pos, false);
+                    world.destroyBlock(pos, false);
 
-                return ActionResult.SUCCESS;
+                return InteractionResult.SUCCESS;
             }
         );
     }
 
     @Override
-    public void onPlaced(World pLevel, BlockPos pPos, BlockState pState, LivingEntity pPlacer, ItemStack pStack) {
-        super.onPlaced(pLevel, pPos, pState, pPlacer, pStack);
+    public void setPlacedBy(Level pLevel, BlockPos pPos, BlockState pState, LivingEntity pPlacer, ItemStack pStack) {
+        super.setPlacedBy(pLevel, pPos, pState, pPlacer, pStack);
         if (pPlacer == null)
             return;
         AdvancementBehaviour.setPlacedBy(pLevel, pPos, pPlacer);
-        double range = pPlacer.getAttributeValue(EntityAttributes.BLOCK_INTERACTION_RANGE) + 1;
-        HitResult hitResult = pPlacer.raycast(range, 1, false);
-        Vec3d location = hitResult.getPos();
+        double range = pPlacer.getAttributeValue(Attributes.BLOCK_INTERACTION_RANGE) + 1;
+        HitResult hitResult = pPlacer.pick(range, 1, false);
+        Vec3 location = hitResult.getLocation();
         if (location == null)
             return;
         PanelSlot initialSlot = getTargetedSlot(pPos, pState, location);
@@ -167,29 +171,29 @@ public class FactoryPanelBlock extends WallMountedBlock implements ProperWaterlo
     }
 
     @Override
-    protected ActionResult onUseWithItem(
+    protected InteractionResult useItemOn(
         ItemStack stack,
         BlockState state,
-        World level,
+        Level level,
         BlockPos pos,
-        PlayerEntity player,
-        Hand hand,
+        Player player,
+        InteractionHand hand,
         BlockHitResult hitResult
     ) {
         if (player == null)
-            return ActionResult.PASS_TO_DEFAULT_BLOCK_ACTION;
-        if (level.isClient())
-            return ActionResult.SUCCESS;
-        if (!stack.isOf(AllItems.FACTORY_GAUGE))
-            return ActionResult.SUCCESS;
-        Vec3d location = hitResult.getPos();
+            return InteractionResult.TRY_WITH_EMPTY_HAND;
+        if (level.isClientSide())
+            return InteractionResult.SUCCESS;
+        if (!stack.is(AllItems.FACTORY_GAUGE))
+            return InteractionResult.SUCCESS;
+        Vec3 location = hitResult.getLocation();
         if (location == null)
-            return ActionResult.SUCCESS;
+            return InteractionResult.SUCCESS;
 
         if (!FactoryPanelBlockItem.isTuned(stack)) {
             AllSoundEvents.DENY.playOnServer(level, pos);
-            player.sendMessage(Text.translatable("create.factory_panel.tune_before_placing"), true);
-            return ActionResult.FAIL;
+            player.displayClientMessage(Component.translatable("create.factory_panel.tune_before_placing"), true);
+            return InteractionResult.FAIL;
         }
 
         PanelSlot newSlot = getTargetedSlot(pos, state, location);
@@ -197,65 +201,65 @@ public class FactoryPanelBlock extends WallMountedBlock implements ProperWaterlo
             level, pos, fpbe -> {
                 if (!fpbe.addPanel(newSlot, LogisticallyLinkedBlockItem.networkFromStack(FactoryPanelBlockItem.fixCtrlCopiedStack(stack))))
                     return;
-                player.sendMessage(Text.translatable("create.logistically_linked.connected"), true);
-                level.playSound(null, pos, soundGroup.getPlaceSound(), SoundCategory.BLOCKS);
+                player.displayClientMessage(Component.translatable("create.logistically_linked.connected"), true);
+                level.playSound(null, pos, soundType.getPlaceSound(), SoundSource.BLOCKS);
                 if (player.isCreative())
                     return;
-                stack.decrement(1);
+                stack.shrink(1);
                 if (stack.isEmpty())
-                    player.setStackInHand(hand, ItemStack.EMPTY);
+                    player.setItemInHand(hand, ItemStack.EMPTY);
             }
         );
-        return ActionResult.SUCCESS;
+        return InteractionResult.SUCCESS;
     }
 
     @Override
-    public boolean onDestroyedByPlayer(BlockState state, World level, BlockPos pos, PlayerEntity player) {
+    public boolean onDestroyedByPlayer(BlockState state, Level level, BlockPos pos, Player player) {
         return !tryDestroySubPanelFirst(state, level, pos, player);
     }
 
-    private boolean tryDestroySubPanelFirst(BlockState state, World level, BlockPos pos, PlayerEntity player) {
-        double range = player.getAttributeValue(EntityAttributes.BLOCK_INTERACTION_RANGE) + 1;
-        HitResult hitResult = player.raycast(range, 1, false);
-        Vec3d location = hitResult.getPos();
+    private boolean tryDestroySubPanelFirst(BlockState state, Level level, BlockPos pos, Player player) {
+        double range = player.getAttributeValue(Attributes.BLOCK_INTERACTION_RANGE) + 1;
+        HitResult hitResult = player.pick(range, 1, false);
+        Vec3 location = hitResult.getLocation();
         PanelSlot destroyedSlot = getTargetedSlot(pos, state, location);
-        return ActionResult.SUCCESS == onBlockEntityUse(
+        return InteractionResult.SUCCESS == onBlockEntityUse(
             level, pos, fpbe -> {
                 if (fpbe.activePanels() < 2)
-                    return ActionResult.FAIL;
+                    return InteractionResult.FAIL;
                 if (!fpbe.removePanel(destroyedSlot))
-                    return ActionResult.FAIL;
+                    return InteractionResult.FAIL;
                 if (!player.isCreative())
-                    dropStack(level, pos, AllItems.FACTORY_GAUGE.getDefaultStack());
-                return ActionResult.SUCCESS;
+                    popResource(level, pos, AllItems.FACTORY_GAUGE.getDefaultInstance());
+                return InteractionResult.SUCCESS;
             }
         );
     }
 
     @Override
-    public boolean emitsRedstonePower(BlockState pState) {
+    public boolean isSignalSource(BlockState pState) {
         return true;
     }
 
     @Override
-    public int getWeakRedstonePower(BlockState pBlockState, BlockView pBlockAccess, BlockPos pPos, Direction pSide) {
-        return pBlockState.get(POWERED) ? 15 : 0;
+    public int getSignal(BlockState pBlockState, BlockGetter pBlockAccess, BlockPos pPos, Direction pSide) {
+        return pBlockState.getValue(POWERED) ? 15 : 0;
     }
 
     @Override
-    public int getStrongRedstonePower(BlockState pBlockState, BlockView pBlockAccess, BlockPos pPos, Direction pSide) {
-        return pBlockState.get(POWERED) && getDirection(pBlockState) == pSide ? 15 : 0;
+    public int getDirectSignal(BlockState pBlockState, BlockGetter pBlockAccess, BlockPos pPos, Direction pSide) {
+        return pBlockState.getValue(POWERED) && getConnectedDirection(pBlockState) == pSide ? 15 : 0;
     }
 
     @Override
-    public boolean canReplace(BlockState pState, ItemPlacementContext pUseContext) {
-        if (!pUseContext.getStack().isOf(AllItems.FACTORY_GAUGE))
+    public boolean canBeReplaced(BlockState pState, BlockPlaceContext pUseContext) {
+        if (!pUseContext.getItemInHand().is(AllItems.FACTORY_GAUGE))
             return false;
-        Vec3d location = pUseContext.getHitPos();
+        Vec3 location = pUseContext.getClickLocation();
 
-        BlockPos pos = pUseContext.getBlockPos();
+        BlockPos pos = pUseContext.getClickedPos();
         PanelSlot slot = getTargetedSlot(pos, pState, location);
-        FactoryPanelBlockEntity blockEntity = getBlockEntity(pUseContext.getWorld(), pos);
+        FactoryPanelBlockEntity blockEntity = getBlockEntity(pUseContext.getLevel(), pos);
 
         if (blockEntity == null)
             return false;
@@ -263,33 +267,33 @@ public class FactoryPanelBlock extends WallMountedBlock implements ProperWaterlo
     }
 
     @Override
-    public VoxelShape getCollisionShape(BlockState pState, BlockView pLevel, BlockPos pPos, ShapeContext pContext) {
-        if (pContext instanceof EntityShapeContext ecc && ecc.getEntity() == null)
-            return getOutlineShape(pState, pLevel, pPos, pContext);
-        return VoxelShapes.empty();
+    public VoxelShape getCollisionShape(BlockState pState, BlockGetter pLevel, BlockPos pPos, CollisionContext pContext) {
+        if (pContext instanceof EntityCollisionContext ecc && ecc.getEntity() == null)
+            return getShape(pState, pLevel, pPos, pContext);
+        return Shapes.empty();
     }
 
     @Override
-    public VoxelShape getOutlineShape(BlockState pState, BlockView pLevel, BlockPos pPos, ShapeContext pContext) {
+    public VoxelShape getShape(BlockState pState, BlockGetter pLevel, BlockPos pPos, CollisionContext pContext) {
         FactoryPanelBlockEntity blockEntity = getBlockEntity(pLevel, pPos);
         if (blockEntity != null)
             return blockEntity.getShape();
-        return AllShapes.FACTORY_PANEL_FALLBACK.get(getDirection(pState));
+        return AllShapes.FACTORY_PANEL_FALLBACK.get(getConnectedDirection(pState));
     }
 
     @Override
-    public BlockState getStateForNeighborUpdate(
+    public BlockState updateShape(
         BlockState pState,
-        WorldView pLevel,
-        ScheduledTickView tickView,
+        LevelReader pLevel,
+        ScheduledTickAccess tickView,
         BlockPos pCurrentPos,
         Direction pFacing,
         BlockPos pFacingPos,
         BlockState pFacingState,
-        Random random
+        RandomSource random
     ) {
         updateWater(pLevel, tickView, pState, pCurrentPos);
-        return super.getStateForNeighborUpdate(pState, pLevel, tickView, pCurrentPos, pFacing, pFacingPos, pFacingState, random);
+        return super.updateShape(pState, pLevel, tickView, pCurrentPos, pFacing, pFacingPos, pFacingState, random);
     }
 
     @Override
@@ -298,23 +302,23 @@ public class FactoryPanelBlock extends WallMountedBlock implements ProperWaterlo
     }
 
     public static Direction connectedDirection(BlockState state) {
-        return getDirection(state);
+        return getConnectedDirection(state);
     }
 
-    public static PanelSlot getTargetedSlot(BlockPos pos, BlockState blockState, Vec3d clickLocation) {
+    public static PanelSlot getTargetedSlot(BlockPos pos, BlockState blockState, Vec3 clickLocation) {
         double bestDistance = Double.MAX_VALUE;
         PanelSlot bestSlot = PanelSlot.BOTTOM_LEFT;
-        Vec3d localClick = clickLocation.subtract(Vec3d.of(pos));
-        float xRot = MathHelper.DEGREES_PER_RADIAN * FactoryPanelBlock.getXRot(blockState);
-        float yRot = MathHelper.DEGREES_PER_RADIAN * FactoryPanelBlock.getYRot(blockState);
+        Vec3 localClick = clickLocation.subtract(Vec3.atLowerCornerOf(pos));
+        float xRot = Mth.RAD_TO_DEG * FactoryPanelBlock.getXRot(blockState);
+        float yRot = Mth.RAD_TO_DEG * FactoryPanelBlock.getYRot(blockState);
 
         for (PanelSlot slot : PanelSlot.values()) {
-            Vec3d vec = new Vec3d(.25 + slot.xOffset * .5, 0, .25 + slot.yOffset * .5);
+            Vec3 vec = new Vec3(.25 + slot.xOffset * .5, 0, .25 + slot.yOffset * .5);
             vec = VecHelper.rotateCentered(vec, 180, Axis.Y);
             vec = VecHelper.rotateCentered(vec, xRot + 90, Axis.X);
             vec = VecHelper.rotateCentered(vec, yRot, Axis.Y);
 
-            double diff = vec.squaredDistanceTo(localClick);
+            double diff = vec.distanceToSqr(localClick);
             if (diff > bestDistance)
                 continue;
             bestDistance = diff;
@@ -335,14 +339,14 @@ public class FactoryPanelBlock extends WallMountedBlock implements ProperWaterlo
     }
 
     public static float getXRot(BlockState state) {
-        BlockFace face = state.get(FactoryPanelBlock.FACE, BlockFace.FLOOR);
-        return face == BlockFace.CEILING ? MathHelper.PI / 2 : face == BlockFace.FLOOR ? -MathHelper.PI / 2 : 0;
+        AttachFace face = state.getValueOrElse(FactoryPanelBlock.FACE, AttachFace.FLOOR);
+        return face == AttachFace.CEILING ? Mth.PI / 2 : face == AttachFace.FLOOR ? -Mth.PI / 2 : 0;
     }
 
     public static float getYRot(BlockState state) {
-        Direction facing = state.get(FactoryPanelBlock.FACING, Direction.SOUTH);
-        BlockFace face = state.get(FactoryPanelBlock.FACE, BlockFace.FLOOR);
-        return (face == BlockFace.CEILING ? MathHelper.PI : 0) + AngleHelper.rad(AngleHelper.horizontalAngle(facing));
+        Direction facing = state.getValueOrElse(FactoryPanelBlock.FACING, Direction.SOUTH);
+        AttachFace face = state.getValueOrElse(FactoryPanelBlock.FACE, AttachFace.FLOOR);
+        return (face == AttachFace.CEILING ? Mth.PI : 0) + AngleHelper.rad(AngleHelper.horizontalAngle(facing));
     }
 
     @Override
@@ -351,7 +355,7 @@ public class FactoryPanelBlock extends WallMountedBlock implements ProperWaterlo
     }
 
     @Override
-    protected @NotNull MapCodec<? extends WallMountedBlock> getCodec() {
+    protected @NotNull MapCodec<? extends FaceAttachedHorizontalDirectionalBlock> codec() {
         return CODEC;
     }
 }

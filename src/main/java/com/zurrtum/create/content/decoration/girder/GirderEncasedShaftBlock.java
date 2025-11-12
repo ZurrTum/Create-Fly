@@ -10,73 +10,73 @@ import com.zurrtum.create.content.kinetics.base.HorizontalAxisKineticBlock;
 import com.zurrtum.create.content.kinetics.base.KineticBlockEntity;
 import com.zurrtum.create.content.schematics.requirement.ItemRequirement;
 import com.zurrtum.create.foundation.block.IBE;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.ShapeContext;
-import net.minecraft.block.Waterloggable;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.fluid.FluidState;
-import net.minecraft.fluid.Fluids;
-import net.minecraft.item.ItemPlacementContext;
-import net.minecraft.item.ItemUsageContext;
-import net.minecraft.state.StateManager.Builder;
-import net.minecraft.state.property.BooleanProperty;
-import net.minecraft.state.property.Property;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Direction.Axis;
-import net.minecraft.util.math.random.Random;
-import net.minecraft.util.shape.VoxelShape;
-import net.minecraft.util.shape.VoxelShapes;
-import net.minecraft.world.BlockView;
-import net.minecraft.world.World;
-import net.minecraft.world.WorldView;
-import net.minecraft.world.tick.ScheduledTickView;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.Direction.Axis;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.item.context.UseOnContext;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelReader;
+import net.minecraft.world.level.ScheduledTickAccess;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.SimpleWaterloggedBlock;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition.Builder;
+import net.minecraft.world.level.block.state.properties.BooleanProperty;
+import net.minecraft.world.level.block.state.properties.Property;
+import net.minecraft.world.level.material.FluidState;
+import net.minecraft.world.level.material.Fluids;
+import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.phys.shapes.Shapes;
+import net.minecraft.world.phys.shapes.VoxelShape;
 
-import static net.minecraft.state.property.Properties.WATERLOGGED;
+import static net.minecraft.world.level.block.state.properties.BlockStateProperties.WATERLOGGED;
 
-public class GirderEncasedShaftBlock extends HorizontalAxisKineticBlock implements IBE<KineticBlockEntity>, Waterloggable, IWrenchable, SpecialBlockItemRequirement {
+public class GirderEncasedShaftBlock extends HorizontalAxisKineticBlock implements IBE<KineticBlockEntity>, SimpleWaterloggedBlock, IWrenchable, SpecialBlockItemRequirement {
 
     public static final BooleanProperty TOP = GirderBlock.TOP;
     public static final BooleanProperty BOTTOM = GirderBlock.BOTTOM;
 
-    public GirderEncasedShaftBlock(Settings properties) {
+    public GirderEncasedShaftBlock(Properties properties) {
         super(properties);
-        setDefaultState(getDefaultState().with(WATERLOGGED, false).with(TOP, false).with(BOTTOM, false));
+        registerDefaultState(defaultBlockState().setValue(WATERLOGGED, false).setValue(TOP, false).setValue(BOTTOM, false));
     }
 
     @Override
-    protected void appendProperties(Builder<Block, BlockState> builder) {
-        super.appendProperties(builder.add(TOP, BOTTOM, WATERLOGGED));
+    protected void createBlockStateDefinition(Builder<Block, BlockState> builder) {
+        super.createBlockStateDefinition(builder.add(TOP, BOTTOM, WATERLOGGED));
     }
 
     @Override
-    public VoxelShape getOutlineShape(BlockState pState, BlockView pLevel, BlockPos pPos, ShapeContext pContext) {
-        return AllShapes.GIRDER_BEAM_SHAFT.get(pState.get(HORIZONTAL_AXIS));
+    public VoxelShape getShape(BlockState pState, BlockGetter pLevel, BlockPos pPos, CollisionContext pContext) {
+        return AllShapes.GIRDER_BEAM_SHAFT.get(pState.getValue(HORIZONTAL_AXIS));
     }
 
     @Override
-    public VoxelShape getSidesShape(BlockState pState, BlockView pReader, BlockPos pPos) {
-        return VoxelShapes.union(super.getSidesShape(pState, pReader, pPos), AllShapes.EIGHT_VOXEL_POLE.get(Axis.Y));
+    public VoxelShape getBlockSupportShape(BlockState pState, BlockGetter pReader, BlockPos pPos) {
+        return Shapes.or(super.getBlockSupportShape(pState, pReader, pPos), AllShapes.EIGHT_VOXEL_POLE.get(Axis.Y));
     }
 
     @Override
     public BlockState getRotatedBlockState(BlockState originalState, Direction targetedFace) {
-        return AllBlocks.METAL_GIRDER.getDefaultState().with(WATERLOGGED, originalState.get(WATERLOGGED))
-            .with(GirderBlock.X, originalState.get(HORIZONTAL_AXIS) == Axis.Z).with(GirderBlock.Z, originalState.get(HORIZONTAL_AXIS) == Axis.X)
-            .with(GirderBlock.AXIS, originalState.get(HORIZONTAL_AXIS) == Axis.X ? Axis.Z : Axis.X)
-            .with(GirderBlock.BOTTOM, originalState.get(BOTTOM)).with(GirderBlock.TOP, originalState.get(TOP));
+        return AllBlocks.METAL_GIRDER.defaultBlockState().setValue(WATERLOGGED, originalState.getValue(WATERLOGGED))
+            .setValue(GirderBlock.X, originalState.getValue(HORIZONTAL_AXIS) == Axis.Z).setValue(GirderBlock.Z, originalState.getValue(HORIZONTAL_AXIS) == Axis.X)
+            .setValue(GirderBlock.AXIS, originalState.getValue(HORIZONTAL_AXIS) == Axis.X ? Axis.Z : Axis.X)
+            .setValue(GirderBlock.BOTTOM, originalState.getValue(BOTTOM)).setValue(GirderBlock.TOP, originalState.getValue(TOP));
     }
 
     @Override
-    public ActionResult onWrenched(BlockState state, ItemUsageContext context) {
-        ActionResult onWrenched = super.onWrenched(state, context);
-        PlayerEntity player = context.getPlayer();
-        if (onWrenched == ActionResult.SUCCESS && player != null && !player.isCreative())
-            player.getInventory().offerOrDrop(AllItems.SHAFT.getDefaultStack());
+    public InteractionResult onWrenched(BlockState state, UseOnContext context) {
+        InteractionResult onWrenched = super.onWrenched(state, context);
+        Player player = context.getPlayer();
+        if (onWrenched == InteractionResult.SUCCESS && player != null && !player.isCreative())
+            player.getInventory().placeItemBackInInventory(AllItems.SHAFT.getDefaultInstance());
         return onWrenched;
     }
 
@@ -92,27 +92,27 @@ public class GirderEncasedShaftBlock extends HorizontalAxisKineticBlock implemen
 
     @Override
     public FluidState getFluidState(BlockState state) {
-        return state.get(WATERLOGGED) ? Fluids.WATER.getStill(false) : Fluids.EMPTY.getDefaultState();
+        return state.getValue(WATERLOGGED) ? Fluids.WATER.getSource(false) : Fluids.EMPTY.defaultFluidState();
     }
 
     @Override
-    public BlockState getStateForNeighborUpdate(
+    public BlockState updateShape(
         BlockState state,
-        WorldView world,
-        ScheduledTickView tickView,
+        LevelReader world,
+        ScheduledTickAccess tickView,
         BlockPos pos,
         Direction direction,
         BlockPos neighbourPos,
         BlockState neighbourState,
-        Random random
+        RandomSource random
     ) {
-        if (state.get(WATERLOGGED))
-            tickView.scheduleFluidTick(pos, Fluids.WATER, Fluids.WATER.getTickRate(world));
+        if (state.getValue(WATERLOGGED))
+            tickView.scheduleTick(pos, Fluids.WATER, Fluids.WATER.getTickDelay(world));
 
         Property<Boolean> updateProperty = direction == Direction.UP ? TOP : BOTTOM;
         if (direction.getAxis().isVertical()) {
-            if (world.getBlockState(pos.offset(direction)).getSidesShape(world, pos.offset(direction)).isEmpty())
-                state = state.with(updateProperty, false);
+            if (world.getBlockState(pos.relative(direction)).getBlockSupportShape(world, pos.relative(direction)).isEmpty())
+                state = state.setValue(updateProperty, false);
             return GirderBlock.updateVerticalProperty(world, pos, state, updateProperty, neighbourState, direction);
         }
 
@@ -120,17 +120,17 @@ public class GirderEncasedShaftBlock extends HorizontalAxisKineticBlock implemen
     }
 
     @Override
-    public BlockState getPlacementState(ItemPlacementContext context) {
-        World level = context.getWorld();
-        BlockPos pos = context.getBlockPos();
+    public BlockState getStateForPlacement(BlockPlaceContext context) {
+        Level level = context.getLevel();
+        BlockPos pos = context.getClickedPos();
         FluidState ifluidstate = level.getFluidState(pos);
-        BlockState state = super.getPlacementState(context);
-        return state.with(WATERLOGGED, ifluidstate.getFluid() == Fluids.WATER);
+        BlockState state = super.getStateForPlacement(context);
+        return state.setValue(WATERLOGGED, ifluidstate.getType() == Fluids.WATER);
     }
 
     @Override
     public ItemRequirement getRequiredItems(BlockState state, BlockEntity be) {
-        return ItemRequirement.of(AllBlocks.SHAFT.getDefaultState(), be).union(ItemRequirement.of(AllBlocks.METAL_GIRDER.getDefaultState(), be));
+        return ItemRequirement.of(AllBlocks.SHAFT.defaultBlockState(), be).union(ItemRequirement.of(AllBlocks.METAL_GIRDER.defaultBlockState(), be));
     }
 
 }

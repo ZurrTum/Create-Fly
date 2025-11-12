@@ -23,32 +23,32 @@ import com.zurrtum.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.foundation.entity.behaviour.EntityBehaviour;
 import com.zurrtum.create.infrastructure.component.ClipboardContent;
 import com.zurrtum.create.infrastructure.packet.s2c.*;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.component.ComponentMap;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.vehicle.AbstractMinecartEntity;
-import net.minecraft.item.ItemPlacementContext;
-import net.minecraft.item.ItemStack;
-import net.minecraft.network.listener.ClientPlayPacketListener;
-import net.minecraft.network.listener.ServerPlayPacketListener;
-import net.minecraft.network.packet.Packet;
-import net.minecraft.util.Hand;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Direction.Axis;
-import net.minecraft.world.World;
 import org.apache.logging.log4j.util.TriConsumer;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.UUID;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.Direction.Axis;
+import net.minecraft.core.component.DataComponentMap;
+import net.minecraft.network.protocol.Packet;
+import net.minecraft.network.protocol.game.ClientGamePacketListener;
+import net.minecraft.network.protocol.game.ServerGamePacketListener;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.vehicle.AbstractMinecart;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
 
 public class AllClientHandle<T> {
-    public static AllClientHandle<? extends ClientPlayPacketListener> INSTANCE = new AllClientHandle<>();
+    public static AllClientHandle<? extends ClientGamePacketListener> INSTANCE = new AllClientHandle<>();
 
     @SuppressWarnings("unchecked")
-    public <P> void call(TriConsumer<AllClientHandle<T>, T, P> fn, ClientPlayPacketListener listener, S2CPacket packet) {
+    public <P> void call(TriConsumer<AllClientHandle<T>, T, P> fn, ClientGamePacketListener listener, S2CPacket packet) {
         if (packet.runInMain()) {
             forceMainThread((T) listener, packet);
         }
@@ -259,7 +259,7 @@ public class AllClientHandle<T> {
         warn();
     }
 
-    public PlayerEntity getPlayer() {
+    public Player getPlayer() {
         warn();
         return null;
     }
@@ -268,7 +268,7 @@ public class AllClientHandle<T> {
         warn();
     }
 
-    public void addAirFlowParticle(World world, BlockPos airCurrentPos, double x, double y, double z) {
+    public void addAirFlowParticle(Level world, BlockPos airCurrentPos, double x, double y, double z) {
         warn();
     }
 
@@ -282,7 +282,7 @@ public class AllClientHandle<T> {
     public void addBehaviours(Entity entity, ArrayList<EntityBehaviour<?>> behaviours) {
     }
 
-    public void showWaterBounds(Axis axis, ItemPlacementContext ctx) {
+    public void showWaterBounds(Axis axis, BlockPlaceContext ctx) {
         warn();
     }
 
@@ -303,7 +303,7 @@ public class AllClientHandle<T> {
         return null;
     }
 
-    public void spawnPipeParticles(World world, BlockPos pos, PipeConnection.Flow flow, boolean openEnd, Direction side, int amount) {
+    public void spawnPipeParticles(Level world, BlockPos pos, PipeConnection.Flow flow, boolean openEnd, Direction side, int amount) {
         warn();
     }
 
@@ -311,7 +311,7 @@ public class AllClientHandle<T> {
         warn();
     }
 
-    public void spawnSuperGlueParticles(World world, BlockPos pos, Direction direction, boolean fullBlock) {
+    public void spawnSuperGlueParticles(Level world, BlockPos pos, Direction direction, boolean fullBlock) {
         warn();
     }
 
@@ -319,19 +319,19 @@ public class AllClientHandle<T> {
         warn();
     }
 
-    public void sendPacket(Packet<ServerPlayPacketListener> packet) {
+    public void sendPacket(Packet<ServerGamePacketListener> packet) {
         warn();
     }
 
-    public void sendPacket(PlayerEntity player, Packet<ServerPlayPacketListener> packet) {
+    public void sendPacket(Player player, Packet<ServerGamePacketListener> packet) {
         warn();
     }
 
-    public void createBasinFluidParticles(World world, BasinBlockEntity blockEntity) {
+    public void createBasinFluidParticles(Level world, BasinBlockEntity blockEntity) {
         warn();
     }
 
-    public void cartClicked(PlayerEntity player, AbstractMinecartEntity minecart) {
+    public void cartClicked(Player player, AbstractMinecart minecart) {
         warn();
     }
 
@@ -360,7 +360,7 @@ public class AllClientHandle<T> {
         warn();
     }
 
-    public void startControlling(PlayerEntity player, AbstractContraptionEntity be, BlockPos pos) {
+    public void startControlling(Player player, AbstractContraptionEntity be, BlockPos pos) {
         warn();
     }
 
@@ -368,7 +368,7 @@ public class AllClientHandle<T> {
         warn();
     }
 
-    public void cannonDontAnimateItem(Hand hand) {
+    public void cannonDontAnimateItem(InteractionHand hand) {
         warn();
     }
 
@@ -388,12 +388,12 @@ public class AllClientHandle<T> {
         warn();
     }
 
-    public boolean factoryPanelClicked(World world, PlayerEntity player, ServerFactoryPanelBehaviour behaviour) {
+    public boolean factoryPanelClicked(Level world, Player player, ServerFactoryPanelBehaviour behaviour) {
         warn();
         return false;
     }
 
-    public void zapperDontAnimateItem(Hand hand) {
+    public void zapperDontAnimateItem(InteractionHand hand) {
         warn();
     }
 
@@ -401,31 +401,31 @@ public class AllClientHandle<T> {
         warn();
     }
 
-    public void openClipboardScreen(PlayerEntity player, ComponentMap components, BlockPos pos) {
+    public void openClipboardScreen(Player player, DataComponentMap components, BlockPos pos) {
         warn();
     }
 
-    public void openDisplayLinkScreen(DisplayLinkBlockEntity be, PlayerEntity player) {
+    public void openDisplayLinkScreen(DisplayLinkBlockEntity be, Player player) {
         warn();
     }
 
-    public void openThresholdSwitchScreen(ThresholdSwitchBlockEntity be, PlayerEntity player) {
+    public void openThresholdSwitchScreen(ThresholdSwitchBlockEntity be, Player player) {
         warn();
     }
 
-    public void openElevatorContactScreen(ElevatorContactBlockEntity be, PlayerEntity player) {
+    public void openElevatorContactScreen(ElevatorContactBlockEntity be, Player player) {
         warn();
     }
 
-    public void openStationScreen(World world, BlockPos pos, PlayerEntity player) {
+    public void openStationScreen(Level world, BlockPos pos, Player player) {
         warn();
     }
 
-    public void openFactoryPanelScreen(ServerFactoryPanelBehaviour behaviour, PlayerEntity player) {
+    public void openFactoryPanelScreen(ServerFactoryPanelBehaviour behaviour, Player player) {
         warn();
     }
 
-    public void openSymmetryWandScreen(ItemStack stack, Hand hand) {
+    public void openSymmetryWandScreen(ItemStack stack, InteractionHand hand) {
         warn();
     }
 
@@ -433,7 +433,7 @@ public class AllClientHandle<T> {
         warn();
     }
 
-    public void openWorldshaperScreen(ItemStack item, Hand hand) {
+    public void openWorldshaperScreen(ItemStack item, InteractionHand hand) {
         warn();
     }
 }

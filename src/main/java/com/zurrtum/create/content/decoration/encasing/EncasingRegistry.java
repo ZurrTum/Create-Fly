@@ -1,9 +1,8 @@
 package com.zurrtum.create.content.decoration.encasing;
 
 import com.zurrtum.create.AllBlocks;
-import net.minecraft.block.Block;
-
 import java.util.*;
+import net.minecraft.world.level.block.Block;
 
 public class EncasingRegistry {
     private static final Map<Block, List<Block>> ENCASED_VARIANTS = new HashMap<>();

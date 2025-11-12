@@ -15,9 +15,9 @@ import me.shedaniel.rei.api.client.gui.widgets.Widget;
 import me.shedaniel.rei.api.client.gui.widgets.Widgets;
 import me.shedaniel.rei.api.common.category.CategoryIdentifier;
 import me.shedaniel.rei.api.common.entry.EntryIngredient;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.item.Items;
-import net.minecraft.text.Text;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.item.Items;
 import org.joml.Matrix3x2f;
 
 import java.util.List;
@@ -29,7 +29,7 @@ public class BlockCuttingCategory extends CreateCategory<BlockCuttingDisplay> {
     }
 
     @Override
-    public Text getTitle() {
+    public Component getTitle() {
         return CreateLang.translateDirect("recipe.block_cutting");
     }
 
@@ -47,12 +47,12 @@ public class BlockCuttingCategory extends CreateCategory<BlockCuttingDisplay> {
         for (int i = 0, left = bounds.x + 83, top = bounds.y + 53; i < size; i++) {
             outputs[i] = new Point(left + (i % 5) * 19, top + (i / 5) * -19);
         }
-        widgets.add(Widgets.createDrawableWidget((DrawContext graphics, int mouseX, int mouseY, float delta) -> {
+        widgets.add(Widgets.createDrawableWidget((GuiGraphics graphics, int mouseX, int mouseY, float delta) -> {
             drawSlotBackground(graphics, input);
             drawSlotBackground(graphics, outputs);
             AllGuiTextures.JEI_DOWN_ARROW.render(graphics, bounds.x + 36, bounds.y + 11);
             AllGuiTextures.JEI_SHADOW.render(graphics, bounds.x + 21, bounds.y + 55);
-            graphics.state.addSpecialElement(new SawRenderState(new Matrix3x2f(graphics.getMatrices()), bounds.x + 30, bounds.y + 31));
+            graphics.guiRenderState.submitPicturesInPictureState(new SawRenderState(new Matrix3x2f(graphics.pose()), bounds.x + 30, bounds.y + 31));
         }));
         widgets.add(createInputSlot(input).entries(display.input()));
         for (int i = 0; i < size; i++) {

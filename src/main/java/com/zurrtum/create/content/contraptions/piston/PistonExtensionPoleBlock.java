@@ -5,148 +5,148 @@ import com.zurrtum.create.AllItems;
 import com.zurrtum.create.AllShapes;
 import com.zurrtum.create.catnip.placement.IPlacementHelper;
 import com.zurrtum.create.catnip.placement.PlacementHelpers;
+import com.zurrtum.create.content.contraptions.piston.MechanicalPistonBlock.PistonState;
 import com.zurrtum.create.content.equipment.wrench.IWrenchable;
 import com.zurrtum.create.foundation.block.WrenchableDirectionalBlock;
 import com.zurrtum.create.foundation.placement.PoleHelper;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.ShapeContext;
-import net.minecraft.block.Waterloggable;
-import net.minecraft.entity.ai.pathing.NavigationType;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.fluid.FluidState;
-import net.minecraft.fluid.Fluids;
-import net.minecraft.item.BlockItem;
-import net.minecraft.item.ItemPlacementContext;
-import net.minecraft.item.ItemStack;
-import net.minecraft.state.StateManager.Builder;
-import net.minecraft.state.property.Properties;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.Hand;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Direction.Axis;
-import net.minecraft.util.math.Direction.AxisDirection;
-import net.minecraft.util.math.random.Random;
-import net.minecraft.util.shape.VoxelShape;
-import net.minecraft.world.BlockView;
-import net.minecraft.world.World;
-import net.minecraft.world.WorldView;
-import net.minecraft.world.tick.ScheduledTickView;
-
 import java.util.function.Predicate;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.Direction.Axis;
+import net.minecraft.core.Direction.AxisDirection;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelReader;
+import net.minecraft.world.level.ScheduledTickAccess;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.SimpleWaterloggedBlock;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition.Builder;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.material.FluidState;
+import net.minecraft.world.level.material.Fluids;
+import net.minecraft.world.level.pathfinder.PathComputationType;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.phys.shapes.VoxelShape;
 
 import static com.zurrtum.create.content.contraptions.piston.MechanicalPistonBlock.*;
 
-public class PistonExtensionPoleBlock extends WrenchableDirectionalBlock implements IWrenchable, Waterloggable {
+public class PistonExtensionPoleBlock extends WrenchableDirectionalBlock implements IWrenchable, SimpleWaterloggedBlock {
 
     private static final int placementHelperId = PlacementHelpers.register(PlacementHelper.get());
 
-    public PistonExtensionPoleBlock(Settings properties) {
+    public PistonExtensionPoleBlock(Properties properties) {
         super(properties);
-        setDefaultState(getDefaultState().with(FACING, Direction.UP).with(Properties.WATERLOGGED, false));
+        registerDefaultState(defaultBlockState().setValue(FACING, Direction.UP).setValue(BlockStateProperties.WATERLOGGED, false));
     }
 
     @Override
-    public BlockState onBreak(World worldIn, BlockPos pos, BlockState state, PlayerEntity player) {
-        Axis axis = state.get(FACING).getAxis();
+    public BlockState playerWillDestroy(Level worldIn, BlockPos pos, BlockState state, Player player) {
+        Axis axis = state.getValue(FACING).getAxis();
         Direction direction = Direction.get(AxisDirection.POSITIVE, axis);
         BlockPos pistonHead = null;
         BlockPos pistonBase = null;
 
         for (int modifier : new int[]{1, -1}) {
             for (int offset = modifier; modifier * offset < MechanicalPistonBlock.maxAllowedPistonPoles(); offset += modifier) {
-                BlockPos currentPos = pos.offset(direction, offset);
+                BlockPos currentPos = pos.relative(direction, offset);
                 BlockState block = worldIn.getBlockState(currentPos);
 
-                if (isExtensionPole(block) && axis == block.get(FACING).getAxis())
+                if (isExtensionPole(block) && axis == block.getValue(FACING).getAxis())
                     continue;
 
-                if (isPiston(block) && block.get(Properties.FACING).getAxis() == axis)
+                if (isPiston(block) && block.getValue(BlockStateProperties.FACING).getAxis() == axis)
                     pistonBase = currentPos;
 
-                if (isPistonHead(block) && block.get(Properties.FACING).getAxis() == axis)
+                if (isPistonHead(block) && block.getValue(BlockStateProperties.FACING).getAxis() == axis)
                     pistonHead = currentPos;
 
                 break;
             }
         }
 
-        if (pistonHead != null && pistonBase != null && worldIn.getBlockState(pistonHead).get(Properties.FACING) == worldIn.getBlockState(pistonBase)
-            .get(Properties.FACING)) {
+        if (pistonHead != null && pistonBase != null && worldIn.getBlockState(pistonHead).getValue(BlockStateProperties.FACING) == worldIn.getBlockState(pistonBase)
+            .getValue(BlockStateProperties.FACING)) {
 
             final BlockPos basePos = pistonBase;
-            BlockPos.stream(pistonBase, pistonHead).filter(p -> !p.equals(pos) && !p.equals(basePos))
-                .forEach(p -> worldIn.breakBlock(p, !player.isCreative()));
-            worldIn.setBlockState(basePos, worldIn.getBlockState(basePos).with(MechanicalPistonBlock.STATE, PistonState.RETRACTED));
+            BlockPos.betweenClosedStream(pistonBase, pistonHead).filter(p -> !p.equals(pos) && !p.equals(basePos))
+                .forEach(p -> worldIn.destroyBlock(p, !player.isCreative()));
+            worldIn.setBlockAndUpdate(basePos, worldIn.getBlockState(basePos).setValue(MechanicalPistonBlock.STATE, PistonState.RETRACTED));
 
             if (worldIn.getBlockEntity(basePos) instanceof MechanicalPistonBlockEntity baseBE) {
                 baseBE.onLengthBroken();
             }
         }
 
-        return super.onBreak(worldIn, pos, state, player);
+        return super.playerWillDestroy(worldIn, pos, state, player);
     }
 
     @Override
-    public VoxelShape getOutlineShape(BlockState state, BlockView worldIn, BlockPos pos, ShapeContext context) {
-        return AllShapes.FOUR_VOXEL_POLE.get(state.get(FACING).getAxis());
+    public VoxelShape getShape(BlockState state, BlockGetter worldIn, BlockPos pos, CollisionContext context) {
+        return AllShapes.FOUR_VOXEL_POLE.get(state.getValue(FACING).getAxis());
     }
 
     @Override
-    public BlockState getPlacementState(ItemPlacementContext context) {
-        FluidState FluidState = context.getWorld().getFluidState(context.getBlockPos());
-        return getDefaultState().with(FACING, context.getSide().getOpposite())
-            .with(Properties.WATERLOGGED, Boolean.valueOf(FluidState.getFluid() == Fluids.WATER));
+    public BlockState getStateForPlacement(BlockPlaceContext context) {
+        FluidState FluidState = context.getLevel().getFluidState(context.getClickedPos());
+        return defaultBlockState().setValue(FACING, context.getClickedFace().getOpposite())
+            .setValue(BlockStateProperties.WATERLOGGED, Boolean.valueOf(FluidState.getType() == Fluids.WATER));
     }
 
     @Override
-    protected ActionResult onUseWithItem(
+    protected InteractionResult useItemOn(
         ItemStack stack,
         BlockState state,
-        World level,
+        Level level,
         BlockPos pos,
-        PlayerEntity player,
-        Hand hand,
+        Player player,
+        InteractionHand hand,
         BlockHitResult hitResult
     ) {
         IPlacementHelper placementHelper = PlacementHelpers.get(placementHelperId);
-        if (placementHelper.matchesItem(stack) && !player.isSneaking())
+        if (placementHelper.matchesItem(stack) && !player.isShiftKeyDown())
             return placementHelper.getOffset(player, level, state, pos, hitResult).placeInWorld(level, (BlockItem) stack.getItem(), player, hand);
 
-        return ActionResult.PASS_TO_DEFAULT_BLOCK_ACTION;
+        return InteractionResult.TRY_WITH_EMPTY_HAND;
     }
 
     @Override
     public FluidState getFluidState(BlockState state) {
-        return state.get(Properties.WATERLOGGED) ? Fluids.WATER.getStill(false) : Fluids.EMPTY.getDefaultState();
+        return state.getValue(BlockStateProperties.WATERLOGGED) ? Fluids.WATER.getSource(false) : Fluids.EMPTY.defaultFluidState();
     }
 
     @Override
-    protected void appendProperties(Builder<Block, BlockState> builder) {
-        builder.add(Properties.WATERLOGGED);
-        super.appendProperties(builder);
+    protected void createBlockStateDefinition(Builder<Block, BlockState> builder) {
+        builder.add(BlockStateProperties.WATERLOGGED);
+        super.createBlockStateDefinition(builder);
     }
 
     @Override
-    public BlockState getStateForNeighborUpdate(
+    public BlockState updateShape(
         BlockState state,
-        WorldView world,
-        ScheduledTickView tickView,
+        LevelReader world,
+        ScheduledTickAccess tickView,
         BlockPos pos,
         Direction direction,
         BlockPos neighbourPos,
         BlockState neighbourState,
-        Random random
+        RandomSource random
     ) {
-        if (state.get(Properties.WATERLOGGED))
-            tickView.scheduleFluidTick(pos, Fluids.WATER, Fluids.WATER.getTickRate(world));
+        if (state.getValue(BlockStateProperties.WATERLOGGED))
+            tickView.scheduleTick(pos, Fluids.WATER, Fluids.WATER.getTickDelay(world));
         return state;
     }
 
     @Override
-    protected boolean canPathfindThrough(BlockState state, NavigationType pathComputationType) {
+    protected boolean isPathfindable(BlockState state, PathComputationType pathComputationType) {
         return false;
     }
 
@@ -159,12 +159,12 @@ public class PistonExtensionPoleBlock extends WrenchableDirectionalBlock impleme
         }
 
         private PlacementHelper() {
-            super(state -> state.isOf(AllBlocks.PISTON_EXTENSION_POLE), state -> state.get(FACING).getAxis(), FACING);
+            super(state -> state.is(AllBlocks.PISTON_EXTENSION_POLE), state -> state.getValue(FACING).getAxis(), FACING);
         }
 
         @Override
         public Predicate<ItemStack> getItemPredicate() {
-            return stack -> stack.isOf(AllItems.PISTON_EXTENSION_POLE);
+            return stack -> stack.is(AllItems.PISTON_EXTENSION_POLE);
         }
     }
 }

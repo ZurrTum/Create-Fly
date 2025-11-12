@@ -17,13 +17,13 @@ import com.zurrtum.create.content.fluids.pump.PumpBlock;
 import com.zurrtum.create.content.kinetics.simpleRelays.ShaftBlock;
 import com.zurrtum.create.content.processing.burner.BlazeBurnerBlock;
 import com.zurrtum.create.content.processing.burner.BlazeBurnerBlock.HeatLevel;
-import net.minecraft.block.BlockState;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Direction.Axis;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.Direction.Axis;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.Vec3;
 
 public class SteamScenes {
 
@@ -92,10 +92,10 @@ public class SteamScenes {
         scene.idle(40);
 
         scene.overlay().showControls(util.vector().blockSurface(util.grid().at(2, 3, 1), Direction.EAST), Pointing.RIGHT, 50)
-            .withItem(AllItems.STEAM_WHISTLE.getDefaultStack()).rightClick();
+            .withItem(AllItems.STEAM_WHISTLE.getDefaultInstance()).rightClick();
         scene.idle(6);
-        BlockState extension = AllBlocks.STEAM_WHISTLE_EXTENSION.getDefaultState();
-        scene.world().setBlock(whistlePos.up(), extension, false);
+        BlockState extension = AllBlocks.STEAM_WHISTLE_EXTENSION.defaultBlockState();
+        scene.world().setBlock(whistlePos.above(), extension, false);
         scene.idle(20);
 
         scene.overlay().showText(70).attachKeyFrame().text("Use a Whistle item on the block to lower its pitch")
@@ -104,33 +104,33 @@ public class SteamScenes {
         scene.idle(40);
 
         scene.overlay().showControls(util.vector().blockSurface(util.grid().at(2, 3, 1), Direction.EAST), Pointing.RIGHT, 2)
-            .withItem(AllItems.STEAM_WHISTLE.getDefaultStack()).rightClick();
+            .withItem(AllItems.STEAM_WHISTLE.getDefaultInstance()).rightClick();
         scene.idle(6);
-        scene.world().cycleBlockProperty(whistlePos.up(), WhistleExtenderBlock.SHAPE);
+        scene.world().cycleBlockProperty(whistlePos.above(), WhistleExtenderBlock.SHAPE);
         scene.idle(4);
         scene.overlay().showControls(util.vector().blockSurface(util.grid().at(2, 3, 1), Direction.EAST), Pointing.RIGHT, 2)
-            .withItem(AllItems.STEAM_WHISTLE.getDefaultStack()).rightClick();
+            .withItem(AllItems.STEAM_WHISTLE.getDefaultInstance()).rightClick();
         scene.idle(6);
-        scene.world().setBlock(whistlePos.up(2), extension, false);
-        scene.world().cycleBlockProperty(whistlePos.up(), WhistleExtenderBlock.SHAPE);
+        scene.world().setBlock(whistlePos.above(2), extension, false);
+        scene.world().cycleBlockProperty(whistlePos.above(), WhistleExtenderBlock.SHAPE);
         scene.idle(4);
         scene.overlay().showControls(util.vector().blockSurface(util.grid().at(2, 3, 1), Direction.EAST), Pointing.RIGHT, 2)
-            .withItem(AllItems.STEAM_WHISTLE.getDefaultStack()).rightClick();
+            .withItem(AllItems.STEAM_WHISTLE.getDefaultInstance()).rightClick();
         scene.idle(6);
-        scene.world().cycleBlockProperty(whistlePos.up(2), WhistleExtenderBlock.SHAPE);
+        scene.world().cycleBlockProperty(whistlePos.above(2), WhistleExtenderBlock.SHAPE);
         scene.idle(4);
         scene.overlay().showControls(util.vector().blockSurface(util.grid().at(2, 3, 1), Direction.EAST), Pointing.RIGHT, 2)
-            .withItem(AllItems.STEAM_WHISTLE.getDefaultStack()).rightClick();
+            .withItem(AllItems.STEAM_WHISTLE.getDefaultInstance()).rightClick();
         scene.idle(6);
-        scene.world().cycleBlockProperty(whistlePos.up(2), WhistleExtenderBlock.SHAPE);
-        scene.world().setBlock(whistlePos.up(3), extension, false);
+        scene.world().cycleBlockProperty(whistlePos.above(2), WhistleExtenderBlock.SHAPE);
+        scene.world().setBlock(whistlePos.above(3), extension, false);
         scene.idle(20);
 
         scene.overlay().showControls(util.vector().blockSurface(util.grid().at(2, 3, 1), Direction.EAST), Pointing.RIGHT, 50)
-            .withItem(AllItems.WRENCH.getDefaultStack()).rightClick();
+            .withItem(AllItems.WRENCH.getDefaultInstance()).rightClick();
         scene.idle(6);
         for (int i = 0; i < 4; i++) {
-            scene.world().cycleBlockProperty(whistlePos.up(i), WhistleBlock.SIZE);
+            scene.world().cycleBlockProperty(whistlePos.above(i), WhistleBlock.SIZE);
             scene.idle(1);
         }
         scene.idle(20);
@@ -140,10 +140,10 @@ public class SteamScenes {
 
         scene.idle(40);
         scene.overlay().showControls(util.vector().blockSurface(util.grid().at(2, 3, 1), Direction.EAST), Pointing.RIGHT, 4)
-            .withItem(AllItems.WRENCH.getDefaultStack()).rightClick();
+            .withItem(AllItems.WRENCH.getDefaultInstance()).rightClick();
         scene.idle(6);
         for (int i = 0; i < 4; i++) {
-            scene.world().cycleBlockProperty(whistlePos.up(i), WhistleBlock.SIZE);
+            scene.world().cycleBlockProperty(whistlePos.above(i), WhistleBlock.SIZE);
             scene.idle(1);
         }
 
@@ -157,7 +157,7 @@ public class SteamScenes {
         scene.idle(20);
 
         scene.overlay().showControls(util.vector().blockSurface(util.grid().at(2, 3, 1), Direction.DOWN), Pointing.UP, 80)
-            .withItem(AllItems.GOGGLES.getDefaultStack());
+            .withItem(AllItems.GOGGLES.getDefaultInstance());
         scene.idle(6);
 
         scene.overlay().showText(70).attachKeyFrame().colored(PonderPalette.BLUE)
@@ -198,9 +198,9 @@ public class SteamScenes {
         Selection pump2 = util.select().fromTo(5, 2, 7, 4, 1, 6);
         Selection pump3 = util.select().fromTo(2, 3, 7, 1, 1, 6);
 
-        scene.world().modifyBlock(util.grid().at(4, 2, 7), s -> s.with(PumpBlock.FACING, Direction.SOUTH), false);
-        scene.world().modifyBlock(util.grid().at(1, 2, 7), s -> s.with(PumpBlock.FACING, Direction.SOUTH), false);
-        scene.world().modifyBlock(util.grid().at(2, 3, 7), s -> s.with(PumpBlock.FACING, Direction.SOUTH), false);
+        scene.world().modifyBlock(util.grid().at(4, 2, 7), s -> s.setValue(PumpBlock.FACING, Direction.SOUTH), false);
+        scene.world().modifyBlock(util.grid().at(1, 2, 7), s -> s.setValue(PumpBlock.FACING, Direction.SOUTH), false);
+        scene.world().modifyBlock(util.grid().at(2, 3, 7), s -> s.setValue(PumpBlock.FACING, Direction.SOUTH), false);
 
         scene.idle(15);
         ElementLink<WorldSectionElement> tankElement = scene.world().showIndependentSection(tank, Direction.DOWN);
@@ -224,9 +224,9 @@ public class SteamScenes {
         scene.idle(60);
 
         scene.overlay().showControls(util.vector().blockSurface(util.grid().at(3, 1, 3), Direction.UP), Pointing.DOWN, 60)
-            .withItem(AllItems.SHAFT.getDefaultStack()).rightClick();
+            .withItem(AllItems.SHAFT.getDefaultInstance()).rightClick();
         scene.idle(10);
-        scene.world().setBlock(engine1ShaftPos, AllBlocks.SHAFT.getDefaultState().with(ShaftBlock.AXIS, Axis.Z), false);
+        scene.world().setBlock(engine1ShaftPos, AllBlocks.SHAFT.defaultBlockState().setValue(ShaftBlock.AXIS, Axis.Z), false);
         ElementLink<WorldSectionElement> engineShaftElement = scene.world().showIndependentSection(engine1Shaft, null);
         scene.world().moveSection(engineShaftElement, util.vector().of(0, -3, 2), 0);
         scene.idle(5);
@@ -234,7 +234,7 @@ public class SteamScenes {
         scene.world().hideIndependentSection(engineElement, null);
         engineElement = scene.world().showIndependentSectionImmediately(engine1);
         scene.world().moveSection(engineElement, util.vector().of(0, -3, 2), 0);
-        scene.world().setBlock(engine1ShaftPos, AllBlocks.POWERED_SHAFT.getDefaultState().with(ShaftBlock.AXIS, Axis.Z), false);
+        scene.world().setBlock(engine1ShaftPos, AllBlocks.POWERED_SHAFT.defaultBlockState().setValue(ShaftBlock.AXIS, Axis.Z), false);
         scene.effects().indicateSuccess(util.grid().at(1, 1, 3));
         scene.idle(40);
 
@@ -287,7 +287,7 @@ public class SteamScenes {
         scene.overlay().showControls(util.vector().blockSurface(util.grid().at(4, 1, 3), Direction.EAST), Pointing.RIGHT, 60)
             .withItem(new ItemStack(Items.OAK_LOG)).rightClick();
         scene.idle(10);
-        scene.world().setBlocks(burners, AllBlocks.BLAZE_BURNER.getDefaultState().with(BlazeBurnerBlock.HEAT_LEVEL, HeatLevel.KINDLED), false);
+        scene.world().setBlocks(burners, AllBlocks.BLAZE_BURNER.defaultBlockState().setValue(BlazeBurnerBlock.HEAT_LEVEL, HeatLevel.KINDLED), false);
         scene.idle(5);
 
         scene.world().setKineticSpeed(engine1Shaft, 64);
@@ -309,11 +309,11 @@ public class SteamScenes {
         scene.world().moveSection(pumpElement, util.vector().of(0, 0, -5), 0);
         scene.idle(20);
 
-        Vec3d target = util.vector().blockSurface(util.grid().at(4, 3, 3), Direction.WEST);
+        Vec3 target = util.vector().blockSurface(util.grid().at(4, 3, 3), Direction.WEST);
         scene.overlay().showText(80).text("Higher power levels require more Water, Size and Heat").attachKeyFrame().pointAt(target).placeNearTarget();
         scene.idle(90);
 
-        scene.overlay().showControls(target.add(0, 0, 0.5), Pointing.DOWN, 60).withItem(AllItems.GOGGLES.getDefaultStack());
+        scene.overlay().showControls(target.add(0, 0, 0.5), Pointing.DOWN, 60).withItem(AllItems.GOGGLES.getDefaultInstance());
         scene.idle(6);
         scene.overlay().showText(80).text("The boiler's current power level can be inspected with Engineer's Goggles").attachKeyFrame()
             .colored(PonderPalette.BLUE).pointAt(target.add(0, 0, 0.5)).placeNearTarget();
@@ -352,9 +352,9 @@ public class SteamScenes {
         scene.world().hideIndependentSection(engineShaftElement, Direction.SOUTH);
         scene.idle(20);
 
-        scene.overlay().showControls(util.vector().of(5, 2, 4), Pointing.DOWN, 10).withItem(AllItems.BLAZE_CAKE.getDefaultStack()).rightClick();
+        scene.overlay().showControls(util.vector().of(5, 2, 4), Pointing.DOWN, 10).withItem(AllItems.BLAZE_CAKE.getDefaultInstance()).rightClick();
         scene.idle(6);
-        scene.world().setBlocks(burners, AllBlocks.BLAZE_BURNER.getDefaultState().with(BlazeBurnerBlock.HEAT_LEVEL, HeatLevel.SEETHING), false);
+        scene.world().setBlocks(burners, AllBlocks.BLAZE_BURNER.defaultBlockState().setValue(BlazeBurnerBlock.HEAT_LEVEL, HeatLevel.SEETHING), false);
         scene.idle(15);
 
         boilerElement = scene.world().showIndependentSection(boiler3, Direction.SOUTH);

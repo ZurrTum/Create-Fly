@@ -3,19 +3,19 @@ package com.zurrtum.create.infrastructure.packet.s2c;
 import com.zurrtum.create.AllClientHandle;
 import com.zurrtum.create.AllPackets;
 import com.zurrtum.create.catnip.codecs.stream.CatnipStreamCodecBuilders;
-import net.minecraft.network.RegistryByteBuf;
-import net.minecraft.network.codec.PacketCodec;
-import net.minecraft.network.packet.PacketType;
-import net.minecraft.util.math.BlockPos;
 import org.apache.logging.log4j.util.TriConsumer;
 
 import java.util.List;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.PacketType;
 
 public record SymmetryEffectPacket(BlockPos mirror, List<BlockPos> positions) implements S2CPacket {
-    public static final PacketCodec<RegistryByteBuf, SymmetryEffectPacket> CODEC = PacketCodec.tuple(
-        BlockPos.PACKET_CODEC,
+    public static final StreamCodec<RegistryFriendlyByteBuf, SymmetryEffectPacket> CODEC = StreamCodec.composite(
+        BlockPos.STREAM_CODEC,
         SymmetryEffectPacket::mirror,
-        CatnipStreamCodecBuilders.list(BlockPos.PACKET_CODEC),
+        CatnipStreamCodecBuilders.list(BlockPos.STREAM_CODEC),
         SymmetryEffectPacket::positions,
         SymmetryEffectPacket::new
     );
@@ -26,7 +26,7 @@ public record SymmetryEffectPacket(BlockPos mirror, List<BlockPos> positions) im
     }
 
     @Override
-    public PacketType<SymmetryEffectPacket> getPacketType() {
+    public PacketType<SymmetryEffectPacket> type() {
         return AllPackets.SYMMETRY_EFFECT;
     }
 

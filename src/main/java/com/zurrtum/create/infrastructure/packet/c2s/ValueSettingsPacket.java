@@ -5,37 +5,36 @@ import com.zurrtum.create.AllPackets;
 import com.zurrtum.create.catnip.codecs.stream.CatnipLargerStreamCodecs;
 import com.zurrtum.create.catnip.codecs.stream.CatnipStreamCodecBuilders;
 import com.zurrtum.create.catnip.codecs.stream.CatnipStreamCodecs;
-import net.minecraft.network.RegistryByteBuf;
-import net.minecraft.network.codec.PacketCodec;
-import net.minecraft.network.codec.PacketCodecs;
-import net.minecraft.network.packet.PacketType;
-import net.minecraft.server.network.ServerPlayNetworkHandler;
-import net.minecraft.util.Hand;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-
 import java.util.function.BiConsumer;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.PacketType;
+import net.minecraft.server.network.ServerGamePacketListenerImpl;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.phys.BlockHitResult;
 
 public record ValueSettingsPacket(
-    BlockPos pos, int row, int value, Hand interactHand, BlockHitResult hitResult, Direction side, boolean ctrlDown, int behaviourIndex
+    BlockPos pos, int row, int value, InteractionHand interactHand, BlockHitResult hitResult, Direction side, boolean ctrlDown, int behaviourIndex
 ) implements C2SPacket {
-    public static final PacketCodec<RegistryByteBuf, ValueSettingsPacket> CODEC = CatnipLargerStreamCodecs.composite(
-        BlockPos.PACKET_CODEC,
+    public static final StreamCodec<RegistryFriendlyByteBuf, ValueSettingsPacket> CODEC = CatnipLargerStreamCodecs.composite(
+        BlockPos.STREAM_CODEC,
         ValueSettingsPacket::pos,
-        PacketCodecs.VAR_INT,
+        ByteBufCodecs.VAR_INT,
         ValueSettingsPacket::row,
-        PacketCodecs.VAR_INT,
+        ByteBufCodecs.VAR_INT,
         ValueSettingsPacket::value,
         CatnipStreamCodecBuilders.nullable(CatnipStreamCodecs.HAND),
         ValueSettingsPacket::interactHand,
         CatnipStreamCodecBuilders.nullable(CatnipStreamCodecs.BLOCK_HIT_RESULT),
         ValueSettingsPacket::hitResult,
-        Direction.PACKET_CODEC,
+        Direction.STREAM_CODEC,
         ValueSettingsPacket::side,
-        PacketCodecs.BOOLEAN,
+        ByteBufCodecs.BOOL,
         ValueSettingsPacket::ctrlDown,
-        PacketCodecs.VAR_INT,
+        ByteBufCodecs.VAR_INT,
         ValueSettingsPacket::behaviourIndex,
         ValueSettingsPacket::new
     );
@@ -46,12 +45,12 @@ public record ValueSettingsPacket(
     }
 
     @Override
-    public PacketType<ValueSettingsPacket> getPacketType() {
+    public PacketType<ValueSettingsPacket> type() {
         return AllPackets.VALUE_SETTINGS;
     }
 
     @Override
-    public BiConsumer<ServerPlayNetworkHandler, ValueSettingsPacket> callback() {
+    public BiConsumer<ServerGamePacketListenerImpl, ValueSettingsPacket> callback() {
         return AllHandle::onValueSettings;
     }
 }

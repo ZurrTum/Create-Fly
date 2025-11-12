@@ -5,10 +5,10 @@ import com.zurrtum.create.client.flywheel.api.visualization.VisualizationContext
 import com.zurrtum.create.client.flywheel.lib.visualization.VisualizationHelper;
 import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.BlockView;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import org.jetbrains.annotations.Nullable;
 
 public class BlockEntityStorage extends Storage<BlockEntity> {
@@ -29,17 +29,17 @@ public class BlockEntityStorage extends Storage<BlockEntity> {
             return false;
         }
 
-        World level = blockEntity.getWorld();
+        Level level = blockEntity.getLevel();
         if (level == null) {
             return false;
         }
 
-        if (level.isAir(blockEntity.getPos())) {
+        if (level.isEmptyBlock(blockEntity.getBlockPos())) {
             return false;
         }
 
-        BlockPos pos = blockEntity.getPos();
-        BlockView existingChunk = level.getChunkAsView(pos.getX() >> 4, pos.getZ() >> 4);
+        BlockPos pos = blockEntity.getBlockPos();
+        BlockGetter existingChunk = level.getChunkForCollisions(pos.getX() >> 4, pos.getZ() >> 4);
         return existingChunk != null;
     }
 
@@ -53,7 +53,7 @@ public class BlockEntityStorage extends Storage<BlockEntity> {
 
         var visual = visualizer.createVisual(visualizationContext, obj, partialTick);
 
-        BlockPos blockPos = obj.getPos();
+        BlockPos blockPos = obj.getBlockPos();
         posLookup.put(blockPos.asLong(), visual);
 
         return visual;
@@ -61,7 +61,7 @@ public class BlockEntityStorage extends Storage<BlockEntity> {
 
     @Override
     public void remove(BlockEntity obj) {
-        posLookup.remove(obj.getPos().asLong());
+        posLookup.remove(obj.getBlockPos().asLong());
         super.remove(obj);
     }
 

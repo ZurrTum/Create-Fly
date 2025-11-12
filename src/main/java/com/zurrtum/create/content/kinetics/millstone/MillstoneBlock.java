@@ -8,95 +8,95 @@ import com.zurrtum.create.content.kinetics.simpleRelays.ICogWheel;
 import com.zurrtum.create.foundation.block.IBE;
 import com.zurrtum.create.foundation.item.ItemHelper;
 import com.zurrtum.create.infrastructure.items.ItemInventoryProvider;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.ShapeContext;
-import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.ItemEntity;
-import net.minecraft.entity.ai.pathing.NavigationType;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.inventory.Inventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.Hand;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Direction.Axis;
-import net.minecraft.util.shape.VoxelShape;
-import net.minecraft.world.BlockView;
-import net.minecraft.world.World;
-import net.minecraft.world.WorldAccess;
-import net.minecraft.world.WorldView;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.Direction.Axis;
+import net.minecraft.world.Container;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.LevelReader;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.pathfinder.PathComputationType;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.phys.shapes.VoxelShape;
 
 public class MillstoneBlock extends KineticBlock implements IBE<MillstoneBlockEntity>, ICogWheel, ItemInventoryProvider<MillstoneBlockEntity> {
 
-    public MillstoneBlock(Settings properties) {
+    public MillstoneBlock(Properties properties) {
         super(properties);
     }
 
     @Override
-    public Inventory getInventory(WorldAccess world, BlockPos pos, BlockState state, MillstoneBlockEntity blockEntity, Direction context) {
+    public Container getInventory(LevelAccessor world, BlockPos pos, BlockState state, MillstoneBlockEntity blockEntity, Direction context) {
         return blockEntity.capability;
     }
 
     @Override
-    public VoxelShape getOutlineShape(BlockState state, BlockView worldIn, BlockPos pos, ShapeContext context) {
+    public VoxelShape getShape(BlockState state, BlockGetter worldIn, BlockPos pos, CollisionContext context) {
         return AllShapes.MILLSTONE;
     }
 
     @Override
-    public boolean hasShaftTowards(WorldView world, BlockPos pos, BlockState state, Direction face) {
+    public boolean hasShaftTowards(LevelReader world, BlockPos pos, BlockState state, Direction face) {
         return face == Direction.DOWN;
     }
 
     @Override
-    protected ActionResult onUseWithItem(
+    protected InteractionResult useItemOn(
         ItemStack stack,
         BlockState state,
-        World level,
+        Level level,
         BlockPos pos,
-        PlayerEntity player,
-        Hand hand,
+        Player player,
+        InteractionHand hand,
         BlockHitResult hitResult
     ) {
         if (!stack.isEmpty())
-            return ActionResult.PASS_TO_DEFAULT_BLOCK_ACTION;
-        if (level.isClient())
-            return ActionResult.SUCCESS;
+            return InteractionResult.TRY_WITH_EMPTY_HAND;
+        if (level.isClientSide())
+            return InteractionResult.SUCCESS;
 
         withBlockEntityDo(
             level, pos, millstone -> {
                 boolean emptyOutput = true;
-                Inventory inv = millstone.capability;
-                for (int slot = 1, size = inv.size(); slot < size; slot++) {
-                    ItemStack stackInSlot = inv.getStack(slot);
+                Container inv = millstone.capability;
+                for (int slot = 1, size = inv.getContainerSize(); slot < size; slot++) {
+                    ItemStack stackInSlot = inv.getItem(slot);
                     if (stackInSlot.isEmpty()) {
                         continue;
                     }
                     emptyOutput = false;
-                    player.getInventory().offerOrDrop(stackInSlot);
-                    inv.setStack(slot, ItemStack.EMPTY);
+                    player.getInventory().placeItemBackInInventory(stackInSlot);
+                    inv.setItem(slot, ItemStack.EMPTY);
                 }
 
                 if (emptyOutput) {
-                    player.getInventory().offerOrDrop(inv.getStack(0));
-                    inv.setStack(0, ItemStack.EMPTY);
+                    player.getInventory().placeItemBackInInventory(inv.getItem(0));
+                    inv.setItem(0, ItemStack.EMPTY);
                 }
 
-                millstone.markDirty();
+                millstone.setChanged();
                 millstone.sendData();
             }
         );
 
-        return ActionResult.SUCCESS;
+        return InteractionResult.SUCCESS;
     }
 
     @Override
-    public void onEntityLand(BlockView worldIn, Entity entityIn) {
-        super.onEntityLand(worldIn, entityIn);
+    public void updateEntityMovementAfterFallOn(BlockGetter worldIn, Entity entityIn) {
+        super.updateEntityMovementAfterFallOn(worldIn, entityIn);
 
-        if (entityIn.getEntityWorld().isClient())
+        if (entityIn.level().isClientSide())
             return;
         if (!(entityIn instanceof ItemEntity itemEntity))
             return;
@@ -104,24 +104,24 @@ public class MillstoneBlock extends KineticBlock implements IBE<MillstoneBlockEn
             return;
 
         MillstoneBlockEntity millstone = null;
-        for (BlockPos pos : Iterate.hereAndBelow(entityIn.getBlockPos()))
+        for (BlockPos pos : Iterate.hereAndBelow(entityIn.blockPosition()))
             if (millstone == null)
                 millstone = getBlockEntity(worldIn, pos);
 
         if (millstone == null)
             return;
 
-        Inventory capability = ItemHelper.getInventory(millstone.getWorld(), millstone.getPos(), millstone.getCachedState(), millstone, null);
+        Container capability = ItemHelper.getInventory(millstone.getLevel(), millstone.getBlockPos(), millstone.getBlockState(), millstone, null);
         if (capability == null)
             return;
 
-        ItemStack stack = itemEntity.getStack();
+        ItemStack stack = itemEntity.getItem();
         int insert = capability.insert(stack);
         if (insert == stack.getCount()) {
             itemEntity.discard();
         } else if (insert != 0) {
-            stack.decrement(insert);
-            itemEntity.setStack(stack);
+            stack.shrink(insert);
+            itemEntity.setItem(stack);
         }
     }
 
@@ -141,7 +141,7 @@ public class MillstoneBlock extends KineticBlock implements IBE<MillstoneBlockEn
     }
 
     @Override
-    protected boolean canPathfindThrough(BlockState state, NavigationType pathComputationType) {
+    protected boolean isPathfindable(BlockState state, PathComputationType pathComputationType) {
         return false;
     }
 

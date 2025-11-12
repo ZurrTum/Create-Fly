@@ -8,9 +8,9 @@ import com.zurrtum.create.content.kinetics.chainConveyor.ChainConveyorBehaviour;
 import com.zurrtum.create.content.kinetics.chainConveyor.ChainConveyorBlockEntity;
 import com.zurrtum.create.content.kinetics.chainConveyor.ChainConveyorPackage;
 import com.zurrtum.create.foundation.utility.TickBasedCache;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.WorldAccess;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.phys.Vec3;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,7 +24,7 @@ public class ChainConveyorClientBehaviour extends ChainConveyorBehaviour {
         true
     ));
 
-    public static ChainConveyorPackagePhysicsData physicsData(ChainConveyorPackage box, WorldAccess level) {
+    public static ChainConveyorPackagePhysicsData physicsData(ChainConveyorPackage box, LevelAccessor level) {
         if (box.physicsData == null) {
             try {
                 ChainConveyorPackagePhysicsData physicsData = physicsDataCache.get(level).get(box.netId, ChainConveyorPackagePhysicsData::new);
@@ -45,7 +45,7 @@ public class ChainConveyorClientBehaviour extends ChainConveyorBehaviour {
     @Override
     public void blockEntityTickBoxVisuals() {
         // We can use TickableVisuals if flywheel is enabled
-        if (!VisualizationManager.supportsVisualization(blockEntity.getWorld()))
+        if (!VisualizationManager.supportsVisualization(blockEntity.getLevel()))
             tickBoxVisuals();
     }
 
@@ -62,7 +62,7 @@ public class ChainConveyorClientBehaviour extends ChainConveyorBehaviour {
         if (box.worldPosition == null)
             return;
 
-        ChainConveyorPackagePhysicsData physicsData = physicsData(box, blockEntity.getWorld());
+        ChainConveyorPackagePhysicsData physicsData = physicsData(box, blockEntity.getLevel());
         physicsData.setBE(blockEntity);
 
         if (!physicsData.shouldTick() && !blockEntity.isVirtual())
@@ -74,9 +74,9 @@ public class ChainConveyorClientBehaviour extends ChainConveyorBehaviour {
         physicsData.flipped = blockEntity.reversed;
 
         if (physicsData.pos != null) {
-            if (physicsData.pos.squaredDistanceTo(box.worldPosition) > 1.5f * 1.5f)
-                physicsData.pos = box.worldPosition.add(physicsData.pos.subtract(box.worldPosition).normalize().multiply(1.5));
-            physicsData.motion = physicsData.motion.add(0, -0.25, 0).multiply(0.75).add((box.worldPosition.subtract(physicsData.pos)).multiply(0.25));
+            if (physicsData.pos.distanceToSqr(box.worldPosition) > 1.5f * 1.5f)
+                physicsData.pos = box.worldPosition.add(physicsData.pos.subtract(box.worldPosition).normalize().scale(1.5));
+            physicsData.motion = physicsData.motion.add(0, -0.25, 0).scale(0.75).add((box.worldPosition.subtract(physicsData.pos)).scale(0.25));
             physicsData.pos = physicsData.pos.add(physicsData.motion);
         }
 
@@ -94,21 +94,21 @@ public class ChainConveyorClientBehaviour extends ChainConveyorBehaviour {
     @Override
     public void updateChainShapes() {
         List<ChainConveyorShape> shapes = new ArrayList<>();
-        shapes.add(new ChainConveyorShape.ChainConveyorBB(Vec3d.ofBottomCenter(BlockPos.ZERO)));
-        BlockPos pos = blockEntity.getPos();
+        shapes.add(new ChainConveyorShape.ChainConveyorBB(Vec3.atBottomCenterOf(BlockPos.ZERO)));
+        BlockPos pos = blockEntity.getBlockPos();
         for (BlockPos target : blockEntity.connections) {
             ChainConveyorBlockEntity.ConnectionStats stats = blockEntity.connectionStats.get(target);
             if (stats == null)
                 continue;
-            Vec3d localStart = stats.start().subtract(Vec3d.of(pos));
-            Vec3d localEnd = stats.end().subtract(Vec3d.of(pos));
+            Vec3 localStart = stats.start().subtract(Vec3.atLowerCornerOf(pos));
+            Vec3 localEnd = stats.end().subtract(Vec3.atLowerCornerOf(pos));
             shapes.add(new ChainConveyorShape.ChainConveyorOBB(target, localStart, localEnd));
         }
-        ChainConveyorInteractionHandler.loadedChains.get(blockEntity.getWorld()).put(pos, shapes);
+        ChainConveyorInteractionHandler.loadedChains.get(blockEntity.getLevel()).put(pos, shapes);
     }
 
     @Override
     public void invalidate() {
-        ChainConveyorInteractionHandler.loadedChains.get(blockEntity.getWorld()).invalidate(blockEntity.getPos());
+        ChainConveyorInteractionHandler.loadedChains.get(blockEntity.getLevel()).invalidate(blockEntity.getBlockPos());
     }
 }

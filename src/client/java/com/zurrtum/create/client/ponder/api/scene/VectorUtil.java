@@ -1,21 +1,21 @@
 package com.zurrtum.create.client.ponder.api.scene;
 
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.phys.Vec3;
 
 public interface VectorUtil {
-    Vec3d centerOf(int x, int y, int z);
+    Vec3 centerOf(int x, int y, int z);
 
-    Vec3d centerOf(BlockPos pos);
+    Vec3 centerOf(BlockPos pos);
 
-    Vec3d topOf(int x, int y, int z);
+    Vec3 topOf(int x, int y, int z);
 
-    Vec3d topOf(BlockPos pos);
+    Vec3 topOf(BlockPos pos);
 
-    Vec3d blockSurface(BlockPos pos, Direction face);
+    Vec3 blockSurface(BlockPos pos, Direction face);
 
-    Vec3d blockSurface(BlockPos pos, Direction face, float margin);
+    Vec3 blockSurface(BlockPos pos, Direction face, float margin);
 
-    Vec3d of(double x, double y, double z);
+    Vec3 of(double x, double y, double z);
 }

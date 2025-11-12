@@ -1,6 +1,7 @@
 package com.zurrtum.create.client.content.kinetics.mechanicalArm;
 
 import com.google.common.collect.Lists;
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.zurrtum.create.catnip.data.Iterate;
 import com.zurrtum.create.catnip.theme.Color;
 import com.zurrtum.create.client.AllPartialModels;
@@ -18,13 +19,12 @@ import com.zurrtum.create.client.flywheel.lib.transform.TransformStack;
 import com.zurrtum.create.client.flywheel.lib.visual.SimpleDynamicVisual;
 import com.zurrtum.create.content.kinetics.mechanicalArm.ArmBlock;
 import com.zurrtum.create.content.kinetics.mechanicalArm.ArmBlockEntity;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.render.item.ItemRenderState;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.item.BlockItem;
-import net.minecraft.item.ItemDisplayContext;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.math.MathHelper;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.item.ItemStackRenderState;
+import net.minecraft.util.Mth;
+import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.ItemDisplayContext;
+import net.minecraft.world.item.ItemStack;
 
 import java.util.ArrayList;
 import java.util.function.Consumer;
@@ -40,8 +40,8 @@ public class ArmVisual extends SingleAxisRotatingVisual<ArmBlockEntity> implemen
     private final ArrayList<TransformedInstance> models;
     private final boolean ceiling;
 
-    private final MatrixStack poseStack = new MatrixStack();
-    private final ItemRenderState itemRenderState = new ItemRenderState();
+    private final PoseStack poseStack = new PoseStack();
+    private final ItemStackRenderState itemRenderState = new ItemStackRenderState();
 
     private boolean wasDancing = false;
     private float baseAngle = Float.NaN;
@@ -67,7 +67,7 @@ public class ArmVisual extends SingleAxisRotatingVisual<ArmBlockEntity> implemen
 
         clawGrips = Lists.newArrayList(clawGrip1, clawGrip2);
         models = Lists.newArrayList(base, lowerBody, upperBody, claw, clawGrip1, clawGrip2);
-        ceiling = blockState.get(ArmBlock.CEILING);
+        ceiling = blockState.getValue(ArmBlock.CEILING);
 
         var msr = TransformStack.of(poseStack);
         msr.translate(getVisualPosition());
@@ -96,10 +96,10 @@ public class ArmVisual extends SingleAxisRotatingVisual<ArmBlockEntity> implemen
         float upperArmAngleNow = blockEntity.upperArmAngle.getValue(pt);
         float headAngleNow = blockEntity.headAngle.getValue(pt);
 
-        boolean settled = MathHelper.approximatelyEquals(baseAngle, baseAngleNow) && MathHelper.approximatelyEquals(
-            lowerArmAngle,
-            lowerArmAngleNow
-        ) && MathHelper.approximatelyEquals(upperArmAngle, upperArmAngleNow) && MathHelper.approximatelyEquals(headAngle, headAngleNow);
+        boolean settled = Mth.equal(baseAngle, baseAngleNow) && Mth.equal(lowerArmAngle, lowerArmAngleNow) && Mth.equal(
+            upperArmAngle,
+            upperArmAngleNow
+        ) && Mth.equal(headAngle, headAngleNow);
 
         this.baseAngle = baseAngleNow;
         this.lowerArmAngle = lowerArmAngleNow;
@@ -114,12 +114,12 @@ public class ArmVisual extends SingleAxisRotatingVisual<ArmBlockEntity> implemen
     }
 
     private void animateRave(float partialTick) {
-        var ticks = AnimationTickHolder.getTicks(blockEntity.getWorld());
+        var ticks = AnimationTickHolder.getTicks(blockEntity.getLevel());
         float renderTick = ticks + partialTick + (blockEntity.hashCode() % 64);
 
         float baseAngle = (renderTick * 10) % 360;
-        float lowerArmAngle = MathHelper.lerp((MathHelper.sin(renderTick / 4) + 1) / 2, -45, 15);
-        float upperArmAngle = MathHelper.lerp((MathHelper.sin(renderTick / 8) + 1) / 4, -45, 95);
+        float lowerArmAngle = Mth.lerpInt((Mth.sin(renderTick / 4) + 1) / 2, -45, 15);
+        float upperArmAngle = Mth.lerpInt((Mth.sin(renderTick / 8) + 1) / 4, -45, 95);
         float headAngle = -lowerArmAngle;
         int color = Color.rainbowColor(ticks * 100).getRGB();
         updateAngles(baseAngle, lowerArmAngle, upperArmAngle, headAngle, color);
@@ -130,7 +130,7 @@ public class ArmVisual extends SingleAxisRotatingVisual<ArmBlockEntity> implemen
     }
 
     private void updateAngles(float baseAngle, float lowerArmAngle, float upperArmAngle, float headAngle, int color) {
-        poseStack.push();
+        poseStack.pushPose();
 
         var msr = TransformStack.of(poseStack);
 
@@ -157,22 +157,22 @@ public class ArmVisual extends SingleAxisRotatingVisual<ArmBlockEntity> implemen
         boolean hasItem = !item.isEmpty();
         boolean isBlockItem;
         if (hasItem && item.getItem() instanceof BlockItem) {
-            MinecraftClient mc = MinecraftClient.getInstance();
-            mc.getItemModelManager().clearAndUpdate(itemRenderState, item, ItemDisplayContext.FIXED, mc.world, null, 0);
-            isBlockItem = itemRenderState.isSideLit();
+            Minecraft mc = Minecraft.getInstance();
+            mc.getItemModelResolver().updateForTopItem(itemRenderState, item, ItemDisplayContext.FIXED, mc.level, null, 0);
+            isBlockItem = itemRenderState.usesBlockLight();
         } else {
             isBlockItem = false;
         }
 
         for (int index : Iterate.zeroAndOne) {
-            poseStack.push();
+            poseStack.pushPose();
             int flip = index * 2 - 1;
             ArmRenderer.transformClawHalf(msr, hasItem, isBlockItem, flip);
             clawGrips.get(index).setTransform(poseStack).setChanged();
-            poseStack.pop();
+            poseStack.popPose();
         }
 
-        poseStack.pop();
+        poseStack.popPose();
     }
 
     @Override

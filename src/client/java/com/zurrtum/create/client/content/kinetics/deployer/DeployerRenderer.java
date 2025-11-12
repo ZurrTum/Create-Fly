@@ -1,5 +1,7 @@
 package com.zurrtum.create.client.content.kinetics.deployer;
 
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.zurrtum.create.catnip.math.AngleHelper;
 import com.zurrtum.create.catnip.math.VecHelper;
 import com.zurrtum.create.catnip.theme.Color;
@@ -16,36 +18,37 @@ import com.zurrtum.create.content.kinetics.base.IRotate;
 import com.zurrtum.create.content.kinetics.deployer.DeployerBlockEntity;
 import com.zurrtum.create.content.kinetics.deployer.DeployerBlockEntity.Mode;
 import com.zurrtum.create.content.kinetics.deployer.DeployerBlockEntity.State;
-import net.minecraft.block.BlockState;
-import net.minecraft.client.item.ItemModelManager;
-import net.minecraft.client.render.OverlayTexture;
-import net.minecraft.client.render.RenderLayer;
-import net.minecraft.client.render.VertexConsumer;
-import net.minecraft.client.render.block.entity.BlockEntityRenderer;
-import net.minecraft.client.render.block.entity.BlockEntityRendererFactory;
-import net.minecraft.client.render.block.entity.state.BlockEntityRenderState;
-import net.minecraft.client.render.command.ModelCommandRenderer;
-import net.minecraft.client.render.command.OrderedRenderCommandQueue;
-import net.minecraft.client.render.item.ItemRenderState;
-import net.minecraft.client.render.state.CameraRenderState;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.item.BlockItem;
-import net.minecraft.item.ItemDisplayContext;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.math.*;
-import net.minecraft.util.math.Direction.Axis;
-import net.minecraft.util.math.Direction.AxisDirection;
-import net.minecraft.world.World;
+import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.SubmitNodeCollector;
+import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
+import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
+import net.minecraft.client.renderer.blockentity.state.BlockEntityRenderState;
+import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
+import net.minecraft.client.renderer.item.ItemModelResolver;
+import net.minecraft.client.renderer.item.ItemStackRenderState;
+import net.minecraft.client.renderer.state.CameraRenderState;
+import net.minecraft.client.renderer.texture.OverlayTexture;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.Direction.Axis;
+import net.minecraft.core.Direction.AxisDirection;
+import net.minecraft.util.Mth;
+import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.ItemDisplayContext;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 
 import static com.zurrtum.create.content.kinetics.base.DirectionalAxisKineticBlock.AXIS_ALONG_FIRST_COORDINATE;
 import static com.zurrtum.create.content.kinetics.base.DirectionalKineticBlock.FACING;
 
 public class DeployerRenderer implements BlockEntityRenderer<DeployerBlockEntity, DeployerRenderer.DeployerRenderState> {
-    protected final ItemModelManager itemModelManager;
+    protected final ItemModelResolver itemModelManager;
 
-    public DeployerRenderer(BlockEntityRendererFactory.Context context) {
-        itemModelManager = context.itemModelManager();
+    public DeployerRenderer(BlockEntityRendererProvider.Context context) {
+        itemModelManager = context.itemModelResolver();
     }
 
     @Override
@@ -54,21 +57,21 @@ public class DeployerRenderer implements BlockEntityRenderer<DeployerBlockEntity
     }
 
     @Override
-    public void updateRenderState(
+    public void extractRenderState(
         DeployerBlockEntity be,
         DeployerRenderState state,
         float tickProgress,
-        Vec3d cameraPos,
-        @Nullable ModelCommandRenderer.CrumblingOverlayCommand crumblingOverlay
+        Vec3 cameraPos,
+        @Nullable ModelFeatureRenderer.CrumblingOverlay crumblingOverlay
     ) {
-        BlockEntityRenderState.updateBlockEntityRenderState(be, state, crumblingOverlay);
-        World world = be.getWorld();
+        BlockEntityRenderState.extractBase(be, state, crumblingOverlay);
+        Level world = be.getLevel();
         updateItemRenderState(be, state, itemModelManager, world, tickProgress);
         state.filter = FilteringRenderer.getFilterRenderState(
             be,
             state.blockState,
             itemModelManager,
-            be.isVirtual() ? -1 : cameraPos.squaredDistanceTo(VecHelper.getCenterOf(state.pos))
+            be.isVirtual() ? -1 : cameraPos.distanceToSqr(VecHelper.getCenterOf(state.blockPos))
         );
         updateComponentsRenderState(be, state, world, tickProgress);
     }
@@ -76,8 +79,8 @@ public class DeployerRenderer implements BlockEntityRenderer<DeployerBlockEntity
     public static void updateItemRenderState(
         DeployerBlockEntity be,
         DeployerRenderState state,
-        ItemModelManager itemModelManager,
-        World world,
+        ItemModelResolver itemModelManager,
+        Level world,
         float tickProgress
     ) {
         ItemStack heldItem = be.heldItem;
@@ -86,59 +89,59 @@ public class DeployerRenderer implements BlockEntityRenderer<DeployerBlockEntity
         }
         DeployerItemRenderState data = state.item = new DeployerItemRenderState();
         data.offset = getHandOffset(state, be, tickProgress, state.blockState).add(VecHelper.getCenterOf(BlockPos.ZERO));
-        Direction facing = state.blockState.get(FACING);
+        Direction facing = state.blockState.getValue(FACING);
         data.punching = be.mode == Mode.PUNCH;
-        data.yRot = MathHelper.RADIANS_PER_DEGREE * (AngleHelper.horizontalAngle(facing) + 180);
-        data.xRot = MathHelper.RADIANS_PER_DEGREE * (facing == Direction.UP ? 90 : facing == Direction.DOWN ? 270 : 0);
+        data.yRot = Mth.DEG_TO_RAD * (AngleHelper.horizontalAngle(facing) + 180);
+        data.xRot = Mth.DEG_TO_RAD * (facing == Direction.UP ? 90 : facing == Direction.DOWN ? 270 : 0);
         data.displayMode = facing == Direction.UP && be.getSpeed() == 0 && !data.punching;
-        ItemRenderState renderState = data.state = new ItemRenderState();
+        ItemStackRenderState renderState = data.state = new ItemStackRenderState();
         if (data.displayMode) {
             renderState.displayContext = ItemDisplayContext.GROUND;
         } else {
             renderState.displayContext = data.punching ? ItemDisplayContext.THIRD_PERSON_RIGHT_HAND : ItemDisplayContext.FIXED;
         }
-        itemModelManager.update(renderState, heldItem, renderState.displayContext, world, null, 0);
-        boolean isBlockItem = (heldItem.getItem() instanceof BlockItem) && renderState.isSideLit();
+        itemModelManager.appendItemLayers(renderState, heldItem, renderState.displayContext, world, null, 0);
+        boolean isBlockItem = (heldItem.getItem() instanceof BlockItem) && renderState.usesBlockLight();
         if (data.displayMode) {
             data.translateY = isBlockItem ? 9 / 16f : 11 / 16f;
             data.scale = isBlockItem ? 1.25f : 1;
-            data.yRot2 = MathHelper.RADIANS_PER_DEGREE * AnimationTickHolder.getRenderTime(world);
+            data.yRot2 = Mth.DEG_TO_RAD * AnimationTickHolder.getRenderTime(world);
         } else {
             data.scale = data.punching ? .75f : isBlockItem ? .75f - 1 / 64f : .5f;
         }
     }
 
-    public static void updateComponentsRenderState(DeployerBlockEntity be, DeployerRenderState state, World world, float tickProgress) {
+    public static void updateComponentsRenderState(DeployerBlockEntity be, DeployerRenderState state, Level world, float tickProgress) {
         if (VisualizationManager.supportsVisualization(world)) {
             return;
         }
         ComponentsRenderState components = state.components = new ComponentsRenderState();
-        components.layer = RenderLayer.getSolid();
-        components.light = state.lightmapCoordinates;
+        components.layer = RenderType.solid();
+        components.light = state.lightCoords;
         Axis axis = ((IRotate) state.blockState.getBlock()).getRotationAxis(state.blockState);
         components.shaft = CachedBuffers.block(KineticBlockEntityRenderer.KINETIC_BLOCK, KineticBlockEntityRenderer.shaft(axis));
-        components.angle = KineticBlockEntityRenderer.getAngleForBe(be, state.pos, axis);
-        components.direction = Direction.from(axis, AxisDirection.POSITIVE);
+        components.angle = KineticBlockEntityRenderer.getAngleForBe(be, state.blockPos, axis);
+        components.direction = Direction.fromAxisAndDirection(axis, AxisDirection.POSITIVE);
         components.color = KineticBlockEntityRenderer.getColor(be);
         components.offset = getHandOffset(state, be, tickProgress, state.blockState);
         components.pole = CachedBuffers.partial(AllPartialModels.DEPLOYER_POLE, state.blockState);
         components.hand = CachedBuffers.partial(getHandPose(be), state.blockState);
-        Direction facing = state.blockState.get(FACING);
-        components.yRot = MathHelper.RADIANS_PER_DEGREE * AngleHelper.horizontalAngle(facing);
-        components.xRot = MathHelper.RADIANS_PER_DEGREE * (facing == Direction.UP ? 270 : facing == Direction.DOWN ? 90 : 0);
-        components.zRot = MathHelper.RADIANS_PER_DEGREE * ((state.blockState.get(AXIS_ALONG_FIRST_COORDINATE) ^ facing.getAxis() == Axis.Z) ? 90 : 0);
+        Direction facing = state.blockState.getValue(FACING);
+        components.yRot = Mth.DEG_TO_RAD * AngleHelper.horizontalAngle(facing);
+        components.xRot = Mth.DEG_TO_RAD * (facing == Direction.UP ? 270 : facing == Direction.DOWN ? 90 : 0);
+        components.zRot = Mth.DEG_TO_RAD * ((state.blockState.getValue(AXIS_ALONG_FIRST_COORDINATE) ^ facing.getAxis() == Axis.Z) ? 90 : 0);
     }
 
     @Override
-    public void render(DeployerRenderState state, MatrixStack matrices, OrderedRenderCommandQueue queue, CameraRenderState cameraState) {
+    public void submit(DeployerRenderState state, PoseStack matrices, SubmitNodeCollector queue, CameraRenderState cameraState) {
         if (state.item != null) {
-            state.item.render(matrices, queue, state.lightmapCoordinates);
+            state.item.render(matrices, queue, state.lightCoords);
         }
         if (state.filter != null) {
-            state.filter.render(state.blockState, queue, matrices, state.lightmapCoordinates);
+            state.filter.render(state.blockState, queue, matrices, state.lightCoords);
         }
         if (state.components != null) {
-            queue.submitCustom(matrices, state.components.layer, state.components);
+            queue.submitCustomGeometry(matrices, state.components.layer, state.components);
         }
     }
 
@@ -146,16 +149,16 @@ public class DeployerRenderer implements BlockEntityRenderer<DeployerBlockEntity
         return be.mode == Mode.PUNCH ? AllPartialModels.DEPLOYER_HAND_PUNCHING : be.heldItem.isEmpty() ? AllPartialModels.DEPLOYER_HAND_POINTING : AllPartialModels.DEPLOYER_HAND_HOLDING;
     }
 
-    public static Vec3d getHandOffset(DeployerRenderState state, DeployerBlockEntity be, float partialTicks, BlockState blockState) {
+    public static Vec3 getHandOffset(DeployerRenderState state, DeployerBlockEntity be, float partialTicks, BlockState blockState) {
         if (state.offset != null) {
             return state.offset;
         }
         return state.offset = getHandOffset(be, partialTicks, blockState);
     }
 
-    public static Vec3d getHandOffset(DeployerBlockEntity be, float partialTicks, BlockState blockState) {
+    public static Vec3 getHandOffset(DeployerBlockEntity be, float partialTicks, BlockState blockState) {
         float distance = getHandOffset(be, partialTicks);
-        return Vec3d.of(blockState.get(FACING).getVector()).multiply(distance);
+        return Vec3.atLowerCornerOf(blockState.getValue(FACING).getUnitVec3i()).scale(distance);
     }
 
     public static float getHandOffset(DeployerBlockEntity be, float partialTicks) {
@@ -174,15 +177,15 @@ public class DeployerRenderer implements BlockEntityRenderer<DeployerBlockEntity
         if (be.state == State.RETRACTING)
             progress = (be.timer - partialTicks * timerSpeed) / 1000f;
         float handLength = handPose == AllPartialModels.DEPLOYER_HAND_POINTING ? 0 : handPose == AllPartialModels.DEPLOYER_HAND_HOLDING ? 4 / 16f : 3 / 16f;
-        return Math.min(MathHelper.clamp(progress, 0, 1) * (be.reach + handLength), 21 / 16f);
+        return Math.min(Mth.clamp(progress, 0, 1) * (be.reach + handLength), 21 / 16f);
     }
 
     private static SuperByteBuffer transform(SuperByteBuffer buffer, BlockState deployerState, boolean axisDirectionMatters) {
-        Direction facing = deployerState.get(FACING);
+        Direction facing = deployerState.getValue(FACING);
 
         float yRot = AngleHelper.horizontalAngle(facing);
         float xRot = facing == Direction.UP ? 270 : facing == Direction.DOWN ? 90 : 0;
-        float zRot = axisDirectionMatters && (deployerState.get(AXIS_ALONG_FIRST_COORDINATE) ^ facing.getAxis() == Axis.Z) ? 90 : 0;
+        float zRot = axisDirectionMatters && (deployerState.getValue(AXIS_ALONG_FIRST_COORDINATE) ^ facing.getAxis() == Axis.Z) ? 90 : 0;
 
         buffer.rotateCentered((float) ((yRot) / 180 * Math.PI), Direction.UP);
         buffer.rotateCentered((float) ((xRot) / 180 * Math.PI), Direction.EAST);
@@ -195,29 +198,29 @@ public class DeployerRenderer implements BlockEntityRenderer<DeployerBlockEntity
     }
 
     public static class DeployerRenderState extends BlockEntityRenderState {
-        public Vec3d offset;
+        public Vec3 offset;
         public DeployerItemRenderState item;
         public FilterRenderState filter;
         public ComponentsRenderState components;
     }
 
     public static class DeployerItemRenderState {
-        public Vec3d offset;
+        public Vec3 offset;
         public boolean punching;
         public float yRot;
         public float xRot;
         public boolean displayMode;
-        public ItemRenderState state;
+        public ItemStackRenderState state;
         public float translateY;
         public float scale;
         public float yRot2;
 
-        public void render(MatrixStack matrices, OrderedRenderCommandQueue queue, int light) {
-            matrices.push();
+        public void render(PoseStack matrices, SubmitNodeCollector queue, int light) {
+            matrices.pushPose();
             matrices.translate(offset);
-            matrices.multiply(RotationAxis.POSITIVE_Y.rotation(yRot));
+            matrices.mulPose(com.mojang.math.Axis.YP.rotation(yRot));
             if (!displayMode) {
-                matrices.multiply(RotationAxis.POSITIVE_X.rotation(xRot));
+                matrices.mulPose(com.mojang.math.Axis.XP.rotation(xRot));
                 matrices.translate(0, 0, -11 / 16f);
             }
             if (punching) {
@@ -226,23 +229,23 @@ public class DeployerRenderer implements BlockEntityRenderer<DeployerBlockEntity
             if (displayMode) {
                 matrices.translate(0, translateY, 0);
                 matrices.scale(scale, scale, scale);
-                matrices.multiply(RotationAxis.POSITIVE_Y.rotation(yRot2));
+                matrices.mulPose(com.mojang.math.Axis.YP.rotation(yRot2));
             } else {
                 matrices.scale(scale, scale, scale);
             }
-            state.render(matrices, queue, light, OverlayTexture.DEFAULT_UV, 0);
-            matrices.pop();
+            state.submit(matrices, queue, light, OverlayTexture.NO_OVERLAY, 0);
+            matrices.popPose();
         }
     }
 
-    public static class ComponentsRenderState implements OrderedRenderCommandQueue.Custom {
-        public RenderLayer layer;
+    public static class ComponentsRenderState implements SubmitNodeCollector.CustomGeometryRenderer {
+        public RenderType layer;
         public int light;
         public SuperByteBuffer shaft;
         public float angle;
         public Direction direction;
         public Color color;
-        public Vec3d offset;
+        public Vec3 offset;
         public SuperByteBuffer pole;
         public SuperByteBuffer hand;
         public float yRot;
@@ -250,7 +253,7 @@ public class DeployerRenderer implements BlockEntityRenderer<DeployerBlockEntity
         public float zRot;
 
         @Override
-        public void render(MatrixStack.Entry matricesEntry, VertexConsumer vertexConsumer) {
+        public void render(PoseStack.Pose matricesEntry, VertexConsumer vertexConsumer) {
             shaft.light(light).rotateCentered(angle, direction).color(color).renderInto(matricesEntry, vertexConsumer);
             pole.translate(offset).rotateCentered(yRot, Direction.UP).rotateCentered(xRot, Direction.EAST).rotateCentered(zRot, Direction.SOUTH)
                 .light(light).renderInto(matricesEntry, vertexConsumer);

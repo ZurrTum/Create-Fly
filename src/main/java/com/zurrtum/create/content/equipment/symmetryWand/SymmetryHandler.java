@@ -1,29 +1,29 @@
 package com.zurrtum.create.content.equipment.symmetryWand;
 
 import com.zurrtum.create.AllItems;
-import net.minecraft.block.BlockState;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.item.ItemPlacementContext;
-import net.minecraft.item.ItemStack;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.util.Hand;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.Vec3;
 
 public class SymmetryHandler {
-    public static void onBlockPlaced(ServerWorld world, PlayerEntity player, BlockPos pos, ItemPlacementContext context) {
-        PlayerInventory inv = player.getInventory();
-        Direction side = context.getSide();
-        Hand hand = context.getHand();
-        Vec3d hitPos = context.getHitPos();
-        boolean canReplaceExisting = context.canReplaceExisting();
+    public static void onBlockPlaced(ServerLevel world, Player player, BlockPos pos, BlockPlaceContext context) {
+        Inventory inv = player.getInventory();
+        Direction side = context.getClickedFace();
+        InteractionHand hand = context.getHand();
+        Vec3 hitPos = context.getClickLocation();
+        boolean canReplaceExisting = context.replacingClickedOnBlock();
         BlockState block = null;
-        for (int i = 0, size = PlayerInventory.getHotbarSize(); i < size; i++) {
-            ItemStack stack = inv.getStack(i);
-            if (stack.isOf(AllItems.WAND_OF_SYMMETRY)) {
+        for (int i = 0, size = Inventory.getSelectionSize(); i < size; i++) {
+            ItemStack stack = inv.getItem(i);
+            if (stack.is(AllItems.WAND_OF_SYMMETRY)) {
                 if (block == null) {
                     block = world.getBlockState(pos);
                 }
@@ -32,12 +32,12 @@ public class SymmetryHandler {
         }
     }
 
-    public static void onBlockDestroyed(ServerPlayerEntity player, BlockPos pos, BlockState state) {
-        PlayerInventory inv = player.getInventory();
-        for (int i = 0, size = PlayerInventory.getHotbarSize(); i < size; i++) {
-            ItemStack stack = inv.getStack(i);
-            if (stack.isOf(AllItems.WAND_OF_SYMMETRY)) {
-                SymmetryWandItem.remove(player.getEntityWorld(), stack, player, pos, state);
+    public static void onBlockDestroyed(ServerPlayer player, BlockPos pos, BlockState state) {
+        Inventory inv = player.getInventory();
+        for (int i = 0, size = Inventory.getSelectionSize(); i < size; i++) {
+            ItemStack stack = inv.getItem(i);
+            if (stack.is(AllItems.WAND_OF_SYMMETRY)) {
+                SymmetryWandItem.remove(player.level(), stack, player, pos, state);
             }
         }
     }

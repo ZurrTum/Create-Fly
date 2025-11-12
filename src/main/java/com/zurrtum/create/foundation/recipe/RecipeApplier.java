@@ -5,13 +5,13 @@ import com.zurrtum.create.infrastructure.items.BaseInventory;
 import it.unimi.dsi.fastutil.objects.Object2ObjectMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenCustomHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectIntPair;
-import net.minecraft.entity.ItemEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.recipe.Recipe;
-import net.minecraft.recipe.RecipeEntry;
-import net.minecraft.recipe.input.RecipeInput;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.World;
+import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.Recipe;
+import net.minecraft.world.item.crafting.RecipeHolder;
+import net.minecraft.world.item.crafting.RecipeInput;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.Vec3;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,30 +23,30 @@ public class RecipeApplier {
         CreateRecipe<T> recipe,
         boolean returnProcessingRemainder
     ) {
-        World world = entity.getEntityWorld();
-        List<ItemStack> stacks = applyCreateRecipeOn(entity.getEntityWorld(), entity.getStack().getCount(), input, recipe, returnProcessingRemainder);
+        Level world = entity.level();
+        List<ItemStack> stacks = applyCreateRecipeOn(entity.level(), entity.getItem().getCount(), input, recipe, returnProcessingRemainder);
         int size = stacks.size();
         if (size == 0) {
             entity.discard();
             return;
         }
-        entity.setStack(stacks.getFirst());
+        entity.setItem(stacks.getFirst());
         if (size == 1) {
             return;
         }
         double x = entity.getX();
         double y = entity.getY();
         double z = entity.getZ();
-        Vec3d velocity = entity.getVelocity();
+        Vec3 velocity = entity.getDeltaMovement();
         for (int i = 1; i < size; i++) {
             ItemEntity entityIn = new ItemEntity(world, x, y, z, stacks.get(i));
-            entityIn.setVelocity(velocity);
-            world.spawnEntity(entityIn);
+            entityIn.setDeltaMovement(velocity);
+            world.addFreshEntity(entityIn);
         }
     }
 
     public static <T extends RecipeInput> List<ItemStack> applyCreateRecipeOn(
-        World world,
+        Level world,
         int count,
         T input,
         CreateRecipe<T> recipe,
@@ -56,7 +56,7 @@ public class RecipeApplier {
         if (returnProcessingRemainder) {
             remainders = new ArrayList<>();
             for (int i = 0, size = input.size(); i < size; i++) {
-                ItemStack recipeRemainder = input.getStackInSlot(i).getItem().getRecipeRemainder();
+                ItemStack recipeRemainder = input.getItem(i).getItem().getCraftingRemainder();
                 if (recipeRemainder.isEmpty()) {
                     continue;
                 }
@@ -72,7 +72,7 @@ public class RecipeApplier {
             List<ItemStack> stacks = new ArrayList<>();
             Object2ObjectMap<ItemStack, ObjectIntPair<ItemStack>> buffer = new Object2ObjectOpenCustomHashMap<>(BaseInventory.ITEM_STACK_HASH_STRATEGY);
             for (int i = 0; i < count; i++) {
-                updateBuffer(buffer, recipe.craft(input, world.random), stacks);
+                updateBuffer(buffer, recipe.assemble(input, world.random), stacks);
                 if (remainders != null) {
                     updateBuffer(buffer, remainders, stacks);
                 }
@@ -80,7 +80,7 @@ public class RecipeApplier {
             buffer.values().stream().map(ObjectIntPair::left).filter(stack -> !stack.isEmpty()).forEach(stacks::add);
             return stacks;
         } else {
-            List<ItemStack> craft = recipe.craft(input, world.random);
+            List<ItemStack> craft = recipe.assemble(input, world.random);
             if (remainders != null) {
                 remainders.addAll(craft);
                 return ItemHelper.multipliedOutput(remainders, count);
@@ -96,7 +96,7 @@ public class RecipeApplier {
         for (ItemStack stack : insert) {
             ObjectIntPair<ItemStack> item = buffer.get(stack);
             if (item == null) {
-                buffer.put(stack, ObjectIntPair.of(stack, stack.getMaxCount()));
+                buffer.put(stack, ObjectIntPair.of(stack, stack.getMaxStackSize()));
             } else {
                 max = item.rightInt();
                 exist = item.left();
@@ -113,10 +113,10 @@ public class RecipeApplier {
     }
 
     public static <T extends RecipeInput> List<ItemStack> applyRecipeOn(
-        World level,
+        Level level,
         int count,
         T input,
-        RecipeEntry<? extends Recipe<T>> entry,
+        RecipeHolder<? extends Recipe<T>> entry,
         boolean returnProcessingRemainder
     ) {
         Recipe<T> recipe = entry.value();
@@ -128,19 +128,19 @@ public class RecipeApplier {
     }
 
     public static <T extends RecipeInput> List<ItemStack> applyRecipeOn(
-        World level,
+        Level level,
         int count,
         T input,
         Recipe<T> recipe,
         boolean returnProcessingRemainder
     ) {
-        ItemStack result = recipe.craft(input, level.getRegistryManager());
+        ItemStack result = recipe.assemble(input, level.registryAccess());
         if (returnProcessingRemainder) {
             int size = input.size();
             if (size != 1) {
                 List<ItemStack> list = new ArrayList<>();
                 for (int i = 0; i < size; i++) {
-                    ItemStack recipeRemainder = input.getStackInSlot(i).getItem().getRecipeRemainder();
+                    ItemStack recipeRemainder = input.getItem(i).getItem().getCraftingRemainder();
                     if (recipeRemainder.isEmpty()) {
                         continue;
                     }
@@ -149,7 +149,7 @@ public class RecipeApplier {
                 list.add(result);
                 return ItemHelper.multipliedOutput(list, count);
             }
-            ItemStack recipeRemainder = input.getStackInSlot(0).getItem().getRecipeRemainder();
+            ItemStack recipeRemainder = input.getItem(0).getItem().getCraftingRemainder();
             if (!recipeRemainder.isEmpty()) {
                 return ItemHelper.multipliedOutput(List.of(result, recipeRemainder), count);
             }

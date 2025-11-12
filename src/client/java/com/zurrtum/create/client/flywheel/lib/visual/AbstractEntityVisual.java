@@ -4,13 +4,13 @@ import com.zurrtum.create.client.flywheel.api.visual.*;
 import com.zurrtum.create.client.flywheel.api.visualization.VisualizationContext;
 import com.zurrtum.create.client.flywheel.api.visualization.VisualizationManager;
 import com.zurrtum.create.client.flywheel.lib.instance.FlatLit;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.render.LightmapTextureManager;
-import net.minecraft.entity.Entity;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.LightType;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.LightTexture;
+import net.minecraft.core.BlockPos;
+import net.minecraft.util.Mth;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.level.LightLayer;
+import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 import org.joml.FrustumIntersection;
 import org.joml.Vector3f;
@@ -37,7 +37,7 @@ public abstract class AbstractEntityVisual<T extends Entity> extends AbstractVis
     protected final EntityVisibilityTester visibilityTester;
 
     public AbstractEntityVisual(VisualizationContext ctx, T entity, float partialTick) {
-        super(ctx, entity.getEntityWorld(), partialTick);
+        super(ctx, entity.level(), partialTick);
         this.entity = entity;
         visibilityTester = new EntityVisibilityTester(entity, ctx.renderOrigin(), 1.5f);
     }
@@ -51,7 +51,7 @@ public abstract class AbstractEntityVisual<T extends Entity> extends AbstractVis
      * @return The distance squared between this visual and the given position.
      */
     public double distanceSquared(double x, double y, double z) {
-        return entity.squaredDistanceTo(x, y, z);
+        return entity.distanceToSqr(x, y, z);
     }
 
     /**
@@ -62,7 +62,7 @@ public abstract class AbstractEntityVisual<T extends Entity> extends AbstractVis
      * @return The position this visual should be rendered at to appear in the correct location.
      */
     public Vector3f getVisualPosition() {
-        Vec3d pos = entity.getEntityPos();
+        Vec3 pos = entity.position();
         var renderOrigin = renderOrigin();
         return new Vector3f((float) (pos.x - renderOrigin.getX()), (float) (pos.y - renderOrigin.getY()), (float) (pos.z - renderOrigin.getZ()));
     }
@@ -75,24 +75,24 @@ public abstract class AbstractEntityVisual<T extends Entity> extends AbstractVis
      * @return The position this visual should be rendered at to appear in the correct location.
      */
     public Vector3f getVisualPosition(float partialTick) {
-        Vec3d pos = entity.getEntityPos();
+        Vec3 pos = entity.position();
         var renderOrigin = renderOrigin();
         return new Vector3f(
-            (float) (MathHelper.lerp(partialTick, entity.lastRenderX, pos.x) - renderOrigin.getX()),
-            (float) (MathHelper.lerp(partialTick, entity.lastRenderY, pos.y) - renderOrigin.getY()),
-            (float) (MathHelper.lerp(partialTick, entity.lastRenderZ, pos.z) - renderOrigin.getZ())
+            (float) (Mth.lerp(partialTick, entity.xOld, pos.x) - renderOrigin.getX()),
+            (float) (Mth.lerp(partialTick, entity.yOld, pos.y) - renderOrigin.getY()),
+            (float) (Mth.lerp(partialTick, entity.zOld, pos.z) - renderOrigin.getZ())
         );
     }
 
     public boolean isVisible(FrustumIntersection frustum) {
-        return !MinecraftClient.getInstance().getEntityRenderDispatcher().getRenderer(entity).canBeCulled(entity) || visibilityTester.check(frustum);
+        return !Minecraft.getInstance().getEntityRenderDispatcher().getRenderer(entity).affectedByCulling(entity) || visibilityTester.check(frustum);
     }
 
     protected int computePackedLight(float partialTick) {
-        BlockPos pos = BlockPos.ofFloored(entity.getClientCameraPosVec(partialTick));
-        int blockLight = entity.isOnFire() ? 15 : level.getLightLevel(LightType.BLOCK, pos);
-        int skyLight = level.getLightLevel(LightType.SKY, pos);
-        return LightmapTextureManager.pack(blockLight, skyLight);
+        BlockPos pos = BlockPos.containing(entity.getLightProbePosition(partialTick));
+        int blockLight = entity.isOnFire() ? 15 : level.getBrightness(LightLayer.BLOCK, pos);
+        int skyLight = level.getBrightness(LightLayer.SKY, pos);
+        return LightTexture.pack(blockLight, skyLight);
     }
 
     protected void relight(float partialTick, @Nullable FlatLit... instances) {

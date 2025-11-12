@@ -4,17 +4,16 @@ import com.zurrtum.create.client.ponder.api.registration.MultiSceneBuilder;
 import com.zurrtum.create.client.ponder.api.registration.PonderSceneRegistrationHelper;
 import com.zurrtum.create.client.ponder.api.registration.StoryBoardEntry;
 import com.zurrtum.create.client.ponder.api.scene.PonderStoryBoard;
-import net.minecraft.util.Identifier;
-
 import java.util.Arrays;
 import java.util.function.Function;
+import net.minecraft.resources.ResourceLocation;
 
 public class GenericPonderSceneRegistrationHelper<T> implements PonderSceneRegistrationHelper<T> {
 
-    private final PonderSceneRegistrationHelper<Identifier> helperDelegate;
-    private final Function<T, Identifier> keyGen;
+    private final PonderSceneRegistrationHelper<ResourceLocation> helperDelegate;
+    private final Function<T, ResourceLocation> keyGen;
 
-    public GenericPonderSceneRegistrationHelper(PonderSceneRegistrationHelper<Identifier> helperDelegate, Function<T, Identifier> keyGen) {
+    public GenericPonderSceneRegistrationHelper(PonderSceneRegistrationHelper<ResourceLocation> helperDelegate, Function<T, ResourceLocation> keyGen) {
         this.helperDelegate = helperDelegate;
         this.keyGen = keyGen;
     }
@@ -24,11 +23,11 @@ public class GenericPonderSceneRegistrationHelper<T> implements PonderSceneRegis
         return new GenericPonderSceneRegistrationHelper<>(helperDelegate, keyGen.andThen(this.keyGen));
     }
 
-    public StoryBoardEntry addStoryBoard(T component, Identifier schematicLocation, PonderStoryBoard storyBoard, Identifier... tags) {
+    public StoryBoardEntry addStoryBoard(T component, ResourceLocation schematicLocation, PonderStoryBoard storyBoard, ResourceLocation... tags) {
         return helperDelegate.addStoryBoard(keyGen.apply(component), schematicLocation, storyBoard, tags);
     }
 
-    public StoryBoardEntry addStoryBoard(T component, String schematicPath, PonderStoryBoard storyBoard, Identifier... tags) {
+    public StoryBoardEntry addStoryBoard(T component, String schematicPath, PonderStoryBoard storyBoard, ResourceLocation... tags) {
         return helperDelegate.addStoryBoard(keyGen.apply(component), schematicPath, storyBoard, tags);
     }
 
@@ -44,7 +43,7 @@ public class GenericPonderSceneRegistrationHelper<T> implements PonderSceneRegis
     }
 
     @Override
-    public Identifier asLocation(String path) {
+    public ResourceLocation asLocation(String path) {
         return helperDelegate.asLocation(path);
     }
 }

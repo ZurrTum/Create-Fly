@@ -9,17 +9,17 @@ import com.mojang.serialization.RecordBuilder;
 import com.zurrtum.create.catnip.math.VecHelper;
 import com.zurrtum.create.content.trains.track.BezierConnection;
 import com.zurrtum.create.content.trains.track.TrackMaterial;
-import net.minecraft.storage.ReadView;
-import net.minecraft.storage.WriteView;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.math.Direction.Axis;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec3d;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import net.minecraft.core.Direction.Axis;
+import net.minecraft.util.Mth;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
 
 public class TrackEdge {
 
@@ -59,24 +59,24 @@ public class TrackEdge {
         return turn;
     }
 
-    public Vec3d getDirection(boolean fromFirst) {
+    public Vec3 getDirection(boolean fromFirst) {
         return getPosition(null, fromFirst ? 0.25f : 1).subtract(getPosition(null, fromFirst ? 0 : 0.75f)).normalize();
     }
 
-    public Vec3d getDirectionAt(double t) {
+    public Vec3 getDirectionAt(double t) {
         double length = getLength();
         double step = .5f / length;
         t /= length;
-        Vec3d ahead = getPosition(null, Math.min(1, t + step));
-        Vec3d behind = getPosition(null, Math.max(0, t - step));
+        Vec3 ahead = getPosition(null, Math.min(1, t + step));
+        Vec3 behind = getPosition(null, Math.max(0, t - step));
         return ahead.subtract(behind).normalize();
     }
 
     public boolean canTravelTo(TrackEdge other) {
         if (isInterDimensional() || other.isInterDimensional())
             return true;
-        Vec3d newDirection = other.getDirection(true);
-        return getDirection(false).dotProduct(newDirection) > 7 / 8f;
+        Vec3 newDirection = other.getDirection(true);
+        return getDirection(false).dot(newDirection) > 7 / 8f;
     }
 
     public double getLength() {
@@ -90,22 +90,22 @@ public class TrackEdge {
         return !tooFar && isTurn() ? turn.incrementT(currentT, distance) : currentT + distance;
     }
 
-    public Vec3d getPosition(@Nullable TrackGraph trackGraph, double t) {
+    public Vec3 getPosition(@Nullable TrackGraph trackGraph, double t) {
         if (isTurn())
-            return turn.getPosition(MathHelper.clamp(t, 0, 1));
+            return turn.getPosition(Mth.clamp(t, 0, 1));
         if (trackGraph != null && (node1.location.yOffsetPixels != 0 || node2.location.yOffsetPixels != 0)) {
-            Vec3d positionSmoothed = getPositionSmoothed(trackGraph, t);
+            Vec3 positionSmoothed = getPositionSmoothed(trackGraph, t);
             if (positionSmoothed != null)
                 return positionSmoothed;
         }
         return VecHelper.lerp((float) t, node1.location.getLocation(), node2.location.getLocation());
     }
 
-    public Vec3d getNormal(@Nullable TrackGraph trackGraph, double t) {
+    public Vec3 getNormal(@Nullable TrackGraph trackGraph, double t) {
         if (isTurn())
-            return turn.getNormal(MathHelper.clamp(t, 0, 1));
+            return turn.getNormal(Mth.clamp(t, 0, 1));
         if (trackGraph != null && (node1.location.yOffsetPixels != 0 || node2.location.yOffsetPixels != 0)) {
-            Vec3d normalSmoothed = getNormalSmoothed(trackGraph, t);
+            Vec3 normalSmoothed = getNormalSmoothed(trackGraph, t);
             if (normalSmoothed != null)
                 return normalSmoothed;
         }
@@ -113,9 +113,9 @@ public class TrackEdge {
     }
 
     @Nullable
-    public Vec3d getPositionSmoothed(TrackGraph trackGraph, double t) {
-        Vec3d node1Location = null;
-        Vec3d node2Location = null;
+    public Vec3 getPositionSmoothed(TrackGraph trackGraph, double t) {
+        Vec3 node1Location = null;
+        Vec3 node2Location = null;
         for (TrackEdge trackEdge : trackGraph.getConnectionsFrom(node1).values())
             if (trackEdge.isTurn())
                 node1Location = trackEdge.getPosition(trackGraph, 0);
@@ -128,9 +128,9 @@ public class TrackEdge {
     }
 
     @Nullable
-    public Vec3d getNormalSmoothed(TrackGraph trackGraph, double t) {
-        Vec3d node1Normal = null;
-        Vec3d node2Normal = null;
+    public Vec3 getNormalSmoothed(TrackGraph trackGraph, double t) {
+        Vec3 node1Normal = null;
+        Vec3 node2Normal = null;
         for (TrackEdge trackEdge : trackGraph.getConnectionsFrom(node1).values())
             if (trackEdge.isTurn())
                 node1Normal = trackEdge.getNormal(trackGraph, 0);
@@ -143,10 +143,10 @@ public class TrackEdge {
     }
 
     public Collection<double[]> getIntersection(TrackNode node1, TrackNode node2, TrackEdge other, TrackNode other1, TrackNode other2) {
-        Vec3d v1 = node1.location.getLocation();
-        Vec3d v2 = node2.location.getLocation();
-        Vec3d w1 = other1.location.getLocation();
-        Vec3d w2 = other2.location.getLocation();
+        Vec3 v1 = node1.location.getLocation();
+        Vec3 v2 = node2.location.getLocation();
+        Vec3 w1 = other1.location.getLocation();
+        Vec3 w2 = other2.location.getLocation();
 
         if (isInterDimensional() || other.isInterDimensional())
             return Collections.emptyList();
@@ -159,14 +159,14 @@ public class TrackEdge {
             return other.getIntersection(other1, other2, this, node1, node2).stream().map(a -> new double[]{a[1], a[0]}).toList();
         }
 
-        Box bb = turn.getBounds();
+        AABB bb = turn.getBounds();
 
         if (!other.isTurn()) {
             if (!bb.intersects(w1, w2))
                 return Collections.emptyList();
 
-            Vec3d seg1 = v1;
-            Vec3d seg2 = null;
+            Vec3 seg1 = v1;
+            Vec3 seg2 = null;
             double t = 0;
 
             Collection<double[]> intersections = new ArrayList<>();
@@ -188,8 +188,8 @@ public class TrackEdge {
         if (!bb.intersects(other.turn.getBounds()))
             return Collections.emptyList();
 
-        Vec3d seg1 = v1;
-        Vec3d seg2 = null;
+        Vec3 seg1 = v1;
+        Vec3 seg2 = null;
         double t = 0;
 
         Collection<double[]> intersections = new ArrayList<>();
@@ -198,8 +198,8 @@ public class TrackEdge {
             t += .5;
             seg2 = getPosition(null, t / getLength());
 
-            Vec3d otherSeg1 = w1;
-            Vec3d otherSeg2 = null;
+            Vec3 otherSeg1 = w1;
+            Vec3 otherSeg2 = null;
             double u = 0;
 
             for (int j = 0; j < other.turn.getSegmentCount(); j++) {
@@ -224,12 +224,12 @@ public class TrackEdge {
         return intersections;
     }
 
-    public void write(WriteView view, DimensionPalette dimensions) {
+    public void write(ValueOutput view, DimensionPalette dimensions) {
         if (isTurn()) {
-            view.put("BezierConnection", BezierConnection.CODEC, turn);
+            view.store("BezierConnection", BezierConnection.CODEC, turn);
         }
-        edgeData.write(view.get("Signals"), dimensions);
-        view.put("Material", TrackMaterial.CODEC, getTrackMaterial());
+        edgeData.write(view.child("Signals"), dimensions);
+        view.store("Material", TrackMaterial.CODEC, getTrackMaterial());
     }
 
     public static <T> DataResult<T> encode(final TrackEdge input, final DynamicOps<T> ops, final T empty, DimensionPalette dimensions) {
@@ -242,14 +242,14 @@ public class TrackEdge {
         return builder.build(empty);
     }
 
-    public static TrackEdge read(TrackNode node1, TrackNode node2, ReadView view, TrackGraph graph, DimensionPalette dimensions) {
+    public static TrackEdge read(TrackNode node1, TrackNode node2, ValueInput view, TrackGraph graph, DimensionPalette dimensions) {
         TrackEdge trackEdge = new TrackEdge(
             node1,
             node2,
             view.read("BezierConnection", BezierConnection.CODEC).orElse(null),
             view.read("Material", TrackMaterial.CODEC).orElseThrow()
         );
-        trackEdge.edgeData = EdgeData.read(view.getReadView("Signals"), trackEdge, graph, dimensions);
+        trackEdge.edgeData = EdgeData.read(view.childOrEmpty("Signals"), trackEdge, graph, dimensions);
         return trackEdge;
     }
 

@@ -1,12 +1,12 @@
 package com.zurrtum.create.client;
 
 import com.zurrtum.create.client.infrastructure.particle.*;
-import net.minecraft.client.particle.ParticleSpriteManager;
+import net.minecraft.client.particle.ParticleResources;
 
 import static com.zurrtum.create.AllParticleTypes.*;
 
 public class AllParticleTypes {
-    public static void register(ParticleSpriteManager particle) {
+    public static void register(ParticleResources particle) {
         particle.register(ROTATION_INDICATOR, RotationIndicatorParticle.Factory::new);
         particle.register(AIR_FLOW, AirFlowParticle.Factory::new);
         particle.register(AIR, AirParticle.Factory::new);

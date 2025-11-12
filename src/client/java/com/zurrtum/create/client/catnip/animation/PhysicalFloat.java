@@ -1,8 +1,7 @@
 package com.zurrtum.create.client.catnip.animation;
 
-import net.minecraft.util.math.MathHelper;
-
 import java.util.ArrayList;
+import net.minecraft.util.Mth;
 
 public class PhysicalFloat {
 
@@ -60,7 +59,7 @@ public class PhysicalFloat {
         forces.removeIf(Force::finished);
 
         if (Float.isFinite(limit)) {
-            speed = MathHelper.clamp(speed, -limit, limit);
+            speed = Mth.clamp(speed, -limit, limit);
         }
 
         value += speed;
@@ -84,7 +83,7 @@ public class PhysicalFloat {
     }
 
     public float getValue(float partialTicks) {
-        return MathHelper.lerp(partialTicks, previousValue, value);
+        return Mth.lerp(partialTicks, previousValue, value);
     }
 
 }

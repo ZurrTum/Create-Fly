@@ -6,66 +6,66 @@ import com.zurrtum.create.catnip.math.VecHelper;
 import com.zurrtum.create.content.equipment.symmetryWand.SymmetryWandItem;
 import com.zurrtum.create.foundation.block.IBE;
 import com.zurrtum.create.foundation.item.ItemPlacementSoundContext;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.component.DataComponentTypes;
-import net.minecraft.entity.TypedEntityData;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.BlockItem;
-import net.minecraft.item.ItemPlacementContext;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NbtCompound;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.Direction.Axis;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Direction.Axis;
-import net.minecraft.world.World;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.component.TypedEntityData;
+import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockState;
 
 public class ItemVaultItem extends BlockItem {
 
-    public ItemVaultItem(Block p_i48527_1_, Settings p_i48527_2_) {
+    public ItemVaultItem(Block p_i48527_1_, Properties p_i48527_2_) {
         super(p_i48527_1_, p_i48527_2_);
     }
 
     @Override
-    public ActionResult place(ItemPlacementContext ctx) {
-        ActionResult initialResult = super.place(ctx);
-        if (!initialResult.isAccepted())
+    public InteractionResult place(BlockPlaceContext ctx) {
+        InteractionResult initialResult = super.place(ctx);
+        if (!initialResult.consumesAction())
             return initialResult;
         tryMultiPlace(ctx);
         return initialResult;
     }
 
     @Override
-    protected boolean postPlacement(BlockPos blockPos, World level, PlayerEntity player, ItemStack itemStack, BlockState blockState) {
+    protected boolean updateCustomBlockEntityTag(BlockPos blockPos, Level level, Player player, ItemStack itemStack, BlockState blockState) {
         MinecraftServer minecraftserver = level.getServer();
         if (minecraftserver == null)
             return false;
-        TypedEntityData<BlockEntityType<?>> data = itemStack.get(DataComponentTypes.BLOCK_ENTITY_DATA);
+        TypedEntityData<BlockEntityType<?>> data = itemStack.get(DataComponents.BLOCK_ENTITY_DATA);
         if (data != null) {
-            NbtCompound nbt = data.copyNbtWithoutId();
+            CompoundTag nbt = data.copyTagWithoutId();
             nbt.remove("Length");
             nbt.remove("Size");
             nbt.remove("Controller");
             nbt.remove("LastKnownPos");
-            itemStack.set(DataComponentTypes.BLOCK_ENTITY_DATA, TypedEntityData.create(((IBE<?>) getBlock()).getBlockEntityType(), nbt));
+            itemStack.set(DataComponents.BLOCK_ENTITY_DATA, TypedEntityData.of(((IBE<?>) getBlock()).getBlockEntityType(), nbt));
         }
-        return super.postPlacement(blockPos, level, player, itemStack, blockState);
+        return super.updateCustomBlockEntityTag(blockPos, level, player, itemStack, blockState);
     }
 
-    private void tryMultiPlace(ItemPlacementContext ctx) {
-        PlayerEntity player = ctx.getPlayer();
+    private void tryMultiPlace(BlockPlaceContext ctx) {
+        Player player = ctx.getPlayer();
         if (player == null)
             return;
-        if (player.isSneaking())
+        if (player.isShiftKeyDown())
             return;
-        Direction face = ctx.getSide();
-        ItemStack stack = ctx.getStack();
-        World world = ctx.getWorld();
-        BlockPos pos = ctx.getBlockPos();
-        BlockPos placedOnPos = pos.offset(face.getOpposite());
+        Direction face = ctx.getClickedFace();
+        ItemStack stack = ctx.getItemInHand();
+        Level world = ctx.getLevel();
+        BlockPos pos = ctx.getClickedPos();
+        BlockPos placedOnPos = pos.relative(face.getOpposite());
         BlockState placedOnState = world.getBlockState(placedOnPos);
 
         if (!ItemVaultBlock.isVault(placedOnState))
@@ -90,20 +90,20 @@ public class ItemVaultItem extends BlockItem {
         if (face.getAxis() != vaultBlockAxis)
             return;
 
-        Direction vaultFacing = Direction.from(vaultBlockAxis, Direction.AxisDirection.POSITIVE);
-        BlockPos startPos = face == vaultFacing.getOpposite() ? controllerBE.getPos().offset(vaultFacing.getOpposite()) : controllerBE.getPos()
-            .offset(vaultFacing, controllerBE.length);
+        Direction vaultFacing = Direction.fromAxisAndDirection(vaultBlockAxis, Direction.AxisDirection.POSITIVE);
+        BlockPos startPos = face == vaultFacing.getOpposite() ? controllerBE.getBlockPos().relative(vaultFacing.getOpposite()) : controllerBE.getBlockPos()
+            .relative(vaultFacing, controllerBE.length);
 
         if (VecHelper.getCoordinate(startPos, vaultBlockAxis) != VecHelper.getCoordinate(pos, vaultBlockAxis))
             return;
 
         for (int xOffset = 0; xOffset < width; xOffset++) {
             for (int zOffset = 0; zOffset < width; zOffset++) {
-                BlockPos offsetPos = vaultBlockAxis == Axis.X ? startPos.add(0, xOffset, zOffset) : startPos.add(xOffset, zOffset, 0);
+                BlockPos offsetPos = vaultBlockAxis == Axis.X ? startPos.offset(0, xOffset, zOffset) : startPos.offset(xOffset, zOffset, 0);
                 BlockState blockState = world.getBlockState(offsetPos);
                 if (ItemVaultBlock.isVault(blockState))
                     continue;
-                if (!blockState.isReplaceable())
+                if (!blockState.canBeReplaced())
                     return;
                 tanksToPlace++;
             }
@@ -115,7 +115,7 @@ public class ItemVaultItem extends BlockItem {
         ItemPlacementSoundContext context = new ItemPlacementSoundContext(ctx, 0.1f, 1.5f, null);
         for (int xOffset = 0; xOffset < width; xOffset++) {
             for (int zOffset = 0; zOffset < width; zOffset++) {
-                BlockPos offsetPos = vaultBlockAxis == Axis.X ? startPos.add(0, xOffset, zOffset) : startPos.add(xOffset, zOffset, 0);
+                BlockPos offsetPos = vaultBlockAxis == Axis.X ? startPos.offset(0, xOffset, zOffset) : startPos.offset(xOffset, zOffset, 0);
                 BlockState blockState = world.getBlockState(offsetPos);
                 if (ItemVaultBlock.isVault(blockState))
                     continue;

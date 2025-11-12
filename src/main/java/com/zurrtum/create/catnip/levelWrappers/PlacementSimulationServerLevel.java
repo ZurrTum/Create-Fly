@@ -1,18 +1,17 @@
 package com.zurrtum.create.catnip.levelWrappers;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.fluid.FluidState;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.util.math.BlockPos;
-
 import java.util.HashMap;
 import java.util.function.Predicate;
+import net.minecraft.core.BlockPos;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.material.FluidState;
 
 public class PlacementSimulationServerLevel extends WrappedServerLevel {
     public HashMap<BlockPos, BlockState> blocksAdded;
 
-    public PlacementSimulationServerLevel(ServerWorld wrapped) {
+    public PlacementSimulationServerLevel(ServerLevel wrapped) {
         super(wrapped);
         blocksAdded = new HashMap<>();
     }
@@ -22,23 +21,23 @@ public class PlacementSimulationServerLevel extends WrappedServerLevel {
     }
 
     @Override
-    public boolean setBlockState(BlockPos pos, BlockState newState, int flags) {
-        blocksAdded.put(pos.toImmutable(), newState);
+    public boolean setBlock(BlockPos pos, BlockState newState, int flags) {
+        blocksAdded.put(pos.immutable(), newState);
         return true;
     }
 
     @Override
-    public boolean setBlockState(BlockPos pos, BlockState state) {
-        return setBlockState(pos, state, 0);
+    public boolean setBlockAndUpdate(BlockPos pos, BlockState state) {
+        return setBlock(pos, state, 0);
     }
 
     @Override
-    public boolean testBlockState(BlockPos pos, Predicate<BlockState> condition) {
+    public boolean isStateAtPosition(BlockPos pos, Predicate<BlockState> condition) {
         return condition.test(getBlockState(pos));
     }
 
     @Override
-    public boolean isPosLoaded(BlockPos pos) {
+    public boolean isLoaded(BlockPos pos) {
         return true;
     }
 
@@ -46,7 +45,7 @@ public class PlacementSimulationServerLevel extends WrappedServerLevel {
     public BlockState getBlockState(BlockPos pos) {
         if (blocksAdded.containsKey(pos))
             return blocksAdded.get(pos);
-        return Blocks.AIR.getDefaultState();
+        return Blocks.AIR.defaultBlockState();
     }
 
     @Override

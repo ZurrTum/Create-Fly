@@ -6,10 +6,6 @@ import com.zurrtum.create.foundation.utility.CreatePaths;
 import com.zurrtum.create.foundation.utility.FilesHelper;
 import com.zurrtum.create.infrastructure.config.AllConfigs;
 import com.zurrtum.create.infrastructure.packet.c2s.SchematicUploadPacket;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.text.Text;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -20,12 +16,15 @@ import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.util.*;
 import java.util.stream.Stream;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.network.chat.Component;
 
 public class ClientSchematicLoader {
 
     public static final int PACKET_DELAY = 10;
 
-    private final List<Text> availableSchematics;
+    private final List<Component> availableSchematics;
     private final Map<String, InputStream> activeUploads;
     private int packetCycle;
 
@@ -35,7 +34,7 @@ public class ClientSchematicLoader {
         refresh();
     }
 
-    public void tick(MinecraftClient mc) {
+    public void tick(Minecraft mc) {
         if (activeUploads.isEmpty())
             return;
         if (packetCycle-- > 0)
@@ -47,7 +46,7 @@ public class ClientSchematicLoader {
         }
     }
 
-    public void startNewUpload(MinecraftClient mc, String schematic) {
+    public void startNewUpload(Minecraft mc, String schematic) {
         Path path = CreatePaths.SCHEMATICS_DIR.resolve(schematic);
 
         if (!Files.exists(path)) {
@@ -64,31 +63,31 @@ public class ClientSchematicLoader {
                 return;
 
             // Validate if the file is encoded in a GZIP compatible format
-            ClientPlayerEntity player = mc.player;
+            LocalPlayer player = mc.player;
             if (!isGZIPEncoded(path.toFile())) {
                 if (player != null)
-                    player.sendMessage(CreateLang.translateDirect("schematics.wrongFormat"), false);
+                    player.displayClientMessage(CreateLang.translateDirect("schematics.wrongFormat"), false);
                 return;
             }
 
             in = Files.newInputStream(path, StandardOpenOption.READ);
             activeUploads.put(schematic, in);
 
-            player.networkHandler.sendPacket(SchematicUploadPacket.begin(schematic, size));
+            player.connection.send(SchematicUploadPacket.begin(schematic, size));
         } catch (IOException e) {
             Create.LOGGER.error("Encountered an error while starting schematic upload", e);
         }
     }
 
-    public static boolean validateSizeLimitation(MinecraftClient mc, long size) {
-        if (mc.isIntegratedServerRunning())
+    public static boolean validateSizeLimitation(Minecraft mc, long size) {
+        if (mc.hasSingleplayerServer())
             return true;
         long maxSize = AllConfigs.server().schematics.maxTotalSchematicSize.get();
         if (size > maxSize * 1000) {
-            ClientPlayerEntity player = mc.player;
+            LocalPlayer player = mc.player;
             if (player != null) {
-                player.sendMessage(CreateLang.translateDirect("schematics.uploadTooLarge").append(" (" + size / 1000 + " KB)."), false);
-                player.sendMessage(CreateLang.translateDirect("schematics.maxAllowedSize").append(" " + maxSize + " KB"), false);
+                player.displayClientMessage(CreateLang.translateDirect("schematics.uploadTooLarge").append(" (" + size / 1000 + " KB)."), false);
+                player.displayClientMessage(CreateLang.translateDirect("schematics.maxAllowedSize").append(" " + maxSize + " KB"), false);
             }
             return false;
         }
@@ -114,7 +113,7 @@ public class ClientSchematicLoader {
         }
     }
 
-    private void continueUpload(MinecraftClient mc, String schematic) {
+    private void continueUpload(Minecraft mc, String schematic) {
         if (activeUploads.containsKey(schematic)) {
             int maxPacketSize = AllConfigs.server().schematics.maxSchematicPacketSize.get();
             byte[] data = new byte[maxPacketSize];
@@ -124,8 +123,8 @@ public class ClientSchematicLoader {
                 if (status != -1) {
                     if (status < maxPacketSize)
                         data = Arrays.copyOf(data, status);
-                    if (mc.world != null)
-                        mc.player.networkHandler.sendPacket(SchematicUploadPacket.write(schematic, data));
+                    if (mc.level != null)
+                        mc.player.connection.send(SchematicUploadPacket.write(schematic, data));
                     else {
                         //noinspection resource
                         activeUploads.remove(schematic);
@@ -141,9 +140,9 @@ public class ClientSchematicLoader {
         }
     }
 
-    private void finishUpload(MinecraftClient mc, String schematic) {
+    private void finishUpload(Minecraft mc, String schematic) {
         if (activeUploads.containsKey(schematic)) {
-            mc.player.networkHandler.sendPacket(SchematicUploadPacket.finish(schematic));
+            mc.player.connection.send(SchematicUploadPacket.finish(schematic));
             //noinspection resource
             activeUploads.remove(schematic);
         }
@@ -158,7 +157,7 @@ public class ClientSchematicLoader {
                 if (Files.isDirectory(path))
                     return;
 
-                availableSchematics.add(Text.literal(path.getFileName().toString()));
+                availableSchematics.add(Component.literal(path.getFileName().toString()));
             });
         } catch (NoSuchFileException ignored) {
             // No Schematics created yet
@@ -220,7 +219,7 @@ public class ClientSchematicLoader {
         });
     }
 
-    public List<Text> getAvailableSchematics() {
+    public List<Component> getAvailableSchematics() {
         return availableSchematics;
     }
 

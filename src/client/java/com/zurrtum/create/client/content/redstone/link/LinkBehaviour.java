@@ -8,9 +8,9 @@ import com.zurrtum.create.content.redstone.link.ServerLinkBehaviour;
 import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
 import com.zurrtum.create.foundation.blockEntity.behaviour.BehaviourType;
 import com.zurrtum.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
-import net.minecraft.block.BlockState;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.Vec3;
 
 public class LinkBehaviour extends BlockEntityBehaviour<SmartBlockEntity> {
     public static final BehaviourType<LinkBehaviour> TYPE = new BehaviourType<>();
@@ -40,10 +40,10 @@ public class LinkBehaviour extends BlockEntityBehaviour<SmartBlockEntity> {
         behaviour.setFrequency(first, heldItem);
     }
 
-    public boolean testHit(Boolean first, Vec3d hit) {
-        BlockState state = blockEntity.getCachedState();
-        Vec3d localHit = hit.subtract(Vec3d.of(blockEntity.getPos()));
-        return (first ? firstSlot : secondSlot).testHit(getWorld(), getPos(), state, localHit);
+    public boolean testHit(Boolean first, Vec3 hit) {
+        BlockState state = blockEntity.getBlockState();
+        Vec3 localHit = hit.subtract(Vec3.atLowerCornerOf(blockEntity.getBlockPos()));
+        return (first ? firstSlot : secondSlot).testHit(getLevel(), getPos(), state, localHit);
     }
 
     public Couple<RedstoneLinkNetworkHandler.Frequency> getNetworkKey() {

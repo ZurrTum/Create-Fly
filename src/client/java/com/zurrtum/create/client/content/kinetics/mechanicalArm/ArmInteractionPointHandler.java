@@ -7,21 +7,21 @@ import com.zurrtum.create.content.kinetics.mechanicalArm.ArmBlockEntity;
 import com.zurrtum.create.content.kinetics.mechanicalArm.ArmInteractionPoint;
 import com.zurrtum.create.content.kinetics.mechanicalArm.ArmInteractionPoint.Mode;
 import com.zurrtum.create.infrastructure.packet.c2s.ArmPlacementPacket;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.text.Text;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.Formatting;
-import net.minecraft.util.Hand;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.hit.HitResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.shape.VoxelShape;
-import net.minecraft.world.World;
+import net.minecraft.ChatFormatting;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.HitResult;
+import net.minecraft.world.phys.shapes.VoxelShape;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -36,7 +36,7 @@ public class ArmInteractionPointHandler {
     static long lastBlockPos = -1;
 
 
-    public static ActionResult rightClickingBlocksSelectsThem(World world, ClientPlayerEntity player, Hand hand, BlockHitResult hit) {
+    public static InteractionResult rightClickingBlocksSelectsThem(Level world, LocalPlayer player, InteractionHand hand, BlockHitResult hit) {
         if (currentItem == null)
             return null;
         if (player != null && player.isSpectator())
@@ -57,12 +57,12 @@ public class ArmInteractionPointHandler {
         selected.cycleMode();
         if (player != null) {
             Mode mode = selected.getMode();
-            Text text = Text.translatable(mode.getTranslationKey(), CreateLang.blockName(state).style(Formatting.WHITE).component())
+            Component text = Component.translatable(mode.getTranslationKey(), CreateLang.blockName(state).style(ChatFormatting.WHITE).component())
                 .withColor(mode.getColor());
-            player.sendMessage(text, true);
+            player.displayClientMessage(text, true);
         }
 
-        return ActionResult.SUCCESS;
+        return InteractionResult.SUCCESS;
     }
 
     public static boolean leftClickingBlocksDeselectsThem(BlockPos pos) {
@@ -71,21 +71,21 @@ public class ArmInteractionPointHandler {
         return remove(pos);
     }
 
-    public static void flushSettings(ClientPlayerEntity player, BlockPos pos) {
+    public static void flushSettings(LocalPlayer player, BlockPos pos) {
         if (currentSelection == null)
             return;
 
         int removed = 0;
         for (Iterator<ArmInteractionPoint> iterator = currentSelection.iterator(); iterator.hasNext(); ) {
             ArmInteractionPoint point = iterator.next();
-            if (point.getPos().isWithinDistance(pos, ArmBlockEntity.getRange()))
+            if (point.getPos().closerThan(pos, ArmBlockEntity.getRange()))
                 continue;
             iterator.remove();
             removed++;
         }
 
         if (removed > 0) {
-            CreateLang.builder().translate("mechanical_arm.points_outside_range", removed).style(Formatting.RED).sendStatus(player);
+            CreateLang.builder().translate("mechanical_arm.points_outside_range", removed).style(ChatFormatting.RED).sendStatus(player);
         } else {
             int inputs = 0;
             int outputs = 0;
@@ -96,22 +96,22 @@ public class ArmInteractionPointHandler {
                     inputs++;
             }
             if (inputs + outputs > 0)
-                CreateLang.builder().translate("mechanical_arm.summary", inputs, outputs).style(Formatting.WHITE).sendStatus(player);
+                CreateLang.builder().translate("mechanical_arm.summary", inputs, outputs).style(ChatFormatting.WHITE).sendStatus(player);
         }
 
-        player.networkHandler.sendPacket(new ArmPlacementPacket(currentSelection, pos));
+        player.connection.send(new ArmPlacementPacket(currentSelection, pos));
         currentSelection.clear();
         currentItem = null;
     }
 
-    public static void tick(MinecraftClient mc) {
-        PlayerEntity player = mc.player;
+    public static void tick(Minecraft mc) {
+        Player player = mc.player;
 
         if (player == null)
             return;
 
-        ItemStack heldItemMainhand = player.getMainHandStack();
-        if (!heldItemMainhand.isOf(AllItems.MECHANICAL_ARM)) {
+        ItemStack heldItemMainhand = player.getMainHandItem();
+        if (!heldItemMainhand.is(AllItems.MECHANICAL_ARM)) {
             currentItem = null;
         } else {
             if (heldItemMainhand != currentItem) {
@@ -125,19 +125,19 @@ public class ArmInteractionPointHandler {
         checkForWrench(mc, heldItemMainhand);
     }
 
-    private static void checkForWrench(MinecraftClient mc, ItemStack heldItem) {
-        if (!heldItem.isOf(AllItems.WRENCH)) {
+    private static void checkForWrench(Minecraft mc, ItemStack heldItem) {
+        if (!heldItem.is(AllItems.WRENCH)) {
             return;
         }
 
-        HitResult objectMouseOver = mc.crosshairTarget;
+        HitResult objectMouseOver = mc.hitResult;
         if (!(objectMouseOver instanceof BlockHitResult result)) {
             return;
         }
 
         BlockPos pos = result.getBlockPos();
 
-        BlockEntity be = mc.world.getBlockEntity(pos);
+        BlockEntity be = mc.level.getBlockEntity(pos);
         if (!(be instanceof ArmBlockEntity)) {
             lastBlockPos = -1;
             currentSelection.clear();
@@ -166,15 +166,15 @@ public class ArmInteractionPointHandler {
                 continue;
             }
 
-            World level = point.getLevel();
+            Level level = point.getLevel();
             BlockPos pos = point.getPos();
             BlockState state = level.getBlockState(pos);
-            VoxelShape shape = state.getOutlineShape(level, pos);
+            VoxelShape shape = state.getShape(level, pos);
             if (shape.isEmpty())
                 continue;
 
             int color = point.getMode().getColor();
-            Outliner.getInstance().showAABB(point, shape.getBoundingBox().offset(pos)).colored(color).lineWidth(1 / 16f);
+            Outliner.getInstance().showAABB(point, shape.bounds().move(pos)).colored(color).lineWidth(1 / 16f);
         }
     }
 

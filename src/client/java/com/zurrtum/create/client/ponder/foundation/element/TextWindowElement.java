@@ -9,19 +9,19 @@ import com.zurrtum.create.client.ponder.foundation.PonderIndex;
 import com.zurrtum.create.client.ponder.foundation.PonderScene;
 import com.zurrtum.create.client.ponder.foundation.PonderScene.SceneTransform;
 import com.zurrtum.create.client.ponder.foundation.ui.PonderUI;
-import net.minecraft.client.font.TextRenderer;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.text.StringVisitable;
-import net.minecraft.text.Style;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec2f;
-import net.minecraft.util.math.Vec3d;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix3x2fStack;
 
 import java.util.List;
 import java.util.function.Supplier;
+import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.network.chat.FormattedText;
+import net.minecraft.network.chat.Style;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.Mth;
+import net.minecraft.world.phys.Vec2;
+import net.minecraft.world.phys.Vec3;
 
 public class TextWindowElement extends AnimatedOverlayElementBase {
 
@@ -34,7 +34,7 @@ public class TextWindowElement extends AnimatedOverlayElementBase {
     // from 0 to 200
     int y;
 
-    @Nullable Vec3d vec;
+    @Nullable Vec3 vec;
 
     boolean nearScene = false;
     PonderPalette palette = PonderPalette.WHITE;
@@ -58,7 +58,7 @@ public class TextWindowElement extends AnimatedOverlayElementBase {
         }
 
         @Override
-        public Builder pointAt(Vec3d vec) {
+        public Builder pointAt(Vec3 vec) {
             TextWindowElement.this.vec = vec;
             return this;
         }
@@ -82,25 +82,25 @@ public class TextWindowElement extends AnimatedOverlayElementBase {
         }
 
         @Override
-        public Builder sharedText(Identifier key) {
+        public Builder sharedText(ResourceLocation key) {
             textGetter = () -> PonderIndex.getLangAccess().getShared(key);
             return this;
         }
 
         @Override
-        public TextElementBuilder sharedText(Identifier key, Object... params) {
+        public TextElementBuilder sharedText(ResourceLocation key, Object... params) {
             textGetter = () -> PonderIndex.getLangAccess().getShared(key, params);
             return this;
         }
 
         @Override
         public Builder sharedText(String key) {
-            return sharedText(Identifier.of(scene.getNamespace(), key));
+            return sharedText(ResourceLocation.fromNamespaceAndPath(scene.getNamespace(), key));
         }
 
         @Override
         public TextElementBuilder sharedText(String key, Object... params) {
-            return sharedText(Identifier.of(scene.getNamespace(), key), params);
+            return sharedText(ResourceLocation.fromNamespaceAndPath(scene.getNamespace(), key), params);
         }
 
         @Override
@@ -117,14 +117,14 @@ public class TextWindowElement extends AnimatedOverlayElementBase {
     }
 
     @Override
-    public void render(PonderScene scene, PonderUI screen, DrawContext graphics, float partialTicks, float fade) {
+    public void render(PonderScene scene, PonderUI screen, GuiGraphics graphics, float partialTicks, float fade) {
         if (bakedText == null)
             bakedText = textGetter.get();
 
         if (fade < 1 / 16f)
             return;
         SceneTransform transform = scene.getTransform();
-        Vec2f sceneToScreen = vec != null ? transform.sceneToScreen(vec, partialTicks) : new Vec2f(
+        Vec2 sceneToScreen = vec != null ? transform.sceneToScreen(vec, partialTicks) : new Vec2(
             screen.width / 2f,
             (screen.height - 200) / 2f + y - 8
         );
@@ -133,7 +133,7 @@ public class TextWindowElement extends AnimatedOverlayElementBase {
         float pY = settled ? (int) sceneToScreen.y : sceneToScreen.y;
 
         float yDiff = (screen.height / 2f - sceneToScreen.y - 10) / 100f;
-        float targetX = (screen.width * MathHelper.lerp(yDiff * yDiff, 6f / 8, 5f / 8));
+        float targetX = (screen.width * Mth.lerp(yDiff * yDiff, 6f / 8, 5f / 8));
 
         if (nearScene)
             targetX = Math.min(targetX, sceneToScreen.x + 50);
@@ -143,16 +143,16 @@ public class TextWindowElement extends AnimatedOverlayElementBase {
 
         int textWidth = (int) Math.min(screen.width - targetX, 180);
 
-        TextRenderer fontRenderer = screen.getFontRenderer();
-        List<StringVisitable> lines = fontRenderer.getTextHandler().wrapLines(bakedText, textWidth, Style.EMPTY);
+        Font fontRenderer = screen.getFontRenderer();
+        List<FormattedText> lines = fontRenderer.getSplitter().splitLines(bakedText, textWidth, Style.EMPTY);
 
         int boxWidth = 0;
-        for (StringVisitable line : lines)
-            boxWidth = Math.max(boxWidth, fontRenderer.getWidth(line));
+        for (FormattedText line : lines)
+            boxWidth = Math.max(boxWidth, fontRenderer.width(line));
 
-        int boxHeight = fontRenderer.getWrappedLinesHeight(bakedText, boxWidth);
+        int boxHeight = fontRenderer.wordWrapHeight(bakedText, boxWidth);
 
-        Matrix3x2fStack poseStack = graphics.getMatrices();
+        Matrix3x2fStack poseStack = graphics.pose();
         poseStack.pushMatrix();
         poseStack.translate(0, pY);
 
@@ -173,7 +173,7 @@ public class TextWindowElement extends AnimatedOverlayElementBase {
         }
 
         for (int i = 0; i < lines.size(); i++) {
-            graphics.drawText(
+            graphics.drawString(
                 fontRenderer,
                 lines.get(i).getString(),
                 (int) (targetX - 10),

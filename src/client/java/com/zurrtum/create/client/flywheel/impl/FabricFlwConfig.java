@@ -5,8 +5,8 @@ import com.zurrtum.create.client.flywheel.api.backend.Backend;
 import com.zurrtum.create.client.flywheel.api.backend.BackendManager;
 import com.zurrtum.create.client.flywheel.backend.BackendConfig;
 import com.zurrtum.create.client.flywheel.impl.config.CClient;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.InvalidIdentifierException;
+import net.minecraft.ResourceLocationException;
+import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.Nullable;
 
 import static com.zurrtum.create.client.flywheel.impl.Flywheel.MOD_ID;
@@ -54,10 +54,10 @@ public class FabricFlwConfig implements FlwConfig {
             return BackendManager.offBackend();
         }
 
-        Identifier backendId;
+        ResourceLocation backendId;
         try {
-            backendId = Identifier.of(value);
-        } catch (InvalidIdentifierException e) {
+            backendId = ResourceLocation.parse(value);
+        } catch (ResourceLocationException e) {
             FlwImpl.CONFIG_LOGGER.warn("'backend' value '{}' is not a valid resource location", value);
             return null;
         }

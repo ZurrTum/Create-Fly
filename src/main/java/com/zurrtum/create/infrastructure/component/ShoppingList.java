@@ -8,31 +8,31 @@ import com.zurrtum.create.catnip.data.IntAttached;
 import com.zurrtum.create.content.logistics.BigItemStack;
 import com.zurrtum.create.content.logistics.packager.InventorySummary;
 import com.zurrtum.create.content.logistics.tableCloth.TableClothBlockEntity;
-import net.minecraft.network.PacketByteBuf;
-import net.minecraft.network.codec.PacketCodec;
-import net.minecraft.util.Uuids;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.WorldAccess;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.Unmodifiable;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.UUIDUtil;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.world.level.LevelAccessor;
 
 public record ShoppingList(@Unmodifiable List<IntAttached<BlockPos>> purchases, UUID shopOwner, UUID shopNetwork) {
     public static final Codec<ShoppingList> CODEC = RecordCodecBuilder.create(instance -> instance.group(
         IntAttached.codec(BlockPos.CODEC).listOf().fieldOf("purchases").forGetter(ShoppingList::purchases),
-        Uuids.INT_STREAM_CODEC.fieldOf("shop_owner").forGetter(ShoppingList::shopOwner),
-        Uuids.INT_STREAM_CODEC.fieldOf("shop_network").forGetter(ShoppingList::shopNetwork)
+        UUIDUtil.CODEC.fieldOf("shop_owner").forGetter(ShoppingList::shopOwner),
+        UUIDUtil.CODEC.fieldOf("shop_network").forGetter(ShoppingList::shopNetwork)
     ).apply(instance, ShoppingList::new));
 
-    public static final PacketCodec<PacketByteBuf, ShoppingList> STREAM_CODEC = PacketCodec.tuple(
-        CatnipStreamCodecBuilders.list(IntAttached.streamCodec(BlockPos.PACKET_CODEC)),
+    public static final StreamCodec<FriendlyByteBuf, ShoppingList> STREAM_CODEC = StreamCodec.composite(
+        CatnipStreamCodecBuilders.list(IntAttached.streamCodec(BlockPos.STREAM_CODEC)),
         ShoppingList::purchases,
-        Uuids.PACKET_CODEC,
+        UUIDUtil.STREAM_CODEC,
         ShoppingList::shopOwner,
-        Uuids.PACKET_CODEC,
+        UUIDUtil.STREAM_CODEC,
         ShoppingList::shopNetwork,
         ShoppingList::new
     );
@@ -52,7 +52,7 @@ public record ShoppingList(@Unmodifiable List<IntAttached<BlockPos>> purchases, 
         return 0;
     }
 
-    public Couple<InventorySummary> bakeEntries(WorldAccess level, @Nullable BlockPos clothPosToIgnore) {
+    public Couple<InventorySummary> bakeEntries(LevelAccessor level, @Nullable BlockPos clothPosToIgnore) {
         InventorySummary input = new InventorySummary();
         InventorySummary output = new InventorySummary();
 

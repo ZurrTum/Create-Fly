@@ -3,9 +3,8 @@ package com.zurrtum.create.client.foundation.blockEntity.behaviour.tooltip;
 import com.zurrtum.create.client.api.goggles.IHaveHoveringInformation;
 import com.zurrtum.create.client.foundation.item.TooltipHelper;
 import com.zurrtum.create.content.logistics.packagePort.frogport.FrogportBlockEntity;
-import net.minecraft.text.Text;
-
 import java.util.List;
+import net.minecraft.network.chat.Component;
 
 public class FrogportTooltipBehaviour extends TooltipBehaviour<FrogportBlockEntity> implements IHaveHoveringInformation {
     public FrogportTooltipBehaviour(FrogportBlockEntity be) {
@@ -13,7 +12,7 @@ public class FrogportTooltipBehaviour extends TooltipBehaviour<FrogportBlockEnti
     }
 
     @Override
-    public boolean addToTooltip(List<Text> tooltip, boolean isPlayerSneaking) {
+    public boolean addToTooltip(List<Component> tooltip, boolean isPlayerSneaking) {
         boolean superTip = IHaveHoveringInformation.super.addToTooltip(tooltip, isPlayerSneaking);
         if (!blockEntity.failedLastExport)
             return superTip;

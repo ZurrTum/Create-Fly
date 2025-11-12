@@ -3,22 +3,21 @@ package com.zurrtum.create.foundation.fluid;
 import com.zurrtum.create.AllTransfer;
 import com.zurrtum.create.infrastructure.fluids.FluidInventory;
 import com.zurrtum.create.infrastructure.fluids.FluidInventoryProvider;
-import net.minecraft.block.BlockState;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-
 import java.util.function.Supplier;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.level.block.state.BlockState;
 
 public class FluidInventoryCache implements Supplier<FluidInventory> {
-    public final ServerWorld world;
+    public final ServerLevel world;
     public final Direction direction;
     public final BlockPos pos;
     public boolean cached;
     public FluidInventory inventory;
     public Supplier<FluidInventory> getter = this::refresh;
 
-    public FluidInventoryCache(ServerWorld world, BlockPos pos, Direction direction) {
+    public FluidInventoryCache(ServerLevel world, BlockPos pos, Direction direction) {
         this.world = world;
         this.direction = direction;
         this.pos = pos;

@@ -6,18 +6,17 @@ import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
 import com.zurrtum.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.foundation.blockEntity.behaviour.scrollValue.ServerBrassDiodeScrollValueBehaviour;
 import com.zurrtum.create.foundation.blockEntity.behaviour.scrollValue.ServerScrollValueBehaviour;
-import net.minecraft.block.AbstractRedstoneGateBlock;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.storage.ReadView;
-import net.minecraft.storage.WriteView;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.MathHelper;
-
 import java.util.List;
 import java.util.Optional;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.util.Mth;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.block.DiodeBlock;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 
 import static com.zurrtum.create.content.redstone.diodes.BrassDiodeBlock.POWERING;
 
@@ -44,7 +43,7 @@ public abstract class BrassDiodeBlockEntity extends SmartBlockEntity implements 
 
     public float getProgress() {
         int max = Math.max(2, maxState.getValue());
-        return MathHelper.clamp(state, 0, max) / (float) max;
+        return Mth.clamp(state, 0, max) / (float) max;
     }
 
     public boolean isIdle() {
@@ -54,8 +53,8 @@ public abstract class BrassDiodeBlockEntity extends SmartBlockEntity implements 
     @Override
     public void tick() {
         super.tick();
-        boolean powered = getCachedState().get(AbstractRedstoneGateBlock.POWERED);
-        boolean powering = getCachedState().get(POWERING);
+        boolean powered = getBlockState().getValue(DiodeBlock.POWERED);
+        boolean powering = getBlockState().getValue(POWERING);
         boolean atMax = state >= maxState.getValue();
         boolean atMin = state <= 0;
         updateState(powered, powering, atMax, atMin);
@@ -64,18 +63,18 @@ public abstract class BrassDiodeBlockEntity extends SmartBlockEntity implements 
     protected abstract void updateState(boolean powered, boolean powering, boolean atMax, boolean atMin);
 
     private void onMaxDelayChanged(int newMax) {
-        state = MathHelper.clamp(state, 0, newMax);
+        state = Mth.clamp(state, 0, newMax);
         sendData();
     }
 
     @Override
-    protected void read(ReadView view, boolean clientPacket) {
-        state = view.getInt("State", 0);
+    protected void read(ValueInput view, boolean clientPacket) {
+        state = view.getIntOr("State", 0);
         super.read(view, clientPacket);
     }
 
     @Override
-    public void write(WriteView view, boolean clientPacket) {
+    public void write(ValueOutput view, boolean clientPacket) {
         view.putInt("State", state);
         super.write(view, clientPacket);
     }
@@ -86,21 +85,21 @@ public abstract class BrassDiodeBlockEntity extends SmartBlockEntity implements 
     }
 
     @Override
-    public boolean readFromClipboard(ReadView view, PlayerEntity player, Direction side, boolean simulate) {
+    public boolean readFromClipboard(ValueInput view, Player player, Direction side, boolean simulate) {
         Optional<Boolean> inverted = view.read("Inverted", Codec.BOOL);
         if (inverted.isEmpty())
             return false;
         if (simulate)
             return true;
-        BlockState blockState = getCachedState();
-        if (blockState.get(BrassDiodeBlock.INVERTED) != inverted.get())
-            world.setBlockState(pos, blockState.cycle(BrassDiodeBlock.INVERTED));
+        BlockState blockState = getBlockState();
+        if (blockState.getValue(BrassDiodeBlock.INVERTED) != inverted.get())
+            level.setBlockAndUpdate(worldPosition, blockState.cycle(BrassDiodeBlock.INVERTED));
         return true;
     }
 
     @Override
-    public boolean writeToClipboard(WriteView view, Direction side) {
-        view.put("Inverted", Codec.BOOL, getCachedState().get(BrassDiodeBlock.INVERTED, false));
+    public boolean writeToClipboard(ValueOutput view, Direction side) {
+        view.store("Inverted", Codec.BOOL, getBlockState().getValueOrElse(BrassDiodeBlock.INVERTED, false));
         return true;
     }
 

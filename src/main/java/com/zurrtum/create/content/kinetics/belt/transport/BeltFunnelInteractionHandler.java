@@ -7,13 +7,13 @@ import com.zurrtum.create.content.logistics.funnel.FunnelBlockEntity;
 import com.zurrtum.create.foundation.blockEntity.behaviour.filtering.ServerFilteringBehaviour;
 import com.zurrtum.create.foundation.blockEntity.behaviour.inventory.InvManipulationBehaviour;
 import com.zurrtum.create.foundation.item.ItemHelper.ExtractionCountMode;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.util.Mth;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
 
 public class BeltFunnelInteractionHandler {
 
@@ -21,24 +21,24 @@ public class BeltFunnelInteractionHandler {
         boolean beltMovementPositive = beltInventory.beltMovementPositive;
         int firstUpcomingSegment = (int) Math.floor(currentItem.beltPosition);
         int step = beltMovementPositive ? 1 : -1;
-        firstUpcomingSegment = MathHelper.clamp(firstUpcomingSegment, 0, beltInventory.belt.beltLength - 1);
+        firstUpcomingSegment = Mth.clamp(firstUpcomingSegment, 0, beltInventory.belt.beltLength - 1);
 
         for (int segment = firstUpcomingSegment; beltMovementPositive ? segment <= nextOffset : segment + 1 >= nextOffset; segment += step) {
-            BlockPos funnelPos = BeltHelper.getPositionForOffset(beltInventory.belt, segment).up();
-            World world = beltInventory.belt.getWorld();
+            BlockPos funnelPos = BeltHelper.getPositionForOffset(beltInventory.belt, segment).above();
+            Level world = beltInventory.belt.getLevel();
             BlockState funnelState = world.getBlockState(funnelPos);
             if (!(funnelState.getBlock() instanceof BeltFunnelBlock))
                 continue;
-            Direction funnelFacing = funnelState.get(BeltFunnelBlock.HORIZONTAL_FACING);
+            Direction funnelFacing = funnelState.getValue(BeltFunnelBlock.HORIZONTAL_FACING);
             Direction movementFacing = beltInventory.belt.getMovementFacing();
             boolean blocking = funnelFacing == movementFacing.getOpposite();
             if (funnelFacing == movementFacing)
                 continue;
-            if (funnelState.get(BeltFunnelBlock.SHAPE) == Shape.PUSHING)
+            if (funnelState.getValue(BeltFunnelBlock.SHAPE) == Shape.PUSHING)
                 continue;
 
             float funnelEntry = segment + .5f;
-            if (funnelState.get(BeltFunnelBlock.SHAPE) == Shape.EXTENDED)
+            if (funnelState.getValue(BeltFunnelBlock.SHAPE) == Shape.EXTENDED)
                 funnelEntry += .499f * (beltMovementPositive ? -1 : 1);
             boolean hasCrossed = nextOffset > funnelEntry && beltMovementPositive || nextOffset < funnelEntry && !beltMovementPositive;
             if (!hasCrossed)
@@ -46,7 +46,7 @@ public class BeltFunnelInteractionHandler {
             if (blocking)
                 currentItem.beltPosition = funnelEntry;
 
-            if (world.isClient() || funnelState.get(BeltFunnelBlock.POWERED, false))
+            if (world.isClientSide() || funnelState.getValueOrElse(BeltFunnelBlock.POWERED, false))
                 if (blocking)
                     return true;
                 else
@@ -91,7 +91,7 @@ public class BeltFunnelInteractionHandler {
             }
 
             ItemStack remainder = inserting.insert(toInsert);
-            if (ItemStack.areEqual(toInsert, remainder)) {
+            if (ItemStack.matches(toInsert, remainder)) {
                 beltInventory.belt.invVersionTracker.awaitNewVersion(inserting);
                 if (blocking)
                     return true;
@@ -101,7 +101,7 @@ public class BeltFunnelInteractionHandler {
 
             int notFilled = currentItem.stack.getCount() - toInsert.getCount();
             if (!remainder.isEmpty()) {
-                remainder.increment(notFilled);
+                remainder.grow(notFilled);
             } else if (notFilled > 0)
                 remainder = currentItem.stack.copyWithCount(notFilled);
 

@@ -1,19 +1,19 @@
 package com.zurrtum.create.content.equipment.clipboard;
 
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.registry.RegistryWrapper;
-import net.minecraft.storage.ReadView;
-import net.minecraft.storage.WriteView;
-import net.minecraft.util.math.Direction;
+import net.minecraft.core.Direction;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 
 public interface ClipboardCloneable {
     String getClipboardKey();
 
-    default boolean canWrite(RegistryWrapper.WrapperLookup registries, Direction side) {
+    default boolean canWrite(HolderLookup.Provider registries, Direction side) {
         return true;
     }
 
-    boolean writeToClipboard(WriteView view, Direction side);
+    boolean writeToClipboard(ValueOutput view, Direction side);
 
-    boolean readFromClipboard(ReadView view, PlayerEntity player, Direction side, boolean simulate);
+    boolean readFromClipboard(ValueInput view, Player player, Direction side, boolean simulate);
 }

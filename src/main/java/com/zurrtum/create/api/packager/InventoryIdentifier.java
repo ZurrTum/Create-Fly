@@ -3,15 +3,15 @@ package com.zurrtum.create.api.packager;
 import com.zurrtum.create.api.registry.SimpleRegistry;
 import com.zurrtum.create.catnip.math.BlockFace;
 import com.zurrtum.create.content.logistics.packager.AllInventoryIdentifiers;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.util.math.BlockBox;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Set;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.levelgen.structure.BoundingBox;
 
 /**
  * Interface identifying an inventory spanning multiple block faces.
@@ -30,7 +30,7 @@ public interface InventoryIdentifier {
      * Get the InventoryIdentifier for the given BlockFace, if present.
      */
     @Nullable
-    static InventoryIdentifier get(World level, BlockFace face) {
+    static InventoryIdentifier get(Level level, BlockFace face) {
         BlockState state = level.getBlockState(face.getPos());
         Finder finder = REGISTRY.get(state);
         Finder toQuery = finder != null ? finder : AllInventoryIdentifiers::fallback;
@@ -47,7 +47,7 @@ public interface InventoryIdentifier {
          *
          * @return the found identifier, or null if one isn't present
          */
-        @Nullable InventoryIdentifier find(World level, BlockState state, BlockFace face);
+        @Nullable InventoryIdentifier find(Level level, BlockState state, BlockFace face);
     }
 
     // common identifier implementations.
@@ -67,10 +67,10 @@ public interface InventoryIdentifier {
         }
     }
 
-    record Bounds(BlockBox bounds) implements InventoryIdentifier {
+    record Bounds(BoundingBox bounds) implements InventoryIdentifier {
         @Override
         public boolean contains(BlockFace face) {
-            return this.bounds.contains(face.getPos());
+            return this.bounds.isInside(face.getPos());
         }
     }
 

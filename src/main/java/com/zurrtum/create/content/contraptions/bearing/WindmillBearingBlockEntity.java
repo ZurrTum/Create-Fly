@@ -6,13 +6,12 @@ import com.zurrtum.create.foundation.advancement.CreateTrigger;
 import com.zurrtum.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.foundation.blockEntity.behaviour.scrollValue.ServerScrollOptionBehaviour;
 import com.zurrtum.create.infrastructure.config.AllConfigs;
-import net.minecraft.block.BlockState;
-import net.minecraft.storage.ReadView;
-import net.minecraft.storage.WriteView;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.MathHelper;
-
 import java.util.List;
+import net.minecraft.core.BlockPos;
+import net.minecraft.util.Mth;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 
 public class WindmillBearingBlockEntity extends MechanicalBearingBlockEntity {
 
@@ -42,7 +41,7 @@ public class WindmillBearingBlockEntity extends MechanicalBearingBlockEntity {
     @Override
     public void tick() {
         super.tick();
-        if (world.isClient())
+        if (level.isClientSide())
             return;
         if (!queuedReassembly)
             return;
@@ -65,7 +64,7 @@ public class WindmillBearingBlockEntity extends MechanicalBearingBlockEntity {
         if (movedContraption == null)
             return lastGeneratedSpeed;
         int sails = ((BearingContraption) movedContraption.getContraption()).getSailBlocks() / AllConfigs.server().kinetics.windmillSailsPerRPM.get();
-        return MathHelper.clamp(sails, 1, 16) * getAngleSpeedDirection();
+        return Mth.clamp(sails, 1, 16) * getAngleSpeedDirection();
     }
 
     @Override
@@ -79,17 +78,17 @@ public class WindmillBearingBlockEntity extends MechanicalBearingBlockEntity {
     }
 
     @Override
-    public void write(WriteView view, boolean clientPacket) {
+    public void write(ValueOutput view, boolean clientPacket) {
         view.putFloat("LastGenerated", lastGeneratedSpeed);
         view.putBoolean("QueueAssembly", queuedReassembly);
         super.write(view, clientPacket);
     }
 
     @Override
-    protected void read(ReadView view, boolean clientPacket) {
+    protected void read(ValueInput view, boolean clientPacket) {
         if (!wasMoved)
-            lastGeneratedSpeed = view.getFloat("LastGenerated", 0);
-        queuedReassembly = view.getBoolean("QueueAssembly", false);
+            lastGeneratedSpeed = view.getFloatOr("LastGenerated", 0);
+        queuedReassembly = view.getBooleanOr("QueueAssembly", false);
         super.read(view, clientPacket);
     }
 
@@ -108,7 +107,7 @@ public class WindmillBearingBlockEntity extends MechanicalBearingBlockEntity {
     private void onDirectionChanged() {
         if (!running)
             return;
-        if (!world.isClient())
+        if (!level.isClientSide())
             updateGeneratedRotation();
     }
 

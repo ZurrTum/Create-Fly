@@ -2,21 +2,20 @@ package com.zurrtum.create.infrastructure.packet.c2s;
 
 import com.zurrtum.create.AllHandle;
 import com.zurrtum.create.AllPackets;
-import net.minecraft.network.RegistryByteBuf;
-import net.minecraft.network.codec.PacketCodec;
-import net.minecraft.network.codec.PacketCodecs;
-import net.minecraft.network.packet.PacketType;
-import net.minecraft.server.network.ServerPlayNetworkHandler;
-
 import java.util.function.BiConsumer;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.PacketType;
+import net.minecraft.server.network.ServerGamePacketListenerImpl;
 
 public record BlueprintPreviewRequestPacket(int entityId, int index, boolean sneaking) implements C2SPacket {
-    public static final PacketCodec<RegistryByteBuf, BlueprintPreviewRequestPacket> CODEC = PacketCodec.tuple(
-        PacketCodecs.INTEGER,
+    public static final StreamCodec<RegistryFriendlyByteBuf, BlueprintPreviewRequestPacket> CODEC = StreamCodec.composite(
+        ByteBufCodecs.INT,
         BlueprintPreviewRequestPacket::entityId,
-        PacketCodecs.VAR_INT,
+        ByteBufCodecs.VAR_INT,
         BlueprintPreviewRequestPacket::index,
-        PacketCodecs.BOOLEAN,
+        ByteBufCodecs.BOOL,
         BlueprintPreviewRequestPacket::sneaking,
         BlueprintPreviewRequestPacket::new
     );
@@ -27,12 +26,12 @@ public record BlueprintPreviewRequestPacket(int entityId, int index, boolean sne
     }
 
     @Override
-    public BiConsumer<ServerPlayNetworkHandler, BlueprintPreviewRequestPacket> callback() {
+    public BiConsumer<ServerGamePacketListenerImpl, BlueprintPreviewRequestPacket> callback() {
         return AllHandle::onBlueprintPreviewRequest;
     }
 
     @Override
-    public PacketType<? extends BlueprintPreviewRequestPacket> getPacketType() {
+    public PacketType<? extends BlueprintPreviewRequestPacket> type() {
         return AllPackets.REQUEST_BLUEPRINT_PREVIEW;
     }
 }

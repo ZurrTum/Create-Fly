@@ -13,12 +13,12 @@ import com.zurrtum.create.client.ponder.api.scene.SceneBuildingUtil;
 import com.zurrtum.create.client.ponder.api.scene.Selection;
 import com.zurrtum.create.content.processing.burner.BlazeBurnerBlock;
 import com.zurrtum.create.content.trains.station.StationBlock;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
 
 public class TrainScenes {
 
@@ -48,7 +48,7 @@ public class TrainScenes {
         scene.idle(15);
 
         BlockPos initialControlsPos = util.grid().at(3, 3, 4);
-        scene.overlay().chaseBoundingBoxOutline(PonderPalette.WHITE, train, new Box(initialControlsPos).shrink(-6 / 16f, 2 / 16f, 0), 85);
+        scene.overlay().chaseBoundingBoxOutline(PonderPalette.WHITE, train, new AABB(initialControlsPos).contract(-6 / 16f, 2 / 16f, 0), 85);
         scene.idle(15);
 
         scene.overlay().showText(70).pointAt(util.vector().of(3.35f, 3.75f, 5)).placeNearTarget().attachKeyFrame()
@@ -169,14 +169,14 @@ public class TrainScenes {
             .text("Schedules allow Trains to be controlled by other Drivers");
         scene.idle(80);
 
-        Vec3d target = util.vector().topOf(util.grid().at(4, 0, 2));
-        scene.overlay().showControls(target, Pointing.RIGHT, 80).rightClick().withItem(AllItems.SCHEDULE.getDefaultStack());
+        Vec3 target = util.vector().topOf(util.grid().at(4, 0, 2));
+        scene.overlay().showControls(target, Pointing.RIGHT, 80).rightClick().withItem(AllItems.SCHEDULE.getDefaultInstance());
         scene.overlay().showText(80).pointAt(target).placeNearTarget().attachKeyFrame().colored(PonderPalette.BLUE)
             .text("Right-click with the item in hand to open its Interface");
         scene.idle(100);
 
         scene.overlay().showControls(util.vector().topOf(util.grid().at(3, 3, 4)), Pointing.DOWN, 80).rightClick()
-            .withItem(AllItems.SCHEDULE.getDefaultStack());
+            .withItem(AllItems.SCHEDULE.getDefaultInstance());
         scene.idle(6);
         scene.world().conductorBlaze(util.grid().at(3, 3, 4), true);
         scene.overlay().showText(70).pointAt(util.vector().blockSurface(util.grid().at(3, 3, 4), Direction.WEST)).placeNearTarget().attachKeyFrame()
@@ -193,7 +193,7 @@ public class TrainScenes {
         ElementLink<WorldSectionElement> trainElement2 = scene.world().showIndependentSection(train2, Direction.DOWN);
         scene.world().moveSection(trainElement2, util.vector().of(0, 0, -3), 0);
         scene.idle(10);
-        Vec3d birbVec = util.vector().topOf(util.grid().at(3, 0, 7));
+        Vec3 birbVec = util.vector().topOf(util.grid().at(3, 0, 7));
         ElementLink<ParrotElement> birb = scene.special().createBirb(birbVec, ParrotPose.FacePointOfInterestPose::new);
         scene.world().animateTrainStation(stationPos, true);
 
@@ -214,7 +214,8 @@ public class TrainScenes {
             .text("Creatures on a lead can be given their seat more conveniently");
         scene.idle(80);
 
-        scene.overlay().showControls(util.vector().topOf(util.grid().at(3, 3, 4)), Pointing.DOWN, 15).withItem(AllItems.SCHEDULE.getDefaultStack());
+        scene.overlay().showControls(util.vector().topOf(util.grid().at(3, 3, 4)), Pointing.DOWN, 15)
+            .withItem(AllItems.SCHEDULE.getDefaultInstance());
         scene.idle(6);
         scene.special().conductorBirb(birb, true);
         scene.special().movePointOfInterest(util.grid().at(16, 4, 4));

@@ -1,5 +1,6 @@
 package com.zurrtum.create.client.content.equipment.blueprint;
 
+import com.mojang.blaze3d.platform.Window;
 import com.zurrtum.create.AllItems;
 import com.zurrtum.create.catnip.data.Couple;
 import com.zurrtum.create.catnip.data.Iterate;
@@ -16,25 +17,24 @@ import com.zurrtum.create.content.logistics.tableCloth.TableClothBlockEntity;
 import com.zurrtum.create.content.trains.track.TrackPlacement.PlacementInfo;
 import com.zurrtum.create.infrastructure.component.ShoppingList;
 import com.zurrtum.create.infrastructure.packet.c2s.BlueprintPreviewRequestPacket;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.tooltip.HoveredTooltipPositioner;
-import net.minecraft.client.gui.tooltip.TooltipBackgroundRenderer;
-import net.minecraft.client.gui.tooltip.TooltipComponent;
-import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.client.util.Window;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.item.Item;
-import net.minecraft.item.Item.TooltipContext;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.item.tooltip.TooltipType;
-import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
-import net.minecraft.util.hit.EntityHitResult;
-import net.minecraft.util.hit.HitResult;
-import net.minecraft.util.hit.HitResult.Type;
-import net.minecraft.world.GameMode;
+import net.minecraft.ChatFormatting;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
+import net.minecraft.client.gui.screens.inventory.tooltip.DefaultTooltipPositioner;
+import net.minecraft.client.gui.screens.inventory.tooltip.TooltipRenderUtil;
+import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.Item.TooltipContext;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.level.GameType;
+import net.minecraft.world.phys.EntityHitResult;
+import net.minecraft.world.phys.HitResult;
+import net.minecraft.world.phys.HitResult.Type;
 
 import java.util.ArrayList;
 import java.util.IdentityHashMap;
@@ -54,17 +54,17 @@ public class BlueprintOverlayRenderer {
     static List<ItemStack> results = new ArrayList<>();
     static boolean resultCraftable = false;
 
-    public static void tick(MinecraftClient mc) {
+    public static void tick(Minecraft mc) {
         BlueprintSection last = lastTargetedSection;
         lastTargetedSection = null;
         active = false;
         noOutput = false;
         shopContext = null;
 
-        if (mc.interactionManager.getCurrentGameMode() == GameMode.SPECTATOR)
+        if (mc.gameMode.getPlayerMode() == GameType.SPECTATOR)
             return;
 
-        HitResult mouseOver = mc.crosshairTarget;
+        HitResult mouseOver = mc.hitResult;
         if (mouseOver == null)
             return;
         if (mouseOver.getType() != Type.ENTITY)
@@ -74,12 +74,12 @@ public class BlueprintOverlayRenderer {
         if (!(entityRay.getEntity() instanceof BlueprintEntity blueprintEntity))
             return;
 
-        BlueprintSection sectionAt = blueprintEntity.getSectionAt(entityRay.getPos().subtract(blueprintEntity.getEntityPos()));
+        BlueprintSection sectionAt = blueprintEntity.getSectionAt(entityRay.getLocation().subtract(blueprintEntity.position()));
 
         lastTargetedSection = last;
         active = true;
 
-        boolean sneak = mc.player.isSneaking();
+        boolean sneak = mc.player.isShiftKeyDown();
         if (sectionAt != lastTargetedSection || AnimationTickHolder.getTicks() % 10 == 0 || lastSneakState != sneak)
             rebuild(mc, blueprintEntity, sectionAt, sneak);
 
@@ -133,7 +133,7 @@ public class BlueprintOverlayRenderer {
             results.add(entry.stack.copyWithCount(entry.count));
     }
 
-    public static void displayShoppingList(ClientPlayerEntity player, Couple<InventorySummary> bakedList) {
+    public static void displayShoppingList(LocalPlayer player, Couple<InventorySummary> bakedList) {
         if (active || bakedList == null)
             return;
         prepareCustomOverlay();
@@ -149,12 +149,12 @@ public class BlueprintOverlayRenderer {
             results.add(entry.stack.copyWithCount(entry.count));
     }
 
-    private static boolean canAfford(ClientPlayerEntity player, BigItemStack entry) {
+    private static boolean canAfford(LocalPlayer player, BigItemStack entry) {
         int itemsPresent = 0;
-        PlayerInventory playerInventory = player.getInventory();
-        for (int i = 0; i < PlayerInventory.MAIN_SIZE; i++) {
-            ItemStack item = playerInventory.getStack(i);
-            if (item.isEmpty() || !ItemStack.areItemsAndComponentsEqual(item, entry.stack))
+        Inventory playerInventory = player.getInventory();
+        for (int i = 0; i < Inventory.INVENTORY_SIZE; i++) {
+            ItemStack item = playerInventory.getItem(i);
+            if (item.isEmpty() || !ItemStack.isSameItemSameComponents(item, entry.stack))
                 continue;
             itemsPresent += item.getCount();
         }
@@ -170,7 +170,7 @@ public class BlueprintOverlayRenderer {
         shopContext = null;
     }
 
-    public static void rebuild(MinecraftClient mc, BlueprintEntity blueprintEntity, BlueprintSection sectionAt, boolean sneak) {
+    public static void rebuild(Minecraft mc, BlueprintEntity blueprintEntity, BlueprintSection sectionAt, boolean sneak) {
         empty = sectionAt.getItems().isEmpty();
         if (empty) {
             cachedRenderedFilters.clear();
@@ -178,7 +178,7 @@ public class BlueprintOverlayRenderer {
             results.clear();
             return;
         }
-        mc.player.networkHandler.sendPacket(new BlueprintPreviewRequestPacket(blueprintEntity.getId(), sectionAt.index, sneak));
+        mc.player.connection.send(new BlueprintPreviewRequestPacket(blueprintEntity.getId(), sectionAt.index, sneak));
     }
 
     public static void updatePreview(List<ItemStack> available, List<ItemStack> missing, ItemStack result) {
@@ -205,8 +205,8 @@ public class BlueprintOverlayRenderer {
         }
     }
 
-    public static void renderOverlay(MinecraftClient mc, DrawContext guiGraphics) {
-        if (mc.currentScreen != null)
+    public static void renderOverlay(Minecraft mc, GuiGraphics guiGraphics) {
+        if (mc.screen != null)
             return;
 
         if (!active || empty)
@@ -222,24 +222,17 @@ public class BlueprintOverlayRenderer {
             w += 30;
         }
 
-        int width = guiGraphics.getScaledWindowWidth();
+        int width = guiGraphics.guiWidth();
         int x = (width - w) / 2;
-        int y = guiGraphics.getScaledWindowHeight() - 100;
+        int y = guiGraphics.guiHeight() - 100;
 
         if (shopContext != null) {
-            TooltipBackgroundRenderer.render(guiGraphics, x - 2, y + 1, w + 4, 19, null);
+            TooltipRenderUtil.renderTooltipBackground(guiGraphics, x - 2, y + 1, w + 4, 19, null);
 
             AllGuiTextures.TRADE_OVERLAY.render(guiGraphics, width / 2 - 48, y - 19);
             if (shopContext.purchases() > 0) {
-                guiGraphics.drawItem(AllItems.SHOPPING_LIST.getDefaultStack(), width / 2 + 20, y - 20);
-                guiGraphics.drawText(
-                    mc.textRenderer,
-                    Text.literal("x" + shopContext.purchases()),
-                    width / 2 + 20 + 16,
-                    y - 20 + 4,
-                    0xff_eeeeee,
-                    true
-                );
+                guiGraphics.renderItem(AllItems.SHOPPING_LIST.getDefaultInstance(), width / 2 + 20, y - 20);
+                guiGraphics.drawString(mc.font, Component.literal("x" + shopContext.purchases()), width / 2 + 20 + 16, y - 20 + 4, 0xff_eeeeee, true);
             }
         }
 
@@ -247,7 +240,7 @@ public class BlueprintOverlayRenderer {
         for (Pair<ItemStack, Boolean> pair : ingredients) {
             (pair.getSecond() ? AllGuiTextures.HOTSLOT_ACTIVE : AllGuiTextures.HOTSLOT).render(guiGraphics, x, y);
             ItemStack itemStack = pair.getFirst();
-            String count = shopContext != null && !shopContext.checkout() || pair.getSecond() ? null : Formatting.GOLD.toString() + itemStack.getCount();
+            String count = shopContext != null && !shopContext.checkout() || pair.getSecond() ? null : ChatFormatting.GOLD.toString() + itemStack.getCount();
             drawItemStack(guiGraphics, mc, x, y, itemStack, count);
             x += 21;
         }
@@ -266,7 +259,7 @@ public class BlueprintOverlayRenderer {
         // Outputs
         if (results.isEmpty()) {
             AllGuiTextures.HOTSLOT.render(guiGraphics, x, y);
-            guiGraphics.drawItem(Items.BARRIER.getDefaultStack(), x + 3, y + 3);
+            guiGraphics.renderItem(Items.BARRIER.getDefaultInstance(), x + 3, y + 3);
         } else {
             for (ItemStack result : results) {
                 AllGuiTextures slot = resultCraftable ? AllGuiTextures.HOTSLOT_SUPER_ACTIVE : AllGuiTextures.HOTSLOT;
@@ -283,39 +276,39 @@ public class BlueprintOverlayRenderer {
             for (boolean count : Iterate.trueAndFalse)
                 for (int i = 0; i < results.size(); i++) {
                     ItemStack result = results.get(i);
-                    List<Text> tooltipLines = result.getTooltip(TooltipContext.create(mc.world), mc.player, TooltipType.Default.BASIC);
+                    List<Component> tooltipLines = result.getTooltipLines(TooltipContext.of(mc.level), mc.player, TooltipFlag.Default.NORMAL);
                     if (tooltipLines.size() <= 1)
                         continue;
                     if (count) {
                         cycle++;
                         continue;
                     }
-                    if ((mc.inGameHud.getTicks() / 40) % cycle != i)
+                    if ((mc.gui.getGuiTicks() / 40) % cycle != i)
                         continue;
                     Window window = mc.getWindow();
-                    guiGraphics.drawTooltip(mc.textRenderer, tooltipLines, 0, 0);
-                    guiGraphics.drawTooltipImmediately(
-                        mc.textRenderer,
-                        tooltipLines.stream().map(Text::asOrderedText).map(TooltipComponent::of).toList(),
-                        window.getScaledWidth(),
-                        window.getScaledHeight(),
-                        HoveredTooltipPositioner.INSTANCE,
+                    guiGraphics.setComponentTooltipForNextFrame(mc.font, tooltipLines, 0, 0);
+                    guiGraphics.renderTooltip(
+                        mc.font,
+                        tooltipLines.stream().map(Component::getVisualOrderText).map(ClientTooltipComponent::create).toList(),
+                        window.getGuiScaledWidth(),
+                        window.getGuiScaledHeight(),
+                        DefaultTooltipPositioner.INSTANCE,
                         null
                     );
                 }
         }
     }
 
-    public static void drawItemStack(DrawContext graphics, MinecraftClient mc, int x, int y, ItemStack itemStack, String count) {
+    public static void drawItemStack(GuiGraphics graphics, Minecraft mc, int x, int y, ItemStack itemStack, String count) {
         if (itemStack.getItem() instanceof FilterItem) {
-            int step = AnimationTickHolder.getTicks(mc.world) / 10;
+            int step = AnimationTickHolder.getTicks(mc.level) / 10;
             ItemStack[] itemsMatchingFilter = getItemsMatchingFilter(itemStack);
             if (itemsMatchingFilter.length > 0)
                 itemStack = itemsMatchingFilter[step % itemsMatchingFilter.length];
         }
 
-        graphics.drawItem(itemStack, x + 3, y + 3);
-        graphics.drawStackOverlay(mc.textRenderer, itemStack, x + 3, y + 3, count);
+        graphics.renderItem(itemStack, x + 3, y + 3);
+        graphics.renderItemDecorations(mc.font, itemStack, x + 3, y + 3, count);
     }
 
     private static ItemStack[] getItemsMatchingFilter(ItemStack filter) {

@@ -12,21 +12,20 @@ import com.zurrtum.create.content.trains.entity.Carriage;
 import com.zurrtum.create.content.trains.entity.CarriageContraptionEntity;
 import com.zurrtum.create.content.trains.station.GlobalStation;
 import com.zurrtum.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.DoorBlock;
-import net.minecraft.block.enums.DoubleBlockHalf;
-import net.minecraft.registry.RegistryKey;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.Direction.AxisDirection;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.sound.SoundCategory;
-import net.minecraft.sound.SoundEvents;
-import net.minecraft.structure.StructureTemplate.StructureBlockInfo;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Direction.AxisDirection;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.World;
-
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.DoorBlock;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.DoubleBlockHalf;
+import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate.StructureBlockInfo;
+import net.minecraft.world.phys.Vec3;
 import java.lang.ref.WeakReference;
 
 public class SlidingDoorMovementBehaviour extends MovementBehaviour {
@@ -42,7 +41,7 @@ public class SlidingDoorMovementBehaviour extends MovementBehaviour {
             return;
         boolean open = SlidingDoorBlockEntity.isOpen(structureBlockInfo.state());
 
-        if (!context.world.isClient()) {
+        if (!context.world.isClientSide()) {
             tickOpen(context, open);
             return;
         }
@@ -54,12 +53,12 @@ public class SlidingDoorMovementBehaviour extends MovementBehaviour {
         sdbe.animation.tickChaser();
 
         if (!wasSettled && sdbe.animation.settled() && !open)
-            context.world.playSoundClient(
+            context.world.playLocalSound(
                 context.position.x,
                 context.position.y,
                 context.position.z,
-                SoundEvents.BLOCK_IRON_DOOR_CLOSE,
-                SoundCategory.BLOCKS,
+                SoundEvents.IRON_DOOR_CLOSE,
+                SoundSource.BLOCKS,
                 .125f,
                 1,
                 false
@@ -77,29 +76,29 @@ public class SlidingDoorMovementBehaviour extends MovementBehaviour {
         Contraption contraption = context.contraption;
 
         StructureBlockInfo info = contraption.getBlocks().get(pos);
-        if (info == null || !info.state().contains(DoorBlock.OPEN))
+        if (info == null || !info.state().hasProperty(DoorBlock.OPEN))
             return;
 
         toggleDoor(pos, contraption, info);
 
         Direction facing = getDoorFacing(context);
-        BlockPos inWorldDoor = BlockPos.ofFloored(context.position).offset(facing);
+        BlockPos inWorldDoor = BlockPos.containing(context.position).relative(facing);
         BlockState inWorldDoorState = context.world.getBlockState(inWorldDoor);
-        if (inWorldDoorState.getBlock() instanceof DoorBlock db && inWorldDoorState.contains(DoorBlock.OPEN))
-            if (inWorldDoorState.contains(DoorBlock.FACING) && inWorldDoorState.get(DoorBlock.FACING, Direction.UP).getAxis() == facing.getAxis())
+        if (inWorldDoorState.getBlock() instanceof DoorBlock db && inWorldDoorState.hasProperty(DoorBlock.OPEN))
+            if (inWorldDoorState.hasProperty(DoorBlock.FACING) && inWorldDoorState.getValueOrElse(DoorBlock.FACING, Direction.UP).getAxis() == facing.getAxis())
                 db.setOpen(null, context.world, inWorldDoorState, inWorldDoor, shouldOpen);
 
         if (shouldOpen)
-            context.world.playSound(null, BlockPos.ofFloored(context.position), SoundEvents.BLOCK_IRON_DOOR_OPEN, SoundCategory.BLOCKS, .125f, 1);
+            context.world.playSound(null, BlockPos.containing(context.position), SoundEvents.IRON_DOOR_OPEN, SoundSource.BLOCKS, .125f, 1);
     }
 
     private void toggleDoor(BlockPos pos, Contraption contraption, StructureBlockInfo info) {
         BlockState newState = info.state().cycle(DoorBlock.OPEN);
         contraption.entity.setBlock(pos, new StructureBlockInfo(info.pos(), newState, info.nbt()));
 
-        BlockPos otherPos = newState.get(DoorBlock.HALF) == DoubleBlockHalf.LOWER ? pos.up() : pos.down();
+        BlockPos otherPos = newState.getValue(DoorBlock.HALF) == DoubleBlockHalf.LOWER ? pos.above() : pos.below();
         info = contraption.getBlocks().get(otherPos);
-        if (info != null && info.state().contains(DoorBlock.OPEN)) {
+        if (info != null && info.state().hasProperty(DoorBlock.OPEN)) {
             newState = info.state().cycle(DoorBlock.OPEN);
             contraption.entity.setBlock(otherPos, new StructureBlockInfo(info.pos(), newState, info.nbt()));
             contraption.invalidateColliders();
@@ -113,7 +112,7 @@ public class SlidingDoorMovementBehaviour extends MovementBehaviour {
             context.data.putBoolean("Open", shouldOpen);
             return true;
         }
-        boolean wasOpen = context.data.getBoolean("Open", false);
+        boolean wasOpen = context.data.getBooleanOr("Open", false);
         context.data.putBoolean("Open", shouldOpen);
         return wasOpen != shouldOpen;
     }
@@ -178,27 +177,27 @@ public class SlidingDoorMovementBehaviour extends MovementBehaviour {
             return null;
 
         BlockPos stationPos = currentStation.getBlockEntityPos();
-        RegistryKey<World> stationDim = currentStation.getBlockEntityDimension();
+        ResourceKey<Level> stationDim = currentStation.getBlockEntityDimension();
         MinecraftServer server = context.world.getServer();
         if (server == null)
             return null;
-        ServerWorld stationLevel = server.getWorld(stationDim);
-        if (stationLevel == null || !stationLevel.isPosLoaded(stationPos))
+        ServerLevel stationLevel = server.getLevel(stationDim);
+        if (stationLevel == null || !stationLevel.isLoaded(stationPos))
             return null;
         return BlockEntityBehaviour.get(stationLevel, stationPos, DoorControlBehaviour.TYPE);
     }
 
     protected Direction getDoorFacing(MovementContext context) {
-        Direction stateFacing = context.state.get(DoorBlock.FACING);
+        Direction stateFacing = context.state.getValue(DoorBlock.FACING);
         Direction originalFacing = Direction.get(AxisDirection.POSITIVE, stateFacing.getAxis());
-        Vec3d centerOfContraption = context.contraption.bounds.getCenter();
-        Vec3d diff = Vec3d.ofCenter(context.localPos).add(Vec3d.of(stateFacing.getVector()).multiply(-.45f)).subtract(centerOfContraption);
+        Vec3 centerOfContraption = context.contraption.bounds.getCenter();
+        Vec3 diff = Vec3.atCenterOf(context.localPos).add(Vec3.atLowerCornerOf(stateFacing.getUnitVec3i()).scale(-.45f)).subtract(centerOfContraption);
         if (originalFacing.getAxis().choose(diff.x, diff.y, diff.z) < 0)
             originalFacing = originalFacing.getOpposite();
 
-        Vec3d directionVec = Vec3d.of(originalFacing.getVector());
+        Vec3 directionVec = Vec3.atLowerCornerOf(originalFacing.getUnitVec3i());
         directionVec = context.rotation.apply(directionVec);
-        return Direction.getFacing(directionVec.x, directionVec.y, directionVec.z);
+        return Direction.getApproximateNearest(directionVec.x, directionVec.y, directionVec.z);
     }
 
 }

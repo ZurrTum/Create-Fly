@@ -1,16 +1,15 @@
 package com.zurrtum.create.content.trains.display;
 
 import com.google.common.base.Strings;
-import net.minecraft.storage.ReadView;
-import net.minecraft.storage.WriteView;
-import net.minecraft.text.Text;
-import net.minecraft.text.TextCodecs;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.random.Random;
-
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.ComponentSerialization;
+import net.minecraft.util.Mth;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 
 public class FlapDisplaySection {
     static final Map<String, String[]> LOADED_FLAP_CYCLES = new HashMap<>();
@@ -25,7 +24,7 @@ public class FlapDisplaySection {
     public boolean wideFlaps;
     boolean sendTransition;
     String cycle;
-    Text component;
+    Component component;
 
     // Client
     public String[] cyclingOptions;
@@ -53,7 +52,7 @@ public class FlapDisplaySection {
         return this;
     }
 
-    public void setText(Text component) {
+    public void setText(Component component) {
         this.component = component;
         sendTransition = true;
     }
@@ -81,7 +80,7 @@ public class FlapDisplaySection {
         spinningTicks = 0;
     }
 
-    public int tick(boolean instant, Random random) {
+    public int tick(boolean instant, RandomSource random) {
         if (cyclingOptions == null)
             return 0;
         int max = Math.max(4, (int) (cyclingOptions.length * 1.75f));
@@ -94,7 +93,7 @@ public class FlapDisplaySection {
 
         int spinningFlaps = 0;
         for (int i = 0; i < spinning.length; i++) {
-            int increasingChance = MathHelper.clamp(8 - spinningTicks, 1, 10);
+            int increasingChance = Mth.clamp(8 - spinningTicks, 1, 10);
             boolean continueSpin = !instant && random.nextInt(increasingChance * max / 4) != 0;
             continueSpin &= max > 5 || spinningTicks < 2;
             spinning[i] &= continueSpin;
@@ -117,7 +116,7 @@ public class FlapDisplaySection {
         return size;
     }
 
-    public void write(WriteView view) {
+    public void write(ValueOutput view) {
         view.putFloat("Width", size);
         view.putString("Cycle", cycle);
         if (rightAligned)
@@ -129,47 +128,47 @@ public class FlapDisplaySection {
         if (wideFlaps)
             view.putBoolean("Wide", true);
         if (component != null)
-            view.put("Text", TextCodecs.CODEC, component);
+            view.store("Text", ComponentSerialization.CODEC, component);
         if (sendTransition)
             view.putBoolean("Transition", true);
         sendTransition = false;
     }
 
-    public static FlapDisplaySection load(ReadView view) {
-        float width = view.getFloat("Width", 0);
-        String cycle = view.getString("Cycle", "");
-        boolean singleFlap = view.getBoolean("SingleFlap", false);
-        boolean hasGap = view.getBoolean("Gap", false);
+    public static FlapDisplaySection load(ValueInput view) {
+        float width = view.getFloatOr("Width", 0);
+        String cycle = view.getStringOr("Cycle", "");
+        boolean singleFlap = view.getBooleanOr("SingleFlap", false);
+        boolean hasGap = view.getBooleanOr("Gap", false);
 
         FlapDisplaySection section = new FlapDisplaySection(width, cycle, singleFlap, hasGap);
         section.cyclingOptions = getFlapCycle(cycle);
-        section.rightAligned = view.getBoolean("RightAligned", false);
-        section.wideFlaps = view.getBoolean("Wide", false);
+        section.rightAligned = view.getBooleanOr("RightAligned", false);
+        section.wideFlaps = view.getBooleanOr("Wide", false);
 
-        view.read("Text", TextCodecs.CODEC).ifPresent(text -> {
+        view.read("Text", ComponentSerialization.CODEC).ifPresent(text -> {
             section.component = text;
-            section.refresh(view.getBoolean("Transition", false));
+            section.refresh(view.getBooleanOr("Transition", false));
         });
         return section;
     }
 
-    public void update(ReadView view) {
-        view.read("Text", TextCodecs.CODEC).ifPresent(text -> component = text);
+    public void update(ValueInput view) {
+        view.read("Text", ComponentSerialization.CODEC).ifPresent(text -> component = text);
         if (cyclingOptions == null)
             cyclingOptions = getFlapCycle(cycle);
-        refresh(view.getBoolean("Transition", false));
+        refresh(view.getBooleanOr("Transition", false));
     }
 
     public boolean renderCharsIndividually() {
         return !singleFlap;
     }
 
-    public Text getText() {
+    public Component getText() {
         return component;
     }
 
     public static String[] getFlapCycle(String key) {
-        return LOADED_FLAP_CYCLES.computeIfAbsent(key, k -> Text.translatable("create.flap_display.cycles." + key).getString().split(";"));
+        return LOADED_FLAP_CYCLES.computeIfAbsent(key, k -> Component.translatable("create.flap_display.cycles." + key).getString().split(";"));
     }
 
 }

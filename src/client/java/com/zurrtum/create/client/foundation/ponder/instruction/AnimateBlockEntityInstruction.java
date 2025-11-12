@@ -8,8 +8,8 @@ import com.zurrtum.create.content.contraptions.bearing.IBearingBlockEntity;
 import com.zurrtum.create.content.contraptions.pulley.PulleyBlockEntity;
 import com.zurrtum.create.content.kinetics.deployer.DeployerBlockEntity;
 import com.zurrtum.create.content.trains.bogey.AbstractBogeyBlockEntity;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.block.entity.BlockEntity;
 
 import java.util.Optional;
 import java.util.function.BiConsumer;
@@ -89,13 +89,13 @@ public class AnimateBlockEntityInstruction extends TickingInstruction {
     @Override
     protected final void firstTick(PonderScene scene) {
         super.firstTick(scene);
-        target = getter.apply(scene.getWorld()) + totalDelta;
+        target = getter.apply(scene.getLevel()) + totalDelta;
     }
 
     @Override
     public void tick(PonderScene scene) {
         super.tick(scene);
-        PonderLevel world = scene.getWorld();
+        PonderLevel world = scene.getLevel();
         float current = getter.apply(world);
         float next = (float) (remainingTicks == 0 ? target : current + deltaPerTick);
         setter.accept(world, next);

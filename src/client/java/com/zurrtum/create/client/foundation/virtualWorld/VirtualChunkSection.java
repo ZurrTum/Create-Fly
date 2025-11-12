@@ -1,11 +1,11 @@
 package com.zurrtum.create.client.foundation.virtualWorld;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.fluid.FluidState;
-import net.minecraft.util.math.ChunkSectionPos;
-import net.minecraft.world.chunk.ChunkSection;
+import net.minecraft.core.SectionPos;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.chunk.LevelChunkSection;
+import net.minecraft.world.level.material.FluidState;
 
-public class VirtualChunkSection extends ChunkSection {
+public class VirtualChunkSection extends LevelChunkSection {
     public final VirtualChunk owner;
 
     public final int xStart;
@@ -13,11 +13,11 @@ public class VirtualChunkSection extends ChunkSection {
     public final int zStart;
 
     public VirtualChunkSection(VirtualChunk owner, int yBase) {
-        super(owner.world.getPalettesFactory());
+        super(owner.world.palettedContainerFactory());
         this.owner = owner;
-        this.xStart = owner.getPos().getStartX();
+        this.xStart = owner.getPos().getMinBlockX();
         this.yStart = yBase;
-        this.zStart = owner.getPos().getStartZ();
+        this.zStart = owner.getPos().getMinBlockZ();
     }
 
     @Override
@@ -38,8 +38,8 @@ public class VirtualChunkSection extends ChunkSection {
     }
 
     @Override
-    public boolean isEmpty() {
-        ChunkSectionPos sectionPos = ChunkSectionPos.from(xStart >> 4, yStart >> 4, zStart >> 4);
+    public boolean hasOnlyAir() {
+        SectionPos sectionPos = SectionPos.of(xStart >> 4, yStart >> 4, zStart >> 4);
         return owner.world.nonEmptyBlockCounts.getShort(sectionPos) == 0;
     }
 }

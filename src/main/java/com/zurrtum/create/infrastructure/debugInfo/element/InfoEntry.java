@@ -1,12 +1,12 @@
 package com.zurrtum.create.infrastructure.debugInfo.element;
 
 import com.zurrtum.create.infrastructure.debugInfo.DebugInformation;
-import net.minecraft.entity.player.PlayerEntity;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import net.minecraft.world.entity.player.Player;
 
 public record InfoEntry(String name, InfoProvider provider) implements InfoElement {
     public InfoEntry(String name, String info) {
@@ -14,7 +14,7 @@ public record InfoEntry(String name, InfoProvider provider) implements InfoEleme
     }
 
     @Override
-    public void print(int depth, @Nullable PlayerEntity player, Consumer<String> lineConsumer) {
+    public void print(int depth, @Nullable Player player, Consumer<String> lineConsumer) {
         String value = provider.getInfoSafe(player);
         String indent = DebugInformation.getIndent(depth);
         if (value.contains("\n")) {

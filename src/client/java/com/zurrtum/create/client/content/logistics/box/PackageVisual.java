@@ -11,10 +11,10 @@ import com.zurrtum.create.client.flywheel.lib.visual.AbstractEntityVisual;
 import com.zurrtum.create.client.flywheel.lib.visual.SimpleDynamicVisual;
 import com.zurrtum.create.content.logistics.box.PackageEntity;
 import com.zurrtum.create.content.logistics.box.PackageItem;
-import net.minecraft.item.ItemStack;
-import net.minecraft.registry.Registries;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.util.Mth;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.phys.Vec3;
 
 public class PackageVisual extends AbstractEntityVisual<PackageEntity> implements SimpleDynamicVisual {
     public final TransformedInstance instance;
@@ -24,8 +24,8 @@ public class PackageVisual extends AbstractEntityVisual<PackageEntity> implement
 
         ItemStack box = entity.box;
         if (box.isEmpty() || !PackageItem.isPackage(box))
-            box = AllItems.CARDBOARD_BLOCK.getDefaultStack();
-        PartialModel model = AllPartialModels.PACKAGES.get(Registries.ITEM.getId(box.getItem()));
+            box = AllItems.CARDBOARD_BLOCK.getDefaultInstance();
+        PartialModel model = AllPartialModels.PACKAGES.get(BuiltInRegistries.ITEM.getKey(box.getItem()));
 
         instance = instancerProvider().instancer(InstanceTypes.TRANSFORMED, Models.partial(model)).createInstance();
 
@@ -38,13 +38,13 @@ public class PackageVisual extends AbstractEntityVisual<PackageEntity> implement
     }
 
     private void animate(float partialTick) {
-        float yaw = MathHelper.lerp(partialTick, entity.lastYaw, entity.getYaw());
+        float yaw = Mth.lerp(partialTick, entity.yRotO, entity.getYRot());
 
-        Vec3d pos = entity.getEntityPos();
+        Vec3 pos = entity.position();
         var renderOrigin = renderOrigin();
-        var x = (float) (MathHelper.lerp(partialTick, entity.lastX, pos.x) - renderOrigin.getX());
-        var y = (float) (MathHelper.lerp(partialTick, entity.lastY, pos.y) - renderOrigin.getY());
-        var z = (float) (MathHelper.lerp(partialTick, entity.lastZ, pos.z) - renderOrigin.getZ());
+        var x = (float) (Mth.lerp(partialTick, entity.xo, pos.x) - renderOrigin.getX());
+        var y = (float) (Mth.lerp(partialTick, entity.yo, pos.y) - renderOrigin.getY());
+        var z = (float) (Mth.lerp(partialTick, entity.zo, pos.z) - renderOrigin.getZ());
 
         long randomBits = (long) entity.getId() * 31L * 493286711L;
         randomBits = randomBits * randomBits * 4392167121L + randomBits * 98761L;

@@ -1,5 +1,7 @@
 package com.zurrtum.create.client.content.trains.entity;
 
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.math.Axis;
 import com.zurrtum.create.catnip.data.Couple;
 import com.zurrtum.create.client.AllBogeyStyleRenders;
 import com.zurrtum.create.client.content.contraptions.render.ClientContraption;
@@ -12,22 +14,20 @@ import com.zurrtum.create.content.trains.entity.Carriage;
 import com.zurrtum.create.content.trains.entity.CarriageBogey;
 import com.zurrtum.create.content.trains.entity.CarriageContraption;
 import com.zurrtum.create.content.trains.entity.CarriageContraptionEntity;
-import net.minecraft.client.render.Frustum;
-import net.minecraft.client.render.LightmapTextureManager;
-import net.minecraft.client.render.command.OrderedRenderCommandQueue;
-import net.minecraft.client.render.entity.EntityRendererFactory;
-import net.minecraft.client.render.state.CameraRenderState;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.RotationAxis;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.LightType;
-import net.minecraft.world.World;
+import net.minecraft.client.renderer.LightTexture;
+import net.minecraft.client.renderer.SubmitNodeCollector;
+import net.minecraft.client.renderer.culling.Frustum;
+import net.minecraft.client.renderer.entity.EntityRendererProvider;
+import net.minecraft.client.renderer.state.CameraRenderState;
+import net.minecraft.core.BlockPos;
+import net.minecraft.util.Mth;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LightLayer;
+import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 
 public class CarriageContraptionEntityRenderer extends OrientedContraptionEntityRenderer<CarriageContraptionEntity, CarriageContraptionEntityRenderer.CarriageContraptionState> {
-    public CarriageContraptionEntityRenderer(EntityRendererFactory.Context context) {
+    public CarriageContraptionEntityRenderer(EntityRendererProvider.Context context) {
         super(context);
     }
 
@@ -53,33 +53,33 @@ public class CarriageContraptionEntityRenderer extends OrientedContraptionEntity
     }
 
     @Override
-    public void updateRenderState(CarriageContraptionEntity entity, CarriageContraptionState state, float tickProgress) {
-        super.updateRenderState(entity, state, tickProgress);
+    public void extractRenderState(CarriageContraptionEntity entity, CarriageContraptionState state, float tickProgress) {
+        super.extractRenderState(entity, state, tickProgress);
         Carriage carriage = entity.getCarriage();
         if (carriage == null) {
             return;
         }
-        World world = entity.getEntityWorld();
-        if (VisualizationManager.supportsVisualization(world)) {
+        Level level = entity.level();
+        if (VisualizationManager.supportsVisualization(level)) {
             return;
         }
         Couple<CarriageBogey> bogeys = carriage.bogeys;
         CarriageBogey first = bogeys.getFirst();
         CarriageBogey second = bogeys.getSecond();
-        Vec3d position = entity.getLerpedPos(tickProgress);
+        Vec3 position = entity.getPosition(tickProgress);
         float viewYRot = entity.getViewYRot(tickProgress);
         float viewXRot = entity.getViewXRot(tickProgress);
         int bogeySpacing = carriage.bogeySpacing;
         int cameraLight = -1;
         float firstYaw = first.yaw.getValue(tickProgress);
         float firstPitch = first.pitch.getValue(tickProgress);
-        if (!state.contraption.isHiddenInPortal(BlockPos.ORIGIN)) {
-            Vec3d pos = first.getAnchorPosition();
+        if (!state.contraption.isHiddenInPortal(BlockPos.ZERO)) {
+            Vec3 pos = first.getAnchorPosition();
             int light;
             if (pos != null) {
-                light = getBogeyLightCoords(world, pos);
+                light = getBogeyLightCoords(level, pos);
             } else {
-                light = cameraLight = getBogeyLightCoords(world, entity.getClientCameraPosVec(tickProgress));
+                light = cameraLight = getBogeyLightCoords(level, entity.getLightProbePosition(tickProgress));
             }
             state.firstBogey = CarriageBogeyRenderState.create(first, viewXRot, viewYRot, bogeySpacing, firstYaw, firstPitch, light, tickProgress);
         }
@@ -87,16 +87,16 @@ public class CarriageContraptionEntityRenderer extends OrientedContraptionEntity
         if (second == null) {
             first.updateCouplingAnchor(position, viewXRot, viewYRot, bogeySpacing, firstYaw, firstPitch, false);
         } else {
-            BlockPos bogeyPos = BlockPos.ORIGIN.offset(entity.getInitialOrientation().rotateYCounterclockwise(), bogeySpacing);
+            BlockPos bogeyPos = BlockPos.ZERO.relative(entity.getInitialOrientation().getCounterClockWise(), bogeySpacing);
             float secondYaw = second.yaw.getValue(tickProgress);
             float secondPitch = second.pitch.getValue(tickProgress);
             if (!state.contraption.isHiddenInPortal(bogeyPos)) {
-                Vec3d pos = second.getAnchorPosition();
+                Vec3 pos = second.getAnchorPosition();
                 int light;
                 if (pos != null) {
-                    light = getBogeyLightCoords(world, pos);
+                    light = getBogeyLightCoords(level, pos);
                 } else if (cameraLight == -1) {
-                    light = getBogeyLightCoords(world, entity.getClientCameraPosVec(tickProgress));
+                    light = getBogeyLightCoords(level, entity.getLightProbePosition(tickProgress));
                 } else {
                     light = cameraLight;
                 }
@@ -121,8 +121,8 @@ public class CarriageContraptionEntityRenderer extends OrientedContraptionEntity
     }
 
     @Override
-    public void render(CarriageContraptionState state, MatrixStack ms, OrderedRenderCommandQueue queue, CameraRenderState cameraRenderState) {
-        super.render(state, ms, queue, cameraRenderState);
+    public void submit(CarriageContraptionState state, PoseStack ms, SubmitNodeCollector queue, CameraRenderState cameraRenderState) {
+        super.submit(state, ms, queue, cameraRenderState);
         if (state.firstBogey != null) {
             state.firstBogey.render(ms, queue);
         }
@@ -131,7 +131,7 @@ public class CarriageContraptionEntityRenderer extends OrientedContraptionEntity
         }
     }
 
-    public static void translateBogey(MatrixStack ms, CarriageBogey bogey, int bogeySpacing, float viewYRot, float viewXRot, float yaw, float pitch) {
+    public static void translateBogey(PoseStack ms, CarriageBogey bogey, int bogeySpacing, float viewYRot, float viewXRot, float yaw, float pitch) {
         boolean selfUpsideDown = bogey.isUpsideDown();
         boolean leadingUpsideDown = bogey.carriage.leadingBogey().isUpsideDown();
         TransformStack.of(ms).rotateYDegrees(viewYRot + 90).rotateXDegrees(-viewXRot).rotateYDegrees(180)
@@ -140,9 +140,9 @@ public class CarriageContraptionEntityRenderer extends OrientedContraptionEntity
             .translateY(selfUpsideDown != leadingUpsideDown ? 2 : 0);
     }
 
-    public static int getBogeyLightCoords(World world, Vec3d pos) {
-        BlockPos lightPos = BlockPos.ofFloored(pos);
-        return LightmapTextureManager.pack(world.getLightLevel(LightType.BLOCK, lightPos), world.getLightLevel(LightType.SKY, lightPos));
+    public static int getBogeyLightCoords(Level world, Vec3 pos) {
+        BlockPos lightPos = BlockPos.containing(pos);
+        return LightTexture.pack(world.getBrightness(LightLayer.BLOCK, lightPos), world.getBrightness(LightLayer.SKY, lightPos));
     }
 
     public static class CarriageContraptionState extends OrientedContraptionState {
@@ -161,26 +161,26 @@ public class CarriageContraptionEntityRenderer extends OrientedContraptionEntity
         public float zRot;
         public int offsetY;
 
-        public void render(MatrixStack matrices, OrderedRenderCommandQueue queue) {
-            matrices.push();
+        public void render(PoseStack matrices, SubmitNodeCollector queue) {
+            matrices.pushPose();
             if (offsetZ != 0) {
-                matrices.multiply(RotationAxis.POSITIVE_Y.rotation(viewYRot));
-                matrices.multiply(RotationAxis.POSITIVE_X.rotation(-viewXRot));
-                matrices.multiply(RotationAxis.POSITIVE_Y.rotation(yRot));
+                matrices.mulPose(Axis.YP.rotation(viewYRot));
+                matrices.mulPose(Axis.XP.rotation(-viewXRot));
+                matrices.mulPose(Axis.YP.rotation(yRot));
                 matrices.translate(0, 0, offsetZ);
-                matrices.multiply(RotationAxis.POSITIVE_Y.rotation(-yRot));
-                matrices.multiply(RotationAxis.POSITIVE_X.rotation(viewXRot));
-                matrices.multiply(RotationAxis.POSITIVE_Y.rotation(-viewYRot));
+                matrices.mulPose(Axis.YP.rotation(-yRot));
+                matrices.mulPose(Axis.XP.rotation(viewXRot));
+                matrices.mulPose(Axis.YP.rotation(-viewYRot));
             }
-            matrices.multiply(RotationAxis.POSITIVE_Y.rotation(yaw));
-            matrices.multiply(RotationAxis.POSITIVE_X.rotation(pitch));
+            matrices.mulPose(Axis.YP.rotation(yaw));
+            matrices.mulPose(Axis.XP.rotation(pitch));
             matrices.translate(0, 0.5f, 0);
             if (zRot != 0) {
-                matrices.multiply(RotationAxis.POSITIVE_Z.rotation(zRot));
+                matrices.mulPose(Axis.ZP.rotation(zRot));
             }
             matrices.translate(0, offsetY, 0);
             data.render(matrices, queue);
-            matrices.pop();
+            matrices.popPose();
         }
 
         @Nullable
@@ -210,16 +210,16 @@ public class CarriageContraptionEntityRenderer extends OrientedContraptionEntity
             CarriageBogeyRenderState state = new CarriageBogeyRenderState();
             state.data = data;
             if (!bogey.isLeading) {
-                state.viewYRot = MathHelper.RADIANS_PER_DEGREE * (viewYRot + 90);
-                state.viewXRot = MathHelper.RADIANS_PER_DEGREE * viewXRot;
-                state.yRot = MathHelper.RADIANS_PER_DEGREE * 180;
+                state.viewYRot = Mth.DEG_TO_RAD * (viewYRot + 90);
+                state.viewXRot = Mth.DEG_TO_RAD * viewXRot;
+                state.yRot = Mth.DEG_TO_RAD * 180;
                 state.offsetZ = -bogeySpacing;
             }
-            state.yaw = MathHelper.RADIANS_PER_DEGREE * yaw;
-            state.pitch = MathHelper.RADIANS_PER_DEGREE * pitch;
+            state.yaw = Mth.DEG_TO_RAD * yaw;
+            state.pitch = Mth.DEG_TO_RAD * pitch;
             boolean selfUpsideDown = bogey.isUpsideDown();
             if (selfUpsideDown) {
-                state.zRot = MathHelper.RADIANS_PER_DEGREE * 180;
+                state.zRot = Mth.DEG_TO_RAD * 180;
             }
             boolean leadingUpsideDown = bogey.carriage.leadingBogey().isUpsideDown();
             if (selfUpsideDown != leadingUpsideDown) {

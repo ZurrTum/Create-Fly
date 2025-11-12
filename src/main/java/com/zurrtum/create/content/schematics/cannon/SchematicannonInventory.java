@@ -3,45 +3,45 @@ package com.zurrtum.create.content.schematics.cannon;
 import com.zurrtum.create.AllItems;
 import com.zurrtum.create.foundation.codec.CreateCodecs;
 import com.zurrtum.create.infrastructure.items.ItemInventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.storage.ReadView;
-import net.minecraft.storage.WriteView;
-import net.minecraft.util.collection.DefaultedList;
+import net.minecraft.core.NonNullList;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 
 public class SchematicannonInventory implements ItemInventory {
     private final SchematicannonBlockEntity blockEntity;
-    private final DefaultedList<ItemStack> stacks;
+    private final NonNullList<ItemStack> stacks;
 
     public SchematicannonInventory(SchematicannonBlockEntity blockEntity) {
         this.blockEntity = blockEntity;
-        this.stacks = DefaultedList.ofSize(5, ItemStack.EMPTY);
+        this.stacks = NonNullList.withSize(5, ItemStack.EMPTY);
     }
 
     @Override
-    public boolean isValid(int slot, ItemStack stack) {
+    public boolean canPlaceItem(int slot, ItemStack stack) {
         return switch (slot) {
             // Blueprint Slot
-            case 0 -> stack.isOf(AllItems.SCHEMATIC);
+            case 0 -> stack.is(AllItems.SCHEMATIC);
             // Blueprint output
             case 1 -> false;
             // Book input
-            case 2 -> stack.isOf(AllItems.CLIPBOARD) || stack.isOf(Items.BOOK) || stack.isOf(Items.WRITTEN_BOOK);
+            case 2 -> stack.is(AllItems.CLIPBOARD) || stack.is(Items.BOOK) || stack.is(Items.WRITTEN_BOOK);
             // Material List output
             case 3 -> false;
             // Gunpowder
-            case 4 -> stack.isOf(Items.GUNPOWDER);
+            case 4 -> stack.is(Items.GUNPOWDER);
             default -> true;
         };
     }
 
     @Override
-    public int size() {
+    public int getContainerSize() {
         return 5;
     }
 
     @Override
-    public ItemStack getStack(int slot) {
+    public ItemStack getItem(int slot) {
         if (slot >= 5) {
             return ItemStack.EMPTY;
         }
@@ -49,7 +49,7 @@ public class SchematicannonInventory implements ItemInventory {
     }
 
     @Override
-    public void setStack(int slot, ItemStack stack) {
+    public void setItem(int slot, ItemStack stack) {
         if (slot >= 5) {
             return;
         }
@@ -57,11 +57,11 @@ public class SchematicannonInventory implements ItemInventory {
     }
 
     @Override
-    public void markDirty() {
-        blockEntity.markDirty();
+    public void setChanged() {
+        blockEntity.setChanged();
     }
 
-    public void read(ReadView view) {
+    public void read(ValueInput view) {
         view.read("Inventory", CreateCodecs.ITEM_LIST_CODEC).ifPresentOrElse(
             list -> {
                 for (int i = 0, size = list.size(); i < size; i++) {
@@ -71,7 +71,7 @@ public class SchematicannonInventory implements ItemInventory {
         );
     }
 
-    public void write(WriteView view) {
-        view.put("Inventory", CreateCodecs.ITEM_LIST_CODEC, stacks);
+    public void write(ValueOutput view) {
+        view.store("Inventory", CreateCodecs.ITEM_LIST_CODEC, stacks);
     }
 }

@@ -6,7 +6,11 @@ import com.zurrtum.create.catnip.math.VecHelper;
 import com.zurrtum.create.content.trains.graph.TrackEdge;
 import com.zurrtum.create.content.trains.graph.TrackGraph;
 import com.zurrtum.create.content.trains.track.BezierConnection;
-import net.minecraft.util.math.*;
+import net.minecraft.core.BlockPos;
+import net.minecraft.util.Mth;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec2;
+import net.minecraft.world.phys.Vec3;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -21,24 +25,24 @@ public class TrackPaverV2 {
             return;
         }
 
-        Vec3d location1 = edge.node1.getLocation().getLocation();
-        Vec3d location2 = edge.node2.getLocation().getLocation();
-        Vec3d diff = location2.subtract(location1);
-        Vec3d direction = VecHelper.clampComponentWise(diff, 1);
+        Vec3 location1 = edge.node1.getLocation().getLocation();
+        Vec3 location2 = edge.node2.getLocation().getLocation();
+        Vec3 diff = location2.subtract(location1);
+        Vec3 direction = VecHelper.clampComponentWise(diff, 1);
         int extent = (int) Math.round((to - from) / direction.length());
         double length = edge.getLength();
 
-        BlockPos pos = BlockPos.ofFloored(edge.getPosition(graph, MathHelper.clamp(from, 1 / 16f, length - 1 / 16f) / length)
+        BlockPos pos = BlockPos.containing(edge.getPosition(graph, Mth.clamp(from, 1 / 16f, length - 1 / 16f) / length)
             .subtract(0, diff.y != 0 ? 1 : 0.5, 0));
 
         paveStraight(task, pos, direction, extent);
     }
 
-    public static void paveStraight(PaveTask task, BlockPos startPos, Vec3d direction, int extent) {
+    public static void paveStraight(PaveTask task, BlockPos startPos, Vec3 direction, int extent) {
         Set<BlockPos> toPlaceOn = new HashSet<>();
-        Vec3d start = VecHelper.getCenterOf(startPos);
-        Vec3d mainNormal = direction.crossProduct(new Vec3d(0, 1, 0));
-        Vec3d normalizedDirection = direction.normalize();
+        Vec3 start = VecHelper.getCenterOf(startPos);
+        Vec3 mainNormal = direction.cross(new Vec3(0, 1, 0));
+        Vec3 normalizedDirection = direction.normalize();
 
         boolean isDiagonalTrack = direction.multiply(1, 0, 1).length() > 1.125f;
         double r1 = task.getHorizontalInterval().getFirst();
@@ -46,20 +50,20 @@ public class TrackPaverV2 {
         double r2 = r1 + flip;
 
         if (isDiagonalTrack) {
-            r1 /= MathHelper.SQUARE_ROOT_OF_TWO;
-            r2 /= MathHelper.SQUARE_ROOT_OF_TWO;
+            r1 /= Mth.SQRT_OF_TWO;
+            r2 /= Mth.SQRT_OF_TWO;
         }
 
         int currentOffset = (int) (Math.abs(r1) * 2 + .5f);
         int nextOffset = (int) (Math.abs(r2) * 2 + .5f);
 
         for (int i = 0; i < extent; i++) {
-            Vec3d offset = direction.multiply(i);
-            Vec3d mainPos = start.add(offset.x, offset.y, offset.z);
-            Vec3d targetVec = mainPos.add(mainNormal.multiply(flip * (int) (currentOffset / 2.0)));
+            Vec3 offset = direction.scale(i);
+            Vec3 mainPos = start.add(offset.x, offset.y, offset.z);
+            Vec3 targetVec = mainPos.add(mainNormal.scale(flip * (int) (currentOffset / 2.0)));
 
             if (!isDiagonalTrack) {
-                toPlaceOn.add(BlockPos.ofFloored(targetVec));
+                toPlaceOn.add(BlockPos.containing(targetVec));
                 continue;
             }
 
@@ -68,15 +72,15 @@ public class TrackPaverV2 {
 
             if (placeSides) {
                 for (int side : Iterate.positiveAndNegative) {
-                    Vec3d sideOffset = normalizedDirection.multiply(side).add(mainNormal.normalize().multiply(flip)).multiply(.5);
-                    toPlaceOn.add(BlockPos.ofFloored(targetVec.add(sideOffset)));
+                    Vec3 sideOffset = normalizedDirection.scale(side).add(mainNormal.normalize().scale(flip)).scale(.5);
+                    toPlaceOn.add(BlockPos.containing(targetVec.add(sideOffset)));
                 }
             }
 
             if (placeRow) {
                 if (Math.abs(currentOffset % 2) == 1)
-                    targetVec = mainPos.add(mainNormal.multiply(flip * (int) ((currentOffset + 1) / 2.0)));
-                toPlaceOn.add(BlockPos.ofFloored(targetVec));
+                    targetVec = mainPos.add(mainNormal.scale(flip * (int) ((currentOffset + 1) / 2.0)));
+                toPlaceOn.add(BlockPos.containing(targetVec));
             }
 
         }
@@ -94,12 +98,12 @@ public class TrackPaverV2 {
         double r2 = radius + .575;
 
         double handleLength = bc.getHandleLength();
-        Vec3d start = bc.starts.getFirst().subtract(Vec3d.of(bePosition)).add(0, 3 / 16f, 0);
-        Vec3d end = bc.starts.getSecond().subtract(Vec3d.of(bePosition)).add(0, 3 / 16f, 0);
-        Vec3d startHandle = bc.axes.getFirst().multiply(handleLength).add(start);
-        Vec3d endHandle = bc.axes.getSecond().multiply(handleLength).add(end);
-        Vec3d startNormal = bc.normals.getFirst();
-        Vec3d endNormal = bc.normals.getSecond();
+        Vec3 start = bc.starts.getFirst().subtract(Vec3.atLowerCornerOf(bePosition)).add(0, 3 / 16f, 0);
+        Vec3 end = bc.starts.getSecond().subtract(Vec3.atLowerCornerOf(bePosition)).add(0, 3 / 16f, 0);
+        Vec3 startHandle = bc.axes.getFirst().scale(handleLength).add(start);
+        Vec3 endHandle = bc.axes.getSecond().scale(handleLength).add(end);
+        Vec3 startNormal = bc.normals.getFirst();
+        Vec3 endNormal = bc.normals.getSecond();
 
         int segCount = bc.getSegmentCount();
         float[] lut = bc.getStepLUT();
@@ -116,33 +120,33 @@ public class TrackPaverV2 {
             if (t > localTo)
                 continue;
 
-            Vec3d vt = VecHelper.bezier(start, end, startHandle, endHandle, t);
-            Vec3d vNormal = startNormal.equals(endNormal) ? startNormal : VecHelper.slerp(t, startNormal, endNormal);
-            Vec3d hNormal = vNormal.crossProduct(VecHelper.bezierDerivative(start, end, startHandle, endHandle, t).normalize()).normalize();
-            vt = vt.add(vNormal.multiply(-1.175f));
+            Vec3 vt = VecHelper.bezier(start, end, startHandle, endHandle, t);
+            Vec3 vNormal = startNormal.equals(endNormal) ? startNormal : VecHelper.slerp(t, startNormal, endNormal);
+            Vec3 hNormal = vNormal.cross(VecHelper.bezierDerivative(start, end, startHandle, endHandle, t).normalize()).normalize();
+            vt = vt.add(vNormal.scale(-1.175f));
 
-            Vec3d vt1 = VecHelper.bezier(start, end, startHandle, endHandle, t1);
-            Vec3d vNormal1 = startNormal.equals(endNormal) ? startNormal : VecHelper.slerp(t1, startNormal, endNormal);
-            Vec3d hNormal1 = vNormal1.crossProduct(VecHelper.bezierDerivative(start, end, startHandle, endHandle, t1).normalize()).normalize();
-            vt1 = vt1.add(vNormal1.multiply(-1.175f));
+            Vec3 vt1 = VecHelper.bezier(start, end, startHandle, endHandle, t1);
+            Vec3 vNormal1 = startNormal.equals(endNormal) ? startNormal : VecHelper.slerp(t1, startNormal, endNormal);
+            Vec3 hNormal1 = vNormal1.cross(VecHelper.bezierDerivative(start, end, startHandle, endHandle, t1).normalize()).normalize();
+            vt1 = vt1.add(vNormal1.scale(-1.175f));
 
-            Vec3d a3 = vt.add(hNormal.multiply(r2));
-            Vec3d b3 = vt1.add(hNormal1.multiply(r2));
-            Vec3d c3 = vt1.add(hNormal1.multiply(r1));
-            Vec3d d3 = vt.add(hNormal.multiply(r1));
+            Vec3 a3 = vt.add(hNormal.scale(r2));
+            Vec3 b3 = vt1.add(hNormal1.scale(r2));
+            Vec3 c3 = vt1.add(hNormal1.scale(r1));
+            Vec3 d3 = vt.add(hNormal.scale(r1));
 
-            Vec2f a = vec2(a3);
-            Vec2f b = vec2(b3);
-            Vec2f c = vec2(c3);
-            Vec2f d = vec2(d3);
+            Vec2 a = vec2(a3);
+            Vec2 b = vec2(b3);
+            Vec2 c = vec2(c3);
+            Vec2 d = vec2(d3);
 
-            Box aabb = new Box(a3, b3).union(new Box(c3, d3));
+            AABB aabb = new AABB(a3, b3).minmax(new AABB(c3, d3));
 
             double y = vt.add(vt1).y / 2f;
-            for (int scanX = MathHelper.floor(aabb.minX); scanX <= aabb.maxX; scanX++) {
-                for (int scanZ = MathHelper.floor(aabb.minZ); scanZ <= aabb.maxZ; scanZ++) {
+            for (int scanX = Mth.floor(aabb.minX); scanX <= aabb.maxX; scanX++) {
+                for (int scanZ = Mth.floor(aabb.minZ); scanZ <= aabb.maxZ; scanZ++) {
 
-                    Vec2f p = new Vec2f(scanX + .5f, scanZ + .5f);
+                    Vec2 p = new Vec2(scanX + .5f, scanZ + .5f);
                     if (!isInTriangle(a, b, c, p) && !isInTriangle(a, c, d, p))
                         continue;
 
@@ -160,17 +164,17 @@ public class TrackPaverV2 {
 
         for (Map.Entry<Pair<Integer, Integer>, Double> entry : yLevels.entrySet()) {
             double yValue = entry.getValue();
-            int floor = MathHelper.floor(yValue);
-            BlockPos targetPos = new BlockPos(entry.getKey().getFirst(), floor, entry.getKey().getSecond()).add(bePosition);
+            int floor = Mth.floor(yValue);
+            BlockPos targetPos = new BlockPos(entry.getKey().getFirst(), floor, entry.getKey().getSecond()).offset(bePosition);
             task.put(targetPos.getX(), targetPos.getZ(), targetPos.getY() + (yValue - floor >= .5 ? .5f : 0));
         }
     }
 
-    private static Vec2f vec2(Vec3d vec3) {
-        return new Vec2f((float) vec3.x, (float) vec3.z);
+    private static Vec2 vec2(Vec3 vec3) {
+        return new Vec2((float) vec3.x, (float) vec3.z);
     }
 
-    private static boolean isInTriangle(Vec2f a, Vec2f b, Vec2f c, Vec2f p) {
+    private static boolean isInTriangle(Vec2 a, Vec2 b, Vec2 c, Vec2 p) {
         float pcx = p.x - c.x;
         float pcy = p.y - c.y;
         float cbx = c.x - b.x;
@@ -181,7 +185,7 @@ public class TrackPaverV2 {
         return d < 0 ? s <= 0 && t <= 0 && s + t >= d : s >= 0 && t >= 0 && s + t <= d;
     }
 
-    public static double lineToPointDiff2d(Vec3d l1, Vec3d l2, Vec3d p) {
+    public static double lineToPointDiff2d(Vec3 l1, Vec3 l2, Vec3 p) {
         return Math.abs((l2.x - l1.x) * (l1.z - p.z) - (l1.x - p.x) * (l2.z - l1.z));
     }
 

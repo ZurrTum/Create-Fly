@@ -4,11 +4,11 @@ import com.zurrtum.create.AllDataComponents;
 import com.zurrtum.create.foundation.gui.menu.HeldItemGhostItemMenu;
 import com.zurrtum.create.foundation.gui.menu.MenuType;
 import com.zurrtum.create.foundation.item.ItemHelper;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.item.ItemStack;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.item.ItemStack;
 
 public abstract class AbstractFilterMenu extends HeldItemGhostItemMenu {
-    protected AbstractFilterMenu(MenuType<ItemStack> type, int id, PlayerInventory inv, ItemStack contentHolder) {
+    protected AbstractFilterMenu(MenuType<ItemStack> type, int id, Inventory inv, ItemStack contentHolder) {
         super(type, id, inv, contentHolder);
     }
 

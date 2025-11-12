@@ -1,6 +1,6 @@
 package com.zurrtum.create.client.vanillin;
 
-import net.minecraft.util.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -10,8 +10,8 @@ public class Vanillin {
     public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
     public static final Logger CONFIG_LOGGER = LoggerFactory.getLogger(MOD_ID + "/config");
 
-    public static Identifier rl(String path) {
-        return Identifier.of(MOD_ID, path);
+    public static ResourceLocation rl(String path) {
+        return ResourceLocation.fromNamespaceAndPath(MOD_ID, path);
     }
 
     public void onInitializeClient() {

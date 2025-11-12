@@ -5,12 +5,12 @@ import com.mojang.datafixers.util.Pair;
 import com.zurrtum.create.client.flywheel.backend.glsl.span.Span;
 import com.zurrtum.create.client.flywheel.backend.glsl.span.StringSpan;
 import com.zurrtum.create.client.flywheel.lib.util.ResourceUtil;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.InvalidIdentifierException;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 import java.util.function.Function;
+import net.minecraft.ResourceLocationException;
+import net.minecraft.resources.ResourceLocation;
 
 /**
  * Immutable class representing a shader file.
@@ -20,7 +20,7 @@ import java.util.function.Function;
  * </p>
  */
 public class SourceFile implements SourceComponent {
-    public final Identifier name;
+    public final ResourceLocation name;
 
     public final SourceLines source;
 
@@ -33,7 +33,7 @@ public class SourceFile implements SourceComponent {
 
     public final String finalSource;
 
-    private SourceFile(Identifier name, SourceLines source, ImmutableList<Import> imports, List<SourceFile> included, String finalSource) {
+    private SourceFile(ResourceLocation name, SourceLines source, ImmutableList<Import> imports, List<SourceFile> included, String finalSource) {
         this.name = name;
         this.source = source;
         this.imports = imports;
@@ -41,11 +41,11 @@ public class SourceFile implements SourceComponent {
         this.finalSource = finalSource;
     }
 
-    public static LoadResult empty(Identifier name) {
+    public static LoadResult empty(ResourceLocation name) {
         return new LoadResult.Success(new SourceFile(name, new SourceLines(name, ""), ImmutableList.of(), ImmutableList.of(), ""));
     }
 
-    public static LoadResult parse(Function<Identifier, LoadResult> sourceFinder, Identifier name, String stringSource) {
+    public static LoadResult parse(Function<ResourceLocation, LoadResult> sourceFinder, ResourceLocation name, String stringSource) {
         var source = new SourceLines(name, stringSource);
 
         var imports = Import.parseImports(source);
@@ -61,10 +61,10 @@ public class SourceFile implements SourceComponent {
                 continue;
             }
 
-            Identifier location;
+            ResourceLocation location;
             try {
                 location = ResourceUtil.parseFlywheelDefault(string);
-            } catch (InvalidIdentifierException e) {
+            } catch (ResourceLocationException e) {
                 failures.add(Pair.of(fileSpan, new LoadError.MalformedInclude(e)));
                 continue;
             }

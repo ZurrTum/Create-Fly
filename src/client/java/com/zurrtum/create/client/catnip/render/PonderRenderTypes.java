@@ -1,120 +1,120 @@
 package com.zurrtum.create.client.catnip.render;
 
 import com.zurrtum.create.client.ponder.enums.PonderSpecialTextures;
-import net.minecraft.client.gl.RenderPipelines;
-import net.minecraft.client.render.RenderLayer;
-import net.minecraft.client.render.RenderLayer.MultiPhaseParameters;
-import net.minecraft.client.render.RenderPhase;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.Util;
-
 import java.util.function.BiFunction;
 import java.util.function.Function;
+import net.minecraft.Util;
+import net.minecraft.client.renderer.RenderPipelines;
+import net.minecraft.client.renderer.RenderStateShard;
+import net.minecraft.client.renderer.RenderStateShard.TextureStateShard;
+import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.RenderType.CompositeState;
+import net.minecraft.resources.ResourceLocation;
 
 import static com.zurrtum.create.client.ponder.Ponder.MOD_ID;
-import static net.minecraft.client.render.RenderPhase.*;
+import static net.minecraft.client.renderer.RenderStateShard.*;
 
 public class PonderRenderTypes {
-    private static final Function<Identifier, RenderLayer> GUI_TEXTURED = Util.memoize(texture -> RenderLayer.of(
+    private static final Function<ResourceLocation, RenderType> GUI_TEXTURED = Util.memoize(texture -> RenderType.create(
         createLayerName("gui_textured"),
         786432,
         false,
         false,
         RenderPipelines.GUI_TEXTURED,
-        MultiPhaseParameters.builder().texture(new RenderPhase.Texture(texture, false)).build(false)
+        CompositeState.builder().setTextureState(new RenderStateShard.TextureStateShard(texture, false)).createCompositeState(false)
     ));
-    private static final RenderLayer GUI = RenderLayer.of(
+    private static final RenderType GUI = RenderType.create(
         createLayerName("gui"),
         786432,
         false,
         false,
         RenderPipelines.GUI,
-        MultiPhaseParameters.builder().build(false)
+        CompositeState.builder().createCompositeState(false)
     );
-    private static final RenderLayer.MultiPhase GUI_INVERT = RenderLayer.of(
+    private static final RenderType.CompositeRenderType GUI_INVERT = RenderType.create(
         "gui_text_highlight",
         1536,
         false,
         false,
         RenderPipelines.GUI_INVERT,
-        MultiPhaseParameters.builder().build(false)
+        CompositeState.builder().createCompositeState(false)
     );
-    private static final RenderLayer.MultiPhase GUI_TEXT_HIGHLIGHT = RenderLayer.of(
+    private static final RenderType.CompositeRenderType GUI_TEXT_HIGHLIGHT = RenderType.create(
         "gui_text_highlight",
         1536,
         false,
         false,
         RenderPipelines.GUI_TEXT_HIGHLIGHT,
-        MultiPhaseParameters.builder().build(false)
+        CompositeState.builder().createCompositeState(false)
     );
-    private static final RenderLayer TRANSLUCENT = RenderLayer.of(
+    private static final RenderType TRANSLUCENT = RenderType.create(
         createLayerName("translucent"),
         786432,
         true,
         true,
         RenderPipelines.TRANSLUCENT,
-        MultiPhaseParameters.builder().lightmap(ENABLE_LIGHTMAP).texture(MIPMAP_BLOCK_ATLAS_TEXTURE).target(ITEM_ENTITY_TARGET).build(true)
+        CompositeState.builder().setLightmapState(LIGHTMAP).setTextureState(BLOCK_SHEET_MIPPED).setOutputState(ITEM_ENTITY_TARGET).createCompositeState(true)
     );
 
-    private static final RenderLayer OUTLINE_SOLID = RenderLayer.of(
+    private static final RenderType OUTLINE_SOLID = RenderType.create(
         createLayerName("outline_solid"),
         256,
         false,
         false,
         RenderPipelines.ENTITY_SOLID,
-        MultiPhaseParameters.builder().texture(new Texture(PonderSpecialTextures.BLANK.getLocation(), false)).lightmap(ENABLE_LIGHTMAP)
-            .overlay(ENABLE_OVERLAY_COLOR).build(false)
+        CompositeState.builder().setTextureState(new TextureStateShard(PonderSpecialTextures.BLANK.getLocation(), false)).setLightmapState(LIGHTMAP)
+            .setOverlayState(OVERLAY).createCompositeState(false)
     );
 
-    private static final BiFunction<Identifier, Boolean, RenderLayer> OUTLINE_TRANSLUCENT = Util.memoize((texture, cull) -> RenderLayer.of(
+    private static final BiFunction<ResourceLocation, Boolean, RenderType> OUTLINE_TRANSLUCENT = Util.memoize((texture, cull) -> RenderType.create(
         createLayerName("outline_translucent" + (cull ? "_cull" : "")),
         256,
         false,
         true,
         cull ? PonderRenderPipelines.RENDERTYPE_ITEM_ENTITY_TRANSLUCENT_CULL : PonderRenderPipelines.ENTITY_TRANSLUCENT,
-        MultiPhaseParameters.builder().texture(new Texture(texture, false)).lightmap(ENABLE_LIGHTMAP).overlay(ENABLE_OVERLAY_COLOR)
-            .target(ITEM_ENTITY_TARGET).build(false)
+        CompositeState.builder().setTextureState(new TextureStateShard(texture, false)).setLightmapState(LIGHTMAP).setOverlayState(OVERLAY)
+            .setOutputState(ITEM_ENTITY_TARGET).createCompositeState(false)
     ));
 
-    private static final RenderLayer FLUID = RenderLayer.of(
+    private static final RenderType FLUID = RenderType.create(
         createLayerName("fluid"),
         256,
         false,
         true,
         RenderPipelines.TRANSLUCENT,
-        MultiPhaseParameters.builder().texture(MIPMAP_BLOCK_ATLAS_TEXTURE).lightmap(ENABLE_LIGHTMAP).target(ITEM_ENTITY_TARGET).build(true)
+        CompositeState.builder().setTextureState(BLOCK_SHEET_MIPPED).setLightmapState(LIGHTMAP).setOutputState(ITEM_ENTITY_TARGET).createCompositeState(true)
     );
 
-    public static RenderLayer getGui() {
+    public static RenderType getGui() {
         return GUI;
     }
 
-    public static RenderLayer getGuiInvert() {
+    public static RenderType getGuiInvert() {
         return GUI_INVERT;
     }
 
-    public static RenderLayer getGuiTextHighlight() {
+    public static RenderType getGuiTextHighlight() {
         return GUI_TEXT_HIGHLIGHT;
     }
 
-    public static RenderLayer getGuiTextured(Identifier texture) {
+    public static RenderType getGuiTextured(ResourceLocation texture) {
         return GUI_TEXTURED.apply(texture);
     }
 
-    public static RenderLayer translucent() {
+    public static RenderType translucent() {
         return TRANSLUCENT;
     }
 
-    public static RenderLayer outlineSolid() {
+    public static RenderType outlineSolid() {
         return OUTLINE_SOLID;
     }
 
-    public static RenderLayer outlineTranslucent(Identifier texture, boolean cull) {
+    public static RenderType outlineTranslucent(ResourceLocation texture, boolean cull) {
         return OUTLINE_TRANSLUCENT.apply(texture, cull);
     }
 
     //TODO vanilla uses the translucent render type for fluids, need to investigate if this is even needed
-    public static RenderLayer fluid() {
+    public static RenderType fluid() {
         return FLUID;
     }
 

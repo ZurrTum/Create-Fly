@@ -3,13 +3,13 @@ package com.zurrtum.create.infrastructure.packet.s2c;
 import com.zurrtum.create.AllClientHandle;
 import com.zurrtum.create.AllPackets;
 import io.netty.buffer.ByteBuf;
-import net.minecraft.network.codec.PacketCodec;
-import net.minecraft.network.packet.PacketType;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.PacketType;
 import org.apache.logging.log4j.util.TriConsumer;
 
 public record WiFiEffectPacket(BlockPos pos) implements S2CPacket {
-    public static final PacketCodec<ByteBuf, WiFiEffectPacket> CODEC = BlockPos.PACKET_CODEC.xmap(WiFiEffectPacket::new, WiFiEffectPacket::pos);
+    public static final StreamCodec<ByteBuf, WiFiEffectPacket> CODEC = BlockPos.STREAM_CODEC.map(WiFiEffectPacket::new, WiFiEffectPacket::pos);
 
     @Override
     public boolean runInMain() {
@@ -17,7 +17,7 @@ public record WiFiEffectPacket(BlockPos pos) implements S2CPacket {
     }
 
     @Override
-    public PacketType<WiFiEffectPacket> getPacketType() {
+    public PacketType<WiFiEffectPacket> type() {
         return AllPackets.PACKAGER_LINK_EFFECT;
     }
 

@@ -9,34 +9,34 @@ import com.zurrtum.create.AllItemAttributeTypes;
 import com.zurrtum.create.content.logistics.item.filter.attribute.ItemAttribute;
 import com.zurrtum.create.content.logistics.item.filter.attribute.ItemAttributeType;
 import io.netty.buffer.ByteBuf;
-import net.minecraft.component.DataComponentTypes;
-import net.minecraft.item.ItemStack;
-import net.minecraft.network.RegistryByteBuf;
-import net.minecraft.network.codec.PacketCodec;
-import net.minecraft.network.codec.PacketCodecs;
-import net.minecraft.text.Text;
-import net.minecraft.text.TextCodecs;
-import net.minecraft.world.World;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.ComponentSerialization;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
 
 public record ItemNameAttribute(String itemName) implements ItemAttribute {
     public static final MapCodec<ItemNameAttribute> CODEC = Codec.STRING.xmap(ItemNameAttribute::new, ItemNameAttribute::itemName).fieldOf("value");
 
-    public static final PacketCodec<ByteBuf, ItemNameAttribute> PACKET_CODEC = PacketCodecs.STRING.xmap(
+    public static final StreamCodec<ByteBuf, ItemNameAttribute> PACKET_CODEC = ByteBufCodecs.STRING_UTF8.map(
         ItemNameAttribute::new,
         ItemNameAttribute::itemName
     );
 
-    private static String extractCustomName(ItemStack stack, World level) {
-        if (stack.contains(DataComponentTypes.CUSTOM_NAME)) {
+    private static String extractCustomName(ItemStack stack, Level level) {
+        if (stack.has(DataComponents.CUSTOM_NAME)) {
             try {
-                String customName = stack.getOrDefault(DataComponentTypes.CUSTOM_NAME, Text.empty()).getString();
-                Optional<Text> component = TextCodecs.CODEC.parse(
-                    level.getRegistryManager().getOps(JsonOps.INSTANCE),
+                String customName = stack.getOrDefault(DataComponents.CUSTOM_NAME, Component.empty()).getString();
+                Optional<Component> component = ComponentSerialization.CODEC.parse(
+                    level.registryAccess().createSerializationContext(JsonOps.INSTANCE),
                     JsonParser.parseString(customName.isEmpty() ? "\"\"" : customName)
                 ).result();
                 if (component.isPresent()) {
@@ -49,7 +49,7 @@ public record ItemNameAttribute(String itemName) implements ItemAttribute {
     }
 
     @Override
-    public boolean appliesTo(ItemStack itemStack, World level) {
+    public boolean appliesTo(ItemStack itemStack, Level level) {
         return extractCustomName(itemStack, level).equals(itemName);
     }
 
@@ -75,7 +75,7 @@ public record ItemNameAttribute(String itemName) implements ItemAttribute {
         }
 
         @Override
-        public List<ItemAttribute> getAllAttributes(ItemStack stack, World level) {
+        public List<ItemAttribute> getAllAttributes(ItemStack stack, Level level) {
             List<ItemAttribute> list = new ArrayList<>();
 
             String name = extractCustomName(stack, level);
@@ -92,7 +92,7 @@ public record ItemNameAttribute(String itemName) implements ItemAttribute {
         }
 
         @Override
-        public PacketCodec<? super RegistryByteBuf, ? extends ItemAttribute> packetCodec() {
+        public StreamCodec<? super RegistryFriendlyByteBuf, ? extends ItemAttribute> packetCodec() {
             return PACKET_CODEC;
         }
     }

@@ -1,5 +1,8 @@
 package com.zurrtum.create.client.content.trains.display;
 
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
+import com.mojang.math.Axis;
 import com.zurrtum.create.catnip.math.AngleHelper;
 import com.zurrtum.create.client.AllPartialModels;
 import com.zurrtum.create.client.catnip.animation.AnimationTickHolder;
@@ -11,29 +14,26 @@ import com.zurrtum.create.content.trains.display.FlapDisplayBlock;
 import com.zurrtum.create.content.trains.display.FlapDisplayBlockEntity;
 import com.zurrtum.create.content.trains.display.FlapDisplayLayout;
 import com.zurrtum.create.content.trains.display.FlapDisplaySection;
-import net.minecraft.client.font.BakedGlyph;
-import net.minecraft.client.font.GlyphProvider;
-import net.minecraft.client.font.TextDrawable;
-import net.minecraft.client.font.TextRenderer;
-import net.minecraft.client.font.TextRenderer.TextLayerType;
-import net.minecraft.client.render.LightmapTextureManager;
-import net.minecraft.client.render.RenderLayer;
-import net.minecraft.client.render.VertexConsumer;
-import net.minecraft.client.render.block.entity.BlockEntityRendererFactory;
-import net.minecraft.client.render.block.entity.state.BlockEntityRenderState;
-import net.minecraft.client.render.command.ModelCommandRenderer;
-import net.minecraft.client.render.command.OrderedRenderCommandQueue;
-import net.minecraft.client.render.state.CameraRenderState;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.text.CharacterVisitor;
-import net.minecraft.text.Style;
-import net.minecraft.text.TextColor;
-import net.minecraft.text.TextVisitFactory;
-import net.minecraft.util.DyeColor;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.RotationAxis;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.World;
+import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.Font.DisplayMode;
+import net.minecraft.client.gui.GlyphSource;
+import net.minecraft.client.gui.font.TextRenderable;
+import net.minecraft.client.gui.font.glyphs.BakedGlyph;
+import net.minecraft.client.renderer.LightTexture;
+import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.SubmitNodeCollector;
+import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
+import net.minecraft.client.renderer.blockentity.state.BlockEntityRenderState;
+import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
+import net.minecraft.client.renderer.state.CameraRenderState;
+import net.minecraft.network.chat.Style;
+import net.minecraft.network.chat.TextColor;
+import net.minecraft.util.FormattedCharSink;
+import net.minecraft.util.Mth;
+import net.minecraft.util.StringDecomposer;
+import net.minecraft.world.item.DyeColor;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix4f;
 
@@ -44,11 +44,11 @@ import java.util.Map;
 import java.util.function.Consumer;
 
 public class FlapDisplayRenderer extends KineticBlockEntityRenderer<FlapDisplayBlockEntity, FlapDisplayRenderer.FlapDisplayRenderState> {
-    protected final TextRenderer textRenderer;
+    protected final Font textRenderer;
 
-    public FlapDisplayRenderer(BlockEntityRendererFactory.Context context) {
+    public FlapDisplayRenderer(BlockEntityRendererProvider.Context context) {
         super(context);
-        textRenderer = context.textRenderer();
+        textRenderer = context.font();
     }
 
     @Override
@@ -57,30 +57,30 @@ public class FlapDisplayRenderer extends KineticBlockEntityRenderer<FlapDisplayB
     }
 
     @Override
-    public void updateRenderState(
+    public void extractRenderState(
         FlapDisplayBlockEntity be,
         FlapDisplayRenderState state,
         float tickProgress,
-        Vec3d cameraPos,
-        ModelCommandRenderer.@Nullable CrumblingOverlayCommand crumblingOverlay
+        Vec3 cameraPos,
+        @Nullable ModelFeatureRenderer.CrumblingOverlay crumblingOverlay
     ) {
-        super.updateRenderState(be, state, tickProgress, cameraPos, crumblingOverlay);
+        super.extractRenderState(be, state, tickProgress, cameraPos, crumblingOverlay);
         if (!be.isController) {
             return;
         }
         if (state.support) {
-            BlockEntityRenderState.updateBlockEntityRenderState(be, state, crumblingOverlay);
+            BlockEntityRenderState.extractBase(be, state, crumblingOverlay);
         }
         FlapDisplayData display = new FlapDisplayData();
         List<FlapDisplayLayout> lines = be.getLines();
         boolean paused = !be.isSpeedRequirementFulfilled();
-        World world = be.getWorld();
+        Level world = be.getLevel();
         int levelTicks = AnimationTickHolder.getTicks(world);
         int ticks = paused ? 0 : levelTicks;
         float time = paused ? 0 : AnimationTickHolder.getRenderTime(world);
         int size = lines.size();
         float y = 4.5f;
-        int light = state.lightmapCoordinates;
+        int light = state.lightCoords;
         for (int j = 0; j < size; j++) {
             List<FlapDisplaySection> line = lines.get(j).getSections();
             int color = getLineColor(be, j);
@@ -109,20 +109,20 @@ public class FlapDisplayRenderer extends KineticBlockEntityRenderer<FlapDisplayB
                 FlapDisplaySection section = line.get(i);
                 renderOutput.nextSection(section, margin + offsets[i]);
                 String text = section.renderCharsIndividually() || !section.spinning[0] ? section.text : section.cyclingOptions[((levelTicks / 3) + i * 13) % section.cyclingOptions.length];
-                TextVisitFactory.visitFormatted(text, Style.EMPTY, renderOutput);
+                StringDecomposer.iterateFormatted(text, Style.EMPTY, renderOutput);
             }
             y += 16;
         }
         if (display.isEmpty()) {
             return;
         }
-        display.yRot = MathHelper.RADIANS_PER_DEGREE * AngleHelper.horizontalAngle(state.blockState.get(FlapDisplayBlock.HORIZONTAL_FACING));
+        display.yRot = Mth.DEG_TO_RAD * AngleHelper.horizontalAngle(state.blockState.getValue(FlapDisplayBlock.HORIZONTAL_FACING));
         state.display = display;
     }
 
     @Override
-    public void render(FlapDisplayRenderState state, MatrixStack matrices, OrderedRenderCommandQueue queue, CameraRenderState cameraState) {
-        super.render(state, matrices, queue, cameraState);
+    public void submit(FlapDisplayRenderState state, PoseStack matrices, SubmitNodeCollector queue, CameraRenderState cameraState) {
+        super.submit(state, matrices, queue, cameraState);
         if (state.display != null) {
             state.display.render(matrices, queue);
         }
@@ -133,8 +133,8 @@ public class FlapDisplayRenderer extends KineticBlockEntityRenderer<FlapDisplayB
         return color == null ? 0xFF_D3C6BA : DyeHelper.getDyeColors(color).getFirst() | 0xFF_000000;
     }
 
-    public static class FlapDisplayRenderOutput implements CharacterVisitor {
-        final TextRenderer textRenderer;
+    public static class FlapDisplayRenderOutput implements FormattedCharSink {
+        final Font textRenderer;
         final int color;
         final int r, g, b, a;
         final boolean paused;
@@ -142,21 +142,21 @@ public class FlapDisplayRenderer extends KineticBlockEntityRenderer<FlapDisplayB
         final float time;
         final int lineIndex;
         final float y;
-        final Consumer<TextDrawable> consumer;
+        final Consumer<TextRenderable> consumer;
 
         FlapDisplaySection section;
         float x;
 
         public FlapDisplayRenderOutput(
             float y,
-            TextRenderer textRenderer,
+            Font textRenderer,
             int color,
             int lineIndex,
             boolean paused,
             int ticks,
             float time,
             boolean glowing,
-            Consumer<TextDrawable> consumer
+            Consumer<TextRenderable> consumer
         ) {
             this.y = y;
             this.textRenderer = textRenderer;
@@ -194,9 +194,9 @@ public class FlapDisplayRenderer extends KineticBlockEntityRenderer<FlapDisplayB
                 }
             }
 
-            GlyphProvider glyphProvider = textRenderer.getGlyphs(style.getFont());
-            BakedGlyph bakedglyph = glyphProvider.get(glyph);
-            float glyphWidth = bakedglyph.getMetrics().getAdvance(false);
+            GlyphSource glyphProvider = textRenderer.getGlyphSource(style.getFont());
+            BakedGlyph bakedglyph = glyphProvider.getGlyph(glyph);
+            float glyphWidth = bakedglyph.info().getAdvance(false);
 
             boolean obfuscated = style.isObfuscated();
             if (!section.renderCharsIndividually() && section.spinning[0]) {
@@ -217,7 +217,7 @@ public class FlapDisplayRenderer extends KineticBlockEntityRenderer<FlapDisplayB
                         }
                     }
                     if (oldGlyph != glyph) {
-                        bakedglyph = glyphProvider.get(glyph);
+                        bakedglyph = glyphProvider.getGlyph(glyph);
                     }
                 }
                 if (canDim && ticks % 3 != 1) {
@@ -226,12 +226,12 @@ public class FlapDisplayRenderer extends KineticBlockEntityRenderer<FlapDisplayB
             }
 
             if (obfuscated && glyph != 32) {
-                bakedglyph = glyphProvider.getObfuscated(textRenderer.random, MathHelper.ceil(glyphWidth));
+                bakedglyph = glyphProvider.getRandomGlyph(textRenderer.random, Mth.ceil(glyphWidth));
             }
 
             int drawColor = a;
             if (textcolor != null) {
-                drawColor |= textcolor.getRgb();
+                drawColor |= textcolor.getValue();
             } else if (dim) {
                 drawColor |= (r * 0xC0 >> 8 << 16) | (g * 0xC0 >> 8 << 8) | (b * 0xC0 >> 8);
             } else {
@@ -243,7 +243,7 @@ public class FlapDisplayRenderer extends KineticBlockEntityRenderer<FlapDisplayB
             if (section.renderCharsIndividually()) {
                 x += (standardWidth - glyphWidth) / 2f;
             }
-            TextDrawable textDrawable = bakedglyph.create(x, y, drawColor, 0, style, 0, 0);
+            TextRenderable textDrawable = bakedglyph.createGlyph(x, y, drawColor, 0, style, 0, 0);
             if (textDrawable != null) {
                 consumer.accept(textDrawable);
             }
@@ -261,12 +261,12 @@ public class FlapDisplayRenderer extends KineticBlockEntityRenderer<FlapDisplayB
         return CachedBuffers.partialFacingVertical(
             AllPartialModels.SHAFTLESS_COGWHEEL,
             state.blockState,
-            state.blockState.get(FlapDisplayBlock.HORIZONTAL_FACING)
+            state.blockState.getValue(FlapDisplayBlock.HORIZONTAL_FACING)
         );
     }
 
     @Override
-    public boolean rendersOutsideBoundingBox() {
+    public boolean shouldRenderOffScreen() {
         //        return be.isController;
         return true;
     }
@@ -276,22 +276,22 @@ public class FlapDisplayRenderer extends KineticBlockEntityRenderer<FlapDisplayB
     }
 
     public static class FlapDisplayData {
-        public Map<RenderLayer, TextRenderState> map = new IdentityHashMap<>();
+        public Map<RenderType, TextRenderState> map = new IdentityHashMap<>();
         public float yRot;
 
-        public void add(int light, boolean glowing, TextDrawable textDrawable) {
-            map.computeIfAbsent(textDrawable.getRenderLayer(TextLayerType.NORMAL), layer -> new TextRenderState(light)).add(glowing, textDrawable);
+        public void add(int light, boolean glowing, TextRenderable textDrawable) {
+            map.computeIfAbsent(textDrawable.renderType(DisplayMode.NORMAL), layer -> new TextRenderState(light)).add(glowing, textDrawable);
         }
 
-        public void render(MatrixStack matrices, OrderedRenderCommandQueue queue) {
-            matrices.push();
+        public void render(PoseStack matrices, SubmitNodeCollector queue) {
+            matrices.pushPose();
             matrices.translate(0.5f, 0.5f, 0.5f);
-            matrices.multiply(RotationAxis.POSITIVE_Y.rotation(yRot));
+            matrices.mulPose(Axis.YP.rotation(yRot));
             matrices.translate(-0.5f, 0.5f, 0.3125f);
             matrices.scale(0.03125f, -0.03125f, 0.03125f);
             matrices.translate(0, 0, 0.5f);
-            map.forEach((layer, state) -> queue.submitCustom(matrices, layer, state));
-            matrices.pop();
+            map.forEach((layer, state) -> queue.submitCustomGeometry(matrices, layer, state));
+            matrices.popPose();
         }
 
         public boolean isEmpty() {
@@ -299,16 +299,16 @@ public class FlapDisplayRenderer extends KineticBlockEntityRenderer<FlapDisplayB
         }
     }
 
-    public static class TextRenderState implements OrderedRenderCommandQueue.Custom {
-        public List<TextDrawable> glowingText = new ArrayList<>();
-        public List<TextDrawable> normalText = new ArrayList<>();
+    public static class TextRenderState implements SubmitNodeCollector.CustomGeometryRenderer {
+        public List<TextRenderable> glowingText = new ArrayList<>();
+        public List<TextRenderable> normalText = new ArrayList<>();
         public int light;
 
         public TextRenderState(int light) {
             this.light = light;
         }
 
-        public void add(boolean glowing, TextDrawable textDrawable) {
+        public void add(boolean glowing, TextRenderable textDrawable) {
             if (glowing) {
                 glowingText.add(textDrawable);
             } else {
@@ -317,12 +317,12 @@ public class FlapDisplayRenderer extends KineticBlockEntityRenderer<FlapDisplayB
         }
 
         @Override
-        public void render(MatrixStack.Entry matricesEntry, VertexConsumer vertexConsumer) {
-            Matrix4f pose = matricesEntry.getPositionMatrix();
-            for (TextDrawable glyph : glowingText) {
-                glyph.render(pose, vertexConsumer, LightmapTextureManager.MAX_LIGHT_COORDINATE, true);
+        public void render(PoseStack.Pose matricesEntry, VertexConsumer vertexConsumer) {
+            Matrix4f pose = matricesEntry.pose();
+            for (TextRenderable glyph : glowingText) {
+                glyph.render(pose, vertexConsumer, LightTexture.FULL_BRIGHT, true);
             }
-            for (TextDrawable glyph : normalText) {
+            for (TextRenderable glyph : normalText) {
                 glyph.render(pose, vertexConsumer, light, true);
             }
         }

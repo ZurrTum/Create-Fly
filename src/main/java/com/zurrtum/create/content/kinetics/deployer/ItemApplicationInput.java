@@ -1,11 +1,11 @@
 package com.zurrtum.create.content.kinetics.deployer;
 
-import net.minecraft.item.ItemStack;
-import net.minecraft.recipe.input.RecipeInput;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.RecipeInput;
 
 public record ItemApplicationInput(ItemStack target, ItemStack ingredient) implements RecipeInput {
     @Override
-    public ItemStack getStackInSlot(int slot) {
+    public ItemStack getItem(int slot) {
         return switch (slot) {
             case 0 -> target;
             case 1 -> ingredient;

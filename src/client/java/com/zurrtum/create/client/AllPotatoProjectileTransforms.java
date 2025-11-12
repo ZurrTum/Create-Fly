@@ -8,8 +8,8 @@ import com.zurrtum.create.content.equipment.potatoCannon.AllPotatoProjectileRend
 import com.zurrtum.create.content.equipment.potatoCannon.AllPotatoProjectileRenderModes.StuckToEntity;
 import com.zurrtum.create.content.equipment.potatoCannon.AllPotatoProjectileRenderModes.TowardMotion;
 import com.zurrtum.create.content.equipment.potatoCannon.AllPotatoProjectileRenderModes.Tumble;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.Mth;
+import net.minecraft.world.phys.Vec3;
 
 import java.util.IdentityHashMap;
 import java.util.Map;
@@ -26,35 +26,35 @@ public class AllPotatoProjectileTransforms {
         ALL.put(renderMode, transform);
     }
 
-    @SuppressWarnings("SuspiciousNameCombination")
     public static void register() {
         register(
             Billboard.class, (mode, ms, state) -> {
-                Vec3d p1 = state.camera.getCameraPosVec(state.pt);
-                Vec3d diff = state.box.getCenter().subtract(p1);
+                Vec3 p1 = state.camera.getEyePosition(state.pt);
+                Vec3 diff = state.box.getCenter().subtract(p1);
 
-                TransformStack.of(ms).rotateYDegrees(AngleHelper.deg(MathHelper.atan2(diff.x, diff.z)) + 180)
-                    .rotateXDegrees(AngleHelper.deg(MathHelper.atan2(diff.y, MathHelper.sqrt((float) (diff.x * diff.x + diff.z * diff.z)))));
+                TransformStack.of(ms).rotateYDegrees(AngleHelper.deg(Mth.atan2(diff.x, diff.z)) + 180)
+                    .rotateXDegrees(AngleHelper.deg(Mth.atan2(diff.y, Mth.sqrt((float) (diff.x * diff.x + diff.z * diff.z)))));
             }
         );
         register(
             Tumble.class, (mode, ms, state) -> {
                 get(Billboard.INSTANCE).transform(Billboard.INSTANCE, ms, state);
-                TransformStack.of(ms).rotateZDegrees(state.age * 2 * (state.hash % 16)).rotateXDegrees(state.age * (state.hash % 32));
+                TransformStack.of(ms).rotateZDegrees(state.ageInTicks * 2 * (state.hash % 16)).rotateXDegrees(state.ageInTicks * (state.hash % 32));
             }
         );
         register(
             TowardMotion.class, (mode, ms, state) -> {
-                Vec3d diff = state.velocity;
-                TransformStack.of(ms).rotateYDegrees(AngleHelper.deg(MathHelper.atan2(diff.x, diff.z)))
-                    .rotateXDegrees(270 + AngleHelper.deg(MathHelper.atan2(diff.y, -MathHelper.sqrt((float) (diff.x * diff.x + diff.z * diff.z)))));
-                TransformStack.of(ms).rotateYDegrees(state.age * 20 * mode.spin() + (state.hash % 360)).rotateZDegrees(-mode.spriteAngleOffset());
+                Vec3 diff = state.velocity;
+                TransformStack.of(ms).rotateYDegrees(AngleHelper.deg(Mth.atan2(diff.x, diff.z)))
+                    .rotateXDegrees(270 + AngleHelper.deg(Mth.atan2(diff.y, -Mth.sqrt((float) (diff.x * diff.x + diff.z * diff.z)))));
+                TransformStack.of(ms).rotateYDegrees(state.ageInTicks * 20 * mode.spin() + (state.hash % 360))
+                    .rotateZDegrees(-mode.spriteAngleOffset());
             }
         );
         register(
             StuckToEntity.class, (mode, ms, state) -> {
-                Vec3d offset = mode.offset();
-                TransformStack.of(ms).rotateYDegrees(AngleHelper.deg(MathHelper.atan2(offset.x, offset.z)));
+                Vec3 offset = mode.offset();
+                TransformStack.of(ms).rotateYDegrees(AngleHelper.deg(Mth.atan2(offset.x, offset.z)));
             }
         );
     }

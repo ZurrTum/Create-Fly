@@ -2,41 +2,41 @@ package com.zurrtum.create.content.redstone.displayLink.source;
 
 import com.zurrtum.create.content.redstone.displayLink.DisplayLinkContext;
 import com.zurrtum.create.content.redstone.displayLink.target.DisplayTargetStats;
-import net.minecraft.block.EnchantingTableBlock;
-import net.minecraft.block.entity.EnchantingTableBlockEntity;
-import net.minecraft.enchantment.EnchantmentHelper;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.text.MutableText;
-import net.minecraft.text.Text;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.random.Random;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.enchantment.EnchantmentHelper;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.EnchantingTableBlock;
+import net.minecraft.world.level.block.entity.EnchantingTableBlockEntity;
 
 public class EnchantPowerDisplaySource extends NumericSingleLineDisplaySource {
 
-    protected static final Random random = Random.create();
+    protected static final RandomSource random = RandomSource.create();
     protected static final ItemStack stack = new ItemStack(Items.DIAMOND_PICKAXE);
 
     @Override
-    protected MutableText provideLine(DisplayLinkContext context, DisplayTargetStats stats) {
+    protected MutableComponent provideLine(DisplayLinkContext context, DisplayTargetStats stats) {
         if (!(context.getSourceBlockEntity() instanceof EnchantingTableBlockEntity))
             return ZERO.copy();
 
         BlockPos pos = context.getSourcePos();
-        World level = context.level();
+        Level level = context.level();
         int enchantPower = 0;
 
-        for (BlockPos blockPos : EnchantingTableBlock.POWER_PROVIDER_OFFSETS) {
-            if (EnchantingTableBlock.canAccessPowerProvider(level, pos, blockPos)) {
+        for (BlockPos blockPos : EnchantingTableBlock.BOOKSHELF_OFFSETS) {
+            if (EnchantingTableBlock.isValidBookShelf(level, pos, blockPos)) {
                 enchantPower++;
             }
         }
 
 
-        int cost = EnchantmentHelper.calculateRequiredExperienceLevel(random, 2, enchantPower, stack);
+        int cost = EnchantmentHelper.getEnchantmentCost(random, 2, enchantPower, stack);
 
-        return Text.literal(String.valueOf(cost));
+        return Component.literal(String.valueOf(cost));
     }
 
     @Override

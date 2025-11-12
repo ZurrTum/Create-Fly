@@ -15,14 +15,13 @@ import me.shedaniel.rei.api.common.entry.EntryIngredient;
 import me.shedaniel.rei.api.common.entry.EntryStack;
 import me.shedaniel.rei.api.common.registry.display.DisplayConsumer;
 import me.shedaniel.rei.api.common.util.EntryIngredients;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.network.codec.PacketCodec;
-import net.minecraft.network.codec.PacketCodecs;
-import net.minecraft.recipe.RecipeEntry;
-import net.minecraft.registry.Registries;
-import net.minecraft.util.Identifier;
-
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.crafting.RecipeHolder;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
@@ -30,33 +29,33 @@ import java.util.stream.Stream;
 import static com.zurrtum.create.Create.MOD_ID;
 
 public record DrainingDisplay(
-    EntryIngredient input, EntryIngredient output, EntryIngredient result, Optional<Identifier> location
+    EntryIngredient input, EntryIngredient output, EntryIngredient result, Optional<ResourceLocation> location
 ) implements Display {
-    public static final Identifier POTIONS = Identifier.of(MOD_ID, "potions");
+    public static final ResourceLocation POTIONS = ResourceLocation.fromNamespaceAndPath(MOD_ID, "potions");
     public static final DisplaySerializer<DrainingDisplay> SERIALIZER = DisplaySerializer.of(
         RecordCodecBuilder.mapCodec(instance -> instance.group(
             EntryIngredient.codec().fieldOf("input").forGetter(DrainingDisplay::input),
             EntryIngredient.codec().fieldOf("output").forGetter(DrainingDisplay::output),
             EntryIngredient.codec().fieldOf("result").forGetter(DrainingDisplay::result),
-            Identifier.CODEC.optionalFieldOf("location").forGetter(DrainingDisplay::location)
-        ).apply(instance, DrainingDisplay::new)), PacketCodec.tuple(
+            ResourceLocation.CODEC.optionalFieldOf("location").forGetter(DrainingDisplay::location)
+        ).apply(instance, DrainingDisplay::new)), StreamCodec.composite(
             EntryIngredient.streamCodec(),
             DrainingDisplay::input,
             EntryIngredient.streamCodec(),
             DrainingDisplay::output,
             EntryIngredient.streamCodec(),
             DrainingDisplay::result,
-            PacketCodecs.optional(Identifier.PACKET_CODEC),
+            ByteBufCodecs.optional(ResourceLocation.STREAM_CODEC),
             DrainingDisplay::location,
             DrainingDisplay::new
         )
     );
 
-    public DrainingDisplay(RecipeEntry<EmptyingRecipe> entry) {
-        this(entry.id().getValue(), entry.value());
+    public DrainingDisplay(RecipeHolder<EmptyingRecipe> entry) {
+        this(entry.id().location(), entry.value());
     }
 
-    public DrainingDisplay(Identifier id, EmptyingRecipe recipe) {
+    public DrainingDisplay(ResourceLocation id, EmptyingRecipe recipe) {
         this(
             EntryIngredients.ofIngredient(recipe.ingredient()),
             IngredientHelper.createEntryIngredient(recipe.fluidResult()),
@@ -85,9 +84,9 @@ public record DrainingDisplay(
                 if (fluid.isEmpty()) {
                     return;
                 }
-                Identifier itemName = Registries.ITEM.getId(stack.getItem());
-                Identifier fluidName = Registries.FLUID.getId(fluid.getFluid());
-                Identifier id = Identifier.of(
+                ResourceLocation itemName = BuiltInRegistries.ITEM.getKey(stack.getItem());
+                ResourceLocation fluidName = BuiltInRegistries.FLUID.getKey(fluid.getFluid());
+                ResourceLocation id = ResourceLocation.fromNamespaceAndPath(
                     MOD_ID,
                     "empty_" + itemName.getNamespace() + "_" + itemName.getPath() + "_with_" + fluidName.getNamespace() + "_" + fluidName.getPath()
                 );
@@ -117,7 +116,7 @@ public record DrainingDisplay(
     }
 
     @Override
-    public Optional<Identifier> getDisplayLocation() {
+    public Optional<ResourceLocation> getDisplayLocation() {
         return location;
     }
 

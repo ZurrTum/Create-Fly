@@ -8,15 +8,15 @@ import com.zurrtum.create.client.catnip.gui.UIRenderHelper;
 import com.zurrtum.create.client.catnip.gui.element.GuiGameElement;
 import com.zurrtum.create.client.catnip.gui.widget.BoxWidget;
 import com.zurrtum.create.client.ponder.foundation.PonderTag;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.input.KeyInput;
-import net.minecraft.client.input.MouseInput;
-import net.minecraft.client.option.KeyBinding;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.math.MathHelper;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Locale;
+import net.minecraft.client.KeyMapping;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.input.KeyEvent;
+import net.minecraft.client.input.MouseButtonInfo;
+import net.minecraft.util.Mth;
+import net.minecraft.world.item.ItemStack;
 
 public class PonderButton extends BoxWidget {
 
@@ -33,7 +33,7 @@ public class PonderButton extends BoxWidget {
     @Nullable
     protected PonderTag tag;
     @Nullable
-    protected KeyBinding shortcut;
+    protected KeyMapping shortcut;
     protected LerpedFloat flash = LerpedFloat.linear().startWithValue(0).chase(0, 0.1f, LerpedFloat.Chaser.EXP);
 
     public PonderButton(int x, int y) {
@@ -52,7 +52,7 @@ public class PonderButton extends BoxWidget {
         updateGradientFromState();
     }
 
-    public <T extends PonderButton> T withShortcut(KeyBinding key) {
+    public <T extends PonderButton> T withShortcut(KeyMapping key) {
         this.shortcut = key;
         //noinspection unchecked
         return (T) this;
@@ -82,15 +82,15 @@ public class PonderButton extends BoxWidget {
     }
 
     @Override
-    protected void beforeRender(DrawContext graphics, int mouseX, int mouseY, float partialTicks) {
+    protected void beforeRender(GuiGraphics graphics, int mouseX, int mouseY, float partialTicks) {
         super.beforeRender(graphics, mouseX, mouseY, partialTicks);
 
         float flashValue = flash.getValue(partialTicks);
         if (flashValue > .1f) {
-            float sin = 0.5f + 0.5f * MathHelper.sin((AnimationTickHolder.getTicks(true) + partialTicks) / 10f);
+            float sin = 0.5f + 0.5f * Mth.sin((AnimationTickHolder.getTicks(true) + partialTicks) / 10f);
             sin *= flashValue;
-            Color nc1 = new Color(255, 255, 255, MathHelper.clamp(gradientColor.getFirst().getAlpha() + 150, 0, 255));
-            Color nc2 = new Color(155, 155, 155, MathHelper.clamp(gradientColor.getSecond().getAlpha() + 150, 0, 255));
+            Color nc1 = new Color(255, 255, 255, Mth.clamp(gradientColor.getFirst().getAlpha() + 150, 0, 255));
+            Color nc2 = new Color(155, 155, 155, Mth.clamp(gradientColor.getSecond().getAlpha() + 150, 0, 255));
             Couple<Color> newColors = Couple.create(nc1, nc2);
             float finalSin = sin;
             gradientColor = gradientColor.mapWithParams((color, other) -> color.mixWith(other, finalSin), newColors);
@@ -98,16 +98,16 @@ public class PonderButton extends BoxWidget {
     }
 
     @Override
-    public void doRender(DrawContext graphics, int mouseX, int mouseY, float partialTicks) {
+    public void doRender(GuiGraphics graphics, int mouseX, int mouseY, float partialTicks) {
         super.doRender(graphics, mouseX, mouseY, partialTicks);
 
         if (!isVisible())
             return;
 
         if (shortcut != null) {
-            graphics.drawCenteredTextWithShadow(
-                graphics.client.textRenderer,
-                shortcut.getBoundKeyLocalizedText().getString().toLowerCase(Locale.ROOT),
+            graphics.drawCenteredString(
+                graphics.minecraft.font,
+                shortcut.getTranslatedKeyMessage().getString().toLowerCase(Locale.ROOT),
                 getX() + width / 2 + 8,
                 getY() + height - 6,
                 UIRenderHelper.COLOR_TEXT_DARKER.getFirst().scaleAlpha(fade.getValue()).getRGB()
@@ -121,8 +121,8 @@ public class PonderButton extends BoxWidget {
     }
 
     @Override
-    public boolean keyPressed(KeyInput input) {
-        if (shortcut != null && shortcut.matchesKey(input)) {
+    public boolean keyPressed(KeyEvent input) {
+        if (shortcut != null && shortcut.matches(input)) {
             gradientColor = getColorClick();
             startGradientAnimation(getColorForState(), 0.15);
 
@@ -134,7 +134,7 @@ public class PonderButton extends BoxWidget {
     }
 
     @Override
-    protected boolean isValidClickButton(MouseInput input) {
+    protected boolean isValidClickButton(MouseButtonInfo input) {
         return isVisible();
     }
 

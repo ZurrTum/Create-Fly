@@ -7,12 +7,12 @@ import com.zurrtum.create.client.flywheel.lib.instance.InstanceTypes;
 import com.zurrtum.create.client.flywheel.lib.instance.TransformedInstance;
 import com.zurrtum.create.client.flywheel.lib.model.LineModelBuilder;
 import com.zurrtum.create.client.flywheel.lib.visual.util.SmartRecycler;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.hud.debug.DebugHudEntries;
-import net.minecraft.client.render.LightmapTextureManager;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.util.math.MathHelper;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.components.debug.DebugScreenEntries;
+import net.minecraft.client.renderer.LightTexture;
+import net.minecraft.util.Mth;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
 import org.joml.Quaternionf;
 
 public final class HitboxComponent implements EntityComponent {
@@ -54,7 +54,7 @@ public final class HitboxComponent implements EntityComponent {
 
     private TransformedInstance createInstance(Model model) {
         TransformedInstance instance = context.instancerProvider().instancer(InstanceTypes.TRANSFORMED, model).createInstance();
-        instance.light(LightmapTextureManager.MAX_LIGHT_COORDINATE);
+        instance.light(LightTexture.FULL_BRIGHT);
         instance.setChanged();
         return instance;
     }
@@ -72,13 +72,13 @@ public final class HitboxComponent implements EntityComponent {
     public void beginFrame(DynamicVisual.Context context) {
         recycler.resetCount();
 
-        var shouldRenderHitBoxes = MinecraftClient.getInstance().debugHudEntryList.isEntryVisible(DebugHudEntries.ENTITY_HITBOXES);
-        if (shouldRenderHitBoxes && !entity.isInvisible() && !MinecraftClient.getInstance().hasReducedDebugInfo()) {
+        var shouldRenderHitBoxes = Minecraft.getInstance().debugEntries.isCurrentlyEnabled(DebugScreenEntries.ENTITY_HITBOXES);
+        if (shouldRenderHitBoxes && !entity.isInvisible() && !Minecraft.getInstance().showOnlyReducedInfo()) {
             float partialTick = context.partialTick();
 
-            double entityX = MathHelper.lerp(partialTick, entity.lastRenderX, entity.getX());
-            double entityY = MathHelper.lerp(partialTick, entity.lastRenderY, entity.getY());
-            double entityZ = MathHelper.lerp(partialTick, entity.lastRenderZ, entity.getZ());
+            double entityX = Mth.lerp(partialTick, entity.xOld, entity.getX());
+            double entityY = Mth.lerp(partialTick, entity.yOld, entity.getY());
+            double entityZ = Mth.lerp(partialTick, entity.zOld, entity.getZ());
 
             var bb = entity.getBoundingBox();
 
@@ -95,13 +95,13 @@ public final class HitboxComponent implements EntityComponent {
             //  injection for them so we'll need platform specific code.
 
             if (showEyeBox) {
-                recycler.get(BOX_MODEL).setIdentityTransform().translate(boxX, entityY + entity.getStandingEyeHeight() - 0.01, boxZ)
+                recycler.get(BOX_MODEL).setIdentityTransform().translate(boxX, entityY + entity.getEyeHeight() - 0.01, boxZ)
                     .scale(widthX, 0.02f, widthZ).color(255, 0, 0).setChanged();
             }
 
-            var viewVector = entity.getRotationVec(partialTick);
+            var viewVector = entity.getViewVector(partialTick);
 
-            recycler.get(LINE_MODEL).setIdentityTransform().translate(entityX, entityY + entity.getStandingEyeHeight(), entityZ)
+            recycler.get(LINE_MODEL).setIdentityTransform().translate(entityX, entityY + entity.getEyeHeight(), entityZ)
                 .rotate(new Quaternionf().rotateTo(0, 1, 0, (float) viewVector.x, (float) viewVector.y, (float) viewVector.z)).color(0, 0, 255)
                 .setChanged();
         }

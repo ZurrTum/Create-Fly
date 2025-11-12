@@ -4,12 +4,12 @@ import com.google.common.collect.ImmutableBiMap;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.zurrtum.create.AllBlocks;
-import net.minecraft.block.Block;
-import net.minecraft.block.Oxidizable;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.WeatheringCopper;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 
-@Mixin(Oxidizable.class)
+@Mixin(WeatheringCopper.class)
 public interface OxidizableMixin {
     @WrapOperation(method = "method_34740", at = @At(value = "INVOKE", target = "Lcom/google/common/collect/ImmutableBiMap;builder()Lcom/google/common/collect/ImmutableBiMap$Builder;", remap = false))
     private static ImmutableBiMap.Builder<Block, Block> addOxidizable(Operation<ImmutableBiMap.Builder<Block, Block>> original) {

@@ -2,21 +2,20 @@ package com.zurrtum.create.infrastructure.packet.c2s;
 
 import com.zurrtum.create.AllHandle;
 import com.zurrtum.create.AllPackets;
-import net.minecraft.item.ItemStack;
-import net.minecraft.network.RegistryByteBuf;
-import net.minecraft.network.codec.PacketCodec;
-import net.minecraft.network.packet.PacketType;
-import net.minecraft.server.network.ServerPlayNetworkHandler;
-import net.minecraft.util.math.BlockPos;
-
 import java.util.List;
 import java.util.function.BiConsumer;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.PacketType;
+import net.minecraft.server.network.ServerGamePacketListenerImpl;
+import net.minecraft.world.item.ItemStack;
 
 public record StockKeeperCategoryEditPacket(BlockPos pos, List<ItemStack> schedule) implements C2SPacket {
-    public static final PacketCodec<RegistryByteBuf, StockKeeperCategoryEditPacket> CODEC = PacketCodec.tuple(
-        BlockPos.PACKET_CODEC,
+    public static final StreamCodec<RegistryFriendlyByteBuf, StockKeeperCategoryEditPacket> CODEC = StreamCodec.composite(
+        BlockPos.STREAM_CODEC,
         StockKeeperCategoryEditPacket::pos,
-        ItemStack.OPTIONAL_LIST_PACKET_CODEC,
+        ItemStack.OPTIONAL_LIST_STREAM_CODEC,
         StockKeeperCategoryEditPacket::schedule,
         StockKeeperCategoryEditPacket::new
     );
@@ -27,12 +26,12 @@ public record StockKeeperCategoryEditPacket(BlockPos pos, List<ItemStack> schedu
     }
 
     @Override
-    public PacketType<StockKeeperCategoryEditPacket> getPacketType() {
+    public PacketType<StockKeeperCategoryEditPacket> type() {
         return AllPackets.CONFIGURE_STOCK_KEEPER_CATEGORIES;
     }
 
     @Override
-    public BiConsumer<ServerPlayNetworkHandler, StockKeeperCategoryEditPacket> callback() {
+    public BiConsumer<ServerGamePacketListenerImpl, StockKeeperCategoryEditPacket> callback() {
         return AllHandle::onStockKeeperCategoryEdit;
     }
 }

@@ -3,39 +3,38 @@ package com.zurrtum.create.content.contraptions;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.zurrtum.create.infrastructure.config.AllConfigs;
-import net.minecraft.block.BlockState;
-import net.minecraft.screen.ScreenTexts;
-import net.minecraft.storage.ReadView;
-import net.minecraft.storage.WriteView;
-import net.minecraft.text.Text;
-import net.minecraft.text.TextCodecs;
-import net.minecraft.util.math.BlockPos;
-
 import java.util.Optional;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.CommonComponents;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.ComponentSerialization;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 
 public class AssemblyException extends Exception {
     public static final Codec<AssemblyException> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-        TextCodecs.CODEC.fieldOf("Component").forGetter(i -> i.component),
+        ComponentSerialization.CODEC.fieldOf("Component").forGetter(i -> i.component),
         BlockPos.CODEC.optionalFieldOf("Position").forGetter(i -> Optional.ofNullable(i.getPosition()))
     ).apply(instance, AssemblyException::new));
 
     private static final long serialVersionUID = 1L;
-    public final Text component;
+    public final Component component;
     private BlockPos position = null;
 
-    public static void write(WriteView view, AssemblyException exception) {
+    public static void write(ValueOutput view, AssemblyException exception) {
         if (exception == null)
             return;
 
-        WriteView lastException = view.get("LastException");
-        lastException.put("Component", TextCodecs.CODEC, exception.component);
+        ValueOutput lastException = view.child("LastException");
+        lastException.store("Component", ComponentSerialization.CODEC, exception.component);
         if (exception.hasPosition())
-            lastException.put("Position", BlockPos.CODEC, exception.getPosition());
+            lastException.store("Position", BlockPos.CODEC, exception.getPosition());
     }
 
-    public static AssemblyException read(ReadView view) {
-        return view.getOptionalReadView("LastException").map(lastException -> {
-            Text component = lastException.read("Component", TextCodecs.CODEC).orElse(ScreenTexts.EMPTY);
+    public static AssemblyException read(ValueInput view) {
+        return view.child("LastException").map(lastException -> {
+            Component component = lastException.read("Component", ComponentSerialization.CODEC).orElse(CommonComponents.EMPTY);
             AssemblyException exception = new AssemblyException(component);
             lastException.read("Position", BlockPos.CODEC).ifPresent(position -> {
                 exception.position = position;
@@ -44,16 +43,16 @@ public class AssemblyException extends Exception {
         }).orElse(null);
     }
 
-    public AssemblyException(Text component) {
+    public AssemblyException(Component component) {
         this.component = component;
     }
 
     public AssemblyException(String langKey, Object... objects) {
-        this(Text.translatable("create.gui.assembly.exception." + langKey, objects));
+        this(Component.translatable("create.gui.assembly.exception." + langKey, objects));
     }
 
     @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
-    private AssemblyException(Text component, Optional<BlockPos> position) {
+    private AssemblyException(Component component, Optional<BlockPos> position) {
         this.component = component;
         this.position = position.orElse(null);
     }

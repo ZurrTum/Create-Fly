@@ -4,11 +4,11 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.zurrtum.create.catnip.data.Pair;
 import com.zurrtum.create.catnip.nbt.NBTHelper;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.network.PacketByteBuf;
-import net.minecraft.network.codec.PacketCodec;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
 
 public class BlockFace extends Pair<BlockPos, Direction> {
     public static Codec<BlockFace> CODEC = RecordCodecBuilder.create(instance -> instance.group(
@@ -16,10 +16,10 @@ public class BlockFace extends Pair<BlockPos, Direction> {
             .forGetter(BlockFace::getPos), Direction.CODEC.fieldOf("direction").forGetter(BlockFace::getFace)
     ).apply(instance, BlockFace::new));
 
-    public static PacketCodec<PacketByteBuf, BlockFace> STREAM_CODEC = PacketCodec.tuple(
-        BlockPos.PACKET_CODEC,
+    public static StreamCodec<FriendlyByteBuf, BlockFace> STREAM_CODEC = StreamCodec.composite(
+        BlockPos.STREAM_CODEC,
         BlockFace::getPos,
-        Direction.PACKET_CODEC,
+        Direction.STREAM_CODEC,
         BlockFace::getFace,
         BlockFace::new
     );
@@ -51,17 +51,17 @@ public class BlockFace extends Pair<BlockPos, Direction> {
     }
 
     public BlockPos getConnectedPos() {
-        return getPos().offset(getFace());
+        return getPos().relative(getFace());
     }
 
-    public NbtCompound serializeNBT() {
-        NbtCompound compoundNBT = new NbtCompound();
-        compoundNBT.put("Pos", BlockPos.CODEC, getPos());
+    public CompoundTag serializeNBT() {
+        CompoundTag compoundNBT = new CompoundTag();
+        compoundNBT.store("Pos", BlockPos.CODEC, getPos());
         NBTHelper.writeEnum(compoundNBT, "Face", getFace());
         return compoundNBT;
     }
 
-    public static BlockFace fromNBT(NbtCompound compound) {
+    public static BlockFace fromNBT(CompoundTag compound) {
         return new BlockFace(NBTHelper.readBlockPos(compound, "Pos"), NBTHelper.readEnum(compound, "Face", Direction.class));
     }
 

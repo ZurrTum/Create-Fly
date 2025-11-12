@@ -4,31 +4,30 @@ import com.zurrtum.create.AllHandle;
 import com.zurrtum.create.AllPackets;
 import com.zurrtum.create.catnip.codecs.stream.CatnipStreamCodecBuilders;
 import com.zurrtum.create.infrastructure.component.BezierTrackPointLocation;
-import net.minecraft.network.RegistryByteBuf;
-import net.minecraft.network.codec.PacketCodec;
-import net.minecraft.network.codec.PacketCodecs;
-import net.minecraft.network.packet.PacketType;
-import net.minecraft.server.network.ServerPlayNetworkHandler;
-import net.minecraft.util.Uuids;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3d;
-
 import java.util.UUID;
 import java.util.function.BiConsumer;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.UUIDUtil;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.PacketType;
+import net.minecraft.server.network.ServerGamePacketListenerImpl;
+import net.minecraft.world.phys.Vec3;
 
 public record TrainRelocationPacket(
-    UUID trainId, BlockPos pos, Vec3d lookAngle, int entityId, boolean direction, BezierTrackPointLocation hoveredBezier
+    UUID trainId, BlockPos pos, Vec3 lookAngle, int entityId, boolean direction, BezierTrackPointLocation hoveredBezier
 ) implements C2SPacket {
-    public static final PacketCodec<RegistryByteBuf, TrainRelocationPacket> CODEC = PacketCodec.tuple(
-        Uuids.PACKET_CODEC,
+    public static final StreamCodec<RegistryFriendlyByteBuf, TrainRelocationPacket> CODEC = StreamCodec.composite(
+        UUIDUtil.STREAM_CODEC,
         TrainRelocationPacket::trainId,
-        BlockPos.PACKET_CODEC,
+        BlockPos.STREAM_CODEC,
         TrainRelocationPacket::pos,
-        Vec3d.PACKET_CODEC,
+        Vec3.STREAM_CODEC,
         TrainRelocationPacket::lookAngle,
-        PacketCodecs.INTEGER,
+        ByteBufCodecs.INT,
         TrainRelocationPacket::entityId,
-        PacketCodecs.BOOLEAN,
+        ByteBufCodecs.BOOL,
         TrainRelocationPacket::direction,
         CatnipStreamCodecBuilders.nullable(BezierTrackPointLocation.STREAM_CODEC),
         TrainRelocationPacket::hoveredBezier,
@@ -36,12 +35,12 @@ public record TrainRelocationPacket(
     );
 
     @Override
-    public PacketType<TrainRelocationPacket> getPacketType() {
+    public PacketType<TrainRelocationPacket> type() {
         return AllPackets.RELOCATE_TRAIN;
     }
 
     @Override
-    public BiConsumer<ServerPlayNetworkHandler, TrainRelocationPacket> callback() {
+    public BiConsumer<ServerGamePacketListenerImpl, TrainRelocationPacket> callback() {
         return AllHandle::onTrainRelocation;
     }
 }

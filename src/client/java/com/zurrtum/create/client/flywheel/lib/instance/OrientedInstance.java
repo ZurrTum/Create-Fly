@@ -3,8 +3,8 @@ package com.zurrtum.create.client.flywheel.lib.instance;
 import com.zurrtum.create.client.flywheel.api.instance.InstanceHandle;
 import com.zurrtum.create.client.flywheel.api.instance.InstanceType;
 import com.zurrtum.create.client.flywheel.lib.transform.Rotate;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.math.Vec3i;
+import net.minecraft.core.Vec3i;
+import net.minecraft.world.phys.Vec3;
 import org.joml.Quaternionf;
 import org.joml.Quaternionfc;
 import org.joml.Vector3fc;
@@ -37,8 +37,8 @@ public class OrientedInstance extends ColoredLitOverlayInstance implements Rotat
         return position(pos.getX(), pos.getY(), pos.getZ());
     }
 
-    public OrientedInstance position(Vec3d pos) {
-        return position((float) pos.getX(), (float) pos.getY(), (float) pos.getZ());
+    public OrientedInstance position(Vec3 pos) {
+        return position((float) pos.x(), (float) pos.y(), (float) pos.z());
     }
 
     public OrientedInstance zeroPosition() {
@@ -67,8 +67,8 @@ public class OrientedInstance extends ColoredLitOverlayInstance implements Rotat
         return pivot(pos.getX(), pos.getY(), pos.getZ());
     }
 
-    public OrientedInstance pivot(Vec3d pos) {
-        return pivot((float) pos.getX(), (float) pos.getY(), (float) pos.getZ());
+    public OrientedInstance pivot(Vec3 pos) {
+        return pivot((float) pos.x(), (float) pos.y(), (float) pos.z());
     }
 
     public OrientedInstance centerPivot() {

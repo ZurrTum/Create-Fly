@@ -1,12 +1,12 @@
 package com.zurrtum.create.client.flywheel.backend.engine.indirect;
 
 import com.mojang.blaze3d.opengl.GlStateManager;
+import com.mojang.blaze3d.opengl.GlTexture;
 import com.mojang.blaze3d.textures.GpuTexture;
 import com.zurrtum.create.client.flywheel.backend.compile.IndirectPrograms;
 import com.zurrtum.create.client.flywheel.backend.gl.GlTextureUnit;
 import com.zurrtum.create.client.flywheel.lib.math.MoreMath;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.texture.GlTexture;
+import net.minecraft.client.Minecraft;
 import org.lwjgl.opengl.GL32;
 import org.lwjgl.opengl.GL46;
 
@@ -23,16 +23,16 @@ public class DepthPyramid {
     }
 
     public void generate() {
-        var mainRenderTarget = MinecraftClient.getInstance().getFramebuffer();
+        var mainRenderTarget = Minecraft.getInstance().getMainRenderTarget();
 
-        int width = mip0Size(mainRenderTarget.textureWidth);
-        int height = mip0Size(mainRenderTarget.textureHeight);
+        int width = mip0Size(mainRenderTarget.width);
+        int height = mip0Size(mainRenderTarget.height);
         int mipLevels = getImageMipLevels(width, height);
 
         createPyramidMips(mipLevels, width, height);
 
-        GpuTexture depthTexture = mainRenderTarget.getDepthAttachment();
-        int depthBufferId = depthTexture != null ? ((GlTexture) depthTexture).getGlId() : 0;
+        GpuTexture depthTexture = mainRenderTarget.getDepthTexture();
+        int depthBufferId = depthTexture != null ? ((GlTexture) depthTexture).glId() : 0;
 
         GL46.glMemoryBarrier(GL46.GL_FRAMEBUFFER_BARRIER_BIT);
 

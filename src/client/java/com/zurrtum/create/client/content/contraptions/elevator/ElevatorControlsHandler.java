@@ -11,21 +11,21 @@ import com.zurrtum.create.content.contraptions.actors.contraptionControls.Contra
 import com.zurrtum.create.content.contraptions.actors.contraptionControls.ContraptionControlsMovement.ElevatorFloorSelection;
 import com.zurrtum.create.content.contraptions.behaviour.MovementContext;
 import com.zurrtum.create.content.contraptions.elevator.ElevatorContraption;
-import net.minecraft.block.BlockState;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.client.world.ClientWorld;
-import net.minecraft.structure.StructureTemplate.StructureBlockInfo;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.WorldAccess;
 import org.apache.commons.lang3.tuple.MutablePair;
 
 import java.lang.ref.WeakReference;
 import java.util.Collection;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.core.BlockPos;
+import net.minecraft.util.Mth;
+import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate.StructureBlockInfo;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.Vec3;
 
 public class ElevatorControlsHandler {
 
@@ -34,8 +34,8 @@ public class ElevatorControlsHandler {
     private static class ElevatorControlsSlot extends ControlsSlot {
 
         @Override
-        public boolean testHit(WorldAccess level, BlockPos pos, BlockState state, Vec3d localHit) {
-            Vec3d offset = getLocalOffset(state);
+        public boolean testHit(LevelAccessor level, BlockPos pos, BlockState state, Vec3 localHit) {
+            Vec3 offset = getLocalOffset(state);
             if (offset == null)
                 return false;
             return localHit.distanceTo(offset) < scale * .85;
@@ -43,16 +43,16 @@ public class ElevatorControlsHandler {
 
     }
 
-    public static boolean onScroll(MinecraftClient mc, double delta) {
-        ClientWorld world = mc.world;
+    public static boolean onScroll(Minecraft mc, double delta) {
+        ClientLevel world = mc.level;
         if (world == null)
             return false;
-        ClientPlayerEntity player = mc.player;
+        LocalPlayer player = mc.player;
 
-        Couple<Vec3d> rayInputs = ContraptionHandlerClient.getRayInputs(mc, player);
-        Vec3d origin = rayInputs.getFirst();
-        Vec3d target = rayInputs.getSecond();
-        Box aabb = new Box(origin, target).expand(16);
+        Couple<Vec3> rayInputs = ContraptionHandlerClient.getRayInputs(mc, player);
+        Vec3 origin = rayInputs.getFirst();
+        Vec3 target = rayInputs.getSecond();
+        AABB aabb = new AABB(origin, target).inflate(16);
 
         Collection<WeakReference<AbstractContraptionEntity>> contraptions = ContraptionHandlerClient.loadedContraptions.get(world).values();
 
@@ -77,10 +77,10 @@ public class ElevatorControlsHandler {
 
             if (info == null)
                 continue;
-            if (!info.state().isOf(AllBlocks.CONTRAPTION_CONTROLS))
+            if (!info.state().is(AllBlocks.CONTRAPTION_CONTROLS))
                 continue;
 
-            if (!slot.testHit(world, pos, info.state(), rayTraceResult.getPos().subtract(Vec3d.of(pos))))
+            if (!slot.testHit(world, pos, info.state(), rayTraceResult.getLocation().subtract(Vec3.atLowerCornerOf(pos))))
                 continue;
 
             MovementContext ctx = null;
@@ -105,11 +105,11 @@ public class ElevatorControlsHandler {
 
             if (prev != efs.currentIndex && !ec.namesList.isEmpty()) {
                 float pitch = (efs.currentIndex) / (float) (ec.namesList.size());
-                pitch = MathHelper.lerp(pitch, 1f, 1.5f);
+                pitch = Mth.lerp(pitch, 1f, 1.5f);
                 AllSoundEvents.SCROLL_VALUE.play(
                     world,
                     player,
-                    BlockPos.ofFloored(contraptionEntity.toGlobalVector(rayTraceResult.getPos(), 1)),
+                    BlockPos.containing(contraptionEntity.toGlobalVector(rayTraceResult.getLocation(), 1)),
                     1,
                     pitch
                 );

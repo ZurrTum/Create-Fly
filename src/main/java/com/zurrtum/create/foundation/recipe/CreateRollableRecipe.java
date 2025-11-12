@@ -1,10 +1,10 @@
 package com.zurrtum.create.foundation.recipe;
 
 import com.zurrtum.create.content.processing.recipe.ChanceOutput;
-import net.minecraft.item.ItemStack;
-import net.minecraft.recipe.input.RecipeInput;
-import net.minecraft.registry.RegistryWrapper;
-import net.minecraft.util.math.random.Random;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.RecipeInput;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,14 +16,14 @@ public interface CreateRollableRecipe<T extends RecipeInput> extends CreateRecip
     }
 
     @Override
-    default ItemStack craft(T input, RegistryWrapper.WrapperLookup registries) {
+    default ItemStack assemble(T input, HolderLookup.Provider registries) {
         return ItemStack.EMPTY;
     }
 
     List<ChanceOutput> results();
 
     @Override
-    default List<ItemStack> craft(T input, Random random) {
+    default List<ItemStack> assemble(T input, RandomSource random) {
         List<ItemStack> list = new ArrayList<>();
         for (ChanceOutput output : results()) {
             ItemStack stack = output.get(random);

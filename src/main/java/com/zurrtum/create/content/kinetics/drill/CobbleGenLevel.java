@@ -1,21 +1,20 @@
 package com.zurrtum.create.content.kinetics.drill;
 
 import com.zurrtum.create.catnip.levelWrappers.WrappedLevel;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.entity.Entity;
-import net.minecraft.fluid.Fluid;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
-import net.minecraft.world.tick.TickPriority;
-
 import java.util.HashMap;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.material.Fluid;
+import net.minecraft.world.ticks.TickPriority;
 
 public class CobbleGenLevel extends WrappedLevel {
 
     public HashMap<BlockPos, BlockState> blocksAdded = new HashMap<>();
 
-    public CobbleGenLevel(World level) {
+    public CobbleGenLevel(Level level) {
         super(level);
     }
 
@@ -24,42 +23,42 @@ public class CobbleGenLevel extends WrappedLevel {
     }
 
     @Override
-    public boolean setBlockState(BlockPos pos, BlockState newState, int flags) {
-        blocksAdded.put(pos.toImmutable(), newState);
+    public boolean setBlock(BlockPos pos, BlockState newState, int flags) {
+        blocksAdded.put(pos.immutable(), newState);
         return true;
     }
 
     @Override
-    public boolean setBlockState(BlockPos pos, BlockState state) {
-        return setBlockState(pos, state, 0);
+    public boolean setBlockAndUpdate(BlockPos pos, BlockState state) {
+        return setBlock(pos, state, 0);
     }
 
     @Override
-    public void scheduleBlockTick(BlockPos pos, Block block, int delay) {
+    public void scheduleTick(BlockPos pos, Block block, int delay) {
     }
 
     @Override
-    public void scheduleBlockTick(BlockPos pos, Block block, int delay, TickPriority priority) {
+    public void scheduleTick(BlockPos pos, Block block, int delay, TickPriority priority) {
     }
 
     @Override
-    public void scheduleFluidTick(BlockPos pos, Fluid fluid, int delay) {
+    public void scheduleTick(BlockPos pos, Fluid fluid, int delay) {
     }
 
     @Override
-    public void scheduleFluidTick(BlockPos pos, Fluid fluid, int delay, TickPriority priority) {
+    public void scheduleTick(BlockPos pos, Fluid fluid, int delay, TickPriority priority) {
     }
 
     @Override
-    public void syncWorldEvent(int type, BlockPos pos, int data) {
+    public void levelEvent(int type, BlockPos pos, int data) {
     }
 
     @Override
-    public void syncWorldEvent(Entity player, int type, BlockPos pos, int data) {
+    public void levelEvent(Entity player, int type, BlockPos pos, int data) {
     }
 
     @Override
-    public void addSyncedBlockEvent(BlockPos pos, Block block, int eventID, int eventParam) {
+    public void blockEvent(BlockPos pos, Block block, int eventID, int eventParam) {
     }
 
 }

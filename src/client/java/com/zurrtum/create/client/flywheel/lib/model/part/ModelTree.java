@@ -1,17 +1,17 @@
 package com.zurrtum.create.client.flywheel.lib.model.part;
 
 import com.zurrtum.create.client.flywheel.api.model.Model;
-import net.minecraft.client.model.ModelTransform;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Arrays;
 import java.util.Map;
 import java.util.NoSuchElementException;
+import net.minecraft.client.model.geom.PartPose;
 
 public final class ModelTree {
     @Nullable
     private final Model model;
-    private final ModelTransform initialPose;
+    private final PartPose initialPose;
     private final ModelTree[] children;
     private final String[] childNames;
 
@@ -22,7 +22,7 @@ public final class ModelTree {
      * @param initialPose The initial pose of this node.
      * @param children    The children of this node.
      */
-    public ModelTree(@Nullable Model model, ModelTransform initialPose, Map<String, ModelTree> children) {
+    public ModelTree(@Nullable Model model, PartPose initialPose, Map<String, ModelTree> children) {
         this.model = model;
         this.initialPose = initialPose;
 
@@ -43,7 +43,7 @@ public final class ModelTree {
         return model;
     }
 
-    public ModelTransform initialPose() {
+    public PartPose initialPose() {
         return initialPose;
     }
 

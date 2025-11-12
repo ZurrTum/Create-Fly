@@ -1,15 +1,15 @@
 package com.zurrtum.create.client.flywheel.impl.visualization;
 
 import com.zurrtum.create.client.flywheel.api.visualization.VisualizationManager;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.entity.Entity;
-import net.minecraft.world.World;
+import net.minecraft.client.Minecraft;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.level.Level;
 
 public final class VisualizationEventHandler {
     private VisualizationEventHandler() {
     }
 
-    public static void onClientTick(MinecraftClient minecraft, World level) {
+    public static void onClientTick(Minecraft minecraft, Level level) {
         // The game won't be paused in the tick event, but let's make sure there's a player.
         if (minecraft.player == null) {
             return;
@@ -23,7 +23,7 @@ public final class VisualizationEventHandler {
         manager.tick();
     }
 
-    public static void onEntityJoinLevel(World level, Entity entity) {
+    public static void onEntityJoinLevel(Level level, Entity entity) {
         VisualizationManager manager = VisualizationManager.get(level);
         if (manager == null) {
             return;
@@ -32,7 +32,7 @@ public final class VisualizationEventHandler {
         manager.entities().queueAdd(entity);
     }
 
-    public static void onEntityLeaveLevel(World level, Entity entity) {
+    public static void onEntityLeaveLevel(Level level, Entity entity) {
         VisualizationManager manager = VisualizationManager.get(level);
         if (manager == null) {
             return;

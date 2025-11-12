@@ -2,35 +2,35 @@ package com.zurrtum.create.content.equipment.toolbox;
 
 import com.zurrtum.create.AllItemTags;
 import com.zurrtum.create.AllRecipeSerializers;
-import net.minecraft.block.Block;
-import net.minecraft.component.ComponentChanges;
-import net.minecraft.item.ItemStack;
-import net.minecraft.recipe.RecipeSerializer;
-import net.minecraft.recipe.SpecialCraftingRecipe;
-import net.minecraft.recipe.book.CraftingRecipeCategory;
-import net.minecraft.recipe.input.CraftingRecipeInput;
-import net.minecraft.registry.RegistryWrapper;
-import net.minecraft.util.DyeColor;
-import net.minecraft.world.World;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.core.component.DataComponentPatch;
+import net.minecraft.world.item.DyeColor;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.CraftingBookCategory;
+import net.minecraft.world.item.crafting.CraftingInput;
+import net.minecraft.world.item.crafting.CustomRecipe;
+import net.minecraft.world.item.crafting.RecipeSerializer;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
 
-public class ToolboxDyeingRecipe extends SpecialCraftingRecipe {
+public class ToolboxDyeingRecipe extends CustomRecipe {
 
-    public ToolboxDyeingRecipe(CraftingRecipeCategory category) {
+    public ToolboxDyeingRecipe(CraftingBookCategory category) {
         super(category);
     }
 
     @Override
-    public boolean matches(CraftingRecipeInput input, World level) {
+    public boolean matches(CraftingInput input, Level level) {
         int toolboxes = 0;
         int dyes = 0;
 
         for (int i = 0; i < input.size(); ++i) {
-            ItemStack stack = input.getStackInSlot(i);
+            ItemStack stack = input.getItem(i);
             if (!stack.isEmpty()) {
-                if (Block.getBlockFromItem(stack.getItem()) instanceof ToolboxBlock) {
+                if (Block.byItem(stack.getItem()) instanceof ToolboxBlock) {
                     ++toolboxes;
                 } else {
-                    if (!stack.isIn(AllItemTags.DYES))
+                    if (!stack.is(AllItemTags.DYES))
                         return false;
                     ++dyes;
                 }
@@ -45,14 +45,14 @@ public class ToolboxDyeingRecipe extends SpecialCraftingRecipe {
     }
 
     @Override
-    public ItemStack craft(CraftingRecipeInput input, RegistryWrapper.WrapperLookup registries) {
+    public ItemStack assemble(CraftingInput input, HolderLookup.Provider registries) {
         ItemStack toolbox = ItemStack.EMPTY;
         DyeColor color = DyeColor.BROWN;
 
         for (int i = 0; i < input.size(); ++i) {
-            ItemStack stack = input.getStackInSlot(i);
+            ItemStack stack = input.getItem(i);
             if (!stack.isEmpty()) {
-                if (Block.getBlockFromItem(stack.getItem()) instanceof ToolboxBlock) {
+                if (Block.byItem(stack.getItem()) instanceof ToolboxBlock) {
                     toolbox = stack;
                 } else {
                     DyeColor color1 = AllItemTags.getDyeColor(stack);
@@ -63,10 +63,10 @@ public class ToolboxDyeingRecipe extends SpecialCraftingRecipe {
             }
         }
 
-        ItemStack dyedToolbox = ToolboxBlock.getColorBlock(color).asItem().getDefaultStack();
-        ComponentChanges componentChanges = toolbox.getComponentChanges();
+        ItemStack dyedToolbox = ToolboxBlock.getColorBlock(color).asItem().getDefaultInstance();
+        DataComponentPatch componentChanges = toolbox.getComponentsPatch();
         if (!componentChanges.isEmpty()) {
-            dyedToolbox.applyUnvalidatedChanges(componentChanges);
+            dyedToolbox.applyComponents(componentChanges);
         }
 
         return dyedToolbox;

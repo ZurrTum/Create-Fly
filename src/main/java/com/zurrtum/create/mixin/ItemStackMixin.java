@@ -7,15 +7,20 @@ import com.zurrtum.create.AllDataComponents;
 import com.zurrtum.create.content.contraptions.glue.SuperGlueHandler;
 import com.zurrtum.create.content.equipment.symmetryWand.SymmetryHandler;
 import com.zurrtum.create.infrastructure.component.ClipboardContent;
-import net.minecraft.component.ComponentType;
-import net.minecraft.component.DataComponentTypes;
-import net.minecraft.component.MergedComponentMap;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.*;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.component.DataComponentType;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.core.component.PatchedDataComponentMap;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.item.context.UseOnContext;
+import net.minecraft.world.level.ItemLike;
+import net.minecraft.world.level.Level;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
@@ -27,42 +32,42 @@ import java.util.function.BiFunction;
 
 @Mixin(ItemStack.class)
 public class ItemStackMixin {
-    @Inject(method = "useOnBlock(Lnet/minecraft/item/ItemUsageContext;)Lnet/minecraft/util/ActionResult;", at = @At(value = "INVOKE", target = "Lnet/minecraft/item/Item;useOnBlock(Lnet/minecraft/item/ItemUsageContext;)Lnet/minecraft/util/ActionResult;"))
+    @Inject(method = "useOn(Lnet/minecraft/world/item/context/UseOnContext;)Lnet/minecraft/world/InteractionResult;", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/item/Item;useOn(Lnet/minecraft/world/item/context/UseOnContext;)Lnet/minecraft/world/InteractionResult;"))
     private void cacheState(
-        ItemUsageContext context,
-        CallbackInfoReturnable<ActionResult> cir,
+        UseOnContext context,
+        CallbackInfoReturnable<InteractionResult> cir,
         @Local Item item,
-        @Share("place") LocalRef<ItemPlacementContext> place
+        @Share("place") LocalRef<BlockPlaceContext> place
     ) {
         if (item instanceof BlockItem) {
-            World world = context.getWorld();
-            if (!world.isClient()) {
-                place.set(new ItemPlacementContext(context));
+            Level world = context.getLevel();
+            if (!world.isClientSide()) {
+                place.set(new BlockPlaceContext(context));
             }
         }
     }
 
-    @Inject(method = "useOnBlock(Lnet/minecraft/item/ItemUsageContext;)Lnet/minecraft/util/ActionResult;", at = @At(value = "INVOKE", target = "Lnet/minecraft/util/ActionResult$Success;shouldIncrementStat()Z"))
+    @Inject(method = "useOn(Lnet/minecraft/world/item/context/UseOnContext;)Lnet/minecraft/world/InteractionResult;", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/InteractionResult$Success;wasItemInteraction()Z"))
     private void useOnBlock(
-        ItemUsageContext context,
-        CallbackInfoReturnable<ActionResult> cir,
-        @Local PlayerEntity player,
-        @Share("place") LocalRef<ItemPlacementContext> place
+        UseOnContext context,
+        CallbackInfoReturnable<InteractionResult> cir,
+        @Local Player player,
+        @Share("place") LocalRef<BlockPlaceContext> place
     ) {
-        ItemPlacementContext placementContext = place.get();
+        BlockPlaceContext placementContext = place.get();
         if (placementContext != null) {
-            ServerWorld world = (ServerWorld) context.getWorld();
-            BlockPos pos = placementContext.getBlockPos();
+            ServerLevel world = (ServerLevel) context.getLevel();
+            BlockPos pos = placementContext.getClickedPos();
             SuperGlueHandler.glueListensForBlockPlacement(world, player, pos);
-            if (!context.getStack().components.contains(DataComponentTypes.CONSUMABLE)) {
+            if (!context.getItemInHand().components.has(DataComponents.CONSUMABLE)) {
                 SymmetryHandler.onBlockPlaced(world, player, pos, placementContext);
             }
         }
     }
 
     @SuppressWarnings("removal")
-    @Inject(method = "<init>(Lnet/minecraft/item/ItemConvertible;ILnet/minecraft/component/MergedComponentMap;)V", at = @At("TAIL"))
-    private void create$migrateOldClipboardComponents(ItemConvertible item, int count, MergedComponentMap components, CallbackInfo ci) {
+    @Inject(method = "<init>(Lnet/minecraft/world/level/ItemLike;ILnet/minecraft/core/component/PatchedDataComponentMap;)V", at = @At("TAIL"))
+    private void create$migrateOldClipboardComponents(ItemLike item, int count, PatchedDataComponentMap components, CallbackInfo ci) {
         ClipboardContent content = ClipboardContent.EMPTY;
 
         content = create$migrateComponent(content, components, AllDataComponents.CLIPBOARD_PAGES, ClipboardContent::setPages);
@@ -84,8 +89,8 @@ public class ItemStackMixin {
     @Unique
     private static <T> ClipboardContent create$migrateComponent(
         ClipboardContent content,
-        MergedComponentMap components,
-        ComponentType<T> componentType,
+        PatchedDataComponentMap components,
+        DataComponentType<T> componentType,
         BiFunction<ClipboardContent, T, ClipboardContent> function
     ) {
         T value = components.get(componentType);

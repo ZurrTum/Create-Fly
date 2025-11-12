@@ -5,27 +5,26 @@ import com.zurrtum.create.client.AllKeys;
 import com.zurrtum.create.client.catnip.gui.widget.AbstractSimiWidget;
 import com.zurrtum.create.client.foundation.blockEntity.behaviour.scrollValue.ScrollValueBehaviour.StepContext;
 import com.zurrtum.create.client.foundation.utility.CreateLang;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.sound.PositionedSoundInstance;
-import net.minecraft.text.MutableText;
-import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
-
 import java.util.function.Consumer;
 import java.util.function.Function;
+import net.minecraft.ChatFormatting;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.resources.sounds.SimpleSoundInstance;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
 
 public class ScrollInput extends AbstractSimiWidget {
 
     protected Consumer<Integer> onScroll;
     protected int state;
-    protected Text title = CreateLang.translateDirect("gui.scrollInput.defaultTitle");
-    protected final Text scrollToModify = CreateLang.translateDirect("gui.scrollInput.scrollToModify");
-    protected final Text shiftScrollsFaster = CreateLang.translateDirect("gui.scrollInput.shiftScrollsFaster");
-    protected Text hint = null;
+    protected Component title = CreateLang.translateDirect("gui.scrollInput.defaultTitle");
+    protected final Component scrollToModify = CreateLang.translateDirect("gui.scrollInput.scrollToModify");
+    protected final Component shiftScrollsFaster = CreateLang.translateDirect("gui.scrollInput.shiftScrollsFaster");
+    protected Component hint = null;
     protected Label displayLabel;
     protected boolean inverted;
     protected boolean soundPlayed;
-    protected Function<Integer, Text> formatter;
+    protected Function<Integer, Component> formatter;
 
     protected int min, max;
     protected int shiftStep;
@@ -39,7 +38,7 @@ public class ScrollInput extends AbstractSimiWidget {
         shiftStep = 5;
         step = standardStep();
         formatter = i -> {
-            return Text.literal(String.valueOf(i));
+            return Component.literal(String.valueOf(i));
         };
         soundPlayed = false;
     }
@@ -64,7 +63,7 @@ public class ScrollInput extends AbstractSimiWidget {
         return this;
     }
 
-    public ScrollInput format(Function<Integer, Text> formatter) {
+    public ScrollInput format(Function<Integer, Component> formatter) {
         this.formatter = formatter;
         return this;
     }
@@ -74,13 +73,13 @@ public class ScrollInput extends AbstractSimiWidget {
         return this;
     }
 
-    public ScrollInput titled(MutableText title) {
+    public ScrollInput titled(MutableComponent title) {
         this.title = title;
         updateTooltip();
         return this;
     }
 
-    public ScrollInput addHint(MutableText hint) {
+    public ScrollInput addHint(MutableComponent hint) {
         this.hint = hint;
         updateTooltip();
         return this;
@@ -145,8 +144,8 @@ public class ScrollInput extends AbstractSimiWidget {
 
         if (priorState != state) {
             if (!soundPlayed)
-                MinecraftClient.getInstance().getSoundManager()
-                    .play(PositionedSoundInstance.master(AllSoundEvents.SCROLL_VALUE.getMainEvent(), 1.5f + 0.1f * (state - min) / (max - min)));
+                Minecraft.getInstance().getSoundManager()
+                    .play(SimpleSoundInstance.forUI(AllSoundEvents.SCROLL_VALUE.getMainEvent(), 1.5f + 0.1f * (state - min) / (max - min)));
             soundPlayed = true;
             onChanged();
         }
@@ -177,11 +176,11 @@ public class ScrollInput extends AbstractSimiWidget {
         toolTip.clear();
         if (title == null)
             return;
-        toolTip.add(title.copyContentOnly().styled(s -> s.withColor(HEADER_RGB.getRGB())));
+        toolTip.add(title.plainCopy().withStyle(s -> s.withColor(HEADER_RGB.getRGB())));
         if (hint != null)
-            toolTip.add(hint.copyContentOnly().styled(s -> s.withColor(HINT_RGB.getRGB())));
-        toolTip.add(scrollToModify.copyContentOnly().formatted(Formatting.ITALIC, Formatting.DARK_GRAY));
-        toolTip.add(shiftScrollsFaster.copyContentOnly().formatted(Formatting.ITALIC, Formatting.DARK_GRAY));
+            toolTip.add(hint.plainCopy().withStyle(s -> s.withColor(HINT_RGB.getRGB())));
+        toolTip.add(scrollToModify.plainCopy().withStyle(ChatFormatting.ITALIC, ChatFormatting.DARK_GRAY));
+        toolTip.add(shiftScrollsFaster.plainCopy().withStyle(ChatFormatting.ITALIC, ChatFormatting.DARK_GRAY));
     }
 
 }

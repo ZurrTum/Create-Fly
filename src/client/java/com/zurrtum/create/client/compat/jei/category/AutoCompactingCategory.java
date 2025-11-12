@@ -14,11 +14,11 @@ import mezz.jei.api.gui.drawable.IDrawable;
 import mezz.jei.api.gui.ingredient.IRecipeSlotsView;
 import mezz.jei.api.recipe.IFocusGroup;
 import mezz.jei.api.recipe.types.IRecipeType;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.recipe.*;
-import net.minecraft.text.Text;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.crafting.*;
 import org.jetbrains.annotations.NotNull;
 import org.joml.Matrix3x2f;
 
@@ -26,10 +26,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-public class AutoCompactingCategory extends CreateCategory<RecipeEntry<CraftingRecipe>> {
-    public static List<RecipeEntry<CraftingRecipe>> getRecipes(PreparedRecipes preparedRecipes) {
-        List<RecipeEntry<CraftingRecipe>> recipes = new ArrayList<>();
-        for (RecipeEntry<CraftingRecipe> entry : preparedRecipes.getAll(RecipeType.CRAFTING)) {
+public class AutoCompactingCategory extends CreateCategory<RecipeHolder<CraftingRecipe>> {
+    public static List<RecipeHolder<CraftingRecipe>> getRecipes(RecipeMap preparedRecipes) {
+        List<RecipeHolder<CraftingRecipe>> recipes = new ArrayList<>();
+        for (RecipeHolder<CraftingRecipe> entry : preparedRecipes.byType(RecipeType.CRAFTING)) {
             CraftingRecipe recipe = entry.value();
             if (!MechanicalPressBlockEntity.canCompress(recipe) || AllRecipeTypes.shouldIgnoreInAutomation(entry)) {
                 continue;
@@ -43,13 +43,13 @@ public class AutoCompactingCategory extends CreateCategory<RecipeEntry<CraftingR
 
     @Override
     @NotNull
-    public IRecipeType<RecipeEntry<CraftingRecipe>> getRecipeType() {
+    public IRecipeType<RecipeHolder<CraftingRecipe>> getRecipeType() {
         return JeiClientPlugin.AUTOMATIC_PACKING;
     }
 
     @Override
     @NotNull
-    public Text getTitle() {
+    public Component getTitle() {
         return CreateLang.translateDirect("recipe.automatic_packing");
     }
 
@@ -64,7 +64,7 @@ public class AutoCompactingCategory extends CreateCategory<RecipeEntry<CraftingR
     }
 
     @Override
-    public void setRecipe(IRecipeLayoutBuilder builder, RecipeEntry<CraftingRecipe> entry, IFocusGroup focuses) {
+    public void setRecipe(IRecipeLayoutBuilder builder, RecipeHolder<CraftingRecipe> entry, IFocusGroup focuses) {
         CraftingRecipe recipe = entry.value();
         ItemStack result;
         List<Ingredient> ingredients;
@@ -84,9 +84,9 @@ public class AutoCompactingCategory extends CreateCategory<RecipeEntry<CraftingR
     }
 
     @Override
-    public void draw(RecipeEntry<CraftingRecipe> entry, IRecipeSlotsView recipeSlotsView, DrawContext graphics, double mouseX, double mouseY) {
+    public void draw(RecipeHolder<CraftingRecipe> entry, IRecipeSlotsView recipeSlotsView, GuiGraphics graphics, double mouseX, double mouseY) {
         AllGuiTextures.JEI_DOWN_ARROW.render(graphics, 136, 32);
         AllGuiTextures.JEI_SHADOW.render(graphics, 81, 68);
-        graphics.state.addSpecialElement(new PressBasinRenderState(new Matrix3x2f(graphics.getMatrices()), 91, -5));
+        graphics.guiRenderState.submitPicturesInPictureState(new PressBasinRenderState(new Matrix3x2f(graphics.pose()), 91, -5));
     }
 }

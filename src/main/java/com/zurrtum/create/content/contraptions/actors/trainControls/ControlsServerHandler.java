@@ -3,18 +3,17 @@ package com.zurrtum.create.content.contraptions.actors.trainControls;
 import com.zurrtum.create.catnip.data.IntAttached;
 import com.zurrtum.create.catnip.data.WorldAttached;
 import com.zurrtum.create.content.contraptions.AbstractContraptionEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.WorldAccess;
-
 import java.util.*;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.LevelAccessor;
 
 public class ControlsServerHandler {
 
     public static WorldAttached<Map<UUID, ControlsContext>> receivedInputs = new WorldAttached<>($ -> new HashMap<>());
     static final int TIMEOUT = 30;
 
-    public static void tick(WorldAccess world) {
+    public static void tick(LevelAccessor world) {
         Map<UUID, ControlsContext> map = receivedInputs.get(world);
         for (Iterator<Map.Entry<UUID, ControlsContext>> iterator = map.entrySet().iterator(); iterator.hasNext(); ) {
 
@@ -34,7 +33,7 @@ public class ControlsServerHandler {
                     entryIterator.remove(); // key released
             }
 
-            PlayerEntity player = world.getPlayerByUuid(entry.getKey());
+            Player player = world.getPlayerByUUID(entry.getKey());
             if (player == null) {
                 ctx.entity.stopControlling(ctx.controlsLocalPos);
                 iterator.remove();
@@ -51,7 +50,7 @@ public class ControlsServerHandler {
     }
 
     public static void receivePressed(
-        WorldAccess world,
+        LevelAccessor world,
         AbstractContraptionEntity entity,
         BlockPos controlsPos,
         UUID uniqueID,

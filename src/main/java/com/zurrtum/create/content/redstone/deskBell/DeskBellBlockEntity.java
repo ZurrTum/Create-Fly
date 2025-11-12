@@ -6,13 +6,12 @@ import com.zurrtum.create.catnip.animation.LerpedFloat;
 import com.zurrtum.create.catnip.animation.LerpedFloat.Chaser;
 import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
 import com.zurrtum.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
-import net.minecraft.block.BlockState;
-import net.minecraft.storage.ReadView;
-import net.minecraft.storage.WriteView;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.MathHelper;
-
 import java.util.List;
+import net.minecraft.core.BlockPos;
+import net.minecraft.util.Mth;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 
 public class DeskBellBlockEntity extends SmartBlockEntity {
 
@@ -33,7 +32,7 @@ public class DeskBellBlockEntity extends SmartBlockEntity {
         super.tick();
         animation.tickChaser();
 
-        if (world.isClient())
+        if (level.isClientSide())
             return;
         if (blockStateTimer == 0)
             return;
@@ -42,13 +41,13 @@ public class DeskBellBlockEntity extends SmartBlockEntity {
 
         if (blockStateTimer > 0)
             return;
-        BlockState blockState = getCachedState();
-        if (blockState.get(DeskBellBlock.POWERED))
-            AllBlocks.DESK_BELL.unPress(blockState, world, pos);
+        BlockState blockState = getBlockState();
+        if (blockState.getValue(DeskBellBlock.POWERED))
+            AllBlocks.DESK_BELL.unPress(blockState, level, worldPosition);
     }
 
     @Override
-    protected void write(WriteView view, boolean clientPacket) {
+    protected void write(ValueOutput view, boolean clientPacket) {
         super.write(view, clientPacket);
         if (clientPacket && ding)
             view.putBoolean("Ding", true);
@@ -56,21 +55,21 @@ public class DeskBellBlockEntity extends SmartBlockEntity {
     }
 
     @Override
-    protected void read(ReadView view, boolean clientPacket) {
+    protected void read(ValueInput view, boolean clientPacket) {
         super.read(view, clientPacket);
-        if (clientPacket && view.getBoolean("Ding", false))
+        if (clientPacket && view.getBooleanOr("Ding", false))
             ding();
     }
 
     public void ding() {
-        if (!world.isClient()) {
+        if (!level.isClientSide()) {
             blockStateTimer = 20;
             ding = true;
             sendData();
             return;
         }
 
-        animationOffset = world.random.nextFloat() * 2 * MathHelper.PI;
+        animationOffset = level.random.nextFloat() * 2 * Mth.PI;
         animation.startWithValue(1).chase(0, 0.05, Chaser.LINEAR);
     }
 

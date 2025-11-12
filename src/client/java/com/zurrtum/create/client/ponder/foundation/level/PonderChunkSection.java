@@ -1,27 +1,27 @@
 package com.zurrtum.create.client.ponder.foundation.level;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.fluid.FluidState;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.ChunkPos;
-import net.minecraft.world.chunk.ChunkSection;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.ChunkPos;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.chunk.LevelChunkSection;
+import net.minecraft.world.level.material.FluidState;
 
-public class PonderChunkSection extends ChunkSection {
+public class PonderChunkSection extends LevelChunkSection {
     public final PonderChunk owner;
-    protected final BlockPos.Mutable scratchPos;
+    protected final BlockPos.MutableBlockPos scratchPos;
 
     public final int xStart;
     public final int yStart;
     public final int zStart;
     public boolean empty;
 
-    public PonderChunkSection(PonderChunk owner, BlockPos.Mutable scratchPos, ChunkPos pos, int yBase, boolean hasBlock) {
-        super(owner.world.getPalettesFactory());
+    public PonderChunkSection(PonderChunk owner, BlockPos.MutableBlockPos scratchPos, ChunkPos pos, int yBase, boolean hasBlock) {
+        super(owner.world.palettedContainerFactory());
         this.owner = owner;
         this.scratchPos = scratchPos;
-        this.xStart = pos.getStartX();
+        this.xStart = pos.getMinBlockX();
         this.yStart = yBase;
-        this.zStart = pos.getStartZ();
+        this.zStart = pos.getMinBlockZ();
         this.empty = !hasBlock;
     }
 
@@ -43,7 +43,7 @@ public class PonderChunkSection extends ChunkSection {
     }
 
     @Override
-    public boolean isEmpty() {
+    public boolean hasOnlyAir() {
         return empty;
     }
 }

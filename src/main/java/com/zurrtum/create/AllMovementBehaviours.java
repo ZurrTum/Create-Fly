@@ -24,8 +24,8 @@ import com.zurrtum.create.content.logistics.funnel.FunnelMovementBehaviour;
 import com.zurrtum.create.content.processing.basin.BasinMovementBehaviour;
 import com.zurrtum.create.content.processing.burner.BlazeBurnerMovementBehaviour;
 import com.zurrtum.create.content.redstone.contact.ContactMovementBehaviour;
-import net.minecraft.block.Block;
-import net.minecraft.block.Blocks;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
 
 public class AllMovementBehaviours {
     public static final BasinMovementBehaviour BASIN = new BasinMovementBehaviour();

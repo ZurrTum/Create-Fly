@@ -4,10 +4,10 @@ import com.zurrtum.create.AllContraptionTypes;
 import com.zurrtum.create.api.contraption.ContraptionType;
 import com.zurrtum.create.content.contraptions.AssemblyException;
 import com.zurrtum.create.content.contraptions.TranslatingContraption;
-import net.minecraft.storage.ReadView;
-import net.minecraft.storage.WriteView;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 
 public class PulleyContraption extends TranslatingContraption {
 
@@ -26,7 +26,7 @@ public class PulleyContraption extends TranslatingContraption {
     }
 
     @Override
-    public boolean assemble(World world, BlockPos pos) throws AssemblyException {
+    public boolean assemble(Level world, BlockPos pos) throws AssemblyException {
         if (!searchMovedStructure(world, pos, null))
             return false;
         startMoving(world);
@@ -44,14 +44,14 @@ public class PulleyContraption extends TranslatingContraption {
     }
 
     @Override
-    public void write(WriteView view, boolean spawnPacket) {
+    public void write(ValueOutput view, boolean spawnPacket) {
         super.write(view, spawnPacket);
         view.putInt("InitialOffset", initialOffset);
     }
 
     @Override
-    public void read(World world, ReadView view, boolean spawnData) {
-        initialOffset = view.getInt("InitialOffset", 0);
+    public void read(Level world, ValueInput view, boolean spawnData) {
+        initialOffset = view.getIntOr("InitialOffset", 0);
         super.read(world, view, spawnData);
     }
 

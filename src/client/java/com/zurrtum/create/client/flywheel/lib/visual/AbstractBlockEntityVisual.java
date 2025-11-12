@@ -6,16 +6,16 @@ import com.zurrtum.create.client.flywheel.api.visualization.VisualizationContext
 import com.zurrtum.create.client.flywheel.lib.instance.FlatLit;
 import com.zurrtum.create.client.flywheel.lib.math.MoreMath;
 import it.unimi.dsi.fastutil.longs.LongSet;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.client.render.WorldRenderer;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.ChunkSectionPos;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.UnknownNullability;
 import org.joml.FrustumIntersection;
 
 import java.util.Iterator;
+import net.minecraft.client.renderer.LevelRenderer;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.SectionPos;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
 
 /**
  * The layer between a {@link BlockEntity} and the Flywheel backend.
@@ -43,17 +43,17 @@ public abstract class AbstractBlockEntityVisual<T extends BlockEntity> extends A
     protected SectionCollector lightSections;
 
     public AbstractBlockEntityVisual(VisualizationContext ctx, T blockEntity, float partialTick) {
-        super(ctx, blockEntity.getWorld(), partialTick);
+        super(ctx, blockEntity.getLevel(), partialTick);
         this.blockEntity = blockEntity;
-        this.pos = blockEntity.getPos();
-        this.blockState = blockEntity.getCachedState();
+        this.pos = blockEntity.getBlockPos();
+        this.blockState = blockEntity.getBlockState();
         this.visualPos = pos.subtract(ctx.renderOrigin());
     }
 
     @Override
     public void setSectionCollector(SectionCollector sectionCollector) {
         this.lightSections = sectionCollector;
-        lightSections.sections(LongSet.of(ChunkSectionPos.toLong(pos)));
+        lightSections.sections(LongSet.of(SectionPos.asLong(pos)));
     }
 
     /**
@@ -91,15 +91,15 @@ public abstract class AbstractBlockEntityVisual<T extends BlockEntity> extends A
      * @return {@code true} if this visual shouldn't be updated this frame based on its distance from the camera.
      */
     public boolean doDistanceLimitThisFrame(DynamicVisual.Context context) {
-        return !context.limiter().shouldUpdate(pos.getSquaredDistance(context.camera().getPos()));
+        return !context.limiter().shouldUpdate(pos.distToCenterSqr(context.camera().getPosition()));
     }
 
     protected int computePackedLight() {
-        return WorldRenderer.getLightmapCoordinates(level, pos);
+        return LevelRenderer.getLightColor(level, pos);
     }
 
     protected void relight(BlockPos pos, @Nullable FlatLit... instances) {
-        FlatLit.relight(WorldRenderer.getLightmapCoordinates(level, pos), instances);
+        FlatLit.relight(LevelRenderer.getLightColor(level, pos), instances);
     }
 
     protected void relight(@Nullable FlatLit... instances) {
@@ -107,7 +107,7 @@ public abstract class AbstractBlockEntityVisual<T extends BlockEntity> extends A
     }
 
     protected void relight(BlockPos pos, Iterator<@Nullable FlatLit> instances) {
-        FlatLit.relight(WorldRenderer.getLightmapCoordinates(level, pos), instances);
+        FlatLit.relight(LevelRenderer.getLightColor(level, pos), instances);
     }
 
     protected void relight(Iterator<@Nullable FlatLit> instances) {
@@ -115,7 +115,7 @@ public abstract class AbstractBlockEntityVisual<T extends BlockEntity> extends A
     }
 
     protected void relight(BlockPos pos, Iterable<@Nullable FlatLit> instances) {
-        FlatLit.relight(WorldRenderer.getLightmapCoordinates(level, pos), instances);
+        FlatLit.relight(LevelRenderer.getLightColor(level, pos), instances);
     }
 
     protected void relight(Iterable<@Nullable FlatLit> instances) {

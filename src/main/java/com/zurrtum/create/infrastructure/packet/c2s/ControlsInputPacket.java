@@ -4,29 +4,28 @@ import com.zurrtum.create.AllHandle;
 import com.zurrtum.create.AllPackets;
 import com.zurrtum.create.catnip.codecs.stream.CatnipStreamCodecBuilders;
 import io.netty.buffer.ByteBuf;
-import net.minecraft.network.codec.PacketCodec;
-import net.minecraft.network.codec.PacketCodecs;
-import net.minecraft.network.packet.PacketType;
-import net.minecraft.server.network.ServerPlayNetworkHandler;
-import net.minecraft.util.math.BlockPos;
-
 import java.util.Collection;
 import java.util.List;
 import java.util.function.BiConsumer;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.PacketType;
+import net.minecraft.server.network.ServerGamePacketListenerImpl;
 
 public record ControlsInputPacket(
     List<Integer> activatedButtons, boolean press, int contraptionEntityId, BlockPos controlsPos, boolean stopControlling
 ) implements C2SPacket {
-    public static final PacketCodec<ByteBuf, ControlsInputPacket> CODEC = PacketCodec.tuple(
-        CatnipStreamCodecBuilders.list(PacketCodecs.VAR_INT),
+    public static final StreamCodec<ByteBuf, ControlsInputPacket> CODEC = StreamCodec.composite(
+        CatnipStreamCodecBuilders.list(ByteBufCodecs.VAR_INT),
         ControlsInputPacket::activatedButtons,
-        PacketCodecs.BOOLEAN,
+        ByteBufCodecs.BOOL,
         ControlsInputPacket::press,
-        PacketCodecs.INTEGER,
+        ByteBufCodecs.INT,
         ControlsInputPacket::contraptionEntityId,
-        BlockPos.PACKET_CODEC,
+        BlockPos.STREAM_CODEC,
         ControlsInputPacket::controlsPos,
-        PacketCodecs.BOOLEAN,
+        ByteBufCodecs.BOOL,
         ControlsInputPacket::stopControlling,
         ControlsInputPacket::new
     );
@@ -43,12 +42,12 @@ public record ControlsInputPacket(
     }
 
     @Override
-    public PacketType<ControlsInputPacket> getPacketType() {
+    public PacketType<ControlsInputPacket> type() {
         return AllPackets.CONTROLS_INPUT;
     }
 
     @Override
-    public BiConsumer<ServerPlayNetworkHandler, ControlsInputPacket> callback() {
+    public BiConsumer<ServerGamePacketListenerImpl, ControlsInputPacket> callback() {
         return AllHandle::onControlsInput;
     }
 }

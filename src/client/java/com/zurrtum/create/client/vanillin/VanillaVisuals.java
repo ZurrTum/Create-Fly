@@ -6,19 +6,19 @@ import com.zurrtum.create.client.vanillin.config.Configurator;
 import com.zurrtum.create.client.vanillin.config.EntityVisualizerBuilder;
 import com.zurrtum.create.client.vanillin.elements.ShadowElement;
 import com.zurrtum.create.client.vanillin.visuals.*;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.client.render.entity.model.EntityModelLayer;
-import net.minecraft.client.render.entity.model.EntityModelLayers;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.decoration.ItemFrameEntity;
-import net.minecraft.entity.vehicle.AbstractMinecartEntity;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
+import net.minecraft.client.model.geom.ModelLayerLocation;
+import net.minecraft.client.model.geom.ModelLayers;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.decoration.ItemFrame;
+import net.minecraft.world.entity.vehicle.AbstractMinecart;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 
 public class VanillaVisuals {
     public static final Configurator CONFIGURATOR = new Configurator();
@@ -43,12 +43,12 @@ public class VanillaVisuals {
             .shouldVisualize((ctx, e) -> ItemDisplayVisual.shouldVisualize(e)).build().skipVanillaRender(ItemDisplayVisual::shouldVisualize)
             .apply(EXPERIMENTAL);
 
-        minecart(EntityType.CHEST_MINECART, EntityModelLayers.CHEST_MINECART).apply(STABLE);
-        minecart(EntityType.COMMAND_BLOCK_MINECART, EntityModelLayers.COMMAND_BLOCK_MINECART).apply(STABLE);
-        minecart(EntityType.FURNACE_MINECART, EntityModelLayers.FURNACE_MINECART).apply(STABLE);
-        minecart(EntityType.HOPPER_MINECART, EntityModelLayers.HOPPER_MINECART).apply(STABLE);
-        minecart(EntityType.MINECART, EntityModelLayers.MINECART).apply(STABLE);
-        minecart(EntityType.SPAWNER_MINECART, EntityModelLayers.SPAWNER_MINECART).apply(STABLE);
+        minecart(EntityType.CHEST_MINECART, ModelLayers.CHEST_MINECART).apply(STABLE);
+        minecart(EntityType.COMMAND_BLOCK_MINECART, ModelLayers.COMMAND_BLOCK_MINECART).apply(STABLE);
+        minecart(EntityType.FURNACE_MINECART, ModelLayers.FURNACE_MINECART).apply(STABLE);
+        minecart(EntityType.HOPPER_MINECART, ModelLayers.HOPPER_MINECART).apply(STABLE);
+        minecart(EntityType.MINECART, ModelLayers.MINECART).apply(STABLE);
+        minecart(EntityType.SPAWNER_MINECART, ModelLayers.SPAWNER_MINECART).apply(STABLE);
 
         composable(EntityType.TNT_MINECART).apply(VanillaVisuals::commonElements)
             .with(element(VisualElements.SHADOW).configure(new ShadowElement.Config(0.7f, ShadowElement.Config.DEFAULT_STRENGTH)).build())
@@ -69,12 +69,12 @@ public class VanillaVisuals {
         builder.with(element(VisualElements.HITBOX).configure(false).build());
     }
 
-    public static <T extends ItemFrameEntity> EntityVisualizerBuilder<T> itemFrame(EntityType<T> type) {
+    public static <T extends ItemFrame> EntityVisualizerBuilder<T> itemFrame(EntityType<T> type) {
         return composable(type).apply(VanillaVisuals::commonElements).with(element(VisualElements.ITEM_FRAME).build())
             .shouldVisualize((ctx, entity) -> ItemFrameVisual.shouldVisualize(entity)).build().skipVanillaRender(ItemFrameVisual::shouldVisualize);
     }
 
-    public static <T extends AbstractMinecartEntity> EntityVisualizerBuilder<T> minecart(EntityType<T> type, EntityModelLayer variant) {
+    public static <T extends AbstractMinecart> EntityVisualizerBuilder<T> minecart(EntityType<T> type, ModelLayerLocation variant) {
         return composable(type).apply(VanillaVisuals::commonElements)
             .with(element(VisualElements.SHADOW).configure(new ShadowElement.Config(0.7f, ShadowElement.Config.DEFAULT_STRENGTH)).build())
             .with(element(VisualElements.FIRE).build()).with(element(VisualElements.MINECART).configure(variant).build()).build()

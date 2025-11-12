@@ -6,18 +6,18 @@ import com.zurrtum.create.infrastructure.items.CombinedInvWrapper;
 import com.zurrtum.create.infrastructure.items.ItemStackHandler;
 import com.zurrtum.create.infrastructure.items.SidedItemInventory;
 import com.zurrtum.create.infrastructure.transfer.SlotRangeCache;
-import net.minecraft.block.BlockState;
-import net.minecraft.inventory.Inventory;
-import net.minecraft.inventory.SidedInventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.Container;
+import net.minecraft.world.WorldlyContainer;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class PortableItemInterfaceBlockEntity extends PortableStorageInterfaceBlockEntity {
 
-    public final Inventory capability;
+    public final Container capability;
 
     public PortableItemInterfaceBlockEntity(BlockPos pos, BlockState state) {
         super(AllBlockEntityTypes.PORTABLE_STORAGE_INTERFACE, pos, state);
@@ -37,35 +37,35 @@ public class PortableItemInterfaceBlockEntity extends PortableStorageInterfaceBl
     }
 
     class InterfaceItemHandler implements SidedItemInventory {
-        private static final Inventory EMPTY = new ItemStackHandler(0);
+        private static final Container EMPTY = new ItemStackHandler(0);
 
         private int[] slots = SlotRangeCache.EMPTY;
-        private Inventory wrapped = EMPTY;
+        private Container wrapped = EMPTY;
 
         @Override
-        public int[] getAvailableSlots(Direction side) {
+        public int[] getSlotsForFace(Direction side) {
             return slots;
         }
 
         @Override
-        public boolean canExtract(int slot, ItemStack stack, Direction dir) {
+        public boolean canTakeItemThroughFace(int slot, ItemStack stack, Direction dir) {
             if (wrapped == EMPTY) {
                 return false;
             }
-            return ((SidedInventory) wrapped).canExtract(slot, stack, dir);
+            return ((WorldlyContainer) wrapped).canTakeItemThroughFace(slot, stack, dir);
         }
 
         @Override
-        public boolean canInsert(int slot, ItemStack stack, @Nullable Direction dir) {
+        public boolean canPlaceItemThroughFace(int slot, ItemStack stack, @Nullable Direction dir) {
             if (wrapped == EMPTY) {
                 return false;
             }
-            return ((SidedInventory) wrapped).canInsert(slot, stack, dir);
+            return ((WorldlyContainer) wrapped).canPlaceItemThroughFace(slot, stack, dir);
         }
 
         public void setInventory(CombinedInvWrapper wrapped) {
             this.wrapped = wrapped;
-            slots = wrapped.getAvailableSlots(null);
+            slots = wrapped.getSlotsForFace(null);
         }
 
         public void setEmpty() {
@@ -74,35 +74,35 @@ public class PortableItemInterfaceBlockEntity extends PortableStorageInterfaceBl
         }
 
         @Override
-        public int size() {
+        public int getContainerSize() {
             return slots.length;
         }
 
         @Override
-        public int getMaxCountPerStack() {
-            return wrapped.getMaxCountPerStack();
+        public int getMaxStackSize() {
+            return wrapped.getMaxStackSize();
         }
 
         @Override
-        public int getMaxCount(ItemStack stack) {
-            return wrapped.getMaxCount(stack);
+        public int getMaxStackSize(ItemStack stack) {
+            return wrapped.getMaxStackSize(stack);
         }
 
         @Override
-        public ItemStack getStack(int slot) {
-            return wrapped.getStack(slot);
+        public ItemStack getItem(int slot) {
+            return wrapped.getItem(slot);
         }
 
         @Override
-        public void setStack(int slot, ItemStack stack) {
-            wrapped.setStack(slot, stack);
+        public void setItem(int slot, ItemStack stack) {
+            wrapped.setItem(slot, stack);
         }
 
         @Override
         public int insert(ItemStack stack, int maxAmount, Direction side) {
             int insert = wrapped.insert(stack, maxAmount, side);
             if (insert != 0) {
-                markDirty();
+                setChanged();
             }
             return insert;
         }
@@ -111,13 +111,13 @@ public class PortableItemInterfaceBlockEntity extends PortableStorageInterfaceBl
         public int extract(ItemStack stack, int maxAmount, Direction side) {
             int extract = wrapped.extract(stack, maxAmount, side);
             if (extract != 0) {
-                markDirty();
+                setChanged();
             }
             return extract;
         }
 
         @Override
-        public void markDirty() {
+        public void setChanged() {
             onContentTransferred();
         }
 

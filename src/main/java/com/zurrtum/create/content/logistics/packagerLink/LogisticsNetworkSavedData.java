@@ -2,19 +2,18 @@ package com.zurrtum.create.content.logistics.packagerLink;
 
 import com.mojang.serialization.Codec;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.world.PersistentState;
-import net.minecraft.world.PersistentStateType;
-
+import net.minecraft.world.level.saveddata.SavedData;
+import net.minecraft.world.level.saveddata.SavedDataType;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-public class LogisticsNetworkSavedData extends PersistentState {
+public class LogisticsNetworkSavedData extends SavedData {
     public static final Codec<LogisticsNetworkSavedData> CODEC = Codec.list(LogisticsNetwork.CODEC)
         .xmap(LogisticsNetworkSavedData::createMap, LogisticsNetworkSavedData::toList)
         .xmap(LogisticsNetworkSavedData::new, LogisticsNetworkSavedData::getLogisticsNetworks);
-    private static final PersistentStateType<LogisticsNetworkSavedData> TYPE = new PersistentStateType<>(
+    private static final SavedDataType<LogisticsNetworkSavedData> TYPE = new SavedDataType<>(
         "create_logistics",
         LogisticsNetworkSavedData::new,
         CODEC,
@@ -46,6 +45,6 @@ public class LogisticsNetworkSavedData extends PersistentState {
     }
 
     public static LogisticsNetworkSavedData load(MinecraftServer server) {
-        return server.getOverworld().getPersistentStateManager().getOrCreate(TYPE);
+        return server.overworld().getDataStorage().computeIfAbsent(TYPE);
     }
 }

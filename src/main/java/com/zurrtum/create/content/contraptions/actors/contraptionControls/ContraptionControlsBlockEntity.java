@@ -7,16 +7,15 @@ import com.zurrtum.create.catnip.animation.LerpedFloat.Chaser;
 import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
 import com.zurrtum.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.foundation.blockEntity.behaviour.filtering.ServerFilteringBehaviour;
-import net.minecraft.block.BlockState;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.storage.ReadView;
-import net.minecraft.storage.WriteView;
-import net.minecraft.text.MutableText;
-import net.minecraft.text.Text;
-import net.minecraft.util.math.BlockPos;
-
 import java.util.List;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 
 public class ContraptionControlsBlockEntity extends SmartBlockEntity {
 
@@ -36,7 +35,7 @@ public class ContraptionControlsBlockEntity extends SmartBlockEntity {
     @Override
     public void addBehaviours(List<BlockEntityBehaviour<?>> behaviours) {
         behaviours.add(filtering = new ServerFilteringBehaviour(this));
-        filtering.withPredicate(stack -> stack.isIn(AllItemTags.CONTRAPTION_CONTROLLED));
+        filtering.withPredicate(stack -> stack.is(AllItemTags.CONTRAPTION_CONTROLLED));
     }
 
     public void pressButton() {
@@ -44,9 +43,9 @@ public class ContraptionControlsBlockEntity extends SmartBlockEntity {
     }
 
     public void updatePoweredState() {
-        if (world.isClient())
+        if (level.isClientSide())
             return;
-        boolean powered = world.isReceivingRedstonePower(pos);
+        boolean powered = level.hasNeighborSignal(worldPosition);
         if (this.powered == powered)
             return;
         this.powered = powered;
@@ -63,7 +62,7 @@ public class ContraptionControlsBlockEntity extends SmartBlockEntity {
     @Override
     public void tick() {
         super.tick();
-        if (!world.isClient())
+        if (!level.isClientSide())
             return;
         tickAnimations();
         int value = disabled ? 4 * 45 : 0;
@@ -77,28 +76,28 @@ public class ContraptionControlsBlockEntity extends SmartBlockEntity {
     }
 
     @Override
-    protected void read(ReadView view, boolean clientPacket) {
+    protected void read(ValueInput view, boolean clientPacket) {
         super.read(view, clientPacket);
-        disabled = view.getBoolean("Disabled", false);
-        powered = view.getBoolean("Powered", false);
+        disabled = view.getBooleanOr("Disabled", false);
+        powered = view.getBooleanOr("Powered", false);
     }
 
     @Override
-    protected void write(WriteView view, boolean clientPacket) {
+    protected void write(ValueOutput view, boolean clientPacket) {
         super.write(view, clientPacket);
         view.putBoolean("Disabled", disabled);
         view.putBoolean("Powered", powered);
     }
 
-    public static void sendStatus(PlayerEntity player, ItemStack filter, boolean enabled) {
-        MutableText state = Text.translatable("create.contraption.controls.actor_toggle." + (enabled ? "on" : "off"))
+    public static void sendStatus(Player player, ItemStack filter, boolean enabled) {
+        MutableComponent state = Component.translatable("create.contraption.controls.actor_toggle." + (enabled ? "on" : "off"))
             .withColor(enabled ? 0xA3DF55 : 0xEE9246);
 
         if (filter.isEmpty()) {
-            player.sendMessage(Text.translatable("create.contraption.controls.all_actor_toggle", state), true);
+            player.displayClientMessage(Component.translatable("create.contraption.controls.all_actor_toggle", state), true);
             return;
         }
 
-        player.sendMessage(Text.translatable("create.contraption.controls.specific_actor_toggle", filter.getName().getString(), state), true);
+        player.displayClientMessage(Component.translatable("create.contraption.controls.specific_actor_toggle", filter.getHoverName().getString(), state), true);
     }
 }

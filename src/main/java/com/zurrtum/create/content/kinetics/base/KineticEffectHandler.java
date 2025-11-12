@@ -3,16 +3,16 @@ package com.zurrtum.create.content.kinetics.base;
 import com.zurrtum.create.catnip.math.VecHelper;
 import com.zurrtum.create.content.kinetics.base.IRotate.SpeedLevel;
 import com.zurrtum.create.infrastructure.particle.RotationIndicatorParticleData;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.particle.ParticleEffect;
-import net.minecraft.particle.ParticleTypes;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction.Axis;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.math.random.Random;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction.Axis;
+import net.minecraft.core.particles.ParticleOptions;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.Vec3;
 
 public class KineticEffectHandler {
 
@@ -26,9 +26,9 @@ public class KineticEffectHandler {
     }
 
     public void tick() {
-        World world = kte.getWorld();
+        Level world = kte.getLevel();
 
-        if (world.isClient()) {
+        if (world.isClientSide()) {
             if (overStressedTime > 0)
                 if (--overStressedTime == 0)
                     if (kte.isOverStressed()) {
@@ -55,17 +55,17 @@ public class KineticEffectHandler {
         particleSpawnCountdown = 2;
     }
 
-    public void spawnEffect(ParticleEffect particle, float maxMotion, int amount) {
-        World world = kte.getWorld();
+    public void spawnEffect(ParticleOptions particle, float maxMotion, int amount) {
+        Level world = kte.getLevel();
         if (world == null)
             return;
-        if (!world.isClient())
+        if (!world.isClientSide())
             return;
-        Random r = world.random;
+        RandomSource r = world.random;
         for (int i = 0; i < amount; i++) {
-            Vec3d motion = VecHelper.offsetRandomly(Vec3d.ZERO, r, maxMotion);
-            Vec3d position = VecHelper.getCenterOf(kte.getPos());
-            world.addParticleClient(particle, position.x, position.y, position.z, motion.x, motion.y, motion.z);
+            Vec3 motion = VecHelper.offsetRandomly(Vec3.ZERO, r, maxMotion);
+            Vec3 position = VecHelper.getCenterOf(kte.getBlockPos());
+            world.addParticle(particle, position.x, position.y, position.z, motion.x, motion.y, motion.z);
         }
     }
 
@@ -74,7 +74,7 @@ public class KineticEffectHandler {
         if (speed == 0)
             return;
 
-        BlockState state = kte.getCachedState();
+        BlockState state = kte.getBlockState();
         Block block = state.getBlock();
         if (!(block instanceof KineticBlock kb))
             return;
@@ -83,22 +83,22 @@ public class KineticEffectHandler {
         float radius2 = kb.getParticleTargetRadius();
 
         Axis axis = kb.getRotationAxis(state);
-        BlockPos pos = kte.getPos();
-        World world = kte.getWorld();
+        BlockPos pos = kte.getBlockPos();
+        Level world = kte.getLevel();
         if (axis == null)
             return;
         if (world == null)
             return;
 
-        Vec3d vec = VecHelper.getCenterOf(pos);
+        Vec3 vec = VecHelper.getCenterOf(pos);
         SpeedLevel speedLevel = SpeedLevel.of(speed);
         int color = speedLevel.getColor();
         int particleSpeed = speedLevel.getParticleSpeed();
         particleSpeed *= Math.signum(speed);
 
-        if (world instanceof ServerWorld serverWorld) {
+        if (world instanceof ServerLevel serverWorld) {
             RotationIndicatorParticleData particleData = new RotationIndicatorParticleData(color, particleSpeed, radius1, radius2, 10, axis);
-            serverWorld.spawnParticles(particleData, vec.x, vec.y, vec.z, 20, 0, 0, 0, 1);
+            serverWorld.sendParticles(particleData, vec.x, vec.y, vec.z, 20, 0, 0, 0, 1);
         }
     }
 

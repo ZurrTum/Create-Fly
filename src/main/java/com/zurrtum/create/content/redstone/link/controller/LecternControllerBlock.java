@@ -6,29 +6,28 @@ import com.zurrtum.create.AllSoundEvents;
 import com.zurrtum.create.api.schematic.requirement.SpecialBlockItemRequirement;
 import com.zurrtum.create.content.schematics.requirement.ItemRequirement;
 import com.zurrtum.create.foundation.block.IBE;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.LecternBlock;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.Hand;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.world.World;
-import net.minecraft.world.WorldView;
-
 import java.util.ArrayList;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelReader;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.LecternBlock;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.BlockHitResult;
 
 public class LecternControllerBlock extends LecternBlock implements IBE<LecternControllerBlockEntity>, SpecialBlockItemRequirement {
 
-    public LecternControllerBlock(Settings properties) {
+    public LecternControllerBlock(Properties properties) {
         super(properties);
-        setDefaultState(getDefaultState().with(HAS_BOOK, true));
+        registerDefaultState(defaultBlockState().setValue(HAS_BOOK, true));
     }
 
     @Override
@@ -42,53 +41,53 @@ public class LecternControllerBlock extends LecternBlock implements IBE<LecternC
     }
 
     @Override
-    public BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
-        return IBE.super.createBlockEntity(pos, state);
+    public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
+        return IBE.super.newBlockEntity(pos, state);
     }
 
     @Override
-    protected ActionResult onUseWithItem(
+    protected InteractionResult useItemOn(
         ItemStack stack,
         BlockState state,
-        World level,
+        Level level,
         BlockPos pos,
-        PlayerEntity player,
-        Hand hand,
+        Player player,
+        InteractionHand hand,
         BlockHitResult hitResult
     ) {
-        if (!player.isSneaking() && LecternControllerBlockEntity.playerInRange(player, level, pos)) {
-            if (!level.isClient())
+        if (!player.isShiftKeyDown() && LecternControllerBlockEntity.playerInRange(player, level, pos)) {
+            if (!level.isClientSide())
                 withBlockEntityDo(level, pos, be -> be.tryStartUsing(player));
-            return ActionResult.SUCCESS;
+            return InteractionResult.SUCCESS;
         }
 
-        if (player.isSneaking()) {
-            if (!level.isClient())
+        if (player.isShiftKeyDown()) {
+            if (!level.isClientSide())
                 replaceWithLectern(state, level, pos);
-            return ActionResult.SUCCESS;
+            return InteractionResult.SUCCESS;
         }
 
-        return ActionResult.PASS_TO_DEFAULT_BLOCK_ACTION;
+        return InteractionResult.TRY_WITH_EMPTY_HAND;
     }
 
     @Override
-    public int getComparatorOutput(BlockState state, World world, BlockPos pos, Direction direction) {
+    public int getAnalogOutputSignal(BlockState state, Level world, BlockPos pos, Direction direction) {
         return 15;
     }
 
-    public void replaceLectern(BlockState lecternState, World world, BlockPos pos, ItemStack controller) {
-        world.setBlockState(pos, getDefaultState().with(FACING, lecternState.get(FACING)).with(POWERED, lecternState.get(POWERED)));
+    public void replaceLectern(BlockState lecternState, Level world, BlockPos pos, ItemStack controller) {
+        world.setBlockAndUpdate(pos, defaultBlockState().setValue(FACING, lecternState.getValue(FACING)).setValue(POWERED, lecternState.getValue(POWERED)));
         withBlockEntityDo(world, pos, be -> be.setController(controller));
     }
 
-    public void replaceWithLectern(BlockState state, World world, BlockPos pos) {
+    public void replaceWithLectern(BlockState state, Level world, BlockPos pos) {
         AllSoundEvents.CONTROLLER_TAKE.playOnServer(world, pos);
-        world.setBlockState(pos, Blocks.LECTERN.getDefaultState().with(FACING, state.get(FACING)).with(POWERED, state.get(POWERED)));
+        world.setBlockAndUpdate(pos, Blocks.LECTERN.defaultBlockState().setValue(FACING, state.getValue(FACING)).setValue(POWERED, state.getValue(POWERED)));
     }
 
     @Override
-    protected ItemStack getPickStack(WorldView world, BlockPos pos, BlockState state, boolean includeData) {
-        return Items.LECTERN.getDefaultStack();
+    protected ItemStack getCloneItemStack(LevelReader world, BlockPos pos, BlockState state, boolean includeData) {
+        return Items.LECTERN.getDefaultInstance();
     }
 
     @Override

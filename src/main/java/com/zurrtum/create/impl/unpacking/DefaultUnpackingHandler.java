@@ -3,21 +3,21 @@ package com.zurrtum.create.impl.unpacking;
 import com.zurrtum.create.api.packager.unpacking.UnpackingHandler;
 import com.zurrtum.create.foundation.item.ItemHelper;
 import com.zurrtum.create.infrastructure.component.PackageOrderWithCrafts;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.inventory.Inventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.Container;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
 
 public class DefaultUnpackingHandler implements UnpackingHandler {
     @Override
     public boolean unpack(
-        World level,
+        Level level,
         BlockPos pos,
         BlockState state,
         Direction side,
@@ -29,7 +29,7 @@ public class DefaultUnpackingHandler implements UnpackingHandler {
         if (targetBE == null)
             return false;
 
-        Inventory targetInv = ItemHelper.getInventory(level, pos, state, targetBE, side);
+        Container targetInv = ItemHelper.getInventory(level, pos, state, targetBE, side);
         if (targetInv == null)
             return false;
 

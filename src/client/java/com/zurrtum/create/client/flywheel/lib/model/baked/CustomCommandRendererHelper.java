@@ -1,40 +1,39 @@
 package com.zurrtum.create.client.flywheel.lib.model.baked;
 
-import net.minecraft.client.render.OutlineVertexConsumerProvider.OutlineVertexConsumer;
-import net.minecraft.client.render.RenderLayer;
-import net.minecraft.client.render.VertexConsumer;
-import net.minecraft.client.render.VertexConsumerProvider;
-import net.minecraft.client.render.command.BatchingRenderCommandQueue;
-import net.minecraft.client.render.command.CustomCommandRenderer;
-import net.minecraft.client.render.command.OrderedRenderCommandQueueImpl;
-
+import com.mojang.blaze3d.vertex.VertexConsumer;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.OutlineBufferSource.EntityOutlineGenerator;
+import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.SubmitNodeCollection;
+import net.minecraft.client.renderer.SubmitNodeStorage;
+import net.minecraft.client.renderer.feature.CustomFeatureRenderer;
 
 public class CustomCommandRendererHelper {
-    public static void render(BatchingRenderCommandQueue queue, VertexConsumerProvider vertexConsumers) {
-        CustomCommandRenderer.Commands commands = queue.getCustomCommands();
+    public static void render(SubmitNodeCollection queue, MultiBufferSource vertexConsumers) {
+        CustomFeatureRenderer.Storage commands = queue.getCustomGeometrySubmits();
 
-        for (Map.Entry<RenderLayer, List<OrderedRenderCommandQueueImpl.CustomCommand>> entry : commands.customCommands.entrySet()) {
+        for (Map.Entry<RenderType, List<SubmitNodeStorage.CustomGeometrySubmit>> entry : commands.customGeometrySubmits.entrySet()) {
             VertexConsumer vertexConsumer = vertexConsumers.getBuffer(entry.getKey());
 
-            for (OrderedRenderCommandQueueImpl.CustomCommand customCommand : entry.getValue()) {
-                customCommand.customRenderer().render(customCommand.matricesEntry(), vertexConsumer);
+            for (SubmitNodeStorage.CustomGeometrySubmit customCommand : entry.getValue()) {
+                customCommand.customGeometryRenderer().render(customCommand.pose(), vertexConsumer);
             }
         }
 
     }
 
-    public static VertexConsumer getOutlineBuffer(VertexConsumerProvider vertexConsumers, RenderLayer layer, int color) {
+    public static VertexConsumer getOutlineBuffer(MultiBufferSource vertexConsumers, RenderType layer, int color) {
         if (layer.isOutline()) {
             VertexConsumer vertexConsumer = vertexConsumers.getBuffer(layer);
-            return new OutlineVertexConsumer(vertexConsumer, color);
+            return new EntityOutlineGenerator(vertexConsumer, color);
         }
-        Optional<RenderLayer> optional = layer.getAffectedOutline();
+        Optional<RenderType> optional = layer.outline();
         if (optional.isPresent()) {
             VertexConsumer vertexConsumer2 = vertexConsumers.getBuffer(optional.get());
-            return new OutlineVertexConsumer(vertexConsumer2, color);
+            return new EntityOutlineGenerator(vertexConsumer2, color);
         }
         return null;
     }

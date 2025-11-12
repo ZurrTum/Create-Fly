@@ -1,14 +1,14 @@
 package com.zurrtum.create.content.redstone.displayLink.source;
 
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.stat.Stats;
-import net.minecraft.text.Text;
+import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.stats.Stats;
 
 public class DeathCounterDisplaySource extends StatTrackingDisplaySource {
 
     @Override
-    protected int updatedScoreOf(ServerPlayerEntity player) {
-        return player.getStatHandler().getStat(Stats.CUSTOM.getOrCreateStat(Stats.DEATHS));
+    protected int updatedScoreOf(ServerPlayer player) {
+        return player.getStats().getValue(Stats.CUSTOM.get(Stats.DEATHS));
     }
 
     @Override
@@ -22,8 +22,8 @@ public class DeathCounterDisplaySource extends StatTrackingDisplaySource {
     }
 
     @Override
-    protected Text getObjectiveDisplayName() {
-        return Text.translatable("create.display_source.scoreboard.objective.deaths");
+    protected Component getObjectiveDisplayName() {
+        return Component.translatable("create.display_source.scoreboard.objective.deaths");
     }
 
 }

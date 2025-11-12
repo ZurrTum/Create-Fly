@@ -1,7 +1,7 @@
 package com.zurrtum.create.client.ponder.api.registration;
 
 import com.zurrtum.create.client.ponder.api.level.PonderLevel;
-import net.minecraft.util.Identifier;
+import net.minecraft.resources.ResourceLocation;
 
 public interface PonderPlugin {
 
@@ -13,13 +13,13 @@ public interface PonderPlugin {
     /**
      * Register all the Ponder Scenes added by your Mod
      */
-    default void registerScenes(PonderSceneRegistrationHelper<Identifier> helper) {
+    default void registerScenes(PonderSceneRegistrationHelper<ResourceLocation> helper) {
     }
 
     /**
      * Register all the Ponder Tags added by your Mod
      */
-    default void registerTags(PonderTagRegistrationHelper<Identifier> helper) {
+    default void registerTags(PonderTagRegistrationHelper<ResourceLocation> helper) {
     }
 
     default void registerSharedText(SharedTextRegistrationHelper helper) {

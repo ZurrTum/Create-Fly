@@ -12,20 +12,24 @@ import com.zurrtum.create.content.processing.recipe.SizedIngredient;
 import com.zurrtum.create.foundation.fluid.FluidIngredient;
 import com.zurrtum.create.infrastructure.component.BottleType;
 import com.zurrtum.create.infrastructure.fluids.FluidStack;
-import net.minecraft.component.type.PotionContentsComponent;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.network.RegistryByteBuf;
-import net.minecraft.network.codec.PacketCodec;
-import net.minecraft.potion.Potion;
-import net.minecraft.recipe.*;
-import net.minecraft.registry.RegistryKeys;
-import net.minecraft.registry.RegistryWrapper;
-import net.minecraft.registry.entry.RegistryEntry.Reference;
-import net.minecraft.resource.featuretoggle.FeatureSet;
-import net.minecraft.util.Identifier;
-import net.minecraft.world.World;
+import net.minecraft.core.Holder.Reference;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.flag.FeatureFlagSet;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.alchemy.Potion;
+import net.minecraft.world.item.alchemy.PotionBrewing;
+import net.minecraft.world.item.alchemy.PotionContents;
+import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.item.crafting.Recipe;
+import net.minecraft.world.item.crafting.RecipeSerializer;
+import net.minecraft.world.item.crafting.RecipeType;
+import net.minecraft.world.level.Level;
 
 import java.util.*;
 
@@ -35,32 +39,28 @@ public record PotionRecipe(FluidStack result, FluidIngredient fluidIngredient, I
     public static final List<Item> SUPPORTED_CONTAINERS = List.of(Items.POTION, Items.SPLASH_POTION, Items.LINGERING_POTION);
     public static ReloadData data;
 
-    public static void register(Map<Identifier, Recipe<?>> map) {
+    public static void register(Map<ResourceLocation, Recipe<?>> map) {
         if (data == null) {
             return;
         }
-        BrewingRecipeRegistry potionBrewing = BrewingRecipeRegistry.create(data.enabledFeatures);
+        PotionBrewing potionBrewing = PotionBrewing.bootstrap(data.enabledFeatures);
         int recipeIndex = 0;
         List<Item> allowedSupportedContainers = new ArrayList<>();
         for (Item container : SUPPORTED_CONTAINERS) {
-            if (potionBrewing.isPotionType(new ItemStack(container))) {
+            if (potionBrewing.isContainer(new ItemStack(container))) {
                 allowedSupportedContainers.add(container);
             }
         }
         for (Item container : allowedSupportedContainers) {
             BottleType bottleType = PotionFluidHandler.bottleTypeFromItem(container);
-            for (BrewingRecipeRegistry.Recipe<Potion> mix : potionBrewing.potionRecipes) {
-                FluidIngredient fromFluid = PotionFluidHandler.getFluidIngredientFromPotion(
-                    new PotionContentsComponent(mix.from()),
-                    bottleType,
-                    81000
-                );
-                FluidStack toFluid = PotionFluidHandler.getFluidFromPotion(new PotionContentsComponent(mix.to()), bottleType, 81000);
-                Identifier id = Identifier.of(MOD_ID, "potion_mixing_vanilla_" + recipeIndex++);
+            for (PotionBrewing.Mix<Potion> mix : potionBrewing.potionMixes) {
+                FluidIngredient fromFluid = PotionFluidHandler.getFluidIngredientFromPotion(new PotionContents(mix.from()), bottleType, 81000);
+                FluidStack toFluid = PotionFluidHandler.getFluidFromPotion(new PotionContents(mix.to()), bottleType, 81000);
+                ResourceLocation id = ResourceLocation.fromNamespaceAndPath(MOD_ID, "potion_mixing_vanilla_" + recipeIndex++);
                 map.put(id, new PotionRecipe(toFluid, fromFluid, mix.ingredient()));
             }
         }
-        for (BrewingRecipeRegistry.Recipe<Item> mix : potionBrewing.itemRecipes) {
+        for (PotionBrewing.Mix<Item> mix : potionBrewing.containerMixes) {
             Item from = mix.from().value();
             if (!allowedSupportedContainers.contains(from)) {
                 continue;
@@ -73,16 +73,12 @@ public record PotionRecipe(FluidStack result, FluidIngredient fluidIngredient, I
             BottleType toBottleType = PotionFluidHandler.bottleTypeFromItem(to);
             Ingredient ingredient = mix.ingredient();
 
-            List<Reference<Potion>> potions = data.registries.getOrThrow(RegistryKeys.POTION).streamEntries().toList();
+            List<Reference<Potion>> potions = data.registries.lookupOrThrow(Registries.POTION).listElements().toList();
 
             for (Reference<Potion> potion : potions) {
-                FluidIngredient fromFluid = PotionFluidHandler.getFluidIngredientFromPotion(
-                    new PotionContentsComponent(potion),
-                    fromBottleType,
-                    81000
-                );
-                FluidStack toFluid = PotionFluidHandler.getFluidFromPotion(new PotionContentsComponent(potion), toBottleType, 81000);
-                Identifier id = Identifier.of(MOD_ID, "potion_mixing_vanilla_" + recipeIndex++);
+                FluidIngredient fromFluid = PotionFluidHandler.getFluidIngredientFromPotion(new PotionContents(potion), fromBottleType, 81000);
+                FluidStack toFluid = PotionFluidHandler.getFluidFromPotion(new PotionContents(potion), toBottleType, 81000);
+                ResourceLocation id = ResourceLocation.fromNamespaceAndPath(MOD_ID, "potion_mixing_vanilla_" + recipeIndex++);
                 map.put(id, new PotionRecipe(toFluid, fromFluid, ingredient));
             }
         }
@@ -105,7 +101,7 @@ public record PotionRecipe(FluidStack result, FluidIngredient fluidIngredient, I
     }
 
     @Override
-    public boolean matches(BasinInput input, World world) {
+    public boolean matches(BasinInput input, Level world) {
         if (!HeatCondition.HEATED.testBlazeBurner(input.heat())) {
             return false;
         }
@@ -151,7 +147,7 @@ public record PotionRecipe(FluidStack result, FluidIngredient fluidIngredient, I
     }
 
     public record ReloadData(
-        RegistryWrapper.WrapperLookup registries, FeatureSet enabledFeatures
+        HolderLookup.Provider registries, FeatureFlagSet enabledFeatures
     ) {
     }
 
@@ -161,12 +157,12 @@ public record PotionRecipe(FluidStack result, FluidIngredient fluidIngredient, I
             FluidIngredient.CODEC.fieldOf("fluid_ingredient").forGetter(PotionRecipe::fluidIngredient),
             Ingredient.CODEC.fieldOf("ingredient").forGetter(PotionRecipe::ingredient)
         ).apply(instance, PotionRecipe::new));
-        public static final PacketCodec<RegistryByteBuf, PotionRecipe> PACKET_CODEC = PacketCodec.tuple(
+        public static final StreamCodec<RegistryFriendlyByteBuf, PotionRecipe> PACKET_CODEC = StreamCodec.composite(
             FluidStack.PACKET_CODEC,
             PotionRecipe::result,
             FluidIngredient.PACKET_CODEC,
             PotionRecipe::fluidIngredient,
-            Ingredient.PACKET_CODEC,
+            Ingredient.CONTENTS_STREAM_CODEC,
             PotionRecipe::ingredient,
             PotionRecipe::new
         );
@@ -177,7 +173,7 @@ public record PotionRecipe(FluidStack result, FluidIngredient fluidIngredient, I
         }
 
         @Override
-        public PacketCodec<RegistryByteBuf, PotionRecipe> packetCodec() {
+        public StreamCodec<RegistryFriendlyByteBuf, PotionRecipe> streamCodec() {
             return PACKET_CODEC;
         }
     }

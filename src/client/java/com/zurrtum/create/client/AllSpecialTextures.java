@@ -1,7 +1,7 @@
 package com.zurrtum.create.client;
 
 import com.zurrtum.create.client.catnip.render.BindableTexture;
-import net.minecraft.util.Identifier;
+import net.minecraft.resources.ResourceLocation;
 
 public enum AllSpecialTextures implements BindableTexture {
 
@@ -15,13 +15,13 @@ public enum AllSpecialTextures implements BindableTexture {
     ;
 
     public static final String ASSET_PATH = "textures/special/";
-    private final Identifier location;
+    private final ResourceLocation location;
 
     AllSpecialTextures(String filename) {
         location = Create.asResource(ASSET_PATH + filename);
     }
 
-    public Identifier getLocation() {
+    public ResourceLocation getLocation() {
         return location;
     }
 

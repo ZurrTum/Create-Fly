@@ -12,15 +12,15 @@ import com.zurrtum.create.content.contraptions.chassis.RadialChassisBlock;
 import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
 import com.zurrtum.create.foundation.blockEntity.behaviour.ValueSettings;
 import com.zurrtum.create.foundation.blockEntity.behaviour.scrollValue.ServerBulkScrollValueBehaviour;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.text.Text;
-import net.minecraft.util.hit.BlockHitResult;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.phys.BlockHitResult;
 
 public class ChassisScrollValueBehaviour extends ScrollValueBehaviour<ChassisBlockEntity, ServerBulkScrollValueBehaviour> {
 
     public ChassisScrollValueBehaviour(ChassisBlockEntity be) {
         super(
-            CreateLang.translateDirect(be.getCachedState()
+            CreateLang.translateDirect(be.getBlockState()
                 .getBlock() instanceof RadialChassisBlock ? "contraptions.chassis.radius" : "contraptions.chassis.range"),
             be,
             new CenteredSideValueBoxTransform()
@@ -30,8 +30,8 @@ public class ChassisScrollValueBehaviour extends ScrollValueBehaviour<ChassisBlo
     }
 
     @Override
-    public ValueSettingsBoard createBoard(PlayerEntity player, BlockHitResult hitResult) {
-        ImmutableList<Text> rows = ImmutableList.of(CreateLang.translateDirect("contraptions.chassis.distance"));
+    public ValueSettingsBoard createBoard(Player player, BlockHitResult hitResult) {
+        ImmutableList<Component> rows = ImmutableList.of(CreateLang.translateDirect("contraptions.chassis.distance"));
         ValueSettingsFormatter formatter = new ValueSettingsFormatter(vs -> ValueSettingsFormatter.toLocaleNumber(new ValueSettings(
             vs.row(),
             vs.value() + 1

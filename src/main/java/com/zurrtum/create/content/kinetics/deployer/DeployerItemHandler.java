@@ -2,9 +2,9 @@ package com.zurrtum.create.content.kinetics.deployer;
 
 import com.zurrtum.create.infrastructure.items.SidedItemInventory;
 import com.zurrtum.create.infrastructure.transfer.SlotRangeCache;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.Hand;
-import net.minecraft.util.math.Direction;
+import net.minecraft.core.Direction;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.Nullable;
 
 public class DeployerItemHandler implements SidedItemInventory {
@@ -17,12 +17,12 @@ public class DeployerItemHandler implements SidedItemInventory {
     }
 
     @Override
-    public int[] getAvailableSlots(Direction side) {
+    public int[] getSlotsForFace(Direction side) {
         return SlotRangeCache.get(be.overflowItems.size() + 1);
     }
 
     @Override
-    public boolean canInsert(int slot, ItemStack stack, @Nullable Direction dir) {
+    public boolean canPlaceItemThroughFace(int slot, ItemStack stack, @Nullable Direction dir) {
         if (slot != 0 || player == null) {
             return false;
         }
@@ -33,7 +33,7 @@ public class DeployerItemHandler implements SidedItemInventory {
     }
 
     @Override
-    public boolean canExtract(int slot, ItemStack stack, Direction dir) {
+    public boolean canTakeItemThroughFace(int slot, ItemStack stack, Direction dir) {
         if (slot != 0) {
             return true;
         }
@@ -43,41 +43,41 @@ public class DeployerItemHandler implements SidedItemInventory {
         if (be.filtering.getFilter().isEmpty()) {
             return true;
         }
-        return !be.filtering.test(player.cast().getMainHandStack());
+        return !be.filtering.test(player.cast().getMainHandItem());
     }
 
     @Override
-    public int size() {
+    public int getContainerSize() {
         return 1 + be.overflowItems.size();
     }
 
     @Override
-    public ItemStack getStack(int slot) {
+    public ItemStack getItem(int slot) {
         int size = be.overflowItems.size();
         if (slot > size) {
             return ItemStack.EMPTY;
         }
         if (slot == 0) {
-            return player == null ? ItemStack.EMPTY : player.cast().getMainHandStack();
+            return player == null ? ItemStack.EMPTY : player.cast().getMainHandItem();
         }
         return be.overflowItems.get(slot - 1);
     }
 
     @Override
-    public void setStack(int slot, ItemStack stack) {
+    public void setItem(int slot, ItemStack stack) {
         int size = be.overflowItems.size();
         if (slot > size) {
             return;
         }
         if (slot == 0) {
-            player.cast().setStackInHand(Hand.MAIN_HAND, stack);
+            player.cast().setItemInHand(InteractionHand.MAIN_HAND, stack);
         } else {
             be.overflowItems.set(slot - 1, stack);
         }
     }
 
     @Override
-    public void markDirty() {
+    public void setChanged() {
         be.overflowItems.removeIf(ItemStack::isEmpty);
         be.notifyUpdate();
     }

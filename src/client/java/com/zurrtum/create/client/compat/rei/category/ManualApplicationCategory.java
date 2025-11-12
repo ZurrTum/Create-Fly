@@ -16,11 +16,11 @@ import me.shedaniel.rei.api.client.gui.widgets.Widgets;
 import me.shedaniel.rei.api.common.category.CategoryIdentifier;
 import me.shedaniel.rei.api.common.entry.EntryStack;
 import me.shedaniel.rei.api.common.util.EntryStacks;
-import net.minecraft.block.BlockState;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.item.BlockItem;
-import net.minecraft.item.ItemStack;
-import net.minecraft.text.Text;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.state.BlockState;
 import org.joml.Matrix3x2f;
 
 import java.util.List;
@@ -32,7 +32,7 @@ public class ManualApplicationCategory extends CreateCategory<ManualApplicationD
     }
 
     @Override
-    public Text getTitle() {
+    public Component getTitle() {
         return CreateLang.translateDirect("recipe.item_application");
     }
 
@@ -47,16 +47,16 @@ public class ManualApplicationCategory extends CreateCategory<ManualApplicationD
         Point target = new Point(bounds.x + 32, bounds.y + 43);
         Point output = new Point(bounds.x + 137, bounds.y + 43);
         Slot targetSlot = createInputSlot(target).entries(display.target());
-        widgets.add(Widgets.createDrawableWidget((DrawContext graphics, int mouseX, int mouseY, float delta) -> {
+        widgets.add(Widgets.createDrawableWidget((GuiGraphics graphics, int mouseX, int mouseY, float delta) -> {
             drawSlotBackground(graphics, input, target, output);
             AllGuiTextures.JEI_SHADOW.render(graphics, bounds.x + 67, bounds.y + 52);
             AllGuiTextures.JEI_DOWN_ARROW.render(graphics, bounds.x + 79, bounds.y + 15);
             EntryStack<ItemStack> slot = targetSlot.getCurrentEntry().cast();
             ItemStack stack = slot.getValue();
             if (stack.getItem() instanceof BlockItem blockItem) {
-                BlockState block = blockItem.getBlock().getDefaultState();
-                graphics.state.addSpecialElement(new ManualBlockRenderState(
-                    new Matrix3x2f(graphics.getMatrices()),
+                BlockState block = blockItem.getBlock().defaultBlockState();
+                graphics.guiRenderState.submitPicturesInPictureState(new ManualBlockRenderState(
+                    new Matrix3x2f(graphics.pose()),
                     block,
                     bounds.x + 79,
                     bounds.y + 34

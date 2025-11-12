@@ -1,60 +1,60 @@
 package com.zurrtum.create.client.infrastructure.particle;
 
+import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.particle.Particle;
-import net.minecraft.client.particle.ParticleFactory;
-import net.minecraft.client.particle.SpriteProvider;
-import net.minecraft.client.world.ClientWorld;
-import net.minecraft.particle.SimpleParticleType;
-import net.minecraft.util.math.random.Random;
+import net.minecraft.client.particle.ParticleProvider;
+import net.minecraft.client.particle.SpriteSet;
+import net.minecraft.core.particles.SimpleParticleType;
+import net.minecraft.util.RandomSource;
 
-public class BasicParticleFactory implements ParticleFactory<SimpleParticleType> {
+public class BasicParticleFactory implements ParticleProvider<SimpleParticleType> {
     @FunctionalInterface
     public interface Factory {
         Particle createParticle(
             SimpleParticleType parameters,
-            SpriteProvider spriteSet,
-            ClientWorld world,
+            SpriteSet spriteSet,
+            ClientLevel world,
             double x,
             double y,
             double z,
             double velocityX,
             double velocityY,
             double velocityZ,
-            Random random
+            RandomSource random
         );
     }
 
     private final Factory factory;
-    private SpriteProvider spriteSet;
+    private SpriteSet spriteSet;
 
-    private BasicParticleFactory(Factory factory, SpriteProvider spriteSet) {
+    private BasicParticleFactory(Factory factory, SpriteSet spriteSet) {
         this.factory = factory;
         this.spriteSet = spriteSet;
     }
 
-    public static ParticleFactory<SimpleParticleType> wifi(SpriteProvider spriteSet) {
+    public static ParticleProvider<SimpleParticleType> wifi(SpriteSet spriteSet) {
         return new BasicParticleFactory(WiFiParticle::new, spriteSet);
     }
 
-    public static ParticleFactory<SimpleParticleType> soul(SpriteProvider spriteSet) {
+    public static ParticleProvider<SimpleParticleType> soul(SpriteSet spriteSet) {
         return new BasicParticleFactory(SoulParticle::new, spriteSet);
     }
 
-    public static ParticleFactory<SimpleParticleType> soulBase(SpriteProvider spriteSet) {
+    public static ParticleProvider<SimpleParticleType> soulBase(SpriteSet spriteSet) {
         return new BasicParticleFactory(SoulBaseParticle::new, spriteSet);
     }
 
     @Override
     public Particle createParticle(
         SimpleParticleType parameters,
-        ClientWorld world,
+        ClientLevel world,
         double x,
         double y,
         double z,
         double velocityX,
         double velocityY,
         double velocityZ,
-        Random random
+        RandomSource random
     ) {
         return factory.createParticle(parameters, spriteSet, world, x, y, z, velocityX, velocityY, velocityZ, random);
     }

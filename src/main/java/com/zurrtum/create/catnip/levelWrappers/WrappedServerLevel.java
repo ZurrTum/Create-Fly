@@ -1,41 +1,41 @@
 package com.zurrtum.create.catnip.levelWrappers;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.component.type.MapIdComponent;
-import net.minecraft.entity.Entity;
-import net.minecraft.fluid.Fluid;
-import net.minecraft.item.map.MapState;
-import net.minecraft.recipe.ServerRecipeManager;
-import net.minecraft.registry.entry.RegistryEntry;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.sound.SoundCategory;
-import net.minecraft.sound.SoundEvent;
-import net.minecraft.util.Util;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.biome.Biome;
-import net.minecraft.world.dimension.DimensionOptions;
-import net.minecraft.world.level.ServerWorldProperties;
-import net.minecraft.world.tick.TickPriority;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collections;
 import java.util.List;
+import net.minecraft.Util;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Holder;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.item.crafting.RecipeManager;
+import net.minecraft.world.level.biome.Biome;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.dimension.LevelStem;
+import net.minecraft.world.level.material.Fluid;
+import net.minecraft.world.level.saveddata.maps.MapId;
+import net.minecraft.world.level.saveddata.maps.MapItemSavedData;
+import net.minecraft.world.level.storage.ServerLevelData;
+import net.minecraft.world.ticks.TickPriority;
 
-public class WrappedServerLevel extends ServerWorld {
-    protected ServerWorld level;
+public class WrappedServerLevel extends ServerLevel {
+    protected ServerLevel level;
 
-    public WrappedServerLevel(ServerWorld level) {
+    public WrappedServerLevel(ServerLevel level) {
         super(
             level.getServer(),
-            Util.getMainWorkerExecutor(),
-            level.getServer().session,
-            (ServerWorldProperties) level.getLevelProperties(),
-            level.getRegistryKey(),
-            new DimensionOptions(level.getDimensionEntry(), level.getChunkManager().getChunkGenerator()),
-            level.isDebugWorld(),
-            level.getBiomeAccess().seed,
+            Util.backgroundExecutor(),
+            level.getServer().storageSource,
+            (ServerLevelData) level.getLevelData(),
+            level.dimension(),
+            new LevelStem(level.dimensionTypeRegistration(), level.getChunkSource().getGenerator()),
+            level.isDebug(),
+            level.getBiomeManager().biomeZoomSeed,
             Collections.emptyList(),
             false,
             level.getRandomSequences()
@@ -44,42 +44,42 @@ public class WrappedServerLevel extends ServerWorld {
     }
 
     @Override
-    public float getSkyAngleRadians(float tickProgress) {
+    public float getSunAngle(float tickProgress) {
         return 0;
     }
 
     @Override
-    public int getLightLevel(BlockPos pos) {
+    public int getMaxLocalRawBrightness(BlockPos pos) {
         return 15;
     }
 
     @Override
-    public void updateListeners(BlockPos pos, BlockState oldState, BlockState newState, int flags) {
-        level.updateListeners(pos, oldState, newState, flags);
+    public void sendBlockUpdated(BlockPos pos, BlockState oldState, BlockState newState, int flags) {
+        level.sendBlockUpdated(pos, oldState, newState, flags);
     }
 
     @Override
-    public void scheduleBlockTick(BlockPos pos, Block block, int delay) {
+    public void scheduleTick(BlockPos pos, Block block, int delay) {
     }
 
     @Override
-    public void scheduleFluidTick(BlockPos pos, Fluid fluid, int delay) {
+    public void scheduleTick(BlockPos pos, Fluid fluid, int delay) {
     }
 
     @Override
-    public void scheduleBlockTick(BlockPos pos, Block block, int delay, TickPriority priority) {
+    public void scheduleTick(BlockPos pos, Block block, int delay, TickPriority priority) {
     }
 
     @Override
-    public void scheduleFluidTick(BlockPos pos, Fluid fluid, int delay, TickPriority priority) {
+    public void scheduleTick(BlockPos pos, Fluid fluid, int delay, TickPriority priority) {
     }
 
     @Override
-    public void syncWorldEvent(@Nullable Entity source, int eventId, BlockPos pos, int data) {
+    public void levelEvent(@Nullable Entity source, int eventId, BlockPos pos, int data) {
     }
 
     @Override
-    public List<ServerPlayerEntity> getPlayers() {
+    public List<ServerPlayer> players() {
         return Collections.emptyList();
     }
 
@@ -90,52 +90,52 @@ public class WrappedServerLevel extends ServerWorld {
         double y,
         double z,
         SoundEvent sound,
-        SoundCategory category,
+        SoundSource category,
         float volume,
         float pitch
     ) {
     }
 
     @Override
-    public void playSoundFromEntity(@Nullable Entity source, Entity entity, SoundEvent sound, SoundCategory category, float volume, float pitch) {
+    public void playSound(@Nullable Entity source, Entity entity, SoundEvent sound, SoundSource category, float volume, float pitch) {
     }
 
     @Override
-    public @Nullable Entity getEntityById(int id) {
+    public @Nullable Entity getEntity(int id) {
         return null;
     }
 
     @Override
-    public @Nullable MapState getMapState(MapIdComponent id) {
+    public @Nullable MapItemSavedData getMapData(MapId id) {
         return null;
     }
 
     @Override
-    public boolean spawnEntity(Entity entity) {
-        entity.setWorld(level);
-        return level.spawnEntity(entity);
+    public boolean addFreshEntity(Entity entity) {
+        entity.setLevel(level);
+        return level.addFreshEntity(entity);
     }
 
     @Override
-    public void putMapState(MapIdComponent id, MapState state) {
+    public void setMapData(MapId id, MapItemSavedData state) {
     }
 
     @Override
-    public MapIdComponent increaseAndGetMapId() {
-        return new MapIdComponent(0);
+    public MapId getFreeMapId() {
+        return new MapId(0);
     }
 
     @Override
-    public void setBlockBreakingInfo(int entityId, BlockPos pos, int progress) {
+    public void destroyBlockProgress(int entityId, BlockPos pos, int progress) {
     }
 
     @Override
-    public ServerRecipeManager getRecipeManager() {
-        return level.getRecipeManager();
+    public RecipeManager recipeAccess() {
+        return level.recipeAccess();
     }
 
     @Override
-    public RegistryEntry<Biome> getGeneratorStoredBiome(int biomeX, int biomeY, int biomeZ) {
-        return level.getGeneratorStoredBiome(biomeX, biomeY, biomeZ);
+    public Holder<Biome> getUncachedNoiseBiome(int biomeX, int biomeY, int biomeZ) {
+        return level.getUncachedNoiseBiome(biomeX, biomeY, biomeZ);
     }
 }

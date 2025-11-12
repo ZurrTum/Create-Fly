@@ -2,19 +2,18 @@ package com.zurrtum.create.content.kinetics.drill;
 
 import com.zurrtum.create.AllBlocks;
 import com.zurrtum.create.AllFluids;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.FluidBlock;
-import net.minecraft.fluid.FlowableFluid;
-import net.minecraft.fluid.Fluid;
-import net.minecraft.fluid.FluidState;
-import net.minecraft.fluid.Fluids;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.world.World;
-
 import java.util.*;
 import java.util.function.Function;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.LiquidBlock;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.material.FlowingFluid;
+import net.minecraft.world.level.material.Fluid;
+import net.minecraft.world.level.material.FluidState;
+import net.minecraft.world.level.material.Fluids;
 
 /**
  * A registry which defines the interactions a source fluid can have with its
@@ -36,8 +35,8 @@ public final class FluidInteractionRegistry {
      * @param interaction the interaction data to check and perform
      */
     public static synchronized void addInteraction(Fluid source, InteractionInformation interaction) {
-        if (source instanceof FlowableFluid flowableFluid) {
-            INTERACTIONS.computeIfAbsent(flowableFluid.getStill(), s -> new ArrayList<>()).add(interaction);
+        if (source instanceof FlowingFluid flowableFluid) {
+            INTERACTIONS.computeIfAbsent(flowableFluid.getSource(), s -> new ArrayList<>()).add(interaction);
             INTERACTIONS.computeIfAbsent(flowableFluid.getFlowing(), s -> new ArrayList<>()).add(interaction);
         } else {
             INTERACTIONS.computeIfAbsent(source, s -> new ArrayList<>()).add(interaction);
@@ -53,11 +52,11 @@ public final class FluidInteractionRegistry {
      * @param pos   the position of the source fluid
      * @return {@code true} if an interaction took place, {@code false} otherwise
      */
-    public static boolean canInteract(World level, BlockPos pos) {
+    public static boolean canInteract(Level level, BlockPos pos) {
         FluidState state = level.getFluidState(pos);
-        Fluid fluid = state.getFluid();
-        for (Direction direction : FluidBlock.FLOW_DIRECTIONS) {
-            BlockPos relativePos = pos.offset(direction.getOpposite());
+        Fluid fluid = state.getType();
+        for (Direction direction : LiquidBlock.POSSIBLE_FLOW_DIRECTIONS) {
+            BlockPos relativePos = pos.relative(direction.getOpposite());
             List<InteractionInformation> interactions = INTERACTIONS.getOrDefault(fluid, Collections.emptyList());
             for (InteractionInformation interaction : interactions) {
                 if (interaction.predicate().test(level, pos, relativePos, state)) {
@@ -76,7 +75,7 @@ public final class FluidInteractionRegistry {
             Fluids.LAVA,
             new InteractionInformation(
                 Fluids.WATER,
-                fluidState -> fluidState.isStill() ? Blocks.OBSIDIAN.getDefaultState() : Blocks.COBBLESTONE.getDefaultState()
+                fluidState -> fluidState.isSource() ? Blocks.OBSIDIAN.defaultBlockState() : Blocks.COBBLESTONE.defaultBlockState()
             )
         );
 
@@ -84,17 +83,17 @@ public final class FluidInteractionRegistry {
         addInteraction(
             Fluids.LAVA,
             new InteractionInformation(
-                (level, currentPos, relativePos, currentState) -> level.getBlockState(currentPos.down())
-                    .isOf(Blocks.SOUL_SOIL) && level.getBlockState(relativePos).isOf(Blocks.BLUE_ICE), Blocks.BASALT.getDefaultState()
+                (level, currentPos, relativePos, currentState) -> level.getBlockState(currentPos.below())
+                    .is(Blocks.SOUL_SOIL) && level.getBlockState(relativePos).is(Blocks.BLUE_ICE), Blocks.BASALT.defaultBlockState()
             )
         );
         addInteraction(
             Fluids.LAVA, new InteractionInformation(
                 AllFluids.HONEY, fluidState -> {
-                if (fluidState.isStill()) {
-                    return Blocks.OBSIDIAN.getDefaultState();
+                if (fluidState.isSource()) {
+                    return Blocks.OBSIDIAN.defaultBlockState();
                 } else {
-                    return AllBlocks.LIMESTONE.getDefaultState();
+                    return AllBlocks.LIMESTONE.defaultBlockState();
                 }
             }
             )
@@ -102,10 +101,10 @@ public final class FluidInteractionRegistry {
         addInteraction(
             Fluids.LAVA, new InteractionInformation(
                 AllFluids.CHOCOLATE, fluidState -> {
-                if (fluidState.isStill()) {
-                    return Blocks.OBSIDIAN.getDefaultState();
+                if (fluidState.isSource()) {
+                    return Blocks.OBSIDIAN.defaultBlockState();
                 } else {
-                    return AllBlocks.SCORIA.getDefaultState();
+                    return AllBlocks.SCORIA.defaultBlockState();
                 }
             }
             )
@@ -152,9 +151,9 @@ public final class FluidInteractionRegistry {
             this(
                 (level, currentPos, relativePos, currentState) -> {
                     FluidState state = level.getFluidState(relativePos);
-                    Fluid fluid = state.getFluid();
-                    if (!fluid.isStill(state) && fluid instanceof FlowableFluid flowableFluid) {
-                        fluid = flowableFluid.getStill();
+                    Fluid fluid = state.getType();
+                    if (!fluid.isSource(state) && fluid instanceof FlowingFluid flowableFluid) {
+                        fluid = flowableFluid.getSource();
                     }
                     return fluid == type;
                 }, getState
@@ -170,8 +169,8 @@ public final class FluidInteractionRegistry {
         public InteractionInformation(HasFluidInteraction predicate, Function<FluidState, BlockState> getState) {
             this(
                 predicate, (level, currentPos, relativePos, currentState) -> {
-                    level.setBlockState(currentPos, getState.apply(currentState));
-                    level.syncWorldEvent(1501, currentPos, 0);
+                    level.setBlockAndUpdate(currentPos, getState.apply(currentState));
+                    level.levelEvent(1501, currentPos, 0);
                 }
             );
         }
@@ -192,7 +191,7 @@ public final class FluidInteractionRegistry {
          * @param currentState the state of the fluid surrounding the source
          * @return {@code true} if an interaction can occur, {@code false} otherwise
          */
-        boolean test(World level, BlockPos currentPos, BlockPos relativePos, FluidState currentState);
+        boolean test(Level level, BlockPos currentPos, BlockPos relativePos, FluidState currentState);
     }
 
     /**
@@ -208,6 +207,6 @@ public final class FluidInteractionRegistry {
          * @param relativePos  a position surrounding the source
          * @param currentState the state of the fluid surrounding the source
          */
-        void interact(World level, BlockPos currentPos, BlockPos relativePos, FluidState currentState);
+        void interact(Level level, BlockPos currentPos, BlockPos relativePos, FluidState currentState);
     }
 }

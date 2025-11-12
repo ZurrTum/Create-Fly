@@ -1,8 +1,8 @@
 package com.zurrtum.create.client.catnip.gui.element;
 
 import com.zurrtum.create.client.catnip.gui.UIRenderHelper;
+import net.minecraft.client.gui.GuiGraphics;
 import com.zurrtum.create.catnip.theme.Color;
-import net.minecraft.client.gui.DrawContext;
 
 public class DelegatedStencilElement extends AbstractRenderElement implements StencilElement {
 
@@ -45,12 +45,12 @@ public class DelegatedStencilElement extends AbstractRenderElement implements St
     }
 
     @Override
-    public void renderStencil(DrawContext graphics) {
+    public void renderStencil(GuiGraphics graphics) {
         stencil.render(graphics, width, height, 1);
     }
 
     @Override
-    public void renderElement(DrawContext graphics) {
+    public void renderElement(GuiGraphics graphics) {
         element.render(graphics, width, height, alpha);
     }
 

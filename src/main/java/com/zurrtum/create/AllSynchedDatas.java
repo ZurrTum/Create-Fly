@@ -5,24 +5,24 @@ import com.zurrtum.create.content.trains.entity.CarriageSyncData;
 import com.zurrtum.create.content.trains.entity.CarriageSyncDataSerializer;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.ItemEntity;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.data.*;
-import net.minecraft.entity.data.DataTracker.SerializedEntry;
-import net.minecraft.entity.passive.HorseEntity;
-import net.minecraft.entity.passive.ParrotEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.vehicle.AbstractMinecartEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.network.RegistryByteBuf;
-import net.minecraft.network.codec.PacketCodec;
-import net.minecraft.network.codec.PacketCodecs;
-import net.minecraft.util.Uuids;
-import net.minecraft.util.collection.Class2IntMap;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.UUIDUtil;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.syncher.*;
+import net.minecraft.network.syncher.SynchedEntityData.DataValue;
+import net.minecraft.util.ClassTreeIdRegistry;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.animal.Parrot;
+import net.minecraft.world.entity.animal.horse.Horse;
+import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.vehicle.AbstractMinecart;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.phys.Vec3;
 import org.apache.logging.log4j.util.TriConsumer;
 
 import java.util.*;
@@ -31,59 +31,59 @@ import java.util.function.*;
 public class AllSynchedDatas {
     private static final Map<Class<?>, SynchedData> ALL = new IdentityHashMap<>();
     private static final Map<Class<?>, Optional<SynchedData>> ON_DATA = new IdentityHashMap<>();
-    public static final List<TrackedDataHandler<?>> HANDLERS = new ArrayList<>();
-    public static final TrackedDataHandler<Optional<MinecartController>> MINECART_CONTROLLER_HANDLER = register(MinecartController.PACKET_CODEC.collect(
-        PacketCodecs::optional));
-    public static final TrackedDataHandler<Optional<UUID>> OPTIONAL_UUID_HANDLER = register(Uuids.PACKET_CODEC.collect(PacketCodecs::optional));
-    public static final TrackedDataHandler<Optional<List<ItemStack>>> CAPTURE_DROPS_HANDLER = register(ItemStack.PACKET_CODEC.collect(PacketCodecs.toList())
-        .collect(PacketCodecs::optional));
-    public static final TrackedDataHandler<CarriageSyncData> CARRIAGE_DATA_HANDLER = register(CarriageSyncDataSerializer::new);
-    public static final TrackedDataHandler<Optional<Vec3d>> OPTIONAL_VEC3D_HANDLER = register(Vec3d.PACKET_CODEC.collect(PacketCodecs::optional));
-    public static final TrackedDataHandler<NbtCompound> NBT_COMPOUND_HANDLER = register(PacketCodecs.UNLIMITED_NBT_COMPOUND);
-    public static final Entry<Integer> HAUNTING = register(HorseEntity.class, TrackedDataHandlerRegistry.INTEGER, 0);
-    public static final Entry<String> ITEM_TYPE = register(ItemEntity.class, TrackedDataHandlerRegistry.STRING, "");
-    public static final Entry<Integer> ITEM_TIME = register(ItemEntity.class, TrackedDataHandlerRegistry.INTEGER, 0);
+    public static final List<EntityDataSerializer<?>> HANDLERS = new ArrayList<>();
+    public static final EntityDataSerializer<Optional<MinecartController>> MINECART_CONTROLLER_HANDLER = register(MinecartController.PACKET_CODEC.apply(
+        ByteBufCodecs::optional));
+    public static final EntityDataSerializer<Optional<UUID>> OPTIONAL_UUID_HANDLER = register(UUIDUtil.STREAM_CODEC.apply(ByteBufCodecs::optional));
+    public static final EntityDataSerializer<Optional<List<ItemStack>>> CAPTURE_DROPS_HANDLER = register(ItemStack.STREAM_CODEC.apply(ByteBufCodecs.list())
+        .apply(ByteBufCodecs::optional));
+    public static final EntityDataSerializer<CarriageSyncData> CARRIAGE_DATA_HANDLER = register(CarriageSyncDataSerializer::new);
+    public static final EntityDataSerializer<Optional<Vec3>> OPTIONAL_VEC3D_HANDLER = register(Vec3.STREAM_CODEC.apply(ByteBufCodecs::optional));
+    public static final EntityDataSerializer<CompoundTag> NBT_COMPOUND_HANDLER = register(ByteBufCodecs.TRUSTED_COMPOUND_TAG);
+    public static final Entry<Integer> HAUNTING = register(Horse.class, EntityDataSerializers.INT, 0);
+    public static final Entry<String> ITEM_TYPE = register(ItemEntity.class, EntityDataSerializers.STRING, "");
+    public static final Entry<Integer> ITEM_TIME = register(ItemEntity.class, EntityDataSerializers.INT, 0);
     public static final Entry<Optional<BlockPos>> BYPASS_CRUSHING_WHEEL = register(
         ItemEntity.class,
-        TrackedDataHandlerRegistry.OPTIONAL_BLOCK_POS,
+        EntityDataSerializers.OPTIONAL_BLOCK_POS,
         Optional.empty()
     );
     public static final Entry<Optional<MinecartController>> MINECART_CONTROLLER = register(
-        AbstractMinecartEntity.class,
+        AbstractMinecart.class,
         MINECART_CONTROLLER_HANDLER,
         Optional.empty(),
         (entity, value) -> value.ifPresent(controller -> controller.setCart(entity))
     );
-    public static final Entry<Integer> VISUAL_BACKTANK_AIR = register(PlayerEntity.class, TrackedDataHandlerRegistry.INTEGER, 0);
-    public static final Entry<Boolean> FIRE_IMMUNE = register(PlayerEntity.class, TrackedDataHandlerRegistry.BOOLEAN, false);
-    public static final Entry<Boolean> HEAVY_BOOTS = register(PlayerEntity.class, TrackedDataHandlerRegistry.BOOLEAN, false);
-    public static final Entry<Boolean> CRUSH_DROP = register(Entity.class, TrackedDataHandlerRegistry.BOOLEAN, false);
+    public static final Entry<Integer> VISUAL_BACKTANK_AIR = register(Player.class, EntityDataSerializers.INT, 0);
+    public static final Entry<Boolean> FIRE_IMMUNE = register(Player.class, EntityDataSerializers.BOOLEAN, false);
+    public static final Entry<Boolean> HEAVY_BOOTS = register(Player.class, EntityDataSerializers.BOOLEAN, false);
+    public static final Entry<Boolean> CRUSH_DROP = register(Entity.class, EntityDataSerializers.BOOLEAN, false);
     public static final Entry<Optional<List<ItemStack>>> CAPTURE_DROPS = register(Entity.class, CAPTURE_DROPS_HANDLER, Optional.empty());
-    public static final Entry<Boolean> CONTRAPTION_GROUNDED = register(Entity.class, TrackedDataHandlerRegistry.BOOLEAN, false);
-    public static final Entry<Optional<Vec3d>> CONTRAPTION_DISMOUNT_LOCATION = register(LivingEntity.class, OPTIONAL_VEC3D_HANDLER, Optional.empty());
-    public static final Entry<Optional<Vec3d>> CONTRAPTION_MOUNT_LOCATION = register(PlayerEntity.class, OPTIONAL_VEC3D_HANDLER, Optional.empty());
-    public static final Entry<Boolean> IS_USING_LECTERN_CONTROLLER = register(PlayerEntity.class, TrackedDataHandlerRegistry.BOOLEAN, false);
-    public static final Entry<NbtCompound> TOOLBOX = register(PlayerEntity.class, NBT_COMPOUND_HANDLER, new NbtCompound());
-    public static final Entry<Integer> LAST_OVERRIDE_LIMB_SWING_UPDATE = register(PlayerEntity.class, TrackedDataHandlerRegistry.INTEGER, -1);
-    public static final Entry<Float> OVERRIDE_LIMB_SWING = register(PlayerEntity.class, TrackedDataHandlerRegistry.FLOAT, 0F);
-    public static final Entry<Boolean> PARROT_TRAIN_HAT = register(ParrotEntity.class, TrackedDataHandlerRegistry.BOOLEAN, false);
+    public static final Entry<Boolean> CONTRAPTION_GROUNDED = register(Entity.class, EntityDataSerializers.BOOLEAN, false);
+    public static final Entry<Optional<Vec3>> CONTRAPTION_DISMOUNT_LOCATION = register(LivingEntity.class, OPTIONAL_VEC3D_HANDLER, Optional.empty());
+    public static final Entry<Optional<Vec3>> CONTRAPTION_MOUNT_LOCATION = register(Player.class, OPTIONAL_VEC3D_HANDLER, Optional.empty());
+    public static final Entry<Boolean> IS_USING_LECTERN_CONTROLLER = register(Player.class, EntityDataSerializers.BOOLEAN, false);
+    public static final Entry<CompoundTag> TOOLBOX = register(Player.class, NBT_COMPOUND_HANDLER, new CompoundTag());
+    public static final Entry<Integer> LAST_OVERRIDE_LIMB_SWING_UPDATE = register(Player.class, EntityDataSerializers.INT, -1);
+    public static final Entry<Float> OVERRIDE_LIMB_SWING = register(Player.class, EntityDataSerializers.FLOAT, 0F);
+    public static final Entry<Boolean> PARROT_TRAIN_HAT = register(Parrot.class, EntityDataSerializers.BOOLEAN, false);
 
-    private static <T> Entry<T> register(Class<? extends DataTracked> type, TrackedDataHandler<T> handler, T def) {
+    private static <T> Entry<T> register(Class<? extends SyncedDataHolder> type, EntityDataSerializer<T> handler, T def) {
         return register(type, handler, def, null);
     }
 
-    private static <E extends DataTracked, T> Entry<T> register(Class<E> type, TrackedDataHandler<T> handler, T def, BiConsumer<E, T> onData) {
+    private static <E extends SyncedDataHolder, T> Entry<T> register(Class<E> type, EntityDataSerializer<T> handler, T def, BiConsumer<E, T> onData) {
         return ALL.computeIfAbsent(type, SynchedData::new).add(handler, def, onData);
     }
 
-    private static <T> TrackedDataHandler<T> register(PacketCodec<? super RegistryByteBuf, T> codec) {
-        TrackedDataHandler<T> handler = TrackedDataHandler.create(codec);
+    private static <T> EntityDataSerializer<T> register(StreamCodec<? super RegistryFriendlyByteBuf, T> codec) {
+        EntityDataSerializer<T> handler = EntityDataSerializer.forValueType(codec);
         HANDLERS.add(handler);
         return handler;
     }
 
-    private static <T> TrackedDataHandler<T> register(Supplier<TrackedDataHandler<T>> factory) {
-        TrackedDataHandler<T> handler = factory.get();
+    private static <T> EntityDataSerializer<T> register(Supplier<EntityDataSerializer<T>> factory) {
+        EntityDataSerializer<T> handler = factory.get();
         HANDLERS.add(handler);
         return handler;
     }
@@ -92,7 +92,7 @@ public class AllSynchedDatas {
         return ALL.computeIfAbsent(type, SynchedData::new);
     }
 
-    public static void onData(DataTracked entity, SerializedEntry<?> entry) {
+    public static void onData(SyncedDataHolder entity, DataValue<?> entry) {
         ON_DATA.computeIfAbsent(entity.getClass(), AllSynchedDatas::getParentOrEmpty).ifPresent(data -> data.onData(entity, entry));
     }
 
@@ -113,15 +113,15 @@ public class AllSynchedDatas {
     public static class SynchedData {
         private final Class<?> type;
         private final Deque<Entry<?>> datas = new ArrayDeque<>();
-        private List<Consumer<DataTracker.Entry<?>[]>> actions;
-        private Int2ObjectMap<BiConsumer<? extends DataTracked, ?>> listeners;
+        private List<Consumer<SynchedEntityData.DataItem<?>[]>> actions;
+        private Int2ObjectMap<BiConsumer<? extends SyncedDataHolder, ?>> listeners;
         private int size;
 
         public SynchedData(Class<?> type) {
             this.type = type;
         }
 
-        public <E extends DataTracked, T> Entry<T> add(TrackedDataHandler<T> handler, T def, BiConsumer<E, T> onData) {
+        public <E extends SyncedDataHolder, T> Entry<T> add(EntityDataSerializer<T> handler, T def, BiConsumer<E, T> onData) {
             Entry<T> entry = new Entry<>(handler, def, onData);
             datas.add(entry);
             return entry;
@@ -152,7 +152,7 @@ public class AllSynchedDatas {
             size = index;
         }
 
-        public int preparse(Class2IntMap map, BiFunction<Class2IntMap, Class<?>, Integer> factory) {
+        public int preparse(ClassTreeIdRegistry map, BiFunction<ClassTreeIdRegistry, Class<?>, Integer> factory) {
             if (size != 0) {
                 return size;
             }
@@ -179,12 +179,12 @@ public class AllSynchedDatas {
             return size;
         }
 
-        public void register(DataTracker.Entry<?>[] entries) {
+        public void register(SynchedEntityData.DataItem<?>[] entries) {
             actions.forEach(action -> action.accept(entries));
         }
 
         @SuppressWarnings("unchecked")
-        protected <E extends DataTracked, T> void onData(E entity, SerializedEntry<T> serializedEntry) {
+        protected <E extends SyncedDataHolder, T> void onData(E entity, DataValue<T> serializedEntry) {
             if (listeners == null) {
                 return;
             }
@@ -196,17 +196,17 @@ public class AllSynchedDatas {
     }
 
     public static class Entry<T> {
-        private final TrackedDataHandler<T> handler;
+        private final EntityDataSerializer<T> handler;
         private final Supplier<T> def;
-        private final BiConsumer<? extends DataTracked, T> listener;
-        private BiFunction<Class<?>, Integer, Consumer<DataTracker.Entry<?>[]>> add = this::firstAdd;
+        private final BiConsumer<? extends SyncedDataHolder, T> listener;
+        private BiFunction<Class<?>, Integer, Consumer<SynchedEntityData.DataItem<?>[]>> add = this::firstAdd;
         private Function<Entity, T> get;
         private TriConsumer<Entity, T, Boolean> set;
 
         @SuppressWarnings("unchecked")
-        private Entry(TrackedDataHandler<T> handler, T def, BiConsumer<? extends DataTracked, T> listener) {
+        private Entry(EntityDataSerializer<T> handler, T def, BiConsumer<? extends SyncedDataHolder, T> listener) {
             this.handler = handler;
-            if (def instanceof NbtCompound nbt) {
+            if (def instanceof CompoundTag nbt) {
                 this.def = () -> (T) nbt.copy();
             } else {
                 this.def = () -> def;
@@ -214,26 +214,26 @@ public class AllSynchedDatas {
             this.listener = listener;
         }
 
-        private Consumer<DataTracker.Entry<?>[]> firstAdd(Class<?> type, int id) {
-            TrackedData<T> data = handler.create(id);
-            get = target -> target.getDataTracker().get(data);
-            set = (target, value, force) -> target.getDataTracker().set(data, value, force);
+        private Consumer<SynchedEntityData.DataItem<?>[]> firstAdd(Class<?> type, int id) {
+            EntityDataAccessor<T> data = handler.createAccessor(id);
+            get = target -> target.getEntityData().get(data);
+            set = (target, value, force) -> target.getEntityData().set(data, value, force);
             add = (otherType, otherId) -> {
-                IdentityHashMap<Class<?>, TrackedData<T>> map = new IdentityHashMap<>();
+                IdentityHashMap<Class<?>, EntityDataAccessor<T>> map = new IdentityHashMap<>();
                 map.put(type, data);
-                get = target -> target.getDataTracker().get(map.get(target.getClass()));
-                set = (target, value, force) -> target.getDataTracker().set(map.get(target.getClass()), value, force);
+                get = target -> target.getEntityData().get(map.get(target.getClass()));
+                set = (target, value, force) -> target.getEntityData().set(map.get(target.getClass()), value, force);
                 add = (addType, addId) -> {
-                    TrackedData<T> addData = handler.create(addId);
+                    EntityDataAccessor<T> addData = handler.createAccessor(addId);
                     map.put(addType, addData);
-                    return entries -> entries[addId] = new DataTracker.Entry<>(addData, def.get());
+                    return entries -> entries[addId] = new SynchedEntityData.DataItem<>(addData, def.get());
                 };
                 return add.apply(otherType, otherId);
             };
-            return entries -> entries[id] = new DataTracker.Entry<>(data, def.get());
+            return entries -> entries[id] = new SynchedEntityData.DataItem<>(data, def.get());
         }
 
-        public Consumer<DataTracker.Entry<?>[]> add(Class<?> type, int id) {
+        public Consumer<SynchedEntityData.DataItem<?>[]> add(Class<?> type, int id) {
             return add.apply(type, id);
         }
 

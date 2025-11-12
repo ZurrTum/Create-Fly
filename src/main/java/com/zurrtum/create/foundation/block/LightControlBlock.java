@@ -1,8 +1,8 @@
 package com.zurrtum.create.foundation.block;
 
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.BlockView;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.BlockGetter;
 
 public interface LightControlBlock {
-    int getLuminance(BlockView world, BlockPos pos);
+    int getLuminance(BlockGetter world, BlockPos pos);
 }

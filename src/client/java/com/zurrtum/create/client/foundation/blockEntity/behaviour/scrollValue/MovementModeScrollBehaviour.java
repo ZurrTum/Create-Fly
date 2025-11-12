@@ -10,12 +10,12 @@ import com.zurrtum.create.content.contraptions.IControlContraption.MovementMode;
 import com.zurrtum.create.content.contraptions.piston.MechanicalPistonBlock;
 import com.zurrtum.create.content.kinetics.base.IRotate;
 import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
-import net.minecraft.text.Text;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Direction.Axis;
+import net.minecraft.core.Direction;
+import net.minecraft.core.Direction.Axis;
+import net.minecraft.network.chat.Component;
 
 public class MovementModeScrollBehaviour extends ScrollOptionBehaviour<MovementMode> {
-    public MovementModeScrollBehaviour(SmartBlockEntity be, Text title, ValueBoxTransform slot) {
+    public MovementModeScrollBehaviour(SmartBlockEntity be, Component title, ValueBoxTransform slot) {
         super(MovementModeIcon.class, MovementModeIcon::from, title, be, slot);
     }
 
@@ -31,7 +31,7 @@ public class MovementModeScrollBehaviour extends ScrollOptionBehaviour<MovementM
         return new MovementModeScrollBehaviour(
             be, CreateLang.translateDirect("contraptions.movement_mode"), new DirectionalExtenderScrollOptionSlot((state, d) -> {
             Axis axis = d.getAxis();
-            Axis extensionAxis = state.get(MechanicalPistonBlock.FACING).getAxis();
+            Axis extensionAxis = state.getValue(MechanicalPistonBlock.FACING).getAxis();
             Axis shaftAxis = ((IRotate) state.getBlock()).getRotationAxis(state);
             return extensionAxis != axis && shaftAxis != axis;
         })

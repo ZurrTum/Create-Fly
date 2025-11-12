@@ -16,19 +16,19 @@ import com.zurrtum.create.infrastructure.fluids.BucketFluidInventory;
 import com.zurrtum.create.infrastructure.fluids.FluidInventory;
 import com.zurrtum.create.infrastructure.fluids.FluidStack;
 import joptsimple.internal.Strings;
-import net.minecraft.block.BlockState;
-import net.minecraft.sound.SoundCategory;
-import net.minecraft.sound.SoundEvents;
-import net.minecraft.storage.ReadView;
-import net.minecraft.storage.WriteView;
-import net.minecraft.text.MutableText;
-import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.world.World;
+import net.minecraft.ChatFormatting;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.util.Mth;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
+import net.minecraft.world.phys.AABB;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
@@ -73,7 +73,7 @@ public class BoilerData {
     private final SoundPool.Sound sound = (level, pos) -> {
         float volume = 3f / Math.max(2, attachedEngines / 6);
         float pitch = 1.18f - level.random.nextFloat() * .25f;
-        level.playSoundClient(pos.getX(), pos.getY(), pos.getZ(), SoundEvents.BLOCK_CANDLE_EXTINGUISH, SoundCategory.BLOCKS, volume, pitch, false);
+        level.playLocalSound(pos.getX(), pos.getY(), pos.getZ(), SoundEvents.CANDLE_EXTINGUISH, SoundSource.BLOCKS, volume, pitch, false);
 
         AllSoundEvents.STEAM.playAt(level, pos, volume / 16, .8f, false);
     };
@@ -83,8 +83,8 @@ public class BoilerData {
     public void tick(FluidTankBlockEntity controller) {
         if (!isActive())
             return;
-        World level = controller.getWorld();
-        if (level.isClient()) {
+        Level level = controller.getLevel();
+        if (level.isClientSide()) {
             pools.values().forEach(p -> p.play(level));
             gauge.tickChaser();
             float current = gauge.getValue(1);
@@ -123,15 +123,15 @@ public class BoilerData {
     }
 
     public void updateOcclusion(FluidTankBlockEntity controller) {
-        if (!controller.getWorld().isClient())
+        if (!controller.getLevel().isClientSide())
             return;
         if (attachedEngines + attachedWhistles == 0)
             return;
         for (Direction d : Iterate.horizontalDirections) {
-            Box aabb = new Box(controller.getPos()).offset(controller.width / 2f - .5f, 0, controller.width / 2f - .5f).contract(5f / 8);
-            aabb = aabb.offset(d.getOffsetX() * (controller.width / 2f + 1 / 4f), 0, d.getOffsetZ() * (controller.width / 2f + 1 / 4f));
-            aabb = aabb.expand(Math.abs(d.getOffsetZ()) / 2f, 0.25f, Math.abs(d.getOffsetX()) / 2f);
-            occludedDirections[d.getHorizontalQuarterTurns()] = !controller.getWorld().isSpaceEmpty(aabb);
+            AABB aabb = new AABB(controller.getBlockPos()).move(controller.width / 2f - .5f, 0, controller.width / 2f - .5f).deflate(5f / 8);
+            aabb = aabb.move(d.getStepX() * (controller.width / 2f + 1 / 4f), 0, d.getStepZ() * (controller.width / 2f + 1 / 4f));
+            aabb = aabb.inflate(Math.abs(d.getStepZ()) / 2f, 0.25f, Math.abs(d.getStepX()) / 2f);
+            occludedDirections[d.get2DDataValue()] = !controller.getLevel().noCollision(aabb);
         }
     }
 
@@ -153,7 +153,7 @@ public class BoilerData {
     }
 
     public int getMaxHeatLevelForWaterSupply() {
-        return (int) Math.min(18, MathHelper.ceil(waterSupply) / waterSupplyPerLevel);
+        return (int) Math.min(18, Mth.ceil(waterSupply) / waterSupplyPerLevel);
     }
 
     public boolean isPassive() {
@@ -190,55 +190,55 @@ public class BoilerData {
     }
 
     @NotNull
-    public MutableText getHeatLevelTextComponent() {
+    public MutableComponent getHeatLevelTextComponent() {
         int boilerLevel = Math.min(activeHeat, Math.min(maxHeatForWater, maxHeatForSize));
 
-        return isPassive() ? Text.translatable("create.boiler.passive") : (boilerLevel == 0 ? Text.translatable("create.boiler.idle") : boilerLevel == 18 ? Text.translatable(
-            "create.boiler.max_lvl") : Text.translatable("create.boiler.lvl", String.valueOf(boilerLevel)));
+        return isPassive() ? Component.translatable("create.boiler.passive") : (boilerLevel == 0 ? Component.translatable("create.boiler.idle") : boilerLevel == 18 ? Component.translatable(
+            "create.boiler.max_lvl") : Component.translatable("create.boiler.lvl", String.valueOf(boilerLevel)));
     }
 
-    public MutableText getSizeComponent(boolean forGoggles, boolean useBlocksAsBars, Formatting... styles) {
+    public MutableComponent getSizeComponent(boolean forGoggles, boolean useBlocksAsBars, ChatFormatting... styles) {
         return componentHelper("size", maxHeatForSize, forGoggles, useBlocksAsBars, styles);
     }
 
-    public MutableText getWaterComponent(boolean forGoggles, boolean useBlocksAsBars, Formatting... styles) {
+    public MutableComponent getWaterComponent(boolean forGoggles, boolean useBlocksAsBars, ChatFormatting... styles) {
         return componentHelper("water", maxHeatForWater, forGoggles, useBlocksAsBars, styles);
     }
 
-    public MutableText getHeatComponent(boolean forGoggles, boolean useBlocksAsBars, Formatting... styles) {
+    public MutableComponent getHeatComponent(boolean forGoggles, boolean useBlocksAsBars, ChatFormatting... styles) {
         return componentHelper("heat", passiveHeat ? 1 : activeHeat, forGoggles, useBlocksAsBars, styles);
     }
 
-    private MutableText componentHelper(String label, int level, boolean forGoggles, boolean useBlocksAsBars, Formatting... styles) {
-        MutableText base = useBlocksAsBars ? blockComponent(level) : barComponent(level);
+    private MutableComponent componentHelper(String label, int level, boolean forGoggles, boolean useBlocksAsBars, ChatFormatting... styles) {
+        MutableComponent base = useBlocksAsBars ? blockComponent(level) : barComponent(level);
 
         if (!forGoggles)
             return base;
 
-        Formatting style1 = styles.length >= 1 ? styles[0] : Formatting.GRAY;
-        Formatting style2 = styles.length >= 2 ? styles[1] : Formatting.DARK_GRAY;
+        ChatFormatting style1 = styles.length >= 1 ? styles[0] : ChatFormatting.GRAY;
+        ChatFormatting style2 = styles.length >= 2 ? styles[1] : ChatFormatting.DARK_GRAY;
 
-        return Text.translatable("create.boiler." + label).formatted(style1)
-            .append(Text.translatable("create.boiler." + label + "_dots").formatted(style2)).append(base);
+        return Component.translatable("create.boiler." + label).withStyle(style1)
+            .append(Component.translatable("create.boiler." + label + "_dots").withStyle(style2)).append(base);
     }
 
-    private MutableText blockComponent(int level) {
-        return Text.literal("█".repeat(minValue) + "▒".repeat(level - minValue) + "░".repeat(maxValue - level));
+    private MutableComponent blockComponent(int level) {
+        return Component.literal("█".repeat(minValue) + "▒".repeat(level - minValue) + "░".repeat(maxValue - level));
     }
 
-    private MutableText barComponent(int level) {
-        return Text.empty().append(bars(Math.max(0, minValue - 1), Formatting.DARK_GREEN)).append(bars(minValue > 0 ? 1 : 0, Formatting.GREEN))
-            .append(bars(Math.max(0, level - minValue), Formatting.DARK_GREEN)).append(bars(Math.max(0, maxValue - level), Formatting.DARK_RED))
-            .append(bars(Math.max(0, Math.min(18 - maxValue, ((maxValue / 5 + 1) * 5) - maxValue)), Formatting.DARK_GRAY));
+    private MutableComponent barComponent(int level) {
+        return Component.empty().append(bars(Math.max(0, minValue - 1), ChatFormatting.DARK_GREEN)).append(bars(minValue > 0 ? 1 : 0, ChatFormatting.GREEN))
+            .append(bars(Math.max(0, level - minValue), ChatFormatting.DARK_GREEN)).append(bars(Math.max(0, maxValue - level), ChatFormatting.DARK_RED))
+            .append(bars(Math.max(0, Math.min(18 - maxValue, ((maxValue / 5 + 1) * 5) - maxValue)), ChatFormatting.DARK_GRAY));
     }
 
-    private MutableText bars(int level, Formatting format) {
-        return Text.literal(Strings.repeat('|', level)).formatted(format);
+    private MutableComponent bars(int level, ChatFormatting format) {
+        return Component.literal(Strings.repeat('|', level)).withStyle(format);
     }
 
     public boolean evaluate(FluidTankBlockEntity controller) {
-        BlockPos controllerPos = controller.getPos();
-        World level = controller.getWorld();
+        BlockPos controllerPos = controller.getBlockPos();
+        Level level = controller.getLevel();
         int prevEngines = attachedEngines;
         int prevWhistles = attachedWhistles;
         attachedEngines = 0;
@@ -248,16 +248,16 @@ public class BoilerData {
             for (int xOffset = 0; xOffset < controller.width; xOffset++) {
                 for (int zOffset = 0; zOffset < controller.width; zOffset++) {
 
-                    BlockPos pos = controllerPos.add(xOffset, yOffset, zOffset);
+                    BlockPos pos = controllerPos.offset(xOffset, yOffset, zOffset);
                     BlockState blockState = level.getBlockState(pos);
                     if (!FluidTankBlock.isTank(blockState))
                         continue;
                     for (Direction d : Iterate.directions) {
-                        BlockPos attachedPos = pos.offset(d);
+                        BlockPos attachedPos = pos.relative(d);
                         BlockState attachedState = level.getBlockState(attachedPos);
-                        if (attachedState.isOf(AllBlocks.STEAM_ENGINE) && SteamEngineBlock.getFacing(attachedState) == d)
+                        if (attachedState.is(AllBlocks.STEAM_ENGINE) && SteamEngineBlock.getFacing(attachedState) == d)
                             attachedEngines++;
-                        if (attachedState.isOf(AllBlocks.STEAM_WHISTLE) && WhistleBlock.getAttachedDirection(attachedState).getOpposite() == d)
+                        if (attachedState.is(AllBlocks.STEAM_WHISTLE) && WhistleBlock.getAttachedDirection(attachedState).getOpposite() == d)
                             attachedWhistles++;
                     }
                 }
@@ -273,22 +273,22 @@ public class BoilerData {
         if (behaviour == null || !behaviour.isOwnerPresent())
             return;
 
-        BlockPos controllerPos = controller.getPos();
-        World level = controller.getWorld();
+        BlockPos controllerPos = controller.getBlockPos();
+        Level level = controller.getLevel();
         Set<Integer> whistlePitches = new HashSet<>();
 
         for (int yOffset = 0; yOffset < controller.height; yOffset++) {
             for (int xOffset = 0; xOffset < controller.width; xOffset++) {
                 for (int zOffset = 0; zOffset < controller.width; zOffset++) {
 
-                    BlockPos pos = controllerPos.add(xOffset, yOffset, zOffset);
+                    BlockPos pos = controllerPos.offset(xOffset, yOffset, zOffset);
                     BlockState blockState = level.getBlockState(pos);
                     if (!FluidTankBlock.isTank(blockState))
                         continue;
                     for (Direction d : Iterate.directions) {
-                        BlockPos attachedPos = pos.offset(d);
+                        BlockPos attachedPos = pos.relative(d);
                         BlockState attachedState = level.getBlockState(attachedPos);
-                        if (attachedState.isOf(AllBlocks.STEAM_WHISTLE) && WhistleBlock.getAttachedDirection(attachedState).getOpposite() == d) {
+                        if (attachedState.is(AllBlocks.STEAM_WHISTLE) && WhistleBlock.getAttachedDirection(attachedState).getOpposite() == d) {
                             if (level.getBlockEntity(attachedPos) instanceof WhistleBlockEntity wbe)
                                 whistlePitches.add(wbe.getPitchId());
                         }
@@ -302,8 +302,8 @@ public class BoilerData {
     }
 
     public boolean updateTemperature(FluidTankBlockEntity controller) {
-        BlockPos controllerPos = controller.getPos();
-        World level = controller.getWorld();
+        BlockPos controllerPos = controller.getBlockPos();
+        Level level = controller.getLevel();
         needsHeatLevelUpdate = false;
 
         boolean prevPassive = passiveHeat;
@@ -313,7 +313,7 @@ public class BoilerData {
 
         for (int xOffset = 0; xOffset < controller.width; xOffset++) {
             for (int zOffset = 0; zOffset < controller.width; zOffset++) {
-                BlockPos pos = controllerPos.add(xOffset, -1, zOffset);
+                BlockPos pos = controllerPos.offset(xOffset, -1, zOffset);
                 BlockState blockState = level.getBlockState(pos);
                 float heat = BoilerHeater.findHeat(level, pos, blockState);
                 if (heat == 0) {
@@ -341,7 +341,7 @@ public class BoilerData {
         Arrays.fill(supplyOverTime, 0);
     }
 
-    public void write(WriteView view) {
+    public void write(ValueOutput view) {
         view.putFloat("Supply", waterSupply);
         view.putInt("ActiveHeat", activeHeat);
         view.putBoolean("PassiveHeat", passiveHeat);
@@ -350,13 +350,13 @@ public class BoilerData {
         view.putBoolean("Update", needsHeatLevelUpdate);
     }
 
-    public void read(ReadView view, int boilerSize) {
-        waterSupply = view.getFloat("Supply", 0);
-        activeHeat = view.getInt("ActiveHeat", 0);
-        passiveHeat = view.getBoolean("PassiveHeat", false);
-        attachedEngines = view.getInt("Engines", 0);
-        attachedWhistles = view.getInt("Whistles", 0);
-        needsHeatLevelUpdate = view.getBoolean("Update", false);
+    public void read(ValueInput view, int boilerSize) {
+        waterSupply = view.getFloatOr("Supply", 0);
+        activeHeat = view.getIntOr("ActiveHeat", 0);
+        passiveHeat = view.getBooleanOr("PassiveHeat", false);
+        attachedEngines = view.getIntOr("Engines", 0);
+        attachedWhistles = view.getIntOr("Whistles", 0);
+        needsHeatLevelUpdate = view.getBooleanOr("Update", false);
         Arrays.fill(supplyOverTime, (int) waterSupply);
 
         int forBoilerSize = getMaxHeatLevelForBoilerSize(boilerSize);

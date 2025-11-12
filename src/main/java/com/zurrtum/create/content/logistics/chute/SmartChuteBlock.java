@@ -1,56 +1,56 @@
 package com.zurrtum.create.content.logistics.chute;
 
 import com.zurrtum.create.AllBlockEntityTypes;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.item.ItemPlacementContext;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.state.StateManager.Builder;
-import net.minecraft.state.property.BooleanProperty;
-import net.minecraft.state.property.Properties;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.random.Random;
-import net.minecraft.world.BlockView;
-import net.minecraft.world.World;
-import net.minecraft.world.block.WireOrientation;
+import net.minecraft.core.BlockPos;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition.Builder;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.block.state.properties.BooleanProperty;
+import net.minecraft.world.level.redstone.Orientation;
 import org.jetbrains.annotations.Nullable;
 
 public class SmartChuteBlock extends AbstractChuteBlock {
 
-    public SmartChuteBlock(Settings p_i48440_1_) {
+    public SmartChuteBlock(Properties p_i48440_1_) {
         super(p_i48440_1_);
-        setDefaultState(getDefaultState().with(POWERED, true));
+        registerDefaultState(defaultBlockState().setValue(POWERED, true));
     }
 
-    public static final BooleanProperty POWERED = Properties.POWERED;
+    public static final BooleanProperty POWERED = BlockStateProperties.POWERED;
 
     @Override
-    public void neighborUpdate(
+    public void neighborChanged(
         BlockState state,
-        World level,
+        Level level,
         BlockPos pos,
         Block block,
-        @Nullable WireOrientation wireOrientation,
+        @Nullable Orientation wireOrientation,
         boolean isMoving
     ) {
-        super.neighborUpdate(state, level, pos, block, wireOrientation, isMoving);
-        if (level.isClient())
+        super.neighborChanged(state, level, pos, block, wireOrientation, isMoving);
+        if (level.isClientSide())
             return;
-        if (!level.getBlockTickScheduler().isTicking(pos, this))
-            level.scheduleBlockTick(pos, this, 1);
+        if (!level.getBlockTicks().willTickThisTick(pos, this))
+            level.scheduleTick(pos, this, 1);
     }
 
     @Override
-    public void scheduledTick(BlockState state, ServerWorld worldIn, BlockPos pos, Random r) {
-        boolean previouslyPowered = state.get(POWERED);
-        if (previouslyPowered != worldIn.isReceivingRedstonePower(pos))
-            worldIn.setBlockState(pos, state.cycle(POWERED), Block.NOTIFY_LISTENERS);
+    public void tick(BlockState state, ServerLevel worldIn, BlockPos pos, RandomSource r) {
+        boolean previouslyPowered = state.getValue(POWERED);
+        if (previouslyPowered != worldIn.hasNeighborSignal(pos))
+            worldIn.setBlock(pos, state.cycle(POWERED), Block.UPDATE_CLIENTS);
     }
 
     @Override
-    public BlockState getPlacementState(ItemPlacementContext ctx) {
-        return super.getPlacementState(ctx).with(POWERED, ctx.getWorld().isReceivingRedstonePower(ctx.getBlockPos()));
+    public BlockState getStateForPlacement(BlockPlaceContext ctx) {
+        return super.getStateForPlacement(ctx).setValue(POWERED, ctx.getLevel().hasNeighborSignal(ctx.getClickedPos()));
     }
 
     @Override
@@ -59,12 +59,12 @@ public class SmartChuteBlock extends AbstractChuteBlock {
     }
 
     @Override
-    protected void appendProperties(Builder<Block, BlockState> builder) {
-        super.appendProperties(builder.add(POWERED));
+    protected void createBlockStateDefinition(Builder<Block, BlockState> builder) {
+        super.createBlockStateDefinition(builder.add(POWERED));
     }
 
     @Override
-    public BlockState updateChuteState(BlockState state, BlockState above, BlockView world, BlockPos pos) {
+    public BlockState updateChuteState(BlockState state, BlockState above, BlockGetter world, BlockPos pos) {
         return state;
     }
 

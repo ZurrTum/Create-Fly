@@ -17,11 +17,11 @@
 package com.zurrtum.create.mixin;
 
 import com.zurrtum.create.infrastructure.itemGroup.FabricItemGroupImpl;
-import net.minecraft.item.ItemGroup;
+import net.minecraft.world.item.CreativeModeTab;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 
-@Mixin(ItemGroup.class)
+@Mixin(CreativeModeTab.class)
 public class ItemGroupMixin implements FabricItemGroupImpl {
     @Unique
     private int page = -1;

@@ -4,20 +4,19 @@ import com.zurrtum.create.AllHandle;
 import com.zurrtum.create.AllPackets;
 import com.zurrtum.create.content.logistics.factoryBoard.FactoryPanelPosition;
 import io.netty.buffer.ByteBuf;
-import net.minecraft.network.codec.PacketCodec;
-import net.minecraft.network.codec.PacketCodecs;
-import net.minecraft.network.packet.PacketType;
-import net.minecraft.server.network.ServerPlayNetworkHandler;
-
 import java.util.function.BiConsumer;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.PacketType;
+import net.minecraft.server.network.ServerGamePacketListenerImpl;
 
 public record FactoryPanelConnectionPacket(FactoryPanelPosition fromPos, FactoryPanelPosition toPos, boolean relocate) implements C2SPacket {
-    public static final PacketCodec<ByteBuf, FactoryPanelConnectionPacket> CODEC = PacketCodec.tuple(
+    public static final StreamCodec<ByteBuf, FactoryPanelConnectionPacket> CODEC = StreamCodec.composite(
         FactoryPanelPosition.PACKET_CODEC,
         FactoryPanelConnectionPacket::fromPos,
         FactoryPanelPosition.PACKET_CODEC,
         FactoryPanelConnectionPacket::toPos,
-        PacketCodecs.BOOLEAN,
+        ByteBufCodecs.BOOL,
         FactoryPanelConnectionPacket::relocate,
         FactoryPanelConnectionPacket::new
     );
@@ -28,12 +27,12 @@ public record FactoryPanelConnectionPacket(FactoryPanelPosition fromPos, Factory
     }
 
     @Override
-    public PacketType<FactoryPanelConnectionPacket> getPacketType() {
+    public PacketType<FactoryPanelConnectionPacket> type() {
         return AllPackets.CONNECT_FACTORY_PANEL;
     }
 
     @Override
-    public BiConsumer<ServerPlayNetworkHandler, FactoryPanelConnectionPacket> callback() {
+    public BiConsumer<ServerGamePacketListenerImpl, FactoryPanelConnectionPacket> callback() {
         return AllHandle::onFactoryPanelConnection;
     }
 }

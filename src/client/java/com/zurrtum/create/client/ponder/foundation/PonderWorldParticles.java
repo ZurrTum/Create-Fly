@@ -7,25 +7,26 @@ import com.mojang.blaze3d.buffers.GpuBufferSlice;
 import com.mojang.blaze3d.systems.RenderPass;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.textures.GpuTextureView;
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.zurrtum.create.client.catnip.levelWrappers.WrappedClientLevel;
 import com.zurrtum.create.client.ponder.api.level.PonderLevel;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
-import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.Camera;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.particle.*;
-import net.minecraft.client.render.Camera;
-import net.minecraft.client.render.Frustum;
-import net.minecraft.client.render.SubmittableBatch;
-import net.minecraft.client.render.command.BatchingRenderCommandQueue;
-import net.minecraft.client.render.command.LayeredCustomCommandRenderer;
-import net.minecraft.client.render.command.OrderedRenderCommandQueue;
-import net.minecraft.client.render.command.OrderedRenderCommandQueueImpl;
-import net.minecraft.client.render.state.CameraRenderState;
-import net.minecraft.client.texture.TextureManager;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.client.world.ClientWorld;
-import net.minecraft.particle.ParticleEffect;
-import net.minecraft.particle.ParticleGroup;
-import net.minecraft.registry.Registries;
+import net.minecraft.client.renderer.SubmitNodeCollection;
+import net.minecraft.client.renderer.SubmitNodeCollector;
+import net.minecraft.client.renderer.SubmitNodeStorage;
+import net.minecraft.client.renderer.culling.Frustum;
+import net.minecraft.client.renderer.feature.ParticleFeatureRenderer;
+import net.minecraft.client.renderer.state.CameraRenderState;
+import net.minecraft.client.renderer.state.ParticlesRenderState;
+import net.minecraft.client.renderer.state.QuadParticleRenderState;
+import net.minecraft.client.renderer.texture.TextureManager;
+import net.minecraft.core.particles.ParticleLimit;
+import net.minecraft.core.particles.ParticleOptions;
+import net.minecraft.core.registries.BuiltInRegistries;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix4f;
 import org.joml.Matrix4fStack;
@@ -37,23 +38,23 @@ import java.util.function.Supplier;
 
 public class PonderWorldParticles {
     private static final Frustum FRUSTUM = new PassFrustum();
-    private final SubmittableBatch particleBatch = new SubmittableBatch();
-    private final Map<ParticleTextureSheet, ParticleRenderer<?>> particles = Maps.newIdentityHashMap();
+    private final ParticlesRenderState particleBatch = new ParticlesRenderState();
+    private final Map<ParticleRenderType, ParticleGroup<?>> particles = Maps.newIdentityHashMap();
     private final Queue<Particle> newParticles = Queues.newArrayDeque();
-    private final Object2IntOpenHashMap<ParticleGroup> groupCounts = new Object2IntOpenHashMap<>();
-    private final ParticleManager particleManager;
-    private final LayeredCustomCommandRenderer.VerticesCache verticesCache = new LayeredCustomCommandRenderer.VerticesCache();
+    private final Object2IntOpenHashMap<ParticleLimit> groupCounts = new Object2IntOpenHashMap<>();
+    private final ParticleEngine particleManager;
+    private final ParticleFeatureRenderer.ParticleBufferCache verticesCache = new ParticleFeatureRenderer.ParticleBufferCache();
 
     PonderLevel world;
-    private final Supplier<ClientWorld> asClientWorld = Suppliers.memoize(() -> WrappedClientLevel.of(world));
+    private final Supplier<ClientLevel> asClientWorld = Suppliers.memoize(() -> WrappedClientLevel.of(world));
 
     public PonderWorldParticles(PonderLevel world) {
         this.world = world;
-        this.particleManager = MinecraftClient.getInstance().particleManager;
+        this.particleManager = Minecraft.getInstance().particleEngine;
     }
 
     public void addParticle(Particle particle) {
-        Optional<ParticleGroup> optional = particle.getGroup();
+        Optional<ParticleLimit> optional = particle.getParticleLimit();
         if (optional.isPresent()) {
             if (canAdd(optional.get())) {
                 newParticles.add(particle);
@@ -64,28 +65,28 @@ public class PonderWorldParticles {
         }
     }
 
-    private boolean canAdd(ParticleGroup group) {
-        return groupCounts.getInt(group) < group.maxCount();
+    private boolean canAdd(ParticleLimit group) {
+        return groupCounts.getInt(group) < group.limit();
     }
 
-    protected void addTo(ParticleGroup group, int count) {
+    protected void addTo(ParticleLimit group, int count) {
         this.groupCounts.addTo(group, count);
     }
 
     public void tick() {
-        particles.forEach((textureSheet, particlex) -> particlex.tick());
+        particles.forEach((textureSheet, particlex) -> particlex.tickParticles());
 
         Particle particle;
         if (!newParticles.isEmpty()) {
             while ((particle = newParticles.poll()) != null) {
-                particles.computeIfAbsent(particle.textureSheet(), particleManager::createParticleRenderer).add(particle);
+                particles.computeIfAbsent(particle.getGroup(), particleManager::createParticleGroup).add(particle);
             }
         }
     }
 
     @Nullable
     @SuppressWarnings("unchecked")
-    public <T extends ParticleEffect> Particle addParticle(
+    public <T extends ParticleOptions> Particle addParticle(
         T parameters,
         double x,
         double y,
@@ -94,8 +95,8 @@ public class PonderWorldParticles {
         double velocityY,
         double velocityZ
     ) {
-        ParticleFactory<T> particleFactory = (ParticleFactory<T>) particleManager.spriteManager.getParticleFactories()
-            .get(Registries.PARTICLE_TYPE.getRawId(parameters.getType()));
+        ParticleProvider<T> particleFactory = (ParticleProvider<T>) particleManager.resourceManager.getProviders()
+            .get(BuiltInRegistries.PARTICLE_TYPE.getId(parameters.getType()));
         if (particleFactory == null) {
             return null;
         }
@@ -107,37 +108,31 @@ public class PonderWorldParticles {
         return particle;
     }
 
-    public void renderParticles(
-        MatrixStack ms,
-        OrderedRenderCommandQueueImpl queue,
-        Camera camera,
-        CameraRenderState cameraRenderState,
-        float tickProgress
-    ) {
+    public void renderParticles(PoseStack ms, SubmitNodeStorage queue, Camera camera, CameraRenderState cameraRenderState, float tickProgress) {
         Matrix4fStack stack = RenderSystem.getModelViewStack();
         stack.pushMatrix();
-        stack.mul(ms.peek().getPositionMatrix());
-        for (ParticleTextureSheet particleTextureSheet : ParticleManager.PARTICLE_TEXTURE_SHEETS) {
-            ParticleRenderer<?> particleRenderer = particles.get(particleTextureSheet);
+        stack.mul(ms.last().pose());
+        for (ParticleRenderType particleTextureSheet : ParticleEngine.RENDER_ORDER) {
+            ParticleGroup<?> particleRenderer = particles.get(particleTextureSheet);
             if (particleRenderer != null && !particleRenderer.isEmpty()) {
-                particleBatch.add(particleRenderer.render(FRUSTUM, camera, tickProgress));
+                particleBatch.add(particleRenderer.extractRenderState(FRUSTUM, camera, tickProgress));
             }
         }
         particleBatch.submit(queue, cameraRenderState);
         GpuBufferSlice gpuBufferSlice = RenderSystem.getDynamicUniforms()
-            .write(new Matrix4f(stack), new Vector4f(1.0F, 1.0F, 1.0F, 1.0F), new Vector3f(), new Matrix4f(), 0.0F);
-        for (BatchingRenderCommandQueue commandQueue : queue.getBatchingQueues().values()) {
-            List<OrderedRenderCommandQueue.LayeredCustom> commands = commandQueue.getLayeredCustomCommands();
+            .writeTransform(new Matrix4f(stack), new Vector4f(1.0F, 1.0F, 1.0F, 1.0F), new Vector3f(), new Matrix4f(), 0.0F);
+        for (SubmitNodeCollection commandQueue : queue.getSubmitsPerOrder().values()) {
+            List<SubmitNodeCollector.ParticleGroupRenderer> commands = commandQueue.getParticleGroupRenderers();
             if (commands.isEmpty()) {
                 continue;
             }
             GpuTextureView gpuTextureView = RenderSystem.outputColorTextureOverride;
             GpuTextureView gpuTextureView2 = RenderSystem.outputDepthTextureOverride;
-            MinecraftClient mc = MinecraftClient.getInstance();
-            GpuTextureView lightTextureView = mc.gameRenderer.getLightmapTextureManager().getGlTextureView();
+            Minecraft mc = Minecraft.getInstance();
+            GpuTextureView lightTextureView = mc.gameRenderer.lightTexture().getTextureView();
             TextureManager textureManager = mc.getTextureManager();
-            for (OrderedRenderCommandQueue.LayeredCustom layeredCustom : commands) {
-                BillboardParticleSubmittable.Buffers buffers = layeredCustom.submit(verticesCache);
+            for (SubmitNodeCollector.ParticleGroupRenderer layeredCustom : commands) {
+                QuadParticleRenderState.PreparedBuffers buffers = layeredCustom.prepare(verticesCache);
                 if (buffers != null) {
                     try (RenderPass renderPass = RenderSystem.getDevice().createCommandEncoder().createRenderPass(
                         () -> "Immediate draw for particle",
@@ -158,7 +153,7 @@ public class PonderWorldParticles {
             commands.clear();
         }
         stack.popMatrix();
-        particleBatch.onFrameEnd();
+        particleBatch.reset();
     }
 
     public void clearEffects() {
@@ -172,7 +167,7 @@ public class PonderWorldParticles {
         }
 
         @Override
-        public boolean intersectPoint(double x, double y, double z) {
+        public boolean pointInFrustum(double x, double y, double z) {
             return true;
         }
     }

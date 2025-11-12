@@ -4,23 +4,22 @@ import com.mojang.serialization.Codec;
 import com.zurrtum.create.AllTrackMaterials;
 import com.zurrtum.create.Create;
 import io.netty.buffer.ByteBuf;
-import net.minecraft.block.Block;
-import net.minecraft.item.BlockItem;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemConvertible;
-import net.minecraft.network.codec.PacketCodec;
-import net.minecraft.util.Identifier;
-
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Supplier;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.level.ItemLike;
+import net.minecraft.world.level.block.Block;
 
-public class TrackMaterial implements ItemConvertible {
-    public static final Map<Identifier, TrackMaterial> ALL = new HashMap<>();
-    public static final Codec<TrackMaterial> CODEC = Identifier.CODEC.xmap(TrackMaterial::fromId, TrackMaterial::getId);
-    public static final PacketCodec<ByteBuf, TrackMaterial> PACKET_CODEC = Identifier.PACKET_CODEC.xmap(TrackMaterial::fromId, TrackMaterial::getId);
+public class TrackMaterial implements ItemLike {
+    public static final Map<ResourceLocation, TrackMaterial> ALL = new HashMap<>();
+    public static final Codec<TrackMaterial> CODEC = ResourceLocation.CODEC.xmap(TrackMaterial::fromId, TrackMaterial::getId);
+    public static final StreamCodec<ByteBuf, TrackMaterial> PACKET_CODEC = ResourceLocation.STREAM_CODEC.map(TrackMaterial::fromId, TrackMaterial::getId);
 
-    private final Identifier id;
+    private final ResourceLocation id;
     private final Supplier<TrackBlock> trackBlock;
     public Object modelHolder;
 
@@ -29,13 +28,13 @@ public class TrackMaterial implements ItemConvertible {
         return (T) modelHolder;
     }
 
-    public TrackMaterial(Identifier id, Supplier<TrackBlock> trackBlock) {
+    public TrackMaterial(ResourceLocation id, Supplier<TrackBlock> trackBlock) {
         this.id = id;
         this.trackBlock = trackBlock;
         ALL.put(this.id, this);
     }
 
-    public Identifier getId() {
+    public ResourceLocation getId() {
         return id;
     }
 
@@ -52,7 +51,7 @@ public class TrackMaterial implements ItemConvertible {
         return ALL.values().stream().map(TrackMaterial::getBlock).toArray(Block[]::new);
     }
 
-    public static TrackMaterial fromId(Identifier id) {
+    public static TrackMaterial fromId(ResourceLocation id) {
         if (ALL.containsKey(id))
             return ALL.get(id);
 

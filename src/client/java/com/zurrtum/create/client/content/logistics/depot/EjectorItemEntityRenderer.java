@@ -1,21 +1,21 @@
 package com.zurrtum.create.client.content.logistics.depot;
 
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.math.Axis;
 import com.zurrtum.create.content.logistics.depot.EjectorItemEntity;
-import net.minecraft.client.render.command.OrderedRenderCommandQueue;
-import net.minecraft.client.render.entity.EntityRendererFactory;
-import net.minecraft.client.render.entity.ItemEntityRenderer;
-import net.minecraft.client.render.entity.state.EntityRenderState;
-import net.minecraft.client.render.entity.state.ItemEntityRenderState;
-import net.minecraft.client.render.state.CameraRenderState;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.entity.ItemEntity;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.RotationAxis;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.client.renderer.SubmitNodeCollector;
+import net.minecraft.client.renderer.entity.EntityRendererProvider;
+import net.minecraft.client.renderer.entity.ItemEntityRenderer;
+import net.minecraft.client.renderer.entity.state.EntityRenderState;
+import net.minecraft.client.renderer.entity.state.ItemEntityRenderState;
+import net.minecraft.client.renderer.state.CameraRenderState;
+import net.minecraft.util.Mth;
+import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
 
 public class EjectorItemEntityRenderer extends ItemEntityRenderer {
-    public EjectorItemEntityRenderer(EntityRendererFactory.Context context) {
+    public EjectorItemEntityRenderer(EntityRendererProvider.Context context) {
         super(context);
     }
 
@@ -33,28 +33,28 @@ public class EjectorItemEntityRenderer extends ItemEntityRenderer {
     }
 
     @Override
-    public void updateRenderState(ItemEntity itemEntity, ItemEntityRenderState itemEntityRenderState, float f) {
-        super.updateRenderState(itemEntity, itemEntityRenderState, f);
+    public void extractRenderState(ItemEntity itemEntity, ItemEntityRenderState itemEntityRenderState, float f) {
+        super.extractRenderState(itemEntity, itemEntityRenderState, f);
         EjectorItemEntity entity = (EjectorItemEntity) itemEntity;
         RenderState state = (RenderState) itemEntityRenderState;
         state.alive = entity.isAlive();
         if (state.alive) {
             if (entity.data.initAge == -1) {
-                itemEntityRenderState.age = 0;
+                itemEntityRenderState.ageInTicks = 0;
             } else {
-                itemEntityRenderState.age = (entity.age - entity.data.initAge + f) / 10.0F;
+                itemEntityRenderState.ageInTicks = (entity.age - entity.data.initAge + f) / 10.0F;
             }
         } else {
             state.rotateY = entity.data.rotateY;
             float time = entity.progress + f;
-            state.rotateX = MathHelper.RADIANS_PER_DEGREE * time * 40;
-            state.location = entity.getLaunchedItemLocation(time).subtract(entity.getEntityPos());
+            state.rotateX = Mth.DEG_TO_RAD * time * 40;
+            state.location = entity.getLaunchedItemLocation(time).subtract(entity.position());
         }
-        itemEntityRenderState.uniqueOffset = entity.data.animateOffset;
+        itemEntityRenderState.bobOffset = entity.data.animateOffset;
     }
 
     @Override
-    public Box getBoundingBox(ItemEntity itemEntity) {
+    public AABB getBoundingBoxForCulling(ItemEntity itemEntity) {
         EjectorItemEntity entity = (EjectorItemEntity) itemEntity;
         if (entity.isAlive()) {
             return entity.getBoundingBox();
@@ -64,42 +64,42 @@ public class EjectorItemEntityRenderer extends ItemEntityRenderer {
     }
 
     @Override
-    public void render(
+    public void submit(
         ItemEntityRenderState itemEntityRenderState,
-        MatrixStack matrixStack,
-        OrderedRenderCommandQueue queue,
+        PoseStack matrixStack,
+        SubmitNodeCollector queue,
         CameraRenderState cameraRenderState
     ) {
-        if (!itemEntityRenderState.itemRenderState.isEmpty()) {
+        if (!itemEntityRenderState.item.isEmpty()) {
             RenderState state = (RenderState) itemEntityRenderState;
-            Box box = state.itemRenderState.getModelBoundingBox();
-            matrixStack.push();
+            AABB box = state.item.getModelBoundingBox();
+            matrixStack.pushPose();
             float f = -((float) box.minY) + 0.0625F;
-            matrixStack.translate(0, state.uniqueOffset + f, -0.0625f);
+            matrixStack.translate(0, state.bobOffset + f, -0.0625f);
             if (!state.alive) {
                 matrixStack.translate(state.location);
                 matrixStack.translate(0, 0.25f, 0);
                 if (state.rotateY != 0) {
-                    matrixStack.multiply(RotationAxis.POSITIVE_Y.rotation(state.rotateY));
+                    matrixStack.mulPose(Axis.YP.rotation(state.rotateY));
                 }
-                matrixStack.multiply(RotationAxis.POSITIVE_X.rotation(state.rotateX));
+                matrixStack.mulPose(Axis.XP.rotation(state.rotateX));
                 matrixStack.translate(0, -0.25f, 0);
-            } else if (state.age > 0) {
-                float g = MathHelper.sin(state.age) * 0.1F + 0.1F;
+            } else if (state.ageInTicks > 0) {
+                float g = Mth.sin(state.ageInTicks) * 0.1F + 0.1F;
                 matrixStack.translate(0, g, 0);
-                matrixStack.multiply(RotationAxis.POSITIVE_Y.rotation(state.age / 2F));
+                matrixStack.mulPose(Axis.YP.rotation(state.ageInTicks / 2F));
             }
-            render(matrixStack, queue, state.light, state, random, box);
-            matrixStack.pop();
+            submitMultipleFromCount(matrixStack, queue, state.lightCoords, state, random, box);
+            matrixStack.popPose();
 
             if (state.alive) {
-                if (state.leashDatas != null) {
-                    for (EntityRenderState.LeashData leashData : state.leashDatas) {
+                if (state.leashStates != null) {
+                    for (EntityRenderState.LeashState leashData : state.leashStates) {
                         queue.submitLeash(matrixStack, leashData);
                     }
                 }
 
-                renderLabelIfPresent(state, matrixStack, queue, cameraRenderState);
+                submitNameTag(state, matrixStack, queue, cameraRenderState);
             }
         }
     }
@@ -108,6 +108,6 @@ public class EjectorItemEntityRenderer extends ItemEntityRenderer {
         public boolean alive;
         public float rotateY;
         public float rotateX;
-        public Vec3d location;
+        public Vec3 location;
     }
 }

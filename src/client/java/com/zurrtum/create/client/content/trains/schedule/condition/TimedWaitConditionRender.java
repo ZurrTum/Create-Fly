@@ -6,31 +6,31 @@ import com.zurrtum.create.client.foundation.gui.ModularGuiLineBuilder;
 import com.zurrtum.create.client.foundation.utility.CreateLang;
 import com.zurrtum.create.content.trains.schedule.condition.TimedWaitCondition;
 import com.zurrtum.create.content.trains.schedule.condition.TimedWaitCondition.TimeUnit;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
-import net.minecraft.util.Identifier;
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 
 import java.util.List;
 import java.util.Locale;
 
 public abstract class TimedWaitConditionRender<T extends TimedWaitCondition> implements IScheduleInput<T> {
-    protected Text formatTime(T input, boolean compact) {
+    protected Component formatTime(T input, boolean compact) {
         int value = input.getValue();
         TimeUnit unit = input.getUnit();
         if (compact) {
-            return Text.literal(value + unit.suffix);
+            return Component.literal(value + unit.suffix);
         }
-        return Text.literal(value + " ").append(CreateLang.translateDirect(getUnitKey(unit)));
+        return Component.literal(value + " ").append(CreateLang.translateDirect(getUnitKey(unit)));
     }
 
     @Override
-    public List<Text> getTitleAs(T input, String type) {
-        Identifier id = input.getId();
+    public List<Component> getTitleAs(T input, String type) {
+        ResourceLocation id = input.getId();
         return ImmutableList.of(
-            Text.translatable(id.getNamespace() + ".schedule." + type + "." + id.getPath()),
-            CreateLang.translateDirect("schedule.condition.for_x_time", formatTime(input, false)).formatted(Formatting.DARK_AQUA)
+            Component.translatable(id.getNamespace() + ".schedule." + type + "." + id.getPath()),
+            CreateLang.translateDirect("schedule.condition.for_x_time", formatTime(input, false)).withStyle(ChatFormatting.DARK_AQUA)
         );
     }
 
@@ -40,7 +40,7 @@ public abstract class TimedWaitConditionRender<T extends TimedWaitCondition> imp
     }
 
     @Override
-    public List<Text> getSecondLineTooltip(int slot) {
+    public List<Component> getSecondLineTooltip(int slot) {
         return ImmutableList.of(CreateLang.translateDirect("generic.duration"));
     }
 
@@ -48,7 +48,7 @@ public abstract class TimedWaitConditionRender<T extends TimedWaitCondition> imp
         return "generic.unit." + unit.name().toLowerCase(Locale.ROOT);
     }
 
-    public List<Text> getUnitOptions() {
+    public List<Component> getUnitOptions() {
         return CreateLang.translatedOptions(null, getUnitKey(TimeUnit.TICKS), getUnitKey(TimeUnit.SECONDS), getUnitKey(TimeUnit.MINUTES));
     }
 

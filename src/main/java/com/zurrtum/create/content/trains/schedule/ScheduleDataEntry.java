@@ -1,56 +1,56 @@
 package com.zurrtum.create.content.trains.schedule;
 
 import com.zurrtum.create.Create;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.registry.RegistryWrapper;
-import net.minecraft.storage.NbtReadView;
-import net.minecraft.storage.ReadView;
-import net.minecraft.storage.WriteView;
-import net.minecraft.util.ErrorReporter;
-import net.minecraft.util.Identifier;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.ProblemReporter;
+import net.minecraft.world.level.storage.TagValueInput;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 
 public abstract class ScheduleDataEntry {
-    protected Identifier id;
-    protected NbtCompound data;
+    protected ResourceLocation id;
+    protected CompoundTag data;
 
-    public ScheduleDataEntry(Identifier id) {
+    public ScheduleDataEntry(ResourceLocation id) {
         this.id = id;
-        data = new NbtCompound();
+        data = new CompoundTag();
     }
 
-    public Identifier getId() {
+    public ResourceLocation getId() {
         return id;
     }
 
-    public NbtCompound getData() {
+    public CompoundTag getData() {
         return data;
     }
 
-    public void setData(RegistryWrapper.WrapperLookup registries, NbtCompound data) {
+    public void setData(HolderLookup.Provider registries, CompoundTag data) {
         this.data = data;
-        try (ErrorReporter.Logging logging = new ErrorReporter.Logging(() -> "ScheduleDataEntry", Create.LOGGER)) {
-            ReadView view = NbtReadView.create(logging, registries, data);
+        try (ProblemReporter.ScopedCollector logging = new ProblemReporter.ScopedCollector(() -> "ScheduleDataEntry", Create.LOGGER)) {
+            ValueInput view = TagValueInput.create(logging, registries, data);
             readAdditional(view);
         }
     }
 
-    protected void writeAdditional(WriteView view) {
+    protected void writeAdditional(ValueOutput view) {
     }
 
-    protected void readAdditional(ReadView view) {
+    protected void readAdditional(ValueInput view) {
     }
 
     public <T> T enumData(String key, Class<T> enumClass) {
         T[] enumConstants = enumClass.getEnumConstants();
-        return enumConstants[data.getInt(key, 0) % enumConstants.length];
+        return enumConstants[data.getIntOr(key, 0) % enumConstants.length];
     }
 
     protected String textData(String key) {
-        return data.getString(key, "");
+        return data.getStringOr(key, "");
     }
 
     public int intData(String key) {
-        return data.getInt(key, 0);
+        return data.getIntOr(key, 0);
     }
 
 }

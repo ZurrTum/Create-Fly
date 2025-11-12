@@ -4,32 +4,30 @@ import com.zurrtum.create.AllBlockEntityTypes;
 import com.zurrtum.create.content.contraptions.ContraptionWorld;
 import com.zurrtum.create.content.equipment.wrench.IWrenchable;
 import com.zurrtum.create.foundation.block.IBE;
-import net.minecraft.block.*;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.block.enums.DoorHinge;
-import net.minecraft.block.enums.DoubleBlockHalf;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemPlacementContext;
-import net.minecraft.sound.BlockSoundGroup;
-import net.minecraft.sound.SoundCategory;
-import net.minecraft.sound.SoundEvents;
-import net.minecraft.state.StateManager;
-import net.minecraft.state.property.BooleanProperty;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.random.Random;
-import net.minecraft.util.shape.VoxelShape;
-import net.minecraft.world.BlockView;
-import net.minecraft.world.World;
-import net.minecraft.world.WorldAccess;
-import net.minecraft.world.WorldView;
-import net.minecraft.world.block.WireOrientation;
-import net.minecraft.world.event.GameEvent;
-import net.minecraft.world.tick.ScheduledTickView;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.level.*;
+import net.minecraft.world.level.block.*;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.BlockSetType;
+import net.minecraft.world.level.block.state.properties.BooleanProperty;
+import net.minecraft.world.level.block.state.properties.DoorHingeSide;
+import net.minecraft.world.level.block.state.properties.DoubleBlockHalf;
+import net.minecraft.world.level.gameevent.GameEvent;
+import net.minecraft.world.level.redstone.Orientation;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Supplier;
@@ -41,16 +39,16 @@ public class SlidingDoorBlock extends DoorBlock implements IWrenchable, IBE<Slid
         true,
         true,
         true,
-        BlockSetType.ActivationRule.EVERYTHING,
-        BlockSoundGroup.NETHERITE,
-        SoundEvents.BLOCK_IRON_DOOR_CLOSE,
-        SoundEvents.BLOCK_IRON_DOOR_OPEN,
-        SoundEvents.BLOCK_IRON_TRAPDOOR_CLOSE,
-        SoundEvents.BLOCK_IRON_TRAPDOOR_OPEN,
-        SoundEvents.BLOCK_METAL_PRESSURE_PLATE_CLICK_OFF,
-        SoundEvents.BLOCK_METAL_PRESSURE_PLATE_CLICK_ON,
-        SoundEvents.BLOCK_STONE_BUTTON_CLICK_OFF,
-        SoundEvents.BLOCK_STONE_BUTTON_CLICK_ON
+        BlockSetType.PressurePlateSensitivity.EVERYTHING,
+        SoundType.NETHERITE_BLOCK,
+        SoundEvents.IRON_DOOR_CLOSE,
+        SoundEvents.IRON_DOOR_OPEN,
+        SoundEvents.IRON_TRAPDOOR_CLOSE,
+        SoundEvents.IRON_TRAPDOOR_OPEN,
+        SoundEvents.METAL_PRESSURE_PLATE_CLICK_OFF,
+        SoundEvents.METAL_PRESSURE_PLATE_CLICK_ON,
+        SoundEvents.STONE_BUTTON_CLICK_OFF,
+        SoundEvents.STONE_BUTTON_CLICK_ON
     );
 
     public static final Supplier<BlockSetType> GLASS_SET_TYPE = () -> new BlockSetType(
@@ -58,58 +56,58 @@ public class SlidingDoorBlock extends DoorBlock implements IWrenchable, IBE<Slid
         true,
         true,
         true,
-        BlockSetType.ActivationRule.EVERYTHING,
-        BlockSoundGroup.GLASS,
-        SoundEvents.BLOCK_IRON_DOOR_CLOSE,
-        SoundEvents.BLOCK_IRON_DOOR_OPEN,
-        SoundEvents.BLOCK_IRON_TRAPDOOR_CLOSE,
-        SoundEvents.BLOCK_IRON_TRAPDOOR_OPEN,
-        SoundEvents.BLOCK_METAL_PRESSURE_PLATE_CLICK_OFF,
-        SoundEvents.BLOCK_METAL_PRESSURE_PLATE_CLICK_ON,
-        SoundEvents.BLOCK_STONE_BUTTON_CLICK_OFF,
-        SoundEvents.BLOCK_STONE_BUTTON_CLICK_ON
+        BlockSetType.PressurePlateSensitivity.EVERYTHING,
+        SoundType.GLASS,
+        SoundEvents.IRON_DOOR_CLOSE,
+        SoundEvents.IRON_DOOR_OPEN,
+        SoundEvents.IRON_TRAPDOOR_CLOSE,
+        SoundEvents.IRON_TRAPDOOR_OPEN,
+        SoundEvents.METAL_PRESSURE_PLATE_CLICK_OFF,
+        SoundEvents.METAL_PRESSURE_PLATE_CLICK_ON,
+        SoundEvents.STONE_BUTTON_CLICK_OFF,
+        SoundEvents.STONE_BUTTON_CLICK_ON
     );
     public static final Supplier<BlockSetType> STONE_SET_TYPE = () -> new BlockSetType(
         "create:stone",
         true,
         true,
         true,
-        BlockSetType.ActivationRule.EVERYTHING,
-        BlockSoundGroup.STONE,
-        SoundEvents.BLOCK_IRON_DOOR_CLOSE,
-        SoundEvents.BLOCK_IRON_DOOR_OPEN,
-        SoundEvents.BLOCK_IRON_TRAPDOOR_CLOSE,
-        SoundEvents.BLOCK_IRON_TRAPDOOR_OPEN,
-        SoundEvents.BLOCK_METAL_PRESSURE_PLATE_CLICK_OFF,
-        SoundEvents.BLOCK_METAL_PRESSURE_PLATE_CLICK_ON,
-        SoundEvents.BLOCK_STONE_BUTTON_CLICK_OFF,
-        SoundEvents.BLOCK_STONE_BUTTON_CLICK_ON
+        BlockSetType.PressurePlateSensitivity.EVERYTHING,
+        SoundType.STONE,
+        SoundEvents.IRON_DOOR_CLOSE,
+        SoundEvents.IRON_DOOR_OPEN,
+        SoundEvents.IRON_TRAPDOOR_CLOSE,
+        SoundEvents.IRON_TRAPDOOR_OPEN,
+        SoundEvents.METAL_PRESSURE_PLATE_CLICK_OFF,
+        SoundEvents.METAL_PRESSURE_PLATE_CLICK_ON,
+        SoundEvents.STONE_BUTTON_CLICK_OFF,
+        SoundEvents.STONE_BUTTON_CLICK_ON
     );
 
-    public static final BooleanProperty VISIBLE = BooleanProperty.of("visible");
+    public static final BooleanProperty VISIBLE = BooleanProperty.create("visible");
     private final boolean folds;
 
-    public static SlidingDoorBlock metal_fold(Settings settings) {
+    public static SlidingDoorBlock metal_fold(Properties settings) {
         return new SlidingDoorBlock(settings, TRAIN_SET_TYPE.get(), true);
     }
 
-    public static SlidingDoorBlock metal_slide(Settings settings) {
+    public static SlidingDoorBlock metal_slide(Properties settings) {
         return new SlidingDoorBlock(settings, TRAIN_SET_TYPE.get(), false);
     }
 
-    public static SlidingDoorBlock glass_slide(Settings settings) {
+    public static SlidingDoorBlock glass_slide(Properties settings) {
         return new SlidingDoorBlock(settings, GLASS_SET_TYPE.get(), false);
     }
 
-    public static SlidingDoorBlock stone_fold(Settings settings) {
+    public static SlidingDoorBlock stone_fold(Properties settings) {
         return new SlidingDoorBlock(settings, STONE_SET_TYPE.get(), true);
     }
 
-    public static SlidingDoorBlock stone_slide(Settings settings) {
+    public static SlidingDoorBlock stone_slide(Properties settings) {
         return new SlidingDoorBlock(settings, STONE_SET_TYPE.get(), false);
     }
 
-    public SlidingDoorBlock(Settings properties, BlockSetType type, boolean folds) {
+    public SlidingDoorBlock(Properties properties, BlockSetType type, boolean folds) {
         super(type, properties);
         this.folds = folds;
     }
@@ -119,139 +117,139 @@ public class SlidingDoorBlock extends DoorBlock implements IWrenchable, IBE<Slid
     }
 
     @Override
-    protected void appendProperties(StateManager.Builder<Block, BlockState> pBuilder) {
-        super.appendProperties(pBuilder.add(VISIBLE));
+    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> pBuilder) {
+        super.createBlockStateDefinition(pBuilder.add(VISIBLE));
     }
 
     @Override
-    public VoxelShape getOutlineShape(BlockState pState, BlockView pLevel, BlockPos pPos, ShapeContext pContext) {
-        if (!pState.get(OPEN) && (pState.get(VISIBLE) || pLevel instanceof ContraptionWorld))
-            return super.getOutlineShape(pState, pLevel, pPos, pContext);
+    public VoxelShape getShape(BlockState pState, BlockGetter pLevel, BlockPos pPos, CollisionContext pContext) {
+        if (!pState.getValue(OPEN) && (pState.getValue(VISIBLE) || pLevel instanceof ContraptionWorld))
+            return super.getShape(pState, pLevel, pPos, pContext);
 
-        Direction direction = pState.get(FACING);
-        boolean hinge = pState.get(HINGE) == DoorHinge.RIGHT;
+        Direction direction = pState.getValue(FACING);
+        boolean hinge = pState.getValue(HINGE) == DoorHingeSide.RIGHT;
         return SlidingDoorShapes.get(direction, hinge, isFoldingDoor());
     }
 
     @Override
-    public boolean canPlaceAt(BlockState pState, WorldView pLevel, BlockPos pPos) {
-        return pState.get(HALF) == DoubleBlockHalf.LOWER || pLevel.getBlockState(pPos.down()).isOf(this);
+    public boolean canSurvive(BlockState pState, LevelReader pLevel, BlockPos pPos) {
+        return pState.getValue(HALF) == DoubleBlockHalf.LOWER || pLevel.getBlockState(pPos.below()).is(this);
     }
 
     @Override
-    public VoxelShape getRaycastShape(BlockState pState, BlockView pLevel, BlockPos pPos) {
-        return getOutlineShape(pState, pLevel, pPos, ShapeContext.absent());
+    public VoxelShape getInteractionShape(BlockState pState, BlockGetter pLevel, BlockPos pPos) {
+        return getShape(pState, pLevel, pPos, CollisionContext.empty());
     }
 
     @Override
-    public BlockState getPlacementState(ItemPlacementContext pContext) {
-        BlockState stateForPlacement = super.getPlacementState(pContext);
-        if (stateForPlacement != null && stateForPlacement.get(OPEN))
-            return stateForPlacement.with(OPEN, false).with(POWERED, false);
+    public BlockState getStateForPlacement(BlockPlaceContext pContext) {
+        BlockState stateForPlacement = super.getStateForPlacement(pContext);
+        if (stateForPlacement != null && stateForPlacement.getValue(OPEN))
+            return stateForPlacement.setValue(OPEN, false).setValue(POWERED, false);
         return stateForPlacement;
     }
 
     @Override
-    public void onBlockAdded(BlockState pState, World pLevel, BlockPos pPos, BlockState pOldState, boolean pIsMoving) {
-        if (!pOldState.isOf(this))
+    public void onPlace(BlockState pState, Level pLevel, BlockPos pPos, BlockState pOldState, boolean pIsMoving) {
+        if (!pOldState.is(this))
             deferUpdate(pLevel, pPos);
     }
 
     @Override
-    public BlockState getStateForNeighborUpdate(
+    public BlockState updateShape(
         BlockState pState,
-        WorldView pLevel,
-        ScheduledTickView tickView,
+        LevelReader pLevel,
+        ScheduledTickAccess tickView,
         BlockPos pCurrentPos,
         Direction pFacing,
         BlockPos pFacingPos,
         BlockState pFacingState,
-        Random random
+        RandomSource random
     ) {
-        BlockState blockState = super.getStateForNeighborUpdate(pState, pLevel, tickView, pCurrentPos, pFacing, pFacingPos, pFacingState, random);
+        BlockState blockState = super.updateShape(pState, pLevel, tickView, pCurrentPos, pFacing, pFacingPos, pFacingState, random);
         if (blockState.isAir())
             return blockState;
-        DoubleBlockHalf doubleblockhalf = blockState.get(HALF);
+        DoubleBlockHalf doubleblockhalf = blockState.getValue(HALF);
         if (pFacing.getAxis() == Direction.Axis.Y && doubleblockhalf == DoubleBlockHalf.LOWER == (pFacing == Direction.UP)) {
-            return pFacingState.isOf(this) && pFacingState.get(HALF) != doubleblockhalf ? blockState.with(
+            return pFacingState.is(this) && pFacingState.getValue(HALF) != doubleblockhalf ? blockState.setValue(
                 VISIBLE,
-                pFacingState.get(VISIBLE)
-            ) : Blocks.AIR.getDefaultState();
+                pFacingState.getValue(VISIBLE)
+            ) : Blocks.AIR.defaultBlockState();
         }
         return blockState;
     }
 
     @Override
-    public void setOpen(@Nullable Entity entity, World level, BlockState state, BlockPos pos, boolean open) {
-        if (!state.isOf(this))
+    public void setOpen(@Nullable Entity entity, Level level, BlockState state, BlockPos pos, boolean open) {
+        if (!state.is(this))
             return;
-        if (state.get(OPEN) == open)
+        if (state.getValue(OPEN) == open)
             return;
-        BlockState changedState = state.with(OPEN, open);
+        BlockState changedState = state.setValue(OPEN, open);
         if (open)
-            changedState = changedState.with(VISIBLE, false);
-        level.setBlockState(pos, changedState, Block.NOTIFY_LISTENERS | Block.REDRAW_ON_MAIN_THREAD);
+            changedState = changedState.setValue(VISIBLE, false);
+        level.setBlock(pos, changedState, Block.UPDATE_CLIENTS | Block.UPDATE_IMMEDIATE);
 
-        DoorHinge hinge = changedState.get(HINGE);
-        Direction facing = changedState.get(FACING);
-        BlockPos otherPos = pos.offset(hinge == DoorHinge.LEFT ? facing.rotateYClockwise() : facing.rotateYCounterclockwise());
+        DoorHingeSide hinge = changedState.getValue(HINGE);
+        Direction facing = changedState.getValue(FACING);
+        BlockPos otherPos = pos.relative(hinge == DoorHingeSide.LEFT ? facing.getClockWise() : facing.getCounterClockWise());
         BlockState otherDoor = level.getBlockState(otherPos);
         if (isDoubleDoor(changedState, hinge, facing, otherDoor))
             setOpen(entity, level, otherDoor, otherPos, open);
 
         this.playSound(entity, level, pos, open);
-        level.emitGameEvent(entity, open ? GameEvent.BLOCK_OPEN : GameEvent.BLOCK_CLOSE, pos);
+        level.gameEvent(entity, open ? GameEvent.BLOCK_OPEN : GameEvent.BLOCK_CLOSE, pos);
     }
 
     @Override
-    public void neighborUpdate(
+    public void neighborChanged(
         BlockState pState,
-        World pLevel,
+        Level pLevel,
         BlockPos pPos,
         Block pBlock,
-        @Nullable WireOrientation wireOrientation,
+        @Nullable Orientation wireOrientation,
         boolean pIsMoving
     ) {
-        boolean lower = pState.get(HALF) == DoubleBlockHalf.LOWER;
+        boolean lower = pState.getValue(HALF) == DoubleBlockHalf.LOWER;
         boolean isPowered = isDoorPowered(pLevel, pPos, pState);
-        if (getDefaultState().isOf(pBlock))
+        if (defaultBlockState().is(pBlock))
             return;
-        if (isPowered == pState.get(POWERED))
+        if (isPowered == pState.getValue(POWERED))
             return;
 
-        SlidingDoorBlockEntity be = getBlockEntity(pLevel, lower ? pPos : pPos.down());
+        SlidingDoorBlockEntity be = getBlockEntity(pLevel, lower ? pPos : pPos.below());
         if (be != null && be.deferUpdate)
             return;
 
-        BlockState changedState = pState.with(POWERED, isPowered).with(OPEN, isPowered);
+        BlockState changedState = pState.setValue(POWERED, isPowered).setValue(OPEN, isPowered);
         if (isPowered)
-            changedState = changedState.with(VISIBLE, false);
+            changedState = changedState.setValue(VISIBLE, false);
 
-        if (isPowered != pState.get(OPEN)) {
+        if (isPowered != pState.getValue(OPEN)) {
             this.playSound(null, pLevel, pPos, isPowered);
-            pLevel.emitGameEvent(null, isPowered ? GameEvent.BLOCK_OPEN : GameEvent.BLOCK_CLOSE, pPos);
+            pLevel.gameEvent(null, isPowered ? GameEvent.BLOCK_OPEN : GameEvent.BLOCK_CLOSE, pPos);
 
-            DoorHinge hinge = changedState.get(HINGE);
-            Direction facing = changedState.get(FACING);
-            BlockPos otherPos = pPos.offset(hinge == DoorHinge.LEFT ? facing.rotateYClockwise() : facing.rotateYCounterclockwise());
+            DoorHingeSide hinge = changedState.getValue(HINGE);
+            Direction facing = changedState.getValue(FACING);
+            BlockPos otherPos = pPos.relative(hinge == DoorHingeSide.LEFT ? facing.getClockWise() : facing.getCounterClockWise());
             BlockState otherDoor = pLevel.getBlockState(otherPos);
 
             if (isDoubleDoor(changedState, hinge, facing, otherDoor)) {
-                otherDoor = otherDoor.with(POWERED, isPowered).with(OPEN, isPowered);
+                otherDoor = otherDoor.setValue(POWERED, isPowered).setValue(OPEN, isPowered);
                 if (isPowered)
-                    otherDoor = otherDoor.with(VISIBLE, false);
-                pLevel.setBlockState(otherPos, otherDoor, Block.NOTIFY_LISTENERS);
+                    otherDoor = otherDoor.setValue(VISIBLE, false);
+                pLevel.setBlock(otherPos, otherDoor, Block.UPDATE_CLIENTS);
             }
         }
 
-        pLevel.setBlockState(pPos, changedState, Block.NOTIFY_LISTENERS);
+        pLevel.setBlock(pPos, changedState, Block.UPDATE_CLIENTS);
     }
 
-    public static boolean isDoorPowered(World pLevel, BlockPos pPos, BlockState state) {
-        boolean lower = state.get(HALF) == DoubleBlockHalf.LOWER;
-        DoorHinge hinge = state.get(HINGE);
-        Direction facing = state.get(FACING);
-        BlockPos otherPos = pPos.offset(hinge == DoorHinge.LEFT ? facing.rotateYClockwise() : facing.rotateYCounterclockwise());
+    public static boolean isDoorPowered(Level pLevel, BlockPos pPos, BlockState state) {
+        boolean lower = state.getValue(HALF) == DoubleBlockHalf.LOWER;
+        DoorHingeSide hinge = state.getValue(HINGE);
+        Direction facing = state.getValue(FACING);
+        BlockPos otherPos = pPos.relative(hinge == DoorHingeSide.LEFT ? facing.getClockWise() : facing.getCounterClockWise());
         BlockState otherDoor = pLevel.getBlockState(otherPos);
 
         if (isDoubleDoor(
@@ -259,55 +257,55 @@ public class SlidingDoorBlock extends DoorBlock implements IWrenchable, IBE<Slid
             hinge,
             facing,
             otherDoor
-        ) && (pLevel.isReceivingRedstonePower(otherPos) || pLevel.isReceivingRedstonePower(otherPos.offset(lower ? Direction.UP : Direction.DOWN))))
+        ) && (pLevel.hasNeighborSignal(otherPos) || pLevel.hasNeighborSignal(otherPos.relative(lower ? Direction.UP : Direction.DOWN))))
             return true;
 
-        return pLevel.isReceivingRedstonePower(pPos) || pLevel.isReceivingRedstonePower(pPos.offset(lower ? Direction.UP : Direction.DOWN));
+        return pLevel.hasNeighborSignal(pPos) || pLevel.hasNeighborSignal(pPos.relative(lower ? Direction.UP : Direction.DOWN));
     }
 
     @Override
-    protected ActionResult onUse(BlockState state, World level, BlockPos pos, PlayerEntity player, BlockHitResult hitResult) {
+    protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hitResult) {
         state = state.cycle(OPEN);
-        boolean isOpen = state.get(OPEN);
+        boolean isOpen = state.getValue(OPEN);
         if (isOpen)
-            state = state.with(VISIBLE, false);
-        level.setBlockState(pos, state, Block.NOTIFY_LISTENERS | Block.REDRAW_ON_MAIN_THREAD);
-        level.emitGameEvent(player, isOpen(state) ? GameEvent.BLOCK_OPEN : GameEvent.BLOCK_CLOSE, pos);
+            state = state.setValue(VISIBLE, false);
+        level.setBlock(pos, state, Block.UPDATE_CLIENTS | Block.UPDATE_IMMEDIATE);
+        level.gameEvent(player, isOpen(state) ? GameEvent.BLOCK_OPEN : GameEvent.BLOCK_CLOSE, pos);
 
-        DoorHinge hinge = state.get(HINGE);
-        Direction facing = state.get(FACING);
-        BlockPos otherPos = pos.offset(hinge == DoorHinge.LEFT ? facing.rotateYClockwise() : facing.rotateYCounterclockwise());
+        DoorHingeSide hinge = state.getValue(HINGE);
+        Direction facing = state.getValue(FACING);
+        BlockPos otherPos = pos.relative(hinge == DoorHingeSide.LEFT ? facing.getClockWise() : facing.getCounterClockWise());
         BlockState otherDoor = level.getBlockState(otherPos);
         if (isDoubleDoor(state, hinge, facing, otherDoor))
-            onUse(otherDoor, level, otherPos, player, hitResult);
+            useWithoutItem(otherDoor, level, otherPos, player, hitResult);
         else if (isOpen) {
             this.playSound(player, level, pos, true);
-            level.emitGameEvent(player, GameEvent.BLOCK_OPEN, pos);
+            level.gameEvent(player, GameEvent.BLOCK_OPEN, pos);
         }
 
-        return ActionResult.SUCCESS;
+        return InteractionResult.SUCCESS;
     }
 
-    public void deferUpdate(WorldAccess level, BlockPos pos) {
+    public void deferUpdate(LevelAccessor level, BlockPos pos) {
         withBlockEntityDo(level, pos, sdte -> sdte.deferUpdate = true);
     }
 
-    public static boolean isDoubleDoor(BlockState pState, DoorHinge hinge, Direction facing, BlockState otherDoor) {
-        return otherDoor.getBlock() == pState.getBlock() && otherDoor.get(HINGE) != hinge && otherDoor.get(FACING) == facing && otherDoor.get(OPEN) != pState.get(
-            OPEN) && otherDoor.get(HALF) == pState.get(HALF);
+    public static boolean isDoubleDoor(BlockState pState, DoorHingeSide hinge, Direction facing, BlockState otherDoor) {
+        return otherDoor.getBlock() == pState.getBlock() && otherDoor.getValue(HINGE) != hinge && otherDoor.getValue(FACING) == facing && otherDoor.getValue(
+            OPEN) != pState.getValue(OPEN) && otherDoor.getValue(HALF) == pState.getValue(HALF);
     }
 
     @Override
-    public BlockRenderType getRenderType(BlockState pState) {
-        return pState.get(VISIBLE) ? BlockRenderType.MODEL : BlockRenderType.INVISIBLE;
+    public RenderShape getRenderShape(BlockState pState) {
+        return pState.getValue(VISIBLE) ? RenderShape.MODEL : RenderShape.INVISIBLE;
     }
 
-    private void playSound(@Nullable Entity pSource, World pLevel, BlockPos pPos, boolean pIsOpening) {
+    private void playSound(@Nullable Entity pSource, Level pLevel, BlockPos pPos, boolean pIsOpening) {
         pLevel.playSound(
             pSource,
             pPos,
-            pIsOpening ? SoundEvents.BLOCK_IRON_DOOR_OPEN : SoundEvents.BLOCK_IRON_DOOR_CLOSE,
-            SoundCategory.BLOCKS,
+            pIsOpening ? SoundEvents.IRON_DOOR_OPEN : SoundEvents.IRON_DOOR_CLOSE,
+            SoundSource.BLOCKS,
             1.0F,
             pLevel.getRandom().nextFloat() * 0.1F + 0.9F
         );
@@ -315,10 +313,10 @@ public class SlidingDoorBlock extends DoorBlock implements IWrenchable, IBE<Slid
 
     @Nullable
     @Override
-    public BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
-        if (state.get(HALF) == DoubleBlockHalf.UPPER)
+    public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
+        if (state.getValue(HALF) == DoubleBlockHalf.UPPER)
             return null;
-        return IBE.super.createBlockEntity(pos, state);
+        return IBE.super.newBlockEntity(pos, state);
     }
 
     @Override

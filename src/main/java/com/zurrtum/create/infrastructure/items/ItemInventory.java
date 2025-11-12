@@ -1,54 +1,54 @@
 package com.zurrtum.create.infrastructure.items;
 
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.inventory.Inventory;
-import net.minecraft.item.ItemStack;
+import net.minecraft.world.Container;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 
-public interface ItemInventory extends Inventory {
+public interface ItemInventory extends Container {
     @Override
     @SuppressWarnings("deprecation")
-    default ItemStack removeStack(int slot, int amount) {
-        if (slot >= size() || amount <= 0) {
+    default ItemStack removeItem(int slot, int amount) {
+        if (slot >= getContainerSize() || amount <= 0) {
             return ItemStack.EMPTY;
         }
-        ItemStack stack = getStack(slot);
+        ItemStack stack = getItem(slot);
         int count = stack.getCount();
         if (count == 0) {
             return stack;
         }
         if (amount >= count) {
-            setStack(slot, ItemStack.EMPTY);
+            setItem(slot, ItemStack.EMPTY);
             return onExtract(stack);
         }
         assert stack.item != null;
         ItemStack extract = new ItemStack(stack.item, amount, stack.components.copy());
-        extract.setBobbingAnimationTime(stack.getBobbingAnimationTime());
+        extract.setPopTime(stack.getPopTime());
         stack.setCount(count - amount);
         return onExtract(extract);
     }
 
     @Override
-    default ItemStack removeStack(int slot) {
-        if (slot >= size()) {
+    default ItemStack removeItemNoUpdate(int slot) {
+        if (slot >= getContainerSize()) {
             return ItemStack.EMPTY;
         }
-        ItemStack stack = getStack(slot);
+        ItemStack stack = getItem(slot);
         if (stack.isEmpty()) {
             return stack;
         }
-        setStack(slot, ItemStack.EMPTY);
+        setItem(slot, ItemStack.EMPTY);
         return onExtract(stack);
     }
 
     @Override
-    default boolean canPlayerUse(PlayerEntity player) {
+    default boolean stillValid(Player player) {
         return true;
     }
 
     @Override
     default boolean isEmpty() {
-        for (int i = 0, size = size(); i < size; i++) {
-            if (!getStack(i).isEmpty()) {
+        for (int i = 0, size = getContainerSize(); i < size; i++) {
+            if (!getItem(i).isEmpty()) {
                 return false;
             }
         }
@@ -56,14 +56,14 @@ public interface ItemInventory extends Inventory {
     }
 
     @Override
-    default void clear() {
-        for (int i = 0, size = size(); i < size; i++) {
-            setStack(i, ItemStack.EMPTY);
+    default void clearContent() {
+        for (int i = 0, size = getContainerSize(); i < size; i++) {
+            setItem(i, ItemStack.EMPTY);
         }
-        markDirty();
+        setChanged();
     }
 
     @Override
-    default void markDirty() {
+    default void setChanged() {
     }
 }

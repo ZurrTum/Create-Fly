@@ -1,5 +1,6 @@
 package com.zurrtum.create.client.flywheel.lib.model;
 
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.zurrtum.create.client.flywheel.api.model.Model;
 import com.zurrtum.create.client.flywheel.lib.model.baked.BakedModelBuilder;
 import com.zurrtum.create.client.flywheel.lib.model.baked.BlockModelBuilder;
@@ -7,13 +8,11 @@ import com.zurrtum.create.client.flywheel.lib.model.baked.PartialModel;
 import com.zurrtum.create.client.flywheel.lib.model.baked.SinglePosVirtualBlockGetter;
 import com.zurrtum.create.client.flywheel.lib.transform.TransformStack;
 import com.zurrtum.create.client.flywheel.lib.util.RendererReloadCache;
-import net.minecraft.block.BlockState;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-
 import java.util.List;
 import java.util.function.BiConsumer;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.level.block.state.BlockState;
 
 /**
  * A collection of methods for creating models from various sources.
@@ -23,7 +22,7 @@ import java.util.function.BiConsumer;
  */
 public final class Models {
     private static final RendererReloadCache<BlockState, Model> BLOCK_STATE = new RendererReloadCache<>(it -> new BlockModelBuilder(SinglePosVirtualBlockGetter.createFullDark().blockState(it),
-        List.of(BlockPos.ORIGIN)
+        List.of(BlockPos.ZERO)
     ).build());
     private static final RendererReloadCache<PartialModel, Model> PARTIAL = new RendererReloadCache<>(it -> new BakedModelBuilder(it.get()).build());
     private static final RendererReloadCache<TransformedPartial<?>, Model> TRANSFORMED_PARTIAL = new RendererReloadCache<>(TransformedPartial::create);
@@ -63,7 +62,7 @@ public final class Models {
      * @param <T>         The type of the key.
      * @return A model built from the baked model the partial model represents, transformed by the given function.
      */
-    public static <T> Model partial(PartialModel partial, T key, BiConsumer<T, MatrixStack> transformer) {
+    public static <T> Model partial(PartialModel partial, T key, BiConsumer<T, PoseStack> transformer) {
         return TRANSFORMED_PARTIAL.get(new TransformedPartial<>(partial, key, transformer));
     }
 
@@ -80,13 +79,13 @@ public final class Models {
         return partial(partial, dir, Models::rotateAboutCenterToFace);
     }
 
-    private static void rotateAboutCenterToFace(Direction facing, MatrixStack stack) {
+    private static void rotateAboutCenterToFace(Direction facing, PoseStack stack) {
         TransformStack.of(stack).center().rotateToFace(facing.getOpposite()).uncenter();
     }
 
-    private record TransformedPartial<T>(PartialModel partial, T key, BiConsumer<T, MatrixStack> transformer) {
+    private record TransformedPartial<T>(PartialModel partial, T key, BiConsumer<T, PoseStack> transformer) {
         private Model create() {
-            var stack = new MatrixStack();
+            var stack = new PoseStack();
             transformer.accept(key, stack);
             return new BakedModelBuilder(partial.get()).poseStack(stack).build();
         }

@@ -1,11 +1,11 @@
 package com.zurrtum.create.client.flywheel.backend.engine;
 
 import it.unimi.dsi.fastutil.ints.IntArrayList;
-import net.minecraft.util.math.ChunkSectionPos;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.function.BiConsumer;
 import java.util.function.Supplier;
+import net.minecraft.core.SectionPos;
 
 // Massive kudos to RogueLogix for figuring out this LUT scheme.
 // First layer is Y, then X, then Z.
@@ -13,9 +13,9 @@ public final class LightLut {
     public final Layer<Layer<IntLayer>> indices = new Layer<>();
 
     public void add(long position, int index) {
-        final var x = ChunkSectionPos.unpackX(position);
-        final var y = ChunkSectionPos.unpackY(position);
-        final var z = ChunkSectionPos.unpackZ(position);
+        final var x = SectionPos.x(position);
+        final var y = SectionPos.y(position);
+        final var z = SectionPos.z(position);
 
         indices.computeIfAbsent(y, Layer::new).computeIfAbsent(x, IntLayer::new).set(z, index + 1);
     }
@@ -26,9 +26,9 @@ public final class LightLut {
     }
 
     public void remove(long section) {
-        final var x = ChunkSectionPos.unpackX(section);
-        final var y = ChunkSectionPos.unpackY(section);
-        final var z = ChunkSectionPos.unpackZ(section);
+        final var x = SectionPos.x(section);
+        final var y = SectionPos.y(section);
+        final var z = SectionPos.z(section);
 
         var first = indices.get(y);
 

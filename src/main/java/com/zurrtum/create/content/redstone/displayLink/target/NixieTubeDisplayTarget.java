@@ -3,19 +3,19 @@ package com.zurrtum.create.content.redstone.displayLink.target;
 import com.zurrtum.create.content.redstone.displayLink.DisplayLinkContext;
 import com.zurrtum.create.content.redstone.nixieTube.NixieTubeBlock;
 import com.zurrtum.create.content.redstone.nixieTube.NixieTubeBlockEntity;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.text.MutableText;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.WorldAccess;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
 import org.apache.commons.lang3.mutable.MutableInt;
 import org.apache.commons.lang3.mutable.MutableObject;
 
 public class NixieTubeDisplayTarget extends SingleLineDisplayTarget {
 
     @Override
-    protected void acceptLine(MutableText text, DisplayLinkContext context) {
+    protected void acceptLine(MutableComponent text, DisplayLinkContext context) {
         NixieTubeBlock.walkNixies(
             context.level(), context.getTargetPos(), false, (currentPos, rowPosition) -> {
                 BlockEntity blockEntity = context.level().getBlockEntity(currentPos);
@@ -32,7 +32,7 @@ public class NixieTubeDisplayTarget extends SingleLineDisplayTarget {
         return count.intValue();
     }
 
-    public Box getMultiblockBounds(WorldAccess level, BlockPos pos) {
+    public AABB getMultiblockBounds(LevelAccessor level, BlockPos pos) {
         MutableObject<BlockPos> start = new MutableObject<>(null);
         MutableObject<BlockPos> end = new MutableObject<>(null);
         NixieTubeBlock.walkNixies(
@@ -46,6 +46,6 @@ public class NixieTubeDisplayTarget extends SingleLineDisplayTarget {
         BlockPos diffToCurrent = start.getValue().subtract(pos);
         BlockPos diff = end.getValue().subtract(start.getValue());
 
-        return super.getMultiblockBounds(level, pos).offset(diffToCurrent).stretch(Vec3d.of(diff));
+        return super.getMultiblockBounds(level, pos).move(diffToCurrent).expandTowards(Vec3.atLowerCornerOf(diff));
     }
 }

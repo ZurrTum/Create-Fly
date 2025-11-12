@@ -3,14 +3,14 @@ package com.zurrtum.create.infrastructure.packet.s2c;
 import com.zurrtum.create.AllClientHandle;
 import com.zurrtum.create.AllPackets;
 import io.netty.buffer.ByteBuf;
-import net.minecraft.network.codec.PacketCodec;
-import net.minecraft.network.packet.PacketType;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.PacketType;
 import org.apache.logging.log4j.util.TriConsumer;
 
 public record ShopUpdatePacket(BlockPos pos) implements S2CPacket {
-    public static final PacketCodec<ByteBuf, ShopUpdatePacket> CODEC = PacketCodec.tuple(
-        BlockPos.PACKET_CODEC,
+    public static final StreamCodec<ByteBuf, ShopUpdatePacket> CODEC = StreamCodec.composite(
+        BlockPos.STREAM_CODEC,
         ShopUpdatePacket::pos,
         ShopUpdatePacket::new
     );
@@ -26,7 +26,7 @@ public record ShopUpdatePacket(BlockPos pos) implements S2CPacket {
     }
 
     @Override
-    public PacketType<ShopUpdatePacket> getPacketType() {
+    public PacketType<ShopUpdatePacket> type() {
         return AllPackets.SHOP_UPDATE;
     }
 }

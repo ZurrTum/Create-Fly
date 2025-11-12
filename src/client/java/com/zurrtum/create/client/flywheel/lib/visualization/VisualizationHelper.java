@@ -6,16 +6,16 @@ import com.zurrtum.create.client.flywheel.api.visualization.BlockEntityVisualize
 import com.zurrtum.create.client.flywheel.api.visualization.EntityVisualizer;
 import com.zurrtum.create.client.flywheel.api.visualization.VisualizationManager;
 import com.zurrtum.create.client.flywheel.api.visualization.VisualizerRegistry;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.client.world.ClientWorld;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityType;
-import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Iterator;
 import java.util.NoSuchElementException;
+import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 
 public final class VisualizationHelper {
     private VisualizationHelper() {
@@ -45,7 +45,7 @@ public final class VisualizationHelper {
      * @param blockEntity The block entity whose visual you want to update.
      */
     public static void queueUpdate(BlockEntity blockEntity) {
-        World level = blockEntity.getWorld();
+        Level level = blockEntity.getLevel();
         VisualizationManager manager = VisualizationManager.get(level);
         if (manager == null) {
             return;
@@ -60,7 +60,7 @@ public final class VisualizationHelper {
      * @param entity The entity whose visual you want to update.
      */
     public static void queueUpdate(Entity entity) {
-        World level = entity.getEntityWorld();
+        Level level = entity.level();
         VisualizationManager manager = VisualizationManager.get(level);
         if (manager == null) {
             return;
@@ -147,7 +147,7 @@ public final class VisualizationHelper {
         return visualizer.skipVanillaRender(entity);
     }
 
-    public static Iterator<Entity> skipVanillaRender(ClientWorld world, Iterator<Entity> iterator) {
+    public static Iterator<Entity> skipVanillaRender(ClientLevel world, Iterator<Entity> iterator) {
         if (VisualizationManager.supportsVisualization(world)) {
             return new EntitySkipIterator(iterator);
         }
@@ -155,7 +155,7 @@ public final class VisualizationHelper {
     }
 
     public static <T extends BlockEntity> boolean tryAddBlockEntity(T blockEntity) {
-        World level = blockEntity.getWorld();
+        Level level = blockEntity.getLevel();
         VisualizationManager manager = VisualizationManager.get(level);
         if (manager == null) {
             return false;

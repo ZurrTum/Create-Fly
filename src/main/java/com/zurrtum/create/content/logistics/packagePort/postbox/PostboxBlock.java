@@ -10,57 +10,57 @@ import com.zurrtum.create.content.logistics.packagePort.PackagePortBlockEntity;
 import com.zurrtum.create.foundation.block.IBE;
 import com.zurrtum.create.foundation.block.ProperWaterloggedBlock;
 import com.zurrtum.create.infrastructure.items.ItemInventoryProvider;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.HorizontalFacingBlock;
-import net.minecraft.block.ShapeContext;
-import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.entity.ai.pathing.NavigationType;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.fluid.FluidState;
-import net.minecraft.inventory.Inventory;
-import net.minecraft.item.ItemPlacementContext;
-import net.minecraft.state.StateManager;
-import net.minecraft.state.property.BooleanProperty;
-import net.minecraft.state.property.Properties;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.DyeColor;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.random.Random;
-import net.minecraft.util.shape.VoxelShape;
-import net.minecraft.world.BlockView;
-import net.minecraft.world.World;
-import net.minecraft.world.WorldAccess;
-import net.minecraft.world.WorldView;
-import net.minecraft.world.tick.ScheduledTickView;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.function.Function;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.Container;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.DyeColor;
+import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.LevelReader;
+import net.minecraft.world.level.ScheduledTickAccess;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.HorizontalDirectionalBlock;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.block.state.properties.BooleanProperty;
+import net.minecraft.world.level.material.FluidState;
+import net.minecraft.world.level.pathfinder.PathComputationType;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.phys.shapes.VoxelShape;
 
-public class PostboxBlock extends HorizontalFacingBlock implements IBE<PostboxBlockEntity>, IWrenchable, ProperWaterloggedBlock, ItemInventoryProvider<PostboxBlockEntity> {
+public class PostboxBlock extends HorizontalDirectionalBlock implements IBE<PostboxBlockEntity>, IWrenchable, ProperWaterloggedBlock, ItemInventoryProvider<PostboxBlockEntity> {
     public static MapCodec<PostboxBlock> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
-        createSettingsCodec(),
+        propertiesCodec(),
         DyeColor.CODEC.fieldOf("color").forGetter(PostboxBlock::getColor)
     ).apply(instance, PostboxBlock::new));
 
-    public static final BooleanProperty OPEN = Properties.OPEN;
+    public static final BooleanProperty OPEN = BlockStateProperties.OPEN;
 
     protected final DyeColor color;
 
-    public PostboxBlock(Settings properties, DyeColor color) {
+    public PostboxBlock(Properties properties, DyeColor color) {
         super(properties);
         this.color = color;
-        setDefaultState(getDefaultState().with(OPEN, false).with(WATERLOGGED, false));
+        registerDefaultState(defaultBlockState().setValue(OPEN, false).setValue(WATERLOGGED, false));
     }
 
     @Override
-    public Inventory getInventory(WorldAccess world, BlockPos pos, BlockState state, PostboxBlockEntity blockEntity, Direction context) {
+    public Container getInventory(LevelAccessor world, BlockPos pos, BlockState state, PostboxBlockEntity blockEntity, Direction context) {
         return blockEntity.inventory;
     }
 
-    public static Function<Settings, PostboxBlock> dyed(DyeColor color) {
+    public static Function<Properties, PostboxBlock> dyed(DyeColor color) {
         return settings -> new PostboxBlock(settings, color);
     }
 
@@ -90,9 +90,9 @@ public class PostboxBlock extends HorizontalFacingBlock implements IBE<PostboxBl
     }
 
     @Override
-    public BlockState getPlacementState(ItemPlacementContext pContext) {
-        Direction facing = pContext.getHorizontalPlayerFacing().getOpposite();
-        return withWater(super.getPlacementState(pContext).with(FACING, facing), pContext);
+    public BlockState getStateForPlacement(BlockPlaceContext pContext) {
+        Direction facing = pContext.getHorizontalDirection().getOpposite();
+        return withWater(super.getStateForPlacement(pContext).setValue(FACING, facing), pContext);
     }
 
     @Override
@@ -101,32 +101,32 @@ public class PostboxBlock extends HorizontalFacingBlock implements IBE<PostboxBl
     }
 
     @Override
-    public BlockState getStateForNeighborUpdate(
+    public BlockState updateShape(
         BlockState pState,
-        WorldView pLevel,
-        ScheduledTickView tickView,
+        LevelReader pLevel,
+        ScheduledTickAccess tickView,
         BlockPos pPos,
         Direction pDirection,
         BlockPos pNeighborPos,
         BlockState pNeighborState,
-        Random random
+        RandomSource random
     ) {
         updateWater(pLevel, tickView, pState, pPos);
         return pState;
     }
 
     @Override
-    public VoxelShape getOutlineShape(BlockState pState, BlockView pLevel, BlockPos pPos, ShapeContext pContext) {
-        return AllShapes.POSTBOX.get(pState.get(FACING));
+    public VoxelShape getShape(BlockState pState, BlockGetter pLevel, BlockPos pPos, CollisionContext pContext) {
+        return AllShapes.POSTBOX.get(pState.getValue(FACING));
     }
 
     @Override
-    protected void appendProperties(StateManager.Builder<Block, BlockState> pBuilder) {
-        super.appendProperties(pBuilder.add(FACING, OPEN, WATERLOGGED));
+    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> pBuilder) {
+        super.createBlockStateDefinition(pBuilder.add(FACING, OPEN, WATERLOGGED));
     }
 
     @Override
-    protected ActionResult onUse(BlockState state, World level, BlockPos pos, PlayerEntity player, BlockHitResult hitResult) {
+    protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hitResult) {
         return onBlockEntityUse(level, pos, be -> be.use(player));
     }
 
@@ -141,22 +141,22 @@ public class PostboxBlock extends HorizontalFacingBlock implements IBE<PostboxBl
     }
 
     @Override
-    protected boolean canPathfindThrough(BlockState state, NavigationType pathComputationType) {
+    protected boolean isPathfindable(BlockState state, PathComputationType pathComputationType) {
         return false;
     }
 
     @Override
-    public boolean hasComparatorOutput(BlockState pState) {
+    public boolean hasAnalogOutputSignal(BlockState pState) {
         return true;
     }
 
     @Override
-    public int getComparatorOutput(BlockState pState, World pLevel, BlockPos pPos, Direction direction) {
+    public int getAnalogOutputSignal(BlockState pState, Level pLevel, BlockPos pPos, Direction direction) {
         return getBlockEntityOptional(pLevel, pPos).map(PackagePortBlockEntity::getComparatorOutput).orElse(0);
     }
 
     @Override
-    protected @NotNull MapCodec<? extends HorizontalFacingBlock> getCodec() {
+    protected @NotNull MapCodec<? extends HorizontalDirectionalBlock> codec() {
         return CODEC;
     }
 }

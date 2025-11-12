@@ -5,21 +5,20 @@ import com.zurrtum.create.client.content.trains.schedule.IScheduleInput;
 import com.zurrtum.create.client.content.trains.schedule.condition.*;
 import com.zurrtum.create.client.content.trains.schedule.destination.*;
 import com.zurrtum.create.content.trains.schedule.ScheduleDataEntry;
-import net.minecraft.util.Identifier;
-
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Supplier;
+import net.minecraft.resources.ResourceLocation;
 
 public class AllScheduleRenders {
-    public static final Map<Identifier, IScheduleInput<?>> ALL = new HashMap<>();
+    public static final Map<ResourceLocation, IScheduleInput<?>> ALL = new HashMap<>();
 
     @SuppressWarnings("unchecked")
     public static <T extends ScheduleDataEntry> IScheduleInput<T> get(T entry) {
         return (IScheduleInput<T>) ALL.get(entry.getId());
     }
 
-    private static void register(Identifier schedule, Supplier<IScheduleInput<?>> render) {
+    private static void register(ResourceLocation schedule, Supplier<IScheduleInput<?>> render) {
         ALL.put(schedule, render.get());
     }
 

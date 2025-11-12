@@ -10,12 +10,12 @@ import com.zurrtum.create.client.ponder.api.element.WorldSectionElement;
 import com.zurrtum.create.client.ponder.api.scene.SceneBuilder;
 import com.zurrtum.create.client.ponder.api.scene.SceneBuildingUtil;
 import com.zurrtum.create.client.ponder.api.scene.Selection;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.RedstoneWireBlock;
-import net.minecraft.state.property.Properties;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.RedStoneWireBlock;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.phys.Vec3;
 
 public class GantryScenes {
 
@@ -54,7 +54,7 @@ public class GantryScenes {
         scene.world().hideIndependentSection(gantry, Direction.UP);
         scene.idle(10);
         gantry = scene.world().showIndependentSection(util.select().layer(2), Direction.DOWN);
-        Vec3d gantryTop = util.vector().topOf(4, 2, 2);
+        Vec3 gantryTop = util.vector().topOf(4, 2, 2);
         scene.world().modifyKineticSpeed(util.select().everywhere(), f -> 0f);
         scene.overlay().showText(40).attachKeyFrame().text("Gantry setups can move attached Blocks.").pointAt(gantryTop).placeNearTarget();
         scene.idle(30);
@@ -62,7 +62,7 @@ public class GantryScenes {
         Selection planks = util.select().position(5, 3, 1);
 
         scene.world().showSectionAndMerge(util.select().layersFrom(3).substract(planks), Direction.DOWN, gantry);
-        scene.world().replaceBlocks(util.select().fromTo(5, 3, 2, 3, 4, 2), Blocks.OAK_PLANKS.getDefaultState(), false);
+        scene.world().replaceBlocks(util.select().fromTo(5, 3, 2, 3, 4, 2), Blocks.OAK_PLANKS.defaultBlockState(), false);
         scene.idle(10);
         scene.world().showSectionAndMerge(planks, Direction.SOUTH, gantry);
 
@@ -74,7 +74,7 @@ public class GantryScenes {
             40
         );
         scene.overlay().showControls(util.vector().centerOf(util.grid().at(3, 3, 2)), Pointing.UP, 40)
-            .withItem(AllItems.SUPER_GLUE.getDefaultStack());
+            .withItem(AllItems.SUPER_GLUE.getDefaultInstance());
         scene.effects().superGlue(util.grid().at(5, 3, 1), Direction.SOUTH, true);
         scene.idle(20);
         scene.overlay().showText(80).attachKeyFrame().sharedText("movement_anchors")
@@ -119,7 +119,7 @@ public class GantryScenes {
         scene.idle(40);
 
         BlockPos cogPos = util.grid().at(1, 2, 1);
-        scene.overlay().showText(60).attachKeyFrame().colored(PonderPalette.RED).pointAt(util.vector().centerOf(cogPos.down().south()))
+        scene.overlay().showText(60).attachKeyFrame().colored(PonderPalette.RED).pointAt(util.vector().centerOf(cogPos.below().south()))
             .text("Redstone-powered gantry shafts stop moving their carriages").placeNearTarget();
         scene.idle(70);
 
@@ -164,7 +164,7 @@ public class GantryScenes {
         boolean flip = true;
 
         for (int i = 0; i < 3; i++) {
-            scene.world().modifyBlocks(util.select().fromTo(4, 1, 2, 4, 2, 2), s -> s.cycle(Properties.POWERED), false);
+            scene.world().modifyBlocks(util.select().fromTo(4, 1, 2, 4, 2, 2), s -> s.cycle(BlockStateProperties.POWERED), false);
             scene.effects().indicateRedstone(util.grid().at(4, 2, 2));
             scene.world().moveSection(gantry1, util.vector().of(flip ? -1 : 1, 0, 0), 20);
             scene.world().moveSection(gantry2, util.vector().of(flip ? 1 : -1, 0, 0), 20);
@@ -192,7 +192,7 @@ public class GantryScenes {
         BlockPos leverPos = util.grid().at(4, 1, 0);
         scene.world().modifyBlocks(
             util.select().fromTo(1, 1, 0, 3, 1, 1),
-            s -> s.contains(RedstoneWireBlock.POWER) ? s.with(RedstoneWireBlock.POWER, 15) : s,
+            s -> s.hasProperty(RedStoneWireBlock.POWER) ? s.setValue(RedStoneWireBlock.POWER, 15) : s,
             false
         );
         scene.world().toggleRedstonePower(util.select().position(leverPos));
@@ -211,7 +211,7 @@ public class GantryScenes {
             scene.effects().rotationDirectionIndicator(util.grid().at(3, 3, 3));
 
             scene.idle(60);
-            scene.world().modifyBlocks(util.select().fromTo(4, 1, 2, 4, 2, 2), s -> s.cycle(Properties.POWERED), false);
+            scene.world().modifyBlocks(util.select().fromTo(4, 1, 2, 4, 2, 2), s -> s.cycle(BlockStateProperties.POWERED), false);
             scene.effects().indicateRedstone(util.grid().at(4, 2, 2));
             scene.world().modifyKineticSpeed(gears1, f -> -f);
             scene.world().modifyKineticSpeed(gears2, f -> -f);

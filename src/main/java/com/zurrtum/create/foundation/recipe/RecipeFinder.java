@@ -3,9 +3,6 @@ package com.zurrtum.create.foundation.recipe;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.zurrtum.create.Create;
-import net.minecraft.recipe.RecipeEntry;
-import net.minecraft.resource.SynchronousResourceReloader;
-import net.minecraft.server.world.ServerWorld;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -13,6 +10,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Predicate;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.packs.resources.ResourceManagerReloadListener;
+import net.minecraft.world.item.crafting.RecipeHolder;
 
 /**
  * Utility for searching through a level's recipe collection.
@@ -21,9 +21,9 @@ import java.util.function.Predicate;
  * @author simibubi
  */
 public class RecipeFinder {
-    private static final Cache<Object, List<RecipeEntry<?>>> CACHED_SEARCHES = CacheBuilder.newBuilder().build();
+    private static final Cache<Object, List<RecipeHolder<?>>> CACHED_SEARCHES = CacheBuilder.newBuilder().build();
 
-    public static final SynchronousResourceReloader LISTENER = resourceManager -> CACHED_SEARCHES.invalidateAll();
+    public static final ResourceManagerReloadListener LISTENER = resourceManager -> CACHED_SEARCHES.invalidateAll();
 
     /**
      * Find all recipes matching the condition predicate.
@@ -33,7 +33,7 @@ public class RecipeFinder {
      * @param cacheKey (can be null to prevent the caching)
      * @return A started search to continue with more specific conditions.
      */
-    public static List<RecipeEntry<?>> get(@Nullable Object cacheKey, ServerWorld level, Predicate<RecipeEntry<?>> conditions) {
+    public static List<RecipeHolder<?>> get(@Nullable Object cacheKey, ServerLevel level, Predicate<RecipeHolder<?>> conditions) {
         if (cacheKey == null)
             return startSearch(level, conditions);
 
@@ -46,9 +46,9 @@ public class RecipeFinder {
         return Collections.emptyList();
     }
 
-    private static List<RecipeEntry<?>> startSearch(ServerWorld level, Predicate<? super RecipeEntry<?>> conditions) {
-        List<RecipeEntry<?>> recipes = new ArrayList<>();
-        for (RecipeEntry<?> r : level.getRecipeManager().values())
+    private static List<RecipeHolder<?>> startSearch(ServerLevel level, Predicate<? super RecipeHolder<?>> conditions) {
+        List<RecipeHolder<?>> recipes = new ArrayList<>();
+        for (RecipeHolder<?> r : level.recipeAccess().getRecipes())
             if (conditions.test(r))
                 recipes.add(r);
         return recipes;

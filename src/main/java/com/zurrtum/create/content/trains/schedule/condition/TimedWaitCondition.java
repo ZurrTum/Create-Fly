@@ -1,11 +1,11 @@
 package com.zurrtum.create.content.trains.schedule.condition;
 
 import com.zurrtum.create.content.trains.entity.Train;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.text.MutableText;
-import net.minecraft.text.Text;
-import net.minecraft.util.Identifier;
-import net.minecraft.world.World;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.Level;
 
 public abstract class TimedWaitCondition extends ScheduleWaitCondition {
 
@@ -23,7 +23,7 @@ public abstract class TimedWaitCondition extends ScheduleWaitCondition {
         }
     }
 
-    protected void requestDisplayIfNecessary(NbtCompound context, int time) {
+    protected void requestDisplayIfNecessary(CompoundTag context, int time) {
         int ticksUntilDeparture = totalWaitTicks() - time;
         if (ticksUntilDeparture < 20 * 60 && ticksUntilDeparture % 100 == 0)
             requestStatusToUpdate(context);
@@ -35,7 +35,7 @@ public abstract class TimedWaitCondition extends ScheduleWaitCondition {
         return getValue() * getUnit().ticksPer;
     }
 
-    public TimedWaitCondition(Identifier id) {
+    public TimedWaitCondition(ResourceLocation id) {
         super(id);
         data.putInt("Value", 5);
         data.putInt("TimeUnit", TimeUnit.SECONDS.ordinal());
@@ -50,15 +50,15 @@ public abstract class TimedWaitCondition extends ScheduleWaitCondition {
     }
 
     @Override
-    public MutableText getWaitingStatus(World level, Train train, NbtCompound tag) {
-        int time = tag.getInt("Time", 0);
+    public MutableComponent getWaitingStatus(Level level, Train train, CompoundTag tag) {
+        int time = tag.getIntOr("Time", 0);
         int ticksUntilDeparture = totalWaitTicks() - time;
         boolean showInMinutes = ticksUntilDeparture >= 20 * 60;
         int num = (int) (showInMinutes ? Math.floor(ticksUntilDeparture / (20 * 60f)) : Math.ceil(ticksUntilDeparture / 100f) * 5);
         String key = "generic." + (showInMinutes ? num == 1 ? "daytime.minute" : "unit.minutes" : num == 1 ? "daytime.second" : "unit.seconds");
-        return Text.translatable(
+        return Component.translatable(
             "create.schedule.condition." + id.getPath() + ".status",
-            Text.literal(num + " ").append(Text.translatable("create." + key))
+            Component.literal(num + " ").append(Component.translatable("create." + key))
         );
     }
 

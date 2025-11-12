@@ -5,7 +5,7 @@ import com.zurrtum.create.client.catnip.lang.FontHelper;
 import com.zurrtum.create.client.foundation.item.ItemDescription;
 import com.zurrtum.create.client.foundation.item.KineticStats;
 import com.zurrtum.create.client.foundation.item.TooltipModifier;
-import net.minecraft.item.Item;
+import net.minecraft.world.item.Item;
 
 public class AllItemTooltips {
     public static void register(Item item) {

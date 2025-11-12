@@ -4,15 +4,15 @@ import com.zurrtum.create.content.processing.burner.BlazeBurnerBlock.HeatLevel;
 import com.zurrtum.create.foundation.blockEntity.behaviour.filtering.ServerFilteringBehaviour;
 import com.zurrtum.create.infrastructure.fluids.FluidInventory;
 import com.zurrtum.create.infrastructure.fluids.FluidStack;
-import net.minecraft.inventory.Inventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.recipe.input.RecipeInput;
 import org.apache.commons.lang3.function.TriFunction;
 
 import java.util.List;
+import net.minecraft.world.Container;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.RecipeInput;
 
 public record BasinInput(
-    ServerFilteringBehaviour filter, HeatLevel heat, FluidInventory fluids, Inventory items,
+    ServerFilteringBehaviour filter, HeatLevel heat, FluidInventory fluids, Container items,
     TriFunction<List<ItemStack>, List<FluidStack>, Boolean, Boolean> callback
 ) implements RecipeInput {
     public BasinInput(BasinBlockEntity basin) {
@@ -24,7 +24,7 @@ public record BasinInput(
     }
 
     @Override
-    public ItemStack getStackInSlot(int slot) {
+    public ItemStack getItem(int slot) {
         return ItemStack.EMPTY;
     }
 

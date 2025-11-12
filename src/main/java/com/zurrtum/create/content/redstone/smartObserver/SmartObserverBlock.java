@@ -15,46 +15,46 @@ import com.zurrtum.create.foundation.blockEntity.behaviour.filtering.ServerFilte
 import com.zurrtum.create.foundation.blockEntity.behaviour.inventory.InvManipulationBehaviour;
 import com.zurrtum.create.foundation.fluid.FluidHelper;
 import com.zurrtum.create.foundation.item.ItemHelper;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.block.enums.BlockFace;
-import net.minecraft.item.ItemPlacementContext;
-import net.minecraft.item.ItemStack;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.state.StateManager;
-import net.minecraft.state.property.BooleanProperty;
-import net.minecraft.state.property.Properties;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Direction.Axis;
-import net.minecraft.util.math.random.Random;
-import net.minecraft.world.BlockView;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.Direction.Axis;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.AttachFace;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.block.state.properties.BooleanProperty;
 
 public class SmartObserverBlock extends DirectedDirectionalBlock implements IBE<SmartObserverBlockEntity>, RedStoneConnectBlock, NeighborUpdateListeningBlock {
 
-    public static final BooleanProperty POWERED = Properties.POWERED;
+    public static final BooleanProperty POWERED = BlockStateProperties.POWERED;
 
-    public SmartObserverBlock(Settings properties) {
+    public SmartObserverBlock(Properties properties) {
         super(properties);
-        setDefaultState(getDefaultState().with(POWERED, false));
+        registerDefaultState(defaultBlockState().setValue(POWERED, false));
     }
 
     @Override
-    protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
-        super.appendProperties(builder.add(POWERED));
+    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
+        super.createBlockStateDefinition(builder.add(POWERED));
     }
 
     @Override
-    public BlockState getPlacementState(ItemPlacementContext context) {
-        BlockState state = getDefaultState();
+    public BlockState getStateForPlacement(BlockPlaceContext context) {
+        BlockState state = defaultBlockState();
 
         Direction preferredFacing = null;
-        for (Direction face : context.getPlacementDirections()) {
-            BlockPos offsetPos = context.getBlockPos().offset(face);
-            World world = context.getWorld();
+        for (Direction face : context.getNearestLookingDirections()) {
+            BlockPos offsetPos = context.getClickedPos().relative(face);
+            Level world = context.getLevel();
             boolean canDetect = false;
             BlockEntity blockEntity = world.getBlockEntity(offsetPos);
 
@@ -63,13 +63,13 @@ public class SmartObserverBlock extends DirectedDirectionalBlock implements IBE<
             else if (BlockEntityBehaviour.get(blockEntity, FluidTransportBehaviour.TYPE) != null)
                 canDetect = true;
             else if (blockEntity != null && (ItemHelper.getInventory(
-                context.getWorld(),
+                context.getLevel(),
                 offsetPos,
                 null,
                 blockEntity,
                 null
             ) != null || FluidHelper.hasFluidInventory(
-                context.getWorld(),
+                context.getLevel(),
                 offsetPos,
                 null,
                 blockEntity,
@@ -86,51 +86,51 @@ public class SmartObserverBlock extends DirectedDirectionalBlock implements IBE<
         }
 
         if (preferredFacing == null) {
-            Direction facing = context.getPlayerLookDirection();
-            preferredFacing = context.getPlayer() != null && context.getPlayer().isSneaking() ? facing : facing.getOpposite();
+            Direction facing = context.getNearestLookingDirection();
+            preferredFacing = context.getPlayer() != null && context.getPlayer().isShiftKeyDown() ? facing : facing.getOpposite();
         }
 
         if (preferredFacing.getAxis() == Axis.Y) {
-            state = state.with(TARGET, preferredFacing == Direction.UP ? BlockFace.CEILING : BlockFace.FLOOR);
-            preferredFacing = context.getHorizontalPlayerFacing();
+            state = state.setValue(TARGET, preferredFacing == Direction.UP ? AttachFace.CEILING : AttachFace.FLOOR);
+            preferredFacing = context.getHorizontalDirection();
         }
 
-        return state.with(FACING, preferredFacing);
+        return state.setValue(FACING, preferredFacing);
     }
 
     @Override
-    public boolean emitsRedstonePower(BlockState state) {
-        return state.get(POWERED);
+    public boolean isSignalSource(BlockState state) {
+        return state.getValue(POWERED);
     }
 
     @Override
-    public int getWeakRedstonePower(BlockState blockState, BlockView blockAccess, BlockPos pos, Direction side) {
-        return emitsRedstonePower(blockState) && (side == null || side != getTargetDirection(blockState).getOpposite()) ? 15 : 0;
+    public int getSignal(BlockState blockState, BlockGetter blockAccess, BlockPos pos, Direction side) {
+        return isSignalSource(blockState) && (side == null || side != getTargetDirection(blockState).getOpposite()) ? 15 : 0;
     }
 
     @Override
-    public void scheduledTick(BlockState state, ServerWorld worldIn, BlockPos pos, Random random) {
-        worldIn.setBlockState(pos, state.with(POWERED, false), Block.NOTIFY_LISTENERS);
-        worldIn.updateNeighborsAlways(pos, this, null);
+    public void tick(BlockState state, ServerLevel worldIn, BlockPos pos, RandomSource random) {
+        worldIn.setBlock(pos, state.setValue(POWERED, false), Block.UPDATE_CLIENTS);
+        worldIn.updateNeighborsAt(pos, this, null);
     }
 
     @Override
     public boolean canConnectRedstone(BlockState state, Direction side) {
-        return side != state.get(FACING).getOpposite();
+        return side != state.getValue(FACING).getOpposite();
     }
 
     @Override
-    public void neighborUpdate(BlockState state, World worldIn, BlockPos pos, Block sourceBlock, BlockPos fromPos, boolean isMoving) {
+    public void neighborUpdate(BlockState state, Level worldIn, BlockPos pos, Block sourceBlock, BlockPos fromPos, boolean isMoving) {
         InvManipulationBehaviour behaviour = BlockEntityBehaviour.get(worldIn, pos, InvManipulationBehaviour.TYPE);
         if (behaviour != null)
             behaviour.onNeighborChanged(fromPos);
     }
 
-    public void onFunnelTransfer(World world, BlockPos funnelPos, ItemStack transferred) {
+    public void onFunnelTransfer(Level world, BlockPos funnelPos, ItemStack transferred) {
         for (Direction direction : Iterate.directions) {
-            BlockPos detectorPos = funnelPos.offset(direction);
+            BlockPos detectorPos = funnelPos.relative(direction);
             BlockState detectorState = world.getBlockState(detectorPos);
-            if (!detectorState.isOf(AllBlocks.SMART_OBSERVER))
+            if (!detectorState.is(AllBlocks.SMART_OBSERVER))
                 continue;
             if (SmartObserverBlock.getTargetDirection(detectorState) != direction.getOpposite())
                 continue;

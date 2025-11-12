@@ -2,11 +2,10 @@ package com.zurrtum.create.infrastructure.worldgen;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import net.minecraft.world.gen.feature.FeatureConfig;
-
 import java.util.List;
+import net.minecraft.world.level.levelgen.feature.configurations.FeatureConfiguration;
 
-public class LayeredOreConfiguration implements FeatureConfig {
+public class LayeredOreConfiguration implements FeatureConfiguration {
     public static final Codec<LayeredOreConfiguration> CODEC = RecordCodecBuilder.create(instance -> {
         return instance.group(
             Codec.list(LayerPattern.CODEC).fieldOf("layer_patterns").forGetter(config -> config.layerPatterns),

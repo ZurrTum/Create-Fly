@@ -1,35 +1,35 @@
 package com.zurrtum.create.content.kinetics.base;
 
 import com.zurrtum.create.catnip.data.Iterate;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.item.ItemPlacementContext;
-import net.minecraft.state.StateManager.Builder;
-import net.minecraft.state.property.EnumProperty;
-import net.minecraft.state.property.Properties;
-import net.minecraft.util.BlockRotation;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Direction.Axis;
+import net.minecraft.core.Direction;
+import net.minecraft.core.Direction.Axis;
+import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Rotation;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition.Builder;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.block.state.properties.EnumProperty;
 
 public abstract class RotatedPillarKineticBlock extends KineticBlock {
 
-    public static final EnumProperty<Direction.Axis> AXIS = Properties.AXIS;
+    public static final EnumProperty<Direction.Axis> AXIS = BlockStateProperties.AXIS;
 
-    public RotatedPillarKineticBlock(Settings properties) {
+    public RotatedPillarKineticBlock(Properties properties) {
         super(properties);
-        this.setDefaultState(this.getDefaultState().with(AXIS, Direction.Axis.Y));
+        this.registerDefaultState(this.defaultBlockState().setValue(AXIS, Direction.Axis.Y));
     }
 
     @Override
-    public BlockState rotate(BlockState state, BlockRotation rot) {
+    public BlockState rotate(BlockState state, Rotation rot) {
         switch (rot) {
             case COUNTERCLOCKWISE_90:
             case CLOCKWISE_90:
-                switch (state.get(AXIS)) {
+                switch (state.getValue(AXIS)) {
                     case X:
-                        return state.with(AXIS, Direction.Axis.Z);
+                        return state.setValue(AXIS, Direction.Axis.Z);
                     case Z:
-                        return state.with(AXIS, Direction.Axis.X);
+                        return state.setValue(AXIS, Direction.Axis.X);
                     default:
                         return state;
                 }
@@ -38,14 +38,14 @@ public abstract class RotatedPillarKineticBlock extends KineticBlock {
         }
     }
 
-    public static Axis getPreferredAxis(ItemPlacementContext context) {
+    public static Axis getPreferredAxis(BlockPlaceContext context) {
         Axis prefferedAxis = null;
         for (Direction side : Iterate.directions) {
-            BlockState blockState = context.getWorld().getBlockState(context.getBlockPos().offset(side));
+            BlockState blockState = context.getLevel().getBlockState(context.getClickedPos().relative(side));
             if (blockState.getBlock() instanceof IRotate) {
                 if (((IRotate) blockState.getBlock()).hasShaftTowards(
-                    context.getWorld(),
-                    context.getBlockPos().offset(side),
+                    context.getLevel(),
+                    context.getClickedPos().relative(side),
                     blockState,
                     side.getOpposite()
                 ))
@@ -61,18 +61,18 @@ public abstract class RotatedPillarKineticBlock extends KineticBlock {
     }
 
     @Override
-    protected void appendProperties(Builder<Block, BlockState> builder) {
+    protected void createBlockStateDefinition(Builder<Block, BlockState> builder) {
         builder.add(AXIS);
     }
 
     @Override
-    public BlockState getPlacementState(ItemPlacementContext context) {
+    public BlockState getStateForPlacement(BlockPlaceContext context) {
         Axis preferredAxis = getPreferredAxis(context);
-        if (preferredAxis != null && (context.getPlayer() == null || !context.getPlayer().isSneaking()))
-            return this.getDefaultState().with(AXIS, preferredAxis);
-        return this.getDefaultState().with(
+        if (preferredAxis != null && (context.getPlayer() == null || !context.getPlayer().isShiftKeyDown()))
+            return this.defaultBlockState().setValue(AXIS, preferredAxis);
+        return this.defaultBlockState().setValue(
             AXIS,
-            preferredAxis != null && context.getPlayer().isSneaking() ? context.getSide().getAxis() : context.getPlayerLookDirection().getAxis()
+            preferredAxis != null && context.getPlayer().isShiftKeyDown() ? context.getClickedFace().getAxis() : context.getNearestLookingDirection().getAxis()
         );
     }
 }

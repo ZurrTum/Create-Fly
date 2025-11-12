@@ -3,19 +3,18 @@ package com.zurrtum.create.infrastructure.packet.c2s;
 import com.zurrtum.create.AllHandle;
 import com.zurrtum.create.AllPackets;
 import io.netty.buffer.ByteBuf;
-import net.minecraft.network.codec.PacketCodec;
-import net.minecraft.network.codec.PacketCodecs;
-import net.minecraft.network.packet.PacketType;
-import net.minecraft.server.network.ServerPlayNetworkHandler;
-import net.minecraft.util.math.BlockPos;
-
 import java.util.function.BiConsumer;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.PacketType;
+import net.minecraft.server.network.ServerGamePacketListenerImpl;
 
 public record SuperGlueRemovalPacket(int entityId, BlockPos soundSource) implements C2SPacket {
-    public static final PacketCodec<ByteBuf, SuperGlueRemovalPacket> CODEC = PacketCodec.tuple(
-        PacketCodecs.INTEGER,
+    public static final StreamCodec<ByteBuf, SuperGlueRemovalPacket> CODEC = StreamCodec.composite(
+        ByteBufCodecs.INT,
         SuperGlueRemovalPacket::entityId,
-        BlockPos.PACKET_CODEC,
+        BlockPos.STREAM_CODEC,
         SuperGlueRemovalPacket::soundSource,
         SuperGlueRemovalPacket::new
     );
@@ -26,12 +25,12 @@ public record SuperGlueRemovalPacket(int entityId, BlockPos soundSource) impleme
     }
 
     @Override
-    public PacketType<SuperGlueRemovalPacket> getPacketType() {
+    public PacketType<SuperGlueRemovalPacket> type() {
         return AllPackets.GLUE_REMOVED;
     }
 
     @Override
-    public BiConsumer<ServerPlayNetworkHandler, SuperGlueRemovalPacket> callback() {
+    public BiConsumer<ServerGamePacketListenerImpl, SuperGlueRemovalPacket> callback() {
         return AllHandle::onSuperGlueRemoval;
     }
 }

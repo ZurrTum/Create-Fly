@@ -4,18 +4,17 @@ import com.zurrtum.create.api.behaviour.display.DisplayHolder;
 import com.zurrtum.create.api.behaviour.display.DisplayTarget;
 import com.zurrtum.create.catnip.data.Couple;
 import com.zurrtum.create.content.redstone.displayLink.DisplayLinkContext;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.block.entity.SignBlockEntity;
-import net.minecraft.block.entity.SignText;
-import net.minecraft.text.MutableText;
-import net.minecraft.text.Text;
-
 import java.util.List;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.SignBlockEntity;
+import net.minecraft.world.level.block.entity.SignText;
 
 public class SignDisplayTarget extends DisplayTarget {
 
     @Override
-    public void acceptText(int line, List<MutableText> text, DisplayLinkContext context) {
+    public void acceptText(int line, List<MutableComponent> text, DisplayLinkContext context) {
         BlockEntity be = context.getTargetBlockEntity();
         if (!(be instanceof SignBlockEntity sign))
             return;
@@ -30,14 +29,14 @@ public class SignDisplayTarget extends DisplayTarget {
                 break;
 
             final int iFinal = i;
-            String content = text.get(iFinal).asTruncatedString(sign.getMaxTextWidth());
-            signText = signText.map(st -> st.withMessage(iFinal + line, Text.literal(content)));
+            String content = text.get(iFinal).getString(sign.getMaxTextLineWidth());
+            signText = signText.map(st -> st.setMessage(iFinal + line, Component.literal(content)));
             changed = true;
         }
 
         if (changed) {
             signText.forEachWithContext(sign::setText);
-            context.level().updateListeners(context.getTargetPos(), sign.getCachedState(), sign.getCachedState(), 2);
+            context.level().sendBlockUpdated(context.getTargetPos(), sign.getBlockState(), sign.getBlockState(), 2);
         }
     }
 

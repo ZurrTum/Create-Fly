@@ -1,6 +1,6 @@
 package com.zurrtum.create.content.contraptions;
 
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.core.BlockPos;
 
 public interface IControlContraption {
 

@@ -2,14 +2,14 @@ package com.zurrtum.create;
 
 import com.mojang.serialization.MapCodec;
 import com.zurrtum.create.infrastructure.particle.*;
-import net.minecraft.network.RegistryByteBuf;
-import net.minecraft.network.codec.PacketCodec;
-import net.minecraft.particle.ParticleEffect;
-import net.minecraft.particle.ParticleType;
-import net.minecraft.particle.SimpleParticleType;
-import net.minecraft.registry.Registries;
-import net.minecraft.registry.Registry;
-import net.minecraft.util.Identifier;
+import net.minecraft.core.Registry;
+import net.minecraft.core.particles.ParticleOptions;
+import net.minecraft.core.particles.ParticleType;
+import net.minecraft.core.particles.SimpleParticleType;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.resources.ResourceLocation;
 
 import static com.zurrtum.create.Create.MOD_ID;
 
@@ -49,25 +49,25 @@ public class AllParticleTypes {
     public static final SimpleParticleType SOUL_EXPANDING_PERIMETER = register("soul_expanding_perimeter");
 
     private static SimpleParticleType register(String name) {
-        Identifier id = Identifier.of(MOD_ID, name);
-        return Registry.register(Registries.PARTICLE_TYPE, id, new SimpleParticleType(false));
+        ResourceLocation id = ResourceLocation.fromNamespaceAndPath(MOD_ID, name);
+        return Registry.register(BuiltInRegistries.PARTICLE_TYPE, id, new SimpleParticleType(false));
     }
 
-    private static <T extends ParticleEffect> ParticleType<T> register(
+    private static <T extends ParticleOptions> ParticleType<T> register(
         String name,
         MapCodec<T> codec,
-        PacketCodec<? super RegistryByteBuf, T> packetCodec
+        StreamCodec<? super RegistryFriendlyByteBuf, T> packetCodec
     ) {
         ParticleType<T> type = new ParticleType<T>(false) {
-            public MapCodec<T> getCodec() {
+            public MapCodec<T> codec() {
                 return codec;
             }
 
-            public PacketCodec<? super RegistryByteBuf, T> getPacketCodec() {
+            public StreamCodec<? super RegistryFriendlyByteBuf, T> streamCodec() {
                 return packetCodec;
             }
         };
-        return Registry.register(Registries.PARTICLE_TYPE, Identifier.of(MOD_ID, name), type);
+        return Registry.register(BuiltInRegistries.PARTICLE_TYPE, ResourceLocation.fromNamespaceAndPath(MOD_ID, name), type);
     }
 
     public static void register() {

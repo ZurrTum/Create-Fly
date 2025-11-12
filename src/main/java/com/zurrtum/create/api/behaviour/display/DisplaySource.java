@@ -9,29 +9,29 @@ import com.zurrtum.create.content.redstone.displayLink.target.DisplayBoardTarget
 import com.zurrtum.create.content.redstone.displayLink.target.DisplayTargetStats;
 import com.zurrtum.create.content.trains.display.FlapDisplayBlockEntity;
 import com.zurrtum.create.content.trains.display.FlapDisplayLayout;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.screen.ScreenTexts;
-import net.minecraft.text.MutableText;
-import net.minecraft.text.Text;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.WorldAccess;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.CommonComponents;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockState;
 
 public abstract class DisplaySource {
     public static final SimpleRegistry.Multi<Block, DisplaySource> BY_BLOCK = SimpleRegistry.Multi.create();
     public static final SimpleRegistry.Multi<BlockEntityType<?>, DisplaySource> BY_BLOCK_ENTITY = SimpleRegistry.Multi.create();
 
-    public static final List<MutableText> EMPTY = ImmutableList.of(Text.empty());
-    public static final MutableText EMPTY_LINE = Text.empty();
-    public static final MutableText WHITESPACE = ScreenTexts.space();
+    public static final List<MutableComponent> EMPTY = ImmutableList.of(Component.empty());
+    public static final MutableComponent EMPTY_LINE = Component.empty();
+    public static final MutableComponent WHITESPACE = CommonComponents.space();
     public Object attachRender;
 
     @SuppressWarnings("unchecked")
@@ -39,22 +39,22 @@ public abstract class DisplaySource {
         return (T) attachRender;
     }
 
-    public abstract List<MutableText> provideText(DisplayLinkContext context, DisplayTargetStats stats);
+    public abstract List<MutableComponent> provideText(DisplayLinkContext context, DisplayTargetStats stats);
 
     public void transferData(DisplayLinkContext context, DisplayTarget activeTarget, int line) {
         DisplayTargetStats stats = activeTarget.provideStats(context);
 
         if (activeTarget instanceof DisplayBoardTarget fddt) {
-            List<List<MutableText>> flapDisplayText = provideFlapDisplayText(context, stats);
+            List<List<MutableComponent>> flapDisplayText = provideFlapDisplayText(context, stats);
             fddt.acceptFlapText(line, flapDisplayText, context);
         }
 
-        List<MutableText> text = provideText(context, stats);
+        List<MutableComponent> text = provideText(context, stats);
         if (text.isEmpty())
             text = EMPTY;
 
         if (activeTarget.requiresComponentSanitization())
-            for (MutableText component : text)
+            for (MutableComponent component : text)
                 if (NBTProcessors.textComponentHasClickEvent(component))
                     return; // Naughty
 
@@ -75,16 +75,16 @@ public abstract class DisplaySource {
         return true;
     }
 
-    protected final Identifier getId() {
-        return CreateRegistries.DISPLAY_SOURCE.getId(this);
+    protected final ResourceLocation getId() {
+        return CreateRegistries.DISPLAY_SOURCE.getKey(this);
     }
 
     protected String getTranslationKey() {
         return this.getId().getPath();
     }
 
-    public Text getName() {
-        return Text.translatable(this.getId().getNamespace() + ".display_source." + getTranslationKey());
+    public Component getName() {
+        return Component.translatable(this.getId().getNamespace() + ".display_source." + getTranslationKey());
     }
 
     public void loadFlapDisplayLayout(DisplayLinkContext context, FlapDisplayBlockEntity flapDisplay, FlapDisplayLayout layout, int lineIndex) {
@@ -96,7 +96,7 @@ public abstract class DisplaySource {
             layout.loadDefault(flapDisplay.getMaxCharCount());
     }
 
-    public List<List<MutableText>> provideFlapDisplayText(DisplayLinkContext context, DisplayTargetStats stats) {
+    public List<List<MutableComponent>> provideFlapDisplayText(DisplayLinkContext context, DisplayTargetStats stats) {
         return provideText(context, stats).stream().map(Arrays::asList).toList();
     }
 
@@ -104,17 +104,17 @@ public abstract class DisplaySource {
      * Get the DisplaySource with the given ID, accounting for legacy names.
      */
     @Nullable
-    public static DisplaySource get(@Nullable Identifier id) {
+    public static DisplaySource get(@Nullable ResourceLocation id) {
         if (id == null)
             return null;
-        return CreateRegistries.DISPLAY_SOURCE.get(id);
+        return CreateRegistries.DISPLAY_SOURCE.getValue(id);
     }
 
     /**
      * Get all DisplaySources applicable to the block at the given location, checking both the Block and BlockEntity.
      * Returns an empty list if none are present, not null.
      */
-    public static List<DisplaySource> getAll(WorldAccess level, BlockPos pos) {
+    public static List<DisplaySource> getAll(LevelAccessor level, BlockPos pos) {
         BlockState state = level.getBlockState(pos);
         List<DisplaySource> byBlock = BY_BLOCK.get(state);
 

@@ -5,14 +5,14 @@ import com.zurrtum.create.foundation.advancement.AdvancementBehaviour;
 import com.zurrtum.create.foundation.fluid.FluidHelper;
 import com.zurrtum.create.foundation.utility.BlockHelper;
 import com.zurrtum.create.infrastructure.fluids.FluidStack;
-import net.minecraft.block.BlockState;
-import net.minecraft.fluid.Fluid;
-import net.minecraft.fluid.FluidState;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.material.Fluid;
+import net.minecraft.world.level.material.FluidState;
 
 public class FluidReactions {
-    public static void handlePipeFlowCollision(World level, BlockPos pos, FluidStack fluid, FluidStack fluid2) {
+    public static void handlePipeFlowCollision(Level level, BlockPos pos, FluidStack fluid, FluidStack fluid2) {
         Fluid f1 = fluid.getFluid();
         Fluid f2 = fluid2.getFluid();
 
@@ -21,17 +21,17 @@ public class FluidReactions {
 
         BlockState state = AllFlowCollision.Flow.get(new AllFlowCollision.FlowEntry(f1, f2));
         if (state != null) {
-            level.setBlockState(pos, state);
+            level.setBlockAndUpdate(pos, state);
         }
     }
 
-    public static void handlePipeSpillCollision(World level, BlockPos pos, Fluid pipeFluid, FluidState worldFluid) {
+    public static void handlePipeSpillCollision(Level level, BlockPos pos, Fluid pipeFluid, FluidState worldFluid) {
         Fluid pf = FluidHelper.convertToStill(pipeFluid);
-        Fluid wf = worldFluid.getFluid();
+        Fluid wf = worldFluid.getType();
 
         BlockState state = AllFlowCollision.Spill.get(new AllFlowCollision.SpillEntry(wf, pf));
         if (state != null) {
-            level.setBlockState(pos, state);
+            level.setBlockAndUpdate(pos, state);
         }
     }
 }

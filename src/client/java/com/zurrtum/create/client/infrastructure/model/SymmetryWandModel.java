@@ -1,28 +1,34 @@
 package com.zurrtum.create.client.infrastructure.model;
 
 import com.google.common.base.Suppliers;
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.math.Axis;
 import com.mojang.serialization.MapCodec;
 import com.zurrtum.create.client.catnip.animation.AnimationTickHolder;
 import com.zurrtum.create.client.foundation.render.RenderTypes;
-import net.minecraft.client.item.ItemModelManager;
-import net.minecraft.client.render.LightmapTextureManager;
-import net.minecraft.client.render.RenderLayer;
-import net.minecraft.client.render.TexturedRenderLayers;
-import net.minecraft.client.render.command.OrderedRenderCommandQueue;
-import net.minecraft.client.render.item.ItemRenderState;
-import net.minecraft.client.render.item.ItemRenderState.Glint;
-import net.minecraft.client.render.item.ItemRenderState.LayerRenderState;
-import net.minecraft.client.render.item.model.ItemModel;
-import net.minecraft.client.render.item.model.special.SpecialModelRenderer;
-import net.minecraft.client.render.model.*;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.client.world.ClientWorld;
-import net.minecraft.item.ItemDisplayContext;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.HeldItemContext;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.RotationAxis;
+import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.client.renderer.LightTexture;
+import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.Sheets;
+import net.minecraft.client.renderer.SubmitNodeCollector;
+import net.minecraft.client.renderer.block.model.BakedQuad;
+import net.minecraft.client.renderer.block.model.FaceBakery;
+import net.minecraft.client.renderer.block.model.TextureSlots;
+import net.minecraft.client.renderer.item.ItemModel;
+import net.minecraft.client.renderer.item.ItemModelResolver;
+import net.minecraft.client.renderer.item.ItemStackRenderState;
+import net.minecraft.client.renderer.item.ItemStackRenderState.FoilType;
+import net.minecraft.client.renderer.item.ItemStackRenderState.LayerRenderState;
+import net.minecraft.client.renderer.item.ModelRenderProperties;
+import net.minecraft.client.renderer.special.SpecialModelRenderer;
+import net.minecraft.client.resources.model.BlockModelRotation;
+import net.minecraft.client.resources.model.ModelBaker;
+import net.minecraft.client.resources.model.ResolvedModel;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.Mth;
+import net.minecraft.world.entity.ItemOwner;
+import net.minecraft.world.item.ItemDisplayContext;
+import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
 
@@ -35,21 +41,27 @@ import java.util.function.Supplier;
 import static com.zurrtum.create.Create.MOD_ID;
 
 public class SymmetryWandModel implements ItemModel, SpecialModelRenderer<Object> {
-    public static final Identifier ID = Identifier.of(MOD_ID, "model/wand_of_symmetry");
-    public static final Identifier ITEM_ID = Identifier.of(MOD_ID, "item/wand_of_symmetry/item");
-    public static final Identifier CORE_ID = Identifier.of(MOD_ID, "item/wand_of_symmetry/core");
-    public static final Identifier CORE_GLOW_ID = Identifier.of(MOD_ID, "item/wand_of_symmetry/core_glow");
-    public static final Identifier BITS_ID = Identifier.of(MOD_ID, "item/wand_of_symmetry/bits");
+    public static final ResourceLocation ID = ResourceLocation.fromNamespaceAndPath(MOD_ID, "model/wand_of_symmetry");
+    public static final ResourceLocation ITEM_ID = ResourceLocation.fromNamespaceAndPath(MOD_ID, "item/wand_of_symmetry/item");
+    public static final ResourceLocation CORE_ID = ResourceLocation.fromNamespaceAndPath(MOD_ID, "item/wand_of_symmetry/core");
+    public static final ResourceLocation CORE_GLOW_ID = ResourceLocation.fromNamespaceAndPath(MOD_ID, "item/wand_of_symmetry/core_glow");
+    public static final ResourceLocation BITS_ID = ResourceLocation.fromNamespaceAndPath(MOD_ID, "item/wand_of_symmetry/bits");
     private static final int[] TINTS = new int[0];
 
-    private final ModelSettings settings;
+    private final ModelRenderProperties settings;
     private final List<BakedQuad> item;
     private final List<BakedQuad> core;
     private final List<BakedQuad> coreGlow;
     private final List<BakedQuad> bits;
     private final Supplier<Vector3f[]> vector;
 
-    public SymmetryWandModel(ModelSettings settings, List<BakedQuad> item, List<BakedQuad> core, List<BakedQuad> coreGlow, List<BakedQuad> bits) {
+    public SymmetryWandModel(
+        ModelRenderProperties settings,
+        List<BakedQuad> item,
+        List<BakedQuad> core,
+        List<BakedQuad> coreGlow,
+        List<BakedQuad> bits
+    ) {
         this.settings = settings;
         this.item = item;
         this.core = core;
@@ -67,89 +79,89 @@ public class SymmetryWandModel implements ItemModel, SpecialModelRenderer<Object
 
     private static void calculatePosition(List<BakedQuad> quads, Consumer<Vector3f> consumer) {
         for (BakedQuad bakedQuad : quads) {
-            BakedQuadFactory.calculatePosition(bakedQuad.vertexData(), consumer);
+            FaceBakery.extractPositions(bakedQuad.vertices(), consumer);
         }
     }
 
     @Override
     public void update(
-        ItemRenderState state,
+        ItemStackRenderState state,
         ItemStack stack,
-        ItemModelManager resolver,
+        ItemModelResolver resolver,
         ItemDisplayContext displayContext,
-        @Nullable ClientWorld world,
-        @Nullable HeldItemContext user,
+        @Nullable ClientLevel world,
+        @Nullable ItemOwner user,
         int seed
     ) {
-        state.addModelKey(this);
-        state.markAnimated();
+        state.appendModelIdentityElement(this);
+        state.setAnimated();
         LayerRenderState renderState = state.newLayer();
-        renderState.setVertices(vector);
-        renderState.setSpecialModel(this, null);
-        settings.addSettings(renderState, displayContext);
+        renderState.setExtents(vector);
+        renderState.setupSpecialModel(this, null);
+        settings.applyToLayer(renderState, displayContext);
     }
 
     @Override
-    public void render(
+    public void submit(
         @Nullable Object data,
         ItemDisplayContext displayContext,
-        MatrixStack matrices,
-        OrderedRenderCommandQueue queue,
+        PoseStack matrices,
+        SubmitNodeCollector queue,
         int light,
         int overlay,
         boolean glint,
         int i
     ) {
-        int maxLight = LightmapTextureManager.MAX_LIGHT_COORDINATE;
-        RenderLayer translucent = RenderTypes.itemGlowingTranslucent();
+        int maxLight = LightTexture.FULL_BRIGHT;
+        RenderType translucent = RenderTypes.itemGlowingTranslucent();
 
-        renderItem(displayContext, matrices, queue, light, overlay, item, TexturedRenderLayers.getItemEntityTranslucentCull());
+        renderItem(displayContext, matrices, queue, light, overlay, item, Sheets.translucentItemSheet());
         renderItem(displayContext, matrices, queue, maxLight, overlay, core, RenderTypes.itemGlowingSolid());
         renderItem(displayContext, matrices, queue, maxLight, overlay, coreGlow, translucent);
 
-        matrices.push();
+        matrices.pushPose();
         float worldTime = AnimationTickHolder.getRenderTime() / 20;
-        float floating = MathHelper.sin(worldTime) * .05f;
+        float floating = Mth.sin(worldTime) * .05f;
         float angle = worldTime * -10 % 360;
         matrices.translate(0.5f, 0.5f, 0.5f);
-        matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(angle));
+        matrices.mulPose(Axis.YP.rotationDegrees(angle));
         matrices.translate(-0.5f, floating - 0.5f, -0.5f);
         renderItem(displayContext, matrices, queue, maxLight, overlay, bits, translucent);
-        matrices.pop();
+        matrices.popPose();
     }
 
     private static void renderItem(
         ItemDisplayContext displayContext,
-        MatrixStack matrices,
-        OrderedRenderCommandQueue queue,
+        PoseStack matrices,
+        SubmitNodeCollector queue,
         int light,
         int overlay,
         List<BakedQuad> item,
-        RenderLayer layer
+        RenderType layer
     ) {
-        queue.submitItem(matrices, displayContext, light, overlay, 0, TINTS, item, layer, Glint.NONE);
+        queue.submitItem(matrices, displayContext, light, overlay, 0, TINTS, item, layer, FoilType.NONE);
     }
 
     @Override
-    public void collectVertices(Set<Vector3f> vertices) {
+    public void getExtents(Set<Vector3f> vertices) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public Object getData(ItemStack stack) {
+    public Object extractArgument(ItemStack stack) {
         throw new UnsupportedOperationException();
     }
 
     public static class Unbaked implements ItemModel.Unbaked {
-        public static final MapCodec<Unbaked> CODEC = MapCodec.unit(Unbaked::new);
+        public static final MapCodec<com.zurrtum.create.client.infrastructure.model.SymmetryWandModel.Unbaked> CODEC = MapCodec.unit(com.zurrtum.create.client.infrastructure.model.SymmetryWandModel.Unbaked::new);
 
         @Override
-        public MapCodec<? extends ItemModel.Unbaked> getCodec() {
+        public MapCodec<? extends ItemModel.Unbaked> type() {
             return CODEC;
         }
 
         @Override
-        public void resolve(Resolver resolver) {
+        public void resolveDependencies(Resolver resolver) {
             resolver.markDependency(ITEM_ID);
             resolver.markDependency(CORE_ID);
             resolver.markDependency(CORE_GLOW_ID);
@@ -157,18 +169,18 @@ public class SymmetryWandModel implements ItemModel, SpecialModelRenderer<Object
         }
 
         @Override
-        public ItemModel bake(ItemModel.BakeContext context) {
-            Baker baker = context.blockModelBaker();
-            BakedSimpleModel model = baker.getModel(ITEM_ID);
-            ModelTextures textures = model.getTextures();
-            List<BakedQuad> quads = model.bakeGeometry(textures, baker, ModelRotation.X0_Y0).getAllQuads();
-            ModelSettings settings = ModelSettings.resolveSettings(baker, model, textures);
+        public ItemModel bake(ItemModel.BakingContext context) {
+            ModelBaker baker = context.blockModelBaker();
+            ResolvedModel model = baker.getModel(ITEM_ID);
+            TextureSlots textures = model.getTopTextureSlots();
+            List<BakedQuad> quads = model.bakeTopGeometry(textures, baker, BlockModelRotation.X0_Y0).getAll();
+            ModelRenderProperties settings = ModelRenderProperties.fromResolvedModel(baker, model, textures);
             return new SymmetryWandModel(settings, quads, bake(baker, CORE_ID), bake(baker, CORE_GLOW_ID), bake(baker, BITS_ID));
         }
 
-        private static List<BakedQuad> bake(Baker baker, Identifier id) {
-            BakedSimpleModel model = baker.getModel(id);
-            return model.bakeGeometry(model.getTextures(), baker, ModelRotation.X0_Y0).getAllQuads();
+        private static List<BakedQuad> bake(ModelBaker baker, ResourceLocation id) {
+            ResolvedModel model = baker.getModel(id);
+            return model.bakeTopGeometry(model.getTopTextureSlots(), baker, BlockModelRotation.X0_Y0).getAll();
         }
     }
 }

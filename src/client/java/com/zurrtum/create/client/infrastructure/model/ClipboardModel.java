@@ -4,18 +4,19 @@ import com.google.common.base.Suppliers;
 import com.mojang.serialization.MapCodec;
 import com.zurrtum.create.AllDataComponents;
 import com.zurrtum.create.infrastructure.component.ClipboardContent;
-import net.minecraft.client.item.ItemModelManager;
-import net.minecraft.client.render.RenderLayer;
-import net.minecraft.client.render.TexturedRenderLayers;
-import net.minecraft.client.render.item.ItemRenderState;
-import net.minecraft.client.render.item.model.BasicItemModel;
-import net.minecraft.client.render.item.model.ItemModel;
-import net.minecraft.client.render.model.*;
-import net.minecraft.client.world.ClientWorld;
-import net.minecraft.item.ItemDisplayContext;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.HeldItemContext;
-import net.minecraft.util.Identifier;
+import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.Sheets;
+import net.minecraft.client.renderer.block.model.BakedQuad;
+import net.minecraft.client.renderer.block.model.TextureSlots;
+import net.minecraft.client.renderer.item.*;
+import net.minecraft.client.resources.model.BlockModelRotation;
+import net.minecraft.client.resources.model.ModelBaker;
+import net.minecraft.client.resources.model.ResolvedModel;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.ItemOwner;
+import net.minecraft.world.item.ItemDisplayContext;
+import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
 
@@ -25,11 +26,11 @@ import java.util.function.Supplier;
 import static com.zurrtum.create.Create.MOD_ID;
 
 public class ClipboardModel implements ItemModel {
-    public static final Identifier ID = Identifier.of(MOD_ID, "model/clipboard");
-    public static final Identifier EMPTY_ID = Identifier.of(MOD_ID, "item/clipboard_0");
-    public static final Identifier WRITTEN_ID = Identifier.of(MOD_ID, "item/clipboard_1");
-    public static final Identifier EDITING_ID = Identifier.of(MOD_ID, "item/clipboard_2");
-    private final RenderLayer layer = TexturedRenderLayers.getItemEntityTranslucentCull();
+    public static final ResourceLocation ID = ResourceLocation.fromNamespaceAndPath(MOD_ID, "model/clipboard");
+    public static final ResourceLocation EMPTY_ID = ResourceLocation.fromNamespaceAndPath(MOD_ID, "item/clipboard_0");
+    public static final ResourceLocation WRITTEN_ID = ResourceLocation.fromNamespaceAndPath(MOD_ID, "item/clipboard_1");
+    public static final ResourceLocation EDITING_ID = ResourceLocation.fromNamespaceAndPath(MOD_ID, "item/clipboard_2");
+    private final RenderType layer = Sheets.translucentItemSheet();
     private final ModelData[] models;
 
     public ClipboardModel(ModelData[] models) {
@@ -38,39 +39,39 @@ public class ClipboardModel implements ItemModel {
 
     @Override
     public void update(
-        ItemRenderState state,
+        ItemStackRenderState state,
         ItemStack stack,
-        ItemModelManager resolver,
+        ItemModelResolver resolver,
         ItemDisplayContext displayContext,
-        @Nullable ClientWorld world,
-        @Nullable HeldItemContext user,
+        @Nullable ClientLevel world,
+        @Nullable ItemOwner user,
         int seed
     ) {
         int index = stack.getOrDefault(AllDataComponents.CLIPBOARD_CONTENT, ClipboardContent.EMPTY).type().ordinal();
-        state.addModelKey(this);
-        state.addModelKey(index);
+        state.appendModelIdentityElement(this);
+        state.appendModelIdentityElement(index);
         models[index].update(state, layer, displayContext);
 
     }
 
     public static class Unbaked implements ItemModel.Unbaked {
-        public static final MapCodec<Unbaked> CODEC = MapCodec.unit(Unbaked::new);
+        public static final MapCodec<com.zurrtum.create.client.infrastructure.model.ClipboardModel.Unbaked> CODEC = MapCodec.unit(com.zurrtum.create.client.infrastructure.model.ClipboardModel.Unbaked::new);
 
         @Override
-        public MapCodec<Unbaked> getCodec() {
+        public MapCodec<com.zurrtum.create.client.infrastructure.model.ClipboardModel.Unbaked> type() {
             return CODEC;
         }
 
         @Override
-        public void resolve(Resolver resolver) {
+        public void resolveDependencies(Resolver resolver) {
             resolver.markDependency(EMPTY_ID);
             resolver.markDependency(WRITTEN_ID);
             resolver.markDependency(EDITING_ID);
         }
 
         @Override
-        public ItemModel bake(ItemModel.BakeContext context) {
-            Baker baker = context.blockModelBaker();
+        public ItemModel bake(ItemModel.BakingContext context) {
+            ModelBaker baker = context.blockModelBaker();
             ModelData[] models = new ModelData[3];
             models[0] = ModelData.bake(baker, EMPTY_ID);
             models[1] = ModelData.bake(baker, WRITTEN_ID);
@@ -79,21 +80,21 @@ public class ClipboardModel implements ItemModel {
         }
     }
 
-    public record ModelData(List<BakedQuad> quads, ModelSettings settings, Supplier<Vector3f[]> vector) {
-        public static ModelData bake(Baker baker, Identifier id) {
-            BakedSimpleModel model = baker.getModel(id);
-            ModelTextures textures = model.getTextures();
-            List<BakedQuad> quads = model.bakeGeometry(textures, baker, ModelRotation.X0_Y0).getAllQuads();
-            ModelSettings settings = ModelSettings.resolveSettings(baker, model, textures);
-            return new ModelData(quads, settings, Suppliers.memoize(() -> BasicItemModel.bakeQuads(quads)));
+    public record ModelData(List<BakedQuad> quads, ModelRenderProperties settings, Supplier<Vector3f[]> vector) {
+        public static ModelData bake(ModelBaker baker, ResourceLocation id) {
+            ResolvedModel model = baker.getModel(id);
+            TextureSlots textures = model.getTopTextureSlots();
+            List<BakedQuad> quads = model.bakeTopGeometry(textures, baker, BlockModelRotation.X0_Y0).getAll();
+            ModelRenderProperties settings = ModelRenderProperties.fromResolvedModel(baker, model, textures);
+            return new ModelData(quads, settings, Suppliers.memoize(() -> BlockModelWrapper.computeExtents(quads)));
         }
 
-        public void update(ItemRenderState state, RenderLayer layer, ItemDisplayContext displayContext) {
-            ItemRenderState.LayerRenderState layerRenderState = state.newLayer();
-            layerRenderState.setRenderLayer(layer);
-            layerRenderState.setVertices(vector);
-            settings.addSettings(layerRenderState, displayContext);
-            layerRenderState.getQuads().addAll(quads);
+        public void update(ItemStackRenderState state, RenderType layer, ItemDisplayContext displayContext) {
+            ItemStackRenderState.LayerRenderState layerRenderState = state.newLayer();
+            layerRenderState.setRenderType(layer);
+            layerRenderState.setExtents(vector);
+            settings.applyToLayer(layerRenderState, displayContext);
+            layerRenderState.prepareQuadList().addAll(quads);
         }
     }
 }

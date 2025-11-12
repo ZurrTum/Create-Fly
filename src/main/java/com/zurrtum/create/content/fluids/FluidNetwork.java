@@ -8,20 +8,20 @@ import com.zurrtum.create.content.fluids.PipeConnection.Flow;
 import com.zurrtum.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.infrastructure.fluids.FluidInventory;
 import com.zurrtum.create.infrastructure.fluids.FluidStack;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
 import java.lang.ref.WeakReference;
 import java.util.*;
 import java.util.function.Supplier;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.level.Level;
 
 public class FluidNetwork {
 
     private static final int CYCLES_PER_TICK = 16;
 
-    World world;
+    Level world;
     BlockFace start;
 
     Supplier<FluidInventory> sourceSupplier;
@@ -36,7 +36,7 @@ public class FluidNetwork {
     List<Pair<BlockFace, FlowSource>> targets;
     Map<BlockPos, WeakReference<FluidTransportBehaviour>> cache;
 
-    public FluidNetwork(World world, BlockFace location, Supplier<FluidInventory> sourceSupplier) {
+    public FluidNetwork(Level world, BlockFace location, Supplier<FluidInventory> sourceSupplier) {
         this.world = world;
         this.start = location;
         this.sourceSupplier = sourceSupplier;
@@ -156,7 +156,7 @@ public class FluidNetwork {
         if (targets.isEmpty())
             return;
         for (Pair<BlockFace, FlowSource> pair : targets) {
-            if (pair.getSecond() != null && world.getTime() % 40 != 0)
+            if (pair.getSecond() != null && world.getGameTime() % 40 != 0)
                 continue;
             PipeConnection pipeConnection = get(pair.getFirst());
             if (pipeConnection == null)
@@ -246,7 +246,7 @@ public class FluidNetwork {
     }
 
     private boolean isPresent(BlockFace location) {
-        return world.isPosLoaded(location.getPos());
+        return world.isLoaded(location.getPos());
     }
 
     @Nullable

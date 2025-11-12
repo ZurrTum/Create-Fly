@@ -9,12 +9,11 @@ import com.zurrtum.create.catnip.animation.LerpedFloat.Chaser;
 import com.zurrtum.create.content.contraptions.glue.SuperGlueEntity;
 import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
 import com.zurrtum.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
-import net.minecraft.block.BlockState;
-import net.minecraft.storage.ReadView;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-
 import java.util.List;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.storage.ValueInput;
 
 public class StickerBlockEntity extends SmartBlockEntity {
     public LerpedFloat piston;
@@ -33,25 +32,25 @@ public class StickerBlockEntity extends SmartBlockEntity {
     @Override
     public void initialize() {
         super.initialize();
-        if (!world.isClient())
+        if (!level.isClientSide())
             return;
         piston.startWithValue(isBlockStateExtended() ? 1 : 0);
     }
 
     public boolean isBlockStateExtended() {
-        BlockState blockState = getCachedState();
-        return blockState.isOf(AllBlocks.STICKER) && blockState.get(StickerBlock.EXTENDED);
+        BlockState blockState = getBlockState();
+        return blockState.is(AllBlocks.STICKER) && blockState.getValue(StickerBlock.EXTENDED);
     }
 
     @Override
     public void tick() {
         super.tick();
-        if (!world.isClient())
+        if (!level.isClientSide())
             return;
         piston.tickChaser();
 
         if (isAttachedToBlock() && piston.getValue(0) != piston.getValue() && piston.getValue() == 1) {
-            AllClientHandle.INSTANCE.spawnSuperGlueParticles(world, pos, getCachedState().get(StickerBlock.FACING), true);
+            AllClientHandle.INSTANCE.spawnSuperGlueParticles(level, worldPosition, getBlockState().getValue(StickerBlock.FACING), true);
             playSound(true);
         }
 
@@ -67,21 +66,21 @@ public class StickerBlockEntity extends SmartBlockEntity {
     }
 
     public boolean isAttachedToBlock() {
-        BlockState blockState = getCachedState();
-        if (!blockState.isOf(AllBlocks.STICKER))
+        BlockState blockState = getBlockState();
+        if (!blockState.is(AllBlocks.STICKER))
             return false;
-        Direction direction = blockState.get(StickerBlock.FACING);
-        return SuperGlueEntity.isValidFace(world, pos.offset(direction), direction.getOpposite());
+        Direction direction = blockState.getValue(StickerBlock.FACING);
+        return SuperGlueEntity.isValidFace(level, worldPosition.relative(direction), direction.getOpposite());
     }
 
     @Override
-    protected void read(ReadView view, boolean clientPacket) {
+    protected void read(ValueInput view, boolean clientPacket) {
         super.read(view, clientPacket);
         if (clientPacket)
             update = true;
     }
 
     public void playSound(boolean attach) {
-        AllSoundEvents.SLIME_ADDED.play(world, AllClientHandle.INSTANCE.getPlayer(), pos, 0.35f, attach ? 0.75f : 0.2f);
+        AllSoundEvents.SLIME_ADDED.play(level, AllClientHandle.INSTANCE.getPlayer(), worldPosition, 0.35f, attach ? 0.75f : 0.2f);
     }
 }

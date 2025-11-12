@@ -3,8 +3,8 @@ package com.zurrtum.create.foundation.blockEntity.behaviour.audio;
 import com.zurrtum.create.content.logistics.packagePort.frogport.FrogportBlockEntity;
 import com.zurrtum.create.foundation.blockEntity.behaviour.BehaviourType;
 import com.zurrtum.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.Level;
 
 public abstract class FrogportAudioBehaviour extends BlockEntityBehaviour<FrogportBlockEntity> {
     public static final BehaviourType<FrogportAudioBehaviour> TYPE = new BehaviourType<>();
@@ -17,13 +17,13 @@ public abstract class FrogportAudioBehaviour extends BlockEntityBehaviour<Frogpo
     public void tick() {
     }
 
-    public abstract void open(World level, BlockPos pos);
+    public abstract void open(Level level, BlockPos pos);
 
-    public abstract void close(World level, BlockPos pos);
+    public abstract void close(Level level, BlockPos pos);
 
-    public abstract void catchPackage(World level, BlockPos pos);
+    public abstract void catchPackage(Level level, BlockPos pos);
 
-    public abstract void depositPackage(World level, BlockPos pos);
+    public abstract void depositPackage(Level level, BlockPos pos);
 
     @Override
     public BehaviourType<?> getType() {

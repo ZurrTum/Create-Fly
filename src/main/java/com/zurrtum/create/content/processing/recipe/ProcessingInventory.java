@@ -2,16 +2,16 @@ package com.zurrtum.create.content.processing.recipe;
 
 import com.zurrtum.create.infrastructure.items.SidedItemInventory;
 import com.zurrtum.create.infrastructure.transfer.SlotRangeCache;
-import net.minecraft.item.ItemStack;
-import net.minecraft.storage.ReadView;
-import net.minecraft.storage.WriteView;
-import net.minecraft.util.collection.DefaultedList;
-import net.minecraft.util.math.Direction;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
+import net.minecraft.core.Direction;
+import net.minecraft.core.NonNullList;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 
 public class ProcessingInventory implements SidedItemInventory {
     private static final int[] INPUT_SLOTS = {0};
@@ -25,10 +25,10 @@ public class ProcessingInventory implements SidedItemInventory {
     private byte outputFlag = 0;
     private final Predicate<Direction> canInsert;
     private final Consumer<ItemStack> callback;
-    private final DefaultedList<ItemStack> stacks;
+    private final NonNullList<ItemStack> stacks;
 
     public ProcessingInventory(Consumer<ItemStack> callback, Predicate<Direction> canInsert) {
-        this.stacks = DefaultedList.ofSize(32, ItemStack.EMPTY);
+        this.stacks = NonNullList.withSize(32, ItemStack.EMPTY);
         this.canInsert = canInsert;
         this.callback = callback;
     }
@@ -44,17 +44,17 @@ public class ProcessingInventory implements SidedItemInventory {
     }
 
     @Override
-    public int size() {
+    public int getContainerSize() {
         return 32;
     }
 
     @Override
-    public int[] getAvailableSlots(Direction side) {
+    public int[] getSlotsForFace(Direction side) {
         return outputFlag == 0 ? INPUT_SLOTS : ALL_SLOTS;
     }
 
     @Override
-    public boolean canInsert(int slot, ItemStack stack, @Nullable Direction dir) {
+    public boolean canPlaceItemThroughFace(int slot, ItemStack stack, @Nullable Direction dir) {
         if (outputFlag == 0) {
             return slot == 0 && canInsert.test(dir);
         }
@@ -62,7 +62,7 @@ public class ProcessingInventory implements SidedItemInventory {
     }
 
     @Override
-    public boolean isValid(int slot, ItemStack stack) {
+    public boolean canPlaceItem(int slot, ItemStack stack) {
         if (outputFlag == 0) {
             return isEmpty();
         }
@@ -70,7 +70,7 @@ public class ProcessingInventory implements SidedItemInventory {
     }
 
     @Override
-    public boolean canExtract(int slot, ItemStack stack, Direction dir) {
+    public boolean canTakeItemThroughFace(int slot, ItemStack stack, Direction dir) {
         return false;
     }
 
@@ -83,7 +83,7 @@ public class ProcessingInventory implements SidedItemInventory {
     }
 
     @Override
-    public ItemStack getStack(int slot) {
+    public ItemStack getItem(int slot) {
         if (slot >= 32) {
             return ItemStack.EMPTY;
         }
@@ -91,7 +91,7 @@ public class ProcessingInventory implements SidedItemInventory {
     }
 
     @Override
-    public void setStack(int slot, ItemStack stack) {
+    public void setItem(int slot, ItemStack stack) {
         if (slot >= 32) {
             return;
         }
@@ -110,20 +110,20 @@ public class ProcessingInventory implements SidedItemInventory {
     }
 
     @Override
-    public int getMaxCountPerStack() {
-        return limit ? 1 : SidedItemInventory.super.getMaxCountPerStack();
+    public int getMaxStackSize() {
+        return limit ? 1 : SidedItemInventory.super.getMaxStackSize();
     }
 
     @Override
-    public void clear() {
+    public void clearContent() {
         remainingTime = 0;
         recipeDuration = 0;
         appliedRecipe = false;
-        SidedItemInventory.super.clear();
+        SidedItemInventory.super.clearContent();
     }
 
-    public void write(WriteView view) {
-        WriteView.ListAppender<ItemStack> list = view.getListAppender("Inventory", ItemStack.OPTIONAL_CODEC);
+    public void write(ValueOutput view) {
+        ValueOutput.TypedOutputList<ItemStack> list = view.list("Inventory", ItemStack.OPTIONAL_CODEC);
         list.add(stacks.getFirst());
         for (int i = 1; i < stacks.size(); i++) {
             ItemStack stack = stacks.get(i);
@@ -137,8 +137,8 @@ public class ProcessingInventory implements SidedItemInventory {
         view.putBoolean("AppliedRecipe", appliedRecipe);
     }
 
-    public void read(ReadView view) {
-        ReadView.TypedListReadView<ItemStack> list = view.getTypedListView("Inventory", ItemStack.OPTIONAL_CODEC);
+    public void read(ValueInput view) {
+        ValueInput.TypedInputList<ItemStack> list = view.listOrEmpty("Inventory", ItemStack.OPTIONAL_CODEC);
         int i = 0;
         for (ItemStack itemStack : list) {
             stacks.set(i++, itemStack);
@@ -146,9 +146,9 @@ public class ProcessingInventory implements SidedItemInventory {
         for (int size = stacks.size(); i < size; i++) {
             stacks.set(i, ItemStack.EMPTY);
         }
-        remainingTime = view.getFloat("ProcessingTime", 0);
-        recipeDuration = view.getFloat("RecipeTime", 0);
-        appliedRecipe = view.getBoolean("AppliedRecipe", false);
+        remainingTime = view.getFloatOr("ProcessingTime", 0);
+        recipeDuration = view.getFloatOr("RecipeTime", 0);
+        appliedRecipe = view.getBooleanOr("AppliedRecipe", false);
         if (appliedRecipe && isEmpty())
             appliedRecipe = false;
     }

@@ -8,26 +8,25 @@ import com.zurrtum.create.client.foundation.blockEntity.behaviour.ValueSettingsI
 import com.zurrtum.create.foundation.blockEntity.behaviour.BehaviourType;
 import com.zurrtum.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.infrastructure.packet.c2s.ValueSettingsPacket;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.text.MutableText;
-import net.minecraft.util.Hand;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.hit.HitResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-
 import java.util.List;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.HitResult;
 
 public class ValueSettingsClient {
     public int interactHeldTicks = -1;
     public BlockPos interactHeldPos = null;
     public BehaviourType<? extends BlockEntityBehaviour<?>> interactHeldBehaviour = null;
-    public Hand interactHeldHand = null;
+    public InteractionHand interactHeldHand = null;
     public Direction interactHeldFace = null;
 
-    public List<MutableText> lastHoverTip;
+    public List<MutableComponent> lastHoverTip;
     public int hoverTicks;
     public int hoverWarmup;
 
@@ -35,7 +34,7 @@ public class ValueSettingsClient {
         return interactHeldTicks != -1 && pos.equals(interactHeldPos);
     }
 
-    public void startInteractionWith(BlockPos pos, BehaviourType<? extends BlockEntityBehaviour<?>> behaviourType, Hand hand, Direction side) {
+    public void startInteractionWith(BlockPos pos, BehaviourType<? extends BlockEntityBehaviour<?>> behaviourType, InteractionHand hand, Direction side) {
         interactHeldTicks = 0;
         interactHeldPos = pos;
         interactHeldBehaviour = behaviourType;
@@ -47,32 +46,32 @@ public class ValueSettingsClient {
         interactHeldTicks = -1;
     }
 
-    public void tick(MinecraftClient mc) {
+    public void tick(Minecraft mc) {
         if (hoverWarmup > 0)
             hoverWarmup--;
         if (hoverTicks > 0)
             hoverTicks--;
         if (interactHeldTicks == -1)
             return;
-        ClientPlayerEntity player = mc.player;
+        LocalPlayer player = mc.player;
 
-        if (!ValueSettingsInputHandler.canInteract(player) || player.getMainHandStack().isOf(AllItems.CLIPBOARD)) {
+        if (!ValueSettingsInputHandler.canInteract(player) || player.getMainHandItem().is(AllItems.CLIPBOARD)) {
             cancelInteraction();
             return;
         }
-        HitResult hitResult = mc.crosshairTarget;
+        HitResult hitResult = mc.hitResult;
         if (!(hitResult instanceof BlockHitResult blockHitResult) || !blockHitResult.getBlockPos().equals(interactHeldPos)) {
             cancelInteraction();
             return;
         }
-        BlockEntityBehaviour<?> behaviour = BlockEntityBehaviour.get(mc.world, interactHeldPos, interactHeldBehaviour);
-        if (!(behaviour instanceof ValueSettingsBehaviour valueSettingBehaviour) || valueSettingBehaviour.bypassesInput(player.getMainHandStack()) || !valueSettingBehaviour.testHit(
-            blockHitResult.getPos())) {
+        BlockEntityBehaviour<?> behaviour = BlockEntityBehaviour.get(mc.level, interactHeldPos, interactHeldBehaviour);
+        if (!(behaviour instanceof ValueSettingsBehaviour valueSettingBehaviour) || valueSettingBehaviour.bypassesInput(player.getMainHandItem()) || !valueSettingBehaviour.testHit(
+            blockHitResult.getLocation())) {
             cancelInteraction();
             return;
         }
-        if (!mc.options.useKey.isPressed()) {
-            player.networkHandler.sendPacket(new ValueSettingsPacket(
+        if (!mc.options.keyUse.isDown()) {
+            player.connection.send(new ValueSettingsPacket(
                 interactHeldPos,
                 0,
                 0,
@@ -88,7 +87,7 @@ public class ValueSettingsClient {
         }
 
         if (interactHeldTicks > 3)
-            player.handSwinging = false;
+            player.swinging = false;
         if (interactHeldTicks++ < 5)
             return;
         ScreenOpener.open(new ValueSettingsScreen(
@@ -101,8 +100,8 @@ public class ValueSettingsClient {
         interactHeldTicks = -1;
     }
 
-    public void showHoverTip(MinecraftClient mc, List<MutableText> tip) {
-        if (mc.currentScreen != null)
+    public void showHoverTip(Minecraft mc, List<MutableComponent> tip) {
+        if (mc.screen != null)
             return;
         if (hoverWarmup < 6) {
             hoverWarmup += 2;
@@ -113,14 +112,14 @@ public class ValueSettingsClient {
         lastHoverTip = tip;
     }
 
-    public void render(MinecraftClient mc, DrawContext guiGraphics) {
+    public void render(Minecraft mc, GuiGraphics guiGraphics) {
         if (!ValueSettingsInputHandler.canInteract(mc.player))
             return;
         if (hoverTicks == 0 || lastHoverTip == null)
             return;
 
-        int x = guiGraphics.getScaledWindowWidth() / 2;
-        int y = guiGraphics.getScaledWindowHeight() - 75 - lastHoverTip.size() * 12;
+        int x = guiGraphics.guiWidth() / 2;
+        int y = guiGraphics.guiHeight() - 75 - lastHoverTip.size() * 12;
         float alpha = hoverTicks > 5 ? (11 - hoverTicks) / 5f : Math.min(1, hoverTicks / 5f);
 
         Color color = new Color(0xffffff);
@@ -129,11 +128,11 @@ public class ValueSettingsClient {
         titleColor.setAlpha(alpha);
 
         for (int i = 0; i < lastHoverTip.size(); i++) {
-            MutableText mutableComponent = lastHoverTip.get(i);
-            guiGraphics.drawText(
-                mc.textRenderer,
+            MutableComponent mutableComponent = lastHoverTip.get(i);
+            guiGraphics.drawString(
+                mc.font,
                 mutableComponent,
-                x - mc.textRenderer.getWidth(mutableComponent) / 2,
+                x - mc.font.width(mutableComponent) / 2,
                 y,
                 (i == 0 ? titleColor : color).getRGB(),
                 true

@@ -12,14 +12,14 @@ import com.zurrtum.create.client.foundation.utility.ControlsUtil;
 import com.zurrtum.create.client.foundation.utility.CreateLang;
 import com.zurrtum.create.content.redstone.link.controller.LinkedControllerMenu;
 import com.zurrtum.create.foundation.gui.menu.MenuType;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.util.math.Rect2i;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.network.RegistryByteBuf;
-import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
+import net.minecraft.ChatFormatting;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.renderer.Rect2i;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.item.ItemStack;
 
 import java.util.Collections;
 import java.util.LinkedList;
@@ -36,18 +36,18 @@ public class LinkedControllerScreen extends AbstractSimiContainerScreen<LinkedCo
     private IconButton confirmButton;
     private ElementWidget renderedItem;
 
-    public LinkedControllerScreen(LinkedControllerMenu menu, PlayerInventory inv, Text title) {
+    public LinkedControllerScreen(LinkedControllerMenu menu, Inventory inv, Component title) {
         super(menu, inv, title);
         this.background = AllGuiTextures.LINKED_CONTROLLER;
     }
 
     public static LinkedControllerScreen create(
-        MinecraftClient mc,
+        Minecraft mc,
         MenuType<ItemStack> type,
         int syncId,
-        PlayerInventory inventory,
-        Text title,
-        RegistryByteBuf extraData
+        Inventory inventory,
+        Component title,
+        RegistryFriendlyByteBuf extraData
     ) {
         return type.create(LinkedControllerScreen::new, syncId, inventory, title, getStack(extraData));
     }
@@ -58,72 +58,70 @@ public class LinkedControllerScreen extends AbstractSimiContainerScreen<LinkedCo
         setWindowOffset(1, 0);
         super.init();
 
-        resetButton = new IconButton(x + background.getWidth() - 62, y + background.getHeight() - 24, AllIcons.I_TRASH);
+        resetButton = new IconButton(leftPos + background.getWidth() - 62, topPos + background.getHeight() - 24, AllIcons.I_TRASH);
         resetButton.withCallback(() -> {
-            handler.clearContents();
-            client.player.networkHandler.sendPacket(AllPackets.CLEAR_CONTAINER);
+            menu.clearContents();
+            minecraft.player.connection.send(AllPackets.CLEAR_CONTAINER);
         });
-        confirmButton = new IconButton(x + background.getWidth() - 33, y + background.getHeight() - 24, AllIcons.I_CONFIRM);
+        confirmButton = new IconButton(leftPos + background.getWidth() - 33, topPos + background.getHeight() - 24, AllIcons.I_CONFIRM);
         confirmButton.withCallback(() -> {
-            client.player.closeHandledScreen();
+            minecraft.player.closeContainer();
         });
 
-        addDrawableChild(resetButton);
-        addDrawableChild(confirmButton);
+        addRenderableWidget(resetButton);
+        addRenderableWidget(confirmButton);
 
-        extraAreas = ImmutableList.of(new Rect2i(x + background.getWidth() + 4, y + background.getHeight() - 44, 64, 56));
-        renderedItem = new ElementWidget(
-            x + background.getWidth() - 4,
-            y + background.getHeight() - 56
-        ).showingElement(GuiGameElement.of(handler.contentHolder).scale(5));
-        addDrawableChild(renderedItem);
+        extraAreas = ImmutableList.of(new Rect2i(leftPos + background.getWidth() + 4, topPos + background.getHeight() - 44, 64, 56));
+        renderedItem = new ElementWidget(leftPos + background.getWidth() - 4, topPos + background.getHeight() - 56).showingElement(GuiGameElement.of(
+            menu.contentHolder).scale(5));
+        addRenderableWidget(renderedItem);
     }
 
     @Override
-    public void close() {
-        super.close();
+    public void onClose() {
+        super.onClose();
         renderedItem.getRenderElement().clear();
     }
 
     @Override
-    protected void drawBackground(DrawContext graphics, float partialTicks, int mouseX, int mouseY) {
+    protected void renderBg(GuiGraphics graphics, float partialTicks, int mouseX, int mouseY) {
         int invX = getLeftOfCentered(PLAYER_INVENTORY.getWidth());
-        int invY = y + background.getHeight() + 4;
+        int invY = topPos + background.getHeight() + 4;
         renderPlayerInventory(graphics, invX, invY);
 
-        background.render(graphics, x, y);
-        graphics.drawText(textRenderer, title, x + 15, y + 4, 0xff592424, false);
+        background.render(graphics, leftPos, topPos);
+        graphics.drawString(font, title, leftPos + 15, topPos + 4, 0xff592424, false);
     }
 
     @Override
-    protected void handledScreenTick() {
-        if (!ItemStack.areEqual(handler.player.getMainHandStack(), handler.contentHolder))
-            client.player.closeHandledScreen();
+    protected void containerTick() {
+        if (!ItemStack.matches(menu.player.getMainHandItem(), menu.contentHolder))
+            minecraft.player.closeContainer();
 
-        super.handledScreenTick();
+        super.containerTick();
     }
 
     @Override
-    protected void drawMouseoverTooltip(DrawContext graphics, int x, int y) {
-        if (!handler.getCursorStack().isEmpty() || focusedSlot == null || focusedSlot.inventory == handler.playerInventory) {
-            super.drawMouseoverTooltip(graphics, x, y);
+    protected void renderTooltip(GuiGraphics graphics, int x, int y) {
+        if (!menu.getCarried().isEmpty() || hoveredSlot == null || hoveredSlot.container == menu.playerInventory) {
+            super.renderTooltip(graphics, x, y);
             return;
         }
 
-        List<Text> list = new LinkedList<>();
-        if (focusedSlot.hasStack())
-            list = getTooltipFromItem(focusedSlot.getStack());
+        List<Component> list = new LinkedList<>();
+        if (hoveredSlot.hasItem())
+            list = getTooltipFromContainerItem(hoveredSlot.getItem());
 
-        graphics.drawTooltip(textRenderer, addToTooltip(list, focusedSlot.getIndex()), x, y);
+        graphics.setComponentTooltipForNextFrame(font, addToTooltip(list, hoveredSlot.getContainerSlot()), x, y);
     }
 
-    private List<Text> addToTooltip(List<Text> list, int slot) {
+    private List<Component> addToTooltip(List<Component> list, int slot) {
         if (slot < 0 || slot >= 12)
             return list;
         list.add(CreateLang.translateDirect(
             "linked_controller.frequency_slot_" + ((slot % 2) + 1),
-            ControlsUtil.getControls().get(slot / 2).getBoundKeyLocalizedText().getString()
-        ).formatted(Formatting.GOLD));
+            ControlsUtil.getControls().get(slot / 2).getTranslatedKeyMessage().getString()
+        ).withStyle(ChatFormatting.GOLD));
         return list;
     }
 

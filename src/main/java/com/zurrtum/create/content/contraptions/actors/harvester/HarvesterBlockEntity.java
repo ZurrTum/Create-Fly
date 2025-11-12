@@ -2,9 +2,9 @@ package com.zurrtum.create.content.contraptions.actors.harvester;
 
 import com.zurrtum.create.AllBlockEntityTypes;
 import com.zurrtum.create.foundation.blockEntity.CachedRenderBBBlockEntity;
-import net.minecraft.block.BlockState;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.AABB;
 
 public class HarvesterBlockEntity extends CachedRenderBBBlockEntity {
 
@@ -16,8 +16,8 @@ public class HarvesterBlockEntity extends CachedRenderBBBlockEntity {
     }
 
     @Override
-    protected Box createRenderBoundingBox() {
-        return new Box(pos);
+    protected AABB createRenderBoundingBox() {
+        return new AABB(worldPosition);
     }
 
     public float getAnimatedSpeed() {

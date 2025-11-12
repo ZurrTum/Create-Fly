@@ -7,9 +7,9 @@ import com.zurrtum.create.client.catnip.gui.element.DelegatedStencilElement;
 import com.zurrtum.create.client.catnip.gui.element.ScreenElement;
 import com.zurrtum.create.client.catnip.render.ColoredRenderable;
 import com.zurrtum.create.client.ponder.Ponder;
-import net.minecraft.client.gl.RenderPipelines;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.util.Identifier;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.renderer.RenderPipelines;
+import net.minecraft.resources.ResourceLocation;
 
 public enum PonderGuiTextures implements TextureSheetSegment, ScreenElement, ColoredRenderable {
 
@@ -50,7 +50,7 @@ public enum PonderGuiTextures implements TextureSheetSegment, ScreenElement, Col
 
     ;
 
-    public final Identifier location;
+    public final ResourceLocation location;
     private final int width;
     private final int height;
     private final int startX;
@@ -71,7 +71,7 @@ public enum PonderGuiTextures implements TextureSheetSegment, ScreenElement, Col
     }
 
     PonderGuiTextures(String namespace, String location, int startX, int startY, int width, int height, int sheetWidth, int sheetHeight) {
-        this.location = Identifier.of(namespace, "textures/gui/" + location + ".png");
+        this.location = ResourceLocation.fromNamespaceAndPath(namespace, "textures/gui/" + location + ".png");
         this.width = width;
         this.height = height;
         this.startX = startX;
@@ -81,17 +81,17 @@ public enum PonderGuiTextures implements TextureSheetSegment, ScreenElement, Col
     }
 
     @Override
-    public void render(DrawContext graphics, int x, int y) {
-        graphics.drawTexture(RenderPipelines.GUI_TEXTURED, getLocation(), x, y, startX, startY, width, height, sheetWidth, sheetHeight);
+    public void render(GuiGraphics graphics, int x, int y) {
+        graphics.blit(RenderPipelines.GUI_TEXTURED, getLocation(), x, y, startX, startY, width, height, sheetWidth, sheetHeight);
     }
 
     @Override
-    public void render(DrawContext graphics, int x, int y, Color c) {
+    public void render(GuiGraphics graphics, int x, int y, Color c) {
         UIRenderHelper.drawColoredTexture(graphics, bind(), c, x, y, startX, startY, width, height);
     }
 
     @Override
-    public Identifier getLocation() {
+    public ResourceLocation getLocation() {
         return location;
     }
 

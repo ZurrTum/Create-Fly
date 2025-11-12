@@ -1,7 +1,7 @@
 package com.zurrtum.create.client.content.logistics.tunnel;
 
 import com.zurrtum.create.client.foundation.blockEntity.behaviour.CenteredSideValueBoxTransform;
-import net.minecraft.util.math.Direction;
+import net.minecraft.core.Direction;
 
 public class BrassTunnelModeSlot extends CenteredSideValueBoxTransform {
 

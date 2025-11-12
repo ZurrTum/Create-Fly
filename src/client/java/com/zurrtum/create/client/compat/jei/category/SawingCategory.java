@@ -14,30 +14,30 @@ import mezz.jei.api.gui.drawable.IDrawable;
 import mezz.jei.api.gui.ingredient.IRecipeSlotsView;
 import mezz.jei.api.recipe.IFocusGroup;
 import mezz.jei.api.recipe.types.IRecipeType;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.item.Items;
-import net.minecraft.recipe.PreparedRecipes;
-import net.minecraft.recipe.RecipeEntry;
-import net.minecraft.text.Text;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.crafting.RecipeHolder;
+import net.minecraft.world.item.crafting.RecipeMap;
 import org.jetbrains.annotations.NotNull;
 import org.joml.Matrix3x2f;
 
 import java.util.List;
 
-public class SawingCategory extends CreateCategory<RecipeEntry<CuttingRecipe>> {
-    public static List<RecipeEntry<CuttingRecipe>> getRecipes(PreparedRecipes preparedRecipes) {
-        return preparedRecipes.getAll(AllRecipeTypes.CUTTING).stream().toList();
+public class SawingCategory extends CreateCategory<RecipeHolder<CuttingRecipe>> {
+    public static List<RecipeHolder<CuttingRecipe>> getRecipes(RecipeMap preparedRecipes) {
+        return preparedRecipes.byType(AllRecipeTypes.CUTTING).stream().toList();
     }
 
     @Override
     @NotNull
-    public IRecipeType<RecipeEntry<CuttingRecipe>> getRecipeType() {
+    public IRecipeType<RecipeHolder<CuttingRecipe>> getRecipeType() {
         return JeiClientPlugin.SAWING;
     }
 
     @Override
     @NotNull
-    public Text getTitle() {
+    public Component getTitle() {
         return CreateLang.translateDirect("recipe.sawing");
     }
 
@@ -52,16 +52,16 @@ public class SawingCategory extends CreateCategory<RecipeEntry<CuttingRecipe>> {
     }
 
     @Override
-    public void setRecipe(IRecipeLayoutBuilder builder, RecipeEntry<CuttingRecipe> entry, IFocusGroup focuses) {
+    public void setRecipe(IRecipeLayoutBuilder builder, RecipeHolder<CuttingRecipe> entry, IFocusGroup focuses) {
         CuttingRecipe recipe = entry.value();
         builder.addInputSlot(44, 5).setBackground(SLOT, -1, -1).add(recipe.ingredient());
         builder.addOutputSlot(118, 48).setBackground(SLOT, -1, -1).add(recipe.result());
     }
 
     @Override
-    public void draw(RecipeEntry<CuttingRecipe> entry, IRecipeSlotsView recipeSlotsView, DrawContext graphics, double mouseX, double mouseY) {
+    public void draw(RecipeHolder<CuttingRecipe> entry, IRecipeSlotsView recipeSlotsView, GuiGraphics graphics, double mouseX, double mouseY) {
         AllGuiTextures.JEI_DOWN_ARROW.render(graphics, 70, 6);
         AllGuiTextures.JEI_SHADOW.render(graphics, 55, 55);
-        graphics.state.addSpecialElement(new SawRenderState(new Matrix3x2f(graphics.getMatrices()), 64, 31));
+        graphics.guiRenderState.submitPicturesInPictureState(new SawRenderState(new Matrix3x2f(graphics.pose()), 64, 31));
     }
 }

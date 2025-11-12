@@ -1,18 +1,11 @@
 package com.zurrtum.create.client.catnip.outliner;
 
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.zurrtum.create.catnip.data.Iterate;
 import com.zurrtum.create.client.catnip.render.BindableTexture;
 import com.zurrtum.create.client.catnip.render.PonderRenderTypes;
 import com.zurrtum.create.client.catnip.render.SuperRenderTypeBuffer;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.render.RenderLayer;
-import net.minecraft.client.render.VertexConsumer;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Direction.Axis;
-import net.minecraft.util.math.Direction.AxisDirection;
-import net.minecraft.util.math.Vec3d;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
 
@@ -20,6 +13,13 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.RenderType;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.Direction.Axis;
+import net.minecraft.core.Direction.AxisDirection;
+import net.minecraft.world.phys.Vec3;
 
 public class BlockClusterOutline extends Outline {
 
@@ -38,7 +38,7 @@ public class BlockClusterOutline extends Outline {
     }
 
     @Override
-    public void render(MinecraftClient mc, MatrixStack ms, SuperRenderTypeBuffer buffer, Vec3d camera, float pt) {
+    public void render(Minecraft mc, PoseStack ms, SuperRenderTypeBuffer buffer, Vec3 camera, float pt) {
         params.loadColor(colorTemp);
         Vector4f color = colorTemp;
         int lightmap = params.lightmap;
@@ -48,35 +48,35 @@ public class BlockClusterOutline extends Outline {
         renderEdges(ms, buffer, camera, pt, color, lightmap, disableLineNormals);
     }
 
-    protected void renderFaces(MatrixStack ms, SuperRenderTypeBuffer buffer, Vec3d camera, float pt, Vector4f color, int lightmap) {
+    protected void renderFaces(PoseStack ms, SuperRenderTypeBuffer buffer, Vec3 camera, float pt, Vector4f color, int lightmap) {
         BindableTexture faceTexture = params.faceTexture;
         if (faceTexture == null)
             return;
         if (cluster.isEmpty())
             return;
 
-        ms.push();
+        ms.pushPose();
         ms.translate(cluster.anchor.getX() - camera.x, cluster.anchor.getY() - camera.y, cluster.anchor.getZ() - camera.z);
 
-        MatrixStack.Entry pose = ms.peek();
-        RenderLayer renderType = PonderRenderTypes.outlineTranslucent(faceTexture.getLocation(), true);
+        PoseStack.Pose pose = ms.last();
+        RenderType renderType = PonderRenderTypes.outlineTranslucent(faceTexture.getLocation(), true);
         VertexConsumer consumer = buffer.getLateBuffer(renderType);
 
         cluster.visibleFaces.forEach((face, axisDirection) -> {
             Direction direction = Direction.get(axisDirection, face.axis);
             BlockPos pos = face.pos;
             if (axisDirection == AxisDirection.POSITIVE)
-                pos = pos.offset(direction.getOpposite());
+                pos = pos.relative(direction.getOpposite());
             bufferBlockFace(pose, consumer, pos, direction, color, lightmap);
         });
 
-        ms.pop();
+        ms.popPose();
     }
 
     protected void renderEdges(
-        MatrixStack ms,
+        PoseStack ms,
         SuperRenderTypeBuffer buffer,
-        Vec3d camera,
+        Vec3 camera,
         float pt,
         Vector4f color,
         int lightmap,
@@ -88,10 +88,10 @@ public class BlockClusterOutline extends Outline {
         if (cluster.isEmpty())
             return;
 
-        ms.push();
+        ms.pushPose();
         ms.translate(cluster.anchor.getX() - camera.x, cluster.anchor.getY() - camera.y, cluster.anchor.getZ() - camera.z);
 
-        MatrixStack.Entry pose = ms.peek();
+        PoseStack.Pose pose = ms.last();
         VertexConsumer consumer = buffer.getBuffer(PonderRenderTypes.outlineSolid());
 
         cluster.visibleEdges.forEach(edge -> {
@@ -102,7 +102,7 @@ public class BlockClusterOutline extends Outline {
             bufferCuboidLine(pose, consumer, origin, direction, 1, lineWidth, color, lightmap, disableNormals);
         });
 
-        ms.pop();
+        ms.popPose();
     }
 
     public static void loadFaceData(Direction face, Vector3f pos0, Vector3f pos1, Vector3f pos2, Vector3f pos3, Vector3f normal) {
@@ -165,7 +165,7 @@ public class BlockClusterOutline extends Outline {
         pos3.add(x, y, z);
     }
 
-    protected void bufferBlockFace(MatrixStack.Entry pose, VertexConsumer consumer, BlockPos pos, Direction face, Vector4f color, int lightmap) {
+    protected void bufferBlockFace(PoseStack.Pose pose, VertexConsumer consumer, BlockPos pos, Direction face, Vector4f color, int lightmap) {
         Vector3f pos0 = pos0Temp;
         Vector3f pos1 = pos1Temp;
         Vector3f pos2 = pos2Temp;
@@ -174,9 +174,9 @@ public class BlockClusterOutline extends Outline {
 
         loadFaceData(face, pos0, pos1, pos2, pos3, normal);
         addPos(
-            pos.getX() + face.getOffsetX() * 1 / 128f,
-            pos.getY() + face.getOffsetY() * 1 / 128f,
-            pos.getZ() + face.getOffsetZ() * 1 / 128f,
+            pos.getX() + face.getStepX() * 1 / 128f,
+            pos.getY() + face.getStepY() * 1 / 128f,
+            pos.getZ() + face.getStepZ() * 1 / 128f,
             pos0,
             pos1,
             pos2,
@@ -211,7 +211,7 @@ public class BlockClusterOutline extends Outline {
             for (Axis axis : Iterate.axes) {
                 Direction direction = Direction.get(AxisDirection.POSITIVE, axis);
                 for (int offset : Iterate.zeroAndOne) {
-                    MergeEntry entry = new MergeEntry(axis, pos.offset(direction, offset));
+                    MergeEntry entry = new MergeEntry(axis, pos.relative(direction, offset));
                     if (visibleFaces.remove(entry) == null)
                         visibleFaces.put(entry, offset == 0 ? AxisDirection.NEGATIVE : AxisDirection.POSITIVE);
                 }
@@ -232,9 +232,9 @@ public class BlockClusterOutline extends Outline {
                         Direction direction2 = Direction.get(AxisDirection.POSITIVE, axis3);
 
                         for (int offset : Iterate.zeroAndOne) {
-                            BlockPos entryPos = pos.offset(direction, offset);
+                            BlockPos entryPos = pos.relative(direction, offset);
                             for (int offset2 : Iterate.zeroAndOne) {
-                                entryPos = entryPos.offset(direction2, offset2);
+                                entryPos = entryPos.relative(direction2, offset2);
                                 MergeEntry entry = new MergeEntry(axis, entryPos);
                                 if (!visibleEdges.remove(entry))
                                     visibleEdges.add(entry);

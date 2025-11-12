@@ -4,40 +4,40 @@ import com.zurrtum.create.AllItems;
 import com.zurrtum.create.AllSoundEvents;
 import com.zurrtum.create.foundation.item.CustomAttackSoundItem;
 import com.zurrtum.create.foundation.item.DamageControlItem;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.attribute.EntityAttributeModifier;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.registry.tag.EntityTypeTags;
-import net.minecraft.sound.SoundCategory;
-import net.minecraft.sound.SoundEvent;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.tags.EntityTypeTags;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.attributes.AttributeModifier;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
 
 import static com.zurrtum.create.Create.MOD_ID;
 
 public class CardboardSwordItem extends Item implements DamageControlItem, CustomAttackSoundItem {
-    public static final EntityAttributeModifier KNOCKBACK_MODIFIER = new EntityAttributeModifier(
-        Identifier.of(
+    public static final AttributeModifier KNOCKBACK_MODIFIER = new AttributeModifier(
+        ResourceLocation.fromNamespaceAndPath(
             MOD_ID,
             "cardboard_sword_knockback_attribute_modifier"
-    ), 2, EntityAttributeModifier.Operation.ADD_VALUE
+    ), 2, AttributeModifier.Operation.ADD_VALUE
     );
 
-    public CardboardSwordItem(Settings settings) {
+    public CardboardSwordItem(Properties settings) {
         super(settings);
     }
 
-    public static void cardboardSwordsMakeNoiseOnClick(PlayerEntity player, BlockPos pos) {
-        ItemStack stack = player.getMainHandStack();
-        if (!stack.isOf(AllItems.CARDBOARD_SWORD)) {
+    public static void cardboardSwordsMakeNoiseOnClick(Player player, BlockPos pos) {
+        ItemStack stack = player.getMainHandItem();
+        if (!stack.is(AllItems.CARDBOARD_SWORD)) {
             return;
         }
-        World world = player.getEntityWorld();
-        if (world.isClient()) {
+        Level world = player.level();
+        if (world.isClientSide()) {
             AllSoundEvents.CARDBOARD_SWORD.playAt(world, pos, 0.5f, 1.85f, false);
         } else {
             AllSoundEvents.CARDBOARD_SWORD.play(world, player, pos, 0.5f, 1.85f);
@@ -46,18 +46,18 @@ public class CardboardSwordItem extends Item implements DamageControlItem, Custo
 
     @Override
     public boolean damage(Entity entity) {
-        return !(entity instanceof LivingEntity) || entity.getType().isIn(EntityTypeTags.ARTHROPOD);
+        return !(entity instanceof LivingEntity) || entity.getType().is(EntityTypeTags.ARTHROPOD);
     }
 
     @Override
     public void playSound(
-        World world,
-        PlayerEntity player,
+        Level world,
+        Player player,
         double x,
         double y,
         double z,
         SoundEvent sound,
-        SoundCategory category,
+        SoundSource category,
         float volume,
         float pitch
     ) {

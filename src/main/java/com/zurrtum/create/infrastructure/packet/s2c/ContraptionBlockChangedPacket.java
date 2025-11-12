@@ -4,18 +4,18 @@ import com.zurrtum.create.AllClientHandle;
 import com.zurrtum.create.AllPackets;
 import com.zurrtum.create.catnip.codecs.stream.CatnipStreamCodecs;
 import io.netty.buffer.ByteBuf;
-import net.minecraft.block.BlockState;
-import net.minecraft.network.codec.PacketCodec;
-import net.minecraft.network.codec.PacketCodecs;
-import net.minecraft.network.packet.PacketType;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.PacketType;
+import net.minecraft.world.level.block.state.BlockState;
 import org.apache.logging.log4j.util.TriConsumer;
 
 public record ContraptionBlockChangedPacket(int entityId, BlockPos localPos, BlockState newState) implements S2CPacket {
-    public static final PacketCodec<ByteBuf, ContraptionBlockChangedPacket> CODEC = PacketCodec.tuple(
-        PacketCodecs.INTEGER,
+    public static final StreamCodec<ByteBuf, ContraptionBlockChangedPacket> CODEC = StreamCodec.composite(
+        ByteBufCodecs.INT,
         ContraptionBlockChangedPacket::entityId,
-        BlockPos.PACKET_CODEC,
+        BlockPos.STREAM_CODEC,
         ContraptionBlockChangedPacket::localPos,
         CatnipStreamCodecs.BLOCK_STATE,
         ContraptionBlockChangedPacket::newState,
@@ -28,7 +28,7 @@ public record ContraptionBlockChangedPacket(int entityId, BlockPos localPos, Blo
     }
 
     @Override
-    public PacketType<ContraptionBlockChangedPacket> getPacketType() {
+    public PacketType<ContraptionBlockChangedPacket> type() {
         return AllPackets.CONTRAPTION_BLOCK_CHANGED;
     }
 }

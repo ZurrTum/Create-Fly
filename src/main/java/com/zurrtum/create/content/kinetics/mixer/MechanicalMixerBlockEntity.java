@@ -16,27 +16,26 @@ import com.zurrtum.create.foundation.blockEntity.behaviour.fluid.SmartFluidTankB
 import com.zurrtum.create.infrastructure.config.AllConfigs;
 import com.zurrtum.create.infrastructure.fluids.FluidStack;
 import com.zurrtum.create.infrastructure.particle.FluidParticleData;
-import net.minecraft.block.BlockState;
-import net.minecraft.item.ItemStack;
-import net.minecraft.particle.ItemStackParticleEffect;
-import net.minecraft.particle.ParticleEffect;
-import net.minecraft.particle.ParticleTypes;
-import net.minecraft.recipe.Recipe;
-import net.minecraft.recipe.RecipeEntry;
-import net.minecraft.recipe.RecipeType;
-import net.minecraft.recipe.ShapelessRecipe;
-import net.minecraft.sound.SoundCategory;
-import net.minecraft.sound.SoundEvents;
-import net.minecraft.storage.ReadView;
-import net.minecraft.storage.WriteView;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.math.Direction.Axis;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec3d;
-
 import java.util.List;
 import java.util.Optional;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction.Axis;
+import net.minecraft.core.particles.ItemParticleOption;
+import net.minecraft.core.particles.ParticleOptions;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.util.Mth;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.Recipe;
+import net.minecraft.world.item.crafting.RecipeHolder;
+import net.minecraft.world.item.crafting.RecipeType;
+import net.minecraft.world.item.crafting.ShapelessRecipe;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
 
 public class MechanicalMixerBlockEntity extends BasinOperatingBlockEntity {
 
@@ -57,14 +56,14 @@ public class MechanicalMixerBlockEntity extends BasinOperatingBlockEntity {
             if (runningTicks < 20) {
                 localTick = runningTicks;
                 float num = (localTick + partialTicks) / 20f;
-                num = ((2 - MathHelper.cos((float) (num * Math.PI))) / 2);
+                num = ((2 - Mth.cos((float) (num * Math.PI))) / 2);
                 offset = num - .5f;
             } else if (runningTicks <= 20) {
                 offset = 1;
             } else {
                 localTick = 40 - runningTicks;
                 float num = (localTick - partialTicks) / 20f;
-                num = ((2 - MathHelper.cos((float) (num * Math.PI))) / 2);
+                num = ((2 - Mth.cos((float) (num * Math.PI))) / 2);
                 offset = num - .5f;
             }
         }
@@ -91,22 +90,22 @@ public class MechanicalMixerBlockEntity extends BasinOperatingBlockEntity {
     }
 
     @Override
-    protected Box createRenderBoundingBox() {
-        return new Box(pos).stretch(0, -1.5, 0);
+    protected AABB createRenderBoundingBox() {
+        return new AABB(worldPosition).expandTowards(0, -1.5, 0);
     }
 
     @Override
-    protected void read(ReadView view, boolean clientPacket) {
-        running = view.getBoolean("Running", false);
-        runningTicks = view.getInt("Ticks", 0);
+    protected void read(ValueInput view, boolean clientPacket) {
+        running = view.getBooleanOr("Running", false);
+        runningTicks = view.getIntOr("Ticks", 0);
         super.read(view, clientPacket);
 
-        if (clientPacket && hasWorld())
+        if (clientPacket && hasLevel())
             getBasin().ifPresent(bte -> bte.setAreFluidsMoving(running && runningTicks <= 20));
     }
 
     @Override
-    protected void write(WriteView view, boolean clientPacket) {
+    protected void write(ValueOutput view, boolean clientPacket) {
         view.putBoolean("Running", running);
         view.putInt("Ticks", runningTicks);
         super.write(view, clientPacket);
@@ -124,11 +123,11 @@ public class MechanicalMixerBlockEntity extends BasinOperatingBlockEntity {
         }
 
         float speed = Math.abs(getSpeed());
-        if (running && world != null) {
-            if (world.isClient() && runningTicks == 20)
+        if (running && level != null) {
+            if (level.isClientSide() && runningTicks == 20)
                 renderParticles();
 
-            if ((!world.isClient() || isVirtual()) && runningTicks == 20) {
+            if ((!level.isClientSide() || isVirtual()) && runningTicks == 20) {
                 if (processingTicks < 0) {
                     float recipeSpeed = 1;
                     //TODO
@@ -138,17 +137,17 @@ public class MechanicalMixerBlockEntity extends BasinOperatingBlockEntity {
                     //                            recipeSpeed = t / 100f;
                     //                    }
 
-                    processingTicks = MathHelper.clamp((MathHelper.floorLog2((int) (512 / speed))) * MathHelper.ceil(recipeSpeed * 15) + 1, 1, 512);
+                    processingTicks = Mth.clamp((Mth.log2((int) (512 / speed))) * Mth.ceil(recipeSpeed * 15) + 1, 1, 512);
 
                     Optional<BasinBlockEntity> basin = getBasin();
                     if (basin.isPresent()) {
                         Couple<SmartFluidTankBehaviour> tanks = basin.get().getTanks();
                         if (!tanks.getFirst().isEmpty() || !tanks.getSecond().isEmpty())
-                            world.playSound(
+                            level.playSound(
                                 null,
-                                pos,
-                                SoundEvents.BLOCK_BUBBLE_COLUMN_WHIRLPOOL_AMBIENT,
-                                SoundCategory.BLOCKS,
+                                worldPosition,
+                                SoundEvents.BUBBLE_COLUMN_WHIRLPOOL_AMBIENT,
+                                SoundSource.BLOCKS,
                                 .75f,
                                 speed < 65 ? .75f : 1.5f
                             );
@@ -172,15 +171,15 @@ public class MechanicalMixerBlockEntity extends BasinOperatingBlockEntity {
 
     public void renderParticles() {
         Optional<BasinBlockEntity> basin = getBasin();
-        if (basin.isEmpty() || world == null)
+        if (basin.isEmpty() || level == null)
             return;
 
         BasinInventory inv = basin.get().itemCapability;
-        for (int slot = 0, size = inv.size(); slot < size; slot++) {
-            ItemStack stackInSlot = inv.getStack(slot);
+        for (int slot = 0, size = inv.getContainerSize(); slot < size; slot++) {
+            ItemStack stackInSlot = inv.getItem(slot);
             if (stackInSlot.isEmpty())
                 continue;
-            ItemStackParticleEffect data = new ItemStackParticleEffect(ParticleTypes.ITEM, stackInSlot);
+            ItemParticleOption data = new ItemParticleOption(ParticleTypes.ITEM, stackInSlot);
             spillParticle(data);
         }
 
@@ -196,18 +195,18 @@ public class MechanicalMixerBlockEntity extends BasinOperatingBlockEntity {
         }
     }
 
-    protected void spillParticle(ParticleEffect data) {
-        float angle = world.random.nextFloat() * 360;
-        Vec3d offset = new Vec3d(0, 0, 0.25f);
+    protected void spillParticle(ParticleOptions data) {
+        float angle = level.random.nextFloat() * 360;
+        Vec3 offset = new Vec3(0, 0, 0.25f);
         offset = VecHelper.rotate(offset, angle, Axis.Y);
-        Vec3d target = VecHelper.rotate(offset, getSpeed() > 0 ? 25 : -25, Axis.Y).add(0, .25f, 0);
-        Vec3d center = offset.add(VecHelper.getCenterOf(pos));
-        target = VecHelper.offsetRandomly(target.subtract(offset), world.random, 1 / 128f);
-        world.addParticleClient(data, center.x, center.y - 1.75f, center.z, target.x, target.y, target.z);
+        Vec3 target = VecHelper.rotate(offset, getSpeed() > 0 ? 25 : -25, Axis.Y).add(0, .25f, 0);
+        Vec3 center = offset.add(VecHelper.getCenterOf(worldPosition));
+        target = VecHelper.offsetRandomly(target.subtract(offset), level.random, 1 / 128f);
+        level.addParticle(data, center.x, center.y - 1.75f, center.z, target.x, target.y, target.z);
     }
 
     @Override
-    protected boolean matchStaticFilters(RecipeEntry<? extends Recipe<?>> recipe) {
+    protected boolean matchStaticFilters(RecipeHolder<? extends Recipe<?>> recipe) {
         Recipe<?> r = recipe.value();
         if ((r instanceof ShapelessRecipe shapelessRecipe && AllConfigs.server().recipes.allowShapelessInMixer.get() && shapelessRecipe.ingredients.size() > 1 && !MechanicalPressBlockEntity.canCompress(
             r)) && !AllRecipeTypes.shouldIgnoreInAutomation(recipe)) {

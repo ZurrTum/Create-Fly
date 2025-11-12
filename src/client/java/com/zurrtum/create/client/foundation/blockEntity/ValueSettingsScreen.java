@@ -1,5 +1,6 @@
 package com.zurrtum.create.client.foundation.blockEntity;
 
+import com.mojang.blaze3d.platform.Window;
 import com.zurrtum.create.AllSoundEvents;
 import com.zurrtum.create.client.AllKeys;
 import com.zurrtum.create.client.catnip.gui.AbstractSimiScreen;
@@ -11,20 +12,19 @@ import com.zurrtum.create.client.foundation.gui.AllIcons;
 import com.zurrtum.create.client.foundation.utility.CreateLang;
 import com.zurrtum.create.foundation.blockEntity.behaviour.ValueSettings;
 import com.zurrtum.create.infrastructure.packet.c2s.ValueSettingsPacket;
-import net.minecraft.client.gui.Click;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.input.KeyInput;
-import net.minecraft.client.sound.PositionedSoundInstance;
-import net.minecraft.client.util.Window;
-import net.minecraft.text.Text;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec2f;
 import org.jetbrains.annotations.NotNull;
 import org.lwjgl.glfw.GLFW;
 
 import java.util.function.Consumer;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.input.KeyEvent;
+import net.minecraft.client.input.MouseButtonEvent;
+import net.minecraft.client.resources.sounds.SimpleSoundInstance;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.network.chat.Component;
+import net.minecraft.util.Mth;
+import net.minecraft.world.phys.Vec2;
 
 public class ValueSettingsScreen extends AbstractSimiScreen {
 
@@ -58,8 +58,8 @@ public class ValueSettingsScreen extends AbstractSimiScreen {
         int milestoneCount = maxValue / board.milestoneInterval() + 1;
         int scale = maxValue > 128 ? 1 : 2;
 
-        for (Text component : board.rows())
-            maxLabelWidth = Math.max(maxLabelWidth, textRenderer.getWidth(component));
+        for (Component component : board.rows())
+            maxLabelWidth = Math.max(maxLabelWidth, font.width(component));
         if (iconMode)
             maxLabelWidth = -18;
 
@@ -70,13 +70,13 @@ public class ValueSettingsScreen extends AbstractSimiScreen {
         setWindowSize(width, height);
         super.init();
 
-        Vec2f coordinateOfValue = getCoordinateOfValue(initialSettings.row(), initialSettings.value());
+        Vec2 coordinateOfValue = getCoordinateOfValue(initialSettings.row(), initialSettings.value());
         setCursor(coordinateOfValue);
     }
 
-    private void setCursor(Vec2f coordinateOfValue) {
-        double guiScale = client.getWindow().getScaleFactor();
-        GLFW.glfwSetCursorPos(client.getWindow().getHandle(), coordinateOfValue.x * guiScale, coordinateOfValue.y * guiScale);
+    private void setCursor(Vec2 coordinateOfValue) {
+        double guiScale = minecraft.getWindow().getGuiScale();
+        GLFW.glfwSetCursorPos(minecraft.getWindow().handle(), coordinateOfValue.x * guiScale, coordinateOfValue.y * guiScale);
     }
 
     public ValueSettings getClosestCoordinate(int mouseX, int mouseY) {
@@ -86,7 +86,7 @@ public class ValueSettingsScreen extends AbstractSimiScreen {
 
         double bestDiff = Double.MAX_VALUE;
         for (; row < board.rows().size(); row++) {
-            Vec2f coord = getCoordinateOfValue(row, 0);
+            Vec2 coord = getCoordinateOfValue(row, 0);
             double diff = Math.abs(coord.y - mouseY);
             if (bestDiff < diff)
                 break;
@@ -96,7 +96,7 @@ public class ValueSettingsScreen extends AbstractSimiScreen {
 
         bestDiff = Double.MAX_VALUE;
         for (; column <= board.maxValue(); column++) {
-            Vec2f coord = getCoordinateOfValue(row, milestonesOnly ? column * board.milestoneInterval() : column);
+            Vec2 coord = getCoordinateOfValue(row, milestonesOnly ? column * board.milestoneInterval() : column);
             double diff = Math.abs(coord.x - mouseX);
             if (bestDiff < diff)
                 break;
@@ -107,7 +107,7 @@ public class ValueSettingsScreen extends AbstractSimiScreen {
         return new ValueSettings(row, milestonesOnly ? Math.min(column * board.milestoneInterval(), board.maxValue()) : column);
     }
 
-    public Vec2f getCoordinateOfValue(int row, int column) {
+    public Vec2 getCoordinateOfValue(int row, int column) {
         int scale = board.maxValue() > 128 ? 1 : 2;
         float xOut = guiLeft + ((Math.max(1, column) - 1) / board.milestoneInterval()) * milestoneSize + column * scale + 1.5f;
         xOut += maxLabelWidth + 14 + 4;
@@ -118,24 +118,24 @@ public class ValueSettingsScreen extends AbstractSimiScreen {
             xOut += milestoneSize;
 
         float yOut = guiTop + (row + .5f) * 11 - .5f;
-        return new Vec2f(xOut, yOut);
+        return new Vec2(xOut, yOut);
     }
 
     @Override
-    protected void renderWindow(DrawContext graphics, int mouseX, int mouseY, float partialTicks) {
+    protected void renderWindow(GuiGraphics graphics, int mouseX, int mouseY, float partialTicks) {
         int x = guiLeft;
         int y = guiTop;
         int milestoneCount = board.maxValue() / board.milestoneInterval() + 1;
         int scale = board.maxValue() > 128 ? 1 : 2;
 
-        Text title = board.title();
-        Text tip = CreateLang.translateDirect("gui.value_settings.release_to_confirm", Text.keybind("key.use"));
-        double fadeIn = Math.pow(MathHelper.clamp((ticksOpen + partialTicks) / 4.0, 0, 1), 1);
+        Component title = board.title();
+        Component tip = CreateLang.translateDirect("gui.value_settings.release_to_confirm", Component.keybind("key.use"));
+        double fadeIn = Math.pow(Mth.clamp((ticksOpen + partialTicks) / 4.0, 0, 1), 1);
 
-        int fattestLabel = Math.max(textRenderer.getWidth(tip), textRenderer.getWidth(title));
+        int fattestLabel = Math.max(font.width(tip), font.width(title));
         if (iconMode)
             for (int i = 0; i <= board.maxValue(); i++)
-                fattestLabel = Math.max(fattestLabel, textRenderer.getWidth(board.formatter().format(new ValueSettings(0, i))));
+                fattestLabel = Math.max(fattestLabel, font.width(board.formatter().format(new ValueSettings(0, i))));
 
         int fatTipOffset = Math.max(0, fattestLabel + 10 - (windowWidth + 13)) / 2;
         int bgWidth = Math.max((windowWidth + 13), fattestLabel + 10);
@@ -163,8 +163,8 @@ public class ValueSettingsScreen extends AbstractSimiScreen {
 
         if (fadeInWidth > fattestLabel) {
             int textX = x - 11 - fatTipOffset + bgWidth / 2;
-            graphics.drawText(textRenderer, title, textX - textRenderer.getWidth(title) / 2, y - 14, 0xffdddddd, false);
-            graphics.drawText(textRenderer, tip, textX - textRenderer.getWidth(tip) / 2, y + windowHeight + additionalHeight - 27, 0xffdddddd, false);
+            graphics.drawString(font, title, textX - font.width(title) / 2, y - 14, 0xffdddddd, false);
+            graphics.drawString(font, tip, textX - font.width(tip) / 2, y + windowHeight + additionalHeight - 27, 0xffdddddd, false);
         }
 
         renderBrassFrame(graphics, x + maxLabelWidth + 14, y - 3, valueBarWidth + 8, board.rows().size() * 11 + 5);
@@ -178,7 +178,7 @@ public class ValueSettingsScreen extends AbstractSimiScreen {
         );
 
         int originalY = y;
-        for (Text component : board.rows()) {
+        for (Component component : board.rows()) {
             int valueBarX = x + maxLabelWidth + 14 + 4;
 
             if (!iconMode) {
@@ -192,7 +192,7 @@ public class ValueSettingsScreen extends AbstractSimiScreen {
                         8,
                         AllGuiTextures.VALUE_SETTINGS_BAR
                     );
-                graphics.drawText(textRenderer, component, x, y + 1, 0xFF442000, false);
+                graphics.drawString(font, component, x, y + 1, 0xFF442000, false);
             }
 
             int milestoneX = valueBarX;
@@ -219,22 +219,22 @@ public class ValueSettingsScreen extends AbstractSimiScreen {
             onHover.accept(closest);
             if (soundCoolDown == 0) {
                 float pitch = (closest.value()) / (float) (board.maxValue());
-                pitch = MathHelper.lerp(pitch, 1.15f, 1.5f);
-                client.getSoundManager().play(PositionedSoundInstance.master(AllSoundEvents.SCROLL_VALUE.getMainEvent(), pitch, 0.25F));
+                pitch = Mth.lerp(pitch, 1.15f, 1.5f);
+                minecraft.getSoundManager().play(SimpleSoundInstance.forUI(AllSoundEvents.SCROLL_VALUE.getMainEvent(), pitch, 0.25F));
                 ScrollValueHandler.wrenchCog.bump(3, -(closest.value() - lastHovered.value()) * 10);
                 soundCoolDown = 1;
             }
         }
         lastHovered = closest;
 
-        Vec2f coordinate = getCoordinateOfValue(closest.row(), closest.value());
-        Text cursorText = board.formatter().format(closest);
+        Vec2 coordinate = getCoordinateOfValue(closest.row(), closest.value());
+        Component cursorText = board.formatter().format(closest);
 
         AllIcons cursorIcon = null;
         if (board.formatter() instanceof ScrollOptionSettingsFormatter sosf)
             cursorIcon = sosf.getIcon(closest);
 
-        int cursorWidth = ((cursorIcon != null ? 16 : textRenderer.getWidth(cursorText)) / 2) * 2 + 3;
+        int cursorWidth = ((cursorIcon != null ? 16 : font.width(cursorText)) / 2) * 2 + 3;
         int cursorX = ((int) (coordinate.x)) - cursorWidth / 2;
         int cursorY = ((int) (coordinate.y)) - 7;
 
@@ -242,10 +242,10 @@ public class ValueSettingsScreen extends AbstractSimiScreen {
             AllGuiTextures.VALUE_SETTINGS_CURSOR_ICON.render(graphics, cursorX - 2, cursorY - 3);
             cursorIcon.render(graphics, cursorX + 1, cursorY - 1, 0xFF431F00);
             if (fadeInWidth > fattestLabel)
-                graphics.drawText(
-                    textRenderer,
+                graphics.drawString(
+                    font,
                     cursorText,
-                    x - 11 - fatTipOffset + (bgWidth - textRenderer.getWidth(cursorText)) / 2,
+                    x - 11 - fatTipOffset + (bgWidth - font.width(cursorText)) / 2,
                     originalY + windowHeight + additionalHeight - 40,
                     0xFFFBDC7D,
                     false
@@ -257,10 +257,10 @@ public class ValueSettingsScreen extends AbstractSimiScreen {
         UIRenderHelper.drawCropped(graphics, cursorX, cursorY, cursorWidth, 14, AllGuiTextures.VALUE_SETTINGS_CURSOR);
         AllGuiTextures.VALUE_SETTINGS_CURSOR_RIGHT.render(graphics, cursorX + cursorWidth, cursorY);
 
-        graphics.drawText(textRenderer, cursorText, cursorX + 2, cursorY + 3, 0xFF442000, false);
+        graphics.drawString(font, cursorText, cursorX + 2, cursorY + 3, 0xFF442000, false);
     }
 
-    protected void renderBrassFrame(DrawContext graphics, int x, int y, int w, int h) {
+    protected void renderBrassFrame(GuiGraphics graphics, int x, int y, int w, int h) {
         AllGuiTextures.BRASS_FRAME_TL.render(graphics, x, y);
         AllGuiTextures.BRASS_FRAME_TR.render(graphics, x + w - 4, y);
         AllGuiTextures.BRASS_FRAME_BL.render(graphics, x, y + h - 4);
@@ -279,7 +279,7 @@ public class ValueSettingsScreen extends AbstractSimiScreen {
     }
 
     @Override
-    public void renderBackground(@NotNull DrawContext graphics, int pMouseX, int pMouseY, float pPartialTick) {
+    public void renderBackground(@NotNull GuiGraphics graphics, int pMouseX, int pMouseY, float pPartialTick) {
         int a = ((int) (0x50 * Math.min(1, (ticksOpen + pPartialTick) / 20f))) << 24;
         graphics.fillGradient(0, 0, this.width, this.height, 0x101010 | a, 0x101010 | a);
     }
@@ -296,7 +296,7 @@ public class ValueSettingsScreen extends AbstractSimiScreen {
     public boolean mouseScrolled(double pMouseX, double pMouseY, double pScrollX, double pScrollY) {
         ValueSettings closest = getClosestCoordinate((int) pMouseX, (int) pMouseY);
         int column = closest.value() + ((int) Math.signum(pScrollY)) * (AllKeys.hasShiftDown() ? board.milestoneInterval() : 1);
-        column = MathHelper.clamp(column, 0, board.maxValue());
+        column = Mth.clamp(column, 0, board.maxValue());
         if (column == closest.value())
             return false;
         setCursor(getCoordinateOfValue(closest.row(), column));
@@ -304,11 +304,11 @@ public class ValueSettingsScreen extends AbstractSimiScreen {
     }
 
     @Override
-    public boolean keyReleased(KeyInput input) {
-        if (client.options.useKey.matchesKey(input)) {
-            Window window = client.getWindow();
-            double x = client.mouse.getX() * window.getScaledWidth() / window.getWidth();
-            double y = client.mouse.getY() * window.getScaledHeight() / window.getHeight();
+    public boolean keyReleased(KeyEvent input) {
+        if (minecraft.options.keyUse.matches(input)) {
+            Window window = minecraft.getWindow();
+            double x = minecraft.mouseHandler.xpos() * window.getGuiScaledWidth() / window.getScreenWidth();
+            double y = minecraft.mouseHandler.ypos() * window.getGuiScaledHeight() / window.getScreenHeight();
             saveAndClose(x, y);
             return true;
         }
@@ -316,8 +316,8 @@ public class ValueSettingsScreen extends AbstractSimiScreen {
     }
 
     @Override
-    public boolean mouseReleased(Click click) {
-        if (client.options.useKey.matchesMouse(click)) {
+    public boolean mouseReleased(MouseButtonEvent click) {
+        if (minecraft.options.keyUse.matchesMouse(click)) {
             saveAndClose(click.x(), click.y());
             return true;
         }
@@ -326,7 +326,7 @@ public class ValueSettingsScreen extends AbstractSimiScreen {
 
     protected void saveAndClose(double pMouseX, double pMouseY) {
         ValueSettings closest = getClosestCoordinate((int) pMouseX, (int) pMouseY);
-        client.player.networkHandler.sendPacket(new ValueSettingsPacket(
+        minecraft.player.connection.send(new ValueSettingsPacket(
             pos,
             closest.row(),
             closest.value(),
@@ -336,12 +336,12 @@ public class ValueSettingsScreen extends AbstractSimiScreen {
             AllKeys.hasControlDown(),
             netId
         ));
-        close();
+        onClose();
     }
 
     @Override
-    public void close() {
-        super.close();
+    public void onClose() {
+        super.onClose();
     }
 
 }

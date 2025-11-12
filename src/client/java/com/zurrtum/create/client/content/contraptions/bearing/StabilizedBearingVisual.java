@@ -1,5 +1,6 @@
 package com.zurrtum.create.client.content.contraptions.bearing;
 
+import com.mojang.math.Axis;
 import com.zurrtum.create.client.AllPartialModels;
 import com.zurrtum.create.client.catnip.animation.AnimationTickHolder;
 import com.zurrtum.create.client.content.contraptions.render.ActorVisual;
@@ -12,10 +13,9 @@ import com.zurrtum.create.client.flywheel.lib.model.Models;
 import com.zurrtum.create.client.foundation.render.AllInstanceTypes;
 import com.zurrtum.create.client.foundation.virtualWorld.VirtualRenderWorld;
 import com.zurrtum.create.content.contraptions.behaviour.MovementContext;
-import net.minecraft.block.BlockState;
-import net.minecraft.state.property.Properties;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.RotationAxis;
+import net.minecraft.core.Direction;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import org.joml.Quaternionf;
 
 public class StabilizedBearingVisual extends ActorVisual {
@@ -24,7 +24,7 @@ public class StabilizedBearingVisual extends ActorVisual {
     final RotatingInstance shaft;
 
     final Direction facing;
-    final RotationAxis rotationAxis;
+    final Axis rotationAxis;
     final Quaternionf blockOrientation;
 
     public StabilizedBearingVisual(VisualizationContext visualizationContext, VirtualRenderWorld simulationWorld, MovementContext movementContext) {
@@ -32,8 +32,8 @@ public class StabilizedBearingVisual extends ActorVisual {
 
         BlockState blockState = movementContext.state;
 
-        facing = blockState.get(Properties.FACING);
-        rotationAxis = RotationAxis.of(Direction.get(Direction.AxisDirection.POSITIVE, facing.getAxis()).getUnitVector());
+        facing = blockState.getValue(BlockStateProperties.FACING);
+        rotationAxis = Axis.of(Direction.get(Direction.AxisDirection.POSITIVE, facing.getAxis()).step());
 
         blockOrientation = BearingVisual.getBlockStateOrientation(facing);
 
@@ -47,7 +47,7 @@ public class StabilizedBearingVisual extends ActorVisual {
         // not rotating so no need to set speed.
         var axis = KineticBlockEntityVisual.rotationAxis(blockState);
         shaft.setRotationAxis(axis).setRotationOffset(KineticBlockEntityVisual.rotationOffset(blockState, axis, movementContext.localPos))
-            .setPosition(movementContext.localPos).rotateToFace(Direction.SOUTH, blockState.get(Properties.FACING).getOpposite()).light(blockLight, 0)
+            .setPosition(movementContext.localPos).rotateToFace(Direction.SOUTH, blockState.getValue(BlockStateProperties.FACING).getOpposite()).light(blockLight, 0)
             .setChanged();
     }
 

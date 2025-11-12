@@ -4,8 +4,7 @@ import com.zurrtum.create.infrastructure.fluids.SidedFluidInventory;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
 import net.fabricmc.fabric.api.transfer.v1.storage.base.CombinedStorage;
 import net.fabricmc.fabric.api.transfer.v1.storage.base.SingleSlotStorage;
-import net.minecraft.util.math.Direction;
-
+import net.minecraft.core.Direction;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;

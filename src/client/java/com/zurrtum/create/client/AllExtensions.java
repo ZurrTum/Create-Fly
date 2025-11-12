@@ -8,13 +8,13 @@ import com.zurrtum.create.content.kinetics.belt.BeltBlock;
 import com.zurrtum.create.content.kinetics.belt.BeltBlockEntity;
 import com.zurrtum.create.content.kinetics.waterwheel.WaterWheelStructuralBlock;
 import com.zurrtum.create.content.trains.track.TrackBlockEntity;
-import net.minecraft.block.Block;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.client.render.BlockRenderLayer;
-import net.minecraft.client.render.entity.model.BipedEntityModel.ArmPose;
-import net.minecraft.item.Item;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.BlockRenderView;
+import net.minecraft.client.model.HumanoidModel.ArmPose;
+import net.minecraft.client.renderer.chunk.ChunkSectionLayer;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.level.BlockAndTintGetter;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.entity.BlockEntity;
 
 import java.util.HashSet;
 import java.util.IdentityHashMap;
@@ -23,7 +23,7 @@ import java.util.Set;
 import java.util.function.BiFunction;
 
 public class AllExtensions {
-    public static final Map<Block, BiFunction<BlockRenderView, BlockPos, BlockRenderLayer>> LAYER = new IdentityHashMap<>();
+    public static final Map<Block, BiFunction<BlockAndTintGetter, BlockPos, ChunkSectionLayer>> LAYER = new IdentityHashMap<>();
     public static final Map<Block, MultiPosDestructionHandler> MULTI_POS = new IdentityHashMap<>();
     public static final Set<Block> BIG_OUTLINE = new HashSet<>();
     public static final Map<Item, ArmPose> ARM_POSE = new IdentityHashMap<>();

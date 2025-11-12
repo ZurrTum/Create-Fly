@@ -12,9 +12,6 @@ import com.zurrtum.create.foundation.blockEntity.behaviour.inventory.TankManipul
 import com.zurrtum.create.foundation.utility.FluidFormatter;
 import com.zurrtum.create.infrastructure.fluids.FluidInventory;
 import com.zurrtum.create.infrastructure.fluids.FluidStack;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.fluid.Fluid;
-import net.minecraft.text.MutableText;
 import org.apache.commons.lang3.mutable.MutableInt;
 
 import java.util.Comparator;
@@ -22,10 +19,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.material.Fluid;
 
 public class FluidListDisplaySource extends ValueListDisplaySource {
     @Override
-    protected Stream<IntAttached<MutableText>> provideEntries(DisplayLinkContext context, int maxRows) {
+    protected Stream<IntAttached<MutableComponent>> provideEntries(DisplayLinkContext context, int maxRows) {
         BlockEntity sourceBE = context.getSourceBlockEntity();
         if (!(sourceBE instanceof SmartObserverBlockEntity cobe))
             return Stream.empty();
@@ -56,11 +56,11 @@ public class FluidListDisplaySource extends ValueListDisplaySource {
     }
 
     @Override
-    protected List<MutableText> createComponentsFromEntry(DisplayLinkContext context, IntAttached<MutableText> entry) {
+    protected List<MutableComponent> createComponentsFromEntry(DisplayLinkContext context, IntAttached<MutableComponent> entry) {
         int amount = entry.getFirst();
-        MutableText name = entry.getSecond().append(WHITESPACE);
+        MutableComponent name = entry.getSecond().append(WHITESPACE);
 
-        Couple<MutableText> formatted = FluidFormatter.asComponents(amount, shortenNumbers(context));
+        Couple<MutableComponent> formatted = FluidFormatter.asComponents(amount, shortenNumbers(context));
 
         return List.of(formatted.getFirst(), formatted.getSecond(), name);
     }

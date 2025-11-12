@@ -4,39 +4,39 @@ import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.mojang.serialization.Dynamic;
 import com.zurrtum.create.infrastructure.worldgen.AllPlacedFeatures;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.resource.ResourcePackManager;
-import net.minecraft.server.SaveLoader;
-import net.minecraft.server.integrated.IntegratedServerLoader;
-import net.minecraft.world.level.storage.LevelStorage;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.screens.worldselection.WorldOpenFlows;
+import net.minecraft.server.WorldStem;
+import net.minecraft.server.packs.repository.PackRepository;
+import net.minecraft.world.level.storage.LevelStorageSource;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 
-@Mixin(IntegratedServerLoader.class)
+@Mixin(WorldOpenFlows.class)
 public class IntegratedServerLoaderMixin {
-    @WrapOperation(method = "start(Lnet/minecraft/world/level/storage/LevelStorage$Session;Lcom/mojang/serialization/Dynamic;ZLjava/lang/Runnable;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/integrated/IntegratedServerLoader;load(Lcom/mojang/serialization/Dynamic;ZLnet/minecraft/resource/ResourcePackManager;)Lnet/minecraft/server/SaveLoader;"))
-    private SaveLoader addBiomeFeatures(
-        IntegratedServerLoader instance,
+    @WrapOperation(method = "openWorldLoadLevelStem(Lnet/minecraft/world/level/storage/LevelStorageSource$LevelStorageAccess;Lcom/mojang/serialization/Dynamic;ZLjava/lang/Runnable;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/worldselection/WorldOpenFlows;loadWorldStem(Lcom/mojang/serialization/Dynamic;ZLnet/minecraft/server/packs/repository/PackRepository;)Lnet/minecraft/server/WorldStem;"))
+    private WorldStem addBiomeFeatures(
+        WorldOpenFlows instance,
         Dynamic<?> levelProperties,
         boolean safeMode,
-        ResourcePackManager dataPackManager,
-        Operation<SaveLoader> original
+        PackRepository dataPackManager,
+        Operation<WorldStem> original
     ) {
-        SaveLoader loader = original.call(instance, levelProperties, safeMode, dataPackManager);
-        AllPlacedFeatures.register(loader.combinedDynamicRegistries().getCombinedRegistryManager());
+        WorldStem loader = original.call(instance, levelProperties, safeMode, dataPackManager);
+        AllPlacedFeatures.register(loader.registries().compositeAccess());
         return loader;
     }
 
-    @WrapOperation(method = "startNewWorld(Lnet/minecraft/world/level/storage/LevelStorage$Session;Lnet/minecraft/server/DataPackContents;Lnet/minecraft/registry/CombinedDynamicRegistries;Lnet/minecraft/world/SaveProperties;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/MinecraftClient;startIntegratedServer(Lnet/minecraft/world/level/storage/LevelStorage$Session;Lnet/minecraft/resource/ResourcePackManager;Lnet/minecraft/server/SaveLoader;Z)V"))
+    @WrapOperation(method = "createLevelFromExistingSettings(Lnet/minecraft/world/level/storage/LevelStorageSource$LevelStorageAccess;Lnet/minecraft/server/ReloadableServerResources;Lnet/minecraft/core/LayeredRegistryAccess;Lnet/minecraft/world/level/storage/WorldData;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/Minecraft;doWorldLoad(Lnet/minecraft/world/level/storage/LevelStorageSource$LevelStorageAccess;Lnet/minecraft/server/packs/repository/PackRepository;Lnet/minecraft/server/WorldStem;Z)V"))
     private void addBiomeFeatures(
-        MinecraftClient instance,
-        LevelStorage.Session session,
-        ResourcePackManager dataPackManager,
-        SaveLoader saveLoader,
+        Minecraft instance,
+        LevelStorageSource.LevelStorageAccess session,
+        PackRepository dataPackManager,
+        WorldStem saveLoader,
         boolean newWorld,
         Operation<Void> original
     ) {
-        AllPlacedFeatures.register(saveLoader.combinedDynamicRegistries().getCombinedRegistryManager());
+        AllPlacedFeatures.register(saveLoader.registries().compositeAccess());
         original.call(instance, session, dataPackManager, saveLoader, newWorld);
     }
 }

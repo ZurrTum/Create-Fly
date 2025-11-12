@@ -2,7 +2,7 @@ package com.zurrtum.create.client.flywheel.backend.engine;
 
 import com.zurrtum.create.client.flywheel.api.material.*;
 import com.zurrtum.create.client.flywheel.backend.MaterialShaderIndices;
-import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.Mth;
 
 // Materials are unpacked in "flywheel:flywheel/internal/packed_material.glsl"
 public final class MaterialEncoder {
@@ -11,12 +11,12 @@ public final class MaterialEncoder {
     private static final int MIPMAP_LENGTH = 1;
     private static final int BACKFACE_CULLING_LENGTH = 1;
     private static final int POLYGON_OFFSET_LENGTH = 1;
-    private static final int DEPTH_TEST_LENGTH = MathHelper.ceilLog2(DepthTest.values().length);
-    private static final int TRANSPARENCY_LENGTH = MathHelper.ceilLog2(Transparency.values().length);
-    private static final int WRITE_MASK_LENGTH = MathHelper.ceilLog2(WriteMask.values().length);
+    private static final int DEPTH_TEST_LENGTH = Mth.ceillog2(DepthTest.values().length);
+    private static final int TRANSPARENCY_LENGTH = Mth.ceillog2(Transparency.values().length);
+    private static final int WRITE_MASK_LENGTH = Mth.ceillog2(WriteMask.values().length);
     private static final int USE_OVERLAY_LENGTH = 1;
     private static final int USE_LIGHT_LENGTH = 1;
-    private static final int CARDINAL_LIGHTING_MODE_LENGTH = MathHelper.ceilLog2(CardinalLightingMode.values().length);
+    private static final int CARDINAL_LIGHTING_MODE_LENGTH = Mth.ceillog2(CardinalLightingMode.values().length);
 
     // The bit offset of each property
     private static final int BLUR_OFFSET = 0;

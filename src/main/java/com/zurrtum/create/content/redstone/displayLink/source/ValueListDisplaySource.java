@@ -8,33 +8,33 @@ import com.zurrtum.create.content.redstone.displayLink.target.DisplayTargetStats
 import com.zurrtum.create.content.trains.display.FlapDisplayBlockEntity;
 import com.zurrtum.create.content.trains.display.FlapDisplayLayout;
 import com.zurrtum.create.content.trains.display.FlapDisplaySection;
-import net.minecraft.block.entity.LecternBlockEntity;
-import net.minecraft.text.MutableText;
-import net.minecraft.text.Text;
 import org.apache.commons.lang3.mutable.MutableInt;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Stream;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.world.level.block.entity.LecternBlockEntity;
 
 import static com.zurrtum.create.content.trains.display.FlapDisplaySection.MONOSPACE;
 
 public abstract class ValueListDisplaySource extends DisplaySource {
 
-    protected abstract Stream<IntAttached<MutableText>> provideEntries(DisplayLinkContext context, int maxRows);
+    protected abstract Stream<IntAttached<MutableComponent>> provideEntries(DisplayLinkContext context, int maxRows);
 
     protected abstract boolean valueFirst();
 
     @Override
-    public List<MutableText> provideText(DisplayLinkContext context, DisplayTargetStats stats) {
+    public List<MutableComponent> provideText(DisplayLinkContext context, DisplayTargetStats stats) {
         boolean isBook = context.getTargetBlockEntity() instanceof LecternBlockEntity;
 
-        List<MutableText> list = provideEntries(
+        List<MutableComponent> list = provideEntries(
             context,
             stats.maxRows() * (isBook ? ENTRIES_PER_PAGE : 1)
         ).map(e -> createComponentsFromEntry(context, e)).map(l -> {
-            MutableText combined = l.get(0).append(l.get(1));
+            MutableComponent combined = l.get(0).append(l.get(1));
             if (l.size() > 2)
                 combined.append(l.get(2));
             return combined;
@@ -48,16 +48,16 @@ public abstract class ValueListDisplaySource extends DisplaySource {
 
     static final int ENTRIES_PER_PAGE = 8;
 
-    private List<MutableText> condensePages(List<MutableText> list) {
-        List<MutableText> condensed = new ArrayList<>();
-        MutableText current = null;
+    private List<MutableComponent> condensePages(List<MutableComponent> list) {
+        List<MutableComponent> condensed = new ArrayList<>();
+        MutableComponent current = null;
         for (int i = 0; i < list.size(); i++) {
-            MutableText atIndex = list.get(i);
+            MutableComponent atIndex = list.get(i);
             if (current == null) {
                 current = atIndex;
                 continue;
             }
-            current.append(Text.literal("\n")).append(atIndex);
+            current.append(Component.literal("\n")).append(atIndex);
             if ((i + 1) % ENTRIES_PER_PAGE == 0) {
                 condensed.add(current);
                 current = null;
@@ -70,7 +70,7 @@ public abstract class ValueListDisplaySource extends DisplaySource {
     }
 
     @Override
-    public List<List<MutableText>> provideFlapDisplayText(DisplayLinkContext context, DisplayTargetStats stats) {
+    public List<List<MutableComponent>> provideFlapDisplayText(DisplayLinkContext context, DisplayTargetStats stats) {
         MutableInt highest = new MutableInt(0);
         context.flapDisplayContext = highest;
         return provideEntries(context, stats.maxRows()).map(e -> {
@@ -79,12 +79,12 @@ public abstract class ValueListDisplaySource extends DisplaySource {
         }).toList();
     }
 
-    protected List<MutableText> createComponentsFromEntry(DisplayLinkContext context, IntAttached<MutableText> entry) {
+    protected List<MutableComponent> createComponentsFromEntry(DisplayLinkContext context, IntAttached<MutableComponent> entry) {
         int number = entry.getFirst();
-        MutableText name = entry.getSecond().append(WHITESPACE);
+        MutableComponent name = entry.getSecond().append(WHITESPACE);
 
         if (shortenNumbers(context)) {
-            Couple<MutableText> shortened = shorten(number);
+            Couple<MutableComponent> shortened = shorten(number);
             return valueFirst() ? Arrays.asList(shortened.getFirst(), shortened.getSecond(), name) : Arrays.asList(
                 name,
                 shortened.getFirst(),
@@ -92,7 +92,7 @@ public abstract class ValueListDisplaySource extends DisplaySource {
             );
         }
 
-        MutableText formattedNumber = Text.literal(String.valueOf(number)).append(WHITESPACE);
+        MutableComponent formattedNumber = Component.literal(String.valueOf(number)).append(WHITESPACE);
         return valueFirst() ? Arrays.asList(formattedNumber, name) : Arrays.asList(name, formattedNumber);
     }
 
@@ -123,24 +123,24 @@ public abstract class ValueListDisplaySource extends DisplaySource {
         layout.configure(layoutKey, valueFirst ? Arrays.asList(value, name) : Arrays.asList(name, value));
     }
 
-    private Couple<MutableText> shorten(int number) {
+    private Couple<MutableComponent> shorten(int number) {
         if (number >= 1000000) {
             return Couple.create(
-                Text.literal(String.valueOf(number / 1000000)),
-                Text.translatable("create.display_source.value_list.million").append(WHITESPACE)
+                Component.literal(String.valueOf(number / 1000000)),
+                Component.translatable("create.display_source.value_list.million").append(WHITESPACE)
             );
         }
         if (number >= 1000) {
             return Couple.create(
-                Text.literal(String.valueOf(number / 1000)),
-                Text.translatable("create.display_source.value_list.thousand").append(WHITESPACE)
+                Component.literal(String.valueOf(number / 1000)),
+                Component.translatable("create.display_source.value_list.thousand").append(WHITESPACE)
             );
         }
-        return Couple.create(Text.literal(String.valueOf(number)), WHITESPACE);
+        return Couple.create(Component.literal(String.valueOf(number)), WHITESPACE);
     }
 
     protected boolean shortenNumbers(DisplayLinkContext context) {
-        return context.sourceConfig().getInt("Format", 0) == 0;
+        return context.sourceConfig().getIntOr("Format", 0) == 0;
     }
 
 }

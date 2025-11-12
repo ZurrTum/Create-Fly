@@ -12,11 +12,10 @@ import com.zurrtum.create.client.flywheel.lib.model.Models;
 import com.zurrtum.create.client.foundation.render.AllInstanceTypes;
 import com.zurrtum.create.content.kinetics.base.IRotate;
 import com.zurrtum.create.content.kinetics.transmission.SplitShaftBlockEntity;
-import net.minecraft.block.Block;
-import net.minecraft.util.math.Direction;
-
 import java.util.ArrayList;
 import java.util.function.Consumer;
+import net.minecraft.core.Direction;
+import net.minecraft.world.level.block.Block;
 
 public class SplitShaftVisual extends KineticBlockEntityVisual<SplitShaftBlockEntity> {
 

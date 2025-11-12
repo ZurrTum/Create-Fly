@@ -10,13 +10,12 @@ import com.zurrtum.create.content.kinetics.base.KineticBlockEntity;
 import com.zurrtum.create.foundation.advancement.CreateTrigger;
 import com.zurrtum.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.infrastructure.fluids.FluidStack;
-import net.minecraft.block.BlockState;
-import net.minecraft.storage.ReadView;
-import net.minecraft.storage.WriteView;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
-
 import java.util.List;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
+import net.minecraft.world.phys.AABB;
 
 public class HosePulleyBlockEntity extends KineticBlockEntity {
 
@@ -32,7 +31,7 @@ public class HosePulleyBlockEntity extends KineticBlockEntity {
         super(AllBlockEntityTypes.HOSE_PULLEY, pos, state);
         offset = LerpedFloat.linear().startWithValue(0);
         isMoving = true;
-        handler = new HosePulleyFluidHandler(this, filler, drainer, () -> pos.down((int) Math.ceil(offset.getValue())), () -> !this.isMoving);
+        handler = new HosePulleyFluidHandler(this, filler, drainer, () -> pos.below((int) Math.ceil(offset.getValue())), () -> !this.isMoving);
     }
 
     @Override
@@ -56,7 +55,7 @@ public class HosePulleyBlockEntity extends KineticBlockEntity {
     }
 
     protected void onTankContentsChanged(FluidStack contents) {
-        markDirty();
+        setChanged();
     }
 
     @Override
@@ -72,7 +71,7 @@ public class HosePulleyBlockEntity extends KineticBlockEntity {
             float newOffset = offset.getValue() + getMovementSpeed();
             if (newOffset < 0)
                 isMoving = false;
-            if (!world.getBlockState(pos.down((int) Math.ceil(newOffset))).isReplaceable()) {
+            if (!level.getBlockState(worldPosition.below((int) Math.ceil(newOffset))).canBeReplaced()) {
                 isMoving = false;
             }
             if (isMoving) {
@@ -85,8 +84,8 @@ public class HosePulleyBlockEntity extends KineticBlockEntity {
     }
 
     @Override
-    protected Box createRenderBoundingBox() {
-        return super.createRenderBoundingBox().stretch(0, -offset.getValue(), 0);
+    protected AABB createRenderBoundingBox() {
+        return super.createRenderBoundingBox().expandTowards(0, -offset.getValue(), 0);
     }
 
     @Override
@@ -97,7 +96,7 @@ public class HosePulleyBlockEntity extends KineticBlockEntity {
             newOffset = 0;
             isMoving = false;
         }
-        if (!world.getBlockState(pos.down((int) Math.ceil(newOffset))).isReplaceable()) {
+        if (!level.getBlockState(worldPosition.below((int) Math.ceil(newOffset))).canBeReplaced()) {
             newOffset = (int) newOffset;
             isMoving = false;
         }
@@ -111,13 +110,13 @@ public class HosePulleyBlockEntity extends KineticBlockEntity {
     @Override
     public void lazyTick() {
         super.lazyTick();
-        if (world.isClient())
+        if (level.isClientSide())
             return;
         if (isMoving)
             return;
 
         int ceil = (int) Math.ceil(offset.getValue() + getMovementSpeed());
-        if (getMovementSpeed() > 0 && world.getBlockState(pos.down(ceil)).isReplaceable()) {
+        if (getMovementSpeed() > 0 && level.getBlockState(worldPosition.below(ceil)).canBeReplaced()) {
             isMoving = true;
             drainer.reset();
             filler.reset();
@@ -128,10 +127,10 @@ public class HosePulleyBlockEntity extends KineticBlockEntity {
     }
 
     @Override
-    protected void write(WriteView view, boolean clientPacket) {
+    protected void write(ValueOutput view, boolean clientPacket) {
         if (clientPacket)
             offset.forceNextSync();
-        offset.write(view.get("Offset"));
+        offset.write(view.child("Offset"));
         handler.write(view);
         super.write(view, clientPacket);
         if (clientPacket)
@@ -139,17 +138,17 @@ public class HosePulleyBlockEntity extends KineticBlockEntity {
     }
 
     @Override
-    protected void read(ReadView view, boolean clientPacket) {
-        offset.read(view.getReadView("Offset"), clientPacket);
+    protected void read(ValueInput view, boolean clientPacket) {
+        offset.read(view.childOrEmpty("Offset"), clientPacket);
         handler.read(view);
         super.read(view, clientPacket);
         if (clientPacket)
-            infinite = view.getBoolean("Infinite", false);
+            infinite = view.getBooleanOr("Infinite", false);
     }
 
     public float getMovementSpeed() {
         float movementSpeed = convertToLinear(getSpeed());
-        if (world.isClient())
+        if (level.isClientSide())
             movementSpeed *= AllClientHandle.INSTANCE.getServerSpeed();
         return movementSpeed;
     }

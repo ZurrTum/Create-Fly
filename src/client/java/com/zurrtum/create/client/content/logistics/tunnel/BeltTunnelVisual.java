@@ -10,11 +10,10 @@ import com.zurrtum.create.client.flywheel.lib.model.Models;
 import com.zurrtum.create.client.flywheel.lib.visual.AbstractBlockEntityVisual;
 import com.zurrtum.create.client.flywheel.lib.visual.SimpleDynamicVisual;
 import com.zurrtum.create.content.logistics.tunnel.BeltTunnelBlockEntity;
-import net.minecraft.util.math.Direction;
-
 import java.util.EnumMap;
 import java.util.Map;
 import java.util.function.Consumer;
+import net.minecraft.core.Direction;
 
 public class BeltTunnelVisual extends AbstractBlockEntityVisual<BeltTunnelBlockEntity> implements SimpleDynamicVisual {
 

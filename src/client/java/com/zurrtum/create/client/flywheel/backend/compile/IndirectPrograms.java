@@ -16,21 +16,21 @@ import com.zurrtum.create.client.flywheel.backend.glsl.ShaderSources;
 import com.zurrtum.create.client.flywheel.backend.glsl.SourceComponent;
 import com.zurrtum.create.client.flywheel.backend.util.AtomicReferenceCounted;
 import com.zurrtum.create.client.flywheel.lib.util.ResourceUtil;
-import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
+import net.minecraft.resources.ResourceLocation;
 
 public class IndirectPrograms extends AtomicReferenceCounted {
-    private static final Identifier CULL_SHADER_API_IMPL = ResourceUtil.rl("internal/indirect/cull_api_impl.glsl");
-    private static final Identifier CULL_SHADER_MAIN = ResourceUtil.rl("internal/indirect/cull.glsl");
-    private static final Identifier APPLY_SHADER_MAIN = ResourceUtil.rl("internal/indirect/apply.glsl");
-    private static final Identifier SCATTER_SHADER_MAIN = ResourceUtil.rl("internal/indirect/scatter.glsl");
-    private static final Identifier DOWNSAMPLE_FIRST = ResourceUtil.rl("internal/indirect/downsample_first.glsl");
-    private static final Identifier DOWNSAMPLE_SECOND = ResourceUtil.rl("internal/indirect/downsample_second.glsl");
+    private static final ResourceLocation CULL_SHADER_API_IMPL = ResourceUtil.rl("internal/indirect/cull_api_impl.glsl");
+    private static final ResourceLocation CULL_SHADER_MAIN = ResourceUtil.rl("internal/indirect/cull.glsl");
+    private static final ResourceLocation APPLY_SHADER_MAIN = ResourceUtil.rl("internal/indirect/apply.glsl");
+    private static final ResourceLocation SCATTER_SHADER_MAIN = ResourceUtil.rl("internal/indirect/scatter.glsl");
+    private static final ResourceLocation DOWNSAMPLE_FIRST = ResourceUtil.rl("internal/indirect/downsample_first.glsl");
+    private static final ResourceLocation DOWNSAMPLE_SECOND = ResourceUtil.rl("internal/indirect/downsample_second.glsl");
 
     private static final Compile<InstanceType<?>> CULL = new Compile<>();
-    private static final Compile<Identifier> UTIL = new Compile<>();
+    private static final Compile<ResourceLocation> UTIL = new Compile<>();
 
     private static final List<String> EXTENSIONS = getExtensions(GlCompat.MAX_GLSL_VERSION);
     private static final List<String> COMPUTE_EXTENSIONS = getComputeExtensions(GlCompat.MAX_GLSL_VERSION);
@@ -40,13 +40,13 @@ public class IndirectPrograms extends AtomicReferenceCounted {
 
     private final PipelineCompiler pipeline;
     private final CompilationHarness<InstanceType<?>> culling;
-    private final CompilationHarness<Identifier> utils;
+    private final CompilationHarness<ResourceLocation> utils;
     private final OitPrograms oitPrograms;
 
     private IndirectPrograms(
         PipelineCompiler pipeline,
         CompilationHarness<InstanceType<?>> culling,
-        CompilationHarness<Identifier> utils,
+        CompilationHarness<ResourceLocation> utils,
         OitPrograms oitPrograms
     ) {
         this.pipeline = pipeline;
@@ -114,7 +114,7 @@ public class IndirectPrograms extends AtomicReferenceCounted {
     /**
      * A compiler for utility shaders, directly compiles the shader at the resource location specified by the parameter.
      */
-    private static CompilationHarness<Identifier> createUtilCompiler(ShaderSources sources) {
+    private static CompilationHarness<ResourceLocation> createUtilCompiler(ShaderSources sources) {
         return UTIL.program().link(UTIL.shader(GlCompat.MAX_GLSL_VERSION, ShaderType.COMPUTE)
                 .nameMapper(resourceLocation -> "utilities/" + ResourceUtil.toDebugFileNameNoExtension(resourceLocation))
                 .requireExtensions(COMPUTE_EXTENSIONS).define("_FLW_SUBGROUP_SIZE", GlCompat.SUBGROUP_SIZE).withResource(s -> s))

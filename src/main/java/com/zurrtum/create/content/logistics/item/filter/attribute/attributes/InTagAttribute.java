@@ -5,29 +5,29 @@ import com.zurrtum.create.AllItemAttributeTypes;
 import com.zurrtum.create.content.logistics.item.filter.attribute.ItemAttribute;
 import com.zurrtum.create.content.logistics.item.filter.attribute.ItemAttributeType;
 import io.netty.buffer.ByteBuf;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.network.RegistryByteBuf;
-import net.minecraft.network.codec.PacketCodec;
-import net.minecraft.registry.RegistryKeys;
-import net.minecraft.registry.tag.ItemTags;
-import net.minecraft.registry.tag.TagKey;
-import net.minecraft.world.World;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 import java.util.stream.Collectors;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.tags.ItemTags;
+import net.minecraft.tags.TagKey;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
 
 public record InTagAttribute(TagKey<Item> tag) implements ItemAttribute {
-    public static final MapCodec<InTagAttribute> CODEC = TagKey.codec(RegistryKeys.ITEM).xmap(InTagAttribute::new, InTagAttribute::tag)
+    public static final MapCodec<InTagAttribute> CODEC = TagKey.hashedCodec(Registries.ITEM).xmap(InTagAttribute::new, InTagAttribute::tag)
         .fieldOf("value");
 
-    public static final PacketCodec<ByteBuf, InTagAttribute> PACKET_CODEC = TagKey.packetCodec(RegistryKeys.ITEM)
-        .xmap(InTagAttribute::new, InTagAttribute::tag);
+    public static final StreamCodec<ByteBuf, InTagAttribute> PACKET_CODEC = TagKey.streamCodec(Registries.ITEM)
+        .map(InTagAttribute::new, InTagAttribute::tag);
 
     @Override
-    public boolean appliesTo(ItemStack stack, World level) {
-        return stack.isIn(tag);
+    public boolean appliesTo(ItemStack stack, Level level) {
+        return stack.is(tag);
     }
 
     @Override
@@ -37,7 +37,7 @@ public record InTagAttribute(TagKey<Item> tag) implements ItemAttribute {
 
     @Override
     public Object[] getTranslationParameters() {
-        return new Object[]{"#" + tag.id()};
+        return new Object[]{"#" + tag.location()};
     }
 
     @Override
@@ -52,8 +52,8 @@ public record InTagAttribute(TagKey<Item> tag) implements ItemAttribute {
         }
 
         @Override
-        public List<ItemAttribute> getAllAttributes(ItemStack stack, World level) {
-            return stack.streamTags().map(InTagAttribute::new).collect(Collectors.toList());
+        public List<ItemAttribute> getAllAttributes(ItemStack stack, Level level) {
+            return stack.getTags().map(InTagAttribute::new).collect(Collectors.toList());
         }
 
         @Override
@@ -62,7 +62,7 @@ public record InTagAttribute(TagKey<Item> tag) implements ItemAttribute {
         }
 
         @Override
-        public PacketCodec<? super RegistryByteBuf, ? extends ItemAttribute> packetCodec() {
+        public StreamCodec<? super RegistryFriendlyByteBuf, ? extends ItemAttribute> packetCodec() {
             return PACKET_CODEC;
         }
     }

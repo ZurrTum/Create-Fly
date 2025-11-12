@@ -1,25 +1,25 @@
 package com.zurrtum.create.client.content.schematics.client;
 
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.zurrtum.create.catnip.animation.LerpedFloat;
 import com.zurrtum.create.catnip.animation.LerpedFloat.Chaser;
 import com.zurrtum.create.catnip.math.VecHelper;
 import com.zurrtum.create.client.catnip.animation.AnimationTickHolder;
 import com.zurrtum.create.client.flywheel.lib.transform.TransformStack;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.structure.StructurePlacementData;
-import net.minecraft.util.BlockMirror;
-import net.minecraft.util.BlockRotation;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.math.Direction.Axis;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction.Axis;
+import net.minecraft.world.level.block.Mirror;
+import net.minecraft.world.level.block.Rotation;
+import net.minecraft.world.level.levelgen.structure.templatesystem.StructurePlaceSettings;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
 
 import static java.lang.Math.abs;
 
 public class SchematicTransformation {
 
-    private Vec3d chasingPos;
-    private Vec3d prevChasingPos;
+    private Vec3 chasingPos;
+    private Vec3 prevChasingPos;
     private BlockPos target;
 
     private LerpedFloat scaleFrontBack, scaleLeftRight;
@@ -28,36 +28,36 @@ public class SchematicTransformation {
     private double zOrigin;
 
     public SchematicTransformation() {
-        chasingPos = Vec3d.ZERO;
-        prevChasingPos = Vec3d.ZERO;
-        target = BlockPos.ORIGIN;
+        chasingPos = Vec3.ZERO;
+        prevChasingPos = Vec3.ZERO;
+        target = BlockPos.ZERO;
         scaleFrontBack = LerpedFloat.linear();
         scaleLeftRight = LerpedFloat.linear();
         rotation = LerpedFloat.angular();
     }
 
-    public void init(BlockPos anchor, StructurePlacementData settings, Box bounds) {
-        int leftRight = settings.getMirror() == BlockMirror.LEFT_RIGHT ? -1 : 1;
-        int frontBack = settings.getMirror() == BlockMirror.FRONT_BACK ? -1 : 1;
+    public void init(BlockPos anchor, StructurePlaceSettings settings, AABB bounds) {
+        int leftRight = settings.getMirror() == Mirror.LEFT_RIGHT ? -1 : 1;
+        int frontBack = settings.getMirror() == Mirror.FRONT_BACK ? -1 : 1;
         getScaleFB().chase(0, 0.45f, Chaser.EXP).startWithValue(frontBack);
         getScaleLR().chase(0, 0.45f, Chaser.EXP).startWithValue(leftRight);
-        xOrigin = bounds.getLengthX() / 2f;
-        zOrigin = bounds.getLengthZ() / 2f;
+        xOrigin = bounds.getXsize() / 2f;
+        zOrigin = bounds.getZsize() / 2f;
 
         int r = -(settings.getRotation().ordinal() * 90);
         rotation.chase(0, 0.45f, Chaser.EXP).startWithValue(r);
 
         target = fromAnchor(anchor);
-        chasingPos = Vec3d.of(target);
+        chasingPos = Vec3.atLowerCornerOf(target);
         prevChasingPos = chasingPos;
     }
 
-    public void applyTransformations(MatrixStack ms, Vec3d camera) {
+    public void applyTransformations(PoseStack ms, Vec3 camera) {
         float pt = AnimationTickHolder.getPartialTicks();
 
         // Translation
         TransformStack.of(ms).translate(VecHelper.lerp(pt, prevChasingPos, chasingPos).subtract(camera));
-        Vec3d rotationOffset = getRotationOffset(true);
+        Vec3 rotationOffset = getRotationOffset(true);
 
         // Rotation & Mirror
         float fb = getScaleFB().getValue(pt);
@@ -74,8 +74,8 @@ public class SchematicTransformation {
         return getMirrorModifier(Axis.X) < 0 != getMirrorModifier(Axis.Z) < 0;
     }
 
-    public Vec3d getRotationOffset(boolean ignoreMirrors) {
-        Vec3d rotationOffset = Vec3d.ZERO;
+    public Vec3 getRotationOffset(boolean ignoreMirrors) {
+        Vec3 rotationOffset = Vec3.ZERO;
         if ((int) (zOrigin * 2) % 2 != (int) (xOrigin * 2) % 2) {
             boolean xGreaterZ = xOrigin > zOrigin;
             float xIn = (xGreaterZ ? 0 : .5f);
@@ -84,14 +84,14 @@ public class SchematicTransformation {
                 xIn *= getMirrorModifier(Axis.X);
                 zIn *= getMirrorModifier(Axis.Z);
             }
-            rotationOffset = new Vec3d(xIn, 0, zIn);
+            rotationOffset = new Vec3(xIn, 0, zIn);
         }
         return rotationOffset;
     }
 
-    public Vec3d toLocalSpace(Vec3d vec) {
+    public Vec3 toLocalSpace(Vec3 vec) {
         float pt = AnimationTickHolder.getPartialTicks();
-        Vec3d rotationOffset = getRotationOffset(true);
+        Vec3 rotationOffset = getRotationOffset(true);
 
         vec = vec.subtract(VecHelper.lerp(pt, prevChasingPos, chasingPos));
         vec = vec.subtract(xOrigin + rotationOffset.x, 0, zOrigin + rotationOffset.z);
@@ -103,8 +103,8 @@ public class SchematicTransformation {
         return vec;
     }
 
-    public StructurePlacementData toSettings() {
-        StructurePlacementData settings = new StructurePlacementData();
+    public StructurePlaceSettings toSettings() {
+        StructurePlaceSettings settings = new StructurePlaceSettings();
 
         int i = (int) rotation.getChaseTarget();
 
@@ -118,50 +118,50 @@ public class SchematicTransformation {
         if (i < 0)
             i += 360;
 
-        BlockRotation rotation = BlockRotation.NONE;
+        Rotation rotation = Rotation.NONE;
         switch (i) {
             case 90:
-                rotation = BlockRotation.COUNTERCLOCKWISE_90;
+                rotation = Rotation.COUNTERCLOCKWISE_90;
                 break;
             case 180:
-                rotation = BlockRotation.CLOCKWISE_180;
+                rotation = Rotation.CLOCKWISE_180;
                 break;
             case 270:
-                rotation = BlockRotation.CLOCKWISE_90;
+                rotation = Rotation.CLOCKWISE_90;
                 break;
             default:
         }
 
         settings.setRotation(rotation);
         if (mirrorfb)
-            settings.setMirror(BlockMirror.FRONT_BACK);
+            settings.setMirror(Mirror.FRONT_BACK);
         if (mirrorlr)
-            settings.setMirror(BlockMirror.LEFT_RIGHT);
+            settings.setMirror(Mirror.LEFT_RIGHT);
 
         return settings;
     }
 
     public BlockPos getAnchor() {
-        Vec3d vec = Vec3d.ZERO.add(.5, 0, .5);
-        Vec3d rotationOffset = getRotationOffset(false);
+        Vec3 vec = Vec3.ZERO.add(.5, 0, .5);
+        Vec3 rotationOffset = getRotationOffset(false);
         vec = vec.subtract(xOrigin, 0, zOrigin);
         vec = vec.subtract(rotationOffset.x, 0, rotationOffset.z);
         vec = vec.multiply(getScaleFB().getChaseTarget(), 1, getScaleLR().getChaseTarget());
         vec = VecHelper.rotate(vec, rotation.getChaseTarget(), Axis.Y);
         vec = vec.add(xOrigin, 0, zOrigin);
         vec = vec.add(target.getX(), target.getY(), target.getZ());
-        return BlockPos.ofFloored(vec.x, vec.y, vec.z);
+        return BlockPos.containing(vec.x, vec.y, vec.z);
     }
 
     public BlockPos fromAnchor(BlockPos pos) {
-        Vec3d vec = Vec3d.ZERO.add(.5, 0, .5);
-        Vec3d rotationOffset = getRotationOffset(false);
+        Vec3 vec = Vec3.ZERO.add(.5, 0, .5);
+        Vec3 rotationOffset = getRotationOffset(false);
         vec = vec.subtract(xOrigin, 0, zOrigin);
         vec = vec.subtract(rotationOffset.x, 0, rotationOffset.z);
         vec = vec.multiply(getScaleFB().getChaseTarget(), 1, getScaleLR().getChaseTarget());
         vec = VecHelper.rotate(vec, rotation.getChaseTarget(), Axis.Y);
         vec = vec.add(xOrigin, 0, zOrigin);
-        return pos.subtract(BlockPos.ofFloored(vec.x, vec.y, vec.z));
+        return pos.subtract(BlockPos.containing(vec.x, vec.y, vec.z));
     }
 
     public int getRotationTarget() {
@@ -181,7 +181,7 @@ public class SchematicTransformation {
 
     public void tick() {
         prevChasingPos = chasingPos;
-        chasingPos = VecHelper.lerp(0.45f, chasingPos, Vec3d.of(target));
+        chasingPos = VecHelper.lerp(0.45f, chasingPos, Vec3.atLowerCornerOf(target));
         getScaleLR().tickChaser();
         getScaleFB().tickChaser();
         rotation.tickChaser();
@@ -199,11 +199,11 @@ public class SchematicTransformation {
     }
 
     public void move(int xIn, int yIn, int zIn) {
-        moveTo(target.add(xIn, yIn, zIn));
+        moveTo(target.offset(xIn, yIn, zIn));
     }
 
     public void startAt(BlockPos pos) {
-        chasingPos = Vec3d.of(pos);
+        chasingPos = Vec3.atLowerCornerOf(pos);
         prevChasingPos = chasingPos;
         moveTo(pos);
     }

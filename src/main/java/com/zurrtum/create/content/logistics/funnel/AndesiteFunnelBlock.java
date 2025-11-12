@@ -1,21 +1,21 @@
 package com.zurrtum.create.content.logistics.funnel;
 
 import com.zurrtum.create.AllBlocks;
-import net.minecraft.block.BlockState;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.world.BlockView;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.block.state.BlockState;
 
 public class AndesiteFunnelBlock extends FunnelBlock {
 
-    public AndesiteFunnelBlock(Settings p_i48415_1_) {
+    public AndesiteFunnelBlock(Properties p_i48415_1_) {
         super(p_i48415_1_);
     }
 
     @Override
-    public BlockState getEquivalentBeltFunnel(BlockView world, BlockPos pos, BlockState state) {
+    public BlockState getEquivalentBeltFunnel(BlockGetter world, BlockPos pos, BlockState state) {
         Direction facing = getFunnelFacing(state);
-        return AllBlocks.ANDESITE_BELT_FUNNEL.getDefaultState().with(BeltFunnelBlock.HORIZONTAL_FACING, facing).with(POWERED, state.get(POWERED));
+        return AllBlocks.ANDESITE_BELT_FUNNEL.defaultBlockState().setValue(BeltFunnelBlock.HORIZONTAL_FACING, facing).setValue(POWERED, state.getValue(POWERED));
     }
 
 }

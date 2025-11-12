@@ -1,20 +1,20 @@
 package com.zurrtum.create.content.logistics.item.filter.attribute;
 
 import com.mojang.serialization.MapCodec;
-import net.minecraft.item.ItemStack;
-import net.minecraft.network.RegistryByteBuf;
-import net.minecraft.network.codec.PacketCodec;
-import net.minecraft.world.World;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
 
 public interface ItemAttributeType {
     @NotNull ItemAttribute createAttribute();
 
-    List<ItemAttribute> getAllAttributes(ItemStack stack, World level);
+    List<ItemAttribute> getAllAttributes(ItemStack stack, Level level);
 
     MapCodec<? extends ItemAttribute> codec();
 
-    PacketCodec<? super RegistryByteBuf, ? extends ItemAttribute> packetCodec();
+    StreamCodec<? super RegistryFriendlyByteBuf, ? extends ItemAttribute> packetCodec();
 }

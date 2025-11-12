@@ -5,32 +5,32 @@ import com.mojang.serialization.DynamicOps;
 import com.mojang.serialization.MapLike;
 import com.mojang.serialization.RecordBuilder;
 import com.zurrtum.create.content.trains.graph.DimensionPalette;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.registry.RegistryKey;
+import net.minecraft.core.BlockPos;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.storage.ReadView;
-import net.minecraft.storage.WriteView;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
-import net.minecraft.world.WorldAccess;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 
 public abstract class SingleBlockEntityEdgePoint extends TrackEdgePoint {
 
-    public RegistryKey<World> blockEntityDimension;
+    public ResourceKey<Level> blockEntityDimension;
     public BlockPos blockEntityPos;
 
     public BlockPos getBlockEntityPos() {
         return blockEntityPos;
     }
 
-    public RegistryKey<World> getBlockEntityDimension() {
+    public ResourceKey<Level> getBlockEntityDimension() {
         return blockEntityDimension;
     }
 
     @Override
     public void blockEntityAdded(BlockEntity blockEntity, boolean front) {
-        this.blockEntityPos = blockEntity.getPos();
-        this.blockEntityDimension = blockEntity.getWorld().getRegistryKey();
+        this.blockEntityPos = blockEntity.getBlockPos();
+        this.blockEntityDimension = blockEntity.getLevel().dimension();
     }
 
     @Override
@@ -39,7 +39,7 @@ public abstract class SingleBlockEntityEdgePoint extends TrackEdgePoint {
     }
 
     @Override
-    public void invalidate(WorldAccess level) {
+    public void invalidate(LevelAccessor level) {
         invalidateAt(level, blockEntityPos);
     }
 
@@ -49,11 +49,11 @@ public abstract class SingleBlockEntityEdgePoint extends TrackEdgePoint {
     }
 
     @Override
-    public void read(ReadView view, boolean migration, DimensionPalette dimensions) {
+    public void read(ValueInput view, boolean migration, DimensionPalette dimensions) {
         super.read(view, migration, dimensions);
         if (migration)
             return;
-        blockEntityPos = view.read("BlockEntityPos", BlockPos.CODEC).orElse(BlockPos.ORIGIN);
+        blockEntityPos = view.read("BlockEntityPos", BlockPos.CODEC).orElse(BlockPos.ZERO);
         blockEntityDimension = view.read("BlockEntityDimension", dimensions).orElseThrow();
     }
 
@@ -63,15 +63,15 @@ public abstract class SingleBlockEntityEdgePoint extends TrackEdgePoint {
         if (migration)
             return;
         MapLike<T> map = ops.getMap(input).getOrThrow();
-        blockEntityPos = BlockPos.CODEC.parse(ops, map.get("BlockEntityPos")).result().orElse(BlockPos.ORIGIN);
+        blockEntityPos = BlockPos.CODEC.parse(ops, map.get("BlockEntityPos")).result().orElse(BlockPos.ZERO);
         blockEntityDimension = dimensions.parse(ops, map.get("BlockEntityDimension")).getOrThrow();
     }
 
     @Override
-    public void write(WriteView view, DimensionPalette dimensions) {
+    public void write(ValueOutput view, DimensionPalette dimensions) {
         super.write(view, dimensions);
-        view.put("BlockEntityPos", BlockPos.CODEC, blockEntityPos);
-        view.put("BlockEntityDimension", dimensions, blockEntityDimension);
+        view.store("BlockEntityPos", BlockPos.CODEC, blockEntityPos);
+        view.store("BlockEntityDimension", dimensions, blockEntityDimension);
     }
 
     @Override

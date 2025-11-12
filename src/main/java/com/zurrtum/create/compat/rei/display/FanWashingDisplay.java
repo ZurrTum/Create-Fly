@@ -9,37 +9,36 @@ import me.shedaniel.rei.api.common.display.Display;
 import me.shedaniel.rei.api.common.display.DisplaySerializer;
 import me.shedaniel.rei.api.common.entry.EntryIngredient;
 import me.shedaniel.rei.api.common.util.EntryIngredients;
-import net.minecraft.network.codec.PacketCodec;
-import net.minecraft.network.codec.PacketCodecs;
-import net.minecraft.recipe.RecipeEntry;
-import net.minecraft.util.Identifier;
-
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.crafting.RecipeHolder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-public record FanWashingDisplay(EntryIngredient input, List<ChanceOutput> outputs, Optional<Identifier> location) implements Display {
+public record FanWashingDisplay(EntryIngredient input, List<ChanceOutput> outputs, Optional<ResourceLocation> location) implements Display {
     public static final DisplaySerializer<FanWashingDisplay> SERIALIZER = DisplaySerializer.of(
         RecordCodecBuilder.mapCodec(instance -> instance.group(
             EntryIngredient.codec().fieldOf("input").forGetter(FanWashingDisplay::input),
             ChanceOutput.CODEC.listOf().fieldOf("outputs").forGetter(FanWashingDisplay::outputs),
-            Identifier.CODEC.optionalFieldOf("location").forGetter(FanWashingDisplay::location)
-        ).apply(instance, FanWashingDisplay::new)), PacketCodec.tuple(
+            ResourceLocation.CODEC.optionalFieldOf("location").forGetter(FanWashingDisplay::location)
+        ).apply(instance, FanWashingDisplay::new)), StreamCodec.composite(
             EntryIngredient.streamCodec(),
             FanWashingDisplay::input,
-            ChanceOutput.PACKET_CODEC.collect(PacketCodecs.toList()),
+            ChanceOutput.PACKET_CODEC.apply(ByteBufCodecs.list()),
             FanWashingDisplay::outputs,
-            PacketCodecs.optional(Identifier.PACKET_CODEC),
+            ByteBufCodecs.optional(ResourceLocation.STREAM_CODEC),
             FanWashingDisplay::location,
             FanWashingDisplay::new
         )
     );
 
-    public FanWashingDisplay(RecipeEntry<SplashingRecipe> entry) {
-        this(entry.id().getValue(), entry.value());
+    public FanWashingDisplay(RecipeHolder<SplashingRecipe> entry) {
+        this(entry.id().location(), entry.value());
     }
 
-    public FanWashingDisplay(Identifier id, SplashingRecipe recipe) {
+    public FanWashingDisplay(ResourceLocation id, SplashingRecipe recipe) {
         this(EntryIngredients.ofIngredient(recipe.ingredient()), recipe.results(), Optional.of(id));
     }
 
@@ -63,7 +62,7 @@ public record FanWashingDisplay(EntryIngredient input, List<ChanceOutput> output
     }
 
     @Override
-    public Optional<Identifier> getDisplayLocation() {
+    public Optional<ResourceLocation> getDisplayLocation() {
         return location;
     }
 

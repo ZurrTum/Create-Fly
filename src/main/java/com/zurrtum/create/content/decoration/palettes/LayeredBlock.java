@@ -1,21 +1,21 @@
 package com.zurrtum.create.content.decoration.palettes;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.block.PillarBlock;
-import net.minecraft.item.ItemPlacementContext;
+import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.level.block.RotatedPillarBlock;
+import net.minecraft.world.level.block.state.BlockState;
 
-public class LayeredBlock extends PillarBlock {
+public class LayeredBlock extends RotatedPillarBlock {
 
-    public LayeredBlock(Settings p_55926_) {
+    public LayeredBlock(Properties p_55926_) {
         super(p_55926_);
     }
 
     @Override
-    public BlockState getPlacementState(ItemPlacementContext pContext) {
-        BlockState stateForPlacement = super.getPlacementState(pContext);
-        BlockState placedOn = pContext.getWorld().getBlockState(pContext.getBlockPos().offset(pContext.getSide().getOpposite()));
-        if (placedOn.getBlock() == this && (pContext.getPlayer() == null || !pContext.getPlayer().isSneaking()))
-            stateForPlacement = stateForPlacement.with(AXIS, placedOn.get(AXIS));
+    public BlockState getStateForPlacement(BlockPlaceContext pContext) {
+        BlockState stateForPlacement = super.getStateForPlacement(pContext);
+        BlockState placedOn = pContext.getLevel().getBlockState(pContext.getClickedPos().relative(pContext.getClickedFace().getOpposite()));
+        if (placedOn.getBlock() == this && (pContext.getPlayer() == null || !pContext.getPlayer().isShiftKeyDown()))
+            stateForPlacement = stateForPlacement.setValue(AXIS, placedOn.getValue(AXIS));
         return stateForPlacement;
     }
 

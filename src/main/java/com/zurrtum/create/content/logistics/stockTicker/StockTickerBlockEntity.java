@@ -16,26 +16,25 @@ import com.zurrtum.create.content.logistics.packagerLink.LogisticallyLinkedBehav
 import com.zurrtum.create.foundation.codec.CreateCodecs;
 import com.zurrtum.create.infrastructure.component.PackageOrderWithCrafts;
 import com.zurrtum.create.infrastructure.items.ItemStackHandler;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.inventory.Inventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.network.RegistryByteBuf;
-import net.minecraft.storage.ReadView;
-import net.minecraft.storage.WriteView;
-import net.minecraft.util.ItemScatterer;
-import net.minecraft.util.Uuids;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Vec3d;
-
 import java.util.*;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.UUIDUtil;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.world.Container;
+import net.minecraft.world.Containers;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
 
 public class StockTickerBlockEntity extends StockCheckingBlockEntity {
-    public static final Codec<Map<UUID, List<Integer>>> UUID_MAP_CODEC = Codec.unboundedMap(Uuids.STRING_CODEC, Codec.INT.listOf());
+    public static final Codec<Map<UUID, List<Integer>>> UUID_MAP_CODEC = Codec.unboundedMap(UUIDUtil.STRING_CODEC, Codec.INT.listOf());
 
     //TODO
     //    public AbstractComputerBehaviour computerBehaviour;
@@ -90,7 +89,7 @@ public class StockTickerBlockEntity extends StockCheckingBlockEntity {
         ticksSinceLastUpdate = 0;
     }
 
-    public Inventory getReceivedPaymentsHandler() {
+    public Container getReceivedPaymentsHandler() {
         return receivedPayments;
     }
 
@@ -128,28 +127,28 @@ public class StockTickerBlockEntity extends StockCheckingBlockEntity {
     @Override
     public void tick() {
         super.tick();
-        if (world.isClient()) {
+        if (level.isClientSide()) {
             if (ticksSinceLastUpdate < 100)
                 ticksSinceLastUpdate += 1;
         }
     }
 
     @Override
-    protected void write(WriteView view, boolean clientPacket) {
+    protected void write(ValueOutput view, boolean clientPacket) {
         super.write(view, clientPacket);
         view.putString("PreviousAddress", previouslyUsedAddress);
         receivedPayments.write(view);
-        view.put("Categories", CreateCodecs.ITEM_LIST_CODEC, categories);
-        view.put("HiddenCategories", UUID_MAP_CODEC, hiddenCategoriesByPlayer);
+        view.store("Categories", CreateCodecs.ITEM_LIST_CODEC, categories);
+        view.store("HiddenCategories", UUID_MAP_CODEC, hiddenCategoriesByPlayer);
 
         if (clientPacket)
             view.putInt("ActiveLinks", activeLinks);
     }
 
     @Override
-    protected void read(ReadView view, boolean clientPacket) {
+    protected void read(ValueInput view, boolean clientPacket) {
         super.read(view, clientPacket);
-        previouslyUsedAddress = view.getString("PreviousAddress", "");
+        previouslyUsedAddress = view.getStringOr("PreviousAddress", "");
         receivedPayments.read(view);
         categories.clear();
         view.read("Categories", CreateCodecs.ITEM_LIST_CODEC).ifPresent(list -> list.forEach(stack -> {
@@ -162,7 +161,7 @@ public class StockTickerBlockEntity extends StockCheckingBlockEntity {
         view.read("HiddenCategories", UUID_MAP_CODEC).ifPresent(map -> hiddenCategoriesByPlayer.putAll(map));
 
         if (clientPacket)
-            activeLinks = view.getInt("ActiveLinks", 0);
+            activeLinks = view.getIntOr("ActiveLinks", 0);
     }
 
     public void receiveStockPacket(List<BigItemStack> stacks, boolean endOfTransmission) {
@@ -185,7 +184,7 @@ public class StockTickerBlockEntity extends StockCheckingBlockEntity {
                 FilterItemStack filterItemStack = FilterItemStack.of(filter);
                 for (Iterator<BigItemStack> iterator = newlyReceivedStockSnapshot.iterator(); iterator.hasNext(); ) {
                     BigItemStack bigStack = iterator.next();
-                    if (!filterItemStack.test(world, bigStack.stack))
+                    if (!filterItemStack.test(level, bigStack.stack))
                         continue;
                     inCategory.add(bigStack);
                     iterator.remove();
@@ -202,15 +201,15 @@ public class StockTickerBlockEntity extends StockCheckingBlockEntity {
     public boolean isKeeperPresent() {
         for (int yOffset : Iterate.zeroAndOne) {
             for (Direction side : Iterate.horizontalDirections) {
-                BlockPos seatPos = pos.down(yOffset).offset(side);
+                BlockPos seatPos = worldPosition.below(yOffset).relative(side);
                 int x = seatPos.getX();
                 int y = seatPos.getY();
                 int z = seatPos.getZ();
-                for (SeatEntity seatEntity : world.getNonSpectatingEntities(SeatEntity.class, new Box(x, y - 0.1f, z, x + 1, y + 1, z + 1)))
-                    if (seatEntity.hasPassengers())
+                for (SeatEntity seatEntity : level.getEntitiesOfClass(SeatEntity.class, new AABB(x, y - 0.1f, z, x + 1, y + 1, z + 1)))
+                    if (seatEntity.isVehicle())
                         return true;
                 if (yOffset == 0) {
-                    BlockEntity entity = world.getBlockEntity(seatPos);
+                    BlockEntity entity = level.getBlockEntity(seatPos);
                     if (entity != null && entity.getType() == AllBlockEntityTypes.HEATER) {
                         return true;
                     }
@@ -222,43 +221,43 @@ public class StockTickerBlockEntity extends StockCheckingBlockEntity {
 
     @Override
     public void destroy() {
-        ItemScatterer.spawn(world, pos, receivedPayments);
-        int x = pos.getX();
-        int y = pos.getY();
-        int z = pos.getZ();
+        Containers.dropContents(level, worldPosition, receivedPayments);
+        int x = worldPosition.getX();
+        int y = worldPosition.getY();
+        int z = worldPosition.getZ();
         for (ItemStack filter : categories) {
             if (!filter.isEmpty() && filter.getItem() instanceof FilterItem) {
-                ItemScatterer.spawn(world, x, y, z, filter);
+                Containers.dropItemStack(level, x, y, z, filter);
             }
         }
         super.destroy();
     }
 
     public void playEffect() {
-        AllSoundEvents.STOCK_LINK.playAt(world, pos, 1.0f, 1.0f, false);
-        Vec3d vec3 = Vec3d.ofCenter(pos);
-        world.addParticleClient(AllParticleTypes.WIFI, vec3.x, vec3.y, vec3.z, 1, 1, 1);
+        AllSoundEvents.STOCK_LINK.playAt(level, worldPosition, 1.0f, 1.0f, false);
+        Vec3 vec3 = Vec3.atCenterOf(worldPosition);
+        level.addParticle(AllParticleTypes.WIFI, vec3.x, vec3.y, vec3.z, 1, 1, 1);
     }
 
     public StockKeeperCategoryMenu createCategoryMenu(
         int pContainerId,
-        PlayerInventory pPlayerInventory,
-        PlayerEntity pPlayer,
-        RegistryByteBuf extraData
+        Inventory pPlayerInventory,
+        Player pPlayer,
+        RegistryFriendlyByteBuf extraData
     ) {
-        extraData.writeBlockPos(pos);
+        extraData.writeBlockPos(worldPosition);
         return new StockKeeperCategoryMenu(pContainerId, pPlayerInventory, StockTickerBlockEntity.this);
     }
 
     public StockKeeperRequestMenu createRequestMenu(
         int pContainerId,
-        PlayerInventory pPlayerInventory,
-        PlayerEntity pPlayer,
-        RegistryByteBuf extraData
+        Inventory pPlayerInventory,
+        Player pPlayer,
+        RegistryFriendlyByteBuf extraData
     ) {
         boolean showLockOption = behaviour.mayAdministrate(pPlayer) && Create.LOGISTICS.isLockable(behaviour.freqId);
         boolean isCurrentlyLocked = Create.LOGISTICS.isLocked(behaviour.freqId);
-        extraData.writeBlockPos(pos);
+        extraData.writeBlockPos(worldPosition);
         extraData.writeBoolean(showLockOption);
         extraData.writeBoolean(isCurrentlyLocked);
         return new StockKeeperRequestMenu(pContainerId, pPlayerInventory, this);
@@ -270,7 +269,7 @@ public class StockTickerBlockEntity extends StockCheckingBlockEntity {
         }
 
         @Override
-        public void markDirty() {
+        public void setChanged() {
             notifyUpdate();
         }
     }

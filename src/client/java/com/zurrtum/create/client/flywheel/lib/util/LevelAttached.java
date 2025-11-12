@@ -3,28 +3,27 @@ package com.zurrtum.create.client.flywheel.lib.util;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
-import net.minecraft.world.WorldAccess;
-
 import java.lang.ref.Cleaner;
 import java.lang.ref.WeakReference;
 import java.util.Iterator;
 import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import net.minecraft.world.level.LevelAccessor;
 
 public final class LevelAttached<T> {
     private static final ConcurrentLinkedDeque<WeakReference<LevelAttached<?>>> ALL = new ConcurrentLinkedDeque<>();
     private static final Cleaner CLEANER = Cleaner.create();
 
-    private final LoadingCache<WorldAccess, T> cache;
+    private final LoadingCache<LevelAccessor, T> cache;
 
-    public LevelAttached(Function<WorldAccess, T> factory, Consumer<T> finalizer) {
+    public LevelAttached(Function<LevelAccessor, T> factory, Consumer<T> finalizer) {
         WeakReference<LevelAttached<?>> thisRef = new WeakReference<>(this);
         ALL.add(thisRef);
 
-        cache = CacheBuilder.newBuilder().<WorldAccess, T>removalListener(n -> finalizer.accept(n.getValue())).build(new CacheLoader<>() {
+        cache = CacheBuilder.newBuilder().<LevelAccessor, T>removalListener(n -> finalizer.accept(n.getValue())).build(new CacheLoader<>() {
             @Override
-            public T load(WorldAccess key) {
+            public T load(LevelAccessor key) {
                 return factory.apply(key);
             }
         });
@@ -32,14 +31,14 @@ public final class LevelAttached<T> {
         CLEANER.register(this, new CleaningAction(thisRef, cache));
     }
 
-    public LevelAttached(Function<WorldAccess, T> factory) {
+    public LevelAttached(Function<LevelAccessor, T> factory) {
         this(
             factory, t -> {
             }
         );
     }
 
-    public static void invalidateLevel(WorldAccess level) {
+    public static void invalidateLevel(LevelAccessor level) {
         Iterator<WeakReference<LevelAttached<?>>> iterator = ALL.iterator();
         while (iterator.hasNext()) {
             LevelAttached<?> attached = iterator.next().get();
@@ -51,15 +50,15 @@ public final class LevelAttached<T> {
         }
     }
 
-    public T get(WorldAccess level) {
+    public T get(LevelAccessor level) {
         return cache.getUnchecked(level);
     }
 
-    public void remove(WorldAccess level) {
+    public void remove(LevelAccessor level) {
         cache.invalidate(level);
     }
 
-    public T refresh(WorldAccess level) {
+    public T refresh(LevelAccessor level) {
         remove(level);
         return get(level);
     }
@@ -70,9 +69,9 @@ public final class LevelAttached<T> {
 
     private static class CleaningAction implements Runnable {
         private final WeakReference<LevelAttached<?>> ref;
-        private final LoadingCache<WorldAccess, ?> cache;
+        private final LoadingCache<LevelAccessor, ?> cache;
 
-        private CleaningAction(WeakReference<LevelAttached<?>> ref, LoadingCache<WorldAccess, ?> cache) {
+        private CleaningAction(WeakReference<LevelAttached<?>> ref, LoadingCache<LevelAccessor, ?> cache) {
             this.ref = ref;
             this.cache = cache;
         }

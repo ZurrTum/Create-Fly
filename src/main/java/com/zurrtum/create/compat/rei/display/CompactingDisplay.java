@@ -9,39 +9,38 @@ import me.shedaniel.rei.api.common.display.Display;
 import me.shedaniel.rei.api.common.display.DisplaySerializer;
 import me.shedaniel.rei.api.common.entry.EntryIngredient;
 import me.shedaniel.rei.api.common.util.EntryIngredients;
-import net.minecraft.network.codec.PacketCodec;
-import net.minecraft.network.codec.PacketCodecs;
-import net.minecraft.recipe.RecipeEntry;
-import net.minecraft.util.Identifier;
-
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.crafting.RecipeHolder;
 import java.util.List;
 import java.util.Optional;
 
 import static com.zurrtum.create.compat.rei.IngredientHelper.getEntryIngredients;
 import static com.zurrtum.create.compat.rei.IngredientHelper.getFluidIngredientStream;
 
-public record CompactingDisplay(List<EntryIngredient> inputs, EntryIngredient output, Optional<Identifier> location) implements Display {
+public record CompactingDisplay(List<EntryIngredient> inputs, EntryIngredient output, Optional<ResourceLocation> location) implements Display {
     public static final DisplaySerializer<CompactingDisplay> SERIALIZER = DisplaySerializer.of(
         RecordCodecBuilder.mapCodec(instance -> instance.group(
             EntryIngredient.codec().listOf().fieldOf("inputs").forGetter(CompactingDisplay::inputs),
             EntryIngredient.codec().fieldOf("output").forGetter(CompactingDisplay::output),
-            Identifier.CODEC.optionalFieldOf("location").forGetter(CompactingDisplay::location)
-        ).apply(instance, CompactingDisplay::new)), PacketCodec.tuple(
-            EntryIngredient.streamCodec().collect(PacketCodecs.toList()),
+            ResourceLocation.CODEC.optionalFieldOf("location").forGetter(CompactingDisplay::location)
+        ).apply(instance, CompactingDisplay::new)), StreamCodec.composite(
+            EntryIngredient.streamCodec().apply(ByteBufCodecs.list()),
             CompactingDisplay::inputs,
             EntryIngredient.streamCodec(),
             CompactingDisplay::output,
-            PacketCodecs.optional(Identifier.PACKET_CODEC),
+            ByteBufCodecs.optional(ResourceLocation.STREAM_CODEC),
             CompactingDisplay::location,
             CompactingDisplay::new
         )
     );
 
-    public CompactingDisplay(RecipeEntry<CompactingRecipe> entry) {
-        this(entry.id().getValue(), entry.value());
+    public CompactingDisplay(RecipeHolder<CompactingRecipe> entry) {
+        this(entry.id().location(), entry.value());
     }
 
-    public CompactingDisplay(Identifier id, CompactingRecipe recipe) {
+    public CompactingDisplay(ResourceLocation id, CompactingRecipe recipe) {
         this(
             getEntryIngredients(IngredientHelper.getSizedIngredientStream(recipe.ingredients()), getFluidIngredientStream(recipe.fluidIngredient())),
             EntryIngredients.of(recipe.result()),
@@ -65,7 +64,7 @@ public record CompactingDisplay(List<EntryIngredient> inputs, EntryIngredient ou
     }
 
     @Override
-    public Optional<Identifier> getDisplayLocation() {
+    public Optional<ResourceLocation> getDisplayLocation() {
         return location;
     }
 

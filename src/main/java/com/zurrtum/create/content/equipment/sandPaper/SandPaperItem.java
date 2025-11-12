@@ -6,147 +6,147 @@ import com.zurrtum.create.AllRecipeTypes;
 import com.zurrtum.create.AllSoundEvents;
 import com.zurrtum.create.catnip.math.VecHelper;
 import com.zurrtum.create.infrastructure.component.SandPaperItemComponent;
-import net.minecraft.block.BlockState;
-import net.minecraft.entity.ItemEntity;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.item.*;
-import net.minecraft.item.consume.UseAction;
-import net.minecraft.particle.ItemStackParticleEffect;
-import net.minecraft.particle.ParticleTypes;
-import net.minecraft.recipe.RecipePropertySet;
-import net.minecraft.recipe.input.SingleStackRecipeInput;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.Hand;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.math.random.Random;
-import net.minecraft.world.RaycastContext.FluidHandling;
-import net.minecraft.world.World;
-import net.minecraft.world.WorldEvents;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.particles.ItemParticleOption;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.*;
+import net.minecraft.world.item.context.UseOnContext;
+import net.minecraft.world.item.crafting.RecipePropertySet;
+import net.minecraft.world.item.crafting.SingleRecipeInput;
+import net.minecraft.world.level.ClipContext.Fluid;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.LevelEvent;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.Vec3;
 
 import java.util.Optional;
 
 public class SandPaperItem extends Item {
 
-    public SandPaperItem(Settings properties) {
+    public SandPaperItem(Properties properties) {
         super(properties);
     }
 
     @Override
-    public ActionResult use(World worldIn, PlayerEntity playerIn, Hand handIn) {
-        ItemStack itemstack = playerIn.getStackInHand(handIn);
+    public InteractionResult use(Level worldIn, Player playerIn, InteractionHand handIn) {
+        ItemStack itemstack = playerIn.getItemInHand(handIn);
 
-        if (itemstack.contains(AllDataComponents.SAND_PAPER_POLISHING)) {
-            playerIn.setCurrentHand(handIn);
-            return ActionResult.PASS;
+        if (itemstack.has(AllDataComponents.SAND_PAPER_POLISHING)) {
+            playerIn.startUsingItem(handIn);
+            return InteractionResult.PASS;
         }
 
-        Hand otherHand = handIn == Hand.MAIN_HAND ? Hand.OFF_HAND : Hand.MAIN_HAND;
-        ItemStack itemInOtherHand = playerIn.getStackInHand(otherHand);
-        RecipePropertySet recipe = worldIn.getRecipeManager().getPropertySet(AllRecipeSets.SAND_PAPER_POLISHING);
-        if (recipe.canUse(itemInOtherHand)) {
+        InteractionHand otherHand = handIn == InteractionHand.MAIN_HAND ? InteractionHand.OFF_HAND : InteractionHand.MAIN_HAND;
+        ItemStack itemInOtherHand = playerIn.getItemInHand(otherHand);
+        RecipePropertySet recipe = worldIn.recipeAccess().propertySet(AllRecipeSets.SAND_PAPER_POLISHING);
+        if (recipe.test(itemInOtherHand)) {
             ItemStack item = itemInOtherHand.copy();
             ItemStack toPolish = item.split(1);
-            playerIn.setCurrentHand(handIn);
+            playerIn.startUsingItem(handIn);
             itemstack.set(AllDataComponents.SAND_PAPER_POLISHING, new SandPaperItemComponent(toPolish));
-            playerIn.setStackInHand(otherHand, item);
-            return ActionResult.SUCCESS.withNewHandStack(itemstack);
+            playerIn.setItemInHand(otherHand, item);
+            return InteractionResult.SUCCESS.heldItemTransformedTo(itemstack);
         }
 
-        BlockHitResult raytraceresult = raycast(worldIn, playerIn, FluidHandling.NONE);
-        Vec3d hitVec = raytraceresult.getPos();
+        BlockHitResult raytraceresult = getPlayerPOVHitResult(worldIn, playerIn, Fluid.NONE);
+        Vec3 hitVec = raytraceresult.getLocation();
 
-        Box bb = new Box(hitVec, hitVec).expand(1f);
+        AABB bb = new AABB(hitVec, hitVec).inflate(1f);
         ItemEntity pickUp = null;
-        for (ItemEntity itemEntity : worldIn.getNonSpectatingEntities(ItemEntity.class, bb)) {
+        for (ItemEntity itemEntity : worldIn.getEntitiesOfClass(ItemEntity.class, bb)) {
             if (!itemEntity.isAlive())
                 continue;
-            if (itemEntity.getEntityPos().distanceTo(playerIn.getEntityPos()) > 3)
+            if (itemEntity.position().distanceTo(playerIn.position()) > 3)
                 continue;
-            ItemStack stack = itemEntity.getStack();
-            if (!recipe.canUse(stack))
+            ItemStack stack = itemEntity.getItem();
+            if (!recipe.test(stack))
                 continue;
             pickUp = itemEntity;
             break;
         }
 
         if (pickUp == null)
-            return ActionResult.FAIL;
+            return InteractionResult.FAIL;
 
-        ItemStack item = pickUp.getStack().copy();
+        ItemStack item = pickUp.getItem().copy();
         ItemStack toPolish = item.split(1);
 
-        playerIn.setCurrentHand(handIn);
+        playerIn.startUsingItem(handIn);
 
-        if (!worldIn.isClient()) {
+        if (!worldIn.isClientSide()) {
             itemstack.set(AllDataComponents.SAND_PAPER_POLISHING, new SandPaperItemComponent(toPolish));
             if (item.isEmpty())
                 pickUp.discard();
             else
-                pickUp.setStack(item);
+                pickUp.setItem(item);
         }
 
-        return ActionResult.SUCCESS.withNewHandStack(itemstack);
+        return InteractionResult.SUCCESS.heldItemTransformedTo(itemstack);
     }
 
     @Override
-    public void usageTick(World world, LivingEntity user, ItemStack stack, int remainingUseTicks) {
-        Random random = user.getRandom();
-        if (stack.contains(AllDataComponents.SAND_PAPER_POLISHING)) {
+    public void onUseTick(Level world, LivingEntity user, ItemStack stack, int remainingUseTicks) {
+        RandomSource random = user.getRandom();
+        if (stack.has(AllDataComponents.SAND_PAPER_POLISHING)) {
             ItemStack polishing = stack.get(AllDataComponents.SAND_PAPER_POLISHING).item();
             if (!polishing.isEmpty())
                 user.spawnItemParticles(polishing, 1);
         }
 
         // After 6 ticks play the sound every 7th
-        if ((user.getItemUseTime() - 6) % 7 == 0) {
+        if ((user.getTicksUsingItem() - 6) % 7 == 0) {
             user.playSound(AllSoundEvents.SANDING_SHORT.getMainEvent(), 0.9F + 0.2F * random.nextFloat(), random.nextFloat() * 0.2F + 0.9F);
         }
     }
 
     @Override
-    public ItemStack finishUsing(ItemStack stack, World world, LivingEntity entityLiving) {
-        if (!(entityLiving instanceof PlayerEntity player))
+    public ItemStack finishUsingItem(ItemStack stack, Level world, LivingEntity entityLiving) {
+        if (!(entityLiving instanceof Player player))
             return stack;
         SandPaperItemComponent component = stack.get(AllDataComponents.SAND_PAPER_POLISHING);
         if (component == null)
             return stack;
         ItemStack toPolish = component.item();
 
-        if (world.isClient()) {
-            spawnParticles(entityLiving.getCameraPosVec(1).add(entityLiving.getRotationVector().multiply(.5f)), toPolish, world);
+        if (world.isClientSide()) {
+            spawnParticles(entityLiving.getEyePosition(1).add(entityLiving.getLookAngle().scale(.5f)), toPolish, world);
             return stack;
         }
 
-        SingleStackRecipeInput input = new SingleStackRecipeInput(toPolish);
-        ((ServerWorld) world).getRecipeManager().getFirstMatch(AllRecipeTypes.SANDPAPER_POLISHING, input, world).ifPresent(recipe -> {
-            ItemStack polished = recipe.value().craft(input, world.getRegistryManager());
-            PlayerInventory playerInv = player.getInventory();
+        SingleRecipeInput input = new SingleRecipeInput(toPolish);
+        ((ServerLevel) world).recipeAccess().getRecipeFor(AllRecipeTypes.SANDPAPER_POLISHING, input, world).ifPresent(recipe -> {
+            ItemStack polished = recipe.value().assemble(input, world.registryAccess());
+            Inventory playerInv = player.getInventory();
             if (!polished.isEmpty()) {
-                playerInv.offerOrDrop(polished);
+                playerInv.placeItemBackInInventory(polished);
             }
-            ItemStack recipeRemainder = toPolish.getItem().getRecipeRemainder();
+            ItemStack recipeRemainder = toPolish.getItem().getCraftingRemainder();
             if (!recipeRemainder.isEmpty()) {
-                playerInv.offerOrDrop(recipeRemainder);
+                playerInv.placeItemBackInInventory(recipeRemainder);
             }
         });
 
         stack.remove(AllDataComponents.SAND_PAPER_POLISHING);
-        stack.damage(1, entityLiving, entityLiving.getActiveHand().getEquipmentSlot());
+        stack.hurtAndBreak(1, entityLiving, entityLiving.getUsedItemHand().asEquipmentSlot());
 
         return stack;
     }
 
-    public static void spawnParticles(Vec3d location, ItemStack polishedStack, World world) {
+    public static void spawnParticles(Vec3 location, ItemStack polishedStack, Level world) {
         for (int i = 0; i < 20; i++) {
-            Vec3d motion = VecHelper.offsetRandomly(Vec3d.ZERO, world.random, 1 / 8f);
-            world.addParticleClient(
-                new ItemStackParticleEffect(ParticleTypes.ITEM, polishedStack),
+            Vec3 motion = VecHelper.offsetRandomly(Vec3.ZERO, world.random, 1 / 8f);
+            world.addParticle(
+                new ItemParticleOption(ParticleTypes.ITEM, polishedStack),
                 location.x,
                 location.y,
                 location.z,
@@ -158,57 +158,56 @@ public class SandPaperItem extends Item {
     }
 
     @Override
-    public boolean onStoppedUsing(ItemStack stack, World worldIn, LivingEntity entityLiving, int timeLeft) {
-        if (!(entityLiving instanceof PlayerEntity player))
+    public boolean releaseUsing(ItemStack stack, Level worldIn, LivingEntity entityLiving, int timeLeft) {
+        if (!(entityLiving instanceof Player player))
             return false;
-        if (stack.contains(AllDataComponents.SAND_PAPER_POLISHING)) {
+        if (stack.has(AllDataComponents.SAND_PAPER_POLISHING)) {
             ItemStack toPolish = stack.get(AllDataComponents.SAND_PAPER_POLISHING).item();
             //noinspection DataFlowIssue - toPolish won't be null as we do call .has before calling .get
-            player.getInventory().offerOrDrop(toPolish);
+            player.getInventory().placeItemBackInInventory(toPolish);
             stack.remove(AllDataComponents.SAND_PAPER_POLISHING);
         }
         return false;
     }
 
     @Override
-    public ActionResult useOnBlock(ItemUsageContext context) {
-        PlayerEntity player = context.getPlayer();
-        ItemStack stack = context.getStack();
-        World level = context.getWorld();
-        BlockPos pos = context.getBlockPos();
+    public InteractionResult useOn(UseOnContext context) {
+        Player player = context.getPlayer();
+        ItemStack stack = context.getItemInHand();
+        Level level = context.getLevel();
+        BlockPos pos = context.getClickedPos();
         BlockState state = level.getBlockState(pos);
 
-        Optional<BlockState> newState = ((AxeItem) Items.DIAMOND_AXE).getStrippedState(state);
+        Optional<BlockState> newState = ((AxeItem) Items.DIAMOND_AXE).getStripped(state);
         if (newState.isPresent()) {
             AllSoundEvents.SANDING_LONG.play(level, player, pos, 1, 1 + (level.random.nextFloat() * 0.5f - 1f) / 5f);
-            level.syncWorldEvent(player, WorldEvents.BLOCK_SCRAPED, pos, 0); // Spawn particles
+            level.levelEvent(player, LevelEvent.PARTICLES_SCRAPE, pos, 0); // Spawn particles
         } else {
-            newState = Optional.ofNullable(HoneycombItem.WAXED_TO_UNWAXED_BLOCKS.get().get(state.getBlock()))
-                .map(block -> block.getStateWithProperties(state));
+            newState = Optional.ofNullable(HoneycombItem.WAX_OFF_BY_BLOCK.get().get(state.getBlock())).map(block -> block.withPropertiesOf(state));
 
             if (newState.isPresent()) {
                 AllSoundEvents.SANDING_LONG.play(level, player, pos, 1, 1 + (level.random.nextFloat() * 0.5f - 1f) / 5f);
-                level.syncWorldEvent(player, WorldEvents.WAX_REMOVED, pos, 0); // Spawn particles
+                level.levelEvent(player, LevelEvent.PARTICLES_WAX_OFF, pos, 0); // Spawn particles
             }
         }
 
         if (newState.isPresent()) {
-            level.setBlockState(pos, newState.get());
+            level.setBlockAndUpdate(pos, newState.get());
             if (player != null)
-                stack.damage(1, player, player.getActiveHand().getEquipmentSlot());
-            return ActionResult.SUCCESS;
+                stack.hurtAndBreak(1, player, player.getUsedItemHand().asEquipmentSlot());
+            return InteractionResult.SUCCESS;
         }
 
-        return ActionResult.PASS;
+        return InteractionResult.PASS;
     }
 
     @Override
-    public int getMaxUseTime(ItemStack stack, LivingEntity user) {
+    public int getUseDuration(ItemStack stack, LivingEntity user) {
         return 32;
     }
 
     @Override
-    public UseAction getUseAction(ItemStack stack) {
-        return UseAction.EAT;
+    public ItemUseAnimation getUseAnimation(ItemStack stack) {
+        return ItemUseAnimation.EAT;
     }
 }

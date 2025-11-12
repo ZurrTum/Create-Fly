@@ -1,34 +1,34 @@
 package com.zurrtum.create.content.kinetics.transmission;
 
 import com.zurrtum.create.AllBlockEntityTypes;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
-import net.minecraft.world.block.WireOrientation;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.redstone.Orientation;
 import org.jetbrains.annotations.Nullable;
 
 public class ClutchBlock extends GearshiftBlock {
-    public ClutchBlock(Settings properties) {
+    public ClutchBlock(Properties properties) {
         super(properties);
     }
 
     @Override
-    public void neighborUpdate(
+    public void neighborChanged(
         BlockState state,
-        World worldIn,
+        Level worldIn,
         BlockPos pos,
         Block blockIn,
-        @Nullable WireOrientation wireOrientation,
+        @Nullable Orientation wireOrientation,
         boolean isMoving
     ) {
-        if (worldIn.isClient())
+        if (worldIn.isClientSide())
             return;
 
-        boolean previouslyPowered = state.get(POWERED);
-        if (previouslyPowered != worldIn.isReceivingRedstonePower(pos)) {
-            worldIn.setBlockState(pos, state.cycle(POWERED), 2 | 16);
+        boolean previouslyPowered = state.getValue(POWERED);
+        if (previouslyPowered != worldIn.hasNeighborSignal(pos)) {
+            worldIn.setBlock(pos, state.cycle(POWERED), 2 | 16);
             detachKinetics(worldIn, pos, previouslyPowered);
         }
     }

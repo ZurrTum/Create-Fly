@@ -3,11 +3,11 @@ package com.zurrtum.create.api.behaviour.movement;
 import com.zurrtum.create.api.registry.SimpleRegistry;
 import com.zurrtum.create.content.contraptions.behaviour.MovementContext;
 import com.zurrtum.create.infrastructure.config.AllConfigs;
-import net.minecraft.block.Block;
-import net.minecraft.entity.ItemEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 
 /**
@@ -36,8 +36,8 @@ public abstract class MovementBehaviour {
     public void visitNewPosition(MovementContext context, BlockPos pos) {
     }
 
-    public Vec3d getActiveAreaOffset(MovementContext context) {
-        return Vec3d.ZERO;
+    public Vec3 getActiveAreaOffset(MovementContext context) {
+        return Vec3.ZERO;
     }
 
     @Nullable
@@ -72,16 +72,16 @@ public abstract class MovementBehaviour {
             return;
 
         // Actors might void items if their positions is undefined
-        Vec3d vec = context.position;
+        Vec3 vec = context.position;
         if (vec == null)
             return;
 
         ItemEntity itemEntity = new ItemEntity(context.world, vec.x, vec.y, vec.z, stack);
-        itemEntity.setVelocity(context.motion.add(0, 0.5f, 0).multiply(context.world.random.nextFloat() * .3f));
-        context.world.spawnEntity(itemEntity);
+        itemEntity.setDeltaMovement(context.motion.add(0, 0.5f, 0).scale(context.world.random.nextFloat() * .3f));
+        context.world.addFreshEntity(itemEntity);
     }
 
-    public void onSpeedChanged(MovementContext context, Vec3d oldMotion, Vec3d motion) {
+    public void onSpeedChanged(MovementContext context, Vec3 oldMotion, Vec3 motion) {
     }
 
     public void stopMoving(MovementContext context) {

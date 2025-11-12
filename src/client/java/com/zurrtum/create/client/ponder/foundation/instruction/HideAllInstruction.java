@@ -3,8 +3,8 @@ package com.zurrtum.create.client.ponder.foundation.instruction;
 import com.zurrtum.create.client.ponder.foundation.PonderScene;
 import com.zurrtum.create.client.ponder.foundation.element.AnimatedOverlayElementBase;
 import com.zurrtum.create.client.ponder.foundation.element.AnimatedSceneElementBase;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.core.Direction;
+import net.minecraft.world.phys.Vec3;
 
 public class HideAllInstruction extends TickingInstruction {
 
@@ -21,7 +21,7 @@ public class HideAllInstruction extends TickingInstruction {
         scene.getElements().forEach(element -> {
             if (element instanceof AnimatedSceneElementBase animatedSceneElement) {
                 animatedSceneElement.setFade(1);
-                animatedSceneElement.setFadeVec(fadeOutTo == null ? null : Vec3d.of(fadeOutTo.getVector()).multiply(.5f));
+                animatedSceneElement.setFadeVec(fadeOutTo == null ? null : Vec3.atLowerCornerOf(fadeOutTo.getUnitVec3i()).scale(.5f));
             } else if (element instanceof AnimatedOverlayElementBase animatedSceneElement) {
                 animatedSceneElement.setFade(1);
             } else

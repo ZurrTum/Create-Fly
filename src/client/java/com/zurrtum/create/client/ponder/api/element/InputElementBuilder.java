@@ -1,7 +1,7 @@
 package com.zurrtum.create.client.ponder.api.element;
 
 import com.zurrtum.create.client.catnip.gui.element.ScreenElement;
-import net.minecraft.item.ItemStack;
+import net.minecraft.world.item.ItemStack;
 
 public interface InputElementBuilder {
 

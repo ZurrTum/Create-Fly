@@ -2,14 +2,14 @@ package com.zurrtum.create.client.flywheel.impl;
 
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
-import net.minecraft.command.CommandSource;
-import net.minecraft.text.Text;
+import net.minecraft.commands.SharedSuggestionProvider;
+import net.minecraft.network.chat.Component;
 
 public final class FlwCommands {
     private FlwCommands() {
     }
 
-    public static void registerClientCommands(CommandDispatcher<CommandSource> dispatcher) {
+    public static void registerClientCommands(CommandDispatcher<SharedSuggestionProvider> dispatcher) {
         //        LiteralArgumentBuilder<CommandSource> command = CommandManager.literal("flywheel");
         //
         //        ConfigValue<String> backendValue = NeoForgeFlwConfig.INSTANCE.client.backend;
@@ -83,7 +83,7 @@ public final class FlwCommands {
         //        event.getDispatcher().register(command);
     }
 
-    private static LiteralArgumentBuilder<CommandSource> createDebugCommand() {
+    private static LiteralArgumentBuilder<SharedSuggestionProvider> createDebugCommand() {
         //        var debug = Commands.literal("debug");
         //
         //        debug.then(Commands.literal("crumbling").then(Commands.argument("pos", BlockPosArgument.blockPos())
@@ -136,11 +136,11 @@ public final class FlwCommands {
         return null;
     }
 
-    private static void sendMessage(CommandSource source, Text message) {
+    private static void sendMessage(SharedSuggestionProvider source, Component message) {
         //        source.sendSuccess(() -> message, true);
     }
 
-    private static void sendFailure(CommandSource source, Text message) {
+    private static void sendFailure(SharedSuggestionProvider source, Component message) {
         //        source.sendFailure(message);
     }
 }

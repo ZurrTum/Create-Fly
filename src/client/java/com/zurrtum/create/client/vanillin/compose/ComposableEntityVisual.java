@@ -8,7 +8,7 @@ import com.zurrtum.create.client.flywheel.api.visualization.VisualizationContext
 import com.zurrtum.create.client.flywheel.lib.visual.AbstractVisual;
 import com.zurrtum.create.client.flywheel.lib.visual.SimpleDynamicVisual;
 import com.zurrtum.create.client.flywheel.lib.visual.SimpleTickableVisual;
-import net.minecraft.entity.Entity;
+import net.minecraft.world.entity.Entity;
 import org.jetbrains.annotations.Nullable;
 
 public class ComposableEntityVisual<T extends Entity> extends AbstractVisual implements EntityVisual<T>, SimpleTickableVisual, SimpleDynamicVisual {
@@ -22,7 +22,7 @@ public class ComposableEntityVisual<T extends Entity> extends AbstractVisual imp
     //  time which interfaces to implement. I have a feeling that configured elements will need to know what class
     //  of visual they create.
     public ComposableEntityVisual(VisualizationContext ctx, T entity, float partialTick, Controller<T> controller) {
-        super(ctx, entity.getEntityWorld(), partialTick);
+        super(ctx, entity.level(), partialTick);
         this.entity = entity;
         this.controller = controller;
         this.visuals = new Visual[controller.elements.length];

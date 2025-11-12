@@ -3,28 +3,27 @@ package com.zurrtum.create.client;
 import com.mojang.serialization.MapCodec;
 import com.zurrtum.create.AllBlocks;
 import com.zurrtum.create.client.infrastructure.model.*;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.client.render.item.model.ItemModel;
-import net.minecraft.client.render.item.model.ItemModelTypes;
-import net.minecraft.client.render.model.BlockStateModel.UnbakedGrouped;
-import net.minecraft.util.Identifier;
-
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.BiFunction;
+import net.minecraft.client.renderer.block.model.BlockStateModel.UnbakedRoot;
+import net.minecraft.client.renderer.item.ItemModel;
+import net.minecraft.client.renderer.item.ItemModels;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
 
 public class AllModels {
-    public static final Map<BlockState, BiFunction<BlockState, UnbakedGrouped, UnbakedGrouped>> ALL = new HashMap<>();
+    public static final Map<BlockState, BiFunction<BlockState, UnbakedRoot, UnbakedRoot>> ALL = new HashMap<>();
 
-    public static void register(Block block, BiFunction<BlockState, UnbakedGrouped, UnbakedGrouped> resolver) {
-        block.getStateManager().getStates().forEach(state -> {
+    public static void register(Block block, BiFunction<BlockState, UnbakedRoot, UnbakedRoot> resolver) {
+        block.getStateDefinition().getPossibleStates().forEach(state -> {
             ALL.put(state, resolver);
         });
     }
 
-    public static <T extends ItemModel.Unbaked> void register(Identifier id, MapCodec<T> codec) {
-        ItemModelTypes.ID_MAPPER.put(id, codec);
+    public static <T extends ItemModel.Unbaked> void register(ResourceLocation id, MapCodec<T> codec) {
+        ItemModels.ID_MAPPER.put(id, codec);
     }
 
     public static void register() {
@@ -41,18 +40,18 @@ public class AllModels {
         register(OversizedModel.ID, OversizedModel.Unbaked.CODEC);
         register(TranslucentModel.ID, TranslucentModel.Unbaked.CODEC);
 
-        BiFunction<BlockState, UnbakedGrouped, UnbakedGrouped> andesiteCasing = CTModel.of(AllCTBehaviours.ANDESITE_CASING);
-        BiFunction<BlockState, UnbakedGrouped, UnbakedGrouped> brassCasing = CTModel.of(AllCTBehaviours.BRASS_CASING);
-        BiFunction<BlockState, UnbakedGrouped, UnbakedGrouped> copperCasing = CTModel.of(AllCTBehaviours.COPPER_CASING);
-        BiFunction<BlockState, UnbakedGrouped, UnbakedGrouped> chassis = CTModel.of(AllCTBehaviours.CHASSIS);
-        BiFunction<BlockState, UnbakedGrouped, UnbakedGrouped> copperShingles = CTModel.of(AllCTBehaviours.COPPER_SHINGLES);
-        BiFunction<BlockState, UnbakedGrouped, UnbakedGrouped> exposedCopperShingles = CTModel.of(AllCTBehaviours.EXPOSED_COPPER_SHINGLES);
-        BiFunction<BlockState, UnbakedGrouped, UnbakedGrouped> weatheredCopperShingles = CTModel.of(AllCTBehaviours.WEATHERED_COPPER_SHINGLES);
-        BiFunction<BlockState, UnbakedGrouped, UnbakedGrouped> oxidizedCopperShingles = CTModel.of(AllCTBehaviours.OXIDIZED_COPPER_SHINGLES);
-        BiFunction<BlockState, UnbakedGrouped, UnbakedGrouped> copperTiles = CTModel.of(AllCTBehaviours.COPPER_TILES);
-        BiFunction<BlockState, UnbakedGrouped, UnbakedGrouped> exposedcopperTiles = CTModel.of(AllCTBehaviours.EXPOSED_COPPER_TILES);
-        BiFunction<BlockState, UnbakedGrouped, UnbakedGrouped> weatheredcopperTiles = CTModel.of(AllCTBehaviours.WEATHERED_COPPER_TILES);
-        BiFunction<BlockState, UnbakedGrouped, UnbakedGrouped> oxidizedcopperTiles = CTModel.of(AllCTBehaviours.OXIDIZED_COPPER_TILES);
+        BiFunction<BlockState, UnbakedRoot, UnbakedRoot> andesiteCasing = CTModel.of(AllCTBehaviours.ANDESITE_CASING);
+        BiFunction<BlockState, UnbakedRoot, UnbakedRoot> brassCasing = CTModel.of(AllCTBehaviours.BRASS_CASING);
+        BiFunction<BlockState, UnbakedRoot, UnbakedRoot> copperCasing = CTModel.of(AllCTBehaviours.COPPER_CASING);
+        BiFunction<BlockState, UnbakedRoot, UnbakedRoot> chassis = CTModel.of(AllCTBehaviours.CHASSIS);
+        BiFunction<BlockState, UnbakedRoot, UnbakedRoot> copperShingles = CTModel.of(AllCTBehaviours.COPPER_SHINGLES);
+        BiFunction<BlockState, UnbakedRoot, UnbakedRoot> exposedCopperShingles = CTModel.of(AllCTBehaviours.EXPOSED_COPPER_SHINGLES);
+        BiFunction<BlockState, UnbakedRoot, UnbakedRoot> weatheredCopperShingles = CTModel.of(AllCTBehaviours.WEATHERED_COPPER_SHINGLES);
+        BiFunction<BlockState, UnbakedRoot, UnbakedRoot> oxidizedCopperShingles = CTModel.of(AllCTBehaviours.OXIDIZED_COPPER_SHINGLES);
+        BiFunction<BlockState, UnbakedRoot, UnbakedRoot> copperTiles = CTModel.of(AllCTBehaviours.COPPER_TILES);
+        BiFunction<BlockState, UnbakedRoot, UnbakedRoot> exposedcopperTiles = CTModel.of(AllCTBehaviours.EXPOSED_COPPER_TILES);
+        BiFunction<BlockState, UnbakedRoot, UnbakedRoot> weatheredcopperTiles = CTModel.of(AllCTBehaviours.WEATHERED_COPPER_TILES);
+        BiFunction<BlockState, UnbakedRoot, UnbakedRoot> oxidizedcopperTiles = CTModel.of(AllCTBehaviours.OXIDIZED_COPPER_TILES);
         register(AllBlocks.ANDESITE_CASING, andesiteCasing);
         register(AllBlocks.GEARBOX, andesiteCasing);
         register(AllBlocks.ANDESITE_ENCASED_SHAFT, andesiteCasing);

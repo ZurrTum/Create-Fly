@@ -5,51 +5,55 @@ import com.zurrtum.create.client.foundation.model.BakedModelHelper;
 import com.zurrtum.create.client.foundation.model.BakedQuadHelper;
 import com.zurrtum.create.content.decoration.copycat.CopycatBlock;
 import com.zurrtum.create.content.decoration.copycat.CopycatStepBlock;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.enums.BlockHalf;
-import net.minecraft.client.render.model.*;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.math.random.Random;
-import net.minecraft.world.BlockRenderView;
+import net.minecraft.client.renderer.block.model.BakedQuad;
+import net.minecraft.client.renderer.block.model.BlockModelPart;
+import net.minecraft.client.renderer.block.model.BlockStateModel;
+import net.minecraft.client.renderer.block.model.SimpleModelWrapper;
+import net.minecraft.client.resources.model.QuadCollection;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.level.BlockAndTintGetter;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.Half;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
 
 import java.util.List;
 import java.util.function.Consumer;
 
 public class CopycatStepModel extends CopycatModel {
-    protected static final Vec3d VEC_Y_3 = new Vec3d(0, .75, 0);
-    protected static final Vec3d VEC_Y_2 = new Vec3d(0, .5, 0);
-    protected static final Vec3d VEC_Y_N2 = new Vec3d(0, -.5, 0);
-    protected static final Box CUBE_AABB = new Box(BlockPos.ORIGIN);
+    protected static final Vec3 VEC_Y_3 = new Vec3(0, .75, 0);
+    protected static final Vec3 VEC_Y_2 = new Vec3(0, .5, 0);
+    protected static final Vec3 VEC_Y_N2 = new Vec3(0, -.5, 0);
+    protected static final AABB CUBE_AABB = new AABB(BlockPos.ZERO);
 
-    public CopycatStepModel(BlockState state, UnbakedGrouped unbaked) {
+    public CopycatStepModel(BlockState state, UnbakedRoot unbaked) {
         super(state, unbaked);
     }
 
     @Override
     protected void addPartsWithInfo(
-        BlockRenderView world,
+        BlockAndTintGetter world,
         BlockPos pos,
         BlockState state,
         CopycatBlock block,
         BlockState material,
-        Random random,
+        RandomSource random,
         List<BlockModelPart> parts
     ) {
-        Direction facing = state.get(CopycatStepBlock.FACING, Direction.SOUTH);
-        boolean upperHalf = state.get(CopycatStepBlock.HALF, BlockHalf.BOTTOM) == BlockHalf.TOP;
-        Vec3d normal = Vec3d.of(facing.getVector());
-        Vec3d normalScaled2 = normal.multiply(.5);
-        Vec3d normalScaledN3 = normal.multiply(-.75);
-        Box bb = CUBE_AABB.shrink(-normal.x * .75, .75, -normal.z * .75);
+        Direction facing = state.getValueOrElse(CopycatStepBlock.FACING, Direction.SOUTH);
+        boolean upperHalf = state.getValueOrElse(CopycatStepBlock.HALF, Half.BOTTOM) == Half.TOP;
+        Vec3 normal = Vec3.atLowerCornerOf(facing.getUnitVec3i());
+        Vec3 normalScaled2 = normal.scale(.5);
+        Vec3 normalScaledN3 = normal.scale(-.75);
+        AABB bb = CUBE_AABB.contract(-normal.x * .75, .75, -normal.z * .75);
 
         OcclusionData occlusionData = gatherOcclusionData(world, pos, state, material, block);
         BlockStateModel model = getModelOf(material);
         for (BlockModelPart part : getMaterialParts(world, pos, material, random, model)) {
-            BakedGeometry.Builder builder = new BakedGeometry.Builder();
-            addCroppedQuads(facing, upperHalf, normalScaled2, normalScaledN3, bb, part.getQuads(null), builder::add);
+            QuadCollection.Builder builder = new QuadCollection.Builder();
+            addCroppedQuads(facing, upperHalf, normalScaled2, normalScaledN3, bb, part.getQuads(null), builder::addUnculledFace);
             for (Direction direction : Iterate.directions) {
                 if (occlusionData.isOccluded(direction))
                     continue;
@@ -60,19 +64,22 @@ public class CopycatStepModel extends CopycatModel {
                     normalScaledN3,
                     bb,
                     part.getQuads(direction),
-                    block.shouldFaceAlwaysRender(state, direction) ? builder::add : (BakedQuad quad) -> builder.add(direction, quad)
+                    block.shouldFaceAlwaysRender(state, direction) ? builder::addUnculledFace : (BakedQuad quad) -> builder.addCulledFace(
+                        direction,
+                        quad
+                    )
                 );
             }
-            parts.add(new GeometryBakedModel(builder.build(), part.useAmbientOcclusion(), part.particleSprite()));
+            parts.add(new SimpleModelWrapper(builder.build(), part.useAmbientOcclusion(), part.particleIcon()));
         }
     }
 
     protected void addCroppedQuads(
         Direction facing,
         boolean upperHalf,
-        Vec3d normalScaled2,
-        Vec3d normalScaledN3,
-        Box bb,
+        Vec3 normalScaled2,
+        Vec3 normalScaledN3,
+        AABB bb,
         List<BakedQuad> quads,
         Consumer<BakedQuad> consumer
     ) {
@@ -82,13 +89,13 @@ public class CopycatStepModel extends CopycatModel {
         }
         for (boolean top : Iterate.trueAndFalse) {
             for (boolean front : Iterate.trueAndFalse) {
-                Box bb1 = bb;
+                AABB bb1 = bb;
                 if (front)
-                    bb1 = bb1.offset(normalScaledN3);
+                    bb1 = bb1.move(normalScaledN3);
                 if (top)
-                    bb1 = bb1.offset(VEC_Y_3);
+                    bb1 = bb1.move(VEC_Y_3);
 
-                Vec3d offset = Vec3d.ZERO;
+                Vec3 offset = Vec3.ZERO;
                 if (front)
                     offset = offset.add(normalScaled2);
                 if (top != upperHalf)
@@ -96,7 +103,7 @@ public class CopycatStepModel extends CopycatModel {
 
                 for (int i = 0; i < size; i++) {
                     BakedQuad quad = quads.get(i);
-                    Direction direction = quad.face();
+                    Direction direction = quad.direction();
 
                     if (front && direction == facing)
                         continue;
@@ -109,7 +116,7 @@ public class CopycatStepModel extends CopycatModel {
 
                     consumer.accept(BakedQuadHelper.cloneWithCustomGeometry(
                         quad,
-                        BakedModelHelper.cropAndMove(quad.vertexData(), quad.sprite(), bb1, offset)
+                        BakedModelHelper.cropAndMove(quad.vertices(), quad.sprite(), bb1, offset)
                     ));
                 }
             }

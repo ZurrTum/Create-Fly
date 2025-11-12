@@ -6,19 +6,19 @@ import com.zurrtum.create.catnip.codecs.stream.CatnipStreamCodecBuilders;
 import com.zurrtum.create.catnip.data.Couple;
 import com.zurrtum.create.catnip.data.IntAttached;
 import com.zurrtum.create.content.contraptions.AbstractContraptionEntity;
-import net.minecraft.network.RegistryByteBuf;
-import net.minecraft.network.codec.PacketCodec;
-import net.minecraft.network.codec.PacketCodecs;
-import net.minecraft.network.packet.PacketType;
 import org.apache.logging.log4j.util.TriConsumer;
 
 import java.util.List;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.PacketType;
 
 public record ElevatorFloorListPacket(int entityId, List<IntAttached<Couple<String>>> floors) implements S2CPacket {
-    public static final PacketCodec<RegistryByteBuf, ElevatorFloorListPacket> CODEC = PacketCodec.tuple(
-        PacketCodecs.INTEGER,
+    public static final StreamCodec<RegistryFriendlyByteBuf, ElevatorFloorListPacket> CODEC = StreamCodec.composite(
+        ByteBufCodecs.INT,
         ElevatorFloorListPacket::entityId,
-        CatnipStreamCodecBuilders.list(IntAttached.streamCodec(Couple.streamCodec(PacketCodecs.STRING))),
+        CatnipStreamCodecBuilders.list(IntAttached.streamCodec(Couple.streamCodec(ByteBufCodecs.STRING_UTF8))),
         ElevatorFloorListPacket::floors,
         ElevatorFloorListPacket::new
     );
@@ -33,7 +33,7 @@ public record ElevatorFloorListPacket(int entityId, List<IntAttached<Couple<Stri
     }
 
     @Override
-    public PacketType<ElevatorFloorListPacket> getPacketType() {
+    public PacketType<ElevatorFloorListPacket> type() {
         return AllPackets.UPDATE_ELEVATOR_FLOORS;
     }
 

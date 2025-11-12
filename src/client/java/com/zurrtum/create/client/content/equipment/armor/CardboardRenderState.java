@@ -1,7 +1,7 @@
 package com.zurrtum.create.client.content.equipment.armor;
 
-import net.minecraft.client.network.ClientPlayerLikeEntity;
-import net.minecraft.entity.PlayerLikeEntity;
+import net.minecraft.client.entity.ClientAvatarEntity;
+import net.minecraft.world.entity.Avatar;
 
 public interface CardboardRenderState {
     double create$getMovement();
@@ -14,5 +14,5 @@ public interface CardboardRenderState {
 
     boolean create$isOnGround();
 
-    <T extends PlayerLikeEntity & ClientPlayerLikeEntity> void create$update(T player, float tickProgress);
+    <T extends Avatar & ClientAvatarEntity> void create$update(T player, float tickProgress);
 }

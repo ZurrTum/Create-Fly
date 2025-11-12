@@ -1,10 +1,9 @@
 package com.zurrtum.create.client.foundation.blockEntity;
 
-import net.minecraft.text.Text;
-
 import java.util.List;
+import net.minecraft.network.chat.Component;
 
 public record ValueSettingsBoard(
-    Text title, int maxValue, int milestoneInterval, List<Text> rows, ValueSettingsFormatter formatter
+    Component title, int maxValue, int milestoneInterval, List<Component> rows, ValueSettingsFormatter formatter
 ) {
 }

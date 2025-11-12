@@ -5,40 +5,40 @@ import com.zurrtum.create.AllShapes;
 import com.zurrtum.create.catnip.math.VecHelper;
 import com.zurrtum.create.content.kinetics.base.KineticBlock;
 import com.zurrtum.create.foundation.block.IBE;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.ShapeContext;
-import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityCollisionHandler;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.ai.pathing.NavigationType;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Direction.Axis;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.shape.VoxelShape;
-import net.minecraft.world.BlockView;
-import net.minecraft.world.World;
-import net.minecraft.world.WorldView;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.Direction.Axis;
+import net.minecraft.util.Mth;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.InsideBlockEffectApplier;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelReader;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.pathfinder.PathComputationType;
+import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.phys.shapes.VoxelShape;
 
 public class TurntableBlock extends KineticBlock implements IBE<TurntableBlockEntity> {
 
-    public TurntableBlock(Settings properties) {
+    public TurntableBlock(Properties properties) {
         super(properties);
     }
 
     @Override
-    public VoxelShape getOutlineShape(BlockState state, BlockView worldIn, BlockPos pos, ShapeContext context) {
+    public VoxelShape getShape(BlockState state, BlockGetter worldIn, BlockPos pos, CollisionContext context) {
         return AllShapes.TURNTABLE_SHAPE;
     }
 
     @Override
-    public void onEntityCollision(BlockState state, World worldIn, BlockPos pos, Entity e, EntityCollisionHandler handler, boolean bl) {
-        if (!e.isOnGround())
+    public void entityInside(BlockState state, Level worldIn, BlockPos pos, Entity e, InsideBlockEffectApplier handler, boolean bl) {
+        if (!e.onGround())
             return;
-        if (e.getVelocity().y > 0)
+        if (e.getDeltaMovement().y > 0)
             return;
         if (e.getY() < pos.getY() + .5f)
             return;
@@ -49,39 +49,39 @@ public class TurntableBlock extends KineticBlock implements IBE<TurntableBlockEn
                 if (speed == 0)
                     return;
 
-                World world = e.getEntityWorld();
-                if (world.isClient() && (e instanceof PlayerEntity)) {
-                    if (worldIn.getBlockState(e.getBlockPos()) != state) {
-                        Vec3d origin = VecHelper.getCenterOf(pos);
-                        Vec3d offset = e.getEntityPos().subtract(origin);
-                        offset = VecHelper.rotate(offset, MathHelper.clamp(speed, -16, 16) / 1f, Axis.Y);
-                        Vec3d movement = origin.add(offset).subtract(e.getEntityPos());
-                        e.setVelocity(e.getVelocity().add(movement));
-                        e.velocityModified = true;
+                Level world = e.level();
+                if (world.isClientSide() && (e instanceof Player)) {
+                    if (worldIn.getBlockState(e.blockPosition()) != state) {
+                        Vec3 origin = VecHelper.getCenterOf(pos);
+                        Vec3 offset = e.position().subtract(origin);
+                        offset = VecHelper.rotate(offset, Mth.clamp(speed, -16, 16) / 1f, Axis.Y);
+                        Vec3 movement = origin.add(offset).subtract(e.position());
+                        e.setDeltaMovement(e.getDeltaMovement().add(movement));
+                        e.hurtMarked = true;
                     }
                 }
 
-                if ((e instanceof PlayerEntity))
+                if ((e instanceof Player))
                     return;
-                if (world.isClient())
+                if (world.isClientSide())
                     return;
 
                 if ((e instanceof LivingEntity livingEntity)) {
-                    float diff = e.getHeadYaw() - speed;
-                    livingEntity.setDespawnCounter(20);
-                    e.setBodyYaw(diff);
-                    e.setHeadYaw(diff);
+                    float diff = e.getYHeadRot() - speed;
+                    livingEntity.setNoActionTime(20);
+                    e.setYBodyRot(diff);
+                    e.setYHeadRot(diff);
                     e.setOnGround(false);
-                    e.velocityModified = true;
+                    e.hurtMarked = true;
                 }
 
-                e.setYaw(e.getYaw() - speed);
+                e.setYRot(e.getYRot() - speed);
             }
         );
     }
 
     @Override
-    public boolean hasShaftTowards(WorldView world, BlockPos pos, BlockState state, Direction face) {
+    public boolean hasShaftTowards(LevelReader world, BlockPos pos, BlockState state, Direction face) {
         return face == Direction.DOWN;
     }
 
@@ -101,7 +101,7 @@ public class TurntableBlock extends KineticBlock implements IBE<TurntableBlockEn
     }
 
     @Override
-    protected boolean canPathfindThrough(BlockState state, NavigationType pathComputationType) {
+    protected boolean isPathfindable(BlockState state, PathComputationType pathComputationType) {
         return false;
     }
 

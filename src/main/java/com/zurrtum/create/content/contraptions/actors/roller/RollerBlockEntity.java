@@ -6,17 +6,16 @@ import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
 import com.zurrtum.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.foundation.blockEntity.behaviour.filtering.ServerFilteringBehaviour;
 import com.zurrtum.create.foundation.blockEntity.behaviour.scrollValue.ServerScrollOptionBehaviour;
-import net.minecraft.block.BlockEntityProvider;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.StairsBlock;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.shape.VoxelShape;
-import net.minecraft.util.shape.VoxelShapes;
-
 import java.util.List;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.EntityBlock;
+import net.minecraft.world.level.block.StairBlock;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.shapes.Shapes;
+import net.minecraft.world.phys.shapes.VoxelShape;
 
 public class RollerBlockEntity extends SmartBlockEntity {
 
@@ -57,20 +56,20 @@ public class RollerBlockEntity extends SmartBlockEntity {
         BlockState appliedState = RollerMovementBehaviour.getStateToPaveWith(newFilter);
         if (appliedState.isAir())
             return false;
-        if (appliedState.getBlock() instanceof BlockEntityProvider)
+        if (appliedState.getBlock() instanceof EntityBlock)
             return false;
-        if (appliedState.getBlock() instanceof StairsBlock)
+        if (appliedState.getBlock() instanceof StairBlock)
             return false;
-        VoxelShape shape = appliedState.getOutlineShape(world, pos);
-        if (shape.isEmpty() || !shape.getBoundingBox().equals(VoxelShapes.fullCube().getBoundingBox()))
+        VoxelShape shape = appliedState.getShape(level, worldPosition);
+        if (shape.isEmpty() || !shape.bounds().equals(Shapes.block().bounds()))
             return false;
-        VoxelShape collisionShape = appliedState.getCollisionShape(world, pos);
+        VoxelShape collisionShape = appliedState.getCollisionShape(level, worldPosition);
         return !collisionShape.isEmpty();
     }
 
     @Override
-    protected Box createRenderBoundingBox() {
-        return new Box(pos).expand(1);
+    protected AABB createRenderBoundingBox() {
+        return new AABB(worldPosition).inflate(1);
     }
 
     public float getAnimatedSpeed() {
@@ -82,14 +81,14 @@ public class RollerBlockEntity extends SmartBlockEntity {
     }
 
     public void searchForSharedValues() {
-        BlockState blockState = getCachedState();
-        Direction facing = blockState.get(RollerBlock.FACING, Direction.SOUTH);
+        BlockState blockState = getBlockState();
+        Direction facing = blockState.getValueOrElse(RollerBlock.FACING, Direction.SOUTH);
 
         for (int side : Iterate.positiveAndNegative) {
-            BlockPos pos = this.pos.offset(facing.rotateYClockwise(), side);
-            if (world.getBlockState(pos) != blockState)
+            BlockPos pos = this.worldPosition.relative(facing.getClockWise(), side);
+            if (level.getBlockState(pos) != blockState)
                 continue;
-            if (!(world.getBlockEntity(pos) instanceof RollerBlockEntity otherRoller))
+            if (!(level.getBlockEntity(pos) instanceof RollerBlockEntity otherRoller))
                 continue;
             acceptSharedValues(otherRoller.mode.getValue(), otherRoller.filtering.getFilter());
             shareValuesToAdjacent();
@@ -106,17 +105,17 @@ public class RollerBlockEntity extends SmartBlockEntity {
     }
 
     public void shareValuesToAdjacent() {
-        if (dontPropagate || world.isClient())
+        if (dontPropagate || level.isClientSide())
             return;
-        BlockState blockState = getCachedState();
-        Direction facing = blockState.get(RollerBlock.FACING, Direction.SOUTH);
+        BlockState blockState = getBlockState();
+        Direction facing = blockState.getValueOrElse(RollerBlock.FACING, Direction.SOUTH);
 
         for (int side : Iterate.positiveAndNegative) {
             for (int i = 1; i < 100; i++) {
-                BlockPos pos = this.pos.offset(facing.rotateYClockwise(), side * i);
-                if (world.getBlockState(pos) != blockState)
+                BlockPos pos = this.worldPosition.relative(facing.getClockWise(), side * i);
+                if (level.getBlockState(pos) != blockState)
                     break;
-                if (!(world.getBlockEntity(pos) instanceof RollerBlockEntity otherRoller))
+                if (!(level.getBlockEntity(pos) instanceof RollerBlockEntity otherRoller))
                     break;
                 otherRoller.acceptSharedValues(mode.getValue(), filtering.getFilter());
             }

@@ -4,8 +4,8 @@ import com.google.common.collect.ImmutableBiMap;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.zurrtum.create.AllBlocks;
-import net.minecraft.block.Block;
-import net.minecraft.item.HoneycombItem;
+import net.minecraft.world.item.HoneycombItem;
+import net.minecraft.world.level.block.Block;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 

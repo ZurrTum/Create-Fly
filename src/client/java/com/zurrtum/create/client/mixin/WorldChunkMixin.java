@@ -1,9 +1,9 @@
 package com.zurrtum.create.client.mixin;
 
 import com.zurrtum.create.client.flywheel.api.visualization.VisualizationManager;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.world.World;
-import net.minecraft.world.chunk.WorldChunk;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.chunk.LevelChunk;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -11,15 +11,15 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-@Mixin(WorldChunk.class)
+@Mixin(LevelChunk.class)
 public abstract class WorldChunkMixin {
     @Shadow
     @Final
-    World world;
+    Level level;
 
-    @Inject(method = "setBlockEntity(Lnet/minecraft/block/entity/BlockEntity;)V", at = @At(value = "INVOKE_ASSIGN", target = "Ljava/util/Map;put(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;"))
+    @Inject(method = "setBlockEntity(Lnet/minecraft/world/level/block/entity/BlockEntity;)V", at = @At(value = "INVOKE_ASSIGN", target = "Ljava/util/Map;put(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;"))
     private void flywheel$onBlockEntityAdded(BlockEntity blockEntity, CallbackInfo ci) {
-        VisualizationManager manager = VisualizationManager.get(world);
+        VisualizationManager manager = VisualizationManager.get(level);
         if (manager == null) {
             return;
         }

@@ -16,16 +16,16 @@ import com.zurrtum.create.content.redstone.link.controller.LinkedControllerServe
 import com.zurrtum.create.foundation.utility.ServerSpeedProvider;
 import com.zurrtum.create.foundation.utility.TickBasedCache;
 import com.zurrtum.create.infrastructure.worldgen.AllPlacedFeatures;
-import net.minecraft.registry.DynamicRegistryManager;
-import net.minecraft.resource.ResourcePackManager;
+import net.minecraft.core.RegistryAccess;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.SaveLoader;
-import net.minecraft.server.dedicated.MinecraftDedicatedServer;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.util.ApiServices;
-import net.minecraft.world.World;
-import net.minecraft.world.chunk.ChunkLoadProgress;
-import net.minecraft.world.level.storage.LevelStorage;
+import net.minecraft.server.Services;
+import net.minecraft.server.WorldStem;
+import net.minecraft.server.dedicated.DedicatedServer;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.progress.LevelLoadListener;
+import net.minecraft.server.packs.repository.PackRepository;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.storage.LevelStorageSource;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -39,9 +39,9 @@ import java.util.function.BooleanSupplier;
 @Mixin(MinecraftServer.class)
 public abstract class MinecraftServerMixin {
     @Shadow
-    public abstract DynamicRegistryManager.Immutable getRegistryManager();
+    public abstract RegistryAccess.Frozen registryAccess();
 
-    @Inject(method = "tick(Ljava/util/function/BooleanSupplier;)V", at = @At("TAIL"))
+    @Inject(method = "tickServer(Ljava/util/function/BooleanSupplier;)V", at = @At("TAIL"))
     void tick(BooleanSupplier shouldKeepTicking, CallbackInfo ci) {
         MinecraftServer server = (MinecraftServer) (Object) this;
         Create.SCHEMATIC_RECEIVER.tick();
@@ -51,13 +51,13 @@ public abstract class MinecraftServerMixin {
         TickBasedCache.tick();
     }
 
-    @Inject(method = "runServer()V", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/MinecraftServer;shutdown()V"))
+    @Inject(method = "runServer()V", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/MinecraftServer;stopServer()V"))
     private void serverStopping(CallbackInfo ci) {
         Create.SCHEMATIC_RECEIVER.shutdown();
     }
 
-    @Inject(method = "tickWorlds(Ljava/util/function/BooleanSupplier;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/world/ServerWorld;tick(Ljava/util/function/BooleanSupplier;)V", shift = At.Shift.AFTER))
-    private void onServerWorldTick(BooleanSupplier shouldKeepTicking, CallbackInfo ci, @Local ServerWorld world) {
+    @Inject(method = "tickChildren(Ljava/util/function/BooleanSupplier;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerLevel;tick(Ljava/util/function/BooleanSupplier;)V", shift = At.Shift.AFTER))
+    private void onServerWorldTick(BooleanSupplier shouldKeepTicking, CallbackInfo ci, @Local ServerLevel world) {
         ContraptionHandler.tick(world);
         CapabilityMinecartController.tick(world);
         CouplingPhysics.tick(world);
@@ -67,49 +67,49 @@ public abstract class MinecraftServerMixin {
         Create.LOGISTICS.tick(world);
     }
 
-    @WrapOperation(method = "createWorlds()V", at = @At(value = "INVOKE", target = "Ljava/util/Map;put(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;"))
+    @WrapOperation(method = "createLevels()V", at = @At(value = "INVOKE", target = "Ljava/util/Map;put(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;"))
     private <K, V> V onLoad(Map<K, V> map, K key, V value, Operation<V> original) {
         V result = original.call(map, key, value);
-        World world = (World) value;
+        Level world = (Level) value;
         Create.REDSTONE_LINK_NETWORK_HANDLER.onLoadWorld(world);
         Create.TORQUE_PROPAGATOR.onLoadWorld(world);
         return result;
     }
 
-    @Inject(method = "createWorlds()V", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/ServerWorldProperties;isInitialized()Z"))
-    private void onLoadOverworld(CallbackInfo ci, @Local ServerWorld world) {
+    @Inject(method = "createLevels()V", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/storage/ServerLevelData;isInitialized()Z"))
+    private void onLoadOverworld(CallbackInfo ci, @Local ServerLevel world) {
         MinecraftServer server = (MinecraftServer) (Object) this;
         Create.RAILWAYS.levelLoaded(server);
         Create.LOGISTICS.levelLoaded(server);
     }
 
-    @Inject(method = "shutdown()V", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/world/ServerWorld;close()V"))
-    private void onUnload(CallbackInfo ci, @Local ServerWorld world) {
+    @Inject(method = "stopServer()V", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerLevel;close()V"))
+    private void onUnload(CallbackInfo ci, @Local ServerLevel world) {
         Create.REDSTONE_LINK_NETWORK_HANDLER.onUnloadWorld(world);
         Create.TORQUE_PROPAGATOR.onUnloadWorld(world);
         WorldAttached.invalidateWorld(world);
         CobbleGenOptimisation.invalidateWorld(world);
     }
 
-    @Inject(method = "runServer()V", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/MinecraftServer;exit()V"))
+    @Inject(method = "runServer()V", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/MinecraftServer;onServerExit()V"))
     private void onStopServer(CallbackInfo ci) {
         Create.SERVER = null;
     }
 
-    @Inject(method = "<init>", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/SaveLoader;saveProperties()Lnet/minecraft/world/SaveProperties;"))
+    @Inject(method = "<init>", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/WorldStem;worldData()Lnet/minecraft/world/level/storage/WorldData;"))
     private void addBiomeFeatures(
         Thread serverThread,
-        LevelStorage.Session session,
-        ResourcePackManager dataPackManager,
-        SaveLoader saveLoader,
+        LevelStorageSource.LevelStorageAccess session,
+        PackRepository dataPackManager,
+        WorldStem saveLoader,
         Proxy proxy,
         DataFixer dataFixer,
-        ApiServices apiServices,
-        ChunkLoadProgress chunkLoadProgress,
+        Services apiServices,
+        LevelLoadListener chunkLoadProgress,
         CallbackInfo ci
     ) {
-        if ((Object) this instanceof MinecraftDedicatedServer) {
-            AllPlacedFeatures.register(getRegistryManager());
+        if ((Object) this instanceof DedicatedServer) {
+            AllPlacedFeatures.register(registryAccess());
         }
     }
 }

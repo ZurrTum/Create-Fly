@@ -11,19 +11,19 @@ import com.zurrtum.create.content.contraptions.mounted.MinecartContraptionItem;
 import com.zurrtum.create.content.equipment.extendoGrip.ExtendoGripItem;
 import com.zurrtum.create.foundation.item.CustomAttackSoundItem;
 import com.zurrtum.create.foundation.item.DamageControlItem;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.damage.DamageSource;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.sound.SoundCategory;
-import net.minecraft.sound.SoundEvent;
-import net.minecraft.storage.ReadView;
-import net.minecraft.storage.WriteView;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.Hand;
-import net.minecraft.world.World;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import org.jetbrains.annotations.NotNull;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -32,15 +32,15 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-@Mixin(PlayerEntity.class)
+@Mixin(Player.class)
 public abstract class PlayerEntityMixin {
     @Shadow
-    public abstract @NotNull ItemStack getWeaponStack();
+    public abstract @NotNull ItemStack getWeaponItem();
 
-    @Inject(method = "interact(Lnet/minecraft/entity/Entity;Lnet/minecraft/util/Hand;)Lnet/minecraft/util/ActionResult;", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/player/PlayerEntity;getStackInHand(Lnet/minecraft/util/Hand;)Lnet/minecraft/item/ItemStack;", ordinal = 0), cancellable = true)
-    private void interact(Entity entity, Hand hand, CallbackInfoReturnable<ActionResult> cir) {
-        PlayerEntity player = (PlayerEntity) (Object) this;
-        ActionResult result = MinecartCouplingItem.handleInteractionWithMinecart(player, hand, entity);
+    @Inject(method = "interactOn(Lnet/minecraft/world/entity/Entity;Lnet/minecraft/world/InteractionHand;)Lnet/minecraft/world/InteractionResult;", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/player/Player;getItemInHand(Lnet/minecraft/world/InteractionHand;)Lnet/minecraft/world/item/ItemStack;", ordinal = 0), cancellable = true)
+    private void interact(Entity entity, InteractionHand hand, CallbackInfoReturnable<InteractionResult> cir) {
+        Player player = (Player) (Object) this;
+        InteractionResult result = MinecartCouplingItem.handleInteractionWithMinecart(player, hand, entity);
         if (result != null) {
             cir.setReturnValue(result);
         }
@@ -50,12 +50,12 @@ public abstract class PlayerEntityMixin {
         }
     }
 
-    @Inject(method = "attack(Lnet/minecraft/entity/Entity;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/item/ItemStack;postHit(Lnet/minecraft/entity/LivingEntity;Lnet/minecraft/entity/LivingEntity;)Z"))
+    @Inject(method = "attack(Lnet/minecraft/world/entity/Entity;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/item/ItemStack;hurtEnemy(Lnet/minecraft/world/entity/LivingEntity;Lnet/minecraft/world/entity/LivingEntity;)Z"))
     private void attack(Entity target, CallbackInfo ci) {
-        ExtendoGripItem.postDamageEntity((PlayerEntity) (Object) this);
+        ExtendoGripItem.postDamageEntity((Player) (Object) this);
     }
 
-    @WrapOperation(method = "attack(Lnet/minecraft/entity/Entity;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/Entity;sidedDamage(Lnet/minecraft/entity/damage/DamageSource;F)Z"))
+    @WrapOperation(method = "attack(Lnet/minecraft/world/entity/Entity;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/Entity;hurtOrSimulate(Lnet/minecraft/world/damagesource/DamageSource;F)Z"))
     private boolean damage(
         Entity entity,
         DamageSource source,
@@ -73,7 +73,7 @@ public abstract class PlayerEntityMixin {
         return original.call(entity, source, amount);
     }
 
-    @WrapOperation(method = "attack(Lnet/minecraft/entity/Entity;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/item/ItemStack;postDamageEntity(Lnet/minecraft/entity/LivingEntity;Lnet/minecraft/entity/LivingEntity;)V"))
+    @WrapOperation(method = "attack(Lnet/minecraft/world/entity/Entity;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/item/ItemStack;postHurtEnemy(Lnet/minecraft/world/entity/LivingEntity;Lnet/minecraft/world/entity/LivingEntity;)V"))
     private void postDamageEntity(
         ItemStack instance,
         LivingEntity target,
@@ -87,37 +87,37 @@ public abstract class PlayerEntityMixin {
         original.call(instance, target, user);
     }
 
-    @WrapOperation(method = "attack(Lnet/minecraft/entity/Entity;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/World;playSound(Lnet/minecraft/entity/Entity;DDDLnet/minecraft/sound/SoundEvent;Lnet/minecraft/sound/SoundCategory;FF)V"))
+    @WrapOperation(method = "attack(Lnet/minecraft/world/entity/Entity;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/Level;playSound(Lnet/minecraft/world/entity/Entity;DDDLnet/minecraft/sounds/SoundEvent;Lnet/minecraft/sounds/SoundSource;FF)V"))
     private void playSound(
-        World world,
+        Level world,
         Entity source,
         double x,
         double y,
         double z,
         SoundEvent sound,
-        SoundCategory category,
+        SoundSource category,
         float volume,
         float pitch,
         Operation<Void> original
     ) {
-        ItemStack stack = getWeaponStack();
+        ItemStack stack = getWeaponItem();
         if (stack.getItem() instanceof CustomAttackSoundItem item) {
-            item.playSound(world, (PlayerEntity) (Object) this, x, y, z, sound, category, volume, pitch);
+            item.playSound(world, (Player) (Object) this, x, y, z, sound, category, volume, pitch);
         } else {
             original.call(world, source, x, y, z, sound, category, volume, pitch);
         }
     }
 
-    @Inject(method = "writeCustomData(Lnet/minecraft/storage/WriteView;)V", at = @At("TAIL"))
-    private void writeCustomData(WriteView view, CallbackInfo ci) {
-        NbtCompound compound = AllSynchedDatas.TOOLBOX.get((PlayerEntity) (Object) this);
+    @Inject(method = "addAdditionalSaveData(Lnet/minecraft/world/level/storage/ValueOutput;)V", at = @At("TAIL"))
+    private void writeCustomData(ValueOutput view, CallbackInfo ci) {
+        CompoundTag compound = AllSynchedDatas.TOOLBOX.get((Player) (Object) this);
         if (!compound.isEmpty()) {
-            view.put("CreateToolboxData", NbtCompound.CODEC, compound);
+            view.store("CreateToolboxData", CompoundTag.CODEC, compound);
         }
     }
 
-    @Inject(method = "readCustomData(Lnet/minecraft/storage/ReadView;)V", at = @At("TAIL"))
-    private void readCustomData(ReadView view, CallbackInfo ci) {
-        view.read("CreateToolboxData", NbtCompound.CODEC).ifPresent(compound -> AllSynchedDatas.TOOLBOX.set((PlayerEntity) (Object) this, compound));
+    @Inject(method = "readAdditionalSaveData(Lnet/minecraft/world/level/storage/ValueInput;)V", at = @At("TAIL"))
+    private void readCustomData(ValueInput view, CallbackInfo ci) {
+        view.read("CreateToolboxData", CompoundTag.CODEC).ifPresent(compound -> AllSynchedDatas.TOOLBOX.set((Player) (Object) this, compound));
     }
 }

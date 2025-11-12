@@ -5,16 +5,16 @@ import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.zurrtum.create.AllParticleTypes;
 import com.zurrtum.create.catnip.codecs.stream.CatnipStreamCodecs;
-import net.minecraft.network.RegistryByteBuf;
-import net.minecraft.network.codec.PacketCodec;
-import net.minecraft.network.codec.PacketCodecs;
-import net.minecraft.particle.ParticleEffect;
-import net.minecraft.particle.ParticleType;
-import net.minecraft.util.math.Direction;
+import net.minecraft.core.Direction;
+import net.minecraft.core.particles.ParticleOptions;
+import net.minecraft.core.particles.ParticleType;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
 
 public record RotationIndicatorParticleData(
     int color, float speed, float radius1, float radius2, int lifeSpan, Direction.Axis axis
-) implements ParticleEffect {
+) implements ParticleOptions {
 
     public static final MapCodec<RotationIndicatorParticleData> CODEC = RecordCodecBuilder.mapCodec(i -> i.group(
         Codec.INT.fieldOf("color").forGetter(RotationIndicatorParticleData::color),
@@ -25,16 +25,16 @@ public record RotationIndicatorParticleData(
         Direction.Axis.CODEC.fieldOf("axis").forGetter(RotationIndicatorParticleData::axis)
     ).apply(i, RotationIndicatorParticleData::new));
 
-    public static final PacketCodec<RegistryByteBuf, RotationIndicatorParticleData> STREAM_CODEC = PacketCodec.tuple(
-        PacketCodecs.INTEGER,
+    public static final StreamCodec<RegistryFriendlyByteBuf, RotationIndicatorParticleData> STREAM_CODEC = StreamCodec.composite(
+        ByteBufCodecs.INT,
         RotationIndicatorParticleData::color,
-        PacketCodecs.FLOAT,
+        ByteBufCodecs.FLOAT,
         RotationIndicatorParticleData::speed,
-        PacketCodecs.FLOAT,
+        ByteBufCodecs.FLOAT,
         RotationIndicatorParticleData::radius1,
-        PacketCodecs.FLOAT,
+        ByteBufCodecs.FLOAT,
         RotationIndicatorParticleData::radius2,
-        PacketCodecs.INTEGER,
+        ByteBufCodecs.INT,
         RotationIndicatorParticleData::lifeSpan,
         CatnipStreamCodecs.AXIS,
         RotationIndicatorParticleData::axis,

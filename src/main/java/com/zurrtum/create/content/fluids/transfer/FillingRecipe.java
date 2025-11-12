@@ -12,24 +12,24 @@ import com.zurrtum.create.AllRecipeTypes;
 import com.zurrtum.create.foundation.fluid.FluidIngredient;
 import com.zurrtum.create.foundation.recipe.CreateRecipe;
 import com.zurrtum.create.infrastructure.component.SequencedAssemblyJunk;
-import net.minecraft.item.ItemStack;
-import net.minecraft.network.RegistryByteBuf;
-import net.minecraft.network.codec.PacketCodec;
-import net.minecraft.recipe.Ingredient;
-import net.minecraft.recipe.RecipeSerializer;
-import net.minecraft.recipe.RecipeType;
-import net.minecraft.registry.RegistryWrapper;
-import net.minecraft.text.Text;
-import net.minecraft.world.World;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.item.crafting.RecipeSerializer;
+import net.minecraft.world.item.crafting.RecipeType;
+import net.minecraft.world.level.Level;
 
 public record FillingRecipe(ItemStack result, Ingredient ingredient, FluidIngredient fluidIngredient) implements CreateRecipe<FillingInput> {
     @Override
-    public boolean matches(FillingInput input, World world) {
+    public boolean matches(FillingInput input, Level world) {
         return ingredient.test(input.item()) && fluidIngredient.test(input.fluid());
     }
 
     @Override
-    public ItemStack craft(FillingInput input, RegistryWrapper.WrapperLookup registries) {
+    public ItemStack assemble(FillingInput input, HolderLookup.Provider registries) {
         SequencedAssemblyJunk junk = input.item().get(AllDataComponents.SEQUENCED_ASSEMBLY_JUNK);
         if (junk != null && junk.hasJunk()) {
             return junk.getJunk();
@@ -47,11 +47,11 @@ public record FillingRecipe(ItemStack result, Ingredient ingredient, FluidIngred
         return AllRecipeTypes.FILLING;
     }
 
-    public static Text getDescriptionForAssembly(DynamicOps<JsonElement> ops, JsonObject object) {
+    public static Component getDescriptionForAssembly(DynamicOps<JsonElement> ops, JsonObject object) {
         return FluidIngredient.CODEC.parse(JsonOps.INSTANCE, object.get("fluid_ingredient")).result()
             .flatMap(fluidIngredient -> fluidIngredient.getMatchingFluidStacks().stream().findFirst())
-            .map(stack -> Text.translatable("create.recipe.assembly.spout_filling_fluid", stack.getName().getString()))
-            .orElseGet(() -> Text.literal("Invalid"));
+            .map(stack -> Component.translatable("create.recipe.assembly.spout_filling_fluid", stack.getName().getString()))
+            .orElseGet(() -> Component.literal("Invalid"));
     }
 
     public static class Serializer implements RecipeSerializer<FillingRecipe> {
@@ -60,10 +60,10 @@ public record FillingRecipe(ItemStack result, Ingredient ingredient, FluidIngred
             Ingredient.CODEC.fieldOf("ingredient").forGetter(FillingRecipe::ingredient),
             FluidIngredient.CODEC.fieldOf("fluid_ingredient").forGetter(FillingRecipe::fluidIngredient)
         ).apply(instance, FillingRecipe::new));
-        public static final PacketCodec<RegistryByteBuf, FillingRecipe> PACKET_CODEC = PacketCodec.tuple(
-            ItemStack.PACKET_CODEC,
+        public static final StreamCodec<RegistryFriendlyByteBuf, FillingRecipe> PACKET_CODEC = StreamCodec.composite(
+            ItemStack.STREAM_CODEC,
             FillingRecipe::result,
-            Ingredient.PACKET_CODEC,
+            Ingredient.CONTENTS_STREAM_CODEC,
             FillingRecipe::ingredient,
             FluidIngredient.PACKET_CODEC,
             FillingRecipe::fluidIngredient,
@@ -76,7 +76,7 @@ public record FillingRecipe(ItemStack result, Ingredient ingredient, FluidIngred
         }
 
         @Override
-        public PacketCodec<RegistryByteBuf, FillingRecipe> packetCodec() {
+        public StreamCodec<RegistryFriendlyByteBuf, FillingRecipe> streamCodec() {
             return PACKET_CODEC;
         }
     }

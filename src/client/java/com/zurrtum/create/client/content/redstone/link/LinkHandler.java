@@ -4,25 +4,25 @@ import com.zurrtum.create.AllItems;
 import com.zurrtum.create.catnip.data.Iterate;
 import com.zurrtum.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.infrastructure.packet.c2s.LinkSettingsPacket;
-import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.sound.SoundCategory;
-import net.minecraft.sound.SoundEvents;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.Hand;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.core.BlockPos;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.BlockHitResult;
 
 public class LinkHandler {
-    public static ActionResult onBlockActivated(World world, ClientPlayerEntity player, Hand hand, BlockHitResult ray) {
-        if (player.isSneaking() || player.isSpectator())
+    public static InteractionResult onBlockActivated(Level world, LocalPlayer player, InteractionHand hand, BlockHitResult ray) {
+        if (player.isShiftKeyDown() || player.isSpectator())
             return null;
 
-        ItemStack heldItem = player.getStackInHand(hand);
-        if (heldItem.isOf(AllItems.LINKED_CONTROLLER))
+        ItemStack heldItem = player.getItemInHand(hand);
+        if (heldItem.is(AllItems.LINKED_CONTROLLER))
             return null;
-        if (heldItem.isOf(AllItems.WRENCH))
+        if (heldItem.is(AllItems.WRENCH))
             return null;
 
         BlockPos pos = ray.getBlockPos();
@@ -31,11 +31,11 @@ public class LinkHandler {
             return null;
 
         for (boolean first : Iterate.trueAndFalse) {
-            if (behaviour.testHit(first, ray.getPos())) {
+            if (behaviour.testHit(first, ray.getLocation())) {
                 behaviour.setFrequency(first, heldItem);
-                world.playSound(null, pos, SoundEvents.ENTITY_ITEM_FRAME_ADD_ITEM, SoundCategory.BLOCKS, .25f, .1f);
-                player.networkHandler.sendPacket(new LinkSettingsPacket(pos, first, hand));
-                return ActionResult.SUCCESS;
+                world.playSound(null, pos, SoundEvents.ITEM_FRAME_ADD_ITEM, SoundSource.BLOCKS, .25f, .1f);
+                player.connection.send(new LinkSettingsPacket(pos, first, hand));
+                return InteractionResult.SUCCESS;
             }
         }
         return null;

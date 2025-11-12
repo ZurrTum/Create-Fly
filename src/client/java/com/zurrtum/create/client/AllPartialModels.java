@@ -8,9 +8,9 @@ import com.zurrtum.create.client.flywheel.lib.model.baked.PartialModel;
 import com.zurrtum.create.content.fluids.FluidTransportBehaviour;
 import com.zurrtum.create.content.kinetics.gantry.GantryShaftBlock;
 import com.zurrtum.create.content.logistics.box.PackageStyles.PackageStyle;
-import net.minecraft.util.DyeColor;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.math.Direction;
+import net.minecraft.core.Direction;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.DyeColor;
 
 import java.util.*;
 
@@ -184,12 +184,12 @@ public class AllPartialModels {
     public static final Map<Direction, PartialModel> METAL_GIRDER_BRACKETS = new EnumMap<>(Direction.class);
     public static final Map<DyeColor, PartialModel> TOOLBOX_LIDS = new EnumMap<>(DyeColor.class);
     public static final Map<DyeColor, PartialModel> DYED_VALVE_HANDLES = new EnumMap<>(DyeColor.class);
-    public static final Map<Identifier, Couple<PartialModel>> FOLDING_DOORS = new HashMap<>();
+    public static final Map<ResourceLocation, Couple<PartialModel>> FOLDING_DOORS = new HashMap<>();
     public static final List<PartialModel> CONTRAPTION_CONTROLS_INDICATOR = new ArrayList<>();
 
-    public static final Map<Identifier, PartialModel> PACKAGES = new HashMap<>();
+    public static final Map<ResourceLocation, PartialModel> PACKAGES = new HashMap<>();
     public static final List<PartialModel> PACKAGES_TO_HIDE_AS = new ArrayList<>();
-    public static final Map<Identifier, PartialModel> PACKAGE_RIGGING = new HashMap<>();
+    public static final Map<ResourceLocation, PartialModel> PACKAGE_RIGGING = new HashMap<>();
 
     public static final Map<GantryShaftKey, PartialModel> GANTRY_SHAFTS = new HashMap<>();
 
@@ -198,7 +198,7 @@ public class AllPartialModels {
             Map<Direction, PartialModel> map = new HashMap<>();
             for (Direction d : Iterate.directions) {
                 String asId = Lang.asId(type.name());
-                map.put(d, block("fluid_pipe/" + asId + "/" + Lang.asId(d.asString())));
+                map.put(d, block("fluid_pipe/" + asId + "/" + Lang.asId(d.getSerializedName())));
             }
             PIPE_ATTACHMENTS.put(type, map);
         }
@@ -219,7 +219,7 @@ public class AllPartialModels {
         putFoldingDoor("copper_door");
 
         for (PackageStyle style : AllPackageStyles.ALL) {
-            Identifier key = style.getItemId();
+            ResourceLocation key = style.getItemId();
             PartialModel model = PartialModel.of(style.getModel());
             PACKAGES.put(key, model);
             if (!style.rare())
@@ -238,8 +238,8 @@ public class AllPartialModels {
     }
 
     public record GantryShaftKey(GantryShaftBlock.Part part, boolean powered, boolean flipped) {
-        private Identifier name() {
-            String partName = part.asString();
+        private ResourceLocation name() {
+            String partName = part.getSerializedName();
 
             if (!(flipped || powered)) {
                 // Non-generated

@@ -5,11 +5,10 @@ import com.zurrtum.create.catnip.theme.Color;
 import com.zurrtum.create.content.kinetics.base.IRotate.SpeedLevel;
 import com.zurrtum.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.infrastructure.config.AllConfigs;
-import net.minecraft.block.BlockState;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.MathHelper;
-
 import java.util.List;
+import net.minecraft.core.BlockPos;
+import net.minecraft.util.Mth;
+import net.minecraft.world.level.block.state.BlockState;
 
 public class SpeedGaugeBlockEntity extends GaugeBlockEntity {
 
@@ -46,7 +45,7 @@ public class SpeedGaugeBlockEntity extends GaugeBlockEntity {
         dialTarget = getDialTarget(speed);
         color = Color.mixColors(SpeedLevel.of(speed).getColor(), 0xffffff, .25f);
 
-        markDirty();
+        setChanged();
     }
 
     public static float getDialTarget(float speed) {
@@ -58,11 +57,11 @@ public class SpeedGaugeBlockEntity extends GaugeBlockEntity {
         if (speed == 0)
             target = 0;
         else if (speed < medium)
-            target = MathHelper.lerp(speed / medium, 0, .45f);
+            target = Mth.lerp(speed / medium, 0, .45f);
         else if (speed < fast)
-            target = MathHelper.lerp((speed - medium) / (fast - medium), .45f, .75f);
+            target = Mth.lerp((speed - medium) / (fast - medium), .45f, .75f);
         else
-            target = MathHelper.lerp((speed - fast) / (max - fast), .75f, 1.125f);
+            target = Mth.lerp((speed - fast) / (max - fast), .75f, 1.125f);
         return target;
     }
 }

@@ -1,28 +1,28 @@
 package com.zurrtum.create.client.flywheel.backend.engine.uniform;
 
-import net.minecraft.client.option.GameOptions;
+import net.minecraft.client.Options;
 
 public final class OptionsUniforms extends UniformWriter {
     private static final int SIZE = 4 * 14;
     static final UniformBuffer BUFFER = new UniformBuffer(Uniforms.OPTIONS_INDEX, SIZE);
 
-    public static void update(GameOptions options) {
+    public static void update(Options options) {
         long ptr = BUFFER.ptr();
 
-        ptr = writeFloat(ptr, options.getGamma().getValue().floatValue());
-        ptr = writeInt(ptr, options.getFov().getValue());
-        ptr = writeFloat(ptr, options.getDistortionEffectScale().getValue().floatValue());
-        ptr = writeFloat(ptr, options.getGlintSpeed().getValue().floatValue());
-        ptr = writeFloat(ptr, options.getGlintStrength().getValue().floatValue());
-        ptr = writeInt(ptr, options.getBiomeBlendRadius().getValue());
-        ptr = writeInt(ptr, options.getAo().getValue() ? 1 : 0);
-        ptr = writeInt(ptr, options.getBobView().getValue() ? 1 : 0);
-        ptr = writeInt(ptr, options.getHighContrast().getValue() ? 1 : 0);
-        ptr = writeFloat(ptr, options.getTextBackgroundOpacity().getValue().floatValue());
-        ptr = writeInt(ptr, options.getBackgroundForChatOnly().getValue() ? 1 : 0);
-        ptr = writeFloat(ptr, options.getDarknessEffectScale().getValue().floatValue());
-        ptr = writeFloat(ptr, options.getDamageTiltStrength().getValue().floatValue());
-        ptr = writeInt(ptr, options.getHideLightningFlashes().getValue() ? 1 : 0);
+        ptr = writeFloat(ptr, options.gamma().get().floatValue());
+        ptr = writeInt(ptr, options.fov().get());
+        ptr = writeFloat(ptr, options.screenEffectScale().get().floatValue());
+        ptr = writeFloat(ptr, options.glintSpeed().get().floatValue());
+        ptr = writeFloat(ptr, options.glintStrength().get().floatValue());
+        ptr = writeInt(ptr, options.biomeBlendRadius().get());
+        ptr = writeInt(ptr, options.ambientOcclusion().get() ? 1 : 0);
+        ptr = writeInt(ptr, options.bobView().get() ? 1 : 0);
+        ptr = writeInt(ptr, options.highContrast().get() ? 1 : 0);
+        ptr = writeFloat(ptr, options.textBackgroundOpacity().get().floatValue());
+        ptr = writeInt(ptr, options.backgroundForChatOnly().get() ? 1 : 0);
+        ptr = writeFloat(ptr, options.darknessEffectScale().get().floatValue());
+        ptr = writeFloat(ptr, options.damageTiltStrength().get().floatValue());
+        ptr = writeInt(ptr, options.hideLightningFlash().get() ? 1 : 0);
 
         BUFFER.markDirty();
     }

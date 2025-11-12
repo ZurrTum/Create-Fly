@@ -15,29 +15,29 @@ import com.zurrtum.create.content.logistics.box.PackageItem;
 import com.zurrtum.create.content.logistics.packagePort.frogport.FrogportBlockEntity;
 import com.zurrtum.create.foundation.codec.CreateCodecs;
 import com.zurrtum.create.infrastructure.config.AllConfigs;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.entity.ItemEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.particle.BlockStateParticleEffect;
-import net.minecraft.particle.ParticleTypes;
-import net.minecraft.storage.ReadView;
-import net.minecraft.storage.WriteView;
-import net.minecraft.util.Hand;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.math.Direction.Axis;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec3d;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 import java.util.function.Consumer;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction.Axis;
+import net.minecraft.core.particles.BlockParticleOption;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.util.Mth;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
 
 public class ChainConveyorBlockEntity extends KineticBlockEntity implements TransformableBlockEntity {
     public static final Codec<List<ChainConveyorPackage>> PACKAGE_CODEC = ChainConveyorPackage.CODEC.listOf();
@@ -48,7 +48,7 @@ public class ChainConveyorBlockEntity extends KineticBlockEntity implements Tran
         CreateCodecs.getArrayListCodec(ChainConveyorPackage.CLIENT_CODEC)
     );
 
-    public record ConnectionStats(float tangentAngle, float chainLength, Vec3d start, Vec3d end) {
+    public record ConnectionStats(float tangentAngle, float chainLength, Vec3 start, Vec3 end) {
     }
 
     public record ConnectedPort(float chainPosition, @Nullable BlockPos connection, String filter) {
@@ -76,8 +76,8 @@ public class ChainConveyorBlockEntity extends KineticBlockEntity implements Tran
     }
 
     @Override
-    protected Box createRenderBoundingBox() {
-        return new Box(pos).expand(connections.isEmpty() ? 3 : 64);
+    protected AABB createRenderBoundingBox() {
+        return new AABB(worldPosition).inflate(connections.isEmpty() ? 3 : 64);
     }
 
     @Override
@@ -93,7 +93,7 @@ public class ChainConveyorBlockEntity extends KineticBlockEntity implements Tran
     public boolean canAcceptPackagesFor(@Nullable BlockPos connection) {
         if (connection == null && !canAcceptMorePackages())
             return false;
-        return connection == null || (world.getBlockEntity(pos.add(connection)) instanceof ChainConveyorBlockEntity otherClbe && otherClbe.canAcceptMorePackages());
+        return connection == null || (level.getBlockEntity(worldPosition.offset(connection)) instanceof ChainConveyorBlockEntity otherClbe && otherClbe.canAcceptMorePackages());
     }
 
     public boolean canAcceptMorePackagesFromOtherConveyor() {
@@ -117,29 +117,29 @@ public class ChainConveyorBlockEntity extends KineticBlockEntity implements Tran
     public void tick() {
         super.tick();
 
-        if (checkInvalid && !world.isClient()) {
+        if (checkInvalid && !level.isClientSide()) {
             checkInvalid = false;
             removeInvalidConnections();
         }
 
-        float serverSpeed = world.isClient() && !isVirtual() ? AllClientHandle.INSTANCE.getServerSpeed() : 1f;
+        float serverSpeed = level.isClientSide() && !isVirtual() ? AllClientHandle.INSTANCE.getServerSpeed() : 1f;
         float speed = getSpeed() / 360f;
         float radius = 1.5f;
         float distancePerTick = Math.abs(speed);
-        float degreesPerTick = (speed / (MathHelper.PI * radius)) * 360f;
+        float degreesPerTick = (speed / (Mth.PI * radius)) * 360f;
         boolean reversedPreviously = reversed;
 
         prepareStats();
 
-        if (world.isClient()) {
+        if (level.isClientSide()) {
             getBehaviour(ChainConveyorBehaviour.TYPE).blockEntityTickBoxVisuals();
         }
 
-        if (!world.isClient()) {
+        if (!level.isClientSide()) {
             routingTable.tick();
             if (routingTable.shouldAdvertise()) {
                 for (BlockPos pos : connections)
-                    if (world.getBlockEntity(this.pos.add(pos)) instanceof ChainConveyorBlockEntity clbe)
+                    if (level.getBlockEntity(this.worldPosition.offset(pos)) instanceof ChainConveyorBlockEntity clbe)
                         routingTable.advertiseTo(pos, clbe.routingTable);
                 routingTable.changed = false;
                 routingTable.lastUpdate = 0;
@@ -154,14 +154,14 @@ public class ChainConveyorBlockEntity extends KineticBlockEntity implements Tran
         if (reversedPreviously != reversed) {
             for (Map.Entry<BlockPos, List<ChainConveyorPackage>> entry : travellingPackages.entrySet()) {
                 BlockPos offset = entry.getKey();
-                if (!(world.getBlockEntity(pos.add(offset)) instanceof ChainConveyorBlockEntity otherLift))
+                if (!(level.getBlockEntity(worldPosition.offset(offset)) instanceof ChainConveyorBlockEntity otherLift))
                     continue;
                 for (Iterator<ChainConveyorPackage> iterator = entry.getValue().iterator(); iterator.hasNext(); ) {
                     ChainConveyorPackage box = iterator.next();
                     if (box.justFlipped)
                         continue;
                     box.justFlipped = true;
-                    float length = (float) Vec3d.of(offset).length() - 22 / 16f;
+                    float length = (float) Vec3.atLowerCornerOf(offset).length() - 22 / 16f;
                     box.chainPosition = length - box.chainPosition;
                     otherLift.addTravellingPackage(box, offset.multiply(-1));
                     iterator.remove();
@@ -189,7 +189,7 @@ public class ChainConveyorBlockEntity extends KineticBlockEntity implements Tran
                 anticipatePosition += serverSpeed * distancePerTick * 4;
                 anticipatePosition = Math.min(stats.chainLength, anticipatePosition);
 
-                if (world.isClient() && !isVirtual())
+                if (level.isClientSide() && !isVirtual())
                     continue;
 
                 for (Map.Entry<BlockPos, ConnectedPort> portEntry : travelPorts.entrySet()) {
@@ -223,7 +223,7 @@ public class ChainConveyorBlockEntity extends KineticBlockEntity implements Tran
                     continue;
 
                 // transfer to other
-                if (world.getBlockEntity(pos.add(target)) instanceof ChainConveyorBlockEntity clbe) {
+                if (level.getBlockEntity(worldPosition.offset(target)) instanceof ChainConveyorBlockEntity clbe) {
                     box.chainPosition = wrapAngle(stats.tangentAngle + 180 + 2 * 35 * (reversed ? -1 : 1));
                     clbe.addLoopingPackage(box);
                     iterator.remove();
@@ -245,7 +245,7 @@ public class ChainConveyorBlockEntity extends KineticBlockEntity implements Tran
             anticipatePosition += serverSpeed * degreesPerTick * 4;
             anticipatePosition = wrapAngle(anticipatePosition);
 
-            if (world.isClient())
+            if (level.isClientSide())
                 continue;
 
             for (Map.Entry<BlockPos, ConnectedPort> portEntry : loopPorts.entrySet()) {
@@ -271,7 +271,7 @@ public class ChainConveyorBlockEntity extends KineticBlockEntity implements Tran
             }
 
             for (BlockPos connection : connections) {
-                if (world.getBlockEntity(pos.add(connection)) instanceof ChainConveyorBlockEntity ccbe && !ccbe.canAcceptMorePackagesFromOtherConveyor())
+                if (level.getBlockEntity(worldPosition.offset(connection)) instanceof ChainConveyorBlockEntity ccbe && !ccbe.canAcceptMorePackagesFromOtherConveyor())
                     continue;
 
                 float offBranchAngle = connectionStats.get(connection).tangentAngle;
@@ -295,10 +295,10 @@ public class ChainConveyorBlockEntity extends KineticBlockEntity implements Tran
         boolean changed = false;
         for (Iterator<BlockPos> iterator = connections.iterator(); iterator.hasNext(); ) {
             BlockPos next = iterator.next();
-            BlockPos target = pos.add(next);
-            if (!world.isPosLoaded(target))
+            BlockPos target = worldPosition.offset(next);
+            if (!level.isLoaded(target))
                 continue;
-            if (world.getBlockEntity(target) instanceof ChainConveyorBlockEntity ccbe && ccbe.connections.contains(next.multiply(-1)))
+            if (level.getBlockEntity(target) instanceof ChainConveyorBlockEntity ccbe && ccbe.connections.contains(next.multiply(-1)))
                 continue;
             iterator.remove();
             changed = true;
@@ -309,24 +309,24 @@ public class ChainConveyorBlockEntity extends KineticBlockEntity implements Tran
 
     public void notifyConnectedToValidate() {
         for (BlockPos blockPos : connections) {
-            BlockPos target = pos.add(blockPos);
-            if (!world.isPosLoaded(target))
+            BlockPos target = worldPosition.offset(blockPos);
+            if (!level.isLoaded(target))
                 continue;
-            if (world.getBlockEntity(target) instanceof ChainConveyorBlockEntity ccbe)
+            if (level.getBlockEntity(target) instanceof ChainConveyorBlockEntity ccbe)
                 ccbe.checkInvalid = true;
         }
     }
 
     public boolean loopThresholdCrossed(float chainPosition, float prevChainPosition, float offBranchAngle) {
-        int sign1 = MathHelper.sign(AngleHelper.getShortestAngleDiff(offBranchAngle, prevChainPosition));
-        int sign2 = MathHelper.sign(AngleHelper.getShortestAngleDiff(offBranchAngle, chainPosition));
+        int sign1 = Mth.sign(AngleHelper.getShortestAngleDiff(offBranchAngle, prevChainPosition));
+        int sign2 = Mth.sign(AngleHelper.getShortestAngleDiff(offBranchAngle, chainPosition));
         boolean notCrossed = sign1 >= sign2 && !reversed || sign1 <= sign2 && reversed;
         return !notCrossed;
     }
 
     private boolean exportToPort(ChainConveyorPackage box, BlockPos offset) {
-        BlockPos globalPos = pos.add(offset);
-        if (!(world.getBlockEntity(globalPos) instanceof FrogportBlockEntity ppbe))
+        BlockPos globalPos = worldPosition.offset(offset);
+        if (!(level.getBlockEntity(globalPos) instanceof FrogportBlockEntity ppbe))
             return false;
 
         if (ppbe.isAnimationInProgress())
@@ -339,7 +339,7 @@ public class ChainConveyorBlockEntity extends KineticBlockEntity implements Tran
     }
 
     private void notifyPortToAnticipate(BlockPos offset) {
-        if (world.getBlockEntity(pos.add(offset)) instanceof FrogportBlockEntity ppbe)
+        if (level.getBlockEntity(worldPosition.offset(offset)) instanceof FrogportBlockEntity ppbe)
             ppbe.sendAnticipate();
     }
 
@@ -347,7 +347,7 @@ public class ChainConveyorBlockEntity extends KineticBlockEntity implements Tran
         if (!connections.contains(connection))
             return false;
         travellingPackages.computeIfAbsent(connection, $ -> new ArrayList<>()).add(box);
-        if (world.isClient())
+        if (level.isClientSide())
             return true;
         notifyUpdate();
         return true;
@@ -355,7 +355,7 @@ public class ChainConveyorBlockEntity extends KineticBlockEntity implements Tran
 
     @Override
     public void notifyUpdate() {
-        world.markDirty(pos);
+        level.blockEntityChanged(worldPosition);
         sendData();
     }
 
@@ -387,49 +387,49 @@ public class ChainConveyorBlockEntity extends KineticBlockEntity implements Tran
                 continue;
             for (ChainConveyorPackage box : entry.getValue()) {
                 box.worldPosition = getPackagePosition(box.chainPosition, target);
-                if (world == null || !world.isClient())
+                if (level == null || !level.isClientSide())
                     continue;
-                Vec3d diff = stats.end.subtract(stats.start).normalize();
-                box.yaw = MathHelper.wrapDegrees((float) MathHelper.atan2(diff.x, diff.z) * MathHelper.DEGREES_PER_RADIAN - 90);
+                Vec3 diff = stats.end.subtract(stats.start).normalize();
+                box.yaw = Mth.wrapDegrees((float) Mth.atan2(diff.x, diff.z) * Mth.RAD_TO_DEG - 90);
             }
         }
 
         for (ChainConveyorPackage box : loopingPackages) {
             box.worldPosition = getPackagePosition(box.chainPosition, null);
-            box.yaw = MathHelper.wrapDegrees(box.chainPosition);
+            box.yaw = Mth.wrapDegrees(box.chainPosition);
             if (reversed)
                 box.yaw += 180;
         }
     }
 
-    public Vec3d getPackagePosition(float chainPosition, @Nullable BlockPos travelTarget) {
+    public Vec3 getPackagePosition(float chainPosition, @Nullable BlockPos travelTarget) {
         if (travelTarget == null)
-            return Vec3d.ofBottomCenter(pos).add(VecHelper.rotate(new Vec3d(0, 6 / 16f, 0.875), chainPosition, Axis.Y));
+            return Vec3.atBottomCenterOf(worldPosition).add(VecHelper.rotate(new Vec3(0, 6 / 16f, 0.875), chainPosition, Axis.Y));
         prepareStats();
         ConnectionStats stats = connectionStats.get(travelTarget);
         if (stats == null)
-            return Vec3d.ZERO;
-        Vec3d diff = stats.end.subtract(stats.start).normalize();
-        return stats.start.add(diff.multiply(Math.min(stats.chainLength, chainPosition)));
+            return Vec3.ZERO;
+        Vec3 diff = stats.end.subtract(stats.start).normalize();
+        return stats.start.add(diff.scale(Math.min(stats.chainLength, chainPosition)));
     }
 
     private void calculateConnectionStats(BlockPos connection) {
         boolean reversed = getSpeed() < 0;
         float offBranchDistance = 35f;
-        float direction = MathHelper.DEGREES_PER_RADIAN * (float) MathHelper.atan2(connection.getX(), connection.getZ());
+        float direction = Mth.RAD_TO_DEG * (float) Mth.atan2(connection.getX(), connection.getZ());
         float angle = wrapAngle(direction - offBranchDistance * (reversed ? -1 : 1));
         float oppositeAngle = wrapAngle(angle + 180 + 2 * offBranchDistance * (reversed ? -1 : 1));
 
-        Vec3d start = Vec3d.ofBottomCenter(pos).add(VecHelper.rotate(new Vec3d(0, 0, 1.25), angle, Axis.Y)).add(0, 6 / 16f, 0);
+        Vec3 start = Vec3.atBottomCenterOf(worldPosition).add(VecHelper.rotate(new Vec3(0, 0, 1.25), angle, Axis.Y)).add(0, 6 / 16f, 0);
 
-        Vec3d end = Vec3d.ofBottomCenter(pos.add(connection)).add(VecHelper.rotate(new Vec3d(0, 0, 1.25), oppositeAngle, Axis.Y)).add(0, 6 / 16f, 0);
+        Vec3 end = Vec3.atBottomCenterOf(worldPosition.offset(connection)).add(VecHelper.rotate(new Vec3(0, 0, 1.25), oppositeAngle, Axis.Y)).add(0, 6 / 16f, 0);
 
         float length = (float) start.distanceTo(end);
         connectionStats.put(connection, new ConnectionStats(angle, length, start, end));
     }
 
     public boolean addConnectionTo(BlockPos target) {
-        BlockPos localTarget = target.subtract(pos);
+        BlockPos localTarget = target.subtract(worldPosition);
         boolean added = connections.add(localTarget);
         if (added) {
             notifyUpdate();
@@ -455,17 +455,17 @@ public class ChainConveyorBlockEntity extends KineticBlockEntity implements Tran
         if (!forPointsAlongChains(
             target,
             chainCount,
-            vec -> world.spawnEntity(new ItemEntity(world, vec.x, vec.y, vec.z, new ItemStack(Items.IRON_CHAIN)))
+            vec -> level.addFreshEntity(new ItemEntity(level, vec.x, vec.y, vec.z, new ItemStack(Items.IRON_CHAIN)))
         )) {
             while (chainCount > 0) {
-                Block.dropStack(world, pos, new ItemStack(Blocks.IRON_CHAIN.asItem(), Math.min(chainCount, 64)));
+                Block.popResource(level, worldPosition, new ItemStack(Blocks.IRON_CHAIN.asItem(), Math.min(chainCount, 64)));
                 chainCount -= 64;
             }
         }
     }
 
     public boolean removeConnectionTo(BlockPos target) {
-        BlockPos localTarget = target.subtract(pos);
+        BlockPos localTarget = target.subtract(worldPosition);
         if (!connections.contains(localTarget))
             return false;
 
@@ -485,7 +485,7 @@ public class ChainConveyorBlockEntity extends KineticBlockEntity implements Tran
 
     private void updateChainShapes() {
         prepareStats();
-        if (world != null && world.isClient()) {
+        if (level != null && level.isClientSide()) {
             getBehaviour(ChainConveyorBehaviour.TYPE).updateChainShapes();
         }
     }
@@ -494,7 +494,7 @@ public class ChainConveyorBlockEntity extends KineticBlockEntity implements Tran
     public void remove() {
         super.remove();
         destroy();
-        if (world == null || !world.isClient())
+        if (level == null || !level.isClientSide())
             return;
         for (BlockPos blockPos : connections)
             spawnDestroyParticles(blockPos);
@@ -503,9 +503,9 @@ public class ChainConveyorBlockEntity extends KineticBlockEntity implements Tran
     private void spawnDestroyParticles(BlockPos blockPos) {
         forPointsAlongChains(
             blockPos,
-            (int) Math.round(Vec3d.of(blockPos).length() * 8),
-            vec -> world.addParticleClient(
-                new BlockStateParticleEffect(ParticleTypes.BLOCK, Blocks.IRON_CHAIN.getDefaultState()),
+            (int) Math.round(Vec3.atLowerCornerOf(blockPos).length() * 8),
+            vec -> level.addParticle(
+                new BlockParticleOption(ParticleTypes.BLOCK, Blocks.IRON_CHAIN.defaultBlockState()),
                 vec.x,
                 vec.y,
                 vec.z,
@@ -522,8 +522,8 @@ public class ChainConveyorBlockEntity extends KineticBlockEntity implements Tran
 
         for (BlockPos blockPos : connections) {
             chainDestroyed(blockPos, !cancelDrops, false);
-            if (world.getBlockEntity(pos.add(blockPos)) instanceof ChainConveyorBlockEntity clbe)
-                clbe.removeConnectionTo(pos);
+            if (level.getBlockEntity(worldPosition.offset(blockPos)) instanceof ChainConveyorBlockEntity clbe)
+                clbe.removeConnectionTo(worldPosition);
         }
 
         for (ChainConveyorPackage box : loopingPackages)
@@ -533,25 +533,25 @@ public class ChainConveyorBlockEntity extends KineticBlockEntity implements Tran
                 drop(box);
     }
 
-    public boolean forPointsAlongChains(BlockPos connection, int positions, Consumer<Vec3d> callback) {
+    public boolean forPointsAlongChains(BlockPos connection, int positions, Consumer<Vec3> callback) {
         prepareStats();
         ConnectionStats stats = connectionStats.get(connection);
         if (stats == null)
             return false;
 
-        Vec3d start = stats.start;
-        Vec3d direction = stats.end.subtract(start);
-        Vec3d origin = Vec3d.ofCenter(pos);
-        Vec3d normal = direction.crossProduct(new Vec3d(0, 1, 0)).normalize();
-        Vec3d offset = start.subtract(origin);
-        Vec3d start2 = origin.add(offset.add(normal.multiply(-2 * normal.dotProduct(offset))));
+        Vec3 start = stats.start;
+        Vec3 direction = stats.end.subtract(start);
+        Vec3 origin = Vec3.atCenterOf(worldPosition);
+        Vec3 normal = direction.cross(new Vec3(0, 1, 0)).normalize();
+        Vec3 offset = start.subtract(origin);
+        Vec3 start2 = origin.add(offset.add(normal.scale(-2 * normal.dot(offset))));
 
         for (boolean firstChain : Iterate.trueAndFalse) {
             int steps = positions / 2;
             if (firstChain)
                 steps += positions % 2;
             for (int i = 0; i < steps; i++)
-                callback.accept((firstChain ? start : start2).add(direction.multiply((0.5 + i) / steps)));
+                callback.accept((firstChain ? start : start2).add(direction.scale((0.5 + i) / steps)));
         }
 
         return true;
@@ -560,19 +560,19 @@ public class ChainConveyorBlockEntity extends KineticBlockEntity implements Tran
     @Override
     public void invalidate() {
         super.invalidate();
-        if (world != null && world.isClient()) {
+        if (level != null && level.isClientSide()) {
             getBehaviour(ChainConveyorBehaviour.TYPE).invalidate();
         }
     }
 
     private void drop(ChainConveyorPackage box) {
         if (box.worldPosition != null)
-            world.spawnEntity(PackageEntity.fromItemStack(world, box.worldPosition.subtract(0, 0.5, 0), box.item));
+            level.addFreshEntity(PackageEntity.fromItemStack(level, box.worldPosition.subtract(0, 0.5, 0), box.item));
     }
 
     @Override
     public List<BlockPos> addPropagationLocations(IRotate block, BlockState state, List<BlockPos> neighbours) {
-        connections.forEach(p -> neighbours.add(pos.add(p)));
+        connections.forEach(p -> neighbours.add(worldPosition.offset(p)));
         return super.addPropagationLocations(block, state, neighbours);
     }
 
@@ -585,7 +585,7 @@ public class ChainConveyorBlockEntity extends KineticBlockEntity implements Tran
         boolean connectedViaAxes,
         boolean connectedViaCogs
     ) {
-        if (connections.contains(target.getPos().subtract(pos))) {
+        if (connections.contains(target.getBlockPos().subtract(worldPosition))) {
             if (!(target instanceof ChainConveyorBlockEntity))
                 return 0;
             return 1;
@@ -594,26 +594,26 @@ public class ChainConveyorBlockEntity extends KineticBlockEntity implements Tran
     }
 
     @Override
-    public void writeSafe(WriteView view) {
+    public void writeSafe(ValueOutput view) {
         super.writeSafe(view);
-        view.put("Connections", CreateCodecs.BLOCKPOS_SET_CODEC, connections);
+        view.store("Connections", CreateCodecs.BLOCKPOS_SET_CODEC, connections);
     }
 
     @Override
-    protected void write(WriteView view, boolean clientPacket) {
+    protected void write(ValueOutput view, boolean clientPacket) {
         super.write(view, clientPacket);
         if (clientPacket && chainDestroyedEffectToSend != null) {
-            view.put("DestroyEffect", BlockPos.CODEC, chainDestroyedEffectToSend);
+            view.store("DestroyEffect", BlockPos.CODEC, chainDestroyedEffectToSend);
             chainDestroyedEffectToSend = null;
         }
 
-        view.put("Connections", CreateCodecs.BLOCKPOS_SET_CODEC, connections);
-        view.put("TravellingPackages", clientPacket ? CLIENT_MAP_CODEC : MAP_CODEC, travellingPackages);
-        view.put("LoopingPackages", clientPacket ? CLIENT_PACKAGE_CODEC : PACKAGE_CODEC, loopingPackages);
+        view.store("Connections", CreateCodecs.BLOCKPOS_SET_CODEC, connections);
+        view.store("TravellingPackages", clientPacket ? CLIENT_MAP_CODEC : MAP_CODEC, travellingPackages);
+        view.store("LoopingPackages", clientPacket ? CLIENT_PACKAGE_CODEC : PACKAGE_CODEC, loopingPackages);
     }
 
     @Override
-    protected void read(ReadView view, boolean clientPacket) {
+    protected void read(ValueInput view, boolean clientPacket) {
         super.read(view, clientPacket);
         if (clientPacket) {
             view.read("DestroyEffect", BlockPos.CODEC).ifPresent(this::spawnDestroyParticles);
@@ -630,7 +630,7 @@ public class ChainConveyorBlockEntity extends KineticBlockEntity implements Tran
         updateBoxWorldPositions();
         updateChainShapes();
 
-        if (connections.size() != sizeBefore && world != null && world.isClient())
+        if (connections.size() != sizeBefore && level != null && level.isClientSide())
             invalidateRenderBoundingBox();
     }
 
@@ -642,14 +642,14 @@ public class ChainConveyorBlockEntity extends KineticBlockEntity implements Tran
     }
 
     public static int getChainCost(BlockPos connection) {
-        return (int) Math.max(Math.round(Vec3d.of(connection).length() / 2.5), 1);
+        return (int) Math.max(Math.round(Vec3.atLowerCornerOf(connection).length() / 2.5), 1);
     }
 
-    public static boolean getChainsFromInventory(PlayerEntity player, ItemStack chain, int cost, boolean simulate) {
+    public static boolean getChainsFromInventory(Player player, ItemStack chain, int cost, boolean simulate) {
         int found = 0;
 
-        PlayerInventory inv = player.getInventory();
-        int size = PlayerInventory.MAIN_SIZE;
+        Inventory inv = player.getInventory();
+        int size = Inventory.INVENTORY_SIZE;
         for (int j = 0; j <= size + 1; j++) {
             int i = j;
             boolean offhand = j == size + 1;
@@ -660,8 +660,8 @@ public class ChainConveyorBlockEntity extends KineticBlockEntity implements Tran
             else if (j == inv.getSelectedSlot())
                 continue;
 
-            ItemStack stackInSlot = offhand ? player.getStackInHand(Hand.OFF_HAND) : inv.getStack(i);
-            if (!ItemStack.areItemsEqual(stackInSlot, chain))
+            ItemStack stackInSlot = offhand ? player.getItemInHand(InteractionHand.OFF_HAND) : inv.getItem(i);
+            if (!ItemStack.isSameItem(stackInSlot, chain))
                 continue;
             if (found >= cost)
                 continue;
@@ -672,9 +672,9 @@ public class ChainConveyorBlockEntity extends KineticBlockEntity implements Tran
                 int remainingItems = count - Math.min(cost - found, count);
                 ItemStack newItem = stackInSlot.copyWithCount(remainingItems);
                 if (offhand)
-                    player.setStackInHand(Hand.OFF_HAND, newItem);
+                    player.setItemInHand(InteractionHand.OFF_HAND, newItem);
                 else
-                    inv.setStack(i, newItem);
+                    inv.setItem(i, newItem);
             }
 
             found += count;

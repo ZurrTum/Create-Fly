@@ -4,56 +4,56 @@ import com.zurrtum.create.AllBlocks;
 import com.zurrtum.create.content.kinetics.belt.BeltBlock;
 import com.zurrtum.create.content.kinetics.belt.BeltSlope;
 import com.zurrtum.create.content.processing.basin.BasinBlock;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.item.BlockItem;
-import net.minecraft.item.ItemPlacementContext;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.World;
-import net.minecraft.world.WorldView;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelReader;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.Vec3;
 
 public class AssemblyOperatorBlockItem extends BlockItem {
 
-    public AssemblyOperatorBlockItem(Block block, Settings builder) {
+    public AssemblyOperatorBlockItem(Block block, Properties builder) {
         super(block, builder);
     }
 
     @Override
-    public ActionResult place(ItemPlacementContext context) {
-        BlockPos placedOnPos = context.getBlockPos().offset(context.getSide().getOpposite());
-        World level = context.getWorld();
+    public InteractionResult place(BlockPlaceContext context) {
+        BlockPos placedOnPos = context.getClickedPos().relative(context.getClickedFace().getOpposite());
+        Level level = context.getLevel();
         BlockState placedOnState = level.getBlockState(placedOnPos);
-        if (operatesOn(level, placedOnPos, placedOnState) && context.getSide() == Direction.UP) {
-            if (level.getBlockState(placedOnPos.up(2)).isReplaceable())
+        if (operatesOn(level, placedOnPos, placedOnState) && context.getClickedFace() == Direction.UP) {
+            if (level.getBlockState(placedOnPos.above(2)).canBeReplaced())
                 context = adjustContext(context, placedOnPos);
             else
-                return ActionResult.FAIL;
+                return InteractionResult.FAIL;
         }
 
         return super.place(context);
     }
 
-    protected ItemPlacementContext adjustContext(ItemPlacementContext context, BlockPos placedOnPos) {
-        BlockPos up = placedOnPos.up(2);
+    protected BlockPlaceContext adjustContext(BlockPlaceContext context, BlockPos placedOnPos) {
+        BlockPos up = placedOnPos.above(2);
         return new AssemblyOperatorUseContext(
-            context.getWorld(), context.getPlayer(), context.getHand(), context.getStack(), new BlockHitResult(
-            new Vec3d(
-                (double) up.getX() + 0.5D + (double) Direction.UP.getOffsetX() * 0.5D,
-                (double) up.getY() + 0.5D + (double) Direction.UP.getOffsetY() * 0.5D,
-                (double) up.getZ() + 0.5D + (double) Direction.UP.getOffsetZ() * 0.5D
+            context.getLevel(), context.getPlayer(), context.getHand(), context.getItemInHand(), new BlockHitResult(
+            new Vec3(
+                (double) up.getX() + 0.5D + (double) Direction.UP.getStepX() * 0.5D,
+                (double) up.getY() + 0.5D + (double) Direction.UP.getStepY() * 0.5D,
+                (double) up.getZ() + 0.5D + (double) Direction.UP.getStepZ() * 0.5D
             ), Direction.UP, up, false
         )
         );
     }
 
-    protected boolean operatesOn(WorldView world, BlockPos pos, BlockState placedOnState) {
-        if (placedOnState.isOf(AllBlocks.BELT))
-            return placedOnState.get(BeltBlock.SLOPE) == BeltSlope.HORIZONTAL;
-        return BasinBlock.isBasin(world, pos) || placedOnState.isOf(AllBlocks.DEPOT) || placedOnState.isOf(AllBlocks.WEIGHTED_EJECTOR);
+    protected boolean operatesOn(LevelReader world, BlockPos pos, BlockState placedOnState) {
+        if (placedOnState.is(AllBlocks.BELT))
+            return placedOnState.getValue(BeltBlock.SLOPE) == BeltSlope.HORIZONTAL;
+        return BasinBlock.isBasin(world, pos) || placedOnState.is(AllBlocks.DEPOT) || placedOnState.is(AllBlocks.WEIGHTED_EJECTOR);
     }
 
 }

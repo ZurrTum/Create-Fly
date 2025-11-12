@@ -5,19 +5,18 @@ import com.zurrtum.create.client.ponder.api.element.ParrotElement;
 import com.zurrtum.create.client.ponder.api.element.ParrotPose;
 import com.zurrtum.create.client.ponder.foundation.PonderScene;
 import com.zurrtum.create.client.ponder.foundation.element.ParrotElementImpl;
-import net.minecraft.util.math.Vec3d;
-
 import java.util.function.Supplier;
+import net.minecraft.world.phys.Vec3;
 
 public class ExpandedParrotElement extends ParrotElementImpl {
 
     protected boolean deferConductor = false;
 
-    protected ExpandedParrotElement(Vec3d location, Supplier<? extends ParrotPose> pose) {
+    protected ExpandedParrotElement(Vec3 location, Supplier<? extends ParrotPose> pose) {
         super(location, pose);
     }
 
-    public static ParrotElement create(Vec3d location, Supplier<? extends ParrotPose> pose) {
+    public static ParrotElement create(Vec3 location, Supplier<? extends ParrotPose> pose) {
         return new ExpandedParrotElement(location, pose);
     }
 

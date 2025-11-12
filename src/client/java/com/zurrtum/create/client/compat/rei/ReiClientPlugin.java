@@ -23,11 +23,10 @@ import me.shedaniel.rei.api.common.entry.type.VanillaEntryTypes;
 import me.shedaniel.rei.api.common.util.EntryIngredients;
 import me.shedaniel.rei.api.common.util.EntryStacks;
 import me.shedaniel.rei.plugin.client.displays.ClientsidedCraftingDisplay;
-import net.minecraft.item.DyeItem;
-import net.minecraft.item.ItemConvertible;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.DyeColor;
-
+import net.minecraft.world.item.DyeColor;
+import net.minecraft.world.item.DyeItem;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.ItemLike;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -39,7 +38,7 @@ public class ReiClientPlugin implements REIClientPlugin {
     public static final CategoryIdentifier<MysteriousItemConversionDisplay> MYSTERY_CONVERSION = CategoryIdentifier.of(MOD_ID, "mystery_conversion");
 
     @SuppressWarnings("unchecked")
-    private <T extends Display> Consumer<CategoryConfiguration<T>> config(ItemConvertible... item) {
+    private <T extends Display> Consumer<CategoryConfiguration<T>> config(ItemLike... item) {
         EntryStack<ItemStack>[] workstations = new EntryStack[item.length];
         for (int i = 0; i < item.length; i++) {
             workstations[i] = EntryStacks.of(item[i]);

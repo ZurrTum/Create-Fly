@@ -3,13 +3,13 @@ package com.zurrtum.create.api.contraption.train;
 import com.zurrtum.create.api.registry.SimpleRegistry;
 import com.zurrtum.create.catnip.math.BlockFace;
 import com.zurrtum.create.content.trains.track.AllPortalTracks;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Portal;
-import net.minecraft.registry.RegistryKey;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Portal;
+import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.Nullable;
 
 /**
@@ -26,7 +26,7 @@ public interface PortalTrackProvider {
      * @param level the level of the inbound track
      * @param face  the face of the inbound track
      */
-    Exit findExit(ServerWorld level, BlockFace face);
+    Exit findExit(ServerLevel level, BlockFace face);
 
     /**
      * Checks if a given {@link BlockState} represents a supported portal block.
@@ -41,12 +41,12 @@ public interface PortalTrackProvider {
     /**
      * Retrieves the corresponding outbound track on the other side of a portal.
      *
-     * @param level        The current {@link ServerWorld}.
+     * @param level        The current {@link ServerLevel}.
      * @param inboundTrack The inbound track {@link BlockFace}.
      * @return the found outbound track, or null if one wasn't found.
      */
     @Nullable
-    static Exit getOtherSide(ServerWorld level, BlockFace inboundTrack) {
+    static Exit getOtherSide(ServerLevel level, BlockFace inboundTrack) {
         BlockPos portalPos = inboundTrack.getConnectedPos();
         BlockState portalState = level.getBlockState(portalPos);
         PortalTrackProvider provider = REGISTRY.get(portalState);
@@ -63,10 +63,10 @@ public interface PortalTrackProvider {
      * @param portal          The portal
      * @return A found exit, or null if one wasn't found
      */
-    static Exit fromPortal(ServerWorld level, BlockFace face, RegistryKey<World> firstDimension, RegistryKey<World> secondDimension, Portal portal) {
+    static Exit fromPortal(ServerLevel level, BlockFace face, ResourceKey<Level> firstDimension, ResourceKey<Level> secondDimension, Portal portal) {
         return AllPortalTracks.fromPortal(level, face, firstDimension, secondDimension, portal);
     }
 
-    record Exit(ServerWorld level, BlockFace face) {
+    record Exit(ServerLevel level, BlockFace face) {
     }
 }

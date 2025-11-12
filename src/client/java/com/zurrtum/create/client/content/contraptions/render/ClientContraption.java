@@ -6,18 +6,18 @@ import com.zurrtum.create.client.flywheel.api.visualization.VisualizationManager
 import com.zurrtum.create.client.foundation.virtualWorld.VirtualRenderWorld;
 import com.zurrtum.create.content.contraptions.Contraption;
 import com.zurrtum.create.content.kinetics.base.KineticBlockEntity;
-import net.minecraft.block.BlockEntityProvider;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.client.render.BlockRenderLayer;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.storage.NbtReadView;
-import net.minecraft.structure.StructureTemplate.StructureBlockInfo;
-import net.minecraft.util.ErrorReporter;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.world.World;
+import net.minecraft.client.renderer.chunk.ChunkSectionLayer;
+import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.util.Mth;
+import net.minecraft.util.ProblemReporter;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.EntityBlock;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate.StructureBlockInfo;
+import net.minecraft.world.level.storage.TagValueInput;
 import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.Nullable;
 
@@ -52,12 +52,12 @@ public class ClientContraption {
     private int childrenVersion = 0;
 
     public ClientContraption(Contraption contraption) {
-        var level = contraption.entity.getEntityWorld();
+        var level = contraption.entity.level();
         this.contraption = contraption;
 
         BlockPos origin = contraption.anchor;
-        int minY = VirtualRenderWorld.nextMultipleOf16(MathHelper.floor(contraption.bounds.minY - 1));
-        int height = VirtualRenderWorld.nextMultipleOf16(MathHelper.ceil(contraption.bounds.maxY + 1)) - minY;
+        int minY = VirtualRenderWorld.nextMultipleOf16(Mth.floor(contraption.bounds.minY - 1));
+        int height = VirtualRenderWorld.nextMultipleOf16(Mth.ceil(contraption.bounds.maxY + 1)) - minY;
         renderLevel = new VirtualRenderWorld(level, minY, height, origin, this::invalidateStructure) {
             @Override
             public boolean supportsVisualization() {
@@ -99,7 +99,7 @@ public class ClientContraption {
     }
 
     public void invalidateStructure() {
-        for (BlockRenderLayer renderType : BlockRenderLayer.values()) {
+        for (ChunkSectionLayer renderType : ChunkSectionLayer.values()) {
             SuperByteBufferCache.getInstance().invalidate(ContraptionEntityRenderer.CONTRAPTION, Pair.of(contraption, renderType));
         }
 
@@ -108,12 +108,12 @@ public class ClientContraption {
 
     private void setupRenderLevelAndRenderedBlockEntities() {
         for (StructureBlockInfo info : contraption.getBlocks().values()) {
-            renderLevel.setBlockState(info.pos(), info.state(), 0);
+            renderLevel.setBlock(info.pos(), info.state(), 0);
 
             BlockEntity blockEntity = readBlockEntity(renderLevel, info, contraption.getIsLegacy().getBoolean(info.pos()));
 
             if (blockEntity != null) {
-                renderLevel.addBlockEntity(blockEntity);
+                renderLevel.setBlockEntity(blockEntity);
 
                 // Don't render block entities that have an actor renderer registered in the MovementBehaviour.
                 MovementBehaviour movementBehaviour = MovementBehaviour.REGISTRY.get(info.state());
@@ -129,10 +129,10 @@ public class ClientContraption {
     }
 
     @Nullable
-    public BlockEntity readBlockEntity(World level, StructureBlockInfo info, boolean legacy) {
+    public BlockEntity readBlockEntity(Level level, StructureBlockInfo info, boolean legacy) {
         BlockState state = info.state();
         BlockPos pos = info.pos();
-        NbtCompound nbt = info.nbt();
+        CompoundTag nbt = info.nbt();
 
         if (legacy) {
             // for contraptions that were assembled pre-updateTags, we need to use the old strategy.
@@ -143,19 +143,19 @@ public class ClientContraption {
             nbt.putInt("y", pos.getY());
             nbt.putInt("z", pos.getZ());
 
-            BlockEntity be = BlockEntity.createFromNbt(pos, state, nbt, level.getRegistryManager());
+            BlockEntity be = BlockEntity.loadStatic(pos, state, nbt, level.registryAccess());
             postprocessReadBlockEntity(level, be, state);
             return be;
         }
 
-        if (!state.hasBlockEntity() || !(state.getBlock() instanceof BlockEntityProvider entityBlock))
+        if (!state.hasBlockEntity() || !(state.getBlock() instanceof EntityBlock entityBlock))
             return null;
 
-        BlockEntity be = entityBlock.createBlockEntity(pos, state);
+        BlockEntity be = entityBlock.newBlockEntity(pos, state);
         postprocessReadBlockEntity(level, be, state);
         if (be != null && nbt != null) {
-            try (ErrorReporter.Logging logging = new ErrorReporter.Logging(be.getReporterContext(), LOGGER)) {
-                be.read(NbtReadView.create(logging, level.getRegistryManager(), nbt));
+            try (ProblemReporter.ScopedCollector logging = new ProblemReporter.ScopedCollector(be.problemPath(), LOGGER)) {
+                be.loadWithComponents(TagValueInput.create(logging, level.registryAccess(), nbt));
             }
         }
 
@@ -163,10 +163,10 @@ public class ClientContraption {
     }
 
     @SuppressWarnings("deprecation")
-    protected static void postprocessReadBlockEntity(World level, @Nullable BlockEntity be, BlockState blockState) {
+    protected static void postprocessReadBlockEntity(Level level, @Nullable BlockEntity be, BlockState blockState) {
         if (be != null) {
-            be.setWorld(level);
-            be.setCachedState(blockState);
+            be.setLevel(level);
+            be.setBlockState(blockState);
             if (be instanceof KineticBlockEntity kbe) {
                 kbe.setSpeed(0);
             }
@@ -186,7 +186,7 @@ public class ClientContraption {
             pos -> {
                 StructureBlockInfo info = contraption.getBlocks().get(pos);
                 if (info == null) {
-                    return Blocks.AIR.getDefaultState();
+                    return Blocks.AIR.defaultBlockState();
                 }
                 return info.state();
             }, contraption.getBlocks().keySet()

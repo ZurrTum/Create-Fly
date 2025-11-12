@@ -6,14 +6,14 @@ import me.shedaniel.rei.api.client.entry.renderer.EntryRenderer;
 import me.shedaniel.rei.api.client.gui.widgets.Tooltip;
 import me.shedaniel.rei.api.client.gui.widgets.TooltipContext;
 import me.shedaniel.rei.api.common.entry.EntryStack;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.Formatting;
+import net.minecraft.ChatFormatting;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.Nullable;
 
 public record ChanceItemRenderer(float chance, EntryRenderer<ItemStack> origin) implements EntryRenderer<ItemStack> {
     @Override
-    public void render(EntryStack<ItemStack> entry, DrawContext graphics, Rectangle bounds, int mouseX, int mouseY, float delta) {
+    public void render(EntryStack<ItemStack> entry, GuiGraphics graphics, Rectangle bounds, int mouseX, int mouseY, float delta) {
         origin.render(entry, graphics, bounds, mouseX, mouseY, delta);
     }
 
@@ -22,7 +22,7 @@ public record ChanceItemRenderer(float chance, EntryRenderer<ItemStack> origin) 
         Tooltip tooltip = origin.getTooltip(entry, context);
         if (tooltip != null) {
             tooltip.add(CreateLang.translateDirect("recipe.processing.chance", chance < 0.01 ? "<1" : (int) (chance * 100))
-                .formatted(Formatting.GOLD));
+                .withStyle(ChatFormatting.GOLD));
         }
         return tooltip;
     }

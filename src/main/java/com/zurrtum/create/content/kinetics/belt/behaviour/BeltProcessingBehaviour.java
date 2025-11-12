@@ -5,9 +5,9 @@ import com.zurrtum.create.content.logistics.funnel.AbstractFunnelBlock;
 import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
 import com.zurrtum.create.foundation.blockEntity.behaviour.BehaviourType;
 import com.zurrtum.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
-import net.minecraft.block.BlockState;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.BlockView;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.block.state.BlockState;
 
 /**
  * Behaviour for BlockEntities which can process items on belts or depots beneath
@@ -43,11 +43,11 @@ public class BeltProcessingBehaviour extends BlockEntityBehaviour<SmartBlockEnti
         return this;
     }
 
-    public static boolean isBlocked(BlockView world, BlockPos processingSpace) {
-        BlockState blockState = world.getBlockState(processingSpace.up());
+    public static boolean isBlocked(BlockGetter world, BlockPos processingSpace) {
+        BlockState blockState = world.getBlockState(processingSpace.above());
         if (AbstractFunnelBlock.isFunnel(blockState))
             return false;
-        return !blockState.getCollisionShape(world, processingSpace.up()).isEmpty();
+        return !blockState.getCollisionShape(world, processingSpace.above()).isEmpty();
     }
 
     @Override

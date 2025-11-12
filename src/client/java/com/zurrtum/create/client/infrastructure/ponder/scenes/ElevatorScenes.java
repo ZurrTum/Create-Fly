@@ -14,15 +14,15 @@ import com.zurrtum.create.content.contraptions.elevator.ElevatorContactBlock;
 import com.zurrtum.create.content.decoration.slidingDoor.SlidingDoorBlock;
 import com.zurrtum.create.content.redstone.nixieTube.NixieTubeBlock;
 import com.zurrtum.create.content.redstone.nixieTube.NixieTubeBlockEntity;
-import net.minecraft.block.Blocks;
-import net.minecraft.nbt.NbtElement;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.nbt.NbtOps;
-import net.minecraft.registry.RegistryOps;
-import net.minecraft.text.Text;
-import net.minecraft.text.TextCodecs;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.math.Direction;
+import net.minecraft.nbt.Tag;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.ComponentSerialization;
+import net.minecraft.resources.RegistryOps;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.phys.AABB;
 
 public class ElevatorScenes {
 
@@ -67,7 +67,7 @@ public class ElevatorScenes {
             .text("Elevator Pulleys can move structures vertically between marked locations");
         scene.idle(60);
         scene.world().moveSection(pulleyLink, util.vector().of(0, 4, 0), 20);
-        scene.world().setBlocks(topCutout, Blocks.AIR.getDefaultState(), false);
+        scene.world().setBlocks(topCutout, Blocks.AIR.defaultBlockState(), false);
         scene.idle(5);
 
         ElementLink<WorldSectionElement> elevatorLink = scene.world()
@@ -99,10 +99,10 @@ public class ElevatorScenes {
             .text("Place a pair of Redstone Contacts facing each other...");
         scene.idle(55);
 
-        Box glue1 = new Box(util.grid().at(3, 4, 2));
-        Box glue2 = glue1.expand(1, 0, 1).stretch(0, -4, 0);
+        AABB glue1 = new AABB(util.grid().at(3, 4, 2));
+        AABB glue2 = glue1.inflate(1, 0, 1).expandTowards(0, -4, 0);
 
-        scene.overlay().showControls(util.vector().centerOf(4, 3, 1), Pointing.RIGHT, 60).withItem(AllItems.SUPER_GLUE.getDefaultStack());
+        scene.overlay().showControls(util.vector().centerOf(4, 3, 1), Pointing.RIGHT, 60).withItem(AllItems.SUPER_GLUE.getDefaultInstance());
         scene.idle(7);
         scene.overlay().chaseBoundingBoxOutline(PonderPalette.GREEN, glue1, glue1, 5);
         scene.idle(1);
@@ -137,7 +137,8 @@ public class ElevatorScenes {
         scene.world().toggleRedstonePower(util.select().position(1, 13, 2));
         scene.world().setBlock(
             topContact,
-            AllBlocks.ELEVATOR_CONTACT.getDefaultState().with(ElevatorContactBlock.FACING, Direction.EAST).with(ElevatorContactBlock.POWERING, true),
+            AllBlocks.ELEVATOR_CONTACT.defaultBlockState().setValue(ElevatorContactBlock.FACING, Direction.EAST)
+                .setValue(ElevatorContactBlock.POWERING, true),
             false
         );
         scene.world().movePulley(pulleyPos, 1, 0);
@@ -161,20 +162,21 @@ public class ElevatorScenes {
         scene.world().moveSection(camLink, util.vector().of(0, 7, 0), 15);
         scene.world().moveSection(pulleyLink, util.vector().of(0, 7, 0), 15);
         scene.addLazyKeyframe();
-        scene.world().setBlocks(midCutout, Blocks.AIR.getDefaultState(), false);
+        scene.world().setBlocks(midCutout, Blocks.AIR.defaultBlockState(), false);
         scene.idle(15);
         scene.world().showSectionAndMerge(midFloor, Direction.EAST, camLink);
         scene.idle(5);
         scene.world().showSectionAndMerge(util.select().position(midContact), Direction.DOWN, camLink);
         scene.idle(10);
         scene.effects().indicateSuccess(util.grid().at(1, 2, 2));
-        scene.world().setBlock(midContact, AllBlocks.ELEVATOR_CONTACT.getDefaultState().with(ElevatorContactBlock.FACING, Direction.EAST), false);
+        scene.world()
+            .setBlock(midContact, AllBlocks.ELEVATOR_CONTACT.defaultBlockState().setValue(ElevatorContactBlock.FACING, Direction.EAST), false);
         scene.idle(15);
 
-        Box bb = new Box(util.grid().at(1, 8, 2));
+        AABB bb = new AABB(util.grid().at(1, 8, 2));
         scene.overlay().chaseBoundingBoxOutline(PonderPalette.WHITE, bb, bb, 5);
         scene.idle(1);
-        scene.overlay().chaseBoundingBoxOutline(PonderPalette.WHITE, bb, bb.stretch(0, -6, 0), 90);
+        scene.overlay().chaseBoundingBoxOutline(PonderPalette.WHITE, bb, bb.expandTowards(0, -6, 0), 90);
         scene.idle(10);
 
         scene.overlay().showText(60).placeNearTarget().pointAt(util.vector().blockSurface(util.grid().at(1, 2, 2), Direction.UP))
@@ -238,7 +240,7 @@ public class ElevatorScenes {
             .text("Right-Clicking the assembled pulley will turn the cabin back into blocks");
         scene.idle(90);
 
-        scene.world().showSectionAndMerge(util.select().fromTo(doorPos, doorPos.up()), Direction.DOWN, elevatorLink);
+        scene.world().showSectionAndMerge(util.select().fromTo(doorPos, doorPos.above()), Direction.DOWN, elevatorLink);
         scene.idle(20);
 
         scene.overlay().showControls(util.vector().blockSurface(util.grid().at(3, 6, 2), Direction.NORTH), Pointing.RIGHT, 60).rightClick();
@@ -247,7 +249,7 @@ public class ElevatorScenes {
         scene.world().movePulley(pulleyPos, 1, 0);
         scene.world().cycleBlockProperty(doorPos, SlidingDoorBlock.OPEN);
         scene.world().cycleBlockProperty(doorPos, SlidingDoorBlock.VISIBLE);
-        scene.world().cycleBlockProperty(doorPos.up(), SlidingDoorBlock.VISIBLE);
+        scene.world().cycleBlockProperty(doorPos.above(), SlidingDoorBlock.VISIBLE);
 
         scene.overlay().showText(80).placeNearTarget().attachKeyFrame().pointAt(util.vector().blockSurface(util.grid().at(3, 1, 1), Direction.NORTH))
             .text("Sliding doors attached to the cabin will open and close automatically");
@@ -256,14 +258,15 @@ public class ElevatorScenes {
         scene.world().moveSection(elevatorLink, util.vector().of(0, 13, 0), 15);
         scene.world().moveSection(camLink, util.vector().of(0, 13, 0), 15);
         scene.world().moveSection(pulleyLink, util.vector().of(0, 13, 0), 15);
-        scene.world().setBlocks(botCutout, Blocks.AIR.getDefaultState(), false);
+        scene.world().setBlocks(botCutout, Blocks.AIR.defaultBlockState(), false);
         scene.idle(15);
         scene.world().showSectionAndMerge(botFloor, Direction.EAST, camLink);
         scene.idle(5);
         scene.world().showSectionAndMerge(util.select().position(botContact), Direction.DOWN, camLink);
         scene.idle(10);
         scene.effects().indicateSuccess(util.grid().at(1, 2, 2));
-        scene.world().setBlock(botContact, AllBlocks.ELEVATOR_CONTACT.getDefaultState().with(ElevatorContactBlock.FACING, Direction.EAST), false);
+        scene.world()
+            .setBlock(botContact, AllBlocks.ELEVATOR_CONTACT.defaultBlockState().setValue(ElevatorContactBlock.FACING, Direction.EAST), false);
         scene.idle(5);
         scene.world().showSectionAndMerge(botInput, Direction.SOUTH, camLink);
         scene.idle(15);
@@ -276,7 +279,7 @@ public class ElevatorScenes {
         scene.world().movePulley(pulleyPos, 12, 50);
         scene.world().cycleBlockProperty(doorPos, SlidingDoorBlock.OPEN);
         scene.world().cycleBlockProperty(doorPos, SlidingDoorBlock.VISIBLE);
-        scene.world().cycleBlockProperty(doorPos.up(), SlidingDoorBlock.VISIBLE);
+        scene.world().cycleBlockProperty(doorPos.above(), SlidingDoorBlock.VISIBLE);
         scene.idle(20);
 
         scene.world().toggleRedstonePower(botInput);
@@ -289,7 +292,7 @@ public class ElevatorScenes {
         scene.world().toggleRedstonePower(outputRedstone);
         scene.world().cycleBlockProperty(doorPos, SlidingDoorBlock.OPEN);
         scene.world().cycleBlockProperty(doorPos, SlidingDoorBlock.VISIBLE);
-        scene.world().cycleBlockProperty(doorPos.up(), SlidingDoorBlock.VISIBLE);
+        scene.world().cycleBlockProperty(doorPos.above(), SlidingDoorBlock.VISIBLE);
         scene.idle(15);
 
         scene.overlay().showText(80).placeNearTarget().attachKeyFrame().pointAt(util.vector().topOf(0, 1, 2))
@@ -300,7 +303,7 @@ public class ElevatorScenes {
             .text("This can be useful to trigger doors or special effects upon arrival");
         scene.idle(90);
 
-        scene.world().setBlock(nixiePos, AllBlocks.GREEN_NIXIE_TUBE.getDefaultState().with(NixieTubeBlock.FACING, Direction.WEST), false);
+        scene.world().setBlock(nixiePos, AllBlocks.GREEN_NIXIE_TUBE.defaultBlockState().setValue(NixieTubeBlock.FACING, Direction.WEST), false);
 
         scene.world().moveSection(camLink, util.vector().of(0, -13, 0), 20);
         scene.world().moveSection(pulleyLink, util.vector().of(0, -13, 0), 20);
@@ -309,16 +312,16 @@ public class ElevatorScenes {
         scene.world().showSectionAndMerge(util.select().position(nixiePos), Direction.DOWN, camLink);
         scene.idle(15);
         scene.overlay().showControls(util.vector().blockSurface(util.grid().at(4, 1, 0), Direction.UP), Pointing.DOWN, 15).rightClick()
-            .withItem(AllItems.DISPLAY_LINK.getDefaultStack());
+            .withItem(AllItems.DISPLAY_LINK.getDefaultInstance());
         scene.world().toggleRedstonePower(util.select().position(1, 14, 2));
         scene.idle(15);
         scene.world().showSectionAndMerge(util.select().position(linkPos), Direction.DOWN, camLink);
         scene.world().flashDisplayLink(linkPos);
         scene.world().modifyBlockEntityNBT(
             util.select().position(nixiePos), NixieTubeBlockEntity.class, nbt -> {
-                RegistryOps<NbtElement> ops = scene.world().getHolderLookupProvider().getOps(NbtOps.INSTANCE);
-                Text component = Text.literal("0F");
-                nbt.put("CustomText", TextCodecs.CODEC, ops, component);
+                RegistryOps<Tag> ops = scene.world().getHolderLookupProvider().createSerializationContext(NbtOps.INSTANCE);
+                Component component = Component.literal("0F");
+                nbt.store("CustomText", ComponentSerialization.CODEC, ops, component);
             }
         );
 
@@ -337,7 +340,7 @@ public class ElevatorScenes {
         scene.world().movePulley(pulleyPos, -12, 70);
         scene.world().cycleBlockProperty(doorPos, SlidingDoorBlock.OPEN);
         scene.world().cycleBlockProperty(doorPos, SlidingDoorBlock.VISIBLE);
-        scene.world().cycleBlockProperty(doorPos.up(), SlidingDoorBlock.VISIBLE);
+        scene.world().cycleBlockProperty(doorPos.above(), SlidingDoorBlock.VISIBLE);
         scene.idle(20);
 
         scene.world().toggleRedstonePower(topInput);
@@ -346,9 +349,9 @@ public class ElevatorScenes {
         scene.world().flashDisplayLink(linkPos);
         scene.world().modifyBlockEntityNBT(
             util.select().position(nixiePos), NixieTubeBlockEntity.class, nbt -> {
-                RegistryOps<NbtElement> ops = scene.world().getHolderLookupProvider().getOps(NbtOps.INSTANCE);
-                Text component = Text.literal("1F");
-                nbt.put("CustomText", TextCodecs.CODEC, ops, component);
+                RegistryOps<Tag> ops = scene.world().getHolderLookupProvider().createSerializationContext(NbtOps.INSTANCE);
+                Component component = Component.literal("1F");
+                nbt.store("CustomText", ComponentSerialization.CODEC, ops, component);
             }
         );
 
@@ -359,14 +362,14 @@ public class ElevatorScenes {
         scene.world().toggleRedstonePower(util.select().position(1, 13, 1));
         scene.world().cycleBlockProperty(doorPos, SlidingDoorBlock.OPEN);
         scene.world().cycleBlockProperty(doorPos, SlidingDoorBlock.VISIBLE);
-        scene.world().cycleBlockProperty(doorPos.up(), SlidingDoorBlock.VISIBLE);
+        scene.world().cycleBlockProperty(doorPos.above(), SlidingDoorBlock.VISIBLE);
 
         scene.world().flashDisplayLink(linkPos);
         scene.world().modifyBlockEntityNBT(
             util.select().position(nixiePos), NixieTubeBlockEntity.class, nbt -> {
-                RegistryOps<NbtElement> ops = scene.world().getHolderLookupProvider().getOps(NbtOps.INSTANCE);
-                Text component = Text.literal("2F");
-                nbt.put("CustomText", TextCodecs.CODEC, ops, component);
+                RegistryOps<Tag> ops = scene.world().getHolderLookupProvider().createSerializationContext(NbtOps.INSTANCE);
+                Component component = Component.literal("2F");
+                nbt.store("CustomText", ComponentSerialization.CODEC, ops, component);
             }
         );
     }

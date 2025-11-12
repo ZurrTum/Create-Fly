@@ -9,16 +9,15 @@ import com.zurrtum.create.content.trains.graph.TrackGraph;
 import com.zurrtum.create.content.trains.signal.SignalBoundary;
 import com.zurrtum.create.content.trains.signal.SignalEdgeGroup;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.world.PersistentState;
-import net.minecraft.world.PersistentStateType;
-
+import net.minecraft.world.level.saveddata.SavedData;
+import net.minecraft.world.level.saveddata.SavedDataType;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-public class RailwaySavedData extends PersistentState {
+public class RailwaySavedData extends SavedData {
     public static final Codec<RailwaySavedData> CODEC = Codec.of(RailwaySavedData::save, RailwaySavedData::load);
-    private static final PersistentStateType<RailwaySavedData> TYPE = new PersistentStateType<>("create_tracks", RailwaySavedData::new, CODEC, null);
+    private static final SavedDataType<RailwaySavedData> TYPE = new SavedDataType<>("create_tracks", RailwaySavedData::new, CODEC, null);
 
     private Map<UUID, TrackGraph> trackNetworks = new HashMap<>();
     private Map<UUID, SignalEdgeGroup> signalEdgeGroups = new HashMap<>();
@@ -104,7 +103,7 @@ public class RailwaySavedData extends PersistentState {
     }
 
     public static RailwaySavedData load(MinecraftServer server) {
-        return server.getOverworld().getPersistentStateManager().getOrCreate(TYPE);
+        return server.overworld().getDataStorage().computeIfAbsent(TYPE);
     }
 
 }

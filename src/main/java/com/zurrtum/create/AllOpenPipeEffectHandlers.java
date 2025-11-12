@@ -3,7 +3,7 @@ package com.zurrtum.create;
 import com.zurrtum.create.api.effect.OpenPipeEffectHandler;
 import com.zurrtum.create.api.registry.SimpleRegistry;
 import com.zurrtum.create.impl.effect.*;
-import net.minecraft.registry.tag.FluidTags;
+import net.minecraft.tags.FluidTags;
 
 public class AllOpenPipeEffectHandlers {
     public static void register() {

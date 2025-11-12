@@ -1,8 +1,8 @@
 package com.zurrtum.create.foundation.block;
 
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.WorldView;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.LevelReader;
 
 public interface SlipperinessControlBlock {
-    float getSlipperiness(WorldView world, BlockPos pos);
+    float getSlipperiness(LevelReader world, BlockPos pos);
 }

@@ -1,23 +1,22 @@
 package com.zurrtum.create.client.flywheel.lib.model.baked;
 
-import net.minecraft.client.render.model.GeometryBakedModel;
-import net.minecraft.util.Identifier;
-
 import java.util.Map;
+import net.minecraft.client.renderer.block.model.SimpleModelWrapper;
+import net.minecraft.resources.ResourceLocation;
 
 public final class PartialModelEventHandler {
     private PartialModelEventHandler() {
     }
 
-    public static Map<Identifier, PartialModel> getRegisterAdditional() {
+    public static Map<ResourceLocation, PartialModel> getRegisterAdditional() {
         return PartialModel.ALL;
     }
 
-    public static void onBakingCompleted(PartialModel partial, GeometryBakedModel bakedModel) {
+    public static void onBakingCompleted(PartialModel partial, SimpleModelWrapper bakedModel) {
         partial.bakedModel = bakedModel;
     }
 
-    public static void onBakingCompleted(Map<Identifier, GeometryBakedModel> models) {
+    public static void onBakingCompleted(Map<ResourceLocation, SimpleModelWrapper> models) {
         PartialModel.populateOnInit = true;
     }
 }

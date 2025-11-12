@@ -8,13 +8,15 @@ import com.zurrtum.create.client.AllModels;
 import com.zurrtum.create.client.flywheel.lib.model.baked.PartialModelEventHandler;
 import com.zurrtum.create.client.model.NormalsModelElement;
 import com.zurrtum.create.client.model.UnbakedModelParser;
-import net.minecraft.block.BlockState;
-import net.minecraft.client.item.ItemAssetsLoader;
-import net.minecraft.client.render.model.*;
-import net.minecraft.client.render.model.json.JsonUnbakedModel;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.JsonHelper;
-import net.minecraft.util.thread.AsyncHelper;
+import net.minecraft.client.renderer.block.model.BlockModel;
+import net.minecraft.client.renderer.block.model.BlockStateModel;
+import net.minecraft.client.renderer.block.model.SimpleModelWrapper;
+import net.minecraft.client.renderer.block.model.SimpleUnbakedGeometry;
+import net.minecraft.client.resources.model.*;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.GsonHelper;
+import net.minecraft.util.thread.ParallelMapTransform;
+import net.minecraft.world.level.block.state.BlockState;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -29,19 +31,19 @@ import java.util.stream.Stream;
 
 import static com.zurrtum.create.Create.MOD_ID;
 
-@Mixin(BakedModelManager.class)
+@Mixin(ModelManager.class)
 public class BakedModelManagerMixin {
-    @Inject(method = "method_65750", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/model/json/JsonUnbakedModel;deserialize(Ljava/io/Reader;)Lnet/minecraft/client/render/model/json/JsonUnbakedModel;"), cancellable = true)
+    @Inject(method = "method_65750", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/block/model/BlockModel;fromStream(Ljava/io/Reader;)Lnet/minecraft/client/renderer/block/model/BlockModel;"), cancellable = true)
     private static void deserialize(
-        CallbackInfoReturnable<Pair<Identifier, JsonUnbakedModel>> cir,
-        @Local Identifier identifier,
+        CallbackInfoReturnable<Pair<ResourceLocation, BlockModel>> cir,
+        @Local ResourceLocation identifier,
         @Local Reader input
     ) {
         if (identifier.getNamespace().equals(MOD_ID)) {
             try {
-                UnbakedModel model = JsonHelper.deserialize(UnbakedModelParser.GSON, input, UnbakedModel.class);
-                if (model instanceof JsonUnbakedModel jsonModel) {
-                    UnbakedGeometry geometry = (UnbakedGeometry) jsonModel.geometry();
+                UnbakedModel model = GsonHelper.fromJson(UnbakedModelParser.GSON, input, UnbakedModel.class);
+                if (model instanceof BlockModel jsonModel) {
+                    SimpleUnbakedGeometry geometry = (SimpleUnbakedGeometry) jsonModel.geometry();
                     if (geometry != null) {
                         geometry.elements().forEach(NormalsModelElement::markFacingNormals);
                     }
@@ -62,42 +64,42 @@ public class BakedModelManagerMixin {
     }
 
     @WrapOperation(method = "method_45897", at = @At(value = "INVOKE", target = "Ljava/util/List;stream()Ljava/util/stream/Stream;"))
-    private static Stream<Pair<Identifier, UnbakedModel>> replace(
-        List<Pair<Identifier, UnbakedModel>> instance,
-        Operation<Stream<Pair<Identifier, UnbakedModel>>> original
+    private static Stream<Pair<ResourceLocation, UnbakedModel>> replace(
+        List<Pair<ResourceLocation, UnbakedModel>> instance,
+        Operation<Stream<Pair<ResourceLocation, UnbakedModel>>> original
     ) {
         return Stream.concat(original.call(instance), UnbakedModelParser.getCaches());
     }
 
-    @Inject(method = "collect", at = @At(value = "NEW", target = "(Lnet/minecraft/client/render/model/BakedSimpleModel;Ljava/util/Map;)Lnet/minecraft/client/render/model/BakedModelManager$Models;"))
+    @Inject(method = "discoverModelDependencies", at = @At(value = "NEW", target = "(Lnet/minecraft/client/resources/model/ResolvedModel;Ljava/util/Map;)Lnet/minecraft/client/resources/model/ModelManager$ResolvedModels;"))
     private static void collect(
-        Map<Identifier, UnbakedModel> modelMap,
-        BlockStatesLoader.LoadedModels stateDefinition,
-        ItemAssetsLoader.Result result,
-        CallbackInfoReturnable<BakedModelManager.Models> cir,
-        @Local ReferencedModelsCollector collector
+        Map<ResourceLocation, UnbakedModel> modelMap,
+        BlockStateModelLoader.LoadedModels stateDefinition,
+        ClientItemInfoLoader.LoadedClientInfos result,
+        CallbackInfoReturnable<ModelManager.ResolvedModels> cir,
+        @Local ModelDiscovery collector
     ) {
-        Map<BlockState, BlockStateModel.UnbakedGrouped> models = stateDefinition.models();
+        Map<BlockState, BlockStateModel.UnbakedRoot> models = stateDefinition.models();
         AllModels.ALL.forEach((state, resolver) -> {
-            BlockStateModel.UnbakedGrouped unbaked = resolver.apply(state, models.get(state));
-            unbaked.resolve(collector::resolve);
+            BlockStateModel.UnbakedRoot unbaked = resolver.apply(state, models.get(state));
+            unbaked.resolveDependencies(collector::getOrCreateModel);
             models.put(state, unbaked);
         });
-        PartialModelEventHandler.getRegisterAdditional().keySet().forEach(collector::resolve);
+        PartialModelEventHandler.getRegisterAdditional().keySet().forEach(collector::getOrCreateModel);
     }
 
-    @WrapOperation(method = "bake", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/model/ModelBaker;bake(Lnet/minecraft/client/render/model/ErrorCollectingSpriteGetter;Ljava/util/concurrent/Executor;)Ljava/util/concurrent/CompletableFuture;"))
-    private static CompletableFuture<ModelBaker.BakedModels> bake(
-        ModelBaker baker,
-        ErrorCollectingSpriteGetter spriteGetter,
+    @WrapOperation(method = "loadModels", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/resources/model/ModelBakery;bakeModels(Lnet/minecraft/client/resources/model/SpriteGetter;Ljava/util/concurrent/Executor;)Ljava/util/concurrent/CompletableFuture;"))
+    private static CompletableFuture<ModelBakery.BakingResult> bake(
+        ModelBakery baker,
+        SpriteGetter spriteGetter,
         Executor executor,
-        Operation<CompletableFuture<ModelBaker.BakedModels>> original
+        Operation<CompletableFuture<ModelBakery.BakingResult>> original
     ) {
-        ModelBaker.BakerImpl bakerImpl = baker.new BakerImpl(spriteGetter);
-        CompletableFuture<ModelBaker.BakedModels> modelsCompletableFuture = original.call(baker, spriteGetter, executor);
-        return AsyncHelper.mapValues(
+        ModelBakery.ModelBakerImpl bakerImpl = baker.new ModelBakerImpl(spriteGetter);
+        CompletableFuture<ModelBakery.BakingResult> modelsCompletableFuture = original.call(baker, spriteGetter, executor);
+        return ParallelMapTransform.schedule(
             PartialModelEventHandler.getRegisterAdditional(), (id, model) -> {
-                GeometryBakedModel bakedModel = GeometryBakedModel.create(bakerImpl, id, ModelRotation.X0_Y0);
+                SimpleModelWrapper bakedModel = SimpleModelWrapper.bake(bakerImpl, id, BlockModelRotation.X0_Y0);
                 PartialModelEventHandler.onBakingCompleted(model, bakedModel);
                 return bakedModel;
             }, executor

@@ -1,13 +1,13 @@
 package com.zurrtum.create.client.flywheel.impl;
 
-import net.minecraft.client.world.ClientWorld;
+import net.minecraft.client.multiplayer.ClientLevel;
 
 public interface FlwImplXplat {
     FlwImplXplat INSTANCE = new FlwImplXplatImpl();
 
     boolean isModLoaded(String modId);
 
-    void dispatchReloadLevelRendererEvent(ClientWorld level);
+    void dispatchReloadLevelRendererEvent(ClientLevel level);
 
     String getVersionStr();
 

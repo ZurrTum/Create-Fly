@@ -8,32 +8,32 @@ import com.zurrtum.create.catnip.math.VecHelper;
 import com.zurrtum.create.content.contraptions.AssemblyException;
 import com.zurrtum.create.content.contraptions.Contraption;
 import com.zurrtum.create.content.contraptions.mounted.CartAssemblerBlockEntity.CartMovementMode;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.block.enums.RailShape;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.vehicle.AbstractMinecartEntity;
-import net.minecraft.inventory.Inventory;
-import net.minecraft.state.property.Properties;
-import net.minecraft.storage.ReadView;
-import net.minecraft.storage.WriteView;
-import net.minecraft.structure.StructureTemplate.StructureBlockInfo;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Direction.Axis;
-import net.minecraft.world.World;
-import net.minecraft.world.WorldAccess;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.Queue;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.Direction.Axis;
+import net.minecraft.world.Container;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.vehicle.AbstractMinecart;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.block.state.properties.RailShape;
+import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate.StructureBlockInfo;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
+import net.minecraft.world.phys.AABB;
 
 import static com.zurrtum.create.content.contraptions.mounted.CartAssemblerBlock.RAIL_SHAPE;
 
 public class MountedContraption extends Contraption {
 
     public CartMovementMode rotationMode;
-    public AbstractMinecartEntity connectedCart;
+    public AbstractMinecart connectedCart;
 
     public MountedContraption() {
         this(CartMovementMode.ROTATE);
@@ -49,35 +49,35 @@ public class MountedContraption extends Contraption {
     }
 
     @Override
-    public boolean assemble(World world, BlockPos pos) throws AssemblyException {
+    public boolean assemble(Level world, BlockPos pos) throws AssemblyException {
         BlockState state = world.getBlockState(pos);
-        if (!state.contains(RAIL_SHAPE))
+        if (!state.hasProperty(RAIL_SHAPE))
             return false;
         if (!searchMovedStructure(world, pos, null))
             return false;
 
-        Axis axis = state.get(RAIL_SHAPE) == RailShape.EAST_WEST ? Axis.X : Axis.Z;
+        Axis axis = state.getValue(RAIL_SHAPE) == RailShape.EAST_WEST ? Axis.X : Axis.Z;
         addBlock(
             world,
             pos,
-            Pair.of(new StructureBlockInfo(pos, AllBlocks.MINECART_ANCHOR.getDefaultState().with(Properties.HORIZONTAL_AXIS, axis), null), null)
+            Pair.of(new StructureBlockInfo(pos, AllBlocks.MINECART_ANCHOR.defaultBlockState().setValue(BlockStateProperties.HORIZONTAL_AXIS, axis), null), null)
         );
 
         return blocks.size() != 1;
     }
 
     @Override
-    protected boolean addToInitialFrontier(World world, BlockPos pos, Direction direction, Queue<BlockPos> frontier) {
+    protected boolean addToInitialFrontier(Level world, BlockPos pos, Direction direction, Queue<BlockPos> frontier) {
         frontier.clear();
-        frontier.add(pos.up());
+        frontier.add(pos.above());
         return true;
     }
 
     @Override
-    protected Pair<StructureBlockInfo, BlockEntity> capture(World world, BlockPos pos) {
+    protected Pair<StructureBlockInfo, BlockEntity> capture(Level world, BlockPos pos) {
         Pair<StructureBlockInfo, BlockEntity> pair = super.capture(world, pos);
         StructureBlockInfo capture = pair.getKey();
-        if (!capture.state().isOf(AllBlocks.CART_ASSEMBLER))
+        if (!capture.state().is(AllBlocks.CART_ASSEMBLER))
             return pair;
 
         Pair<StructureBlockInfo, BlockEntity> anchorSwap = Pair.of(
@@ -93,11 +93,11 @@ public class MountedContraption extends Contraption {
         for (Axis axis : Iterate.axes) {
             if (axis.isVertical() || !VecHelper.onSameAxis(anchor, pos, axis))
                 continue;
-            for (AbstractMinecartEntity abstractMinecartEntity : world.getNonSpectatingEntities(AbstractMinecartEntity.class, new Box(pos))) {
+            for (AbstractMinecart abstractMinecartEntity : world.getEntitiesOfClass(AbstractMinecart.class, new AABB(pos))) {
                 if (!CartAssemblerBlock.canAssembleTo(abstractMinecartEntity))
                     break;
                 connectedCart = abstractMinecartEntity;
-                connectedCart.setPosition(pos.getX() + .5, pos.getY(), pos.getZ() + .5f);
+                connectedCart.setPos(pos.getX() + .5, pos.getY(), pos.getZ() + .5f);
             }
         }
 
@@ -105,17 +105,17 @@ public class MountedContraption extends Contraption {
     }
 
     @Override
-    protected boolean movementAllowed(BlockState state, World world, BlockPos pos) {
-        if (!pos.equals(anchor) && state.isOf(AllBlocks.CART_ASSEMBLER))
+    protected boolean movementAllowed(BlockState state, Level world, BlockPos pos) {
+        if (!pos.equals(anchor) && state.is(AllBlocks.CART_ASSEMBLER))
             return testSecondaryCartAssembler(world, pos);
         return super.movementAllowed(state, world, pos);
     }
 
-    protected boolean testSecondaryCartAssembler(World world, BlockPos pos) {
+    protected boolean testSecondaryCartAssembler(Level world, BlockPos pos) {
         for (Axis axis : Iterate.axes) {
             if (axis.isVertical() || !VecHelper.onSameAxis(anchor, pos, axis))
                 continue;
-            for (AbstractMinecartEntity abstractMinecartEntity : world.getNonSpectatingEntities(AbstractMinecartEntity.class, new Box(pos))) {
+            for (AbstractMinecart abstractMinecartEntity : world.getEntitiesOfClass(AbstractMinecart.class, new AABB(pos))) {
                 if (!CartAssemblerBlock.canAssembleTo(abstractMinecartEntity))
                     break;
                 return true;
@@ -125,25 +125,25 @@ public class MountedContraption extends Contraption {
     }
 
     @Override
-    public void write(WriteView view, boolean spawnPacket) {
+    public void write(ValueOutput view, boolean spawnPacket) {
         super.write(view, spawnPacket);
-        view.put("RotationMode", CartMovementMode.CODEC, rotationMode);
+        view.store("RotationMode", CartMovementMode.CODEC, rotationMode);
     }
 
     @Override
-    public void read(World world, ReadView view, boolean spawnData) {
+    public void read(Level world, ValueInput view, boolean spawnData) {
         view.read("RotationMode", CartMovementMode.CODEC).ifPresent(mode -> rotationMode = mode);
         super.read(world, view, spawnData);
     }
 
     @Override
-    protected boolean customBlockPlacement(WorldAccess world, BlockPos pos, BlockState state) {
-        return state.isOf(AllBlocks.MINECART_ANCHOR);
+    protected boolean customBlockPlacement(LevelAccessor world, BlockPos pos, BlockState state) {
+        return state.is(AllBlocks.MINECART_ANCHOR);
     }
 
     @Override
-    protected boolean customBlockRemoval(WorldAccess world, BlockPos pos, BlockState state) {
-        return state.isOf(AllBlocks.MINECART_ANCHOR);
+    protected boolean customBlockRemoval(LevelAccessor world, BlockPos pos, BlockState state) {
+        return state.is(AllBlocks.MINECART_ANCHOR);
     }
 
     @Override
@@ -152,7 +152,7 @@ public class MountedContraption extends Contraption {
     }
 
     public void addExtraInventories(Entity cart) {
-        if (cart instanceof Inventory inventory)
+        if (cart instanceof Container inventory)
             storage.attachExternal(inventory);
     }
 

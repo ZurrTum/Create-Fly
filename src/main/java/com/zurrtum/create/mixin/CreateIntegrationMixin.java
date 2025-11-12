@@ -5,7 +5,7 @@ import com.zurrtum.create.api.contraption.BlockMovementChecks.CheckResult;
 import dan200.computercraft.shared.integration.CreateIntegration;
 import dan200.computercraft.shared.peripheral.modem.wired.CableBlock;
 import dan200.computercraft.shared.peripheral.modem.wireless.WirelessModemBlock;
-import net.minecraft.block.Block;
+import net.minecraft.world.level.block.Block;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -18,9 +18,9 @@ public class CreateIntegrationMixin {
         BlockMovementChecks.registerAttachedCheck((state, world, pos, direction) -> {
             Block block = state.getBlock();
             if (block instanceof WirelessModemBlock) {
-                return CheckResult.of(state.get(WirelessModemBlock.FACING) == direction);
+                return CheckResult.of(state.getValue(WirelessModemBlock.FACING) == direction);
             } else {
-                return block instanceof CableBlock ? CheckResult.of(state.get(CableBlock.MODEM).getFacing() == direction) : CheckResult.PASS;
+                return block instanceof CableBlock ? CheckResult.of(state.getValue(CableBlock.MODEM).getFacing() == direction) : CheckResult.PASS;
             }
         });
         ci.cancel();

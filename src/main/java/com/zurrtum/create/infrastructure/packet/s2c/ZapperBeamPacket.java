@@ -3,23 +3,23 @@ package com.zurrtum.create.infrastructure.packet.s2c;
 import com.zurrtum.create.AllClientHandle;
 import com.zurrtum.create.AllPackets;
 import com.zurrtum.create.catnip.codecs.stream.CatnipStreamCodecs;
-import net.minecraft.network.RegistryByteBuf;
-import net.minecraft.network.codec.PacketCodec;
-import net.minecraft.network.codec.PacketCodecs;
-import net.minecraft.network.packet.PacketType;
-import net.minecraft.util.Hand;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.PacketType;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.phys.Vec3;
 import org.apache.logging.log4j.util.TriConsumer;
 
-public record ZapperBeamPacket(Vec3d location, Hand hand, boolean self, Vec3d target) implements ShootGadgetPacket {
-    public static final PacketCodec<RegistryByteBuf, ZapperBeamPacket> CODEC = PacketCodec.tuple(
-        Vec3d.PACKET_CODEC,
+public record ZapperBeamPacket(Vec3 location, InteractionHand hand, boolean self, Vec3 target) implements ShootGadgetPacket {
+    public static final StreamCodec<RegistryFriendlyByteBuf, ZapperBeamPacket> CODEC = StreamCodec.composite(
+        Vec3.STREAM_CODEC,
         ZapperBeamPacket::location,
         CatnipStreamCodecs.HAND,
         ZapperBeamPacket::hand,
-        PacketCodecs.BOOLEAN,
+        ByteBufCodecs.BOOL,
         ZapperBeamPacket::self,
-        Vec3d.PACKET_CODEC,
+        Vec3.STREAM_CODEC,
         ZapperBeamPacket::target,
         ZapperBeamPacket::new
     );
@@ -30,7 +30,7 @@ public record ZapperBeamPacket(Vec3d location, Hand hand, boolean self, Vec3d ta
     }
 
     @Override
-    public PacketType<ZapperBeamPacket> getPacketType() {
+    public PacketType<ZapperBeamPacket> type() {
         return AllPackets.BEAM_EFFECT;
     }
 

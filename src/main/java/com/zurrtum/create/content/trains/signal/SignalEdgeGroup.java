@@ -5,17 +5,17 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.zurrtum.create.Create;
 import com.zurrtum.create.content.trains.entity.Train;
+import net.minecraft.core.UUIDUtil;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.util.Uuids;
 import org.apache.commons.lang3.mutable.MutableInt;
 
 import java.util.*;
 import java.util.function.Consumer;
 
 public class SignalEdgeGroup {
-    private static final Codec<Map<UUID, UUID>> INTERSECTING_CODEC = Codec.unboundedMap(Uuids.STRING_CODEC, Uuids.STRING_CODEC);
+    private static final Codec<Map<UUID, UUID>> INTERSECTING_CODEC = Codec.unboundedMap(UUIDUtil.STRING_CODEC, UUIDUtil.STRING_CODEC);
     public static final Codec<SignalEdgeGroup> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-        Uuids.STRING_CODEC.fieldOf("Id").forGetter(i -> i.id),
+        UUIDUtil.STRING_CODEC.fieldOf("Id").forGetter(i -> i.id),
         EdgeGroupColor.CODEC.fieldOf("Color").forGetter(group -> group.color),
         INTERSECTING_CODEC.fieldOf("Connected").forGetter(group -> group.intersecting),
         Codec.BOOL.fieldOf("Fallback").forGetter(group -> group.fallbackGroup)

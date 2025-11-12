@@ -16,11 +16,11 @@ import com.zurrtum.create.client.foundation.render.AllInstanceTypes;
 import com.zurrtum.create.client.foundation.virtualWorld.VirtualRenderWorld;
 import com.zurrtum.create.content.contraptions.behaviour.MovementContext;
 import com.zurrtum.create.content.kinetics.deployer.DeployerBlockEntity.Mode;
-import net.minecraft.block.BlockState;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.util.Mth;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.Vec3;
 import org.joml.Matrix4f;
 import org.joml.Matrix4fc;
 
@@ -42,13 +42,13 @@ public class DeployerActorVisual extends ActorVisual {
     public DeployerActorVisual(VisualizationContext visualizationContext, VirtualRenderWorld simulationWorld, MovementContext context) {
         super(visualizationContext, simulationWorld, context);
         BlockState state = context.state;
-        Mode mode = context.blockEntityData.get("Mode", Mode.CODEC).orElse(Mode.PUNCH);
+        Mode mode = context.blockEntityData.read("Mode", Mode.CODEC).orElse(Mode.PUNCH);
         PartialModel handPose = DeployerRenderer.getHandPose(mode);
 
         stationaryTimer = context.data.contains("StationaryTimer");
-        facing = state.get(FACING);
+        facing = state.getValue(FACING);
 
-        boolean rotatePole = state.get(AXIS_ALONG_FIRST_COORDINATE) ^ facing.getAxis() == Direction.Axis.Z;
+        boolean rotatePole = state.getValue(AXIS_ALONG_FIRST_COORDINATE) ^ facing.getAxis() == Direction.Axis.Z;
         float yRot = AngleHelper.horizontalAngle(facing);
         float xRot = facing == Direction.UP ? 270 : facing == Direction.DOWN ? 90 : 0;
         float zRot = rotatePole ? 90 : 0;
@@ -64,14 +64,13 @@ public class DeployerActorVisual extends ActorVisual {
         shaft.setRotationAxis(axis).setRotationOffset(KineticBlockEntityVisual.rotationOffset(state, axis, context.localPos))
             .setPosition(context.localPos).light(blockLight, 0).setChanged();
 
-        pole.translate(context.localPos).center().rotate(yRot * MathHelper.RADIANS_PER_DEGREE, Direction.UP)
-            .rotate(xRot * MathHelper.RADIANS_PER_DEGREE, Direction.EAST).rotate(zRot * MathHelper.RADIANS_PER_DEGREE, Direction.SOUTH).uncenter()
-            .light(blockLight, 0).setChanged();
+        pole.translate(context.localPos).center().rotate(yRot * Mth.DEG_TO_RAD, Direction.UP).rotate(xRot * Mth.DEG_TO_RAD, Direction.EAST)
+            .rotate(zRot * Mth.DEG_TO_RAD, Direction.SOUTH).uncenter().light(blockLight, 0).setChanged();
 
         basePoleTransform = new Matrix4f(pole.pose);
 
-        hand.translate(context.localPos).center().rotate(yRot * MathHelper.RADIANS_PER_DEGREE, Direction.UP)
-            .rotate(xRot * MathHelper.RADIANS_PER_DEGREE, Direction.EAST).uncenter().light(blockLight, 0).setChanged();
+        hand.translate(context.localPos).center().rotate(yRot * Mth.DEG_TO_RAD, Direction.UP).rotate(xRot * Mth.DEG_TO_RAD, Direction.EAST).uncenter()
+            .light(blockLight, 0).setChanged();
 
         baseHandTransform = new Matrix4f(hand.pose);
     }
@@ -90,12 +89,12 @@ public class DeployerActorVisual extends ActorVisual {
         if (context.disabled) {
             factor = 0;
         } else if (context.contraption.stalled || context.position == null || context.data.contains("StationaryTimer")) {
-            factor = MathHelper.sin(AnimationTickHolder.getRenderTime() * .5f) * .25f + .25f;
+            factor = Mth.sin(AnimationTickHolder.getRenderTime() * .5f) * .25f + .25f;
         } else {
-            Vec3d center = VecHelper.getCenterOf(BlockPos.ofFloored(context.position));
+            Vec3 center = VecHelper.getCenterOf(BlockPos.containing(context.position));
             double distance = context.position.distanceTo(center);
             double nextDistance = context.position.add(context.motion).distanceTo(center);
-            factor = .5f - MathHelper.clamp(MathHelper.lerp(AnimationTickHolder.getPartialTicks(), distance, nextDistance), 0, 1);
+            factor = .5f - Mth.clamp(Mth.lerp(AnimationTickHolder.getPartialTicks(), distance, nextDistance), 0, 1);
         }
         return (float) factor;
     }

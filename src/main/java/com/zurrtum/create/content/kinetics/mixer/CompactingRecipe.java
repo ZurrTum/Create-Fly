@@ -10,19 +10,19 @@ import com.zurrtum.create.content.processing.basin.BasinInput;
 import com.zurrtum.create.content.processing.basin.BasinRecipe;
 import com.zurrtum.create.content.processing.recipe.SizedIngredient;
 import com.zurrtum.create.foundation.fluid.FluidIngredient;
-import net.minecraft.item.ItemStack;
-import net.minecraft.network.RegistryByteBuf;
-import net.minecraft.network.codec.PacketCodec;
-import net.minecraft.network.codec.PacketCodecs;
-import net.minecraft.recipe.RecipeSerializer;
-import net.minecraft.recipe.RecipeType;
-import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.List;
 import java.util.Optional;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.RecipeSerializer;
+import net.minecraft.world.item.crafting.RecipeType;
+import net.minecraft.world.level.Level;
 
 public record CompactingRecipe(
     ItemStack result, @Nullable FluidIngredient fluidIngredient, List<SizedIngredient> ingredients
@@ -43,7 +43,7 @@ public record CompactingRecipe(
     }
 
     @Override
-    public boolean matches(BasinInput input, World world) {
+    public boolean matches(BasinInput input, Level world) {
         List<ItemStack> outputs = BasinRecipe.tryCraft(input, ingredients);
         if (outputs == null) {
             return false;
@@ -94,12 +94,12 @@ public record CompactingRecipe(
             }
             return DataResult.success(recipe);
         });
-        public static final PacketCodec<RegistryByteBuf, CompactingRecipe> PACKET_CODEC = PacketCodec.tuple(
-            ItemStack.PACKET_CODEC,
+        public static final StreamCodec<RegistryFriendlyByteBuf, CompactingRecipe> PACKET_CODEC = StreamCodec.composite(
+            ItemStack.STREAM_CODEC,
             CompactingRecipe::result,
-            FluidIngredient.PACKET_CODEC.collect(PacketCodecs::optional),
+            FluidIngredient.PACKET_CODEC.apply(ByteBufCodecs::optional),
             Serializer::getOptionalFluidIngredient,
-            SizedIngredient.PACKET_CODEC.collect(PacketCodecs.toList()),
+            SizedIngredient.PACKET_CODEC.apply(ByteBufCodecs.list()),
             CompactingRecipe::ingredients,
             Serializer::createRecipe
         );
@@ -119,7 +119,7 @@ public record CompactingRecipe(
         }
 
         @Override
-        public PacketCodec<RegistryByteBuf, CompactingRecipe> packetCodec() {
+        public StreamCodec<RegistryFriendlyByteBuf, CompactingRecipe> streamCodec() {
             return PACKET_CODEC;
         }
     }

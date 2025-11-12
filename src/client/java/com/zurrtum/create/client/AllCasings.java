@@ -6,10 +6,10 @@ import com.zurrtum.create.content.fluids.pipes.EncasedPipeBlock;
 import com.zurrtum.create.content.kinetics.gearbox.GearboxBlock;
 import com.zurrtum.create.content.kinetics.simpleRelays.encased.EncasedCogwheelBlock;
 import com.zurrtum.create.content.kinetics.simpleRelays.encased.EncasedShaftBlock;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Direction.AxisDirection;
+import net.minecraft.core.Direction;
+import net.minecraft.core.Direction.AxisDirection;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
 
 import java.util.IdentityHashMap;
 import java.util.Map;
@@ -57,29 +57,29 @@ public class AllCasings {
         make(AllBlocks.RAILWAY_CASING, AllSpriteShifts.RAILWAY_CASING_SIDE);
         make(AllBlocks.SHADOW_STEEL_CASING, AllSpriteShifts.SHADOW_STEEL_CASING);
         make(AllBlocks.REFINED_RADIANCE_CASING, AllSpriteShifts.REFINED_RADIANCE_CASING);
-        make(AllBlocks.GEARBOX, AllSpriteShifts.ANDESITE_CASING, (s, f) -> f.getAxis() == s.get(GearboxBlock.AXIS));
-        make(AllBlocks.ANDESITE_ENCASED_SHAFT, AllSpriteShifts.ANDESITE_CASING, (s, f) -> f.getAxis() != s.get(EncasedShaftBlock.AXIS));
-        make(AllBlocks.BRASS_ENCASED_SHAFT, AllSpriteShifts.BRASS_CASING, (s, f) -> f.getAxis() != s.get(EncasedShaftBlock.AXIS));
+        make(AllBlocks.GEARBOX, AllSpriteShifts.ANDESITE_CASING, (s, f) -> f.getAxis() == s.getValue(GearboxBlock.AXIS));
+        make(AllBlocks.ANDESITE_ENCASED_SHAFT, AllSpriteShifts.ANDESITE_CASING, (s, f) -> f.getAxis() != s.getValue(EncasedShaftBlock.AXIS));
+        make(AllBlocks.BRASS_ENCASED_SHAFT, AllSpriteShifts.BRASS_CASING, (s, f) -> f.getAxis() != s.getValue(EncasedShaftBlock.AXIS));
         make(
             AllBlocks.ANDESITE_ENCASED_COGWHEEL,
             AllSpriteShifts.ANDESITE_CASING,
-            (s, f) -> f.getAxis() == s.get(EncasedCogwheelBlock.AXIS) && !s.get(f.getDirection() == AxisDirection.POSITIVE ? EncasedCogwheelBlock.TOP_SHAFT : EncasedCogwheelBlock.BOTTOM_SHAFT)
+            (s, f) -> f.getAxis() == s.getValue(EncasedCogwheelBlock.AXIS) && !s.getValue(f.getAxisDirection() == AxisDirection.POSITIVE ? EncasedCogwheelBlock.TOP_SHAFT : EncasedCogwheelBlock.BOTTOM_SHAFT)
         );
         make(
             AllBlocks.BRASS_ENCASED_COGWHEEL,
             AllSpriteShifts.BRASS_CASING,
-            (s, f) -> f.getAxis() == s.get(EncasedCogwheelBlock.AXIS) && !s.get(f.getDirection() == AxisDirection.POSITIVE ? EncasedCogwheelBlock.TOP_SHAFT : EncasedCogwheelBlock.BOTTOM_SHAFT)
+            (s, f) -> f.getAxis() == s.getValue(EncasedCogwheelBlock.AXIS) && !s.getValue(f.getAxisDirection() == AxisDirection.POSITIVE ? EncasedCogwheelBlock.TOP_SHAFT : EncasedCogwheelBlock.BOTTOM_SHAFT)
         );
         make(
             AllBlocks.ANDESITE_ENCASED_LARGE_COGWHEEL,
             AllSpriteShifts.ANDESITE_CASING,
-            (s, f) -> f.getAxis() == s.get(EncasedCogwheelBlock.AXIS) && !s.get(f.getDirection() == AxisDirection.POSITIVE ? EncasedCogwheelBlock.TOP_SHAFT : EncasedCogwheelBlock.BOTTOM_SHAFT)
+            (s, f) -> f.getAxis() == s.getValue(EncasedCogwheelBlock.AXIS) && !s.getValue(f.getAxisDirection() == AxisDirection.POSITIVE ? EncasedCogwheelBlock.TOP_SHAFT : EncasedCogwheelBlock.BOTTOM_SHAFT)
         );
         make(
             AllBlocks.BRASS_ENCASED_LARGE_COGWHEEL,
             AllSpriteShifts.BRASS_CASING,
-            (s, f) -> f.getAxis() == s.get(EncasedCogwheelBlock.AXIS) && !s.get(f.getDirection() == AxisDirection.POSITIVE ? EncasedCogwheelBlock.TOP_SHAFT : EncasedCogwheelBlock.BOTTOM_SHAFT)
+            (s, f) -> f.getAxis() == s.getValue(EncasedCogwheelBlock.AXIS) && !s.getValue(f.getAxisDirection() == AxisDirection.POSITIVE ? EncasedCogwheelBlock.TOP_SHAFT : EncasedCogwheelBlock.BOTTOM_SHAFT)
         );
-        make(AllBlocks.ENCASED_FLUID_PIPE, AllSpriteShifts.COPPER_CASING, (s, f) -> !s.get(EncasedPipeBlock.FACING_TO_PROPERTY_MAP.get(f)));
+        make(AllBlocks.ENCASED_FLUID_PIPE, AllSpriteShifts.COPPER_CASING, (s, f) -> !s.getValue(EncasedPipeBlock.FACING_TO_PROPERTY_MAP.get(f)));
     }
 }

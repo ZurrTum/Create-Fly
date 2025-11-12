@@ -6,16 +6,6 @@ import com.llamalad7.mixinextras.sugar.Local;
 import com.zurrtum.create.client.AllExtensions;
 import com.zurrtum.create.client.flywheel.lib.visualization.VisualizationHelper;
 import com.zurrtum.create.client.infrastructure.model.WrapperBlockStateModel;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.client.render.BlockRenderLayer;
-import net.minecraft.client.render.chunk.ChunkRendererRegion;
-import net.minecraft.client.render.chunk.SectionBuilder;
-import net.minecraft.client.render.model.BlockModelPart;
-import net.minecraft.client.render.model.BlockStateModel;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.random.Random;
-import net.minecraft.world.BlockRenderView;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -23,23 +13,33 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.List;
 import java.util.function.BiFunction;
+import net.minecraft.client.renderer.block.model.BlockModelPart;
+import net.minecraft.client.renderer.block.model.BlockStateModel;
+import net.minecraft.client.renderer.chunk.ChunkSectionLayer;
+import net.minecraft.client.renderer.chunk.RenderSectionRegion;
+import net.minecraft.client.renderer.chunk.SectionCompiler;
+import net.minecraft.core.BlockPos;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.level.BlockAndTintGetter;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
 
-@Mixin(SectionBuilder.class)
+@Mixin(SectionCompiler.class)
 public class SectionBuilderMixin {
-    @Inject(method = "addBlockEntity", at = @At("HEAD"), cancellable = true)
-    private <E extends BlockEntity> void flywheel$tryAddBlockEntity(SectionBuilder.RenderData data, E blockEntity, CallbackInfo ci) {
+    @Inject(method = "handleBlockEntity", at = @At("HEAD"), cancellable = true)
+    private <E extends BlockEntity> void flywheel$tryAddBlockEntity(SectionCompiler.Results data, E blockEntity, CallbackInfo ci) {
         if (VisualizationHelper.tryAddBlockEntity(blockEntity)) {
             ci.cancel();
         }
     }
 
-    @WrapOperation(method = "build(Lnet/minecraft/util/math/ChunkSectionPos;Lnet/minecraft/client/render/chunk/ChunkRendererRegion;Lcom/mojang/blaze3d/systems/VertexSorter;Lnet/minecraft/client/render/chunk/BlockBufferAllocatorStorage;)Lnet/minecraft/client/render/chunk/SectionBuilder$RenderData;", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/model/BlockStateModel;addParts(Lnet/minecraft/util/math/random/Random;Ljava/util/List;)V"))
+    @WrapOperation(method = "compile(Lnet/minecraft/core/SectionPos;Lnet/minecraft/client/renderer/chunk/RenderSectionRegion;Lcom/mojang/blaze3d/vertex/VertexSorting;Lnet/minecraft/client/renderer/SectionBufferBuilderPack;)Lnet/minecraft/client/renderer/chunk/SectionCompiler$Results;", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/block/model/BlockStateModel;collectParts(Lnet/minecraft/util/RandomSource;Ljava/util/List;)V"))
     private void build(
         BlockStateModel model,
-        Random random,
+        RandomSource random,
         List<BlockModelPart> parts,
         Operation<Void> original,
-        @Local(argsOnly = true) ChunkRendererRegion world,
+        @Local(argsOnly = true) RenderSectionRegion world,
         @Local(ordinal = 2) BlockPos pos,
         @Local BlockState state
     ) {
@@ -50,14 +50,14 @@ public class SectionBuilderMixin {
         }
     }
 
-    @WrapOperation(method = "build(Lnet/minecraft/util/math/ChunkSectionPos;Lnet/minecraft/client/render/chunk/ChunkRendererRegion;Lcom/mojang/blaze3d/systems/VertexSorter;Lnet/minecraft/client/render/chunk/BlockBufferAllocatorStorage;)Lnet/minecraft/client/render/chunk/SectionBuilder$RenderData;", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/RenderLayers;getBlockLayer(Lnet/minecraft/block/BlockState;)Lnet/minecraft/client/render/BlockRenderLayer;"))
-    private BlockRenderLayer getLayer(
+    @WrapOperation(method = "compile(Lnet/minecraft/core/SectionPos;Lnet/minecraft/client/renderer/chunk/RenderSectionRegion;Lcom/mojang/blaze3d/vertex/VertexSorting;Lnet/minecraft/client/renderer/SectionBufferBuilderPack;)Lnet/minecraft/client/renderer/chunk/SectionCompiler$Results;", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/ItemBlockRenderTypes;getChunkRenderType(Lnet/minecraft/world/level/block/state/BlockState;)Lnet/minecraft/client/renderer/chunk/ChunkSectionLayer;"))
+    private ChunkSectionLayer getLayer(
         BlockState state,
-        Operation<BlockRenderLayer> original,
-        @Local(argsOnly = true) ChunkRendererRegion world,
+        Operation<ChunkSectionLayer> original,
+        @Local(argsOnly = true) RenderSectionRegion world,
         @Local(ordinal = 2) BlockPos pos
     ) {
-        BiFunction<BlockRenderView, BlockPos, BlockRenderLayer> customLayer = AllExtensions.LAYER.get(state.getBlock());
+        BiFunction<BlockAndTintGetter, BlockPos, ChunkSectionLayer> customLayer = AllExtensions.LAYER.get(state.getBlock());
         if (customLayer != null) {
             return customLayer.apply(world, pos);
         }

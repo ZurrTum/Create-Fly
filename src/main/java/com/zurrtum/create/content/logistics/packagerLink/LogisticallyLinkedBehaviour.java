@@ -13,14 +13,14 @@ import com.zurrtum.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.foundation.utility.TickBasedCache;
 import com.zurrtum.create.infrastructure.component.PackageOrderWithCrafts;
 import com.zurrtum.create.infrastructure.items.ItemStackHandler;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.storage.ReadView;
-import net.minecraft.storage.WriteView;
-import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
-import net.minecraft.util.Uuids;
-import net.minecraft.util.math.GlobalPos;
+import net.minecraft.ChatFormatting;
+import net.minecraft.core.GlobalPos;
+import net.minecraft.core.UUIDUtil;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import org.apache.commons.lang3.mutable.MutableBoolean;
 import org.jetbrains.annotations.Nullable;
 
@@ -82,7 +82,7 @@ public class LogisticallyLinkedBehaviour extends BlockEntityBehaviour<SmartBlock
     }
 
     public static void keepAlive(LogisticallyLinkedBehaviour behaviour) {
-        boolean onClient = behaviour.blockEntity.getWorld().isClient();
+        boolean onClient = behaviour.blockEntity.getLevel().isClientSide();
         if (behaviour.redstonePower == 15)
             return;
         try {
@@ -112,7 +112,7 @@ public class LogisticallyLinkedBehaviour extends BlockEntityBehaviour<SmartBlock
 
     @Override
     public void unload() {
-        if (loadedGlobally && global && getWorld() != null)
+        if (loadedGlobally && global && getLevel() != null)
             Create.LOGISTICS.linkInvalidated(freqId, getGlobalPos());
         super.unload();
         remove(this);
@@ -126,7 +126,7 @@ public class LogisticallyLinkedBehaviour extends BlockEntityBehaviour<SmartBlock
     @Override
     public void initialize() {
         super.initialize();
-        if (getWorld().isClient())
+        if (getLevel().isClientSide())
             return;
 
         if (!loadedGlobally && global) {
@@ -136,7 +136,7 @@ public class LogisticallyLinkedBehaviour extends BlockEntityBehaviour<SmartBlock
 
         if (!addedGlobally && global) {
             addedGlobally = true;
-            blockEntity.markDirty();
+            blockEntity.setChanged();
             if (blockEntity instanceof PackagerLinkBlockEntity plbe)
                 Create.LOGISTICS.linkAdded(freqId, getGlobalPos(), plbe.placedBy);
         }
@@ -144,13 +144,13 @@ public class LogisticallyLinkedBehaviour extends BlockEntityBehaviour<SmartBlock
     }
 
     private GlobalPos getGlobalPos() {
-        return GlobalPos.create(getWorld().getRegistryKey(), getPos());
+        return GlobalPos.of(getLevel().dimension(), getPos());
     }
 
     @Override
     public void destroy() {
         super.destroy();
-        if (addedGlobally && global && getWorld() != null)
+        if (addedGlobally && global && getLevel() != null)
             Create.LOGISTICS.linkRemoved(freqId, getGlobalPos());
     }
 
@@ -158,7 +158,7 @@ public class LogisticallyLinkedBehaviour extends BlockEntityBehaviour<SmartBlock
         if (power == redstonePower)
             return;
         redstonePower = power;
-        blockEntity.markDirty();
+        blockEntity.setChanged();
 
         if (power == 15)
             remove(this);
@@ -193,8 +193,8 @@ public class LogisticallyLinkedBehaviour extends BlockEntityBehaviour<SmartBlock
         InventorySummary summary = LogisticsManager.ACCURATE_SUMMARIES.getIfPresent(freqId);
         if (summary == null)
             return;
-        for (int i = 0, size = packageContents.size(); i < size; i++) {
-            ItemStack orderedStack = packageContents.getStack(i);
+        for (int i = 0, size = packageContents.getContainerSize(); i < size; i++) {
+            ItemStack orderedStack = packageContents.getItem(i);
             if (orderedStack.isEmpty())
                 continue;
             summary.add(orderedStack, -Math.min(summary.getCountOf(orderedStack), orderedStack.getCount()));
@@ -203,18 +203,18 @@ public class LogisticallyLinkedBehaviour extends BlockEntityBehaviour<SmartBlock
 
     //
 
-    public boolean mayInteract(PlayerEntity player) {
+    public boolean mayInteract(Player player) {
         return Create.LOGISTICS.mayInteract(freqId, player);
     }
 
-    public boolean mayInteractMessage(PlayerEntity player) {
+    public boolean mayInteractMessage(Player player) {
         boolean mayInteract = Create.LOGISTICS.mayInteract(freqId, player);
         if (!mayInteract)
-            player.sendMessage(Text.translatable("create.logistically_linked.protected").formatted(Formatting.RED), true);
+            player.displayClientMessage(Component.translatable("create.logistically_linked.protected").withStyle(ChatFormatting.RED), true);
         return mayInteract;
     }
 
-    public boolean mayAdministrate(PlayerEntity player) {
+    public boolean mayAdministrate(Player player) {
         return Create.LOGISTICS.mayAdministrate(freqId, player);
     }
 
@@ -228,24 +228,24 @@ public class LogisticallyLinkedBehaviour extends BlockEntityBehaviour<SmartBlock
     }
 
     @Override
-    public void writeSafe(WriteView view) {
-        view.put("Freq", Uuids.INT_STREAM_CODEC, freqId);
+    public void writeSafe(ValueOutput view) {
+        view.store("Freq", UUIDUtil.CODEC, freqId);
     }
 
     @Override
-    public void write(WriteView view, boolean clientPacket) {
+    public void write(ValueOutput view, boolean clientPacket) {
         super.write(view, clientPacket);
-        view.put("Freq", Uuids.INT_STREAM_CODEC, freqId);
+        view.store("Freq", UUIDUtil.CODEC, freqId);
         view.putInt("Power", redstonePower);
         view.putBoolean("Added", addedGlobally);
     }
 
     @Override
-    public void read(ReadView view, boolean clientPacket) {
+    public void read(ValueInput view, boolean clientPacket) {
         super.read(view, clientPacket);
-        freqId = view.read("Freq", Uuids.INT_STREAM_CODEC).orElse(null);
-        redstonePower = view.getInt("Power", 0);
-        addedGlobally = view.getBoolean("Added", false);
+        freqId = view.read("Freq", UUIDUtil.CODEC).orElse(null);
+        redstonePower = view.getIntOr("Power", 0);
+        addedGlobally = view.getBooleanOr("Added", false);
     }
 
     @Override

@@ -2,22 +2,21 @@ package com.zurrtum.create.client.ponder.foundation;
 
 import com.zurrtum.create.client.ponder.api.registration.StoryBoardEntry;
 import com.zurrtum.create.client.ponder.api.scene.PonderStoryBoard;
-import net.minecraft.util.Identifier;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import net.minecraft.resources.ResourceLocation;
 
 public class PonderStoryBoardEntry implements StoryBoardEntry {
 
     private final PonderStoryBoard board;
     private final String namespace;
-    private final Identifier schematicLocation;
-    private final Identifier component;
-    private final List<Identifier> tags;
+    private final ResourceLocation schematicLocation;
+    private final ResourceLocation component;
+    private final List<ResourceLocation> tags;
     private final List<SceneOrderingEntry> orderingEntries;
 
-    public PonderStoryBoardEntry(PonderStoryBoard board, String namespace, Identifier schematicLocation, Identifier component) {
+    public PonderStoryBoardEntry(PonderStoryBoard board, String namespace, ResourceLocation schematicLocation, ResourceLocation component) {
         this.board = board;
         this.namespace = namespace;
         this.schematicLocation = schematicLocation;
@@ -26,8 +25,8 @@ public class PonderStoryBoardEntry implements StoryBoardEntry {
         this.orderingEntries = new ArrayList<>();
     }
 
-    public PonderStoryBoardEntry(PonderStoryBoard board, String namespace, String schematicPath, Identifier component) {
-        this(board, namespace, Identifier.of(namespace, schematicPath), component);
+    public PonderStoryBoardEntry(PonderStoryBoard board, String namespace, String schematicPath, ResourceLocation component) {
+        this(board, namespace, ResourceLocation.fromNamespaceAndPath(namespace, schematicPath), component);
     }
 
     @Override
@@ -41,17 +40,17 @@ public class PonderStoryBoardEntry implements StoryBoardEntry {
     }
 
     @Override
-    public Identifier getSchematicLocation() {
+    public ResourceLocation getSchematicLocation() {
         return schematicLocation;
     }
 
     @Override
-    public Identifier getComponent() {
+    public ResourceLocation getComponent() {
         return component;
     }
 
     @Override
-    public List<Identifier> getTags() {
+    public List<ResourceLocation> getTags() {
         return tags;
     }
 
@@ -75,13 +74,13 @@ public class PonderStoryBoardEntry implements StoryBoardEntry {
     }
 
     @Override
-    public StoryBoardEntry highlightTag(Identifier tag) {
+    public StoryBoardEntry highlightTag(ResourceLocation tag) {
         tags.add(tag);
         return this;
     }
 
     @Override
-    public StoryBoardEntry highlightTags(Identifier... tags) {
+    public StoryBoardEntry highlightTags(ResourceLocation... tags) {
         Collections.addAll(this.tags, tags);
         return this;
     }

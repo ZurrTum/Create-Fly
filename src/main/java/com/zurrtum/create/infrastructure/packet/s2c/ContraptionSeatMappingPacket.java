@@ -3,23 +3,23 @@ package com.zurrtum.create.infrastructure.packet.s2c;
 import com.zurrtum.create.AllClientHandle;
 import com.zurrtum.create.AllPackets;
 import io.netty.buffer.ByteBuf;
-import net.minecraft.network.codec.PacketCodec;
-import net.minecraft.network.codec.PacketCodecs;
-import net.minecraft.network.packet.PacketType;
-import net.minecraft.util.Uuids;
 import org.apache.logging.log4j.util.TriConsumer;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+import net.minecraft.core.UUIDUtil;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.PacketType;
 
 public record ContraptionSeatMappingPacket(int entityId, Map<UUID, Integer> mapping, int dismountedId) implements S2CPacket {
-    public static final PacketCodec<ByteBuf, ContraptionSeatMappingPacket> CODEC = PacketCodec.tuple(
-        PacketCodecs.INTEGER,
+    public static final StreamCodec<ByteBuf, ContraptionSeatMappingPacket> CODEC = StreamCodec.composite(
+        ByteBufCodecs.INT,
         ContraptionSeatMappingPacket::entityId,
-        PacketCodecs.map(HashMap::new, Uuids.PACKET_CODEC, PacketCodecs.INTEGER),
+        ByteBufCodecs.map(HashMap::new, UUIDUtil.STREAM_CODEC, ByteBufCodecs.INT),
         p -> new HashMap<>(p.mapping),
-        PacketCodecs.INTEGER,
+        ByteBufCodecs.INT,
         ContraptionSeatMappingPacket::dismountedId,
         ContraptionSeatMappingPacket::new
     );
@@ -34,7 +34,7 @@ public record ContraptionSeatMappingPacket(int entityId, Map<UUID, Integer> mapp
     }
 
     @Override
-    public PacketType<ContraptionSeatMappingPacket> getPacketType() {
+    public PacketType<ContraptionSeatMappingPacket> type() {
         return AllPackets.CONTRAPTION_SEAT_MAPPING;
     }
 }

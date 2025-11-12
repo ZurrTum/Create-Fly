@@ -1,35 +1,35 @@
 package com.zurrtum.create.client.catnip.gui.render;
 
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.zurrtum.create.client.flywheel.lib.model.baked.PartialModel;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.ScreenRect;
-import net.minecraft.client.gui.render.state.special.SpecialGuiElementRenderState;
-import net.minecraft.client.render.model.GeometryBakedModel;
-import net.minecraft.client.util.math.MatrixStack;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix3x2f;
 
 import java.util.function.BiConsumer;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.navigation.ScreenRectangle;
+import net.minecraft.client.gui.render.state.pip.PictureInPictureRenderState;
+import net.minecraft.client.renderer.block.model.SimpleModelWrapper;
 
-public class PartialRenderState implements SpecialGuiElementRenderState {
-    public GeometryBakedModel model;
+public class PartialRenderState implements PictureInPictureRenderState {
+    public SimpleModelWrapper model;
     public boolean dirty;
-    public Matrix3x2f pose;
-    public ScreenRect bounds;
+    public Matrix3x2f IDENTITY_POSE;
+    public ScreenRectangle bounds;
     public int x1, y1, x2, y2, padding;
     public float size;
-    private BiConsumer<MatrixStack, Float> transform;
+    private BiConsumer<PoseStack, Float> transform;
     private float partialTicks;
-    public @Nullable ScreenRect scissor;
+    public @Nullable ScreenRectangle scissor;
 
-    public void transform(MatrixStack matrices) {
+    public void transform(PoseStack matrices) {
         if (transform != null) {
             transform.accept(matrices, partialTicks);
         }
     }
 
     public void update(
-        DrawContext graphics,
+        GuiGraphics graphics,
         PartialModel partial,
         float x,
         float y,
@@ -38,7 +38,7 @@ public class PartialRenderState implements SpecialGuiElementRenderState {
         float scale,
         int padding,
         float partialTicks,
-        BiConsumer<MatrixStack, Float> transform
+        BiConsumer<PoseStack, Float> transform
     ) {
         float size = scale * 16 + padding;
         if (model != partial.get()) {
@@ -47,14 +47,14 @@ public class PartialRenderState implements SpecialGuiElementRenderState {
         } else if (size != this.size || partialTicks != this.partialTicks) {
             dirty = true;
         }
-        pose = new Matrix3x2f(graphics.getMatrices());
-        pose.translate(xLocal, yLocal);
+        IDENTITY_POSE = new Matrix3x2f(graphics.pose());
+        IDENTITY_POSE.translate(xLocal, yLocal);
         x1 = (int) x;
         y1 = (int) y;
         x2 = (int) (x + size);
         y2 = (int) (y + size);
-        bounds = new ScreenRect(x1, y1, (int) size, (int) size).transformEachVertex(pose);
-        scissor = graphics.scissorStack.peekLast();
+        bounds = new ScreenRectangle(x1, y1, (int) size, (int) size).transformMaxBounds(IDENTITY_POSE);
+        scissor = graphics.scissorStack.peek();
         if (scissor != null) {
             bounds = bounds.intersection(scissor);
         }
@@ -69,32 +69,32 @@ public class PartialRenderState implements SpecialGuiElementRenderState {
     }
 
     @Override
-    public int x1() {
+    public int x0() {
         return x1;
     }
 
     @Override
-    public int x2() {
+    public int x1() {
         return x2;
     }
 
     @Override
-    public int y1() {
+    public int y0() {
         return y1;
     }
 
     @Override
-    public int y2() {
+    public int y1() {
         return y2;
     }
 
     @Override
     public Matrix3x2f pose() {
-        return pose;
+        return IDENTITY_POSE;
     }
 
     @Override
-    public @Nullable ScreenRect bounds() {
+    public @Nullable ScreenRectangle bounds() {
         return bounds;
     }
 
@@ -104,7 +104,7 @@ public class PartialRenderState implements SpecialGuiElementRenderState {
     }
 
     @Override
-    public @Nullable ScreenRect scissorArea() {
+    public @Nullable ScreenRectangle scissorArea() {
         return scissor;
     }
 }

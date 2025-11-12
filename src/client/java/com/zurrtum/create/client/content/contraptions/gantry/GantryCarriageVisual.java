@@ -14,9 +14,9 @@ import com.zurrtum.create.client.flywheel.lib.model.Models;
 import com.zurrtum.create.client.flywheel.lib.visual.SimpleDynamicVisual;
 import com.zurrtum.create.content.contraptions.gantry.GantryCarriageBlock;
 import com.zurrtum.create.content.contraptions.gantry.GantryCarriageBlockEntity;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.MathHelper;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.util.Mth;
 
 import java.util.function.Consumer;
 
@@ -37,14 +37,14 @@ public class GantryCarriageVisual extends ShaftVisual<GantryCarriageBlockEntity>
 
         gantryCogs = instancerProvider().instancer(InstanceTypes.TRANSFORMED, Models.partial(AllPartialModels.GANTRY_COGS)).createInstance();
 
-        facing = blockState.get(GantryCarriageBlock.FACING);
-        alongFirst = blockState.get(GantryCarriageBlock.AXIS_ALONG_FIRST_COORDINATE);
+        facing = blockState.getValue(GantryCarriageBlock.FACING);
+        alongFirst = blockState.getValue(GantryCarriageBlock.AXIS_ALONG_FIRST_COORDINATE);
         rotationAxis = KineticBlockEntityRenderer.getRotationAxisOf(blockEntity);
 
         rotationMult = getRotationMultiplier(getGantryAxis(), facing);
 
-        visualPos = facing.getDirection() == Direction.AxisDirection.POSITIVE ? blockEntity.getPos() : blockEntity.getPos()
-            .offset(facing.getOpposite());
+        visualPos = facing.getAxisDirection() == Direction.AxisDirection.POSITIVE ? blockEntity.getBlockPos() : blockEntity.getBlockPos()
+            .relative(facing.getOpposite());
 
         animateCogs(getCogAngle());
     }
@@ -53,7 +53,7 @@ public class GantryCarriageVisual extends ShaftVisual<GantryCarriageBlockEntity>
     public void beginFrame(DynamicVisual.Context ctx) {
         float cogAngle = getCogAngle();
 
-        if (MathHelper.approximatelyEquals(cogAngle, lastAngle))
+        if (Mth.equal(cogAngle, lastAngle))
             return;
 
         animateCogs(cogAngle);

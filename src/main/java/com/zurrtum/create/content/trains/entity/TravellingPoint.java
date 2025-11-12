@@ -6,14 +6,14 @@ import com.zurrtum.create.catnip.data.Couple;
 import com.zurrtum.create.catnip.data.Pair;
 import com.zurrtum.create.content.trains.graph.*;
 import com.zurrtum.create.content.trains.signal.TrackEdgePoint;
-import net.minecraft.storage.ReadView;
-import net.minecraft.storage.WriteView;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec3d;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 import java.util.function.*;
+import net.minecraft.util.Mth;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
+import net.minecraft.world.phys.Vec3;
 
 public class TravellingPoint {
 
@@ -142,17 +142,17 @@ public class TravellingPoint {
         };
     }
 
-    public ITrackSelector steer(SteerDirection direction, Vec3d upNormal) {
+    public ITrackSelector steer(SteerDirection direction, Vec3 upNormal) {
         return (graph, pair) -> {
             List<Map.Entry<TrackNode, TrackEdge>> validTargets = pair.getSecond();
             double closest = Double.MAX_VALUE;
             Map.Entry<TrackNode, TrackEdge> best = null;
 
             for (Map.Entry<TrackNode, TrackEdge> entry : validTargets) {
-                Vec3d trajectory = edge.getDirection(false);
-                Vec3d entryTrajectory = entry.getValue().getDirection(true);
-                Vec3d normal = trajectory.crossProduct(upNormal);
-                double dot = normal.dotProduct(entryTrajectory);
+                Vec3 trajectory = edge.getDirection(false);
+                Vec3 entryTrajectory = entry.getValue().getDirection(true);
+                Vec3 normal = trajectory.cross(upNormal);
+                double dot = normal.dot(entryTrajectory);
                 double diff = Math.abs(direction.targetDot - dot);
                 if (diff > closest)
                     continue;
@@ -200,7 +200,7 @@ public class TravellingPoint {
         if (edge == null)
             return 0;
         double edgeLength = edge.getLength();
-        if (MathHelper.approximatelyEquals(distance, 0))
+        if (Mth.equal(distance, 0))
             return 0;
 
         double prevPos = position;
@@ -384,17 +384,17 @@ public class TravellingPoint {
         edge = graph.getConnectionsFrom(node1).get(node2);
     }
 
-    public Vec3d getPosition(@Nullable TrackGraph trackGraph) {
+    public Vec3 getPosition(@Nullable TrackGraph trackGraph) {
         return getPosition(trackGraph, false);
     }
 
-    public Vec3d getPosition(@Nullable TrackGraph trackGraph, boolean flipUpsideDown) {
+    public Vec3 getPosition(@Nullable TrackGraph trackGraph, boolean flipUpsideDown) {
         return getPositionWithOffset(trackGraph, 0, flipUpsideDown);
     }
 
-    public Vec3d getPositionWithOffset(@Nullable TrackGraph trackGraph, double offset, boolean flipUpsideDown) {
+    public Vec3 getPositionWithOffset(@Nullable TrackGraph trackGraph, double offset, boolean flipUpsideDown) {
         double t = (position + offset) / edge.getLength();
-        return edge.getPosition(trackGraph, t).add(edge.getNormal(trackGraph, t).multiply(upsideDown ^ flipUpsideDown ? -1 : 1));
+        return edge.getPosition(trackGraph, t).add(edge.getNormal(trackGraph, t).scale(upsideDown ^ flipUpsideDown ? -1 : 1));
     }
 
     public void migrateTo(List<TrackGraphLocation> locations) {
@@ -406,12 +406,12 @@ public class TravellingPoint {
         edge = graph.getConnectionsFrom(node1).get(node2);
     }
 
-    public void write(WriteView view, DimensionPalette dimensions) {
+    public void write(ValueOutput view, DimensionPalette dimensions) {
         if (Objects.isNull(node1) || Objects.isNull(node2))
             return;
-        WriteView.ListView list = view.getList("Nodes");
-        node1.getLocation().write(list.add(), dimensions);
-        node2.getLocation().write(list.add(), dimensions);
+        ValueOutput.ValueOutputList list = view.childrenList("Nodes");
+        node1.getLocation().write(list.addChild(), dimensions);
+        node2.getLocation().write(list.addChild(), dimensions);
         view.putDouble("Position", position);
         view.putBoolean("UpsideDown", upsideDown);
     }
@@ -429,12 +429,12 @@ public class TravellingPoint {
         return map.build(empty);
     }
 
-    public static TravellingPoint read(ReadView view, TrackGraph graph, DimensionPalette dimensions) {
+    public static TravellingPoint read(ValueInput view, TrackGraph graph, DimensionPalette dimensions) {
         if (graph == null)
             return new TravellingPoint(null, null, null, 0, false);
 
-        Couple<TrackNode> locs = view.getOptionalListReadView("Nodes").map(list -> {
-            Iterator<ReadView> iterator = list.iterator();
+        Couple<TrackNode> locs = view.childrenList("Nodes").map(list -> {
+            Iterator<ValueInput> iterator = list.iterator();
             return Couple.create(
                 graph.locateNode(TrackNodeLocation.read(iterator.next(), dimensions)),
                 graph.locateNode(TrackNodeLocation.read(iterator.next(), dimensions))
@@ -444,13 +444,13 @@ public class TravellingPoint {
         if (locs.either(Objects::isNull))
             return new TravellingPoint(null, null, null, 0, false);
 
-        double position = view.getDouble("Position", 0);
+        double position = view.getDoubleOr("Position", 0);
         return new TravellingPoint(
             locs.getFirst(),
             locs.getSecond(),
             graph.getConnectionsFrom(locs.getFirst()).get(locs.getSecond()),
             position,
-            view.getBoolean("UpsideDown", false)
+            view.getBooleanOr("UpsideDown", false)
         );
     }
 

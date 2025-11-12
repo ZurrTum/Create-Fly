@@ -2,18 +2,18 @@ package com.zurrtum.create.client.foundation.virtualWorld;
 
 import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
-import net.minecraft.util.math.ChunkPos;
-import net.minecraft.world.World;
-import net.minecraft.world.chunk.Chunk;
-import net.minecraft.world.chunk.ChunkManager;
-import net.minecraft.world.chunk.ChunkStatus;
-import net.minecraft.world.chunk.WorldChunk;
-import net.minecraft.world.chunk.light.LightingProvider;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.function.BooleanSupplier;
+import net.minecraft.world.level.ChunkPos;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.chunk.ChunkAccess;
+import net.minecraft.world.level.chunk.ChunkSource;
+import net.minecraft.world.level.chunk.LevelChunk;
+import net.minecraft.world.level.chunk.status.ChunkStatus;
+import net.minecraft.world.level.lighting.LevelLightEngine;
 
-public class VirtualChunkSource extends ChunkManager {
+public class VirtualChunkSource extends ChunkSource {
     private final VirtualRenderWorld world;
     private final Long2ObjectMap<VirtualChunk> chunks = new Long2ObjectOpenHashMap<>();
 
@@ -22,28 +22,28 @@ public class VirtualChunkSource extends ChunkManager {
     }
 
     @Override
-    public World getWorld() {
+    public Level getLevel() {
         return world;
     }
 
     @Override
-    public Chunk getChunk(int x, int z) {
+    public ChunkAccess getChunkForLighting(int x, int z) {
         return chunks.computeIfAbsent(
-            ChunkPos.toLong(x, z),
-            packedPos -> new VirtualChunk(world, ChunkPos.getPackedX(packedPos), ChunkPos.getPackedZ(packedPos))
+            ChunkPos.asLong(x, z),
+            packedPos -> new VirtualChunk(world, ChunkPos.getX(packedPos), ChunkPos.getZ(packedPos))
         );
     }
 
     @Override
     @Nullable
-    public WorldChunk getWorldChunk(int x, int z, boolean load) {
+    public LevelChunk getChunk(int x, int z, boolean load) {
         return null;
     }
 
     @Override
     @Nullable
-    public Chunk getChunk(int x, int z, ChunkStatus status, boolean load) {
-        return getChunk(x, z);
+    public ChunkAccess getChunk(int x, int z, ChunkStatus status, boolean load) {
+        return getChunkForLighting(x, z);
     }
 
     @Override
@@ -51,17 +51,17 @@ public class VirtualChunkSource extends ChunkManager {
     }
 
     @Override
-    public String getDebugString() {
+    public String gatherStats() {
         return "VirtualChunkSource";
     }
 
     @Override
-    public int getLoadedChunkCount() {
+    public int getLoadedChunksCount() {
         return 0;
     }
 
     @Override
-    public LightingProvider getLightingProvider() {
-        return world.getLightingProvider();
+    public LevelLightEngine getLightEngine() {
+        return world.getLightEngine();
     }
 }

@@ -5,18 +5,17 @@ import com.zurrtum.create.client.flywheel.api.instance.InstanceHandle;
 import com.zurrtum.create.client.flywheel.api.instance.InstanceType;
 import com.zurrtum.create.client.flywheel.api.instance.InstanceWriter;
 import com.zurrtum.create.client.flywheel.api.layout.Layout;
-import net.minecraft.util.Identifier;
-
 import java.util.Objects;
+import net.minecraft.resources.ResourceLocation;
 
 public final class SimpleInstanceType<I extends Instance> implements InstanceType<I> {
     private final Factory<I> factory;
     private final Layout layout;
     private final InstanceWriter<I> writer;
-    private final Identifier vertexShader;
-    private final Identifier cullShader;
+    private final ResourceLocation vertexShader;
+    private final ResourceLocation cullShader;
 
-    public SimpleInstanceType(Factory<I> factory, Layout layout, InstanceWriter<I> writer, Identifier vertexShader, Identifier cullShader) {
+    public SimpleInstanceType(Factory<I> factory, Layout layout, InstanceWriter<I> writer, ResourceLocation vertexShader, ResourceLocation cullShader) {
         this.factory = factory;
         this.layout = layout;
         this.writer = writer;
@@ -44,12 +43,12 @@ public final class SimpleInstanceType<I extends Instance> implements InstanceTyp
     }
 
     @Override
-    public Identifier vertexShader() {
+    public ResourceLocation vertexShader() {
         return vertexShader;
     }
 
     @Override
-    public Identifier cullShader() {
+    public ResourceLocation cullShader() {
         return cullShader;
     }
 
@@ -62,8 +61,8 @@ public final class SimpleInstanceType<I extends Instance> implements InstanceTyp
         private final Factory<I> factory;
         private Layout layout;
         private InstanceWriter<I> writer;
-        private Identifier vertexShader;
-        private Identifier cullShader;
+        private ResourceLocation vertexShader;
+        private ResourceLocation cullShader;
 
         public Builder(Factory<I> factory) {
             this.factory = factory;
@@ -79,12 +78,12 @@ public final class SimpleInstanceType<I extends Instance> implements InstanceTyp
             return this;
         }
 
-        public Builder<I> vertexShader(Identifier vertexShader) {
+        public Builder<I> vertexShader(ResourceLocation vertexShader) {
             this.vertexShader = vertexShader;
             return this;
         }
 
-        public Builder<I> cullShader(Identifier cullShader) {
+        public Builder<I> cullShader(ResourceLocation cullShader) {
             this.cullShader = cullShader;
             return this;
         }

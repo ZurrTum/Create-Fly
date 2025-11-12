@@ -3,22 +3,22 @@ package com.zurrtum.create.client.infrastructure.particle;
 import com.mojang.blaze3d.buffers.GpuBufferSlice;
 import com.mojang.blaze3d.systems.RenderPass;
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.VertexFormat;
-import net.minecraft.client.particle.BillboardParticle;
-import net.minecraft.client.particle.BillboardParticleSubmittable;
-import net.minecraft.client.render.*;
-import net.minecraft.client.render.command.LayeredCustomCommandRenderer;
-import net.minecraft.client.render.command.OrderedRenderCommandQueue;
-import net.minecraft.client.render.state.CameraRenderState;
-import net.minecraft.client.texture.TextureManager;
-import net.minecraft.client.util.BufferAllocator;
+import com.mojang.blaze3d.vertex.*;
+import net.minecraft.client.particle.SingleQuadParticle;
+import net.minecraft.client.renderer.LightTexture;
+import net.minecraft.client.renderer.SubmitNodeCollector;
+import net.minecraft.client.renderer.feature.ParticleFeatureRenderer;
+import net.minecraft.client.renderer.state.CameraRenderState;
+import net.minecraft.client.renderer.state.ParticleGroupRenderState;
+import net.minecraft.client.renderer.state.QuadParticleRenderState;
+import net.minecraft.client.renderer.texture.TextureManager;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
 
 import java.util.Arrays;
 import java.util.Map;
 
-public class CubeParticleSubmittable implements OrderedRenderCommandQueue.LayeredCustom, Submittable {
+public class CubeParticleSubmittable implements SubmitNodeCollector.ParticleGroupRenderer, ParticleGroupRenderState {
     public static final Vector3f[] CUBE = {
         // TOP
         new Vector3f(-1, -1, 1), new Vector3f(-1, -1, -1), new Vector3f(1, -1, -1), new Vector3f(1, -1, 1),
@@ -47,31 +47,31 @@ public class CubeParticleSubmittable implements OrderedRenderCommandQueue.Layere
     }
 
     @Override
-    public void onFrameEnd() {
+    public void clear() {
         vertices.reset();
         particles = 0;
     }
 
     @Override
-    public BillboardParticleSubmittable.Buffers submit(LayeredCustomCommandRenderer.VerticesCache cache) {
+    public QuadParticleRenderState.PreparedBuffers prepare(ParticleFeatureRenderer.ParticleBufferCache cache) {
         int i = particles * 24;
-        try (BufferAllocator bufferAllocator = BufferAllocator.fixedSized(i * VertexFormats.POSITION_TEXTURE_COLOR_LIGHT.getVertexSize())) {
-            BufferBuilder bufferBuilder = new BufferBuilder(bufferAllocator, VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_TEXTURE_COLOR_LIGHT);
+        try (ByteBufferBuilder bufferAllocator = ByteBufferBuilder.exactlySized(i * DefaultVertexFormat.PARTICLE.getVertexSize())) {
+            BufferBuilder bufferBuilder = new BufferBuilder(bufferAllocator, VertexFormat.Mode.QUADS, DefaultVertexFormat.PARTICLE);
             vertices.render((x, y, z, scale, color) -> drawFace(bufferBuilder, x, y, z, scale, color));
-            BillboardParticleSubmittable.Layer layer = new BillboardParticleSubmittable.Layer(0, vertices.nextVertexIndex() * 36);
-            BuiltBuffer builtBuffer = bufferBuilder.endNullable();
+            QuadParticleRenderState.PreparedLayer layer = new QuadParticleRenderState.PreparedLayer(0, vertices.nextVertexIndex() * 36);
+            MeshData builtBuffer = bufferBuilder.build();
             if (builtBuffer != null) {
-                cache.write(builtBuffer.getBuffer());
-                RenderSystem.getSequentialBuffer(VertexFormat.DrawMode.QUADS).getIndexBuffer(builtBuffer.getDrawParameters().indexCount());
-                GpuBufferSlice gpuBufferSlice = RenderSystem.getDynamicUniforms().write(
+                cache.write(builtBuffer.vertexBuffer());
+                RenderSystem.getSequentialBuffer(VertexFormat.Mode.QUADS).getBuffer(builtBuffer.drawState().indexCount());
+                GpuBufferSlice gpuBufferSlice = RenderSystem.getDynamicUniforms().writeTransform(
                     RenderSystem.getModelViewMatrix(),
                     new Vector4f(1.0F, 1.0F, 1.0F, 1.0F),
                     new Vector3f(),
                     RenderSystem.getTextureMatrix(),
                     RenderSystem.getShaderLineWidth()
                 );
-                return new BillboardParticleSubmittable.Buffers(
-                    builtBuffer.getDrawParameters().indexCount(),
+                return new QuadParticleRenderState.PreparedBuffers(
+                    builtBuffer.drawState().indexCount(),
                     gpuBufferSlice,
                     Map.of(CubeParticleRenderer.RENDER_TYPE, layer)
                 );
@@ -81,21 +81,21 @@ public class CubeParticleSubmittable implements OrderedRenderCommandQueue.Layere
     }
 
     private void drawFace(VertexConsumer buffer, float x, float y, float z, float scale, int color) {
-        int light = LightmapTextureManager.MAX_LIGHT_COORDINATE;
+        int light = LightTexture.FULL_BRIGHT;
         Vector3f vec = new Vector3f();
         for (int i = 0; i < 6; i++) {
             // 6 faces to a cube
             for (int j = 0; j < 4; j++) {
                 CUBE[i * 4 + j].mul(scale, vec).add(x, y, z);
-                buffer.vertex(vec.x, vec.y, vec.z).texture((float) j / 2, j % 2).color(color).light(light);
+                buffer.addVertex(vec.x, vec.y, vec.z).setUv((float) j / 2, j % 2).setColor(color).setLight(light);
             }
         }
     }
 
     @Override
     public void render(
-        BillboardParticleSubmittable.Buffers buffers,
-        LayeredCustomCommandRenderer.VerticesCache cache,
+        QuadParticleRenderState.PreparedBuffers buffers,
+        ParticleFeatureRenderer.ParticleBufferCache cache,
         RenderPass renderPass,
         TextureManager manager,
         boolean translucent
@@ -103,21 +103,21 @@ public class CubeParticleSubmittable implements OrderedRenderCommandQueue.Layere
         if (translucent) {
             return;
         }
-        RenderSystem.ShapeIndexBuffer shapeIndexBuffer = RenderSystem.getSequentialBuffer(VertexFormat.DrawMode.QUADS);
+        RenderSystem.AutoStorageIndexBuffer shapeIndexBuffer = RenderSystem.getSequentialBuffer(VertexFormat.Mode.QUADS);
         renderPass.setVertexBuffer(0, cache.get());
-        renderPass.setIndexBuffer(shapeIndexBuffer.getIndexBuffer(buffers.indexCount()), shapeIndexBuffer.getIndexType());
+        renderPass.setIndexBuffer(shapeIndexBuffer.getBuffer(buffers.indexCount()), shapeIndexBuffer.type());
         renderPass.setUniform("DynamicTransforms", buffers.dynamicTransforms());
-        for (Map.Entry<BillboardParticle.RenderType, BillboardParticleSubmittable.Layer> entry : buffers.layers().entrySet()) {
+        for (Map.Entry<SingleQuadParticle.Layer, QuadParticleRenderState.PreparedLayer> entry : buffers.layers().entrySet()) {
             renderPass.setPipeline(entry.getKey().pipeline());
-            renderPass.bindSampler("Sampler0", manager.getTexture(entry.getKey().textureAtlasLocation()).getGlTextureView());
+            renderPass.bindSampler("Sampler0", manager.getTexture(entry.getKey().textureAtlasLocation()).getTextureView());
             renderPass.drawIndexed(0, 0, entry.getValue().indexCount(), 1);
         }
     }
 
     @Override
-    public void submit(OrderedRenderCommandQueue queue, CameraRenderState cameraRenderState) {
+    public void submit(SubmitNodeCollector queue, CameraRenderState cameraRenderState) {
         if (particles > 0) {
-            queue.submitCustom(this);
+            queue.submitParticleGroup(this);
         }
     }
 

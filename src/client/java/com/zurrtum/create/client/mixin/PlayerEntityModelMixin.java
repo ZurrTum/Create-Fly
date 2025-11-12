@@ -2,23 +2,23 @@ package com.zurrtum.create.client.mixin;
 
 import com.zurrtum.create.client.foundation.render.PlayerSkyhookRenderer;
 import com.zurrtum.create.client.foundation.render.SkyhookRenderState;
-import net.minecraft.client.render.entity.model.PlayerEntityModel;
-import net.minecraft.client.render.entity.state.PlayerEntityRenderState;
+import net.minecraft.client.model.PlayerModel;
+import net.minecraft.client.renderer.entity.state.AvatarRenderState;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-@Mixin(PlayerEntityModel.class)
+@Mixin(PlayerModel.class)
 public class PlayerEntityModelMixin {
-    @Inject(method = "setAngles(Lnet/minecraft/client/render/entity/state/PlayerEntityRenderState;)V", at = @At("TAIL"))
-    private void afterSetupAnim(PlayerEntityRenderState state, CallbackInfo ci) {
+    @Inject(method = "setupAnim(Lnet/minecraft/client/renderer/entity/state/AvatarRenderState;)V", at = @At("TAIL"))
+    private void afterSetupAnim(AvatarRenderState state, CallbackInfo ci) {
         SkyhookRenderState skyhookRenderState = (SkyhookRenderState) state;
         PlayerSkyhookRenderer.afterSetupAnim(
             skyhookRenderState.create$getUuid(),
             state.mainArm,
             skyhookRenderState.create$getMainStack(),
-            (PlayerEntityModel) (Object) this
+            (PlayerModel) (Object) this
         );
     }
 }

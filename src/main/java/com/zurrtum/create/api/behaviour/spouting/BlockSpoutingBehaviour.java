@@ -3,12 +3,12 @@ package com.zurrtum.create.api.behaviour.spouting;
 import com.zurrtum.create.api.registry.SimpleRegistry;
 import com.zurrtum.create.content.fluids.spout.SpoutBlockEntity;
 import com.zurrtum.create.infrastructure.fluids.FluidStack;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.Nullable;
 
 /**
@@ -30,7 +30,7 @@ public interface BlockSpoutingBehaviour {
      * Queries both the block and the block entity if needed.
      */
     @Nullable
-    static BlockSpoutingBehaviour get(World level, BlockPos pos) {
+    static BlockSpoutingBehaviour get(Level level, BlockPos pos) {
         BlockState state = level.getBlockState(pos);
         BlockSpoutingBehaviour byBlock = BY_BLOCK.get(state.getBlock());
         if (byBlock != null)
@@ -59,5 +59,5 @@ public interface BlockSpoutingBehaviour {
      * @param simulate       Whether the spout is testing or actually performing this behaviour
      * @return The amount filled into the block, 0 to idle/cancel
      */
-    int fillBlock(World level, BlockPos pos, SpoutBlockEntity spout, FluidStack availableFluid, boolean simulate);
+    int fillBlock(Level level, BlockPos pos, SpoutBlockEntity spout, FluidStack availableFluid, boolean simulate);
 }

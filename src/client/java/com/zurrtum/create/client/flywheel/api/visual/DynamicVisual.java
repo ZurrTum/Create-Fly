@@ -3,7 +3,7 @@ package com.zurrtum.create.client.flywheel.api.visual;
 import com.zurrtum.create.client.flywheel.api.instance.Instance;
 import com.zurrtum.create.client.flywheel.api.instance.Instancer;
 import com.zurrtum.create.client.flywheel.api.task.Plan;
-import net.minecraft.client.render.Camera;
+import net.minecraft.client.Camera;
 import org.jetbrains.annotations.ApiStatus;
 import org.joml.FrustumIntersection;
 

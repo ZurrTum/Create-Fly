@@ -15,10 +15,10 @@ import com.zurrtum.create.content.logistics.box.PackageItem;
 import com.zurrtum.create.content.logistics.box.PackageStyles;
 import com.zurrtum.create.content.processing.recipe.ProcessingInventory;
 import com.zurrtum.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 
 import java.util.List;
 
@@ -66,7 +66,7 @@ public class PackagerScenes {
         scene.idle(30);
 
         scene.world().toggleRedstonePower(util.select().fromTo(lever, packager1));
-        scene.effects().indicateRedstone(lever.west(2).down());
+        scene.effects().indicateRedstone(lever.west(2).below());
 
         scene.idle(10);
         ItemStack box = PackageStyles.getDefaultBox().copy();
@@ -234,7 +234,7 @@ public class PackagerScenes {
         scene.rotateCameraY(-15);
         scene.idle(15);
 
-        scene.overlay().showControls(util.vector().of(4, 2.825, 4.5), Pointing.DOWN, 60).withItem(AllItems.PACKAGE_FILTER.getDefaultStack());
+        scene.overlay().showControls(util.vector().of(4, 2.825, 4.5), Pointing.DOWN, 60).withItem(AllItems.PACKAGE_FILTER.getDefaultInstance());
         scene.idle(10);
         scene.overlay().showFilterSlotInput(util.vector().of(4.1, 2.825, 4.5), 50);
         scene.idle(30);
@@ -287,8 +287,8 @@ public class PackagerScenes {
         scene.world().modifyBlockEntity(
             sawPos, SawBlockEntity.class, be -> {
                 ProcessingInventory inventory = be.inventory;
-                inventory.setStack(0, ItemStack.EMPTY);
-                inventory.setStack(1, iron);
+                inventory.setItem(0, ItemStack.EMPTY);
+                inventory.setItem(1, iron);
                 inventory.remainingTime = inventory.recipeDuration = 20;
                 inventory.appliedRecipe = true;
             }
@@ -297,8 +297,8 @@ public class PackagerScenes {
         scene.world().modifyBlockEntity(
             sawPos, SawBlockEntity.class, be -> {
                 ProcessingInventory inventory = be.inventory;
-                inventory.setStack(1, ItemStack.EMPTY);
-                DirectBeltInputBehaviour behaviour = BlockEntityBehaviour.get(be.getWorld(), util.grid().at(1, 1, 4), DirectBeltInputBehaviour.TYPE);
+                inventory.setItem(1, ItemStack.EMPTY);
+                DirectBeltInputBehaviour behaviour = BlockEntityBehaviour.get(be.getLevel(), util.grid().at(1, 1, 4), DirectBeltInputBehaviour.TYPE);
                 behaviour.handleInsertion(iron, Direction.WEST, false);
             }
         );

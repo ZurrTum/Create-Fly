@@ -1,16 +1,15 @@
 package com.zurrtum.create.content.processing.basin;
 
 import com.zurrtum.create.infrastructure.items.ItemInventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.storage.ReadView;
-import net.minecraft.storage.WriteView;
-import net.minecraft.util.collection.DefaultedList;
-
 import java.util.List;
+import net.minecraft.core.NonNullList;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 
 public class BasinInventory implements ItemInventory {
     private final BasinBlockEntity blockEntity;
-    private final DefaultedList<ItemStack> stacks = DefaultedList.ofSize(18, ItemStack.EMPTY);
+    private final NonNullList<ItemStack> stacks = NonNullList.withSize(18, ItemStack.EMPTY);
     private boolean check = true;
 
     public BasinInventory(BasinBlockEntity be) {
@@ -18,14 +17,14 @@ public class BasinInventory implements ItemInventory {
     }
 
     @Override
-    public boolean isValid(int slot, ItemStack stack) {
+    public boolean canPlaceItem(int slot, ItemStack stack) {
         if (check) {
             if (slot > 9) {
                 return false;
             }
             for (int i = 0; i < slot; i++) {
                 ItemStack itemStack = stacks.get(i);
-                if (itemStack.isEmpty() || ItemStack.areItemsAndComponentsEqual(itemStack, stack)) {
+                if (itemStack.isEmpty() || ItemStack.isSameItemSameComponents(itemStack, stack)) {
                     return false;
                 }
             }
@@ -42,12 +41,12 @@ public class BasinInventory implements ItemInventory {
     }
 
     @Override
-    public int size() {
+    public int getContainerSize() {
         return 18;
     }
 
     @Override
-    public ItemStack getStack(int slot) {
+    public ItemStack getItem(int slot) {
         if (slot >= 18) {
             return ItemStack.EMPTY;
         }
@@ -55,7 +54,7 @@ public class BasinInventory implements ItemInventory {
     }
 
     @Override
-    public void setStack(int slot, ItemStack stack) {
+    public void setItem(int slot, ItemStack stack) {
         if (slot >= 18) {
             return;
         }
@@ -63,14 +62,14 @@ public class BasinInventory implements ItemInventory {
     }
 
     @Override
-    public void markDirty() {
+    public void setChanged() {
         blockEntity.notifyChangeOfContents();
         blockEntity.notifyUpdate();
     }
 
-    public void write(WriteView view) {
-        WriteView inventory = view.get("Inventory");
-        WriteView.ListAppender<ItemStack> input = inventory.getListAppender("Input", ItemStack.CODEC);
+    public void write(ValueOutput view) {
+        ValueOutput inventory = view.child("Inventory");
+        ValueOutput.TypedOutputList<ItemStack> input = inventory.list("Input", ItemStack.CODEC);
         for (int i = 0; i < 9; i++) {
             ItemStack stack = stacks.get(i);
             if (stack.isEmpty()) {
@@ -78,7 +77,7 @@ public class BasinInventory implements ItemInventory {
             }
             input.add(stack);
         }
-        WriteView.ListAppender<ItemStack> output = inventory.getListAppender("Output", ItemStack.CODEC);
+        ValueOutput.TypedOutputList<ItemStack> output = inventory.list("Output", ItemStack.CODEC);
         for (int i = 9; i < 18; i++) {
             ItemStack stack = stacks.get(i);
             if (stack.isEmpty()) {
@@ -88,10 +87,10 @@ public class BasinInventory implements ItemInventory {
         }
     }
 
-    public void read(ReadView view) {
-        view.getOptionalReadView("Inventory").ifPresentOrElse(
+    public void read(ValueInput view) {
+        view.child("Inventory").ifPresentOrElse(
             inventory -> {
-                List<ItemStack> list = inventory.getTypedListView("Input", ItemStack.CODEC).stream().toList();
+                List<ItemStack> list = inventory.listOrEmpty("Input", ItemStack.CODEC).stream().toList();
                 int stop = list.size();
                 for (int i = 0; i < stop; i++) {
                     stacks.set(i, list.get(i));
@@ -99,7 +98,7 @@ public class BasinInventory implements ItemInventory {
                 for (int i = stop; i < 9; i++) {
                     stacks.set(i, ItemStack.EMPTY);
                 }
-                list = inventory.getTypedListView("Output", ItemStack.CODEC).stream().toList();
+                list = inventory.listOrEmpty("Output", ItemStack.CODEC).stream().toList();
                 stop = 9 + list.size();
                 for (int i = 9; i < stop; i++) {
                     stacks.set(i, list.get(i - 9));

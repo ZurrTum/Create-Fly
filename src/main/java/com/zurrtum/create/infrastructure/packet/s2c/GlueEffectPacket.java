@@ -3,20 +3,20 @@ package com.zurrtum.create.infrastructure.packet.s2c;
 import com.zurrtum.create.AllClientHandle;
 import com.zurrtum.create.AllPackets;
 import io.netty.buffer.ByteBuf;
-import net.minecraft.network.codec.PacketCodec;
-import net.minecraft.network.codec.PacketCodecs;
-import net.minecraft.network.packet.PacketType;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.PacketType;
 import org.apache.logging.log4j.util.TriConsumer;
 
 public record GlueEffectPacket(BlockPos pos, Direction direction, boolean fullBlock) implements S2CPacket {
-    public static final PacketCodec<ByteBuf, GlueEffectPacket> CODEC = PacketCodec.tuple(
-        BlockPos.PACKET_CODEC,
+    public static final StreamCodec<ByteBuf, GlueEffectPacket> CODEC = StreamCodec.composite(
+        BlockPos.STREAM_CODEC,
         GlueEffectPacket::pos,
-        Direction.PACKET_CODEC,
+        Direction.STREAM_CODEC,
         GlueEffectPacket::direction,
-        PacketCodecs.BOOLEAN,
+        ByteBufCodecs.BOOL,
         GlueEffectPacket::fullBlock,
         GlueEffectPacket::new
     );
@@ -32,7 +32,7 @@ public record GlueEffectPacket(BlockPos pos, Direction direction, boolean fullBl
     }
 
     @Override
-    public PacketType<GlueEffectPacket> getPacketType() {
+    public PacketType<GlueEffectPacket> type() {
         return AllPackets.GLUE_EFFECT;
     }
 }

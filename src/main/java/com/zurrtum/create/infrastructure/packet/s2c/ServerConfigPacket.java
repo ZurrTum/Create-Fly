@@ -6,11 +6,11 @@ import com.google.gson.JsonObject;
 import com.zurrtum.create.AllPackets;
 import com.zurrtum.create.infrastructure.config.AllConfigs;
 import io.netty.buffer.ByteBuf;
-import net.minecraft.network.codec.PacketCodec;
-import net.minecraft.network.codec.PacketCodecs;
-import net.minecraft.network.listener.ClientConfigurationPacketListener;
-import net.minecraft.network.packet.Packet;
-import net.minecraft.network.packet.PacketType;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.Packet;
+import net.minecraft.network.protocol.PacketType;
+import net.minecraft.network.protocol.configuration.ClientConfigurationPacketListener;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.ByteArrayInputStream;
@@ -21,8 +21,8 @@ import java.util.zip.GZIPOutputStream;
 
 public record ServerConfigPacket(byte[] data) implements Packet<ClientConfigurationPacketListener> {
     public static final Gson GSON = new GsonBuilder().disableHtmlEscaping().create();
-    public static final PacketCodec<ByteBuf, ServerConfigPacket> CODEC = PacketCodecs.byteArray(Integer.MAX_VALUE)
-        .xmap(ServerConfigPacket::new, ServerConfigPacket::data);
+    public static final StreamCodec<ByteBuf, ServerConfigPacket> CODEC = ByteBufCodecs.byteArray(Integer.MAX_VALUE)
+        .map(ServerConfigPacket::new, ServerConfigPacket::data);
     public static byte[] CACHE;
 
     @Nullable
@@ -41,7 +41,7 @@ public record ServerConfigPacket(byte[] data) implements Packet<ClientConfigurat
     }
 
     @Override
-    public void apply(ClientConfigurationPacketListener listener) {
+    public void handle(ClientConfigurationPacketListener listener) {
         try (GZIPInputStream gzis = new GZIPInputStream(new ByteArrayInputStream(data))) {
             String json = new String(gzis.readAllBytes(), StandardCharsets.UTF_8);
             AllConfigs.server().reload(GSON.fromJson(json, JsonObject.class));
@@ -50,7 +50,7 @@ public record ServerConfigPacket(byte[] data) implements Packet<ClientConfigurat
     }
 
     @Override
-    public PacketType<ServerConfigPacket> getPacketType() {
+    public PacketType<ServerConfigPacket> type() {
         return AllPackets.SERVER_CONFIG;
     }
 }

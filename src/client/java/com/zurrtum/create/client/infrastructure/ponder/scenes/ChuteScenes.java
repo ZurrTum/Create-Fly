@@ -13,14 +13,14 @@ import com.zurrtum.create.client.ponder.api.scene.Selection;
 import com.zurrtum.create.content.logistics.chute.ChuteBlock;
 import com.zurrtum.create.content.logistics.chute.ChuteBlock.Shape;
 import com.zurrtum.create.content.logistics.chute.SmartChuteBlockEntity;
-import net.minecraft.block.Blocks;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.ItemEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.phys.Vec3;
 
 public class ChuteScenes {
 
@@ -53,17 +53,17 @@ public class ChuteScenes {
         scene.world().moveSection(top, util.vector().of(-1, 0, 0), 10);
         scene.idle(20);
         scene.overlay().showControls(util.vector().blockSurface(util.grid().at(2, 3, 2), Direction.NORTH), Pointing.RIGHT, 40).rightClick()
-            .withItem(AllItems.WRENCH.getDefaultStack());
+            .withItem(AllItems.WRENCH.getDefaultInstance());
         scene.idle(7);
-        scene.world().modifyBlock(util.grid().at(3, 3, 3), s -> s.with(ChuteBlock.SHAPE, Shape.WINDOW), false);
+        scene.world().modifyBlock(util.grid().at(3, 3, 3), s -> s.setValue(ChuteBlock.SHAPE, Shape.WINDOW), false);
         scene.overlay().showText(50).attachKeyFrame().pointAt(util.vector().blockSurface(util.grid().at(2, 3, 2), Direction.WEST)).placeNearTarget()
             .text("Using the Wrench, a window can be created");
 
         scene.idle(60);
         scene.overlay().showControls(util.vector().blockSurface(util.grid().at(2, 2, 2), Direction.NORTH), Pointing.RIGHT, 40).rightClick()
-            .withItem(AllItems.INDUSTRIAL_IRON_BLOCK.getDefaultStack());
+            .withItem(AllItems.INDUSTRIAL_IRON_BLOCK.getDefaultInstance());
         scene.idle(7);
-        scene.world().modifyBlock(util.grid().at(3, 2, 3), s -> s.with(ChuteBlock.SHAPE, Shape.ENCASED), false);
+        scene.world().modifyBlock(util.grid().at(3, 2, 3), s -> s.setValue(ChuteBlock.SHAPE, Shape.ENCASED), false);
         scene.overlay().showText(50).pointAt(util.vector().blockSurface(util.grid().at(2, 2, 2), Direction.WEST)).placeNearTarget()
             .text("Using Industrial Iron Blocks, chutes can be encased");
 
@@ -80,11 +80,11 @@ public class ChuteScenes {
         scene.addKeyframe();
 
         scene.rotateCameraY(-90);
-        scene.world().modifyBlock(util.grid().at(2, 2, 1), s -> s.with(ChuteBlock.SHAPE, Shape.NORMAL), false);
-        scene.world().modifyBlock(util.grid().at(2, 3, 2), s -> s.with(ChuteBlock.SHAPE, Shape.INTERSECTION), false);
+        scene.world().modifyBlock(util.grid().at(2, 2, 1), s -> s.setValue(ChuteBlock.SHAPE, Shape.NORMAL), false);
+        scene.world().modifyBlock(util.grid().at(2, 3, 2), s -> s.setValue(ChuteBlock.SHAPE, Shape.INTERSECTION), false);
         scene.world().showSection(util.select().fromTo(2, 1, 1, 2, 2, 1), Direction.DOWN);
         scene.idle(30);
-        ItemStack chuteItem = AllItems.CHUTE.getDefaultStack();
+        ItemStack chuteItem = AllItems.CHUTE.getDefaultInstance();
         scene.overlay().showControls(util.vector().blockSurface(util.grid().at(2, 2, 1), Direction.SOUTH), Pointing.LEFT, 30).rightClick()
             .withItem(chuteItem);
         scene.idle(7);
@@ -110,15 +110,15 @@ public class ChuteScenes {
         Direction offset = Direction.NORTH;
         for (int i = 0; i < 3; i++) {
             remove = scene.world().createItemEntity(
-                util.vector().centerOf(util.grid().at(2, 6, 3).offset(offset)),
-                util.vector().of(0, 0.1, 0).add(Vec3d.of(offset.getVector()).multiply(-.1)),
+                util.vector().centerOf(util.grid().at(2, 6, 3).relative(offset)),
+                util.vector().of(0, 0.1, 0).add(Vec3.atLowerCornerOf(offset.getUnitVec3i()).scale(-.1)),
                 stack
             );
             scene.idle(12);
             scene.world().createItemOnBeltLike(util.grid().at(2, 4, 3), Direction.UP, stack);
             scene.world().modifyEntity(remove, Entity::discard);
             scene.idle(3);
-            offset = offset.rotateYClockwise();
+            offset = offset.getClockWise();
         }
 
         scene.idle(10);
@@ -133,7 +133,7 @@ public class ChuteScenes {
         scene.scaleSceneView(.9f);
         scene.showBasePlate();
         Selection chute = util.select().fromTo(1, 2, 2, 1, 4, 2);
-        scene.world().setBlocks(chute, Blocks.AIR.getDefaultState(), false);
+        scene.world().setBlocks(chute, Blocks.AIR.defaultBlockState(), false);
         scene.world().showSection(util.select().position(1, 1, 2), Direction.UP);
         scene.idle(20);
 
@@ -141,12 +141,12 @@ public class ChuteScenes {
         scene.world().showSection(chute, Direction.DOWN);
         scene.idle(20);
         scene.world().setKineticSpeed(util.select().position(1, 1, 2), 0);
-        Vec3d surface = util.vector().blockSurface(util.grid().at(1, 2, 2), Direction.WEST);
+        Vec3 surface = util.vector().blockSurface(util.grid().at(1, 2, 2), Direction.WEST);
         scene.overlay().showText(70).text("Using Encased Fans at the top or bottom, a Chute can move items upward").attachKeyFrame().pointAt(surface)
             .placeNearTarget();
         scene.idle(80);
         scene.overlay().showControls(util.vector().blockSurface(util.grid().at(1, 2, 2), Direction.NORTH), Pointing.RIGHT, 50)
-            .withItem(AllItems.GOGGLES.getDefaultStack());
+            .withItem(AllItems.GOGGLES.getDefaultInstance());
         scene.overlay().showText(70).text("Inspecting chutes with Engineers' Goggles reveals information about the movement direction")
             .attachKeyFrame().pointAt(surface).placeNearTarget();
         scene.idle(80);
@@ -183,7 +183,7 @@ public class ChuteScenes {
             .pointAt(util.vector().blockSurface(smarty, Direction.WEST)).placeNearTarget();
         scene.idle(70);
 
-        Vec3d filter = util.vector().blockSurface(smarty, Direction.NORTH).add(0, 3 / 16f, 0);
+        Vec3 filter = util.vector().blockSurface(smarty, Direction.NORTH).add(0, 3 / 16f, 0);
         scene.overlay().showFilterSlotInput(filter, Direction.NORTH, 70);
         scene.idle(10);
         scene.rotateCameraY(20);

@@ -1,10 +1,10 @@
 package com.zurrtum.create.api.contraption;
 
 import com.zurrtum.create.impl.contraption.BlockMovementChecksImpl;
-import net.minecraft.block.BlockState;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
 
 /**
  * Provides several interfaces that can define the behavior of blocks when mounting onto contraptions:
@@ -46,11 +46,11 @@ public class BlockMovementChecks {
 
     // queries
 
-    public static boolean isMovementNecessary(BlockState state, World world, BlockPos pos) {
+    public static boolean isMovementNecessary(BlockState state, Level world, BlockPos pos) {
         return BlockMovementChecksImpl.isMovementNecessary(state, world, pos);
     }
 
-    public static boolean isMovementAllowed(BlockState state, World world, BlockPos pos) {
+    public static boolean isMovementAllowed(BlockState state, Level world, BlockPos pos) {
         return BlockMovementChecksImpl.isMovementAllowed(state, world, pos);
     }
 
@@ -58,7 +58,7 @@ public class BlockMovementChecks {
         return BlockMovementChecksImpl.isBrittle(state);
     }
 
-    public static boolean isBlockAttachedTowards(BlockState state, World world, BlockPos pos, Direction direction) {
+    public static boolean isBlockAttachedTowards(BlockState state, Level world, BlockPos pos, Direction direction) {
         return BlockMovementChecksImpl.isBlockAttachedTowards(state, world, pos, direction);
     }
 
@@ -94,7 +94,7 @@ public class BlockMovementChecks {
          * Determine if it's necessary to move the given block. Contraptions
          * will generally ignore blocks that are unnecessary to move.
          */
-        CheckResult isMovementNecessary(BlockState state, World world, BlockPos pos);
+        CheckResult isMovementNecessary(BlockState state, Level world, BlockPos pos);
     }
 
     @FunctionalInterface
@@ -104,7 +104,7 @@ public class BlockMovementChecks {
          *
          * @see ContraptionMovementSetting
          */
-        CheckResult isMovementAllowed(BlockState state, World world, BlockPos pos);
+        CheckResult isMovementAllowed(BlockState state, Level world, BlockPos pos);
     }
 
     @FunctionalInterface
@@ -128,7 +128,7 @@ public class BlockMovementChecks {
          *     <li>Bed halves are attached to each other</li>
          * </ul>
          */
-        CheckResult isBlockAttachedTowards(BlockState state, World world, BlockPos pos, Direction direction);
+        CheckResult isBlockAttachedTowards(BlockState state, Level world, BlockPos pos, Direction direction);
     }
 
     @FunctionalInterface

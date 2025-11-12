@@ -7,11 +7,11 @@ import com.zurrtum.create.client.flywheel.api.visualization.BlockEntityVisualize
 import com.zurrtum.create.client.flywheel.api.visualization.EntityVisualizer;
 import com.zurrtum.create.client.flywheel.api.visualization.VisualizationManager;
 import com.zurrtum.create.client.flywheel.impl.FlwApiLinkImpl;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityType;
-import net.minecraft.world.WorldAccess;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 import org.jetbrains.annotations.Nullable;
 
 public interface FlwApiLink {
@@ -29,11 +29,11 @@ public interface FlwApiLink {
 
     LayoutBuilder createLayoutBuilder();
 
-    boolean supportsVisualization(@Nullable WorldAccess level);
+    boolean supportsVisualization(@Nullable LevelAccessor level);
 
-    @Nullable VisualizationManager getVisualizationManager(@Nullable WorldAccess level);
+    @Nullable VisualizationManager getVisualizationManager(@Nullable LevelAccessor level);
 
-    VisualizationManager getVisualizationManagerOrThrow(@Nullable WorldAccess level);
+    VisualizationManager getVisualizationManagerOrThrow(@Nullable LevelAccessor level);
 
     <T extends BlockEntity> @Nullable BlockEntityVisualizer<? super T> getVisualizer(BlockEntityType<T> type);
 

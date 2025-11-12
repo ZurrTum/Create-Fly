@@ -7,47 +7,47 @@ import com.zurrtum.create.catnip.codecs.stream.CatnipStreamCodecBuilders;
 import com.zurrtum.create.content.logistics.item.filter.attribute.ItemAttribute;
 import com.zurrtum.create.content.logistics.item.filter.attribute.ItemAttributeType;
 import io.netty.buffer.ByteBuf;
-import net.minecraft.item.ItemGroup;
-import net.minecraft.item.ItemStack;
-import net.minecraft.network.RegistryByteBuf;
-import net.minecraft.network.codec.PacketCodec;
-import net.minecraft.registry.Registries;
-import net.minecraft.util.Identifier;
-import net.minecraft.world.World;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.CreativeModeTab;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
 
 public class InItemGroupAttribute implements ItemAttribute {
-    public static final MapCodec<InItemGroupAttribute> CODEC = Registries.ITEM_GROUP.getCodec().xmap(InItemGroupAttribute::new, i -> i.group)
+    public static final MapCodec<InItemGroupAttribute> CODEC = BuiltInRegistries.CREATIVE_MODE_TAB.byNameCodec().xmap(InItemGroupAttribute::new, i -> i.group)
         .fieldOf("value");
 
-    public static final PacketCodec<ByteBuf, InItemGroupAttribute> PACKET_CODEC = CatnipStreamCodecBuilders.nullable(Identifier.PACKET_CODEC)
-        .xmap(i -> new InItemGroupAttribute(Registries.ITEM_GROUP.get(i)), i -> i.group == null ? null : Registries.ITEM_GROUP.getId(i.group));
+    public static final StreamCodec<ByteBuf, InItemGroupAttribute> PACKET_CODEC = CatnipStreamCodecBuilders.nullable(ResourceLocation.STREAM_CODEC)
+        .map(i -> new InItemGroupAttribute(BuiltInRegistries.CREATIVE_MODE_TAB.getValue(i)), i -> i.group == null ? null : BuiltInRegistries.CREATIVE_MODE_TAB.getKey(i.group));
 
     @Nullable
-    private ItemGroup group;
+    private CreativeModeTab group;
 
-    public InItemGroupAttribute(@Nullable ItemGroup group) {
+    public InItemGroupAttribute(@Nullable CreativeModeTab group) {
         this.group = group;
     }
 
-    private static boolean tabContainsItem(ItemGroup tab, ItemStack stack) {
+    private static boolean tabContainsItem(CreativeModeTab tab, ItemStack stack) {
         return tab.contains(stack) || tab.contains(new ItemStack(stack.getItem()));
     }
 
     @Override
-    public boolean appliesTo(ItemStack stack, World world) {
+    public boolean appliesTo(ItemStack stack, Level world) {
         if (group == null)
             return false;
 
-        if (group.getDisplayStacks().isEmpty() && group.getSearchTabStacks().isEmpty()) {
+        if (group.getDisplayItems().isEmpty() && group.getSearchTabDisplayItems().isEmpty()) {
 
             try {
-                group.updateEntries(new ItemGroup.DisplayContext(world.getEnabledFeatures(), false, world.getRegistryManager()));
+                group.buildContents(new CreativeModeTab.ItemDisplayParameters(world.enabledFeatures(), false, world.registryAccess()));
             } catch (RuntimeException | LinkageError e) {
                 Create.LOGGER.error("Attribute Filter: Item Group {} crashed while building contents.", group.getDisplayName().getString(), e);
                 group = null;
@@ -96,11 +96,11 @@ public class InItemGroupAttribute implements ItemAttribute {
         }
 
         @Override
-        public List<ItemAttribute> getAllAttributes(ItemStack stack, World level) {
+        public List<ItemAttribute> getAllAttributes(ItemStack stack, Level level) {
             List<ItemAttribute> list = new ArrayList<>();
 
-            for (ItemGroup tab : Registries.ITEM_GROUP) {
-                if (tab.shouldDisplay() && tab.getType() == ItemGroup.Type.CATEGORY && tabContainsItem(tab, stack)) {
+            for (CreativeModeTab tab : BuiltInRegistries.CREATIVE_MODE_TAB) {
+                if (tab.shouldDisplay() && tab.getType() == CreativeModeTab.Type.CATEGORY && tabContainsItem(tab, stack)) {
                     list.add(new InItemGroupAttribute(tab));
                 }
             }
@@ -114,7 +114,7 @@ public class InItemGroupAttribute implements ItemAttribute {
         }
 
         @Override
-        public PacketCodec<? super RegistryByteBuf, ? extends ItemAttribute> packetCodec() {
+        public StreamCodec<? super RegistryFriendlyByteBuf, ? extends ItemAttribute> packetCodec() {
             return PACKET_CODEC;
         }
     }

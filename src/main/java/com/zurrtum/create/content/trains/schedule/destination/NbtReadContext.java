@@ -1,21 +1,20 @@
 package com.zurrtum.create.content.trains.schedule.destination;
 
 import com.mojang.serialization.DynamicOps;
-import net.minecraft.registry.Registry;
-import net.minecraft.registry.RegistryKey;
-import net.minecraft.registry.RegistryOps;
-import net.minecraft.registry.RegistryWrapper;
-import net.minecraft.storage.ReadContext;
-
 import java.util.Optional;
 import java.util.stream.Stream;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.core.Registry;
+import net.minecraft.resources.RegistryOps;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.level.storage.ValueInputContextHelper;
 
-public class NbtReadContext extends ReadContext {
+public class NbtReadContext extends ValueInputContextHelper {
     public NbtReadContext(DynamicOps<?> ops) {
         super(new EmptyWrapperLookup(ops), null);
     }
 
-    public static class EmptyWrapperLookup implements RegistryWrapper.WrapperLookup {
+    public static class EmptyWrapperLookup implements HolderLookup.Provider {
         private RegistryOps<?> ops;
 
         public EmptyWrapperLookup(DynamicOps<?> ops) {
@@ -25,19 +24,19 @@ public class NbtReadContext extends ReadContext {
         }
 
         @Override
-        public Stream<RegistryKey<? extends Registry<?>>> streamAllRegistryKeys() {
+        public Stream<ResourceKey<? extends Registry<?>>> listRegistryKeys() {
             throw new UnsupportedOperationException();
         }
 
         @Override
-        public <T> Optional<? extends RegistryWrapper.Impl<T>> getOptional(RegistryKey<? extends Registry<? extends T>> registryRef) {
+        public <T> Optional<? extends HolderLookup.RegistryLookup<T>> lookup(ResourceKey<? extends Registry<? extends T>> registryRef) {
             throw new UnsupportedOperationException();
         }
 
         @Override
         @SuppressWarnings("unchecked")
-        public <V> RegistryOps<V> getOps(DynamicOps<V> delegate) {
-            return ops != null ? (RegistryOps<V>) ops : RegistryWrapper.WrapperLookup.super.getOps(delegate);
+        public <V> RegistryOps<V> createSerializationContext(DynamicOps<V> delegate) {
+            return ops != null ? (RegistryOps<V>) ops : HolderLookup.Provider.super.createSerializationContext(delegate);
         }
     }
 }

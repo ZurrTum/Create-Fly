@@ -8,12 +8,11 @@ import com.zurrtum.create.client.foundation.blockEntity.behaviour.ValueBoxTransf
 import com.zurrtum.create.content.contraptions.bearing.BearingBlock;
 import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
 import com.zurrtum.create.foundation.blockEntity.behaviour.scrollValue.ServerScrollOptionBehaviour;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.text.Text;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.math.Direction.Axis;
-
 import java.util.function.Function;
+import net.minecraft.core.Direction.Axis;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.phys.BlockHitResult;
 
 public abstract class ScrollOptionBehaviour<T extends Enum<T>> extends ScrollValueBehaviour<SmartBlockEntity, ServerScrollOptionBehaviour<T>> {
     private final INamedIconOptions[] icons;
@@ -22,7 +21,7 @@ public abstract class ScrollOptionBehaviour<T extends Enum<T>> extends ScrollVal
     public <E extends Enum<E> & INamedIconOptions> ScrollOptionBehaviour(
         Class<E> enum_,
         Function<T, INamedIconOptions> getter,
-        Text label,
+        Component label,
         SmartBlockEntity be,
         ValueBoxTransform slot
     ) {
@@ -36,12 +35,12 @@ public abstract class ScrollOptionBehaviour<T extends Enum<T>> extends ScrollVal
     }
 
     @Override
-    public ValueSettingsBoard createBoard(PlayerEntity player, BlockHitResult hitResult) {
+    public ValueSettingsBoard createBoard(Player player, BlockHitResult hitResult) {
         return new ValueSettingsBoard(
             label,
             behaviour.getMax(),
             1,
-            ImmutableList.of(Text.literal("Select")),
+            ImmutableList.of(Component.literal("Select")),
             new ScrollOptionSettingsFormatter(icons)
         );
     }
@@ -49,7 +48,7 @@ public abstract class ScrollOptionBehaviour<T extends Enum<T>> extends ScrollVal
     public static ValueBoxTransform getMovementModeSlot() {
         return new DirectionalExtenderScrollOptionSlot((state, d) -> {
             Axis axis = d.getAxis();
-            Axis bearingAxis = state.get(BearingBlock.FACING).getAxis();
+            Axis bearingAxis = state.getValue(BearingBlock.FACING).getAxis();
             return bearingAxis != axis;
         });
     }

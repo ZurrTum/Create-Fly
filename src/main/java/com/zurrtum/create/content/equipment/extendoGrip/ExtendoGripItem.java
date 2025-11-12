@@ -4,71 +4,71 @@ import com.zurrtum.create.AllAdvancements;
 import com.zurrtum.create.AllItems;
 import com.zurrtum.create.content.equipment.armor.BacktankUtil;
 import com.zurrtum.create.infrastructure.config.AllConfigs;
-import net.minecraft.component.DataComponentTypes;
-import net.minecraft.component.type.AttributeModifierSlot;
-import net.minecraft.component.type.AttributeModifiersComponent;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EquipmentSlot;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.attribute.EntityAttributeModifier;
-import net.minecraft.entity.attribute.EntityAttributes;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.util.Hand;
-import net.minecraft.util.Identifier;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.EquipmentSlotGroup;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.attributes.AttributeModifier;
+import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.component.ItemAttributeModifiers;
 import org.jetbrains.annotations.Nullable;
 
 import static com.zurrtum.create.Create.MOD_ID;
 
 public class ExtendoGripItem extends Item {
-    public static final EntityAttributeModifier singleRangeAttributeModifier = new EntityAttributeModifier(
-        Identifier.of(
+    public static final AttributeModifier singleRangeAttributeModifier = new AttributeModifier(
+        ResourceLocation.fromNamespaceAndPath(
             MOD_ID,
             "single_range_attribute_modifier"
-    ), 3, EntityAttributeModifier.Operation.ADD_VALUE
+    ), 3, AttributeModifier.Operation.ADD_VALUE
     );
-    public static final EntityAttributeModifier doubleRangeAttributeModifier = new EntityAttributeModifier(
-        Identifier.of(
+    public static final AttributeModifier doubleRangeAttributeModifier = new AttributeModifier(
+        ResourceLocation.fromNamespaceAndPath(
             MOD_ID,
             "double_range_attribute_modifier"
-    ), 2, EntityAttributeModifier.Operation.ADD_VALUE
+    ), 2, AttributeModifier.Operation.ADD_VALUE
     );
-    public static final EntityAttributeModifier attackKnockbackAttributeModifier = new EntityAttributeModifier(
-        Identifier.of(
+    public static final AttributeModifier attackKnockbackAttributeModifier = new AttributeModifier(
+        ResourceLocation.fromNamespaceAndPath(
             MOD_ID,
             "attack_knockback_attribute_modifier"
-    ), 4, EntityAttributeModifier.Operation.ADD_VALUE
+    ), 4, AttributeModifier.Operation.ADD_VALUE
     );
-    public static final AttributeModifiersComponent rangeModifier = AttributeModifiersComponent.builder()
-        .add(EntityAttributes.BLOCK_INTERACTION_RANGE, singleRangeAttributeModifier, AttributeModifierSlot.HAND)
-        .add(EntityAttributes.ENTITY_INTERACTION_RANGE, singleRangeAttributeModifier, AttributeModifierSlot.HAND)
-        .add(EntityAttributes.ATTACK_KNOCKBACK, attackKnockbackAttributeModifier, AttributeModifierSlot.HAND).build();
-    public static final AttributeModifiersComponent doubleRangeModifier = AttributeModifiersComponent.builder()
-        .add(EntityAttributes.BLOCK_INTERACTION_RANGE, doubleRangeAttributeModifier, AttributeModifierSlot.MAINHAND)
-        .add(EntityAttributes.ENTITY_INTERACTION_RANGE, doubleRangeAttributeModifier, AttributeModifierSlot.MAINHAND).build();
+    public static final ItemAttributeModifiers rangeModifier = ItemAttributeModifiers.builder()
+        .add(Attributes.BLOCK_INTERACTION_RANGE, singleRangeAttributeModifier, EquipmentSlotGroup.HAND)
+        .add(Attributes.ENTITY_INTERACTION_RANGE, singleRangeAttributeModifier, EquipmentSlotGroup.HAND)
+        .add(Attributes.ATTACK_KNOCKBACK, attackKnockbackAttributeModifier, EquipmentSlotGroup.HAND).build();
+    public static final ItemAttributeModifiers doubleRangeModifier = ItemAttributeModifiers.builder()
+        .add(Attributes.BLOCK_INTERACTION_RANGE, doubleRangeAttributeModifier, EquipmentSlotGroup.MAINHAND)
+        .add(Attributes.ENTITY_INTERACTION_RANGE, doubleRangeAttributeModifier, EquipmentSlotGroup.MAINHAND).build();
 
-    public ExtendoGripItem(Settings properties) {
+    public ExtendoGripItem(Properties properties) {
         super(properties);
     }
 
     @Override
-    public void inventoryTick(ItemStack stack, ServerWorld world, Entity entity, @Nullable EquipmentSlot slot) {
-        AttributeModifiersComponent modifiers = stack.get(DataComponentTypes.ATTRIBUTE_MODIFIERS);
+    public void inventoryTick(ItemStack stack, ServerLevel world, Entity entity, @Nullable EquipmentSlot slot) {
+        ItemAttributeModifiers modifiers = stack.get(DataComponents.ATTRIBUTE_MODIFIERS);
         if (slot == EquipmentSlot.MAINHAND) {
-            if (entity instanceof LivingEntity livingEntity && livingEntity.getEquippedStack(EquipmentSlot.OFFHAND).isOf(AllItems.EXTENDO_GRIP)) {
+            if (entity instanceof LivingEntity livingEntity && livingEntity.getItemBySlot(EquipmentSlot.OFFHAND).is(AllItems.EXTENDO_GRIP)) {
                 if (modifiers != doubleRangeModifier) {
-                    stack.set(DataComponentTypes.ATTRIBUTE_MODIFIERS, doubleRangeModifier);
-                    livingEntity.lastEquipmentStacks.get(slot).remove(DataComponentTypes.ATTRIBUTE_MODIFIERS);
-                    if (entity instanceof ServerPlayerEntity serverPlayer) {
+                    stack.set(DataComponents.ATTRIBUTE_MODIFIERS, doubleRangeModifier);
+                    livingEntity.lastEquipmentItems.get(slot).remove(DataComponents.ATTRIBUTE_MODIFIERS);
+                    if (entity instanceof ServerPlayer serverPlayer) {
                         AllAdvancements.EXTENDO_GRIP_DUAL.trigger(serverPlayer);
                     }
                 }
             } else {
                 applyAttributeModifiers(stack, modifiers, rangeModifier);
-                if (entity instanceof ServerPlayerEntity serverPlayer) {
+                if (entity instanceof ServerPlayer serverPlayer) {
                     AllAdvancements.EXTENDO_GRIP.trigger(serverPlayer);
                 }
             }
@@ -77,63 +77,63 @@ public class ExtendoGripItem extends Item {
         }
     }
 
-    private static void applyAttributeModifiers(ItemStack stack, AttributeModifiersComponent oldComponent, AttributeModifiersComponent newComponent) {
+    private static void applyAttributeModifiers(ItemStack stack, ItemAttributeModifiers oldComponent, ItemAttributeModifiers newComponent) {
         if (oldComponent != newComponent) {
-            stack.set(DataComponentTypes.ATTRIBUTE_MODIFIERS, newComponent);
+            stack.set(DataComponents.ATTRIBUTE_MODIFIERS, newComponent);
         }
     }
 
-    public static void postDamageEntity(PlayerEntity player) {
-        if (damageMainHand(player, player.getMainHandStack())) {
+    public static void postDamageEntity(Player player) {
+        if (damageMainHand(player, player.getMainHandItem())) {
             return;
         }
         damageOffHand(player);
     }
 
-    public static void postPlace(PlayerEntity player) {
+    public static void postPlace(Player player) {
         damageOffHand(player);
     }
 
-    public static void postMine(PlayerEntity player, ItemStack stack) {
+    public static void postMine(Player player, ItemStack stack) {
         if (damageMainHand(player, stack)) {
             return;
         }
         damageOffHand(player);
     }
 
-    private static boolean damageMainHand(PlayerEntity player, ItemStack stack) {
-        if (stack.isOf(AllItems.EXTENDO_GRIP)) {
+    private static boolean damageMainHand(Player player, ItemStack stack) {
+        if (stack.is(AllItems.EXTENDO_GRIP)) {
             damage(player, EquipmentSlot.MAINHAND, stack);
             return true;
         }
         return false;
     }
 
-    private static void damageOffHand(PlayerEntity player) {
-        ItemStack stack = player.getOffHandStack();
-        if (stack.isOf(AllItems.EXTENDO_GRIP)) {
+    private static void damageOffHand(Player player) {
+        ItemStack stack = player.getOffhandItem();
+        if (stack.is(AllItems.EXTENDO_GRIP)) {
             damage(player, EquipmentSlot.OFFHAND, stack);
         }
     }
 
-    private static void damage(PlayerEntity player, EquipmentSlot slot, ItemStack stack) {
+    private static void damage(Player player, EquipmentSlot slot, ItemStack stack) {
         if (!BacktankUtil.canAbsorbDamage(player, maxUses())) {
-            stack.damage(1, player, slot);
+            stack.hurtAndBreak(1, player, slot);
         }
     }
 
     @Override
-    public boolean isItemBarVisible(ItemStack stack) {
+    public boolean isBarVisible(ItemStack stack) {
         return BacktankUtil.isBarVisible(stack, maxUses());
     }
 
     @Override
-    public int getItemBarStep(ItemStack stack) {
+    public int getBarWidth(ItemStack stack) {
         return BacktankUtil.getBarWidth(stack, maxUses());
     }
 
     @Override
-    public int getItemBarColor(ItemStack stack) {
+    public int getBarColor(ItemStack stack) {
         return BacktankUtil.getBarColor(stack, maxUses());
     }
 
@@ -141,10 +141,10 @@ public class ExtendoGripItem extends Item {
         return AllConfigs.server().equipment.maxExtendoGripActions.get();
     }
 
-    public static boolean shouldInteraction(PlayerEntity player, Hand hand, ItemStack stack) {
-        if (stack.isOf(AllItems.EXTENDO_GRIP)) {
+    public static boolean shouldInteraction(Player player, InteractionHand hand, ItemStack stack) {
+        if (stack.is(AllItems.EXTENDO_GRIP)) {
             return true;
         }
-        return player.getEquippedStack(hand == Hand.MAIN_HAND ? EquipmentSlot.OFFHAND : EquipmentSlot.MAINHAND).isOf(AllItems.EXTENDO_GRIP);
+        return player.getItemBySlot(hand == InteractionHand.MAIN_HAND ? EquipmentSlot.OFFHAND : EquipmentSlot.MAINHAND).is(AllItems.EXTENDO_GRIP);
     }
 }

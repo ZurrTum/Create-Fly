@@ -1,17 +1,17 @@
 package com.zurrtum.create.client.catnip.impl.client.render.model;
 
+import com.mojang.blaze3d.vertex.BufferBuilder;
+import com.mojang.blaze3d.vertex.ByteBufferBuilder;
+import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.VertexFormat;
 import com.zurrtum.create.client.catnip.client.render.model.ShadeSeparatedResultConsumer;
-import net.minecraft.client.render.BlockRenderLayer;
-import net.minecraft.client.render.BufferBuilder;
-import net.minecraft.client.render.VertexFormats;
-import net.minecraft.client.util.BufferAllocator;
+import net.minecraft.client.renderer.chunk.ChunkSectionLayer;
 import org.jetbrains.annotations.UnknownNullability;
 
 // Modified from https://github.com/Engine-Room/Flywheel/blob/2f67f54c8898d91a48126c3c753eefa6cd224f84/fabric/src/lib/java/dev/engine_room/flywheel/lib/model/baked/MeshEmitter.java
 class MeshEmitter {
-    private final BlockRenderLayer renderType;
-    private final BufferAllocator byteBufferBuilder;
+    private final ChunkSectionLayer renderType;
+    private final ByteBufferBuilder byteBufferBuilder;
     @UnknownNullability
     private BufferBuilder bufferBuilder;
 
@@ -19,9 +19,9 @@ class MeshEmitter {
     private ShadeSeparatedResultConsumer resultConsumer;
     private boolean currentShade;
 
-    MeshEmitter(BlockRenderLayer renderType) {
+    MeshEmitter(ChunkSectionLayer renderType) {
         this.renderType = renderType;
-        this.byteBufferBuilder = new BufferAllocator(renderType.getBufferSize());
+        this.byteBufferBuilder = new ByteBufferBuilder(renderType.bufferSize());
     }
 
     public void prepare(ShadeSeparatedResultConsumer resultConsumer) {
@@ -42,17 +42,17 @@ class MeshEmitter {
 
     private void prepareForGeometry(boolean shade) {
         if (bufferBuilder == null) {
-            bufferBuilder = new BufferBuilder(byteBufferBuilder, VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR_TEXTURE_LIGHT_NORMAL);
+            bufferBuilder = new BufferBuilder(byteBufferBuilder, VertexFormat.Mode.QUADS, DefaultVertexFormat.BLOCK);
         } else if (shade != currentShade) {
             emit();
-            bufferBuilder = new BufferBuilder(byteBufferBuilder, VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR_TEXTURE_LIGHT_NORMAL);
+            bufferBuilder = new BufferBuilder(byteBufferBuilder, VertexFormat.Mode.QUADS, DefaultVertexFormat.BLOCK);
         }
 
         currentShade = shade;
     }
 
     private void emit() {
-        var data = bufferBuilder.endNullable();
+        var data = bufferBuilder.build();
         bufferBuilder = null;
 
         if (data != null) {

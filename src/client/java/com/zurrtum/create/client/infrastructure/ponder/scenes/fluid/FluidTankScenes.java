@@ -22,19 +22,19 @@ import com.zurrtum.create.content.fluids.tank.FluidTankBlockEntity;
 import com.zurrtum.create.content.redstone.nixieTube.NixieTubeBlockEntity;
 import com.zurrtum.create.foundation.fluid.FluidTank;
 import com.zurrtum.create.infrastructure.fluids.FluidStack;
-import net.minecraft.fluid.Fluids;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.math.random.Random;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.level.material.Fluids;
+import net.minecraft.world.phys.Vec3;
 
 public class FluidTankScenes {
 
     public static void storage(SceneBuilder builder, SceneBuildingUtil util) {
         CreateSceneBuilder scene = new CreateSceneBuilder(builder);
-        Random random = Random.create();
+        RandomSource random = RandomSource.create();
 
         scene.title("fluid_tank_storage", "Storing Fluids in Fluid Tanks");
         scene.configureBasePlate(0, 0, 5);
@@ -82,12 +82,12 @@ public class FluidTankScenes {
         scene.idle(5);
         scene.world().setKineticSpeed(pump, 0);
         scene.world().showSection(pipe, Direction.EAST);
-        scene.world().modifyBlock(pumpPos, s -> s.with(PumpBlock.FACING, Direction.SOUTH), false);
+        scene.world().modifyBlock(pumpPos, s -> s.setValue(PumpBlock.FACING, Direction.SOUTH), false);
         scene.idle(10);
         scene.world().showSection(largeCog1, Direction.UP);
         scene.world().showSection(kinetics1, Direction.WEST);
         scene.idle(10);
-        scene.world().setBlock(util.grid().at(1, -1, 5), AllBlocks.FLUID_TANK.getDefaultState(), false);
+        scene.world().setBlock(util.grid().at(1, -1, 5), AllBlocks.FLUID_TANK.defaultBlockState(), false);
         scene.world().setKineticSpeed(pump, -32);
 
         scene.idle(5);
@@ -104,7 +104,7 @@ public class FluidTankScenes {
             .pointAt(util.vector().centerOf(1, 1, 2));
         scene.idle(40);
 
-        scene.world().modifyBlock(pumpPos, s -> s.with(PumpBlock.FACING, Direction.NORTH), true);
+        scene.world().modifyBlock(pumpPos, s -> s.setValue(PumpBlock.FACING, Direction.NORTH), true);
         scene.world().propagatePipeChange(pumpPos);
         for (int i = 0; i < 4; i++) {
             scene.world().modifyBlockEntity(tankPos, FluidTankBlockEntity.class, be -> be.getTankInventory().insert(content, 162000));
@@ -158,7 +158,7 @@ public class FluidTankScenes {
             .colored(PonderPalette.GREEN).placeNearTarget().pointAt(util.vector().topOf(2, 1, 1));
         scene.idle(90);
 
-        ItemStack chocBucket = AllItems.CHOCOLATE_BUCKET.getDefaultStack();
+        ItemStack chocBucket = AllItems.CHOCOLATE_BUCKET.getDefaultInstance();
         scene.world().createItemOnBeltLike(util.grid().at(3, 1, 0), Direction.WEST, chocBucket);
         scene.idle(40);
         scene.world()
@@ -169,7 +169,7 @@ public class FluidTankScenes {
         for (int i = 0; i < 10; i++) {
             scene.effects().emitParticles(
                 util.vector().topOf(3, 1, 1).add(0, 1 / 16f, 0),
-                scene.effects().simpleParticleEmitter(FluidFX.getFluidParticle(content), VecHelper.offsetRandomly(Vec3d.ZERO, random, .1f)),
+                scene.effects().simpleParticleEmitter(FluidFX.getFluidParticle(content), VecHelper.offsetRandomly(Vec3.ZERO, random, .1f)),
                 1,
                 1
             );
@@ -279,15 +279,15 @@ public class FluidTankScenes {
         scene.world().showSection(full3, Direction.DOWN);
         scene.idle(10);
 
-        Vec3d blockSurface = util.vector().blockSurface(util.grid().at(3, 3, 1), Direction.WEST);
+        Vec3 blockSurface = util.vector().blockSurface(util.grid().at(3, 3, 1), Direction.WEST);
         scene.overlay().showText(60).text("...and grow in height by more than 30 additional layers").attachKeyFrame().placeNearTarget()
             .pointAt(blockSurface);
         scene.idle(70);
 
         scene.overlay().showControls(util.vector().blockSurface(util.grid().at(3, 3, 1), Direction.NORTH), Pointing.RIGHT, 60).rightClick()
-            .withItem(AllItems.WRENCH.getDefaultStack());
+            .withItem(AllItems.WRENCH.getDefaultInstance());
         scene.idle(7);
-        scene.world().modifyBlocks(full2, s -> s.with(FluidTankBlock.SHAPE, FluidTankBlock.Shape.PLAIN), false);
+        scene.world().modifyBlocks(full2, s -> s.setValue(FluidTankBlock.SHAPE, FluidTankBlock.Shape.PLAIN), false);
         scene.idle(30);
 
         scene.overlay().showText(60).text("Using a Wrench, a tanks' window can be toggled").attachKeyFrame().placeNearTarget().pointAt(blockSurface);
@@ -342,7 +342,7 @@ public class FluidTankScenes {
         scene.world().showSection(largeCog, Direction.UP);
         scene.world().showSection(cog, Direction.NORTH);
         scene.world().showSection(pipes, Direction.NORTH);
-        scene.world().modifyBlock(pumpPos, s -> s.with(PumpBlock.FACING, Direction.SOUTH), false);
+        scene.world().modifyBlock(pumpPos, s -> s.setValue(PumpBlock.FACING, Direction.SOUTH), false);
         scene.world().propagatePipeChange(pumpPos);
         scene.idle(40);
 
@@ -350,7 +350,7 @@ public class FluidTankScenes {
             .pointAt(util.vector().blockSurface(util.grid().at(3, 1, 2), Direction.WEST));
         scene.idle(120);
 
-        scene.world().modifyBlock(pumpPos, s -> s.with(PumpBlock.FACING, Direction.NORTH), true);
+        scene.world().modifyBlock(pumpPos, s -> s.setValue(PumpBlock.FACING, Direction.NORTH), true);
         scene.world().propagatePipeChange(pumpPos);
         scene.idle(40);
 

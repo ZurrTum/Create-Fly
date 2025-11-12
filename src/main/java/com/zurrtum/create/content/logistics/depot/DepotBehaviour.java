@@ -16,17 +16,17 @@ import com.zurrtum.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.foundation.codec.CreateCodecs;
 import com.zurrtum.create.foundation.item.ItemHelper;
 import com.zurrtum.create.infrastructure.items.ItemInventory;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.item.ItemStack;
-import net.minecraft.storage.ReadView;
-import net.minecraft.storage.WriteView;
-import net.minecraft.util.ItemScatterer;
-import net.minecraft.util.collection.DefaultedList;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.NonNullList;
+import net.minecraft.world.Containers;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
+import net.minecraft.world.phys.Vec3;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -54,7 +54,7 @@ public class DepotBehaviour extends BlockEntityBehaviour<SmartBlockEntity> {
 
     public DepotBehaviour(SmartBlockEntity be) {
         super(be);
-        maxStackSize = () -> heldItem != null ? heldItem.stack.getMaxCount() : 64;
+        maxStackSize = () -> heldItem != null ? heldItem.stack.getMaxStackSize() : 64;
         canAcceptItems = () -> true;
         canFunnelsPullFrom = $ -> true;
         acceptedItems = $ -> true;
@@ -83,22 +83,22 @@ public class DepotBehaviour extends BlockEntityBehaviour<SmartBlockEntity> {
     public void tick() {
         super.tick();
 
-        World world = blockEntity.getWorld();
+        Level world = blockEntity.getLevel();
 
         for (Iterator<TransportedItemStack> iterator = incoming.iterator(); iterator.hasNext(); ) {
             TransportedItemStack ts = iterator.next();
             if (!tick(ts))
                 continue;
-            if (world.isClient() && !blockEntity.isVirtual())
+            if (world.isClientSide() && !blockEntity.isVirtual())
                 continue;
             if (heldItem == null) {
                 heldItem = ts;
             } else {
                 if (!ItemHelper.canItemStackAmountsStack(heldItem.stack, ts.stack)) {
-                    Vec3d vec = VecHelper.getCenterOf(blockEntity.getPos());
-                    ItemScatterer.spawn(blockEntity.getWorld(), vec.x, vec.y + .5f, vec.z, ts.stack);
+                    Vec3 vec = VecHelper.getCenterOf(blockEntity.getBlockPos());
+                    Containers.dropItemStack(blockEntity.getLevel(), vec.x, vec.y + .5f, vec.z, ts.stack);
                 } else {
-                    heldItem.stack.increment(ts.stack.getCount());
+                    heldItem.stack.grow(ts.stack.getCount());
                 }
             }
             iterator.remove();
@@ -110,14 +110,14 @@ public class DepotBehaviour extends BlockEntityBehaviour<SmartBlockEntity> {
         if (!tick(heldItem))
             return;
 
-        BlockPos pos = blockEntity.getPos();
+        BlockPos pos = blockEntity.getBlockPos();
 
-        if (world.isClient())
+        if (world.isClientSide())
             return;
         if (handleBeltFunnelOutput())
             return;
 
-        BeltProcessingBehaviour processingBehaviour = BlockEntityBehaviour.get(world, pos.up(2), BeltProcessingBehaviour.TYPE);
+        BeltProcessingBehaviour processingBehaviour = BlockEntityBehaviour.get(world, pos.above(2), BeltProcessingBehaviour.TYPE);
         if (processingBehaviour == null)
             return;
         if (!heldItem.locked && BeltProcessingBehaviour.isBlocked(world, pos))
@@ -136,7 +136,7 @@ public class DepotBehaviour extends BlockEntityBehaviour<SmartBlockEntity> {
         }
 
         heldItem.locked = result == ProcessingResult.HOLD;
-        if (heldItem.locked != wasLocked || !ItemStack.areEqual(previousItem, heldItem.stack))
+        if (heldItem.locked != wasLocked || !ItemStack.matches(previousItem, heldItem.stack))
             blockEntity.sendData();
     }
 
@@ -158,20 +158,20 @@ public class DepotBehaviour extends BlockEntityBehaviour<SmartBlockEntity> {
     }
 
     private boolean handleBeltFunnelOutput() {
-        BlockState funnel = getWorld().getBlockState(getPos().up());
+        BlockState funnel = getLevel().getBlockState(getPos().above());
         Direction funnelFacing = AbstractFunnelBlock.getFunnelFacing(funnel);
         if (funnelFacing == null || !canFunnelsPullFrom.test(funnelFacing.getOpposite()))
             return false;
 
-        for (int slot = 0; slot < processingOutputBuffer.size(); slot++) {
-            ItemStack previousItem = processingOutputBuffer.getStack(slot);
+        for (int slot = 0; slot < processingOutputBuffer.getContainerSize(); slot++) {
+            ItemStack previousItem = processingOutputBuffer.getItem(slot);
             if (previousItem.isEmpty())
                 continue;
             ItemStack afterInsert = blockEntity.getBehaviour(DirectBeltInputBehaviour.TYPE).tryExportingToBeltFunnel(previousItem, null, false);
             if (afterInsert == null)
                 return false;
             if (previousItem.getCount() != afterInsert.getCount()) {
-                processingOutputBuffer.setStack(slot, afterInsert);
+                processingOutputBuffer.setItem(slot, afterInsert);
                 blockEntity.notifyUpdate();
                 return true;
             }
@@ -196,26 +196,26 @@ public class DepotBehaviour extends BlockEntityBehaviour<SmartBlockEntity> {
     @Override
     public void destroy() {
         super.destroy();
-        World level = getWorld();
+        Level level = getLevel();
         BlockPos pos = getPos();
-        ItemScatterer.spawn(level, pos, processingOutputBuffer);
+        Containers.dropContents(level, pos, processingOutputBuffer);
         for (TransportedItemStack transportedItemStack : incoming)
-            Block.dropStack(level, pos, transportedItemStack.stack);
+            Block.popResource(level, pos, transportedItemStack.stack);
         if (!getHeldItemStack().isEmpty())
-            Block.dropStack(level, pos, getHeldItemStack());
+            Block.popResource(level, pos, getHeldItemStack());
     }
 
     @Override
-    public void write(WriteView view, boolean clientPacket) {
+    public void write(ValueOutput view, boolean clientPacket) {
         if (heldItem != null)
-            view.put("HeldItem", TransportedItemStack.CODEC, heldItem);
+            view.store("HeldItem", TransportedItemStack.CODEC, heldItem);
         processingOutputBuffer.write(view);
         if (canMergeItems() && !incoming.isEmpty())
-            view.put("Incoming", CreateCodecs.TRANSPORTED_ITEM_LIST_CODEC, incoming);
+            view.store("Incoming", CreateCodecs.TRANSPORTED_ITEM_LIST_CODEC, incoming);
     }
 
     @Override
-    public void read(ReadView view, boolean clientPacket) {
+    public void read(ValueInput view, boolean clientPacket) {
         heldItem = view.read("HeldItem", TransportedItemStack.CODEC).orElse(null);
         processingOutputBuffer.read(view);
         if (canMergeItems()) {
@@ -245,8 +245,8 @@ public class DepotBehaviour extends BlockEntityBehaviour<SmartBlockEntity> {
     public int getPresentStackSize() {
         int cumulativeStackSize = 0;
         cumulativeStackSize += getHeldItemStack().getCount();
-        for (int slot = 0; slot < processingOutputBuffer.size(); slot++)
-            cumulativeStackSize += processingOutputBuffer.getStack(slot).getCount();
+        for (int slot = 0; slot < processingOutputBuffer.getContainerSize(); slot++)
+            cumulativeStackSize += processingOutputBuffer.getItem(slot).getCount();
         return cumulativeStackSize;
     }
 
@@ -254,7 +254,7 @@ public class DepotBehaviour extends BlockEntityBehaviour<SmartBlockEntity> {
         int cumulativeStackSize = getPresentStackSize();
         for (TransportedItemStack transportedItemStack : incoming)
             cumulativeStackSize += transportedItemStack.stack.getCount();
-        int fromGetter = Math.min(maxStackSize.get() == 0 ? 64 : maxStackSize.get(), getHeldItemStack().getMaxCount());
+        int fromGetter = Math.min(maxStackSize.get() == 0 ? 64 : maxStackSize.get(), getHeldItemStack().getMaxStackSize());
         return (fromGetter) - cumulativeStackSize;
     }
 
@@ -295,7 +295,7 @@ public class DepotBehaviour extends BlockEntityBehaviour<SmartBlockEntity> {
         }
 
         ItemStack returned = ItemStack.EMPTY;
-        int maxCount = heldItem.stack.getMaxCount();
+        int maxCount = heldItem.stack.getMaxStackSize();
         boolean stackTooLarge = maxCount < heldItem.stack.getCount();
         if (stackTooLarge)
             returned = heldItem.stack.copyWithCount(heldItem.stack.getCount() - maxCount);
@@ -305,9 +305,9 @@ public class DepotBehaviour extends BlockEntityBehaviour<SmartBlockEntity> {
 
         if (this.isEmpty()) {
             if (heldItem.insertedFrom.getAxis().isHorizontal())
-                AllSoundEvents.DEPOT_SLIDE.playOnServer(getWorld(), getPos());
+                AllSoundEvents.DEPOT_SLIDE.playOnServer(getLevel(), getPos());
             else
-                AllSoundEvents.DEPOT_PLOP.playOnServer(getWorld(), getPos());
+                AllSoundEvents.DEPOT_PLOP.playOnServer(getLevel(), getPos());
         }
 
         if (stackTooLarge) {
@@ -389,13 +389,13 @@ public class DepotBehaviour extends BlockEntityBehaviour<SmartBlockEntity> {
             List<ItemStack> items = outputs.stream().skip(skip).map(t -> t.stack).toList();
             items = processingOutputBuffer.insert(items);
             if (!items.isEmpty()) {
-                World world = blockEntity.getWorld();
-                Vec3d vec = VecHelper.getCenterOf(blockEntity.getPos()).add(0, .5f, 0);
+                Level world = blockEntity.getLevel();
+                Vec3 vec = VecHelper.getCenterOf(blockEntity.getBlockPos()).add(0, .5f, 0);
                 double x = vec.x;
                 double y = vec.y + .5f;
                 double z = vec.z;
                 for (ItemStack stack : items) {
-                    ItemScatterer.spawn(world, x, y, z, stack);
+                    Containers.dropItemStack(world, x, y, z, stack);
                 }
             }
         }
@@ -411,8 +411,8 @@ public class DepotBehaviour extends BlockEntityBehaviour<SmartBlockEntity> {
         return processingOutputBuffer.isEmpty();
     }
 
-    private Vec3d getWorldPositionOf(TransportedItemStack transported) {
-        return VecHelper.getCenterOf(blockEntity.getPos());
+    private Vec3 getWorldPositionOf(TransportedItemStack transported) {
+        return VecHelper.getCenterOf(blockEntity.getBlockPos());
     }
 
     @Override
@@ -425,37 +425,37 @@ public class DepotBehaviour extends BlockEntityBehaviour<SmartBlockEntity> {
     }
 
     public class DepotOutputHandler implements ItemInventory {
-        private final DefaultedList<ItemStack> stacks;
+        private final NonNullList<ItemStack> stacks;
 
         public DepotOutputHandler() {
-            this.stacks = DefaultedList.ofSize(8, ItemStack.EMPTY);
+            this.stacks = NonNullList.withSize(8, ItemStack.EMPTY);
         }
 
         @Override
-        public int size() {
+        public int getContainerSize() {
             return 8;
         }
 
         @Override
-        public ItemStack getStack(int slot) {
-            if (slot >= size()) {
+        public ItemStack getItem(int slot) {
+            if (slot >= getContainerSize()) {
                 return ItemStack.EMPTY;
             }
             return stacks.get(slot);
         }
 
         @Override
-        public void setStack(int slot, ItemStack stack) {
+        public void setItem(int slot, ItemStack stack) {
             stacks.set(slot, stack);
         }
 
         @Override
-        public void markDirty() {
+        public void setChanged() {
             blockEntity.notifyUpdate();
         }
 
-        public void write(WriteView view) {
-            WriteView.ListAppender<ItemStack> list = view.getListAppender("Inventory", ItemStack.CODEC);
+        public void write(ValueOutput view) {
+            ValueOutput.TypedOutputList<ItemStack> list = view.list("Inventory", ItemStack.CODEC);
             for (ItemStack stack : stacks) {
                 if (stack.isEmpty()) {
                     continue;
@@ -464,8 +464,8 @@ public class DepotBehaviour extends BlockEntityBehaviour<SmartBlockEntity> {
             }
         }
 
-        public void read(ReadView view) {
-            ReadView.TypedListReadView<ItemStack> list = view.getTypedListView("Inventory", ItemStack.CODEC);
+        public void read(ValueInput view) {
+            ValueInput.TypedInputList<ItemStack> list = view.listOrEmpty("Inventory", ItemStack.CODEC);
             int i = 0;
             for (ItemStack itemStack : list) {
                 stacks.set(i++, itemStack);

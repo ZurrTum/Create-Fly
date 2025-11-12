@@ -1,5 +1,6 @@
 package com.zurrtum.create.client.content.schematics.client.tools;
 
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.zurrtum.create.catnip.math.VecHelper;
 import com.zurrtum.create.client.AllKeys;
 import com.zurrtum.create.client.AllSpecialTextures;
@@ -11,25 +12,24 @@ import com.zurrtum.create.client.content.schematics.client.SchematicHandler;
 import com.zurrtum.create.client.content.schematics.client.SchematicTransformation;
 import com.zurrtum.create.client.foundation.utility.RaycastHelper;
 import com.zurrtum.create.client.foundation.utility.RaycastHelper.PredicateTraceResult;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.hud.InGameHud;
-import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.hit.HitResult.Type;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.Gui;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.HitResult.Type;
+import net.minecraft.world.phys.Vec3;
 
 public abstract class SchematicToolBase implements ISchematicTool {
 
     protected SchematicHandler schematicHandler;
 
     protected BlockPos selectedPos;
-    protected Vec3d chasingSelectedPos;
-    protected Vec3d lastChasingSelectedPos;
+    protected Vec3 chasingSelectedPos;
+    protected Vec3 lastChasingSelectedPos;
 
     protected boolean selectIgnoreBlocks;
     protected int selectionRange;
@@ -43,37 +43,37 @@ public abstract class SchematicToolBase implements ISchematicTool {
         selectedPos = null;
         selectedFace = null;
         schematicSelected = false;
-        chasingSelectedPos = Vec3d.ZERO;
-        lastChasingSelectedPos = Vec3d.ZERO;
+        chasingSelectedPos = Vec3.ZERO;
+        lastChasingSelectedPos = Vec3.ZERO;
     }
 
     @Override
-    public void updateSelection(MinecraftClient mc) {
+    public void updateSelection(Minecraft mc) {
         updateTargetPos();
 
         if (selectedPos == null)
             return;
         lastChasingSelectedPos = chasingSelectedPos;
-        Vec3d target = Vec3d.of(selectedPos);
+        Vec3 target = Vec3.atLowerCornerOf(selectedPos);
         if (target.distanceTo(chasingSelectedPos) < 1 / 512f) {
             chasingSelectedPos = target;
             return;
         }
 
-        chasingSelectedPos = chasingSelectedPos.add(target.subtract(chasingSelectedPos).multiply(1 / 2f));
+        chasingSelectedPos = chasingSelectedPos.add(target.subtract(chasingSelectedPos).scale(1 / 2f));
     }
 
     public void updateTargetPos() {
-        ClientPlayerEntity player = MinecraftClient.getInstance().player;
+        LocalPlayer player = Minecraft.getInstance().player;
 
         // Select Blueprint
         if (schematicHandler.isDeployed()) {
             SchematicTransformation transformation = schematicHandler.getTransformation();
-            Box localBounds = schematicHandler.getBounds();
+            AABB localBounds = schematicHandler.getBounds();
 
-            Vec3d traceOrigin = player.getEyePos();
-            Vec3d start = transformation.toLocalSpace(traceOrigin);
-            Vec3d end = transformation.toLocalSpace(RaycastHelper.getTraceTarget(player, 70, traceOrigin));
+            Vec3 traceOrigin = player.getEyePosition();
+            Vec3 start = transformation.toLocalSpace(traceOrigin);
+            Vec3 end = transformation.toLocalSpace(RaycastHelper.getTraceTarget(player, 70, traceOrigin));
             PredicateTraceResult result = RaycastHelper.rayTraceUntil(start, end, pos -> localBounds.contains(VecHelper.getCenterOf(pos)));
 
             schematicSelected = !result.missed();
@@ -85,41 +85,41 @@ public abstract class SchematicToolBase implements ISchematicTool {
         // Select location at distance
         if (selectIgnoreBlocks) {
             float pt = AnimationTickHolder.getPartialTicks();
-            selectedPos = BlockPos.ofFloored(player.getCameraPosVec(pt).add(player.getRotationVector().multiply(selectionRange)));
+            selectedPos = BlockPos.containing(player.getEyePosition(pt).add(player.getLookAngle().scale(selectionRange)));
             if (snap)
-                lastChasingSelectedPos = chasingSelectedPos = Vec3d.of(selectedPos);
+                lastChasingSelectedPos = chasingSelectedPos = Vec3.atLowerCornerOf(selectedPos);
             return;
         }
 
         // Select targeted Block
         selectedPos = null;
-        BlockHitResult trace = RaycastHelper.rayTraceRange(player.getEntityWorld(), player, 75);
+        BlockHitResult trace = RaycastHelper.rayTraceRange(player.level(), player, 75);
         if (trace == null || trace.getType() != Type.BLOCK)
             return;
 
-        BlockPos hit = BlockPos.ofFloored(trace.getPos());
-        boolean replaceable = player.getEntityWorld().getBlockState(hit).isReplaceable();
-        if (trace.getSide().getAxis().isVertical() && !replaceable)
-            hit = hit.offset(trace.getSide());
+        BlockPos hit = BlockPos.containing(trace.getLocation());
+        boolean replaceable = player.level().getBlockState(hit).canBeReplaced();
+        if (trace.getDirection().getAxis().isVertical() && !replaceable)
+            hit = hit.relative(trace.getDirection());
         selectedPos = hit;
         if (snap)
-            lastChasingSelectedPos = chasingSelectedPos = Vec3d.of(selectedPos);
+            lastChasingSelectedPos = chasingSelectedPos = Vec3.atLowerCornerOf(selectedPos);
     }
 
     @Override
-    public void renderTool(MinecraftClient mc, MatrixStack ms, SuperRenderTypeBuffer buffer, Vec3d camera) {
+    public void renderTool(Minecraft mc, PoseStack ms, SuperRenderTypeBuffer buffer, Vec3 camera) {
     }
 
     @Override
-    public void renderOverlay(InGameHud gui, DrawContext graphics, float partialTicks, int width, int height) {
+    public void renderOverlay(Gui gui, GuiGraphics graphics, float partialTicks, int width, int height) {
     }
 
     @Override
-    public void renderOnSchematic(MinecraftClient mc, MatrixStack ms, SuperRenderTypeBuffer buffer) {
+    public void renderOnSchematic(Minecraft mc, PoseStack ms, SuperRenderTypeBuffer buffer) {
         if (!schematicHandler.isDeployed())
             return;
 
-        ms.push();
+        ms.pushPose();
         AABBOutline outline = schematicHandler.getOutline();
         if (renderSelectedFace) {
             outline.getParams().highlightFace(selectedFace).withFaceTextures(
@@ -128,9 +128,9 @@ public abstract class SchematicToolBase implements ISchematicTool {
             );
         }
         outline.getParams().colored(0x6886c5).withFaceTexture(AllSpecialTextures.CHECKERED).lineWidth(1 / 16f);
-        outline.render(MinecraftClient.getInstance(), ms, buffer, Vec3d.ZERO, AnimationTickHolder.getPartialTicks());
+        outline.render(Minecraft.getInstance(), ms, buffer, Vec3.ZERO, AnimationTickHolder.getPartialTicks());
         outline.getParams().clearTextures();
-        ms.pop();
+        ms.popPose();
     }
 
 }

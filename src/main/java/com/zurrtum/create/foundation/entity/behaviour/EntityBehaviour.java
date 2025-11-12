@@ -1,7 +1,7 @@
 package com.zurrtum.create.foundation.entity.behaviour;
 
 import com.zurrtum.create.foundation.blockEntity.behaviour.BehaviourType;
-import net.minecraft.entity.Entity;
+import net.minecraft.world.entity.Entity;
 
 public abstract class EntityBehaviour<T extends Entity> {
     public T entity;

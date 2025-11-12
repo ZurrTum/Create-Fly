@@ -3,27 +3,26 @@ package com.zurrtum.create.infrastructure.packet.c2s;
 import com.zurrtum.create.AllHandle;
 import com.zurrtum.create.AllPackets;
 import com.zurrtum.create.catnip.codecs.stream.CatnipStreamCodecBuilders;
-import net.minecraft.network.RegistryByteBuf;
-import net.minecraft.network.codec.PacketCodec;
-import net.minecraft.network.codec.PacketCodecs;
-import net.minecraft.network.packet.PacketType;
-import net.minecraft.server.network.ServerPlayNetworkHandler;
-
 import java.util.function.BiConsumer;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.PacketType;
+import net.minecraft.server.network.ServerGamePacketListenerImpl;
 
 public record SchematicUploadPacket(int code, long size, String schematic, byte[] data) implements C2SPacket {
     public static final int BEGIN = 0;
     public static final int WRITE = 1;
     public static final int FINISH = 2;
 
-    public static final PacketCodec<RegistryByteBuf, SchematicUploadPacket> CODEC = PacketCodec.tuple(
-        PacketCodecs.VAR_INT,
+    public static final StreamCodec<RegistryFriendlyByteBuf, SchematicUploadPacket> CODEC = StreamCodec.composite(
+        ByteBufCodecs.VAR_INT,
         SchematicUploadPacket::code,
-        PacketCodecs.VAR_LONG,
+        ByteBufCodecs.VAR_LONG,
         SchematicUploadPacket::size,
-        CatnipStreamCodecBuilders.nullable(PacketCodecs.string(256)),
+        CatnipStreamCodecBuilders.nullable(ByteBufCodecs.stringUtf8(256)),
         SchematicUploadPacket::schematic,
-        CatnipStreamCodecBuilders.nullable(PacketCodecs.byteArray(Integer.MAX_VALUE)),
+        CatnipStreamCodecBuilders.nullable(ByteBufCodecs.byteArray(Integer.MAX_VALUE)),
         SchematicUploadPacket::data,
         SchematicUploadPacket::new
     );
@@ -46,12 +45,12 @@ public record SchematicUploadPacket(int code, long size, String schematic, byte[
     }
 
     @Override
-    public PacketType<SchematicUploadPacket> getPacketType() {
+    public PacketType<SchematicUploadPacket> type() {
         return AllPackets.UPLOAD_SCHEMATIC;
     }
 
     @Override
-    public BiConsumer<ServerPlayNetworkHandler, SchematicUploadPacket> callback() {
+    public BiConsumer<ServerGamePacketListenerImpl, SchematicUploadPacket> callback() {
         return AllHandle::onSchematicUpload;
     }
 }

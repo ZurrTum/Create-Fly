@@ -4,13 +4,13 @@ import com.mojang.serialization.Codec;
 import com.zurrtum.create.catnip.codecs.stream.CatnipStreamCodecBuilders;
 import com.zurrtum.create.content.processing.burner.BlazeBurnerBlock.HeatLevel;
 import io.netty.buffer.ByteBuf;
-import net.minecraft.network.codec.PacketCodec;
-import net.minecraft.util.StringIdentifiable;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Locale;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.util.StringRepresentable;
 
-public enum HeatCondition implements StringIdentifiable {
+public enum HeatCondition implements StringRepresentable {
 
     NONE(0xffffffff),
     HEATED(0xFFE88300),
@@ -18,8 +18,8 @@ public enum HeatCondition implements StringIdentifiable {
 
     private final int color;
 
-    public static final Codec<HeatCondition> CODEC = StringIdentifiable.createCodec(HeatCondition::values);
-    public static final PacketCodec<ByteBuf, HeatCondition> PACKET_CODEC = CatnipStreamCodecBuilders.ofEnum(HeatCondition.class);
+    public static final Codec<HeatCondition> CODEC = StringRepresentable.fromEnum(HeatCondition::values);
+    public static final StreamCodec<ByteBuf, HeatCondition> PACKET_CODEC = CatnipStreamCodecBuilders.ofEnum(HeatCondition.class);
 
     HeatCondition(int color) {
         this.color = color;
@@ -42,12 +42,12 @@ public enum HeatCondition implements StringIdentifiable {
     }
 
     @Override
-    public @NotNull String asString() {
+    public @NotNull String getSerializedName() {
         return name().toLowerCase(Locale.ROOT);
     }
 
     public String getTranslationKey() {
-        return "recipe.heat_requirement." + asString();
+        return "recipe.heat_requirement." + getSerializedName();
     }
 
     public int getColor() {

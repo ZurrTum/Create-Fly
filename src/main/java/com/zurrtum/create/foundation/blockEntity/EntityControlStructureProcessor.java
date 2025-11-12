@@ -1,8 +1,8 @@
 package com.zurrtum.create.foundation.blockEntity;
 
-import net.minecraft.structure.StructureTemplate;
-import net.minecraft.world.World;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate;
 
 public interface EntityControlStructureProcessor {
-    boolean skip(World world, StructureTemplate.StructureEntityInfo info);
+    boolean skip(Level world, StructureTemplate.StructureEntityInfo info);
 }

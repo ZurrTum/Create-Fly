@@ -1,56 +1,56 @@
 package com.zurrtum.create.client.flywheel.lib.transform;
 
-import net.minecraft.client.util.math.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
 import org.jetbrains.annotations.ApiStatus;
 import org.joml.Matrix3fc;
 import org.joml.Matrix4fc;
 import org.joml.Quaternionfc;
 
 /**
- * A wrapper around {@link MatrixStack} that implements {@link TransformStack}.
+ * A wrapper around {@link PoseStack} that implements {@link TransformStack}.
  * <br>
- * Only one instance of this class should exist per {@link MatrixStack}.
+ * Only one instance of this class should exist per {@link PoseStack}.
  */
 public final class PoseTransformStack implements TransformStack<PoseTransformStack> {
-    private final MatrixStack stack;
+    private final PoseStack stack;
 
     /**
-     * Use {@link TransformStack#of(MatrixStack)}.
+     * Use {@link TransformStack#of(PoseStack)}.
      */
     @ApiStatus.Internal
-    public PoseTransformStack(MatrixStack stack) {
+    public PoseTransformStack(PoseStack stack) {
         this.stack = stack;
     }
 
     @Override
     public PoseTransformStack pushPose() {
-        stack.push();
+        stack.pushPose();
         return this;
     }
 
     @Override
     public PoseTransformStack popPose() {
-        stack.pop();
+        stack.popPose();
         return this;
     }
 
     @Override
     public PoseTransformStack mulPose(Matrix4fc pose) {
-        stack.peek().getPositionMatrix().mul(pose);
+        stack.last().pose().mul(pose);
         return this;
     }
 
     @Override
     public PoseTransformStack mulNormal(Matrix3fc normal) {
-        stack.peek().getNormalMatrix().mul(normal);
+        stack.last().normal().mul(normal);
         return this;
     }
 
     @Override
     public PoseTransformStack rotateAround(Quaternionfc quaternion, float x, float y, float z) {
-        MatrixStack.Entry pose = stack.peek();
-        pose.getPositionMatrix().rotateAround(quaternion, x, y, z);
-        pose.getNormalMatrix().rotate(quaternion);
+        PoseStack.Pose pose = stack.last();
+        pose.pose().rotateAround(quaternion, x, y, z);
+        pose.normal().rotate(quaternion);
         return this;
     }
 
@@ -62,9 +62,9 @@ public final class PoseTransformStack implements TransformStack<PoseTransformSta
 
     @Override
     public PoseTransformStack rotate(Quaternionfc quaternion) {
-        MatrixStack.Entry pose = stack.peek();
-        pose.getPositionMatrix().rotate(quaternion);
-        pose.getNormalMatrix().rotate(quaternion);
+        PoseStack.Pose pose = stack.last();
+        pose.pose().rotate(quaternion);
+        pose.normal().rotate(quaternion);
         return this;
     }
 
@@ -74,7 +74,7 @@ public final class PoseTransformStack implements TransformStack<PoseTransformSta
         return this;
     }
 
-    public MatrixStack unwrap() {
+    public PoseStack unwrap() {
         return stack;
     }
 }

@@ -6,34 +6,34 @@ import com.zurrtum.create.AllRecipeSets;
 import com.zurrtum.create.AllRecipeTypes;
 import com.zurrtum.create.foundation.advancement.CreateTrigger;
 import com.zurrtum.create.foundation.utility.BlockHelper;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.component.DataComponentTypes;
-import net.minecraft.entity.EquipmentSlot;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.BlockItem;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.recipe.RecipeEntry;
-import net.minecraft.recipe.RecipeManager;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.sound.SoundCategory;
-import net.minecraft.sound.SoundEvents;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.Hand;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.RecipeAccess;
+import net.minecraft.world.item.crafting.RecipeHolder;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.BlockHitResult;
 
 import java.util.Optional;
 
 public class ManualApplicationHelper {
-    public static ActionResult manualApplicationRecipesApplyInWorld(
-        World level,
-        PlayerEntity player,
+    public static InteractionResult manualApplicationRecipesApplyInWorld(
+        Level level,
+        Player player,
         ItemStack heldItem,
-        Hand hand,
+        InteractionHand hand,
         BlockHitResult hit,
         BlockPos pos
     ) {
@@ -44,65 +44,65 @@ public class ManualApplicationHelper {
         if (blockState.isAir())
             return null;
 
-        ItemStack block = blockState.getBlock().asItem().getDefaultStack();
-        if (level.isClient()) {
-            RecipeManager recipeManager = level.getRecipeManager();
-            if (recipeManager.getPropertySet(AllRecipeSets.ITEM_APPLICATION_TARGET)
-                .canUse(block) && recipeManager.getPropertySet(AllRecipeSets.ITEM_APPLICATION_INGREDIENT).canUse(heldItem)) {
-                return ActionResult.SUCCESS;
+        ItemStack block = blockState.getBlock().asItem().getDefaultInstance();
+        if (level.isClientSide()) {
+            RecipeAccess recipeManager = level.recipeAccess();
+            if (recipeManager.propertySet(AllRecipeSets.ITEM_APPLICATION_TARGET)
+                .test(block) && recipeManager.propertySet(AllRecipeSets.ITEM_APPLICATION_INGREDIENT).test(heldItem)) {
+                return InteractionResult.SUCCESS;
             }
             return null;
         }
 
         ItemApplicationInput input = new ItemApplicationInput(block, heldItem);
-        Optional<RecipeEntry<ManualApplicationRecipe>> foundRecipe = ((ServerWorld) level).getRecipeManager()
-            .getFirstMatch(AllRecipeTypes.ITEM_APPLICATION, input, level);
+        Optional<RecipeHolder<ManualApplicationRecipe>> foundRecipe = ((ServerLevel) level).recipeAccess()
+            .getRecipeFor(AllRecipeTypes.ITEM_APPLICATION, input, level);
         if (foundRecipe.isEmpty()) {
             return null;
         }
 
-        level.playSound(null, pos, SoundEvents.BLOCK_COPPER_BREAK, SoundCategory.PLAYERS, 1, 1.45f);
+        level.playSound(null, pos, SoundEvents.COPPER_BREAK, SoundSource.PLAYERS, 1, 1.45f);
         ManualApplicationRecipe recipe = foundRecipe.get().value();
-        level.breakBlock(pos, false);
+        level.destroyBlock(pos, false);
 
-        ItemStack stack = recipe.craft(input, level.getRegistryManager());
+        ItemStack stack = recipe.assemble(input, level.registryAccess());
         Item item = stack.getItem();
         if (item instanceof BlockItem blockItem) {
-            BlockState transformedBlock = BlockHelper.copyProperties(blockState, blockItem.getBlock().getDefaultState());
-            level.setBlockState(pos, transformedBlock, Block.NOTIFY_ALL);
-            awardAdvancements((ServerPlayerEntity) player, transformedBlock);
+            BlockState transformedBlock = BlockHelper.copyProperties(blockState, blockItem.getBlock().defaultBlockState());
+            level.setBlock(pos, transformedBlock, Block.UPDATE_ALL);
+            awardAdvancements((ServerPlayer) player, transformedBlock);
         } else {
-            Block.dropStack(level, pos, stack);
+            Block.popResource(level, pos, stack);
         }
 
-        if (!heldItem.contains(DataComponentTypes.UNBREAKABLE) && !player.isCreative() && !recipe.keepHeldItem()) {
+        if (!heldItem.has(DataComponents.UNBREAKABLE) && !player.isCreative() && !recipe.keepHeldItem()) {
             if (heldItem.getMaxDamage() > 0) {
-                heldItem.damage(1, player, EquipmentSlot.MAINHAND);
+                heldItem.hurtAndBreak(1, player, EquipmentSlot.MAINHAND);
             } else {
-                ItemStack leftover = heldItem.getItem().getRecipeRemainder();
-                heldItem.decrement(1);
+                ItemStack leftover = heldItem.getItem().getCraftingRemainder();
+                heldItem.shrink(1);
                 if (!leftover.isEmpty()) {
                     if (heldItem.isEmpty()) {
-                        player.setStackInHand(hand, leftover);
-                    } else if (!player.getInventory().insertStack(leftover)) {
-                        player.dropItem(leftover, false);
+                        player.setItemInHand(hand, leftover);
+                    } else if (!player.getInventory().add(leftover)) {
+                        player.drop(leftover, false);
                     }
                 }
             }
         }
-        return ActionResult.SUCCESS;
+        return InteractionResult.SUCCESS;
     }
 
-    private static void awardAdvancements(ServerPlayerEntity player, BlockState placed) {
+    private static void awardAdvancements(ServerPlayer player, BlockState placed) {
         CreateTrigger advancement;
 
-        if (placed.isOf(AllBlocks.ANDESITE_CASING))
+        if (placed.is(AllBlocks.ANDESITE_CASING))
             advancement = AllAdvancements.ANDESITE_CASING;
-        else if (placed.isOf(AllBlocks.BRASS_CASING))
+        else if (placed.is(AllBlocks.BRASS_CASING))
             advancement = AllAdvancements.BRASS_CASING;
-        else if (placed.isOf(AllBlocks.COPPER_CASING))
+        else if (placed.is(AllBlocks.COPPER_CASING))
             advancement = AllAdvancements.COPPER_CASING;
-        else if (placed.isOf(AllBlocks.RAILWAY_CASING))
+        else if (placed.is(AllBlocks.RAILWAY_CASING))
             advancement = AllAdvancements.TRAIN_CASING;
         else
             return;

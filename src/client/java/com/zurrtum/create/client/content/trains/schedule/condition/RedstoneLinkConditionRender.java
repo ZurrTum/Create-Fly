@@ -8,9 +8,9 @@ import com.zurrtum.create.client.foundation.gui.ModularGuiLineBuilder;
 import com.zurrtum.create.client.foundation.utility.CreateLang;
 import com.zurrtum.create.content.redstone.link.RedstoneLinkNetworkHandler.Frequency;
 import com.zurrtum.create.content.trains.schedule.condition.RedstoneLinkCondition;
-import net.minecraft.item.ItemStack;
-import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.item.ItemStack;
 
 import java.util.List;
 
@@ -21,26 +21,28 @@ public class RedstoneLinkConditionRender implements IScheduleInput<RedstoneLinkC
     }
 
     @Override
-    public Pair<ItemStack, Text> getSummary(RedstoneLinkCondition input) {
+    public Pair<ItemStack, Component> getSummary(RedstoneLinkCondition input) {
         return Pair.of(
-            AllItems.REDSTONE_LINK.getDefaultStack(),
+            AllItems.REDSTONE_LINK.getDefaultInstance(),
             input.lowActivation() ? CreateLang.translateDirect("schedule.condition.redstone_link_off") : CreateLang.translateDirect(
                 "schedule.condition.redstone_link_on")
         );
     }
 
     @Override
-    public List<Text> getSecondLineTooltip(int slot) {
+    public List<Component> getSecondLineTooltip(int slot) {
         return ImmutableList.of(CreateLang.translateDirect(slot == 0 ? "logistics.firstFrequency" : "logistics.secondFrequency")
-            .formatted(Formatting.RED));
+            .withStyle(ChatFormatting.RED));
     }
 
     @Override
-    public List<Text> getTitleAs(RedstoneLinkCondition input, String type) {
+    public List<Component> getTitleAs(RedstoneLinkCondition input, String type) {
         return ImmutableList.of(
             CreateLang.translateDirect("schedule.condition.redstone_link.frequency_" + (input.lowActivation() ? "unpowered" : "powered")),
-            Text.literal(" #1 ").formatted(Formatting.GRAY).append(input.freq.getFirst().getStack().getName().copy().formatted(Formatting.DARK_AQUA)),
-            Text.literal(" #2 ").formatted(Formatting.GRAY).append(input.freq.getSecond().getStack().getName().copy().formatted(Formatting.DARK_AQUA))
+            Component.literal(" #1 ").withStyle(ChatFormatting.GRAY)
+                .append(input.freq.getFirst().getStack().getHoverName().copy().withStyle(ChatFormatting.DARK_AQUA)),
+            Component.literal(" #2 ").withStyle(ChatFormatting.GRAY)
+                .append(input.freq.getSecond().getStack().getHoverName().copy().withStyle(ChatFormatting.DARK_AQUA))
         );
     }
 

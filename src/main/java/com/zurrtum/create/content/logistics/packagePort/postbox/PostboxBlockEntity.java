@@ -7,15 +7,14 @@ import com.zurrtum.create.catnip.animation.LerpedFloat.Chaser;
 import com.zurrtum.create.content.logistics.packagePort.PackagePortBlockEntity;
 import com.zurrtum.create.content.trains.station.GlobalPackagePort;
 import com.zurrtum.create.content.trains.station.GlobalStation;
-import net.minecraft.block.BlockState;
-import net.minecraft.item.BoneMealItem;
-import net.minecraft.sound.SoundCategory;
-import net.minecraft.sound.SoundEvents;
-import net.minecraft.storage.ReadView;
-import net.minecraft.storage.WriteView;
-import net.minecraft.util.math.BlockPos;
-
 import java.lang.ref.WeakReference;
+import net.minecraft.core.BlockPos;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.item.BoneMealItem;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 
 public class PostboxBlockEntity extends PackagePortBlockEntity {
 
@@ -45,7 +44,7 @@ public class PostboxBlockEntity extends PackagePortBlockEntity {
     @Override
     public void tick() {
         super.tick();
-        if (!world.isClient() && !isVirtual()) {
+        if (!level.isClientSide() && !isVirtual()) {
             if (sendParticles)
                 sendData();
             return;
@@ -57,24 +56,24 @@ public class PostboxBlockEntity extends PackagePortBlockEntity {
             if (target != currentTarget) {
                 flag.chase(target, 0.1f, Chaser.LINEAR);
                 if (target == 1)
-                    AllSoundEvents.CONTRAPTION_ASSEMBLE.playAt(world, pos, 1, 2, true);
+                    AllSoundEvents.CONTRAPTION_ASSEMBLE.playAt(level, worldPosition, 1, 2, true);
             }
         }
         boolean settled = flag.getValue() > .15f;
         flag.tickChaser();
         if (currentTarget == 0 && settled != flag.getValue() > .15f)
-            AllSoundEvents.CONTRAPTION_DISASSEMBLE.playAt(world, pos, 0.75f, 1.5f, true);
+            AllSoundEvents.CONTRAPTION_DISASSEMBLE.playAt(level, worldPosition, 0.75f, 1.5f, true);
 
         if (sendParticles) {
             sendParticles = false;
-            BoneMealItem.createParticles(world, pos, 40);
+            BoneMealItem.addGrowthParticles(level, worldPosition, 40);
         }
     }
 
     @Override
     protected void onOpenChange(boolean open) {
-        world.setBlockState(pos, getCachedState().with(PostboxBlock.OPEN, open));
-        world.playSound(null, pos, open ? SoundEvents.BLOCK_BARREL_OPEN : SoundEvents.BLOCK_BARREL_CLOSE, SoundCategory.BLOCKS);
+        level.setBlockAndUpdate(worldPosition, getBlockState().setValue(PostboxBlock.OPEN, open));
+        level.playSound(null, worldPosition, open ? SoundEvents.BARREL_OPEN : SoundEvents.BARREL_CLOSE, SoundSource.BLOCKS);
     }
 
     public void spawnParticles() {
@@ -82,7 +81,7 @@ public class PostboxBlockEntity extends PackagePortBlockEntity {
     }
 
     @Override
-    protected void write(WriteView view, boolean clientPacket) {
+    protected void write(ValueOutput view, boolean clientPacket) {
         super.write(view, clientPacket);
         if (clientPacket && sendParticles)
             view.putBoolean("Particles", true);
@@ -90,26 +89,26 @@ public class PostboxBlockEntity extends PackagePortBlockEntity {
     }
 
     @Override
-    protected void read(ReadView view, boolean clientPacket) {
+    protected void read(ValueInput view, boolean clientPacket) {
         super.read(view, clientPacket);
-        sendParticles = clientPacket && view.getBoolean("Particles", false);
+        sendParticles = clientPacket && view.getBooleanOr("Particles", false);
     }
 
     @Override
-    public void markDirty() {
+    public void setChanged() {
         saveOfflineBuffer();
-        super.markDirty();
+        super.setChanged();
     }
 
     private void saveOfflineBuffer() {
-        if (world == null || world.isClient()) {
+        if (level == null || level.isClientSide()) {
             return;
         }
         GlobalStation station = trackedGlobalStation.get();
         if (station == null) {
             return;
         }
-        GlobalPackagePort globalPackagePort = station.connectedPorts.get(pos);
+        GlobalPackagePort globalPackagePort = station.connectedPorts.get(worldPosition);
         if (globalPackagePort == null) {
             return;
         }

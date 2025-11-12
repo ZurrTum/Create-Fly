@@ -5,14 +5,13 @@ import com.zurrtum.create.client.flywheel.backend.glsl.span.CharPos;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.ints.IntList;
 import it.unimi.dsi.fastutil.ints.IntLists;
-import net.minecraft.util.Identifier;
-
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import net.minecraft.resources.ResourceLocation;
 
 public class SourceLines implements CharSequence {
     private static final Pattern NEW_LINE = Pattern.compile("(\\r\\n|\\r|\\n)");
-    public final Identifier name;
+    public final ResourceLocation name;
     /**
      * 0-indexed line to char pos mapping.
      */
@@ -23,7 +22,7 @@ public class SourceLines implements CharSequence {
     private final ImmutableList<String> lines;
     public final String raw;
 
-    public SourceLines(Identifier name, String raw) {
+    public SourceLines(ResourceLocation name, String raw) {
         this.name = name;
         this.raw = raw;
         this.lineStarts = createLineLookup(raw);

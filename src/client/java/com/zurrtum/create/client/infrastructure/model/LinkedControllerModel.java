@@ -2,6 +2,8 @@ package com.zurrtum.create.client.infrastructure.model;
 
 import com.google.common.base.Supplier;
 import com.google.common.base.Suppliers;
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.math.Axis;
 import com.mojang.serialization.MapCodec;
 import com.zurrtum.create.AllItems;
 import com.zurrtum.create.catnip.animation.LerpedFloat;
@@ -9,27 +11,25 @@ import com.zurrtum.create.catnip.animation.LerpedFloat.Chaser;
 import com.zurrtum.create.client.catnip.animation.AnimationTickHolder;
 import com.zurrtum.create.client.content.redstone.link.controller.LinkedControllerClientHandler;
 import com.zurrtum.create.client.content.redstone.link.controller.LinkedControllerClientHandler.Mode;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.item.ItemModelManager;
-import net.minecraft.client.render.RenderLayer;
-import net.minecraft.client.render.TexturedRenderLayers;
-import net.minecraft.client.render.command.OrderedRenderCommandQueue;
-import net.minecraft.client.render.item.ItemRenderState;
-import net.minecraft.client.render.item.ItemRenderState.LayerRenderState;
-import net.minecraft.client.render.item.model.BasicItemModel;
-import net.minecraft.client.render.item.model.ItemModel;
-import net.minecraft.client.render.item.model.special.SpecialModelRenderer;
-import net.minecraft.client.render.model.*;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.client.world.ClientWorld;
-import net.minecraft.item.ItemDisplayContext;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.Arm;
-import net.minecraft.util.HeldItemContext;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.Util;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.RotationAxis;
+import net.minecraft.Util;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.client.renderer.Sheets;
+import net.minecraft.client.renderer.SubmitNodeCollector;
+import net.minecraft.client.renderer.block.model.BakedQuad;
+import net.minecraft.client.renderer.block.model.TextureSlots;
+import net.minecraft.client.renderer.item.*;
+import net.minecraft.client.renderer.item.ItemStackRenderState.LayerRenderState;
+import net.minecraft.client.renderer.special.SpecialModelRenderer;
+import net.minecraft.client.resources.model.BlockModelRotation;
+import net.minecraft.client.resources.model.ModelBaker;
+import net.minecraft.client.resources.model.ResolvedModel;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.Mth;
+import net.minecraft.world.entity.HumanoidArm;
+import net.minecraft.world.entity.ItemOwner;
+import net.minecraft.world.item.ItemDisplayContext;
+import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
 
@@ -40,11 +40,11 @@ import java.util.Set;
 import static com.zurrtum.create.Create.MOD_ID;
 
 public class LinkedControllerModel implements ItemModel, SpecialModelRenderer<LinkedControllerModel.RenderData> {
-    public static final Identifier ID = Identifier.of(MOD_ID, "model/linked_controller");
-    public static final Identifier ITEM_ID = Identifier.of(MOD_ID, "item/linked_controller/item");
-    public static final Identifier POWERED_ID = Identifier.of(MOD_ID, "item/linked_controller/powered");
-    public static final Identifier TORCH_ID = Identifier.of(MOD_ID, "item/linked_controller/torch");
-    public static final Identifier BUTTON_ID = Identifier.of(MOD_ID, "item/linked_controller/button");
+    public static final ResourceLocation ID = ResourceLocation.fromNamespaceAndPath(MOD_ID, "model/linked_controller");
+    public static final ResourceLocation ITEM_ID = ResourceLocation.fromNamespaceAndPath(MOD_ID, "item/linked_controller/item");
+    public static final ResourceLocation POWERED_ID = ResourceLocation.fromNamespaceAndPath(MOD_ID, "item/linked_controller/powered");
+    public static final ResourceLocation TORCH_ID = ResourceLocation.fromNamespaceAndPath(MOD_ID, "item/linked_controller/torch");
+    public static final ResourceLocation BUTTON_ID = ResourceLocation.fromNamespaceAndPath(MOD_ID, "item/linked_controller/button");
 
     private static final LerpedFloat equipProgress = LerpedFloat.linear().startWithValue(0);
     private static final List<LerpedFloat> buttons = Util.make(
@@ -54,7 +54,7 @@ public class LinkedControllerModel implements ItemModel, SpecialModelRenderer<Li
         }
     );
 
-    public static void tick(MinecraftClient mc) {
+    public static void tick(Minecraft mc) {
         if (mc.isPaused())
             return;
 
@@ -78,10 +78,10 @@ public class LinkedControllerModel implements ItemModel, SpecialModelRenderer<Li
         }
     }
 
-    private final RenderLayer itemLayer = TexturedRenderLayers.getItemEntityTranslucentCull();
-    private final RenderLayer cutoutLayer = RenderLayer.getCutout();
+    private final net.minecraft.client.renderer.RenderType itemLayer = Sheets.translucentItemSheet();
+    private final net.minecraft.client.renderer.RenderType cutoutLayer = net.minecraft.client.renderer.RenderType.cutout();
     private final int[] tints = new int[0];
-    private final ModelSettings settings;
+    private final ModelRenderProperties settings;
     private final Supplier<Vector3f[]> vector;
     private final List<BakedQuad> item;
     private final List<BakedQuad> powered;
@@ -89,7 +89,7 @@ public class LinkedControllerModel implements ItemModel, SpecialModelRenderer<Li
     private final List<BakedQuad> button;
 
     public LinkedControllerModel(
-        ModelSettings settings,
+        ModelRenderProperties settings,
         List<BakedQuad> item,
         List<BakedQuad> powered,
         List<BakedQuad> torch,
@@ -97,7 +97,7 @@ public class LinkedControllerModel implements ItemModel, SpecialModelRenderer<Li
     ) {
         this.settings = settings;
         this.item = item;
-        this.vector = Suppliers.memoize(() -> BasicItemModel.bakeQuads(item));
+        this.vector = Suppliers.memoize(() -> BlockModelWrapper.computeExtents(item));
         this.powered = powered;
         this.torch = torch;
         this.button = button;
@@ -105,46 +105,46 @@ public class LinkedControllerModel implements ItemModel, SpecialModelRenderer<Li
 
     @Override
     public void update(
-        ItemRenderState state,
+        ItemStackRenderState state,
         ItemStack stack,
-        ItemModelManager resolver,
+        ItemModelResolver resolver,
         ItemDisplayContext displayContext,
-        @Nullable ClientWorld world,
-        @Nullable HeldItemContext user,
+        @Nullable ClientLevel world,
+        @Nullable ItemOwner user,
         int seed
     ) {
-        state.addModelKey(this);
-        state.markAnimated();
+        state.appendModelIdentityElement(this);
+        state.setAnimated();
         LayerRenderState layerRenderState = state.newLayer();
-        layerRenderState.setVertices(vector);
-        settings.addSettings(layerRenderState, displayContext);
+        layerRenderState.setExtents(vector);
+        settings.applyToLayer(layerRenderState, displayContext);
 
         RenderData data = new RenderData();
-        MinecraftClient mc = MinecraftClient.getInstance();
-        boolean rightHanded = mc.options.getMainArm().getValue() == Arm.RIGHT;
+        Minecraft mc = Minecraft.getInstance();
+        boolean rightHanded = mc.options.mainHand().get() == HumanoidArm.RIGHT;
         ItemDisplayContext mainHand = rightHanded ? ItemDisplayContext.FIRST_PERSON_RIGHT_HAND : ItemDisplayContext.FIRST_PERSON_LEFT_HAND;
         ItemDisplayContext offHand = rightHanded ? ItemDisplayContext.FIRST_PERSON_LEFT_HAND : ItemDisplayContext.FIRST_PERSON_RIGHT_HAND;
-        boolean noControllerInMain = !mc.player.getMainHandStack().isOf(AllItems.LINKED_CONTROLLER);
+        boolean noControllerInMain = !mc.player.getMainHandItem().is(AllItems.LINKED_CONTROLLER);
         if (displayContext == mainHand || (displayContext == offHand && noControllerInMain)) {
             data.equip = true;
             data.active = true;
         }
         if (displayContext == ItemDisplayContext.GUI) {
-            if (stack == mc.player.getMainHandStack())
+            if (stack == mc.player.getMainHandItem())
                 data.active = true;
-            if (stack == mc.player.getOffHandStack() && noControllerInMain)
+            if (stack == mc.player.getOffhandItem() && noControllerInMain)
                 data.active = true;
         }
         data.active &= LinkedControllerClientHandler.MODE != Mode.IDLE;
-        layerRenderState.setSpecialModel(this, data);
+        layerRenderState.setupSpecialModel(this, data);
     }
 
     @Override
-    public void render(
+    public void submit(
         LinkedControllerModel.RenderData data,
         ItemDisplayContext displayContext,
-        MatrixStack matrices,
-        OrderedRenderCommandQueue queue,
+        PoseStack matrices,
+        SubmitNodeCollector queue,
         int light,
         int overlay,
         boolean glint,
@@ -156,8 +156,8 @@ public class LinkedControllerModel implements ItemModel, SpecialModelRenderer<Li
 
     public void renderInLectern(
         ItemDisplayContext displayContext,
-        MatrixStack matrices,
-        OrderedRenderCommandQueue queue,
+        PoseStack matrices,
+        SubmitNodeCollector queue,
         int light,
         int overlay,
         boolean active,
@@ -168,8 +168,8 @@ public class LinkedControllerModel implements ItemModel, SpecialModelRenderer<Li
 
     private void render(
         ItemDisplayContext displayContext,
-        MatrixStack matrices,
-        OrderedRenderCommandQueue queue,
+        PoseStack matrices,
+        SubmitNodeCollector queue,
         int light,
         int overlay,
         RenderType renderType,
@@ -178,7 +178,7 @@ public class LinkedControllerModel implements ItemModel, SpecialModelRenderer<Li
         boolean renderDepression
     ) {
         float pt = -1;
-        matrices.push();
+        matrices.pushPose();
 
         if (equip) {
             pt = AnimationTickHolder.getPartialTicks();
@@ -186,21 +186,21 @@ public class LinkedControllerModel implements ItemModel, SpecialModelRenderer<Li
             int handModifier = displayContext == ItemDisplayContext.FIRST_PERSON_LEFT_HAND ? -1 : 1;
             matrices.translate(0, progress / 4, progress / 4 * handModifier);
             matrices.translate(0.5f, 0.5f, 0.5f);
-            matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(progress * -30 * handModifier));
-            matrices.multiply(RotationAxis.POSITIVE_Z.rotationDegrees(progress * -30));
+            matrices.mulPose(Axis.YP.rotationDegrees(progress * -30 * handModifier));
+            matrices.mulPose(Axis.ZP.rotationDegrees(progress * -30));
             matrices.translate(-0.5f, -0.5f, -0.5f);
         }
 
         renderQuads(displayContext, matrices, queue, light, overlay, itemLayer, active ? powered : item);
 
         if (!active) {
-            matrices.pop();
+            matrices.popPose();
             return;
         }
         renderQuads(displayContext, matrices, queue, light, overlay, cutoutLayer, torch);
         if (renderType == RenderType.NORMAL) {
             if (LinkedControllerClientHandler.MODE == Mode.BIND) {
-                int i = MathHelper.lerp((MathHelper.sin(AnimationTickHolder.getRenderTime() / 4f) + 1) / 2, 5, 15);
+                int i = Mth.lerpInt((Mth.sin(AnimationTickHolder.getRenderTime() / 4f) + 1) / 2, 5, 15);
                 light = i << 20;
             }
         }
@@ -210,7 +210,7 @@ public class LinkedControllerModel implements ItemModel, SpecialModelRenderer<Li
         if (pt == -1) {
             pt = AnimationTickHolder.getPartialTicks();
         }
-        matrices.push();
+        matrices.pushPose();
         matrices.translate(2 * s, 0, 8 * s);
         renderButton(displayContext, matrices, queue, light, overlay, button, pt, b, index++, renderDepression);
         matrices.translate(4 * s, 0, 0);
@@ -219,20 +219,20 @@ public class LinkedControllerModel implements ItemModel, SpecialModelRenderer<Li
         renderButton(displayContext, matrices, queue, light, overlay, button, pt, b, index++, renderDepression);
         matrices.translate(0, 0, -4 * s);
         renderButton(displayContext, matrices, queue, light, overlay, button, pt, b, index++, renderDepression);
-        matrices.pop();
+        matrices.popPose();
 
         matrices.translate(3 * s, 0, 3 * s);
         renderButton(displayContext, matrices, queue, light, overlay, button, pt, b, index++, renderDepression);
         matrices.translate(2 * s, 0, 0);
         renderButton(displayContext, matrices, queue, light, overlay, button, pt, b, index, renderDepression);
 
-        matrices.pop();
+        matrices.popPose();
     }
 
     private void renderButton(
         ItemDisplayContext displayContext,
-        MatrixStack matrices,
-        OrderedRenderCommandQueue queue,
+        PoseStack matrices,
+        SubmitNodeCollector queue,
         int light,
         int overlay,
         List<BakedQuad> button,
@@ -241,25 +241,25 @@ public class LinkedControllerModel implements ItemModel, SpecialModelRenderer<Li
         int index,
         boolean renderDepression
     ) {
-        matrices.push();
+        matrices.pushPose();
         if (renderDepression) {
             float depression = b * buttons.get(index).getValue(pt);
             matrices.translate(0, depression, 0);
         }
         renderQuads(displayContext, matrices, queue, light, overlay, itemLayer, button);
-        matrices.pop();
+        matrices.popPose();
     }
 
     private void renderQuads(
         ItemDisplayContext displayContext,
-        MatrixStack matrices,
-        OrderedRenderCommandQueue queue,
+        PoseStack matrices,
+        SubmitNodeCollector queue,
         int light,
         int overlay,
-        RenderLayer layer,
+        net.minecraft.client.renderer.RenderType layer,
         List<BakedQuad> quads
     ) {
-        queue.submitItem(matrices, displayContext, light, overlay, 0, tints, quads, layer, ItemRenderState.Glint.NONE);
+        queue.submitItem(matrices, displayContext, light, overlay, 0, tints, quads, layer, ItemStackRenderState.FoilType.NONE);
     }
 
     public static class RenderData {
@@ -268,25 +268,25 @@ public class LinkedControllerModel implements ItemModel, SpecialModelRenderer<Li
     }
 
     @Override
-    public void collectVertices(Set<Vector3f> vertices) {
+    public void getExtents(Set<Vector3f> vertices) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public RenderData getData(ItemStack stack) {
+    public RenderData extractArgument(ItemStack stack) {
         throw new UnsupportedOperationException();
     }
 
     public static class Unbaked implements ItemModel.Unbaked {
-        public static final MapCodec<Unbaked> CODEC = MapCodec.unit(Unbaked::new);
+        public static final MapCodec<com.zurrtum.create.client.infrastructure.model.LinkedControllerModel.Unbaked> CODEC = MapCodec.unit(com.zurrtum.create.client.infrastructure.model.LinkedControllerModel.Unbaked::new);
 
         @Override
-        public MapCodec<Unbaked> getCodec() {
+        public MapCodec<com.zurrtum.create.client.infrastructure.model.LinkedControllerModel.Unbaked> type() {
             return CODEC;
         }
 
         @Override
-        public void resolve(Resolver resolver) {
+        public void resolveDependencies(Resolver resolver) {
             resolver.markDependency(ITEM_ID);
             resolver.markDependency(POWERED_ID);
             resolver.markDependency(TORCH_ID);
@@ -294,18 +294,18 @@ public class LinkedControllerModel implements ItemModel, SpecialModelRenderer<Li
         }
 
         @Override
-        public ItemModel bake(ItemModel.BakeContext context) {
-            Baker baker = context.blockModelBaker();
-            BakedSimpleModel model = baker.getModel(ITEM_ID);
-            ModelTextures textures = model.getTextures();
-            List<BakedQuad> quads = model.bakeGeometry(textures, baker, ModelRotation.X0_Y0).getAllQuads();
-            ModelSettings settings = ModelSettings.resolveSettings(baker, model, textures);
+        public ItemModel bake(ItemModel.BakingContext context) {
+            ModelBaker baker = context.blockModelBaker();
+            ResolvedModel model = baker.getModel(ITEM_ID);
+            TextureSlots textures = model.getTopTextureSlots();
+            List<BakedQuad> quads = model.bakeTopGeometry(textures, baker, BlockModelRotation.X0_Y0).getAll();
+            ModelRenderProperties settings = ModelRenderProperties.fromResolvedModel(baker, model, textures);
             return new LinkedControllerModel(settings, quads, bakeQuads(baker, POWERED_ID), bakeQuads(baker, TORCH_ID), bakeQuads(baker, BUTTON_ID));
         }
 
-        private static List<BakedQuad> bakeQuads(Baker baker, Identifier id) {
-            BakedSimpleModel model = baker.getModel(id);
-            return model.bakeGeometry(model.getTextures(), baker, ModelRotation.X0_Y0).getAllQuads();
+        private static List<BakedQuad> bakeQuads(ModelBaker baker, ResourceLocation id) {
+            ResolvedModel model = baker.getModel(id);
+            return model.bakeTopGeometry(model.getTopTextureSlots(), baker, BlockModelRotation.X0_Y0).getAll();
         }
     }
 

@@ -1,48 +1,47 @@
 package com.zurrtum.create.foundation.codec;
 
 import io.netty.buffer.ByteBuf;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.network.PacketByteBuf;
-import net.minecraft.network.RegistryByteBuf;
-import net.minecraft.network.codec.PacketCodec;
-import net.minecraft.network.codec.PacketCodecs;
-import net.minecraft.registry.RegistryWrapper;
-
 import java.util.Vector;
 import java.util.function.BiFunction;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
 
 public interface CreateStreamCodecs {
     /**
      * @deprecated Vector should be replaced with list
      */
     @Deprecated(forRemoval = true)
-    static <B extends ByteBuf, V> PacketCodec.ResultFunction<B, V, Vector<V>> vector() {
-        return codec -> PacketCodecs.collection(Vector::new, codec);
+    static <B extends ByteBuf, V> StreamCodec.CodecOperation<B, V, Vector<V>> vector() {
+        return codec -> ByteBufCodecs.collection(Vector::new, codec);
     }
 
-    static <C> PacketCodec<RegistryByteBuf, C> ofLegacyNbtWithRegistries(
-        BiFunction<C, RegistryWrapper.WrapperLookup, NbtCompound> writer,
-        BiFunction<RegistryWrapper.WrapperLookup, NbtCompound, C> reader
+    static <C> StreamCodec<RegistryFriendlyByteBuf, C> ofLegacyNbtWithRegistries(
+        BiFunction<C, HolderLookup.Provider, CompoundTag> writer,
+        BiFunction<HolderLookup.Provider, CompoundTag, C> reader
     ) {
-        return new PacketCodec<>() {
+        return new StreamCodec<>() {
             @Override
-            public C decode(RegistryByteBuf buffer) {
-                return reader.apply(buffer.getRegistryManager(), buffer.readNbt());
+            public C decode(RegistryFriendlyByteBuf buffer) {
+                return reader.apply(buffer.registryAccess(), buffer.readNbt());
             }
 
             @Override
-            public void encode(RegistryByteBuf buffer, C value) {
-                buffer.writeNbt(writer.apply(value, buffer.getRegistryManager()));
+            public void encode(RegistryFriendlyByteBuf buffer, C value) {
+                buffer.writeNbt(writer.apply(value, buffer.registryAccess()));
             }
         };
     }
 
-    PacketCodec<PacketByteBuf, byte[]> UNBOUNDED_BYTE_ARRAY = new PacketCodec<>() {
-        public byte[] decode(PacketByteBuf buf) {
+    StreamCodec<FriendlyByteBuf, byte[]> UNBOUNDED_BYTE_ARRAY = new StreamCodec<>() {
+        public byte[] decode(FriendlyByteBuf buf) {
             return buf.readByteArray();
         }
 
-        public void encode(PacketByteBuf buf, byte[] data) {
+        public void encode(FriendlyByteBuf buf, byte[] data) {
             buf.writeByteArray(data);
         }
     };

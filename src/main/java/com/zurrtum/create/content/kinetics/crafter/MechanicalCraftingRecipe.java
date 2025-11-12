@@ -7,46 +7,42 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.zurrtum.create.AllRecipeSerializers;
 import com.zurrtum.create.AllRecipeTypes;
 import com.zurrtum.create.foundation.recipe.CreateRecipe;
-import net.minecraft.item.ItemStack;
-import net.minecraft.network.RegistryByteBuf;
-import net.minecraft.network.codec.PacketCodec;
-import net.minecraft.network.codec.PacketCodecs;
-import net.minecraft.recipe.Ingredient;
-import net.minecraft.recipe.RawShapedRecipe;
-import net.minecraft.recipe.RecipeSerializer;
-import net.minecraft.recipe.RecipeType;
-import net.minecraft.recipe.input.CraftingRecipeInput;
-import net.minecraft.registry.RegistryWrapper;
-import net.minecraft.util.dynamic.Codecs;
-import net.minecraft.world.World;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.util.ExtraCodecs;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.*;
+import net.minecraft.world.level.Level;
 
 import java.util.List;
 import java.util.Optional;
 
-public record MechanicalCraftingRecipe(RawShapedRecipe raw, ItemStack result, boolean symmetrical) implements CreateRecipe<CraftingRecipeInput> {
+public record MechanicalCraftingRecipe(ShapedRecipePattern raw, ItemStack result, boolean symmetrical) implements CreateRecipe<CraftingInput> {
     @Override
-    public boolean matches(CraftingRecipeInput input, World worldIn) {
+    public boolean matches(CraftingInput input, Level worldIn) {
         if (symmetrical)
             return raw.matches(input);
 
         // From ShapedRecipe except the symmetry
-        if (input.getStackCount() != raw.ingredientCount) {
+        if (input.ingredientCount() != raw.ingredientCount) {
             return false;
         }
-        int width = raw.getWidth();
-        if (input.getWidth() != width) {
+        int width = raw.width();
+        if (input.width() != width) {
             return false;
         }
-        int height = raw.getHeight();
-        if (input.getHeight() != height) {
+        int height = raw.height();
+        if (input.height() != height) {
             return false;
         }
-        List<Optional<Ingredient>> ingredients = raw.getIngredients();
+        List<Optional<Ingredient>> ingredients = raw.ingredients();
         for (int i = 0; i < height; i++) {
             for (int j = 0; j < width; j++) {
                 Optional<Ingredient> optional = ingredients.get(j + i * width);
-                ItemStack itemStack = input.getStackInSlot(j, i);
-                if (!Ingredient.matches(optional, itemStack)) {
+                ItemStack itemStack = input.getItem(j, i);
+                if (!Ingredient.testOptionalIngredient(optional, itemStack)) {
                     return false;
                 }
             }
@@ -55,7 +51,7 @@ public record MechanicalCraftingRecipe(RawShapedRecipe raw, ItemStack result, bo
     }
 
     @Override
-    public ItemStack craft(CraftingRecipeInput craftingRecipeInput, RegistryWrapper.WrapperLookup wrapperLookup) {
+    public ItemStack assemble(CraftingInput craftingRecipeInput, HolderLookup.Provider wrapperLookup) {
         return result.copy();
     }
 
@@ -70,12 +66,12 @@ public record MechanicalCraftingRecipe(RawShapedRecipe raw, ItemStack result, bo
     }
 
     public static class Serializer implements RecipeSerializer<MechanicalCraftingRecipe> {
-        public static final MapCodec<RawShapedRecipe.Data> DATA_CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
-            Codecs.strictUnboundedMap(Codec.STRING.xmap(key -> key.charAt(0), String::valueOf), Ingredient.CODEC).fieldOf("key")
-                .forGetter(RawShapedRecipe.Data::key), Codec.STRING.listOf().fieldOf("pattern").forGetter(RawShapedRecipe.Data::pattern)
-        ).apply(instance, RawShapedRecipe.Data::new));
-        public static final MapCodec<RawShapedRecipe> RAW_CODEC = DATA_CODEC.flatXmap(
-            RawShapedRecipe::fromData,
+        public static final MapCodec<ShapedRecipePattern.Data> DATA_CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
+            ExtraCodecs.strictUnboundedMap(Codec.STRING.xmap(key -> key.charAt(0), String::valueOf), Ingredient.CODEC).fieldOf("key")
+                .forGetter(ShapedRecipePattern.Data::key), Codec.STRING.listOf().fieldOf("pattern").forGetter(ShapedRecipePattern.Data::pattern)
+        ).apply(instance, ShapedRecipePattern.Data::new));
+        public static final MapCodec<ShapedRecipePattern> RAW_CODEC = DATA_CODEC.flatXmap(
+            ShapedRecipePattern::unpack,
             recipe -> recipe.data.map(DataResult::success).orElseGet(() -> DataResult.error(() -> "Cannot encode unpacked recipe"))
         );
         public static final MapCodec<MechanicalCraftingRecipe> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
@@ -84,12 +80,12 @@ public record MechanicalCraftingRecipe(RawShapedRecipe raw, ItemStack result, bo
             Codec.BOOL.optionalFieldOf("accept_mirrored", false).forGetter(MechanicalCraftingRecipe::symmetrical)
         ).apply(instance, MechanicalCraftingRecipe::new));
 
-        public static final PacketCodec<RegistryByteBuf, MechanicalCraftingRecipe> PACKET_CODEC = PacketCodec.tuple(
-            RawShapedRecipe.PACKET_CODEC,
+        public static final StreamCodec<RegistryFriendlyByteBuf, MechanicalCraftingRecipe> PACKET_CODEC = StreamCodec.composite(
+            ShapedRecipePattern.STREAM_CODEC,
             MechanicalCraftingRecipe::raw,
-            ItemStack.PACKET_CODEC,
+            ItemStack.STREAM_CODEC,
             MechanicalCraftingRecipe::result,
-            PacketCodecs.BOOLEAN,
+            ByteBufCodecs.BOOL,
             MechanicalCraftingRecipe::symmetrical,
             MechanicalCraftingRecipe::new
         );
@@ -100,7 +96,7 @@ public record MechanicalCraftingRecipe(RawShapedRecipe raw, ItemStack result, bo
         }
 
         @Override
-        public PacketCodec<RegistryByteBuf, MechanicalCraftingRecipe> packetCodec() {
+        public StreamCodec<RegistryFriendlyByteBuf, MechanicalCraftingRecipe> streamCodec() {
             return PACKET_CODEC;
         }
     }

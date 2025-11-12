@@ -1,5 +1,6 @@
 package com.zurrtum.create.client.content.redstone.link;
 
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.datafixers.util.Pair;
 import com.zurrtum.create.catnip.data.Iterate;
 import com.zurrtum.create.client.Create;
@@ -10,48 +11,47 @@ import com.zurrtum.create.client.foundation.blockEntity.behaviour.ValueBoxTransf
 import com.zurrtum.create.client.foundation.utility.CreateLang;
 import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
 import com.zurrtum.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
-import net.minecraft.block.BlockState;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.item.ItemModelManager;
-import net.minecraft.client.render.command.OrderedRenderCommandQueue;
-import net.minecraft.client.render.item.ItemRenderState;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.client.world.ClientWorld;
-import net.minecraft.item.ItemDisplayContext;
-import net.minecraft.item.ItemStack;
-import net.minecraft.text.MutableText;
-import net.minecraft.text.Text;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.hit.HitResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.World;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.client.renderer.SubmitNodeCollector;
+import net.minecraft.client.renderer.item.ItemModelResolver;
+import net.minecraft.client.renderer.item.ItemStackRenderState;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.world.item.ItemDisplayContext;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.HitResult;
+import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class LinkRenderer {
-    public static void tick(MinecraftClient mc) {
-        HitResult target = mc.crosshairTarget;
+    public static void tick(Minecraft mc) {
+        HitResult target = mc.hitResult;
         if (!(target instanceof BlockHitResult result))
             return;
 
-        ClientWorld world = mc.world;
+        ClientLevel world = mc.level;
         BlockPos pos = result.getBlockPos();
 
         LinkBehaviour behaviour = BlockEntityBehaviour.get(world, pos, LinkBehaviour.TYPE);
         if (behaviour == null)
             return;
 
-        Text freq1 = CreateLang.translateDirect("logistics.firstFrequency");
-        Text freq2 = CreateLang.translateDirect("logistics.secondFrequency");
+        Component freq1 = CreateLang.translateDirect("logistics.firstFrequency");
+        Component freq2 = CreateLang.translateDirect("logistics.secondFrequency");
 
         for (boolean first : Iterate.trueAndFalse) {
-            Box bb = new Box(Vec3d.ZERO, Vec3d.ZERO).expand(.25f);
-            Text label = first ? freq1 : freq2;
-            boolean hit = behaviour.testHit(first, target.getPos());
+            AABB bb = new AABB(Vec3.ZERO, Vec3.ZERO).inflate(.25f);
+            Component label = first ? freq1 : freq2;
+            boolean hit = behaviour.testHit(first, target.getLocation());
             ValueBoxTransform transform = first ? behaviour.firstSlot : behaviour.secondSlot;
 
             ValueBox box = new ValueBox(label, bb, pos).passive(!hit);
@@ -60,12 +60,12 @@ public class LinkRenderer {
             if (!empty)
                 box.wideOutline();
 
-            Outliner.getInstance().showOutline(Pair.of(first, pos), box.transform(transform)).highlightFace(result.getSide());
+            Outliner.getInstance().showOutline(Pair.of(first, pos), box.transform(transform)).highlightFace(result.getDirection());
 
             if (!hit)
                 continue;
 
-            List<MutableText> tip = new ArrayList<>();
+            List<MutableComponent> tip = new ArrayList<>();
             tip.add(label.copy());
             tip.add(CreateLang.translateDirect(empty ? "logistics.filter.click_to_set" : "logistics.filter.click_to_replace"));
             Create.VALUE_SETTINGS_HANDLER.showHoverTip(mc, tip);
@@ -73,7 +73,7 @@ public class LinkRenderer {
     }
 
     @Nullable
-    public static LinkRenderState getLinkRenderState(SmartBlockEntity be, ItemModelManager itemModelManager, double distance) {
+    public static LinkRenderState getLinkRenderState(SmartBlockEntity be, ItemModelResolver itemModelManager, double distance) {
         LinkBehaviour behaviour = be.getBehaviour(LinkBehaviour.TYPE);
         if (behaviour == null || behaviour.behaviour == null) {
             return null;
@@ -88,26 +88,26 @@ public class LinkRenderer {
             itemModelManager,
             behaviour.getFirstStack(),
             behaviour.getLastStack(),
-            be.getWorld()
+            be.getLevel()
         );
     }
 
     public record LinkRenderState(
-        ValueBoxTransform firstSlot, ItemRenderState firstState, float firstOffset, ValueBoxTransform secondSlot, ItemRenderState secondState,
-        float secondOffset
+        ValueBoxTransform firstSlot, ItemStackRenderState firstState, float firstOffset, ValueBoxTransform secondSlot,
+        ItemStackRenderState secondState, float secondOffset
     ) {
         public static LinkRenderState create(
             ValueBoxTransform firstSlot,
             ValueBoxTransform secondSlot,
-            ItemModelManager itemModelManager,
+            ItemModelResolver itemModelManager,
             ItemStack firstStack,
             ItemStack secondStack,
-            World world
+            Level world
         ) {
-            ItemRenderState firstState = new ItemRenderState(), secondState = new ItemRenderState();
+            ItemStackRenderState firstState = new ItemStackRenderState(), secondState = new ItemStackRenderState();
             firstState.displayContext = secondState.displayContext = ItemDisplayContext.FIXED;
-            itemModelManager.update(firstState, firstStack, firstState.displayContext, world, null, 0);
-            itemModelManager.update(secondState, secondStack, secondState.displayContext, world, null, 0);
+            itemModelManager.appendItemLayers(firstState, firstStack, firstState.displayContext, world, null, 0);
+            itemModelManager.appendItemLayers(secondState, secondStack, secondState.displayContext, world, null, 0);
             return new LinkRenderState(
                 firstSlot,
                 firstState,
@@ -118,15 +118,15 @@ public class LinkRenderer {
             );
         }
 
-        public void render(BlockState blockState, OrderedRenderCommandQueue queue, MatrixStack ms, int light) {
-            ms.push();
+        public void render(BlockState blockState, SubmitNodeCollector queue, PoseStack ms, int light) {
+            ms.pushPose();
             firstSlot.transform(blockState, ms);
             ValueBoxRenderer.renderItemIntoValueBox(firstState, queue, ms, light, firstOffset);
-            ms.pop();
-            ms.push();
+            ms.popPose();
+            ms.pushPose();
             secondSlot.transform(blockState, ms);
             ValueBoxRenderer.renderItemIntoValueBox(secondState, queue, ms, light, secondOffset);
-            ms.pop();
+            ms.popPose();
         }
     }
 }

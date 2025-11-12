@@ -2,9 +2,9 @@ package com.zurrtum.create.content.fluids.tank;
 
 import it.unimi.dsi.fastutil.longs.LongArrayList;
 import it.unimi.dsi.fastutil.longs.LongList;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3i;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Vec3i;
+import net.minecraft.world.level.Level;
 
 /**
  * One person walking sounds like one person walking, and you can easily distinguish where they are.
@@ -36,7 +36,7 @@ public class SoundPool {
 
     private final LongList queuedPositions = new LongArrayList();
 
-    private final BlockPos.Mutable pos = new BlockPos.Mutable();
+    private final BlockPos.MutableBlockPos pos = new BlockPos.MutableBlockPos();
 
     private int ticks = 0;
 
@@ -54,7 +54,7 @@ public class SoundPool {
         queuedPositions.add(pos);
     }
 
-    public void play(World level) {
+    public void play(Level level) {
         if (queuedPositions.isEmpty()) {
             return;
         }
@@ -85,17 +85,17 @@ public class SoundPool {
         queuedPositions.clear();
     }
 
-    private void rollNextPosition(World level) {
+    private void rollNextPosition(Level level) {
         int index = level.random.nextInt(queuedPositions.size());
         long pos = queuedPositions.removeLong(index);
         playAt(level, pos);
     }
 
-    private void playAt(World level, long pos) {
+    private void playAt(Level level, long pos) {
         sound.playAt(level, this.pos.set(pos));
     }
 
     public interface Sound {
-        void playAt(World level, Vec3i pos);
+        void playAt(Level level, Vec3i pos);
     }
 }

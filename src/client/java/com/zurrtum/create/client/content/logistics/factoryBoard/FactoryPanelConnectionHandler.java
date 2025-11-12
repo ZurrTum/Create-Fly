@@ -10,41 +10,41 @@ import com.zurrtum.create.content.logistics.factoryBoard.*;
 import com.zurrtum.create.foundation.block.WrenchableDirectionalBlock;
 import com.zurrtum.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.infrastructure.packet.c2s.FactoryPanelConnectionPacket;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.client.world.ClientWorld;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.sound.SoundCategory;
-import net.minecraft.sound.SoundEvents;
-import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.hit.HitResult.Type;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.WorldAccess;
+import net.minecraft.ChatFormatting;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.network.chat.Component;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.HitResult.Type;
+import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 
 public class FactoryPanelConnectionHandler {
 
     static FactoryPanelPosition connectingFrom;
-    static Box connectingFromBox;
+    static AABB connectingFromBox;
 
     static boolean relocating;
     static FactoryPanelPosition validRelocationTarget;
 
-    public static boolean panelClicked(WorldAccess level, PlayerEntity player, ServerFactoryPanelBehaviour panel) {
+    public static boolean panelClicked(LevelAccessor level, Player player, ServerFactoryPanelBehaviour panel) {
         if (connectingFrom == null)
             return false;
 
         ServerFactoryPanelBehaviour at = ServerFactoryPanelBehaviour.at(level, connectingFrom);
         if (panel.getPanelPosition().equals(connectingFrom) || at == null) {
-            player.sendMessage(Text.empty(), true);
+            player.displayClientMessage(Component.empty(), true);
             connectingFrom = null;
             connectingFromBox = null;
             return true;
@@ -52,27 +52,29 @@ public class FactoryPanelConnectionHandler {
 
         String checkForIssues = checkForIssues(at, panel);
         if (checkForIssues != null) {
-            player.sendMessage(CreateLang.translate(checkForIssues).style(Formatting.RED).component(), true);
+            player.displayClientMessage(CreateLang.translate(checkForIssues).style(ChatFormatting.RED).component(), true);
             connectingFrom = null;
             connectingFromBox = null;
-            AllSoundEvents.DENY.playAt(player.getEntityWorld(), player.getBlockPos(), 1, 1, false);
+            AllSoundEvents.DENY.playAt(player.level(), player.blockPosition(), 1, 1, false);
             return true;
         }
 
         ItemStack filterFrom = panel.getFilter();
         ItemStack filterTo = at.getFilter();
 
-        ((ClientPlayerEntity) player).networkHandler.sendPacket(new FactoryPanelConnectionPacket(panel.getPanelPosition(), connectingFrom, false));
+        ((LocalPlayer) player).connection.send(new FactoryPanelConnectionPacket(panel.getPanelPosition(), connectingFrom, false));
 
-        player.sendMessage(
-            CreateLang.translate("factory_panel.panels_connected", filterFrom.getName().getString(), filterTo.getName().getString())
-                .style(Formatting.GREEN).component(), true
+        player.displayClientMessage(
+            CreateLang.translate(
+                "factory_panel.panels_connected",
+                filterFrom.getHoverName().getString(),
+                filterTo.getHoverName().getString()
+            ).style(ChatFormatting.GREEN).component(), true
         );
 
         connectingFrom = null;
         connectingFromBox = null;
-        player.getEntityWorld()
-            .playSoundAtBlockCenterClient(player.getBlockPos(), SoundEvents.BLOCK_AMETHYST_BLOCK_PLACE, SoundCategory.BLOCKS, 0.5f, 0.5f, false);
+        player.level().playLocalSound(player.blockPosition(), SoundEvents.AMETHYST_BLOCK_PLACE, SoundSource.BLOCKS, 0.5f, 0.5f, false);
 
         return true;
     }
@@ -86,20 +88,19 @@ public class FactoryPanelConnectionHandler {
         if (from.targetedBy.size() >= 9)
             return "factory_panel.cannot_add_more_inputs";
 
-        BlockState state1 = to.blockEntity.getCachedState();
-        BlockState state2 = from.blockEntity.getCachedState();
+        BlockState state1 = to.blockEntity.getBlockState();
+        BlockState state2 = from.blockEntity.getBlockState();
         BlockPos diff = to.getPos().subtract(from.getPos());
 
-        if (state1.with(FactoryPanelBlock.WATERLOGGED, false).with(FactoryPanelBlock.POWERED, false) != state2.with(
-            FactoryPanelBlock.WATERLOGGED,
-            false
-        ).with(FactoryPanelBlock.POWERED, false))
+        if (state1.setValue(FactoryPanelBlock.WATERLOGGED, false)
+            .setValue(FactoryPanelBlock.POWERED, false) != state2.setValue(FactoryPanelBlock.WATERLOGGED, false)
+            .setValue(FactoryPanelBlock.POWERED, false))
             return "factory_panel.same_orientation";
 
         if (FactoryPanelBlock.connectedDirection(state1).getAxis().choose(diff.getX(), diff.getY(), diff.getZ()) != 0)
             return "factory_panel.same_surface";
 
-        if (!diff.isWithinDistance(BlockPos.ORIGIN, 16))
+        if (!diff.closerThan(BlockPos.ZERO, 16))
             return "factory_panel.too_far_apart";
 
         if (to.panelBE().restocker)
@@ -116,65 +117,63 @@ public class FactoryPanelConnectionHandler {
         if (from == null)
             return "factory_panel.connection_aborted";
 
-        BlockState state1 = from.blockEntity.getCachedState();
-        BlockState state2 = to.blockEntity.getCachedState();
+        BlockState state1 = from.blockEntity.getBlockState();
+        BlockState state2 = to.blockEntity.getBlockState();
         BlockPos diff = to.getPos().subtract(from.getPos());
         Direction connectedDirection = FactoryPanelBlock.connectedDirection(state1);
 
-        if (connectedDirection != state2.get(WrenchableDirectionalBlock.FACING, connectedDirection))
+        if (connectedDirection != state2.getValueOrElse(WrenchableDirectionalBlock.FACING, connectedDirection))
             return "factory_panel.same_orientation";
 
         if (connectedDirection.getAxis().choose(diff.getX(), diff.getY(), diff.getZ()) != 0)
             return "factory_panel.same_surface";
 
-        if (!diff.isWithinDistance(BlockPos.ORIGIN, 16))
+        if (!diff.closerThan(BlockPos.ZERO, 16))
             return "factory_panel.too_far_apart";
 
         return null;
     }
 
-    public static void clientTick(MinecraftClient mc) {
+    public static void clientTick(Minecraft mc) {
         if (connectingFrom == null || connectingFromBox == null)
             return;
 
-        ClientWorld world = mc.world;
+        ClientLevel world = mc.level;
         ServerFactoryPanelBehaviour at = ServerFactoryPanelBehaviour.at(world, connectingFrom);
 
-        if (!connectingFrom.pos().isWithinDistance(mc.player.getBlockPos(), 16) || at == null) {
+        if (!connectingFrom.pos().closerThan(mc.player.blockPosition(), 16) || at == null) {
             connectingFrom = null;
             connectingFromBox = null;
-            mc.player.sendMessage(Text.empty(), true);
+            mc.player.displayClientMessage(Component.empty(), true);
             return;
         }
 
         Outliner.getInstance().showAABB(connectingFrom, connectingFromBox).colored(AnimationTickHolder.getTicks() % 16 > 8 ? 0x38b764 : 0xa7f070)
             .lineWidth(1 / 16f);
 
-        mc.player.sendMessage(
-            CreateLang.translate(relocating ? "factory_panel.click_to_relocate" : "factory_panel.click_second_panel").component(),
-            true
-        );
+        mc.player.displayClientMessage(
+            CreateLang.translate(relocating ? "factory_panel.click_to_relocate" : "factory_panel.click_second_panel").component(), true);
 
         if (!relocating)
             return;
 
         validRelocationTarget = null;
 
-        if (!(mc.crosshairTarget instanceof BlockHitResult bhr) || bhr.getType() == Type.MISS)
+        if (!(mc.hitResult instanceof BlockHitResult bhr) || bhr.getType() == Type.MISS)
             return;
 
-        Vec3d offsetPos = bhr.getPos().add(Vec3d.of(bhr.getSide().getVector()).multiply(1 / 32f));
-        BlockPos pos = BlockPos.ofFloored(offsetPos);
-        BlockState blockState = at.blockEntity.getCachedState();
+        Vec3 offsetPos = bhr.getLocation().add(Vec3.atLowerCornerOf(bhr.getDirection().getUnitVec3i()).scale(1 / 32f));
+        BlockPos pos = BlockPos.containing(offsetPos);
+        BlockState blockState = at.blockEntity.getBlockState();
         PanelSlot slot = FactoryPanelBlock.getTargetedSlot(pos, blockState, offsetPos);
         BlockPos diff = pos.subtract(connectingFrom.pos());
         Direction facing = FactoryPanelBlock.connectedDirection(blockState);
 
         if (facing.getAxis().choose(diff.getX(), diff.getY(), diff.getZ()) != 0)
             return;
-        if (!AllBlocks.FACTORY_GAUGE.canPlaceAt(blockState, world, pos))
+        if (!AllBlocks.FACTORY_GAUGE.canSurvive(blockState, world, pos))
             return;
-        if (world.getBlockState(pos.offset(facing.getOpposite())).isOf(AllBlocks.PACKAGER))
+        if (world.getBlockState(pos.relative(facing.getOpposite())).is(AllBlocks.PACKAGER))
             return;
 
         validRelocationTarget = new FactoryPanelPosition(pos, slot);
@@ -182,31 +181,31 @@ public class FactoryPanelConnectionHandler {
         Outliner.getInstance().showAABB("target", getBB(blockState, validRelocationTarget)).colored(0xeeeeee).disableLineNormals().lineWidth(1 / 16f);
     }
 
-    public static boolean onRightClick(MinecraftClient mc) {
+    public static boolean onRightClick(Minecraft mc) {
         if (connectingFrom == null || connectingFromBox == null)
             return false;
         boolean missed = false;
 
-        ClientPlayerEntity player = mc.player;
+        LocalPlayer player = mc.player;
         if (relocating) {
-            if (player.isSneaking())
+            if (player.isShiftKeyDown())
                 validRelocationTarget = null;
             if (validRelocationTarget != null)
-                player.networkHandler.sendPacket(new FactoryPanelConnectionPacket(validRelocationTarget, connectingFrom, true));
+                player.connection.send(new FactoryPanelConnectionPacket(validRelocationTarget, connectingFrom, true));
 
             connectingFrom = null;
             connectingFromBox = null;
 
             if (validRelocationTarget == null)
-                player.sendMessage(CreateLang.translate("factory_panel.relocation_aborted").component(), true);
+                player.displayClientMessage(CreateLang.translate("factory_panel.relocation_aborted").component(), true);
 
             relocating = false;
             validRelocationTarget = null;
             return true;
         }
 
-        if (mc.crosshairTarget instanceof BlockHitResult bhr && bhr.getType() != Type.MISS) {
-            ClientWorld world = mc.world;
+        if (mc.hitResult instanceof BlockHitResult bhr && bhr.getType() != Type.MISS) {
+            ClientLevel world = mc.level;
             BlockEntity blockEntity = world.getBlockEntity(bhr.getBlockPos());
             FactoryPanelSupportBehaviour behaviour = BlockEntityBehaviour.get(world, bhr.getBlockPos(), FactoryPanelSupportBehaviour.TYPE);
 
@@ -215,10 +214,10 @@ public class FactoryPanelConnectionHandler {
                 ServerFactoryPanelBehaviour at = ServerFactoryPanelBehaviour.at(world, connectingFrom);
                 String checkForIssues = checkForIssues(at, behaviour);
                 if (checkForIssues != null) {
-                    player.sendMessage(CreateLang.translate(checkForIssues).style(Formatting.RED).component(), true);
+                    player.displayClientMessage(CreateLang.translate(checkForIssues).style(ChatFormatting.RED).component(), true);
                     connectingFrom = null;
                     connectingFromBox = null;
-                    AllSoundEvents.DENY.playAt(world, player.getBlockPos(), 1, 1, false);
+                    AllSoundEvents.DENY.playAt(world, player.blockPosition(), 1, 1, false);
                     return true;
                 }
 
@@ -226,32 +225,25 @@ public class FactoryPanelConnectionHandler {
                 double bestDistance = Double.POSITIVE_INFINITY;
 
                 for (PanelSlot slot : PanelSlot.values()) {
-                    FactoryPanelPosition panelPosition = new FactoryPanelPosition(blockEntity.getPos(), slot);
+                    FactoryPanelPosition panelPosition = new FactoryPanelPosition(blockEntity.getBlockPos(), slot);
                     FactoryPanelConnection connection = new FactoryPanelConnection(panelPosition, 1);
-                    Vec3d diff = connection.calculatePathDiff(world.getBlockState(connectingFrom.pos()), connectingFrom);
-                    if (bestDistance < diff.lengthSquared())
+                    Vec3 diff = connection.calculatePathDiff(world.getBlockState(connectingFrom.pos()), connectingFrom);
+                    if (bestDistance < diff.lengthSqr())
                         continue;
-                    bestDistance = diff.lengthSquared();
+                    bestDistance = diff.lengthSqr();
                     bestPosition = panelPosition;
                 }
 
-                player.networkHandler.sendPacket(new FactoryPanelConnectionPacket(bestPosition, connectingFrom, false));
+                player.connection.send(new FactoryPanelConnectionPacket(bestPosition, connectingFrom, false));
 
-                player.sendMessage(
-                    CreateLang.translate("factory_panel.link_connected", blockEntity.getCachedState().getBlock().getName())
-                        .style(Formatting.GREEN).component(), true
+                player.displayClientMessage(
+                    CreateLang.translate("factory_panel.link_connected", blockEntity.getBlockState().getBlock().getName()).style(ChatFormatting.GREEN)
+                        .component(), true
                 );
 
                 connectingFrom = null;
                 connectingFromBox = null;
-                player.getEntityWorld().playSoundAtBlockCenterClient(
-                    player.getBlockPos(),
-                    SoundEvents.BLOCK_AMETHYST_BLOCK_PLACE,
-                    SoundCategory.BLOCKS,
-                    0.5f,
-                    0.5f,
-                    false
-                );
+                player.level().playLocalSound(player.blockPosition(), SoundEvents.AMETHYST_BLOCK_PLACE, SoundSource.BLOCKS, 0.5f, 0.5f, false);
                 return true;
             }
 
@@ -259,11 +251,11 @@ public class FactoryPanelConnectionHandler {
                 missed = true;
         }
 
-        if (!player.isSneaking() && !missed)
+        if (!player.isShiftKeyDown() && !missed)
             return false;
         connectingFrom = null;
         connectingFromBox = null;
-        player.sendMessage(CreateLang.translate("factory_panel.connection_aborted").component(), true);
+        player.displayClientMessage(CreateLang.translate("factory_panel.connection_aborted").component(), true);
         return true;
     }
 
@@ -275,14 +267,14 @@ public class FactoryPanelConnectionHandler {
     public static void startConnection(ServerFactoryPanelBehaviour behaviour) {
         relocating = false;
         connectingFrom = behaviour.getPanelPosition();
-        connectingFromBox = getBB(behaviour.blockEntity.getCachedState(), connectingFrom);
+        connectingFromBox = getBB(behaviour.blockEntity.getBlockState(), connectingFrom);
     }
 
-    public static Box getBB(BlockState blockState, FactoryPanelPosition factoryPanelPosition) {
-        Vec3d location = FactoryPanelSlotPositioning.getCenterOfSlot(blockState, factoryPanelPosition.slot())
-            .add(Vec3d.of(factoryPanelPosition.pos()));
-        Vec3d plane = VecHelper.axisAlingedPlaneOf(FactoryPanelBlock.connectedDirection(blockState));
-        return new Box(location, location).expand(plane.x * 3 / 16f, plane.y * 3 / 16f, plane.z * 3 / 16f);
+    public static AABB getBB(BlockState blockState, FactoryPanelPosition factoryPanelPosition) {
+        Vec3 location = FactoryPanelSlotPositioning.getCenterOfSlot(blockState, factoryPanelPosition.slot())
+            .add(Vec3.atLowerCornerOf(factoryPanelPosition.pos()));
+        Vec3 plane = VecHelper.axisAlingedPlaneOf(FactoryPanelBlock.connectedDirection(blockState));
+        return new AABB(location, location).inflate(plane.x * 3 / 16f, plane.y * 3 / 16f, plane.z * 3 / 16f);
     }
 
 }

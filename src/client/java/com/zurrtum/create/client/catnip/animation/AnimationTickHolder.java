@@ -3,9 +3,9 @@ package com.zurrtum.create.client.catnip.animation;
 import com.zurrtum.create.client.catnip.levelWrappers.WrappedClientLevel;
 import com.zurrtum.create.client.ponder.api.level.PonderLevel;
 import com.zurrtum.create.client.ponder.foundation.ui.PonderUI;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.render.RenderTickCounter;
-import net.minecraft.world.WorldAccess;
+import net.minecraft.client.DeltaTracker;
+import net.minecraft.client.Minecraft;
+import net.minecraft.world.level.LevelAccessor;
 
 public class AnimationTickHolder {
 
@@ -18,7 +18,7 @@ public class AnimationTickHolder {
     }
 
     public static void tick() {
-        if (!MinecraftClient.getInstance().isPaused()) {
+        if (!Minecraft.getInstance().isPaused()) {
             ticks = (ticks + 1) % 1_728_000; // wrap around every 24 hours so we maintain enough floating point precision
         } else {
             pausedTicks = (pausedTicks + 1) % 1_728_000;
@@ -33,7 +33,7 @@ public class AnimationTickHolder {
         return includePaused ? ticks + pausedTicks : ticks;
     }
 
-    public static int getTicks(WorldAccess level) {
+    public static int getTicks(LevelAccessor level) {
         if (level instanceof WrappedClientLevel wrappedLevel) {
             return getTicks(wrappedLevel.getWrappedLevel());
         } else if (level instanceof PonderLevel) {
@@ -42,7 +42,7 @@ public class AnimationTickHolder {
         return getTicks();
     }
 
-    public static float getPartialTicks(WorldAccess level) {
+    public static float getPartialTicks(LevelAccessor level) {
         if (level instanceof PonderLevel) {
             return PonderUI.getPartialTicks();
         }
@@ -53,7 +53,7 @@ public class AnimationTickHolder {
         return getTicks() + getPartialTicks();
     }
 
-    public static float getRenderTime(WorldAccess level) {
+    public static float getRenderTime(LevelAccessor level) {
         return getTicks(level) + getPartialTicks(level);
     }
 
@@ -61,18 +61,18 @@ public class AnimationTickHolder {
      * @return the fraction between the current tick to the next tick, frozen during game pause [0-1]
      */
     public static float getPartialTicks() {
-        MinecraftClient mc = MinecraftClient.getInstance();
-        return mc.getRenderTickCounter().getTickProgress(false);
+        Minecraft mc = Minecraft.getInstance();
+        return mc.getDeltaTracker().getGameTimeDeltaPartialTick(false);
     }
 
     /**
      * @return the fraction between the current tick to the next tick, not frozen during game pause [0-1]
      */
-    public static float getPartialTicksUI(RenderTickCounter timer) {
-        if (timer instanceof RenderTickCounter.Dynamic timerAccessor) {
-            return timerAccessor.tickProgress;
+    public static float getPartialTicksUI(DeltaTracker timer) {
+        if (timer instanceof DeltaTracker.Timer timerAccessor) {
+            return timerAccessor.deltaTickResidual;
         } else {
-            return timer.getTickProgress(false);
+            return timer.getGameTimeDeltaPartialTick(false);
         }
     }
 }

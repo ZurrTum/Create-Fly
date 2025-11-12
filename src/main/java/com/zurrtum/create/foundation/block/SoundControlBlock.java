@@ -1,9 +1,9 @@
 package com.zurrtum.create.foundation.block;
 
-import net.minecraft.sound.BlockSoundGroup;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.WorldView;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.LevelReader;
+import net.minecraft.world.level.block.SoundType;
 
 public interface SoundControlBlock {
-    BlockSoundGroup getSoundGroup(WorldView level, BlockPos pos);
+    SoundType getSoundGroup(LevelReader level, BlockPos pos);
 }

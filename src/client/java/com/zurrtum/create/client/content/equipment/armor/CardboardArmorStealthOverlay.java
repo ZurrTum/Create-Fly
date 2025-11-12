@@ -3,15 +3,15 @@ package com.zurrtum.create.client.content.equipment.armor;
 import com.zurrtum.create.catnip.animation.LerpedFloat;
 import com.zurrtum.create.catnip.animation.LerpedFloat.Chaser;
 import com.zurrtum.create.content.equipment.armor.CardboardArmorHandler;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.client.render.RenderTickCounter;
+import net.minecraft.client.DeltaTracker;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.player.LocalPlayer;
 
 public class CardboardArmorStealthOverlay {
     private static final LerpedFloat opacity = LerpedFloat.linear().startWithValue(0).chase(0, 0.25f, Chaser.EXP);
 
-    public static void clientTick(MinecraftClient mc) {
-        ClientPlayerEntity player = mc.player;
+    public static void clientTick(Minecraft mc) {
+        LocalPlayer player = mc.player;
         if (player == null)
             return;
 
@@ -19,7 +19,7 @@ public class CardboardArmorStealthOverlay {
         opacity.updateChaseTarget(CardboardArmorHandler.testForStealth(player) ? 1 : 0);
     }
 
-    public static float getOverlayOpacity(RenderTickCounter tickCounter) {
-        return opacity.getValue(tickCounter.getTickProgress(true));
+    public static float getOverlayOpacity(DeltaTracker tickCounter) {
+        return opacity.getValue(tickCounter.getGameTimeDeltaPartialTick(true));
     }
 }

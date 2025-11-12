@@ -3,20 +3,22 @@ package com.zurrtum.create.client.infrastructure.model;
 import com.google.common.base.Suppliers;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import net.minecraft.client.item.ItemModelManager;
-import net.minecraft.client.render.RenderLayer;
-import net.minecraft.client.render.TexturedRenderLayers;
-import net.minecraft.client.render.item.ItemRenderState;
-import net.minecraft.client.render.item.model.BasicItemModel;
-import net.minecraft.client.render.item.model.ItemModel;
-import net.minecraft.client.render.item.tint.TintSource;
-import net.minecraft.client.render.item.tint.TintSourceTypes;
-import net.minecraft.client.render.model.*;
-import net.minecraft.client.world.ClientWorld;
-import net.minecraft.item.ItemDisplayContext;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.HeldItemContext;
-import net.minecraft.util.Identifier;
+import net.minecraft.client.color.item.ItemTintSource;
+import net.minecraft.client.color.item.ItemTintSources;
+import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.Sheets;
+import net.minecraft.client.renderer.block.model.BakedQuad;
+import net.minecraft.client.renderer.block.model.TextureSlots;
+import net.minecraft.client.renderer.item.*;
+import net.minecraft.client.resources.model.BlockModelRotation;
+import net.minecraft.client.resources.model.ModelBaker;
+import net.minecraft.client.resources.model.ResolvableModel;
+import net.minecraft.client.resources.model.ResolvedModel;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.ItemOwner;
+import net.minecraft.world.item.ItemDisplayContext;
+import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
 
@@ -26,23 +28,23 @@ import java.util.function.Supplier;
 import static com.zurrtum.create.Create.MOD_ID;
 
 public class TranslucentModel implements ItemModel {
-    public static final Identifier ID = Identifier.of(MOD_ID, "model/translucent");
-    private final RenderLayer layer = TexturedRenderLayers.getItemEntityTranslucentCull();
-    private final List<TintSource> tints;
+    public static final ResourceLocation ID = ResourceLocation.fromNamespaceAndPath(MOD_ID, "model/translucent");
+    private final RenderType layer = Sheets.translucentItemSheet();
+    private final List<ItemTintSource> tints;
     private final List<BakedQuad> quads;
     private final Supplier<Vector3f[]> vector;
-    private final ModelSettings settings;
+    private final ModelRenderProperties settings;
     private final boolean animated;
 
-    public TranslucentModel(List<TintSource> tints, List<BakedQuad> quads, ModelSettings settings) {
+    public TranslucentModel(List<ItemTintSource> tints, List<BakedQuad> quads, ModelRenderProperties settings) {
         this.tints = tints;
         this.quads = quads;
         this.settings = settings;
-        this.vector = Suppliers.memoize(() -> BasicItemModel.bakeQuads(quads));
+        this.vector = Suppliers.memoize(() -> BlockModelWrapper.computeExtents(quads));
         boolean bl = false;
 
         for (BakedQuad bakedQuad : quads) {
-            if (bakedQuad.sprite().getContents().isAnimated()) {
+            if (bakedQuad.sprite().contents().isAnimated()) {
                 bl = true;
                 break;
             }
@@ -53,63 +55,65 @@ public class TranslucentModel implements ItemModel {
 
     @Override
     public void update(
-        ItemRenderState state,
+        ItemStackRenderState state,
         ItemStack stack,
-        ItemModelManager resolver,
+        ItemModelResolver resolver,
         ItemDisplayContext displayContext,
-        @Nullable ClientWorld world,
-        @Nullable HeldItemContext heldItemContext,
+        @Nullable ClientLevel world,
+        @Nullable ItemOwner heldItemContext,
         int seed
     ) {
-        state.addModelKey(this);
-        ItemRenderState.LayerRenderState layerRenderState = state.newLayer();
-        if (stack.hasGlint()) {
-            layerRenderState.setGlint(ItemRenderState.Glint.STANDARD);
-            state.markAnimated();
-            state.addModelKey(ItemRenderState.Glint.STANDARD);
+        state.appendModelIdentityElement(this);
+        ItemStackRenderState.LayerRenderState layerRenderState = state.newLayer();
+        if (stack.hasFoil()) {
+            layerRenderState.setFoilType(ItemStackRenderState.FoilType.STANDARD);
+            state.setAnimated();
+            state.appendModelIdentityElement(ItemStackRenderState.FoilType.STANDARD);
         }
 
         int i = tints.size();
-        int[] is = layerRenderState.initTints(i);
+        int[] is = layerRenderState.prepareTintLayers(i);
 
         for (int j = 0; j < i; j++) {
-            int k = tints.get(j).getTint(stack, world, heldItemContext == null ? null : heldItemContext.getEntity());
+            int k = tints.get(j).calculate(stack, world, heldItemContext == null ? null : heldItemContext.asLivingEntity());
             is[j] = k;
-            state.addModelKey(k);
+            state.appendModelIdentityElement(k);
         }
 
-        layerRenderState.setVertices(vector);
-        layerRenderState.setRenderLayer(layer);
-        settings.addSettings(layerRenderState, displayContext);
-        layerRenderState.getQuads().addAll(quads);
+        layerRenderState.setExtents(vector);
+        layerRenderState.setRenderType(layer);
+        settings.applyToLayer(layerRenderState, displayContext);
+        layerRenderState.prepareQuadList().addAll(quads);
         if (animated) {
-            state.markAnimated();
+            state.setAnimated();
         }
     }
 
-    public record Unbaked(Identifier model, List<TintSource> tints) implements ItemModel.Unbaked {
-        public static final MapCodec<Unbaked> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
-            Identifier.CODEC.fieldOf("model").forGetter(Unbaked::model),
-            TintSourceTypes.CODEC.listOf().optionalFieldOf("tints", List.of()).forGetter(Unbaked::tints)
-        ).apply(instance, Unbaked::new));
+    public record Unbaked(ResourceLocation model, List<ItemTintSource> tints) implements ItemModel.Unbaked {
+        public static final MapCodec<com.zurrtum.create.client.infrastructure.model.TranslucentModel.Unbaked> CODEC = RecordCodecBuilder.mapCodec(
+            instance -> instance.group(
+                ResourceLocation.CODEC.fieldOf("model").forGetter(com.zurrtum.create.client.infrastructure.model.TranslucentModel.Unbaked::model),
+                ItemTintSources.CODEC.listOf().optionalFieldOf("tints", List.of())
+                    .forGetter(com.zurrtum.create.client.infrastructure.model.TranslucentModel.Unbaked::tints)
+            ).apply(instance, com.zurrtum.create.client.infrastructure.model.TranslucentModel.Unbaked::new));
 
         @Override
-        public void resolve(ResolvableModel.Resolver resolver) {
+        public void resolveDependencies(ResolvableModel.Resolver resolver) {
             resolver.markDependency(model);
         }
 
         @Override
-        public ItemModel bake(ItemModel.BakeContext context) {
-            Baker baker = context.blockModelBaker();
-            BakedSimpleModel bakedSimpleModel = baker.getModel(model);
-            ModelTextures modelTextures = bakedSimpleModel.getTextures();
-            List<BakedQuad> list = bakedSimpleModel.bakeGeometry(modelTextures, baker, ModelRotation.X0_Y0).getAllQuads();
-            ModelSettings modelSettings = ModelSettings.resolveSettings(baker, bakedSimpleModel, modelTextures);
+        public ItemModel bake(ItemModel.BakingContext context) {
+            ModelBaker baker = context.blockModelBaker();
+            ResolvedModel bakedSimpleModel = baker.getModel(model);
+            TextureSlots modelTextures = bakedSimpleModel.getTopTextureSlots();
+            List<BakedQuad> list = bakedSimpleModel.bakeTopGeometry(modelTextures, baker, BlockModelRotation.X0_Y0).getAll();
+            ModelRenderProperties modelSettings = ModelRenderProperties.fromResolvedModel(baker, bakedSimpleModel, modelTextures);
             return new TranslucentModel(tints, list, modelSettings);
         }
 
         @Override
-        public MapCodec<Unbaked> getCodec() {
+        public MapCodec<com.zurrtum.create.client.infrastructure.model.TranslucentModel.Unbaked> type() {
             return CODEC;
         }
     }

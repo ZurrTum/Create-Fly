@@ -16,12 +16,11 @@ import com.zurrtum.create.client.flywheel.backend.gl.TextureBuffer;
 import com.zurrtum.create.client.flywheel.backend.gl.array.GlVertexArray;
 import com.zurrtum.create.client.flywheel.backend.gl.shader.GlProgram;
 import com.zurrtum.create.client.flywheel.lib.material.SimpleMaterial;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.render.model.ModelBaker;
-
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.resources.model.ModelBakery;
 
 public class InstancedDrawManager extends DrawManager<InstancedInstancer<?>> {
     private static final Comparator<InstancedDraw> DRAW_COMPARATOR = Comparator.comparingInt(InstancedDraw::bias)
@@ -259,7 +258,7 @@ public class InstancedDrawManager extends DrawManager<InstancedInstancer<?>> {
             GroupKey<?> shader = groupEntry.getKey();
 
             for (var progressEntry : byProgress.int2ObjectEntrySet()) {
-                TextureBinder.bindCrumbling(ModelBaker.BLOCK_DESTRUCTION_STAGE_TEXTURES.get(progressEntry.getIntKey()));
+                TextureBinder.bindCrumbling(ModelBakery.BREAKING_LOCATIONS.get(progressEntry.getIntKey()));
 
                 for (var instanceHandlePair : progressEntry.getValue()) {
                     InstancedInstancer<?> instancer = instanceHandlePair.getFirst();
@@ -289,7 +288,7 @@ public class InstancedDrawManager extends DrawManager<InstancedInstancer<?>> {
     @Override
     public void triggerFallback() {
         InstancingPrograms.kill();
-        MinecraftClient.getInstance().worldRenderer.reload();
+        Minecraft.getInstance().levelRenderer.allChanged();
     }
 
     public static void uploadMaterialUniform(GlProgram program, Material material) {

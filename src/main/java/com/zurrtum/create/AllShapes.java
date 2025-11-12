@@ -3,22 +3,22 @@ package com.zurrtum.create;
 import com.zurrtum.create.catnip.math.VoxelShaper;
 import com.zurrtum.create.content.logistics.chute.ChuteShapes;
 import com.zurrtum.create.content.trains.track.TrackVoxelShapes;
-import net.minecraft.block.Block;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.FacingBlock;
-import net.minecraft.block.PistonHeadBlock;
-import net.minecraft.util.function.BooleanBiFunction;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.shape.VoxelShape;
-import net.minecraft.util.shape.VoxelShapes;
-
 import java.util.function.BiFunction;
+import net.minecraft.core.Direction;
+import net.minecraft.core.Direction.Axis;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.DirectionalBlock;
+import net.minecraft.world.level.block.piston.PistonHeadBlock;
+import net.minecraft.world.phys.shapes.BooleanOp;
+import net.minecraft.world.phys.shapes.Shapes;
+import net.minecraft.world.phys.shapes.VoxelShape;
 
-import static net.minecraft.util.math.Direction.*;
+import static net.minecraft.core.Direction.*;
 
 public class AllShapes {
-    private static final VoxelShape PISTON_HEAD = Blocks.PISTON_HEAD.getDefaultState().with(FacingBlock.FACING, UP)
-        .with(PistonHeadBlock.SHORT, true).getOutlineShape(null, null);
+    private static final VoxelShape PISTON_HEAD = Blocks.PISTON_HEAD.defaultBlockState().setValue(DirectionalBlock.FACING, UP)
+        .setValue(PistonHeadBlock.SHORT, true).getShape(null, null);
     private static final VoxelShape SMALL_GEAR_SHAPE = cuboid(2, 6, 2, 14, 10, 14);
     private static final VoxelShape LARGE_GEAR_SHAPE = cuboid(0, 6, 0, 16, 10, 16);
     private static final VoxelShape VERTICAL_TABLET_SHAPE = cuboid(3, 1, -1, 13, 15, 3);
@@ -157,7 +157,7 @@ public class AllShapes {
     public static final VoxelShape TABLE_CLOTH = shape(-1, -9, -1, 17, 1, 17).build();
     public static final VoxelShape TABLE_CLOTH_OCCLUSION = shape(0, 0, 0, 16, 1, 16).build();
     public static final VoxelShape CHAIN_CONVEYOR_INTERACTION = shape(-10, 2, 0, 26, 14, 16).add(0, 2, -10, 16, 14, 26)
-        .add(-5, 2, -5, 21, 14, 21).add(VoxelShapes.fullCube()).build();
+        .add(-5, 2, -5, 21, 14, 21).add(Shapes.block()).build();
     public static final VoxelShape TRACK_FALLBACK = shape(0, 0, 0, 16, 4, 16).build();
     public static final VoxelShape BASIN_BLOCK_SHAPE = shape(0, 2, 0, 16, 16, 16).erase(2, 2, 2, 14, 16, 14)
         .add(2, 0, 2, 14, 2, 14).build();
@@ -175,7 +175,7 @@ public class AllShapes {
     public static final VoxelShape SEAT = cuboid(0, 0, 0, 16, 8, 16);
     public static final VoxelShape SEAT_COLLISION = cuboid(0, 0, 0, 16, 6, 16);
     public static final VoxelShape SEAT_COLLISION_PLAYERS = cuboid(0, 0, 0, 16, 3, 16);
-    public static final VoxelShape MECHANICAL_PROCESSOR_SHAPE = shape(VoxelShapes.fullCube()).erase(4, 0, 4, 12, 16, 12)
+    public static final VoxelShape MECHANICAL_PROCESSOR_SHAPE = shape(Shapes.block()).erase(4, 0, 4, 12, 16, 12)
         .build();
     public static final VoxelShape TURNTABLE_SHAPE = shape(1, 4, 1, 15, 8, 15).add(5, 0, 5, 11, 4, 11).build();
     public static final VoxelShape CRATE_BLOCK_SHAPE = cuboid(1, 0, 1, 15, 14, 15);
@@ -247,7 +247,7 @@ public class AllShapes {
     }
 
     private static VoxelShape cuboid(double x1, double y1, double z1, double x2, double y2, double z2) {
-        return Block.createCuboidShape(x1, y1, z1, x2, y2, z2);
+        return Block.box(x1, y1, z1, x2, y2, z2);
     }
 
     public static class Builder {
@@ -258,7 +258,7 @@ public class AllShapes {
         }
 
         public Builder add(VoxelShape shape) {
-            this.shape = VoxelShapes.union(this.shape, shape);
+            this.shape = Shapes.or(this.shape, shape);
             return this;
         }
 
@@ -267,10 +267,10 @@ public class AllShapes {
         }
 
         public Builder erase(double x1, double y1, double z1, double x2, double y2, double z2) {
-            this.shape = VoxelShapes.combineAndSimplify(
+            this.shape = Shapes.join(
                 shape,
                 cuboid(x1, y1, z1, x2, y2, z2),
-                BooleanBiFunction.ONLY_FIRST
+                BooleanOp.ONLY_FIRST
             );
             return this;
         }

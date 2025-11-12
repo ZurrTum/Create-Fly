@@ -13,16 +13,16 @@ import com.zurrtum.create.content.contraptions.actors.harvester.HarvesterBlockEn
 import com.zurrtum.create.content.contraptions.actors.psi.PortableItemInterfaceBlockEntity;
 import com.zurrtum.create.content.contraptions.actors.psi.PortableStorageInterfaceBlockEntity;
 import com.zurrtum.create.content.contraptions.chassis.LinearChassisBlock;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.CropBlock;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.ItemEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.CropBlock;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.Vec3;
 
 public class MovementActorScenes {
 
@@ -43,7 +43,7 @@ public class MovementActorScenes {
         scene.idle(10);
         scene.world().rotateBearing(bearing, 360, 70);
         scene.world().rotateSection(contraption, 0, 360, 0, 70);
-        scene.overlay().showText(60).pointAt(util.vector().topOf(bearing.up(2))).colored(PonderPalette.RED).placeNearTarget().attachKeyFrame()
+        scene.overlay().showText(60).pointAt(util.vector().topOf(bearing.above(2))).colored(PonderPalette.RED).placeNearTarget().attachKeyFrame()
             .text("Moving inventories can be tricky to access with automation.");
 
         scene.idle(70);
@@ -94,7 +94,7 @@ public class MovementActorScenes {
         scene.overlay().showText(70).placeNearTarget().pointAt(util.vector().topOf(hopper)).attachKeyFrame().text("Items can now be inserted...");
 
         ItemStack itemStack = new ItemStack(Items.COPPER_INGOT);
-        Vec3d entitySpawn = util.vector().topOf(hopper.up(3));
+        Vec3 entitySpawn = util.vector().topOf(hopper.above(3));
 
         ElementLink<EntityElement> entity1 = scene.world().createItemEntity(entitySpawn, util.vector().of(0, 0.2, 0), itemStack);
         scene.idle(10);
@@ -114,7 +114,7 @@ public class MovementActorScenes {
         scene.world().showSection(util.select().fromTo(0, 1, 0, 1, 2, 6), Direction.DOWN);
         scene.idle(10);
         scene.world().createItemOnBelt(beltPos, Direction.EAST, itemStack.copy());
-        scene.overlay().showText(40).placeNearTarget().pointAt(util.vector().topOf(beltPos.up())).text("...or extracted from the contraption");
+        scene.overlay().showText(40).placeNearTarget().pointAt(util.vector().topOf(beltPos.above())).text("...or extracted from the contraption");
         scene.idle(15);
         scene.world().createItemOnBelt(beltPos, Direction.EAST, itemStack);
 
@@ -183,7 +183,7 @@ public class MovementActorScenes {
         Selection crops = util.select().fromTo(4, 1, 2, 3, 1, 2)
             .add(util.select().fromTo(3, 1, 1, 2, 1, 1).add(util.select().position(2, 1, 3)).add(util.select().position(1, 1, 2)));
 
-        scene.world().setBlocks(crops, Blocks.WHEAT.getDefaultState().with(CropBlock.AGE, 7), false);
+        scene.world().setBlocks(crops, Blocks.WHEAT.defaultBlockState().setValue(CropBlock.AGE, 7), false);
         scene.world().showSection(util.select().layer(0), Direction.UP);
 
         BlockPos bearingPos = util.grid().at(4, 1, 4);
@@ -211,7 +211,7 @@ public class MovementActorScenes {
         scene.world().rotateBearing(bearingPos, -360, 140);
         scene.world().rotateSection(contraption, 0, -360, 0, 140);
 
-        BlockState harvested = Blocks.WHEAT.getDefaultState();
+        BlockState harvested = Blocks.WHEAT.defaultBlockState();
         ItemStack wheatItem = new ItemStack(Items.WHEAT);
 
         scene.idle(5);
@@ -245,7 +245,7 @@ public class MovementActorScenes {
         scene.world().hideSection(crops, Direction.DOWN);
         scene.idle(15);
         scene.world().modifyEntities(ItemEntity.class, Entity::discard);
-        scene.world().setBlocks(crops, Blocks.WHEAT.getDefaultState().with(CropBlock.AGE, 7), false);
+        scene.world().setBlocks(crops, Blocks.WHEAT.defaultBlockState().setValue(CropBlock.AGE, 7), false);
         scene.world().showSection(crops, Direction.UP);
 
         for (int i = 0; i < 3; i++)
@@ -324,7 +324,7 @@ public class MovementActorScenes {
         scene.world().moveSection(contraption, util.vector().of(-2, 0, 0), 60);
         scene.idle(15);
 
-        Vec3d m = util.vector().of(-0.1, .2, 0);
+        Vec3 m = util.vector().of(-0.1, .2, 0);
         scene.world().destroyBlock(util.grid().at(2, 1, 3));
         scene.world().createItemEntity(util.vector().centerOf(2, 1, 3), m, new ItemStack(Items.LEVER));
         scene.world().destroyBlock(util.grid().at(2, 1, 2));
@@ -346,7 +346,7 @@ public class MovementActorScenes {
         scene.world().moveSection(contraption, util.vector().of(2, 0, 0), 40);
         scene.world().hideSection(garbage, Direction.UP);
         scene.idle(40);
-        scene.world().setBlocks(garbage, Blocks.SNOW.getDefaultState(), false);
+        scene.world().setBlocks(garbage, Blocks.SNOW.defaultBlockState(), false);
         scene.world().modifyEntities(ItemEntity.class, Entity::discard);
         ElementLink<WorldSectionElement> chest = scene.world().showIndependentSection(util.select().position(4, 2, 2), Direction.DOWN);
 
@@ -381,7 +381,7 @@ public class MovementActorScenes {
         Selection dirt = util.select().fromTo(2, 0, 3, 1, 0, 2);
         scene.world().hideSection(dirt, Direction.DOWN);
         scene.idle(15);
-        scene.world().setBlocks(dirt, Blocks.GRASS_BLOCK.getDefaultState(), false);
+        scene.world().setBlocks(dirt, Blocks.GRASS_BLOCK.defaultBlockState(), false);
         scene.world().showSection(dirt, Direction.UP);
         scene.overlay().showText(60).placeNearTarget().attachKeyFrame().pointAt(util.vector().blockSurface(util.grid().at(3, 1, 3), Direction.EAST))
             .text("Additionally, ploughs can create farmland");
@@ -392,9 +392,9 @@ public class MovementActorScenes {
         scene.world().moveSection(contraption, util.vector().of(-2, 0, 0), 60);
         scene.world().moveSection(chest, util.vector().of(-2, 0, 0), 60);
         scene.idle(15);
-        scene.world().setBlocks(util.select().fromTo(2, 0, 2, 2, 0, 3), Blocks.FARMLAND.getDefaultState(), true);
+        scene.world().setBlocks(util.select().fromTo(2, 0, 2, 2, 0, 3), Blocks.FARMLAND.defaultBlockState(), true);
         scene.idle(30);
-        scene.world().setBlocks(util.select().fromTo(1, 0, 2, 1, 0, 3), Blocks.FARMLAND.getDefaultState(), true);
+        scene.world().setBlocks(util.select().fromTo(1, 0, 2, 1, 0, 3), Blocks.FARMLAND.defaultBlockState(), true);
         scene.idle(20);
 
         scene.world().modifyKineticSpeed(util.select().everywhere(), f -> -f);
@@ -482,7 +482,7 @@ public class MovementActorScenes {
         scene.world().rotateBearing(bearingPos, -30, 20);
         scene.world().rotateSection(contraptionLink, 0, -30, 0, 20);
 
-        BlockState harvested = Blocks.WHEAT.getDefaultState();
+        BlockState harvested = Blocks.WHEAT.defaultBlockState();
 
         scene.idle(20);
         scene.overlay().showText(60).placeNearTarget().pointAt(util.vector().topOf(cobblePos))
@@ -493,7 +493,7 @@ public class MovementActorScenes {
             scene.world().incrementBlockBreakingProgress(cobblePos);
         }
 
-        Vec3d m = util.vector().of(.1, 0, -.1);
+        Vec3 m = util.vector().of(.1, 0, -.1);
         ItemStack cobbleItem = new ItemStack(Items.COBBLESTONE);
         ItemStack wheatItem = new ItemStack(Items.WHEAT);
         ElementLink<EntityElement> item1 = scene.world().createItemEntity(util.vector().centerOf(cobblePos), m, cobbleItem);
@@ -579,18 +579,21 @@ public class MovementActorScenes {
         scene.idle(75);
 
         scene.overlay().showControls(util.vector().topOf(controlsPos2), Pointing.DOWN, 30).rightClick()
-            .withItem(AllItems.MECHANICAL_DRILL.getDefaultStack());
+            .withItem(AllItems.MECHANICAL_DRILL.getDefaultInstance());
         scene.idle(5);
         scene.overlay().showControls(util.vector().centerOf(controlsPos1), Pointing.UP, 25).rightClick()
-            .withItem(AllItems.MECHANICAL_HARVESTER.getDefaultStack());
+            .withItem(AllItems.MECHANICAL_HARVESTER.getDefaultInstance());
         scene.idle(2);
-        scene.world()
-            .setFilterData(util.select().position(controlsPos2), ContraptionControlsBlockEntity.class, AllItems.MECHANICAL_DRILL.getDefaultStack());
+        scene.world().setFilterData(
+            util.select().position(controlsPos2),
+            ContraptionControlsBlockEntity.class,
+            AllItems.MECHANICAL_DRILL.getDefaultInstance()
+        );
         scene.idle(5);
         scene.world().setFilterData(
             util.select().position(controlsPos1),
             ContraptionControlsBlockEntity.class,
-            AllItems.MECHANICAL_HARVESTER.getDefaultStack()
+            AllItems.MECHANICAL_HARVESTER.getDefaultInstance()
         );
         scene.idle(30);
 

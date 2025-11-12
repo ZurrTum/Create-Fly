@@ -1,17 +1,17 @@
 package com.zurrtum.create.client.model;
 
 import com.google.gson.JsonObject;
-import net.minecraft.client.render.BlockRenderLayer;
-import net.minecraft.client.render.model.BakedSimpleModel;
-import net.minecraft.client.render.model.GeometryBakedModel;
-import net.minecraft.client.render.model.json.JsonUnbakedModel;
-import net.minecraft.util.JsonHelper;
+import net.minecraft.client.renderer.block.model.BlockModel;
+import net.minecraft.client.renderer.block.model.SimpleModelWrapper;
+import net.minecraft.client.renderer.chunk.ChunkSectionLayer;
+import net.minecraft.client.resources.model.ResolvedModel;
+import net.minecraft.util.GsonHelper;
 import org.jetbrains.annotations.Nullable;
 
 public interface LayerUnbakedModel {
-    static GeometryBakedModel setBlockRenderLayer(GeometryBakedModel geometry, BakedSimpleModel model) {
-        if (model.getModel() instanceof LayerUnbakedModel unbakedModel) {
-            BlockRenderLayer layer = unbakedModel.create$getBlockRenderLayer();
+    static SimpleModelWrapper setBlockRenderLayer(SimpleModelWrapper geometry, ResolvedModel model) {
+        if (model.wrapped() instanceof LayerUnbakedModel unbakedModel) {
+            ChunkSectionLayer layer = unbakedModel.create$getBlockRenderLayer();
             if (layer != null) {
                 ((LayerBakedModel) (Object) geometry).create$setBlockRenderLayer(layer);
             }
@@ -19,9 +19,9 @@ public interface LayerUnbakedModel {
         return geometry;
     }
 
-    static JsonUnbakedModel setBlockRenderLayer(JsonUnbakedModel model, JsonObject jsonObject) {
+    static BlockModel setBlockRenderLayer(BlockModel model, JsonObject jsonObject) {
         if (jsonObject.has("render_type")) {
-            BlockRenderLayer layer = NamedBlockRenderLayer.get(JsonHelper.getString(jsonObject, "render_type"));
+            ChunkSectionLayer layer = NamedBlockRenderLayer.get(GsonHelper.getAsString(jsonObject, "render_type"));
             if (layer != null) {
                 ((LayerUnbakedModel) (Object) model).create$setBlockRenderLayer(layer);
             }
@@ -30,10 +30,10 @@ public interface LayerUnbakedModel {
     }
 
     @Nullable
-    default BlockRenderLayer create$getBlockRenderLayer() {
+    default ChunkSectionLayer create$getBlockRenderLayer() {
         return null;
     }
 
-    default void create$setBlockRenderLayer(BlockRenderLayer layer) {
+    default void create$setBlockRenderLayer(ChunkSectionLayer layer) {
     }
 }

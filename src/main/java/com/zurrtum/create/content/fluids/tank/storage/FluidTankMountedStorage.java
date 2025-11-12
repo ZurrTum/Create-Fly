@@ -12,16 +12,16 @@ import com.zurrtum.create.content.contraptions.Contraption;
 import com.zurrtum.create.content.fluids.tank.FluidTankBlockEntity;
 import com.zurrtum.create.foundation.fluid.FluidTank;
 import com.zurrtum.create.infrastructure.fluids.FluidStack;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.util.dynamic.Codecs;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.util.ExtraCodecs;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.Nullable;
 
 public class FluidTankMountedStorage extends WrapperMountedFluidStorage<FluidTankMountedStorage.Handler> implements SyncedMountedStorage {
     public static final MapCodec<FluidTankMountedStorage> CODEC = RecordCodecBuilder.mapCodec(i -> i.group(
-        Codecs.NON_NEGATIVE_INT.fieldOf("capacity").forGetter(FluidTankMountedStorage::getCapacity),
+        ExtraCodecs.NON_NEGATIVE_INT.fieldOf("capacity").forGetter(FluidTankMountedStorage::getCapacity),
         FluidStack.OPTIONAL_CODEC.fieldOf("fluid").forGetter(FluidTankMountedStorage::getFluid)
     ).apply(i, FluidTankMountedStorage::new));
 
@@ -37,7 +37,7 @@ public class FluidTankMountedStorage extends WrapperMountedFluidStorage<FluidTan
     }
 
     @Override
-    public void unmount(World level, BlockState state, BlockPos pos, @Nullable BlockEntity be) {
+    public void unmount(Level level, BlockState state, BlockPos pos, @Nullable BlockEntity be) {
         if (be instanceof FluidTankBlockEntity tank && tank.isController()) {
             FluidTank inventory = tank.getTankInventory();
             // capacity shouldn't change, leave it

@@ -3,13 +3,13 @@ package com.zurrtum.create.infrastructure.packet.s2c;
 import com.zurrtum.create.AllClientHandle;
 import com.zurrtum.create.AllPackets;
 import io.netty.buffer.ByteBuf;
-import net.minecraft.network.codec.PacketCodec;
-import net.minecraft.network.packet.PacketType;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.PacketType;
 import org.apache.logging.log4j.util.TriConsumer;
 
 public record RemoveBlockEntityPacket(BlockPos pos) implements S2CPacket {
-    public static final PacketCodec<ByteBuf, RemoveBlockEntityPacket> CODEC = BlockPos.PACKET_CODEC.xmap(
+    public static final StreamCodec<ByteBuf, RemoveBlockEntityPacket> CODEC = BlockPos.STREAM_CODEC.map(
         RemoveBlockEntityPacket::new,
         RemoveBlockEntityPacket::pos
     );
@@ -25,7 +25,7 @@ public record RemoveBlockEntityPacket(BlockPos pos) implements S2CPacket {
     }
 
     @Override
-    public PacketType<RemoveBlockEntityPacket> getPacketType() {
+    public PacketType<RemoveBlockEntityPacket> type() {
         return AllPackets.REMOVE_TE;
     }
 }

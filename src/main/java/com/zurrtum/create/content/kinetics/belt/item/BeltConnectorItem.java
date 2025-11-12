@@ -12,96 +12,96 @@ import com.zurrtum.create.content.kinetics.simpleRelays.AbstractSimpleShaftBlock
 import com.zurrtum.create.content.kinetics.simpleRelays.ShaftBlock;
 import com.zurrtum.create.foundation.block.ProperWaterloggedBlock;
 import com.zurrtum.create.infrastructure.config.AllConfigs;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.BlockItem;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.ItemUsageContext;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.sound.SoundCategory;
-import net.minecraft.sound.SoundEvents;
-import net.minecraft.state.property.Properties;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Direction.Axis;
-import net.minecraft.util.math.Direction.AxisDirection;
-import net.minecraft.world.World;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.LinkedList;
 import java.util.List;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.Direction.Axis;
+import net.minecraft.core.Direction.AxisDirection;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.context.UseOnContext;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 
 public class BeltConnectorItem extends BlockItem {
 
-    public BeltConnectorItem(Settings properties) {
+    public BeltConnectorItem(Properties properties) {
         super(AllBlocks.BELT, properties);
     }
 
     @NotNull
     @Override
-    public ActionResult useOnBlock(ItemUsageContext context) {
-        PlayerEntity playerEntity = context.getPlayer();
-        ItemStack heldStack = context.getStack();
+    public InteractionResult useOn(UseOnContext context) {
+        Player playerEntity = context.getPlayer();
+        ItemStack heldStack = context.getItemInHand();
 
-        if (playerEntity != null && playerEntity.isSneaking()) {
+        if (playerEntity != null && playerEntity.isShiftKeyDown()) {
             heldStack.remove(AllDataComponents.BELT_FIRST_SHAFT);
-            return ActionResult.SUCCESS;
+            return InteractionResult.SUCCESS;
         }
 
-        World world = context.getWorld();
-        BlockPos pos = context.getBlockPos();
+        Level world = context.getLevel();
+        BlockPos pos = context.getClickedPos();
         boolean validAxis = validateAxis(world, pos);
 
-        if (world.isClient())
-            return validAxis ? ActionResult.SUCCESS : ActionResult.FAIL;
+        if (world.isClientSide())
+            return validAxis ? InteractionResult.SUCCESS : InteractionResult.FAIL;
 
         BlockPos firstPulley = null;
 
         // Remove first if no longer existant or valid
-        if (heldStack.contains(AllDataComponents.BELT_FIRST_SHAFT)) {
+        if (heldStack.has(AllDataComponents.BELT_FIRST_SHAFT)) {
             firstPulley = heldStack.get(AllDataComponents.BELT_FIRST_SHAFT);
-            if (!validateAxis(world, firstPulley) || !firstPulley.isWithinDistance(pos, maxLength() * 2)) {
+            if (!validateAxis(world, firstPulley) || !firstPulley.closerThan(pos, maxLength() * 2)) {
                 heldStack.remove(AllDataComponents.BELT_FIRST_SHAFT);
             }
         }
 
         if (!validAxis || playerEntity == null)
-            return ActionResult.FAIL;
+            return InteractionResult.FAIL;
 
-        if (heldStack.contains(AllDataComponents.BELT_FIRST_SHAFT)) {
+        if (heldStack.has(AllDataComponents.BELT_FIRST_SHAFT)) {
 
             if (!canConnect(world, firstPulley, pos))
-                return ActionResult.FAIL;
+                return InteractionResult.FAIL;
 
             if (firstPulley != null && !firstPulley.equals(pos)) {
                 createBelts(world, firstPulley, pos);
-                if (playerEntity instanceof ServerPlayerEntity serverPlayerEntity) {
+                if (playerEntity instanceof ServerPlayer serverPlayerEntity) {
                     AllAdvancements.BELT.trigger(serverPlayerEntity);
                 }
                 if (!playerEntity.isCreative())
-                    heldStack.decrement(1);
+                    heldStack.shrink(1);
             }
 
             if (!heldStack.isEmpty()) {
                 heldStack.remove(AllDataComponents.BELT_FIRST_SHAFT);
-                playerEntity.getItemCooldownManager().set(heldStack, 5);
+                playerEntity.getCooldowns().addCooldown(heldStack, 5);
             }
-            return ActionResult.SUCCESS;
+            return InteractionResult.SUCCESS;
         }
 
         heldStack.set(AllDataComponents.BELT_FIRST_SHAFT, pos);
-        playerEntity.getItemCooldownManager().set(heldStack, 5);
-        return ActionResult.SUCCESS;
+        playerEntity.getCooldowns().addCooldown(heldStack, 5);
+        return InteractionResult.SUCCESS;
     }
 
-    public static void createBelts(World world, BlockPos start, BlockPos end) {
+    public static void createBelts(Level world, BlockPos start, BlockPos end) {
         world.playSound(
             null,
-            BlockPos.ofFloored(VecHelper.getCenterOf(start.add(end)).multiply(.5f)),
-            SoundEvents.BLOCK_WOOL_PLACE,
-            SoundCategory.BLOCKS,
+            BlockPos.containing(VecHelper.getCenterOf(start.offset(end)).scale(.5f)),
+            SoundEvents.WOOL_PLACE,
+            SoundSource.BLOCKS,
             0.5F,
             1F
         );
@@ -111,15 +111,15 @@ public class BeltConnectorItem extends BlockItem {
 
         BlockPos diff = end.subtract(start);
         if (diff.getX() == diff.getZ())
-            facing = Direction.get(facing.getDirection(), world.getBlockState(start).get(Properties.AXIS) == Axis.X ? Axis.Z : Axis.X);
+            facing = Direction.get(facing.getAxisDirection(), world.getBlockState(start).getValue(BlockStateProperties.AXIS) == Axis.X ? Axis.Z : Axis.X);
 
         List<BlockPos> beltsToCreate = getBeltChainBetween(start, end, slope, facing);
-        BlockState beltBlock = AllBlocks.BELT.getDefaultState();
+        BlockState beltBlock = AllBlocks.BELT.defaultBlockState();
         boolean failed = false;
 
         for (BlockPos pos : beltsToCreate) {
             BlockState existingBlock = world.getBlockState(pos);
-            if (existingBlock.getHardness(world, pos) == -1) {
+            if (existingBlock.getDestroySpeed(world, pos) == -1) {
                 failed = true;
                 break;
             }
@@ -129,18 +129,18 @@ public class BeltConnectorItem extends BlockItem {
             boolean pulley = ShaftBlock.isShaft(shaftState);
             if (part == BeltPart.MIDDLE && pulley)
                 part = BeltPart.PULLEY;
-            if (pulley && shaftState.get(AbstractSimpleShaftBlock.AXIS) == Axis.Y)
+            if (pulley && shaftState.getValue(AbstractSimpleShaftBlock.AXIS) == Axis.Y)
                 slope = BeltSlope.SIDEWAYS;
 
-            if (!existingBlock.isReplaceable())
-                world.breakBlock(pos, false);
+            if (!existingBlock.canBeReplaced())
+                world.destroyBlock(pos, false);
 
             KineticBlockEntity.switchToBlockState(
                 world,
                 pos,
                 ProperWaterloggedBlock.withWater(
                     world,
-                    beltBlock.with(BeltBlock.SLOPE, slope).with(BeltBlock.PART, part).with(BeltBlock.HORIZONTAL_FACING, facing),
+                    beltBlock.setValue(BeltBlock.SLOPE, slope).setValue(BeltBlock.PART, part).setValue(BeltBlock.HORIZONTAL_FACING, facing),
                     pos
                 )
             );
@@ -150,8 +150,8 @@ public class BeltConnectorItem extends BlockItem {
             return;
 
         for (BlockPos pos : beltsToCreate)
-            if (world.getBlockState(pos).isOf(AllBlocks.BELT))
-                world.breakBlock(pos, false);
+            if (world.getBlockState(pos).is(AllBlocks.BELT))
+                world.destroyBlock(pos, false);
     }
 
     private static Direction getFacingFromTo(BlockPos start, BlockPos end) {
@@ -187,13 +187,13 @@ public class BeltConnectorItem extends BlockItem {
             positions.add(current);
 
             if (slope == BeltSlope.VERTICAL) {
-                current = current.up(direction.getDirection() == AxisDirection.POSITIVE ? 1 : -1);
+                current = current.above(direction.getAxisDirection() == AxisDirection.POSITIVE ? 1 : -1);
                 continue;
             }
 
-            current = current.offset(direction);
+            current = current.relative(direction);
             if (slope != BeltSlope.HORIZONTAL)
-                current = current.up(slope == BeltSlope.UPWARD ? 1 : -1);
+                current = current.above(slope == BeltSlope.UPWARD ? 1 : -1);
 
         } while (!current.equals(end) && limit-- > 0);
 
@@ -201,14 +201,14 @@ public class BeltConnectorItem extends BlockItem {
         return positions;
     }
 
-    public static boolean canConnect(World world, BlockPos first, BlockPos second) {
-        if (!world.isPosLoaded(first) || !world.isPosLoaded(second))
+    public static boolean canConnect(Level world, BlockPos first, BlockPos second) {
+        if (!world.isLoaded(first) || !world.isLoaded(second))
             return false;
-        if (!second.isWithinDistance(first, maxLength()))
+        if (!second.closerThan(first, maxLength()))
             return false;
 
         BlockPos diff = second.subtract(first);
-        Axis shaftAxis = world.getBlockState(first).get(Properties.AXIS);
+        Axis shaftAxis = world.getBlockState(first).getValue(BlockStateProperties.AXIS);
 
         int x = diff.getX();
         int y = diff.getY();
@@ -219,7 +219,7 @@ public class BeltConnectorItem extends BlockItem {
             return false;
         if (sames != 1)
             return false;
-        if (shaftAxis != world.getBlockState(second).get(Properties.AXIS))
+        if (shaftAxis != world.getBlockState(second).getValue(BlockStateProperties.AXIS))
             return false;
         if (shaftAxis == Axis.Y && x != 0 && z != 0)
             return false;
@@ -237,13 +237,13 @@ public class BeltConnectorItem extends BlockItem {
         if (Math.signum(speed1) != Math.signum(speed2) && speed1 != 0 && speed2 != 0)
             return false;
 
-        BlockPos step = BlockPos.ofFloored(Math.signum(diff.getX()), Math.signum(diff.getY()), Math.signum(diff.getZ()));
+        BlockPos step = BlockPos.containing(Math.signum(diff.getX()), Math.signum(diff.getY()), Math.signum(diff.getZ()));
         int limit = 1000;
-        for (BlockPos currentPos = first.add(step); !currentPos.equals(second) && limit-- > 0; currentPos = currentPos.add(step)) {
+        for (BlockPos currentPos = first.offset(step); !currentPos.equals(second) && limit-- > 0; currentPos = currentPos.offset(step)) {
             BlockState blockState = world.getBlockState(currentPos);
-            if (ShaftBlock.isShaft(blockState) && blockState.get(AbstractSimpleShaftBlock.AXIS) == shaftAxis)
+            if (ShaftBlock.isShaft(blockState) && blockState.getValue(AbstractSimpleShaftBlock.AXIS) == shaftAxis)
                 continue;
-            if (!blockState.isReplaceable())
+            if (!blockState.canBeReplaced())
                 return false;
         }
 
@@ -255,8 +255,8 @@ public class BeltConnectorItem extends BlockItem {
         return AllConfigs.server().kinetics.maxBeltLength.get();
     }
 
-    public static boolean validateAxis(World world, BlockPos pos) {
-        if (!world.isPosLoaded(pos))
+    public static boolean validateAxis(Level world, BlockPos pos) {
+        if (!world.isLoaded(pos))
             return false;
         if (!ShaftBlock.isShaft(world.getBlockState(pos)))
             return false;

@@ -8,13 +8,12 @@ import com.zurrtum.create.content.kinetics.transmission.sequencer.SequencerInstr
 import com.zurrtum.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.foundation.blockEntity.behaviour.scrollValue.ServerScrollValueBehaviour;
 import com.zurrtum.create.foundation.blockEntity.behaviour.scrollValue.ServerValveScrollValueBehaviour;
-import net.minecraft.block.BlockState;
-import net.minecraft.storage.ReadView;
-import net.minecraft.storage.WriteView;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.MathHelper;
-
 import java.util.List;
+import net.minecraft.core.BlockPos;
+import net.minecraft.util.Mth;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 
 public class ValveHandleBlockEntity extends HandCrankBlockEntity {
 
@@ -45,7 +44,7 @@ public class ValveHandleBlockEntity extends HandCrankBlockEntity {
     }
 
     @Override
-    public void write(WriteView view, boolean clientPacket) {
+    public void write(ValueOutput view, boolean clientPacket) {
         super.write(view, clientPacket);
         view.putInt("TotalUseTicks", totalUseTicks);
         view.putInt("StartAngle", startAngle);
@@ -53,11 +52,11 @@ public class ValveHandleBlockEntity extends HandCrankBlockEntity {
     }
 
     @Override
-    protected void read(ReadView view, boolean clientPacket) {
+    protected void read(ValueInput view, boolean clientPacket) {
         super.read(view, clientPacket);
-        totalUseTicks = view.getInt("TotalUseTicks", 0);
-        startAngle = view.getInt("StartAngle", 0);
-        targetAngle = view.getInt("TargetAngle", 0);
+        totalUseTicks = view.getIntOr("TotalUseTicks", 0);
+        startAngle = view.getIntOr("StartAngle", 0);
+        targetAngle = view.getIntOr("TargetAngle", 0);
     }
 
     @Override
@@ -77,7 +76,7 @@ public class ValveHandleBlockEntity extends HandCrankBlockEntity {
             return false;
         if (inUse > 0 || cooldown > 0)
             return false;
-        if (world.isClient())
+        if (level.isClientSide())
             return true;
 
         // Always overshoot, target will stop early
@@ -88,7 +87,7 @@ public class ValveHandleBlockEntity extends HandCrankBlockEntity {
         inUse = (int) Math.ceil(target / degreesPerTick) + 2;
 
         startAngle = 0;
-        targetAngle = Math.round((startAngle + (target > 135 ? 180 : 90) * MathHelper.sign(value)) / 90f) * 90;
+        targetAngle = Math.round((startAngle + (target > 135 ? 180 : 90) * Mth.sign(value)) / 90f) * 90;
         totalUseTicks = inUse;
         backwards = sneak;
 
@@ -105,23 +104,23 @@ public class ValveHandleBlockEntity extends HandCrankBlockEntity {
 
     @Override
     @SuppressWarnings("deprecation")
-    public void onBlockReplaced(BlockPos pos, BlockState oldState) {
-        BlockState state = world.getBlockState(pos);
-        if (getType().supports(state)) {
+    public void preRemoveSideEffects(BlockPos pos, BlockState oldState) {
+        BlockState state = level.getBlockState(pos);
+        if (getType().isValid(state)) {
             keepAlive = true;
-            setCachedState(state);
+            setBlockState(state);
         } else {
-            super.onBlockReplaced(pos, oldState);
+            super.preRemoveSideEffects(pos, oldState);
         }
     }
 
     @Override
-    public void markRemoved() {
+    public void setRemoved() {
         if (keepAlive) {
             keepAlive = false;
-            world.getChunk(pos).setBlockEntity(this);
+            level.getChunk(worldPosition).setBlockEntity(this);
         } else {
-            super.markRemoved();
+            super.setRemoved();
         }
     }
 }

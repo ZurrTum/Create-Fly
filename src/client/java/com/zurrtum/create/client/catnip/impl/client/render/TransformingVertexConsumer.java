@@ -1,8 +1,8 @@
 package com.zurrtum.create.client.catnip.impl.client.render;
 
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.zurrtum.create.client.flywheel.lib.math.MatrixMath;
-import net.minecraft.client.render.VertexConsumer;
-import net.minecraft.client.util.math.MatrixStack;
 import org.jetbrains.annotations.UnknownNullability;
 import org.joml.Matrix3f;
 import org.joml.Matrix4f;
@@ -12,9 +12,9 @@ public class TransformingVertexConsumer implements VertexConsumer {
     @UnknownNullability
     private VertexConsumer delegate;
     @UnknownNullability
-    private MatrixStack poseStack;
+    private PoseStack poseStack;
 
-    public void prepare(VertexConsumer delegate, MatrixStack poseStack) {
+    public void prepare(VertexConsumer delegate, PoseStack poseStack) {
         this.delegate = delegate;
         this.poseStack = poseStack;
     }
@@ -25,10 +25,10 @@ public class TransformingVertexConsumer implements VertexConsumer {
     }
 
     @Override
-    public VertexConsumer vertex(float x, float y, float z) {
-        Matrix4f matrix = poseStack.peek().getPositionMatrix();
+    public VertexConsumer addVertex(float x, float y, float z) {
+        Matrix4f matrix = poseStack.last().pose();
 
-        delegate.vertex(
+        delegate.addVertex(
             MatrixMath.transformPositionX(matrix, x, y, z),
             MatrixMath.transformPositionY(matrix, x, y, z),
             MatrixMath.transformPositionZ(matrix, x, y, z)
@@ -37,33 +37,33 @@ public class TransformingVertexConsumer implements VertexConsumer {
     }
 
     @Override
-    public VertexConsumer color(int red, int green, int blue, int alpha) {
-        delegate.color(red, green, blue, alpha);
+    public VertexConsumer setColor(int red, int green, int blue, int alpha) {
+        delegate.setColor(red, green, blue, alpha);
         return this;
     }
 
     @Override
-    public VertexConsumer texture(float u, float v) {
-        delegate.texture(u, v);
+    public VertexConsumer setUv(float u, float v) {
+        delegate.setUv(u, v);
         return this;
     }
 
     @Override
-    public VertexConsumer overlay(int u, int v) {
-        delegate.overlay(u, v);
+    public VertexConsumer setUv1(int u, int v) {
+        delegate.setUv1(u, v);
         return this;
     }
 
     @Override
-    public VertexConsumer light(int u, int v) {
-        delegate.light(u, v);
+    public VertexConsumer setUv2(int u, int v) {
+        delegate.setUv2(u, v);
         return this;
     }
 
     @Override
-    public VertexConsumer normal(float x, float y, float z) {
-        Matrix3f matrix = poseStack.peek().getNormalMatrix();
-        delegate.normal(
+    public VertexConsumer setNormal(float x, float y, float z) {
+        Matrix3f matrix = poseStack.last().normal();
+        delegate.setNormal(
             MatrixMath.transformNormalX(matrix, x, y, z),
             MatrixMath.transformNormalY(matrix, x, y, z),
             MatrixMath.transformNormalZ(matrix, x, y, z)

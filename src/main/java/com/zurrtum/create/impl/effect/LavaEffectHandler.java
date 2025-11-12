@@ -2,21 +2,21 @@ package com.zurrtum.create.impl.effect;
 
 import com.zurrtum.create.api.effect.OpenPipeEffectHandler;
 import com.zurrtum.create.infrastructure.fluids.FluidStack;
-import net.minecraft.entity.Entity;
-import net.minecraft.util.math.Box;
-import net.minecraft.world.World;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.AABB;
 
 import java.util.List;
 
 public class LavaEffectHandler implements OpenPipeEffectHandler {
     @Override
-    public void apply(World level, Box area, FluidStack fluid) {
-        if (level.getTime() % 5 != 0)
+    public void apply(Level level, AABB area, FluidStack fluid) {
+        if (level.getGameTime() % 5 != 0)
             return;
 
-        List<Entity> entities = level.getOtherEntities(null, area, entity -> !entity.isFireImmune());
+        List<Entity> entities = level.getEntities((Entity) null, area, entity -> !entity.fireImmune());
         for (Entity entity : entities) {
-            entity.setOnFireFor(3);
+            entity.igniteForSeconds(3);
         }
     }
 }

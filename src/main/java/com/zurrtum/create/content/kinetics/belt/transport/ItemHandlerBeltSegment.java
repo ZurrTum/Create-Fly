@@ -1,7 +1,7 @@
 package com.zurrtum.create.content.kinetics.belt.transport;
 
 import com.zurrtum.create.infrastructure.items.ItemInventory;
-import net.minecraft.item.ItemStack;
+import net.minecraft.world.item.ItemStack;
 
 public class ItemHandlerBeltSegment implements ItemInventory {
     private final BeltInventory beltInventory;
@@ -13,12 +13,12 @@ public class ItemHandlerBeltSegment implements ItemInventory {
     }
 
     @Override
-    public int size() {
+    public int getContainerSize() {
         return 1;
     }
 
     @Override
-    public boolean isValid(int slot, ItemStack stack) {
+    public boolean canPlaceItem(int slot, ItemStack stack) {
         return beltInventory.canInsertAt(offset);
     }
 
@@ -29,7 +29,7 @@ public class ItemHandlerBeltSegment implements ItemInventory {
     }
 
     @Override
-    public ItemStack getStack(int slot) {
+    public ItemStack getItem(int slot) {
         if (slot != 0)
             return ItemStack.EMPTY;
         TransportedItemStack stackAtOffset = beltInventory.getStackAtOffset(offset);
@@ -39,7 +39,7 @@ public class ItemHandlerBeltSegment implements ItemInventory {
     }
 
     @Override
-    public ItemStack removeStack(int slot, int amount) {
+    public ItemStack removeItem(int slot, int amount) {
         if (slot != 0)
             return ItemStack.EMPTY;
         TransportedItemStack transported = this.beltInventory.getStackAtOffset(offset);
@@ -51,12 +51,12 @@ public class ItemHandlerBeltSegment implements ItemInventory {
         if (transported.stack.isEmpty())
             beltInventory.toRemove.add(transported);
         else
-            markDirty();
+            setChanged();
         return extracted;
     }
 
     @Override
-    public ItemStack removeStack(int slot) {
+    public ItemStack removeItemNoUpdate(int slot) {
         if (slot != 0)
             return ItemStack.EMPTY;
         TransportedItemStack transported = this.beltInventory.getStackAtOffset(offset);
@@ -69,7 +69,7 @@ public class ItemHandlerBeltSegment implements ItemInventory {
     }
 
     @Override
-    public void setStack(int slot, ItemStack stack) {
+    public void setItem(int slot, ItemStack stack) {
         if (slot != 0) {
             return;
         }
@@ -89,12 +89,12 @@ public class ItemHandlerBeltSegment implements ItemInventory {
     }
 
     @Override
-    public void markDirty() {
+    public void setChanged() {
         beltInventory.belt.notifyUpdate();
     }
 
     @Override
-    public int getMaxCount(ItemStack stack) {
-        return Math.min(stack.getMaxCount(), 64);
+    public int getMaxStackSize(ItemStack stack) {
+        return Math.min(stack.getMaxStackSize(), 64);
     }
 }

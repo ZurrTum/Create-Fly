@@ -1,12 +1,12 @@
 package com.zurrtum.create.impl.registry;
 
 import com.zurrtum.create.api.registry.SimpleRegistry;
-import net.minecraft.state.State;
-import net.minecraft.world.World;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.StateHolder;
 
 // methods are synchronized since registrations can happen during parallel mod loading
 public abstract sealed class SimpleRegistryImpl<K, V> implements SimpleRegistry<K, V> permits SimpleRegistryImpl.MultiImpl, SimpleRegistryImpl.SingleImpl {
@@ -55,7 +55,7 @@ public abstract sealed class SimpleRegistryImpl<K, V> implements SimpleRegistry<
     @Override
     @Nullable
     @SuppressWarnings("unchecked")
-    public synchronized V get(State<K, ?> state) {
+    public synchronized V get(StateHolder<K, ?> state) {
         Objects.requireNonNull(state, "state");
         return this.get(state.owner);
     }
@@ -72,7 +72,7 @@ public abstract sealed class SimpleRegistryImpl<K, V> implements SimpleRegistry<
 
         @Override
         @Nullable
-        public synchronized V get(K object, World world) {
+        public synchronized V get(K object, Level world) {
             Objects.requireNonNull(object, "object");
             if (this.registrations.containsKey(object)) {
                 return this.registrations.get(object);
@@ -155,7 +155,7 @@ public abstract sealed class SimpleRegistryImpl<K, V> implements SimpleRegistry<
 
         @Override
         @NotNull
-        public synchronized List<V> get(K object, World world) {
+        public synchronized List<V> get(K object, Level world) {
             Objects.requireNonNull(object, "object");
             if (!this.totals.containsKey(object)) {
                 this.totals.put(object, this.calculateTotal(object, world));
@@ -164,7 +164,7 @@ public abstract sealed class SimpleRegistryImpl<K, V> implements SimpleRegistry<
             return this.totals.get(object);
         }
 
-        private List<V> calculateTotal(K object, World world) {
+        private List<V> calculateTotal(K object, Level world) {
             List<V> registrations = this.registrations.getOrDefault(object, List.of());
             List<V> total = new ArrayList<>(registrations);
 
@@ -205,7 +205,7 @@ public abstract sealed class SimpleRegistryImpl<K, V> implements SimpleRegistry<
 
         // remove nullable
         @Override
-        public synchronized List<V> get(State<K, ?> state) {
+        public synchronized List<V> get(StateHolder<K, ?> state) {
             return super.get(state);
         }
 

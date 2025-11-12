@@ -5,29 +5,29 @@ import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.mojang.brigadier.CommandDispatcher;
 import com.zurrtum.create.client.flywheel.impl.FlwCommands;
 import com.zurrtum.create.foundation.blockEntity.SyncedBlockEntity;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.client.network.ClientPlayNetworkHandler;
-import net.minecraft.command.CommandSource;
-import net.minecraft.network.packet.s2c.play.CommandTreeS2CPacket;
-import net.minecraft.storage.ReadView;
+import net.minecraft.client.multiplayer.ClientPacketListener;
+import net.minecraft.commands.SharedSuggestionProvider;
+import net.minecraft.network.protocol.game.ClientboundCommandsPacket;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.storage.ValueInput;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-@Mixin(ClientPlayNetworkHandler.class)
+@Mixin(ClientPacketListener.class)
 public class ClientPlayNetworkHandlerMixin {
     @Shadow
-    private CommandDispatcher<CommandSource> commandDispatcher;
+    private CommandDispatcher<SharedSuggestionProvider> commands;
 
-    @Inject(method = "onCommandTree(Lnet/minecraft/network/packet/s2c/play/CommandTreeS2CPacket;)V", at = @At("TAIL"))
-    private void addCommand(CommandTreeS2CPacket packet, CallbackInfo ci) {
-        FlwCommands.registerClientCommands(commandDispatcher);
+    @Inject(method = "handleCommands(Lnet/minecraft/network/protocol/game/ClientboundCommandsPacket;)V", at = @At("TAIL"))
+    private void addCommand(ClientboundCommandsPacket packet, CallbackInfo ci) {
+        FlwCommands.registerClientCommands(commands);
     }
 
-    @WrapOperation(method = "method_38542(Lnet/minecraft/network/packet/s2c/play/BlockEntityUpdateS2CPacket;Lnet/minecraft/block/entity/BlockEntity;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/block/entity/BlockEntity;read(Lnet/minecraft/storage/ReadView;)V"))
-    private void onDataPacket(BlockEntity blockEntity, ReadView view, Operation<Void> original) {
+    @WrapOperation(method = "method_38542(Lnet/minecraft/network/protocol/game/ClientboundBlockEntityDataPacket;Lnet/minecraft/world/level/block/entity/BlockEntity;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/block/entity/BlockEntity;loadWithComponents(Lnet/minecraft/world/level/storage/ValueInput;)V"))
+    private void onDataPacket(BlockEntity blockEntity, ValueInput view, Operation<Void> original) {
         if (blockEntity instanceof SyncedBlockEntity syncedBlockEntity) {
             syncedBlockEntity.onDataPacket(view);
         } else {

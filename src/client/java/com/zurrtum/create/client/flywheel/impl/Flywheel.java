@@ -2,7 +2,7 @@ package com.zurrtum.create.client.flywheel.impl;
 
 import net.fabricmc.loader.api.Version;
 import net.fabricmc.loader.impl.util.version.StringVersion;
-import net.minecraft.command.argument.ArgumentTypes;
+import net.minecraft.commands.synchronization.ArgumentTypeInfos;
 import org.jetbrains.annotations.UnknownNullability;
 
 public final class Flywheel {
@@ -19,9 +19,9 @@ public final class Flywheel {
         // We can't use ArgumentTypeRegistry from Fabric API here as it also registers to BuiltInRegistries.COMMAND_ARGUMENT_TYPE.
         // We can't register anything to BuiltInRegistries.COMMAND_ARGUMENT_TYPE because it is a synced registry but
         // Flywheel is a client-side only mod.
-        ArgumentTypes.CLASS_MAP.put(BackendArgument.class, BackendArgument.INFO);
-        ArgumentTypes.CLASS_MAP.put(DebugModeArgument.class, DebugModeArgument.INFO);
-        ArgumentTypes.CLASS_MAP.put(LightSmoothnessArgument.class, LightSmoothnessArgument.INFO);
+        ArgumentTypeInfos.BY_CLASS.put(BackendArgument.class, BackendArgument.INFO);
+        ArgumentTypeInfos.BY_CLASS.put(DebugModeArgument.class, DebugModeArgument.INFO);
+        ArgumentTypeInfos.BY_CLASS.put(LightSmoothnessArgument.class, LightSmoothnessArgument.INFO);
     }
 
     public static Version version() {

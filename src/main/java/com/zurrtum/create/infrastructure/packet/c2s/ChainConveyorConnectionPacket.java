@@ -2,31 +2,30 @@ package com.zurrtum.create.infrastructure.packet.c2s;
 
 import com.zurrtum.create.AllHandle;
 import com.zurrtum.create.AllPackets;
-import net.minecraft.item.ItemStack;
-import net.minecraft.network.RegistryByteBuf;
-import net.minecraft.network.codec.PacketCodec;
-import net.minecraft.network.codec.PacketCodecs;
-import net.minecraft.network.packet.PacketType;
-import net.minecraft.server.network.ServerPlayNetworkHandler;
-import net.minecraft.util.math.BlockPos;
-
 import java.util.function.BiConsumer;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.PacketType;
+import net.minecraft.server.network.ServerGamePacketListenerImpl;
+import net.minecraft.world.item.ItemStack;
 
 public record ChainConveyorConnectionPacket(BlockPos pos, BlockPos targetPos, ItemStack chain, boolean connect) implements C2SPacket {
-    public static final PacketCodec<RegistryByteBuf, ChainConveyorConnectionPacket> CODEC = PacketCodec.tuple(
-        BlockPos.PACKET_CODEC,
+    public static final StreamCodec<RegistryFriendlyByteBuf, ChainConveyorConnectionPacket> CODEC = StreamCodec.composite(
+        BlockPos.STREAM_CODEC,
         ChainConveyorConnectionPacket::pos,
-        BlockPos.PACKET_CODEC,
+        BlockPos.STREAM_CODEC,
         ChainConveyorConnectionPacket::targetPos,
-        ItemStack.PACKET_CODEC,
+        ItemStack.STREAM_CODEC,
         ChainConveyorConnectionPacket::chain,
-        PacketCodecs.BOOLEAN,
+        ByteBufCodecs.BOOL,
         ChainConveyorConnectionPacket::connect,
         ChainConveyorConnectionPacket::new
     );
 
     @Override
-    public PacketType<ChainConveyorConnectionPacket> getPacketType() {
+    public PacketType<ChainConveyorConnectionPacket> type() {
         return AllPackets.CHAIN_CONVEYOR_CONNECT;
     }
 
@@ -36,7 +35,7 @@ public record ChainConveyorConnectionPacket(BlockPos pos, BlockPos targetPos, It
     }
 
     @Override
-    public BiConsumer<ServerPlayNetworkHandler, ChainConveyorConnectionPacket> callback() {
+    public BiConsumer<ServerGamePacketListenerImpl, ChainConveyorConnectionPacket> callback() {
         return AllHandle::onChainConveyorConnection;
     }
 }

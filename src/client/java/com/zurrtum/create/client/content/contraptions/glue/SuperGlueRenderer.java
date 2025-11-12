@@ -1,14 +1,14 @@
 package com.zurrtum.create.client.content.contraptions.glue;
 
 import com.zurrtum.create.content.contraptions.glue.SuperGlueEntity;
-import net.minecraft.client.render.Frustum;
-import net.minecraft.client.render.entity.EntityRenderer;
-import net.minecraft.client.render.entity.EntityRendererFactory;
-import net.minecraft.client.render.entity.state.EntityRenderState;
+import net.minecraft.client.renderer.culling.Frustum;
+import net.minecraft.client.renderer.entity.EntityRenderer;
+import net.minecraft.client.renderer.entity.EntityRendererProvider;
+import net.minecraft.client.renderer.entity.state.EntityRenderState;
 
 public class SuperGlueRenderer extends EntityRenderer<SuperGlueEntity, EntityRenderState> {
 
-    public SuperGlueRenderer(EntityRendererFactory.Context context) {
+    public SuperGlueRenderer(EntityRendererProvider.Context context) {
         super(context);
     }
 

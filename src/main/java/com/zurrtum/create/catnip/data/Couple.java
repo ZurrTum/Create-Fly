@@ -6,15 +6,15 @@ import com.mojang.serialization.DataResult;
 import com.mojang.serialization.DynamicOps;
 import com.mojang.serialization.ListBuilder;
 import com.zurrtum.create.catnip.nbt.NBTHelper;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.nbt.NbtList;
-import net.minecraft.network.codec.PacketCodec;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Iterator;
 import java.util.List;
 import java.util.function.*;
 import java.util.stream.Stream;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.network.codec.StreamCodec;
 
 public class Couple<T> extends Pair<T, T> implements Iterable<T> {
 
@@ -36,7 +36,7 @@ public class Couple<T> extends Pair<T, T> implements Iterable<T> {
         return new Couple<>(factory.apply(true), factory.apply(false));
     }
 
-    public static <S> Couple<S> deserializeEach(NbtList list, Function<NbtCompound, S> deserializer) {
+    public static <S> Couple<S> deserializeEach(ListTag list, Function<CompoundTag, S> deserializer) {
         List<S> readCompoundList = NBTHelper.readCompoundList(list, deserializer);
         return new Couple<>(readCompoundList.get(0), readCompoundList.get(1));
     }
@@ -80,8 +80,8 @@ public class Couple<T> extends Pair<T, T> implements Iterable<T> {
         };
     }
 
-    public static <B, T> PacketCodec<B, Couple<T>> streamCodec(PacketCodec<? super B, T> codec) {
-        return PacketCodec.tuple(codec, Couple::getFirst, codec, Couple::getSecond, Couple::new);
+    public static <B, T> StreamCodec<B, Couple<T>> streamCodec(StreamCodec<? super B, T> codec) {
+        return StreamCodec.composite(codec, Couple::getFirst, codec, Couple::getSecond, Couple::new);
     }
 
     public T get(boolean first) {
@@ -161,7 +161,7 @@ public class Couple<T> extends Pair<T, T> implements Iterable<T> {
         return Couple.create(second, first);
     }
 
-    public NbtList serializeEach(Function<T, NbtCompound> serializer) {
+    public ListTag serializeEach(Function<T, CompoundTag> serializer) {
         return NBTHelper.writeCompoundList(ImmutableList.of(first, second), serializer);
     }
 

@@ -16,25 +16,30 @@ import com.zurrtum.create.infrastructure.component.ShoppingList;
 import com.zurrtum.create.infrastructure.packet.c2s.LogisticalStockRequestPacket;
 import com.zurrtum.create.infrastructure.packet.s2c.RemoveBlockEntityPacket;
 import com.zurrtum.create.infrastructure.packet.s2c.ShopUpdatePacket;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.network.packet.Packet;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.sound.SoundCategory;
-import net.minecraft.sound.SoundEvents;
-import net.minecraft.storage.ReadView;
-import net.minecraft.storage.WriteView;
-import net.minecraft.text.Text;
+import net.minecraft.ChatFormatting;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.UUIDUtil;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.protocol.Packet;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.*;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.math.ChunkPos;
-import net.minecraft.util.math.Direction;
+import net.minecraft.world.Containers;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.ChunkPos;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.BlockHitResult;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -97,10 +102,10 @@ public class TableClothBlockEntity extends SmartBlockEntity implements Transform
     }
 
     public void notifyShopUpdate() {
-        if (world instanceof ServerWorld serverLevel) {
-            Packet<?> packet = new ShopUpdatePacket(pos);
-            for (ServerPlayerEntity player : serverLevel.getChunkManager().chunkLoadingManager.getPlayersWatchingChunk(new ChunkPos(pos), false)) {
-                player.networkHandler.sendPacket(packet);
+        if (level instanceof ServerLevel serverLevel) {
+            Packet<?> packet = new ShopUpdatePacket(worldPosition);
+            for (ServerPlayer player : serverLevel.getChunkSource().chunkMap.getPlayers(new ChunkPos(worldPosition), false)) {
+                player.connection.send(packet);
             }
         }
     }
@@ -108,122 +113,122 @@ public class TableClothBlockEntity extends SmartBlockEntity implements Transform
     @Override
     public void lazyTick() {
         super.lazyTick();
-        BlockPos relativePos = pos.offset(facing);
-        sideOccluded = world.getBlockState(relativePos)
-            .isIn(AllBlockTags.TABLE_CLOTHS) || Block.isFaceFullSquare(
-            world.getBlockState(relativePos.down()).getCullingShape(),
+        BlockPos relativePos = worldPosition.relative(facing);
+        sideOccluded = level.getBlockState(relativePos)
+            .is(AllBlockTags.TABLE_CLOTHS) || Block.isFaceFull(
+            level.getBlockState(relativePos.below()).getOcclusionShape(),
             facing.getOpposite()
         );
     }
 
     @Override
-    protected Box createRenderBoundingBox() {
-        return super.createRenderBoundingBox().expand(1);
+    protected AABB createRenderBoundingBox() {
+        return super.createRenderBoundingBox().inflate(1);
     }
 
     public boolean isShop() {
         return !requestData.encodedRequest().isEmpty();
     }
 
-    public ActionResult use(PlayerEntity player, BlockHitResult ray) {
+    public InteractionResult use(Player player, BlockHitResult ray) {
         if (isShop())
             return useShop(player);
 
-        ItemStack heldItem = player.getStackInHand(Hand.MAIN_HAND);
+        ItemStack heldItem = player.getItemInHand(InteractionHand.MAIN_HAND);
 
         if (heldItem.isEmpty()) {
             if (manuallyAddedItems.isEmpty())
-                return ActionResult.SUCCESS;
-            player.setStackInHand(Hand.MAIN_HAND, manuallyAddedItems.remove(manuallyAddedItems.size() - 1));
-            world.playSound(null, pos, SoundEvents.ENTITY_ITEM_FRAME_REMOVE_ITEM, SoundCategory.BLOCKS, 0.5f, 1f);
+                return InteractionResult.SUCCESS;
+            player.setItemInHand(InteractionHand.MAIN_HAND, manuallyAddedItems.remove(manuallyAddedItems.size() - 1));
+            level.playSound(null, worldPosition, SoundEvents.ITEM_FRAME_REMOVE_ITEM, SoundSource.BLOCKS, 0.5f, 1f);
 
             if (manuallyAddedItems.isEmpty()/* && !computerBehaviour.hasAttachedComputer()*/) {
-                world.setBlockState(pos, getCachedState().with(TableClothBlock.HAS_BE, false), Block.NOTIFY_ALL);
-                if (world instanceof ServerWorld serverLevel) {
-                    Packet<?> packet = new RemoveBlockEntityPacket(pos);
-                    for (ServerPlayerEntity serverPlayer : serverLevel.getChunkManager().chunkLoadingManager.getPlayersWatchingChunk(
-                        new ChunkPos(pos),
+                level.setBlock(worldPosition, getBlockState().setValue(TableClothBlock.HAS_BE, false), Block.UPDATE_ALL);
+                if (level instanceof ServerLevel serverLevel) {
+                    Packet<?> packet = new RemoveBlockEntityPacket(worldPosition);
+                    for (ServerPlayer serverPlayer : serverLevel.getChunkSource().chunkMap.getPlayers(
+                        new ChunkPos(worldPosition),
                         false
                     )) {
-                        serverPlayer.networkHandler.sendPacket(packet);
+                        serverPlayer.connection.send(packet);
                     }
                 }
             } else
                 notifyUpdate();
 
-            return ActionResult.SUCCESS;
+            return InteractionResult.SUCCESS;
         }
 
         if (manuallyAddedItems.size() >= 4)
-            return ActionResult.SUCCESS;
+            return InteractionResult.SUCCESS;
 
-        world.playSound(null, pos, SoundEvents.ENTITY_ITEM_FRAME_ADD_ITEM, SoundCategory.BLOCKS, 0.5f, 1f);
+        level.playSound(null, worldPosition, SoundEvents.ITEM_FRAME_ADD_ITEM, SoundSource.BLOCKS, 0.5f, 1f);
         manuallyAddedItems.add(heldItem.copyWithCount(1));
-        facing = player.getHorizontalFacing().getOpposite();
-        heldItem.decrement(1);
+        facing = player.getDirection().getOpposite();
+        heldItem.shrink(1);
         if (heldItem.isEmpty())
-            player.setStackInHand(Hand.MAIN_HAND, ItemStack.EMPTY);
+            player.setItemInHand(InteractionHand.MAIN_HAND, ItemStack.EMPTY);
         notifyUpdate();
-        return ActionResult.SUCCESS;
+        return InteractionResult.SUCCESS;
     }
 
-    public ActionResult useShop(PlayerEntity player) {
-        ItemStack itemInHand = player.getStackInHand(Hand.MAIN_HAND);
+    public InteractionResult useShop(Player player) {
+        ItemStack itemInHand = player.getItemInHand(InteractionHand.MAIN_HAND);
         ItemStack prevListItem = ItemStack.EMPTY;
         boolean addOntoList = false;
 
         // Remove other lists from inventory
         for (int i = 0; i < 9; i++) {
-            ItemStack item = player.getInventory().getStack(i);
-            if (!item.isOf(AllItems.SHOPPING_LIST))
+            ItemStack item = player.getInventory().getItem(i);
+            if (!item.is(AllItems.SHOPPING_LIST))
                 continue;
             prevListItem = item;
             addOntoList = true;
-            player.getInventory().setStack(i, ItemStack.EMPTY);
+            player.getInventory().setItem(i, ItemStack.EMPTY);
         }
 
         // add onto existing list if in hand
-        if (itemInHand.isOf(AllItems.SHOPPING_LIST)) {
+        if (itemInHand.is(AllItems.SHOPPING_LIST)) {
             prevListItem = itemInHand;
             addOntoList = true;
         }
 
         if (!itemInHand.isEmpty() && !addOntoList) {
-            player.sendMessage(Text.translatable("create.stock_keeper.shopping_list_empty_hand"), true);
-            AllSoundEvents.DENY.playOnServer(world, pos, 0.5f, 1);
-            return ActionResult.SUCCESS;
+            player.displayClientMessage(Component.translatable("create.stock_keeper.shopping_list_empty_hand"), true);
+            AllSoundEvents.DENY.playOnServer(level, worldPosition, 0.5f, 1);
+            return InteractionResult.SUCCESS;
         }
 
         if (getPaymentItem().isEmpty()) {
-            player.sendMessage(Text.translatable("create.stock_keeper.no_price_set"), true);
-            AllSoundEvents.DENY.playOnServer(world, pos, 0.5f, 1);
-            return ActionResult.SUCCESS;
+            player.displayClientMessage(Component.translatable("create.stock_keeper.no_price_set"), true);
+            AllSoundEvents.DENY.playOnServer(level, worldPosition, 0.5f, 1);
+            return InteractionResult.SUCCESS;
         }
 
         UUID tickerID = null;
-        BlockPos tickerPos = requestData.targetOffset().add(pos);
-        if (world.getBlockEntity(tickerPos) instanceof StockTickerBlockEntity stbe && stbe.isKeeperPresent())
+        BlockPos tickerPos = requestData.targetOffset().offset(worldPosition);
+        if (level.getBlockEntity(tickerPos) instanceof StockTickerBlockEntity stbe && stbe.isKeeperPresent())
             tickerID = stbe.behaviour.freqId;
 
         int stockLevel = getStockLevelForTrade(ShoppingListItem.getList(prevListItem));
 
         if (tickerID == null) {
-            player.sendMessage(Text.translatable("create.stock_keeper.keeper_missing").formatted(Formatting.RED), true);
-            AllSoundEvents.DENY.playOnServer(world, pos, 0.5f, 1);
-            return ActionResult.SUCCESS;
+            player.displayClientMessage(Component.translatable("create.stock_keeper.keeper_missing").withStyle(ChatFormatting.RED), true);
+            AllSoundEvents.DENY.playOnServer(level, worldPosition, 0.5f, 1);
+            return InteractionResult.SUCCESS;
         }
 
         if (stockLevel == 0) {
-            player.sendMessage(Text.translatable("create.stock_keeper.out_of_stock").formatted(Formatting.RED), true);
-            AllSoundEvents.DENY.playOnServer(world, pos, 0.5f, 1);
+            player.displayClientMessage(Component.translatable("create.stock_keeper.out_of_stock").withStyle(ChatFormatting.RED), true);
+            AllSoundEvents.DENY.playOnServer(level, worldPosition, 0.5f, 1);
             if (!prevListItem.isEmpty()) {
-                if (player.getStackInHand(Hand.MAIN_HAND).isEmpty())
-                    player.setStackInHand(Hand.MAIN_HAND, prevListItem);
+                if (player.getItemInHand(InteractionHand.MAIN_HAND).isEmpty())
+                    player.setItemInHand(InteractionHand.MAIN_HAND, prevListItem);
                 else
-                    player.getInventory().offerOrDrop(prevListItem);
+                    player.getInventory().placeItemBackInInventory(prevListItem);
             }
 
-            return ActionResult.SUCCESS;
+            return InteractionResult.SUCCESS;
         }
 
         ShoppingList list = new ShoppingList(new ArrayList<>(), owner, tickerID);
@@ -236,46 +241,46 @@ public class TableClothBlockEntity extends SmartBlockEntity implements Transform
                 addOntoList = false;
         }
 
-        if (list.getPurchases(pos) >= stockLevel) {
+        if (list.getPurchases(worldPosition) >= stockLevel) {
             for (IntAttached<BlockPos> entry : list.purchases())
-                if (pos.equals(entry.getValue()))
+                if (worldPosition.equals(entry.getValue()))
                     entry.setFirst(Math.min(stockLevel, entry.getFirst()));
 
-            player.sendMessage(Text.translatable("create.stock_keeper.limited_stock").formatted(Formatting.RED), true);
+            player.displayClientMessage(Component.translatable("create.stock_keeper.limited_stock").withStyle(ChatFormatting.RED), true);
         } else {
-            AllSoundEvents.CONFIRM_2.playOnServer(world, pos, 0.5f, 1.0f);
+            AllSoundEvents.CONFIRM_2.playOnServer(level, worldPosition, 0.5f, 1.0f);
 
             ShoppingList.Mutable mutable = new ShoppingList.Mutable(list);
-            mutable.addPurchases(pos, 1);
+            mutable.addPurchases(worldPosition, 1);
             list = mutable.toImmutable();
 
             if (!addOntoList)
-                player.sendMessage(Text.translatable("create.stock_keeper.use_list_to_add_purchases").withColor(0xeeeeee), true);
+                player.displayClientMessage(Component.translatable("create.stock_keeper.use_list_to_add_purchases").withColor(0xeeeeee), true);
             if (!addOntoList)
-                world.playSound(null, pos, SoundEvents.ITEM_BOOK_PAGE_TURN, SoundCategory.BLOCKS, 1, 1.5f);
+                level.playSound(null, worldPosition, SoundEvents.BOOK_PAGE_TURN, SoundSource.BLOCKS, 1, 1.5f);
         }
 
-        ItemStack newListItem = ShoppingListItem.saveList(AllItems.SHOPPING_LIST.getDefaultStack(), list, requestData.encodedTargetAddress());
+        ItemStack newListItem = ShoppingListItem.saveList(AllItems.SHOPPING_LIST.getDefaultInstance(), list, requestData.encodedTargetAddress());
 
-        if (player.getStackInHand(Hand.MAIN_HAND).isEmpty())
-            player.setStackInHand(Hand.MAIN_HAND, newListItem);
+        if (player.getItemInHand(InteractionHand.MAIN_HAND).isEmpty())
+            player.setItemInHand(InteractionHand.MAIN_HAND, newListItem);
         else
-            player.getInventory().offerOrDrop(newListItem);
+            player.getInventory().placeItemBackInInventory(newListItem);
 
-        return ActionResult.SUCCESS;
+        return InteractionResult.SUCCESS;
     }
 
     public int getStockLevelForTrade(@Nullable ShoppingList otherPurchases) {
-        BlockPos tickerPos = requestData.targetOffset().add(pos);
-        if (!(world.getBlockEntity(tickerPos) instanceof StockTickerBlockEntity stbe))
+        BlockPos tickerPos = requestData.targetOffset().offset(worldPosition);
+        if (!(level.getBlockEntity(tickerPos) instanceof StockTickerBlockEntity stbe))
             return 0;
 
         InventorySummary recentSummary;
 
-        if (world.isClient()) {
+        if (level.isClientSide()) {
             if (stbe.getTicksSinceLastUpdate() > 15) {
                 stbe.resetTicksSinceLastUpdate();
-                AllClientHandle.INSTANCE.sendPacket(new LogisticalStockRequestPacket(stbe.getPos()));
+                AllClientHandle.INSTANCE.sendPacket(new LogisticalStockRequestPacket(stbe.getBlockPos()));
             }
             recentSummary = stbe.getLastClientsideStockSnapshotAsSummary();
         } else
@@ -286,7 +291,7 @@ public class TableClothBlockEntity extends SmartBlockEntity implements Transform
 
         InventorySummary modifierSummary = new InventorySummary();
         if (otherPurchases != null)
-            modifierSummary = otherPurchases.bakeEntries(world, pos).getFirst();
+            modifierSummary = otherPurchases.bakeEntries(level, worldPosition).getFirst();
 
         int smallestQuotient = Integer.MAX_VALUE;
         for (BigItemStack entry : requestData.encodedRequest().stacks())
@@ -300,29 +305,29 @@ public class TableClothBlockEntity extends SmartBlockEntity implements Transform
     }
 
     @Override
-    protected void write(WriteView view, boolean clientPacket) {
+    protected void write(ValueOutput view, boolean clientPacket) {
         super.write(view, clientPacket);
-        view.put("Items", CreateCodecs.ITEM_LIST_CODEC, manuallyAddedItems);
-        view.put("Facing", Direction.CODEC, facing);
-        view.put("RequestData", AutoRequestData.CODEC, requestData);
+        view.store("Items", CreateCodecs.ITEM_LIST_CODEC, manuallyAddedItems);
+        view.store("Facing", Direction.CODEC, facing);
+        view.store("RequestData", AutoRequestData.CODEC, requestData);
         if (owner != null)
-            view.put("OwnerUUID", Uuids.INT_STREAM_CODEC, owner);
+            view.store("OwnerUUID", UUIDUtil.CODEC, owner);
     }
 
     @Override
-    protected void read(ReadView view, boolean clientPacket) {
+    protected void read(ValueInput view, boolean clientPacket) {
         super.read(view, clientPacket);
         manuallyAddedItems.clear();
         view.read("Items", CreateCodecs.ITEM_LIST_CODEC).ifPresent(list -> manuallyAddedItems.addAll(list));
         requestData = view.read("RequestData", AutoRequestData.CODEC).orElseGet(AutoRequestData::new);
-        owner = view.read("OwnerUUID", Uuids.INT_STREAM_CODEC).orElse(null);
+        owner = view.read("OwnerUUID", UUIDUtil.CODEC).orElse(null);
         facing = view.read("Facing", Direction.CODEC).orElse(Direction.DOWN);
     }
 
     @Override
     public void destroy() {
         super.destroy();
-        manuallyAddedItems.forEach(stack -> ItemScatterer.spawn(world, pos.getX(), pos.getY(), pos.getZ(), stack));
+        manuallyAddedItems.forEach(stack -> Containers.dropItemStack(level, worldPosition.getX(), worldPosition.getY(), worldPosition.getZ(), stack));
         manuallyAddedItems.clear();
     }
 

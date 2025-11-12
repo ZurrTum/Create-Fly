@@ -15,29 +15,29 @@ import mezz.jei.api.gui.ingredient.IRecipeSlotsView;
 import mezz.jei.api.recipe.IFocusGroup;
 import mezz.jei.api.recipe.RecipeIngredientRole;
 import mezz.jei.api.recipe.types.IRecipeType;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.recipe.PreparedRecipes;
-import net.minecraft.recipe.RecipeEntry;
-import net.minecraft.text.Text;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.item.crafting.RecipeHolder;
+import net.minecraft.world.item.crafting.RecipeMap;
 import org.jetbrains.annotations.NotNull;
 import org.joml.Matrix3x2f;
 
 import java.util.List;
 
-public class SandpaperPolishingCategory extends CreateCategory<RecipeEntry<SandPaperPolishingRecipe>> {
-    public static List<RecipeEntry<SandPaperPolishingRecipe>> getRecipes(PreparedRecipes preparedRecipes) {
-        return preparedRecipes.getAll(AllRecipeTypes.SANDPAPER_POLISHING).stream().toList();
+public class SandpaperPolishingCategory extends CreateCategory<RecipeHolder<SandPaperPolishingRecipe>> {
+    public static List<RecipeHolder<SandPaperPolishingRecipe>> getRecipes(RecipeMap preparedRecipes) {
+        return preparedRecipes.byType(AllRecipeTypes.SANDPAPER_POLISHING).stream().toList();
     }
 
     @Override
     @NotNull
-    public IRecipeType<RecipeEntry<SandPaperPolishingRecipe>> getRecipeType() {
+    public IRecipeType<RecipeHolder<SandPaperPolishingRecipe>> getRecipeType() {
         return JeiClientPlugin.SANDPAPER_POLISHING;
     }
 
     @Override
     @NotNull
-    public Text getTitle() {
+    public Component getTitle() {
         return CreateLang.translateDirect("recipe.sandpaper_polishing");
     }
 
@@ -52,7 +52,7 @@ public class SandpaperPolishingCategory extends CreateCategory<RecipeEntry<SandP
     }
 
     @Override
-    public void setRecipe(IRecipeLayoutBuilder builder, RecipeEntry<SandPaperPolishingRecipe> entry, IFocusGroup focuses) {
+    public void setRecipe(IRecipeLayoutBuilder builder, RecipeHolder<SandPaperPolishingRecipe> entry, IFocusGroup focuses) {
         SandPaperPolishingRecipe recipe = entry.value();
         builder.addInputSlot(27, 29).setBackground(SLOT, -1, -1).add(recipe.ingredient());
         builder.addOutputSlot(132, 29).setBackground(SLOT, -1, -1).add(recipe.result());
@@ -60,16 +60,16 @@ public class SandpaperPolishingCategory extends CreateCategory<RecipeEntry<SandP
 
     @Override
     public void draw(
-        RecipeEntry<SandPaperPolishingRecipe> entry,
+        RecipeHolder<SandPaperPolishingRecipe> entry,
         IRecipeSlotsView recipeSlotsView,
-        DrawContext graphics,
+        GuiGraphics graphics,
         double mouseX,
         double mouseY
     ) {
         AllGuiTextures.JEI_SHADOW.render(graphics, 61, 21);
         AllGuiTextures.JEI_LONG_ARROW.render(graphics, 52, 32);
         recipeSlotsView.getSlotViews(RecipeIngredientRole.INPUT).getFirst().getDisplayedItemStack().ifPresent(stack -> {
-            graphics.state.addSpecialElement(new SandPaperRenderState(new Matrix3x2f(graphics.getMatrices()), stack, 74, -2));
+            graphics.guiRenderState.submitPicturesInPictureState(new SandPaperRenderState(new Matrix3x2f(graphics.pose()), stack, 74, -2));
         });
     }
 }

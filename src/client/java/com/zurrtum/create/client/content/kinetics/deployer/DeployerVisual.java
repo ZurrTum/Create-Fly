@@ -1,5 +1,6 @@
 package com.zurrtum.create.client.content.kinetics.deployer;
 
+import com.mojang.math.Axis;
 import com.zurrtum.create.catnip.math.AngleHelper;
 import com.zurrtum.create.client.AllPartialModels;
 import com.zurrtum.create.client.content.kinetics.base.ShaftVisual;
@@ -14,7 +15,10 @@ import com.zurrtum.create.client.flywheel.lib.model.baked.PartialModel;
 import com.zurrtum.create.client.flywheel.lib.visual.SimpleDynamicVisual;
 import com.zurrtum.create.client.flywheel.lib.visual.SimpleTickableVisual;
 import com.zurrtum.create.content.kinetics.deployer.DeployerBlockEntity;
-import net.minecraft.util.math.*;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.Vec3i;
+import net.minecraft.util.Mth;
 import org.joml.Quaternionf;
 
 import java.util.function.Consumer;
@@ -39,9 +43,9 @@ public class DeployerVisual extends ShaftVisual<DeployerBlockEntity> implements 
     public DeployerVisual(VisualizationContext context, DeployerBlockEntity blockEntity, float partialTick) {
         super(context, blockEntity, partialTick);
 
-        facing = blockState.get(FACING);
+        facing = blockState.getValue(FACING);
 
-        boolean rotatePole = blockState.get(AXIS_ALONG_FIRST_COORDINATE) ^ facing.getAxis() == Direction.Axis.Z;
+        boolean rotatePole = blockState.getValue(AXIS_ALONG_FIRST_COORDINATE) ^ facing.getAxis() == Direction.Axis.Z;
 
         yRot = AngleHelper.horizontalAngle(facing);
         xRot = facing == Direction.UP ? 270 : facing == Direction.DOWN ? 90 : 0;
@@ -72,7 +76,7 @@ public class DeployerVisual extends ShaftVisual<DeployerBlockEntity> implements 
     public void beginFrame(DynamicVisual.Context ctx) {
         float newProgress = getProgress(ctx.partialTick());
 
-        if (MathHelper.approximatelyEquals(newProgress, progress))
+        if (Mth.equal(newProgress, progress))
             return;
 
         progress = newProgress;
@@ -107,8 +111,8 @@ public class DeployerVisual extends ShaftVisual<DeployerBlockEntity> implements 
 
     private void updatePosition() {
         float handLength = currentHand == AllPartialModels.DEPLOYER_HAND_POINTING ? 0 : currentHand == AllPartialModels.DEPLOYER_HAND_HOLDING ? 4 / 16f : 3 / 16f;
-        float distance = Math.min(MathHelper.clamp(progress, 0, 1) * (blockEntity.reach + handLength), 21 / 16f);
-        Vec3i facingVec = facing.getVector();
+        float distance = Math.min(Mth.clamp(progress, 0, 1) * (blockEntity.reach + handLength), 21 / 16f);
+        Vec3i facingVec = facing.getUnitVec3i();
         BlockPos blockPos = getVisualPosition();
 
         float x = blockPos.getX() + ((float) facingVec.getX()) * distance;
@@ -121,12 +125,12 @@ public class DeployerVisual extends ShaftVisual<DeployerBlockEntity> implements 
 
     static void updateRotation(OrientedInstance pole, OrientedInstance hand, float yRot, float xRot, float zRot) {
 
-        Quaternionf q = RotationAxis.POSITIVE_Y.rotationDegrees(yRot);
-        q.mul(RotationAxis.POSITIVE_X.rotationDegrees(xRot));
+        Quaternionf q = Axis.YP.rotationDegrees(yRot);
+        q.mul(Axis.XP.rotationDegrees(xRot));
 
         hand.rotation(q).setChanged();
 
-        q.mul(RotationAxis.POSITIVE_Z.rotationDegrees(zRot));
+        q.mul(Axis.ZP.rotationDegrees(zRot));
 
         pole.rotation(q).setChanged();
     }

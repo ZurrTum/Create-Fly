@@ -1,5 +1,7 @@
 package com.zurrtum.create.client.content.contraptions.gantry;
 
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.zurrtum.create.catnip.data.Iterate;
 import com.zurrtum.create.catnip.math.AngleHelper;
 import com.zurrtum.create.client.AllPartialModels;
@@ -10,22 +12,20 @@ import com.zurrtum.create.client.content.kinetics.base.KineticBlockEntityRendere
 import com.zurrtum.create.content.contraptions.gantry.GantryCarriageBlock;
 import com.zurrtum.create.content.contraptions.gantry.GantryCarriageBlockEntity;
 import com.zurrtum.create.content.kinetics.base.KineticBlockEntity;
-import net.minecraft.block.BlockState;
-import net.minecraft.client.render.RenderLayer;
-import net.minecraft.client.render.VertexConsumer;
-import net.minecraft.client.render.block.entity.BlockEntityRendererFactory;
-import net.minecraft.client.render.command.ModelCommandRenderer;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Direction.Axis;
-import net.minecraft.util.math.Direction.AxisDirection;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
+import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.Direction.Axis;
+import net.minecraft.core.Direction.AxisDirection;
+import net.minecraft.util.Mth;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 
 public class GantryCarriageRenderer extends KineticBlockEntityRenderer<GantryCarriageBlockEntity, GantryCarriageRenderer.GantryCarriageRenderState> {
-    public GantryCarriageRenderer(BlockEntityRendererFactory.Context context) {
+    public GantryCarriageRenderer(BlockEntityRendererProvider.Context context) {
         super(context);
     }
 
@@ -35,22 +35,22 @@ public class GantryCarriageRenderer extends KineticBlockEntityRenderer<GantryCar
     }
 
     @Override
-    public void updateRenderState(
+    public void extractRenderState(
         GantryCarriageBlockEntity be,
         GantryCarriageRenderState state,
         float tickProgress,
-        Vec3d cameraPos,
-        ModelCommandRenderer.@Nullable CrumblingOverlayCommand crumblingOverlay
+        Vec3 cameraPos,
+        @Nullable ModelFeatureRenderer.CrumblingOverlay crumblingOverlay
     ) {
-        super.updateRenderState(be, state, tickProgress, cameraPos, crumblingOverlay);
+        super.extractRenderState(be, state, tickProgress, cameraPos, crumblingOverlay);
         if (state.support) {
             return;
         }
-        BlockState blockState = be.getCachedState();
-        Direction facing = blockState.get(GantryCarriageBlock.FACING);
-        Boolean alongFirst = blockState.get(GantryCarriageBlock.AXIS_ALONG_FIRST_COORDINATE);
+        BlockState blockState = be.getBlockState();
+        Direction facing = blockState.getValue(GantryCarriageBlock.FACING);
+        Boolean alongFirst = blockState.getValue(GantryCarriageBlock.AXIS_ALONG_FIRST_COORDINATE);
         Axis rotationAxis = state.axis;
-        BlockPos visualPos = facing.getDirection() == AxisDirection.POSITIVE ? be.getPos() : be.getPos().offset(facing.getOpposite());
+        BlockPos visualPos = facing.getAxisDirection() == AxisDirection.POSITIVE ? be.getBlockPos() : be.getBlockPos().relative(facing.getOpposite());
         float angleForBE = getAngleForBE(be, visualPos, rotationAxis);
         Axis gantryAxis = Axis.X;
         for (Axis axis : Iterate.axes) {
@@ -65,19 +65,19 @@ public class GantryCarriageRenderer extends KineticBlockEntityRenderer<GantryCar
             angleForBE *= -1;
         }
         state.cogs = CachedBuffers.partial(AllPartialModels.GANTRY_COGS, blockState);
-        state.yRot = MathHelper.RADIANS_PER_DEGREE * AngleHelper.horizontalAngle(facing);
-        state.xRot = MathHelper.RADIANS_PER_DEGREE * (facing == Direction.UP ? 0 : facing == Direction.DOWN ? 180 : 90);
-        state.yRot2 = MathHelper.RADIANS_PER_DEGREE * (alongFirst ^ facing.getAxis() == Axis.X ? 0 : 90);
-        state.xRot2 = MathHelper.RADIANS_PER_DEGREE * -angleForBE;
+        state.yRot = Mth.DEG_TO_RAD * AngleHelper.horizontalAngle(facing);
+        state.xRot = Mth.DEG_TO_RAD * (facing == Direction.UP ? 0 : facing == Direction.DOWN ? 180 : 90);
+        state.yRot2 = Mth.DEG_TO_RAD * (alongFirst ^ facing.getAxis() == Axis.X ? 0 : 90);
+        state.xRot2 = Mth.DEG_TO_RAD * -angleForBE;
     }
 
     @Override
-    protected RenderLayer getRenderType(GantryCarriageBlockEntity be, BlockState state) {
-        return RenderLayer.getSolid();
+    protected RenderType getRenderType(GantryCarriageBlockEntity be, BlockState state) {
+        return RenderType.solid();
     }
 
     public static float getAngleForBE(KineticBlockEntity be, final BlockPos pos, Axis axis) {
-        float time = AnimationTickHolder.getRenderTime(be.getWorld());
+        float time = AnimationTickHolder.getRenderTime(be.getLevel());
         float offset = getRotationOffsetForPosition(be, pos, axis);
         return (time * be.getSpeed() * 3f / 20 + offset) % 360;
     }
@@ -95,13 +95,13 @@ public class GantryCarriageRenderer extends KineticBlockEntityRenderer<GantryCar
         public float xRot2;
 
         @Override
-        public void render(MatrixStack.Entry matricesEntry, VertexConsumer vertexConsumer) {
+        public void render(PoseStack.Pose matricesEntry, VertexConsumer vertexConsumer) {
             super.render(matricesEntry, vertexConsumer);
             cogs.center().rotateY(yRot).rotateX(xRot).rotateY(yRot2);
             if (xRot2 != 0) {
                 cogs.translate(0, -0.5625f, 0).rotateX(xRot2).translate(0, 0.5625f, 0);
             }
-            cogs.uncenter().light(lightmapCoordinates).renderInto(matricesEntry, vertexConsumer);
+            cogs.uncenter().light(lightCoords).renderInto(matricesEntry, vertexConsumer);
         }
     }
 }

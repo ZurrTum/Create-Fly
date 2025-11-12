@@ -1,16 +1,15 @@
 package com.zurrtum.create;
 
-import net.minecraft.item.DyeItem;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.registry.RegistryKeys;
-import net.minecraft.registry.tag.TagKey;
-import net.minecraft.util.DyeColor;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.Util;
-
 import java.util.HashMap;
 import java.util.Map;
+import net.minecraft.Util;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.TagKey;
+import net.minecraft.world.item.DyeColor;
+import net.minecraft.world.item.DyeItem;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
 
 import static com.zurrtum.create.Create.MOD_ID;
 
@@ -74,26 +73,26 @@ public class AllItemTags {
     public static final TagKey<Item> CURIOS_HEAD = register("curios", "head");
 
     private static TagKey<Item> register(String name) {
-        return TagKey.of(RegistryKeys.ITEM, Identifier.of(MOD_ID, name));
+        return TagKey.create(Registries.ITEM, ResourceLocation.fromNamespaceAndPath(MOD_ID, name));
     }
 
     private static TagKey<Item> register(String namespace, String name) {
-        return TagKey.of(RegistryKeys.ITEM, Identifier.of(namespace, name));
+        return TagKey.create(Registries.ITEM, ResourceLocation.fromNamespaceAndPath(namespace, name));
     }
 
     private static final Map<TagKey<Item>, DyeColor> dyesTag = Util.make(
         new HashMap<>(), map -> {
             for (DyeColor color : DyeColor.values()) {
-                map.put(TagKey.of(RegistryKeys.ITEM, Identifier.of("c", "dyes/" + color.getId())), color);
+                map.put(TagKey.create(Registries.ITEM, ResourceLocation.fromNamespaceAndPath("c", "dyes/" + color.getName())), color);
             }
         }
     );
 
     public static DyeColor getDyeColor(ItemStack stack) {
         if (stack.getItem() instanceof DyeItem dyeItem) {
-            return dyeItem.getColor();
+            return dyeItem.getDyeColor();
         }
-        return dyesTag.entrySet().stream().filter(entry -> stack.isIn(entry.getKey())).map(Map.Entry::getValue).findAny().orElse(null);
+        return dyesTag.entrySet().stream().filter(entry -> stack.is(entry.getKey())).map(Map.Entry::getValue).findAny().orElse(null);
     }
 
     public static void register() {

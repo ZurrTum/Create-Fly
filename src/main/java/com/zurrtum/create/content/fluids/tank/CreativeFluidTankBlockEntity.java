@@ -5,11 +5,10 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.zurrtum.create.AllBlockEntityTypes;
 import com.zurrtum.create.foundation.fluid.FluidTank;
 import com.zurrtum.create.infrastructure.fluids.FluidStack;
-import net.minecraft.block.BlockState;
-import net.minecraft.util.dynamic.Codecs;
-import net.minecraft.util.math.BlockPos;
-
 import java.util.function.Consumer;
+import net.minecraft.core.BlockPos;
+import net.minecraft.util.ExtraCodecs;
+import net.minecraft.world.level.block.state.BlockState;
 
 public class CreativeFluidTankBlockEntity extends FluidTankBlockEntity {
 
@@ -25,7 +24,7 @@ public class CreativeFluidTankBlockEntity extends FluidTankBlockEntity {
     public static class CreativeFluidTankInventory extends FluidTank {
         public static final Codec<CreativeFluidTankInventory> CODEC = RecordCodecBuilder.create(i -> i.group(
             FluidStack.OPTIONAL_CODEC.fieldOf("fluid").forGetter(FluidTank::getFluid),
-            Codecs.NON_NEGATIVE_INT.fieldOf("capacity").forGetter(FluidTank::getMaxAmountPerStack)
+            ExtraCodecs.NON_NEGATIVE_INT.fieldOf("capacity").forGetter(FluidTank::getMaxAmountPerStack)
         ).apply(i, CreativeFluidTankInventory::new));
 
         private final Consumer<FluidStack> updateCallback;

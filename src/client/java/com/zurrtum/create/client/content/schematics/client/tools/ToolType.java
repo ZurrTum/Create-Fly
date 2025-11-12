@@ -3,12 +3,11 @@ package com.zurrtum.create.client.content.schematics.client.tools;
 import com.zurrtum.create.client.catnip.lang.Lang;
 import com.zurrtum.create.client.foundation.gui.AllIcons;
 import com.zurrtum.create.client.foundation.utility.CreateLang;
-import net.minecraft.text.MutableText;
-import net.minecraft.text.Text;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
 
 public enum ToolType {
 
@@ -31,7 +30,7 @@ public enum ToolType {
         return tool;
     }
 
-    public MutableText getDisplayName() {
+    public MutableComponent getDisplayName() {
         return CreateLang.translateDirect("schematic.tool." + Lang.asId(name()));
     }
 
@@ -47,7 +46,7 @@ public enum ToolType {
         return tools;
     }
 
-    public List<Text> getDescription() {
+    public List<Component> getDescription() {
         return CreateLang.translatedOptions("schematic.tool." + Lang.asId(name()) + ".description", "0", "1", "2", "3");
     }
 

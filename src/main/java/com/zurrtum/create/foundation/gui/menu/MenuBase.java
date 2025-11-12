@@ -1,18 +1,18 @@
 package com.zurrtum.create.foundation.gui.menu;
 
 import com.zurrtum.create.foundation.utility.IInteractionChecker;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.screen.ScreenHandler;
-import net.minecraft.screen.slot.Slot;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.Slot;
 
-public abstract class MenuBase<T> extends ScreenHandler {
-    public PlayerEntity player;
-    public PlayerInventory playerInventory;
+public abstract class MenuBase<T> extends AbstractContainerMenu {
+    public Player player;
+    public Inventory playerInventory;
     public T contentHolder;
     private final MenuType<T> type;
 
-    protected MenuBase(MenuType<T> type, int id, PlayerInventory inv, T contentHolder) {
+    protected MenuBase(MenuType<T> type, int id, Inventory inv, T contentHolder) {
         super(null, id);
         this.type = type;
         init(inv, contentHolder);
@@ -22,13 +22,13 @@ public abstract class MenuBase<T> extends ScreenHandler {
         return type;
     }
 
-    protected void init(PlayerInventory inv, T contentHolderIn) {
+    protected void init(Inventory inv, T contentHolderIn) {
         player = inv.player;
         playerInventory = inv;
         contentHolder = contentHolderIn;
         initAndReadInventory(contentHolder);
         addSlots();
-        sendContentUpdates();
+        broadcastChanges();
     }
 
     protected abstract void initAndReadInventory(T contentHolder);
@@ -45,18 +45,18 @@ public abstract class MenuBase<T> extends ScreenHandler {
             this.addSlot(this.createPlayerSlot(playerInventory, hotbarSlot, x + hotbarSlot * 18, y + 58));
     }
 
-    protected Slot createPlayerSlot(PlayerInventory inventory, int index, int x, int y) {
+    protected Slot createPlayerSlot(Inventory inventory, int index, int x, int y) {
         return new Slot(inventory, index, x, y);
     }
 
     @Override
-    public void onClosed(PlayerEntity playerIn) {
-        super.onClosed(playerIn);
+    public void removed(Player playerIn) {
+        super.removed(playerIn);
         saveData(contentHolder);
     }
 
     @Override
-    public boolean canUse(PlayerEntity player) {
+    public boolean stillValid(Player player) {
         if (contentHolder == null)
             return false;
         if (contentHolder instanceof IInteractionChecker)

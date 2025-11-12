@@ -1,23 +1,23 @@
 package com.zurrtum.create.client.infrastructure.particle;
 
-import net.minecraft.client.particle.BillboardParticleRenderer;
-import net.minecraft.client.particle.BillboardParticleSubmittable;
-import net.minecraft.client.particle.ParticleManager;
-import net.minecraft.client.particle.ParticleTextureSheet;
-import net.minecraft.client.render.VertexConsumer;
+import com.mojang.blaze3d.vertex.VertexConsumer;
+import net.minecraft.client.particle.ParticleEngine;
+import net.minecraft.client.particle.ParticleRenderType;
+import net.minecraft.client.particle.QuadParticleGroup;
+import net.minecraft.client.renderer.state.QuadParticleRenderState;
 import org.joml.Quaternionf;
 
-public class SteamJetParticleRenderer extends BillboardParticleRenderer {
-    public static final ParticleTextureSheet SHEET = new ParticleTextureSheet("create:steam_jet");
+public class SteamJetParticleRenderer extends QuadParticleGroup {
+    public static final ParticleRenderType SHEET = new ParticleRenderType("create:steam_jet");
 
-    public SteamJetParticleRenderer(ParticleManager manager) {
+    public SteamJetParticleRenderer(ParticleEngine manager) {
         super(manager, SHEET);
-        submittable = new SteamJetParticleSubmittable();
+        particleTypeRenderState = new SteamJetParticleSubmittable();
     }
 
-    public static class SteamJetParticleSubmittable extends BillboardParticleSubmittable {
+    public static class SteamJetParticleSubmittable extends QuadParticleRenderState {
         @Override
-        protected void drawFace(
+        protected void renderRotatedQuad(
             VertexConsumer vertexConsumer,
             float x,
             float y,

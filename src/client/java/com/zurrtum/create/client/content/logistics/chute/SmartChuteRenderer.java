@@ -1,19 +1,19 @@
 package com.zurrtum.create.client.content.logistics.chute;
 
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.zurrtum.create.client.content.logistics.chute.ChuteRenderer.ChuteItemRenderState;
 import com.zurrtum.create.client.foundation.blockEntity.renderer.SmartBlockEntityRenderer;
 import com.zurrtum.create.content.logistics.chute.SmartChuteBlockEntity;
-import net.minecraft.client.render.block.entity.BlockEntityRendererFactory;
-import net.minecraft.client.render.command.ModelCommandRenderer;
-import net.minecraft.client.render.command.OrderedRenderCommandQueue;
-import net.minecraft.client.render.state.CameraRenderState;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.client.renderer.SubmitNodeCollector;
+import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
+import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
+import net.minecraft.client.renderer.state.CameraRenderState;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 
 public class SmartChuteRenderer extends SmartBlockEntityRenderer<SmartChuteBlockEntity, SmartChuteRenderer.SmartChuteRenderState> {
-    public SmartChuteRenderer(BlockEntityRendererFactory.Context context) {
+    public SmartChuteRenderer(BlockEntityRendererProvider.Context context) {
         super(context);
     }
 
@@ -23,14 +23,14 @@ public class SmartChuteRenderer extends SmartBlockEntityRenderer<SmartChuteBlock
     }
 
     @Override
-    public void updateRenderState(
+    public void extractRenderState(
         SmartChuteBlockEntity be,
         SmartChuteRenderState state,
         float tickProgress,
-        Vec3d cameraPos,
-        ModelCommandRenderer.@Nullable CrumblingOverlayCommand crumblingOverlay
+        Vec3 cameraPos,
+        @Nullable ModelFeatureRenderer.CrumblingOverlay crumblingOverlay
     ) {
-        super.updateRenderState(be, state, tickProgress, cameraPos, crumblingOverlay);
+        super.extractRenderState(be, state, tickProgress, cameraPos, crumblingOverlay);
         ItemStack item = be.getItem();
         if (item.isEmpty()) {
             return;
@@ -39,14 +39,14 @@ public class SmartChuteRenderer extends SmartBlockEntityRenderer<SmartChuteBlock
         if (itemPosition > 0) {
             return;
         }
-        state.item = ChuteItemRenderState.create(itemModelManager, item, itemPosition, be.getWorld());
+        state.item = ChuteItemRenderState.create(itemModelManager, item, itemPosition, be.getLevel());
     }
 
     @Override
-    public void render(SmartChuteRenderState state, MatrixStack matrices, OrderedRenderCommandQueue queue, CameraRenderState cameraState) {
-        super.render(state, matrices, queue, cameraState);
+    public void submit(SmartChuteRenderState state, PoseStack matrices, SubmitNodeCollector queue, CameraRenderState cameraState) {
+        super.submit(state, matrices, queue, cameraState);
         if (state.item != null) {
-            state.item.render(matrices, queue, state.lightmapCoordinates);
+            state.item.render(matrices, queue, state.lightCoords);
         }
     }
 

@@ -1,30 +1,30 @@
 package com.zurrtum.create.catnip.codecs.stream;
 
 import com.mojang.datafixers.util.*;
-import net.minecraft.network.codec.PacketCodec;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.function.Function;
+import net.minecraft.network.codec.StreamCodec;
 
 public interface CatnipLargerStreamCodecs {
-    static <B, C, T1, T2, T3, T4, T5, T6, T7> PacketCodec<B, C> composite(
-        PacketCodec<? super B, T1> codec1,
+    static <B, C, T1, T2, T3, T4, T5, T6, T7> StreamCodec<B, C> composite(
+        StreamCodec<? super B, T1> codec1,
         Function<C, T1> getter1,
-        PacketCodec<? super B, T2> codec2,
+        StreamCodec<? super B, T2> codec2,
         Function<C, T2> getter2,
-        PacketCodec<? super B, T3> codec3,
+        StreamCodec<? super B, T3> codec3,
         Function<C, T3> getter3,
-        PacketCodec<? super B, T4> codec4,
+        StreamCodec<? super B, T4> codec4,
         Function<C, T4> getter4,
-        PacketCodec<? super B, T5> codec5,
+        StreamCodec<? super B, T5> codec5,
         Function<C, T5> getter5,
-        PacketCodec<? super B, T6> codec6,
+        StreamCodec<? super B, T6> codec6,
         Function<C, T6> getter6,
-        PacketCodec<? super B, T7> codec7,
+        StreamCodec<? super B, T7> codec7,
         Function<C, T7> getter7,
         Function7<T1, T2, T3, T4, T5, T6, T7, C> factory
     ) {
-        return new PacketCodec<>() {
+        return new StreamCodec<>() {
             @Override
             public @NotNull C decode(B buffer) {
                 T1 t1 = codec1.decode(buffer);
@@ -50,26 +50,26 @@ public interface CatnipLargerStreamCodecs {
         };
     }
 
-    static <B, C, T1, T2, T3, T4, T5, T6, T7, T8> PacketCodec<B, C> composite(
-        PacketCodec<? super B, T1> codec1,
+    static <B, C, T1, T2, T3, T4, T5, T6, T7, T8> StreamCodec<B, C> composite(
+        StreamCodec<? super B, T1> codec1,
         Function<C, T1> getter1,
-        PacketCodec<? super B, T2> codec2,
+        StreamCodec<? super B, T2> codec2,
         Function<C, T2> getter2,
-        PacketCodec<? super B, T3> codec3,
+        StreamCodec<? super B, T3> codec3,
         Function<C, T3> getter3,
-        PacketCodec<? super B, T4> codec4,
+        StreamCodec<? super B, T4> codec4,
         Function<C, T4> getter4,
-        PacketCodec<? super B, T5> codec5,
+        StreamCodec<? super B, T5> codec5,
         Function<C, T5> getter5,
-        PacketCodec<? super B, T6> codec6,
+        StreamCodec<? super B, T6> codec6,
         Function<C, T6> getter6,
-        PacketCodec<? super B, T7> codec7,
+        StreamCodec<? super B, T7> codec7,
         Function<C, T7> getter7,
-        PacketCodec<? super B, T8> codec8,
+        StreamCodec<? super B, T8> codec8,
         Function<C, T8> getter8,
         Function8<T1, T2, T3, T4, T5, T6, T7, T8, C> factory
     ) {
-        return new PacketCodec<>() {
+        return new StreamCodec<>() {
             @Override
             public @NotNull C decode(B buffer) {
                 T1 t1 = codec1.decode(buffer);
@@ -97,28 +97,28 @@ public interface CatnipLargerStreamCodecs {
         };
     }
 
-    static <B, C, T1, T2, T3, T4, T5, T6, T7, T8, T9> PacketCodec<B, C> composite(
-        PacketCodec<? super B, T1> codec1,
+    static <B, C, T1, T2, T3, T4, T5, T6, T7, T8, T9> StreamCodec<B, C> composite(
+        StreamCodec<? super B, T1> codec1,
         Function<C, T1> getter1,
-        PacketCodec<? super B, T2> codec2,
+        StreamCodec<? super B, T2> codec2,
         Function<C, T2> getter2,
-        PacketCodec<? super B, T3> codec3,
+        StreamCodec<? super B, T3> codec3,
         Function<C, T3> getter3,
-        PacketCodec<? super B, T4> codec4,
+        StreamCodec<? super B, T4> codec4,
         Function<C, T4> getter4,
-        PacketCodec<? super B, T5> codec5,
+        StreamCodec<? super B, T5> codec5,
         Function<C, T5> getter5,
-        PacketCodec<? super B, T6> codec6,
+        StreamCodec<? super B, T6> codec6,
         Function<C, T6> getter6,
-        PacketCodec<? super B, T7> codec7,
+        StreamCodec<? super B, T7> codec7,
         Function<C, T7> getter7,
-        PacketCodec<? super B, T8> codec8,
+        StreamCodec<? super B, T8> codec8,
         Function<C, T8> getter8,
-        PacketCodec<? super B, T9> codec9,
+        StreamCodec<? super B, T9> codec9,
         Function<C, T9> getter9,
         Function9<T1, T2, T3, T4, T5, T6, T7, T8, T9, C> factory
     ) {
-        return new PacketCodec<>() {
+        return new StreamCodec<>() {
             @Override
             public @NotNull C decode(B buffer) {
                 T1 t1 = codec1.decode(buffer);
@@ -148,30 +148,30 @@ public interface CatnipLargerStreamCodecs {
         };
     }
 
-    static <B, C, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10> PacketCodec<B, C> composite(
-        PacketCodec<? super B, T1> codec1,
+    static <B, C, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10> StreamCodec<B, C> composite(
+        StreamCodec<? super B, T1> codec1,
         Function<C, T1> getter1,
-        PacketCodec<? super B, T2> codec2,
+        StreamCodec<? super B, T2> codec2,
         Function<C, T2> getter2,
-        PacketCodec<? super B, T3> codec3,
+        StreamCodec<? super B, T3> codec3,
         Function<C, T3> getter3,
-        PacketCodec<? super B, T4> codec4,
+        StreamCodec<? super B, T4> codec4,
         Function<C, T4> getter4,
-        PacketCodec<? super B, T5> codec5,
+        StreamCodec<? super B, T5> codec5,
         Function<C, T5> getter5,
-        PacketCodec<? super B, T6> codec6,
+        StreamCodec<? super B, T6> codec6,
         Function<C, T6> getter6,
-        PacketCodec<? super B, T7> codec7,
+        StreamCodec<? super B, T7> codec7,
         Function<C, T7> getter7,
-        PacketCodec<? super B, T8> codec8,
+        StreamCodec<? super B, T8> codec8,
         Function<C, T8> getter8,
-        PacketCodec<? super B, T9> codec9,
+        StreamCodec<? super B, T9> codec9,
         Function<C, T9> getter9,
-        PacketCodec<? super B, T10> codec10,
+        StreamCodec<? super B, T10> codec10,
         Function<C, T10> getter10,
         Function10<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, C> factory
     ) {
-        return new PacketCodec<>() {
+        return new StreamCodec<>() {
             @Override
             public @NotNull C decode(B buffer) {
                 T1 t1 = codec1.decode(buffer);
@@ -203,32 +203,32 @@ public interface CatnipLargerStreamCodecs {
         };
     }
 
-    static <B, C, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11> PacketCodec<B, C> composite(
-        PacketCodec<? super B, T1> codec1,
+    static <B, C, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11> StreamCodec<B, C> composite(
+        StreamCodec<? super B, T1> codec1,
         Function<C, T1> getter1,
-        PacketCodec<? super B, T2> codec2,
+        StreamCodec<? super B, T2> codec2,
         Function<C, T2> getter2,
-        PacketCodec<? super B, T3> codec3,
+        StreamCodec<? super B, T3> codec3,
         Function<C, T3> getter3,
-        PacketCodec<? super B, T4> codec4,
+        StreamCodec<? super B, T4> codec4,
         Function<C, T4> getter4,
-        PacketCodec<? super B, T5> codec5,
+        StreamCodec<? super B, T5> codec5,
         Function<C, T5> getter5,
-        PacketCodec<? super B, T6> codec6,
+        StreamCodec<? super B, T6> codec6,
         Function<C, T6> getter6,
-        PacketCodec<? super B, T7> codec7,
+        StreamCodec<? super B, T7> codec7,
         Function<C, T7> getter7,
-        PacketCodec<? super B, T8> codec8,
+        StreamCodec<? super B, T8> codec8,
         Function<C, T8> getter8,
-        PacketCodec<? super B, T9> codec9,
+        StreamCodec<? super B, T9> codec9,
         Function<C, T9> getter9,
-        PacketCodec<? super B, T10> codec10,
+        StreamCodec<? super B, T10> codec10,
         Function<C, T10> getter10,
-        PacketCodec<? super B, T11> codec11,
+        StreamCodec<? super B, T11> codec11,
         Function<C, T11> getter11,
         Function11<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, C> factory
     ) {
-        return new PacketCodec<>() {
+        return new StreamCodec<>() {
             @Override
             public @NotNull C decode(B buffer) {
                 T1 t1 = codec1.decode(buffer);
@@ -262,34 +262,34 @@ public interface CatnipLargerStreamCodecs {
         };
     }
 
-    static <B, C, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12> PacketCodec<B, C> composite(
-        PacketCodec<? super B, T1> codec1,
+    static <B, C, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12> StreamCodec<B, C> composite(
+        StreamCodec<? super B, T1> codec1,
         Function<C, T1> getter1,
-        PacketCodec<? super B, T2> codec2,
+        StreamCodec<? super B, T2> codec2,
         Function<C, T2> getter2,
-        PacketCodec<? super B, T3> codec3,
+        StreamCodec<? super B, T3> codec3,
         Function<C, T3> getter3,
-        PacketCodec<? super B, T4> codec4,
+        StreamCodec<? super B, T4> codec4,
         Function<C, T4> getter4,
-        PacketCodec<? super B, T5> codec5,
+        StreamCodec<? super B, T5> codec5,
         Function<C, T5> getter5,
-        PacketCodec<? super B, T6> codec6,
+        StreamCodec<? super B, T6> codec6,
         Function<C, T6> getter6,
-        PacketCodec<? super B, T7> codec7,
+        StreamCodec<? super B, T7> codec7,
         Function<C, T7> getter7,
-        PacketCodec<? super B, T8> codec8,
+        StreamCodec<? super B, T8> codec8,
         Function<C, T8> getter8,
-        PacketCodec<? super B, T9> codec9,
+        StreamCodec<? super B, T9> codec9,
         Function<C, T9> getter9,
-        PacketCodec<? super B, T10> codec10,
+        StreamCodec<? super B, T10> codec10,
         Function<C, T10> getter10,
-        PacketCodec<? super B, T11> codec11,
+        StreamCodec<? super B, T11> codec11,
         Function<C, T11> getter11,
-        PacketCodec<? super B, T12> codec12,
+        StreamCodec<? super B, T12> codec12,
         Function<C, T12> getter12,
         Function12<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, C> factory
     ) {
-        return new PacketCodec<>() {
+        return new StreamCodec<>() {
             @Override
             public @NotNull C decode(B buffer) {
                 T1 t1 = codec1.decode(buffer);
@@ -325,36 +325,36 @@ public interface CatnipLargerStreamCodecs {
         };
     }
 
-    static <B, C, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13> PacketCodec<B, C> composite(
-        PacketCodec<? super B, T1> codec1,
+    static <B, C, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13> StreamCodec<B, C> composite(
+        StreamCodec<? super B, T1> codec1,
         Function<C, T1> getter1,
-        PacketCodec<? super B, T2> codec2,
+        StreamCodec<? super B, T2> codec2,
         Function<C, T2> getter2,
-        PacketCodec<? super B, T3> codec3,
+        StreamCodec<? super B, T3> codec3,
         Function<C, T3> getter3,
-        PacketCodec<? super B, T4> codec4,
+        StreamCodec<? super B, T4> codec4,
         Function<C, T4> getter4,
-        PacketCodec<? super B, T5> codec5,
+        StreamCodec<? super B, T5> codec5,
         Function<C, T5> getter5,
-        PacketCodec<? super B, T6> codec6,
+        StreamCodec<? super B, T6> codec6,
         Function<C, T6> getter6,
-        PacketCodec<? super B, T7> codec7,
+        StreamCodec<? super B, T7> codec7,
         Function<C, T7> getter7,
-        PacketCodec<? super B, T8> codec8,
+        StreamCodec<? super B, T8> codec8,
         Function<C, T8> getter8,
-        PacketCodec<? super B, T9> codec9,
+        StreamCodec<? super B, T9> codec9,
         Function<C, T9> getter9,
-        PacketCodec<? super B, T10> codec10,
+        StreamCodec<? super B, T10> codec10,
         Function<C, T10> getter10,
-        PacketCodec<? super B, T11> codec11,
+        StreamCodec<? super B, T11> codec11,
         Function<C, T11> getter11,
-        PacketCodec<? super B, T12> codec12,
+        StreamCodec<? super B, T12> codec12,
         Function<C, T12> getter12,
-        PacketCodec<? super B, T13> codec13,
+        StreamCodec<? super B, T13> codec13,
         Function<C, T13> getter13,
         Function13<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, C> factory
     ) {
-        return new PacketCodec<>() {
+        return new StreamCodec<>() {
             @Override
             public @NotNull C decode(B buffer) {
                 T1 t1 = codec1.decode(buffer);
@@ -392,38 +392,38 @@ public interface CatnipLargerStreamCodecs {
         };
     }
 
-    static <B, C, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14> PacketCodec<B, C> composite(
-        PacketCodec<? super B, T1> codec1,
+    static <B, C, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14> StreamCodec<B, C> composite(
+        StreamCodec<? super B, T1> codec1,
         Function<C, T1> getter1,
-        PacketCodec<? super B, T2> codec2,
+        StreamCodec<? super B, T2> codec2,
         Function<C, T2> getter2,
-        PacketCodec<? super B, T3> codec3,
+        StreamCodec<? super B, T3> codec3,
         Function<C, T3> getter3,
-        PacketCodec<? super B, T4> codec4,
+        StreamCodec<? super B, T4> codec4,
         Function<C, T4> getter4,
-        PacketCodec<? super B, T5> codec5,
+        StreamCodec<? super B, T5> codec5,
         Function<C, T5> getter5,
-        PacketCodec<? super B, T6> codec6,
+        StreamCodec<? super B, T6> codec6,
         Function<C, T6> getter6,
-        PacketCodec<? super B, T7> codec7,
+        StreamCodec<? super B, T7> codec7,
         Function<C, T7> getter7,
-        PacketCodec<? super B, T8> codec8,
+        StreamCodec<? super B, T8> codec8,
         Function<C, T8> getter8,
-        PacketCodec<? super B, T9> codec9,
+        StreamCodec<? super B, T9> codec9,
         Function<C, T9> getter9,
-        PacketCodec<? super B, T10> codec10,
+        StreamCodec<? super B, T10> codec10,
         Function<C, T10> getter10,
-        PacketCodec<? super B, T11> codec11,
+        StreamCodec<? super B, T11> codec11,
         Function<C, T11> getter11,
-        PacketCodec<? super B, T12> codec12,
+        StreamCodec<? super B, T12> codec12,
         Function<C, T12> getter12,
-        PacketCodec<? super B, T13> codec13,
+        StreamCodec<? super B, T13> codec13,
         Function<C, T13> getter13,
-        PacketCodec<? super B, T14> codec14,
+        StreamCodec<? super B, T14> codec14,
         Function<C, T14> getter14,
         Function14<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, C> factory
     ) {
-        return new PacketCodec<>() {
+        return new StreamCodec<>() {
             @Override
             public @NotNull C decode(B buffer) {
                 T1 t1 = codec1.decode(buffer);
@@ -463,40 +463,40 @@ public interface CatnipLargerStreamCodecs {
         };
     }
 
-    static <B, C, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15> PacketCodec<B, C> composite(
-        PacketCodec<? super B, T1> codec1,
+    static <B, C, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15> StreamCodec<B, C> composite(
+        StreamCodec<? super B, T1> codec1,
         Function<C, T1> getter1,
-        PacketCodec<? super B, T2> codec2,
+        StreamCodec<? super B, T2> codec2,
         Function<C, T2> getter2,
-        PacketCodec<? super B, T3> codec3,
+        StreamCodec<? super B, T3> codec3,
         Function<C, T3> getter3,
-        PacketCodec<? super B, T4> codec4,
+        StreamCodec<? super B, T4> codec4,
         Function<C, T4> getter4,
-        PacketCodec<? super B, T5> codec5,
+        StreamCodec<? super B, T5> codec5,
         Function<C, T5> getter5,
-        PacketCodec<? super B, T6> codec6,
+        StreamCodec<? super B, T6> codec6,
         Function<C, T6> getter6,
-        PacketCodec<? super B, T7> codec7,
+        StreamCodec<? super B, T7> codec7,
         Function<C, T7> getter7,
-        PacketCodec<? super B, T8> codec8,
+        StreamCodec<? super B, T8> codec8,
         Function<C, T8> getter8,
-        PacketCodec<? super B, T9> codec9,
+        StreamCodec<? super B, T9> codec9,
         Function<C, T9> getter9,
-        PacketCodec<? super B, T10> codec10,
+        StreamCodec<? super B, T10> codec10,
         Function<C, T10> getter10,
-        PacketCodec<? super B, T11> codec11,
+        StreamCodec<? super B, T11> codec11,
         Function<C, T11> getter11,
-        PacketCodec<? super B, T12> codec12,
+        StreamCodec<? super B, T12> codec12,
         Function<C, T12> getter12,
-        PacketCodec<? super B, T13> codec13,
+        StreamCodec<? super B, T13> codec13,
         Function<C, T13> getter13,
-        PacketCodec<? super B, T14> codec14,
+        StreamCodec<? super B, T14> codec14,
         Function<C, T14> getter14,
-        PacketCodec<? super B, T15> codec15,
+        StreamCodec<? super B, T15> codec15,
         Function<C, T15> getter15,
         Function15<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, C> factory
     ) {
-        return new PacketCodec<>() {
+        return new StreamCodec<>() {
             @Override
             public @NotNull C decode(B buffer) {
                 T1 t1 = codec1.decode(buffer);
@@ -538,42 +538,42 @@ public interface CatnipLargerStreamCodecs {
         };
     }
 
-    static <B, C, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16> PacketCodec<B, C> composite(
-        PacketCodec<? super B, T1> codec1,
+    static <B, C, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16> StreamCodec<B, C> composite(
+        StreamCodec<? super B, T1> codec1,
         Function<C, T1> getter1,
-        PacketCodec<? super B, T2> codec2,
+        StreamCodec<? super B, T2> codec2,
         Function<C, T2> getter2,
-        PacketCodec<? super B, T3> codec3,
+        StreamCodec<? super B, T3> codec3,
         Function<C, T3> getter3,
-        PacketCodec<? super B, T4> codec4,
+        StreamCodec<? super B, T4> codec4,
         Function<C, T4> getter4,
-        PacketCodec<? super B, T5> codec5,
+        StreamCodec<? super B, T5> codec5,
         Function<C, T5> getter5,
-        PacketCodec<? super B, T6> codec6,
+        StreamCodec<? super B, T6> codec6,
         Function<C, T6> getter6,
-        PacketCodec<? super B, T7> codec7,
+        StreamCodec<? super B, T7> codec7,
         Function<C, T7> getter7,
-        PacketCodec<? super B, T8> codec8,
+        StreamCodec<? super B, T8> codec8,
         Function<C, T8> getter8,
-        PacketCodec<? super B, T9> codec9,
+        StreamCodec<? super B, T9> codec9,
         Function<C, T9> getter9,
-        PacketCodec<? super B, T10> codec10,
+        StreamCodec<? super B, T10> codec10,
         Function<C, T10> getter10,
-        PacketCodec<? super B, T11> codec11,
+        StreamCodec<? super B, T11> codec11,
         Function<C, T11> getter11,
-        PacketCodec<? super B, T12> codec12,
+        StreamCodec<? super B, T12> codec12,
         Function<C, T12> getter12,
-        PacketCodec<? super B, T13> codec13,
+        StreamCodec<? super B, T13> codec13,
         Function<C, T13> getter13,
-        PacketCodec<? super B, T14> codec14,
+        StreamCodec<? super B, T14> codec14,
         Function<C, T14> getter14,
-        PacketCodec<? super B, T15> codec15,
+        StreamCodec<? super B, T15> codec15,
         Function<C, T15> getter15,
-        PacketCodec<? super B, T16> codec16,
+        StreamCodec<? super B, T16> codec16,
         Function<C, T16> getter16,
         Function16<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, C> factory
     ) {
-        return new PacketCodec<>() {
+        return new StreamCodec<>() {
             @Override
             public @NotNull C decode(B buffer) {
                 T1 t1 = codec1.decode(buffer);

@@ -9,16 +9,16 @@ import com.zurrtum.create.content.trains.track.TrackTargetingBehaviour;
 import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
 import com.zurrtum.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.foundation.blockEntity.behaviour.filtering.ServerFilteringBehaviour;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.math.Vec3d;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
 
 public class TrackObserverBlockEntity extends SmartBlockEntity implements TransformableBlockEntity {
 
@@ -37,18 +37,18 @@ public class TrackObserverBlockEntity extends SmartBlockEntity implements Transf
     }
 
     private void onFilterChanged(ItemStack newFilter) {
-        if (world.isClient())
+        if (level.isClientSide())
             return;
         TrackObserver observer = getObserver();
         if (observer != null)
-            observer.setFilterAndNotify(world, newFilter);
+            observer.setFilterAndNotify(level, newFilter);
     }
 
     @Override
     public void tick() {
         super.tick();
 
-        if (world.isClient())
+        if (level.isClientSide())
             return;
 
         boolean shouldBePowered = false;
@@ -58,10 +58,10 @@ public class TrackObserverBlockEntity extends SmartBlockEntity implements Transf
         if (isBlockPowered() == shouldBePowered)
             return;
 
-        BlockState blockState = getCachedState();
-        if (blockState.contains(TrackObserverBlock.POWERED))
-            world.setBlockState(pos, blockState.with(TrackObserverBlock.POWERED, shouldBePowered), Block.NOTIFY_ALL);
-        DisplayLinkBlock.notifyGatherers(world, pos);
+        BlockState blockState = getBlockState();
+        if (blockState.hasProperty(TrackObserverBlock.POWERED))
+            level.setBlock(worldPosition, blockState.setValue(TrackObserverBlock.POWERED, shouldBePowered), Block.UPDATE_ALL);
+        DisplayLinkBlock.notifyGatherers(level, worldPosition);
     }
 
     @Nullable
@@ -74,12 +74,12 @@ public class TrackObserverBlockEntity extends SmartBlockEntity implements Transf
     }
 
     public boolean isBlockPowered() {
-        return getCachedState().get(TrackObserverBlock.POWERED, false);
+        return getBlockState().getValueOrElse(TrackObserverBlock.POWERED, false);
     }
 
     @Override
-    protected Box createRenderBoundingBox() {
-        return new Box(Vec3d.of(pos), Vec3d.of(edgePoint.getGlobalPosition())).expand(2);
+    protected AABB createRenderBoundingBox() {
+        return new AABB(Vec3.atLowerCornerOf(worldPosition), Vec3.atLowerCornerOf(edgePoint.getGlobalPosition())).inflate(2);
     }
 
     @Override

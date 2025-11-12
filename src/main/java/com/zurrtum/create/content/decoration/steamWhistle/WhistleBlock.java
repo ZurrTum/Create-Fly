@@ -9,76 +9,79 @@ import com.zurrtum.create.content.equipment.wrench.IWrenchable;
 import com.zurrtum.create.content.fluids.tank.FluidTankBlock;
 import com.zurrtum.create.foundation.advancement.AdvancementBehaviour;
 import com.zurrtum.create.foundation.block.IBE;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.ShapeContext;
-import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.ai.pathing.NavigationType;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemPlacementContext;
-import net.minecraft.item.ItemStack;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.sound.BlockSoundGroup;
-import net.minecraft.sound.SoundCategory;
-import net.minecraft.sound.SoundEvent;
-import net.minecraft.sound.SoundEvents;
-import net.minecraft.state.StateManager.Builder;
-import net.minecraft.state.property.BooleanProperty;
-import net.minecraft.state.property.EnumProperty;
-import net.minecraft.state.property.Properties;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.Direction.Axis;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.*;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Direction.Axis;
-import net.minecraft.util.math.random.Random;
-import net.minecraft.util.shape.VoxelShape;
-import net.minecraft.world.BlockView;
-import net.minecraft.world.World;
-import net.minecraft.world.WorldAccess;
-import net.minecraft.world.WorldView;
-import net.minecraft.world.block.WireOrientation;
-import net.minecraft.world.tick.ScheduledTickView;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.LevelReader;
+import net.minecraft.world.level.ScheduledTickAccess;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.Mirror;
+import net.minecraft.world.level.block.Rotation;
+import net.minecraft.world.level.block.SoundType;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition.Builder;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.block.state.properties.BooleanProperty;
+import net.minecraft.world.level.block.state.properties.EnumProperty;
+import net.minecraft.world.level.pathfinder.PathComputationType;
+import net.minecraft.world.level.redstone.Orientation;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Locale;
 
 public class WhistleBlock extends Block implements IBE<WhistleBlockEntity>, IWrenchable {
 
-    public static final EnumProperty<Direction> FACING = Properties.HORIZONTAL_FACING;
-    public static final BooleanProperty WALL = BooleanProperty.of("wall");
-    public static final BooleanProperty POWERED = Properties.POWERED;
-    public static final EnumProperty<WhistleSize> SIZE = EnumProperty.of("size", WhistleSize.class);
+    public static final EnumProperty<Direction> FACING = BlockStateProperties.HORIZONTAL_FACING;
+    public static final BooleanProperty WALL = BooleanProperty.create("wall");
+    public static final BooleanProperty POWERED = BlockStateProperties.POWERED;
+    public static final EnumProperty<WhistleSize> SIZE = EnumProperty.create("size", WhistleSize.class);
 
-    public enum WhistleSize implements StringIdentifiable {
+    public enum WhistleSize implements StringRepresentable {
 
         SMALL,
         MEDIUM,
         LARGE;
 
         @Override
-        public String asString() {
+        public String getSerializedName() {
             return name().toLowerCase(Locale.ROOT);
         }
 
     }
 
-    public WhistleBlock(Settings p_49795_) {
+    public WhistleBlock(Properties p_49795_) {
         super(p_49795_);
-        setDefaultState(getDefaultState().with(POWERED, false).with(WALL, false).with(SIZE, WhistleSize.MEDIUM));
+        registerDefaultState(defaultBlockState().setValue(POWERED, false).setValue(WALL, false).setValue(SIZE, WhistleSize.MEDIUM));
     }
 
     @Override
-    public void onPlaced(World pLevel, BlockPos pPos, BlockState pState, LivingEntity pPlacer, ItemStack pStack) {
-        super.onPlaced(pLevel, pPos, pState, pPlacer, pStack);
+    public void setPlacedBy(Level pLevel, BlockPos pPos, BlockState pState, LivingEntity pPlacer, ItemStack pStack) {
+        super.setPlacedBy(pLevel, pPos, pState, pPlacer, pStack);
         AdvancementBehaviour.setPlacedBy(pLevel, pPos, pPlacer);
     }
 
     @Override
-    public boolean canPlaceAt(BlockState pState, WorldView pLevel, BlockPos pPos) {
-        return FluidTankBlock.isTank(pLevel.getBlockState(pPos.offset(getAttachedDirection(pState))));
+    public boolean canSurvive(BlockState pState, LevelReader pLevel, BlockPos pPos) {
+        return FluidTankBlock.isTank(pLevel.getBlockState(pPos.relative(getAttachedDirection(pState))));
     }
 
     @Override
@@ -87,156 +90,156 @@ public class WhistleBlock extends Block implements IBE<WhistleBlockEntity>, IWre
     }
 
     @Override
-    protected void appendProperties(Builder<Block, BlockState> pBuilder) {
-        super.appendProperties(pBuilder.add(FACING, POWERED, SIZE, WALL));
+    protected void createBlockStateDefinition(Builder<Block, BlockState> pBuilder) {
+        super.createBlockStateDefinition(pBuilder.add(FACING, POWERED, SIZE, WALL));
     }
 
     @Override
-    public BlockState getPlacementState(ItemPlacementContext pContext) {
-        World level = pContext.getWorld();
-        BlockPos clickedPos = pContext.getBlockPos();
-        Direction face = pContext.getSide();
+    public BlockState getStateForPlacement(BlockPlaceContext pContext) {
+        Level level = pContext.getLevel();
+        BlockPos clickedPos = pContext.getClickedPos();
+        Direction face = pContext.getClickedFace();
         boolean wall = true;
         if (face.getAxis() == Axis.Y) {
-            face = pContext.getHorizontalPlayerFacing().getOpposite();
+            face = pContext.getHorizontalDirection().getOpposite();
             wall = false;
         }
 
-        BlockState state = super.getPlacementState(pContext).with(FACING, face.getOpposite())
-            .with(POWERED, level.isReceivingRedstonePower(clickedPos)).with(WALL, wall);
-        if (!canPlaceAt(state, level, clickedPos))
+        BlockState state = super.getStateForPlacement(pContext).setValue(FACING, face.getOpposite())
+            .setValue(POWERED, level.hasNeighborSignal(clickedPos)).setValue(WALL, wall);
+        if (!canSurvive(state, level, clickedPos))
             return null;
         return state;
     }
 
     @Override
-    protected ActionResult onUseWithItem(
+    protected InteractionResult useItemOn(
         ItemStack stack,
         BlockState state,
-        World level,
+        Level level,
         BlockPos pos,
-        PlayerEntity player,
-        Hand hand,
+        Player player,
+        InteractionHand hand,
         BlockHitResult hitResult
     ) {
         if (player == null)
-            return ActionResult.PASS_TO_DEFAULT_BLOCK_ACTION;
+            return InteractionResult.TRY_WITH_EMPTY_HAND;
 
-        if (stack.isOf(AllItems.STEAM_WHISTLE)) {
+        if (stack.is(AllItems.STEAM_WHISTLE)) {
             incrementSize(level, pos);
-            return ActionResult.SUCCESS;
+            return InteractionResult.SUCCESS;
         }
 
-        return ActionResult.PASS_TO_DEFAULT_BLOCK_ACTION;
+        return InteractionResult.TRY_WITH_EMPTY_HAND;
     }
 
-    public static void incrementSize(WorldAccess pLevel, BlockPos pPos) {
+    public static void incrementSize(LevelAccessor pLevel, BlockPos pPos) {
         BlockState base = pLevel.getBlockState(pPos);
-        if (!base.contains(SIZE))
+        if (!base.hasProperty(SIZE))
             return;
-        WhistleSize size = base.get(SIZE);
-        BlockSoundGroup soundtype = base.getSoundGroup();
-        BlockPos currentPos = pPos.up();
+        WhistleSize size = base.getValue(SIZE);
+        SoundType soundtype = base.getSoundType();
+        BlockPos currentPos = pPos.above();
 
         for (int i = 1; i <= 6; i++) {
             BlockState blockState = pLevel.getBlockState(currentPos);
             float pVolume = (soundtype.getVolume() + 1.0F) / 2.0F;
-            SoundEvent growSound = SoundEvents.BLOCK_NOTE_BLOCK_XYLOPHONE.value();
+            SoundEvent growSound = SoundEvents.NOTE_BLOCK_XYLOPHONE.value();
             SoundEvent hitSound = soundtype.getHitSound();
 
-            if (blockState.isOf(AllBlocks.STEAM_WHISTLE_EXTENSION)) {
-                if (blockState.get(WhistleExtenderBlock.SHAPE) == WhistleExtenderShape.SINGLE) {
-                    pLevel.setBlockState(currentPos, blockState.with(WhistleExtenderBlock.SHAPE, WhistleExtenderShape.DOUBLE), 3);
+            if (blockState.is(AllBlocks.STEAM_WHISTLE_EXTENSION)) {
+                if (blockState.getValue(WhistleExtenderBlock.SHAPE) == WhistleExtenderShape.SINGLE) {
+                    pLevel.setBlock(currentPos, blockState.setValue(WhistleExtenderBlock.SHAPE, WhistleExtenderShape.DOUBLE), 3);
                     float pPitch = (float) Math.pow(2, -(i * 2) / 12.0);
-                    pLevel.playSound(null, currentPos, growSound, SoundCategory.BLOCKS, pVolume / 4f, pPitch);
-                    pLevel.playSound(null, currentPos, hitSound, SoundCategory.BLOCKS, pVolume, pPitch);
+                    pLevel.playSound(null, currentPos, growSound, SoundSource.BLOCKS, pVolume / 4f, pPitch);
+                    pLevel.playSound(null, currentPos, hitSound, SoundSource.BLOCKS, pVolume, pPitch);
                     return;
                 }
-                currentPos = currentPos.up();
+                currentPos = currentPos.above();
                 continue;
             }
 
-            if (!blockState.isReplaceable())
+            if (!blockState.canBeReplaced())
                 return;
 
-            pLevel.setBlockState(currentPos, AllBlocks.STEAM_WHISTLE_EXTENSION.getDefaultState().with(SIZE, size), 3);
+            pLevel.setBlock(currentPos, AllBlocks.STEAM_WHISTLE_EXTENSION.defaultBlockState().setValue(SIZE, size), 3);
             float pPitch = (float) Math.pow(2, -(i * 2 - 1) / 12.0);
-            pLevel.playSound(null, currentPos, growSound, SoundCategory.BLOCKS, pVolume / 4f, pPitch);
-            pLevel.playSound(null, currentPos, hitSound, SoundCategory.BLOCKS, pVolume, pPitch);
+            pLevel.playSound(null, currentPos, growSound, SoundSource.BLOCKS, pVolume / 4f, pPitch);
+            pLevel.playSound(null, currentPos, hitSound, SoundSource.BLOCKS, pVolume, pPitch);
             return;
         }
     }
 
-    public static void queuePitchUpdate(WorldAccess level, BlockPos pos) {
+    public static void queuePitchUpdate(LevelAccessor level, BlockPos pos) {
         BlockState blockState = level.getBlockState(pos);
-        if (blockState.getBlock() instanceof WhistleBlock whistle && !level.getBlockTickScheduler().isQueued(pos, whistle))
-            level.scheduleBlockTick(pos, whistle, 1);
+        if (blockState.getBlock() instanceof WhistleBlock whistle && !level.getBlockTicks().hasScheduledTick(pos, whistle))
+            level.scheduleTick(pos, whistle, 1);
     }
 
     @Override
-    public void scheduledTick(BlockState pState, ServerWorld pLevel, BlockPos pPos, Random pRandom) {
+    public void tick(BlockState pState, ServerLevel pLevel, BlockPos pPos, RandomSource pRandom) {
         withBlockEntityDo(pLevel, pPos, WhistleBlockEntity::updatePitch);
     }
 
     @Override
-    public void onBlockAdded(BlockState pState, World pLevel, BlockPos pPos, BlockState pOldState, boolean pIsMoving) {
-        FluidTankBlock.updateBoilerState(pState, pLevel, pPos.offset(getAttachedDirection(pState)));
-        if (pOldState.getBlock() != this || pOldState.get(SIZE) != pState.get(SIZE))
+    public void onPlace(BlockState pState, Level pLevel, BlockPos pPos, BlockState pOldState, boolean pIsMoving) {
+        FluidTankBlock.updateBoilerState(pState, pLevel, pPos.relative(getAttachedDirection(pState)));
+        if (pOldState.getBlock() != this || pOldState.getValue(SIZE) != pState.getValue(SIZE))
             queuePitchUpdate(pLevel, pPos);
     }
 
     @Override
-    public void onStateReplaced(BlockState pState, ServerWorld pLevel, BlockPos pPos, boolean pIsMoving) {
-        FluidTankBlock.updateBoilerState(pState, pLevel, pPos.offset(getAttachedDirection(pState)));
+    public void affectNeighborsAfterRemoval(BlockState pState, ServerLevel pLevel, BlockPos pPos, boolean pIsMoving) {
+        FluidTankBlock.updateBoilerState(pState, pLevel, pPos.relative(getAttachedDirection(pState)));
     }
 
     @Override
-    public void neighborUpdate(
+    public void neighborChanged(
         BlockState state,
-        World worldIn,
+        Level worldIn,
         BlockPos pos,
         Block blockIn,
-        @Nullable WireOrientation wireOrientation,
+        @Nullable Orientation wireOrientation,
         boolean isMoving
     ) {
-        if (worldIn.isClient())
+        if (worldIn.isClientSide())
             return;
-        boolean previouslyPowered = state.get(POWERED);
-        if (previouslyPowered != worldIn.isReceivingRedstonePower(pos))
-            worldIn.setBlockState(pos, state.cycle(POWERED), Block.NOTIFY_LISTENERS);
+        boolean previouslyPowered = state.getValue(POWERED);
+        if (previouslyPowered != worldIn.hasNeighborSignal(pos))
+            worldIn.setBlock(pos, state.cycle(POWERED), Block.UPDATE_CLIENTS);
     }
 
     @Override
-    public BlockState getStateForNeighborUpdate(
+    public BlockState updateShape(
         BlockState pState,
-        WorldView pLevel,
-        ScheduledTickView tickView,
+        LevelReader pLevel,
+        ScheduledTickAccess tickView,
         BlockPos pCurrentPos,
         Direction pFacing,
         BlockPos pFacingPos,
         BlockState pFacingState,
-        Random random
+        RandomSource random
     ) {
-        return getAttachedDirection(pState) == pFacing && !pState.canPlaceAt(pLevel, pCurrentPos) ? Blocks.AIR.getDefaultState() : pState;
+        return getAttachedDirection(pState) == pFacing && !pState.canSurvive(pLevel, pCurrentPos) ? Blocks.AIR.defaultBlockState() : pState;
     }
 
     @Override
-    public VoxelShape getOutlineShape(BlockState pState, BlockView pLevel, BlockPos pPos, ShapeContext pContext) {
-        WhistleSize size = pState.get(SIZE);
-        if (!pState.get(WALL))
+    public VoxelShape getShape(BlockState pState, BlockGetter pLevel, BlockPos pPos, CollisionContext pContext) {
+        WhistleSize size = pState.getValue(SIZE);
+        if (!pState.getValue(WALL))
             return size == WhistleSize.SMALL ? AllShapes.WHISTLE_SMALL_FLOOR : size == WhistleSize.MEDIUM ? AllShapes.WHISTLE_MEDIUM_FLOOR : AllShapes.WHISTLE_LARGE_FLOOR;
-        Direction direction = pState.get(FACING);
+        Direction direction = pState.getValue(FACING);
         return (size == WhistleSize.SMALL ? AllShapes.WHISTLE_SMALL_WALL : size == WhistleSize.MEDIUM ? AllShapes.WHISTLE_MEDIUM_WALL : AllShapes.WHISTLE_LARGE_WALL).get(
             direction);
     }
 
     @Override
-    protected boolean canPathfindThrough(BlockState state, NavigationType pathComputationType) {
+    protected boolean isPathfindable(BlockState state, PathComputationType pathComputationType) {
         return false;
     }
 
     public static Direction getAttachedDirection(BlockState state) {
-        return state.get(WALL) ? state.get(FACING) : Direction.DOWN;
+        return state.getValue(WALL) ? state.getValue(FACING) : Direction.DOWN;
     }
 
     @Override
@@ -250,17 +253,17 @@ public class WhistleBlock extends Block implements IBE<WhistleBlockEntity>, IWre
     }
 
     @Override
-    public BlockState rotate(BlockState pState, BlockRotation pRotation) {
-        return pState.with(FACING, pRotation.rotate(pState.get(FACING)));
+    public BlockState rotate(BlockState pState, Rotation pRotation) {
+        return pState.setValue(FACING, pRotation.rotate(pState.getValue(FACING)));
     }
 
     @Override
-    public BlockState mirror(BlockState pState, BlockMirror pMirror) {
-        return pMirror == BlockMirror.NONE ? pState : pState.rotate(pMirror.getRotation(pState.get(FACING)));
+    public BlockState mirror(BlockState pState, Mirror pMirror) {
+        return pMirror == Mirror.NONE ? pState : pState.rotate(pMirror.getRotation(pState.getValue(FACING)));
     }
 
     @Override
-    protected boolean isSideInvisible(BlockState state, BlockState stateFrom, Direction direction) {
-        return direction == Direction.UP && stateFrom.isOf(AllBlocks.STEAM_WHISTLE_EXTENSION);
+    protected boolean skipRendering(BlockState state, BlockState stateFrom, Direction direction) {
+        return direction == Direction.UP && stateFrom.is(AllBlocks.STEAM_WHISTLE_EXTENSION);
     }
 }

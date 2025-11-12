@@ -6,66 +6,66 @@ import com.zurrtum.create.AllShapes;
 import com.zurrtum.create.AllSoundEvents;
 import com.zurrtum.create.content.contraptions.actors.trainControls.ControlsBlock;
 import com.zurrtum.create.foundation.block.IBE;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.HorizontalFacingBlock;
-import net.minecraft.block.ShapeContext;
-import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.shape.VoxelShape;
-import net.minecraft.world.BlockView;
-import net.minecraft.world.World;
-import net.minecraft.world.block.WireOrientation;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.HorizontalDirectionalBlock;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.redstone.Orientation;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class ContraptionControlsBlock extends ControlsBlock implements IBE<ContraptionControlsBlockEntity> {
 
-    public static final MapCodec<ContraptionControlsBlock> CODEC = createCodec(ContraptionControlsBlock::new);
+    public static final MapCodec<ContraptionControlsBlock> CODEC = simpleCodec(ContraptionControlsBlock::new);
 
-    public ContraptionControlsBlock(Settings pProperties) {
+    public ContraptionControlsBlock(Properties pProperties) {
         super(pProperties);
     }
 
     @Override
-    protected ActionResult onUse(BlockState state, World level, BlockPos pos, PlayerEntity player, BlockHitResult hitResult) {
+    protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hitResult) {
         return onBlockEntityUse(
             level, pos, cte -> {
                 cte.pressButton();
-                if (!level.isClient()) {
+                if (!level.isClientSide()) {
                     cte.disabled = !cte.disabled;
                     cte.notifyUpdate();
                     ContraptionControlsBlockEntity.sendStatus(player, cte.filtering.getFilter(), !cte.disabled);
-                    AllSoundEvents.CONTROLLER_CLICK.play(cte.getWorld(), null, cte.getPos(), 1, cte.disabled ? 0.8f : 1.5f);
+                    AllSoundEvents.CONTROLLER_CLICK.play(cte.getLevel(), null, cte.getBlockPos(), 1, cte.disabled ? 0.8f : 1.5f);
                 }
-                return ActionResult.SUCCESS;
+                return InteractionResult.SUCCESS;
             }
         );
     }
 
     @Override
-    public void neighborUpdate(
+    public void neighborChanged(
         BlockState pState,
-        World pLevel,
+        Level pLevel,
         BlockPos pPos,
         Block pBlock,
-        @Nullable WireOrientation wireOrientation,
+        @Nullable Orientation wireOrientation,
         boolean pIsMoving
     ) {
         withBlockEntityDo(pLevel, pPos, ContraptionControlsBlockEntity::updatePoweredState);
     }
 
     @Override
-    public VoxelShape getOutlineShape(BlockState pState, BlockView pLevel, BlockPos pPos, ShapeContext pContext) {
-        return AllShapes.CONTRAPTION_CONTROLS.get(pState.get(FACING));
+    public VoxelShape getShape(BlockState pState, BlockGetter pLevel, BlockPos pPos, CollisionContext pContext) {
+        return AllShapes.CONTRAPTION_CONTROLS.get(pState.getValue(FACING));
     }
 
     @Override
-    public VoxelShape getCollisionShape(BlockState pState, BlockView pLevel, BlockPos pPos, ShapeContext pContext) {
-        return AllShapes.CONTRAPTION_CONTROLS_COLLISION.get(pState.get(FACING));
+    public VoxelShape getCollisionShape(BlockState pState, BlockGetter pLevel, BlockPos pPos, CollisionContext pContext) {
+        return AllShapes.CONTRAPTION_CONTROLS_COLLISION.get(pState.getValue(FACING));
     }
 
     @Override
@@ -79,7 +79,7 @@ public class ContraptionControlsBlock extends ControlsBlock implements IBE<Contr
     }
 
     @Override
-    protected @NotNull MapCodec<? extends HorizontalFacingBlock> getCodec() {
+    protected @NotNull MapCodec<? extends HorizontalDirectionalBlock> codec() {
         return CODEC;
     }
 }

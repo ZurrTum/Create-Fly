@@ -10,16 +10,16 @@ import com.zurrtum.create.content.trains.graph.DimensionPalette;
 import com.zurrtum.create.content.trains.graph.TrackNode;
 import com.zurrtum.create.content.trains.signal.SingleBlockEntityEdgePoint;
 import com.zurrtum.create.foundation.codec.CreateCodecs;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.inventory.Inventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.network.PacketByteBuf;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.storage.ReadView;
-import net.minecraft.storage.WriteView;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.world.Container;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import org.jetbrains.annotations.Nullable;
 
 import java.lang.ref.WeakReference;
@@ -44,15 +44,15 @@ public class GlobalStation extends SingleBlockEntityEdgePoint {
     @Override
     public void blockEntityAdded(BlockEntity blockEntity, boolean front) {
         super.blockEntityAdded(blockEntity, front);
-        BlockState state = blockEntity.getCachedState();
-        assembling = state != null && state.contains(StationBlock.ASSEMBLING) && state.get(StationBlock.ASSEMBLING);
+        BlockState state = blockEntity.getBlockState();
+        assembling = state != null && state.hasProperty(StationBlock.ASSEMBLING) && state.getValue(StationBlock.ASSEMBLING);
     }
 
     @Override
-    public void read(ReadView view, boolean migration, DimensionPalette dimensions) {
+    public void read(ValueInput view, boolean migration, DimensionPalette dimensions) {
         super.read(view, migration, dimensions);
-        name = view.getString("Name", "");
-        assembling = view.getBoolean("Assembling", false);
+        name = view.getStringOr("Name", "");
+        assembling = view.getBooleanOr("Assembling", false);
         nearestTrain = new WeakReference<>(null);
         view.read("Ports", PORTS_CODEC).ifPresentOrElse(ports -> connectedPorts = ports, connectedPorts::clear);
     }
@@ -66,20 +66,20 @@ public class GlobalStation extends SingleBlockEntityEdgePoint {
     }
 
     @Override
-    public void read(PacketByteBuf buffer, DimensionPalette dimensions) {
+    public void read(FriendlyByteBuf buffer, DimensionPalette dimensions) {
         super.read(buffer, dimensions);
-        name = buffer.readString();
+        name = buffer.readUtf();
         assembling = buffer.readBoolean();
         if (buffer.readBoolean())
             blockEntityPos = buffer.readBlockPos();
     }
 
     @Override
-    public void write(WriteView view, DimensionPalette dimensions) {
+    public void write(ValueOutput view, DimensionPalette dimensions) {
         super.write(view, dimensions);
         view.putString("Name", name);
         view.putBoolean("Assembling", assembling);
-        view.put("Ports", PORTS_CODEC, connectedPorts);
+        view.store("Ports", PORTS_CODEC, connectedPorts);
     }
 
     @Override
@@ -93,9 +93,9 @@ public class GlobalStation extends SingleBlockEntityEdgePoint {
     }
 
     @Override
-    public void write(PacketByteBuf buffer, DimensionPalette dimensions) {
+    public void write(FriendlyByteBuf buffer, DimensionPalette dimensions) {
         super.write(buffer, dimensions);
-        buffer.writeString(name);
+        buffer.writeUtf(name);
         buffer.writeBoolean(assembling);
         buffer.writeBoolean(blockEntityPos != null);
         if (blockEntityPos != null)
@@ -158,10 +158,10 @@ public class GlobalStation extends SingleBlockEntityEdgePoint {
         if (train == null || connectedPorts.isEmpty())
             return;
         MinecraftServer server = Create.SERVER;
-        World level = server.getWorld(getBlockEntityDimension());
+        Level level = server.getLevel(getBlockEntityDimension());
 
         for (Carriage carriage : train.carriages) {
-            Inventory carriageInventory = carriage.storage.getAllItems();
+            Container carriageInventory = carriage.storage.getAllItems();
             if (carriageInventory == null)
                 continue;
 
@@ -171,14 +171,14 @@ public class GlobalStation extends SingleBlockEntityEdgePoint {
                 BlockPos pos = entry.getKey();
                 PostboxBlockEntity box = null;
 
-                Inventory postboxInventory = port.offlineBuffer;
-                if (level != null && level.isPosLoaded(pos) && level.getBlockEntity(pos) instanceof PostboxBlockEntity ppbe) {
+                Container postboxInventory = port.offlineBuffer;
+                if (level != null && level.isLoaded(pos) && level.getBlockEntity(pos) instanceof PostboxBlockEntity ppbe) {
                     postboxInventory = ppbe.inventory;
                     box = ppbe;
                 }
 
-                for (int slot = 0, size = postboxInventory.size(); slot < size; slot++) {
-                    ItemStack stack = postboxInventory.getStack(slot);
+                for (int slot = 0, size = postboxInventory.getContainerSize(); slot < size; slot++) {
+                    ItemStack stack = postboxInventory.getItem(slot);
                     if (PackageItem.matchAddress(stack, port.address))
                         continue;
 
@@ -188,7 +188,7 @@ public class GlobalStation extends SingleBlockEntityEdgePoint {
 
                     int count = stack.getCount();
                     if (insert == count) {
-                        postboxInventory.setStack(slot, ItemStack.EMPTY);
+                        postboxInventory.setItem(slot, ItemStack.EMPTY);
                     } else {
                         stack.setCount(count - insert);
                     }
@@ -214,8 +214,8 @@ public class GlobalStation extends SingleBlockEntityEdgePoint {
                     if (!PackageItem.matchAddress(stack, port.address))
                         continue;
 
-                    Inventory postboxInventory = port.offlineBuffer;
-                    if (level != null && level.isPosLoaded(pos) && level.getBlockEntity(pos) instanceof PostboxBlockEntity ppbe) {
+                    Container postboxInventory = port.offlineBuffer;
+                    if (level != null && level.isLoaded(pos) && level.getBlockEntity(pos) instanceof PostboxBlockEntity ppbe) {
                         postboxInventory = ppbe.inventory;
                         box = ppbe;
                         box.inventory.sendMode();

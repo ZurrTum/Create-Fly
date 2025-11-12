@@ -1,6 +1,6 @@
 package com.zurrtum.create.client.catnip.gui.element;
 
-import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.gui.GuiGraphics;
 
 public interface RenderElement extends FadableScreenElement {
 
@@ -26,10 +26,10 @@ public interface RenderElement extends FadableScreenElement {
 
     float getZ();
 
-    void render(DrawContext graphics);
+    void render(GuiGraphics graphics);
 
     @Override
-    default void render(DrawContext graphics, int x, int y, float alpha) {
+    default void render(GuiGraphics graphics, int x, int y, float alpha) {
         this.at(x, y).withAlpha(alpha).render(graphics);
     }
 

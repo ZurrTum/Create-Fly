@@ -1,18 +1,18 @@
 package com.zurrtum.create.content.processing;
 
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemPlacementContext;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.Hand;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.world.World;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.BlockHitResult;
 import org.jetbrains.annotations.Nullable;
 
-public class AssemblyOperatorUseContext extends ItemPlacementContext {
+public class AssemblyOperatorUseContext extends BlockPlaceContext {
     protected AssemblyOperatorUseContext(
-        World world,
-        @Nullable PlayerEntity playerEntity,
-        Hand hand,
+        Level world,
+        @Nullable Player playerEntity,
+        InteractionHand hand,
         ItemStack itemStack,
         BlockHitResult blockHitResult
     ) {

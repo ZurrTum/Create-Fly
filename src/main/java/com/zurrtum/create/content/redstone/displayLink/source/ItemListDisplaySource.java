@@ -6,22 +6,21 @@ import com.zurrtum.create.content.redstone.smartObserver.SmartObserverBlockEntit
 import com.zurrtum.create.foundation.blockEntity.behaviour.filtering.ServerFilteringBehaviour;
 import com.zurrtum.create.foundation.blockEntity.behaviour.inventory.InvManipulationBehaviour;
 import com.zurrtum.create.foundation.item.CountedItemStackList;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.inventory.Inventory;
-import net.minecraft.text.MutableText;
-
 import java.util.stream.Stream;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.world.Container;
+import net.minecraft.world.level.block.entity.BlockEntity;
 
 public class ItemListDisplaySource extends ValueListDisplaySource {
 
     @Override
-    protected Stream<IntAttached<MutableText>> provideEntries(DisplayLinkContext context, int maxRows) {
+    protected Stream<IntAttached<MutableComponent>> provideEntries(DisplayLinkContext context, int maxRows) {
         BlockEntity sourceBE = context.getSourceBlockEntity();
         if (!(sourceBE instanceof SmartObserverBlockEntity cobe))
             return Stream.empty();
 
         InvManipulationBehaviour invManipulationBehaviour = cobe.getBehaviour(InvManipulationBehaviour.TYPE);
-        Inventory handler = invManipulationBehaviour.getInventory();
+        Container handler = invManipulationBehaviour.getInventory();
 
         if (handler == null)
             return Stream.empty();

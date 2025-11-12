@@ -8,41 +8,40 @@ import me.shedaniel.rei.api.common.display.Display;
 import me.shedaniel.rei.api.common.display.DisplaySerializer;
 import me.shedaniel.rei.api.common.entry.EntryIngredient;
 import me.shedaniel.rei.api.common.util.EntryIngredients;
-import net.minecraft.network.codec.PacketCodec;
-import net.minecraft.network.codec.PacketCodecs;
-import net.minecraft.recipe.RecipeEntry;
-import net.minecraft.util.Identifier;
-
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.crafting.RecipeHolder;
 import java.util.List;
 import java.util.Optional;
 
 public record ManualApplicationDisplay(
-    EntryIngredient input, EntryIngredient target, EntryIngredient output, Optional<Identifier> location
+    EntryIngredient input, EntryIngredient target, EntryIngredient output, Optional<ResourceLocation> location
 ) implements Display {
     public static final DisplaySerializer<ManualApplicationDisplay> SERIALIZER = DisplaySerializer.of(
         RecordCodecBuilder.mapCodec(instance -> instance.group(
             EntryIngredient.codec().fieldOf("input").forGetter(ManualApplicationDisplay::input),
             EntryIngredient.codec().fieldOf("target").forGetter(ManualApplicationDisplay::target),
             EntryIngredient.codec().fieldOf("output").forGetter(ManualApplicationDisplay::output),
-            Identifier.CODEC.optionalFieldOf("location").forGetter(ManualApplicationDisplay::location)
-        ).apply(instance, ManualApplicationDisplay::new)), PacketCodec.tuple(
+            ResourceLocation.CODEC.optionalFieldOf("location").forGetter(ManualApplicationDisplay::location)
+        ).apply(instance, ManualApplicationDisplay::new)), StreamCodec.composite(
             EntryIngredient.streamCodec(),
             ManualApplicationDisplay::input,
             EntryIngredient.streamCodec(),
             ManualApplicationDisplay::target,
             EntryIngredient.streamCodec(),
             ManualApplicationDisplay::output,
-            PacketCodecs.optional(Identifier.PACKET_CODEC),
+            ByteBufCodecs.optional(ResourceLocation.STREAM_CODEC),
             ManualApplicationDisplay::location,
             ManualApplicationDisplay::new
         )
     );
 
-    public ManualApplicationDisplay(RecipeEntry<ManualApplicationRecipe> entry) {
-        this(entry.id().getValue(), entry.value());
+    public ManualApplicationDisplay(RecipeHolder<ManualApplicationRecipe> entry) {
+        this(entry.id().location(), entry.value());
     }
 
-    public ManualApplicationDisplay(Identifier id, ManualApplicationRecipe recipe) {
+    public ManualApplicationDisplay(ResourceLocation id, ManualApplicationRecipe recipe) {
         this(
             EntryIngredients.ofIngredient(recipe.ingredient()),
             EntryIngredients.ofIngredient(recipe.target()),
@@ -67,7 +66,7 @@ public record ManualApplicationDisplay(
     }
 
     @Override
-    public Optional<Identifier> getDisplayLocation() {
+    public Optional<ResourceLocation> getDisplayLocation() {
         return location;
     }
 

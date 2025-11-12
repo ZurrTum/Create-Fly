@@ -6,11 +6,6 @@ import com.mojang.serialization.Codec;
 import com.zurrtum.create.content.trains.station.StationBlockEntity;
 import com.zurrtum.create.content.trains.station.StationMapData;
 import com.zurrtum.create.content.trains.station.StationMarker;
-import net.minecraft.item.map.MapDecoration;
-import net.minecraft.item.map.MapState;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.BlockView;
-import net.minecraft.world.WorldAccess;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -20,8 +15,13 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.*;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.saveddata.maps.MapDecoration;
+import net.minecraft.world.level.saveddata.maps.MapItemSavedData;
 
-@Mixin(MapState.class)
+@Mixin(MapItemSavedData.class)
 public abstract class MapStateMixin implements StationMapData {
     @Shadow
     @Final
@@ -40,13 +40,13 @@ public abstract class MapStateMixin implements StationMapData {
     Map<String, MapDecoration> decorations;
 
     @Shadow
-    private int decorationCount;
+    private int trackedDecorationCount;
 
     @Unique
     private final Map<String, StationMarker> create$stationMarkers = Maps.newHashMap();
 
-    @ModifyExpressionValue(method = "createStateType(Lnet/minecraft/component/type/MapIdComponent;)Lnet/minecraft/world/PersistentStateType;", at = @At(value = "FIELD", target = "Lnet/minecraft/item/map/MapState;CODEC:Lcom/mojang/serialization/Codec;"))
-    private static Codec<MapState> saveCodec(Codec<MapState> codec) {
+    @ModifyExpressionValue(method = "type(Lnet/minecraft/world/level/saveddata/maps/MapId;)Lnet/minecraft/world/level/saveddata/SavedDataType;", at = @At(value = "FIELD", target = "Lnet/minecraft/world/level/saveddata/maps/MapItemSavedData;CODEC:Lcom/mojang/serialization/Codec;"))
+    private static Codec<MapItemSavedData> saveCodec(Codec<MapItemSavedData> codec) {
         return StationMarker.WrapperCodec.get(codec);
     }
 
@@ -75,14 +75,14 @@ public abstract class MapStateMixin implements StationMapData {
         MapDecoration oldDecoration = decorations.put(marker.getId(), decoration);
         if (!decoration.equals(oldDecoration)) {
             if (oldDecoration != null && oldDecoration.type().value().trackCount()) {
-                --decorationCount;
+                --trackedDecorationCount;
             }
 
             if (decoration.type().value().trackCount()) {
-                ++decorationCount;
+                ++trackedDecorationCount;
             }
 
-            markDecorationsDirty();
+            setDecorationsDirty();
         }
     }
 
@@ -90,13 +90,13 @@ public abstract class MapStateMixin implements StationMapData {
     protected abstract void removeDecoration(String id);
 
     @Shadow
-    protected abstract void markDecorationsDirty();
+    protected abstract void setDecorationsDirty();
 
     @Shadow
-    public abstract boolean decorationCountNotLessThan(int trackedCount);
+    public abstract boolean isTrackedCountOverLimit(int trackedCount);
 
     @Override
-    public boolean create$toggleStation(WorldAccess level, BlockPos pos, StationBlockEntity stationBlockEntity) {
+    public boolean create$toggleStation(LevelAccessor level, BlockPos pos, StationBlockEntity stationBlockEntity) {
         double xCenter = pos.getX() + 0.5D;
         double zCenter = pos.getZ() + 0.5D;
         int scaleMultiplier = 1 << scale;
@@ -116,7 +116,7 @@ public abstract class MapStateMixin implements StationMapData {
             return true;
         }
 
-        if (!decorationCountNotLessThan(256)) {
+        if (!isTrackedCountOverLimit(256)) {
             create$addStationMarker(marker);
             return true;
         }
@@ -124,13 +124,13 @@ public abstract class MapStateMixin implements StationMapData {
         return false;
     }
 
-    @Inject(method = "removeBanner(Lnet/minecraft/world/BlockView;II)V", at = @At("RETURN"))
-    public void create$onCheckBanners(BlockView blockGetter, int x, int z, CallbackInfo ci) {
+    @Inject(method = "checkBanners(Lnet/minecraft/world/level/BlockGetter;II)V", at = @At("RETURN"))
+    public void create$onCheckBanners(BlockGetter blockGetter, int x, int z, CallbackInfo ci) {
         create$checkStations(blockGetter, x, z);
     }
 
     @Unique
-    private void create$checkStations(BlockView blockGetter, int x, int z) {
+    private void create$checkStations(BlockGetter blockGetter, int x, int z) {
         Iterator<StationMarker> iterator = create$stationMarkers.values().iterator();
         List<StationMarker> newMarkers = new ArrayList<>();
 

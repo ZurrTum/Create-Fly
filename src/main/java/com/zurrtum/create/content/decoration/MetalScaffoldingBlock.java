@@ -3,71 +3,71 @@ package com.zurrtum.create.content.decoration;
 import com.zurrtum.create.AllShapes;
 import com.zurrtum.create.content.equipment.wrench.IWrenchable;
 import com.zurrtum.create.foundation.block.ScaffoldingControlBlock;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.ScaffoldingBlock;
-import net.minecraft.block.ShapeContext;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.random.Random;
-import net.minecraft.util.shape.VoxelShape;
-import net.minecraft.util.shape.VoxelShapes;
-import net.minecraft.world.BlockView;
-import net.minecraft.world.WorldView;
-import net.minecraft.world.tick.ScheduledTickView;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.LevelReader;
+import net.minecraft.world.level.ScheduledTickAccess;
+import net.minecraft.world.level.block.ScaffoldingBlock;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.phys.shapes.Shapes;
+import net.minecraft.world.phys.shapes.VoxelShape;
 
 public class MetalScaffoldingBlock extends ScaffoldingBlock implements IWrenchable, ScaffoldingControlBlock {
 
-    public MetalScaffoldingBlock(Settings pProperties) {
+    public MetalScaffoldingBlock(Properties pProperties) {
         super(pProperties);
     }
 
     @Override
-    public void scheduledTick(BlockState pState, ServerWorld pLevel, BlockPos pPos, Random pRand) {
+    public void tick(BlockState pState, ServerLevel pLevel, BlockPos pPos, RandomSource pRand) {
     }
 
     @Override
-    public boolean canPlaceAt(BlockState pState, WorldView pLevel, BlockPos pPos) {
+    public boolean canSurvive(BlockState pState, LevelReader pLevel, BlockPos pPos) {
         return true;
     }
 
     @Override
-    public VoxelShape getCollisionShape(BlockState pState, BlockView pLevel, BlockPos pPos, ShapeContext pContext) {
-        if (pState.get(BOTTOM))
+    public VoxelShape getCollisionShape(BlockState pState, BlockGetter pLevel, BlockPos pPos, CollisionContext pContext) {
+        if (pState.getValue(BOTTOM))
             return AllShapes.SCAFFOLD_HALF;
         return super.getCollisionShape(pState, pLevel, pPos, pContext);
     }
 
     @Override
-    public VoxelShape getOutlineShape(BlockState pState, BlockView pLevel, BlockPos pPos, ShapeContext pContext) {
-        if (pState.get(BOTTOM))
+    public VoxelShape getShape(BlockState pState, BlockGetter pLevel, BlockPos pPos, CollisionContext pContext) {
+        if (pState.getValue(BOTTOM))
             return AllShapes.SCAFFOLD_HALF;
-        if (!pContext.isHolding(pState.getBlock().asItem()))
+        if (!pContext.isHoldingItem(pState.getBlock().asItem()))
             return AllShapes.SCAFFOLD_FULL;
-        return VoxelShapes.fullCube();
+        return Shapes.block();
     }
 
     @Override
-    public VoxelShape getRaycastShape(BlockState pState, BlockView pLevel, BlockPos pPos) {
-        return VoxelShapes.fullCube();
+    public VoxelShape getInteractionShape(BlockState pState, BlockGetter pLevel, BlockPos pPos) {
+        return Shapes.block();
     }
 
     @Override
-    public BlockState getStateForNeighborUpdate(
+    public BlockState updateShape(
         BlockState pState,
-        WorldView pLevel,
-        ScheduledTickView tickView,
+        LevelReader pLevel,
+        ScheduledTickAccess tickView,
         BlockPos pCurrentPos,
         Direction pFacing,
         BlockPos pFacingPos,
         BlockState pFacingState,
-        Random random
+        RandomSource random
     ) {
-        super.getStateForNeighborUpdate(pState, pLevel, tickView, pCurrentPos, pFacing, pFacingPos, pFacingState, random);
-        BlockState stateBelow = pLevel.getBlockState(pCurrentPos.down());
-        return pFacing == Direction.DOWN ? pState.with(
+        super.updateShape(pState, pLevel, tickView, pCurrentPos, pFacing, pFacingPos, pFacingState, random);
+        BlockState stateBelow = pLevel.getBlockState(pCurrentPos.below());
+        return pFacing == Direction.DOWN ? pState.setValue(
             BOTTOM,
-            !stateBelow.isOf(this) && !stateBelow.isSideSolidFullSquare(pLevel, pCurrentPos.down(), Direction.UP)
+            !stateBelow.is(this) && !stateBelow.isFaceSturdy(pLevel, pCurrentPos.below(), Direction.UP)
         ) : pState;
     }
 

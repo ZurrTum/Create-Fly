@@ -19,8 +19,8 @@ import com.zurrtum.create.client.foundation.block.connected.GlassPaneCTBehaviour
 import com.zurrtum.create.client.foundation.block.connected.HorizontalCTBehaviour;
 import com.zurrtum.create.client.foundation.block.connected.RotatedPillarCTBehaviour;
 import com.zurrtum.create.client.foundation.block.connected.SimpleCTBehaviour;
-import net.minecraft.block.Oxidizable.OxidationLevel;
-import net.minecraft.block.WoodType;
+import net.minecraft.world.level.block.WeatheringCopper.WeatherState;
+import net.minecraft.world.level.block.state.properties.WoodType;
 
 public class AllCTBehaviours {
     public static final EncasedCTBehaviour ANDESITE_CASING = new EncasedCTBehaviour(AllSpriteShifts.ANDESITE_CASING);
@@ -78,14 +78,14 @@ public class AllCTBehaviours {
         AllSpriteShifts.COPPER_CASING
     );
     public static final TrapdoorCTBehaviour FRAMED_GLASS_TRAPDOOR = new TrapdoorCTBehaviour();
-    public static final RoofBlockCTBehaviour COPPER_SHINGLES = new RoofBlockCTBehaviour(AllSpriteShifts.COPPER_SHINGLES.get(OxidationLevel.UNAFFECTED));
-    public static final RoofBlockCTBehaviour EXPOSED_COPPER_SHINGLES = new RoofBlockCTBehaviour(AllSpriteShifts.COPPER_SHINGLES.get(OxidationLevel.EXPOSED));
-    public static final RoofBlockCTBehaviour WEATHERED_COPPER_SHINGLES = new RoofBlockCTBehaviour(AllSpriteShifts.COPPER_SHINGLES.get(OxidationLevel.WEATHERED));
-    public static final RoofBlockCTBehaviour OXIDIZED_COPPER_SHINGLES = new RoofBlockCTBehaviour(AllSpriteShifts.COPPER_SHINGLES.get(OxidationLevel.OXIDIZED));
-    public static final RoofBlockCTBehaviour COPPER_TILES = new RoofBlockCTBehaviour(AllSpriteShifts.COPPER_TILES.get(OxidationLevel.UNAFFECTED));
-    public static final RoofBlockCTBehaviour EXPOSED_COPPER_TILES = new RoofBlockCTBehaviour(AllSpriteShifts.COPPER_TILES.get(OxidationLevel.EXPOSED));
-    public static final RoofBlockCTBehaviour WEATHERED_COPPER_TILES = new RoofBlockCTBehaviour(AllSpriteShifts.COPPER_TILES.get(OxidationLevel.WEATHERED));
-    public static final RoofBlockCTBehaviour OXIDIZED_COPPER_TILES = new RoofBlockCTBehaviour(AllSpriteShifts.COPPER_TILES.get(OxidationLevel.OXIDIZED));
+    public static final RoofBlockCTBehaviour COPPER_SHINGLES = new RoofBlockCTBehaviour(AllSpriteShifts.COPPER_SHINGLES.get(WeatherState.UNAFFECTED));
+    public static final RoofBlockCTBehaviour EXPOSED_COPPER_SHINGLES = new RoofBlockCTBehaviour(AllSpriteShifts.COPPER_SHINGLES.get(WeatherState.EXPOSED));
+    public static final RoofBlockCTBehaviour WEATHERED_COPPER_SHINGLES = new RoofBlockCTBehaviour(AllSpriteShifts.COPPER_SHINGLES.get(WeatherState.WEATHERED));
+    public static final RoofBlockCTBehaviour OXIDIZED_COPPER_SHINGLES = new RoofBlockCTBehaviour(AllSpriteShifts.COPPER_SHINGLES.get(WeatherState.OXIDIZED));
+    public static final RoofBlockCTBehaviour COPPER_TILES = new RoofBlockCTBehaviour(AllSpriteShifts.COPPER_TILES.get(WeatherState.UNAFFECTED));
+    public static final RoofBlockCTBehaviour EXPOSED_COPPER_TILES = new RoofBlockCTBehaviour(AllSpriteShifts.COPPER_TILES.get(WeatherState.EXPOSED));
+    public static final RoofBlockCTBehaviour WEATHERED_COPPER_TILES = new RoofBlockCTBehaviour(AllSpriteShifts.COPPER_TILES.get(WeatherState.WEATHERED));
+    public static final RoofBlockCTBehaviour OXIDIZED_COPPER_TILES = new RoofBlockCTBehaviour(AllSpriteShifts.COPPER_TILES.get(WeatherState.OXIDIZED));
     public static final SimpleCTBehaviour FRAMED_GLASS = new SimpleCTBehaviour(AllSpriteShifts.FRAMED_GLASS);
     public static final HorizontalCTBehaviour HORIZONTAL_FRAMED_GLASS = new HorizontalCTBehaviour(
         AllSpriteShifts.HORIZONTAL_FRAMED_GLASS,

@@ -9,9 +9,9 @@ import com.zurrtum.create.infrastructure.fluids.FluidInventory;
 import com.zurrtum.create.infrastructure.fluids.FluidStack;
 import com.zurrtum.create.infrastructure.fluids.SidedFluidInventory;
 import com.zurrtum.create.infrastructure.transfer.SlotRangeCache;
-import net.minecraft.storage.ReadView;
-import net.minecraft.storage.WriteView;
-import net.minecraft.util.math.Direction;
+import net.minecraft.core.Direction;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import org.apache.commons.lang3.function.TriFunction;
 import org.jetbrains.annotations.Nullable;
 
@@ -108,7 +108,7 @@ public class SmartFluidTankBehaviour extends BlockEntityBehaviour<SmartBlockEnti
     @Override
     public void initialize() {
         super.initialize();
-        if (getWorld().isClient())
+        if (getLevel().isClientSide())
             return;
         forEach(ts -> {
             ts.fluidLevel.forceNextSync();
@@ -152,7 +152,7 @@ public class SmartFluidTankBehaviour extends BlockEntityBehaviour<SmartBlockEnti
     protected void updateFluids() {
         fluidUpdateCallback.run();
         blockEntity.sendData();
-        blockEntity.markDirty();
+        blockEntity.setChanged();
     }
 
     public TankSegment getPrimaryHandler() {
@@ -184,18 +184,18 @@ public class SmartFluidTankBehaviour extends BlockEntityBehaviour<SmartBlockEnti
     }
 
     @Override
-    public void write(WriteView view, boolean clientPacket) {
+    public void write(ValueOutput view, boolean clientPacket) {
         super.write(view, clientPacket);
-        WriteView.ListView list = view.getList(getType().getName() + "Tanks");
-        forEach(ts -> ts.write(list.add()));
+        ValueOutput.ValueOutputList list = view.childrenList(getType().getName() + "Tanks");
+        forEach(ts -> ts.write(list.addChild()));
     }
 
     @Override
-    public void read(ReadView view, boolean clientPacket) {
+    public void read(ValueInput view, boolean clientPacket) {
         super.read(view, clientPacket);
         int i = 0;
         int size = tanks.length;
-        for (ReadView item : view.getListReadView(getType().getName() + "Tanks")) {
+        for (ValueInput item : view.childrenListOrEmpty(getType().getName() + "Tanks")) {
             if (i >= size)
                 break;
             tanks[i].read(item, clientPacket);
@@ -362,10 +362,10 @@ public class SmartFluidTankBehaviour extends BlockEntityBehaviour<SmartBlockEnti
 
         @Override
         public void markDirty() {
-            if (!blockEntity.hasWorld())
+            if (!blockEntity.hasLevel())
                 return;
             fluidLevel.chase(fluid.getAmount() / (float) capacity, .25, Chaser.EXP);
-            if (!getWorld().isClient())
+            if (!getLevel().isClientSide())
                 sendDataLazily();
             if (blockEntity.isVirtual() && !fluid.isEmpty())
                 renderedFluid = fluid;
@@ -383,12 +383,12 @@ public class SmartFluidTankBehaviour extends BlockEntityBehaviour<SmartBlockEnti
             return fluidLevel.getValue(partialTicks) * capacity;
         }
 
-        public void write(WriteView view) {
-            view.put("TankContent", FluidStack.OPTIONAL_CODEC, fluid);
+        public void write(ValueOutput view) {
+            view.store("TankContent", FluidStack.OPTIONAL_CODEC, fluid);
             fluidLevel.write(view);
         }
 
-        public void read(ReadView view, boolean clientPacket) {
+        public void read(ValueInput view, boolean clientPacket) {
             fluid = view.read("TankContent", FluidStack.OPTIONAL_CODEC).orElse(FluidStack.EMPTY);
             fluidLevel.read(view, clientPacket);
             if (!fluid.isEmpty())

@@ -6,14 +6,14 @@ import com.zurrtum.create.foundation.fluid.FluidHelper;
 import com.zurrtum.create.infrastructure.fluids.BucketFluidInventory;
 import com.zurrtum.create.infrastructure.fluids.FluidStack;
 import com.zurrtum.create.infrastructure.fluids.SidedFluidInventory;
-import net.minecraft.storage.ReadView;
-import net.minecraft.storage.WriteView;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Optional;
 import java.util.function.Supplier;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 
 public class HosePulleyFluidHandler implements SidedFluidInventory {
     private static final int HALF_BUCKET = BucketFluidInventory.CAPACITY / 2;
@@ -46,7 +46,7 @@ public class HosePulleyFluidHandler implements SidedFluidInventory {
 
     @Override
     public int[] getAvailableSlots(@Nullable Direction side) {
-        if (HosePulleyBlock.hasPipeTowards(be.getWorld(), be.getPos(), be.getCachedState(), side)) {
+        if (HosePulleyBlock.hasPipeTowards(be.getLevel(), be.getBlockPos(), be.getBlockState(), side)) {
             return SLOTS;
         } else {
             return EMPTY_SLOTS;
@@ -142,13 +142,13 @@ public class HosePulleyFluidHandler implements SidedFluidInventory {
         previousAmount = stack.getAmount();
     }
 
-    public void write(WriteView view) {
+    public void write(ValueOutput view) {
         if (!stack.isEmpty()) {
-            view.put("Fluid", FluidStack.CODEC, stack);
+            view.store("Fluid", FluidStack.CODEC, stack);
         }
     }
 
-    public void read(ReadView view) {
+    public void read(ValueInput view) {
         stack = view.read("Fluid", FluidStack.CODEC).orElse(FluidStack.EMPTY);
     }
 }

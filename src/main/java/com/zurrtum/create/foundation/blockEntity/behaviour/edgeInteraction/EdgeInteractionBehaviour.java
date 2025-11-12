@@ -3,12 +3,11 @@ package com.zurrtum.create.foundation.blockEntity.behaviour.edgeInteraction;
 import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
 import com.zurrtum.create.foundation.blockEntity.behaviour.BehaviourType;
 import com.zurrtum.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
-import net.minecraft.item.Item;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.world.World;
-
 import java.util.function.Predicate;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.level.Level;
 
 public class EdgeInteractionBehaviour extends BlockEntityBehaviour<SmartBlockEntity> {
 
@@ -46,12 +45,12 @@ public class EdgeInteractionBehaviour extends BlockEntityBehaviour<SmartBlockEnt
 
     @FunctionalInterface
     public interface ConnectionCallback {
-        void apply(World world, BlockPos clicked, BlockPos neighbour);
+        void apply(Level world, BlockPos clicked, BlockPos neighbour);
     }
 
     @FunctionalInterface
     public interface ConnectivityPredicate {
-        boolean test(World world, BlockPos pos, Direction selectedFace, Direction connectedFace);
+        boolean test(Level world, BlockPos pos, Direction selectedFace, Direction connectedFace);
     }
 
 }

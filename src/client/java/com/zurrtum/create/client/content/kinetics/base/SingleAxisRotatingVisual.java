@@ -12,7 +12,7 @@ import com.zurrtum.create.client.flywheel.lib.visual.SimpleTickableVisual;
 import com.zurrtum.create.client.flywheel.lib.visualization.SimpleBlockEntityVisualizer;
 import com.zurrtum.create.client.foundation.render.AllInstanceTypes;
 import com.zurrtum.create.content.kinetics.base.KineticBlockEntity;
-import net.minecraft.util.math.Direction;
+import net.minecraft.core.Direction;
 
 import java.util.function.Consumer;
 
@@ -63,7 +63,7 @@ public class SingleAxisRotatingVisual<T extends KineticBlockEntity> extends Kine
         T blockEntity,
         float partialTick
     ) {
-        var model = Models.partial(BacktankRenderer.getShaftModel(blockEntity.getCachedState()));
+        var model = Models.partial(BacktankRenderer.getShaftModel(blockEntity.getBlockState()));
         return new SingleAxisRotatingVisual<>(context, blockEntity, partialTick, model);
     }
 

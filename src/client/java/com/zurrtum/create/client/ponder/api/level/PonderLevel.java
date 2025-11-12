@@ -1,5 +1,6 @@
 package com.zurrtum.create.client.ponder.api.level;
 
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.zurrtum.create.catnip.levelWrappers.SchematicLevel;
 import com.zurrtum.create.client.ponder.Ponder;
 import com.zurrtum.create.client.ponder.api.element.WorldSectionElement;
@@ -11,41 +12,41 @@ import com.zurrtum.create.client.ponder.foundation.level.PonderChunk;
 import com.zurrtum.create.ponder.api.VirtualBlockEntity;
 import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.Camera;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.particle.Particle;
-import net.minecraft.client.render.Camera;
-import net.minecraft.client.render.command.OrderedRenderCommandQueue;
-import net.minecraft.client.render.command.OrderedRenderCommandQueueImpl;
-import net.minecraft.client.render.entity.EntityRenderManager;
-import net.minecraft.client.render.entity.state.EntityRenderState;
-import net.minecraft.client.render.state.CameraRenderState;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.SpawnReason;
-import net.minecraft.fluid.FluidState;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.particle.BlockStateParticleEffect;
-import net.minecraft.particle.ParticleEffect;
-import net.minecraft.particle.ParticleTypes;
-import net.minecraft.registry.DynamicRegistryManager;
-import net.minecraft.storage.NbtReadView;
-import net.minecraft.storage.NbtWriteView;
-import net.minecraft.storage.ReadView;
-import net.minecraft.util.ErrorReporter;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.math.*;
-import net.minecraft.util.shape.VoxelShape;
-import net.minecraft.world.BlockView;
-import net.minecraft.world.LightType;
-import net.minecraft.world.RaycastContext;
-import net.minecraft.world.World;
-import net.minecraft.world.chunk.Chunk;
-import net.minecraft.world.chunk.ChunkStatus;
-import net.minecraft.world.chunk.WorldChunk;
+import net.minecraft.client.renderer.SubmitNodeCollector;
+import net.minecraft.client.renderer.SubmitNodeStorage;
+import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
+import net.minecraft.client.renderer.entity.state.EntityRenderState;
+import net.minecraft.client.renderer.state.CameraRenderState;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.RegistryAccess;
+import net.minecraft.core.particles.BlockParticleOption;
+import net.minecraft.core.particles.ParticleOptions;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.util.Mth;
+import net.minecraft.util.ProblemReporter;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntitySpawnReason;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.level.*;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.chunk.ChunkAccess;
+import net.minecraft.world.level.chunk.LevelChunk;
+import net.minecraft.world.level.chunk.status.ChunkStatus;
+import net.minecraft.world.level.material.FluidState;
+import net.minecraft.world.level.storage.TagValueInput;
+import net.minecraft.world.level.storage.TagValueOutput;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
@@ -56,7 +57,7 @@ public class PonderLevel extends SchematicLevel {
     public PonderScene scene;
 
     protected Map<BlockPos, BlockState> originalBlocks;
-    protected Map<BlockPos, NbtCompound> originalBlockEntities;
+    protected Map<BlockPos, CompoundTag> originalBlockEntities;
     protected Map<BlockPos, Integer> blockBreakingProgressions;
     protected List<Entity> originalEntities;
     @Nullable
@@ -68,7 +69,7 @@ public class PonderLevel extends SchematicLevel {
     @Nullable Selection mask;
     boolean currentlyTickingEntities;
 
-    public PonderLevel(BlockPos anchor, World original) {
+    public PonderLevel(BlockPos anchor, Level original) {
         super(anchor, original);
         originalBlocks = new HashMap<>();
         originalBlockEntities = new HashMap<>();
@@ -82,14 +83,14 @@ public class PonderLevel extends SchematicLevel {
         originalBlocks.clear();
         originalBlockEntities.clear();
         originalBlocks.putAll(blocks);
-        DynamicRegistryManager registryManager = getRegistryManager();
-        blockEntities.forEach((k, v) -> originalBlockEntities.put(k, v.createNbtWithIdentifyingData(registryManager)));
+        RegistryAccess registryManager = registryAccess();
+        blockEntities.forEach((k, v) -> originalBlockEntities.put(k, v.saveWithFullMetadata(registryManager)));
         entities.forEach(e -> {
-            try (ErrorReporter.Logging logging = new ErrorReporter.Logging(e.getErrorReporterContext(), Ponder.LOGGER)) {
-                NbtWriteView writeView = NbtWriteView.create(logging, registryManager);
-                e.saveData(writeView);
-                ReadView readView = NbtReadView.create(logging, registryManager, writeView.getNbt());
-                EntityType.getEntityFromData(readView, this, SpawnReason.LOAD).ifPresent(originalEntities::add);
+            try (ProblemReporter.ScopedCollector logging = new ProblemReporter.ScopedCollector(e.problemPath(), Ponder.LOGGER)) {
+                TagValueOutput writeView = TagValueOutput.createWithContext(logging, registryManager);
+                e.save(writeView);
+                ValueInput readView = TagValueInput.create(logging, registryManager, writeView.buildResult());
+                EntityType.create(readView, this, EntitySpawnReason.LOAD).ifPresent(originalEntities::add);
             }
         });
     }
@@ -101,19 +102,19 @@ public class PonderLevel extends SchematicLevel {
         blockBreakingProgressions.clear();
         renderedBlockEntities.clear();
         blocks.putAll(originalBlocks);
-        DynamicRegistryManager registryManager = getRegistryManager();
+        RegistryAccess registryManager = registryAccess();
         originalBlockEntities.forEach((k, v) -> {
-            BlockEntity blockEntity = BlockEntity.createFromNbt(k, originalBlocks.get(k), v, registryManager);
-            onBEAdded(blockEntity, blockEntity.getPos());
+            BlockEntity blockEntity = BlockEntity.loadStatic(k, originalBlocks.get(k), v, registryManager);
+            onBEAdded(blockEntity, blockEntity.getBlockPos());
             blockEntities.put(k, blockEntity);
             renderedBlockEntities.add(blockEntity);
         });
         originalEntities.forEach(e -> {
-            try (ErrorReporter.Logging logging = new ErrorReporter.Logging(e.getErrorReporterContext(), Ponder.LOGGER)) {
-                NbtWriteView writeView = NbtWriteView.create(logging, registryManager);
-                e.saveData(writeView);
-                ReadView readView = NbtReadView.create(logging, registryManager, writeView.getNbt());
-                EntityType.getEntityFromData(readView, this, SpawnReason.LOAD).ifPresent(entities::add);
+            try (ProblemReporter.ScopedCollector logging = new ProblemReporter.ScopedCollector(e.problemPath(), Ponder.LOGGER)) {
+                TagValueOutput writeView = TagValueOutput.createWithContext(logging, registryManager);
+                e.save(writeView);
+                ValueInput readView = TagValueInput.create(logging, registryManager, writeView.buildResult());
+                EntityType.create(readView, this, EntitySpawnReason.LOAD).ifPresent(entities::add);
             }
         });
         particles.clearEffects();
@@ -126,9 +127,9 @@ public class PonderLevel extends SchematicLevel {
             if (originalBlocks.containsKey(p))
                 blocks.put(p, originalBlocks.get(p));
             if (originalBlockEntities.containsKey(p)) {
-                BlockEntity blockEntity = BlockEntity.createFromNbt(p, originalBlocks.get(p), originalBlockEntities.get(p), getRegistryManager());
+                BlockEntity blockEntity = BlockEntity.loadStatic(p, originalBlocks.get(p), originalBlockEntities.get(p), registryAccess());
                 if (blockEntity != null) {
-                    onBEAdded(blockEntity, blockEntity.getPos());
+                    onBEAdded(blockEntity, blockEntity.getBlockPos());
                     blockEntities.put(p, blockEntity);
                 }
             }
@@ -150,7 +151,7 @@ public class PonderLevel extends SchematicLevel {
     }
 
     @Override
-    public int getLightLevel(LightType p_226658_1_, BlockPos p_226658_2_) {
+    public int getBrightness(LightLayer p_226658_1_, BlockPos p_226658_2_) {
         return overrideLight == -1 ? 15 : overrideLight;
     }
 
@@ -165,51 +166,51 @@ public class PonderLevel extends SchematicLevel {
     @Override
     public BlockState getBlockState(BlockPos globalPos) {
         if (mask != null && !mask.test(globalPos.subtract(anchor)))
-            return Blocks.AIR.getDefaultState();
+            return Blocks.AIR.defaultBlockState();
         if (currentlyTickingEntities && globalPos.getY() < 0)
-            return Blocks.AIR.getDefaultState();
+            return Blocks.AIR.defaultBlockState();
         return super.getBlockState(globalPos);
     }
 
     @Override // For particle collision
-    public BlockView getChunkAsView(int p_225522_1_, int p_225522_2_) {
+    public BlockGetter getChunkForCollisions(int p_225522_1_, int p_225522_2_) {
         return this;
     }
 
-    public void renderEntities(MatrixStack ms, OrderedRenderCommandQueue queue, Camera ari, CameraRenderState cameraRenderState, float pt) {
-        Vec3d Vector3d = ari.getPos();
-        double d0 = Vector3d.getX();
-        double d1 = Vector3d.getY();
-        double d2 = Vector3d.getZ();
+    public void renderEntities(PoseStack ms, SubmitNodeCollector queue, Camera ari, CameraRenderState cameraRenderState, float pt) {
+        Vec3 Vector3d = ari.getPosition();
+        double d0 = Vector3d.x();
+        double d1 = Vector3d.y();
+        double d2 = Vector3d.z();
 
-        MinecraftClient mc = MinecraftClient.getInstance();
-        EntityRenderManager renderManager = mc.getEntityRenderDispatcher();
+        Minecraft mc = Minecraft.getInstance();
+        EntityRenderDispatcher renderManager = mc.getEntityRenderDispatcher();
         for (Entity entity : entities) {
-            if (entity.age == 0) {
-                entity.lastRenderX = entity.getX();
-                entity.lastRenderY = entity.getY();
-                entity.lastRenderZ = entity.getZ();
+            if (entity.tickCount == 0) {
+                entity.xOld = entity.getX();
+                entity.yOld = entity.getY();
+                entity.zOld = entity.getZ();
             }
             renderEntity(renderManager, entity, cameraRenderState, d0, d1, d2, pt, ms, queue);
         }
     }
 
     private void renderEntity(
-        EntityRenderManager renderManager,
+        EntityRenderDispatcher renderManager,
         Entity entity,
         CameraRenderState cameraRenderState,
         double x,
         double y,
         double z,
         float pt,
-        MatrixStack ms,
-        OrderedRenderCommandQueue queue
+        PoseStack ms,
+        SubmitNodeCollector queue
     ) {
-        EntityRenderState state = renderManager.getAndUpdateRenderState(entity, pt);
-        renderManager.render(state, cameraRenderState, state.x - x, state.y - y, state.z - z, ms, queue);
+        EntityRenderState state = renderManager.extractEntity(entity, pt);
+        renderManager.submit(state, cameraRenderState, state.x - x, state.y - y, state.z - z, ms, queue);
     }
 
-    public void renderParticles(MatrixStack ms, OrderedRenderCommandQueueImpl queue, Camera ari, CameraRenderState cameraRenderState, float pt) {
+    public void renderParticles(PoseStack ms, SubmitNodeStorage queue, Camera ari, CameraRenderState cameraRenderState, float pt) {
         particles.renderParticles(ms, queue, ari, cameraRenderState, pt);
     }
 
@@ -221,10 +222,10 @@ public class PonderLevel extends SchematicLevel {
         for (Iterator<Entity> iterator = entities.iterator(); iterator.hasNext(); ) {
             Entity entity = iterator.next();
 
-            entity.age++;
-            entity.lastRenderX = entity.getX();
-            entity.lastRenderY = entity.getY();
-            entity.lastRenderZ = entity.getZ();
+            entity.tickCount++;
+            entity.xOld = entity.getX();
+            entity.yOld = entity.getY();
+            entity.zOld = entity.getZ();
             entity.tick();
 
             if (entity.getY() <= -.5f)
@@ -238,13 +239,13 @@ public class PonderLevel extends SchematicLevel {
     }
 
     @Override
-    public void addParticleClient(ParticleEffect data, double x, double y, double z, double mx, double my, double mz) {
+    public void addParticle(ParticleOptions data, double x, double y, double z, double mx, double my, double mz) {
         particles.addParticle(data, x, y, z, mx, my, mz);
     }
 
     @Override
-    public void addImportantParticleClient(ParticleEffect data, double x, double y, double z, double mx, double my, double mz) {
-        addParticleClient(data, x, y, z, mx, my, mz);
+    public void addAlwaysVisibleParticle(ParticleOptions data, double x, double y, double z, double mx, double my, double mz) {
+        addParticle(data, x, y, z, mx, my, mz);
     }
 
     public void addParticle(@Nullable Particle p) {
@@ -271,17 +272,17 @@ public class PonderLevel extends SchematicLevel {
     }
 
     public void addBlockDestroyEffects(BlockPos pos, BlockState state) {
-        VoxelShape voxelshape = state.getOutlineShape(this, pos);
+        VoxelShape voxelshape = state.getShape(this, pos);
         if (voxelshape.isEmpty())
             return;
 
-        Box bb = voxelshape.getBoundingBox();
+        AABB bb = voxelshape.bounds();
         double d1 = Math.min(1.0D, bb.maxX - bb.minX);
         double d2 = Math.min(1.0D, bb.maxY - bb.minY);
         double d3 = Math.min(1.0D, bb.maxZ - bb.minZ);
-        int i = Math.max(2, MathHelper.ceil(d1 / 0.25D));
-        int j = Math.max(2, MathHelper.ceil(d2 / 0.25D));
-        int k = Math.max(2, MathHelper.ceil(d3 / 0.25D));
+        int i = Math.max(2, Mth.ceil(d1 / 0.25D));
+        int j = Math.max(2, Mth.ceil(d2 / 0.25D));
+        int k = Math.max(2, Mth.ceil(d3 / 0.25D));
 
         for (int l = 0; l < i; ++l) {
             for (int i1 = 0; i1 < j; ++i1) {
@@ -292,8 +293,8 @@ public class PonderLevel extends SchematicLevel {
                     double d7 = d4 * d1 + bb.minX;
                     double d8 = d5 * d2 + bb.minY;
                     double d9 = d6 * d3 + bb.minZ;
-                    addParticleClient(
-                        new BlockStateParticleEffect(ParticleTypes.BLOCK, state),
+                    addParticle(
+                        new BlockParticleOption(ParticleTypes.BLOCK, state),
                         pos.getX() + d7,
                         pos.getY() + d8,
                         pos.getZ() + d9,
@@ -313,65 +314,62 @@ public class PonderLevel extends SchematicLevel {
 
     @Override
     @SuppressWarnings("deprecation")
-    public boolean isChunkLoaded(BlockPos pos) {
+    public boolean hasChunkAt(BlockPos pos) {
         return true; // fix particle lighting
     }
 
     @Override
     @SuppressWarnings("deprecation")
-    public boolean isPosLoaded(int x, int y) {
+    public boolean hasChunkAt(int x, int y) {
         return true; // fix particle lighting
     }
 
     @Override
-    public boolean isPosLoaded(BlockPos pos) {
+    public boolean isLoaded(BlockPos pos) {
         return true; // fix particle lighting
     }
 
     @Override
-    public boolean isPlayerInRange(double p_217358_1_, double p_217358_3_, double p_217358_5_, double p_217358_7_) {
+    public boolean hasNearbyAlivePlayer(double p_217358_1_, double p_217358_3_, double p_217358_5_, double p_217358_7_) {
         return true; // always enable spawner animations
     }
 
     @Override
-    public BlockHitResult raycast(RaycastContext context) {
-        return BlockView.raycast(
-            context.getStart(), context.getEnd(), context, (innerContext, pos) -> {
+    public BlockHitResult clip(ClipContext context) {
+        return BlockGetter.traverseBlocks(
+            context.getFrom(), context.getTo(), context, (innerContext, pos) -> {
                 BlockState blockState = getBlockState(pos);
                 FluidState fluidState = blockState.getFluidState();
-                Vec3d vec3d = innerContext.getStart();
-                Vec3d vec3d2 = innerContext.getEnd();
+                Vec3 vec3d = innerContext.getFrom();
+                Vec3 vec3d2 = innerContext.getTo();
                 VoxelShape voxelShape = innerContext.getBlockShape(blockState, this, pos);
-                BlockHitResult blockHitResult = raycastBlock(vec3d, vec3d2, pos, voxelShape, blockState);
+                BlockHitResult blockHitResult = clipWithInteractionOverride(vec3d, vec3d2, pos, voxelShape, blockState);
                 VoxelShape voxelShape2 = innerContext.getFluidShape(fluidState, this, pos);
-                BlockHitResult blockHitResult2 = voxelShape2.raycast(vec3d, vec3d2, pos);
-                double d = blockHitResult == null ? Double.MAX_VALUE : innerContext.getStart().squaredDistanceTo(blockHitResult.getPos());
-                double e = blockHitResult2 == null ? Double.MAX_VALUE : innerContext.getStart().squaredDistanceTo(blockHitResult2.getPos());
+                BlockHitResult blockHitResult2 = voxelShape2.clip(vec3d, vec3d2, pos);
+                double d = blockHitResult == null ? Double.MAX_VALUE : innerContext.getFrom().distanceToSqr(blockHitResult.getLocation());
+                double e = blockHitResult2 == null ? Double.MAX_VALUE : innerContext.getFrom().distanceToSqr(blockHitResult2.getLocation());
                 return d <= e ? blockHitResult : blockHitResult2;
             }, (innerContext) -> {
-                Vec3d vec3d = innerContext.getStart().subtract(innerContext.getEnd());
-                return BlockHitResult.createMissed(
-                    innerContext.getEnd(),
-                    Direction.getFacing(vec3d.x, vec3d.y, vec3d.z),
-                    BlockPos.ofFloored(innerContext.getEnd())
+                Vec3 vec3d = innerContext.getFrom().subtract(innerContext.getTo());
+                return BlockHitResult.miss(
+                    innerContext.getTo(),
+                    Direction.getApproximateNearest(vec3d.x, vec3d.y, vec3d.z),
+                    BlockPos.containing(innerContext.getTo())
                 );
             }
         );
     }
 
     @Override
-    public WorldChunk getChunk(int x, int z) {
+    public LevelChunk getChunk(int x, int z) {
         if (chunks == null) {
             chunks = new Long2ObjectOpenHashMap<>();
         }
-        return chunks.computeIfAbsent(
-            ChunkPos.toLong(x, z),
-            packedPos -> new PonderChunk(this, ChunkPos.getPackedX(packedPos), ChunkPos.getPackedZ(packedPos))
-        );
+        return chunks.computeIfAbsent(ChunkPos.asLong(x, z), packedPos -> new PonderChunk(this, ChunkPos.getX(packedPos), ChunkPos.getZ(packedPos)));
     }
 
     @Override
-    public Chunk getChunk(int x, int z, ChunkStatus leastStatus, boolean create) {
+    public ChunkAccess getChunk(int x, int z, ChunkStatus leastStatus, boolean create) {
         return getChunk(x, z);
     }
 }

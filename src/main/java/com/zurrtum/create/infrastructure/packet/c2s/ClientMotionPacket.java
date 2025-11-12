@@ -2,33 +2,32 @@ package com.zurrtum.create.infrastructure.packet.c2s;
 
 import com.zurrtum.create.AllHandle;
 import com.zurrtum.create.AllPackets;
-import net.minecraft.network.RegistryByteBuf;
-import net.minecraft.network.codec.PacketCodec;
-import net.minecraft.network.codec.PacketCodecs;
-import net.minecraft.network.packet.PacketType;
-import net.minecraft.server.network.ServerPlayNetworkHandler;
-import net.minecraft.util.math.Vec3d;
-
 import java.util.function.BiConsumer;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.PacketType;
+import net.minecraft.server.network.ServerGamePacketListenerImpl;
+import net.minecraft.world.phys.Vec3;
 
-public record ClientMotionPacket(Vec3d motion, boolean onGround, float limbSwing) implements C2SPacket {
-    public static final PacketCodec<RegistryByteBuf, ClientMotionPacket> CODEC = PacketCodec.tuple(
-        Vec3d.PACKET_CODEC,
+public record ClientMotionPacket(Vec3 motion, boolean onGround, float limbSwing) implements C2SPacket {
+    public static final StreamCodec<RegistryFriendlyByteBuf, ClientMotionPacket> CODEC = StreamCodec.composite(
+        Vec3.STREAM_CODEC,
         ClientMotionPacket::motion,
-        PacketCodecs.BOOLEAN,
+        ByteBufCodecs.BOOL,
         ClientMotionPacket::onGround,
-        PacketCodecs.FLOAT,
+        ByteBufCodecs.FLOAT,
         ClientMotionPacket::limbSwing,
         ClientMotionPacket::new
     );
 
     @Override
-    public PacketType<ClientMotionPacket> getPacketType() {
+    public PacketType<ClientMotionPacket> type() {
         return AllPackets.CLIENT_MOTION;
     }
 
     @Override
-    public BiConsumer<ServerPlayNetworkHandler, ClientMotionPacket> callback() {
+    public BiConsumer<ServerGamePacketListenerImpl, ClientMotionPacket> callback() {
         return AllHandle::onClientMotion;
     }
 }

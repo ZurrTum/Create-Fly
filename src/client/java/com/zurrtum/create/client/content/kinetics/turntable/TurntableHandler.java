@@ -4,25 +4,25 @@ import com.zurrtum.create.AllBlocks;
 import com.zurrtum.create.catnip.math.VecHelper;
 import com.zurrtum.create.client.catnip.animation.AnimationTickHolder;
 import com.zurrtum.create.content.kinetics.turntable.TurntableBlockEntity;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.client.Minecraft;
+import net.minecraft.core.BlockPos;
+import net.minecraft.util.Mth;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.phys.Vec3;
 
 public class TurntableHandler {
-    public static void gameRenderFrame(MinecraftClient mc) {
-        if (mc.interactionManager == null || mc.player == null)
+    public static void gameRenderFrame(Minecraft mc) {
+        if (mc.gameMode == null || mc.player == null)
             return;
-        BlockPos pos = mc.player.getBlockPos();
-        if (!mc.world.getBlockState(pos).isOf(AllBlocks.TURNTABLE))
+        BlockPos pos = mc.player.blockPosition();
+        if (!mc.level.getBlockState(pos).is(AllBlocks.TURNTABLE))
             return;
-        if (!mc.player.isOnGround())
+        if (!mc.player.onGround())
             return;
         if (mc.isPaused())
             return;
 
-        BlockEntity blockEntity = mc.world.getBlockEntity(pos);
+        BlockEntity blockEntity = mc.level.getBlockEntity(pos);
         if (!(blockEntity instanceof TurntableBlockEntity turnTable))
             return;
 
@@ -31,13 +31,13 @@ public class TurntableHandler {
         if (speed == 0)
             return;
 
-        Vec3d origin = VecHelper.getCenterOf(pos);
-        Vec3d offset = mc.player.getEntityPos().subtract(origin);
+        Vec3 origin = VecHelper.getCenterOf(pos);
+        Vec3 offset = mc.player.position().subtract(origin);
 
         if (offset.length() > 1 / 4f)
-            speed *= MathHelper.clamp((1 / 2f - offset.length()) * 2, 0, 1);
+            speed *= Mth.clamp((1 / 2f - offset.length()) * 2, 0, 1);
 
-        mc.player.setYaw(mc.player.lastYaw - speed * AnimationTickHolder.getPartialTicks());
-        mc.player.bodyYaw = mc.player.getYaw();
+        mc.player.setYRot(mc.player.yRotO - speed * AnimationTickHolder.getPartialTicks());
+        mc.player.yBodyRot = mc.player.getYRot();
     }
 }

@@ -7,16 +7,16 @@ import com.zurrtum.create.client.content.logistics.factoryBoard.FactoryPanelConn
 import com.zurrtum.create.content.logistics.packagerLink.LogisticallyLinkedBehaviour;
 import com.zurrtum.create.content.logistics.packagerLink.LogisticallyLinkedBlockItem;
 import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
-import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.component.DataComponentTypes;
-import net.minecraft.entity.TypedEntityData;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.util.Uuids;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.shape.VoxelShape;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.core.UUIDUtil;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.component.TypedEntityData;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.shapes.VoxelShape;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.List;
@@ -27,22 +27,22 @@ public class LogisticallyLinkedClientHandler {
 
     private static UUID previouslyHeldFrequency;
 
-    public static void tick(MinecraftClient mc) {
+    public static void tick(Minecraft mc) {
         previouslyHeldFrequency = null;
 
-        ClientPlayerEntity player = mc.player;
+        LocalPlayer player = mc.player;
         if (player == null)
             return;
-        ItemStack mainHandItem = player.getMainHandStack();
+        ItemStack mainHandItem = player.getMainHandItem();
         if (!(mainHandItem.getItem() instanceof LogisticallyLinkedBlockItem) || !LogisticallyLinkedBlockItem.isTuned(mainHandItem))
             return;
 
-        TypedEntityData<BlockEntityType<?>> data = mainHandItem.get(DataComponentTypes.BLOCK_ENTITY_DATA);
+        TypedEntityData<BlockEntityType<?>> data = mainHandItem.get(DataComponents.BLOCK_ENTITY_DATA);
         if (data == null || !data.contains("Freq")) {
             return;
         }
-        NbtCompound tag = data.copyNbtWithoutId();
-        Optional<UUID> uuid = tag.get("Freq", Uuids.INT_STREAM_CODEC);
+        CompoundTag tag = data.copyTagWithoutId();
+        Optional<UUID> uuid = tag.read("Freq", UUIDUtil.CODEC);
         if (uuid.isEmpty())
             return;
 
@@ -50,15 +50,15 @@ public class LogisticallyLinkedClientHandler {
 
         for (LogisticallyLinkedBehaviour behaviour : LogisticallyLinkedBehaviour.getAllPresent(previouslyHeldFrequency, false, true)) {
             SmartBlockEntity be = behaviour.blockEntity;
-            VoxelShape shape = be.getCachedState().getOutlineShape(player.getEntityWorld(), be.getPos());
+            VoxelShape shape = be.getBlockState().getShape(player.level(), be.getBlockPos());
             if (shape.isEmpty())
                 continue;
-            if (!player.getBlockPos().isWithinDistance(be.getPos(), 64))
+            if (!player.blockPosition().closerThan(be.getBlockPos(), 64))
                 continue;
-            List<Box> list = shape.getBoundingBoxes();
+            List<AABB> list = shape.toAabbs();
             for (int i = 0, size = list.size(); i < size; i++) {
-                Box aabb = list.get(i);
-                Outliner.getInstance().showAABB(Pair.of(behaviour, i), aabb.expand(-1 / 128f).offset(be.getPos()), 2).lineWidth(1 / 32f)
+                AABB aabb = list.get(i);
+                Outliner.getInstance().showAABB(Pair.of(behaviour, i), aabb.inflate(-1 / 128f).move(be.getBlockPos()), 2).lineWidth(1 / 32f)
                     .disableLineNormals().colored(AnimationTickHolder.getTicks() % 16 < 8 ? 0x708DAD : 0x90ADCD);
             }
 
@@ -70,14 +70,14 @@ public class LogisticallyLinkedClientHandler {
             return;
         if (!previouslyHeldFrequency.equals(fpb.getNetwork()))
             return;
-        ClientPlayerEntity player = MinecraftClient.getInstance().player;
+        LocalPlayer player = Minecraft.getInstance().player;
         if (player == null)
             return;
-        if (!player.getBlockPos().isWithinDistance(fpb.getPos(), 64))
+        if (!player.blockPosition().closerThan(fpb.getPos(), 64))
             return;
 
         Outliner.getInstance()
-            .showAABB(fpb, FactoryPanelConnectionHandler.getBB(fpb.blockEntity.getCachedState(), fpb.getPanelPosition()).expand(-1.5 / 128f))
+            .showAABB(fpb, FactoryPanelConnectionHandler.getBB(fpb.blockEntity.getBlockState(), fpb.getPanelPosition()).inflate(-1.5 / 128f))
             .lineWidth(1 / 32f).disableLineNormals().colored(AnimationTickHolder.getTicks() % 16 < 8 ? 0x708DAD : 0x90ADCD);
     }
 

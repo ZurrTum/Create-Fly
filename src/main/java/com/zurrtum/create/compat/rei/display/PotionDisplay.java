@@ -11,39 +11,38 @@ import me.shedaniel.rei.api.common.display.Display;
 import me.shedaniel.rei.api.common.display.DisplaySerializer;
 import me.shedaniel.rei.api.common.entry.EntryIngredient;
 import me.shedaniel.rei.api.common.util.EntryIngredients;
-import net.minecraft.network.codec.PacketCodec;
-import net.minecraft.network.codec.PacketCodecs;
-import net.minecraft.recipe.RecipeEntry;
-import net.minecraft.util.Identifier;
-
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.crafting.RecipeHolder;
 import java.util.List;
 import java.util.Optional;
 
-public record PotionDisplay(EntryIngredient input, FluidIngredient fluid, FluidStack output, Optional<Identifier> location) implements Display {
+public record PotionDisplay(EntryIngredient input, FluidIngredient fluid, FluidStack output, Optional<ResourceLocation> location) implements Display {
     public static final DisplaySerializer<PotionDisplay> SERIALIZER = DisplaySerializer.of(
         RecordCodecBuilder.mapCodec(instance -> instance.group(
             EntryIngredient.codec().fieldOf("input").forGetter(PotionDisplay::input),
             FluidIngredient.CODEC.fieldOf("fluid").forGetter(PotionDisplay::fluid),
             FluidStack.CODEC.fieldOf("output").forGetter(PotionDisplay::output),
-            Identifier.CODEC.optionalFieldOf("location").forGetter(PotionDisplay::location)
-        ).apply(instance, PotionDisplay::new)), PacketCodec.tuple(
+            ResourceLocation.CODEC.optionalFieldOf("location").forGetter(PotionDisplay::location)
+        ).apply(instance, PotionDisplay::new)), StreamCodec.composite(
             EntryIngredient.streamCodec(),
             PotionDisplay::input,
             FluidIngredient.PACKET_CODEC,
             PotionDisplay::fluid,
             FluidStack.PACKET_CODEC,
             PotionDisplay::output,
-            PacketCodecs.optional(Identifier.PACKET_CODEC),
+            ByteBufCodecs.optional(ResourceLocation.STREAM_CODEC),
             PotionDisplay::location,
             PotionDisplay::new
         )
     );
 
-    public PotionDisplay(RecipeEntry<PotionRecipe> entry) {
-        this(entry.id().getValue(), entry.value());
+    public PotionDisplay(RecipeHolder<PotionRecipe> entry) {
+        this(entry.id().location(), entry.value());
     }
 
-    public PotionDisplay(Identifier id, PotionRecipe recipe) {
+    public PotionDisplay(ResourceLocation id, PotionRecipe recipe) {
         this(EntryIngredients.ofIngredient(recipe.ingredient()), recipe.fluidIngredient(), recipe.result(), Optional.of(id));
     }
 
@@ -63,7 +62,7 @@ public record PotionDisplay(EntryIngredient input, FluidIngredient fluid, FluidS
     }
 
     @Override
-    public Optional<Identifier> getDisplayLocation() {
+    public Optional<ResourceLocation> getDisplayLocation() {
         return location;
     }
 

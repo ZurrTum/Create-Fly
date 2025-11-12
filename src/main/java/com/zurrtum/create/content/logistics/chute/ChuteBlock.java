@@ -6,70 +6,72 @@ import com.zurrtum.create.AllItems;
 import com.zurrtum.create.catnip.data.Iterate;
 import com.zurrtum.create.content.logistics.funnel.FunnelBlock;
 import com.zurrtum.create.foundation.block.ProperWaterloggedBlock;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.entity.ai.pathing.NavigationType;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.fluid.FluidState;
-import net.minecraft.item.ItemPlacementContext;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.ItemUsageContext;
-import net.minecraft.sound.SoundCategory;
-import net.minecraft.sound.SoundEvents;
-import net.minecraft.state.StateManager.Builder;
-import net.minecraft.state.property.EnumProperty;
-import net.minecraft.state.property.Properties;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.*;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.random.Random;
-import net.minecraft.world.BlockView;
-import net.minecraft.world.World;
-import net.minecraft.world.WorldEvents;
-import net.minecraft.world.WorldView;
-import net.minecraft.world.tick.ScheduledTickView;
-
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.item.context.UseOnContext;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelReader;
+import net.minecraft.world.level.ScheduledTickAccess;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.LevelEvent;
+import net.minecraft.world.level.block.Mirror;
+import net.minecraft.world.level.block.Rotation;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition.Builder;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.block.state.properties.EnumProperty;
+import net.minecraft.world.level.material.FluidState;
+import net.minecraft.world.level.pathfinder.PathComputationType;
+import net.minecraft.world.phys.BlockHitResult;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
 public class ChuteBlock extends AbstractChuteBlock implements ProperWaterloggedBlock {
 
-    public static final EnumProperty<Shape> SHAPE = EnumProperty.of("shape", Shape.class);
-    public static final EnumProperty<Direction> FACING = Properties.HOPPER_FACING;
+    public static final EnumProperty<Shape> SHAPE = EnumProperty.create("shape", Shape.class);
+    public static final EnumProperty<Direction> FACING = BlockStateProperties.FACING_HOPPER;
 
-    public ChuteBlock(Settings p_i48440_1_) {
+    public ChuteBlock(Properties p_i48440_1_) {
         super(p_i48440_1_);
-        setDefaultState(getDefaultState().with(SHAPE, Shape.NORMAL).with(FACING, Direction.DOWN).with(WATERLOGGED, false));
+        registerDefaultState(defaultBlockState().setValue(SHAPE, Shape.NORMAL).setValue(FACING, Direction.DOWN).setValue(WATERLOGGED, false));
     }
 
-    public enum Shape implements StringIdentifiable {
+    public enum Shape implements StringRepresentable {
         INTERSECTION,
         WINDOW,
         NORMAL,
         ENCASED;
 
         @Override
-        public String asString() {
+        public String getSerializedName() {
             return name().toLowerCase(Locale.ROOT);
         }
     }
 
     @Override
     public Direction getFacing(BlockState state) {
-        return state.get(FACING);
+        return state.getValue(FACING);
     }
 
     @Override
     public boolean isOpen(BlockState state) {
-        return state.get(FACING) == Direction.DOWN || state.get(SHAPE) == Shape.INTERSECTION;
+        return state.getValue(FACING) == Direction.DOWN || state.getValue(SHAPE) == Shape.INTERSECTION;
     }
 
     @Override
-    public boolean isTransparent(BlockState state) {
-        return state.get(SHAPE) == Shape.WINDOW;
+    public boolean propagatesSkylightDown(BlockState state) {
+        return state.getValue(SHAPE) == Shape.WINDOW;
     }
 
     @Override
@@ -78,108 +80,108 @@ public class ChuteBlock extends AbstractChuteBlock implements ProperWaterloggedB
     }
 
     @Override
-    public ActionResult onWrenched(BlockState state, ItemUsageContext context) {
-        Shape shape = state.get(SHAPE);
-        boolean down = state.get(FACING) == Direction.DOWN;
+    public InteractionResult onWrenched(BlockState state, UseOnContext context) {
+        Shape shape = state.getValue(SHAPE);
+        boolean down = state.getValue(FACING) == Direction.DOWN;
         if (shape == Shape.INTERSECTION)
-            return ActionResult.PASS;
-        World level = context.getWorld();
-        if (level.isClient())
-            return ActionResult.SUCCESS;
+            return InteractionResult.PASS;
+        Level level = context.getLevel();
+        if (level.isClientSide())
+            return InteractionResult.SUCCESS;
         if (shape == Shape.ENCASED) {
-            level.setBlockState(context.getBlockPos(), state.with(SHAPE, Shape.NORMAL));
-            level.syncWorldEvent(
-                WorldEvents.BLOCK_BROKEN,
-                context.getBlockPos(),
-                Block.getRawIdFromState(AllBlocks.INDUSTRIAL_IRON_BLOCK.getDefaultState())
+            level.setBlockAndUpdate(context.getClickedPos(), state.setValue(SHAPE, Shape.NORMAL));
+            level.levelEvent(
+                LevelEvent.PARTICLES_DESTROY_BLOCK,
+                context.getClickedPos(),
+                Block.getId(AllBlocks.INDUSTRIAL_IRON_BLOCK.defaultBlockState())
             );
-            return ActionResult.SUCCESS;
+            return InteractionResult.SUCCESS;
         }
         if (down)
-            level.setBlockState(context.getBlockPos(), state.with(SHAPE, shape != Shape.NORMAL ? Shape.NORMAL : Shape.WINDOW));
-        return ActionResult.SUCCESS;
+            level.setBlockAndUpdate(context.getClickedPos(), state.setValue(SHAPE, shape != Shape.NORMAL ? Shape.NORMAL : Shape.WINDOW));
+        return InteractionResult.SUCCESS;
     }
 
     @Override
-    protected ActionResult onUseWithItem(
+    protected InteractionResult useItemOn(
         ItemStack stack,
         BlockState state,
-        World level,
+        Level level,
         BlockPos pos,
-        PlayerEntity player,
-        Hand hand,
+        Player player,
+        InteractionHand hand,
         BlockHitResult hitResult
     ) {
-        Shape shape = state.get(SHAPE);
-        if (!stack.isOf(AllItems.INDUSTRIAL_IRON_BLOCK))
-            return super.onUseWithItem(stack, state, level, pos, player, hand, hitResult);
+        Shape shape = state.getValue(SHAPE);
+        if (!stack.is(AllItems.INDUSTRIAL_IRON_BLOCK))
+            return super.useItemOn(stack, state, level, pos, player, hand, hitResult);
         if (shape == Shape.INTERSECTION || shape == Shape.ENCASED)
-            return super.onUseWithItem(stack, state, level, pos, player, hand, hitResult);
-        if (player == null || level.isClient())
-            return ActionResult.SUCCESS;
+            return super.useItemOn(stack, state, level, pos, player, hand, hitResult);
+        if (player == null || level.isClientSide())
+            return InteractionResult.SUCCESS;
 
-        level.setBlockState(pos, state.with(SHAPE, Shape.ENCASED));
-        level.playSound(null, pos, SoundEvents.BLOCK_NETHERITE_BLOCK_HIT, SoundCategory.BLOCKS, 0.5f, 1.05f);
-        return ActionResult.SUCCESS;
+        level.setBlockAndUpdate(pos, state.setValue(SHAPE, Shape.ENCASED));
+        level.playSound(null, pos, SoundEvents.NETHERITE_BLOCK_HIT, SoundSource.BLOCKS, 0.5f, 1.05f);
+        return InteractionResult.SUCCESS;
     }
 
     @Override
-    public BlockState getPlacementState(ItemPlacementContext ctx) {
-        BlockState state = withWater(super.getPlacementState(ctx), ctx);
-        Direction face = ctx.getSide();
-        if (face.getAxis().isHorizontal() && !ctx.shouldCancelInteraction()) {
-            World world = ctx.getWorld();
-            BlockPos pos = ctx.getBlockPos();
-            return updateChuteState(state.with(FACING, face), world.getBlockState(pos.up()), world, pos);
+    public BlockState getStateForPlacement(BlockPlaceContext ctx) {
+        BlockState state = withWater(super.getStateForPlacement(ctx), ctx);
+        Direction face = ctx.getClickedFace();
+        if (face.getAxis().isHorizontal() && !ctx.isSecondaryUseActive()) {
+            Level world = ctx.getLevel();
+            BlockPos pos = ctx.getClickedPos();
+            return updateChuteState(state.setValue(FACING, face), world.getBlockState(pos.above()), world, pos);
         }
         return state;
     }
 
     @Override
-    public BlockState getStateForNeighborUpdate(
+    public BlockState updateShape(
         BlockState state,
-        WorldView world,
-        ScheduledTickView tickView,
+        LevelReader world,
+        ScheduledTickAccess tickView,
         BlockPos pos,
         Direction direction,
         BlockPos p_196271_6_,
         BlockState above,
-        Random random
+        RandomSource random
     ) {
         updateWater(world, tickView, state, pos);
-        return super.getStateForNeighborUpdate(state, world, tickView, pos, direction, p_196271_6_, above, random);
+        return super.updateShape(state, world, tickView, pos, direction, p_196271_6_, above, random);
     }
 
     @Override
-    protected void appendProperties(Builder<Block, BlockState> p_206840_1_) {
-        super.appendProperties(p_206840_1_.add(SHAPE, FACING, WATERLOGGED));
+    protected void createBlockStateDefinition(Builder<Block, BlockState> p_206840_1_) {
+        super.createBlockStateDefinition(p_206840_1_.add(SHAPE, FACING, WATERLOGGED));
     }
 
     @Override
-    public boolean canPlaceAt(BlockState state, WorldView world, BlockPos pos) {
-        BlockState above = world.getBlockState(pos.up());
+    public boolean canSurvive(BlockState state, LevelReader world, BlockPos pos) {
+        BlockState above = world.getBlockState(pos.above());
         return !isChute(above) || getChuteFacing(above) == Direction.DOWN;
     }
 
     @Override
-    public BlockState updateChuteState(BlockState state, BlockState above, BlockView world, BlockPos pos) {
+    public BlockState updateChuteState(BlockState state, BlockState above, BlockGetter world, BlockPos pos) {
         if (!(state.getBlock() instanceof ChuteBlock))
             return state;
 
         Map<Direction, Boolean> connections = new HashMap<>();
         int amtConnections = 0;
-        Direction facing = state.get(FACING);
+        Direction facing = state.getValue(FACING);
         boolean vertical = facing == Direction.DOWN;
 
         if (!vertical) {
-            BlockState target = world.getBlockState(pos.down().offset(facing.getOpposite()));
+            BlockState target = world.getBlockState(pos.below().relative(facing.getOpposite()));
             if (!isChute(target))
-                return state.with(FACING, Direction.DOWN).with(SHAPE, Shape.NORMAL);
+                return state.setValue(FACING, Direction.DOWN).setValue(SHAPE, Shape.NORMAL);
         }
 
         for (Direction direction : Iterate.horizontalDirections) {
-            BlockState diagonalInputChute = world.getBlockState(pos.up().offset(direction));
-            boolean value = diagonalInputChute.getBlock() instanceof ChuteBlock && diagonalInputChute.get(FACING) == direction;
+            BlockState diagonalInputChute = world.getBlockState(pos.above().relative(direction));
+            boolean value = diagonalInputChute.getBlock() instanceof ChuteBlock && diagonalInputChute.getValue(FACING) == direction;
             connections.put(direction, value);
             if (value)
                 amtConnections++;
@@ -187,32 +189,32 @@ public class ChuteBlock extends AbstractChuteBlock implements ProperWaterloggedB
 
         boolean noConnections = amtConnections == 0;
         if (vertical)
-            return state.with(SHAPE, noConnections ? state.get(SHAPE) == Shape.INTERSECTION ? Shape.NORMAL : state.get(SHAPE) : Shape.INTERSECTION);
+            return state.setValue(SHAPE, noConnections ? state.getValue(SHAPE) == Shape.INTERSECTION ? Shape.NORMAL : state.getValue(SHAPE) : Shape.INTERSECTION);
         if (noConnections)
-            return state.with(SHAPE, Shape.INTERSECTION);
+            return state.setValue(SHAPE, Shape.INTERSECTION);
         if (connections.get(Direction.NORTH) && connections.get(Direction.SOUTH))
-            return state.with(SHAPE, Shape.INTERSECTION);
+            return state.setValue(SHAPE, Shape.INTERSECTION);
         if (connections.get(Direction.EAST) && connections.get(Direction.WEST))
-            return state.with(SHAPE, Shape.INTERSECTION);
+            return state.setValue(SHAPE, Shape.INTERSECTION);
         if (amtConnections == 1 && connections.get(facing) && !(getChuteFacing(above) == Direction.DOWN) && !(above.getBlock() instanceof FunnelBlock && FunnelBlock.getFunnelFacing(
             above) == Direction.DOWN))
-            return state.with(SHAPE, state.get(SHAPE) == Shape.ENCASED ? Shape.ENCASED : Shape.NORMAL);
-        return state.with(SHAPE, Shape.INTERSECTION);
+            return state.setValue(SHAPE, state.getValue(SHAPE) == Shape.ENCASED ? Shape.ENCASED : Shape.NORMAL);
+        return state.setValue(SHAPE, Shape.INTERSECTION);
     }
 
     @Override
-    public BlockState rotate(BlockState pState, BlockRotation pRot) {
-        return pState.with(FACING, pRot.rotate(pState.get(FACING)));
+    public BlockState rotate(BlockState pState, Rotation pRot) {
+        return pState.setValue(FACING, pRot.rotate(pState.getValue(FACING)));
     }
 
     @Override
     @SuppressWarnings("deprecation")
-    public BlockState mirror(BlockState pState, BlockMirror pMirror) {
-        return pState.rotate(pMirror.getRotation(pState.get(FACING)));
+    public BlockState mirror(BlockState pState, Mirror pMirror) {
+        return pState.rotate(pMirror.getRotation(pState.getValue(FACING)));
     }
 
     @Override
-    protected boolean canPathfindThrough(BlockState state, NavigationType pathComputationType) {
+    protected boolean isPathfindable(BlockState state, PathComputationType pathComputationType) {
         return false;
     }
 

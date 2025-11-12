@@ -11,18 +11,18 @@ import com.zurrtum.create.client.flywheel.backend.gl.shader.ShaderType;
 import com.zurrtum.create.client.flywheel.backend.glsl.GlslVersion;
 import com.zurrtum.create.client.flywheel.backend.glsl.ShaderSources;
 import com.zurrtum.create.client.flywheel.lib.util.ResourceUtil;
-import net.minecraft.util.Identifier;
+import net.minecraft.resources.ResourceLocation;
 
 public class OitPrograms {
-    private static final Identifier FULLSCREEN = ResourceUtil.rl("internal/fullscreen.vert");
-    static final Identifier OIT_COMPOSITE = ResourceUtil.rl("internal/oit_composite.frag");
-    static final Identifier OIT_DEPTH = ResourceUtil.rl("internal/oit_depth.frag");
+    private static final ResourceLocation FULLSCREEN = ResourceUtil.rl("internal/fullscreen.vert");
+    static final ResourceLocation OIT_COMPOSITE = ResourceUtil.rl("internal/oit_composite.frag");
+    static final ResourceLocation OIT_DEPTH = ResourceUtil.rl("internal/oit_depth.frag");
 
-    private static final Compile<Identifier> COMPILE = new Compile<>();
+    private static final Compile<ResourceLocation> COMPILE = new Compile<>();
 
-    private final CompilationHarness<Identifier> harness;
+    private final CompilationHarness<ResourceLocation> harness;
 
-    public OitPrograms(CompilationHarness<Identifier> harness) {
+    public OitPrograms(CompilationHarness<ResourceLocation> harness) {
         this.harness = harness;
     }
 

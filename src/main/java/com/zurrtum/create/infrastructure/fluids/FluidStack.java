@@ -12,27 +12,27 @@ import io.netty.handler.codec.DecoderException;
 import io.netty.handler.codec.EncoderException;
 import it.unimi.dsi.fastutil.objects.ObjectSet;
 import it.unimi.dsi.fastutil.objects.Reference2ObjectMap;
-import net.minecraft.block.Block;
-import net.minecraft.block.Blocks;
-import net.minecraft.component.*;
-import net.minecraft.component.type.PotionContentsComponent;
-import net.minecraft.fluid.Fluid;
-import net.minecraft.fluid.Fluids;
-import net.minecraft.item.ItemConvertible;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.nbt.NbtElement;
+import net.minecraft.Util;
+import net.minecraft.core.Holder;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.core.component.*;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtOps;
-import net.minecraft.network.RegistryByteBuf;
-import net.minecraft.network.codec.PacketCodec;
-import net.minecraft.network.codec.PacketCodecs;
-import net.minecraft.registry.Registries;
-import net.minecraft.registry.RegistryKeys;
-import net.minecraft.registry.RegistryWrapper;
-import net.minecraft.registry.entry.RegistryEntry;
-import net.minecraft.registry.tag.TagKey;
-import net.minecraft.text.Text;
-import net.minecraft.util.Util;
-import net.minecraft.util.dynamic.Codecs;
+import net.minecraft.nbt.Tag;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.tags.TagKey;
+import net.minecraft.util.ExtraCodecs;
+import net.minecraft.world.item.alchemy.PotionContents;
+import net.minecraft.world.level.ItemLike;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.material.Fluid;
+import net.minecraft.world.level.material.Fluids;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Objects;
@@ -40,47 +40,47 @@ import java.util.Optional;
 
 import static com.zurrtum.create.Create.LOGGER;
 
-public class FluidStack implements ComponentHolder {
+public class FluidStack implements DataComponentHolder {
     public static final FluidStack EMPTY = new FluidStack(null);
     @SuppressWarnings("deprecation")
-    public static final Codec<RegistryEntry<Fluid>> FLUID_ENTRY_CODEC = Registries.FLUID.getEntryCodec()
-        .validate(entry -> entry.matches(Fluids.EMPTY.getRegistryEntry()) ? DataResult.error(() -> "Fluid must not be minecraft:empty") : DataResult.success(
+    public static final Codec<Holder<Fluid>> FLUID_ENTRY_CODEC = BuiltInRegistries.FLUID.holderByNameCodec()
+        .validate(entry -> entry.is(Fluids.EMPTY.builtInRegistryHolder()) ? DataResult.error(() -> "Fluid must not be minecraft:empty") : DataResult.success(
             entry));
-    public static final PacketCodec<RegistryByteBuf, RegistryEntry<Fluid>> FLUID_ENTRY_PACKET_CODEC = PacketCodecs.registryEntry(RegistryKeys.FLUID);
+    public static final StreamCodec<RegistryFriendlyByteBuf, Holder<Fluid>> FLUID_ENTRY_PACKET_CODEC = ByteBufCodecs.holderRegistry(Registries.FLUID);
     public static final MapCodec<FluidStack> MAP_CODEC = MapCodec.recursive(
         "FluidStack", codec -> RecordCodecBuilder.mapCodec(instance -> instance.group(
             FLUID_ENTRY_CODEC.fieldOf("id").forGetter(FluidStack::getRegistryEntry),
-            Codecs.POSITIVE_INT.fieldOf("amount").orElse(1).forGetter(FluidStack::getAmount),
-            ComponentChanges.CODEC.optionalFieldOf("components", ComponentChanges.EMPTY).forGetter(stack -> stack.components.getChanges())
+            ExtraCodecs.POSITIVE_INT.fieldOf("amount").orElse(1).forGetter(FluidStack::getAmount),
+            DataComponentPatch.CODEC.optionalFieldOf("components", DataComponentPatch.EMPTY).forGetter(stack -> stack.components.asPatch())
         ).apply(instance, FluidStack::new))
     );
     public static final Codec<FluidStack> CODEC = Codec.lazyInitialized(MAP_CODEC::codec);
-    public static final Codec<FluidStack> OPTIONAL_CODEC = Codecs.optional(CODEC)
+    public static final Codec<FluidStack> OPTIONAL_CODEC = ExtraCodecs.optionalEmptyMap(CODEC)
         .xmap(optional -> optional.orElse(FluidStack.EMPTY), stack -> stack.isEmpty() ? Optional.empty() : Optional.of(stack));
-    public static final PacketCodec<RegistryByteBuf, FluidStack> OPTIONAL_PACKET_CODEC = new PacketCodec<RegistryByteBuf, FluidStack>() {
-        public FluidStack decode(RegistryByteBuf registryByteBuf) {
+    public static final StreamCodec<RegistryFriendlyByteBuf, FluidStack> OPTIONAL_PACKET_CODEC = new StreamCodec<RegistryFriendlyByteBuf, FluidStack>() {
+        public FluidStack decode(RegistryFriendlyByteBuf registryByteBuf) {
             int i = registryByteBuf.readVarInt();
             if (i <= 0) {
                 return FluidStack.EMPTY;
             } else {
-                RegistryEntry<Fluid> registryEntry = FLUID_ENTRY_PACKET_CODEC.decode(registryByteBuf);
-                ComponentChanges componentChanges = ComponentChanges.PACKET_CODEC.decode(registryByteBuf);
+                Holder<Fluid> registryEntry = FLUID_ENTRY_PACKET_CODEC.decode(registryByteBuf);
+                DataComponentPatch componentChanges = DataComponentPatch.STREAM_CODEC.decode(registryByteBuf);
                 return new FluidStack(registryEntry, i, componentChanges);
             }
         }
 
-        public void encode(RegistryByteBuf registryByteBuf, FluidStack fluidStack) {
+        public void encode(RegistryFriendlyByteBuf registryByteBuf, FluidStack fluidStack) {
             if (fluidStack.isEmpty()) {
                 registryByteBuf.writeVarInt(0);
             } else {
                 registryByteBuf.writeVarInt(fluidStack.getAmount());
                 FLUID_ENTRY_PACKET_CODEC.encode(registryByteBuf, fluidStack.getRegistryEntry());
-                ComponentChanges.PACKET_CODEC.encode(registryByteBuf, fluidStack.components.getChanges());
+                DataComponentPatch.STREAM_CODEC.encode(registryByteBuf, fluidStack.components.asPatch());
             }
         }
     };
-    public static final PacketCodec<RegistryByteBuf, FluidStack> PACKET_CODEC = new PacketCodec<RegistryByteBuf, FluidStack>() {
-        public FluidStack decode(RegistryByteBuf registryByteBuf) {
+    public static final StreamCodec<RegistryFriendlyByteBuf, FluidStack> PACKET_CODEC = new StreamCodec<RegistryFriendlyByteBuf, FluidStack>() {
+        public FluidStack decode(RegistryFriendlyByteBuf registryByteBuf) {
             FluidStack fluidStack = FluidStack.OPTIONAL_PACKET_CODEC.decode(registryByteBuf);
             if (fluidStack.isEmpty()) {
                 throw new DecoderException("Empty FluidStack not allowed");
@@ -89,7 +89,7 @@ public class FluidStack implements ComponentHolder {
             }
         }
 
-        public void encode(RegistryByteBuf registryByteBuf, FluidStack fluidStack) {
+        public void encode(RegistryFriendlyByteBuf registryByteBuf, FluidStack fluidStack) {
             if (fluidStack.isEmpty()) {
                 throw new EncoderException("Empty FluidStack not allowed");
             } else {
@@ -97,15 +97,15 @@ public class FluidStack implements ComponentHolder {
             }
         }
     };
-    private final MergedComponentMap components;
+    private final PatchedDataComponentMap components;
     private final Fluid fluid;
     private int amount;
 
     public FluidStack(Fluid fluid, int amount) {
-        this(fluid, amount, new MergedComponentMap(ComponentMap.EMPTY));
+        this(fluid, amount, new PatchedDataComponentMap(DataComponentMap.EMPTY));
     }
 
-    public FluidStack(Fluid fluid, int amount, MergedComponentMap components) {
+    public FluidStack(Fluid fluid, int amount, PatchedDataComponentMap components) {
         this.fluid = fluid;
         this.amount = amount;
         this.components = components;
@@ -113,19 +113,19 @@ public class FluidStack implements ComponentHolder {
 
     private FluidStack(@Nullable Void v) {
         fluid = null;
-        components = new MergedComponentMap(ComponentMap.EMPTY);
+        components = new PatchedDataComponentMap(DataComponentMap.EMPTY);
     }
 
-    public FluidStack(RegistryEntry<Fluid> fluid, int amount, ComponentChanges changes) {
-        this(fluid.value(), amount, MergedComponentMap.create(ComponentMap.EMPTY, changes));
+    public FluidStack(Holder<Fluid> fluid, int amount, DataComponentPatch changes) {
+        this(fluid.value(), amount, PatchedDataComponentMap.fromPatch(DataComponentMap.EMPTY, changes));
     }
 
-    public FluidStack(Fluid fluid, int amount, ComponentChanges changes) {
-        this(fluid, amount, MergedComponentMap.create(ComponentMap.EMPTY, changes));
+    public FluidStack(Fluid fluid, int amount, DataComponentPatch changes) {
+        this(fluid, amount, PatchedDataComponentMap.fromPatch(DataComponentMap.EMPTY, changes));
     }
 
-    public FluidStack(Fluid fluid, long amount, ComponentChanges changes) {
-        this(fluid, (int) amount, MergedComponentMap.create(ComponentMap.EMPTY, changes));
+    public FluidStack(Fluid fluid, long amount, DataComponentPatch changes) {
+        this(fluid, (int) amount, PatchedDataComponentMap.fromPatch(DataComponentMap.EMPTY, changes));
     }
 
     public static boolean areFluidsAndComponentsEqual(FluidStack stack, FluidStack otherStack) {
@@ -138,13 +138,13 @@ public class FluidStack implements ComponentHolder {
 
     public static boolean areFluidsAndComponentsEqualIgnoreCapacity(FluidStack stack, FluidStack otherStack) {
         if (stack.isOf(otherStack.getFluid())) {
-            MergedComponentMap stackComponents = stack.directComponents();
-            MergedComponentMap otherStackComponents = otherStack.directComponents();
+            PatchedDataComponentMap stackComponents = stack.directComponents();
+            PatchedDataComponentMap otherStackComponents = otherStack.directComponents();
             if (stackComponents == otherStackComponents) {
                 return true;
             }
-            Reference2ObjectMap<ComponentType<?>, Optional<?>> stackComponentMap = stackComponents.changedComponents;
-            Reference2ObjectMap<ComponentType<?>, Optional<?>> otherStackComponentMap = otherStackComponents.changedComponents;
+            Reference2ObjectMap<DataComponentType<?>, Optional<?>> stackComponentMap = stackComponents.patch;
+            Reference2ObjectMap<DataComponentType<?>, Optional<?>> otherStackComponentMap = otherStackComponents.patch;
             if (stackComponentMap == otherStackComponentMap) {
                 return true;
             }
@@ -162,8 +162,8 @@ public class FluidStack implements ComponentHolder {
                 return false;
             }
             if (hasMaxCapacityComponent) {
-                ObjectSet<Reference2ObjectMap.Entry<ComponentType<?>, Optional<?>>> stackComponentSet = stackComponentMap.reference2ObjectEntrySet();
-                for (Reference2ObjectMap.Entry<ComponentType<?>, Optional<?>> componentEntry : otherStackComponentMap.reference2ObjectEntrySet()) {
+                ObjectSet<Reference2ObjectMap.Entry<DataComponentType<?>, Optional<?>>> stackComponentSet = stackComponentMap.reference2ObjectEntrySet();
+                for (Reference2ObjectMap.Entry<DataComponentType<?>, Optional<?>> componentEntry : otherStackComponentMap.reference2ObjectEntrySet()) {
                     if (!stackComponentSet.contains(componentEntry) && componentEntry.getKey() != AllDataComponents.FLUID_MAX_CAPACITY) {
                         return false;
                     }
@@ -175,13 +175,13 @@ public class FluidStack implements ComponentHolder {
         return false;
     }
 
-    public static Optional<FluidStack> fromNbt(RegistryWrapper.WrapperLookup registries, NbtElement nbt) {
-        return CODEC.parse(registries.getOps(NbtOps.INSTANCE), nbt)
+    public static Optional<FluidStack> fromNbt(HolderLookup.Provider registries, Tag nbt) {
+        return CODEC.parse(registries.createSerializationContext(NbtOps.INSTANCE), nbt)
             .resultOrPartial(error -> LOGGER.error("Tried to load invalid fluid: '{}'", error));
     }
 
     @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
-    public static FluidStack fromNbt(RegistryWrapper.WrapperLookup registries, Optional<NbtCompound> nbt) {
+    public static FluidStack fromNbt(HolderLookup.Provider registries, Optional<CompoundTag> nbt) {
         return nbt.flatMap(n -> fromNbt(registries, n)).orElse(FluidStack.EMPTY);
     }
 
@@ -194,7 +194,7 @@ public class FluidStack implements ComponentHolder {
         }
     }
 
-    public void applyComponentsFrom(ComponentMap map) {
+    public void applyComponentsFrom(DataComponentMap map) {
         components.setAll(map);
     }
 
@@ -224,7 +224,7 @@ public class FluidStack implements ComponentHolder {
         increment(-amount);
     }
 
-    public MergedComponentMap directComponents() {
+    public PatchedDataComponentMap directComponents() {
         return components;
     }
 
@@ -240,13 +240,13 @@ public class FluidStack implements ComponentHolder {
         this.amount = amount;
     }
 
-    public ComponentChanges getComponentChanges() {
-        return !isEmpty() ? components.getChanges() : ComponentChanges.EMPTY;
+    public DataComponentPatch getComponentChanges() {
+        return !isEmpty() ? components.asPatch() : DataComponentPatch.EMPTY;
     }
 
     @Override
-    public ComponentMap getComponents() {
-        return !isEmpty() ? components : ComponentMap.EMPTY;
+    public DataComponentMap getComponents() {
+        return !isEmpty() ? components : DataComponentMap.EMPTY;
     }
 
     public Fluid getFluid() {
@@ -257,26 +257,26 @@ public class FluidStack implements ComponentHolder {
         return getOrDefault(AllDataComponents.FLUID_MAX_CAPACITY, Integer.MAX_VALUE);
     }
 
-    public Text getName() {
+    public Component getName() {
         if (fluid == AllFluids.POTION) {
-            PotionContentsComponent contents = getOrDefault(DataComponentTypes.POTION_CONTENTS, PotionContentsComponent.DEFAULT);
-            ItemConvertible itemFromBottleType = PotionFluidHandler.itemFromBottleType(getOrDefault(
+            PotionContents contents = getOrDefault(DataComponents.POTION_CONTENTS, PotionContents.EMPTY);
+            ItemLike itemFromBottleType = PotionFluidHandler.itemFromBottleType(getOrDefault(
                 AllDataComponents.POTION_FLUID_BOTTLE_TYPE,
                 BottleType.REGULAR
             ));
-            return contents.getName(itemFromBottleType.asItem().getTranslationKey() + ".effect.");
+            return contents.getName(itemFromBottleType.asItem().getDescriptionId() + ".effect.");
         }
-        Block block = fluid.getDefaultState().getBlockState().getBlock();
+        Block block = fluid.defaultFluidState().createLegacyBlock().getBlock();
         if (fluid != Fluids.EMPTY && block == Blocks.AIR) {
-            return Text.translatable(Util.createTranslationKey("block", Registries.FLUID.getId(fluid)));
+            return Component.translatable(Util.makeDescriptionId("block", BuiltInRegistries.FLUID.getKey(fluid)));
         } else {
             return block.getName();
         }
     }
 
     @SuppressWarnings("deprecation")
-    public RegistryEntry<Fluid> getRegistryEntry() {
-        return getFluid().getRegistryEntry();
+    public Holder<Fluid> getRegistryEntry() {
+        return getFluid().builtInRegistryHolder();
     }
 
     public void increment(int amount) {
@@ -289,7 +289,7 @@ public class FluidStack implements ComponentHolder {
 
     @SuppressWarnings("deprecation")
     public boolean isIn(TagKey<Fluid> tag) {
-        return getFluid().getRegistryEntry().isIn(tag);
+        return getFluid().builtInRegistryHolder().is(tag);
     }
 
     public boolean isOf(Fluid fluid) {
@@ -297,12 +297,12 @@ public class FluidStack implements ComponentHolder {
     }
 
     @Nullable
-    public <T> T remove(ComponentType<? extends T> type) {
+    public <T> T remove(DataComponentType<? extends T> type) {
         return this.components.remove(type);
     }
 
     @Nullable
-    public <T> T set(ComponentType<T> type, @Nullable T value) {
+    public <T> T set(DataComponentType<T> type, @Nullable T value) {
         return components.set(type, value);
     }
 
@@ -313,15 +313,15 @@ public class FluidStack implements ComponentHolder {
         return stack;
     }
 
-    public NbtElement toNbt(RegistryWrapper.WrapperLookup registries) {
+    public Tag toNbt(HolderLookup.Provider registries) {
         if (isEmpty()) {
             throw new IllegalStateException("Cannot encode empty FluidStack");
         } else {
-            return CODEC.encodeStart(registries.getOps(NbtOps.INSTANCE), this).getOrThrow();
+            return CODEC.encodeStart(registries.createSerializationContext(NbtOps.INSTANCE), this).getOrThrow();
         }
     }
 
     public String toString() {
-        return getAmount() + " " + Registries.FLUID.getEntry(getFluid()).getIdAsString();
+        return getAmount() + " " + BuiltInRegistries.FLUID.wrapAsHolder(getFluid()).getRegisteredName();
     }
 }

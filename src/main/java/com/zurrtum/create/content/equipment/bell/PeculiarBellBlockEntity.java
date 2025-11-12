@@ -1,8 +1,8 @@
 package com.zurrtum.create.content.equipment.bell;
 
 import com.zurrtum.create.AllBlockEntityTypes;
-import net.minecraft.block.BlockState;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.block.state.BlockState;
 
 public class PeculiarBellBlockEntity extends AbstractBellBlockEntity {
     public PeculiarBellBlockEntity(BlockPos pos, BlockState state) {

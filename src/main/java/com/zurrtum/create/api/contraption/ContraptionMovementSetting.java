@@ -1,19 +1,19 @@
 package com.zurrtum.create.api.contraption;
 
 import com.zurrtum.create.api.registry.SimpleRegistry;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.structure.StructureTemplate;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
 import java.util.function.Supplier;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate;
 
 /**
  * Defines whether a block is movable by contraptions.
- * This is used as a fallback check for {@link BlockMovementChecks#isMovementAllowed(BlockState, World, BlockPos)}.
+ * This is used as a fallback check for {@link BlockMovementChecks#isMovementAllowed(BlockState, Level, BlockPos)}.
  * The registry uses suppliers, so the setting of a block can change. This is useful for config options.
  */
 public enum ContraptionMovementSetting {

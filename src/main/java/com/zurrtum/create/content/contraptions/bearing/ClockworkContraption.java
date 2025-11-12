@@ -5,18 +5,18 @@ import com.zurrtum.create.AllContraptionTypes;
 import com.zurrtum.create.api.contraption.ContraptionType;
 import com.zurrtum.create.content.contraptions.AssemblyException;
 import com.zurrtum.create.content.contraptions.Contraption;
-import net.minecraft.storage.ReadView;
-import net.minecraft.storage.WriteView;
-import net.minecraft.util.StringIdentifiable;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.world.World;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.HashSet;
 import java.util.Locale;
 import java.util.Queue;
 import java.util.Set;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.util.StringRepresentable;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 
 public class ClockworkContraption extends Contraption {
 
@@ -32,16 +32,16 @@ public class ClockworkContraption extends Contraption {
 
     private void ignoreBlocks(Set<BlockPos> blocks, BlockPos anchor) {
         for (BlockPos blockPos : blocks)
-            ignoreBlocks.add(anchor.add(blockPos));
+            ignoreBlocks.add(anchor.offset(blockPos));
     }
 
     @Override
     protected boolean isAnchoringBlockAt(BlockPos pos) {
-        return pos.equals(anchor.offset(facing.getOpposite(), offset + 1));
+        return pos.equals(anchor.relative(facing.getOpposite(), offset + 1));
     }
 
     public static Pair<ClockworkContraption, ClockworkContraption> assembleClockworkAt(
-        World world,
+        Level world,
         BlockPos pos,
         Direction direction
     ) throws AssemblyException {
@@ -55,7 +55,7 @@ public class ClockworkContraption extends Contraption {
         if (!hourArm.assemble(world, pos))
             return null;
         for (int i = 0; i < 16; i++) {
-            BlockPos offsetPos = BlockPos.ORIGIN.offset(direction, i);
+            BlockPos offsetPos = BlockPos.ZERO.relative(direction, i);
             if (hourArm.getBlocks().containsKey(offsetPos))
                 continue;
             hourArmBlocks = i;
@@ -84,17 +84,17 @@ public class ClockworkContraption extends Contraption {
     }
 
     @Override
-    public boolean assemble(World world, BlockPos pos) throws AssemblyException {
+    public boolean assemble(Level world, BlockPos pos) throws AssemblyException {
         return searchMovedStructure(world, pos, facing);
     }
 
     @Override
-    public boolean searchMovedStructure(World world, BlockPos pos, Direction direction) throws AssemblyException {
-        return super.searchMovedStructure(world, pos.offset(direction, offset + 1), null);
+    public boolean searchMovedStructure(Level world, BlockPos pos, Direction direction) throws AssemblyException {
+        return super.searchMovedStructure(world, pos.relative(direction, offset + 1), null);
     }
 
     @Override
-    protected boolean moveBlock(World world, Direction direction, Queue<BlockPos> frontier, Set<BlockPos> visited) throws AssemblyException {
+    protected boolean moveBlock(Level world, Direction direction, Queue<BlockPos> frontier, Set<BlockPos> visited) throws AssemblyException {
         if (ignoreBlocks.contains(frontier.peek())) {
             frontier.poll();
             return true;
@@ -103,36 +103,36 @@ public class ClockworkContraption extends Contraption {
     }
 
     @Override
-    public void write(WriteView view, boolean spawnPacket) {
+    public void write(ValueOutput view, boolean spawnPacket) {
         super.write(view, spawnPacket);
-        view.put("facing", Direction.CODEC, facing);
-        view.put("handType", HandType.CODEC, handType);
+        view.store("facing", Direction.CODEC, facing);
+        view.store("handType", HandType.CODEC, handType);
         view.putInt("offset", offset);
     }
 
     @Override
-    public void read(World world, ReadView view, boolean spawnData) {
+    public void read(Level world, ValueInput view, boolean spawnData) {
         facing = view.read("facing", Direction.CODEC).orElse(Direction.DOWN);
         handType = view.read("handType", HandType.CODEC).orElse(HandType.HOUR);
-        offset = view.getInt("offset", 0);
+        offset = view.getIntOr("offset", 0);
         super.read(world, view, spawnData);
     }
 
     @Override
     public boolean canBeStabilized(Direction facing, BlockPos localPos) {
-        if (BlockPos.ZERO.equals(localPos) || BlockPos.ZERO.equals(localPos.offset(facing)))
+        if (BlockPos.ZERO.equals(localPos) || BlockPos.ZERO.equals(localPos.relative(facing)))
             return false;
         return facing.getAxis() == this.facing.getAxis();
     }
 
-    public enum HandType implements StringIdentifiable {
+    public enum HandType implements StringRepresentable {
         HOUR,
         MINUTE;
 
-        public static final Codec<HandType> CODEC = StringIdentifiable.createCodec(HandType::values);
+        public static final Codec<HandType> CODEC = StringRepresentable.fromEnum(HandType::values);
 
         @Override
-        public String asString() {
+        public String getSerializedName() {
             return name().toLowerCase(Locale.ROOT);
         }
     }

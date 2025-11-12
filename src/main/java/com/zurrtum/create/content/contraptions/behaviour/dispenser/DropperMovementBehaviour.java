@@ -7,17 +7,17 @@ import com.zurrtum.create.api.contraption.storage.item.MountedItemStorage;
 import com.zurrtum.create.content.contraptions.behaviour.MovementContext;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.ints.IntList;
-import net.minecraft.inventory.Inventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.Util;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.random.Random;
-import net.minecraft.world.WorldEvents;
+import net.minecraft.Util;
+import net.minecraft.core.BlockPos;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.Container;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.LevelEvent;
 
 public class DropperMovementBehaviour extends MovementBehaviour {
     @Override
     public void visitNewPosition(MovementContext context, BlockPos pos) {
-        if (context.world.isClient())
+        if (context.world.isClientSide())
             return;
 
         MountedItemStorage storage = context.getItemStorage();
@@ -32,10 +32,10 @@ public class DropperMovementBehaviour extends MovementBehaviour {
         }
 
         // copy because dispense behaviors will modify it directly
-        ItemStack stack = storage.getStack(slot).copy();
+        ItemStack stack = storage.getItem(slot).copy();
         MountedDispenseBehavior behavior = getDispenseBehavior(context, pos, stack);
         ItemStack remainder = behavior.dispense(stack, context, pos);
-        storage.setStack(slot, remainder);
+        storage.setItem(slot, remainder);
     }
 
     protected MountedDispenseBehavior getDispenseBehavior(MovementContext context, BlockPos pos, ItemStack stack) {
@@ -45,17 +45,17 @@ public class DropperMovementBehaviour extends MovementBehaviour {
     /**
      * Finds a dispensable slot. Empty slots are skipped and nearly-empty slots are topped off.
      */
-    private static int getSlot(MountedItemStorage storage, Random random, Inventory contraptionInventory) {
+    private static int getSlot(MountedItemStorage storage, RandomSource random, Container contraptionInventory) {
         IntList filledSlots = new IntArrayList();
-        for (int i = 0, size = storage.size(); i < size; i++) {
-            ItemStack stack = storage.getStack(i);
+        for (int i = 0, size = storage.getContainerSize(); i < size; i++) {
+            ItemStack stack = storage.getItem(i);
             if (stack.isEmpty())
                 continue;
 
-            if (stack.getCount() == 1 && stack.getMaxCount() != 1) {
-                storage.setStack(i, ItemStack.EMPTY);
+            if (stack.getCount() == 1 && stack.getMaxStackSize() != 1) {
+                storage.setItem(i, ItemStack.EMPTY);
                 boolean fill = tryTopOff(stack, contraptionInventory);
-                storage.setStack(i, stack);
+                storage.setItem(i, stack);
                 if (!fill) {
                     continue;
                 }
@@ -71,9 +71,9 @@ public class DropperMovementBehaviour extends MovementBehaviour {
         };
     }
 
-    private static boolean tryTopOff(ItemStack stack, Inventory from) {
+    private static boolean tryTopOff(ItemStack stack, Container from) {
         int count = stack.getCount();
-        int extract = from.extract(stack, stack.getMaxCount() - count);
+        int extract = from.extract(stack, stack.getMaxStackSize() - count);
         if (extract == 0) {
             return false;
         }
@@ -82,6 +82,6 @@ public class DropperMovementBehaviour extends MovementBehaviour {
     }
 
     private static void failDispense(MovementContext ctx, BlockPos pos) {
-        ctx.world.syncWorldEvent(WorldEvents.DISPENSER_FAILS, pos, 0);
+        ctx.world.levelEvent(LevelEvent.SOUND_DISPENSER_FAIL, pos, 0);
     }
 }

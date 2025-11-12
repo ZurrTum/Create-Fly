@@ -14,8 +14,8 @@ import me.shedaniel.rei.api.client.gui.widgets.Widget;
 import me.shedaniel.rei.api.client.gui.widgets.Widgets;
 import me.shedaniel.rei.api.common.category.CategoryIdentifier;
 import me.shedaniel.rei.api.common.util.EntryStacks;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.text.Text;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.network.chat.Component;
 import org.joml.Matrix3x2f;
 
 import java.util.List;
@@ -27,7 +27,7 @@ public class DeployingCategory extends CreateCategory<DeployingDisplay> {
     }
 
     @Override
-    public Text getTitle() {
+    public Component getTitle() {
         return CreateLang.translateDirect("recipe.deploying");
     }
 
@@ -41,11 +41,11 @@ public class DeployingCategory extends CreateCategory<DeployingDisplay> {
         Point input = new Point(bounds.x + 56, bounds.y + 10);
         Point target = new Point(bounds.x + 32, bounds.y + 56);
         Point output = new Point(bounds.x + 137, bounds.y + 56);
-        widgets.add(Widgets.createDrawableWidget((DrawContext graphics, int mouseX, int mouseY, float delta) -> {
+        widgets.add(Widgets.createDrawableWidget((GuiGraphics graphics, int mouseX, int mouseY, float delta) -> {
             drawSlotBackground(graphics, input, target, output);
             AllGuiTextures.JEI_SHADOW.render(graphics, bounds.x + 67, bounds.y + 62);
             AllGuiTextures.JEI_DOWN_ARROW.render(graphics, bounds.x + 131, bounds.y + 34);
-            graphics.state.addSpecialElement(new DeployerRenderState(new Matrix3x2f(graphics.getMatrices()), bounds.x + 80, bounds.y - 5));
+            graphics.guiRenderState.submitPicturesInPictureState(new DeployerRenderState(new Matrix3x2f(graphics.pose()), bounds.x + 80, bounds.y - 5));
         }));
         widgets.add(createInputSlot(input).entries(display.input()));
         widgets.add(createInputSlot(target).entries(display.target()));

@@ -1,5 +1,7 @@
 package com.zurrtum.create.client.content.contraptions.actors.contraptionControls;
 
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.zurrtum.create.AllBlocks;
 import com.zurrtum.create.catnip.data.Couple;
 import com.zurrtum.create.catnip.math.AngleHelper;
@@ -17,33 +19,31 @@ import com.zurrtum.create.content.contraptions.actors.contraptionControls.Contra
 import com.zurrtum.create.content.contraptions.actors.contraptionControls.ContraptionControlsBlockEntity;
 import com.zurrtum.create.content.contraptions.actors.contraptionControls.ContraptionControlsMovement;
 import com.zurrtum.create.content.contraptions.behaviour.MovementContext;
-import net.minecraft.block.BlockState;
-import net.minecraft.client.font.TextRenderer;
-import net.minecraft.client.render.LightmapTextureManager;
-import net.minecraft.client.render.RenderLayer;
-import net.minecraft.client.render.VertexConsumer;
-import net.minecraft.client.render.WorldRenderer;
-import net.minecraft.client.render.command.OrderedRenderCommandQueue;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.text.OrderedText;
-import net.minecraft.text.Text;
-import net.minecraft.util.DyeColor;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.World;
 import org.joml.Matrix4f;
 import org.joml.Quaternionf;
 
 import java.util.Random;
+import net.minecraft.client.gui.Font;
+import net.minecraft.client.renderer.LevelRenderer;
+import net.minecraft.client.renderer.LightTexture;
+import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.SubmitNodeCollector;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.network.chat.Component;
+import net.minecraft.util.FormattedCharSequence;
+import net.minecraft.world.item.DyeColor;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.Vec3;
 
 public class ContraptionControlsMovementRender implements MovementRenderBehaviour {
     private static final ThreadLocal<Random> RANDOM = ThreadLocal.withInitial(Random::new);
 
     @Override
     public MovementRenderState getRenderState(
-        Vec3d camera,
-        TextRenderer textRenderer,
+        Vec3 camera,
+        Font textRenderer,
         MovementContext context,
         VirtualRenderWorld renderWorld,
         Matrix4f worldMatrix4f
@@ -52,7 +52,7 @@ public class ContraptionControlsMovementRender implements MovementRenderBehaviou
             return null;
         }
         BlockState blockState = context.state;
-        if (!blockState.isOf(AllBlocks.CONTRAPTION_CONTROLS)) {
+        if (!blockState.is(AllBlocks.CONTRAPTION_CONTROLS)) {
             return null;
         }
         BlockPos pos = context.localPos;
@@ -61,16 +61,16 @@ public class ContraptionControlsMovementRender implements MovementRenderBehaviou
         if (ClientContraption.getBlockEntityClientSide(context.contraption, pos) instanceof ContraptionControlsBlockEntity cbe) {
             state.buttondepth = -1 / 24f * cbe.button.getValue(AnimationTickHolder.getPartialTicks(renderWorld));
         }
-        state.layer = RenderLayer.getSolid();
-        Direction facing = blockState.get(ContraptionControlsBlock.FACING);
+        state.layer = RenderType.solid();
+        Direction facing = blockState.getValue(ContraptionControlsBlock.FACING);
         state.button = CachedBuffers.partialFacing(AllPartialModels.CONTRAPTION_CONTROLS_BUTTON, blockState, facing.getOpposite());
-        state.light = WorldRenderer.getLightmapCoordinates(renderWorld, pos);
+        state.light = LevelRenderer.getLightColor(renderWorld, pos);
         state.world = context.world;
         state.worldMatrix4f = worldMatrix4f;
         String text = efs.currentShortName;
         String description = efs.currentLongName;
-        Vec3d position = context.position;
-        float playerDistance = (float) (position == null ? 0 : camera.squaredDistanceTo(position));
+        Vec3 position = context.position;
+        float playerDistance = (float) (position == null ? 0 : camera.distanceToSqr(position));
         boolean hideText = text.isBlank() || playerDistance > 100;
         boolean hideDescription = description.isBlank() || playerDistance > 20;
         if (hideText && hideDescription) {
@@ -85,36 +85,36 @@ public class ContraptionControlsMovementRender implements MovementRenderBehaviou
         state.offsetZ = state.buttondepth - .25f;
         if (!hideText) {
             state.shadowColor = Color.mixColors(darkColor, 0, .35f) | 0xFF000000;
-            int actualWidth = textRenderer.getWidth(text);
+            int actualWidth = textRenderer.width(text);
             int width = Math.max(actualWidth, 12);
             state.textScale = 1 / (5f * (width - .5f));
             state.textX = (float) Math.max(0, width - actualWidth) / 2;
             state.textY = (width - 8f) / 2;
-            state.text = Text.literal(text).asOrderedText();
+            state.text = Component.literal(text).getVisualOrderText();
         }
         if (!hideDescription) {
-            int actualWidth = textRenderer.getWidth(description);
+            int actualWidth = textRenderer.width(description);
             int width = Math.max(actualWidth, 55);
             state.descriptionScale = 1 / (3f * (width - .5f));
             state.descriptionX = (float) Math.max(0, width - actualWidth) / 2;
             state.descriptionY = (width - 8f) / 2;
-            state.description = Text.literal(description).asOrderedText();
+            state.description = Component.literal(description).getVisualOrderText();
         }
         return state;
     }
 
-    public static class ContraptionControlsMovementRenderState extends MovementRenderState implements OrderedRenderCommandQueue.Custom {
-        public RenderLayer layer;
+    public static class ContraptionControlsMovementRenderState extends MovementRenderState implements SubmitNodeCollector.CustomGeometryRenderer {
+        public RenderType layer;
         public SuperByteBuffer button;
         public int light;
-        public World world;
+        public Level world;
         public Matrix4f worldMatrix4f;
         public float buttondepth;
         public float upAngle;
         public float westAngle;
         public float offsetZ;
-        public OrderedText text;
-        public OrderedText description;
+        public FormattedCharSequence text;
+        public FormattedCharSequence description;
         public float textScale;
         public float textX;
         public float textY;
@@ -129,17 +129,17 @@ public class ContraptionControlsMovementRender implements MovementRenderBehaviou
         }
 
         @Override
-        public void render(MatrixStack matrices, OrderedRenderCommandQueue queue) {
-            matrices.push();
+        public void render(PoseStack matrices, SubmitNodeCollector queue) {
+            matrices.pushPose();
             matrices.translate(0, buttondepth, 0);
-            queue.submitCustom(matrices, layer, this);
-            matrices.pop();
+            queue.submitCustomGeometry(matrices, layer, this);
+            matrices.popPose();
             if (text != null || description != null) {
-                matrices.multiply(new Quaternionf().setAngleAxis(upAngle, 0, 1, 0), 0.5f, 0.5f, 0.5f);
+                matrices.rotateAround(new Quaternionf().setAngleAxis(upAngle, 0, 1, 0), 0.5f, 0.5f, 0.5f);
                 matrices.translate(0.4f, 1.125f, 0.5f);
-                matrices.multiply(new Quaternionf().setAngleAxis(westAngle, -1, 0, 0));
+                matrices.mulPose(new Quaternionf().setAngleAxis(westAngle, -1, 0, 0));
                 if (text != null) {
-                    matrices.push();
+                    matrices.pushPose();
                     matrices.translate(0, 0.15f, offsetZ);
                     matrices.scale(textScale, -textScale, textScale);
                     queue.submitText(
@@ -148,8 +148,8 @@ public class ContraptionControlsMovementRender implements MovementRenderBehaviou
                         textY,
                         text,
                         false,
-                        TextRenderer.TextLayerType.NORMAL,
-                        LightmapTextureManager.MAX_LIGHT_COORDINATE,
+                        Font.DisplayMode.NORMAL,
+                        LightTexture.FULL_BRIGHT,
                         color,
                         0,
                         0
@@ -161,16 +161,16 @@ public class ContraptionControlsMovementRender implements MovementRenderBehaviou
                         textY,
                         text,
                         false,
-                        TextRenderer.TextLayerType.NORMAL,
-                        LightmapTextureManager.MAX_LIGHT_COORDINATE,
+                        Font.DisplayMode.NORMAL,
+                        LightTexture.FULL_BRIGHT,
                         shadowColor,
                         0,
                         0
                     );
-                    matrices.pop();
+                    matrices.popPose();
                 }
                 if (description != null) {
-                    matrices.push();
+                    matrices.pushPose();
                     matrices.translate(-.0635f, 0.06f, offsetZ);
                     matrices.scale(descriptionScale, -descriptionScale, descriptionScale);
                     queue.submitText(
@@ -179,19 +179,19 @@ public class ContraptionControlsMovementRender implements MovementRenderBehaviou
                         descriptionY,
                         description,
                         false,
-                        TextRenderer.TextLayerType.NORMAL,
-                        LightmapTextureManager.MAX_LIGHT_COORDINATE,
+                        Font.DisplayMode.NORMAL,
+                        LightTexture.FULL_BRIGHT,
                         color,
                         0,
                         0
                     );
-                    matrices.pop();
+                    matrices.popPose();
                 }
             }
         }
 
         @Override
-        public void render(MatrixStack.Entry matricesEntry, VertexConsumer vertexConsumer) {
+        public void render(PoseStack.Pose matricesEntry, VertexConsumer vertexConsumer) {
             button.light(light).useLevelLight(world, worldMatrix4f).renderInto(matricesEntry, vertexConsumer);
         }
     }

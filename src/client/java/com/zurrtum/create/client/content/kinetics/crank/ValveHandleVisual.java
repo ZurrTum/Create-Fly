@@ -10,10 +10,10 @@ import com.zurrtum.create.client.flywheel.lib.model.Models;
 import com.zurrtum.create.client.flywheel.lib.visual.SimpleDynamicVisual;
 import com.zurrtum.create.content.kinetics.crank.ValveHandleBlock;
 import com.zurrtum.create.content.kinetics.crank.ValveHandleBlockEntity;
-import net.minecraft.block.BlockState;
-import net.minecraft.state.property.Properties;
-import net.minecraft.util.DyeColor;
-import net.minecraft.util.math.Direction;
+import net.minecraft.core.Direction;
+import net.minecraft.world.item.DyeColor;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import org.joml.Quaternionf;
 
 import java.util.function.Consumer;
@@ -24,7 +24,7 @@ public class ValveHandleVisual extends KineticBlockEntityVisual<ValveHandleBlock
     public ValveHandleVisual(VisualizationContext modelManager, ValveHandleBlockEntity blockEntity, float partialTick) {
         super(modelManager, blockEntity, partialTick);
 
-        BlockState state = blockEntity.getCachedState();
+        BlockState state = blockEntity.getBlockState();
         DyeColor color = null;
         if (state != null && state.getBlock() instanceof ValveHandleBlock vhb)
             color = vhb.color;
@@ -43,12 +43,12 @@ public class ValveHandleVisual extends KineticBlockEntityVisual<ValveHandleBlock
     }
 
     private void rotateCrank(float pt) {
-        var facing = blockState.get(Properties.FACING);
+        var facing = blockState.getValue(BlockStateProperties.FACING);
         float angle = ValveHandleRenderer.getValveHandleIndependentAngle(blockEntity, pt);
 
         crank.setIdentityTransform().translate(getVisualPosition()).center()
             .rotate(angle, Direction.get(Direction.AxisDirection.POSITIVE, facing.getAxis()))
-            .rotate(new Quaternionf().rotateTo(0, 1, 0, facing.getOffsetX(), facing.getOffsetY(), facing.getOffsetZ())).uncenter().setChanged();
+            .rotate(new Quaternionf().rotateTo(0, 1, 0, facing.getStepX(), facing.getStepY(), facing.getStepZ())).uncenter().setChanged();
     }
 
     @Override

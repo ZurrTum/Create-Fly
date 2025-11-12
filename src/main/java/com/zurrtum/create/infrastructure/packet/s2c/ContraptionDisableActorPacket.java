@@ -2,20 +2,20 @@ package com.zurrtum.create.infrastructure.packet.s2c;
 
 import com.zurrtum.create.AllClientHandle;
 import com.zurrtum.create.AllPackets;
-import net.minecraft.item.ItemStack;
-import net.minecraft.network.RegistryByteBuf;
-import net.minecraft.network.codec.PacketCodec;
-import net.minecraft.network.codec.PacketCodecs;
-import net.minecraft.network.packet.PacketType;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.PacketType;
+import net.minecraft.world.item.ItemStack;
 import org.apache.logging.log4j.util.TriConsumer;
 
 public record ContraptionDisableActorPacket(int entityId, ItemStack filter, boolean enable) implements S2CPacket {
-    public static final PacketCodec<RegistryByteBuf, ContraptionDisableActorPacket> CODEC = PacketCodec.tuple(
-        PacketCodecs.INTEGER,
+    public static final StreamCodec<RegistryFriendlyByteBuf, ContraptionDisableActorPacket> CODEC = StreamCodec.composite(
+        ByteBufCodecs.INT,
         ContraptionDisableActorPacket::entityId,
-        ItemStack.OPTIONAL_PACKET_CODEC,
+        ItemStack.OPTIONAL_STREAM_CODEC,
         ContraptionDisableActorPacket::filter,
-        PacketCodecs.BOOLEAN,
+        ByteBufCodecs.BOOL,
         ContraptionDisableActorPacket::enable,
         ContraptionDisableActorPacket::new
     );
@@ -31,7 +31,7 @@ public record ContraptionDisableActorPacket(int entityId, ItemStack filter, bool
     }
 
     @Override
-    public PacketType<ContraptionDisableActorPacket> getPacketType() {
+    public PacketType<ContraptionDisableActorPacket> type() {
         return AllPackets.CONTRAPTION_ACTOR_TOGGLE;
     }
 }

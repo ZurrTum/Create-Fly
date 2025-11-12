@@ -1,7 +1,7 @@
 package com.zurrtum.create.client.catnip.gui.element;
 
-import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.gui.GuiGraphics;
 
 public interface ScreenElement {
-    void render(DrawContext graphics, int x, int y);
+    void render(GuiGraphics graphics, int x, int y);
 }

@@ -6,11 +6,10 @@ import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.ModContainer;
 import net.fabricmc.loader.api.metadata.ModMetadata;
 import net.minecraft.SharedConstants;
-import net.minecraft.registry.VersionedIdentifier;
-import net.minecraft.resource.*;
-import net.minecraft.resource.metadata.PackResourceMetadata;
-import net.minecraft.resource.metadata.ResourceMetadataMap;
-import net.minecraft.text.Text;
+import net.minecraft.network.chat.Component;
+import net.minecraft.server.packs.*;
+import net.minecraft.server.packs.metadata.pack.PackMetadataSection;
+import net.minecraft.server.packs.repository.*;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
@@ -24,21 +23,21 @@ import java.util.function.Consumer;
 
 import static com.zurrtum.create.Create.MOD_ID;
 
-@Mixin(VanillaResourcePackProvider.class)
+@Mixin(BuiltInPackSource.class)
 public class VanillaResourcePackProviderMixin {
-    @Inject(method = "register(Ljava/util/function/Consumer;)V", at = @At("TAIL"))
-    private void addDataPack(Consumer<ResourcePackProfile> consumer, CallbackInfo ci) {
-        if ((Object) this instanceof VanillaDataPackProvider) {
+    @Inject(method = "loadPacks(Ljava/util/function/Consumer;)V", at = @At("TAIL"))
+    private void addDataPack(Consumer<Pack> consumer, CallbackInfo ci) {
+        if ((Object) this instanceof ServerPacksSource) {
             FabricLoader loader = FabricLoader.getInstance();
             if (!loader.isModLoaded("fabric-api")) {
-                String directory = ResourceType.SERVER_DATA.getDirectory();
+                String directory = PackType.SERVER_DATA.getDirectory();
                 ModContainer mod = loader.getModContainer(MOD_ID).orElseThrow();
                 List<Path> paths = mod.getRootPaths();
                 addDataPack(
                     consumer,
                     createInfo("fabric-convention-tags-v2", "Fabric Convention Tags (v2)", "2.15.2+d9a8963096"),
                     paths,
-                    Text.of("fabric-convention-tags-v2-2.15.2+d9a8963096"),
+                    Component.nullToEmpty("fabric-convention-tags-v2-2.15.2+d9a8963096"),
                     directory + "/fabric",
                     "c"
                 );
@@ -47,14 +46,14 @@ public class VanillaResourcePackProviderMixin {
                     consumer,
                     createInfo(MOD_ID, metadata.getName(), metadata.getVersion().getFriendlyString()),
                     paths,
-                    Text.translatable("advancement.create.root"),
+                    Component.translatable("advancement.create.root"),
                     directory,
                     MOD_ID,
                     "minecraft",
                     "c"
                 );
             }
-            DynamicPack dynamicPack = new DynamicPack("create:dynamic_data", Text.translatable("advancement.create.root"), ResourceType.SERVER_DATA);
+            DynamicPack dynamicPack = new DynamicPack("create:dynamic_data", Component.translatable("advancement.create.root"), PackType.SERVER_DATA);
             RuntimeDataGenerator.insertIntoPack(dynamicPack);
             if (!dynamicPack.isEmpty()) {
                 addDataPack(consumer, false, dynamicPack);
@@ -63,44 +62,44 @@ public class VanillaResourcePackProviderMixin {
     }
 
     @Unique
-    private static ResourcePackInfo createInfo(String id, String name, String version) {
-        return new ResourcePackInfo(id, Text.of(name), ResourcePackSource.BUILTIN, Optional.of(new VersionedIdentifier(id, "data", version)));
+    private static PackLocationInfo createInfo(String id, String name, String version) {
+        return new PackLocationInfo(id, Component.nullToEmpty(name), PackSource.BUILT_IN, Optional.of(new KnownPack(id, "data", version)));
     }
 
     @Unique
     private static void addDataPack(
-        Consumer<ResourcePackProfile> consumer,
-        ResourcePackInfo info,
+        Consumer<Pack> consumer,
+        PackLocationInfo info,
         List<Path> paths,
-        Text title,
+        Component title,
         String directory,
         String... namespace
     ) {
-        ResourceMetadataMap metadataMap = ResourceMetadataMap.of(
-            PackResourceMetadata.SERVER_DATA_SERIALIZER,
-            new PackResourceMetadata(title, SharedConstants.getGameVersion().packVersion(ResourceType.SERVER_DATA).majorRange())
+        BuiltInMetadata metadataMap = BuiltInMetadata.of(
+            PackMetadataSection.SERVER_TYPE,
+            new PackMetadataSection(title, SharedConstants.getCurrentVersion().packVersion(PackType.SERVER_DATA).minorRange())
         );
-        DefaultResourcePackBuilder builder = new DefaultResourcePackBuilder().withMetadataMap(metadataMap).withNamespaces(namespace);
+        VanillaPackResourcesBuilder builder = new VanillaPackResourcesBuilder().setMetadata(metadataMap).exposeNamespace(namespace);
         for (Path path : paths) {
-            builder.withPath(ResourceType.SERVER_DATA, path.resolve(directory));
+            builder.pushAssetPath(PackType.SERVER_DATA, path.resolve(directory));
         }
         addDataPack(consumer, true, builder.build(info));
     }
 
     @Unique
-    private static void addDataPack(Consumer<ResourcePackProfile> consumer, boolean required, ResourcePack pack) {
-        ResourcePackProfile.PackFactory packFactory = new ResourcePackProfile.PackFactory() {
+    private static void addDataPack(Consumer<Pack> consumer, boolean required, PackResources pack) {
+        Pack.ResourcesSupplier packFactory = new Pack.ResourcesSupplier() {
             @Override
-            public ResourcePack open(ResourcePackInfo info) {
+            public PackResources openPrimary(PackLocationInfo info) {
                 return pack;
             }
 
             @Override
-            public ResourcePack openWithOverlays(ResourcePackInfo info, ResourcePackProfile.Metadata metadata) {
+            public PackResources openFull(PackLocationInfo info, Pack.Metadata metadata) {
                 return pack;
             }
         };
-        ResourcePackPosition position = new ResourcePackPosition(required, ResourcePackProfile.InsertionPosition.BOTTOM, false);
-        consumer.accept(ResourcePackProfile.create(pack.getInfo(), packFactory, ResourceType.SERVER_DATA, position));
+        PackSelectionConfig position = new PackSelectionConfig(required, Pack.Position.BOTTOM, false);
+        consumer.accept(Pack.readMetaAndCreate(pack.location(), packFactory, PackType.SERVER_DATA, position));
     }
 }

@@ -6,14 +6,13 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.zurrtum.create.AllRecipeSerializers;
 import com.zurrtum.create.AllRecipeTypes;
 import com.zurrtum.create.content.processing.recipe.ChanceOutput;
-import net.minecraft.network.RegistryByteBuf;
-import net.minecraft.network.codec.PacketCodec;
-import net.minecraft.network.codec.PacketCodecs;
-import net.minecraft.recipe.Ingredient;
-import net.minecraft.recipe.RecipeSerializer;
-import net.minecraft.recipe.RecipeType;
-
 import java.util.List;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.item.crafting.RecipeSerializer;
+import net.minecraft.world.item.crafting.RecipeType;
 
 public record CrushingRecipe(int time, List<ChanceOutput> results, Ingredient ingredient) implements AbstractCrushingRecipe {
     @Override
@@ -33,12 +32,12 @@ public record CrushingRecipe(int time, List<ChanceOutput> results, Ingredient in
             Ingredient.CODEC.fieldOf("ingredient").forGetter(CrushingRecipe::ingredient)
         ).apply(instance, CrushingRecipe::new));
 
-        public static final PacketCodec<RegistryByteBuf, CrushingRecipe> PACKET_CODEC = PacketCodec.tuple(
-            PacketCodecs.INTEGER,
+        public static final StreamCodec<RegistryFriendlyByteBuf, CrushingRecipe> PACKET_CODEC = StreamCodec.composite(
+            ByteBufCodecs.INT,
             CrushingRecipe::time,
-            ChanceOutput.PACKET_CODEC.collect(PacketCodecs.toList()),
+            ChanceOutput.PACKET_CODEC.apply(ByteBufCodecs.list()),
             CrushingRecipe::results,
-            Ingredient.PACKET_CODEC,
+            Ingredient.CONTENTS_STREAM_CODEC,
             CrushingRecipe::ingredient,
             CrushingRecipe::new
         );
@@ -49,7 +48,7 @@ public record CrushingRecipe(int time, List<ChanceOutput> results, Ingredient in
         }
 
         @Override
-        public PacketCodec<RegistryByteBuf, CrushingRecipe> packetCodec() {
+        public StreamCodec<RegistryFriendlyByteBuf, CrushingRecipe> streamCodec() {
             return PACKET_CODEC;
         }
     }

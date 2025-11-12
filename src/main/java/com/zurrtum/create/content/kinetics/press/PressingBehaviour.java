@@ -9,19 +9,19 @@ import com.zurrtum.create.content.processing.basin.BasinBlock;
 import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
 import com.zurrtum.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.foundation.codec.CreateCodecs;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.ItemEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.particle.ItemStackParticleEffect;
-import net.minecraft.particle.ParticleTypes;
-import net.minecraft.sound.BlockSoundGroup;
-import net.minecraft.storage.ReadView;
-import net.minecraft.storage.WriteView;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.particles.ItemParticleOption;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.util.Mth;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.SoundType;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -68,11 +68,11 @@ public class PressingBehaviour extends BeltProcessingBehaviour {
     }
 
     @Override
-    public void read(ReadView view, boolean clientPacket) {
-        running = view.getBoolean("Running", false);
-        mode = Mode.values()[view.getInt("Mode", 0)];
-        finished = view.getBoolean("Finished", false);
-        prevRunningTicks = runningTicks = view.getInt("Ticks", 0);
+    public void read(ValueInput view, boolean clientPacket) {
+        running = view.getBooleanOr("Running", false);
+        mode = Mode.values()[view.getIntOr("Mode", 0)];
+        finished = view.getBooleanOr("Finished", false);
+        prevRunningTicks = runningTicks = view.getIntOr("Ticks", 0);
         super.read(view, clientPacket);
 
         if (clientPacket) {
@@ -82,7 +82,7 @@ public class PressingBehaviour extends BeltProcessingBehaviour {
     }
 
     @Override
-    public void write(WriteView view, boolean clientPacket) {
+    public void write(ValueOutput view, boolean clientPacket) {
         view.putBoolean("Running", running);
         view.putInt("Mode", mode.ordinal());
         view.putBoolean("Finished", finished);
@@ -90,7 +90,7 @@ public class PressingBehaviour extends BeltProcessingBehaviour {
         super.write(view, clientPacket);
 
         if (clientPacket) {
-            view.put("ParticleItems", CreateCodecs.ITEM_LIST_CODEC, particleItems);
+            view.store("ParticleItems", CreateCodecs.ITEM_LIST_CODEC, particleItems);
             particleItems.clear();
         }
     }
@@ -99,10 +99,10 @@ public class PressingBehaviour extends BeltProcessingBehaviour {
         if (!running)
             return 0;
         int runningTicks = Math.abs(this.runningTicks);
-        float ticks = MathHelper.lerp(partialTicks, prevRunningTicks, runningTicks);
+        float ticks = Mth.lerpInt(partialTicks, prevRunningTicks, runningTicks);
         if (runningTicks < (CYCLE * 2) / 3)
-            return (float) MathHelper.clamp(Math.pow(ticks / CYCLE * 2, 3), 0, 1);
-        return MathHelper.clamp((CYCLE - ticks) / CYCLE * 3, 0, 1);
+            return (float) Mth.clamp(Math.pow(ticks / CYCLE * 2, 3), 0, 1);
+        return Mth.clamp((CYCLE - ticks) / CYCLE * 3, 0, 1);
     }
 
     public void start(Mode mode) {
@@ -126,11 +126,11 @@ public class PressingBehaviour extends BeltProcessingBehaviour {
     public void tick() {
         super.tick();
 
-        World level = getWorld();
+        Level level = getLevel();
         BlockPos worldPosition = getPos();
 
         if (!running || level == null) {
-            if (level != null && !level.isClient()) {
+            if (level != null && !level.isClientSide()) {
 
                 if (specifics.getKineticSpeed() == 0)
                     return;
@@ -139,13 +139,13 @@ public class PressingBehaviour extends BeltProcessingBehaviour {
                 if (entityScanCooldown <= 0) {
                     entityScanCooldown = ENTITY_SCAN;
 
-                    if (BlockEntityBehaviour.get(level, worldPosition.down(2), TransportedItemStackHandlerBehaviour.TYPE) != null)
+                    if (BlockEntityBehaviour.get(level, worldPosition.below(2), TransportedItemStackHandlerBehaviour.TYPE) != null)
                         return;
-                    if (BasinBlock.isBasin(level, worldPosition.down(2)))
+                    if (BasinBlock.isBasin(level, worldPosition.below(2)))
                         return;
 
-                    for (ItemEntity itemEntity : level.getNonSpectatingEntities(ItemEntity.class, new Box(worldPosition.down()).contract(.125f))) {
-                        if (!itemEntity.isAlive() || !itemEntity.isOnGround())
+                    for (ItemEntity itemEntity : level.getEntitiesOfClass(ItemEntity.class, new AABB(worldPosition.below()).deflate(.125f))) {
+                        if (!itemEntity.isAlive() || !itemEntity.onGround())
                             continue;
                         if (!specifics.tryProcessInWorld(itemEntity, true))
                             continue;
@@ -158,7 +158,7 @@ public class PressingBehaviour extends BeltProcessingBehaviour {
             return;
         }
 
-        if (level.isClient() && runningTicks == -CYCLE / 2) {
+        if (level.isClientSide() && runningTicks == -CYCLE / 2) {
             prevRunningTicks = CYCLE / 2;
             return;
         }
@@ -169,7 +169,7 @@ public class PressingBehaviour extends BeltProcessingBehaviour {
             if (onBasin())
                 applyOnBasin();
 
-            if (level.getBlockState(worldPosition.down(2)).getSoundGroup() == BlockSoundGroup.WOOL)
+            if (level.getBlockState(worldPosition.below(2)).getSoundType() == SoundType.WOOL)
                 AllSoundEvents.MECHANICAL_PRESS_ACTIVATION_ON_BELT.playOnServer(level, worldPosition);
             else
                 AllSoundEvents.MECHANICAL_PRESS_ACTIVATION.playOnServer(
@@ -179,11 +179,11 @@ public class PressingBehaviour extends BeltProcessingBehaviour {
                     .75f + (Math.abs(specifics.getKineticSpeed()) / 1024f)
                 );
 
-            if (!level.isClient())
+            if (!level.isClientSide())
                 blockEntity.sendData();
         }
 
-        if (!level.isClient() && runningTicks > CYCLE) {
+        if (!level.isClientSide() && runningTicks > CYCLE) {
             finished = true;
             running = false;
             particleItems.clear();
@@ -197,14 +197,14 @@ public class PressingBehaviour extends BeltProcessingBehaviour {
         if (prevRunningTicks < CYCLE / 2 && runningTicks >= CYCLE / 2) {
             runningTicks = CYCLE / 2;
             // Pause the ticks until a packet is received
-            if (level.isClient() && !blockEntity.isVirtual())
+            if (level.isClientSide() && !blockEntity.isVirtual())
                 runningTicks = -(CYCLE / 2);
         }
     }
 
     protected void applyOnBasin() {
-        World level = getWorld();
-        if (level.isClient())
+        Level level = getLevel();
+        if (level.isClientSide())
             return;
         particleItems.clear();
         if (specifics.tryProcessInBasin(false))
@@ -212,20 +212,20 @@ public class PressingBehaviour extends BeltProcessingBehaviour {
     }
 
     protected void applyInWorld() {
-        World level = getWorld();
+        Level level = getLevel();
         BlockPos worldPosition = getPos();
-        Box bb = new Box(worldPosition.down(1));
+        AABB bb = new AABB(worldPosition.below(1));
         boolean bulk = specifics.canProcessInBulk();
 
         particleItems.clear();
 
-        if (level.isClient())
+        if (level.isClientSide())
             return;
 
-        for (Entity entity : level.getOtherEntities(null, bb)) {
+        for (Entity entity : level.getEntities(null, bb)) {
             if (!(entity instanceof ItemEntity itemEntity))
                 continue;
-            if (!entity.isAlive() || !entity.isOnGround())
+            if (!entity.isAlive() || !entity.onGround())
                 continue;
 
             entityScanCooldown = 0;
@@ -240,7 +240,7 @@ public class PressingBehaviour extends BeltProcessingBehaviour {
         float speed = specifics.getKineticSpeed();
         if (speed == 0)
             return 0;
-        return (int) MathHelper.lerp(MathHelper.clamp(Math.abs(speed) / 512f, 0, 1), 1, 60);
+        return (int) Mth.lerpInt(Mth.clamp(Math.abs(speed) / 512f, 0, 1), 1, 60);
     }
 
     protected void spawnParticles() {
@@ -250,37 +250,37 @@ public class PressingBehaviour extends BeltProcessingBehaviour {
         BlockPos worldPosition = getPos();
 
         if (mode == Mode.BASIN)
-            particleItems.forEach(stack -> makeCompactingParticleEffect(VecHelper.getCenterOf(worldPosition.down(2)), stack));
+            particleItems.forEach(stack -> makeCompactingParticleEffect(VecHelper.getCenterOf(worldPosition.below(2)), stack));
         if (mode == Mode.BELT)
-            particleItems.forEach(stack -> makePressingParticleEffect(VecHelper.getCenterOf(worldPosition.down(2)).add(0, 8 / 16f, 0), stack));
+            particleItems.forEach(stack -> makePressingParticleEffect(VecHelper.getCenterOf(worldPosition.below(2)).add(0, 8 / 16f, 0), stack));
         if (mode == Mode.WORLD)
-            particleItems.forEach(stack -> makePressingParticleEffect(VecHelper.getCenterOf(worldPosition.down(1)).add(0, -1 / 4f, 0), stack));
+            particleItems.forEach(stack -> makePressingParticleEffect(VecHelper.getCenterOf(worldPosition.below(1)).add(0, -1 / 4f, 0), stack));
 
         particleItems.clear();
     }
 
-    public void makePressingParticleEffect(Vec3d pos, ItemStack stack) {
+    public void makePressingParticleEffect(Vec3 pos, ItemStack stack) {
         makePressingParticleEffect(pos, stack, specifics.getParticleAmount());
     }
 
-    public void makePressingParticleEffect(Vec3d pos, ItemStack stack, int amount) {
-        World level = getWorld();
-        if (level == null || !level.isClient())
+    public void makePressingParticleEffect(Vec3 pos, ItemStack stack, int amount) {
+        Level level = getLevel();
+        if (level == null || !level.isClientSide())
             return;
         for (int i = 0; i < amount; i++) {
-            Vec3d motion = VecHelper.offsetRandomly(Vec3d.ZERO, level.random, .125f).multiply(1, 0, 1);
+            Vec3 motion = VecHelper.offsetRandomly(Vec3.ZERO, level.random, .125f).multiply(1, 0, 1);
             motion = motion.add(0, amount != 1 ? 0.125f : 1 / 16f, 0);
-            level.addParticleClient(new ItemStackParticleEffect(ParticleTypes.ITEM, stack), pos.x, pos.y - .25f, pos.z, motion.x, motion.y, motion.z);
+            level.addParticle(new ItemParticleOption(ParticleTypes.ITEM, stack), pos.x, pos.y - .25f, pos.z, motion.x, motion.y, motion.z);
         }
     }
 
-    public void makeCompactingParticleEffect(Vec3d pos, ItemStack stack) {
-        World level = getWorld();
-        if (level == null || !level.isClient())
+    public void makeCompactingParticleEffect(Vec3 pos, ItemStack stack) {
+        Level level = getLevel();
+        if (level == null || !level.isClientSide())
             return;
         for (int i = 0; i < 20; i++) {
-            Vec3d motion = VecHelper.offsetRandomly(Vec3d.ZERO, level.random, .175f).multiply(1, 0, 1);
-            level.addParticleClient(new ItemStackParticleEffect(ParticleTypes.ITEM, stack), pos.x, pos.y, pos.z, motion.x, motion.y + .25f, motion.z);
+            Vec3 motion = VecHelper.offsetRandomly(Vec3.ZERO, level.random, .175f).multiply(1, 0, 1);
+            level.addParticle(new ItemParticleOption(ParticleTypes.ITEM, stack), pos.x, pos.y, pos.z, motion.x, motion.y + .25f, motion.z);
         }
     }
 

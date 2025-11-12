@@ -9,7 +9,7 @@ import com.zurrtum.create.client.flywheel.lib.model.Models;
 import com.zurrtum.create.client.flywheel.lib.model.baked.PartialModel;
 import com.zurrtum.create.client.foundation.virtualWorld.VirtualRenderWorld;
 import com.zurrtum.create.content.contraptions.behaviour.MovementContext;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.phys.Vec3;
 
 public class RollerActorVisual extends HarvesterActorVisual {
 
@@ -36,8 +36,8 @@ public class RollerActorVisual extends HarvesterActorVisual {
     }
 
     @Override
-    protected Vec3d getRotationOffset() {
-        return Vec3d.ZERO;
+    protected Vec3 getRotationOffset() {
+        return Vec3.ZERO;
     }
 
     @Override

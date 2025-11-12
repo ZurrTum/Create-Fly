@@ -2,8 +2,8 @@ package com.zurrtum.create.content.trains.bogey;
 
 import com.zurrtum.create.AllBlockEntityTypes;
 import com.zurrtum.create.AllBogeyStyles;
-import net.minecraft.block.BlockState;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.block.state.BlockState;
 
 public class StandardBogeyBlockEntity extends AbstractBogeyBlockEntity {
 

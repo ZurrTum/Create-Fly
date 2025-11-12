@@ -3,15 +3,14 @@ package com.zurrtum.create.infrastructure.packet.c2s;
 import com.zurrtum.create.AllHandle;
 import com.zurrtum.create.AllPackets;
 import io.netty.buffer.ByteBuf;
-import net.minecraft.network.codec.PacketCodec;
-import net.minecraft.network.packet.PacketType;
-import net.minecraft.server.network.ServerPlayNetworkHandler;
-import net.minecraft.util.math.BlockPos;
-
 import java.util.function.BiConsumer;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.PacketType;
+import net.minecraft.server.network.ServerGamePacketListenerImpl;
 
 public record ToolboxDisposeAllPacket(BlockPos toolboxPos) implements C2SPacket {
-    public static final PacketCodec<ByteBuf, ToolboxDisposeAllPacket> CODEC = BlockPos.PACKET_CODEC.xmap(
+    public static final StreamCodec<ByteBuf, ToolboxDisposeAllPacket> CODEC = BlockPos.STREAM_CODEC.map(
         ToolboxDisposeAllPacket::new,
         ToolboxDisposeAllPacket::toolboxPos
     );
@@ -22,12 +21,12 @@ public record ToolboxDisposeAllPacket(BlockPos toolboxPos) implements C2SPacket 
     }
 
     @Override
-    public PacketType<ToolboxDisposeAllPacket> getPacketType() {
+    public PacketType<ToolboxDisposeAllPacket> type() {
         return AllPackets.TOOLBOX_DISPOSE_ALL;
     }
 
     @Override
-    public BiConsumer<ServerPlayNetworkHandler, ToolboxDisposeAllPacket> callback() {
+    public BiConsumer<ServerGamePacketListenerImpl, ToolboxDisposeAllPacket> callback() {
         return AllHandle::onToolboxDisposeAll;
     }
 }

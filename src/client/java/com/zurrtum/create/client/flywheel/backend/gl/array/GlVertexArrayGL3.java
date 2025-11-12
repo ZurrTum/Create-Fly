@@ -2,13 +2,13 @@ package com.zurrtum.create.client.flywheel.backend.gl.array;
 
 import com.zurrtum.create.client.flywheel.backend.gl.GlCompat;
 import com.zurrtum.create.client.flywheel.backend.gl.buffer.GlBufferType;
-import net.minecraft.util.Util;
 import org.lwjgl.opengl.*;
 import org.lwjgl.system.Checks;
 
 import java.util.Arrays;
 import java.util.BitSet;
 import java.util.List;
+import net.minecraft.Util;
 
 public abstract class GlVertexArrayGL3 extends GlVertexArray {
     private final BitSet attributeDirty = new BitSet(MAX_ATTRIBS);

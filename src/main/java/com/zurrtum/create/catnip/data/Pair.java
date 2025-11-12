@@ -2,9 +2,8 @@ package com.zurrtum.create.catnip.data;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import net.minecraft.network.codec.PacketCodec;
-
 import java.util.Objects;
+import net.minecraft.network.codec.StreamCodec;
 
 public class Pair<F, S> {
 
@@ -28,11 +27,11 @@ public class Pair<F, S> {
         ).apply(instance, Pair::new));
     }
 
-    public static <B, F, S> PacketCodec<B, Pair<F, S>> streamCodec(
-        PacketCodec<? super B, F> firstCodec,
-        PacketCodec<? super B, S> secondCodec
+    public static <B, F, S> StreamCodec<B, Pair<F, S>> streamCodec(
+        StreamCodec<? super B, F> firstCodec,
+        StreamCodec<? super B, S> secondCodec
     ) {
-        return PacketCodec.tuple(firstCodec, Pair::getFirst, secondCodec, Pair::getSecond, Pair::new);
+        return StreamCodec.composite(firstCodec, Pair::getFirst, secondCodec, Pair::getSecond, Pair::new);
     }
 
     public F getFirst() {

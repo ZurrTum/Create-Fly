@@ -1,5 +1,7 @@
 package com.zurrtum.create.client.content.trains.signal;
 
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.zurrtum.create.client.AllPartialModels;
 import com.zurrtum.create.client.AllTrackRenders;
 import com.zurrtum.create.client.catnip.animation.AnimationTickHolder;
@@ -14,26 +16,24 @@ import com.zurrtum.create.content.trains.signal.SignalBoundary;
 import com.zurrtum.create.content.trains.track.ITrackBlock;
 import com.zurrtum.create.content.trains.track.TrackTargetingBehaviour;
 import com.zurrtum.create.content.trains.track.TrackTargetingBehaviour.RenderedTrackOverlayType;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.client.render.LightmapTextureManager;
-import net.minecraft.client.render.RenderLayer;
-import net.minecraft.client.render.VertexConsumer;
-import net.minecraft.client.render.WorldRenderer;
-import net.minecraft.client.render.block.entity.BlockEntityRenderer;
-import net.minecraft.client.render.block.entity.BlockEntityRendererFactory;
-import net.minecraft.client.render.block.entity.state.BlockEntityRenderState;
-import net.minecraft.client.render.command.ModelCommandRenderer;
-import net.minecraft.client.render.command.OrderedRenderCommandQueue;
-import net.minecraft.client.render.state.CameraRenderState;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.World;
+import net.minecraft.client.renderer.LevelRenderer;
+import net.minecraft.client.renderer.LightTexture;
+import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.SubmitNodeCollector;
+import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
+import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
+import net.minecraft.client.renderer.blockentity.state.BlockEntityRenderState;
+import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
+import net.minecraft.client.renderer.state.CameraRenderState;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 
 public class SignalRenderer implements BlockEntityRenderer<SignalBlockEntity, SignalRenderer.SignalRenderState> {
-    public SignalRenderer(BlockEntityRendererFactory.Context context) {
+    public SignalRenderer(BlockEntityRendererProvider.Context context) {
     }
 
     @Override
@@ -42,31 +42,28 @@ public class SignalRenderer implements BlockEntityRenderer<SignalBlockEntity, Si
     }
 
     @Override
-    public void updateRenderState(
+    public void extractRenderState(
         SignalBlockEntity be,
         SignalRenderState state,
         float tickProgress,
-        Vec3d cameraPos,
-        @Nullable ModelCommandRenderer.CrumblingOverlayCommand crumblingOverlay
+        Vec3 cameraPos,
+        @Nullable ModelFeatureRenderer.CrumblingOverlay crumblingOverlay
     ) {
-        World world = be.getWorld();
+        Level world = be.getLevel();
         if (VisualizationManager.supportsVisualization(world)) {
             return;
         }
-        state.pos = be.getPos();
-        state.blockState = be.getCachedState();
-        state.type = be.getType();
-        state.layer = RenderLayer.getSolid();
+        state.blockPos = be.getBlockPos();
+        state.blockState = be.getBlockState();
+        state.blockEntityType = be.getType();
+        state.layer = RenderType.solid();
         float renderTime = AnimationTickHolder.getRenderTime(world);
         if (be.getState().isRedLight(renderTime)) {
             state.model = CachedBuffers.partial(AllPartialModels.SIGNAL_ON, state.blockState);
-            state.lightmapCoordinates = LightmapTextureManager.MAX_BLOCK_LIGHT_COORDINATE;
+            state.lightCoords = LightTexture.FULL_BLOCK;
         } else {
             state.model = CachedBuffers.partial(AllPartialModels.SIGNAL_OFF, state.blockState);
-            state.lightmapCoordinates = world != null ? WorldRenderer.getLightmapCoordinates(
-                world,
-                state.pos
-            ) : LightmapTextureManager.MAX_LIGHT_COORDINATE;
+            state.lightCoords = world != null ? LevelRenderer.getLightColor(world, state.blockPos) : LightTexture.FULL_BRIGHT;
         }
         TrackTargetingBehaviour<SignalBoundary> target = be.edgePoint;
         BlockPos targetPosition = target.getGlobalPosition();
@@ -83,38 +80,31 @@ public class SignalRenderer implements BlockEntityRenderer<SignalBlockEntity, Si
         if (renderer != null) {
             RenderedTrackOverlayType type = overlayState == OverlayState.DUAL ? RenderedTrackOverlayType.DUAL_SIGNAL : RenderedTrackOverlayType.SIGNAL;
             state.block = renderer.getRenderState(
-                world,
-                new Vec3d(
-                    targetPosition.getX() - state.pos.getX(),
-                    targetPosition.getY() - state.pos.getY(),
-                    targetPosition.getZ() - state.pos.getZ()
-                ),
-                trackState,
-                targetPosition,
-                target.getTargetDirection(),
-                target.getTargetBezier(),
-                type,
-                1
+                world, new Vec3(
+                    targetPosition.getX() - state.blockPos.getX(),
+                    targetPosition.getY() - state.blockPos.getY(),
+                    targetPosition.getZ() - state.blockPos.getZ()
+                ), trackState, targetPosition, target.getTargetDirection(), target.getTargetBezier(), type, 1
             );
         }
     }
 
     @Override
-    public void render(SignalRenderState state, MatrixStack matrices, OrderedRenderCommandQueue queue, CameraRenderState cameraState) {
-        queue.submitCustom(matrices, state.layer, state);
+    public void submit(SignalRenderState state, PoseStack matrices, SubmitNodeCollector queue, CameraRenderState cameraState) {
+        queue.submitCustomGeometry(matrices, state.layer, state);
         if (state.block != null) {
             state.block.render(matrices, queue);
         }
     }
 
-    public static class SignalRenderState extends BlockEntityRenderState implements OrderedRenderCommandQueue.Custom {
-        public RenderLayer layer;
+    public static class SignalRenderState extends BlockEntityRenderState implements SubmitNodeCollector.CustomGeometryRenderer {
+        public RenderType layer;
         public SuperByteBuffer model;
         TrackBlockRenderState block;
 
         @Override
-        public void render(MatrixStack.Entry matricesEntry, VertexConsumer vertexConsumer) {
-            model.light(lightmapCoordinates).renderInto(matricesEntry, vertexConsumer);
+        public void render(PoseStack.Pose matricesEntry, VertexConsumer vertexConsumer) {
+            model.light(lightCoords).renderInto(matricesEntry, vertexConsumer);
         }
     }
 }

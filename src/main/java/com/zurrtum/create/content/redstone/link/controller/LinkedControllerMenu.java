@@ -5,12 +5,12 @@ import com.zurrtum.create.AllMenuTypes;
 import com.zurrtum.create.foundation.gui.menu.HeldItemGhostItemMenu;
 import com.zurrtum.create.foundation.item.ItemHelper;
 import com.zurrtum.create.infrastructure.items.ItemStackHandler;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.screen.slot.Slot;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.item.ItemStack;
 
 public class LinkedControllerMenu extends HeldItemGhostItemMenu {
-    public LinkedControllerMenu(int id, PlayerInventory inv, ItemStack filterItem) {
+    public LinkedControllerMenu(int id, Inventory inv, ItemStack filterItem) {
         super(AllMenuTypes.LINKED_CONTROLLER, id, inv, filterItem);
     }
 

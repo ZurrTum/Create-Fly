@@ -6,12 +6,11 @@ import com.zurrtum.create.content.redstone.displayLink.target.DisplayBoardTarget
 import com.zurrtum.create.content.redstone.displayLink.target.LecternDisplayTarget;
 import com.zurrtum.create.content.redstone.displayLink.target.NixieTubeDisplayTarget;
 import com.zurrtum.create.content.redstone.displayLink.target.SignDisplayTarget;
-import net.minecraft.block.Block;
-import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.registry.Registry;
-import net.minecraft.util.Identifier;
-
 import java.util.function.Supplier;
+import net.minecraft.core.Registry;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 
 import static com.zurrtum.create.Create.MOD_ID;
 
@@ -22,7 +21,7 @@ public class AllDisplayTargets {
     public static final NixieTubeDisplayTarget NIXIE_TUBE = register("nixie_tube", NixieTubeDisplayTarget::new);
 
     private static <T extends DisplayTarget> T register(String id, Supplier<T> factory) {
-        return Registry.register(CreateRegistries.DISPLAY_TARGET, Identifier.of(MOD_ID, id), factory.get());
+        return Registry.register(CreateRegistries.DISPLAY_TARGET, ResourceLocation.fromNamespaceAndPath(MOD_ID, id), factory.get());
     }
 
     public static void register(DisplayTarget display, Block... blocks) {

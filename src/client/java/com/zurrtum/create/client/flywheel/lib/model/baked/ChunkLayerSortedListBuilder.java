@@ -2,9 +2,8 @@ package com.zurrtum.create.client.flywheel.lib.model.baked;
 
 import com.google.common.collect.ImmutableList;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
-import net.minecraft.client.render.BlockRenderLayer;
-
 import java.util.List;
+import net.minecraft.client.renderer.chunk.ChunkSectionLayer;
 
 class ChunkLayerSortedListBuilder<T> {
     private static final ThreadLocal<ChunkLayerSortedListBuilder<?>> THREAD_LOCAL = ThreadLocal.withInitial(ChunkLayerSortedListBuilder::new);
@@ -24,7 +23,7 @@ class ChunkLayerSortedListBuilder<T> {
         return (ChunkLayerSortedListBuilder<T>) THREAD_LOCAL.get();
     }
 
-    public void add(BlockRenderLayer renderType, T obj) {
+    public void add(ChunkSectionLayer renderType, T obj) {
         Integer layerIndex = BakedModelBufferer.CHUNK_LAYERS_INDEX.get(renderType);
         if (layerIndex == null) {
             throw new IllegalArgumentException("RenderType '" + renderType + "' is not a chunk layer");

@@ -13,22 +13,21 @@ import com.zurrtum.create.client.flywheel.lib.model.Models;
 import com.zurrtum.create.client.foundation.render.AllInstanceTypes;
 import com.zurrtum.create.content.kinetics.simpleRelays.BracketedKineticBlockEntity;
 import com.zurrtum.create.content.kinetics.simpleRelays.ICogWheel;
-import net.minecraft.util.math.Direction;
+import net.minecraft.core.Direction;
 
 import java.util.function.Consumer;
 
 public class BracketedKineticBlockEntityVisual {
-
     public static BlockEntityVisual<BracketedKineticBlockEntity> create(
         VisualizationContext context,
         BracketedKineticBlockEntity blockEntity,
         float partialTick
     ) {
-        if (ICogWheel.isLargeCog(blockEntity.getCachedState())) {
+        if (ICogWheel.isLargeCog(blockEntity.getBlockState())) {
             return new LargeCogVisual(context, blockEntity, partialTick);
         } else {
             Model model;
-            if (blockEntity.getCachedState().isOf(AllBlocks.COGWHEEL)) {
+            if (blockEntity.getBlockState().is(AllBlocks.COGWHEEL)) {
                 model = Models.partial(AllPartialModels.COGWHEEL);
             } else {
                 model = Models.partial(AllPartialModels.SHAFT);

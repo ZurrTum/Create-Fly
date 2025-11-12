@@ -4,20 +4,22 @@ import com.google.common.base.Suppliers;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import net.minecraft.client.item.ItemModelManager;
-import net.minecraft.client.render.RenderLayers;
-import net.minecraft.client.render.item.ItemRenderState;
-import net.minecraft.client.render.item.model.BasicItemModel;
-import net.minecraft.client.render.item.model.ItemModel;
-import net.minecraft.client.render.item.tint.TintSource;
-import net.minecraft.client.render.item.tint.TintSourceTypes;
-import net.minecraft.client.render.model.*;
-import net.minecraft.client.world.ClientWorld;
-import net.minecraft.item.ItemDisplayContext;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.HeldItemContext;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.math.Box;
+import net.minecraft.client.color.item.ItemTintSource;
+import net.minecraft.client.color.item.ItemTintSources;
+import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.client.renderer.ItemBlockRenderTypes;
+import net.minecraft.client.renderer.block.model.BakedQuad;
+import net.minecraft.client.renderer.block.model.TextureSlots;
+import net.minecraft.client.renderer.item.*;
+import net.minecraft.client.resources.model.BlockModelRotation;
+import net.minecraft.client.resources.model.ModelBaker;
+import net.minecraft.client.resources.model.ResolvableModel;
+import net.minecraft.client.resources.model.ResolvedModel;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.ItemOwner;
+import net.minecraft.world.item.ItemDisplayContext;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.phys.AABB;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
 
@@ -27,24 +29,24 @@ import java.util.function.Supplier;
 import static com.zurrtum.create.Create.MOD_ID;
 
 public class OversizedModel implements ItemModel {
-    public static final Identifier ID = Identifier.of(MOD_ID, "model/oversized");
-    private final List<TintSource> tints;
+    public static final ResourceLocation ID = ResourceLocation.fromNamespaceAndPath(MOD_ID, "model/oversized");
+    private final List<ItemTintSource> tints;
     private final List<BakedQuad> quads;
     private final Supplier<Vector3f[]> vector;
-    private final ModelSettings settings;
-    private final Box box;
+    private final ModelRenderProperties settings;
+    private final AABB box;
     private final boolean animated;
 
-    public OversizedModel(List<TintSource> tints, List<BakedQuad> quads, ModelSettings settings, Box box) {
+    public OversizedModel(List<ItemTintSource> tints, List<BakedQuad> quads, ModelRenderProperties settings, AABB box) {
         this.tints = tints;
         this.quads = quads;
         this.settings = settings;
-        this.vector = Suppliers.memoize(() -> BasicItemModel.bakeQuads(this.quads));
+        this.vector = Suppliers.memoize(() -> BlockModelWrapper.computeExtents(this.quads));
         this.box = box;
         boolean bl = false;
 
         for (BakedQuad bakedQuad : quads) {
-            if (bakedQuad.sprite().getContents().isAnimated()) {
+            if (bakedQuad.sprite().contents().isAnimated()) {
                 bl = true;
                 break;
             }
@@ -55,37 +57,37 @@ public class OversizedModel implements ItemModel {
 
     @Override
     public void update(
-        ItemRenderState state,
+        ItemStackRenderState state,
         ItemStack stack,
-        ItemModelManager resolver,
+        ItemModelResolver resolver,
         ItemDisplayContext displayContext,
-        @Nullable ClientWorld world,
-        @Nullable HeldItemContext heldItemContext,
+        @Nullable ClientLevel world,
+        @Nullable ItemOwner heldItemContext,
         int seed
     ) {
-        state.addModelKey(this);
-        ItemRenderState.LayerRenderState layerRenderState = state.newLayer();
-        if (stack.hasGlint()) {
-            layerRenderState.setGlint(ItemRenderState.Glint.STANDARD);
-            state.markAnimated();
-            state.addModelKey(ItemRenderState.Glint.STANDARD);
+        state.appendModelIdentityElement(this);
+        ItemStackRenderState.LayerRenderState layerRenderState = state.newLayer();
+        if (stack.hasFoil()) {
+            layerRenderState.setFoilType(ItemStackRenderState.FoilType.STANDARD);
+            state.setAnimated();
+            state.appendModelIdentityElement(ItemStackRenderState.FoilType.STANDARD);
         }
 
         int i = tints.size();
-        int[] is = layerRenderState.initTints(i);
+        int[] is = layerRenderState.prepareTintLayers(i);
 
         for (int j = 0; j < i; j++) {
-            int k = tints.get(j).getTint(stack, world, heldItemContext == null ? null : heldItemContext.getEntity());
+            int k = tints.get(j).calculate(stack, world, heldItemContext == null ? null : heldItemContext.asLivingEntity());
             is[j] = k;
-            state.addModelKey(k);
+            state.appendModelIdentityElement(k);
         }
 
-        layerRenderState.setVertices(vector);
-        layerRenderState.setRenderLayer(RenderLayers.getItemLayer(stack));
-        settings.addSettings(layerRenderState, displayContext);
-        layerRenderState.getQuads().addAll(quads);
+        layerRenderState.setExtents(vector);
+        layerRenderState.setRenderType(ItemBlockRenderTypes.getRenderType(stack));
+        settings.applyToLayer(layerRenderState, displayContext);
+        layerRenderState.prepareQuadList().addAll(quads);
         if (animated) {
-            state.markAnimated();
+            state.setAnimated();
         }
         if (displayContext == ItemDisplayContext.GUI) {
             state.setOversizedInGui(true);
@@ -93,31 +95,33 @@ public class OversizedModel implements ItemModel {
         }
     }
 
-    public record Unbaked(Identifier model, List<TintSource> tints, List<Double> min, List<Double> max) implements ItemModel.Unbaked {
-        public static final MapCodec<Unbaked> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
-            Identifier.CODEC.fieldOf("model").forGetter(Unbaked::model),
-            TintSourceTypes.CODEC.listOf().optionalFieldOf("tints", List.of()).forGetter(Unbaked::tints),
-            Codec.DOUBLE.listOf(3, 3).fieldOf("min").forGetter(Unbaked::min),
-            Codec.DOUBLE.listOf(3, 3).fieldOf("max").forGetter(Unbaked::max)
-        ).apply(instance, Unbaked::new));
+    public record Unbaked(ResourceLocation model, List<ItemTintSource> tints, List<Double> min, List<Double> max) implements ItemModel.Unbaked {
+        public static final MapCodec<com.zurrtum.create.client.infrastructure.model.OversizedModel.Unbaked> CODEC = RecordCodecBuilder.mapCodec(
+            instance -> instance.group(
+                ResourceLocation.CODEC.fieldOf("model").forGetter(com.zurrtum.create.client.infrastructure.model.OversizedModel.Unbaked::model),
+                ItemTintSources.CODEC.listOf().optionalFieldOf("tints", List.of())
+                    .forGetter(com.zurrtum.create.client.infrastructure.model.OversizedModel.Unbaked::tints),
+                Codec.DOUBLE.listOf(3, 3).fieldOf("min").forGetter(com.zurrtum.create.client.infrastructure.model.OversizedModel.Unbaked::min),
+                Codec.DOUBLE.listOf(3, 3).fieldOf("max").forGetter(com.zurrtum.create.client.infrastructure.model.OversizedModel.Unbaked::max)
+            ).apply(instance, com.zurrtum.create.client.infrastructure.model.OversizedModel.Unbaked::new));
 
         @Override
-        public void resolve(ResolvableModel.Resolver resolver) {
+        public void resolveDependencies(ResolvableModel.Resolver resolver) {
             resolver.markDependency(this.model);
         }
 
         @Override
-        public ItemModel bake(ItemModel.BakeContext context) {
-            Baker baker = context.blockModelBaker();
-            BakedSimpleModel bakedSimpleModel = baker.getModel(this.model);
-            ModelTextures modelTextures = bakedSimpleModel.getTextures();
-            List<BakedQuad> list = bakedSimpleModel.bakeGeometry(modelTextures, baker, ModelRotation.X0_Y0).getAllQuads();
-            ModelSettings modelSettings = ModelSettings.resolveSettings(baker, bakedSimpleModel, modelTextures);
-            return new OversizedModel(tints, list, modelSettings, new Box(min.get(0), min.get(1), min.get(2), max.get(0), max.get(1), max.get(2)));
+        public ItemModel bake(ItemModel.BakingContext context) {
+            ModelBaker baker = context.blockModelBaker();
+            ResolvedModel bakedSimpleModel = baker.getModel(this.model);
+            TextureSlots modelTextures = bakedSimpleModel.getTopTextureSlots();
+            List<BakedQuad> list = bakedSimpleModel.bakeTopGeometry(modelTextures, baker, BlockModelRotation.X0_Y0).getAll();
+            ModelRenderProperties modelSettings = ModelRenderProperties.fromResolvedModel(baker, bakedSimpleModel, modelTextures);
+            return new OversizedModel(tints, list, modelSettings, new AABB(min.get(0), min.get(1), min.get(2), max.get(0), max.get(1), max.get(2)));
         }
 
         @Override
-        public MapCodec<Unbaked> getCodec() {
+        public MapCodec<com.zurrtum.create.client.infrastructure.model.OversizedModel.Unbaked> type() {
             return CODEC;
         }
     }

@@ -5,21 +5,20 @@ import com.zurrtum.create.catnip.data.Pair;
 import com.zurrtum.create.client.catnip.gui.UIRenderHelper;
 import com.zurrtum.create.client.foundation.gui.widget.ScrollInput;
 import com.zurrtum.create.client.foundation.gui.widget.TooltipArea;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.Drawable;
-import net.minecraft.client.gui.Element;
-import net.minecraft.client.gui.Selectable;
-import net.minecraft.client.gui.widget.ClickableWidget;
-import net.minecraft.client.gui.widget.TextFieldWidget;
-import net.minecraft.nbt.NbtCompound;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.AbstractWidget;
+import net.minecraft.client.gui.components.EditBox;
+import net.minecraft.client.gui.components.Renderable;
+import net.minecraft.client.gui.components.events.GuiEventListener;
+import net.minecraft.client.gui.narration.NarratableEntry;
+import net.minecraft.nbt.CompoundTag;
 
 public class ModularGuiLine {
 
-    List<Pair<ClickableWidget, String>> widgets;
+    List<Pair<AbstractWidget, String>> widgets;
     List<Couple<Integer>> customBoxes;
     boolean speechBubble;
 
@@ -29,7 +28,7 @@ public class ModularGuiLine {
         speechBubble = false;
     }
 
-    public void renderWidgetBG(int guiLeft, DrawContext graphics) {
+    public void renderWidgetBG(int guiLeft, GuiGraphics graphics) {
         boolean first = true;
 
         if (!customBoxes.isEmpty()) {
@@ -42,15 +41,15 @@ public class ModularGuiLine {
             return;
         }
 
-        for (Pair<ClickableWidget, String> pair : widgets) {
+        for (Pair<AbstractWidget, String> pair : widgets) {
             if (pair.getSecond().equals("Dummy"))
                 continue;
 
-            ClickableWidget aw = pair.getFirst();
+            AbstractWidget aw = pair.getFirst();
             int x = aw.getX();
             int width = aw.getWidth();
 
-            if (aw instanceof TextFieldWidget) {
+            if (aw instanceof EditBox) {
                 x -= 5;
                 width += 9;
             }
@@ -60,7 +59,7 @@ public class ModularGuiLine {
         }
     }
 
-    private void box(DrawContext graphics, int x, int width, boolean b) {
+    private void box(GuiGraphics graphics, int x, int width, boolean b) {
         UIRenderHelper.drawStretched(graphics, x, 0, width, 18, AllGuiTextures.DATA_AREA);
         if (b)
             AllGuiTextures.DATA_AREA_SPEECH.render(graphics, x - 3, 0);
@@ -69,26 +68,26 @@ public class ModularGuiLine {
         AllGuiTextures.DATA_AREA_END.render(graphics, x + width - 2, 0);
     }
 
-    public void saveValues(NbtCompound data) {
-        for (Pair<ClickableWidget, String> pair : widgets) {
-            ClickableWidget w = pair.getFirst();
+    public void saveValues(CompoundTag data) {
+        for (Pair<AbstractWidget, String> pair : widgets) {
+            AbstractWidget w = pair.getFirst();
             String key = pair.getSecond();
-            if (w instanceof TextFieldWidget eb)
-                data.putString(key, eb.getText());
+            if (w instanceof EditBox eb)
+                data.putString(key, eb.getValue());
             if (w instanceof ScrollInput si)
                 data.putInt(key, si.getState());
         }
     }
 
     @SuppressWarnings("unchecked")
-    public <T extends Element & Drawable & Selectable> void loadValues(NbtCompound data, Consumer<T> addRenderable, Consumer<T> addRenderableOnly) {
-        for (Pair<ClickableWidget, String> pair : widgets) {
-            ClickableWidget w = pair.getFirst();
+    public <T extends GuiEventListener & Renderable & NarratableEntry> void loadValues(CompoundTag data, Consumer<T> addRenderable, Consumer<T> addRenderableOnly) {
+        for (Pair<AbstractWidget, String> pair : widgets) {
+            AbstractWidget w = pair.getFirst();
             String key = pair.getSecond();
-            if (w instanceof TextFieldWidget eb)
-                eb.setText(data.getString(key, ""));
+            if (w instanceof EditBox eb)
+                eb.setValue(data.getStringOr(key, ""));
             if (w instanceof ScrollInput si)
-                si.setState(data.getInt(key, 0));
+                si.setState(data.getIntOr(key, 0));
 
             if (w instanceof TooltipArea)
                 addRenderableOnly.accept((T) w);
@@ -97,7 +96,7 @@ public class ModularGuiLine {
         }
     }
 
-    public void forEach(Consumer<Element> callback) {
+    public void forEach(Consumer<GuiEventListener> callback) {
         widgets.forEach(p -> callback.accept(p.getFirst()));
     }
 
@@ -106,7 +105,7 @@ public class ModularGuiLine {
         customBoxes.clear();
     }
 
-    public void add(Pair<ClickableWidget, String> pair) {
+    public void add(Pair<AbstractWidget, String> pair) {
         widgets.add(pair);
     }
 

@@ -12,9 +12,9 @@ import com.zurrtum.create.client.flywheel.lib.visual.AbstractBlockEntityVisual;
 import com.zurrtum.create.client.flywheel.lib.visual.SimpleDynamicVisual;
 import com.zurrtum.create.content.contraptions.chassis.StickerBlock;
 import com.zurrtum.create.content.contraptions.chassis.StickerBlockEntity;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.MathHelper;
+import net.minecraft.client.Minecraft;
+import net.minecraft.core.Direction;
+import net.minecraft.util.Mth;
 
 import java.util.function.Consumer;
 
@@ -32,9 +32,9 @@ public class StickerVisual extends AbstractBlockEntityVisual<StickerBlockEntity>
 
         head = instancerProvider().instancer(InstanceTypes.TRANSFORMED, Models.partial(AllPartialModels.STICKER_HEAD)).createInstance();
 
-        fakeWorld = blockEntity.getWorld() != MinecraftClient.getInstance().world;
-        facing = blockState.get(StickerBlock.FACING);
-        offset = blockState.get(StickerBlock.EXTENDED) ? 1 : 0;
+        fakeWorld = blockEntity.getLevel() != Minecraft.getInstance().level;
+        facing = blockState.getValue(StickerBlock.FACING);
+        offset = blockState.getValue(StickerBlock.EXTENDED) ? 1 : 0;
 
         animateHead(offset);
     }
@@ -46,7 +46,7 @@ public class StickerVisual extends AbstractBlockEntityVisual<StickerBlockEntity>
         if (fakeWorld)
             offset = this.offset;
 
-        if (MathHelper.approximatelyEquals(offset, lastOffset))
+        if (Mth.equal(offset, lastOffset))
             return;
 
         animateHead(offset);

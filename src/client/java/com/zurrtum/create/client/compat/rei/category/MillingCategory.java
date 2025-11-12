@@ -16,8 +16,8 @@ import me.shedaniel.rei.api.client.gui.widgets.Widget;
 import me.shedaniel.rei.api.client.gui.widgets.Widgets;
 import me.shedaniel.rei.api.common.category.CategoryIdentifier;
 import me.shedaniel.rei.api.common.entry.EntryIngredient;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.text.Text;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.network.chat.Component;
 import org.joml.Matrix3x2f;
 
 import java.util.ArrayList;
@@ -30,7 +30,7 @@ public class MillingCategory extends CreateCategory<MillingDisplay> {
     }
 
     @Override
-    public Text getTitle() {
+    public Component getTitle() {
         return CreateLang.translateDirect("recipe.milling");
     }
 
@@ -65,13 +65,13 @@ public class MillingCategory extends CreateCategory<MillingDisplay> {
                 );
             }
         }
-        widgets.add(Widgets.createDrawableWidget((DrawContext graphics, int mouseX, int mouseY, float delta) -> {
+        widgets.add(Widgets.createDrawableWidget((GuiGraphics graphics, int mouseX, int mouseY, float delta) -> {
             drawSlotBackground(graphics, outputs, input);
             drawChanceSlotBackground(graphics, chances);
             AllGuiTextures.JEI_ARROW.render(graphics, bounds.x + 90, bounds.y + 37);
             AllGuiTextures.JEI_DOWN_ARROW.render(graphics, bounds.x + 48, bounds.y + 9);
             AllGuiTextures.JEI_SHADOW.render(graphics, bounds.x + 37, bounds.y + 45);
-            graphics.state.addSpecialElement(new MillstoneRenderState(new Matrix3x2f(graphics.getMatrices()), bounds.x + 47, bounds.y + 24));
+            graphics.guiRenderState.submitPicturesInPictureState(new MillstoneRenderState(new Matrix3x2f(graphics.pose()), bounds.x + 47, bounds.y + 24));
         }));
         widgets.add(createInputSlot(input).entries(display.input()));
         for (int i = 0, size = outputs.size(); i < size; i++) {

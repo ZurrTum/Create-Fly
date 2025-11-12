@@ -1,40 +1,40 @@
 package com.zurrtum.create.impl.registry;
 
 import com.zurrtum.create.api.registry.SimpleRegistry;
-import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.registry.Registries;
-import net.minecraft.registry.entry.RegistryEntry;
-import net.minecraft.registry.tag.TagKey;
-import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Function;
+import net.minecraft.core.Holder;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.TagKey;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 
 public class TagProviderImpl<K, V> implements SimpleRegistry.Provider<K, V> {
     private final TagKey<K> tag;
-    private final Function<K, RegistryEntry<K>> holderGetter;
+    private final Function<K, Holder<K>> holderGetter;
     private final V value;
 
-    public TagProviderImpl(TagKey<K> tag, Function<K, RegistryEntry<K>> holderGetter, V value) {
+    public TagProviderImpl(TagKey<K> tag, Function<K, Holder<K>> holderGetter, V value) {
         this.tag = tag;
         this.holderGetter = holderGetter;
         this.value = value;
     }
 
     // eye of the beholder? check the nametag, buddy
-    public static RegistryEntry<BlockEntityType<?>> getBeHolder(BlockEntityType<?> type) {
-        Identifier key = Registries.BLOCK_ENTITY_TYPE.getId(type);
+    public static Holder<BlockEntityType<?>> getBeHolder(BlockEntityType<?> type) {
+        ResourceLocation key = BuiltInRegistries.BLOCK_ENTITY_TYPE.getKey(type);
         if (key == null)
             throw new IllegalStateException("Unregistered BlockEntityType: " + type);
 
-        return Registries.BLOCK_ENTITY_TYPE.getEntry(key).orElseThrow();
+        return BuiltInRegistries.BLOCK_ENTITY_TYPE.get(key).orElseThrow();
     }
 
     @Override
     @Nullable
     public V get(K object) {
-        RegistryEntry<K> holder = this.holderGetter.apply(object);
-        return holder.isIn(this.tag) ? this.value : null;
+        Holder<K> holder = this.holderGetter.apply(object);
+        return holder.is(this.tag) ? this.value : null;
     }
 
     @Override

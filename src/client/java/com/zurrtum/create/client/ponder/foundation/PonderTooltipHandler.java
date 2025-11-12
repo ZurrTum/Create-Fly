@@ -1,6 +1,7 @@
 package com.zurrtum.create.client.ponder.foundation;
 
 import com.google.common.base.Strings;
+import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.zurrtum.create.catnip.animation.LerpedFloat;
 import com.zurrtum.create.catnip.data.Couple;
@@ -13,19 +14,17 @@ import com.zurrtum.create.client.ponder.Ponder;
 import com.zurrtum.create.client.ponder.enums.PonderKeybinds;
 import com.zurrtum.create.client.ponder.foundation.registration.PonderLocalization;
 import com.zurrtum.create.client.ponder.foundation.ui.PonderUI;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.font.TextRenderer;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.util.InputUtil;
-import net.minecraft.item.ItemStack;
-import net.minecraft.text.MutableText;
-import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
+import net.minecraft.ChatFormatting;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.world.item.ItemStack;
 
 public class PonderTooltipHandler {
 
@@ -52,8 +51,8 @@ public class PonderTooltipHandler {
 
     public static void deferredTick() {
         deferTick = false;
-        MinecraftClient instance = MinecraftClient.getInstance();
-        Screen currentScreen = instance.currentScreen;
+        Minecraft instance = Minecraft.getInstance();
+        Screen currentScreen = instance.screen;
 
         if (hoveredStack.isEmpty() || trackingStack.isEmpty()) {
             trackingStack = ItemStack.EMPTY;
@@ -63,9 +62,9 @@ public class PonderTooltipHandler {
 
         float value = holdKeyProgress.getValue();
 
-        if (RenderSystem.isOnRenderThread() && !subject && !PonderKeybinds.PONDER.isUnbound() && InputUtil.isKeyPressed(
+        if (RenderSystem.isOnRenderThread() && !subject && !PonderKeybinds.PONDER.isUnbound() && InputConstants.isKeyDown(
             instance.getWindow(),
-            PonderKeybinds.PONDER.boundKey.getCode()
+            PonderKeybinds.PONDER.key.getValue()
         ) && currentScreen != null) {
             if (value >= 1) {
                 if (currentScreen instanceof NavigatableSimiScreen)
@@ -81,14 +80,14 @@ public class PonderTooltipHandler {
         hoveredStack = ItemStack.EMPTY;
     }
 
-    public static void addToTooltip(List<Text> toolTip, ItemStack stack) {
+    public static void addToTooltip(List<Component> toolTip, ItemStack stack) {
         if (!enable)
             return;
 
         if (NavigatableSimiScreen.isCurrentlyRenderingPreviousScreen())
             return;
 
-        MinecraftClient mc = MinecraftClient.getInstance();
+        Minecraft mc = Minecraft.getInstance();
         updateHovered(mc, stack);
 
         if (deferTick)
@@ -98,8 +97,8 @@ public class PonderTooltipHandler {
             return;
 
         // TODO - Checkover
-        float renderPartialTicks = AnimationTickHolder.getPartialTicksUI(mc.getRenderTickCounter());
-        Text component = subject ? Ponder.lang().translate(SUBJECT).component().formatted(Formatting.GREEN) : makeProgressBar(Math.min(
+        float renderPartialTicks = AnimationTickHolder.getPartialTicksUI(mc.getDeltaTracker());
+        Component component = subject ? Ponder.lang().translate(SUBJECT).component().withStyle(ChatFormatting.GREEN) : makeProgressBar(Math.min(
             1,
             holdKeyProgress.getValue(renderPartialTicks) * 8 / 7f
         ));
@@ -109,8 +108,8 @@ public class PonderTooltipHandler {
             toolTip.add(1, component);
     }
 
-    protected static void updateHovered(MinecraftClient instance, ItemStack stack) {
-        Screen currentScreen = instance.currentScreen;
+    protected static void updateHovered(Minecraft instance, ItemStack stack) {
+        Screen currentScreen = instance.screen;
         boolean inPonderUI = currentScreen instanceof PonderUI;
 
         ItemStack prevStack = trackingStack;
@@ -120,7 +119,7 @@ public class PonderTooltipHandler {
         if (inPonderUI) {
             PonderUI ponderUI = (PonderUI) currentScreen;
             ItemStack uiSubject = ponderUI.getSubject();
-            if (!uiSubject.isEmpty() && stack.isOf(uiSubject.getItem()))
+            if (!uiSubject.isEmpty() && stack.is(uiSubject.getItem()))
                 subject = true;
         }
 
@@ -129,7 +128,7 @@ public class PonderTooltipHandler {
         if (!PonderIndex.getSceneAccess().doScenesExistForId(RegisteredObjectsHelper.getKeyOrThrow(stack.getItem())))
             return;
 
-        if (prevStack.isEmpty() || !prevStack.isOf(stack.getItem()))
+        if (prevStack.isEmpty() || !prevStack.is(stack.getItem()))
             holdKeyProgress.startWithValue(0);
 
         hoveredStack = stack;
@@ -147,7 +146,7 @@ public class PonderTooltipHandler {
             return Optional.empty();
 
         // TODO - Checkover
-        float renderPartialTicks = AnimationTickHolder.getPartialTicksUI(MinecraftClient.getInstance().getRenderTickCounter());
+        float renderPartialTicks = AnimationTickHolder.getPartialTicksUI(Minecraft.getInstance().getDeltaTracker());
 
         Color startC;
         Color endC;
@@ -166,24 +165,24 @@ public class PonderTooltipHandler {
         return borderB.mixWith(borderC, (progress - .5f) * 2);
     }
 
-    private static Text makeProgressBar(float progress) {
-        MutableText holdW = Ponder.lang()
-            .translate(HOLD_TO_PONDER, PonderKeybinds.PONDER.getBoundKeyLocalizedText().copy().formatted(Formatting.GRAY)).style(Formatting.DARK_GRAY)
+    private static Component makeProgressBar(float progress) {
+        MutableComponent holdW = Ponder.lang()
+            .translate(HOLD_TO_PONDER, PonderKeybinds.PONDER.getTranslatedKeyMessage().copy().withStyle(ChatFormatting.GRAY)).style(ChatFormatting.DARK_GRAY)
             .component();
 
         if (progress > 0) {
-            TextRenderer fontRenderer = MinecraftClient.getInstance().textRenderer;
-            float charWidth = fontRenderer.getWidth("|");
-            float tipWidth = fontRenderer.getWidth(holdW);
+            Font fontRenderer = Minecraft.getInstance().font;
+            float charWidth = fontRenderer.width("|");
+            float tipWidth = fontRenderer.width(holdW);
 
             int total = (int) (tipWidth / charWidth);
             int current = (int) (progress * total);
 
             String bars = "";
-            bars += Formatting.GRAY + Strings.repeat("|", current);
+            bars += ChatFormatting.GRAY + Strings.repeat("|", current);
             if (progress < 1)
-                bars += Formatting.DARK_GRAY + Strings.repeat("|", total - current);
-            return Text.literal(bars);
+                bars += ChatFormatting.DARK_GRAY + Strings.repeat("|", total - current);
+            return Component.literal(bars);
         }
 
         return holdW;

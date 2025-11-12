@@ -2,17 +2,16 @@ package com.zurrtum.create.client.flywheel.backend.compile;
 
 import com.mojang.serialization.Codec;
 import com.zurrtum.create.client.flywheel.backend.compile.core.Compilation;
-import net.minecraft.util.StringIdentifiable;
-
 import java.util.Locale;
+import net.minecraft.util.StringRepresentable;
 
-public enum LightSmoothness implements StringIdentifiable {
+public enum LightSmoothness implements StringRepresentable {
     FLAT(0, false),
     TRI_LINEAR(1, false),
     SMOOTH(2, false),
     SMOOTH_INNER_FACE_CORRECTED(2, true);
 
-    public static final Codec<LightSmoothness> CODEC = StringIdentifiable.createCodec(LightSmoothness::values);
+    public static final Codec<LightSmoothness> CODEC = StringRepresentable.fromEnum(LightSmoothness::values);
 
     private final int smoothnessDefine;
     private final boolean innerFaceCorrection;
@@ -30,7 +29,7 @@ public enum LightSmoothness implements StringIdentifiable {
     }
 
     @Override
-    public String asString() {
+    public String getSerializedName() {
         return name().toLowerCase(Locale.ROOT);
     }
 }

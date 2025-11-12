@@ -6,11 +6,11 @@ import com.mojang.serialization.DynamicOps;
 import com.zurrtum.create.AllRecipeSerializers;
 import com.zurrtum.create.AllRecipeTypes;
 import com.zurrtum.create.foundation.recipe.IngredientText;
-import net.minecraft.item.ItemStack;
-import net.minecraft.recipe.Ingredient;
-import net.minecraft.recipe.RecipeSerializer;
-import net.minecraft.recipe.RecipeType;
-import net.minecraft.text.Text;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.item.crafting.RecipeSerializer;
+import net.minecraft.world.item.crafting.RecipeType;
 
 public record DeployerApplicationRecipe(
     ItemStack result, boolean keepHeldItem, Ingredient target, Ingredient ingredient
@@ -25,9 +25,9 @@ public record DeployerApplicationRecipe(
         return AllRecipeTypes.DEPLOYING;
     }
 
-    public static Text getDescriptionForAssembly(DynamicOps<JsonElement> ops, JsonObject object) {
+    public static Component getDescriptionForAssembly(DynamicOps<JsonElement> ops, JsonObject object) {
         return Ingredient.CODEC.parse(ops, object.get("ingredient")).result()
-            .map(ingredient -> Text.translatable("create.recipe.assembly.deploying_item", new IngredientText(ingredient)))
-            .orElseGet(() -> Text.literal("Invalid"));
+            .map(ingredient -> Component.translatable("create.recipe.assembly.deploying_item", new IngredientText(ingredient)))
+            .orElseGet(() -> Component.literal("Invalid"));
     }
 }

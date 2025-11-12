@@ -1,13 +1,12 @@
 package com.zurrtum.create.catnip.math;
 
-import net.minecraft.util.StringIdentifiable;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Direction.Axis;
-import net.minecraft.util.math.Direction.AxisDirection;
-
 import java.util.Locale;
+import net.minecraft.core.Direction;
+import net.minecraft.core.Direction.Axis;
+import net.minecraft.core.Direction.AxisDirection;
+import net.minecraft.util.StringRepresentable;
 
-public enum Pointing implements StringIdentifiable {
+public enum Pointing implements StringRepresentable {
     UP(0),
     LEFT(270),
     DOWN(180),
@@ -20,7 +19,7 @@ public enum Pointing implements StringIdentifiable {
     }
 
     @Override
-    public String asString() {
+    public String getSerializedName() {
         return name().toLowerCase(Locale.ROOT);
     }
 
@@ -31,9 +30,9 @@ public enum Pointing implements StringIdentifiable {
     public Direction getCombinedDirection(Direction direction) {
         Axis axis = direction.getAxis();
         Direction top = axis == Axis.Y ? Direction.SOUTH : Direction.UP;
-        int rotations = direction.getDirection() == AxisDirection.NEGATIVE ? 4 - ordinal() : ordinal();
+        int rotations = direction.getAxisDirection() == AxisDirection.NEGATIVE ? 4 - ordinal() : ordinal();
         for (int i = 0; i < rotations; i++)
-            top = top.rotateClockwise(axis);
+            top = top.getClockWise(axis);
         return top;
     }
 

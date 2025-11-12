@@ -9,11 +9,11 @@ import com.zurrtum.create.client.foundation.utility.CreateLang;
 import com.zurrtum.create.content.kinetics.crank.ValveHandleBlockEntity;
 import com.zurrtum.create.foundation.blockEntity.behaviour.ValueSettings;
 import com.zurrtum.create.foundation.blockEntity.behaviour.scrollValue.ServerScrollValueBehaviour;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.text.MutableText;
-import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
-import net.minecraft.util.hit.BlockHitResult;
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.phys.BlockHitResult;
 
 public class ValveHandleScrollValueBehaviour extends ScrollValueBehaviour<ValveHandleBlockEntity, ServerScrollValueBehaviour> {
 
@@ -24,15 +24,15 @@ public class ValveHandleScrollValueBehaviour extends ScrollValueBehaviour<ValveH
     }
 
     @Override
-    public ValueSettingsBoard createBoard(PlayerEntity player, BlockHitResult hitResult) {
-        ImmutableList<Text> rows = ImmutableList.of(
-            Text.literal("\u27f3").formatted(Formatting.BOLD),
-            Text.literal("\u27f2").formatted(Formatting.BOLD)
+    public ValueSettingsBoard createBoard(Player player, BlockHitResult hitResult) {
+        ImmutableList<Component> rows = ImmutableList.of(
+            Component.literal("\u27f3").withStyle(ChatFormatting.BOLD),
+            Component.literal("\u27f2").withStyle(ChatFormatting.BOLD)
         );
         return new ValueSettingsBoard(label, 180, 45, rows, new ValueSettingsFormatter(this::formatValue));
     }
 
-    public MutableText formatValue(ValueSettings settings) {
+    public MutableComponent formatValue(ValueSettings settings) {
         return CreateLang.number(Math.max(1, Math.abs(settings.value()))).add(CreateLang.translateDirect("generic.unit.degrees")).component();
     }
 }

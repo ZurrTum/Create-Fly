@@ -2,18 +2,18 @@ package com.zurrtum.create.infrastructure.packet.s2c;
 
 import com.zurrtum.create.AllClientHandle;
 import com.zurrtum.create.AllPackets;
-import net.minecraft.item.ItemStack;
-import net.minecraft.network.RegistryByteBuf;
-import net.minecraft.network.codec.PacketCodec;
-import net.minecraft.network.packet.PacketType;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.PacketType;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.phys.Vec3;
 import org.apache.logging.log4j.util.TriConsumer;
 
-public record PackageDestroyPacket(Vec3d location, ItemStack box) implements S2CPacket {
-    public static final PacketCodec<RegistryByteBuf, PackageDestroyPacket> CODEC = PacketCodec.tuple(
-        Vec3d.PACKET_CODEC,
+public record PackageDestroyPacket(Vec3 location, ItemStack box) implements S2CPacket {
+    public static final StreamCodec<RegistryFriendlyByteBuf, PackageDestroyPacket> CODEC = StreamCodec.composite(
+        Vec3.STREAM_CODEC,
         PackageDestroyPacket::location,
-        ItemStack.PACKET_CODEC,
+        ItemStack.STREAM_CODEC,
         PackageDestroyPacket::box,
         PackageDestroyPacket::new
     );
@@ -29,7 +29,7 @@ public record PackageDestroyPacket(Vec3d location, ItemStack box) implements S2C
     }
 
     @Override
-    public PacketType<PackageDestroyPacket> getPacketType() {
+    public PacketType<PackageDestroyPacket> type() {
         return AllPackets.PACKAGE_DESTROYED;
     }
 }

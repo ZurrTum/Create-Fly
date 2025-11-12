@@ -3,78 +3,78 @@ package com.zurrtum.create.content.contraptions.mounted;
 import com.zurrtum.create.AllBlocks;
 import com.zurrtum.create.content.redstone.rail.ControllerRailBlock;
 import com.zurrtum.create.foundation.advancement.AdvancementBehaviour;
-import net.minecraft.block.AbstractRailBlock;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.enums.RailShape;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.BlockItem;
-import net.minecraft.item.ItemUsageContext;
-import net.minecraft.sound.SoundCategory;
-import net.minecraft.sound.SoundEvents;
-import net.minecraft.text.Text;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Direction.AxisDirection;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.Direction.AxisDirection;
+import net.minecraft.network.chat.Component;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.context.UseOnContext;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.BaseRailBlock;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.RailShape;
 import org.jetbrains.annotations.NotNull;
 
 public class CartAssemblerBlockItem extends BlockItem {
 
-    public CartAssemblerBlockItem(Block block, Settings properties) {
+    public CartAssemblerBlockItem(Block block, Properties properties) {
         super(block, properties);
     }
 
     @NotNull
     @Override
-    public ActionResult useOnBlock(ItemUsageContext context) {
+    public InteractionResult useOn(UseOnContext context) {
         if (tryPlaceAssembler(context)) {
-            context.getWorld().playSound(null, context.getBlockPos(), SoundEvents.BLOCK_STONE_PLACE, SoundCategory.BLOCKS, 1, 1);
-            return ActionResult.SUCCESS;
+            context.getLevel().playSound(null, context.getClickedPos(), SoundEvents.STONE_PLACE, SoundSource.BLOCKS, 1, 1);
+            return InteractionResult.SUCCESS;
         }
-        return super.useOnBlock(context);
+        return super.useOn(context);
     }
 
-    public boolean tryPlaceAssembler(ItemUsageContext context) {
-        BlockPos pos = context.getBlockPos();
-        World world = context.getWorld();
+    public boolean tryPlaceAssembler(UseOnContext context) {
+        BlockPos pos = context.getClickedPos();
+        Level world = context.getLevel();
         BlockState state = world.getBlockState(pos);
         Block block = state.getBlock();
-        PlayerEntity player = context.getPlayer();
+        Player player = context.getPlayer();
 
         if (player == null)
             return false;
-        if (!(block instanceof AbstractRailBlock abstractRailBlock)) {
-            player.sendMessage(Text.translatable("create.block.cart_assembler.invalid"), true);
+        if (!(block instanceof BaseRailBlock abstractRailBlock)) {
+            player.displayClientMessage(Component.translatable("create.block.cart_assembler.invalid"), true);
             return false;
         }
 
-        RailShape shape = state.get(abstractRailBlock.getShapeProperty());
+        RailShape shape = state.getValue(abstractRailBlock.getShapeProperty());
         if (shape != RailShape.EAST_WEST && shape != RailShape.NORTH_SOUTH)
             return false;
 
-        BlockState newState = AllBlocks.CART_ASSEMBLER.getDefaultState().with(CartAssemblerBlock.RAIL_SHAPE, shape);
+        BlockState newState = AllBlocks.CART_ASSEMBLER.defaultBlockState().setValue(CartAssemblerBlock.RAIL_SHAPE, shape);
         CartAssembleRailType newType = null;
         for (CartAssembleRailType type : CartAssembleRailType.values())
             if (type.matches(state))
                 newType = type;
         if (newType == null)
             return false;
-        if (world.isClient())
+        if (world.isClientSide())
             return true;
 
-        newState = newState.with(CartAssemblerBlock.RAIL_TYPE, newType);
-        if (state.contains(ControllerRailBlock.BACKWARDS))
-            newState = newState.with(CartAssemblerBlock.BACKWARDS, state.get(ControllerRailBlock.BACKWARDS));
+        newState = newState.setValue(CartAssemblerBlock.RAIL_TYPE, newType);
+        if (state.hasProperty(ControllerRailBlock.BACKWARDS))
+            newState = newState.setValue(CartAssemblerBlock.BACKWARDS, state.getValue(ControllerRailBlock.BACKWARDS));
         else {
-            Direction direction = player.getMovementDirection();
-            newState = newState.with(CartAssemblerBlock.BACKWARDS, direction.getDirection() == AxisDirection.POSITIVE);
+            Direction direction = player.getMotionDirection();
+            newState = newState.setValue(CartAssemblerBlock.BACKWARDS, direction.getAxisDirection() == AxisDirection.POSITIVE);
         }
 
-        world.setBlockState(pos, newState);
+        world.setBlockAndUpdate(pos, newState);
         if (!player.isCreative())
-            context.getStack().decrement(1);
+            context.getItemInHand().shrink(1);
 
         AdvancementBehaviour.setPlacedBy(world, pos, player);
         return true;

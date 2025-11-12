@@ -2,38 +2,37 @@ package com.zurrtum.create.content.trains.bogey;
 
 import com.zurrtum.create.AllBogeyStyles;
 import com.zurrtum.create.AllSoundEvents;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.particle.ParticleEffect;
-import net.minecraft.particle.ParticleTypes;
-import net.minecraft.sound.SoundEvent;
-import net.minecraft.text.Text;
-import net.minecraft.util.Identifier;
-
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
+import net.minecraft.core.particles.ParticleOptions;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.sounds.SoundEvent;
 
 public class BogeyStyle {
-    public final Identifier id;
-    public final Identifier cycleGroup;
-    public final Text displayName;
+    public final ResourceLocation id;
+    public final ResourceLocation cycleGroup;
+    public final Component displayName;
     public final Supplier<SoundEvent> soundEvent;
-    public final ParticleEffect contactParticle;
-    public final ParticleEffect smokeParticle;
-    public final NbtCompound defaultData;
+    public final ParticleOptions contactParticle;
+    public final ParticleOptions smokeParticle;
+    public final CompoundTag defaultData;
     private final Map<BogeySize, AbstractBogeyBlock<?>> sizes;
 
     public BogeyStyle(
-        Identifier id,
-        Identifier cycleGroup,
-        Text displayName,
+        ResourceLocation id,
+        ResourceLocation cycleGroup,
+        Component displayName,
         Supplier<SoundEvent> soundEvent,
-        ParticleEffect contactParticle,
-        ParticleEffect smokeParticle,
-        NbtCompound defaultData,
+        ParticleOptions contactParticle,
+        ParticleOptions smokeParticle,
+        CompoundTag defaultData,
         Map<BogeySize, AbstractBogeyBlock<?>> sizes
     ) {
         this.id = id;
@@ -46,7 +45,7 @@ public class BogeyStyle {
         this.sizes = sizes;
     }
 
-    public Map<Identifier, BogeyStyle> getCycleGroup() {
+    public Map<ResourceLocation, BogeyStyle> getCycleGroup() {
         return AllBogeyStyles.getCycleGroup(cycleGroup);
     }
 
@@ -65,22 +64,22 @@ public class BogeyStyle {
     }
 
     public static class Builder {
-        protected final Identifier id;
-        protected final Identifier cycleGroup;
+        protected final ResourceLocation id;
+        protected final ResourceLocation cycleGroup;
         protected final Map<BogeySize, AbstractBogeyBlock<?>> sizes = new LinkedHashMap<>();
 
-        protected Text displayName = Text.translatable("create.bogey.style.invalid");
+        protected Component displayName = Component.translatable("create.bogey.style.invalid");
         protected Supplier<SoundEvent> soundEvent = AllSoundEvents.TRAIN2::getMainEvent;
-        protected ParticleEffect contactParticle = ParticleTypes.CRIT;
-        protected ParticleEffect smokeParticle = ParticleTypes.POOF;
-        protected NbtCompound defaultData = new NbtCompound();
+        protected ParticleOptions contactParticle = ParticleTypes.CRIT;
+        protected ParticleOptions smokeParticle = ParticleTypes.POOF;
+        protected CompoundTag defaultData = new CompoundTag();
 
-        public Builder(Identifier id, Identifier cycleGroup) {
+        public Builder(ResourceLocation id, ResourceLocation cycleGroup) {
             this.id = id;
             this.cycleGroup = cycleGroup;
         }
 
-        public Builder displayName(Text displayName) {
+        public Builder displayName(Component displayName) {
             this.displayName = displayName;
             return this;
         }
@@ -90,17 +89,17 @@ public class BogeyStyle {
             return this;
         }
 
-        public Builder contactParticle(ParticleEffect contactParticle) {
+        public Builder contactParticle(ParticleOptions contactParticle) {
             this.contactParticle = contactParticle;
             return this;
         }
 
-        public Builder smokeParticle(ParticleEffect smokeParticle) {
+        public Builder smokeParticle(ParticleOptions smokeParticle) {
             this.smokeParticle = smokeParticle;
             return this;
         }
 
-        public Builder defaultData(NbtCompound defaultData) {
+        public Builder defaultData(CompoundTag defaultData) {
             this.defaultData = defaultData;
             return this;
         }

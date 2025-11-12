@@ -3,10 +3,9 @@ package com.zurrtum.create.foundation.blockEntity.behaviour.simple;
 import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
 import com.zurrtum.create.foundation.blockEntity.behaviour.BehaviourType;
 import com.zurrtum.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
-import net.minecraft.storage.ReadView;
-import net.minecraft.storage.WriteView;
-
 import java.util.function.Supplier;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 
 public class DeferralBehaviour extends BlockEntityBehaviour {
 
@@ -26,14 +25,14 @@ public class DeferralBehaviour extends BlockEntityBehaviour {
     }
 
     @Override
-    public void write(WriteView view, boolean clientPacket) {
+    public void write(ValueOutput view, boolean clientPacket) {
         view.putBoolean("NeedsUpdate", needsUpdate);
         super.write(view, clientPacket);
     }
 
     @Override
-    public void read(ReadView view, boolean clientPacket) {
-        needsUpdate = view.getBoolean("NeedsUpdate", false);
+    public void read(ValueInput view, boolean clientPacket) {
+        needsUpdate = view.getBooleanOr("NeedsUpdate", false);
         super.read(view, clientPacket);
     }
 

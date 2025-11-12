@@ -7,14 +7,13 @@ import com.zurrtum.create.AllRecipeSerializers;
 import com.zurrtum.create.AllRecipeTypes;
 import com.zurrtum.create.content.kinetics.crusher.AbstractCrushingRecipe;
 import com.zurrtum.create.content.processing.recipe.ChanceOutput;
-import net.minecraft.network.RegistryByteBuf;
-import net.minecraft.network.codec.PacketCodec;
-import net.minecraft.network.codec.PacketCodecs;
-import net.minecraft.recipe.Ingredient;
-import net.minecraft.recipe.RecipeSerializer;
-import net.minecraft.recipe.RecipeType;
-
 import java.util.List;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.item.crafting.RecipeSerializer;
+import net.minecraft.world.item.crafting.RecipeType;
 
 public record MillingRecipe(int time, List<ChanceOutput> results, Ingredient ingredient) implements AbstractCrushingRecipe {
     @Override
@@ -34,12 +33,12 @@ public record MillingRecipe(int time, List<ChanceOutput> results, Ingredient ing
             Ingredient.CODEC.fieldOf("ingredient").forGetter(MillingRecipe::ingredient)
         ).apply(instance, MillingRecipe::new));
 
-        public static final PacketCodec<RegistryByteBuf, MillingRecipe> PACKET_CODEC = PacketCodec.tuple(
-            PacketCodecs.INTEGER,
+        public static final StreamCodec<RegistryFriendlyByteBuf, MillingRecipe> PACKET_CODEC = StreamCodec.composite(
+            ByteBufCodecs.INT,
             MillingRecipe::time,
-            ChanceOutput.PACKET_CODEC.collect(PacketCodecs.toList()),
+            ChanceOutput.PACKET_CODEC.apply(ByteBufCodecs.list()),
             MillingRecipe::results,
-            Ingredient.PACKET_CODEC,
+            Ingredient.CONTENTS_STREAM_CODEC,
             MillingRecipe::ingredient,
             MillingRecipe::new
         );
@@ -50,7 +49,7 @@ public record MillingRecipe(int time, List<ChanceOutput> results, Ingredient ing
         }
 
         @Override
-        public PacketCodec<RegistryByteBuf, MillingRecipe> packetCodec() {
+        public StreamCodec<RegistryFriendlyByteBuf, MillingRecipe> streamCodec() {
             return PACKET_CODEC;
         }
     }

@@ -84,7 +84,7 @@ public class KineticNetwork {
         be.updateFromNetwork(0, 0, 0);
 
         if (members.isEmpty()) {
-            TorquePropagator.networks.get(be.getWorld()).remove(this.id);
+            TorquePropagator.networks.get(be.getLevel()).remove(this.id);
             return;
         }
 
@@ -130,7 +130,7 @@ public class KineticNetwork {
         float presentCapacity = 0;
         for (Iterator<KineticBlockEntity> iterator = sources.keySet().iterator(); iterator.hasNext(); ) {
             KineticBlockEntity be = iterator.next();
-            if (be.getWorld().getBlockEntity(be.getPos()) != be) {
+            if (be.getLevel().getBlockEntity(be.getBlockPos()) != be) {
                 iterator.remove();
                 continue;
             }
@@ -144,7 +144,7 @@ public class KineticNetwork {
         float presentStress = 0;
         for (Iterator<KineticBlockEntity> iterator = members.keySet().iterator(); iterator.hasNext(); ) {
             KineticBlockEntity be = iterator.next();
-            if (be.getWorld().getBlockEntity(be.getPos()) != be) {
+            if (be.getLevel().getBlockEntity(be.getBlockPos()) != be) {
                 iterator.remove();
                 continue;
             }

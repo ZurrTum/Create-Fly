@@ -12,42 +12,41 @@ import me.shedaniel.rei.api.common.display.Display;
 import me.shedaniel.rei.api.common.display.DisplaySerializer;
 import me.shedaniel.rei.api.common.entry.EntryIngredient;
 import me.shedaniel.rei.api.common.util.EntryIngredients;
-import net.minecraft.network.codec.PacketCodec;
-import net.minecraft.network.codec.PacketCodecs;
-import net.minecraft.recipe.Recipe;
-import net.minecraft.recipe.RecipeEntry;
-import net.minecraft.util.Identifier;
-
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.crafting.Recipe;
+import net.minecraft.world.item.crafting.RecipeHolder;
 import java.util.List;
 import java.util.Optional;
 
 public record DeployingDisplay(
-    EntryIngredient input, EntryIngredient target, EntryIngredient output, Optional<Identifier> location
+    EntryIngredient input, EntryIngredient target, EntryIngredient output, Optional<ResourceLocation> location
 ) implements Display {
     public static final DisplaySerializer<DeployingDisplay> SERIALIZER = DisplaySerializer.of(
         RecordCodecBuilder.mapCodec(instance -> instance.group(
             EntryIngredient.codec().fieldOf("input").forGetter(DeployingDisplay::input),
             EntryIngredient.codec().fieldOf("target").forGetter(DeployingDisplay::target),
             EntryIngredient.codec().fieldOf("output").forGetter(DeployingDisplay::output),
-            Identifier.CODEC.optionalFieldOf("location").forGetter(DeployingDisplay::location)
-        ).apply(instance, DeployingDisplay::new)), PacketCodec.tuple(
+            ResourceLocation.CODEC.optionalFieldOf("location").forGetter(DeployingDisplay::location)
+        ).apply(instance, DeployingDisplay::new)), StreamCodec.composite(
             EntryIngredient.streamCodec(),
             DeployingDisplay::input,
             EntryIngredient.streamCodec(),
             DeployingDisplay::target,
             EntryIngredient.streamCodec(),
             DeployingDisplay::output,
-            PacketCodecs.optional(Identifier.PACKET_CODEC),
+            ByteBufCodecs.optional(ResourceLocation.STREAM_CODEC),
             DeployingDisplay::location,
             DeployingDisplay::new
         )
     );
 
-    public static DeployingDisplay of(RecipeEntry<?> entry) {
+    public static DeployingDisplay of(RecipeHolder<?> entry) {
         if (!AllRecipeTypes.CAN_BE_AUTOMATED.test(entry)) {
             return null;
         }
-        Identifier id = entry.id().getValue();
+        ResourceLocation id = entry.id().location();
         Recipe<?> recipe = entry.value();
         if (recipe instanceof ItemApplicationRecipe itemApplicationRecipe) {
             return new DeployingDisplay(id, itemApplicationRecipe);
@@ -57,7 +56,7 @@ public record DeployingDisplay(
         return null;
     }
 
-    public DeployingDisplay(Identifier id, ItemApplicationRecipe recipe) {
+    public DeployingDisplay(ResourceLocation id, ItemApplicationRecipe recipe) {
         this(
             EntryIngredients.ofIngredient(recipe.ingredient()),
             IngredientHelper.getInputEntryIngredient(recipe.target()),
@@ -66,7 +65,7 @@ public record DeployingDisplay(
         );
     }
 
-    public DeployingDisplay(Identifier id, SandPaperPolishingRecipe recipe) {
+    public DeployingDisplay(ResourceLocation id, SandPaperPolishingRecipe recipe) {
         this(
             EntryIngredients.ofItemTag(AllItemTags.SANDPAPER),
             EntryIngredients.ofIngredient(recipe.ingredient()),
@@ -91,7 +90,7 @@ public record DeployingDisplay(
     }
 
     @Override
-    public Optional<Identifier> getDisplayLocation() {
+    public Optional<ResourceLocation> getDisplayLocation() {
         return location;
     }
 

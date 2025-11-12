@@ -11,27 +11,26 @@ import com.zurrtum.create.content.kinetics.belt.BeltSlope;
 import com.zurrtum.create.content.kinetics.belt.item.BeltConnectorItem;
 import com.zurrtum.create.content.kinetics.simpleRelays.AbstractSimpleShaftBlock;
 import com.zurrtum.create.foundation.utility.BlockHelper;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.SpawnReason;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.registry.RegistryEntryLookup;
-import net.minecraft.storage.NbtReadView;
-import net.minecraft.storage.ReadView;
-import net.minecraft.storage.WriteView;
-import net.minecraft.util.ErrorReporter;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction.Axis;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.world.World;
-
 import java.util.Arrays;
 import java.util.Optional;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction.Axis;
+import net.minecraft.core.HolderGetter;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.Mth;
+import net.minecraft.util.ProblemReporter;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntitySpawnReason;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.storage.TagValueInput;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 
 public abstract class LaunchedItem {
 
@@ -45,7 +44,7 @@ public abstract class LaunchedItem {
     }
 
     private static int ticksForDistance(BlockPos start, BlockPos target) {
-        return (int) (Math.max(10, Math.sqrt(Math.sqrt(target.getSquaredDistance(start))) * 4f));
+        return (int) (Math.max(10, Math.sqrt(Math.sqrt(target.distSqr(start))) * 4f));
     }
 
     LaunchedItem() {
@@ -58,28 +57,28 @@ public abstract class LaunchedItem {
         this.ticksRemaining = ticksLeft;
     }
 
-    public boolean update(World world) {
+    public boolean update(Level world) {
         if (ticksRemaining > 0) {
             ticksRemaining--;
             return false;
         }
-        if (world.isClient())
+        if (world.isClientSide())
             return false;
 
         place(world);
         return true;
     }
 
-    public void write(WriteView view) {
+    public void write(ValueOutput view) {
         view.putInt("TotalTicks", totalTicks);
         view.putInt("TicksLeft", ticksRemaining);
         if (!stack.isEmpty()) {
-            view.put("Stack", ItemStack.CODEC, stack);
+            view.store("Stack", ItemStack.CODEC, stack);
         }
-        view.put("Target", BlockPos.CODEC, target);
+        view.store("Target", BlockPos.CODEC, target);
     }
 
-    public static LaunchedItem from(ReadView view, RegistryEntryLookup<Block> holderGetter) {
+    public static LaunchedItem from(ValueInput view, HolderGetter<Block> holderGetter) {
         LaunchedItem item = ForBelt.from(view, holderGetter);
         if (item != null) {
             return item;
@@ -93,42 +92,42 @@ public abstract class LaunchedItem {
         return item;
     }
 
-    abstract void place(World world);
+    abstract void place(Level world);
 
-    void read(ReadView view, RegistryEntryLookup<Block> holderGetter) {
-        target = view.read("Target", BlockPos.CODEC).orElse(BlockPos.ORIGIN);
-        ticksRemaining = view.getInt("TicksLeft", 0);
-        totalTicks = view.getInt("TotalTicks", 0);
+    void read(ValueInput view, HolderGetter<Block> holderGetter) {
+        target = view.read("Target", BlockPos.CODEC).orElse(BlockPos.ZERO);
+        ticksRemaining = view.getIntOr("TicksLeft", 0);
+        totalTicks = view.getIntOr("TotalTicks", 0);
         stack = view.read("Stack", ItemStack.CODEC).orElse(ItemStack.EMPTY);
     }
 
     public static class ForBlockState extends LaunchedItem {
         public BlockState state;
-        public NbtCompound data;
+        public CompoundTag data;
 
         ForBlockState() {
         }
 
-        public ForBlockState(BlockPos start, BlockPos target, ItemStack stack, BlockState state, NbtCompound data) {
+        public ForBlockState(BlockPos start, BlockPos target, ItemStack stack, BlockState state, CompoundTag data) {
             super(start, target, stack);
             this.state = state;
             this.data = data;
         }
 
         @Override
-        public void write(WriteView view) {
+        public void write(ValueOutput view) {
             super.write(view);
-            view.put("BlockState", BlockState.CODEC, state);
+            view.store("BlockState", BlockState.CODEC, state);
             if (data != null) {
                 data.remove("x");
                 data.remove("y");
                 data.remove("z");
                 data.remove("id");
-                view.put("Data", NbtCompound.CODEC, data);
+                view.store("Data", CompoundTag.CODEC, data);
             }
         }
 
-        public static LaunchedItem from(ReadView view, RegistryEntryLookup<Block> holderGetter) {
+        public static LaunchedItem from(ValueInput view, HolderGetter<Block> holderGetter) {
             return view.read("BlockState", BlockState.CODEC).map(state -> {
                 ForBlockState result = new ForBlockState();
                 result.read(view, holderGetter, state);
@@ -137,18 +136,18 @@ public abstract class LaunchedItem {
         }
 
         @Override
-        void read(ReadView view, RegistryEntryLookup<Block> holderGetter) {
-            read(view, holderGetter, view.read("BlockState", BlockState.CODEC).orElseGet(Blocks.AIR::getDefaultState));
+        void read(ValueInput view, HolderGetter<Block> holderGetter) {
+            read(view, holderGetter, view.read("BlockState", BlockState.CODEC).orElseGet(Blocks.AIR::defaultBlockState));
         }
 
-        private void read(ReadView view, RegistryEntryLookup<Block> holderGetter, BlockState state) {
+        private void read(ValueInput view, HolderGetter<Block> holderGetter, BlockState state) {
             super.read(view, holderGetter);
             this.state = state;
-            view.read("Data", NbtCompound.CODEC).ifPresent(nbt -> data = nbt);
+            view.read("Data", CompoundTag.CODEC).ifPresent(nbt -> data = nbt);
         }
 
         @Override
-        void place(World world) {
+        void place(Level world) {
             BlockHelper.placeSchematicBlock(world, state, target, stack, data);
         }
 
@@ -162,13 +161,13 @@ public abstract class LaunchedItem {
         }
 
         @Override
-        public void write(WriteView view) {
+        public void write(ValueOutput view) {
             super.write(view);
-            view.put("Length", Codec.INT, length);
+            view.store("Length", Codec.INT, length);
             view.putIntArray("Casing", Arrays.stream(casings).mapToInt(CasingType::ordinal).toArray());
         }
 
-        public static LaunchedItem from(ReadView view, RegistryEntryLookup<Block> holderGetter) {
+        public static LaunchedItem from(ValueInput view, HolderGetter<Block> holderGetter) {
             return view.read("Length", Codec.INT).map(length -> {
                 ForBelt result = new ForBelt();
                 result.read(view, holderGetter, length);
@@ -177,16 +176,16 @@ public abstract class LaunchedItem {
         }
 
         @Override
-        void read(ReadView view, RegistryEntryLookup<Block> holderGetter) {
+        void read(ValueInput view, HolderGetter<Block> holderGetter) {
             read(view, holderGetter, view.read("Length", Codec.INT).orElse(0));
         }
 
-        private void read(ReadView view, RegistryEntryLookup<Block> holderGetter, int length) {
+        private void read(ValueInput view, HolderGetter<Block> holderGetter, int length) {
             this.length = length;
-            int[] intArray = view.getOptionalIntArray("Casing").orElseGet(() -> new int[0]);
+            int[] intArray = view.getIntArray("Casing").orElseGet(() -> new int[0]);
             casings = new CasingType[length];
             for (int i = 0; i < casings.length; i++)
-                casings[i] = i >= intArray.length ? CasingType.NONE : CasingType.values()[MathHelper.clamp(
+                casings[i] = i >= intArray.length ? CasingType.NONE : CasingType.values()[Mth.clamp(
                     intArray[i],
                     0,
                     CasingType.values().length - 1
@@ -201,19 +200,19 @@ public abstract class LaunchedItem {
         }
 
         @Override
-        void place(World world) {
-            boolean isStart = state.get(BeltBlock.PART) == BeltPart.START;
-            BlockPos offset = BeltBlock.nextSegmentPosition(state, BlockPos.ORIGIN, isStart);
+        void place(Level world) {
+            boolean isStart = state.getValue(BeltBlock.PART) == BeltPart.START;
+            BlockPos offset = BeltBlock.nextSegmentPosition(state, BlockPos.ZERO, isStart);
             int i = length - 1;
-            Axis axis = state.get(BeltBlock.SLOPE) == BeltSlope.SIDEWAYS ? Axis.Y : state.get(BeltBlock.HORIZONTAL_FACING).rotateYClockwise()
+            Axis axis = state.getValue(BeltBlock.SLOPE) == BeltSlope.SIDEWAYS ? Axis.Y : state.getValue(BeltBlock.HORIZONTAL_FACING).getClockWise()
                 .getAxis();
-            world.setBlockState(target, AllBlocks.SHAFT.getDefaultState().with(AbstractSimpleShaftBlock.AXIS, axis));
-            BeltConnectorItem.createBelts(world, target, target.add(offset.getX() * i, offset.getY() * i, offset.getZ() * i));
+            world.setBlockAndUpdate(target, AllBlocks.SHAFT.defaultBlockState().setValue(AbstractSimpleShaftBlock.AXIS, axis));
+            BeltConnectorItem.createBelts(world, target, target.offset(offset.getX() * i, offset.getY() * i, offset.getZ() * i));
 
             for (int segment = 0; segment < length; segment++) {
                 if (casings[segment] == CasingType.NONE)
                     continue;
-                BlockPos casingTarget = target.add(offset.getX() * segment, offset.getY() * segment, offset.getZ() * segment);
+                BlockPos casingTarget = target.offset(offset.getX() * segment, offset.getY() * segment, offset.getZ() * segment);
                 if (world.getBlockEntity(casingTarget) instanceof BeltBlockEntity bbe)
                     bbe.setCasingType(casings[segment]);
             }
@@ -223,7 +222,7 @@ public abstract class LaunchedItem {
 
     public static class ForEntity extends LaunchedItem {
         public Entity entity;
-        private NbtCompound deferredTag;
+        private CompoundTag deferredTag;
 
         ForEntity() {
         }
@@ -234,12 +233,12 @@ public abstract class LaunchedItem {
         }
 
         @Override
-        public boolean update(World world) {
+        public boolean update(Level world) {
             if (deferredTag != null && entity == null) {
                 try {
-                    try (ErrorReporter.Logging logging = new ErrorReporter.Logging(() -> "LaunchedItem.ForEntity", Create.LOGGER)) {
-                        ReadView view = NbtReadView.create(logging, world.getRegistryManager(), deferredTag);
-                        Optional<Entity> loadEntityUnchecked = EntityType.getEntityFromData(view, world, SpawnReason.LOAD);
+                    try (ProblemReporter.ScopedCollector logging = new ProblemReporter.ScopedCollector(() -> "LaunchedItem.ForEntity", Create.LOGGER)) {
+                        ValueInput view = TagValueInput.create(logging, world.registryAccess(), deferredTag);
+                        Optional<Entity> loadEntityUnchecked = EntityType.create(view, world, EntitySpawnReason.LOAD);
                         if (loadEntityUnchecked.isEmpty())
                             return true;
                         entity = loadEntityUnchecked.get();
@@ -253,29 +252,29 @@ public abstract class LaunchedItem {
         }
 
         @Override
-        public void write(WriteView view) {
+        public void write(ValueOutput view) {
             super.write(view);
             if (entity != null) {
-                WriteView data = view.get("Entity");
+                ValueOutput data = view.child("Entity");
                 EntityType<?> entityType = entity.getType();
-                Identifier id = EntityType.getId(entityType);
-                if (id != null && entityType.isSaveable()) {
+                ResourceLocation id = EntityType.getKey(entityType);
+                if (id != null && entityType.canSerialize()) {
                     data.putString("id", id.toString());
                 }
-                entity.writeData(data);
+                entity.saveWithoutId(data);
             }
         }
 
         @Override
-        void read(ReadView view, RegistryEntryLookup<Block> holderGetter) {
+        void read(ValueInput view, HolderGetter<Block> holderGetter) {
             super.read(view, holderGetter);
-            view.read("Entity", NbtCompound.CODEC).ifPresent(nbt -> deferredTag = nbt);
+            view.read("Entity", CompoundTag.CODEC).ifPresent(nbt -> deferredTag = nbt);
         }
 
         @Override
-        void place(World world) {
+        void place(Level world) {
             if (entity != null)
-                world.spawnEntity(entity);
+                world.addFreshEntity(entity);
         }
 
     }

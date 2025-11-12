@@ -2,21 +2,21 @@ package com.zurrtum.create.api.registry;
 
 import com.zurrtum.create.impl.registry.SimpleRegistryImpl;
 import com.zurrtum.create.impl.registry.TagProviderImpl;
-import net.minecraft.block.Block;
-import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.entity.EntityType;
-import net.minecraft.fluid.Fluid;
-import net.minecraft.item.Item;
-import net.minecraft.registry.entry.RegistryEntry;
-import net.minecraft.registry.tag.TagKey;
-import net.minecraft.state.State;
-import net.minecraft.world.World;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.function.Function;
+import net.minecraft.core.Holder;
+import net.minecraft.tags.TagKey;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.StateHolder;
+import net.minecraft.world.level.material.Fluid;
 
 /**
  * A simple registry mapping between objects with identity semantics.
@@ -51,7 +51,7 @@ public interface SimpleRegistry<K, V> {
      */
     void invalidate();
 
-    default @Nullable V get(K object, World world) {
+    default @Nullable V get(K object, Level world) {
         return get(object);
     }
 
@@ -63,7 +63,7 @@ public interface SimpleRegistry<K, V> {
     /**
      * Shortcut for {@link #get(Object)} that accepts a StateHolder, such as BlockState or FluidState.
      */
-    @Nullable V get(State<K, ?> state);
+    @Nullable V get(StateHolder<K, ?> state);
 
     /**
      * A provider can provide values to the registry in a lazy fashion. When a key does not have an
@@ -78,7 +78,7 @@ public interface SimpleRegistry<K, V> {
          * Create a provider that will return the same value for all entries in a tag.
          * The Provider will invalidate itself when tags are reloaded.
          */
-        static <K, V> Provider<K, V> forTag(TagKey<K> tag, Function<K, RegistryEntry<K>> holderGetter, V value) {
+        static <K, V> Provider<K, V> forTag(TagKey<K> tag, Function<K, Holder<K>> holderGetter, V value) {
             return new TagProviderImpl<>(tag, holderGetter, value);
         }
 
@@ -87,7 +87,7 @@ public interface SimpleRegistry<K, V> {
          */
         @SuppressWarnings("deprecation")
         static <V> Provider<Block, V> forBlockTag(TagKey<Block> tag, V value) {
-            return new TagProviderImpl<>(tag, Block::getRegistryEntry, value);
+            return new TagProviderImpl<>(tag, Block::builtInRegistryHolder, value);
         }
 
         // factory methods for common Providers
@@ -104,7 +104,7 @@ public interface SimpleRegistry<K, V> {
          */
         @SuppressWarnings("deprecation")
         static <V> Provider<Item, V> forItemTag(TagKey<Item> tag, V value) {
-            return new TagProviderImpl<>(tag, Item::getRegistryEntry, value);
+            return new TagProviderImpl<>(tag, Item::builtInRegistryHolder, value);
         }
 
         /**
@@ -112,7 +112,7 @@ public interface SimpleRegistry<K, V> {
          */
         @SuppressWarnings("deprecation")
         static <V> Provider<EntityType<?>, V> forEntityTag(TagKey<EntityType<?>> tag, V value) {
-            return new TagProviderImpl<>(tag, EntityType::getRegistryEntry, value);
+            return new TagProviderImpl<>(tag, EntityType::builtInRegistryHolder, value);
         }
 
         /**
@@ -120,10 +120,10 @@ public interface SimpleRegistry<K, V> {
          */
         @SuppressWarnings("deprecation")
         static <V> Provider<Fluid, V> forFluidTag(TagKey<Fluid> tag, V value) {
-            return new TagProviderImpl<>(tag, Fluid::getRegistryEntry, value);
+            return new TagProviderImpl<>(tag, Fluid::builtInRegistryHolder, value);
         }
 
-        default @Nullable V get(K object, World world) {
+        default @Nullable V get(K object, Level world) {
             return get(object);
         }
 
@@ -163,12 +163,12 @@ public interface SimpleRegistry<K, V> {
         @NotNull List<V> get(K object);
 
         @Override
-        @NotNull List<V> get(K object, World world);
+        @NotNull List<V> get(K object, Level world);
 
         /**
          * Never returns null, will return an empty list if no registrations are present
          */
         @Override
-        @NotNull List<V> get(State<K, ?> state);
+        @NotNull List<V> get(StateHolder<K, ?> state);
     }
 }

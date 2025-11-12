@@ -3,24 +3,24 @@ package com.zurrtum.create.content.equipment.bell;
 import com.zurrtum.create.AllBlockEntityTypes;
 import com.zurrtum.create.AllBlocks;
 import com.zurrtum.create.AllSoundEvents;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.item.ItemPlacementContext;
-import net.minecraft.particle.ParticleTypes;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.math.random.Random;
-import net.minecraft.world.World;
-import net.minecraft.world.WorldAccess;
-import net.minecraft.world.WorldView;
-import net.minecraft.world.tick.ScheduledTickView;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.LevelReader;
+import net.minecraft.world.level.ScheduledTickAccess;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.Vec3;
 
 public class PeculiarBellBlock extends AbstractBellBlock<PeculiarBellBlockEntity> {
 
-    public PeculiarBellBlock(Settings properties) {
+    public PeculiarBellBlock(Properties properties) {
         super(properties);
     }
 
@@ -35,66 +35,66 @@ public class PeculiarBellBlock extends AbstractBellBlock<PeculiarBellBlockEntity
     }
 
     @Override
-    public void playSound(World world, BlockPos pos) {
+    public void playSound(Level world, BlockPos pos) {
         AllSoundEvents.PECULIAR_BELL_USE.playOnServer(world, pos, 2f, 0.94f);
     }
 
     @Override
-    public BlockState getPlacementState(ItemPlacementContext ctx) {
-        BlockState newState = super.getPlacementState(ctx);
+    public BlockState getStateForPlacement(BlockPlaceContext ctx) {
+        BlockState newState = super.getStateForPlacement(ctx);
         if (newState == null)
             return null;
 
-        World world = ctx.getWorld();
-        BlockPos pos = ctx.getBlockPos();
-        return tryConvert(world, pos, newState, world.getBlockState(pos.offset(Direction.DOWN)));
+        Level world = ctx.getLevel();
+        BlockPos pos = ctx.getClickedPos();
+        return tryConvert(world, pos, newState, world.getBlockState(pos.relative(Direction.DOWN)));
     }
 
     @Override
-    public BlockState getStateForNeighborUpdate(
+    public BlockState updateShape(
         BlockState state,
-        WorldView world,
-        ScheduledTickView tickView,
+        LevelReader world,
+        ScheduledTickAccess tickView,
         BlockPos currentPos,
         Direction facing,
         BlockPos facingPos,
         BlockState facingState,
-        Random random
+        RandomSource random
     ) {
-        BlockState newState = super.getStateForNeighborUpdate(state, world, tickView, currentPos, facing, facingPos, facingState, random);
+        BlockState newState = super.updateShape(state, world, tickView, currentPos, facing, facingPos, facingState, random);
         if (facing != Direction.DOWN)
             return newState;
 
-        return tryConvert((WorldAccess) world, currentPos, newState, facingState);
+        return tryConvert((LevelAccessor) world, currentPos, newState, facingState);
     }
 
-    protected BlockState tryConvert(WorldAccess world, BlockPos pos, BlockState state, BlockState underState) {
-        if (!state.isOf(AllBlocks.PECULIAR_BELL))
+    protected BlockState tryConvert(LevelAccessor world, BlockPos pos, BlockState state, BlockState underState) {
+        if (!state.is(AllBlocks.PECULIAR_BELL))
             return state;
 
         Block underBlock = underState.getBlock();
         if (!(Blocks.SOUL_FIRE.equals(underBlock) || Blocks.SOUL_CAMPFIRE.equals(underBlock)))
             return state;
 
-        if (world.isClient()) {
+        if (world.isClientSide()) {
             spawnConversionParticles(world, pos);
-        } else if (world instanceof World worldIn) {
+        } else if (world instanceof Level worldIn) {
             AllSoundEvents.HAUNTED_BELL_CONVERT.playOnServer(worldIn, pos);
         }
 
-        return AllBlocks.HAUNTED_BELL.getDefaultState().with(HauntedBellBlock.FACING, state.get(FACING))
-            .with(HauntedBellBlock.ATTACHMENT, state.get(ATTACHMENT)).with(HauntedBellBlock.POWERED, state.get(POWERED));
+        return AllBlocks.HAUNTED_BELL.defaultBlockState().setValue(HauntedBellBlock.FACING, state.getValue(FACING))
+            .setValue(HauntedBellBlock.ATTACHMENT, state.getValue(ATTACHMENT)).setValue(HauntedBellBlock.POWERED, state.getValue(POWERED));
     }
 
-    public void spawnConversionParticles(WorldAccess world, BlockPos blockPos) {
-        Random random = world.getRandom();
+    public void spawnConversionParticles(LevelAccessor world, BlockPos blockPos) {
+        RandomSource random = world.getRandom();
         int num = random.nextInt(10) + 15;
         for (int i = 0; i < num; i++) {
             float pitch = random.nextFloat() * 120 - 90;
             float yaw = random.nextFloat() * 360;
-            Vec3d vel = Vec3d.fromPolar(pitch, yaw).multiply(random.nextDouble() * 0.1 + 0.1);
-            Vec3d pos = Vec3d.ofCenter(blockPos);
-            world.addParticleClient(ParticleTypes.SOUL_FIRE_FLAME, pos.x, pos.y, pos.z, vel.x, vel.y, vel.z);
+            Vec3 vel = Vec3.directionFromRotation(pitch, yaw).scale(random.nextDouble() * 0.1 + 0.1);
+            Vec3 pos = Vec3.atCenterOf(blockPos);
+            world.addParticle(ParticleTypes.SOUL_FIRE_FLAME, pos.x, pos.y, pos.z, vel.x, vel.y, vel.z);
         }
     }
 

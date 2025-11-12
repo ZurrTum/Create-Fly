@@ -4,19 +4,19 @@ import com.zurrtum.create.api.contraption.storage.item.MountedItemStorage;
 import com.zurrtum.create.api.registry.SimpleRegistry;
 import com.zurrtum.create.content.contraptions.behaviour.MovementContext;
 import com.zurrtum.create.impl.contraption.dispenser.DispenserBehaviorConverter;
-import net.minecraft.block.DispenserBlock;
-import net.minecraft.block.dispenser.DispenserBehavior;
-import net.minecraft.inventory.Inventory;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.Util;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.Util;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.dispenser.DispenseItemBehavior;
+import net.minecraft.world.Container;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.DispenserBlock;
+import net.minecraft.world.phys.Vec3;
 
 /**
- * A parallel to {@link DispenserBehavior}, for use by mounted dispensers.
- * Create will attempt to wrap existing {@link DispenserBehavior}s, but this interface can be used to provide better or fixed behavior.
+ * A parallel to {@link DispenseItemBehavior}, for use by mounted dispensers.
+ * Create will attempt to wrap existing {@link DispenseItemBehavior}s, but this interface can be used to provide better or fixed behavior.
  *
  * @see DefaultMountedDispenseBehavior
  * @see MountedProjectileDispenseBehavior
@@ -42,14 +42,14 @@ public interface MountedDispenseBehavior {
 
     // utilities for implementations
 
-    static Vec3d getDispenserNormal(MovementContext ctx) {
-        Direction facing = ctx.state.get(DispenserBlock.FACING);
-        Vec3d normal = Vec3d.of(facing.getVector());
+    static Vec3 getDispenserNormal(MovementContext ctx) {
+        Direction facing = ctx.state.getValue(DispenserBlock.FACING);
+        Vec3 normal = Vec3.atLowerCornerOf(facing.getUnitVec3i());
         return ctx.rotation.apply(normal).normalize();
     }
 
-    static Direction getClosestFacingDirection(Vec3d facing) {
-        return Direction.getFacing(facing.x, facing.y, facing.z);
+    static Direction getClosestFacingDirection(Vec3 facing) {
+        return Direction.getApproximateNearest(facing.x, facing.y, facing.z);
     }
 
     /**
@@ -83,7 +83,7 @@ public interface MountedDispenseBehavior {
             }
         }
         // next, try the whole contraption inventory
-        Inventory contraption = context.contraption.getStorage().getAllItems();
+        Container contraption = context.contraption.getStorage().getAllItems();
         insert = contraption.insert(toInsert);
         if (insert == count) {
             return;

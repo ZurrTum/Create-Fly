@@ -4,15 +4,15 @@ import com.zurrtum.create.AllMenuTypes;
 import com.zurrtum.create.AllSoundEvents;
 import com.zurrtum.create.foundation.gui.menu.GhostItemMenu;
 import com.zurrtum.create.infrastructure.items.ItemStackHandler;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.screen.slot.Slot;
-import net.minecraft.sound.SoundCategory;
-import net.minecraft.sound.SoundEvents;
-import net.minecraft.text.Text;
+import net.minecraft.network.chat.Component;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.inventory.Slot;
 
 public class FactoryPanelSetItemMenu extends GhostItemMenu<ServerFactoryPanelBehaviour> {
 
-    public FactoryPanelSetItemMenu(int id, PlayerInventory inv, ServerFactoryPanelBehaviour contentHolder) {
+    public FactoryPanelSetItemMenu(int id, Inventory inv, ServerFactoryPanelBehaviour contentHolder) {
         super(AllMenuTypes.FACTORY_PANEL_SET_ITEM, id, inv, contentHolder);
     }
 
@@ -39,12 +39,12 @@ public class FactoryPanelSetItemMenu extends GhostItemMenu<ServerFactoryPanelBeh
 
     @Override
     protected void saveData(ServerFactoryPanelBehaviour contentHolder) {
-        if (!contentHolder.setFilter(ghostInventory.getStack(0))) {
-            player.sendMessage(Text.translatable("create.logistics.filter.invalid_item"), true);
-            AllSoundEvents.DENY.playOnServer(player.getEntityWorld(), player.getBlockPos(), 1, 1);
+        if (!contentHolder.setFilter(ghostInventory.getItem(0))) {
+            player.displayClientMessage(Component.translatable("create.logistics.filter.invalid_item"), true);
+            AllSoundEvents.DENY.playOnServer(player.level(), player.blockPosition(), 1, 1);
             return;
         }
-        player.getEntityWorld().playSound(null, contentHolder.getPos(), SoundEvents.ENTITY_ITEM_FRAME_ADD_ITEM, SoundCategory.BLOCKS, .25f, .1f);
+        player.level().playSound(null, contentHolder.getPos(), SoundEvents.ITEM_FRAME_ADD_ITEM, SoundSource.BLOCKS, .25f, .1f);
     }
 
 }

@@ -3,104 +3,104 @@ package com.zurrtum.create.content.redstone.diodes;
 import com.mojang.serialization.MapCodec;
 import com.zurrtum.create.AllItems;
 import com.zurrtum.create.foundation.block.RedStoneConnectBlock;
-import net.minecraft.block.AbstractRedstoneGateBlock;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.sound.SoundCategory;
-import net.minecraft.sound.SoundEvents;
-import net.minecraft.state.StateManager;
-import net.minecraft.state.property.BooleanProperty;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.Hand;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.random.Random;
-import net.minecraft.world.BlockView;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.DiodeBlock;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.BooleanProperty;
+import net.minecraft.world.phys.BlockHitResult;
 import org.jetbrains.annotations.NotNull;
 
 public class ToggleLatchBlock extends AbstractDiodeBlock implements RedStoneConnectBlock {
 
-    public static BooleanProperty POWERING = BooleanProperty.of("powering");
+    public static BooleanProperty POWERING = BooleanProperty.create("powering");
 
-    public static final MapCodec<ToggleLatchBlock> CODEC = createCodec(ToggleLatchBlock::new);
+    public static final MapCodec<ToggleLatchBlock> CODEC = simpleCodec(ToggleLatchBlock::new);
 
-    public ToggleLatchBlock(Settings properties) {
+    public ToggleLatchBlock(Properties properties) {
         super(properties);
-        setDefaultState(getDefaultState().with(POWERING, false).with(POWERED, false));
+        registerDefaultState(defaultBlockState().setValue(POWERING, false).setValue(POWERED, false));
     }
 
     @Override
-    protected @NotNull MapCodec<? extends AbstractRedstoneGateBlock> getCodec() {
+    protected @NotNull MapCodec<? extends DiodeBlock> codec() {
         return CODEC;
     }
 
     @Override
-    protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
+    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         builder.add(POWERED, POWERING, FACING);
     }
 
     @Override
-    public int getWeakRedstonePower(BlockState blockState, BlockView blockAccess, BlockPos pos, Direction side) {
-        return blockState.get(FACING) == side ? getOutputLevel(blockAccess, pos, blockState) : 0;
+    public int getSignal(BlockState blockState, BlockGetter blockAccess, BlockPos pos, Direction side) {
+        return blockState.getValue(FACING) == side ? getOutputSignal(blockAccess, pos, blockState) : 0;
     }
 
     @Override
-    protected int getUpdateDelayInternal(BlockState state) {
+    protected int getDelay(BlockState state) {
         return 1;
     }
 
     @Override
-    protected ActionResult onUseWithItem(
+    protected InteractionResult useItemOn(
         ItemStack stack,
         BlockState state,
-        World level,
+        Level level,
         BlockPos pos,
-        PlayerEntity player,
-        Hand hand,
+        Player player,
+        InteractionHand hand,
         BlockHitResult hitResult
     ) {
-        if (!player.canModifyBlocks())
-            return ActionResult.PASS_TO_DEFAULT_BLOCK_ACTION;
-        if (player.isSneaking())
-            return ActionResult.PASS_TO_DEFAULT_BLOCK_ACTION;
-        if (stack.isOf(AllItems.WRENCH))
-            return ActionResult.PASS_TO_DEFAULT_BLOCK_ACTION;
+        if (!player.mayBuild())
+            return InteractionResult.TRY_WITH_EMPTY_HAND;
+        if (player.isShiftKeyDown())
+            return InteractionResult.TRY_WITH_EMPTY_HAND;
+        if (stack.is(AllItems.WRENCH))
+            return InteractionResult.TRY_WITH_EMPTY_HAND;
         return activated(level, pos, state);
     }
 
     @Override
-    protected int getOutputLevel(BlockView worldIn, BlockPos pos, BlockState state) {
-        return state.get(POWERING) ? 15 : 0;
+    protected int getOutputSignal(BlockGetter worldIn, BlockPos pos, BlockState state) {
+        return state.getValue(POWERING) ? 15 : 0;
     }
 
     @Override
-    public void scheduledTick(BlockState state, ServerWorld worldIn, BlockPos pos, Random random) {
-        boolean poweredPreviously = state.get(POWERED);
-        super.scheduledTick(state, worldIn, pos, random);
+    public void tick(BlockState state, ServerLevel worldIn, BlockPos pos, RandomSource random) {
+        boolean poweredPreviously = state.getValue(POWERED);
+        super.tick(state, worldIn, pos, random);
         BlockState newState = worldIn.getBlockState(pos);
-        if (newState.get(POWERED) && !poweredPreviously)
-            worldIn.setBlockState(pos, newState.cycle(POWERING), Block.NOTIFY_LISTENERS);
+        if (newState.getValue(POWERED) && !poweredPreviously)
+            worldIn.setBlock(pos, newState.cycle(POWERING), Block.UPDATE_CLIENTS);
     }
 
-    protected ActionResult activated(World worldIn, BlockPos pos, BlockState state) {
-        if (!worldIn.isClient()) {
-            float f = !state.get(POWERING) ? 0.6F : 0.5F;
-            worldIn.playSound(null, pos, SoundEvents.BLOCK_LEVER_CLICK, SoundCategory.BLOCKS, 0.3F, f);
-            worldIn.setBlockState(pos, state.cycle(POWERING), Block.NOTIFY_LISTENERS);
+    protected InteractionResult activated(Level worldIn, BlockPos pos, BlockState state) {
+        if (!worldIn.isClientSide()) {
+            float f = !state.getValue(POWERING) ? 0.6F : 0.5F;
+            worldIn.playSound(null, pos, SoundEvents.LEVER_CLICK, SoundSource.BLOCKS, 0.3F, f);
+            worldIn.setBlock(pos, state.cycle(POWERING), Block.UPDATE_CLIENTS);
         }
-        return ActionResult.SUCCESS;
+        return InteractionResult.SUCCESS;
     }
 
     @Override
     public boolean canConnectRedstone(BlockState state, Direction side) {
         if (side == null)
             return false;
-        return side.getAxis() == state.get(FACING).getAxis();
+        return side.getAxis() == state.getValue(FACING).getAxis();
     }
 
 }

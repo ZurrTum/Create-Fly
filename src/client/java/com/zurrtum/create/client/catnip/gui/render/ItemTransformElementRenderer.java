@@ -1,31 +1,31 @@
 package com.zurrtum.create.client.catnip.gui.render;
 
-import com.mojang.blaze3d.systems.ProjectionType;
+import com.mojang.blaze3d.ProjectionType;
+import com.mojang.blaze3d.platform.Lighting;
 import com.mojang.blaze3d.systems.RenderSystem;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gl.RenderPipelines;
-import net.minecraft.client.gui.render.SpecialGuiElementRenderer;
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.math.Axis;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.render.TextureSetup;
+import net.minecraft.client.gui.render.pip.PictureInPictureRenderer;
+import net.minecraft.client.gui.render.state.BlitRenderState;
 import net.minecraft.client.gui.render.state.GuiRenderState;
-import net.minecraft.client.gui.render.state.TexturedQuadGuiElementRenderState;
-import net.minecraft.client.render.DiffuseLighting;
-import net.minecraft.client.render.LightmapTextureManager;
-import net.minecraft.client.render.OverlayTexture;
-import net.minecraft.client.render.VertexConsumerProvider;
-import net.minecraft.client.render.command.OrderedRenderCommandQueueImpl;
-import net.minecraft.client.render.command.RenderDispatcher;
-import net.minecraft.client.texture.TextureSetup;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.util.math.RotationAxis;
+import net.minecraft.client.renderer.LightTexture;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.RenderPipelines;
+import net.minecraft.client.renderer.SubmitNodeStorage;
+import net.minecraft.client.renderer.feature.FeatureRenderDispatcher;
+import net.minecraft.client.renderer.texture.OverlayTexture;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public class ItemTransformElementRenderer extends SpecialGuiElementRenderer<ItemTransformRenderState> {
+public class ItemTransformElementRenderer extends PictureInPictureRenderer<ItemTransformRenderState> {
     private static final Map<Object, GpuTexture> TEXTURES = new HashMap<>();
-    private final MatrixStack matrices = new MatrixStack();
+    private final PoseStack matrices = new PoseStack();
     private int windowScaleFactor;
 
-    public ItemTransformElementRenderer(VertexConsumerProvider.Immediate vertexConsumers) {
+    public ItemTransformElementRenderer(MultiBufferSource.BufferSource vertexConsumers) {
         super(vertexConsumers);
     }
 
@@ -37,13 +37,13 @@ public class ItemTransformElementRenderer extends SpecialGuiElementRenderer<Item
     }
 
     @Override
-    public void render(ItemTransformRenderState item, GuiRenderState state, int windowScaleFactor) {
+    public void prepare(ItemTransformRenderState item, GuiRenderState state, int windowScaleFactor) {
         if (this.windowScaleFactor != windowScaleFactor) {
             this.windowScaleFactor = windowScaleFactor;
             TEXTURES.values().forEach(GpuTexture::close);
             TEXTURES.clear();
         }
-        float size = item.size() * windowScaleFactor;
+        float size = item.scale() * windowScaleFactor;
         Object key = item.getKey();
         GpuTexture texture = TEXTURES.get(key);
         boolean draw;
@@ -55,67 +55,67 @@ public class ItemTransformElementRenderer extends SpecialGuiElementRenderer<Item
             draw = item.state().isAnimated();
         }
         if (draw) {
-            RenderSystem.setProjectionMatrix(projectionMatrix.set(size, size), ProjectionType.ORTHOGRAPHIC);
+            RenderSystem.setProjectionMatrix(projectionMatrixBuffer.getBuffer(size, size), ProjectionType.ORTHOGRAPHIC);
             texture.prepare();
-            matrices.push();
+            matrices.pushPose();
             matrices.translate(size / 2, size / 2, 0);
             if (item.padding() != 0) {
                 size -= item.padding() * windowScaleFactor;
             }
             matrices.scale(size, -size, size);
             if (item.zRot() != 0) {
-                matrices.multiply(RotationAxis.POSITIVE_Z.rotation(item.zRot()));
+                matrices.mulPose(Axis.ZP.rotation(item.zRot()));
             }
             if (item.xRot() != 0) {
-                matrices.multiply(RotationAxis.POSITIVE_X.rotation(item.xRot()));
+                matrices.mulPose(Axis.XP.rotation(item.xRot()));
             }
             if (item.yRot() != 0) {
-                matrices.multiply(RotationAxis.POSITIVE_Y.rotation(item.yRot()));
+                matrices.mulPose(Axis.YP.rotation(item.yRot()));
             }
-            boolean blockLight = item.state().isSideLit();
-            DiffuseLighting lighting = MinecraftClient.getInstance().gameRenderer.getDiffuseLighting();
+            boolean blockLight = item.state().usesBlockLight();
+            Lighting lighting = Minecraft.getInstance().gameRenderer.getLighting();
             if (blockLight) {
-                lighting.setShaderLights(DiffuseLighting.Type.ITEMS_3D);
+                lighting.setupFor(Lighting.Entry.ITEMS_3D);
             } else {
-                lighting.setShaderLights(DiffuseLighting.Type.ITEMS_FLAT);
+                lighting.setupFor(Lighting.Entry.ITEMS_FLAT);
             }
-            RenderDispatcher renderDispatcher = MinecraftClient.getInstance().gameRenderer.getEntityRenderDispatcher();
-            OrderedRenderCommandQueueImpl queue = renderDispatcher.getQueue();
-            item.state().render(matrices, queue, LightmapTextureManager.MAX_LIGHT_COORDINATE, OverlayTexture.DEFAULT_UV, 0);
-            renderDispatcher.render();
-            vertexConsumers.draw();
-            matrices.pop();
+            FeatureRenderDispatcher renderDispatcher = Minecraft.getInstance().gameRenderer.getFeatureRenderDispatcher();
+            SubmitNodeStorage queue = renderDispatcher.getSubmitNodeStorage();
+            item.state().submit(matrices, queue, LightTexture.FULL_BRIGHT, OverlayTexture.NO_OVERLAY, 0);
+            renderDispatcher.renderAllFeatures();
+            bufferSource.endBatch();
+            matrices.popPose();
             texture.clear();
         }
-        state.addSimpleElementToCurrentLayer(new TexturedQuadGuiElementRenderState(
+        state.submitBlitToCurrentLayer(new BlitRenderState(
             RenderPipelines.GUI_TEXTURED_PREMULTIPLIED_ALPHA,
-            TextureSetup.withoutGlTexture(texture.textureView()),
+            TextureSetup.singleTexture(texture.textureView()),
             item.pose(),
+            item.x0(),
+            item.y0(),
             item.x1(),
             item.y1(),
-            item.x2(),
-            item.y2(),
             0.0F,
             1.0F,
             1.0F,
             0.0F,
             -1,
-            item.scissor(),
+            item.scissorArea(),
             null
         ));
     }
 
     @Override
-    protected void render(ItemTransformRenderState item, MatrixStack matrices) {
+    protected void renderToTexture(ItemTransformRenderState item, PoseStack matrices) {
     }
 
     @Override
-    protected String getName() {
+    protected String getTextureLabel() {
         return "Item Transform";
     }
 
     @Override
-    public Class<ItemTransformRenderState> getElementClass() {
+    public Class<ItemTransformRenderState> getRenderStateClass() {
         return ItemTransformRenderState.class;
     }
 }

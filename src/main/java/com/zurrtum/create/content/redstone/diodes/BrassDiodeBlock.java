@@ -6,82 +6,82 @@ import com.zurrtum.create.AllBlocks;
 import com.zurrtum.create.AllItems;
 import com.zurrtum.create.foundation.block.IBE;
 import com.zurrtum.create.foundation.block.RedStoneConnectBlock;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.sound.SoundCategory;
-import net.minecraft.sound.SoundEvents;
-import net.minecraft.state.StateManager;
-import net.minecraft.state.property.BooleanProperty;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.Hand;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.world.BlockView;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.BooleanProperty;
+import net.minecraft.world.phys.BlockHitResult;
 import org.jetbrains.annotations.NotNull;
 
 public class BrassDiodeBlock extends AbstractDiodeBlock implements IBE<BrassDiodeBlockEntity>, RedStoneConnectBlock {
 
-    public static final BooleanProperty POWERING = BooleanProperty.of("powering");
-    public static final BooleanProperty INVERTED = BooleanProperty.of("inverted");
+    public static final BooleanProperty POWERING = BooleanProperty.create("powering");
+    public static final BooleanProperty INVERTED = BooleanProperty.create("inverted");
 
-    public static final MapCodec<BrassDiodeBlock> CODEC = createCodec(BrassDiodeBlock::new);
+    public static final MapCodec<BrassDiodeBlock> CODEC = simpleCodec(BrassDiodeBlock::new);
 
-    public BrassDiodeBlock(Settings properties) {
+    public BrassDiodeBlock(Properties properties) {
         super(properties);
-        setDefaultState(getDefaultState().with(POWERED, false).with(POWERING, false).with(INVERTED, false));
+        registerDefaultState(defaultBlockState().setValue(POWERED, false).setValue(POWERING, false).setValue(INVERTED, false));
     }
 
     @Override
-    protected ActionResult onUseWithItem(
+    protected InteractionResult useItemOn(
         ItemStack stack,
         BlockState state,
-        World level,
+        Level level,
         BlockPos pos,
-        PlayerEntity player,
-        Hand hand,
+        Player player,
+        InteractionHand hand,
         BlockHitResult hitResult
     ) {
         return toggle(level, pos, state, player, hand);
     }
 
-    public ActionResult toggle(World pLevel, BlockPos pPos, BlockState pState, PlayerEntity player, Hand pHand) {
-        if (!player.canModifyBlocks())
-            return ActionResult.PASS_TO_DEFAULT_BLOCK_ACTION;
-        if (player.isSneaking())
-            return ActionResult.PASS_TO_DEFAULT_BLOCK_ACTION;
-        if (player.getStackInHand(pHand).isOf(AllItems.WRENCH))
-            return ActionResult.PASS_TO_DEFAULT_BLOCK_ACTION;
-        if (pLevel.isClient())
-            return ActionResult.SUCCESS;
-        pLevel.setBlockState(pPos, pState.cycle(INVERTED), Block.NOTIFY_ALL);
-        float f = !pState.get(INVERTED) ? 0.6F : 0.5F;
-        pLevel.playSound(null, pPos, SoundEvents.BLOCK_LEVER_CLICK, SoundCategory.BLOCKS, 0.3F, f);
-        return ActionResult.SUCCESS;
+    public InteractionResult toggle(Level pLevel, BlockPos pPos, BlockState pState, Player player, InteractionHand pHand) {
+        if (!player.mayBuild())
+            return InteractionResult.TRY_WITH_EMPTY_HAND;
+        if (player.isShiftKeyDown())
+            return InteractionResult.TRY_WITH_EMPTY_HAND;
+        if (player.getItemInHand(pHand).is(AllItems.WRENCH))
+            return InteractionResult.TRY_WITH_EMPTY_HAND;
+        if (pLevel.isClientSide())
+            return InteractionResult.SUCCESS;
+        pLevel.setBlock(pPos, pState.cycle(INVERTED), Block.UPDATE_ALL);
+        float f = !pState.getValue(INVERTED) ? 0.6F : 0.5F;
+        pLevel.playSound(null, pPos, SoundEvents.LEVER_CLICK, SoundSource.BLOCKS, 0.3F, f);
+        return InteractionResult.SUCCESS;
     }
 
     @Override
-    protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
+    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         builder.add(POWERED, POWERING, FACING, INVERTED);
-        super.appendProperties(builder);
+        super.createBlockStateDefinition(builder);
     }
 
     @Override
-    protected int getOutputLevel(BlockView worldIn, BlockPos pos, BlockState state) {
-        return state.get(POWERING) ^ state.get(INVERTED) ? 15 : 0;
+    protected int getOutputSignal(BlockGetter worldIn, BlockPos pos, BlockState state) {
+        return state.getValue(POWERING) ^ state.getValue(INVERTED) ? 15 : 0;
     }
 
     @Override
-    public int getWeakRedstonePower(BlockState blockState, BlockView blockAccess, BlockPos pos, Direction side) {
-        return blockState.get(FACING) == side ? this.getOutputLevel(blockAccess, pos, blockState) : 0;
+    public int getSignal(BlockState blockState, BlockGetter blockAccess, BlockPos pos, Direction side) {
+        return blockState.getValue(FACING) == side ? this.getOutputSignal(blockAccess, pos, blockState) : 0;
     }
 
     @Override
-    protected int getUpdateDelayInternal(BlockState state) {
+    protected int getDelay(BlockState state) {
         return 2;
     }
 
@@ -89,7 +89,7 @@ public class BrassDiodeBlock extends AbstractDiodeBlock implements IBE<BrassDiod
     public boolean canConnectRedstone(BlockState state, Direction side) {
         if (side == null)
             return false;
-        return side.getAxis() == state.get(FACING).getAxis();
+        return side.getAxis() == state.getValue(FACING).getAxis();
     }
 
     @Override
@@ -103,7 +103,7 @@ public class BrassDiodeBlock extends AbstractDiodeBlock implements IBE<BrassDiod
     }
 
     @Override
-    protected @NotNull MapCodec<? extends AbstractDiodeBlock> getCodec() {
+    protected @NotNull MapCodec<? extends AbstractDiodeBlock> codec() {
         return CODEC;
     }
 }

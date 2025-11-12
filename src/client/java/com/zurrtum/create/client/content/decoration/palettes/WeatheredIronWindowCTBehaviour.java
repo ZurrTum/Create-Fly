@@ -5,17 +5,17 @@ import com.zurrtum.create.client.foundation.block.connected.AllCTTypes;
 import com.zurrtum.create.client.foundation.block.connected.CTSpriteShiftEntry;
 import com.zurrtum.create.client.foundation.block.connected.CTType;
 import com.zurrtum.create.client.foundation.block.connected.ConnectedTextureBehaviour;
-import net.minecraft.block.BlockState;
-import net.minecraft.client.texture.Sprite;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Direction.Axis;
-import net.minecraft.util.math.random.Random;
-import net.minecraft.world.BlockRenderView;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.Direction.Axis;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.level.BlockAndTintGetter;
+import net.minecraft.world.level.block.state.BlockState;
 
 public class WeatheredIronWindowCTBehaviour extends ConnectedTextureBehaviour.Base {
 
@@ -31,7 +31,7 @@ public class WeatheredIronWindowCTBehaviour extends ConnectedTextureBehaviour.Ba
     }
 
     @Override
-    public @Nullable CTSpriteShiftEntry getShift(BlockState state, Random rand, Direction direction, @NotNull Sprite sprite) {
+    public @Nullable CTSpriteShiftEntry getShift(BlockState state, RandomSource rand, Direction direction, @NotNull TextureAtlasSprite sprite) {
         if (direction.getAxis() == Axis.Y || sprite == null)
             return null;
         CTSpriteShiftEntry entry = shifts.get(rand.nextInt(shifts.size()));
@@ -41,12 +41,12 @@ public class WeatheredIronWindowCTBehaviour extends ConnectedTextureBehaviour.Ba
     }
 
     @Override
-    public @Nullable CTSpriteShiftEntry getShift(BlockState state, Direction direction, @Nullable Sprite sprite) {
+    public @Nullable CTSpriteShiftEntry getShift(BlockState state, Direction direction, @Nullable TextureAtlasSprite sprite) {
         return null;
     }
 
     @Override
-    public @Nullable CTType getDataType(BlockRenderView world, BlockPos pos, BlockState state, Direction direction) {
+    public @Nullable CTType getDataType(BlockAndTintGetter world, BlockPos pos, BlockState state, Direction direction) {
         return AllCTTypes.RECTANGLE;
     }
 

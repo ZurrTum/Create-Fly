@@ -1,22 +1,11 @@
 package com.zurrtum.create.client.foundation.render;
 
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.zurrtum.create.Create;
 import com.zurrtum.create.catnip.registry.RegisteredObjectsHelper;
 import com.zurrtum.create.client.flywheel.lib.visualization.VisualizationHelper;
 import com.zurrtum.create.client.foundation.virtualWorld.VirtualRenderWorld;
 import com.zurrtum.create.client.infrastructure.config.AllConfigs;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.render.WorldRenderer;
-import net.minecraft.client.render.block.entity.BlockEntityRenderManager;
-import net.minecraft.client.render.block.entity.BlockEntityRenderer;
-import net.minecraft.client.render.block.entity.state.BlockEntityRenderState;
-import net.minecraft.client.render.command.OrderedRenderCommandQueue;
-import net.minecraft.client.render.state.CameraRenderState;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix4f;
 import org.joml.Vector4f;
@@ -24,6 +13,17 @@ import org.joml.Vector4f;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.List;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.LevelRenderer;
+import net.minecraft.client.renderer.SubmitNodeCollector;
+import net.minecraft.client.renderer.blockentity.BlockEntityRenderDispatcher;
+import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
+import net.minecraft.client.renderer.blockentity.state.BlockEntityRenderState;
+import net.minecraft.client.renderer.state.CameraRenderState;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.phys.Vec3;
 
 public class BlockEntityRenderHelper {
     /**
@@ -41,18 +41,18 @@ public class BlockEntityRenderHelper {
         BitSet shouldRenderBEs,
         BitSet erroredBEsOut,
         @Nullable VirtualRenderWorld renderLevel,
-        World realLevel,
-        MatrixStack ms,
+        Level realLevel,
+        PoseStack ms,
         @Nullable Matrix4f lightTransform,
-        Vec3d camera,
+        Vec3 camera,
         float pt
     ) {
         int size = blockEntities.size();
         if (size == 0) {
             return null;
         }
-        MinecraftClient mc = MinecraftClient.getInstance();
-        BlockEntityRenderManager dispatcher = mc.getBlockEntityRenderDispatcher();
+        Minecraft mc = Minecraft.getInstance();
+        BlockEntityRenderDispatcher dispatcher = mc.getBlockEntityRenderDispatcher();
         List<BlockEntityRenderState> states = new ArrayList<>();
         for (int i = shouldRenderBEs.nextSetBit(0); i >= 0 && i < size; i = shouldRenderBEs.nextSetBit(i + 1)) {
             BlockEntity blockEntity = blockEntities.get(i);
@@ -60,7 +60,7 @@ public class BlockEntityRenderHelper {
                 continue;
             }
 
-            BlockEntityRenderer<BlockEntity, BlockEntityRenderState> renderer = dispatcher.get(blockEntity);
+            BlockEntityRenderer<BlockEntity, BlockEntityRenderState> renderer = dispatcher.getRenderer(blockEntity);
             if (renderer == null) {
                 // Don't bother looping over it again if we can't do anything with it.
                 erroredBEsOut.set(i);
@@ -69,13 +69,13 @@ public class BlockEntityRenderHelper {
 
             try {
                 BlockEntityRenderState renderState = renderer.createRenderState();
-                int realLevelLight = WorldRenderer.getLightmapCoordinates(realLevel, getLightPos(lightTransform, blockEntity.getPos()));
+                int realLevelLight = LevelRenderer.getLightColor(realLevel, getLightPos(lightTransform, blockEntity.getBlockPos()));
                 if (renderLevel != null) {
                     renderLevel.setExternalLight(realLevelLight);
                 }
-                renderer.updateRenderState(blockEntity, renderState, pt, camera, null);
+                renderer.extractRenderState(blockEntity, renderState, pt, camera, null);
                 if (renderLevel == null) {
-                    renderState.lightmapCoordinates = realLevelLight;
+                    renderState.lightCoords = realLevelLight;
                 }
                 states.add(renderState);
             } catch (Exception e) {
@@ -96,43 +96,43 @@ public class BlockEntityRenderHelper {
         if (states.isEmpty()) {
             return null;
         }
-        return new BlockEntityListRenderState(dispatcher, ms, camera, BlockPos.ofFloored(camera), states);
+        return new BlockEntityListRenderState(dispatcher, ms, camera, BlockPos.containing(camera), states);
     }
 
     private static BlockPos getLightPos(@Nullable Matrix4f lightTransform, BlockPos contraptionPos) {
         if (lightTransform != null) {
             Vector4f lightVec = new Vector4f(contraptionPos.getX() + .5f, contraptionPos.getY() + .5f, contraptionPos.getZ() + .5f, 1);
             lightVec.mul(lightTransform);
-            return BlockPos.ofFloored(lightVec.x(), lightVec.y(), lightVec.z());
+            return BlockPos.containing(lightVec.x(), lightVec.y(), lightVec.z());
         } else {
             return contraptionPos;
         }
     }
 
     public record BlockEntityListRenderState(
-        BlockEntityRenderManager dispatcher, MatrixStack matrices, Vec3d camera, BlockPos cameraPos, List<BlockEntityRenderState> states
+        BlockEntityRenderDispatcher dispatcher, PoseStack matrices, Vec3 camera, BlockPos cameraPos, List<BlockEntityRenderState> states
     ) {
-        public void render(OrderedRenderCommandQueue queue, CameraRenderState cameraRenderState) {
-            Vec3d prevPos = cameraRenderState.pos;
+        public void render(SubmitNodeCollector queue, CameraRenderState cameraRenderState) {
+            Vec3 prevPos = cameraRenderState.pos;
             BlockPos prevBlockPos = cameraRenderState.blockPos;
-            Vec3d prevEntityPos = cameraRenderState.entityPos;
+            Vec3 prevEntityPos = cameraRenderState.entityPos;
             cameraRenderState.pos = camera;
             cameraRenderState.blockPos = cameraPos;
-            cameraRenderState.entityPos = new Vec3d(
+            cameraRenderState.entityPos = new Vec3(
                 prevEntityPos.x - prevPos.x + camera.x,
                 prevEntityPos.y - prevPos.y + camera.y,
                 prevEntityPos.z - prevPos.z + camera.z
             );
             for (BlockEntityRenderState state : states) {
-                BlockEntityRenderer<BlockEntity, BlockEntityRenderState> renderer = dispatcher.getByRenderState(state);
+                BlockEntityRenderer<BlockEntity, BlockEntityRenderState> renderer = dispatcher.getRenderer(state);
                 if (renderer == null) {
                     continue;
                 }
-                BlockPos pos = state.pos;
-                matrices.push();
+                BlockPos pos = state.blockPos;
+                matrices.pushPose();
                 matrices.translate(pos.getX(), pos.getY(), pos.getZ());
-                renderer.render(state, matrices, queue, cameraRenderState);
-                matrices.pop();
+                renderer.submit(state, matrices, queue, cameraRenderState);
+                matrices.popPose();
             }
             cameraRenderState.pos = prevPos;
             cameraRenderState.blockPos = prevBlockPos;

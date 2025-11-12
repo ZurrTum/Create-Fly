@@ -2,20 +2,20 @@ package com.zurrtum.create.content.kinetics.deployer;
 
 import com.mojang.authlib.GameProfile;
 import com.zurrtum.create.api.entity.FakePlayerHandler;
-import net.minecraft.item.ItemStack;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.network.ServerPlayerInteractionManager;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.util.math.BlockPos;
 import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.UUID;
+import net.minecraft.core.BlockPos;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.server.level.ServerPlayerGameMode;
+import net.minecraft.world.item.ItemStack;
 
 public interface DeployerPlayer {
     UUID FALLBACK_ID = UUID.fromString("9e2faded-cafe-4ec2-c314-dad129ae971d");
 
-    static DeployerPlayer create(ServerWorld world, @Nullable UUID owner, @Nullable String name) {
+    static DeployerPlayer create(ServerLevel world, @Nullable UUID owner, @Nullable String name) {
         GameProfile profile = new GameProfile(owner == null ? FALLBACK_ID : owner, owner == null || name == null ? "Deployer" : name);
         if (FakePlayerHandler.FABRIC) {
             return new DeployerFabricFakePlayer(world, profile);
@@ -32,7 +32,7 @@ public interface DeployerPlayer {
 
     void setSpawnedItemEffects(ItemStack spawnedItemEffects);
 
-    ServerPlayerInteractionManager getInteractionManager();
+    ServerPlayerGameMode getInteractionManager();
 
     boolean getPlacedTracks();
 
@@ -42,7 +42,7 @@ public interface DeployerPlayer {
 
     void setOnMinecartContraption(boolean onMinecartContraption);
 
-    default ServerPlayerEntity cast() {
-        return (ServerPlayerEntity) this;
+    default ServerPlayer cast() {
+        return (ServerPlayer) this;
     }
 }

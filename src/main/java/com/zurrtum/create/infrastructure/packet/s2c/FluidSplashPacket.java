@@ -2,20 +2,20 @@ package com.zurrtum.create.infrastructure.packet.s2c;
 
 import com.zurrtum.create.AllClientHandle;
 import com.zurrtum.create.AllPackets;
-import net.minecraft.fluid.Fluid;
-import net.minecraft.network.RegistryByteBuf;
-import net.minecraft.network.codec.PacketCodec;
-import net.minecraft.network.codec.PacketCodecs;
-import net.minecraft.network.packet.PacketType;
-import net.minecraft.registry.RegistryKeys;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.PacketType;
+import net.minecraft.world.level.material.Fluid;
 import org.apache.logging.log4j.util.TriConsumer;
 
 public record FluidSplashPacket(BlockPos pos, Fluid fluid) implements S2CPacket {
-    public static final PacketCodec<RegistryByteBuf, FluidSplashPacket> CODEC = PacketCodec.tuple(
-        BlockPos.PACKET_CODEC,
+    public static final StreamCodec<RegistryFriendlyByteBuf, FluidSplashPacket> CODEC = StreamCodec.composite(
+        BlockPos.STREAM_CODEC,
         FluidSplashPacket::pos,
-        PacketCodecs.registryValue(RegistryKeys.FLUID),
+        ByteBufCodecs.registry(Registries.FLUID),
         FluidSplashPacket::fluid,
         FluidSplashPacket::new
     );
@@ -26,7 +26,7 @@ public record FluidSplashPacket(BlockPos pos, Fluid fluid) implements S2CPacket 
     }
 
     @Override
-    public PacketType<FluidSplashPacket> getPacketType() {
+    public PacketType<FluidSplashPacket> type() {
         return AllPackets.FLUID_SPLASH;
     }
 }

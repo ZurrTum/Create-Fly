@@ -1,18 +1,18 @@
 package com.zurrtum.create.client.flywheel.api.material;
 
-import net.minecraft.util.Identifier;
+import net.minecraft.resources.ResourceLocation;
 
 /**
  * A vertex and fragment shader pair that can be attached to a material.
  */
 public interface MaterialShaders {
     /**
-     * @apiNote {@code flywheel/} is implicitly prepended to the {@link Identifier}'s path.
+     * @apiNote {@code flywheel/} is implicitly prepended to the {@link ResourceLocation}'s path.
      */
-    Identifier vertexSource();
+    ResourceLocation vertexSource();
 
     /**
-     * @apiNote {@code flywheel/} is implicitly prepended to the {@link Identifier}'s path.
+     * @apiNote {@code flywheel/} is implicitly prepended to the {@link ResourceLocation}'s path.
      */
-    Identifier fragmentSource();
+    ResourceLocation fragmentSource();
 }

@@ -12,56 +12,55 @@ import com.zurrtum.create.content.logistics.packagerLink.LogisticallyLinkedBehav
 import com.zurrtum.create.content.logistics.tableCloth.ShoppingListItem;
 import com.zurrtum.create.foundation.gui.menu.MenuProvider;
 import com.zurrtum.create.infrastructure.component.ShoppingList;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.inventory.Inventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.text.Text;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.Formatting;
-import net.minecraft.util.Hand;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.world.World;
-
 import java.util.ArrayList;
 import java.util.List;
+import net.minecraft.ChatFormatting;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.util.Mth;
+import net.minecraft.world.Container;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
 
 public class StockTickerInteractionHandler {
-    public static ActionResult interactWithLogisticsManager(Entity entity, PlayerEntity player, Hand hand) {
+    public static InteractionResult interactWithLogisticsManager(Entity entity, Player player, InteractionHand hand) {
         BlockPos targetPos = getStockTickerPosition(entity);
         if (targetPos == null)
             return null;
 
-        if (interactWithLogisticsManagerAt(player, player.getEntityWorld(), targetPos)) {
-            return ActionResult.SUCCESS;
+        if (interactWithLogisticsManagerAt(player, player.level(), targetPos)) {
+            return InteractionResult.SUCCESS;
         }
         return null;
     }
 
-    public static boolean interactWithLogisticsManagerAt(PlayerEntity player, World level, BlockPos targetPos) {
-        ItemStack mainHandItem = player.getMainHandStack();
+    public static boolean interactWithLogisticsManagerAt(Player player, Level level, BlockPos targetPos) {
+        ItemStack mainHandItem = player.getMainHandItem();
 
-        if (mainHandItem.isOf(AllItems.SHOPPING_LIST)) {
+        if (mainHandItem.is(AllItems.SHOPPING_LIST)) {
             interactWithShop(player, level, targetPos, mainHandItem);
             return true;
         }
 
-        if (level.isClient())
+        if (level.isClientSide())
             return true;
         if (!(level.getBlockEntity(targetPos) instanceof StockTickerBlockEntity stbe))
             return false;
 
         if (!stbe.behaviour.mayInteract(player)) {
-            player.sendMessage(Text.translatable("create.stock_keeper.locked").formatted(Formatting.RED), true);
+            player.displayClientMessage(Component.translatable("create.stock_keeper.locked").withStyle(ChatFormatting.RED), true);
             return true;
         }
 
-        if (player instanceof ServerPlayerEntity sp) {
+        if (player instanceof ServerPlayer sp) {
             MenuProvider.openHandledScreen(sp, stbe::createRequestMenu);
             stbe.getRecentSummary().divideAndSendTo(sp, targetPos);
         }
@@ -69,8 +68,8 @@ public class StockTickerInteractionHandler {
         return true;
     }
 
-    private static void interactWithShop(PlayerEntity player, World level, BlockPos targetPos, ItemStack mainHandItem) {
-        if (level.isClient())
+    private static void interactWithShop(Player player, Level level, BlockPos targetPos, ItemStack mainHandItem) {
+        if (level.isClientSide())
             return;
         if (!(level.getBlockEntity(targetPos) instanceof StockTickerBlockEntity tickerBE))
             return;
@@ -80,8 +79,8 @@ public class StockTickerInteractionHandler {
             return;
 
         if (!tickerBE.behaviour.freqId.equals(list.shopNetwork())) {
-            AllSoundEvents.DENY.playOnServer(level, player.getBlockPos());
-            player.sendMessage(Text.translatable("create.stock_keeper.wrong_network").formatted(Formatting.RED), true);
+            AllSoundEvents.DENY.playOnServer(level, player.blockPosition());
+            player.displayClientMessage(Component.translatable("create.stock_keeper.wrong_network").withStyle(ChatFormatting.RED), true);
             return;
         }
 
@@ -99,34 +98,34 @@ public class StockTickerInteractionHandler {
             if (recentSummary.getCountOf(entry.stack) >= entry.count)
                 continue;
 
-            AllSoundEvents.DENY.playOnServer(level, player.getBlockPos());
-            player.sendMessage(Text.translatable("create.stock_keeper.stock_level_too_low").formatted(Formatting.RED), true);
+            AllSoundEvents.DENY.playOnServer(level, player.blockPosition());
+            player.displayClientMessage(Component.translatable("create.stock_keeper.stock_level_too_low").withStyle(ChatFormatting.RED), true);
             return;
         }
 
         // Check space in stock ticker
         int occupiedSlots = 0;
         for (BigItemStack entry : paymentEntries.getStacksByCount())
-            occupiedSlots += MathHelper.ceil(entry.count / (float) entry.stack.getMaxCount());
-        Inventory receivedPayments = tickerBE.receivedPayments;
-        for (int i = 0, size = receivedPayments.size(); i < size; i++)
-            if (receivedPayments.getStack(i).isEmpty())
+            occupiedSlots += Mth.ceil(entry.count / (float) entry.stack.getMaxStackSize());
+        Container receivedPayments = tickerBE.receivedPayments;
+        for (int i = 0, size = receivedPayments.getContainerSize(); i < size; i++)
+            if (receivedPayments.getItem(i).isEmpty())
                 occupiedSlots--;
 
         if (occupiedSlots > 0) {
-            AllSoundEvents.DENY.playOnServer(level, player.getBlockPos());
-            player.sendMessage(Text.translatable("create.stock_keeper.cash_register_full").formatted(Formatting.RED), true);
+            AllSoundEvents.DENY.playOnServer(level, player.blockPosition());
+            player.displayClientMessage(Component.translatable("create.stock_keeper.cash_register_full").withStyle(ChatFormatting.RED), true);
             return;
         }
 
         // Transfer payment to stock ticker
-        PlayerInventory playerInventory = player.getInventory();
+        Inventory playerInventory = player.getInventory();
         for (boolean simulate : Iterate.trueAndFalse) {
             InventorySummary tally = paymentEntries.copy();
             List<ItemStack> toTransfer = new ArrayList<>();
 
-            for (int i = 0; i < PlayerInventory.MAIN_SIZE; i++) {
-                ItemStack item = playerInventory.getStack(i);
+            for (int i = 0; i < Inventory.INVENTORY_SIZE; i++) {
+                ItemStack item = playerInventory.getItem(i);
                 if (item.isEmpty())
                     continue;
                 int countOf = tally.getCountOf(item);
@@ -139,13 +138,13 @@ public class StockTickerInteractionHandler {
                     continue;
 
                 int newStackSize = item.getCount() - toRemove;
-                playerInventory.setStack(i, newStackSize == 0 ? ItemStack.EMPTY : item.copyWithCount(newStackSize));
+                playerInventory.setItem(i, newStackSize == 0 ? ItemStack.EMPTY : item.copyWithCount(newStackSize));
                 toTransfer.add(item.copyWithCount(toRemove));
             }
 
             if (simulate && tally.getTotalCount() != 0) {
-                AllSoundEvents.DENY.playOnServer(level, player.getBlockPos());
-                player.sendMessage(Text.translatable("create.stock_keeper.too_broke").formatted(Formatting.RED), true);
+                AllSoundEvents.DENY.playOnServer(level, player.blockPosition());
+                player.displayClientMessage(Component.translatable("create.stock_keeper.too_broke").withStyle(ChatFormatting.RED), true);
                 return;
             }
 
@@ -156,9 +155,9 @@ public class StockTickerInteractionHandler {
         }
 
         tickerBE.broadcastPackageRequest(RequestType.PLAYER, order, null, ShoppingListItem.getAddress(mainHandItem));
-        player.setStackInHand(Hand.MAIN_HAND, ItemStack.EMPTY);
+        player.setItemInHand(InteractionHand.MAIN_HAND, ItemStack.EMPTY);
         if (!order.isEmpty())
-            AllSoundEvents.STOCK_TICKER_TRADE.playOnServer(level, tickerBE.getPos());
+            AllSoundEvents.STOCK_TICKER_TRADE.playOnServer(level, tickerBE.getBlockPos());
     }
 
     public static BlockPos getStockTickerPosition(Entity entity) {
@@ -170,14 +169,14 @@ public class StockTickerInteractionHandler {
         if (entity.getType() == AllEntityTypes.PACKAGE)
             return null;
 
-        BlockPos pos = entity.getBlockPos();
+        BlockPos pos = entity.blockPosition();
         int stations = 0;
         BlockPos targetPos = null;
 
-        World world = entity.getEntityWorld();
+        Level world = entity.level();
         for (Direction d : Iterate.horizontalDirections) {
             for (int y : Iterate.zeroAndOne) {
-                BlockPos workstationPos = pos.offset(d).up(y);
+                BlockPos workstationPos = pos.relative(d).above(y);
                 if (!(world.getBlockState(workstationPos).getBlock() instanceof StockTickerBlock))
                     continue;
                 targetPos = workstationPos;

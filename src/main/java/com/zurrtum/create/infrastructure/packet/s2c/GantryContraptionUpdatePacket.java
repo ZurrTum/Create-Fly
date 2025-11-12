@@ -3,20 +3,20 @@ package com.zurrtum.create.infrastructure.packet.s2c;
 import com.zurrtum.create.AllClientHandle;
 import com.zurrtum.create.AllPackets;
 import io.netty.buffer.ByteBuf;
-import net.minecraft.network.codec.PacketCodec;
-import net.minecraft.network.codec.PacketCodecs;
-import net.minecraft.network.packet.PacketType;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.PacketType;
 import org.apache.logging.log4j.util.TriConsumer;
 
 public record GantryContraptionUpdatePacket(int entityID, double coord, double motion, double sequenceLimit) implements S2CPacket {
-    public static final PacketCodec<ByteBuf, GantryContraptionUpdatePacket> CODEC = PacketCodec.tuple(
-        PacketCodecs.INTEGER,
+    public static final StreamCodec<ByteBuf, GantryContraptionUpdatePacket> CODEC = StreamCodec.composite(
+        ByteBufCodecs.INT,
         GantryContraptionUpdatePacket::entityID,
-        PacketCodecs.DOUBLE,
+        ByteBufCodecs.DOUBLE,
         GantryContraptionUpdatePacket::coord,
-        PacketCodecs.DOUBLE,
+        ByteBufCodecs.DOUBLE,
         GantryContraptionUpdatePacket::motion,
-        PacketCodecs.DOUBLE,
+        ByteBufCodecs.DOUBLE,
         GantryContraptionUpdatePacket::sequenceLimit,
         GantryContraptionUpdatePacket::new
     );
@@ -27,7 +27,7 @@ public record GantryContraptionUpdatePacket(int entityID, double coord, double m
     }
 
     @Override
-    public PacketType<GantryContraptionUpdatePacket> getPacketType() {
+    public PacketType<GantryContraptionUpdatePacket> type() {
         return AllPackets.GANTRY_UPDATE;
     }
 }

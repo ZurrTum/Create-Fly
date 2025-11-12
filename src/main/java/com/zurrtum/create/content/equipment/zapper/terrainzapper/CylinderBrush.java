@@ -2,16 +2,16 @@ package com.zurrtum.create.content.equipment.zapper.terrainzapper;
 
 import com.zurrtum.create.catnip.math.VecHelper;
 import com.zurrtum.create.infrastructure.component.PlacementOptions;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Direction.AxisDirection;
-import net.minecraft.util.math.Vec3d;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.Direction.AxisDirection;
+import net.minecraft.world.phys.Vec3;
 
 public class CylinderBrush extends ShapedBrush {
 
@@ -25,14 +25,14 @@ public class CylinderBrush extends ShapedBrush {
         cachedBrushes = new HashMap<>();
         for (int i = 0; i <= MAX_RADIUS; i++) {
             int radius = i;
-            List<BlockPos> positions = BlockPos.stream(BlockPos.ORIGIN.add(-i - 1, 0, -i - 1), BlockPos.ORIGIN.add(i + 1, 0, i + 1))
+            List<BlockPos> positions = BlockPos.betweenClosedStream(BlockPos.ZERO.offset(-i - 1, 0, -i - 1), BlockPos.ZERO.offset(i + 1, 0, i + 1))
                 .map(BlockPos::new).filter(p -> VecHelper.getCenterOf(p).distanceTo(VecHelper.getCenterOf(BlockPos.ZERO)) < radius + .42f).toList();
             for (int h = 0; h <= MAX_HEIGHT; h++) {
                 List<BlockPos> stackedPositions = new ArrayList<>();
                 for (int layer = 0; layer < h; layer++) {
                     int yOffset = layer - h / 2;
                     for (BlockPos p : positions)
-                        stackedPositions.add(p.up(yOffset));
+                        stackedPositions.add(p.above(yOffset));
                 }
                 cachedBrushes.put(Pair.of(i, h), stackedPositions);
             }
@@ -40,17 +40,17 @@ public class CylinderBrush extends ShapedBrush {
     }
 
     @Override
-    public BlockPos getOffset(Vec3d ray, Direction face, PlacementOptions option) {
+    public BlockPos getOffset(Vec3 ray, Direction face, PlacementOptions option) {
         if (option == PlacementOptions.Merged)
-            return BlockPos.ORIGIN;
+            return BlockPos.ZERO;
 
         int offset = option == PlacementOptions.Attached ? 0 : -1;
-        boolean negative = face.getDirection() == AxisDirection.NEGATIVE;
+        boolean negative = face.getAxisDirection() == AxisDirection.NEGATIVE;
         int yOffset = option == PlacementOptions.Attached ? negative ? 1 : 2 : negative ? 0 : -1;
         int r = (param0 + 1 + offset);
         int y = (param1 + (param1 == 0 ? 0 : yOffset)) / 2;
 
-        return BlockPos.ORIGIN.offset(face, (face.getAxis().isVertical() ? y : r) * (option == PlacementOptions.Attached ? 1 : -1));
+        return BlockPos.ZERO.relative(face, (face.getAxis().isVertical() ? y : r) * (option == PlacementOptions.Attached ? 1 : -1));
     }
 
     @Override

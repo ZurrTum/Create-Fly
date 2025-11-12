@@ -2,51 +2,51 @@ package com.zurrtum.create.foundation.recipe;
 
 import com.zurrtum.create.AllRecipeSerializers;
 import com.zurrtum.create.catnip.data.IntAttached;
-import net.minecraft.component.ComponentType;
-import net.minecraft.component.DataComponentTypes;
-import net.minecraft.item.ItemStack;
-import net.minecraft.recipe.RecipeSerializer;
-import net.minecraft.recipe.SpecialCraftingRecipe;
-import net.minecraft.recipe.book.CraftingRecipeCategory;
-import net.minecraft.recipe.input.CraftingRecipeInput;
-import net.minecraft.registry.RegistryWrapper;
-import net.minecraft.world.World;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.core.component.DataComponentType;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.CraftingBookCategory;
+import net.minecraft.world.item.crafting.CraftingInput;
+import net.minecraft.world.item.crafting.CustomRecipe;
+import net.minecraft.world.item.crafting.RecipeSerializer;
+import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.Nullable;
 
-public class ItemCopyingRecipe extends SpecialCraftingRecipe {
+public class ItemCopyingRecipe extends CustomRecipe {
 
     public interface SupportsItemCopying {
 
         default ItemStack createCopy(ItemStack original, int count) {
             ItemStack copyWithCount = original.copyWithCount(count);
-            copyWithCount.remove(DataComponentTypes.ENCHANTMENTS);
-            copyWithCount.remove(DataComponentTypes.STORED_ENCHANTMENTS);
+            copyWithCount.remove(DataComponents.ENCHANTMENTS);
+            copyWithCount.remove(DataComponents.STORED_ENCHANTMENTS);
             return copyWithCount;
         }
 
         default boolean canCopyFromItem(ItemStack item) {
-            return item.contains(getComponentType());
+            return item.has(getComponentType());
         }
 
         default boolean canCopyToItem(ItemStack item) {
-            return !item.contains(getComponentType());
+            return !item.has(getComponentType());
         }
 
-        ComponentType<?> getComponentType();
+        DataComponentType<?> getComponentType();
 
     }
 
-    public ItemCopyingRecipe(CraftingRecipeCategory category) {
+    public ItemCopyingRecipe(CraftingBookCategory category) {
         super(category);
     }
 
     @Override
-    public boolean matches(CraftingRecipeInput input, World level) {
+    public boolean matches(CraftingInput input, Level level) {
         return copyCheck(input) != null;
     }
 
     @Override
-    public ItemStack craft(CraftingRecipeInput input, RegistryWrapper.WrapperLookup registries) {
+    public ItemStack assemble(CraftingInput input, HolderLookup.Provider registries) {
         IntAttached<ItemStack> copyCheck = copyCheck(input);
         if (copyCheck == null)
             return ItemStack.EMPTY;
@@ -59,13 +59,13 @@ public class ItemCopyingRecipe extends SpecialCraftingRecipe {
     }
 
     @Nullable
-    private IntAttached<ItemStack> copyCheck(CraftingRecipeInput input) {
+    private IntAttached<ItemStack> copyCheck(CraftingInput input) {
         ItemStack itemToCopy = ItemStack.EMPTY;
         int copyTargets = 0;
 
         int size = input.size();
         for (int j = 0; j < size; ++j) {
-            ItemStack itemInSlot = input.getStackInSlot(j);
+            ItemStack itemInSlot = input.getItem(j);
             if (itemInSlot.isEmpty())
                 continue;
             if (!(itemInSlot.getItem() instanceof SupportsItemCopying sic))
@@ -79,7 +79,7 @@ public class ItemCopyingRecipe extends SpecialCraftingRecipe {
             return null;
 
         for (int j = 0; j < size; ++j) {
-            ItemStack itemInSlot = input.getStackInSlot(j);
+            ItemStack itemInSlot = input.getItem(j);
             if (itemInSlot.isEmpty() || itemInSlot == itemToCopy)
                 continue;
             if (itemToCopy.getItem() != itemInSlot.getItem())

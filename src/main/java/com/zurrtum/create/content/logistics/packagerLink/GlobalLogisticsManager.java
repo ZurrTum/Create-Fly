@@ -1,9 +1,9 @@
 package com.zurrtum.create.content.logistics.packagerLink;
 
-import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.core.GlobalPos;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.util.math.GlobalPos;
-import net.minecraft.world.World;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
@@ -26,14 +26,14 @@ public class GlobalLogisticsManager {
         loadLogisticsData(server);
     }
 
-    public boolean mayInteract(UUID networkId, PlayerEntity player) {
+    public boolean mayInteract(UUID networkId, Player player) {
         LogisticsNetwork network = logisticsNetworks.get(networkId);
-        return network == null || network.owner == null || !network.locked || network.owner.equals(player.getUuid());
+        return network == null || network.owner == null || !network.locked || network.owner.equals(player.getUUID());
     }
 
-    public boolean mayAdministrate(UUID networkId, PlayerEntity player) {
+    public boolean mayAdministrate(UUID networkId, Player player) {
         LogisticsNetwork network = logisticsNetworks.get(networkId);
-        return network == null || network.owner == null || network.owner.equals(player.getUuid());
+        return network == null || network.owner == null || network.owner.equals(player.getUUID());
     }
 
     public boolean isLockable(UUID networkId) {
@@ -99,8 +99,8 @@ public class GlobalLogisticsManager {
         logisticsNetworks = savedData.getLogisticsNetworks();
     }
 
-    public void tick(World level) {
-        if (level.getRegistryKey() != World.OVERWORLD)
+    public void tick(Level level) {
+        if (level.dimension() != Level.OVERWORLD)
             return;
         logisticsNetworks.forEach((id, network) -> {
             network.panelPromises.tick();
@@ -109,7 +109,7 @@ public class GlobalLogisticsManager {
 
     public void markDirty() {
         if (savedData != null)
-            savedData.markDirty();
+            savedData.setDirty();
     }
 
 }

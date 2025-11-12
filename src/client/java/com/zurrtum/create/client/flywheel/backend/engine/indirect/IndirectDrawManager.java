@@ -14,12 +14,11 @@ import com.zurrtum.create.client.flywheel.backend.gl.buffer.GlBufferType;
 import com.zurrtum.create.client.flywheel.backend.gl.buffer.GlBufferUsage;
 import com.zurrtum.create.client.flywheel.lib.material.SimpleMaterial;
 import com.zurrtum.create.client.flywheel.lib.memory.MemoryBlock;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.render.model.ModelBaker;
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.resources.model.ModelBakery;
 
 import static org.lwjgl.opengl.GL11.GL_TRIANGLES;
 import static org.lwjgl.opengl.GL11.GL_UNSIGNED_INT;
@@ -240,7 +239,7 @@ public class IndirectDrawManager extends DrawManager<IndirectInstancer<?>> {
             }
 
             for (var progressEntry : byProgress.int2ObjectEntrySet()) {
-                TextureBinder.bindCrumbling(ModelBaker.BLOCK_DESTRUCTION_STAGE_TEXTURES.get(progressEntry.getIntKey()));
+                TextureBinder.bindCrumbling(ModelBakery.BREAKING_LOCATIONS.get(progressEntry.getIntKey()));
 
                 for (var instanceHandlePair : progressEntry.getValue()) {
                     IndirectInstancer<?> instancer = instanceHandlePair.getFirst();
@@ -275,6 +274,6 @@ public class IndirectDrawManager extends DrawManager<IndirectInstancer<?>> {
     @Override
     public void triggerFallback() {
         IndirectPrograms.kill();
-        MinecraftClient.getInstance().worldRenderer.reload();
+        Minecraft.getInstance().levelRenderer.allChanged();
     }
 }

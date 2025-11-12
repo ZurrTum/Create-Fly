@@ -1,17 +1,17 @@
 package com.zurrtum.create.client.flywheel.api.backend;
 
-import net.minecraft.client.render.BufferBuilderStorage;
-import net.minecraft.client.render.Camera;
-import net.minecraft.client.render.WorldRenderer;
-import net.minecraft.client.world.ClientWorld;
+import net.minecraft.client.Camera;
+import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.client.renderer.LevelRenderer;
+import net.minecraft.client.renderer.RenderBuffers;
 import org.joml.Matrix4fc;
 
 public interface RenderContext {
-    WorldRenderer renderer();
+    LevelRenderer renderer();
 
-    ClientWorld level();
+    ClientLevel level();
 
-    BufferBuilderStorage buffers();
+    RenderBuffers buffers();
 
     Matrix4fc modelView();
 

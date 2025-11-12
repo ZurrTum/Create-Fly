@@ -6,37 +6,37 @@ import com.zurrtum.create.client.foundation.utility.RaycastHelper;
 import com.zurrtum.create.content.kinetics.chainConveyor.ChainConveyorBlockEntity;
 import com.zurrtum.create.content.kinetics.chainConveyor.ChainConveyorPackage;
 import com.zurrtum.create.infrastructure.packet.c2s.ChainPackageInteractionPacket;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.entity.attribute.EntityAttributes;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
 
 import java.util.List;
 import java.util.Map;
 
 public class ChainPackageInteractionHandler {
-    public static boolean onUse(MinecraftClient mc) {
-        ClientPlayerEntity player = mc.player;
-        ItemStack stack = player.getMainHandStack();
-        if (stack.isIn(AllItemTags.TOOLS_WRENCH) || stack.isOf(Items.IRON_CHAIN) || stack.isOf(AllItems.PACKAGE_FROGPORT)) {
+    public static boolean onUse(Minecraft mc) {
+        LocalPlayer player = mc.player;
+        ItemStack stack = player.getMainHandItem();
+        if (stack.is(AllItemTags.TOOLS_WRENCH) || stack.is(Items.IRON_CHAIN) || stack.is(AllItems.PACKAGE_FROGPORT)) {
             return false;
         }
-        double range = player.getAttributeValue(EntityAttributes.BLOCK_INTERACTION_RANGE) + 1;
-        for (Map.Entry<Integer, ChainConveyorPackagePhysicsData> entry : ChainConveyorClientBehaviour.physicsDataCache.get(mc.world).asMap()
+        double range = player.getAttributeValue(Attributes.BLOCK_INTERACTION_RANGE) + 1;
+        for (Map.Entry<Integer, ChainConveyorPackagePhysicsData> entry : ChainConveyorClientBehaviour.physicsDataCache.get(mc.level).asMap()
             .entrySet()) {
             ChainConveyorPackagePhysicsData data = entry.getValue();
             if (data == null || data.targetPos == null || data.beReference == null)
                 continue;
-            Box bounds = new Box(data.targetPos, data.targetPos).offset(0, -.25, 0).stretch(0, 0.5, 0).expand(0.45);
+            AABB bounds = new AABB(data.targetPos, data.targetPos).move(0, -.25, 0).expandTowards(0, 0.5, 0).inflate(0.45);
 
-            Vec3d from = player.getEyePos();
-            Vec3d to = RaycastHelper.getTraceTarget(player, range, from);
+            Vec3 from = player.getEyePosition();
+            Vec3 to = RaycastHelper.getTraceTarget(player, range, from);
 
-            if (bounds.raycast(from, to).isEmpty())
+            if (bounds.clip(from, to).isEmpty())
                 continue;
 
             ChainConveyorBlockEntity ccbe = data.beReference.get();
@@ -46,7 +46,7 @@ public class ChainPackageInteractionHandler {
             int i = entry.getKey();
             for (ChainConveyorPackage pckg : ccbe.getLoopingPackages()) {
                 if (pckg.netId == i) {
-                    player.networkHandler.sendPacket(new ChainPackageInteractionPacket(ccbe.getPos(), BlockPos.ORIGIN, pckg.chainPosition, true));
+                    player.connection.send(new ChainPackageInteractionPacket(ccbe.getBlockPos(), BlockPos.ZERO, pckg.chainPosition, true));
                     return true;
                 }
             }
@@ -57,7 +57,7 @@ public class ChainPackageInteractionHandler {
                     continue;
                 for (ChainConveyorPackage pckg : list) {
                     if (pckg.netId == i) {
-                        player.networkHandler.sendPacket(new ChainPackageInteractionPacket(ccbe.getPos(), connection, pckg.chainPosition, true));
+                        player.connection.send(new ChainPackageInteractionPacket(ccbe.getBlockPos(), connection, pckg.chainPosition, true));
                         return true;
                     }
                 }

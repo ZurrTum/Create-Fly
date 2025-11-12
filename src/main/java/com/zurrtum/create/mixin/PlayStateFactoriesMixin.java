@@ -3,47 +3,47 @@ package com.zurrtum.create.mixin;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.zurrtum.create.AllPackets;
-import net.minecraft.network.NetworkPhase;
-import net.minecraft.network.RegistryByteBuf;
-import net.minecraft.network.listener.ClientPlayPacketListener;
-import net.minecraft.network.listener.ServerPlayPacketListener;
-import net.minecraft.network.state.ContextAwareNetworkStateFactory;
-import net.minecraft.network.state.NetworkStateBuilder;
-import net.minecraft.network.state.NetworkStateFactory;
-import net.minecraft.network.state.PlayStateFactories;
+import net.minecraft.network.ConnectionProtocol;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.protocol.ProtocolInfoBuilder;
+import net.minecraft.network.protocol.SimpleUnboundProtocol;
+import net.minecraft.network.protocol.UnboundProtocol;
+import net.minecraft.network.protocol.game.ClientGamePacketListener;
+import net.minecraft.network.protocol.game.GameProtocols;
+import net.minecraft.network.protocol.game.ServerGamePacketListener;
 import net.minecraft.util.Unit;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 
 import java.util.function.Consumer;
 
-@Mixin(PlayStateFactories.class)
+@Mixin(GameProtocols.class)
 public class PlayStateFactoriesMixin {
-    @WrapOperation(method = "<clinit>", at = @At(value = "INVOKE", target = "Lnet/minecraft/network/state/NetworkStateBuilder;s2c(Lnet/minecraft/network/NetworkPhase;Ljava/util/function/Consumer;)Lnet/minecraft/network/state/NetworkStateFactory;"))
-    private static NetworkStateFactory<ClientPlayPacketListener, RegistryByteBuf> addS2CPacket(
-        NetworkPhase type,
-        Consumer<NetworkStateBuilder<ClientPlayPacketListener, RegistryByteBuf, Unit>> registrar,
-        Operation<NetworkStateFactory<ClientPlayPacketListener, RegistryByteBuf>> original
+    @WrapOperation(method = "<clinit>", at = @At(value = "INVOKE", target = "Lnet/minecraft/network/protocol/ProtocolInfoBuilder;clientboundProtocol(Lnet/minecraft/network/ConnectionProtocol;Ljava/util/function/Consumer;)Lnet/minecraft/network/protocol/SimpleUnboundProtocol;"))
+    private static SimpleUnboundProtocol<ClientGamePacketListener, RegistryFriendlyByteBuf> addS2CPacket(
+        ConnectionProtocol type,
+        Consumer<ProtocolInfoBuilder<ClientGamePacketListener, RegistryFriendlyByteBuf, Unit>> registrar,
+        Operation<SimpleUnboundProtocol<ClientGamePacketListener, RegistryFriendlyByteBuf>> original
     ) {
         return original.call(
-            type, (Consumer<NetworkStateBuilder<ClientPlayPacketListener, RegistryByteBuf, Unit>>) (builder -> {
+            type, (Consumer<ProtocolInfoBuilder<ClientGamePacketListener, RegistryFriendlyByteBuf, Unit>>) (builder -> {
                 registrar.accept(builder);
-                AllPackets.S2C.forEach(builder::add);
+                AllPackets.S2C.forEach(builder::addPacket);
             })
         );
     }
 
-    @WrapOperation(method = "<clinit>", at = @At(value = "INVOKE", target = "Lnet/minecraft/network/state/NetworkStateBuilder;contextAwareC2S(Lnet/minecraft/network/NetworkPhase;Ljava/util/function/Consumer;)Lnet/minecraft/network/state/ContextAwareNetworkStateFactory;"))
-    private static ContextAwareNetworkStateFactory<ServerPlayPacketListener, RegistryByteBuf, PlayStateFactories.PacketCodecModifierContext> addC2SPacket(
-        NetworkPhase type,
-        Consumer<NetworkStateBuilder<ServerPlayPacketListener, RegistryByteBuf, PlayStateFactories.PacketCodecModifierContext>> registrar,
-        Operation<ContextAwareNetworkStateFactory<ServerPlayPacketListener, RegistryByteBuf, PlayStateFactories.PacketCodecModifierContext>> original
+    @WrapOperation(method = "<clinit>", at = @At(value = "INVOKE", target = "Lnet/minecraft/network/protocol/ProtocolInfoBuilder;contextServerboundProtocol(Lnet/minecraft/network/ConnectionProtocol;Ljava/util/function/Consumer;)Lnet/minecraft/network/protocol/UnboundProtocol;"))
+    private static UnboundProtocol<ServerGamePacketListener, RegistryFriendlyByteBuf, GameProtocols.Context> addC2SPacket(
+        ConnectionProtocol type,
+        Consumer<ProtocolInfoBuilder<ServerGamePacketListener, RegistryFriendlyByteBuf, GameProtocols.Context>> registrar,
+        Operation<UnboundProtocol<ServerGamePacketListener, RegistryFriendlyByteBuf, GameProtocols.Context>> original
     ) {
         return original.call(
             type,
-            (Consumer<NetworkStateBuilder<ServerPlayPacketListener, RegistryByteBuf, PlayStateFactories.PacketCodecModifierContext>>) (builder -> {
+            (Consumer<ProtocolInfoBuilder<ServerGamePacketListener, RegistryFriendlyByteBuf, GameProtocols.Context>>) (builder -> {
                 registrar.accept(builder);
-                AllPackets.C2S.forEach(builder::add);
+                AllPackets.C2S.forEach(builder::addPacket);
             })
         );
     }

@@ -18,158 +18,152 @@ import com.zurrtum.create.content.trains.display.FlapDisplayBlock;
 import com.zurrtum.create.content.trains.track.TrackBlock;
 import com.zurrtum.create.content.trains.track.TrackShape;
 import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
-import net.minecraft.block.*;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.block.enums.BlockFace;
-import net.minecraft.entity.ai.pathing.NavigationType;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.fluid.FluidState;
-import net.minecraft.fluid.Fluids;
-import net.minecraft.item.BlockItem;
-import net.minecraft.item.ItemPlacementContext;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.ItemUsageContext;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.sound.SoundCategory;
-import net.minecraft.sound.SoundEvents;
-import net.minecraft.state.StateManager.Builder;
-import net.minecraft.state.property.BooleanProperty;
-import net.minecraft.state.property.EnumProperty;
-import net.minecraft.state.property.Properties;
-import net.minecraft.state.property.Property;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.BlockMirror;
-import net.minecraft.util.BlockRotation;
-import net.minecraft.util.Hand;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Direction.Axis;
-import net.minecraft.util.math.Direction.AxisDirection;
-import net.minecraft.util.math.random.Random;
-import net.minecraft.util.shape.VoxelShape;
-import net.minecraft.util.shape.VoxelShapes;
-import net.minecraft.world.BlockRenderView;
-import net.minecraft.world.BlockView;
-import net.minecraft.world.World;
-import net.minecraft.world.WorldView;
-import net.minecraft.world.tick.ScheduledTickView;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.Direction.Axis;
+import net.minecraft.core.Direction.AxisDirection;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.item.context.UseOnContext;
+import net.minecraft.world.level.*;
+import net.minecraft.world.level.block.*;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition.Builder;
+import net.minecraft.world.level.block.state.properties.*;
+import net.minecraft.world.level.material.FluidState;
+import net.minecraft.world.level.material.Fluids;
+import net.minecraft.world.level.pathfinder.PathComputationType;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.phys.shapes.Shapes;
+import net.minecraft.world.phys.shapes.VoxelShape;
 
-import static net.minecraft.block.WallMountedBlock.FACE;
-import static net.minecraft.state.property.Properties.WATERLOGGED;
+import static net.minecraft.world.level.block.FaceAttachedHorizontalDirectionalBlock.FACE;
+import static net.minecraft.world.level.block.state.properties.BlockStateProperties.WATERLOGGED;
 
-public class GirderBlock extends Block implements Waterloggable, IWrenchable {
+public class GirderBlock extends Block implements SimpleWaterloggedBlock, IWrenchable {
 
     private static final int placementHelperId = PlacementHelpers.register(new GirderPlacementHelper());
 
-    public static final BooleanProperty X = BooleanProperty.of("x");
-    public static final BooleanProperty Z = BooleanProperty.of("z");
-    public static final BooleanProperty TOP = BooleanProperty.of("top");
-    public static final BooleanProperty BOTTOM = BooleanProperty.of("bottom");
-    public static final EnumProperty<Axis> AXIS = Properties.AXIS;
+    public static final BooleanProperty X = BooleanProperty.create("x");
+    public static final BooleanProperty Z = BooleanProperty.create("z");
+    public static final BooleanProperty TOP = BooleanProperty.create("top");
+    public static final BooleanProperty BOTTOM = BooleanProperty.create("bottom");
+    public static final EnumProperty<Axis> AXIS = BlockStateProperties.AXIS;
 
-    public GirderBlock(Settings p_49795_) {
+    public GirderBlock(Properties p_49795_) {
         super(p_49795_);
-        setDefaultState(getDefaultState().with(WATERLOGGED, false).with(AXIS, Axis.Y).with(TOP, false).with(BOTTOM, false).with(X, false)
-            .with(Z, false));
+        registerDefaultState(defaultBlockState().setValue(WATERLOGGED, false).setValue(AXIS, Axis.Y).setValue(TOP, false).setValue(BOTTOM, false)
+            .setValue(X, false).setValue(Z, false));
     }
 
     @Override
-    protected void appendProperties(Builder<Block, BlockState> pBuilder) {
-        super.appendProperties(pBuilder.add(X, Z, TOP, BOTTOM, AXIS, WATERLOGGED));
+    protected void createBlockStateDefinition(Builder<Block, BlockState> pBuilder) {
+        super.createBlockStateDefinition(pBuilder.add(X, Z, TOP, BOTTOM, AXIS, WATERLOGGED));
     }
 
     @Override
-    public VoxelShape getSidesShape(BlockState pState, BlockView pReader, BlockPos pPos) {
-        return VoxelShapes.union(super.getSidesShape(pState, pReader, pPos), AllShapes.EIGHT_VOXEL_POLE.get(Axis.Y));
+    public VoxelShape getBlockSupportShape(BlockState pState, BlockGetter pReader, BlockPos pPos) {
+        return Shapes.or(super.getBlockSupportShape(pState, pReader, pPos), AllShapes.EIGHT_VOXEL_POLE.get(Axis.Y));
     }
 
     @Override
-    protected ActionResult onUseWithItem(
+    protected InteractionResult useItemOn(
         ItemStack stack,
         BlockState state,
-        World level,
+        Level level,
         BlockPos pos,
-        PlayerEntity player,
-        Hand hand,
+        Player player,
+        InteractionHand hand,
         BlockHitResult hitResult
     ) {
         if (player == null)
-            return ActionResult.PASS_TO_DEFAULT_BLOCK_ACTION;
+            return InteractionResult.TRY_WITH_EMPTY_HAND;
 
-        if (stack.isOf(AllItems.SHAFT)) {
+        if (stack.is(AllItems.SHAFT)) {
             KineticBlockEntity.switchToBlockState(
                 level,
                 pos,
-                AllBlocks.METAL_GIRDER_ENCASED_SHAFT.getDefaultState().with(WATERLOGGED, state.get(WATERLOGGED)).with(TOP, state.get(TOP))
-                    .with(BOTTOM, state.get(BOTTOM))
-                    .with(GirderEncasedShaftBlock.HORIZONTAL_AXIS, state.get(X) || hitResult.getSide().getAxis() == Axis.Z ? Axis.Z : Axis.X)
+                AllBlocks.METAL_GIRDER_ENCASED_SHAFT.defaultBlockState().setValue(WATERLOGGED, state.getValue(WATERLOGGED))
+                    .setValue(TOP, state.getValue(TOP)).setValue(BOTTOM, state.getValue(BOTTOM)).setValue(
+                        GirderEncasedShaftBlock.HORIZONTAL_AXIS,
+                        state.getValue(X) || hitResult.getDirection().getAxis() == Axis.Z ? Axis.Z : Axis.X
+                    )
             );
 
-            level.playSound(null, pos, SoundEvents.BLOCK_NETHERITE_BLOCK_HIT, SoundCategory.BLOCKS, 0.5f, 1.25f);
-            if (!level.isClient() && !player.isCreative()) {
-                stack.decrement(1);
+            level.playSound(null, pos, SoundEvents.NETHERITE_BLOCK_HIT, SoundSource.BLOCKS, 0.5f, 1.25f);
+            if (!level.isClientSide() && !player.isCreative()) {
+                stack.shrink(1);
                 if (stack.isEmpty())
-                    player.setStackInHand(hand, ItemStack.EMPTY);
+                    player.setItemInHand(hand, ItemStack.EMPTY);
             }
 
-            return ActionResult.SUCCESS;
+            return InteractionResult.SUCCESS;
         }
 
-        if (stack.isOf(AllItems.WRENCH) && !player.isSneaking()) {
+        if (stack.is(AllItems.WRENCH) && !player.isShiftKeyDown()) {
             if (GirderWrenchBehavior.handleClick(level, pos, state, hitResult))
-                return ActionResult.SUCCESS;
-            return ActionResult.FAIL;
+                return InteractionResult.SUCCESS;
+            return InteractionResult.FAIL;
         }
 
         IPlacementHelper helper = PlacementHelpers.get(placementHelperId);
         if (helper.matchesItem(stack))
             return helper.getOffset(player, level, state, pos, hitResult).placeInWorld(level, (BlockItem) stack.getItem(), player, hand);
 
-        return ActionResult.PASS_TO_DEFAULT_BLOCK_ACTION;
+        return InteractionResult.TRY_WITH_EMPTY_HAND;
     }
 
     @Override
     public FluidState getFluidState(BlockState state) {
-        return state.get(WATERLOGGED) ? Fluids.WATER.getStill(false) : Fluids.EMPTY.getDefaultState();
+        return state.getValue(WATERLOGGED) ? Fluids.WATER.getSource(false) : Fluids.EMPTY.defaultFluidState();
     }
 
     @Override
-    public ActionResult onWrenched(BlockState state, ItemUsageContext context) {
-        return ActionResult.PASS;
+    public InteractionResult onWrenched(BlockState state, UseOnContext context) {
+        return InteractionResult.PASS;
     }
 
     @Override
-    public void scheduledTick(BlockState p_60462_, ServerWorld p_60463_, BlockPos p_60464_, Random p_60465_) {
-        Block.replace(p_60462_, Block.postProcessState(p_60462_, p_60463_, p_60464_), p_60463_, p_60464_, 3);
+    public void tick(BlockState p_60462_, ServerLevel p_60463_, BlockPos p_60464_, RandomSource p_60465_) {
+        Block.updateOrDestroy(p_60462_, Block.updateFromNeighbourShapes(p_60462_, p_60463_, p_60464_), p_60463_, p_60464_, 3);
     }
 
     @Override
-    public BlockState getStateForNeighborUpdate(
+    public BlockState updateShape(
         BlockState state,
-        WorldView world,
-        ScheduledTickView tickView,
+        LevelReader world,
+        ScheduledTickAccess tickView,
         BlockPos pos,
         Direction direction,
         BlockPos neighbourPos,
         BlockState neighbourState,
-        Random random
+        RandomSource random
     ) {
-        if (state.get(WATERLOGGED))
-            tickView.scheduleFluidTick(pos, Fluids.WATER, Fluids.WATER.getTickRate(world));
+        if (state.getValue(WATERLOGGED))
+            tickView.scheduleTick(pos, Fluids.WATER, Fluids.WATER.getTickDelay(world));
         Axis axis = direction.getAxis();
 
         if (direction.getAxis() != Axis.Y) {
-            if (state.get(AXIS) != direction.getAxis()) {
+            if (state.getValue(AXIS) != direction.getAxis()) {
                 Property<Boolean> updateProperty = axis == Axis.X ? X : axis == Axis.Z ? Z : direction == Direction.UP ? TOP : BOTTOM;
                 if (!isConnected(world, pos, state, direction) && !isConnected(world, pos, state, direction.getOpposite()))
-                    state = state.with(updateProperty, false);
+                    state = state.setValue(updateProperty, false);
             }
-        } else if (state.get(AXIS) != Axis.Y) {
-            if (world.getBlockState(pos.up()).getSidesShape(world, pos.up()).isEmpty())
-                state = state.with(TOP, false);
-            if (world.getBlockState(pos.down()).getSidesShape(world, pos.down()).isEmpty())
-                state = state.with(BOTTOM, false);
+        } else if (state.getValue(AXIS) != Axis.Y) {
+            if (world.getBlockState(pos.above()).getBlockSupportShape(world, pos.above()).isEmpty())
+                state = state.setValue(TOP, false);
+            if (world.getBlockState(pos.below()).getBlockSupportShape(world, pos.below()).isEmpty())
+                state = state.setValue(BOTTOM, false);
         }
 
         for (Direction d : Iterate.directionsInAxis(axis))
@@ -179,70 +173,70 @@ public class GirderBlock extends Block implements Waterloggable, IWrenchable {
     }
 
     @Override
-    public BlockState getPlacementState(ItemPlacementContext context) {
-        World level = context.getWorld();
-        BlockPos pos = context.getBlockPos();
-        Direction face = context.getSide();
+    public BlockState getStateForPlacement(BlockPlaceContext context) {
+        Level level = context.getLevel();
+        BlockPos pos = context.getClickedPos();
+        Direction face = context.getClickedFace();
         FluidState ifluidstate = level.getFluidState(pos);
-        BlockState state = super.getPlacementState(context);
-        state = state.with(X, face.getAxis() == Axis.X);
-        state = state.with(Z, face.getAxis() == Axis.Z);
-        state = state.with(AXIS, face.getAxis());
+        BlockState state = super.getStateForPlacement(context);
+        state = state.setValue(X, face.getAxis() == Axis.X);
+        state = state.setValue(Z, face.getAxis() == Axis.Z);
+        state = state.setValue(AXIS, face.getAxis());
 
         for (Direction d : Iterate.directions)
             state = updateState(level, pos, state, d);
 
-        return state.with(WATERLOGGED, ifluidstate.getFluid() == Fluids.WATER);
+        return state.setValue(WATERLOGGED, ifluidstate.getType() == Fluids.WATER);
     }
 
-    public static BlockState updateState(WorldView level, BlockPos pos, BlockState state, Direction d) {
+    public static BlockState updateState(LevelReader level, BlockPos pos, BlockState state, Direction d) {
         Axis axis = d.getAxis();
         Property<Boolean> updateProperty = axis == Axis.X ? X : axis == Axis.Z ? Z : d == Direction.UP ? TOP : BOTTOM;
-        BlockState sideState = level.getBlockState(pos.offset(d));
+        BlockState sideState = level.getBlockState(pos.relative(d));
 
         if (axis.isVertical())
             return updateVerticalProperty(level, pos, state, updateProperty, sideState, d);
 
-        if (state.get(AXIS) == axis)
-            state = state.with(updateProperty, true);
-        else if (sideState.getBlock() instanceof GirderEncasedShaftBlock && sideState.get(GirderEncasedShaftBlock.HORIZONTAL_AXIS) != axis)
-            state = state.with(updateProperty, true);
-        else if (sideState.getBlock() == state.getBlock() && sideState.get(updateProperty))
-            state = state.with(updateProperty, true);
+        if (state.getValue(AXIS) == axis)
+            state = state.setValue(updateProperty, true);
+        else if (sideState.getBlock() instanceof GirderEncasedShaftBlock && sideState.getValue(GirderEncasedShaftBlock.HORIZONTAL_AXIS) != axis)
+            state = state.setValue(updateProperty, true);
+        else if (sideState.getBlock() == state.getBlock() && sideState.getValue(updateProperty))
+            state = state.setValue(updateProperty, true);
         else if (sideState.getBlock() instanceof NixieTubeBlock && NixieTubeBlock.getFacing(sideState) == d)
-            state = state.with(updateProperty, true);
+            state = state.setValue(updateProperty, true);
         else if (sideState.getBlock() instanceof PlacardBlock && PlacardBlock.connectedDirection(sideState) == d)
-            state = state.with(updateProperty, true);
+            state = state.setValue(updateProperty, true);
         else if (isFacingBracket(level, pos, d))
-            state = state.with(updateProperty, true);
+            state = state.setValue(updateProperty, true);
 
         for (Direction d2 : Iterate.directionsInAxis(axis == Axis.X ? Axis.Z : Axis.X)) {
-            BlockState above = level.getBlockState(pos.up().offset(d2));
-            if (above.isIn(AllBlockTags.GIRDABLE_TRACKS)) {
-                TrackShape shape = above.get(TrackBlock.SHAPE);
+            BlockState above = level.getBlockState(pos.above().relative(d2));
+            if (above.is(AllBlockTags.GIRDABLE_TRACKS)) {
+                TrackShape shape = above.getValue(TrackBlock.SHAPE);
                 if (shape == (axis == Axis.X ? TrackShape.XO : TrackShape.ZO))
-                    state = state.with(updateProperty, true);
+                    state = state.setValue(updateProperty, true);
             }
         }
 
         return state;
     }
 
-    public static boolean isFacingBracket(BlockRenderView level, BlockPos pos, Direction d) {
-        BlockEntity blockEntity = level.getBlockEntity(pos.offset(d));
+    public static boolean isFacingBracket(BlockAndTintGetter level, BlockPos pos, Direction d) {
+        BlockEntity blockEntity = level.getBlockEntity(pos.relative(d));
         if (!(blockEntity instanceof SmartBlockEntity sbe))
             return false;
         BracketedBlockEntityBehaviour behaviour = sbe.getBehaviour(BracketedBlockEntityBehaviour.TYPE);
         if (behaviour == null)
             return false;
         BlockState bracket = behaviour.getBracket();
-        if (bracket == null || !bracket.contains(BracketBlock.FACING))
+        if (bracket == null || !bracket.hasProperty(BracketBlock.FACING))
             return false;
-        return bracket.get(BracketBlock.FACING) == d;
+        return bracket.getValue(BracketBlock.FACING) == d;
     }
 
     public static BlockState updateVerticalProperty(
-        WorldView level,
+        LevelReader level,
         BlockPos pos,
         BlockState state,
         Property<Boolean> updateProperty,
@@ -251,26 +245,26 @@ public class GirderBlock extends Block implements Waterloggable, IWrenchable {
     ) {
         boolean canAttach = false;
 
-        if (state.contains(AXIS) && state.get(AXIS) == Axis.Y)
+        if (state.hasProperty(AXIS) && state.getValue(AXIS) == Axis.Y)
             canAttach = true;
         else if (isGirder(sideState) && isXGirder(sideState) == isZGirder(sideState))
             canAttach = true;
         else if (isGirder(sideState))
             canAttach = true;
-        else if (sideState.contains(WallBlock.UP) && sideState.get(WallBlock.UP))
+        else if (sideState.hasProperty(WallBlock.UP) && sideState.getValue(WallBlock.UP))
             canAttach = true;
         else if (sideState.getBlock() instanceof NixieTubeBlock && NixieTubeBlock.getFacing(sideState) == d)
             canAttach = true;
         else if (sideState.getBlock() instanceof FlapDisplayBlock)
             canAttach = true;
-        else if (sideState.getBlock() instanceof LanternBlock && (d == Direction.DOWN) == (sideState.get(LanternBlock.HANGING)))
+        else if (sideState.getBlock() instanceof LanternBlock && (d == Direction.DOWN) == (sideState.getValue(LanternBlock.HANGING)))
             canAttach = true;
-        else if (sideState.getBlock() instanceof ChainBlock && sideState.get(ChainBlock.AXIS) == Axis.Y)
+        else if (sideState.getBlock() instanceof ChainBlock && sideState.getValue(ChainBlock.AXIS) == Axis.Y)
             canAttach = true;
-        else if (sideState.contains(FACE)) {
-            if (sideState.get(FACE) == BlockFace.CEILING && d == Direction.DOWN)
+        else if (sideState.hasProperty(FACE)) {
+            if (sideState.getValue(FACE) == AttachFace.CEILING && d == Direction.DOWN)
                 canAttach = true;
-            else if (sideState.get(FACE) == BlockFace.FLOOR && d == Direction.UP)
+            else if (sideState.getValue(FACE) == AttachFace.FLOOR && d == Direction.UP)
                 canAttach = true;
         } else if (sideState.getBlock() instanceof PlacardBlock && PlacardBlock.connectedDirection(sideState) == d)
             canAttach = true;
@@ -278,7 +272,7 @@ public class GirderBlock extends Block implements Waterloggable, IWrenchable {
             canAttach = true;
 
         if (canAttach)
-            return state.with(updateProperty, true);
+            return state.setValue(updateProperty, true);
         return state;
     }
 
@@ -287,35 +281,35 @@ public class GirderBlock extends Block implements Waterloggable, IWrenchable {
     }
 
     public static boolean isXGirder(BlockState state) {
-        return (state.getBlock() instanceof GirderBlock && state.get(X)) || (state.getBlock() instanceof GirderEncasedShaftBlock && state.get(
+        return (state.getBlock() instanceof GirderBlock && state.getValue(X)) || (state.getBlock() instanceof GirderEncasedShaftBlock && state.getValue(
             GirderEncasedShaftBlock.HORIZONTAL_AXIS) == Axis.Z);
     }
 
     public static boolean isZGirder(BlockState state) {
-        return (state.getBlock() instanceof GirderBlock && state.get(Z)) || (state.getBlock() instanceof GirderEncasedShaftBlock && state.get(
+        return (state.getBlock() instanceof GirderBlock && state.getValue(Z)) || (state.getBlock() instanceof GirderEncasedShaftBlock && state.getValue(
             GirderEncasedShaftBlock.HORIZONTAL_AXIS) == Axis.X);
     }
 
     @Override
-    public VoxelShape getOutlineShape(BlockState state, BlockView pLevel, BlockPos pPos, ShapeContext pContext) {
-        boolean x = state.get(GirderBlock.X);
-        boolean z = state.get(GirderBlock.Z);
+    public VoxelShape getShape(BlockState state, BlockGetter pLevel, BlockPos pPos, CollisionContext pContext) {
+        boolean x = state.getValue(GirderBlock.X);
+        boolean z = state.getValue(GirderBlock.Z);
         return x ? z ? AllShapes.GIRDER_CROSS : AllShapes.GIRDER_BEAM.get(Axis.X) : z ? AllShapes.GIRDER_BEAM.get(Axis.Z) : AllShapes.EIGHT_VOXEL_POLE.get(
             Axis.Y);
     }
 
     @Override
-    protected boolean canPathfindThrough(BlockState state, NavigationType pathComputationType) {
+    protected boolean isPathfindable(BlockState state, PathComputationType pathComputationType) {
         return false;
     }
 
-    public static boolean isConnected(BlockRenderView world, BlockPos pos, BlockState state, Direction side) {
+    public static boolean isConnected(BlockAndTintGetter world, BlockPos pos, BlockState state, Direction side) {
         Axis axis = side.getAxis();
-        if (state.getBlock() instanceof GirderBlock && !state.get(axis == Axis.X ? X : Z))
+        if (state.getBlock() instanceof GirderBlock && !state.getValue(axis == Axis.X ? X : Z))
             return false;
-        if (state.getBlock() instanceof GirderEncasedShaftBlock && state.get(GirderEncasedShaftBlock.HORIZONTAL_AXIS) == axis)
+        if (state.getBlock() instanceof GirderEncasedShaftBlock && state.getValue(GirderEncasedShaftBlock.HORIZONTAL_AXIS) == axis)
             return false;
-        BlockPos relative = pos.offset(side);
+        BlockPos relative = pos.relative(side);
         BlockState blockState = world.getBlockState(relative);
         if (blockState.isAir())
             return false;
@@ -326,24 +320,24 @@ public class GirderBlock extends Block implements Waterloggable, IWrenchable {
         //TODO
         //        if (blockState.getBlock() instanceof PlacardBlock && PlacardBlock.connectedDirection(blockState) == side)
         //            return true;
-        VoxelShape shape = blockState.getOutlineShape(world, relative);
+        VoxelShape shape = blockState.getShape(world, relative);
         if (shape.isEmpty())
             return false;
-        if (Block.isFaceFullSquare(shape, side.getOpposite()) && blockState.isSolid())
+        if (Block.isFaceFull(shape, side.getOpposite()) && blockState.isSolid())
             return true;
         return AbstractChuteBlock.getChuteFacing(blockState) == Direction.DOWN;
     }
 
     @Override
-    public BlockState rotate(BlockState state, BlockRotation rot) {
-        state = state.with(AXIS, rot.rotate(Direction.from(state.get(AXIS), AxisDirection.POSITIVE)).getAxis());
+    public BlockState rotate(BlockState state, Rotation rot) {
+        state = state.setValue(AXIS, rot.rotate(Direction.fromAxisAndDirection(state.getValue(AXIS), AxisDirection.POSITIVE)).getAxis());
         if (rot.rotate(Direction.EAST).getAxis() == Axis.X)
             return state;
-        return state.with(X, state.get(Z)).with(Z, state.get(Z));
+        return state.setValue(X, state.getValue(Z)).setValue(Z, state.getValue(Z));
     }
 
     @Override
-    public BlockState mirror(BlockState state, BlockMirror mirrorIn) {
+    public BlockState mirror(BlockState state, Mirror mirrorIn) {
         return state;
     }
 

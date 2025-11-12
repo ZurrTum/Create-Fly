@@ -2,16 +2,15 @@ package com.zurrtum.create.infrastructure.packet.c2s;
 
 import com.zurrtum.create.AllHandle;
 import com.zurrtum.create.AllPackets;
-import net.minecraft.item.ItemStack;
-import net.minecraft.network.RegistryByteBuf;
-import net.minecraft.network.codec.PacketCodec;
-import net.minecraft.network.packet.PacketType;
-import net.minecraft.server.network.ServerPlayNetworkHandler;
-
 import java.util.function.BiConsumer;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.PacketType;
+import net.minecraft.server.network.ServerGamePacketListenerImpl;
+import net.minecraft.world.item.ItemStack;
 
 public record SchematicPlacePacket(ItemStack stack) implements C2SPacket {
-    public static final PacketCodec<RegistryByteBuf, SchematicPlacePacket> CODEC = ItemStack.PACKET_CODEC.xmap(
+    public static final StreamCodec<RegistryFriendlyByteBuf, SchematicPlacePacket> CODEC = ItemStack.STREAM_CODEC.map(
         SchematicPlacePacket::new,
         SchematicPlacePacket::stack
     );
@@ -22,12 +21,12 @@ public record SchematicPlacePacket(ItemStack stack) implements C2SPacket {
     }
 
     @Override
-    public PacketType<SchematicPlacePacket> getPacketType() {
+    public PacketType<SchematicPlacePacket> type() {
         return AllPackets.PLACE_SCHEMATIC;
     }
 
     @Override
-    public BiConsumer<ServerPlayNetworkHandler, SchematicPlacePacket> callback() {
+    public BiConsumer<ServerGamePacketListenerImpl, SchematicPlacePacket> callback() {
         return AllHandle::onSchematicPlace;
     }
 }

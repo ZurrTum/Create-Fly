@@ -8,7 +8,7 @@ import java.util.function.Function;
 
 // TODO: 1.21.7 - Move into api package
 public interface PotatoProjectileRenderMode {
-    Codec<PotatoProjectileRenderMode> CODEC = CreateRegistries.POTATO_PROJECTILE_RENDER_MODE.getCodec()
+    Codec<PotatoProjectileRenderMode> CODEC = CreateRegistries.POTATO_PROJECTILE_RENDER_MODE.byNameCodec()
         .dispatch(PotatoProjectileRenderMode::codec, Function.identity());
 
     MapCodec<? extends PotatoProjectileRenderMode> codec();

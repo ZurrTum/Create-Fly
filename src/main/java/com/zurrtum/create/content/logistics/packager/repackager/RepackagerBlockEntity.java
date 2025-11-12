@@ -7,12 +7,11 @@ import com.zurrtum.create.content.logistics.crate.BottomlessItemHandler;
 import com.zurrtum.create.content.logistics.packager.PackagerBlockEntity;
 import com.zurrtum.create.content.logistics.packager.PackagerItemHandler;
 import com.zurrtum.create.content.logistics.packager.PackagingRequest;
-import net.minecraft.block.BlockState;
-import net.minecraft.inventory.Inventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.math.BlockPos;
-
 import java.util.List;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.Container;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.state.BlockState;
 
 public class RepackagerBlockEntity extends PackagerBlockEntity {
 
@@ -27,7 +26,7 @@ public class RepackagerBlockEntity extends PackagerBlockEntity {
         if (animationTicks > 0)
             return false;
 
-        Inventory targetInv = targetInventory.getInventory();
+        Container targetInv = targetInventory.getInventory();
         if (targetInv == null || targetInv instanceof PackagerItemHandler)
             return false;
 
@@ -67,7 +66,7 @@ public class RepackagerBlockEntity extends PackagerBlockEntity {
         if (!queuedExitingPackages.isEmpty())
             return;
 
-        Inventory targetInv = targetInventory.getInventory();
+        Container targetInv = targetInventory.getInventory();
         if (targetInv == null || targetInv instanceof PackagerItemHandler)
             return;
 
@@ -80,7 +79,7 @@ public class RepackagerBlockEntity extends PackagerBlockEntity {
             PackageItem.addAddress(heldBox, signBasedAddress);
     }
 
-    protected void attemptToRepackage(Inventory targetInv) {
+    protected void attemptToRepackage(Container targetInv) {
         repackageHelper.clear();
         int completedOrderId = -1;
 
@@ -105,7 +104,7 @@ public class RepackagerBlockEntity extends PackagerBlockEntity {
         if (completedOrderId == -1)
             return;
 
-        List<BigItemStack> boxesToExport = repackageHelper.repack(completedOrderId, world.getRandom());
+        List<BigItemStack> boxesToExport = repackageHelper.repack(completedOrderId, level.getRandom());
         if (boxesToExport.isEmpty())
             return;
 

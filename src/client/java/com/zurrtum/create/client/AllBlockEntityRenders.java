@@ -122,18 +122,17 @@ import com.zurrtum.create.client.content.trains.track.TrackVisual;
 import com.zurrtum.create.client.flywheel.lib.visualization.SimpleBlockEntityVisualizer;
 import com.zurrtum.create.client.foundation.blockEntity.renderer.SmartBlockEntityRenderer;
 import com.zurrtum.create.content.kinetics.belt.BeltBlockEntity;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.client.render.block.entity.BlockEntityRendererFactories;
-import net.minecraft.client.render.block.entity.BlockEntityRendererFactory;
-import net.minecraft.client.render.block.entity.state.BlockEntityRenderState;
-
 import java.util.function.Predicate;
+import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
+import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
+import net.minecraft.client.renderer.blockentity.state.BlockEntityRenderState;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 
 public class AllBlockEntityRenders {
     public static <T extends BlockEntity, P extends T, S extends BlockEntityRenderState> void visual(
         BlockEntityType<P> type,
-        BlockEntityRendererFactory<T, S> rendererFactory,
+        BlockEntityRendererProvider<T, S> rendererFactory,
         SimpleBlockEntityVisualizer.Factory<P> visualizerFactory
     ) {
         visual(type, rendererFactory, visualizerFactory, blockEntity -> true);
@@ -141,7 +140,7 @@ public class AllBlockEntityRenders {
 
     public static <T extends BlockEntity, P extends T, S extends BlockEntityRenderState> void normal(
         BlockEntityType<P> type,
-        BlockEntityRendererFactory<T, S> rendererFactory,
+        BlockEntityRendererProvider<T, S> rendererFactory,
         SimpleBlockEntityVisualizer.Factory<P> visualizerFactory
     ) {
         visual(type, rendererFactory, visualizerFactory, blockEntity -> false);
@@ -149,19 +148,19 @@ public class AllBlockEntityRenders {
 
     public static <T extends BlockEntity, P extends T, S extends BlockEntityRenderState> void visual(
         BlockEntityType<P> type,
-        BlockEntityRendererFactory<T, S> rendererFactory,
+        BlockEntityRendererProvider<T, S> rendererFactory,
         SimpleBlockEntityVisualizer.Factory<P> visualizerFactory,
         Predicate<P> skipVanillaRender
     ) {
-        BlockEntityRendererFactories.register(type, rendererFactory);
+        BlockEntityRenderers.register(type, rendererFactory);
         SimpleBlockEntityVisualizer.builder(type).factory(visualizerFactory).skipVanillaRender(skipVanillaRender).apply();
     }
 
     public static <T extends BlockEntity, P extends T, S extends BlockEntityRenderState> void render(
         BlockEntityType<P> type,
-        BlockEntityRendererFactory<T, S> rendererFactory
+        BlockEntityRendererProvider<T, S> rendererFactory
     ) {
-        BlockEntityRendererFactories.register(type, rendererFactory);
+        BlockEntityRenderers.register(type, rendererFactory);
     }
 
     public static void register() {

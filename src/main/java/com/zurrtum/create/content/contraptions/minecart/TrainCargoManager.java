@@ -7,11 +7,11 @@ import com.zurrtum.create.api.contraption.storage.fluid.MountedFluidStorageWrapp
 import com.zurrtum.create.api.contraption.storage.item.MountedItemStorageWrapper;
 import com.zurrtum.create.content.contraptions.Contraption;
 import com.zurrtum.create.content.contraptions.MountedStorageManager;
-import net.minecraft.storage.ReadView;
-import net.minecraft.storage.WriteView;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.concurrent.atomic.AtomicInteger;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 
 public class TrainCargoManager extends MountedStorageManager {
 
@@ -35,7 +35,7 @@ public class TrainCargoManager extends MountedStorageManager {
     }
 
     @Override
-    public void write(WriteView view, boolean clientPacket) {
+    public void write(ValueOutput view, boolean clientPacket) {
         super.write(view, clientPacket);
         view.putInt("TicksSinceLastExchange", ticksSinceLastExchange);
     }
@@ -47,9 +47,9 @@ public class TrainCargoManager extends MountedStorageManager {
     }
 
     @Override
-    public void read(ReadView view, boolean clientPacket, @Nullable Contraption contraption) {
+    public void read(ValueInput view, boolean clientPacket, @Nullable Contraption contraption) {
         super.read(view, clientPacket, contraption);
-        ticksSinceLastExchange = view.getInt("TicksSinceLastExchange", 0);
+        ticksSinceLastExchange = view.getIntOr("TicksSinceLastExchange", 0);
     }
 
     @Override

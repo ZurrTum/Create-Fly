@@ -14,24 +14,20 @@ import com.zurrtum.create.content.processing.recipe.ChanceOutput;
 import com.zurrtum.create.foundation.recipe.ComponentsIngredient;
 import com.zurrtum.create.foundation.recipe.CreateRecipe;
 import com.zurrtum.create.infrastructure.component.SequencedAssemblyJunk;
-import net.minecraft.component.DataComponentTypes;
-import net.minecraft.component.type.LoreComponent;
-import net.minecraft.item.ItemStack;
-import net.minecraft.network.RegistryByteBuf;
-import net.minecraft.network.codec.PacketCodec;
-import net.minecraft.network.codec.PacketCodecs;
-import net.minecraft.recipe.Ingredient;
-import net.minecraft.recipe.Recipe;
-import net.minecraft.recipe.RecipeSerializer;
-import net.minecraft.recipe.RecipeType;
-import net.minecraft.recipe.input.SingleStackRecipeInput;
-import net.minecraft.registry.Registries;
-import net.minecraft.registry.RegistryWrapper;
-import net.minecraft.screen.ScreenTexts;
-import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
-import net.minecraft.util.Identifier;
-import net.minecraft.world.World;
+import net.minecraft.ChatFormatting;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.chat.CommonComponents;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.component.ItemLore;
+import net.minecraft.world.item.crafting.*;
+import net.minecraft.world.level.Level;
 import org.apache.commons.lang3.mutable.MutableInt;
 import org.apache.logging.log4j.util.TriConsumer;
 
@@ -44,24 +40,24 @@ import java.util.stream.Stream;
 
 public record SequencedAssemblyRecipe(
     Ingredient ingredient, ItemStack transitionalItem, ChanceOutput result, List<ChanceOutput> junks, int loops, List<Recipe<?>> sequence
-) implements CreateRecipe<SingleStackRecipeInput> {
+) implements CreateRecipe<SingleRecipeInput> {
     @Override
     public RecipeType<SequencedAssemblyRecipe> getType() {
         return AllRecipeTypes.SEQUENCED_ASSEMBLY;
     }
 
     @Override
-    public boolean matches(SingleStackRecipeInput input, World world) {
+    public boolean matches(SingleRecipeInput input, Level world) {
         return ingredient.test(input.item());
     }
 
     @Override
-    public ItemStack craft(SingleStackRecipeInput input, RegistryWrapper.WrapperLookup registries) {
+    public ItemStack assemble(SingleRecipeInput input, HolderLookup.Provider registries) {
         return result.stack().copy();
     }
 
     @Override
-    public RecipeSerializer<? extends Recipe<SingleStackRecipeInput>> getSerializer() {
+    public RecipeSerializer<? extends Recipe<SingleRecipeInput>> getSerializer() {
         return AllRecipeSerializers.SEQUENCED_ASSEMBLY;
     }
 
@@ -79,7 +75,7 @@ public record SequencedAssemblyRecipe(
         private static final String INGREDIENT_ID = "$ingredient";
         private static final String RESULT_ID = "$result";
         private static final AtomicInteger idGenerator = new AtomicInteger();
-        public static final Map<Identifier, Recipe<?>> GENERATE_RECIPES = new HashMap<>();
+        public static final Map<ResourceLocation, Recipe<?>> GENERATE_RECIPES = new HashMap<>();
         public static final MapCodec<SequencedAssemblyRecipe> CODEC = new MapCodec<>() {
             @Override
             public <T> RecordBuilder<T> encode(SequencedAssemblyRecipe input, DynamicOps<T> ops, RecordBuilder<T> prefix) {
@@ -106,17 +102,17 @@ public record SequencedAssemblyRecipe(
                     ChanceOutput result = ChanceOutput.CODEC.parse(dynamicOps, input.get("result")).getOrThrow();
                     List<ChanceOutput> junks = JUNKS_CODEC.parse(dynamicOps, input.get("junks")).result().orElse(List.of());
 
-                    List<Text> RecipeName = new ArrayList<>(sequenceSize);
+                    List<Component> RecipeName = new ArrayList<>(sequenceSize);
                     for (int i = 0; i < sequenceSize; i++) {
                         JsonObject object = (JsonObject) sequenceJson.get(i);
                         RecipeName.add(AllAssemblyRecipeNames.get(ops, object));
                     }
 
                     ItemStack transitional = transitionalItem.copy();
-                    Ingredient transitionalIngredient = Ingredient.ofItem(transitionalItem.getItem());
+                    Ingredient transitionalIngredient = Ingredient.of(transitionalItem.getItem());
                     Supplier<JsonElement> transitionalJsonIngredient = () -> ComponentsIngredient.CODEC.encodeStart(
                         ops,
-                        new ComponentsIngredient(transitionalIngredient, transitional.getComponentChanges())
+                        new ComponentsIngredient(transitionalIngredient, transitional.getComponentsPatch())
                     ).getOrThrow();
 
                     List<BiFunction<JsonElement, JsonElement, JsonObject>> sequenceJsonFactory = new ArrayList<>(size);
@@ -137,20 +133,20 @@ public record SequencedAssemblyRecipe(
                     MutableInt step = new MutableInt(1);
                     Supplier<JsonElement> transitionalJsonResult = () -> {
                         int index = step.getAndIncrement();
-                        List<Text> lore = new ArrayList<>(6);
-                        lore.add(ScreenTexts.EMPTY);
-                        lore.add(Text.translatable("create.recipe.sequenced_assembly").formatted(Formatting.GRAY)
-                            .styled(style -> style.withItalic(false)));
-                        lore.add(Text.translatable("create.recipe.assembly.progress", index, size).formatted(Formatting.DARK_GRAY)
-                            .styled(style -> style.withItalic(false)));
-                        lore.add(Text.translatable("create.recipe.assembly.next", RecipeName.get(index % sequenceSize)).formatted(Formatting.AQUA)
-                            .styled(style -> style.withItalic(false)));
+                        List<Component> lore = new ArrayList<>(6);
+                        lore.add(CommonComponents.EMPTY);
+                        lore.add(Component.translatable("create.recipe.sequenced_assembly").withStyle(ChatFormatting.GRAY)
+                            .withStyle(style -> style.withItalic(false)));
+                        lore.add(Component.translatable("create.recipe.assembly.progress", index, size).withStyle(ChatFormatting.DARK_GRAY)
+                            .withStyle(style -> style.withItalic(false)));
+                        lore.add(Component.translatable("create.recipe.assembly.next", RecipeName.get(index % sequenceSize))
+                            .withStyle(ChatFormatting.AQUA).withStyle(style -> style.withItalic(false)));
                         for (int i = index + 1, end = Math.min(i + 2, size); i < end; i++) {
-                            lore.add(Text.literal("-> ").append(RecipeName.get(i % sequenceSize)).formatted(Formatting.DARK_AQUA)
-                                .styled(style -> style.withItalic(false)));
+                            lore.add(Component.literal("-> ").append(RecipeName.get(i % sequenceSize)).withStyle(ChatFormatting.DARK_AQUA)
+                                .withStyle(style -> style.withItalic(false)));
                         }
                         transitional.set(AllDataComponents.SEQUENCED_ASSEMBLY_PROGRESS, (float) index / size);
-                        transitional.set(DataComponentTypes.LORE, new LoreComponent(lore, lore));
+                        transitional.set(DataComponents.LORE, new ItemLore(lore, lore));
                         return ItemStack.CODEC.encodeStart(ops, transitional).getOrThrow();
                     };
                     Supplier<JsonElement> transitionalJsonChanceResult = () -> {
@@ -161,15 +157,15 @@ public record SequencedAssemblyRecipe(
                     };
                     JsonElement jsonResult = ItemStack.CODEC.encodeStart(ops, result.stack()).getOrThrow();
 
-                    Identifier id = Identifier.of(AllRecipeTypes.SEQUENCED_ASSEMBLY.toString())
-                        .withSuffixedPath("_" + idGenerator.incrementAndGet() + "_" + Registries.ITEM.getId(result.stack().getItem())
+                    ResourceLocation id = ResourceLocation.parse(AllRecipeTypes.SEQUENCED_ASSEMBLY.toString())
+                        .withSuffix("_" + idGenerator.incrementAndGet() + "_" + BuiltInRegistries.ITEM.getKey(result.stack().getItem())
                             .getPath() + "_");
                     List<Recipe<?>> sequence = new ArrayList<>(size);
                     TriConsumer<Integer, JsonElement, JsonElement> recipeAdd = (i, ingredientJson, resultJson) -> {
                         JsonObject object = sequenceJsonFactory.get(i % sequenceSize).apply(ingredientJson, resultJson);
                         Recipe<?> recipe = Recipe.CODEC.parse(ops, object).getOrThrow();
                         sequence.add(recipe);
-                        GENERATE_RECIPES.put(id.withSuffixedPath(String.valueOf(sequence.size())), recipe);
+                        GENERATE_RECIPES.put(id.withSuffix(String.valueOf(sequence.size())), recipe);
                     };
 
                     JsonElement ingredientJson = (JsonElement) input.get("ingredient");
@@ -247,18 +243,18 @@ public record SequencedAssemblyRecipe(
                 );
             }
         };
-        public static final PacketCodec<RegistryByteBuf, SequencedAssemblyRecipe> PACKET_CODEC = PacketCodec.tuple(
-            Ingredient.PACKET_CODEC,
+        public static final StreamCodec<RegistryFriendlyByteBuf, SequencedAssemblyRecipe> PACKET_CODEC = StreamCodec.composite(
+            Ingredient.CONTENTS_STREAM_CODEC,
             SequencedAssemblyRecipe::ingredient,
-            ItemStack.PACKET_CODEC,
+            ItemStack.STREAM_CODEC,
             SequencedAssemblyRecipe::transitionalItem,
             ChanceOutput.PACKET_CODEC,
             SequencedAssemblyRecipe::result,
-            ChanceOutput.PACKET_CODEC.collect(PacketCodecs.toList()),
+            ChanceOutput.PACKET_CODEC.apply(ByteBufCodecs.list()),
             SequencedAssemblyRecipe::junks,
-            PacketCodecs.INTEGER,
+            ByteBufCodecs.INT,
             SequencedAssemblyRecipe::loops,
-            Recipe.PACKET_CODEC.collect(PacketCodecs.toList()),
+            Recipe.STREAM_CODEC.apply(ByteBufCodecs.list()),
             SequencedAssemblyRecipe::sequence,
             SequencedAssemblyRecipe::new
         );
@@ -269,7 +265,7 @@ public record SequencedAssemblyRecipe(
         }
 
         @Override
-        public PacketCodec<RegistryByteBuf, SequencedAssemblyRecipe> packetCodec() {
+        public StreamCodec<RegistryFriendlyByteBuf, SequencedAssemblyRecipe> streamCodec() {
             return PACKET_CODEC;
         }
     }

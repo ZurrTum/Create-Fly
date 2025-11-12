@@ -1,5 +1,7 @@
 package com.zurrtum.create.client.content.kinetics.gearbox;
 
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.zurrtum.create.catnip.theme.Color;
 import com.zurrtum.create.client.AllPartialModels;
 import com.zurrtum.create.client.catnip.animation.AnimationTickHolder;
@@ -7,24 +9,22 @@ import com.zurrtum.create.client.catnip.render.CachedBuffers;
 import com.zurrtum.create.client.catnip.render.SuperByteBuffer;
 import com.zurrtum.create.client.content.kinetics.base.KineticBlockEntityRenderer;
 import com.zurrtum.create.content.kinetics.gearbox.GearboxBlockEntity;
-import net.minecraft.client.render.RenderLayer;
-import net.minecraft.client.render.VertexConsumer;
-import net.minecraft.client.render.block.entity.BlockEntityRenderer;
-import net.minecraft.client.render.block.entity.BlockEntityRendererFactory;
-import net.minecraft.client.render.block.entity.state.BlockEntityRenderState;
-import net.minecraft.client.render.command.ModelCommandRenderer;
-import net.minecraft.client.render.command.OrderedRenderCommandQueue;
-import net.minecraft.client.render.state.CameraRenderState;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.state.property.Properties;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Direction.Axis;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.SubmitNodeCollector;
+import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
+import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
+import net.minecraft.client.renderer.blockentity.state.BlockEntityRenderState;
+import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
+import net.minecraft.client.renderer.state.CameraRenderState;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.Direction.Axis;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 
 public class GearboxRenderer implements BlockEntityRenderer<GearboxBlockEntity, GearboxRenderer.GearboxRenderState> {
-    public GearboxRenderer(BlockEntityRendererFactory.Context context) {
+    public GearboxRenderer(BlockEntityRendererProvider.Context context) {
     }
 
     @Override
@@ -33,24 +33,24 @@ public class GearboxRenderer implements BlockEntityRenderer<GearboxBlockEntity, 
     }
 
     @Override
-    public void updateRenderState(
+    public void extractRenderState(
         GearboxBlockEntity be,
         GearboxRenderState state,
         float tickProgress,
-        Vec3d cameraPos,
-        @Nullable ModelCommandRenderer.CrumblingOverlayCommand crumblingOverlay
+        Vec3 cameraPos,
+        @Nullable ModelFeatureRenderer.CrumblingOverlay crumblingOverlay
     ) {
-        BlockEntityRenderState.updateBlockEntityRenderState(be, state, crumblingOverlay);
-        state.layer = RenderLayer.getSolid();
-        Axis boxAxis = state.blockState.get(Properties.AXIS);
-        BlockPos pos = state.pos;
-        float time = AnimationTickHolder.getRenderTime(be.getWorld());
+        BlockEntityRenderState.extractBase(be, state, crumblingOverlay);
+        state.layer = RenderType.solid();
+        Axis boxAxis = state.blockState.getValue(BlockStateProperties.AXIS);
+        BlockPos pos = state.blockPos;
+        float time = AnimationTickHolder.getRenderTime(be.getLevel());
         float speed = be.getSpeed();
         BlockPos source = null;
         Direction sourceFacing = null;
         if (speed != 0 && be.source != null) {
-            source = be.source.subtract(state.pos);
-            sourceFacing = Direction.getFacing(source.getX(), source.getY(), source.getZ());
+            source = be.source.subtract(state.blockPos);
+            sourceFacing = Direction.getApproximateNearest(source.getX(), source.getY(), source.getZ());
         }
         state.color = KineticBlockEntityRenderer.getColor(be);
         float angle = (time * speed * 3f / 10) % 360;
@@ -81,7 +81,7 @@ public class GearboxRenderer implements BlockEntityRenderer<GearboxBlockEntity, 
         if (source != null) {
             if (sourceFacing.getAxis() == direction.getAxis())
                 angle *= sourceFacing == direction ? 1 : -1;
-            else if (sourceFacing.getDirection() == direction.getDirection())
+            else if (sourceFacing.getAxisDirection() == direction.getAxisDirection())
                 angle *= -1;
         }
         angle += offset;
@@ -89,12 +89,12 @@ public class GearboxRenderer implements BlockEntityRenderer<GearboxBlockEntity, 
     }
 
     @Override
-    public void render(GearboxRenderState state, MatrixStack matrices, OrderedRenderCommandQueue queue, CameraRenderState cameraState) {
-        queue.submitCustom(matrices, state.layer, state);
+    public void submit(GearboxRenderState state, PoseStack matrices, SubmitNodeCollector queue, CameraRenderState cameraState) {
+        queue.submitCustomGeometry(matrices, state.layer, state);
     }
 
-    public static class GearboxRenderState extends BlockEntityRenderState implements OrderedRenderCommandQueue.Custom {
-        public RenderLayer layer;
+    public static class GearboxRenderState extends BlockEntityRenderState implements SubmitNodeCollector.CustomGeometryRenderer {
+        public RenderType layer;
         public Color color;
         public SuperByteBuffer down;
         public float downAngle;
@@ -109,15 +109,15 @@ public class GearboxRenderer implements BlockEntityRenderer<GearboxBlockEntity, 
         public SuperByteBuffer east;
         public float eastAngle;
 
-        private void render(SuperByteBuffer model, float angle, Direction axis, MatrixStack.Entry matricesEntry, VertexConsumer vertexConsumer) {
-            model.light(lightmapCoordinates);
+        private void render(SuperByteBuffer model, float angle, Direction axis, PoseStack.Pose matricesEntry, VertexConsumer vertexConsumer) {
+            model.light(lightCoords);
             model.rotateCentered(angle, axis);
             model.color(color);
             model.renderInto(matricesEntry, vertexConsumer);
         }
 
         @Override
-        public void render(MatrixStack.Entry matricesEntry, VertexConsumer vertexConsumer) {
+        public void render(PoseStack.Pose matricesEntry, VertexConsumer vertexConsumer) {
             if (down != null) {
                 render(down, downAngle, Direction.UP, matricesEntry, vertexConsumer);
                 render(up, upAngle, Direction.UP, matricesEntry, vertexConsumer);

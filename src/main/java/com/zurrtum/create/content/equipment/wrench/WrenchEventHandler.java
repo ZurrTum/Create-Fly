@@ -2,29 +2,29 @@ package com.zurrtum.create.content.equipment.wrench;
 
 import com.zurrtum.create.AllItemTags;
 import com.zurrtum.create.AllItems;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.ItemUsageContext;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.Hand;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.context.UseOnContext;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.BlockHitResult;
 
 public class WrenchEventHandler {
-    public static ActionResult useOwnWrenchLogicForCreateBlocks(
-        World world,
-        PlayerEntity player,
+    public static InteractionResult useOwnWrenchLogicForCreateBlocks(
+        Level world,
+        Player player,
         ItemStack itemStack,
-        Hand hand,
+        InteractionHand hand,
         BlockHitResult hitVec,
         BlockPos pos
     ) {
-        if (world == null || player == null || !player.canModifyBlocks() || itemStack.isEmpty() || itemStack.isOf(AllItems.WRENCH))
+        if (world == null || player == null || !player.mayBuild() || itemStack.isEmpty() || itemStack.is(AllItems.WRENCH))
             return null;
-        if (!itemStack.isIn(AllItemTags.TOOLS_WRENCH))
+        if (!itemStack.is(AllItemTags.TOOLS_WRENCH))
             return null;
 
         BlockState state = world.getBlockState(pos);
@@ -33,7 +33,7 @@ public class WrenchEventHandler {
         if (!(block instanceof IWrenchable actor))
             return null;
 
-        ItemUsageContext context = new ItemUsageContext(player, hand, hitVec);
-        return player.isSneaking() ? actor.onSneakWrenched(state, context) : actor.onWrenched(state, context);
+        UseOnContext context = new UseOnContext(player, hand, hitVec);
+        return player.isShiftKeyDown() ? actor.onSneakWrenched(state, context) : actor.onWrenched(state, context);
     }
 }

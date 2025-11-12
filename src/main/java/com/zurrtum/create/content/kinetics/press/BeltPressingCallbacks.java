@@ -6,7 +6,7 @@ import com.zurrtum.create.content.kinetics.belt.behaviour.TransportedItemStackHa
 import com.zurrtum.create.content.kinetics.belt.behaviour.TransportedItemStackHandlerBehaviour.TransportedResult;
 import com.zurrtum.create.content.kinetics.belt.transport.TransportedItemStack;
 import com.zurrtum.create.content.kinetics.press.PressingBehaviour.Mode;
-import net.minecraft.item.ItemStack;
+import net.minecraft.world.item.ItemStack;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -60,7 +60,7 @@ public class BeltPressingCallbacks {
             boolean centered = BeltHelper.isItemUpright(stack);
             copy.stack = stack;
             copy.locked = true;
-            copy.angle = centered ? 180 : behaviour.getWorld().random.nextInt(360);
+            copy.angle = centered ? 180 : behaviour.getLevel().random.nextInt(360);
             return copy;
         }).collect(Collectors.toList());
 
@@ -72,7 +72,7 @@ public class BeltPressingCallbacks {
 
         } else {
             TransportedItemStack left = transported.copy();
-            left.stack.decrement(1);
+            left.stack.shrink(1);
 
             if (collect.isEmpty())
                 handler.handleProcessingOnItem(transported, TransportedResult.convertTo(left));

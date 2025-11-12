@@ -20,14 +20,14 @@ import it.unimi.dsi.fastutil.longs.Long2IntMap;
 import it.unimi.dsi.fastutil.longs.Long2IntOpenHashMap;
 import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
 import it.unimi.dsi.fastutil.longs.LongSet;
-import net.minecraft.client.render.LightmapTextureManager;
-import net.minecraft.util.math.ChunkSectionPos;
-import net.minecraft.util.math.Vec3i;
-import net.minecraft.world.WorldAccess;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.system.MemoryUtil;
 
 import java.util.BitSet;
+import net.minecraft.client.renderer.LightTexture;
+import net.minecraft.core.SectionPos;
+import net.minecraft.core.Vec3i;
+import net.minecraft.world.level.LevelAccessor;
 
 /**
  * A managed arena of light sections for uploading to the GPU.
@@ -51,7 +51,7 @@ public class LightStorage implements Effect {
     private static final int DEFAULT_ARENA_CAPACITY_SECTIONS = 64;
     private static final int INVALID_SECTION = -1;
 
-    private final WorldAccess level;
+    private final LevelAccessor level;
     private final LightLut lut;
     public final CpuArena arena;
     private final Long2IntMap section2ArenaIndex;
@@ -65,7 +65,7 @@ public class LightStorage implements Effect {
     @Nullable
     private LongSet requestedSections;
 
-    public LightStorage(WorldAccess level) {
+    public LightStorage(LevelAccessor level) {
         this.level = level;
         lut = new LightLut();
         arena = new CpuArena(SECTION_SIZE_BYTES, DEFAULT_ARENA_CAPACITY_SECTIONS);
@@ -75,7 +75,7 @@ public class LightStorage implements Effect {
     }
 
     @Override
-    public WorldAccess level() {
+    public LevelAccessor level() {
         return level;
     }
 
@@ -139,7 +139,7 @@ public class LightStorage implements Effect {
                 for (int x = -1; x <= 1; x++) {
                     for (int y = -1; y <= 1; y++) {
                         for (int z = -1; z <= 1; z++) {
-                            long section = ChunkSectionPos.offset(updatedSection, x, y, z);
+                            long section = SectionPos.offset(updatedSection, x, y, z);
                             if (section2ArenaIndex.containsKey(section)) {
                                 sectionsToCollect.add(section);
                             }
@@ -275,16 +275,16 @@ public class LightStorage implements Effect {
 
         private void setupSectionBoxes() {
             section2ArenaIndex.keySet().forEach(l -> {
-                var x = ChunkSectionPos.unpackX(l) * 16 - renderOrigin.getX();
-                var y = ChunkSectionPos.unpackY(l) * 16 - renderOrigin.getY();
-                var z = ChunkSectionPos.unpackZ(l) * 16 - renderOrigin.getZ();
+                var x = SectionPos.x(l) * 16 - renderOrigin.getX();
+                var y = SectionPos.y(l) * 16 - renderOrigin.getY();
+                var z = SectionPos.z(l) * 16 - renderOrigin.getZ();
 
                 var instance = boxes.get();
 
                 // Slightly smaller than a full 16x16x16 section to make it obvious which sections
                 // are actually represented when many are tiled next to each other.
                 instance.setIdentityTransform().translate(x + 1, y + 1, z + 1).scale(14).color(255, 255, 0)
-                    .light(LightmapTextureManager.MAX_LIGHT_COORDINATE).setChanged();
+                    .light(LightTexture.FULL_BRIGHT).setChanged();
             });
         }
 
@@ -344,17 +344,17 @@ public class LightStorage implements Effect {
 
                     for (int z = 0; z < size3; z++) {
                         boxes.get().setIdentityTransform().translate(x2, y2, debug3).scale(1, 1, size3 * 16).color(0, 0, 255)
-                            .light(LightmapTextureManager.MAX_LIGHT_COORDINATE).setChanged();
+                            .light(LightTexture.FULL_BRIGHT).setChanged();
                     }
                 }
 
                 boxes.get().setIdentityTransform().translate(debug2, y2, minLocal3 * 16 - renderOrigin.getZ())
-                    .scale(size2 * 16, 1, (maxLocal3 - minLocal3) * 16).color(255, 0, 0).light(LightmapTextureManager.MAX_LIGHT_COORDINATE)
+                    .scale(size2 * 16, 1, (maxLocal3 - minLocal3) * 16).color(255, 0, 0).light(LightTexture.FULL_BRIGHT)
                     .setChanged();
             }
 
             boxes.get().setIdentityTransform().translate(min2 * 16 - renderOrigin.getX(), debug1, min3 * 16 - renderOrigin.getZ())
-                .scale((max2 - min2) * 16, size1 * 16, (max3 - min3) * 16).color(0, 255, 0).light(LightmapTextureManager.MAX_LIGHT_COORDINATE)
+                .scale((max2 - min2) * 16, size1 * 16, (max3 - min3) * 16).color(0, 255, 0).light(LightTexture.FULL_BRIGHT)
                 .setChanged();
         }
 

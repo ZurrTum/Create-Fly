@@ -2,24 +2,23 @@ package com.zurrtum.create.content.trains.schedule;
 
 import com.mojang.serialization.*;
 import com.zurrtum.create.catnip.codecs.stream.CatnipStreamCodecBuilders;
-import net.minecraft.network.RegistryByteBuf;
-import net.minecraft.network.codec.PacketCodec;
-import net.minecraft.network.codec.PacketCodecs;
-import net.minecraft.storage.ReadView;
-import net.minecraft.storage.WriteView;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 
 public class Schedule {
-    public static final PacketCodec<RegistryByteBuf, Schedule> STREAM_CODEC = PacketCodec.tuple(
+    public static final StreamCodec<RegistryFriendlyByteBuf, Schedule> STREAM_CODEC = StreamCodec.composite(
         CatnipStreamCodecBuilders.list(ScheduleEntry.STREAM_CODEC),
         schedule -> schedule.entries,
-        PacketCodecs.BOOLEAN,
+        ByteBufCodecs.BOOL,
         schedule -> schedule.cyclic,
-        PacketCodecs.VAR_INT,
+        ByteBufCodecs.VAR_INT,
         schedule -> schedule.savedProgress,
         Schedule::new
     );
@@ -38,9 +37,9 @@ public class Schedule {
         this.savedProgress = savedProgress;
     }
 
-    public void write(WriteView view) {
-        WriteView.ListView list = view.getList("Entries");
-        entries.forEach(entry -> entry.write(list.add()));
+    public void write(ValueOutput view) {
+        ValueOutput.ValueOutputList list = view.childrenList("Entries");
+        entries.forEach(entry -> entry.write(list.addChild()));
         view.putBoolean("Cyclic", cyclic);
         if (savedProgress > 0)
             view.putInt("Progress", savedProgress);
@@ -57,11 +56,11 @@ public class Schedule {
         return map.build(empty);
     }
 
-    public static Schedule read(ReadView view) {
+    public static Schedule read(ValueInput view) {
         Schedule schedule = new Schedule();
-        schedule.entries = view.getListReadView("Entries").stream().map(ScheduleEntry::read).collect(Collectors.toList());
-        schedule.cyclic = view.getBoolean("Cyclic", false);
-        view.getOptionalInt("Progress").ifPresent(value -> schedule.savedProgress = value);
+        schedule.entries = view.childrenListOrEmpty("Entries").stream().map(ScheduleEntry::read).collect(Collectors.toList());
+        schedule.cyclic = view.getBooleanOr("Cyclic", false);
+        view.getInt("Progress").ifPresent(value -> schedule.savedProgress = value);
         return schedule;
     }
 

@@ -1,148 +1,147 @@
 package com.zurrtum.create.client.foundation.render;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gl.RenderPipelines;
-import net.minecraft.client.render.RenderLayer;
-import net.minecraft.client.render.RenderPhase;
-import net.minecraft.client.texture.AbstractTexture;
-import net.minecraft.client.texture.TextureManager;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.Util;
-
 import java.util.Optional;
 import java.util.function.BiFunction;
 import java.util.function.Function;
+import net.minecraft.Util;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.RenderPipelines;
+import net.minecraft.client.renderer.RenderStateShard;
+import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.texture.AbstractTexture;
+import net.minecraft.client.renderer.texture.TextureManager;
+import net.minecraft.resources.ResourceLocation;
 
 import static com.zurrtum.create.Create.MOD_ID;
 
-public class RenderTypes extends RenderPhase {
-    private static final RenderLayer ENTITY_SOLID_BLOCK_MIPPED = RenderLayer.of(
+public class RenderTypes extends RenderStateShard {
+    private static final RenderType ENTITY_SOLID_BLOCK_MIPPED = RenderType.create(
         createLayerName("entity_solid_block_mipped"),
         256,
         true,
         false,
         RenderPipelines.ENTITY_SOLID,
-        RenderLayer.MultiPhaseParameters.builder().texture(MIPMAP_BLOCK_ATLAS_TEXTURE).lightmap(ENABLE_LIGHTMAP).overlay(ENABLE_OVERLAY_COLOR)
-            .build(true)
+        RenderType.CompositeState.builder().setTextureState(BLOCK_SHEET_MIPPED).setLightmapState(LIGHTMAP).setOverlayState(OVERLAY)
+            .createCompositeState(true)
     );
 
-    private static final RenderLayer ENTITY_CUTOUT_BLOCK_MIPPED = RenderLayer.of(
+    private static final RenderType ENTITY_CUTOUT_BLOCK_MIPPED = RenderType.create(
         createLayerName("entity_cutout_block_mipped"),
         256,
         true,
         false,
         RenderPipelines.ENTITY_CUTOUT,
-        RenderLayer.MultiPhaseParameters.builder().texture(MIPMAP_BLOCK_ATLAS_TEXTURE).lightmap(ENABLE_LIGHTMAP).overlay(ENABLE_OVERLAY_COLOR)
-            .build(true)
+        RenderType.CompositeState.builder().setTextureState(BLOCK_SHEET_MIPPED).setLightmapState(LIGHTMAP).setOverlayState(OVERLAY)
+            .createCompositeState(true)
     );
 
-    private static final RenderLayer ENTITY_TRANSLUCENT_BLOCK_MIPPED = RenderLayer.of(
+    private static final RenderType ENTITY_TRANSLUCENT_BLOCK_MIPPED = RenderType.create(
         createLayerName("entity_translucent_block_mipped"),
         256,
         true,
         true,
-        RenderPipelines.RENDERTYPE_ITEM_ENTITY_TRANSLUCENT_CULL,
-        RenderLayer.MultiPhaseParameters.builder().texture(MIPMAP_BLOCK_ATLAS_TEXTURE).lightmap(ENABLE_LIGHTMAP).overlay(ENABLE_OVERLAY_COLOR)
-            .build(true)
+        RenderPipelines.ITEM_ENTITY_TRANSLUCENT_CULL,
+        RenderType.CompositeState.builder().setTextureState(BLOCK_SHEET_MIPPED).setLightmapState(LIGHTMAP).setOverlayState(OVERLAY)
+            .createCompositeState(true)
     );
 
-    private static final RenderLayer TRANSLUCENT = RenderLayer.of(
+    private static final RenderType TRANSLUCENT = RenderType.create(
         createLayerName("translucent"),
         256,
         true,
         true,
         RenderPipelines.TRANSLUCENT,
-        RenderLayer.MultiPhaseParameters.builder().lightmap(ENABLE_LIGHTMAP).texture(MIPMAP_BLOCK_ATLAS_TEXTURE).build(true)
+        RenderType.CompositeState.builder().setLightmapState(LIGHTMAP).setTextureState(BLOCK_SHEET_MIPPED).createCompositeState(true)
     );
 
-    private static final RenderLayer ADDITIVE = RenderLayer.of(
+    private static final RenderType ADDITIVE = RenderType.create(
         createLayerName("additive"),
         256,
         true,
         true,
         AllRenderPipelines.ADDITIVE,
-        RenderLayer.MultiPhaseParameters.builder().texture(BLOCK_ATLAS_TEXTURE).lightmap(ENABLE_LIGHTMAP).overlay(ENABLE_OVERLAY_COLOR).build(true)
+        RenderType.CompositeState.builder().setTextureState(BLOCK_SHEET).setLightmapState(LIGHTMAP).setOverlayState(OVERLAY).createCompositeState(true)
     );
 
-    private static final RenderLayer ADDITIVE2 = RenderLayer.of(
+    private static final RenderType ADDITIVE2 = RenderType.create(
         createLayerName("additive2"),
         256,
         true,
         true,
         AllRenderPipelines.ADDITIVE2,
-        RenderLayer.MultiPhaseParameters.builder().texture(BLOCK_ATLAS_TEXTURE).lightmap(ENABLE_LIGHTMAP).overlay(ENABLE_OVERLAY_COLOR).build(true)
+        RenderType.CompositeState.builder().setTextureState(BLOCK_SHEET).setLightmapState(LIGHTMAP).setOverlayState(OVERLAY).createCompositeState(true)
     );
 
-    private static final RenderLayer ITEM_GLOWING_SOLID = RenderLayer.of(
+    private static final RenderType ITEM_GLOWING_SOLID = RenderType.create(
         createLayerName("item_glowing_solid"),
         256,
         true,
         false,
         AllRenderPipelines.GLOWING,
-        RenderLayer.MultiPhaseParameters.builder().texture(BLOCK_ATLAS_TEXTURE).lightmap(ENABLE_LIGHTMAP).overlay(ENABLE_OVERLAY_COLOR).build(true)
+        RenderType.CompositeState.builder().setTextureState(BLOCK_SHEET).setLightmapState(LIGHTMAP).setOverlayState(OVERLAY).createCompositeState(true)
     );
 
-    private static final RenderLayer ITEM_GLOWING_TRANSLUCENT = RenderLayer.of(
+    private static final RenderType ITEM_GLOWING_TRANSLUCENT = RenderType.create(
         createLayerName("item_glowing_translucent"),
         256,
         true,
         true,
         AllRenderPipelines.GLOWING_TRANSLUCENT,
-        RenderLayer.MultiPhaseParameters.builder().texture(BLOCK_ATLAS_TEXTURE).lightmap(ENABLE_LIGHTMAP).overlay(ENABLE_OVERLAY_COLOR).build(true)
+        RenderType.CompositeState.builder().setTextureState(BLOCK_SHEET).setLightmapState(LIGHTMAP).setOverlayState(OVERLAY).createCompositeState(true)
     );
 
-    private static final Function<Identifier, RenderLayer> CHAIN = Util.memoize((p_234330_) -> RenderLayer.of(
+    private static final Function<ResourceLocation, RenderType> CHAIN = Util.memoize((p_234330_) -> RenderType.create(
         "chain_conveyor_chain",
         256,
         false,
         true,
         RenderPipelines.CUTOUT_MIPPED,
-        RenderLayer.MultiPhaseParameters.builder().texture(new Texture(p_234330_, true)).lightmap(ENABLE_LIGHTMAP).overlay(ENABLE_OVERLAY_COLOR)
-            .build(false)
+        RenderType.CompositeState.builder().setTextureState(new TextureStateShard(p_234330_, true)).setLightmapState(LIGHTMAP).setOverlayState(OVERLAY)
+            .createCompositeState(false)
     ));
 
-    public static RenderLayer entitySolidBlockMipped() {
+    public static RenderType entitySolidBlockMipped() {
         return ENTITY_SOLID_BLOCK_MIPPED;
     }
 
-    public static RenderLayer entityCutoutBlockMipped() {
+    public static RenderType entityCutoutBlockMipped() {
         return ENTITY_CUTOUT_BLOCK_MIPPED;
     }
 
-    public static RenderLayer entityTranslucentBlockMipped() {
+    public static RenderType entityTranslucentBlockMipped() {
         return ENTITY_TRANSLUCENT_BLOCK_MIPPED;
     }
 
-    public static RenderLayer translucent() {
+    public static RenderType translucent() {
         return TRANSLUCENT;
     }
 
-    public static RenderLayer additive() {
+    public static RenderType additive() {
         return ADDITIVE;
     }
 
-    public static RenderLayer additive2() {
+    public static RenderType additive2() {
         return ADDITIVE2;
     }
 
-    public static BiFunction<Identifier, Boolean, RenderLayer> TRAIN_MAP = Util.memoize(RenderTypes::getTrainMap);
+    public static BiFunction<ResourceLocation, Boolean, RenderType> TRAIN_MAP = Util.memoize(RenderTypes::getTrainMap);
 
-    private static RenderLayer getTrainMap(Identifier locationIn, boolean linearFiltering) {
-        RenderLayer.MultiPhaseParameters rendertype$state = RenderLayer.MultiPhaseParameters.builder()
-            .texture(new FilterTexture(locationIn, linearFiltering, false)).lightmap(ENABLE_LIGHTMAP).build(false);
-        return RenderLayer.of("create_train_map", 256, false, true, RenderPipelines.RENDERTYPE_TEXT, rendertype$state);
+    private static RenderType getTrainMap(ResourceLocation locationIn, boolean linearFiltering) {
+        RenderType.CompositeState rendertype$state = RenderType.CompositeState.builder()
+            .setTextureState(new FilterTexture(locationIn, linearFiltering, false)).setLightmapState(LIGHTMAP).createCompositeState(false);
+        return RenderType.create("create_train_map", 256, false, true, RenderPipelines.TEXT, rendertype$state);
     }
 
-    public static RenderLayer itemGlowingSolid() {
+    public static RenderType itemGlowingSolid() {
         return ITEM_GLOWING_SOLID;
     }
 
-    public static RenderLayer itemGlowingTranslucent() {
+    public static RenderType itemGlowingTranslucent() {
         return ITEM_GLOWING_TRANSLUCENT;
     }
 
-    public static RenderLayer chain(Identifier pLocation) {
+    public static RenderType chain(ResourceLocation pLocation) {
         return CHAIN.apply(pLocation);
     }
 
@@ -155,18 +154,18 @@ public class RenderTypes extends RenderPhase {
         super(null, null, null);
     }
 
-    private static class FilterTexture extends RenderPhase.TextureBase {
+    private static class FilterTexture extends RenderStateShard.EmptyTextureStateShard {
         @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
-        private final Optional<Identifier> id;
+        private final Optional<ResourceLocation> id;
         private final boolean mipmap;
 
-        public FilterTexture(Identifier id, boolean bilinear, boolean mipmap) {
+        public FilterTexture(ResourceLocation id, boolean bilinear, boolean mipmap) {
             super(
                 () -> {
-                    TextureManager textureManager = MinecraftClient.getInstance().getTextureManager();
+                    TextureManager textureManager = Minecraft.getInstance().getTextureManager();
                     AbstractTexture abstractTexture = textureManager.getTexture(id);
                     abstractTexture.setFilter(bilinear, mipmap);
-                    RenderSystem.setShaderTexture(0, abstractTexture.getGlTextureView());
+                    RenderSystem.setShaderTexture(0, abstractTexture.getTextureView());
                 }, () -> {
                 }
             );
@@ -180,7 +179,7 @@ public class RenderTypes extends RenderPhase {
         }
 
         @Override
-        public Optional<Identifier> getId() {
+        public Optional<ResourceLocation> cutoutTexture() {
             return this.id;
         }
     }

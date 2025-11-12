@@ -12,15 +12,15 @@ import com.zurrtum.create.client.ponder.api.scene.SceneBuilder;
 import com.zurrtum.create.client.ponder.api.scene.SceneBuildingUtil;
 import com.zurrtum.create.client.ponder.api.scene.Selection;
 import com.zurrtum.create.content.contraptions.piston.MechanicalPistonHeadBlock;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.TallPlantBlock;
-import net.minecraft.block.enums.DoubleBlockHalf;
-import net.minecraft.block.enums.PistonType;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.DoublePlantBlock;
+import net.minecraft.world.level.block.state.properties.DoubleBlockHalf;
+import net.minecraft.world.level.block.state.properties.PistonType;
+import net.minecraft.world.phys.Vec3;
 
 public class PistonScenes {
 
@@ -49,7 +49,7 @@ public class PistonScenes {
         scene.idle(15);
 
         scene.effects().indicateRedstone(leverPos);
-        scene.world().toggleRedstonePower(util.select().fromTo(leverPos, leverPos.down()));
+        scene.world().toggleRedstonePower(util.select().fromTo(leverPos, leverPos.below()));
         scene.world().modifyKineticSpeed(kinetics, f -> -f);
         scene.effects().rotationDirectionIndicator(shaft);
         scene.world().moveSection(contraption, util.vector().of(-2, 0, 0), 40);
@@ -59,10 +59,10 @@ public class PistonScenes {
 
         scene.overlay().showText(45).pointAt(util.vector().blockSurface(shaft, Direction.SOUTH)).placeNearTarget()
             .text("Speed and direction of movement depend on the Rotational Input");
-        scene.world().setBlock(util.grid().at(2, 1, 1), Blocks.AIR.getDefaultState(), false);
-        scene.world().setBlock(util.grid().at(0, 1, 2), Blocks.OAK_PLANKS.getDefaultState(), false);
+        scene.world().setBlock(util.grid().at(2, 1, 1), Blocks.AIR.defaultBlockState(), false);
+        scene.world().setBlock(util.grid().at(0, 1, 2), Blocks.OAK_PLANKS.defaultBlockState(), false);
         scene.effects().indicateRedstone(leverPos);
-        scene.world().toggleRedstonePower(util.select().fromTo(leverPos, leverPos.down()));
+        scene.world().toggleRedstonePower(util.select().fromTo(leverPos, leverPos.below()));
         scene.world().modifyKineticSpeed(kinetics, f -> -f);
         scene.effects().rotationDirectionIndicator(shaft);
         scene.world().moveSection(contraption, util.vector().of(2, 0, 0), 40);
@@ -71,12 +71,12 @@ public class PistonScenes {
         scene.overlay().showControls(util.vector().blockSurface(piston, Direction.WEST), Pointing.DOWN, 30).rightClick()
             .withItem(new ItemStack(Items.SLIME_BALL));
         scene.idle(7);
-        scene.world().modifyBlock(piston.north(), s -> s.with(MechanicalPistonHeadBlock.TYPE, PistonType.STICKY), false);
+        scene.world().modifyBlock(piston.north(), s -> s.setValue(MechanicalPistonHeadBlock.TYPE, PistonType.STICKY), false);
         scene.effects().superGlue(piston, Direction.WEST, true);
 
         scene.idle(33);
         scene.effects().indicateRedstone(leverPos);
-        scene.world().toggleRedstonePower(util.select().fromTo(leverPos, leverPos.down()));
+        scene.world().toggleRedstonePower(util.select().fromTo(leverPos, leverPos.below()));
         scene.world().modifyKineticSpeed(kinetics, f -> -f);
         scene.effects().rotationDirectionIndicator(shaft);
         scene.world().moveSection(contraption, util.vector().of(-2, 0, 0), 40);
@@ -85,18 +85,18 @@ public class PistonScenes {
         scene.overlay().showText(60).pointAt(util.vector().topOf(piston)).placeNearTarget().attachKeyFrame()
             .text("Sticky Mechanical Pistons can pull the attached blocks back");
         scene.idle(20);
-        scene.world().setBlock(util.grid().at(2, 1, 1), Blocks.OAK_PLANKS.getDefaultState(), false);
-        scene.world().setBlock(util.grid().at(0, 1, 2), Blocks.AIR.getDefaultState(), false);
+        scene.world().setBlock(util.grid().at(2, 1, 1), Blocks.OAK_PLANKS.defaultBlockState(), false);
+        scene.world().setBlock(util.grid().at(0, 1, 2), Blocks.AIR.defaultBlockState(), false);
         scene.effects().indicateRedstone(leverPos);
-        scene.world().toggleRedstonePower(util.select().fromTo(leverPos, leverPos.down()));
+        scene.world().toggleRedstonePower(util.select().fromTo(leverPos, leverPos.below()));
         scene.world().modifyKineticSpeed(kinetics, f -> -f);
         scene.effects().rotationDirectionIndicator(shaft);
         scene.world().moveSection(contraption, util.vector().of(2, 0, 0), 40);
 
         scene.idle(50);
-        scene.world().setBlock(util.grid().at(2, 1, 1), Blocks.AIR.getDefaultState(), false);
+        scene.world().setBlock(util.grid().at(2, 1, 1), Blocks.AIR.defaultBlockState(), false);
 
-        scene.world().replaceBlocks(util.select().fromTo(2, 3, 2, 2, 2, 0), Blocks.OAK_PLANKS.getDefaultState(), false);
+        scene.world().replaceBlocks(util.select().fromTo(2, 3, 2, 2, 2, 0), Blocks.OAK_PLANKS.defaultBlockState(), false);
         scene.overlay().showOutline(
             PonderPalette.GREEN,
             "glue",
@@ -104,7 +104,7 @@ public class PistonScenes {
             40
         );
         scene.overlay().showControls(util.vector().centerOf(util.grid().at(2, 2, 0)), Pointing.RIGHT, 40)
-            .withItem(AllItems.SUPER_GLUE.getDefaultStack());
+            .withItem(AllItems.SUPER_GLUE.getDefaultInstance());
 
         ElementLink<WorldSectionElement> chassis = scene.world().showIndependentSection(util.select().fromTo(2, 2, 0, 2, 3, 2), Direction.DOWN);
         scene.world().moveSection(chassis, util.vector().of(0, -1, 1), 0);
@@ -117,7 +117,7 @@ public class PistonScenes {
 
         scene.idle(90);
         scene.effects().indicateRedstone(leverPos);
-        scene.world().toggleRedstonePower(util.select().fromTo(leverPos, leverPos.down()));
+        scene.world().toggleRedstonePower(util.select().fromTo(leverPos, leverPos.below()));
         scene.world().modifyKineticSpeed(kinetics, f -> -f);
         scene.effects().rotationDirectionIndicator(shaft);
         scene.world().moveSection(contraption, util.vector().of(-2, 0, 0), 40);
@@ -144,7 +144,7 @@ public class PistonScenes {
 
         BlockPos leverPos = util.grid().at(3, 2, 4);
         scene.effects().indicateRedstone(leverPos);
-        scene.world().toggleRedstonePower(util.select().fromTo(leverPos, leverPos.down()));
+        scene.world().toggleRedstonePower(util.select().fromTo(leverPos, leverPos.below()));
         scene.world().setKineticSpeed(kinetics, 16);
         scene.idle(10);
 
@@ -153,7 +153,7 @@ public class PistonScenes {
         scene.idle(60);
 
         scene.effects().indicateRedstone(leverPos);
-        scene.world().toggleRedstonePower(util.select().fromTo(leverPos, leverPos.down()));
+        scene.world().toggleRedstonePower(util.select().fromTo(leverPos, leverPos.below()));
         scene.world().setKineticSpeed(kinetics, 0);
         scene.idle(5);
         scene.world().showSectionAndMerge(util.select().position(piston.north().east()), Direction.DOWN, contraption);
@@ -173,7 +173,7 @@ public class PistonScenes {
         scene.idle(15);
 
         scene.effects().indicateRedstone(leverPos);
-        scene.world().toggleRedstonePower(util.select().fromTo(leverPos, leverPos.down()));
+        scene.world().toggleRedstonePower(util.select().fromTo(leverPos, leverPos.below()));
         scene.world().setKineticSpeed(kinetics, 16);
         scene.world().moveSection(contraption, util.vector().of(-2, 0, 0), 40);
         scene.special().moveParrot(birb, util.vector().of(-2, 0, 0), 40);
@@ -204,13 +204,13 @@ public class PistonScenes {
         scene.world().showSectionAndMerge(util.select().position(piston.north().east(2)), Direction.DOWN, contraption);
         scene.world().showSectionAndMerge(util.select().position(piston.north().west()), Direction.DOWN, contraption);
         scene.idle(5);
-        scene.world().showSectionAndMerge(util.select().position(piston.north().west().up()), Direction.DOWN, contraption);
+        scene.world().showSectionAndMerge(util.select().position(piston.north().west().above()), Direction.DOWN, contraption);
         scene.idle(15);
         scene.effects().superGlue(piston.west(), Direction.UP, true);
         scene.idle(10);
 
         scene.effects().indicateRedstone(leverPos);
-        scene.world().toggleRedstonePower(util.select().fromTo(leverPos, leverPos.down()));
+        scene.world().toggleRedstonePower(util.select().fromTo(leverPos, leverPos.below()));
         scene.world().modifyKineticSpeed(kinetics, f -> -f);
         scene.effects().rotationDirectionIndicator(shaft);
         scene.world().moveSection(contraption, util.vector().of(-2, 0, 0), 40);
@@ -224,24 +224,25 @@ public class PistonScenes {
         scene.idle(80);
 
         scene.effects().indicateRedstone(leverPos);
-        scene.world().toggleRedstonePower(util.select().fromTo(leverPos, leverPos.down()));
+        scene.world().toggleRedstonePower(util.select().fromTo(leverPos, leverPos.below()));
         scene.world().modifyKineticSpeed(kinetics, f -> -f);
         scene.effects().rotationDirectionIndicator(shaft);
         scene.world().moveSection(contraption, util.vector().of(2, 0, 0), 40);
         scene.world().hideSection(rose, Direction.UP);
         scene.idle(50);
 
-        scene.world().setBlock(util.grid().at(0, 1, 2), Blocks.ROSE_BUSH.getDefaultState(), false);
-        scene.world().setBlock(util.grid().at(0, 2, 2), Blocks.ROSE_BUSH.getDefaultState().with(TallPlantBlock.HALF, DoubleBlockHalf.UPPER), false);
+        scene.world().setBlock(util.grid().at(0, 1, 2), Blocks.ROSE_BUSH.defaultBlockState(), false);
+        scene.world()
+            .setBlock(util.grid().at(0, 2, 2), Blocks.ROSE_BUSH.defaultBlockState().setValue(DoublePlantBlock.HALF, DoubleBlockHalf.UPPER), false);
         scene.world().showIndependentSection(rose, Direction.DOWN);
-        Vec3d filter = util.vector().topOf(piston).add(.125, 0, 0);
+        Vec3 filter = util.vector().topOf(piston).add(.125, 0, 0);
         scene.overlay().showFilterSlotInput(filter, Direction.UP, 60);
         scene.overlay().showControls(filter.add(0, .125, 0), Pointing.DOWN, 60).rightClick();
         scene.overlay().showText(70).pointAt(filter.add(-.125, 0, 0)).placeNearTarget().attachKeyFrame().sharedText("behaviour_modify_value_panel");
         scene.idle(80);
 
         scene.effects().indicateRedstone(leverPos);
-        scene.world().toggleRedstonePower(util.select().fromTo(leverPos, leverPos.down()));
+        scene.world().toggleRedstonePower(util.select().fromTo(leverPos, leverPos.below()));
         scene.world().modifyKineticSpeed(kinetics, f -> -f);
         scene.effects().rotationDirectionIndicator(shaft);
         scene.world().moveSection(contraption, util.vector().of(-2, 0, 0), 40);

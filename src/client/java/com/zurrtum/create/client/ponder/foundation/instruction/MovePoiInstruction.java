@@ -1,13 +1,13 @@
 package com.zurrtum.create.client.ponder.foundation.instruction;
 
 import com.zurrtum.create.client.ponder.foundation.PonderScene;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.phys.Vec3;
 
 public class MovePoiInstruction extends PonderInstruction {
 
-    private final Vec3d poi;
+    private final Vec3 poi;
 
-    public MovePoiInstruction(Vec3d poi) {
+    public MovePoiInstruction(Vec3 poi) {
         this.poi = poi;
     }
 

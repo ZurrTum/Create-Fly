@@ -6,16 +6,16 @@ import com.zurrtum.create.client.foundation.gui.ModularGuiLineBuilder;
 import com.zurrtum.create.client.foundation.utility.CreateLang;
 import com.zurrtum.create.content.logistics.filter.FilterItemStack;
 import com.zurrtum.create.content.trains.schedule.condition.ItemThresholdCondition;
-import net.minecraft.item.ItemStack;
-import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.item.ItemStack;
 
 import java.util.List;
 
 public class ItemThresholdConditionRender extends CargoThresholdConditionRender<ItemThresholdCondition> {
     @Override
-    protected Text getUnit(ItemThresholdCondition input) {
-        return Text.literal(input.inStacks() ? "▤" : "");
+    protected Component getUnit(ItemThresholdCondition input) {
+        return Component.literal(input.inStacks() ? "▤" : "");
     }
 
     @Override
@@ -34,7 +34,7 @@ public class ItemThresholdConditionRender extends CargoThresholdConditionRender<
     }
 
     @Override
-    public List<Text> getTitleAs(ItemThresholdCondition input, String type) {
+    public List<Component> getTitleAs(ItemThresholdCondition input, String type) {
         FilterItemStack stack = input.stack;
         return ImmutableList.of(
             CreateLang.translateDirect(
@@ -45,8 +45,8 @@ public class ItemThresholdConditionRender extends CargoThresholdConditionRender<
                 input.getThreshold(),
                 CreateLang.translateDirect("schedule.condition.threshold." + (input.inStacks() ? "stacks" : "items")),
                 stack.isEmpty() ? CreateLang.translateDirect("schedule.condition.threshold.anything") : stack.isFilterItem() ? CreateLang.translateDirect(
-                    "schedule.condition.threshold.matching_content") : stack.item().getName()
-            ).formatted(Formatting.DARK_AQUA)
+                    "schedule.condition.threshold.matching_content") : stack.item().getHoverName()
+            ).withStyle(ChatFormatting.DARK_AQUA)
         );
     }
 

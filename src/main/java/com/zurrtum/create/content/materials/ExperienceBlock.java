@@ -1,37 +1,37 @@
 package com.zurrtum.create.content.materials;
 
 import com.zurrtum.create.catnip.math.VecHelper;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.particle.ParticleTypes;
-import net.minecraft.sound.BlockSoundGroup;
-import net.minecraft.sound.SoundEvents;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.math.random.Random;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.SoundType;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.Vec3;
 
 public class ExperienceBlock extends Block {
-    public static final BlockSoundGroup SOUND = new BlockSoundGroup(
+    public static final SoundType SOUND = new SoundType(
         1,
         .5f,
-        SoundEvents.BLOCK_AMETHYST_BLOCK_BREAK,
-        SoundEvents.BLOCK_AMETHYST_BLOCK_STEP,
-        SoundEvents.BLOCK_AMETHYST_BLOCK_PLACE,
-        SoundEvents.BLOCK_AMETHYST_BLOCK_HIT,
-        SoundEvents.BLOCK_AMETHYST_BLOCK_FALL
+        SoundEvents.AMETHYST_BLOCK_BREAK,
+        SoundEvents.AMETHYST_BLOCK_STEP,
+        SoundEvents.AMETHYST_BLOCK_PLACE,
+        SoundEvents.AMETHYST_BLOCK_HIT,
+        SoundEvents.AMETHYST_BLOCK_FALL
     );
 
-    public ExperienceBlock(Settings pProperties) {
+    public ExperienceBlock(Properties pProperties) {
         super(pProperties);
     }
 
     @Override
-    public void randomDisplayTick(BlockState pState, World pLevel, BlockPos pPos, Random pRand) {
+    public void animateTick(BlockState pState, Level pLevel, BlockPos pPos, RandomSource pRand) {
         if (pRand.nextInt(5) != 0)
             return;
-        Vec3d vec3 = VecHelper.clampComponentWise(VecHelper.offsetRandomly(Vec3d.ZERO, pRand, .75f), .55f).add(VecHelper.getCenterOf(pPos));
-        pLevel.addParticleClient(
+        Vec3 vec3 = VecHelper.clampComponentWise(VecHelper.offsetRandomly(Vec3.ZERO, pRand, .75f), .55f).add(VecHelper.getCenterOf(pPos));
+        pLevel.addParticle(
             ParticleTypes.END_ROD,
             vec3.x,
             vec3.y,

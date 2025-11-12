@@ -4,12 +4,12 @@ import com.zurrtum.create.catnip.animation.LerpedFloat;
 import com.zurrtum.create.client.catnip.gui.element.AbstractRenderElement;
 import com.zurrtum.create.client.catnip.gui.element.RenderElement;
 import com.zurrtum.create.client.catnip.gui.element.ScreenElement;
-import net.minecraft.client.gui.DrawContext;
 import org.joml.Matrix3x2fStack;
 import org.joml.Vector4i;
 
 import java.util.function.Consumer;
 import java.util.function.UnaryOperator;
+import net.minecraft.client.gui.GuiGraphics;
 
 public class ElementWidget extends AbstractSimiWidget {
 
@@ -124,20 +124,20 @@ public class ElementWidget extends AbstractSimiWidget {
     }
 
     @Override
-    protected void beforeRender(DrawContext graphics, int mouseX, int mouseY, float partialTicks) {
+    protected void beforeRender(GuiGraphics graphics, int mouseX, int mouseY, float partialTicks) {
         super.beforeRender(graphics, mouseX, mouseY, partialTicks);
-        hovered = isMouseOver(mouseX, mouseY);
+        isHovered = isMouseOver(mouseX, mouseY);
 
         float fadeValue = fade.getValue(partialTicks);
         element.withAlpha(fadeValue);
         if (fadeValue < 1) {
-            graphics.getMatrices().translate((1 - fadeValue) * fadeModX, (1 - fadeValue) * fadeModY);
+            graphics.pose().translate((1 - fadeValue) * fadeModX, (1 - fadeValue) * fadeModY);
         }
     }
 
     @Override
-    public void doRender(DrawContext graphics, int mouseX, int mouseY, float partialTicks) {
-        Matrix3x2fStack poseStack = graphics.getMatrices();
+    public void doRender(GuiGraphics graphics, int mouseX, int mouseY, float partialTicks) {
+        Matrix3x2fStack poseStack = graphics.pose();
         poseStack.pushMatrix();
         poseStack.translate(getX() + paddingX, getY() + paddingY);
         float innerWidth = width - 2 * paddingX;

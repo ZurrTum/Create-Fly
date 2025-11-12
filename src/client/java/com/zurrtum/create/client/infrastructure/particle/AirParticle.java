@@ -2,19 +2,19 @@ package com.zurrtum.create.client.infrastructure.particle;
 
 import com.zurrtum.create.catnip.math.VecHelper;
 import com.zurrtum.create.infrastructure.particle.AirParticleData;
-import net.minecraft.client.particle.AnimatedParticle;
+import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.particle.Particle;
-import net.minecraft.client.particle.ParticleFactory;
-import net.minecraft.client.particle.SpriteProvider;
-import net.minecraft.client.render.WorldRenderer;
-import net.minecraft.client.world.ClientWorld;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.math.random.Random;
+import net.minecraft.client.particle.ParticleProvider;
+import net.minecraft.client.particle.SimpleAnimatedParticle;
+import net.minecraft.client.particle.SpriteSet;
+import net.minecraft.client.renderer.LevelRenderer;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.util.Mth;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.phys.Vec3;
 
-public class AirParticle extends AnimatedParticle {
+public class AirParticle extends SimpleAnimatedParticle {
 
     private float originX, originY, originZ;
     private float targetX, targetY, targetZ;
@@ -24,7 +24,7 @@ public class AirParticle extends AnimatedParticle {
     private Direction.Axis twirlAxis;
 
     protected AirParticle(
-        ClientWorld world,
+        ClientLevel world,
         AirParticleData data,
         double x,
         double y,
@@ -32,17 +32,17 @@ public class AirParticle extends AnimatedParticle {
         double dx,
         double dy,
         double dz,
-        SpriteProvider sprite,
-        Random random
+        SpriteSet sprite,
+        RandomSource random
     ) {
         super(world, x, y, z, sprite, random.nextFloat() * .5f);
-        scale *= 0.75F;
-        collidesWithWorld = false;
+        quadSize *= 0.75F;
+        hasPhysics = false;
 
         setPos(x, y, z);
-        originX = (float) (lastX = x);
-        originY = (float) (lastY = y);
-        originZ = (float) (lastZ = z);
+        originX = (float) (xo = x);
+        originY = (float) (yo = y);
+        originZ = (float) (zo = z);
         targetX = (float) (x + dx);
         targetY = (float) (y + dy);
         targetZ = (float) (z + dz);
@@ -53,69 +53,69 @@ public class AirParticle extends AnimatedParticle {
         twirlAxis = random.nextBoolean() ? Direction.Axis.X : Direction.Axis.Z;
 
         // speed in m/ticks
-        double length = new Vec3d(dx, dy, dz).length();
-        maxAge = Math.min((int) (length / data.speed()), 60);
+        double length = new Vec3(dx, dy, dz).length();
+        lifetime = Math.min((int) (length / data.speed()), 60);
         selectSprite(7);
         setAlpha(.25f);
 
         if (length == 0) {
-            markDead();
+            remove();
             setAlpha(0);
         }
     }
 
     @Override
     public void tick() {
-        this.lastX = this.x;
-        this.lastY = this.y;
-        this.lastZ = this.z;
-        if (this.age++ >= this.maxAge) {
-            this.markDead();
+        this.xo = this.x;
+        this.yo = this.y;
+        this.zo = this.z;
+        if (this.age++ >= this.lifetime) {
+            this.remove();
             return;
         }
 
-        float progress = (float) Math.pow(((float) age) / maxAge, drag);
+        float progress = (float) Math.pow(((float) age) / lifetime, drag);
         float angle = (progress * 2 * 360 + twirlAngleOffset) % 360;
-        Vec3d twirl = VecHelper.rotate(new Vec3d(0, twirlRadius, 0), angle, twirlAxis);
+        Vec3 twirl = VecHelper.rotate(new Vec3(0, twirlRadius, 0), angle, twirlAxis);
 
-        float x = (float) (MathHelper.lerp(progress, originX, targetX) + twirl.x);
-        float y = (float) (MathHelper.lerp(progress, originY, targetY) + twirl.y);
-        float z = (float) (MathHelper.lerp(progress, originZ, targetZ) + twirl.z);
+        float x = (float) (Mth.lerp(progress, originX, targetX) + twirl.x);
+        float y = (float) (Mth.lerp(progress, originY, targetY) + twirl.y);
+        float z = (float) (Mth.lerp(progress, originZ, targetZ) + twirl.z);
 
-        velocityX = x - this.x;
-        velocityY = y - this.y;
-        velocityZ = z - this.z;
+        xd = x - this.x;
+        yd = y - this.y;
+        zd = z - this.z;
 
-        updateSprite(spriteProvider);
-        this.move(this.velocityX, this.velocityY, this.velocityZ);
+        setSpriteFromAge(sprites);
+        this.move(this.xd, this.yd, this.zd);
     }
 
-    public int getBrightness(float partialTick) {
-        BlockPos blockpos = BlockPos.ofFloored(this.x, this.y, this.z);
-        return this.world.isPosLoaded(blockpos) ? WorldRenderer.getLightmapCoordinates(world, blockpos) : 0;
+    public int getLightColor(float partialTick) {
+        BlockPos blockpos = BlockPos.containing(this.x, this.y, this.z);
+        return this.level.isLoaded(blockpos) ? LevelRenderer.getLightColor(level, blockpos) : 0;
     }
 
     private void selectSprite(int index) {
-        setSprite(spriteProvider.getSprite(index, 8));
+        setSprite(sprites.get(index, 8));
     }
 
-    public static class Factory implements ParticleFactory<AirParticleData> {
-        private final SpriteProvider spriteSet;
+    public static class Factory implements ParticleProvider<AirParticleData> {
+        private final SpriteSet spriteSet;
 
-        public Factory(SpriteProvider animatedSprite) {
+        public Factory(SpriteSet animatedSprite) {
             this.spriteSet = animatedSprite;
         }
 
         public Particle createParticle(
             AirParticleData data,
-            ClientWorld worldIn,
+            ClientLevel worldIn,
             double x,
             double y,
             double z,
             double xSpeed,
             double ySpeed,
             double zSpeed,
-            Random random
+            RandomSource random
         ) {
             return new AirParticle(worldIn, data, x, y, z, xSpeed, ySpeed, zSpeed, this.spriteSet, random);
         }

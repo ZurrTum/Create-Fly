@@ -5,14 +5,14 @@ import com.zurrtum.create.catnip.config.ConfigBase;
 import com.zurrtum.create.catnip.config.DoubleRawValue;
 import it.unimi.dsi.fastutil.objects.Object2DoubleMap;
 import it.unimi.dsi.fastutil.objects.Object2DoubleOpenHashMap;
-import net.minecraft.block.Block;
-import net.minecraft.registry.Registries;
-import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.DoubleSupplier;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.block.Block;
 
 public class CStress extends ConfigBase {
     // bump this version to reset configured values.
@@ -20,22 +20,22 @@ public class CStress extends ConfigBase {
 
     // IDs need to be used since configs load before registration
 
-    private static final Object2DoubleMap<Identifier> DEFAULT_IMPACTS = new Object2DoubleOpenHashMap<>();
-    private static final Object2DoubleMap<Identifier> DEFAULT_CAPACITIES = new Object2DoubleOpenHashMap<>();
+    private static final Object2DoubleMap<ResourceLocation> DEFAULT_IMPACTS = new Object2DoubleOpenHashMap<>();
+    private static final Object2DoubleMap<ResourceLocation> DEFAULT_CAPACITIES = new Object2DoubleOpenHashMap<>();
 
-    protected final Map<Identifier, DoubleRawValue> capacities = new HashMap<>();
-    protected final Map<Identifier, DoubleRawValue> impacts = new HashMap<>();
+    protected final Map<ResourceLocation, DoubleRawValue> capacities = new HashMap<>();
+    protected final Map<ResourceLocation, DoubleRawValue> impacts = new HashMap<>();
 
     public static void setNoImpact(Block block) {
         setImpact(block, 0);
     }
 
     public static void setImpact(Block block, double value) {
-        DEFAULT_IMPACTS.put(Registries.BLOCK.getId(block), value);
+        DEFAULT_IMPACTS.put(BuiltInRegistries.BLOCK.getKey(block), value);
     }
 
     public static void setCapacity(Block block, double value) {
-        DEFAULT_CAPACITIES.put(Registries.BLOCK.getId(block), value);
+        DEFAULT_CAPACITIES.put(BuiltInRegistries.BLOCK.getKey(block), value);
     }
 
     @Override
@@ -56,14 +56,14 @@ public class CStress extends ConfigBase {
 
     @Nullable
     public DoubleSupplier getImpact(Block block) {
-        Identifier id = Registries.BLOCK.getId(block);
+        ResourceLocation id = BuiltInRegistries.BLOCK.getKey(block);
         DoubleRawValue value = this.impacts.get(id);
         return value == null ? null : value::get;
     }
 
     @Nullable
     public DoubleSupplier getCapacity(Block block) {
-        Identifier id = Registries.BLOCK.getId(block);
+        ResourceLocation id = BuiltInRegistries.BLOCK.getKey(block);
         DoubleRawValue value = this.capacities.get(id);
         return value == null ? null : value::get;
     }

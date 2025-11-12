@@ -1,32 +1,32 @@
 package com.zurrtum.create.client.catnip.gui.element;
 
 import com.mojang.blaze3d.opengl.GlStateManager;
-import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.gui.GuiGraphics;
 import org.lwjgl.opengl.GL11;
 
 public interface StencilElement extends RenderElement {
 
     @Override
-    default void render(DrawContext graphics) {
-        graphics.getMatrices().pushMatrix();
+    default void render(GuiGraphics graphics) {
+        graphics.pose().pushMatrix();
         transform(graphics);
         prepareStencil(graphics);
         renderStencil(graphics);
         prepareElement(graphics);
         renderElement(graphics);
         cleanUp(graphics);
-        graphics.getMatrices().popMatrix();
+        graphics.pose().popMatrix();
     }
 
-    void renderStencil(DrawContext graphics);
+    void renderStencil(GuiGraphics graphics);
 
-    void renderElement(DrawContext graphics);
+    void renderElement(GuiGraphics graphics);
 
-    default void transform(DrawContext graphics) {
-        graphics.getMatrices().translate(getX(), getY());
+    default void transform(GuiGraphics graphics) {
+        graphics.pose().translate(getX(), getY());
     }
 
-    default void prepareStencil(DrawContext graphics) {
+    default void prepareStencil(GuiGraphics graphics) {
         //        graphics.draw();
         GL11.glDisable(GL11.GL_STENCIL_TEST);
         GL11.glStencilMask(~0);
@@ -37,13 +37,13 @@ public interface StencilElement extends RenderElement {
         GL11.glStencilFunc(GL11.GL_NEVER, 1, 0xFF);
     }
 
-    default void prepareElement(DrawContext graphics) {
+    default void prepareElement(GuiGraphics graphics) {
         GL11.glEnable(GL11.GL_STENCIL_TEST);
         GL11.glStencilOp(GL11.GL_KEEP, GL11.GL_KEEP, GL11.GL_KEEP);
         GL11.glStencilFunc(GL11.GL_EQUAL, 1, 0xFF);
     }
 
-    default void cleanUp(DrawContext graphics) {
+    default void cleanUp(GuiGraphics graphics) {
         GL11.glDisable(GL11.GL_STENCIL_TEST);
         //        graphics.draw();
 

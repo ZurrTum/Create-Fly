@@ -26,28 +26,28 @@ import com.zurrtum.create.foundation.item.ItemHelper;
 import com.zurrtum.create.infrastructure.component.PackageOrderWithCrafts;
 import com.zurrtum.create.infrastructure.items.ItemStackHandler;
 import com.zurrtum.create.infrastructure.packet.s2c.WiFiEffectPacket;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.block.entity.SignBlockEntity;
-import net.minecraft.block.entity.SignText;
-import net.minecraft.inventory.Inventory;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.sound.SoundCategory;
-import net.minecraft.sound.SoundEvents;
-import net.minecraft.storage.ReadView;
-import net.minecraft.storage.WriteView;
-import net.minecraft.text.Text;
-import net.minecraft.util.ItemScatterer;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.MathHelper;
 import org.apache.commons.lang3.mutable.MutableBoolean;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.util.Mth;
+import net.minecraft.world.Container;
+import net.minecraft.world.Containers;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.entity.SignBlockEntity;
+import net.minecraft.world.level.block.entity.SignText;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 
 public class PackagerBlockEntity extends SmartBlockEntity {
     private static final Codec<List<BigItemStack>> EXITING_CODEC = BigItemStack.CODEC.listOf();
@@ -80,7 +80,7 @@ public class PackagerBlockEntity extends SmartBlockEntity {
 
     public PackagerBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         super(type, pos, state);
-        redstonePowered = state.get(PackagerBlock.POWERED, false);
+        redstonePowered = state.getValueOrElse(PackagerBlock.POWERED, false);
         heldBox = ItemStack.EMPTY;
         previouslyUnwrapped = ItemStack.EMPTY;
         inventory = new PackagerItemHandler(this);
@@ -151,7 +151,7 @@ public class PackagerBlockEntity extends SmartBlockEntity {
         if (animationTicks == 0) {
             previouslyUnwrapped = ItemStack.EMPTY;
 
-            if (!world.isClient() && !queuedExitingPackages.isEmpty() && heldBox.isEmpty()) {
+            if (!level.isClientSide() && !queuedExitingPackages.isEmpty() && heldBox.isEmpty()) {
                 BigItemStack entry = queuedExitingPackages.getFirst();
                 heldBox = entry.stack.copy();
 
@@ -167,18 +167,18 @@ public class PackagerBlockEntity extends SmartBlockEntity {
             return;
         }
 
-        if (world.isClient()) {
+        if (level.isClientSide()) {
             if (animationTicks == CYCLE - (animationInward ? 5 : 1))
-                AllSoundEvents.PACKAGER.playAt(world, pos, 1, 1, true);
+                AllSoundEvents.PACKAGER.playAt(level, worldPosition, 1, 1, true);
             if (animationTicks == (animationInward ? 1 : 5))
-                world.playSoundAtBlockCenterClient(pos, SoundEvents.BLOCK_IRON_TRAPDOOR_CLOSE, SoundCategory.BLOCKS, 0.25f, 0.75f, true);
+                level.playLocalSound(worldPosition, SoundEvents.IRON_TRAPDOOR_CLOSE, SoundSource.BLOCKS, 0.25f, 0.75f, true);
         }
 
         animationTicks--;
 
-        if (animationTicks == 0 && !world.isClient()) {
+        if (animationTicks == 0 && !level.isClientSide()) {
             wakeTheFrogs();
-            markDirty();
+            setChanged();
         }
     }
 
@@ -192,20 +192,20 @@ public class PackagerBlockEntity extends SmartBlockEntity {
 
         InventorySummary availableItems = new InventorySummary();
 
-        Inventory targetInv = targetInventory.getInventory();
+        Container targetInv = targetInventory.getInventory();
         if (targetInv == null || targetInv instanceof PackagerItemHandler) {
             this.availableItems = availableItems;
             return availableItems;
         }
 
         if (targetInv instanceof BottomlessItemHandler bih) {
-            availableItems.add(bih.getStack(0), BigItemStack.INF);
+            availableItems.add(bih.getItem(0), BigItemStack.INF);
             this.availableItems = availableItems;
             return availableItems;
         }
 
-        for (int slot = 0, size = targetInv.size(); slot < size; slot++) {
-            availableItems.add(targetInv.getStack(slot));
+        for (int slot = 0, size = targetInv.getContainerSize(); slot < size; slot++) {
+            availableItems.add(targetInv.getItem(slot));
         }
 
         invVersionTracker.awaitNewVersion(targetInventory.getInventory());
@@ -221,14 +221,14 @@ public class PackagerBlockEntity extends SmartBlockEntity {
         Set<RequestPromiseQueue> promiseQueues = new HashSet<>();
 
         for (Direction d : Iterate.directions) {
-            if (!world.isPosLoaded(pos.offset(d)))
+            if (!level.isLoaded(worldPosition.relative(d)))
                 continue;
 
-            BlockState adjacentState = world.getBlockState(pos.offset(d));
-            if (adjacentState.isOf(AllBlocks.FACTORY_GAUGE)) {
+            BlockState adjacentState = level.getBlockState(worldPosition.relative(d));
+            if (adjacentState.is(AllBlocks.FACTORY_GAUGE)) {
                 if (FactoryPanelBlock.connectedDirection(adjacentState) != d)
                     continue;
-                if (!(world.getBlockEntity(pos.offset(d)) instanceof FactoryPanelBlockEntity fpbe))
+                if (!(level.getBlockEntity(worldPosition.relative(d)) instanceof FactoryPanelBlockEntity fpbe))
                     continue;
                 if (!fpbe.restocker)
                     continue;
@@ -239,10 +239,10 @@ public class PackagerBlockEntity extends SmartBlockEntity {
                 }
             }
 
-            if (adjacentState.isOf(AllBlocks.STOCK_LINK)) {
+            if (adjacentState.is(AllBlocks.STOCK_LINK)) {
                 if (PackagerLinkBlock.getConnectedDirection(adjacentState) != d)
                     continue;
-                if (!(world.getBlockEntity(pos.offset(d)) instanceof PackagerLinkBlockEntity plbe))
+                if (!(level.getBlockEntity(worldPosition.relative(d)) instanceof PackagerLinkBlockEntity plbe))
                     continue;
                 UUID freqId = plbe.behaviour.freqId;
                 if (!Create.LOGISTICS.hasQueuedPromises(freqId))
@@ -265,12 +265,12 @@ public class PackagerBlockEntity extends SmartBlockEntity {
     @Override
     public void lazyTick() {
         super.lazyTick();
-        if (world.isClient())
+        if (level.isClientSide())
             return;
         recheckIfLinksPresent();
         if (!redstonePowered)
             return;
-        redstonePowered = getCachedState().get(PackagerBlock.POWERED, false);
+        redstonePowered = getBlockState().getValueOrElse(PackagerBlock.POWERED, false);
         if (!redstoneModeActive())
             return;
         updateSignAddress();
@@ -278,52 +278,52 @@ public class PackagerBlockEntity extends SmartBlockEntity {
     }
 
     public void recheckIfLinksPresent() {
-        if (world.isClient())
+        if (level.isClientSide())
             return;
-        BlockState blockState = getCachedState();
-        if (!blockState.contains(PackagerBlock.LINKED))
+        BlockState blockState = getBlockState();
+        if (!blockState.hasProperty(PackagerBlock.LINKED))
             return;
         boolean shouldBeLinked = getLinkPos() != null;
-        boolean isLinked = blockState.get(PackagerBlock.LINKED);
+        boolean isLinked = blockState.getValue(PackagerBlock.LINKED);
         if (shouldBeLinked == isLinked)
             return;
-        world.setBlockState(pos, blockState.cycle(PackagerBlock.LINKED));
+        level.setBlockAndUpdate(worldPosition, blockState.cycle(PackagerBlock.LINKED));
     }
 
     public boolean redstoneModeActive() {
-        return !getCachedState().get(PackagerBlock.LINKED, false);
+        return !getBlockState().getValueOrElse(PackagerBlock.LINKED, false);
     }
 
     private BlockPos getLinkPos() {
         for (Direction d : Iterate.directions) {
-            BlockState adjacentState = world.getBlockState(pos.offset(d));
-            if (!adjacentState.isOf(AllBlocks.STOCK_LINK))
+            BlockState adjacentState = level.getBlockState(worldPosition.relative(d));
+            if (!adjacentState.is(AllBlocks.STOCK_LINK))
                 continue;
             if (PackagerLinkBlock.getConnectedDirection(adjacentState) != d)
                 continue;
-            return pos.offset(d);
+            return worldPosition.relative(d);
         }
         return null;
     }
 
     public void flashLink() {
-        if (!(world instanceof ServerWorld serverWorld)) {
+        if (!(level instanceof ServerLevel serverWorld)) {
             return;
         }
         for (Direction d : Iterate.directions) {
-            BlockPos adjacentPos = pos.offset(d);
-            BlockState adjacentState = world.getBlockState(adjacentPos);
-            if (!adjacentState.isOf(AllBlocks.STOCK_LINK))
+            BlockPos adjacentPos = worldPosition.relative(d);
+            BlockState adjacentState = level.getBlockState(adjacentPos);
+            if (!adjacentState.is(AllBlocks.STOCK_LINK))
                 continue;
             if (PackagerLinkBlock.getConnectedDirection(adjacentState) != d)
                 continue;
-            serverWorld.getServer().getPlayerManager().sendToAround(
+            serverWorld.getServer().getPlayerList().broadcast(
                 null,
                 adjacentPos.getX(),
                 adjacentPos.getY(),
                 adjacentPos.getZ(),
                 32,
-                serverWorld.getRegistryKey(),
+                serverWorld.dimension(),
                 new WiFiEffectPacket(adjacentPos)
             );
             return;
@@ -341,7 +341,7 @@ public class PackagerBlockEntity extends SmartBlockEntity {
 
     public void activate() {
         redstonePowered = true;
-        markDirty();
+        setChanged();
 
         recheckIfLinksPresent();
         if (!redstoneModeActive())
@@ -360,7 +360,7 @@ public class PackagerBlockEntity extends SmartBlockEntity {
         if (animationTicks > 0)
             return false;
 
-        Objects.requireNonNull(world);
+        Objects.requireNonNull(level);
 
         ItemStackHandler contents = PackageItem.getContents(box);
         List<ItemStack> items = ItemHelper.getNonEmptyStacks(contents);
@@ -368,14 +368,14 @@ public class PackagerBlockEntity extends SmartBlockEntity {
             return true;
 
         PackageOrderWithCrafts orderContext = PackageItem.getOrderContext(box);
-        Direction facing = getCachedState().get(PackagerBlock.FACING, Direction.UP);
-        BlockPos target = pos.offset(facing.getOpposite());
-        BlockState targetState = world.getBlockState(target);
+        Direction facing = getBlockState().getValueOrElse(PackagerBlock.FACING, Direction.UP);
+        BlockPos target = worldPosition.relative(facing.getOpposite());
+        BlockState targetState = level.getBlockState(target);
 
         UnpackingHandler handler = UnpackingHandler.REGISTRY.get(targetState);
         UnpackingHandler toUse = handler != null ? handler : AllUnpackingHandlers.DEFAULT;
         // note: handler may modify the passed items
-        boolean unpacked = toUse.unpack(world, target, targetState, facing, items, orderContext, simulate);
+        boolean unpacked = toUse.unpack(level, target, targetState, facing, items, orderContext, simulate);
 
         if (unpacked && !simulate) {
             previouslyUnwrapped = box;
@@ -391,7 +391,7 @@ public class PackagerBlockEntity extends SmartBlockEntity {
         if (queuedRequests == null && (!heldBox.isEmpty() || animationTicks != 0 || buttonCooldown > 0))
             return;
 
-        Inventory targetInv = targetInventory.getInventory();
+        Container targetInv = targetInventory.getInventory();
         if (targetInv == null || targetInv instanceof PackagerItemHandler)
             return;
 
@@ -431,7 +431,7 @@ public class PackagerBlockEntity extends SmartBlockEntity {
                     ItemStack stack = nextRequest.item();
                     Item item = stack.getItem();
 
-                    boolean bulky = !item.canBeNested();
+                    boolean bulky = !item.canFitInsideContainerItems();
                     if (bulky && anyItemPresent.isTrue())
                         break Outer;
 
@@ -473,7 +473,7 @@ public class PackagerBlockEntity extends SmartBlockEntity {
                     if (bulky)
                         break Outer;
                 } else {
-                    ItemStack extracted = targetInv.extract(stack -> anyItemPresent.isFalse() || stack.getItem().canBeNested(), 64);
+                    ItemStack extracted = targetInv.extract(stack -> anyItemPresent.isFalse() || stack.getItem().canFitInsideContainerItems(), 64);
                     if (extracted.isEmpty())
                         break Outer;
 
@@ -483,7 +483,7 @@ public class PackagerBlockEntity extends SmartBlockEntity {
 
                     if (item instanceof PackageItem)
                         extractedPackageItem = extracted;
-                    if (!item.canBeNested())
+                    if (!item.canFitInsideContainerItems())
                         break Outer;
                 }
             }
@@ -506,7 +506,7 @@ public class PackagerBlockEntity extends SmartBlockEntity {
             PackageItem.addAddress(createdBox, signBasedAddress);
 
         BlockPos linkPos = getLinkPos();
-        if (extractedPackageItem.isEmpty() && linkPos != null && world.getBlockEntity(linkPos) instanceof PackagerLinkBlockEntity plbe)
+        if (extractedPackageItem.isEmpty() && linkPos != null && level.getBlockEntity(linkPos) instanceof PackagerLinkBlockEntity plbe)
             plbe.behaviour.deductFromAccurateSummary(extractedItems);
 
         if (!heldBox.isEmpty() || animationTicks != 0) {
@@ -540,13 +540,13 @@ public class PackagerBlockEntity extends SmartBlockEntity {
     }
 
     protected String getSign(Direction side) {
-        BlockEntity blockEntity = world.getBlockEntity(pos.offset(side));
+        BlockEntity blockEntity = level.getBlockEntity(worldPosition.relative(side));
         if (!(blockEntity instanceof SignBlockEntity sign))
             return null;
         for (boolean front : Iterate.trueAndFalse) {
             SignText text = sign.getText(front);
             String address = "";
-            for (Text component : text.getMessages(false)) {
+            for (Component component : text.getMessages(false)) {
                 String string = component.getString();
                 if (!string.isBlank())
                     address += string.trim() + " ";
@@ -564,14 +564,14 @@ public class PackagerBlockEntity extends SmartBlockEntity {
     }
 
     @Override
-    protected void read(ReadView view, boolean clientPacket) {
+    protected void read(ValueInput view, boolean clientPacket) {
         super.read(view, clientPacket);
-        redstonePowered = view.getBoolean("Active", false);
-        animationInward = view.getBoolean("AnimationInward", false);
-        animationTicks = view.getInt("AnimationTicks", 0);
-        signBasedAddress = view.getString("SignAddress", "");
-        customComputerAddress = view.getString("ComputerAddress", "");
-        hasCustomComputerAddress = view.getBoolean("HasComputerAddress", false);
+        redstonePowered = view.getBooleanOr("Active", false);
+        animationInward = view.getBooleanOr("AnimationInward", false);
+        animationTicks = view.getIntOr("AnimationTicks", 0);
+        signBasedAddress = view.getStringOr("SignAddress", "");
+        customComputerAddress = view.getStringOr("ComputerAddress", "");
+        hasCustomComputerAddress = view.getBooleanOr("HasComputerAddress", false);
         heldBox = view.read("HeldBox", ItemStack.CODEC).orElse(ItemStack.EMPTY);
         previouslyUnwrapped = view.read("InsertedBox", ItemStack.CODEC).orElse(ItemStack.EMPTY);
         if (clientPacket)
@@ -582,7 +582,7 @@ public class PackagerBlockEntity extends SmartBlockEntity {
     }
 
     @Override
-    protected void write(WriteView view, boolean clientPacket) {
+    protected void write(ValueOutput view, boolean clientPacket) {
         super.write(view, clientPacket);
         view.putBoolean("Active", redstonePowered);
         view.putBoolean("AnimationInward", animationInward);
@@ -591,32 +591,32 @@ public class PackagerBlockEntity extends SmartBlockEntity {
         view.putString("ComputerAddress", customComputerAddress);
         view.putBoolean("HasComputerAddress", hasCustomComputerAddress);
         if (!heldBox.isEmpty()) {
-            view.put("HeldBox", ItemStack.CODEC, heldBox);
+            view.store("HeldBox", ItemStack.CODEC, heldBox);
         }
         if (!previouslyUnwrapped.isEmpty()) {
-            view.put("InsertedBox", ItemStack.CODEC, previouslyUnwrapped);
+            view.store("InsertedBox", ItemStack.CODEC, previouslyUnwrapped);
         }
         if (clientPacket)
             return;
-        view.put("QueuedExitingPackages", EXITING_CODEC, queuedExitingPackages);
+        view.store("QueuedExitingPackages", EXITING_CODEC, queuedExitingPackages);
         if (availableItems != null)
-            view.put("LastSummary", InventorySummary.CODEC, availableItems);
+            view.store("LastSummary", InventorySummary.CODEC, availableItems);
     }
 
     @Override
     public void destroy() {
         super.destroy();
-        ItemScatterer.spawn(world, pos, inventory);
+        Containers.dropContents(level, worldPosition, inventory);
         queuedExitingPackages.forEach(bigStack -> {
             for (int i = 0; i < bigStack.count; i++)
-                ItemScatterer.spawn(world, pos.getX(), pos.getY(), pos.getZ(), bigStack.stack.copy());
+                Containers.dropItemStack(level, worldPosition.getX(), worldPosition.getY(), worldPosition.getZ(), bigStack.stack.copy());
         });
         queuedExitingPackages.clear();
     }
 
     public float getTrayOffset(float partialTicks) {
         float tickCycle = animationInward ? animationTicks - partialTicks : animationTicks - 5 - partialTicks;
-        float progress = MathHelper.clamp(tickCycle / (CYCLE - 5) * 2 - 1, -1, 1);
+        float progress = Mth.clamp(tickCycle / (CYCLE - 5) * 2 - 1, -1, 1);
         progress = 1 - progress * progress;
         return progress * progress;
     }
@@ -631,7 +631,7 @@ public class PackagerBlockEntity extends SmartBlockEntity {
         if (inventory == null)
             return false;
 
-        Inventory targetHandler = targetInventory.getInventory();
+        Container targetHandler = targetInventory.getInventory();
         if (targetHandler == null)
             return false;
 
@@ -643,18 +643,18 @@ public class PackagerBlockEntity extends SmartBlockEntity {
         }
     }
 
-    private static boolean isSameInventoryFallback(Inventory first, Inventory second) {
+    private static boolean isSameInventoryFallback(Container first, Container second) {
         if (first == second)
             return true;
 
         // If a contained ItemStack instance is the same, we can be pretty sure these
         // inventories are the same (works for compound inventories)
-        for (int i = 0, secondSize = second.size(); i < secondSize; i++) {
-            ItemStack stackInSlot = second.getStack(i);
+        for (int i = 0, secondSize = second.getContainerSize(); i < secondSize; i++) {
+            ItemStack stackInSlot = second.getItem(i);
             if (stackInSlot.isEmpty())
                 continue;
-            for (int j = 0, firstSize = first.size(); j < firstSize; j++)
-                if (stackInSlot == first.getStack(j))
+            for (int j = 0, firstSize = first.getContainerSize(); j < firstSize; j++)
+                if (stackInSlot == first.getItem(j))
                     return true;
             break;
         }

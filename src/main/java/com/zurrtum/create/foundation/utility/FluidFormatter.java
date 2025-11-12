@@ -2,23 +2,23 @@ package com.zurrtum.create.foundation.utility;
 
 import com.zurrtum.create.catnip.data.Couple;
 import com.zurrtum.create.infrastructure.fluids.BucketFluidInventory;
-import net.minecraft.text.MutableText;
-import net.minecraft.text.Text;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
 
 public class FluidFormatter {
     public static String asString(long amount, boolean shorten) {
-        Couple<MutableText> couple = asComponents(amount, shorten);
+        Couple<MutableComponent> couple = asComponents(amount, shorten);
         return couple.getFirst().getString() + " " + couple.getSecond().getString();
     }
 
-    public static Couple<MutableText> asComponents(long amount, boolean shorten) {
+    public static Couple<MutableComponent> asComponents(long amount, boolean shorten) {
         if (shorten && amount >= BucketFluidInventory.CAPACITY) {
             return Couple.create(
-                Text.literal(String.format("%.1f", (float) (amount / BucketFluidInventory.CAPACITY))),
-                Text.translatable("create.generic.unit.buckets")
+                Component.literal(String.format("%.1f", (float) (amount / BucketFluidInventory.CAPACITY))),
+                Component.translatable("create.generic.unit.buckets")
             );
         }
 
-        return Couple.create(Text.literal(String.valueOf(amount)), Text.translatable("create.generic.unit.millibuckets"));
+        return Couple.create(Component.literal(String.valueOf(amount)), Component.translatable("create.generic.unit.millibuckets"));
     }
 }

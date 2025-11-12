@@ -6,15 +6,15 @@ import com.google.gson.JsonParseException;
 import com.mojang.serialization.JsonOps;
 import com.zurrtum.create.catnip.theme.Color;
 import joptsimple.internal.Strings;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.font.TextRenderer;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.registry.DynamicRegistryManager;
-import net.minecraft.text.MutableText;
-import net.minecraft.text.Text;
-import net.minecraft.text.TextCodecs;
-import net.minecraft.util.Formatting;
-import net.minecraft.util.math.MathHelper;
+import net.minecraft.ChatFormatting;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.Font;
+import net.minecraft.core.RegistryAccess;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.ComponentSerialization;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.util.Mth;
+import net.minecraft.world.entity.player.Player;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
@@ -24,7 +24,7 @@ public class LangBuilder {
     private static final Gson GSON = new GsonBuilder().disableHtmlEscaping().create();
     public static final float DEFAULT_SPACE_WIDTH = 4.0F; // space width in vanilla's default font
     String namespace;
-    @Nullable MutableText component;
+    @Nullable MutableComponent component;
 
     public LangBuilder(String namespace) {
         this.namespace = namespace;
@@ -37,12 +37,12 @@ public class LangBuilder {
         return args;
     }
 
-    static int getIndents(TextRenderer font, int defaultIndents) {
-        int spaceWidth = font.getWidth(" ");
+    static int getIndents(Font font, int defaultIndents) {
+        int spaceWidth = font.width(" ");
         if (DEFAULT_SPACE_WIDTH == spaceWidth) {
             return defaultIndents;
         }
-        return MathHelper.ceil(DEFAULT_SPACE_WIDTH * defaultIndents / spaceWidth);
+        return Mth.ceil(DEFAULT_SPACE_WIDTH * defaultIndents / spaceWidth);
     }
 
     public LangBuilder space() {
@@ -64,7 +64,7 @@ public class LangBuilder {
      */
     public LangBuilder translate(String langKey, Object... args) {
         Object[] args1 = resolveBuilders(args);
-        return add(Text.translatable(namespace + "." + langKey, args1));
+        return add(Component.translatable(namespace + "." + langKey, args1));
     }
 
     /**
@@ -74,7 +74,7 @@ public class LangBuilder {
      * @return
      */
     public LangBuilder text(String literalText) {
-        return add(Text.literal(literalText));
+        return add(Component.literal(literalText));
     }
 
     //
@@ -86,8 +86,8 @@ public class LangBuilder {
      * @param literalText
      * @return
      */
-    public LangBuilder text(Formatting format, String literalText) {
-        return add(Text.literal(literalText).formatted(format));
+    public LangBuilder text(ChatFormatting format, String literalText) {
+        return add(Component.literal(literalText).withStyle(format));
     }
 
     /**
@@ -98,7 +98,7 @@ public class LangBuilder {
      * @return
      */
     public LangBuilder text(int color, String literalText) {
-        return add(Text.literal(literalText).styled(s -> s.withColor(color)));
+        return add(Component.literal(literalText).withStyle(s -> s.withColor(color)));
     }
 
     /**
@@ -119,7 +119,7 @@ public class LangBuilder {
      * @param customComponent
      * @return
      */
-    public LangBuilder add(MutableText customComponent) {
+    public LangBuilder add(MutableComponent customComponent) {
         component = component == null ? customComponent : component.append(customComponent);
         return this;
     }
@@ -130,8 +130,8 @@ public class LangBuilder {
      * @param component the component to append
      * @return this builder
      */
-    public LangBuilder add(Text component) {
-        if (component instanceof MutableText mutableComponent)
+    public LangBuilder add(Component component) {
+        if (component instanceof MutableComponent mutableComponent)
             return add(mutableComponent);
         else
             return add(component.copy());
@@ -143,9 +143,9 @@ public class LangBuilder {
      * @param format
      * @return
      */
-    public LangBuilder style(Formatting format) {
+    public LangBuilder style(ChatFormatting format) {
         assertComponent();
-        component = component.formatted(format);
+        component = component.withStyle(format);
         return this;
     }
 
@@ -154,7 +154,7 @@ public class LangBuilder {
      */
     public LangBuilder color(int color) {
         assertComponent();
-        component = component.styled(s -> s.withColor(color));
+        component = component.withStyle(s -> s.withColor(color));
         return this;
     }
 
@@ -165,7 +165,7 @@ public class LangBuilder {
         return this.color(color.getRGB());
     }
 
-    public MutableText component() {
+    public MutableComponent component() {
         assertComponent();
         return component;
     }
@@ -175,25 +175,25 @@ public class LangBuilder {
     }
 
     public String json() {
-        return GSON.toJson(TextCodecs.CODEC.encodeStart(DynamicRegistryManager.EMPTY.getOps(JsonOps.INSTANCE), component())
+        return GSON.toJson(ComponentSerialization.CODEC.encodeStart(RegistryAccess.EMPTY.createSerializationContext(JsonOps.INSTANCE), component())
             .getOrThrow(JsonParseException::new));
     }
 
-    public void sendStatus(PlayerEntity player) {
-        player.sendMessage(component(), true);
+    public void sendStatus(Player player) {
+        player.displayClientMessage(component(), true);
     }
 
     //
 
-    public void sendChat(PlayerEntity player) {
-        player.sendMessage(component(), false);
+    public void sendChat(Player player) {
+        player.displayClientMessage(component(), false);
     }
 
-    public void addTo(List<? super MutableText> tooltip) {
+    public void addTo(List<? super MutableComponent> tooltip) {
         tooltip.add(component());
     }
 
-    public void addTo(Consumer<? super MutableText> tooltip) {
+    public void addTo(Consumer<? super MutableComponent> tooltip) {
         tooltip.accept(component());
     }
 
@@ -202,12 +202,12 @@ public class LangBuilder {
             throw new IllegalStateException("No components were added to builder");
     }
 
-    public void forGoggles(List<? super MutableText> tooltip) {
+    public void forGoggles(List<? super MutableComponent> tooltip) {
         forGoggles(tooltip, 0);
     }
 
-    public void forGoggles(List<? super MutableText> tooltip, int indents) {
-        tooltip.add(new LangBuilder(namespace).text(Strings.repeat(' ', getIndents(MinecraftClient.getInstance().textRenderer, 4 + indents)))
+    public void forGoggles(List<? super MutableComponent> tooltip, int indents) {
+        tooltip.add(new LangBuilder(namespace).text(Strings.repeat(' ', getIndents(Minecraft.getInstance().font, 4 + indents)))
             .add(this).component());
     }
 }

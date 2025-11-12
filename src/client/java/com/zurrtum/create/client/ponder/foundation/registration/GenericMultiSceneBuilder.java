@@ -4,9 +4,8 @@ import com.zurrtum.create.client.ponder.api.registration.MultiSceneBuilder;
 import com.zurrtum.create.client.ponder.api.registration.PonderSceneRegistrationHelper;
 import com.zurrtum.create.client.ponder.api.registration.StoryBoardEntry;
 import com.zurrtum.create.client.ponder.api.scene.PonderStoryBoard;
-import net.minecraft.util.Identifier;
-
 import java.util.function.Consumer;
+import net.minecraft.resources.ResourceLocation;
 
 public class GenericMultiSceneBuilder<T> implements MultiSceneBuilder {
 
@@ -19,7 +18,7 @@ public class GenericMultiSceneBuilder<T> implements MultiSceneBuilder {
     }
 
     @Override
-    public MultiSceneBuilder addStoryBoard(Identifier schematicLocation, PonderStoryBoard storyBoard) {
+    public MultiSceneBuilder addStoryBoard(ResourceLocation schematicLocation, PonderStoryBoard storyBoard) {
         return addStoryBoard(
             schematicLocation, storyBoard, $ -> {
             }
@@ -27,12 +26,12 @@ public class GenericMultiSceneBuilder<T> implements MultiSceneBuilder {
     }
 
     @Override
-    public MultiSceneBuilder addStoryBoard(Identifier schematicLocation, PonderStoryBoard storyBoard, Identifier... tags) {
+    public MultiSceneBuilder addStoryBoard(ResourceLocation schematicLocation, PonderStoryBoard storyBoard, ResourceLocation... tags) {
         return addStoryBoard(schematicLocation, storyBoard, sb -> sb.highlightTags(tags));
     }
 
     @Override
-    public MultiSceneBuilder addStoryBoard(Identifier schematicLocation, PonderStoryBoard storyBoard, Consumer<StoryBoardEntry> extras) {
+    public MultiSceneBuilder addStoryBoard(ResourceLocation schematicLocation, PonderStoryBoard storyBoard, Consumer<StoryBoardEntry> extras) {
         components.forEach(c -> extras.accept(helper.addStoryBoard(c, schematicLocation, storyBoard)));
         return this;
     }
@@ -43,7 +42,7 @@ public class GenericMultiSceneBuilder<T> implements MultiSceneBuilder {
     }
 
     @Override
-    public MultiSceneBuilder addStoryBoard(String schematicPath, PonderStoryBoard storyBoard, Identifier... tags) {
+    public MultiSceneBuilder addStoryBoard(String schematicPath, PonderStoryBoard storyBoard, ResourceLocation... tags) {
         return addStoryBoard(helper.asLocation(schematicPath), storyBoard, tags);
     }
 

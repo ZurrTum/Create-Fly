@@ -2,17 +2,16 @@ package com.zurrtum.create.client.content.trains.schedule.hat;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import net.minecraft.client.model.ModelPart;
-import net.minecraft.util.math.Vec3d;
-
 import java.util.ArrayList;
 import java.util.List;
+import net.minecraft.client.model.geom.ModelPart;
+import net.minecraft.world.phys.Vec3;
 
-public record TrainHatInfo(String part, int cubeIndex, Vec3d offset, float scale) {
+public record TrainHatInfo(String part, int cubeIndex, Vec3 offset, float scale) {
     public static final Codec<TrainHatInfo> CODEC = RecordCodecBuilder.create(instance -> instance.group(
         Codec.STRING.optionalFieldOf("model_part", "").forGetter(TrainHatInfo::part),
         Codec.INT.optionalFieldOf("cube_index", 0).forGetter(TrainHatInfo::cubeIndex),
-        Vec3d.CODEC.fieldOf("offset").forGetter(TrainHatInfo::offset),
+        Vec3.CODEC.fieldOf("offset").forGetter(TrainHatInfo::offset),
         Codec.FLOAT.optionalFieldOf("scale", 1.0F).forGetter(TrainHatInfo::scale)
     ).apply(instance, TrainHatInfo::new));
 

@@ -2,38 +2,38 @@ package com.zurrtum.create.content.trains.schedule.condition;
 
 import com.zurrtum.create.content.trains.entity.Train;
 import com.zurrtum.create.content.trains.station.GlobalStation;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.registry.RegistryKey;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.text.MutableText;
-import net.minecraft.text.Text;
-import net.minecraft.util.Identifier;
-import net.minecraft.world.World;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.level.Level;
 
 public class StationUnloadedCondition extends ScheduleWaitCondition {
-    public StationUnloadedCondition(Identifier id) {
+    public StationUnloadedCondition(ResourceLocation id) {
         super(id);
     }
 
     @Override
-    public boolean tickCompletion(World level, Train train, NbtCompound context) {
+    public boolean tickCompletion(Level level, Train train, CompoundTag context) {
         GlobalStation currentStation = train.getCurrentStation();
         if (currentStation == null)
             return false;
-        RegistryKey<World> stationDim = currentStation.getBlockEntityDimension();
+        ResourceKey<Level> stationDim = currentStation.getBlockEntityDimension();
         MinecraftServer server = level.getServer();
         if (server == null)
             return false;
-        ServerWorld stationLevel = server.getWorld(stationDim);
+        ServerLevel stationLevel = server.getLevel(stationDim);
         if (stationLevel == null) {
             return false;
         }
-        return !stationLevel.shouldTickEntityAt(currentStation.getBlockEntityPos());
+        return !stationLevel.isPositionEntityTicking(currentStation.getBlockEntityPos());
     }
 
     @Override
-    public MutableText getWaitingStatus(World level, Train train, NbtCompound tag) {
-        return Text.translatable("create.schedule.condition.unloaded.status");
+    public MutableComponent getWaitingStatus(Level level, Train train, CompoundTag tag) {
+        return Component.translatable("create.schedule.condition.unloaded.status");
     }
 }

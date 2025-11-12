@@ -1,11 +1,10 @@
 package com.zurrtum.create.client.flywheel.backend.engine.uniform;
 
 import com.mojang.serialization.Codec;
-import net.minecraft.util.StringIdentifiable;
-
 import java.util.Locale;
+import net.minecraft.util.StringRepresentable;
 
-public enum DebugMode implements StringIdentifiable {
+public enum DebugMode implements StringRepresentable {
     OFF,
     NORMALS,
     INSTANCE_ID,
@@ -15,10 +14,10 @@ public enum DebugMode implements StringIdentifiable {
     DIFFUSE,
     MODEL_ID;
 
-    public static final Codec<DebugMode> CODEC = StringIdentifiable.createCodec(DebugMode::values);
+    public static final Codec<DebugMode> CODEC = StringRepresentable.fromEnum(DebugMode::values);
 
     @Override
-    public String asString() {
+    public String getSerializedName() {
         return name().toLowerCase(Locale.ROOT);
     }
 }

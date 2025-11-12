@@ -12,17 +12,16 @@ import com.zurrtum.create.foundation.advancement.CreateTrigger;
 import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
 import com.zurrtum.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.foundation.blockEntity.behaviour.scrollValue.ServerScrollOptionBehaviour;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Direction.Axis;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.world.World;
-
 import java.lang.ref.WeakReference;
 import java.util.List;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.Direction.Axis;
+import net.minecraft.util.Mth;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.AABB;
 
 public class SteamEngineBlockEntity extends SmartBlockEntity {
 
@@ -61,34 +60,34 @@ public class SteamEngineBlockEntity extends SmartBlockEntity {
         PoweredShaftBlockEntity shaft = getShaft();
 
         if (tank == null || shaft == null || !isValid()) {
-            if (world.isClient())
+            if (level.isClientSide())
                 return;
             if (shaft == null)
                 return;
-            if (!shaft.getPos().subtract(pos).equals(shaft.enginePos))
+            if (!shaft.getBlockPos().subtract(worldPosition).equals(shaft.enginePos))
                 return;
             if (shaft.engineEfficiency == 0)
                 return;
-            Direction facing = SteamEngineBlock.getFacing(getCachedState());
-            if (world.isPosLoaded(pos.offset(facing.getOpposite())))
-                shaft.update(pos, 0, 0);
+            Direction facing = SteamEngineBlock.getFacing(getBlockState());
+            if (level.isLoaded(worldPosition.relative(facing.getOpposite())))
+                shaft.update(worldPosition, 0, 0);
             return;
         }
 
-        BlockState shaftState = shaft.getCachedState();
+        BlockState shaftState = shaft.getBlockState();
         Axis targetAxis = Axis.X;
         if (shaftState.getBlock() instanceof IRotate ir)
             targetAxis = ir.getRotationAxis(shaftState);
         boolean verticalTarget = targetAxis == Axis.Y;
 
-        BlockState blockState = getCachedState();
-        if (!blockState.isOf(AllBlocks.STEAM_ENGINE))
+        BlockState blockState = getBlockState();
+        if (!blockState.is(AllBlocks.STEAM_ENGINE))
             return;
         Direction facing = SteamEngineBlock.getFacing(blockState);
         if (facing.getAxis() == Axis.Y)
-            facing = blockState.get(SteamEngineBlock.FACING);
+            facing = blockState.getValue(SteamEngineBlock.FACING);
 
-        float efficiency = MathHelper.clamp(tank.boiler.getEngineEfficiency(tank.getTotalTankSize()), 0, 1);
+        float efficiency = Mth.clamp(tank.boiler.getEngineEfficiency(tank.getTotalTankSize()), 0, 1);
         if (efficiency > 0)
             award(AllAdvancements.STEAM_ENGINE);
 
@@ -104,9 +103,9 @@ public class SteamEngineBlockEntity extends SmartBlockEntity {
             conveyedSpeedLevel *= -1;
         }
 
-        shaft.update(pos, conveyedSpeedLevel, efficiency);
+        shaft.update(worldPosition, conveyedSpeedLevel, efficiency);
 
-        if (!world.isClient())
+        if (!level.isClientSide())
             return;
 
         AllClientHandle.INSTANCE.spawnSteamEngineParticles(this);
@@ -116,23 +115,23 @@ public class SteamEngineBlockEntity extends SmartBlockEntity {
     public void remove() {
         PoweredShaftBlockEntity shaft = getShaft();
         if (shaft != null)
-            shaft.remove(pos);
+            shaft.remove(worldPosition);
         super.remove();
     }
 
     @Override
-    protected Box createRenderBoundingBox() {
-        return super.createRenderBoundingBox().expand(2);
+    protected AABB createRenderBoundingBox() {
+        return super.createRenderBoundingBox().inflate(2);
     }
 
     public PoweredShaftBlockEntity getShaft() {
         PoweredShaftBlockEntity shaft = target.get();
-        if (shaft == null || shaft.isRemoved() || !shaft.canBePoweredBy(pos)) {
+        if (shaft == null || shaft.isRemoved() || !shaft.canBePoweredBy(worldPosition)) {
             if (shaft != null)
                 target = new WeakReference<>(null);
-            Direction facing = SteamEngineBlock.getFacing(getCachedState());
-            BlockEntity anyShaftAt = world.getBlockEntity(pos.offset(facing, 2));
-            if (anyShaftAt instanceof PoweredShaftBlockEntity ps && ps.canBePoweredBy(pos))
+            Direction facing = SteamEngineBlock.getFacing(getBlockState());
+            BlockEntity anyShaftAt = level.getBlockEntity(worldPosition.relative(facing, 2));
+            if (anyShaftAt instanceof PoweredShaftBlockEntity ps && ps.canBePoweredBy(worldPosition))
                 target = new WeakReference<>(shaft = ps);
         }
         return shaft;
@@ -143,8 +142,8 @@ public class SteamEngineBlockEntity extends SmartBlockEntity {
         if (tank == null || tank.isRemoved()) {
             if (tank != null)
                 source = new WeakReference<>(null);
-            Direction facing = SteamEngineBlock.getFacing(getCachedState());
-            BlockEntity be = world.getBlockEntity(pos.offset(facing.getOpposite()));
+            Direction facing = SteamEngineBlock.getFacing(getBlockState());
+            BlockEntity be = level.getBlockEntity(worldPosition.relative(facing.getOpposite()));
             if (be instanceof FluidTankBlockEntity tankBe)
                 source = new WeakReference<>(tank = tankBe);
         }
@@ -154,12 +153,12 @@ public class SteamEngineBlockEntity extends SmartBlockEntity {
     }
 
     public boolean isValid() {
-        Direction dir = SteamEngineBlock.getConnectedDirection(getCachedState()).getOpposite();
+        Direction dir = SteamEngineBlock.getConnectedDirection(getBlockState()).getOpposite();
 
-        World level = getWorld();
+        Level level = getLevel();
         if (level == null)
             return false;
 
-        return level.getBlockState(getPos().offset(dir)).isOf(AllBlocks.FLUID_TANK);
+        return level.getBlockState(getBlockPos().relative(dir)).is(AllBlocks.FLUID_TANK);
     }
 }

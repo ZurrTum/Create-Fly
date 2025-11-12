@@ -1,20 +1,19 @@
 package com.zurrtum.create.client.ponder.api.registration;
 
 import com.zurrtum.create.client.ponder.api.scene.PonderStoryBoard;
-import net.minecraft.util.Identifier;
-
 import java.util.List;
+import net.minecraft.resources.ResourceLocation;
 
 public interface StoryBoardEntry {
     PonderStoryBoard getBoard();
 
     String getNamespace();
 
-    Identifier getSchematicLocation();
+    ResourceLocation getSchematicLocation();
 
-    Identifier getComponent();
+    ResourceLocation getComponent();
 
-    List<Identifier> getTags();
+    List<ResourceLocation> getTags();
 
     List<SceneOrderingEntry> getOrderingEntries();
 
@@ -69,14 +68,14 @@ public interface StoryBoardEntry {
      *
      * @return this StoryBoardEntry
      */
-    StoryBoardEntry highlightTag(Identifier tag);
+    StoryBoardEntry highlightTag(ResourceLocation tag);
 
     /**
      * causes the supplied PonderTags to flash when viewing this scene in the PonderUI
      *
      * @return this StoryBoardEntry
      */
-    StoryBoardEntry highlightTags(Identifier... tags);
+    StoryBoardEntry highlightTags(ResourceLocation... tags);
 
     /**
      * causes all assigned PonderTags to flash when viewing this scene in the PonderUI
@@ -90,14 +89,14 @@ public interface StoryBoardEntry {
         AFTER
     }
 
-    record SceneOrderingEntry(SceneOrderingType type, Identifier sceneId) {
+    record SceneOrderingEntry(SceneOrderingType type, ResourceLocation sceneId) {
 
         public static SceneOrderingEntry after(String namespace, String sceneId) {
-            return new SceneOrderingEntry(SceneOrderingType.AFTER, Identifier.of(namespace, sceneId));
+            return new SceneOrderingEntry(SceneOrderingType.AFTER, ResourceLocation.fromNamespaceAndPath(namespace, sceneId));
         }
 
         public static SceneOrderingEntry before(String namespace, String sceneId) {
-            return new SceneOrderingEntry(SceneOrderingType.BEFORE, Identifier.of(namespace, sceneId));
+            return new SceneOrderingEntry(SceneOrderingType.BEFORE, ResourceLocation.fromNamespaceAndPath(namespace, sceneId));
         }
     }
 }

@@ -2,8 +2,8 @@ package com.zurrtum.create.client.mixin;
 
 import com.zurrtum.create.client.content.trains.track.TrackBlockOutline;
 import com.zurrtum.create.client.foundation.block.BigOutlines;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.render.GameRenderer;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.GameRenderer;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -15,11 +15,11 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public class GameRendererMixin {
     @Shadow
     @Final
-    private MinecraftClient client;
+    private Minecraft minecraft;
 
-    @Inject(method = "updateCrosshairTarget(F)V", at = @At("TAIL"))
+    @Inject(method = "pick(F)V", at = @At("TAIL"))
     private void bigShapePick(CallbackInfo ci) {
-        BigOutlines.pick(client);
-        TrackBlockOutline.pickCurves(client);
+        BigOutlines.pick(minecraft);
+        TrackBlockOutline.pickCurves(minecraft);
     }
 }

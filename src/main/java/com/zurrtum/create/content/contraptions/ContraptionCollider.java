@@ -17,33 +17,33 @@ import com.zurrtum.create.foundation.collision.Matrix3d;
 import com.zurrtum.create.foundation.collision.OrientedBB;
 import com.zurrtum.create.foundation.utility.BlockHelper;
 import com.zurrtum.create.infrastructure.config.AllConfigs;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.CocoaBlock;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.ItemEntity;
-import net.minecraft.entity.SpawnGroup;
-import net.minecraft.entity.damage.DamageSource;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.registry.tag.BlockTags;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.sound.SoundCategory;
-import net.minecraft.sound.SoundEvents;
-import net.minecraft.structure.StructureTemplate.StructureBlockInfo;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Direction.Axis;
-import net.minecraft.util.math.Direction.AxisDirection;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.shape.VoxelShape;
-import net.minecraft.world.World;
 import org.apache.commons.lang3.mutable.MutableBoolean;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.apache.commons.lang3.mutable.MutableObject;
 
 import java.util.ArrayList;
 import java.util.List;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.Direction.Axis;
+import net.minecraft.core.Direction.AxisDirection;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.tags.BlockTags;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.MobCategory;
+import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.CocoaBlock;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate.StructureBlockInfo;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.phys.shapes.VoxelShape;
 
 public class ContraptionCollider {
 
@@ -55,30 +55,30 @@ public class ContraptionCollider {
     }
 
     static void collideEntities(AbstractContraptionEntity contraptionEntity) {
-        World world = contraptionEntity.getEntityWorld();
+        Level world = contraptionEntity.level();
         Contraption contraption = contraptionEntity.getContraption();
-        Box bounds = contraptionEntity.getBoundingBox();
+        AABB bounds = contraptionEntity.getBoundingBox();
 
         if (contraption == null)
             return;
         if (bounds == null)
             return;
 
-        Vec3d contraptionPosition = contraptionEntity.getEntityPos();
-        Vec3d contraptionMotion = contraptionPosition.subtract(contraptionEntity.getPrevPositionVec());
-        Vec3d anchorVec = contraptionEntity.getAnchorVec();
+        Vec3 contraptionPosition = contraptionEntity.position();
+        Vec3 contraptionMotion = contraptionPosition.subtract(contraptionEntity.getPrevPositionVec());
+        Vec3 anchorVec = contraptionEntity.getAnchorVec();
         ContraptionRotationState rotation = null;
 
-        List<Entity> entitiesWithinAABB = world.getEntitiesByClass(Entity.class, bounds.expand(2).stretch(0, 32, 0), contraptionEntity::collidesWith);
+        List<Entity> entitiesWithinAABB = world.getEntitiesOfClass(Entity.class, bounds.inflate(2).expandTowards(0, 32, 0), contraptionEntity::canCollideWith);
         for (Entity entity : entitiesWithinAABB) {
             if (!entity.isAlive())
                 continue;
 
             PlayerType playerType = getPlayerType(entity);
 
-            entity.streamSelfAndPassengers().forEach(e -> {
-                if (e instanceof ServerPlayerEntity playerEntity)
-                    playerEntity.networkHandler.floatingTicks = 0;
+            entity.getSelfAndPassengers().forEach(e -> {
+                if (e instanceof ServerPlayer playerEntity)
+                    playerEntity.connection.aboveGroundTickCount = 0;
             });
 
             if (playerType == PlayerType.SERVER)
@@ -90,54 +90,54 @@ public class ContraptionCollider {
             Matrix3d rotationMatrix = rotation.asMatrix();
 
             // Transform entity position and motion to local space
-            Vec3d entityPosition = entity.getEntityPos();
-            Box entityBounds = entity.getBoundingBox();
-            Vec3d motion = entity.getVelocity();
+            Vec3 entityPosition = entity.position();
+            AABB entityBounds = entity.getBoundingBox();
+            Vec3 motion = entity.getDeltaMovement();
             float yawOffset = rotation.getYawOffset();
-            Vec3d position = getWorldToLocalTranslation(entity, anchorVec, rotationMatrix, yawOffset);
+            Vec3 position = getWorldToLocalTranslation(entity, anchorVec, rotationMatrix, yawOffset);
 
             motion = motion.subtract(contraptionMotion);
             motion = rotationMatrix.transform(motion);
 
             // Prepare entity bounds
-            Box localBB = entityBounds.offset(position).expand(1.0E-7D);
+            AABB localBB = entityBounds.move(position).inflate(1.0E-7D);
 
             OrientedBB obb = new OrientedBB(localBB);
             obb.setRotation(rotationMatrix);
 
             // Use simplified bbs when present
-            final Vec3d motionCopy = motion;
-            List<Box> collidableBBs = contraption.getSimplifiedEntityColliders().orElseGet(() -> {
+            final Vec3 motionCopy = motion;
+            List<AABB> collidableBBs = contraption.getSimplifiedEntityColliders().orElseGet(() -> {
 
                 // Else find 'nearby' individual block shapes to collide with
-                List<Box> bbs = new ArrayList<>();
-                List<VoxelShape> potentialHits = getPotentiallyCollidedShapes(world, contraption, localBB.stretch(motionCopy));
-                potentialHits.forEach(shape -> bbs.addAll(shape.getBoundingBoxes()));
+                List<AABB> bbs = new ArrayList<>();
+                List<VoxelShape> potentialHits = getPotentiallyCollidedShapes(world, contraption, localBB.expandTowards(motionCopy));
+                potentialHits.forEach(shape -> bbs.addAll(shape.toAabbs()));
                 return bbs;
 
             });
 
-            MutableObject<Vec3d> collisionResponse = new MutableObject<>(Vec3d.ZERO);
-            MutableObject<Vec3d> normal = new MutableObject<>(Vec3d.ZERO);
-            MutableObject<Vec3d> location = new MutableObject<>(Vec3d.ZERO);
+            MutableObject<Vec3> collisionResponse = new MutableObject<>(Vec3.ZERO);
+            MutableObject<Vec3> normal = new MutableObject<>(Vec3.ZERO);
+            MutableObject<Vec3> location = new MutableObject<>(Vec3.ZERO);
             MutableBoolean surfaceCollision = new MutableBoolean(false);
             MutableFloat temporalResponse = new MutableFloat(1);
-            Vec3d obbCenter = obb.getCenter();
+            Vec3 obbCenter = obb.getCenter();
 
             // Apply separation maths
             boolean doHorizontalPass = !rotation.hasVerticalRotation();
             for (boolean horizontalPass : Iterate.trueAndFalse) {
                 boolean verticalPass = !horizontalPass || !doHorizontalPass;
 
-                for (Box bb : collidableBBs) {
-                    Vec3d currentResponse = collisionResponse.getValue();
-                    Vec3d currentCenter = obbCenter.add(currentResponse);
+                for (AABB bb : collidableBBs) {
+                    Vec3 currentResponse = collisionResponse.getValue();
+                    Vec3 currentCenter = obbCenter.add(currentResponse);
 
-                    if (Math.abs(currentCenter.x - bb.getCenter().x) - entityBounds.getLengthX() - 1 > bb.getLengthX() / 2)
+                    if (Math.abs(currentCenter.x - bb.getCenter().x) - entityBounds.getXsize() - 1 > bb.getXsize() / 2)
                         continue;
-                    if (Math.abs((currentCenter.y + motion.y) - bb.getCenter().y) - entityBounds.getLengthY() - 1 > bb.getLengthY() / 2)
+                    if (Math.abs((currentCenter.y + motion.y) - bb.getCenter().y) - entityBounds.getYsize() - 1 > bb.getYsize() / 2)
                         continue;
-                    if (Math.abs(currentCenter.z - bb.getCenter().z) - entityBounds.getLengthZ() - 1 > bb.getLengthZ() / 2)
+                    if (Math.abs(currentCenter.z - bb.getCenter().z) - entityBounds.getZsize() - 1 > bb.getZsize() / 2)
                         continue;
 
                     obb.setCenter(currentCenter);
@@ -150,12 +150,12 @@ public class ContraptionCollider {
 
                     double timeOfImpact = intersect.getTimeOfImpact();
                     boolean isTemporal = timeOfImpact > 0 && timeOfImpact < 1;
-                    Vec3d collidingNormal = intersect.getCollisionNormal();
-                    Vec3d collisionPosition = intersect.getCollisionPosition();
+                    Vec3 collidingNormal = intersect.getCollisionNormal();
+                    Vec3 collisionPosition = intersect.getCollisionPosition();
 
                     if (!isTemporal) {
-                        Vec3d separation = intersect.asSeparationVec(entity.getStepHeight());
-                        if (separation != null && !separation.equals(Vec3d.ZERO)) {
+                        Vec3 separation = intersect.asSeparationVec(entity.maxUpStep());
+                        if (separation != null && !separation.equals(Vec3.ZERO)) {
                             collisionResponse.setValue(currentResponse.add(separation));
                             timeOfImpact = 0;
                         }
@@ -186,14 +186,14 @@ public class ContraptionCollider {
             }
 
             // Resolve collision
-            Vec3d entityMotion = entity.getVelocity();
-            Vec3d entityMotionNoTemporal = entityMotion;
-            Vec3d collisionNormal = normal.getValue();
-            Vec3d collisionLocation = location.getValue();
-            Vec3d totalResponse = collisionResponse.getValue();
-            boolean hardCollision = !totalResponse.equals(Vec3d.ZERO);
+            Vec3 entityMotion = entity.getDeltaMovement();
+            Vec3 entityMotionNoTemporal = entityMotion;
+            Vec3 collisionNormal = normal.getValue();
+            Vec3 collisionLocation = location.getValue();
+            Vec3 totalResponse = collisionResponse.getValue();
+            boolean hardCollision = !totalResponse.equals(Vec3.ZERO);
             boolean temporalCollision = temporalResponse.getValue() != 1;
-            Vec3d motionResponse = !temporalCollision ? motion : motion.normalize().multiply(motion.length() * temporalResponse.getValue());
+            Vec3 motionResponse = !temporalCollision ? motion : motion.normalize().scale(motion.length() * temporalResponse.getValue());
 
             rotationMatrix.transpose();
             motionResponse = rotationMatrix.transform(motionResponse).add(contraptionMotion);
@@ -209,21 +209,21 @@ public class ContraptionCollider {
             double bounce = 0;
             double slide = 0;
 
-            if (!collisionLocation.equals(Vec3d.ZERO)) {
-                collisionLocation = collisionLocation.add(entity.getEntityPos().add(entity.getBoundingBox().getCenter()).multiply(.5f));
+            if (!collisionLocation.equals(Vec3.ZERO)) {
+                collisionLocation = collisionLocation.add(entity.position().add(entity.getBoundingBox().getCenter()).scale(.5f));
                 if (temporalCollision)
                     collisionLocation = collisionLocation.add(0, motionResponse.y, 0);
 
-                BlockPos pos = BlockPos.ofFloored(contraptionEntity.toLocalVector(entity.getEntityPos(), 0));
+                BlockPos pos = BlockPos.containing(contraptionEntity.toLocalVector(entity.position(), 0));
                 if (contraption.getBlocks().containsKey(pos)) {
                     BlockState blockState = contraption.getBlocks().get(pos).state();
-                    if (blockState.isIn(BlockTags.CLIMBABLE)) {
+                    if (blockState.is(BlockTags.CLIMBABLE)) {
                         surfaceCollision.setTrue();
                         totalResponse = totalResponse.add(0, .1f, 0);
                     }
                 }
 
-                pos = BlockPos.ofFloored(contraptionEntity.toLocalVector(collisionLocation, 0));
+                pos = BlockPos.containing(contraptionEntity.toLocalVector(collisionLocation, 0));
                 if (contraption.getBlocks().containsKey(pos)) {
                     BlockState blockState = contraption.getBlocks().get(pos).state();
 
@@ -232,34 +232,34 @@ public class ContraptionCollider {
                         movingInteractionBehaviour.handleEntityCollision(entity, pos, contraptionEntity);
 
                     bounce = BlockHelper.getBounceMultiplier(blockState.getBlock());
-                    slide = Math.max(0, blockState.getBlock().getSlipperiness() - .6f);
+                    slide = Math.max(0, blockState.getBlock().getFriction() - .6f);
                 }
             }
 
-            boolean hasNormal = !collisionNormal.equals(Vec3d.ZERO);
+            boolean hasNormal = !collisionNormal.equals(Vec3.ZERO);
             boolean anyCollision = hardCollision || temporalCollision;
 
             if (bounce > 0 && hasNormal && anyCollision && bounceEntity(entity, collisionNormal, contraptionEntity, bounce)) {
-                entity.getEntityWorld()
-                    .playSound(null, entity.getX(), entity.getY(), entity.getZ(), SoundEvents.BLOCK_SLIME_BLOCK_FALL, SoundCategory.BLOCKS, .5f, 1);
+                entity.level()
+                    .playSound(null, entity.getX(), entity.getY(), entity.getZ(), SoundEvents.SLIME_BLOCK_FALL, SoundSource.BLOCKS, .5f, 1);
                 continue;
             }
 
             if (temporalCollision) {
                 double idealVerticalMotion = motionResponse.y;
                 if (idealVerticalMotion != entityMotion.y) {
-                    entity.setVelocity(entityMotion.multiply(1, 0, 1).add(0, idealVerticalMotion, 0));
-                    entityMotion = entity.getVelocity();
+                    entity.setDeltaMovement(entityMotion.multiply(1, 0, 1).add(0, idealVerticalMotion, 0));
+                    entityMotion = entity.getDeltaMovement();
                 }
             }
 
             if (hardCollision) {
-                double motionX = entityMotion.getX();
-                double motionY = entityMotion.getY();
-                double motionZ = entityMotion.getZ();
-                double intersectX = totalResponse.getX();
-                double intersectY = totalResponse.getY();
-                double intersectZ = totalResponse.getZ();
+                double motionX = entityMotion.x();
+                double motionY = entityMotion.y();
+                double motionZ = entityMotion.z();
+                double intersectX = totalResponse.x();
+                double intersectY = totalResponse.y();
+                double intersectZ = totalResponse.z();
 
                 double horizonalEpsilon = 1 / 128f;
                 if (motionX != 0 && Math.abs(intersectX) > horizonalEpsilon && motionX > 0 == intersectX < 0)
@@ -273,25 +273,25 @@ public class ContraptionCollider {
 
             if (bounce == 0 && slide > 0 && hasNormal && anyCollision && rotation.hasVerticalRotation()) {
                 double slideFactor = collisionNormal.multiply(1, 0, 1).length() * 1.25f;
-                Vec3d motionIn = entityMotionNoTemporal.multiply(0, .9, 0).add(0, -.01f, 0);
-                Vec3d slideNormal = collisionNormal.crossProduct(motionIn.crossProduct(collisionNormal)).normalize();
-                Vec3d newMotion = entityMotion.multiply(.85, 0, .85)
-                    .add(slideNormal.multiply((.2f + slide) * motionIn.length() * slideFactor).add(0, -.1f - collisionNormal.y * .125f, 0));
-                entity.setVelocity(newMotion);
-                entityMotion = entity.getVelocity();
+                Vec3 motionIn = entityMotionNoTemporal.multiply(0, .9, 0).add(0, -.01f, 0);
+                Vec3 slideNormal = collisionNormal.cross(motionIn.cross(collisionNormal)).normalize();
+                Vec3 newMotion = entityMotion.multiply(.85, 0, .85)
+                    .add(slideNormal.scale((.2f + slide) * motionIn.length() * slideFactor).add(0, -.1f - collisionNormal.y * .125f, 0));
+                entity.setDeltaMovement(newMotion);
+                entityMotion = entity.getDeltaMovement();
             }
 
             if (!hardCollision && surfaceCollision.isFalse())
                 continue;
 
-            Vec3d allowedMovement = collide(totalResponse, entity);
-            entity.setPosition(entityPosition.x + allowedMovement.x, entityPosition.y + allowedMovement.y, entityPosition.z + allowedMovement.z);
-            entityPosition = entity.getEntityPos();
+            Vec3 allowedMovement = collide(totalResponse, entity);
+            entity.setPos(entityPosition.x + allowedMovement.x, entityPosition.y + allowedMovement.y, entityPosition.z + allowedMovement.z);
+            entityPosition = entity.position();
 
             entityMotion = handleDamageFromTrain(world, contraptionEntity, contraptionMotion, entity, entityMotion, playerType);
 
-            entity.velocityModified = true;
-            Vec3d contactPointMotion;
+            entity.hurtMarked = true;
+            Vec3 contactPointMotion;
 
             if (surfaceCollision.isTrue()) {
                 contraptionEntity.registerColliding(entity);
@@ -305,23 +305,23 @@ public class ContraptionCollider {
                 }
                 contactPointMotion = contraptionEntity.getContactPointMotion(entityPosition);
                 allowedMovement = collide(contactPointMotion, entity);
-                entity.setPosition(entityPosition.x + allowedMovement.x, entityPosition.y, entityPosition.z + allowedMovement.z);
+                entity.setPos(entityPosition.x + allowedMovement.x, entityPosition.y, entityPosition.z + allowedMovement.z);
             }
-            entity.setVelocity(entityMotion);
+            entity.setDeltaMovement(entityMotion);
         }
     }
 
-    private static Vec3d handleDamageFromTrain(
-        World world,
+    private static Vec3 handleDamageFromTrain(
+        Level world,
         AbstractContraptionEntity contraptionEntity,
-        Vec3d contraptionMotion,
+        Vec3 contraptionMotion,
         Entity entity,
-        Vec3d entityMotion,
+        Vec3 entityMotion,
         PlayerType playerType
     ) {
         if (!(contraptionEntity instanceof CarriageContraptionEntity cce))
             return entityMotion;
-        if (!entity.isOnGround())
+        if (!entity.onGround())
             return entityMotion;
 
         if (AllSynchedDatas.CONTRAPTION_GROUNDED.get(entity)) {
@@ -338,52 +338,52 @@ public class ContraptionCollider {
         if (!AllConfigs.server().trains.trainsCauseDamage.get())
             return entityMotion;
 
-        Vec3d diffMotion = contraptionMotion.subtract(entity.getVelocity());
+        Vec3 diffMotion = contraptionMotion.subtract(entity.getDeltaMovement());
 
         if (diffMotion.length() <= 0.35f || contraptionMotion.length() <= 0.35f)
             return entityMotion;
 
         DamageSource source = AllDamageSources.get(world).runOver(contraptionEntity);
         double damage = diffMotion.length();
-        if (entity.getType().getSpawnGroup() == SpawnGroup.MONSTER)
+        if (entity.getType().getCategory() == MobCategory.MONSTER)
             damage *= 2;
 
-        if (entity instanceof PlayerEntity p && (p.isCreative() || p.isSpectator()))
+        if (entity instanceof Player p && (p.isCreative() || p.isSpectator()))
             return entityMotion;
 
         if (playerType != PlayerType.CLIENT) {
-            ServerWorld serverWorld = (ServerWorld) world;
-            entity.damage(serverWorld, source, (int) (damage * 16));
-            serverWorld.playSound(null, entity.getBlockPos(), SoundEvents.ENTITY_PLAYER_ATTACK_CRIT, SoundCategory.NEUTRAL, 1, .75f);
+            ServerLevel serverWorld = (ServerLevel) world;
+            entity.hurtServer(serverWorld, source, (int) (damage * 16));
+            serverWorld.playSound(null, entity.blockPosition(), SoundEvents.PLAYER_ATTACK_CRIT, SoundSource.NEUTRAL, 1, .75f);
             if (!entity.isAlive())
                 contraptionEntity.getControllingPlayer()
-                    .ifPresent(uuid -> AllAdvancements.TRAIN_ROADKILL.trigger((ServerPlayerEntity) serverWorld.getPlayerByUuid(uuid)));
+                    .ifPresent(uuid -> AllAdvancements.TRAIN_ROADKILL.trigger((ServerPlayer) serverWorld.getPlayerByUUID(uuid)));
         }
 
-        Vec3d added = entityMotion.add(contraptionMotion.multiply(1, 0, 1).normalize().add(0, .25, 0).multiply(damage * 4)).add(diffMotion);
+        Vec3 added = entityMotion.add(contraptionMotion.multiply(1, 0, 1).normalize().add(0, .25, 0).scale(damage * 4)).add(diffMotion);
 
         return VecHelper.clamp(added, 3);
     }
 
-    public static boolean bounceEntity(Entity entity, Vec3d normal, AbstractContraptionEntity contraption, double factor) {
+    public static boolean bounceEntity(Entity entity, Vec3 normal, AbstractContraptionEntity contraption, double factor) {
         if (factor == 0)
             return false;
-        if (entity.bypassesLandingEffects())
+        if (entity.isSuppressingBounce())
             return false;
 
-        Vec3d contactPointMotion = contraption.getContactPointMotion(entity.getEntityPos());
-        Vec3d motion = entity.getVelocity().subtract(contactPointMotion);
-        Vec3d deltav = normal.multiply(factor * 2 * motion.dotProduct(normal));
-        if (deltav.dotProduct(deltav) < 0.1f)
+        Vec3 contactPointMotion = contraption.getContactPointMotion(entity.position());
+        Vec3 motion = entity.getDeltaMovement().subtract(contactPointMotion);
+        Vec3 deltav = normal.scale(factor * 2 * motion.dot(normal));
+        if (deltav.dot(deltav) < 0.1f)
             return false;
-        entity.setVelocity(entity.getVelocity().subtract(deltav));
+        entity.setDeltaMovement(entity.getDeltaMovement().subtract(deltav));
         return true;
     }
 
-    public static Vec3d getWorldToLocalTranslation(Entity entity, Vec3d anchorVec, Matrix3d rotationMatrix, float yawOffset) {
-        Vec3d entityPosition = entity.getEntityPos();
-        Vec3d centerY = new Vec3d(0, entity.getBoundingBox().getLengthY() / 2, 0);
-        Vec3d position = entityPosition;
+    public static Vec3 getWorldToLocalTranslation(Entity entity, Vec3 anchorVec, Matrix3d rotationMatrix, float yawOffset) {
+        Vec3 entityPosition = entity.position();
+        Vec3 centerY = new Vec3(0, entity.getBoundingBox().getYsize() / 2, 0);
+        Vec3 position = entityPosition;
         position = position.add(centerY);
         position = worldToLocalPos(position, anchorVec, rotationMatrix, yawOffset);
         position = position.subtract(centerY);
@@ -391,16 +391,16 @@ public class ContraptionCollider {
         return position;
     }
 
-    public static Vec3d worldToLocalPos(Vec3d worldPos, AbstractContraptionEntity contraptionEntity) {
+    public static Vec3 worldToLocalPos(Vec3 worldPos, AbstractContraptionEntity contraptionEntity) {
         return worldToLocalPos(worldPos, contraptionEntity.getAnchorVec(), contraptionEntity.getRotationState());
     }
 
-    public static Vec3d worldToLocalPos(Vec3d worldPos, Vec3d anchorVec, ContraptionRotationState rotation) {
+    public static Vec3 worldToLocalPos(Vec3 worldPos, Vec3 anchorVec, ContraptionRotationState rotation) {
         return worldToLocalPos(worldPos, anchorVec, rotation.asMatrix(), rotation.getYawOffset());
     }
 
-    public static Vec3d worldToLocalPos(Vec3d worldPos, Vec3d anchorVec, Matrix3d rotationMatrix, float yawOffset) {
-        Vec3d localPos = worldPos;
+    public static Vec3 worldToLocalPos(Vec3 worldPos, Vec3 anchorVec, Matrix3d rotationMatrix, float yawOffset) {
+        Vec3 localPos = worldPos;
         localPos = localPos.subtract(anchorVec);
         localPos = localPos.subtract(VecHelper.CENTER_OF_ORIGIN);
         localPos = VecHelper.rotate(localPos, -yawOffset, Axis.Y);
@@ -412,37 +412,37 @@ public class ContraptionCollider {
     /**
      * From Entity#collide
      **/
-    public static Vec3d collide(Vec3d p_20273_, Entity e) {
-        Box aabb = e.getBoundingBox();
-        World world = e.getEntityWorld();
-        List<VoxelShape> list = world.getEntityCollisions(e, aabb.stretch(p_20273_));
-        Vec3d vec3 = p_20273_.lengthSquared() == 0.0D ? p_20273_ : Entity.adjustMovementForCollisions(e, p_20273_, aabb, world, list);
+    public static Vec3 collide(Vec3 p_20273_, Entity e) {
+        AABB aabb = e.getBoundingBox();
+        Level world = e.level();
+        List<VoxelShape> list = world.getEntityCollisions(e, aabb.expandTowards(p_20273_));
+        Vec3 vec3 = p_20273_.lengthSqr() == 0.0D ? p_20273_ : Entity.collideBoundingBox(e, p_20273_, aabb, world, list);
         boolean flag = p_20273_.x != vec3.x;
         boolean flag1 = p_20273_.y != vec3.y;
         boolean flag2 = p_20273_.z != vec3.z;
         boolean flag3 = flag1 && p_20273_.y < 0.0D;
-        if (e.getStepHeight() > 0.0F && flag3 && (flag || flag2)) {
-            Vec3d vec31 = Entity.adjustMovementForCollisions(e, new Vec3d(p_20273_.x, e.getStepHeight(), p_20273_.z), aabb, world, list);
-            Vec3d vec32 = Entity.adjustMovementForCollisions(
+        if (e.maxUpStep() > 0.0F && flag3 && (flag || flag2)) {
+            Vec3 vec31 = Entity.collideBoundingBox(e, new Vec3(p_20273_.x, e.maxUpStep(), p_20273_.z), aabb, world, list);
+            Vec3 vec32 = Entity.collideBoundingBox(
                 e,
-                new Vec3d(0.0D, e.getStepHeight(), 0.0D),
-                aabb.stretch(p_20273_.x, 0.0D, p_20273_.z),
+                new Vec3(0.0D, e.maxUpStep(), 0.0D),
+                aabb.expandTowards(p_20273_.x, 0.0D, p_20273_.z),
                 world,
                 list
             );
-            if (vec32.y < (double) e.getStepHeight()) {
-                Vec3d vec33 = Entity.adjustMovementForCollisions(e, new Vec3d(p_20273_.x, 0.0D, p_20273_.z), aabb.offset(vec32), world, list)
+            if (vec32.y < (double) e.maxUpStep()) {
+                Vec3 vec33 = Entity.collideBoundingBox(e, new Vec3(p_20273_.x, 0.0D, p_20273_.z), aabb.move(vec32), world, list)
                     .add(vec32);
-                if (vec33.horizontalLengthSquared() > vec31.horizontalLengthSquared()) {
+                if (vec33.horizontalDistanceSqr() > vec31.horizontalDistanceSqr()) {
                     vec31 = vec33;
                 }
             }
 
-            if (vec31.horizontalLengthSquared() > vec3.horizontalLengthSquared()) {
-                return vec31.add(Entity.adjustMovementForCollisions(
+            if (vec31.horizontalDistanceSqr() > vec3.horizontalDistanceSqr()) {
+                return vec31.add(Entity.collideBoundingBox(
                     e,
-                    new Vec3d(0.0D, -vec31.y + p_20273_.y, 0.0D),
-                    aabb.offset(vec31),
+                    new Vec3(0.0D, -vec31.y + p_20273_.y, 0.0D),
+                    aabb.move(vec31),
                     world,
                     list
                 ));
@@ -453,30 +453,30 @@ public class ContraptionCollider {
     }
 
     private static PlayerType getPlayerType(Entity entity) {
-        return entity instanceof PlayerEntity ? PlayerType.SERVER : PlayerType.NONE;
+        return entity instanceof Player ? PlayerType.SERVER : PlayerType.NONE;
     }
 
-    public static List<VoxelShape> getPotentiallyCollidedShapes(World world, Contraption contraption, Box localBB) {
-        double height = localBB.getLengthY();
-        double width = localBB.getLengthX();
+    public static List<VoxelShape> getPotentiallyCollidedShapes(Level world, Contraption contraption, AABB localBB) {
+        double height = localBB.getYsize();
+        double width = localBB.getXsize();
         double horizontalFactor = (height > width && width != 0) ? height / width : 1;
         double verticalFactor = (width > height && height != 0) ? width / height : 1;
-        Box blockScanBB = localBB.expand(0.5f);
-        blockScanBB = blockScanBB.expand(horizontalFactor, verticalFactor, horizontalFactor);
+        AABB blockScanBB = localBB.inflate(0.5f);
+        blockScanBB = blockScanBB.inflate(horizontalFactor, verticalFactor, horizontalFactor);
 
-        BlockPos min = BlockPos.ofFloored(blockScanBB.minX, blockScanBB.minY, blockScanBB.minZ);
-        BlockPos max = BlockPos.ofFloored(blockScanBB.maxX, blockScanBB.maxY, blockScanBB.maxZ);
+        BlockPos min = BlockPos.containing(blockScanBB.minX, blockScanBB.minY, blockScanBB.minZ);
+        BlockPos max = BlockPos.containing(blockScanBB.maxX, blockScanBB.maxY, blockScanBB.maxZ);
 
         List<VoxelShape> potentialHits = new ArrayList<>();
 
-        for (BlockPos p : BlockPos.iterate(min, max)) {
+        for (BlockPos p : BlockPos.betweenClosed(min, max)) {
             if (contraption.blocks.containsKey(p) && !contraption.isHiddenInPortal(p)) {
                 StructureBlockInfo info = contraption.getBlocks().get(p);
 
                 BlockState blockState = info.state();
                 BlockPos pos = info.pos();
 
-                VoxelShape collisionShape = blockState.getCollisionShape(world, p).offset(pos.getX(), pos.getY(), pos.getZ());
+                VoxelShape collisionShape = blockState.getCollisionShape(world, p).move(pos.getX(), pos.getY(), pos.getZ());
 
                 if (!collisionShape.isEmpty()) {
                     potentialHits.add(collisionShape);
@@ -491,53 +491,53 @@ public class ContraptionCollider {
         if (!contraptionEntity.supportsTerrainCollision())
             return false;
 
-        World world = contraptionEntity.getEntityWorld();
-        Vec3d motion = contraptionEntity.getVelocity();
+        Level world = contraptionEntity.level();
+        Vec3 motion = contraptionEntity.getDeltaMovement();
         TranslatingContraption contraption = (TranslatingContraption) contraptionEntity.getContraption();
-        Box bounds = contraptionEntity.getBoundingBox();
-        Vec3d position = contraptionEntity.getEntityPos();
-        BlockPos gridPos = BlockPos.ofFloored(position);
+        AABB bounds = contraptionEntity.getBoundingBox();
+        Vec3 position = contraptionEntity.position();
+        BlockPos gridPos = BlockPos.containing(position);
 
         if (contraption == null)
             return false;
         if (bounds == null)
             return false;
-        if (motion.equals(Vec3d.ZERO))
+        if (motion.equals(Vec3.ZERO))
             return false;
 
-        Direction movementDirection = Direction.getFacing(motion.x, motion.y, motion.z);
+        Direction movementDirection = Direction.getApproximateNearest(motion.x, motion.y, motion.z);
 
         // Blocks in the world
-        if (movementDirection.getDirection() == AxisDirection.POSITIVE)
-            gridPos = gridPos.offset(movementDirection);
+        if (movementDirection.getAxisDirection() == AxisDirection.POSITIVE)
+            gridPos = gridPos.relative(movementDirection);
         if (isCollidingWithWorld(world, contraption, gridPos, movementDirection))
             return true;
 
         // Other moving Contraptions
-        for (ControlledContraptionEntity otherContraptionEntity : world.getEntitiesByClass(
+        for (ControlledContraptionEntity otherContraptionEntity : world.getEntitiesOfClass(
             ControlledContraptionEntity.class,
-            bounds.expand(1),
+            bounds.inflate(1),
             e -> !e.equals(contraptionEntity)
         )) {
 
             if (!otherContraptionEntity.supportsTerrainCollision())
                 continue;
 
-            Vec3d otherMotion = otherContraptionEntity.getVelocity();
+            Vec3 otherMotion = otherContraptionEntity.getDeltaMovement();
             TranslatingContraption otherContraption = (TranslatingContraption) otherContraptionEntity.getContraption();
-            Box otherBounds = otherContraptionEntity.getBoundingBox();
-            Vec3d otherPosition = otherContraptionEntity.getEntityPos();
+            AABB otherBounds = otherContraptionEntity.getBoundingBox();
+            Vec3 otherPosition = otherContraptionEntity.position();
 
             if (otherContraption == null)
                 return false;
             if (otherBounds == null)
                 return false;
 
-            if (!bounds.offset(motion).intersects(otherBounds.offset(otherMotion)))
+            if (!bounds.move(motion).intersects(otherBounds.move(otherMotion)))
                 continue;
 
             for (BlockPos colliderPos : contraption.getOrCreateColliders(world, movementDirection)) {
-                colliderPos = colliderPos.add(gridPos).subtract(BlockPos.ofFloored(otherPosition));
+                colliderPos = colliderPos.offset(gridPos).subtract(BlockPos.containing(otherPosition));
                 if (!otherContraption.getBlocks().containsKey(colliderPos))
                     continue;
                 return true;
@@ -547,11 +547,11 @@ public class ContraptionCollider {
         return false;
     }
 
-    public static boolean isCollidingWithWorld(World world, TranslatingContraption contraption, BlockPos anchor, Direction movementDirection) {
+    public static boolean isCollidingWithWorld(Level world, TranslatingContraption contraption, BlockPos anchor, Direction movementDirection) {
         for (BlockPos pos : contraption.getOrCreateColliders(world, movementDirection)) {
-            BlockPos colliderPos = pos.add(anchor);
+            BlockPos colliderPos = pos.offset(anchor);
 
-            if (!world.isPosLoaded(colliderPos))
+            if (!world.isLoaded(colliderPos))
                 return true;
 
             BlockState collidedState = world.getBlockState(colliderPos);
@@ -579,9 +579,9 @@ public class ContraptionCollider {
                 }
             }
 
-            if (collidedState.isOf(AllBlocks.PULLEY_MAGNET) && pos.equals(BlockPos.ZERO) && movementDirection == Direction.UP)
+            if (collidedState.is(AllBlocks.PULLEY_MAGNET) && pos.equals(BlockPos.ZERO) && movementDirection == Direction.UP)
                 continue;
-            if (!collidedState.isReplaceable() && !emptyCollider) {
+            if (!collidedState.canBeReplaced() && !emptyCollider) {
                 return true;
             }
 

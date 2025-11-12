@@ -1,33 +1,33 @@
 package com.zurrtum.create.client.foundation.blockEntity.renderer;
 
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.zurrtum.create.catnip.math.VecHelper;
 import com.zurrtum.create.client.content.redstone.link.LinkRenderer;
 import com.zurrtum.create.client.content.redstone.link.LinkRenderer.LinkRenderState;
 import com.zurrtum.create.client.foundation.blockEntity.behaviour.filtering.FilteringRenderer;
 import com.zurrtum.create.client.foundation.blockEntity.behaviour.filtering.FilteringRenderer.FilterRenderState;
 import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.item.ItemModelManager;
-import net.minecraft.client.render.block.entity.BlockEntityRenderer;
-import net.minecraft.client.render.block.entity.BlockEntityRendererFactory;
-import net.minecraft.client.render.block.entity.state.BlockEntityRenderState;
-import net.minecraft.client.render.command.ModelCommandRenderer;
-import net.minecraft.client.render.command.OrderedRenderCommandQueue;
-import net.minecraft.client.render.state.CameraRenderState;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.text.Text;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.hit.HitResult;
-import net.minecraft.util.hit.HitResult.Type;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.SubmitNodeCollector;
+import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
+import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
+import net.minecraft.client.renderer.blockentity.state.BlockEntityRenderState;
+import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
+import net.minecraft.client.renderer.item.ItemModelResolver;
+import net.minecraft.client.renderer.state.CameraRenderState;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.HitResult;
+import net.minecraft.world.phys.HitResult.Type;
+import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 
 public class SmartBlockEntityRenderer<T extends SmartBlockEntity, S extends SmartBlockEntityRenderer.SmartRenderState> implements BlockEntityRenderer<T, S> {
-    protected final ItemModelManager itemModelManager;
+    protected final ItemModelResolver itemModelManager;
 
-    public SmartBlockEntityRenderer(BlockEntityRendererFactory.Context context) {
-        itemModelManager = context.itemModelManager();
+    public SmartBlockEntityRenderer(BlockEntityRendererProvider.Context context) {
+        itemModelManager = context.itemModelResolver();
     }
 
     @Override
@@ -37,52 +37,52 @@ public class SmartBlockEntityRenderer<T extends SmartBlockEntity, S extends Smar
     }
 
     @Override
-    public void updateRenderState(
+    public void extractRenderState(
         T be,
         S state,
         float tickProgress,
-        Vec3d cameraPos,
-        @Nullable ModelCommandRenderer.CrumblingOverlayCommand crumblingOverlay
+        Vec3 cameraPos,
+        @Nullable ModelFeatureRenderer.CrumblingOverlay crumblingOverlay
     ) {
-        BlockEntityRenderState.updateBlockEntityRenderState(be, state, crumblingOverlay);
+        BlockEntityRenderState.extractBase(be, state, crumblingOverlay);
         if (be.isRemoved()) {
             return;
         }
-        double distance = be.isVirtual() ? -1 : cameraPos.squaredDistanceTo(VecHelper.getCenterOf(state.pos));
+        double distance = be.isVirtual() ? -1 : cameraPos.distanceToSqr(VecHelper.getCenterOf(state.blockPos));
         state.filter = FilteringRenderer.getFilterRenderState(be, state.blockState, itemModelManager, distance);
         state.link = LinkRenderer.getLinkRenderState(be, itemModelManager, distance);
     }
 
     @Override
-    public void render(S state, MatrixStack matrices, OrderedRenderCommandQueue queue, CameraRenderState cameraState) {
+    public void submit(S state, PoseStack matrices, SubmitNodeCollector queue, CameraRenderState cameraState) {
         if (state.filter != null) {
-            state.filter.render(state.blockState, queue, matrices, state.lightmapCoordinates);
+            state.filter.render(state.blockState, queue, matrices, state.lightCoords);
         }
         if (state.link != null) {
-            state.link.render(state.blockState, queue, matrices, state.lightmapCoordinates);
+            state.link.render(state.blockState, queue, matrices, state.lightCoords);
         }
     }
 
     public static NameplateRenderState getNameplateRenderState(
         SmartBlockEntity blockEntity,
         BlockPos pos,
-        Vec3d cameraPos,
-        Text tag,
+        Vec3 cameraPos,
+        Component tag,
         float yOffset,
         int light
     ) {
         if (blockEntity.isVirtual()) {
             return null;
         }
-        double distance = cameraPos.squaredDistanceTo(Vec3d.ofCenter(pos));
+        double distance = cameraPos.distanceToSqr(Vec3.atCenterOf(pos));
         if (distance > 4096.0f) {
             return null;
         }
-        HitResult hitResult = MinecraftClient.getInstance().crosshairTarget;
+        HitResult hitResult = Minecraft.getInstance().hitResult;
         if (!(hitResult instanceof BlockHitResult bhr) || bhr.getType() == Type.MISS || !bhr.getBlockPos().equals(pos)) {
             return null;
         }
-        Vec3d labelPos = new Vec3d(0.5, yOffset - 0.25, 0.5);
+        Vec3 labelPos = new Vec3(0.5, yOffset - 0.25, 0.5);
         return new NameplateRenderState(labelPos, tag, light, distance);
     }
 
@@ -91,9 +91,9 @@ public class SmartBlockEntityRenderer<T extends SmartBlockEntity, S extends Smar
         public LinkRenderState link;
     }
 
-    public record NameplateRenderState(Vec3d pos, Text label, int light, double distance) {
-        public void render(MatrixStack matrices, OrderedRenderCommandQueue queue, CameraRenderState cameraState) {
-            queue.submitLabel(matrices, pos, 0, label, true, light, distance, cameraState);
+    public record NameplateRenderState(Vec3 pos, Component label, int light, double distance) {
+        public void render(PoseStack matrices, SubmitNodeCollector queue, CameraRenderState cameraState) {
+            queue.submitNameTag(matrices, pos, 0, label, true, light, distance, cameraState);
         }
     }
 }

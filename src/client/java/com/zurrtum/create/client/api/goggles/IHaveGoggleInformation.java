@@ -4,11 +4,10 @@ import com.zurrtum.create.client.catnip.lang.LangBuilder;
 import com.zurrtum.create.client.foundation.utility.CreateLang;
 import com.zurrtum.create.infrastructure.fluids.FluidInventory;
 import com.zurrtum.create.infrastructure.fluids.FluidStack;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
-
 import java.util.List;
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.level.block.entity.BlockEntity;
 
 /**
  * Implement this interface on the {@link BlockEntity} that wants to add info to the goggle overlay
@@ -20,11 +19,11 @@ public non-sealed interface IHaveGoggleInformation extends IHaveCustomOverlayIco
      * @return {@code true} if the tooltip creation was successful and should be
      * displayed, or {@code false} if the overlay should not be displayed
      */
-    default boolean addToGoggleTooltip(List<Text> tooltip, boolean isPlayerSneaking) {
+    default boolean addToGoggleTooltip(List<Component> tooltip, boolean isPlayerSneaking) {
         return false;
     }
 
-    default boolean containedFluidTooltip(List<Text> tooltip, boolean isPlayerSneaking, FluidInventory handler) {
+    default boolean containedFluidTooltip(List<Component> tooltip, boolean isPlayerSneaking, FluidInventory handler) {
         if (handler == null)
             return false;
 
@@ -41,11 +40,11 @@ public non-sealed interface IHaveGoggleInformation extends IHaveCustomOverlayIco
             if (fluidStack.isEmpty())
                 continue;
 
-            CreateLang.fluidName(fluidStack).style(Formatting.GRAY).forGoggles(tooltip, 1);
+            CreateLang.fluidName(fluidStack).style(ChatFormatting.GRAY).forGoggles(tooltip, 1);
 
-            CreateLang.builder().add(CreateLang.number((double) fluidStack.getAmount() / 81).add(mb).style(Formatting.GOLD))
-                .text(Formatting.GRAY, " / ")
-                .add(CreateLang.number((double) handler.getMaxAmount(fluidStack) / 81).add(mb).style(Formatting.DARK_GRAY)).forGoggles(tooltip, 1);
+            CreateLang.builder().add(CreateLang.number((double) fluidStack.getAmount() / 81).add(mb).style(ChatFormatting.GOLD))
+                .text(ChatFormatting.GRAY, " / ")
+                .add(CreateLang.number((double) handler.getMaxAmount(fluidStack) / 81).add(mb).style(ChatFormatting.DARK_GRAY)).forGoggles(tooltip, 1);
 
             isEmpty = false;
         }
@@ -60,7 +59,7 @@ public non-sealed interface IHaveGoggleInformation extends IHaveCustomOverlayIco
             return true;
 
         CreateLang.translate("gui.goggles.fluid_container.capacity")
-            .add(CreateLang.number((double) handler.getMaxAmountPerStack() / 81).add(mb).style(Formatting.GOLD)).style(Formatting.GRAY)
+            .add(CreateLang.number((double) handler.getMaxAmountPerStack() / 81).add(mb).style(ChatFormatting.GOLD)).style(ChatFormatting.GRAY)
             .forGoggles(tooltip, 1);
 
         return true;

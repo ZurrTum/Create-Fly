@@ -2,39 +2,39 @@ package com.zurrtum.create.content.contraptions.bearing;
 
 import com.zurrtum.create.AllBlockEntityTypes;
 import com.zurrtum.create.foundation.block.IBE;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.ItemUsageContext;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.Hand;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.context.UseOnContext;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.BlockHitResult;
 
 public class ClockworkBearingBlock extends BearingBlock implements IBE<ClockworkBearingBlockEntity> {
 
-    public ClockworkBearingBlock(Settings properties) {
+    public ClockworkBearingBlock(Properties properties) {
         super(properties);
     }
 
     @Override
-    protected ActionResult onUseWithItem(
+    protected InteractionResult useItemOn(
         ItemStack stack,
         BlockState state,
-        World level,
+        Level level,
         BlockPos pos,
-        PlayerEntity player,
-        Hand hand,
+        Player player,
+        InteractionHand hand,
         BlockHitResult hitResult
     ) {
-        if (!player.canModifyBlocks())
-            return ActionResult.FAIL;
-        if (player.isSneaking())
-            return ActionResult.FAIL;
+        if (!player.mayBuild())
+            return InteractionResult.FAIL;
+        if (player.isShiftKeyDown())
+            return InteractionResult.FAIL;
         if (stack.isEmpty()) {
-            if (!level.isClient()) {
+            if (!level.isClientSide()) {
                 withBlockEntityDo(
                     level, pos, be -> {
                         if (be.running) {
@@ -45,9 +45,9 @@ public class ClockworkBearingBlock extends BearingBlock implements IBE<Clockwork
                     }
                 );
             }
-            return ActionResult.SUCCESS;
+            return InteractionResult.SUCCESS;
         }
-        return ActionResult.PASS_TO_DEFAULT_BLOCK_ACTION;
+        return InteractionResult.TRY_WITH_EMPTY_HAND;
     }
 
     @Override
@@ -56,10 +56,10 @@ public class ClockworkBearingBlock extends BearingBlock implements IBE<Clockwork
     }
 
     @Override
-    public ActionResult onWrenched(BlockState state, ItemUsageContext context) {
-        ActionResult resultType = super.onWrenched(state, context);
-        if (!context.getWorld().isClient() && resultType.isAccepted())
-            withBlockEntityDo(context.getWorld(), context.getBlockPos(), ClockworkBearingBlockEntity::disassemble);
+    public InteractionResult onWrenched(BlockState state, UseOnContext context) {
+        InteractionResult resultType = super.onWrenched(state, context);
+        if (!context.getLevel().isClientSide() && resultType.consumesAction())
+            withBlockEntityDo(context.getLevel(), context.getClickedPos(), ClockworkBearingBlockEntity::disassemble);
         return resultType;
     }
 

@@ -1,9 +1,9 @@
 package com.zurrtum.create.client.flywheel.lib.material;
 
 import com.zurrtum.create.client.flywheel.api.material.*;
-import net.minecraft.client.render.RenderPhase;
-import net.minecraft.client.texture.SpriteAtlasTexture;
-import net.minecraft.util.Identifier;
+import net.minecraft.client.renderer.RenderStateShard;
+import net.minecraft.client.renderer.texture.TextureAtlas;
+import net.minecraft.resources.ResourceLocation;
 
 public class SimpleMaterial implements Material {
     protected final MaterialShaders shaders;
@@ -11,7 +11,7 @@ public class SimpleMaterial implements Material {
     protected final CutoutShader cutout;
     protected final LightShader light;
 
-    protected final Identifier texture;
+    protected final ResourceLocation texture;
     protected final boolean blur;
     protected final boolean mipmap;
 
@@ -25,7 +25,7 @@ public class SimpleMaterial implements Material {
     protected final boolean useLight;
     protected final CardinalLightingMode cardinalLightingMode;
 
-    protected RenderPhase.Target target;
+    protected RenderStateShard.OutputStateShard target;
 
     protected SimpleMaterial(Builder builder) {
         shaders = builder.shaders();
@@ -74,7 +74,7 @@ public class SimpleMaterial implements Material {
     }
 
     @Override
-    public Identifier texture() {
+    public ResourceLocation texture() {
         return texture;
     }
 
@@ -134,7 +134,7 @@ public class SimpleMaterial implements Material {
         protected CutoutShader cutout;
         protected LightShader light;
 
-        protected Identifier texture;
+        protected ResourceLocation texture;
         protected boolean blur;
         protected boolean mipmap;
 
@@ -154,7 +154,7 @@ public class SimpleMaterial implements Material {
             fog = FogShaders.LINEAR;
             cutout = CutoutShaders.OFF;
             light = LightShaders.SMOOTH_WHEN_EMBEDDED;
-            texture = SpriteAtlasTexture.BLOCK_ATLAS_TEXTURE;
+            texture = TextureAtlas.LOCATION_BLOCKS;
             blur = false;
             mipmap = true;
             backfaceCulling = true;
@@ -210,7 +210,7 @@ public class SimpleMaterial implements Material {
             return this;
         }
 
-        public Builder texture(Identifier value) {
+        public Builder texture(ResourceLocation value) {
             this.texture = value;
             return this;
         }
@@ -294,7 +294,7 @@ public class SimpleMaterial implements Material {
         }
 
         @Override
-        public Identifier texture() {
+        public ResourceLocation texture() {
             return texture;
         }
 

@@ -2,16 +2,16 @@ package com.zurrtum.create.content.kinetics.base;
 
 import com.zurrtum.create.content.equipment.wrench.IWrenchable;
 import com.zurrtum.create.infrastructure.config.AllConfigs;
-import net.minecraft.block.BlockState;
-import net.minecraft.util.Formatting;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Direction.Axis;
-import net.minecraft.world.WorldView;
+import net.minecraft.ChatFormatting;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.Direction.Axis;
+import net.minecraft.world.level.LevelReader;
+import net.minecraft.world.level.block.state.BlockState;
 
 public interface IRotate extends IWrenchable {
 
-    boolean hasShaftTowards(WorldView world, BlockPos pos, BlockState state, Direction face);
+    boolean hasShaftTowards(LevelReader world, BlockPos pos, BlockState state, Direction face);
 
     Axis getRotationAxis(BlockState state);
 
@@ -28,16 +28,16 @@ public interface IRotate extends IWrenchable {
     }
 
     enum SpeedLevel {
-        NONE(Formatting.DARK_GRAY, 0x000000, 0),
-        SLOW(Formatting.GREEN, 0x22FF22, 10),
-        MEDIUM(Formatting.AQUA, 0x0084FF, 20),
-        FAST(Formatting.LIGHT_PURPLE, 0xFF55FF, 30);
+        NONE(ChatFormatting.DARK_GRAY, 0x000000, 0),
+        SLOW(ChatFormatting.GREEN, 0x22FF22, 10),
+        MEDIUM(ChatFormatting.AQUA, 0x0084FF, 20),
+        FAST(ChatFormatting.LIGHT_PURPLE, 0xFF55FF, 30);
 
-        private final Formatting textColor;
+        private final ChatFormatting textColor;
         private final int color;
         private final int particleSpeed;
 
-        SpeedLevel(Formatting textColor, int color, int particleSpeed) {
+        SpeedLevel(ChatFormatting textColor, int color, int particleSpeed) {
             this.textColor = textColor;
             this.color = color;
             this.particleSpeed = particleSpeed;
@@ -55,7 +55,7 @@ public interface IRotate extends IWrenchable {
             return NONE;
         }
 
-        public Formatting getTextColor() {
+        public ChatFormatting getTextColor() {
             return textColor;
         }
 
@@ -79,15 +79,15 @@ public interface IRotate extends IWrenchable {
     }
 
     enum StressImpact {
-        LOW(Formatting.YELLOW, Formatting.GREEN),
-        MEDIUM(Formatting.GOLD, Formatting.YELLOW),
-        HIGH(Formatting.RED, Formatting.GOLD),
-        OVERSTRESSED(Formatting.RED, Formatting.RED);
+        LOW(ChatFormatting.YELLOW, ChatFormatting.GREEN),
+        MEDIUM(ChatFormatting.GOLD, ChatFormatting.YELLOW),
+        HIGH(ChatFormatting.RED, ChatFormatting.GOLD),
+        OVERSTRESSED(ChatFormatting.RED, ChatFormatting.RED);
 
-        private final Formatting absoluteColor;
-        private final Formatting relativeColor;
+        private final ChatFormatting absoluteColor;
+        private final ChatFormatting relativeColor;
 
-        StressImpact(Formatting absoluteColor, Formatting relativeColor) {
+        StressImpact(ChatFormatting absoluteColor, ChatFormatting relativeColor) {
             this.absoluteColor = absoluteColor;
             this.relativeColor = relativeColor;
         }
@@ -106,11 +106,11 @@ public interface IRotate extends IWrenchable {
             return !AllConfigs.server().kinetics.disableStress.get();
         }
 
-        public Formatting getAbsoluteColor() {
+        public ChatFormatting getAbsoluteColor() {
             return absoluteColor;
         }
 
-        public Formatting getRelativeColor() {
+        public ChatFormatting getRelativeColor() {
             return relativeColor;
         }
     }

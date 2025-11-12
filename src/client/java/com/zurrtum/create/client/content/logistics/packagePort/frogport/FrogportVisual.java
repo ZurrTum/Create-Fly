@@ -9,11 +9,11 @@ import com.zurrtum.create.client.flywheel.lib.model.Models;
 import com.zurrtum.create.client.flywheel.lib.visual.AbstractBlockEntityVisual;
 import com.zurrtum.create.client.flywheel.lib.visual.SimpleDynamicVisual;
 import com.zurrtum.create.content.logistics.packagePort.frogport.FrogportBlockEntity;
-import net.minecraft.block.Blocks;
-import net.minecraft.registry.Registries;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.Mth;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix4f;
 
@@ -42,9 +42,9 @@ public class FrogportVisual extends AbstractBlockEntityVisual<FrogportBlockEntit
 
         tongue = ctx.instancerProvider().instancer(InstanceTypes.TRANSFORMED, Models.partial(AllPartialModels.FROGPORT_TONGUE)).createInstance();
 
-        rig = ctx.instancerProvider().instancer(InstanceTypes.TRANSFORMED, Models.block(Blocks.AIR.getDefaultState())).createInstance();
+        rig = ctx.instancerProvider().instancer(InstanceTypes.TRANSFORMED, Models.block(Blocks.AIR.defaultBlockState())).createInstance();
 
-        box = ctx.instancerProvider().instancer(InstanceTypes.TRANSFORMED, Models.block(Blocks.AIR.getDefaultState())).createInstance();
+        box = ctx.instancerProvider().instancer(InstanceTypes.TRANSFORMED, Models.block(Blocks.AIR.defaultBlockState())).createInstance();
 
         rig.handle().setVisible(false);
         box.handle().setVisible(false);
@@ -71,14 +71,14 @@ public class FrogportVisual extends AbstractBlockEntityVisual<FrogportBlockEntit
         boolean animating = blockEntity.isAnimationInProgress();
         boolean depositing = blockEntity.currentlyDepositing;
 
-        Vec3d diff = Vec3d.ZERO;
+        Vec3 diff = Vec3.ZERO;
 
         if (hasTarget) {
-            diff = blockEntity.target.getExactTargetLocation(blockEntity, blockEntity.getWorld(), blockEntity.getPos())
-                .subtract(0, animating && depositing ? 0 : 0.75, 0).subtract(Vec3d.ofCenter(blockEntity.getPos()));
-            tonguePitch = (float) MathHelper.atan2(diff.y, diff.multiply(1, 0, 1).length() + (3 / 16f)) * MathHelper.DEGREES_PER_RADIAN;
+            diff = blockEntity.target.getExactTargetLocation(blockEntity, blockEntity.getLevel(), blockEntity.getBlockPos())
+                .subtract(0, animating && depositing ? 0 : 0.75, 0).subtract(Vec3.atCenterOf(blockEntity.getBlockPos()));
+            tonguePitch = (float) Mth.atan2(diff.y, diff.multiply(1, 0, 1).length() + (3 / 16f)) * Mth.RAD_TO_DEG;
             tongueLength = Math.max((float) diff.length(), 1);
-            headPitch = MathHelper.clamp(tonguePitch * 2, 60, 100);
+            headPitch = Mth.clamp(tonguePitch * 2, 60, 100);
         }
 
         if (animating) {
@@ -161,14 +161,14 @@ public class FrogportVisual extends AbstractBlockEntityVisual<FrogportBlockEntit
         }
     }
 
-    private void renderPackage(Vec3d diff, float scale, float itemDistance) {
+    private void renderPackage(Vec3 diff, float scale, float itemDistance) {
         if (blockEntity.animatedPackage == null || scale < 0.45) {
             rig.handle().setVisible(false);
             box.handle().setVisible(false);
             return;
         }
-        Identifier key = Registries.ITEM.getId(blockEntity.animatedPackage.getItem());
-        if (key == Registries.ITEM.getDefaultId()) {
+        ResourceLocation key = BuiltInRegistries.ITEM.getKey(blockEntity.animatedPackage.getItem());
+        if (key == BuiltInRegistries.ITEM.getDefaultKey()) {
             rig.handle().setVisible(false);
             box.handle().setVisible(false);
             return;
@@ -181,7 +181,7 @@ public class FrogportVisual extends AbstractBlockEntityVisual<FrogportBlockEntit
         box.handle().setVisible(true);
 
         box.setIdentityTransform().translate(getVisualPosition()).translate(0, 3 / 16f, 0)
-            .translate(diff.normalize().multiply(itemDistance).subtract(0, animating && depositing ? 0.75 : 0, 0)).center().scale(scale).uncenter()
+            .translate(diff.normalize().scale(itemDistance).subtract(0, animating && depositing ? 0.75 : 0, 0)).center().scale(scale).uncenter()
             .setChanged();
 
         if (!depositing) {

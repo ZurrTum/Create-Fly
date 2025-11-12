@@ -2,17 +2,17 @@ package com.zurrtum.create.content.kinetics.deployer;
 
 import com.mojang.authlib.GameProfile;
 import net.fabricmc.fabric.api.entity.FakePlayer;
-import net.minecraft.entity.EntityDimensions;
-import net.minecraft.entity.EntityPose;
-import net.minecraft.entity.EquipmentSlot;
-import net.minecraft.entity.effect.StatusEffectInstance;
-import net.minecraft.item.ItemStack;
-import net.minecraft.server.network.ServerPlayerInteractionManager;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.text.Text;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.GameMode;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayerGameMode;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.entity.EntityDimensions;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.Pose;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.GameType;
+import net.minecraft.world.phys.Vec3;
 import org.apache.commons.lang3.tuple.Pair;
 
 public class DeployerFabricFakePlayer extends FakePlayer implements DeployerPlayer {
@@ -21,14 +21,14 @@ public class DeployerFabricFakePlayer extends FakePlayer implements DeployerPlay
     public boolean placedTracks;
     public boolean onMinecartContraption;
 
-    protected DeployerFabricFakePlayer(ServerWorld world, GameProfile profile) {
+    protected DeployerFabricFakePlayer(ServerLevel world, GameProfile profile) {
         super(world, profile);
-        interactionManager.setGameMode(GameMode.SURVIVAL, null);
+        gameMode.setGameModeForPlayer(GameType.SURVIVAL, null);
     }
 
     @Override
-    public ServerPlayerInteractionManager getInteractionManager() {
-        return interactionManager;
+    public ServerPlayerGameMode getInteractionManager() {
+        return gameMode;
     }
 
     @Override
@@ -72,46 +72,46 @@ public class DeployerFabricFakePlayer extends FakePlayer implements DeployerPlay
     }
 
     @Override
-    public Text getDisplayName() {
-        return Text.translatable("create.block.deployer.damage_source_name");
+    public Component getDisplayName() {
+        return Component.translatable("create.block.deployer.damage_source_name");
     }
 
     @Override
-    public EntityDimensions getBaseDimensions(EntityPose pose) {
-        return super.getBaseDimensions(pose).withEyeHeight(0);
+    public EntityDimensions getDefaultDimensions(Pose pose) {
+        return super.getDefaultDimensions(pose).withEyeHeight(0);
     }
 
     @Override
-    public Vec3d getEntityPos() {
-        Vec3d pos = super.getEntityPos();
-        return new Vec3d(pos.x, pos.y, pos.z);
+    public Vec3 position() {
+        Vec3 pos = super.position();
+        return new Vec3(pos.x, pos.y, pos.z);
     }
 
     @Override
-    public float getAttackCooldownProgressPerTick() {
+    public float getCurrentItemAttackStrengthDelay() {
         return 1 / 64f;
     }
 
     @Override
-    public boolean canConsume(boolean ignoreHunger) {
+    public boolean canEat(boolean ignoreHunger) {
         return false;
     }
 
     @Override
-    public boolean canHaveStatusEffect(StatusEffectInstance effect) {
+    public boolean canBeAffected(MobEffectInstance effect) {
         return false;
     }
 
     @Override
-    public boolean isArmorSlot(EquipmentSlot slot) {
+    public boolean doesEmitEquipEvent(EquipmentSlot slot) {
         return false;
     }
 
     @Override
     public void remove(RemovalReason reason) {
-        ServerWorld world = getEntityWorld();
-        if (blockBreakingProgress != null && !world.isClient())
-            world.setBlockBreakingInfo(getId(), blockBreakingProgress.getKey(), -1);
+        ServerLevel world = level();
+        if (blockBreakingProgress != null && !world.isClientSide())
+            world.destroyBlockProgress(getId(), blockBreakingProgress.getKey(), -1);
         super.remove(reason);
     }
 }

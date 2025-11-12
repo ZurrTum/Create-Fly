@@ -5,12 +5,12 @@ import com.zurrtum.create.content.schematics.requirement.ItemRequirement;
 import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
 import com.zurrtum.create.foundation.blockEntity.behaviour.BehaviourType;
 import com.zurrtum.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.storage.ReadView;
-import net.minecraft.storage.WriteView;
-import net.minecraft.world.World;
-import net.minecraft.world.WorldEvents;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.LevelEvent;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Predicate;
@@ -42,10 +42,10 @@ public class BracketedBlockEntityBehaviour extends BlockEntityBehaviour<SmartBlo
         this.bracket = state;
         reRender = true;
         blockEntity.notifyUpdate();
-        World world = getWorld();
-        if (world.isClient())
+        Level world = getLevel();
+        if (world.isClientSide())
             return;
-        blockEntity.getCachedState().updateNeighbors(world, getPos(), 3);
+        blockEntity.getBlockState().updateNeighbourShapes(world, getPos(), 3);
     }
 
     public void transformBracket(StructureTransform transform) {
@@ -62,9 +62,9 @@ public class BracketedBlockEntityBehaviour extends BlockEntityBehaviour<SmartBlo
         }
 
         BlockState removed = this.bracket;
-        World world = getWorld();
-        if (!world.isClient())
-            world.syncWorldEvent(WorldEvents.BLOCK_BROKEN, getPos(), Block.getRawIdFromState(bracket));
+        Level world = getLevel();
+        if (!world.isClientSide())
+            world.levelEvent(LevelEvent.PARTICLES_DESTROY_BLOCK, getPos(), Block.getId(bracket));
         this.bracket = null;
         reRender = true;
         if (inOnReplacedContext) {
@@ -72,9 +72,9 @@ public class BracketedBlockEntityBehaviour extends BlockEntityBehaviour<SmartBlo
             return removed;
         }
         blockEntity.notifyUpdate();
-        if (world.isClient())
+        if (world.isClientSide())
             return removed;
-        blockEntity.getCachedState().updateNeighbors(world, getPos(), 3);
+        blockEntity.getBlockState().updateNeighbourShapes(world, getPos(), 3);
         return removed;
     }
 
@@ -92,7 +92,7 @@ public class BracketedBlockEntityBehaviour extends BlockEntityBehaviour<SmartBlo
     }
 
     public boolean canHaveBracket() {
-        return pred.test(blockEntity.getCachedState());
+        return pred.test(blockEntity.getBlockState());
     }
 
     @Override
@@ -109,9 +109,9 @@ public class BracketedBlockEntityBehaviour extends BlockEntityBehaviour<SmartBlo
     }
 
     @Override
-    public void write(WriteView view, boolean clientPacket) {
+    public void write(ValueOutput view, boolean clientPacket) {
         if (isBracketPresent() && isBracketValid(bracket)) {
-            view.put("Bracket", BlockState.CODEC, bracket);
+            view.store("Bracket", BlockState.CODEC, bracket);
         }
         if (clientPacket && reRender) {
             view.putBoolean("Redraw", true);
@@ -121,14 +121,14 @@ public class BracketedBlockEntityBehaviour extends BlockEntityBehaviour<SmartBlo
     }
 
     @Override
-    public void read(ReadView view, boolean clientPacket) {
+    public void read(ValueInput view, boolean clientPacket) {
         view.read("Bracket", BlockState.CODEC).ifPresent(state -> {
             bracket = null;
             if (isBracketValid(state))
                 bracket = state;
         });
-        if (clientPacket && view.getBoolean("Redraw", false))
-            getWorld().updateListeners(getPos(), blockEntity.getCachedState(), blockEntity.getCachedState(), 16);
+        if (clientPacket && view.getBooleanOr("Redraw", false))
+            getLevel().sendBlockUpdated(getPos(), blockEntity.getBlockState(), blockEntity.getBlockState(), 16);
         super.read(view, clientPacket);
     }
 

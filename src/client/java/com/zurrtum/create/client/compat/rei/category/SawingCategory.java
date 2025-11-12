@@ -14,9 +14,9 @@ import me.shedaniel.rei.api.client.gui.Renderer;
 import me.shedaniel.rei.api.client.gui.widgets.Widget;
 import me.shedaniel.rei.api.client.gui.widgets.Widgets;
 import me.shedaniel.rei.api.common.category.CategoryIdentifier;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.item.Items;
-import net.minecraft.text.Text;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.item.Items;
 import org.joml.Matrix3x2f;
 
 import java.util.List;
@@ -28,7 +28,7 @@ public class SawingCategory extends CreateCategory<SawingDisplay> {
     }
 
     @Override
-    public Text getTitle() {
+    public Component getTitle() {
         return CreateLang.translateDirect("recipe.sawing");
     }
 
@@ -41,11 +41,11 @@ public class SawingCategory extends CreateCategory<SawingDisplay> {
     public void addWidgets(List<Widget> widgets, SawingDisplay display, Rectangle bounds) {
         Point input = new Point(bounds.x + 49, bounds.y + 10);
         Point output = new Point(bounds.x + 123, bounds.y + 53);
-        widgets.add(Widgets.createDrawableWidget((DrawContext graphics, int mouseX, int mouseY, float delta) -> {
+        widgets.add(Widgets.createDrawableWidget((GuiGraphics graphics, int mouseX, int mouseY, float delta) -> {
             drawSlotBackground(graphics, input, output);
             AllGuiTextures.JEI_DOWN_ARROW.render(graphics, bounds.x + 75, bounds.y + 11);
             AllGuiTextures.JEI_SHADOW.render(graphics, bounds.x + 60, bounds.y + 60);
-            graphics.state.addSpecialElement(new SawRenderState(new Matrix3x2f(graphics.getMatrices()), bounds.x + 69, bounds.y + 36));
+            graphics.guiRenderState.submitPicturesInPictureState(new SawRenderState(new Matrix3x2f(graphics.pose()), bounds.x + 69, bounds.y + 36));
         }));
         widgets.add(createInputSlot(input).entries(display.input()));
         widgets.add(createOutputSlot(output).entries(display.output()));

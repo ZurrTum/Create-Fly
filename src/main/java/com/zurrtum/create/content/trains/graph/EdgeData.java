@@ -8,11 +8,11 @@ import com.zurrtum.create.catnip.data.Couple;
 import com.zurrtum.create.content.trains.signal.SignalBoundary;
 import com.zurrtum.create.content.trains.signal.SignalEdgeGroup;
 import com.zurrtum.create.content.trains.signal.TrackEdgePoint;
+import net.minecraft.core.UUIDUtil;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.storage.ReadView;
-import net.minecraft.storage.WriteView;
-import net.minecraft.util.Uuids;
-import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.Mth;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
@@ -164,29 +164,29 @@ public class EdgeData {
     @Nullable
     public <T extends TrackEdgePoint> T get(EdgePointType<T> type, double exactPosition) {
         T next = next(type, exactPosition - .5f);
-        if (next != null && MathHelper.approximatelyEquals(next.getLocationOn(edge), exactPosition))
+        if (next != null && Mth.equal(next.getLocationOn(edge), exactPosition))
             return next;
         return null;
     }
 
-    public void write(WriteView view, DimensionPalette dimensions) {
+    public void write(ValueOutput view, DimensionPalette dimensions) {
         if (singleSignalGroup == passiveGroup)
             view.putBoolean("PassiveGroup", true);
         else if (singleSignalGroup != null)
-            view.put("SignalGroup", Uuids.INT_STREAM_CODEC, singleSignalGroup);
+            view.store("SignalGroup", UUIDUtil.CODEC, singleSignalGroup);
 
         if (hasPoints()) {
-            WriteView.ListView list = view.getList("Points");
+            ValueOutput.ValueOutputList list = view.childrenList("Points");
             for (TrackEdgePoint point : points) {
-                WriteView item = list.add();
-                item.put("Id", Uuids.INT_STREAM_CODEC, point.id);
-                item.put("Type", EdgePointType.CODEC, point.getType());
+                ValueOutput item = list.addChild();
+                item.store("Id", UUIDUtil.CODEC, point.id);
+                item.store("Type", EdgePointType.CODEC, point.getType());
             }
         }
         if (hasIntersections()) {
-            WriteView.ListView list = view.getList("Intersections");
+            ValueOutput.ValueOutputList list = view.childrenList("Intersections");
             for (TrackEdgeIntersection intersection : intersections) {
-                intersection.write(list.add(), dimensions);
+                intersection.write(list.addChild(), dimensions);
             }
         }
     }
@@ -196,13 +196,13 @@ public class EdgeData {
         if (input.singleSignalGroup == passiveGroup)
             builder.add("PassiveGroup", ops.createBoolean(true));
         else if (input.singleSignalGroup != null)
-            builder.add("SignalGroup", input.singleSignalGroup, Uuids.INT_STREAM_CODEC);
+            builder.add("SignalGroup", input.singleSignalGroup, UUIDUtil.CODEC);
 
         if (input.hasPoints()) {
             ListBuilder<T> list = ops.listBuilder();
             for (TrackEdgePoint point : input.points) {
                 RecordBuilder<T> item = ops.mapBuilder();
-                item.add("Id", point.id, Uuids.INT_STREAM_CODEC);
+                item.add("Id", point.id, UUIDUtil.CODEC);
                 item.add("Type", point.getType(), EdgePointType.CODEC);
                 list.add(item.build(empty));
             }
@@ -218,19 +218,19 @@ public class EdgeData {
         return builder.build(empty);
     }
 
-    public static EdgeData read(ReadView view, TrackEdge edge, TrackGraph graph, DimensionPalette dimensions) {
+    public static EdgeData read(ValueInput view, TrackEdge edge, TrackGraph graph, DimensionPalette dimensions) {
         EdgeData data = new EdgeData(edge);
-        view.read("SignalGroup", Uuids.INT_STREAM_CODEC).ifPresentOrElse(
+        view.read("SignalGroup", UUIDUtil.CODEC).ifPresentOrElse(
             id -> data.singleSignalGroup = id, () -> {
-                if (!view.getBoolean("PassiveGroup", false)) {
+                if (!view.getBooleanOr("PassiveGroup", false)) {
                     data.singleSignalGroup = null;
                 }
             }
         );
 
-        view.getOptionalListReadView("Points").ifPresent(list -> list.forEach(item -> item.read("Type", EdgePointType.CODEC)
-            .flatMap(type -> item.read("Id", Uuids.INT_STREAM_CODEC).map(id -> graph.getPoint(type, id))).ifPresent(data.points::add)));
-        view.getOptionalListReadView("Intersections")
+        view.childrenList("Points").ifPresent(list -> list.forEach(item -> item.read("Type", EdgePointType.CODEC)
+            .flatMap(type -> item.read("Id", UUIDUtil.CODEC).map(id -> graph.getPoint(type, id))).ifPresent(data.points::add)));
+        view.childrenList("Intersections")
             .ifPresent(list -> list.forEach(item -> data.intersections.add(TrackEdgeIntersection.read(item, dimensions))));
         return data;
     }
@@ -238,7 +238,7 @@ public class EdgeData {
     public static <T> EdgeData decode(DynamicOps<T> ops, T input, TrackEdge edge, TrackGraph graph, DimensionPalette dimensions) {
         EdgeData data = new EdgeData(edge);
         MapLike<T> map = ops.getMap(input).getOrThrow();
-        Uuids.INT_STREAM_CODEC.decode(ops, map.get("SignalGroup")).result().map(Pair::getFirst).ifPresentOrElse(
+        UUIDUtil.CODEC.decode(ops, map.get("SignalGroup")).result().map(Pair::getFirst).ifPresentOrElse(
             id -> data.singleSignalGroup = id, () -> {
                 if (!Optional.ofNullable(map.get("PassiveGroup")).flatMap(value -> ops.getBooleanValue(value).result()).orElse(false)) {
                     data.singleSignalGroup = null;
@@ -248,7 +248,7 @@ public class EdgeData {
         ops.getList(map.get("Points")).ifSuccess(list -> list.accept(item -> {
             MapLike<T> point = ops.getMap(item).getOrThrow();
             EdgePointType.CODEC.decode(ops, point.get("Type")).result().map(Pair::getFirst)
-                .flatMap(type -> Uuids.INT_STREAM_CODEC.decode(ops, point.get("Id")).result().map(Pair::getFirst).map(id -> graph.getPoint(type, id)))
+                .flatMap(type -> UUIDUtil.CODEC.decode(ops, point.get("Id")).result().map(Pair::getFirst).map(id -> graph.getPoint(type, id)))
                 .ifPresent(data.points::add);
         }));
         ops.getList(map.get("Intersections")).ifSuccess(list -> list.accept(item -> {

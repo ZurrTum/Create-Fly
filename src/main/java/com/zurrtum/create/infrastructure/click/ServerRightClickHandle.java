@@ -1,13 +1,13 @@
 package com.zurrtum.create.infrastructure.click;
 
-import net.minecraft.item.ItemStack;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.Hand;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.BlockHitResult;
 
 public interface ServerRightClickHandle {
-    ActionResult onRightClickBlock(World world, ServerPlayerEntity player, ItemStack stack, Hand hand, BlockHitResult hit, BlockPos pos);
+    InteractionResult onRightClickBlock(Level world, ServerPlayer player, ItemStack stack, InteractionHand hand, BlockHitResult hit, BlockPos pos);
 }

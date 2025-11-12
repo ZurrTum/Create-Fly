@@ -14,12 +14,11 @@ import com.zurrtum.create.client.flywheel.lib.visual.SimpleDynamicVisual;
 import com.zurrtum.create.content.kinetics.steamEngine.PoweredShaftBlockEntity;
 import com.zurrtum.create.content.kinetics.steamEngine.SteamEngineBlock;
 import com.zurrtum.create.content.kinetics.steamEngine.SteamEngineBlockEntity;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Direction.Axis;
-import net.minecraft.util.math.MathHelper;
-
 import java.util.Objects;
 import java.util.function.Consumer;
+import net.minecraft.core.Direction;
+import net.minecraft.core.Direction.Axis;
+import net.minecraft.util.Mth;
 
 public class SteamEngineVisual extends AbstractBlockEntityVisual<SteamEngineBlockEntity> implements SimpleDynamicVisual {
 
@@ -75,17 +74,17 @@ public class SteamEngineVisual extends AbstractBlockEntityVisual<SteamEngineBloc
         Axis facingAxis = facing.getAxis();
 
         boolean roll90 = facingAxis.isHorizontal() && axis == Axis.Y || facingAxis.isVertical() && axis == Axis.Z;
-        float piston = ((6 / 16f) * MathHelper.sin(angle) - MathHelper.sqrt(MathHelper.square(14 / 16f) - MathHelper.square(6 / 16f) * MathHelper.square(
-            MathHelper.cos(angle))));
-        float distance = MathHelper.sqrt(MathHelper.square(piston - 6 / 16f * MathHelper.sin(angle)));
-        float angle2 = (float) Math.acos(distance / (14 / 16f)) * (MathHelper.cos(angle) >= 0 ? 1f : -1f);
+        float piston = ((6 / 16f) * Mth.sin(angle) - Mth.sqrt(Mth.square(14 / 16f) - Mth.square(6 / 16f) * Mth.square(
+            Mth.cos(angle))));
+        float distance = Mth.sqrt(Mth.square(piston - 6 / 16f * Mth.sin(angle)));
+        float angle2 = (float) Math.acos(distance / (14 / 16f)) * (Mth.cos(angle) >= 0 ? 1f : -1f);
 
         transformed(this.piston, facing, roll90).translate(0, piston + 20 / 16f, 0).setChanged();
 
         transformed(linkage, facing, roll90).center().translate(0, 1, 0).uncenter().translate(0, piston + 20 / 16f, 0).translate(0, 4 / 16f, 8 / 16f)
             .rotateX(angle2).translate(0, -4 / 16f, -8 / 16f).setChanged();
 
-        transformed(connector, facing, roll90).translate(0, 2, 0).center().rotateX(-(angle + MathHelper.HALF_PI)).uncenter().setChanged();
+        transformed(connector, facing, roll90).translate(0, 2, 0).center().rotateX(-(angle + Mth.HALF_PI)).uncenter().setChanged();
     }
 
     protected TransformedInstance transformed(TransformedInstance modelData, Direction facing, boolean roll90) {

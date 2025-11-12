@@ -16,9 +16,9 @@ import com.zurrtum.create.content.kinetics.transmission.sequencer.InstructionSpe
 import com.zurrtum.create.content.kinetics.transmission.sequencer.SequencedGearshiftBlockEntity;
 import com.zurrtum.create.content.kinetics.transmission.sequencer.SequencerInstructions;
 import com.zurrtum.create.infrastructure.packet.c2s.ConfigureSequencedGearshiftPacket;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.text.Text;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.network.chat.Component;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -62,19 +62,19 @@ public class SequencedGearshiftScreen extends AbstractSimiScreen {
             initInputsOfRow(row, x, y);
 
         confirmButton = new IconButton(x + background.getWidth() - 33, y + background.getHeight() - 24, AllIcons.I_CONFIRM);
-        confirmButton.withCallback(this::close);
-        addDrawableChild(confirmButton);
+        confirmButton.withCallback(this::onClose);
+        addRenderableWidget(confirmButton);
 
         renderedItem = new ElementWidget(
             x + background.getWidth() + 6,
             y + background.getHeight() - 56
-        ).showingElement(GuiGameElement.of(AllItems.SEQUENCED_GEARSHIFT.getDefaultStack()).scale(5));
-        addDrawableChild(renderedItem);
+        ).showingElement(GuiGameElement.of(AllItems.SEQUENCED_GEARSHIFT.getDefaultInstance()).scale(5));
+        addRenderableWidget(renderedItem);
     }
 
     @Override
-    public void close() {
-        super.close();
+    public void onClose() {
+        super.onClose();
         renderedItem.getRenderElement().clear();
     }
 
@@ -90,15 +90,15 @@ public class SequencedGearshiftScreen extends AbstractSimiScreen {
         return "gui.sequenced_gearshift.speed." + Lang.asId(def.name());
     }
 
-    private static List<Text> getSpeedOptions() {
-        List<Text> options = new ArrayList<>();
+    private static List<Component> getSpeedOptions() {
+        List<Component> options = new ArrayList<>();
         for (InstructionSpeedModifiers entry : InstructionSpeedModifiers.values())
             options.add(CreateLang.translateDirect(translationKey(entry)));
         return options;
     }
 
-    private static List<Text> getSequencerOptions() {
-        List<Text> options = new ArrayList<>();
+    private static List<Component> getSequencerOptions() {
+        List<Component> options = new ArrayList<>();
         for (SequencerInstructions entry : SequencerInstructions.values())
             options.add(CreateLang.translateDirect(descriptiveTranslationKey(entry)));
         return options;
@@ -229,8 +229,8 @@ public class SequencedGearshiftScreen extends AbstractSimiScreen {
         };
     }
 
-    private static Text label(InstructionSpeedModifiers def) {
-        return Text.literal(switch (def) {
+    private static Component label(InstructionSpeedModifiers def) {
+        return Component.literal(switch (def) {
             case FORWARD_FAST -> ">>";
             case FORWARD -> "->";
             case BACK -> "<-";
@@ -239,7 +239,7 @@ public class SequencedGearshiftScreen extends AbstractSimiScreen {
     }
 
     @Override
-    protected void renderWindow(DrawContext graphics, int mouseX, int mouseY, float partialTicks) {
+    protected void renderWindow(GuiGraphics graphics, int mouseX, int mouseY, float partialTicks) {
         int x = guiLeft;
         int y = guiTop;
 
@@ -267,22 +267,22 @@ public class SequencedGearshiftScreen extends AbstractSimiScreen {
             label(graphics, 36, yOffset - 1, CreateLang.translateDirect(translationKey(def)));
             if (hasValueParameter(def)) {
                 String text = formatValue(def, instruction.value);
-                int stringWidth = textRenderer.getWidth(text);
-                label(graphics, 90 + (12 - stringWidth / 2), yOffset - 1, Text.literal(text));
+                int stringWidth = font.width(text);
+                label(graphics, 90 + (12 - stringWidth / 2), yOffset - 1, Component.literal(text));
             }
             if (hasSpeedParameter(def))
                 label(graphics, 127, yOffset - 1, label(instruction.speedModifier));
         }
 
-        graphics.drawText(textRenderer, title, x + (background.getWidth() - 8) / 2 - textRenderer.getWidth(title) / 2, y + 4, 0xFF592424, false);
+        graphics.drawString(font, title, x + (background.getWidth() - 8) / 2 - font.width(title) / 2, y + 4, 0xFF592424, false);
     }
 
-    private void label(DrawContext graphics, int x, int y, Text text) {
-        graphics.drawText(textRenderer, text, guiLeft + x, guiTop + 26 + y, 0xFFFFFFEE, true);
+    private void label(GuiGraphics graphics, int x, int y, Component text) {
+        graphics.drawString(font, text, guiLeft + x, guiTop + 26 + y, 0xFFFFFFEE, true);
     }
 
     public void sendPacket() {
-        MinecraftClient.getInstance().getNetworkHandler().sendPacket(new ConfigureSequencedGearshiftPacket(be.getPos(), instructions));
+        Minecraft.getInstance().getConnection().send(new ConfigureSequencedGearshiftPacket(be.getBlockPos(), instructions));
     }
 
     @Override

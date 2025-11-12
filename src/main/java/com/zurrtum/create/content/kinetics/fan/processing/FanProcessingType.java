@@ -1,26 +1,26 @@
 package com.zurrtum.create.content.kinetics.fan.processing;
 
 import com.zurrtum.create.api.registry.CreateRegistries;
-import net.minecraft.entity.Entity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.particle.ParticleEffect;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.math.random.Random;
-import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.particles.ParticleOptions;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.Vec3;
 
 public interface FanProcessingType {
     @Nullable
     static FanProcessingType parse(String str) {
-        return CreateRegistries.FAN_PROCESSING_TYPE.get(Identifier.tryParse(str));
+        return CreateRegistries.FAN_PROCESSING_TYPE.getValue(ResourceLocation.tryParse(str));
     }
 
     @Nullable
-    static FanProcessingType getAt(World level, BlockPos pos) {
+    static FanProcessingType getAt(Level level, BlockPos pos) {
         for (FanProcessingType type : FanProcessingTypeRegistry.SORTED_TYPES_VIEW) {
             if (type.isValidAt(level, pos)) {
                 return type;
@@ -29,25 +29,25 @@ public interface FanProcessingType {
         return null;
     }
 
-    boolean isValidAt(World level, BlockPos pos);
+    boolean isValidAt(Level level, BlockPos pos);
 
     int getPriority();
 
-    boolean canProcess(ItemStack stack, World level);
+    boolean canProcess(ItemStack stack, Level level);
 
-    @Nullable List<ItemStack> process(ItemStack stack, World level);
+    @Nullable List<ItemStack> process(ItemStack stack, Level level);
 
-    void spawnProcessingParticles(World level, Vec3d pos);
+    void spawnProcessingParticles(Level level, Vec3 pos);
 
-    void morphAirFlow(AirFlowParticleAccess particleAccess, Random random);
+    void morphAirFlow(AirFlowParticleAccess particleAccess, RandomSource random);
 
-    void affectEntity(Entity entity, World level);
+    void affectEntity(Entity entity, Level level);
 
     interface AirFlowParticleAccess {
         void setColor(int color);
 
         void setAlpha(float alpha);
 
-        void spawnExtraParticle(ParticleEffect options, float speedMultiplier);
+        void spawnExtraParticle(ParticleOptions options, float speedMultiplier);
     }
 }

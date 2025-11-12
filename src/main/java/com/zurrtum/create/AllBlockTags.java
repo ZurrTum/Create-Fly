@@ -1,11 +1,11 @@
 package com.zurrtum.create;
 
-import net.minecraft.block.Block;
-import net.minecraft.registry.RegistryKeys;
-import net.minecraft.registry.tag.TagKey;
-import net.minecraft.util.Identifier;
-
 import static com.zurrtum.create.Create.MOD_ID;
+
+import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.TagKey;
+import net.minecraft.world.level.block.Block;
 
 public class AllBlockTags {
     public static final TagKey<Block> BRITTLE = register("brittle");
@@ -50,11 +50,11 @@ public class AllBlockTags {
     public static final TagKey<Block> NON_DOUBLE_DOOR = register("quark", "non_double_door");
 
     private static TagKey<Block> register(String name) {
-        return TagKey.of(RegistryKeys.BLOCK, Identifier.of(MOD_ID, name));
+        return TagKey.create(Registries.BLOCK, ResourceLocation.fromNamespaceAndPath(MOD_ID, name));
     }
 
     private static TagKey<Block> register(String namespace, String name) {
-        return TagKey.of(RegistryKeys.BLOCK, Identifier.of(namespace, name));
+        return TagKey.create(Registries.BLOCK, ResourceLocation.fromNamespaceAndPath(namespace, name));
     }
 
     public static void register() {

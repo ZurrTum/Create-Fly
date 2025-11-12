@@ -7,7 +7,7 @@ import it.unimi.dsi.fastutil.Function;
 import net.irisshaders.iris.pipeline.IrisPipelines;
 import net.irisshaders.iris.pipeline.IrisRenderingPipeline;
 import net.irisshaders.iris.pipeline.programs.ShaderKey;
-import net.minecraft.client.gl.RenderPipelines;
+import net.minecraft.client.renderer.RenderPipelines;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -23,7 +23,7 @@ public abstract class IrisPipelinesMixin {
     @Inject(method = "<clinit>", at = @At("TAIL"))
     private static void add(CallbackInfo ci) {
         IrisPipelines.copyPipeline(
-            RenderPipelines.RENDERTYPE_ITEM_ENTITY_TRANSLUCENT_CULL,
+            RenderPipelines.ITEM_ENTITY_TRANSLUCENT_CULL,
             PonderRenderPipelines.RENDERTYPE_ITEM_ENTITY_TRANSLUCENT_CULL
         );
         IrisPipelines.copyPipeline(RenderPipelines.ENTITY_TRANSLUCENT, PonderRenderPipelines.ENTITY_TRANSLUCENT);

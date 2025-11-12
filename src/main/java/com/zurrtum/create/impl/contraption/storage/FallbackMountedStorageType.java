@@ -1,9 +1,9 @@
 package com.zurrtum.create.impl.contraption.storage;
 
 import com.zurrtum.create.api.contraption.storage.item.simple.SimpleMountedStorageType;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.inventory.Inventory;
-import net.minecraft.world.World;
+import net.minecraft.world.Container;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
 
 public class FallbackMountedStorageType extends SimpleMountedStorageType<FallbackMountedStorage> {
     public FallbackMountedStorageType() {
@@ -11,13 +11,13 @@ public class FallbackMountedStorageType extends SimpleMountedStorageType<Fallbac
     }
 
     @Override
-    protected FallbackMountedStorage createStorage(Inventory handler) {
+    protected FallbackMountedStorage createStorage(Container handler) {
         return new FallbackMountedStorage(handler);
     }
 
     @Override
-    protected Inventory getHandler(World level, BlockEntity be) {
-        Inventory handler = super.getHandler(level, be);
+    protected Container getHandler(Level level, BlockEntity be) {
+        Container handler = super.getHandler(level, be);
         return handler != null && FallbackMountedStorage.isValid(handler) ? handler : null;
     }
 }

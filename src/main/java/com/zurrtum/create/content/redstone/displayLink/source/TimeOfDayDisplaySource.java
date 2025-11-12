@@ -4,34 +4,34 @@ import com.zurrtum.create.content.kinetics.clock.CuckooClockBlockEntity;
 import com.zurrtum.create.content.redstone.displayLink.DisplayLinkContext;
 import com.zurrtum.create.content.redstone.displayLink.target.DisplayTargetStats;
 import com.zurrtum.create.content.trains.display.FlapDisplaySection;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.text.MutableText;
-import net.minecraft.text.Text;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.server.level.ServerLevel;
 
 public class TimeOfDayDisplaySource extends SingleLineDisplaySource {
 
-    public static final MutableText EMPTY_TIME;
+    public static final MutableComponent EMPTY_TIME;
 
     static {
-        EMPTY_TIME = Text.literal("--:--");
+        EMPTY_TIME = Component.literal("--:--");
     }
 
     @Override
-    protected MutableText provideLine(DisplayLinkContext context, DisplayTargetStats stats) {
-        if (!(context.level() instanceof ServerWorld sLevel))
+    protected MutableComponent provideLine(DisplayLinkContext context, DisplayTargetStats stats) {
+        if (!(context.level() instanceof ServerLevel sLevel))
             return EMPTY_TIME;
         if (!(context.getSourceBlockEntity() instanceof CuckooClockBlockEntity ccbe))
             return EMPTY_TIME;
         if (ccbe.getSpeed() == 0)
             return EMPTY_TIME;
 
-        boolean c12 = context.sourceConfig().getInt("Cycle", 0) == 0;
-        boolean isNatural = sLevel.getDimension().natural();
+        boolean c12 = context.sourceConfig().getIntOr("Cycle", 0) == 0;
+        boolean isNatural = sLevel.dimensionType().natural();
 
-        int dayTime = (int) (sLevel.getTimeOfDay() % 24000);
+        int dayTime = (int) (sLevel.getDayTime() % 24000);
         int hours = (dayTime / 1000 + 6) % 24;
         int minutes = (dayTime % 1000) * 60 / 1000;
-        MutableText suffix = Text.translatable("create.generic.daytime." + (hours > 11 ? "pm" : "am"));
+        MutableComponent suffix = Component.translatable("create.generic.daytime." + (hours > 11 ? "pm" : "am"));
 
         minutes = minutes / 5 * 5;
         if (c12) {
@@ -45,7 +45,7 @@ public class TimeOfDayDisplaySource extends SingleLineDisplaySource {
             minutes = sLevel.random.nextInt(40) + 60;
         }
 
-        MutableText component = Text.literal((hours < 10 ? " " : "") + hours + ":" + (minutes < 10 ? "0" : "") + minutes + (c12 ? " " : ""));
+        MutableComponent component = Component.literal((hours < 10 ? " " : "") + hours + ":" + (minutes < 10 ? "0" : "") + minutes + (c12 ? " " : ""));
 
         return c12 ? component.append(suffix) : component;
     }

@@ -14,21 +14,21 @@ import com.zurrtum.create.content.contraptions.elevator.ElevatorColumn.ColumnCoo
 import com.zurrtum.create.content.contraptions.pulley.PulleyContraption;
 import com.zurrtum.create.content.redstone.contact.RedstoneContactBlock;
 import com.zurrtum.create.infrastructure.packet.s2c.ElevatorFloorListPacket;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.storage.ReadView;
-import net.minecraft.storage.WriteView;
-import net.minecraft.structure.StructureTemplate.StructureBlockInfo;
-import net.minecraft.text.Text;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Direction.Axis;
-import net.minecraft.world.World;
 import org.apache.commons.lang3.tuple.MutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.List;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.Direction.Axis;
+import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate.StructureBlockInfo;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 
 public class ElevatorContraption extends PulleyContraption {
 
@@ -58,11 +58,11 @@ public class ElevatorContraption extends PulleyContraption {
     public void tickStorage(AbstractContraptionEntity entity) {
         super.tickStorage(entity);
 
-        if (entity.age % 10 != 0)
+        if (entity.tickCount % 10 != 0)
             return;
 
         ColumnCoords coords = getGlobalColumn();
-        ElevatorColumn column = ElevatorColumn.get(entity.getEntityWorld(), coords);
+        ElevatorColumn column = ElevatorColumn.get(entity.level(), coords);
 
         if (column == null)
             return;
@@ -71,8 +71,8 @@ public class ElevatorContraption extends PulleyContraption {
 
         namesList = column.compileNamesList();
         namesListVersion = column.namesListVersion;
-        if (entity.getEntityWorld() instanceof ServerWorld serverWorld) {
-            serverWorld.getChunkManager().sendToOtherNearbyPlayers(entity, new ElevatorFloorListPacket(entity, namesList));
+        if (entity.level() instanceof ServerLevel serverWorld) {
+            serverWorld.getChunkSource().sendToTrackingPlayers(entity, new ElevatorFloorListPacket(entity, namesList));
         }
     }
 
@@ -84,7 +84,7 @@ public class ElevatorContraption extends PulleyContraption {
         return column.relative(anchor);
     }
 
-    public Integer getCurrentTargetY(World level) {
+    public Integer getCurrentTargetY(Level level) {
         ColumnCoords coords = getGlobalColumn();
         ElevatorColumn column = ElevatorColumn.get(level, coords);
         if (column == null)
@@ -102,35 +102,35 @@ public class ElevatorContraption extends PulleyContraption {
     }
 
     @Override
-    public boolean assemble(World world, BlockPos pos) throws AssemblyException {
+    public boolean assemble(Level world, BlockPos pos) throws AssemblyException {
         if (!searchMovedStructure(world, pos, null))
             return false;
         if (blocks.size() <= 0)
             return false;
         if (contacts == 0)
-            throw new AssemblyException(Text.translatable("create.gui.assembly.exception.no_contacts"));
+            throw new AssemblyException(Component.translatable("create.gui.assembly.exception.no_contacts"));
         if (contacts > 1)
-            throw new AssemblyException(Text.translatable("create.gui.assembly.exception.too_many_contacts"));
+            throw new AssemblyException(Component.translatable("create.gui.assembly.exception.too_many_contacts"));
         ElevatorColumn column = ElevatorColumn.get(world, getGlobalColumn());
         if (column != null && column.isActive())
-            throw new AssemblyException(Text.translatable("create.gui.assembly.exception.column_conflict"));
+            throw new AssemblyException(Component.translatable("create.gui.assembly.exception.column_conflict"));
         startMoving(world);
         return true;
     }
 
     @Override
-    protected Pair<StructureBlockInfo, BlockEntity> capture(World world, BlockPos pos) {
+    protected Pair<StructureBlockInfo, BlockEntity> capture(Level world, BlockPos pos) {
         BlockState blockState = world.getBlockState(pos);
 
-        if (!blockState.isOf(AllBlocks.REDSTONE_CONTACT))
+        if (!blockState.is(AllBlocks.REDSTONE_CONTACT))
             return super.capture(world, pos);
 
-        Direction facing = blockState.get(RedstoneContactBlock.FACING);
+        Direction facing = blockState.getValue(RedstoneContactBlock.FACING);
         if (facing.getAxis() == Axis.Y)
             return super.capture(world, pos);
 
         contacts++;
-        BlockPos local = toLocalPos(pos.offset(facing));
+        BlockPos local = toLocalPos(pos.relative(facing));
         column = new ColumnCoords(local.getX(), local.getZ(), facing.getOpposite());
         contactYOffset = local.getY();
 
@@ -141,7 +141,7 @@ public class ElevatorContraption extends PulleyContraption {
         return contactYOffset;
     }
 
-    public void broadcastFloorData(World level, BlockPos contactPos) {
+    public void broadcastFloorData(Level level, BlockPos contactPos) {
         ElevatorColumn column = ElevatorColumn.get(level, getGlobalColumn());
         if (!(level.getBlockEntity(contactPos) instanceof ElevatorContactBlockEntity ecbe))
             return;
@@ -150,22 +150,22 @@ public class ElevatorContraption extends PulleyContraption {
     }
 
     @Override
-    public void write(WriteView view, boolean spawnPacket) {
+    public void write(ValueOutput view, boolean spawnPacket) {
         super.write(view, spawnPacket);
         view.putBoolean("Arrived", arrived);
-        view.put("Column", ColumnCoords.CODEC, column);
+        view.store("Column", ColumnCoords.CODEC, column);
         view.putInt("ContactY", contactYOffset);
         view.putInt("MaxContactY", maxContactY);
         view.putInt("MinContactY", minContactY);
     }
 
     @Override
-    public void read(World world, ReadView view, boolean spawnData) {
-        arrived = view.getBoolean("Arrived", false);
+    public void read(Level world, ValueInput view, boolean spawnData) {
+        arrived = view.getBooleanOr("Arrived", false);
         column = view.read("Column", ColumnCoords.CODEC).orElseThrow();
-        contactYOffset = view.getInt("ContactY", 0);
-        maxContactY = view.getInt("MaxContactY", 0);
-        minContactY = view.getInt("MinContactY", 0);
+        contactYOffset = view.getIntOr("ContactY", 0);
+        maxContactY = view.getIntOr("MaxContactY", 0);
+        minContactY = view.getIntOr("MinContactY", 0);
         super.read(world, view, spawnData);
     }
 

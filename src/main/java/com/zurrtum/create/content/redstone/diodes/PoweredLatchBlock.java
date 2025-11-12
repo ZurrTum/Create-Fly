@@ -1,109 +1,109 @@
 package com.zurrtum.create.content.redstone.diodes;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.RedstoneWireBlock;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.sound.SoundCategory;
-import net.minecraft.sound.SoundEvents;
-import net.minecraft.state.StateManager;
-import net.minecraft.state.property.BooleanProperty;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.random.Random;
-import net.minecraft.world.World;
-import net.minecraft.world.tick.TickPriority;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.RedStoneWireBlock;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.BooleanProperty;
+import net.minecraft.world.ticks.TickPriority;
 
 public class PoweredLatchBlock extends ToggleLatchBlock {
 
-    public static BooleanProperty POWERED_SIDE = BooleanProperty.of("powered_side");
+    public static BooleanProperty POWERED_SIDE = BooleanProperty.create("powered_side");
 
-    public PoweredLatchBlock(Settings properties) {
+    public PoweredLatchBlock(Properties properties) {
         super(properties);
-        setDefaultState(getDefaultState().with(POWERED_SIDE, false));
+        registerDefaultState(defaultBlockState().setValue(POWERED_SIDE, false));
     }
 
     @Override
-    protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
-        super.appendProperties(builder.add(POWERED_SIDE));
+    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
+        super.createBlockStateDefinition(builder.add(POWERED_SIDE));
     }
 
     @Override
-    protected void updatePowered(World worldIn, BlockPos pos, BlockState state) {
-        boolean back = state.get(POWERED);
-        boolean shouldBack = hasPower(worldIn, pos, state);
-        boolean side = state.get(POWERED_SIDE);
+    protected void checkTickOnNeighbor(Level worldIn, BlockPos pos, BlockState state) {
+        boolean back = state.getValue(POWERED);
+        boolean shouldBack = shouldTurnOn(worldIn, pos, state);
+        boolean side = state.getValue(POWERED_SIDE);
         boolean shouldSide = isPoweredOnSides(worldIn, pos, state);
 
         TickPriority tickpriority = TickPriority.HIGH;
-        if (isTargetNotAligned(worldIn, pos, state))
+        if (shouldPrioritize(worldIn, pos, state))
             tickpriority = TickPriority.EXTREMELY_HIGH;
         else if (side || back)
             tickpriority = TickPriority.VERY_HIGH;
 
-        if (worldIn.getBlockTickScheduler().isTicking(pos, this))
+        if (worldIn.getBlockTicks().willTickThisTick(pos, this))
             return;
         if (back != shouldBack || side != shouldSide)
-            worldIn.scheduleBlockTick(pos, this, getUpdateDelayInternal(state), tickpriority);
+            worldIn.scheduleTick(pos, this, getDelay(state), tickpriority);
     }
 
-    protected boolean isPoweredOnSides(World worldIn, BlockPos pos, BlockState state) {
-        Direction direction = state.get(FACING);
-        Direction left = direction.rotateYClockwise();
-        Direction right = direction.rotateYCounterclockwise();
+    protected boolean isPoweredOnSides(Level worldIn, BlockPos pos, BlockState state) {
+        Direction direction = state.getValue(FACING);
+        Direction left = direction.getClockWise();
+        Direction right = direction.getCounterClockWise();
 
         for (Direction d : new Direction[]{left, right}) {
-            BlockPos blockpos = pos.offset(d);
-            int i = worldIn.getEmittedRedstonePower(blockpos, d);
+            BlockPos blockpos = pos.relative(d);
+            int i = worldIn.getSignal(blockpos, d);
             if (i > 0)
                 return true;
             BlockState blockstate = worldIn.getBlockState(blockpos);
-            if (blockstate.getBlock() == Blocks.REDSTONE_WIRE && blockstate.get(RedstoneWireBlock.POWER) > 0)
+            if (blockstate.getBlock() == Blocks.REDSTONE_WIRE && blockstate.getValue(RedStoneWireBlock.POWER) > 0)
                 return true;
         }
         return false;
     }
 
     @Override
-    public void scheduledTick(BlockState state, ServerWorld worldIn, BlockPos pos, Random random) {
-        boolean back = state.get(POWERED);
-        boolean shouldBack = hasPower(worldIn, pos, state);
-        boolean side = state.get(POWERED_SIDE);
+    public void tick(BlockState state, ServerLevel worldIn, BlockPos pos, RandomSource random) {
+        boolean back = state.getValue(POWERED);
+        boolean shouldBack = shouldTurnOn(worldIn, pos, state);
+        boolean side = state.getValue(POWERED_SIDE);
         boolean shouldSide = isPoweredOnSides(worldIn, pos, state);
         BlockState stateIn = state;
 
         if (back != shouldBack) {
-            state = state.with(POWERED, shouldBack);
+            state = state.setValue(POWERED, shouldBack);
             if (shouldBack)
-                state = state.with(POWERING, true);
+                state = state.setValue(POWERING, true);
             else if (side)
-                state = state.with(POWERING, false);
+                state = state.setValue(POWERING, false);
         }
 
         if (side != shouldSide) {
-            state = state.with(POWERED_SIDE, shouldSide);
+            state = state.setValue(POWERED_SIDE, shouldSide);
             if (shouldSide)
-                state = state.with(POWERING, false);
+                state = state.setValue(POWERING, false);
             else if (back)
-                state = state.with(POWERING, true);
+                state = state.setValue(POWERING, true);
         }
 
         if (state != stateIn)
-            worldIn.setBlockState(pos, state, Block.NOTIFY_LISTENERS);
+            worldIn.setBlock(pos, state, Block.UPDATE_CLIENTS);
     }
 
     @Override
-    protected ActionResult activated(World worldIn, BlockPos pos, BlockState state) {
-        if (state.get(POWERED) != state.get(POWERED_SIDE))
-            return ActionResult.PASS_TO_DEFAULT_BLOCK_ACTION;
-        if (!worldIn.isClient()) {
-            float f = !state.get(POWERING) ? 0.6F : 0.5F;
-            worldIn.playSound(null, pos, SoundEvents.BLOCK_LEVER_CLICK, SoundCategory.BLOCKS, 0.3F, f);
-            worldIn.setBlockState(pos, state.cycle(POWERING), Block.NOTIFY_LISTENERS);
+    protected InteractionResult activated(Level worldIn, BlockPos pos, BlockState state) {
+        if (state.getValue(POWERED) != state.getValue(POWERED_SIDE))
+            return InteractionResult.TRY_WITH_EMPTY_HAND;
+        if (!worldIn.isClientSide()) {
+            float f = !state.getValue(POWERING) ? 0.6F : 0.5F;
+            worldIn.playSound(null, pos, SoundEvents.LEVER_CLICK, SoundSource.BLOCKS, 0.3F, f);
+            worldIn.setBlock(pos, state.cycle(POWERING), Block.UPDATE_CLIENTS);
         }
-        return ActionResult.SUCCESS;
+        return InteractionResult.SUCCESS;
     }
 
     @Override

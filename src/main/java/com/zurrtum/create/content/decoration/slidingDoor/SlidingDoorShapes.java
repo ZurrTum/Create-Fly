@@ -1,28 +1,28 @@
 package com.zurrtum.create.content.decoration.slidingDoor;
 
-import net.minecraft.block.Block;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.shape.VoxelShape;
+import net.minecraft.core.Direction;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.phys.shapes.VoxelShape;
 
 public class SlidingDoorShapes {
 
-    protected static final VoxelShape SE_AABB = Block.createCuboidShape(0.0D, 0.0D, -13.0D, 3.0D, 16.0D, 3.0D);
-    protected static final VoxelShape ES_AABB = Block.createCuboidShape(-13.0D, 0.0D, 0.0D, 3.0D, 16.0D, 3.0D);
-    protected static final VoxelShape NW_AABB = Block.createCuboidShape(13.0D, 0.0D, 13.0D, 16.0D, 16.0D, 29.0D);
-    protected static final VoxelShape WN_AABB = Block.createCuboidShape(13.0D, 0.0D, 13.0D, 29.0D, 16.0D, 16.0D);
-    protected static final VoxelShape SW_AABB = Block.createCuboidShape(13.0D, 0.0D, -13.0D, 16.0D, 16.0D, 3.0D);
-    protected static final VoxelShape WS_AABB = Block.createCuboidShape(13.0D, 0.0D, 0.0D, 29.0D, 16.0D, 3.0D);
-    protected static final VoxelShape NE_AABB = Block.createCuboidShape(0.0D, 0.0D, 13.0D, 3.0D, 16.0D, 29.0D);
-    protected static final VoxelShape EN_AABB = Block.createCuboidShape(-13.0D, 0.0D, 13.0D, 3.0D, 16.0D, 16.0D);
+    protected static final VoxelShape SE_AABB = Block.box(0.0D, 0.0D, -13.0D, 3.0D, 16.0D, 3.0D);
+    protected static final VoxelShape ES_AABB = Block.box(-13.0D, 0.0D, 0.0D, 3.0D, 16.0D, 3.0D);
+    protected static final VoxelShape NW_AABB = Block.box(13.0D, 0.0D, 13.0D, 16.0D, 16.0D, 29.0D);
+    protected static final VoxelShape WN_AABB = Block.box(13.0D, 0.0D, 13.0D, 29.0D, 16.0D, 16.0D);
+    protected static final VoxelShape SW_AABB = Block.box(13.0D, 0.0D, -13.0D, 16.0D, 16.0D, 3.0D);
+    protected static final VoxelShape WS_AABB = Block.box(13.0D, 0.0D, 0.0D, 29.0D, 16.0D, 3.0D);
+    protected static final VoxelShape NE_AABB = Block.box(0.0D, 0.0D, 13.0D, 3.0D, 16.0D, 29.0D);
+    protected static final VoxelShape EN_AABB = Block.box(-13.0D, 0.0D, 13.0D, 3.0D, 16.0D, 16.0D);
 
-    protected static final VoxelShape SE_AABB_FOLD = Block.createCuboidShape(0.0D, 0.0D, -3.0D, 9.0D, 16.0D, 3.0D);
-    protected static final VoxelShape ES_AABB_FOLD = Block.createCuboidShape(-3.0D, 0.0D, 0.0D, 3.0D, 16.0D, 9.0D);
-    protected static final VoxelShape NW_AABB_FOLD = Block.createCuboidShape(7.0D, 0.0D, 13.0D, 16.0D, 16.0D, 19.0D);
-    protected static final VoxelShape WN_AABB_FOLD = Block.createCuboidShape(13.0D, 0.0D, 7.0D, 19.0D, 16.0D, 16.0D);
-    protected static final VoxelShape SW_AABB_FOLD = Block.createCuboidShape(7.0D, 0.0D, -3.0D, 16.0D, 16.0D, 3.0D);
-    protected static final VoxelShape WS_AABB_FOLD = Block.createCuboidShape(13.0D, 0.0D, 0.0D, 19.0D, 16.0D, 9.0D);
-    protected static final VoxelShape NE_AABB_FOLD = Block.createCuboidShape(0.0D, 0.0D, 13.0D, 9.0D, 16.0D, 19.0D);
-    protected static final VoxelShape EN_AABB_FOLD = Block.createCuboidShape(-3.0D, 0.0D, 7.0D, 3.0D, 16.0D, 16.0D);
+    protected static final VoxelShape SE_AABB_FOLD = Block.box(0.0D, 0.0D, -3.0D, 9.0D, 16.0D, 3.0D);
+    protected static final VoxelShape ES_AABB_FOLD = Block.box(-3.0D, 0.0D, 0.0D, 3.0D, 16.0D, 9.0D);
+    protected static final VoxelShape NW_AABB_FOLD = Block.box(7.0D, 0.0D, 13.0D, 16.0D, 16.0D, 19.0D);
+    protected static final VoxelShape WN_AABB_FOLD = Block.box(13.0D, 0.0D, 7.0D, 19.0D, 16.0D, 16.0D);
+    protected static final VoxelShape SW_AABB_FOLD = Block.box(7.0D, 0.0D, -3.0D, 16.0D, 16.0D, 3.0D);
+    protected static final VoxelShape WS_AABB_FOLD = Block.box(13.0D, 0.0D, 0.0D, 19.0D, 16.0D, 9.0D);
+    protected static final VoxelShape NE_AABB_FOLD = Block.box(0.0D, 0.0D, 13.0D, 9.0D, 16.0D, 19.0D);
+    protected static final VoxelShape EN_AABB_FOLD = Block.box(-3.0D, 0.0D, 7.0D, 3.0D, 16.0D, 16.0D);
 
     public static VoxelShape get(Direction facing, boolean hinge, boolean fold) {
         if (fold)

@@ -3,22 +3,22 @@ package com.zurrtum.create.mixin;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.mojang.datafixers.DataFixer;
-import net.minecraft.datafixer.DataFixTypes;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.world.PersistentStateManager;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.util.datafix.DataFixTypes;
+import net.minecraft.world.level.storage.DimensionDataStorage;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 
-@Mixin(PersistentStateManager.class)
+@Mixin(DimensionDataStorage.class)
 class PersistentStateManagerMixin {
-    @WrapOperation(method = "readNbt(Ljava/lang/String;Lnet/minecraft/datafixer/DataFixTypes;I)Lnet/minecraft/nbt/NbtCompound;", at = @At(value = "INVOKE", target = "Lnet/minecraft/datafixer/DataFixTypes;update(Lcom/mojang/datafixers/DataFixer;Lnet/minecraft/nbt/NbtCompound;II)Lnet/minecraft/nbt/NbtCompound;"))
-    private NbtCompound handleNullDataFixType(
+    @WrapOperation(method = "readTagFromDisk(Ljava/lang/String;Lnet/minecraft/util/datafix/DataFixTypes;I)Lnet/minecraft/nbt/CompoundTag;", at = @At(value = "INVOKE", target = "Lnet/minecraft/util/datafix/DataFixTypes;update(Lcom/mojang/datafixers/DataFixer;Lnet/minecraft/nbt/CompoundTag;II)Lnet/minecraft/nbt/CompoundTag;"))
+    private CompoundTag handleNullDataFixType(
         DataFixTypes dataFixTypes,
         DataFixer dataFixer,
-        NbtCompound nbt,
+        CompoundTag nbt,
         int oldVersion,
         int newVersion,
-        Operation<NbtCompound> original
+        Operation<CompoundTag> original
     ) {
         if (dataFixTypes == null) {
             return nbt;

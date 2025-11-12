@@ -7,20 +7,20 @@ import com.zurrtum.create.catnip.data.Couple;
 import com.zurrtum.create.catnip.data.IntAttached;
 import com.zurrtum.create.catnip.data.WorldAttached;
 import com.zurrtum.create.foundation.utility.BlockHelper;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.world.World;
-import net.minecraft.world.WorldAccess;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.block.entity.BlockEntity;
 
 public class ElevatorColumn {
 
     public static WorldAttached<Map<ColumnCoords, ElevatorColumn>> LOADED_COLUMNS = new WorldAttached<>($ -> new HashMap<>());
 
-    protected WorldAccess level;
+    protected LevelAccessor level;
     protected ColumnCoords coords;
     public List<Integer> contacts;
     protected int targetedYLevel;
@@ -28,15 +28,15 @@ public class ElevatorColumn {
     protected boolean targetAvailable;
 
     @Nullable
-    public static ElevatorColumn get(WorldAccess level, ColumnCoords coords) {
+    public static ElevatorColumn get(LevelAccessor level, ColumnCoords coords) {
         return LOADED_COLUMNS.get(level).get(coords);
     }
 
-    public static ElevatorColumn getOrCreate(WorldAccess level, ColumnCoords coords) {
+    public static ElevatorColumn getOrCreate(LevelAccessor level, ColumnCoords coords) {
         return LOADED_COLUMNS.get(level).computeIfAbsent(coords, c -> new ElevatorColumn(level, c));
     }
 
-    public ElevatorColumn(WorldAccess level, ColumnCoords coords) {
+    public ElevatorColumn(LevelAccessor level, ColumnCoords coords) {
         this.level = level;
         this.coords = coords;
         contacts = new ArrayList<>();
@@ -47,11 +47,11 @@ public class ElevatorColumn {
         for (BlockPos pos : getContacts()) {
             BlockEntity blockEntity = level.getBlockEntity(pos);
             if (blockEntity instanceof ElevatorContactBlockEntity ecbe)
-                ecbe.markDirty();
+                ecbe.setChanged();
         }
     }
 
-    public void floorReached(WorldAccess level, String name) {
+    public void floorReached(LevelAccessor level, String name) {
         getContacts().forEach(p -> {
             if (level.getBlockEntity(p) instanceof ElevatorContactBlockEntity ecbe)
                 ecbe.updateDisplayedFloor(name);
@@ -77,10 +77,10 @@ public class ElevatorColumn {
     }
 
     public void gatherAll() {
-        BlockPos.stream(contactAt(level.getBottomY()), contactAt(level.getTopYInclusive()))
-            .filter(p -> coords.equals(ElevatorContactBlock.getColumnCoords(level, p))).forEach(p -> level.setBlockState(
+        BlockPos.betweenClosedStream(contactAt(level.getMinY()), contactAt(level.getMaxY()))
+            .filter(p -> coords.equals(ElevatorContactBlock.getColumnCoords(level, p))).forEach(p -> level.setBlock(
                 p,
-                BlockHelper.copyProperties(level.getBlockState(p), AllBlocks.ELEVATOR_CONTACT.getDefaultState()),
+                BlockHelper.copyProperties(level.getBlockState(p), AllBlocks.ELEVATOR_CONTACT.defaultBlockState()),
                 3
             ));
     }
@@ -112,7 +112,7 @@ public class ElevatorColumn {
         return targetedYLevel;
     }
 
-    public void initNames(World level) {
+    public void initNames(Level level) {
         Integer prevLevel = null;
 
         for (int i = 0; i < contacts.size(); i++) {

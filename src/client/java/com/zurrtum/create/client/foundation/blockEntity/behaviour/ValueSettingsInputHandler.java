@@ -13,33 +13,33 @@ import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
 import com.zurrtum.create.foundation.blockEntity.behaviour.BehaviourType;
 import com.zurrtum.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.infrastructure.packet.c2s.ValueSettingsPacket;
-import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.Hand;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.BlockHitResult;
 
 public class ValueSettingsInputHandler {
-    public static ActionResult onBlockActivated(World world, ClientPlayerEntity player, Hand hand, BlockHitResult ray) {
+    public static InteractionResult onBlockActivated(Level world, LocalPlayer player, InteractionHand hand, BlockHitResult ray) {
         if (!canInteract(player))
             return null;
-        ItemStack stack = player.getMainHandStack();
-        if (stack.isOf(AllItems.CLIPBOARD))
+        ItemStack stack = player.getMainHandItem();
+        if (stack.is(AllItems.CLIPBOARD))
             return null;
         BlockPos pos = ray.getBlockPos();
         if (!(world.getBlockEntity(pos) instanceof SmartBlockEntity sbe))
             return null;
 
         if (Create.VALUE_SETTINGS_HANDLER.cancelIfWarmupAlreadyStarted(pos)) {
-            return ActionResult.FAIL;
+            return InteractionResult.FAIL;
         }
 
         if (sbe instanceof FactoryPanelBlockEntity fpbe) {
             for (FilteringBehaviour<?> behaviour : FactoryPanelBehaviour.allBehaviours(fpbe)) {
-                ActionResult result = handleInteraction(behaviour, behaviour.getType(), player, hand, ray, stack, pos, sbe);
+                InteractionResult result = handleInteraction(behaviour, behaviour.getType(), player, hand, ray, stack, pos, sbe);
                 if (result != null) {
                     return result;
                 }
@@ -47,14 +47,14 @@ public class ValueSettingsInputHandler {
         } else {
             ScrollValueBehaviour<?, ?> scrollValueBehaviour = sbe.getBehaviour(ScrollValueBehaviour.TYPE);
             if (scrollValueBehaviour != null) {
-                ActionResult result = handleInteraction(scrollValueBehaviour, ScrollValueBehaviour.TYPE, player, hand, ray, stack, pos, sbe);
+                InteractionResult result = handleInteraction(scrollValueBehaviour, ScrollValueBehaviour.TYPE, player, hand, ray, stack, pos, sbe);
                 if (result != null) {
                     return result;
                 }
             }
             FilteringBehaviour<?> filteringBehaviour = sbe.getBehaviour(FilteringBehaviour.TYPE);
             if (filteringBehaviour instanceof SidedFilteringBehaviour sidedBehaviour) {
-                filteringBehaviour = sidedBehaviour.get(ray.getSide());
+                filteringBehaviour = sidedBehaviour.get(ray.getDirection());
             }
             if (filteringBehaviour != null) {
                 return handleInteraction(filteringBehaviour, FilteringBehaviour.TYPE, player, hand, ray, stack, pos, sbe);
@@ -63,11 +63,11 @@ public class ValueSettingsInputHandler {
         return null;
     }
 
-    private static ActionResult handleInteraction(
+    private static InteractionResult handleInteraction(
         BlockEntityBehaviour<?> behaviour,
         BehaviourType<? extends BlockEntityBehaviour<?>> type,
-        ClientPlayerEntity player,
-        Hand hand,
+        LocalPlayer player,
+        InteractionHand hand,
         BlockHitResult ray,
         ItemStack stack,
         BlockPos pos,
@@ -81,29 +81,29 @@ public class ValueSettingsInputHandler {
 
         if (!valueSettingsBehaviour.isActive())
             return null;
-        if (valueSettingsBehaviour.onlyVisibleWithWrench() && !player.getStackInHand(hand).getRegistryEntry().isIn(AllItemTags.TOOLS_WRENCH))
+        if (valueSettingsBehaviour.onlyVisibleWithWrench() && !player.getItemInHand(hand).getItemHolder().is(AllItemTags.TOOLS_WRENCH))
             return null;
         if (valueSettingsBehaviour.getSlotPositioning() instanceof ValueBoxTransform.Sided sidedSlot) {
-            if (!sidedSlot.isSideActive(sbe.getCachedState(), ray.getSide()))
+            if (!sidedSlot.isSideActive(sbe.getBlockState(), ray.getDirection()))
                 return null;
-            sidedSlot.fromSide(ray.getSide());
+            sidedSlot.fromSide(ray.getDirection());
         }
 
         boolean fakePlayer = FakePlayerHandler.has(player);
-        if (!valueSettingsBehaviour.testHit(ray.getPos()))
+        if (!valueSettingsBehaviour.testHit(ray.getLocation()))
             return null;
 
         if (!valueSettingsBehaviour.acceptsValueSettings() || fakePlayer) {
-            valueSettingsBehaviour.onShortInteract(player, hand, ray.getSide(), ray);
-            player.networkHandler.sendPacket(new ValueSettingsPacket(pos, 0, 0, hand, ray, ray.getSide(), false, valueSettingsBehaviour.netId()));
-            return ActionResult.SUCCESS;
+            valueSettingsBehaviour.onShortInteract(player, hand, ray.getDirection(), ray);
+            player.connection.send(new ValueSettingsPacket(pos, 0, 0, hand, ray, ray.getDirection(), false, valueSettingsBehaviour.netId()));
+            return InteractionResult.SUCCESS;
         }
 
-        Create.VALUE_SETTINGS_HANDLER.startInteractionWith(pos, type, hand, ray.getSide());
-        return ActionResult.SUCCESS;
+        Create.VALUE_SETTINGS_HANDLER.startInteractionWith(pos, type, hand, ray.getDirection());
+        return InteractionResult.SUCCESS;
     }
 
-    public static boolean canInteract(PlayerEntity player) {
-        return player != null && !player.isSpectator() && !player.isSneaking() && player.canModifyBlocks();
+    public static boolean canInteract(Player player) {
+        return player != null && !player.isSpectator() && !player.isShiftKeyDown() && player.mayBuild();
     }
 }

@@ -1,65 +1,64 @@
 package com.zurrtum.create.client.foundation.utility;
 
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.BlockPos.Mutable;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.RaycastContext;
-import net.minecraft.world.RaycastContext.FluidHandling;
-import net.minecraft.world.RaycastContext.ShapeType;
-import net.minecraft.world.World;
-
 import java.util.function.Predicate;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.BlockPos.MutableBlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.util.Mth;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.ClipContext;
+import net.minecraft.world.level.ClipContext.Block;
+import net.minecraft.world.level.ClipContext.Fluid;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.Vec3;
 
 public class RaycastHelper {
 
-    public static BlockHitResult rayTraceRange(World level, PlayerEntity player, double range) {
-        Vec3d origin = player.getEyePos();
-        Vec3d target = getTraceTarget(player, range, origin);
-        RaycastContext context = new RaycastContext(origin, target, ShapeType.COLLIDER, FluidHandling.NONE, player);
-        return level.raycast(context);
+    public static BlockHitResult rayTraceRange(Level level, Player player, double range) {
+        Vec3 origin = player.getEyePosition();
+        Vec3 target = getTraceTarget(player, range, origin);
+        ClipContext context = new ClipContext(origin, target, Block.COLLIDER, Fluid.NONE, player);
+        return level.clip(context);
     }
 
-    public static PredicateTraceResult rayTraceUntil(PlayerEntity player, double range, Predicate<BlockPos> predicate) {
-        Vec3d origin = player.getEyePos();
-        Vec3d target = getTraceTarget(player, range, origin);
+    public static PredicateTraceResult rayTraceUntil(Player player, double range, Predicate<BlockPos> predicate) {
+        Vec3 origin = player.getEyePosition();
+        Vec3 target = getTraceTarget(player, range, origin);
         return rayTraceUntil(origin, target, predicate);
     }
 
-    public static Vec3d getTraceTarget(PlayerEntity player, double range, Vec3d origin) {
-        float f = player.getPitch();
-        float f1 = player.getYaw();
-        float n1 = -f1 * MathHelper.RADIANS_PER_DEGREE - (float) Math.PI;
-        float n2 = -f * MathHelper.RADIANS_PER_DEGREE;
-        float f2 = MathHelper.cos(n1);
-        float f3 = MathHelper.sin(n1);
-        float f4 = -MathHelper.cos(n2);
-        float f5 = MathHelper.sin(n2);
+    public static Vec3 getTraceTarget(Player player, double range, Vec3 origin) {
+        float f = player.getXRot();
+        float f1 = player.getYRot();
+        float n1 = -f1 * Mth.DEG_TO_RAD - (float) Math.PI;
+        float n2 = -f * Mth.DEG_TO_RAD;
+        float f2 = Mth.cos(n1);
+        float f3 = Mth.sin(n1);
+        float f4 = -Mth.cos(n2);
+        float f5 = Mth.sin(n2);
         float f6 = f3 * f4;
         float f7 = f2 * f4;
         return origin.add((double) f6 * range, (double) f5 * range, (double) f7 * range);
     }
 
-    public static PredicateTraceResult rayTraceUntil(Vec3d start, Vec3d end, Predicate<BlockPos> predicate) {
+    public static PredicateTraceResult rayTraceUntil(Vec3 start, Vec3 end, Predicate<BlockPos> predicate) {
         if (Double.isNaN(start.x) || Double.isNaN(start.y) || Double.isNaN(start.z))
             return null;
         if (Double.isNaN(end.x) || Double.isNaN(end.y) || Double.isNaN(end.z))
             return null;
 
-        int dx = MathHelper.floor(end.x);
-        int dy = MathHelper.floor(end.y);
-        int dz = MathHelper.floor(end.z);
-        int x = MathHelper.floor(start.x);
-        int y = MathHelper.floor(start.y);
-        int z = MathHelper.floor(start.z);
+        int dx = Mth.floor(end.x);
+        int dy = Mth.floor(end.y);
+        int dz = Mth.floor(end.z);
+        int x = Mth.floor(start.x);
+        int y = Mth.floor(start.y);
+        int z = Mth.floor(start.z);
 
-        Mutable currentPos = new BlockPos(x, y, z).mutableCopy();
+        MutableBlockPos currentPos = new BlockPos(x, y, z).mutable();
 
         if (predicate.test(currentPos))
-            return new PredicateTraceResult(currentPos.toImmutable(), Direction.getFacing(dx - x, dy - y, dz - z));
+            return new PredicateTraceResult(currentPos.immutable(), Direction.getApproximateNearest(dx - x, dy - y, dz - z));
 
         int remainingDistance = 200;
 
@@ -138,22 +137,22 @@ public class RaycastHelper {
 
             if (d3 < d4 && d3 < d5) {
                 enumfacing = dx > x ? Direction.WEST : Direction.EAST;
-                start = new Vec3d(d0, start.y + d7 * d3, start.z + d8 * d3);
+                start = new Vec3(d0, start.y + d7 * d3, start.z + d8 * d3);
             } else if (d4 < d5) {
                 enumfacing = dy > y ? Direction.DOWN : Direction.UP;
-                start = new Vec3d(start.x + d6 * d4, d1, start.z + d8 * d4);
+                start = new Vec3(start.x + d6 * d4, d1, start.z + d8 * d4);
             } else {
                 enumfacing = dz > z ? Direction.NORTH : Direction.SOUTH;
-                start = new Vec3d(start.x + d6 * d5, start.y + d7 * d5, d2);
+                start = new Vec3(start.x + d6 * d5, start.y + d7 * d5, d2);
             }
 
-            x = MathHelper.floor(start.x) - (enumfacing == Direction.EAST ? 1 : 0);
-            y = MathHelper.floor(start.y) - (enumfacing == Direction.UP ? 1 : 0);
-            z = MathHelper.floor(start.z) - (enumfacing == Direction.SOUTH ? 1 : 0);
+            x = Mth.floor(start.x) - (enumfacing == Direction.EAST ? 1 : 0);
+            y = Mth.floor(start.y) - (enumfacing == Direction.UP ? 1 : 0);
+            z = Mth.floor(start.z) - (enumfacing == Direction.SOUTH ? 1 : 0);
             currentPos.set(x, y, z);
 
             if (predicate.test(currentPos))
-                return new PredicateTraceResult(currentPos.toImmutable(), enumfacing);
+                return new PredicateTraceResult(currentPos.immutable(), enumfacing);
         }
 
         return new PredicateTraceResult();

@@ -6,21 +6,21 @@ import com.zurrtum.create.content.kinetics.drill.FluidInteractionRegistry.FluidI
 import com.zurrtum.create.content.kinetics.drill.FluidInteractionRegistry.HasFluidInteraction;
 import com.zurrtum.create.content.kinetics.drill.FluidInteractionRegistry.InteractionInformation;
 import com.zurrtum.create.foundation.fluid.FluidHelper;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.fluid.Fluid;
-import net.minecraft.fluid.FluidState;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.world.World;
-import net.minecraft.world.WorldAccess;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.material.Fluid;
+import net.minecraft.world.level.material.FluidState;
 
 public class CobbleGenOptimisation {
     static CobbleGenLevel cachedLevel;
@@ -29,18 +29,18 @@ public class CobbleGenOptimisation {
     }
 
     @Nullable
-    public static CobbleGenBlockConfiguration getConfig(WorldAccess level, BlockPos drillPos, Direction drillDirection) {
+    public static CobbleGenBlockConfiguration getConfig(LevelAccessor level, BlockPos drillPos, Direction drillDirection) {
         List<BlockState> list = new ArrayList<>();
         for (Direction side : Iterate.directions) {
-            BlockPos relative = drillPos.offset(drillDirection).offset(side);
-            if (level instanceof World l && !l.isPosLoaded(relative))
+            BlockPos relative = drillPos.relative(drillDirection).relative(side);
+            if (level instanceof Level l && !l.isLoaded(relative))
                 return null;
             list.add(level.getBlockState(relative));
         }
         return new CobbleGenBlockConfiguration(list);
     }
 
-    public static BlockState determineOutput(ServerWorld level, BlockPos pos, CobbleGenBlockConfiguration config) {
+    public static BlockState determineOutput(ServerLevel level, BlockPos pos, CobbleGenBlockConfiguration config) {
         Map<Fluid, List<InteractionInformation>> interactions = FluidInteractionRegistry.INTERACTIONS;
         Map<Fluid, Pair<Direction, FluidState>> presentFluidTypes = new HashMap<>();
 
@@ -49,7 +49,7 @@ public class CobbleGenOptimisation {
                 break;
             FluidState fluidState = config.statesAroundDrill.get(i).getFluidState();
             if (!fluidState.isEmpty()) {
-                Fluid fluid = fluidState.getFluid();
+                Fluid fluid = fluidState.getType();
                 if (interactions.get(fluid) != null)
                     presentFluidTypes.put(fluid, Pair.of(Iterate.directions[i], fluidState));
             }
@@ -61,7 +61,7 @@ public class CobbleGenOptimisation {
         Search:
         for (Map.Entry<Fluid, Pair<Direction, FluidState>> type : presentFluidTypes.entrySet()) {
             List<InteractionInformation> list = interactions.get(type.getKey());
-            FluidState state = FluidHelper.convertToFlowing(type.getValue().getSecond().getFluid()).getDefaultState();
+            FluidState state = FluidHelper.convertToFlowing(type.getValue().getSecond().getType()).defaultFluidState();
 
             if (list == null)
                 continue;
@@ -69,7 +69,7 @@ public class CobbleGenOptimisation {
                 for (InteractionInformation information : list) {
                     if (d == type.getValue().getFirst())
                         continue;
-                    BlockPos relative = pos.offset(d);
+                    BlockPos relative = pos.relative(d);
                     HasFluidInteraction predicate = information.predicate();
                     if (!predicate.test(level, pos, relative, state))
                         continue;
@@ -80,25 +80,25 @@ public class CobbleGenOptimisation {
             }
         }
 
-        ServerWorld owLevel = level.getServer().getWorld(World.OVERWORLD);
+        ServerLevel owLevel = level.getServer().getLevel(Level.OVERWORLD);
         if (owLevel == null)
             owLevel = level;
 
         if (cachedLevel == null || cachedLevel.getLevel() != owLevel)
             cachedLevel = new CobbleGenLevel(level);
 
-        BlockState result = Blocks.AIR.getDefaultState();
+        BlockState result = Blocks.AIR.defaultBlockState();
         if (interaction == null)
             return result;
 
-        interaction.interact(cachedLevel, pos, pos.offset(affected.getFirst()), affected.getSecond());
+        interaction.interact(cachedLevel, pos, pos.relative(affected.getFirst()), affected.getSecond());
         BlockState output = cachedLevel.blocksAdded.getOrDefault(pos, result);
         cachedLevel.clear();
 
         return output;
     }
 
-    public static void invalidateWorld(WorldAccess world) {
+    public static void invalidateWorld(LevelAccessor world) {
         if (cachedLevel != null && cachedLevel.getLevel() == world)
             cachedLevel = null;
     }

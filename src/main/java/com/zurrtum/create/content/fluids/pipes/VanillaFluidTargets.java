@@ -4,45 +4,45 @@ import com.zurrtum.create.AllFluids;
 import com.zurrtum.create.infrastructure.fluids.BottleFluidInventory;
 import com.zurrtum.create.infrastructure.fluids.BucketFluidInventory;
 import com.zurrtum.create.infrastructure.fluids.FluidStack;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.LeveledCauldronBlock;
-import net.minecraft.fluid.Fluids;
-import net.minecraft.state.property.Properties;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.LayeredCauldronBlock;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.material.Fluids;
 
 public class VanillaFluidTargets {
 
     public static boolean canProvideFluidWithoutCapability(BlockState state) {
-        if (state.contains(Properties.HONEY_LEVEL))
+        if (state.hasProperty(BlockStateProperties.LEVEL_HONEY))
             return true;
-        if (state.isOf(Blocks.CAULDRON))
+        if (state.is(Blocks.CAULDRON))
             return true;
-        if (state.isOf(Blocks.LAVA_CAULDRON))
+        if (state.is(Blocks.LAVA_CAULDRON))
             return true;
-        return state.isOf(Blocks.WATER_CAULDRON);
+        return state.is(Blocks.WATER_CAULDRON);
     }
 
-    public static FluidStack drainBlock(World level, BlockPos pos, BlockState state, boolean simulate) {
-        if (state.contains(Properties.HONEY_LEVEL) && state.get(Properties.HONEY_LEVEL) >= 5) {
+    public static FluidStack drainBlock(Level level, BlockPos pos, BlockState state, boolean simulate) {
+        if (state.hasProperty(BlockStateProperties.LEVEL_HONEY) && state.getValue(BlockStateProperties.LEVEL_HONEY) >= 5) {
             if (!simulate)
-                level.setBlockState(pos, state.with(Properties.HONEY_LEVEL, 0), Block.NOTIFY_ALL);
+                level.setBlock(pos, state.setValue(BlockStateProperties.LEVEL_HONEY, 0), Block.UPDATE_ALL);
             return new FluidStack(AllFluids.HONEY, BottleFluidInventory.CAPACITY);
         }
 
-        if (state.isOf(Blocks.LAVA_CAULDRON)) {
+        if (state.is(Blocks.LAVA_CAULDRON)) {
             if (!simulate)
-                level.setBlockState(pos, Blocks.CAULDRON.getDefaultState(), Block.NOTIFY_ALL);
+                level.setBlock(pos, Blocks.CAULDRON.defaultBlockState(), Block.UPDATE_ALL);
             return new FluidStack(Fluids.LAVA, BucketFluidInventory.CAPACITY);
         }
 
-        if (state.isOf(Blocks.WATER_CAULDRON) && state.getBlock() instanceof LeveledCauldronBlock lcb) {
+        if (state.is(Blocks.WATER_CAULDRON) && state.getBlock() instanceof LayeredCauldronBlock lcb) {
             if (!lcb.isFull(state))
                 return FluidStack.EMPTY;
             if (!simulate)
-                level.setBlockState(pos, Blocks.CAULDRON.getDefaultState(), Block.NOTIFY_ALL);
+                level.setBlock(pos, Blocks.CAULDRON.defaultBlockState(), Block.UPDATE_ALL);
             return new FluidStack(Fluids.WATER, BucketFluidInventory.CAPACITY);
         }
 

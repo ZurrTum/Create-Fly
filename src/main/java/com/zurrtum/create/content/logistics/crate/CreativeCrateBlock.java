@@ -3,21 +3,21 @@ package com.zurrtum.create.content.logistics.crate;
 import com.zurrtum.create.AllBlockEntityTypes;
 import com.zurrtum.create.foundation.block.IBE;
 import com.zurrtum.create.infrastructure.items.ItemInventoryProvider;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.inventory.Inventory;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.world.WorldAccess;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.Container;
+import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockState;
 
 public class CreativeCrateBlock extends CrateBlock implements IBE<CreativeCrateBlockEntity>, ItemInventoryProvider<CreativeCrateBlockEntity> {
 
-    public CreativeCrateBlock(Settings p_i48415_1_) {
+    public CreativeCrateBlock(Properties p_i48415_1_) {
         super(p_i48415_1_);
     }
 
     @Override
-    public Inventory getInventory(WorldAccess world, BlockPos pos, BlockState state, CreativeCrateBlockEntity blockEntity, Direction context) {
+    public Container getInventory(LevelAccessor world, BlockPos pos, BlockState state, CreativeCrateBlockEntity blockEntity, Direction context) {
         return blockEntity.inv;
     }
 

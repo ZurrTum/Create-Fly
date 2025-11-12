@@ -6,13 +6,12 @@ import com.zurrtum.create.foundation.fluid.FluidIngredient;
 import com.zurrtum.create.infrastructure.fluids.FluidInventory;
 import com.zurrtum.create.infrastructure.fluids.FluidStack;
 import it.unimi.dsi.fastutil.ints.IntObjectPair;
-import net.minecraft.inventory.Inventory;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.recipe.*;
-import net.minecraft.recipe.book.RecipeBookCategory;
-import net.minecraft.registry.RegistryWrapper;
-import net.minecraft.world.World;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.world.Container;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.*;
+import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
@@ -22,18 +21,18 @@ public interface BasinRecipe extends Recipe<BasinInput> {
     Map<ShapelessRecipe, List<SizedIngredient>> SHAPELESS_CACHE = new IdentityHashMap<>();
     Map<ShapedRecipe, List<SizedIngredient>> SHAPED_CACHE = new IdentityHashMap<>();
 
-    static boolean matchCraftingRecipe(BasinInput input, ShapelessRecipe recipe, World world) {
+    static boolean matchCraftingRecipe(BasinInput input, ShapelessRecipe recipe, Level world) {
         return matchCraftingRecipe(input, recipe, world, SHAPELESS_CACHE, SizedIngredient::of);
     }
 
-    static boolean matchCraftingRecipe(BasinInput input, ShapedRecipe recipe, World world) {
+    static boolean matchCraftingRecipe(BasinInput input, ShapedRecipe recipe, Level world) {
         return matchCraftingRecipe(input, recipe, world, SHAPED_CACHE, SizedIngredient::of);
     }
 
     private static <T extends CraftingRecipe> boolean matchCraftingRecipe(
         BasinInput input,
         T recipe,
-        World world,
+        Level world,
         Map<T, List<SizedIngredient>> ingredientCache,
         Function<T, List<SizedIngredient>> recipeToIngredients
     ) {
@@ -41,7 +40,7 @@ public interface BasinRecipe extends Recipe<BasinInput> {
         if (filter == null) {
             return false;
         }
-        ItemStack result = recipe.craft(null, world.getRegistryManager());
+        ItemStack result = recipe.assemble(null, world.registryAccess());
         if (!filter.test(result)) {
             return false;
         }
@@ -59,15 +58,15 @@ public interface BasinRecipe extends Recipe<BasinInput> {
 
     @Nullable
     static List<ItemStack> tryCraft(BasinInput input, Ingredient ingredient) {
-        Inventory inventory = input.items();
-        for (int i = 0, size = inventory.size(); i < size; i++) {
-            ItemStack stack = inventory.getStack(i);
+        Container inventory = input.items();
+        for (int i = 0, size = inventory.getContainerSize(); i < size; i++) {
+            ItemStack stack = inventory.getItem(i);
             if (stack.isEmpty()) {
                 continue;
             }
             if (ingredient.test(stack)) {
                 List<ItemStack> outputs = new ArrayList<>();
-                ItemStack remainder = stack.getItem().getRecipeRemainder();
+                ItemStack remainder = stack.getItem().getCraftingRemainder();
                 if (remainder != ItemStack.EMPTY) {
                     outputs.add(remainder);
                 }
@@ -83,10 +82,10 @@ public interface BasinRecipe extends Recipe<BasinInput> {
         if (remainder == 1) {
             return tryCraft(input, ingredient.getIngredient());
         }
-        Inventory inventory = input.items();
+        Container inventory = input.items();
         List<ItemStack> outputs = new ArrayList<>();
-        for (int i = 0, size = inventory.size(); i < size; i++) {
-            ItemStack stack = inventory.getStack(i);
+        for (int i = 0, size = inventory.getContainerSize(); i < size; i++) {
+            ItemStack stack = inventory.getItem(i);
             if (stack.isEmpty()) {
                 continue;
             }
@@ -114,14 +113,14 @@ public interface BasinRecipe extends Recipe<BasinInput> {
         List<ItemStack> usings = new ArrayList<>();
         List<ItemStack> inputs = new LinkedList<>();
         int ingredientIndex = 0;
-        Inventory inventory = input.items();
+        Container inventory = input.items();
         Find:
-        for (int itemIndex = 0, inventorySize = inventory.size(); ingredientIndex < ingredientSize; ingredientIndex++) {
+        for (int itemIndex = 0, inventorySize = inventory.getContainerSize(); ingredientIndex < ingredientSize; ingredientIndex++) {
             SizedIngredient ingredient = ingredients.get(ingredientIndex);
             int size = inputs.size();
             int remainder = ingredient.getCount();
             for (; itemIndex < inventorySize; itemIndex++) {
-                ItemStack stack = inventory.getStack(itemIndex);
+                ItemStack stack = inventory.getItem(itemIndex);
                 if (stack.isEmpty()) {
                     continue;
                 }
@@ -284,18 +283,18 @@ public interface BasinRecipe extends Recipe<BasinInput> {
         return true;
     }
 
-    static boolean applyCraftingRecipe(BasinInput input, ShapedRecipe recipe, World world) {
+    static boolean applyCraftingRecipe(BasinInput input, ShapedRecipe recipe, Level world) {
         return applyCraftingRecipe(input, recipe, world, SHAPED_CACHE, SizedIngredient::of);
     }
 
-    static boolean applyCraftingRecipe(BasinInput input, ShapelessRecipe recipe, World world) {
+    static boolean applyCraftingRecipe(BasinInput input, ShapelessRecipe recipe, Level world) {
         return applyCraftingRecipe(input, recipe, world, SHAPELESS_CACHE, SizedIngredient::of);
     }
 
     private static <T extends CraftingRecipe> boolean applyCraftingRecipe(
         BasinInput input,
         T recipe,
-        World world,
+        Level world,
         Map<T, List<SizedIngredient>> ingredientCache,
         Function<T, List<SizedIngredient>> recipeToIngredients
     ) {
@@ -305,7 +304,7 @@ public interface BasinRecipe extends Recipe<BasinInput> {
         if (outputs == null) {
             return false;
         }
-        outputs.add(recipe.craft(null, world.getRegistryManager()));
+        outputs.add(recipe.assemble(null, world.registryAccess()));
         if (!input.acceptOutputs(outputs, List.of(), true)) {
             return false;
         }
@@ -316,7 +315,7 @@ public interface BasinRecipe extends Recipe<BasinInput> {
     static void addRecipeRemainder(ItemStack stack, int count, List<ItemStack> outputs) {
         Item item = stack.getItem();
         for (int i = 0; i < count; i++) {
-            ItemStack remainder = item.getRecipeRemainder();
+            ItemStack remainder = item.getCraftingRemainder();
             if (remainder != ItemStack.EMPTY) {
                 outputs.add(remainder);
             }
@@ -325,9 +324,9 @@ public interface BasinRecipe extends Recipe<BasinInput> {
 
     @Nullable
     static List<ItemStack> prepareCraft(BasinInput input, Ingredient ingredient, Deque<Runnable> changes) {
-        Inventory inventory = input.items();
-        for (int i = 0, size = inventory.size(); i < size; i++) {
-            ItemStack stack = inventory.getStack(i);
+        Container inventory = input.items();
+        for (int i = 0, size = inventory.getContainerSize(); i < size; i++) {
+            ItemStack stack = inventory.getItem(i);
             if (stack.isEmpty()) {
                 continue;
             }
@@ -337,17 +336,17 @@ public interface BasinRecipe extends Recipe<BasinInput> {
                     int newCount = count - 1;
                     changes.add(() -> {
                         stack.setCount(newCount);
-                        inventory.markDirty();
+                        inventory.setChanged();
                     });
                 } else {
                     int slot = i;
                     changes.add(() -> {
-                        inventory.setStack(slot, ItemStack.EMPTY);
-                        inventory.markDirty();
+                        inventory.setItem(slot, ItemStack.EMPTY);
+                        inventory.setChanged();
                     });
                 }
                 List<ItemStack> outputs = new ArrayList<>();
-                ItemStack remainder = stack.getItem().getRecipeRemainder();
+                ItemStack remainder = stack.getItem().getCraftingRemainder();
                 if (remainder != ItemStack.EMPTY) {
                     outputs.add(remainder);
                 }
@@ -363,10 +362,10 @@ public interface BasinRecipe extends Recipe<BasinInput> {
         if (remainder == 1) {
             return prepareCraft(input, ingredient.getIngredient(), changes);
         }
-        Inventory inventory = input.items();
+        Container inventory = input.items();
         List<ItemStack> outputs = new ArrayList<>();
-        for (int i = 0, size = inventory.size(); i < size; i++) {
-            ItemStack stack = inventory.getStack(i);
+        for (int i = 0, size = inventory.getContainerSize(); i < size; i++) {
+            ItemStack stack = inventory.getItem(i);
             if (stack.isEmpty()) {
                 continue;
             }
@@ -379,12 +378,12 @@ public interface BasinRecipe extends Recipe<BasinInput> {
                     using = remainder;
                 } else {
                     int slot = i;
-                    changes.add(() -> inventory.setStack(slot, ItemStack.EMPTY));
+                    changes.add(() -> inventory.setItem(slot, ItemStack.EMPTY));
                     using = count;
                 }
                 addRecipeRemainder(stack, using, outputs);
                 if (using == remainder) {
-                    changes.add(inventory::markDirty);
+                    changes.add(inventory::setChanged);
                     return outputs;
                 }
                 remainder -= using;
@@ -405,14 +404,14 @@ public interface BasinRecipe extends Recipe<BasinInput> {
         List<ItemStack> usings = new ArrayList<>();
         List<IntObjectPair<ItemStack>> inputs = new LinkedList<>();
         int ingredientIndex = 0;
-        Inventory inventory = input.items();
+        Container inventory = input.items();
         Apply:
-        for (int itemIndex = 0, inventorySize = inventory.size(); ingredientIndex < ingredientSize; ingredientIndex++) {
+        for (int itemIndex = 0, inventorySize = inventory.getContainerSize(); ingredientIndex < ingredientSize; ingredientIndex++) {
             SizedIngredient ingredient = ingredients.get(ingredientIndex);
             int size = inputs.size();
             int remainder = ingredient.getCount();
             for (; itemIndex < inventorySize; itemIndex++) {
-                ItemStack stack = inventory.getStack(itemIndex);
+                ItemStack stack = inventory.getItem(itemIndex);
                 if (stack.isEmpty()) {
                     continue;
                 }
@@ -427,7 +426,7 @@ public interface BasinRecipe extends Recipe<BasinInput> {
                     } else {
                         usings.add(stack);
                         int slot = itemIndex;
-                        changes.add(() -> inventory.setStack(slot, ItemStack.EMPTY));
+                        changes.add(() -> inventory.setItem(slot, ItemStack.EMPTY));
                         if (count == remainder) {
                             itemIndex++;
                             continue Apply;
@@ -454,7 +453,7 @@ public interface BasinRecipe extends Recipe<BasinInput> {
                     }
                     usings.add(stack);
                     int slot = pair.leftInt();
-                    changes.add(() -> inventory.setStack(slot, ItemStack.EMPTY));
+                    changes.add(() -> inventory.setItem(slot, ItemStack.EMPTY));
                     if (count == remainder) {
                         ingredientIndex++;
                         break Apply;
@@ -483,7 +482,7 @@ public interface BasinRecipe extends Recipe<BasinInput> {
                     }
                     usings.add(stack);
                     int slot = pair.leftInt();
-                    changes.add(() -> inventory.setStack(slot, ItemStack.EMPTY));
+                    changes.add(() -> inventory.setItem(slot, ItemStack.EMPTY));
                     if (count == remainder) {
                         continue Apply;
                     }
@@ -492,7 +491,7 @@ public interface BasinRecipe extends Recipe<BasinInput> {
             }
             return null;
         }
-        changes.add(inventory::markDirty);
+        changes.add(inventory::setChanged);
         List<ItemStack> outputs = new ArrayList<>();
         for (ItemStack stack : usings) {
             addRecipeRemainder(stack, stack.getCount(), outputs);
@@ -644,22 +643,22 @@ public interface BasinRecipe extends Recipe<BasinInput> {
     boolean apply(BasinInput input);
 
     @Override
-    default IngredientPlacement getIngredientPlacement() {
-        return IngredientPlacement.NONE;
+    default PlacementInfo placementInfo() {
+        return PlacementInfo.NOT_PLACEABLE;
     }
 
     @Override
-    default RecipeBookCategory getRecipeBookCategory() {
+    default RecipeBookCategory recipeBookCategory() {
         return null;
     }
 
     @Override
-    default boolean isIgnoredInRecipeBook() {
+    default boolean isSpecial() {
         return true;
     }
 
     @Override
-    default ItemStack craft(BasinInput input, RegistryWrapper.WrapperLookup registries) {
+    default ItemStack assemble(BasinInput input, HolderLookup.Provider registries) {
         return ItemStack.EMPTY;
     }
 }

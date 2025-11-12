@@ -6,13 +6,12 @@ import com.zurrtum.create.content.redstone.displayLink.target.DisplayTargetStats
 import com.zurrtum.create.content.trains.entity.Train;
 import com.zurrtum.create.content.trains.observer.TrackObserver;
 import com.zurrtum.create.content.trains.observer.TrackObserverBlockEntity;
-import net.minecraft.text.MutableText;
-
 import java.util.UUID;
+import net.minecraft.network.chat.MutableComponent;
 
 public class ObservedTrainNameSource extends SingleLineDisplaySource {
     @Override
-    protected MutableText provideLine(DisplayLinkContext context, DisplayTargetStats stats) {
+    protected MutableComponent provideLine(DisplayLinkContext context, DisplayTargetStats stats) {
         if (!(context.getSourceBlockEntity() instanceof TrackObserverBlockEntity observerBE))
             return EMPTY_LINE;
         TrackObserver observer = observerBE.getObserver();

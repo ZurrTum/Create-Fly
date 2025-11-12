@@ -1,31 +1,31 @@
 package com.zurrtum.create.client.infrastructure.model;
 
 import com.zurrtum.create.content.kinetics.waterwheel.LargeWaterWheelBlockEntity;
-import net.minecraft.block.BlockState;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.render.model.BlockModelPart;
-import net.minecraft.client.texture.Sprite;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.random.Random;
-import net.minecraft.world.BlockRenderView;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.block.model.BlockModelPart;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.core.BlockPos;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.level.BlockAndTintGetter;
+import net.minecraft.world.level.block.state.BlockState;
 
 import java.util.List;
 
 public class LargeWaterWheelModel extends WrapperBlockStateModel {
-    public LargeWaterWheelModel(BlockState state, UnbakedGrouped unbaked) {
+    public LargeWaterWheelModel(BlockState state, UnbakedRoot unbaked) {
         super(state, unbaked);
     }
 
     @Override
-    public Sprite particleSpriteWithInfo(BlockRenderView world, BlockPos pos, BlockState state) {
+    public TextureAtlasSprite particleSpriteWithInfo(BlockAndTintGetter world, BlockPos pos, BlockState state) {
         if (world.getBlockEntity(pos) instanceof LargeWaterWheelBlockEntity blockEntity) {
-            return MinecraftClient.getInstance().getBlockRenderManager().getModel(blockEntity.material).particleSprite();
+            return Minecraft.getInstance().getBlockRenderer().getBlockModel(blockEntity.material).particleIcon();
         } else {
-            return model.particleSprite();
+            return model.particleIcon();
         }
     }
 
     @Override
-    public void addPartsWithInfo(BlockRenderView world, BlockPos pos, BlockState state, Random random, List<BlockModelPart> parts) {
+    public void addPartsWithInfo(BlockAndTintGetter world, BlockPos pos, BlockState state, RandomSource random, List<BlockModelPart> parts) {
     }
 }

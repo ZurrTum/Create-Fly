@@ -17,15 +17,14 @@ import com.zurrtum.create.client.flywheel.backend.engine.embed.EnvironmentStorag
 import com.zurrtum.create.client.flywheel.backend.engine.uniform.Uniforms;
 import com.zurrtum.create.client.flywheel.backend.gl.GlStateTracker;
 import it.unimi.dsi.fastutil.longs.LongSet;
-import net.minecraft.client.render.Camera;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.ChunkSectionPos;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.math.Vec3i;
-import net.minecraft.world.LightType;
-import net.minecraft.world.WorldAccess;
-
 import java.util.List;
+import net.minecraft.client.Camera;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.SectionPos;
+import net.minecraft.core.Vec3i;
+import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.LightLayer;
+import net.minecraft.world.phys.Vec3;
 
 public class EngineImpl implements Engine {
     private final DrawManager<? extends AbstractInstancer<?>> drawManager;
@@ -33,9 +32,9 @@ public class EngineImpl implements Engine {
     private final EnvironmentStorage environmentStorage;
     private final LightStorage lightStorage;
 
-    private BlockPos renderOrigin = BlockPos.ORIGIN;
+    private BlockPos renderOrigin = BlockPos.ZERO;
 
-    public EngineImpl(WorldAccess level, DrawManager<? extends AbstractInstancer<?>> drawManager, int maxOriginDistance) {
+    public EngineImpl(LevelAccessor level, DrawManager<? extends AbstractInstancer<?>> drawManager, int maxOriginDistance) {
         this.drawManager = drawManager;
         sqrMaxOriginDistance = maxOriginDistance * maxOriginDistance;
         environmentStorage = new EnvironmentStorage();
@@ -59,7 +58,7 @@ public class EngineImpl implements Engine {
 
     @Override
     public boolean updateRenderOrigin(Camera camera) {
-        Vec3d cameraPos = camera.getPos();
+        Vec3 cameraPos = camera.getPosition();
         double dx = renderOrigin.getX() - cameraPos.x;
         double dy = renderOrigin.getY() - cameraPos.y;
         double dz = renderOrigin.getZ() - cameraPos.z;
@@ -69,7 +68,7 @@ public class EngineImpl implements Engine {
             return false;
         }
 
-        renderOrigin = BlockPos.ofFloored(cameraPos);
+        renderOrigin = BlockPos.containing(cameraPos);
         drawManager.onRenderOriginChanged();
         return true;
     }
@@ -80,7 +79,7 @@ public class EngineImpl implements Engine {
     }
 
     @Override
-    public void onLightUpdate(ChunkSectionPos sectionPos, LightType layer) {
+    public void onLightUpdate(SectionPos sectionPos, LightLayer layer) {
         lightStorage.onLightUpdate(sectionPos.asLong());
     }
 

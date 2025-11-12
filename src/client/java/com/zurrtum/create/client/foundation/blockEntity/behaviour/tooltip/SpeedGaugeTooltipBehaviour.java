@@ -6,10 +6,9 @@ import com.zurrtum.create.client.foundation.item.TooltipHelper;
 import com.zurrtum.create.client.foundation.utility.CreateLang;
 import com.zurrtum.create.content.kinetics.base.IRotate.SpeedLevel;
 import com.zurrtum.create.content.kinetics.gauge.SpeedGaugeBlockEntity;
-import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
-
 import java.util.List;
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.Component;
 
 public class SpeedGaugeTooltipBehaviour extends GaugeTooltipBehaviour<SpeedGaugeBlockEntity> {
     public SpeedGaugeTooltipBehaviour(SpeedGaugeBlockEntity be) {
@@ -17,9 +16,9 @@ public class SpeedGaugeTooltipBehaviour extends GaugeTooltipBehaviour<SpeedGauge
     }
 
     @Override
-    public boolean addToGoggleTooltip(List<Text> tooltip, boolean isPlayerSneaking) {
+    public boolean addToGoggleTooltip(List<Component> tooltip, boolean isPlayerSneaking) {
         super.addToGoggleTooltip(tooltip, isPlayerSneaking);
-        CreateLang.translate("gui.speedometer.title").style(Formatting.GRAY).forGoggles(tooltip);
+        CreateLang.translate("gui.speedometer.title").style(ChatFormatting.GRAY).forGoggles(tooltip);
         getFormattedSpeedText(blockEntity.getSpeed(), blockEntity.isOverStressed()).forGoggles(tooltip);
         return true;
     }
@@ -32,7 +31,7 @@ public class SpeedGaugeTooltipBehaviour extends GaugeTooltipBehaviour<SpeedGauge
             .space().translate("generic.unit.rpm").text(")").space();
 
         if (overstressed)
-            builder.style(Formatting.DARK_GRAY).style(Formatting.STRIKETHROUGH);
+            builder.style(ChatFormatting.DARK_GRAY).style(ChatFormatting.STRIKETHROUGH);
         else
             builder.style(speedLevel.getTextColor());
 

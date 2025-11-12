@@ -16,21 +16,21 @@ import com.zurrtum.create.foundation.fluid.FluidHelper;
 import com.zurrtum.create.infrastructure.fluids.BucketFluidInventory;
 import com.zurrtum.create.infrastructure.fluids.FluidStack;
 import com.zurrtum.create.infrastructure.particle.FluidParticleData;
-import net.minecraft.block.BlockState;
-import net.minecraft.item.ItemStack;
-import net.minecraft.particle.ParticleEffect;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.storage.ReadView;
-import net.minecraft.storage.WriteView;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Vec3d;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.particles.ParticleOptions;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
 
 import static com.zurrtum.create.content.kinetics.belt.behaviour.BeltProcessingBehaviour.ProcessingResult.HOLD;
 import static com.zurrtum.create.content.kinetics.belt.behaviour.BeltProcessingBehaviour.ProcessingResult.PASS;
@@ -54,8 +54,8 @@ public class SpoutBlockEntity extends SmartBlockEntity {
     }
 
     @Override
-    protected Box createRenderBoundingBox() {
-        return super.createRenderBoundingBox().stretch(0, -2, 0);
+    protected AABB createRenderBoundingBox() {
+        return super.createRenderBoundingBox().expandTowards(0, -2, 0);
     }
 
     @Override
@@ -75,11 +75,11 @@ public class SpoutBlockEntity extends SmartBlockEntity {
     protected ProcessingResult onItemReceived(TransportedItemStack transported, TransportedItemStackHandlerBehaviour handler) {
         if (handler.blockEntity.isVirtual())
             return PASS;
-        if (!FillingBySpout.canItemBeFilled(world, transported.stack))
+        if (!FillingBySpout.canItemBeFilled(level, transported.stack))
             return PASS;
         if (tank.isEmpty())
             return HOLD;
-        if (FillingBySpout.getRequiredAmountForItem((ServerWorld) world, transported.stack, getCurrentFluidInTank()) == -1)
+        if (FillingBySpout.getRequiredAmountForItem((ServerLevel) level, transported.stack, getCurrentFluidInTank()) == -1)
             return PASS;
         return HOLD;
     }
@@ -87,12 +87,12 @@ public class SpoutBlockEntity extends SmartBlockEntity {
     protected ProcessingResult whenItemHeld(TransportedItemStack transported, TransportedItemStackHandlerBehaviour handler) {
         if (processingTicks != -1 && processingTicks != 5)
             return HOLD;
-        if (!FillingBySpout.canItemBeFilled(world, transported.stack))
+        if (!FillingBySpout.canItemBeFilled(level, transported.stack))
             return PASS;
         if (tank.isEmpty())
             return HOLD;
         FluidStack fluid = getCurrentFluidInTank();
-        int requiredAmountForItem = FillingBySpout.getRequiredAmountForItem((ServerWorld) world, transported.stack, fluid.copy());
+        int requiredAmountForItem = FillingBySpout.getRequiredAmountForItem((ServerLevel) level, transported.stack, fluid.copy());
         if (requiredAmountForItem <= 0)
             return PASS;
         if (requiredAmountForItem > fluid.getAmount())
@@ -101,12 +101,12 @@ public class SpoutBlockEntity extends SmartBlockEntity {
         if (processingTicks == -1) {
             processingTicks = FILLING_TIME;
             notifyUpdate();
-            AllSoundEvents.SPOUTING.playOnServer(world, pos, 0.75f, 0.9f + 0.2f * (float) Math.random());
+            AllSoundEvents.SPOUTING.playOnServer(level, worldPosition, 0.75f, 0.9f + 0.2f * (float) Math.random());
             return HOLD;
         }
 
         // Process finished
-        ItemStack out = FillingBySpout.fillItem((ServerWorld) world, requiredAmountForItem, transported.stack, fluid);
+        ItemStack out = FillingBySpout.fillItem((ServerLevel) level, requiredAmountForItem, transported.stack, fluid);
         if (!out.isEmpty()) {
             transported.clearFanProcessingData();
             List<TransportedItemStack> outList = new ArrayList<>();
@@ -121,9 +121,9 @@ public class SpoutBlockEntity extends SmartBlockEntity {
 
         award(AllAdvancements.SPOUT);
         if (trackFoods()) {
-            createdChocolateBerries |= out.isOf(AllItems.CHOCOLATE_BERRIES);
-            createdHoneyApple |= out.isOf(AllItems.HONEYED_APPLE);
-            createdSweetRoll |= out.isOf(AllItems.SWEET_ROLL);
+            createdChocolateBerries |= out.is(AllItems.CHOCOLATE_BERRIES);
+            createdHoneyApple |= out.is(AllItems.HONEYED_APPLE);
+            createdSweetRoll |= out.is(AllItems.SWEET_ROLL);
             if (createdChocolateBerries && createdHoneyApple && createdSweetRoll)
                 award(AllAdvancements.FOODS);
         }
@@ -141,7 +141,7 @@ public class SpoutBlockEntity extends SmartBlockEntity {
     }
 
     @Override
-    protected void write(WriteView view, boolean clientPacket) {
+    protected void write(ValueOutput view, boolean clientPacket) {
         super.write(view, clientPacket);
 
         view.putInt("ProcessingTicks", processingTicks);
@@ -166,17 +166,17 @@ public class SpoutBlockEntity extends SmartBlockEntity {
     }
 
     @Override
-    protected void read(ReadView view, boolean clientPacket) {
+    protected void read(ValueInput view, boolean clientPacket) {
         super.read(view, clientPacket);
-        processingTicks = view.getInt("ProcessingTicks", 0);
+        processingTicks = view.getIntOr("ProcessingTicks", 0);
 
-        createdChocolateBerries = view.getBoolean("ChocolateBerries", false);
-        createdHoneyApple = view.getBoolean("HoneyApple", false);
-        createdSweetRoll = view.getBoolean("SweetRoll", false);
+        createdChocolateBerries = view.getBooleanOr("ChocolateBerries", false);
+        createdHoneyApple = view.getBooleanOr("HoneyApple", false);
+        createdSweetRoll = view.getBooleanOr("SweetRoll", false);
 
         if (!clientPacket)
             return;
-        if (view.getBoolean("Splash", false))
+        if (view.getBooleanOr("Splash", false))
             spawnSplash(tank.getPrimaryTank().getRenderedFluid());
     }
 
@@ -184,10 +184,10 @@ public class SpoutBlockEntity extends SmartBlockEntity {
         super.tick();
 
         FluidStack currentFluidInTank = getCurrentFluidInTank();
-        if (processingTicks == -1 && (isVirtual() || !world.isClient()) && !currentFluidInTank.isEmpty()) {
-            BlockPos filling = pos.down(2);
-            BlockSpoutingBehaviour behavior = BlockSpoutingBehaviour.get(world, filling);
-            if (behavior != null && behavior.fillBlock(world, filling, this, currentFluidInTank.copy(), true) > 0) {
+        if (processingTicks == -1 && (isVirtual() || !level.isClientSide()) && !currentFluidInTank.isEmpty()) {
+            BlockPos filling = worldPosition.below(2);
+            BlockSpoutingBehaviour behavior = BlockSpoutingBehaviour.get(level, filling);
+            if (behavior != null && behavior.fillBlock(level, filling, this, currentFluidInTank.copy(), true) > 0) {
                 processingTicks = FILLING_TIME;
                 customProcess = behavior;
                 notifyUpdate();
@@ -197,7 +197,7 @@ public class SpoutBlockEntity extends SmartBlockEntity {
         if (processingTicks >= 0) {
             processingTicks--;
             if (processingTicks == 5 && customProcess != null) {
-                int fillBlock = customProcess.fillBlock(world, pos.down(2), this, currentFluidInTank.copy(), false);
+                int fillBlock = customProcess.fillBlock(level, worldPosition.below(2), this, currentFluidInTank.copy(), false);
                 customProcess = null;
                 if (fillBlock > 0) {
                     tank.getPrimaryHandler()
@@ -208,7 +208,7 @@ public class SpoutBlockEntity extends SmartBlockEntity {
             }
         }
 
-        if (processingTicks >= 8 && world.isClient()) {
+        if (processingTicks >= 8 && level.isClientSide()) {
             spawnProcessingParticles(tank.getPrimaryTank().getRenderedFluid());
         }
     }
@@ -216,10 +216,10 @@ public class SpoutBlockEntity extends SmartBlockEntity {
     protected void spawnProcessingParticles(FluidStack fluid) {
         if (isVirtual() || fluid.isEmpty())
             return;
-        Vec3d vec = VecHelper.getCenterOf(pos);
+        Vec3 vec = VecHelper.getCenterOf(worldPosition);
         vec = vec.subtract(0, 8 / 16f, 0);
-        ParticleEffect particle = new FluidParticleData(AllParticleTypes.FLUID_PARTICLE, fluid.getFluid(), fluid.getComponentChanges());
-        world.addImportantParticleClient(particle, vec.x, vec.y, vec.z, 0, -.1f, 0);
+        ParticleOptions particle = new FluidParticleData(AllParticleTypes.FLUID_PARTICLE, fluid.getFluid(), fluid.getComponentChanges());
+        level.addAlwaysVisibleParticle(particle, vec.x, vec.y, vec.z, 0, -.1f, 0);
     }
 
     protected static int SPLASH_PARTICLE_COUNT = 20;
@@ -227,13 +227,13 @@ public class SpoutBlockEntity extends SmartBlockEntity {
     protected void spawnSplash(FluidStack fluid) {
         if (isVirtual() || fluid.isEmpty())
             return;
-        Vec3d vec = VecHelper.getCenterOf(pos);
+        Vec3 vec = VecHelper.getCenterOf(worldPosition);
         vec = vec.subtract(0, 2 - 5 / 16f, 0);
-        ParticleEffect particle = new FluidParticleData(AllParticleTypes.FLUID_PARTICLE, fluid.getFluid(), fluid.getComponentChanges());
+        ParticleOptions particle = new FluidParticleData(AllParticleTypes.FLUID_PARTICLE, fluid.getFluid(), fluid.getComponentChanges());
         for (int i = 0; i < SPLASH_PARTICLE_COUNT; i++) {
-            Vec3d m = VecHelper.offsetRandomly(Vec3d.ZERO, world.random, 0.125f);
-            m = new Vec3d(m.x, Math.abs(m.y), m.z);
-            world.addImportantParticleClient(particle, vec.x, vec.y, vec.z, m.x, m.y, m.z);
+            Vec3 m = VecHelper.offsetRandomly(Vec3.ZERO, level.random, 0.125f);
+            m = new Vec3(m.x, Math.abs(m.y), m.z);
+            level.addAlwaysVisibleParticle(particle, vec.x, vec.y, vec.z, m.x, m.y, m.z);
         }
     }
 

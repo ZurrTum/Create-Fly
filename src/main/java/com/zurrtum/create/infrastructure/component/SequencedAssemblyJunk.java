@@ -3,23 +3,22 @@ package com.zurrtum.create.infrastructure.component;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.zurrtum.create.content.processing.recipe.ChanceOutput;
-import net.minecraft.item.ItemStack;
-import net.minecraft.network.RegistryByteBuf;
-import net.minecraft.network.codec.PacketCodec;
-import net.minecraft.network.codec.PacketCodecs;
-
 import java.util.List;
 import java.util.Random;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.world.item.ItemStack;
 
 public record SequencedAssemblyJunk(float chance, List<ChanceOutput> junks) {
     public static final Codec<SequencedAssemblyJunk> CODEC = RecordCodecBuilder.create(instance -> instance.group(
         Codec.FLOAT.fieldOf("chance").forGetter(SequencedAssemblyJunk::chance),
         ChanceOutput.CODEC.listOf().fieldOf("junks").forGetter(SequencedAssemblyJunk::junks)
     ).apply(instance, SequencedAssemblyJunk::new));
-    public static final PacketCodec<RegistryByteBuf, SequencedAssemblyJunk> PACKET_CODEC = PacketCodec.tuple(
-        PacketCodecs.FLOAT,
+    public static final StreamCodec<RegistryFriendlyByteBuf, SequencedAssemblyJunk> PACKET_CODEC = StreamCodec.composite(
+        ByteBufCodecs.FLOAT,
         SequencedAssemblyJunk::chance,
-        ChanceOutput.PACKET_CODEC.collect(PacketCodecs.toList()),
+        ChanceOutput.PACKET_CODEC.apply(ByteBufCodecs.list()),
         SequencedAssemblyJunk::junks,
         SequencedAssemblyJunk::new
     );

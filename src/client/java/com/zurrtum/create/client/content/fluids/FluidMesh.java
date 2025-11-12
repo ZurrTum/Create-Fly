@@ -9,15 +9,15 @@ import com.zurrtum.create.client.flywheel.lib.material.SimpleMaterial;
 import com.zurrtum.create.client.flywheel.lib.model.QuadMesh;
 import com.zurrtum.create.client.flywheel.lib.model.SingleMeshModel;
 import com.zurrtum.create.client.flywheel.lib.util.RendererReloadCache;
-import net.minecraft.client.render.OverlayTexture;
-import net.minecraft.client.texture.Sprite;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.MathHelper;
+import net.minecraft.client.renderer.texture.OverlayTexture;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.core.Direction;
+import net.minecraft.util.Mth;
 import org.joml.Vector4f;
 import org.joml.Vector4fc;
 
 public class FluidMesh {
-    private static final RendererReloadCache<Sprite, Model> STREAM = new RendererReloadCache<>(sprite -> new SingleMeshModel(
+    private static final RendererReloadCache<TextureAtlasSprite, Model> STREAM = new RendererReloadCache<>(sprite -> new SingleMeshModel(
         new FluidStreamMesh(sprite), material(sprite)));
 
     private static final RendererReloadCache<SurfaceKey, Model> SURFACE = new RendererReloadCache<>(sprite -> new SingleMeshModel(
@@ -28,26 +28,26 @@ public class FluidMesh {
     public static final float PIPE_RADIUS = 3f / 16f;
 
     // TODO: width parameter here too
-    public static Model stream(Sprite sprite) {
+    public static Model stream(TextureAtlasSprite sprite) {
         return STREAM.get(sprite);
     }
 
-    public static Model surface(Sprite sprite, float width) {
+    public static Model surface(TextureAtlasSprite sprite, float width) {
         return SURFACE.get(new SurfaceKey(sprite, width));
     }
 
-    private static SimpleMaterial material(Sprite sprite) {
-        return SimpleMaterial.builder().cardinalLightingMode(CardinalLightingMode.OFF).texture(sprite.getAtlasId())
+    private static SimpleMaterial material(TextureAtlasSprite sprite) {
+        return SimpleMaterial.builder().cardinalLightingMode(CardinalLightingMode.OFF).texture(sprite.atlasLocation())
             .transparency(Transparency.ORDER_INDEPENDENT).build();
     }
 
-    private record SurfaceKey(Sprite texture, float width) {
+    private record SurfaceKey(TextureAtlasSprite texture, float width) {
     }
 
-    public record FluidSurfaceMesh(Sprite texture, float width) implements QuadMesh {
+    public record FluidSurfaceMesh(TextureAtlasSprite texture, float width) implements QuadMesh {
         @Override
         public int vertexCount() {
-            int quadWidth = MathHelper.ceil(width) - MathHelper.floor(-width);
+            int quadWidth = Mth.ceil(width) - Mth.floor(-width);
             return 4 * quadWidth * quadWidth;
         }
 
@@ -59,7 +59,7 @@ public class FluidMesh {
                 vertexList.b(i, 1);
                 vertexList.a(i, 1);
                 vertexList.light(i, 0);
-                vertexList.overlay(i, OverlayTexture.DEFAULT_UV);
+                vertexList.overlay(i, OverlayTexture.NO_OVERLAY);
 
                 vertexList.normalX(i, 0);
                 vertexList.normalY(i, 1);
@@ -77,26 +77,26 @@ public class FluidMesh {
 
             int vertex = 0;
 
-            float shrink = texture.getUvScaleDelta() * 0.25f * textureScale;
-            float centerU = texture.getMinU() + (texture.getMaxU() - texture.getMinU()) * 0.5f;
-            float centerV = texture.getMinV() + (texture.getMaxV() - texture.getMinV()) * 0.5f;
+            float shrink = texture.uvShrinkRatio() * 0.25f * textureScale;
+            float centerU = texture.getU0() + (texture.getU1() - texture.getU0()) * 0.5f;
+            float centerV = texture.getV0() + (texture.getV1() - texture.getV0()) * 0.5f;
 
             float x2;
             float y2;
             for (float x1 = left; x1 < right; x1 = x2) {
-                float x1floor = MathHelper.floor(x1);
+                float x1floor = Mth.floor(x1);
                 x2 = Math.min(x1floor + 1, right);
-                float u1 = texture.getFrameU((x1 - x1floor) * 16 * textureScale);
-                float u2 = texture.getFrameU((x2 - x1floor) * 16 * textureScale);
-                u1 = MathHelper.lerp(shrink, u1, centerU);
-                u2 = MathHelper.lerp(shrink, u2, centerU);
+                float u1 = texture.getU((x1 - x1floor) * 16 * textureScale);
+                float u2 = texture.getU((x2 - x1floor) * 16 * textureScale);
+                u1 = Mth.lerp(shrink, u1, centerU);
+                u2 = Mth.lerp(shrink, u2, centerU);
                 for (float y1 = down; y1 < up; y1 = y2) {
-                    float y1floor = MathHelper.floor(y1);
+                    float y1floor = Mth.floor(y1);
                     y2 = Math.min(y1floor + 1, up);
-                    float v1 = texture.getFrameV((y1 - y1floor) * 16 * textureScale);
-                    float v2 = texture.getFrameV((y2 - y1floor) * 16 * textureScale);
-                    v1 = MathHelper.lerp(shrink, v1, centerV);
-                    v2 = MathHelper.lerp(shrink, v2, centerV);
+                    float v1 = texture.getV((y1 - y1floor) * 16 * textureScale);
+                    float v2 = texture.getV((y2 - y1floor) * 16 * textureScale);
+                    v1 = Mth.lerp(shrink, v1, centerV);
+                    v2 = Mth.lerp(shrink, v2, centerV);
 
                     vertexList.x(vertex, x1);
                     vertexList.z(vertex, y1);
@@ -124,11 +124,11 @@ public class FluidMesh {
 
         @Override
         public Vector4fc boundingSphere() {
-            return new Vector4f(0, 0, 0, width / MathHelper.SQUARE_ROOT_OF_TWO);
+            return new Vector4f(0, 0, 0, width / Mth.SQRT_OF_TWO);
         }
     }
 
-    public record FluidStreamMesh(Sprite texture) implements QuadMesh {
+    public record FluidStreamMesh(TextureAtlasSprite texture) implements QuadMesh {
         @Override
         public int vertexCount() {
             return 4 * 2 * 4;
@@ -142,15 +142,15 @@ public class FluidMesh {
                 vertexList.b(i, 1);
                 vertexList.a(i, 1);
                 vertexList.light(i, 0);
-                vertexList.overlay(i, OverlayTexture.DEFAULT_UV);
+                vertexList.overlay(i, OverlayTexture.NO_OVERLAY);
 
                 vertexList.v(i, 0);
             }
 
             float textureScale = 1 / 32f;
 
-            float shrink = texture.getUvScaleDelta() * 0.25f * textureScale;
-            float centerU = texture.getMinU() + (texture.getMaxU() - texture.getMinU()) * 0.5f;
+            float shrink = texture.uvShrinkRatio() * 0.25f * textureScale;
+            float centerU = texture.getU0() + (texture.getU1() - texture.getU0()) * 0.5f;
 
             float radius = PIPE_RADIUS;
             float left = -radius;
@@ -161,12 +161,12 @@ public class FluidMesh {
             for (var horizontalDirection : Iterate.horizontalDirections) {
                 float x2;
                 for (float x1 = left; x1 < right; x1 = x2) {
-                    float x1floor = MathHelper.floor(x1);
+                    float x1floor = Mth.floor(x1);
                     x2 = Math.min(x1floor + 1, right);
-                    float u1 = texture.getFrameU((x1 - x1floor) * 16 * textureScale);
-                    float u2 = texture.getFrameU((x2 - x1floor) * 16 * textureScale);
-                    u1 = MathHelper.lerp(shrink, u1, centerU);
-                    u2 = MathHelper.lerp(shrink, u2, centerU);
+                    float u1 = texture.getU((x1 - x1floor) * 16 * textureScale);
+                    float u2 = texture.getU((x2 - x1floor) * 16 * textureScale);
+                    u1 = Mth.lerp(shrink, u1, centerU);
+                    u2 = Mth.lerp(shrink, u2, centerU);
 
                     putQuad(vertexList, vertex, horizontalDirection, radius, x1, x2, u1, u2);
                     vertex += 4;
@@ -226,9 +226,9 @@ public class FluidMesh {
             vertexList.u(i + 3, u1);
 
             for (int j = 0; j < 4; j++) {
-                vertexList.normalX(i + j, horizontal.getOffsetX());
-                vertexList.normalY(i + j, horizontal.getOffsetY());
-                vertexList.normalZ(i + j, horizontal.getOffsetZ());
+                vertexList.normalX(i + j, horizontal.getStepX());
+                vertexList.normalY(i + j, horizontal.getStepY());
+                vertexList.normalZ(i + j, horizontal.getStepZ());
             }
         }
 

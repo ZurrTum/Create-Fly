@@ -3,25 +3,24 @@ package com.zurrtum.create.infrastructure.packet.c2s;
 import com.zurrtum.create.AllHandle;
 import com.zurrtum.create.AllPackets;
 import io.netty.buffer.ByteBuf;
-import net.minecraft.network.codec.PacketCodec;
-import net.minecraft.network.codec.PacketCodecs;
-import net.minecraft.network.packet.PacketType;
-import net.minecraft.server.network.ServerPlayNetworkHandler;
-import net.minecraft.util.math.BlockPos;
-
 import java.util.function.BiConsumer;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.PacketType;
+import net.minecraft.server.network.ServerGamePacketListenerImpl;
 
 public record CurvedTrackSelectionPacket(BlockPos pos, BlockPos targetPos, boolean front, int segment, int slot) implements C2SPacket {
-    public static final PacketCodec<ByteBuf, CurvedTrackSelectionPacket> CODEC = PacketCodec.tuple(
-        BlockPos.PACKET_CODEC,
+    public static final StreamCodec<ByteBuf, CurvedTrackSelectionPacket> CODEC = StreamCodec.composite(
+        BlockPos.STREAM_CODEC,
         CurvedTrackSelectionPacket::pos,
-        BlockPos.PACKET_CODEC,
+        BlockPos.STREAM_CODEC,
         CurvedTrackSelectionPacket::targetPos,
-        PacketCodecs.BOOLEAN,
+        ByteBufCodecs.BOOL,
         CurvedTrackSelectionPacket::front,
-        PacketCodecs.VAR_INT,
+        ByteBufCodecs.VAR_INT,
         CurvedTrackSelectionPacket::segment,
-        PacketCodecs.VAR_INT,
+        ByteBufCodecs.VAR_INT,
         CurvedTrackSelectionPacket::slot,
         CurvedTrackSelectionPacket::new
     );
@@ -32,12 +31,12 @@ public record CurvedTrackSelectionPacket(BlockPos pos, BlockPos targetPos, boole
     }
 
     @Override
-    public PacketType<CurvedTrackSelectionPacket> getPacketType() {
+    public PacketType<CurvedTrackSelectionPacket> type() {
         return AllPackets.SELECT_CURVED_TRACK;
     }
 
     @Override
-    public BiConsumer<ServerPlayNetworkHandler, CurvedTrackSelectionPacket> callback() {
+    public BiConsumer<ServerGamePacketListenerImpl, CurvedTrackSelectionPacket> callback() {
         return AllHandle::onCurvedTrackSelection;
     }
 }

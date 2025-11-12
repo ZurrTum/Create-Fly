@@ -4,31 +4,31 @@ import com.mojang.serialization.MapCodec;
 import com.zurrtum.create.AllItemAttributeTypes;
 import com.zurrtum.create.content.logistics.item.filter.attribute.ItemAttribute;
 import com.zurrtum.create.content.logistics.item.filter.attribute.ItemAttributeType;
-import net.minecraft.enchantment.Enchantment;
-import net.minecraft.enchantment.EnchantmentHelper;
-import net.minecraft.item.ItemStack;
-import net.minecraft.network.RegistryByteBuf;
-import net.minecraft.network.codec.PacketCodec;
-import net.minecraft.registry.entry.RegistryEntry;
-import net.minecraft.world.World;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
+import net.minecraft.core.Holder;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.enchantment.Enchantment;
+import net.minecraft.world.item.enchantment.EnchantmentHelper;
+import net.minecraft.world.level.Level;
 
-public record EnchantAttribute(@Nullable RegistryEntry<Enchantment> enchantment) implements ItemAttribute {
-    public static final MapCodec<EnchantAttribute> CODEC = Enchantment.ENTRY_CODEC.xmap(EnchantAttribute::new, EnchantAttribute::enchantment)
+public record EnchantAttribute(@Nullable Holder<Enchantment> enchantment) implements ItemAttribute {
+    public static final MapCodec<EnchantAttribute> CODEC = Enchantment.CODEC.xmap(EnchantAttribute::new, EnchantAttribute::enchantment)
         .fieldOf("value");
 
-    public static final PacketCodec<RegistryByteBuf, EnchantAttribute> PACKET_CODEC = Enchantment.ENTRY_PACKET_CODEC.xmap(
+    public static final StreamCodec<RegistryFriendlyByteBuf, EnchantAttribute> PACKET_CODEC = Enchantment.STREAM_CODEC.map(
         EnchantAttribute::new,
         EnchantAttribute::enchantment
     );
 
     @Override
-    public boolean appliesTo(ItemStack itemStack, World level) {
-        return EnchantmentHelper.getEnchantments(itemStack).getEnchantments().contains(enchantment);
+    public boolean appliesTo(ItemStack itemStack, Level level) {
+        return EnchantmentHelper.getEnchantmentsForCrafting(itemStack).keySet().contains(enchantment);
     }
 
     @Override
@@ -56,10 +56,10 @@ public record EnchantAttribute(@Nullable RegistryEntry<Enchantment> enchantment)
         }
 
         @Override
-        public List<ItemAttribute> getAllAttributes(ItemStack stack, World level) {
+        public List<ItemAttribute> getAllAttributes(ItemStack stack, Level level) {
             List<ItemAttribute> list = new ArrayList<>();
 
-            for (RegistryEntry<Enchantment> enchantmentHolder : EnchantmentHelper.getEnchantments(stack).getEnchantments()) {
+            for (Holder<Enchantment> enchantmentHolder : EnchantmentHelper.getEnchantmentsForCrafting(stack).keySet()) {
                 list.add(new EnchantAttribute(enchantmentHolder));
             }
 
@@ -72,7 +72,7 @@ public record EnchantAttribute(@Nullable RegistryEntry<Enchantment> enchantment)
         }
 
         @Override
-        public PacketCodec<? super RegistryByteBuf, ? extends ItemAttribute> packetCodec() {
+        public StreamCodec<? super RegistryFriendlyByteBuf, ? extends ItemAttribute> packetCodec() {
             return PACKET_CODEC;
         }
     }

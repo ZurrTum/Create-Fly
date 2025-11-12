@@ -4,16 +4,15 @@ import com.zurrtum.create.AllHandle;
 import com.zurrtum.create.AllPackets;
 import com.zurrtum.create.catnip.codecs.stream.CatnipStreamCodecs;
 import com.zurrtum.create.infrastructure.component.SymmetryMirror;
-import net.minecraft.network.PacketByteBuf;
-import net.minecraft.network.codec.PacketCodec;
-import net.minecraft.network.packet.PacketType;
-import net.minecraft.server.network.ServerPlayNetworkHandler;
-import net.minecraft.util.Hand;
-
 import java.util.function.BiConsumer;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.PacketType;
+import net.minecraft.server.network.ServerGamePacketListenerImpl;
+import net.minecraft.world.InteractionHand;
 
-public record ConfigureSymmetryWandPacket(Hand hand, SymmetryMirror mirror) implements C2SPacket {
-    public static final PacketCodec<PacketByteBuf, ConfigureSymmetryWandPacket> CODEC = PacketCodec.tuple(
+public record ConfigureSymmetryWandPacket(InteractionHand hand, SymmetryMirror mirror) implements C2SPacket {
+    public static final StreamCodec<FriendlyByteBuf, ConfigureSymmetryWandPacket> CODEC = StreamCodec.composite(
         CatnipStreamCodecs.HAND,
         ConfigureSymmetryWandPacket::hand,
         SymmetryMirror.STREAM_CODEC,
@@ -22,12 +21,12 @@ public record ConfigureSymmetryWandPacket(Hand hand, SymmetryMirror mirror) impl
     );
 
     @Override
-    public PacketType<ConfigureSymmetryWandPacket> getPacketType() {
+    public PacketType<ConfigureSymmetryWandPacket> type() {
         return AllPackets.CONFIGURE_SYMMETRY_WAND;
     }
 
     @Override
-    public BiConsumer<ServerPlayNetworkHandler, ConfigureSymmetryWandPacket> callback() {
+    public BiConsumer<ServerGamePacketListenerImpl, ConfigureSymmetryWandPacket> callback() {
         return AllHandle::onConfigureSymmetryWand;
     }
 }

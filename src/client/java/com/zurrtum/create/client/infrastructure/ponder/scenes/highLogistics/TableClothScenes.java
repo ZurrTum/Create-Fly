@@ -14,12 +14,12 @@ import com.zurrtum.create.content.logistics.tableCloth.TableClothBlock;
 import com.zurrtum.create.content.logistics.tableCloth.TableClothBlockEntity;
 import com.zurrtum.create.infrastructure.component.AutoRequestData;
 import com.zurrtum.create.infrastructure.component.PackageOrderWithCrafts;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
 
 import java.util.List;
 
@@ -98,14 +98,14 @@ public class TableClothScenes {
             .pointAt(util.vector().of(2, 3, 4)).placeNearTarget();
         scene.idle(110);
 
-        ItemStack tickerItem = AllItems.STOCK_TICKER.getDefaultStack();
+        ItemStack tickerItem = AllItems.STOCK_TICKER.getDefaultInstance();
         scene.overlay().showControls(util.vector().centerOf(2, 3, 4), Pointing.DOWN, 80).rightClick().withItem(tickerItem);
         scene.idle(5);
 
-        Box bb1 = new Box(link);
-        scene.overlay().chaseBoundingBoxOutline(PonderPalette.BLUE, link, bb1.contract(0.45), 10);
+        AABB bb1 = new AABB(link);
+        scene.overlay().chaseBoundingBoxOutline(PonderPalette.BLUE, link, bb1.deflate(0.45), 10);
         scene.idle(1);
-        bb1 = bb1.contract(1 / 16f).shrink(0, 8 / 16f, 0);
+        bb1 = bb1.deflate(1 / 16f).contract(0, 8 / 16f, 0);
         scene.overlay().chaseBoundingBoxOutline(PonderPalette.BLUE, link, bb1, 50);
         scene.idle(26);
 
@@ -134,7 +134,7 @@ public class TableClothScenes {
             .placeNearTarget();
         scene.idle(80);
 
-        ItemStack clothItem = AllItems.LIGHT_GRAY_TABLE_CLOTH.getDefaultStack();
+        ItemStack clothItem = AllItems.LIGHT_GRAY_TABLE_CLOTH.getDefaultInstance();
         scene.overlay().showControls(util.vector().of(3, 3, 1.75), Pointing.DOWN, 120).rightClick().withItem(clothItem);
         scene.idle(30);
 
@@ -159,7 +159,7 @@ public class TableClothScenes {
         scene.idle(20);
 
         ItemStack diamondItem = new ItemStack(Items.DIAMOND);
-        Vec3d filterSlot = util.vector().of(5.25, 1.825, 1);
+        Vec3 filterSlot = util.vector().of(5.25, 1.825, 1);
         scene.overlay().showControls(filterSlot, Pointing.DOWN, 120).rightClick().withItem(diamondItem);
         scene.idle(5);
         scene.world().setFilterData(util.select().position(5, 2, 1), TableClothBlockEntity.class, diamondItem);
@@ -176,7 +176,7 @@ public class TableClothScenes {
             .placeNearTarget();
         scene.idle(100);
 
-        ItemStack listItem = AllItems.SHOPPING_LIST.getDefaultStack();
+        ItemStack listItem = AllItems.SHOPPING_LIST.getDefaultInstance();
         scene.overlay().showControls(util.vector().of(3, 3, 1.75), Pointing.DOWN, 90).rightClick().withItem(listItem);
         scene.idle(5);
         scene.effects().indicateSuccess(util.grid().at(3, 1, 1));

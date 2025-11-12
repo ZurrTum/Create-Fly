@@ -4,20 +4,20 @@ import com.zurrtum.create.AllClientHandle;
 import com.zurrtum.create.AllPackets;
 import com.zurrtum.create.catnip.codecs.stream.CatnipStreamCodecBuilders;
 import com.zurrtum.create.content.logistics.BigItemStack;
-import net.minecraft.network.RegistryByteBuf;
-import net.minecraft.network.codec.PacketCodec;
-import net.minecraft.network.codec.PacketCodecs;
-import net.minecraft.network.packet.PacketType;
-import net.minecraft.util.math.BlockPos;
 import org.apache.logging.log4j.util.TriConsumer;
 
 import java.util.List;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.PacketType;
 
 public record LogisticalStockResponsePacket(boolean lastPacket, BlockPos pos, List<BigItemStack> items) implements S2CPacket {
-    public static final PacketCodec<RegistryByteBuf, LogisticalStockResponsePacket> CODEC = PacketCodec.tuple(
-        PacketCodecs.BOOLEAN,
+    public static final StreamCodec<RegistryFriendlyByteBuf, LogisticalStockResponsePacket> CODEC = StreamCodec.composite(
+        ByteBufCodecs.BOOL,
         LogisticalStockResponsePacket::lastPacket,
-        BlockPos.PACKET_CODEC,
+        BlockPos.STREAM_CODEC,
         LogisticalStockResponsePacket::pos,
         CatnipStreamCodecBuilders.list(BigItemStack.STREAM_CODEC),
         LogisticalStockResponsePacket::items,
@@ -30,7 +30,7 @@ public record LogisticalStockResponsePacket(boolean lastPacket, BlockPos pos, Li
     }
 
     @Override
-    public PacketType<LogisticalStockResponsePacket> getPacketType() {
+    public PacketType<LogisticalStockResponsePacket> type() {
         return AllPackets.LOGISTICS_STOCK_RESPONSE;
     }
 

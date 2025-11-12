@@ -4,17 +4,17 @@ import com.zurrtum.create.client.flywheel.api.visualization.BlockEntityVisualize
 import com.zurrtum.create.client.flywheel.api.visualization.EntityVisualizer;
 import com.zurrtum.create.client.flywheel.api.visualization.VisualizerRegistry;
 import com.zurrtum.create.client.vanillin.Vanillin;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityType;
-import net.minecraft.registry.Registries;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 
 public class Configurator {
     public final Map<BlockEntityType<?>, ConfiguredBlockEntity<?>> blockEntities = new LinkedHashMap<>();
@@ -111,7 +111,7 @@ public class Configurator {
 
         @Override
         public String configKey() {
-            return Registries.BLOCK_ENTITY_TYPE.getId(type).toString();
+            return BuiltInRegistries.BLOCK_ENTITY_TYPE.getKey(type).toString();
         }
 
         @Override
@@ -137,7 +137,7 @@ public class Configurator {
 
         @Override
         public String configKey() {
-            return Registries.ENTITY_TYPE.getId(type).toString();
+            return BuiltInRegistries.ENTITY_TYPE.getKey(type).toString();
         }
 
         @Override

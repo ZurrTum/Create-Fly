@@ -4,21 +4,20 @@ import com.zurrtum.create.AllHandle;
 import com.zurrtum.create.AllPackets;
 import com.zurrtum.create.catnip.codecs.stream.CatnipStreamCodecs;
 import io.netty.buffer.ByteBuf;
-import net.minecraft.network.codec.PacketCodec;
-import net.minecraft.network.codec.PacketCodecs;
-import net.minecraft.network.packet.PacketType;
-import net.minecraft.server.network.ServerPlayNetworkHandler;
-import net.minecraft.util.math.BlockPos;
-
 import java.util.Collection;
 import java.util.List;
 import java.util.function.BiConsumer;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.PacketType;
+import net.minecraft.server.network.ServerGamePacketListenerImpl;
 
 public record LinkedControllerInputPacket(List<Integer> activatedButtons, boolean press, BlockPos lecternPos) implements C2SPacket {
-    public static final PacketCodec<ByteBuf, LinkedControllerInputPacket> CODEC = PacketCodec.tuple(
-        PacketCodecs.INTEGER.collect(PacketCodecs.toList()),
+    public static final StreamCodec<ByteBuf, LinkedControllerInputPacket> CODEC = StreamCodec.composite(
+        ByteBufCodecs.INT.apply(ByteBufCodecs.list()),
         LinkedControllerInputPacket::activatedButtons,
-        PacketCodecs.BOOLEAN,
+        ByteBufCodecs.BOOL,
         LinkedControllerInputPacket::press,
         CatnipStreamCodecs.NULLABLE_BLOCK_POS,
         LinkedControllerInputPacket::lecternPos,
@@ -39,12 +38,12 @@ public record LinkedControllerInputPacket(List<Integer> activatedButtons, boolea
     }
 
     @Override
-    public PacketType<LinkedControllerInputPacket> getPacketType() {
+    public PacketType<LinkedControllerInputPacket> type() {
         return AllPackets.LINKED_CONTROLLER_INPUT;
     }
 
     @Override
-    public BiConsumer<ServerPlayNetworkHandler, LinkedControllerInputPacket> callback() {
+    public BiConsumer<ServerGamePacketListenerImpl, LinkedControllerInputPacket> callback() {
         return AllHandle::onLinkedControllerInput;
     }
 }

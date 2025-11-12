@@ -3,12 +3,12 @@ package com.zurrtum.create.infrastructure.component;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.zurrtum.create.catnip.codecs.stream.CatnipStreamCodecBuilders;
-import net.minecraft.network.RegistryByteBuf;
-import net.minecraft.network.codec.PacketCodec;
-import net.minecraft.network.codec.PacketCodecs;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Optional;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
 
 public record PackageOrderData(
     int orderId, int linkIndex, boolean isFinalLink, int fragmentIndex, boolean isFinal, @Nullable PackageOrderWithCrafts orderContext
@@ -33,16 +33,16 @@ public record PackageOrderData(
         PackageOrderWithCrafts.CODEC.optionalFieldOf("order_context").forGetter(i -> Optional.ofNullable(i.orderContext))
     ).apply(instance, PackageOrderData::new));
 
-    public static final PacketCodec<RegistryByteBuf, PackageOrderData> STREAM_CODEC = PacketCodec.tuple(
-        PacketCodecs.INTEGER,
+    public static final StreamCodec<RegistryFriendlyByteBuf, PackageOrderData> STREAM_CODEC = StreamCodec.composite(
+        ByteBufCodecs.INT,
         PackageOrderData::orderId,
-        PacketCodecs.INTEGER,
+        ByteBufCodecs.INT,
         PackageOrderData::linkIndex,
-        PacketCodecs.BOOLEAN,
+        ByteBufCodecs.BOOL,
         PackageOrderData::isFinalLink,
-        PacketCodecs.INTEGER,
+        ByteBufCodecs.INT,
         PackageOrderData::fragmentIndex,
-        PacketCodecs.BOOLEAN,
+        ByteBufCodecs.BOOL,
         PackageOrderData::isFinal,
         CatnipStreamCodecBuilders.nullable(PackageOrderWithCrafts.STREAM_CODEC),
         PackageOrderData::orderContext,

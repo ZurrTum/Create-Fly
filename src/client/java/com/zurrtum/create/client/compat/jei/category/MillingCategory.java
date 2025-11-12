@@ -15,29 +15,29 @@ import mezz.jei.api.gui.drawable.IDrawable;
 import mezz.jei.api.gui.ingredient.IRecipeSlotsView;
 import mezz.jei.api.recipe.IFocusGroup;
 import mezz.jei.api.recipe.types.IRecipeType;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.recipe.PreparedRecipes;
-import net.minecraft.recipe.RecipeEntry;
-import net.minecraft.text.Text;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.item.crafting.RecipeHolder;
+import net.minecraft.world.item.crafting.RecipeMap;
 import org.jetbrains.annotations.NotNull;
 import org.joml.Matrix3x2f;
 
 import java.util.List;
 
-public class MillingCategory extends CreateCategory<RecipeEntry<MillingRecipe>> {
-    public static List<RecipeEntry<MillingRecipe>> getRecipes(PreparedRecipes preparedRecipes) {
-        return preparedRecipes.getAll(AllRecipeTypes.MILLING).stream().toList();
+public class MillingCategory extends CreateCategory<RecipeHolder<MillingRecipe>> {
+    public static List<RecipeHolder<MillingRecipe>> getRecipes(RecipeMap preparedRecipes) {
+        return preparedRecipes.byType(AllRecipeTypes.MILLING).stream().toList();
     }
 
     @Override
     @NotNull
-    public IRecipeType<RecipeEntry<MillingRecipe>> getRecipeType() {
+    public IRecipeType<RecipeHolder<MillingRecipe>> getRecipeType() {
         return JeiClientPlugin.MILLING;
     }
 
     @Override
     @NotNull
-    public Text getTitle() {
+    public Component getTitle() {
         return CreateLang.translateDirect("recipe.milling");
     }
 
@@ -52,7 +52,7 @@ public class MillingCategory extends CreateCategory<RecipeEntry<MillingRecipe>> 
     }
 
     @Override
-    public void setRecipe(IRecipeLayoutBuilder builder, RecipeEntry<MillingRecipe> entry, IFocusGroup focuses) {
+    public void setRecipe(IRecipeLayoutBuilder builder, RecipeHolder<MillingRecipe> entry, IFocusGroup focuses) {
         MillingRecipe recipe = entry.value();
         builder.addInputSlot(15, 9).setBackground(SLOT, -1, -1).add(recipe.ingredient());
         List<ChanceOutput> results = recipe.results();
@@ -67,10 +67,10 @@ public class MillingCategory extends CreateCategory<RecipeEntry<MillingRecipe>> 
     }
 
     @Override
-    public void draw(RecipeEntry<MillingRecipe> entry, IRecipeSlotsView recipeSlotsView, DrawContext graphics, double mouseX, double mouseY) {
+    public void draw(RecipeHolder<MillingRecipe> entry, IRecipeSlotsView recipeSlotsView, GuiGraphics graphics, double mouseX, double mouseY) {
         AllGuiTextures.JEI_ARROW.render(graphics, 85, 32);
         AllGuiTextures.JEI_DOWN_ARROW.render(graphics, 43, 4);
         AllGuiTextures.JEI_SHADOW.render(graphics, 32, 40);
-        graphics.state.addSpecialElement(new MillstoneRenderState(new Matrix3x2f(graphics.getMatrices()), 42, 19));
+        graphics.guiRenderState.submitPicturesInPictureState(new MillstoneRenderState(new Matrix3x2f(graphics.pose()), 42, 19));
     }
 }

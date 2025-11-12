@@ -15,19 +15,19 @@ import com.zurrtum.create.infrastructure.config.AllConfigs;
 import com.zurrtum.create.infrastructure.fluids.BucketFluidInventory;
 import com.zurrtum.create.infrastructure.fluids.FluidInventory;
 import com.zurrtum.create.infrastructure.fluids.FluidStack;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.storage.ReadView;
-import net.minecraft.storage.WriteView;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.math.Direction;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.Objects;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
+import net.minecraft.world.phys.AABB;
 
 import static java.lang.Math.abs;
 
@@ -74,9 +74,9 @@ public class FluidTankBlockEntity extends SmartBlockEntity implements IMultiBloc
     }
 
     @Override
-    public void onBlockReplaced(BlockPos pos, BlockState oldState) {
-        super.onBlockReplaced(pos, oldState);
-        world.removeBlockEntity(pos);
+    public void preRemoveSideEffects(BlockPos pos, BlockState oldState) {
+        super.preRemoveSideEffects(pos, oldState);
+        level.removeBlockEntity(pos);
         ConnectivityHandler.splitMulti(this);
     }
 
@@ -86,7 +86,7 @@ public class FluidTankBlockEntity extends SmartBlockEntity implements IMultiBloc
 
     protected void updateConnectivity() {
         updateConnectivity = false;
-        if (world.isClient())
+        if (level.isClientSide())
             return;
         if (!isController())
             return;
@@ -103,8 +103,8 @@ public class FluidTankBlockEntity extends SmartBlockEntity implements IMultiBloc
         }
 
         if (lastKnownPos == null)
-            lastKnownPos = pos;
-        else if (!lastKnownPos.equals(pos) && pos != null) {
+            lastKnownPos = worldPosition;
+        else if (!lastKnownPos.equals(worldPosition) && worldPosition != null) {
             onPositionChanged();
             return;
         }
@@ -135,27 +135,27 @@ public class FluidTankBlockEntity extends SmartBlockEntity implements IMultiBloc
 
     @Override
     public boolean isController() {
-        return controller == null || pos.getX() == controller.getX() && pos.getY() == controller.getY() && pos.getZ() == controller.getZ();
+        return controller == null || worldPosition.getX() == controller.getX() && worldPosition.getY() == controller.getY() && worldPosition.getZ() == controller.getZ();
     }
 
     @Override
     public void initialize() {
         super.initialize();
         sendData();
-        if (world.isClient())
+        if (level.isClientSide())
             invalidateRenderBoundingBox();
     }
 
     private void onPositionChanged() {
         removeController(true);
-        lastKnownPos = pos;
+        lastKnownPos = worldPosition;
     }
 
     protected void onFluidStackChanged(FluidStack newFluidStack) {
-        if (!hasWorld())
+        if (!hasLevel())
             return;
 
-        int luminosity = (int) (newFluidStack.getFluid().getDefaultState().getBlockState().getLuminance() / 1.2f);
+        int luminosity = (int) (newFluidStack.getFluid().defaultFluidState().createLegacyBlock().getLightEmission() / 1.2f);
         boolean reversed = false;
         int maxY = (int) ((getFillState() * height) + 1);
 
@@ -165,11 +165,11 @@ public class FluidTankBlockEntity extends SmartBlockEntity implements IMultiBloc
 
             for (int xOffset = 0; xOffset < width; xOffset++) {
                 for (int zOffset = 0; zOffset < width; zOffset++) {
-                    BlockPos pos = this.pos.add(xOffset, yOffset, zOffset);
-                    FluidTankBlockEntity tankAt = ConnectivityHandler.partAt(getType(), world, pos);
+                    BlockPos pos = this.worldPosition.offset(xOffset, yOffset, zOffset);
+                    FluidTankBlockEntity tankAt = ConnectivityHandler.partAt(getType(), level, pos);
                     if (tankAt == null)
                         continue;
-                    world.updateComparators(pos, tankAt.getCachedState().getBlock());
+                    level.updateNeighbourForOutputSignal(pos, tankAt.getBlockState().getBlock());
                     if (tankAt.luminosity == actualLuminosity)
                         continue;
                     tankAt.setLuminosity(actualLuminosity);
@@ -177,8 +177,8 @@ public class FluidTankBlockEntity extends SmartBlockEntity implements IMultiBloc
             }
         }
 
-        if (!world.isClient()) {
-            markDirty();
+        if (!level.isClientSide()) {
+            setChanged();
             sendData();
         }
 
@@ -190,7 +190,7 @@ public class FluidTankBlockEntity extends SmartBlockEntity implements IMultiBloc
     }
 
     protected void setLuminosity(int luminosity) {
-        if (world.isClient())
+        if (level.isClientSide())
             return;
         if (this.luminosity == luminosity)
             return;
@@ -200,25 +200,25 @@ public class FluidTankBlockEntity extends SmartBlockEntity implements IMultiBloc
     }
 
     protected void updateStateLuminosity() {
-        if (world.isClient())
+        if (level.isClientSide())
             return;
         int actualLuminosity = luminosity;
         FluidTankBlockEntity controllerBE = getControllerBE();
         if (controllerBE == null || !controllerBE.window)
             actualLuminosity = 0;
         refreshBlockState();
-        BlockState state = getCachedState();
-        if (state.get(FluidTankBlock.LIGHT_LEVEL) != actualLuminosity) {
-            world.setBlockState(pos, state.with(FluidTankBlock.LIGHT_LEVEL, actualLuminosity), 23);
+        BlockState state = getBlockState();
+        if (state.getValue(FluidTankBlock.LIGHT_LEVEL) != actualLuminosity) {
+            level.setBlock(worldPosition, state.setValue(FluidTankBlock.LIGHT_LEVEL, actualLuminosity), 23);
         }
     }
 
     @SuppressWarnings("unchecked")
     @Override
     public FluidTankBlockEntity getControllerBE() {
-        if (isController() || !hasWorld())
+        if (isController() || !hasLevel())
             return this;
-        BlockEntity blockEntity = world.getBlockEntity(controller);
+        BlockEntity blockEntity = level.getBlockEntity(controller);
         if (blockEntity instanceof FluidTankBlockEntity)
             return (FluidTankBlockEntity) blockEntity;
         return null;
@@ -236,7 +236,7 @@ public class FluidTankBlockEntity extends SmartBlockEntity implements IMultiBloc
     }
 
     public void removeController(boolean keepFluids) {
-        if (world.isClient())
+        if (level.isClientSide())
             return;
         updateConnectivity = true;
         if (!keepFluids)
@@ -247,16 +247,16 @@ public class FluidTankBlockEntity extends SmartBlockEntity implements IMultiBloc
         boiler.clear();
         onFluidStackChanged(tankInventory.getFluid());
 
-        BlockState state = getCachedState();
+        BlockState state = getBlockState();
         if (FluidTankBlock.isTank(state)) {
-            state = state.with(FluidTankBlock.BOTTOM, true);
-            state = state.with(FluidTankBlock.TOP, true);
-            state = state.with(FluidTankBlock.SHAPE, window ? Shape.WINDOW : Shape.PLAIN);
-            getWorld().setBlockState(pos, state, Block.NOTIFY_LISTENERS | Block.NO_REDRAW | Block.FORCE_STATE);
+            state = state.setValue(FluidTankBlock.BOTTOM, true);
+            state = state.setValue(FluidTankBlock.TOP, true);
+            state = state.setValue(FluidTankBlock.SHAPE, window ? Shape.WINDOW : Shape.PLAIN);
+            getLevel().setBlock(worldPosition, state, Block.UPDATE_CLIENTS | Block.UPDATE_INVISIBLE | Block.UPDATE_KNOWN_SHAPE);
         }
 
         refreshCapability();
-        markDirty();
+        setChanged();
         sendData();
     }
 
@@ -301,8 +301,8 @@ public class FluidTankBlockEntity extends SmartBlockEntity implements IMultiBloc
             for (int xOffset = 0; xOffset < width; xOffset++) {
                 for (int zOffset = 0; zOffset < width; zOffset++) {
 
-                    BlockPos pos = this.pos.add(xOffset, yOffset, zOffset);
-                    BlockState blockState = world.getBlockState(pos);
+                    BlockPos pos = this.worldPosition.offset(xOffset, yOffset, zOffset);
+                    BlockState blockState = level.getBlockState(pos);
                     if (!FluidTankBlock.isTank(blockState))
                         continue;
 
@@ -319,15 +319,15 @@ public class FluidTankBlockEntity extends SmartBlockEntity implements IMultiBloc
                             shape = Shape.WINDOW;
                     }
 
-                    world.setBlockState(
+                    level.setBlock(
                         pos,
-                        blockState.with(FluidTankBlock.SHAPE, shape),
-                        Block.NOTIFY_LISTENERS | Block.NO_REDRAW | Block.FORCE_STATE
+                        blockState.setValue(FluidTankBlock.SHAPE, shape),
+                        Block.UPDATE_CLIENTS | Block.UPDATE_INVISIBLE | Block.UPDATE_KNOWN_SHAPE
                     );
-                    BlockEntity be = world.getBlockEntity(pos);
+                    BlockEntity be = level.getBlockEntity(pos);
                     if (be instanceof FluidTankBlockEntity tankAt)
                         tankAt.updateStateLuminosity();
-                    world.getChunkManager().getLightingProvider().checkBlock(pos);
+                    level.getChunkSource().getLightEngine().checkBlock(pos);
                 }
             }
         }
@@ -347,7 +347,7 @@ public class FluidTankBlockEntity extends SmartBlockEntity implements IMultiBloc
             for (int yOffset = 0; yOffset < height; yOffset++)
                 for (int xOffset = 0; xOffset < width; xOffset++)
                     for (int zOffset = 0; zOffset < width; zOffset++)
-                        if (world.getBlockEntity(pos.add(xOffset, yOffset, zOffset)) instanceof FluidTankBlockEntity fbe)
+                        if (level.getBlockEntity(worldPosition.offset(xOffset, yOffset, zOffset)) instanceof FluidTankBlockEntity fbe)
                             fbe.refreshCapability();
         }
 
@@ -359,13 +359,13 @@ public class FluidTankBlockEntity extends SmartBlockEntity implements IMultiBloc
 
     @Override
     public void setController(BlockPos controller) {
-        if (world.isClient() && !isVirtual())
+        if (level.isClientSide() && !isVirtual())
             return;
         if (controller.equals(this.controller))
             return;
         this.controller = controller;
         refreshCapability();
-        markDirty();
+        setChanged();
         sendData();
     }
 
@@ -380,27 +380,27 @@ public class FluidTankBlockEntity extends SmartBlockEntity implements IMultiBloc
 
     @Override
     public BlockPos getController() {
-        return isController() ? pos : controller;
+        return isController() ? worldPosition : controller;
     }
 
     @Override
-    protected Box createRenderBoundingBox() {
+    protected AABB createRenderBoundingBox() {
         if (isController())
-            return super.createRenderBoundingBox().stretch(width - 1, height - 1, width - 1);
+            return super.createRenderBoundingBox().expandTowards(width - 1, height - 1, width - 1);
         else
             return super.createRenderBoundingBox();
     }
 
     @Nullable
     public FluidTankBlockEntity getOtherFluidTankBlockEntity(Direction direction) {
-        BlockEntity otherBE = world.getBlockEntity(pos.offset(direction));
+        BlockEntity otherBE = level.getBlockEntity(worldPosition.relative(direction));
         if (otherBE instanceof FluidTankBlockEntity)
             return (FluidTankBlockEntity) otherBE;
         return null;
     }
 
     @Override
-    protected void read(ReadView view, boolean clientPacket) {
+    protected void read(ValueInput view, boolean clientPacket) {
         super.read(view, clientPacket);
 
         BlockPos controllerBefore = controller;
@@ -408,25 +408,25 @@ public class FluidTankBlockEntity extends SmartBlockEntity implements IMultiBloc
         int prevHeight = height;
         int prevLum = luminosity;
 
-        updateConnectivity = view.getBoolean("Uninitialized", false);
-        luminosity = view.getInt("Luminosity", 0);
+        updateConnectivity = view.getBooleanOr("Uninitialized", false);
+        luminosity = view.getIntOr("Luminosity", 0);
 
         lastKnownPos = view.read("LastKnownPos", BlockPos.CODEC).orElse(null);
 
         controller = view.read("Controller", BlockPos.CODEC).orElse(null);
 
         if (isController()) {
-            window = view.getBoolean("Window", false);
-            width = view.getInt("Size", 0);
-            height = view.getInt("Height", 0);
+            window = view.getBooleanOr("Window", false);
+            width = view.getIntOr("Size", 0);
+            height = view.getIntOr("Height", 0);
             tankInventory.setCapacity(getTotalTankSize() * getCapacityMultiplier());
 
             tankInventory.read(view);
         }
 
-        boiler.read(view.getReadView("Boiler"), width * width * height);
+        boiler.read(view.childOrEmpty("Boiler"), width * width * height);
 
-        if (view.getBoolean("ForceFluidLevel", false) || fluidLevel == null)
+        if (view.getBooleanOr("ForceFluidLevel", false) || fluidLevel == null)
             fluidLevel = LerpedFloat.linear().startWithValue(getFillState());
 
         updateCapability = true;
@@ -436,22 +436,22 @@ public class FluidTankBlockEntity extends SmartBlockEntity implements IMultiBloc
 
         boolean changeOfController = !Objects.equals(controllerBefore, controller);
         if (changeOfController || prevSize != width || prevHeight != height) {
-            if (hasWorld())
-                world.updateListeners(getPos(), getCachedState(), getCachedState(), 16);
+            if (hasLevel())
+                level.sendBlockUpdated(getBlockPos(), getBlockState(), getBlockState(), 16);
             if (isController())
                 tankInventory.setCapacity(getCapacityMultiplier() * getTotalTankSize());
             invalidateRenderBoundingBox();
         }
         if (isController()) {
             float fillState = getFillState();
-            if (view.getBoolean("ForceFluidLevel", false) || fluidLevel == null)
+            if (view.getBooleanOr("ForceFluidLevel", false) || fluidLevel == null)
                 fluidLevel = LerpedFloat.linear().startWithValue(fillState);
             fluidLevel.chase(fillState, 0.5f, Chaser.EXP);
         }
-        if (luminosity != prevLum && hasWorld())
-            world.getChunkManager().getLightingProvider().checkBlock(pos);
+        if (luminosity != prevLum && hasLevel())
+            level.getChunkSource().getLightEngine().checkBlock(worldPosition);
 
-        if (view.getBoolean("LazySync", false))
+        if (view.getBooleanOr("LazySync", false))
             fluidLevel.chase(fluidLevel.getChaseTarget(), 0.125f, Chaser.EXP);
     }
 
@@ -460,14 +460,14 @@ public class FluidTankBlockEntity extends SmartBlockEntity implements IMultiBloc
     }
 
     @Override
-    public void write(WriteView view, boolean clientPacket) {
+    public void write(ValueOutput view, boolean clientPacket) {
         if (updateConnectivity)
             view.putBoolean("Uninitialized", true);
-        boiler.write(view.get("Boiler"));
+        boiler.write(view.child("Boiler"));
         if (lastKnownPos != null)
-            view.put("LastKnownPos", BlockPos.CODEC, lastKnownPos);
+            view.store("LastKnownPos", BlockPos.CODEC, lastKnownPos);
         if (!isController())
-            view.put("Controller", BlockPos.CODEC, controller);
+            view.store("Controller", BlockPos.CODEC, controller);
         if (isController()) {
             view.putBoolean("Window", window);
             tankInventory.write(view);
@@ -487,7 +487,7 @@ public class FluidTankBlockEntity extends SmartBlockEntity implements IMultiBloc
     }
 
     @Override
-    public void writeSafe(WriteView view) {
+    public void writeSafe(ValueOutput view) {
         if (isController()) {
             view.putBoolean("Window", window);
             view.putInt("Size", width);
@@ -539,17 +539,17 @@ public class FluidTankBlockEntity extends SmartBlockEntity implements IMultiBloc
 
     @Override
     public void notifyMultiUpdated() {
-        BlockState state = getCachedState();
+        BlockState state = getBlockState();
         if (FluidTankBlock.isTank(state)) { // safety
-            state = state.with(FluidTankBlock.BOTTOM, getController().getY() == pos.getY());
-            state = state.with(FluidTankBlock.TOP, getController().getY() + height - 1 == pos.getY());
-            world.setBlockState(pos, state, Block.NOTIFY_LISTENERS | Block.NO_REDRAW);
+            state = state.setValue(FluidTankBlock.BOTTOM, getController().getY() == worldPosition.getY());
+            state = state.setValue(FluidTankBlock.TOP, getController().getY() + height - 1 == worldPosition.getY());
+            level.setBlock(worldPosition, state, Block.UPDATE_CLIENTS | Block.UPDATE_INVISIBLE);
         }
         if (isController())
             setWindows(window);
         onFluidStackChanged(tankInventory.getFluid());
         updateBoilerState();
-        markDirty();
+        setChanged();
     }
 
     @Override

@@ -2,10 +2,10 @@ package com.zurrtum.create.content.redstone.displayLink.source;
 
 import com.zurrtum.create.content.redstone.displayLink.DisplayLinkContext;
 import com.zurrtum.create.content.trains.display.FlapDisplaySection;
-import net.minecraft.text.Text;
+import net.minecraft.network.chat.Component;
 
 public abstract class NumericSingleLineDisplaySource extends SingleLineDisplaySource {
-    protected static final Text ZERO = Text.literal("0");
+    protected static final Component ZERO = Component.literal("0");
 
     @Override
     protected String getFlapDisplayLayoutName(DisplayLinkContext context) {

@@ -1,16 +1,16 @@
 package com.zurrtum.create.content.contraptions.behaviour;
 
 import com.zurrtum.create.content.contraptions.Contraption;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.LeverBlock;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.sound.SoundEvents;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.core.BlockPos;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.block.LeverBlock;
+import net.minecraft.world.level.block.state.BlockState;
 
 public class LeverMovingInteraction extends SimpleBlockMovingInteraction {
     @Override
-    protected BlockState handle(PlayerEntity player, Contraption contraption, BlockPos pos, BlockState currentState) {
-        playSound(player, SoundEvents.BLOCK_LEVER_CLICK, currentState.get(LeverBlock.POWERED) ? 0.5f : 0.6f);
+    protected BlockState handle(Player player, Contraption contraption, BlockPos pos, BlockState currentState) {
+        playSound(player, SoundEvents.LEVER_CLICK, currentState.getValue(LeverBlock.POWERED) ? 0.5f : 0.6f);
         return currentState.cycle(LeverBlock.POWERED);
     }
 }

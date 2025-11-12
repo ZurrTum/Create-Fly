@@ -5,37 +5,37 @@ import com.zurrtum.create.content.kinetics.fan.AirCurrent;
 import com.zurrtum.create.content.kinetics.fan.IAirCurrentSource;
 import com.zurrtum.create.content.kinetics.fan.processing.FanProcessingType;
 import com.zurrtum.create.infrastructure.particle.AirFlowParticleData;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.client.particle.AnimatedParticle;
+import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.particle.Particle;
-import net.minecraft.client.particle.ParticleFactory;
-import net.minecraft.client.particle.SpriteProvider;
-import net.minecraft.client.render.WorldRenderer;
-import net.minecraft.client.world.ClientWorld;
-import net.minecraft.particle.ParticleEffect;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.math.random.Random;
+import net.minecraft.client.particle.ParticleProvider;
+import net.minecraft.client.particle.SimpleAnimatedParticle;
+import net.minecraft.client.particle.SpriteSet;
+import net.minecraft.client.renderer.LevelRenderer;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.particles.ParticleOptions;
+import net.minecraft.util.Mth;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 
-public class AirFlowParticle extends AnimatedParticle {
+public class AirFlowParticle extends SimpleAnimatedParticle {
 
     private final IAirCurrentSource source;
     private final Access access = new Access();
 
-    protected AirFlowParticle(ClientWorld world, IAirCurrentSource source, double x, double y, double z, SpriteProvider sprite, Random random) {
+    protected AirFlowParticle(ClientLevel world, IAirCurrentSource source, double x, double y, double z, SpriteSet sprite, RandomSource random) {
         super(world, x, y, z, sprite, random.nextFloat() * .5f);
         this.source = source;
-        this.scale *= 0.75F;
-        this.maxAge = 40;
-        collidesWithWorld = false;
+        this.quadSize *= 0.75F;
+        this.lifetime = 40;
+        hasPhysics = false;
         selectSprite(7);
-        Vec3d offset = VecHelper.offsetRandomly(Vec3d.ZERO, random, .25f);
+        Vec3 offset = VecHelper.offsetRandomly(Vec3.ZERO, random, .25f);
         this.setPos(x + offset.x, y + offset.y, z + offset.z);
-        this.lastX = this.x;
-        this.lastY = this.y;
-        this.lastZ = this.z;
+        this.xo = this.x;
+        this.yo = this.y;
+        this.zo = this.z;
         setColor(0xEEEEEE);
         setAlpha(.25f);
     }
@@ -43,52 +43,52 @@ public class AirFlowParticle extends AnimatedParticle {
     @Override
     public void tick() {
         if (source == null || source.isSourceRemoved()) {
-            markDead();
+            remove();
             return;
         }
-        this.lastX = this.x;
-        this.lastY = this.y;
-        this.lastZ = this.z;
-        if (this.age++ >= this.maxAge) {
-            markDead();
+        this.xo = this.x;
+        this.yo = this.y;
+        this.zo = this.z;
+        if (this.age++ >= this.lifetime) {
+            remove();
         } else {
             AirCurrent airCurrent = source.getAirCurrent();
-            if (airCurrent == null || !airCurrent.bounds.expand(.25f).contains(x, y, z)) {
-                markDead();
+            if (airCurrent == null || !airCurrent.bounds.inflate(.25f).contains(x, y, z)) {
+                remove();
                 return;
             }
 
-            Vec3d directionVec = Vec3d.of(airCurrent.direction.getVector());
-            Vec3d motion = directionVec.multiply(1 / 8f);
+            Vec3 directionVec = Vec3.atLowerCornerOf(airCurrent.direction.getUnitVec3i());
+            Vec3 motion = directionVec.scale(1 / 8f);
             if (!source.getAirCurrent().pushing)
-                motion = motion.multiply(-1);
+                motion = motion.scale(-1);
 
-            double distance = new Vec3d(x, y, z).subtract(VecHelper.getCenterOf(source.getAirCurrentPos())).multiply(directionVec).length() - .5f;
+            double distance = new Vec3(x, y, z).subtract(VecHelper.getCenterOf(source.getAirCurrentPos())).multiply(directionVec).length() - .5f;
             if (distance > airCurrent.maxDistance + 1 || distance < -.25f) {
-                markDead();
+                remove();
                 return;
             }
-            motion = motion.multiply(airCurrent.maxDistance - (distance - 1f)).multiply(.5f);
+            motion = motion.scale(airCurrent.maxDistance - (distance - 1f)).scale(.5f);
 
             FanProcessingType type = getType(distance);
             if (type == null) {
                 setColor(0xEEEEEE);
                 setAlpha(.25f);
-                selectSprite((int) MathHelper.clamp((distance / airCurrent.maxDistance) * 8 + random.nextInt(4), 0, 7));
+                selectSprite((int) Mth.clamp((distance / airCurrent.maxDistance) * 8 + random.nextInt(4), 0, 7));
             } else {
                 type.morphAirFlow(access, random);
                 selectSprite(random.nextInt(3));
             }
 
-            velocityX = motion.x;
-            velocityY = motion.y;
-            velocityZ = motion.z;
+            xd = motion.x;
+            yd = motion.y;
+            zd = motion.z;
 
             if (this.onGround) {
-                this.velocityX *= 0.7;
-                this.velocityZ *= 0.7;
+                this.xd *= 0.7;
+                this.zd *= 0.7;
             }
-            this.move(this.velocityX, this.velocityY, this.velocityZ);
+            this.move(this.xd, this.yd, this.zd);
         }
     }
 
@@ -100,33 +100,33 @@ public class AirFlowParticle extends AnimatedParticle {
     }
 
     @Override
-    public int getBrightness(float partialTick) {
-        BlockPos blockpos = BlockPos.ofFloored(this.x, this.y, this.z);
-        return this.world.isPosLoaded(blockpos) ? WorldRenderer.getLightmapCoordinates(world, blockpos) : 0;
+    public int getLightColor(float partialTick) {
+        BlockPos blockpos = BlockPos.containing(this.x, this.y, this.z);
+        return this.level.isLoaded(blockpos) ? LevelRenderer.getLightColor(level, blockpos) : 0;
     }
 
     private void selectSprite(int index) {
-        setSprite(spriteProvider.getSprite(index, 8));
+        setSprite(sprites.get(index, 8));
     }
 
-    public static class Factory implements ParticleFactory<AirFlowParticleData> {
-        private final SpriteProvider spriteSet;
+    public static class Factory implements ParticleProvider<AirFlowParticleData> {
+        private final SpriteSet spriteSet;
 
-        public Factory(SpriteProvider animatedSprite) {
+        public Factory(SpriteSet animatedSprite) {
             this.spriteSet = animatedSprite;
         }
 
         @Override
         public Particle createParticle(
             AirFlowParticleData data,
-            ClientWorld worldIn,
+            ClientLevel worldIn,
             double x,
             double y,
             double z,
             double xSpeed,
             double ySpeed,
             double zSpeed,
-            Random random
+            RandomSource random
         ) {
             BlockEntity be = worldIn.getBlockEntity(new BlockPos(data.posX(), data.posY(), data.posZ()));
             if (!(be instanceof IAirCurrentSource))
@@ -147,8 +147,8 @@ public class AirFlowParticle extends AnimatedParticle {
         }
 
         @Override
-        public void spawnExtraParticle(ParticleEffect options, float speedMultiplier) {
-            world.addParticleClient(options, x, y, z, velocityX * speedMultiplier, velocityY * speedMultiplier, velocityZ * speedMultiplier);
+        public void spawnExtraParticle(ParticleOptions options, float speedMultiplier) {
+            level.addParticle(options, x, y, z, xd * speedMultiplier, yd * speedMultiplier, zd * speedMultiplier);
         }
     }
 

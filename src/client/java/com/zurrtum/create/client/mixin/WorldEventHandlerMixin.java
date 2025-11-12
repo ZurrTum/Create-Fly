@@ -4,26 +4,26 @@ import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
 import com.zurrtum.create.foundation.block.SoundControlBlock;
-import net.minecraft.block.BlockState;
-import net.minecraft.client.world.ClientWorld;
-import net.minecraft.client.world.WorldEventHandler;
-import net.minecraft.sound.BlockSoundGroup;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.client.renderer.LevelEventHandler;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.block.SoundType;
+import net.minecraft.world.level.block.state.BlockState;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 
-@Mixin(WorldEventHandler.class)
+@Mixin(LevelEventHandler.class)
 public class WorldEventHandlerMixin {
     @Shadow
     @Final
-    private ClientWorld world;
+    private ClientLevel level;
 
-    @WrapOperation(method = "processWorldEvent(ILnet/minecraft/util/math/BlockPos;I)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/block/BlockState;getSoundGroup()Lnet/minecraft/sound/BlockSoundGroup;"))
-    private BlockSoundGroup getBreakSound(BlockState state, Operation<BlockSoundGroup> original, @Local(argsOnly = true) BlockPos pos) {
+    @WrapOperation(method = "levelEvent(ILnet/minecraft/core/BlockPos;I)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/block/state/BlockState;getSoundType()Lnet/minecraft/world/level/block/SoundType;"))
+    private SoundType getBreakSound(BlockState state, Operation<SoundType> original, @Local(argsOnly = true) BlockPos pos) {
         if (state.getBlock() instanceof SoundControlBlock block) {
-            return block.getSoundGroup(world, pos);
+            return block.getSoundGroup(level, pos);
         }
         return original.call(state);
     }

@@ -3,7 +3,7 @@ package com.zurrtum.create.client.foundation.blockEntity.behaviour.audio;
 import com.zurrtum.create.client.foundation.sound.SoundScapes;
 import com.zurrtum.create.client.foundation.sound.SoundScapes.AmbienceGroup;
 import com.zurrtum.create.content.kinetics.millstone.MillstoneBlockEntity;
-import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.Mth;
 
 public class MillstoneAudioBehaviour extends KineticAudioBehaviour<MillstoneBlockEntity> {
     public MillstoneAudioBehaviour(MillstoneBlockEntity be) {
@@ -16,10 +16,10 @@ public class MillstoneAudioBehaviour extends KineticAudioBehaviour<MillstoneBloc
 
         if (blockEntity.getSpeed() == 0)
             return;
-        if (blockEntity.capability.getStack(0).isEmpty())
+        if (blockEntity.capability.getItem(0).isEmpty())
             return;
 
-        float pitch = MathHelper.clamp((Math.abs(blockEntity.getSpeed()) / 256f) + .45f, .85f, 1f);
-        SoundScapes.play(AmbienceGroup.MILLING, blockEntity.getPos(), pitch);
+        float pitch = Mth.clamp((Math.abs(blockEntity.getSpeed()) / 256f) + .45f, .85f, 1f);
+        SoundScapes.play(AmbienceGroup.MILLING, blockEntity.getBlockPos(), pitch);
     }
 }

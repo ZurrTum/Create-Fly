@@ -6,68 +6,68 @@ import com.zurrtum.create.AllSoundEvents;
 import com.zurrtum.create.foundation.block.IBE;
 import com.zurrtum.create.foundation.block.ProperWaterloggedBlock;
 import com.zurrtum.create.foundation.block.WrenchableDirectionalBlock;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.ShapeContext;
-import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.entity.ai.pathing.NavigationType;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.fluid.FluidState;
-import net.minecraft.item.ItemPlacementContext;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.state.StateManager;
-import net.minecraft.state.property.BooleanProperty;
-import net.minecraft.state.property.Properties;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.random.Random;
-import net.minecraft.util.shape.VoxelShape;
-import net.minecraft.world.BlockView;
-import net.minecraft.world.World;
-import net.minecraft.world.WorldAccess;
-import net.minecraft.world.WorldView;
-import net.minecraft.world.tick.ScheduledTickView;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.LevelReader;
+import net.minecraft.world.level.ScheduledTickAccess;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.block.state.properties.BooleanProperty;
+import net.minecraft.world.level.material.FluidState;
+import net.minecraft.world.level.pathfinder.PathComputationType;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.Nullable;
 
 public class DeskBellBlock extends WrenchableDirectionalBlock implements ProperWaterloggedBlock, IBE<DeskBellBlockEntity> {
 
-    public static final BooleanProperty POWERED = Properties.POWERED;
+    public static final BooleanProperty POWERED = BlockStateProperties.POWERED;
 
-    public DeskBellBlock(Settings properties) {
+    public DeskBellBlock(Properties properties) {
         super(properties);
-        setDefaultState(getDefaultState().with(FACING, Direction.UP).with(POWERED, false).with(WATERLOGGED, false));
+        registerDefaultState(defaultBlockState().setValue(FACING, Direction.UP).setValue(POWERED, false).setValue(WATERLOGGED, false));
     }
 
     @Override
-    public BlockState getPlacementState(ItemPlacementContext context) {
-        return withWater(getDefaultState().with(FACING, context.getSide()), context);
+    public BlockState getStateForPlacement(BlockPlaceContext context) {
+        return withWater(defaultBlockState().setValue(FACING, context.getClickedFace()), context);
     }
 
     @Override
-    public BlockState getStateForNeighborUpdate(
+    public BlockState updateShape(
         BlockState pState,
-        WorldView pLevel,
-        ScheduledTickView tickView,
+        LevelReader pLevel,
+        ScheduledTickAccess tickView,
         BlockPos pPos,
         Direction pDirection,
         BlockPos pNeighborPos,
         BlockState pNeighborState,
-        Random random
+        RandomSource random
     ) {
         updateWater(pLevel, tickView, pState, pPos);
         return pState;
     }
 
     @Override
-    public VoxelShape getOutlineShape(BlockState pState, BlockView pLevel, BlockPos pPos, ShapeContext pContext) {
-        return AllShapes.DESK_BELL.get(pState.get(FACING));
+    public VoxelShape getShape(BlockState pState, BlockGetter pLevel, BlockPos pPos, CollisionContext pContext) {
+        return AllShapes.DESK_BELL.get(pState.getValue(FACING));
     }
 
     @Override
-    protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
-        super.appendProperties(builder.add(POWERED, WATERLOGGED));
+    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
+        super.createBlockStateDefinition(builder.add(POWERED, WATERLOGGED));
     }
 
     @Override
@@ -76,55 +76,55 @@ public class DeskBellBlock extends WrenchableDirectionalBlock implements ProperW
     }
 
     @Override
-    protected ActionResult onUse(BlockState state, World level, BlockPos pos, PlayerEntity player, BlockHitResult hitResult) {
+    protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hitResult) {
         playSound(player, level, pos);
-        if (level.isClient())
-            return ActionResult.SUCCESS;
-        level.setBlockState(pos, state.with(POWERED, true), Block.NOTIFY_ALL);
+        if (level.isClientSide())
+            return InteractionResult.SUCCESS;
+        level.setBlock(pos, state.setValue(POWERED, true), Block.UPDATE_ALL);
         updateNeighbours(state, level, pos);
         withBlockEntityDo(level, pos, DeskBellBlockEntity::ding);
-        return ActionResult.SUCCESS;
+        return InteractionResult.SUCCESS;
     }
 
-    public void playSound(@Nullable PlayerEntity pPlayer, WorldAccess pLevel, BlockPos pPos) {
-        if (pLevel instanceof World level)
+    public void playSound(@Nullable Player pPlayer, LevelAccessor pLevel, BlockPos pPos) {
+        if (pLevel instanceof Level level)
             AllSoundEvents.DESK_BELL_USE.play(level, pPlayer, pPos);
     }
 
     @Override
-    public void onStateReplaced(BlockState pState, ServerWorld pLevel, BlockPos pPos, boolean pIsMoving) {
+    public void affectNeighborsAfterRemoval(BlockState pState, ServerLevel pLevel, BlockPos pPos, boolean pIsMoving) {
         if (!pIsMoving)
-            if (pState.get(POWERED))
+            if (pState.getValue(POWERED))
                 updateNeighbours(pState, pLevel, pPos);
     }
 
     @Override
-    public int getWeakRedstonePower(BlockState pBlockState, BlockView pBlockAccess, BlockPos pPos, Direction pSide) {
-        return pBlockState.get(POWERED) ? 15 : 0;
+    public int getSignal(BlockState pBlockState, BlockGetter pBlockAccess, BlockPos pPos, Direction pSide) {
+        return pBlockState.getValue(POWERED) ? 15 : 0;
     }
 
     @Override
-    public int getStrongRedstonePower(BlockState pBlockState, BlockView pBlockAccess, BlockPos pPos, Direction pSide) {
-        return pBlockState.get(POWERED) && getConnectedDirection(pBlockState) == pSide ? 15 : 0;
+    public int getDirectSignal(BlockState pBlockState, BlockGetter pBlockAccess, BlockPos pPos, Direction pSide) {
+        return pBlockState.getValue(POWERED) && getConnectedDirection(pBlockState) == pSide ? 15 : 0;
     }
 
     @Override
-    public boolean emitsRedstonePower(BlockState pState) {
+    public boolean isSignalSource(BlockState pState) {
         return true;
     }
 
-    public void unPress(BlockState pState, World pLevel, BlockPos pPos) {
-        pLevel.setBlockState(pPos, pState.with(POWERED, false), Block.NOTIFY_ALL);
+    public void unPress(BlockState pState, Level pLevel, BlockPos pPos) {
+        pLevel.setBlock(pPos, pState.setValue(POWERED, false), Block.UPDATE_ALL);
         updateNeighbours(pState, pLevel, pPos);
     }
 
-    protected void updateNeighbours(BlockState pState, World pLevel, BlockPos pPos) {
-        pLevel.updateNeighborsAlways(pPos, this, null);
-        pLevel.updateNeighborsAlways(pPos.offset(getConnectedDirection(pState).getOpposite()), this, null);
+    protected void updateNeighbours(BlockState pState, Level pLevel, BlockPos pPos) {
+        pLevel.updateNeighborsAt(pPos, this, null);
+        pLevel.updateNeighborsAt(pPos.relative(getConnectedDirection(pState).getOpposite()), this, null);
     }
 
     private Direction getConnectedDirection(BlockState pState) {
-        return pState.get(FACING, Direction.UP);
+        return pState.getValueOrElse(FACING, Direction.UP);
     }
 
     @Override
@@ -138,7 +138,7 @@ public class DeskBellBlock extends WrenchableDirectionalBlock implements ProperW
     }
 
     @Override
-    protected boolean canPathfindThrough(BlockState state, NavigationType pathComputationType) {
+    protected boolean isPathfindable(BlockState state, PathComputationType pathComputationType) {
         return false;
     }
 

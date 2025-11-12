@@ -8,14 +8,13 @@ import com.zurrtum.create.client.ponder.api.scene.SceneBuildingUtil;
 import com.zurrtum.create.client.ponder.api.scene.Selection;
 import com.zurrtum.create.content.kinetics.crafter.MechanicalCrafterBlockEntity;
 import com.zurrtum.create.content.logistics.box.PackageItem;
-import net.minecraft.block.Blocks;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.math.Direction;
-
 import java.util.List;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.phys.AABB;
 
 public class RepackagerScenes {
 
@@ -75,8 +74,8 @@ public class RepackagerScenes {
         scene.world().showSection(packFunnel, Direction.DOWN);
         scene.idle(20);
 
-        scene.world().setBlock(util.grid().at(4, 2, 1), Blocks.AIR.getDefaultState(), false);
-        scene.world().setBlock(util.grid().at(6, 2, 1), Blocks.AIR.getDefaultState(), false);
+        scene.world().setBlock(util.grid().at(4, 2, 1), Blocks.AIR.defaultBlockState(), false);
+        scene.world().setBlock(util.grid().at(6, 2, 1), Blocks.AIR.defaultBlockState(), false);
 
         ItemStack box1 = PackageItem.containing(List.of());
         ItemStack box2 = PackageItem.containing(List.of());
@@ -88,11 +87,11 @@ public class RepackagerScenes {
         scene.idle(3);
         scene.world().multiplyKineticSpeed(util.select().everywhere(), 1 / 16f);
 
-        Box bb1 = new Box(util.grid().at(2, 2, 1)).contract(0.125, 0.5, 0.125).expand(0.65, 0, 0).offset(1.05, -.5, 0);
-        Box bb2 = new Box(util.grid().at(7, 2, 1)).contract(0.125, 0.5, 0.125).offset(-.25, -.5, 0);
+        AABB bb1 = new AABB(util.grid().at(2, 2, 1)).deflate(0.125, 0.5, 0.125).inflate(0.65, 0, 0).move(1.05, -.5, 0);
+        AABB bb2 = new AABB(util.grid().at(7, 2, 1)).deflate(0.125, 0.5, 0.125).move(-.25, -.5, 0);
 
-        scene.overlay().chaseBoundingBoxOutline(PonderPalette.INPUT, pack, new Box(bb1.getCenter(), bb1.getCenter()), 1);
-        scene.overlay().chaseBoundingBoxOutline(PonderPalette.OUTPUT, repack, new Box(bb2.getCenter(), bb2.getCenter()), 1);
+        scene.overlay().chaseBoundingBoxOutline(PonderPalette.INPUT, pack, new AABB(bb1.getCenter(), bb1.getCenter()), 1);
+        scene.overlay().chaseBoundingBoxOutline(PonderPalette.OUTPUT, repack, new AABB(bb2.getCenter(), bb2.getCenter()), 1);
         scene.idle(1);
         scene.overlay().chaseBoundingBoxOutline(PonderPalette.INPUT, pack, bb1, 60);
         scene.overlay().chaseBoundingBoxOutline(PonderPalette.OUTPUT, repack, bb2, 60);

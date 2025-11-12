@@ -5,17 +5,21 @@ import com.zurrtum.create.AllSoundEvents;
 import com.zurrtum.create.api.behaviour.display.DisplayHolder;
 import com.zurrtum.create.content.kinetics.base.KineticBlockEntity;
 import com.zurrtum.create.foundation.utility.DynamicComponent;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.screen.ScreenTexts;
-import net.minecraft.sound.SoundCategory;
-import net.minecraft.sound.SoundEvents;
-import net.minecraft.storage.ReadView;
-import net.minecraft.storage.WriteView;
-import net.minecraft.text.Text;
-import net.minecraft.util.DyeColor;
-import net.minecraft.util.math.*;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.Vec3i;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.CommonComponents;
+import net.minecraft.network.chat.Component;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.util.Mth;
+import net.minecraft.world.item.DyeColor;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
+import net.minecraft.world.phys.AABB;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -30,7 +34,7 @@ public class FlapDisplayBlockEntity extends KineticBlockEntity implements Displa
     public DyeColor[] colour;
     public boolean[] glowingLines;
     public boolean[] manualLines;
-    private NbtCompound displayLink;
+    private CompoundTag displayLink;
 
     public FlapDisplayBlockEntity(BlockPos pos, BlockState state) {
         super(AllBlockEntityTypes.FLAP_DISPLAY, pos, state);
@@ -44,12 +48,12 @@ public class FlapDisplayBlockEntity extends KineticBlockEntity implements Displa
     }
 
     @Override
-    public NbtCompound getDisplayLinkData() {
+    public CompoundTag getDisplayLinkData() {
         return displayLink;
     }
 
     @Override
-    public void setDisplayLinkData(NbtCompound data) {
+    public void setDisplayLinkData(CompoundTag data) {
         displayLink = data;
     }
 
@@ -65,27 +69,27 @@ public class FlapDisplayBlockEntity extends KineticBlockEntity implements Displa
     }
 
     public void updateControllerStatus() {
-        if (world.isClient())
+        if (level.isClientSide())
             return;
 
-        BlockState blockState = getCachedState();
+        BlockState blockState = getBlockState();
         if (!(blockState.getBlock() instanceof FlapDisplayBlock))
             return;
 
-        Direction leftDirection = blockState.get(FlapDisplayBlock.HORIZONTAL_FACING).rotateYClockwise();
-        boolean shouldBeController = !blockState.get(FlapDisplayBlock.UP) && world.getBlockState(pos.offset(leftDirection)) != blockState;
+        Direction leftDirection = blockState.getValue(FlapDisplayBlock.HORIZONTAL_FACING).getClockWise();
+        boolean shouldBeController = !blockState.getValue(FlapDisplayBlock.UP) && level.getBlockState(worldPosition.relative(leftDirection)) != blockState;
 
         int newXSize = 1;
         int newYSize = 1;
 
         if (shouldBeController) {
             for (int xOffset = 1; xOffset < 32; xOffset++) {
-                if (world.getBlockState(pos.offset(leftDirection.getOpposite(), xOffset)) != blockState)
+                if (level.getBlockState(worldPosition.relative(leftDirection.getOpposite(), xOffset)) != blockState)
                     break;
                 newXSize++;
             }
             for (int yOffset = 0; yOffset < 32; yOffset++) {
-                if (!world.getBlockState(pos.offset(Direction.DOWN, yOffset)).get(FlapDisplayBlock.DOWN, false))
+                if (!level.getBlockState(worldPosition.relative(Direction.DOWN, yOffset)).getValueOrElse(FlapDisplayBlock.DOWN, false))
                     break;
                 newYSize++;
             }
@@ -108,30 +112,21 @@ public class FlapDisplayBlockEntity extends KineticBlockEntity implements Displa
     public void tick() {
         super.tick();
         isRunning = super.isSpeedRequirementFulfilled();
-        if ((!world.isClient() || !isRunning) && !isVirtual())
+        if ((!level.isClientSide() || !isRunning) && !isVirtual())
             return;
         int activeFlaps = 0;
         boolean instant = Math.abs(getSpeed()) > 128;
         for (FlapDisplayLayout line : lines)
             for (FlapDisplaySection section : line.getSections())
-                activeFlaps += section.tick(instant, world.random);
+                activeFlaps += section.tick(instant, level.random);
         if (activeFlaps == 0)
             return;
 
-        float volume = MathHelper.clamp(activeFlaps / 20f, 0.25f, 1.5f);
-        float bgVolume = MathHelper.clamp(activeFlaps / 40f, 0.25f, 1f);
-        BlockPos middle = pos.offset(getDirection().rotateYClockwise(), xSize / 2).offset(Direction.DOWN, ySize / 2);
-        AllSoundEvents.SCROLL_VALUE.playAt(world, middle, volume, 0.56f, false);
-        world.playSoundClient(
-            middle.getX(),
-            middle.getY(),
-            middle.getZ(),
-            SoundEvents.BLOCK_CALCITE_HIT,
-            SoundCategory.BLOCKS,
-            .35f * bgVolume,
-            1.95f,
-            false
-        );
+        float volume = Mth.clamp(activeFlaps / 20f, 0.25f, 1.5f);
+        float bgVolume = Mth.clamp(activeFlaps / 40f, 0.25f, 1f);
+        BlockPos middle = worldPosition.relative(getDirection().getClockWise(), xSize / 2).relative(Direction.DOWN, ySize / 2);
+        AllSoundEvents.SCROLL_VALUE.playAt(level, middle, volume, 0.56f, false);
+        level.playLocalSound(middle.getX(), middle.getY(), middle.getZ(), SoundEvents.CALCITE_HIT, SoundSource.BLOCKS, .35f * bgVolume, 1.95f, false);
     }
 
     @Override
@@ -144,7 +139,7 @@ public class FlapDisplayBlockEntity extends KineticBlockEntity implements Displa
         return isRunning;
     }
 
-    public void applyTextManually(int lineIndex, Text componentText) {
+    public void applyTextManually(int lineIndex, Component componentText) {
         List<FlapDisplayLayout> lines = getLines();
         if (lineIndex >= lines.size())
             return;
@@ -157,13 +152,13 @@ public class FlapDisplayBlockEntity extends KineticBlockEntity implements Displa
         FlapDisplaySection flapDisplaySection = sections.getFirst();
         if (componentText == null) {
             manualLines[lineIndex] = false;
-            flapDisplaySection.setText(ScreenTexts.EMPTY);
+            flapDisplaySection.setText(CommonComponents.EMPTY);
             notifyUpdate();
             return;
         }
 
         manualLines[lineIndex] = true;
-        Text text = isVirtual() ? componentText : DynamicComponent.parseCustomText(world, pos, componentText);
+        Component text = isVirtual() ? componentText : DynamicComponent.parseCustomText(level, worldPosition, componentText);
         flapDisplaySection.setText(text);
         if (isVirtual())
             flapDisplaySection.refresh(true);
@@ -202,7 +197,7 @@ public class FlapDisplayBlockEntity extends KineticBlockEntity implements Displa
     }
 
     @Override
-    protected void write(WriteView view, boolean clientPacket) {
+    protected void write(ValueOutput view, boolean clientPacket) {
         super.write(view, clientPacket);
         writeDisplayLink(view);
 
@@ -220,32 +215,32 @@ public class FlapDisplayBlockEntity extends KineticBlockEntity implements Displa
 
         for (int j = 0; j < colour.length; j++)
             if (colour[j] != null)
-                view.put("Dye" + j, DyeColor.CODEC, colour[j]);
+                view.store("Dye" + j, DyeColor.CODEC, colour[j]);
 
         List<FlapDisplayLayout> lines = getLines();
         for (int i = 0; i < lines.size(); i++)
-            lines.get(i).write(view.get("Display" + i));
+            lines.get(i).write(view.child("Display" + i));
     }
 
     @Override
-    protected void read(ReadView view, boolean clientPacket) {
+    protected void read(ValueInput view, boolean clientPacket) {
         super.read(view, clientPacket);
         readDisplayLink(view);
         boolean wasActive = isController;
         int prevX = xSize;
         int prevY = ySize;
 
-        isController = view.getBoolean("Controller", false);
-        xSize = view.getInt("XSize", 0);
-        ySize = view.getInt("YSize", 0);
+        isController = view.getBooleanOr("Controller", false);
+        xSize = view.getIntOr("XSize", 0);
+        ySize = view.getIntOr("YSize", 0);
 
         manualLines = new boolean[ySize * 2];
         for (int i = 0; i < ySize * 2; i++)
-            manualLines[i] = view.getBoolean("CustomLine" + i, false);
+            manualLines[i] = view.getBooleanOr("CustomLine" + i, false);
 
         glowingLines = new boolean[ySize * 2];
         for (int i = 0; i < ySize * 2; i++)
-            glowingLines[i] = view.getBoolean("GlowingLine" + i, false);
+            glowingLines[i] = view.getBooleanOr("GlowingLine" + i, false);
 
         colour = new DyeColor[ySize * 2];
         for (int i = 0; i < ySize * 2; i++)
@@ -258,38 +253,38 @@ public class FlapDisplayBlockEntity extends KineticBlockEntity implements Displa
 
         List<FlapDisplayLayout> lines = getLines();
         for (int i = 0; i < lines.size(); i++)
-            lines.get(i).read(view.getReadView("Display" + i));
+            lines.get(i).read(view.childOrEmpty("Display" + i));
     }
 
     public int getLineIndexAt(double yCoord) {
-        return (int) MathHelper.clamp(Math.floor(2 * (pos.getY() - yCoord + 1)), 0, ySize * 2);
+        return (int) Mth.clamp(Math.floor(2 * (worldPosition.getY() - yCoord + 1)), 0, ySize * 2);
     }
 
     public FlapDisplayBlockEntity getController() {
         if (isController)
             return this;
 
-        BlockState blockState = getCachedState();
+        BlockState blockState = getBlockState();
         if (!(blockState.getBlock() instanceof FlapDisplayBlock))
             return null;
 
-        BlockPos.Mutable pos = getPos().mutableCopy();
-        Direction side = blockState.get(FlapDisplayBlock.HORIZONTAL_FACING).rotateYClockwise();
+        BlockPos.MutableBlockPos pos = getBlockPos().mutable();
+        Direction side = blockState.getValue(FlapDisplayBlock.HORIZONTAL_FACING).getClockWise();
 
         for (int i = 0; i < 64; i++) {
-            BlockState other = world.getBlockState(pos);
+            BlockState other = level.getBlockState(pos);
 
-            if (other.get(FlapDisplayBlock.UP, false)) {
+            if (other.getValueOrElse(FlapDisplayBlock.UP, false)) {
                 pos.move(Direction.UP);
                 continue;
             }
 
-            if (!world.getBlockState(pos.offset(side)).get(FlapDisplayBlock.UP, true)) {
+            if (!level.getBlockState(pos.relative(side)).getValueOrElse(FlapDisplayBlock.UP, true)) {
                 pos.move(side);
                 continue;
             }
 
-            BlockEntity found = world.getBlockEntity(pos);
+            BlockEntity found = level.getBlockEntity(pos);
             if (found instanceof FlapDisplayBlockEntity flap && flap.isController)
                 return flap;
 
@@ -300,16 +295,16 @@ public class FlapDisplayBlockEntity extends KineticBlockEntity implements Displa
     }
 
     @Override
-    protected Box createRenderBoundingBox() {
-        Box aabb = new Box(pos);
+    protected AABB createRenderBoundingBox() {
+        AABB aabb = new AABB(worldPosition);
         if (!isController)
             return aabb;
-        Vec3i normal = getDirection().rotateYClockwise().getVector();
-        return aabb.stretch(normal.getX() * xSize, -ySize, normal.getZ() * xSize);
+        Vec3i normal = getDirection().getClockWise().getUnitVec3i();
+        return aabb.expandTowards(normal.getX() * xSize, -ySize, normal.getZ() * xSize);
     }
 
     public Direction getDirection() {
-        return getCachedState().get(FlapDisplayBlock.HORIZONTAL_FACING, Direction.SOUTH).getOpposite();
+        return getBlockState().getValueOrElse(FlapDisplayBlock.HORIZONTAL_FACING, Direction.SOUTH).getOpposite();
     }
 
     public boolean isLineGlowing(int line) {

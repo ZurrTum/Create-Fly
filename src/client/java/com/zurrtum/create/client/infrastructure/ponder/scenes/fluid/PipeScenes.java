@@ -23,18 +23,18 @@ import com.zurrtum.create.content.fluids.tank.FluidTankBlockEntity;
 import com.zurrtum.create.content.processing.basin.BasinBlockEntity;
 import com.zurrtum.create.foundation.blockEntity.behaviour.fluid.SmartFluidTankBehaviour;
 import com.zurrtum.create.infrastructure.fluids.FluidStack;
-import net.minecraft.block.BeehiveBlock;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.fluid.Fluids;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.state.property.BooleanProperty;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Direction.Axis;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.Direction.Axis;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.level.block.BeehiveBlock;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.BooleanProperty;
+import net.minecraft.world.level.material.Fluids;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
 
 public class PipeScenes {
 
@@ -45,10 +45,10 @@ public class PipeScenes {
         scene.showBasePlate();
         scene.idle(5);
 
-        BlockState pipeState = AllBlocks.FLUID_PIPE.getDefaultState().with(FluidPipeBlock.UP, false).with(FluidPipeBlock.DOWN, false);
+        BlockState pipeState = AllBlocks.FLUID_PIPE.defaultBlockState().setValue(FluidPipeBlock.UP, false).setValue(FluidPipeBlock.DOWN, false);
 
-        scene.world().setBlock(util.grid().at(2, 1, 1), pipeState.with(FluidPipeBlock.NORTH, false).with(FluidPipeBlock.SOUTH, false), false);
-        scene.world().setBlock(util.grid().at(1, 1, 2), pipeState.with(FluidPipeBlock.WEST, false).with(FluidPipeBlock.EAST, false), false);
+        scene.world().setBlock(util.grid().at(2, 1, 1), pipeState.setValue(FluidPipeBlock.NORTH, false).setValue(FluidPipeBlock.SOUTH, false), false);
+        scene.world().setBlock(util.grid().at(1, 1, 2), pipeState.setValue(FluidPipeBlock.WEST, false).setValue(FluidPipeBlock.EAST, false), false);
 
         Selection largeCog = util.select().position(5, 0, 1);
         Selection kinetics = util.select().fromTo(5, 1, 0, 3, 1, 0);
@@ -79,22 +79,22 @@ public class PipeScenes {
 
         scene.idle(60);
 
-        scene.overlay().showControls(util.vector().centerOf(2, 1, 1), Pointing.DOWN, 40).rightClick().withItem(AllItems.WRENCH.getDefaultStack());
+        scene.overlay().showControls(util.vector().centerOf(2, 1, 1), Pointing.DOWN, 40).rightClick().withItem(AllItems.WRENCH.getDefaultInstance());
         scene.idle(7);
         scene.world().restoreBlocks(util.select().position(2, 1, 1));
         scene.overlay().showText(70).attachKeyFrame().pointAt(util.vector().centerOf(2, 1, 1)).placeNearTarget()
             .text("Using a wrench, a straight pipe segment can be given a window");
         scene.idle(40);
 
-        scene.overlay().showControls(util.vector().centerOf(1, 1, 2), Pointing.DOWN, 10).rightClick().withItem(AllItems.WRENCH.getDefaultStack());
+        scene.overlay().showControls(util.vector().centerOf(1, 1, 2), Pointing.DOWN, 10).rightClick().withItem(AllItems.WRENCH.getDefaultInstance());
         scene.idle(7);
         scene.world().restoreBlocks(util.select().position(1, 1, 2));
         scene.idle(40);
 
-        Vec3d center = util.vector().centerOf(2, 1, 2);
-        Box bb = new Box(center, center).expand(1 / 6f);
-        Box bb1 = bb.offset(-0.5, 0, 0);
-        Box bb2 = bb.offset(0, 0, -0.5);
+        Vec3 center = util.vector().centerOf(2, 1, 2);
+        AABB bb = new AABB(center, center).inflate(1 / 6f);
+        AABB bb1 = bb.move(-0.5, 0, 0);
+        AABB bb2 = bb.move(0, 0, -0.5);
 
         scene.world().showSection(strayPipes, Direction.DOWN);
         scene.idle(10);
@@ -111,7 +111,7 @@ public class PipeScenes {
         scene.idle(10);
 
         BlockPos pumpPos = util.grid().at(3, 1, 1);
-        scene.world().setBlock(pumpPos, AllBlocks.MECHANICAL_PUMP.getDefaultState().with(PumpBlock.FACING, Direction.WEST), true);
+        scene.world().setBlock(pumpPos, AllBlocks.MECHANICAL_PUMP.defaultBlockState().setValue(PumpBlock.FACING, Direction.WEST), true);
         scene.idle(10);
         scene.world().showSection(largeCog, Direction.UP);
         scene.world().showSection(kinetics, Direction.SOUTH);
@@ -211,27 +211,27 @@ public class PipeScenes {
         scene.idle(5);
         scene.world().hideSection(tank, Direction.EAST);
         scene.idle(5);
-        scene.world().setBlock(drainPos, Blocks.AIR.getDefaultState(), false);
+        scene.world().setBlock(drainPos, Blocks.AIR.defaultBlockState(), false);
         scene.world().propagatePipeChange(pumpPos);
         scene.world().hideSection(basin, Direction.NORTH);
         scene.idle(5);
-        scene.world().setBlock(util.grid().at(3, 1, 1), Blocks.AIR.getDefaultState(), false);
+        scene.world().setBlock(util.grid().at(3, 1, 1), Blocks.AIR.defaultBlockState(), false);
         scene.idle(5);
-        scene.world().setBlock(util.grid().at(3, 1, 3), AllBlocks.GLASS_FLUID_PIPE.getDefaultState().with(AxisPipeBlock.AXIS, Axis.Z), false);
+        scene.world().setBlock(util.grid().at(3, 1, 3), AllBlocks.GLASS_FLUID_PIPE.defaultBlockState().setValue(AxisPipeBlock.AXIS, Axis.Z), false);
         scene.idle(10);
         //		scene.world().multiplyKineticSpeed(util.select.everywhere(), 2);
         scene.world().propagatePipeChange(pumpPos);
         ElementLink<WorldSectionElement> water = scene.world().showIndependentSection(waterSourceS, Direction.DOWN);
         scene.world().moveSection(water, util.vector().of(0, 0, 1), 0);
         scene.idle(10);
-        scene.world().setBlock(drainPos, Blocks.WATER.getDefaultState(), false);
+        scene.world().setBlock(drainPos, Blocks.WATER.defaultBlockState(), false);
         scene.idle(20);
 
         scene.overlay().showText(60).text("Source blocks right in front of an open end can be picked up...").attachKeyFrame().placeNearTarget()
             .pointAt(util.vector().blockSurface(drainPos, Direction.SOUTH));
 
         scene.idle(40);
-        scene.world().setBlock(drainPos.north(), Blocks.AIR.getDefaultState(), false);
+        scene.world().setBlock(drainPos.north(), Blocks.AIR.defaultBlockState(), false);
         scene.idle(40);
         ElementLink<WorldSectionElement> target = scene.world().showIndependentSection(waterTargetS, Direction.UP);
         scene.world().moveSection(target, util.vector().of(-1, 0, 0), 0);
@@ -244,9 +244,9 @@ public class PipeScenes {
         scene.idle(80);
         scene.world().hideIndependentSection(target, Direction.DOWN);
         scene.idle(5);
-        scene.world().setBlock(drainPos, Blocks.BEE_NEST.getDefaultState().with(BeehiveBlock.HONEY_LEVEL, 5), false);
+        scene.world().setBlock(drainPos, Blocks.BEE_NEST.defaultBlockState().setValue(BeehiveBlock.HONEY_LEVEL, 5), false);
         scene.world().showSection(drain, Direction.DOWN);
-        scene.world().setBlock(util.grid().at(3, 1, 2), AllBlocks.FLUID_TANK.getDefaultState(), false);
+        scene.world().setBlock(util.grid().at(3, 1, 2), AllBlocks.FLUID_TANK.defaultBlockState(), false);
         scene.world().propagatePipeChange(pumpPos);
         scene.idle(15);
 
@@ -254,7 +254,7 @@ public class PipeScenes {
             .pointAt(util.vector().topOf(drainPos));
 
         scene.idle(60);
-        scene.world().setBlock(drainPos, Blocks.BEE_NEST.getDefaultState().with(BeehiveBlock.HONEY_LEVEL, 0), false);
+        scene.world().setBlock(drainPos, Blocks.BEE_NEST.defaultBlockState().setValue(BeehiveBlock.HONEY_LEVEL, 0), false);
     }
 
     public static void encasing(SceneBuilder scene, SceneBuildingUtil util) {
@@ -267,8 +267,9 @@ public class PipeScenes {
         scene.world().showSection(util.select().layer(1), Direction.DOWN);
         scene.idle(15);
 
-        BlockState copperEncased = AllBlocks.ENCASED_FLUID_PIPE.getDefaultState().with(FluidPipeBlock.SOUTH, true).with(FluidPipeBlock.WEST, true);
-        ItemStack casingItem = AllItems.COPPER_CASING.getDefaultStack();
+        BlockState copperEncased = AllBlocks.ENCASED_FLUID_PIPE.defaultBlockState().setValue(FluidPipeBlock.SOUTH, true)
+            .setValue(FluidPipeBlock.WEST, true);
+        ItemStack casingItem = AllItems.COPPER_CASING.getDefaultInstance();
 
         scene.overlay().showControls(util.vector().topOf(3, 1, 1), Pointing.DOWN, 60).rightClick().withItem(casingItem);
         scene.idle(7);
@@ -280,7 +281,7 @@ public class PipeScenes {
 
         scene.idle(70);
         scene.world().destroyBlock(util.grid().at(2, 1, 1));
-        scene.world().modifyBlock(util.grid().at(1, 1, 1), s -> s.with(FluidPipeBlock.EAST, false).with(FluidPipeBlock.NORTH, true), false);
+        scene.world().modifyBlock(util.grid().at(1, 1, 1), s -> s.setValue(FluidPipeBlock.EAST, false).setValue(FluidPipeBlock.NORTH, true), false);
         scene.idle(5);
 
         scene.overlay().showLine(PonderPalette.RED, util.vector().of(1.5, 1.75, 1), util.vector().of(1.5, 1.75, 2), 80);
@@ -294,15 +295,15 @@ public class PipeScenes {
             .pointAt(util.vector().blockSurface(util.grid().at(3, 1, 1), Direction.WEST));
 
         scene.idle(70);
-        BlockState defaultState = AllBlocks.FLUID_PIPE.getDefaultState();
-        for (BooleanProperty booleanProperty : FluidPipeBlock.FACING_PROPERTIES.values())
-            defaultState = defaultState.with(booleanProperty, false);
+        BlockState defaultState = AllBlocks.FLUID_PIPE.defaultBlockState();
+        for (BooleanProperty booleanProperty : FluidPipeBlock.PROPERTY_BY_DIRECTION.values())
+            defaultState = defaultState.setValue(booleanProperty, false);
 
-        scene.world().setBlock(util.grid().at(3, 2, 1), defaultState.with(FluidPipeBlock.EAST, true).with(FluidPipeBlock.WEST, true), false);
-        scene.world().setBlock(util.grid().at(1, 2, 1), defaultState.with(FluidPipeBlock.UP, true).with(FluidPipeBlock.DOWN, true), false);
+        scene.world().setBlock(util.grid().at(3, 2, 1), defaultState.setValue(FluidPipeBlock.EAST, true).setValue(FluidPipeBlock.WEST, true), false);
+        scene.world().setBlock(util.grid().at(1, 2, 1), defaultState.setValue(FluidPipeBlock.UP, true).setValue(FluidPipeBlock.DOWN, true), false);
         scene.world().showSection(util.select().layer(2), Direction.DOWN);
         scene.idle(10);
-        scene.world().modifyBlock(util.grid().at(1, 1, 1), s -> s.with(FluidPipeBlock.UP, true).with(FluidPipeBlock.NORTH, false), false);
+        scene.world().modifyBlock(util.grid().at(1, 1, 1), s -> s.setValue(FluidPipeBlock.UP, true).setValue(FluidPipeBlock.NORTH, false), false);
         scene.idle(20);
 
         scene.overlay().showText(60).placeNearTarget().colored(PonderPalette.RED)
@@ -330,8 +331,9 @@ public class PipeScenes {
         scene.world().setKineticSpeed(pipes1, 0);
         scene.world().propagatePipeChange(pumpPos);
         scene.world().setBlock(valvePos, AllBlocks.FLUID_PIPE.getAxisState(Axis.X), false);
-        scene.world().setBlock(util.grid().at(3, 1, 1), Blocks.AIR.getDefaultState(), false);
-        scene.world().setBlock(util.grid().at(3, 1, 1), AllBlocks.GLASS_FLUID_PIPE.getDefaultState().with(GlassFluidPipeBlock.AXIS, Axis.X), false);
+        scene.world().setBlock(util.grid().at(3, 1, 1), Blocks.AIR.defaultBlockState(), false);
+        scene.world()
+            .setBlock(util.grid().at(3, 1, 1), AllBlocks.GLASS_FLUID_PIPE.defaultBlockState().setValue(GlassFluidPipeBlock.AXIS, Axis.X), false);
 
         scene.idle(5);
         scene.world().showSection(tank1, Direction.NORTH);
@@ -369,7 +371,7 @@ public class PipeScenes {
         scene.effects().rotationSpeedIndicator(handlePos);
         scene.world().modifyBlockEntity(valvePos, FluidValveBlockEntity.class, be -> be.onSpeedChanged(0));
         scene.idle(22);
-        scene.world().modifyBlock(valvePos, s -> s.with(FluidValveBlock.ENABLED, true), false);
+        scene.world().modifyBlock(valvePos, s -> s.setValue(FluidValveBlock.ENABLED, true), false);
         scene.effects().indicateSuccess(valvePos);
         scene.idle(5);
         scene.world().setKineticSpeed(valveKinetics, 0);
@@ -387,7 +389,7 @@ public class PipeScenes {
         scene.effects().rotationSpeedIndicator(handlePos);
         scene.world().modifyBlockEntity(valvePos, FluidValveBlockEntity.class, be -> be.onSpeedChanged(0));
         scene.idle(22);
-        scene.world().modifyBlock(valvePos, s -> s.with(FluidValveBlock.ENABLED, false), false);
+        scene.world().modifyBlock(valvePos, s -> s.setValue(FluidValveBlock.ENABLED, false), false);
         scene.effects().indicateRedstone(valvePos);
         scene.world().propagatePipeChange(pumpPos);
         scene.idle(5);
@@ -417,10 +419,11 @@ public class PipeScenes {
 
         scene.world().setBlock(util.grid().at(3, 1, 3), AllBlocks.FLUID_PIPE.getAxisState(Axis.X), false);
         scene.world().setBlock(smartPos, AllBlocks.FLUID_PIPE.getAxisState(Axis.X), false);
-        scene.world().setBlock(util.grid().at(2, 1, 3), AllBlocks.GLASS_FLUID_PIPE.getDefaultState().with(GlassFluidPipeBlock.AXIS, Axis.X), false);
+        scene.world()
+            .setBlock(util.grid().at(2, 1, 3), AllBlocks.GLASS_FLUID_PIPE.defaultBlockState().setValue(GlassFluidPipeBlock.AXIS, Axis.X), false);
         scene.world().setBlock(
             util.grid().at(1, 1, 3),
-            AllBlocks.FLUID_PIPE.getAxisState(Axis.X).with(FluidPipeBlock.NORTH, true).with(FluidPipeBlock.WEST, false),
+            AllBlocks.FLUID_PIPE.getAxisState(Axis.X).setValue(FluidPipeBlock.NORTH, true).setValue(FluidPipeBlock.WEST, false),
             false
         );
 
@@ -434,7 +437,7 @@ public class PipeScenes {
         scene.world().destroyBlock(smartPos);
         scene.world().restoreBlocks(util.select().position(smartPos));
 
-        Vec3d filterVec = util.vector().topOf(smartPos).subtract(0.25, 0, 0);
+        Vec3 filterVec = util.vector().topOf(smartPos).subtract(0.25, 0, 0);
         scene.overlay().showText(50).placeNearTarget().text("Smart pipes can help control flows by fluid type").pointAt(filterVec);
         scene.idle(60);
 
@@ -443,7 +446,7 @@ public class PipeScenes {
         scene.idle(90);
 
         FluidStack chocolate = new FluidStack(AllFluids.CHOCOLATE, 81000);
-        ItemStack bucket = AllItems.CHOCOLATE_BUCKET.getDefaultStack();
+        ItemStack bucket = AllItems.CHOCOLATE_BUCKET.getDefaultInstance();
         ItemStack milkBucket = new ItemStack(Items.MILK_BUCKET);
         scene.overlay().showControls(filterVec, Pointing.DOWN, 80).rightClick().withItem(bucket);
         scene.idle(7);

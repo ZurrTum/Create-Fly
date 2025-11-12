@@ -4,7 +4,6 @@ import it.unimi.dsi.fastutil.objects.Object2IntLinkedOpenCustomHashMap;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntSortedMap;
 import it.unimi.dsi.fastutil.objects.ObjectIterator;
-import net.minecraft.util.math.Direction;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -12,6 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.function.Predicate;
+import net.minecraft.core.Direction;
 
 public interface SidedFluidInventory extends FluidInventory {
     boolean canExtract(int slot, FluidStack stack, Direction dir);
@@ -642,7 +642,7 @@ public interface SidedFluidInventory extends FluidInventory {
     @Override
     @NotNull
     default java.util.Iterator<FluidStack> iterator(Direction side) {
-        return new Iterator(this, side);
+        return new com.zurrtum.create.infrastructure.fluids.SidedFluidInventory.Iterator(this, side);
     }
 
     @Override

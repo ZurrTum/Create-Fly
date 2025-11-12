@@ -15,15 +15,14 @@ import me.shedaniel.rei.api.common.entry.EntryIngredient;
 import me.shedaniel.rei.api.common.entry.EntryStack;
 import me.shedaniel.rei.api.common.registry.display.DisplayConsumer;
 import me.shedaniel.rei.api.common.util.EntryIngredients;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.network.codec.PacketCodec;
-import net.minecraft.network.codec.PacketCodecs;
-import net.minecraft.recipe.RecipeEntry;
-import net.minecraft.registry.Registries;
-import net.minecraft.util.Identifier;
-
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.crafting.RecipeHolder;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
@@ -31,33 +30,33 @@ import java.util.stream.Stream;
 import static com.zurrtum.create.Create.MOD_ID;
 
 public record SpoutFillingDisplay(
-    EntryIngredient input, EntryIngredient fluid, EntryIngredient output, Optional<Identifier> location
+    EntryIngredient input, EntryIngredient fluid, EntryIngredient output, Optional<ResourceLocation> location
 ) implements Display {
-    public static final Identifier POTIONS = Identifier.of(MOD_ID, "potions");
+    public static final ResourceLocation POTIONS = ResourceLocation.fromNamespaceAndPath(MOD_ID, "potions");
     public static final DisplaySerializer<SpoutFillingDisplay> SERIALIZER = DisplaySerializer.of(
         RecordCodecBuilder.mapCodec(instance -> instance.group(
             EntryIngredient.codec().fieldOf("input").forGetter(SpoutFillingDisplay::input),
             EntryIngredient.codec().fieldOf("fluid").forGetter(SpoutFillingDisplay::fluid),
             EntryIngredient.codec().fieldOf("output").forGetter(SpoutFillingDisplay::output),
-            Identifier.CODEC.optionalFieldOf("location").forGetter(SpoutFillingDisplay::location)
-        ).apply(instance, SpoutFillingDisplay::new)), PacketCodec.tuple(
+            ResourceLocation.CODEC.optionalFieldOf("location").forGetter(SpoutFillingDisplay::location)
+        ).apply(instance, SpoutFillingDisplay::new)), StreamCodec.composite(
             EntryIngredient.streamCodec(),
             SpoutFillingDisplay::input,
             EntryIngredient.streamCodec(),
             SpoutFillingDisplay::fluid,
             EntryIngredient.streamCodec(),
             SpoutFillingDisplay::output,
-            PacketCodecs.optional(Identifier.PACKET_CODEC),
+            ByteBufCodecs.optional(ResourceLocation.STREAM_CODEC),
             SpoutFillingDisplay::location,
             SpoutFillingDisplay::new
         )
     );
 
-    public SpoutFillingDisplay(RecipeEntry<FillingRecipe> entry) {
-        this(entry.id().getValue(), entry.value());
+    public SpoutFillingDisplay(RecipeHolder<FillingRecipe> entry) {
+        this(entry.id().location(), entry.value());
     }
 
-    public SpoutFillingDisplay(Identifier id, FillingRecipe recipe) {
+    public SpoutFillingDisplay(ResourceLocation id, FillingRecipe recipe) {
         this(
             EntryIngredients.ofIngredient(recipe.ingredient()),
             IngredientHelper.createEntryIngredient(recipe.fluidIngredient()),
@@ -69,7 +68,7 @@ public record SpoutFillingDisplay(
     public static void register(Stream<EntryStack<?>> itemStream, Stream<EntryStack<?>> fluidStream, DisplayConsumer registry) {
         List<FluidStack> fluids = fluidStream.map(entry -> {
             dev.architectury.fluid.FluidStack stack = entry.castValue();
-            return new FluidStack(stack.getFluid(), stack.getAmount(), stack.getComponents().getChanges());
+            return new FluidStack(stack.getFluid(), stack.getAmount(), stack.getComponents().asPatch());
         }).toList();
         itemStream.forEach(entry -> {
             ItemStack stack = entry.castValue();
@@ -99,10 +98,10 @@ public record SpoutFillingDisplay(
                     ItemStack result = capability.getContainer();
                     if (!result.isEmpty()) {
                         Item item = stack.getItem();
-                        if (!result.isOf(item)) {
-                            Identifier itemName = Registries.ITEM.getId(item);
-                            Identifier fluidName = Registries.FLUID.getId(fluid.getFluid());
-                            Identifier id = Identifier.of(
+                        if (!result.is(item)) {
+                            ResourceLocation itemName = BuiltInRegistries.ITEM.getKey(item);
+                            ResourceLocation fluidName = BuiltInRegistries.FLUID.getKey(fluid.getFluid());
+                            ResourceLocation id = ResourceLocation.fromNamespaceAndPath(
                                 MOD_ID,
                                 "fill_" + itemName.getNamespace() + "_" + itemName.getPath() + "_with_" + fluidName.getNamespace() + "_" + fluidName.getPath()
                             );
@@ -136,7 +135,7 @@ public record SpoutFillingDisplay(
     }
 
     @Override
-    public Optional<Identifier> getDisplayLocation() {
+    public Optional<ResourceLocation> getDisplayLocation() {
         return location;
     }
 

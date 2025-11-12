@@ -7,27 +7,26 @@ import com.zurrtum.create.content.redstone.displayLink.target.DisplayTargetStats
 import com.zurrtum.create.content.trains.display.FlapDisplayBlockEntity;
 import com.zurrtum.create.content.trains.display.FlapDisplayLayout;
 import com.zurrtum.create.content.trains.display.FlapDisplaySection;
-import net.minecraft.text.MutableText;
-import net.minecraft.text.Text;
-
 import java.util.List;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
 
 public abstract class SingleLineDisplaySource extends DisplaySource {
 
-    protected abstract MutableText provideLine(DisplayLinkContext context, DisplayTargetStats stats);
+    protected abstract MutableComponent provideLine(DisplayLinkContext context, DisplayTargetStats stats);
 
     public abstract boolean allowsLabeling(DisplayLinkContext context);
 
     @Override
-    public List<MutableText> provideText(DisplayLinkContext context, DisplayTargetStats stats) {
-        MutableText line = provideLine(context, stats);
+    public List<MutableComponent> provideText(DisplayLinkContext context, DisplayTargetStats stats) {
+        MutableComponent line = provideLine(context, stats);
         if (line == EMPTY_LINE)
             return EMPTY;
 
         if (allowsLabeling(context)) {
-            String label = context.sourceConfig().getString("Label", "");
+            String label = context.sourceConfig().getStringOr("Label", "");
             if (!label.isEmpty()) {
-                line = Text.literal(label + " ").append(line);
+                line = Component.literal(label + " ").append(line);
             }
         }
 
@@ -35,12 +34,12 @@ public abstract class SingleLineDisplaySource extends DisplaySource {
     }
 
     @Override
-    public List<List<MutableText>> provideFlapDisplayText(DisplayLinkContext context, DisplayTargetStats stats) {
+    public List<List<MutableComponent>> provideFlapDisplayText(DisplayLinkContext context, DisplayTargetStats stats) {
 
         if (allowsLabeling(context)) {
-            String label = context.sourceConfig().getString("Label", "");
+            String label = context.sourceConfig().getStringOr("Label", "");
             if (!label.isEmpty()) {
-                return ImmutableList.of(ImmutableList.of(Text.literal(label + " "), provideLine(context, stats)));
+                return ImmutableList.of(ImmutableList.of(Component.literal(label + " "), provideLine(context, stats)));
             }
         }
 
@@ -57,7 +56,7 @@ public abstract class SingleLineDisplaySource extends DisplaySource {
             return;
         }
 
-        String label = context.sourceConfig().getString("Label", "");
+        String label = context.sourceConfig().getStringOr("Label", "");
 
         if (label.isEmpty()) {
             if (!layout.isLayout(layoutKey))

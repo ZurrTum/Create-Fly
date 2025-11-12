@@ -1,21 +1,21 @@
 package com.zurrtum.create.foundation.utility;
 
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
 
 public abstract class AbstractBlockBreakQueue {
     protected Consumer<BlockPos> makeCallbackFor(
-        World world,
+        Level world,
         float effectChance,
         ItemStack toDamage,
-        @Nullable PlayerEntity playerEntity,
+        @Nullable Player playerEntity,
         BiConsumer<BlockPos, ItemStack> drop
     ) {
         return pos -> {
@@ -23,11 +23,11 @@ public abstract class AbstractBlockBreakQueue {
         };
     }
 
-    public void destroyBlocks(World world, @Nullable LivingEntity entity, BiConsumer<BlockPos, ItemStack> drop) {
-        PlayerEntity playerEntity = entity instanceof PlayerEntity ? ((PlayerEntity) entity) : null;
-        ItemStack toDamage = playerEntity != null && !playerEntity.isCreative() ? playerEntity.getMainHandStack() : ItemStack.EMPTY;
+    public void destroyBlocks(Level world, @Nullable LivingEntity entity, BiConsumer<BlockPos, ItemStack> drop) {
+        Player playerEntity = entity instanceof Player ? ((Player) entity) : null;
+        ItemStack toDamage = playerEntity != null && !playerEntity.isCreative() ? playerEntity.getMainHandItem() : ItemStack.EMPTY;
         destroyBlocks(world, toDamage, playerEntity, drop);
     }
 
-    public abstract void destroyBlocks(World world, ItemStack toDamage, @Nullable PlayerEntity playerEntity, BiConsumer<BlockPos, ItemStack> drop);
+    public abstract void destroyBlocks(Level world, ItemStack toDamage, @Nullable Player playerEntity, BiConsumer<BlockPos, ItemStack> drop);
 }

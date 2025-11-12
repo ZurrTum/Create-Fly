@@ -1,6 +1,6 @@
 package com.zurrtum.create.client.flywheel.impl.visual;
 
-import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.Mth;
 
 public class BandedPrimeLimiter implements DistanceUpdateLimiterImpl {
     // 1 followed by the prime numbers
@@ -19,10 +19,10 @@ public class BandedPrimeLimiter implements DistanceUpdateLimiterImpl {
     }
 
     protected int getUpdateDivisor(double distanceSquared) {
-        int dSq = MathHelper.ceil(distanceSquared);
+        int dSq = Mth.ceil(distanceSquared);
 
         int i = (dSq / 2048);
 
-        return DIVISOR_SEQUENCE[MathHelper.clamp(i, 0, DIVISOR_SEQUENCE.length - 1)];
+        return DIVISOR_SEQUENCE[Mth.clamp(i, 0, DIVISOR_SEQUENCE.length - 1)];
     }
 }

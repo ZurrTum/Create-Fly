@@ -15,31 +15,31 @@ import mezz.jei.api.gui.drawable.IDrawable;
 import mezz.jei.api.gui.ingredient.IRecipeSlotsView;
 import mezz.jei.api.recipe.IFocusGroup;
 import mezz.jei.api.recipe.types.IRecipeType;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.fluid.Fluids;
-import net.minecraft.item.Items;
-import net.minecraft.recipe.PreparedRecipes;
-import net.minecraft.recipe.RecipeEntry;
-import net.minecraft.text.Text;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.crafting.RecipeHolder;
+import net.minecraft.world.item.crafting.RecipeMap;
+import net.minecraft.world.level.material.Fluids;
 import org.jetbrains.annotations.NotNull;
 import org.joml.Matrix3x2f;
 
 import java.util.List;
 
-public class FanWashingCategory extends CreateCategory<RecipeEntry<SplashingRecipe>> {
-    public static List<RecipeEntry<SplashingRecipe>> getRecipes(PreparedRecipes preparedRecipes) {
-        return preparedRecipes.getAll(AllRecipeTypes.SPLASHING).stream().toList();
+public class FanWashingCategory extends CreateCategory<RecipeHolder<SplashingRecipe>> {
+    public static List<RecipeHolder<SplashingRecipe>> getRecipes(RecipeMap preparedRecipes) {
+        return preparedRecipes.byType(AllRecipeTypes.SPLASHING).stream().toList();
     }
 
     @Override
     @NotNull
-    public IRecipeType<RecipeEntry<SplashingRecipe>> getRecipeType() {
+    public IRecipeType<RecipeHolder<SplashingRecipe>> getRecipeType() {
         return JeiClientPlugin.FAN_WASHING;
     }
 
     @Override
     @NotNull
-    public Text getTitle() {
+    public Component getTitle() {
         return CreateLang.translateDirect("recipe.fan_washing");
     }
 
@@ -54,7 +54,7 @@ public class FanWashingCategory extends CreateCategory<RecipeEntry<SplashingReci
     }
 
     @Override
-    public void setRecipe(IRecipeLayoutBuilder builder, RecipeEntry<SplashingRecipe> entry, IFocusGroup focuses) {
+    public void setRecipe(IRecipeLayoutBuilder builder, RecipeHolder<SplashingRecipe> entry, IFocusGroup focuses) {
         SplashingRecipe recipe = entry.value();
         List<ChanceOutput> results = recipe.results();
         int outputSize = results.size();
@@ -71,16 +71,16 @@ public class FanWashingCategory extends CreateCategory<RecipeEntry<SplashingReci
     }
 
     @Override
-    public void draw(RecipeEntry<SplashingRecipe> entry, IRecipeSlotsView recipeSlotsView, DrawContext graphics, double mouseX, double mouseY) {
+    public void draw(RecipeHolder<SplashingRecipe> entry, IRecipeSlotsView recipeSlotsView, GuiGraphics graphics, double mouseX, double mouseY) {
         int xOffsetAmount = 1 - Math.min(3, entry.value().results().size());
         AllGuiTextures.JEI_SHADOW.render(graphics, 46, 27);
         AllGuiTextures.JEI_SHADOW.render(graphics, 65, 39);
         AllGuiTextures.JEI_LONG_ARROW.render(graphics, 54 + 7 * xOffsetAmount, 51);
-        graphics.state.addSpecialElement(new FanRenderState(
-            new Matrix3x2f(graphics.getMatrices()),
+        graphics.guiRenderState.submitPicturesInPictureState(new FanRenderState(
+            new Matrix3x2f(graphics.pose()),
             56,
             4,
-            Fluids.WATER.getDefaultState().getBlockState()
+            Fluids.WATER.defaultFluidState().createLegacyBlock()
         ));
     }
 }

@@ -12,17 +12,16 @@ import com.zurrtum.create.content.processing.recipe.HeatCondition;
 import com.zurrtum.create.content.processing.recipe.SizedIngredient;
 import com.zurrtum.create.foundation.fluid.FluidIngredient;
 import com.zurrtum.create.infrastructure.fluids.FluidStack;
-import net.minecraft.item.ItemStack;
-import net.minecraft.network.RegistryByteBuf;
-import net.minecraft.network.codec.PacketCodec;
-import net.minecraft.network.codec.PacketCodecs;
-import net.minecraft.recipe.RecipeSerializer;
-import net.minecraft.recipe.RecipeType;
-import net.minecraft.world.World;
-
 import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.List;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.RecipeSerializer;
+import net.minecraft.world.item.crafting.RecipeType;
+import net.minecraft.world.level.Level;
 
 public record MixingRecipe(
     ItemStack result, FluidStack fluidResult, HeatCondition heat, List<FluidIngredient> fluidIngredients, List<SizedIngredient> ingredients
@@ -43,7 +42,7 @@ public record MixingRecipe(
     }
 
     @Override
-    public boolean matches(BasinInput input, World world) {
+    public boolean matches(BasinInput input, Level world) {
         if (!heat.testBlazeBurner(input.heat())) {
             return false;
         }
@@ -110,16 +109,16 @@ public record MixingRecipe(
             }
             return DataResult.success(recipe);
         });
-        private static final PacketCodec<RegistryByteBuf, MixingRecipe> PACKET_CODEC = PacketCodec.tuple(
-            ItemStack.OPTIONAL_PACKET_CODEC,
+        private static final StreamCodec<RegistryFriendlyByteBuf, MixingRecipe> PACKET_CODEC = StreamCodec.composite(
+            ItemStack.OPTIONAL_STREAM_CODEC,
             MixingRecipe::result,
             FluidStack.OPTIONAL_PACKET_CODEC,
             MixingRecipe::fluidResult,
             HeatCondition.PACKET_CODEC,
             MixingRecipe::heat,
-            FluidIngredient.PACKET_CODEC.collect(PacketCodecs.toList()),
+            FluidIngredient.PACKET_CODEC.apply(ByteBufCodecs.list()),
             MixingRecipe::fluidIngredients,
-            SizedIngredient.PACKET_CODEC.collect(PacketCodecs.toList()),
+            SizedIngredient.PACKET_CODEC.apply(ByteBufCodecs.list()),
             MixingRecipe::ingredients,
             MixingRecipe::new
         );
@@ -130,7 +129,7 @@ public record MixingRecipe(
         }
 
         @Override
-        public PacketCodec<RegistryByteBuf, MixingRecipe> packetCodec() {
+        public StreamCodec<RegistryFriendlyByteBuf, MixingRecipe> streamCodec() {
             return PACKET_CODEC;
         }
     }

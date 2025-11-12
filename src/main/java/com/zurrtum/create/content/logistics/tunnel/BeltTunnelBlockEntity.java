@@ -11,28 +11,27 @@ import com.zurrtum.create.content.logistics.tunnel.BeltTunnelBlock.Shape;
 import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
 import com.zurrtum.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.infrastructure.packet.s2c.TunnelFlapPacket;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.inventory.Inventory;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.state.property.Properties;
-import net.minecraft.storage.ReadView;
-import net.minecraft.storage.WriteView;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.ChunkPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Direction.Axis;
-import net.minecraft.util.math.Direction.AxisDirection;
-
 import java.util.*;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.Direction.Axis;
+import net.minecraft.core.Direction.AxisDirection;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.Container;
+import net.minecraft.world.level.ChunkPos;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 
 public class BeltTunnelBlockEntity extends SmartBlockEntity {
 
     public Map<Direction, LerpedFloat> flaps;
     public Set<Direction> sides;
 
-    public Inventory cap = null;
+    public Container cap = null;
     protected List<Pair<Direction, Boolean>> flapsToSend;
 
     public BeltTunnelBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
@@ -46,37 +45,37 @@ public class BeltTunnelBlockEntity extends SmartBlockEntity {
         return new BeltTunnelBlockEntity(AllBlockEntityTypes.ANDESITE_TUNNEL, pos, state);
     }
 
-    protected void writeFlapsAndSides(WriteView view) {
-        WriteView.ListAppender<Direction> flapsList = view.getListAppender("Flaps", Direction.CODEC);
+    protected void writeFlapsAndSides(ValueOutput view) {
+        ValueOutput.TypedOutputList<Direction> flapsList = view.list("Flaps", Direction.CODEC);
         for (Direction direction : flaps.keySet())
             flapsList.add(direction);
 
-        WriteView.ListAppender<Direction> sidesList = view.getListAppender("Sides", Direction.CODEC);
+        ValueOutput.TypedOutputList<Direction> sidesList = view.list("Sides", Direction.CODEC);
         for (Direction direction : sides)
             sidesList.add(direction);
     }
 
     @Override
-    public void writeSafe(WriteView view) {
+    public void writeSafe(ValueOutput view) {
         writeFlapsAndSides(view);
         super.writeSafe(view);
     }
 
     @Override
-    public void write(WriteView view, boolean clientPacket) {
+    public void write(ValueOutput view, boolean clientPacket) {
         writeFlapsAndSides(view);
         super.write(view, clientPacket);
     }
 
     @Override
-    protected void read(ReadView view, boolean clientPacket) {
+    protected void read(ValueInput view, boolean clientPacket) {
         Set<Direction> newFlaps = new HashSet<>(6);
-        ReadView.TypedListReadView<Direction> flapsList = view.getTypedListView("Flaps", Direction.CODEC);
+        ValueInput.TypedInputList<Direction> flapsList = view.listOrEmpty("Flaps", Direction.CODEC);
         for (Direction direction : flapsList)
             newFlaps.add(direction);
 
         sides.clear();
-        ReadView.TypedListReadView<Direction> sidesList = view.getTypedListView("Sides", Direction.CODEC);
+        ValueInput.TypedInputList<Direction> sidesList = view.listOrEmpty("Sides", Direction.CODEC);
         for (Direction direction : sidesList)
             sides.add(direction);
 
@@ -98,11 +97,11 @@ public class BeltTunnelBlockEntity extends SmartBlockEntity {
     public void updateTunnelConnections() {
         flaps.clear();
         sides.clear();
-        BlockState tunnelState = getCachedState();
+        BlockState tunnelState = getBlockState();
         for (Direction direction : Iterate.horizontalDirections) {
-            if (direction.getAxis() != tunnelState.get(Properties.HORIZONTAL_AXIS)) {
-                boolean positive = direction.getDirection() == AxisDirection.POSITIVE ^ direction.getAxis() == Axis.Z;
-                Shape shape = tunnelState.get(BeltTunnelBlock.SHAPE);
+            if (direction.getAxis() != tunnelState.getValue(BlockStateProperties.HORIZONTAL_AXIS)) {
+                boolean positive = direction.getAxisDirection() == AxisDirection.POSITIVE ^ direction.getAxis() == Axis.Z;
+                Shape shape = tunnelState.getValue(BeltTunnelBlock.SHAPE);
                 if (BeltTunnelBlock.isStraight(tunnelState))
                     continue;
                 if (positive && shape == Shape.T_LEFT)
@@ -114,13 +113,13 @@ public class BeltTunnelBlockEntity extends SmartBlockEntity {
             sides.add(direction);
 
             // Flap might be occluded
-            if (world == null)
+            if (level == null)
                 continue;
-            BlockState nextState = world.getBlockState(pos.offset(direction));
+            BlockState nextState = level.getBlockState(worldPosition.relative(direction));
             if (nextState.getBlock() instanceof BeltTunnelBlock)
                 continue;
             if (nextState.getBlock() instanceof BeltFunnelBlock)
-                if (nextState.get(BeltFunnelBlock.SHAPE) == BeltFunnelBlock.Shape.EXTENDED && nextState.get(BeltFunnelBlock.HORIZONTAL_FACING) == direction.getOpposite())
+                if (nextState.getValue(BeltFunnelBlock.SHAPE) == BeltFunnelBlock.Shape.EXTENDED && nextState.getValue(BeltFunnelBlock.HORIZONTAL_FACING) == direction.getOpposite())
                     continue;
 
             flaps.put(direction, createChasingFlap());
@@ -129,7 +128,7 @@ public class BeltTunnelBlockEntity extends SmartBlockEntity {
     }
 
     public void flap(Direction side, boolean inward) {
-        if (world.isClient()) {
+        if (level.isClientSide()) {
             if (flaps.containsKey(side))
                 flaps.get(side).setValue(inward ? -1 : 1);
             return;
@@ -147,7 +146,7 @@ public class BeltTunnelBlockEntity extends SmartBlockEntity {
     @Override
     public void tick() {
         super.tick();
-        if (!world.isClient()) {
+        if (!level.isClientSide()) {
             if (!flapsToSend.isEmpty())
                 sendFlaps();
             return;
@@ -156,10 +155,10 @@ public class BeltTunnelBlockEntity extends SmartBlockEntity {
     }
 
     private void sendFlaps() {
-        if (world instanceof ServerWorld serverLevel) {
+        if (level instanceof ServerLevel serverLevel) {
             TunnelFlapPacket packet = new TunnelFlapPacket(this, flapsToSend);
-            for (ServerPlayerEntity player : serverLevel.getChunkManager().chunkLoadingManager.getPlayersWatchingChunk(new ChunkPos(pos), false)) {
-                player.networkHandler.sendPacket(packet);
+            for (ServerPlayer player : serverLevel.getChunkSource().chunkMap.getPlayers(new ChunkPos(worldPosition), false)) {
+                player.connection.send(packet);
             }
         }
         flapsToSend.clear();

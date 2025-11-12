@@ -2,13 +2,13 @@ package com.zurrtum.create.foundation.blockEntity.behaviour;
 
 import com.zurrtum.create.content.schematics.requirement.ItemRequirement;
 import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.storage.ReadView;
-import net.minecraft.storage.WriteView;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.BlockView;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 
 import java.util.ConcurrentModificationException;
 
@@ -23,7 +23,7 @@ public abstract class BlockEntityBehaviour<T extends SmartBlockEntity> {
         setLazyTickRate(10);
     }
 
-    public static <T extends BlockEntityBehaviour<?>> T get(BlockView reader, BlockPos pos, BehaviourType<T> type) {
+    public static <T extends BlockEntityBehaviour<?>> T get(BlockGetter reader, BlockPos pos, BehaviourType<T> type) {
         BlockEntity be;
         try {
             be = reader.getBlockEntity(pos);
@@ -55,18 +55,18 @@ public abstract class BlockEntityBehaviour<T extends SmartBlockEntity> {
 
     }
 
-    public void read(ReadView view, boolean clientPacket) {
+    public void read(ValueInput view, boolean clientPacket) {
 
     }
 
-    public void write(WriteView view, boolean clientPacket) {
+    public void write(ValueOutput view, boolean clientPacket) {
 
     }
 
     /**
      * Called when isSafeNBT == true. Defaults to write()
      */
-    public void writeSafe(WriteView view) {
+    public void writeSafe(ValueOutput view) {
         write(view, false);
     }
 
@@ -111,10 +111,10 @@ public abstract class BlockEntityBehaviour<T extends SmartBlockEntity> {
     }
 
     public BlockPos getPos() {
-        return blockEntity.getPos();
+        return blockEntity.getBlockPos();
     }
 
-    public World getWorld() {
-        return blockEntity.getWorld();
+    public Level getLevel() {
+        return blockEntity.getLevel();
     }
 }

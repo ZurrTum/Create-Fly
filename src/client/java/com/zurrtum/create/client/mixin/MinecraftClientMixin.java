@@ -3,6 +3,7 @@ package com.zurrtum.create.client.mixin;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
+import com.mojang.blaze3d.platform.Window;
 import com.zurrtum.create.AllPackets;
 import com.zurrtum.create.catnip.data.WorldAttached;
 import com.zurrtum.create.client.Create;
@@ -69,16 +70,6 @@ import com.zurrtum.create.content.contraptions.minecart.CouplingPhysics;
 import com.zurrtum.create.content.contraptions.minecart.capability.CapabilityMinecartController;
 import com.zurrtum.create.content.kinetics.drill.CobbleGenOptimisation;
 import com.zurrtum.create.foundation.utility.TickBasedCache;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.RunArgs;
-import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.client.network.ClientPlayerInteractionManager;
-import net.minecraft.client.util.Window;
-import net.minecraft.client.world.ClientWorld;
-import net.minecraft.resource.ReloadableResourceManagerImpl;
-import net.minecraft.util.Hand;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -90,49 +81,58 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.main.GameConfig;
+import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.client.multiplayer.MultiPlayerGameMode;
+import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.server.packs.resources.ReloadableResourceManager;
+import net.minecraft.world.InteractionHand;
 
-@Mixin(MinecraftClient.class)
+@Mixin(Minecraft.class)
 public class MinecraftClientMixin {
     @Shadow
     @Nullable
-    public ClientWorld world;
+    public ClientLevel level;
 
     @Shadow
     @Final
-    private ReloadableResourceManagerImpl resourceManager;
+    private ReloadableResourceManager resourceManager;
 
     @Shadow
     @Nullable
-    public ClientPlayerEntity player;
+    public LocalPlayer player;
 
     @Shadow
     @Final
     private Window window;
 
-    @Inject(method = "<init>", at = @At(value = "INVOKE", target = "Lnet/minecraft/resource/ReloadableResourceManagerImpl;reload(Ljava/util/concurrent/Executor;Ljava/util/concurrent/Executor;Ljava/util/concurrent/CompletableFuture;Ljava/util/List;)Lnet/minecraft/resource/ResourceReload;"))
-    private void flywheel$onBeginInitialResourceReload(RunArgs args, CallbackInfo ci) {
+    @Inject(method = "<init>", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/packs/resources/ReloadableResourceManager;createReload(Ljava/util/concurrent/Executor;Ljava/util/concurrent/Executor;Ljava/util/concurrent/CompletableFuture;Ljava/util/List;)Lnet/minecraft/server/packs/resources/ReloadInstance;"))
+    private void flywheel$onBeginInitialResourceReload(GameConfig args, CallbackInfo ci) {
         FlwImpl.freezeRegistries();
     }
 
-    @Inject(method = "<init>", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/util/Window;setVsync(Z)V"))
-    private void register(RunArgs args, CallbackInfo ci) {
-        resourceManager.registerReloader(ObjLoader.INSTANCE);
-        resourceManager.registerReloader(FlwProgramsReloader.INSTANCE);
-        resourceManager.registerReloader(TrainHatInfoReloadListener.LISTENER);
+    @Inject(method = "<init>", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/platform/Window;updateVsync(Z)V"))
+    private void register(GameConfig args, CallbackInfo ci) {
+        resourceManager.registerReloadListener(ObjLoader.INSTANCE);
+        resourceManager.registerReloadListener(FlwProgramsReloader.INSTANCE);
+        resourceManager.registerReloadListener(TrainHatInfoReloadListener.LISTENER);
     }
 
-    @Inject(method = "<init>", at = @At(value = "NEW", target = "net/minecraft/resource/ReloadableResourceManagerImpl"))
-    private void init(RunArgs args, CallbackInfo ci) {
+    @Inject(method = "<init>", at = @At(value = "NEW", target = "net/minecraft/server/packs/resources/ReloadableResourceManager"))
+    private void init(GameConfig args, CallbackInfo ci) {
         UIRenderHelper.init();
     }
 
-    @Inject(method = "onResolutionChanged()V", at = @At("TAIL"))
+    @Inject(method = "resizeDisplay()V", at = @At("TAIL"))
     private void onResolutionChanged(CallbackInfo ci) {
         UIRenderHelper.updateWindowSize(window);
     }
 
     @Inject(method = "method_53522", at = @At("HEAD"))
-    private void endReload(MinecraftClient.LoadingContext loadingContext, Optional<Throwable> error, CallbackInfo ci) {
+    private void endReload(Minecraft.GameLoadCookie loadingContext, Optional<Throwable> error, CallbackInfo ci) {
         BackendManagerImpl.onEndClientResourceReload(error.isPresent());
         RendererReloadCache.onReloadLevelRenderer();
     }
@@ -140,7 +140,7 @@ public class MinecraftClientMixin {
     @Inject(method = "method_24228", at = @At("HEAD"))
     private void endReload(
         boolean bl,
-        MinecraftClient.LoadingContext loadingContext,
+        Minecraft.GameLoadCookie loadingContext,
         CompletableFuture<Void> completableFuture,
         Optional<Throwable> error,
         CallbackInfo ci
@@ -149,8 +149,8 @@ public class MinecraftClientMixin {
         RendererReloadCache.onReloadLevelRenderer();
     }
 
-    @Inject(method = "setWorld(Lnet/minecraft/client/world/ClientWorld;)V", at = @At("HEAD"))
-    private void unload(ClientWorld world, CallbackInfo ci) {
+    @Inject(method = "updateLevelInEngines(Lnet/minecraft/client/multiplayer/ClientLevel;)V", at = @At("HEAD"))
+    private void unload(ClientLevel world, CallbackInfo ci) {
         if (world != null) {
             LevelAttached.invalidateLevel(world);
         }
@@ -160,10 +160,10 @@ public class MinecraftClientMixin {
     private void tickPre(CallbackInfo ci) {
         AnimationTickHolder.tick();
         PonderTooltipHandler.tick();
-        if (world == null || player == null) {
+        if (level == null || player == null) {
             return;
         }
-        MinecraftClient mc = (MinecraftClient) (Object) this;
+        Minecraft mc = (Minecraft) (Object) this;
         PlacementClient.tick(mc);
         GhostBlocks.getInstance().tickGhosts();
         Outliner.getInstance().tickOutlines();
@@ -174,10 +174,10 @@ public class MinecraftClientMixin {
 
     @Inject(method = "tick()V", at = @At("TAIL"))
     private void tickPost(CallbackInfo ci) {
-        if (world == null || player == null) {
+        if (level == null || player == null) {
             return;
         }
-        MinecraftClient mc = (MinecraftClient) (Object) this;
+        Minecraft mc = (Minecraft) (Object) this;
         SoundScapes.tick();
         Create.SCHEMATIC_SENDER.tick(mc);
         Create.SCHEMATIC_AND_QUILL_HANDLER.tick(mc);
@@ -185,11 +185,11 @@ public class MinecraftClientMixin {
         Create.SCHEMATIC_HANDLER.tick(mc);
         Create.ZAPPER_RENDER_HANDLER.tick();
         Create.POTATO_CANNON_RENDER_HANDLER.tick();
-        Create.SOUL_PULSE_EFFECT_HANDLER.tick(world);
+        Create.SOUL_PULSE_EFFECT_HANDLER.tick(level);
         GlobalRailwayManagerClient.tick(mc);
-        ContraptionHandlerClient.tick(world);
-        CapabilityMinecartController.tick(world);
-        CouplingPhysics.tick(world);
+        ContraptionHandlerClient.tick(level);
+        CapabilityMinecartController.tick(level);
+        CouplingPhysics.tick(level);
         ServerSpeedProvider.clientTick(mc);
         BeltConnectorHandler.tick(mc);
         FilteringRenderer.tick(mc);
@@ -230,74 +230,74 @@ public class MinecraftClientMixin {
         SymmetryHandlerClient.onClientTick(mc);
     }
 
-    @Inject(method = "render(Z)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/GameRenderer;render(Lnet/minecraft/client/render/RenderTickCounter;Z)V"))
+    @Inject(method = "runTick(Z)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/GameRenderer;render(Lnet/minecraft/client/DeltaTracker;Z)V"))
     private void render(boolean tick, CallbackInfo ci) {
-        TurntableHandler.gameRenderFrame((MinecraftClient) (Object) this);
+        TurntableHandler.gameRenderFrame((Minecraft) (Object) this);
     }
 
-    @Inject(method = "tick()V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/world/ClientWorld;tick(Ljava/util/function/BooleanSupplier;)V", shift = At.Shift.AFTER))
+    @Inject(method = "tick()V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/multiplayer/ClientLevel;tick(Ljava/util/function/BooleanSupplier;)V", shift = At.Shift.AFTER))
     private void tick(CallbackInfo ci) {
-        VisualizationEventHandler.onClientTick((MinecraftClient) (Object) this, world);
+        VisualizationEventHandler.onClientTick((Minecraft) (Object) this, level);
     }
 
-    @Inject(method = "doItemUse()V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/network/ClientPlayerEntity;getStackInHand(Lnet/minecraft/util/Hand;)Lnet/minecraft/item/ItemStack;"), cancellable = true)
-    private void doItemUse(CallbackInfo ci, @Local Hand hand) {
-        MinecraftClient mc = (MinecraftClient) (Object) this;
-        if (hand == Hand.MAIN_HAND && (CurvedTrackInteraction.onClickInput(mc, false) || Create.GLUE_HANDLER.onMouseInput(
+    @Inject(method = "startUseItem()V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/player/LocalPlayer;getItemInHand(Lnet/minecraft/world/InteractionHand;)Lnet/minecraft/world/item/ItemStack;"), cancellable = true)
+    private void doItemUse(CallbackInfo ci, @Local InteractionHand hand) {
+        Minecraft mc = (Minecraft) (Object) this;
+        if (hand == InteractionHand.MAIN_HAND && (CurvedTrackInteraction.onClickInput(mc, false) || Create.GLUE_HANDLER.onMouseInput(
             mc,
             false
         ) || FactoryPanelConnectionHandler.onRightClick(mc) || ChainConveyorConnectionHandler.onRightClick(mc) || TrainRelocatorClient.onClicked(mc) || ChainConveyorInteractionHandler.onUse(
             mc) || PackagePortTargetSelectionHandler.onUse(mc) || ChainPackageInteractionHandler.onUse(mc))) {
-            player.swingHand(hand);
+            player.swing(hand);
             ci.cancel();
         } else if (ContraptionHandlerClient.rightClickingOnContraptionsGetsHandledLocally(mc, hand)) {
             ci.cancel();
         }
-        if (hand == Hand.MAIN_HAND) {
+        if (hand == InteractionHand.MAIN_HAND) {
             LinkedControllerClientHandler.deactivateInLectern(player);
         }
     }
 
-    @WrapOperation(method = "handleBlockBreaking(Z)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/network/ClientPlayerInteractionManager;updateBlockBreakingProgress(Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/util/math/Direction;)Z"))
-    private boolean handleBlockBreaking(ClientPlayerInteractionManager instance, BlockPos pos, Direction direction, Operation<Boolean> original) {
-        MinecraftClient mc = (MinecraftClient) (Object) this;
+    @WrapOperation(method = "continueAttack(Z)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/multiplayer/MultiPlayerGameMode;continueDestroyBlock(Lnet/minecraft/core/BlockPos;Lnet/minecraft/core/Direction;)Z"))
+    private boolean handleBlockBreaking(MultiPlayerGameMode instance, BlockPos pos, Direction direction, Operation<Boolean> original) {
+        Minecraft mc = (Minecraft) (Object) this;
         return CurvedTrackInteraction.onClickInput(mc, true) || Create.GLUE_HANDLER.onMouseInput(mc, true) || original.call(instance, pos, direction);
     }
 
-    @Inject(method = "doAttack()Z", at = @At(value = "INVOKE", target = "Lnet/minecraft/util/hit/HitResult;getType()Lnet/minecraft/util/hit/HitResult$Type;"), cancellable = true)
+    @Inject(method = "startAttack()Z", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/phys/HitResult;getType()Lnet/minecraft/world/phys/HitResult$Type;"), cancellable = true)
     private void doAttack(CallbackInfoReturnable<Boolean> cir) {
-        MinecraftClient mc = (MinecraftClient) (Object) this;
+        Minecraft mc = (Minecraft) (Object) this;
         if (CurvedTrackInteraction.onClickInput(mc, true) || Create.GLUE_HANDLER.onMouseInput(mc, true)) {
-            player.swingHand(Hand.MAIN_HAND);
+            player.swing(InteractionHand.MAIN_HAND);
             cir.setReturnValue(false);
         }
     }
 
-    @Inject(method = "doAttack()Z", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/network/ClientPlayerEntity;resetLastAttackedTicks()V"))
+    @Inject(method = "startAttack()Z", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/player/LocalPlayer;resetAttackStrengthTicker()V"))
     private void missingAttack(CallbackInfoReturnable<Boolean> cir) {
-        player.networkHandler.sendPacket(AllPackets.LEFT_CLICK);
+        player.connection.send(AllPackets.LEFT_CLICK);
     }
 
-    @Inject(method = "joinWorld(Lnet/minecraft/client/world/ClientWorld;)V", at = @At("HEAD"))
+    @Inject(method = "setLevel(Lnet/minecraft/client/multiplayer/ClientLevel;)V", at = @At("HEAD"))
     private void onJoinWorld(CallbackInfo ci) {
-        if (world != null) {
+        if (level != null) {
             onUnloadWorld(null);
         }
     }
 
-    @Inject(method = "disconnect(Lnet/minecraft/client/gui/screen/Screen;Z)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/hud/InGameHud;clear()V"))
+    @Inject(method = "disconnect(Lnet/minecraft/client/gui/screens/Screen;Z)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/Gui;onDisconnected()V"))
     private void onUnloadWorld(CallbackInfo ci) {
         Create.SCHEMATIC_HANDLER.updateRenderers();
         Create.SOUL_PULSE_EFFECT_HANDLER.refresh();
         AnimationTickHolder.reset();
         ControlsHandler.levelUnloaded();
-        WorldAttached.invalidateWorld(world);
-        CobbleGenOptimisation.invalidateWorld(world);
+        WorldAttached.invalidateWorld(level);
+        CobbleGenOptimisation.invalidateWorld(level);
     }
 
-    @Inject(method = "doItemPick()V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/MinecraftClient;isCtrlPressed()Z"), cancellable = true)
+    @Inject(method = "pickBlock()V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/Minecraft;hasControlDown()Z"), cancellable = true)
     private void doItemPick(CallbackInfo ci) {
-        if (ToolboxHandlerClient.onPickItem((MinecraftClient) (Object) this)) {
+        if (ToolboxHandlerClient.onPickItem((Minecraft) (Object) this)) {
             ci.cancel();
         }
     }

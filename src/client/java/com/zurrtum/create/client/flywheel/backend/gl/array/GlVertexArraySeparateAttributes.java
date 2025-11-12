@@ -3,13 +3,13 @@ package com.zurrtum.create.client.flywheel.backend.gl.array;
 import com.zurrtum.create.client.flywheel.backend.gl.GlCompat;
 import com.zurrtum.create.client.flywheel.backend.gl.GlStateTracker;
 import com.zurrtum.create.client.flywheel.backend.gl.buffer.GlBufferType;
-import net.minecraft.util.Util;
 import org.lwjgl.opengl.GL43C;
 import org.lwjgl.system.Checks;
 
 import java.util.Arrays;
 import java.util.BitSet;
 import java.util.List;
+import net.minecraft.Util;
 
 public class GlVertexArraySeparateAttributes extends GlVertexArray {
     public static final boolean SUPPORTED = isSupported();

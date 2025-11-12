@@ -13,16 +13,16 @@ import com.zurrtum.create.client.ponder.api.scene.SceneBuildingUtil;
 import com.zurrtum.create.client.ponder.api.scene.Selection;
 import com.zurrtum.create.infrastructure.component.ClipboardContent;
 import com.zurrtum.create.infrastructure.component.ClipboardType;
-import net.minecraft.block.Blocks;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.screen.ScreenTexts;
-import net.minecraft.text.Text;
-import net.minecraft.util.DyeColor;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.network.chat.CommonComponents;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.item.DyeColor;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
 
 public class DisplayScenes {
 
@@ -68,10 +68,10 @@ public class DisplayScenes {
         scene.world().showSection(fullBoard, Direction.NORTH);
         scene.idle(25);
 
-        Vec3d target = util.vector().of(3.5, 2.75, 3.25);
-        scene.overlay().showControls(target, Pointing.RIGHT, 60).withItem(AllItems.DISPLAY_LINK.getDefaultStack()).rightClick();
+        Vec3 target = util.vector().of(3.5, 2.75, 3.25);
+        scene.overlay().showControls(target, Pointing.RIGHT, 60).withItem(AllItems.DISPLAY_LINK.getDefaultInstance()).rightClick();
         scene.idle(6);
-        scene.overlay().chaseBoundingBoxOutline(PonderPalette.OUTPUT, link, new Box(board).stretch(-2, -1, 0).contract(0, 0, 3 / 16f), 60);
+        scene.overlay().chaseBoundingBoxOutline(PonderPalette.OUTPUT, link, new AABB(board).expandTowards(-2, -1, 0).deflate(0, 0, 3 / 16f), 60);
         scene.idle(35);
         scene.overlay().showText(70).text("First, right-click the target display...").pointAt(target.add(-1, 0, 0)).colored(PonderPalette.OUTPUT)
             .attachKeyFrame().placeNearTarget();
@@ -85,7 +85,7 @@ public class DisplayScenes {
             .colored(PonderPalette.INPUT).placeNearTarget();
         scene.idle(60);
 
-        ItemStack item = AllItems.PROPELLER.getDefaultStack();
+        ItemStack item = AllItems.PROPELLER.getDefaultInstance();
         scene.world().createItemOnBeltLike(depotPos, Direction.SOUTH, item);
         scene.idle(20);
 
@@ -95,14 +95,14 @@ public class DisplayScenes {
             .attachKeyFrame().placeNearTarget();
         scene.idle(80);
         scene.effects().indicateSuccess(linkPos);
-        scene.world().setDisplayBoardText(board, 1, item.getName());
+        scene.world().setDisplayBoardText(board, 1, item.getHoverName());
         scene.world().flashDisplayLink(linkPos);
         scene.idle(50);
 
         scene.world().removeItemsFromBelt(depotPos);
-        item = AllItems.BLAZE_CAKE.getDefaultStack();
+        item = AllItems.BLAZE_CAKE.getDefaultInstance();
         scene.world().createItemOnBeltLike(depotPos, Direction.SOUTH, item);
-        scene.world().setDisplayBoardText(board, 1, item.getName());
+        scene.world().setDisplayBoardText(board, 1, item.getHoverName());
         scene.world().flashDisplayLink(linkPos);
         scene.idle(20);
 
@@ -111,15 +111,15 @@ public class DisplayScenes {
 
         scene.idle(30);
         scene.world().removeItemsFromBelt(depotPos);
-        item = AllItems.DISPLAY_BOARD.getDefaultStack();
+        item = AllItems.DISPLAY_BOARD.getDefaultInstance();
         scene.world().createItemOnBeltLike(depotPos, Direction.SOUTH, item);
-        scene.world().setDisplayBoardText(board, 1, item.getName());
+        scene.world().setDisplayBoardText(board, 1, item.getHoverName());
         scene.world().flashDisplayLink(linkPos);
         scene.idle(50);
 
         scene.world().hideSection(depot, Direction.SOUTH);
         scene.idle(5);
-        scene.world().setDisplayBoardText(board, 1, ScreenTexts.EMPTY);
+        scene.world().setDisplayBoardText(board, 1, CommonComponents.EMPTY);
         scene.world().flashDisplayLink(linkPos);
         scene.idle(5);
         ElementLink<WorldSectionElement> dirtElement = scene.world().showIndependentSection(dirt, Direction.SOUTH);
@@ -135,7 +135,7 @@ public class DisplayScenes {
         ElementLink<WorldSectionElement> stressElement = scene.world().showIndependentSection(stresso, Direction.SOUTH);
         scene.world().moveSection(stressElement, util.vector().of(0, -2, 0), 0);
         scene.idle(10);
-        scene.world().setDisplayBoardText(board, 1, Text.literal(1024 + " ").append(CreateLang.translateDirect("generic.unit.stress")));
+        scene.world().setDisplayBoardText(board, 1, Component.literal(1024 + " ").append(CreateLang.translateDirect("generic.unit.stress")));
         scene.world().flashDisplayLink(linkPos);
         scene.idle(40);
         scene.world().hideIndependentSection(stressElement, Direction.SOUTH);
@@ -144,8 +144,8 @@ public class DisplayScenes {
         ElementLink<WorldSectionElement> chestElement = scene.world().showIndependentSection(content, Direction.SOUTH);
         scene.world().moveSection(chestElement, util.vector().of(0, -3, 0), 0);
         scene.idle(10);
-        scene.world().setDisplayBoardText(board, 1, Text.literal(418 + " ").append(new ItemStack(Items.DEEPSLATE).getName()));
-        scene.world().setDisplayBoardText(board, 2, Text.literal(14 + " ").append(AllItems.COGWHEEL.getDefaultStack().getName()));
+        scene.world().setDisplayBoardText(board, 1, Component.literal(418 + " ").append(new ItemStack(Items.DEEPSLATE).getHoverName()));
+        scene.world().setDisplayBoardText(board, 2, Component.literal(14 + " ").append(AllItems.COGWHEEL.getDefaultInstance().getHoverName()));
         scene.world().flashDisplayLink(linkPos);
         scene.idle(40);
         scene.world().hideIndependentSection(chestElement, Direction.SOUTH);
@@ -157,8 +157,8 @@ public class DisplayScenes {
         ElementLink<WorldSectionElement> cuckooElement = scene.world().showIndependentSection(cuckoo, Direction.SOUTH);
         scene.world().moveSection(cuckooElement, util.vector().of(0, -1, 0), 0);
         scene.idle(10);
-        scene.world().setDisplayBoardText(board, 1, Text.literal("6:00 ").append(CreateLang.translateDirect("generic.daytime.pm")));
-        scene.world().setDisplayBoardText(board, 2, ScreenTexts.EMPTY);
+        scene.world().setDisplayBoardText(board, 1, Component.literal("6:00 ").append(CreateLang.translateDirect("generic.daytime.pm")));
+        scene.world().setDisplayBoardText(board, 2, CommonComponents.EMPTY);
         scene.world().flashDisplayLink(linkPos);
         scene.idle(90);
 
@@ -242,12 +242,12 @@ public class DisplayScenes {
         scene.rotateCameraY(-60);
         scene.idle(20);
 
-        Vec3d target = util.vector().of(3.95, 2.75, 3.25);
-        ItemStack clipboard = AllItems.CLIPBOARD.getDefaultStack();
+        Vec3 target = util.vector().of(3.95, 2.75, 3.25);
+        ItemStack clipboard = AllItems.CLIPBOARD.getDefaultInstance();
         clipboard.set(AllDataComponents.CLIPBOARD_CONTENT, ClipboardContent.EMPTY.setType(ClipboardType.WRITTEN));
         scene.overlay().showControls(target, Pointing.RIGHT, 40).withItem(clipboard).rightClick();
         scene.idle(6);
-        scene.world().setDisplayBoardText(board, 0, Text.literal("Create"));
+        scene.world().setDisplayBoardText(board, 0, Component.literal("Create"));
         scene.idle(25);
 
         scene.overlay().showText(50).text("Static text can be applied using written Clipboards").pointAt(target.add(-2, 0, 0)).attachKeyFrame()
@@ -258,32 +258,32 @@ public class DisplayScenes {
         scene.idle(10);
         scene.world().showSection(link, Direction.EAST);
         scene.idle(15);
-        scene.overlay().chaseBoundingBoxOutline(PonderPalette.INPUT, depot, new Box(linkPos).shrink(-.5f, 0, 0), 60);
+        scene.overlay().chaseBoundingBoxOutline(PonderPalette.INPUT, depot, new AABB(linkPos).contract(-.5f, 0, 0), 60);
         scene.idle(5);
-        scene.overlay().chaseBoundingBoxOutline(PonderPalette.OUTPUT, link, new Box(board).stretch(-2, -1, 0).contract(0, 0, 3 / 16f), 60);
+        scene.overlay().chaseBoundingBoxOutline(PonderPalette.OUTPUT, link, new AABB(board).expandTowards(-2, -1, 0).deflate(0, 0, 3 / 16f), 60);
         scene.idle(20);
 
         scene.overlay().showText(70).text("And dynamic text through the use of Display Links").pointAt(target.add(-2, 0, 0)).attachKeyFrame()
             .colored(PonderPalette.OUTPUT).placeNearTarget();
         scene.idle(50);
 
-        ItemStack item = AllItems.PROPELLER.getDefaultStack();
+        ItemStack item = AllItems.PROPELLER.getDefaultInstance();
         scene.world().createItemOnBeltLike(depotPos, Direction.SOUTH, item);
-        scene.world().setDisplayBoardText(board, 1, item.getName());
+        scene.world().setDisplayBoardText(board, 1, item.getHoverName());
         scene.world().flashDisplayLink(linkPos);
         scene.idle(50);
 
         scene.world().removeItemsFromBelt(depotPos);
-        item = AllItems.BLAZE_CAKE.getDefaultStack();
+        item = AllItems.BLAZE_CAKE.getDefaultInstance();
         scene.world().createItemOnBeltLike(depotPos, Direction.SOUTH, item);
-        scene.world().setDisplayBoardText(board, 1, item.getName());
+        scene.world().setDisplayBoardText(board, 1, item.getHoverName());
         scene.world().flashDisplayLink(linkPos);
         scene.idle(50);
 
         scene.world().removeItemsFromBelt(depotPos);
-        item = AllItems.DISPLAY_BOARD.getDefaultStack();
+        item = AllItems.DISPLAY_BOARD.getDefaultInstance();
         scene.world().createItemOnBeltLike(depotPos, Direction.SOUTH, item);
-        scene.world().setDisplayBoardText(board, 1, item.getName());
+        scene.world().setDisplayBoardText(board, 1, item.getHoverName());
         scene.world().flashDisplayLink(linkPos);
         scene.idle(50);
 
@@ -303,7 +303,7 @@ public class DisplayScenes {
 
         scene.overlay().showControls(target, Pointing.RIGHT, 40).rightClick();
         scene.idle(6);
-        scene.world().setDisplayBoardText(board, 0, ScreenTexts.EMPTY);
+        scene.world().setDisplayBoardText(board, 0, CommonComponents.EMPTY);
         scene.idle(25);
 
         scene.overlay().showText(70).text("Lines can be reset by clicking them with an empty hand").pointAt(target.add(-2, 0, 0)).attachKeyFrame()
@@ -335,13 +335,13 @@ public class DisplayScenes {
         scene.world().showSection(fullBoard, Direction.NORTH);
         scene.idle(25);
 
-        Vec3d target = util.vector().of(3.5, 2.75, 3.25);
+        Vec3 target = util.vector().of(3.5, 2.75, 3.25);
         scene.world().showSection(depot, Direction.DOWN);
         scene.idle(10);
         scene.world().showSection(link, Direction.EAST);
         scene.idle(10);
         scene.world().flashDisplayLink(linkPos);
-        scene.world().setDisplayBoardText(board, 1, new ItemStack(Items.CALCITE).getName());
+        scene.world().setDisplayBoardText(board, 1, new ItemStack(Items.CALCITE).getHoverName());
         scene.idle(10);
         scene.world().showSection(redstone, Direction.EAST);
         scene.idle(20);
@@ -370,7 +370,7 @@ public class DisplayScenes {
         scene.effects().indicateRedstone(leverPos);
         scene.idle(1);
         scene.world().flashDisplayLink(linkPos);
-        scene.world().setDisplayBoardText(board, 1, item.getName());
+        scene.world().setDisplayBoardText(board, 1, item.getHoverName());
 
         scene.idle(15);
         scene.overlay().showText(100).colored(PonderPalette.GREEN).attachKeyFrame().pointAt(target.add(-2.45, -0.5, 0)).placeNearTarget()
@@ -378,13 +378,13 @@ public class DisplayScenes {
         scene.idle(100);
 
         scene.world().hideSection(depot, Direction.SOUTH);
-        scene.world().setBlock(util.grid().at(4, 1, 0), Blocks.REDSTONE_BLOCK.getDefaultState(), false);
+        scene.world().setBlock(util.grid().at(4, 1, 0), Blocks.REDSTONE_BLOCK.defaultBlockState(), false);
         scene.idle(10);
         ElementLink<WorldSectionElement> redstoneBlock = scene.world().showIndependentSection(util.select().position(4, 1, 0), Direction.SOUTH);
         scene.world().moveSection(redstoneBlock, util.vector().of(-1, 0, 1), 0);
         scene.idle(10);
         scene.world().flashDisplayLink(linkPos);
-        scene.world().setDisplayBoardText(board, 1, ScreenTexts.EMPTY);
+        scene.world().setDisplayBoardText(board, 1, CommonComponents.EMPTY);
         scene.idle(25);
 
         scene.overlay().showOutlineWithText(depot, 80).colored(PonderPalette.RED).attachKeyFrame().pointAt(util.vector().topOf(linkPos))

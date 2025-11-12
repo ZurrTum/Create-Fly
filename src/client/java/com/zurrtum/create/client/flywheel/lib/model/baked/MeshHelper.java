@@ -1,10 +1,10 @@
 package com.zurrtum.create.client.flywheel.lib.model.baked;
 
+import com.mojang.blaze3d.vertex.MeshData;
 import com.zurrtum.create.client.flywheel.lib.memory.MemoryBlock;
 import com.zurrtum.create.client.flywheel.lib.model.SimpleQuadMesh;
 import com.zurrtum.create.client.flywheel.lib.vertex.NoOverlayVertexView;
 import com.zurrtum.create.client.flywheel.lib.vertex.VertexView;
-import net.minecraft.client.render.BuiltBuffer;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.system.MemoryUtil;
 
@@ -14,15 +14,15 @@ public final class MeshHelper {
     private MeshHelper() {
     }
 
-    public static SimpleQuadMesh blockVerticesToMesh(BuiltBuffer data, @Nullable String meshDescriptor) {
-        BuiltBuffer.DrawParameters drawState = data.getDrawParameters();
+    public static SimpleQuadMesh blockVerticesToMesh(MeshData data, @Nullable String meshDescriptor) {
+        MeshData.DrawState drawState = data.drawState();
         int vertexCount = drawState.vertexCount();
         long srcStride = drawState.format().getVertexSize();
 
         VertexView vertexView = new NoOverlayVertexView();
         long dstStride = vertexView.stride();
 
-        ByteBuffer src = data.getBuffer();
+        ByteBuffer src = data.vertexBuffer();
         MemoryBlock dst = MemoryBlock.mallocTracked((long) vertexCount * dstStride);
         long srcPtr = MemoryUtil.memAddress(src);
         long dstPtr = dst.ptr();

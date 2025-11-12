@@ -15,12 +15,12 @@ import com.zurrtum.create.content.logistics.crate.CreativeCrateMountedStorageTyp
 import com.zurrtum.create.content.logistics.depot.storage.DepotMountedStorageType;
 import com.zurrtum.create.content.logistics.vault.ItemVaultMountedStorageType;
 import com.zurrtum.create.impl.contraption.storage.FallbackMountedStorageType;
-import net.minecraft.block.Block;
-import net.minecraft.block.Blocks;
-import net.minecraft.registry.Registry;
-import net.minecraft.registry.RegistryKey;
-import net.minecraft.registry.tag.TagKey;
-import net.minecraft.util.Identifier;
+import net.minecraft.core.Registry;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.TagKey;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
 
 import static com.zurrtum.create.Create.MOD_ID;
 
@@ -42,7 +42,7 @@ public class AllMountedStorageTypes {
     private static <T extends MountedItemStorageType<?>> T register(String id, T type) {
         return Registry.register(
             CreateRegistries.MOUNTED_ITEM_STORAGE_TYPE,
-            RegistryKey.of(CreateRegistryKeys.MOUNTED_ITEM_STORAGE_TYPE, Identifier.of(MOD_ID, id)),
+            ResourceKey.create(CreateRegistryKeys.MOUNTED_ITEM_STORAGE_TYPE, ResourceLocation.fromNamespaceAndPath(MOD_ID, id)),
             type
         );
     }
@@ -50,7 +50,7 @@ public class AllMountedStorageTypes {
     private static <T extends MountedFluidStorageType<?>> T register(String id, T type) {
         return Registry.register(
             CreateRegistries.MOUNTED_FLUID_STORAGE_TYPE,
-            RegistryKey.of(CreateRegistryKeys.MOUNTED_FLUID_STORAGE_TYPE, Identifier.of(MOD_ID, id)),
+            ResourceKey.create(CreateRegistryKeys.MOUNTED_FLUID_STORAGE_TYPE, ResourceLocation.fromNamespaceAndPath(MOD_ID, id)),
             type
         );
     }
@@ -63,7 +63,7 @@ public class AllMountedStorageTypes {
 
     @SuppressWarnings("deprecation")
     public static void register(MountedItemStorageType<?> type, TagKey<Block> tag) {
-        MountedItemStorageType.REGISTRY.registerProvider(block -> block.getRegistryEntry().isIn(tag) ? type : null);
+        MountedItemStorageType.REGISTRY.registerProvider(block -> block.builtInRegistryHolder().is(tag) ? type : null);
     }
 
     public static void register(MountedFluidStorageType<?> type, Block... blocks) {

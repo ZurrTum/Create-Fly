@@ -2,12 +2,12 @@ package com.zurrtum.create.infrastructure.debugInfo.element;
 
 import com.google.common.collect.ImmutableList;
 import com.zurrtum.create.infrastructure.debugInfo.DebugInformation;
-import net.minecraft.entity.player.PlayerEntity;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
+import net.minecraft.world.entity.player.Player;
 
 /**
  * A section for organizing debug information. Can contain both information and other sections.
@@ -19,7 +19,7 @@ public record DebugInfoSection(String name, ImmutableList<InfoElement> elements)
     }
 
     @Override
-    public void print(int depth, @Nullable PlayerEntity player, Consumer<String> lineConsumer) {
+    public void print(int depth, @Nullable Player player, Consumer<String> lineConsumer) {
         String indent = DebugInformation.getIndent(depth);
         lineConsumer.accept(indent + name + ":");
         elements.forEach(element -> element.print(depth + 1, player, lineConsumer));

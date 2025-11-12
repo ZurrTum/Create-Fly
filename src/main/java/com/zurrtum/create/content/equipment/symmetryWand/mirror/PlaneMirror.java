@@ -2,20 +2,19 @@ package com.zurrtum.create.content.equipment.symmetryWand.mirror;
 
 import com.zurrtum.create.catnip.data.Pair;
 import com.zurrtum.create.infrastructure.component.SymmetryMirror;
-import net.minecraft.block.BlockState;
-import net.minecraft.util.StringIdentifiable;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Vec3d;
-
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.util.StringRepresentable;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.Vec3;
 
 public class PlaneMirror extends SymmetryMirror {
 
-    public enum Align implements StringIdentifiable {
+    public enum Align implements StringRepresentable {
         XY("xy"),
         YZ("yz");
 
@@ -26,7 +25,7 @@ public class PlaneMirror extends SymmetryMirror {
         }
 
         @Override
-        public String asString() {
+        public String getSerializedName() {
             return name;
         }
 
@@ -36,7 +35,7 @@ public class PlaneMirror extends SymmetryMirror {
         }
     }
 
-    public PlaneMirror(Vec3d pos) {
+    public PlaneMirror(Vec3 pos) {
         super(pos);
         orientation = Align.XY;
     }

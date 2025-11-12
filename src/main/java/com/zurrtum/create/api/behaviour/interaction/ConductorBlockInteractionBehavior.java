@@ -12,20 +12,19 @@ import com.zurrtum.create.content.trains.entity.CarriageContraptionEntity;
 import com.zurrtum.create.content.trains.entity.Train;
 import com.zurrtum.create.content.trains.schedule.Schedule;
 import com.zurrtum.create.content.trains.schedule.ScheduleItem;
-import net.minecraft.block.BlockState;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.sound.SoundCategory;
-import net.minecraft.sound.SoundEvents;
-import net.minecraft.structure.StructureTemplate.StructureBlockInfo;
-import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
-import net.minecraft.util.Hand;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-
 import java.util.function.Consumer;
+import net.minecraft.ChatFormatting;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate.StructureBlockInfo;
 
 /**
  * Partial interaction behavior implementation that allows blocks to act as conductors on trains, like Blaze Burners.
@@ -47,14 +46,14 @@ public abstract class ConductorBlockInteractionBehavior extends MovingInteractio
 
     @Override
     public final boolean handlePlayerInteraction(
-        PlayerEntity player,
-        Hand activeHand,
+        Player player,
+        InteractionHand activeHand,
         BlockPos localPos,
         AbstractContraptionEntity contraptionEntity
     ) {
         if (!(contraptionEntity instanceof CarriageContraptionEntity carriageEntity))
             return false;
-        if (activeHand == Hand.OFF_HAND)
+        if (activeHand == InteractionHand.OFF_HAND)
             return false;
         Contraption contraption = carriageEntity.getContraption();
         if (!(contraption instanceof CarriageContraption carriageContraption))
@@ -65,7 +64,7 @@ public abstract class ConductorBlockInteractionBehavior extends MovingInteractio
             return false;
 
         Direction assemblyDirection = carriageContraption.getAssemblyDirection();
-        ItemStack itemInHand = player.getStackInHand(activeHand);
+        ItemStack itemInHand = player.getItemInHand(activeHand);
         for (Direction direction : Iterate.directionsInAxis(assemblyDirection.getAxis())) {
             if (!carriageContraption.inControl(localPos, direction))
                 continue;
@@ -73,64 +72,64 @@ public abstract class ConductorBlockInteractionBehavior extends MovingInteractio
             Train train = carriageEntity.getCarriage().train;
             if (train == null)
                 return false;
-            if (player.getEntityWorld().isClient())
+            if (player.level().isClientSide())
                 return true;
 
             if (train.runtime.getSchedule() != null) {
                 if (train.runtime.paused && !train.runtime.completed) {
                     train.runtime.paused = false;
-                    AllSoundEvents.CONFIRM.playOnServer(player.getEntityWorld(), player.getBlockPos(), 1, 1);
-                    player.sendMessage(Text.translatable("create.schedule.continued"), true);
+                    AllSoundEvents.CONFIRM.playOnServer(player.level(), player.blockPosition(), 1, 1);
+                    player.displayClientMessage(Component.translatable("create.schedule.continued"), true);
                     return true;
                 }
 
                 if (!itemInHand.isEmpty()) {
-                    AllSoundEvents.DENY.playOnServer(player.getEntityWorld(), player.getBlockPos(), 1, 1);
-                    player.sendMessage(Text.translatable("create.schedule.remove_with_empty_hand"), true);
+                    AllSoundEvents.DENY.playOnServer(player.level(), player.blockPosition(), 1, 1);
+                    player.displayClientMessage(Component.translatable("create.schedule.remove_with_empty_hand"), true);
                     return true;
                 }
 
-                player.getEntityWorld().playSound(
+                player.level().playSound(
                     null,
-                    player.getBlockPos(),
-                    SoundEvents.ENTITY_ITEM_PICKUP,
-                    SoundCategory.PLAYERS,
+                    player.blockPosition(),
+                    SoundEvents.ITEM_PICKUP,
+                    SoundSource.PLAYERS,
                     .2f,
-                    1f + player.getEntityWorld().random.nextFloat()
+                    1f + player.level().random.nextFloat()
                 );
-                player.sendMessage(
-                    Text.translatable(train.runtime.isAutoSchedule ? "create.schedule.auto_removed_from_train" : "create.schedule.removed_from_train"),
+                player.displayClientMessage(
+                    Component.translatable(train.runtime.isAutoSchedule ? "create.schedule.auto_removed_from_train" : "create.schedule.removed_from_train"),
                     true
                 );
-                player.setStackInHand(activeHand, train.runtime.returnSchedule(player.getRegistryManager()));
+                player.setItemInHand(activeHand, train.runtime.returnSchedule(player.registryAccess()));
                 this.onScheduleUpdate(false, info.state(), newBlockState -> setBlockState(localPos, contraptionEntity, newBlockState));
                 return true;
             }
 
-            if (!itemInHand.isOf(AllItems.SCHEDULE))
+            if (!itemInHand.is(AllItems.SCHEDULE))
                 return true;
 
-            Schedule schedule = ScheduleItem.getSchedule(player.getRegistryManager(), itemInHand);
+            Schedule schedule = ScheduleItem.getSchedule(player.registryAccess(), itemInHand);
             if (schedule == null)
                 return false;
 
             if (schedule.entries.isEmpty()) {
-                AllSoundEvents.DENY.playOnServer(player.getEntityWorld(), player.getBlockPos(), 1, 1);
-                player.sendMessage(Text.translatable("create.schedule.no_stops"), true);
+                AllSoundEvents.DENY.playOnServer(player.level(), player.blockPosition(), 1, 1);
+                player.displayClientMessage(Component.translatable("create.schedule.no_stops"), true);
                 return true;
             }
             this.onScheduleUpdate(true, info.state(), newBlockState -> setBlockState(localPos, contraptionEntity, newBlockState));
             train.runtime.setSchedule(schedule, false);
-            AllAdvancements.CONDUCTOR.trigger((ServerPlayerEntity) player);
-            AllSoundEvents.CONFIRM.playOnServer(player.getEntityWorld(), player.getBlockPos(), 1, 1);
-            player.sendMessage(Text.translatable("create.schedule.applied_to_train").formatted(Formatting.GREEN), true);
-            itemInHand.decrement(1);
-            player.setStackInHand(activeHand, itemInHand.isEmpty() ? ItemStack.EMPTY : itemInHand);
+            AllAdvancements.CONDUCTOR.trigger((ServerPlayer) player);
+            AllSoundEvents.CONFIRM.playOnServer(player.level(), player.blockPosition(), 1, 1);
+            player.displayClientMessage(Component.translatable("create.schedule.applied_to_train").withStyle(ChatFormatting.GREEN), true);
+            itemInHand.shrink(1);
+            player.setItemInHand(activeHand, itemInHand.isEmpty() ? ItemStack.EMPTY : itemInHand);
             return true;
         }
 
-        player.sendMessage(Text.translatable("create.schedule.non_controlling_seat"), true);
-        AllSoundEvents.DENY.playOnServer(player.getEntityWorld(), player.getBlockPos(), 1, 1);
+        player.displayClientMessage(Component.translatable("create.schedule.non_controlling_seat"), true);
+        AllSoundEvents.DENY.playOnServer(player.level(), player.blockPosition(), 1, 1);
         return true;
     }
 
@@ -147,7 +146,7 @@ public abstract class ConductorBlockInteractionBehavior extends MovingInteractio
     public static class BlazeBurner extends ConductorBlockInteractionBehavior {
         @Override
         public boolean isValidConductor(BlockState state) {
-            return state.get(BlazeBurnerBlock.HEAT_LEVEL) != BlazeBurnerBlock.HeatLevel.NONE;
+            return state.getValue(BlazeBurnerBlock.HEAT_LEVEL) != BlazeBurnerBlock.HeatLevel.NONE;
         }
     }
 }

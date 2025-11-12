@@ -1,8 +1,8 @@
 package com.zurrtum.create.client.flywheel.api.visualization;
 
 import com.zurrtum.create.client.flywheel.api.visual.BlockEntityVisual;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.client.render.block.entity.BlockEntityRenderer;
+import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
+import net.minecraft.world.level.block.entity.BlockEntity;
 
 /**
  * A visualizer that will be keyed to a block entity type.

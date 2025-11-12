@@ -6,70 +6,70 @@ import com.zurrtum.create.api.schematic.requirement.SpecialBlockItemRequirement;
 import com.zurrtum.create.content.fluids.FluidTransportBehaviour;
 import com.zurrtum.create.content.schematics.requirement.ItemRequirement;
 import com.zurrtum.create.foundation.block.IBE;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Waterloggable;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.entity.ai.pathing.NavigationType;
-import net.minecraft.fluid.FluidState;
-import net.minecraft.fluid.Fluids;
-import net.minecraft.item.ItemPlacementContext;
-import net.minecraft.item.ItemUsageContext;
-import net.minecraft.state.StateManager.Builder;
-import net.minecraft.state.property.BooleanProperty;
-import net.minecraft.state.property.Properties;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.item.context.UseOnContext;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.SimpleWaterloggedBlock;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition.Builder;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.block.state.properties.BooleanProperty;
+import net.minecraft.world.level.material.FluidState;
+import net.minecraft.world.level.material.Fluids;
+import net.minecraft.world.level.pathfinder.PathComputationType;
 
-public class GlassFluidPipeBlock extends AxisPipeBlock implements IBE<StraightPipeBlockEntity>, Waterloggable, SpecialBlockItemRequirement {
+public class GlassFluidPipeBlock extends AxisPipeBlock implements IBE<StraightPipeBlockEntity>, SimpleWaterloggedBlock, SpecialBlockItemRequirement {
 
-    public static final BooleanProperty ALT = BooleanProperty.of("alt");
+    public static final BooleanProperty ALT = BooleanProperty.create("alt");
 
-    public GlassFluidPipeBlock(Settings p_i48339_1_) {
+    public GlassFluidPipeBlock(Properties p_i48339_1_) {
         super(p_i48339_1_);
-        setDefaultState(getDefaultState().with(ALT, false).with(Properties.WATERLOGGED, false));
+        registerDefaultState(defaultBlockState().setValue(ALT, false).setValue(BlockStateProperties.WATERLOGGED, false));
     }
 
     @Override
-    protected void appendProperties(Builder<Block, BlockState> p_206840_1_) {
-        super.appendProperties(p_206840_1_.add(ALT, Properties.WATERLOGGED));
+    protected void createBlockStateDefinition(Builder<Block, BlockState> p_206840_1_) {
+        super.createBlockStateDefinition(p_206840_1_.add(ALT, BlockStateProperties.WATERLOGGED));
     }
 
     @Override
-    public ActionResult onWrenched(BlockState state, ItemUsageContext context) {
+    public InteractionResult onWrenched(BlockState state, UseOnContext context) {
         if (tryRemoveBracket(context))
-            return ActionResult.SUCCESS;
+            return InteractionResult.SUCCESS;
         BlockState newState;
-        World world = context.getWorld();
-        BlockPos pos = context.getBlockPos();
+        Level world = context.getLevel();
+        BlockPos pos = context.getClickedPos();
         FluidTransportBehaviour.cacheFlows(world, pos);
-        newState = toRegularPipe(world, pos, state).with(Properties.WATERLOGGED, state.get(Properties.WATERLOGGED));
-        world.setBlockState(pos, newState, Block.NOTIFY_ALL);
+        newState = toRegularPipe(world, pos, state).setValue(BlockStateProperties.WATERLOGGED, state.getValue(BlockStateProperties.WATERLOGGED));
+        world.setBlock(pos, newState, Block.UPDATE_ALL);
         FluidTransportBehaviour.loadFlows(world, pos);
-        return ActionResult.SUCCESS;
+        return InteractionResult.SUCCESS;
     }
 
     @Override
-    public BlockState getPlacementState(ItemPlacementContext context) {
-        FluidState ifluidstate = context.getWorld().getFluidState(context.getBlockPos());
-        BlockState state = super.getPlacementState(context);
-        return state == null ? null : state.with(Properties.WATERLOGGED, ifluidstate.getFluid() == Fluids.WATER);
+    public BlockState getStateForPlacement(BlockPlaceContext context) {
+        FluidState ifluidstate = context.getLevel().getFluidState(context.getClickedPos());
+        BlockState state = super.getStateForPlacement(context);
+        return state == null ? null : state.setValue(BlockStateProperties.WATERLOGGED, ifluidstate.getType() == Fluids.WATER);
     }
 
     @Override
     public FluidState getFluidState(BlockState state) {
-        return state.get(Properties.WATERLOGGED) ? Fluids.WATER.getStill(false) : Fluids.EMPTY.getDefaultState();
+        return state.getValue(BlockStateProperties.WATERLOGGED) ? Fluids.WATER.getSource(false) : Fluids.EMPTY.defaultFluidState();
     }
 
     @Override
     public ItemRequirement getRequiredItems(BlockState state, BlockEntity be) {
-        return ItemRequirement.of(AllBlocks.FLUID_PIPE.getDefaultState(), be);
+        return ItemRequirement.of(AllBlocks.FLUID_PIPE.defaultBlockState(), be);
     }
 
     @Override
-    protected boolean canPathfindThrough(BlockState state, NavigationType pathComputationType) {
+    protected boolean isPathfindable(BlockState state, PathComputationType pathComputationType) {
         return false;
     }
 

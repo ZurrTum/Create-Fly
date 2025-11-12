@@ -4,8 +4,7 @@ import com.zurrtum.create.AllDataComponents;
 import com.zurrtum.create.infrastructure.fluids.FluidStack;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
 import net.fabricmc.fabric.api.transfer.v1.transaction.TransactionContext;
-import net.minecraft.component.ComponentType;
-
+import net.minecraft.core.component.DataComponentType;
 import java.util.Objects;
 
 public class FluidInventorySlotWrapper extends SingleFluidStackStorage {
@@ -68,7 +67,7 @@ public class FluidInventorySlotWrapper extends SingleFluidStackStorage {
 
         if (!original.isEmpty() && original.getFluid() == currentStack.getFluid()) {
             if (!Objects.equals(original.getComponentChanges(), currentStack.getComponentChanges())) {
-                for (ComponentType<?> type : original.getComponents().getTypes()) {
+                for (DataComponentType<?> type : original.getComponents().keySet()) {
                     original.set(type, null);
                 }
 

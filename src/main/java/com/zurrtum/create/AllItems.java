@@ -59,32 +59,33 @@ import com.zurrtum.create.content.trains.track.TrackTargetingBlockItem;
 import com.zurrtum.create.foundation.item.TagDependentIngredientItem;
 import com.zurrtum.create.foundation.item.UncontainableBlockItem;
 import com.zurrtum.create.infrastructure.fluids.FlowableFluid;
-import net.minecraft.block.Block;
-import net.minecraft.block.Blocks;
-import net.minecraft.component.DataComponentTypes;
-import net.minecraft.component.type.*;
-import net.minecraft.entity.EquipmentSlot;
-import net.minecraft.entity.attribute.EntityAttributeModifier;
-import net.minecraft.entity.attribute.EntityAttributes;
-import net.minecraft.entity.effect.StatusEffectInstance;
-import net.minecraft.entity.effect.StatusEffects;
-import net.minecraft.fluid.Fluid;
-import net.minecraft.item.BlockItem;
-import net.minecraft.item.BucketItem;
-import net.minecraft.item.Item;
-import net.minecraft.item.Items;
-import net.minecraft.item.consume.ApplyEffectsConsumeEffect;
-import net.minecraft.item.consume.UseAction;
-import net.minecraft.item.equipment.EquipmentType;
-import net.minecraft.registry.Registries;
-import net.minecraft.registry.Registry;
-import net.minecraft.registry.RegistryKey;
-import net.minecraft.registry.RegistryKeys;
-import net.minecraft.registry.entry.RegistryEntryList;
-import net.minecraft.registry.tag.BlockTags;
-import net.minecraft.sound.SoundEvents;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.Rarity;
+import net.minecraft.core.HolderSet;
+import net.minecraft.core.Registry;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.tags.BlockTags;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.effect.MobEffects;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.EquipmentSlotGroup;
+import net.minecraft.world.entity.ai.attributes.AttributeModifier;
+import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.food.FoodProperties;
+import net.minecraft.world.item.*;
+import net.minecraft.world.item.component.Consumable;
+import net.minecraft.world.item.component.ItemAttributeModifiers;
+import net.minecraft.world.item.component.Tool;
+import net.minecraft.world.item.component.Weapon;
+import net.minecraft.world.item.consume_effects.ApplyStatusEffectsConsumeEffect;
+import net.minecraft.world.item.equipment.ArmorType;
+import net.minecraft.world.item.equipment.Equippable;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.material.Fluid;
 
 import java.util.List;
 import java.util.function.BiFunction;
@@ -101,7 +102,7 @@ public class AllItems {
     public static final BlockItem STEAM_ENGINE = register(AllBlocks.STEAM_ENGINE);
     public static final BlockItem GANTRY_CARRIAGE = register(AllBlocks.GANTRY_CARRIAGE);
     public static final LargeWaterWheelBlockItem LARGE_WATER_WHEEL = register(AllBlocks.LARGE_WATER_WHEEL, LargeWaterWheelBlockItem::new);
-    public static final BlockItem CREATIVE_MOTOR = register(AllBlocks.CREATIVE_MOTOR, BlockItem::new, new Item.Settings().rarity(Rarity.EPIC));
+    public static final BlockItem CREATIVE_MOTOR = register(AllBlocks.CREATIVE_MOTOR, BlockItem::new, new Item.Properties().rarity(Rarity.EPIC));
     public static final BlockItem ROTATION_SPEED_CONTROLLER = register(AllBlocks.ROTATION_SPEED_CONTROLLER);
     public static final BlockItem GEARBOX = register(AllBlocks.GEARBOX);
     public static final BlockItem WATER_WHEEL = register(AllBlocks.WATER_WHEEL);
@@ -153,7 +154,7 @@ public class AllItems {
     public static final FluidTankItem CREATIVE_FLUID_TANK = register(
         AllBlocks.CREATIVE_FLUID_TANK,
         FluidTankItem::new,
-        new Item.Settings().rarity(Rarity.EPIC)
+        new Item.Properties().rarity(Rarity.EPIC)
     );
     public static final AssemblyOperatorBlockItem MECHANICAL_PRESS = register(AllBlocks.MECHANICAL_PRESS, AssemblyOperatorBlockItem::new);
     public static final EjectorItem WEIGHTED_EJECTOR = register(AllBlocks.WEIGHTED_EJECTOR, EjectorItem::new);
@@ -233,7 +234,7 @@ public class AllItems {
     public static final BlockItem NOZZLE = register(AllBlocks.NOZZLE);
     public static final BlockItem DESK_BELL = register(AllBlocks.DESK_BELL);
     public static final BlockItem MECHANICAL_CRAFTER = register(AllBlocks.MECHANICAL_CRAFTER);
-    public static final BlockItem CREATIVE_CRATE = register(AllBlocks.CREATIVE_CRATE, BlockItem::new, new Item.Settings().rarity(Rarity.EPIC));
+    public static final BlockItem CREATIVE_CRATE = register(AllBlocks.CREATIVE_CRATE, BlockItem::new, new Item.Properties().rarity(Rarity.EPIC));
     public static final ItemVaultItem ITEM_VAULT = register(AllBlocks.ITEM_VAULT, ItemVaultItem::new);
     public static final TrackBlockItem TRACK = register(AllBlocks.TRACK, TrackBlockItem::new);
     public static final BlockItem TRAIN_CONTROLS = register(AllBlocks.TRAIN_CONTROLS);
@@ -340,7 +341,7 @@ public class AllItems {
     public static final BlockItem EXPERIENCE_BLOCK = register(
         AllBlocks.EXPERIENCE_BLOCK,
         BlockItem::new,
-        new Item.Settings().rarity(Rarity.UNCOMMON)
+        new Item.Properties().rarity(Rarity.UNCOMMON)
     );
     public static final BlockItem ROSE_QUARTZ_BLOCK = register(AllBlocks.ROSE_QUARTZ_BLOCK);
     public static final BlockItem ROSE_QUARTZ_TILES = register(AllBlocks.ROSE_QUARTZ_TILES);
@@ -693,25 +694,24 @@ public class AllItems {
     public static final GogglesItem GOGGLES = register(
         "goggles",
         GogglesItem::new,
-        new Item.Settings().maxCount(1).component(DataComponentTypes.EQUIPPABLE, EquippableComponent.builder(EquipmentSlot.HEAD).build())
+        new Item.Properties().stacksTo(1).component(DataComponents.EQUIPPABLE, Equippable.builder(EquipmentSlot.HEAD).build())
     );
     public static final Item BRASS_HAND = register("brass_hand");
     public static final Item ANDESITE_ALLOY = register("andesite_alloy");
-    public static final WrenchItem WRENCH = register("wrench", WrenchItem::new, new Item.Settings().maxCount(1));
+    public static final WrenchItem WRENCH = register("wrench", WrenchItem::new, new Item.Properties().stacksTo(1));
     public static final BeltConnectorItem BELT_CONNECTOR = register("belt_connector", BeltConnectorItem::new);
-    public static final SuperGlueItem SUPER_GLUE = register("super_glue", SuperGlueItem::new, new Item.Settings().maxDamage(99));
+    public static final SuperGlueItem SUPER_GLUE = register("super_glue", SuperGlueItem::new, new Item.Properties().durability(99));
     public static final BlazeBurnerBlockItem EMPTY_BLAZE_BURNER = register("empty_blaze_burner", BlazeBurnerBlockItem::empty);
     public static final BuildersTeaItem BUILDERS_TEA = register(
-        "builders_tea", BuildersTeaItem::new, new Item.Settings().maxCount(16).food(
-            new FoodComponent.Builder().nutrition(1).saturationModifier(.6F).alwaysEdible().build(),
-            ConsumableComponent.builder().consumeSeconds(2.1F).useAction(UseAction.DRINK).sound(SoundEvents.ENTITY_GENERIC_DRINK)
-                .consumeParticles(false)
-                .consumeEffect(new ApplyEffectsConsumeEffect(new StatusEffectInstance(StatusEffects.HASTE, 3 * 60 * 20, 0, false, false))).build()
+        "builders_tea", BuildersTeaItem::new, new Item.Properties().stacksTo(16).food(
+            new FoodProperties.Builder().nutrition(1).saturationModifier(.6F).alwaysEdible().build(),
+            Consumable.builder().consumeSeconds(2.1F).animation(ItemUseAnimation.DRINK).sound(SoundEvents.GENERIC_DRINK).hasConsumeParticles(false)
+                .onConsume(new ApplyStatusEffectsConsumeEffect(new MobEffectInstance(MobEffects.HASTE, 3 * 60 * 20, 0, false, false))).build()
         )
     );
     public static final Item BLAZE_CAKE_BASE = register("blaze_cake_base");
     public static final Item BLAZE_CAKE = register("blaze_cake");
-    public static final Item CREATIVE_BLAZE_CAKE = register("creative_blaze_cake", new Item.Settings().rarity(Rarity.EPIC));
+    public static final Item CREATIVE_BLAZE_CAKE = register("creative_blaze_cake", new Item.Properties().rarity(Rarity.EPIC));
     public static final Item COPPER_SHEET = register("copper_sheet");
     public static final Item BRASS_SHEET = register("brass_sheet");
     public static final Item IRON_SHEET = register("iron_sheet");
@@ -741,31 +741,31 @@ public class AllItems {
     public static final Item CINDER_FLOUR = register("cinder_flour");
     public static final Item BAR_OF_CHOCOLATE = register(
         "bar_of_chocolate",
-        new Item.Settings().food(new FoodComponent.Builder().nutrition(6).saturationModifier(0.3F).build())
+        new Item.Properties().food(new FoodProperties.Builder().nutrition(6).saturationModifier(0.3F).build())
     );
     public static final Item ZINC_INGOT = register("zinc_ingot");
     public static final Item STURDY_SHEET = register("sturdy_sheet");
     public static final Item CHOCOLATE_BERRIES = register(
         "chocolate_glazed_berries",
-        new Item.Settings().food(new FoodComponent.Builder().nutrition(7).saturationModifier(0.8F).build())
+        new Item.Properties().food(new FoodProperties.Builder().nutrition(7).saturationModifier(0.8F).build())
     );
     public static final Item HONEYED_APPLE = register(
         "honeyed_apple",
-        new Item.Settings().food(new FoodComponent.Builder().nutrition(8).saturationModifier(0.8F).build())
+        new Item.Properties().food(new FoodProperties.Builder().nutrition(8).saturationModifier(0.8F).build())
     );
     public static final Item SWEET_ROLL = register(
         "sweet_roll",
-        new Item.Settings().food(new FoodComponent.Builder().nutrition(6).saturationModifier(0.8F).build())
+        new Item.Properties().food(new FoodProperties.Builder().nutrition(6).saturationModifier(0.8F).build())
     );
     public static final DivingHelmetItem COPPER_DIVING_HELMET = register(
         "copper_diving_helmet",
         DivingHelmetItem::new,
-        new Item.Settings().maxDamage(EquipmentType.HELMET.getMaxDamage(AllArmorMaterials.COPPER.durability()))
-            .attributeModifiers(DivingHelmetItem.createAttributeModifiers(AllArmorMaterials.COPPER))
-            .enchantable(AllArmorMaterials.COPPER.enchantmentValue()).component(
-                DataComponentTypes.EQUIPPABLE,
-                EquippableComponent.builder(EquipmentSlot.HEAD).equipSound(AllArmorMaterials.COPPER.equipSound())
-                    .model(AllArmorMaterials.COPPER.assetId()).build()
+        new Item.Properties().durability(ArmorType.HELMET.getDurability(AllArmorMaterials.COPPER.durability()))
+            .attributes(DivingHelmetItem.createAttributeModifiers(AllArmorMaterials.COPPER)).enchantable(AllArmorMaterials.COPPER.enchantmentValue())
+            .component(
+                DataComponents.EQUIPPABLE,
+                Equippable.builder(EquipmentSlot.HEAD).setEquipSound(AllArmorMaterials.COPPER.equipSound())
+                    .setAsset(AllArmorMaterials.COPPER.assetId()).build()
             ).repairable(AllArmorMaterials.COPPER.repairIngredient())
     );
     public static final BacktankItem COPPER_BACKTANK = register(
@@ -776,36 +776,36 @@ public class AllItems {
     public static final DivingBootsItem COPPER_DIVING_BOOTS = register(
         "copper_diving_boots",
         DivingBootsItem::new,
-        new Item.Settings().armor(AllArmorMaterials.COPPER, EquipmentType.BOOTS)
+        new Item.Properties().humanoidArmor(AllArmorMaterials.COPPER, ArmorType.BOOTS)
     );
     public static final DivingHelmetItem NETHERITE_DIVING_HELMET = register(
         "netherite_diving_helmet",
         DivingHelmetItem::new,
-        new Item.Settings().maxDamage(EquipmentType.HELMET.getMaxDamage(AllArmorMaterials.NETHERITE.durability()))
-            .attributeModifiers(DivingHelmetItem.createAttributeModifiers(AllArmorMaterials.NETHERITE))
+        new Item.Properties().durability(ArmorType.HELMET.getDurability(AllArmorMaterials.NETHERITE.durability()))
+            .attributes(DivingHelmetItem.createAttributeModifiers(AllArmorMaterials.NETHERITE))
             .enchantable(AllArmorMaterials.NETHERITE.enchantmentValue()).component(
-                DataComponentTypes.EQUIPPABLE,
-                EquippableComponent.builder(EquipmentSlot.HEAD).equipSound(AllArmorMaterials.NETHERITE.equipSound())
-                    .model(AllArmorMaterials.NETHERITE.assetId()).build()
-            ).repairable(AllArmorMaterials.NETHERITE.repairIngredient()).fireproof()
+                DataComponents.EQUIPPABLE,
+                Equippable.builder(EquipmentSlot.HEAD).setEquipSound(AllArmorMaterials.NETHERITE.equipSound())
+                    .setAsset(AllArmorMaterials.NETHERITE.assetId()).build()
+            ).repairable(AllArmorMaterials.NETHERITE.repairIngredient()).fireResistant()
     );
     public static final BacktankItem NETHERITE_BACKTANK = register(
         "netherite_backtank",
         BacktankItem::netherite,
-        AllArmorMaterials.chest(AllArmorMaterials.NETHERITE).fireproof()
+        AllArmorMaterials.chest(AllArmorMaterials.NETHERITE).fireResistant()
     );
     public static final DivingBootsItem NETHERITE_DIVING_BOOTS = register(
         "netherite_diving_boots",
         DivingBootsItem::new,
-        new Item.Settings().armor(AllArmorMaterials.NETHERITE, EquipmentType.BOOTS).fireproof()
+        new Item.Properties().humanoidArmor(AllArmorMaterials.NETHERITE, ArmorType.BOOTS).fireResistant()
     );
     public static final Item ROSE_QUARTZ = register("rose_quartz");
     public static final Item POLISHED_ROSE_QUARTZ = register("polished_rose_quartz");
-    public static final SandPaperItem SAND_PAPER = register("sand_paper", SandPaperItem::new, new Item.Settings().maxDamage(8).enchantable(1));
+    public static final SandPaperItem SAND_PAPER = register("sand_paper", SandPaperItem::new, new Item.Properties().durability(8).enchantable(1));
     public static final SandPaperItem RED_SAND_PAPER = register(
         "red_sand_paper",
         SandPaperItem::new,
-        new Item.Settings().maxDamage(8).enchantable(1)
+        new Item.Properties().durability(8).enchantable(1)
     );
     public static final Item PRECISION_MECHANISM = register("precision_mechanism");
     public static final Item POWDERED_OBSIDIAN = register("powdered_obsidian");
@@ -817,179 +817,185 @@ public class AllItems {
     public static final SequencedAssemblyItem INCOMPLETE_PRECISION_MECHANISM = register(
         "incomplete_precision_mechanism",
         SequencedAssemblyItem::new,
-        new Item.Settings().maxCount(1)
+        new Item.Properties().stacksTo(1)
     );
     public static final SequencedAssemblyItem INCOMPLETE_REINFORCED_SHEET = register(
         "unprocessed_obsidian_sheet",
         SequencedAssemblyItem::new,
-        new Item.Settings().maxCount(1)
+        new Item.Properties().stacksTo(1)
     );
     public static final SequencedAssemblyItem INCOMPLETE_TRACK = register(
         "incomplete_track",
         SequencedAssemblyItem::new,
-        new Item.Settings().maxCount(1)
+        new Item.Properties().stacksTo(1)
     );
     public static final ExperienceNuggetItem EXP_NUGGET = register(
         "experience_nugget",
         ExperienceNuggetItem::new,
-        new Item.Settings().rarity(Rarity.UNCOMMON)
+        new Item.Properties().rarity(Rarity.UNCOMMON)
     );
     public static final ScheduleItem SCHEDULE = register("schedule", ScheduleItem::new);
-    public static final PotatoCannonItem POTATO_CANNON = register("potato_cannon", PotatoCannonItem::new, new Item.Settings().maxDamage(100));
+    public static final PotatoCannonItem POTATO_CANNON = register("potato_cannon", PotatoCannonItem::new, new Item.Properties().durability(100));
     public static final ExtendoGripItem EXTENDO_GRIP = register(
         "extendo_grip",
         ExtendoGripItem::new,
-        new Item.Settings().rarity(Rarity.UNCOMMON).maxDamage(200).attributeModifiers(ExtendoGripItem.rangeModifier)
+        new Item.Properties().rarity(Rarity.UNCOMMON).durability(200).attributes(ExtendoGripItem.rangeModifier)
     );
     public static final LinkedControllerItem LINKED_CONTROLLER = register(
         "linked_controller",
         LinkedControllerItem::new,
-        new Item.Settings().maxCount(1)
+        new Item.Properties().stacksTo(1)
     );
     public static final PackageItem CARDBOARD_PACKAGE_12X12 = register(
         "cardboard_package_12x12",
         PackageItem.styled(AllPackageStyles.CARDBOARD_12X12),
-        new Item.Settings().maxCount(1).translationKey("item.create.package")
+        new Item.Properties().stacksTo(1).overrideDescription("item.create.package")
     );
     public static final PackageItem CARDBOARD_PACKAGE_10X12 = register(
         "cardboard_package_10x12",
         PackageItem.styled(AllPackageStyles.CARDBOARD_10X12),
-        new Item.Settings().maxCount(1).translationKey("item.create.package")
+        new Item.Properties().stacksTo(1).overrideDescription("item.create.package")
     );
     public static final PackageItem CARDBOARD_PACKAGE_10X8 = register(
         "cardboard_package_10x8",
         PackageItem.styled(AllPackageStyles.CARDBOARD_10X8),
-        new Item.Settings().maxCount(1).translationKey("item.create.package")
+        new Item.Properties().stacksTo(1).overrideDescription("item.create.package")
     );
     public static final PackageItem CARDBOARD_PACKAGE_12X10 = register(
         "cardboard_package_12x10",
         PackageItem.styled(AllPackageStyles.CARDBOARD_12X10),
-        new Item.Settings().maxCount(1).translationKey("item.create.package")
+        new Item.Properties().stacksTo(1).overrideDescription("item.create.package")
     );
     public static final PackageItem RARE_CREEPER_PACKAGE = register(
         "rare_creeper_package",
         PackageItem.styled(AllPackageStyles.RARE_CREEPER),
-        new Item.Settings().maxCount(1).translationKey("item.create.rare_package")
+        new Item.Properties().stacksTo(1).overrideDescription("item.create.rare_package")
     );
     public static final PackageItem RARE_DARCY_PACKAGE = register(
         "rare_darcy_package",
         PackageItem.styled(AllPackageStyles.RARE_DARCY),
-        new Item.Settings().maxCount(1).translationKey("item.create.rare_package")
+        new Item.Properties().stacksTo(1).overrideDescription("item.create.rare_package")
     );
     public static final PackageItem RARE_EVAN_PACKAGE = register(
         "rare_evan_package",
         PackageItem.styled(AllPackageStyles.RARE_EVAN),
-        new Item.Settings().maxCount(1).translationKey("item.create.rare_package")
+        new Item.Properties().stacksTo(1).overrideDescription("item.create.rare_package")
     );
     public static final PackageItem RARE_JINX_PACKAGE = register(
         "rare_jinx_package",
         PackageItem.styled(AllPackageStyles.RARE_JINX),
-        new Item.Settings().maxCount(1).translationKey("item.create.rare_package")
+        new Item.Properties().stacksTo(1).overrideDescription("item.create.rare_package")
     );
     public static final PackageItem RARE_KRYPPERS_PACKAGE = register(
         "rare_kryppers_package",
         PackageItem.styled(AllPackageStyles.RARE_KRYPPERS),
-        new Item.Settings().maxCount(1).translationKey("item.create.rare_package")
+        new Item.Properties().stacksTo(1).overrideDescription("item.create.rare_package")
     );
     public static final PackageItem RARE_SIMI_PACKAGE = register(
         "rare_simi_package",
         PackageItem.styled(AllPackageStyles.RARE_SIMI),
-        new Item.Settings().maxCount(1).translationKey("item.create.rare_package")
+        new Item.Properties().stacksTo(1).overrideDescription("item.create.rare_package")
     );
     public static final PackageItem RARE_STARLOTTE_PACKAGE = register(
         "rare_starlotte_package",
         PackageItem.styled(AllPackageStyles.RARE_STARLOTTE),
-        new Item.Settings().maxCount(1).translationKey("item.create.rare_package")
+        new Item.Properties().stacksTo(1).overrideDescription("item.create.rare_package")
     );
     public static final PackageItem RARE_THUNDER_PACKAGE = register(
         "rare_thunder_package",
         PackageItem.styled(AllPackageStyles.RARE_THUNDER),
-        new Item.Settings().maxCount(1).translationKey("item.create.rare_package")
+        new Item.Properties().stacksTo(1).overrideDescription("item.create.rare_package")
     );
     public static final PackageItem RARE_UP_PACKAGE = register(
         "rare_up_package",
         PackageItem.styled(AllPackageStyles.RARE_UP),
-        new Item.Settings().maxCount(1).translationKey("item.create.rare_package")
+        new Item.Properties().stacksTo(1).overrideDescription("item.create.rare_package")
     );
     public static final PackageItem RARE_VECTOR_PACKAGE = register(
         "rare_vector_package",
         PackageItem.styled(AllPackageStyles.RARE_VECTOR),
-        new Item.Settings().maxCount(1).translationKey("item.create.rare_package")
+        new Item.Properties().stacksTo(1).overrideDescription("item.create.rare_package")
     );
-    public static final ShoppingListItem SHOPPING_LIST = register("shopping_list", ShoppingListItem::new, new Item.Settings().maxCount(1));
+    public static final ShoppingListItem SHOPPING_LIST = register("shopping_list", ShoppingListItem::new, new Item.Properties().stacksTo(1));
     public static final CardboardArmorItem CARDBOARD_HELMET = register(
         "cardboard_helmet",
         CardboardArmorItem::new,
-        new Item.Settings().maxDamage(EquipmentType.HELMET.getMaxDamage(AllArmorMaterials.CARDBOARD.durability()))
-            .attributeModifiers(AllArmorMaterials.CARDBOARD.createAttributeModifiers(EquipmentType.HELMET))
-            .enchantable(AllArmorMaterials.CARDBOARD.enchantmentValue()).component(
-                DataComponentTypes.EQUIPPABLE,
-                EquippableComponent.builder(EquipmentType.HELMET.getEquipmentSlot()).equipSound(AllArmorMaterials.CARDBOARD.equipSound())
-                    .model(AllArmorMaterials.CARDBOARD.assetId()).cameraOverlay(Identifier.of(MOD_ID, "misc/package_blur")).build()
+        new Item.Properties().durability(ArmorType.HELMET.getDurability(AllArmorMaterials.CARDBOARD.durability()))
+            .attributes(AllArmorMaterials.CARDBOARD.createAttributes(ArmorType.HELMET)).enchantable(AllArmorMaterials.CARDBOARD.enchantmentValue())
+            .component(
+                DataComponents.EQUIPPABLE,
+                Equippable.builder(ArmorType.HELMET.getSlot()).setEquipSound(AllArmorMaterials.CARDBOARD.equipSound())
+                    .setAsset(AllArmorMaterials.CARDBOARD.assetId())
+                    .setCameraOverlay(ResourceLocation.fromNamespaceAndPath(MOD_ID, "misc/package_blur")).build()
             ).repairable(AllArmorMaterials.CARDBOARD.repairIngredient())
     );
     public static final CardboardArmorItem CARDBOARD_CHESTPLATE = register(
         "cardboard_chestplate",
         CardboardArmorItem::new,
-        new Item.Settings().armor(AllArmorMaterials.CARDBOARD, EquipmentType.CHESTPLATE)
+        new Item.Properties().humanoidArmor(AllArmorMaterials.CARDBOARD, ArmorType.CHESTPLATE)
     );
     public static final CardboardArmorItem CARDBOARD_LEGGINGS = register(
         "cardboard_leggings",
         CardboardArmorItem::new,
-        new Item.Settings().armor(AllArmorMaterials.CARDBOARD, EquipmentType.LEGGINGS)
+        new Item.Properties().humanoidArmor(AllArmorMaterials.CARDBOARD, ArmorType.LEGGINGS)
     );
     public static final CardboardArmorItem CARDBOARD_BOOTS = register(
         "cardboard_boots",
         CardboardArmorItem::new,
-        new Item.Settings().armor(AllArmorMaterials.CARDBOARD, EquipmentType.BOOTS)
+        new Item.Properties().humanoidArmor(AllArmorMaterials.CARDBOARD, ArmorType.BOOTS)
     );
     @SuppressWarnings("deprecation")
     public static final CardboardSwordItem CARDBOARD_SWORD = register(
         "cardboard_sword",
         CardboardSwordItem::new,
-        new Item.Settings().maxDamage(AllToolMaterials.CARDBOARD.durability()).repairable(AllToolMaterials.CARDBOARD.repairItems())
+        new Item.Properties().durability(AllToolMaterials.CARDBOARD.durability()).repairable(AllToolMaterials.CARDBOARD.repairItems())
             .enchantable(AllToolMaterials.CARDBOARD.enchantmentValue()).component(
-                DataComponentTypes.TOOL, new ToolComponent(
+                DataComponents.TOOL, new Tool(
                     List.of(
-                        ToolComponent.Rule.ofAlwaysDropping(RegistryEntryList.of(Blocks.COBWEB.getRegistryEntry()), 15.0F),
-                        ToolComponent.Rule.of(
-                            Registries.createEntryLookup(Registries.BLOCK).getOrThrow(BlockTags.SWORD_INSTANTLY_MINES),
+                        Tool.Rule.minesAndDrops(HolderSet.direct(Blocks.COBWEB.builtInRegistryHolder()), 15.0F),
+                        Tool.Rule.overrideSpeed(
+                            BuiltInRegistries.acquireBootstrapRegistrationLookup(BuiltInRegistries.BLOCK).getOrThrow(BlockTags.SWORD_INSTANTLY_MINES),
                             Float.MAX_VALUE
                         ),
-                        ToolComponent.Rule.of(Registries.createEntryLookup(Registries.BLOCK).getOrThrow(BlockTags.SWORD_EFFICIENT), 1.5F)
+                        Tool.Rule.overrideSpeed(
+                            BuiltInRegistries.acquireBootstrapRegistrationLookup(BuiltInRegistries.BLOCK)
+                                .getOrThrow(BlockTags.SWORD_EFFICIENT), 1.5F
+                        )
                     ), 1.0F, 2, false
                 )
-            ).attributeModifiers(AttributeModifiersComponent.builder().add(
-                EntityAttributes.ATTACK_DAMAGE, new EntityAttributeModifier(
-                    Item.BASE_ATTACK_DAMAGE_MODIFIER_ID,
+            ).attributes(ItemAttributeModifiers.builder().add(
+                Attributes.ATTACK_DAMAGE,
+                new AttributeModifier(
+                    Item.BASE_ATTACK_DAMAGE_ID,
                     3.0F + AllToolMaterials.CARDBOARD.attackDamageBonus(),
-                    EntityAttributeModifier.Operation.ADD_VALUE
-                ), AttributeModifierSlot.MAINHAND
+                    AttributeModifier.Operation.ADD_VALUE
+                ),
+                EquipmentSlotGroup.MAINHAND
             ).add(
-                EntityAttributes.ATTACK_SPEED,
-                new EntityAttributeModifier(Item.BASE_ATTACK_SPEED_MODIFIER_ID, 1.0F, EntityAttributeModifier.Operation.ADD_VALUE),
-                AttributeModifierSlot.MAINHAND
-            ).add(EntityAttributes.ATTACK_KNOCKBACK, CardboardSwordItem.KNOCKBACK_MODIFIER, AttributeModifierSlot.MAINHAND).build())
-            .component(DataComponentTypes.WEAPON, new WeaponComponent(1))
+                Attributes.ATTACK_SPEED,
+                new AttributeModifier(Item.BASE_ATTACK_SPEED_ID, 1.0F, AttributeModifier.Operation.ADD_VALUE),
+                EquipmentSlotGroup.MAINHAND
+            ).add(Attributes.ATTACK_KNOCKBACK, CardboardSwordItem.KNOCKBACK_MODIFIER, EquipmentSlotGroup.MAINHAND).build())
+            .component(DataComponents.WEAPON, new Weapon(1))
     );
     public static final BlueprintItem CRAFTING_BLUEPRINT = register("crafting_blueprint", BlueprintItem::new);
     public static final TreeFertilizerItem TREE_FERTILIZER = register("tree_fertilizer", TreeFertilizerItem::new);
     public static final SymmetryWandItem WAND_OF_SYMMETRY = register(
         "wand_of_symmetry",
         SymmetryWandItem::new,
-        new Item.Settings().maxCount(1).rarity(Rarity.UNCOMMON)
+        new Item.Properties().stacksTo(1).rarity(Rarity.UNCOMMON)
     );
-    public static final Item EMPTY_SCHEMATIC = register("empty_schematic", new Item.Settings().maxCount(1));
+    public static final Item EMPTY_SCHEMATIC = register("empty_schematic", new Item.Properties().stacksTo(1));
     public static final SchematicAndQuillItem SCHEMATIC_AND_QUILL = register(
         "schematic_and_quill",
         SchematicAndQuillItem::new,
-        new Item.Settings().maxCount(1)
+        new Item.Properties().stacksTo(1)
     );
-    public static final SchematicItem SCHEMATIC = register("schematic", SchematicItem::new, new Item.Settings().maxCount(1));
+    public static final SchematicItem SCHEMATIC = register("schematic", SchematicItem::new, new Item.Properties().stacksTo(1));
     public static final WorldshaperItem WORLDSHAPER = register(
         "handheld_worldshaper",
         WorldshaperItem::new,
-        new Item.Settings().maxCount(1).rarity(Rarity.EPIC)
+        new Item.Properties().stacksTo(1).rarity(Rarity.EPIC)
     );
     public static final TagDependentIngredientItem CRUSHED_RAW_OSMIUM = register("crushed_raw_osmium", TagDependentIngredientItem.tag("ores/osmium"));
     public static final TagDependentIngredientItem CRUSHED_RAW_PLATINUM = register(
@@ -1013,11 +1019,11 @@ public class AllItems {
     );
     public static final TagDependentIngredientItem CRUSHED_RAW_NICKEL = register("crushed_raw_nickel", TagDependentIngredientItem.tag("ores/nickel"));
 
-    private static <T extends BucketItem> T register(FlowableFluid fluid, BiFunction<Fluid, Item.Settings, T> factory) {
+    private static <T extends BucketItem> T register(FlowableFluid fluid, BiFunction<Fluid, Item.Properties, T> factory) {
         T bucket = register(
-            Registries.FLUID.getId(fluid).withSuffixedPath("_bucket"),
+            BuiltInRegistries.FLUID.getKey(fluid).withSuffix("_bucket"),
             settings -> factory.apply(fluid, settings),
-            new Item.Settings().recipeRemainder(Items.BUCKET).maxCount(1)
+            new Item.Properties().craftRemainder(Items.BUCKET).stacksTo(1)
         );
         fluid.getEntry().bucket = bucket;
         return bucket;
@@ -1027,16 +1033,16 @@ public class AllItems {
         return register(block, BlockItem::new);
     }
 
-    private static <T extends Block, U extends Item> U register(T block, BiFunction<T, Item.Settings, U> factory) {
-        return register(block, factory, new Item.Settings());
+    private static <T extends Block, U extends Item> U register(T block, BiFunction<T, Item.Properties, U> factory) {
+        return register(block, factory, new Item.Properties());
     }
 
     @SuppressWarnings("deprecation")
-    private static <T extends Block, U extends Item> U register(T block, BiFunction<T, Item.Settings, U> factory, Item.Settings settings) {
+    private static <T extends Block, U extends Item> U register(T block, BiFunction<T, Item.Properties, U> factory, Item.Properties settings) {
         return register(
-            block.getRegistryEntry().registryKey().getValue(),
+            block.builtInRegistryHolder().key().location(),
             itemSettings -> factory.apply(block, itemSettings),
-            settings.useBlockPrefixedTranslationKey()
+            settings.useBlockDescriptionPrefix()
         );
     }
 
@@ -1044,25 +1050,25 @@ public class AllItems {
         return register(id, Item::new);
     }
 
-    private static Item register(String id, Item.Settings settings) {
-        return register(Identifier.of(MOD_ID, id), Item::new, settings);
+    private static Item register(String id, Item.Properties settings) {
+        return register(ResourceLocation.fromNamespaceAndPath(MOD_ID, id), Item::new, settings);
     }
 
-    private static <T extends Item> T register(String id, Function<Item.Settings, T> factory) {
-        return register(Identifier.of(MOD_ID, id), factory, new Item.Settings());
+    private static <T extends Item> T register(String id, Function<Item.Properties, T> factory) {
+        return register(ResourceLocation.fromNamespaceAndPath(MOD_ID, id), factory, new Item.Properties());
     }
 
-    private static <T extends Item> T register(String id, Function<Item.Settings, T> factory, Item.Settings settings) {
-        return register(Identifier.of(MOD_ID, id), factory, settings);
+    private static <T extends Item> T register(String id, Function<Item.Properties, T> factory, Item.Properties settings) {
+        return register(ResourceLocation.fromNamespaceAndPath(MOD_ID, id), factory, settings);
     }
 
-    private static <T extends Item> T register(Identifier id, Function<Item.Settings, T> factory, Item.Settings settings) {
-        RegistryKey<Item> key = RegistryKey.of(RegistryKeys.ITEM, id);
-        T item = factory.apply(settings.registryKey(key));
+    private static <T extends Item> T register(ResourceLocation id, Function<Item.Properties, T> factory, Item.Properties settings) {
+        ResourceKey<Item> key = ResourceKey.create(Registries.ITEM, id);
+        T item = factory.apply(settings.setId(key));
         if (item instanceof BlockItem blockItem) {
-            blockItem.appendBlocks(Item.BLOCK_ITEMS, item);
+            blockItem.registerBlocks(Item.BY_BLOCK, item);
         }
-        return Registry.register(Registries.ITEM, key, item);
+        return Registry.register(BuiltInRegistries.ITEM, key, item);
     }
 
     public static void register() {

@@ -20,17 +20,17 @@ import mezz.jei.api.gui.ingredient.IRecipeSlotsView;
 import mezz.jei.api.recipe.IFocusGroup;
 import mezz.jei.api.recipe.types.IRecipeType;
 import net.fabricmc.fabric.api.recipe.v1.ingredient.DefaultCustomIngredients;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.recipe.Ingredient;
-import net.minecraft.recipe.PreparedRecipes;
-import net.minecraft.recipe.RecipeEntry;
-import net.minecraft.registry.Registries;
-import net.minecraft.registry.RegistryKey;
-import net.minecraft.registry.RegistryKeys;
-import net.minecraft.text.Text;
-import net.minecraft.util.Identifier;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.item.crafting.RecipeHolder;
+import net.minecraft.world.item.crafting.RecipeMap;
 import org.apache.commons.lang3.mutable.MutableInt;
 import org.jetbrains.annotations.NotNull;
 import org.joml.Matrix3x2f;
@@ -41,17 +41,17 @@ import java.util.stream.Stream;
 
 import static com.zurrtum.create.Create.MOD_ID;
 
-public class DrainingCategory extends CreateCategory<RecipeEntry<EmptyingRecipe>> {
-    public static List<RecipeEntry<EmptyingRecipe>> getRecipes(PreparedRecipes preparedRecipes, Stream<ItemStack> itemStream) {
-        List<RecipeEntry<EmptyingRecipe>> recipes = new ArrayList<>(preparedRecipes.getAll(AllRecipeTypes.EMPTYING));
+public class DrainingCategory extends CreateCategory<RecipeHolder<EmptyingRecipe>> {
+    public static List<RecipeHolder<EmptyingRecipe>> getRecipes(RecipeMap preparedRecipes, Stream<ItemStack> itemStream) {
+        List<RecipeHolder<EmptyingRecipe>> recipes = new ArrayList<>(preparedRecipes.byType(AllRecipeTypes.EMPTYING));
         MutableInt i = new MutableInt();
         itemStream.forEach(stack -> {
             if (PotionFluidHandler.isPotionItem(stack)) {
-                Ingredient ingredient = stack.getComponentChanges()
-                    .isEmpty() ? Ingredient.ofItem(stack.getItem()) : DefaultCustomIngredients.components(stack);
-                recipes.add(new RecipeEntry<>(
-                    RegistryKey.of(RegistryKeys.RECIPE, Identifier.of(MOD_ID, "draining_potions_" + i.getAndIncrement())),
-                    new EmptyingRecipe(Items.GLASS_BOTTLE.getDefaultStack(), PotionFluidHandler.getFluidFromPotionItem(stack), ingredient)
+                Ingredient ingredient = stack.getComponentsPatch()
+                    .isEmpty() ? Ingredient.of(stack.getItem()) : DefaultCustomIngredients.components(stack);
+                recipes.add(new RecipeHolder<>(
+                    ResourceKey.create(Registries.RECIPE, ResourceLocation.fromNamespaceAndPath(MOD_ID, "draining_potions_" + i.getAndIncrement())),
+                    new EmptyingRecipe(Items.GLASS_BOTTLE.getDefaultInstance(), PotionFluidHandler.getFluidFromPotionItem(stack), ingredient)
                 ));
                 return;
             }
@@ -63,16 +63,16 @@ public class DrainingCategory extends CreateCategory<RecipeEntry<EmptyingRecipe>
                 if (fluid.isEmpty()) {
                     return;
                 }
-                Identifier itemName = Registries.ITEM.getId(stack.getItem());
-                Identifier fluidName = Registries.FLUID.getId(fluid.getFluid());
-                Identifier id = Identifier.of(
+                ResourceLocation itemName = BuiltInRegistries.ITEM.getKey(stack.getItem());
+                ResourceLocation fluidName = BuiltInRegistries.FLUID.getKey(fluid.getFluid());
+                ResourceLocation id = ResourceLocation.fromNamespaceAndPath(
                     MOD_ID,
                     "empty_" + itemName.getNamespace() + "_" + itemName.getPath() + "_with_" + fluidName.getNamespace() + "_" + fluidName.getPath()
                 );
-                Ingredient ingredient = stack.getComponentChanges()
-                    .isEmpty() ? Ingredient.ofItem(stack.getItem()) : DefaultCustomIngredients.components(stack);
-                recipes.add(new RecipeEntry<>(
-                    RegistryKey.of(RegistryKeys.RECIPE, id),
+                Ingredient ingredient = stack.getComponentsPatch()
+                    .isEmpty() ? Ingredient.of(stack.getItem()) : DefaultCustomIngredients.components(stack);
+                recipes.add(new RecipeHolder<>(
+                    ResourceKey.create(Registries.RECIPE, id),
                     new EmptyingRecipe(capability.getContainer(), fluid, ingredient)
                 ));
             }
@@ -82,13 +82,13 @@ public class DrainingCategory extends CreateCategory<RecipeEntry<EmptyingRecipe>
 
     @Override
     @NotNull
-    public IRecipeType<RecipeEntry<EmptyingRecipe>> getRecipeType() {
+    public IRecipeType<RecipeHolder<EmptyingRecipe>> getRecipeType() {
         return JeiClientPlugin.DRAINING;
     }
 
     @Override
     @NotNull
-    public Text getTitle() {
+    public Component getTitle() {
         return CreateLang.translateDirect("recipe.draining");
     }
 
@@ -103,7 +103,7 @@ public class DrainingCategory extends CreateCategory<RecipeEntry<EmptyingRecipe>
     }
 
     @Override
-    public void setRecipe(IRecipeLayoutBuilder builder, RecipeEntry<EmptyingRecipe> entry, IFocusGroup focuses) {
+    public void setRecipe(IRecipeLayoutBuilder builder, RecipeHolder<EmptyingRecipe> entry, IFocusGroup focuses) {
         EmptyingRecipe recipe = entry.value();
         builder.addInputSlot(27, 8).setBackground(SLOT, -1, -1).add(recipe.ingredient());
         addFluidSlot(builder, 132, 8, recipe.fluidResult()).setBackground(SLOT, -1, -1);
@@ -111,12 +111,12 @@ public class DrainingCategory extends CreateCategory<RecipeEntry<EmptyingRecipe>
     }
 
     @Override
-    public void draw(RecipeEntry<EmptyingRecipe> entry, IRecipeSlotsView recipeSlotsView, DrawContext graphics, double mouseX, double mouseY) {
+    public void draw(RecipeHolder<EmptyingRecipe> entry, IRecipeSlotsView recipeSlotsView, GuiGraphics graphics, double mouseX, double mouseY) {
         AllGuiTextures.JEI_SHADOW.render(graphics, 62, 37);
         AllGuiTextures.JEI_DOWN_ARROW.render(graphics, 73, 4);
         FluidStack stack = entry.value().fluidResult();
-        graphics.state.addSpecialElement(new DrainRenderState(
-            new Matrix3x2f(graphics.getMatrices()),
+        graphics.guiRenderState.submitPicturesInPictureState(new DrainRenderState(
+            new Matrix3x2f(graphics.pose()),
             stack.getFluid(),
             stack.getComponentChanges(),
             75,

@@ -8,7 +8,7 @@ import com.zurrtum.create.content.kinetics.belt.transport.TransportedItemStack;
 public class DepotMovementBehaviour extends MovementBehaviour {
     @Override
     public void tick(MovementContext context) {
-        if (context.world.isClient()) {
+        if (context.world.isClientSide()) {
             DepotBehaviour behaviour;
             if (context.temporaryData == null) {
                 if (AllClientHandle.INSTANCE.getBlockEntityClientSide(context.contraption, context.localPos) instanceof DepotBlockEntity be) {

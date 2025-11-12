@@ -4,44 +4,44 @@ import com.mojang.serialization.MapCodec;
 import com.zurrtum.create.api.contraption.transformable.TransformableBlock;
 import com.zurrtum.create.content.contraptions.StructureTransform;
 import com.zurrtum.create.content.equipment.wrench.IWrenchable;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.HorizontalFacingBlock;
-import net.minecraft.block.enums.BlockFace;
-import net.minecraft.item.ItemPlacementContext;
-import net.minecraft.state.StateManager;
-import net.minecraft.state.property.EnumProperty;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Direction.Axis;
-import net.minecraft.util.math.Direction.AxisDirection;
+import net.minecraft.core.Direction;
+import net.minecraft.core.Direction.Axis;
+import net.minecraft.core.Direction.AxisDirection;
+import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.HorizontalDirectionalBlock;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.AttachFace;
+import net.minecraft.world.level.block.state.properties.EnumProperty;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class DirectedDirectionalBlock extends HorizontalFacingBlock implements IWrenchable, TransformableBlock {
+public class DirectedDirectionalBlock extends HorizontalDirectionalBlock implements IWrenchable, TransformableBlock {
 
-    public static final EnumProperty<BlockFace> TARGET = EnumProperty.of("target", BlockFace.class);
+    public static final EnumProperty<AttachFace> TARGET = EnumProperty.create("target", AttachFace.class);
 
-    public static final MapCodec<DirectedDirectionalBlock> CODEC = createCodec(DirectedDirectionalBlock::new);
+    public static final MapCodec<DirectedDirectionalBlock> CODEC = simpleCodec(DirectedDirectionalBlock::new);
 
-    public DirectedDirectionalBlock(Settings pProperties) {
+    public DirectedDirectionalBlock(Properties pProperties) {
         super(pProperties);
-        setDefaultState(getDefaultState().with(TARGET, BlockFace.WALL));
+        registerDefaultState(defaultBlockState().setValue(TARGET, AttachFace.WALL));
     }
 
     @Override
-    protected void appendProperties(StateManager.Builder<Block, BlockState> pBuilder) {
-        super.appendProperties(pBuilder.add(TARGET, FACING));
+    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> pBuilder) {
+        super.createBlockStateDefinition(pBuilder.add(TARGET, FACING));
     }
 
     @Nullable
-    public BlockState getPlacementState(ItemPlacementContext pContext) {
-        for (Direction direction : pContext.getPlacementDirections()) {
+    public BlockState getStateForPlacement(BlockPlaceContext pContext) {
+        for (Direction direction : pContext.getNearestLookingDirections()) {
             BlockState blockstate;
             if (direction.getAxis() == Axis.Y) {
-                blockstate = getDefaultState().with(TARGET, direction == Direction.UP ? BlockFace.CEILING : BlockFace.FLOOR)
-                    .with(FACING, pContext.getHorizontalPlayerFacing());
+                blockstate = defaultBlockState().setValue(TARGET, direction == Direction.UP ? AttachFace.CEILING : AttachFace.FLOOR)
+                    .setValue(FACING, pContext.getHorizontalDirection());
             } else {
-                blockstate = getDefaultState().with(TARGET, BlockFace.WALL).with(FACING, direction.getOpposite());
+                blockstate = defaultBlockState().setValue(TARGET, AttachFace.WALL).setValue(FACING, direction.getOpposite());
             }
 
             return blockstate;
@@ -51,10 +51,10 @@ public class DirectedDirectionalBlock extends HorizontalFacingBlock implements I
     }
 
     public static Direction getTargetDirection(BlockState pState) {
-        return switch (pState.get(TARGET)) {
+        return switch (pState.getValue(TARGET)) {
             case CEILING -> Direction.UP;
             case FLOOR -> Direction.DOWN;
-            default -> pState.get(FACING);
+            default -> pState.getValue(FACING);
         };
     }
 
@@ -64,13 +64,13 @@ public class DirectedDirectionalBlock extends HorizontalFacingBlock implements I
             return IWrenchable.super.getRotatedBlockState(originalState, targetedFace);
 
         Direction targetDirection = getTargetDirection(originalState);
-        Direction newFacing = targetDirection.rotateClockwise(targetedFace.getAxis());
-        if (targetedFace.getDirection() == AxisDirection.NEGATIVE)
+        Direction newFacing = targetDirection.getClockWise(targetedFace.getAxis());
+        if (targetedFace.getAxisDirection() == AxisDirection.NEGATIVE)
             newFacing = newFacing.getOpposite();
 
         if (newFacing.getAxis() == Axis.Y)
-            return originalState.with(TARGET, newFacing == Direction.UP ? BlockFace.CEILING : BlockFace.FLOOR);
-        return originalState.with(TARGET, BlockFace.WALL).with(FACING, newFacing);
+            return originalState.setValue(TARGET, newFacing == Direction.UP ? AttachFace.CEILING : AttachFace.FLOOR);
+        return originalState.setValue(TARGET, AttachFace.WALL).setValue(FACING, newFacing);
     }
 
     @Override
@@ -84,12 +84,12 @@ public class DirectedDirectionalBlock extends HorizontalFacingBlock implements I
         Direction newFacing = transform.rotateFacing(targetDirection);
 
         if (newFacing.getAxis() == Axis.Y)
-            return state.with(TARGET, newFacing == Direction.UP ? BlockFace.CEILING : BlockFace.FLOOR);
-        return state.with(TARGET, BlockFace.WALL).with(FACING, newFacing);
+            return state.setValue(TARGET, newFacing == Direction.UP ? AttachFace.CEILING : AttachFace.FLOOR);
+        return state.setValue(TARGET, AttachFace.WALL).setValue(FACING, newFacing);
     }
 
     @Override
-    protected @NotNull MapCodec<? extends HorizontalFacingBlock> getCodec() {
+    protected @NotNull MapCodec<? extends HorizontalDirectionalBlock> codec() {
         return CODEC;
     }
 }

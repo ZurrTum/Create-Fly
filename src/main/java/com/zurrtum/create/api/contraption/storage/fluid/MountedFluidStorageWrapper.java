@@ -3,7 +3,7 @@ package com.zurrtum.create.api.contraption.storage.fluid;
 import com.google.common.collect.ImmutableMap;
 import com.zurrtum.create.infrastructure.fluids.CombinedTankWrapper;
 import com.zurrtum.create.infrastructure.fluids.FluidInventory;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.core.BlockPos;
 
 /**
  * Wrapper around many MountedFluidStorages, providing access to all of them as one storage.

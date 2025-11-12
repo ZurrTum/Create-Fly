@@ -1,18 +1,18 @@
 package com.zurrtum.create.content.trains.bogey;
 
-import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.UnmodifiableView;
 
 import java.util.*;
+import net.minecraft.resources.ResourceLocation;
 
 import static com.zurrtum.create.Create.MOD_ID;
 
 public class AllBogeySizes {
-    private static final Map<Identifier, BogeySize> BOGEY_SIZES = new HashMap<>();
+    private static final Map<ResourceLocation, BogeySize> BOGEY_SIZES = new HashMap<>();
     private static final List<BogeySize> SORTED_INCREASING = new ArrayList<>();
     private static final List<BogeySize> SORTED_DECREASING = new ArrayList<>();
     @UnmodifiableView
-    private static final Map<Identifier, BogeySize> BOGEY_SIZES_VIEW = Collections.unmodifiableMap(BOGEY_SIZES);
+    private static final Map<ResourceLocation, BogeySize> BOGEY_SIZES_VIEW = Collections.unmodifiableMap(BOGEY_SIZES);
     @UnmodifiableView
     private static final List<BogeySize> SORTED_INCREASING_VIEW = Collections.unmodifiableList(SORTED_INCREASING);
     @UnmodifiableView
@@ -22,13 +22,13 @@ public class AllBogeySizes {
     public static final BogeySize LARGE = register("large", 12.5f);
 
     private static BogeySize register(String id, float radius) {
-        BogeySize size = new BogeySize(Identifier.of(MOD_ID, id), radius / 16f);
+        BogeySize size = new BogeySize(ResourceLocation.fromNamespaceAndPath(MOD_ID, id), radius / 16f);
         register(size);
         return size;
     }
 
     public static void register(BogeySize size) {
-        Identifier id = size.id();
+        ResourceLocation id = size.id();
         if (BOGEY_SIZES.containsKey(id)) {
             throw new IllegalArgumentException();
         }
@@ -41,7 +41,7 @@ public class AllBogeySizes {
     }
 
     @UnmodifiableView
-    public static Map<Identifier, BogeySize> all() {
+    public static Map<ResourceLocation, BogeySize> all() {
         return BOGEY_SIZES_VIEW;
     }
 

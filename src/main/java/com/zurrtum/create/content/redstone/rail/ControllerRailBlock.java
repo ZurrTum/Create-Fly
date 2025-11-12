@@ -6,51 +6,54 @@ import com.zurrtum.create.catnip.data.Iterate;
 import com.zurrtum.create.catnip.math.VecHelper;
 import com.zurrtum.create.content.equipment.wrench.IWrenchable;
 import com.zurrtum.create.foundation.block.MinecartPassBlock;
-import net.minecraft.block.*;
-import net.minecraft.block.enums.RailShape;
-import net.minecraft.entity.vehicle.AbstractMinecartEntity;
-import net.minecraft.entity.vehicle.FurnaceMinecartEntity;
-import net.minecraft.item.ItemPlacementContext;
-import net.minecraft.item.ItemUsageContext;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.state.StateManager;
-import net.minecraft.state.property.*;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.BlockMirror;
-import net.minecraft.util.BlockRotation;
-import net.minecraft.util.math.*;
-import net.minecraft.util.math.Direction.Axis;
-import net.minecraft.util.math.Direction.AxisDirection;
-import net.minecraft.world.BlockRenderView;
-import net.minecraft.world.BlockView;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.Direction.Axis;
+import net.minecraft.core.Direction.AxisDirection;
+import net.minecraft.core.Vec3i;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.util.Mth;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.vehicle.AbstractMinecart;
+import net.minecraft.world.entity.vehicle.MinecartFurnace;
+import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.item.context.UseOnContext;
+import net.minecraft.world.level.BlockAndTintGetter;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.*;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.*;
+import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 
-public class ControllerRailBlock extends AbstractRailBlock implements IWrenchable, MinecartPassBlock {
+public class ControllerRailBlock extends BaseRailBlock implements IWrenchable, MinecartPassBlock {
 
-    public static final EnumProperty<RailShape> SHAPE = Properties.STRAIGHT_RAIL_SHAPE;
-    public static final BooleanProperty BACKWARDS = BooleanProperty.of("backwards");
-    public static final IntProperty POWER = Properties.POWER;
-    private static final BlockRotation[] WRENCH_ROTATION = new BlockRotation[]{BlockRotation.CLOCKWISE_90, BlockRotation.CLOCKWISE_180, BlockRotation.COUNTERCLOCKWISE_90};
+    public static final EnumProperty<RailShape> SHAPE = BlockStateProperties.RAIL_SHAPE_STRAIGHT;
+    public static final BooleanProperty BACKWARDS = BooleanProperty.create("backwards");
+    public static final IntegerProperty POWER = BlockStateProperties.POWER;
+    private static final Rotation[] WRENCH_ROTATION = new Rotation[]{Rotation.CLOCKWISE_90, Rotation.CLOCKWISE_180, Rotation.COUNTERCLOCKWISE_90};
 
-    public static final MapCodec<ControllerRailBlock> CODEC = createCodec(ControllerRailBlock::new);
+    public static final MapCodec<ControllerRailBlock> CODEC = simpleCodec(ControllerRailBlock::new);
 
-    public ControllerRailBlock(Settings properties) {
+    public ControllerRailBlock(Properties properties) {
         super(true, properties);
-        setDefaultState(getDefaultState().with(POWER, 0).with(BACKWARDS, false).with(SHAPE, RailShape.NORTH_SOUTH).with(WATERLOGGED, false));
+        registerDefaultState(defaultBlockState().setValue(POWER, 0).setValue(BACKWARDS, false).setValue(SHAPE, RailShape.NORTH_SOUTH)
+            .setValue(WATERLOGGED, false));
     }
 
-    public static int getWireColor(BlockState state, @Nullable BlockRenderView world, @Nullable BlockPos pos, int tintIndex) {
-        return RedstoneWireBlock.getWireColor(pos != null && world != null ? state.get(Properties.POWER) : 0);
+    public static int getWireColor(BlockState state, @Nullable BlockAndTintGetter world, @Nullable BlockPos pos, int tintIndex) {
+        return RedStoneWireBlock.getColorForPower(pos != null && world != null ? state.getValue(BlockStateProperties.POWER) : 0);
     }
 
     public static Vec3i getAccelerationVector(BlockState state) {
         Direction pointingTo = getPointingTowards(state);
-        return (isStateBackwards(state) ? pointingTo.getOpposite() : pointingTo).getVector();
+        return (isStateBackwards(state) ? pointingTo.getOpposite() : pointingTo).getUnitVec3i();
     }
 
     private static Direction getPointingTowards(BlockState state) {
-        return switch (state.get(SHAPE)) {
+        return switch (state.getValue(SHAPE)) {
             case ASCENDING_WEST, EAST_WEST -> Direction.WEST;
             case ASCENDING_EAST -> Direction.EAST;
             case ASCENDING_SOUTH -> Direction.SOUTH;
@@ -59,9 +62,9 @@ public class ControllerRailBlock extends AbstractRailBlock implements IWrenchabl
     }
 
     @Override
-    protected BlockState updateBlockState(World world, BlockPos pos, BlockState state, boolean p_208489_4_) {
-        BlockState updatedState = super.updateBlockState(world, pos, state, p_208489_4_);
-        if (updatedState.get(SHAPE) == state.get(SHAPE))
+    protected BlockState updateDir(Level world, BlockPos pos, BlockState state, boolean p_208489_4_) {
+        BlockState updatedState = super.updateDir(world, pos, state, p_208489_4_);
+        if (updatedState.getValue(SHAPE) == state.getValue(SHAPE))
             return updatedState;
         BlockState reversedUpdatedState = updatedState;
 
@@ -71,13 +74,13 @@ public class ControllerRailBlock extends AbstractRailBlock implements IWrenchabl
                 Direction offset = getPointingTowards(updatedState);
                 if (opposite)
                     offset = offset.getOpposite();
-                for (BlockPos adjPos : Iterate.hereBelowAndAbove(pos.offset(offset))) {
+                for (BlockPos adjPos : Iterate.hereBelowAndAbove(pos.relative(offset))) {
                     BlockState adjState = world.getBlockState(adjPos);
-                    if (!adjState.isOf(AllBlocks.CONTROLLER_RAIL))
+                    if (!adjState.is(AllBlocks.CONTROLLER_RAIL))
                         continue;
                     if (getPointingTowards(adjState).getAxis() != offset.getAxis())
                         continue;
-                    if (adjState.get(BACKWARDS) != reversedUpdatedState.get(BACKWARDS))
+                    if (adjState.getValue(BACKWARDS) != reversedUpdatedState.getValue(BACKWARDS))
                         reversedUpdatedState = reversedUpdatedState.cycle(BACKWARDS);
                 }
             }
@@ -85,28 +88,31 @@ public class ControllerRailBlock extends AbstractRailBlock implements IWrenchabl
 
         // Replace if changed
         if (reversedUpdatedState != updatedState)
-            world.setBlockState(pos, reversedUpdatedState);
+            world.setBlockAndUpdate(pos, reversedUpdatedState);
         return reversedUpdatedState;
     }
 
-    private static void decelerateCart(BlockPos pos, AbstractMinecartEntity cart) {
-        Vec3d diff = VecHelper.getCenterOf(pos).subtract(cart.getEntityPos());
-        cart.setVelocity(diff.x / 16f, 0, diff.z / 16f);
+    private static void decelerateCart(BlockPos pos, AbstractMinecart cart) {
+        Vec3 diff = VecHelper.getCenterOf(pos).subtract(cart.position());
+        cart.setDeltaMovement(diff.x / 16f, 0, diff.z / 16f);
 
-        if (cart instanceof FurnaceMinecartEntity fme) {
-            fme.pushVec = Vec3d.ZERO;
+        if (cart instanceof MinecartFurnace fme) {
+            fme.push = Vec3.ZERO;
         }
     }
 
-    private static boolean isStableWith(BlockState testState, BlockView world, BlockPos pos) {
-        return hasTopRim(world, pos.down()) && (!testState.get(SHAPE).isAscending() || hasTopRim(world, pos.offset(getPointingTowards(testState))));
+    private static boolean isStableWith(BlockState testState, BlockGetter world, BlockPos pos) {
+        return canSupportRigidBlock(world, pos.below()) && (!testState.getValue(SHAPE).isSlope() || canSupportRigidBlock(
+            world,
+            pos.relative(getPointingTowards(testState))
+        ));
     }
 
     @Override
-    public BlockState getPlacementState(ItemPlacementContext p_196258_1_) {
-        Direction direction = p_196258_1_.getHorizontalPlayerFacing();
-        BlockState base = super.getPlacementState(p_196258_1_);
-        return (base == null ? getDefaultState() : base).with(BACKWARDS, direction.getDirection() == AxisDirection.POSITIVE);
+    public BlockState getStateForPlacement(BlockPlaceContext p_196258_1_) {
+        Direction direction = p_196258_1_.getHorizontalDirection();
+        BlockState base = super.getStateForPlacement(p_196258_1_);
+        return (base == null ? defaultBlockState() : base).setValue(BACKWARDS, direction.getAxisDirection() == AxisDirection.POSITIVE);
     }
 
     @Override
@@ -115,37 +121,37 @@ public class ControllerRailBlock extends AbstractRailBlock implements IWrenchabl
     }
 
     @Override
-    protected void appendProperties(StateManager.Builder<Block, BlockState> p_206840_1_) {
+    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> p_206840_1_) {
         p_206840_1_.add(SHAPE, POWER, BACKWARDS, WATERLOGGED);
     }
 
     @Override
-    public void onMinecartPass(BlockState state, World world, BlockPos pos, AbstractMinecartEntity cart) {
-        if (world.isClient())
+    public void onMinecartPass(BlockState state, Level world, BlockPos pos, AbstractMinecart cart) {
+        if (world.isClientSide())
             return;
-        Vec3d accelerationVec = Vec3d.of(getAccelerationVector(state));
-        double targetSpeed = cart.getMaxSpeed((ServerWorld) world) * state.get(POWER) / 15f;
+        Vec3 accelerationVec = Vec3.atLowerCornerOf(getAccelerationVector(state));
+        double targetSpeed = cart.getMaxSpeed((ServerLevel) world) * state.getValue(POWER) / 15f;
 
-        if (cart instanceof FurnaceMinecartEntity fme) {
-            fme.pushVec = new Vec3d(accelerationVec.x, 0, accelerationVec.z);
+        if (cart instanceof MinecartFurnace fme) {
+            fme.push = new Vec3(accelerationVec.x, 0, accelerationVec.z);
         }
 
-        Vec3d motion = cart.getVelocity();
-        if ((motion.dotProduct(accelerationVec) >= 0 || motion.lengthSquared() < 0.0001) && targetSpeed > 0)
-            cart.setVelocity(accelerationVec.multiply(targetSpeed));
+        Vec3 motion = cart.getDeltaMovement();
+        if ((motion.dot(accelerationVec) >= 0 || motion.lengthSqr() < 0.0001) && targetSpeed > 0)
+            cart.setDeltaMovement(accelerationVec.scale(targetSpeed));
         else
             decelerateCart(pos, cart);
     }
 
     @Override
-    protected void updateBlockState(BlockState state, World world, BlockPos pos, Block block) {
+    protected void updateState(BlockState state, Level world, BlockPos pos, Block block) {
         int newPower = calculatePower(world, pos);
-        if (state.get(POWER) != newPower)
-            placeAndNotify(state.with(POWER, newPower), pos, world);
+        if (state.getValue(POWER) != newPower)
+            placeAndNotify(state.setValue(POWER, newPower), pos, world);
     }
 
-    private int calculatePower(World world, BlockPos pos) {
-        int newPower = world.getReceivedRedstonePower(pos);
+    private int calculatePower(Level world, BlockPos pos) {
+        int newPower = world.getBestNeighborSignal(pos);
         if (newPower != 0)
             return newPower;
 
@@ -162,7 +168,7 @@ public class ControllerRailBlock extends AbstractRailBlock implements IWrenchabl
                 break;
             forwardDistance++;
             lastForwardRail = testPos;
-            forwardPower = world.getReceivedRedstonePower(testPos);
+            forwardPower = world.getBestNeighborSignal(testPos);
             if (forwardPower != 0)
                 break;
         }
@@ -172,7 +178,7 @@ public class ControllerRailBlock extends AbstractRailBlock implements IWrenchabl
                 break;
             backwardsDistance++;
             lastBackwardsRail = testPos;
-            backwardsPower = world.getReceivedRedstonePower(testPos);
+            backwardsPower = world.getBestNeighborSignal(testPos);
             if (backwardsPower != 0)
                 break;
         }
@@ -184,45 +190,45 @@ public class ControllerRailBlock extends AbstractRailBlock implements IWrenchabl
         if (forwardPower == 0 && backwardsDistance <= 8)
             return backwardsPower;
         if (backwardsPower != 0 && forwardPower != 0)
-            return MathHelper.ceil((backwardsPower * forwardDistance + forwardPower * backwardsDistance) / (double) (forwardDistance + backwardsDistance));
+            return Mth.ceil((backwardsPower * forwardDistance + forwardPower * backwardsDistance) / (double) (forwardDistance + backwardsDistance));
         return 0;
     }
 
     @Override
-    public ActionResult onWrenched(BlockState state, ItemUsageContext context) {
-        World world = context.getWorld();
-        if (world.isClient())
-            return ActionResult.SUCCESS;
-        BlockPos pos = context.getBlockPos();
-        for (BlockRotation testRotation : WRENCH_ROTATION) {
+    public InteractionResult onWrenched(BlockState state, UseOnContext context) {
+        Level world = context.getLevel();
+        if (world.isClientSide())
+            return InteractionResult.SUCCESS;
+        BlockPos pos = context.getClickedPos();
+        for (Rotation testRotation : WRENCH_ROTATION) {
             BlockState testState = rotate(state, testRotation);
             if (isStableWith(testState, world, pos)) {
                 placeAndNotify(testState, pos, world);
-                return ActionResult.SUCCESS;
+                return InteractionResult.SUCCESS;
             }
         }
-        BlockState testState = state.with(BACKWARDS, !state.get(BACKWARDS));
+        BlockState testState = state.setValue(BACKWARDS, !state.getValue(BACKWARDS));
         if (isStableWith(testState, world, pos))
             placeAndNotify(testState, pos, world);
-        return ActionResult.SUCCESS;
+        return InteractionResult.SUCCESS;
     }
 
-    private void placeAndNotify(BlockState state, BlockPos pos, World world) {
-        world.setBlockState(pos, state, Block.NOTIFY_ALL);
-        world.updateNeighborsAlways(pos.down(), this, null);
-        if (state.get(SHAPE).isAscending())
-            world.updateNeighborsAlways(pos.up(), this, null);
+    private void placeAndNotify(BlockState state, BlockPos pos, Level world) {
+        world.setBlock(pos, state, Block.UPDATE_ALL);
+        world.updateNeighborsAt(pos.below(), this, null);
+        if (state.getValue(SHAPE).isSlope())
+            world.updateNeighborsAt(pos.above(), this, null);
     }
 
     @Nullable
-    private BlockPos findNextRail(BlockPos from, BlockView world, boolean reversed) {
+    private BlockPos findNextRail(BlockPos from, BlockGetter world, boolean reversed) {
         BlockState current = world.getBlockState(from);
         if (!(current.getBlock() instanceof ControllerRailBlock))
             return null;
         Vec3i accelerationVec = getAccelerationVector(current);
-        BlockPos baseTestPos = reversed ? from.subtract(accelerationVec) : from.add(accelerationVec);
+        BlockPos baseTestPos = reversed ? from.subtract(accelerationVec) : from.offset(accelerationVec);
         for (BlockPos testPos : Iterate.hereBelowAndAbove(baseTestPos)) {
-            if (testPos.getY() > from.getY() && !current.get(SHAPE).isAscending())
+            if (testPos.getY() > from.getY() && !current.getValue(SHAPE).isSlope())
                 continue;
             BlockState testState = world.getBlockState(testPos);
             if (testState.getBlock() instanceof ControllerRailBlock && getAccelerationVector(testState).equals(accelerationVec))
@@ -232,53 +238,53 @@ public class ControllerRailBlock extends AbstractRailBlock implements IWrenchabl
     }
 
     @Override
-    public boolean hasComparatorOutput(BlockState state) {
+    public boolean hasAnalogOutputSignal(BlockState state) {
         return true;
     }
 
     @Override
-    public int getComparatorOutput(BlockState state, World world, BlockPos pos, Direction direction) {
-        return state.get(POWER);
+    public int getAnalogOutputSignal(BlockState state, Level world, BlockPos pos, Direction direction) {
+        return state.getValue(POWER);
     }
 
     @Override
-    public BlockState rotate(BlockState state, BlockRotation rotation) {
-        if (rotation == BlockRotation.NONE)
+    public BlockState rotate(BlockState state, Rotation rotation) {
+        if (rotation == Rotation.NONE)
             return state;
 
-        RailShape railshape = Blocks.POWERED_RAIL.getDefaultState().with(SHAPE, state.get(SHAPE)).rotate(rotation).get(SHAPE);
-        state = state.with(SHAPE, railshape);
+        RailShape railshape = Blocks.POWERED_RAIL.defaultBlockState().setValue(SHAPE, state.getValue(SHAPE)).rotate(rotation).getValue(SHAPE);
+        state = state.setValue(SHAPE, railshape);
 
-        if (rotation == BlockRotation.CLOCKWISE_180 || (getPointingTowards(state).getAxis() == Axis.Z) == (rotation == BlockRotation.COUNTERCLOCKWISE_90))
+        if (rotation == Rotation.CLOCKWISE_180 || (getPointingTowards(state).getAxis() == Axis.Z) == (rotation == Rotation.COUNTERCLOCKWISE_90))
             return state.cycle(BACKWARDS);
 
         return state;
     }
 
     @Override
-    public BlockState mirror(BlockState state, BlockMirror mirror) {
-        if (mirror == BlockMirror.NONE)
+    public BlockState mirror(BlockState state, Mirror mirror) {
+        if (mirror == Mirror.NONE)
             return state;
 
-        RailShape railshape = Blocks.POWERED_RAIL.getDefaultState().with(SHAPE, state.get(SHAPE)).mirror(mirror).get(SHAPE);
-        state = state.with(SHAPE, railshape);
+        RailShape railshape = Blocks.POWERED_RAIL.defaultBlockState().setValue(SHAPE, state.getValue(SHAPE)).mirror(mirror).getValue(SHAPE);
+        state = state.setValue(SHAPE, railshape);
 
-        if ((getPointingTowards(state).getAxis() == Axis.Z) == (mirror == BlockMirror.LEFT_RIGHT))
+        if ((getPointingTowards(state).getAxis() == Axis.Z) == (mirror == Mirror.LEFT_RIGHT))
             return state.cycle(BACKWARDS);
 
         return state;
     }
 
     public static boolean isStateBackwards(BlockState state) {
-        return state.get(BACKWARDS) ^ isReversedSlope(state);
+        return state.getValue(BACKWARDS) ^ isReversedSlope(state);
     }
 
     public static boolean isReversedSlope(BlockState state) {
-        return state.get(SHAPE) == RailShape.ASCENDING_SOUTH || state.get(SHAPE) == RailShape.ASCENDING_EAST;
+        return state.getValue(SHAPE) == RailShape.ASCENDING_SOUTH || state.getValue(SHAPE) == RailShape.ASCENDING_EAST;
     }
 
     @Override
-    protected MapCodec<? extends AbstractRailBlock> getCodec() {
+    protected MapCodec<? extends BaseRailBlock> codec() {
         return CODEC;
     }
 }

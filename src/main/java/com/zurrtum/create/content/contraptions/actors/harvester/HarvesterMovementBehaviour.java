@@ -7,16 +7,17 @@ import com.zurrtum.create.content.contraptions.behaviour.MovementContext;
 import com.zurrtum.create.foundation.item.ItemHelper;
 import com.zurrtum.create.foundation.utility.BlockHelper;
 import com.zurrtum.create.infrastructure.config.AllConfigs;
-import net.minecraft.block.*;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.registry.tag.BlockTags;
-import net.minecraft.state.property.IntProperty;
-import net.minecraft.state.property.Properties;
-import net.minecraft.state.property.Property;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.tags.BlockTags;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.*;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.block.state.properties.IntegerProperty;
+import net.minecraft.world.level.block.state.properties.Property;
+import net.minecraft.world.phys.Vec3;
 import org.apache.commons.lang3.mutable.MutableBoolean;
 
 public class HarvesterMovementBehaviour extends MovementBehaviour {
@@ -25,23 +26,23 @@ public class HarvesterMovementBehaviour extends MovementBehaviour {
     public boolean isActive(MovementContext context) {
         return super.isActive(context) && !VecHelper.isVecPointingTowards(
             context.relativeMotion,
-            context.state.get(HarvesterBlock.FACING).getOpposite()
+            context.state.getValue(HarvesterBlock.FACING).getOpposite()
         );
     }
 
     @Override
-    public Vec3d getActiveAreaOffset(MovementContext context) {
-        return Vec3d.of(context.state.get(HarvesterBlock.FACING).getVector()).multiply(.45);
+    public Vec3 getActiveAreaOffset(MovementContext context) {
+        return Vec3.atLowerCornerOf(context.state.getValue(HarvesterBlock.FACING).getUnitVec3i()).scale(.45);
     }
 
     @Override
     public void visitNewPosition(MovementContext context, BlockPos pos) {
-        World world = context.world;
-        if (world.isClient())
+        Level world = context.world;
+        if (world.isClientSide())
             return;
 
         BlockState stateVisited = world.getBlockState(pos);
-        if (stateVisited.isAir() || stateVisited.isIn(AllBlockTags.NON_HARVESTABLE))
+        if (stateVisited.isAir() || stateVisited.is(AllBlockTags.NON_HARVESTABLE))
             return;
 
         boolean notCropButCuttable = false;
@@ -56,7 +57,7 @@ public class HarvesterMovementBehaviour extends MovementBehaviour {
         ItemStack item = ItemStack.EMPTY;
         float effectChance = 1;
 
-        if (stateVisited.isIn(BlockTags.LEAVES)) {
+        if (stateVisited.is(BlockTags.LEAVES)) {
             item = new ItemStack(Items.SHEARS);
             effectChance = .45f;
         }
@@ -69,7 +70,7 @@ public class HarvesterMovementBehaviour extends MovementBehaviour {
                     stack,
                     new ItemStack(state.getBlock())
                 )) {
-                    stack.decrement(1);
+                    stack.shrink(1);
                     seedSubtracted.setTrue();
                 }
                 dropItem(context, stack);
@@ -77,29 +78,29 @@ public class HarvesterMovementBehaviour extends MovementBehaviour {
         );
 
         BlockState cutCrop = cutCrop(world, pos, stateVisited);
-        world.setBlockState(pos, cutCrop.canPlaceAt(world, pos) ? cutCrop : Blocks.AIR.getDefaultState());
+        world.setBlockAndUpdate(pos, cutCrop.canSurvive(world, pos) ? cutCrop : Blocks.AIR.defaultBlockState());
     }
 
-    public boolean isValidCrop(World world, BlockPos pos, BlockState state) {
+    public boolean isValidCrop(Level world, BlockPos pos, BlockState state) {
         boolean harvestPartial = AllConfigs.server().kinetics.harvestPartiallyGrown.get();
         boolean replant = AllConfigs.server().kinetics.harvesterReplants.get();
 
         if (state.getBlock() instanceof CropBlock crop) {
             if (harvestPartial)
-                return state != crop.withAge(0) || !replant;
-            return crop.isMature(state);
+                return state != crop.getStateForAge(0) || !replant;
+            return crop.isMaxAge(state);
         }
 
         if (state.getCollisionShape(world, pos).isEmpty() || state.getBlock() instanceof CocoaBlock) {
             for (Property<?> property : state.getProperties()) {
-                if (!(property instanceof IntProperty ageProperty))
+                if (!(property instanceof IntegerProperty ageProperty))
                     continue;
-                if (!property.getName().equals(Properties.AGE_1.getName()))
+                if (!property.getName().equals(BlockStateProperties.AGE_1.getName()))
                     continue;
-                int age = state.get(ageProperty);
+                int age = state.getValue(ageProperty);
                 if (state.getBlock() instanceof SweetBerryBushBlock && age <= 1 && replant)
                     continue;
-                if (age == 0 && replant || !harvestPartial && (ageProperty.getValues().size() - 1 != age))
+                if (age == 0 && replant || !harvestPartial && (ageProperty.getPossibleValues().size() - 1 != age))
                     continue;
                 return true;
             }
@@ -108,29 +109,29 @@ public class HarvesterMovementBehaviour extends MovementBehaviour {
         return false;
     }
 
-    public boolean isValidOther(World world, BlockPos pos, BlockState state) {
+    public boolean isValidOther(Level world, BlockPos pos, BlockState state) {
         if (state.getBlock() instanceof CropBlock)
             return false;
         if (state.getBlock() instanceof SugarCaneBlock)
             return true;
-        if (state.isIn(BlockTags.LEAVES))
+        if (state.is(BlockTags.LEAVES))
             return true;
         if (state.getBlock() instanceof CocoaBlock)
-            return state.get(CocoaBlock.AGE) == CocoaBlock.MAX_AGE;
+            return state.getValue(CocoaBlock.AGE) == CocoaBlock.MAX_AGE;
 
         if (state.getCollisionShape(world, pos).isEmpty()) {
-            if (state.getBlock() instanceof AbstractPlantStemBlock)
+            if (state.getBlock() instanceof GrowingPlantHeadBlock)
                 return true;
 
             for (Property<?> property : state.getProperties()) {
-                if (!(property instanceof IntProperty))
+                if (!(property instanceof IntegerProperty))
                     continue;
-                if (!property.getName().equals(Properties.AGE_1.getName()))
+                if (!property.getName().equals(BlockStateProperties.AGE_1.getName()))
                     continue;
                 return false;
             }
 
-            if (state.getBlock() instanceof PlantBlock) {
+            if (state.getBlock() instanceof VegetationBlock) {
                 return true;
             }
             //TODO
@@ -141,42 +142,42 @@ public class HarvesterMovementBehaviour extends MovementBehaviour {
         return false;
     }
 
-    private BlockState cutCrop(World world, BlockPos pos, BlockState state) {
+    private BlockState cutCrop(Level world, BlockPos pos, BlockState state) {
         if (!AllConfigs.server().kinetics.harvesterReplants.get()) {
             if (state.getFluidState().isEmpty())
-                return Blocks.AIR.getDefaultState();
-            return state.getFluidState().getBlockState();
+                return Blocks.AIR.defaultBlockState();
+            return state.getFluidState().createLegacyBlock();
         }
 
         Block block = state.getBlock();
         if (block instanceof CropBlock crop) {
-            BlockState newState = crop.withAge(0);
-            if (!newState.isOf(block))
+            BlockState newState = crop.getStateForAge(0);
+            if (!newState.is(block))
                 return newState;
-            IntProperty ageProperty = crop.getAgeProperty();
-            return state.with(ageProperty, 0);
+            IntegerProperty ageProperty = crop.getAgeProperty();
+            return state.setValue(ageProperty, 0);
         }
         if (block == Blocks.SWEET_BERRY_BUSH) {
-            return state.with(Properties.AGE_3, 1);
+            return state.setValue(BlockStateProperties.AGE_3, 1);
         }
-        if (state.isIn(AllBlockTags.SUGAR_CANE_VARIANTS) || block instanceof AbstractPlantStemBlock) {
+        if (state.is(AllBlockTags.SUGAR_CANE_VARIANTS) || block instanceof GrowingPlantHeadBlock) {
             if (state.getFluidState().isEmpty())
-                return Blocks.AIR.getDefaultState();
-            return state.getFluidState().getBlockState();
+                return Blocks.AIR.defaultBlockState();
+            return state.getFluidState().createLegacyBlock();
         }
         if (state.getCollisionShape(world, pos).isEmpty() || block instanceof CocoaBlock) {
             for (Property<?> property : state.getProperties()) {
-                if (!(property instanceof IntProperty))
+                if (!(property instanceof IntegerProperty))
                     continue;
-                if (!property.getName().equals(Properties.AGE_1.getName()))
+                if (!property.getName().equals(BlockStateProperties.AGE_1.getName()))
                     continue;
-                return state.with((IntProperty) property, 0);
+                return state.setValue((IntegerProperty) property, 0);
             }
         }
 
         if (state.getFluidState().isEmpty())
-            return Blocks.AIR.getDefaultState();
-        return state.getFluidState().getBlockState();
+            return Blocks.AIR.defaultBlockState();
+        return state.getFluidState().createLegacyBlock();
     }
 
     @Override

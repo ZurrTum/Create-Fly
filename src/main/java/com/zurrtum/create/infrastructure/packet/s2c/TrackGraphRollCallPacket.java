@@ -6,17 +6,17 @@ import com.zurrtum.create.Create;
 import com.zurrtum.create.catnip.codecs.stream.CatnipStreamCodecBuilders;
 import com.zurrtum.create.content.trains.graph.TrackGraph;
 import io.netty.buffer.ByteBuf;
-import net.minecraft.network.codec.PacketCodec;
-import net.minecraft.network.codec.PacketCodecs;
-import net.minecraft.network.packet.PacketType;
 import org.apache.logging.log4j.util.TriConsumer;
 
 import java.util.ArrayList;
 import java.util.List;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.PacketType;
 
 public record TrackGraphRollCallPacket(List<Entry> entries) implements S2CPacket {
-    public static final PacketCodec<ByteBuf, TrackGraphRollCallPacket> CODEC = CatnipStreamCodecBuilders.list(Entry.STREAM_CODEC)
-        .xmap(TrackGraphRollCallPacket::new, TrackGraphRollCallPacket::entries);
+    public static final StreamCodec<ByteBuf, TrackGraphRollCallPacket> CODEC = CatnipStreamCodecBuilders.list(Entry.STREAM_CODEC)
+        .map(TrackGraphRollCallPacket::new, TrackGraphRollCallPacket::entries);
 
     public static TrackGraphRollCallPacket ofServer() {
         List<Entry> entries = new ArrayList<>();
@@ -32,15 +32,15 @@ public record TrackGraphRollCallPacket(List<Entry> entries) implements S2CPacket
     }
 
     @Override
-    public PacketType<TrackGraphRollCallPacket> getPacketType() {
+    public PacketType<TrackGraphRollCallPacket> type() {
         return AllPackets.TRACK_GRAPH_ROLL_CALL;
     }
 
     public record Entry(int netId, int checksum) {
-        public static final PacketCodec<ByteBuf, Entry> STREAM_CODEC = PacketCodec.tuple(
-            PacketCodecs.VAR_INT,
+        public static final StreamCodec<ByteBuf, Entry> STREAM_CODEC = StreamCodec.composite(
+            ByteBufCodecs.VAR_INT,
             Entry::netId,
-            PacketCodecs.INTEGER,
+            ByteBufCodecs.INT,
             Entry::checksum,
             Entry::new
         );

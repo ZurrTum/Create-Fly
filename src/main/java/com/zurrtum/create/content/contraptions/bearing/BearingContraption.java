@@ -8,14 +8,14 @@ import com.zurrtum.create.content.contraptions.AssemblyException;
 import com.zurrtum.create.content.contraptions.Contraption;
 import com.zurrtum.create.content.decoration.copycat.CopycatBlockEntity;
 import com.zurrtum.create.infrastructure.config.AllConfigs;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.storage.ReadView;
-import net.minecraft.storage.WriteView;
-import net.minecraft.structure.StructureTemplate.StructureBlockInfo;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate.StructureBlockInfo;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import org.apache.commons.lang3.tuple.Pair;
 
 public class BearingContraption extends Contraption {
@@ -34,8 +34,8 @@ public class BearingContraption extends Contraption {
     }
 
     @Override
-    public boolean assemble(World world, BlockPos pos) throws AssemblyException {
-        BlockPos offset = pos.offset(facing);
+    public boolean assemble(Level world, BlockPos pos) throws AssemblyException {
+        BlockPos offset = pos.relative(facing);
         if (!searchMovedStructure(world, offset, null))
             return false;
         startMoving(world);
@@ -52,35 +52,35 @@ public class BearingContraption extends Contraption {
 
     @Override
     protected boolean isAnchoringBlockAt(BlockPos pos) {
-        return pos.equals(anchor.offset(facing.getOpposite()));
+        return pos.equals(anchor.relative(facing.getOpposite()));
     }
 
     @Override
-    public void addBlock(World level, BlockPos pos, Pair<StructureBlockInfo, BlockEntity> capture) {
+    public void addBlock(Level level, BlockPos pos, Pair<StructureBlockInfo, BlockEntity> capture) {
         BlockPos localPos = pos.subtract(anchor);
-        if (!getBlocks().containsKey(localPos) && getSailBlock(capture).isIn(AllBlockTags.WINDMILL_SAILS))
+        if (!getBlocks().containsKey(localPos) && getSailBlock(capture).is(AllBlockTags.WINDMILL_SAILS))
             sailBlocks++;
         super.addBlock(level, pos, capture);
     }
 
     private BlockState getSailBlock(Pair<StructureBlockInfo, BlockEntity> capture) {
         BlockState state = capture.getKey().state();
-        if (state.isOf(AllBlocks.COPYCAT_PANEL) && capture.getRight() instanceof CopycatBlockEntity cbe)
+        if (state.is(AllBlocks.COPYCAT_PANEL) && capture.getRight() instanceof CopycatBlockEntity cbe)
             return cbe.getMaterial();
         return state;
     }
 
     @Override
-    public void write(WriteView view, boolean spawnPacket) {
+    public void write(ValueOutput view, boolean spawnPacket) {
         super.write(view, spawnPacket);
         view.putInt("Sails", sailBlocks);
-        view.putInt("Facing", facing.getIndex());
+        view.putInt("Facing", facing.get3DDataValue());
     }
 
     @Override
-    public void read(World world, ReadView view, boolean spawnData) {
-        sailBlocks = view.getInt("Sails", 0);
-        facing = Direction.byIndex(view.getInt("Facing", 0));
+    public void read(Level world, ValueInput view, boolean spawnData) {
+        sailBlocks = view.getIntOr("Sails", 0);
+        facing = Direction.from3DDataValue(view.getIntOr("Facing", 0));
         super.read(world, view, spawnData);
     }
 

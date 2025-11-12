@@ -10,20 +10,19 @@ import com.zurrtum.create.content.trains.schedule.ScheduleRuntime;
 import com.zurrtum.create.content.trains.schedule.ScheduleRuntime.State;
 import com.zurrtum.create.content.trains.station.GlobalPackagePort;
 import com.zurrtum.create.content.trains.station.GlobalStation;
-import net.minecraft.inventory.Inventory;
-import net.minecraft.item.ItemStack;
+import net.minecraft.core.BlockPos;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
-
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.Container;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.regex.PatternSyntaxException;
 
 public class FetchPackagesInstruction extends TextScheduleInstruction {
-    public FetchPackagesInstruction(Identifier id) {
+    public FetchPackagesInstruction(ResourceLocation id) {
         super(id);
     }
 
@@ -43,7 +42,7 @@ public class FetchPackagesInstruction extends TextScheduleInstruction {
     }
 
     @Override
-    public DiscoveredPath start(ScheduleRuntime runtime, World level) {
+    public DiscoveredPath start(ScheduleRuntime runtime, Level level) {
         MinecraftServer server = level.getServer();
         if (server == null)
             return null;
@@ -60,7 +59,7 @@ public class FetchPackagesInstruction extends TextScheduleInstruction {
         }
 
         for (GlobalStation globalStation : train.graph.getPoints(EdgePointType.STATION)) {
-            ServerWorld dimLevel = server.getWorld(globalStation.blockEntityDimension);
+            ServerLevel dimLevel = server.getLevel(globalStation.blockEntityDimension);
             if (dimLevel == null)
                 continue;
 
@@ -68,8 +67,8 @@ public class FetchPackagesInstruction extends TextScheduleInstruction {
                 GlobalPackagePort port = entry.getValue();
                 BlockPos pos = entry.getKey();
 
-                Inventory postboxInventory = port.offlineBuffer;
-                if (dimLevel.isPosLoaded(pos) && dimLevel.getBlockEntity(pos) instanceof PostboxBlockEntity ppbe)
+                Container postboxInventory = port.offlineBuffer;
+                if (dimLevel.isLoaded(pos) && dimLevel.getBlockEntity(pos) instanceof PostboxBlockEntity ppbe)
                     postboxInventory = ppbe.inventory;
 
                 for (ItemStack stack : postboxInventory) {

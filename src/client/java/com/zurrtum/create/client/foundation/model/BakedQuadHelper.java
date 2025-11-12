@@ -1,17 +1,16 @@
 package com.zurrtum.create.client.foundation.model;
 
+import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.VertexFormat;
 import com.zurrtum.create.client.model.NormalsBakedQuad;
-import net.minecraft.client.render.VertexFormats;
-import net.minecraft.client.render.model.BakedQuad;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec3d;
-
 import java.util.Arrays;
+import net.minecraft.client.renderer.block.model.BakedQuad;
+import net.minecraft.util.Mth;
+import net.minecraft.world.phys.Vec3;
 
 public final class BakedQuadHelper {
 
-    public static final VertexFormat FORMAT = VertexFormats.POSITION_COLOR_TEXTURE_LIGHT_NORMAL;
+    public static final VertexFormat FORMAT = DefaultVertexFormat.BLOCK;
     public static final int VERTEX_STRIDE = FORMAT.getVertexSize() / 4;
 
     public static final int X_OFFSET = 0;
@@ -28,9 +27,9 @@ public final class BakedQuadHelper {
 
     public static BakedQuad clone(BakedQuad quad) {
         BakedQuad bakedQuad = new BakedQuad(
-            Arrays.copyOf(quad.vertexData(), quad.vertexData().length),
+            Arrays.copyOf(quad.vertices(), quad.vertices().length),
             quad.tintIndex(),
-            quad.face(),
+            quad.direction(),
             quad.sprite(),
             quad.shade(),
             quad.lightEmission()
@@ -42,38 +41,38 @@ public final class BakedQuadHelper {
     }
 
     public static BakedQuad cloneWithCustomGeometry(BakedQuad quad, int[] vertexData) {
-        BakedQuad bakedQuad = new BakedQuad(vertexData, quad.tintIndex(), quad.face(), quad.sprite(), quad.shade(), quad.lightEmission());
+        BakedQuad bakedQuad = new BakedQuad(vertexData, quad.tintIndex(), quad.direction(), quad.sprite(), quad.shade(), quad.lightEmission());
         if (NormalsBakedQuad.hasNormals(quad)) {
             NormalsBakedQuad.markNormals(bakedQuad);
         }
         return bakedQuad;
     }
 
-    public static Vec3d getXYZ(int[] vertexData, int vertex) {
+    public static Vec3 getXYZ(int[] vertexData, int vertex) {
         float x = Float.intBitsToFloat(vertexData[vertex * VERTEX_STRIDE + X_OFFSET]);
         float y = Float.intBitsToFloat(vertexData[vertex * VERTEX_STRIDE + Y_OFFSET]);
         float z = Float.intBitsToFloat(vertexData[vertex * VERTEX_STRIDE + Z_OFFSET]);
-        return new Vec3d(x, y, z);
+        return new Vec3(x, y, z);
     }
 
-    public static void setXYZ(int[] vertexData, int vertex, Vec3d xyz) {
+    public static void setXYZ(int[] vertexData, int vertex, Vec3 xyz) {
         vertexData[vertex * VERTEX_STRIDE + X_OFFSET] = Float.floatToRawIntBits((float) xyz.x);
         vertexData[vertex * VERTEX_STRIDE + Y_OFFSET] = Float.floatToRawIntBits((float) xyz.y);
         vertexData[vertex * VERTEX_STRIDE + Z_OFFSET] = Float.floatToRawIntBits((float) xyz.z);
     }
 
-    public static Vec3d getNormalXYZ(int[] vertexData, int vertex) {
+    public static Vec3 getNormalXYZ(int[] vertexData, int vertex) {
         int data = vertexData[vertex * VERTEX_STRIDE + NORMAL_OFFSET];
         float x = (byte) (data >> 24 & 0xFF) / 127f;
         float y = (byte) (data >> 16 & 0xFF) / 127f;
         float z = (byte) (data >> 8 & 0xFF) / 127f;
-        return new Vec3d(x, y, z);
+        return new Vec3(x, y, z);
     }
 
-    public static void setNormalXYZ(int[] vertexData, int vertex, Vec3d xyz) {
-        int x = Byte.toUnsignedInt((byte) (MathHelper.clamp(xyz.x, -1.0f, 1.0f) * 127));
-        int y = Byte.toUnsignedInt((byte) (MathHelper.clamp(xyz.y, -1.0f, 1.0f) * 127));
-        int z = Byte.toUnsignedInt((byte) (MathHelper.clamp(xyz.z, -1.0f, 1.0f) * 127));
+    public static void setNormalXYZ(int[] vertexData, int vertex, Vec3 xyz) {
+        int x = Byte.toUnsignedInt((byte) (Mth.clamp(xyz.x, -1.0f, 1.0f) * 127));
+        int y = Byte.toUnsignedInt((byte) (Mth.clamp(xyz.y, -1.0f, 1.0f) * 127));
+        int z = Byte.toUnsignedInt((byte) (Mth.clamp(xyz.z, -1.0f, 1.0f) * 127));
         int data = (x << 24) | (y << 16) | (z << 8);
         vertexData[vertex * VERTEX_STRIDE + NORMAL_OFFSET] = data;
     }

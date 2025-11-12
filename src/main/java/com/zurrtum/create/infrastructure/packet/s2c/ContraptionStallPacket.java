@@ -3,22 +3,22 @@ package com.zurrtum.create.infrastructure.packet.s2c;
 import com.zurrtum.create.AllClientHandle;
 import com.zurrtum.create.AllPackets;
 import io.netty.buffer.ByteBuf;
-import net.minecraft.network.codec.PacketCodec;
-import net.minecraft.network.codec.PacketCodecs;
-import net.minecraft.network.packet.PacketType;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.PacketType;
 import org.apache.logging.log4j.util.TriConsumer;
 
 public record ContraptionStallPacket(int entityId, double x, double y, double z, float angle) implements S2CPacket {
-    public static final PacketCodec<ByteBuf, ContraptionStallPacket> CODEC = PacketCodec.tuple(
-        PacketCodecs.INTEGER,
+    public static final StreamCodec<ByteBuf, ContraptionStallPacket> CODEC = StreamCodec.composite(
+        ByteBufCodecs.INT,
         ContraptionStallPacket::entityId,
-        PacketCodecs.DOUBLE,
+        ByteBufCodecs.DOUBLE,
         ContraptionStallPacket::x,
-        PacketCodecs.DOUBLE,
+        ByteBufCodecs.DOUBLE,
         ContraptionStallPacket::y,
-        PacketCodecs.DOUBLE,
+        ByteBufCodecs.DOUBLE,
         ContraptionStallPacket::z,
-        PacketCodecs.FLOAT,
+        ByteBufCodecs.FLOAT,
         ContraptionStallPacket::angle,
         ContraptionStallPacket::new
     );
@@ -29,7 +29,7 @@ public record ContraptionStallPacket(int entityId, double x, double y, double z,
     }
 
     @Override
-    public PacketType<ContraptionStallPacket> getPacketType() {
+    public PacketType<ContraptionStallPacket> type() {
         return AllPackets.CONTRAPTION_STALL;
     }
 }

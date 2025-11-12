@@ -13,33 +13,33 @@ import mezz.jei.api.gui.drawable.IDrawable;
 import mezz.jei.api.gui.ingredient.IRecipeSlotsView;
 import mezz.jei.api.recipe.IFocusGroup;
 import mezz.jei.api.recipe.types.IRecipeType;
-import net.minecraft.block.Blocks;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.item.Items;
-import net.minecraft.recipe.PreparedRecipes;
-import net.minecraft.recipe.RecipeEntry;
-import net.minecraft.recipe.RecipeType;
-import net.minecraft.recipe.SmokingRecipe;
-import net.minecraft.text.Text;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.crafting.RecipeHolder;
+import net.minecraft.world.item.crafting.RecipeMap;
+import net.minecraft.world.item.crafting.RecipeType;
+import net.minecraft.world.item.crafting.SmokingRecipe;
+import net.minecraft.world.level.block.Blocks;
 import org.jetbrains.annotations.NotNull;
 import org.joml.Matrix3x2f;
 
 import java.util.List;
 
-public class FanSmokingCategory extends CreateCategory<RecipeEntry<SmokingRecipe>> {
-    public static List<RecipeEntry<SmokingRecipe>> getRecipes(PreparedRecipes preparedRecipes) {
-        return preparedRecipes.getAll(RecipeType.SMOKING).stream().filter(AllRecipeTypes.CAN_BE_AUTOMATED).toList();
+public class FanSmokingCategory extends CreateCategory<RecipeHolder<SmokingRecipe>> {
+    public static List<RecipeHolder<SmokingRecipe>> getRecipes(RecipeMap preparedRecipes) {
+        return preparedRecipes.byType(RecipeType.SMOKING).stream().filter(AllRecipeTypes.CAN_BE_AUTOMATED).toList();
     }
 
     @Override
     @NotNull
-    public IRecipeType<RecipeEntry<SmokingRecipe>> getRecipeType() {
+    public IRecipeType<RecipeHolder<SmokingRecipe>> getRecipeType() {
         return JeiClientPlugin.FAN_SMOKING;
     }
 
     @Override
     @NotNull
-    public Text getTitle() {
+    public Component getTitle() {
         return CreateLang.translateDirect("recipe.fan_smoking");
     }
 
@@ -54,17 +54,17 @@ public class FanSmokingCategory extends CreateCategory<RecipeEntry<SmokingRecipe
     }
 
     @Override
-    public void setRecipe(IRecipeLayoutBuilder builder, RecipeEntry<SmokingRecipe> entry, IFocusGroup focuses) {
+    public void setRecipe(IRecipeLayoutBuilder builder, RecipeHolder<SmokingRecipe> entry, IFocusGroup focuses) {
         SmokingRecipe recipe = entry.value();
-        builder.addInputSlot(21, 48).setBackground(SLOT, -1, -1).add(recipe.ingredient());
+        builder.addInputSlot(21, 48).setBackground(SLOT, -1, -1).add(recipe.input());
         builder.addOutputSlot(141, 48).setBackground(SLOT, -1, -1).add(recipe.result());
     }
 
     @Override
-    public void draw(RecipeEntry<SmokingRecipe> entry, IRecipeSlotsView recipeSlotsView, DrawContext graphics, double mouseX, double mouseY) {
+    public void draw(RecipeHolder<SmokingRecipe> entry, IRecipeSlotsView recipeSlotsView, GuiGraphics graphics, double mouseX, double mouseY) {
         AllGuiTextures.JEI_SHADOW.render(graphics, 46, 27);
         AllGuiTextures.JEI_LIGHT.render(graphics, 65, 39);
         AllGuiTextures.JEI_LONG_ARROW.render(graphics, 54, 51);
-        graphics.state.addSpecialElement(new FanRenderState(new Matrix3x2f(graphics.getMatrices()), 56, 4, Blocks.FIRE.getDefaultState()));
+        graphics.guiRenderState.submitPicturesInPictureState(new FanRenderState(new Matrix3x2f(graphics.pose()), 56, 4, Blocks.FIRE.defaultBlockState()));
     }
 }

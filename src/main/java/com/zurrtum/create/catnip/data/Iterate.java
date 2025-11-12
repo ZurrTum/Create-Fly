@@ -1,12 +1,11 @@
 package com.zurrtum.create.catnip.data;
 
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Direction.Axis;
-
 import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.List;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.Direction.Axis;
 
 public class Iterate {
     public static final boolean[] trueAndFalse = {true, false};
@@ -21,7 +20,7 @@ public class Iterate {
     private static Direction[] getHorizontals() {
         Direction[] directions = new Direction[4];
         for (int i = 0; i < 4; i++)
-            directions[i] = Direction.fromHorizontalQuarterTurns(i);
+            directions[i] = Direction.from2DDataValue(i);
         return directions;
     }
 
@@ -34,11 +33,11 @@ public class Iterate {
     }
 
     public static List<BlockPos> hereAndBelow(BlockPos pos) {
-        return Arrays.asList(pos, pos.down());
+        return Arrays.asList(pos, pos.below());
     }
 
     public static List<BlockPos> hereBelowAndAbove(BlockPos pos) {
-        return Arrays.asList(pos, pos.down(), pos.up());
+        return Arrays.asList(pos, pos.below(), pos.above());
     }
 
     public static <T> T cycleValue(List<T> list, T current) {

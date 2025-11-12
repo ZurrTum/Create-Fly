@@ -4,13 +4,12 @@ import com.zurrtum.create.client.catnip.lang.Lang;
 import com.zurrtum.create.client.catnip.lang.LangBuilder;
 import com.zurrtum.create.client.catnip.lang.LangNumberFormat;
 import com.zurrtum.create.infrastructure.fluids.FluidStack;
-import net.minecraft.block.BlockState;
-import net.minecraft.item.ItemStack;
-import net.minecraft.text.MutableText;
-import net.minecraft.text.Text;
-
 import java.util.ArrayList;
 import java.util.List;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.state.BlockState;
 
 import static com.zurrtum.create.Create.MOD_ID;
 
@@ -19,13 +18,13 @@ public class CreateLang extends Lang {
     /**
      * legacy-ish. Use CreateLang.translate and other builder methods where possible
      */
-    public static MutableText translateDirect(String key, Object... args) {
+    public static MutableComponent translateDirect(String key, Object... args) {
         Object[] args1 = LangBuilder.resolveBuilders(args);
-        return Text.translatable(MOD_ID + "." + key, args1);
+        return Component.translatable(MOD_ID + "." + key, args1);
     }
 
-    public static List<Text> translatedOptions(String prefix, String... keys) {
-        List<Text> result = new ArrayList<>(keys.length);
+    public static List<Component> translatedOptions(String prefix, String... keys) {
+        List<Component> result = new ArrayList<>(keys.length);
         for (String key : keys)
             result.add(translate((prefix != null ? prefix + "." : "") + key).component());
         return result;
@@ -42,7 +41,7 @@ public class CreateLang extends Lang {
     }
 
     public static LangBuilder itemName(ItemStack stack) {
-        return builder().add(stack.getName().copy());
+        return builder().add(stack.getHoverName().copy());
     }
 
     public static LangBuilder fluidName(FluidStack stack) {

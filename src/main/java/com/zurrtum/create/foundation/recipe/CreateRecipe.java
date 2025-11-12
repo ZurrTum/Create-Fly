@@ -1,29 +1,29 @@
 package com.zurrtum.create.foundation.recipe;
 
-import net.minecraft.item.ItemStack;
-import net.minecraft.recipe.IngredientPlacement;
-import net.minecraft.recipe.Recipe;
-import net.minecraft.recipe.book.RecipeBookCategory;
-import net.minecraft.recipe.input.RecipeInput;
-import net.minecraft.registry.RegistryWrapper;
-import net.minecraft.util.math.random.Random;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.PlacementInfo;
+import net.minecraft.world.item.crafting.Recipe;
+import net.minecraft.world.item.crafting.RecipeBookCategory;
+import net.minecraft.world.item.crafting.RecipeInput;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public interface CreateRecipe<T extends RecipeInput> extends Recipe<T> {
     @Override
-    default IngredientPlacement getIngredientPlacement() {
-        return IngredientPlacement.NONE;
+    default PlacementInfo placementInfo() {
+        return PlacementInfo.NOT_PLACEABLE;
     }
 
     @Override
-    default RecipeBookCategory getRecipeBookCategory() {
+    default RecipeBookCategory recipeBookCategory() {
         return null;
     }
 
     @Override
-    default boolean isIgnoredInRecipeBook() {
+    default boolean isSpecial() {
         return true;
     }
 
@@ -31,9 +31,9 @@ public interface CreateRecipe<T extends RecipeInput> extends Recipe<T> {
         return false;
     }
 
-    default List<ItemStack> craft(T input, Random random) {
+    default List<ItemStack> assemble(T input, RandomSource random) {
         List<ItemStack> list = new ArrayList<>(1);
-        list.add(craft(input, (RegistryWrapper.WrapperLookup) null));
+        list.add(assemble(input, (HolderLookup.Provider) null));
         return list;
     }
 }

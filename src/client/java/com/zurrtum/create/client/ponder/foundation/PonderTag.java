@@ -4,10 +4,10 @@ import com.zurrtum.create.client.catnip.gui.element.GuiGameElement;
 import com.zurrtum.create.client.catnip.gui.element.GuiGameElement.GuiItemRenderBuilder;
 import com.zurrtum.create.client.catnip.gui.element.ScreenElement;
 import com.zurrtum.create.client.ponder.Ponder;
-import net.minecraft.client.gl.RenderPipelines;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.Identifier;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.renderer.RenderPipelines;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix3x2fStack;
 
@@ -18,17 +18,17 @@ public class PonderTag implements ScreenElement {
      * for a certain Scene should be highlighted instead of selected single ones
      */
     public static final class Highlight {
-        public static final Identifier ALL = Ponder.asResource("_all");
+        public static final ResourceLocation ALL = Ponder.asResource("_all");
     }
 
-    private final Identifier id;
+    private final ResourceLocation id;
     @Nullable
-    private final Identifier textureIconLocation;
+    private final ResourceLocation textureIconLocation;
     private final ItemStack mainItem;
     private final GuiItemRenderBuilder itemIcon;
 
 
-    public PonderTag(Identifier id, @Nullable Identifier textureIconLocation, ItemStack itemIcon, ItemStack mainItem) {
+    public PonderTag(ResourceLocation id, @Nullable ResourceLocation textureIconLocation, ItemStack itemIcon, ItemStack mainItem) {
         this.id = id;
         this.textureIconLocation = textureIconLocation;
         this.mainItem = mainItem;
@@ -39,7 +39,7 @@ public class PonderTag implements ScreenElement {
         }
     }
 
-    public Identifier getId() {
+    public ResourceLocation getId() {
         return id;
     }
 
@@ -55,14 +55,14 @@ public class PonderTag implements ScreenElement {
         return PonderIndex.getLangAccess().getTagDescription(id);
     }
 
-    public void render(DrawContext graphics, int x, int y) {
-        Matrix3x2fStack poseStack = graphics.getMatrices();
+    public void render(GuiGraphics graphics, int x, int y) {
+        Matrix3x2fStack poseStack = graphics.pose();
         poseStack.pushMatrix();
         poseStack.translate(x, y);
         if (textureIconLocation != null) {
             //RenderSystem.setShaderTexture(0, icon);
             poseStack.scale(0.25f, 0.25f);
-            graphics.drawTexture(RenderPipelines.GUI_TEXTURED, textureIconLocation, 0, 0, 0, 0, 0, 64, 64, 64, 64);
+            graphics.blit(RenderPipelines.GUI_TEXTURED, textureIconLocation, 0, 0, 0, 0, 0, 64, 64, 64, 64);
         } else if (itemIcon != null) {
             itemIcon.render(graphics);
         }

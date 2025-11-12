@@ -10,111 +10,111 @@ import com.zurrtum.create.content.schematics.requirement.ItemRequirement.ItemUse
 import com.zurrtum.create.foundation.block.IBE;
 import com.zurrtum.create.foundation.block.RedStoneConnectBlock;
 import com.zurrtum.create.infrastructure.component.ClipboardEntry;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.ShapeContext;
-import net.minecraft.block.Waterloggable;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.component.DataComponentTypes;
-import net.minecraft.entity.ai.pathing.NavigationType;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.fluid.FluidState;
-import net.minecraft.fluid.Fluids;
-import net.minecraft.item.ItemPlacementContext;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.screen.ScreenTexts;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.state.StateManager.Builder;
-import net.minecraft.text.Text;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.DyeColor;
-import net.minecraft.util.Hand;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.random.Random;
-import net.minecraft.util.shape.VoxelShape;
-import net.minecraft.world.BlockView;
-import net.minecraft.world.World;
-import net.minecraft.world.WorldAccess;
-import net.minecraft.world.WorldView;
-import net.minecraft.world.block.WireOrientation;
-import net.minecraft.world.tick.ScheduledTickView;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.network.chat.CommonComponents;
+import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.DyeColor;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.LevelReader;
+import net.minecraft.world.level.ScheduledTickAccess;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.SimpleWaterloggedBlock;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition.Builder;
+import net.minecraft.world.level.material.FluidState;
+import net.minecraft.world.level.material.Fluids;
+import net.minecraft.world.level.pathfinder.PathComputationType;
+import net.minecraft.world.level.redstone.Orientation;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.phys.shapes.VoxelShape;
 
-import static net.minecraft.state.property.Properties.WATERLOGGED;
+import static net.minecraft.world.level.block.state.properties.BlockStateProperties.WATERLOGGED;
 
-public class NixieTubeBlock extends DoubleFaceAttachedBlock implements IBE<NixieTubeBlockEntity>, IWrenchable, Waterloggable, SpecialBlockItemRequirement, RedStoneConnectBlock {
+public class NixieTubeBlock extends DoubleFaceAttachedBlock implements IBE<NixieTubeBlockEntity>, IWrenchable, SimpleWaterloggedBlock, SpecialBlockItemRequirement, RedStoneConnectBlock {
     protected final DyeColor color;
 
-    public NixieTubeBlock(Settings properties, DyeColor color) {
+    public NixieTubeBlock(Properties properties, DyeColor color) {
         super(properties);
         this.color = color;
-        setDefaultState(getDefaultState().with(FACE, DoubleAttachFace.FLOOR).with(WATERLOGGED, false));
+        registerDefaultState(defaultBlockState().setValue(FACE, DoubleAttachFace.FLOOR).setValue(WATERLOGGED, false));
     }
 
-    public NixieTubeBlock(Settings properties) {
+    public NixieTubeBlock(Properties properties) {
         this(properties, DyeColor.ORANGE);
     }
 
-    public static Function<Settings, NixieTubeBlock> dyed(DyeColor color) {
+    public static Function<Properties, NixieTubeBlock> dyed(DyeColor color) {
         return properties -> new NixieTubeBlock(properties, color);
     }
 
     @Override
-    protected ActionResult onUseWithItem(
+    protected InteractionResult useItemOn(
         ItemStack stack,
         BlockState state,
-        World level,
+        Level level,
         BlockPos pos,
-        PlayerEntity player,
-        Hand hand,
+        Player player,
+        InteractionHand hand,
         BlockHitResult hitResult
     ) {
-        if (player.isSneaking())
-            return ActionResult.PASS_TO_DEFAULT_BLOCK_ACTION;
+        if (player.isShiftKeyDown())
+            return InteractionResult.TRY_WITH_EMPTY_HAND;
 
         NixieTubeBlockEntity nixie = getBlockEntity(level, pos);
 
         if (nixie == null) {
-            return ActionResult.PASS_TO_DEFAULT_BLOCK_ACTION;
+            return InteractionResult.TRY_WITH_EMPTY_HAND;
         }
         // Refuse interaction if nixie tube is in a computer-controlled row
         if (isInComputerControlledRow(level, pos)) {
-            return ActionResult.PASS_TO_DEFAULT_BLOCK_ACTION;
+            return InteractionResult.TRY_WITH_EMPTY_HAND;
         }
         if (stack.isEmpty()) {
             if (nixie.reactsToRedstone())
-                return ActionResult.PASS_TO_DEFAULT_BLOCK_ACTION;
+                return InteractionResult.TRY_WITH_EMPTY_HAND;
             nixie.clearCustomText();
             updateDisplayedRedstoneValue(state, level, pos);
-            return ActionResult.SUCCESS;
+            return InteractionResult.SUCCESS;
         }
 
-        boolean display = stack.getItem() == Items.NAME_TAG && stack.contains(DataComponentTypes.CUSTOM_NAME) || stack.isOf(AllItems.CLIPBOARD);
+        boolean display = stack.getItem() == Items.NAME_TAG && stack.has(DataComponents.CUSTOM_NAME) || stack.is(AllItems.CLIPBOARD);
         DyeColor dye = AllItemTags.getDyeColor(stack);
 
         if (!display && dye == null)
-            return ActionResult.PASS_TO_DEFAULT_BLOCK_ACTION;
+            return InteractionResult.TRY_WITH_EMPTY_HAND;
 
-        Text component;
+        Component component;
 
-        if (stack.isOf(AllItems.CLIPBOARD)) {
+        if (stack.is(AllItems.CLIPBOARD)) {
             List<ClipboardEntry> entries = ClipboardEntry.getLastViewedEntries(stack);
-            component = entries.isEmpty() ? stack.getOrDefault(DataComponentTypes.CUSTOM_NAME, ScreenTexts.EMPTY) : entries.getFirst().text;
+            component = entries.isEmpty() ? stack.getOrDefault(DataComponents.CUSTOM_NAME, CommonComponents.EMPTY) : entries.getFirst().text;
         } else {
-            component = stack.getOrDefault(DataComponentTypes.CUSTOM_NAME, ScreenTexts.EMPTY);
+            component = stack.getOrDefault(DataComponents.CUSTOM_NAME, CommonComponents.EMPTY);
         }
 
-        if (level.isClient())
-            return ActionResult.SUCCESS;
+        if (level.isClientSide())
+            return InteractionResult.SUCCESS;
 
         // Skip computer check in this walk since it was already performed at the start.
         walkNixies(
@@ -122,19 +122,19 @@ public class NixieTubeBlock extends DoubleFaceAttachedBlock implements IBE<Nixie
                 if (display)
                     withBlockEntityDo(level, currentPos, be -> be.displayCustomText(component, rowPosition));
                 if (dye != null)
-                    level.setBlockState(currentPos, withColor(state, dye));
+                    level.setBlockAndUpdate(currentPos, withColor(state, dye));
             }
         );
 
-        return ActionResult.SUCCESS;
+        return InteractionResult.SUCCESS;
     }
 
     public static Direction getLeftNixieDirection(@NotNull BlockState state) {
-        Direction left = state.get(FACING).getOpposite();
+        Direction left = state.getValue(FACING).getOpposite();
 
-        if (state.get(FACE) == DoubleAttachFace.WALL)
+        if (state.getValue(FACE) == DoubleAttachFace.WALL)
             left = Direction.UP;
-        if (state.get(FACE) == DoubleAttachFace.WALL_REVERSED)
+        if (state.getValue(FACE) == DoubleAttachFace.WALL_REVERSED)
             left = Direction.DOWN;
         return left;
     }
@@ -143,7 +143,7 @@ public class NixieTubeBlock extends DoubleFaceAttachedBlock implements IBE<Nixie
         return getLeftNixieDirection(state).getOpposite();
     }
 
-    public static boolean isInComputerControlledRow(@NotNull WorldAccess world, @NotNull BlockPos pos) {
+    public static boolean isInComputerControlledRow(@NotNull LevelAccessor world, @NotNull BlockPos pos) {
         return Mods.COMPUTERCRAFT.isLoaded() && !walkNixies(world, pos, false, null);
     }
 
@@ -157,7 +157,7 @@ public class NixieTubeBlock extends DoubleFaceAttachedBlock implements IBE<Nixie
      * @return True if the row was walked, false if the walk was aborted because it is computer-controlled.
      */
     public static boolean walkNixies(
-        @NotNull WorldAccess world,
+        @NotNull LevelAccessor world,
         @NotNull BlockPos start,
         boolean allowComputerControlled,
         @Nullable BiConsumer<BlockPos, Integer> callback
@@ -176,7 +176,7 @@ public class NixieTubeBlock extends DoubleFaceAttachedBlock implements IBE<Nixie
         Direction right = left.getOpposite();
 
         while (true) {
-            BlockPos nextPos = currentPos.offset(left);
+            BlockPos nextPos = currentPos.relative(left);
             if (!areNixieBlocksEqual(world.getBlockState(nextPos), state))
                 break;
             // If computer-controlled nixie walking is disallowed, presence of any (same-color)
@@ -201,7 +201,7 @@ public class NixieTubeBlock extends DoubleFaceAttachedBlock implements IBE<Nixie
             // No need to iterate over the nixies to the left again
             currentPos = start;
             while (true) {
-                BlockPos nextPos = currentPos.offset(right);
+                BlockPos nextPos = currentPos.relative(right);
                 if (!areNixieBlocksEqual(world.getBlockState(nextPos), state))
                     break;
                 //TODO
@@ -219,7 +219,7 @@ public class NixieTubeBlock extends DoubleFaceAttachedBlock implements IBE<Nixie
             final int rowPosition = index;
             if (callback != null)
                 callback.accept(currentPos, rowPosition);
-            BlockPos nextPos = currentPos.offset(right);
+            BlockPos nextPos = currentPos.relative(right);
             if (!areNixieBlocksEqual(world.getBlockState(nextPos), state))
                 break;
             currentPos = nextPos;
@@ -230,13 +230,13 @@ public class NixieTubeBlock extends DoubleFaceAttachedBlock implements IBE<Nixie
     }
 
     @Override
-    protected void appendProperties(Builder<Block, BlockState> builder) {
-        super.appendProperties(builder.add(FACE, FACING, WATERLOGGED));
+    protected void createBlockStateDefinition(Builder<Block, BlockState> builder) {
+        super.createBlockStateDefinition(builder.add(FACE, FACING, WATERLOGGED));
     }
 
     @Override
-    protected ItemStack getPickStack(WorldView world, BlockPos pos, BlockState state, boolean includeData) {
-        return AllItems.ORANGE_NIXIE_TUBE.getDefaultStack();
+    protected ItemStack getCloneItemStack(LevelReader world, BlockPos pos, BlockState state, boolean includeData) {
+        return AllItems.ORANGE_NIXIE_TUBE.getDefaultInstance();
     }
 
     @Override
@@ -245,68 +245,68 @@ public class NixieTubeBlock extends DoubleFaceAttachedBlock implements IBE<Nixie
     }
 
     @Override
-    public VoxelShape getOutlineShape(BlockState pState, BlockView pLevel, BlockPos pPos, ShapeContext pContext) {
-        Direction facing = pState.get(FACING);
-        return switch (pState.get(FACE)) {
-            case CEILING -> AllShapes.NIXIE_TUBE_CEILING.get(facing.rotateYClockwise().getAxis());
-            case FLOOR -> AllShapes.NIXIE_TUBE.get(facing.rotateYClockwise().getAxis());
+    public VoxelShape getShape(BlockState pState, BlockGetter pLevel, BlockPos pPos, CollisionContext pContext) {
+        Direction facing = pState.getValue(FACING);
+        return switch (pState.getValue(FACE)) {
+            case CEILING -> AllShapes.NIXIE_TUBE_CEILING.get(facing.getClockWise().getAxis());
+            case FLOOR -> AllShapes.NIXIE_TUBE.get(facing.getClockWise().getAxis());
             default -> AllShapes.NIXIE_TUBE_WALL.get(facing);
         };
     }
 
     @Override
     public FluidState getFluidState(BlockState state) {
-        return state.get(WATERLOGGED) ? Fluids.WATER.getStill(false) : Fluids.EMPTY.getDefaultState();
+        return state.getValue(WATERLOGGED) ? Fluids.WATER.getSource(false) : Fluids.EMPTY.defaultFluidState();
     }
 
     @Override
-    public BlockState getStateForNeighborUpdate(
+    public BlockState updateShape(
         BlockState state,
-        WorldView world,
-        ScheduledTickView tickView,
+        LevelReader world,
+        ScheduledTickAccess tickView,
         BlockPos pos,
         Direction direction,
         BlockPos neighbourPos,
         BlockState neighbourState,
-        Random random
+        RandomSource random
     ) {
-        if (state.get(WATERLOGGED))
-            tickView.scheduleFluidTick(pos, Fluids.WATER, Fluids.WATER.getTickRate(world));
+        if (state.getValue(WATERLOGGED))
+            tickView.scheduleTick(pos, Fluids.WATER, Fluids.WATER.getTickDelay(world));
         return state;
     }
 
     @Override
-    public BlockState getPlacementState(ItemPlacementContext context) {
-        BlockState state = super.getPlacementState(context);
+    public BlockState getStateForPlacement(BlockPlaceContext context) {
+        BlockState state = super.getStateForPlacement(context);
         if (state == null)
             return null;
-        if (state.get(FACE) != DoubleAttachFace.WALL && state.get(FACE) != DoubleAttachFace.WALL_REVERSED)
-            state = state.with(FACING, state.get(FACING).rotateYClockwise());
-        return state.with(WATERLOGGED, context.getWorld().getFluidState(context.getBlockPos()).getFluid() == Fluids.WATER);
+        if (state.getValue(FACE) != DoubleAttachFace.WALL && state.getValue(FACE) != DoubleAttachFace.WALL_REVERSED)
+            state = state.setValue(FACING, state.getValue(FACING).getClockWise());
+        return state.setValue(WATERLOGGED, context.getLevel().getFluidState(context.getClickedPos()).getType() == Fluids.WATER);
     }
 
     @Override
-    public void neighborUpdate(
+    public void neighborChanged(
         BlockState state,
-        World level,
+        Level level,
         BlockPos pos,
         Block block,
-        @Nullable WireOrientation wireOrientation,
+        @Nullable Orientation wireOrientation,
         boolean isMoving
     ) {
-        if (level.isClient())
+        if (level.isClientSide())
             return;
-        if (!level.getBlockTickScheduler().isTicking(pos, this))
-            level.scheduleBlockTick(pos, this, 1);
+        if (!level.getBlockTicks().willTickThisTick(pos, this))
+            level.scheduleTick(pos, this, 1);
     }
 
     @Override
-    public void scheduledTick(BlockState state, ServerWorld worldIn, BlockPos pos, Random r) {
+    public void tick(BlockState state, ServerLevel worldIn, BlockPos pos, RandomSource r) {
         updateDisplayedRedstoneValue(state, worldIn, pos);
     }
 
     @Override
-    public void onBlockAdded(BlockState state, World worldIn, BlockPos pos, BlockState oldState, boolean isMoving) {
+    public void onPlace(BlockState state, Level worldIn, BlockPos pos, BlockState oldState, boolean isMoving) {
         if (state.getBlock() == oldState.getBlock() || isMoving || oldState.getBlock() instanceof NixieTubeBlock)
             return;
         if (Mods.COMPUTERCRAFT.isLoaded() && isInComputerControlledRow(worldIn, pos)) {
@@ -323,36 +323,36 @@ public class NixieTubeBlock extends DoubleFaceAttachedBlock implements IBE<Nixie
     }
 
     public static void updateDisplayedRedstoneValue(NixieTubeBlockEntity be, BlockState state, boolean force) {
-        if (be.getWorld() == null || be.getWorld().isClient())
+        if (be.getLevel() == null || be.getLevel().isClientSide())
             return;
         if (be.reactsToRedstone() || force)
-            be.updateRedstoneStrength(getPower(be.getWorld(), state, be.getPos()));
+            be.updateRedstoneStrength(getPower(be.getLevel(), state, be.getBlockPos()));
     }
 
-    private void updateDisplayedRedstoneValue(BlockState state, World level, BlockPos pos) {
-        if (level.isClient())
+    private void updateDisplayedRedstoneValue(BlockState state, Level level, BlockPos pos) {
+        if (level.isClientSide())
             return;
         withBlockEntityDo(level, pos, be -> NixieTubeBlock.updateDisplayedRedstoneValue(be, state, false));
     }
 
-    static boolean isValidBlock(BlockView world, BlockPos pos, boolean above) {
-        BlockState state = world.getBlockState(pos.up(above ? 1 : -1));
-        return !state.getOutlineShape(world, pos).isEmpty();
+    static boolean isValidBlock(BlockGetter world, BlockPos pos, boolean above) {
+        BlockState state = world.getBlockState(pos.above(above ? 1 : -1));
+        return !state.getShape(world, pos).isEmpty();
     }
 
-    private static int getPower(World worldIn, BlockState state, BlockPos pos) {
+    private static int getPower(Level worldIn, BlockState state, BlockPos pos) {
         int power = 0;
         for (Direction direction : Iterate.directions)
-            power = Math.max(worldIn.getEmittedRedstonePower(pos.offset(direction), direction), power);
+            power = Math.max(worldIn.getSignal(pos.relative(direction), direction), power);
         for (Direction direction : Iterate.directions) {
-            if (state.get(FACING).getOpposite() != direction)
-                power = Math.max(worldIn.getEmittedRedstonePower(pos.offset(direction), Direction.UP), power);
+            if (state.getValue(FACING).getOpposite() != direction)
+                power = Math.max(worldIn.getSignal(pos.relative(direction), Direction.UP), power);
         }
         return power;
     }
 
     @Override
-    protected boolean canPathfindThrough(BlockState state, NavigationType pathComputationType) {
+    protected boolean isPathfindable(BlockState state, PathComputationType pathComputationType) {
         return false;
     }
 
@@ -405,8 +405,8 @@ public class NixieTubeBlock extends DoubleFaceAttachedBlock implements IBE<Nixie
     }
 
     public static BlockState withColor(BlockState state, DyeColor color) {
-        return (color == DyeColor.ORANGE ? AllBlocks.ORANGE_NIXIE_TUBE : getColorBlock(color)).getDefaultState().with(FACING, state.get(FACING))
-            .with(WATERLOGGED, state.get(WATERLOGGED)).with(FACE, state.get(FACE));
+        return (color == DyeColor.ORANGE ? AllBlocks.ORANGE_NIXIE_TUBE : getColorBlock(color)).defaultBlockState().setValue(FACING, state.getValue(FACING))
+            .setValue(WATERLOGGED, state.getValue(WATERLOGGED)).setValue(FACE, state.getValue(FACE));
     }
 
     public static DyeColor colorOf(BlockState blockState) {

@@ -6,12 +6,12 @@ import com.zurrtum.create.AllRecipeSerializers;
 import com.zurrtum.create.AllRecipeTypes;
 import com.zurrtum.create.foundation.recipe.CreateSingleStackRecipe;
 import com.zurrtum.create.infrastructure.fluids.FluidStack;
-import net.minecraft.item.ItemStack;
-import net.minecraft.network.RegistryByteBuf;
-import net.minecraft.network.codec.PacketCodec;
-import net.minecraft.recipe.Ingredient;
-import net.minecraft.recipe.RecipeSerializer;
-import net.minecraft.recipe.RecipeType;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.item.crafting.RecipeSerializer;
+import net.minecraft.world.item.crafting.RecipeType;
 
 public record EmptyingRecipe(ItemStack result, FluidStack fluidResult, Ingredient ingredient) implements CreateSingleStackRecipe {
     @Override
@@ -31,12 +31,12 @@ public record EmptyingRecipe(ItemStack result, FluidStack fluidResult, Ingredien
             Ingredient.CODEC.fieldOf("ingredient").forGetter(EmptyingRecipe::ingredient)
         ).apply(instance, EmptyingRecipe::new));
 
-        public static final PacketCodec<RegistryByteBuf, EmptyingRecipe> PACKET_CODEC = PacketCodec.tuple(
-            ItemStack.PACKET_CODEC,
+        public static final StreamCodec<RegistryFriendlyByteBuf, EmptyingRecipe> PACKET_CODEC = StreamCodec.composite(
+            ItemStack.STREAM_CODEC,
             EmptyingRecipe::result,
             FluidStack.PACKET_CODEC,
             EmptyingRecipe::fluidResult,
-            Ingredient.PACKET_CODEC,
+            Ingredient.CONTENTS_STREAM_CODEC,
             EmptyingRecipe::ingredient,
             EmptyingRecipe::new
         );
@@ -47,7 +47,7 @@ public record EmptyingRecipe(ItemStack result, FluidStack fluidResult, Ingredien
         }
 
         @Override
-        public PacketCodec<RegistryByteBuf, EmptyingRecipe> packetCodec() {
+        public StreamCodec<RegistryFriendlyByteBuf, EmptyingRecipe> streamCodec() {
             return PACKET_CODEC;
         }
     }

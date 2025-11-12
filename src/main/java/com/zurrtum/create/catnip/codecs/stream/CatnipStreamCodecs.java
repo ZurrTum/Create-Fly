@@ -1,73 +1,73 @@
 package com.zurrtum.create.catnip.codecs.stream;
 
 import io.netty.buffer.ByteBuf;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.fluid.Fluid;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.nbt.NbtElement;
-import net.minecraft.nbt.NbtList;
-import net.minecraft.network.PacketByteBuf;
-import net.minecraft.network.RegistryByteBuf;
-import net.minecraft.network.codec.PacketCodec;
-import net.minecraft.network.codec.PacketCodecs;
-import net.minecraft.registry.RegistryKeys;
-import net.minecraft.registry.entry.RegistryEntry;
-import net.minecraft.util.BlockMirror;
-import net.minecraft.util.Hand;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.hit.HitResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Vec3d;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.function.Function;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.Holder;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.Tag;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Mirror;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.material.Fluid;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.HitResult;
+import net.minecraft.world.phys.Vec3;
 
 public interface CatnipStreamCodecs {
-    PacketCodec<PacketByteBuf, Character> CHAR = new PacketCodec<>() {
-        public @NotNull Character decode(PacketByteBuf buffer) {
+    StreamCodec<FriendlyByteBuf, Character> CHAR = new StreamCodec<>() {
+        public @NotNull Character decode(FriendlyByteBuf buffer) {
             return buffer.readChar();
         }
 
-        public void encode(PacketByteBuf buffer, @NotNull Character value) {
+        public void encode(FriendlyByteBuf buffer, @NotNull Character value) {
             buffer.writeChar(value);
         }
     };
-    PacketCodec<RegistryByteBuf, RegistryEntry<Fluid>> HOLDER_FLUID = PacketCodecs.registryEntry(RegistryKeys.FLUID);
-    PacketCodec<RegistryByteBuf, Fluid> FLUID = PacketCodecs.registryValue(RegistryKeys.FLUID);
-    PacketCodec<ByteBuf, NbtElement> COMPOUND_AS_TAG = PacketCodecs.NBT_COMPOUND.xmap(Function.identity(), tag -> (NbtCompound) tag);
-    PacketCodec<PacketByteBuf, NbtList> COMPOUND_LIST_TAG = new PacketCodec<>() {
+    StreamCodec<RegistryFriendlyByteBuf, Holder<Fluid>> HOLDER_FLUID = ByteBufCodecs.holderRegistry(Registries.FLUID);
+    StreamCodec<RegistryFriendlyByteBuf, Fluid> FLUID = ByteBufCodecs.registry(Registries.FLUID);
+    StreamCodec<ByteBuf, Tag> COMPOUND_AS_TAG = ByteBufCodecs.COMPOUND_TAG.map(Function.identity(), tag -> (CompoundTag) tag);
+    StreamCodec<FriendlyByteBuf, ListTag> COMPOUND_LIST_TAG = new StreamCodec<>() {
         @Override
-        public @NotNull NbtList decode(PacketByteBuf buffer) {
-            return buffer.readCollection(size -> new NbtList(), COMPOUND_AS_TAG);
+        public @NotNull ListTag decode(FriendlyByteBuf buffer) {
+            return buffer.readCollection(size -> new ListTag(), COMPOUND_AS_TAG);
         }
 
         @Override
-        public void encode(PacketByteBuf buffer, NbtList value) {
+        public void encode(FriendlyByteBuf buffer, ListTag value) {
             buffer.writeCollection(value, COMPOUND_AS_TAG);
         }
     };
-    PacketCodec<ByteBuf, BlockState> BLOCK_STATE = PacketCodecs.entryOf(Block.STATE_IDS);
-    PacketCodec<ByteBuf, BlockPos> NULLABLE_BLOCK_POS = CatnipStreamCodecBuilders.nullable(BlockPos.PACKET_CODEC);
-    PacketCodec<ByteBuf, Direction.Axis> AXIS = CatnipStreamCodecBuilders.ofEnum(Direction.Axis.class);
-    PacketCodec<ByteBuf, BlockMirror> MIRROR = CatnipStreamCodecBuilders.ofEnum(BlockMirror.class);
+    StreamCodec<ByteBuf, BlockState> BLOCK_STATE = ByteBufCodecs.idMapper(Block.BLOCK_STATE_REGISTRY);
+    StreamCodec<ByteBuf, BlockPos> NULLABLE_BLOCK_POS = CatnipStreamCodecBuilders.nullable(BlockPos.STREAM_CODEC);
+    StreamCodec<ByteBuf, Direction.Axis> AXIS = CatnipStreamCodecBuilders.ofEnum(Direction.Axis.class);
+    StreamCodec<ByteBuf, Mirror> MIRROR = CatnipStreamCodecBuilders.ofEnum(Mirror.class);
 
     // optimization: 2 values, use bool instead of ofEnum
-    PacketCodec<ByteBuf, Hand> HAND = PacketCodecs.BOOLEAN.xmap(value -> value ? Hand.MAIN_HAND : Hand.OFF_HAND, hand -> hand == Hand.MAIN_HAND);
+    StreamCodec<ByteBuf, InteractionHand> HAND = ByteBufCodecs.BOOL.map(value -> value ? InteractionHand.MAIN_HAND : InteractionHand.OFF_HAND, hand -> hand == InteractionHand.MAIN_HAND);
 
-    PacketCodec<PacketByteBuf, BlockHitResult> BLOCK_HIT_RESULT = PacketCodec.tuple(
-        PacketCodecs.BOOLEAN,
+    StreamCodec<FriendlyByteBuf, BlockHitResult> BLOCK_HIT_RESULT = StreamCodec.composite(
+        ByteBufCodecs.BOOL,
         i -> i.getType() == HitResult.Type.MISS,
-        Vec3d.PACKET_CODEC,
-        HitResult::getPos,
-        Direction.PACKET_CODEC,
-        BlockHitResult::getSide,
-        BlockPos.PACKET_CODEC,
+        Vec3.STREAM_CODEC,
+        HitResult::getLocation,
+        Direction.STREAM_CODEC,
+        BlockHitResult::getDirection,
+        BlockPos.STREAM_CODEC,
         BlockHitResult::getBlockPos,
-        PacketCodecs.BOOLEAN,
-        BlockHitResult::isInsideBlock,
-        (miss, location, direction, blockPos, isInside) -> miss ? BlockHitResult.createMissed(location, direction, blockPos) : new BlockHitResult(
+        ByteBufCodecs.BOOL,
+        BlockHitResult::isInside,
+        (miss, location, direction, blockPos, isInside) -> miss ? BlockHitResult.miss(location, direction, blockPos) : new BlockHitResult(
             location,
             direction,
             blockPos,

@@ -4,9 +4,9 @@ import com.zurrtum.create.catnip.math.AngleHelper;
 import com.zurrtum.create.catnip.math.VecHelper;
 import com.zurrtum.create.client.foundation.blockEntity.behaviour.CenteredSideValueBoxTransform;
 import com.zurrtum.create.content.kinetics.mechanicalArm.ArmBlock;
-import net.minecraft.block.BlockState;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.core.Direction;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.Vec3;
 
 public class SelectionModeValueBox extends CenteredSideValueBoxTransform {
     public SelectionModeValueBox() {
@@ -14,9 +14,9 @@ public class SelectionModeValueBox extends CenteredSideValueBoxTransform {
     }
 
     @Override
-    public Vec3d getLocalOffset(BlockState state) {
-        int yPos = state.get(ArmBlock.CEILING) ? 16 - 3 : 3;
-        Vec3d location = VecHelper.voxelSpace(8, yPos, 15.5);
+    public Vec3 getLocalOffset(BlockState state) {
+        int yPos = state.getValue(ArmBlock.CEILING) ? 16 - 3 : 3;
+        Vec3 location = VecHelper.voxelSpace(8, yPos, 15.5);
         location = VecHelper.rotateCentered(location, AngleHelper.horizontalAngle(getSide()), Direction.Axis.Y);
         return location;
     }

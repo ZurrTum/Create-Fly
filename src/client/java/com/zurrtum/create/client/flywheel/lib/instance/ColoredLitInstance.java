@@ -2,7 +2,7 @@ package com.zurrtum.create.client.flywheel.lib.instance;
 
 import com.zurrtum.create.client.flywheel.api.instance.InstanceHandle;
 import com.zurrtum.create.client.flywheel.api.instance.InstanceType;
-import net.minecraft.util.math.ColorHelper;
+import net.minecraft.util.ARGB;
 
 public abstract class ColoredLitInstance extends AbstractInstance implements FlatLit {
     public byte red = (byte) 0xFF;
@@ -17,11 +17,11 @@ public abstract class ColoredLitInstance extends AbstractInstance implements Fla
     }
 
     public ColoredLitInstance colorArgb(int argb) {
-        return color(ColorHelper.getRed(argb), ColorHelper.getGreen(argb), ColorHelper.getBlue(argb), ColorHelper.getAlpha(argb));
+        return color(ARGB.red(argb), ARGB.green(argb), ARGB.blue(argb), ARGB.alpha(argb));
     }
 
     public ColoredLitInstance colorRgb(int rgb) {
-        return color(ColorHelper.getRed(rgb), ColorHelper.getGreen(rgb), ColorHelper.getBlue(rgb));
+        return color(ARGB.red(rgb), ARGB.green(rgb), ARGB.blue(rgb));
     }
 
     public ColoredLitInstance color(int red, int green, int blue, int alpha) {

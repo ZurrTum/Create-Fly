@@ -27,19 +27,19 @@ import com.zurrtum.create.content.redstone.displayLink.DisplayLinkContext;
 import com.zurrtum.create.content.redstone.displayLink.source.SingleLineDisplaySource;
 import com.zurrtum.create.content.redstone.displayLink.target.DisplayTargetStats;
 import com.zurrtum.create.infrastructure.packet.c2s.DisplayLinkConfigurationPacket;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.Element;
-import net.minecraft.client.world.ClientWorld;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.screen.ScreenTexts;
-import net.minecraft.text.MutableText;
-import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
-import net.minecraft.util.Identifier;
+import net.minecraft.ChatFormatting;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.events.GuiEventListener;
+import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.CommonComponents;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
 import org.joml.Matrix3x2fStack;
 
 import java.util.Collections;
@@ -80,7 +80,7 @@ public class DisplayLinkScreen extends AbstractSimiScreen {
     protected void init() {
         setWindowSize(background.getWidth(), background.getHeight());
         super.init();
-        clearChildren();
+        clearWidgets();
 
         int x = guiLeft;
         int y = guiTop;
@@ -89,26 +89,26 @@ public class DisplayLinkScreen extends AbstractSimiScreen {
         initGathererOptions();
 
         confirmButton = new IconButton(x + background.getWidth() - 33, y + background.getHeight() - 24, AllIcons.I_CONFIRM);
-        confirmButton.withCallback(this::close);
-        addDrawableChild(confirmButton);
+        confirmButton.withCallback(this::onClose);
+        addRenderableWidget(confirmButton);
 
         renderedItem = new ElementWidget(
             x + background.getWidth() - 11,
             y + background.getHeight() - 55
-        ).showingElement(GuiGameElement.of(AllItems.DISPLAY_LINK.getDefaultStack()).scale(4).rotate(50, 207, -14).padding(17));
-        addDrawableChild(renderedItem);
+        ).showingElement(GuiGameElement.of(AllItems.DISPLAY_LINK.getDefaultInstance()).scale(4).rotate(50, 207, -14).padding(17));
+        addRenderableWidget(renderedItem);
     }
 
     @Override
     public void tick() {
         super.tick();
-        if (sourceState != null && sourceState.getBlock() != client.world.getBlockState(blockEntity.getSourcePosition())
-            .getBlock() || targetState != null && targetState.getBlock() != client.world.getBlockState(blockEntity.getTargetPosition()).getBlock())
+        if (sourceState != null && sourceState.getBlock() != minecraft.level.getBlockState(blockEntity.getSourcePosition())
+            .getBlock() || targetState != null && targetState.getBlock() != minecraft.level.getBlockState(blockEntity.getTargetPosition()).getBlock())
             initGathererOptions();
     }
 
     private void initGathererOptions() {
-        ClientWorld level = client.world;
+        ClientLevel level = minecraft.level;
         sourceState = level.getBlockState(blockEntity.getSourcePosition());
         targetState = level.getBlockState(blockEntity.getTargetPosition());
 
@@ -119,22 +119,22 @@ public class DisplayLinkScreen extends AbstractSimiScreen {
         Block sourceBlock = sourceState.getBlock();
         Block targetBlock = targetState.getBlock();
 
-        asItem = sourceState.getPickStack(level, blockEntity.getSourcePosition(), true);
+        asItem = sourceState.getCloneItemStack(level, blockEntity.getSourcePosition(), true);
         ItemStack sourceIcon = asItem == null || asItem.isEmpty() ? FALLBACK : asItem;
-        asItem = targetState.getPickStack(level, blockEntity.getTargetPosition(), true);
+        asItem = targetState.getCloneItemStack(level, blockEntity.getTargetPosition(), true);
         ItemStack targetIcon = asItem == null || asItem.isEmpty() ? FALLBACK : asItem;
 
         sources = DisplaySource.getAll(level, blockEntity.getSourcePosition());
         target = DisplayTarget.get(level, blockEntity.getTargetPosition());
 
-        remove(targetLineSelector);
-        remove(targetLineLabel);
-        remove(sourceTypeSelector);
-        remove(sourceTypeLabel);
-        remove(sourceWidget);
-        remove(targetWidget);
+        removeWidget(targetLineSelector);
+        removeWidget(targetLineLabel);
+        removeWidget(sourceTypeSelector);
+        removeWidget(sourceTypeLabel);
+        removeWidget(sourceWidget);
+        removeWidget(targetWidget);
 
-        configWidgets.forEach(s -> s.forEach(this::remove));
+        configWidgets.forEach(s -> s.forEach(this::removeWidget));
 
         targetLineSelector = null;
         sourceTypeSelector = null;
@@ -144,17 +144,17 @@ public class DisplayLinkScreen extends AbstractSimiScreen {
             int rows = stats.maxRows();
             int startIndex = Math.min(blockEntity.targetLine, rows);
 
-            targetLineLabel = new Label(x + 65, y + 109, ScreenTexts.EMPTY).withShadow();
+            targetLineLabel = new Label(x + 65, y + 109, CommonComponents.EMPTY).withShadow();
             targetLineLabel.text = target.getLineOptionText(startIndex);
 
             if (rows > 1) {
                 targetLineSelector = new ScrollInput(x + 61, y + 105, 135, 16).withRange(0, rows)
                     .titled(CreateLang.translateDirect("display_link.display_on")).inverted()
                     .calling(i -> targetLineLabel.text = target.getLineOptionText(i)).setState(startIndex);
-                addDrawableChild(targetLineSelector);
+                addRenderableWidget(targetLineSelector);
             }
 
-            addDrawableChild(targetLineLabel);
+            addRenderableWidget(targetLineLabel);
         }
 
         sourceWidget = new ElementWidget(x + 37, y + 26).showingElement(GuiGameElement.of(sourceIcon)).withCallback((mX, mY) -> {
@@ -163,12 +163,12 @@ public class DisplayLinkScreen extends AbstractSimiScreen {
 
         sourceWidget.getToolTip().addAll(List.of(
             CreateLang.translateDirect("display_link.reading_from"),
-            sourceState.getBlock().getName().styled(s -> s.withColor(sources.isEmpty() ? 0xF68989 : 0xF2C16D)),
+            sourceState.getBlock().getName().withStyle(s -> s.withColor(sources.isEmpty() ? 0xF68989 : 0xF2C16D)),
             CreateLang.translateDirect("display_link.attached_side"),
-            CreateLang.translateDirect("display_link.view_compatible").formatted(Formatting.GRAY)
+            CreateLang.translateDirect("display_link.view_compatible").withStyle(ChatFormatting.GRAY)
         ));
 
-        addDrawableChild(sourceWidget);
+        addRenderableWidget(sourceWidget);
 
         targetWidget = new ElementWidget(x + 37, y + 105).showingElement(GuiGameElement.of(targetIcon)).withCallback((mX, mY) -> {
             ScreenOpener.open(new PonderTagScreen(AllCreatePonderTags.DISPLAY_TARGETS));
@@ -176,77 +176,72 @@ public class DisplayLinkScreen extends AbstractSimiScreen {
 
         targetWidget.getToolTip().addAll(List.of(
             CreateLang.translateDirect("display_link.writing_to"),
-            targetState.getBlock().getName().styled(s -> s.withColor(target == null ? 0xF68989 : 0xF2C16D)),
+            targetState.getBlock().getName().withStyle(s -> s.withColor(target == null ? 0xF68989 : 0xF2C16D)),
             CreateLang.translateDirect("display_link.targeted_location"),
-            CreateLang.translateDirect("display_link.view_compatible").formatted(Formatting.GRAY)
+            CreateLang.translateDirect("display_link.view_compatible").withStyle(ChatFormatting.GRAY)
         ));
 
-        addDrawableChild(targetWidget);
+        addRenderableWidget(targetWidget);
 
         if (!sources.isEmpty()) {
             int startIndex = Math.max(sources.indexOf(blockEntity.activeSource), 0);
 
-            sourceTypeLabel = new Label(x + 65, y + 30, ScreenTexts.EMPTY).withShadow();
+            sourceTypeLabel = new Label(x + 65, y + 30, CommonComponents.EMPTY).withShadow();
             sourceTypeLabel.text = sources.get(startIndex).getName();
 
             if (sources.size() > 1) {
-                List<Text> options = sources.stream().map(DisplaySource::getName).toList();
+                List<Component> options = sources.stream().map(DisplaySource::getName).toList();
                 sourceTypeSelector = new SelectionScrollInput(x + 61, y + 26, 135, 16).forOptions(options).writingTo(sourceTypeLabel)
                     .titled(CreateLang.translateDirect("display_link.information_type")).calling(this::initGathererSourceSubOptions)
                     .setState(startIndex);
                 sourceTypeSelector.onChanged();
-                addDrawableChild(sourceTypeSelector);
+                addRenderableWidget(sourceTypeSelector);
             } else
                 initGathererSourceSubOptions(0);
 
-            addDrawableChild(sourceTypeLabel);
+            addRenderableWidget(sourceTypeLabel);
         }
     }
 
     private void initGathererSourceSubOptions(int i) {
         DisplaySource source = sources.get(i);
-        source.populateData(new DisplayLinkContext(blockEntity.getWorld(), blockEntity));
+        source.populateData(new DisplayLinkContext(blockEntity.getLevel(), blockEntity));
 
         if (targetLineSelector != null)
             targetLineSelector.titled(source instanceof SingleLineDisplaySource ? CreateLang.translateDirect("display_link.display_on") : CreateLang.translateDirect(
                 "display_link.display_on_multiline"));
 
         configWidgets.forEach(s -> {
-            s.forEach(this::remove);
+            s.forEach(this::removeWidget);
             s.clear();
         });
 
         DisplaySourceRender render = source.getAttachRender();
         if (render != null) {
-            DisplayLinkContext context = new DisplayLinkContext(client.world, blockEntity);
+            DisplayLinkContext context = new DisplayLinkContext(minecraft.level, blockEntity);
             configWidgets.forEachWithContext((s, first) -> {
-                render.initConfigurationWidgets(
-                    source,
-                    context,
-                    new ModularGuiLineBuilder(textRenderer, s, guiLeft + 60, guiTop + (first ? 51 : 72)),
-                    first
-                );
+                render.initConfigurationWidgets(source, context, new ModularGuiLineBuilder(font, s, guiLeft + 60, guiTop + (first ? 51 : 72)), first);
             });
         }
-        configWidgets.forEach(s -> s.loadValues(blockEntity.getSourceConfig(), this::addDrawableChild, this::addDrawable));
+        configWidgets.forEach(s -> s.loadValues(blockEntity.getSourceConfig(), this::addRenderableWidget, this::addRenderableOnly));
     }
 
     @Override
-    public void close() {
-        super.close();
-        NbtCompound sourceData = new NbtCompound();
+    public void onClose() {
+        super.onClose();
+        CompoundTag sourceData = new CompoundTag();
 
         if (!sources.isEmpty()) {
             DisplaySource source = sources.get(sourceTypeSelector == null ? 0 : sourceTypeSelector.getState());
-            Identifier id = CreateRegistries.DISPLAY_SOURCE.getId(source);
+            ResourceLocation id = CreateRegistries.DISPLAY_SOURCE.getKey(source);
             if (id != null) {
                 sourceData.putString("Id", id.toString());
             }
             configWidgets.forEach(s -> s.saveValues(sourceData));
         }
 
-        client.player.networkHandler.sendPacket(new DisplayLinkConfigurationPacket(
-            blockEntity.getPos(),
+        minecraft.player.connection.send(new DisplayLinkConfigurationPacket(
+            blockEntity.getBlockPos(),
             sourceData,
             targetLineSelector == null ? 0 : targetLineSelector.getState()
         ));
@@ -255,20 +250,20 @@ public class DisplayLinkScreen extends AbstractSimiScreen {
     }
 
     @Override
-    protected void renderWindow(DrawContext graphics, int mouseX, int mouseY, float partialTicks) {
+    protected void renderWindow(GuiGraphics graphics, int mouseX, int mouseY, float partialTicks) {
         int x = guiLeft;
         int y = guiTop;
 
         background.render(graphics, x, y);
-        MutableText header = CreateLang.translateDirect("display_link.title");
-        graphics.drawText(textRenderer, header, x + background.getWidth() / 2 - textRenderer.getWidth(header) / 2, y + 4, 0xFF592424, false);
+        MutableComponent header = CreateLang.translateDirect("display_link.title");
+        graphics.drawString(font, header, x + background.getWidth() / 2 - font.width(header) / 2, y + 4, 0xFF592424, false);
 
         if (sources.isEmpty())
-            graphics.drawText(textRenderer, CreateLang.translateDirect("display_link.no_source"), x + 65, y + 30, 0xFFD3D3D3, true);
+            graphics.drawString(font, CreateLang.translateDirect("display_link.no_source"), x + 65, y + 30, 0xFFD3D3D3, true);
         if (target == null)
-            graphics.drawText(textRenderer, CreateLang.translateDirect("display_link.no_target"), x + 65, y + 109, 0xFFD3D3D3, true);
+            graphics.drawString(font, CreateLang.translateDirect("display_link.no_target"), x + 65, y + 109, 0xFFD3D3D3, true);
 
-        Matrix3x2fStack ms = graphics.getMatrices();
+        Matrix3x2fStack ms = graphics.pose();
         ms.pushMatrix();
         ms.translate(0, guiTop + 46);
         configWidgets.getFirst().renderWidgetBG(guiLeft, graphics);
@@ -278,8 +273,8 @@ public class DisplayLinkScreen extends AbstractSimiScreen {
     }
 
     @Override
-    protected void remove(Element p_169412_) {
+    protected void removeWidget(GuiEventListener p_169412_) {
         if (p_169412_ != null)
-            super.remove(p_169412_);
+            super.removeWidget(p_169412_);
     }
 }

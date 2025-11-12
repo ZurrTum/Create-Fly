@@ -17,19 +17,18 @@ import com.zurrtum.create.content.kinetics.mixer.PotionRecipe;
 import com.zurrtum.create.content.kinetics.press.PressingRecipe;
 import com.zurrtum.create.content.kinetics.saw.CuttingRecipe;
 import com.zurrtum.create.content.processing.sequenced.SequencedAssemblyRecipe;
-import net.minecraft.recipe.Recipe;
-import net.minecraft.recipe.RecipeEntry;
-import net.minecraft.recipe.RecipeSerializer;
-import net.minecraft.recipe.RecipeType;
-import net.minecraft.registry.Registries;
-import net.minecraft.registry.Registry;
-import net.minecraft.registry.RegistryKeys;
-import net.minecraft.registry.tag.TagKey;
-import net.minecraft.util.Identifier;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Predicate;
+import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.TagKey;
+import net.minecraft.world.item.crafting.Recipe;
+import net.minecraft.world.item.crafting.RecipeHolder;
+import net.minecraft.world.item.crafting.RecipeSerializer;
+import net.minecraft.world.item.crafting.RecipeType;
 
 import static com.zurrtum.create.Create.MOD_ID;
 
@@ -52,23 +51,23 @@ public class AllRecipeTypes {
     public static final RecipeType<SequencedAssemblyRecipe> SEQUENCED_ASSEMBLY = register("sequenced_assembly");
     public static final RecipeType<PotionRecipe> POTION = register("potion");
 
-    private static final TagKey<RecipeSerializer<?>> AUTOMATION_IGNORE_TAG = TagKey.of(
-        RegistryKeys.RECIPE_SERIALIZER,
-        Identifier.of(MOD_ID, "automation_ignore")
+    private static final TagKey<RecipeSerializer<?>> AUTOMATION_IGNORE_TAG = TagKey.create(
+        Registries.RECIPE_SERIALIZER,
+        ResourceLocation.fromNamespaceAndPath(MOD_ID, "automation_ignore")
     );
-    public static final Predicate<RecipeEntry<?>> CAN_BE_AUTOMATED = r -> !r.id().getValue().getPath().endsWith("_manual_only");
+    public static final Predicate<RecipeHolder<?>> CAN_BE_AUTOMATED = r -> !r.id().location().getPath().endsWith("_manual_only");
 
-    public static boolean shouldIgnoreInAutomation(RecipeEntry<?> recipe) {
+    public static boolean shouldIgnoreInAutomation(RecipeHolder<?> recipe) {
         RecipeSerializer<?> serializer = recipe.value().getSerializer();
-        if (serializer != null && Registries.RECIPE_SERIALIZER.getEntry(serializer).isIn(AllRecipeTypes.AUTOMATION_IGNORE_TAG))
+        if (serializer != null && BuiltInRegistries.RECIPE_SERIALIZER.wrapAsHolder(serializer).is(AllRecipeTypes.AUTOMATION_IGNORE_TAG))
             return true;
         return !CAN_BE_AUTOMATED.test(recipe);
     }
 
     private static <T extends Recipe<?>> RecipeType<T> register(String name) {
-        Identifier id = Identifier.of(MOD_ID, name);
+        ResourceLocation id = ResourceLocation.fromNamespaceAndPath(MOD_ID, name);
         return Registry.register(
-            Registries.RECIPE_TYPE, id, new RecipeType<T>() {
+            BuiltInRegistries.RECIPE_TYPE, id, new RecipeType<T>() {
                 public String toString() {
                     return id.toString();
                 }

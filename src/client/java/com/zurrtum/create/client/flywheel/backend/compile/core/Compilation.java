@@ -8,13 +8,13 @@ import com.zurrtum.create.client.flywheel.backend.glsl.GlslVersion;
 import com.zurrtum.create.client.flywheel.backend.glsl.SourceComponent;
 import com.zurrtum.create.client.flywheel.backend.glsl.SourceFile;
 import com.zurrtum.create.client.flywheel.lib.util.StringUtil;
-import net.minecraft.client.MinecraftClient;
 import org.lwjgl.opengl.GL20;
 
 import java.io.File;
 import java.io.FileWriter;
 import java.util.ArrayList;
 import java.util.List;
+import net.minecraft.client.Minecraft;
 
 /**
  * Builder style class for compiling shaders.
@@ -101,7 +101,7 @@ public class Compilation {
             return;
         }
 
-        File file = new File(new File(MinecraftClient.getInstance().runDirectory, "flywheel_sources"), fileName);
+        File file = new File(new File(Minecraft.getInstance().gameDirectory, "flywheel_sources"), fileName);
         // mkdirs of the parent so we don't create a directory named by the leaf file we want to write
         file.getParentFile().mkdirs();
         try (FileWriter writer = new FileWriter(file)) {

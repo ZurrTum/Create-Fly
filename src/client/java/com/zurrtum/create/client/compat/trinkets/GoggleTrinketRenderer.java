@@ -1,22 +1,22 @@
 package com.zurrtum.create.client.compat.trinkets;
 
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.math.Axis;
 import com.zurrtum.create.AllItems;
 import dev.emi.trinkets.api.SlotReference;
 import dev.emi.trinkets.api.TrinketInventory;
 import dev.emi.trinkets.api.client.TrinketRenderer;
 import dev.emi.trinkets.api.client.TrinketRendererRegistry;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.render.OverlayTexture;
-import net.minecraft.client.render.command.OrderedRenderCommandQueue;
-import net.minecraft.client.render.entity.model.EntityModel;
-import net.minecraft.client.render.entity.model.PlayerEntityModel;
-import net.minecraft.client.render.entity.state.LivingEntityRenderState;
-import net.minecraft.client.render.entity.state.PlayerEntityRenderState;
-import net.minecraft.client.render.item.ItemRenderState;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.item.ItemDisplayContext;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.math.RotationAxis;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.model.EntityModel;
+import net.minecraft.client.model.PlayerModel;
+import net.minecraft.client.renderer.SubmitNodeCollector;
+import net.minecraft.client.renderer.entity.state.AvatarRenderState;
+import net.minecraft.client.renderer.entity.state.LivingEntityRenderState;
+import net.minecraft.client.renderer.item.ItemStackRenderState;
+import net.minecraft.client.renderer.texture.OverlayTexture;
+import net.minecraft.world.item.ItemDisplayContext;
+import net.minecraft.world.item.ItemStack;
 
 public class GoggleTrinketRenderer implements TrinketRenderer {
     public static void register() {
@@ -28,35 +28,35 @@ public class GoggleTrinketRenderer implements TrinketRenderer {
         ItemStack stack,
         SlotReference slotReference,
         EntityModel<? extends LivingEntityRenderState> contextModel,
-        MatrixStack matrices,
-        OrderedRenderCommandQueue queue,
+        PoseStack matrices,
+        SubmitNodeCollector queue,
         int light,
         LivingEntityRenderState state,
         float headYaw,
         float headPitch
     ) {
-        if (stack.isOf(AllItems.GOGGLES) && contextModel instanceof PlayerEntityModel entityModel) {
-            matrices.push();
-            entityModel.getRootPart().applyTransform(matrices);
-            entityModel.getHead().applyTransform(matrices);
+        if (stack.is(AllItems.GOGGLES) && contextModel instanceof PlayerModel entityModel) {
+            matrices.pushPose();
+            entityModel.root().translateAndRotate(matrices);
+            entityModel.getHead().translateAndRotate(matrices);
             matrices.translate(0.0F, -0.25F, 0.0F);
-            matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(180.0F));
+            matrices.mulPose(Axis.YP.rotationDegrees(180.0F));
             matrices.scale(0.625F, -0.625F, -0.625F);
-            if (headOccupied((PlayerEntityRenderState) state, slotReference)) {
-                matrices.multiply(RotationAxis.POSITIVE_Z.rotationDegrees(180.0F));
+            if (headOccupied((AvatarRenderState) state, slotReference)) {
+                matrices.mulPose(Axis.ZP.rotationDegrees(180.0F));
                 matrices.translate(0.0F, -0.25F, 0.0F);
             }
-            ItemRenderState item = new ItemRenderState();
+            ItemStackRenderState item = new ItemStackRenderState();
             item.displayContext = ItemDisplayContext.HEAD;
-            MinecraftClient mc = MinecraftClient.getInstance();
-            mc.getItemModelManager().update(item, stack, item.displayContext, mc.world, null, 0);
-            item.render(matrices, queue, light, OverlayTexture.DEFAULT_UV, 0);
-            matrices.pop();
+            Minecraft mc = Minecraft.getInstance();
+            mc.getItemModelResolver().appendItemLayers(item, stack, item.displayContext, mc.level, null, 0);
+            item.submit(matrices, queue, light, OverlayTexture.NO_OVERLAY, 0);
+            matrices.popPose();
         }
     }
 
-    public static boolean headOccupied(PlayerEntityRenderState state, SlotReference slotReference) {
-        if (!state.equippedHeadStack.isEmpty()) {
+    public static boolean headOccupied(AvatarRenderState state, SlotReference slotReference) {
+        if (!state.headEquipment.isEmpty()) {
             return true;
         }
         TrinketInventory inv = slotReference.inventory().getComponent().getInventory().get("head").get("hat");

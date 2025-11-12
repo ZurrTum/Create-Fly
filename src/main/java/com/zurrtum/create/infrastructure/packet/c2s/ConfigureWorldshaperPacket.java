@@ -11,31 +11,30 @@ import com.zurrtum.create.infrastructure.component.PlacementPatterns;
 import com.zurrtum.create.infrastructure.component.TerrainBrushes;
 import com.zurrtum.create.infrastructure.component.TerrainTools;
 import io.netty.buffer.ByteBuf;
-import net.minecraft.item.ItemStack;
-import net.minecraft.network.codec.PacketCodec;
-import net.minecraft.network.codec.PacketCodecs;
-import net.minecraft.network.packet.PacketType;
-import net.minecraft.server.network.ServerPlayNetworkHandler;
-import net.minecraft.util.Hand;
-
 import java.util.function.BiConsumer;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.PacketType;
+import net.minecraft.server.network.ServerGamePacketListenerImpl;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.item.ItemStack;
 
 public record ConfigureWorldshaperPacket(
-    Hand hand, PlacementPatterns pattern, TerrainBrushes brush, int brushParamX, int brushParamY, int brushParamZ, TerrainTools tool,
+    InteractionHand hand, PlacementPatterns pattern, TerrainBrushes brush, int brushParamX, int brushParamY, int brushParamZ, TerrainTools tool,
     PlacementOptions placement
 ) implements ConfigureZapperPacket {
-    public static final PacketCodec<ByteBuf, ConfigureWorldshaperPacket> CODEC = CatnipLargerStreamCodecs.composite(
+    public static final StreamCodec<ByteBuf, ConfigureWorldshaperPacket> CODEC = CatnipLargerStreamCodecs.composite(
         CatnipStreamCodecs.HAND,
         packet -> packet.hand,
         PlacementPatterns.STREAM_CODEC,
         packet -> packet.pattern,
         TerrainBrushes.STREAM_CODEC,
         packet -> packet.brush,
-        PacketCodecs.VAR_INT,
+        ByteBufCodecs.VAR_INT,
         packet -> packet.brushParamX,
-        PacketCodecs.VAR_INT,
+        ByteBufCodecs.VAR_INT,
         packet -> packet.brushParamY,
-        PacketCodecs.VAR_INT,
+        ByteBufCodecs.VAR_INT,
         packet -> packet.brushParamZ,
         TerrainTools.STREAM_CODEC,
         packet -> packet.tool,
@@ -50,12 +49,12 @@ public record ConfigureWorldshaperPacket(
     }
 
     @Override
-    public PacketType<ConfigureWorldshaperPacket> getPacketType() {
+    public PacketType<ConfigureWorldshaperPacket> type() {
         return AllPackets.CONFIGURE_WORLDSHAPER;
     }
 
     @Override
-    public BiConsumer<ServerPlayNetworkHandler, ConfigureWorldshaperPacket> callback() {
+    public BiConsumer<ServerGamePacketListenerImpl, ConfigureWorldshaperPacket> callback() {
         return AllHandle::onConfigureWorldshaper;
     }
 }

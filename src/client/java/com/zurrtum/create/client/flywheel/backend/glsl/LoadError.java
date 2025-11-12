@@ -3,20 +3,19 @@ package com.zurrtum.create.client.flywheel.backend.glsl;
 import com.mojang.datafixers.util.Pair;
 import com.zurrtum.create.client.flywheel.backend.glsl.error.ErrorBuilder;
 import com.zurrtum.create.client.flywheel.backend.glsl.span.Span;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.InvalidIdentifierException;
-
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
+import net.minecraft.ResourceLocationException;
+import net.minecraft.resources.ResourceLocation;
 
 sealed public interface LoadError {
     ErrorBuilder generateMessage();
 
-    record CircularDependency(Identifier offender, List<Identifier> stack) implements LoadError {
+    record CircularDependency(ResourceLocation offender, List<ResourceLocation> stack) implements LoadError {
         public String format() {
-            return stack.stream().dropWhile(l -> !l.equals(offender)).map(Identifier::toString).collect(Collectors.joining(" -> "));
+            return stack.stream().dropWhile(l -> !l.equals(offender)).map(ResourceLocation::toString).collect(Collectors.joining(" -> "));
         }
 
         @Override
@@ -25,7 +24,7 @@ sealed public interface LoadError {
         }
     }
 
-    record IncludeError(Identifier location, List<Pair<Span, LoadError>> innerErrors) implements LoadError {
+    record IncludeError(ResourceLocation location, List<Pair<Span, LoadError>> innerErrors) implements LoadError {
         @Override
         public ErrorBuilder generateMessage() {
             var out = ErrorBuilder.create().error("could not load \"" + location + "\"").pointAtFile(location);
@@ -39,7 +38,7 @@ sealed public interface LoadError {
         }
     }
 
-    record IOError(Identifier location, IOException exception) implements LoadError {
+    record IOError(ResourceLocation location, IOException exception) implements LoadError {
         @Override
         public ErrorBuilder generateMessage() {
             if (exception instanceof FileNotFoundException) {
@@ -50,14 +49,14 @@ sealed public interface LoadError {
         }
     }
 
-    record ResourceError(Identifier location) implements LoadError {
+    record ResourceError(ResourceLocation location) implements LoadError {
         @Override
         public ErrorBuilder generateMessage() {
             return ErrorBuilder.create().error("\"" + location + "\" was not found");
         }
     }
 
-    record MalformedInclude(InvalidIdentifierException exception) implements LoadError {
+    record MalformedInclude(ResourceLocationException exception) implements LoadError {
         @Override
         public ErrorBuilder generateMessage() {
             return ErrorBuilder.create().error(exception.toString());

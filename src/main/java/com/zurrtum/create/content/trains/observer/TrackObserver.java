@@ -14,14 +14,13 @@ import com.zurrtum.create.content.trains.signal.SignalPropagator;
 import com.zurrtum.create.content.trains.signal.SingleBlockEntityEdgePoint;
 import com.zurrtum.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.foundation.blockEntity.behaviour.filtering.ServerFilteringBehaviour;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.item.ItemStack;
+import net.minecraft.core.UUIDUtil;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.storage.ReadView;
-import net.minecraft.storage.WriteView;
-import net.minecraft.util.Uuids;
-import net.minecraft.world.World;
-
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import java.util.UUID;
 
 public class TrackObserver extends SingleBlockEntityEdgePoint {
@@ -41,7 +40,7 @@ public class TrackObserver extends SingleBlockEntityEdgePoint {
         super.blockEntityAdded(blockEntity, front);
         ServerFilteringBehaviour filteringBehaviour = BlockEntityBehaviour.get(blockEntity, ServerFilteringBehaviour.TYPE);
         if (filteringBehaviour != null)
-            setFilterAndNotify(blockEntity.getWorld(), filteringBehaviour.getFilter());
+            setFilterAndNotify(blockEntity.getLevel(), filteringBehaviour.getFilter());
     }
 
     @Override
@@ -53,12 +52,12 @@ public class TrackObserver extends SingleBlockEntityEdgePoint {
             currentTrain = null;
     }
 
-    public void setFilterAndNotify(World level, ItemStack filter) {
+    public void setFilterAndNotify(Level level, ItemStack filter) {
         this.filter = FilterItemStack.of(filter.copy());
         notifyTrains(level);
     }
 
-    private void notifyTrains(World level) {
+    private void notifyTrains(Level level) {
         TrackGraph graph = Create.RAILWAYS.sided(level).getGraph(edgeLocation.getFirst());
         if (graph == null)
             return;
@@ -86,11 +85,11 @@ public class TrackObserver extends SingleBlockEntityEdgePoint {
     }
 
     @Override
-    public void read(ReadView view, boolean migration, DimensionPalette dimensions) {
+    public void read(ValueInput view, boolean migration, DimensionPalette dimensions) {
         super.read(view, migration, dimensions);
-        activated = view.getInt("Activated", 0);
+        activated = view.getIntOr("Activated", 0);
         filter = view.read("Filter", FilterItemStack.CODEC).orElseGet(FilterItemStack::empty);
-        currentTrain = view.read("TrainId", Uuids.INT_STREAM_CODEC).orElse(null);
+        currentTrain = view.read("TrainId", UUIDUtil.CODEC).orElse(null);
     }
 
     @Override
@@ -99,16 +98,16 @@ public class TrackObserver extends SingleBlockEntityEdgePoint {
         MapLike<T> map = ops.getMap(input).getOrThrow();
         activated = ops.getNumberValue(map.get("Activated")).getOrThrow().intValue();
         filter = FilterItemStack.CODEC.parse(ops, map.get("Filter")).result().orElseGet(FilterItemStack::empty);
-        currentTrain = Uuids.INT_STREAM_CODEC.parse(ops, map.get("TrainId")).result().orElse(null);
+        currentTrain = UUIDUtil.CODEC.parse(ops, map.get("TrainId")).result().orElse(null);
     }
 
     @Override
-    public void write(WriteView view, DimensionPalette dimensions) {
+    public void write(ValueOutput view, DimensionPalette dimensions) {
         super.write(view, dimensions);
         view.putInt("Activated", activated);
-        view.put("Filter", FilterItemStack.CODEC, filter);
+        view.store("Filter", FilterItemStack.CODEC, filter);
         if (currentTrain != null)
-            view.put("TrainId", Uuids.INT_STREAM_CODEC, currentTrain);
+            view.store("TrainId", UUIDUtil.CODEC, currentTrain);
     }
 
     @Override
@@ -118,7 +117,7 @@ public class TrackObserver extends SingleBlockEntityEdgePoint {
         map.add("Activated", ops.createInt(activated));
         map.add("Filter", filter, FilterItemStack.CODEC);
         if (currentTrain != null)
-            map.add("TrainId", currentTrain, Uuids.INT_STREAM_CODEC);
+            map.add("TrainId", currentTrain, UUIDUtil.CODEC);
         return map.build(prefix);
     }
 }

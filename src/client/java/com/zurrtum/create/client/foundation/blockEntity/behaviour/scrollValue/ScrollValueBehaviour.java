@@ -14,13 +14,13 @@ import com.zurrtum.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.foundation.blockEntity.behaviour.ValueSettings;
 import com.zurrtum.create.foundation.blockEntity.behaviour.scrollValue.ServerBulkScrollValueBehaviour;
 import com.zurrtum.create.foundation.blockEntity.behaviour.scrollValue.ServerScrollValueBehaviour;
-import net.minecraft.block.BlockState;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.text.Text;
-import net.minecraft.util.Hand;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.core.Direction;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
@@ -32,13 +32,13 @@ public class ScrollValueBehaviour<B extends SmartBlockEntity, T extends ServerSc
     protected T behaviour;
     ValueBoxTransform slotPositioning;
 
-    public Text label;
+    public Component label;
     protected boolean needsWrench;
     protected Function<Integer, String> formatter = i -> Integer.toString(i);
     protected Supplier<Boolean> isActive = () -> true;
 
     @SuppressWarnings("unchecked")
-    public ScrollValueBehaviour(Text label, B be, ValueBoxTransform slotPositioning) {
+    public ScrollValueBehaviour(Component label, B be, ValueBoxTransform slotPositioning) {
         super(be);
         this.label = label;
         this.slotPositioning = slotPositioning;
@@ -93,13 +93,13 @@ public class ScrollValueBehaviour<B extends SmartBlockEntity, T extends ServerSc
     }
 
     @Override
-    public boolean testHit(Vec3d hit) {
-        BlockState state = behaviour.blockEntity.getCachedState();
-        Vec3d localHit = hit.subtract(Vec3d.of(behaviour.blockEntity.getPos()));
-        return slotPositioning.testHit(behaviour.getWorld(), behaviour.getPos(), state, localHit);
+    public boolean testHit(Vec3 hit) {
+        BlockState state = behaviour.blockEntity.getBlockState();
+        Vec3 localHit = hit.subtract(Vec3.atLowerCornerOf(behaviour.blockEntity.getBlockPos()));
+        return slotPositioning.testHit(behaviour.getLevel(), behaviour.getPos(), state, localHit);
     }
 
-    public void setLabel(Text label) {
+    public void setLabel(Component label) {
         this.label = label;
     }
 
@@ -121,8 +121,8 @@ public class ScrollValueBehaviour<B extends SmartBlockEntity, T extends ServerSc
     }
 
     @Override
-    public ValueSettingsBoard createBoard(PlayerEntity player, BlockHitResult hitResult) {
-        return new ValueSettingsBoard(label, behaviour.getMax(), 10, ImmutableList.of(Text.literal("Value")), new ValueSettingsFormatter());
+    public ValueSettingsBoard createBoard(Player player, BlockHitResult hitResult) {
+        return new ValueSettingsBoard(label, behaviour.getMax(), 10, ImmutableList.of(Component.literal("Value")), new ValueSettingsFormatter());
     }
 
     @Override
@@ -131,17 +131,17 @@ public class ScrollValueBehaviour<B extends SmartBlockEntity, T extends ServerSc
     }
 
     @Override
-    public void setValueSettings(PlayerEntity player, ValueSettings valueSetting, boolean ctrlDown) {
+    public void setValueSettings(Player player, ValueSettings valueSetting, boolean ctrlDown) {
         behaviour.setValueSettings(player, valueSetting, ctrlDown);
     }
 
     @Override
-    public boolean mayInteract(PlayerEntity player) {
+    public boolean mayInteract(Player player) {
         return behaviour.mayInteract(player);
     }
 
     @Override
-    public void onShortInteract(PlayerEntity player, Hand hand, Direction side, BlockHitResult hitResult) {
+    public void onShortInteract(Player player, InteractionHand hand, Direction side, BlockHitResult hitResult) {
         behaviour.onShortInteract(player, hand, side, hitResult);
     }
 

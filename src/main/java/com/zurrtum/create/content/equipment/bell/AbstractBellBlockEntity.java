@@ -2,15 +2,14 @@ package com.zurrtum.create.content.equipment.bell;
 
 import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
 import com.zurrtum.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.storage.ReadView;
-import net.minecraft.storage.WriteView;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.world.World;
-
 import java.util.List;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 
 public abstract class AbstractBellBlockEntity extends SmartBlockEntity {
 
@@ -28,7 +27,7 @@ public abstract class AbstractBellBlockEntity extends SmartBlockEntity {
     public void addBehaviours(List<BlockEntityBehaviour<?>> behaviours) {
     }
 
-    public boolean ring(World world, BlockPos pos, Direction direction) {
+    public boolean ring(Level world, BlockPos pos, Direction direction) {
         isRinging = true;
         ringingTicks = 0;
         ringDirection = direction;
@@ -53,15 +52,15 @@ public abstract class AbstractBellBlockEntity extends SmartBlockEntity {
     }
 
     @Override
-    protected void write(WriteView view, boolean clientPacket) {
+    protected void write(ValueOutput view, boolean clientPacket) {
         super.write(view, clientPacket);
         if (!clientPacket || ringingTicks != 0 || !isRinging)
             return;
-        view.put("Ringing", Direction.CODEC, ringDirection);
+        view.store("Ringing", Direction.CODEC, ringDirection);
     }
 
     @Override
-    protected void read(ReadView view, boolean clientPacket) {
+    protected void read(ValueInput view, boolean clientPacket) {
         super.read(view, clientPacket);
         if (!clientPacket)
             return;

@@ -18,34 +18,33 @@ import com.zurrtum.create.client.content.schematics.table.SchematicTableScreen;
 import com.zurrtum.create.client.content.trains.schedule.ScheduleScreen;
 import com.zurrtum.create.client.foundation.gui.menu.ScreenFactory;
 import com.zurrtum.create.foundation.gui.menu.MenuType;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.screen.ingame.ScreenHandlerProvider;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.network.RegistryByteBuf;
-import net.minecraft.screen.ScreenHandler;
-import net.minecraft.text.Text;
-
 import java.util.IdentityHashMap;
 import java.util.Map;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.gui.screens.inventory.MenuAccess;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.inventory.AbstractContainerMenu;
 
 public class AllMenuScreens {
     public static final Map<MenuType<?>, ScreenFactory<?, ?, ?>> ALL = new IdentityHashMap<>();
 
     @SuppressWarnings("unchecked")
-    public static <T extends ScreenHandler, U extends Screen & ScreenHandlerProvider<T>, H> void open(
-        MinecraftClient client,
+    public static <T extends AbstractContainerMenu, U extends Screen & MenuAccess<T>, H> void open(
+        Minecraft client,
         MenuType<H> type,
         int id,
-        Text name,
-        RegistryByteBuf extraData
+        Component name,
+        RegistryFriendlyByteBuf extraData
     ) {
-        PlayerInventory inventory = client.player.getInventory();
+        Inventory inventory = client.player.getInventory();
         ScreenFactory<T, U, H> factory = (ScreenFactory<T, U, H>) ALL.get(type);
         if (factory != null) {
             U screen = factory.create(client, type, id, inventory, name, extraData);
             if (screen != null) {
-                client.player.currentScreenHandler = screen.getScreenHandler();
+                client.player.containerMenu = screen.getMenu();
                 client.setScreen(screen);
                 return;
             }
@@ -53,7 +52,7 @@ public class AllMenuScreens {
         Create.LOGGER.warn("Failed to create screen");
     }
 
-    public static <T extends ScreenHandler, U extends Screen & ScreenHandlerProvider<T>, H> void register(
+    public static <T extends AbstractContainerMenu, U extends Screen & MenuAccess<T>, H> void register(
         MenuType<H> type,
         ScreenFactory<T, U, H> factory
     ) {

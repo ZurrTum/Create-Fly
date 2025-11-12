@@ -11,15 +11,14 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.zurrtum.create.client.model.StandardModelParameters;
 import com.zurrtum.create.client.model.UnbakedModelLoader;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.resource.Resource;
-import net.minecraft.resource.ResourceManager;
-import net.minecraft.resource.SynchronousResourceReloader;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.JsonHelper;
-
 import java.io.FileNotFoundException;
 import java.util.Map;
+import net.minecraft.client.Minecraft;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.packs.resources.Resource;
+import net.minecraft.server.packs.resources.ResourceManager;
+import net.minecraft.server.packs.resources.ResourceManagerReloadListener;
+import net.minecraft.util.GsonHelper;
 
 /**
  * A loader for {@link ObjModel OBJ models}.
@@ -27,16 +26,16 @@ import java.util.Map;
  * Allows the user to enable automatic face culling, toggle quad shading, flip UVs, render emissively and specify a
  * {@link ObjMaterialLibrary material library} override.
  */
-public class ObjLoader implements UnbakedModelLoader<ObjModel>, SynchronousResourceReloader {
+public class ObjLoader implements UnbakedModelLoader<ObjModel>, ResourceManagerReloadListener {
     public static ObjLoader INSTANCE = new ObjLoader();
 
     private final Map<ObjGeometry.Settings, ObjGeometry> geometryCache = Maps.newConcurrentMap();
-    private final Map<Identifier, ObjMaterialLibrary> materialCache = Maps.newConcurrentMap();
+    private final Map<ResourceLocation, ObjMaterialLibrary> materialCache = Maps.newConcurrentMap();
 
-    private final ResourceManager manager = MinecraftClient.getInstance().getResourceManager();
+    private final ResourceManager manager = Minecraft.getInstance().getResourceManager();
 
     @Override
-    public void reload(ResourceManager resourceManager) {
+    public void onResourceManagerReload(ResourceManager resourceManager) {
         geometryCache.clear();
         materialCache.clear();
     }
@@ -48,15 +47,15 @@ public class ObjLoader implements UnbakedModelLoader<ObjModel>, SynchronousResou
 
         String modelLocation = jsonObject.get("model").getAsString();
 
-        boolean automaticCulling = JsonHelper.getBoolean(jsonObject, "automatic_culling", true);
-        boolean shadeQuads = JsonHelper.getBoolean(jsonObject, "shade_quads", true);
-        boolean flipV = JsonHelper.getBoolean(jsonObject, "flip_v", false);
-        boolean emissiveAmbient = JsonHelper.getBoolean(jsonObject, "emissive_ambient", true);
-        String mtlOverride = JsonHelper.getString(jsonObject, "mtl_override", null);
+        boolean automaticCulling = GsonHelper.getAsBoolean(jsonObject, "automatic_culling", true);
+        boolean shadeQuads = GsonHelper.getAsBoolean(jsonObject, "shade_quads", true);
+        boolean flipV = GsonHelper.getAsBoolean(jsonObject, "flip_v", false);
+        boolean emissiveAmbient = GsonHelper.getAsBoolean(jsonObject, "emissive_ambient", true);
+        String mtlOverride = GsonHelper.getAsString(jsonObject, "mtl_override", null);
         StandardModelParameters parameters = StandardModelParameters.parse(jsonObject, jsonDeserializationContext);
 
         var geometry = loadGeometry(new ObjGeometry.Settings(
-            Identifier.of(modelLocation),
+            ResourceLocation.parse(modelLocation),
             automaticCulling,
             shadeQuads,
             flipV,
@@ -71,7 +70,7 @@ public class ObjLoader implements UnbakedModelLoader<ObjModel>, SynchronousResou
         return geometryCache.computeIfAbsent(
             settings, (data) -> {
                 Resource resource = manager.getResource(settings.modelLocation()).orElseThrow();
-                try (ObjTokenizer tokenizer = new ObjTokenizer(resource.getInputStream())) {
+                try (ObjTokenizer tokenizer = new ObjTokenizer(resource.open())) {
                     return ObjGeometry.parse(tokenizer, data);
                 } catch (FileNotFoundException e) {
                     throw new RuntimeException("Could not find OBJ model", e);
@@ -82,11 +81,11 @@ public class ObjLoader implements UnbakedModelLoader<ObjModel>, SynchronousResou
         );
     }
 
-    public ObjMaterialLibrary loadMaterialLibrary(Identifier materialLocation) {
+    public ObjMaterialLibrary loadMaterialLibrary(ResourceLocation materialLocation) {
         return materialCache.computeIfAbsent(
             materialLocation, (location) -> {
                 Resource resource = manager.getResource(location).orElseThrow();
-                try (ObjTokenizer rdr = new ObjTokenizer(resource.getInputStream())) {
+                try (ObjTokenizer rdr = new ObjTokenizer(resource.open())) {
                     return new ObjMaterialLibrary(rdr);
                 } catch (FileNotFoundException e) {
                     throw new RuntimeException("Could not find OBJ material library", e);

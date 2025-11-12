@@ -1,5 +1,6 @@
 package com.zurrtum.create.client.content.kinetics.gauge;
 
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.zurrtum.create.catnip.data.Couple;
 import com.zurrtum.create.catnip.data.Iterate;
 import com.zurrtum.create.client.AllPartialModels;
@@ -17,18 +18,16 @@ import com.zurrtum.create.client.flywheel.lib.transform.TransformStack;
 import com.zurrtum.create.client.flywheel.lib.visual.SimpleDynamicVisual;
 import com.zurrtum.create.content.kinetics.gauge.GaugeBlock;
 import com.zurrtum.create.content.kinetics.gauge.GaugeBlockEntity;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.MathHelper;
-
 import java.util.ArrayList;
 import java.util.function.Consumer;
+import net.minecraft.core.Direction;
+import net.minecraft.util.Mth;
 
 public abstract class GaugeVisual extends ShaftVisual<GaugeBlockEntity> implements SimpleDynamicVisual {
 
     protected final ArrayList<DialFace> faces = new ArrayList<>(2);
 
-    protected final MatrixStack ms = new MatrixStack();
+    protected final PoseStack ms = new PoseStack();
 
     protected GaugeVisual(VisualizationContext context, GaugeBlockEntity blockEntity, float partialTick) {
         super(context, blockEntity, partialTick);
@@ -44,7 +43,7 @@ public abstract class GaugeVisual extends ShaftVisual<GaugeBlockEntity> implemen
         var msr = TransformStack.of(ms);
         msr.translate(getVisualPosition());
 
-        float progress = MathHelper.lerp(AnimationTickHolder.getPartialTicks(), blockEntity.prevDialState, blockEntity.dialState);
+        float progress = Mth.lerp(AnimationTickHolder.getPartialTicks(), blockEntity.prevDialState, blockEntity.dialState);
 
         for (Direction facing : Iterate.directions) {
             if (!gaugeBlock.shouldRenderHeadOnFace(level, pos, blockState, facing))
@@ -64,10 +63,10 @@ public abstract class GaugeVisual extends ShaftVisual<GaugeBlockEntity> implemen
 
     @Override
     public void beginFrame(DynamicVisual.Context ctx) {
-        if (MathHelper.approximatelyEquals(blockEntity.prevDialState, blockEntity.dialState))
+        if (Mth.equal(blockEntity.prevDialState, blockEntity.dialState))
             return;
 
-        float progress = MathHelper.lerp(ctx.partialTick(), blockEntity.prevDialState, blockEntity.dialState);
+        float progress = Mth.lerp(ctx.partialTick(), blockEntity.prevDialState, blockEntity.dialState);
 
         var msr = TransformStack.of(ms);
 
@@ -138,7 +137,7 @@ public abstract class GaugeVisual extends ShaftVisual<GaugeBlockEntity> implemen
         }
 
         protected TransformStack<?> rotateToFace(TransformStack<?> msr) {
-            return msr.center().rotate((float) ((-face.getPositiveHorizontalDegrees() - 90) / 180 * Math.PI), Direction.UP).uncenter();
+            return msr.center().rotate((float) ((-face.toYRot() - 90) / 180 * Math.PI), Direction.UP).uncenter();
         }
 
         private void delete() {

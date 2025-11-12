@@ -5,17 +5,16 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.zurrtum.create.infrastructure.fluids.FluidStack;
-import net.minecraft.fluid.FlowableFluid;
-import net.minecraft.fluid.Fluid;
-import net.minecraft.network.RegistryByteBuf;
-import net.minecraft.network.codec.PacketCodec;
-import net.minecraft.network.codec.PacketCodecs;
-import net.minecraft.registry.Registries;
-import net.minecraft.registry.RegistryKeys;
-import net.minecraft.registry.entry.RegistryEntry;
-import net.minecraft.registry.tag.TagKey;
-
 import java.util.List;
+import net.minecraft.core.Holder;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.tags.TagKey;
+import net.minecraft.world.level.material.FlowingFluid;
+import net.minecraft.world.level.material.Fluid;
 
 public record FluidTagIngredient(TagKey<Fluid> tag, int amount) implements FluidIngredient {
     @Override
@@ -26,10 +25,10 @@ public record FluidTagIngredient(TagKey<Fluid> tag, int amount) implements Fluid
     @Override
     public List<Fluid> getMatchingFluids() {
         ImmutableList.Builder<Fluid> builder = ImmutableList.builder();
-        for (RegistryEntry<Fluid> holder : Registries.FLUID.iterateEntries(tag)) {
+        for (Holder<Fluid> holder : BuiltInRegistries.FLUID.getTagOrEmpty(tag)) {
             Fluid fluid = holder.value();
-            if (fluid instanceof FlowableFluid flowing)
-                fluid = flowing.getStill();
+            if (fluid instanceof FlowingFluid flowing)
+                fluid = flowing.getSource();
             builder.add(fluid);
         }
         return builder.build();
@@ -38,10 +37,10 @@ public record FluidTagIngredient(TagKey<Fluid> tag, int amount) implements Fluid
     @Override
     public List<FluidStack> getMatchingFluidStacks() {
         ImmutableList.Builder<FluidStack> builder = ImmutableList.builder();
-        for (RegistryEntry<Fluid> holder : Registries.FLUID.iterateEntries(tag)) {
+        for (Holder<Fluid> holder : BuiltInRegistries.FLUID.getTagOrEmpty(tag)) {
             Fluid fluid = holder.value();
-            if (fluid instanceof FlowableFluid flowing)
-                fluid = flowing.getStill();
+            if (fluid instanceof FlowingFluid flowing)
+                fluid = flowing.getSource();
             builder.add(new FluidStack(fluid, amount));
         }
         return builder.build();
@@ -54,13 +53,13 @@ public record FluidTagIngredient(TagKey<Fluid> tag, int amount) implements Fluid
 
     public record Serializer(String type) implements FluidIngredientSerializer {
         public static final MapCodec<FluidTagIngredient> CODEC = RecordCodecBuilder.mapCodec(i -> i.group(
-            TagKey.codec(RegistryKeys.FLUID).fieldOf("fluid_tag").forGetter(FluidTagIngredient::tag),
+            TagKey.hashedCodec(Registries.FLUID).fieldOf("fluid_tag").forGetter(FluidTagIngredient::tag),
             Codec.INT.optionalFieldOf("amount", 81000).forGetter(FluidTagIngredient::amount)
         ).apply(i, FluidTagIngredient::new));
-        public static final PacketCodec<RegistryByteBuf, FluidTagIngredient> PACKET_CODEC = PacketCodec.tuple(
-            TagKey.packetCodec(RegistryKeys.FLUID),
+        public static final StreamCodec<RegistryFriendlyByteBuf, FluidTagIngredient> PACKET_CODEC = StreamCodec.composite(
+            TagKey.streamCodec(Registries.FLUID),
             FluidTagIngredient::tag,
-            PacketCodecs.INTEGER,
+            ByteBufCodecs.INT,
             FluidTagIngredient::amount,
             FluidTagIngredient::new
         );
@@ -71,7 +70,7 @@ public record FluidTagIngredient(TagKey<Fluid> tag, int amount) implements Fluid
         }
 
         @Override
-        public PacketCodec<RegistryByteBuf, FluidTagIngredient> packetCodec() {
+        public StreamCodec<RegistryFriendlyByteBuf, FluidTagIngredient> packetCodec() {
             return PACKET_CODEC;
         }
     }

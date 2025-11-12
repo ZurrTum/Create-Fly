@@ -1,157 +1,157 @@
 package com.zurrtum.create.client.content.trains.station;
 
-import net.minecraft.client.font.TextHandler;
-import net.minecraft.client.font.TextRenderer;
-import net.minecraft.client.render.VertexConsumerProvider;
-import net.minecraft.text.OrderedText;
-import net.minecraft.text.StringVisitable;
-import net.minecraft.text.Text;
 import org.joml.Matrix4f;
 
 import java.util.List;
+import net.minecraft.client.StringSplitter;
+import net.minecraft.client.gui.Font;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.FormattedText;
+import net.minecraft.util.FormattedCharSequence;
 
-public class NoShadowFontWrapper extends TextRenderer {
-    private final TextRenderer wrapped;
+public class NoShadowFontWrapper extends Font {
+    private final Font wrapped;
 
-    public NoShadowFontWrapper(TextRenderer wrapped) {
-        super(wrapped.fonts);
+    public NoShadowFontWrapper(Font wrapped) {
+        super(wrapped.provider);
         this.wrapped = wrapped;
     }
 
     @Override
-    public void draw(
-        Text text,
+    public void drawInBatch(
+        Component text,
         float x,
         float y,
         int color,
         boolean shadow,
         Matrix4f matrix,
-        VertexConsumerProvider vertexConsumers,
-        TextLayerType layerType,
+        MultiBufferSource vertexConsumers,
+        DisplayMode layerType,
         int backgroundColor,
         int light
     ) {
-        wrapped.draw(text, x, y, color, false, matrix, vertexConsumers, layerType, backgroundColor, light);
+        wrapped.drawInBatch(text, x, y, color, false, matrix, vertexConsumers, layerType, backgroundColor, light);
     }
 
     @Override
-    public void draw(
+    public void drawInBatch(
         String string,
         float x,
         float y,
         int color,
         boolean shadow,
         Matrix4f matrix,
-        VertexConsumerProvider vertexConsumers,
-        TextLayerType layerType,
+        MultiBufferSource vertexConsumers,
+        DisplayMode layerType,
         int backgroundColor,
         int light
     ) {
-        wrapped.draw(string, x, y, color, false, matrix, vertexConsumers, layerType, backgroundColor, light);
+        wrapped.drawInBatch(string, x, y, color, false, matrix, vertexConsumers, layerType, backgroundColor, light);
     }
 
     @Override
-    public void draw(
-        OrderedText text,
+    public void drawInBatch(
+        FormattedCharSequence text,
         float x,
         float y,
         int color,
         boolean shadow,
         Matrix4f matrix,
-        VertexConsumerProvider vertexConsumers,
-        TextLayerType layerType,
+        MultiBufferSource vertexConsumers,
+        DisplayMode layerType,
         int backgroundColor,
         int light
     ) {
-        wrapped.draw(text, x, y, color, false, matrix, vertexConsumers, layerType, backgroundColor, light);
+        wrapped.drawInBatch(text, x, y, color, false, matrix, vertexConsumers, layerType, backgroundColor, light);
     }
 
     @Override
-    public int getWrappedLinesHeight(StringVisitable text, int maxWidth) {
-        return wrapped.getWrappedLinesHeight(text, maxWidth);
+    public int wordWrapHeight(FormattedText text, int maxWidth) {
+        return wrapped.wordWrapHeight(text, maxWidth);
     }
 
     @Override
-    public String mirror(String text) {
-        return wrapped.mirror(text);
+    public String bidirectionalShaping(String text) {
+        return wrapped.bidirectionalShaping(text);
     }
 
     @Override
-    public void drawWithOutline(
-        OrderedText text,
+    public void drawInBatch8xOutline(
+        FormattedCharSequence text,
         float x,
         float y,
         int color,
         int outlineColor,
         Matrix4f matrix,
-        VertexConsumerProvider vertexConsumers,
+        MultiBufferSource vertexConsumers,
         int light
     ) {
-        wrapped.drawWithOutline(text, x, y, color, outlineColor, matrix, vertexConsumers, light);
+        wrapped.drawInBatch8xOutline(text, x, y, color, outlineColor, matrix, vertexConsumers, light);
     }
 
     @Override
-    public int getWidth(String text) {
-        return wrapped.getWidth(text);
+    public int width(String text) {
+        return wrapped.width(text);
     }
 
     @Override
-    public int getWidth(OrderedText text) {
-        return wrapped.getWidth(text);
+    public int width(FormattedCharSequence text) {
+        return wrapped.width(text);
     }
 
     @Override
-    public int getWidth(StringVisitable text) {
-        return wrapped.getWidth(text);
+    public int width(FormattedText text) {
+        return wrapped.width(text);
     }
 
     @Override
-    public String trimToWidth(String text, int maxWidth) {
-        return wrapped.trimToWidth(text, maxWidth);
+    public String plainSubstrByWidth(String text, int maxWidth) {
+        return wrapped.plainSubstrByWidth(text, maxWidth);
     }
 
     @Override
-    public String trimToWidth(String text, int maxWidth, boolean backwards) {
-        return wrapped.trimToWidth(text, maxWidth, backwards);
+    public String plainSubstrByWidth(String text, int maxWidth, boolean backwards) {
+        return wrapped.plainSubstrByWidth(text, maxWidth, backwards);
     }
 
     @Override
-    public StringVisitable trimToWidth(StringVisitable text, int width) {
-        return wrapped.trimToWidth(text, width);
+    public FormattedText substrByWidth(FormattedText text, int width) {
+        return wrapped.substrByWidth(text, width);
     }
 
     @Override
-    public int getWrappedLinesHeight(String text, int maxWidth) {
-        return wrapped.getWrappedLinesHeight(text, maxWidth);
+    public int wordWrapHeight(String text, int maxWidth) {
+        return wrapped.wordWrapHeight(text, maxWidth);
     }
 
     @Override
-    public List<OrderedText> wrapLines(StringVisitable text, int width) {
-        return wrapped.wrapLines(text, width);
+    public List<FormattedCharSequence> split(FormattedText text, int width) {
+        return wrapped.split(text, width);
     }
 
     @Override
-    public List<StringVisitable> wrapLinesWithoutLanguage(StringVisitable text, int width) {
-        return wrapped.wrapLinesWithoutLanguage(text, width);
+    public List<FormattedText> splitIgnoringLanguage(FormattedText text, int width) {
+        return wrapped.splitIgnoringLanguage(text, width);
     }
 
     @Override
-    public boolean isRightToLeft() {
-        return wrapped.isRightToLeft();
+    public boolean isBidirectional() {
+        return wrapped.isBidirectional();
     }
 
     @Override
-    public TextHandler getTextHandler() {
-        return wrapped.getTextHandler();
+    public StringSplitter getSplitter() {
+        return wrapped.getSplitter();
     }
 
     @Override
-    public GlyphDrawable prepare(String string, float x, float y, int color, boolean shadow, int backgroundColor) {
-        return wrapped.prepare(string, x, y, color, false, backgroundColor);
+    public PreparedText prepareText(String string, float x, float y, int color, boolean shadow, int backgroundColor) {
+        return wrapped.prepareText(string, x, y, color, false, backgroundColor);
     }
 
     @Override
-    public GlyphDrawable prepare(OrderedText text, float x, float y, int color, boolean shadow, int backgroundColor) {
-        return wrapped.prepare(text, x, y, color, false, backgroundColor);
+    public PreparedText prepareText(FormattedCharSequence text, float x, float y, int color, boolean shadow, int backgroundColor) {
+        return wrapped.prepareText(text, x, y, color, false, backgroundColor);
     }
 }

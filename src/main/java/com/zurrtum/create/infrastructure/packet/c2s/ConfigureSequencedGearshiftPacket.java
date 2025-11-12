@@ -4,27 +4,26 @@ import com.zurrtum.create.AllHandle;
 import com.zurrtum.create.AllPackets;
 import com.zurrtum.create.content.kinetics.transmission.sequencer.Instruction;
 import com.zurrtum.create.foundation.codec.CreateStreamCodecs;
-import net.minecraft.network.RegistryByteBuf;
-import net.minecraft.network.codec.PacketCodec;
-import net.minecraft.network.packet.PacketType;
-import net.minecraft.server.network.ServerPlayNetworkHandler;
-import net.minecraft.util.math.BlockPos;
-
 import java.util.Vector;
 import java.util.function.BiConsumer;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.PacketType;
+import net.minecraft.server.network.ServerGamePacketListenerImpl;
 
 public record ConfigureSequencedGearshiftPacket(BlockPos pos, Vector<Instruction> instructions) implements C2SPacket {
     @SuppressWarnings("removal")
-    public static final PacketCodec<RegistryByteBuf, ConfigureSequencedGearshiftPacket> CODEC = PacketCodec.tuple(
-        BlockPos.PACKET_CODEC,
+    public static final StreamCodec<RegistryFriendlyByteBuf, ConfigureSequencedGearshiftPacket> CODEC = StreamCodec.composite(
+        BlockPos.STREAM_CODEC,
         ConfigureSequencedGearshiftPacket::pos,
-        Instruction.STREAM_CODEC.collect(CreateStreamCodecs.vector()),
+        Instruction.STREAM_CODEC.apply(CreateStreamCodecs.vector()),
         ConfigureSequencedGearshiftPacket::instructions,
         ConfigureSequencedGearshiftPacket::new
     );
 
     @Override
-    public PacketType<ConfigureSequencedGearshiftPacket> getPacketType() {
+    public PacketType<ConfigureSequencedGearshiftPacket> type() {
         return AllPackets.CONFIGURE_SEQUENCER;
     }
 
@@ -34,7 +33,7 @@ public record ConfigureSequencedGearshiftPacket(BlockPos pos, Vector<Instruction
     }
 
     @Override
-    public BiConsumer<ServerPlayNetworkHandler, ConfigureSequencedGearshiftPacket> callback() {
+    public BiConsumer<ServerGamePacketListenerImpl, ConfigureSequencedGearshiftPacket> callback() {
         return AllHandle::onConfigureSequencedGearshift;
     }
 }

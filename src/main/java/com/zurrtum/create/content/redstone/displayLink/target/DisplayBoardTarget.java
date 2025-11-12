@@ -7,22 +7,21 @@ import com.zurrtum.create.content.redstone.displayLink.DisplayLinkContext;
 import com.zurrtum.create.content.redstone.displayLink.source.SingleLineDisplaySource;
 import com.zurrtum.create.content.trains.display.FlapDisplayBlockEntity;
 import com.zurrtum.create.content.trains.display.FlapDisplayLayout;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.text.MutableText;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.math.Vec3i;
-import net.minecraft.world.WorldAccess;
-
 import java.util.List;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Vec3i;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.phys.AABB;
 
 public class DisplayBoardTarget extends DisplayTarget {
 
     @Override
-    public void acceptText(int line, List<MutableText> text, DisplayLinkContext context) {
+    public void acceptText(int line, List<MutableComponent> text, DisplayLinkContext context) {
     }
 
-    public void acceptFlapText(int line, List<List<MutableText>> text, DisplayLinkContext context) {
+    public void acceptFlapText(int line, List<List<MutableComponent>> text, DisplayLinkContext context) {
         FlapDisplayBlockEntity controller = getController(context);
         if (controller == null)
             return;
@@ -50,7 +49,7 @@ public class DisplayBoardTarget extends DisplayTarget {
             source.loadFlapDisplayLayout(context, controller, layout, i);
 
             for (int sectionIndex = 0; sectionIndex < layout.getSections().size(); sectionIndex++) {
-                List<MutableText> textLine = text.get(i);
+                List<MutableComponent> textLine = text.get(i);
                 if (textLine.size() <= sectionIndex)
                     break;
                 layout.getSections().get(sectionIndex).setText(textLine.get(sectionIndex));
@@ -84,8 +83,8 @@ public class DisplayBoardTarget extends DisplayTarget {
         return be.getController();
     }
 
-    public Box getMultiblockBounds(WorldAccess level, BlockPos pos) {
-        Box baseShape = super.getMultiblockBounds(level, pos);
+    public AABB getMultiblockBounds(LevelAccessor level, BlockPos pos) {
+        AABB baseShape = super.getMultiblockBounds(level, pos);
         BlockEntity be = level.getBlockEntity(pos);
 
         if (!(be instanceof FlapDisplayBlockEntity fdbe))
@@ -95,8 +94,8 @@ public class DisplayBoardTarget extends DisplayTarget {
         if (controller == null)
             return baseShape;
 
-        Vec3i normal = controller.getDirection().rotateYClockwise().getVector();
-        return baseShape.offset(controller.getPos().subtract(pos))
-            .stretch(normal.getX() * (controller.xSize - 1), 1 - controller.ySize, normal.getZ() * (controller.xSize - 1));
+        Vec3i normal = controller.getDirection().getClockWise().getUnitVec3i();
+        return baseShape.move(controller.getBlockPos().subtract(pos))
+            .expandTowards(normal.getX() * (controller.xSize - 1), 1 - controller.ySize, normal.getZ() * (controller.xSize - 1));
     }
 }

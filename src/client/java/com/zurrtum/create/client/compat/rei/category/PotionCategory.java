@@ -17,10 +17,10 @@ import me.shedaniel.rei.api.client.gui.widgets.Widget;
 import me.shedaniel.rei.api.client.gui.widgets.Widgets;
 import me.shedaniel.rei.api.common.category.CategoryIdentifier;
 import me.shedaniel.rei.api.common.util.EntryIngredients;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.item.Items;
-import net.minecraft.text.Text;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.item.Items;
 import org.joml.Matrix3x2f;
 
 import java.util.List;
@@ -32,7 +32,7 @@ public class PotionCategory extends CreateCategory<PotionDisplay> {
     }
 
     @Override
-    public Text getTitle() {
+    public Component getTitle() {
         return CreateLang.translateDirect("recipe.automatic_brewing");
     }
 
@@ -47,21 +47,21 @@ public class PotionCategory extends CreateCategory<PotionDisplay> {
         Point fluid = new Point(bounds.x + 45, bounds.y + 56);
         Point output = new Point(bounds.x + 147, bounds.y + 56);
         HeatCondition requiredHeat = HeatCondition.HEATED;
-        widgets.add(Widgets.createDrawableWidget((DrawContext graphics, int mouseX, int mouseY, float delta) -> {
+        widgets.add(Widgets.createDrawableWidget((GuiGraphics graphics, int mouseX, int mouseY, float delta) -> {
             drawSlotBackground(graphics, input, fluid, output);
             AllGuiTextures.JEI_DOWN_ARROW.render(graphics, bounds.x + 141, bounds.y + 37);
-            Matrix3x2f pose = new Matrix3x2f(graphics.getMatrices());
+            Matrix3x2f pose = new Matrix3x2f(graphics.pose());
             AllGuiTextures.JEI_HEAT_BAR.render(graphics, bounds.x + 9, bounds.y + 85);
             AllGuiTextures.JEI_LIGHT.render(graphics, bounds.x + 86, bounds.y + 93);
-            graphics.state.addSpecialElement(new BasinBlazeBurnerRenderState(
+            graphics.guiRenderState.submitPicturesInPictureState(new BasinBlazeBurnerRenderState(
                 pose,
                 bounds.x + 96,
                 bounds.y + 74,
                 requiredHeat.visualizeAsBlazeBurner()
             ));
-            graphics.state.addSpecialElement(new MixingBasinRenderState(pose, bounds.x + 96, bounds.y));
-            graphics.drawText(
-                MinecraftClient.getInstance().textRenderer,
+            graphics.guiRenderState.submitPicturesInPictureState(new MixingBasinRenderState(pose, bounds.x + 96, bounds.y));
+            graphics.drawString(
+                Minecraft.getInstance().font,
                 CreateLang.translateDirect(requiredHeat.getTranslationKey()),
                 bounds.x + 14,
                 bounds.y + 91,

@@ -8,31 +8,30 @@ import com.zurrtum.create.catnip.animation.LerpedFloat;
 import com.zurrtum.create.catnip.math.VecHelper;
 import com.zurrtum.create.content.kinetics.base.KineticBlockEntity;
 import com.zurrtum.create.foundation.advancement.CreateTrigger;
-import net.minecraft.block.BlockState;
-import net.minecraft.storage.ReadView;
-import net.minecraft.storage.WriteView;
-import net.minecraft.util.StringIdentifiable;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.World.ExplosionSourceType;
-
 import java.util.List;
 import java.util.Locale;
+import net.minecraft.core.BlockPos;
+import net.minecraft.util.Mth;
+import net.minecraft.util.StringRepresentable;
+import net.minecraft.world.level.Level.ExplosionInteraction;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
+import net.minecraft.world.phys.Vec3;
 
 public class CuckooClockBlockEntity extends KineticBlockEntity {
     public LerpedFloat animationProgress = LerpedFloat.linear();
     public Animation animationType;
     private boolean sendAnimationUpdate;
 
-    public enum Animation implements StringIdentifiable {
+    public enum Animation implements StringRepresentable {
         PIG,
         CREEPER,
         SURPRISE,
         NONE;
-        public static final Codec<Animation> CODEC = StringIdentifiable.createCodec(Animation::values);
+        public static final Codec<Animation> CODEC = StringRepresentable.fromEnum(Animation::values);
 
-        public String asString() {
+        public String getSerializedName() {
             return name().toLowerCase(Locale.ROOT);
         }
     }
@@ -48,7 +47,7 @@ public class CuckooClockBlockEntity extends KineticBlockEntity {
     }
 
     @Override
-    protected void read(ReadView view, boolean clientPacket) {
+    protected void read(ValueInput view, boolean clientPacket) {
         super.read(view, clientPacket);
         if (clientPacket) {
             view.read("Animation", Animation.CODEC).ifPresent(animation -> {
@@ -59,9 +58,9 @@ public class CuckooClockBlockEntity extends KineticBlockEntity {
     }
 
     @Override
-    public void write(WriteView view, boolean clientPacket) {
+    public void write(ValueOutput view, boolean clientPacket) {
         if (clientPacket && sendAnimationUpdate)
-            view.put("Animation", Animation.CODEC, animationType);
+            view.store("Animation", Animation.CODEC, animationType);
         sendAnimationUpdate = false;
         super.write(view, clientPacket);
     }
@@ -69,16 +68,16 @@ public class CuckooClockBlockEntity extends KineticBlockEntity {
     @Override
     public void tick() {
         super.tick();
-        if (world.isClient() || getSpeed() == 0)
+        if (level.isClientSide() || getSpeed() == 0)
             return;
 
-        boolean isNatural = world.getDimension().natural();
+        boolean isNatural = level.dimensionType().natural();
         if (!isNatural) {
             return;
         }
 
         if (animationType == Animation.NONE) {
-            int dayTime = (int) (world.getTimeOfDay() % 24000);
+            int dayTime = (int) (level.getDayTime() % 24000);
             int hours = (dayTime / 1000 + 6) % 24;
             int minutes = (dayTime % 1000) * 60 / 1000;
             if (hours == 12 && minutes < 5)
@@ -90,19 +89,19 @@ public class CuckooClockBlockEntity extends KineticBlockEntity {
             if (value > 100)
                 animationType = Animation.NONE;
 
-            if (animationType == Animation.SURPRISE && MathHelper.approximatelyEquals(animationProgress.getValue(), 50)) {
-                Vec3d center = VecHelper.getCenterOf(pos);
-                world.breakBlock(pos, false);
-                world.createExplosion(
+            if (animationType == Animation.SURPRISE && Mth.equal(animationProgress.getValue(), 50)) {
+                Vec3 center = VecHelper.getCenterOf(worldPosition);
+                level.destroyBlock(worldPosition, false);
+                level.explode(
                     null,
-                    AllDamageSources.get(world).cuckoo_surprise,
+                    AllDamageSources.get(level).cuckoo_surprise,
                     null,
                     center.x,
                     center.y,
                     center.z,
                     3,
                     false,
-                    ExplosionSourceType.BLOCK
+                    ExplosionInteraction.BLOCK
                 );
             }
         }
@@ -116,7 +115,7 @@ public class CuckooClockBlockEntity extends KineticBlockEntity {
 
     public void startAnimation(Animation animation) {
         animationType = animation;
-        if (animation != null && CuckooClockBlock.containsSurprise(getCachedState()))
+        if (animation != null && CuckooClockBlock.containsSurprise(getBlockState()))
             animationType = Animation.SURPRISE;
         animationProgress.startWithValue(0);
         sendAnimationUpdate = true;

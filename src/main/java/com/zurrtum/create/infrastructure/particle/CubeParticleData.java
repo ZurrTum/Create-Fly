@@ -4,13 +4,13 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.zurrtum.create.AllParticleTypes;
-import net.minecraft.network.RegistryByteBuf;
-import net.minecraft.network.codec.PacketCodec;
-import net.minecraft.network.codec.PacketCodecs;
-import net.minecraft.particle.ParticleEffect;
-import net.minecraft.particle.ParticleType;
+import net.minecraft.core.particles.ParticleOptions;
+import net.minecraft.core.particles.ParticleType;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
 
-public record CubeParticleData(float red, float green, float blue, float scale, int avgAge, boolean hot) implements ParticleEffect {
+public record CubeParticleData(float red, float green, float blue, float scale, int avgAge, boolean hot) implements ParticleOptions {
 
     public static final MapCodec<CubeParticleData> CODEC = RecordCodecBuilder.mapCodec(i -> i.group(
         Codec.FLOAT.fieldOf("r").forGetter(CubeParticleData::red),
@@ -21,18 +21,18 @@ public record CubeParticleData(float red, float green, float blue, float scale, 
         Codec.BOOL.fieldOf("hot").forGetter(CubeParticleData::hot)
     ).apply(i, CubeParticleData::new));
 
-    public static final PacketCodec<RegistryByteBuf, CubeParticleData> STREAM_CODEC = PacketCodec.tuple(
-        PacketCodecs.FLOAT,
+    public static final StreamCodec<RegistryFriendlyByteBuf, CubeParticleData> STREAM_CODEC = StreamCodec.composite(
+        ByteBufCodecs.FLOAT,
         CubeParticleData::red,
-        PacketCodecs.FLOAT,
+        ByteBufCodecs.FLOAT,
         CubeParticleData::green,
-        PacketCodecs.FLOAT,
+        ByteBufCodecs.FLOAT,
         CubeParticleData::blue,
-        PacketCodecs.FLOAT,
+        ByteBufCodecs.FLOAT,
         CubeParticleData::scale,
-        PacketCodecs.INTEGER,
+        ByteBufCodecs.INT,
         CubeParticleData::avgAge,
-        PacketCodecs.BOOLEAN,
+        ByteBufCodecs.BOOL,
         CubeParticleData::hot,
         CubeParticleData::new
     );

@@ -2,11 +2,11 @@ package com.zurrtum.create.foundation.blockEntity;
 
 import com.zurrtum.create.foundation.fluid.FluidTank;
 import com.zurrtum.create.infrastructure.fluids.FluidStack;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.state.property.Properties;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import org.jetbrains.annotations.Nullable;
 
 public interface IMultiBlockEntityContainer {
@@ -44,15 +44,15 @@ public interface IMultiBlockEntityContainer {
     Direction.Axis getMainConnectionAxis();
 
     default Direction.Axis getMainAxisOf(BlockEntity be) { // this feels redundant, but it gives us a default to use when defining ::getMainConnectionAxis
-        BlockState state = be.getCachedState();
+        BlockState state = be.getBlockState();
 
         Direction.Axis axis;
-        if (state.contains(Properties.HORIZONTAL_AXIS)) {
-            axis = state.get(Properties.HORIZONTAL_AXIS);
-        } else if (state.contains(Properties.FACING)) {
-            axis = state.get(Properties.FACING).getAxis();
-        } else if (state.contains(Properties.HORIZONTAL_FACING)) {
-            axis = state.get(Properties.HORIZONTAL_FACING).getAxis();
+        if (state.hasProperty(BlockStateProperties.HORIZONTAL_AXIS)) {
+            axis = state.getValue(BlockStateProperties.HORIZONTAL_AXIS);
+        } else if (state.hasProperty(BlockStateProperties.FACING)) {
+            axis = state.getValue(BlockStateProperties.FACING).getAxis();
+        } else if (state.hasProperty(BlockStateProperties.HORIZONTAL_FACING)) {
+            axis = state.getValue(BlockStateProperties.HORIZONTAL_FACING).getAxis();
         } else
             axis = Direction.Axis.Y;
 

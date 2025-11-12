@@ -2,29 +2,28 @@ package com.zurrtum.create.foundation.item;
 
 import com.zurrtum.create.catnip.data.IntAttached;
 import com.zurrtum.create.foundation.blockEntity.behaviour.filtering.ServerFilteringBehaviour;
-import net.minecraft.inventory.Inventory;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.text.MutableText;
-
 import java.util.*;
 import java.util.stream.Stream;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.world.Container;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
 
 public class CountedItemStackList {
 
     Map<Item, Set<ItemStackEntry>> items = new HashMap<>();
 
-    public CountedItemStackList(Inventory inventory, ServerFilteringBehaviour filteringBehaviour) {
-        for (int slot = 0, size = inventory.size(); slot < size; slot++) {
-            ItemStack extractItem = inventory.getStack(slot);
+    public CountedItemStackList(Container inventory, ServerFilteringBehaviour filteringBehaviour) {
+        for (int slot = 0, size = inventory.getContainerSize(); slot < size; slot++) {
+            ItemStack extractItem = inventory.getItem(slot);
             if (filteringBehaviour.test(extractItem))
                 add(extractItem);
         }
     }
 
-    public Stream<IntAttached<MutableText>> getTopNames(int limit) {
+    public Stream<IntAttached<MutableComponent>> getTopNames(int limit) {
         return items.values().stream().flatMap(Collection::stream).sorted(IntAttached.comparator()).limit(limit)
-            .map(entry -> IntAttached.with(entry.count(), entry.stack().getName().copy()));
+            .map(entry -> IntAttached.with(entry.count(), entry.stack().getHoverName().copy()));
     }
 
     public void add(ItemStack stack) {
@@ -66,7 +65,7 @@ public class CountedItemStackList {
         }
 
         public boolean matches(ItemStack other) {
-            return ItemStack.areItemsAndComponentsEqual(other, stack());
+            return ItemStack.isSameItemSameComponents(other, stack());
         }
 
         public ItemStack stack() {

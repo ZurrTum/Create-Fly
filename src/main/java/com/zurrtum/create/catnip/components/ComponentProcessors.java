@@ -1,30 +1,30 @@
 package com.zurrtum.create.catnip.components;
 
-import net.minecraft.component.Component;
-import net.minecraft.component.ComponentType;
-import net.minecraft.component.DataComponentTypes;
-import net.minecraft.item.ItemStack;
+import net.minecraft.core.component.DataComponentType;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.core.component.TypedDataComponent;
+import net.minecraft.world.item.ItemStack;
 
 public class ComponentProcessors {
     public static ItemStack withUnsafeComponentsDiscarded(ItemStack stack) {
-        if (stack.getComponentChanges().isEmpty())
+        if (stack.getComponentsPatch().isEmpty())
             return stack;
         ItemStack copy = stack.copy();
-        stack.getComponents().stream().filter(ComponentProcessors::isUnsafeItemComponent).map(Component::type).forEach(copy::remove);
+        stack.getComponents().stream().filter(ComponentProcessors::isUnsafeItemComponent).map(TypedDataComponent::type).forEach(copy::remove);
         return copy;
     }
 
-    public static boolean isUnsafeItemComponent(Component<?> component) {
+    public static boolean isUnsafeItemComponent(TypedDataComponent<?> component) {
         return isUnsafeItemComponent(component.type());
     }
 
-    public static boolean isUnsafeItemComponent(ComponentType<?> component) {
-        if (component.equals(DataComponentTypes.ENCHANTMENTS))
+    public static boolean isUnsafeItemComponent(DataComponentType<?> component) {
+        if (component.equals(DataComponents.ENCHANTMENTS))
             return false;
-        if (component.equals(DataComponentTypes.POTION_CONTENTS))
+        if (component.equals(DataComponents.POTION_CONTENTS))
             return false;
-        if (component.equals(DataComponentTypes.DAMAGE))
+        if (component.equals(DataComponents.DAMAGE))
             return false;
-        return !component.equals(DataComponentTypes.CUSTOM_NAME);
+        return !component.equals(DataComponents.CUSTOM_NAME);
     }
 }

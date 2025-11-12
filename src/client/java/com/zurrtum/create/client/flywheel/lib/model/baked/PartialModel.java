@@ -1,11 +1,11 @@
 package com.zurrtum.create.client.flywheel.lib.model.baked;
 
 import com.google.common.collect.MapMaker;
-import net.minecraft.client.render.model.GeometryBakedModel;
-import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.UnknownNullability;
 
 import java.util.concurrent.ConcurrentMap;
+import net.minecraft.client.renderer.block.model.SimpleModelWrapper;
+import net.minecraft.resources.ResourceLocation;
 
 /**
  * A helper class for loading and accessing JSON models not directly used by any blocks or items.
@@ -15,30 +15,30 @@ import java.util.concurrent.ConcurrentMap;
  * Once Minecraft has finished baking all models, all PartialModels will have their bakedModel fields populated.
  */
 public final class PartialModel {
-    static final ConcurrentMap<Identifier, PartialModel> ALL = new MapMaker().weakValues().makeMap();
+    static final ConcurrentMap<ResourceLocation, PartialModel> ALL = new MapMaker().weakValues().makeMap();
     static boolean populateOnInit = false;
 
-    private final Identifier modelLocation;
+    private final ResourceLocation modelLocation;
     @UnknownNullability
-    GeometryBakedModel bakedModel;
+    SimpleModelWrapper bakedModel;
 
-    private PartialModel(Identifier modelLocation) {
+    private PartialModel(ResourceLocation modelLocation) {
         this.modelLocation = modelLocation;
         if (populateOnInit) {
             throw new RuntimeException("Loading new models after resolve models is not supported");
         }
     }
 
-    public static PartialModel of(Identifier modelLocation) {
+    public static PartialModel of(ResourceLocation modelLocation) {
         return ALL.computeIfAbsent(modelLocation, PartialModel::new);
     }
 
     @UnknownNullability
-    public GeometryBakedModel get() {
+    public SimpleModelWrapper get() {
         return bakedModel;
     }
 
-    public Identifier modelLocation() {
+    public ResourceLocation modelLocation() {
         return modelLocation;
     }
 }

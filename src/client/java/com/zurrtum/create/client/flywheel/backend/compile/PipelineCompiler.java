@@ -24,9 +24,8 @@ import com.zurrtum.create.client.flywheel.backend.glsl.generate.FnSignature;
 import com.zurrtum.create.client.flywheel.backend.glsl.generate.GlslExpr;
 import com.zurrtum.create.client.flywheel.lib.material.CutoutShaders;
 import com.zurrtum.create.client.flywheel.lib.util.ResourceUtil;
-import net.minecraft.util.Identifier;
-
 import java.util.*;
+import net.minecraft.resources.ResourceLocation;
 
 public final class PipelineCompiler {
     private static final Set<PipelineCompiler> ALL = Collections.newSetFromMap(new WeakHashMap<>());
@@ -36,8 +35,8 @@ public final class PipelineCompiler {
     private static UberShaderComponent FOG;
     private static UberShaderComponent CUTOUT;
 
-    private static final Identifier API_IMPL_VERT = ResourceUtil.rl("internal/api_impl.vert");
-    private static final Identifier API_IMPL_FRAG = ResourceUtil.rl("internal/api_impl.frag");
+    private static final ResourceLocation API_IMPL_VERT = ResourceUtil.rl("internal/api_impl.vert");
+    private static final ResourceLocation API_IMPL_FRAG = ResourceUtil.rl("internal/api_impl.frag");
 
     private final CompilationHarness<PipelineProgramKey> harness;
 

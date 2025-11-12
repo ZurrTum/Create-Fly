@@ -4,9 +4,8 @@ import com.mojang.serialization.*;
 import com.zurrtum.create.Create;
 import com.zurrtum.create.content.trains.signal.TrackEdgePoint;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.storage.ReadView;
-import net.minecraft.storage.WriteView;
-
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -55,11 +54,11 @@ public class EdgePointStorage {
         pointsByType.clear();
     }
 
-    public void write(WriteView view, DimensionPalette dimensions) {
+    public void write(ValueOutput view, DimensionPalette dimensions) {
         for (Map.Entry<EdgePointType<?>, Map<UUID, TrackEdgePoint>> entry : pointsByType.entrySet()) {
             EdgePointType<?> type = entry.getKey();
-            WriteView.ListView list = view.getList(type.getId().toString());
-            entry.getValue().values().forEach(edgePoint -> edgePoint.write(list.add(), dimensions));
+            ValueOutput.ValueOutputList list = view.childrenList(type.getId().toString());
+            entry.getValue().values().forEach(edgePoint -> edgePoint.write(list.addChild(), dimensions));
         }
     }
 
@@ -76,10 +75,10 @@ public class EdgePointStorage {
         return map.build(empty);
     }
 
-    public void read(ReadView view, DimensionPalette dimensions) {
+    public void read(ValueInput view, DimensionPalette dimensions) {
         for (EdgePointType<?> type : EdgePointType.TYPES.values()) {
             Map<UUID, TrackEdgePoint> map = getMap(type);
-            view.getListReadView(type.getId().toString()).forEach(item -> {
+            view.childrenListOrEmpty(type.getId().toString()).forEach(item -> {
                 TrackEdgePoint edgePoint = type.create();
                 edgePoint.read(item, false, dimensions);
                 map.put(edgePoint.getId(), edgePoint);

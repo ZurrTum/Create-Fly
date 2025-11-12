@@ -3,12 +3,11 @@ package com.zurrtum.create.content.equipment.zapper.terrainzapper;
 
 import com.zurrtum.create.foundation.utility.BlockHelper;
 import com.zurrtum.create.infrastructure.component.TerrainTools;
-import net.minecraft.block.BlockState;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.world.WorldAccess;
-
 import java.util.*;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.block.state.BlockState;
 
 public class DynamicBrush extends Brush {
 
@@ -55,7 +54,7 @@ public class DynamicBrush extends Brush {
 
     @Override
     public Collection<BlockPos> addToGlobalPositions(
-        WorldAccess world,
+        LevelAccessor world,
         BlockPos targetPos,
         Direction targetFace,
         Collection<BlockPos> affectedPositions,
@@ -80,7 +79,7 @@ public class DynamicBrush extends Brush {
                         if (targetFace.getAxis().choose(x, y, z) == 0 || !surface)
                             offsets.add(new BlockPos(x, y, z));
 
-        BlockPos startPos = replace ? targetPos : targetPos.offset(targetFace);
+        BlockPos startPos = replace ? targetPos : targetPos.relative(targetFace);
         frontier.add(startPos);
 
         while (!frontier.isEmpty()) {
@@ -88,25 +87,25 @@ public class DynamicBrush extends Brush {
             if (visited.contains(currentPos))
                 continue;
             visited.add(currentPos);
-            if (!currentPos.isWithinDistance(startPos, searchRange))
+            if (!currentPos.closerThan(startPos, searchRange))
                 continue;
 
             // Replace Mode
             if (replace) {
                 BlockState stateToReplace = world.getBlockState(currentPos);
-                BlockState stateAboveStateToReplace = world.getBlockState(currentPos.offset(targetFace));
+                BlockState stateAboveStateToReplace = world.getBlockState(currentPos.relative(targetFace));
 
                 // Criteria
-                if (stateToReplace.getHardness(world, currentPos) == -1)
+                if (stateToReplace.getDestroySpeed(world, currentPos) == -1)
                     continue;
                 if (stateToReplace.getBlock() != state.getBlock() && !fuzzy)
                     continue;
-                if (stateToReplace.isReplaceable())
+                if (stateToReplace.canBeReplaced())
                     continue;
                 if (BlockHelper.hasBlockSolidSide(
                     stateAboveStateToReplace,
                     world,
-                    currentPos.offset(targetFace),
+                    currentPos.relative(targetFace),
                     targetFace.getOpposite()
                 ) && surface)
                     continue;
@@ -114,26 +113,26 @@ public class DynamicBrush extends Brush {
 
                 // Search adjacent spaces
                 for (BlockPos offset : offsets)
-                    frontier.add(currentPos.add(offset));
+                    frontier.add(currentPos.offset(offset));
                 continue;
             }
 
             // Place Mode
             BlockState stateToPlaceAt = world.getBlockState(currentPos);
-            BlockState stateToPlaceOn = world.getBlockState(currentPos.offset(targetFace.getOpposite()));
+            BlockState stateToPlaceOn = world.getBlockState(currentPos.relative(targetFace.getOpposite()));
 
             // Criteria
-            if (stateToPlaceOn.isReplaceable())
+            if (stateToPlaceOn.canBeReplaced())
                 continue;
             if (stateToPlaceOn.getBlock() != state.getBlock() && !fuzzy)
                 continue;
-            if (!stateToPlaceAt.isReplaceable())
+            if (!stateToPlaceAt.canBeReplaced())
                 continue;
             affectedPositions.add(currentPos);
 
             // Search adjacent spaces
             for (BlockPos offset : offsets)
-                frontier.add(currentPos.add(offset));
+                frontier.add(currentPos.offset(offset));
             continue;
         }
 

@@ -1,40 +1,40 @@
 package com.zurrtum.create.content.materials;
 
 import com.zurrtum.create.catnip.math.VecHelper;
-import net.minecraft.entity.ExperienceOrbEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.sound.SoundCategory;
-import net.minecraft.sound.SoundEvents;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.Hand;
-import net.minecraft.util.math.Direction.Axis;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.World;
+import net.minecraft.core.Direction.Axis;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.util.Mth;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.ExperienceOrb;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.Vec3;
 
 public class ExperienceNuggetItem extends Item {
 
-    public ExperienceNuggetItem(Settings pProperties) {
+    public ExperienceNuggetItem(Properties pProperties) {
         super(pProperties);
     }
 
     @Override
-    public boolean hasGlint(ItemStack pStack) {
+    public boolean isFoil(ItemStack pStack) {
         return true;
     }
 
     @Override
-    public ActionResult use(World pLevel, PlayerEntity pPlayer, Hand pUsedHand) {
-        ItemStack itemInHand = pPlayer.getStackInHand(pUsedHand);
-        if (pLevel.isClient()) {
-            pLevel.playSound(pPlayer, pPlayer.getBlockPos(), SoundEvents.BLOCK_AMETHYST_BLOCK_BREAK, SoundCategory.PLAYERS, .5f, 1);
-            return ActionResult.CONSUME.withNewHandStack(itemInHand);
+    public InteractionResult use(Level pLevel, Player pPlayer, InteractionHand pUsedHand) {
+        ItemStack itemInHand = pPlayer.getItemInHand(pUsedHand);
+        if (pLevel.isClientSide()) {
+            pLevel.playSound(pPlayer, pPlayer.blockPosition(), SoundEvents.AMETHYST_BLOCK_BREAK, SoundSource.PLAYERS, .5f, 1);
+            return InteractionResult.CONSUME.heldItemTransformedTo(itemInHand);
         }
 
-        int amountUsed = pPlayer.isSneaking() ? 1 : itemInHand.getCount();
-        int total = MathHelper.ceil(3f * amountUsed);
+        int amountUsed = pPlayer.isShiftKeyDown() ? 1 : itemInHand.getCount();
+        int total = Mth.ceil(3f * amountUsed);
         int maxOrbs = amountUsed == 1 ? 1 : 5;
         int valuePer = Math.max(1, 1 + total / maxOrbs);
 
@@ -43,23 +43,23 @@ public class ExperienceNuggetItem extends Item {
             if (value == 0)
                 continue;
 
-            Vec3d offset = VecHelper.offsetRandomly(Vec3d.ZERO, pLevel.random, 1).normalize();
-            Vec3d look = pPlayer.getRotationVector();
-            Vec3d motion = look.multiply(0.2).add(0, 0.2, 0).add(offset.multiply(.1));
-            Vec3d cross = look.crossProduct(VecHelper.rotate(new Vec3d(-.75f, 0, 0), -pPlayer.getYaw(), Axis.Y));
+            Vec3 offset = VecHelper.offsetRandomly(Vec3.ZERO, pLevel.random, 1).normalize();
+            Vec3 look = pPlayer.getLookAngle();
+            Vec3 motion = look.scale(0.2).add(0, 0.2, 0).add(offset.scale(.1));
+            Vec3 cross = look.cross(VecHelper.rotate(new Vec3(-.75f, 0, 0), -pPlayer.getYRot(), Axis.Y));
 
-            Vec3d global = pPlayer.getEyePos().add(look.multiply(.5f)).add(cross);
-            ExperienceOrbEntity xp = new ExperienceOrbEntity(pLevel, global.x, global.y, global.z, value);
-            xp.setVelocity(motion);
-            pLevel.spawnEntity(xp);
+            Vec3 global = pPlayer.getEyePosition().add(look.scale(.5f)).add(cross);
+            ExperienceOrb xp = new ExperienceOrb(pLevel, global.x, global.y, global.z, value);
+            xp.setDeltaMovement(motion);
+            pLevel.addFreshEntity(xp);
         }
 
-        itemInHand.decrement(amountUsed);
+        itemInHand.shrink(amountUsed);
         if (!itemInHand.isEmpty())
-            return ActionResult.SUCCESS.withNewHandStack(itemInHand);
+            return InteractionResult.SUCCESS.heldItemTransformedTo(itemInHand);
 
-        pPlayer.setStackInHand(pUsedHand, ItemStack.EMPTY);
-        return ActionResult.CONSUME.withNewHandStack(itemInHand);
+        pPlayer.setItemInHand(pUsedHand, ItemStack.EMPTY);
+        return InteractionResult.CONSUME.heldItemTransformedTo(itemInHand);
     }
 
 }

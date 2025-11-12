@@ -16,15 +16,15 @@ import com.zurrtum.create.content.kinetics.belt.BeltBlockEntity;
 import com.zurrtum.create.content.logistics.tunnel.BrassTunnelBlockEntity;
 import com.zurrtum.create.foundation.blockEntity.behaviour.filtering.ServerSidedFilteringBehaviour;
 import com.zurrtum.create.foundation.blockEntity.behaviour.scrollValue.ServerScrollOptionBehaviour;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.ItemEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.Vec3;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -57,7 +57,7 @@ public class TunnelScenes {
             scene.world().modifyBlockEntityNBT(
                 util.select().position(1 + i, 1, 2),
                 BeltBlockEntity.class,
-                nbt -> nbt.put("Casing", BeltBlockEntity.CasingType.CODEC, BeltBlockEntity.CasingType.ANDESITE),
+                nbt -> nbt.store("Casing", BeltBlockEntity.CasingType.CODEC, BeltBlockEntity.CasingType.ANDESITE),
                 true
             );
             scene.idle(4);
@@ -122,7 +122,7 @@ public class TunnelScenes {
             scene.world().modifyBlockEntityNBT(
                 util.select().position(2 + i, 1, 2),
                 BeltBlockEntity.class,
-                nbt -> nbt.put("Casing", BeltBlockEntity.CasingType.CODEC, BeltBlockEntity.CasingType.BRASS),
+                nbt -> nbt.store("Casing", BeltBlockEntity.CasingType.CODEC, BeltBlockEntity.CasingType.BRASS),
                 true
             );
             scene.idle(4);
@@ -149,7 +149,7 @@ public class TunnelScenes {
         for (Direction d : Iterate.horizontalDirections) {
             if (d == Direction.SOUTH)
                 continue;
-            Vec3d filter = getTunnelFilterVec(tunnelPos, d);
+            Vec3 filter = getTunnelFilterVec(tunnelPos, d);
             scene.overlay().showFilterSlotInput(filter, d, 40);
             scene.idle(3);
         }
@@ -161,7 +161,7 @@ public class TunnelScenes {
         scene.rotateCameraY(70);
 
         scene.idle(20);
-        Vec3d tunnelFilterVec = getTunnelFilterVec(tunnelPos, Direction.EAST);
+        Vec3 tunnelFilterVec = getTunnelFilterVec(tunnelPos, Direction.EAST);
         scene.overlay().showFilterSlotInput(tunnelFilterVec, Direction.EAST, 10);
         scene.overlay().showText(60).attachKeyFrame().pointAt(tunnelFilterVec).placeNearTarget()
             .text("Filters on inbound connections simply block non-matching items");
@@ -170,7 +170,7 @@ public class TunnelScenes {
         scene.world()
             .modifyBlockEntity(tunnelPos, tunnelClass, be -> be.getBehaviour(ServerSidedFilteringBehaviour.TYPE).setFilter(Direction.EAST, copper));
         scene.overlay().showControls(tunnelFilterVec, Pointing.DOWN, 30).withItem(copper);
-        ItemStack zinc = AllItems.ZINC_INGOT.getDefaultStack();
+        ItemStack zinc = AllItems.ZINC_INGOT.getDefaultInstance();
         scene.world().createItemOnBelt(util.grid().at(5, 1, 2), Direction.EAST, zinc);
         scene.idle(70);
         scene.world().multiplyKineticSpeed(util.select().everywhere(), -2);
@@ -220,7 +220,7 @@ public class TunnelScenes {
         );
         scene.idle(10);
 
-        Vec3d tunnelTop = util.vector().topOf(tunnelPos);
+        Vec3 tunnelTop = util.vector().topOf(tunnelPos);
         scene.overlay().showCenteredScrollInput(tunnelPos, Direction.UP, 120);
         scene.overlay().showText(120).attachKeyFrame().pointAt(tunnelTop).placeNearTarget()
             .text("Whenever a passing item has multiple valid exits, the distribution mode will decide how to handle it");
@@ -253,7 +253,7 @@ public class TunnelScenes {
         ItemStack item3 = new ItemStack(Items.SWEET_BERRIES);
 
         tunnelFilterVec = getTunnelFilterVec(tunnelPos, Direction.WEST);
-        BlockPos newTunnelPos = tunnelPos.up(2).south();
+        BlockPos newTunnelPos = tunnelPos.above(2).south();
         scene.overlay().showControls(tunnelFilterVec.add(0, 0, -1), Pointing.RIGHT, 20).withItem(item1);
         scene.world().modifyBlockEntity(
             newTunnelPos.north(),
@@ -277,8 +277,8 @@ public class TunnelScenes {
         scene.idle(90);
 
         BlockPos beltPos = util.grid().at(5, 3, 3);
-        Vec3d m = util.vector().of(0, 0.1, 0);
-        Vec3d spawn = util.vector().centerOf(util.grid().at(5, 3, 2));
+        Vec3 m = util.vector().of(0, 0.1, 0);
+        Vec3 spawn = util.vector().centerOf(util.grid().at(5, 3, 2));
         scene.world().createItemEntity(spawn, m, item1);
         scene.idle(12);
         scene.world().createItemOnBelt(beltPos, Direction.UP, item1);
@@ -295,7 +295,7 @@ public class TunnelScenes {
 
         scene.world().showSectionAndMerge(util.select().position(3, 5, 2), Direction.DOWN, newBelt);
 
-        scene.overlay().showText(80).pointAt(util.vector().blockSurface(tunnelPos.up().north(), Direction.WEST)).placeNearTarget()
+        scene.overlay().showText(80).pointAt(util.vector().blockSurface(tunnelPos.above().north(), Direction.WEST)).placeNearTarget()
             .text("For this, items can also be inserted into the Tunnel block directly");
         scene.idle(20);
 
@@ -317,15 +317,15 @@ public class TunnelScenes {
 
     }
 
-    protected static Vec3d getTunnelFilterVec(BlockPos pos, Direction d) {
-        return VecHelper.getCenterOf(pos).add(Vec3d.of(d.getVector()).multiply(.5)).add(0, 0.3, 0);
+    protected static Vec3 getTunnelFilterVec(BlockPos pos, Direction d) {
+        return VecHelper.getCenterOf(pos).add(Vec3.atLowerCornerOf(d.getUnitVec3i()).scale(.5)).add(0, 0.3, 0);
     }
 
     public static void brassModes(SceneBuilder builder, SceneBuildingUtil util) {
         CreateSceneBuilder scene = new CreateSceneBuilder(builder);
         scene.title("brass_tunnel_modes", "Distribution Modes of the Brass Tunnel");
         scene.configureBasePlate(0, 1, 5);
-        BlockState barrier = Blocks.BARRIER.getDefaultState();
+        BlockState barrier = Blocks.BARRIER.defaultBlockState();
         scene.world().setBlock(util.grid().at(1, 1, 0), barrier, false);
         scene.world().showSection(util.select().layer(0), Direction.UP);
         scene.idle(5);
@@ -336,7 +336,7 @@ public class TunnelScenes {
             scene.idle(4);
         }
 
-        Vec3d tunnelTop = util.vector().topOf(util.grid().at(2, 2, 3));
+        Vec3 tunnelTop = util.vector().topOf(util.grid().at(2, 2, 3));
         scene.overlay().showControls(tunnelTop, Pointing.DOWN, 80).rightClick();
         scene.idle(7);
         scene.overlay().showCenteredScrollInput(util.grid().at(2, 2, 3), Direction.UP, 120);
@@ -348,7 +348,7 @@ public class TunnelScenes {
         ElementLink<WorldSectionElement> blockage = scene.world().showIndependentSection(util.select().position(4, 1, 0), Direction.UP);
         scene.world().moveSection(blockage, util.vector().of(-3, 0, 0), 0);
 
-        Vec3d modeVec = util.vector().of(4, 2.5, 3);
+        Vec3 modeVec = util.vector().of(4, 2.5, 3);
         scene.overlay().showControls(modeVec, Pointing.RIGHT, 140).showing(AllIcons.I_TUNNEL_SPLIT);
 
         ElementLink<WorldSectionElement> blockage2 = null;
@@ -382,7 +382,7 @@ public class TunnelScenes {
                     .pointAt(util.vector().blockSurface(util.grid().at(1, 1, 2), Direction.UP)).placeNearTarget().colored(PonderPalette.RED);
                 scene.idle(60);
                 scene.world().moveSection(blockage, util.vector().of(-1, 0, 0), 10);
-                scene.world().setBlock(util.grid().at(1, 1, 0), Blocks.AIR.getDefaultState(), false);
+                scene.world().setBlock(util.grid().at(1, 1, 0), Blocks.AIR.defaultBlockState(), false);
                 scene.world().multiplyKineticSpeed(util.select().everywhere(), 1.5f);
             }
 
@@ -422,7 +422,7 @@ public class TunnelScenes {
                     .pointAt(util.vector().blockSurface(util.grid().at(1, 1, 2), Direction.UP)).colored(PonderPalette.RED);
                 scene.idle(30);
                 scene.world().moveSection(blockage, util.vector().of(-1, 0, 0), 10);
-                scene.world().setBlock(util.grid().at(1, 1, 0), Blocks.AIR.getDefaultState(), false);
+                scene.world().setBlock(util.grid().at(1, 1, 0), Blocks.AIR.defaultBlockState(), false);
             }
 
             if (i == 19) {
@@ -439,16 +439,16 @@ public class TunnelScenes {
             }
 
             if (i == 21) {
-                scene.world().setBlock(util.grid().at(2, 1, 0), Blocks.BARRIER.getDefaultState(), false);
+                scene.world().setBlock(util.grid().at(2, 1, 0), Blocks.BARRIER.defaultBlockState(), false);
                 blockage2 = scene.world().showIndependentSection(util.select().position(4, 1, 0), Direction.UP);
                 scene.world().moveSection(blockage2, util.vector().of(-2, 0, 0), 0);
             }
 
             if (i == 25) {
                 scene.world().hideIndependentSection(blockage, Direction.DOWN);
-                scene.world().setBlock(util.grid().at(1, 1, 0), Blocks.AIR.getDefaultState(), false);
+                scene.world().setBlock(util.grid().at(1, 1, 0), Blocks.AIR.defaultBlockState(), false);
                 scene.world().hideIndependentSection(blockage2, Direction.DOWN);
-                scene.world().setBlock(util.grid().at(2, 1, 0), Blocks.AIR.getDefaultState(), false);
+                scene.world().setBlock(util.grid().at(2, 1, 0), Blocks.AIR.defaultBlockState(), false);
             }
 
             if (i == 26) {
@@ -480,7 +480,7 @@ public class TunnelScenes {
 
         ItemStack item1 = new ItemStack(Items.CARROT);
         ItemStack item2 = new ItemStack(Items.HONEY_BOTTLE);
-        ItemStack item3 = AllItems.POLISHED_ROSE_QUARTZ.getDefaultStack();
+        ItemStack item3 = AllItems.POLISHED_ROSE_QUARTZ.getDefaultInstance();
 
         scene.world().createItemOnBelt(util.grid().at(3, 1, 4), Direction.UP, item1);
         scene.world().createItemOnBelt(util.grid().at(2, 1, 4), Direction.UP, item2);

@@ -1,14 +1,14 @@
 package com.zurrtum.create.content.kinetics.chainConveyor;
 
 import com.zurrtum.create.content.logistics.box.PackageItem;
-import net.minecraft.item.ItemStack;
-import net.minecraft.text.Text;
-import net.minecraft.util.math.BlockPos;
 import org.apache.commons.lang3.mutable.MutableInt;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.item.ItemStack;
 
 public class ChainConveyorRoutingTable {
 
@@ -55,7 +55,7 @@ public class ChainConveyorRoutingTable {
         for (RoutingTableEntry entry : entriesByDistance)
             if (PackageItem.matchAddress(box, entry.port()))
                 return entry.nextConnection();
-        return BlockPos.ORIGIN;
+        return BlockPos.ZERO;
     }
 
     public void advertiseTo(BlockPos connection, ChainConveyorRoutingTable otherTable) {
@@ -92,10 +92,10 @@ public class ChainConveyorRoutingTable {
         changed = true;
     }
 
-    public Collection<? extends Text> createSummary() {
-        ArrayList<Text> list = new ArrayList<>();
+    public Collection<? extends Component> createSummary() {
+        ArrayList<Component> list = new ArrayList<>();
         for (RoutingTableEntry entry : entriesByDistance) {
-            list.add(Text.literal("    [" + entry.distance() + "] " + entry.port()));
+            list.add(Component.literal("    [" + entry.distance() + "] " + entry.port()));
         }
         return list;
     }

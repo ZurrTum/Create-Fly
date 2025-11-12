@@ -5,21 +5,21 @@ import com.zurrtum.create.AllPackets;
 import com.zurrtum.create.api.registry.CreateRegistryKeys;
 import com.zurrtum.create.foundation.codec.CreateStreamCodecs;
 import com.zurrtum.create.foundation.gui.menu.MenuType;
-import net.minecraft.network.RegistryByteBuf;
-import net.minecraft.network.codec.PacketCodec;
-import net.minecraft.network.codec.PacketCodecs;
-import net.minecraft.network.packet.PacketType;
-import net.minecraft.text.Text;
-import net.minecraft.text.TextCodecs;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.ComponentSerialization;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.PacketType;
 import org.apache.logging.log4j.util.TriConsumer;
 
-public record OpenScreenPacket(int id, MenuType<?> type, Text name, byte[] data) implements S2CPacket {
-    public static final PacketCodec<RegistryByteBuf, OpenScreenPacket> CODEC = PacketCodec.tuple(
-        PacketCodecs.SYNC_ID,
+public record OpenScreenPacket(int id, MenuType<?> menu, Component name, byte[] data) implements S2CPacket {
+    public static final StreamCodec<RegistryFriendlyByteBuf, OpenScreenPacket> CODEC = StreamCodec.composite(
+        ByteBufCodecs.CONTAINER_ID,
         OpenScreenPacket::id,
-        PacketCodecs.registryValue(CreateRegistryKeys.MENU_TYPE),
-        OpenScreenPacket::type,
-        TextCodecs.UNLIMITED_REGISTRY_PACKET_CODEC,
+        ByteBufCodecs.registry(CreateRegistryKeys.MENU_TYPE),
+        OpenScreenPacket::menu,
+        ComponentSerialization.TRUSTED_STREAM_CODEC,
         OpenScreenPacket::name,
         CreateStreamCodecs.UNBOUNDED_BYTE_ARRAY,
         OpenScreenPacket::data,
@@ -37,7 +37,7 @@ public record OpenScreenPacket(int id, MenuType<?> type, Text name, byte[] data)
     }
 
     @Override
-    public PacketType<OpenScreenPacket> getPacketType() {
+    public PacketType<OpenScreenPacket> type() {
         return AllPackets.OPEN_SCREEN;
     }
 }

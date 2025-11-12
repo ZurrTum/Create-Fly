@@ -4,18 +4,18 @@ import com.mojang.serialization.MapCodec;
 import com.zurrtum.create.AllStructureProcessorTypes;
 import com.zurrtum.create.catnip.nbt.NBTProcessors;
 import com.zurrtum.create.foundation.blockEntity.EntityControlStructureProcessor;
-import net.minecraft.block.BlockEntityProvider;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.SpawnReason;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.structure.StructurePlacementData;
-import net.minecraft.structure.StructureTemplate;
-import net.minecraft.structure.processor.StructureProcessor;
-import net.minecraft.structure.processor.StructureProcessorType;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
-import net.minecraft.world.WorldView;
+import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.entity.EntitySpawnReason;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelReader;
+import net.minecraft.world.level.block.EntityBlock;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.levelgen.structure.templatesystem.StructurePlaceSettings;
+import net.minecraft.world.level.levelgen.structure.templatesystem.StructureProcessor;
+import net.minecraft.world.level.levelgen.structure.templatesystem.StructureProcessorType;
+import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate;
 import org.jetbrains.annotations.Nullable;
 
 public class SchematicProcessor extends StructureProcessor implements EntityControlStructureProcessor {
@@ -27,18 +27,18 @@ public class SchematicProcessor extends StructureProcessor implements EntityCont
 
     @Nullable
     @Override
-    public StructureTemplate.StructureBlockInfo process(
-        WorldView world,
+    public StructureTemplate.StructureBlockInfo processBlock(
+        LevelReader world,
         BlockPos pos,
         BlockPos anotherPos,
         StructureTemplate.StructureBlockInfo rawInfo,
         StructureTemplate.StructureBlockInfo info,
-        StructurePlacementData settings
+        StructurePlaceSettings settings
     ) {
         if (info.nbt() != null && info.state().hasBlockEntity()) {
-            BlockEntity be = ((BlockEntityProvider) info.state().getBlock()).createBlockEntity(info.pos(), info.state());
+            BlockEntity be = ((EntityBlock) info.state().getBlock()).newBlockEntity(info.pos(), info.state());
             if (be != null) {
-                NbtCompound nbt = NBTProcessors.process(info.state(), be, info.nbt(), false);
+                CompoundTag nbt = NBTProcessors.process(info.state(), be, info.nbt(), false);
                 if (nbt != info.nbt())
                     return new StructureTemplate.StructureBlockInfo(info.pos(), info.state(), nbt);
             }
@@ -47,8 +47,8 @@ public class SchematicProcessor extends StructureProcessor implements EntityCont
     }
 
     @Override
-    public boolean skip(World world, StructureTemplate.StructureEntityInfo info) {
-        return info.nbt.get("id", EntityType.CODEC).map(type -> !type.canPotentiallyExecuteCommands() && type.create(world, SpawnReason.LOAD) != null)
+    public boolean skip(Level world, StructureTemplate.StructureEntityInfo info) {
+        return info.nbt.read("id", EntityType.CODEC).map(type -> !type.onlyOpCanSetNbt() && type.create(world, EntitySpawnReason.LOAD) != null)
             .orElse(false);
     }
 

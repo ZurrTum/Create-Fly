@@ -4,50 +4,54 @@ import com.zurrtum.create.client.catnip.animation.AnimationTickHolder;
 import com.zurrtum.create.client.catnip.gui.TickableGuiEventListener;
 import com.zurrtum.create.client.catnip.gui.widget.AbstractSimiWidget;
 import com.zurrtum.create.client.foundation.gui.AllGuiTextures;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.*;
-import net.minecraft.client.gui.screen.ingame.GenericContainerScreen;
-import net.minecraft.client.gui.screen.ingame.HandledScreen;
-import net.minecraft.client.gui.widget.ClickableWidget;
-import net.minecraft.client.gui.widget.TextFieldWidget;
-import net.minecraft.client.input.KeyInput;
-import net.minecraft.client.sound.PositionedSoundInstance;
-import net.minecraft.client.util.math.Rect2i;
-import net.minecraft.client.world.ClientWorld;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.network.RegistryByteBuf;
-import net.minecraft.screen.ScreenHandler;
-import net.minecraft.sound.SoundEvent;
-import net.minecraft.text.Text;
+import net.minecraft.client.gui.components.AbstractWidget;
+import net.minecraft.client.gui.components.EditBox;
+import net.minecraft.client.gui.components.Renderable;
+import net.minecraft.client.gui.components.events.GuiEventListener;
+import net.minecraft.client.gui.narration.NarratableEntry;
+import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
+import net.minecraft.client.gui.screens.inventory.ContainerScreen;
+import net.minecraft.client.input.KeyEvent;
+import net.minecraft.client.input.MouseButtonEvent;
+import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.client.renderer.Rect2i;
+import net.minecraft.client.resources.sounds.SimpleSoundInstance;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.chat.Component;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import org.lwjgl.glfw.GLFW;
 
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-public abstract class AbstractSimiContainerScreen<T extends ScreenHandler> extends HandledScreen<T> {
+public abstract class AbstractSimiContainerScreen<T extends AbstractContainerMenu> extends AbstractContainerScreen<T> {
     protected int windowXOffset, windowYOffset;
 
-    public AbstractSimiContainerScreen(T container, PlayerInventory inv, Text title) {
+    public AbstractSimiContainerScreen(T container, Inventory inv, Component title) {
         super(container, inv, title);
     }
 
     public int getGuiLeft() {
-        return x;
+        return leftPos;
     }
 
     public int getGuiTop() {
-        return y;
+        return topPos;
     }
 
     /**
      * This method must be called before {@code super.init()}!
      */
     protected void setWindowSize(int width, int height) {
-        backgroundWidth = width;
-        backgroundHeight = height;
+        imageWidth = width;
+        imageHeight = height;
     }
 
     /**
@@ -61,13 +65,13 @@ public abstract class AbstractSimiContainerScreen<T extends ScreenHandler> exten
     @Override
     protected void init() {
         super.init();
-        x += windowXOffset;
-        y += windowYOffset;
+        leftPos += windowXOffset;
+        topPos += windowYOffset;
     }
 
     @Override
-    protected void handledScreenTick() {
-        for (Element listener : children()) {
+    protected void containerTick() {
+        for (GuiEventListener listener : children()) {
             if (listener instanceof TickableGuiEventListener tickable) {
                 tickable.tick();
             }
@@ -75,27 +79,27 @@ public abstract class AbstractSimiContainerScreen<T extends ScreenHandler> exten
     }
 
     @SuppressWarnings("unchecked")
-    protected <W extends Element & Drawable & Selectable> void addRenderableWidgets(W... widgets) {
+    protected <W extends GuiEventListener & Renderable & NarratableEntry> void addRenderableWidgets(W... widgets) {
         for (W widget : widgets) {
-            addDrawableChild(widget);
+            addRenderableWidget(widget);
         }
     }
 
-    protected <W extends Element & Drawable & Selectable> void addRenderableWidgets(Collection<W> widgets) {
+    protected <W extends GuiEventListener & Renderable & NarratableEntry> void addRenderableWidgets(Collection<W> widgets) {
         for (W widget : widgets) {
-            addDrawableChild(widget);
+            addRenderableWidget(widget);
         }
     }
 
-    protected void removeWidgets(Element... widgets) {
-        for (Element widget : widgets) {
-            remove(widget);
+    protected void removeWidgets(GuiEventListener... widgets) {
+        for (GuiEventListener widget : widgets) {
+            removeWidget(widget);
         }
     }
 
-    protected void removeWidgets(Collection<? extends Element> widgets) {
-        for (Element widget : widgets) {
-            remove(widget);
+    protected void removeWidgets(Collection<? extends GuiEventListener> widgets) {
+        for (GuiEventListener widget : widgets) {
+            removeWidget(widget);
         }
     }
 
@@ -106,8 +110,8 @@ public abstract class AbstractSimiContainerScreen<T extends ScreenHandler> exten
 	}*/
 
     @Override
-    public void render(DrawContext graphics, int mouseX, int mouseY, float partialTicks) {
-        partialTicks = AnimationTickHolder.getPartialTicksUI(client.getRenderTickCounter());
+    public void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTicks) {
+        partialTicks = AnimationTickHolder.getPartialTicksUI(minecraft.getDeltaTracker());
 
         super.render(graphics, mouseX, mouseY, partialTicks);
 
@@ -115,54 +119,54 @@ public abstract class AbstractSimiContainerScreen<T extends ScreenHandler> exten
     }
 
     @Override
-    protected void drawForeground(DrawContext graphics, int mouseX, int mouseY) {
+    protected void renderLabels(GuiGraphics graphics, int mouseX, int mouseY) {
         // no-op to prevent screen- and inventory-title from being rendered at incorrect
         // location
         // could also set this.titleX/Y and this.playerInventoryTitleX/Y to the proper
         // values instead
     }
 
-    protected void renderForeground(DrawContext graphics, int mouseX, int mouseY, float partialTicks) {
-        drawMouseoverTooltip(graphics, mouseX, mouseY);
-        for (Drawable widget : drawables) {
+    protected void renderForeground(GuiGraphics graphics, int mouseX, int mouseY, float partialTicks) {
+        renderTooltip(graphics, mouseX, mouseY);
+        for (Renderable widget : renderables) {
             if (widget instanceof AbstractSimiWidget simiWidget && simiWidget.isMouseOver(mouseX, mouseY)) {
-                List<Text> tooltip = simiWidget.getToolTip();
+                List<Component> tooltip = simiWidget.getToolTip();
                 if (tooltip.isEmpty())
                     continue;
                 int ttx = simiWidget.lockedTooltipX == -1 ? mouseX : simiWidget.lockedTooltipX + simiWidget.getX();
                 int tty = simiWidget.lockedTooltipY == -1 ? mouseY : simiWidget.lockedTooltipY + simiWidget.getY();
-                graphics.drawTooltip(textRenderer, tooltip, ttx, tty);
+                graphics.setComponentTooltipForNextFrame(font, tooltip, ttx, tty);
             }
         }
     }
 
     public int getLeftOfCentered(int textureWidth) {
-        return x - windowXOffset + (backgroundWidth - textureWidth) / 2;
+        return leftPos - windowXOffset + (imageWidth - textureWidth) / 2;
     }
 
-    public void renderPlayerInventory(DrawContext graphics, int x, int y) {
+    public void renderPlayerInventory(GuiGraphics graphics, int x, int y) {
         AllGuiTextures.PLAYER_INVENTORY.render(graphics, x, y);
-        graphics.drawText(textRenderer, playerInventoryTitle, x + 8, y + 6, 0xFF404040, false);
+        graphics.drawString(font, playerInventoryTitle, x + 8, y + 6, 0xFF404040, false);
     }
 
     @Override
-    public boolean keyPressed(KeyInput input) {
-        if (getFocused() instanceof TextFieldWidget && input.key() != GLFW.GLFW_KEY_ESCAPE)
+    public boolean keyPressed(KeyEvent input) {
+        if (getFocused() instanceof EditBox && input.key() != GLFW.GLFW_KEY_ESCAPE)
             return getFocused().keyPressed(input);
         return super.keyPressed(input);
     }
 
     @Override
-    public boolean mouseClicked(Click click, boolean doubled) {
+    public boolean mouseClicked(MouseButtonEvent click, boolean doubled) {
         if (getFocused() != null && !getFocused().isMouseOver(click.x(), click.y()))
             setFocused(null);
         return super.mouseClicked(click, doubled);
     }
 
     @Override
-    public Element getFocused() {
-        Element focused = super.getFocused();
-        if (focused instanceof ClickableWidget && !focused.isFocused())
+    public GuiEventListener getFocused() {
+        GuiEventListener focused = super.getFocused();
+        if (focused instanceof AbstractWidget && !focused.isFocused())
             focused = null;
         setFocused(focused);
         return focused;
@@ -172,35 +176,35 @@ public abstract class AbstractSimiContainerScreen<T extends ScreenHandler> exten
      * Used for moving JEI out of the way of extra things like block renders.
      *
      * @return the space that the GUI takes up outside the normal rectangle defined
-     * by {@link GenericContainerScreen}.
+     * by {@link ContainerScreen}.
      */
     public List<Rect2i> getExtraAreas() {
         return Collections.emptyList();
     }
 
     @Deprecated
-    protected void debugWindowArea(DrawContext graphics) {
-        graphics.fill(x + backgroundWidth, y + backgroundHeight, x, y, 0xD3D3D3D3);
+    protected void debugWindowArea(GuiGraphics graphics) {
+        graphics.fill(leftPos + imageWidth, topPos + imageHeight, leftPos, topPos, 0xD3D3D3D3);
     }
 
     @Deprecated
-    protected void debugExtraAreas(DrawContext graphics) {
+    protected void debugExtraAreas(GuiGraphics graphics) {
         for (Rect2i area : getExtraAreas()) {
             graphics.fill(area.getX() + area.getWidth(), area.getY() + area.getHeight(), area.getX(), area.getY(), 0xD3D3D3D3);
         }
     }
 
     protected void playUiSound(SoundEvent sound, float volume, float pitch) {
-        MinecraftClient.getInstance().getSoundManager().play(PositionedSoundInstance.master(sound, pitch, volume * 0.25f));
+        Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(sound, pitch, volume * 0.25f));
     }
 
-    public static ItemStack getStack(RegistryByteBuf extraData) {
-        return ItemStack.PACKET_CODEC.decode(extraData);
+    public static ItemStack getStack(RegistryFriendlyByteBuf extraData) {
+        return ItemStack.STREAM_CODEC.decode(extraData);
     }
 
     @SuppressWarnings("unchecked")
-    public static <T extends BlockEntity> T getBlockEntity(MinecraftClient mc, RegistryByteBuf extraData) {
-        ClientWorld world = mc.world;
+    public static <T extends BlockEntity> T getBlockEntity(Minecraft mc, RegistryFriendlyByteBuf extraData) {
+        ClientLevel world = mc.level;
         if (world == null) {
             return null;
         }

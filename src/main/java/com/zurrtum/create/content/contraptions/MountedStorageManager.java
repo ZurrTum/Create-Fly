@@ -19,25 +19,25 @@ import com.zurrtum.create.catnip.nbt.NBTHelper;
 import com.zurrtum.create.foundation.codec.CreateCodecs;
 import com.zurrtum.create.infrastructure.items.CombinedInvWrapper;
 import com.zurrtum.create.infrastructure.packet.s2c.MountedStorageSyncPacket;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.inventory.Inventory;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.network.listener.ClientPlayPacketListener;
-import net.minecraft.network.packet.Packet;
-import net.minecraft.registry.RegistryWrapper;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.world.ServerChunkManager;
-import net.minecraft.storage.ReadView;
-import net.minecraft.storage.WriteView;
-import net.minecraft.structure.StructureTemplate.StructureBlockInfo;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 import java.util.function.Predicate;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.protocol.Packet;
+import net.minecraft.network.protocol.game.ClientGamePacketListener;
+import net.minecraft.server.level.ServerChunkCache;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.Container;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate.StructureBlockInfo;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 
 public class MountedStorageManager {
     // builders used during assembly, null afterward
@@ -58,7 +58,7 @@ public class MountedStorageManager {
     private ImmutableMap<BlockPos, SyncedMountedStorage> syncedItems;
     private ImmutableMap<BlockPos, SyncedMountedStorage> syncedFluids;
 
-    private List<Inventory> externalHandlers;
+    private List<Container> externalHandlers;
     protected CombinedInvWrapper allItems;
 
     // ticks until storage can sync again
@@ -133,7 +133,7 @@ public class MountedStorageManager {
         // interactablePositions intentionally not reset
     }
 
-    public void addBlock(World level, BlockState state, BlockPos globalPos, BlockPos localPos, @Nullable BlockEntity be) {
+    public void addBlock(Level level, BlockState state, BlockPos globalPos, BlockPos localPos, @Nullable BlockEntity be) {
         MountedItemStorageType<?> itemType = MountedItemStorageType.REGISTRY.get(state.getBlock());
         if (itemType != null) {
             MountedItemStorage storage = itemType.mount(level, state, globalPos, be);
@@ -151,7 +151,7 @@ public class MountedStorageManager {
         }
     }
 
-    public void unmount(World level, StructureBlockInfo info, BlockPos globalPos, @Nullable BlockEntity be) {
+    public void unmount(Level level, StructureBlockInfo info, BlockPos globalPos, @Nullable BlockEntity be) {
         BlockPos localPos = info.pos();
         BlockState state = info.state();
 
@@ -194,8 +194,8 @@ public class MountedStorageManager {
         });
 
         if (!items.isEmpty() || !fluids.isEmpty()) {
-            Packet<ClientPlayPacketListener> packet = new MountedStorageSyncPacket(entity.getId(), items, fluids);
-            ((ServerChunkManager) entity.getEntityWorld().getChunkManager()).sendToOtherNearbyPlayers(entity, packet);
+            Packet<ClientGamePacketListener> packet = new MountedStorageSyncPacket(entity.getId(), items, fluids);
+            ((ServerChunkCache) entity.level().getChunkSource()).sendToTrackingPlayers(entity, packet);
             syncCooldown = 8;
         }
     }
@@ -235,17 +235,17 @@ public class MountedStorageManager {
     }
 
     // contraption is provided on the client for initial afterSync storage callbacks
-    public void read(ReadView view, boolean clientPacket, @Nullable Contraption contraption) {
+    public void read(ValueInput view, boolean clientPacket, @Nullable Contraption contraption) {
         reset();
 
         try {
-            view.getListReadView("items").forEach(item -> {
+            view.childrenListOrEmpty("items").forEach(item -> {
                 BlockPos pos = item.read("pos", BlockPos.CODEC).orElseThrow();
                 MountedItemStorage storage = item.read("storage", MountedItemStorage.CODEC).orElseThrow();
                 addStorage(storage, pos);
             });
 
-            view.getListReadView("fluids").forEach(fluid -> {
+            view.childrenListOrEmpty("fluids").forEach(fluid -> {
                 BlockPos pos = fluid.read("pos", BlockPos.CODEC).orElseThrow();
                 MountedFluidStorage storage = fluid.read("storage", MountedFluidStorage.CODEC).orElseThrow();
                 addStorage(storage, pos);
@@ -307,29 +307,29 @@ public class MountedStorageManager {
         });
     }
 
-    public void write(WriteView view, boolean clientPacket) {
-        WriteView.ListView items = view.getList("items");
+    public void write(ValueOutput view, boolean clientPacket) {
+        ValueOutput.ValueOutputList items = view.childrenList("items");
         getAllItemStorages().forEach((pos, storage) -> {
             if (!clientPacket || storage instanceof SyncedMountedStorage) {
-                WriteView item = items.add();
-                item.put("pos", BlockPos.CODEC, pos);
-                item.put("storage", MountedItemStorage.CODEC, storage);
+                ValueOutput item = items.addChild();
+                item.store("pos", BlockPos.CODEC, pos);
+                item.store("storage", MountedItemStorage.CODEC, storage);
             }
         });
 
-        WriteView.ListView fluids = view.getList("fluids");
+        ValueOutput.ValueOutputList fluids = view.childrenList("fluids");
         getFluids().storages.forEach((pos, storage) -> {
             if (!clientPacket || storage instanceof SyncedMountedStorage) {
-                WriteView fluid = fluids.add();
-                fluid.put("pos", BlockPos.CODEC, pos);
-                fluid.put("storage", MountedFluidStorage.CODEC, storage);
+                ValueOutput fluid = fluids.addChild();
+                fluid.store("pos", BlockPos.CODEC, pos);
+                fluid.store("storage", MountedFluidStorage.CODEC, storage);
             }
         });
 
         if (clientPacket) {
             // let the client know of all non-synced ones too
             List<BlockPos> list = Sets.union(this.getAllItemStorages().keySet(), getFluids().storages.keySet()).stream().toList();
-            view.put("interactable_positions", CreateCodecs.BLOCK_POS_LIST_CODEC, list);
+            view.store("interactable_positions", CreateCodecs.BLOCK_POS_LIST_CODEC, list);
         }
     }
 
@@ -363,10 +363,10 @@ public class MountedStorageManager {
         }
     }
 
-    public void attachExternal(Inventory externalStorage) {
+    public void attachExternal(Container externalStorage) {
         this.externalHandlers.add(externalStorage);
         int size = externalHandlers.size();
-        Inventory[] all = new Inventory[size + 1];
+        Container[] all = new Container[size + 1];
         all[0] = this.items;
         for (int i = 0; i < size; i++) {
             all[i + 1] = externalHandlers.get(i);
@@ -420,8 +420,8 @@ public class MountedStorageManager {
         return this.fluids;
     }
 
-    public boolean handlePlayerStorageInteraction(Contraption contraption, PlayerEntity player, BlockPos localPos) {
-        if (!(player instanceof ServerPlayerEntity serverPlayer)) {
+    public boolean handlePlayerStorageInteraction(Contraption contraption, Player player, BlockPos localPos) {
+        if (!(player instanceof ServerPlayer serverPlayer)) {
             return this.interactablePositions != null && this.interactablePositions.contains(localPos);
         }
 
@@ -439,11 +439,11 @@ public class MountedStorageManager {
         }
     }
 
-    private void readLegacy(RegistryWrapper.WrapperLookup registries, NbtCompound nbt) {
+    private void readLegacy(HolderLookup.Provider registries, CompoundTag nbt) {
         NBTHelper.iterateCompoundList(
             nbt.getListOrEmpty("Storage"), tag -> {
                 BlockPos pos = NBTHelper.readBlockPos(tag, "Pos");
-                NbtCompound data = tag.getCompoundOrEmpty("Data");
+                CompoundTag data = tag.getCompoundOrEmpty("Data");
 
                 //TODO
                 //                if (data.contains("Toolbox")) {
@@ -467,7 +467,7 @@ public class MountedStorageManager {
         NBTHelper.iterateCompoundList(
             nbt.getListOrEmpty("FluidStorage"), tag -> {
                 BlockPos pos = NBTHelper.readBlockPos(tag, "Pos");
-                NbtCompound data = tag.getCompoundOrEmpty("Data");
+                CompoundTag data = tag.getCompoundOrEmpty("Data");
 
                 //TODO
                 //                if (data.contains("Bottomless")) {

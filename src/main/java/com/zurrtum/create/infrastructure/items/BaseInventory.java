@@ -2,11 +2,6 @@ package com.zurrtum.create.infrastructure.items;
 
 import it.unimi.dsi.fastutil.Hash;
 import it.unimi.dsi.fastutil.objects.*;
-import net.minecraft.component.ComponentType;
-import net.minecraft.component.DataComponentTypes;
-import net.minecraft.component.MergedComponentMap;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.math.Direction;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
@@ -14,15 +9,20 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
+import net.minecraft.core.Direction;
+import net.minecraft.core.component.DataComponentType;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.core.component.PatchedDataComponentMap;
+import net.minecraft.world.item.ItemStack;
 
 public interface BaseInventory extends Iterable<ItemStack> {
     Hash.Strategy<ItemStack> ITEM_STACK_HASH_STRATEGY = new Hash.Strategy<>() {
         public boolean equals(ItemStack stack, ItemStack other) {
-            return stack == other || stack != null && other != null && ItemStack.areItemsAndComponentsEqual(stack, other);
+            return stack == other || stack != null && other != null && ItemStack.isSameItemSameComponents(stack, other);
         }
 
         public int hashCode(ItemStack stack) {
-            return ItemStack.hashCode(stack);
+            return ItemStack.hashItemAndComponents(stack);
         }
     };
 
@@ -238,7 +238,7 @@ public interface BaseInventory extends Iterable<ItemStack> {
                         return maxAmount;
                     }
                 } else if (matches(target, stack)) {
-                    count += target.getMaxCount() - target.getCount();
+                    count += target.getMaxStackSize() - target.getCount();
                     if (count >= maxAmount) {
                         return maxAmount;
                     }
@@ -263,7 +263,7 @@ public interface BaseInventory extends Iterable<ItemStack> {
                         return maxAmount;
                     }
                 } else if (matches(target, stack)) {
-                    count += target.getMaxCount() - target.getCount();
+                    count += target.getMaxStackSize() - target.getCount();
                     if (count >= maxAmount) {
                         return maxAmount;
                     }
@@ -318,7 +318,7 @@ public interface BaseInventory extends Iterable<ItemStack> {
                             entry.setValue(remaining - insert);
                         }
                     } else if (matches(target, stack)) {
-                        int maxCount = target.getMaxCount();
+                        int maxCount = target.getMaxStackSize();
                         int count = target.getCount();
                         if (count != maxCount) {
                             int remaining = entry.getIntValue();
@@ -384,7 +384,7 @@ public interface BaseInventory extends Iterable<ItemStack> {
                             entry.setValue(remaining - insert);
                         }
                     } else if (matches(target, stack)) {
-                        int maxCount = target.getMaxCount();
+                        int maxCount = target.getMaxStackSize();
                         int count = target.getCount();
                         if (count != maxCount) {
                             int remaining = entry.getIntValue();
@@ -409,7 +409,7 @@ public interface BaseInventory extends Iterable<ItemStack> {
     default ItemStack directCopy(ItemStack stack, int count) {
         assert stack.item != null;
         ItemStack copy = new ItemStack(stack.item, count, stack.components.copy());
-        copy.setBobbingAnimationTime(stack.getBobbingAnimationTime());
+        copy.setPopTime(stack.getPopTime());
         return copy;
     }
 
@@ -776,7 +776,7 @@ public interface BaseInventory extends Iterable<ItemStack> {
                     }
                     remaining -= insert;
                 } else if (matches(target, stack)) {
-                    int maxCount = target.getMaxCount();
+                    int maxCount = target.getMaxStackSize();
                     int count = target.getCount();
                     if (count != maxCount) {
                         int insert = Math.min(remaining, maxCount - count);
@@ -815,7 +815,7 @@ public interface BaseInventory extends Iterable<ItemStack> {
                     }
                     remaining -= insert;
                 } else if (matches(target, stack)) {
-                    int maxCount = target.getMaxCount();
+                    int maxCount = target.getMaxStackSize();
                     int count = target.getCount();
                     if (count != maxCount) {
                         int insert = Math.min(remaining, maxCount - count);
@@ -900,7 +900,7 @@ public interface BaseInventory extends Iterable<ItemStack> {
                         dirty = true;
                         break;
                     } else if (matches(target, stack)) {
-                        int maxCount = target.getMaxCount();
+                        int maxCount = target.getMaxStackSize();
                         int count = target.getCount();
                         if (count != maxCount) {
                             int remaining = entry.getIntValue();
@@ -1004,7 +1004,7 @@ public interface BaseInventory extends Iterable<ItemStack> {
                         dirty = true;
                         break;
                     } else if (matches(target, stack)) {
-                        int maxCount = target.getMaxCount();
+                        int maxCount = target.getMaxStackSize();
                         int count = target.getCount();
                         if (count != maxCount) {
                             int remaining = entry.getIntValue();
@@ -1069,7 +1069,7 @@ public interface BaseInventory extends Iterable<ItemStack> {
                 if (target.isEmpty()) {
                     emptys.add(i);
                 } else if (matches(target, stack)) {
-                    int maxCount = target.getMaxCount();
+                    int maxCount = target.getMaxStackSize();
                     int count = target.getCount();
                     if (count != maxCount) {
                         int insert = Math.min(remaining, maxCount - count);
@@ -1105,24 +1105,24 @@ public interface BaseInventory extends Iterable<ItemStack> {
     }
 
     default boolean matches(ItemStack stack, ItemStack otherStack) {
-        if (stack.isOf(otherStack.getItem())) {
-            MergedComponentMap stackComponents = stack.components;
-            MergedComponentMap otherStackComponents = otherStack.components;
+        if (stack.is(otherStack.getItem())) {
+            PatchedDataComponentMap stackComponents = stack.components;
+            PatchedDataComponentMap otherStackComponents = otherStack.components;
             if (stackComponents == otherStackComponents) {
                 return true;
             }
-            Reference2ObjectMap<ComponentType<?>, Optional<?>> stackComponentMap = stackComponents.changedComponents;
-            Reference2ObjectMap<ComponentType<?>, Optional<?>> otherStackComponentMap = otherStackComponents.changedComponents;
+            Reference2ObjectMap<DataComponentType<?>, Optional<?>> stackComponentMap = stackComponents.patch;
+            Reference2ObjectMap<DataComponentType<?>, Optional<?>> otherStackComponentMap = otherStackComponents.patch;
             if (stackComponentMap == otherStackComponentMap) {
                 return true;
             }
             int stackComponentCount = stackComponentMap.size();
-            if (stackComponentMap.containsKey(DataComponentTypes.MAX_STACK_SIZE)) {
+            if (stackComponentMap.containsKey(DataComponents.MAX_STACK_SIZE)) {
                 stackComponentCount--;
             }
             int otherStackComponentCount = otherStackComponentMap.size();
             boolean hasMaxCapacityComponent = false;
-            if (otherStackComponentMap.containsKey(DataComponentTypes.MAX_STACK_SIZE)) {
+            if (otherStackComponentMap.containsKey(DataComponents.MAX_STACK_SIZE)) {
                 otherStackComponentCount--;
                 hasMaxCapacityComponent = true;
             }
@@ -1130,9 +1130,9 @@ public interface BaseInventory extends Iterable<ItemStack> {
                 return false;
             }
             if (hasMaxCapacityComponent) {
-                ObjectSet<Reference2ObjectMap.Entry<ComponentType<?>, Optional<?>>> stackComponentSet = stackComponentMap.reference2ObjectEntrySet();
-                for (Reference2ObjectMap.Entry<ComponentType<?>, Optional<?>> componentEntry : otherStackComponentMap.reference2ObjectEntrySet()) {
-                    if (!stackComponentSet.contains(componentEntry) && componentEntry.getKey() != DataComponentTypes.MAX_STACK_SIZE) {
+                ObjectSet<Reference2ObjectMap.Entry<DataComponentType<?>, Optional<?>>> stackComponentSet = stackComponentMap.reference2ObjectEntrySet();
+                for (Reference2ObjectMap.Entry<DataComponentType<?>, Optional<?>> componentEntry : otherStackComponentMap.reference2ObjectEntrySet()) {
+                    if (!stackComponentSet.contains(componentEntry) && componentEntry.getKey() != DataComponents.MAX_STACK_SIZE) {
                         return false;
                     }
                 }
@@ -1274,7 +1274,7 @@ public interface BaseInventory extends Iterable<ItemStack> {
                     changes.add(() -> create$setStack(slot, directCopy(stack, insert)));
                     maxAmount -= insert;
                 } else if (matches(target, stack)) {
-                    int maxCount = target.getMaxCount();
+                    int maxCount = target.getMaxStackSize();
                     int count = target.getCount();
                     if (count != maxCount) {
                         int insert = Math.min(maxAmount, maxCount - count);
@@ -1340,7 +1340,7 @@ public interface BaseInventory extends Iterable<ItemStack> {
                             entry.setValue(remaining - insert);
                         }
                     } else if (matches(target, stack)) {
-                        int maxCount = target.getMaxCount();
+                        int maxCount = target.getMaxStackSize();
                         int count = target.getCount();
                         if (count != maxCount) {
                             int remaining = entry.getIntValue();
@@ -1389,17 +1389,17 @@ public interface BaseInventory extends Iterable<ItemStack> {
 
     @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
     default ItemStack removeMaxSize(ItemStack stack, Optional<Integer> max) {
-        MergedComponentMap components = stack.components;
-        components.onWrite();
-        components.changedComponents.remove(DataComponentTypes.MAX_STACK_SIZE, max);
+        PatchedDataComponentMap components = stack.components;
+        components.ensureMapOwnership();
+        components.patch.remove(DataComponents.MAX_STACK_SIZE, max);
         return stack;
     }
 
     @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
     default void setMaxSize(ItemStack stack, Optional<Integer> max) {
-        MergedComponentMap components = stack.components;
-        components.onWrite();
-        components.changedComponents.put(DataComponentTypes.MAX_STACK_SIZE, max);
+        PatchedDataComponentMap components = stack.components;
+        components.ensureMapOwnership();
+        components.patch.put(DataComponents.MAX_STACK_SIZE, max);
     }
 
     default Stream<ItemStack> stream(Direction side) {

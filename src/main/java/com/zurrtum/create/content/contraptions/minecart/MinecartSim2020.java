@@ -4,16 +4,20 @@ import com.google.common.collect.Maps;
 import com.mojang.datafixers.util.Pair;
 import com.zurrtum.create.AllSynchedDatas;
 import com.zurrtum.create.catnip.math.VecHelper;
-import net.minecraft.block.AbstractRailBlock;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.enums.RailShape;
-import net.minecraft.entity.MovementType;
-import net.minecraft.entity.vehicle.AbstractMinecartEntity;
-import net.minecraft.entity.vehicle.DefaultMinecartController;
-import net.minecraft.entity.vehicle.FurnaceMinecartEntity;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.util.Util;
-import net.minecraft.util.math.*;
+import net.minecraft.Util;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.Vec3i;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.util.Mth;
+import net.minecraft.world.entity.MoverType;
+import net.minecraft.world.entity.vehicle.AbstractMinecart;
+import net.minecraft.world.entity.vehicle.MinecartFurnace;
+import net.minecraft.world.entity.vehicle.OldMinecartBehavior;
+import net.minecraft.world.level.block.BaseRailBlock;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.RailShape;
+import net.minecraft.world.phys.Vec3;
 
 import java.util.Map;
 
@@ -23,16 +27,16 @@ import java.util.Map;
 public class MinecartSim2020 {
     private static final Map<RailShape, Pair<Vec3i, Vec3i>> MATRIX = Util.make(
         Maps.newEnumMap(RailShape.class), (map) -> {
-            Vec3i west = Direction.WEST.getVector();
-            Vec3i east = Direction.EAST.getVector();
-            Vec3i north = Direction.NORTH.getVector();
-            Vec3i south = Direction.SOUTH.getVector();
+            Vec3i west = Direction.WEST.getUnitVec3i();
+            Vec3i east = Direction.EAST.getUnitVec3i();
+            Vec3i north = Direction.NORTH.getUnitVec3i();
+            Vec3i south = Direction.SOUTH.getUnitVec3i();
             map.put(RailShape.NORTH_SOUTH, Pair.of(north, south));
             map.put(RailShape.EAST_WEST, Pair.of(west, east));
-            map.put(RailShape.ASCENDING_EAST, Pair.of(west.down(), east));
-            map.put(RailShape.ASCENDING_WEST, Pair.of(west, east.down()));
-            map.put(RailShape.ASCENDING_NORTH, Pair.of(north, south.down()));
-            map.put(RailShape.ASCENDING_SOUTH, Pair.of(north.down(), south));
+            map.put(RailShape.ASCENDING_EAST, Pair.of(west.below(), east));
+            map.put(RailShape.ASCENDING_WEST, Pair.of(west, east.below()));
+            map.put(RailShape.ASCENDING_NORTH, Pair.of(north, south.below()));
+            map.put(RailShape.ASCENDING_SOUTH, Pair.of(north.below(), south));
             map.put(RailShape.SOUTH_EAST, Pair.of(south, east));
             map.put(RailShape.SOUTH_WEST, Pair.of(south, west));
             map.put(RailShape.NORTH_WEST, Pair.of(north, west));
@@ -40,31 +44,25 @@ public class MinecartSim2020 {
         }
     );
 
-    public static Vec3d predictNextPositionOf(AbstractMinecartEntity cart) {
-        Vec3d position = cart.getEntityPos();
-        Vec3d motion = VecHelper.clamp(cart.getVelocity(), 1f);
+    public static Vec3 predictNextPositionOf(AbstractMinecart cart) {
+        Vec3 position = cart.position();
+        Vec3 motion = VecHelper.clamp(cart.getDeltaMovement(), 1f);
         return position.add(motion);
     }
 
-    public static boolean canAddMotion(AbstractMinecartEntity c) {
-        if (c instanceof FurnaceMinecartEntity furnace)
-            return MathHelper.approximatelyEquals(furnace.pushVec.x, 0) && MathHelper.approximatelyEquals(furnace.pushVec.z, 0);
+    public static boolean canAddMotion(AbstractMinecart c) {
+        if (c instanceof MinecartFurnace furnace)
+            return Mth.equal(furnace.push.x, 0) && Mth.equal(furnace.push.z, 0);
 
         return AllSynchedDatas.MINECART_CONTROLLER.get(c).map(controller -> !controller.isStalled()).orElse(true);
     }
 
-    public static void moveCartAlongTrack(
-        ServerWorld world,
-        AbstractMinecartEntity cart,
-        Vec3d forcedMovement,
-        BlockPos cartPos,
-        BlockState trackState
-    ) {
+    public static void moveCartAlongTrack(ServerLevel world, AbstractMinecart cart, Vec3 forcedMovement, BlockPos cartPos, BlockState trackState) {
 
-        if (forcedMovement.equals(Vec3d.ZERO))
+        if (forcedMovement.equals(Vec3.ZERO))
             return;
 
-        Vec3d previousMotion = cart.getVelocity();
+        Vec3 previousMotion = cart.getDeltaMovement();
         cart.fallDistance = 0.0F;
 
         double x = cart.getX();
@@ -75,14 +73,14 @@ public class MinecartSim2020 {
         double actualY = y;
         double actualZ = z;
 
-        if (!(cart.getController() instanceof DefaultMinecartController controller)) {
+        if (!(cart.getBehavior() instanceof OldMinecartBehavior controller)) {
             return;
         }
-        Vec3d actualVec = controller.snapPositionToRail(actualX, actualY, actualZ);
+        Vec3 actualVec = controller.getPos(actualX, actualY, actualZ);
         actualY = cartPos.getY() + 1;
 
-        AbstractRailBlock abstractrailblock = (AbstractRailBlock) trackState.getBlock();
-        RailShape railshape = trackState.get(abstractrailblock.getShapeProperty());
+        BaseRailBlock abstractrailblock = (BaseRailBlock) trackState.getBlock();
+        RailShape railshape = trackState.getValue(abstractrailblock.getShapeProperty());
         switch (railshape) {
             case ASCENDING_EAST:
                 forcedMovement = forcedMovement.add(-1 * 0.0078125D, 0.0D, 0.0D);
@@ -135,62 +133,62 @@ public class MinecartSim2020 {
         actualX = d23 + d4 * d14;
         actualZ = d10 + d5 * d14;
 
-        cart.setPosition(actualX, actualY, actualZ);
-        cart.setVelocity(forcedMovement);
+        cart.setPos(actualX, actualY, actualZ);
+        cart.setDeltaMovement(forcedMovement);
 
-        double s = cart.hasPassengers() ? 0.75 : 1.0;
+        double s = cart.isVehicle() ? 0.75 : 1.0;
         double t = controller.getMaxSpeed(world);
-        Vec3d vec3d2 = cart.getVelocity();
-        cart.move(MovementType.SELF, new Vec3d(MathHelper.clamp(s * vec3d2.x, -t, t), 0.0, MathHelper.clamp(s * vec3d2.z, -t, t)));
+        Vec3 vec3d2 = cart.getDeltaMovement();
+        cart.move(MoverType.SELF, new Vec3(Mth.clamp(s * vec3d2.x, -t, t), 0.0, Mth.clamp(s * vec3d2.z, -t, t)));
 
         x = cart.getX();
         y = cart.getY();
         z = cart.getZ();
 
-        if (Vector3i.getY() != 0 && MathHelper.floor(x) - cartPos.getX() == Vector3i.getX() && MathHelper.floor(z) - cartPos.getZ() == Vector3i.getZ()) {
-            cart.setPosition(x, y + (double) Vector3i.getY(), z);
-        } else if (Vector3i1.getY() != 0 && MathHelper.floor(x) - cartPos.getX() == Vector3i1.getX() && MathHelper.floor(z) - cartPos.getZ() == Vector3i1.getZ()) {
-            cart.setPosition(x, y + (double) Vector3i1.getY(), z);
+        if (Vector3i.getY() != 0 && Mth.floor(x) - cartPos.getX() == Vector3i.getX() && Mth.floor(z) - cartPos.getZ() == Vector3i.getZ()) {
+            cart.setPos(x, y + (double) Vector3i.getY(), z);
+        } else if (Vector3i1.getY() != 0 && Mth.floor(x) - cartPos.getX() == Vector3i1.getX() && Mth.floor(z) - cartPos.getZ() == Vector3i1.getZ()) {
+            cart.setPos(x, y + (double) Vector3i1.getY(), z);
         }
 
         x = cart.getX();
         y = cart.getY();
         z = cart.getZ();
 
-        Vec3d Vector3d3 = controller.snapPositionToRail(x, y, z);
+        Vec3 Vector3d3 = controller.getPos(x, y, z);
         if (Vector3d3 != null && actualVec != null) {
             double d17 = (actualVec.y - Vector3d3.y) * 0.05D;
-            Vec3d Vector3d4 = cart.getVelocity();
-            double d18 = Math.sqrt(Vector3d4.horizontalLengthSquared());
+            Vec3 Vector3d4 = cart.getDeltaMovement();
+            double d18 = Math.sqrt(Vector3d4.horizontalDistanceSqr());
             if (d18 > 0.0D) {
-                cart.setVelocity(Vector3d4.multiply((d18 + d17) / d18, 1.0D, (d18 + d17) / d18));
+                cart.setDeltaMovement(Vector3d4.multiply((d18 + d17) / d18, 1.0D, (d18 + d17) / d18));
             }
 
-            cart.setPosition(x, Vector3d3.y, z);
+            cart.setPos(x, Vector3d3.y, z);
         }
 
         x = cart.getX();
         y = cart.getY();
         z = cart.getZ();
 
-        int j = MathHelper.floor(x);
-        int i = MathHelper.floor(z);
+        int j = Mth.floor(x);
+        int i = Mth.floor(z);
         if (j != cartPos.getX() || i != cartPos.getZ()) {
-            Vec3d Vector3d5 = cart.getVelocity();
-            double d26 = Math.sqrt(Vector3d5.horizontalLengthSquared());
-            cart.setVelocity(d26 * (double) (j - cartPos.getX()), Vector3d5.y, d26 * (double) (i - cartPos.getZ()));
+            Vec3 Vector3d5 = cart.getDeltaMovement();
+            double d26 = Math.sqrt(Vector3d5.horizontalDistanceSqr());
+            cart.setDeltaMovement(d26 * (double) (j - cartPos.getX()), Vector3d5.y, d26 * (double) (i - cartPos.getZ()));
         }
 
-        cart.setVelocity(previousMotion);
+        cart.setDeltaMovement(previousMotion);
     }
 
-    public static Vec3d getRailVec(RailShape shape) {
+    public static Vec3 getRailVec(RailShape shape) {
         return switch (shape) {
-            case ASCENDING_NORTH, ASCENDING_SOUTH, NORTH_SOUTH -> new Vec3d(0, 0, 1);
-            case ASCENDING_EAST, ASCENDING_WEST, EAST_WEST -> new Vec3d(1, 0, 0);
-            case NORTH_EAST, SOUTH_WEST -> new Vec3d(1, 0, 1).normalize();
-            case NORTH_WEST, SOUTH_EAST -> new Vec3d(1, 0, -1).normalize();
-            default -> new Vec3d(0, 1, 0);
+            case ASCENDING_NORTH, ASCENDING_SOUTH, NORTH_SOUTH -> new Vec3(0, 0, 1);
+            case ASCENDING_EAST, ASCENDING_WEST, EAST_WEST -> new Vec3(1, 0, 0);
+            case NORTH_EAST, SOUTH_WEST -> new Vec3(1, 0, 1).normalize();
+            case NORTH_WEST, SOUTH_EAST -> new Vec3(1, 0, -1).normalize();
+            default -> new Vec3(0, 1, 0);
         };
     }
 

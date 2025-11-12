@@ -4,27 +4,27 @@ import com.zurrtum.create.client.flywheel.api.backend.RenderContext;
 import com.zurrtum.create.client.flywheel.api.internal.FlwApiLink;
 import com.zurrtum.create.client.flywheel.api.visual.Effect;
 import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.BlockBreakingInfo;
-import net.minecraft.util.math.Vec3i;
-import net.minecraft.world.WorldAccess;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.SortedSet;
+import net.minecraft.core.Vec3i;
+import net.minecraft.server.level.BlockDestructionProgress;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.block.entity.BlockEntity;
 
 @ApiStatus.NonExtendable
 public interface VisualizationManager {
-    static boolean supportsVisualization(@Nullable WorldAccess level) {
+    static boolean supportsVisualization(@Nullable LevelAccessor level) {
         return FlwApiLink.INSTANCE.supportsVisualization(level);
     }
 
-    static @Nullable VisualizationManager get(@Nullable WorldAccess level) {
+    static @Nullable VisualizationManager get(@Nullable LevelAccessor level) {
         return FlwApiLink.INSTANCE.getVisualizationManager(level);
     }
 
-    static VisualizationManager getOrThrow(@Nullable WorldAccess level) {
+    static VisualizationManager getOrThrow(@Nullable LevelAccessor level) {
         return FlwApiLink.INSTANCE.getVisualizationManagerOrThrow(level);
     }
 
@@ -69,8 +69,8 @@ public interface VisualizationManager {
          *
          * <p>Guaranteed to be called after {@link #onStartLevelRender} and {@link #afterEntities}
          *
-         * @param destructionProgress The destruction progress map from {@link net.minecraft.client.render.WorldRenderer LevelRenderer}.
+         * @param destructionProgress The destruction progress map from {@link net.minecraft.client.renderer.LevelRenderer LevelRenderer}.
          */
-        void beforeCrumbling(RenderContext ctx, Long2ObjectMap<SortedSet<BlockBreakingInfo>> destructionProgress);
+        void beforeCrumbling(RenderContext ctx, Long2ObjectMap<SortedSet<BlockDestructionProgress>> destructionProgress);
     }
 }

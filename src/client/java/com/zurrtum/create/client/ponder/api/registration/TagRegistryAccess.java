@@ -1,21 +1,20 @@
 package com.zurrtum.create.client.ponder.api.registration;
 
 import com.zurrtum.create.client.ponder.foundation.PonderTag;
-import net.minecraft.util.Identifier;
-
 import java.util.List;
 import java.util.Set;
+import net.minecraft.resources.ResourceLocation;
 
 public interface TagRegistryAccess {
 
-    PonderTag getRegisteredTag(Identifier tagLocation);
+    PonderTag getRegisteredTag(ResourceLocation tagLocation);
 
     List<PonderTag> getListedTags();
 
-    Set<PonderTag> getTags(Identifier item);
+    Set<PonderTag> getTags(ResourceLocation item);
 
-    Set<Identifier> getItems(Identifier tag);
+    Set<ResourceLocation> getItems(ResourceLocation tag);
 
-    Set<Identifier> getItems(PonderTag tag);
+    Set<ResourceLocation> getItems(PonderTag tag);
 
 }

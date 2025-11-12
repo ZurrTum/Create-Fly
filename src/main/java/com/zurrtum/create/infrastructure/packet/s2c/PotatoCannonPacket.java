@@ -3,30 +3,30 @@ package com.zurrtum.create.infrastructure.packet.s2c;
 import com.zurrtum.create.AllClientHandle;
 import com.zurrtum.create.AllPackets;
 import com.zurrtum.create.catnip.codecs.stream.CatnipStreamCodecs;
-import net.minecraft.item.ItemStack;
-import net.minecraft.network.RegistryByteBuf;
-import net.minecraft.network.codec.PacketCodec;
-import net.minecraft.network.codec.PacketCodecs;
-import net.minecraft.network.packet.PacketType;
-import net.minecraft.util.Hand;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.PacketType;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.phys.Vec3;
 import org.apache.logging.log4j.util.TriConsumer;
 
 public record PotatoCannonPacket(
-    Vec3d location, Vec3d motion, ItemStack item, Hand hand, float pitch, boolean self
+    Vec3 location, Vec3 motion, ItemStack item, InteractionHand hand, float pitch, boolean self
 ) implements ShootGadgetPacket {
-    public static final PacketCodec<RegistryByteBuf, PotatoCannonPacket> CODEC = PacketCodec.tuple(
-        Vec3d.PACKET_CODEC,
+    public static final StreamCodec<RegistryFriendlyByteBuf, PotatoCannonPacket> CODEC = StreamCodec.composite(
+        Vec3.STREAM_CODEC,
         PotatoCannonPacket::location,
-        Vec3d.PACKET_CODEC,
+        Vec3.STREAM_CODEC,
         PotatoCannonPacket::motion,
-        ItemStack.OPTIONAL_PACKET_CODEC,
+        ItemStack.OPTIONAL_STREAM_CODEC,
         PotatoCannonPacket::item,
         CatnipStreamCodecs.HAND,
         PotatoCannonPacket::hand,
-        PacketCodecs.FLOAT,
+        ByteBufCodecs.FLOAT,
         PotatoCannonPacket::pitch,
-        PacketCodecs.BOOLEAN,
+        ByteBufCodecs.BOOL,
         PotatoCannonPacket::self,
         PotatoCannonPacket::new
     );
@@ -42,7 +42,7 @@ public record PotatoCannonPacket(
     }
 
     @Override
-    public PacketType<PotatoCannonPacket> getPacketType() {
+    public PacketType<PotatoCannonPacket> type() {
         return AllPackets.POTATO_CANNON;
     }
 }

@@ -7,27 +7,26 @@ import com.zurrtum.create.infrastructure.component.PlacementOptions;
 import com.zurrtum.create.infrastructure.component.PlacementPatterns;
 import com.zurrtum.create.infrastructure.component.TerrainBrushes;
 import com.zurrtum.create.infrastructure.component.TerrainTools;
-import net.minecraft.block.BlockState;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.text.Text;
-import net.minecraft.util.Hand;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
-
 import java.util.ArrayList;
 import java.util.List;
+import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.BlockHitResult;
 
 public class WorldshaperItem extends ZapperItem {
 
-    public WorldshaperItem(Settings properties) {
+    public WorldshaperItem(Properties properties) {
         super(properties);
     }
 
     @Override
-    protected void openHandgunGUI(ItemStack item, Hand hand) {
+    protected void openHandgunGUI(ItemStack item, InteractionHand hand) {
         AllClientHandle.INSTANCE.openWorldshaperScreen(item, hand);
     }
 
@@ -42,9 +41,9 @@ public class WorldshaperItem extends ZapperItem {
     }
 
     @Override
-    public Text validateUsage(ItemStack item) {
-        if (!item.contains(AllDataComponents.SHAPER_BRUSH_PARAMS))
-            return Text.translatable("create.terrainzapper.shiftRightClickToSet");
+    public Component validateUsage(ItemStack item) {
+        if (!item.has(AllDataComponents.SHAPER_BRUSH_PARAMS))
+            return Component.translatable("create.terrainzapper.shiftRightClickToSet");
         return super.validateUsage(item);
     }
 
@@ -55,7 +54,7 @@ public class WorldshaperItem extends ZapperItem {
     }
 
     @Override
-    protected boolean activate(World level, PlayerEntity player, ItemStack stack, BlockState stateToUse, BlockHitResult raytrace, NbtCompound data) {
+    protected boolean activate(Level level, Player player, ItemStack stack, BlockState stateToUse, BlockHitResult raytrace, CompoundTag data) {
 
         BlockPos targetPos = raytrace.getBlockPos();
         List<BlockPos> affectedPositions = new ArrayList<>();
@@ -66,10 +65,10 @@ public class WorldshaperItem extends ZapperItem {
         TerrainTools tool = stack.getOrDefault(AllDataComponents.SHAPER_TOOL, TerrainTools.Fill);
 
         brush.set(params.getX(), params.getY(), params.getZ());
-        targetPos = targetPos.add(brush.getOffset(player.getRotationVector(), raytrace.getSide(), option));
-        brush.addToGlobalPositions(level, targetPos, raytrace.getSide(), affectedPositions, tool);
+        targetPos = targetPos.offset(brush.getOffset(player.getLookAngle(), raytrace.getDirection(), option));
+        brush.addToGlobalPositions(level, targetPos, raytrace.getDirection(), affectedPositions, tool);
         PlacementPatterns.applyPattern(affectedPositions, stack, level.random);
-        brush.redirectTool(tool).run(level, affectedPositions, raytrace.getSide(), stateToUse, data, player);
+        brush.redirectTool(tool).run(level, affectedPositions, raytrace.getDirection(), stateToUse, data, player);
 
         return true;
     }

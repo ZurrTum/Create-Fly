@@ -2,8 +2,8 @@ package com.zurrtum.create.content.kinetics.gearbox;
 
 import com.zurrtum.create.AllBlockEntityTypes;
 import com.zurrtum.create.content.kinetics.base.DirectionalShaftHalvesBlockEntity;
-import net.minecraft.block.BlockState;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.block.state.BlockState;
 
 public class GearboxBlockEntity extends DirectionalShaftHalvesBlockEntity {
 

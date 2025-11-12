@@ -8,15 +8,14 @@ import com.zurrtum.create.content.kinetics.transmission.sequencer.SequencerInstr
 import com.zurrtum.create.foundation.advancement.CreateTrigger;
 import com.zurrtum.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.foundation.blockEntity.behaviour.scrollValue.ServerScrollOptionBehaviour;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.storage.ReadView;
-import net.minecraft.storage.WriteView;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec3d;
-
 import java.util.List;
+import net.minecraft.core.BlockPos;
+import net.minecraft.util.Mth;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
+import net.minecraft.world.phys.Vec3;
 
 public abstract class LinearActuatorBlockEntity extends KineticBlockEntity implements IControlContraption {
 
@@ -71,23 +70,23 @@ public abstract class LinearActuatorBlockEntity extends KineticBlockEntity imple
         if (isPassive())
             return;
 
-        if (world.isClient())
+        if (level.isClientSide())
             clientOffsetDiff *= .75f;
 
         if (waitingForSpeedChange) {
             if (movedContraption != null) {
-                if (world.isClient()) {
+                if (level.isClientSide()) {
                     float syncSpeed = clientOffsetDiff / 2f;
                     offset += syncSpeed;
                     movedContraption.setContraptionMotion(toMotionVector(syncSpeed));
                     return;
                 }
-                movedContraption.setContraptionMotion(Vec3d.ZERO);
+                movedContraption.setContraptionMotion(Vec3.ZERO);
             }
             return;
         }
 
-        if (!world.isClient() && assembleNextTick) {
+        if (!level.isClientSide() && assembleNextTick) {
             assembleNextTick = false;
             if (running) {
                 if (getSpeed() == 0)
@@ -133,7 +132,7 @@ public abstract class LinearActuatorBlockEntity extends KineticBlockEntity imple
 
         if (contraptionPresent) {
             if (moveAndCollideContraption()) {
-                movedContraption.setContraptionMotion(Vec3d.ZERO);
+                movedContraption.setContraptionMotion(Vec3.ZERO);
                 offset = getGridOffset(offset);
                 resetContraptionToOffset();
                 collided();
@@ -147,7 +146,7 @@ public abstract class LinearActuatorBlockEntity extends KineticBlockEntity imple
         int extensionRange = getExtensionRange();
         if (offset <= 0 || offset >= extensionRange) {
             offset = offset <= 0 ? 0 : extensionRange;
-            if (!world.isClient()) {
+            if (!level.isClientSide()) {
                 moveAndCollideContraption();
                 resetContraptionToOffset();
                 tryDisassemble();
@@ -166,16 +165,16 @@ public abstract class LinearActuatorBlockEntity extends KineticBlockEntity imple
     @Override
     public void lazyTick() {
         super.lazyTick();
-        if (movedContraption != null && !world.isClient())
+        if (movedContraption != null && !level.isClientSide())
             sendData();
     }
 
     protected int getGridOffset(float offset) {
-        return MathHelper.clamp((int) (offset + .5f), 0, getExtensionRange());
+        return Mth.clamp((int) (offset + .5f), 0, getExtensionRange());
     }
 
     public float getInterpolatedOffset(float partialTicks) {
-        float interpolatedOffset = MathHelper.clamp(offset + (partialTicks - .5f) * getMovementSpeed(), 0, getExtensionRange());
+        float interpolatedOffset = Mth.clamp(offset + (partialTicks - .5f) * getMovementSpeed(), 0, getExtensionRange());
         return interpolatedOffset;
     }
 
@@ -195,7 +194,7 @@ public abstract class LinearActuatorBlockEntity extends KineticBlockEntity imple
                 offset = Math.round(offset * 16) / 16;
                 resetContraptionToOffset();
             }
-            movedContraption.getContraption().stop(world);
+            movedContraption.getContraption().stop(level);
         }
 
         if (sequenceContext != null && sequenceContext.instruction() == SequencerInstructions.TURN_DISTANCE)
@@ -204,21 +203,21 @@ public abstract class LinearActuatorBlockEntity extends KineticBlockEntity imple
 
     @Override
     public void remove() {
-        this.removed = true;
-        if (!world.isClient())
+        this.remove = true;
+        if (!level.isClientSide())
             disassemble();
         super.remove();
     }
 
     @Override
-    protected void write(WriteView view, boolean clientPacket) {
+    protected void write(ValueOutput view, boolean clientPacket) {
         view.putBoolean("Running", running);
         view.putBoolean("Waiting", waitingForSpeedChange);
         view.putFloat("Offset", offset);
         if (sequencedOffsetLimit >= 0)
             view.putDouble("SequencedOffsetLimit", sequencedOffsetLimit);
         if (lastException != null) {
-            view.put("LastException", AssemblyException.CODEC, lastException);
+            view.store("LastException", AssemblyException.CODEC, lastException);
         }
         super.write(view, clientPacket);
 
@@ -229,14 +228,14 @@ public abstract class LinearActuatorBlockEntity extends KineticBlockEntity imple
     }
 
     @Override
-    protected void read(ReadView view, boolean clientPacket) {
-        boolean forceMovement = view.getBoolean("ForceMovement", false);
+    protected void read(ValueInput view, boolean clientPacket) {
+        boolean forceMovement = view.getBooleanOr("ForceMovement", false);
         float offsetBefore = offset;
 
-        running = view.getBoolean("Running", false);
-        waitingForSpeedChange = view.getBoolean("Waiting", false);
-        offset = view.getFloat("Offset", 0);
-        sequencedOffsetLimit = view.getDouble("SequencedOffsetLimit", -1);
+        running = view.getBooleanOr("Running", false);
+        waitingForSpeedChange = view.getBooleanOr("Waiting", false);
+        offset = view.getFloatOr("Offset", 0);
+        sequencedOffsetLimit = view.getDoubleOr("SequencedOffsetLimit", -1);
         lastException = view.read("LastException", AssemblyException.CODEC).orElse(null);
         super.read(view, clientPacket);
 
@@ -264,15 +263,15 @@ public abstract class LinearActuatorBlockEntity extends KineticBlockEntity imple
 
     protected abstract int getInitialOffset();
 
-    protected abstract Vec3d toMotionVector(float speed);
+    protected abstract Vec3 toMotionVector(float speed);
 
-    protected abstract Vec3d toPosition(float offset);
+    protected abstract Vec3 toPosition(float offset);
 
     protected void visitNewPosition() {
     }
 
     protected void tryDisassemble() {
-        if (removed) {
+        if (remove) {
             disassemble();
             return;
         }
@@ -296,18 +295,18 @@ public abstract class LinearActuatorBlockEntity extends KineticBlockEntity imple
         if (movedContraption == null)
             return false;
         if (movedContraption.isStalled()) {
-            movedContraption.setContraptionMotion(Vec3d.ZERO);
+            movedContraption.setContraptionMotion(Vec3.ZERO);
             return false;
         }
 
-        Vec3d motion = getMotionVector();
+        Vec3 motion = getMotionVector();
         movedContraption.setContraptionMotion(getMotionVector());
         movedContraption.move(motion.x, motion.y, motion.z);
         return ContraptionCollider.collideBlocks(movedContraption);
     }
 
     protected void collided() {
-        if (world.isClient()) {
+        if (level.isClientSide()) {
             waitingForSpeedChange = true;
             return;
         }
@@ -321,28 +320,28 @@ public abstract class LinearActuatorBlockEntity extends KineticBlockEntity imple
             return;
         if (!movedContraption.isAlive())
             return;
-        Vec3d vec = toPosition(offset);
-        movedContraption.setPosition(vec.x, vec.y, vec.z);
+        Vec3 vec = toPosition(offset);
+        movedContraption.setPos(vec.x, vec.y, vec.z);
         if (getSpeed() == 0 || waitingForSpeedChange)
-            movedContraption.setContraptionMotion(Vec3d.ZERO);
+            movedContraption.setContraptionMotion(Vec3.ZERO);
     }
 
     public float getMovementSpeed() {
-        float movementSpeed = MathHelper.clamp(convertToLinear(getSpeed()), -.49f, .49f) + clientOffsetDiff / 2f;
-        if (world.isClient())
+        float movementSpeed = Mth.clamp(convertToLinear(getSpeed()), -.49f, .49f) + clientOffsetDiff / 2f;
+        if (level.isClientSide())
             movementSpeed *= AllClientHandle.INSTANCE.getServerSpeed();
         if (sequencedOffsetLimit >= 0)
-            movementSpeed = (float) MathHelper.clamp(movementSpeed, -sequencedOffsetLimit, sequencedOffsetLimit);
+            movementSpeed = (float) Mth.clamp(movementSpeed, -sequencedOffsetLimit, sequencedOffsetLimit);
         return movementSpeed;
     }
 
-    public Vec3d getMotionVector() {
+    public Vec3 getMotionVector() {
         return toMotionVector(getMovementSpeed());
     }
 
     @Override
     public void onStall() {
-        if (!world.isClient()) {
+        if (!level.isClientSide()) {
             forceMove = true;
             sendData();
         }
@@ -361,7 +360,7 @@ public abstract class LinearActuatorBlockEntity extends KineticBlockEntity imple
     @Override
     public void attach(ControlledContraptionEntity contraption) {
         this.movedContraption = contraption;
-        if (!world.isClient()) {
+        if (!level.isClientSide()) {
             this.running = true;
             sendData();
         }
@@ -374,6 +373,6 @@ public abstract class LinearActuatorBlockEntity extends KineticBlockEntity imple
 
     @Override
     public BlockPos getBlockPosition() {
-        return pos;
+        return worldPosition;
     }
 }

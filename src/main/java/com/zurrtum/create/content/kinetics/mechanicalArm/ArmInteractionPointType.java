@@ -2,14 +2,14 @@ package com.zurrtum.create.content.kinetics.mechanicalArm;
 
 import com.zurrtum.create.api.registry.CreateRegistries;
 import it.unimi.dsi.fastutil.objects.ReferenceArrayList;
-import net.minecraft.block.BlockState;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.UnmodifiableView;
 
 import java.util.Collections;
 import java.util.List;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
 
 public abstract class ArmInteractionPointType {
     private static final List<ArmInteractionPointType> SORTED_TYPES = new ReferenceArrayList<>();
@@ -23,17 +23,17 @@ public abstract class ArmInteractionPointType {
     }
 
     @Nullable
-    public static ArmInteractionPointType getPrimaryType(World level, BlockPos pos, BlockState state) {
+    public static ArmInteractionPointType getPrimaryType(Level level, BlockPos pos, BlockState state) {
         for (ArmInteractionPointType type : SORTED_TYPES_VIEW)
             if (type.canCreatePoint(level, pos, state))
                 return type;
         return null;
     }
 
-    public abstract boolean canCreatePoint(World level, BlockPos pos, BlockState state);
+    public abstract boolean canCreatePoint(Level level, BlockPos pos, BlockState state);
 
     @Nullable
-    public abstract ArmInteractionPoint createPoint(World level, BlockPos pos, BlockState state);
+    public abstract ArmInteractionPoint createPoint(Level level, BlockPos pos, BlockState state);
 
     public int getPriority() {
         return 0;

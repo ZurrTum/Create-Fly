@@ -2,10 +2,9 @@ package com.zurrtum.create.content.logistics.packagerLink;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-
 import java.util.*;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
 
 public class RequestPromiseQueue {
     public static final Codec<RequestPromiseQueue> CODEC = RecordCodecBuilder.create(instance -> instance.group(Codec.list(RequestPromise.CODEC)
@@ -40,7 +39,7 @@ public class RequestPromiseQueue {
 
         for (Iterator<RequestPromise> iterator = list.iterator(); iterator.hasNext(); ) {
             RequestPromise promise = iterator.next();
-            if (!ItemStack.areItemsAndComponentsEqual(promise.promisedStack.stack, stack))
+            if (!ItemStack.isSameItemSameComponents(promise.promisedStack.stack, stack))
                 continue;
             if (expiryTime != -1 && promise.ticksExisted >= expiryTime) {
                 iterator.remove();
@@ -60,7 +59,7 @@ public class RequestPromiseQueue {
 
         for (Iterator<RequestPromise> iterator = list.iterator(); iterator.hasNext(); ) {
             RequestPromise promise = iterator.next();
-            if (!ItemStack.areItemsAndComponentsEqual(promise.promisedStack.stack, stack))
+            if (!ItemStack.isSameItemSameComponents(promise.promisedStack.stack, stack))
                 continue;
             iterator.remove();
             onChanged.run();
@@ -77,7 +76,7 @@ public class RequestPromiseQueue {
 
         for (Iterator<RequestPromise> iterator = list.iterator(); iterator.hasNext(); ) {
             RequestPromise requestPromise = iterator.next();
-            if (!ItemStack.areItemsAndComponentsEqual(requestPromise.promisedStack.stack, stack))
+            if (!ItemStack.isSameItemSameComponents(requestPromise.promisedStack.stack, stack))
                 continue;
 
             int toSubtract = Math.min(amount, requestPromise.promisedStack.count);

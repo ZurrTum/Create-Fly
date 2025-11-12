@@ -9,23 +9,23 @@ import com.zurrtum.create.content.contraptions.AbstractContraptionEntity;
 import com.zurrtum.create.content.contraptions.minecart.capability.CapabilityMinecartController;
 import com.zurrtum.create.content.contraptions.minecart.capability.MinecartController;
 import com.zurrtum.create.infrastructure.config.AllConfigs;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.vehicle.AbstractMinecartEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.text.Text;
-import net.minecraft.util.Hand;
-import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.function.Consumer;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.vehicle.AbstractMinecart;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
 
 public class CouplingHandler {
     public static boolean preventEntitiesFromMoutingOccupiedCart(Entity entityMounting, Entity entityBeingMounted) {
-        if (entityBeingMounted instanceof AbstractMinecartEntity cart) {
+        if (entityBeingMounted instanceof AbstractMinecart cart) {
             Optional<MinecartController> value = AllSynchedDatas.MINECART_CONTROLLER.get(cart);
             if (value.isPresent()) {
                 return !(entityMounting instanceof AbstractContraptionEntity) && value.get().isCoupledThroughContraption();
@@ -34,7 +34,7 @@ public class CouplingHandler {
         return false;
     }
 
-    public static void forEachLoadedCoupling(World world, Consumer<Couple<MinecartController>> consumer) {
+    public static void forEachLoadedCoupling(Level world, Consumer<Couple<MinecartController>> consumer) {
         if (world == null)
             return;
         Set<UUID> cartsWithCoupling = CapabilityMinecartController.loadedMinecartsWithCoupling.get(world);
@@ -56,13 +56,13 @@ public class CouplingHandler {
         ;
     }
 
-    public static boolean tryToCoupleCarts(@Nullable PlayerEntity player, World world, int cartId1, int cartId2) {
-        Entity entity1 = world.getEntityById(cartId1);
-        Entity entity2 = world.getEntityById(cartId2);
+    public static boolean tryToCoupleCarts(@Nullable Player player, Level world, int cartId1, int cartId2) {
+        Entity entity1 = world.getEntity(cartId1);
+        Entity entity2 = world.getEntity(cartId2);
 
-        if (!(entity1 instanceof AbstractMinecartEntity cart1))
+        if (!(entity1 instanceof AbstractMinecart cart1))
             return false;
-        if (!(entity2 instanceof AbstractMinecartEntity cart2))
+        if (!(entity2 instanceof AbstractMinecart cart2))
             return false;
 
         String tooMany = "two_couplings_max";
@@ -70,7 +70,7 @@ public class CouplingHandler {
         String noLoops = "no_loops";
         String tooFar = "too_far";
 
-        int distanceTo = (int) entity1.getEntityPos().distanceTo(entity2.getEntityPos());
+        int distanceTo = (int) entity1.position().distanceTo(entity2.position());
         boolean contraptionCoupling = player == null;
 
         if (distanceTo < 2) {
@@ -84,8 +84,8 @@ public class CouplingHandler {
             return false;
         }
 
-        UUID mainID = cart1.getUuid();
-        UUID connectedID = cart2.getUuid();
+        UUID mainID = cart1.getUUID();
+        UUID connectedID = cart2.getUUID();
         MinecartController mainController = CapabilityMinecartController.getIfPresent(world, mainID);
         MinecartController connectedController = CapabilityMinecartController.getIfPresent(world, connectedID);
 
@@ -130,13 +130,13 @@ public class CouplingHandler {
         }
 
         if (!contraptionCoupling) {
-            for (Hand hand : Hand.values()) {
+            for (InteractionHand hand : InteractionHand.values()) {
                 if (player.isCreative())
                     break;
-                ItemStack heldItem = player.getStackInHand(hand);
-                if (!heldItem.isOf(AllItems.MINECART_COUPLING))
+                ItemStack heldItem = player.getItemInHand(hand);
+                if (!heldItem.is(AllItems.MINECART_COUPLING))
                     continue;
-                heldItem.decrement(1);
+                heldItem.shrink(1);
                 break;
             }
         }
@@ -153,7 +153,7 @@ public class CouplingHandler {
      * Optional.EMPTY if none connected, null if not yet loaded
      */
     @Nullable
-    public static Optional<MinecartController> getNextInCouplingChainLegacy(World world, MinecartController controller, boolean forward) {
+    public static Optional<MinecartController> getNextInCouplingChainLegacy(Level world, MinecartController controller, boolean forward) {
         UUID coupledCart = controller.getCoupledCart(forward);
         if (coupledCart == null)
             return Optional.empty();
@@ -161,17 +161,17 @@ public class CouplingHandler {
         return coupledController == null ? null : Optional.of(coupledController);
     }
 
-    public static Optional<MinecartController> getNextInCouplingChain(World world, MinecartController controller, boolean forward) {
+    public static Optional<MinecartController> getNextInCouplingChain(Level world, MinecartController controller, boolean forward) {
         UUID coupledCart = controller.getCoupledCart(forward);
         if (coupledCart == null)
             return Optional.empty();
         return Optional.ofNullable(CapabilityMinecartController.getIfPresent(world, coupledCart));
     }
 
-    public static void status(PlayerEntity player, String key) {
+    public static void status(Player player, String key) {
         if (player == null)
             return;
-        player.sendMessage(Text.translatable("create.minecart_coupling." + key), true);
+        player.displayClientMessage(Component.translatable("create.minecart_coupling." + key), true);
     }
 
 }

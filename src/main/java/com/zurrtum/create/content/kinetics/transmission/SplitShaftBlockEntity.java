@@ -1,10 +1,10 @@
 package com.zurrtum.create.content.kinetics.transmission;
 
 import com.zurrtum.create.content.kinetics.base.DirectionalShaftHalvesBlockEntity;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockState;
 
 public abstract class SplitShaftBlockEntity extends DirectionalShaftHalvesBlockEntity {
 

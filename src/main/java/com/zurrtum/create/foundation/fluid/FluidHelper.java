@@ -12,27 +12,26 @@ import com.zurrtum.create.infrastructure.fluids.FluidInventoryProvider;
 import com.zurrtum.create.infrastructure.fluids.FluidItemInventory;
 import com.zurrtum.create.infrastructure.fluids.FluidStack;
 import it.unimi.dsi.fastutil.objects.Object2ReferenceOpenHashMap;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.fluid.FlowableFluid;
-import net.minecraft.fluid.Fluid;
-import net.minecraft.fluid.FluidState;
-import net.minecraft.fluid.Fluids;
-import net.minecraft.item.ItemStack;
-import net.minecraft.registry.tag.FluidTags;
-import net.minecraft.registry.tag.TagKey;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.sound.SoundEvent;
-import net.minecraft.sound.SoundEvents;
-import net.minecraft.util.Hand;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.world.World;
-
 import java.util.Map;
 import java.util.function.Supplier;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.tags.FluidTags;
+import net.minecraft.tags.TagKey;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.material.FlowingFluid;
+import net.minecraft.world.level.material.Fluid;
+import net.minecraft.world.level.material.FluidState;
+import net.minecraft.world.level.material.Fluids;
 
 public class FluidHelper {
     private static final Map<BlockPos, FluidInventoryCache> INV_CACHE = new Object2ReferenceOpenHashMap<>();
@@ -60,11 +59,11 @@ public class FluidHelper {
 
     @SuppressWarnings("deprecation")
     public static boolean isTag(Fluid fluid, TagKey<Fluid> tag) {
-        return fluid.isIn(tag);
+        return fluid.is(tag);
     }
 
     public static boolean isTag(FluidState fluid, TagKey<Fluid> tag) {
-        return fluid.isIn(tag);
+        return fluid.is(tag);
     }
 
     public static boolean isTag(FluidStack fluid, TagKey<Fluid> tag) {
@@ -75,7 +74,7 @@ public class FluidHelper {
         //TODO
         SoundEvent soundevent = null;//fluid.getFluid().getFluidType().getSound(fluid, SoundActions.BUCKET_FILL);
         if (soundevent == null)
-            soundevent = FluidHelper.isTag(fluid, FluidTags.LAVA) ? SoundEvents.ITEM_BUCKET_FILL_LAVA : SoundEvents.ITEM_BUCKET_FILL;
+            soundevent = FluidHelper.isTag(fluid, FluidTags.LAVA) ? SoundEvents.BUCKET_FILL_LAVA : SoundEvents.BUCKET_FILL;
         return soundevent;
     }
 
@@ -83,13 +82,13 @@ public class FluidHelper {
         //TODO
         SoundEvent soundevent = null;//fluid.getFluid().getFluidType().getSound(fluid, SoundActions.BUCKET_EMPTY);
         if (soundevent == null)
-            soundevent = FluidHelper.isTag(fluid, FluidTags.LAVA) ? SoundEvents.ITEM_BUCKET_EMPTY_LAVA : SoundEvents.ITEM_BUCKET_EMPTY;
+            soundevent = FluidHelper.isTag(fluid, FluidTags.LAVA) ? SoundEvents.BUCKET_EMPTY_LAVA : SoundEvents.BUCKET_EMPTY;
         return soundevent;
     }
 
     public static boolean hasBlockState(Fluid fluid) {
-        BlockState blockState = fluid.getDefaultState().getBlockState();
-        return blockState != null && blockState != Blocks.AIR.getDefaultState();
+        BlockState blockState = fluid.defaultFluidState().createLegacyBlock();
+        return blockState != null && blockState != Blocks.AIR.defaultBlockState();
     }
 
     public static FluidStack copyStackWithAmount(FluidStack fs, int amount) {
@@ -103,24 +102,24 @@ public class FluidHelper {
     }
 
     public static Fluid convertToFlowing(Fluid fluid) {
-        if (fluid instanceof FlowableFluid flowableFluid)
+        if (fluid instanceof FlowingFluid flowableFluid)
             return flowableFluid.getFlowing();
         return fluid;
     }
 
     public static Fluid convertToStill(Fluid fluid) {
-        if (fluid instanceof FlowableFluid flowableFluid)
-            return flowableFluid.getStill();
+        if (fluid instanceof FlowingFluid flowableFluid)
+            return flowableFluid.getSource();
         return fluid;
     }
 
-    public static FluidInventory getFluidInventory(World world, BlockPos pos, Direction direction) {
+    public static FluidInventory getFluidInventory(Level world, BlockPos pos, Direction direction) {
         return getFluidInventory(world, pos, null, null, direction);
     }
 
-    public static FluidInventory getFluidInventory(World world, BlockPos pos, BlockState state, BlockEntity blockEntity, Direction direction) {
+    public static FluidInventory getFluidInventory(Level world, BlockPos pos, BlockState state, BlockEntity blockEntity, Direction direction) {
         if (state == null) {
-            state = blockEntity != null ? blockEntity.getCachedState() : world.getBlockState(pos);
+            state = blockEntity != null ? blockEntity.getBlockState() : world.getBlockState(pos);
         }
         if (state.getBlock() instanceof FluidInventoryProvider<?> provider) {
             return provider.getFluidInventory(state, world, pos, blockEntity, direction);
@@ -128,9 +127,9 @@ public class FluidHelper {
         return AllTransfer.getFluidInventory(world, pos, state, blockEntity, direction);
     }
 
-    public static boolean hasFluidInventory(World world, BlockPos pos, BlockState state, BlockEntity blockEntity, Direction direction) {
+    public static boolean hasFluidInventory(Level world, BlockPos pos, BlockState state, BlockEntity blockEntity, Direction direction) {
         if (state == null) {
-            state = blockEntity != null ? blockEntity.getCachedState() : world.getBlockState(pos);
+            state = blockEntity != null ? blockEntity.getBlockState() : world.getBlockState(pos);
         }
         if (state.getBlock() instanceof FluidInventoryProvider<?>) {
             return true;
@@ -150,15 +149,15 @@ public class FluidHelper {
         return AllFluidItemInventory.has(stack) || AllTransfer.hasFluidInventory(stack);
     }
 
-    public static boolean tryEmptyItemIntoBE(World worldIn, PlayerEntity player, Hand handIn, ItemStack heldItem, SmartBlockEntity be) {
+    public static boolean tryEmptyItemIntoBE(Level worldIn, Player player, InteractionHand handIn, ItemStack heldItem, SmartBlockEntity be) {
         if (!GenericItemEmptying.canItemBeEmptied(worldIn, heldItem))
             return false;
 
-        FluidInventory capability = getFluidInventory(worldIn, be.getPos(), null, be, null);
+        FluidInventory capability = getFluidInventory(worldIn, be.getBlockPos(), null, be, null);
         if (capability == null) {
             return false;
         }
-        if (worldIn.isClient())
+        if (worldIn.isClientSide())
             return true;
         Pair<FluidStack, ItemStack> emptyingResult = GenericItemEmptying.emptyItem(worldIn, heldItem, true);
         FluidStack fluidStack = emptyingResult.getFirst();
@@ -171,20 +170,20 @@ public class FluidHelper {
 
         if (!player.isCreative() && !(be instanceof CreativeFluidTankBlockEntity)) {
             if (copyOfHeld.isEmpty())
-                player.setStackInHand(handIn, emptyingResult.getSecond());
+                player.setItemInHand(handIn, emptyingResult.getSecond());
             else {
-                player.setStackInHand(handIn, copyOfHeld);
-                player.getInventory().offerOrDrop(emptyingResult.getSecond());
+                player.setItemInHand(handIn, copyOfHeld);
+                player.getInventory().placeItemBackInInventory(emptyingResult.getSecond());
             }
         }
         return true;
     }
 
-    public static boolean tryFillItemFromBE(World world, PlayerEntity player, Hand handIn, ItemStack heldItem, SmartBlockEntity be) {
+    public static boolean tryFillItemFromBE(Level world, Player player, InteractionHand handIn, ItemStack heldItem, SmartBlockEntity be) {
         if (!GenericItemFilling.canItemBeFilled(world, heldItem))
             return false;
 
-        FluidInventory capability = FluidHelper.getFluidInventory(world, be.getPos(), null, be, null);
+        FluidInventory capability = FluidHelper.getFluidInventory(world, be.getBlockPos(), null, be, null);
 
         if (capability == null)
             return false;
@@ -198,7 +197,7 @@ public class FluidHelper {
             if (requiredAmountForItem > fluid.getAmount())
                 continue;
 
-            if (world.isClient())
+            if (world.isClientSide())
                 return true;
 
             if (player.isCreative() || be instanceof CreativeFluidTankBlockEntity)
@@ -210,7 +209,7 @@ public class FluidHelper {
             capability.extract(copy, null);
 
             if (!player.isCreative())
-                player.getInventory().offerOrDrop(out);
+                player.getInventory().placeItemBackInInventory(out);
             be.notifyUpdate();
             return true;
         }
@@ -297,7 +296,7 @@ public class FluidHelper {
     //        return null;
     //    }
 
-    public static Supplier<FluidInventory> getFluidInventoryCache(ServerWorld world, BlockPos pos, Direction direction) {
+    public static Supplier<FluidInventory> getFluidInventoryCache(ServerLevel world, BlockPos pos, Direction direction) {
         FluidInventoryCache cache = new FluidInventoryCache(world, pos, direction);
         INV_CACHE.put(pos, cache);
         return cache;

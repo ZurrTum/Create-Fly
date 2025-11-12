@@ -2,7 +2,7 @@ package com.zurrtum.create.client.flywheel.api.visualization;
 
 import com.zurrtum.create.client.flywheel.api.backend.BackendImplemented;
 import com.zurrtum.create.client.flywheel.api.instance.InstancerProvider;
-import net.minecraft.util.math.Vec3i;
+import net.minecraft.core.Vec3i;
 
 /**
  * A context object passed on visual creation.

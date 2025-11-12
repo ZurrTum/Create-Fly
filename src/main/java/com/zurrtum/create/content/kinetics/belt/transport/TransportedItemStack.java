@@ -6,14 +6,13 @@ import com.zurrtum.create.api.registry.CreateRegistries;
 import com.zurrtum.create.content.kinetics.belt.BeltHelper;
 import com.zurrtum.create.content.kinetics.fan.processing.FanProcessingType;
 import com.zurrtum.create.content.logistics.box.PackageItem;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.registry.RegistryWrapper;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.math.Direction;
-
 import java.util.Optional;
 import java.util.Random;
+import net.minecraft.core.Direction;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.ItemStack;
 
 public class TransportedItemStack implements Comparable<TransportedItemStack> {
     public static final Codec<TransportedItemStack> CODEC = RecordCodecBuilder.create(instance -> instance.group(
@@ -25,7 +24,7 @@ public class TransportedItemStack implements Comparable<TransportedItemStack> {
         Codec.INT.fieldOf("InSegment").forGetter(i -> i.insertedAt),
         Codec.INT.fieldOf("Angle").forGetter(i -> i.angle),
         Direction.CODEC.fieldOf("InDirection").forGetter(i -> i.insertedFrom),
-        CreateRegistries.FAN_PROCESSING_TYPE.getCodec().optionalFieldOf("FanProcessingType").forGetter(i -> Optional.ofNullable(i.processedBy)),
+        CreateRegistries.FAN_PROCESSING_TYPE.byNameCodec().optionalFieldOf("FanProcessingType").forGetter(i -> Optional.ofNullable(i.processedBy)),
         Codec.INT.optionalFieldOf("FanProcessingTime", 0).forGetter(i -> i.processingTime),
         Codec.BOOL.fieldOf("Locked").forGetter(i -> i.locked),
         Codec.BOOL.fieldOf("LockedExternally").forGetter(i -> i.lockedExternally)
@@ -117,10 +116,10 @@ public class TransportedItemStack implements Comparable<TransportedItemStack> {
         return copy;
     }
 
-    public NbtCompound serializeNBT(RegistryWrapper.WrapperLookup registries) {
-        NbtCompound nbt = new NbtCompound();
+    public CompoundTag serializeNBT(HolderLookup.Provider registries) {
+        CompoundTag nbt = new CompoundTag();
         if (!stack.isEmpty()) {
-            nbt.put("Item", ItemStack.CODEC, stack);
+            nbt.store("Item", ItemStack.CODEC, stack);
         }
         nbt.putFloat("Pos", beltPosition);
         nbt.putFloat("PrevPos", prevBeltPosition);
@@ -128,10 +127,10 @@ public class TransportedItemStack implements Comparable<TransportedItemStack> {
         nbt.putFloat("PrevOffset", prevSideOffset);
         nbt.putInt("InSegment", insertedAt);
         nbt.putInt("Angle", angle);
-        nbt.putInt("InDirection", insertedFrom.getIndex());
+        nbt.putInt("InDirection", insertedFrom.get3DDataValue());
 
         if (processedBy != null) {
-            Identifier key = CreateRegistries.FAN_PROCESSING_TYPE.getId(processedBy);
+            ResourceLocation key = CreateRegistries.FAN_PROCESSING_TYPE.getKey(processedBy);
             if (key == null)
                 throw new IllegalArgumentException("Could not get id for FanProcessingType " + processedBy + "!");
 
@@ -146,22 +145,22 @@ public class TransportedItemStack implements Comparable<TransportedItemStack> {
         return nbt;
     }
 
-    public static TransportedItemStack read(NbtCompound nbt, RegistryWrapper.WrapperLookup registries) {
-        ItemStack source = nbt.get("Item", ItemStack.CODEC).orElse(ItemStack.EMPTY);
+    public static TransportedItemStack read(CompoundTag nbt, HolderLookup.Provider registries) {
+        ItemStack source = nbt.read("Item", ItemStack.CODEC).orElse(ItemStack.EMPTY);
         TransportedItemStack stack = new TransportedItemStack(source);
-        stack.beltPosition = nbt.getFloat("Pos", 0);
-        stack.prevBeltPosition = nbt.getFloat("PrevPos", 0);
-        stack.sideOffset = nbt.getFloat("Offset", 0);
-        stack.prevSideOffset = nbt.getFloat("PrevOffset", 0);
-        stack.insertedAt = nbt.getInt("InSegment", 0);
-        stack.angle = nbt.getInt("Angle", 0);
-        stack.insertedFrom = Direction.byIndex(nbt.getInt("InDirection", 0));
-        stack.locked = nbt.getBoolean("Locked", false);
-        stack.lockedExternally = nbt.getBoolean("LockedExternally", false);
+        stack.beltPosition = nbt.getFloatOr("Pos", 0);
+        stack.prevBeltPosition = nbt.getFloatOr("PrevPos", 0);
+        stack.sideOffset = nbt.getFloatOr("Offset", 0);
+        stack.prevSideOffset = nbt.getFloatOr("PrevOffset", 0);
+        stack.insertedAt = nbt.getIntOr("InSegment", 0);
+        stack.angle = nbt.getIntOr("Angle", 0);
+        stack.insertedFrom = Direction.from3DDataValue(nbt.getIntOr("InDirection", 0));
+        stack.locked = nbt.getBooleanOr("Locked", false);
+        stack.lockedExternally = nbt.getBooleanOr("LockedExternally", false);
 
         if (nbt.contains("FanProcessingType")) {
-            stack.processedBy = FanProcessingType.parse(nbt.getString("FanProcessingType", ""));
-            stack.processingTime = nbt.getInt("FanProcessingTime", 0);
+            stack.processedBy = FanProcessingType.parse(nbt.getStringOr("FanProcessingType", ""));
+            stack.processingTime = nbt.getIntOr("FanProcessingTime", 0);
         }
 
         return stack;

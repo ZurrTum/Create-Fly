@@ -1,17 +1,17 @@
 package com.zurrtum.create.client.ponder.foundation.render;
 
+import com.mojang.blaze3d.platform.Window;
 import com.zurrtum.create.catnip.animation.LerpedFloat;
 import com.zurrtum.create.client.ponder.foundation.PonderScene;
-import net.minecraft.client.gui.ScreenRect;
-import net.minecraft.client.gui.render.state.special.SpecialGuiElementRenderState;
-import net.minecraft.client.util.Window;
+import net.minecraft.client.gui.navigation.ScreenRectangle;
+import net.minecraft.client.gui.render.state.pip.PictureInPictureRenderState;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix3x2f;
 
 public record SceneRenderState(
     int id, PonderScene scene, int width, int height, double slide, boolean userViewMode, LerpedFloat finishingFlash, float partialTicks,
-    Matrix3x2f pose, int x2, int y2, ScreenRect bounds
-) implements SpecialGuiElementRenderState {
+    Matrix3x2f pose, int x1, int y1, ScreenRectangle bounds
+) implements PictureInPictureRenderState {
     public SceneRenderState(
         int id,
         PonderScene scene,
@@ -34,19 +34,19 @@ public record SceneRenderState(
             finishingFlash,
             partialTicks,
             pose,
-            window.getScaledWidth(),
-            window.getScaledHeight(),
-            new ScreenRect(0, 0, window.getScaledWidth(), window.getScaledHeight()).transformEachVertex(pose)
+            window.getGuiScaledWidth(),
+            window.getGuiScaledHeight(),
+            new ScreenRectangle(0, 0, window.getGuiScaledWidth(), window.getGuiScaledHeight()).transformMaxBounds(pose)
         );
     }
 
     @Override
-    public int x1() {
+    public int x0() {
         return 0;
     }
 
     @Override
-    public int y1() {
+    public int y0() {
         return 0;
     }
 
@@ -56,7 +56,7 @@ public record SceneRenderState(
     }
 
     @Override
-    public @Nullable ScreenRect scissorArea() {
+    public @Nullable ScreenRectangle scissorArea() {
         return null;
     }
 }

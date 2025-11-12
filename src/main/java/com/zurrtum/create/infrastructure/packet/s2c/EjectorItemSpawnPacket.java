@@ -4,29 +4,29 @@ import com.zurrtum.create.AllPackets;
 import com.zurrtum.create.content.logistics.depot.EjectorBlockEntity;
 import com.zurrtum.create.content.logistics.depot.EjectorItemEntity;
 import com.zurrtum.create.content.logistics.depot.EntityLauncher;
-import net.minecraft.network.RegistryByteBuf;
-import net.minecraft.network.codec.PacketCodec;
-import net.minecraft.network.packet.Packet;
-import net.minecraft.network.packet.PacketType;
-import net.minecraft.network.packet.s2c.play.EntitySpawnS2CPacket;
-import net.minecraft.server.network.EntityTrackerEntry;
-import net.minecraft.util.math.Direction;
+import net.minecraft.core.Direction;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.Packet;
+import net.minecraft.network.protocol.PacketType;
+import net.minecraft.network.protocol.game.ClientboundAddEntityPacket;
+import net.minecraft.server.level.ServerEntity;
 
-public class EjectorItemSpawnPacket extends EntitySpawnS2CPacket {
+public class EjectorItemSpawnPacket extends ClientboundAddEntityPacket {
     private final boolean alive;
     private final int progress;
     private final boolean hasLauncher;
     private final EntityLauncher launcher;
     private final Direction direction;
-    public static final PacketCodec<RegistryByteBuf, EjectorItemSpawnPacket> CODEC = Packet.createCodec(
+    public static final StreamCodec<RegistryFriendlyByteBuf, EjectorItemSpawnPacket> CODEC = Packet.codec(
         EjectorItemSpawnPacket::write,
         EjectorItemSpawnPacket::new
     );
 
-    public EjectorItemSpawnPacket(EjectorItemEntity entity, EntityTrackerEntry entityTrackerEntry) {
+    public EjectorItemSpawnPacket(EjectorItemEntity entity, ServerEntity entityTrackerEntry) {
         super(entity, entityTrackerEntry);
         alive = entity.isAlive();
-        hasLauncher = !alive && !(entity.getEntityWorld().getBlockEntity(entity.getBlockPos()) instanceof EjectorBlockEntity);
+        hasLauncher = !alive && !(entity.level().getBlockEntity(entity.blockPosition()) instanceof EjectorBlockEntity);
         if (hasLauncher) {
             progress = entity.progress;
             launcher = entity.launcher;
@@ -38,7 +38,7 @@ public class EjectorItemSpawnPacket extends EntitySpawnS2CPacket {
         }
     }
 
-    private EjectorItemSpawnPacket(RegistryByteBuf buf) {
+    private EjectorItemSpawnPacket(RegistryFriendlyByteBuf buf) {
         super(buf);
         alive = buf.readBoolean();
         progress = buf.readInt();
@@ -46,7 +46,7 @@ public class EjectorItemSpawnPacket extends EntitySpawnS2CPacket {
             hasLauncher = buf.readBoolean();
             if (hasLauncher) {
                 launcher = EntityLauncher.PACKET_CODEC.decode(buf);
-                direction = Direction.PACKET_CODEC.decode(buf);
+                direction = Direction.STREAM_CODEC.decode(buf);
                 return;
             }
         } else {
@@ -57,7 +57,7 @@ public class EjectorItemSpawnPacket extends EntitySpawnS2CPacket {
     }
 
     @Override
-    public void write(RegistryByteBuf buf) {
+    public void write(RegistryFriendlyByteBuf buf) {
         super.write(buf);
         buf.writeBoolean(alive);
         buf.writeInt(progress);
@@ -65,7 +65,7 @@ public class EjectorItemSpawnPacket extends EntitySpawnS2CPacket {
             buf.writeBoolean(hasLauncher);
             if (hasLauncher) {
                 EntityLauncher.PACKET_CODEC.encode(buf, launcher);
-                Direction.PACKET_CODEC.encode(buf, direction);
+                Direction.STREAM_CODEC.encode(buf, direction);
             }
         }
     }
@@ -92,7 +92,7 @@ public class EjectorItemSpawnPacket extends EntitySpawnS2CPacket {
 
     @Override
     @SuppressWarnings("unchecked")
-    public PacketType<EntitySpawnS2CPacket> getPacketType() {
-        return (PacketType<EntitySpawnS2CPacket>) (PacketType<?>) AllPackets.EJECTOR_ITEM_SPAWN;
+    public PacketType<ClientboundAddEntityPacket> type() {
+        return (PacketType<ClientboundAddEntityPacket>) (PacketType<?>) AllPackets.EJECTOR_ITEM_SPAWN;
     }
 }

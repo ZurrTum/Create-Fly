@@ -4,22 +4,21 @@ import com.zurrtum.create.catnip.data.Iterate;
 import com.zurrtum.create.client.AllCTBehaviours;
 import com.zurrtum.create.client.AllPartialModels;
 import com.zurrtum.create.content.decoration.girder.GirderBlock;
-import net.minecraft.block.BlockState;
-import net.minecraft.client.render.model.BlockModelPart;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.random.Random;
-import net.minecraft.world.BlockRenderView;
-
 import java.util.List;
+import net.minecraft.client.renderer.block.model.BlockModelPart;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.level.BlockAndTintGetter;
+import net.minecraft.world.level.block.state.BlockState;
 
 public class ConnectedGirderModel extends CTModel {
-    public ConnectedGirderModel(BlockState state, UnbakedGrouped unbaked) {
+    public ConnectedGirderModel(BlockState state, UnbakedRoot unbaked) {
         super(state, unbaked, AllCTBehaviours.METAL_GIRDER);
     }
 
     @Override
-    public void addPartsWithInfo(BlockRenderView world, BlockPos pos, BlockState state, Random random, List<BlockModelPart> parts) {
+    public void addPartsWithInfo(BlockAndTintGetter world, BlockPos pos, BlockState state, RandomSource random, List<BlockModelPart> parts) {
         super.addPartsWithInfo(world, pos, state, random, parts);
         for (Direction direction : Iterate.horizontalDirections) {
             if (GirderBlock.isConnected(world, pos, state, direction)) {

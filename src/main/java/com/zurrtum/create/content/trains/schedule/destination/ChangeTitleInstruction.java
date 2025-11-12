@@ -3,12 +3,12 @@ package com.zurrtum.create.content.trains.schedule.destination;
 import com.zurrtum.create.content.trains.graph.DiscoveredPath;
 import com.zurrtum.create.content.trains.schedule.ScheduleRuntime;
 import com.zurrtum.create.content.trains.schedule.ScheduleRuntime.State;
-import net.minecraft.util.Identifier;
-import net.minecraft.world.World;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.Nullable;
 
 public class ChangeTitleInstruction extends TextScheduleInstruction {
-    public ChangeTitleInstruction(Identifier id) {
+    public ChangeTitleInstruction(ResourceLocation id) {
         super(id);
     }
 
@@ -23,7 +23,7 @@ public class ChangeTitleInstruction extends TextScheduleInstruction {
 
     @Override
     @Nullable
-    public DiscoveredPath start(ScheduleRuntime runtime, World level) {
+    public DiscoveredPath start(ScheduleRuntime runtime, Level level) {
         runtime.currentTitle = getScheduleTitle();
         runtime.state = State.PRE_TRANSIT;
         runtime.currentEntry++;

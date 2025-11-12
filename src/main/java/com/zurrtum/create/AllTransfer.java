@@ -48,15 +48,15 @@ import net.fabricmc.fabric.api.transfer.v1.item.ItemStorage;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
 import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
 import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.inventory.Inventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.Container;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -70,7 +70,7 @@ import java.util.function.Supplier;
 public class AllTransfer {
     public static final boolean DISABLE = !FabricLoader.getInstance().isModLoaded("fabric-transfer-api-v1");
     public static Map<Class<? extends SmartBlockEntity>, List<Function<? extends SmartBlockEntity, BlockEntityBehaviour<?>>>> ALL;
-    private static final Map<Storage<ItemVariant>, Inventory> WRAPPERS_ITEM = new MapMaker().weakValues().makeMap();
+    private static final Map<Storage<ItemVariant>, Container> WRAPPERS_ITEM = new MapMaker().weakValues().makeMap();
     private static final Map<Storage<FluidVariant>, FluidInventory> WRAPPERS_FLUID = new MapMaker().weakValues().makeMap();
 
     @SuppressWarnings("unchecked")
@@ -87,8 +87,8 @@ public class AllTransfer {
         }
     }
 
-    public static Supplier<Inventory> getCacheInventory(
-        ServerWorld world,
+    public static Supplier<Container> getCacheInventory(
+        ServerLevel world,
         BlockPos pos,
         Direction direction,
         BiPredicate<BlockEntity, Direction> filter
@@ -106,8 +106,8 @@ public class AllTransfer {
         };
     }
 
-    public static Inventory getInventory(
-        World world,
+    public static Container getInventory(
+        Level world,
         BlockPos pos,
         @Nullable BlockState state,
         @Nullable BlockEntity blockEntity,
@@ -124,7 +124,7 @@ public class AllTransfer {
     }
 
     public static boolean hasFluidInventory(
-        World world,
+        Level world,
         BlockPos pos,
         @Nullable BlockState state,
         @Nullable BlockEntity blockEntity,
@@ -136,7 +136,7 @@ public class AllTransfer {
         return FluidStorage.SIDED.find(world, pos, state, blockEntity, direction) != null;
     }
 
-    public static Supplier<FluidInventory> getCacheFluidInventory(ServerWorld world, BlockPos pos, Direction direction) {
+    public static Supplier<FluidInventory> getCacheFluidInventory(ServerLevel world, BlockPos pos, Direction direction) {
         if (DISABLE) {
             return null;
         }
@@ -151,7 +151,7 @@ public class AllTransfer {
     }
 
     public static FluidInventory getFluidInventory(
-        World world,
+        Level world,
         BlockPos pos,
         @Nullable BlockState state,
         @Nullable BlockEntity blockEntity,
@@ -190,7 +190,7 @@ public class AllTransfer {
         return FluidItemInventoryWrapper.of(inventory, context);
     }
 
-    private static <T extends SmartBlockEntity> void registerItemSide(Class<T> target, BlockEntityType<T> type, Function<T, Inventory> factory) {
+    private static <T extends SmartBlockEntity> void registerItemSide(Class<T> target, BlockEntityType<T> type, Function<T, Container> factory) {
         ALL.computeIfAbsent(target, t -> new ArrayList<>()).add((T be) -> new CachedInventoryBehaviour<>(be, factory));
         ItemStorage.SIDED.registerForBlockEntity(CachedInventoryBehaviour::get, type);
     }
@@ -198,7 +198,7 @@ public class AllTransfer {
     private static <T extends SmartBlockEntity> void registerItemSide(
         Class<T> target,
         BlockEntityType<T> type,
-        BiFunction<T, Direction, Inventory> factory
+        BiFunction<T, Direction, Container> factory
     ) {
         ALL.computeIfAbsent(target, t -> new ArrayList<>()).add((T be) -> new CachedDirectionInventoryBehaviour<>(be, factory));
         ItemStorage.SIDED.registerForBlockEntity(CachedDirectionInventoryBehaviour::get, type);
@@ -240,7 +240,7 @@ public class AllTransfer {
         registerItemSide(EjectorBlockEntity.class, AllBlockEntityTypes.WEIGHTED_EJECTOR, be -> be.depotBehaviour.itemHandler);
         registerItemSide(
             BeltBlockEntity.class, AllBlockEntityTypes.BELT, be -> {
-                if (!BeltBlock.canTransportObjects(be.getCachedState()))
+                if (!BeltBlock.canTransportObjects(be.getBlockState()))
                     return null;
                 if (!be.isRemoved() && be.itemHandler == null)
                     be.initializeItemHandler();
@@ -253,13 +253,13 @@ public class AllTransfer {
         registerItemSide(
             BeltTunnelBlockEntity.class, AllBlockEntityTypes.ANDESITE_TUNNEL, be -> {
                 if (be.cap == null) {
-                    World world = be.getWorld();
-                    BlockPos pos = be.getPos();
-                    BlockState state = world.getBlockState(pos.down());
-                    if (state.isOf(AllBlocks.BELT)) {
-                        BlockEntity beBelow = world.getBlockEntity(pos.down());
+                    Level world = be.getLevel();
+                    BlockPos pos = be.getBlockPos();
+                    BlockState state = world.getBlockState(pos.below());
+                    if (state.is(AllBlocks.BELT)) {
+                        BlockEntity beBelow = world.getBlockEntity(pos.below());
                         if (beBelow != null) {
-                            Inventory capBelow = ItemHelper.getInventory(world, pos.down(), state, beBelow, Direction.UP);
+                            Container capBelow = ItemHelper.getInventory(world, pos.below(), state, beBelow, Direction.UP);
                             if (capBelow != null) {
                                 be.cap = capBelow;
                             }

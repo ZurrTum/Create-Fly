@@ -1,5 +1,6 @@
 package com.zurrtum.create.client.content.equipment.goggles;
 
+import com.mojang.blaze3d.platform.Window;
 import com.zurrtum.create.AllBlocks;
 import com.zurrtum.create.AllItems;
 import com.zurrtum.create.api.equipment.goggles.IProxyHoveringInformation;
@@ -24,28 +25,27 @@ import com.zurrtum.create.content.contraptions.piston.MechanicalPistonBlock;
 import com.zurrtum.create.content.contraptions.piston.PistonExtensionPoleBlock;
 import com.zurrtum.create.content.equipment.goggles.GogglesItem;
 import com.zurrtum.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
-import net.minecraft.block.BlockState;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.Mouse;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.render.RenderTickCounter;
-import net.minecraft.client.util.Window;
-import net.minecraft.client.world.ClientWorld;
-import net.minecraft.item.ItemStack;
-import net.minecraft.screen.ScreenTexts;
-import net.minecraft.text.StringVisitable;
-import net.minecraft.text.Text;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.hit.HitResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.world.World;
 import org.joml.Matrix3x2fStack;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import net.minecraft.client.DeltaTracker;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.MouseHandler;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.network.chat.CommonComponents;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.FormattedText;
+import net.minecraft.util.Mth;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.HitResult;
 
 public class GoggleOverlayRenderer {
 
@@ -54,8 +54,8 @@ public class GoggleOverlayRenderer {
     public static int hoverTicks = 0;
     public static BlockPos lastHovered = null;
 
-    public static void renderOverlay(MinecraftClient mc, DrawContext guiGraphics, RenderTickCounter deltaTracker) {
-        HitResult objectMouseOver = mc.crosshairTarget;
+    public static void renderOverlay(Minecraft mc, GuiGraphics guiGraphics, DeltaTracker deltaTracker) {
+        HitResult objectMouseOver = mc.hitResult;
         if (!(objectMouseOver instanceof BlockHitResult result)) {
             lastHovered = null;
             hoverTicks = 0;
@@ -70,7 +70,7 @@ public class GoggleOverlayRenderer {
                 return;
         }
 
-        ClientWorld world = mc.world;
+        ClientLevel world = mc.level;
         BlockPos pos = result.getBlockPos();
 
         int prevHoverTicks = hoverTicks;
@@ -82,7 +82,7 @@ public class GoggleOverlayRenderer {
         TooltipBehaviour<?> be = BlockEntityBehaviour.get(world, pos, TooltipBehaviour.TYPE);
         boolean wearingGoggles = GogglesItem.isWearingGoggles(mc.player);
 
-        boolean isShifting = mc.player.isSneaking();
+        boolean isShifting = mc.player.isShiftKeyDown();
 
         boolean hasGoggleInformation = be instanceof IHaveGoggleInformation;
         boolean hasHoveringInformation = be instanceof IHaveHoveringInformation;
@@ -91,7 +91,7 @@ public class GoggleOverlayRenderer {
         boolean hoverAddedInformation = false;
 
         ItemStack item = new ItemStack(AllItems.GOGGLES);
-        List<Text> tooltip = new ArrayList<>();
+        List<Component> tooltip = new ArrayList<>();
 
         if (be instanceof IHaveCustomOverlayIcon customOverlayIcon)
             item = customOverlayIcon.getIcon(isShifting);
@@ -103,7 +103,7 @@ public class GoggleOverlayRenderer {
 
         if (hasHoveringInformation) {
             if (!tooltip.isEmpty())
-                tooltip.add(ScreenTexts.EMPTY);
+                tooltip.add(CommonComponents.EMPTY);
             IHaveHoveringInformation hte = (IHaveHoveringInformation) be;
             hoverAddedInformation = hte.addToTooltip(tooltip, isShifting);
 
@@ -131,14 +131,14 @@ public class GoggleOverlayRenderer {
 
         // check for piston poles if goggles are worn
         BlockState state = world.getBlockState(pos);
-        if (wearingGoggles && state.isOf(AllBlocks.PISTON_EXTENSION_POLE)) {
-            Direction[] directions = Iterate.directionsInAxis(state.get(PistonExtensionPoleBlock.FACING).getAxis());
+        if (wearingGoggles && state.is(AllBlocks.PISTON_EXTENSION_POLE)) {
+            Direction[] directions = Iterate.directionsInAxis(state.getValue(PistonExtensionPoleBlock.FACING).getAxis());
             int poles = 1;
             boolean pistonFound = false;
             for (Direction dir : directions) {
                 int attachedPoles = PistonExtensionPoleBlock.PlacementHelper.get().attachedPoles(world, pos, dir);
                 poles += attachedPoles;
-                pistonFound |= world.getBlockState(pos.offset(dir, attachedPoles + 1)).getBlock() instanceof MechanicalPistonBlock;
+                pistonFound |= world.getBlockState(pos.relative(dir, attachedPoles + 1)).getBlock() instanceof MechanicalPistonBlock;
             }
 
             if (!pistonFound) {
@@ -146,7 +146,7 @@ public class GoggleOverlayRenderer {
                 return;
             }
             if (!tooltip.isEmpty())
-                tooltip.add(ScreenTexts.EMPTY);
+                tooltip.add(CommonComponents.EMPTY);
 
             CreateLang.translate("gui.goggles.pole_length").text(" " + poles).forGoggles(tooltip);
         }
@@ -156,12 +156,12 @@ public class GoggleOverlayRenderer {
             return;
         }
 
-        Matrix3x2fStack poseStack = guiGraphics.getMatrices();
+        Matrix3x2fStack poseStack = guiGraphics.pose();
         poseStack.pushMatrix();
 
         int tooltipTextWidth = 0;
-        for (StringVisitable textLine : tooltip) {
-            int textLineWidth = mc.textRenderer.getWidth(textLine);
+        for (FormattedText textLine : tooltip) {
+            int textLineWidth = mc.font.width(textLine);
             if (textLineWidth > tooltipTextWidth)
                 tooltipTextWidth = textLineWidth;
         }
@@ -172,8 +172,8 @@ public class GoggleOverlayRenderer {
             tooltipHeight += (tooltip.size() - 1) * 10;
         }
 
-        int width = guiGraphics.getScaledWindowWidth();
-        int height = guiGraphics.getScaledWindowHeight();
+        int width = guiGraphics.guiWidth();
+        int height = guiGraphics.guiHeight();
 
         CClient cfg = AllConfigs.client();
         int posX = width / 2 + cfg.overlayOffsetX.get();
@@ -182,7 +182,7 @@ public class GoggleOverlayRenderer {
         posX = Math.min(posX, width - tooltipTextWidth - 20);
         posY = Math.min(posY, height - tooltipHeight - 20);
 
-        float fade = MathHelper.clamp((hoverTicks + deltaTracker.getTickProgress(false)) / 24f, 0, 1);
+        float fade = Mth.clamp((hoverTicks + deltaTracker.getGameTimeDeltaPartialTick(false)) / 24f, 0, 1);
         Boolean useCustom = cfg.overlayCustomColor.get();
         Color colorBackground = useCustom ? new Color(cfg.overlayBackgroundColor.get()) : BoxElement.COLOR_VANILLA_BACKGROUND.scaleAlpha(.75f);
         Color colorBorderTop = useCustom ? new Color(cfg.overlayBorderColorTop.get()) : BoxElement.COLOR_VANILLA_BORDER.getFirst().copy();
@@ -225,13 +225,13 @@ public class GoggleOverlayRenderer {
          *
          * this is a workaround to fix this behavior
          */
-        Mouse mouseHandler = mc.mouse;
+        MouseHandler mouseHandler = mc.mouseHandler;
         Window window = mc.getWindow();
-        double guiScale = window.getScaleFactor();
-        double cursorX = mouseHandler.getX();
-        double cursorY = mouseHandler.getY();
-        mouseHandler.x = Math.round(cursorX / guiScale) * guiScale;
-        mouseHandler.y = Math.round(cursorY / guiScale) * guiScale;
+        double guiScale = window.getGuiScale();
+        double cursorX = mouseHandler.xpos();
+        double cursorY = mouseHandler.ypos();
+        mouseHandler.xpos = Math.round(cursorX / guiScale) * guiScale;
+        mouseHandler.ypos = Math.round(cursorY / guiScale) * guiScale;
 
         RemovedGuiUtils.drawHoveringText(
             guiGraphics,
@@ -244,18 +244,18 @@ public class GoggleOverlayRenderer {
             colorBackground.getRGB(),
             colorBorderTop.getRGB(),
             colorBorderBot.getRGB(),
-            mc.textRenderer
+            mc.font
         );
 
-        guiGraphics.drawItem(item, posX + 10, posY - 16);
+        guiGraphics.renderItem(item, posX + 10, posY - 16);
 
-        mouseHandler.x = cursorX;
-        mouseHandler.y = cursorY;
+        mouseHandler.xpos = cursorX;
+        mouseHandler.ypos = cursorY;
         poseStack.popMatrix();
 
     }
 
-    public static BlockPos proxiedOverlayPosition(World level, BlockPos pos) {
+    public static BlockPos proxiedOverlayPosition(Level level, BlockPos pos) {
         BlockState targetedState = level.getBlockState(pos);
         if (targetedState.getBlock() instanceof IProxyHoveringInformation proxy)
             return proxy.getInformationSource(level, pos, targetedState);

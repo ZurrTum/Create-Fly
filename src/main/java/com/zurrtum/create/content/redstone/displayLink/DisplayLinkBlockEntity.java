@@ -12,24 +12,23 @@ import com.zurrtum.create.content.logistics.factoryBoard.FactoryPanelPosition;
 import com.zurrtum.create.content.logistics.factoryBoard.FactoryPanelSupportBehaviour;
 import com.zurrtum.create.foundation.advancement.CreateTrigger;
 import com.zurrtum.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.storage.ReadView;
-import net.minecraft.storage.WriteView;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Vec3d;
-
 import java.util.List;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
+import net.minecraft.world.phys.Vec3;
 
 public class DisplayLinkBlockEntity extends LinkWithBulbBlockEntity implements TransformableBlockEntity {
 
     public BlockPos targetOffset;
 
     public DisplaySource activeSource;
-    private NbtCompound sourceConfig;
+    private CompoundTag sourceConfig;
 
     public DisplayTarget activeTarget;
     public int targetLine;
@@ -41,8 +40,8 @@ public class DisplayLinkBlockEntity extends LinkWithBulbBlockEntity implements T
 
     public DisplayLinkBlockEntity(BlockPos pos, BlockState state) {
         super(AllBlockEntityTypes.DISPLAY_LINK, pos, state);
-        targetOffset = BlockPos.ORIGIN;
-        sourceConfig = new NbtCompound();
+        targetOffset = BlockPos.ZERO;
+        sourceConfig = new CompoundTag();
         targetLine = 0;
     }
 
@@ -77,7 +76,7 @@ public class DisplayLinkBlockEntity extends LinkWithBulbBlockEntity implements T
             return;
         if (activeSource == null)
             return;
-        if (world.isClient())
+        if (level.isClientSide())
             return;
 
         refreshTicks++;
@@ -88,9 +87,9 @@ public class DisplayLinkBlockEntity extends LinkWithBulbBlockEntity implements T
 
     public void tickSource() {
         refreshTicks = 0;
-        if (getCachedState().get(DisplayLinkBlock.POWERED, true))
+        if (getBlockState().getValueOrElse(DisplayLinkBlock.POWERED, true))
             return;
-        if (!world.isClient())
+        if (!level.isClientSide())
             updateGatheredData();
     }
 
@@ -98,7 +97,7 @@ public class DisplayLinkBlockEntity extends LinkWithBulbBlockEntity implements T
         if (activeSource == null)
             return;
         refreshTicks = 0;
-        activeSource.onSignalReset(new DisplayLinkContext(world, this));
+        activeSource.onSignalReset(new DisplayLinkContext(level, this));
         updateGatheredData();
     }
 
@@ -106,11 +105,11 @@ public class DisplayLinkBlockEntity extends LinkWithBulbBlockEntity implements T
         BlockPos sourcePosition = getSourcePosition();
         BlockPos targetPosition = getTargetPosition();
 
-        if (!world.isPosLoaded(targetPosition) || !world.isPosLoaded(sourcePosition))
+        if (!level.isLoaded(targetPosition) || !level.isLoaded(sourcePosition))
             return;
 
-        DisplayTarget target = DisplayTarget.get(world, targetPosition);
-        List<DisplaySource> sources = DisplaySource.getAll(world, sourcePosition);
+        DisplayTarget target = DisplayTarget.get(level, targetPosition);
+        List<DisplaySource> sources = DisplaySource.getAll(level, sourcePosition);
         boolean notify = false;
 
         if (activeTarget != target) {
@@ -120,7 +119,7 @@ public class DisplayLinkBlockEntity extends LinkWithBulbBlockEntity implements T
 
         if (activeSource != null && !sources.contains(activeSource)) {
             activeSource = null;
-            sourceConfig = new NbtCompound();
+            sourceConfig = new CompoundTag();
             notify = true;
         }
 
@@ -129,7 +128,7 @@ public class DisplayLinkBlockEntity extends LinkWithBulbBlockEntity implements T
         if (activeSource == null || activeTarget == null)
             return;
 
-        DisplayLinkContext context = new DisplayLinkContext(world, this);
+        DisplayLinkContext context = new DisplayLinkContext(level, this);
         activeSource.transferData(context, activeTarget, targetLine);
         sendPulseNextSync();
         sendData();
@@ -138,49 +137,49 @@ public class DisplayLinkBlockEntity extends LinkWithBulbBlockEntity implements T
     }
 
     @Override
-    public void writeSafe(WriteView view) {
+    public void writeSafe(ValueOutput view) {
         super.writeSafe(view);
         writeGatheredData(view);
     }
 
     @Override
-    protected void write(WriteView view, boolean clientPacket) {
+    protected void write(ValueOutput view, boolean clientPacket) {
         super.write(view, clientPacket);
         writeGatheredData(view);
         if (clientPacket && activeTarget != null) {
-            Identifier id = CreateRegistries.DISPLAY_TARGET.getId(this.activeTarget);
+            ResourceLocation id = CreateRegistries.DISPLAY_TARGET.getKey(this.activeTarget);
             if (id != null) {
-                view.put("TargetType", Identifier.CODEC, id);
+                view.store("TargetType", ResourceLocation.CODEC, id);
             }
         }
     }
 
-    private void writeGatheredData(WriteView view) {
-        view.put("TargetOffset", BlockPos.CODEC, targetOffset);
+    private void writeGatheredData(ValueOutput view) {
+        view.store("TargetOffset", BlockPos.CODEC, targetOffset);
         view.putInt("TargetLine", targetLine);
 
         if (activeSource != null) {
-            NbtCompound data = sourceConfig.copy();
-            Identifier id = CreateRegistries.DISPLAY_SOURCE.getId(this.activeSource);
+            CompoundTag data = sourceConfig.copy();
+            ResourceLocation id = CreateRegistries.DISPLAY_SOURCE.getKey(this.activeSource);
             if (id != null) {
-                data.put("Id", Identifier.CODEC, id);
+                data.store("Id", ResourceLocation.CODEC, id);
             }
-            view.put("Source", NbtCompound.CODEC, data);
+            view.store("Source", CompoundTag.CODEC, data);
         }
     }
 
     @Override
-    protected void read(ReadView view, boolean clientPacket) {
+    protected void read(ValueInput view, boolean clientPacket) {
         super.read(view, clientPacket);
-        targetOffset = view.read("TargetOffset", BlockPos.CODEC).orElse(BlockPos.ORIGIN);
-        targetLine = view.getInt("TargetLine", 0);
+        targetOffset = view.read("TargetOffset", BlockPos.CODEC).orElse(BlockPos.ZERO);
+        targetLine = view.getIntOr("TargetLine", 0);
 
         if (clientPacket) {
-            view.read("TargetType", Identifier.CODEC).ifPresent(id -> activeTarget = DisplayTarget.get(id));
+            view.read("TargetType", ResourceLocation.CODEC).ifPresent(id -> activeTarget = DisplayTarget.get(id));
         }
-        view.read("Source", NbtCompound.CODEC).ifPresent(data -> {
-            activeSource = DisplaySource.get(data.get("Id", Identifier.CODEC).orElse(null));
-            sourceConfig = activeSource != null ? data.copy() : new NbtCompound();
+        view.read("Source", CompoundTag.CODEC).ifPresent(data -> {
+            activeSource = DisplaySource.get(data.read("Id", ResourceLocation.CODEC).orElse(null));
+            sourceConfig = activeSource != null ? data.copy() : new CompoundTag();
         });
     }
 
@@ -192,37 +191,37 @@ public class DisplayLinkBlockEntity extends LinkWithBulbBlockEntity implements T
     //    }
 
     public void target(BlockPos targetPosition) {
-        this.targetOffset = targetPosition.subtract(pos);
+        this.targetOffset = targetPosition.subtract(worldPosition);
     }
 
     public BlockPos getSourcePosition() {
         for (FactoryPanelPosition position : factoryPanelSupport.getLinkedPanels())
             return position.pos();
-        return pos.offset(getDirection());
+        return worldPosition.relative(getDirection());
     }
 
-    public NbtCompound getSourceConfig() {
+    public CompoundTag getSourceConfig() {
         return sourceConfig;
     }
 
-    public void setSourceConfig(NbtCompound sourceConfig) {
+    public void setSourceConfig(CompoundTag sourceConfig) {
         this.sourceConfig = sourceConfig;
     }
 
     public Direction getDirection() {
-        return getCachedState().get(DisplayLinkBlock.FACING, Direction.UP).getOpposite();
+        return getBlockState().getValueOrElse(DisplayLinkBlock.FACING, Direction.UP).getOpposite();
     }
 
     public BlockPos getTargetPosition() {
-        return pos.add(targetOffset);
+        return worldPosition.offset(targetOffset);
     }
 
-    private static final Vec3d bulbOffset = VecHelper.voxelSpace(11, 7, 5);
-    private static final Vec3d bulbOffsetVertical = VecHelper.voxelSpace(5, 7, 11);
+    private static final Vec3 bulbOffset = VecHelper.voxelSpace(11, 7, 5);
+    private static final Vec3 bulbOffsetVertical = VecHelper.voxelSpace(5, 7, 11);
 
     @Override
-    public Vec3d getBulbOffset(BlockState state) {
-        if (state.get(DisplayLinkBlock.FACING, Direction.UP).getAxis().isVertical())
+    public Vec3 getBulbOffset(BlockState state) {
+        if (state.getValueOrElse(DisplayLinkBlock.FACING, Direction.UP).getAxis().isVertical())
             return bulbOffsetVertical;
         return bulbOffset;
     }

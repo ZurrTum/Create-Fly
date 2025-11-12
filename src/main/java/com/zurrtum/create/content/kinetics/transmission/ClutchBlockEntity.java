@@ -1,10 +1,10 @@
 package com.zurrtum.create.content.kinetics.transmission;
 
 import com.zurrtum.create.AllBlockEntityTypes;
-import net.minecraft.block.BlockState;
-import net.minecraft.state.property.Properties;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 
 public class ClutchBlockEntity extends SplitShaftBlockEntity {
 
@@ -15,7 +15,7 @@ public class ClutchBlockEntity extends SplitShaftBlockEntity {
     @Override
     public float getRotationSpeedModifier(Direction face) {
         if (hasSource()) {
-            if (face != getSourceFacing() && getCachedState().get(Properties.POWERED))
+            if (face != getSourceFacing() && getBlockState().getValue(BlockStateProperties.POWERED))
                 return 0;
         }
         return 1;

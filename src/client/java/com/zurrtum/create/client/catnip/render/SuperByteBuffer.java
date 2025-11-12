@@ -1,30 +1,30 @@
 package com.zurrtum.create.client.catnip.render;
 
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.zurrtum.create.catnip.theme.Color;
 import com.zurrtum.create.client.flywheel.lib.transform.TransformStack;
-import net.minecraft.client.render.LightmapTextureManager;
-import net.minecraft.client.render.VertexConsumer;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.util.math.Direction;
-import net.minecraft.world.BlockRenderView;
+import net.minecraft.client.renderer.LightTexture;
+import net.minecraft.core.Direction;
+import net.minecraft.world.level.BlockAndTintGetter;
 import org.joml.Matrix4f;
 
 @SuppressWarnings({"UnusedReturnValue", "unused", "unchecked"})
 public interface SuperByteBuffer extends TransformStack<SuperByteBuffer> {
 
     static int maxLight(int packedLight1, int packedLight2) {
-        int blockLight1 = LightmapTextureManager.getBlockLightCoordinates(packedLight1);
-        int skyLight1 = LightmapTextureManager.getSkyLightCoordinates(packedLight1);
-        int blockLight2 = LightmapTextureManager.getBlockLightCoordinates(packedLight2);
-        int skyLight2 = LightmapTextureManager.getSkyLightCoordinates(packedLight2);
-        return LightmapTextureManager.pack(Math.max(blockLight1, blockLight2), Math.max(skyLight1, skyLight2));
+        int blockLight1 = LightTexture.block(packedLight1);
+        int skyLight1 = LightTexture.sky(packedLight1);
+        int blockLight2 = LightTexture.block(packedLight2);
+        int skyLight2 = LightTexture.sky(packedLight2);
+        return LightTexture.pack(Math.max(blockLight1, blockLight2), Math.max(skyLight1, skyLight2));
     }
 
-    void renderInto(MatrixStack.Entry entry, VertexConsumer consumer);
+    void renderInto(PoseStack.Pose entry, VertexConsumer consumer);
 
     boolean isEmpty();
 
-    MatrixStack getTransforms();
+    PoseStack getTransforms();
 
     <Self extends SuperByteBuffer> Self reset();
 
@@ -47,13 +47,13 @@ public interface SuperByteBuffer extends TransformStack<SuperByteBuffer> {
     /**
      * Indicate that this buffer should look up the light coordinates in the level.
      */
-    <Self extends SuperByteBuffer> Self useLevelLight(BlockRenderView level);
+    <Self extends SuperByteBuffer> Self useLevelLight(BlockAndTintGetter level);
 
     /**
      * Indicate that this buffer should look up the light coordinates in the level.
      * Light Positions will be transformed by the passed Matrix before the lookup.
      */
-    <Self extends SuperByteBuffer> Self useLevelLight(BlockRenderView level, Matrix4f lightTransform);
+    <Self extends SuperByteBuffer> Self useLevelLight(BlockAndTintGetter level, Matrix4f lightTransform);
 
     //
 

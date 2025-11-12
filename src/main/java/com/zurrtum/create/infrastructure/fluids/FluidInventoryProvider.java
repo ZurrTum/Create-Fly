@@ -1,22 +1,22 @@
 package com.zurrtum.create.infrastructure.fluids;
 
 import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.world.WorldAccess;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.Nullable;
 
 public interface FluidInventoryProvider<T extends SmartBlockEntity> {
-    default FluidInventory getFluidInventory(BlockState state, WorldAccess world, BlockPos pos) {
+    default FluidInventory getFluidInventory(BlockState state, LevelAccessor world, BlockPos pos) {
         return getFluidInventory(state, world, pos, null, null);
     }
 
     @SuppressWarnings("unchecked")
     default FluidInventory getFluidInventory(
         @Nullable BlockState state,
-        WorldAccess world,
+        LevelAccessor world,
         BlockPos pos,
         @Nullable BlockEntity blockEntity,
         Direction context
@@ -33,7 +33,7 @@ public interface FluidInventoryProvider<T extends SmartBlockEntity> {
             }
         } else {
             if (state == null) {
-                state = blockEntity.getCachedState();
+                state = blockEntity.getBlockState();
             }
         }
         Class<T> expectedClass = getBlockEntityClass();
@@ -44,5 +44,5 @@ public interface FluidInventoryProvider<T extends SmartBlockEntity> {
 
     Class<T> getBlockEntityClass();
 
-    FluidInventory getFluidInventory(WorldAccess world, BlockPos pos, BlockState state, T blockEntity, Direction context);
+    FluidInventory getFluidInventory(LevelAccessor world, BlockPos pos, BlockState state, T blockEntity, Direction context);
 }

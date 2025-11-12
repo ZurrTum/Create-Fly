@@ -6,20 +6,20 @@ import com.zurrtum.create.content.redstone.displayLink.DisplayLinkBlockEntity;
 import com.zurrtum.create.content.redstone.displayLink.DisplayLinkContext;
 import com.zurrtum.create.content.redstone.displayLink.target.DisplayTargetStats;
 import com.zurrtum.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
-import net.minecraft.item.ItemStack;
-import net.minecraft.text.MutableText;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.world.item.ItemStack;
 import org.apache.commons.lang3.mutable.MutableObject;
 
 public class ItemNameDisplaySource extends SingleLineDisplaySource {
     @Override
-    protected MutableText provideLine(DisplayLinkContext context, DisplayTargetStats stats) {
+    protected MutableComponent provideLine(DisplayLinkContext context, DisplayTargetStats stats) {
         DisplayLinkBlockEntity gatherer = context.blockEntity();
         Direction direction = gatherer.getDirection();
-        BlockPos.Mutable pos = gatherer.getSourcePosition().mutableCopy();
+        BlockPos.MutableBlockPos pos = gatherer.getSourcePosition().mutable();
 
-        MutableText combined = EMPTY_LINE.copy();
+        MutableComponent combined = EMPTY_LINE.copy();
 
         for (int i = 0; i < 32; i++) {
             TransportedItemStackHandlerBehaviour behaviour = BlockEntityBehaviour.get(
@@ -42,7 +42,7 @@ public class ItemNameDisplaySource extends SingleLineDisplaySource {
 
             ItemStack stack = stackHolder.getValue();
             if (stack != null && !stack.isEmpty())
-                combined = combined.append(stack.getName());
+                combined = combined.append(stack.getHoverName());
         }
 
         return combined;

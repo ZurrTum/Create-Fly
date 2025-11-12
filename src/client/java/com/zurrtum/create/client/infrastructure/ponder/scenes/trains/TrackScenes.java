@@ -13,12 +13,12 @@ import com.zurrtum.create.client.ponder.api.scene.SceneBuildingUtil;
 import com.zurrtum.create.client.ponder.api.scene.Selection;
 import com.zurrtum.create.content.processing.burner.BlazeBurnerBlock;
 import com.zurrtum.create.content.processing.burner.BlazeBurnerBlockEntity;
-import net.minecraft.block.Blocks;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
 
 import java.util.List;
 
@@ -49,18 +49,18 @@ public class TrackScenes {
         scene.world().moveSection(fgTrack, util.vector().of(0, -2, 0), 0);
         scene.idle(20);
 
-        Vec3d startTrack = util.vector().topOf(3, 0, 5);
+        Vec3 startTrack = util.vector().topOf(3, 0, 5);
         scene.overlay().showText(70).pointAt(startTrack).placeNearTarget().colored(PonderPalette.GREEN).attachKeyFrame()
             .text("To place rows of track in bulk, click on an existing track");
         scene.idle(30);
 
-        ItemStack trackStack = AllItems.TRACK.getDefaultStack();
+        ItemStack trackStack = AllItems.TRACK.getDefaultInstance();
 
         scene.overlay().showControls(startTrack, Pointing.DOWN, 40).rightClick().withItem(trackStack);
 
         scene.overlay().showControls(startTrack, Pointing.DOWN, 40).rightClick().withItem(trackStack);
         scene.idle(6);
-        Box bb = new Box(util.grid().at(3, 1, 5)).shrink(0, .75f, 0).expand(0, 0, .85f);
+        AABB bb = new AABB(util.grid().at(3, 1, 5)).contract(0, .75f, 0).inflate(0, 0, .85f);
         scene.overlay().chaseBoundingBoxOutline(PonderPalette.GREEN, startTrack, bb, 32);
         scene.idle(45);
 
@@ -69,7 +69,7 @@ public class TrackScenes {
         scene.overlay().showText(40).pointAt(util.vector().topOf(12, 0, 5)).placeNearTarget().colored(PonderPalette.GREEN)
             .text("Then place or select a second track");
         scene.idle(20);
-        scene.overlay().chaseBoundingBoxOutline(PonderPalette.GREEN, startTrack, bb.stretch(9, 0, 0), 30);
+        scene.overlay().chaseBoundingBoxOutline(PonderPalette.GREEN, startTrack, bb.expandTowards(9, 0, 0), 30);
 
         scene.world().showSectionAndMerge(util.select().fromTo(12, 3, 5, 4, 3, 5), Direction.WEST, fgTrack);
         scene.idle(55);
@@ -114,10 +114,10 @@ public class TrackScenes {
         scene.world().hideSection(util.select().fromTo(12, 1, 2, 12, 1, 5), Direction.NORTH);
         scene.world().hideSection(util.select().fromTo(5, 1, 12, 2, 1, 12), Direction.WEST);
 
-        bb = new Box(util.grid().at(5, 1, 5)).shrink(0, .75f, 0).expand(3, 0, 3).stretch(.85f, 0, .85f);
+        bb = new AABB(util.grid().at(5, 1, 5)).contract(0, .75f, 0).inflate(3, 0, 3).expandTowards(.85f, 0, .85f);
         scene.overlay().chaseBoundingBoxOutline(PonderPalette.GREEN, startTrack, bb, 32);
         scene.idle(20);
-        scene.overlay().chaseBoundingBoxOutline(PonderPalette.GREEN, startTrack, bb.offset(4, 0, 4), 32);
+        scene.overlay().chaseBoundingBoxOutline(PonderPalette.GREEN, startTrack, bb.move(4, 0, 4), 32);
         scene.idle(30);
 
         scene.world().hideSection(util.select().fromTo(12, 1, 6, 6, 1, 12), Direction.UP);
@@ -195,7 +195,7 @@ public class TrackScenes {
 
         scene.overlay().showControls(util.vector().topOf(12, 1, 3), Pointing.LEFT, 30).withItem(trackStack);
         scene.idle(4);
-        smoothStone = AllItems.METAL_GIRDER.getDefaultStack();
+        smoothStone = AllItems.METAL_GIRDER.getDefaultInstance();
         scene.overlay().showControls(util.vector().topOf(12, 1, 3), Pointing.RIGHT, 26).withItem(smoothStone);
         scene.idle(30);
 
@@ -342,7 +342,7 @@ public class TrackScenes {
         scene.idle(10);
         scene.world().hideIndependentSection(trainElement, null);
         scene.idle(5);
-        scene.overlay().chaseBoundingBoxOutline(PonderPalette.BLUE, trainElement, new Box(util.grid().at(4, 2, 4)).expand(1, .75f, .5f), 280);
+        scene.overlay().chaseBoundingBoxOutline(PonderPalette.BLUE, trainElement, new AABB(util.grid().at(4, 2, 4)).inflate(1, .75f, .5f), 280);
 
         scene.idle(15);
         scene.overlay().showText(60).pointAt(util.vector().blockSurface(util.grid().at(3, 2, 4), Direction.WEST)).placeNearTarget()

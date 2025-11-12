@@ -1,10 +1,10 @@
 package com.zurrtum.create.api.schematic.nbt;
 
 import com.zurrtum.create.api.registry.SimpleRegistry;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.registry.RegistryWrapper;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 
 /**
  * Registry for safe NBT writers, used for filtering unsafe BlockEntity data out of schematics.
@@ -23,7 +23,7 @@ public class SafeNbtWriterRegistry {
          *
          * @param tag the NBT tag to write to
          */
-        void writeSafe(BlockEntity be, NbtCompound tag, RegistryWrapper.WrapperLookup registries);
+        void writeSafe(BlockEntity be, CompoundTag tag, HolderLookup.Provider registries);
     }
 
     private SafeNbtWriterRegistry() {

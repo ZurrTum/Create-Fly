@@ -6,13 +6,13 @@ import com.zurrtum.create.foundation.blockEntity.behaviour.BehaviourType;
 import com.zurrtum.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.foundation.blockEntity.behaviour.ValueSettings;
 import com.zurrtum.create.foundation.blockEntity.behaviour.ValueSettingsHandleBehaviour;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.storage.ReadView;
-import net.minecraft.storage.WriteView;
-import net.minecraft.util.Hand;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.MathHelper;
+import net.minecraft.core.Direction;
+import net.minecraft.util.Mth;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
+import net.minecraft.world.phys.BlockHitResult;
 
 import java.util.function.Consumer;
 
@@ -34,12 +34,12 @@ public class ServerScrollValueBehaviour extends BlockEntityBehaviour<SmartBlockE
     }
 
     public void setValue(int value) {
-        value = MathHelper.clamp(value, min, max);
+        value = Mth.clamp(value, min, max);
         if (value == this.value)
             return;
         this.value = value;
         callback.accept(value);
-        blockEntity.markDirty();
+        blockEntity.setChanged();
         blockEntity.sendData();
     }
 
@@ -57,14 +57,14 @@ public class ServerScrollValueBehaviour extends BlockEntityBehaviour<SmartBlockE
     }
 
     @Override
-    public void write(WriteView view, boolean clientPacket) {
+    public void write(ValueOutput view, boolean clientPacket) {
         view.putInt("ScrollValue", value);
         super.write(view, clientPacket);
     }
 
     @Override
-    public void read(ReadView view, boolean clientPacket) {
-        value = view.getInt("ScrollValue", 0);
+    public void read(ValueInput view, boolean clientPacket) {
+        value = view.getIntOr("ScrollValue", 0);
         super.read(view, clientPacket);
     }
 
@@ -80,13 +80,13 @@ public class ServerScrollValueBehaviour extends BlockEntityBehaviour<SmartBlockE
     }
 
     @Override
-    public void onShortInteract(PlayerEntity player, Hand hand, Direction side, BlockHitResult hitResult) {
+    public void onShortInteract(Player player, InteractionHand hand, Direction side, BlockHitResult hitResult) {
         if (FakePlayerHandler.has(player))
-            blockEntity.getCachedState().onUseWithItem(player.getStackInHand(hand), getWorld(), player, hand, hitResult);
+            blockEntity.getBlockState().useItemOn(player.getItemInHand(hand), getLevel(), player, hand, hitResult);
     }
 
     @Override
-    public void setValueSettings(PlayerEntity player, ValueSettings valueSetting, boolean ctrlDown) {
+    public void setValueSettings(Player player, ValueSettings valueSetting, boolean ctrlDown) {
         if (valueSetting.equals(getValueSettings()))
             return;
         setValue(valueSetting.value());

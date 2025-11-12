@@ -3,24 +3,23 @@ package com.zurrtum.create.client.ponder.api.scene;
 import com.zurrtum.create.client.ponder.api.element.ElementLink;
 import com.zurrtum.create.client.ponder.api.element.EntityElement;
 import com.zurrtum.create.client.ponder.api.element.WorldSectionElement;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.entity.Entity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.registry.RegistryWrapper;
-import net.minecraft.state.property.Property;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.World;
-
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.UnaryOperator;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.Property;
+import net.minecraft.world.phys.Vec3;
 
 public interface WorldInstructions {
-    RegistryWrapper.WrapperLookup getHolderLookupProvider();
+    HolderLookup.Provider getHolderLookupProvider();
 
     void incrementBlockBreakingProgress(BlockPos pos);
 
@@ -44,11 +43,11 @@ public interface WorldInstructions {
 
     void rotateSection(ElementLink<WorldSectionElement> link, double xRotation, double yRotation, double zRotation, int duration);
 
-    void configureCenterOfRotation(ElementLink<WorldSectionElement> link, Vec3d anchor);
+    void configureCenterOfRotation(ElementLink<WorldSectionElement> link, Vec3 anchor);
 
-    void configureStabilization(ElementLink<WorldSectionElement> link, Vec3d anchor);
+    void configureStabilization(ElementLink<WorldSectionElement> link, Vec3 anchor);
 
-    void moveSection(ElementLink<WorldSectionElement> link, Vec3d offset, int duration);
+    void moveSection(ElementLink<WorldSectionElement> link, Vec3 offset, int duration);
 
     void setBlocks(Selection selection, BlockState state, boolean spawnParticles);
 
@@ -72,13 +71,13 @@ public interface WorldInstructions {
 
     void modifyEntity(ElementLink<EntityElement> link, Consumer<Entity> entityCallBack);
 
-    ElementLink<EntityElement> createEntity(Function<World, Entity> factory);
+    ElementLink<EntityElement> createEntity(Function<Level, Entity> factory);
 
-    ElementLink<EntityElement> createItemEntity(Vec3d location, Vec3d motion, ItemStack stack);
+    ElementLink<EntityElement> createItemEntity(Vec3 location, Vec3 motion, ItemStack stack);
 
-    void modifyBlockEntityNBT(Selection selection, Class<? extends BlockEntity> beType, Consumer<NbtCompound> consumer);
+    void modifyBlockEntityNBT(Selection selection, Class<? extends BlockEntity> beType, Consumer<CompoundTag> consumer);
 
     <T extends BlockEntity> void modifyBlockEntity(BlockPos position, Class<T> beType, Consumer<T> consumer);
 
-    void modifyBlockEntityNBT(Selection selection, Class<? extends BlockEntity> teType, Consumer<NbtCompound> consumer, boolean reDrawBlocks);
+    void modifyBlockEntityNBT(Selection selection, Class<? extends BlockEntity> teType, Consumer<CompoundTag> consumer, boolean reDrawBlocks);
 }

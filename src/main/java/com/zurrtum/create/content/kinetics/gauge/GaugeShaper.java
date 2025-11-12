@@ -2,11 +2,10 @@ package com.zurrtum.create.content.kinetics.gauge;
 
 import com.zurrtum.create.AllShapes;
 import com.zurrtum.create.catnip.math.VoxelShaper;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.shape.VoxelShape;
-
 import java.util.Arrays;
+import net.minecraft.core.Direction;
+import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.phys.shapes.VoxelShape;
 
 public class GaugeShaper extends VoxelShaper {
 
@@ -15,7 +14,7 @@ public class GaugeShaper extends VoxelShaper {
     static GaugeShaper make() {
         GaugeShaper shaper = new GaugeShaper();
         shaper.axisFalse = forDirectional(AllShapes.GAUGE_SHAPE_UP, Direction.UP);
-        shaper.axisTrue = forDirectional(rotatedCopy(AllShapes.GAUGE_SHAPE_UP, new Vec3d(0, 90, 0)), Direction.UP);
+        shaper.axisTrue = forDirectional(rotatedCopy(AllShapes.GAUGE_SHAPE_UP, new Vec3(0, 90, 0)), Direction.UP);
         //shapes for X axis need to be swapped
         Arrays.asList(Direction.EAST, Direction.WEST).forEach(direction -> {
             VoxelShape mem = shaper.axisFalse.get(direction);

@@ -14,11 +14,11 @@ import com.zurrtum.create.client.ponder.api.scene.Selection;
 import com.zurrtum.create.content.logistics.box.PackageItem;
 import com.zurrtum.create.content.logistics.box.PackageStyles;
 import com.zurrtum.create.content.logistics.packagePort.postbox.PostboxBlockEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
 
 import java.util.List;
 
@@ -68,16 +68,16 @@ public class PostboxScenes {
         scene.world().showSectionAndMerge(stationS, Direction.DOWN, base);
         scene.idle(15);
 
-        Vec3d fromTarget = util.vector().topOf(station);
+        Vec3 fromTarget = util.vector().topOf(station);
 
-        ItemStack postboxItem = AllItems.WHITE_POSTBOX.getDefaultStack();
+        ItemStack postboxItem = AllItems.WHITE_POSTBOX.getDefaultInstance();
         scene.overlay().showControls(fromTarget, Pointing.DOWN, 50).rightClick().withItem(postboxItem);
         scene.idle(5);
 
-        Box bb1 = new Box(fromTarget, fromTarget);
+        AABB bb1 = new AABB(fromTarget, fromTarget);
         scene.overlay().chaseBoundingBoxOutline(PonderPalette.WHITE, box, bb1, 10);
         scene.idle(1);
-        scene.overlay().chaseBoundingBoxOutline(PonderPalette.WHITE, box, bb1.expand(0.025, 0.025, 0.025), 50);
+        scene.overlay().chaseBoundingBoxOutline(PonderPalette.WHITE, box, bb1.inflate(0.025, 0.025, 0.025), 50);
         scene.idle(26);
 
         scene.overlay().showText(80).text("Right-click a Train Station and place the Postbox nearby").attachKeyFrame().placeNearTarget()
@@ -89,20 +89,20 @@ public class PostboxScenes {
         scene.world().moveSection(postboxE, util.vector().of(0, -1, 0), 0);
 
         scene.idle(15);
-        scene.overlay().chaseBoundingBoxOutline(PonderPalette.GREEN, box, bb1.expand(0.025, 0.025, 0.025), 50);
+        scene.overlay().chaseBoundingBoxOutline(PonderPalette.GREEN, box, bb1.inflate(0.025, 0.025, 0.025), 50);
 
-        Box bb2 = new Box(box.down()).contract(0.125, 0, 0).shrink(0, 0.125, 0);
+        AABB bb2 = new AABB(box.below()).deflate(0.125, 0, 0).contract(0, 0.125, 0);
 
         scene.overlay().chaseBoundingBoxOutline(PonderPalette.GREEN, box2, bb2, 50);
         scene.idle(10);
-        scene.overlay().showLine(PonderPalette.GREEN, util.vector().topOf(box.down()), fromTarget, 40);
+        scene.overlay().showLine(PonderPalette.GREEN, util.vector().topOf(box.below()), fromTarget, 40);
         scene.idle(45);
 
-        scene.overlay().showControls(util.vector().topOf(box.down()), Pointing.DOWN, 40).rightClick();
+        scene.overlay().showControls(util.vector().topOf(box.below()), Pointing.DOWN, 40).rightClick();
         scene.idle(7);
         scene.overlay().chaseBoundingBoxOutline(PonderPalette.BLUE, funnel, bb2, 70);
         scene.overlay().showText(70).attachKeyFrame().colored(PonderPalette.BLUE).text("Assign it an address in the inventory UI")
-            .pointAt(util.vector().topOf(box.down())).placeNearTarget();
+            .pointAt(util.vector().topOf(box.below())).placeNearTarget();
         scene.idle(80);
 
         scene.world().moveSection(postboxE, util.vector().of(0, 1, 0), 10);
@@ -226,8 +226,8 @@ public class PostboxScenes {
         scene.world().hideIndependentSection(train1L, null);
         scene.world().hideIndependentSection(train2L, null);
         scene.idle(5);
-        scene.overlay().chaseBoundingBoxOutline(PonderPalette.BLUE, train1L, new Box(util.grid().at(1, 3, 4)).expand(1, .75f, .5f), 280);
-        scene.overlay().chaseBoundingBoxOutline(PonderPalette.BLUE, train2L, new Box(util.grid().at(5, 3, 4)).expand(1, .75f, .5f), 280);
+        scene.overlay().chaseBoundingBoxOutline(PonderPalette.BLUE, train1L, new AABB(util.grid().at(1, 3, 4)).inflate(1, .75f, .5f), 280);
+        scene.overlay().chaseBoundingBoxOutline(PonderPalette.BLUE, train2L, new AABB(util.grid().at(5, 3, 4)).inflate(1, .75f, .5f), 280);
         scene.idle(19);
 
         ElementLink<WorldSectionElement> outpostL = scene.world().showIndependentSection(glass, Direction.UP);

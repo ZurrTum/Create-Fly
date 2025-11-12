@@ -14,9 +14,9 @@ import com.zurrtum.create.content.contraptions.actors.psi.PortableFluidInterface
 import com.zurrtum.create.content.fluids.pump.PumpBlock;
 import com.zurrtum.create.content.fluids.tank.FluidTankBlockEntity;
 import com.zurrtum.create.infrastructure.fluids.FluidStack;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.item.ItemStack;
 
 public class FluidMovementActorScenes {
 
@@ -39,9 +39,9 @@ public class FluidMovementActorScenes {
         BlockPos ct2 = util.grid().at(6, 3, 2);
         BlockPos st = util.grid().at(0, 1, 5);
         Class<FluidTankBlockEntity> type = FluidTankBlockEntity.class;
-        ItemStack bucket = AllItems.CHOCOLATE_BUCKET.getDefaultStack();
+        ItemStack bucket = AllItems.CHOCOLATE_BUCKET.getDefaultInstance();
 
-        scene.world().modifyBlock(pumpPos, s -> s.with(PumpBlock.FACING, Direction.NORTH), false);
+        scene.world().modifyBlock(pumpPos, s -> s.setValue(PumpBlock.FACING, Direction.NORTH), false);
 
         scene.world().modifyBlockEntity(st, type, be -> be.getTankInventory().insert(chocolate, 810000));
 
@@ -53,7 +53,7 @@ public class FluidMovementActorScenes {
         scene.idle(10);
         scene.world().rotateBearing(bearing, 360, 70);
         scene.world().rotateSection(contraption, 0, 360, 0, 70);
-        scene.overlay().showText(60).pointAt(util.vector().topOf(bearing.up(2))).colored(PonderPalette.RED).placeNearTarget().attachKeyFrame()
+        scene.overlay().showText(60).pointAt(util.vector().topOf(bearing.above(2))).colored(PonderPalette.RED).placeNearTarget().attachKeyFrame()
             .text("Fluid Tanks on moving contraptions cannot be accessed by any pipes");
 
         scene.idle(70);
@@ -128,7 +128,7 @@ public class FluidMovementActorScenes {
         scene.idle(50);
 
         scene.overlay().showText(40).placeNearTarget().pointAt(util.vector().topOf(pumpPos)).text("...or extracted from the contraption");
-        scene.world().modifyBlock(pumpPos, s -> s.with(PumpBlock.FACING, Direction.SOUTH), true);
+        scene.world().modifyBlock(pumpPos, s -> s.setValue(PumpBlock.FACING, Direction.SOUTH), true);
         scene.world().propagatePipeChange(pumpPos);
         scene.idle(30);
 

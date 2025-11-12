@@ -1,30 +1,30 @@
 package com.zurrtum.create.client.catnip.gui.render;
 
-import com.mojang.blaze3d.systems.ProjectionType;
+import com.mojang.blaze3d.ProjectionType;
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.math.Axis;
 import com.zurrtum.create.client.flywheel.lib.model.baked.SinglePosVirtualBlockGetter;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.RedstoneTorchBlock;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gl.RenderPipelines;
-import net.minecraft.client.gui.render.SpecialGuiElementRenderer;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.render.TextureSetup;
+import net.minecraft.client.gui.render.pip.PictureInPictureRenderer;
+import net.minecraft.client.gui.render.state.BlitRenderState;
 import net.minecraft.client.gui.render.state.GuiRenderState;
-import net.minecraft.client.gui.render.state.TexturedQuadGuiElementRenderState;
-import net.minecraft.client.render.*;
-import net.minecraft.client.texture.TextureSetup;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.RotationAxis;
+import net.minecraft.client.renderer.*;
+import net.minecraft.client.renderer.chunk.ChunkSectionLayer;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.RedstoneTorchBlock;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public class BlockTransformElementRenderer extends SpecialGuiElementRenderer<BlockTransformRenderState> {
+public class BlockTransformElementRenderer extends PictureInPictureRenderer<BlockTransformRenderState> {
     private static final Map<Object, GpuTexture> TEXTURES = new HashMap<>();
-    private final MatrixStack matrices = new MatrixStack();
+    private final PoseStack matrices = new PoseStack();
     private int windowScaleFactor;
 
-    public BlockTransformElementRenderer(VertexConsumerProvider.Immediate vertexConsumers) {
+    public BlockTransformElementRenderer(MultiBufferSource.BufferSource vertexConsumers) {
         super(vertexConsumers);
     }
 
@@ -36,7 +36,7 @@ public class BlockTransformElementRenderer extends SpecialGuiElementRenderer<Blo
     }
 
     @Override
-    public void render(BlockTransformRenderState block, GuiRenderState state, int windowScaleFactor) {
+    public void prepare(BlockTransformRenderState block, GuiRenderState state, int windowScaleFactor) {
         if (this.windowScaleFactor != windowScaleFactor) {
             this.windowScaleFactor = windowScaleFactor;
             TEXTURES.values().forEach(GpuTexture::close);
@@ -45,72 +45,71 @@ public class BlockTransformElementRenderer extends SpecialGuiElementRenderer<Blo
         Object key = block.getKey();
         GpuTexture texture = TEXTURES.get(key);
         if (texture == null) {
-            float size = block.size() * windowScaleFactor;
+            float size = block.scale() * windowScaleFactor;
             texture = GpuTexture.create((int) size);
             TEXTURES.put(key, texture);
-            RenderSystem.setProjectionMatrix(projectionMatrix.set(size, size), ProjectionType.ORTHOGRAPHIC);
+            RenderSystem.setProjectionMatrix(projectionMatrixBuffer.getBuffer(size, size), ProjectionType.ORTHOGRAPHIC);
             texture.prepare();
-            matrices.push();
+            matrices.pushPose();
             matrices.translate(size / 2, size / 2, 0);
             if (block.padding() != 0) {
                 size -= block.padding() * windowScaleFactor;
             }
             matrices.scale(size, size, size);
             if (block.zRot() != 0) {
-                matrices.multiply(RotationAxis.POSITIVE_Z.rotation(block.zRot()));
+                matrices.mulPose(Axis.ZP.rotation(block.zRot()));
             }
             if (block.xRot() != 0) {
-                matrices.multiply(RotationAxis.POSITIVE_X.rotation(block.xRot()));
+                matrices.mulPose(Axis.XP.rotation(block.xRot()));
             }
             if (block.yRot() != 0) {
-                matrices.multiply(RotationAxis.POSITIVE_Y.rotation(block.yRot()));
+                matrices.mulPose(Axis.YP.rotation(block.yRot()));
             }
             matrices.scale(1, -1, 1);
             matrices.translate(-0.5F, -0.5F, -0.5F);
-            MinecraftClient mc = MinecraftClient.getInstance();
-            RenderLayer layer;
-            if (block.state().isOf(Blocks.REDSTONE_TORCH) && block.state().get(RedstoneTorchBlock.LIT)) {
-                layer = RenderLayer.getCutout();
+            Minecraft mc = Minecraft.getInstance();
+            RenderType layer;
+            if (block.state().is(Blocks.REDSTONE_TORCH) && block.state().getValue(RedstoneTorchBlock.LIT)) {
+                layer = RenderType.cutout();
             } else {
-                layer = RenderLayers.getBlockLayer(block.state()) == BlockRenderLayer.TRANSLUCENT ? TexturedRenderLayers.getItemEntityTranslucentCull() : TexturedRenderLayers.getEntityCutout();
+                layer = ItemBlockRenderTypes.getChunkRenderType(block.state()) == ChunkSectionLayer.TRANSLUCENT ? Sheets.translucentItemSheet() : Sheets.cutoutBlockSheet();
             }
             SinglePosVirtualBlockGetter world = SinglePosVirtualBlockGetter.createFullBright();
             world.blockState(block.state());
-            mc.getBlockRenderManager()
-                .renderBlock(block.state(), BlockPos.ORIGIN, world, matrices, vertexConsumers.getBuffer(layer), false, block.parts());
-            vertexConsumers.draw();
-            matrices.pop();
+            mc.getBlockRenderer().renderBatched(block.state(), BlockPos.ZERO, world, matrices, bufferSource.getBuffer(layer), false, block.parts());
+            bufferSource.endBatch();
+            matrices.popPose();
             texture.clear();
         }
-        state.addSimpleElementToCurrentLayer(new TexturedQuadGuiElementRenderState(
+        state.submitBlitToCurrentLayer(new BlitRenderState(
             RenderPipelines.GUI_TEXTURED_PREMULTIPLIED_ALPHA,
-            TextureSetup.withoutGlTexture(texture.textureView()),
+            TextureSetup.singleTexture(texture.textureView()),
             block.pose(),
+            block.x0(),
+            block.y0(),
             block.x1(),
             block.y1(),
-            block.x2(),
-            block.y2(),
             0.0F,
             1.0F,
             1.0F,
             0.0F,
             -1,
-            block.scissor(),
+            block.scissorArea(),
             null
         ));
     }
 
     @Override
-    protected void render(BlockTransformRenderState block, MatrixStack matrices) {
+    protected void renderToTexture(BlockTransformRenderState block, PoseStack matrices) {
     }
 
     @Override
-    protected String getName() {
+    protected String getTextureLabel() {
         return "Block Transform";
     }
 
     @Override
-    public Class<BlockTransformRenderState> getElementClass() {
+    public Class<BlockTransformRenderState> getRenderStateClass() {
         return BlockTransformRenderState.class;
     }
 }

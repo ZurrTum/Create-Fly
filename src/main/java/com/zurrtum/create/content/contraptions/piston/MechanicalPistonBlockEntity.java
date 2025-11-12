@@ -5,16 +5,16 @@ import com.zurrtum.create.content.contraptions.AssemblyException;
 import com.zurrtum.create.content.contraptions.ContraptionCollider;
 import com.zurrtum.create.content.contraptions.ControlledContraptionEntity;
 import com.zurrtum.create.content.contraptions.piston.MechanicalPistonBlock.PistonState;
-import net.minecraft.block.BlockState;
-import net.minecraft.state.property.Properties;
-import net.minecraft.storage.ReadView;
-import net.minecraft.storage.WriteView;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Direction.Axis;
-import net.minecraft.util.math.Direction.AxisDirection;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.Direction.Axis;
+import net.minecraft.core.Direction.AxisDirection;
+import net.minecraft.util.Mth;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
+import net.minecraft.world.phys.Vec3;
 
 public class MechanicalPistonBlockEntity extends LinearActuatorBlockEntity {
     protected int extensionLength;
@@ -24,34 +24,34 @@ public class MechanicalPistonBlockEntity extends LinearActuatorBlockEntity {
     }
 
     @Override
-    protected void read(ReadView view, boolean clientPacket) {
-        extensionLength = view.getInt("ExtensionLength", 0);
+    protected void read(ValueInput view, boolean clientPacket) {
+        extensionLength = view.getIntOr("ExtensionLength", 0);
         super.read(view, clientPacket);
     }
 
     @Override
-    protected void write(WriteView view, boolean clientPacket) {
+    protected void write(ValueOutput view, boolean clientPacket) {
         view.putInt("ExtensionLength", extensionLength);
         super.write(view, clientPacket);
     }
 
     @Override
     public void assemble() throws AssemblyException {
-        if (!(world.getBlockState(pos).getBlock() instanceof MechanicalPistonBlock))
+        if (!(level.getBlockState(worldPosition).getBlock() instanceof MechanicalPistonBlock))
             return;
 
-        Direction direction = getCachedState().get(Properties.FACING);
+        Direction direction = getBlockState().getValue(BlockStateProperties.FACING);
 
         // Collect Construct
         PistonContraption contraption = new PistonContraption(direction, getMovementSpeed() < 0);
-        if (!contraption.assemble(world, pos))
+        if (!contraption.assemble(level, worldPosition))
             return;
 
         Direction positive = Direction.get(AxisDirection.POSITIVE, direction.getAxis());
         Direction movementDirection = getSpeed() > 0 ^ direction.getAxis() != Axis.Z ? positive : positive.getOpposite();
 
-        BlockPos anchor = contraption.anchor.offset(direction, contraption.initialExtensionProgress);
-        if (ContraptionCollider.isCollidingWithWorld(world, contraption, anchor.offset(movementDirection), movementDirection))
+        BlockPos anchor = contraption.anchor.relative(direction, contraption.initialExtensionProgress);
+        if (ContraptionCollider.isCollidingWithWorld(level, contraption, anchor.relative(movementDirection), movementDirection))
             return;
 
         // Check if not at limit already
@@ -67,14 +67,14 @@ public class MechanicalPistonBlockEntity extends LinearActuatorBlockEntity {
         sendData();
         clientOffsetDiff = 0;
 
-        BlockPos startPos = BlockPos.ORIGIN.offset(direction, contraption.initialExtensionProgress);
-        contraption.removeBlocksFromWorld(world, startPos);
-        movedContraption = ControlledContraptionEntity.create(getWorld(), this, contraption);
+        BlockPos startPos = BlockPos.ZERO.relative(direction, contraption.initialExtensionProgress);
+        contraption.removeBlocksFromWorld(level, startPos);
+        movedContraption = ControlledContraptionEntity.create(getLevel(), this, contraption);
         resetContraptionToOffset();
         forceMove = true;
-        world.spawnEntity(movedContraption);
+        level.addFreshEntity(movedContraption);
 
-        AllSoundEvents.CONTRAPTION_ASSEMBLE.playOnServer(world, pos);
+        AllSoundEvents.CONTRAPTION_ASSEMBLE.playOnServer(level, worldPosition);
 
         if (contraption.containsBlockBreakers())
             award(AllAdvancements.CONTRAPTION_ACTORS);
@@ -84,19 +84,19 @@ public class MechanicalPistonBlockEntity extends LinearActuatorBlockEntity {
     public void disassemble() {
         if (!running && movedContraption == null)
             return;
-        if (!removed)
-            getWorld().setBlockState(pos, getCachedState().with(MechanicalPistonBlock.STATE, PistonState.EXTENDED), 3 | 16);
+        if (!remove)
+            getLevel().setBlock(worldPosition, getBlockState().setValue(MechanicalPistonBlock.STATE, PistonState.EXTENDED), 3 | 16);
         if (movedContraption != null) {
             resetContraptionToOffset();
             movedContraption.disassemble();
-            AllSoundEvents.CONTRAPTION_DISASSEMBLE.playOnServer(world, pos);
+            AllSoundEvents.CONTRAPTION_DISASSEMBLE.playOnServer(level, worldPosition);
         }
         running = false;
         movedContraption = null;
         sendData();
 
-        if (removed)
-            AllBlocks.MECHANICAL_PISTON.onBreak(world, pos, getCachedState(), null);
+        if (remove)
+            AllBlocks.MECHANICAL_PISTON.playerWillDestroy(level, worldPosition, getBlockState(), null);
     }
 
     @Override
@@ -108,17 +108,17 @@ public class MechanicalPistonBlockEntity extends LinearActuatorBlockEntity {
 
     @Override
     public float getMovementSpeed() {
-        float movementSpeed = MathHelper.clamp(convertToLinear(getSpeed()), -.49f, .49f);
-        if (world.isClient())
+        float movementSpeed = Mth.clamp(convertToLinear(getSpeed()), -.49f, .49f);
+        if (level.isClientSide())
             movementSpeed *= AllClientHandle.INSTANCE.getServerSpeed();
-        Direction pistonDirection = getCachedState().get(Properties.FACING);
-        int movementModifier = pistonDirection.getDirection().offset() * (pistonDirection.getAxis() == Axis.Z ? -1 : 1);
+        Direction pistonDirection = getBlockState().getValue(BlockStateProperties.FACING);
+        int movementModifier = pistonDirection.getAxisDirection().getStep() * (pistonDirection.getAxis() == Axis.Z ? -1 : 1);
         movementSpeed = movementSpeed * -movementModifier + clientOffsetDiff / 2f;
 
         int extensionRange = getExtensionRange();
-        movementSpeed = MathHelper.clamp(movementSpeed, 0 - offset, extensionRange - offset);
+        movementSpeed = Mth.clamp(movementSpeed, 0 - offset, extensionRange - offset);
         if (sequencedOffsetLimit >= 0)
-            movementSpeed = (float) MathHelper.clamp(movementSpeed, -sequencedOffsetLimit, sequencedOffsetLimit);
+            movementSpeed = (float) Mth.clamp(movementSpeed, -sequencedOffsetLimit, sequencedOffsetLimit);
         return movementSpeed;
     }
 
@@ -132,15 +132,15 @@ public class MechanicalPistonBlockEntity extends LinearActuatorBlockEntity {
     }
 
     @Override
-    protected Vec3d toMotionVector(float speed) {
-        Direction pistonDirection = getCachedState().get(Properties.FACING);
-        return Vec3d.of(pistonDirection.getVector()).multiply(speed);
+    protected Vec3 toMotionVector(float speed) {
+        Direction pistonDirection = getBlockState().getValue(BlockStateProperties.FACING);
+        return Vec3.atLowerCornerOf(pistonDirection.getUnitVec3i()).scale(speed);
     }
 
     @Override
-    protected Vec3d toPosition(float offset) {
-        Vec3d position = Vec3d.of(getCachedState().get(Properties.FACING).getVector()).multiply(offset);
-        return position.add(Vec3d.of(movedContraption.getContraption().anchor));
+    protected Vec3 toPosition(float offset) {
+        Vec3 position = Vec3.atLowerCornerOf(getBlockState().getValue(BlockStateProperties.FACING).getUnitVec3i()).scale(offset);
+        return position.add(Vec3.atLowerCornerOf(movedContraption.getContraption().anchor));
     }
 
     @Override

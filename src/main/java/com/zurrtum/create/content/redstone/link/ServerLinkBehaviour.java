@@ -7,14 +7,14 @@ import com.zurrtum.create.content.redstone.link.RedstoneLinkNetworkHandler.Frequ
 import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
 import com.zurrtum.create.foundation.blockEntity.behaviour.BehaviourType;
 import com.zurrtum.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.storage.ReadView;
-import net.minecraft.storage.WriteView;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
+import net.minecraft.world.phys.Vec3;
 
 import java.util.Optional;
 import java.util.function.IntConsumer;
@@ -30,7 +30,7 @@ public class ServerLinkBehaviour extends BlockEntityBehaviour<SmartBlockEntity> 
 
     public Frequency frequencyFirst;
     public Frequency frequencyLast;
-    Vec3d textShift;
+    Vec3 textShift;
 
     public boolean newPosition;
     private Mode mode;
@@ -41,7 +41,7 @@ public class ServerLinkBehaviour extends BlockEntityBehaviour<SmartBlockEntity> 
         super(be);
         frequencyFirst = Frequency.EMPTY;
         frequencyLast = Frequency.EMPTY;
-        textShift = Vec3d.ZERO;
+        textShift = Vec3.ZERO;
         newPosition = true;
     }
 
@@ -59,7 +59,7 @@ public class ServerLinkBehaviour extends BlockEntityBehaviour<SmartBlockEntity> 
         return behaviour;
     }
 
-    public ServerLinkBehaviour moveText(Vec3d shift) {
+    public ServerLinkBehaviour moveText(Vec3 shift) {
         textShift = shift;
         return this;
     }
@@ -89,15 +89,15 @@ public class ServerLinkBehaviour extends BlockEntityBehaviour<SmartBlockEntity> 
     }
 
     public void notifySignalChange() {
-        Create.REDSTONE_LINK_NETWORK_HANDLER.updateNetworkOf(getWorld(), this);
+        Create.REDSTONE_LINK_NETWORK_HANDLER.updateNetworkOf(getLevel(), this);
     }
 
     @Override
     public void initialize() {
         super.initialize();
-        if (getWorld().isClient())
+        if (getLevel().isClientSide())
             return;
-        getHandler().addToNetwork(getWorld(), this);
+        getHandler().addToNetwork(getLevel(), this);
         newPosition = true;
     }
 
@@ -109,9 +109,9 @@ public class ServerLinkBehaviour extends BlockEntityBehaviour<SmartBlockEntity> 
     @Override
     public void unload() {
         super.unload();
-        if (getWorld().isClient())
+        if (getLevel().isClientSide())
             return;
-        getHandler().removeFromNetwork(getWorld(), this);
+        getHandler().removeFromNetwork(getLevel(), this);
     }
 
     @Override
@@ -120,16 +120,16 @@ public class ServerLinkBehaviour extends BlockEntityBehaviour<SmartBlockEntity> 
     }
 
     @Override
-    public void write(WriteView view, boolean clientPacket) {
+    public void write(ValueOutput view, boolean clientPacket) {
         super.write(view, clientPacket);
-        view.put("FrequencyFirst", Frequency.CODEC, frequencyFirst);
-        view.put("FrequencyLast", Frequency.CODEC, frequencyLast);
-        view.put("LastKnownPosition", BlockPos.CODEC, blockEntity.getPos());
+        view.store("FrequencyFirst", Frequency.CODEC, frequencyFirst);
+        view.store("FrequencyLast", Frequency.CODEC, frequencyLast);
+        view.store("LastKnownPosition", BlockPos.CODEC, blockEntity.getBlockPos());
     }
 
     @Override
-    public void read(ReadView view, boolean clientPacket) {
-        newPosition = view.read("LastKnownPosition", BlockPos.CODEC).map(pos -> !blockEntity.getPos().equals(pos)).orElse(true);
+    public void read(ValueInput view, boolean clientPacket) {
+        newPosition = view.read("LastKnownPosition", BlockPos.CODEC).map(pos -> !blockEntity.getBlockPos().equals(pos)).orElse(true);
 
         super.read(view, clientPacket);
         frequencyFirst = view.read("FrequencyFirst", Frequency.CODEC).orElse(Frequency.EMPTY);
@@ -140,10 +140,10 @@ public class ServerLinkBehaviour extends BlockEntityBehaviour<SmartBlockEntity> 
         stack = stack.copy();
         stack.setCount(1);
         ItemStack toCompare = first ? frequencyFirst.getStack() : frequencyLast.getStack();
-        boolean changed = !ItemStack.areItemsAndComponentsEqual(stack, toCompare);
+        boolean changed = !ItemStack.isSameItemSameComponents(stack, toCompare);
 
         if (changed)
-            getHandler().removeFromNetwork(getWorld(), this);
+            getHandler().removeFromNetwork(getLevel(), this);
 
         if (first)
             frequencyFirst = Frequency.of(stack);
@@ -154,7 +154,7 @@ public class ServerLinkBehaviour extends BlockEntityBehaviour<SmartBlockEntity> 
             return;
 
         blockEntity.sendData();
-        getHandler().addToNetwork(getWorld(), this);
+        getHandler().addToNetwork(getLevel(), this);
     }
 
     @Override
@@ -168,13 +168,13 @@ public class ServerLinkBehaviour extends BlockEntityBehaviour<SmartBlockEntity> 
 
     @Override
     public boolean isAlive() {
-        World level = getWorld();
+        Level level = getLevel();
         BlockPos pos = getPos();
         if (blockEntity.isChunkUnloaded())
             return false;
         if (blockEntity.isRemoved())
             return false;
-        if (!level.isPosLoaded(pos))
+        if (!level.isLoaded(pos))
             return false;
         return level.getBlockEntity(pos) == blockEntity;
     }
@@ -190,14 +190,14 @@ public class ServerLinkBehaviour extends BlockEntityBehaviour<SmartBlockEntity> 
     }
 
     @Override
-    public boolean writeToClipboard(WriteView view, Direction side) {
-        view.put("First", ItemStack.OPTIONAL_CODEC, frequencyFirst.getStack());
-        view.put("Last", ItemStack.OPTIONAL_CODEC, frequencyLast.getStack());
+    public boolean writeToClipboard(ValueOutput view, Direction side) {
+        view.store("First", ItemStack.OPTIONAL_CODEC, frequencyFirst.getStack());
+        view.store("Last", ItemStack.OPTIONAL_CODEC, frequencyLast.getStack());
         return true;
     }
 
     @Override
-    public boolean readFromClipboard(ReadView view, PlayerEntity player, Direction side, boolean simulate) {
+    public boolean readFromClipboard(ValueInput view, Player player, Direction side, boolean simulate) {
         Optional<ItemStack> first = view.read("First", ItemStack.OPTIONAL_CODEC);
         if (first.isEmpty()) {
             return false;

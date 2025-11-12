@@ -1,5 +1,7 @@
 package com.zurrtum.create.client.content.kinetics.belt;
 
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.zurrtum.create.AllBlocks;
 import com.zurrtum.create.catnip.levelWrappers.WrappedLevel;
 import com.zurrtum.create.catnip.math.AngleHelper;
@@ -21,24 +23,30 @@ import com.zurrtum.create.content.kinetics.belt.*;
 import com.zurrtum.create.content.kinetics.belt.transport.BeltInventory;
 import com.zurrtum.create.content.kinetics.belt.transport.TransportedItemStack;
 import com.zurrtum.create.content.logistics.box.PackageItem;
-import net.minecraft.client.item.ItemModelManager;
-import net.minecraft.client.render.*;
-import net.minecraft.client.render.block.entity.BlockEntityRenderer;
-import net.minecraft.client.render.block.entity.BlockEntityRendererFactory;
-import net.minecraft.client.render.block.entity.state.BlockEntityRenderState;
-import net.minecraft.client.render.command.ModelCommandRenderer;
-import net.minecraft.client.render.command.OrderedRenderCommandQueue;
-import net.minecraft.client.render.item.ItemRenderState;
-import net.minecraft.client.render.state.CameraRenderState;
-import net.minecraft.client.texture.Sprite;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.item.ItemDisplayContext;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.DyeColor;
-import net.minecraft.util.math.*;
-import net.minecraft.util.math.Direction.Axis;
-import net.minecraft.util.math.Direction.AxisDirection;
-import net.minecraft.world.World;
+import net.minecraft.client.renderer.LevelRenderer;
+import net.minecraft.client.renderer.LightTexture;
+import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.SubmitNodeCollector;
+import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
+import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
+import net.minecraft.client.renderer.blockentity.state.BlockEntityRenderState;
+import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
+import net.minecraft.client.renderer.item.ItemModelResolver;
+import net.minecraft.client.renderer.item.ItemStackRenderState;
+import net.minecraft.client.renderer.state.CameraRenderState;
+import net.minecraft.client.renderer.texture.OverlayTexture;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.Direction.Axis;
+import net.minecraft.core.Direction.AxisDirection;
+import net.minecraft.core.Vec3i;
+import net.minecraft.util.Mth;
+import net.minecraft.world.item.DyeColor;
+import net.minecraft.world.item.ItemDisplayContext;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
@@ -46,10 +54,10 @@ import java.util.Random;
 import java.util.function.Supplier;
 
 public class BeltRenderer implements BlockEntityRenderer<BeltBlockEntity, BeltRenderer.BeltRenderState> {
-    protected final ItemModelManager itemModelManager;
+    protected final ItemModelResolver itemModelManager;
 
-    public BeltRenderer(BlockEntityRendererFactory.Context context) {
-        itemModelManager = context.itemModelManager();
+    public BeltRenderer(BlockEntityRendererProvider.Context context) {
+        itemModelManager = context.itemModelResolver();
     }
 
     @Override
@@ -58,23 +66,23 @@ public class BeltRenderer implements BlockEntityRenderer<BeltBlockEntity, BeltRe
     }
 
     @Override
-    public void updateRenderState(
+    public void extractRenderState(
         BeltBlockEntity be,
         BeltRenderState state,
         float tickProgress,
-        Vec3d cameraPos,
-        @Nullable ModelCommandRenderer.CrumblingOverlayCommand crumblingOverlay
+        Vec3 cameraPos,
+        @Nullable ModelFeatureRenderer.CrumblingOverlay crumblingOverlay
     ) {
-        BlockEntityRenderState.updateBlockEntityRenderState(be, state, crumblingOverlay);
-        World world = be.getWorld();
+        BlockEntityRenderState.extractBase(be, state, crumblingOverlay);
+        Level world = be.getLevel();
         float speed = be.getSpeed();
         boolean stopped = speed == 0;
-        state.render = !VisualizationManager.supportsVisualization(world) && state.blockState.isOf(AllBlocks.BELT);
+        state.render = !VisualizationManager.supportsVisualization(world) && state.blockState.is(AllBlocks.BELT);
         if (state.render) {
-            BeltSlope beltSlope = state.blockState.get(BeltBlock.SLOPE);
-            BeltPart part = state.blockState.get(BeltBlock.PART);
-            Direction facing = state.blockState.get(BeltBlock.HORIZONTAL_FACING);
-            AxisDirection axisDirection = facing.getDirection();
+            BeltSlope beltSlope = state.blockState.getValue(BeltBlock.SLOPE);
+            BeltPart part = state.blockState.getValue(BeltBlock.PART);
+            Direction facing = state.blockState.getValue(BeltBlock.HORIZONTAL_FACING);
+            AxisDirection axisDirection = facing.getAxisDirection();
 
             boolean downward = beltSlope == BeltSlope.DOWNWARD;
             boolean upward = beltSlope == BeltSlope.UPWARD;
@@ -84,9 +92,9 @@ public class BeltRenderer implements BlockEntityRenderer<BeltBlockEntity, BeltRe
             boolean sideways = beltSlope == BeltSlope.SIDEWAYS;
             boolean alongX = facing.getAxis() == Axis.X;
 
-            state.localTransforms = new MatrixStack();
+            state.localTransforms = new PoseStack();
             var msr = TransformStack.of(state.localTransforms);
-            state.layer = RenderLayer.getSolid();
+            state.layer = RenderType.solid();
 
             msr.center().rotateYDegrees(AngleHelper.horizontalAngle(facing) + (upward ? 180 : 0) + (sideways ? 270 : 0))
                 .rotateZDegrees(sideways ? 90 : 0).rotateXDegrees(!diagonal && beltSlope != BeltSlope.HORIZONTAL ? 90 : 0).uncenter();
@@ -101,15 +109,15 @@ public class BeltRenderer implements BlockEntityRenderer<BeltBlockEntity, BeltRe
             boolean needScroll = !stopped || color != null;
             double scroll = 0;
             if (needScroll) {
-                float time = AnimationTickHolder.getRenderTime(world) * axisDirection.offset();
+                float time = AnimationTickHolder.getRenderTime(world) * axisDirection.getStep();
                 if (diagonal && (downward ^ alongX) || !sideways && !diagonal && alongX || sideways && axisDirection == AxisDirection.NEGATIVE) {
                     speed = -speed;
                 }
                 scroll = speed * time / (31.5 * 16);
                 float scrollMult = diagonal ? 3f / 8f : 0.5f;
                 state.topShift = getSpriteShiftEntry(color, diagonal, false);
-                Sprite target = state.topShift.getTarget();
-                float spriteSize = target.getMaxV() - target.getMinV();
+                TextureAtlasSprite target = state.topShift.getTarget();
+                float spriteSize = target.getV1() - target.getV0();
                 state.topScroll = (float) ((scroll - Math.floor(scroll)) * spriteSize * scrollMult);
             }
             if (!diagonal) {
@@ -117,16 +125,16 @@ public class BeltRenderer implements BlockEntityRenderer<BeltBlockEntity, BeltRe
                 if (needScroll) {
                     scroll += 0.5;
                     state.bottomShift = getSpriteShiftEntry(color, false, true);
-                    Sprite target = state.bottomShift.getTarget();
-                    float spriteSize = target.getMaxV() - target.getMinV();
+                    TextureAtlasSprite target = state.bottomShift.getTarget();
+                    float spriteSize = target.getV1() - target.getV0();
                     state.bottomScroll = (float) ((scroll - Math.floor(scroll)) * spriteSize * 0.5f);
                 }
             }
             if (be.hasPulley()) {
-                Direction dir = sideways ? Direction.UP : facing.rotateYClockwise();
+                Direction dir = sideways ? Direction.UP : facing.getClockWise();
 
-                Supplier<MatrixStack> matrixStackSupplier = () -> {
-                    MatrixStack stack = new MatrixStack();
+                Supplier<PoseStack> matrixStackSupplier = () -> {
+                    PoseStack stack = new PoseStack();
                     var stacker = TransformStack.of(stack);
                     stacker.center();
                     if (dir.getAxis() == Axis.X)
@@ -140,7 +148,7 @@ public class BeltRenderer implements BlockEntityRenderer<BeltBlockEntity, BeltRe
 
                 state.pulley = CachedBuffers.partialDirectional(AllPartialModels.BELT_PULLEY, state.blockState, dir, matrixStackSupplier);
                 Axis axis = ((IRotate) state.blockState.getBlock()).getRotationAxis(state.blockState);
-                state.pulleyAngle = KineticBlockEntityRenderer.getAngleForBe(be, state.pos, axis);
+                state.pulleyAngle = KineticBlockEntityRenderer.getAngleForBe(be, state.blockPos, axis);
                 state.pulleyDirection = Direction.get(AxisDirection.POSITIVE, axis);
                 state.pulleyColor = KineticBlockEntityRenderer.getColor(be);
             }
@@ -159,16 +167,16 @@ public class BeltRenderer implements BlockEntityRenderer<BeltBlockEntity, BeltRe
             items = new BeltItemState[lazyClientItem == null ? transportedSize : transportedSize + 1];
             state.items = items;
             state.beltFacing = be.getBeltFacing();
-            state.directionVec = state.beltFacing.getVector();
-            state.beltStartOffset = Vec3d.of(state.directionVec).multiply(-.5).add(.5, 15 / 16f, .5);
-            state.slope = state.blockState.get(BeltBlock.SLOPE);
+            state.directionVec = state.beltFacing.getUnitVec3i();
+            state.beltStartOffset = Vec3.atLowerCornerOf(state.directionVec).scale(-.5).add(.5, 15 / 16f, .5);
+            state.slope = state.blockState.getValue(BeltBlock.SLOPE);
             state.verticality = state.slope == BeltSlope.DOWNWARD ? -1 : state.slope == BeltSlope.UPWARD ? 1 : 0;
             state.slopeAlongX = state.beltFacing.getAxis() == Axis.X;
             state.partialTicks = tickProgress;
             state.camera = cameraPos;
             state.onContraption = world instanceof WrappedLevel;
             state.onPonder = world instanceof PonderLevel;
-            BlockPos.Mutable mutablePos = new BlockPos.Mutable();
+            BlockPos.MutableBlockPos mutablePos = new BlockPos.MutableBlockPos();
             for (int i = 0; i < transportedSize; i++) {
                 items[i] = BeltItemState.create(itemModelManager, transportedItems.get(i), state, stopped, world, mutablePos);
             }
@@ -179,12 +187,12 @@ public class BeltRenderer implements BlockEntityRenderer<BeltBlockEntity, BeltRe
     }
 
     @Override
-    public void render(BeltRenderState state, MatrixStack matrices, OrderedRenderCommandQueue queue, CameraRenderState cameraState) {
+    public void submit(BeltRenderState state, PoseStack matrices, SubmitNodeCollector queue, CameraRenderState cameraState) {
         if (state.render) {
-            queue.submitCustom(matrices, state.layer, state);
+            queue.submitCustomGeometry(matrices, state.layer, state);
         }
         if (state.beltLength != 0) {
-            Vec3d beltStartOffset = state.beltStartOffset;
+            Vec3 beltStartOffset = state.beltStartOffset;
             matrices.translate(beltStartOffset.x, beltStartOffset.y, beltStartOffset.z);
             for (BeltItemState item : state.items) {
                 renderItem(state, item, matrices, queue);
@@ -193,7 +201,7 @@ public class BeltRenderer implements BlockEntityRenderer<BeltBlockEntity, BeltRe
     }
 
     @Override
-    public boolean rendersOutsideBoundingBox(/*BeltBlockEntity be*/) {
+    public boolean shouldRenderOffScreen(/*BeltBlockEntity be*/) {
         //TODO
         //        return be.isController();
         return true;
@@ -230,28 +238,28 @@ public class BeltRenderer implements BlockEntityRenderer<BeltBlockEntity, BeltRe
     }
 
     @SuppressWarnings("SuspiciousNameCombination")
-    private void renderItem(BeltRenderState state, BeltItemState item, MatrixStack ms, OrderedRenderCommandQueue queue) {
+    private void renderItem(BeltRenderState state, BeltItemState item, PoseStack ms, SubmitNodeCollector queue) {
         float offset = item.offset;
         float verticalMovement;
         if (offset < .5)
             verticalMovement = 0;
         else
             verticalMovement = state.verticality * (Math.min(offset, state.beltLength - .5f) - .5f);
-        Vec3d offsetVec = Vec3d.of(state.directionVec).multiply(offset);
+        Vec3 offsetVec = Vec3.atLowerCornerOf(state.directionVec).scale(offset);
         if (verticalMovement != 0)
             offsetVec = offsetVec.add(0, verticalMovement, 0);
-        boolean onSlope = state.slope != BeltSlope.HORIZONTAL && MathHelper.clamp(offset, .5f, state.beltLength - .5f) == offset;
-        boolean tiltForward = (state.slope == BeltSlope.DOWNWARD ^ state.beltFacing.getDirection() == AxisDirection.POSITIVE) == (state.beltFacing.getAxis() == Axis.Z);
+        boolean onSlope = state.slope != BeltSlope.HORIZONTAL && Mth.clamp(offset, .5f, state.beltLength - .5f) == offset;
+        boolean tiltForward = (state.slope == BeltSlope.DOWNWARD ^ state.beltFacing.getAxisDirection() == AxisDirection.POSITIVE) == (state.beltFacing.getAxis() == Axis.Z);
         float slopeAngle = onSlope ? tiltForward ? -45 : 45 : 0;
 
-        BlockPos pos = state.pos;
-        Vec3d itemPos = state.beltStartOffset.add(pos.getX(), pos.getY(), pos.getZ()).add(offsetVec);
+        BlockPos pos = state.blockPos;
+        Vec3 itemPos = state.beltStartOffset.add(pos.getX(), pos.getY(), pos.getZ()).add(offsetVec);
 
-        ms.push();
+        ms.pushPose();
         TransformStack.of(ms).nudge(item.angle);
         ms.translate(offsetVec.x, offsetVec.y, offsetVec.z);
 
-        boolean alongX = state.beltFacing.rotateYClockwise().getAxis() == Axis.X;
+        boolean alongX = state.beltFacing.getClockWise().getAxis() == Axis.X;
         float sideOffset = item.sideOffset;
         if (!alongX)
             sideOffset *= -1;
@@ -259,59 +267,59 @@ public class BeltRenderer implements BlockEntityRenderer<BeltBlockEntity, BeltRe
 
         int stackLight;
         if (state.onContraption) {
-            stackLight = state.lightmapCoordinates;
+            stackLight = state.lightCoords;
         } else {
             stackLight = item.light;
         }
 
         boolean renderUpright = item.upright;
-        boolean blockItem = item.state.isSideLit();
+        boolean blockItem = item.state.usesBlockLight();
 
         int count = 0;
         if (state.onPonder || state.camera.distanceTo(itemPos) < 16)
-            count = MathHelper.floorLog2(item.count) / 2;
+            count = Mth.log2(item.count) / 2;
 
         Random r = new Random(item.angle);
 
         boolean slopeShadowOnly = renderUpright && onSlope;
         float slopeOffset = 1 / 8f;
         if (slopeShadowOnly)
-            ms.push();
+            ms.pushPose();
         if (!renderUpright || slopeShadowOnly)
-            ms.multiply((state.slopeAlongX ? RotationAxis.POSITIVE_Z : RotationAxis.POSITIVE_X).rotationDegrees(slopeAngle));
+            ms.mulPose((state.slopeAlongX ? com.mojang.math.Axis.ZP : com.mojang.math.Axis.XP).rotationDegrees(slopeAngle));
         if (onSlope)
             ms.translate(0, slopeOffset, 0);
-        ms.push();
+        ms.pushPose();
         ms.translate(0, -1 / 8f + 0.005f, 0);
         ShadowRenderHelper.renderShadow(ms, queue, .75f, .2f);
-        ms.pop();
+        ms.popPose();
         if (slopeShadowOnly) {
-            ms.pop();
+            ms.popPose();
             ms.translate(0, slopeOffset, 0);
         }
 
         if (renderUpright) {
-            Vec3d vectorForOffset = BeltHelper.getVectorForOffset(
-                state.pos,
+            Vec3 vectorForOffset = BeltHelper.getVectorForOffset(
+                state.blockPos,
                 state.slope,
                 state.verticality,
                 state.beltLength,
                 state.directionVec,
                 offset
             );
-            Vec3d diff = vectorForOffset.subtract(state.camera);
-            float yRot = (float) (MathHelper.atan2(diff.x, diff.z) + Math.PI);
-            ms.multiply(RotationAxis.POSITIVE_Y.rotation(yRot));
+            Vec3 diff = vectorForOffset.subtract(state.camera);
+            float yRot = (float) (Mth.atan2(diff.x, diff.z) + Math.PI);
+            ms.mulPose(com.mojang.math.Axis.YP.rotation(yRot));
             ms.translate(0, 3 / 32d, 1 / 16f);
         }
 
         for (int i = 0; i <= count; i++) {
-            ms.push();
+            ms.pushPose();
 
-            ms.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(item.angle));
+            ms.mulPose(com.mojang.math.Axis.YP.rotationDegrees(item.angle));
             if (!blockItem && !renderUpright) {
                 ms.translate(0, -.09375, 0);
-                ms.multiply(RotationAxis.POSITIVE_X.rotationDegrees(90));
+                ms.mulPose(com.mojang.math.Axis.XP.rotationDegrees(90));
             }
 
             if (blockItem && !item.box)
@@ -324,25 +332,25 @@ public class BeltRenderer implements BlockEntityRenderer<BeltBlockEntity, BeltRe
                 ms.scale(.5f, .5f, .5f);
             }
 
-            item.state.render(ms, queue, stackLight, OverlayTexture.DEFAULT_UV, 0);
-            ms.pop();
+            item.state.submit(ms, queue, stackLight, OverlayTexture.NO_OVERLAY, 0);
+            ms.popPose();
 
             if (!renderUpright) {
                 if (!blockItem)
-                    ms.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(10));
+                    ms.mulPose(com.mojang.math.Axis.YP.rotationDegrees(10));
                 ms.translate(0, blockItem ? 1 / 64d : 1 / 16d, 0);
             } else
                 ms.translate(0, 0, -1 / 16f);
 
         }
 
-        ms.pop();
+        ms.popPose();
     }
 
-    public static class BeltRenderState extends BlockEntityRenderState implements OrderedRenderCommandQueue.Custom {
+    public static class BeltRenderState extends BlockEntityRenderState implements SubmitNodeCollector.CustomGeometryRenderer {
         public boolean render;
-        public RenderLayer layer;
-        public MatrixStack localTransforms;
+        public RenderType layer;
+        public PoseStack localTransforms;
         public SuperByteBuffer top;
         public SpriteShiftEntry topShift;
         public float topScroll;
@@ -358,24 +366,24 @@ public class BeltRenderer implements BlockEntityRenderer<BeltBlockEntity, BeltRe
         public Direction beltFacing;
         public boolean onContraption;
         public Vec3i directionVec;
-        public Vec3d beltStartOffset;
+        public Vec3 beltStartOffset;
         public BeltSlope slope;
         public int verticality;
         public boolean slopeAlongX;
         public float partialTicks;
-        public Vec3d camera;
+        public Vec3 camera;
         boolean onPonder;
 
         @Override
-        public void render(MatrixStack.Entry matricesEntry, VertexConsumer vertexConsumer) {
-            top.light(lightmapCoordinates);
+        public void render(PoseStack.Pose matricesEntry, VertexConsumer vertexConsumer) {
+            top.light(lightCoords);
             if (topShift != null) {
                 top.shiftUVScrolling(topShift, topScroll);
             }
             top.transform(localTransforms);
             top.renderInto(matricesEntry, vertexConsumer);
             if (bottom != null) {
-                bottom.light(lightmapCoordinates);
+                bottom.light(lightCoords);
                 if (bottomShift != null) {
                     bottom.shiftUVScrolling(bottomShift, bottomScroll);
                 }
@@ -383,7 +391,7 @@ public class BeltRenderer implements BlockEntityRenderer<BeltBlockEntity, BeltRe
                 bottom.renderInto(matricesEntry, vertexConsumer);
             }
             if (pulley != null) {
-                pulley.light(lightmapCoordinates);
+                pulley.light(lightCoords);
                 pulley.rotateCentered(pulleyAngle, pulleyDirection);
                 pulley.color(pulleyColor);
                 pulley.renderInto(matricesEntry, vertexConsumer);
@@ -392,36 +400,37 @@ public class BeltRenderer implements BlockEntityRenderer<BeltBlockEntity, BeltRe
     }
 
     public record BeltItemState(
-        ItemRenderState state, float offset, float sideOffset, Integer light, boolean upright, boolean box, int angle, int count
+        ItemStackRenderState state, float offset, float sideOffset, Integer light, boolean upright, boolean box, int angle, int count
     ) {
         public static BeltItemState create(
-            ItemModelManager itemModelManager,
+            ItemModelResolver itemModelManager,
             TransportedItemStack transported,
             BeltRenderState state,
             boolean stopped,
-            World world,
-            BlockPos.Mutable mutablePos
+            Level world,
+            BlockPos.MutableBlockPos mutablePos
         ) {
             float offset, sideOffset;
             if (stopped) {
                 offset = transported.beltPosition;
                 sideOffset = transported.sideOffset;
             } else {
-                offset = MathHelper.lerp(state.partialTicks, transported.prevBeltPosition, transported.beltPosition);
-                sideOffset = MathHelper.lerp(state.partialTicks, transported.prevSideOffset, transported.sideOffset);
+                offset = Mth.lerp(state.partialTicks, transported.prevBeltPosition, transported.beltPosition);
+                sideOffset = Mth.lerp(state.partialTicks, transported.prevSideOffset, transported.sideOffset);
             }
             Integer light;
             if (state.onContraption) {
                 light = null;
             } else {
                 int segment = (int) Math.floor(offset);
-                mutablePos.set(state.pos).move(state.directionVec.getX() * segment, state.verticality * segment, state.directionVec.getZ() * segment);
-                light = world != null ? WorldRenderer.getLightmapCoordinates(world, mutablePos) : LightmapTextureManager.MAX_LIGHT_COORDINATE;
+                mutablePos.set(state.blockPos)
+                    .move(state.directionVec.getX() * segment, state.verticality * segment, state.directionVec.getZ() * segment);
+                light = world != null ? LevelRenderer.getLightColor(world, mutablePos) : LightTexture.FULL_BRIGHT;
             }
             ItemStack stack = transported.stack;
-            ItemRenderState renderState = new ItemRenderState();
+            ItemStackRenderState renderState = new ItemStackRenderState();
             renderState.displayContext = ItemDisplayContext.FIXED;
-            itemModelManager.update(renderState, stack, ItemDisplayContext.FIXED, null, null, 0);
+            itemModelManager.appendItemLayers(renderState, stack, ItemDisplayContext.FIXED, null, null, 0);
             boolean upright = BeltHelper.isItemUpright(transported.stack);
             boolean box = PackageItem.isPackage(transported.stack);
             return new BeltItemState(renderState, offset, sideOffset, light, upright, box, transported.angle, stack.getCount());

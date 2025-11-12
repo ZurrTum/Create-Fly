@@ -1,32 +1,32 @@
 package com.zurrtum.create.infrastructure.fluids;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.fluid.FlowableFluid;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
-import net.minecraft.world.block.WireOrientation;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.material.FlowingFluid;
+import net.minecraft.world.level.redstone.Orientation;
 import org.jetbrains.annotations.Nullable;
 
-public class FluidBlock extends net.minecraft.block.FluidBlock {
-    public FluidBlock(FlowableFluid fluid, Settings settings) {
+public class FluidBlock extends net.minecraft.world.level.block.LiquidBlock {
+    public FluidBlock(FlowingFluid fluid, Properties settings) {
         super(fluid, settings);
     }
 
     @Override
-    protected void onBlockAdded(BlockState state, World world, BlockPos pos, BlockState oldState, boolean notify) {
-        world.scheduleFluidTick(pos, state.getFluidState().getFluid(), this.fluid.getTickRate(world));
+    protected void onPlace(BlockState state, Level world, BlockPos pos, BlockState oldState, boolean notify) {
+        world.scheduleTick(pos, state.getFluidState().getType(), this.fluid.getTickDelay(world));
     }
 
     @Override
-    protected void neighborUpdate(
+    protected void neighborChanged(
         BlockState state,
-        World world,
+        Level world,
         BlockPos pos,
         Block sourceBlock,
-        @Nullable WireOrientation wireOrientation,
+        @Nullable Orientation wireOrientation,
         boolean notify
     ) {
-        world.scheduleFluidTick(pos, state.getFluidState().getFluid(), this.fluid.getTickRate(world));
+        world.scheduleTick(pos, state.getFluidState().getType(), this.fluid.getTickDelay(world));
     }
 }

@@ -4,30 +4,30 @@ import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import com.llamalad7.mixinextras.sugar.Local;
 import com.zurrtum.create.client.model.LayerBakedModel;
 import com.zurrtum.create.client.model.LayerUnbakedModel;
-import net.minecraft.client.render.BlockRenderLayer;
-import net.minecraft.client.render.model.BakedSimpleModel;
-import net.minecraft.client.render.model.GeometryBakedModel;
+import net.minecraft.client.renderer.block.model.SimpleModelWrapper;
+import net.minecraft.client.renderer.chunk.ChunkSectionLayer;
+import net.minecraft.client.resources.model.ResolvedModel;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 
-@Mixin(GeometryBakedModel.class)
+@Mixin(SimpleModelWrapper.class)
 public class GeometryBakedModelMixin implements LayerBakedModel {
     @Unique
-    private BlockRenderLayer blockRenderLayer;
+    private ChunkSectionLayer blockRenderLayer;
 
     @Override
-    public BlockRenderLayer create$getBlockRenderLayer() {
+    public ChunkSectionLayer create$getBlockRenderLayer() {
         return blockRenderLayer;
     }
 
     @Override
-    public void create$setBlockRenderLayer(BlockRenderLayer blockRenderLayer) {
+    public void create$setBlockRenderLayer(ChunkSectionLayer blockRenderLayer) {
         this.blockRenderLayer = blockRenderLayer;
     }
 
-    @ModifyReturnValue(method = "create(Lnet/minecraft/client/render/model/Baker;Lnet/minecraft/util/Identifier;Lnet/minecraft/client/render/model/ModelBakeSettings;)Lnet/minecraft/client/render/model/GeometryBakedModel;", at = @At("RETURN"))
-    private static GeometryBakedModel addBlockRenderLayer(GeometryBakedModel geometry, @Local BakedSimpleModel model) {
+    @ModifyReturnValue(method = "bake(Lnet/minecraft/client/resources/model/ModelBaker;Lnet/minecraft/resources/ResourceLocation;Lnet/minecraft/client/resources/model/ModelState;)Lnet/minecraft/client/renderer/block/model/SimpleModelWrapper;", at = @At("RETURN"))
+    private static SimpleModelWrapper addBlockRenderLayer(SimpleModelWrapper geometry, @Local ResolvedModel model) {
         return LayerUnbakedModel.setBlockRenderLayer(geometry, model);
     }
 }

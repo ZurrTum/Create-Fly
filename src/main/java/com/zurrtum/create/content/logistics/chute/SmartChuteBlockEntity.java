@@ -4,12 +4,11 @@ import com.zurrtum.create.AllBlockEntityTypes;
 import com.zurrtum.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.foundation.blockEntity.behaviour.filtering.ServerFilteringBehaviour;
 import com.zurrtum.create.foundation.item.ItemHelper.ExtractionCountMode;
-import net.minecraft.block.BlockState;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-
 import java.util.List;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.state.BlockState;
 
 public class SmartChuteBlockEntity extends ChuteBlockEntity {
 
@@ -36,8 +35,8 @@ public class SmartChuteBlockEntity extends ChuteBlockEntity {
 
     @Override
     protected boolean canActivate() {
-        BlockState blockState = getCachedState();
-        return blockState.contains(SmartChuteBlock.POWERED) && !blockState.get(SmartChuteBlock.POWERED);
+        BlockState blockState = getBlockState();
+        return blockState.hasProperty(SmartChuteBlock.POWERED) && !blockState.getValue(SmartChuteBlock.POWERED);
     }
 
     @Override
@@ -48,9 +47,9 @@ public class SmartChuteBlockEntity extends ChuteBlockEntity {
 
     private boolean isExtracting() {
         boolean up = getItemMotion() < 0;
-        BlockPos chutePos = pos.offset(up ? Direction.UP : Direction.DOWN);
-        BlockState blockState = world.getBlockState(chutePos);
-        return !AbstractChuteBlock.isChute(blockState) && !blockState.isReplaceable();
+        BlockPos chutePos = worldPosition.relative(up ? Direction.UP : Direction.DOWN);
+        BlockState blockState = level.getBlockState(chutePos);
+        return !AbstractChuteBlock.isChute(blockState) && !blockState.canBeReplaced();
     }
 
 }

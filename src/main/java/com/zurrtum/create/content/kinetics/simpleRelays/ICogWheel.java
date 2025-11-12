@@ -1,11 +1,11 @@
 package com.zurrtum.create.content.kinetics.simpleRelays;
 
 import com.zurrtum.create.content.kinetics.base.IRotate;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.item.BlockItem;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
+import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
 
 public interface ICogWheel extends IRotate {
 

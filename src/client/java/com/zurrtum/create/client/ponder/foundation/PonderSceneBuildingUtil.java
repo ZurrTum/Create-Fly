@@ -3,7 +3,11 @@ package com.zurrtum.create.client.ponder.foundation;
 
 import com.zurrtum.create.catnip.math.VecHelper;
 import com.zurrtum.create.client.ponder.api.scene.*;
-import net.minecraft.util.math.*;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.Vec3i;
+import net.minecraft.world.level.levelgen.structure.BoundingBox;
+import net.minecraft.world.phys.Vec3;
 
 /**
  * Helpful shortcuts for marking boundaries, points or sections inside the scene
@@ -14,9 +18,9 @@ public class PonderSceneBuildingUtil implements SceneBuildingUtil {
     private final VectorUtil vector;
     private final PositionUtil grid;
 
-    private final BlockBox sceneBounds;
+    private final BoundingBox sceneBounds;
 
-    PonderSceneBuildingUtil(BlockBox sceneBounds) {
+    PonderSceneBuildingUtil(BoundingBox sceneBounds) {
         this.sceneBounds = sceneBounds;
         this.select = new PonderSelectionUtil();
         this.vector = new PonderVectorUtil();
@@ -55,38 +59,38 @@ public class PonderSceneBuildingUtil implements SceneBuildingUtil {
     public class PonderVectorUtil implements VectorUtil {
 
         @Override
-        public Vec3d centerOf(int x, int y, int z) {
+        public Vec3 centerOf(int x, int y, int z) {
             return centerOf(grid().at(x, y, z));
         }
 
         @Override
-        public Vec3d centerOf(BlockPos pos) {
+        public Vec3 centerOf(BlockPos pos) {
             return VecHelper.getCenterOf(pos);
         }
 
         @Override
-        public Vec3d topOf(int x, int y, int z) {
+        public Vec3 topOf(int x, int y, int z) {
             return blockSurface(grid().at(x, y, z), Direction.UP);
         }
 
         @Override
-        public Vec3d topOf(BlockPos pos) {
+        public Vec3 topOf(BlockPos pos) {
             return blockSurface(pos, Direction.UP);
         }
 
         @Override
-        public Vec3d blockSurface(BlockPos pos, Direction face) {
+        public Vec3 blockSurface(BlockPos pos, Direction face) {
             return blockSurface(pos, face, 0);
         }
 
         @Override
-        public Vec3d blockSurface(BlockPos pos, Direction face, float margin) {
-            return centerOf(pos).add(Vec3d.of(face.getVector()).multiply(.5f + margin));
+        public Vec3 blockSurface(BlockPos pos, Direction face, float margin) {
+            return centerOf(pos).add(Vec3.atLowerCornerOf(face.getUnitVec3i()).scale(.5f + margin));
         }
 
         @Override
-        public Vec3d of(double x, double y, double z) {
-            return new Vec3d(x, y, z);
+        public Vec3 of(double x, double y, double z) {
+            return new Vec3(x, y, z);
         }
 
     }
@@ -120,7 +124,7 @@ public class PonderSceneBuildingUtil implements SceneBuildingUtil {
 
         @Override
         public Selection column(int x, int z) {
-            return cuboid(new BlockPos(x, 1, z), new Vec3i(0, sceneBounds.getBlockCountY(), 0));
+            return cuboid(new BlockPos(x, 1, z), new Vec3i(0, sceneBounds.getYSpan(), 0));
         }
 
         @Override
@@ -130,20 +134,20 @@ public class PonderSceneBuildingUtil implements SceneBuildingUtil {
 
         @Override
         public Selection layersFrom(int y) {
-            return layers(y, sceneBounds.getBlockCountY() - y);
+            return layers(y, sceneBounds.getYSpan() - y);
         }
 
         @Override
         public Selection layers(int y, int height) {
             return cuboid(
                 new BlockPos(0, y, 0),
-                new Vec3i(sceneBounds.getBlockCountX() - 1, Math.min(sceneBounds.getBlockCountY() - y, height) - 1, sceneBounds.getBlockCountZ() - 1)
+                new Vec3i(sceneBounds.getXSpan() - 1, Math.min(sceneBounds.getYSpan() - y, height) - 1, sceneBounds.getZSpan() - 1)
             );
         }
 
         @Override
         public Selection cuboid(BlockPos origin, Vec3i size) {
-            return SelectionImpl.of(BlockBox.create(origin, origin.add(size)));
+            return SelectionImpl.of(BoundingBox.fromCorners(origin, origin.offset(size)));
         }
 
     }

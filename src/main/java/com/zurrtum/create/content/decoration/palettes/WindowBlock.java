@@ -1,22 +1,22 @@
 package com.zurrtum.create.content.decoration.palettes;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.util.math.Direction;
+import net.minecraft.core.Direction;
+import net.minecraft.world.level.block.state.BlockState;
 
 public class WindowBlock extends ConnectedGlassBlock {
 
     protected final boolean translucent;
 
-    public WindowBlock(Settings settings, boolean translucent) {
+    public WindowBlock(Properties settings, boolean translucent) {
         super(settings);
         this.translucent = translucent;
     }
 
-    public WindowBlock(Settings settings) {
+    public WindowBlock(Properties settings) {
         this(settings, false);
     }
 
-    public static WindowBlock translucent(Settings settings) {
+    public static WindowBlock translucent(Properties settings) {
         return new WindowBlock(settings, true);
     }
 
@@ -25,14 +25,14 @@ public class WindowBlock extends ConnectedGlassBlock {
     }
 
     @Override
-    public boolean isSideInvisible(BlockState state, BlockState adjacentBlockState, Direction side) {
+    public boolean skipRendering(BlockState state, BlockState adjacentBlockState, Direction side) {
         if (state.getBlock() == adjacentBlockState.getBlock()) {
             return true;
         }
         if (state.getBlock() instanceof WindowBlock windowBlock && adjacentBlockState.getBlock() instanceof ConnectedGlassBlock) {
             return !windowBlock.isTranslucent() && side.getAxis().isHorizontal();
         }
-        return super.isSideInvisible(state, adjacentBlockState, side);
+        return super.skipRendering(state, adjacentBlockState, side);
     }
 
 }

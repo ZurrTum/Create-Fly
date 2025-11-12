@@ -11,15 +11,14 @@ import com.zurrtum.create.content.kinetics.gantry.GantryShaftBlock;
 import com.zurrtum.create.content.kinetics.gantry.GantryShaftBlockEntity;
 import com.zurrtum.create.content.kinetics.transmission.sequencer.SequencerInstructions;
 import com.zurrtum.create.foundation.advancement.CreateTrigger;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.storage.ReadView;
-import net.minecraft.storage.WriteView;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Direction.Axis;
-
 import java.util.List;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.Direction.Axis;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 
 public class GantryCarriageBlockEntity extends KineticBlockEntity {
 
@@ -48,8 +47,8 @@ public class GantryCarriageBlockEntity extends KineticBlockEntity {
     @Override
     public void initialize() {
         super.initialize();
-        if (!getCachedState().canPlaceAt(world, pos))
-            world.breakBlock(pos, true);
+        if (!getBlockState().canSurvive(level, worldPosition))
+            level.destroyBlock(worldPosition, true);
     }
 
     public void queueAssembly() {
@@ -60,7 +59,7 @@ public class GantryCarriageBlockEntity extends KineticBlockEntity {
     public void tick() {
         super.tick();
 
-        if (world.isClient())
+        if (level.isClientSide())
             return;
 
         if (assembleNextTick) {
@@ -74,29 +73,29 @@ public class GantryCarriageBlockEntity extends KineticBlockEntity {
     }
 
     private void tryAssemble() {
-        BlockState blockState = getCachedState();
+        BlockState blockState = getBlockState();
         if (!(blockState.getBlock() instanceof GantryCarriageBlock))
             return;
 
-        Direction direction = blockState.get(GantryCarriageBlock.FACING);
+        Direction direction = blockState.getValue(GantryCarriageBlock.FACING);
         GantryContraption contraption = new GantryContraption(direction);
 
-        BlockEntity blockEntity = world.getBlockEntity(pos.offset(direction.getOpposite()));
+        BlockEntity blockEntity = level.getBlockEntity(worldPosition.relative(direction.getOpposite()));
         if (!(blockEntity instanceof GantryShaftBlockEntity shaftBE))
             return;
-        BlockState shaftState = shaftBE.getCachedState();
+        BlockState shaftState = shaftBE.getBlockState();
         if (shaftState.getBlock() != AllBlocks.GANTRY_SHAFT)
             return;
 
         float pinionMovementSpeed = shaftBE.getPinionMovementSpeed();
-        Direction shaftOrientation = shaftState.get(GantryShaftBlock.FACING);
+        Direction shaftOrientation = shaftState.getValue(GantryShaftBlock.FACING);
         Direction movementDirection = shaftOrientation;
         if (pinionMovementSpeed < 0)
             movementDirection = movementDirection.getOpposite();
 
         try {
             lastException = null;
-            if (!contraption.assemble(world, pos))
+            if (!contraption.assemble(level, worldPosition))
                 return;
 
             sendData();
@@ -105,33 +104,33 @@ public class GantryCarriageBlockEntity extends KineticBlockEntity {
             sendData();
             return;
         }
-        if (ContraptionCollider.isCollidingWithWorld(world, contraption, pos.offset(movementDirection), movementDirection))
+        if (ContraptionCollider.isCollidingWithWorld(level, contraption, worldPosition.relative(movementDirection), movementDirection))
             return;
 
         if (contraption.containsBlockBreakers())
             award(AllAdvancements.CONTRAPTION_ACTORS);
 
-        contraption.removeBlocksFromWorld(world, BlockPos.ORIGIN);
-        GantryContraptionEntity movedContraption = GantryContraptionEntity.create(world, contraption, shaftOrientation);
-        BlockPos anchor = pos;
-        movedContraption.setPos(anchor.getX(), anchor.getY(), anchor.getZ());
-        AllSoundEvents.CONTRAPTION_ASSEMBLE.playOnServer(world, pos);
-        world.spawnEntity(movedContraption);
+        contraption.removeBlocksFromWorld(level, BlockPos.ZERO);
+        GantryContraptionEntity movedContraption = GantryContraptionEntity.create(level, contraption, shaftOrientation);
+        BlockPos anchor = worldPosition;
+        movedContraption.setPosRaw(anchor.getX(), anchor.getY(), anchor.getZ());
+        AllSoundEvents.CONTRAPTION_ASSEMBLE.playOnServer(level, worldPosition);
+        level.addFreshEntity(movedContraption);
 
         if (shaftBE.sequenceContext != null && shaftBE.sequenceContext.instruction() == SequencerInstructions.TURN_DISTANCE)
             movedContraption.limitMovement(shaftBE.sequenceContext.getEffectiveValue(shaftBE.getTheoreticalSpeed()));
     }
 
     @Override
-    protected void write(WriteView view, boolean clientPacket) {
+    protected void write(ValueOutput view, boolean clientPacket) {
         if (lastException != null) {
-            view.put("LastException", AssemblyException.CODEC, lastException);
+            view.store("LastException", AssemblyException.CODEC, lastException);
         }
         super.write(view, clientPacket);
     }
 
     @Override
-    protected void read(ReadView view, boolean clientPacket) {
+    protected void read(ValueInput view, boolean clientPacket) {
         lastException = view.read("LastException", AssemblyException.CODEC).orElse(null);
         super.read(view, clientPacket);
     }
@@ -149,20 +148,20 @@ public class GantryCarriageBlockEntity extends KineticBlockEntity {
 
         if (connectedViaAxes)
             return defaultModifier;
-        if (!stateTo.isOf(AllBlocks.GANTRY_SHAFT))
+        if (!stateTo.is(AllBlocks.GANTRY_SHAFT))
             return defaultModifier;
-        if (!stateTo.get(GantryShaftBlock.POWERED))
+        if (!stateTo.getValue(GantryShaftBlock.POWERED))
             return defaultModifier;
 
-        Direction direction = Direction.getFacing(diff.getX(), diff.getY(), diff.getZ());
-        if (stateFrom.get(GantryCarriageBlock.FACING) != direction.getOpposite())
+        Direction direction = Direction.getApproximateNearest(diff.getX(), diff.getY(), diff.getZ());
+        if (stateFrom.getValue(GantryCarriageBlock.FACING) != direction.getOpposite())
             return defaultModifier;
-        return getGantryPinionModifier(stateTo.get(GantryShaftBlock.FACING), stateFrom.get(GantryCarriageBlock.FACING));
+        return getGantryPinionModifier(stateTo.getValue(GantryShaftBlock.FACING), stateFrom.getValue(GantryCarriageBlock.FACING));
     }
 
     public static float getGantryPinionModifier(Direction shaft, Direction pinionDirection) {
         Axis shaftAxis = shaft.getAxis();
-        float directionModifier = shaft.getDirection().offset();
+        float directionModifier = shaft.getAxisDirection().getStep();
         if (shaftAxis == Axis.Y)
             if (pinionDirection == Direction.NORTH || pinionDirection == Direction.EAST)
                 return -directionModifier;
@@ -176,16 +175,16 @@ public class GantryCarriageBlockEntity extends KineticBlockEntity {
     }
 
     private boolean shouldAssemble() {
-        BlockState blockState = getCachedState();
+        BlockState blockState = getBlockState();
         if (!(blockState.getBlock() instanceof GantryCarriageBlock))
             return false;
-        Direction facing = blockState.get(GantryCarriageBlock.FACING).getOpposite();
-        BlockState shaftState = world.getBlockState(pos.offset(facing));
+        Direction facing = blockState.getValue(GantryCarriageBlock.FACING).getOpposite();
+        BlockState shaftState = level.getBlockState(worldPosition.relative(facing));
         if (!(shaftState.getBlock() instanceof GantryShaftBlock))
             return false;
-        if (shaftState.get(GantryShaftBlock.POWERED))
+        if (shaftState.getValue(GantryShaftBlock.POWERED))
             return false;
-        BlockEntity be = world.getBlockEntity(pos.offset(facing));
+        BlockEntity be = level.getBlockEntity(worldPosition.relative(facing));
         return be instanceof GantryShaftBlockEntity && ((GantryShaftBlockEntity) be).canAssembleOn();
     }
 }

@@ -13,20 +13,19 @@ import com.zurrtum.create.foundation.blockEntity.behaviour.CachedInventoryBehavi
 import com.zurrtum.create.foundation.utility.IInteractionChecker;
 import com.zurrtum.create.ponder.api.VirtualBlockEntity;
 import it.unimi.dsi.fastutil.objects.Reference2ObjectArrayMap;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.network.RegistryByteBuf;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.storage.ReadView;
-import net.minecraft.storage.WriteView;
-import net.minecraft.util.math.BlockPos;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 
 public abstract class SmartBlockEntity extends CachedRenderBBBlockEntity implements PartialSafeNBT, IInteractionChecker, SpecialBlockEntityItemRequirement, VirtualBlockEntity {
 
@@ -75,7 +74,7 @@ public abstract class SmartBlockEntity extends CachedRenderBBBlockEntity impleme
     }
 
     public void tick() {
-        if (!initialized && hasWorld()) {
+        if (!initialized && hasLevel()) {
             initialize();
             initialized = true;
         }
@@ -94,14 +93,14 @@ public abstract class SmartBlockEntity extends CachedRenderBBBlockEntity impleme
     /**
      * Hook only these in future subclasses of STE
      */
-    protected void write(WriteView view, boolean clientPacket) {
-        super.writeData(view);
+    protected void write(ValueOutput view, boolean clientPacket) {
+        super.saveAdditional(view);
         forEachBehaviour(tb -> tb.write(view, clientPacket));
     }
 
     @Override
-    public void writeSafe(WriteView view) {
-        super.writeData(view);
+    public void writeSafe(ValueOutput view) {
+        super.saveAdditional(view);
         forEachBehaviour(tb -> {
             if (tb.isSafeNBT())
                 tb.writeSafe(view);
@@ -111,19 +110,19 @@ public abstract class SmartBlockEntity extends CachedRenderBBBlockEntity impleme
     /**
      * Hook only these in future subclasses of STE
      */
-    protected void read(ReadView view, boolean clientPacket) {
+    protected void read(ValueInput view, boolean clientPacket) {
         if (firstNbtRead) {
             firstNbtRead = false;
             ArrayList<BlockEntityBehaviour<?>> list = new ArrayList<>();
             addBehavioursDeferred(list);
             list.forEach(b -> behaviours.put(b.getType(), b));
         }
-        super.readData(view);
+        super.loadAdditional(view);
         forEachBehaviour(tb -> tb.read(view, clientPacket));
     }
 
     @Override
-    protected void readData(ReadView view) {
+    protected void loadAdditional(ValueInput view) {
         read(view, false);
     }
 
@@ -132,8 +131,8 @@ public abstract class SmartBlockEntity extends CachedRenderBBBlockEntity impleme
     }
 
     @Override
-    public void markRemoved() {
-        super.markRemoved();
+    public void setRemoved() {
+        super.setRemoved();
         if (!chunkUnloaded)
             remove();
         invalidate();
@@ -160,23 +159,23 @@ public abstract class SmartBlockEntity extends CachedRenderBBBlockEntity impleme
     }
 
     @Override
-    public void onBlockReplaced(BlockPos pos, BlockState oldState) {
-        super.onBlockReplaced(pos, oldState);
+    public void preRemoveSideEffects(BlockPos pos, BlockState oldState) {
+        super.preRemoveSideEffects(pos, oldState);
         destroy();
     }
 
     @Override
-    protected void writeData(WriteView view) {
+    protected void saveAdditional(ValueOutput view) {
         write(view, false);
     }
 
     @Override
-    public final void readClient(ReadView view) {
+    public final void readClient(ValueInput view) {
         read(view, true);
     }
 
     @Override
-    public final void writeClient(WriteView view) {
+    public final void writeClient(ValueOutput view) {
         write(view, true);
     }
 
@@ -231,23 +230,23 @@ public abstract class SmartBlockEntity extends CachedRenderBBBlockEntity impleme
     }
 
     @Override
-    public boolean canPlayerUse(PlayerEntity player) {
-        if (world == null || world.getBlockEntity(pos) != this)
+    public boolean canPlayerUse(Player player) {
+        if (level == null || level.getBlockEntity(worldPosition) != this)
             return false;
-        return player.squaredDistanceTo(pos.getX() + 0.5D, pos.getY() + 0.5D, pos.getZ() + 0.5D) <= 64.0D;
+        return player.distanceToSqr(worldPosition.getX() + 0.5D, worldPosition.getY() + 0.5D, worldPosition.getZ() + 0.5D) <= 64.0D;
     }
 
-    public void sendToMenu(RegistryByteBuf buffer) {
-        buffer.writeBlockPos(getPos());
-        buffer.writeNbt(toInitialChunkDataNbt(buffer.getRegistryManager()));
+    public void sendToMenu(RegistryFriendlyByteBuf buffer) {
+        buffer.writeBlockPos(getBlockPos());
+        buffer.writeNbt(getUpdateTag(buffer.registryAccess()));
     }
 
     @SuppressWarnings("deprecation")
     public void refreshBlockState() {
-        setCachedState(getWorld().getBlockState(getPos()));
+        setBlockState(getLevel().getBlockState(getBlockPos()));
     }
 
-    public void addAdvancementBehaviour(ServerPlayerEntity player) {
+    public void addAdvancementBehaviour(ServerPlayer player) {
         List<CreateTrigger> awardables = getAwardables();
         if (awardables != null) {
             behaviours.put(AdvancementBehaviour.TYPE, new AdvancementBehaviour(this, player, awardables.toArray(CreateTrigger[]::new)));

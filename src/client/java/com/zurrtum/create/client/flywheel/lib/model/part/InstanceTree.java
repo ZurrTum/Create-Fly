@@ -1,14 +1,12 @@
 package com.zurrtum.create.client.flywheel.lib.model.part;
 
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.zurrtum.create.client.flywheel.api.instance.InstancerProvider;
 import com.zurrtum.create.client.flywheel.api.model.Model;
 import com.zurrtum.create.client.flywheel.lib.instance.InstanceTypes;
 import com.zurrtum.create.client.flywheel.lib.instance.TransformedInstance;
 import com.zurrtum.create.client.flywheel.lib.transform.Affine;
 import com.zurrtum.create.client.flywheel.lib.transform.TransformStack;
-import net.minecraft.client.model.ModelPart;
-import net.minecraft.client.model.ModelTransform;
-import net.minecraft.client.util.math.MatrixStack;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix4f;
@@ -19,6 +17,8 @@ import org.joml.Vector3fc;
 import java.util.NoSuchElementException;
 import java.util.function.Consumer;
 import java.util.function.ObjIntConsumer;
+import net.minecraft.client.model.geom.ModelPart;
+import net.minecraft.client.model.geom.PartPose;
 
 public final class InstanceTree {
     private final ModelTree source;
@@ -78,7 +78,7 @@ public final class InstanceTree {
         return instance;
     }
 
-    public ModelTransform initialPose() {
+    public PartPose initialPose() {
         return source.initialPose();
     }
 
@@ -159,12 +159,12 @@ public final class InstanceTree {
             affine.rotate(tempQuaternion.rotationZYX(zRot, yRot, xRot));
         }
 
-        if (xScale != ModelPart.field_37937 || yScale != ModelPart.field_37937 || zScale != ModelPart.field_37937) {
+        if (xScale != ModelPart.DEFAULT_SCALE || yScale != ModelPart.DEFAULT_SCALE || zScale != ModelPart.DEFAULT_SCALE) {
             affine.scale(xScale, yScale, zScale);
         }
     }
 
-    public void translateAndRotate(MatrixStack poseStack, Quaternionf tempQuaternion) {
+    public void translateAndRotate(PoseStack poseStack, Quaternionf tempQuaternion) {
         translateAndRotate(TransformStack.of(poseStack), tempQuaternion);
     }
 
@@ -175,7 +175,7 @@ public final class InstanceTree {
             pose.rotateZYX(zRot, yRot, xRot);
         }
 
-        if (xScale != ModelPart.field_37937 || yScale != ModelPart.field_37937 || zScale != ModelPart.field_37937) {
+        if (xScale != ModelPart.DEFAULT_SCALE || yScale != ModelPart.DEFAULT_SCALE || zScale != ModelPart.DEFAULT_SCALE) {
             pose.scale(xScale, yScale, zScale);
         }
     }
@@ -452,20 +452,20 @@ public final class InstanceTree {
         offsetScale(offset.x(), offset.y(), offset.z());
     }
 
-    public ModelTransform storePose() {
-        return ModelTransform.of(x, y, z, xRot, yRot, zRot);
+    public PartPose storePose() {
+        return PartPose.offsetAndRotation(x, y, z, xRot, yRot, zRot);
     }
 
-    public void loadPose(ModelTransform pose) {
+    public void loadPose(PartPose pose) {
         x = pose.x();
         y = pose.y();
         z = pose.z();
-        xRot = pose.pitch();
-        yRot = pose.yaw();
-        zRot = pose.roll();
-        xScale = ModelPart.field_37937;
-        yScale = ModelPart.field_37937;
-        zScale = ModelPart.field_37937;
+        xRot = pose.xRot();
+        yRot = pose.yRot();
+        zRot = pose.zRot();
+        xScale = ModelPart.DEFAULT_SCALE;
+        yScale = ModelPart.DEFAULT_SCALE;
+        zScale = ModelPart.DEFAULT_SCALE;
         setChanged();
     }
 
@@ -487,12 +487,12 @@ public final class InstanceTree {
     }
 
     public void copyTransform(ModelPart modelPart) {
-        x = modelPart.originX;
-        y = modelPart.originY;
-        z = modelPart.originZ;
-        xRot = modelPart.pitch;
-        yRot = modelPart.yaw;
-        zRot = modelPart.roll;
+        x = modelPart.x;
+        y = modelPart.y;
+        z = modelPart.z;
+        xRot = modelPart.xRot;
+        yRot = modelPart.yRot;
+        zRot = modelPart.zRot;
         xScale = modelPart.xScale;
         yScale = modelPart.yScale;
         zScale = modelPart.zScale;

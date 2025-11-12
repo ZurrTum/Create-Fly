@@ -1,36 +1,36 @@
 package com.zurrtum.create.api.behaviour.display;
 
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.storage.ReadView;
-import net.minecraft.storage.WriteView;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import org.jetbrains.annotations.Nullable;
 
 public interface DisplayHolder {
-    NbtCompound getDisplayLinkData();
+    CompoundTag getDisplayLinkData();
 
-    void setDisplayLinkData(NbtCompound data);
+    void setDisplayLinkData(CompoundTag data);
 
     default void updateLine(int line, BlockPos pos) {
-        NbtCompound data = getDisplayLinkData();
+        CompoundTag data = getDisplayLinkData();
         if (data == null) {
-            data = new NbtCompound();
+            data = new CompoundTag();
             setDisplayLinkData(data);
         }
-        data.put("Line" + line, BlockPos.CODEC, pos);
+        data.store("Line" + line, BlockPos.CODEC, pos);
     }
 
     @Nullable
     default BlockPos getLine(int line) {
-        NbtCompound data = getDisplayLinkData();
+        CompoundTag data = getDisplayLinkData();
         if (data == null) {
             return null;
         }
-        return data.get("Line" + line, BlockPos.CODEC).orElse(null);
+        return data.read("Line" + line, BlockPos.CODEC).orElse(null);
     }
 
     default void removeLine(int line) {
-        NbtCompound data = getDisplayLinkData();
+        CompoundTag data = getDisplayLinkData();
         if (data == null) {
             return;
         }
@@ -40,16 +40,16 @@ public interface DisplayHolder {
         }
     }
 
-    default void writeDisplayLink(WriteView view) {
-        NbtCompound data = getDisplayLinkData();
+    default void writeDisplayLink(ValueOutput view) {
+        CompoundTag data = getDisplayLinkData();
         if (data == null) {
             return;
         }
-        view.put("DisplayLink", NbtCompound.CODEC, data);
+        view.store("DisplayLink", CompoundTag.CODEC, data);
     }
 
-    default void readDisplayLink(ReadView view) {
-        NbtCompound data = view.read("DisplayLink", NbtCompound.CODEC).orElse(null);
+    default void readDisplayLink(ValueInput view) {
+        CompoundTag data = view.read("DisplayLink", CompoundTag.CODEC).orElse(null);
         setDisplayLinkData(data);
     }
 }

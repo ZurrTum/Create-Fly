@@ -1,25 +1,25 @@
 package com.zurrtum.create.client.ponder.foundation.element;
 
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.zurrtum.create.catnip.animation.LerpedFloat;
 import com.zurrtum.create.client.ponder.api.element.AnimatedSceneElement;
 import com.zurrtum.create.client.ponder.api.level.PonderLevel;
-import net.minecraft.client.item.ItemModelManager;
-import net.minecraft.client.render.BlockRenderLayer;
-import net.minecraft.client.render.Camera;
-import net.minecraft.client.render.LightmapTextureManager;
-import net.minecraft.client.render.VertexConsumerProvider;
-import net.minecraft.client.render.block.BlockRenderManager;
-import net.minecraft.client.render.block.entity.BlockEntityRenderManager;
-import net.minecraft.client.render.command.OrderedRenderCommandQueue;
-import net.minecraft.client.render.entity.EntityRenderManager;
-import net.minecraft.client.render.state.CameraRenderState;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.client.Camera;
+import net.minecraft.client.renderer.LightTexture;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.SubmitNodeCollector;
+import net.minecraft.client.renderer.block.BlockRenderDispatcher;
+import net.minecraft.client.renderer.blockentity.BlockEntityRenderDispatcher;
+import net.minecraft.client.renderer.chunk.ChunkSectionLayer;
+import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
+import net.minecraft.client.renderer.item.ItemModelResolver;
+import net.minecraft.client.renderer.state.CameraRenderState;
+import net.minecraft.util.Mth;
+import net.minecraft.world.phys.Vec3;
 
 public abstract class AnimatedSceneElementBase extends PonderElementBase implements AnimatedSceneElement {
 
-    protected Vec3d fadeVec;
+    protected Vec3 fadeVec;
     protected LerpedFloat fade;
 
     public AnimatedSceneElementBase() {
@@ -37,100 +37,100 @@ public abstract class AnimatedSceneElementBase extends PonderElementBase impleme
     }
 
     @Override
-    public void setFadeVec(Vec3d fadeVec) {
+    public void setFadeVec(Vec3 fadeVec) {
         this.fadeVec = fadeVec;
     }
 
     @Override
     public final void renderFirst(
-        BlockEntityRenderManager blockEntityRenderDispatcher,
-        BlockRenderManager blockRenderManager,
+        BlockEntityRenderDispatcher blockEntityRenderDispatcher,
+        BlockRenderDispatcher blockRenderManager,
         PonderLevel world,
-        VertexConsumerProvider buffer,
-        OrderedRenderCommandQueue queue,
+        MultiBufferSource buffer,
+        SubmitNodeCollector queue,
         Camera camera,
         CameraRenderState cameraRenderState,
-        MatrixStack poseStack,
+        PoseStack poseStack,
         float pt
     ) {
-        poseStack.push();
+        poseStack.pushPose();
         float currentFade = applyFade(poseStack, pt);
         renderFirst(blockEntityRenderDispatcher, blockRenderManager, world, buffer, queue, camera, cameraRenderState, poseStack, currentFade, pt);
-        poseStack.pop();
+        poseStack.popPose();
     }
 
     @Override
-    public final void renderLayer(PonderLevel world, VertexConsumerProvider buffer, BlockRenderLayer type, MatrixStack poseStack, float pt) {
-        poseStack.push();
+    public final void renderLayer(PonderLevel world, MultiBufferSource buffer, ChunkSectionLayer type, PoseStack poseStack, float pt) {
+        poseStack.pushPose();
         float currentFade = applyFade(poseStack, pt);
         renderLayer(world, buffer, type, poseStack, currentFade, pt);
-        poseStack.pop();
+        poseStack.popPose();
     }
 
     @Override
     public final void renderLast(
-        EntityRenderManager entityRenderManager,
-        ItemModelManager itemModelManager,
+        EntityRenderDispatcher entityRenderManager,
+        ItemModelResolver itemModelManager,
         PonderLevel world,
-        VertexConsumerProvider buffer,
-        OrderedRenderCommandQueue queue,
+        MultiBufferSource buffer,
+        SubmitNodeCollector queue,
         Camera camera,
         CameraRenderState cameraRenderState,
-        MatrixStack poseStack,
+        PoseStack poseStack,
         float pt
     ) {
-        poseStack.push();
+        poseStack.pushPose();
         float currentFade = applyFade(poseStack, pt);
         renderLast(entityRenderManager, itemModelManager, world, buffer, queue, camera, cameraRenderState, poseStack, currentFade, pt);
-        poseStack.pop();
+        poseStack.popPose();
     }
 
-    protected float applyFade(MatrixStack ms, float pt) {
+    protected float applyFade(PoseStack ms, float pt) {
         float currentFade = fade.getValue(pt);
         if (fadeVec != null) {
-            Vec3d scaled = fadeVec.multiply(-1 + currentFade);
+            Vec3 scaled = fadeVec.scale(-1 + currentFade);
             ms.translate(scaled.x, scaled.y, scaled.z);
         }
 
         return currentFade;
     }
 
-    protected void renderLayer(PonderLevel world, VertexConsumerProvider buffer, BlockRenderLayer type, MatrixStack ms, float fade, float pt) {
+    protected void renderLayer(PonderLevel world, MultiBufferSource buffer, ChunkSectionLayer type, PoseStack ms, float fade, float pt) {
     }
 
     protected void renderFirst(
-        BlockEntityRenderManager blockEntityRenderDispatcher,
-        BlockRenderManager blockRenderManager,
+        BlockEntityRenderDispatcher blockEntityRenderDispatcher,
+        BlockRenderDispatcher blockRenderManager,
         PonderLevel world,
-        VertexConsumerProvider buffer,
-        OrderedRenderCommandQueue queue,
+        MultiBufferSource buffer,
+        SubmitNodeCollector queue,
         Camera camera,
         CameraRenderState cameraRenderState,
-        MatrixStack ms,
+        PoseStack ms,
         float fade,
         float pt
     ) {
     }
 
     protected void renderLast(
-        EntityRenderManager entityRenderManager,
-        ItemModelManager itemModelManager,
+        EntityRenderDispatcher entityRenderManager,
+        ItemModelResolver itemModelManager,
         PonderLevel world,
-        VertexConsumerProvider buffer,
-        OrderedRenderCommandQueue queue,
+        MultiBufferSource buffer,
+        SubmitNodeCollector queue,
         Camera camera,
         CameraRenderState cameraRenderState,
-        MatrixStack ms,
+        PoseStack ms,
         float fade,
         float pt
     ) {
     }
 
     protected int lightCoordsFromFade(float fade) {
-        int light = LightmapTextureManager.MAX_LIGHT_COORDINATE;
+        int light = LightTexture.FULL_BRIGHT;
         if (fade != 1) {
-            light = (int) (MathHelper.lerp(fade, 5, 0xF));
-            light = LightmapTextureManager.pack(light, light);
+            light = (int) (Mth.lerpInt(fade, 5, 0xF));
+            light = LightTexture.pack(light, light);
         }
         return light;
     }

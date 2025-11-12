@@ -13,7 +13,7 @@ import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
 import net.fabricmc.fabric.api.transfer.v1.storage.StorageView;
 import net.fabricmc.fabric.api.transfer.v1.storage.base.SingleSlotStorage;
 import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
-import net.minecraft.util.math.Direction;
+import net.minecraft.core.Direction;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -46,7 +46,7 @@ public abstract class FluidInventoryWrapper<T extends Storage<FluidVariant>, S e
     }
 
     @Override
-    public void clear() {
+    public void clearContent() {
         try (Transaction transaction = Transaction.openOuter()) {
             for (StorageView<FluidVariant> view : storage.nonEmptyViews()) {
                 view.extract(view.getResource(), view.getAmount(), transaction);
@@ -477,7 +477,7 @@ public abstract class FluidInventoryWrapper<T extends Storage<FluidVariant>, S e
     @Override
     @NotNull
     public java.util.Iterator<FluidStack> iterator() {
-        return storage.supportsExtraction() ? new Iterator(storage) : Collections.emptyIterator();
+        return storage.supportsExtraction() ? new com.zurrtum.create.infrastructure.transfer.FluidInventoryWrapper.Iterator(storage) : Collections.emptyIterator();
     }
 
     @Override
@@ -688,11 +688,11 @@ public abstract class FluidInventoryWrapper<T extends Storage<FluidVariant>, S e
         }
 
         @Override
-        public void clear() {
+        public void clearContent() {
             if (!canExtract) {
                 return;
             }
-            inventory.clear();
+            inventory.clearContent();
         }
 
         @Override

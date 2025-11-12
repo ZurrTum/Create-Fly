@@ -9,16 +9,16 @@ import com.zurrtum.create.content.trains.graph.*;
 import com.zurrtum.create.content.trains.signal.TrackEdgePoint;
 import com.zurrtum.create.content.trains.track.BezierConnection;
 import com.zurrtum.create.content.trains.track.TrackMaterial;
-import net.minecraft.network.PacketByteBuf;
-import net.minecraft.network.codec.PacketCodec;
-import net.minecraft.network.packet.PacketType;
-import net.minecraft.util.math.Vec3d;
 import org.apache.logging.log4j.util.TriConsumer;
 
 import java.util.*;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.PacketType;
+import net.minecraft.world.phys.Vec3;
 
 public class TrackGraphSyncPacket extends TrackGraphPacket implements S2CPacket {
-    public static final PacketCodec<PacketByteBuf, TrackGraphSyncPacket> CODEC = PacketCodec.of(
+    public static final StreamCodec<FriendlyByteBuf, TrackGraphSyncPacket> CODEC = StreamCodec.ofMember(
         TrackGraphSyncPacket::write,
         TrackGraphSyncPacket::new
     );
@@ -29,13 +29,13 @@ public class TrackGraphSyncPacket extends TrackGraphPacket implements S2CPacket 
     }
 
     @Override
-    public PacketType<TrackGraphSyncPacket> getPacketType() {
+    public PacketType<TrackGraphSyncPacket> type() {
         return AllPackets.SYNC_RAIL_GRAPH;
     }
 
     public static final int NULL_GROUP = 0, PASSIVE_GROUP = 1, GROUP = 2;
 
-    public Map<Integer, Pair<TrackNodeLocation, Vec3d>> addedNodes;
+    public Map<Integer, Pair<TrackNodeLocation, Vec3>> addedNodes;
     public List<Pair<Pair<Couple<Integer>, TrackMaterial>, BezierConnection>> addedEdges;
     public List<Integer> removedNodes;
     public List<TrackEdgePoint> addedEdgePoints;
@@ -57,10 +57,10 @@ public class TrackGraphSyncPacket extends TrackGraphPacket implements S2CPacket 
         packetDeletesGraph = false;
     }
 
-    public TrackGraphSyncPacket(PacketByteBuf buffer) {
+    public TrackGraphSyncPacket(FriendlyByteBuf buffer) {
         int size;
 
-        graphId = buffer.readUuid();
+        graphId = buffer.readUUID();
         netId = buffer.readInt();
         packetDeletesGraph = buffer.readBoolean();
         fullWipe = buffer.readBoolean();
@@ -99,7 +99,7 @@ public class TrackGraphSyncPacket extends TrackGraphPacket implements S2CPacket 
 
         size = buffer.readVarInt();
         for (int i = 0; i < size; i++)
-            removedEdgePoints.add(buffer.readUuid());
+            removedEdgePoints.add(buffer.readUUID());
 
         size = buffer.readVarInt();
         for (int i = 0; i < size; i++) {
@@ -108,17 +108,17 @@ public class TrackGraphSyncPacket extends TrackGraphPacket implements S2CPacket 
             Pair<Integer, List<UUID>> entry = Pair.of(buffer.readVarInt(), list);
             int size2 = buffer.readVarInt();
             for (int j = 0; j < size2; j++)
-                list.add(buffer.readUuid());
+                list.add(buffer.readUUID());
             updatedEdgeData.put(key, entry);
         }
 
         size = buffer.readVarInt();
         for (int i = 0; i < size; i++)
-            splitSubGraphs.put(buffer.readVarInt(), Pair.of(buffer.readInt(), buffer.readUuid()));
+            splitSubGraphs.put(buffer.readVarInt(), Pair.of(buffer.readInt(), buffer.readUUID()));
     }
 
-    public void write(PacketByteBuf buffer) {
-        buffer.writeUuid(graphId);
+    public void write(FriendlyByteBuf buffer) {
+        buffer.writeUUID(graphId);
         buffer.writeInt(netId);
         buffer.writeBoolean(packetDeletesGraph);
         buffer.writeBoolean(fullWipe);
@@ -139,7 +139,7 @@ public class TrackGraphSyncPacket extends TrackGraphPacket implements S2CPacket 
         addedNodes.forEach((node, loc) -> {
             buffer.writeVarInt(node);
             loc.getFirst().send(buffer, dimensions);
-            Vec3d.PACKET_CODEC.encode(buffer, loc.getSecond());
+            Vec3.STREAM_CODEC.encode(buffer, loc.getSecond());
         });
 
         buffer.writeVarInt(addedEdges.size());
@@ -156,7 +156,7 @@ public class TrackGraphSyncPacket extends TrackGraphPacket implements S2CPacket 
         addedEdgePoints.forEach(ep -> ep.write(buffer, dimensions));
 
         buffer.writeVarInt(removedEdgePoints.size());
-        removedEdgePoints.forEach(buffer::writeUuid);
+        removedEdgePoints.forEach(buffer::writeUUID);
 
         buffer.writeVarInt(updatedEdgeData.size());
         for (Map.Entry<Couple<Integer>, Pair<Integer, List<UUID>>> entry : updatedEdgeData.entrySet()) {
@@ -165,14 +165,14 @@ public class TrackGraphSyncPacket extends TrackGraphPacket implements S2CPacket 
             buffer.writeVarInt(pair.getFirst());
             List<UUID> list = pair.getSecond();
             buffer.writeVarInt(list.size());
-            list.forEach(buffer::writeUuid);
+            list.forEach(buffer::writeUUID);
         }
 
         buffer.writeVarInt(splitSubGraphs.size());
         splitSubGraphs.forEach((node, p) -> {
             buffer.writeVarInt(node);
             buffer.writeInt(p.getFirst());
-            buffer.writeUuid(p.getSecond());
+            buffer.writeUUID(p.getSecond());
         });
     }
 

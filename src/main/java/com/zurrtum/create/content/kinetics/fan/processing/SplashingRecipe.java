@@ -6,14 +6,13 @@ import com.zurrtum.create.AllRecipeSerializers;
 import com.zurrtum.create.AllRecipeTypes;
 import com.zurrtum.create.content.processing.recipe.ChanceOutput;
 import com.zurrtum.create.foundation.recipe.CreateSingleStackRollableRecipe;
-import net.minecraft.network.RegistryByteBuf;
-import net.minecraft.network.codec.PacketCodec;
-import net.minecraft.network.codec.PacketCodecs;
-import net.minecraft.recipe.Ingredient;
-import net.minecraft.recipe.RecipeSerializer;
-import net.minecraft.recipe.RecipeType;
-
 import java.util.List;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.item.crafting.RecipeSerializer;
+import net.minecraft.world.item.crafting.RecipeType;
 
 public record SplashingRecipe(List<ChanceOutput> results, Ingredient ingredient) implements CreateSingleStackRollableRecipe {
     @Override
@@ -32,10 +31,10 @@ public record SplashingRecipe(List<ChanceOutput> results, Ingredient ingredient)
             Ingredient.CODEC.fieldOf("ingredient").forGetter(SplashingRecipe::ingredient)
         ).apply(instance, SplashingRecipe::new));
 
-        public static final PacketCodec<RegistryByteBuf, SplashingRecipe> PACKET_CODEC = PacketCodec.tuple(
-            ChanceOutput.PACKET_CODEC.collect(PacketCodecs.toList()),
+        public static final StreamCodec<RegistryFriendlyByteBuf, SplashingRecipe> PACKET_CODEC = StreamCodec.composite(
+            ChanceOutput.PACKET_CODEC.apply(ByteBufCodecs.list()),
             SplashingRecipe::results,
-            Ingredient.PACKET_CODEC,
+            Ingredient.CONTENTS_STREAM_CODEC,
             SplashingRecipe::ingredient,
             SplashingRecipe::new
         );
@@ -46,7 +45,7 @@ public record SplashingRecipe(List<ChanceOutput> results, Ingredient ingredient)
         }
 
         @Override
-        public PacketCodec<RegistryByteBuf, SplashingRecipe> packetCodec() {
+        public StreamCodec<RegistryFriendlyByteBuf, SplashingRecipe> streamCodec() {
             return PACKET_CODEC;
         }
     }

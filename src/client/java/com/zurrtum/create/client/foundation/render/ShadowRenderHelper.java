@@ -1,53 +1,57 @@
 package com.zurrtum.create.client.foundation.render;
 
-import net.minecraft.block.BlockRenderType;
-import net.minecraft.block.BlockState;
-import net.minecraft.client.render.*;
-import net.minecraft.client.render.command.OrderedRenderCommandQueue;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.shape.VoxelShape;
-import net.minecraft.world.WorldView;
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
+import net.minecraft.client.renderer.LightTexture;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.SubmitNodeCollector;
+import net.minecraft.client.renderer.texture.OverlayTexture;
+import net.minecraft.core.BlockPos;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.Mth;
+import net.minecraft.world.level.LevelReader;
+import net.minecraft.world.level.block.RenderShape;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.phys.shapes.VoxelShape;
 
 /**
  * Taken from EntityRendererManager
  */
 public class ShadowRenderHelper {
 
-    private static final RenderLayer SHADOW_LAYER = RenderLayer.getEntityShadow(Identifier.ofVanilla("textures/misc/shadow.png"));
+    private static final RenderType SHADOW_LAYER = RenderType.entityShadow(ResourceLocation.withDefaultNamespace("textures/misc/shadow.png"));
 
-    public static void renderShadow(MatrixStack matrixStack, OrderedRenderCommandQueue queue, float opacity, float radius) {
-        queue.submitCustom(matrixStack, SHADOW_LAYER, new ShadowRenderState(opacity / 2, radius, -1 * radius));
+    public static void renderShadow(PoseStack matrixStack, SubmitNodeCollector queue, float opacity, float radius) {
+        queue.submitCustomGeometry(matrixStack, SHADOW_LAYER, new ShadowRenderState(opacity / 2, radius, -1 * radius));
     }
 
-    public static void renderShadow(MatrixStack matrixStack, VertexConsumerProvider buffer, WorldView world, Vec3d pos, float opacity, float radius) {
+    public static void renderShadow(PoseStack matrixStack, MultiBufferSource buffer, LevelReader world, Vec3 pos, float opacity, float radius) {
         float f = radius;
 
-        double d2 = pos.getX();
-        double d0 = pos.getY();
-        double d1 = pos.getZ();
-        int i = MathHelper.floor(d2 - (double) f);
-        int j = MathHelper.floor(d2 + (double) f);
-        int k = MathHelper.floor(d0 - (double) f);
-        int l = MathHelper.floor(d0);
-        int i1 = MathHelper.floor(d1 - (double) f);
-        int j1 = MathHelper.floor(d1 + (double) f);
-        MatrixStack.Entry entry = matrixStack.peek();
+        double d2 = pos.x();
+        double d0 = pos.y();
+        double d1 = pos.z();
+        int i = Mth.floor(d2 - (double) f);
+        int j = Mth.floor(d2 + (double) f);
+        int k = Mth.floor(d0 - (double) f);
+        int l = Mth.floor(d0);
+        int i1 = Mth.floor(d1 - (double) f);
+        int j1 = Mth.floor(d1 + (double) f);
+        PoseStack.Pose entry = matrixStack.last();
         VertexConsumer builder = buffer.getBuffer(SHADOW_LAYER);
 
-        for (BlockPos blockpos : BlockPos.iterate(new BlockPos(i, k, i1), new BlockPos(j, l, j1))) {
+        for (BlockPos blockpos : BlockPos.betweenClosed(new BlockPos(i, k, i1), new BlockPos(j, l, j1))) {
             renderBlockShadow(entry, builder, world, blockpos, d2, d0, d1, f, opacity);
         }
     }
 
     private static void renderBlockShadow(
-        MatrixStack.Entry entry,
+        PoseStack.Pose entry,
         VertexConsumer builder,
-        WorldView world,
+        LevelReader world,
         BlockPos pos,
         double x,
         double y,
@@ -55,20 +59,20 @@ public class ShadowRenderHelper {
         float radius,
         float opacity
     ) {
-        BlockPos blockpos = pos.down();
+        BlockPos blockpos = pos.below();
         BlockState blockstate = world.getBlockState(blockpos);
-        if (blockstate.getRenderType() != BlockRenderType.INVISIBLE && world.getLightLevel(pos) > 3) {
-            if (blockstate.isFullCube(world, blockpos)) {
-                VoxelShape voxelshape = blockstate.getOutlineShape(world, pos.down());
+        if (blockstate.getRenderShape() != RenderShape.INVISIBLE && world.getMaxLocalRawBrightness(pos) > 3) {
+            if (blockstate.isCollisionShapeFullBlock(world, blockpos)) {
+                VoxelShape voxelshape = blockstate.getShape(world, pos.below());
                 if (!voxelshape.isEmpty()) {
-                    float brightness = LightmapTextureManager.getBrightness(world.getDimension(), world.getLightLevel(pos));
+                    float brightness = LightTexture.getBrightness(world.dimensionType(), world.getMaxLocalRawBrightness(pos));
                     float f = (float) ((opacity - (y - pos.getY()) / 2.0D) * 0.5D * brightness);
                     if (f >= 0.0F) {
                         if (f > 1.0F) {
                             f = 1.0F;
                         }
 
-                        Box AABB = voxelshape.getBoundingBox();
+                        AABB AABB = voxelshape.bounds();
                         double d0 = (double) pos.getX() + AABB.minX;
                         double d1 = (double) pos.getX() + AABB.maxX;
                         double d2 = (double) pos.getY() + AABB.minY;
@@ -93,14 +97,14 @@ public class ShadowRenderHelper {
         }
     }
 
-    private static void shadowVertex(MatrixStack.Entry entry, VertexConsumer builder, float alpha, float x, float y, float z, float u, float v) {
-        builder.vertex(entry.getPositionMatrix(), x, y, z).color(1.0F, 1.0F, 1.0F, alpha).texture(u, v).overlay(OverlayTexture.DEFAULT_UV)
-            .light(LightmapTextureManager.MAX_LIGHT_COORDINATE).normal(entry, 0.0F, 1.0F, 0.0F);
+    private static void shadowVertex(PoseStack.Pose entry, VertexConsumer builder, float alpha, float x, float y, float z, float u, float v) {
+        builder.addVertex(entry.pose(), x, y, z).setColor(1.0F, 1.0F, 1.0F, alpha).setUv(u, v).setOverlay(OverlayTexture.NO_OVERLAY)
+            .setLight(LightTexture.FULL_BRIGHT).setNormal(entry, 0.0F, 1.0F, 0.0F);
     }
 
-    public record ShadowRenderState(float opacity, float radius, float negativeRadius) implements OrderedRenderCommandQueue.Custom {
+    public record ShadowRenderState(float opacity, float radius, float negativeRadius) implements SubmitNodeCollector.CustomGeometryRenderer {
         @Override
-        public void render(MatrixStack.Entry entry, VertexConsumer builder) {
+        public void render(PoseStack.Pose entry, VertexConsumer builder) {
             shadowVertex(entry, builder, opacity, negativeRadius, 0, negativeRadius, 0, 0);
             shadowVertex(entry, builder, opacity, negativeRadius, 0, radius, 0, 1);
             shadowVertex(entry, builder, opacity, radius, 0, radius, 1, 1);

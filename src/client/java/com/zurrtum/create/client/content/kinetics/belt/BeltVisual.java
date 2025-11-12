@@ -18,9 +18,9 @@ import com.zurrtum.create.content.kinetics.belt.BeltBlock;
 import com.zurrtum.create.content.kinetics.belt.BeltBlockEntity;
 import com.zurrtum.create.content.kinetics.belt.BeltPart;
 import com.zurrtum.create.content.kinetics.belt.BeltSlope;
-import net.minecraft.util.DyeColor;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.MathHelper;
+import net.minecraft.core.Direction;
+import net.minecraft.util.Mth;
+import net.minecraft.world.item.DyeColor;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Quaternionf;
 
@@ -41,12 +41,12 @@ public class BeltVisual extends KineticBlockEntityVisual<BeltBlockEntity> {
         super(context, blockEntity, partialTick);
 
 
-        BeltPart part = blockState.get(BeltBlock.PART);
+        BeltPart part = blockState.getValue(BeltBlock.PART);
         boolean start = part == BeltPart.START;
         boolean end = part == BeltPart.END;
         DyeColor color = blockEntity.color.orElse(null);
 
-        boolean diagonal = blockState.get(BeltBlock.SLOPE).isDiagonal();
+        boolean diagonal = blockState.getValue(BeltBlock.SLOPE).isDiagonal();
         belts = new ScrollInstance[diagonal ? 1 : 2];
 
         for (boolean bottom : Iterate.trueAndFalse) {
@@ -74,7 +74,7 @@ public class BeltVisual extends KineticBlockEntityVisual<BeltBlockEntity> {
     public void update(float pt) {
         DyeColor color = blockEntity.color.orElse(null);
 
-        boolean diagonal = blockState.get(BeltBlock.SLOPE).isDiagonal();
+        boolean diagonal = blockState.getValue(BeltBlock.SLOPE).isDiagonal();
 
         boolean bottom = true;
         for (ScrollInstance key : belts) {
@@ -123,17 +123,17 @@ public class BeltVisual extends KineticBlockEntityVisual<BeltBlockEntity> {
     }
 
     private Direction getOrientation() {
-        Direction dir = blockState.get(BeltBlock.HORIZONTAL_FACING).rotateYClockwise();
+        Direction dir = blockState.getValue(BeltBlock.HORIZONTAL_FACING).getClockWise();
 
-        if (blockState.get(BeltBlock.SLOPE) == BeltSlope.SIDEWAYS)
+        if (blockState.getValue(BeltBlock.SLOPE) == BeltSlope.SIDEWAYS)
             dir = Direction.UP;
 
         return dir;
     }
 
     private ScrollInstance setup(ScrollInstance key, boolean bottom, SpriteShiftEntry spriteShift) {
-        BeltSlope beltSlope = blockState.get(BeltBlock.SLOPE);
-        Direction facing = blockState.get(BeltBlock.HORIZONTAL_FACING);
+        BeltSlope beltSlope = blockState.getValue(BeltBlock.SLOPE);
+        Direction facing = blockState.getValue(BeltBlock.HORIZONTAL_FACING);
         boolean diagonal = beltSlope.isDiagonal();
         boolean sideways = beltSlope == BeltSlope.SIDEWAYS;
         boolean vertical = beltSlope == BeltSlope.VERTICAL;
@@ -143,7 +143,7 @@ public class BeltVisual extends KineticBlockEntityVisual<BeltBlockEntity> {
         boolean downward = beltSlope == BeltSlope.DOWNWARD;
 
         float speed = blockEntity.getSpeed();
-        if (((facing.getDirection() == Direction.AxisDirection.NEGATIVE) ^ upward) ^ ((alongX && !diagonal) || (alongZ && diagonal))) {
+        if (((facing.getAxisDirection() == Direction.AxisDirection.NEGATIVE) ^ upward) ^ ((alongX && !diagonal) || (alongZ && diagonal))) {
             speed = -speed;
         }
         if (sideways && (facing == Direction.SOUTH || facing == Direction.WEST) || (vertical && facing == Direction.EAST)) {
@@ -151,14 +151,10 @@ public class BeltVisual extends KineticBlockEntityVisual<BeltBlockEntity> {
         }
 
         float rotX = (!diagonal && beltSlope != BeltSlope.HORIZONTAL ? 90 : 0) + (downward ? 180 : 0) + (sideways ? 90 : 0) + (vertical && alongZ ? 180 : 0);
-        float rotY = facing.getPositiveHorizontalDegrees() + ((diagonal ^ alongX) && !downward ? 180 : 0) + (sideways && alongZ ? 180 : 0) + (vertical && alongX ? 90 : 0);
+        float rotY = facing.toYRot() + ((diagonal ^ alongX) && !downward ? 180 : 0) + (sideways && alongZ ? 180 : 0) + (vertical && alongX ? 90 : 0);
         float rotZ = (sideways ? 90 : 0) + (vertical && alongX ? 90 : 0);
 
-        Quaternionf q = new Quaternionf().rotationXYZ(
-            rotX * MathHelper.RADIANS_PER_DEGREE,
-            rotY * MathHelper.RADIANS_PER_DEGREE,
-            rotZ * MathHelper.RADIANS_PER_DEGREE
-        );
+        Quaternionf q = new Quaternionf().rotationXYZ(rotX * Mth.DEG_TO_RAD, rotY * Mth.DEG_TO_RAD, rotZ * Mth.DEG_TO_RAD);
 
         key.setSpriteShift(spriteShift, 1f, (diagonal ? SCROLL_FACTOR_DIAGONAL : SCROLL_FACTOR_OTHERWISE)).position(getVisualPosition()).rotation(q)
             .speed(0, speed * MAGIC_SCROLL_MULTIPLIER).offset(0, bottom ? SCROLL_OFFSET_BOTTOM : SCROLL_OFFSET_OTHERWISE)

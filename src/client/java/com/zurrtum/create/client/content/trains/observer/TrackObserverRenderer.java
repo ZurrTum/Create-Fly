@@ -1,5 +1,6 @@
 package com.zurrtum.create.client.content.trains.observer;
 
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.zurrtum.create.client.AllTrackRenders;
 import com.zurrtum.create.client.content.trains.track.TrackBlockRenderState;
 import com.zurrtum.create.client.content.trains.track.TrackBlockRenderer;
@@ -10,20 +11,19 @@ import com.zurrtum.create.content.trains.observer.TrackObserverBlockEntity;
 import com.zurrtum.create.content.trains.track.ITrackBlock;
 import com.zurrtum.create.content.trains.track.TrackTargetingBehaviour;
 import com.zurrtum.create.content.trains.track.TrackTargetingBehaviour.RenderedTrackOverlayType;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.client.render.block.entity.BlockEntityRendererFactory;
-import net.minecraft.client.render.command.ModelCommandRenderer;
-import net.minecraft.client.render.command.OrderedRenderCommandQueue;
-import net.minecraft.client.render.state.CameraRenderState;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.World;
+import net.minecraft.client.renderer.SubmitNodeCollector;
+import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
+import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
+import net.minecraft.client.renderer.state.CameraRenderState;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 
 public class TrackObserverRenderer extends SmartBlockEntityRenderer<TrackObserverBlockEntity, TrackObserverRenderer.TrackObserverRenderState> {
-    public TrackObserverRenderer(BlockEntityRendererFactory.Context context) {
+    public TrackObserverRenderer(BlockEntityRendererProvider.Context context) {
         super(context);
     }
 
@@ -33,15 +33,15 @@ public class TrackObserverRenderer extends SmartBlockEntityRenderer<TrackObserve
     }
 
     @Override
-    public void updateRenderState(
+    public void extractRenderState(
         TrackObserverBlockEntity be,
         TrackObserverRenderState state,
         float tickProgress,
-        Vec3d cameraPos,
-        ModelCommandRenderer.@Nullable CrumblingOverlayCommand crumblingOverlay
+        Vec3 cameraPos,
+        @Nullable ModelFeatureRenderer.CrumblingOverlay crumblingOverlay
     ) {
-        super.updateRenderState(be, state, tickProgress, cameraPos, crumblingOverlay);
-        World world = be.getWorld();
+        super.extractRenderState(be, state, tickProgress, cameraPos, crumblingOverlay);
+        Level world = be.getLevel();
         if (VisualizationManager.supportsVisualization(world)) {
             return;
         }
@@ -55,24 +55,18 @@ public class TrackObserverRenderer extends SmartBlockEntityRenderer<TrackObserve
         TrackBlockRenderer renderer = AllTrackRenders.get(track);
         if (renderer != null) {
             state.block = renderer.getRenderState(
-                world,
-                new Vec3d(targetPosition.getX() - state.pos.getX(),
-                    targetPosition.getY() - state.pos.getY(),
-                    targetPosition.getZ() - state.pos.getZ()
-                ),
-                trackState,
-                targetPosition,
-                target.getTargetDirection(),
-                target.getTargetBezier(),
-                RenderedTrackOverlayType.OBSERVER,
-                1
+                world, new Vec3(
+                    targetPosition.getX() - state.blockPos.getX(),
+                    targetPosition.getY() - state.blockPos.getY(),
+                    targetPosition.getZ() - state.blockPos.getZ()
+                ), trackState, targetPosition, target.getTargetDirection(), target.getTargetBezier(), RenderedTrackOverlayType.OBSERVER, 1
             );
         }
     }
 
     @Override
-    public void render(TrackObserverRenderState state, MatrixStack matrices, OrderedRenderCommandQueue queue, CameraRenderState cameraState) {
-        super.render(state, matrices, queue, cameraState);
+    public void submit(TrackObserverRenderState state, PoseStack matrices, SubmitNodeCollector queue, CameraRenderState cameraState) {
+        super.submit(state, matrices, queue, cameraState);
         if (state.block != null) {
             state.block.render(matrices, queue);
         }

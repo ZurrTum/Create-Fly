@@ -9,18 +9,18 @@ import com.zurrtum.create.content.trains.schedule.ScheduleRuntime;
 import com.zurrtum.create.content.trains.schedule.ScheduleRuntime.State;
 import com.zurrtum.create.content.trains.station.GlobalPackagePort;
 import com.zurrtum.create.content.trains.station.GlobalStation;
-import net.minecraft.inventory.Inventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Map;
+import net.minecraft.core.BlockPos;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.Container;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
 
 public class DeliverPackagesInstruction extends ScheduleInstruction {
-    public DeliverPackagesInstruction(Identifier id) {
+    public DeliverPackagesInstruction(ResourceLocation id) {
         super(id);
     }
 
@@ -31,7 +31,7 @@ public class DeliverPackagesInstruction extends ScheduleInstruction {
 
     @Override
     @Nullable
-    public DiscoveredPath start(ScheduleRuntime runtime, World level) {
+    public DiscoveredPath start(ScheduleRuntime runtime, Level level) {
         boolean anyMatch = false;
         String firstPackage = null;
         ArrayList<GlobalStation> validStations = new ArrayList<>();
@@ -44,7 +44,7 @@ public class DeliverPackagesInstruction extends ScheduleInstruction {
         }
 
         for (Carriage carriage : train.carriages) {
-            Inventory carriageInventory = carriage.storage.getAllItems();
+            Container carriageInventory = carriage.storage.getAllItems();
             if (carriageInventory == null)
                 continue;
 

@@ -9,103 +9,103 @@ import com.zurrtum.create.Create;
 import com.zurrtum.create.content.trains.entity.Train;
 import com.zurrtum.create.content.trains.schedule.ScheduleDataEntry;
 import com.zurrtum.create.content.trains.schedule.destination.NbtReadContext;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.nbt.NbtElement;
-import net.minecraft.network.RegistryByteBuf;
-import net.minecraft.network.codec.PacketCodec;
-import net.minecraft.storage.NbtReadView;
-import net.minecraft.storage.NbtWriteView;
-import net.minecraft.storage.ReadView;
-import net.minecraft.storage.WriteView;
-import net.minecraft.text.MutableText;
-import net.minecraft.util.ErrorReporter;
-import net.minecraft.util.Identifier;
-import net.minecraft.world.World;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.Tag;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.ProblemReporter;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.storage.TagValueInput;
+import net.minecraft.world.level.storage.TagValueOutput;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 
 public abstract class ScheduleWaitCondition extends ScheduleDataEntry {
-    public static final PacketCodec<RegistryByteBuf, ScheduleWaitCondition> STREAM_CODEC = PacketCodec.ofStatic(
+    public static final StreamCodec<RegistryFriendlyByteBuf, ScheduleWaitCondition> STREAM_CODEC = StreamCodec.of(
         ScheduleWaitCondition::encode,
         ScheduleWaitCondition::decode
     );
 
-    public ScheduleWaitCondition(Identifier id) {
+    public ScheduleWaitCondition(ResourceLocation id) {
         super(id);
     }
 
-    public abstract boolean tickCompletion(World level, Train train, NbtCompound context);
+    public abstract boolean tickCompletion(Level level, Train train, CompoundTag context);
 
-    protected void requestStatusToUpdate(NbtCompound context) {
-        context.putInt("StatusVersion", context.getInt("StatusVersion", 0) + 1);
+    protected void requestStatusToUpdate(CompoundTag context) {
+        context.putInt("StatusVersion", context.getIntOr("StatusVersion", 0) + 1);
     }
 
-    public final void write(WriteView view) {
-        view.put("Id", Identifier.CODEC, id);
-        try (ErrorReporter.Logging logging = new ErrorReporter.Logging(() -> "ScheduleWaitCondition", Create.LOGGER)) {
-            NbtWriteView writeView = new NbtWriteView(logging, ((NbtWriteView) view).ops, data);
+    public final void write(ValueOutput view) {
+        view.store("Id", ResourceLocation.CODEC, id);
+        try (ProblemReporter.ScopedCollector logging = new ProblemReporter.ScopedCollector(() -> "ScheduleWaitCondition", Create.LOGGER)) {
+            TagValueOutput writeView = new TagValueOutput(logging, ((TagValueOutput) view).ops, data);
             writeAdditional(writeView);
-            view.put("Data", NbtCompound.CODEC, writeView.getNbt());
+            view.store("Data", CompoundTag.CODEC, writeView.buildResult());
         }
     }
 
     @SuppressWarnings("unchecked")
     public static <T> DataResult<T> encode(final ScheduleWaitCondition input, final DynamicOps<T> ops, final T empty) {
         RecordBuilder<T> map = ops.mapBuilder();
-        map.add("Id", input.id, Identifier.CODEC);
-        try (ErrorReporter.Logging logging = new ErrorReporter.Logging(() -> "ScheduleWaitCondition", Create.LOGGER)) {
-            NbtWriteView view = new NbtWriteView(logging, (DynamicOps<NbtElement>) ops, input.data);
+        map.add("Id", input.id, ResourceLocation.CODEC);
+        try (ProblemReporter.ScopedCollector logging = new ProblemReporter.ScopedCollector(() -> "ScheduleWaitCondition", Create.LOGGER)) {
+            TagValueOutput view = new TagValueOutput(logging, (DynamicOps<Tag>) ops, input.data);
             input.writeAdditional(view);
-            map.add("Data", view.getNbt(), NbtCompound.CODEC);
+            map.add("Data", view.buildResult(), CompoundTag.CODEC);
         }
         return map.build(empty);
     }
 
-    public static ScheduleWaitCondition read(ReadView view) {
-        Identifier location = view.read("Id", Identifier.CODEC).orElse(null);
+    public static ScheduleWaitCondition read(ValueInput view) {
+        ResourceLocation location = view.read("Id", ResourceLocation.CODEC).orElse(null);
         ScheduleWaitCondition condition = AllSchedules.createScheduleWaitCondition(location);
         if (condition == null) {
             return fallback(location);
         }
-        ReadView data = view.getReadView("Data");
+        ValueInput data = view.childOrEmpty("Data");
         condition.readAdditional(data);
-        condition.data = view.read("Data", NbtCompound.CODEC).orElseGet(NbtCompound::new);
+        condition.data = view.read("Data", CompoundTag.CODEC).orElseGet(CompoundTag::new);
         return condition;
     }
 
     public static <T> ScheduleWaitCondition decode(DynamicOps<T> ops, T input) {
         MapLike<T> map = ops.getMap(input).getOrThrow();
-        Identifier location = Identifier.CODEC.parse(ops, map.get("Id")).result().orElse(null);
+        ResourceLocation location = ResourceLocation.CODEC.parse(ops, map.get("Id")).result().orElse(null);
         ScheduleWaitCondition condition = AllSchedules.createScheduleWaitCondition(location);
         if (condition == null) {
             return fallback(location);
         }
-        condition.data = NbtCompound.CODEC.parse(ops, map.get("Data")).result().orElseGet(NbtCompound::new);
-        try (ErrorReporter.Logging logging = new ErrorReporter.Logging(() -> "ScheduleWaitCondition", Create.LOGGER)) {
-            NbtReadView view = new NbtReadView(logging, new NbtReadContext(ops), condition.data);
+        condition.data = CompoundTag.CODEC.parse(ops, map.get("Data")).result().orElseGet(CompoundTag::new);
+        try (ProblemReporter.ScopedCollector logging = new ProblemReporter.ScopedCollector(() -> "ScheduleWaitCondition", Create.LOGGER)) {
+            TagValueInput view = new TagValueInput(logging, new NbtReadContext(ops), condition.data);
             condition.readAdditional(view);
         }
         return condition;
     }
 
-    private static ScheduleWaitCondition fallback(Identifier location) {
+    private static ScheduleWaitCondition fallback(ResourceLocation location) {
         Create.LOGGER.warn("Could not parse waiting condition type: {}", location);
         return null;
     }
 
-    private static void encode(RegistryByteBuf buf, ScheduleWaitCondition value) {
-        try (ErrorReporter.Logging logging = new ErrorReporter.Logging(() -> "ScheduleWaitCondition", Create.LOGGER)) {
-            NbtWriteView view = NbtWriteView.create(logging, buf.getRegistryManager());
+    private static void encode(RegistryFriendlyByteBuf buf, ScheduleWaitCondition value) {
+        try (ProblemReporter.ScopedCollector logging = new ProblemReporter.ScopedCollector(() -> "ScheduleWaitCondition", Create.LOGGER)) {
+            TagValueOutput view = TagValueOutput.createWithContext(logging, buf.registryAccess());
             value.write(view);
-            buf.writeNbt(view.getNbt());
+            buf.writeNbt(view.buildResult());
         }
     }
 
-    private static ScheduleWaitCondition decode(RegistryByteBuf buf) {
-        try (ErrorReporter.Logging logging = new ErrorReporter.Logging(() -> "ScheduleWaitCondition", Create.LOGGER)) {
-            ReadView view = NbtReadView.create(logging, buf.getRegistryManager(), buf.readNbt());
+    private static ScheduleWaitCondition decode(RegistryFriendlyByteBuf buf) {
+        try (ProblemReporter.ScopedCollector logging = new ProblemReporter.ScopedCollector(() -> "ScheduleWaitCondition", Create.LOGGER)) {
+            ValueInput view = TagValueInput.create(logging, buf.registryAccess(), buf.readNbt());
             return ScheduleWaitCondition.read(view);
         }
     }
 
-    public abstract MutableText getWaitingStatus(World level, Train train, NbtCompound tag);
+    public abstract MutableComponent getWaitingStatus(Level level, Train train, CompoundTag tag);
 
 }

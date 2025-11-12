@@ -1,7 +1,7 @@
 package com.zurrtum.create.client.flywheel.lib.vertex;
 
 import com.zurrtum.create.client.flywheel.api.vertex.MutableVertexList;
-import net.minecraft.client.render.OverlayTexture;
+import net.minecraft.client.renderer.texture.OverlayTexture;
 
 public interface DefaultVertexList extends MutableVertexList {
     @Override
@@ -51,7 +51,7 @@ public interface DefaultVertexList extends MutableVertexList {
 
     @Override
     default int overlay(int index) {
-        return OverlayTexture.DEFAULT_UV;
+        return OverlayTexture.NO_OVERLAY;
     }
 
     @Override

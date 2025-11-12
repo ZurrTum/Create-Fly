@@ -8,13 +8,12 @@ import com.zurrtum.create.client.flywheel.api.visualization.VisualizationContext
 import com.zurrtum.create.client.flywheel.lib.model.Models;
 import com.zurrtum.create.client.foundation.render.AllInstanceTypes;
 import com.zurrtum.create.content.kinetics.fan.EncasedFanBlockEntity;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.MathHelper;
-
 import java.util.function.Consumer;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.util.Mth;
 
-import static net.minecraft.state.property.Properties.FACING;
+import static net.minecraft.world.level.block.state.properties.BlockStateProperties.FACING;
 
 public class FanVisual extends KineticBlockEntityVisual<EncasedFanBlockEntity> {
 
@@ -26,7 +25,7 @@ public class FanVisual extends KineticBlockEntityVisual<EncasedFanBlockEntity> {
     public FanVisual(VisualizationContext context, EncasedFanBlockEntity blockEntity, float partialTick) {
         super(context, blockEntity, partialTick);
 
-        direction = blockState.get(FACING);
+        direction = blockState.getValue(FACING);
 
         opposite = direction.getOpposite();
         shaft = instancerProvider().instancer(AllInstanceTypes.ROTATING, Models.partial(AllPartialModels.SHAFT_HALF)).createInstance();
@@ -40,9 +39,9 @@ public class FanVisual extends KineticBlockEntityVisual<EncasedFanBlockEntity> {
     private float getFanSpeed() {
         float speed = blockEntity.getSpeed() * 5;
         if (speed > 0)
-            speed = MathHelper.clamp(speed, 80, 64 * 20);
+            speed = Mth.clamp(speed, 80, 64 * 20);
         if (speed < 0)
-            speed = MathHelper.clamp(speed, -64 * 20, -80);
+            speed = Mth.clamp(speed, -64 * 20, -80);
         return speed;
     }
 
@@ -54,10 +53,10 @@ public class FanVisual extends KineticBlockEntityVisual<EncasedFanBlockEntity> {
 
     @Override
     public void updateLight(float partialTick) {
-        BlockPos behind = pos.offset(opposite);
+        BlockPos behind = pos.relative(opposite);
         relight(behind, shaft);
 
-        BlockPos inFront = pos.offset(direction);
+        BlockPos inFront = pos.relative(direction);
         relight(inFront, fan);
     }
 

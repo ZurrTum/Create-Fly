@@ -1,11 +1,11 @@
 package com.zurrtum.create.content.redstone.displayLink;
 
 import com.zurrtum.create.infrastructure.config.AllConfigs;
-import net.minecraft.block.Block;
+import net.minecraft.world.level.block.Block;
 
 public class DisplayLinkBlockItem extends ClickToLinkBlockItem {
 
-    public DisplayLinkBlockItem(Block pBlock, Settings pProperties) {
+    public DisplayLinkBlockItem(Block pBlock, Properties pProperties) {
         super(pBlock, pProperties);
     }
 

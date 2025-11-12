@@ -1,41 +1,41 @@
 package com.zurrtum.create.client.catnip.impl.client.render;
 
-import net.minecraft.client.render.VertexConsumer;
+import com.mojang.blaze3d.vertex.VertexConsumer;
 
 public record ColoringVertexConsumer(VertexConsumer delegate, float red, float green, float blue, float alpha) implements VertexConsumer {
     @Override
-    public VertexConsumer vertex(float x, float y, float z) {
-        delegate.vertex(x, y, z);
+    public VertexConsumer addVertex(float x, float y, float z) {
+        delegate.addVertex(x, y, z);
         return this;
     }
 
     @Override
-    public VertexConsumer color(int r, int g, int b, int a) {
-        delegate.color((int) (r * red), (int) (g * green), (int) (b * blue), (int) (a * alpha));
+    public VertexConsumer setColor(int r, int g, int b, int a) {
+        delegate.setColor((int) (r * red), (int) (g * green), (int) (b * blue), (int) (a * alpha));
         return this;
     }
 
     @Override
-    public VertexConsumer texture(float u, float v) {
-        delegate.texture(u, v);
+    public VertexConsumer setUv(float u, float v) {
+        delegate.setUv(u, v);
         return this;
     }
 
     @Override
-    public VertexConsumer overlay(int u, int v) {
-        delegate.overlay(u, v);
+    public VertexConsumer setUv1(int u, int v) {
+        delegate.setUv1(u, v);
         return this;
     }
 
     @Override
-    public VertexConsumer light(int u, int v) {
-        delegate.light(u, v);
+    public VertexConsumer setUv2(int u, int v) {
+        delegate.setUv2(u, v);
         return this;
     }
 
     @Override
-    public VertexConsumer normal(float x, float y, float z) {
-        delegate.normal(x, y, z);
+    public VertexConsumer setNormal(float x, float y, float z) {
+        delegate.setNormal(x, y, z);
         return this;
     }
 }

@@ -6,17 +6,17 @@ import com.zurrtum.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.foundation.fluid.FluidHelper;
 import com.zurrtum.create.infrastructure.fluids.FluidInventory;
 import com.zurrtum.create.infrastructure.fluids.FluidStack;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
 import java.lang.ref.WeakReference;
 import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
 
 public abstract class FlowSource {
     BlockFace location;
@@ -37,10 +37,10 @@ public abstract class FlowSource {
 
     public abstract boolean isEndpoint();
 
-    public void manageSource(World world, BlockEntity networkBE) {
+    public void manageSource(Level world, BlockEntity networkBE) {
     }
 
-    public void whileFlowPresent(World world, boolean pulling) {
+    public void whileFlowPresent(Level world, boolean pulling) {
     }
 
     public @Nullable FluidInventory provideHandler() {
@@ -54,13 +54,13 @@ public abstract class FlowSource {
             super(location);
         }
 
-        public void manageSource(World world, BlockEntity networkBE) {
+        public void manageSource(Level world, BlockEntity networkBE) {
             if (fluidHandlerCache == null) {
                 BlockPos pos = location.getConnectedPos();
                 BlockEntity blockEntity = world.getBlockEntity(pos);
                 if (blockEntity != null) {
                     Direction side = location.getOppositeFace();
-                    if (world instanceof ServerWorld serverWorld) {
+                    if (world instanceof ServerLevel serverWorld) {
                         fluidHandlerCache = FluidHelper.getFluidInventoryCache(serverWorld, pos, side);
                     } else if (networkBE instanceof SmartBlockEntity smartBE && smartBE.isVirtual()) {
                         fluidHandlerCache = () -> FluidHelper.getFluidInventory(world, pos, null, blockEntity, side);
@@ -89,7 +89,7 @@ public abstract class FlowSource {
         }
 
         @Override
-        public void manageSource(World world, BlockEntity networkBE) {
+        public void manageSource(Level world, BlockEntity networkBE) {
             if (cached != null && cached.get() != null && !cached.get().blockEntity.isRemoved())
                 return;
             cached = null;

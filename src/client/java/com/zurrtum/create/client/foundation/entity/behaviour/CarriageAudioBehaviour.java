@@ -10,17 +10,17 @@ import com.zurrtum.create.content.trains.entity.*;
 import com.zurrtum.create.content.trains.entity.Carriage.DimensionalCarriageEntity;
 import com.zurrtum.create.foundation.blockEntity.behaviour.BehaviourType;
 import com.zurrtum.create.foundation.entity.behaviour.EntityBehaviour;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.hud.SubtitlesHud;
-import net.minecraft.client.sound.MovingSoundInstance;
-import net.minecraft.client.sound.SoundInstance;
-import net.minecraft.client.sound.WeightedSoundSet;
-import net.minecraft.entity.Entity;
-import net.minecraft.sound.SoundCategory;
-import net.minecraft.sound.SoundEvent;
-import net.minecraft.sound.SoundEvents;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.components.SubtitleOverlay;
+import net.minecraft.client.resources.sounds.AbstractTickableSoundInstance;
+import net.minecraft.client.resources.sounds.SoundInstance;
+import net.minecraft.client.sounds.WeighedSoundEvents;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.util.Mth;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.phys.Vec3;
 
 public class CarriageAudioBehaviour extends EntityBehaviour<CarriageContraptionEntity> {
     public static final BehaviourType<CarriageAudioBehaviour> TYPE = new BehaviourType<>();
@@ -67,17 +67,17 @@ public class CarriageAudioBehaviour extends EntityBehaviour<CarriageContraptionE
         Carriage carriage = entity.getCarriage();
         if (carriage == null)
             return;
-        MinecraftClient mc = MinecraftClient.getInstance();
+        Minecraft mc = Minecraft.getInstance();
         Entity camEntity = mc.getCameraEntity();
         if (camEntity == null)
             return;
-        DimensionalCarriageEntity dce = carriage.getDimensional(entity.getEntityWorld());
+        DimensionalCarriageEntity dce = carriage.getDimensional(entity.level());
         if (!dce.pointsInitialised)
             return;
-        Vec3d leadingAnchor = dce.leadingAnchor();
+        Vec3 leadingAnchor = dce.leadingAnchor();
         if (leadingAnchor == null)
             return;
-        Vec3d trailingAnchor = dce.trailingAnchor();
+        Vec3 trailingAnchor = dce.trailingAnchor();
         if (trailingAnchor == null)
             return;
         if (bogeySounds == null) {
@@ -87,9 +87,9 @@ public class CarriageAudioBehaviour extends EntityBehaviour<CarriageContraptionE
 
         tick++;
 
-        Vec3d cam = camEntity.getEyePos();
-        Vec3d contraptionMotion = entity.getEntityPos().subtract(entity.getPrevPositionVec());
-        Vec3d combinedMotion = contraptionMotion.subtract(camEntity.getVelocity());
+        Vec3 cam = camEntity.getEyePosition();
+        Vec3 contraptionMotion = entity.position().subtract(entity.getPrevPositionVec());
+        Vec3 combinedMotion = contraptionMotion.subtract(camEntity.getDeltaMovement());
 
         Train train = carriage.train;
 
@@ -108,8 +108,8 @@ public class CarriageAudioBehaviour extends EntityBehaviour<CarriageContraptionE
                 ), 10
             );
 
-        Vec3d toBogey1 = leadingAnchor.subtract(cam);
-        Vec3d toBogey2 = trailingAnchor.subtract(cam);
+        Vec3 toBogey1 = leadingAnchor.subtract(cam);
+        Vec3 toBogey2 = trailingAnchor.subtract(cam);
         double distance1 = toBogey1.length();
         double distance2 = toBogey2.length();
 
@@ -122,15 +122,15 @@ public class CarriageAudioBehaviour extends EntityBehaviour<CarriageContraptionE
             closestBogeySound = relevantBogey.getStyle().soundEvent.get();
         }
 
-        Vec3d toCarriage = distance1 > distance2 ? toBogey2 : toBogey1;
+        Vec3 toCarriage = distance1 > distance2 ? toBogey2 : toBogey1;
         double distance = Math.min(distance1, distance2);
-        Vec3d soundLocation = cam.add(toCarriage);
+        Vec3 soundLocation = cam.add(toCarriage);
 
-        double dot = toCarriage.normalize().dotProduct(combinedMotion.normalize());
+        double dot = toCarriage.normalize().dot(combinedMotion.normalize());
 
         speedFactor.chase(contraptionMotion.length(), .25f, Chaser.exp(.05f));
-        distanceFactor.chase(MathHelper.clampedLerp(100, 0, (distance - 3) / 64d), .25f, Chaser.exp(50f));
-        approachFactor.chase(MathHelper.clampedLerp(50, 200, .5f * (dot + 1)), .25f, Chaser.exp(10f));
+        distanceFactor.chase(Mth.clampedLerp(100, 0, (distance - 3) / 64d), .25f, Chaser.exp(50f));
+        approachFactor.chase(Mth.clampedLerp(50, 200, .5f * (dot + 1)), .25f, Chaser.exp(10f));
         seatCrossfade.chase(camEntity.getVehicle() instanceof CarriageContraptionEntity ? 1 : 0, .1f, Chaser.EXP);
 
         speedFactor.tickChaser();
@@ -147,42 +147,42 @@ public class CarriageAudioBehaviour extends EntityBehaviour<CarriageContraptionE
         if (entity.carriageIndex == 0) {
             float v = volume * (1 - seatCrossfade.getValue() * .35f) * .75f;
             if ((3 + tick) % 4 == 0)
-                AllSoundEvents.STEAM.playAt(entity.getEntityWorld(), soundLocation, v * ((tick + 7) % 8 == 0 ? 0.75f : .45f), 1.17f, false);
+                AllSoundEvents.STEAM.playAt(entity.level(), soundLocation, v * ((tick + 7) % 8 == 0 ? 0.75f : .45f), 1.17f, false);
             if (tick % 16 == 0)
-                AllSoundEvents.STEAM.playAt(entity.getEntityWorld(), soundLocation, v * 1.5f, .8f, false);
+                AllSoundEvents.STEAM.playAt(entity.level(), soundLocation, v * 1.5f, .8f, false);
         }
 
         if (!arrived && speedFactor.getValue() < .002f && train.accumulatedSteamRelease > 1) {
             arrived = true;
             float releaseVolume = train.accumulatedSteamRelease / 10f;
-            entity.getEntityWorld().playSoundClient(
+            entity.level().playLocalSound(
                 soundLocation.x,
                 soundLocation.y,
                 soundLocation.z,
-                SoundEvents.BLOCK_LAVA_EXTINGUISH,
-                SoundCategory.NEUTRAL,
+                SoundEvents.LAVA_EXTINGUISH,
+                SoundSource.NEUTRAL,
                 .25f * releaseVolume,
                 .78f,
                 false
             );
-            entity.getEntityWorld().playSoundClient(
+            entity.level().playLocalSound(
                 soundLocation.x,
                 soundLocation.y,
                 soundLocation.z,
-                SoundEvents.BLOCK_WOODEN_TRAPDOOR_CLOSE,
-                SoundCategory.NEUTRAL,
+                SoundEvents.WOODEN_TRAPDOOR_CLOSE,
+                SoundSource.NEUTRAL,
                 .2f * releaseVolume,
                 1.5f,
                 false
             );
-            AllSoundEvents.STEAM.playAt(entity.getEntityWorld(), soundLocation, .75f * releaseVolume, .5f, false);
+            AllSoundEvents.STEAM.playAt(entity.level(), soundLocation, .75f * releaseVolume, .5f, false);
         }
 
         float pitchModifier = ((entity.getId() * 10) % 13) / 36f;
 
         volume = Math.min(volume, distanceFactor.getValue() / 800);
 
-        float pitch = MathHelper.clamp(speedFactor.getValue() * 2 + .25f, .75f, 1.95f) - pitchModifier;
+        float pitch = Mth.clamp(speedFactor.getValue() * 2 + .25f, .75f, 1.95f) - pitchModifier;
         //		float pitch2 = Mth.clamp(speedFactor.getValue() * 2, 0.75f, 1.25f) - pitchModifier;
 
         minecartEsqueSound.setPitch(pitch * 1.5f);
@@ -190,7 +190,7 @@ public class CarriageAudioBehaviour extends EntityBehaviour<CarriageContraptionE
         volume = Math.min(volume, distanceFactor.getValue() / 1000);
 
         for (Carriage trainCarriage : train.carriages) {
-            DimensionalCarriageEntity mainDCE = carriage.getDimensionalIfPresent(entity.getEntityWorld().getRegistryKey());
+            DimensionalCarriageEntity mainDCE = carriage.getDimensionalIfPresent(entity.level().dimension());
             if (mainDCE == null)
                 continue;
             CarriageContraptionEntity mainEntity = mainDCE.entity.get();
@@ -222,7 +222,7 @@ public class CarriageAudioBehaviour extends EntityBehaviour<CarriageContraptionE
         }
 
         train.honkTicks--;
-        train.determineHonk(entity.getEntityWorld());
+        train.determineHonk(entity.level());
 
         if (train.lowHonk == null)
             return;
@@ -234,32 +234,32 @@ public class CarriageAudioBehaviour extends EntityBehaviour<CarriageContraptionE
         SoundEntry continuousSound = !low ? AllSoundEvents.WHISTLE_TRAIN_MANUAL : AllSoundEvents.WHISTLE_TRAIN_MANUAL_LOW;
 
         if (train.honkTicks == 5)
-            endSound.playAt(mc.world, soundLocation, 1, honkPitch, false);
+            endSound.playAt(mc.level, soundLocation, 1, honkPitch, false);
         if (train.honkTicks == 19)
-            endSound.playAt(mc.world, soundLocation, .5f, honkPitch, false);
+            endSound.playAt(mc.level, soundLocation, .5f, honkPitch, false);
 
         sharedHonkSound = playIfMissing(mc, sharedHonkSound, continuousSound.getMainEvent(), true);
         sharedHonkSound.setLocation(soundLocation);
-        float fadeout = MathHelper.clamp((3 - train.honkTicks) / 3f, 0, 1);
-        float fadein = MathHelper.clamp((train.honkTicks - 17) / 3f, 0, 1);
+        float fadeout = Mth.clamp((3 - train.honkTicks) / 3f, 0, 1);
+        float fadein = Mth.clamp((train.honkTicks - 17) / 3f, 0, 1);
         sharedHonkSound.setVolume(1 - fadeout - fadein);
         sharedHonkSound.setPitch(honkPitch);
 
     }
 
-    private LoopingSound playIfMissing(MinecraftClient mc, LoopingSound loopingSound, SoundEvent sound) {
+    private LoopingSound playIfMissing(Minecraft mc, LoopingSound loopingSound, SoundEvent sound) {
         return playIfMissing(mc, loopingSound, sound, false);
     }
 
-    private LoopingSound playIfMissing(MinecraftClient mc, LoopingSound loopingSound, SoundEvent sound, boolean continuouslyShowSubtitle) {
+    private LoopingSound playIfMissing(Minecraft mc, LoopingSound loopingSound, SoundEvent sound, boolean continuouslyShowSubtitle) {
         if (loopingSound == null) {
-            loopingSound = new LoopingSound(sound, SoundCategory.NEUTRAL, continuouslyShowSubtitle);
+            loopingSound = new LoopingSound(sound, SoundSource.NEUTRAL, continuouslyShowSubtitle);
             mc.getSoundManager().play(loopingSound);
         }
         return loopingSound;
     }
 
-    public void submitSharedSoundVolume(MinecraftClient mc, Vec3d location, float volume) {
+    public void submitSharedSoundVolume(Minecraft mc, Vec3 location, float volume) {
         minecartEsqueSound = playIfMissing(mc, minecartEsqueSound, AllSoundEvents.TRAIN.getMainEvent());
         sharedWheelSound = playIfMissing(mc, sharedWheelSound, closestBogeySound);
         sharedWheelSoundSeated = playIfMissing(mc, sharedWheelSoundSeated, AllSoundEvents.TRAIN3.getMainEvent());
@@ -272,8 +272,8 @@ public class CarriageAudioBehaviour extends EntityBehaviour<CarriageContraptionE
         } else if (sharedWheelSound.getVolume() > volume)
             return;
 
-        Vec3d currentLoc = new Vec3d(minecartEsqueSound.getX(), minecartEsqueSound.getY(), minecartEsqueSound.getZ());
-        Vec3d newLoc = approach ? currentLoc.add(location.subtract(currentLoc).multiply(.125f)) : location;
+        Vec3 currentLoc = new Vec3(minecartEsqueSound.getX(), minecartEsqueSound.getY(), minecartEsqueSound.getZ());
+        Vec3 newLoc = approach ? currentLoc.add(location.subtract(currentLoc).scale(.125f)) : location;
 
         minecartEsqueSound.setLocation(newLoc);
         sharedWheelSound.setLocation(newLoc);
@@ -301,17 +301,17 @@ public class CarriageAudioBehaviour extends EntityBehaviour<CarriageContraptionE
             sharedHonkSound.stopSound();
     }
 
-    static class LoopingSound extends MovingSoundInstance {
-        private static final SubtitlesHud OVERLAY = MinecraftClient.getInstance().inGameHud.subtitlesHud;
+    static class LoopingSound extends AbstractTickableSoundInstance {
+        private static final SubtitleOverlay OVERLAY = Minecraft.getInstance().gui.subtitleOverlay;
 
         private final boolean repeatSubtitle;
-        private final WeightedSoundSet weighedSoundEvents = getSoundSet(MinecraftClient.getInstance().getSoundManager());
+        private final WeighedSoundEvents weighedSoundEvents = resolve(Minecraft.getInstance().getSoundManager());
         private byte subtitleTimer = 0;
 
-        protected LoopingSound(SoundEvent soundEvent, SoundCategory source, boolean repeatSubtitle) {
-            super(soundEvent, source, SoundInstance.createRandom());
-            this.repeat = true;
-            this.repeatDelay = 0;
+        protected LoopingSound(SoundEvent soundEvent, SoundSource source, boolean repeatSubtitle) {
+            super(soundEvent, source, SoundInstance.createUnseededRandom());
+            this.looping = true;
+            this.delay = 0;
             this.volume = 0.0001f;
             this.repeatSubtitle = repeatSubtitle;
         }
@@ -322,7 +322,7 @@ public class CarriageAudioBehaviour extends EntityBehaviour<CarriageContraptionE
                 subtitleTimer++;
 
                 if (subtitleTimer == 20) {
-                    OVERLAY.onSoundPlayed(this, weighedSoundEvents, sound.getAttenuation());
+                    OVERLAY.onPlaySound(this, weighedSoundEvents, sound.getAttenuationDistance());
                     subtitleTimer = 0;
                 }
             }
@@ -346,14 +346,14 @@ public class CarriageAudioBehaviour extends EntityBehaviour<CarriageContraptionE
             return pitch;
         }
 
-        public void setLocation(Vec3d location) {
+        public void setLocation(Vec3 location) {
             x = location.x;
             y = location.y;
             z = location.z;
         }
 
         public void stopSound() {
-            MinecraftClient.getInstance().getSoundManager().stop(this);
+            Minecraft.getInstance().getSoundManager().stop(this);
         }
 
     }

@@ -2,16 +2,16 @@ package com.zurrtum.create.client.ponder.foundation.instruction;
 
 import com.zurrtum.create.client.ponder.api.PonderPalette;
 import com.zurrtum.create.client.ponder.foundation.PonderScene;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.phys.Vec3;
 
 public class LineInstruction extends TickingInstruction {
 
     private PonderPalette color;
-    private Vec3d start;
-    private Vec3d end;
+    private Vec3 start;
+    private Vec3 end;
     private boolean big;
 
-    public LineInstruction(PonderPalette color, Vec3d start, Vec3d end, int ticks, boolean big) {
+    public LineInstruction(PonderPalette color, Vec3 start, Vec3 end, int ticks, boolean big) {
         super(false, ticks);
         this.color = color;
         this.start = start;

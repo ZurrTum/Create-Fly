@@ -12,23 +12,23 @@ import com.zurrtum.create.client.content.logistics.depot.EjectorItemEntityRender
 import com.zurrtum.create.client.content.trains.entity.CarriageContraptionEntityRenderer;
 import com.zurrtum.create.client.content.trains.entity.CarriageContraptionVisual;
 import com.zurrtum.create.client.flywheel.lib.visualization.SimpleEntityVisualizer;
-import net.minecraft.client.render.entity.EntityRendererFactories;
-import net.minecraft.client.render.entity.EntityRendererFactory;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityType;
+import net.minecraft.client.renderer.entity.EntityRendererProvider;
+import net.minecraft.client.renderer.entity.EntityRenderers;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
 
 public class AllEntityRenders {
     private static <T extends Entity, P extends T> void visual(
         EntityType<P> type,
-        EntityRendererFactory<T> rendererFactory,
+        EntityRendererProvider<T> rendererFactory,
         SimpleEntityVisualizer.Factory<P> visualizerFactory
     ) {
-        EntityRendererFactories.register(type, rendererFactory);
+        EntityRenderers.register(type, rendererFactory);
         SimpleEntityVisualizer.builder(type).factory(visualizerFactory).skipVanillaRender(blockEntity -> false).apply();
     }
 
-    public static <T extends Entity> void render(EntityType<? extends T> type, EntityRendererFactory<T> factory) {
-        EntityRendererFactories.register(type, factory);
+    public static <T extends Entity> void render(EntityType<? extends T> type, EntityRendererProvider<T> factory) {
+        EntityRenderers.register(type, factory);
     }
 
     public static void register() {

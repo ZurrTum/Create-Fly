@@ -12,17 +12,17 @@ import com.zurrtum.create.content.kinetics.base.KineticBlockEntity;
 import com.zurrtum.create.foundation.advancement.CreateTrigger;
 import com.zurrtum.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.foundation.blockEntity.behaviour.scrollValue.ServerScrollOptionBehaviour;
-import net.minecraft.block.BlockState;
-import net.minecraft.state.property.Properties;
-import net.minecraft.storage.ReadView;
-import net.minecraft.storage.WriteView;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Direction.Axis;
-import net.minecraft.util.math.MathHelper;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.List;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.Direction.Axis;
+import net.minecraft.util.Mth;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 
 public class ClockworkBearingBlockEntity extends KineticBlockEntity implements IBearingBlockEntity {
 
@@ -66,21 +66,21 @@ public class ClockworkBearingBlockEntity extends KineticBlockEntity implements I
     public void tick() {
         super.tick();
 
-        if (world.isClient()) {
+        if (level.isClientSide()) {
             prevForcedAngle = hourAngle;
             clientMinuteAngleDiff /= 2;
             clientHourAngleDiff /= 2;
         }
 
-        if (!world.isClient() && assembleNextTick) {
+        if (!level.isClientSide() && assembleNextTick) {
             assembleNextTick = false;
             if (running) {
                 boolean canDisassemble = true;
                 if (speed == 0 && (canDisassemble || hourHand == null || hourHand.getContraption().getBlocks().isEmpty())) {
                     if (hourHand != null)
-                        hourHand.getContraption().stop(world);
+                        hourHand.getContraption().stop(level);
                     if (minuteHand != null)
-                        minuteHand.getContraption().stop(world);
+                        minuteHand.getContraption().stop(level);
                     disassemble();
                 }
                 return;
@@ -110,11 +110,11 @@ public class ClockworkBearingBlockEntity extends KineticBlockEntity implements I
     }
 
     protected void applyRotations() {
-        BlockState blockState = getCachedState();
+        BlockState blockState = getBlockState();
         Axis axis = Axis.X;
 
-        if (blockState.contains(Properties.FACING))
-            axis = blockState.get(Properties.FACING).getAxis();
+        if (blockState.hasProperty(BlockStateProperties.FACING))
+            axis = blockState.getValue(BlockStateProperties.FACING).getAxis();
 
         if (hourHand != null) {
             hourHand.setAngle(hourAngle);
@@ -129,7 +129,7 @@ public class ClockworkBearingBlockEntity extends KineticBlockEntity implements I
     @Override
     public void lazyTick() {
         super.lazyTick();
-        if (hourHand != null && !world.isClient())
+        if (hourHand != null && !level.isClientSide())
             sendData();
     }
 
@@ -169,38 +169,38 @@ public class ClockworkBearingBlockEntity extends KineticBlockEntity implements I
     }
 
     protected float getHourTarget(boolean cycle24) {
-        boolean isNatural = world.getDimension().natural();
-        int dayTime = (int) ((world.getTimeOfDay() * (isNatural ? 1 : 24)) % 24000);
+        boolean isNatural = level.dimensionType().natural();
+        int dayTime = (int) ((level.getDayTime() * (isNatural ? 1 : 24)) % 24000);
         int hours = (dayTime / 1000 + 6) % 24;
-        int offset = getCachedState().get(ClockworkBearingBlock.FACING).getDirection().offset();
+        int offset = getBlockState().getValue(ClockworkBearingBlock.FACING).getAxisDirection().getStep();
         return offset * -360 / (cycle24 ? 24f : 12f) * (hours % (cycle24 ? 24 : 12));
     }
 
     protected float getMinuteTarget() {
-        boolean isNatural = world.getDimension().natural();
-        int dayTime = (int) ((world.getTimeOfDay() * (isNatural ? 1 : 24)) % 24000);
+        boolean isNatural = level.dimensionType().natural();
+        int dayTime = (int) ((level.getDayTime() * (isNatural ? 1 : 24)) % 24000);
         int minutes = (dayTime % 1000) * 60 / 1000;
-        int offset = getCachedState().get(ClockworkBearingBlock.FACING).getDirection().offset();
+        int offset = getBlockState().getValue(ClockworkBearingBlock.FACING).getAxisDirection().getStep();
         return offset * -360 / 60f * (minutes);
     }
 
     public float getAngularSpeed() {
         float speed = -Math.abs(getSpeed() * 3 / 10f);
-        if (world.isClient())
+        if (level.isClientSide())
             speed *= AllClientHandle.INSTANCE.getServerSpeed();
         return speed;
     }
 
     public void assemble() {
-        if (!(world.getBlockState(pos).getBlock() instanceof ClockworkBearingBlock))
+        if (!(level.getBlockState(worldPosition).getBlock() instanceof ClockworkBearingBlock))
             return;
 
-        Direction direction = getCachedState().get(Properties.FACING);
+        Direction direction = getBlockState().getValue(BlockStateProperties.FACING);
 
         // Collect Construct
         Pair<ClockworkContraption, ClockworkContraption> contraption;
         try {
-            contraption = ClockworkContraption.assembleClockworkAt(world, pos, direction);
+            contraption = ClockworkContraption.assembleClockworkAt(level, worldPosition, direction);
             lastException = null;
         } catch (AssemblyException e) {
             lastException = e;
@@ -213,24 +213,24 @@ public class ClockworkBearingBlockEntity extends KineticBlockEntity implements I
             return;
         if (contraption.getLeft().getBlocks().isEmpty())
             return;
-        BlockPos anchor = pos.offset(direction);
+        BlockPos anchor = worldPosition.relative(direction);
 
-        contraption.getLeft().removeBlocksFromWorld(world, BlockPos.ORIGIN);
-        hourHand = ControlledContraptionEntity.create(world, this, contraption.getLeft());
-        hourHand.setPos(anchor.getX(), anchor.getY(), anchor.getZ());
+        contraption.getLeft().removeBlocksFromWorld(level, BlockPos.ZERO);
+        hourHand = ControlledContraptionEntity.create(level, this, contraption.getLeft());
+        hourHand.setPosRaw(anchor.getX(), anchor.getY(), anchor.getZ());
         hourHand.setRotationAxis(direction.getAxis());
-        world.spawnEntity(hourHand);
+        level.addFreshEntity(hourHand);
 
         if (contraption.getLeft().containsBlockBreakers())
             award(AllAdvancements.CONTRAPTION_ACTORS);
 
         if (contraption.getRight() != null) {
-            anchor = pos.offset(direction, contraption.getRight().offset + 1);
-            contraption.getRight().removeBlocksFromWorld(world, BlockPos.ORIGIN);
-            minuteHand = ControlledContraptionEntity.create(world, this, contraption.getRight());
-            minuteHand.setPos(anchor.getX(), anchor.getY(), anchor.getZ());
+            anchor = worldPosition.relative(direction, contraption.getRight().offset + 1);
+            contraption.getRight().removeBlocksFromWorld(level, BlockPos.ZERO);
+            minuteHand = ControlledContraptionEntity.create(level, this, contraption.getRight());
+            minuteHand.setPosRaw(anchor.getX(), anchor.getY(), anchor.getZ());
             minuteHand.setRotationAxis(direction.getAxis());
-            world.spawnEntity(minuteHand);
+            level.addFreshEntity(minuteHand);
 
             if (contraption.getRight().containsBlockBreakers())
                 award(AllAdvancements.CONTRAPTION_ACTORS);
@@ -270,24 +270,24 @@ public class ClockworkBearingBlockEntity extends KineticBlockEntity implements I
         if (!(contraption.getContraption() instanceof ClockworkContraption cc))
             return;
 
-        markDirty();
-        Direction facing = getCachedState().get(Properties.FACING);
-        BlockPos anchor = pos.offset(facing, cc.offset + 1);
+        setChanged();
+        Direction facing = getBlockState().getValue(BlockStateProperties.FACING);
+        BlockPos anchor = worldPosition.relative(facing, cc.offset + 1);
         if (cc.handType == HandType.HOUR) {
             this.hourHand = contraption;
-            hourHand.setPos(anchor.getX(), anchor.getY(), anchor.getZ());
+            hourHand.setPosRaw(anchor.getX(), anchor.getY(), anchor.getZ());
         } else {
             this.minuteHand = contraption;
-            minuteHand.setPos(anchor.getX(), anchor.getY(), anchor.getZ());
+            minuteHand.setPosRaw(anchor.getX(), anchor.getY(), anchor.getZ());
         }
-        if (!world.isClient()) {
+        if (!level.isClientSide()) {
             this.running = true;
             sendData();
         }
     }
 
     @Override
-    public void write(WriteView view, boolean clientPacket) {
+    public void write(ValueOutput view, boolean clientPacket) {
         view.putBoolean("Running", running);
         view.putFloat("HourAngle", hourAngle);
         view.putFloat("MinuteAngle", minuteAngle);
@@ -296,13 +296,13 @@ public class ClockworkBearingBlockEntity extends KineticBlockEntity implements I
     }
 
     @Override
-    protected void read(ReadView view, boolean clientPacket) {
+    protected void read(ValueInput view, boolean clientPacket) {
         float hourAngleBefore = hourAngle;
         float minuteAngleBefore = minuteAngle;
 
-        running = view.getBoolean("Running", false);
-        hourAngle = view.getFloat("HourAngle", 0);
-        minuteAngle = view.getFloat("MinuteAngle", 0);
+        running = view.getBooleanOr("Running", false);
+        hourAngle = view.getFloatOr("HourAngle", 0);
+        minuteAngle = view.getFloatOr("MinuteAngle", 0);
         lastException = AssemblyException.read(view);
         super.read(view, clientPacket);
 
@@ -334,21 +334,21 @@ public class ClockworkBearingBlockEntity extends KineticBlockEntity implements I
     @Override
     public float getInterpolatedAngle(float partialTicks) {
         if (isVirtual())
-            return MathHelper.lerp(partialTicks, prevForcedAngle, hourAngle);
+            return Mth.lerp(partialTicks, prevForcedAngle, hourAngle);
         if (hourHand == null || hourHand.isStalled())
             partialTicks = 0;
-        return MathHelper.lerp(partialTicks, hourAngle, hourAngle + getHourArmSpeed());
+        return Mth.lerp(partialTicks, hourAngle, hourAngle + getHourArmSpeed());
     }
 
     @Override
     public void onStall() {
-        if (!world.isClient())
+        if (!level.isClientSide())
             sendData();
     }
 
     @Override
     public void remove() {
-        if (!world.isClient())
+        if (!level.isClientSide())
             disassemble();
         super.remove();
     }
@@ -379,6 +379,6 @@ public class ClockworkBearingBlockEntity extends KineticBlockEntity implements I
 
     @Override
     public BlockPos getBlockPosition() {
-        return pos;
+        return worldPosition;
     }
 }

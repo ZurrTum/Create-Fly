@@ -1,8 +1,8 @@
 package com.zurrtum.create.content.contraptions.data;
 
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.network.PacketByteBuf;
-import net.minecraft.util.Util;
+import net.minecraft.Util;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.FriendlyByteBuf;
 
 public class ContraptionSyncLimiting {
     /**
@@ -32,7 +32,7 @@ public class ContraptionSyncLimiting {
         return SIZE_LIMIT;
     }) - BUFFER;
 
-    public static void writeSafe(NbtCompound compound, PacketByteBuf dst) {
+    public static void writeSafe(CompoundTag compound, FriendlyByteBuf dst) {
         // Write the NBT, but take note of where we were before in case we need to roll back.
         int writerIndexBefore = dst.writerIndex();
         dst.writeNbt(compound);

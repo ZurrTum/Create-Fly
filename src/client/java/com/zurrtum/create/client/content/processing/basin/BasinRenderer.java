@@ -1,5 +1,8 @@
 package com.zurrtum.create.client.content.processing.basin;
 
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
+import com.mojang.math.Axis;
 import com.zurrtum.create.catnip.data.IntAttached;
 import com.zurrtum.create.catnip.math.AngleHelper;
 import com.zurrtum.create.catnip.math.VecHelper;
@@ -15,30 +18,30 @@ import com.zurrtum.create.foundation.blockEntity.behaviour.fluid.SmartFluidTankB
 import com.zurrtum.create.foundation.blockEntity.behaviour.fluid.SmartFluidTankBehaviour.TankSegment;
 import com.zurrtum.create.infrastructure.fluids.BucketFluidInventory;
 import com.zurrtum.create.infrastructure.fluids.FluidStack;
-import net.minecraft.client.render.OverlayTexture;
-import net.minecraft.client.render.RenderLayer;
-import net.minecraft.client.render.VertexConsumer;
-import net.minecraft.client.render.block.entity.BlockEntityRendererFactory;
-import net.minecraft.client.render.command.ModelCommandRenderer;
-import net.minecraft.client.render.command.OrderedRenderCommandQueue;
-import net.minecraft.client.render.item.ItemRenderState;
-import net.minecraft.client.render.state.CameraRenderState;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.component.ComponentChanges;
-import net.minecraft.fluid.Fluid;
-import net.minecraft.item.ItemDisplayContext;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.math.*;
-import net.minecraft.util.math.Direction.Axis;
-import net.minecraft.util.math.random.Random;
-import net.minecraft.world.World;
+import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.SubmitNodeCollector;
+import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
+import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
+import net.minecraft.client.renderer.item.ItemStackRenderState;
+import net.minecraft.client.renderer.state.CameraRenderState;
+import net.minecraft.client.renderer.texture.OverlayTexture;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.component.DataComponentPatch;
+import net.minecraft.util.Mth;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.item.ItemDisplayContext;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.material.Fluid;
+import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class BasinRenderer extends SmartBlockEntityRenderer<BasinBlockEntity, BasinRenderer.BasinRenderState> {
-    public BasinRenderer(BlockEntityRendererFactory.Context context) {
+    public BasinRenderer(BlockEntityRendererProvider.Context context) {
         super(context);
     }
 
@@ -48,52 +51,52 @@ public class BasinRenderer extends SmartBlockEntityRenderer<BasinBlockEntity, Ba
     }
 
     @Override
-    public void updateRenderState(
+    public void extractRenderState(
         BasinBlockEntity be,
         BasinRenderState state,
         float tickProgress,
-        Vec3d cameraPos,
-        @Nullable ModelCommandRenderer.CrumblingOverlayCommand crumblingOverlay
+        Vec3 cameraPos,
+        @Nullable ModelFeatureRenderer.CrumblingOverlay crumblingOverlay
     ) {
-        super.updateRenderState(be, state, tickProgress, cameraPos, crumblingOverlay);
+        super.extractRenderState(be, state, tickProgress, cameraPos, crumblingOverlay);
         float fluidLevel = updateFluids(be, state, tickProgress);
         updateIngredients(be, state, tickProgress, fluidLevel);
         updateOutputs(be, state, tickProgress);
     }
 
     @Override
-    public void render(BasinRenderState state, MatrixStack matrices, OrderedRenderCommandQueue queue, CameraRenderState cameraState) {
-        super.render(state, matrices, queue, cameraState);
+    public void submit(BasinRenderState state, PoseStack matrices, SubmitNodeCollector queue, CameraRenderState cameraState) {
+        super.submit(state, matrices, queue, cameraState);
         if (state.fluids != null) {
-            queue.submitCustom(matrices, state.layer, state);
+            queue.submitCustomGeometry(matrices, state.layer, state);
         }
         if (state.ingredients != null) {
-            matrices.push();
+            matrices.pushPose();
             matrices.translate(.5, .2f, .5);
-            matrices.multiply(RotationAxis.POSITIVE_Y.rotation(state.ingredientYRot));
+            matrices.mulPose(Axis.YP.rotation(state.ingredientYRot));
             for (IngredientRenderData ingredient : state.ingredients) {
-                matrices.push();
+                matrices.pushPose();
                 matrices.translate(ingredient.itemPosition);
-                matrices.multiply(RotationAxis.POSITIVE_Y.rotation(ingredient.yRot));
-                matrices.multiply(RotationAxis.POSITIVE_X.rotation(state.ingredientXRot));
-                for (Vec3d offset : ingredient.offsets) {
-                    matrices.push();
+                matrices.mulPose(Axis.YP.rotation(ingredient.yRot));
+                matrices.mulPose(Axis.XP.rotation(state.ingredientXRot));
+                for (Vec3 offset : ingredient.offsets) {
+                    matrices.pushPose();
                     matrices.translate(offset);
-                    ingredient.renderState.render(matrices, queue, state.lightmapCoordinates, OverlayTexture.DEFAULT_UV, 0);
-                    matrices.pop();
+                    ingredient.renderState.submit(matrices, queue, state.lightCoords, OverlayTexture.NO_OVERLAY, 0);
+                    matrices.popPose();
                 }
-                matrices.pop();
+                matrices.popPose();
             }
-            matrices.pop();
+            matrices.popPose();
         }
         if (state.outputs != null) {
             for (OutputItemRenderData item : state.outputs) {
-                matrices.push();
+                matrices.pushPose();
                 matrices.translate(item.offset);
-                matrices.multiply(RotationAxis.POSITIVE_Y.rotation(state.outputYRot));
-                matrices.multiply(RotationAxis.POSITIVE_X.rotation(item.xRot));
-                item.renderState.render(matrices, queue, state.lightmapCoordinates, OverlayTexture.DEFAULT_UV, 0);
-                matrices.pop();
+                matrices.mulPose(Axis.YP.rotation(state.outputYRot));
+                matrices.mulPose(Axis.XP.rotation(item.xRot));
+                item.renderState.submit(matrices, queue, state.lightCoords, OverlayTexture.NO_OVERLAY, 0);
+                matrices.popPose();
             }
         }
     }
@@ -119,7 +122,7 @@ public class BasinRenderer extends SmartBlockEntityRenderer<BasinBlockEntity, Ba
                 if (units < 1)
                     continue;
 
-                float partial = MathHelper.clamp(units / totalUnits, 0, 1);
+                float partial = Mth.clamp(units / totalUnits, 0, 1);
                 xMax += partial * 12 / 16f;
                 fluids.add(new FluidRenderData(renderedFluid.getFluid(), renderedFluid.getComponentChanges(), xMin, xMax));
 
@@ -129,9 +132,9 @@ public class BasinRenderer extends SmartBlockEntityRenderer<BasinBlockEntity, Ba
         if (fluids.isEmpty()) {
             return 0;
         }
-        float fluidLevel = MathHelper.clamp(totalUnits / (BucketFluidInventory.CAPACITY * 2), 0, 1);
+        float fluidLevel = Mth.clamp(totalUnits / (BucketFluidInventory.CAPACITY * 2), 0, 1);
         fluidLevel = 1 - ((1 - fluidLevel) * (1 - fluidLevel));
-        state.layer = ShadersModHelper.isShaderPackInUse() ? RenderLayer.getTranslucentMovingBlock() : PonderRenderTypes.fluid();
+        state.layer = ShadersModHelper.isShaderPackInUse() ? RenderType.translucentMovingBlock() : PonderRenderTypes.fluid();
         state.fluids = fluids;
         state.yMin = 2 / 16f;
         state.yMax = state.yMin + 12 / 16f * fluidLevel;
@@ -146,8 +149,8 @@ public class BasinRenderer extends SmartBlockEntityRenderer<BasinBlockEntity, Ba
             return;
         }
         List<ItemStack> stacks = new ArrayList<>();
-        for (int slot = 0, size = inv.size(); slot < size; slot++) {
-            ItemStack stack = inv.getStack(slot);
+        for (int slot = 0, size = inv.getContainerSize(); slot < size; slot++) {
+            ItemStack stack = inv.getItem(slot);
             if (stack.isEmpty()) {
                 continue;
             }
@@ -157,33 +160,33 @@ public class BasinRenderer extends SmartBlockEntityRenderer<BasinBlockEntity, Ba
         if (itemCount == 0) {
             return;
         }
-        float level = MathHelper.clamp(fluidLevel - .3f, .125f, .6f);
-        Random r = Random.create(state.pos.hashCode());
-        Vec3d baseVector = new Vec3d(itemCount == 1 ? 0 : .125, level, 0);
-        World world = be.getWorld();
+        float level = Mth.clamp(fluidLevel - .3f, .125f, .6f);
+        RandomSource r = RandomSource.create(state.blockPos.hashCode());
+        Vec3 baseVector = new Vec3(itemCount == 1 ? 0 : .125, level, 0);
+        Level world = be.getLevel();
         float time = AnimationTickHolder.getRenderTime(world);
         float anglePartition = 360f / itemCount;
         IngredientRenderData[] ingredients = new IngredientRenderData[itemCount];
         for (int i = 0, size = itemCount; i < size; i++) {
             ItemStack stack = stacks.get(i);
-            Vec3d itemPosition = VecHelper.rotate(baseVector, anglePartition * itemCount, Axis.Y);
+            Vec3 itemPosition = VecHelper.rotate(baseVector, anglePartition * itemCount, net.minecraft.core.Direction.Axis.Y);
             if (fluidLevel > 0) {
-                itemPosition = itemPosition.add(0, (MathHelper.sin(time / 12f + anglePartition * itemCount) + 1.5f) * 1 / 32f, 0);
+                itemPosition = itemPosition.add(0, (Mth.sin(time / 12f + anglePartition * itemCount) + 1.5f) * 1 / 32f, 0);
             }
-            float yRot = MathHelper.RADIANS_PER_DEGREE * (anglePartition * itemCount + 35);
-            ItemRenderState renderState = new ItemRenderState();
+            float yRot = Mth.DEG_TO_RAD * (anglePartition * itemCount + 35);
+            ItemStackRenderState renderState = new ItemStackRenderState();
             renderState.displayContext = ItemDisplayContext.GROUND;
-            itemModelManager.update(renderState, stack, renderState.displayContext, world, null, 0);
+            itemModelManager.appendItemLayers(renderState, stack, renderState.displayContext, world, null, 0);
             int count = stack.getCount() / 8 + 1;
-            Vec3d[] offsets = new Vec3d[count];
+            Vec3[] offsets = new Vec3[count];
             for (int j = 0; j < count; j++) {
-                offsets[j] = VecHelper.offsetRandomly(Vec3d.ZERO, r, 1 / 16f);
+                offsets[j] = VecHelper.offsetRandomly(Vec3.ZERO, r, 1 / 16f);
             }
             ingredients[i] = new IngredientRenderData(renderState, itemPosition, yRot, offsets);
             itemCount--;
         }
-        state.ingredientYRot = MathHelper.RADIANS_PER_DEGREE * be.ingredientRotation.getValue(partialTicks);
-        state.ingredientXRot = MathHelper.RADIANS_PER_DEGREE * 65;
+        state.ingredientYRot = Mth.DEG_TO_RAD * be.ingredientRotation.getValue(partialTicks);
+        state.ingredientXRot = Mth.DEG_TO_RAD * 65;
         state.ingredients = ingredients;
     }
 
@@ -191,7 +194,7 @@ public class BasinRenderer extends SmartBlockEntityRenderer<BasinBlockEntity, Ba
         if (!(state.blockState.getBlock() instanceof BasinBlock)) {
             return;
         }
-        Direction direction = state.blockState.get(BasinBlock.FACING);
+        Direction direction = state.blockState.getValue(BasinBlock.FACING);
         if (direction == Direction.DOWN) {
             return;
         }
@@ -199,37 +202,37 @@ public class BasinRenderer extends SmartBlockEntityRenderer<BasinBlockEntity, Ba
         if (visualizedOutputItems.isEmpty()) {
             return;
         }
-        Vec3d directionVec = Vec3d.of(direction.getVector());
-        Vec3d outVec = VecHelper.getCenterOf(BlockPos.ZERO).add(directionVec.multiply(.55).subtract(0, 1 / 2f, 0));
-        World world = be.getWorld();
-        boolean outToBasin = world.getBlockState(state.pos.offset(direction)).getBlock() instanceof BasinBlock;
+        Vec3 directionVec = Vec3.atLowerCornerOf(direction.getUnitVec3i());
+        Vec3 outVec = VecHelper.getCenterOf(BlockPos.ZERO).add(directionVec.scale(.55).subtract(0, 1 / 2f, 0));
+        Level world = be.getLevel();
+        boolean outToBasin = world.getBlockState(state.blockPos.relative(direction)).getBlock() instanceof BasinBlock;
         List<OutputItemRenderData> outputs = new ArrayList<>();
         for (IntAttached<ItemStack> intAttached : visualizedOutputItems) {
             float progress = 1 - (intAttached.getFirst() - partialTicks) / BasinBlockEntity.OUTPUT_ANIMATION_TIME;
             if (!outToBasin && progress > .35f) {
                 continue;
             }
-            Vec3d offset = outVec.add(0, Math.max(-.55f, -(progress * progress * 2)), 0).add(directionVec.multiply(progress * .5f));
-            float xRot = MathHelper.RADIANS_PER_DEGREE * progress * 180;
-            ItemRenderState renderState = new ItemRenderState();
+            Vec3 offset = outVec.add(0, Math.max(-.55f, -(progress * progress * 2)), 0).add(directionVec.scale(progress * .5f));
+            float xRot = Mth.DEG_TO_RAD * progress * 180;
+            ItemStackRenderState renderState = new ItemStackRenderState();
             renderState.displayContext = ItemDisplayContext.GROUND;
-            itemModelManager.update(renderState, intAttached.getValue(), renderState.displayContext, world, null, 0);
+            itemModelManager.appendItemLayers(renderState, intAttached.getValue(), renderState.displayContext, world, null, 0);
             outputs.add(new OutputItemRenderData(renderState, offset, xRot));
         }
         if (outputs.isEmpty()) {
             return;
         }
-        state.outputYRot = MathHelper.RADIANS_PER_DEGREE * AngleHelper.horizontalAngle(direction);
+        state.outputYRot = Mth.DEG_TO_RAD * AngleHelper.horizontalAngle(direction);
         state.outputs = outputs;
     }
 
     @Override
-    public int getRenderDistance() {
+    public int getViewDistance() {
         return 16;
     }
 
-    public static class BasinRenderState extends SmartRenderState implements OrderedRenderCommandQueue.Custom {
-        public RenderLayer layer;
+    public static class BasinRenderState extends SmartRenderState implements SubmitNodeCollector.CustomGeometryRenderer {
+        public RenderType layer;
         public float yMin, yMax, zMin, zMax;
         public List<FluidRenderData> fluids;
         public float ingredientYRot, ingredientXRot;
@@ -238,7 +241,7 @@ public class BasinRenderer extends SmartBlockEntityRenderer<BasinBlockEntity, Ba
         public List<OutputItemRenderData> outputs;
 
         @Override
-        public void render(MatrixStack.Entry matricesEntry, VertexConsumer vertexConsumer) {
+        public void render(PoseStack.Pose matricesEntry, VertexConsumer vertexConsumer) {
             for (FluidRenderData data : fluids) {
                 FluidRenderHelper.renderFluidBox(
                     data.fluid,
@@ -251,7 +254,7 @@ public class BasinRenderer extends SmartBlockEntityRenderer<BasinBlockEntity, Ba
                     zMax,
                     vertexConsumer,
                     matricesEntry,
-                    lightmapCoordinates,
+                    lightCoords,
                     false,
                     false
                 );
@@ -259,12 +262,12 @@ public class BasinRenderer extends SmartBlockEntityRenderer<BasinBlockEntity, Ba
         }
     }
 
-    public record FluidRenderData(Fluid fluid, ComponentChanges changes, float xMin, float xMax) {
+    public record FluidRenderData(Fluid fluid, DataComponentPatch changes, float xMin, float xMax) {
     }
 
-    public record IngredientRenderData(ItemRenderState renderState, Vec3d itemPosition, float yRot, Vec3d[] offsets) {
+    public record IngredientRenderData(ItemStackRenderState renderState, Vec3 itemPosition, float yRot, Vec3[] offsets) {
     }
 
-    public record OutputItemRenderData(ItemRenderState renderState, Vec3d offset, float xRot) {
+    public record OutputItemRenderData(ItemStackRenderState renderState, Vec3 offset, float xRot) {
     }
 }

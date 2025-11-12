@@ -4,11 +4,11 @@ import com.zurrtum.create.content.logistics.filter.FilterItem;
 import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
 import com.zurrtum.create.foundation.blockEntity.behaviour.ValueSettings;
 import com.zurrtum.create.foundation.blockEntity.behaviour.filtering.ServerFilteringBehaviour;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.Hand;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.math.Direction;
+import net.minecraft.core.Direction;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.phys.BlockHitResult;
 
 public class ServerTableClothFilteringBehaviour extends ServerFilteringBehaviour {
     public ServerTableClothFilteringBehaviour(SmartBlockEntity be) {
@@ -18,7 +18,7 @@ public class ServerTableClothFilteringBehaviour extends ServerFilteringBehaviour
     }
 
     @Override
-    public void onShortInteract(PlayerEntity player, Hand hand, Direction side, BlockHitResult hitResult) {
+    public void onShortInteract(Player player, InteractionHand hand, Direction side, BlockHitResult hitResult) {
         super.onShortInteract(player, hand, side, hitResult);
     }
 
@@ -27,8 +27,8 @@ public class ServerTableClothFilteringBehaviour extends ServerFilteringBehaviour
     }
 
     @Override
-    public boolean mayInteract(PlayerEntity player) {
-        return dbe().owner == null || player.getUuid().equals(dbe().owner);
+    public boolean mayInteract(Player player) {
+        return dbe().owner == null || player.getUUID().equals(dbe().owner);
     }
 
     @Override
@@ -49,11 +49,11 @@ public class ServerTableClothFilteringBehaviour extends ServerFilteringBehaviour
     }
 
     @Override
-    public void setValueSettings(PlayerEntity player, ValueSettings settings, boolean ctrlDown) {
+    public void setValueSettings(Player player, ValueSettings settings, boolean ctrlDown) {
         if (getValueSettings().equals(settings))
             return;
         count = Math.max(1, settings.value());
-        blockEntity.markDirty();
+        blockEntity.setChanged();
         blockEntity.sendData();
         playFeedbackSound(this);
     }

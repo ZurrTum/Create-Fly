@@ -11,40 +11,40 @@ import com.zurrtum.create.foundation.block.NeighborUpdateListeningBlock;
 import com.zurrtum.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.foundation.item.ItemHelper;
 import com.zurrtum.create.infrastructure.items.ItemInventoryProvider;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.ShapeContext;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.ItemEntity;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.inventory.Inventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.Hand;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.math.random.Random;
-import net.minecraft.util.shape.VoxelShape;
-import net.minecraft.world.BlockView;
-import net.minecraft.world.World;
-import net.minecraft.world.WorldAccess;
-import net.minecraft.world.WorldView;
-import net.minecraft.world.tick.ScheduledTickView;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.Container;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.LevelReader;
+import net.minecraft.world.level.ScheduledTickAccess;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.Nullable;
 
 public abstract class AbstractChuteBlock extends Block implements IWrenchable, IBE<ChuteBlockEntity>, ItemInventoryProvider<ChuteBlockEntity>, NeighborUpdateListeningBlock {
 
-    public AbstractChuteBlock(Settings p_i48440_1_) {
+    public AbstractChuteBlock(Properties p_i48440_1_) {
         super(p_i48440_1_);
     }
 
     @Override
-    public Inventory getInventory(WorldAccess world, BlockPos pos, BlockState state, ChuteBlockEntity blockEntity, Direction context) {
+    public Container getInventory(LevelAccessor world, BlockPos pos, BlockState state, ChuteBlockEntity blockEntity, Direction context) {
         return blockEntity.itemHandler;
     }
 
@@ -57,7 +57,7 @@ public abstract class AbstractChuteBlock extends Block implements IWrenchable, I
     }
 
     public static boolean isTransparentChute(BlockState state) {
-        return isChute(state) && ((AbstractChuteBlock) state.getBlock()).isTransparent(state);
+        return isChute(state) && ((AbstractChuteBlock) state.getBlock()).propagatesSkylightDown(state);
     }
 
     @Nullable
@@ -73,95 +73,95 @@ public abstract class AbstractChuteBlock extends Block implements IWrenchable, I
         return true;
     }
 
-    public boolean isTransparent(BlockState state) {
+    public boolean propagatesSkylightDown(BlockState state) {
         return false;
     }
 
     @Override
-    public void onPlaced(World pLevel, BlockPos pPos, BlockState pState, LivingEntity pPlacer, ItemStack pStack) {
-        super.onPlaced(pLevel, pPos, pState, pPlacer, pStack);
+    public void setPlacedBy(Level pLevel, BlockPos pPos, BlockState pState, LivingEntity pPlacer, ItemStack pStack) {
+        super.setPlacedBy(pLevel, pPos, pState, pPlacer, pStack);
         AdvancementBehaviour.setPlacedBy(pLevel, pPos, pPlacer);
     }
 
     @Override
-    public void onEntityLand(BlockView worldIn, Entity entityIn) {
-        super.onEntityLand(worldIn, entityIn);
+    public void updateEntityMovementAfterFallOn(BlockGetter worldIn, Entity entityIn) {
+        super.updateEntityMovementAfterFallOn(worldIn, entityIn);
         ItemStack stack = ItemHelper.fromItemEntity(entityIn);
         if (stack.isEmpty())
             return;
-        if (entityIn.getEntityWorld().isClient())
+        if (entityIn.level().isClientSide())
             return;
         if (!entityIn.isAlive())
             return;
-        BlockPos pos = BlockPos.ofFloored(entityIn.getEntityPos().add(0, 0.5f, 0)).down();
-        DirectBeltInputBehaviour input = BlockEntityBehaviour.get(entityIn.getEntityWorld(), pos, DirectBeltInputBehaviour.TYPE);
+        BlockPos pos = BlockPos.containing(entityIn.position().add(0, 0.5f, 0)).below();
+        DirectBeltInputBehaviour input = BlockEntityBehaviour.get(entityIn.level(), pos, DirectBeltInputBehaviour.TYPE);
         if (input == null)
             return;
         if (!input.canInsertFromSide(Direction.UP))
             return;
-        if (!PackageEntity.centerPackage(entityIn, Vec3d.ofBottomCenter(pos.up())))
+        if (!PackageEntity.centerPackage(entityIn, Vec3.atBottomCenterOf(pos.above())))
             return;
         ItemStack remainder = input.handleInsertion(stack, Direction.UP, false);
         if (remainder.isEmpty()) {
             entityIn.discard();
             if (entityIn instanceof PackageEntity box) {
-                PlayerEntity player = box.tossedBy.get();
-                if (player instanceof ServerPlayerEntity serverPlayer)
+                Player player = box.tossedBy.get();
+                if (player instanceof ServerPlayer serverPlayer)
                     AllAdvancements.PACKAGE_CHUTE_THROW.trigger(serverPlayer);
             }
         } else if (remainder.getCount() < stack.getCount() && entityIn instanceof ItemEntity itemEntity)
-            itemEntity.setStack(remainder);
+            itemEntity.setItem(remainder);
     }
 
     @Override
-    public void onBlockAdded(BlockState state, World world, BlockPos pos, BlockState p_220082_4_, boolean p_220082_5_) {
+    public void onPlace(BlockState state, Level world, BlockPos pos, BlockState p_220082_4_, boolean p_220082_5_) {
         withBlockEntityDo(world, pos, ChuteBlockEntity::onAdded);
         updateDiagonalNeighbour(state, world, pos);
     }
 
-    protected void updateDiagonalNeighbour(BlockState state, World world, BlockPos pos) {
+    protected void updateDiagonalNeighbour(BlockState state, Level world, BlockPos pos) {
         if (!isChute(state))
             return;
         AbstractChuteBlock block = (AbstractChuteBlock) state.getBlock();
         Direction facing = block.getFacing(state);
-        BlockPos toUpdate = pos.down();
+        BlockPos toUpdate = pos.below();
         if (facing.getAxis().isHorizontal())
-            toUpdate = toUpdate.offset(facing.getOpposite());
+            toUpdate = toUpdate.relative(facing.getOpposite());
 
         BlockState stateToUpdate = world.getBlockState(toUpdate);
-        if (isChute(stateToUpdate) && !world.getBlockTickScheduler().isQueued(toUpdate, stateToUpdate.getBlock()))
-            world.scheduleBlockTick(toUpdate, stateToUpdate.getBlock(), 1);
+        if (isChute(stateToUpdate) && !world.getBlockTicks().hasScheduledTick(toUpdate, stateToUpdate.getBlock()))
+            world.scheduleTick(toUpdate, stateToUpdate.getBlock(), 1);
     }
 
     @Override
-    public void onStateReplaced(BlockState state, ServerWorld world, BlockPos pos, boolean isMoving) {
+    public void affectNeighborsAfterRemoval(BlockState state, ServerLevel world, BlockPos pos, boolean isMoving) {
         updateDiagonalNeighbour(state, world, pos);
 
         for (Direction direction : Iterate.horizontalDirections) {
-            BlockPos toUpdate = pos.up().offset(direction);
+            BlockPos toUpdate = pos.above().relative(direction);
             BlockState stateToUpdate = world.getBlockState(toUpdate);
-            if (isChute(stateToUpdate) && !world.getBlockTickScheduler().isQueued(toUpdate, stateToUpdate.getBlock()))
-                world.scheduleBlockTick(toUpdate, stateToUpdate.getBlock(), 1);
+            if (isChute(stateToUpdate) && !world.getBlockTicks().hasScheduledTick(toUpdate, stateToUpdate.getBlock()))
+                world.scheduleTick(toUpdate, stateToUpdate.getBlock(), 1);
         }
     }
 
     @Override
-    public void scheduledTick(BlockState pState, ServerWorld pLevel, BlockPos pPos, Random pRandom) {
-        BlockState updated = updateChuteState(pState, pLevel.getBlockState(pPos.up()), pLevel, pPos);
+    public void tick(BlockState pState, ServerLevel pLevel, BlockPos pPos, RandomSource pRandom) {
+        BlockState updated = updateChuteState(pState, pLevel.getBlockState(pPos.above()), pLevel, pPos);
         if (pState != updated)
-            pLevel.setBlockState(pPos, updated);
+            pLevel.setBlockAndUpdate(pPos, updated);
     }
 
     @Override
-    public BlockState getStateForNeighborUpdate(
+    public BlockState updateShape(
         BlockState state,
-        WorldView world,
-        ScheduledTickView tickView,
+        LevelReader world,
+        ScheduledTickAccess tickView,
         BlockPos pos,
         Direction direction,
         BlockPos p_196271_6_,
         BlockState above,
-        Random random
+        RandomSource random
     ) {
         if (direction != Direction.UP)
             return state;
@@ -169,20 +169,20 @@ public abstract class AbstractChuteBlock extends Block implements IWrenchable, I
     }
 
     @Override
-    public void neighborUpdate(BlockState state, World world, BlockPos pos, Block sourceBlock, BlockPos neighbourPos, boolean isMoving) {
-        if (pos.down().equals(neighbourPos))
+    public void neighborUpdate(BlockState state, Level world, BlockPos pos, Block sourceBlock, BlockPos neighbourPos, boolean isMoving) {
+        if (pos.below().equals(neighbourPos))
             withBlockEntityDo(world, pos, ChuteBlockEntity::blockBelowChanged);
     }
 
-    public abstract BlockState updateChuteState(BlockState state, BlockState above, BlockView world, BlockPos pos);
+    public abstract BlockState updateChuteState(BlockState state, BlockState above, BlockGetter world, BlockPos pos);
 
     @Override
-    public VoxelShape getOutlineShape(BlockState p_220053_1_, BlockView p_220053_2_, BlockPos p_220053_3_, ShapeContext p_220053_4_) {
+    public VoxelShape getShape(BlockState p_220053_1_, BlockGetter p_220053_2_, BlockPos p_220053_3_, CollisionContext p_220053_4_) {
         return ChuteShapes.getShape(p_220053_1_);
     }
 
     @Override
-    public VoxelShape getCollisionShape(BlockState p_220071_1_, BlockView p_220071_2_, BlockPos p_220071_3_, ShapeContext p_220071_4_) {
+    public VoxelShape getCollisionShape(BlockState p_220071_1_, BlockGetter p_220071_2_, BlockPos p_220071_3_, CollisionContext p_220071_4_) {
         return ChuteShapes.getCollisionShape(p_220071_1_);
     }
 
@@ -192,27 +192,27 @@ public abstract class AbstractChuteBlock extends Block implements IWrenchable, I
     }
 
     @Override
-    protected ActionResult onUseWithItem(
+    protected InteractionResult useItemOn(
         ItemStack stack,
         BlockState state,
-        World level,
+        Level level,
         BlockPos pos,
-        PlayerEntity player,
-        Hand hand,
+        Player player,
+        InteractionHand hand,
         BlockHitResult hitResult
     ) {
         if (!stack.isEmpty())
-            return ActionResult.PASS_TO_DEFAULT_BLOCK_ACTION;
-        if (level.isClient())
-            return ActionResult.SUCCESS;
+            return InteractionResult.TRY_WITH_EMPTY_HAND;
+        if (level.isClientSide())
+            return InteractionResult.SUCCESS;
 
         return onBlockEntityUseItemOn(
             level, pos, be -> {
                 if (be.item.isEmpty())
-                    return ActionResult.PASS_TO_DEFAULT_BLOCK_ACTION;
-                player.getInventory().offerOrDrop(be.item);
+                    return InteractionResult.TRY_WITH_EMPTY_HAND;
+                player.getInventory().placeItemBackInInventory(be.item);
                 be.setItem(ItemStack.EMPTY);
-                return ActionResult.SUCCESS;
+                return InteractionResult.SUCCESS;
             }
         );
     }

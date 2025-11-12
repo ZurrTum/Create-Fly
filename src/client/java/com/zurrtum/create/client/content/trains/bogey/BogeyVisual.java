@@ -1,14 +1,14 @@
 package com.zurrtum.create.client.content.trains.bogey;
 
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.zurrtum.create.client.flywheel.api.instance.Instance;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.nbt.NbtCompound;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Consumer;
+import net.minecraft.nbt.CompoundTag;
 
 public interface BogeyVisual {
-    void update(NbtCompound bogeyData, float wheelAngle, MatrixStack poseStack);
+    void update(CompoundTag bogeyData, float wheelAngle, PoseStack poseStack);
 
     void hide();
 

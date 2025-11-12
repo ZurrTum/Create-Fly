@@ -3,24 +3,23 @@ package com.zurrtum.create.infrastructure.packet.c2s;
 import com.zurrtum.create.AllHandle;
 import com.zurrtum.create.AllPackets;
 import com.zurrtum.create.infrastructure.component.PackageOrderWithCrafts;
-import net.minecraft.network.RegistryByteBuf;
-import net.minecraft.network.codec.PacketCodec;
-import net.minecraft.network.codec.PacketCodecs;
-import net.minecraft.network.packet.PacketType;
-import net.minecraft.server.network.ServerPlayNetworkHandler;
-import net.minecraft.util.math.BlockPos;
-
 import java.util.function.BiConsumer;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.PacketType;
+import net.minecraft.server.network.ServerGamePacketListenerImpl;
 
 public record PackageOrderRequestPacket(BlockPos pos, PackageOrderWithCrafts order, String address, boolean encodeRequester) implements C2SPacket {
-    public static final PacketCodec<RegistryByteBuf, PackageOrderRequestPacket> CODEC = PacketCodec.tuple(
-        BlockPos.PACKET_CODEC,
+    public static final StreamCodec<RegistryFriendlyByteBuf, PackageOrderRequestPacket> CODEC = StreamCodec.composite(
+        BlockPos.STREAM_CODEC,
         PackageOrderRequestPacket::pos,
         PackageOrderWithCrafts.STREAM_CODEC,
         PackageOrderRequestPacket::order,
-        PacketCodecs.STRING,
+        ByteBufCodecs.STRING_UTF8,
         PackageOrderRequestPacket::address,
-        PacketCodecs.BOOLEAN,
+        ByteBufCodecs.BOOL,
         PackageOrderRequestPacket::encodeRequester,
         PackageOrderRequestPacket::new
     );
@@ -31,12 +30,12 @@ public record PackageOrderRequestPacket(BlockPos pos, PackageOrderWithCrafts ord
     }
 
     @Override
-    public PacketType<PackageOrderRequestPacket> getPacketType() {
+    public PacketType<PackageOrderRequestPacket> type() {
         return AllPackets.LOGISTICS_PACKAGE_REQUEST;
     }
 
     @Override
-    public BiConsumer<ServerPlayNetworkHandler, PackageOrderRequestPacket> callback() {
+    public BiConsumer<ServerGamePacketListenerImpl, PackageOrderRequestPacket> callback() {
         return AllHandle::onPackageOrderRequest;
     }
 }

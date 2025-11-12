@@ -1,19 +1,18 @@
 package com.zurrtum.create.client.flywheel.lib.model.baked;
 
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.fluid.FluidState;
-import net.minecraft.registry.RegistryKeys;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.world.BlockRenderView;
-import net.minecraft.world.biome.Biome;
-import net.minecraft.world.biome.BiomeKeys;
-import net.minecraft.world.biome.ColorResolver;
-import net.minecraft.world.chunk.light.LightingProvider;
-
 import java.util.function.ToIntFunction;
+import net.minecraft.client.Minecraft;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.world.level.BlockAndTintGetter;
+import net.minecraft.world.level.ColorResolver;
+import net.minecraft.world.level.biome.Biome;
+import net.minecraft.world.level.biome.Biomes;
+import net.minecraft.world.level.lighting.LevelLightEngine;
+import net.minecraft.world.level.material.FluidState;
 
-public abstract class VirtualBlockGetter implements BlockRenderView {
+public abstract class VirtualBlockGetter implements BlockAndTintGetter {
     protected final VirtualLightEngine lightEngine;
 
     public VirtualBlockGetter(ToIntFunction<BlockPos> blockLightFunc, ToIntFunction<BlockPos> skyLightFunc) {
@@ -26,19 +25,19 @@ public abstract class VirtualBlockGetter implements BlockRenderView {
     }
 
     @Override
-    public float getBrightness(Direction direction, boolean shaded) {
+    public float getShade(Direction direction, boolean shaded) {
         return 1f;
     }
 
     @Override
-    public LightingProvider getLightingProvider() {
+    public LevelLightEngine getLightEngine() {
         return lightEngine;
     }
 
     @Override
-    public int getColor(BlockPos pos, ColorResolver resolver) {
-        Biome plainsBiome = MinecraftClient.getInstance().getNetworkHandler().getRegistryManager().getOrThrow(RegistryKeys.BIOME)
-            .getValueOrThrow(BiomeKeys.PLAINS);
+    public int getBlockTint(BlockPos pos, ColorResolver resolver) {
+        Biome plainsBiome = Minecraft.getInstance().getConnection().registryAccess().lookupOrThrow(Registries.BIOME)
+            .getValueOrThrow(Biomes.PLAINS);
         return resolver.getColor(plainsBiome, pos.getX(), pos.getZ());
     }
 }

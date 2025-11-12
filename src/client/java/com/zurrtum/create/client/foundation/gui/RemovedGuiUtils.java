@@ -1,19 +1,19 @@
 package com.zurrtum.create.client.foundation.gui;
 
 import com.mojang.blaze3d.opengl.GlStateManager;
-import net.minecraft.client.font.TextRenderer;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.tooltip.TooltipComponent;
-import net.minecraft.item.ItemStack;
-import net.minecraft.text.OrderedText;
-import net.minecraft.text.StringVisitable;
-import net.minecraft.text.Style;
-import net.minecraft.text.Text;
-import net.minecraft.util.Language;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
+import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
+import net.minecraft.locale.Language;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.FormattedText;
+import net.minecraft.network.chat.Style;
+import net.minecraft.util.FormattedCharSequence;
+import net.minecraft.world.item.ItemStack;
 
 public class RemovedGuiUtils {
     public static final int DEFAULT_BACKGROUND_COLOR = 0xF0100010;
@@ -31,14 +31,14 @@ public class RemovedGuiUtils {
     }
 
     public static void drawHoveringText(
-        DrawContext graphics,
-        List<? extends StringVisitable> textLines,
+        GuiGraphics graphics,
+        List<? extends FormattedText> textLines,
         int mouseX,
         int mouseY,
         int screenWidth,
         int screenHeight,
         int maxTextWidth,
-        TextRenderer font
+        Font font
     ) {
         drawHoveringText(
             graphics,
@@ -56,8 +56,8 @@ public class RemovedGuiUtils {
     }
 
     public static void drawHoveringText(
-        DrawContext graphics,
-        List<? extends StringVisitable> textLines,
+        GuiGraphics graphics,
+        List<? extends FormattedText> textLines,
         int mouseX,
         int mouseY,
         int screenWidth,
@@ -66,7 +66,7 @@ public class RemovedGuiUtils {
         int backgroundColor,
         int borderColorStart,
         int borderColorEnd,
-        TextRenderer font
+        Font font
     ) {
         drawHoveringText(
             cachedTooltipStack,
@@ -86,14 +86,14 @@ public class RemovedGuiUtils {
 
     public static void drawHoveringText(
         @NotNull final ItemStack stack,
-        DrawContext graphics,
-        List<? extends StringVisitable> textLines,
+        GuiGraphics graphics,
+        List<? extends FormattedText> textLines,
         int mouseX,
         int mouseY,
         int screenWidth,
         int screenHeight,
         int maxTextWidth,
-        TextRenderer font
+        Font font
     ) {
         drawHoveringText(
             stack,
@@ -113,8 +113,8 @@ public class RemovedGuiUtils {
 
     public static void drawHoveringText(
         @NotNull final ItemStack stack,
-        DrawContext graphics,
-        List<? extends StringVisitable> textLines,
+        GuiGraphics graphics,
+        List<? extends FormattedText> textLines,
         int mouseX,
         int mouseY,
         int screenWidth,
@@ -123,22 +123,22 @@ public class RemovedGuiUtils {
         int backgroundColor,
         int borderColorStart,
         int borderColorEnd,
-        TextRenderer font
+        Font font
     ) {
         if (textLines.isEmpty())
             return;
 
-        List<TooltipComponent> list = new ArrayList<>();
-        for (StringVisitable textLine : textLines) {
-            OrderedText charSequence = textLine instanceof Text text ? text.asOrderedText() : Language.getInstance().reorder(textLine);
-            list.add(TooltipComponent.of(charSequence));
+        List<ClientTooltipComponent> list = new ArrayList<>();
+        for (FormattedText textLine : textLines) {
+            FormattedCharSequence charSequence = textLine instanceof Component text ? text.getVisualOrderText() : Language.getInstance().getVisualOrder(textLine);
+            list.add(ClientTooltipComponent.create(charSequence));
         }
 
         GlStateManager._disableDepthTest();
         int tooltipTextWidth = 0;
 
-        for (StringVisitable textLine : textLines) {
-            int textLineWidth = font.getWidth(textLine);
+        for (FormattedText textLine : textLines) {
+            int textLineWidth = font.width(textLine);
             if (textLineWidth > tooltipTextWidth)
                 tooltipTextWidth = textLineWidth;
         }
@@ -166,15 +166,15 @@ public class RemovedGuiUtils {
 
         if (needsWrap) {
             int wrappedTooltipWidth = 0;
-            List<StringVisitable> wrappedTextLines = new ArrayList<>();
+            List<FormattedText> wrappedTextLines = new ArrayList<>();
             for (int i = 0; i < textLines.size(); i++) {
-                StringVisitable textLine = textLines.get(i);
-                List<StringVisitable> wrappedLine = font.getTextHandler().wrapLines(textLine, tooltipTextWidth, Style.EMPTY);
+                FormattedText textLine = textLines.get(i);
+                List<FormattedText> wrappedLine = font.getSplitter().splitLines(textLine, tooltipTextWidth, Style.EMPTY);
                 if (i == 0)
                     titleLinesCount = wrappedLine.size();
 
-                for (StringVisitable line : wrappedLine) {
-                    int lineWidth = font.getWidth(line);
+                for (FormattedText line : wrappedLine) {
+                    int lineWidth = font.width(line);
                     if (lineWidth > wrappedTooltipWidth)
                         wrappedTooltipWidth = lineWidth;
                     wrappedTextLines.add(line);
@@ -249,10 +249,10 @@ public class RemovedGuiUtils {
         );
 
         for (int lineNumber = 0; lineNumber < list.size(); ++lineNumber) {
-            TooltipComponent line = list.get(lineNumber);
+            ClientTooltipComponent line = list.get(lineNumber);
 
             if (line != null)
-                line.drawText(graphics, font, tooltipX, tooltipY);
+                line.renderText(graphics, font, tooltipX, tooltipY);
 
             if (lineNumber + 1 == titleLinesCount)
                 tooltipY += 2;

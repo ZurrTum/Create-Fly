@@ -1,11 +1,11 @@
 package com.zurrtum.create.client.foundation.sound;
 
 import com.zurrtum.create.client.catnip.animation.AnimationTickHolder;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.world.ClientWorld;
-import net.minecraft.sound.SoundCategory;
-import net.minecraft.sound.SoundEvent;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.phys.Vec3;
 
 public class RepeatingSound {
 
@@ -27,10 +27,10 @@ public class RepeatingSound {
         if (AnimationTickHolder.getTicks() % repeatDelay != 0)
             return;
 
-        ClientWorld world = MinecraftClient.getInstance().world;
-        Vec3d meanPos = scape.getMeanPos();
+        ClientLevel world = Minecraft.getInstance().level;
+        Vec3 meanPos = scape.getMeanPos();
 
-        world.playSoundClient(meanPos.x, meanPos.y, meanPos.z, event, SoundCategory.AMBIENT, scape.getVolume() * relativeVolume, sharedPitch, true);
+        world.playLocalSound(meanPos.x, meanPos.y, meanPos.z, event, SoundSource.AMBIENT, scape.getVolume() * relativeVolume, sharedPitch, true);
     }
 
 }

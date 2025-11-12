@@ -11,130 +11,130 @@ import com.zurrtum.create.content.fluids.FluidTransportBehaviour;
 import com.zurrtum.create.foundation.advancement.AdvancementBehaviour;
 import com.zurrtum.create.foundation.block.NeighborUpdateListeningBlock;
 import com.zurrtum.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.PillarBlock;
-import net.minecraft.block.ShapeContext;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.state.property.BooleanProperty;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.Hand;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Direction.Axis;
-import net.minecraft.util.math.Direction.AxisDirection;
-import net.minecraft.util.math.random.Random;
-import net.minecraft.util.shape.VoxelShape;
-import net.minecraft.world.BlockView;
-import net.minecraft.world.World;
-import net.minecraft.world.WorldAccess;
-import net.minecraft.world.WorldView;
-import net.minecraft.world.block.WireOrientation;
-import net.minecraft.world.tick.TickPriority;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Map;
 import java.util.Optional;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.Direction.Axis;
+import net.minecraft.core.Direction.AxisDirection;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.LevelReader;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.RotatedPillarBlock;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.BooleanProperty;
+import net.minecraft.world.level.redstone.Orientation;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.phys.shapes.VoxelShape;
+import net.minecraft.world.ticks.TickPriority;
 
-public class AxisPipeBlock extends PillarBlock implements IWrenchableWithBracket, IAxisPipe, NeighborUpdateListeningBlock {
+public class AxisPipeBlock extends RotatedPillarBlock implements IWrenchableWithBracket, IAxisPipe, NeighborUpdateListeningBlock {
 
-    public AxisPipeBlock(Settings p_i48339_1_) {
+    public AxisPipeBlock(Properties p_i48339_1_) {
         super(p_i48339_1_);
     }
 
     @Override
-    public void onStateReplaced(BlockState state, ServerWorld world, BlockPos pos, boolean isMoving) {
+    public void affectNeighborsAfterRemoval(BlockState state, ServerLevel world, BlockPos pos, boolean isMoving) {
         FluidPropagator.propagateChangedPipe(world, pos, state);
         if (!isMoving)
-            removeBracket(world, pos, true).ifPresent(stack -> Block.dropStack(world, pos, stack));
+            removeBracket(world, pos, true).ifPresent(stack -> Block.popResource(world, pos, stack));
     }
 
     @Override
-    protected ActionResult onUseWithItem(
+    protected InteractionResult useItemOn(
         ItemStack stack,
         BlockState state,
-        World level,
+        Level level,
         BlockPos pos,
-        PlayerEntity player,
-        Hand hand,
+        Player player,
+        InteractionHand hand,
         BlockHitResult hitResult
     ) {
-        if (!stack.isOf(AllItems.COPPER_CASING))
-            return ActionResult.PASS_TO_DEFAULT_BLOCK_ACTION;
-        if (level.isClient())
-            return ActionResult.SUCCESS;
-        BlockState newState = AllBlocks.ENCASED_FLUID_PIPE.getDefaultState();
+        if (!stack.is(AllItems.COPPER_CASING))
+            return InteractionResult.TRY_WITH_EMPTY_HAND;
+        if (level.isClientSide())
+            return InteractionResult.SUCCESS;
+        BlockState newState = AllBlocks.ENCASED_FLUID_PIPE.defaultBlockState();
         for (Direction d : Iterate.directionsInAxis(getAxis(state)))
-            newState = newState.with(EncasedPipeBlock.FACING_TO_PROPERTY_MAP.get(d), true);
+            newState = newState.setValue(EncasedPipeBlock.FACING_TO_PROPERTY_MAP.get(d), true);
         FluidTransportBehaviour.cacheFlows(level, pos);
-        level.setBlockState(pos, newState);
+        level.setBlockAndUpdate(pos, newState);
         FluidTransportBehaviour.loadFlows(level, pos);
-        return ActionResult.SUCCESS;
+        return InteractionResult.SUCCESS;
     }
 
     @Override
-    public void onPlaced(World pLevel, BlockPos pPos, BlockState pState, LivingEntity pPlacer, ItemStack pStack) {
-        super.onPlaced(pLevel, pPos, pState, pPlacer, pStack);
+    public void setPlacedBy(Level pLevel, BlockPos pPos, BlockState pState, LivingEntity pPlacer, ItemStack pStack) {
+        super.setPlacedBy(pLevel, pPos, pState, pPlacer, pStack);
         AdvancementBehaviour.setPlacedBy(pLevel, pPos, pPlacer);
     }
 
     @Override
-    public void onBlockAdded(BlockState state, World world, BlockPos pos, BlockState oldState, boolean isMoving) {
-        if (world.isClient())
+    public void onPlace(BlockState state, Level world, BlockPos pos, BlockState oldState, boolean isMoving) {
+        if (world.isClientSide())
             return;
         if (state != oldState)
-            world.scheduleBlockTick(pos, this, 1, TickPriority.HIGH);
+            world.scheduleTick(pos, this, 1, TickPriority.HIGH);
     }
 
     @Override
-    protected ItemStack getPickStack(WorldView world, BlockPos pos, BlockState state, boolean includeData) {
-        return AllItems.FLUID_PIPE.getDefaultStack();
+    protected ItemStack getCloneItemStack(LevelReader world, BlockPos pos, BlockState state, boolean includeData) {
+        return AllItems.FLUID_PIPE.getDefaultInstance();
     }
 
     @Override
-    public void neighborUpdate(BlockState state, World world, BlockPos pos, Block otherBlock, BlockPos neighborPos, boolean isMoving) {
+    public void neighborUpdate(BlockState state, Level world, BlockPos pos, Block otherBlock, BlockPos neighborPos, boolean isMoving) {
         Direction d = FluidPropagator.validateNeighbourChange(state, world, pos, otherBlock, neighborPos, isMoving);
         if (d == null)
             return;
         if (!isOpenAt(state, d))
             return;
-        world.scheduleBlockTick(pos, this, 1, TickPriority.HIGH);
+        world.scheduleTick(pos, this, 1, TickPriority.HIGH);
     }
 
     @Override
-    public void neighborUpdate(
+    public void neighborChanged(
         BlockState state,
-        World world,
+        Level world,
         BlockPos pos,
         Block otherBlock,
-        @Nullable WireOrientation wireOrientation,
+        @Nullable Orientation wireOrientation,
         boolean isMoving
     ) {
     }
 
     public static boolean isOpenAt(BlockState state, Direction d) {
-        return d.getAxis() == state.get(AXIS);
+        return d.getAxis() == state.getValue(AXIS);
     }
 
     @Override
-    public void scheduledTick(BlockState state, ServerWorld world, BlockPos pos, Random r) {
+    public void tick(BlockState state, ServerLevel world, BlockPos pos, RandomSource r) {
         FluidPropagator.propagateChangedPipe(world, pos, state);
     }
 
     @Override
-    public VoxelShape getOutlineShape(BlockState state, BlockView p_220053_2_, BlockPos p_220053_3_, ShapeContext p_220053_4_) {
-        return AllShapes.EIGHT_VOXEL_POLE.get(state.get(AXIS));
+    public VoxelShape getShape(BlockState state, BlockGetter p_220053_2_, BlockPos p_220053_3_, CollisionContext p_220053_4_) {
+        return AllShapes.EIGHT_VOXEL_POLE.get(state.getValue(AXIS));
     }
 
-    public BlockState toRegularPipe(WorldAccess world, BlockPos pos, BlockState state) {
-        Direction side = Direction.get(AxisDirection.POSITIVE, state.get(AXIS));
-        Map<Direction, BooleanProperty> facingToPropertyMap = FluidPipeBlock.FACING_PROPERTIES;
+    public BlockState toRegularPipe(LevelAccessor world, BlockPos pos, BlockState state) {
+        Direction side = Direction.get(AxisDirection.POSITIVE, state.getValue(AXIS));
+        Map<Direction, BooleanProperty> facingToPropertyMap = FluidPipeBlock.PROPERTY_BY_DIRECTION;
         return AllBlocks.FLUID_PIPE.updateBlockState(
-            AllBlocks.FLUID_PIPE.getDefaultState().with(facingToPropertyMap.get(side), true).with(facingToPropertyMap.get(side.getOpposite()), true),
+            AllBlocks.FLUID_PIPE.defaultBlockState().setValue(facingToPropertyMap.get(side), true).setValue(facingToPropertyMap.get(side.getOpposite()), true),
             side,
             null,
             world,
@@ -144,11 +144,11 @@ public class AxisPipeBlock extends PillarBlock implements IWrenchableWithBracket
 
     @Override
     public Axis getAxis(BlockState state) {
-        return state.get(AXIS);
+        return state.getValue(AXIS);
     }
 
     @Override
-    public Optional<ItemStack> removeBracket(BlockView world, BlockPos pos, boolean inOnReplacedContext) {
+    public Optional<ItemStack> removeBracket(BlockGetter world, BlockPos pos, boolean inOnReplacedContext) {
         BracketedBlockEntityBehaviour behaviour = BlockEntityBehaviour.get(world, pos, BracketedBlockEntityBehaviour.TYPE);
         if (behaviour == null)
             return Optional.empty();

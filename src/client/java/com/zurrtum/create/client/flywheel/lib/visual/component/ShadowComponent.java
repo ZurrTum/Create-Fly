@@ -13,19 +13,19 @@ import com.zurrtum.create.client.flywheel.lib.material.SimpleMaterial;
 import com.zurrtum.create.client.flywheel.lib.model.QuadMesh;
 import com.zurrtum.create.client.flywheel.lib.model.SingleMeshModel;
 import com.zurrtum.create.client.flywheel.lib.visual.util.InstanceRecycler;
-import net.minecraft.block.BlockRenderType;
-import net.minecraft.block.BlockState;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.render.LightmapTextureManager;
-import net.minecraft.client.render.OverlayTexture;
-import net.minecraft.entity.Entity;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction.Axis;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.shape.VoxelShape;
-import net.minecraft.world.World;
-import net.minecraft.world.chunk.Chunk;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.LightTexture;
+import net.minecraft.client.renderer.texture.OverlayTexture;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction.Axis;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.Mth;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.RenderShape;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.chunk.ChunkAccess;
+import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector4f;
 import org.joml.Vector4fc;
@@ -40,7 +40,7 @@ import org.joml.Vector4fc;
  * The shadow will be cast on blocks at most {@code min(radius, 2 * strength)} blocks below the entity.</p>
  */
 public final class ShadowComponent implements EntityComponent {
-    private static final Identifier SHADOW_TEXTURE = Identifier.ofVanilla("textures/misc/shadow.png");
+    private static final ResourceLocation SHADOW_TEXTURE = ResourceLocation.withDefaultNamespace("textures/misc/shadow.png");
     private static final Material SHADOW_MATERIAL = SimpleMaterial.builder().texture(SHADOW_TEXTURE).mipmap(false)
         .polygonOffset(true) // vanilla shadows use "view offset" but this seems to work fine
         .transparency(Transparency.TRANSLUCENT).writeMask(WriteMask.COLOR).build();
@@ -48,8 +48,8 @@ public final class ShadowComponent implements EntityComponent {
 
     private final VisualizationContext context;
     private final Entity entity;
-    private final World level;
-    private final BlockPos.Mutable pos = new BlockPos.Mutable();
+    private final Level level;
+    private final BlockPos.MutableBlockPos pos = new BlockPos.MutableBlockPos();
 
     private final InstanceRecycler<ShadowInstance> instances = new InstanceRecycler<>(this::createInstance);
 
@@ -60,7 +60,7 @@ public final class ShadowComponent implements EntityComponent {
     public ShadowComponent(VisualizationContext context, Entity entity) {
         this.context = context;
         this.entity = entity;
-        this.level = entity.getEntityWorld();
+        this.level = entity.level();
     }
 
     private ShadowInstance createInstance() {
@@ -107,7 +107,7 @@ public final class ShadowComponent implements EntityComponent {
     public void beginFrame(DynamicVisual.Context context) {
         instances.resetCount();
 
-        boolean shadowsEnabled = MinecraftClient.getInstance().options.getEntityShadows().getValue();
+        boolean shadowsEnabled = Minecraft.getInstance().options.entityShadows().get();
         if (shadowsEnabled && radius > 0 && !entity.isInvisible()) {
             setupInstances(context);
         }
@@ -116,21 +116,21 @@ public final class ShadowComponent implements EntityComponent {
     }
 
     private void setupInstances(DynamicVisual.Context context) {
-        double entityX = MathHelper.lerp(context.partialTick(), entity.lastRenderX, entity.getX());
-        double entityY = MathHelper.lerp(context.partialTick(), entity.lastRenderY, entity.getY());
-        double entityZ = MathHelper.lerp(context.partialTick(), entity.lastRenderZ, entity.getZ());
+        double entityX = Mth.lerp(context.partialTick(), entity.xOld, entity.getX());
+        double entityY = Mth.lerp(context.partialTick(), entity.yOld, entity.getY());
+        double entityZ = Mth.lerp(context.partialTick(), entity.zOld, entity.getZ());
         float castDistance = Math.min(strength * 2, radius);
-        int minXPos = MathHelper.floor(entityX - (double) radius);
-        int maxXPos = MathHelper.floor(entityX + (double) radius);
-        int minYPos = MathHelper.floor(entityY - (double) castDistance);
-        int maxYPos = MathHelper.floor(entityY);
-        int minZPos = MathHelper.floor(entityZ - (double) radius);
-        int maxZPos = MathHelper.floor(entityZ + (double) radius);
+        int minXPos = Mth.floor(entityX - (double) radius);
+        int maxXPos = Mth.floor(entityX + (double) radius);
+        int minYPos = Mth.floor(entityY - (double) castDistance);
+        int maxYPos = Mth.floor(entityY);
+        int minZPos = Mth.floor(entityZ - (double) radius);
+        int maxZPos = Mth.floor(entityZ + (double) radius);
 
         for (int z = minZPos; z <= maxZPos; ++z) {
             for (int x = minXPos; x <= maxXPos; ++x) {
                 pos.set(x, 0, z);
-                Chunk chunk = level.getChunk(pos);
+                ChunkAccess chunk = level.getChunk(pos);
 
                 for (int y = minYPos; y <= maxYPos; ++y) {
                     pos.setY(y);
@@ -141,14 +141,14 @@ public final class ShadowComponent implements EntityComponent {
         }
     }
 
-    private void setupInstance(Chunk chunk, BlockPos.Mutable pos, float entityX, float entityZ, float strength) {
+    private void setupInstance(ChunkAccess chunk, BlockPos.MutableBlockPos pos, float entityX, float entityZ, float strength) {
         // TODO: cache this?
-        var maxLocalRawBrightness = level.getLightLevel(pos);
+        var maxLocalRawBrightness = level.getMaxLocalRawBrightness(pos);
         if (maxLocalRawBrightness <= 3) {
             // Too dark to render.
             return;
         }
-        float blockBrightness = LightmapTextureManager.getBrightness(level.getDimension(), maxLocalRawBrightness);
+        float blockBrightness = LightTexture.getBrightness(level.dimensionType(), maxLocalRawBrightness);
         float alpha = strength * 0.5F * blockBrightness;
         if (alpha < 0.0F) {
             // Too far away/too weak to render.
@@ -171,11 +171,11 @@ public final class ShadowComponent implements EntityComponent {
         int y = pos.getY() - renderOrigin.getY() + 1; // +1 since we moved the pos down.
         int z = pos.getZ() - renderOrigin.getZ();
 
-        double minX = x + shape.getMin(Axis.X);
-        double minY = y + shape.getMin(Axis.Y);
-        double minZ = z + shape.getMin(Axis.Z);
-        double maxX = x + shape.getMax(Axis.X);
-        double maxZ = z + shape.getMax(Axis.Z);
+        double minX = x + shape.min(Axis.X);
+        double minY = y + shape.min(Axis.Y);
+        double minZ = z + shape.min(Axis.Z);
+        double maxX = x + shape.max(Axis.X);
+        double maxZ = z + shape.max(Axis.Z);
 
         var instance = instances.get();
         instance.x = (float) minX;
@@ -191,15 +191,15 @@ public final class ShadowComponent implements EntityComponent {
     }
 
     @Nullable
-    private VoxelShape getShapeAt(Chunk chunk, BlockPos pos) {
+    private VoxelShape getShapeAt(ChunkAccess chunk, BlockPos pos) {
         BlockState state = chunk.getBlockState(pos);
-        if (state.getRenderType() == BlockRenderType.INVISIBLE) {
+        if (state.getRenderShape() == RenderShape.INVISIBLE) {
             return null;
         }
-        if (!state.isFullCube(chunk, pos)) {
+        if (!state.isCollisionShapeFullBlock(chunk, pos)) {
             return null;
         }
-        VoxelShape shape = state.getOutlineShape(chunk, pos);
+        VoxelShape shape = state.getShape(chunk, pos);
         if (shape.isEmpty()) {
             return null;
         }
@@ -247,8 +247,8 @@ public final class ShadowComponent implements EntityComponent {
             vertexList.b(i, 1);
             vertexList.u(i, 0);
             vertexList.v(i, 0);
-            vertexList.light(i, LightmapTextureManager.MAX_LIGHT_COORDINATE);
-            vertexList.overlay(i, OverlayTexture.DEFAULT_UV);
+            vertexList.light(i, LightTexture.FULL_BRIGHT);
+            vertexList.overlay(i, OverlayTexture.NO_OVERLAY);
             vertexList.normalX(i, 0);
             vertexList.normalY(i, 1);
             vertexList.normalZ(i, 0);

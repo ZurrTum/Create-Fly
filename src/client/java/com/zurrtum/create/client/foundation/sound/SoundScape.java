@@ -5,15 +5,14 @@ import com.zurrtum.create.client.catnip.animation.AnimationTickHolder;
 import com.zurrtum.create.client.foundation.sound.SoundScapes.AmbienceGroup;
 import com.zurrtum.create.client.foundation.sound.SoundScapes.PitchGroup;
 import com.zurrtum.create.client.infrastructure.config.AllConfigs;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.entity.Entity;
-import net.minecraft.sound.SoundEvent;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec3d;
-
 import java.util.ArrayList;
 import java.util.List;
+import net.minecraft.client.Minecraft;
+import net.minecraft.core.BlockPos;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.util.Mth;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.phys.Vec3;
 
 public class SoundScape {
     private final float pitch;
@@ -21,7 +20,7 @@ public class SoundScape {
     private final PitchGroup pitchGroup;
     List<ContinuousSound> continuous;
     List<RepeatingSound> repeating;
-    private Vec3d meanPos;
+    private Vec3 meanPos;
 
     public SoundScape(float pitch, AmbienceGroup group) {
         this.pitchGroup = SoundScapes.getGroupFromPitch(pitch);
@@ -50,7 +49,7 @@ public class SoundScape {
     }
 
     public void play() {
-        continuous.forEach(MinecraftClient.getInstance().getSoundManager()::play);
+        continuous.forEach(Minecraft.getInstance().getSoundManager()::play);
     }
 
     public void tick() {
@@ -63,12 +62,12 @@ public class SoundScape {
         continuous.forEach(ContinuousSound::remove);
     }
 
-    public Vec3d getMeanPos() {
+    public Vec3 getMeanPos() {
         return meanPos == null ? meanPos = determineMeanPos() : meanPos;
     }
 
-    private Vec3d determineMeanPos() {
-        meanPos = Vec3d.ZERO;
+    private Vec3 determineMeanPos() {
+        meanPos = Vec3.ZERO;
         int amount = 0;
         for (BlockPos blockPos : SoundScapes.getAllLocations(group, pitchGroup)) {
             meanPos = meanPos.add(VecHelper.getCenterOf(blockPos));
@@ -76,20 +75,20 @@ public class SoundScape {
         }
         if (amount == 0)
             return meanPos;
-        return meanPos.multiply(1f / amount);
+        return meanPos.scale(1f / amount);
     }
 
     public float getVolume() {
-        Entity renderViewEntity = MinecraftClient.getInstance().getCameraEntity();
+        Entity renderViewEntity = Minecraft.getInstance().getCameraEntity();
         float distanceMultiplier = 0;
         if (renderViewEntity != null) {
-            double distanceTo = renderViewEntity.getEntityPos().distanceTo(getMeanPos());
-            distanceMultiplier = (float) MathHelper.lerp(distanceTo / SoundScapes.MAX_AMBIENT_SOURCE_DISTANCE, 2, 0);
+            double distanceTo = renderViewEntity.position().distanceTo(getMeanPos());
+            distanceMultiplier = (float) Mth.lerp(distanceTo / SoundScapes.MAX_AMBIENT_SOURCE_DISTANCE, 2, 0);
         }
         int soundCount = SoundScapes.getSoundCount(group, pitchGroup);
         float max = AllConfigs.client().ambientVolumeCap.getF();
         float argMax = (float) SoundScapes.SOUND_VOLUME_ARG_MAX;
-        return MathHelper.clamp(soundCount / (argMax * 10f), 0.025f, max) * distanceMultiplier;
+        return Mth.clamp(soundCount / (argMax * 10f), 0.025f, max) * distanceMultiplier;
     }
 
 }

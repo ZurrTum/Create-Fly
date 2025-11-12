@@ -26,20 +26,20 @@ import com.zurrtum.create.foundation.utility.BlockHelper;
 import com.zurrtum.create.infrastructure.fluids.BucketFluidInventory;
 import com.zurrtum.create.infrastructure.fluids.FluidInventory;
 import com.zurrtum.create.infrastructure.fluids.FluidStack;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.inventory.Inventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.storage.ReadView;
-import net.minecraft.storage.WriteView;
-import net.minecraft.util.ItemScatterer;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.Container;
+import net.minecraft.world.Containers;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 
 public class BasinBlockEntity extends SmartBlockEntity {
     public boolean areFluidsMoving;
@@ -113,7 +113,7 @@ public class BasinBlockEntity extends SmartBlockEntity {
     }
 
     @Override
-    protected void read(ReadView view, boolean clientPacket) {
+    protected void read(ValueInput view, boolean clientPacket) {
         super.read(view, clientPacket);
         itemCapability.read(view);
 
@@ -128,29 +128,29 @@ public class BasinBlockEntity extends SmartBlockEntity {
         if (!clientPacket)
             return;
 
-        view.getTypedListView("VisualizedItems", ItemStack.OPTIONAL_CODEC).stream()
+        view.listOrEmpty("VisualizedItems", ItemStack.OPTIONAL_CODEC).stream()
             .forEach(stack -> visualizedOutputItems.add(IntAttached.with(OUTPUT_ANIMATION_TIME, stack)));
-        view.getTypedListView("VisualizedFluids", FluidStack.OPTIONAL_CODEC).stream()
+        view.listOrEmpty("VisualizedFluids", FluidStack.OPTIONAL_CODEC).stream()
             .forEach(stack -> visualizedOutputFluids.add(IntAttached.with(OUTPUT_ANIMATION_TIME, stack)));
     }
 
     @Override
-    public void write(WriteView view, boolean clientPacket) {
+    public void write(ValueOutput view, boolean clientPacket) {
         super.write(view, clientPacket);
         itemCapability.write(view);
 
         if (preferredSpoutput != null)
-            view.put("PreferredSpoutput", Direction.CODEC, preferredSpoutput);
-        view.put("DisabledSpoutput", CreateCodecs.DIRECTION_LIST_CODEC, disabledSpoutputs);
-        view.put("Overflow", CreateCodecs.ITEM_LIST_CODEC, spoutputBuffer);
-        view.put("FluidOverflow", CreateCodecs.FLUID_LIST_CODEC, spoutputFluidBuffer);
+            view.store("PreferredSpoutput", Direction.CODEC, preferredSpoutput);
+        view.store("DisabledSpoutput", CreateCodecs.DIRECTION_LIST_CODEC, disabledSpoutputs);
+        view.store("Overflow", CreateCodecs.ITEM_LIST_CODEC, spoutputBuffer);
+        view.store("FluidOverflow", CreateCodecs.FLUID_LIST_CODEC, spoutputFluidBuffer);
 
         if (!clientPacket)
             return;
 
-        WriteView.ListAppender<ItemStack> items = view.getListAppender("VisualizedItems", ItemStack.OPTIONAL_CODEC);
+        ValueOutput.TypedOutputList<ItemStack> items = view.list("VisualizedItems", ItemStack.OPTIONAL_CODEC);
         visualizedOutputItems.stream().map(IntAttached::getValue).forEach(items::add);
-        WriteView.ListAppender<FluidStack> fluids = view.getListAppender("VisualizedFluids", FluidStack.OPTIONAL_CODEC);
+        ValueOutput.TypedOutputList<FluidStack> fluids = view.list("VisualizedFluids", FluidStack.OPTIONAL_CODEC);
         visualizedOutputFluids.stream().map(IntAttached::getValue).forEach(fluids::add);
         visualizedOutputItems.clear();
         visualizedOutputFluids.clear();
@@ -159,8 +159,8 @@ public class BasinBlockEntity extends SmartBlockEntity {
     @Override
     public void destroy() {
         super.destroy();
-        ItemScatterer.spawn(world, pos, itemCapability);
-        spoutputBuffer.forEach(is -> Block.dropStack(world, pos, is));
+        Containers.dropContents(level, worldPosition, itemCapability);
+        spoutputBuffer.forEach(is -> Block.popResource(level, worldPosition, is));
     }
 
     @Override
@@ -177,7 +177,7 @@ public class BasinBlockEntity extends SmartBlockEntity {
     public void lazyTick() {
         super.lazyTick();
 
-        if (!world.isClient()) {
+        if (!level.isClientSide()) {
             updateSpoutput();
             if (recipeBackupCheck-- > 0)
                 return;
@@ -188,7 +188,7 @@ public class BasinBlockEntity extends SmartBlockEntity {
             return;
         }
 
-        BlockEntity blockEntity = world.getBlockEntity(pos.up(2));
+        BlockEntity blockEntity = level.getBlockEntity(worldPosition.above(2));
         if (!(blockEntity instanceof MechanicalMixerBlockEntity mixer)) {
             setAreFluidsMoving(false);
             return;
@@ -202,8 +202,8 @@ public class BasinBlockEntity extends SmartBlockEntity {
     }
 
     public void onWrenched(Direction face) {
-        BlockState blockState = getCachedState();
-        Direction currentFacing = blockState.get(BasinBlock.FACING);
+        BlockState blockState = getBlockState();
+        Direction currentFacing = blockState.getValue(BasinBlock.FACING);
 
         disabledSpoutputs.remove(face);
         if (currentFacing == face) {
@@ -217,33 +217,33 @@ public class BasinBlockEntity extends SmartBlockEntity {
     }
 
     private void updateSpoutput() {
-        BlockState blockState = getCachedState();
-        Direction currentFacing = blockState.get(BasinBlock.FACING);
+        BlockState blockState = getBlockState();
+        Direction currentFacing = blockState.getValue(BasinBlock.FACING);
         Direction newFacing = Direction.DOWN;
         for (Direction test : Iterate.horizontalDirections) {
-            boolean canOutputTo = BasinBlock.canOutputTo(world, pos, test);
+            boolean canOutputTo = BasinBlock.canOutputTo(level, worldPosition, test);
             if (canOutputTo && !disabledSpoutputs.contains(test))
                 newFacing = test;
         }
 
-        if (preferredSpoutput != null && BasinBlock.canOutputTo(world, pos, preferredSpoutput) && preferredSpoutput != Direction.UP)
+        if (preferredSpoutput != null && BasinBlock.canOutputTo(level, worldPosition, preferredSpoutput) && preferredSpoutput != Direction.UP)
             newFacing = preferredSpoutput;
 
         if (newFacing == currentFacing)
             return;
 
-        world.setBlockState(pos, blockState.with(BasinBlock.FACING, newFacing));
+        level.setBlockAndUpdate(worldPosition, blockState.setValue(BasinBlock.FACING, newFacing));
 
         if (newFacing.getAxis().isVertical())
             return;
 
         for (int slot = 9; slot < 18; slot++) {
-            ItemStack stack = itemCapability.getStack(slot);
+            ItemStack stack = itemCapability.getItem(slot);
             if (stack.isEmpty())
                 continue;
             if (acceptOutputs(ImmutableList.of(stack), Collections.emptyList(), true)) {
                 acceptOutputs(ImmutableList.of(stack), Collections.emptyList(), false);
-                itemCapability.setStack(slot, ItemStack.EMPTY);
+                itemCapability.setItem(slot, ItemStack.EMPTY);
             }
         }
 
@@ -268,14 +268,14 @@ public class BasinBlockEntity extends SmartBlockEntity {
         cachedHeatLevel = null;
 
         super.tick();
-        if (world.isClient()) {
-            AllClientHandle.INSTANCE.createBasinFluidParticles(world, this);
+        if (level.isClientSide()) {
+            AllClientHandle.INSTANCE.createBasinFluidParticles(level, this);
             tickVisualizedOutputs();
             ingredientRotationSpeed.tickChaser();
             ingredientRotation.setValue(ingredientRotation.getValue() + ingredientRotationSpeed.getValue());
         }
 
-        if ((!spoutputBuffer.isEmpty() || !spoutputFluidBuffer.isEmpty()) && !world.isClient())
+        if ((!spoutputBuffer.isEmpty() || !spoutputFluidBuffer.isEmpty()) && !level.isClientSide())
             tryClearingSpoutputOverflow();
         if (!contentsChanged)
             return;
@@ -284,10 +284,10 @@ public class BasinBlockEntity extends SmartBlockEntity {
         getOperator().ifPresent(be -> be.basinChecker.scheduleUpdate());
 
         for (Direction offset : Iterate.horizontalDirections) {
-            BlockPos toUpdate = pos.up().offset(offset);
-            BlockState stateToUpdate = world.getBlockState(toUpdate);
-            if (stateToUpdate.getBlock() instanceof BasinBlock && stateToUpdate.get(BasinBlock.FACING) == offset.getOpposite()) {
-                BlockEntity be = world.getBlockEntity(toUpdate);
+            BlockPos toUpdate = worldPosition.above().relative(offset);
+            BlockState stateToUpdate = level.getBlockState(toUpdate);
+            if (stateToUpdate.getBlock() instanceof BasinBlock && stateToUpdate.getValue(BasinBlock.FACING) == offset.getOpposite()) {
+                BlockEntity be = level.getBlockEntity(toUpdate);
                 if (be instanceof BasinBlockEntity)
                     ((BasinBlockEntity) be).contentsChanged = true;
             }
@@ -295,29 +295,29 @@ public class BasinBlockEntity extends SmartBlockEntity {
     }
 
     private void tryClearingSpoutputOverflow() {
-        BlockState blockState = getCachedState();
+        BlockState blockState = getBlockState();
         if (!(blockState.getBlock() instanceof BasinBlock))
             return;
-        Direction direction = blockState.get(BasinBlock.FACING);
-        BlockEntity be = world.getBlockEntity(pos.down().offset(direction));
+        Direction direction = blockState.getValue(BasinBlock.FACING);
+        BlockEntity be = level.getBlockEntity(worldPosition.below().relative(direction));
 
         ServerFilteringBehaviour filter = null;
         InvManipulationBehaviour inserter = null;
         if (be != null) {
-            filter = BlockEntityBehaviour.get(world, be.getPos(), ServerFilteringBehaviour.TYPE);
-            inserter = BlockEntityBehaviour.get(world, be.getPos(), InvManipulationBehaviour.TYPE);
+            filter = BlockEntityBehaviour.get(level, be.getBlockPos(), ServerFilteringBehaviour.TYPE);
+            inserter = BlockEntityBehaviour.get(level, be.getBlockPos(), InvManipulationBehaviour.TYPE);
         }
 
         if (filter != null && filter.isRecipeFilter())
             filter = null; // Do not test spout outputs against the recipe filter
 
         Direction opposite = direction.getOpposite();
-        Inventory targetInv = be == null ? null : ItemHelper.getInventory(world, be.getPos(), null, be, opposite);
+        Container targetInv = be == null ? null : ItemHelper.getInventory(level, be.getBlockPos(), null, be, opposite);
         if (targetInv == null && inserter != null) {
             targetInv = inserter.getInventory();
         }
 
-        FluidInventory targetTank = be == null ? null : FluidHelper.getFluidInventory(world, be.getPos(), null, be, opposite);
+        FluidInventory targetTank = be == null ? null : FluidHelper.getFluidInventory(level, be.getBlockPos(), null, be, opposite);
 
         boolean update = false;
 
@@ -325,7 +325,7 @@ public class BasinBlockEntity extends SmartBlockEntity {
             ItemStack itemStack = iterator.next();
 
             if (direction == Direction.DOWN) {
-                Block.dropStack(world, pos, itemStack);
+                Block.popResource(level, worldPosition, itemStack);
                 iterator.remove();
                 update = true;
                 continue;
@@ -348,7 +348,7 @@ public class BasinBlockEntity extends SmartBlockEntity {
             if (insert == count)
                 iterator.remove();
             else
-                itemStack.decrement(insert);
+                itemStack.shrink(insert);
         }
 
         for (Iterator<FluidStack> iterator = spoutputFluidBuffer.iterator(); iterator.hasNext(); ) {
@@ -408,9 +408,9 @@ public class BasinBlockEntity extends SmartBlockEntity {
     }
 
     private Optional<BasinOperatingBlockEntity> getOperator() {
-        if (world == null)
+        if (level == null)
             return Optional.empty();
-        BlockEntity be = world.getBlockEntity(pos.up(2));
+        BlockEntity be = level.getBlockEntity(worldPosition.above(2));
         if (be instanceof BasinOperatingBlockEntity)
             return Optional.of((BasinOperatingBlockEntity) be);
         return Optional.empty();
@@ -438,22 +438,22 @@ public class BasinBlockEntity extends SmartBlockEntity {
     }
 
     private boolean acceptOutputsInner(List<ItemStack> outputItems, List<FluidStack> outputFluids, boolean simulate) {
-        BlockState blockState = getCachedState();
+        BlockState blockState = getBlockState();
         if (!(blockState.getBlock() instanceof BasinBlock))
             return false;
 
-        Direction direction = blockState.get(BasinBlock.FACING);
+        Direction direction = blockState.getValue(BasinBlock.FACING);
         if (direction != Direction.DOWN) {
 
-            BlockEntity be = world.getBlockEntity(pos.down().offset(direction));
+            BlockEntity be = level.getBlockEntity(worldPosition.below().relative(direction));
 
-            InvManipulationBehaviour inserter = be == null ? null : BlockEntityBehaviour.get(world, be.getPos(), InvManipulationBehaviour.TYPE);
+            InvManipulationBehaviour inserter = be == null ? null : BlockEntityBehaviour.get(level, be.getBlockPos(), InvManipulationBehaviour.TYPE);
             Direction opposite = direction.getOpposite();
-            Inventory targetInv = be == null ? null : ItemHelper.getInventory(world, be.getPos(), null, be, opposite);
+            Container targetInv = be == null ? null : ItemHelper.getInventory(level, be.getBlockPos(), null, be, opposite);
             if (targetInv == null && inserter != null) {
                 targetInv = inserter.getInventory();
             }
-            FluidInventory targetTank = be == null ? null : FluidHelper.getFluidInventory(world, be.getPos(), null, be, opposite);
+            FluidInventory targetTank = be == null ? null : FluidHelper.getFluidInventory(level, be.getBlockPos(), null, be, opposite);
             boolean externalTankNotPresent = targetTank == null;
 
             if (!outputItems.isEmpty() && targetInv == null)
@@ -494,7 +494,7 @@ public class BasinBlockEntity extends SmartBlockEntity {
         }
     }
 
-    private boolean acceptItemOutputsIntoBasin(List<ItemStack> outputItems, boolean simulate, Inventory targetInv) {
+    private boolean acceptItemOutputsIntoBasin(List<ItemStack> outputItems, boolean simulate, Container targetInv) {
         if (simulate) {
             return targetInv.countSpace(outputItems, 9, 17);
         } else {
@@ -503,14 +503,14 @@ public class BasinBlockEntity extends SmartBlockEntity {
         }
     }
 
-    public void readOnlyItems(ReadView view) {
+    public void readOnlyItems(ValueInput view) {
         itemCapability.read(view);
     }
 
     public static HeatLevel getHeatLevelOf(BlockState state) {
-        if (state.contains(BlazeBurnerBlock.HEAT_LEVEL))
-            return state.get(BlazeBurnerBlock.HEAT_LEVEL);
-        return state.isIn(AllBlockTags.PASSIVE_BOILER_HEATERS) && BlockHelper.isNotUnheated(state) ? HeatLevel.SMOULDERING : HeatLevel.NONE;
+        if (state.hasProperty(BlazeBurnerBlock.HEAT_LEVEL))
+            return state.getValue(BlazeBurnerBlock.HEAT_LEVEL);
+        return state.is(AllBlockTags.PASSIVE_BOILER_HEATERS) && BlockHelper.isNotUnheated(state) ? HeatLevel.SMOULDERING : HeatLevel.NONE;
     }
 
     public Couple<SmartFluidTankBehaviour> getTanks() {
@@ -610,10 +610,10 @@ public class BasinBlockEntity extends SmartBlockEntity {
 
     @NotNull HeatLevel getHeatLevel() {
         if (cachedHeatLevel == null) {
-            if (world == null)
+            if (level == null)
                 return HeatLevel.NONE;
 
-            cachedHeatLevel = getHeatLevelOf(world.getBlockState(getPos().down(1)));
+            cachedHeatLevel = getHeatLevelOf(level.getBlockState(getBlockPos().below(1)));
         }
         return cachedHeatLevel;
     }

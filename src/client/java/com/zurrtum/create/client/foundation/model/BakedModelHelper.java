@@ -2,35 +2,34 @@ package com.zurrtum.create.client.foundation.model;
 
 import com.zurrtum.create.catnip.data.Iterate;
 import com.zurrtum.create.catnip.math.VecHelper;
-import net.minecraft.client.render.model.BakedGeometry;
-import net.minecraft.client.render.model.BakedQuad;
-import net.minecraft.client.render.model.GeometryBakedModel;
-import net.minecraft.client.texture.Sprite;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Vec3d;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.UnaryOperator;
+import net.minecraft.client.renderer.block.model.BakedQuad;
+import net.minecraft.client.renderer.block.model.SimpleModelWrapper;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.client.resources.model.QuadCollection;
+import net.minecraft.core.Direction;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
 
 import static com.zurrtum.create.client.catnip.render.SpriteShiftEntry.getUnInterpolatedU;
 import static com.zurrtum.create.client.catnip.render.SpriteShiftEntry.getUnInterpolatedV;
 
 public class BakedModelHelper {
 
-    public static int[] cropAndMove(int[] vertexData, Sprite sprite, Box crop, Vec3d move) {
+    public static int[] cropAndMove(int[] vertexData, TextureAtlasSprite sprite, AABB crop, Vec3 move) {
         vertexData = Arrays.copyOf(vertexData, vertexData.length);
 
-        Vec3d xyz0 = BakedQuadHelper.getXYZ(vertexData, 0);
-        Vec3d xyz1 = BakedQuadHelper.getXYZ(vertexData, 1);
-        Vec3d xyz2 = BakedQuadHelper.getXYZ(vertexData, 2);
-        Vec3d xyz3 = BakedQuadHelper.getXYZ(vertexData, 3);
+        Vec3 xyz0 = BakedQuadHelper.getXYZ(vertexData, 0);
+        Vec3 xyz1 = BakedQuadHelper.getXYZ(vertexData, 1);
+        Vec3 xyz2 = BakedQuadHelper.getXYZ(vertexData, 2);
+        Vec3 xyz3 = BakedQuadHelper.getXYZ(vertexData, 3);
 
-        Vec3d uAxis = xyz3.add(xyz2).multiply(.5);
-        Vec3d vAxis = xyz1.add(xyz2).multiply(.5);
-        Vec3d center = xyz3.add(xyz2).add(xyz0).add(xyz1).multiply(.25);
+        Vec3 uAxis = xyz3.add(xyz2).scale(.5);
+        Vec3 vAxis = xyz1.add(xyz2).scale(.5);
+        Vec3 center = xyz3.add(xyz2).add(xyz0).add(xyz1).scale(.25);
 
         float u0 = BakedQuadHelper.getU(vertexData, 0);
         float u3 = BakedQuadHelper.getU(vertexData, 3);
@@ -43,8 +42,8 @@ public class BakedModelHelper {
         if (uScale == 0) {
             float v3 = BakedQuadHelper.getV(vertexData, 3);
             float u1 = BakedQuadHelper.getU(vertexData, 1);
-            uAxis = xyz1.add(xyz2).multiply(.5);
-            vAxis = xyz3.add(xyz2).multiply(.5);
+            uAxis = xyz1.add(xyz2).scale(.5);
+            vAxis = xyz3.add(xyz2).scale(.5);
             uScale = (float) Math.round((getUnInterpolatedU(sprite, u1) - getUnInterpolatedU(sprite, u0)) / xyz1.distanceTo(xyz0));
             vScale = (float) Math.round((getUnInterpolatedV(sprite, v3) - getUnInterpolatedV(sprite, v0)) / xyz3.distanceTo(xyz0));
 
@@ -53,21 +52,21 @@ public class BakedModelHelper {
         uAxis = uAxis.subtract(center).normalize();
         vAxis = vAxis.subtract(center).normalize();
 
-        Vec3d min = new Vec3d(crop.minX, crop.minY, crop.minZ);
-        Vec3d max = new Vec3d(crop.maxX, crop.maxY, crop.maxZ);
+        Vec3 min = new Vec3(crop.minX, crop.minY, crop.minZ);
+        Vec3 max = new Vec3(crop.maxX, crop.maxY, crop.maxZ);
 
         for (int vertex = 0; vertex < 4; vertex++) {
-            Vec3d xyz = BakedQuadHelper.getXYZ(vertexData, vertex);
-            Vec3d newXyz = VecHelper.componentMin(max, VecHelper.componentMax(xyz, min));
-            Vec3d diff = newXyz.subtract(xyz);
+            Vec3 xyz = BakedQuadHelper.getXYZ(vertexData, vertex);
+            Vec3 newXyz = VecHelper.componentMin(max, VecHelper.componentMax(xyz, min));
+            Vec3 diff = newXyz.subtract(xyz);
 
-            if (diff.lengthSquared() > 0) {
+            if (diff.lengthSqr() > 0) {
                 float u = BakedQuadHelper.getU(vertexData, vertex);
                 float v = BakedQuadHelper.getV(vertexData, vertex);
-                float uDiff = (float) uAxis.dotProduct(diff) * uScale;
-                float vDiff = (float) vAxis.dotProduct(diff) * vScale;
-                BakedQuadHelper.setU(vertexData, vertex, sprite.getFrameU(getUnInterpolatedU(sprite, u) + uDiff));
-                BakedQuadHelper.setV(vertexData, vertex, sprite.getFrameV(getUnInterpolatedV(sprite, v) + vDiff));
+                float uDiff = (float) uAxis.dot(diff) * uScale;
+                float vDiff = (float) vAxis.dot(diff) * vScale;
+                BakedQuadHelper.setU(vertexData, vertex, sprite.getU(getUnInterpolatedU(sprite, u) + uDiff));
+                BakedQuadHelper.setV(vertexData, vertex, sprite.getV(getUnInterpolatedV(sprite, v) + vDiff));
             }
 
             BakedQuadHelper.setXYZ(vertexData, vertex, newXyz.add(move));
@@ -76,42 +75,42 @@ public class BakedModelHelper {
         return vertexData;
     }
 
-    public static GeometryBakedModel generateModel(GeometryBakedModel template, UnaryOperator<Sprite> spriteSwapper) {
-        BakedGeometry.Builder builder = new BakedGeometry.Builder();
+    public static SimpleModelWrapper generateModel(SimpleModelWrapper template, UnaryOperator<TextureAtlasSprite> spriteSwapper) {
+        QuadCollection.Builder builder = new QuadCollection.Builder();
         for (Direction cullFace : Iterate.directions) {
             List<BakedQuad> quads = template.getQuads(cullFace);
-            swapSprites(quads, spriteSwapper).forEach(quad -> builder.add(cullFace, quad));
+            swapSprites(quads, spriteSwapper).forEach(quad -> builder.addCulledFace(cullFace, quad));
         }
 
         List<BakedQuad> quads = template.getQuads(null);
-        swapSprites(quads, spriteSwapper).forEach(builder::add);
+        swapSprites(quads, spriteSwapper).forEach(builder::addUnculledFace);
 
-        Sprite particleSprite = template.particleSprite();
-        Sprite swappedParticleSprite = spriteSwapper.apply(particleSprite);
+        TextureAtlasSprite particleSprite = template.particleIcon();
+        TextureAtlasSprite swappedParticleSprite = spriteSwapper.apply(particleSprite);
         if (swappedParticleSprite != null) {
             particleSprite = swappedParticleSprite;
         }
-        return new GeometryBakedModel(builder.build(), template.useAmbientOcclusion(), particleSprite);
+        return new SimpleModelWrapper(builder.build(), template.useAmbientOcclusion(), particleSprite);
     }
 
-    public static List<BakedQuad> swapSprites(List<BakedQuad> quads, UnaryOperator<Sprite> spriteSwapper) {
+    public static List<BakedQuad> swapSprites(List<BakedQuad> quads, UnaryOperator<TextureAtlasSprite> spriteSwapper) {
         List<BakedQuad> newQuads = new ArrayList<>(quads);
         int size = quads.size();
         for (int i = 0; i < size; i++) {
             BakedQuad quad = quads.get(i);
-            Sprite sprite = quad.sprite();
-            Sprite newSprite = spriteSwapper.apply(sprite);
+            TextureAtlasSprite sprite = quad.sprite();
+            TextureAtlasSprite newSprite = spriteSwapper.apply(sprite);
             if (newSprite == null || sprite == newSprite)
                 continue;
 
             BakedQuad newQuad = BakedQuadHelper.clone(quad);
-            int[] vertexData = newQuad.vertexData();
+            int[] vertexData = newQuad.vertices();
 
             for (int vertex = 0; vertex < 4; vertex++) {
                 float u = BakedQuadHelper.getU(vertexData, vertex);
                 float v = BakedQuadHelper.getV(vertexData, vertex);
-                BakedQuadHelper.setU(vertexData, vertex, newSprite.getFrameU(getUnInterpolatedU(sprite, u)));
-                BakedQuadHelper.setV(vertexData, vertex, newSprite.getFrameV(getUnInterpolatedV(sprite, v)));
+                BakedQuadHelper.setU(vertexData, vertex, newSprite.getU(getUnInterpolatedU(sprite, u)));
+                BakedQuadHelper.setV(vertexData, vertex, newSprite.getV(getUnInterpolatedV(sprite, v)));
             }
 
             newQuads.set(i, newQuad);

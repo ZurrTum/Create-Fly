@@ -5,16 +5,15 @@ import com.zurrtum.create.catnip.animation.LerpedFloat;
 import com.zurrtum.create.catnip.animation.LerpedFloat.Chaser;
 import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
 import com.zurrtum.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.DoorBlock;
-import net.minecraft.sound.SoundCategory;
-import net.minecraft.sound.SoundEvents;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
-
 import java.util.List;
+import net.minecraft.core.BlockPos;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.DoorBlock;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.AABB;
 
 public class SlidingDoorBlockEntity extends SmartBlockEntity {
 
@@ -29,37 +28,37 @@ public class SlidingDoorBlockEntity extends SmartBlockEntity {
 
     @Override
     public void tick() {
-        if (deferUpdate && !world.isClient()) {
+        if (deferUpdate && !level.isClientSide()) {
             deferUpdate = false;
-            BlockState blockState = getCachedState();
-            blockState.neighborUpdate(world, pos, Blocks.AIR, null, false);
+            BlockState blockState = getBlockState();
+            blockState.handleNeighborChanged(level, worldPosition, Blocks.AIR, null, false);
         }
 
         super.tick();
-        boolean open = isOpen(getCachedState());
+        boolean open = isOpen(getBlockState());
         boolean wasSettled = animation.settled();
         animation.chase(open ? 1 : 0, .15f, Chaser.LINEAR);
         animation.tickChaser();
 
-        if (world.isClient()) {
+        if (level.isClientSide()) {
             if (bridgeTicks < 2 && open)
                 bridgeTicks++;
-            else if (bridgeTicks > 0 && !open && isVisible(getCachedState()))
+            else if (bridgeTicks > 0 && !open && isVisible(getBlockState()))
                 bridgeTicks--;
             return;
         }
 
-        if (!open && !wasSettled && animation.settled() && !isVisible(getCachedState()))
+        if (!open && !wasSettled && animation.settled() && !isVisible(getBlockState()))
             showBlockModel();
     }
 
     @Override
-    protected Box createRenderBoundingBox() {
-        return super.createRenderBoundingBox().expand(1);
+    protected AABB createRenderBoundingBox() {
+        return super.createRenderBoundingBox().inflate(1);
     }
 
     protected boolean isVisible(BlockState state) {
-        return state.get(SlidingDoorBlock.VISIBLE, true);
+        return state.getValueOrElse(SlidingDoorBlock.VISIBLE, true);
     }
 
     public boolean shouldRenderSpecial(BlockState state) {
@@ -67,8 +66,8 @@ public class SlidingDoorBlockEntity extends SmartBlockEntity {
     }
 
     protected void showBlockModel() {
-        world.setBlockState(pos, getCachedState().with(SlidingDoorBlock.VISIBLE, true), Block.NOTIFY_ALL);
-        world.playSound(null, pos, SoundEvents.BLOCK_IRON_DOOR_CLOSE, SoundCategory.BLOCKS, .5f, 1);
+        level.setBlock(worldPosition, getBlockState().setValue(SlidingDoorBlock.VISIBLE, true), Block.UPDATE_ALL);
+        level.playSound(null, worldPosition, SoundEvents.IRON_DOOR_CLOSE, SoundSource.BLOCKS, .5f, 1);
     }
 
     @Override
@@ -76,7 +75,7 @@ public class SlidingDoorBlockEntity extends SmartBlockEntity {
     }
 
     public static boolean isOpen(BlockState state) {
-        return state.get(DoorBlock.OPEN, false);
+        return state.getValueOrElse(DoorBlock.OPEN, false);
     }
 
 }

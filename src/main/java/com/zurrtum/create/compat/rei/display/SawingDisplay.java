@@ -8,36 +8,35 @@ import me.shedaniel.rei.api.common.display.Display;
 import me.shedaniel.rei.api.common.display.DisplaySerializer;
 import me.shedaniel.rei.api.common.entry.EntryIngredient;
 import me.shedaniel.rei.api.common.util.EntryIngredients;
-import net.minecraft.network.codec.PacketCodec;
-import net.minecraft.network.codec.PacketCodecs;
-import net.minecraft.recipe.RecipeEntry;
-import net.minecraft.util.Identifier;
-
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.crafting.RecipeHolder;
 import java.util.List;
 import java.util.Optional;
 
-public record SawingDisplay(EntryIngredient input, EntryIngredient output, Optional<Identifier> location) implements Display {
+public record SawingDisplay(EntryIngredient input, EntryIngredient output, Optional<ResourceLocation> location) implements Display {
     public static final DisplaySerializer<SawingDisplay> SERIALIZER = DisplaySerializer.of(
         RecordCodecBuilder.mapCodec(instance -> instance.group(
             EntryIngredient.codec().fieldOf("input").forGetter(SawingDisplay::input),
             EntryIngredient.codec().fieldOf("output").forGetter(SawingDisplay::output),
-            Identifier.CODEC.optionalFieldOf("location").forGetter(SawingDisplay::location)
-        ).apply(instance, SawingDisplay::new)), PacketCodec.tuple(
+            ResourceLocation.CODEC.optionalFieldOf("location").forGetter(SawingDisplay::location)
+        ).apply(instance, SawingDisplay::new)), StreamCodec.composite(
             EntryIngredient.streamCodec(),
             SawingDisplay::input,
             EntryIngredient.streamCodec(),
             SawingDisplay::output,
-            PacketCodecs.optional(Identifier.PACKET_CODEC),
+            ByteBufCodecs.optional(ResourceLocation.STREAM_CODEC),
             SawingDisplay::location,
             SawingDisplay::new
         )
     );
 
-    public SawingDisplay(RecipeEntry<CuttingRecipe> entry) {
-        this(entry.id().getValue(), entry.value());
+    public SawingDisplay(RecipeHolder<CuttingRecipe> entry) {
+        this(entry.id().location(), entry.value());
     }
 
-    public SawingDisplay(Identifier id, CuttingRecipe recipe) {
+    public SawingDisplay(ResourceLocation id, CuttingRecipe recipe) {
         this(EntryIngredients.ofIngredient(recipe.ingredient()), EntryIngredients.of(recipe.result()), Optional.of(id));
     }
 
@@ -57,7 +56,7 @@ public record SawingDisplay(EntryIngredient input, EntryIngredient output, Optio
     }
 
     @Override
-    public Optional<Identifier> getDisplayLocation() {
+    public Optional<ResourceLocation> getDisplayLocation() {
         return location;
     }
 

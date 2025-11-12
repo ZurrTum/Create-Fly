@@ -4,24 +4,24 @@ import com.google.common.collect.ImmutableList;
 import com.zurrtum.create.client.AllKeys;
 import com.zurrtum.create.client.catnip.lang.FontHelper.Palette;
 import com.zurrtum.create.client.foundation.utility.CreateLang;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.resource.language.I18n;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemConvertible;
-import net.minecraft.screen.ScreenTexts;
-import net.minecraft.text.MutableText;
-import net.minecraft.text.Text;
 import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 import java.util.function.Supplier;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.resources.language.I18n;
+import net.minecraft.network.chat.CommonComponents;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.level.ItemLike;
 
-import static net.minecraft.util.Formatting.*;
+import static net.minecraft.ChatFormatting.*;
 
 public record ItemDescription(
-    ImmutableList<Text> lines, ImmutableList<Text> linesOnShift, ImmutableList<Text> linesOnCtrl
+    ImmutableList<Component> lines, ImmutableList<Component> linesOnShift, ImmutableList<Component> linesOnCtrl
 ) {
     private static final Map<Item, Supplier<String>> CUSTOM_TOOLTIP_KEYS = new IdentityHashMap<>();
 
@@ -42,32 +42,32 @@ public record ItemDescription(
     }
 
     public static boolean canFillBuilder(String translationKey) {
-        return I18n.hasTranslation(translationKey);
+        return I18n.exists(translationKey);
     }
 
     public static void fillBuilder(Builder builder, String translationKey) {
         // Summary
         String summaryKey = translationKey + ".summary";
-        if (I18n.hasTranslation(summaryKey)) {
-            builder.addSummary(I18n.translate(summaryKey));
+        if (I18n.exists(summaryKey)) {
+            builder.addSummary(I18n.get(summaryKey));
         }
 
         // Behaviours
         for (int i = 1; i < 100; i++) {
             String conditionKey = translationKey + ".condition" + i;
             String behaviourKey = translationKey + ".behaviour" + i;
-            if (!I18n.hasTranslation(conditionKey))
+            if (!I18n.exists(conditionKey))
                 break;
-            builder.addBehaviour(I18n.translate(conditionKey), I18n.translate(behaviourKey));
+            builder.addBehaviour(I18n.get(conditionKey), I18n.get(behaviourKey));
         }
 
         // Actions
         for (int i = 1; i < 100; i++) {
             String controlKey = translationKey + ".control" + i;
             String actionKey = translationKey + ".action" + i;
-            if (!I18n.hasTranslation(controlKey))
+            if (!I18n.exists(controlKey))
                 break;
-            builder.addAction(I18n.translate(controlKey), I18n.translate(actionKey));
+            builder.addAction(I18n.get(controlKey), I18n.get(actionKey));
         }
     }
 
@@ -75,22 +75,22 @@ public record ItemDescription(
         CUSTOM_TOOLTIP_KEYS.put(item, supplier);
     }
 
-    public static void useKey(ItemConvertible item, String string) {
+    public static void useKey(ItemLike item, String string) {
         useKey(item.asItem(), () -> string);
     }
 
-    public static void referKey(ItemConvertible item, Supplier<? extends ItemConvertible> otherItem) {
-        useKey(item.asItem(), () -> otherItem.get().asItem().getTranslationKey());
+    public static void referKey(ItemLike item, Supplier<? extends ItemLike> otherItem) {
+        useKey(item.asItem(), () -> otherItem.get().asItem().getDescriptionId());
     }
 
     public static String getTooltipTranslationKey(Item item) {
         if (CUSTOM_TOOLTIP_KEYS.containsKey(item)) {
             return CUSTOM_TOOLTIP_KEYS.get(item).get() + ".tooltip";
         }
-        return item.getTranslationKey() + ".tooltip";
+        return item.getDescriptionId() + ".tooltip";
     }
 
-    public ImmutableList<Text> getCurrentLines() {
+    public ImmutableList<Component> getCurrentLines() {
         if (AllKeys.hasShiftDown()) {
             return linesOnShift;
         } else if (AllKeys.hasControlDown()) {
@@ -126,29 +126,29 @@ public record ItemDescription(
         }
 
         public ItemDescription build() {
-            List<Text> lines = new ArrayList<>();
-            List<Text> linesOnShift = new ArrayList<>();
-            List<Text> linesOnCtrl = new ArrayList<>();
+            List<Component> lines = new ArrayList<>();
+            List<Component> linesOnShift = new ArrayList<>();
+            List<Component> linesOnCtrl = new ArrayList<>();
 
             for (String summaryLine : summary) {
                 linesOnShift.addAll(TooltipHelper.cutStringTextComponent(summaryLine, palette));
             }
 
             if (!behaviours.isEmpty()) {
-                linesOnShift.add(ScreenTexts.EMPTY);
+                linesOnShift.add(CommonComponents.EMPTY);
             }
 
             for (Pair<String, String> behaviourPair : behaviours) {
                 String condition = behaviourPair.getLeft();
                 String behaviour = behaviourPair.getRight();
-                linesOnShift.add(Text.literal(condition).formatted(GRAY));
+                linesOnShift.add(Component.literal(condition).withStyle(GRAY));
                 linesOnShift.addAll(TooltipHelper.cutStringTextComponent(behaviour, palette.primary(), palette.highlight(), 1));
             }
 
             for (Pair<String, String> actionPair : actions) {
                 String condition = actionPair.getLeft();
                 String action = actionPair.getRight();
-                linesOnCtrl.add(Text.literal(condition).formatted(GRAY));
+                linesOnCtrl.add(Component.literal(condition).withStyle(GRAY));
                 linesOnCtrl.addAll(TooltipHelper.cutStringTextComponent(action, palette.primary(), palette.highlight(), 1));
             }
 
@@ -158,35 +158,35 @@ public record ItemDescription(
             if (hasDescription || hasControls) {
                 String[] holdDesc = CreateLang.translateDirect("tooltip.holdForDescription", "$").getString().split("\\$");
                 String[] holdCtrl = CreateLang.translateDirect("tooltip.holdForControls", "$").getString().split("\\$");
-                MutableText keyShift = CreateLang.translateDirect("tooltip.keyShift");
-                MutableText keyCtrl = CreateLang.translateDirect("tooltip.keyCtrl");
-                for (List<Text> list : Arrays.asList(lines, linesOnShift, linesOnCtrl)) {
+                MutableComponent keyShift = CreateLang.translateDirect("tooltip.keyShift");
+                MutableComponent keyCtrl = CreateLang.translateDirect("tooltip.keyCtrl");
+                for (List<Component> list : Arrays.asList(lines, linesOnShift, linesOnCtrl)) {
                     boolean shift = list == linesOnShift;
                     boolean ctrl = list == linesOnCtrl;
 
                     if (holdDesc.length != 2 || holdCtrl.length != 2) {
-                        list.add(0, Text.literal("Invalid lang formatting!"));
+                        list.add(0, Component.literal("Invalid lang formatting!"));
                         continue;
                     }
 
                     if (hasControls) {
-                        MutableText tabBuilder = Text.empty();
-                        tabBuilder.append(Text.literal(holdCtrl[0]).formatted(DARK_GRAY));
-                        tabBuilder.append(keyCtrl.copyContentOnly().formatted(ctrl ? WHITE : GRAY));
-                        tabBuilder.append(Text.literal(holdCtrl[1]).formatted(DARK_GRAY));
+                        MutableComponent tabBuilder = Component.empty();
+                        tabBuilder.append(Component.literal(holdCtrl[0]).withStyle(DARK_GRAY));
+                        tabBuilder.append(keyCtrl.plainCopy().withStyle(ctrl ? WHITE : GRAY));
+                        tabBuilder.append(Component.literal(holdCtrl[1]).withStyle(DARK_GRAY));
                         list.add(0, tabBuilder);
                     }
 
                     if (hasDescription) {
-                        MutableText tabBuilder = Text.empty();
-                        tabBuilder.append(Text.literal(holdDesc[0]).formatted(DARK_GRAY));
-                        tabBuilder.append(keyShift.copyContentOnly().formatted(shift ? WHITE : GRAY));
-                        tabBuilder.append(Text.literal(holdDesc[1]).formatted(DARK_GRAY));
+                        MutableComponent tabBuilder = Component.empty();
+                        tabBuilder.append(Component.literal(holdDesc[0]).withStyle(DARK_GRAY));
+                        tabBuilder.append(keyShift.plainCopy().withStyle(shift ? WHITE : GRAY));
+                        tabBuilder.append(Component.literal(holdDesc[1]).withStyle(DARK_GRAY));
                         list.add(0, tabBuilder);
                     }
 
                     if (shift || ctrl)
-                        list.add(hasDescription && hasControls ? 2 : 1, ScreenTexts.EMPTY);
+                        list.add(hasDescription && hasControls ? 2 : 1, CommonComponents.EMPTY);
                 }
             }
 
@@ -215,7 +215,7 @@ public record ItemDescription(
         }
 
         @Override
-        public void modify(List<Text> tooltip, PlayerEntity player) {
+        public void modify(List<Component> tooltip, Player player) {
             if (checkLocale()) {
                 description = create(item, palette);
             }
@@ -226,7 +226,7 @@ public record ItemDescription(
         }
 
         protected boolean checkLocale() {
-            String currentLanguage = MinecraftClient.getInstance().getLanguageManager().getLanguage();
+            String currentLanguage = Minecraft.getInstance().getLanguageManager().getSelected();
             if (!currentLanguage.equals(cachedLanguage)) {
                 cachedLanguage = currentLanguage;
                 return true;

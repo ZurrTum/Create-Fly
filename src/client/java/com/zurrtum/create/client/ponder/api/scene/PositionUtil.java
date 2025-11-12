@@ -1,6 +1,6 @@
 package com.zurrtum.create.client.ponder.api.scene;
 
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.core.BlockPos;
 
 public interface PositionUtil {
     BlockPos at(int x, int y, int z);

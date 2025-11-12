@@ -6,11 +6,11 @@ import com.zurrtum.create.catnip.theme.Color;
 import com.zurrtum.create.client.catnip.gui.UIRenderHelper;
 import com.zurrtum.create.client.catnip.gui.element.BoxElement;
 import com.zurrtum.create.client.catnip.gui.element.FadableScreenElement;
-import net.minecraft.client.gui.Click;
-import net.minecraft.client.gui.DrawContext;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Function;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.input.MouseButtonEvent;
 
 public class BoxWidget extends ElementWidget {
 
@@ -115,7 +115,7 @@ public class BoxWidget extends ElementWidget {
     }
 
     @Override
-    public void onClick(Click click, boolean doubled) {
+    public void onClick(MouseButtonEvent click, boolean doubled) {
         super.onClick(click, doubled);
 
         gradientColor = getColorClick();
@@ -123,10 +123,10 @@ public class BoxWidget extends ElementWidget {
     }
 
     @Override
-    protected void beforeRender(DrawContext graphics, int mouseX, int mouseY, float partialTicks) {
+    protected void beforeRender(GuiGraphics graphics, int mouseX, int mouseY, float partialTicks) {
         super.beforeRender(graphics, mouseX, mouseY, partialTicks);
 
-        if (hovered != wasHovered) {
+        if (isHovered != wasHovered) {
             animateGradientFromState();
         }
 
@@ -140,7 +140,7 @@ public class BoxWidget extends ElementWidget {
     }
 
     @Override
-    public void doRender(DrawContext graphics, int mouseX, int mouseY, float partialTicks) {
+    public void doRender(GuiGraphics graphics, int mouseX, int mouseY, float partialTicks) {
         float fadeValue = fade.getValue(partialTicks);
         if (fadeValue < .1f)
             return;
@@ -151,7 +151,7 @@ public class BoxWidget extends ElementWidget {
 
         super.doRender(graphics, mouseX, mouseY, partialTicks);
 
-        wasHovered = hovered;
+        wasHovered = isHovered;
     }
 
     @Override
@@ -198,9 +198,9 @@ public class BoxWidget extends ElementWidget {
             return getColorDisabled();
 
         if (customBorder != null)
-            return hovered ? customBorder.map(Color::darker) : customBorder;
+            return isHovered ? customBorder.map(Color::darker) : customBorder;
 
-        return hovered ? getColorHover() : getColorIdle();
+        return isHovered ? getColorHover() : getColorIdle();
     }
 
     public Couple<Color> getColorIdle() {

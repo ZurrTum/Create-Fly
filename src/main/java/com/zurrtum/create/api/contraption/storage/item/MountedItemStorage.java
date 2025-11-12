@@ -4,26 +4,26 @@ import com.mojang.serialization.Codec;
 import com.zurrtum.create.api.contraption.storage.item.menu.MountedStorageMenus;
 import com.zurrtum.create.content.contraptions.Contraption;
 import com.zurrtum.create.infrastructure.items.ItemInventory;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.entity.ContainerUser;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.inventory.Inventory;
+import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.NbtOps;
-import net.minecraft.network.RegistryByteBuf;
-import net.minecraft.network.codec.PacketCodec;
-import net.minecraft.registry.RegistryOps;
-import net.minecraft.screen.NamedScreenHandlerFactory;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.sound.SoundCategory;
-import net.minecraft.sound.SoundEvents;
-import net.minecraft.structure.StructureTemplate.StructureBlockInfo;
-import net.minecraft.text.MutableText;
-import net.minecraft.text.Text;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.World;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.resources.RegistryOps;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.Container;
+import net.minecraft.world.MenuProvider;
+import net.minecraft.world.entity.ContainerUser;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate.StructureBlockInfo;
+import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Objects;
@@ -35,14 +35,14 @@ public abstract class MountedItemStorage implements ItemInventory {
     public static final Codec<MountedItemStorage> CODEC = MountedItemStorageType.CODEC.dispatch(storage -> storage.type, type -> type.codec);
 
     @SuppressWarnings("deprecation")
-    public static final PacketCodec<RegistryByteBuf, MountedItemStorage> STREAM_CODEC = PacketCodec.of(
-        (b, t) -> t.encode(
-            RegistryOps.of(
+    public static final StreamCodec<RegistryFriendlyByteBuf, MountedItemStorage> STREAM_CODEC = StreamCodec.ofMember(
+        (b, t) -> t.writeWithCodec(
+            RegistryOps.create(
                 NbtOps.INSTANCE,
-                t.getRegistryManager()
+                t.registryAccess()
             ), CODEC, b
         ),
-        b -> b.decode(RegistryOps.of(NbtOps.INSTANCE, b.getRegistryManager()), CODEC)
+        b -> b.readWithCodecTrusted(RegistryOps.create(NbtOps.INSTANCE, b.registryAccess()), CODEC)
     );
 
     public final MountedItemStorageType<? extends MountedItemStorage> type;
@@ -55,7 +55,7 @@ public abstract class MountedItemStorage implements ItemInventory {
      * Un-mount this storage back into the world. The expected storage type of the target
      * block has already been checked to make sure it matches this storage's type.
      */
-    public abstract void unmount(World level, BlockState state, BlockPos pos, @Nullable BlockEntity be);
+    public abstract void unmount(Level level, BlockState state, BlockPos pos, @Nullable BlockEntity be);
 
     /**
      * Handle a player clicking on this mounted storage. This is always called on the server.
@@ -64,24 +64,24 @@ public abstract class MountedItemStorage implements ItemInventory {
      *
      * @return true if the interaction was successful
      */
-    public boolean handleInteraction(ServerPlayerEntity player, Contraption contraption, StructureBlockInfo info) {
-        ServerWorld level = player.getEntityWorld();
+    public boolean handleInteraction(ServerPlayer player, Contraption contraption, StructureBlockInfo info) {
+        ServerLevel level = player.level();
         BlockPos localPos = info.pos();
-        Vec3d localPosVec = Vec3d.ofCenter(localPos);
-        Predicate<PlayerEntity> stillValid = p -> {
-            Vec3d currentPos = contraption.entity.toGlobalVector(localPosVec, 0);
+        Vec3 localPosVec = Vec3.atCenterOf(localPos);
+        Predicate<Player> stillValid = p -> {
+            Vec3 currentPos = contraption.entity.toGlobalVector(localPosVec, 0);
             return this.isMenuValid(player, contraption, currentPos);
         };
-        Text menuName = this.getMenuName(info, contraption);
-        Inventory handler = this.getHandlerForMenu(info, contraption);
+        Component menuName = this.getMenuName(info, contraption);
+        Container handler = this.getHandlerForMenu(info, contraption);
         Consumer<ContainerUser> onClose = p -> {
-            Vec3d newPos = contraption.entity.toGlobalVector(localPosVec, 0);
+            Vec3 newPos = contraption.entity.toGlobalVector(localPosVec, 0);
             this.playClosingSound(level, newPos);
         };
 
-        OptionalInt id = player.openHandledScreen(this.createMenuProvider(menuName, handler, stillValid, onClose));
+        OptionalInt id = player.openMenu(this.createMenuProvider(menuName, handler, stillValid, onClose));
         if (id.isPresent()) {
-            Vec3d globalPos = contraption.entity.toGlobalVector(localPosVec, 0);
+            Vec3 globalPos = contraption.entity.toGlobalVector(localPosVec, 0);
             this.playOpeningSound(level, globalPos);
             return true;
         } else {
@@ -93,7 +93,7 @@ public abstract class MountedItemStorage implements ItemInventory {
      * Get the item handler that will be used by this storage's menu. This is useful for
      * handling multi-blocks, such as double chests.
      */
-    protected Inventory getHandlerForMenu(StructureBlockInfo info, Contraption contraption) {
+    protected Container getHandlerForMenu(StructureBlockInfo info, Contraption contraption) {
         return this;
     }
 
@@ -102,26 +102,26 @@ public abstract class MountedItemStorage implements ItemInventory {
      * @param pos    the center of this storage in-world
      * @return true if a GUI opened for this storage is still valid
      */
-    protected boolean isMenuValid(ServerPlayerEntity player, Contraption contraption, Vec3d pos) {
-        return contraption.entity.isAlive() && player.squaredDistanceTo(pos) < (8 * 8);
+    protected boolean isMenuValid(ServerPlayer player, Contraption contraption, Vec3 pos) {
+        return contraption.entity.isAlive() && player.distanceToSqr(pos) < (8 * 8);
     }
 
     /**
      * @return the title to be shown in the GUI when this storage is opened
      */
-    protected Text getMenuName(StructureBlockInfo info, Contraption contraption) {
-        MutableText blockName = info.state().getBlock().getName();
-        return Text.translatable("create.contraptions.moving_container", blockName);
+    protected Component getMenuName(StructureBlockInfo info, Contraption contraption) {
+        MutableComponent blockName = info.state().getBlock().getName();
+        return Component.translatable("create.contraptions.moving_container", blockName);
     }
 
     /**
      * @return a MenuProvider that provides the menu players will see when opening this storage
      */
     @Nullable
-    protected NamedScreenHandlerFactory createMenuProvider(
-        Text name,
-        Inventory handler,
-        Predicate<PlayerEntity> stillValid,
+    protected MenuProvider createMenuProvider(
+        Component name,
+        Container handler,
+        Predicate<Player> stillValid,
         Consumer<ContainerUser> onClose
     ) {
         return MountedStorageMenus.createGeneric(name, handler, stillValid, onClose);
@@ -130,13 +130,13 @@ public abstract class MountedItemStorage implements ItemInventory {
     /**
      * Play the sound made by opening this storage's GUI.
      */
-    protected void playOpeningSound(ServerWorld level, Vec3d pos) {
-        level.playSound(null, BlockPos.ofFloored(pos), SoundEvents.BLOCK_BARREL_OPEN, SoundCategory.BLOCKS, 0.75f, 1f);
+    protected void playOpeningSound(ServerLevel level, Vec3 pos) {
+        level.playSound(null, BlockPos.containing(pos), SoundEvents.BARREL_OPEN, SoundSource.BLOCKS, 0.75f, 1f);
     }
 
     /**
      * Play the sound made by closing this storage's GUI.
      */
-    protected void playClosingSound(ServerWorld level, Vec3d pos) {
+    protected void playClosingSound(ServerLevel level, Vec3 pos) {
     }
 }

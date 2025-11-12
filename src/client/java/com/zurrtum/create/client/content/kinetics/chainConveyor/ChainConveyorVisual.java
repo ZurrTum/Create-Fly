@@ -17,15 +17,15 @@ import com.zurrtum.create.client.foundation.render.SpecialModels;
 import com.zurrtum.create.content.kinetics.chainConveyor.ChainConveyorBlockEntity;
 import com.zurrtum.create.content.kinetics.chainConveyor.ChainConveyorPackage;
 import com.zurrtum.create.content.logistics.box.PackageItem;
-import net.minecraft.client.render.LightmapTextureManager;
-import net.minecraft.registry.Registries;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.LightType;
-import net.minecraft.world.World;
+import net.minecraft.client.renderer.LightTexture;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.Mth;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LightLayer;
+import net.minecraft.world.phys.Vec3;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,8 +35,8 @@ public class ChainConveyorVisual extends SingleAxisRotatingVisual<ChainConveyorB
 
     private final List<TransformedInstance> guards = new ArrayList<>();
 
-    private final SmartRecycler<Identifier, TransformedInstance> boxes;
-    private final SmartRecycler<Identifier, TransformedInstance> rigging;
+    private final SmartRecycler<ResourceLocation, TransformedInstance> boxes;
+    private final SmartRecycler<ResourceLocation, TransformedInstance> rigging;
 
     public ChainConveyorVisual(VisualizationContext context, ChainConveyorBlockEntity blockEntity, float partialTick) {
         super(context, blockEntity, partialTick, Models.partial(AllPartialModels.CHAIN_CONVEYOR_SHAFT));
@@ -90,25 +90,22 @@ public class ChainConveyorVisual extends SingleAxisRotatingVisual<ChainConveyorB
         if (box.item == null || box.item.isEmpty())
             return;
 
-        ChainConveyorPackagePhysicsData physicsData = ChainConveyorClientBehaviour.physicsData(box, be.getWorld());
+        ChainConveyorPackagePhysicsData physicsData = ChainConveyorClientBehaviour.physicsData(box, be.getLevel());
         if (physicsData.prevPos == null)
             return;
 
-        Vec3d position = physicsData.prevPos.lerp(physicsData.pos, partialTicks);
-        Vec3d targetPosition = physicsData.prevTargetPos.lerp(physicsData.targetPos, partialTicks);
+        Vec3 position = physicsData.prevPos.lerp(physicsData.pos, partialTicks);
+        Vec3 targetPosition = physicsData.prevTargetPos.lerp(physicsData.targetPos, partialTicks);
         float yaw = AngleHelper.angleLerp(partialTicks, physicsData.prevYaw, physicsData.yaw);
-        Vec3d offset = new Vec3d(targetPosition.x - this.pos.getX(), targetPosition.y - this.pos.getY(), targetPosition.z - this.pos.getZ());
+        Vec3 offset = new Vec3(targetPosition.x - this.pos.getX(), targetPosition.y - this.pos.getY(), targetPosition.z - this.pos.getZ());
 
-        BlockPos containingPos = BlockPos.ofFloored(position);
-        World level = be.getWorld();
-        int light = LightmapTextureManager.pack(
-            level.getLightLevel(LightType.BLOCK, containingPos),
-            level.getLightLevel(LightType.SKY, containingPos)
-        );
+        BlockPos containingPos = BlockPos.containing(position);
+        Level level = be.getLevel();
+        int light = LightTexture.pack(level.getBrightness(LightLayer.BLOCK, containingPos), level.getBrightness(LightLayer.SKY, containingPos));
 
         if (physicsData.modelKey == null) {
-            Identifier key = Registries.ITEM.getId(box.item.getItem());
-            if (key == Registries.ITEM.getDefaultId())
+            ResourceLocation key = BuiltInRegistries.ITEM.getKey(box.item.getItem());
+            if (key == BuiltInRegistries.ITEM.getDefaultKey())
                 return;
             physicsData.modelKey = key;
         }
@@ -116,11 +113,11 @@ public class ChainConveyorVisual extends SingleAxisRotatingVisual<ChainConveyorB
         TransformedInstance rigBuffer = rigging.get(physicsData.modelKey);
         TransformedInstance boxBuffer = boxes.get(physicsData.modelKey);
 
-        Vec3d dangleDiff = VecHelper.rotate(targetPosition.add(0, 0.5, 0).subtract(position), -yaw, Direction.Axis.Y);
-        float zRot = MathHelper.wrapDegrees((float) MathHelper.atan2(-dangleDiff.x, dangleDiff.y) * MathHelper.DEGREES_PER_RADIAN) / 2;
-        float xRot = MathHelper.wrapDegrees((float) MathHelper.atan2(dangleDiff.z, dangleDiff.y) * MathHelper.DEGREES_PER_RADIAN) / 2;
-        zRot = MathHelper.clamp(zRot, -25, 25);
-        xRot = MathHelper.clamp(xRot, -25, 25);
+        Vec3 dangleDiff = VecHelper.rotate(targetPosition.add(0, 0.5, 0).subtract(position), -yaw, Direction.Axis.Y);
+        float zRot = Mth.wrapDegrees((float) Mth.atan2(-dangleDiff.x, dangleDiff.y) * Mth.RAD_TO_DEG) / 2;
+        float xRot = Mth.wrapDegrees((float) Mth.atan2(dangleDiff.z, dangleDiff.y) * Mth.RAD_TO_DEG) / 2;
+        zRot = Mth.clamp(zRot, -25, 25);
+        xRot = Mth.clamp(xRot, -25, 25);
 
         for (TransformedInstance buf : new TransformedInstance[]{rigBuffer, boxBuffer}) {
             buf.setIdentityTransform();
@@ -175,8 +172,8 @@ public class ChainConveyorVisual extends SingleAxisRotatingVisual<ChainConveyorB
                 continue;
             }
 
-            Vec3d diff = stats.end().subtract(stats.start());
-            double yaw = MathHelper.DEGREES_PER_RADIAN * MathHelper.atan2(diff.x, diff.z);
+            Vec3 diff = stats.end().subtract(stats.start());
+            double yaw = Mth.RAD_TO_DEG * Mth.atan2(diff.x, diff.z);
 
             TransformedInstance guard = guardInstancer.createInstance();
             guard.translate(getVisualPosition()).center().rotateYDegrees((float) yaw).uncenter().light(rotatingModel.light).setChanged();

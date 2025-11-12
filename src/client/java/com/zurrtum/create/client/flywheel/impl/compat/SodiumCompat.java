@@ -5,8 +5,8 @@ import com.zurrtum.create.client.flywheel.impl.FlwImpl;
 import com.zurrtum.create.client.flywheel.lib.visualization.VisualizationHelper;
 import net.caffeinemc.mods.sodium.api.blockentity.BlockEntityRenderHandler;
 import net.caffeinemc.mods.sodium.api.blockentity.BlockEntityRenderPredicate;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 import org.jetbrains.annotations.Nullable;
 
 public final class SodiumCompat {

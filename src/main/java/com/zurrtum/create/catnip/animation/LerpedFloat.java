@@ -1,9 +1,9 @@
 package com.zurrtum.create.catnip.animation;
 
 import com.zurrtum.create.catnip.math.AngleHelper;
-import net.minecraft.storage.ReadView;
-import net.minecraft.storage.WriteView;
-import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.Mth;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import org.jetbrains.annotations.Nullable;
 
 public class LerpedFloat {
@@ -27,7 +27,7 @@ public class LerpedFloat {
     }
 
     public static LerpedFloat linear() {
-        return new LerpedFloat((p, c, t) -> (float) MathHelper.lerp(p, c, t));
+        return new LerpedFloat((p, c, t) -> (float) Mth.lerp(p, c, t));
     }
 
     public static LerpedFloat angular() {
@@ -70,14 +70,14 @@ public class LerpedFloat {
     public boolean updateChaseSpeed(double speed) {
         float prevSpeed = this.chaseSpeed;
         this.chaseSpeed = (float) speed;
-        return !MathHelper.approximatelyEquals(prevSpeed, speed);
+        return !Mth.equal(prevSpeed, speed);
     }
 
     public void tickChaser() {
         previousValue = value;
         if (chaseFunction == null)
             return;
-        if (MathHelper.approximatelyEquals((double) value, chaseTarget)) {
+        if (Mth.equal((double) value, chaseTarget)) {
             value = chaseTarget;
             return;
         }
@@ -102,10 +102,10 @@ public class LerpedFloat {
     }
 
     public boolean settled() {
-        return MathHelper.approximatelyEquals(
+        return Mth.equal(
             (double) previousValue,
             value
-        ) && (chaseFunction == null || MathHelper.approximatelyEquals((double) value, chaseTarget));
+        ) && (chaseFunction == null || Mth.equal((double) value, chaseTarget));
     }
 
     public float getChaseTarget() {
@@ -116,7 +116,7 @@ public class LerpedFloat {
         forcedSync = true;
     }
 
-    public void write(WriteView view) {
+    public void write(ValueOutput view) {
         view.putFloat("Speed", chaseSpeed);
         view.putFloat("Target", chaseTarget);
         view.putFloat("Value", value);
@@ -125,15 +125,15 @@ public class LerpedFloat {
         forcedSync = false;
     }
 
-    public void read(ReadView view, boolean clientPacket) {
-        if (!clientPacket || view.getBoolean("Force", false))
-            startWithValue(view.getFloat("Value", 0));
+    public void read(ValueInput view, boolean clientPacket) {
+        if (!clientPacket || view.getBooleanOr("Force", false))
+            startWithValue(view.getFloatOr("Value", 0));
         readChaser(view);
     }
 
-    protected void readChaser(ReadView view) {
-        chaseSpeed = view.getFloat("Speed", 0);
-        chaseTarget = view.getFloat("Target", 0);
+    protected void readChaser(ValueInput view) {
+        chaseSpeed = view.getFloatOr("Speed", 0);
+        chaseTarget = view.getFloatOr("Target", 0);
     }
 
     @FunctionalInterface
@@ -146,10 +146,10 @@ public class LerpedFloat {
 
         Chaser IDLE = (c, s, t) -> (float) c;
         Chaser EXP = exp(Double.MAX_VALUE);
-        Chaser LINEAR = (c, s, t) -> (float) (c + MathHelper.clamp(t - c, -s, s));
+        Chaser LINEAR = (c, s, t) -> (float) (c + Mth.clamp(t - c, -s, s));
 
         static Chaser exp(double maxEffectiveSpeed) {
-            return (c, s, t) -> (float) (c + MathHelper.clamp((t - c) * s, -maxEffectiveSpeed, maxEffectiveSpeed));
+            return (c, s, t) -> (float) (c + Mth.clamp((t - c) * s, -maxEffectiveSpeed, maxEffectiveSpeed));
         }
 
         float chase(double current, double speed, double target);

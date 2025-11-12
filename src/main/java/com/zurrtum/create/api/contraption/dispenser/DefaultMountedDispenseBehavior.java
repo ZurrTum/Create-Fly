@@ -1,20 +1,20 @@
 package com.zurrtum.create.api.contraption.dispenser;
 
 import com.zurrtum.create.content.contraptions.behaviour.MovementContext;
-import net.minecraft.block.dispenser.ItemDispenserBehavior;
-import net.minecraft.block.entity.HopperBlockEntity;
-import net.minecraft.entity.ItemEntity;
-import net.minecraft.inventory.Inventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.World;
-import net.minecraft.world.WorldAccess;
-import net.minecraft.world.WorldEvents;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.dispenser.DefaultDispenseItemBehavior;
+import net.minecraft.world.Container;
+import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.block.LevelEvent;
+import net.minecraft.world.level.block.entity.HopperBlockEntity;
+import net.minecraft.world.phys.Vec3;
 
 /**
- * A parallel to {@link ItemDispenserBehavior}, providing a common, default, extendable dispense implementation.
+ * A parallel to {@link DefaultDispenseItemBehavior}, providing a common, default, extendable dispense implementation.
  */
 public class DefaultMountedDispenseBehavior implements MountedDispenseBehavior {
     /**
@@ -24,10 +24,10 @@ public class DefaultMountedDispenseBehavior implements MountedDispenseBehavior {
 
     @Override
     public ItemStack dispense(ItemStack stack, MovementContext context, BlockPos pos) {
-        Vec3d normal = MountedDispenseBehavior.getDispenserNormal(context);
+        Vec3 normal = MountedDispenseBehavior.getDispenserNormal(context);
 
         Direction closestToFacing = MountedDispenseBehavior.getClosestFacingDirection(normal);
-        Inventory inventory = HopperBlockEntity.getInventoryAt(context.world, pos.offset(closestToFacing));
+        Container inventory = HopperBlockEntity.getContainerAt(context.world, pos.relative(closestToFacing));
         if (inventory == null) {
             ItemStack remainder = this.execute(stack, context, pos, normal);
             this.playSound(context.world, pos);
@@ -35,9 +35,9 @@ public class DefaultMountedDispenseBehavior implements MountedDispenseBehavior {
             return remainder;
         } else {
             ItemStack toInsert = stack.copyWithCount(1);
-            ItemStack remainder = HopperBlockEntity.transfer(null, inventory, toInsert, closestToFacing.getOpposite());
+            ItemStack remainder = HopperBlockEntity.addItem(null, inventory, toInsert, closestToFacing.getOpposite());
             if (remainder.isEmpty()) {
-                stack.decrement(1);
+                stack.shrink(1);
             }
         }
         return stack;
@@ -48,25 +48,25 @@ public class DefaultMountedDispenseBehavior implements MountedDispenseBehavior {
      *
      * @return the remaining items after dispensing one
      */
-    protected ItemStack execute(ItemStack stack, MovementContext context, BlockPos pos, Vec3d facing) {
+    protected ItemStack execute(ItemStack stack, MovementContext context, BlockPos pos, Vec3 facing) {
         ItemStack toDispense = stack.split(1);
         spawnItem(context.world, toDispense, 6, facing, pos, context);
         return stack;
     }
 
-    protected void playSound(WorldAccess level, BlockPos pos) {
-        level.syncWorldEvent(WorldEvents.DISPENSER_DISPENSES, pos, 0);
+    protected void playSound(LevelAccessor level, BlockPos pos) {
+        level.levelEvent(LevelEvent.SOUND_DISPENSER_DISPENSE, pos, 0);
     }
 
-    protected void playAnimation(WorldAccess level, BlockPos pos, Vec3d facing) {
+    protected void playAnimation(LevelAccessor level, BlockPos pos, Vec3 facing) {
         this.playAnimation(level, pos, MountedDispenseBehavior.getClosestFacingDirection(facing));
     }
 
-    protected void playAnimation(WorldAccess level, BlockPos pos, Direction direction) {
-        level.syncWorldEvent(WorldEvents.DISPENSER_ACTIVATED, pos, direction.getIndex());
+    protected void playAnimation(LevelAccessor level, BlockPos pos, Direction direction) {
+        level.levelEvent(LevelEvent.PARTICLES_SHOOT_SMOKE, pos, direction.get3DDataValue());
     }
 
-    public static void spawnItem(World level, ItemStack stack, int speed, Vec3d facing, BlockPos pos, MovementContext context) {
+    public static void spawnItem(Level level, ItemStack stack, int speed, Vec3 facing, BlockPos pos, MovementContext context) {
         double x = pos.getX() + facing.x + .5;
         double y = pos.getY() + facing.y + .5;
         double z = pos.getZ() + facing.z + .5;
@@ -78,11 +78,11 @@ public class DefaultMountedDispenseBehavior implements MountedDispenseBehavior {
 
         ItemEntity entity = new ItemEntity(level, x, y, z, stack);
         double d3 = level.random.nextDouble() * 0.1 + 0.2;
-        entity.setVelocity(
-            level.random.nextGaussian() * 0.0075 * speed + facing.getX() * d3 + context.motion.x,
-            level.random.nextGaussian() * 0.0075 * speed + facing.getY() * d3 + context.motion.y,
-            level.random.nextGaussian() * 0.0075 * speed + facing.getZ() * d3 + context.motion.z
+        entity.setDeltaMovement(
+            level.random.nextGaussian() * 0.0075 * speed + facing.x() * d3 + context.motion.x,
+            level.random.nextGaussian() * 0.0075 * speed + facing.y() * d3 + context.motion.y,
+            level.random.nextGaussian() * 0.0075 * speed + facing.z() * d3 + context.motion.z
         );
-        level.spawnEntity(entity);
+        level.addFreshEntity(entity);
     }
 }

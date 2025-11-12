@@ -1,6 +1,6 @@
 package com.zurrtum.create.client.catnip.layout;
 
-import net.minecraft.client.util.math.Rect2i;
+import net.minecraft.client.renderer.Rect2i;
 
 public interface LayoutHelper {
 

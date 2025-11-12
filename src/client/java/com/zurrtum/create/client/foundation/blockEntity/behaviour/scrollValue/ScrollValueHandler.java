@@ -1,8 +1,8 @@
 package com.zurrtum.create.client.foundation.blockEntity.behaviour.scrollValue;
 
 import com.zurrtum.create.client.catnip.animation.PhysicalFloat;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.util.math.MathHelper;
+import net.minecraft.client.Minecraft;
+import net.minecraft.util.Mth;
 
 public class ScrollValueHandler {
 
@@ -12,10 +12,10 @@ public class ScrollValueHandler {
     public static final PhysicalFloat wrenchCog = PhysicalFloat.create().withDrag(0.3);
 
     public static float getScroll(float partialTicks) {
-        return wrenchCog.getValue(partialTicks) + MathHelper.lerp(partialTicks, lastPassiveScroll, passiveScroll);
+        return wrenchCog.getValue(partialTicks) + Mth.lerp(partialTicks, lastPassiveScroll, passiveScroll);
     }
 
-    public static void tick(MinecraftClient client) {
+    public static void tick(Minecraft client) {
         if (!client.isPaused()) {
             lastPassiveScroll = passiveScroll;
             wrenchCog.tick();

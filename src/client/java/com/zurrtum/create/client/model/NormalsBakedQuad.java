@@ -1,6 +1,6 @@
 package com.zurrtum.create.client.model;
 
-import net.minecraft.client.render.model.BakedQuad;
+import net.minecraft.client.renderer.block.model.BakedQuad;
 
 public interface NormalsBakedQuad {
     void create$markNormals();

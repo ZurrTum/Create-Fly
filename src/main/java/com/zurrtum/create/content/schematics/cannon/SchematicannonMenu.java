@@ -2,15 +2,15 @@ package com.zurrtum.create.content.schematics.cannon;
 
 import com.zurrtum.create.AllMenuTypes;
 import com.zurrtum.create.foundation.gui.menu.MenuBase;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.inventory.Inventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.screen.slot.Slot;
+import net.minecraft.world.Container;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.item.ItemStack;
 
 public class SchematicannonMenu extends MenuBase<SchematicannonBlockEntity> {
 
-    public SchematicannonMenu(int id, PlayerInventory inv, SchematicannonBlockEntity be) {
+    public SchematicannonMenu(int id, Inventory inv, SchematicannonBlockEntity be) {
         super(AllMenuTypes.SCHEMATICANNON, id, inv, be);
     }
 
@@ -37,16 +37,16 @@ public class SchematicannonMenu extends MenuBase<SchematicannonBlockEntity> {
     }
 
     @Override
-    public ItemStack quickMove(PlayerEntity playerIn, int index) {
+    public ItemStack quickMoveStack(Player playerIn, int index) {
         Slot clickedSlot = getSlot(index);
-        if (!clickedSlot.hasStack())
+        if (!clickedSlot.hasItem())
             return ItemStack.EMPTY;
-        ItemStack stack = clickedSlot.getStack();
+        ItemStack stack = clickedSlot.getItem();
 
         if (index < 5) {
-            insertItem(stack, 5, slots.size(), true);
+            moveItemStackTo(stack, 5, slots.size(), true);
         } else {
-            if (insertItem(stack, 0, 1, false) || insertItem(stack, 2, 3, false) || insertItem(stack, 4, 5, false))
+            if (moveItemStackTo(stack, 0, 1, false) || moveItemStackTo(stack, 2, 3, false) || moveItemStackTo(stack, 4, 5, false))
                 ;
         }
 
@@ -54,13 +54,13 @@ public class SchematicannonMenu extends MenuBase<SchematicannonBlockEntity> {
     }
 
     private static class MenuSlot extends Slot {
-        public MenuSlot(Inventory inventory, int index, int x, int y) {
+        public MenuSlot(Container inventory, int index, int x, int y) {
             super(inventory, index, x, y);
         }
 
         @Override
-        public ItemStack takeStack(int amount) {
-            return super.takeStack(Math.min(inventory.getMaxCount(getStack()), amount));
+        public ItemStack remove(int amount) {
+            return super.remove(Math.min(container.getMaxStackSize(getItem()), amount));
         }
     }
 }

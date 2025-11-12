@@ -6,10 +6,10 @@ import com.zurrtum.create.client.catnip.render.SuperByteBuffer;
 import com.zurrtum.create.client.content.kinetics.base.KineticBlockEntityRenderer;
 import com.zurrtum.create.client.content.kinetics.base.KineticBlockEntityRenderer.KineticRenderState;
 import com.zurrtum.create.content.kinetics.motor.CreativeMotorBlockEntity;
-import net.minecraft.client.render.block.entity.BlockEntityRendererFactory;
+import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 
 public class CreativeMotorRenderer extends KineticBlockEntityRenderer<CreativeMotorBlockEntity, KineticRenderState> {
-    public CreativeMotorRenderer(BlockEntityRendererFactory.Context context) {
+    public CreativeMotorRenderer(BlockEntityRendererProvider.Context context) {
         super(context);
     }
 

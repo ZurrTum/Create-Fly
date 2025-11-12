@@ -2,9 +2,9 @@ package com.zurrtum.create.api.effect;
 
 import com.zurrtum.create.api.registry.SimpleRegistry;
 import com.zurrtum.create.infrastructure.fluids.FluidStack;
-import net.minecraft.fluid.Fluid;
-import net.minecraft.util.math.Box;
-import net.minecraft.world.World;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.material.Fluid;
+import net.minecraft.world.phys.AABB;
 
 /**
  * Interface for custom behavior for fluids spilling out of open pipes. Examples:
@@ -22,5 +22,5 @@ public interface OpenPipeEffectHandler {
      * @param area  the area to apply effects in
      * @param fluid the fluid in the pipe. Do not modify, it will do nothing
      */
-    void apply(World level, Box area, FluidStack fluid);
+    void apply(Level level, AABB area, FluidStack fluid);
 }

@@ -1,33 +1,33 @@
 package com.zurrtum.create.client.content.logistics.chute;
 
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.math.Axis;
 import com.zurrtum.create.content.logistics.box.PackageItem;
 import com.zurrtum.create.content.logistics.chute.ChuteBlock;
 import com.zurrtum.create.content.logistics.chute.ChuteBlock.Shape;
 import com.zurrtum.create.content.logistics.chute.ChuteBlockEntity;
-import net.minecraft.client.item.ItemModelManager;
-import net.minecraft.client.render.OverlayTexture;
-import net.minecraft.client.render.block.entity.BlockEntityRenderer;
-import net.minecraft.client.render.block.entity.BlockEntityRendererFactory;
-import net.minecraft.client.render.block.entity.state.BlockEntityRenderState;
-import net.minecraft.client.render.command.ModelCommandRenderer;
-import net.minecraft.client.render.command.OrderedRenderCommandQueue;
-import net.minecraft.client.render.item.ItemRenderState;
-import net.minecraft.client.render.state.CameraRenderState;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.item.ItemDisplayContext;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.RotationAxis;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.World;
+import net.minecraft.client.renderer.SubmitNodeCollector;
+import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
+import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
+import net.minecraft.client.renderer.blockentity.state.BlockEntityRenderState;
+import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
+import net.minecraft.client.renderer.item.ItemModelResolver;
+import net.minecraft.client.renderer.item.ItemStackRenderState;
+import net.minecraft.client.renderer.state.CameraRenderState;
+import net.minecraft.client.renderer.texture.OverlayTexture;
+import net.minecraft.core.Direction;
+import net.minecraft.util.Mth;
+import net.minecraft.world.item.ItemDisplayContext;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 
 public class ChuteRenderer implements BlockEntityRenderer<ChuteBlockEntity, ChuteRenderer.ChuteRenderState> {
-    protected final ItemModelManager itemModelManager;
+    protected final ItemModelResolver itemModelManager;
 
-    public ChuteRenderer(BlockEntityRendererFactory.Context context) {
-        itemModelManager = context.itemModelManager();
+    public ChuteRenderer(BlockEntityRendererProvider.Context context) {
+        itemModelManager = context.itemModelResolver();
     }
 
     @Override
@@ -36,22 +36,22 @@ public class ChuteRenderer implements BlockEntityRenderer<ChuteBlockEntity, Chut
     }
 
     @Override
-    public void updateRenderState(
+    public void extractRenderState(
         ChuteBlockEntity be,
         ChuteRenderState state,
         float tickProgress,
-        Vec3d cameraPos,
-        @Nullable ModelCommandRenderer.CrumblingOverlayCommand crumblingOverlay
+        Vec3 cameraPos,
+        @Nullable ModelFeatureRenderer.CrumblingOverlay crumblingOverlay
     ) {
-        BlockEntityRenderState.updateBlockEntityRenderState(be, state, crumblingOverlay);
+        BlockEntityRenderState.extractBase(be, state, crumblingOverlay);
         ItemStack item = be.getItem();
         if (item.isEmpty()) {
             return;
         }
-        if (state.blockState.get(ChuteBlock.FACING) != Direction.DOWN) {
+        if (state.blockState.getValue(ChuteBlock.FACING) != Direction.DOWN) {
             return;
         }
-        boolean notWindow = state.blockState.get(ChuteBlock.SHAPE) != Shape.WINDOW;
+        boolean notWindow = state.blockState.getValue(ChuteBlock.SHAPE) != Shape.WINDOW;
         if (notWindow && be.bottomPullDistance == 0) {
             return;
         }
@@ -59,13 +59,13 @@ public class ChuteRenderer implements BlockEntityRenderer<ChuteBlockEntity, Chut
         if (notWindow && itemPosition > .5f) {
             return;
         }
-        state.item = ChuteItemRenderState.create(itemModelManager, item, itemPosition, be.getWorld());
+        state.item = ChuteItemRenderState.create(itemModelManager, item, itemPosition, be.getLevel());
     }
 
     @Override
-    public void render(ChuteRenderState state, MatrixStack matrices, OrderedRenderCommandQueue queue, CameraRenderState cameraState) {
+    public void submit(ChuteRenderState state, PoseStack matrices, SubmitNodeCollector queue, CameraRenderState cameraState) {
         if (state.item != null) {
-            state.item.render(matrices, queue, state.lightmapCoordinates);
+            state.item.render(matrices, queue, state.lightCoords);
         }
     }
 
@@ -73,34 +73,34 @@ public class ChuteRenderer implements BlockEntityRenderer<ChuteBlockEntity, Chut
         public ChuteItemRenderState item;
     }
 
-    public record ChuteItemRenderState(ItemRenderState item, float offset, float rotate) {
-        public static ChuteItemRenderState create(ItemModelManager itemModelManager, ItemStack stack, float itemPosition, World world) {
+    public record ChuteItemRenderState(ItemStackRenderState item, float offset, float rotate) {
+        public static ChuteItemRenderState create(ItemModelResolver itemModelManager, ItemStack stack, float itemPosition, Level world) {
             float offset = itemPosition - .5f;
             float rotate;
             if (PackageItem.isPackage(stack)) {
                 rotate = -1;
             } else {
-                rotate = MathHelper.RADIANS_PER_DEGREE * itemPosition * 180;
+                rotate = Mth.DEG_TO_RAD * itemPosition * 180;
             }
-            ItemRenderState item = new ItemRenderState();
+            ItemStackRenderState item = new ItemStackRenderState();
             item.displayContext = ItemDisplayContext.FIXED;
-            itemModelManager.update(item, stack, item.displayContext, world, null, 0);
+            itemModelManager.appendItemLayers(item, stack, item.displayContext, world, null, 0);
             return new ChuteItemRenderState(item, offset, rotate);
         }
 
-        public void render(MatrixStack matrices, OrderedRenderCommandQueue queue, int light) {
-            matrices.push();
+        public void render(PoseStack matrices, SubmitNodeCollector queue, int light) {
+            matrices.pushPose();
             matrices.translate(0.5f, 0.5f, 0.5f);
             matrices.translate(0, offset, 0);
             if (rotate == -1) {
                 matrices.scale(1.5f, 1.5f, 1.5f);
             } else {
                 matrices.scale(0.5f, 0.5f, 0.5f);
-                matrices.multiply(RotationAxis.POSITIVE_X.rotation(rotate));
-                matrices.multiply(RotationAxis.POSITIVE_Y.rotation(rotate));
+                matrices.mulPose(Axis.XP.rotation(rotate));
+                matrices.mulPose(Axis.YP.rotation(rotate));
             }
-            item.render(matrices, queue, light, OverlayTexture.DEFAULT_UV, 0);
-            matrices.pop();
+            item.submit(matrices, queue, light, OverlayTexture.NO_OVERLAY, 0);
+            matrices.popPose();
         }
     }
 }

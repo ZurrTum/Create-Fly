@@ -1,13 +1,13 @@
 package com.zurrtum.create.content.decoration.encasing;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.Hand;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.BlockHitResult;
 
 /**
  * Implement this interface to indicate that this block is encased.
@@ -16,8 +16,8 @@ public interface EncasedBlock {
     Block getCasing();
 
     /**
-     * Handles how encasing should be done if {@link EncasableBlock#tryEncase(BlockState, World, BlockPos, ItemStack, PlayerEntity, Hand, BlockHitResult)} is successful.
+     * Handles how encasing should be done if {@link EncasableBlock#tryEncase(BlockState, Level, BlockPos, ItemStack, Player, InteractionHand, BlockHitResult)} is successful.
      */
-    default void handleEncasing(BlockState state, World level, BlockPos pos, ItemStack heldItem, PlayerEntity player, Hand hand, BlockHitResult ray) {
+    default void handleEncasing(BlockState state, Level level, BlockPos pos, ItemStack heldItem, Player player, InteractionHand hand, BlockHitResult ray) {
     }
 }

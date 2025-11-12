@@ -4,55 +4,54 @@ import com.zurrtum.create.api.connectivity.ConnectivityHandler;
 import com.zurrtum.create.catnip.data.Iterate;
 import com.zurrtum.create.client.AllCTBehaviours;
 import com.zurrtum.create.client.foundation.block.connected.ConnectedTextureBehaviour;
-import net.minecraft.block.BlockState;
-import net.minecraft.client.render.model.BakedGeometry;
-import net.minecraft.client.render.model.BakedQuad;
-import net.minecraft.client.render.model.BlockModelPart;
-import net.minecraft.client.render.model.GeometryBakedModel;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.random.Random;
-import net.minecraft.world.BlockRenderView;
-
 import java.util.List;
+import net.minecraft.client.renderer.block.model.BakedQuad;
+import net.minecraft.client.renderer.block.model.BlockModelPart;
+import net.minecraft.client.renderer.block.model.SimpleModelWrapper;
+import net.minecraft.client.resources.model.QuadCollection;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.level.BlockAndTintGetter;
+import net.minecraft.world.level.block.state.BlockState;
 
 public class FluidTankModel extends CTModel {
-    public FluidTankModel(BlockState state, UnbakedGrouped unbaked, ConnectedTextureBehaviour behaviour) {
+    public FluidTankModel(BlockState state, UnbakedRoot unbaked, ConnectedTextureBehaviour behaviour) {
         super(state, unbaked, behaviour);
     }
 
-    public static FluidTankModel standard(BlockState state, UnbakedGrouped unbaked) {
+    public static FluidTankModel standard(BlockState state, UnbakedRoot unbaked) {
         return new FluidTankModel(state, unbaked, AllCTBehaviours.FLUID_TANK);
     }
 
-    public static FluidTankModel creative(BlockState state, UnbakedGrouped unbaked) {
+    public static FluidTankModel creative(BlockState state, UnbakedRoot unbaked) {
         return new FluidTankModel(state, unbaked, AllCTBehaviours.CREATIVE_FLUID_TANK);
     }
 
     @Override
-    public void addPartsWithInfo(BlockRenderView world, BlockPos pos, BlockState state, Random random, List<BlockModelPart> parts) {
+    public void addPartsWithInfo(BlockAndTintGetter world, BlockPos pos, BlockState state, RandomSource random, List<BlockModelPart> parts) {
         int[] indices = createCTData(world, pos, state);
         boolean[] culls = createCullData(world, pos);
-        for (BlockModelPart part : model.getParts(random)) {
-            BakedGeometry.Builder builder = new BakedGeometry.Builder();
+        for (BlockModelPart part : model.collectParts(random)) {
+            QuadCollection.Builder builder = new QuadCollection.Builder();
             for (BakedQuad quad : part.getQuads(null)) {
-                builder.add(replaceQuad(state, random, indices[quad.face().getIndex()], quad));
+                builder.addUnculledFace(replaceQuad(state, random, indices[quad.direction().get3DDataValue()], quad));
             }
             for (Direction direction : Iterate.directions) {
-                int i = direction.getHorizontalQuarterTurns();
+                int i = direction.get2DDataValue();
                 if (i != -1 && culls[i]) {
                     continue;
                 }
-                addQuads(builder, part, direction, state, random, indices[direction.getIndex()]);
+                addQuads(builder, part, direction, state, random, indices[direction.get3DDataValue()]);
             }
-            parts.add(new GeometryBakedModel(builder.build(), part.useAmbientOcclusion(), part.particleSprite()));
+            parts.add(new SimpleModelWrapper(builder.build(), part.useAmbientOcclusion(), part.particleIcon()));
         }
     }
 
-    protected boolean[] createCullData(BlockRenderView world, BlockPos pos) {
+    protected boolean[] createCullData(BlockAndTintGetter world, BlockPos pos) {
         boolean[] culledFaces = new boolean[4];
         for (Direction face : Iterate.horizontalDirections) {
-            culledFaces[face.getHorizontalQuarterTurns()] = ConnectivityHandler.isConnected(world, pos, pos.offset(face));
+            culledFaces[face.get2DDataValue()] = ConnectivityHandler.isConnected(world, pos, pos.relative(face));
         }
         return culledFaces;
     }

@@ -1,7 +1,7 @@
 package com.zurrtum.create.foundation.collision;
 
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.Mth;
+import net.minecraft.world.phys.Vec3;
 import org.joml.Matrix4f;
 
 public class Matrix3d {
@@ -21,8 +21,8 @@ public class Matrix3d {
         if (radians == 0)
             return this;
 
-        double s = MathHelper.sin(radians);
-        double c = MathHelper.cos(radians);
+        double s = Mth.sin(radians);
+        double c = Mth.cos(radians);
         m22 = m11 = c;
         m21 = s;
         m12 = -s;
@@ -34,8 +34,8 @@ public class Matrix3d {
         if (radians == 0)
             return this;
 
-        double s = MathHelper.sin(radians);
-        double c = MathHelper.cos(radians);
+        double s = Mth.sin(radians);
+        double c = Mth.cos(radians);
         m00 = m22 = c;
         m02 = s;
         m20 = -s;
@@ -47,8 +47,8 @@ public class Matrix3d {
         if (radians == 0)
             return this;
 
-        double s = MathHelper.sin(radians);
-        double c = MathHelper.cos(radians);
+        double s = Mth.sin(radians);
+        double c = Mth.cos(radians);
         m00 = m11 = c;
         m01 = -s;
         m10 = s;
@@ -110,11 +110,11 @@ public class Matrix3d {
         return this;
     }
 
-    public Vec3d transform(Vec3d vec) {
+    public Vec3 transform(Vec3 vec) {
         double x = vec.x * m00 + vec.y * m01 + vec.z * m02;
         double y = vec.x * m10 + vec.y * m11 + vec.z * m12;
         double z = vec.x * m20 + vec.y * m21 + vec.z * m22;
-        return new Vec3d(x, y, z);
+        return new Vec3(x, y, z);
     }
 
     public Matrix3d copy() {

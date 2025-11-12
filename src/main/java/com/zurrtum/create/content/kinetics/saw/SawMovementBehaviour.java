@@ -4,36 +4,36 @@ import com.zurrtum.create.AllDamageSources;
 import com.zurrtum.create.catnip.math.VecHelper;
 import com.zurrtum.create.content.contraptions.behaviour.MovementContext;
 import com.zurrtum.create.content.kinetics.base.BlockBreakingMovementBehaviour;
-import net.minecraft.block.BlockState;
-import net.minecraft.entity.ItemEntity;
-import net.minecraft.entity.damage.DamageSource;
-import net.minecraft.inventory.Inventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.registry.tag.BlockTags;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.tags.BlockTags;
+import net.minecraft.world.Container;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.Vec3;
 
 public class SawMovementBehaviour extends BlockBreakingMovementBehaviour {
 
     @Override
     public boolean isActive(MovementContext context) {
-        return super.isActive(context) && !VecHelper.isVecPointingTowards(context.relativeMotion, context.state.get(SawBlock.FACING).getOpposite());
+        return super.isActive(context) && !VecHelper.isVecPointingTowards(context.relativeMotion, context.state.getValue(SawBlock.FACING).getOpposite());
     }
 
     @Override
-    public Vec3d getActiveAreaOffset(MovementContext context) {
-        return Vec3d.of(context.state.get(SawBlock.FACING).getVector()).multiply(.65f);
+    public Vec3 getActiveAreaOffset(MovementContext context) {
+        return Vec3.atLowerCornerOf(context.state.getValue(SawBlock.FACING).getUnitVec3i()).scale(.65f);
     }
 
     @Override
     public void visitNewPosition(MovementContext context, BlockPos pos) {
         super.visitNewPosition(context, pos);
-        Vec3d facingVec = Vec3d.of(context.state.get(SawBlock.FACING).getVector());
+        Vec3 facingVec = Vec3.atLowerCornerOf(context.state.getValue(SawBlock.FACING).getUnitVec3i());
         facingVec = context.rotation.apply(facingVec);
 
-        Direction closestToFacing = Direction.getFacing(facingVec.x, facingVec.y, facingVec.z);
+        Direction closestToFacing = Direction.getApproximateNearest(facingVec.x, facingVec.y, facingVec.z);
         if (closestToFacing.getAxis().isVertical() && context.data.contains("BreakingPos")) {
             context.data.remove("BreakingPos");
             context.stall = false;
@@ -41,13 +41,13 @@ public class SawMovementBehaviour extends BlockBreakingMovementBehaviour {
     }
 
     @Override
-    public boolean canBreak(World world, BlockPos breakingPos, BlockState state) {
+    public boolean canBreak(Level world, BlockPos breakingPos, BlockState state) {
         return super.canBreak(world, breakingPos, state) && SawBlockEntity.isSawable(state);
     }
 
     @Override
     protected void onBlockBroken(MovementContext context, BlockPos pos, BlockState brokenState) {
-        if (brokenState.isIn(BlockTags.LEAVES))
+        if (brokenState.is(BlockTags.LEAVES))
             return;
 
         //TODO
@@ -62,19 +62,19 @@ public class SawMovementBehaviour extends BlockBreakingMovementBehaviour {
     }
 
     public void dropItemFromCutTree(MovementContext context, BlockPos pos, ItemStack stack) {
-        Inventory inventory = context.contraption.getStorage().getAllItems();
+        Container inventory = context.contraption.getStorage().getAllItems();
         int count = stack.getCount();
         int insert = inventory.insert(stack);
         if (insert == count)
             return;
 
-        World world = context.world;
-        Vec3d dropPos = VecHelper.getCenterOf(pos);
+        Level world = context.world;
+        Vec3 dropPos = VecHelper.getCenterOf(pos);
         float distance = context.position == null ? 1 : (float) dropPos.distanceTo(context.position);
         stack.setCount(count - insert);
         ItemEntity entity = new ItemEntity(world, dropPos.x, dropPos.y, dropPos.z, stack);
-        entity.setVelocity(context.relativeMotion.multiply(distance / 20f));
-        world.spawnEntity(entity);
+        entity.setDeltaMovement(context.relativeMotion.scale(distance / 20f));
+        world.addFreshEntity(entity);
     }
 
     @Override
@@ -90,7 +90,7 @@ public class SawMovementBehaviour extends BlockBreakingMovementBehaviour {
     }
 
     @Override
-    protected DamageSource getDamageSource(World level) {
+    protected DamageSource getDamageSource(Level level) {
         return AllDamageSources.get(level).saw;
     }
 }

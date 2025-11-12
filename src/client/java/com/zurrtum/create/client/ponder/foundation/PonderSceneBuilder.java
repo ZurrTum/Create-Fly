@@ -12,23 +12,27 @@ import com.zurrtum.create.client.ponder.api.level.PonderLevel;
 import com.zurrtum.create.client.ponder.api.scene.*;
 import com.zurrtum.create.client.ponder.foundation.element.*;
 import com.zurrtum.create.client.ponder.foundation.instruction.*;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.RedstoneTorchBlock;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.ItemEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.particle.DustParticleEffect;
-import net.minecraft.particle.ParticleEffect;
-import net.minecraft.registry.RegistryWrapper;
-import net.minecraft.state.property.Properties;
-import net.minecraft.state.property.Property;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.math.*;
-import net.minecraft.util.math.Direction.Axis;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.Direction.Axis;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.core.Vec3i;
+import net.minecraft.core.particles.DustParticleOptions;
+import net.minecraft.core.particles.ParticleOptions;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.RedstoneTorchBlock;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.block.state.properties.Property;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
 
 import java.util.UUID;
 import java.util.function.Consumer;
@@ -92,7 +96,7 @@ public class PonderSceneBuilder implements SceneBuilder {
 
     @Override
     public void title(String sceneId, String title) {
-        scene.sceneId = Identifier.of(scene.getNamespace(), sceneId);
+        scene.sceneId = ResourceLocation.fromNamespaceAndPath(scene.getNamespace(), sceneId);
         scene.localization.registerSpecific(scene.sceneId, PonderScene.TITLE_KEY, title);
     }
 
@@ -176,18 +180,18 @@ public class PonderSceneBuilder implements SceneBuilder {
     public class PonderEffectInstructions implements EffectInstructions {
 
         @Override
-        public void emitParticles(Vec3d location, ParticleEmitter emitter, float amountPerCycle, int cycles) {
+        public void emitParticles(Vec3 location, ParticleEmitter emitter, float amountPerCycle, int cycles) {
             addInstruction(new EmitParticlesInstruction(location, emitter, amountPerCycle, cycles));
         }
 
         @Override
-        public <T extends ParticleEffect> ParticleEmitter simpleParticleEmitter(T data, Vec3d motion) {
-            return (w, x, y, z) -> w.addParticleClient(data, x, y, z, motion.x, motion.y, motion.z);
+        public <T extends ParticleOptions> ParticleEmitter simpleParticleEmitter(T data, Vec3 motion) {
+            return (w, x, y, z) -> w.addParticle(data, x, y, z, motion.x, motion.y, motion.z);
         }
 
         @Override
-        public <T extends ParticleEffect> ParticleEmitter particleEmitterWithinBlockSpace(T data, Vec3d motion) {
-            return (w, x, y, z) -> w.addParticleClient(
+        public <T extends ParticleOptions> ParticleEmitter particleEmitterWithinBlockSpace(T data, Vec3 motion) {
+            return (w, x, y, z) -> w.addParticle(
                 data,
                 Math.floor(x) + w.random.nextFloat(),
                 Math.floor(y) + w.random.nextFloat(),
@@ -213,7 +217,7 @@ public class PonderSceneBuilder implements SceneBuilder {
             int rgb = new Color(color).getRGB();
             addInstruction(new EmitParticlesInstruction(
                 VecHelper.getCenterOf(pos),
-                effects().particleEmitterWithinBlockSpace(new DustParticleEffect(rgb, 1), Vec3d.ZERO),
+                effects().particleEmitterWithinBlockSpace(new DustParticleOptions(rgb, 1), Vec3.ZERO),
                 amount,
                 2
             ));
@@ -238,14 +242,14 @@ public class PonderSceneBuilder implements SceneBuilder {
         }
 
         @Override
-        public InputElementBuilder showControls(Vec3d sceneSpace, Pointing direction, int duration) {
+        public InputElementBuilder showControls(Vec3 sceneSpace, Pointing direction, int duration) {
             InputWindowElement inputWindowElement = new InputWindowElement(sceneSpace, direction);
             addInstruction(new ShowInputInstruction(inputWindowElement, duration));
             return inputWindowElement.builder();
         }
 
         @Override
-        public void chaseBoundingBoxOutline(PonderPalette color, Object slot, Box boundingBox, int duration) {
+        public void chaseBoundingBoxOutline(PonderPalette color, Object slot, AABB boundingBox, int duration) {
             addInstruction(new ChaseAABBInstruction(color, slot, boundingBox, duration));
         }
 
@@ -255,11 +259,11 @@ public class PonderSceneBuilder implements SceneBuilder {
         }
 
         @Override
-        public void showScrollInput(Vec3d location, Direction side, int duration) {
+        public void showScrollInput(Vec3 location, Direction side, int duration) {
             Axis axis = side.getAxis();
             float s = 1 / 16f;
             float q = 1 / 4f;
-            Vec3d expands = new Vec3d(axis == Axis.X ? s : q, axis == Axis.Y ? s : q, axis == Axis.Z ? s : q);
+            Vec3 expands = new Vec3(axis == Axis.X ? s : q, axis == Axis.Y ? s : q, axis == Axis.Z ? s : q);
             addInstruction(new HighlightValueBoxInstruction(location, expands, duration));
         }
 
@@ -267,7 +271,7 @@ public class PonderSceneBuilder implements SceneBuilder {
         public void showRepeaterScrollInput(BlockPos pos, int duration) {
             float s = 1 / 16f;
             float q = 1 / 6f;
-            Vec3d expands = new Vec3d(q, s, q);
+            Vec3 expands = new Vec3(q, s, q);
             addInstruction(new HighlightValueBoxInstruction(
                 scene.getSceneBuildingUtil().vector().blockSurface(pos, Direction.DOWN)
                     .add(0, 3 / 16f, 0), expands, duration
@@ -275,26 +279,26 @@ public class PonderSceneBuilder implements SceneBuilder {
         }
 
         @Override
-        public void showFilterSlotInput(Vec3d location, int duration) {
+        public void showFilterSlotInput(Vec3 location, int duration) {
             float s = .1f;
-            Vec3d expands = new Vec3d(s, s, s);
+            Vec3 expands = new Vec3(s, s, s);
             addInstruction(new HighlightValueBoxInstruction(location, expands, duration));
         }
 
         @Override
-        public void showFilterSlotInput(Vec3d location, Direction side, int duration) {
-            location = location.add(Vec3d.of(side.getVector()).multiply(-3 / 128f));
-            Vec3d expands = VecHelper.axisAlingedPlaneOf(side).multiply(11 / 128f);
+        public void showFilterSlotInput(Vec3 location, Direction side, int duration) {
+            location = location.add(Vec3.atLowerCornerOf(side.getUnitVec3i()).scale(-3 / 128f));
+            Vec3 expands = VecHelper.axisAlingedPlaneOf(side).scale(11 / 128f);
             addInstruction(new HighlightValueBoxInstruction(location, expands, duration));
         }
 
         @Override
-        public void showLine(PonderPalette color, Vec3d start, Vec3d end, int duration) {
+        public void showLine(PonderPalette color, Vec3 start, Vec3 end, int duration) {
             addInstruction(new LineInstruction(color, start, end, duration, false));
         }
 
         @Override
-        public void showBigLine(PonderPalette color, Vec3d start, Vec3d end, int duration) {
+        public void showBigLine(PonderPalette color, Vec3 start, Vec3 end, int duration) {
             addInstruction(new LineInstruction(color, start, end, duration, true));
         }
 
@@ -308,7 +312,7 @@ public class PonderSceneBuilder implements SceneBuilder {
     public class PonderSpecialInstructions implements SpecialInstructions {
 
         @Override
-        public ElementLink<ParrotElement> createBirb(Vec3d location, Supplier<? extends ParrotPose> pose) {
+        public ElementLink<ParrotElement> createBirb(Vec3 location, Supplier<? extends ParrotPose> pose) {
             ElementLink<ParrotElement> link = new ElementLinkImpl<>(ParrotElement.class);
             ParrotElement parrot = ParrotElementImpl.create(location, pose);
             addInstruction(new CreateParrotInstruction(10, Direction.DOWN, parrot));
@@ -322,7 +326,7 @@ public class PonderSceneBuilder implements SceneBuilder {
         }
 
         @Override
-        public void movePointOfInterest(Vec3d location) {
+        public void movePointOfInterest(Vec3 location) {
             addInstruction(new MovePoiInstruction(location));
         }
 
@@ -333,16 +337,16 @@ public class PonderSceneBuilder implements SceneBuilder {
 
         @Override
         public void rotateParrot(ElementLink<ParrotElement> link, double xRotation, double yRotation, double zRotation, int duration) {
-            addInstruction(AnimateParrotInstruction.rotate(link, new Vec3d(xRotation, yRotation, zRotation), duration));
+            addInstruction(AnimateParrotInstruction.rotate(link, new Vec3(xRotation, yRotation, zRotation), duration));
         }
 
         @Override
-        public void moveParrot(ElementLink<ParrotElement> link, Vec3d offset, int duration) {
+        public void moveParrot(ElementLink<ParrotElement> link, Vec3 offset, int duration) {
             addInstruction(AnimateParrotInstruction.move(link, offset, duration));
         }
 
         @Override
-        public ElementLink<MinecartElement> createCart(Vec3d location, float angle, MinecartConstructor type) {
+        public ElementLink<MinecartElement> createCart(Vec3 location, float angle, MinecartConstructor type) {
             ElementLink<MinecartElement> link = new ElementLinkImpl<>(MinecartElement.class);
             MinecartElement cart = new MinecartElementImpl(location, angle, type);
             addInstruction(new CreateMinecartInstruction(10, Direction.DOWN, cart));
@@ -356,7 +360,7 @@ public class PonderSceneBuilder implements SceneBuilder {
         }
 
         @Override
-        public void moveCart(ElementLink<MinecartElement> link, Vec3d offset, int duration) {
+        public void moveCart(ElementLink<MinecartElement> link, Vec3 offset, int duration) {
             addInstruction(AnimateMinecartInstruction.move(link, offset, duration));
         }
 
@@ -369,18 +373,18 @@ public class PonderSceneBuilder implements SceneBuilder {
 
     public class PonderWorldInstructions implements WorldInstructions {
         @Override
-        public RegistryWrapper.WrapperLookup getHolderLookupProvider() {
-            return scene.getWorld().getRegistryManager();
+        public HolderLookup.Provider getHolderLookupProvider() {
+            return scene.getLevel().registryAccess();
         }
 
         @Override
         public void incrementBlockBreakingProgress(BlockPos pos) {
             addInstruction(scene -> {
-                PonderLevel world = scene.getWorld();
+                PonderLevel world = scene.getLevel();
                 int progress = world.getBlockBreakingProgressions().getOrDefault(pos, -1) + 1;
                 if (progress == 9) {
                     world.addBlockDestroyEffects(pos, world.getBlockState(pos));
-                    world.breakBlock(pos, false);
+                    world.destroyBlock(pos, false);
                     world.setBlockBreakingProgress(pos, 0);
                     scene.forEach(WorldSectionElement.class, WorldSectionElement::queueRedraw);
                 } else
@@ -445,7 +449,7 @@ public class PonderSceneBuilder implements SceneBuilder {
 
         @Override
         public void restoreBlocks(Selection selection) {
-            addInstruction(scene -> scene.getWorld().restoreBlocks(selection));
+            addInstruction(scene -> scene.getLevel().restoreBlocks(selection));
         }
 
         @Override
@@ -468,21 +472,21 @@ public class PonderSceneBuilder implements SceneBuilder {
 
         @Override
         public void rotateSection(ElementLink<WorldSectionElement> link, double xRotation, double yRotation, double zRotation, int duration) {
-            addInstruction(AnimateWorldSectionInstruction.rotate(link, new Vec3d(xRotation, yRotation, zRotation), duration));
+            addInstruction(AnimateWorldSectionInstruction.rotate(link, new Vec3(xRotation, yRotation, zRotation), duration));
         }
 
         @Override
-        public void configureCenterOfRotation(ElementLink<WorldSectionElement> link, Vec3d anchor) {
+        public void configureCenterOfRotation(ElementLink<WorldSectionElement> link, Vec3 anchor) {
             addInstruction(scene -> scene.resolveOptional(link).ifPresent(safe -> safe.setCenterOfRotation(anchor)));
         }
 
         @Override
-        public void configureStabilization(ElementLink<WorldSectionElement> link, Vec3d anchor) {
+        public void configureStabilization(ElementLink<WorldSectionElement> link, Vec3 anchor) {
             addInstruction(scene -> scene.resolveOptional(link).ifPresent(safe -> safe.stabilizeRotation(anchor)));
         }
 
         @Override
-        public void moveSection(ElementLink<WorldSectionElement> link, Vec3d offset, int duration) {
+        public void moveSection(ElementLink<WorldSectionElement> link, Vec3 offset, int duration) {
             addInstruction(AnimateWorldSectionInstruction.move(link, offset, duration));
         }
 
@@ -493,7 +497,7 @@ public class PonderSceneBuilder implements SceneBuilder {
 
         @Override
         public void destroyBlock(BlockPos pos) {
-            setBlock(pos, Blocks.AIR.getDefaultState(), true);
+            setBlock(pos, Blocks.AIR.defaultBlockState(), true);
         }
 
         @Override
@@ -513,7 +517,7 @@ public class PonderSceneBuilder implements SceneBuilder {
 
         @Override
         public void cycleBlockProperty(BlockPos pos, Property<?> property) {
-            modifyBlocks(scene.getSceneBuildingUtil().select().position(pos), s -> s.contains(property) ? s.cycle(property) : s, false);
+            modifyBlocks(scene.getSceneBuildingUtil().select().position(pos), s -> s.hasProperty(property) ? s.cycle(property) : s, false);
         }
 
         @Override
@@ -525,11 +529,11 @@ public class PonderSceneBuilder implements SceneBuilder {
         public void toggleRedstonePower(Selection selection) {
             modifyBlocks(
                 selection, s -> {
-                    if (s.contains(Properties.POWER))
-                        s = s.with(Properties.POWER, s.get(Properties.POWER) == 0 ? 15 : 0);
-                    if (s.contains(Properties.POWERED))
-                        s = s.cycle(Properties.POWERED);
-                    if (s.contains(RedstoneTorchBlock.LIT))
+                    if (s.hasProperty(BlockStateProperties.POWER))
+                        s = s.setValue(BlockStateProperties.POWER, s.getValue(BlockStateProperties.POWER) == 0 ? 15 : 0);
+                    if (s.hasProperty(BlockStateProperties.POWERED))
+                        s = s.cycle(BlockStateProperties.POWERED);
+                    if (s.hasProperty(RedstoneTorchBlock.LIT))
                         s = s.cycle(RedstoneTorchBlock.LIT);
                     return s;
                 }, false
@@ -545,7 +549,7 @@ public class PonderSceneBuilder implements SceneBuilder {
         public <T extends Entity> void modifyEntitiesInside(Class<T> entityClass, Selection area, Consumer<T> entityCallBack) {
             addInstruction(scene -> scene.forEachWorldEntity(
                 entityClass, e -> {
-                    if (area.test(e.getBlockPos()))
+                    if (area.test(e.blockPosition()))
                         entityCallBack.accept(e);
                 }
             ));
@@ -561,37 +565,37 @@ public class PonderSceneBuilder implements SceneBuilder {
         }
 
         @Override
-        public ElementLink<EntityElement> createEntity(Function<World, Entity> factory) {
+        public ElementLink<EntityElement> createEntity(Function<Level, Entity> factory) {
             ElementLink<EntityElement> link = new ElementLinkImpl<>(EntityElement.class, UUID.randomUUID());
             addInstruction(scene -> {
-                PonderLevel world = scene.getWorld();
+                PonderLevel world = scene.getLevel();
                 Entity entity = factory.apply(world);
                 EntityElement handle = new EntityElementImpl(entity);
                 scene.addElement(handle);
                 scene.linkElement(handle, link);
-                world.spawnEntity(entity);
+                world.addFreshEntity(entity);
             });
             return link;
         }
 
         @Override
-        public ElementLink<EntityElement> createItemEntity(Vec3d location, Vec3d motion, ItemStack stack) {
+        public ElementLink<EntityElement> createItemEntity(Vec3 location, Vec3 motion, ItemStack stack) {
             return createEntity(world -> {
                 ItemEntity itemEntity = new ItemEntity(world, location.x, location.y, location.z, stack);
-                itemEntity.setVelocity(motion);
+                itemEntity.setDeltaMovement(motion);
                 return itemEntity;
             });
         }
 
         @Override
-        public void modifyBlockEntityNBT(Selection selection, Class<? extends BlockEntity> beType, Consumer<NbtCompound> consumer) {
+        public void modifyBlockEntityNBT(Selection selection, Class<? extends BlockEntity> beType, Consumer<CompoundTag> consumer) {
             modifyBlockEntityNBT(selection, beType, consumer, false);
         }
 
         @Override
         public <T extends BlockEntity> void modifyBlockEntity(BlockPos position, Class<T> beType, Consumer<T> consumer) {
             addInstruction(scene -> {
-                BlockEntity blockEntity = scene.getWorld().getBlockEntity(position);
+                BlockEntity blockEntity = scene.getLevel().getBlockEntity(position);
                 if (beType.isInstance(blockEntity))
                     consumer.accept(beType.cast(blockEntity));
             });
@@ -601,7 +605,7 @@ public class PonderSceneBuilder implements SceneBuilder {
         public void modifyBlockEntityNBT(
             Selection selection,
             Class<? extends BlockEntity> teType,
-            Consumer<NbtCompound> consumer,
+            Consumer<CompoundTag> consumer,
             boolean reDrawBlocks
         ) {
             addInstruction(new BlockEntityDataInstruction(

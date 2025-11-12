@@ -5,8 +5,8 @@ import com.zurrtum.create.content.redstone.displayLink.target.DisplayTargetStats
 import com.zurrtum.create.content.redstone.displayLink.target.NixieTubeDisplayTarget;
 import com.zurrtum.create.content.redstone.nixieTube.NixieTubeBlockEntity;
 import com.zurrtum.create.content.trains.display.FlapDisplaySection;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.text.MutableText;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.world.level.block.entity.BlockEntity;
 
 public class NixieTubeDisplaySource extends SingleLineDisplaySource {
 
@@ -16,12 +16,12 @@ public class NixieTubeDisplaySource extends SingleLineDisplaySource {
     }
 
     @Override
-    protected MutableText provideLine(DisplayLinkContext context, DisplayTargetStats stats) {
+    protected MutableComponent provideLine(DisplayLinkContext context, DisplayTargetStats stats) {
         BlockEntity sourceBE = context.getSourceBlockEntity();
         if (!(sourceBE instanceof NixieTubeBlockEntity nbe))
             return EMPTY_LINE;
 
-        MutableText text = nbe.getFullText();
+        MutableComponent text = nbe.getFullText();
 
         try {
             String line = text.getString();

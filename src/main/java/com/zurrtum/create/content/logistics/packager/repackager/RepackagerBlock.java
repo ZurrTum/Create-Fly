@@ -3,14 +3,14 @@ package com.zurrtum.create.content.logistics.packager.repackager;
 import com.zurrtum.create.AllBlockEntityTypes;
 import com.zurrtum.create.content.logistics.packager.PackagerBlock;
 import com.zurrtum.create.content.logistics.packager.PackagerBlockEntity;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.state.StateManager;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
 
 public class RepackagerBlock extends PackagerBlock {
 
-    public RepackagerBlock(Settings properties) {
+    public RepackagerBlock(Properties properties) {
         super(properties);
     }
 
@@ -20,7 +20,7 @@ public class RepackagerBlock extends PackagerBlock {
     }
 
     @Override
-    protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
+    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         builder.add(FACING, POWERED);
     }
 

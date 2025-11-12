@@ -1,14 +1,14 @@
 package com.zurrtum.create.content.trains.schedule.condition;
 
 import com.zurrtum.create.content.trains.entity.Train;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.text.MutableText;
-import net.minecraft.text.Text;
-import net.minecraft.util.Identifier;
-import net.minecraft.world.World;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.Level;
 
 public class PlayerPassengerCondition extends ScheduleWaitCondition {
-    public PlayerPassengerCondition(Identifier id) {
+    public PlayerPassengerCondition(ResourceLocation id) {
         super(id);
     }
 
@@ -21,8 +21,8 @@ public class PlayerPassengerCondition extends ScheduleWaitCondition {
     }
 
     @Override
-    public boolean tickCompletion(World level, Train train, NbtCompound context) {
-        int prev = context.getInt("PrevPlayerCount", 0);
+    public boolean tickCompletion(Level level, Train train, CompoundTag context) {
+        int prev = context.getIntOr("PrevPlayerCount", 0);
         int present = train.countPlayerPassengers();
         int target = getTarget();
         context.putInt("PrevPlayerCount", present);
@@ -32,7 +32,7 @@ public class PlayerPassengerCondition extends ScheduleWaitCondition {
     }
 
     @Override
-    public MutableText getWaitingStatus(World level, Train train, NbtCompound tag) {
-        return Text.translatable("create.schedule.condition.player_count.status", train.countPlayerPassengers(), getTarget());
+    public MutableComponent getWaitingStatus(Level level, Train train, CompoundTag tag) {
+        return Component.translatable("create.schedule.condition.player_count.status", train.countPlayerPassengers(), getTarget());
     }
 }

@@ -2,37 +2,37 @@ package com.zurrtum.create.catnip.codecs.stream;
 
 import com.mojang.datafixers.util.Pair;
 import io.netty.buffer.ByteBuf;
-import net.minecraft.network.PacketByteBuf;
-import net.minecraft.network.codec.PacketCodec;
-import net.minecraft.network.codec.PacketCodecs;
-import net.minecraft.network.encoding.VarInts;
-import net.minecraft.registry.Registry;
-import net.minecraft.registry.RegistryKey;
-import net.minecraft.registry.tag.TagKey;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.collection.DefaultedList;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Array;
 import java.util.List;
 import java.util.Optional;
+import net.minecraft.core.NonNullList;
+import net.minecraft.core.Registry;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.VarInt;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.TagKey;
 
 public interface CatnipStreamCodecBuilders {
-    static <T extends ByteBuf, S extends Enum<S>> PacketCodec<T, S> ofEnum(Class<S> clazz) {
-        return new PacketCodec<>() {
+    static <T extends ByteBuf, S extends Enum<S>> StreamCodec<T, S> ofEnum(Class<S> clazz) {
+        return new StreamCodec<>() {
             public @NotNull S decode(@NotNull T buffer) {
-                return clazz.getEnumConstants()[VarInts.read(buffer)];
+                return clazz.getEnumConstants()[VarInt.read(buffer)];
             }
 
             public void encode(@NotNull T buffer, @NotNull S value) {
-                VarInts.write(buffer, value.ordinal());
+                VarInt.write(buffer, value.ordinal());
             }
         };
     }
 
-    static <B extends ByteBuf, L, R> PacketCodec<B, Pair<L, R>> pair(PacketCodec<B, L> codecL, PacketCodec<B, R> codecR) {
-        return new PacketCodec<>() {
+    static <B extends ByteBuf, L, R> StreamCodec<B, Pair<L, R>> pair(StreamCodec<B, L> codecL, StreamCodec<B, R> codecR) {
+        return new StreamCodec<>() {
             @Override
             public @NotNull Pair<L, R> decode(B buffer) {
                 L l = codecL.decode(buffer);
@@ -48,54 +48,54 @@ public interface CatnipStreamCodecBuilders {
         };
     }
 
-    static <B extends PacketByteBuf, V> PacketCodec.ResultFunction<B, V, Optional<V>> optional() {
-        return PacketCodecs::optional;
+    static <B extends FriendlyByteBuf, V> StreamCodec.CodecOperation<B, V, Optional<V>> optional() {
+        return ByteBufCodecs::optional;
     }
 
-    static <B extends ByteBuf, V> PacketCodec<B, @Nullable V> nullable(PacketCodec<B, V> base) {
-        return new PacketCodec<>() {
+    static <B extends ByteBuf, V> StreamCodec<B, @Nullable V> nullable(StreamCodec<B, V> base) {
+        return new StreamCodec<>() {
             @Override
             public @Nullable V decode(@NotNull B buffer) {
-                return PacketByteBuf.readNullable(buffer, base);
+                return FriendlyByteBuf.readNullable(buffer, base);
             }
 
             @Override
             public void encode(@NotNull B buffer, @Nullable V value) {
-                PacketByteBuf.writeNullable(buffer, value, base);
+                FriendlyByteBuf.writeNullable(buffer, value, base);
             }
         };
     }
 
-    static <B extends PacketByteBuf, V> PacketCodec.ResultFunction<B, V, @Nullable V> nullable() {
+    static <B extends FriendlyByteBuf, V> StreamCodec.CodecOperation<B, V, @Nullable V> nullable() {
         return CatnipStreamCodecBuilders::nullable;
     }
 
-    static <B extends ByteBuf, V> PacketCodec<B, List<V>> list(PacketCodec<B, V> base) {
-        return base.collect(PacketCodecs.toList());
+    static <B extends ByteBuf, V> StreamCodec<B, List<V>> list(StreamCodec<B, V> base) {
+        return base.apply(ByteBufCodecs.list());
     }
 
-    static <B extends PacketByteBuf, V> PacketCodec<B, List<V>> list(PacketCodec<B, V> base, int maxSize) {
-        return base.collect(PacketCodecs.toList(maxSize));
+    static <B extends FriendlyByteBuf, V> StreamCodec<B, List<V>> list(StreamCodec<B, V> base, int maxSize) {
+        return base.apply(ByteBufCodecs.list(maxSize));
     }
 
-    static <B extends PacketByteBuf, V> PacketCodec.ResultFunction<B, V, DefaultedList<V>> nonNullList() {
-        return streamCodec -> PacketCodecs.collection(DefaultedList::ofSize, streamCodec);
+    static <B extends FriendlyByteBuf, V> StreamCodec.CodecOperation<B, V, NonNullList<V>> nonNullList() {
+        return streamCodec -> ByteBufCodecs.collection(NonNullList::createWithCapacity, streamCodec);
     }
 
-    static <B extends PacketByteBuf, V> PacketCodec.ResultFunction<B, V, DefaultedList<V>> nonNullList(int maxSize) {
-        return streamCodec -> PacketCodecs.collection(DefaultedList::ofSize, streamCodec, maxSize);
+    static <B extends FriendlyByteBuf, V> StreamCodec.CodecOperation<B, V, NonNullList<V>> nonNullList(int maxSize) {
+        return streamCodec -> ByteBufCodecs.collection(NonNullList::createWithCapacity, streamCodec, maxSize);
     }
 
-    static <B extends PacketByteBuf, V> PacketCodec<B, DefaultedList<V>> nonNullList(PacketCodec<B, V> base) {
-        return base.collect(nonNullList());
+    static <B extends FriendlyByteBuf, V> StreamCodec<B, NonNullList<V>> nonNullList(StreamCodec<B, V> base) {
+        return base.apply(nonNullList());
     }
 
-    static <B extends PacketByteBuf, V> PacketCodec<B, DefaultedList<V>> nonNullList(PacketCodec<B, V> base, int maxSize) {
-        return base.collect(nonNullList(maxSize));
+    static <B extends FriendlyByteBuf, V> StreamCodec<B, NonNullList<V>> nonNullList(StreamCodec<B, V> base, int maxSize) {
+        return base.apply(nonNullList(maxSize));
     }
 
-    static <B extends PacketByteBuf, V> PacketCodec<B, V[]> array(PacketCodec<? super B, V> base, Class<?> clazz) {
-        return new PacketCodec<>() {
+    static <B extends FriendlyByteBuf, V> StreamCodec<B, V[]> array(StreamCodec<? super B, V> base, Class<?> clazz) {
+        return new StreamCodec<>() {
             @Override
             public V @NotNull [] decode(@NotNull B buffer) {
                 int size = buffer.readVarInt();
@@ -116,11 +116,11 @@ public interface CatnipStreamCodecBuilders {
         };
     }
 
-    static <B extends PacketByteBuf, V> PacketCodec.ResultFunction<B, V, V[]> array(Class<?> clazz) {
+    static <B extends FriendlyByteBuf, V> StreamCodec.CodecOperation<B, V, V[]> array(Class<?> clazz) {
         return streamCodec -> array(streamCodec, clazz);
     }
 
-    static <T> PacketCodec<ByteBuf, TagKey<T>> tagKey(RegistryKey<? extends Registry<T>> registry) {
-        return Identifier.PACKET_CODEC.xmap(id -> TagKey.of(registry, id), TagKey::id);
+    static <T> StreamCodec<ByteBuf, TagKey<T>> tagKey(ResourceKey<? extends Registry<T>> registry) {
+        return ResourceLocation.STREAM_CODEC.map(id -> TagKey.create(registry, id), TagKey::location);
     }
 }

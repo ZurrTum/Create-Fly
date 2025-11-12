@@ -9,71 +9,70 @@ import com.zurrtum.create.content.kinetics.belt.item.BeltConnectorItem;
 import com.zurrtum.create.content.kinetics.belt.transport.BeltInventory;
 import com.zurrtum.create.content.kinetics.belt.transport.TransportedItemStack;
 import com.zurrtum.create.foundation.block.ProperWaterloggedBlock;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.entity.ItemEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.sound.SoundCategory;
-import net.minecraft.sound.SoundEvents;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.DyeColor;
-import net.minecraft.util.Formatting;
-import net.minecraft.util.Hand;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Direction.Axis;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.World;
-import net.minecraft.world.WorldEvents;
-
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
+import net.minecraft.ChatFormatting;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.Direction.Axis;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.DyeColor;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.LevelEvent;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.Vec3;
 
 public class BeltSlicer {
 
     public static class Feedback {
         int color = 0xffffff;
-        Box bb;
+        AABB bb;
         String langKey;
-        Formatting formatting = Formatting.WHITE;
+        ChatFormatting formatting = ChatFormatting.WHITE;
     }
 
-    public static ActionResult useWrench(
+    public static InteractionResult useWrench(
         BlockState state,
-        World world,
+        Level world,
         BlockPos pos,
-        PlayerEntity player,
-        Hand handIn,
+        Player player,
+        InteractionHand handIn,
         BlockHitResult hit,
         Feedback feedBack
     ) {
         BeltBlockEntity controllerBE = BeltHelper.getControllerBE(world, pos);
         if (controllerBE == null)
-            return ActionResult.PASS_TO_DEFAULT_BLOCK_ACTION;
-        if (state.get(BeltBlock.CASING) && hit.getSide() != Direction.UP)
-            return ActionResult.PASS_TO_DEFAULT_BLOCK_ACTION;
-        if (state.get(BeltBlock.PART) == BeltPart.PULLEY && hit.getSide().getAxis() != Axis.Y)
-            return ActionResult.PASS_TO_DEFAULT_BLOCK_ACTION;
+            return InteractionResult.TRY_WITH_EMPTY_HAND;
+        if (state.getValue(BeltBlock.CASING) && hit.getDirection() != Direction.UP)
+            return InteractionResult.TRY_WITH_EMPTY_HAND;
+        if (state.getValue(BeltBlock.PART) == BeltPart.PULLEY && hit.getDirection().getAxis() != Axis.Y)
+            return InteractionResult.TRY_WITH_EMPTY_HAND;
 
         int beltLength = controllerBE.beltLength;
         if (beltLength == 2)
-            return ActionResult.FAIL;
+            return InteractionResult.FAIL;
 
-        BlockPos beltVector = BlockPos.ofFloored(BeltHelper.getBeltVector(state));
-        BeltPart part = state.get(BeltBlock.PART);
-        List<BlockPos> beltChain = BeltBlock.getBeltChain(world, controllerBE.getPos());
+        BlockPos beltVector = BlockPos.containing(BeltHelper.getBeltVector(state));
+        BeltPart part = state.getValue(BeltBlock.PART);
+        List<BlockPos> beltChain = BeltBlock.getBeltChain(world, controllerBE.getBlockPos());
         boolean creative = player.isCreative();
 
         // Shorten from End
         if (hoveringEnd(state, hit)) {
-            if (world.isClient())
-                return ActionResult.SUCCESS;
+            if (world.isClientSide())
+                return InteractionResult.SUCCESS;
 
             for (BlockPos blockPos : beltChain) {
                 BeltBlockEntity belt = BeltHelper.getSegmentBE(world, blockPos);
@@ -85,20 +84,20 @@ public class BeltSlicer {
             }
 
             BeltInventory inventory = controllerBE.inventory;
-            BlockPos next = part == BeltPart.END ? pos.subtract(beltVector) : pos.add(beltVector);
+            BlockPos next = part == BeltPart.END ? pos.subtract(beltVector) : pos.offset(beltVector);
             BlockState replacedState = world.getBlockState(next);
             BeltBlockEntity segmentBE = BeltHelper.getSegmentBE(world, next);
             KineticBlockEntity.switchToBlockState(
                 world,
                 next,
-                ProperWaterloggedBlock.withWater(world, state.with(BeltBlock.CASING, segmentBE != null && segmentBE.casing != CasingType.NONE), next)
+                ProperWaterloggedBlock.withWater(world, state.setValue(BeltBlock.CASING, segmentBE != null && segmentBE.casing != CasingType.NONE), next)
             );
-            world.setBlockState(pos, ProperWaterloggedBlock.withWater(world, Blocks.AIR.getDefaultState(), pos), Block.NOTIFY_ALL | Block.MOVED);
+            world.setBlock(pos, ProperWaterloggedBlock.withWater(world, Blocks.AIR.defaultBlockState(), pos), Block.UPDATE_ALL | Block.UPDATE_MOVE_BY_PISTON);
             world.removeBlockEntity(pos);
-            world.syncWorldEvent(WorldEvents.BLOCK_BROKEN, pos, Block.getRawIdFromState(state));
+            world.levelEvent(LevelEvent.PARTICLES_DESTROY_BLOCK, pos, Block.getId(state));
 
-            if (!creative && replacedState.isOf(AllBlocks.BELT) && replacedState.get(BeltBlock.PART) == BeltPart.PULLEY)
-                player.getInventory().offerOrDrop(AllItems.SHAFT.getDefaultStack());
+            if (!creative && replacedState.is(AllBlocks.BELT) && replacedState.getValue(BeltBlock.PART) == BeltPart.PULLEY)
+                player.getInventory().placeItemBackInInventory(AllItems.SHAFT.getDefaultInstance());
 
             // Eject overshooting items
             if (part == BeltPart.END && inventory != null) {
@@ -125,33 +124,33 @@ public class BeltSlicer {
                             pos.getZ() + .5f,
                             transportedItemStack.stack
                         );
-                        entity.setVelocity(Vec3d.ZERO);
-                        entity.setToDefaultPickupDelay();
-                        entity.velocityModified = true;
-                        world.spawnEntity(entity);
+                        entity.setDeltaMovement(Vec3.ZERO);
+                        entity.setDefaultPickUpDelay();
+                        entity.hurtMarked = true;
+                        world.addFreshEntity(entity);
                     } else
                         segmentBE.getInventory().addItem(transportedItemStack);
                 }
             }
 
-            return ActionResult.SUCCESS;
+            return InteractionResult.SUCCESS;
         }
 
         BeltBlockEntity segmentBE = BeltHelper.getSegmentBE(world, pos);
         if (segmentBE == null)
-            return ActionResult.PASS_TO_DEFAULT_BLOCK_ACTION;
+            return InteractionResult.TRY_WITH_EMPTY_HAND;
 
         // Split in half
         int hitSegment = segmentBE.index;
-        Vec3d centerOf = VecHelper.getCenterOf(hit.getBlockPos());
-        Vec3d subtract = hit.getPos().subtract(centerOf);
-        boolean towardPositive = subtract.dotProduct(Vec3d.of(beltVector)) > 0;
-        BlockPos next = !towardPositive ? pos.subtract(beltVector) : pos.add(beltVector);
+        Vec3 centerOf = VecHelper.getCenterOf(hit.getBlockPos());
+        Vec3 subtract = hit.getLocation().subtract(centerOf);
+        boolean towardPositive = subtract.dot(Vec3.atLowerCornerOf(beltVector)) > 0;
+        BlockPos next = !towardPositive ? pos.subtract(beltVector) : pos.offset(beltVector);
 
         if (hitSegment == 0 || hitSegment == 1 && !towardPositive)
-            return ActionResult.FAIL;
+            return InteractionResult.FAIL;
         if (hitSegment == controllerBE.beltLength - 1 || hitSegment == controllerBE.beltLength - 2 && towardPositive)
-            return ActionResult.FAIL;
+            return InteractionResult.FAIL;
 
         // Look for shafts
         if (!creative) {
@@ -159,50 +158,50 @@ public class BeltSlicer {
             if (!segmentBE.hasPulley())
                 requiredShafts++;
             BlockState other = world.getBlockState(next);
-            if (other.isOf(AllBlocks.BELT) && other.get(BeltBlock.PART) == BeltPart.MIDDLE)
+            if (other.is(AllBlocks.BELT) && other.getValue(BeltBlock.PART) == BeltPart.MIDDLE)
                 requiredShafts++;
 
             int amountRetrieved = 0;
             boolean beltFound = false;
             Search:
             while (true) {
-                for (int i = 0; i < player.getInventory().size(); ++i) {
+                for (int i = 0; i < player.getInventory().getContainerSize(); ++i) {
                     if (amountRetrieved == requiredShafts && beltFound)
                         break Search;
 
-                    ItemStack itemstack = player.getInventory().getStack(i);
+                    ItemStack itemstack = player.getInventory().getItem(i);
                     if (itemstack.isEmpty())
                         continue;
                     int count = itemstack.getCount();
 
-                    if (itemstack.isOf(AllItems.BELT_CONNECTOR) && !beltFound) {
-                        if (!world.isClient())
-                            itemstack.decrement(1);
+                    if (itemstack.is(AllItems.BELT_CONNECTOR) && !beltFound) {
+                        if (!world.isClientSide())
+                            itemstack.shrink(1);
                         beltFound = true;
                         continue;
                     }
 
-                    if (itemstack.isOf(AllItems.SHAFT)) {
+                    if (itemstack.is(AllItems.SHAFT)) {
                         int taken = Math.min(count, requiredShafts - amountRetrieved);
-                        if (!world.isClient())
+                        if (!world.isClientSide())
                             if (taken == count)
-                                player.getInventory().setStack(i, ItemStack.EMPTY);
+                                player.getInventory().setItem(i, ItemStack.EMPTY);
                             else
-                                itemstack.decrement(taken);
+                                itemstack.shrink(taken);
                         amountRetrieved += taken;
                     }
                 }
 
-                if (!world.isClient()) {
-                    player.getInventory().offerOrDrop(new ItemStack(AllItems.SHAFT, amountRetrieved));
+                if (!world.isClientSide()) {
+                    player.getInventory().placeItemBackInInventory(new ItemStack(AllItems.SHAFT, amountRetrieved));
                     if (beltFound)
-                        player.getInventory().offerOrDrop(AllItems.BELT_CONNECTOR.getDefaultStack());
+                        player.getInventory().placeItemBackInInventory(AllItems.BELT_CONNECTOR.getDefaultInstance());
                 }
-                return ActionResult.FAIL;
+                return InteractionResult.FAIL;
             }
         }
 
-        if (!world.isClient()) {
+        if (!world.isClientSide()) {
             for (BlockPos blockPos : beltChain) {
                 BeltBlockEntity belt = BeltHelper.getSegmentBE(world, blockPos);
                 if (belt == null)
@@ -213,19 +212,19 @@ public class BeltSlicer {
             }
 
             BeltInventory inventory = controllerBE.inventory;
-            KineticBlockEntity.switchToBlockState(world, pos, state.with(BeltBlock.PART, towardPositive ? BeltPart.END : BeltPart.START));
+            KineticBlockEntity.switchToBlockState(world, pos, state.setValue(BeltBlock.PART, towardPositive ? BeltPart.END : BeltPart.START));
             KineticBlockEntity.switchToBlockState(
                 world,
                 next,
-                world.getBlockState(next).with(BeltBlock.PART, towardPositive ? BeltPart.START : BeltPart.END)
+                world.getBlockState(next).setValue(BeltBlock.PART, towardPositive ? BeltPart.START : BeltPart.END)
             );
-            world.playSound(null, pos, SoundEvents.BLOCK_WOOL_HIT, SoundCategory.PLAYERS, 0.5F, 2.3F);
+            world.playSound(null, pos, SoundEvents.WOOL_HIT, SoundSource.PLAYERS, 0.5F, 2.3F);
 
             // Transfer items to new controller
             BeltBlockEntity newController = towardPositive ? BeltHelper.getSegmentBE(world, next) : segmentBE;
             if (newController != null && inventory != null) {
                 newController.inventory = null;
-                newController.setController(newController.getPos());
+                newController.setController(newController.getBlockPos());
                 for (Iterator<TransportedItemStack> iterator = inventory.getTransportedItems().iterator(); iterator.hasNext(); ) {
                     TransportedItemStack transportedItemStack = iterator.next();
                     float newPosition = transportedItemStack.beltPosition - hitSegment - (towardPositive ? 1 : 0);
@@ -238,59 +237,59 @@ public class BeltSlicer {
             }
         }
 
-        return ActionResult.SUCCESS;
+        return InteractionResult.SUCCESS;
     }
 
-    public static ActionResult useConnector(
+    public static InteractionResult useConnector(
         BlockState state,
-        World world,
+        Level world,
         BlockPos pos,
-        PlayerEntity player,
-        Hand handIn,
+        Player player,
+        InteractionHand handIn,
         BlockHitResult hit,
         Feedback feedBack
     ) {
         BeltBlockEntity controllerBE = BeltHelper.getControllerBE(world, pos);
         if (controllerBE == null)
-            return ActionResult.PASS_TO_DEFAULT_BLOCK_ACTION;
+            return InteractionResult.TRY_WITH_EMPTY_HAND;
 
         int beltLength = controllerBE.beltLength;
         if (beltLength == BeltConnectorItem.maxLength())
-            return ActionResult.FAIL;
+            return InteractionResult.FAIL;
 
-        BlockPos beltVector = BlockPos.ofFloored(BeltHelper.getBeltVector(state));
-        BeltPart part = state.get(BeltBlock.PART);
-        Direction facing = state.get(BeltBlock.HORIZONTAL_FACING);
-        List<BlockPos> beltChain = BeltBlock.getBeltChain(world, controllerBE.getPos());
+        BlockPos beltVector = BlockPos.containing(BeltHelper.getBeltVector(state));
+        BeltPart part = state.getValue(BeltBlock.PART);
+        Direction facing = state.getValue(BeltBlock.HORIZONTAL_FACING);
+        List<BlockPos> beltChain = BeltBlock.getBeltChain(world, controllerBE.getBlockPos());
         boolean creative = player.isCreative();
 
         if (!hoveringEnd(state, hit))
-            return ActionResult.PASS_TO_DEFAULT_BLOCK_ACTION;
+            return InteractionResult.TRY_WITH_EMPTY_HAND;
 
-        BlockPos next = part == BeltPart.START ? pos.subtract(beltVector) : pos.add(beltVector);
+        BlockPos next = part == BeltPart.START ? pos.subtract(beltVector) : pos.offset(beltVector);
         BeltBlockEntity mergedController = null;
         int mergedBeltLength = 0;
 
         // Merge Belts / Extend at End
         BlockState nextState = world.getBlockState(next);
-        if (!nextState.isReplaceable()) {
-            if (!nextState.isOf(AllBlocks.BELT))
-                return ActionResult.FAIL;
+        if (!nextState.canBeReplaced()) {
+            if (!nextState.is(AllBlocks.BELT))
+                return InteractionResult.FAIL;
             if (!beltStatesCompatible(state, nextState))
-                return ActionResult.FAIL;
+                return InteractionResult.FAIL;
 
             mergedController = BeltHelper.getControllerBE(world, next);
             if (mergedController == null)
-                return ActionResult.FAIL;
+                return InteractionResult.FAIL;
             if (mergedController.beltLength + beltLength > BeltConnectorItem.maxLength())
-                return ActionResult.FAIL;
+                return InteractionResult.FAIL;
 
             mergedBeltLength = mergedController.beltLength;
 
-            if (!world.isClient()) {
-                boolean flipBelt = facing != nextState.get(BeltBlock.HORIZONTAL_FACING);
+            if (!world.isClientSide()) {
+                boolean flipBelt = facing != nextState.getValue(BeltBlock.HORIZONTAL_FACING);
                 Optional<DyeColor> color = controllerBE.color;
-                for (BlockPos blockPos : BeltBlock.getBeltChain(world, mergedController.getPos())) {
+                for (BlockPos blockPos : BeltBlock.getBeltChain(world, mergedController.getBlockPos())) {
                     BeltBlockEntity belt = BeltHelper.getSegmentBE(world, blockPos);
                     if (belt == null)
                         continue;
@@ -299,7 +298,7 @@ public class BeltSlicer {
                     belt.beltLength = 0;
                     belt.color = color;
                     if (flipBelt)
-                        world.setBlockState(blockPos, flipBelt(world.getBlockState(blockPos)), Block.NOTIFY_ALL | Block.MOVED);
+                        world.setBlock(blockPos, flipBelt(world.getBlockState(blockPos)), Block.UPDATE_ALL | Block.UPDATE_MOVE_BY_PISTON);
                 }
 
                 // Reverse items
@@ -311,11 +310,11 @@ public class BeltSlicer {
                     }
                 }
 
-                beltChain = BeltBlock.getBeltChain(world, mergedController.getPos());
+                beltChain = BeltBlock.getBeltChain(world, mergedController.getBlockPos());
             }
         }
 
-        if (!world.isClient()) {
+        if (!world.isClientSide()) {
             for (BlockPos blockPos : beltChain) {
                 BeltBlockEntity belt = BeltHelper.getSegmentBE(world, blockPos);
                 if (belt == null)
@@ -326,19 +325,19 @@ public class BeltSlicer {
             }
 
             BeltInventory inventory = controllerBE.inventory;
-            KineticBlockEntity.switchToBlockState(world, pos, state.with(BeltBlock.PART, BeltPart.MIDDLE));
+            KineticBlockEntity.switchToBlockState(world, pos, state.setValue(BeltBlock.PART, BeltPart.MIDDLE));
 
             if (mergedController == null) {
                 // Attach at end
-                world.setBlockState(
+                world.setBlock(
                     next,
-                    ProperWaterloggedBlock.withWater(world, state.with(BeltBlock.CASING, false), next),
-                    Block.NOTIFY_ALL | Block.MOVED
+                    ProperWaterloggedBlock.withWater(world, state.setValue(BeltBlock.CASING, false), next),
+                    Block.UPDATE_ALL | Block.UPDATE_MOVE_BY_PISTON
                 );
                 BeltBlockEntity segmentBE = BeltHelper.getSegmentBE(world, next);
                 if (segmentBE != null)
                     segmentBE.color = controllerBE.color;
-                world.playSound(null, pos, SoundEvents.BLOCK_WOOL_PLACE, SoundCategory.PLAYERS, 0.5F, 1F);
+                world.playSound(null, pos, SoundEvents.WOOL_PLACE, SoundSource.PLAYERS, 0.5F, 1F);
 
                 // Transfer items to new controller
                 if (part == BeltPart.START && segmentBE != null && inventory != null) {
@@ -352,20 +351,20 @@ public class BeltSlicer {
             } else {
                 // Merge with other
                 BeltInventory mergedInventory = mergedController.inventory;
-                world.playSound(null, pos, SoundEvents.BLOCK_WOOL_HIT, SoundCategory.PLAYERS, 0.5F, 1.3F);
+                world.playSound(null, pos, SoundEvents.WOOL_HIT, SoundSource.PLAYERS, 0.5F, 1.3F);
                 BeltBlockEntity segmentBE = BeltHelper.getSegmentBE(world, next);
                 KineticBlockEntity.switchToBlockState(
                     world,
                     next,
-                    state.with(BeltBlock.CASING, segmentBE != null && segmentBE.casing != CasingType.NONE).with(BeltBlock.PART, BeltPart.MIDDLE)
+                    state.setValue(BeltBlock.CASING, segmentBE != null && segmentBE.casing != CasingType.NONE).setValue(BeltBlock.PART, BeltPart.MIDDLE)
                 );
 
                 if (!creative) {
-                    player.getInventory().offerOrDrop(new ItemStack(AllBlocks.SHAFT, 2));
-                    player.getInventory().offerOrDrop(AllItems.BELT_CONNECTOR.getDefaultStack());
+                    player.getInventory().placeItemBackInInventory(new ItemStack(AllBlocks.SHAFT, 2));
+                    player.getInventory().placeItemBackInInventory(AllItems.BELT_CONNECTOR.getDefaultInstance());
                 }
 
-                for (BlockPos blockPos : BeltBlock.getBeltChain(world, controllerBE.getPos())) {
+                for (BlockPos blockPos : BeltBlock.getBeltChain(world, controllerBE.getBlockPos())) {
                     BeltBlockEntity belt = BeltHelper.getSegmentBE(world, blockPos);
                     if (belt == null)
                         continue;
@@ -373,12 +372,12 @@ public class BeltSlicer {
                 }
 
                 // Transfer items to other controller
-                BlockPos search = controllerBE.getPos();
+                BlockPos search = controllerBE.getBlockPos();
                 for (int i = 0; i < 10000; i++) {
                     BlockState blockState = world.getBlockState(search);
-                    if (!blockState.isOf(AllBlocks.BELT))
+                    if (!blockState.is(AllBlocks.BELT))
                         break;
-                    if (blockState.get(BeltBlock.PART) != BeltPart.START) {
+                    if (blockState.getValue(BeltBlock.PART) != BeltPart.START) {
                         search = search.subtract(beltVector);
                         continue;
                     }
@@ -408,14 +407,14 @@ public class BeltSlicer {
                 }
             }
         }
-        return ActionResult.SUCCESS;
+        return InteractionResult.SUCCESS;
     }
 
     static boolean beltStatesCompatible(BlockState state, BlockState nextState) {
-        Direction facing1 = state.get(BeltBlock.HORIZONTAL_FACING);
-        BeltSlope slope1 = state.get(BeltBlock.SLOPE);
-        Direction facing2 = nextState.get(BeltBlock.HORIZONTAL_FACING);
-        BeltSlope slope2 = nextState.get(BeltBlock.SLOPE);
+        Direction facing1 = state.getValue(BeltBlock.HORIZONTAL_FACING);
+        BeltSlope slope1 = state.getValue(BeltBlock.SLOPE);
+        Direction facing2 = nextState.getValue(BeltBlock.HORIZONTAL_FACING);
+        BeltSlope slope2 = nextState.getValue(BeltBlock.SLOPE);
 
         switch (slope1) {
             case UPWARD:
@@ -432,32 +431,32 @@ public class BeltSlicer {
     }
 
     static BlockState flipBelt(BlockState state) {
-        Direction facing = state.get(BeltBlock.HORIZONTAL_FACING);
-        BeltSlope slope = state.get(BeltBlock.SLOPE);
-        BeltPart part = state.get(BeltBlock.PART);
+        Direction facing = state.getValue(BeltBlock.HORIZONTAL_FACING);
+        BeltSlope slope = state.getValue(BeltBlock.SLOPE);
+        BeltPart part = state.getValue(BeltBlock.PART);
 
         if (slope == BeltSlope.UPWARD)
-            state = state.with(BeltBlock.SLOPE, BeltSlope.DOWNWARD);
+            state = state.setValue(BeltBlock.SLOPE, BeltSlope.DOWNWARD);
         else if (slope == BeltSlope.DOWNWARD)
-            state = state.with(BeltBlock.SLOPE, BeltSlope.UPWARD);
+            state = state.setValue(BeltBlock.SLOPE, BeltSlope.UPWARD);
 
         if (part == BeltPart.END)
-            state = state.with(BeltBlock.PART, BeltPart.START);
+            state = state.setValue(BeltBlock.PART, BeltPart.START);
         else if (part == BeltPart.START)
-            state = state.with(BeltBlock.PART, BeltPart.END);
+            state = state.setValue(BeltBlock.PART, BeltPart.END);
 
-        return state.with(BeltBlock.HORIZONTAL_FACING, facing.getOpposite());
+        return state.setValue(BeltBlock.HORIZONTAL_FACING, facing.getOpposite());
     }
 
     static boolean hoveringEnd(BlockState state, BlockHitResult hit) {
-        BeltPart part = state.get(BeltBlock.PART);
+        BeltPart part = state.getValue(BeltBlock.PART);
         if (part == BeltPart.MIDDLE || part == BeltPart.PULLEY)
             return false;
 
-        Vec3d beltVector = BeltHelper.getBeltVector(state);
-        Vec3d centerOf = VecHelper.getCenterOf(hit.getBlockPos());
-        Vec3d subtract = hit.getPos().subtract(centerOf);
+        Vec3 beltVector = BeltHelper.getBeltVector(state);
+        Vec3 centerOf = VecHelper.getCenterOf(hit.getBlockPos());
+        Vec3 subtract = hit.getLocation().subtract(centerOf);
 
-        return subtract.dotProduct(beltVector) > 0 == (part == BeltPart.END);
+        return subtract.dot(beltVector) > 0 == (part == BeltPart.END);
     }
 }

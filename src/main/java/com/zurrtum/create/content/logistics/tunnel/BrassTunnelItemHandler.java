@@ -1,8 +1,8 @@
 package com.zurrtum.create.content.logistics.tunnel;
 
 import com.zurrtum.create.infrastructure.items.ItemInventory;
-import net.minecraft.inventory.Inventory;
-import net.minecraft.item.ItemStack;
+import net.minecraft.world.Container;
+import net.minecraft.world.item.ItemStack;
 
 public class BrassTunnelItemHandler implements ItemInventory {
     private final BrassTunnelBlockEntity blockEntity;
@@ -12,56 +12,56 @@ public class BrassTunnelItemHandler implements ItemInventory {
     }
 
     @Override
-    public boolean isValid(int slot, ItemStack stack) {
+    public boolean canPlaceItem(int slot, ItemStack stack) {
         if (blockEntity.hasDistributionBehaviour()) {
             return blockEntity.canTakeItems();
         }
-        Inventory inventory = blockEntity.getBeltCapability();
+        Container inventory = blockEntity.getBeltCapability();
         if (inventory == null) {
             return false;
         }
-        return inventory.isValid(slot, stack);
+        return inventory.canPlaceItem(slot, stack);
     }
 
     @Override
-    public int size() {
+    public int getContainerSize() {
         return 1;
     }
 
     @Override
-    public int getMaxCount(ItemStack stack) {
-        return blockEntity.stackToDistribute.isEmpty() ? 64 : blockEntity.stackToDistribute.getMaxCount();
+    public int getMaxStackSize(ItemStack stack) {
+        return blockEntity.stackToDistribute.isEmpty() ? 64 : blockEntity.stackToDistribute.getMaxStackSize();
     }
 
     @Override
-    public ItemStack getStack(int slot) {
+    public ItemStack getItem(int slot) {
         if (slot != 0) {
             return ItemStack.EMPTY;
         }
         if (blockEntity.hasDistributionBehaviour()) {
             return blockEntity.stackToDistribute;
         } else {
-            Inventory inventory = blockEntity.getBeltCapability();
+            Container inventory = blockEntity.getBeltCapability();
             if (inventory == null) {
                 return ItemStack.EMPTY;
             }
-            return inventory.getStack(0);
+            return inventory.getItem(0);
         }
     }
 
     @Override
-    public void setStack(int slot, ItemStack stack) {
+    public void setItem(int slot, ItemStack stack) {
         if (slot != 0) {
             return;
         }
         if (blockEntity.hasDistributionBehaviour()) {
             blockEntity.setStackToDistribute(stack, null);
         } else {
-            Inventory inventory = blockEntity.getBeltCapability();
+            Container inventory = blockEntity.getBeltCapability();
             if (inventory == null) {
                 return;
             }
-            inventory.setStack(0, stack);
+            inventory.setItem(0, stack);
         }
     }
 }

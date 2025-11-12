@@ -8,31 +8,31 @@ import com.zurrtum.create.client.foundation.gui.widget.Label;
 import com.zurrtum.create.client.foundation.gui.widget.ScrollInput;
 import com.zurrtum.create.client.foundation.utility.CreateLang;
 import com.zurrtum.create.content.trains.schedule.condition.TimeOfDayCondition;
-import net.minecraft.client.gl.RenderPipelines;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.math.MathHelper;
+import net.minecraft.ChatFormatting;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.renderer.RenderPipelines;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.Mth;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import org.apache.commons.lang3.mutable.MutableObject;
 
 import java.util.List;
 
 public class TimeOfDayConditionRender implements IScheduleInput<TimeOfDayCondition> {
     @Override
-    public Pair<ItemStack, Text> getSummary(TimeOfDayCondition input) {
+    public Pair<ItemStack, Component> getSummary(TimeOfDayCondition input) {
         return Pair.of(new ItemStack(Items.STRUCTURE_VOID), input.getDigitalDisplay(input.intData("Hour"), input.intData("Minute"), false));
     }
 
     @Override
-    public List<Text> getTitleAs(TimeOfDayCondition input, String type) {
+    public List<Component> getTitleAs(TimeOfDayCondition input, String type) {
         return ImmutableList.of(
             CreateLang.translateDirect("schedule.condition.time_of_day.scheduled"),
-            input.getDigitalDisplay(input.intData("Hour"), input.intData("Minute"), false).formatted(Formatting.DARK_AQUA)
-                .append(Text.literal(" -> ").formatted(Formatting.DARK_GRAY)).append(CreateLang.translatedOptions(
+            input.getDigitalDisplay(input.intData("Hour"), input.intData("Minute"), false).withStyle(ChatFormatting.DARK_AQUA)
+                .append(Component.literal(" -> ").withStyle(ChatFormatting.DARK_GRAY)).append(CreateLang.translatedOptions(
                     "schedule.condition.time_of_day.rotation",
                     "every_24",
                     "every_12",
@@ -44,7 +44,7 @@ public class TimeOfDayConditionRender implements IScheduleInput<TimeOfDayConditi
                     "every_0_45",
                     "every_0_30",
                     "every_0_15"
-                ).get(input.intData("Rotation")).copy().formatted(Formatting.GRAY))
+                ).get(input.intData("Rotation")).copy().withStyle(ChatFormatting.GRAY))
         );
     }
 
@@ -52,15 +52,15 @@ public class TimeOfDayConditionRender implements IScheduleInput<TimeOfDayConditi
         return t < 10 ? "0" + t : "" + t;
     }
 
-    private Identifier getClockTextureId(TimeOfDayCondition input) {
+    private ResourceLocation getClockTextureId(TimeOfDayCondition input) {
         int displayHr = (input.intData("Hour") + 12) % 24;
         float progress = (displayHr * 60f + input.intData("Minute")) / (24 * 60);
-        return Identifier.ofVanilla("textures/item/clock_" + twoDigits(MathHelper.clamp((int) (progress * 64), 0, 63)) + ".png");
+        return ResourceLocation.withDefaultNamespace("textures/item/clock_" + twoDigits(Mth.clamp((int) (progress * 64), 0, 63)) + ".png");
     }
 
     @Override
-    public boolean renderSpecialIcon(TimeOfDayCondition input, DrawContext graphics, int x, int y) {
-        graphics.drawTexture(RenderPipelines.GUI_TEXTURED, getClockTextureId(input), x, y, 0, 0, 16, 16, 16, 16);
+    public boolean renderSpecialIcon(TimeOfDayCondition input, GuiGraphics graphics, int x, int y) {
+        graphics.blit(RenderPipelines.GUI_TEXTURED, getClockTextureId(input), x, y, 0, 0, 16, 16, 16, 16);
         return true;
     }
 
@@ -104,7 +104,7 @@ public class TimeOfDayConditionRender implements IScheduleInput<TimeOfDayConditi
             }, "Rotation"
         );
 
-        NbtCompound data = input.getData();
+        CompoundTag data = input.getData();
         hourInput.getValue().titled(CreateLang.translateDirect("generic.daytime.hour")).calling(t -> {
             data.putInt("Hour", t);
             timeLabel.getValue().text = input.getDigitalDisplay(t, minuteInput.getValue().getState(), true);

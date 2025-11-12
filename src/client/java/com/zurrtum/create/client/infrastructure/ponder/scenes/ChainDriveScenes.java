@@ -12,11 +12,11 @@ import com.zurrtum.create.client.ponder.api.scene.SceneBuildingUtil;
 import com.zurrtum.create.client.ponder.api.scene.Selection;
 import com.zurrtum.create.content.kinetics.chainDrive.ChainDriveBlock;
 import com.zurrtum.create.content.redstone.analogLever.AnalogLeverBlockEntity;
-import net.minecraft.block.RedstoneWireBlock;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Direction.Axis;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.Direction.Axis;
+import net.minecraft.world.level.block.RedStoneWireBlock;
+import net.minecraft.world.phys.AABB;
 
 public class ChainDriveScenes {
 
@@ -56,7 +56,7 @@ public class ChainDriveScenes {
 
         Selection shafts = util.select().fromTo(2, 1, 0, 2, 1, 1);
         BlockPos rotatedECD = util.grid().at(3, 1, 0);
-        Selection verticalShaft = util.select().fromTo(rotatedECD.up(), rotatedECD.up(2));
+        Selection verticalShaft = util.select().fromTo(rotatedECD.above(), rotatedECD.above(2));
 
         scene.world().showSection(shafts, Direction.EAST);
         scene.idle(10);
@@ -70,9 +70,9 @@ public class ChainDriveScenes {
         scene.idle(25);
 
         scene.addKeyframe();
-        scene.overlay().showControls(util.vector().topOf(rotatedECD), Pointing.DOWN, 30).rightClick().withItem(AllItems.WRENCH.getDefaultStack());
+        scene.overlay().showControls(util.vector().topOf(rotatedECD), Pointing.DOWN, 30).rightClick().withItem(AllItems.WRENCH.getDefaultInstance());
         scene.idle(7);
-        scene.world().modifyBlock(rotatedECD, s -> s.with(ChainDriveBlock.AXIS, Axis.Y), true);
+        scene.world().modifyBlock(rotatedECD, s -> s.setValue(ChainDriveBlock.AXIS, Axis.Y), true);
         scene.idle(40);
 
         scene.world().showSection(verticalShaft, Direction.DOWN);
@@ -96,25 +96,25 @@ public class ChainDriveScenes {
         BlockPos leverPos = util.grid().at(3, 1, 0);
         BlockPos eastDrive = util.grid().at(3, 1, 2);
 
-        BlockPos eastGauge = eastDrive.up(3);
-        BlockPos middleGauge = eastGauge.west().down();
-        BlockPos westGauge = eastGauge.west(2).down(2);
+        BlockPos eastGauge = eastDrive.above(3);
+        BlockPos middleGauge = eastGauge.west().below();
+        BlockPos westGauge = eastGauge.west(2).below(2);
 
         ElementLink<WorldSectionElement> lever = scene.world().showIndependentSection(util.select().fromTo(leverPos, leverPos.south()), Direction.UP);
 
         scene.idle(5);
         scene.world().showSection(util.select().fromTo(4, 1, 3, 4, 2, 3), Direction.DOWN);
         scene.idle(10);
-        scene.world().showSection(util.select().fromTo(eastDrive, eastDrive.west(2)).add(util.select().position(eastDrive.up())), Direction.DOWN);
+        scene.world().showSection(util.select().fromTo(eastDrive, eastDrive.west(2)).add(util.select().position(eastDrive.above())), Direction.DOWN);
         scene.idle(10);
 
         scene.overlay().showText(60).text("Unpowered Chain Gearshifts behave exactly like Chain Drives").attachKeyFrame().placeNearTarget()
             .pointAt(util.vector().blockSurface(eastDrive, Direction.NORTH));
         scene.idle(60);
 
-        scene.world().showSection(util.select().fromTo(eastGauge, eastGauge.down()), Direction.DOWN);
+        scene.world().showSection(util.select().fromTo(eastGauge, eastGauge.below()), Direction.DOWN);
         scene.idle(5);
-        scene.world().showSection(util.select().fromTo(middleGauge, middleGauge.down()), Direction.DOWN);
+        scene.world().showSection(util.select().fromTo(middleGauge, middleGauge.below()), Direction.DOWN);
         scene.idle(5);
         scene.world().showSection(util.select().position(westGauge), Direction.DOWN);
         scene.idle(5);
@@ -129,13 +129,13 @@ public class ChainDriveScenes {
 
         scene.world().toggleRedstonePower(util.select().fromTo(leverPos, leverPos.south(2)));
         scene.effects().indicateRedstone(leverPos);
-        scene.world().modifyKineticSpeed(util.select().fromTo(westGauge.down(), middleGauge), f -> 2 * f);
+        scene.world().modifyKineticSpeed(util.select().fromTo(westGauge.below(), middleGauge), f -> 2 * f);
 
         scene.idle(10);
 
-        Box bb = new Box(eastDrive);
+        AABB bb = new AABB(eastDrive);
         scene.overlay().chaseBoundingBoxOutline(PonderPalette.MEDIUM, eastDrive, bb, 160);
-        scene.overlay().chaseBoundingBoxOutline(PonderPalette.FAST, eastDrive.west(), bb.offset(-2, 0, 0).stretch(15 / 16f, 0, 0), 160);
+        scene.overlay().chaseBoundingBoxOutline(PonderPalette.FAST, eastDrive.west(), bb.move(-2, 0, 0).expandTowards(15 / 16f, 0, 0), 160);
         scene.idle(20);
 
         scene.overlay().showText(80).text("When Powered, the speed transmitted to other Chain Drives in the row is doubled").attachKeyFrame()
@@ -156,7 +156,7 @@ public class ChainDriveScenes {
         scene.world().toggleRedstonePower(util.select().fromTo(leverPos, leverPos.south(2)));
         Selection newDriveSelect = util.select().fromTo(eastDrive.south(2), eastDrive.south(2).west(2));
         ElementLink<WorldSectionElement> drives = scene.world().showIndependentSection(newDriveSelect, Direction.NORTH);
-        scene.world().modifyKineticSpeed(util.select().fromTo(westGauge.down(), middleGauge), f -> .5f * f);
+        scene.world().modifyKineticSpeed(util.select().fromTo(westGauge.below(), middleGauge), f -> .5f * f);
         scene.world().setKineticSpeed(newDriveSelect, -32);
         scene.world().moveSection(drives, util.vector().of(0, 0, -2), 0);
         scene.world().moveSection(lever, util.vector().of(-2, 0, 0), 10);
@@ -171,9 +171,9 @@ public class ChainDriveScenes {
 
         scene.idle(10);
 
-        bb = new Box(eastDrive);
-        scene.overlay().chaseBoundingBoxOutline(PonderPalette.MEDIUM, eastDrive, bb.stretch(-15 / 16f, 0, 0), 160);
-        scene.overlay().chaseBoundingBoxOutline(PonderPalette.SLOW, eastDrive.west(), bb.offset(-2, 0, 0), 160);
+        bb = new AABB(eastDrive);
+        scene.overlay().chaseBoundingBoxOutline(PonderPalette.MEDIUM, eastDrive, bb.expandTowards(-15 / 16f, 0, 0), 160);
+        scene.overlay().chaseBoundingBoxOutline(PonderPalette.SLOW, eastDrive.west(), bb.move(-2, 0, 0), 160);
         scene.idle(20);
 
         scene.overlay().showText(80).text("Whenever the Powered Gearshift is not at the source, its speed will be halved instead").attachKeyFrame()
@@ -203,7 +203,7 @@ public class ChainDriveScenes {
 
         scene.idle(15);
         scene.world().modifyBlockEntityNBT(util.select().position(analogPos), AnalogLeverBlockEntity.class, nbt -> nbt.putInt("State", 8));
-        scene.world().modifyBlock(analogPos.south(), s -> s.with(RedstoneWireBlock.POWER, 8), false);
+        scene.world().modifyBlock(analogPos.south(), s -> s.setValue(RedStoneWireBlock.POWER, 8), false);
         scene.world().toggleRedstonePower(util.select().position(1, 1, 4));
         scene.world().modifyKineticSpeed(util.select().position(westGauge), f -> .75f * f);
         scene.effects().indicateRedstone(analogPos);

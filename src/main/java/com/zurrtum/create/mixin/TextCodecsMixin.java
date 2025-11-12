@@ -2,18 +2,18 @@ package com.zurrtum.create.mixin;
 
 import com.mojang.serialization.MapCodec;
 import com.zurrtum.create.foundation.recipe.IngredientTextContent;
-import net.minecraft.text.TextCodecs;
-import net.minecraft.text.TextContent;
-import net.minecraft.util.dynamic.Codecs;
+import net.minecraft.network.chat.ComponentContents;
+import net.minecraft.network.chat.ComponentSerialization;
+import net.minecraft.util.ExtraCodecs;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-@Mixin(TextCodecs.class)
+@Mixin(ComponentSerialization.class)
 public class TextCodecsMixin {
-    @Inject(method = "registerTypes(Lnet/minecraft/util/dynamic/Codecs$IdMapper;)V", at = @At("TAIL"))
-    private static void registerTypes(Codecs.IdMapper<String, MapCodec<? extends TextContent>> idMapper, CallbackInfo ci) {
+    @Inject(method = "bootstrap(Lnet/minecraft/util/ExtraCodecs$LateBoundIdMapper;)V", at = @At("TAIL"))
+    private static void registerTypes(ExtraCodecs.LateBoundIdMapper<String, MapCodec<? extends ComponentContents>> idMapper, CallbackInfo ci) {
         idMapper.put("ingredient", IngredientTextContent.CODEC);
     }
 }

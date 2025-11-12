@@ -8,22 +8,21 @@ import com.zurrtum.create.client.foundation.gui.ModularGuiLineBuilder;
 import com.zurrtum.create.client.foundation.utility.CreateLang;
 import com.zurrtum.create.content.trains.schedule.condition.CargoThresholdCondition;
 import com.zurrtum.create.content.trains.schedule.condition.CargoThresholdCondition.Ops;
-import net.minecraft.item.ItemStack;
-import net.minecraft.text.MutableText;
-import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
-
 import java.util.Arrays;
 import java.util.List;
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.world.item.ItemStack;
 
 public abstract class CargoThresholdConditionRender<T extends CargoThresholdCondition> implements IScheduleInput<T> {
-    protected abstract Text getUnit(T input);
+    protected abstract Component getUnit(T input);
 
     protected abstract ItemStack getIcon(T input);
 
     @Override
-    public Pair<ItemStack, Text> getSummary(T input) {
-        return Pair.of(getIcon(input), Text.literal(input.getOperator().formatted + " " + input.getThreshold()).append(getUnit(input)));
+    public Pair<ItemStack, Component> getSummary(T input) {
+        return Pair.of(getIcon(input), Component.literal(input.getOperator().formatted + " " + input.getThreshold()).append(getUnit(input)));
     }
 
     @Override
@@ -32,15 +31,15 @@ public abstract class CargoThresholdConditionRender<T extends CargoThresholdCond
     }
 
     @Override
-    public List<Text> getSecondLineTooltip(int slot) {
+    public List<Component> getSecondLineTooltip(int slot) {
         return ImmutableList.of(
             CreateLang.translateDirect("schedule.condition.threshold.place_item"),
-            CreateLang.translateDirect("schedule.condition.threshold.place_item_2").formatted(Formatting.GRAY),
-            CreateLang.translateDirect("schedule.condition.threshold.place_item_3").formatted(Formatting.GRAY)
+            CreateLang.translateDirect("schedule.condition.threshold.place_item_2").withStyle(ChatFormatting.GRAY),
+            CreateLang.translateDirect("schedule.condition.threshold.place_item_3").withStyle(ChatFormatting.GRAY)
         );
     }
 
-    public List<MutableText> getOpsOptions() {
+    public List<MutableComponent> getOpsOptions() {
         return Arrays.stream(Ops.values()).map(op -> CreateLang.translateDirect("schedule.condition.threshold." + Lang.asId(op.name()))).toList();
     }
 
@@ -49,7 +48,7 @@ public abstract class CargoThresholdConditionRender<T extends CargoThresholdCond
         builder.addSelectionScrollInput(
             0, 24, (i, l) -> {
                 i.forOptions(getOpsOptions()).titled(CreateLang.translateDirect("schedule.condition.threshold.train_holds", ""))
-                    .format(state -> Text.literal(" " + Ops.values()[state].formatted));
+                    .format(state -> Component.literal(" " + Ops.values()[state].formatted));
             }, "Operator"
         );
         builder.addIntegerTextInput(

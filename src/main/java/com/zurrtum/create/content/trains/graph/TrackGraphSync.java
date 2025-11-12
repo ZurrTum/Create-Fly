@@ -11,7 +11,7 @@ import com.zurrtum.create.infrastructure.packet.s2c.TrackGraphPacket;
 import com.zurrtum.create.infrastructure.packet.s2c.TrackGraphRollCallPacket;
 import com.zurrtum.create.infrastructure.packet.s2c.TrackGraphSyncPacket;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.level.ServerPlayer;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
@@ -28,7 +28,7 @@ public class TrackGraphSync {
             for (TrackGraphPacket packet : queuedPackets) {
                 if (!packet.packetDeletesGraph && !Create.RAILWAYS.trackNetworks.containsKey(packet.graphId))
                     continue;
-                server.getPlayerManager().sendToAll(packet);
+                server.getPlayerList().broadcastAll(packet);
                 rollCallIn = 3;
             }
 
@@ -99,16 +99,16 @@ public class TrackGraphSync {
 
     //
 
-    public void sendEdgeGroups(List<UUID> ids, List<EdgeGroupColor> colors, ServerPlayerEntity player) {
-        player.networkHandler.sendPacket(new SignalEdgeGroupPacket(ids, colors, true));
+    public void sendEdgeGroups(List<UUID> ids, List<EdgeGroupColor> colors, ServerPlayer player) {
+        player.connection.send(new SignalEdgeGroupPacket(ids, colors, true));
     }
 
     public void edgeGroupCreated(MinecraftServer server, UUID id, EdgeGroupColor color) {
-        server.getPlayerManager().sendToAll(new SignalEdgeGroupPacket(id, color));
+        server.getPlayerList().broadcastAll(new SignalEdgeGroupPacket(id, color));
     }
 
     public void edgeGroupRemoved(MinecraftServer server, UUID id) {
-        server.getPlayerManager().sendToAll(new SignalEdgeGroupPacket(ImmutableList.of(id), Collections.emptyList(), false));
+        server.getPlayerList().broadcastAll(new SignalEdgeGroupPacket(ImmutableList.of(id), Collections.emptyList(), false));
     }
 
     //
@@ -126,7 +126,7 @@ public class TrackGraphSync {
         currentPayload++;
     }
 
-    public void sendFullGraphTo(TrackGraph graph, ServerPlayerEntity player) {
+    public void sendFullGraphTo(TrackGraph graph, ServerPlayer player) {
         TrackGraphSyncPacket packet = new TrackGraphSyncPacket(graph.id, graph.netId);
         packet.fullWipe = true;
         int sent = 0;
@@ -194,11 +194,11 @@ public class TrackGraphSync {
     }
 
     private void sendRollCall(MinecraftServer server) {
-        server.getPlayerManager().sendToAll(TrackGraphRollCallPacket.ofServer());
+        server.getPlayerList().broadcastAll(TrackGraphRollCallPacket.ofServer());
     }
 
-    private TrackGraphSyncPacket flushAndCreateNew(TrackGraph graph, ServerPlayerEntity player, TrackGraphSyncPacket packet) {
-        player.networkHandler.sendPacket(packet);
+    private TrackGraphSyncPacket flushAndCreateNew(TrackGraph graph, ServerPlayer player, TrackGraphSyncPacket packet) {
+        player.connection.send(packet);
         packet = new TrackGraphSyncPacket(graph.id, graph.netId);
         return packet;
     }

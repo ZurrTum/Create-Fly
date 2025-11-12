@@ -15,9 +15,12 @@ import com.zurrtum.create.content.kinetics.mechanicalArm.ArmInteractionPointType
 import com.zurrtum.create.content.logistics.item.filter.attribute.ItemAttributeType;
 import com.zurrtum.create.content.logistics.packagePort.PackagePortTargetType;
 import com.zurrtum.create.foundation.gui.menu.MenuType;
-import net.minecraft.registry.*;
-import net.minecraft.registry.SimpleRegistry;
-import net.minecraft.registry.entry.RegistryEntryInfo;
+import net.minecraft.core.MappedRegistry;
+import net.minecraft.core.RegistrationInfo;
+import net.minecraft.core.Registry;
+import net.minecraft.core.WritableRegistry;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.resources.ResourceKey;
 
 public class CreateRegistries {
     public static final Registry<ArmInteractionPointType> ARM_INTERACTION_POINT_TYPE = register(CreateRegistryKeys.ARM_INTERACTION_POINT_TYPE);
@@ -35,18 +38,18 @@ public class CreateRegistries {
     public static final Registry<PackagePortTargetType> PACKAGE_PORT_TARGET_TYPE = register(CreateRegistryKeys.PACKAGE_PORT_TARGET_TYPE);
     public static final Registry<MenuType<?>> MENU_TYPE = register(CreateRegistryKeys.MENU_TYPE);
 
-    private static <T> Registry<T> register(RegistryKey<? extends Registry<T>> key) {
+    private static <T> Registry<T> register(ResourceKey<? extends Registry<T>> key) {
         return register(key, false);
     }
 
-    private static <T> Registry<T> registerIntrusive(RegistryKey<? extends Registry<T>> key) {
+    private static <T> Registry<T> registerIntrusive(ResourceKey<? extends Registry<T>> key) {
         return register(key, true);
     }
 
     @SuppressWarnings("unchecked")
-    private static <T> Registry<T> register(RegistryKey<? extends Registry<T>> key, boolean intrusive) {
-        SimpleRegistry<T> registry = new SimpleRegistry<>(key, Lifecycle.stable(), intrusive);
-        Registries.ROOT.add((RegistryKey<MutableRegistry<?>>) (Object) key, registry, RegistryEntryInfo.DEFAULT);
+    private static <T> Registry<T> register(ResourceKey<? extends Registry<T>> key, boolean intrusive) {
+        MappedRegistry<T> registry = new MappedRegistry<>(key, Lifecycle.stable(), intrusive);
+        BuiltInRegistries.WRITABLE_REGISTRY.register((ResourceKey<WritableRegistry<?>>) (Object) key, registry, RegistrationInfo.BUILT_IN);
         return registry;
     }
 

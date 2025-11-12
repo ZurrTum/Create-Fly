@@ -4,9 +4,9 @@ import com.zurrtum.create.client.AllKeys;
 import com.zurrtum.create.client.catnip.gui.element.ScreenElement;
 import com.zurrtum.create.client.catnip.gui.widget.AbstractSimiWidget;
 import com.zurrtum.create.client.foundation.gui.AllGuiTextures;
-import net.minecraft.client.gl.RenderPipelines;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.text.Text;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.renderer.RenderPipelines;
+import net.minecraft.network.chat.Component;
 
 public class IconButton extends AbstractSimiWidget {
 
@@ -24,19 +24,19 @@ public class IconButton extends AbstractSimiWidget {
     }
 
     @Override
-    public void doRender(DrawContext graphics, int mouseX, int mouseY, float partialTicks) {
+    public void doRender(GuiGraphics graphics, int mouseX, int mouseY, float partialTicks) {
         if (visible) {
-            hovered = mouseX >= getX() && mouseY >= getY() && mouseX < getX() + width && mouseY < getY() + height;
+            isHovered = mouseX >= getX() && mouseY >= getY() && mouseX < getX() + width && mouseY < getY() + height;
 
-            AllGuiTextures button = !active ? AllGuiTextures.BUTTON_DISABLED : hovered && AllKeys.isMouseButtonDown(0) ? AllGuiTextures.BUTTON_DOWN : hovered ? AllGuiTextures.BUTTON_HOVER : green ? AllGuiTextures.BUTTON_GREEN : AllGuiTextures.BUTTON;
+            AllGuiTextures button = !active ? AllGuiTextures.BUTTON_DISABLED : isHovered && AllKeys.isMouseButtonDown(0) ? AllGuiTextures.BUTTON_DOWN : isHovered ? AllGuiTextures.BUTTON_HOVER : green ? AllGuiTextures.BUTTON_GREEN : AllGuiTextures.BUTTON;
 
             drawBg(graphics, button);
             icon.render(graphics, getX() + 1, getY() + 1);
         }
     }
 
-    protected void drawBg(DrawContext graphics, AllGuiTextures button) {
-        graphics.drawTexture(
+    protected void drawBg(GuiGraphics graphics, AllGuiTextures button) {
+        graphics.blit(
             RenderPipelines.GUI_TEXTURED,
             button.location,
             getX(),
@@ -50,7 +50,7 @@ public class IconButton extends AbstractSimiWidget {
         );
     }
 
-    public void setToolTip(Text text) {
+    public void setToolTip(Component text) {
         toolTip.clear();
         toolTip.add(text);
     }

@@ -3,26 +3,26 @@ package com.zurrtum.create.client.flywheel.lib.util;
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
-import net.minecraft.text.Text;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.InvalidIdentifierException;
+import net.minecraft.ResourceLocationException;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 
 import static com.zurrtum.create.client.flywheel.impl.Flywheel.MOD_ID;
 
 public final class ResourceUtil {
-    private static final SimpleCommandExceptionType ERROR_INVALID = new SimpleCommandExceptionType(Text.translatable("argument.id.invalid"));
+    private static final SimpleCommandExceptionType ERROR_INVALID = new SimpleCommandExceptionType(Component.translatable("argument.id.invalid"));
 
     private ResourceUtil() {
     }
 
-    public static Identifier rl(String path) {
-        return Identifier.of(MOD_ID, path);
+    public static ResourceLocation rl(String path) {
+        return ResourceLocation.fromNamespaceAndPath(MOD_ID, path);
     }
 
     /**
-     * Same as {@link Identifier#of(String)}, but defaults to Flywheel namespace.
+     * Same as {@link ResourceLocation#parse(String)}, but defaults to Flywheel namespace.
      */
-    public static Identifier parseFlywheelDefault(String location) {
+    public static ResourceLocation parseFlywheelDefault(String location) {
         String namespace = MOD_ID;
         String path = location;
         int i = location.indexOf(58);
@@ -33,16 +33,16 @@ public final class ResourceUtil {
             }
         }
 
-        return Identifier.of(namespace, path);
+        return ResourceLocation.fromNamespaceAndPath(namespace, path);
     }
 
     /**
-     * Same as {@link Identifier#fromCommandInput(StringReader)}, but defaults to Flywheel namespace.
+     * Same as {@link ResourceLocation#read(StringReader)}, but defaults to Flywheel namespace.
      */
-    public static Identifier readFlywheelDefault(StringReader reader) throws CommandSyntaxException {
+    public static ResourceLocation readFlywheelDefault(StringReader reader) throws CommandSyntaxException {
         int i = reader.getCursor();
 
-        while (reader.canRead() && Identifier.isCharValid(reader.peek())) {
+        while (reader.canRead() && ResourceLocation.isAllowedInResourceLocation(reader.peek())) {
             reader.skip();
         }
 
@@ -50,17 +50,17 @@ public final class ResourceUtil {
 
         try {
             return parseFlywheelDefault(s);
-        } catch (InvalidIdentifierException var4) {
+        } catch (ResourceLocationException var4) {
             reader.setCursor(i);
             throw ERROR_INVALID.createWithContext(reader);
         }
     }
 
     /**
-     * Same as {@link Identifier#toUnderscoreSeparatedString()}, but also removes the file extension.
+     * Same as {@link ResourceLocation#toDebugFileName()}, but also removes the file extension.
      */
-    public static String toDebugFileNameNoExtension(Identifier resourceLocation) {
-        String stringLoc = resourceLocation.toUnderscoreSeparatedString();
+    public static String toDebugFileNameNoExtension(ResourceLocation resourceLocation) {
+        String stringLoc = resourceLocation.toDebugFileName();
         return stringLoc.substring(0, stringLoc.lastIndexOf('.'));
     }
 }

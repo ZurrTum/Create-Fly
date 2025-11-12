@@ -2,40 +2,40 @@ package com.zurrtum.create.client.infrastructure.particle;
 
 import com.zurrtum.create.client.foundation.render.AllRenderPipelines;
 import com.zurrtum.create.client.ponder.enums.PonderSpecialTextures;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.particle.BillboardParticle.RenderType;
-import net.minecraft.client.particle.ParticleManager;
-import net.minecraft.client.particle.ParticleRenderer;
-import net.minecraft.client.particle.ParticleTextureSheet;
-import net.minecraft.client.render.Camera;
-import net.minecraft.client.render.Frustum;
-import net.minecraft.client.render.Submittable;
-import net.minecraft.util.crash.CrashException;
-import net.minecraft.util.crash.CrashReport;
-import net.minecraft.util.crash.CrashReportSection;
+import net.minecraft.CrashReport;
+import net.minecraft.CrashReportCategory;
+import net.minecraft.ReportedException;
+import net.minecraft.client.Camera;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.particle.ParticleEngine;
+import net.minecraft.client.particle.ParticleGroup;
+import net.minecraft.client.particle.ParticleRenderType;
+import net.minecraft.client.particle.SingleQuadParticle.Layer;
+import net.minecraft.client.renderer.culling.Frustum;
+import net.minecraft.client.renderer.state.ParticleGroupRenderState;
 
-public class CubeParticleRenderer extends ParticleRenderer<CubeParticle> {
-    public static final ParticleTextureSheet SHEET = new ParticleTextureSheet("create:cube");
-    public static final RenderType RENDER_TYPE = new RenderType(false, PonderSpecialTextures.BLANK.getLocation(), AllRenderPipelines.CUBE);
+public class CubeParticleRenderer extends ParticleGroup<CubeParticle> {
+    public static final ParticleRenderType SHEET = new ParticleRenderType("create:cube");
+    public static final Layer RENDER_TYPE = new Layer(false, PonderSpecialTextures.BLANK.getLocation(), AllRenderPipelines.CUBE);
     public CubeParticleSubmittable submittable = new CubeParticleSubmittable();
 
-    public CubeParticleRenderer(ParticleManager particleManager) {
+    public CubeParticleRenderer(ParticleEngine particleManager) {
         super(particleManager);
-        MinecraftClient.getInstance().getTextureManager().getTexture(PonderSpecialTextures.BLANK.getLocation());
+        Minecraft.getInstance().getTextureManager().getTexture(PonderSpecialTextures.BLANK.getLocation());
     }
 
     @Override
-    public Submittable render(Frustum frustum, Camera camera, float tickProgress) {
+    public ParticleGroupRenderState extractRenderState(Frustum frustum, Camera camera, float tickProgress) {
         for (CubeParticle particle : particles) {
             if (particle.shouldRender(frustum)) {
                 try {
                     particle.render(submittable, camera, tickProgress);
                 } catch (Throwable var9) {
-                    CrashReport crashReport = CrashReport.create(var9, "Rendering Particle");
-                    CrashReportSection crashReportSection = crashReport.addElement("Particle being rendered");
-                    crashReportSection.add("Particle", particle::toString);
-                    crashReportSection.add("Particle Type", RENDER_TYPE::toString);
-                    throw new CrashException(crashReport);
+                    CrashReport crashReport = CrashReport.forThrowable(var9, "Rendering Particle");
+                    CrashReportCategory crashReportSection = crashReport.addCategory("Particle being rendered");
+                    crashReportSection.setDetail("Particle", particle::toString);
+                    crashReportSection.setDetail("Particle Type", RENDER_TYPE::toString);
+                    throw new ReportedException(crashReport);
                 }
             }
         }

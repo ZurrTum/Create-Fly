@@ -1,17 +1,17 @@
 package com.zurrtum.create.content.redstone.diodes;
 
 import com.zurrtum.create.content.equipment.wrench.IWrenchable;
-import net.minecraft.block.AbstractRedstoneGateBlock;
-import net.minecraft.block.BlockState;
+import net.minecraft.world.level.block.DiodeBlock;
+import net.minecraft.world.level.block.state.BlockState;
 
-public abstract class AbstractDiodeBlock extends AbstractRedstoneGateBlock implements IWrenchable {
+public abstract class AbstractDiodeBlock extends DiodeBlock implements IWrenchable {
 
-    public AbstractDiodeBlock(Settings builder) {
+    public AbstractDiodeBlock(Properties builder) {
         super(builder);
     }
 
     @Override
-    public boolean emitsRedstonePower(BlockState state) {
+    public boolean isSignalSource(BlockState state) {
         return true;
     }
 }

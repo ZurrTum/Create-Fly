@@ -12,9 +12,8 @@ import com.zurrtum.create.client.flywheel.lib.model.Models;
 import com.zurrtum.create.client.flywheel.lib.visual.SimpleDynamicVisual;
 import com.zurrtum.create.client.foundation.render.AllInstanceTypes;
 import com.zurrtum.create.content.kinetics.mixer.MechanicalMixerBlockEntity;
-import net.minecraft.util.math.Direction;
-
 import java.util.function.Consumer;
+import net.minecraft.core.Direction;
 
 public class MixerVisual extends SingleAxisRotatingVisual<MechanicalMixerBlockEntity> implements SimpleDynamicVisual {
 
@@ -62,7 +61,7 @@ public class MixerVisual extends SingleAxisRotatingVisual<MechanicalMixerBlockEn
     public void updateLight(float partialTick) {
         super.updateLight(partialTick);
 
-        relight(pos.down(), mixerHead);
+        relight(pos.below(), mixerHead);
         relight(mixerPole);
     }
 

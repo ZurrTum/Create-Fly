@@ -1,7 +1,7 @@
 package com.zurrtum.create.client.compat.jei.display;
 
-import net.minecraft.item.Item;
-import net.minecraft.util.Identifier;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.Item;
 
-public record MysteriousItemConversionDisplay(Identifier id, Item input, Item output) {
+public record MysteriousItemConversionDisplay(ResourceLocation id, Item input, Item output) {
 }

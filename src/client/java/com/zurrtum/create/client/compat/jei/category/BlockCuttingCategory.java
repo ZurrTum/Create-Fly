@@ -18,14 +18,14 @@ import mezz.jei.api.gui.drawable.IDrawable;
 import mezz.jei.api.gui.ingredient.IRecipeSlotsView;
 import mezz.jei.api.recipe.IFocusGroup;
 import mezz.jei.api.recipe.types.IRecipeType;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.recipe.*;
-import net.minecraft.registry.entry.RegistryEntryList;
-import net.minecraft.text.Text;
-import net.minecraft.util.Identifier;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.core.HolderSet;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.crafting.*;
 import org.jetbrains.annotations.NotNull;
 import org.joml.Matrix3x2f;
 
@@ -34,32 +34,32 @@ import java.util.List;
 import java.util.Objects;
 
 public class BlockCuttingCategory extends CreateCategory<BlockCuttingDisplay> {
-    public static List<BlockCuttingDisplay> getRecipes(PreparedRecipes preparedRecipes) {
-        Object2ObjectMap<Ingredient, Pair<Identifier, List<ItemStack>>> map = new Object2ObjectOpenCustomHashMap<>(new Hash.Strategy<>() {
+    public static List<BlockCuttingDisplay> getRecipes(RecipeMap preparedRecipes) {
+        Object2ObjectMap<Ingredient, Pair<ResourceLocation, List<ItemStack>>> map = new Object2ObjectOpenCustomHashMap<>(new Hash.Strategy<>() {
             public boolean equals(Ingredient ingredient, Ingredient other) {
                 return Objects.equals(ingredient, other);
             }
 
             public int hashCode(Ingredient ingredient) {
-                if (ingredient.entries instanceof RegistryEntryList.Direct<Item> direct) {
+                if (ingredient.values instanceof HolderSet.Direct<Item> direct) {
                     return direct.hashCode();
                 }
-                if (ingredient.entries instanceof RegistryEntryList.Named<Item> named) {
-                    return named.getTag().id().hashCode();
+                if (ingredient.values instanceof HolderSet.Named<Item> named) {
+                    return named.key().location().hashCode();
                 }
                 return ingredient.hashCode();
             }
         });
-        for (RecipeEntry<StonecuttingRecipe> entry : preparedRecipes.getAll(RecipeType.STONECUTTING)) {
+        for (RecipeHolder<StonecutterRecipe> entry : preparedRecipes.byType(RecipeType.STONECUTTING)) {
             if (AllRecipeTypes.shouldIgnoreInAutomation(entry)) {
                 continue;
             }
-            StonecuttingRecipe recipe = entry.value();
-            map.computeIfAbsent(recipe.ingredient(), i -> Pair.of(entry.id().getValue(), new ArrayList<>())).getSecond().add(recipe.result());
+            StonecutterRecipe recipe = entry.value();
+            map.computeIfAbsent(recipe.input(), i -> Pair.of(entry.id().location(), new ArrayList<>())).getSecond().add(recipe.result());
         }
         List<BlockCuttingDisplay> recipes = new ArrayList<>();
-        for (Object2ObjectMap.Entry<Ingredient, Pair<Identifier, List<ItemStack>>> entry : map.object2ObjectEntrySet()) {
-            Pair<Identifier, List<ItemStack>> pair = entry.getValue();
+        for (Object2ObjectMap.Entry<Ingredient, Pair<ResourceLocation, List<ItemStack>>> entry : map.object2ObjectEntrySet()) {
+            Pair<ResourceLocation, List<ItemStack>> pair = entry.getValue();
             List<ItemStack> outputs = pair.getSecond();
             int size = outputs.size();
             if (size <= 15) {
@@ -81,7 +81,7 @@ public class BlockCuttingCategory extends CreateCategory<BlockCuttingDisplay> {
     }
 
     @Override
-    public Identifier getRegistryName(BlockCuttingDisplay display) {
+    public ResourceLocation getRegistryName(BlockCuttingDisplay display) {
         return display.id();
     }
 
@@ -93,7 +93,7 @@ public class BlockCuttingCategory extends CreateCategory<BlockCuttingDisplay> {
 
     @Override
     @NotNull
-    public Text getTitle() {
+    public Component getTitle() {
         return CreateLang.translateDirect("recipe.block_cutting");
     }
 
@@ -117,9 +117,9 @@ public class BlockCuttingCategory extends CreateCategory<BlockCuttingDisplay> {
     }
 
     @Override
-    public void draw(BlockCuttingDisplay recipe, IRecipeSlotsView recipeSlotsView, DrawContext graphics, double mouseX, double mouseY) {
+    public void draw(BlockCuttingDisplay recipe, IRecipeSlotsView recipeSlotsView, GuiGraphics graphics, double mouseX, double mouseY) {
         AllGuiTextures.JEI_DOWN_ARROW.render(graphics, 31, 6);
         AllGuiTextures.JEI_SHADOW.render(graphics, 16, 50);
-        graphics.state.addSpecialElement(new SawRenderState(new Matrix3x2f(graphics.getMatrices()), 25, 26));
+        graphics.guiRenderState.submitPicturesInPictureState(new SawRenderState(new Matrix3x2f(graphics.pose()), 25, 26));
     }
 }

@@ -1,19 +1,19 @@
 package com.zurrtum.create.foundation.gui.menu;
 
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.text.Text;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.entity.player.Inventory;
 import org.apache.commons.lang3.function.TriFunction;
 
 @FunctionalInterface
 public interface MenuType<H> {
-    MenuBase<H> create(int syncId, PlayerInventory playerInventory, H holder);
+    MenuBase<H> create(int syncId, Inventory playerInventory, H holder);
 
     @SuppressWarnings("unchecked")
     default <T extends MenuBase<H>, S> S create(
-        TriFunction<T, PlayerInventory, Text, S> factory,
+        TriFunction<T, Inventory, Component, S> factory,
         int syncId,
-        PlayerInventory playerInventory,
-        Text name,
+        Inventory playerInventory,
+        Component name,
         H holder
     ) {
         if (holder == null) {

@@ -3,11 +3,6 @@ package com.zurrtum.create.foundation.blockEntity.behaviour.filtering;
 import com.zurrtum.create.catnip.data.Iterate;
 import com.zurrtum.create.content.schematics.requirement.ItemRequirement;
 import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.storage.ReadView;
-import net.minecraft.storage.WriteView;
-import net.minecraft.util.math.Direction;
-
 import java.util.HashSet;
 import java.util.IdentityHashMap;
 import java.util.Map;
@@ -15,6 +10,10 @@ import java.util.Set;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
+import net.minecraft.core.Direction;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 
 public class ServerSidedFilteringBehaviour extends ServerFilteringBehaviour {
 
@@ -53,19 +52,19 @@ public class ServerSidedFilteringBehaviour extends ServerFilteringBehaviour {
     }
 
     @Override
-    public void write(WriteView view, boolean clientPacket) {
-        WriteView.ListView list = view.getList("Filters");
+    public void write(ValueOutput view, boolean clientPacket) {
+        ValueOutput.ValueOutputList list = view.childrenList("Filters");
         sidedFilters.forEach((side, filter) -> {
-            WriteView item = list.add();
-            item.put("Side", Direction.CODEC, side);
+            ValueOutput item = list.addChild();
+            item.store("Side", Direction.CODEC, side);
             filter.write(item, clientPacket);
         });
         super.write(view, clientPacket);
     }
 
     @Override
-    public void read(ReadView view, boolean clientPacket) {
-        view.getListReadView("Filters").forEach(item -> {
+    public void read(ValueInput view, boolean clientPacket) {
+        view.childrenListOrEmpty("Filters").forEach(item -> {
             Direction side = item.read("Side", Direction.CODEC).orElseThrow();
             ServerFilteringBehaviour filter = sidedFilters.get(side);
             if (filter != null) {

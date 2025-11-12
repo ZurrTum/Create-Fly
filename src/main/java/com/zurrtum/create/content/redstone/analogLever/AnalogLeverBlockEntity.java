@@ -5,13 +5,12 @@ import com.zurrtum.create.catnip.animation.LerpedFloat;
 import com.zurrtum.create.catnip.animation.LerpedFloat.Chaser;
 import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
 import com.zurrtum.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
-import net.minecraft.block.BlockState;
-import net.minecraft.storage.ReadView;
-import net.minecraft.storage.WriteView;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.MathHelper;
-
 import java.util.List;
+import net.minecraft.core.BlockPos;
+import net.minecraft.util.Mth;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 
 public class AnalogLeverBlockEntity extends SmartBlockEntity {
 
@@ -25,7 +24,7 @@ public class AnalogLeverBlockEntity extends SmartBlockEntity {
     }
 
     @Override
-    public void write(WriteView view, boolean clientPacket) {
+    public void write(ValueOutput view, boolean clientPacket) {
         view.putInt("State", state);
         view.putInt("ChangeTimer", lastChange);
         super.write(view, clientPacket);
@@ -33,9 +32,9 @@ public class AnalogLeverBlockEntity extends SmartBlockEntity {
 
 
     @Override
-    protected void read(ReadView view, boolean clientPacket) {
-        state = view.getInt("State", 0);
-        lastChange = view.getInt("ChangeTimer", 0);
+    protected void read(ValueInput view, boolean clientPacket) {
+        state = view.getIntOr("State", 0);
+        lastChange = view.getIntOr("ChangeTimer", 0);
         clientState.chase(state, 0.2f, Chaser.EXP);
         super.read(view, clientPacket);
     }
@@ -48,7 +47,7 @@ public class AnalogLeverBlockEntity extends SmartBlockEntity {
             if (lastChange == 0)
                 updateOutput();
         }
-        if (world.isClient())
+        if (level.isClientSide())
             clientState.tickChaser();
     }
 
@@ -59,7 +58,7 @@ public class AnalogLeverBlockEntity extends SmartBlockEntity {
     }
 
     private void updateOutput() {
-        AnalogLeverBlock.updateNeighbors(getCachedState(), world, pos);
+        AnalogLeverBlock.updateNeighbors(getBlockState(), level, worldPosition);
     }
 
     @Override
@@ -69,7 +68,7 @@ public class AnalogLeverBlockEntity extends SmartBlockEntity {
     public void changeState(boolean back) {
         int prevState = state;
         state += back ? -1 : 1;
-        state = MathHelper.clamp(state, 0, 15);
+        state = Mth.clamp(state, 0, 15);
         if (prevState != state)
             lastChange = 15;
         sendData();

@@ -10,98 +10,97 @@ import com.zurrtum.create.content.kinetics.base.HorizontalKineticBlock;
 import com.zurrtum.create.content.schematics.requirement.ItemRequirement;
 import com.zurrtum.create.content.schematics.requirement.ItemRequirement.ItemUseType;
 import com.zurrtum.create.foundation.block.IBE;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.ShapeContext;
-import net.minecraft.block.Waterloggable;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.component.ComponentChanges;
-import net.minecraft.component.DataComponentTypes;
-import net.minecraft.entity.EquipmentSlot;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.ai.pathing.NavigationType;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.fluid.FluidState;
-import net.minecraft.fluid.Fluids;
-import net.minecraft.item.BlockItem;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemPlacementContext;
-import net.minecraft.item.ItemStack;
-import net.minecraft.loot.context.LootContextParameters;
-import net.minecraft.loot.context.LootWorldContext;
-import net.minecraft.sound.SoundCategory;
-import net.minecraft.sound.SoundEvents;
-import net.minecraft.state.StateManager.Builder;
-import net.minecraft.state.property.Properties;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.Hand;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Direction.Axis;
-import net.minecraft.util.math.random.Random;
-import net.minecraft.util.shape.VoxelShape;
-import net.minecraft.world.BlockView;
-import net.minecraft.world.World;
-import net.minecraft.world.WorldView;
-import net.minecraft.world.tick.ScheduledTickView;
-
 import java.util.List;
 import java.util.Optional;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.Direction.Axis;
+import net.minecraft.core.component.DataComponentPatch;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelReader;
+import net.minecraft.world.level.ScheduledTickAccess;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.SimpleWaterloggedBlock;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition.Builder;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.material.FluidState;
+import net.minecraft.world.level.material.Fluids;
+import net.minecraft.world.level.pathfinder.PathComputationType;
+import net.minecraft.world.level.storage.loot.LootParams;
+import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.phys.shapes.VoxelShape;
 
-public class BacktankBlock extends HorizontalKineticBlock implements IBE<BacktankBlockEntity>, Waterloggable, SpecialBlockItemRequirement {
+public class BacktankBlock extends HorizontalKineticBlock implements IBE<BacktankBlockEntity>, SimpleWaterloggedBlock, SpecialBlockItemRequirement {
 
-    public BacktankBlock(Settings properties) {
+    public BacktankBlock(Properties properties) {
         super(properties);
-        setDefaultState(getDefaultState().with(Properties.WATERLOGGED, false));
+        registerDefaultState(defaultBlockState().setValue(BlockStateProperties.WATERLOGGED, false));
     }
 
     @Override
     public FluidState getFluidState(BlockState state) {
-        return state.get(Properties.WATERLOGGED) ? Fluids.WATER.getStill(false) : Fluids.EMPTY.getDefaultState();
+        return state.getValue(BlockStateProperties.WATERLOGGED) ? Fluids.WATER.getSource(false) : Fluids.EMPTY.defaultFluidState();
     }
 
     @Override
-    protected void appendProperties(Builder<Block, BlockState> builder) {
-        builder.add(Properties.WATERLOGGED);
-        super.appendProperties(builder);
+    protected void createBlockStateDefinition(Builder<Block, BlockState> builder) {
+        builder.add(BlockStateProperties.WATERLOGGED);
+        super.createBlockStateDefinition(builder);
     }
 
     @Override
-    public boolean hasComparatorOutput(BlockState p_149740_1_) {
+    public boolean hasAnalogOutputSignal(BlockState p_149740_1_) {
         return true;
     }
 
     @Override
-    public int getComparatorOutput(BlockState state, World world, BlockPos pos, Direction direction) {
+    public int getAnalogOutputSignal(BlockState state, Level world, BlockPos pos, Direction direction) {
         return getBlockEntityOptional(world, pos).map(BacktankBlockEntity::getComparatorOutput).orElse(0);
     }
 
     @Override
-    public BlockState getStateForNeighborUpdate(
+    public BlockState updateShape(
         BlockState state,
-        WorldView world,
-        ScheduledTickView tickView,
+        LevelReader world,
+        ScheduledTickAccess tickView,
         BlockPos pos,
         Direction direction,
         BlockPos neighbourPos,
         BlockState neighbourState,
-        Random random
+        RandomSource random
     ) {
-        if (state.get(Properties.WATERLOGGED))
-            tickView.scheduleFluidTick(pos, Fluids.WATER, Fluids.WATER.getTickRate(world));
+        if (state.getValue(BlockStateProperties.WATERLOGGED))
+            tickView.scheduleTick(pos, Fluids.WATER, Fluids.WATER.getTickDelay(world));
         return state;
     }
 
     @Override
-    public BlockState getPlacementState(ItemPlacementContext context) {
-        FluidState fluidState = context.getWorld().getFluidState(context.getBlockPos());
-        return super.getPlacementState(context).with(Properties.WATERLOGGED, fluidState.getFluid() == Fluids.WATER);
+    public BlockState getStateForPlacement(BlockPlaceContext context) {
+        FluidState fluidState = context.getLevel().getFluidState(context.getClickedPos());
+        return super.getStateForPlacement(context).setValue(BlockStateProperties.WATERLOGGED, fluidState.getType() == Fluids.WATER);
     }
 
     @Override
-    public boolean hasShaftTowards(WorldView world, BlockPos pos, BlockState state, Direction face) {
+    public boolean hasShaftTowards(LevelReader world, BlockPos pos, BlockState state, Direction face) {
         return face == Direction.UP;
     }
 
@@ -111,88 +110,88 @@ public class BacktankBlock extends HorizontalKineticBlock implements IBE<Backtan
     }
 
     @Override
-    public void onPlaced(World worldIn, BlockPos pos, BlockState state, LivingEntity placer, ItemStack stack) {
-        super.onPlaced(worldIn, pos, state, placer, stack);
-        if (worldIn.isClient())
+    public void setPlacedBy(Level worldIn, BlockPos pos, BlockState state, LivingEntity placer, ItemStack stack) {
+        super.setPlacedBy(worldIn, pos, state, placer, stack);
+        if (worldIn.isClientSide())
             return;
         if (stack == null)
             return;
         withBlockEntityDo(
             worldIn, pos, be -> {
-                be.setCapacityEnchantLevel(stack.getEnchantments().getLevel(worldIn.getRegistryManager().getEntryOrThrow(AllEnchantments.CAPACITY)));
+                be.setCapacityEnchantLevel(stack.getEnchantments().getLevel(worldIn.registryAccess().getOrThrow(AllEnchantments.CAPACITY)));
                 be.setAirLevel(stack.getOrDefault(AllDataComponents.BACKTANK_AIR, 0));
-                if (stack.contains(DataComponentTypes.CUSTOM_NAME))
+                if (stack.has(DataComponents.CUSTOM_NAME))
                     be.setCustomName(stack.getCustomName());
 
-                be.setComponentPatch(stack.getComponentChanges());
+                be.setComponentPatch(stack.getComponentsPatch());
             }
         );
     }
 
     @Override
-    public List<ItemStack> getDroppedStacks(BlockState pState, LootWorldContext.Builder pBuilder) {
-        List<ItemStack> lootDrops = super.getDroppedStacks(pState, pBuilder);
+    public List<ItemStack> getDrops(BlockState pState, LootParams.Builder pBuilder) {
+        List<ItemStack> lootDrops = super.getDrops(pState, pBuilder);
 
-        BlockEntity blockEntity = pBuilder.getOptional(LootContextParameters.BLOCK_ENTITY);
+        BlockEntity blockEntity = pBuilder.getOptionalParameter(LootContextParams.BLOCK_ENTITY);
         if (!(blockEntity instanceof BacktankBlockEntity bbe))
             return lootDrops;
 
-        ComponentChanges components = bbe.getComponentPatch().withRemovedIf(c -> c.equals(AllDataComponents.BACKTANK_AIR));
+        DataComponentPatch components = bbe.getComponentPatch().forget(c -> c.equals(AllDataComponents.BACKTANK_AIR));
         if (components.isEmpty())
             return lootDrops;
 
         return lootDrops.stream().peek(stack -> {
             if (stack.getItem() instanceof BacktankItem)
-                stack.applyUnvalidatedChanges(components);
+                stack.applyComponents(components);
         }).toList();
     }
 
     @Override
-    protected ActionResult onUseWithItem(
+    protected InteractionResult useItemOn(
         ItemStack stack,
         BlockState state,
-        World level,
+        Level level,
         BlockPos pos,
-        PlayerEntity player,
-        Hand hand,
+        Player player,
+        InteractionHand hand,
         BlockHitResult hitResult
     ) {
         if (player == null)
-            return ActionResult.PASS_TO_DEFAULT_BLOCK_ACTION;
+            return InteractionResult.TRY_WITH_EMPTY_HAND;
         if (FakePlayerHandler.has(player))
-            return ActionResult.PASS_TO_DEFAULT_BLOCK_ACTION;
-        if (player.isSneaking())
-            return ActionResult.PASS_TO_DEFAULT_BLOCK_ACTION;
-        if (player.getMainHandStack().getItem() instanceof BlockItem)
-            return ActionResult.PASS_TO_DEFAULT_BLOCK_ACTION;
-        if (!player.getEquippedStack(EquipmentSlot.CHEST).isEmpty())
-            return ActionResult.PASS_TO_DEFAULT_BLOCK_ACTION;
-        if (!level.isClient()) {
-            level.playSound(null, pos, SoundEvents.ENTITY_ITEM_PICKUP, SoundCategory.PLAYERS, .75f, 1);
-            player.equipStack(EquipmentSlot.CHEST, getPickStack(level, pos, state, true));
-            level.breakBlock(pos, false);
+            return InteractionResult.TRY_WITH_EMPTY_HAND;
+        if (player.isShiftKeyDown())
+            return InteractionResult.TRY_WITH_EMPTY_HAND;
+        if (player.getMainHandItem().getItem() instanceof BlockItem)
+            return InteractionResult.TRY_WITH_EMPTY_HAND;
+        if (!player.getItemBySlot(EquipmentSlot.CHEST).isEmpty())
+            return InteractionResult.TRY_WITH_EMPTY_HAND;
+        if (!level.isClientSide()) {
+            level.playSound(null, pos, SoundEvents.ITEM_PICKUP, SoundSource.PLAYERS, .75f, 1);
+            player.setItemSlot(EquipmentSlot.CHEST, getCloneItemStack(level, pos, state, true));
+            level.destroyBlock(pos, false);
         }
-        return ActionResult.SUCCESS;
+        return InteractionResult.SUCCESS;
     }
 
     @SuppressWarnings("deprecation")
-    public ItemStack getPickStack(WorldView pLevel, BlockPos pos, BlockState state, boolean includeData) {
+    public ItemStack getCloneItemStack(LevelReader pLevel, BlockPos pos, BlockState state, boolean includeData) {
         Item item = asItem();
         //        if (item instanceof BacktankItem.BacktankBlockItem placeable)
         //            item = placeable.getActualItem();
 
         Optional<BacktankBlockEntity> blockEntityOptional = getBlockEntityOptional(pLevel, pos);
 
-        ComponentChanges components = blockEntityOptional.map(BacktankBlockEntity::getComponentPatch).orElse(ComponentChanges.EMPTY);
+        DataComponentPatch components = blockEntityOptional.map(BacktankBlockEntity::getComponentPatch).orElse(DataComponentPatch.EMPTY);
         int air = blockEntityOptional.map(BacktankBlockEntity::getAirLevel).orElse(0);
 
-        ItemStack stack = new ItemStack(item.getRegistryEntry(), 1, components);
+        ItemStack stack = new ItemStack(item.builtInRegistryHolder(), 1, components);
         stack.set(AllDataComponents.BACKTANK_AIR, air);
         return stack;
     }
 
     @Override
-    public VoxelShape getOutlineShape(BlockState p_220053_1_, BlockView p_220053_2_, BlockPos p_220053_3_, ShapeContext p_220053_4_) {
+    public VoxelShape getShape(BlockState p_220053_1_, BlockGetter p_220053_2_, BlockPos p_220053_3_, CollisionContext p_220053_4_) {
         return AllShapes.BACKTANK;
     }
 
@@ -207,7 +206,7 @@ public class BacktankBlock extends HorizontalKineticBlock implements IBE<Backtan
     }
 
     @Override
-    protected boolean canPathfindThrough(BlockState state, NavigationType pathComputationType) {
+    protected boolean isPathfindable(BlockState state, PathComputationType pathComputationType) {
         return false;
     }
 

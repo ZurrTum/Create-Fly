@@ -9,9 +9,9 @@ import com.zurrtum.create.client.ponder.api.element.WorldSectionElement;
 import com.zurrtum.create.client.ponder.api.scene.SceneBuilder;
 import com.zurrtum.create.client.ponder.api.scene.SceneBuildingUtil;
 import com.zurrtum.create.client.ponder.api.scene.Selection;
-import net.minecraft.block.Blocks;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.level.block.Blocks;
 
 public class PulleyScenes {
 
@@ -70,7 +70,7 @@ public class PulleyScenes {
         scene.idle(15);
         ElementLink<WorldSectionElement> chassis = scene.world().showIndependentSection(util.select().fromTo(2, 1, 1, 0, 2, 1), Direction.SOUTH);
         scene.world().moveSection(chassis, util.vector().of(1, 0, 1), 0);
-        scene.world().replaceBlocks(util.select().fromTo(0, 2, 1, 2, 1, 1), Blocks.OAK_PLANKS.getDefaultState(), false);
+        scene.world().replaceBlocks(util.select().fromTo(0, 2, 1, 2, 1, 1), Blocks.OAK_PLANKS.defaultBlockState(), false);
 
         scene.idle(5);
         scene.world().showSectionAndMerge(util.select().position(2, 1, 0), Direction.SOUTH, chassis);
@@ -81,7 +81,7 @@ public class PulleyScenes {
             40
         );
         scene.overlay().showControls(util.vector().centerOf(util.grid().at(2, 2, 0)), Pointing.RIGHT, 40)
-            .withItem(AllItems.SUPER_GLUE.getDefaultStack());
+            .withItem(AllItems.SUPER_GLUE.getDefaultInstance());
         scene.idle(15);
         scene.effects().superGlue(util.grid().at(3, 1, 1), Direction.SOUTH, true);
         scene.overlay().showText(80).pointAt(util.vector().blockSurface(util.grid().at(1, 2, 2), Direction.NORTH)).placeNearTarget().attachKeyFrame()
@@ -125,7 +125,7 @@ public class PulleyScenes {
         scene.idle(10);
 
         scene.world().showSection(util.select().position(pulleyPos), Direction.SOUTH);
-        ElementLink<WorldSectionElement> glass = scene.world().showIndependentSection(util.select().position(pulleyPos.down()), Direction.UP);
+        ElementLink<WorldSectionElement> glass = scene.world().showIndependentSection(util.select().position(pulleyPos.below()), Direction.UP);
         scene.idle(20);
 
         scene.world().toggleRedstonePower(redstoneStuff);
@@ -152,7 +152,7 @@ public class PulleyScenes {
         scene.world().hideSection(util.select().position(flowerPos), Direction.DOWN);
         scene.idle(40);
 
-        scene.world().setBlock(flowerPos, Blocks.BLUE_ORCHID.getDefaultState(), false);
+        scene.world().setBlock(flowerPos, Blocks.BLUE_ORCHID.defaultBlockState(), false);
         scene.world().showSection(util.select().position(flowerPos), Direction.DOWN);
         scene.overlay().showCenteredScrollInput(pulleyPos, Direction.UP, 60);
         scene.overlay().showControls(util.vector().topOf(pulleyPos), Pointing.DOWN, 60).rightClick();

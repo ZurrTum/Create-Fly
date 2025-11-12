@@ -5,58 +5,57 @@ import com.zurrtum.create.AllItems;
 import com.zurrtum.create.content.kinetics.belt.item.BeltConnectorItem;
 import com.zurrtum.create.content.kinetics.simpleRelays.ShaftBlock;
 import com.zurrtum.create.infrastructure.config.AllConfigs;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.particle.DustParticleEffect;
-import net.minecraft.state.property.Properties;
-import net.minecraft.util.Hand;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.hit.HitResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.ColorHelper;
-import net.minecraft.util.math.Direction.Axis;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.math.random.Random;
-import net.minecraft.world.World;
-
 import java.util.LinkedList;
 import java.util.List;
+import net.minecraft.client.Minecraft;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction.Axis;
+import net.minecraft.core.particles.DustParticleOptions;
+import net.minecraft.util.ARGB;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.HitResult;
+import net.minecraft.world.phys.Vec3;
 
 public class BeltConnectorHandler {
-    private static final int CONNECT_COLOR = ColorHelper.fromFloats(1, .3f, .9f, .5f);
-    private static final int NO_CONNECT_COLOR = ColorHelper.fromFloats(1, .9f, .3f, .5f);
+    private static final int CONNECT_COLOR = ARGB.colorFromFloat(1, .3f, .9f, .5f);
+    private static final int NO_CONNECT_COLOR = ARGB.colorFromFloat(1, .9f, .3f, .5f);
 
-    public static void tick(MinecraftClient mc) {
-        PlayerEntity player = mc.player;
-        World world = mc.world;
+    public static void tick(Minecraft mc) {
+        Player player = mc.player;
+        Level world = mc.level;
 
         if (player == null || world == null)
             return;
-        if (mc.currentScreen != null)
+        if (mc.screen != null)
             return;
 
-        Random random = world.random;
-        for (Hand hand : Hand.values()) {
-            ItemStack heldItem = player.getStackInHand(hand);
+        RandomSource random = world.random;
+        for (InteractionHand hand : InteractionHand.values()) {
+            ItemStack heldItem = player.getItemInHand(hand);
 
-            if (!heldItem.isOf(AllItems.BELT_CONNECTOR))
+            if (!heldItem.is(AllItems.BELT_CONNECTOR))
                 continue;
 
-            if (!heldItem.contains(AllDataComponents.BELT_FIRST_SHAFT))
+            if (!heldItem.has(AllDataComponents.BELT_FIRST_SHAFT))
                 continue;
 
             BlockPos first = heldItem.get(AllDataComponents.BELT_FIRST_SHAFT);
 
-            if (!world.getBlockState(first).contains(Properties.AXIS))
+            if (!world.getBlockState(first).hasProperty(BlockStateProperties.AXIS))
                 continue;
-            Axis axis = world.getBlockState(first).get(Properties.AXIS);
+            Axis axis = world.getBlockState(first).getValue(BlockStateProperties.AXIS);
 
-            HitResult rayTrace = mc.crosshairTarget;
+            HitResult rayTrace = mc.hitResult;
             if (rayTrace == null || !(rayTrace instanceof BlockHitResult)) {
                 if (random.nextInt(50) == 0) {
-                    world.addParticleClient(
-                        new DustParticleEffect(CONNECT_COLOR, 1),
+                    world.addParticle(
+                        new DustParticleOptions(CONNECT_COLOR, 1),
                         first.getX() + .5f + randomOffset(random, .25f),
                         first.getY() + .5f + randomOffset(random, .25f),
                         first.getZ() + .5f + randomOffset(random, .25f),
@@ -70,30 +69,30 @@ public class BeltConnectorHandler {
 
             BlockPos selected = ((BlockHitResult) rayTrace).getBlockPos();
 
-            if (world.getBlockState(selected).isReplaceable())
+            if (world.getBlockState(selected).canBeReplaced())
                 return;
             if (!ShaftBlock.isShaft(world.getBlockState(selected)))
-                selected = selected.offset(((BlockHitResult) rayTrace).getSide());
-            if (!selected.isWithinDistance(first, AllConfigs.server().kinetics.maxBeltLength.get()))
+                selected = selected.relative(((BlockHitResult) rayTrace).getDirection());
+            if (!selected.closerThan(first, AllConfigs.server().kinetics.maxBeltLength.get()))
                 return;
 
             boolean canConnect = BeltConnectorItem.validateAxis(world, selected) && BeltConnectorItem.canConnect(world, first, selected);
 
-            Vec3d start = Vec3d.of(first);
-            Vec3d end = Vec3d.of(selected);
-            Vec3d actualDiff = end.subtract(start);
+            Vec3 start = Vec3.atLowerCornerOf(first);
+            Vec3 end = Vec3.atLowerCornerOf(selected);
+            Vec3 actualDiff = end.subtract(start);
             end = end.subtract(axis.choose(actualDiff.x, 0, 0), axis.choose(0, actualDiff.y, 0), axis.choose(0, 0, actualDiff.z));
-            Vec3d diff = end.subtract(start);
+            Vec3 diff = end.subtract(start);
 
             double x = Math.abs(diff.x);
             double y = Math.abs(diff.y);
             double z = Math.abs(diff.z);
             float length = (float) Math.max(x, Math.max(y, z));
-            Vec3d step = diff.normalize();
+            Vec3 step = diff.normalize();
 
             int sames = ((x == y) ? 1 : 0) + ((y == z) ? 1 : 0) + ((z == x) ? 1 : 0);
             if (sames == 0) {
-                List<Vec3d> validDiffs = new LinkedList<>();
+                List<Vec3> validDiffs = new LinkedList<>();
                 for (int i = -1; i <= 1; i++)
                     for (int j = -1; j <= 1; j++)
                         for (int k = -1; k <= 1; k++) {
@@ -103,11 +102,11 @@ public class BeltConnectorHandler {
                                 continue;
                             if (i == 0 && j == 0 && k == 0)
                                 continue;
-                            validDiffs.add(new Vec3d(i, j, k));
+                            validDiffs.add(new Vec3(i, j, k));
                         }
                 int closestIndex = 0;
                 float closest = Float.MAX_VALUE;
-                for (Vec3d validDiff : validDiffs) {
+                for (Vec3 validDiff : validDiffs) {
                     double distanceTo = step.distanceTo(validDiff);
                     if (distanceTo < closest) {
                         closest = (float) distanceTo;
@@ -120,12 +119,12 @@ public class BeltConnectorHandler {
             if (axis == Axis.Y && step.x != 0 && step.z != 0)
                 return;
 
-            step = new Vec3d(Math.signum(step.x), Math.signum(step.y), Math.signum(step.z));
+            step = new Vec3(Math.signum(step.x), Math.signum(step.y), Math.signum(step.z));
             int color = canConnect ? CONNECT_COLOR : NO_CONNECT_COLOR;
             for (float f = 0; f < length; f += .0625f) {
-                Vec3d position = start.add(step.multiply(f));
+                Vec3 position = start.add(step.scale(f));
                 if (random.nextInt(10) == 0) {
-                    world.addParticleClient(new DustParticleEffect(color, 1), position.x + .5f, position.y + .5f, position.z + .5f, 0, 0, 0);
+                    world.addParticle(new DustParticleOptions(color, 1), position.x + .5f, position.y + .5f, position.z + .5f, 0, 0, 0);
                 }
             }
 
@@ -133,7 +132,7 @@ public class BeltConnectorHandler {
         }
     }
 
-    private static float randomOffset(Random random, float range) {
+    private static float randomOffset(RandomSource random, float range) {
         return (random.nextFloat() - .5f) * 2 * range;
     }
 

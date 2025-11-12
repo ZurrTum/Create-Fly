@@ -4,19 +4,19 @@ import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.zurrtum.create.content.logistics.stockTicker.StockTickerInteractionHandler;
 import com.zurrtum.create.content.trains.schedule.ScheduleItemEntityInteraction;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.Hand;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.phys.Vec3;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 
-@Mixin(targets = "net.minecraft.server.network.ServerPlayNetworkHandler$1")
+@Mixin(targets = "net.minecraft.server.network.ServerGamePacketListenerImpl$1")
 public class PlayerInteractEntityC2SPacketMixin {
-    @WrapOperation(method = "method_33898(Lnet/minecraft/util/math/Vec3d;Lnet/minecraft/server/network/ServerPlayerEntity;Lnet/minecraft/entity/Entity;Lnet/minecraft/util/Hand;)Lnet/minecraft/util/ActionResult;", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/Entity;interactAt(Lnet/minecraft/entity/player/PlayerEntity;Lnet/minecraft/util/math/Vec3d;Lnet/minecraft/util/Hand;)Lnet/minecraft/util/ActionResult;"))
-    private static ActionResult interactAt(Entity entity, PlayerEntity player, Vec3d hitPos, Hand hand, Operation<ActionResult> original) {
-        ActionResult result = ScheduleItemEntityInteraction.interactWithConductor(entity, player, hand);
+    @WrapOperation(method = "method_33898(Lnet/minecraft/world/phys/Vec3;Lnet/minecraft/server/level/ServerPlayer;Lnet/minecraft/world/entity/Entity;Lnet/minecraft/world/InteractionHand;)Lnet/minecraft/world/InteractionResult;", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/Entity;interactAt(Lnet/minecraft/world/entity/player/Player;Lnet/minecraft/world/phys/Vec3;Lnet/minecraft/world/InteractionHand;)Lnet/minecraft/world/InteractionResult;"))
+    private static InteractionResult interactAt(Entity entity, Player player, Vec3 hitPos, InteractionHand hand, Operation<InteractionResult> original) {
+        InteractionResult result = ScheduleItemEntityInteraction.interactWithConductor(entity, player, hand);
         if (result != null) {
             return result;
         }

@@ -5,13 +5,12 @@ import com.zurrtum.create.AllBlocks;
 import com.zurrtum.create.content.logistics.factoryBoard.FactoryPanelSupportBehaviour;
 import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
 import com.zurrtum.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
-import net.minecraft.block.BlockState;
-import net.minecraft.storage.ReadView;
-import net.minecraft.storage.WriteView;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-
 import java.util.List;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 
 public class RedstoneLinkBlockEntity extends SmartBlockEntity {
 
@@ -33,7 +32,7 @@ public class RedstoneLinkBlockEntity extends SmartBlockEntity {
             this,
             () -> link != null && link.isListening(),
             () -> receivedSignal > 0,
-            () -> AllBlocks.REDSTONE_LINK.updateTransmittedSignal(getCachedState(), world, pos)
+            () -> AllBlocks.REDSTONE_LINK.updateTransmittedSignal(getBlockState(), level, worldPosition)
         ));
     }
 
@@ -64,7 +63,7 @@ public class RedstoneLinkBlockEntity extends SmartBlockEntity {
     }
 
     @Override
-    public void write(WriteView view, boolean clientPacket) {
+    public void write(ValueOutput view, boolean clientPacket) {
         view.putBoolean("Transmitter", transmitter);
         view.putInt("Receive", getReceivedSignal());
         view.putBoolean("ReceivedChanged", receivedSignalChanged);
@@ -73,14 +72,14 @@ public class RedstoneLinkBlockEntity extends SmartBlockEntity {
     }
 
     @Override
-    protected void read(ReadView view, boolean clientPacket) {
-        transmitter = view.getBoolean("Transmitter", false);
+    protected void read(ValueInput view, boolean clientPacket) {
+        transmitter = view.getBooleanOr("Transmitter", false);
         super.read(view, clientPacket);
 
-        receivedSignal = view.getInt("Receive", 0);
-        receivedSignalChanged = view.getBoolean("ReceivedChanged", false);
-        if (world == null || world.isClient() || !link.newPosition)
-            transmittedSignal = view.getInt("Transmit", 0);
+        receivedSignal = view.getIntOr("Receive", 0);
+        receivedSignalChanged = view.getBooleanOr("ReceivedChanged", false);
+        if (level == null || level.isClientSide() || !link.newPosition)
+            transmittedSignal = view.getIntOr("Transmit", 0);
     }
 
     @Override
@@ -98,16 +97,16 @@ public class RedstoneLinkBlockEntity extends SmartBlockEntity {
 
         if (transmitter)
             return;
-        if (world.isClient())
+        if (level.isClientSide())
             return;
 
-        BlockState blockState = getCachedState();
-        if (!blockState.isOf(AllBlocks.REDSTONE_LINK))
+        BlockState blockState = getBlockState();
+        if (!blockState.is(AllBlocks.REDSTONE_LINK))
             return;
 
-        if ((getReceivedSignal() > 0) != blockState.get(RedstoneLinkBlock.POWERED)) {
+        if ((getReceivedSignal() > 0) != blockState.getValue(RedstoneLinkBlock.POWERED)) {
             receivedSignalChanged = true;
-            world.setBlockState(pos, blockState.cycle(RedstoneLinkBlock.POWERED));
+            level.setBlockAndUpdate(worldPosition, blockState.cycle(RedstoneLinkBlock.POWERED));
         }
 
         if (receivedSignalChanged) {
@@ -119,20 +118,20 @@ public class RedstoneLinkBlockEntity extends SmartBlockEntity {
     public void remove() {
         super.remove();
 
-        updateSelfAndAttached(getCachedState());
+        updateSelfAndAttached(getBlockState());
     }
 
     public void updateSelfAndAttached(BlockState blockState) {
-        Direction attachedFace = blockState.get(RedstoneLinkBlock.FACING).getOpposite();
-        BlockPos attachedPos = pos.offset(attachedFace);
-        world.updateNeighbors(pos, world.getBlockState(pos).getBlock());
-        world.updateNeighbors(attachedPos, world.getBlockState(attachedPos).getBlock());
+        Direction attachedFace = blockState.getValue(RedstoneLinkBlock.FACING).getOpposite();
+        BlockPos attachedPos = worldPosition.relative(attachedFace);
+        level.updateNeighborsAt(worldPosition, level.getBlockState(worldPosition).getBlock());
+        level.updateNeighborsAt(attachedPos, level.getBlockState(attachedPos).getBlock());
         receivedSignalChanged = false;
         panelSupport.notifyPanels();
     }
 
     protected Boolean isTransmitterBlock() {
-        return !getCachedState().get(RedstoneLinkBlock.RECEIVER);
+        return !getBlockState().getValue(RedstoneLinkBlock.RECEIVER);
     }
 
     public int getReceivedSignal() {

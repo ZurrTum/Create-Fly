@@ -1,34 +1,34 @@
 package com.zurrtum.create.client.ponder.foundation.instruction;
 
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.math.Axis;
 import com.zurrtum.create.catnip.animation.LerpedFloat;
 import com.zurrtum.create.client.ponder.api.element.MinecartElement;
 import com.zurrtum.create.client.ponder.api.level.PonderLevel;
 import com.zurrtum.create.client.ponder.foundation.PonderScene;
 import com.zurrtum.create.client.ponder.foundation.element.AnimatedSceneElementBase;
-import net.minecraft.client.item.ItemModelManager;
-import net.minecraft.client.render.Camera;
-import net.minecraft.client.render.VertexConsumerProvider;
-import net.minecraft.client.render.command.OrderedRenderCommandQueue;
-import net.minecraft.client.render.entity.EntityRenderManager;
-import net.minecraft.client.render.entity.state.EntityRenderState;
-import net.minecraft.client.render.state.CameraRenderState;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.entity.vehicle.AbstractMinecartEntity;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.RotationAxis;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.client.Camera;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.SubmitNodeCollector;
+import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
+import net.minecraft.client.renderer.entity.state.EntityRenderState;
+import net.minecraft.client.renderer.item.ItemModelResolver;
+import net.minecraft.client.renderer.state.CameraRenderState;
+import net.minecraft.util.Mth;
+import net.minecraft.world.entity.vehicle.AbstractMinecart;
+import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 
 public class MinecartElementImpl extends AnimatedSceneElementBase implements MinecartElement {
 
-    private final Vec3d location;
+    private final Vec3 location;
     private final LerpedFloat rotation;
     @Nullable
-    private AbstractMinecartEntity entity;
+    private AbstractMinecart entity;
     private final MinecartConstructor constructor;
     private final float initialRotation;
 
-    public MinecartElementImpl(Vec3d location, float rotation, MinecartConstructor constructor) {
+    public MinecartElementImpl(Vec3 location, float rotation, MinecartConstructor constructor) {
         initialRotation = rotation;
         this.location = location.add(0, 1 / 16f, 0);
         this.constructor = constructor;
@@ -38,13 +38,13 @@ public class MinecartElementImpl extends AnimatedSceneElementBase implements Min
     @Override
     public void reset(PonderScene scene) {
         super.reset(scene);
-        entity.setPos(0, 0, 0);
-        entity.lastX = 0;
-        entity.lastY = 0;
-        entity.lastZ = 0;
-        entity.lastRenderX = 0;
-        entity.lastRenderY = 0;
-        entity.lastRenderZ = 0;
+        entity.setPosRaw(0, 0, 0);
+        entity.xo = 0;
+        entity.yo = 0;
+        entity.zo = 0;
+        entity.xOld = 0;
+        entity.yOld = 0;
+        entity.zOld = 0;
         rotation.startWithValue(initialRotation);
     }
 
@@ -52,28 +52,28 @@ public class MinecartElementImpl extends AnimatedSceneElementBase implements Min
     public void tick(PonderScene scene) {
         super.tick(scene);
         if (entity == null)
-            entity = constructor.create(scene.getWorld(), 0, 0, 0);
+            entity = constructor.create(scene.getLevel(), 0, 0, 0);
 
-        entity.age++;
+        entity.tickCount++;
         entity.setOnGround(true);
-        entity.lastX = entity.getX();
-        entity.lastY = entity.getY();
-        entity.lastZ = entity.getZ();
-        entity.lastRenderX = entity.getX();
-        entity.lastRenderY = entity.getY();
-        entity.lastRenderZ = entity.getZ();
+        entity.xo = entity.getX();
+        entity.yo = entity.getY();
+        entity.zo = entity.getZ();
+        entity.xOld = entity.getX();
+        entity.yOld = entity.getY();
+        entity.zOld = entity.getZ();
     }
 
     @Override
-    public void setPositionOffset(Vec3d position, boolean immediate) {
+    public void setPositionOffset(Vec3 position, boolean immediate) {
         if (entity == null)
             return;
-        entity.setPos(position.x, position.y, position.z);
+        entity.setPosRaw(position.x, position.y, position.z);
         if (!immediate)
             return;
-        entity.lastX = position.x;
-        entity.lastY = position.y;
-        entity.lastZ = position.z;
+        entity.xo = position.x;
+        entity.yo = position.y;
+        entity.zo = position.z;
     }
 
     @Override
@@ -87,44 +87,40 @@ public class MinecartElementImpl extends AnimatedSceneElementBase implements Min
     }
 
     @Override
-    public Vec3d getPositionOffset() {
-        return entity != null ? entity.getEntityPos() : Vec3d.ZERO;
+    public Vec3 getPositionOffset() {
+        return entity != null ? entity.position() : Vec3.ZERO;
     }
 
     @Override
-    public Vec3d getRotation() {
-        return new Vec3d(0, rotation.getValue(), 0);
+    public Vec3 getRotation() {
+        return new Vec3(0, rotation.getValue(), 0);
     }
 
     @Override
     public void renderLast(
-        EntityRenderManager entityRenderManager,
-        ItemModelManager itemModelManager,
+        EntityRenderDispatcher entityRenderManager,
+        ItemModelResolver itemModelManager,
         PonderLevel world,
-        VertexConsumerProvider buffer,
-        OrderedRenderCommandQueue queue,
+        MultiBufferSource buffer,
+        SubmitNodeCollector queue,
         Camera camera,
         CameraRenderState cameraRenderState,
-        MatrixStack poseStack,
+        PoseStack poseStack,
         float fade,
         float pt
     ) {
         if (entity == null)
             entity = constructor.create(world, 0, 0, 0);
 
-        poseStack.push();
+        poseStack.pushPose();
         poseStack.translate(location.x, location.y, location.z);
-        poseStack.translate(
-            MathHelper.lerp(pt, entity.lastX, entity.getX()),
-            MathHelper.lerp(pt, entity.lastY, entity.getY()),
-            MathHelper.lerp(pt, entity.lastZ, entity.getZ())
-        );
+        poseStack.translate(Mth.lerp(pt, entity.xo, entity.getX()), Mth.lerp(pt, entity.yo, entity.getY()), Mth.lerp(pt, entity.zo, entity.getZ()));
 
-        poseStack.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(rotation.getValue(pt)));
+        poseStack.mulPose(Axis.YP.rotationDegrees(rotation.getValue(pt)));
 
-        EntityRenderState state = entityRenderManager.getAndUpdateRenderState(entity, pt);
-        entityRenderManager.render(state, cameraRenderState, 0, 0, 0, poseStack, queue);
-        poseStack.pop();
+        EntityRenderState state = entityRenderManager.extractEntity(entity, pt);
+        entityRenderManager.submit(state, cameraRenderState, 0, 0, 0, poseStack, queue);
+        poseStack.popPose();
     }
 
 }

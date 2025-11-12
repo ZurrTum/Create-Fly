@@ -12,8 +12,8 @@ import com.zurrtum.create.client.flywheel.lib.model.Models;
 import com.zurrtum.create.client.foundation.virtualWorld.VirtualRenderWorld;
 import com.zurrtum.create.content.contraptions.behaviour.MovementContext;
 import com.zurrtum.create.content.kinetics.drill.DrillBlock;
-import net.minecraft.block.BlockState;
-import net.minecraft.util.math.Direction;
+import net.minecraft.core.Direction;
+import net.minecraft.world.level.block.state.BlockState;
 
 public class DrillActorVisual extends ActorVisual {
     TransformedInstance drillHead;
@@ -27,7 +27,7 @@ public class DrillActorVisual extends ActorVisual {
 
         BlockState state = context.state;
 
-        facing = state.get(DrillBlock.FACING);
+        facing = state.getValue(DrillBlock.FACING);
 
         drillHead = instancerProvider.instancer(InstanceTypes.TRANSFORMED, Models.partial(AllPartialModels.DRILL_HEAD)).createInstance();
     }

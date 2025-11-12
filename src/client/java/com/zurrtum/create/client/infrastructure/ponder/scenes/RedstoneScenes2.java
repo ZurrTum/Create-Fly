@@ -14,9 +14,9 @@ import com.zurrtum.create.content.redstone.RoseQuartzLampBlock;
 import com.zurrtum.create.content.redstone.diodes.BrassDiodeBlock;
 import com.zurrtum.create.content.redstone.diodes.PulseTimerBlockEntity;
 import com.zurrtum.create.content.redstone.nixieTube.NixieTubeBlockEntity;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.phys.Vec3;
 
 public class RedstoneScenes2 {
 
@@ -105,14 +105,14 @@ public class RedstoneScenes2 {
         scene.idle(90);
 
         scene.overlay().showControls(util.vector().topOf(centerLamp.east(2)), Pointing.DOWN, 20).rightClick()
-            .withItem(AllItems.WRENCH.getDefaultStack());
+            .withItem(AllItems.WRENCH.getDefaultInstance());
         scene.idle(6);
         scene.world().cycleBlockProperty(centerLamp.east(), RoseQuartzLampBlock.POWERING);
         scene.world().toggleRedstonePower(comparator);
         scene.world().modifyBlockEntityNBT(comparator, NixieTubeBlockEntity.class, nbt -> nbt.putInt("RedstoneStrength", 0));
         scene.idle(20);
 
-        scene.overlay().showControls(util.vector().topOf(centerLamp), Pointing.DOWN, 20).rightClick().withItem(AllItems.WRENCH.getDefaultStack());
+        scene.overlay().showControls(util.vector().topOf(centerLamp), Pointing.DOWN, 20).rightClick().withItem(AllItems.WRENCH.getDefaultInstance());
         scene.idle(6);
         scene.world().cycleBlockProperty(centerLamp.west(), RoseQuartzLampBlock.POWERING);
         scene.world().toggleRedstonePower(comparator);
@@ -135,7 +135,7 @@ public class RedstoneScenes2 {
 
         BlockPos circuitPos = util.grid().at(2, 1, 2);
         BlockPos leverPos = util.grid().at(4, 1, 2);
-        Vec3d circuitTop = util.vector().blockSurface(circuitPos, Direction.DOWN).add(0, 3 / 16f, 0);
+        Vec3 circuitTop = util.vector().blockSurface(circuitPos, Direction.DOWN).add(0, 3 / 16f, 0);
 
         world.modifyBlockEntityNBT(select.position(circuitPos), PulseTimerBlockEntity.class, nbt -> nbt.putInt("ScrollValue", 30));
         world.showSection(select.fromTo(1, 1, 2, 0, 1, 2), Direction.UP);

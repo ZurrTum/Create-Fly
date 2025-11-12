@@ -17,15 +17,14 @@ import com.zurrtum.create.foundation.blockEntity.behaviour.inventory.CapManipula
 import com.zurrtum.create.foundation.blockEntity.behaviour.inventory.InvManipulationBehaviour;
 import com.zurrtum.create.foundation.blockEntity.behaviour.inventory.TankManipulationBehaviour;
 import com.zurrtum.create.foundation.blockEntity.behaviour.inventory.VersionedInventoryTrackerBehaviour;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.item.ItemStack;
-import net.minecraft.storage.ReadView;
-import net.minecraft.storage.WriteView;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-
 import java.util.List;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 
 public class SmartObserverBlockEntity extends SmartBlockEntity {
 
@@ -59,21 +58,21 @@ public class SmartObserverBlockEntity extends SmartBlockEntity {
     public void tick() {
         super.tick();
 
-        if (world.isClient())
+        if (level.isClientSide())
             return;
 
-        BlockState state = getCachedState();
+        BlockState state = getBlockState();
         if (turnOffTicks > 0) {
             turnOffTicks--;
             if (turnOffTicks == 0)
-                world.scheduleBlockTick(pos, state.getBlock(), 1);
+                level.scheduleTick(worldPosition, state.getBlock(), 1);
         }
 
         if (!isActive())
             return;
 
-        BlockPos targetPos = pos.offset(SmartObserverBlock.getTargetDirection(state));
-        Block block = world.getBlockState(targetPos).getBlock();
+        BlockPos targetPos = worldPosition.relative(SmartObserverBlock.getTargetDirection(state));
+        Block block = level.getBlockState(targetPos).getBlock();
 
         if (!filtering.getFilter().isEmpty() && block.asItem() != null && filtering.test(new ItemStack(block))) {
             activate(3);
@@ -81,7 +80,7 @@ public class SmartObserverBlockEntity extends SmartBlockEntity {
         }
 
         // Detect items on belt
-        TransportedItemStackHandlerBehaviour behaviour = BlockEntityBehaviour.get(world, targetPos, TransportedItemStackHandlerBehaviour.TYPE);
+        TransportedItemStackHandlerBehaviour behaviour = BlockEntityBehaviour.get(level, targetPos, TransportedItemStackHandlerBehaviour.TYPE);
         if (behaviour != null) {
             behaviour.handleCenteredProcessingOnAllItems(
                 .45f, stack -> {
@@ -95,7 +94,7 @@ public class SmartObserverBlockEntity extends SmartBlockEntity {
         }
 
         // Detect fluids in pipe
-        FluidTransportBehaviour fluidBehaviour = BlockEntityBehaviour.get(world, targetPos, FluidTransportBehaviour.TYPE);
+        FluidTransportBehaviour fluidBehaviour = BlockEntityBehaviour.get(level, targetPos, FluidTransportBehaviour.TYPE);
         if (fluidBehaviour != null) {
             for (Direction side : Iterate.directions) {
                 Flow flow = fluidBehaviour.getFlow(side);
@@ -110,7 +109,7 @@ public class SmartObserverBlockEntity extends SmartBlockEntity {
         }
 
         // Detect packages looping on a chain conveyor
-        if (world.getBlockEntity(targetPos) instanceof ChainConveyorBlockEntity ccbe) {
+        if (level.getBlockEntity(targetPos) instanceof ChainConveyorBlockEntity ccbe) {
             for (ChainConveyorPackage box : ccbe.getLoopingPackages())
                 if (filtering.test(box.item)) {
                     activate();
@@ -146,12 +145,12 @@ public class SmartObserverBlockEntity extends SmartBlockEntity {
     }
 
     public void activate(int ticks) {
-        BlockState state = getCachedState();
+        BlockState state = getBlockState();
         turnOffTicks = ticks;
-        if (state.get(SmartObserverBlock.POWERED))
+        if (state.getValue(SmartObserverBlock.POWERED))
             return;
-        world.setBlockState(pos, state.with(SmartObserverBlock.POWERED, true));
-        world.updateNeighborsAlways(pos, state.getBlock(), null);
+        level.setBlockAndUpdate(worldPosition, state.setValue(SmartObserverBlock.POWERED, true));
+        level.updateNeighborsAt(worldPosition, state.getBlock(), null);
     }
 
     private boolean isActive() {
@@ -159,15 +158,15 @@ public class SmartObserverBlockEntity extends SmartBlockEntity {
     }
 
     @Override
-    public void write(WriteView view, boolean clientPacket) {
+    public void write(ValueOutput view, boolean clientPacket) {
         view.putInt("TurnOff", turnOffTicks);
         super.write(view, clientPacket);
     }
 
     @Override
-    protected void read(ReadView view, boolean clientPacket) {
+    protected void read(ValueInput view, boolean clientPacket) {
         super.read(view, clientPacket);
-        turnOffTicks = view.getInt("TurnOff", 0);
+        turnOffTicks = view.getIntOr("TurnOff", 0);
     }
 
 }

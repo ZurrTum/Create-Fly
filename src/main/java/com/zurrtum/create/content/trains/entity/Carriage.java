@@ -17,28 +17,28 @@ import com.zurrtum.create.content.trains.entity.TravellingPoint.ITrackSelector;
 import com.zurrtum.create.content.trains.graph.DimensionPalette;
 import com.zurrtum.create.content.trains.graph.TrackGraph;
 import com.zurrtum.create.content.trains.graph.TrackNodeLocation;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.SpawnReason;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.network.RegistryByteBuf;
-import net.minecraft.network.codec.PacketCodec;
-import net.minecraft.network.codec.PacketCodecs;
-import net.minecraft.registry.RegistryKey;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.UUIDUtil;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.storage.NbtReadView;
-import net.minecraft.storage.NbtWriteView;
-import net.minecraft.storage.ReadView;
-import net.minecraft.storage.WriteView;
-import net.minecraft.util.ErrorReporter;
-import net.minecraft.util.Uuids;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.World;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.util.Mth;
+import net.minecraft.util.ProblemReporter;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntitySpawnReason;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.storage.TagValueInput;
+import net.minecraft.world.level.storage.TagValueOutput;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
+import net.minecraft.world.phys.Vec3;
 import org.apache.commons.lang3.mutable.MutableDouble;
 import org.jetbrains.annotations.Nullable;
 
@@ -49,12 +49,12 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 
 public class Carriage {
-    public static final PacketCodec<RegistryByteBuf, Carriage> STREAM_CODEC = PacketCodec.tuple(
+    public static final StreamCodec<RegistryFriendlyByteBuf, Carriage> STREAM_CODEC = StreamCodec.composite(
         CarriageBogey.STREAM_CODEC,
         carriage -> carriage.bogeys.getFirst(),
         CatnipStreamCodecBuilders.nullable(CarriageBogey.STREAM_CODEC),
         carriage -> carriage.bogeys.getSecond(),
-        PacketCodecs.VAR_INT,
+        ByteBufCodecs.VAR_INT,
         carriage -> carriage.bogeySpacing,
         Carriage::new
     );
@@ -71,10 +71,10 @@ public class Carriage {
     public Couple<CarriageBogey> bogeys;
     public TrainCargoManager storage;
 
-    NbtCompound serialisedEntity;
-    Map<Integer, NbtCompound> serialisedPassengers;
+    CompoundTag serialisedEntity;
+    Map<Integer, CompoundTag> serialisedPassengers;
 
-    private Map<RegistryKey<World>, DimensionalCarriageEntity> entities;
+    private Map<ResourceKey<Level>, DimensionalCarriageEntity> entities;
 
     static final int FIRST = 0, MIDDLE = 1, LAST = 2, BOTH = 3;
 
@@ -82,7 +82,7 @@ public class Carriage {
         this.bogeySpacing = bogeySpacing;
         this.bogeys = Couple.create(bogey1, bogey2);
         this.id = netIdGenerator.incrementAndGet();
-        this.serialisedEntity = new NbtCompound();
+        this.serialisedEntity = new CompoundTag();
         this.presentConductors = Couple.create(false, false);
         this.serialisedPassengers = new HashMap<>();
         this.entities = new HashMap<>();
@@ -106,15 +106,15 @@ public class Carriage {
         return entities.size() > 1;
     }
 
-    public List<RegistryKey<World>> getPresentDimensions() {
+    public List<ResourceKey<Level>> getPresentDimensions() {
         return entities.keySet().stream().distinct().toList();
     }
 
-    public Optional<BlockPos> getPositionInDimension(RegistryKey<World> dimension) {
-        return Optional.ofNullable(entities.get(dimension)).map(carriage -> BlockPos.ofFloored(carriage.positionAnchor));
+    public Optional<BlockPos> getPositionInDimension(ResourceKey<Level> dimension) {
+        return Optional.ofNullable(entities.get(dimension)).map(carriage -> BlockPos.containing(carriage.positionAnchor));
     }
 
-    public void setContraption(World level, CarriageContraption contraption) {
+    public void setContraption(Level level, CarriageContraption contraption) {
         this.storage = null;
         CarriageContraptionEntity entity = CarriageContraptionEntity.create(level, contraption);
         entity.setCarriage(this);
@@ -127,21 +127,21 @@ public class Carriage {
         dimensional.removeAndSaveEntity(entity, true);
     }
 
-    public DimensionalCarriageEntity getDimensional(World level) {
-        return getDimensional(level.getRegistryKey());
+    public DimensionalCarriageEntity getDimensional(Level level) {
+        return getDimensional(level.dimension());
     }
 
-    public DimensionalCarriageEntity getDimensional(RegistryKey<World> dimension) {
+    public DimensionalCarriageEntity getDimensional(ResourceKey<Level> dimension) {
         return entities.computeIfAbsent(dimension, $ -> new DimensionalCarriageEntity());
     }
 
     @Nullable
-    public DimensionalCarriageEntity getDimensionalIfPresent(RegistryKey<World> dimension) {
+    public DimensionalCarriageEntity getDimensionalIfPresent(ResourceKey<Level> dimension) {
         return entities.get(dimension);
     }
 
     public double travel(
-        World level,
+        Level level,
         TrackGraph graph,
         double distance,
         TravellingPoint toFollowForward,
@@ -250,9 +250,9 @@ public class Carriage {
         }
     }
 
-    private Set<RegistryKey<World>> currentlyTraversedDimensions = new HashSet<>();
+    private Set<ResourceKey<Level>> currentlyTraversedDimensions = new HashSet<>();
 
-    public void manageEntities(World level) {
+    public void manageEntities(Level level) {
         currentlyTraversedDimensions.clear();
 
         bogeys.forEach(cb -> {
@@ -265,15 +265,15 @@ public class Carriage {
             });
         });
 
-        for (Iterator<Map.Entry<RegistryKey<World>, DimensionalCarriageEntity>> iterator = entities.entrySet().iterator(); iterator.hasNext(); ) {
-            Map.Entry<RegistryKey<World>, DimensionalCarriageEntity> entry = iterator.next();
+        for (Iterator<Map.Entry<ResourceKey<Level>, DimensionalCarriageEntity>> iterator = entities.entrySet().iterator(); iterator.hasNext(); ) {
+            Map.Entry<ResourceKey<Level>, DimensionalCarriageEntity> entry = iterator.next();
 
             boolean discard = !currentlyTraversedDimensions.isEmpty() && !currentlyTraversedDimensions.contains(entry.getKey());
 
             MinecraftServer server = level.getServer();
             if (server == null)
                 continue;
-            ServerWorld currentLevel = server.getWorld(entry.getKey());
+            ServerLevel currentLevel = server.getLevel(entry.getKey());
             if (currentLevel == null)
                 continue;
 
@@ -285,7 +285,7 @@ public class Carriage {
                     iterator.remove();
                 else if (dimensionalCarriageEntity.positionAnchor != null && CarriageEntityHandler.isActiveChunk(
                     currentLevel,
-                    BlockPos.ofFloored(dimensionalCarriageEntity.positionAnchor)
+                    BlockPos.containing(dimensionalCarriageEntity.positionAnchor)
                 ))
                     dimensionalCarriageEntity.createEntity(currentLevel, anyAvailableEntity() == null);
 
@@ -322,8 +322,8 @@ public class Carriage {
         if (trailingBogey.points.either(t -> t.edge == null))
             return;
 
-        RegistryKey<World> leadingBogeyDim = leadingBogey.getDimension();
-        RegistryKey<World> trailingBogeyDim = trailingBogey.getDimension();
+        ResourceKey<Level> leadingBogeyDim = leadingBogey.getDimension();
+        ResourceKey<Level> trailingBogeyDim = trailingBogey.getDimension();
         double leadingWheelSpacing = leadingBogey.type.getWheelPointSpacing();
         double trailingWheelSpacing = trailingBogey.type.getWheelPointSpacing();
 
@@ -333,8 +333,8 @@ public class Carriage {
         for (boolean leading : Iterate.trueAndFalse) {
             TravellingPoint point = leading ? getLeadingPoint() : getTrailingPoint();
             TravellingPoint otherPoint = !leading ? getLeadingPoint() : getTrailingPoint();
-            RegistryKey<World> dimension = point.node1.getLocation().dimension;
-            RegistryKey<World> otherDimension = otherPoint.node1.getLocation().dimension;
+            ResourceKey<Level> dimension = point.node1.getLocation().dimension;
+            ResourceKey<Level> otherDimension = otherPoint.node1.getLocation().dimension;
 
             if (dimension.equals(otherDimension) && leading) {
                 getDimensional(dimension).discardPivot();
@@ -408,9 +408,9 @@ public class Carriage {
 
     }
 
-    private Vec3d pivoted(
+    private Vec3 pivoted(
         DimensionalCarriageEntity dce,
-        RegistryKey<World> dimension,
+        ResourceKey<Level> dimension,
         TravellingPoint start,
         double offset,
         boolean leadingUpsideDown,
@@ -422,13 +422,13 @@ public class Carriage {
         if (pivot == null)
             return null;
         boolean flipped = start != getLeadingPoint() && (leadingUpsideDown != trailingUpsideDown);
-        Vec3d startVec = start.getPosition(train.graph, flipped);
-        Vec3d portalVec = pivot.getLocation().add(0, leadingUpsideDown ? -1.0 : 1.0, 0);
+        Vec3 startVec = start.getPosition(train.graph, flipped);
+        Vec3 portalVec = pivot.getLocation().add(0, leadingUpsideDown ? -1.0 : 1.0, 0);
         return VecHelper.lerp((float) (offset / startVec.distanceTo(portalVec)), startVec, portalVec);
     }
 
-    public void alignEntity(World level) {
-        DimensionalCarriageEntity dimensionalCarriageEntity = entities.get(level.getRegistryKey());
+    public void alignEntity(Level level) {
+        DimensionalCarriageEntity dimensionalCarriageEntity = entities.get(level.dimension());
         if (dimensionalCarriageEntity != null) {
             CarriageContraptionEntity entity = dimensionalCarriageEntity.entity.get();
             if (entity != null)
@@ -465,8 +465,8 @@ public class Carriage {
         return null;
     }
 
-    public Pair<RegistryKey<World>, DimensionalCarriageEntity> anyAvailableDimensionalCarriage() {
-        for (Map.Entry<RegistryKey<World>, DimensionalCarriageEntity> entry : entities.entrySet())
+    public Pair<ResourceKey<Level>, DimensionalCarriageEntity> anyAvailableDimensionalCarriage() {
+        for (Map.Entry<ResourceKey<Level>, DimensionalCarriageEntity> entry : entities.entrySet())
             if (entry.getValue().entity.get() != null)
                 return Pair.of(entry.getKey(), entry.getValue());
         return null;
@@ -480,16 +480,16 @@ public class Carriage {
         }
     }
 
-    public void write(WriteView view, DimensionPalette dimensions) {
-        bogeys.getFirst().write(view.get("FirstBogey"), dimensions);
+    public void write(ValueOutput view, DimensionPalette dimensions) {
+        bogeys.getFirst().write(view.child("FirstBogey"), dimensions);
         if (isOnTwoBogeys())
-            bogeys.getSecond().write(view.get("SecondBogey"), dimensions);
+            bogeys.getSecond().write(view.child("SecondBogey"), dimensions);
         view.putInt("Spacing", bogeySpacing);
         view.putBoolean("FrontConductor", presentConductors.getFirst());
         view.putBoolean("BackConductor", presentConductors.getSecond());
         view.putBoolean("Stalled", stalled);
 
-        Map<Integer, NbtCompound> passengerMap = new HashMap<>();
+        Map<Integer, CompoundTag> passengerMap = new HashMap<>();
 
         for (DimensionalCarriageEntity dimensionalCarriageEntity : entities.values()) {
             CarriageContraptionEntity entity = dimensionalCarriageEntity.entity.get();
@@ -500,28 +500,28 @@ public class Carriage {
             if (contraption == null)
                 continue;
             Map<UUID, Integer> mapping = contraption.getSeatMapping();
-            for (Entity passenger : entity.getPassengerList())
-                if (mapping.containsKey(passenger.getUuid())) {
-                    try (ErrorReporter.Logging logging = new ErrorReporter.Logging(passenger.getErrorReporterContext(), Create.LOGGER)) {
-                        NbtWriteView data = NbtWriteView.create(logging, entity.getRegistryManager());
-                        if (passenger.saveSelfData(data))
-                            passengerMap.put(mapping.get(passenger.getUuid()), data.getNbt());
+            for (Entity passenger : entity.getPassengers())
+                if (mapping.containsKey(passenger.getUUID())) {
+                    try (ProblemReporter.ScopedCollector logging = new ProblemReporter.ScopedCollector(passenger.problemPath(), Create.LOGGER)) {
+                        TagValueOutput data = TagValueOutput.createWithContext(logging, entity.registryAccess());
+                        if (passenger.saveAsPassenger(data))
+                            passengerMap.put(mapping.get(passenger.getUUID()), data.buildResult());
                     }
                 }
         }
 
-        view.put("Entity", NbtCompound.CODEC, serialisedEntity.copy());
+        view.store("Entity", CompoundTag.CODEC, serialisedEntity.copy());
 
-        NbtCompound passengerTag = new NbtCompound();
+        CompoundTag passengerTag = new CompoundTag();
         passengerMap.putAll(serialisedPassengers);
         passengerMap.forEach((seat, nbt) -> passengerTag.put("Seat" + seat, nbt.copy()));
-        view.put("Passengers", NbtCompound.CODEC, passengerTag);
+        view.store("Passengers", CompoundTag.CODEC, passengerTag);
 
-        WriteView.ListView list = view.getList("EntityPositioning");
+        ValueOutput.ValueOutputList list = view.childrenList("EntityPositioning");
         entities.forEach((key, entity) -> {
-            WriteView item = list.add();
+            ValueOutput item = list.addChild();
             entity.write(item);
-            item.put("Dim", dimensions, key);
+            item.store("Dim", dimensions, key);
         });
     }
 
@@ -535,7 +535,7 @@ public class Carriage {
         map.add("BackConductor", ops.createBoolean(input.presentConductors.getSecond()));
         map.add("Stalled", ops.createBoolean(input.stalled));
 
-        Map<Integer, NbtCompound> passengerMap = new HashMap<>();
+        Map<Integer, CompoundTag> passengerMap = new HashMap<>();
 
         for (DimensionalCarriageEntity dimensionalCarriageEntity : input.entities.values()) {
             CarriageContraptionEntity entity = dimensionalCarriageEntity.entity.get();
@@ -546,22 +546,22 @@ public class Carriage {
             if (contraption == null)
                 continue;
             Map<UUID, Integer> mapping = contraption.getSeatMapping();
-            for (Entity passenger : entity.getPassengerList())
-                if (mapping.containsKey(passenger.getUuid())) {
-                    try (ErrorReporter.Logging logging = new ErrorReporter.Logging(passenger.getErrorReporterContext(), Create.LOGGER)) {
-                        NbtWriteView data = NbtWriteView.create(logging, entity.getRegistryManager());
-                        if (passenger.saveSelfData(data))
-                            passengerMap.put(mapping.get(passenger.getUuid()), data.getNbt());
+            for (Entity passenger : entity.getPassengers())
+                if (mapping.containsKey(passenger.getUUID())) {
+                    try (ProblemReporter.ScopedCollector logging = new ProblemReporter.ScopedCollector(passenger.problemPath(), Create.LOGGER)) {
+                        TagValueOutput data = TagValueOutput.createWithContext(logging, entity.registryAccess());
+                        if (passenger.saveAsPassenger(data))
+                            passengerMap.put(mapping.get(passenger.getUUID()), data.buildResult());
                     }
                 }
         }
 
-        map.add("Entity", input.serialisedEntity.copy(), NbtCompound.CODEC);
+        map.add("Entity", input.serialisedEntity.copy(), CompoundTag.CODEC);
 
-        NbtCompound passengerTag = new NbtCompound();
+        CompoundTag passengerTag = new CompoundTag();
         passengerMap.putAll(input.serialisedPassengers);
         passengerMap.forEach((seat, nbt) -> passengerTag.put("Seat" + seat, nbt.copy()));
-        map.add("Passengers", passengerTag, NbtCompound.CODEC);
+        map.add("Passengers", passengerTag, CompoundTag.CODEC);
 
         ListBuilder<T> list = ops.listBuilder();
         input.entities.forEach((key, entity) -> {
@@ -575,31 +575,31 @@ public class Carriage {
     }
 
     private void serialize(Entity entity) {
-        try (ErrorReporter.Logging logging = new ErrorReporter.Logging(entity.getErrorReporterContext(), Create.LOGGER)) {
-            NbtWriteView view = NbtWriteView.create(logging, entity.getRegistryManager());
-            entity.saveSelfData(view);
-            serialisedEntity = view.getNbt();
+        try (ProblemReporter.ScopedCollector logging = new ProblemReporter.ScopedCollector(entity.problemPath(), Create.LOGGER)) {
+            TagValueOutput view = TagValueOutput.createWithContext(logging, entity.registryAccess());
+            entity.saveAsPassenger(view);
+            serialisedEntity = view.buildResult();
             serialisedEntity.remove("Passengers");
             serialisedEntity.getCompound("Contraption").ifPresent(nbt -> nbt.remove("Passengers"));
         }
     }
 
-    public static Carriage read(ReadView view, TrackGraph graph, DimensionPalette dimensions) {
-        CarriageBogey bogey1 = CarriageBogey.read(view.getReadView("FirstBogey"), graph, dimensions);
-        CarriageBogey bogey2 = view.getOptionalReadView("SecondBogey").map(bogey -> CarriageBogey.read(bogey, graph, dimensions)).orElse(null);
+    public static Carriage read(ValueInput view, TrackGraph graph, DimensionPalette dimensions) {
+        CarriageBogey bogey1 = CarriageBogey.read(view.childOrEmpty("FirstBogey"), graph, dimensions);
+        CarriageBogey bogey2 = view.child("SecondBogey").map(bogey -> CarriageBogey.read(bogey, graph, dimensions)).orElse(null);
 
-        Carriage carriage = new Carriage(bogey1, bogey2, view.getInt("Spacing", 0));
+        Carriage carriage = new Carriage(bogey1, bogey2, view.getIntOr("Spacing", 0));
 
-        carriage.stalled = view.getBoolean("Stalled", false);
-        carriage.presentConductors = Couple.create(view.getBoolean("FrontConductor", false), view.getBoolean("BackConductor", false));
-        carriage.serialisedEntity = view.read("Entity", NbtCompound.CODEC).orElseGet(NbtCompound::new);
+        carriage.stalled = view.getBooleanOr("Stalled", false);
+        carriage.presentConductors = Couple.create(view.getBooleanOr("FrontConductor", false), view.getBooleanOr("BackConductor", false));
+        carriage.serialisedEntity = view.read("Entity", CompoundTag.CODEC).orElseGet(CompoundTag::new);
 
-        view.getListReadView("EntityPositioning").forEach(item -> {
+        view.childrenListOrEmpty("EntityPositioning").forEach(item -> {
             carriage.getDimensional(item.read("Dim", dimensions).orElseThrow()).read(item);
         });
 
-        view.read("Passengers", NbtCompound.CODEC)
-            .ifPresent(nbt -> nbt.forEach((key, value) -> carriage.serialisedPassengers.put(Integer.valueOf(key.substring(4)), (NbtCompound) value)));
+        view.read("Passengers", CompoundTag.CODEC)
+            .ifPresent(nbt -> nbt.forEach((key, value) -> carriage.serialisedPassengers.put(Integer.valueOf(key.substring(4)), (CompoundTag) value)));
 
         return carriage;
     }
@@ -617,15 +617,15 @@ public class Carriage {
             ops.getBooleanValue(map.get("FrontConductor")).getOrThrow(),
             ops.getBooleanValue(map.get("BackConductor")).getOrThrow()
         );
-        carriage.serialisedEntity = NbtCompound.CODEC.parse(ops, map.get("Entity")).result().orElseGet(NbtCompound::new);
+        carriage.serialisedEntity = CompoundTag.CODEC.parse(ops, map.get("Entity")).result().orElseGet(CompoundTag::new);
 
         ops.getList(map.get("EntityPositioning")).getOrThrow().accept(item -> {
             MapLike<T> entity = ops.getMap(item).getOrThrow();
             carriage.getDimensional(dimensions.parse(ops, entity.get("Dim")).getOrThrow()).read(ops, entity);
         });
 
-        NbtCompound.CODEC.parse(ops, map.get("Passengers"))
-            .ifSuccess(nbt -> nbt.forEach((key, value) -> carriage.serialisedPassengers.put(Integer.valueOf(key.substring(4)), (NbtCompound) value)));
+        CompoundTag.CODEC.parse(ops, map.get("Passengers"))
+            .ifSuccess(nbt -> nbt.forEach((key, value) -> carriage.serialisedPassengers.put(Integer.valueOf(key.substring(4)), (CompoundTag) value)));
 
         return carriage;
     }
@@ -633,8 +633,8 @@ public class Carriage {
     private TravellingPoint portalScout = new TravellingPoint();
 
     public class DimensionalCarriageEntity {
-        public Vec3d positionAnchor;
-        public Couple<Vec3d> rotationAnchors;
+        public Vec3 positionAnchor;
+        public Couple<Vec3> rotationAnchors;
         public WeakReference<CarriageContraptionEntity> entity;
 
         public TrackNodeLocation pivot;
@@ -666,8 +666,8 @@ public class Carriage {
         }
 
         public void updateCutoff(boolean leadingIsCurrent) {
-            Vec3d leadingAnchor = rotationAnchors.getFirst();
-            Vec3d trailingAnchor = rotationAnchors.getSecond();
+            Vec3 leadingAnchor = rotationAnchors.getFirst();
+            Vec3 trailingAnchor = rotationAnchors.getSecond();
 
             if (leadingAnchor == null || trailingAnchor == null)
                 return;
@@ -676,16 +676,16 @@ public class Carriage {
                 return;
             }
 
-            Vec3d pivotLoc = pivot.getLocation().add(0, 1, 0);
+            Vec3 pivotLoc = pivot.getLocation().add(0, 1, 0);
 
             double leadingSpacing = leadingBogey().type.getWheelPointSpacing() / 2;
             double trailingSpacing = trailingBogey().type.getWheelPointSpacing() / 2;
             double anchorSpacing = leadingSpacing + bogeySpacing + trailingSpacing;
 
             if (isOnTwoBogeys()) {
-                Vec3d diff = trailingAnchor.subtract(leadingAnchor).normalize();
-                trailingAnchor = trailingAnchor.add(diff.multiply(trailingSpacing));
-                leadingAnchor = leadingAnchor.add(diff.multiply(-leadingSpacing));
+                Vec3 diff = trailingAnchor.subtract(leadingAnchor).normalize();
+                trailingAnchor = trailingAnchor.add(diff.scale(trailingSpacing));
+                leadingAnchor = leadingAnchor.add(diff.scale(-leadingSpacing));
             }
 
             double leadingDiff = leadingAnchor.distanceTo(pivotLoc);
@@ -703,10 +703,10 @@ public class Carriage {
             else if (!leadingIsCurrent && leadingDiff < trailingDiff && trailingDiff > 1)
                 cutoff = 0;
             else
-                cutoff = (float) MathHelper.clamp(1 - (leadingIsCurrent ? leadingDiff : trailingDiff), 0, 1) * (leadingIsCurrent ? 1 : -1);
+                cutoff = (float) Mth.clamp(1 - (leadingIsCurrent ? leadingDiff : trailingDiff), 0, 1) * (leadingIsCurrent ? 1 : -1);
         }
 
-        public TrackNodeLocation findPivot(RegistryKey<World> dimension, boolean leading) {
+        public TrackNodeLocation findPivot(ResourceKey<Level> dimension, boolean leading) {
             if (pivot != null)
                 return pivot;
 
@@ -734,16 +734,16 @@ public class Carriage {
             return pivot;
         }
 
-        public void write(WriteView view) {
+        public void write(ValueOutput view) {
             view.putFloat("Cutoff", cutoff);
             view.putInt("DiscardTicks", discardTicks);
             storage.write(view, false);
             if (pivot != null)
-                pivot.write(view.get("Pivot"), null);
+                pivot.write(view.child("Pivot"), null);
             if (positionAnchor != null)
-                view.put("PositionAnchor", Vec3d.CODEC, positionAnchor);
+                view.store("PositionAnchor", Vec3.CODEC, positionAnchor);
             if (rotationAnchors.both(Objects::nonNull)) {
-                WriteView.ListAppender<Vec3d> list = view.getListAppender("RotationAnchors", Vec3d.CODEC);
+                ValueOutput.TypedOutputList<Vec3> list = view.list("RotationAnchors", Vec3.CODEC);
                 list.add(rotationAnchors.getFirst());
                 list.add(rotationAnchors.getSecond());
             }
@@ -756,25 +756,25 @@ public class Carriage {
             if (pivot != null)
                 map.add("Pivot", TrackNodeLocation.encode(pivot, ops, empty, null));
             if (positionAnchor != null)
-                map.add("PositionAnchor", positionAnchor, Vec3d.CODEC);
+                map.add("PositionAnchor", positionAnchor, Vec3.CODEC);
             if (rotationAnchors.both(Objects::nonNull)) {
                 ListBuilder<T> list = ops.listBuilder();
-                list.add(rotationAnchors.getFirst(), Vec3d.CODEC);
-                list.add(rotationAnchors.getSecond(), Vec3d.CODEC);
+                list.add(rotationAnchors.getFirst(), Vec3.CODEC);
+                list.add(rotationAnchors.getSecond(), Vec3.CODEC);
                 map.add("RotationAnchors", list.build(empty));
             }
         }
 
-        public void read(ReadView view) {
-            cutoff = view.getFloat("Cutoff", 0);
-            discardTicks = view.getInt("DiscardTicks", 0);
+        public void read(ValueInput view) {
+            cutoff = view.getFloatOr("Cutoff", 0);
+            discardTicks = view.getIntOr("DiscardTicks", 0);
             storage.read(view, false, null);
-            view.getOptionalReadView("Pivot").ifPresent(pivot -> this.pivot = TrackNodeLocation.read(pivot, null));
+            view.child("Pivot").ifPresent(pivot -> this.pivot = TrackNodeLocation.read(pivot, null));
             if (positionAnchor != null)
                 return;
-            positionAnchor = view.read("PositionAnchor", Vec3d.CODEC).orElse(null);
-            view.getOptionalTypedListView("RotationAnchors", Vec3d.CODEC).ifPresent(list -> {
-                Iterator<Vec3d> iterator = list.iterator();
+            positionAnchor = view.read("PositionAnchor", Vec3.CODEC).orElse(null);
+            view.list("RotationAnchors", Vec3.CODEC).ifPresent(list -> {
+                Iterator<Vec3> iterator = list.iterator();
                 rotationAnchors = Couple.create(iterator.next(), iterator.next());
             });
         }
@@ -786,21 +786,21 @@ public class Carriage {
             Optional.ofNullable(map.get("Pivot")).ifPresent(pivot -> this.pivot = TrackNodeLocation.decode(ops, pivot, null));
             if (positionAnchor != null)
                 return;
-            positionAnchor = Vec3d.CODEC.parse(ops, map.get("PositionAnchor")).result().orElse(null);
+            positionAnchor = Vec3.CODEC.parse(ops, map.get("PositionAnchor")).result().orElse(null);
             ops.getStream(map.get("RotationAnchors")).ifSuccess(list -> {
                 Iterator<T> iterator = list.iterator();
                 rotationAnchors = Couple.create(
-                    Vec3d.CODEC.parse(ops, iterator.next()).getOrThrow(),
-                    Vec3d.CODEC.parse(ops, iterator.next()).getOrThrow()
+                    Vec3.CODEC.parse(ops, iterator.next()).getOrThrow(),
+                    Vec3.CODEC.parse(ops, iterator.next()).getOrThrow()
                 );
             });
         }
 
-        public Vec3d leadingAnchor() {
+        public Vec3 leadingAnchor() {
             return isOnTwoBogeys() ? rotationAnchors.getFirst() : positionAnchor;
         }
 
-        public Vec3d trailingAnchor() {
+        public Vec3 trailingAnchor() {
             return isOnTwoBogeys() ? rotationAnchors.getSecond() : positionAnchor;
         }
 
@@ -809,7 +809,7 @@ public class Carriage {
                 return Integer.MIN_VALUE;
             if (cutoff >= 1)
                 return Integer.MAX_VALUE;
-            return MathHelper.floor(-bogeySpacing + -1 + (2 + bogeySpacing) * cutoff);
+            return Mth.floor(-bogeySpacing + -1 + (2 + bogeySpacing) * cutoff);
         }
 
         public int maxAllowedLocalCoord() {
@@ -817,21 +817,21 @@ public class Carriage {
                 return Integer.MAX_VALUE;
             if (cutoff <= -1)
                 return Integer.MIN_VALUE;
-            return MathHelper.ceil(-bogeySpacing + -1 + (2 + bogeySpacing) * (cutoff + 1));
+            return Mth.ceil(-bogeySpacing + -1 + (2 + bogeySpacing) * (cutoff + 1));
         }
 
         public void updatePassengerLoadout() {
             Entity entity = this.entity.get();
             if (!(entity instanceof CarriageContraptionEntity cce))
                 return;
-            if (!(entity.getEntityWorld() instanceof ServerWorld sLevel))
+            if (!(entity.level() instanceof ServerLevel sLevel))
                 return;
 
             Set<Integer> loadedPassengers = new HashSet<>();
             int min = minAllowedLocalCoord();
             int max = maxAllowedLocalCoord();
 
-            for (Map.Entry<Integer, NbtCompound> entry : serialisedPassengers.entrySet()) {
+            for (Map.Entry<Integer, CompoundTag> entry : serialisedPassengers.entrySet()) {
                 Integer seatId = entry.getKey();
                 List<BlockPos> seats = cce.getContraption().getSeats();
                 if (seatId >= seats.size())
@@ -841,26 +841,26 @@ public class Carriage {
                 if (!cce.isLocalCoordWithin(localPos, min, max))
                     continue;
 
-                NbtCompound tag = entry.getValue();
+                CompoundTag tag = entry.getValue();
                 Entity passenger = null;
 
                 if (tag.contains("PlayerPassenger")) {
-                    passenger = sLevel.getServer().getPlayerManager().getPlayer(tag.get("PlayerPassenger", Uuids.INT_STREAM_CODEC).orElse(null));
+                    passenger = sLevel.getServer().getPlayerList().getPlayer(tag.read("PlayerPassenger", UUIDUtil.CODEC).orElse(null));
 
                 } else {
-                    passenger = EntityType.loadEntityWithPassengers(
-                        tag, entity.getEntityWorld(), SpawnReason.LOAD, e -> {
-                            e.refreshPositionAfterTeleport(positionAnchor);
+                    passenger = EntityType.loadEntityRecursive(
+                        tag, entity.level(), EntitySpawnReason.LOAD, e -> {
+                            e.snapTo(positionAnchor);
                             return e;
                         }
                     );
                     if (passenger != null)
-                        sLevel.spawnNewEntityAndPassengers(passenger);
+                        sLevel.tryAddFreshEntityWithPassengers(passenger);
                 }
 
                 if (passenger != null) {
-                    RegistryKey<World> passengerDimension = passenger.getEntityWorld().getRegistryKey();
-                    if (!passengerDimension.equals(sLevel.getRegistryKey()) && passenger instanceof ServerPlayerEntity sp)
+                    ResourceKey<Level> passengerDimension = passenger.level().dimension();
+                    if (!passengerDimension.equals(sLevel.dimension()) && passenger instanceof ServerPlayer sp)
                         continue;
                     cce.addSittingPassenger(passenger, seatId);
                 }
@@ -871,53 +871,53 @@ public class Carriage {
             loadedPassengers.forEach(serialisedPassengers::remove);
 
             Map<UUID, Integer> mapping = cce.getContraption().getSeatMapping();
-            for (Entity passenger : entity.getPassengerList()) {
-                BlockPos localPos = cce.getContraption().getSeatOf(passenger.getUuid());
+            for (Entity passenger : entity.getPassengers()) {
+                BlockPos localPos = cce.getContraption().getSeatOf(passenger.getUUID());
                 if (cce.isLocalCoordWithin(localPos, min, max))
                     continue;
-                if (!mapping.containsKey(passenger.getUuid()))
+                if (!mapping.containsKey(passenger.getUUID()))
                     continue;
 
-                Integer seat = mapping.get(passenger.getUuid());
-                if ((passenger instanceof ServerPlayerEntity sp)) {
+                Integer seat = mapping.get(passenger.getUUID());
+                if ((passenger instanceof ServerPlayer sp)) {
                     dismountPlayer(sLevel, sp, seat, true);
                     continue;
                 }
 
-                try (ErrorReporter.Logging logging = new ErrorReporter.Logging(passenger.getErrorReporterContext(), Create.LOGGER)) {
-                    NbtWriteView view = NbtWriteView.create(logging, entity.getRegistryManager());
-                    passenger.saveSelfData(view);
-                    serialisedPassengers.put(seat, view.getNbt());
+                try (ProblemReporter.ScopedCollector logging = new ProblemReporter.ScopedCollector(passenger.problemPath(), Create.LOGGER)) {
+                    TagValueOutput view = TagValueOutput.createWithContext(logging, entity.registryAccess());
+                    passenger.saveAsPassenger(view);
+                    serialisedPassengers.put(seat, view.buildResult());
                     passenger.discard();
                 }
             }
 
         }
 
-        private void dismountPlayer(ServerWorld sLevel, ServerPlayerEntity sp, Integer seat, boolean capture) {
+        private void dismountPlayer(ServerLevel sLevel, ServerPlayer sp, Integer seat, boolean capture) {
             if (!capture) {
                 sp.stopRiding();
                 return;
             }
 
-            NbtCompound tag = new NbtCompound();
-            tag.put("PlayerPassenger", Uuids.INT_STREAM_CODEC, sp.getUuid());
+            CompoundTag tag = new CompoundTag();
+            tag.store("PlayerPassenger", UUIDUtil.CODEC, sp.getUUID());
             serialisedPassengers.put(seat, tag);
             sp.stopRiding();
             AllSynchedDatas.CONTRAPTION_DISMOUNT_LOCATION.set(sp, Optional.empty());
 
-            for (Map.Entry<RegistryKey<World>, DimensionalCarriageEntity> other : entities.entrySet()) {
+            for (Map.Entry<ResourceKey<Level>, DimensionalCarriageEntity> other : entities.entrySet()) {
                 DimensionalCarriageEntity otherDce = other.getValue();
                 if (otherDce == this)
                     continue;
-                if (sp.getEntityWorld().getRegistryKey().equals(other.getKey()))
+                if (sp.level().dimension().equals(other.getKey()))
                     continue;
-                Vec3d loc = otherDce.pivot == null ? otherDce.positionAnchor : otherDce.pivot.getLocation();
+                Vec3 loc = otherDce.pivot == null ? otherDce.positionAnchor : otherDce.pivot.getLocation();
                 if (loc == null)
                     continue;
-                ServerWorld level = sLevel.getServer().getWorld(other.getKey());
-                sp.teleport(level, loc.x, loc.y, loc.z, Set.of(), sp.getYaw(), sp.getPitch(), true);
-                sp.resetPortalCooldown();
+                ServerLevel level = sLevel.getServer().getLevel(other.getKey());
+                sp.teleportTo(level, loc.x, loc.y, loc.z, Set.of(), sp.getYRot(), sp.getXRot(), true);
+                sp.setPortalCooldown();
                 AllAdvancements.TRAIN_PORTAL.trigger(sp);
             }
         }
@@ -931,31 +931,31 @@ public class Carriage {
                 return;
             cc.portalCutoffMin = minAllowedLocalCoord();
             cc.portalCutoffMax = maxAllowedLocalCoord();
-            if (!entity.getEntityWorld().isClient())
+            if (!entity.level().isClientSide())
                 return;
             AllClientHandle.INSTANCE.invalidateCarriage(cce);
         }
 
-        private void createEntity(World level, boolean loadPassengers) {
+        private void createEntity(Level level, boolean loadPassengers) {
             if (positionAnchor != null)
                 serialisedEntity.put("Pos", VecHelper.writeNBT(positionAnchor));
-            try (ErrorReporter.Logging logging = new ErrorReporter.Logging(() -> "Carriage", Create.LOGGER)) {
-                ReadView view = NbtReadView.create(logging, level.getRegistryManager(), serialisedEntity);
-                Entity entity = EntityType.getEntityFromData(view, level, SpawnReason.LOAD).orElse(null);
+            try (ProblemReporter.ScopedCollector logging = new ProblemReporter.ScopedCollector(() -> "Carriage", Create.LOGGER)) {
+                ValueInput view = TagValueInput.create(logging, level.registryAccess(), serialisedEntity);
+                Entity entity = EntityType.create(view, level, EntitySpawnReason.LOAD).orElse(null);
 
                 if (!(entity instanceof CarriageContraptionEntity cce)) {
                     train.invalid = true;
                     return;
                 }
 
-                entity.refreshPositionAfterTeleport(positionAnchor);
+                entity.snapTo(positionAnchor);
                 this.entity = new WeakReference<>(cce);
 
                 cce.setCarriage(Carriage.this);
                 cce.syncCarriage();
 
-                if (level instanceof ServerWorld sl)
-                    sl.spawnEntity(entity);
+                if (level instanceof ServerLevel sl)
+                    sl.addFreshEntity(entity);
 
                 updatePassengerLoadout();
             }
@@ -965,27 +965,27 @@ public class Carriage {
             Contraption contraption = entity.getContraption();
             if (contraption != null) {
                 Map<UUID, Integer> mapping = contraption.getSeatMapping();
-                for (Entity passenger : entity.getPassengerList()) {
-                    if (!mapping.containsKey(passenger.getUuid()))
+                for (Entity passenger : entity.getPassengers()) {
+                    if (!mapping.containsKey(passenger.getUUID()))
                         continue;
 
-                    Integer seat = mapping.get(passenger.getUuid());
+                    Integer seat = mapping.get(passenger.getUUID());
 
-                    if (passenger instanceof ServerPlayerEntity sp) {
-                        dismountPlayer(sp.getEntityWorld(), sp, seat, portal);
+                    if (passenger instanceof ServerPlayer sp) {
+                        dismountPlayer(sp.level(), sp, seat, portal);
                         continue;
                     }
 
-                    try (ErrorReporter.Logging logging = new ErrorReporter.Logging(passenger.getErrorReporterContext(), Create.LOGGER)) {
-                        NbtWriteView view = NbtWriteView.create(logging, entity.getRegistryManager());
-                        passenger.saveSelfData(view);
-                        serialisedPassengers.put(seat, view.getNbt());
+                    try (ProblemReporter.ScopedCollector logging = new ProblemReporter.ScopedCollector(passenger.problemPath(), Create.LOGGER)) {
+                        TagValueOutput view = TagValueOutput.createWithContext(logging, entity.registryAccess());
+                        passenger.saveAsPassenger(view);
+                        serialisedPassengers.put(seat, view.buildResult());
                     }
                 }
             }
 
-            for (Entity passenger : entity.getPassengerList())
-                if (!(passenger instanceof PlayerEntity))
+            for (Entity passenger : entity.getPassengers())
+                if (!(passenger instanceof Player))
                     passenger.discard();
 
             serialize(entity);
@@ -997,8 +997,8 @@ public class Carriage {
             if (rotationAnchors.either(Objects::isNull))
                 return;
 
-            Vec3d positionVec = rotationAnchors.getFirst();
-            Vec3d coupledVec = rotationAnchors.getSecond();
+            Vec3 positionVec = rotationAnchors.getFirst();
+            Vec3 coupledVec = rotationAnchors.getSecond();
 
             double diffX = positionVec.x - coupledVec.x;
             double diffY = positionVec.y - coupledVec.y;
@@ -1007,15 +1007,15 @@ public class Carriage {
             entity.prevYaw = entity.yaw;
             entity.prevPitch = entity.pitch;
 
-            if (!entity.getEntityWorld().isClient()) {
-                Vec3d lookahead = positionAnchor.add(positionAnchor.subtract(entity.getEntityPos()).normalize().multiply(16));
+            if (!entity.level().isClientSide()) {
+                Vec3 lookahead = positionAnchor.add(positionAnchor.subtract(entity.position()).normalize().scale(16));
 
-                for (Entity e : entity.getPassengerList()) {
-                    if (!(e instanceof PlayerEntity))
+                for (Entity e : entity.getPassengers()) {
+                    if (!(e instanceof Player))
                         continue;
-                    if (e.squaredDistanceTo(entity) > 32 * 32)
+                    if (e.distanceToSqr(entity) > 32 * 32)
                         continue;
-                    if (CarriageEntityHandler.isActiveChunk(entity.getEntityWorld(), BlockPos.ofFloored(lookahead)))
+                    if (CarriageEntityHandler.isActiveChunk(entity.level(), BlockPos.containing(lookahead)))
                         break;
                     train.carriageWaitingForChunks = id;
                     return;
@@ -1027,16 +1027,16 @@ public class Carriage {
                 entity.setServerSidePrevPosition();
             }
 
-            entity.setPosition(positionAnchor);
-            entity.yaw = (float) (MathHelper.atan2(diffZ, diffX) * 180 / Math.PI) + 180;
+            entity.setPos(positionAnchor);
+            entity.yaw = (float) (Mth.atan2(diffZ, diffX) * 180 / Math.PI) + 180;
             entity.pitch = (float) (Math.atan2(diffY, Math.sqrt(diffX * diffX + diffZ * diffZ)) * 180 / Math.PI) * -1;
 
             if (!entity.firstPositionUpdate)
                 return;
 
-            entity.lastX = entity.getX();
-            entity.lastY = entity.getY();
-            entity.lastZ = entity.getZ();
+            entity.xo = entity.getX();
+            entity.yo = entity.getY();
+            entity.zo = entity.getZ();
             entity.prevYaw = entity.yaw;
             entity.prevPitch = entity.pitch;
         }

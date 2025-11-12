@@ -1,5 +1,6 @@
 package com.zurrtum.create.client.content.contraptions.pulley;
 
+import com.mojang.math.Axis;
 import com.zurrtum.create.catnip.math.AngleHelper;
 import com.zurrtum.create.client.catnip.render.SpriteShiftEntry;
 import com.zurrtum.create.client.content.kinetics.base.ShaftVisual;
@@ -17,9 +18,12 @@ import it.unimi.dsi.fastutil.bytes.ByteArrayList;
 import it.unimi.dsi.fastutil.bytes.ByteList;
 import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
 import it.unimi.dsi.fastutil.longs.LongSet;
-import net.minecraft.client.render.LightmapTextureManager;
-import net.minecraft.util.math.*;
-import net.minecraft.world.LightType;
+import net.minecraft.client.renderer.LightTexture;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.SectionPos;
+import net.minecraft.util.Mth;
+import net.minecraft.world.level.LightLayer;
 import org.joml.Quaternionf;
 import org.joml.Quaternionfc;
 
@@ -31,7 +35,7 @@ public abstract class AbstractPulleyVisual<T extends KineticBlockEntity> extends
     private final SmartRecycler<Boolean, TransformedInstance> rope;
 
     protected final Direction rotatingAbout;
-    protected final RotationAxis rotationAxis;
+    protected final Axis rotationAxis;
 
     private final LightCache lightCache = new LightCache();
 
@@ -41,10 +45,10 @@ public abstract class AbstractPulleyVisual<T extends KineticBlockEntity> extends
         super(dispatcher, blockEntity, partialTick);
 
         rotatingAbout = Direction.get(Direction.AxisDirection.POSITIVE, rotationAxis());
-        rotationAxis = RotationAxis.of(rotatingAbout.getUnitVector());
+        rotationAxis = Axis.of(rotatingAbout.step());
 
         float blockStateAngle = AngleHelper.horizontalAngle(rotatingAbout);
-        Quaternionfc rotation = new Quaternionf().rotationY(MathHelper.RADIANS_PER_DEGREE * blockStateAngle);
+        Quaternionfc rotation = new Quaternionf().rotationY(Mth.DEG_TO_RAD * blockStateAngle);
 
         coil = getCoilModel().createInstance().rotation(rotation).position(getVisualPosition()).setSpriteShift(getCoilAnimation());
 
@@ -100,7 +104,7 @@ public abstract class AbstractPulleyVisual<T extends KineticBlockEntity> extends
         magnetInstancer().stealInstance(magnet);
 
         magnet.setIdentityTransform().translate(getVisualPosition()).translate(0, -offset, 0)
-            .light(lightCache.getPackedLight(Math.max(0, MathHelper.floor(offset)))).setChanged();
+            .light(lightCache.getPackedLight(Math.max(0, Mth.floor(offset)))).setChanged();
 
         rope.resetCount();
 
@@ -135,11 +139,11 @@ public abstract class AbstractPulleyVisual<T extends KineticBlockEntity> extends
 
     private void updateOffset(float pt) {
         offset = getOffset(pt);
-        lightCache.setSize(MathHelper.ceil(offset) + 2);
+        lightCache.setSize(Mth.ceil(offset) + 2);
     }
 
     private int getNeededRopeCount() {
-        return Math.max(0, MathHelper.ceil(offset - 1.25f));
+        return Math.max(0, Mth.ceil(offset - 1.25f));
     }
 
     private boolean shouldRenderHalfRope() {
@@ -165,7 +169,7 @@ public abstract class AbstractPulleyVisual<T extends KineticBlockEntity> extends
     private class LightCache {
         private final ByteList data = new ByteArrayList();
         private final LongSet sections = new LongOpenHashSet();
-        private final BlockPos.Mutable mutablePos = new BlockPos.Mutable();
+        private final BlockPos.MutableBlockPos mutablePos = new BlockPos.MutableBlockPos();
         private int sectionCount;
 
         public void setSize(int size) {
@@ -173,15 +177,15 @@ public abstract class AbstractPulleyVisual<T extends KineticBlockEntity> extends
                 data.size(size);
                 update();
 
-                int sectionCount = MoreMath.ceilingDiv(size + 15 - pos.getY() + pos.getY() / 4 * 4, ChunkSectionPos.field_33097);
+                int sectionCount = MoreMath.ceilingDiv(size + 15 - pos.getY() + pos.getY() / 4 * 4, SectionPos.SECTION_SIZE);
                 if (sectionCount != this.sectionCount) {
                     this.sectionCount = sectionCount;
                     sections.clear();
-                    int sectionX = ChunkSectionPos.getSectionCoord(pos.getX());
-                    int sectionY = ChunkSectionPos.getSectionCoord(pos.getY());
-                    int sectionZ = ChunkSectionPos.getSectionCoord(pos.getZ());
+                    int sectionX = SectionPos.blockToSectionCoord(pos.getX());
+                    int sectionY = SectionPos.blockToSectionCoord(pos.getY());
+                    int sectionZ = SectionPos.blockToSectionCoord(pos.getZ());
                     for (int i = 0; i < sectionCount; i++) {
-                        sections.add(ChunkSectionPos.asLong(sectionX, sectionY - i, sectionZ));
+                        sections.add(SectionPos.asLong(sectionX, sectionY - i, sectionZ));
                     }
                     // Will be null during initialization
                     if (lightSections != null) {
@@ -199,8 +203,8 @@ public abstract class AbstractPulleyVisual<T extends KineticBlockEntity> extends
             mutablePos.set(pos);
 
             for (int i = 0; i < data.size(); i++) {
-                int blockLight = level.getLightLevel(LightType.BLOCK, mutablePos);
-                int skyLight = level.getLightLevel(LightType.SKY, mutablePos);
+                int blockLight = level.getBrightness(LightLayer.BLOCK, mutablePos);
+                int skyLight = level.getBrightness(LightLayer.SKY, mutablePos);
                 int light = ((skyLight & 0xF) << 4) | (blockLight & 0xF);
                 data.set(i, (byte) light);
                 mutablePos.move(Direction.DOWN);
@@ -215,7 +219,7 @@ public abstract class AbstractPulleyVisual<T extends KineticBlockEntity> extends
             int light = Byte.toUnsignedInt(data.getByte(offset));
             int blockLight = light & 0xF;
             int skyLight = (light >>> 4) & 0xF;
-            return LightmapTextureManager.pack(blockLight, skyLight);
+            return LightTexture.pack(blockLight, skyLight);
         }
     }
 }

@@ -14,10 +14,10 @@ import me.shedaniel.rei.api.client.gui.Renderer;
 import me.shedaniel.rei.api.client.gui.widgets.Widget;
 import me.shedaniel.rei.api.client.gui.widgets.Widgets;
 import me.shedaniel.rei.api.common.category.CategoryIdentifier;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.fluid.Fluids;
-import net.minecraft.item.Items;
-import net.minecraft.text.Text;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.level.material.Fluids;
 import org.joml.Matrix3x2f;
 
 import java.util.List;
@@ -29,7 +29,7 @@ public class FanBlastingCategory extends CreateCategory<FanBlastingDisplay> {
     }
 
     @Override
-    public Text getTitle() {
+    public Component getTitle() {
         return CreateLang.translateDirect("recipe.fan_blasting");
     }
 
@@ -42,16 +42,16 @@ public class FanBlastingCategory extends CreateCategory<FanBlastingDisplay> {
     public void addWidgets(List<Widget> widgets, FanBlastingDisplay display, Rectangle bounds) {
         Point input = new Point(bounds.x + 26, bounds.y + 53);
         Point output = new Point(bounds.x + 146, bounds.y + 53);
-        widgets.add(Widgets.createDrawableWidget((DrawContext graphics, int mouseX, int mouseY, float delta) -> {
+        widgets.add(Widgets.createDrawableWidget((GuiGraphics graphics, int mouseX, int mouseY, float delta) -> {
             drawSlotBackground(graphics, input, output);
             AllGuiTextures.JEI_SHADOW.render(graphics, bounds.x + 51, bounds.y + 32);
             AllGuiTextures.JEI_LIGHT.render(graphics, bounds.x + 70, bounds.y + 44);
             AllGuiTextures.JEI_LONG_ARROW.render(graphics, bounds.x + 59, bounds.y + 56);
-            graphics.state.addSpecialElement(new FanRenderState(
-                new Matrix3x2f(graphics.getMatrices()),
+            graphics.guiRenderState.submitPicturesInPictureState(new FanRenderState(
+                new Matrix3x2f(graphics.pose()),
                 bounds.x + 61,
                 bounds.y + 9,
-                Fluids.LAVA.getDefaultState().getBlockState()
+                Fluids.LAVA.defaultFluidState().createLegacyBlock()
             ));
         }));
         widgets.add(createInputSlot(input).entries(display.input()));

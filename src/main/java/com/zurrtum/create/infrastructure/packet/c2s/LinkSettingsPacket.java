@@ -4,20 +4,19 @@ import com.zurrtum.create.AllHandle;
 import com.zurrtum.create.AllPackets;
 import com.zurrtum.create.catnip.codecs.stream.CatnipStreamCodecs;
 import io.netty.buffer.ByteBuf;
-import net.minecraft.network.codec.PacketCodec;
-import net.minecraft.network.codec.PacketCodecs;
-import net.minecraft.network.packet.PacketType;
-import net.minecraft.server.network.ServerPlayNetworkHandler;
-import net.minecraft.util.Hand;
-import net.minecraft.util.math.BlockPos;
-
 import java.util.function.BiConsumer;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.PacketType;
+import net.minecraft.server.network.ServerGamePacketListenerImpl;
+import net.minecraft.world.InteractionHand;
 
-public record LinkSettingsPacket(BlockPos pos, boolean first, Hand hand) implements C2SPacket {
-    public static final PacketCodec<ByteBuf, LinkSettingsPacket> CODEC = PacketCodec.tuple(
-        BlockPos.PACKET_CODEC,
+public record LinkSettingsPacket(BlockPos pos, boolean first, InteractionHand hand) implements C2SPacket {
+    public static final StreamCodec<ByteBuf, LinkSettingsPacket> CODEC = StreamCodec.composite(
+        BlockPos.STREAM_CODEC,
         LinkSettingsPacket::pos,
-        PacketCodecs.BOOLEAN,
+        ByteBufCodecs.BOOL,
         LinkSettingsPacket::first,
         CatnipStreamCodecs.HAND,
         LinkSettingsPacket::hand,
@@ -30,12 +29,12 @@ public record LinkSettingsPacket(BlockPos pos, boolean first, Hand hand) impleme
     }
 
     @Override
-    public PacketType<LinkSettingsPacket> getPacketType() {
+    public PacketType<LinkSettingsPacket> type() {
         return AllPackets.LINK_SETTINGS;
     }
 
     @Override
-    public BiConsumer<ServerPlayNetworkHandler, LinkSettingsPacket> callback() {
+    public BiConsumer<ServerGamePacketListenerImpl, LinkSettingsPacket> callback() {
         return AllHandle::onLinkSettings;
     }
 }

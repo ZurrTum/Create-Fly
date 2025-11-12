@@ -4,11 +4,11 @@ import com.zurrtum.create.client.AllCasings;
 import com.zurrtum.create.client.AllCasings.Entry;
 import com.zurrtum.create.client.foundation.block.connected.CTSpriteShiftEntry;
 import com.zurrtum.create.client.foundation.block.connected.ConnectedTextureBehaviour;
-import net.minecraft.block.BlockState;
-import net.minecraft.client.texture.Sprite;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.world.BlockRenderView;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.level.BlockAndTintGetter;
+import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.Nullable;
 
 public class EncasedCTBehaviour extends ConnectedTextureBehaviour.Base {
@@ -20,7 +20,7 @@ public class EncasedCTBehaviour extends ConnectedTextureBehaviour.Base {
     }
 
     @Override
-    public boolean connectsTo(BlockState state, BlockState other, BlockRenderView reader, BlockPos pos, BlockPos otherPos, Direction face) {
+    public boolean connectsTo(BlockState state, BlockState other, BlockAndTintGetter reader, BlockPos pos, BlockPos otherPos, Direction face) {
         if (isBeingBlocked(state, reader, pos, otherPos, face))
             return false;
         Entry entry = AllCasings.get(state);
@@ -33,7 +33,7 @@ public class EncasedCTBehaviour extends ConnectedTextureBehaviour.Base {
     }
 
     @Override
-    public CTSpriteShiftEntry getShift(BlockState state, Direction direction, @Nullable Sprite sprite) {
+    public CTSpriteShiftEntry getShift(BlockState state, Direction direction, @Nullable TextureAtlasSprite sprite) {
         return shift;
     }
 

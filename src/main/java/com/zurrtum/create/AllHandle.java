@@ -90,34 +90,6 @@ import com.zurrtum.create.infrastructure.config.AllConfigs;
 import com.zurrtum.create.infrastructure.items.ItemStackHandler;
 import com.zurrtum.create.infrastructure.packet.c2s.*;
 import com.zurrtum.create.infrastructure.packet.s2c.*;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.component.MergedComponentMap;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.attribute.EntityAttributes;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.recipe.ServerRecipeManager;
-import net.minecraft.screen.ScreenHandler;
-import net.minecraft.server.network.ServerPlayNetworkHandler;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.sound.BlockSoundGroup;
-import net.minecraft.sound.SoundCategory;
-import net.minecraft.sound.SoundEvents;
-import net.minecraft.storage.NbtWriteView;
-import net.minecraft.text.Text;
-import net.minecraft.util.ErrorReporter;
-import net.minecraft.util.Formatting;
-import net.minecraft.util.Hand;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.World;
 import org.apache.commons.lang3.mutable.MutableBoolean;
 import org.apache.commons.lang3.mutable.MutableObject;
 import org.jetbrains.annotations.Nullable;
@@ -129,10 +101,38 @@ import java.util.UUID;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import net.minecraft.ChatFormatting;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.component.PatchedDataComponentMap;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.server.network.ServerGamePacketListenerImpl;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.util.ProblemReporter;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.crafting.RecipeManager;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.SoundType;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.storage.TagValueOutput;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
 
 public class AllHandle {
-    public static void onConfigureSchematicannon(ServerPlayNetworkHandler listener, ConfigureSchematicannonPacket packet) {
-        if (!(listener.player.currentScreenHandler instanceof SchematicannonMenu menu))
+    public static void onConfigureSchematicannon(ServerGamePacketListenerImpl listener, ConfigureSchematicannonPacket packet) {
+        if (!(listener.player.containerMenu instanceof SchematicannonMenu menu))
             return;
 
         SchematicannonBlockEntity be = menu.contentHolder;
@@ -170,26 +170,26 @@ public class AllHandle {
         be.sendUpdate = true;
     }
 
-    private static void onBlockEntityConfiguration(ServerPlayNetworkHandler listener, BlockPos pos, int distance, Predicate<BlockEntity> predicate) {
-        ServerPlayerEntity player = listener.player;
-        if (player.isSpectator() || !player.canModifyBlocks()) {
+    private static void onBlockEntityConfiguration(ServerGamePacketListenerImpl listener, BlockPos pos, int distance, Predicate<BlockEntity> predicate) {
+        ServerPlayer player = listener.player;
+        if (player.isSpectator() || !player.mayBuild()) {
             return;
         }
-        ServerWorld world = player.getEntityWorld();
-        if (!world.isPosLoaded(pos)) {
+        ServerLevel world = player.level();
+        if (!world.isLoaded(pos)) {
             return;
         }
-        if (!pos.isWithinDistance(player.getBlockPos(), distance)) {
+        if (!pos.closerThan(player.blockPosition(), distance)) {
             return;
         }
         BlockEntity blockEntity = world.getBlockEntity(pos);
         if (predicate.test(blockEntity)) {
-            world.getChunkManager().markForUpdate(pos);
-            blockEntity.markDirty();
+            world.getChunkSource().blockChanged(pos);
+            blockEntity.setChanged();
         }
     }
 
-    public static void onConfigureThresholdSwitch(ServerPlayNetworkHandler listener, ConfigureThresholdSwitchPacket packet) {
+    public static void onConfigureThresholdSwitch(ServerGamePacketListenerImpl listener, ConfigureThresholdSwitchPacket packet) {
         onBlockEntityConfiguration(
             listener, packet.pos(), 20, blockEntity -> {
                 if (blockEntity instanceof ThresholdSwitchBlockEntity be) {
@@ -204,7 +204,7 @@ public class AllHandle {
         );
     }
 
-    public static void onConfigureSequencedGearshift(ServerPlayNetworkHandler listener, ConfigureSequencedGearshiftPacket packet) {
+    public static void onConfigureSequencedGearshift(ServerGamePacketListenerImpl listener, ConfigureSequencedGearshiftPacket packet) {
         onBlockEntityConfiguration(
             listener, packet.pos(), 20, blockEntity -> {
                 //TODO
@@ -218,7 +218,7 @@ public class AllHandle {
         );
     }
 
-    public static void onEjectorTrigger(ServerPlayNetworkHandler listener, EjectorTriggerPacket packet) {
+    public static void onEjectorTrigger(ServerGamePacketListenerImpl listener, EjectorTriggerPacket packet) {
         onBlockEntityConfiguration(
             listener, packet.pos(), 20, blockEntity -> {
                 if (blockEntity instanceof EjectorBlockEntity be) {
@@ -230,13 +230,13 @@ public class AllHandle {
         );
     }
 
-    public static void onStationEdit(ServerPlayNetworkHandler listener, StationEditPacket packet) {
+    public static void onStationEdit(ServerGamePacketListenerImpl listener, StationEditPacket packet) {
         onBlockEntityConfiguration(
             listener, packet.pos(), 20, blockEntity -> {
                 if (blockEntity instanceof StationBlockEntity be) {
-                    ServerPlayerEntity player = listener.player;
-                    World level = be.getWorld();
-                    BlockPos blockPos = be.getPos();
+                    ServerPlayer player = listener.player;
+                    Level level = be.getLevel();
+                    BlockPos blockPos = be.getBlockPos();
                     BlockState blockState = level.getBlockState(blockPos);
                     GlobalStation station = be.getStation();
 
@@ -256,14 +256,14 @@ public class AllHandle {
                     if (!(blockState.getBlock() instanceof StationBlock))
                         return true;
 
-                    Boolean isAssemblyMode = blockState.get(StationBlock.ASSEMBLING);
+                    Boolean isAssemblyMode = blockState.getValue(StationBlock.ASSEMBLING);
                     boolean assemblyComplete = false;
 
                     if (packet.tryAssemble() != null) {
                         if (!isAssemblyMode)
                             return true;
                         if (packet.tryAssemble()) {
-                            be.assemble(player.getUuid());
+                            be.assemble(player.getUUID());
                             assemblyComplete = station != null && station.getPresentTrain() != null;
                         } else {
                             if (be.tryDisassembleTrain(player) && be.tryEnterAssemblyMode())
@@ -284,14 +284,14 @@ public class AllHandle {
         );
     }
 
-    public static void onDisplayLinkConfiguration(ServerPlayNetworkHandler listener, DisplayLinkConfigurationPacket packet) {
+    public static void onDisplayLinkConfiguration(ServerGamePacketListenerImpl listener, DisplayLinkConfigurationPacket packet) {
         onBlockEntityConfiguration(
             listener, packet.pos(), 20, blockEntity -> {
                 if (blockEntity instanceof DisplayLinkBlockEntity be) {
                     be.targetLine = packet.targetLine();
 
-                    NbtCompound configData = packet.configData();
-                    Identifier id = configData.get("Id", Identifier.CODEC).orElse(null);
+                    CompoundTag configData = packet.configData();
+                    ResourceLocation id = configData.read("Id", ResourceLocation.CODEC).orElse(null);
                     if (id == null) {
                         be.notifyUpdate();
                         return true;
@@ -307,7 +307,7 @@ public class AllHandle {
                         be.activeSource = source;
                         be.setSourceConfig(configData.copy());
                     } else {
-                        be.getSourceConfig().copyFrom(configData);
+                        be.getSourceConfig().merge(configData);
                     }
 
                     be.updateGatheredData();
@@ -319,16 +319,16 @@ public class AllHandle {
         );
     }
 
-    public static void onCurvedTrackDestroy(ServerPlayNetworkHandler listener, CurvedTrackDestroyPacket packet) {
+    public static void onCurvedTrackDestroy(ServerGamePacketListenerImpl listener, CurvedTrackDestroyPacket packet) {
         BlockPos pos = packet.pos();
         onBlockEntityConfiguration(
             listener, pos, AllConfigs.server().trains.maxTrackPlacementLength.get() + 16, blockEntity -> {
                 if (blockEntity instanceof TrackBlockEntity be) {
-                    ServerPlayerEntity player = listener.player;
-                    ServerWorld world = player.getEntityWorld();
+                    ServerPlayer player = listener.player;
+                    ServerLevel world = player.level();
                     int verifyDistance = AllConfigs.server().trains.maxTrackPlacementLength.get() * 4;
-                    if (!be.getPos().isWithinDistance(player.getBlockPos(), verifyDistance)) {
-                        Create.LOGGER.warn(player.getNameForScoreboard() + " too far away from destroyed Curve track");
+                    if (!be.getBlockPos().closerThan(player.blockPosition(), verifyDistance)) {
+                        Create.LOGGER.warn(player.getScoreboardName() + " too far away from destroyed Curve track");
                         return true;
                     }
 
@@ -339,7 +339,7 @@ public class AllHandle {
                     if (world.getBlockEntity(targetPos) instanceof TrackBlockEntity other)
                         other.removeConnection(pos);
 
-                    BlockState blockState = be.getCachedState();
+                    BlockState blockState = be.getBlockState();
                     TrackPropagator.onRailRemoved(world, pos, blockState);
 
                     if (packet.wrench()) {
@@ -350,7 +350,7 @@ public class AllHandle {
                         bezierConnection.spawnItems(world);
 
                     bezierConnection.spawnDestroyParticles(world);
-                    BlockSoundGroup soundtype = blockState.getSoundGroup();
+                    SoundType soundtype = blockState.getSoundType();
                     if (soundtype == null)
                         return true;
 
@@ -358,7 +358,7 @@ public class AllHandle {
                         null,
                         packet.soundSource(),
                         soundtype.getBreakSound(),
-                        SoundCategory.BLOCKS,
+                        SoundSource.BLOCKS,
                         (soundtype.getVolume() + 1.0F) / 2.0F,
                         soundtype.getPitch() * 0.8F
                     );
@@ -369,20 +369,20 @@ public class AllHandle {
         );
     }
 
-    public static void onCurvedTrackSelection(ServerPlayNetworkHandler listener, CurvedTrackSelectionPacket packet) {
+    public static void onCurvedTrackSelection(ServerGamePacketListenerImpl listener, CurvedTrackSelectionPacket packet) {
         BlockPos pos = packet.pos();
         onBlockEntityConfiguration(
             listener, pos, AllConfigs.server().trains.maxTrackPlacementLength.get() + 16, blockEntity -> {
                 if (blockEntity instanceof TrackBlockEntity be) {
-                    ServerPlayerEntity player = listener.player;
-                    ServerWorld world = player.getEntityWorld();
+                    ServerPlayer player = listener.player;
+                    ServerLevel world = player.level();
                     if (player.getInventory().getSelectedSlot() != packet.slot())
                         return true;
-                    ItemStack stack = player.getInventory().getStack(packet.slot());
+                    ItemStack stack = player.getInventory().getItem(packet.slot());
                     if (!(stack.getItem() instanceof TrackTargetingBlockItem))
                         return true;
-                    if (player.isSneaking() && stack.contains(AllDataComponents.TRACK_TARGETING_ITEM_SELECTED_POS)) {
-                        player.sendMessage(Text.translatable("create.track_target.clear"), true);
+                    if (player.isShiftKeyDown() && stack.has(AllDataComponents.TRACK_TARGETING_ITEM_SELECTED_POS)) {
+                        player.displayClientMessage(Component.translatable("create.track_target.clear"), true);
                         stack.remove(AllDataComponents.TRACK_TARGETING_ITEM_SELECTED_POS);
                         stack.remove(AllDataComponents.TRACK_TARGETING_ITEM_SELECTED_DIRECTION);
                         stack.remove(AllDataComponents.TRACK_TARGETING_ITEM_BEZIER);
@@ -390,7 +390,7 @@ public class AllHandle {
                         return true;
                     }
 
-                    EdgePointType<?> type = stack.isOf(AllItems.TRACK_SIGNAL) ? EdgePointType.SIGNAL : EdgePointType.STATION;
+                    EdgePointType<?> type = stack.is(AllItems.TRACK_SIGNAL) ? EdgePointType.SIGNAL : EdgePointType.STATION;
                     MutableObject<OverlapResult> result = new MutableObject<>(null);
                     BezierTrackPointLocation bezierTrackPointLocation = new BezierTrackPointLocation(packet.targetPos(), packet.segment());
                     TrackTargetingBlockItem.withGraphLocation(
@@ -403,7 +403,7 @@ public class AllHandle {
                     );
 
                     if (result.getValue().feedback != null) {
-                        player.sendMessage(Text.translatable("create." + result.getValue().feedback).formatted(Formatting.RED), true);
+                        player.displayClientMessage(Component.translatable("create." + result.getValue().feedback).withStyle(ChatFormatting.RED), true);
                         AllSoundEvents.DENY.play(world, null, pos, .5f, 1);
                         return true;
                     }
@@ -412,7 +412,7 @@ public class AllHandle {
                     stack.set(AllDataComponents.TRACK_TARGETING_ITEM_SELECTED_DIRECTION, packet.front());
                     stack.set(AllDataComponents.TRACK_TARGETING_ITEM_BEZIER, bezierTrackPointLocation);
 
-                    player.sendMessage(Text.translatable("create.track_target.set"), true);
+                    player.displayClientMessage(Component.translatable("create.track_target.set"), true);
                     AllSoundEvents.CONTROLLER_CLICK.play(world, null, pos, 1, 1);
                     return true;
                 }
@@ -421,7 +421,7 @@ public class AllHandle {
         );
     }
 
-    public static void onGaugeObserved(ServerPlayNetworkHandler listener, GaugeObservedPacket packet) {
+    public static void onGaugeObserved(ServerGamePacketListenerImpl listener, GaugeObservedPacket packet) {
         onBlockEntityConfiguration(
             listener, packet.pos(), 20, blockEntity -> {
                 if (blockEntity instanceof StressGaugeBlockEntity be) {
@@ -432,7 +432,7 @@ public class AllHandle {
         );
     }
 
-    public static void onEjectorAward(ServerPlayNetworkHandler listener, EjectorAwardPacket packet) {
+    public static void onEjectorAward(ServerGamePacketListenerImpl listener, EjectorAwardPacket packet) {
         onBlockEntityConfiguration(
             listener, packet.pos(), 20, blockEntity -> {
                 if (blockEntity instanceof EjectorBlockEntity) {
@@ -444,7 +444,7 @@ public class AllHandle {
         );
     }
 
-    public static void onElevatorContactEdit(ServerPlayNetworkHandler listener, ElevatorContactEditPacket packet) {
+    public static void onElevatorContactEdit(ServerGamePacketListenerImpl listener, ElevatorContactEditPacket packet) {
         onBlockEntityConfiguration(
             listener, packet.pos(), 20, blockEntity -> {
                 if (blockEntity instanceof ElevatorContactBlockEntity be) {
@@ -457,11 +457,11 @@ public class AllHandle {
         );
     }
 
-    public static void onValueSettings(ServerPlayNetworkHandler listener, ValueSettingsPacket packet) {
+    public static void onValueSettings(ServerGamePacketListenerImpl listener, ValueSettingsPacket packet) {
         onBlockEntityConfiguration(
             listener, packet.pos(), 20, blockEntity -> {
                 if (blockEntity instanceof SmartBlockEntity be) {
-                    ServerPlayerEntity player = listener.player;
+                    ServerPlayer player = listener.player;
                     if (be instanceof FactoryPanelBlockEntity fpbe) {
                         for (ServerFactoryPanelBehaviour behaviour : fpbe.panels.values()) {
                             if (handleValueSettings(player, behaviour, packet)) {
@@ -482,7 +482,7 @@ public class AllHandle {
         );
     }
 
-    private static boolean handleValueSettings(ServerPlayerEntity player, ValueSettingsHandleBehaviour handle, ValueSettingsPacket packet) {
+    private static boolean handleValueSettings(ServerPlayer player, ValueSettingsHandleBehaviour handle, ValueSettingsPacket packet) {
         if (handle == null || !handle.acceptsValueSettings() || packet.behaviourIndex() != handle.netId()) {
             return false;
         }
@@ -494,7 +494,7 @@ public class AllHandle {
         return true;
     }
 
-    public static void onLogisticalStockRequest(ServerPlayNetworkHandler listener, LogisticalStockRequestPacket packet) {
+    public static void onLogisticalStockRequest(ServerGamePacketListenerImpl listener, LogisticalStockRequestPacket packet) {
         onBlockEntityConfiguration(
             listener, packet.pos(), 4096, blockEntity -> {
                 if (blockEntity instanceof StockCheckingBlockEntity be) {
@@ -506,9 +506,9 @@ public class AllHandle {
         );
     }
 
-    public static void onPackageOrderRequest(ServerPlayNetworkHandler listener, PackageOrderRequestPacket packet) {
-        ServerPlayerEntity player = listener.player;
-        ServerWorld world = player.getEntityWorld();
+    public static void onPackageOrderRequest(ServerGamePacketListenerImpl listener, PackageOrderRequestPacket packet) {
+        ServerPlayer player = listener.player;
+        ServerLevel world = player.level();
         BlockPos pos = packet.pos();
         onBlockEntityConfiguration(
             listener, pos, 20, blockEntity -> {
@@ -517,7 +517,7 @@ public class AllHandle {
                     if (packet.encodeRequester()) {
                         if (!order.isEmpty())
                             AllSoundEvents.CONFIRM.playOnServer(world, pos);
-                        player.closeHandledScreen();
+                        player.closeContainer();
                         RedstoneRequesterBlock.programRequester(player, be, order, packet.address());
                         return true;
                     }
@@ -525,8 +525,8 @@ public class AllHandle {
                     if (!order.isEmpty()) {
                         AllSoundEvents.STOCK_TICKER_REQUEST.playOnServer(world, pos);
                         AllAdvancements.STOCK_TICKER.trigger(player);
-                        listener.server.getPlayerManager()
-                            .sendToAround(null, pos.getX(), pos.getY(), pos.getZ(), 32, world.getRegistryKey(), new WiFiEffectPacket(pos));
+                        listener.server.getPlayerList()
+                            .broadcast(null, pos.getX(), pos.getY(), pos.getZ(), 32, world.dimension(), new WiFiEffectPacket(pos));
                     }
 
                     be.broadcastPackageRequest(RequestType.PLAYER, order, null, packet.address());
@@ -537,22 +537,22 @@ public class AllHandle {
         );
     }
 
-    public static void onChainConveyorConnection(ServerPlayNetworkHandler listener, ChainConveyorConnectionPacket packet) {
-        ServerPlayerEntity player = listener.player;
-        ServerWorld world = player.getEntityWorld();
+    public static void onChainConveyorConnection(ServerGamePacketListenerImpl listener, ChainConveyorConnectionPacket packet) {
+        ServerPlayer player = listener.player;
+        ServerLevel world = player.level();
         int maxRange = AllConfigs.server().kinetics.maxChainConveyorLength.get() + 16;
         onBlockEntityConfiguration(
             listener, packet.pos(), maxRange, blockEntity -> {
                 if (blockEntity instanceof ChainConveyorBlockEntity be) {
                     BlockPos targetPos = packet.targetPos();
                     boolean connect = packet.connect();
-                    if (!be.getPos().isWithinDistance(targetPos, maxRange - 16 + 1))
+                    if (!be.getBlockPos().closerThan(targetPos, maxRange - 16 + 1))
                         return true;
                     if (!(world.getBlockEntity(targetPos) instanceof ChainConveyorBlockEntity clbe))
                         return true;
 
                     if (connect && !player.isCreative()) {
-                        int chainCost = ChainConveyorBlockEntity.getChainCost(targetPos.subtract(be.getPos()));
+                        int chainCost = ChainConveyorBlockEntity.getChainCost(targetPos.subtract(be.getBlockPos()));
                         boolean hasEnough = ChainConveyorBlockEntity.getChainsFromInventory(player, packet.chain(), chainCost, true);
                         if (!hasEnough)
                             return true;
@@ -563,23 +563,23 @@ public class AllHandle {
                         if (!player.isCreative()) {
                             int chainCost = ChainConveyorBlockEntity.getChainCost(targetPos.subtract(packet.pos()));
                             while (chainCost > 0) {
-                                player.getInventory().offerOrDrop(new ItemStack(Items.IRON_CHAIN, Math.min(chainCost, 64)));
+                                player.getInventory().placeItemBackInInventory(new ItemStack(Items.IRON_CHAIN, Math.min(chainCost, 64)));
                                 chainCost -= 64;
                             }
                         }
-                        be.chainDestroyed(targetPos.subtract(be.getPos()), false, true);
-                        world.playSound(null, player.getBlockPos(), SoundEvents.BLOCK_CHAIN_BREAK, SoundCategory.BLOCKS);
+                        be.chainDestroyed(targetPos.subtract(be.getBlockPos()), false, true);
+                        world.playSound(null, player.blockPosition(), SoundEvents.CHAIN_BREAK, SoundSource.BLOCKS);
                     }
 
                     if (connect) {
-                        if (!clbe.addConnectionTo(be.getPos()))
+                        if (!clbe.addConnectionTo(be.getBlockPos()))
                             return true;
                     } else
-                        clbe.removeConnectionTo(be.getPos());
+                        clbe.removeConnectionTo(be.getBlockPos());
 
                     if (connect) {
                         if (!be.addConnectionTo(targetPos))
-                            clbe.removeConnectionTo(be.getPos());
+                            clbe.removeConnectionTo(be.getBlockPos());
                     } else
                         be.removeConnectionTo(targetPos);
                     return true;
@@ -589,14 +589,14 @@ public class AllHandle {
         );
     }
 
-    public static void onServerboundChainConveyorRiding(ServerPlayNetworkHandler listener, ServerboundChainConveyorRidingPacket packet) {
-        ServerPlayerEntity sender = listener.player;
+    public static void onServerboundChainConveyorRiding(ServerGamePacketListenerImpl listener, ServerboundChainConveyorRidingPacket packet) {
+        ServerPlayer sender = listener.player;
         onBlockEntityConfiguration(
             listener, packet.pos(), AllConfigs.server().kinetics.maxChainConveyorLength.get() * 2, blockEntity -> {
                 if (blockEntity instanceof ChainConveyorBlockEntity be) {
                     sender.fallDistance = 0;
-                    sender.networkHandler.floatingTicks = 0;
-                    sender.networkHandler.vehicleFloatingTicks = 0;
+                    sender.connection.aboveGroundTickCount = 0;
+                    sender.connection.aboveGroundVehicleTickCount = 0;
                     if (packet.stop()) {
                         ServerChainConveyorHandler.handleStopRidingPacket(listener.server, sender);
                     } else {
@@ -609,8 +609,8 @@ public class AllHandle {
         );
     }
 
-    public static void onChainPackageInteraction(ServerPlayNetworkHandler listener, ChainPackageInteractionPacket packet) {
-        ServerPlayerEntity player = listener.player;
+    public static void onChainPackageInteraction(ServerGamePacketListenerImpl listener, ChainPackageInteractionPacket packet) {
+        ServerPlayer player = listener.player;
         int maxRange = AllConfigs.server().kinetics.maxChainConveyorLength.get() + 16;
         onBlockEntityConfiguration(
             listener, packet.pos(), maxRange, blockEntity -> {
@@ -638,23 +638,23 @@ public class AllHandle {
                             best = liftPackage;
                         }
 
-                        if (player.getMainHandStack().isEmpty()) {
-                            player.setStackInHand(Hand.MAIN_HAND, best.item.copy());
+                        if (player.getMainHandItem().isEmpty()) {
+                            player.setItemInHand(InteractionHand.MAIN_HAND, best.item.copy());
                         } else {
-                            player.getInventory().offerOrDrop(best.item.copy());
+                            player.getInventory().placeItemBackInInventory(best.item.copy());
                         }
 
                         list.remove(best);
                         be.sendData();
                     } else {
-                        ChainConveyorPackage chainConveyorPackage = new ChainConveyorPackage(chainPosition, player.getMainHandStack().copy());
+                        ChainConveyorPackage chainConveyorPackage = new ChainConveyorPackage(chainPosition, player.getMainHandItem().copy());
                         if (!be.canAcceptPackagesFor(selectedConnection))
                             return true;
 
                         if (!player.isCreative()) {
-                            player.getMainHandStack().decrement(1);
-                            if (player.getMainHandStack().isEmpty()) {
-                                player.setStackInHand(Hand.MAIN_HAND, ItemStack.EMPTY);
+                            player.getMainHandItem().shrink(1);
+                            if (player.getMainHandItem().isEmpty()) {
+                                player.setItemInHand(InteractionHand.MAIN_HAND, ItemStack.EMPTY);
                             }
                         }
 
@@ -671,7 +671,7 @@ public class AllHandle {
         );
     }
 
-    public static void onPackagePortConfiguration(ServerPlayNetworkHandler listener, PackagePortConfigurationPacket packet) {
+    public static void onPackagePortConfiguration(ServerGamePacketListenerImpl listener, PackagePortConfigurationPacket packet) {
         onBlockEntityConfiguration(
             listener, packet.pos(), 20, blockEntity -> {
                 if (blockEntity instanceof PackagePortBlockEntity be) {
@@ -687,12 +687,12 @@ public class AllHandle {
         );
     }
 
-    public static void onFactoryPanelConnection(ServerPlayNetworkHandler listener, FactoryPanelConnectionPacket packet) {
-        ServerPlayerEntity player = listener.player;
+    public static void onFactoryPanelConnection(ServerGamePacketListenerImpl listener, FactoryPanelConnectionPacket packet) {
+        ServerPlayer player = listener.player;
         onBlockEntityConfiguration(
             listener, packet.toPos().pos(), 40, blockEntity -> {
                 if (blockEntity instanceof FactoryPanelBlockEntity be) {
-                    ServerFactoryPanelBehaviour behaviour = ServerFactoryPanelBehaviour.at(be.getWorld(), packet.toPos());
+                    ServerFactoryPanelBehaviour behaviour = ServerFactoryPanelBehaviour.at(be.getLevel(), packet.toPos());
                     if (behaviour != null)
                         if (packet.relocate())
                             behaviour.moveTo(packet.fromPos(), player);
@@ -705,7 +705,7 @@ public class AllHandle {
         );
     }
 
-    public static void onFactoryPanelConfiguration(ServerPlayNetworkHandler listener, FactoryPanelConfigurationPacket packet) {
+    public static void onFactoryPanelConfiguration(ServerGamePacketListenerImpl listener, FactoryPanelConfigurationPacket packet) {
         onBlockEntityConfiguration(
             listener, packet.position().pos(), 20, blockEntity -> {
                 if (blockEntity instanceof FactoryPanelBlockEntity be) {
@@ -744,7 +744,7 @@ public class AllHandle {
                     if (removeConnection != null) {
                         behaviour.targetedBy.remove(removeConnection);
                         behaviour.searchForCraftingRecipe();
-                        ServerFactoryPanelBehaviour source = ServerFactoryPanelBehaviour.at(be.getWorld(), removeConnection);
+                        ServerFactoryPanelBehaviour source = ServerFactoryPanelBehaviour.at(be.getLevel(), removeConnection);
                         if (source != null) {
                             source.targeting.remove(behaviour.getPanelPosition());
                             source.blockEntity.sendData();
@@ -761,7 +761,7 @@ public class AllHandle {
         );
     }
 
-    public static void onRedstoneRequesterConfiguration(ServerPlayNetworkHandler listener, RedstoneRequesterConfigurationPacket packet) {
+    public static void onRedstoneRequesterConfiguration(ServerGamePacketListenerImpl listener, RedstoneRequesterConfigurationPacket packet) {
         onBlockEntityConfiguration(
             listener, packet.pos(), 20, blockEntity -> {
                 if (blockEntity instanceof RedstoneRequesterBlockEntity be) {
@@ -783,7 +783,7 @@ public class AllHandle {
         );
     }
 
-    public static void onStockKeeperCategoryEdit(ServerPlayNetworkHandler listener, StockKeeperCategoryEditPacket packet) {
+    public static void onStockKeeperCategoryEdit(ServerGamePacketListenerImpl listener, StockKeeperCategoryEditPacket packet) {
         onBlockEntityConfiguration(
             listener, packet.pos(), 20, blockEntity -> {
                 if (blockEntity instanceof StockTickerBlockEntity be) {
@@ -795,13 +795,13 @@ public class AllHandle {
         );
     }
 
-    public static void onStockKeeperCategoryRefund(ServerPlayNetworkHandler listener, StockKeeperCategoryRefundPacket packet) {
+    public static void onStockKeeperCategoryRefund(ServerGamePacketListenerImpl listener, StockKeeperCategoryRefundPacket packet) {
         onBlockEntityConfiguration(
             listener, packet.pos(), 20, blockEntity -> {
                 if (blockEntity instanceof StockTickerBlockEntity be) {
                     ItemStack filter = packet.filter();
                     if (!filter.isEmpty() && filter.getItem() instanceof FilterItem)
-                        listener.player.getInventory().offerOrDrop(filter);
+                        listener.player.getInventory().placeItemBackInInventory(filter);
                     return true;
                 }
                 return false;
@@ -809,8 +809,8 @@ public class AllHandle {
         );
     }
 
-    public static void onStockKeeperLock(ServerPlayNetworkHandler listener, StockKeeperLockPacket packet) {
-        ServerPlayerEntity player = listener.player;
+    public static void onStockKeeperLock(ServerGamePacketListenerImpl listener, StockKeeperLockPacket packet) {
+        ServerPlayer player = listener.player;
         onBlockEntityConfiguration(
             listener, packet.pos(), 20, blockEntity -> {
                 if (blockEntity instanceof StockTickerBlockEntity be) {
@@ -828,15 +828,15 @@ public class AllHandle {
         );
     }
 
-    public static void onStockKeeperCategoryHiding(ServerPlayNetworkHandler listener, StockKeeperCategoryHidingPacket packet) {
+    public static void onStockKeeperCategoryHiding(ServerGamePacketListenerImpl listener, StockKeeperCategoryHidingPacket packet) {
         onBlockEntityConfiguration(
             listener, packet.pos(), 20, blockEntity -> {
                 if (blockEntity instanceof StockTickerBlockEntity be) {
                     if (packet.indices().isEmpty()) {
-                        be.hiddenCategoriesByPlayer.remove(listener.player.getUuid());
+                        be.hiddenCategoriesByPlayer.remove(listener.player.getUUID());
                         return false;
                     } else {
-                        be.hiddenCategoriesByPlayer.put(listener.player.getUuid(), packet.indices());
+                        be.hiddenCategoriesByPlayer.put(listener.player.getUUID(), packet.indices());
                     }
                     return true;
                 }
@@ -845,14 +845,14 @@ public class AllHandle {
         );
     }
 
-    public static void onSchematicPlace(ServerPlayNetworkHandler listener, SchematicPlacePacket packet) {
-        ServerPlayerEntity player = listener.player;
+    public static void onSchematicPlace(ServerGamePacketListenerImpl listener, SchematicPlacePacket packet) {
+        ServerPlayer player = listener.player;
         if (!player.isCreative()) {
             return;
         }
-        ServerWorld world = player.getEntityWorld();
+        ServerLevel world = player.level();
         SchematicPrinter printer = new SchematicPrinter();
-        printer.loadSchematic(packet.stack(), world, !player.isCreativeLevelTwoOp());
+        printer.loadSchematic(packet.stack(), world, !player.canUseGameMasterBlocks());
         if (!printer.isLoaded() || printer.isErrored()) {
             return;
         }
@@ -871,20 +871,20 @@ public class AllHandle {
                         return;
                     }
 
-                    NbtCompound data = BlockHelper.prepareBlockEntityData(world, state, blockEntity);
+                    CompoundTag data = BlockHelper.prepareBlockEntityData(world, state, blockEntity);
                     BlockHelper.placeSchematicBlock(world, state, pos, null, data);
                 }, (pos, entity) -> {
-                    world.spawnEntity(entity);
+                    world.addFreshEntity(entity);
                 }
             );
         }
     }
 
-    public static void onSchematicUpload(ServerPlayNetworkHandler listener, SchematicUploadPacket packet) {
-        ServerPlayerEntity player = listener.player;
+    public static void onSchematicUpload(ServerGamePacketListenerImpl listener, SchematicUploadPacket packet) {
+        ServerPlayer player = listener.player;
         String schematic = packet.schematic();
         if (packet.code() == SchematicUploadPacket.BEGIN) {
-            BlockPos pos = ((SchematicTableMenu) player.currentScreenHandler).contentHolder.getPos();
+            BlockPos pos = ((SchematicTableMenu) player.containerMenu).contentHolder.getBlockPos();
             Create.SCHEMATIC_RECEIVER.handleNewUpload(player, schematic, packet.size(), pos);
         } else if (packet.code() == SchematicUploadPacket.WRITE) {
             Create.SCHEMATIC_RECEIVER.handleWriteRequest(player, schematic, packet.data());
@@ -893,18 +893,18 @@ public class AllHandle {
         }
     }
 
-    public static void onClearContainer(ServerPlayNetworkHandler listener) {
-        if (!(listener.player.currentScreenHandler instanceof IClearableMenu menu))
+    public static void onClearContainer(ServerGamePacketListenerImpl listener) {
+        if (!(listener.player.containerMenu instanceof IClearableMenu menu))
             return;
         menu.clearContents();
     }
 
-    public static void onFilterScreen(ServerPlayNetworkHandler serverPlayNetworkHandler, FilterScreenPacket packet) {
-        ServerPlayerEntity player = serverPlayNetworkHandler.player;
-        NbtCompound tag = packet.data() == null ? new NbtCompound() : packet.data();
+    public static void onFilterScreen(ServerGamePacketListenerImpl serverPlayNetworkHandler, FilterScreenPacket packet) {
+        ServerPlayer player = serverPlayNetworkHandler.player;
+        CompoundTag tag = packet.data() == null ? new CompoundTag() : packet.data();
         FilterScreenPacket.Option option = packet.option();
 
-        if (player.currentScreenHandler instanceof FilterMenu c) {
+        if (player.containerMenu instanceof FilterMenu c) {
             if (option == FilterScreenPacket.Option.WHITELIST)
                 c.blacklist = false;
             if (option == FilterScreenPacket.Option.BLACKLIST)
@@ -914,8 +914,8 @@ public class AllHandle {
             if (option == FilterScreenPacket.Option.IGNORE_DATA)
                 c.respectNBT = false;
             if (option == FilterScreenPacket.Option.UPDATE_FILTER_ITEM)
-                c.ghostInventory.setStack(tag.getInt("Slot", 0), tag.get("Item", ItemStack.CODEC).orElse(ItemStack.EMPTY));
-        } else if (player.currentScreenHandler instanceof AttributeFilterMenu c) {
+                c.ghostInventory.setItem(tag.getIntOr("Slot", 0), tag.read("Item", ItemStack.CODEC).orElse(ItemStack.EMPTY));
+        } else if (player.containerMenu instanceof AttributeFilterMenu c) {
             if (option == FilterScreenPacket.Option.WHITELIST)
                 c.whitelistMode = AttributeFilterWhitelistMode.WHITELIST_DISJ;
             if (option == FilterScreenPacket.Option.WHITELIST2)
@@ -923,49 +923,49 @@ public class AllHandle {
             if (option == FilterScreenPacket.Option.BLACKLIST)
                 c.whitelistMode = AttributeFilterWhitelistMode.BLACKLIST;
             if (option == FilterScreenPacket.Option.ADD_TAG)
-                c.appendSelectedAttribute(ItemAttribute.loadStatic(packet.data(), player.getRegistryManager()), false);
+                c.appendSelectedAttribute(ItemAttribute.loadStatic(packet.data(), player.registryAccess()), false);
             if (option == FilterScreenPacket.Option.ADD_INVERTED_TAG)
-                c.appendSelectedAttribute(ItemAttribute.loadStatic(packet.data(), player.getRegistryManager()), true);
-        } else if (player.currentScreenHandler instanceof PackageFilterMenu c) {
+                c.appendSelectedAttribute(ItemAttribute.loadStatic(packet.data(), player.registryAccess()), true);
+        } else if (player.containerMenu instanceof PackageFilterMenu c) {
             if (option == FilterScreenPacket.Option.UPDATE_ADDRESS)
-                c.address = tag.getString("Address", "");
+                c.address = tag.getStringOr("Address", "");
         }
     }
 
-    public static void onContraptionInteraction(ServerPlayNetworkHandler listener, ContraptionInteractionPacket packet) {
-        ServerPlayerEntity sender = listener.player;
-        Entity entityByID = sender.getEntityWorld().getEntityById(packet.target());
+    public static void onContraptionInteraction(ServerGamePacketListenerImpl listener, ContraptionInteractionPacket packet) {
+        ServerPlayer sender = listener.player;
+        Entity entityByID = sender.level().getEntity(packet.target());
         if (!(entityByID instanceof AbstractContraptionEntity contraptionEntity))
             return;
-        Box bb = contraptionEntity.getBoundingBox();
-        double boundsExtra = Math.max(bb.getLengthX(), bb.getLengthY());
-        double d = sender.getAttributeValue(EntityAttributes.BLOCK_INTERACTION_RANGE) + 10 + boundsExtra;
-        if (!sender.canSee(entityByID))
+        AABB bb = contraptionEntity.getBoundingBox();
+        double boundsExtra = Math.max(bb.getXsize(), bb.getYsize());
+        double d = sender.getAttributeValue(Attributes.BLOCK_INTERACTION_RANGE) + 10 + boundsExtra;
+        if (!sender.hasLineOfSight(entityByID))
             d -= 3;
         d *= d;
-        if (sender.squaredDistanceTo(entityByID) > d)
+        if (sender.distanceToSqr(entityByID) > d)
             return;
         if (contraptionEntity.handlePlayerInteraction(sender, packet.localPos(), packet.face(), packet.hand()))
-            sender.swingHand(packet.hand(), true);
+            sender.swing(packet.hand(), true);
     }
 
-    public static void onClientMotion(ServerPlayNetworkHandler listener, ClientMotionPacket packet) {
-        ServerPlayerEntity sender = listener.player;
-        sender.setVelocity(packet.motion());
+    public static void onClientMotion(ServerGamePacketListenerImpl listener, ClientMotionPacket packet) {
+        ServerPlayer sender = listener.player;
+        sender.setDeltaMovement(packet.motion());
         sender.setOnGround(packet.onGround());
         if (packet.onGround()) {
-            sender.handleFallDamage(sender.fallDistance, 1, sender.getDamageSources().fall());
+            sender.causeFallDamage(sender.fallDistance, 1, sender.damageSources().fall());
             sender.fallDistance = 0;
-            sender.networkHandler.floatingTicks = 0;
-            sender.networkHandler.vehicleFloatingTicks = 0;
+            sender.connection.aboveGroundTickCount = 0;
+            sender.connection.aboveGroundVehicleTickCount = 0;
         }
-        sender.getEntityWorld().getChunkManager()
-            .sendToOtherNearbyPlayers(sender, new LimbSwingUpdatePacket(sender.getId(), sender.getEntityPos(), packet.limbSwing()));
+        sender.level().getChunkSource()
+            .sendToTrackingPlayers(sender, new LimbSwingUpdatePacket(sender.getId(), sender.position(), packet.limbSwing()));
     }
 
-    public static void onArmPlacement(ServerPlayNetworkHandler listener, ArmPlacementPacket packet) {
-        World world = listener.player.getEntityWorld();
-        if (!world.isPosLoaded(packet.pos()))
+    public static void onArmPlacement(ServerGamePacketListenerImpl listener, ArmPlacementPacket packet) {
+        Level world = listener.player.level();
+        if (!world.isLoaded(packet.pos()))
             return;
         BlockEntity blockEntity = world.getBlockEntity(packet.pos());
         if (!(blockEntity instanceof ArmBlockEntity arm))
@@ -974,10 +974,10 @@ public class AllHandle {
         arm.interactionPointTag = packet.tag();
     }
 
-    public static void onPackagePortPlacement(ServerPlayNetworkHandler listener, PackagePortPlacementPacket packet) {
-        World world = listener.player.getEntityWorld();
+    public static void onPackagePortPlacement(ServerGamePacketListenerImpl listener, PackagePortPlacementPacket packet) {
+        Level world = listener.player.level();
         BlockPos pos = packet.pos();
-        if (world == null || !world.isPosLoaded(pos))
+        if (world == null || !world.isLoaded(pos))
             return;
         BlockEntity blockEntity = world.getBlockEntity(pos);
         if (!(blockEntity instanceof PackagePortBlockEntity ppbe))
@@ -986,9 +986,9 @@ public class AllHandle {
         if (!target.canSupport(ppbe))
             return;
 
-        Vec3d targetLocation = target.getExactTargetLocation(ppbe, world, pos);
-        if (targetLocation == Vec3d.ZERO || !targetLocation.isInRange(
-            Vec3d.ofBottomCenter(pos),
+        Vec3 targetLocation = target.getExactTargetLocation(ppbe, world, pos);
+        if (targetLocation == Vec3.ZERO || !targetLocation.closerThan(
+            Vec3.atBottomCenterOf(pos),
             AllConfigs.server().logistics.packagePortRange.get() + 2
         ))
             return;
@@ -999,29 +999,29 @@ public class AllHandle {
         ppbe.use(listener.player);
     }
 
-    public static void onCouplingCreation(ServerPlayNetworkHandler listener, CouplingCreationPacket packet) {
-        CouplingHandler.tryToCoupleCarts(listener.player, listener.player.getEntityWorld(), packet.id1(), packet.id2());
+    public static void onCouplingCreation(ServerGamePacketListenerImpl listener, CouplingCreationPacket packet) {
+        CouplingHandler.tryToCoupleCarts(listener.player, listener.player.level(), packet.id1(), packet.id2());
     }
 
-    public static void onInstantSchematic(ServerPlayNetworkHandler listener, InstantSchematicPacket packet) {
+    public static void onInstantSchematic(ServerGamePacketListenerImpl listener, InstantSchematicPacket packet) {
         Create.SCHEMATIC_RECEIVER.handleInstantSchematic(
             listener.player,
             packet.name(),
-            listener.player.getEntityWorld(),
+            listener.player.level(),
             packet.origin(),
             packet.bounds()
         );
     }
 
-    public static void onSchematicSync(ServerPlayNetworkHandler listener, SchematicSyncPacket packet) {
-        ServerPlayerEntity player = listener.player;
+    public static void onSchematicSync(ServerGamePacketListenerImpl listener, SchematicSyncPacket packet) {
+        ServerPlayer player = listener.player;
         ItemStack stack;
         if (packet.slot() == -1) {
-            stack = player.getMainHandStack();
+            stack = player.getMainHandItem();
         } else {
-            stack = player.getInventory().getStack(packet.slot());
+            stack = player.getInventory().getItem(packet.slot());
         }
-        if (!stack.isOf(AllItems.SCHEMATIC)) {
+        if (!stack.is(AllItems.SCHEMATIC)) {
             return;
         }
         stack.set(AllDataComponents.SCHEMATIC_DEPLOYED, packet.deployed());
@@ -1031,58 +1031,58 @@ public class AllHandle {
         SchematicInstances.clearHash(stack);
     }
 
-    public static void onLeftClick(ServerPlayNetworkHandler listener) {
-        ServerPlayerEntity player = listener.player;
-        ItemStack stack = player.getMainHandStack();
+    public static void onLeftClick(ServerGamePacketListenerImpl listener) {
+        ServerPlayer player = listener.player;
+        ItemStack stack = player.getMainHandItem();
         if (stack.getItem() instanceof ZapperItem) {
             ZapperInteractionHandler.trySelect(stack, player);
         }
     }
 
-    public static void onEjectorPlacement(ServerPlayNetworkHandler listener, EjectorPlacementPacket packet) {
-        ServerWorld world = listener.player.getEntityWorld();
+    public static void onEjectorPlacement(ServerGamePacketListenerImpl listener, EjectorPlacementPacket packet) {
+        ServerLevel world = listener.player.level();
         BlockPos pos = packet.pos();
-        if (!world.isPosLoaded(pos))
+        if (!world.isLoaded(pos))
             return;
         BlockEntity blockEntity = world.getBlockEntity(pos);
         BlockState state = world.getBlockState(pos);
         if (blockEntity instanceof EjectorBlockEntity ejector)
             ejector.setTarget(packet.h(), packet.v());
-        if (state.isOf(AllBlocks.WEIGHTED_EJECTOR))
-            world.setBlockState(pos, state.with(EjectorBlock.HORIZONTAL_FACING, packet.facing()));
+        if (state.is(AllBlocks.WEIGHTED_EJECTOR))
+            world.setBlockAndUpdate(pos, state.setValue(EjectorBlock.HORIZONTAL_FACING, packet.facing()));
     }
 
-    public static void onEjectorElytra(ServerPlayNetworkHandler listener, EjectorElytraPacket packet) {
-        ServerWorld world = listener.player.getEntityWorld();
-        if (!world.isPosLoaded(packet.pos()))
+    public static void onEjectorElytra(ServerGamePacketListenerImpl listener, EjectorElytraPacket packet) {
+        ServerLevel world = listener.player.level();
+        if (!world.isLoaded(packet.pos()))
             return;
         BlockEntity blockEntity = world.getBlockEntity(packet.pos());
         if (blockEntity instanceof EjectorBlockEntity ejector)
             ejector.deployElytra(listener.player);
     }
 
-    private static void onLinkedController(ServerPlayerEntity player, BlockPos pos, Consumer<BlockEntity> onLectern, Consumer<ItemStack> onStack) {
+    private static void onLinkedController(ServerPlayer player, BlockPos pos, Consumer<BlockEntity> onLectern, Consumer<ItemStack> onStack) {
         if (pos != null) {
             if (onLectern != null) {
-                onLectern.accept(player.getEntityWorld().getBlockEntity(pos));
+                onLectern.accept(player.level().getBlockEntity(pos));
             }
         } else if (onStack != null) {
-            ItemStack controller = player.getMainHandStack();
-            if (!controller.isOf(AllItems.LINKED_CONTROLLER)) {
-                controller = player.getOffHandStack();
-                if (!controller.isOf(AllItems.LINKED_CONTROLLER))
+            ItemStack controller = player.getMainHandItem();
+            if (!controller.is(AllItems.LINKED_CONTROLLER)) {
+                controller = player.getOffhandItem();
+                if (!controller.is(AllItems.LINKED_CONTROLLER))
                     return;
             }
             onStack.accept(controller);
         }
     }
 
-    public static void onLinkedControllerInput(ServerPlayNetworkHandler listener, LinkedControllerInputPacket packet) {
-        ServerPlayerEntity player = listener.player;
+    public static void onLinkedControllerInput(ServerGamePacketListenerImpl listener, LinkedControllerInputPacket packet) {
+        ServerPlayer player = listener.player;
         Consumer<ItemStack> handleItem = stack -> {
-            ServerWorld world = player.getEntityWorld();
-            UUID uniqueID = player.getUuid();
-            BlockPos pos = player.getBlockPos();
+            ServerLevel world = player.level();
+            UUID uniqueID = player.getUUID();
+            BlockPos pos = player.blockPosition();
 
             if (player.isSpectator() && packet.press())
                 return;
@@ -1105,8 +1105,8 @@ public class AllHandle {
         );
     }
 
-    public static void onLinkedControllerBind(ServerPlayNetworkHandler listener, LinkedControllerBindPacket packet) {
-        ServerPlayerEntity player = listener.player;
+    public static void onLinkedControllerBind(ServerGamePacketListenerImpl listener, LinkedControllerBindPacket packet) {
+        ServerPlayer player = listener.player;
         if (player.isSpectator()) {
             return;
         }
@@ -1114,7 +1114,7 @@ public class AllHandle {
             player, null, null, stack -> {
                 ItemStackHandler frequencyItems = LinkedControllerItem.getFrequencyItems(stack);
                 ServerLinkBehaviour linkBehaviour = BlockEntityBehaviour.get(
-                    player.getEntityWorld(),
+                    player.level(),
                     packet.linkLocation(),
                     ServerLinkBehaviour.TYPE
                 );
@@ -1123,15 +1123,15 @@ public class AllHandle {
 
                 int button = packet.button();
                 linkBehaviour.getNetworkKey()
-                    .forEachWithContext((f, first) -> frequencyItems.setStack(button * 2 + (first ? 0 : 1), f.getStack().copy()));
+                    .forEachWithContext((f, first) -> frequencyItems.setItem(button * 2 + (first ? 0 : 1), f.getStack().copy()));
 
                 stack.set(AllDataComponents.LINKED_CONTROLLER_ITEMS, ItemHelper.containerContentsFromHandler(frequencyItems));
             }
         );
     }
 
-    public static void onLinkedControllerStopLectern(ServerPlayNetworkHandler listener, LinkedControllerStopLecternPacket packet) {
-        ServerPlayerEntity player = listener.player;
+    public static void onLinkedControllerStopLectern(ServerGamePacketListenerImpl listener, LinkedControllerStopLecternPacket packet) {
+        ServerPlayer player = listener.player;
         onLinkedController(
             player, packet.lecternPos(), blockEntity -> {
                 if (blockEntity instanceof LecternControllerBlockEntity lectern) {
@@ -1141,23 +1141,23 @@ public class AllHandle {
         );
     }
 
-    public static void onGhostItemSubmit(ServerPlayNetworkHandler listener, GhostItemSubmitPacket packet) {
-        ScreenHandler containerMenu = listener.player.currentScreenHandler;
+    public static void onGhostItemSubmit(ServerGamePacketListenerImpl listener, GhostItemSubmitPacket packet) {
+        AbstractContainerMenu containerMenu = listener.player.containerMenu;
         int slot = packet.slot();
         ItemStack item = packet.item();
         if (containerMenu instanceof GhostItemMenu<?> menu) {
-            menu.ghostInventory.setStack(slot, item);
-            menu.getSlot(36 + slot).markDirty();
+            menu.ghostInventory.setItem(slot, item);
+            menu.getSlot(36 + slot).setChanged();
         } else if (containerMenu instanceof StockKeeperCategoryMenu menu && (item.isEmpty() || item.getItem() instanceof FilterItem)) {
-            menu.proxyInventory.setStack(slot, item);
-            menu.getSlot(36 + slot).markDirty();
+            menu.proxyInventory.setItem(slot, item);
+            menu.getSlot(36 + slot).setChanged();
         }
     }
 
-    public static void onBlueprintAssignCompleteRecipe(ServerPlayNetworkHandler listener, BlueprintAssignCompleteRecipePacket packet) {
-        ServerPlayerEntity player = listener.player;
-        if (player.currentScreenHandler instanceof BlueprintMenu c) {
-            ServerRecipeManager.ServerRecipe serverRecipe = listener.server.getRecipeManager().get(packet.recipeId());
+    public static void onBlueprintAssignCompleteRecipe(ServerGamePacketListenerImpl listener, BlueprintAssignCompleteRecipePacket packet) {
+        ServerPlayer player = listener.player;
+        if (player.containerMenu instanceof BlueprintMenu c) {
+            RecipeManager.ServerDisplayInfo serverRecipe = listener.server.getRecipeManager().getRecipeFromDisplay(packet.recipeId());
             if (serverRecipe != null) {
                 //TODO
                 //                BlueprintItem.assignCompleteRecipe(player.getWorld(), c.ghostInventory, serverRecipe.parent().value());
@@ -1165,22 +1165,22 @@ public class AllHandle {
         }
     }
 
-    public static void onConfigureSymmetryWand(ServerPlayNetworkHandler listener, ConfigureSymmetryWandPacket packet) {
-        ItemStack stack = listener.player.getStackInHand(packet.hand());
+    public static void onConfigureSymmetryWand(ServerGamePacketListenerImpl listener, ConfigureSymmetryWandPacket packet) {
+        ItemStack stack = listener.player.getItemInHand(packet.hand());
         if (stack.getItem() instanceof SymmetryWandItem) {
             SymmetryWandItem.configureSettings(stack, packet.mirror());
         }
     }
 
-    public static void onConfigureWorldshaper(ServerPlayNetworkHandler listener, ConfigureWorldshaperPacket packet) {
-        ItemStack stack = listener.player.getStackInHand(packet.hand());
+    public static void onConfigureWorldshaper(ServerGamePacketListenerImpl listener, ConfigureWorldshaperPacket packet) {
+        ItemStack stack = listener.player.getItemInHand(packet.hand());
         if (stack.getItem() instanceof ZapperItem) {
             packet.configureZapper(stack);
         }
     }
 
-    public static void onToolboxEquip(ServerPlayNetworkHandler listener, ToolboxEquipPacket packet) {
-        ServerPlayerEntity player = listener.player;
+    public static void onToolboxEquip(ServerGamePacketListenerImpl listener, ToolboxEquipPacket packet) {
+        ServerPlayer player = listener.player;
         BlockPos toolboxPos = packet.toolboxPos();
         int slot = packet.slot();
         int hotbarSlot = packet.hotbarSlot();
@@ -1189,10 +1189,10 @@ public class AllHandle {
             ToolboxHandler.syncData(player, AllSynchedDatas.TOOLBOX.get(player));
             return;
         }
-        ServerWorld world = player.getEntityWorld();
+        ServerLevel world = player.level();
         BlockEntity blockEntity = world.getBlockEntity(toolboxPos);
         double maxRange = ToolboxHandler.getMaxRange(player);
-        if (player.squaredDistanceTo(toolboxPos.getX() + 0.5, toolboxPos.getY(), toolboxPos.getZ() + 0.5) > maxRange * maxRange)
+        if (player.distanceToSqr(toolboxPos.getX() + 0.5, toolboxPos.getY(), toolboxPos.getZ() + 0.5) > maxRange * maxRange)
             return;
         if (!(blockEntity instanceof ToolboxBlockEntity toolboxBlockEntity))
             return;
@@ -1204,68 +1204,68 @@ public class AllHandle {
             return;
         }
 
-        PlayerInventory playerInventory = player.getInventory();
-        ItemStack playerStack = playerInventory.getStack(hotbarSlot);
+        Inventory playerInventory = player.getInventory();
+        ItemStack playerStack = playerInventory.getItem(hotbarSlot);
         if (!playerStack.isEmpty() && !ToolboxInventory.canItemsShareCompartment(playerStack, toolboxBlockEntity.inventory.filters.get(slot))) {
             toolboxBlockEntity.inventory.inLimitedMode(inventory -> {
                 int count = playerStack.getCount();
                 int insert = inventory.insertExist(playerStack);
                 if (insert != count) {
                     count -= insert;
-                    insert = playerInventory.insert(playerStack, count, PlayerInventory.getHotbarSize(), PlayerInventory.MAIN_SIZE);
+                    insert = playerInventory.insert(playerStack, count, Inventory.getSelectionSize(), Inventory.INVENTORY_SIZE);
                 }
                 if (insert == count) {
-                    playerInventory.setStack(hotbarSlot, ItemStack.EMPTY);
+                    playerInventory.setItem(hotbarSlot, ItemStack.EMPTY);
                 } else {
                     playerStack.setCount(count - insert);
                 }
             });
         }
 
-        NbtCompound compound = AllSynchedDatas.TOOLBOX.get(player);
+        CompoundTag compound = AllSynchedDatas.TOOLBOX.get(player);
         String key = String.valueOf(hotbarSlot);
 
-        NbtCompound data = new NbtCompound();
+        CompoundTag data = new CompoundTag();
         data.putInt("Slot", slot);
-        data.put("Pos", BlockPos.CODEC, toolboxPos);
+        data.store("Pos", BlockPos.CODEC, toolboxPos);
         compound.put(key, data);
 
         toolboxBlockEntity.connectPlayer(slot, player, hotbarSlot);
         ToolboxHandler.syncData(player, compound);
     }
 
-    public static void onToolboxDisposeAll(ServerPlayNetworkHandler listener, ToolboxDisposeAllPacket packet) {
-        ServerPlayerEntity player = listener.player;
-        ServerWorld world = player.getEntityWorld();
+    public static void onToolboxDisposeAll(ServerGamePacketListenerImpl listener, ToolboxDisposeAllPacket packet) {
+        ServerPlayer player = listener.player;
+        ServerLevel world = player.level();
         BlockPos toolboxPos = packet.toolboxPos();
         BlockEntity blockEntity = world.getBlockEntity(toolboxPos);
 
         double maxRange = ToolboxHandler.getMaxRange(player);
-        if (player.squaredDistanceTo(toolboxPos.getX() + 0.5, toolboxPos.getY(), toolboxPos.getZ() + 0.5) > maxRange * maxRange)
+        if (player.distanceToSqr(toolboxPos.getX() + 0.5, toolboxPos.getY(), toolboxPos.getZ() + 0.5) > maxRange * maxRange)
             return;
         if (!(blockEntity instanceof ToolboxBlockEntity toolbox))
             return;
 
-        NbtCompound compound = AllSynchedDatas.TOOLBOX.get(player);
+        CompoundTag compound = AllSynchedDatas.TOOLBOX.get(player);
         MutableBoolean sendData = new MutableBoolean(false);
 
-        PlayerInventory playerInventory = player.getInventory();
+        Inventory playerInventory = player.getInventory();
         toolbox.inventory.inLimitedMode(inventory -> {
             for (int i = 0; i < 36; i++) {
-                if (compound.getCompound(String.valueOf(i)).flatMap(nbt -> nbt.get("Pos", BlockPos.CODEC)).map(pos -> pos.equals(toolboxPos))
+                if (compound.getCompound(String.valueOf(i)).flatMap(nbt -> nbt.read("Pos", BlockPos.CODEC)).map(pos -> pos.equals(toolboxPos))
                     .orElse(false)) {
                     ToolboxHandler.unequip(player, i, true);
                     sendData.setTrue();
                 }
 
-                ItemStack itemStack = playerInventory.getStack(i);
+                ItemStack itemStack = playerInventory.getItem(i);
                 int count = itemStack.getCount();
                 if (count == 0) {
                     continue;
                 }
                 int insert = toolbox.inventory.insertExist(itemStack, count);
                 if (insert == count) {
-                    playerInventory.setStack(i, ItemStack.EMPTY);
+                    playerInventory.setItem(i, ItemStack.EMPTY);
                 } else {
                     itemStack.setCount(count - insert);
                 }
@@ -1276,43 +1276,43 @@ public class AllHandle {
             ToolboxHandler.syncData(player, compound);
     }
 
-    public static void onScheduleEdit(ServerPlayNetworkHandler listener, ScheduleEditPacket packet) {
-        ServerPlayerEntity sender = listener.player;
-        ItemStack mainHandItem = sender.getMainHandStack();
-        if (!mainHandItem.isOf(AllItems.SCHEDULE))
+    public static void onScheduleEdit(ServerGamePacketListenerImpl listener, ScheduleEditPacket packet) {
+        ServerPlayer sender = listener.player;
+        ItemStack mainHandItem = sender.getMainHandItem();
+        if (!mainHandItem.is(AllItems.SCHEDULE))
             return;
 
         if (packet.schedule().entries.isEmpty()) {
             mainHandItem.remove(AllDataComponents.TRAIN_SCHEDULE);
         } else {
-            try (ErrorReporter.Logging logging = new ErrorReporter.Logging(() -> "ScheduleEdit", Create.LOGGER)) {
-                NbtWriteView view = NbtWriteView.create(logging, sender.getRegistryManager());
+            try (ProblemReporter.ScopedCollector logging = new ProblemReporter.ScopedCollector(() -> "ScheduleEdit", Create.LOGGER)) {
+                TagValueOutput view = TagValueOutput.createWithContext(logging, sender.registryAccess());
                 packet.schedule().write(view);
-                mainHandItem.set(AllDataComponents.TRAIN_SCHEDULE, view.getNbt());
+                mainHandItem.set(AllDataComponents.TRAIN_SCHEDULE, view.buildResult());
             }
         }
 
-        sender.getItemCooldownManager().set(mainHandItem, 5);
+        sender.getCooldowns().addCooldown(mainHandItem, 5);
     }
 
-    public static void onTrainEdit(ServerPlayNetworkHandler listener, TrainEditPacket packet) {
-        ServerPlayerEntity sender = listener.player;
-        ServerWorld world = sender.getEntityWorld();
+    public static void onTrainEdit(ServerGamePacketListenerImpl listener, TrainEditPacket packet) {
+        ServerPlayer sender = listener.player;
+        ServerLevel world = sender.level();
         Train train = Create.RAILWAYS.sided(world).trains.get(packet.id());
         if (train == null)
             return;
         if (!packet.name().isBlank()) {
-            train.name = Text.literal(packet.name());
+            train.name = Component.literal(packet.name());
         }
         train.icon = TrainIconType.byId(packet.iconType());
         train.mapColorIndex = packet.mapColor();
-        listener.server.getPlayerManager().sendToAll(new TrainEditReturnPacket(packet.id(), packet.name(), packet.iconType(), packet.mapColor()));
+        listener.server.getPlayerList().broadcastAll(new TrainEditReturnPacket(packet.id(), packet.name(), packet.iconType(), packet.mapColor()));
     }
 
-    public static void onTrainRelocation(ServerPlayNetworkHandler listener, TrainRelocationPacket packet) {
-        ServerPlayerEntity sender = listener.player;
+    public static void onTrainRelocation(ServerGamePacketListenerImpl listener, TrainRelocationPacket packet) {
+        ServerPlayer sender = listener.player;
         Train train = Create.RAILWAYS.trains.get(packet.trainId());
-        Entity entity = sender.getEntityWorld().getEntityById(packet.entityId());
+        Entity entity = sender.level().getEntity(packet.entityId());
 
         String messagePrefix = sender.getName().getString() + " could not relocate Train ";
 
@@ -1325,28 +1325,28 @@ public class AllHandle {
             return;
 
         int verifyDistance = AllConfigs.server().trains.maxTrackPlacementLength.get() * 2;
-        if (!sender.getEntityPos().isInRange(Vec3d.ofCenter(packet.pos()), verifyDistance)) {
+        if (!sender.position().closerThan(Vec3.atCenterOf(packet.pos()), verifyDistance)) {
             Create.LOGGER.warn(messagePrefix + train.name.getString() + ": player too far from clicked pos");
             return;
         }
-        if (!sender.getEntityPos().isInRange(cce.getEntityPos(), verifyDistance + cce.getBoundingBox().getLengthX() / 2)) {
+        if (!sender.position().closerThan(cce.position(), verifyDistance + cce.getBoundingBox().getXsize() / 2)) {
             Create.LOGGER.warn(messagePrefix + train.name.getString() + ": player too far from carriage entity");
             return;
         }
 
         if (TrainRelocator.relocate(
             train,
-            sender.getEntityWorld(),
+            sender.level(),
             packet.pos(),
             packet.hoveredBezier(),
             packet.direction(),
             packet.lookAngle(),
             null
         )) {
-            sender.sendMessage(Text.translatable("create.train.relocate.success").formatted(Formatting.GREEN), true);
+            sender.displayClientMessage(Component.translatable("create.train.relocate.success").withStyle(ChatFormatting.GREEN), true);
             train.carriages.forEach(c -> c.forEachPresentEntity(e -> {
                 e.nonDamageTicks = 10;
-                listener.player.getEntityWorld().getChunkManager().sendToOtherNearbyPlayers(e, new ContraptionRelocationPacket(e.getId()));
+                listener.player.level().getChunkSource().sendToTrackingPlayers(e, new ContraptionRelocationPacket(e.getId()));
             }));
             return;
         }
@@ -1354,15 +1354,15 @@ public class AllHandle {
         Create.LOGGER.warn(messagePrefix + train.name.getString() + ": relocation failed server-side");
     }
 
-    public static void onControlsInput(ServerPlayNetworkHandler listener, ControlsInputPacket packet) {
-        ServerPlayerEntity player = listener.player;
-        ServerWorld world = player.getEntityWorld();
-        UUID uniqueID = player.getUuid();
+    public static void onControlsInput(ServerGamePacketListenerImpl listener, ControlsInputPacket packet) {
+        ServerPlayer player = listener.player;
+        ServerLevel world = player.level();
+        UUID uniqueID = player.getUUID();
 
         if (player.isSpectator() && packet.press())
             return;
 
-        Entity entity = world.getEntityById(packet.contraptionEntityId());
+        Entity entity = world.getEntity(packet.contraptionEntityId());
         if (!(entity instanceof AbstractContraptionEntity ace))
             return;
         if (packet.stopControlling()) {
@@ -1370,26 +1370,26 @@ public class AllHandle {
             return;
         }
 
-        if (ace.toGlobalVector(Vec3d.ofCenter(packet.controlsPos()), 0).isInRange(player.getEntityPos(), 16))
+        if (ace.toGlobalVector(Vec3.atCenterOf(packet.controlsPos()), 0).closerThan(player.position(), 16))
             ControlsServerHandler.receivePressed(world, ace, packet.controlsPos(), uniqueID, packet.activatedButtons(), packet.press());
     }
 
-    public static void onPlaceExtendedCurve(ServerPlayNetworkHandler listener, PlaceExtendedCurvePacket packet) {
-        ItemStack stack = listener.player.getStackInHand(packet.mainHand() ? Hand.MAIN_HAND : Hand.OFF_HAND);
-        if (!stack.isIn(AllItemTags.TRACKS))
+    public static void onPlaceExtendedCurve(ServerGamePacketListenerImpl listener, PlaceExtendedCurvePacket packet) {
+        ItemStack stack = listener.player.getItemInHand(packet.mainHand() ? InteractionHand.MAIN_HAND : InteractionHand.OFF_HAND);
+        if (!stack.is(AllItemTags.TRACKS))
             return;
         stack.set(AllDataComponents.TRACK_EXTENDED_CURVE, true);
     }
 
-    public static void onSuperGlueSelection(ServerPlayNetworkHandler listener, SuperGlueSelectionPacket packet) {
-        ServerPlayerEntity player = listener.player;
-        ServerWorld world = player.getEntityWorld();
-        double range = player.getAttributeValue(EntityAttributes.BLOCK_INTERACTION_RANGE) + 2;
+    public static void onSuperGlueSelection(ServerGamePacketListenerImpl listener, SuperGlueSelectionPacket packet) {
+        ServerPlayer player = listener.player;
+        ServerLevel world = player.level();
+        double range = player.getAttributeValue(Attributes.BLOCK_INTERACTION_RANGE) + 2;
         BlockPos to = packet.to();
-        if (player.squaredDistanceTo(Vec3d.ofCenter(to)) > range * range)
+        if (player.distanceToSqr(Vec3.atCenterOf(to)) > range * range)
             return;
         BlockPos from = packet.from();
-        if (!to.isWithinDistance(from, 25))
+        if (!to.closerThan(from, 25))
             return;
 
         Set<BlockPos> group = SuperGlueSelectionHelper.searchGlueGroup(world, from, to, false);
@@ -1400,43 +1400,43 @@ public class AllHandle {
         if (!SuperGlueSelectionHelper.collectGlueFromInventory(player, 1, true))
             return;
 
-        Box bb = SuperGlueEntity.span(from, to);
+        AABB bb = SuperGlueEntity.span(from, to);
         SuperGlueSelectionHelper.collectGlueFromInventory(player, 1, false);
         SuperGlueEntity entity = new SuperGlueEntity(world, bb);
-        world.spawnEntity(entity);
+        world.addFreshEntity(entity);
         entity.spawnParticles();
 
         AllAdvancements.SUPER_GLUE.trigger(player);
     }
 
-    public static void onSuperGlueRemoval(ServerPlayNetworkHandler listener, SuperGlueRemovalPacket packet) {
-        ServerPlayerEntity player = listener.player;
-        ServerWorld world = player.getEntityWorld();
-        Entity entity = world.getEntityById(packet.entityId());
+    public static void onSuperGlueRemoval(ServerGamePacketListenerImpl listener, SuperGlueRemovalPacket packet) {
+        ServerPlayer player = listener.player;
+        ServerLevel world = player.level();
+        Entity entity = world.getEntity(packet.entityId());
         if (!(entity instanceof SuperGlueEntity superGlue))
             return;
         double range = 32;
-        if (player.squaredDistanceTo(superGlue.getEntityPos()) > range * range)
+        if (player.distanceToSqr(superGlue.position()) > range * range)
             return;
         AllSoundEvents.SLIME_ADDED.play(world, null, packet.soundSource(), 0.5F, 0.5F);
         superGlue.spawnParticles();
         entity.discard();
     }
 
-    public static void onTrainCollision(ServerPlayNetworkHandler listener, TrainCollisionPacket packet) {
-        ServerPlayerEntity player = listener.player;
-        ServerWorld world = player.getEntityWorld();
-        Entity entity = world.getEntityById(packet.contraptionEntityId());
+    public static void onTrainCollision(ServerGamePacketListenerImpl listener, TrainCollisionPacket packet) {
+        ServerPlayer player = listener.player;
+        ServerLevel world = player.level();
+        Entity entity = world.getEntity(packet.contraptionEntityId());
         if (!(entity instanceof CarriageContraptionEntity cce))
             return;
 
-        player.damage(world, AllDamageSources.get(world).runOver(cce), packet.damage());
-        world.playSound(player, entity.getBlockPos(), SoundEvents.ENTITY_PLAYER_ATTACK_CRIT, SoundCategory.NEUTRAL, 1, .75f);
+        player.hurtServer(world, AllDamageSources.get(world).runOver(cce), packet.damage());
+        world.playSound(player, entity.blockPosition(), SoundEvents.PLAYER_ATTACK_CRIT, SoundSource.NEUTRAL, 1, .75f);
     }
 
-    public static void onTrainHUDUpdate(ServerPlayNetworkHandler listener, TrainHUDUpdatePacket packet) {
-        ServerPlayerEntity player = listener.player;
-        Train train = Create.RAILWAYS.sided(player.getEntityWorld()).trains.get(packet.trainId());
+    public static void onTrainHUDUpdate(ServerGamePacketListenerImpl listener, TrainHUDUpdatePacket packet) {
+        ServerPlayer player = listener.player;
+        Train train = Create.RAILWAYS.sided(player.level()).trains.get(packet.trainId());
         if (train == null)
             return;
 
@@ -1444,18 +1444,18 @@ public class AllHandle {
             train.throttle = packet.throttle();
     }
 
-    public static void onTrainHonk(ServerPlayNetworkHandler listener, HonkPacket packet) {
-        ServerPlayerEntity player = listener.player;
-        Train train = Create.RAILWAYS.sided(player.getEntityWorld()).trains.get(packet.trainId());
+    public static void onTrainHonk(ServerGamePacketListenerImpl listener, HonkPacket packet) {
+        ServerPlayer player = listener.player;
+        Train train = Create.RAILWAYS.sided(player.level()).trains.get(packet.trainId());
         if (train == null)
             return;
 
         AllAdvancements.TRAIN_WHISTLE.trigger(player);
-        listener.server.getPlayerManager().sendToAll(new HonkReturnPacket(train, packet.isHonk()));
+        listener.server.getPlayerList().broadcastAll(new HonkReturnPacket(train, packet.isHonk()));
     }
 
-    public static void onTrackGraphRequest(ServerPlayNetworkHandler listener, TrackGraphRequestPacket packet) {
-        ServerPlayerEntity player = listener.player;
+    public static void onTrackGraphRequest(ServerGamePacketListenerImpl listener, TrackGraphRequestPacket packet) {
+        ServerPlayer player = listener.player;
         int netId = packet.netId();
         for (TrackGraph trackGraph : Create.RAILWAYS.trackNetworks.values()) {
             if (trackGraph.netId == netId) {
@@ -1465,24 +1465,24 @@ public class AllHandle {
         }
     }
 
-    public static void onElevatorRequestFloorList(ServerPlayNetworkHandler listener, RequestFloorListPacket packet) {
-        Entity entityByID = listener.player.getEntityWorld().getEntityById(packet.entityId());
+    public static void onElevatorRequestFloorList(ServerGamePacketListenerImpl listener, RequestFloorListPacket packet) {
+        Entity entityByID = listener.player.level().getEntity(packet.entityId());
         if (!(entityByID instanceof AbstractContraptionEntity ace))
             return;
         if (!(ace.getContraption() instanceof ElevatorContraption ec))
             return;
-        listener.sendPacket(new ElevatorFloorListPacket(ace, ec.namesList));
+        listener.send(new ElevatorFloorListPacket(ace, ec.namesList));
     }
 
-    public static void onElevatorTargetFloor(ServerPlayNetworkHandler listener, ElevatorTargetFloorPacket packet) {
-        ServerPlayerEntity sender = listener.player;
-        ServerWorld world = sender.getEntityWorld();
-        Entity entityByID = world.getEntityById(packet.entityId());
+    public static void onElevatorTargetFloor(ServerGamePacketListenerImpl listener, ElevatorTargetFloorPacket packet) {
+        ServerPlayer sender = listener.player;
+        ServerLevel world = sender.level();
+        Entity entityByID = world.getEntity(packet.entityId());
         if (!(entityByID instanceof AbstractContraptionEntity ace))
             return;
         if (!(ace.getContraption() instanceof ElevatorContraption ec))
             return;
-        if (ace.squaredDistanceTo(sender) > 50 * 50)
+        if (ace.distanceToSqr(sender) > 50 * 50)
             return;
 
         ElevatorColumn elevatorColumn = ElevatorColumn.get(world, ec.getGlobalColumn());
@@ -1503,19 +1503,19 @@ public class AllHandle {
         ecb.callToContactAndUpdate(elevatorColumn, blockState, world, pos, false);
     }
 
-    public static void onClipboardEdit(ServerPlayNetworkHandler listener, ClipboardEditPacket packet) {
-        ServerPlayerEntity sender = listener.player;
+    public static void onClipboardEdit(ServerGamePacketListenerImpl listener, ClipboardEditPacket packet) {
+        ServerPlayer sender = listener.player;
         ClipboardContent processedContent = clipboardProcessor(packet.clipboardContent());
 
         BlockPos targetedBlock = packet.targetedBlock();
         if (targetedBlock != null) {
-            ServerWorld world = sender.getEntityWorld();
-            if (!world.isPosLoaded(targetedBlock))
+            ServerLevel world = sender.level();
+            if (!world.isLoaded(targetedBlock))
                 return;
-            if (!targetedBlock.isWithinDistance(sender.getBlockPos(), 20))
+            if (!targetedBlock.closerThan(sender.blockPosition(), 20))
                 return;
             if (world.getBlockEntity(targetedBlock) instanceof ClipboardBlockEntity cbe) {
-                MergedComponentMap map = new MergedComponentMap(cbe.getComponents());
+                PatchedDataComponentMap map = new PatchedDataComponentMap(cbe.components());
                 if (processedContent == null) {
                     map.remove(AllDataComponents.CLIPBOARD_CONTENT);
                 } else {
@@ -1527,8 +1527,8 @@ public class AllHandle {
             return;
         }
 
-        ItemStack itemStack = sender.getInventory().getStack(packet.hotbarSlot());
-        if (!itemStack.isOf(AllItems.CLIPBOARD))
+        ItemStack itemStack = sender.getInventory().getItem(packet.hotbarSlot());
+        if (!itemStack.is(AllItems.CLIPBOARD))
             return;
         if (processedContent == null) {
             itemStack.remove(AllDataComponents.CLIPBOARD_CONTENT);
@@ -1551,35 +1551,35 @@ public class AllHandle {
         return content;
     }
 
-    public static void onContraptionColliderLockRequest(ServerPlayNetworkHandler listener, ContraptionColliderLockPacketRequest packet) {
-        ServerPlayerEntity player = listener.player;
-        player.getEntityWorld().getChunkManager()
-            .sendToOtherNearbyPlayers(player, new ContraptionColliderLockPacket(packet.contraption(), packet.offset(), player.getId()));
+    public static void onContraptionColliderLockRequest(ServerGamePacketListenerImpl listener, ContraptionColliderLockPacketRequest packet) {
+        ServerPlayer player = listener.player;
+        player.level().getChunkSource()
+            .sendToTrackingPlayers(player, new ContraptionColliderLockPacket(packet.contraption(), packet.offset(), player.getId()));
     }
 
-    public static void onRadialWrenchMenuSubmit(ServerPlayNetworkHandler listener, RadialWrenchMenuSubmitPacket packet) {
-        ServerWorld world = listener.player.getEntityWorld();
+    public static void onRadialWrenchMenuSubmit(ServerGamePacketListenerImpl listener, RadialWrenchMenuSubmitPacket packet) {
+        ServerLevel world = listener.player.level();
         BlockPos blockPos = packet.blockPos();
         BlockState newState = packet.newState();
-        if (!world.getBlockState(blockPos).isOf(newState.getBlock()))
+        if (!world.getBlockState(blockPos).is(newState.getBlock()))
             return;
 
-        BlockState updatedState = Block.postProcessState(newState, world, blockPos);
+        BlockState updatedState = Block.updateFromNeighbourShapes(newState, world, blockPos);
         KineticBlockEntity.switchToBlockState(world, blockPos, updatedState);
 
         IWrenchable.playRotateSound(world, blockPos);
     }
 
-    public static void onTrainMapSyncRequest(ServerPlayNetworkHandler listener) {
+    public static void onTrainMapSyncRequest(ServerGamePacketListenerImpl listener) {
     }
 
-    public static void onLinkSettings(ServerPlayNetworkHandler listener, LinkSettingsPacket packet) {
+    public static void onLinkSettings(ServerGamePacketListenerImpl listener, LinkSettingsPacket packet) {
         onBlockEntityConfiguration(
             listener, packet.pos(), 20, blockEntity -> {
                 if (blockEntity instanceof SmartBlockEntity be) {
                     ServerLinkBehaviour behaviour = be.getBehaviour(ServerLinkBehaviour.TYPE);
                     if (behaviour != null) {
-                        behaviour.setFrequency(packet.first(), listener.player.getStackInHand(packet.hand()));
+                        behaviour.setFrequency(packet.first(), listener.player.getItemInHand(packet.hand()));
                         return true;
                     }
                 }
@@ -1588,12 +1588,12 @@ public class AllHandle {
         );
     }
 
-    public static void onBlueprintPreviewRequest(ServerPlayNetworkHandler listener, BlueprintPreviewRequestPacket packet) {
-        Entity entity = listener.player.getEntityWorld().getEntityById(packet.entityId());
+    public static void onBlueprintPreviewRequest(ServerGamePacketListenerImpl listener, BlueprintPreviewRequestPacket packet) {
+        Entity entity = listener.player.level().getEntity(packet.entityId());
         if (!(entity instanceof BlueprintEntity blueprint)) {
-            listener.sendPacket(BlueprintPreviewPacket.EMPTY);
+            listener.send(BlueprintPreviewPacket.EMPTY);
             return;
         }
-        listener.sendPacket(BlueprintEntity.getPreview(blueprint, packet.index(), listener.player, packet.sneaking()));
+        listener.send(BlueprintEntity.getPreview(blueprint, packet.index(), listener.player, packet.sneaking()));
     }
 }

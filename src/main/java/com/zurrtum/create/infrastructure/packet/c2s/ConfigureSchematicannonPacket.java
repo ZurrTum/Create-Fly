@@ -4,30 +4,29 @@ import com.zurrtum.create.AllHandle;
 import com.zurrtum.create.AllPackets;
 import com.zurrtum.create.catnip.codecs.stream.CatnipStreamCodecBuilders;
 import io.netty.buffer.ByteBuf;
-import net.minecraft.network.RegistryByteBuf;
-import net.minecraft.network.codec.PacketCodec;
-import net.minecraft.network.codec.PacketCodecs;
-import net.minecraft.network.packet.PacketType;
-import net.minecraft.server.network.ServerPlayNetworkHandler;
-
 import java.util.function.BiConsumer;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.PacketType;
+import net.minecraft.server.network.ServerGamePacketListenerImpl;
 
 public record ConfigureSchematicannonPacket(Option option, boolean set) implements C2SPacket {
-    public static final PacketCodec<RegistryByteBuf, ConfigureSchematicannonPacket> CODEC = PacketCodec.tuple(
+    public static final StreamCodec<RegistryFriendlyByteBuf, ConfigureSchematicannonPacket> CODEC = StreamCodec.composite(
         Option.CODEC,
         ConfigureSchematicannonPacket::option,
-        PacketCodecs.BOOLEAN,
+        ByteBufCodecs.BOOL,
         ConfigureSchematicannonPacket::set,
         ConfigureSchematicannonPacket::new
     );
 
     @Override
-    public PacketType<ConfigureSchematicannonPacket> getPacketType() {
+    public PacketType<ConfigureSchematicannonPacket> type() {
         return AllPackets.CONFIGURE_SCHEMATICANNON;
     }
 
     @Override
-    public BiConsumer<ServerPlayNetworkHandler, ConfigureSchematicannonPacket> callback() {
+    public BiConsumer<ServerGamePacketListenerImpl, ConfigureSchematicannonPacket> callback() {
         return AllHandle::onConfigureSchematicannon;
     }
 
@@ -42,6 +41,6 @@ public record ConfigureSchematicannonPacket(Option option, boolean set) implemen
         PAUSE,
         STOP;
 
-        public static final PacketCodec<ByteBuf, Option> CODEC = CatnipStreamCodecBuilders.ofEnum(Option.class);
+        public static final StreamCodec<ByteBuf, Option> CODEC = CatnipStreamCodecBuilders.ofEnum(Option.class);
     }
 }

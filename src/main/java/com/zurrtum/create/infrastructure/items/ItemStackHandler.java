@@ -3,55 +3,55 @@ package com.zurrtum.create.infrastructure.items;
 import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.*;
 import com.zurrtum.create.foundation.codec.CreateCodecs;
-import net.minecraft.item.ItemStack;
-import net.minecraft.storage.ReadView;
-import net.minecraft.storage.WriteView;
-import net.minecraft.util.collection.DefaultedList;
+import net.minecraft.core.NonNullList;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import org.apache.commons.lang3.mutable.MutableInt;
 
 public class ItemStackHandler implements ItemInventory {
     public static final Codec<ItemStackHandler> CODEC = Codec.of(ItemStackHandler::encode, ItemStackHandler::decode);
 
-    protected final DefaultedList<ItemStack> stacks;
+    protected final NonNullList<ItemStack> stacks;
 
     public ItemStackHandler() {
         this(1);
     }
 
     public ItemStackHandler(int size) {
-        this.stacks = DefaultedList.ofSize(size, ItemStack.EMPTY);
+        this.stacks = NonNullList.withSize(size, ItemStack.EMPTY);
     }
 
     @Override
-    public int size() {
+    public int getContainerSize() {
         return stacks.size();
     }
 
     @Override
-    public ItemStack getStack(int slot) {
-        if (slot >= size()) {
+    public ItemStack getItem(int slot) {
+        if (slot >= getContainerSize()) {
             return ItemStack.EMPTY;
         }
         return stacks.get(slot);
     }
 
     @Override
-    public void setStack(int slot, ItemStack stack) {
-        if (slot >= size()) {
+    public void setItem(int slot, ItemStack stack) {
+        if (slot >= getContainerSize()) {
             return;
         }
         stacks.set(slot, stack);
     }
 
-    public DefaultedList<ItemStack> getStacks() {
+    public NonNullList<ItemStack> getStacks() {
         return stacks;
     }
 
-    public void writeSlots(WriteView view) {
-        view.put("Inventory", CreateCodecs.ITEM_LIST_CODEC, stacks);
+    public void writeSlots(ValueOutput view) {
+        view.store("Inventory", CreateCodecs.ITEM_LIST_CODEC, stacks);
     }
 
-    public void readSlots(ReadView view) {
+    public void readSlots(ValueInput view) {
         view.read("Inventory", CreateCodecs.ITEM_LIST_CODEC).ifPresentOrElse(
             list -> {
                 for (int i = 0, size = list.size(); i < size; i++) {
@@ -61,8 +61,8 @@ public class ItemStackHandler implements ItemInventory {
         );
     }
 
-    public void write(WriteView view) {
-        WriteView.ListAppender<ItemStack> list = view.getListAppender("Inventory", ItemStack.CODEC);
+    public void write(ValueOutput view) {
+        ValueOutput.TypedOutputList<ItemStack> list = view.list("Inventory", ItemStack.CODEC);
         for (ItemStack stack : stacks) {
             if (stack.isEmpty()) {
                 continue;
@@ -71,8 +71,8 @@ public class ItemStackHandler implements ItemInventory {
         }
     }
 
-    public void read(ReadView view) {
-        ReadView.TypedListReadView<ItemStack> list = view.getTypedListView("Inventory", ItemStack.CODEC);
+    public void read(ValueInput view) {
+        ValueInput.TypedInputList<ItemStack> list = view.listOrEmpty("Inventory", ItemStack.CODEC);
         int i = 0;
         for (ItemStack itemStack : list) {
             stacks.set(i++, itemStack);

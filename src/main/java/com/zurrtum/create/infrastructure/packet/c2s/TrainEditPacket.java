@@ -2,37 +2,36 @@ package com.zurrtum.create.infrastructure.packet.c2s;
 
 import com.zurrtum.create.AllHandle;
 import com.zurrtum.create.AllPackets;
-import net.minecraft.network.RegistryByteBuf;
-import net.minecraft.network.codec.PacketCodec;
-import net.minecraft.network.codec.PacketCodecs;
-import net.minecraft.network.packet.PacketType;
-import net.minecraft.server.network.ServerPlayNetworkHandler;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.Uuids;
-
 import java.util.UUID;
 import java.util.function.BiConsumer;
+import net.minecraft.core.UUIDUtil;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.PacketType;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.network.ServerGamePacketListenerImpl;
 
-public record TrainEditPacket(UUID id, String name, Identifier iconType, int mapColor) implements C2SPacket {
-    public static PacketCodec<RegistryByteBuf, TrainEditPacket> CODEC = PacketCodec.tuple(
-        Uuids.PACKET_CODEC,
+public record TrainEditPacket(UUID id, String name, ResourceLocation iconType, int mapColor) implements C2SPacket {
+    public static StreamCodec<RegistryFriendlyByteBuf, TrainEditPacket> CODEC = StreamCodec.composite(
+        UUIDUtil.STREAM_CODEC,
         TrainEditPacket::id,
-        PacketCodecs.string(256),
+        ByteBufCodecs.stringUtf8(256),
         TrainEditPacket::name,
-        Identifier.PACKET_CODEC,
+        ResourceLocation.STREAM_CODEC,
         TrainEditPacket::iconType,
-        PacketCodecs.INTEGER,
+        ByteBufCodecs.INT,
         TrainEditPacket::mapColor,
         TrainEditPacket::new
     );
 
     @Override
-    public PacketType<TrainEditPacket> getPacketType() {
+    public PacketType<TrainEditPacket> type() {
         return AllPackets.C_CONFIGURE_TRAIN;
     }
 
     @Override
-    public BiConsumer<ServerPlayNetworkHandler, TrainEditPacket> callback() {
+    public BiConsumer<ServerGamePacketListenerImpl, TrainEditPacket> callback() {
         return AllHandle::onTrainEdit;
     }
 }

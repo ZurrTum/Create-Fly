@@ -15,31 +15,31 @@ import mezz.jei.api.gui.ingredient.IRecipeSlotView;
 import mezz.jei.api.gui.ingredient.IRecipeSlotsView;
 import mezz.jei.api.recipe.IFocusGroup;
 import mezz.jei.api.recipe.types.IRecipeType;
-import net.minecraft.block.BlockState;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.item.BlockItem;
-import net.minecraft.recipe.PreparedRecipes;
-import net.minecraft.recipe.RecipeEntry;
-import net.minecraft.text.Text;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.crafting.RecipeHolder;
+import net.minecraft.world.item.crafting.RecipeMap;
+import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.NotNull;
 import org.joml.Matrix3x2f;
 
 import java.util.List;
 
-public class ManualApplicationCategory extends CreateCategory<RecipeEntry<ManualApplicationRecipe>> {
-    public static List<RecipeEntry<ManualApplicationRecipe>> getRecipes(PreparedRecipes preparedRecipes) {
-        return preparedRecipes.getAll(AllRecipeTypes.ITEM_APPLICATION).stream().toList();
+public class ManualApplicationCategory extends CreateCategory<RecipeHolder<ManualApplicationRecipe>> {
+    public static List<RecipeHolder<ManualApplicationRecipe>> getRecipes(RecipeMap preparedRecipes) {
+        return preparedRecipes.byType(AllRecipeTypes.ITEM_APPLICATION).stream().toList();
     }
 
     @Override
     @NotNull
-    public IRecipeType<RecipeEntry<ManualApplicationRecipe>> getRecipeType() {
+    public IRecipeType<RecipeHolder<ManualApplicationRecipe>> getRecipeType() {
         return JeiClientPlugin.ITEM_APPLICATION;
     }
 
     @Override
     @NotNull
-    public Text getTitle() {
+    public Component getTitle() {
         return CreateLang.translateDirect("recipe.item_application");
     }
 
@@ -54,7 +54,7 @@ public class ManualApplicationCategory extends CreateCategory<RecipeEntry<Manual
     }
 
     @Override
-    public void setRecipe(IRecipeLayoutBuilder builder, RecipeEntry<ManualApplicationRecipe> entry, IFocusGroup focuses) {
+    public void setRecipe(IRecipeLayoutBuilder builder, RecipeHolder<ManualApplicationRecipe> entry, IFocusGroup focuses) {
         ManualApplicationRecipe recipe = entry.value();
         builder.addInputSlot(51, 5).setBackground(SLOT, -1, -1).add(recipe.ingredient());
         builder.addInputSlot(27, 38).setSlotName("target").setBackground(SLOT, -1, -1).add(recipe.target());
@@ -63,9 +63,9 @@ public class ManualApplicationCategory extends CreateCategory<RecipeEntry<Manual
 
     @Override
     public void draw(
-        RecipeEntry<ManualApplicationRecipe> entry,
+        RecipeHolder<ManualApplicationRecipe> entry,
         IRecipeSlotsView recipeSlotsView,
-        DrawContext graphics,
+        GuiGraphics graphics,
         double mouseX,
         double mouseY
     ) {
@@ -73,8 +73,8 @@ public class ManualApplicationCategory extends CreateCategory<RecipeEntry<Manual
         AllGuiTextures.JEI_DOWN_ARROW.render(graphics, 79, 15);
         recipeSlotsView.findSlotByName("target").flatMap(IRecipeSlotView::getDisplayedItemStack).ifPresent(stack -> {
             if (stack.getItem() instanceof BlockItem blockItem) {
-                BlockState block = blockItem.getBlock().getDefaultState();
-                graphics.state.addSpecialElement(new ManualBlockRenderState(new Matrix3x2f(graphics.getMatrices()), block, 79, 34));
+                BlockState block = blockItem.getBlock().defaultBlockState();
+                graphics.guiRenderState.submitPicturesInPictureState(new ManualBlockRenderState(new Matrix3x2f(graphics.pose()), block, 79, 34));
             }
         });
     }

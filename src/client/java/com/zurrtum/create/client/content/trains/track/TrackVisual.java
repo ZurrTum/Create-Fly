@@ -1,5 +1,7 @@
 package com.zurrtum.create.client.content.trains.track;
 
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.PoseStack.Pose;
 import com.zurrtum.create.catnip.data.Couple;
 import com.zurrtum.create.catnip.data.Iterate;
 import com.zurrtum.create.client.AllPartialModels;
@@ -19,11 +21,9 @@ import com.zurrtum.create.content.trains.track.BezierConnection;
 import com.zurrtum.create.content.trains.track.TrackBlockEntity;
 import it.unimi.dsi.fastutil.longs.LongArraySet;
 import it.unimi.dsi.fastutil.longs.LongSet;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.client.util.math.MatrixStack.Entry;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.ChunkSectionPos;
-import net.minecraft.util.math.MathHelper;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.SectionPos;
+import net.minecraft.util.Mth;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.UnknownNullability;
 
@@ -44,9 +44,9 @@ public class TrackVisual extends AbstractVisual implements BlockEntityVisual<Tra
     protected SectionCollector lightSections;
 
     public TrackVisual(VisualizationContext context, TrackBlockEntity track, float partialTick) {
-        super(context, track.getWorld(), partialTick);
+        super(context, track.getLevel(), partialTick);
         this.blockEntity = track;
-        this.pos = blockEntity.getPos();
+        this.pos = blockEntity.getBlockPos();
         this.visualPos = pos.subtract(context.renderOrigin());
 
         collectConnections();
@@ -101,27 +101,27 @@ public class TrackVisual extends AbstractVisual implements BlockEntityVisual<Tra
             // The start and end positions are not enough to enclose the entire curve.
             // Check the computed bounds but expand by one for safety.
             var bounds = connection.getBounds();
-            minX = Math.min(minX, MathHelper.floor(bounds.minX) - 1);
-            minY = Math.min(minY, MathHelper.floor(bounds.minY) - 1);
-            minZ = Math.min(minZ, MathHelper.floor(bounds.minZ) - 1);
-            maxX = Math.max(maxX, MathHelper.ceil(bounds.maxX) + 1);
-            maxY = Math.max(maxY, MathHelper.ceil(bounds.maxY) + 1);
-            maxZ = Math.max(maxZ, MathHelper.ceil(bounds.maxZ) + 1);
+            minX = Math.min(minX, Mth.floor(bounds.minX) - 1);
+            minY = Math.min(minY, Mth.floor(bounds.minY) - 1);
+            minZ = Math.min(minZ, Mth.floor(bounds.minZ) - 1);
+            maxX = Math.max(maxX, Mth.ceil(bounds.maxX) + 1);
+            maxY = Math.max(maxY, Mth.ceil(bounds.maxY) + 1);
+            maxZ = Math.max(maxZ, Mth.ceil(bounds.maxZ) + 1);
         }
 
-        var minSectionX = ChunkSectionPos.getSectionCoord(minX);
-        var minSectionY = ChunkSectionPos.getSectionCoord(minY);
-        var minSectionZ = ChunkSectionPos.getSectionCoord(minZ);
-        int maxSectionX = ChunkSectionPos.getSectionCoord(maxX);
-        int maxSectionY = ChunkSectionPos.getSectionCoord(maxY);
-        int maxSectionZ = ChunkSectionPos.getSectionCoord(maxZ);
+        var minSectionX = SectionPos.blockToSectionCoord(minX);
+        var minSectionY = SectionPos.blockToSectionCoord(minY);
+        var minSectionZ = SectionPos.blockToSectionCoord(minZ);
+        int maxSectionX = SectionPos.blockToSectionCoord(maxX);
+        int maxSectionY = SectionPos.blockToSectionCoord(maxY);
+        int maxSectionZ = SectionPos.blockToSectionCoord(maxZ);
 
         LongSet out = new LongArraySet();
 
         for (int x = minSectionX; x <= maxSectionX; x++) {
             for (int y = minSectionY; y <= maxSectionY; y++) {
                 for (int z = minSectionZ; z <= maxSectionZ; z++) {
-                    out.add(ChunkSectionPos.asLong(x, y, z));
+                    out.add(SectionPos.asLong(x, y, z));
                 }
             }
         }
@@ -147,7 +147,7 @@ public class TrackVisual extends AbstractVisual implements BlockEntityVisual<Tra
         private BezierTrackVisual(BezierConnection bc) {
             girder = bc.hasGirder ? new GirderVisual(bc) : null;
 
-            MatrixStack pose = new MatrixStack();
+            PoseStack pose = new PoseStack();
             TransformStack.of(pose).translate(visualPos);
 
             int segCount = bc.getSegmentCount();
@@ -168,7 +168,7 @@ public class TrackVisual extends AbstractVisual implements BlockEntityVisual<Tra
                 ties[modelIndex].setTransform(pose).mul(segment.tieTransform[i]).setChanged();
 
                 for (boolean first : Iterate.trueAndFalse) {
-                    Entry transform = segment.railTransforms[i].get(first);
+                    Pose transform = segment.railTransforms[i].get(first);
                     (first ? this.left : this.right)[modelIndex].setTransform(pose).mul(transform).setChanged();
                 }
             }
@@ -202,7 +202,7 @@ public class TrackVisual extends AbstractVisual implements BlockEntityVisual<Tra
             private final Couple<Couple<TransformedInstance[]>> beamCaps;
 
             private GirderVisual(BezierConnection bc) {
-                MatrixStack pose = new MatrixStack();
+                PoseStack pose = new PoseStack();
                 TransformStack.of(pose).translate(visualPos).nudge((int) bc.bePositions.getFirst().asLong());
 
                 int segCount = bc.getSegmentCount();
@@ -222,10 +222,10 @@ public class TrackVisual extends AbstractVisual implements BlockEntityVisual<Tra
                     var modelIndex = i - 1;
 
                     for (boolean first : Iterate.trueAndFalse) {
-                        Entry beamTransform = segment.beams[i].get(first);
+                        Pose beamTransform = segment.beams[i].get(first);
                         beams.get(first)[modelIndex].setTransform(pose).mul(beamTransform).setChanged();
                         for (boolean top : Iterate.trueAndFalse) {
-                            Entry beamCapTransform = segment.beamCaps[i].get(top).get(first);
+                            Pose beamCapTransform = segment.beamCaps[i].get(top).get(first);
                             beamCaps.get(top).get(first)[modelIndex].setTransform(pose).mul(beamCapTransform).setChanged();
                         }
                     }

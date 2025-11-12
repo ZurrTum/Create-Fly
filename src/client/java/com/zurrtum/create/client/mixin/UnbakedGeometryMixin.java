@@ -5,22 +5,22 @@ import com.llamalad7.mixinextras.sugar.Local;
 import com.zurrtum.create.client.model.NormalsBakedQuad;
 import com.zurrtum.create.client.model.NormalsModelElement;
 import com.zurrtum.create.client.model.NormalsModelElement.NormalsType;
-import net.minecraft.client.render.model.BakedQuad;
-import net.minecraft.client.render.model.UnbakedGeometry;
-import net.minecraft.client.render.model.json.ModelElement;
+import net.minecraft.client.renderer.block.model.BakedQuad;
+import net.minecraft.client.renderer.block.model.BlockElement;
+import net.minecraft.client.renderer.block.model.SimpleUnbakedGeometry;
 import org.joml.Vector3f;
 import org.joml.Vector3fc;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 
-@Mixin(UnbakedGeometry.class)
+@Mixin(SimpleUnbakedGeometry.class)
 public class UnbakedGeometryMixin {
-    @ModifyReturnValue(method = "bakeQuad(Lnet/minecraft/client/render/model/json/ModelElement;Lnet/minecraft/client/render/model/json/ModelElementFace;Lnet/minecraft/client/texture/Sprite;Lnet/minecraft/util/math/Direction;Lnet/minecraft/client/render/model/ModelBakeSettings;)Lnet/minecraft/client/render/model/BakedQuad;", at = @At("RETURN"))
-    private static BakedQuad bakeQuad(BakedQuad quad, @Local(argsOnly = true) ModelElement element) {
+    @ModifyReturnValue(method = "bakeFace(Lnet/minecraft/client/renderer/block/model/BlockElement;Lnet/minecraft/client/renderer/block/model/BlockElementFace;Lnet/minecraft/client/renderer/texture/TextureAtlasSprite;Lnet/minecraft/core/Direction;Lnet/minecraft/client/resources/model/ModelState;)Lnet/minecraft/client/renderer/block/model/BakedQuad;", at = @At("RETURN"))
+    private static BakedQuad bakeQuad(BakedQuad quad, @Local(argsOnly = true) BlockElement element) {
         NormalsType type = NormalsModelElement.getNormalsType(element);
         if (type != null) {
-            int[] faceData = quad.vertexData();
+            int[] faceData = quad.vertices();
             Vector3fc vector;
             if (type == NormalsType.CALC) {
                 Vector3f v1 = getVertexPos(faceData, 3);
@@ -32,7 +32,7 @@ public class UnbakedGeometryMixin {
                 v2.cross(v1);
                 vector = v2.normalize();
             } else {
-                vector = quad.face().getFloatVector();
+                vector = quad.direction().getUnitVec3f();
             }
 
             int x = ((byte) Math.round(vector.x() * 127)) & 0xFF;

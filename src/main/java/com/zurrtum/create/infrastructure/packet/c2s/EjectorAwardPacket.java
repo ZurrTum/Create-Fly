@@ -3,18 +3,17 @@ package com.zurrtum.create.infrastructure.packet.c2s;
 import com.zurrtum.create.AllHandle;
 import com.zurrtum.create.AllPackets;
 import io.netty.buffer.ByteBuf;
-import net.minecraft.network.codec.PacketCodec;
-import net.minecraft.network.packet.PacketType;
-import net.minecraft.server.network.ServerPlayNetworkHandler;
-import net.minecraft.util.math.BlockPos;
-
 import java.util.function.BiConsumer;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.PacketType;
+import net.minecraft.server.network.ServerGamePacketListenerImpl;
 
 public record EjectorAwardPacket(BlockPos pos) implements C2SPacket {
-    public static final PacketCodec<ByteBuf, EjectorAwardPacket> CODEC = BlockPos.PACKET_CODEC.xmap(EjectorAwardPacket::new, EjectorAwardPacket::pos);
+    public static final StreamCodec<ByteBuf, EjectorAwardPacket> CODEC = BlockPos.STREAM_CODEC.map(EjectorAwardPacket::new, EjectorAwardPacket::pos);
 
     @Override
-    public PacketType<EjectorAwardPacket> getPacketType() {
+    public PacketType<EjectorAwardPacket> type() {
         return AllPackets.EJECTOR_AWARD;
     }
 
@@ -24,7 +23,7 @@ public record EjectorAwardPacket(BlockPos pos) implements C2SPacket {
     }
 
     @Override
-    public BiConsumer<ServerPlayNetworkHandler, EjectorAwardPacket> callback() {
+    public BiConsumer<ServerGamePacketListenerImpl, EjectorAwardPacket> callback() {
         return AllHandle::onEjectorAward;
     }
 }

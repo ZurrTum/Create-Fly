@@ -3,28 +3,28 @@ package com.zurrtum.create.content.processing.basin;
 import com.zurrtum.create.AllClientHandle;
 import com.zurrtum.create.api.behaviour.movement.MovementBehaviour;
 import com.zurrtum.create.content.contraptions.behaviour.MovementContext;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.entity.ItemEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NbtElement;
+import net.minecraft.core.Direction;
 import net.minecraft.nbt.NbtOps;
-import net.minecraft.registry.RegistryOps;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.World;
+import net.minecraft.nbt.Tag;
+import net.minecraft.resources.RegistryOps;
+import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class BasinMovementBehaviour extends MovementBehaviour {
-    private static final Vec3d UP = Vec3d.of(Direction.UP.getVector());
+    private static final Vec3 UP = Vec3.atLowerCornerOf(Direction.UP.getUnitVec3i());
 
     @Override
     public void tick(MovementContext context) {
         if (context.temporaryData == null) {
-            Vec3d facingVec = context.rotation.apply(UP);
-            if (Direction.getFacing(facingVec) == Direction.DOWN)
+            Vec3 facingVec = context.rotation.apply(UP);
+            if (Direction.getApproximateNearest(facingVec) == Direction.DOWN)
                 dump(context, facingVec);
         }
     }
@@ -32,7 +32,7 @@ public class BasinMovementBehaviour extends MovementBehaviour {
     @Nullable
     public static List<ItemStack> readInventory(MovementContext context) {
         return context.blockEntityData.getCompound("Inventory").map(nbt -> {
-            RegistryOps<NbtElement> ops = context.world.getRegistryManager().getOps(NbtOps.INSTANCE);
+            RegistryOps<Tag> ops = context.world.registryAccess().createSerializationContext(NbtOps.INSTANCE);
             List<ItemStack> result = new ArrayList<>();
             nbt.getList("Input").ifPresent(list -> list.forEach(item -> ItemStack.CODEC.parse(ops, item).ifSuccess(result::add)));
             nbt.getList("Output").ifPresent(list -> list.forEach(item -> ItemStack.CODEC.parse(ops, item).ifSuccess(result::add)));
@@ -43,24 +43,24 @@ public class BasinMovementBehaviour extends MovementBehaviour {
         }).orElse(null);
     }
 
-    private void dump(MovementContext context, Vec3d facingVec) {
+    private void dump(MovementContext context, Vec3 facingVec) {
         List<ItemStack> inventory = readInventory(context);
         if (inventory == null) {
             return;
         }
-        Vec3d velocity = facingVec.multiply(0.5);
-        World world = context.world;
+        Vec3 velocity = facingVec.scale(0.5);
+        Level world = context.world;
         for (ItemStack stack : inventory) {
             ItemEntity item = new ItemEntity(world, context.position.x, context.position.y, context.position.z, stack);
-            item.setVelocity(velocity);
-            world.spawnEntity(item);
+            item.setDeltaMovement(velocity);
+            world.addFreshEntity(item);
         }
         context.blockEntityData.remove("Inventory");
         // FIXME: Why are we setting client-side data here?
-        if (context.contraption.entity.getEntityWorld().isClient()) {
+        if (context.contraption.entity.level().isClientSide()) {
             BlockEntity blockEntity = AllClientHandle.INSTANCE.getBlockEntityClientSide(context.contraption, context.localPos);
             if (blockEntity instanceof BasinBlockEntity basin) {
-                basin.itemCapability.clear();
+                basin.itemCapability.clearContent();
             }
         }
         context.temporaryData = Boolean.TRUE;

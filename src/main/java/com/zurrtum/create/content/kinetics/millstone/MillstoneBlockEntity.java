@@ -10,22 +10,22 @@ import com.zurrtum.create.foundation.advancement.CreateTrigger;
 import com.zurrtum.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.infrastructure.items.SidedItemInventory;
 import com.zurrtum.create.infrastructure.transfer.SlotRangeCache;
-import net.minecraft.block.BlockState;
-import net.minecraft.item.ItemStack;
-import net.minecraft.particle.ItemStackParticleEffect;
-import net.minecraft.particle.ParticleTypes;
-import net.minecraft.recipe.RecipeEntry;
-import net.minecraft.recipe.input.SingleStackRecipeInput;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.storage.ReadView;
-import net.minecraft.storage.WriteView;
-import net.minecraft.util.ItemScatterer;
-import net.minecraft.util.collection.DefaultedList;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Direction.Axis;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.Direction.Axis;
+import net.minecraft.core.NonNullList;
+import net.minecraft.core.particles.ItemParticleOption;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.util.Mth;
+import net.minecraft.world.Containers;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.RecipeHolder;
+import net.minecraft.world.item.crafting.SingleRecipeInput;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
+import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
@@ -58,9 +58,9 @@ public class MillstoneBlockEntity extends KineticBlockEntity {
 
         if (getSpeed() == 0)
             return;
-        for (int i = 1, size = capability.size(); i < size; i++) {
-            ItemStack stack = capability.getStack(i);
-            if (stack.getCount() == capability.getMaxCount(stack)) {
+        for (int i = 1, size = capability.getContainerSize(); i < size; i++) {
+            ItemStack stack = capability.getItem(i);
+            if (stack.getCount() == capability.getMaxStackSize(stack)) {
                 return;
             }
         }
@@ -68,25 +68,24 @@ public class MillstoneBlockEntity extends KineticBlockEntity {
         if (timer > 0) {
             timer -= getProcessingSpeed();
 
-            if (world.isClient()) {
+            if (level.isClientSide()) {
                 spawnParticles();
                 return;
             }
             if (timer <= 0)
                 process();
             return;
-        } else if (world.isClient()) {
+        } else if (level.isClientSide()) {
             return;
         }
 
-        ItemStack stack = capability.getStack(0);
+        ItemStack stack = capability.getItem(0);
         if (stack.isEmpty())
             return;
 
-        SingleStackRecipeInput input = new SingleStackRecipeInput(stack);
-        if (lastRecipe == null || !lastRecipe.matches(input, world)) {
-            Optional<RecipeEntry<MillingRecipe>> recipe = ((ServerWorld) world).getRecipeManager()
-                .getFirstMatch(AllRecipeTypes.MILLING, input, world);
+        SingleRecipeInput input = new SingleRecipeInput(stack);
+        if (lastRecipe == null || !lastRecipe.matches(input, level)) {
+            Optional<RecipeHolder<MillingRecipe>> recipe = ((ServerLevel) level).recipeAccess().getRecipeFor(AllRecipeTypes.MILLING, input, level);
             if (recipe.isEmpty()) {
                 timer = 100;
                 sendData();
@@ -105,26 +104,25 @@ public class MillstoneBlockEntity extends KineticBlockEntity {
     @Override
     public void destroy() {
         super.destroy();
-        ItemScatterer.spawn(world, pos, capability);
+        Containers.dropContents(level, worldPosition, capability);
     }
 
     private void process() {
-        ItemStack stack = capability.getStack(0);
-        SingleStackRecipeInput input = new SingleStackRecipeInput(stack);
+        ItemStack stack = capability.getItem(0);
+        SingleRecipeInput input = new SingleRecipeInput(stack);
 
-        if (lastRecipe == null || !lastRecipe.matches(input, world)) {
-            Optional<RecipeEntry<MillingRecipe>> recipe = ((ServerWorld) world).getRecipeManager()
-                .getFirstMatch(AllRecipeTypes.MILLING, input, world);
+        if (lastRecipe == null || !lastRecipe.matches(input, level)) {
+            Optional<RecipeHolder<MillingRecipe>> recipe = ((ServerLevel) level).recipeAccess().getRecipeFor(AllRecipeTypes.MILLING, input, level);
             if (recipe.isEmpty())
                 return;
             lastRecipe = recipe.get().value();
         }
 
-        ItemStack recipeRemainder = stack.getItem().getRecipeRemainder();
-        stack.decrement(1);
-        capability.setStack(0, stack);
+        ItemStack recipeRemainder = stack.getItem().getCraftingRemainder();
+        stack.shrink(1);
+        capability.setItem(0, stack);
         capability.outputAllowInsertion();
-        List<ItemStack> list = lastRecipe.craft(input, world.random);
+        List<ItemStack> list = lastRecipe.assemble(input, level.random);
         if (!recipeRemainder.isEmpty()) {
             list.add(recipeRemainder);
         }
@@ -134,48 +132,48 @@ public class MillstoneBlockEntity extends KineticBlockEntity {
         award(AllAdvancements.MILLSTONE);
 
         sendData();
-        markDirty();
+        setChanged();
     }
 
     public void spawnParticles() {
-        ItemStack stackInSlot = capability.getStack(0);
+        ItemStack stackInSlot = capability.getItem(0);
         if (stackInSlot.isEmpty())
             return;
 
-        ItemStackParticleEffect data = new ItemStackParticleEffect(ParticleTypes.ITEM, stackInSlot);
-        float angle = world.random.nextFloat() * 360;
-        Vec3d offset = new Vec3d(0, 0, 0.5f);
+        ItemParticleOption data = new ItemParticleOption(ParticleTypes.ITEM, stackInSlot);
+        float angle = level.random.nextFloat() * 360;
+        Vec3 offset = new Vec3(0, 0, 0.5f);
         offset = VecHelper.rotate(offset, angle, Axis.Y);
-        Vec3d target = VecHelper.rotate(offset, getSpeed() > 0 ? 25 : -25, Axis.Y);
+        Vec3 target = VecHelper.rotate(offset, getSpeed() > 0 ? 25 : -25, Axis.Y);
 
-        Vec3d center = offset.add(VecHelper.getCenterOf(pos));
-        target = VecHelper.offsetRandomly(target.subtract(offset), world.random, 1 / 128f);
-        world.addParticleClient(data, center.x, center.y, center.z, target.x, target.y, target.z);
+        Vec3 center = offset.add(VecHelper.getCenterOf(worldPosition));
+        target = VecHelper.offsetRandomly(target.subtract(offset), level.random, 1 / 128f);
+        level.addParticle(data, center.x, center.y, center.z, target.x, target.y, target.z);
     }
 
     @Override
-    public void write(WriteView view, boolean clientPacket) {
+    public void write(ValueOutput view, boolean clientPacket) {
         view.putInt("Timer", timer);
         capability.write(view);
         super.write(view, clientPacket);
     }
 
     @Override
-    protected void read(ReadView view, boolean clientPacket) {
-        timer = view.getInt("Timer", 0);
+    protected void read(ValueInput view, boolean clientPacket) {
+        timer = view.getIntOr("Timer", 0);
         capability.read(view);
         super.read(view, clientPacket);
     }
 
     public int getProcessingSpeed() {
-        return MathHelper.clamp((int) Math.abs(getSpeed() / 16f), 1, 512);
+        return Mth.clamp((int) Math.abs(getSpeed() / 16f), 1, 512);
     }
 
     private boolean canProcess(ItemStack stack) {
-        SingleStackRecipeInput input = new SingleStackRecipeInput(stack);
-        if (lastRecipe != null && lastRecipe.matches(input, world))
+        SingleRecipeInput input = new SingleRecipeInput(stack);
+        if (lastRecipe != null && lastRecipe.matches(input, level))
             return true;
-        Optional<RecipeEntry<MillingRecipe>> recipe = ((ServerWorld) world).getRecipeManager().getFirstMatch(AllRecipeTypes.MILLING, input, world);
+        Optional<RecipeHolder<MillingRecipe>> recipe = ((ServerLevel) level).recipeAccess().getRecipeFor(AllRecipeTypes.MILLING, input, level);
         if (recipe.isEmpty()) {
             return false;
         }
@@ -185,7 +183,7 @@ public class MillstoneBlockEntity extends KineticBlockEntity {
 
     public class MillstoneInventoryHandler implements SidedItemInventory {
         private static final int[] SLOTS = SlotRangeCache.get(10);
-        private final DefaultedList<ItemStack> stacks = DefaultedList.ofSize(10, ItemStack.EMPTY);
+        private final NonNullList<ItemStack> stacks = NonNullList.withSize(10, ItemStack.EMPTY);
         private boolean check = true;
 
         public void outputAllowInsertion() {
@@ -197,32 +195,32 @@ public class MillstoneBlockEntity extends KineticBlockEntity {
         }
 
         @Override
-        public int size() {
+        public int getContainerSize() {
             return 10;
         }
 
         @Override
-        public int[] getAvailableSlots(Direction side) {
+        public int[] getSlotsForFace(Direction side) {
             return SLOTS;
         }
 
         @Override
-        public boolean isValid(int slot, ItemStack stack) {
+        public boolean canPlaceItem(int slot, ItemStack stack) {
             return !check || canProcess(stack);
         }
 
         @Override
-        public boolean canInsert(int slot, ItemStack stack, @Nullable Direction dir) {
+        public boolean canPlaceItemThroughFace(int slot, ItemStack stack, @Nullable Direction dir) {
             return check ? slot == 0 : slot > 0;
         }
 
         @Override
-        public boolean canExtract(int slot, ItemStack stack, Direction dir) {
+        public boolean canTakeItemThroughFace(int slot, ItemStack stack, Direction dir) {
             return slot != 0;
         }
 
         @Override
-        public ItemStack getStack(int slot) {
+        public ItemStack getItem(int slot) {
             if (slot >= 10) {
                 return ItemStack.EMPTY;
             }
@@ -230,7 +228,7 @@ public class MillstoneBlockEntity extends KineticBlockEntity {
         }
 
         @Override
-        public void setStack(int slot, ItemStack stack) {
+        public void setItem(int slot, ItemStack stack) {
             if (slot >= 10) {
                 return;
             }
@@ -238,12 +236,12 @@ public class MillstoneBlockEntity extends KineticBlockEntity {
         }
 
         @Override
-        public void markDirty() {
-            MillstoneBlockEntity.this.markDirty();
+        public void setChanged() {
+            MillstoneBlockEntity.this.setChanged();
         }
 
-        public void write(WriteView view) {
-            WriteView.ListAppender<ItemStack> list = view.getListAppender("Inventory", ItemStack.OPTIONAL_CODEC);
+        public void write(ValueOutput view) {
+            ValueOutput.TypedOutputList<ItemStack> list = view.list("Inventory", ItemStack.OPTIONAL_CODEC);
             list.add(stacks.getFirst());
             for (int i = 1; i < 10; i++) {
                 ItemStack stack = stacks.get(i);
@@ -254,15 +252,15 @@ public class MillstoneBlockEntity extends KineticBlockEntity {
             }
         }
 
-        public void read(ReadView view) {
-            List<ItemStack> list = view.getTypedListView("Inventory", ItemStack.OPTIONAL_CODEC).stream().toList();
-            setStack(0, list.getFirst());
+        public void read(ValueInput view) {
+            List<ItemStack> list = view.listOrEmpty("Inventory", ItemStack.OPTIONAL_CODEC).stream().toList();
+            setItem(0, list.getFirst());
             int size = list.size();
             for (int i = 1; i < size; i++) {
-                setStack(i, list.get(i));
+                setItem(i, list.get(i));
             }
             for (int i = size; i < 10; i++) {
-                setStack(i, ItemStack.EMPTY);
+                setItem(i, ItemStack.EMPTY);
             }
         }
     }

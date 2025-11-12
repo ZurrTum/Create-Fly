@@ -12,11 +12,11 @@ import com.zurrtum.create.client.flywheel.lib.model.Models;
 import com.zurrtum.create.client.flywheel.lib.visual.SimpleDynamicVisual;
 import com.zurrtum.create.client.foundation.render.AllInstanceTypes;
 import com.zurrtum.create.content.kinetics.crank.HandCrankBlockEntity;
-import net.minecraft.state.property.Properties;
-import net.minecraft.util.math.Direction;
 import org.joml.Quaternionf;
 
 import java.util.function.Consumer;
+import net.minecraft.core.Direction;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 
 public class HandCrankVisual extends KineticBlockEntityVisual<HandCrankBlockEntity> implements SimpleDynamicVisual {
     private final RotatingInstance rotatingModel;
@@ -31,7 +31,7 @@ public class HandCrankVisual extends KineticBlockEntityVisual<HandCrankBlockEnti
 
         rotatingModel = instancerProvider().instancer(AllInstanceTypes.ROTATING, Models.partial(AllPartialModels.HAND_CRANK_BASE)).createInstance();
 
-        rotatingModel.setup(HandCrankVisual.this.blockEntity).setPosition(getVisualPosition()).rotateToFace(blockState.get(Properties.FACING))
+        rotatingModel.setup(HandCrankVisual.this.blockEntity).setPosition(getVisualPosition()).rotateToFace(blockState.getValue(BlockStateProperties.FACING))
             .setChanged();
     }
 
@@ -41,12 +41,12 @@ public class HandCrankVisual extends KineticBlockEntityVisual<HandCrankBlockEnti
     }
 
     private void rotateCrank(float pt) {
-        var facing = blockState.get(Properties.FACING);
+        var facing = blockState.getValue(BlockStateProperties.FACING);
         float angle = HandCrankRenderer.getHandCrankIndependentAngle(blockEntity, pt);
 
         crank.setIdentityTransform().translate(getVisualPosition()).center()
             .rotate(angle, Direction.get(Direction.AxisDirection.POSITIVE, facing.getAxis()))
-            .rotate(new Quaternionf().rotateTo(0, 0, -1, facing.getOffsetX(), facing.getOffsetY(), facing.getOffsetZ())).uncenter().setChanged();
+            .rotate(new Quaternionf().rotateTo(0, 0, -1, facing.getStepX(), facing.getStepY(), facing.getStepZ())).uncenter().setChanged();
     }
 
     @Override

@@ -3,12 +3,12 @@ package com.zurrtum.create.client.content.trains.entity;
 import com.zurrtum.create.client.content.contraptions.render.ClientContraption;
 import com.zurrtum.create.content.trains.bogey.AbstractBogeyBlock;
 import com.zurrtum.create.content.trains.entity.CarriageContraption;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.structure.StructureTemplate.StructureBlockInfo;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate.StructureBlockInfo;
 
 import java.util.BitSet;
 import java.util.HashMap;
@@ -33,14 +33,14 @@ public class CarriageClientContraption extends ClientContraption {
             if (contraption.withinVisible(pos)) {
                 values.put(pos, info.state());
             } else if (contraption.atSeam(pos)) {
-                values.put(pos, Blocks.PURPLE_STAINED_GLASS.getDefaultState());
+                values.put(pos, Blocks.PURPLE_STAINED_GLASS.defaultBlockState());
             }
         });
-        return new RenderedBlocks(pos -> values.getOrDefault(pos, Blocks.AIR.getDefaultState()), values.keySet());
+        return new RenderedBlocks(pos -> values.getOrDefault(pos, Blocks.AIR.defaultBlockState()), values.keySet());
     }
 
     @Override
-    public BlockEntity readBlockEntity(World level, StructureBlockInfo info, boolean legacy) {
+    public BlockEntity readBlockEntity(Level level, StructureBlockInfo info, boolean legacy) {
         if (info.state().getBlock() instanceof AbstractBogeyBlock<?> bogey && !bogey.captureBlockEntityForTrain())
             return null; // Bogeys are typically rendered by the carriage contraption, not the BE
 
@@ -59,7 +59,7 @@ public class CarriageClientContraption extends ClientContraption {
 
         for (var i = 0; i < renderedBlockEntityView.size(); i++) {
             var be = renderedBlockEntityView.get(i);
-            if (contraption.isHiddenInPortal(be.getPos())) {
+            if (contraption.isHiddenInPortal(be.getBlockPos())) {
                 scratchBlockEntitiesOutsidePortal.clear(i);
             }
         }

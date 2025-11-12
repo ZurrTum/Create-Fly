@@ -3,49 +3,49 @@ package com.zurrtum.create.client.content.contraptions.wrench;
 import com.zurrtum.create.AllItems;
 import com.zurrtum.create.client.AllKeys;
 import com.zurrtum.create.client.catnip.gui.ScreenOpener;
-import net.minecraft.block.BlockState;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.input.KeyInput;
-import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.hit.HitResult;
-import net.minecraft.world.GameMode;
-import net.minecraft.world.World;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.input.KeyEvent;
+import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.GameType;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.HitResult;
 
 public class RadialWrenchHandler {
 
     public static int COOLDOWN = 0;
 
     public static void clientTick() {
-        if (COOLDOWN > 0 && !AllKeys.ROTATE_MENU.isPressed())
+        if (COOLDOWN > 0 && !AllKeys.ROTATE_MENU.isDown())
             COOLDOWN--;
     }
 
-    public static void onKeyInput(MinecraftClient mc, KeyInput input, boolean pressed) {
+    public static void onKeyInput(Minecraft mc, KeyEvent input, boolean pressed) {
         if (!pressed)
             return;
 
-        if (!AllKeys.ROTATE_MENU.matchesKey(input))
+        if (!AllKeys.ROTATE_MENU.matches(input))
             return;
 
         if (COOLDOWN > 0)
             return;
 
-        if (mc.interactionManager == null || mc.interactionManager.getCurrentGameMode() == GameMode.SPECTATOR)
+        if (mc.gameMode == null || mc.gameMode.getPlayerMode() == GameType.SPECTATOR)
             return;
 
-        ClientPlayerEntity player = mc.player;
+        LocalPlayer player = mc.player;
         if (player == null)
             return;
 
-        World level = player.getEntityWorld();
+        Level level = player.level();
 
-        ItemStack heldItem = player.getMainHandStack();
-        if (!heldItem.isOf(AllItems.WRENCH))
+        ItemStack heldItem = player.getMainHandItem();
+        if (!heldItem.is(AllItems.WRENCH))
             return;
 
-        HitResult objectMouseOver = mc.crosshairTarget;
+        HitResult objectMouseOver = mc.hitResult;
         if (!(objectMouseOver instanceof BlockHitResult blockHitResult))
             return;
 

@@ -1,14 +1,14 @@
 package com.zurrtum.create.client.catnip.gui;
 
 import com.zurrtum.create.catnip.animation.LerpedFloat;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.screen.Screen;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Deque;
 import java.util.List;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.screens.Screen;
 
 public class ScreenOpener {
 
@@ -17,7 +17,7 @@ public class ScreenOpener {
     private static Screen backSteppedFrom = null;
 
     public static void open(@Nullable Screen screen) {
-        open(MinecraftClient.getInstance().currentScreen, screen);
+        open(Minecraft.getInstance().screen, screen);
     }
 
     public static void open(@Nullable Screen current, @Nullable Screen toOpen) {
@@ -72,7 +72,7 @@ public class ScreenOpener {
         if (!screen.isEquivalentTo((NavigatableSimiScreen) previouslyRenderedScreen))
             return false;
 
-        openPreviousScreen(MinecraftClient.getInstance().currentScreen, screen);
+        openPreviousScreen(Minecraft.getInstance().screen, screen);
         return true;
     }
 
@@ -95,11 +95,11 @@ public class ScreenOpener {
     }
 
     private static void openScreen(@Nullable Screen screen) {
-        MinecraftClient.getInstance().send(() -> {
-            MinecraftClient.getInstance().setScreen(screen);
+        Minecraft.getInstance().schedule(() -> {
+            Minecraft.getInstance().setScreen(screen);
             Screen previouslyRenderedScreen = getPreviouslyRenderedScreen();
             if (previouslyRenderedScreen != null && screen instanceof NavigatableSimiScreen)
-                previouslyRenderedScreen.init(MinecraftClient.getInstance(), screen.width, screen.height);
+                previouslyRenderedScreen.init(Minecraft.getInstance(), screen.width, screen.height);
         });
     }
 

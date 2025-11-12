@@ -8,21 +8,21 @@ import com.zurrtum.create.catnip.data.Pair;
 import com.zurrtum.create.content.contraptions.Contraption;
 import com.zurrtum.create.content.decoration.steamWhistle.WhistleBlock;
 import com.zurrtum.create.content.decoration.steamWhistle.WhistleBlock.WhistleSize;
-import net.minecraft.block.BellBlock;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.NoteBlock;
-import net.minecraft.sound.SoundCategory;
-import net.minecraft.sound.SoundEvent;
-import net.minecraft.sound.SoundEvents;
-import net.minecraft.storage.ReadView;
-import net.minecraft.storage.WriteView;
-import net.minecraft.structure.StructureTemplate.StructureBlockInfo;
-import net.minecraft.util.math.BlockPos;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import net.minecraft.core.BlockPos;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.level.block.BellBlock;
+import net.minecraft.world.level.block.NoteBlock;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate.StructureBlockInfo;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 
 public class ArrivalSoundQueue {
     public int offset;
@@ -70,8 +70,8 @@ public class ArrivalSoundQueue {
                     continue;
                 BlockState state = info.state();
                 if (state.getBlock() instanceof WhistleBlock && info.nbt() != null) {
-                    int pitch = info.nbt().getInt("Pitch", 0);
-                    WhistleSize size = state.get(WhistleBlock.SIZE);
+                    int pitch = info.nbt().getIntOr("Pitch", 0);
+                    WhistleSize size = state.getValue(WhistleBlock.SIZE);
                     return Pair.of(size == WhistleSize.LARGE, (size == WhistleSize.SMALL ? 12 : 0) - pitch);
                 }
             }
@@ -79,22 +79,22 @@ public class ArrivalSoundQueue {
         return null;
     }
 
-    public void write(WriteView view) {
-        WriteView tag = view.get("SoundQueue");
+    public void write(ValueOutput view) {
+        ValueOutput tag = view.child("SoundQueue");
         tag.putInt("Offset", offset);
-        WriteView.ListView list = tag.getList("Sources");
+        ValueOutput.ValueOutputList list = tag.childrenList("Sources");
         for (Map.Entry<Integer, BlockPos> entry : sources.entries()) {
-            WriteView item = list.add();
+            ValueOutput item = list.addChild();
             item.putInt("Tick", entry.getKey());
-            item.put("Pos", BlockPos.CODEC, entry.getValue());
+            item.store("Pos", BlockPos.CODEC, entry.getValue());
         }
     }
 
-    public void read(ReadView view) {
-        ReadView tag = view.getReadView("SoundQueue");
-        offset = tag.getInt("Offset", 0);
-        ReadView.ListReadView list = tag.getListReadView("Sources");
-        list.forEach(item -> add(item.getInt("Tick", 0), item.read("Pos", BlockPos.CODEC).orElse(BlockPos.ORIGIN)));
+    public void read(ValueInput view) {
+        ValueInput tag = view.childOrEmpty("SoundQueue");
+        offset = tag.getIntOr("Offset", 0);
+        ValueInput.ValueInputList list = tag.childrenListOrEmpty("Sources");
+        list.forEach(item -> add(item.getIntOr("Tick", 0), item.read("Pos", BlockPos.CODEC).orElse(BlockPos.ZERO)));
     }
 
     public void add(int offset, BlockPos localPos) {
@@ -117,20 +117,20 @@ public class ArrivalSoundQueue {
         BlockState state = info.state();
 
         if (state.getBlock() instanceof BellBlock) {
-            if (state.isOf(AllBlocks.HAUNTED_BELL))
+            if (state.is(AllBlocks.HAUNTED_BELL))
                 playSimple(entity, AllSoundEvents.HAUNTED_BELL_USE.getMainEvent(), 1, 1);
             else
-                playSimple(entity, SoundEvents.BLOCK_BELL_USE, 1, 1);
+                playSimple(entity, SoundEvents.BELL_BLOCK, 1, 1);
         }
 
         if (state.getBlock() instanceof NoteBlock nb) {
-            float f = (float) Math.pow(2, (state.get(NoteBlock.NOTE) - 12) / 12.0);
-            playSimple(entity, state.get(NoteBlock.INSTRUMENT).getSound().value(), 1, f);
+            float f = (float) Math.pow(2, (state.getValue(NoteBlock.NOTE) - 12) / 12.0);
+            playSimple(entity, state.getValue(NoteBlock.INSTRUMENT).getSoundEvent().value(), 1, f);
         }
 
         if (state.getBlock() instanceof WhistleBlock && info.nbt() != null) {
-            int pitch = info.nbt().getInt("Pitch", 0);
-            WhistleSize size = state.get(WhistleBlock.SIZE);
+            int pitch = info.nbt().getIntOr("Pitch", 0);
+            WhistleSize size = state.getValue(WhistleBlock.SIZE);
             float f = (float) Math.pow(2, ((size == WhistleSize.SMALL ? 12 : 0) - pitch) / 12.0);
             playSimple(entity, (size == WhistleSize.LARGE ? AllSoundEvents.WHISTLE_TRAIN_LOW : AllSoundEvents.WHISTLE_TRAIN).getMainEvent(), 1, f);
             //			playSimple(entity, AllSoundEvents.WHISTLE_CHIFF.getMainEvent(), .75f,
@@ -140,7 +140,7 @@ public class ArrivalSoundQueue {
     }
 
     private static void playSimple(CarriageContraptionEntity entity, SoundEvent event, float volume, float pitch) {
-        entity.getEntityWorld().playSoundFromEntity(null, entity, event, SoundCategory.NEUTRAL, 5 * volume, pitch);
+        entity.level().playSound(null, entity, event, SoundSource.NEUTRAL, 5 * volume, pitch);
     }
 
 }

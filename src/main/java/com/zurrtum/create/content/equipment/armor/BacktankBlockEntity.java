@@ -6,44 +6,43 @@ import com.zurrtum.create.content.kinetics.base.KineticBlockEntity;
 import com.zurrtum.create.foundation.advancement.CreateTrigger;
 import com.zurrtum.create.foundation.blockEntity.ComparatorUtil;
 import com.zurrtum.create.infrastructure.particle.AirParticleData;
-import net.minecraft.block.BlockState;
-import net.minecraft.component.ComponentChanges;
-import net.minecraft.component.ComponentMap.Builder;
-import net.minecraft.component.ComponentsAccess;
-import net.minecraft.particle.ParticleTypes;
-import net.minecraft.state.property.BooleanProperty;
-import net.minecraft.state.property.Properties;
-import net.minecraft.storage.ReadView;
-import net.minecraft.storage.WriteView;
-import net.minecraft.text.Text;
-import net.minecraft.text.TextCodecs;
-import net.minecraft.util.Nameable;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction.Axis;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec3d;
-
 import java.util.List;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction.Axis;
+import net.minecraft.core.component.DataComponentGetter;
+import net.minecraft.core.component.DataComponentMap.Builder;
+import net.minecraft.core.component.DataComponentPatch;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.ComponentSerialization;
+import net.minecraft.util.Mth;
+import net.minecraft.world.Nameable;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.block.state.properties.BooleanProperty;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
+import net.minecraft.world.phys.Vec3;
 
 public class BacktankBlockEntity extends KineticBlockEntity implements Nameable {
 
     public int airLevel;
     public int airLevelTimer;
-    private final Text defaultName;
-    private Text customName;
+    private final Component defaultName;
+    private Component customName;
 
     private int capacityEnchantLevel;
 
-    private ComponentChanges componentPatch;
+    private DataComponentPatch componentPatch;
 
     public BacktankBlockEntity(BlockPos pos, BlockState state) {
         super(AllBlockEntityTypes.BACKTANK, pos, state);
         defaultName = getDefaultName(state);
-        componentPatch = ComponentChanges.EMPTY;
+        componentPatch = DataComponentPatch.EMPTY;
     }
 
-    public static Text getDefaultName(BlockState state) {
-        if (state.isOf(AllBlocks.NETHERITE_BACKTANK)) {
+    public static Component getDefaultName(BlockState state) {
+        if (state.is(AllBlocks.NETHERITE_BACKTANK)) {
             AllItems.NETHERITE_BACKTANK.getName();
         }
 
@@ -68,9 +67,9 @@ public class BacktankBlockEntity extends KineticBlockEntity implements Nameable 
         if (getSpeed() == 0)
             return;
 
-        BlockState state = getCachedState();
-        BooleanProperty waterProperty = Properties.WATERLOGGED;
-        if (state.contains(waterProperty) && state.get(waterProperty))
+        BlockState state = getBlockState();
+        BooleanProperty waterProperty = BlockStateProperties.WATERLOGGED;
+        if (state.hasProperty(waterProperty) && state.getValue(waterProperty))
             return;
 
         if (airLevelTimer > 0) {
@@ -79,12 +78,12 @@ public class BacktankBlockEntity extends KineticBlockEntity implements Nameable 
         }
 
         int max = BacktankUtil.maxAir(capacityEnchantLevel);
-        if (world.isClient()) {
-            Vec3d centerOf = VecHelper.getCenterOf(pos);
-            Vec3d v = VecHelper.offsetRandomly(centerOf, world.random, .65f);
-            Vec3d m = centerOf.subtract(v);
+        if (level.isClientSide()) {
+            Vec3 centerOf = VecHelper.getCenterOf(worldPosition);
+            Vec3 v = VecHelper.offsetRandomly(centerOf, level.random, .65f);
+            Vec3 m = centerOf.subtract(v);
             if (airLevel != max)
-                world.addParticleClient(new AirParticleData(1, .05f), v.x, v.y, v.z, m.x, m.y, m.z);
+                level.addParticle(new AirParticleData(1, .05f), v.x, v.y, v.z, m.x, m.y, m.z);
             return;
         }
 
@@ -93,13 +92,13 @@ public class BacktankBlockEntity extends KineticBlockEntity implements Nameable 
 
         int prevComparatorLevel = getComparatorOutput();
         float abs = Math.abs(getSpeed());
-        int increment = MathHelper.clamp(((int) abs - 100) / 20, 1, 5);
+        int increment = Mth.clamp(((int) abs - 100) / 20, 1, 5);
         airLevel = Math.min(max, airLevel + increment);
-        if (getComparatorOutput() != prevComparatorLevel && !world.isClient())
-            world.updateComparators(pos, state.getBlock());
+        if (getComparatorOutput() != prevComparatorLevel && !level.isClientSide())
+            level.updateNeighbourForOutputSignal(worldPosition, state.getBlock());
         if (airLevel == max)
             sendData();
-        airLevelTimer = MathHelper.clamp((int) (128f - abs / 5f) - 108, 0, 20);
+        airLevelTimer = Mth.clamp((int) (128f - abs / 5f) - 108, 0, 20);
     }
 
     public int getComparatorOutput() {
@@ -108,56 +107,56 @@ public class BacktankBlockEntity extends KineticBlockEntity implements Nameable 
     }
 
     @Override
-    protected void write(WriteView view, boolean clientPacket) {
+    protected void write(ValueOutput view, boolean clientPacket) {
         super.write(view, clientPacket);
         view.putInt("Air", airLevel);
         view.putInt("Timer", airLevelTimer);
         view.putInt("CapacityEnchantment", capacityEnchantLevel);
 
         if (customName != null)
-            view.put("CustomName", TextCodecs.CODEC, customName);
+            view.store("CustomName", ComponentSerialization.CODEC, customName);
 
-        view.put("Components", ComponentChanges.CODEC, componentPatch);
+        view.store("Components", DataComponentPatch.CODEC, componentPatch);
     }
 
     @Override
-    protected void read(ReadView view, boolean clientPacket) {
+    protected void read(ValueInput view, boolean clientPacket) {
         super.read(view, clientPacket);
         int prev = airLevel;
-        airLevel = view.getInt("Air", 0);
-        airLevelTimer = view.getInt("Timer", 0);
-        capacityEnchantLevel = view.getInt("CapacityEnchantment", 0);
+        airLevel = view.getIntOr("Air", 0);
+        airLevelTimer = view.getIntOr("Timer", 0);
+        capacityEnchantLevel = view.getIntOr("CapacityEnchantment", 0);
 
-        customName = view.read("CustomName", TextCodecs.CODEC).orElse(null);
-        componentPatch = view.read("Components", ComponentChanges.CODEC).orElse(ComponentChanges.EMPTY);
+        customName = view.read("CustomName", ComponentSerialization.CODEC).orElse(null);
+        componentPatch = view.read("Components", DataComponentPatch.CODEC).orElse(DataComponentPatch.EMPTY);
         if (prev != 0 && prev != airLevel && airLevel == BacktankUtil.maxAir(capacityEnchantLevel) && clientPacket)
             playFilledEffect();
     }
 
     @Override
-    protected void readComponents(ComponentsAccess componentInput) {
+    protected void applyImplicitComponents(DataComponentGetter componentInput) {
         setAirLevel(componentInput.getOrDefault(AllDataComponents.BACKTANK_AIR, 0));
     }
 
     @Override
-    protected void addComponents(Builder components) {
-        components.add(AllDataComponents.BACKTANK_AIR, airLevel);
+    protected void collectImplicitComponents(Builder components) {
+        components.set(AllDataComponents.BACKTANK_AIR, airLevel);
     }
 
     protected void playFilledEffect() {
-        AllSoundEvents.CONFIRM.playAt(world, pos, 0.4f, 1, true);
-        Vec3d baseMotion = new Vec3d(.25, 0.1, 0);
-        Vec3d baseVec = VecHelper.getCenterOf(pos);
+        AllSoundEvents.CONFIRM.playAt(level, worldPosition, 0.4f, 1, true);
+        Vec3 baseMotion = new Vec3(.25, 0.1, 0);
+        Vec3 baseVec = VecHelper.getCenterOf(worldPosition);
         for (int i = 0; i < 360; i += 10) {
-            Vec3d m = VecHelper.rotate(baseMotion, i, Axis.Y);
-            Vec3d v = baseVec.add(m.normalize().multiply(.25f));
+            Vec3 m = VecHelper.rotate(baseMotion, i, Axis.Y);
+            Vec3 v = baseVec.add(m.normalize().scale(.25f));
 
-            world.addParticleClient(ParticleTypes.SPIT, v.x, v.y, v.z, m.x, m.y, m.z);
+            level.addParticle(ParticleTypes.SPIT, v.x, v.y, v.z, m.x, m.y, m.z);
         }
     }
 
     @Override
-    public Text getName() {
+    public Component getName() {
         return this.customName != null ? this.customName : defaultName;
     }
 
@@ -170,7 +169,7 @@ public class BacktankBlockEntity extends KineticBlockEntity implements Nameable 
         sendData();
     }
 
-    public void setCustomName(Text customName) {
+    public void setCustomName(Component customName) {
         this.customName = customName;
     }
 
@@ -178,11 +177,11 @@ public class BacktankBlockEntity extends KineticBlockEntity implements Nameable 
         this.capacityEnchantLevel = capacityEnchantLevel;
     }
 
-    public void setComponentPatch(ComponentChanges componentPatch) {
+    public void setComponentPatch(DataComponentPatch componentPatch) {
         this.componentPatch = componentPatch;
     }
 
-    public ComponentChanges getComponentPatch() {
+    public DataComponentPatch getComponentPatch() {
         return componentPatch;
     }
 

@@ -4,9 +4,9 @@ import com.llamalad7.mixinextras.sugar.Local;
 import com.zurrtum.create.client.Create;
 import com.zurrtum.create.client.content.contraptions.elevator.ElevatorControlsHandler;
 import com.zurrtum.create.client.content.trains.TrainHUD;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.Mouse;
-import net.minecraft.client.input.MouseInput;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.MouseHandler;
+import net.minecraft.client.input.MouseButtonInfo;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -14,27 +14,27 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-@Mixin(Mouse.class)
+@Mixin(MouseHandler.class)
 public class MouseMixin {
     @Shadow
     @Final
-    private MinecraftClient client;
+    private Minecraft minecraft;
 
-    @Inject(method = "onMouseButton(JLnet/minecraft/client/input/MouseInput;I)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/MinecraftClient;getOverlay()Lnet/minecraft/client/gui/screen/Overlay;", ordinal = 0), cancellable = true)
-    private void onMouseButton(long window, MouseInput input, int action, CallbackInfo ci) {
+    @Inject(method = "onButton(JLnet/minecraft/client/input/MouseButtonInfo;I)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/Minecraft;getOverlay()Lnet/minecraft/client/gui/screens/Overlay;", ordinal = 0), cancellable = true)
+    private void onMouseButton(long window, MouseButtonInfo input, int action, CallbackInfo ci) {
         if (action == 0) {
             return;
         }
         int button = input.button();
-        if (Create.SCHEMATIC_HANDLER.onMouseInput(client, button) || Create.SCHEMATIC_AND_QUILL_HANDLER.onMouseInput(client, button)) {
+        if (Create.SCHEMATIC_HANDLER.onMouseInput(minecraft, button) || Create.SCHEMATIC_AND_QUILL_HANDLER.onMouseInput(minecraft, button)) {
             ci.cancel();
         }
     }
 
-    @Inject(method = "onMouseScroll(JDD)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/network/ClientPlayerEntity;getInventory()Lnet/minecraft/entity/player/PlayerInventory;"), cancellable = true)
+    @Inject(method = "onScroll(JDD)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/player/LocalPlayer;getInventory()Lnet/minecraft/world/entity/player/Inventory;"), cancellable = true)
     private void onMouseScroll(long window, double horizontal, double vertical, CallbackInfo ci, @Local(ordinal = 4) double delta) {
-        if (Create.SCHEMATIC_HANDLER.mouseScrolled(delta) || Create.SCHEMATIC_AND_QUILL_HANDLER.mouseScrolled(client, delta) || TrainHUD.onScroll(
-            delta) || ElevatorControlsHandler.onScroll(client, delta)) {
+        if (Create.SCHEMATIC_HANDLER.mouseScrolled(delta) || Create.SCHEMATIC_AND_QUILL_HANDLER.mouseScrolled(minecraft, delta) || TrainHUD.onScroll(
+            delta) || ElevatorControlsHandler.onScroll(minecraft, delta)) {
             ci.cancel();
         }
     }

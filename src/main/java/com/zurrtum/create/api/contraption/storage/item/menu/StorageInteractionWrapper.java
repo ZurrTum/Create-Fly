@@ -1,48 +1,47 @@
 package com.zurrtum.create.api.contraption.storage.item.menu;
 
 import com.zurrtum.create.infrastructure.items.ItemInventory;
-import net.minecraft.entity.ContainerUser;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.inventory.Inventory;
-import net.minecraft.item.ItemStack;
-
 import java.util.function.Consumer;
 import java.util.function.Predicate;
+import net.minecraft.world.Container;
+import net.minecraft.world.entity.ContainerUser;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 
 public class StorageInteractionWrapper implements ItemInventory {
-    private final Inventory inv;
-    private final Predicate<PlayerEntity> stillValid;
+    private final Container inv;
+    private final Predicate<Player> stillValid;
     private final Consumer<ContainerUser> onClose;
 
-    public StorageInteractionWrapper(Inventory inv, Predicate<PlayerEntity> stillValid, Consumer<ContainerUser> onClose) {
+    public StorageInteractionWrapper(Container inv, Predicate<Player> stillValid, Consumer<ContainerUser> onClose) {
         this.inv = inv;
         this.stillValid = stillValid;
         this.onClose = onClose;
     }
 
     @Override
-    public int size() {
-        return inv.size();
+    public int getContainerSize() {
+        return inv.getContainerSize();
     }
 
     @Override
-    public ItemStack getStack(int slot) {
-        return inv.getStack(slot);
+    public ItemStack getItem(int slot) {
+        return inv.getItem(slot);
     }
 
     @Override
-    public void setStack(int slot, ItemStack stack) {
-        inv.setStack(slot, stack);
+    public void setItem(int slot, ItemStack stack) {
+        inv.setItem(slot, stack);
     }
 
     @Override
-    public int getMaxCountPerStack() {
-        return inv.getMaxCountPerStack();
+    public int getMaxStackSize() {
+        return inv.getMaxStackSize();
     }
 
     @Override
-    public int getMaxCount(ItemStack stack) {
-        return inv.getMaxCount(stack);
+    public int getMaxStackSize(ItemStack stack) {
+        return inv.getMaxStackSize(stack);
     }
 
     @Override
@@ -56,12 +55,12 @@ public class StorageInteractionWrapper implements ItemInventory {
     }
 
     @Override
-    public boolean canPlayerUse(PlayerEntity player) {
+    public boolean stillValid(Player player) {
         return stillValid.test(player);
     }
 
     @Override
-    public void onClose(ContainerUser player) {
+    public void stopOpen(ContainerUser player) {
         onClose.accept(player);
     }
 }

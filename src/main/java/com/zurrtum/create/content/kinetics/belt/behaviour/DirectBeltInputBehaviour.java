@@ -9,13 +9,13 @@ import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
 import com.zurrtum.create.foundation.blockEntity.behaviour.BehaviourType;
 import com.zurrtum.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.foundation.item.ItemHelper;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.inventory.Inventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.Container;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Supplier;
@@ -67,7 +67,7 @@ public class DirectBeltInputBehaviour extends BlockEntityBehaviour<SmartBlockEnt
     }
 
     private ItemStack defaultInsertionCallback(TransportedItemStack inserted, Direction side, boolean simulate) {
-        Inventory lazy = ItemHelper.getInventory(blockEntity.getWorld(), blockEntity.getPos(), null, blockEntity, side);
+        Container lazy = ItemHelper.getInventory(blockEntity.getLevel(), blockEntity.getBlockPos(), null, blockEntity, side);
         if (lazy == null)
             return inserted.stack;
         int count = inserted.stack.getCount();
@@ -120,19 +120,19 @@ public class DirectBeltInputBehaviour extends BlockEntityBehaviour<SmartBlockEnt
 
     @Nullable
     public ItemStack tryExportingToBeltFunnel(ItemStack stack, @Nullable Direction side, boolean simulate) {
-        BlockPos funnelPos = blockEntity.getPos().up();
-        World world = getWorld();
+        BlockPos funnelPos = blockEntity.getBlockPos().above();
+        Level world = getLevel();
         BlockState funnelState = world.getBlockState(funnelPos);
         if (!(funnelState.getBlock() instanceof BeltFunnelBlock))
             return null;
-        if (funnelState.get(BeltFunnelBlock.SHAPE) != Shape.PULLING)
+        if (funnelState.getValue(BeltFunnelBlock.SHAPE) != Shape.PULLING)
             return null;
         if (side != null && FunnelBlock.getFunnelFacing(funnelState) != side)
             return null;
         BlockEntity be = world.getBlockEntity(funnelPos);
         if (!(be instanceof FunnelBlockEntity))
             return null;
-        if (funnelState.get(BeltFunnelBlock.POWERED))
+        if (funnelState.getValue(BeltFunnelBlock.POWERED))
             return null;
         ItemStack insert = FunnelBlock.tryInsert(world, funnelPos, stack, simulate);
         if (insert.getCount() != stack.getCount() && !simulate)

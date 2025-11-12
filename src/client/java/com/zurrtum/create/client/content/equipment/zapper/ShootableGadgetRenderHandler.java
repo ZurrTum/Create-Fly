@@ -1,22 +1,22 @@
 package com.zurrtum.create.client.content.equipment.zapper;
 
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.network.AbstractClientPlayerEntity;
-import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.client.render.command.OrderedRenderCommandQueue;
-import net.minecraft.client.render.entity.EntityRenderManager;
-import net.minecraft.client.render.entity.PlayerEntityRenderer;
-import net.minecraft.client.render.item.HeldItemRenderer;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.entity.player.PlayerModelPart;
-import net.minecraft.item.ItemDisplayContext;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.Arm;
-import net.minecraft.util.Hand;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.RotationAxis;
-import net.minecraft.util.math.Vec3d;
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.math.Axis;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.player.AbstractClientPlayer;
+import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.client.renderer.ItemInHandRenderer;
+import net.minecraft.client.renderer.SubmitNodeCollector;
+import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
+import net.minecraft.client.renderer.entity.player.AvatarRenderer;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.Mth;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.entity.HumanoidArm;
+import net.minecraft.world.entity.player.PlayerModelPart;
+import net.minecraft.world.item.ItemDisplayContext;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.phys.Vec3;
 
 public abstract class ShootableGadgetRenderHandler {
 
@@ -35,7 +35,7 @@ public abstract class ShootableGadgetRenderHandler {
     }
 
     public float getAnimation(boolean rightHand, float partialTicks) {
-        return MathHelper.lerp(
+        return Mth.lerp(
             partialTicks,
             rightHand ? lastRightHandAnimation : lastLeftHandAnimation,
             rightHand ? rightHandAnimation : leftHandAnimation
@@ -46,9 +46,9 @@ public abstract class ShootableGadgetRenderHandler {
         return 0.8f;
     }
 
-    public void shoot(Hand hand, Vec3d location) {
-        ClientPlayerEntity player = MinecraftClient.getInstance().player;
-        boolean rightHand = hand == Hand.MAIN_HAND ^ player.getMainArm() == Arm.LEFT;
+    public void shoot(InteractionHand hand, Vec3 location) {
+        LocalPlayer player = Minecraft.getInstance().player;
+        boolean rightHand = hand == InteractionHand.MAIN_HAND ^ player.getMainArm() == HumanoidArm.LEFT;
         if (rightHand) {
             rightHandAnimation = .2f;
             dontReequipRight = false;
@@ -59,35 +59,35 @@ public abstract class ShootableGadgetRenderHandler {
         playSound(hand, location);
     }
 
-    public abstract void playSound(Hand hand, Vec3d position);
+    public abstract void playSound(InteractionHand hand, Vec3 position);
 
     protected abstract boolean appliesTo(ItemStack stack);
 
-    protected abstract void transformTool(MatrixStack ms, float flip, float equipProgress, float recoil, float pt);
+    protected abstract void transformTool(PoseStack ms, float flip, float equipProgress, float recoil, float pt);
 
-    protected abstract void transformHand(MatrixStack ms, float flip, float equipProgress, float recoil, float pt);
+    protected abstract void transformHand(PoseStack ms, float flip, float equipProgress, float recoil, float pt);
 
     public boolean onRenderPlayerHand(
         ItemStack heldItem,
-        MinecraftClient mc,
-        EntityRenderManager entityRenderDispatcher,
-        HeldItemRenderer firstPersonRenderer,
-        MatrixStack ms,
-        OrderedRenderCommandQueue queue,
+        Minecraft mc,
+        EntityRenderDispatcher entityRenderDispatcher,
+        ItemInHandRenderer firstPersonRenderer,
+        PoseStack ms,
+        SubmitNodeCollector queue,
         int light,
         float pt,
-        Hand hand,
+        InteractionHand hand,
         float equipProgress,
         float swingProgress
     ) {
         if (!appliesTo(heldItem))
             return false;
 
-        AbstractClientPlayerEntity player = mc.player;
-        PlayerEntityRenderer<AbstractClientPlayerEntity> playerrenderer = entityRenderDispatcher.getPlayerRenderer(player);
+        AbstractClientPlayer player = mc.player;
+        AvatarRenderer<AbstractClientPlayer> playerrenderer = entityRenderDispatcher.getPlayerRenderer(player);
 
-        boolean rightHand = hand == Hand.MAIN_HAND ^ player.getMainArm() == Arm.LEFT;
-        float recoil = rightHand ? MathHelper.lerp(pt, lastRightHandAnimation, rightHandAnimation) : MathHelper.lerp(
+        boolean rightHand = hand == InteractionHand.MAIN_HAND ^ player.getMainArm() == HumanoidArm.LEFT;
+        float recoil = rightHand ? Mth.lerp(pt, lastRightHandAnimation, rightHandAnimation) : Mth.lerp(
             pt,
             lastLeftHandAnimation,
             leftHandAnimation
@@ -100,37 +100,37 @@ public abstract class ShootableGadgetRenderHandler {
 
         // Render arm
         float flip = rightHand ? 1.0F : -1.0F;
-        float f1 = MathHelper.sqrt(swingProgress);
-        float f2 = -0.3F * MathHelper.sin(f1 * (float) Math.PI);
-        float f3 = 0.4F * MathHelper.sin(f1 * ((float) Math.PI * 2F));
-        float f4 = -0.4F * MathHelper.sin(swingProgress * (float) Math.PI);
-        float f5 = MathHelper.sin(swingProgress * swingProgress * (float) Math.PI);
-        float f6 = MathHelper.sin(f1 * (float) Math.PI);
+        float f1 = Mth.sqrt(swingProgress);
+        float f2 = -0.3F * Mth.sin(f1 * (float) Math.PI);
+        float f3 = 0.4F * Mth.sin(f1 * ((float) Math.PI * 2F));
+        float f4 = -0.4F * Mth.sin(swingProgress * (float) Math.PI);
+        float f5 = Mth.sin(swingProgress * swingProgress * (float) Math.PI);
+        float f6 = Mth.sin(f1 * (float) Math.PI);
 
-        ms.push();
+        ms.pushPose();
         ms.translate(flip * (f2 + 0.64F - .1f), f3 + -0.4F + equipProgress * -0.6F, f4 + -0.72F + .3f + recoil);
-        ms.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(flip * 75.0F));
-        ms.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(flip * f6 * 70.0F));
-        ms.multiply(RotationAxis.POSITIVE_Z.rotationDegrees(flip * f5 * -20.0F));
+        ms.mulPose(Axis.YP.rotationDegrees(flip * 75.0F));
+        ms.mulPose(Axis.YP.rotationDegrees(flip * f6 * 70.0F));
+        ms.mulPose(Axis.ZP.rotationDegrees(flip * f5 * -20.0F));
         ms.translate(flip * -1.0F, 3.6F, 3.5F);
-        ms.multiply(RotationAxis.POSITIVE_Z.rotationDegrees(flip * 120.0F));
-        ms.multiply(RotationAxis.POSITIVE_X.rotationDegrees(200.0F));
-        ms.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(flip * -135.0F));
+        ms.mulPose(Axis.ZP.rotationDegrees(flip * 120.0F));
+        ms.mulPose(Axis.XP.rotationDegrees(200.0F));
+        ms.mulPose(Axis.YP.rotationDegrees(flip * -135.0F));
         ms.translate(flip * 5.6F, 0.0F, 0.0F);
-        ms.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(flip * 40.0F));
+        ms.mulPose(Axis.YP.rotationDegrees(flip * 40.0F));
         transformHand(ms, flip, equipProgress, recoil, pt);
-        Identifier texture = player.getSkin().body().texturePath();
+        ResourceLocation texture = player.getSkin().body().texturePath();
         if (rightHand)
-            playerrenderer.renderRightArm(ms, queue, light, texture, player.isModelPartVisible(PlayerModelPart.RIGHT_SLEEVE));
+            playerrenderer.renderRightHand(ms, queue, light, texture, player.isModelPartShown(PlayerModelPart.RIGHT_SLEEVE));
         else
-            playerrenderer.renderLeftArm(ms, queue, light, texture, player.isModelPartVisible(PlayerModelPart.LEFT_SLEEVE));
-        ms.pop();
+            playerrenderer.renderLeftHand(ms, queue, light, texture, player.isModelPartShown(PlayerModelPart.LEFT_SLEEVE));
+        ms.popPose();
 
         // Render gadget
-        ms.push();
+        ms.pushPose();
         ms.translate(flip * (f2 + 0.64F - .1f), f3 + -0.4F + equipProgress * -0.6F, f4 + -0.72F - 0.1f + recoil);
-        ms.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(flip * f6 * 70.0F));
-        ms.multiply(RotationAxis.POSITIVE_Z.rotationDegrees(flip * f5 * -20.0F));
+        ms.mulPose(Axis.YP.rotationDegrees(flip * f6 * 70.0F));
+        ms.mulPose(Axis.ZP.rotationDegrees(flip * f5 * -20.0F));
         transformTool(ms, flip, equipProgress, recoil, pt);
         firstPersonRenderer.renderItem(
             player,
@@ -140,13 +140,13 @@ public abstract class ShootableGadgetRenderHandler {
             queue,
             light
         );
-        ms.pop();
+        ms.popPose();
         return true;
     }
 
-    public void dontAnimateItem(Hand hand) {
-        ClientPlayerEntity player = MinecraftClient.getInstance().player;
-        boolean rightHand = hand == Hand.MAIN_HAND ^ player.getMainArm() == Arm.LEFT;
+    public void dontAnimateItem(InteractionHand hand) {
+        LocalPlayer player = Minecraft.getInstance().player;
+        boolean rightHand = hand == InteractionHand.MAIN_HAND ^ player.getMainArm() == HumanoidArm.LEFT;
         dontReequipRight |= rightHand;
         dontReequipLeft |= !rightHand;
     }

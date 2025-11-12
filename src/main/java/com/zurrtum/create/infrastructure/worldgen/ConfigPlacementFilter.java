@@ -2,23 +2,23 @@ package com.zurrtum.create.infrastructure.worldgen;
 
 import com.mojang.serialization.MapCodec;
 import com.zurrtum.create.infrastructure.config.AllConfigs;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.random.Random;
-import net.minecraft.world.gen.feature.FeaturePlacementContext;
-import net.minecraft.world.gen.placementmodifier.AbstractConditionalPlacementModifier;
-import net.minecraft.world.gen.placementmodifier.PlacementModifierType;
+import net.minecraft.core.BlockPos;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.level.levelgen.placement.PlacementContext;
+import net.minecraft.world.level.levelgen.placement.PlacementFilter;
+import net.minecraft.world.level.levelgen.placement.PlacementModifierType;
 
-public class ConfigPlacementFilter extends AbstractConditionalPlacementModifier {
+public class ConfigPlacementFilter extends PlacementFilter {
     public static final ConfigPlacementFilter INSTANCE = new ConfigPlacementFilter();
     public static final MapCodec<ConfigPlacementFilter> CODEC = MapCodec.unit(() -> INSTANCE);
 
     @Override
-    protected boolean shouldPlace(FeaturePlacementContext context, Random random, BlockPos pos) {
+    protected boolean shouldPlace(PlacementContext context, RandomSource random, BlockPos pos) {
         return !AllConfigs.common().worldGen.disable.get();
     }
 
     @Override
-    public PlacementModifierType<?> getType() {
+    public PlacementModifierType<?> type() {
         return AllPlacementModifiers.CONFIG_FILTER;
     }
 }

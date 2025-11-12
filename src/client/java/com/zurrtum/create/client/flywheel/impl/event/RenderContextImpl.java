@@ -1,21 +1,21 @@
 package com.zurrtum.create.client.flywheel.impl.event;
 
 import com.zurrtum.create.client.flywheel.api.backend.RenderContext;
-import net.minecraft.client.render.BufferBuilderStorage;
-import net.minecraft.client.render.Camera;
-import net.minecraft.client.render.WorldRenderer;
-import net.minecraft.client.world.ClientWorld;
+import net.minecraft.client.Camera;
+import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.client.renderer.LevelRenderer;
+import net.minecraft.client.renderer.RenderBuffers;
 import org.joml.Matrix4f;
 import org.joml.Matrix4fc;
 
 public record RenderContextImpl(
-    WorldRenderer renderer, ClientWorld level, BufferBuilderStorage buffers, Matrix4fc modelView, Matrix4fc projection, Matrix4fc viewProjection,
+    LevelRenderer renderer, ClientLevel level, RenderBuffers buffers, Matrix4fc modelView, Matrix4fc projection, Matrix4fc viewProjection,
     Camera camera, float partialTick
 ) implements RenderContext {
     public static RenderContextImpl create(
-        WorldRenderer renderer,
-        ClientWorld level,
-        BufferBuilderStorage buffers,
+        LevelRenderer renderer,
+        ClientLevel level,
+        RenderBuffers buffers,
         Matrix4fc modelView,
         Matrix4f projection,
         Camera camera,

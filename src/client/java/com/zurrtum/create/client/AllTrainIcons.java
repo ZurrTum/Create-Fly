@@ -2,10 +2,9 @@ package com.zurrtum.create.client;
 
 import com.zurrtum.create.client.content.trains.entity.TrainIcon;
 import com.zurrtum.create.content.trains.entity.TrainIconType;
-import net.minecraft.util.Identifier;
-
 import java.util.IdentityHashMap;
 import java.util.Map;
+import net.minecraft.resources.ResourceLocation;
 
 public class AllTrainIcons {
     public static final Map<TrainIconType, TrainIcon> ALL = new IdentityHashMap<>();
@@ -17,7 +16,7 @@ public class AllTrainIcons {
         return ALL.getOrDefault(type, TRADITIONAL);
     }
 
-    public static TrainIcon register(TrainIconType type, Identifier sheet, int x, int y) {
+    public static TrainIcon register(TrainIconType type, ResourceLocation sheet, int x, int y) {
         TrainIcon icon = new TrainIcon(type, sheet, x, y);
         ALL.put(type, icon);
         return icon;

@@ -16,15 +16,14 @@ import com.zurrtum.create.content.trains.signal.SignalBlock.SignalType;
 import com.zurrtum.create.content.trains.signal.SignalBlockEntity.OverlayState;
 import com.zurrtum.create.content.trains.signal.SignalBlockEntity.SignalState;
 import com.zurrtum.create.foundation.codec.CreateCodecs;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.network.PacketByteBuf;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.UUIDUtil;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.storage.ReadView;
-import net.minecraft.storage.WriteView;
-import net.minecraft.util.Uuids;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.WorldAccess;
-
+import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import java.util.*;
 
 public class SignalBoundary extends TrackEdgePoint {
@@ -81,7 +80,7 @@ public class SignalBoundary extends TrackEdgePoint {
     }
 
     @Override
-    public void invalidate(WorldAccess level) {
+    public void invalidate(LevelAccessor level) {
         blockEntities.forEach(s -> s.keySet().forEach(p -> invalidateAt(level, p)));
         MinecraftServer server = level.getServer();
         groups.forEach(uuid -> {
@@ -99,13 +98,13 @@ public class SignalBoundary extends TrackEdgePoint {
     public void blockEntityAdded(BlockEntity blockEntity, boolean front) {
         Map<BlockPos, Boolean> blockEntitiesOnSide = blockEntities.get(front);
         if (blockEntitiesOnSide.isEmpty())
-            blockEntity.getCachedState().getOrEmpty(SignalBlock.TYPE).ifPresent(type -> types.set(front, type));
-        blockEntitiesOnSide.put(blockEntity.getPos(), blockEntity instanceof SignalBlockEntity ste && ste.getReportedPower());
+            blockEntity.getBlockState().getOptionalValue(SignalBlock.TYPE).ifPresent(type -> types.set(front, type));
+        blockEntitiesOnSide.put(blockEntity.getBlockPos(), blockEntity instanceof SignalBlockEntity ste && ste.getReportedPower());
     }
 
     public void updateBlockEntityPower(SignalBlockEntity blockEntity) {
         for (boolean front : Iterate.trueAndFalse)
-            blockEntities.get(front).computeIfPresent(blockEntity.getPos(), (p, c) -> blockEntity.getReportedPower());
+            blockEntities.get(front).computeIfPresent(blockEntity.getBlockPos(), (p, c) -> blockEntity.getReportedPower());
     }
 
     @Override
@@ -249,7 +248,7 @@ public class SignalBoundary extends TrackEdgePoint {
     }
 
     @Override
-    public void read(ReadView view, boolean migration, DimensionPalette dimensions) {
+    public void read(ValueInput view, boolean migration, DimensionPalette dimensions) {
         super.read(view, migration, dimensions);
 
         if (migration)
@@ -265,10 +264,10 @@ public class SignalBoundary extends TrackEdgePoint {
 
         for (int i = 1; i <= 2; i++) {
             boolean first = i == 1;
-            view.read("Group" + i, Uuids.INT_STREAM_CODEC).ifPresent(uuid -> groups.set(first, uuid));
+            view.read("Group" + i, UUIDUtil.CODEC).ifPresent(uuid -> groups.set(first, uuid));
         }
         for (int i = 1; i <= 2; i++)
-            sidesToUpdate.set(i == 1, view.getBoolean("Update" + i, false));
+            sidesToUpdate.set(i == 1, view.getBooleanOr("Update" + i, false));
         for (int i = 1; i <= 2; i++)
             types.set(i == 1, view.read("Type" + i, SignalType.CODEC).orElse(SignalType.ENTRY_SIGNAL));
         for (int i = 1; i <= 2; i++)
@@ -294,7 +293,7 @@ public class SignalBoundary extends TrackEdgePoint {
 
         for (int i = 1; i <= 2; i++) {
             boolean first = i == 1;
-            Optional.ofNullable(map.get("Group" + i)).flatMap(value -> Uuids.INT_STREAM_CODEC.parse(ops, value).result())
+            Optional.ofNullable(map.get("Group" + i)).flatMap(value -> UUIDUtil.CODEC.parse(ops, value).result())
                 .ifPresent(uuid -> groups.set(first, uuid));
         }
         for (int i = 1; i <= 2; i++)
@@ -306,30 +305,30 @@ public class SignalBoundary extends TrackEdgePoint {
     }
 
     @Override
-    public void read(PacketByteBuf buffer, DimensionPalette dimensions) {
+    public void read(FriendlyByteBuf buffer, DimensionPalette dimensions) {
         super.read(buffer, dimensions);
         for (int i = 1; i <= 2; i++) {
             if (buffer.readBoolean())
-                groups.set(i == 1, buffer.readUuid());
+                groups.set(i == 1, buffer.readUUID());
         }
     }
 
     @Override
-    public void write(WriteView view, DimensionPalette dimensions) {
+    public void write(ValueOutput view, DimensionPalette dimensions) {
         super.write(view, dimensions);
         for (int i = 1; i <= 2; i++)
             if (!blockEntities.get(i == 1).isEmpty())
-                view.put("Tiles" + i, CreateCodecs.BLOCK_POS_BOOLEAN_MAP_CODEC, blockEntities.get(i == 1));
+                view.store("Tiles" + i, CreateCodecs.BLOCK_POS_BOOLEAN_MAP_CODEC, blockEntities.get(i == 1));
         for (int i = 1; i <= 2; i++)
             if (groups.get(i == 1) != null)
-                view.put("Group" + i, Uuids.INT_STREAM_CODEC, groups.get(i == 1));
+                view.store("Group" + i, UUIDUtil.CODEC, groups.get(i == 1));
         for (int i = 1; i <= 2; i++)
             if (sidesToUpdate.get(i == 1))
                 view.putBoolean("Update" + i, true);
         for (int i = 1; i <= 2; i++)
-            view.put("Type" + i, SignalType.CODEC, types.get(i == 1));
+            view.store("Type" + i, SignalType.CODEC, types.get(i == 1));
         for (int i = 1; i <= 2; i++)
-            view.put("State" + i, SignalState.CODEC, cachedStates.get(i == 1));
+            view.store("State" + i, SignalState.CODEC, cachedStates.get(i == 1));
     }
 
     @Override
@@ -341,7 +340,7 @@ public class SignalBoundary extends TrackEdgePoint {
                 map.add("Tiles" + i, blockEntities.get(i == 1), CreateCodecs.BLOCK_POS_BOOLEAN_MAP_CODEC);
         for (int i = 1; i <= 2; i++)
             if (groups.get(i == 1) != null)
-                map.add("Group" + i, groups.get(i == 1), Uuids.INT_STREAM_CODEC);
+                map.add("Group" + i, groups.get(i == 1), UUIDUtil.CODEC);
         for (int i = 1; i <= 2; i++)
             if (sidesToUpdate.get(i == 1))
                 map.add("Update" + i, ops.createBoolean(true));
@@ -353,13 +352,13 @@ public class SignalBoundary extends TrackEdgePoint {
     }
 
     @Override
-    public void write(PacketByteBuf buffer, DimensionPalette dimensions) {
+    public void write(FriendlyByteBuf buffer, DimensionPalette dimensions) {
         super.write(buffer, dimensions);
         for (int i = 1; i <= 2; i++) {
             boolean hasGroup = groups.get(i == 1) != null;
             buffer.writeBoolean(hasGroup);
             if (hasGroup)
-                buffer.writeUuid(groups.get(i == 1));
+                buffer.writeUUID(groups.get(i == 1));
         }
     }
 

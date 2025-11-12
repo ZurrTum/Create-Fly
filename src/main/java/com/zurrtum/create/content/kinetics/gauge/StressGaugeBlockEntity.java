@@ -6,12 +6,11 @@ import com.zurrtum.create.catnip.theme.Color;
 import com.zurrtum.create.content.kinetics.base.IRotate.StressImpact;
 import com.zurrtum.create.foundation.advancement.CreateTrigger;
 import com.zurrtum.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
-import net.minecraft.block.BlockState;
-import net.minecraft.storage.ReadView;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.MathHelper;
-
 import java.util.List;
+import net.minecraft.core.BlockPos;
+import net.minecraft.util.Mth;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.storage.ValueInput;
 
 public class StressGaugeBlockEntity extends GaugeBlockEntity {
 
@@ -70,7 +69,7 @@ public class StressGaugeBlockEntity extends GaugeBlockEntity {
         }
 
         sendData();
-        markDirty();
+        setChanged();
     }
 
     @Override
@@ -78,7 +77,7 @@ public class StressGaugeBlockEntity extends GaugeBlockEntity {
         super.onSpeedChanged(prevSpeed);
         if (getSpeed() == 0) {
             dialTarget = 0;
-            markDirty();
+            setChanged();
             return;
         }
 
@@ -86,9 +85,9 @@ public class StressGaugeBlockEntity extends GaugeBlockEntity {
     }
 
     @Override
-    protected void read(ReadView view, boolean clientPacket) {
+    protected void read(ValueInput view, boolean clientPacket) {
         super.read(view, clientPacket);
-        if (clientPacket && pos != null && pos.equals(lastSent))
+        if (clientPacket && worldPosition != null && worldPosition.equals(lastSent))
             lastSent = null;
     }
 
@@ -102,7 +101,7 @@ public class StressGaugeBlockEntity extends GaugeBlockEntity {
 
     public void onObserved() {
         award(AllAdvancements.STRESSOMETER);
-        if (MathHelper.approximatelyEquals(dialTarget, 1))
+        if (Mth.equal(dialTarget, 1))
             award(AllAdvancements.STRESSOMETER_MAXED);
     }
 }

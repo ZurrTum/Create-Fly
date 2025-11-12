@@ -6,23 +6,23 @@ import com.zurrtum.create.infrastructure.items.BaseInventory;
 import it.unimi.dsi.fastutil.objects.Object2IntLinkedOpenCustomHashMap;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.ObjectBidirectionalIterator;
-import net.minecraft.item.ItemStack;
-import net.minecraft.network.RegistryByteBuf;
-import net.minecraft.network.codec.PacketCodec;
-import net.minecraft.network.codec.PacketCodecs;
-import net.minecraft.network.packet.PacketType;
 import org.apache.logging.log4j.util.TriConsumer;
 
 import java.util.ArrayList;
 import java.util.List;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.PacketType;
+import net.minecraft.world.item.ItemStack;
 
 public record BlueprintPreviewPacket(List<ItemStack> available, List<ItemStack> missing, ItemStack result) implements S2CPacket {
-    public static final PacketCodec<RegistryByteBuf, BlueprintPreviewPacket> CODEC = PacketCodec.tuple(
-        ItemStack.PACKET_CODEC.collect(PacketCodecs.toList()),
+    public static final StreamCodec<RegistryFriendlyByteBuf, BlueprintPreviewPacket> CODEC = StreamCodec.composite(
+        ItemStack.STREAM_CODEC.apply(ByteBufCodecs.list()),
         BlueprintPreviewPacket::available,
-        ItemStack.PACKET_CODEC.collect(PacketCodecs.toList()),
+        ItemStack.STREAM_CODEC.apply(ByteBufCodecs.list()),
         BlueprintPreviewPacket::missing,
-        ItemStack.OPTIONAL_PACKET_CODEC,
+        ItemStack.OPTIONAL_STREAM_CODEC,
         BlueprintPreviewPacket::result,
         BlueprintPreviewPacket::new
     );
@@ -54,7 +54,7 @@ public record BlueprintPreviewPacket(List<ItemStack> available, List<ItemStack> 
         while (iterator.hasNext()) {
             Object2IntMap.Entry<ItemStack> entry = iterator.next();
             ItemStack stack = entry.getKey();
-            int maxCount = stack.getMaxCount();
+            int maxCount = stack.getMaxStackSize();
             int count = entry.getIntValue();
             while (count > maxCount) {
                 result.add(stack.copyWithCount(maxCount));
@@ -71,7 +71,7 @@ public record BlueprintPreviewPacket(List<ItemStack> available, List<ItemStack> 
     }
 
     @Override
-    public PacketType<BlueprintPreviewPacket> getPacketType() {
+    public PacketType<BlueprintPreviewPacket> type() {
         return AllPackets.BLUEPRINT_PREVIEW;
     }
 }

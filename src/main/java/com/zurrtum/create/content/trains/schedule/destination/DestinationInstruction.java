@@ -6,14 +6,14 @@ import com.zurrtum.create.content.trains.graph.DiscoveredPath;
 import com.zurrtum.create.content.trains.graph.EdgePointType;
 import com.zurrtum.create.content.trains.schedule.ScheduleRuntime;
 import com.zurrtum.create.content.trains.station.GlobalStation;
-import net.minecraft.util.Identifier;
-import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.Level;
 
 public class DestinationInstruction extends TextScheduleInstruction {
-    public DestinationInstruction(Identifier id) {
+    public DestinationInstruction(ResourceLocation id) {
         super(id);
     }
 
@@ -32,7 +32,7 @@ public class DestinationInstruction extends TextScheduleInstruction {
 
     @Override
     @Nullable
-    public DiscoveredPath start(ScheduleRuntime runtime, World level) {
+    public DiscoveredPath start(ScheduleRuntime runtime, Level level) {
         String regex = getFilterForRegex();
         boolean anyMatch = false;
         ArrayList<GlobalStation> validStations = new ArrayList<>();

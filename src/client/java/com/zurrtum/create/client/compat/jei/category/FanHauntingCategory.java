@@ -15,31 +15,31 @@ import mezz.jei.api.gui.drawable.IDrawable;
 import mezz.jei.api.gui.ingredient.IRecipeSlotsView;
 import mezz.jei.api.recipe.IFocusGroup;
 import mezz.jei.api.recipe.types.IRecipeType;
-import net.minecraft.block.Blocks;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.item.Items;
-import net.minecraft.recipe.PreparedRecipes;
-import net.minecraft.recipe.RecipeEntry;
-import net.minecraft.text.Text;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.crafting.RecipeHolder;
+import net.minecraft.world.item.crafting.RecipeMap;
+import net.minecraft.world.level.block.Blocks;
 import org.jetbrains.annotations.NotNull;
 import org.joml.Matrix3x2f;
 
 import java.util.List;
 
-public class FanHauntingCategory extends CreateCategory<RecipeEntry<HauntingRecipe>> {
-    public static List<RecipeEntry<HauntingRecipe>> getRecipes(PreparedRecipes preparedRecipes) {
-        return preparedRecipes.getAll(AllRecipeTypes.HAUNTING).stream().toList();
+public class FanHauntingCategory extends CreateCategory<RecipeHolder<HauntingRecipe>> {
+    public static List<RecipeHolder<HauntingRecipe>> getRecipes(RecipeMap preparedRecipes) {
+        return preparedRecipes.byType(AllRecipeTypes.HAUNTING).stream().toList();
     }
 
     @Override
     @NotNull
-    public IRecipeType<RecipeEntry<HauntingRecipe>> getRecipeType() {
+    public IRecipeType<RecipeHolder<HauntingRecipe>> getRecipeType() {
         return JeiClientPlugin.FAN_HAUNTING;
     }
 
     @Override
     @NotNull
-    public Text getTitle() {
+    public Component getTitle() {
         return CreateLang.translateDirect("recipe.fan_haunting");
     }
 
@@ -54,7 +54,7 @@ public class FanHauntingCategory extends CreateCategory<RecipeEntry<HauntingReci
     }
 
     @Override
-    public void setRecipe(IRecipeLayoutBuilder builder, RecipeEntry<HauntingRecipe> entry, IFocusGroup focuses) {
+    public void setRecipe(IRecipeLayoutBuilder builder, RecipeHolder<HauntingRecipe> entry, IFocusGroup focuses) {
         HauntingRecipe recipe = entry.value();
         List<ChanceOutput> results = recipe.results();
         int outputSize = results.size();
@@ -71,11 +71,11 @@ public class FanHauntingCategory extends CreateCategory<RecipeEntry<HauntingReci
     }
 
     @Override
-    public void draw(RecipeEntry<HauntingRecipe> entry, IRecipeSlotsView recipeSlotsView, DrawContext graphics, double mouseX, double mouseY) {
+    public void draw(RecipeHolder<HauntingRecipe> entry, IRecipeSlotsView recipeSlotsView, GuiGraphics graphics, double mouseX, double mouseY) {
         int xOffsetAmount = 1 - Math.min(3, entry.value().results().size());
         AllGuiTextures.JEI_SHADOW.render(graphics, 46, 27);
         AllGuiTextures.JEI_LIGHT.render(graphics, 65, 39);
         AllGuiTextures.JEI_LONG_ARROW.render(graphics, 54 + 7 * xOffsetAmount, 51);
-        graphics.state.addSpecialElement(new FanRenderState(new Matrix3x2f(graphics.getMatrices()), 56, 4, Blocks.SOUL_FIRE.getDefaultState()));
+        graphics.guiRenderState.submitPicturesInPictureState(new FanRenderState(new Matrix3x2f(graphics.pose()), 56, 4, Blocks.SOUL_FIRE.defaultBlockState()));
     }
 }

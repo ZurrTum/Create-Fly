@@ -1,5 +1,6 @@
 package com.zurrtum.create.client.content.contraptions.bearing;
 
+import com.mojang.math.Axis;
 import com.zurrtum.create.catnip.math.AngleHelper;
 import com.zurrtum.create.client.AllPartialModels;
 import com.zurrtum.create.client.content.kinetics.base.OrientedRotatingVisual;
@@ -13,9 +14,8 @@ import com.zurrtum.create.client.flywheel.lib.model.baked.PartialModel;
 import com.zurrtum.create.client.flywheel.lib.visual.SimpleDynamicVisual;
 import com.zurrtum.create.content.contraptions.bearing.IBearingBlockEntity;
 import com.zurrtum.create.content.kinetics.base.KineticBlockEntity;
-import net.minecraft.state.property.Properties;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.RotationAxis;
+import net.minecraft.core.Direction;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import org.joml.Quaternionf;
 
 import java.util.function.Consumer;
@@ -23,7 +23,7 @@ import java.util.function.Consumer;
 public class BearingVisual<B extends KineticBlockEntity & IBearingBlockEntity> extends OrientedRotatingVisual<B> implements SimpleDynamicVisual {
     final OrientedInstance topInstance;
 
-    final RotationAxis rotationAxis;
+    final Axis rotationAxis;
     final Quaternionf blockOrientation;
 
     public BearingVisual(VisualizationContext context, B blockEntity, float partialTick) {
@@ -32,12 +32,12 @@ public class BearingVisual<B extends KineticBlockEntity & IBearingBlockEntity> e
             blockEntity,
             partialTick,
             Direction.SOUTH,
-            blockEntity.getCachedState().get(Properties.FACING).getOpposite(),
+            blockEntity.getBlockState().getValue(BlockStateProperties.FACING).getOpposite(),
             Models.partial(AllPartialModels.SHAFT_HALF)
         );
 
-        Direction facing = blockState.get(Properties.FACING);
-        rotationAxis = RotationAxis.of(Direction.get(Direction.AxisDirection.POSITIVE, rotationAxis()).getUnitVector());
+        Direction facing = blockState.getValue(BlockStateProperties.FACING);
+        rotationAxis = Axis.of(Direction.get(Direction.AxisDirection.POSITIVE, rotationAxis()).step());
 
         blockOrientation = getBlockStateOrientation(facing);
 
@@ -74,12 +74,12 @@ public class BearingVisual<B extends KineticBlockEntity & IBearingBlockEntity> e
         Quaternionf orientation;
 
         if (facing.getAxis().isHorizontal()) {
-            orientation = RotationAxis.POSITIVE_Y.rotationDegrees(AngleHelper.horizontalAngle(facing.getOpposite()));
+            orientation = Axis.YP.rotationDegrees(AngleHelper.horizontalAngle(facing.getOpposite()));
         } else {
             orientation = new Quaternionf();
         }
 
-        orientation.mul(RotationAxis.POSITIVE_X.rotationDegrees(-90 - AngleHelper.verticalAngle(facing)));
+        orientation.mul(Axis.XP.rotationDegrees(-90 - AngleHelper.verticalAngle(facing)));
         return orientation;
     }
 

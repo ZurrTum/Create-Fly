@@ -1,7 +1,7 @@
 package com.zurrtum.create.client.flywheel.impl.extension;
 
 import com.zurrtum.create.client.flywheel.api.visualization.EntityVisualizer;
-import net.minecraft.entity.Entity;
+import net.minecraft.world.entity.Entity;
 import org.jetbrains.annotations.Nullable;
 
 public interface EntityTypeExtension<T extends Entity> {

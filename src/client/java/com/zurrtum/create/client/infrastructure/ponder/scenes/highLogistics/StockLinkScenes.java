@@ -13,11 +13,11 @@ import com.zurrtum.create.client.ponder.api.scene.Selection;
 import com.zurrtum.create.content.logistics.box.PackageItem;
 import com.zurrtum.create.content.logistics.packager.PackagerBlock;
 import com.zurrtum.create.content.redstone.analogLever.AnalogLeverBlockEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.math.Direction;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.phys.AABB;
 
 import java.util.List;
 
@@ -52,34 +52,34 @@ public class StockLinkScenes {
         scene.idle(25);
 
         scene.overlay().showText(70).attachKeyFrame().text("When placed, Stock Links create a new stock network")
-            .pointAt(util.vector().centerOf(link2.down())).placeNearTarget();
+            .pointAt(util.vector().centerOf(link2.below())).placeNearTarget();
         scene.idle(80);
 
-        ItemStack linkItem = AllItems.STOCK_LINK.getDefaultStack();
-        scene.overlay().showControls(util.vector().topOf(link2.down()), Pointing.DOWN, 50).rightClick().withItem(linkItem);
+        ItemStack linkItem = AllItems.STOCK_LINK.getDefaultInstance();
+        scene.overlay().showControls(util.vector().topOf(link2.below()), Pointing.DOWN, 50).rightClick().withItem(linkItem);
         scene.idle(5);
 
-        Box bb1 = new Box(link2.down());
-        scene.overlay().chaseBoundingBoxOutline(PonderPalette.BLUE, link2, bb1.contract(0.45), 10);
+        AABB bb1 = new AABB(link2.below());
+        scene.overlay().chaseBoundingBoxOutline(PonderPalette.BLUE, link2, bb1.deflate(0.45), 10);
         scene.idle(1);
-        bb1 = bb1.contract(1 / 16f).shrink(0, 8 / 16f, 0);
+        bb1 = bb1.deflate(1 / 16f).contract(0, 8 / 16f, 0);
         scene.overlay().chaseBoundingBoxOutline(PonderPalette.BLUE, link2, bb1, 50);
         scene.idle(26);
 
         scene.overlay().showText(80).text("Right-click an existing link before placing it to bind them").attachKeyFrame().colored(PonderPalette.BLUE)
-            .placeNearTarget().pointAt(util.vector().centerOf(link2.down()));
+            .placeNearTarget().pointAt(util.vector().centerOf(link2.below()));
 
         scene.idle(40);
 
         scene.world().showSectionAndMerge(link1S, Direction.DOWN, linkL);
         scene.idle(20);
 
-        scene.overlay().chaseBoundingBoxOutline(PonderPalette.GREEN, link1, bb1.offset(util.vector().of(2, 0, 0)), 40);
+        scene.overlay().chaseBoundingBoxOutline(PonderPalette.GREEN, link1, bb1.move(util.vector().of(2, 0, 0)), 40);
         scene.overlay().chaseBoundingBoxOutline(PonderPalette.GREEN, link2, bb1, 40);
         scene.overlay().showLine(
             PonderPalette.GREEN,
-            util.vector().centerOf(link1.down()).subtract(0, 1 / 4f, 0),
-            util.vector().centerOf(link2.down()).subtract(0, 1 / 4f, 0),
+            util.vector().centerOf(link1.below()).subtract(0, 1 / 4f, 0),
+            util.vector().centerOf(link2.below()).subtract(0, 1 / 4f, 0),
             40
         );
         scene.idle(60);

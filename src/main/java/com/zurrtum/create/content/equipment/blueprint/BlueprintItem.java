@@ -1,55 +1,55 @@
 package com.zurrtum.create.content.equipment.blueprint;
 
-import net.minecraft.component.DataComponentTypes;
-import net.minecraft.component.type.NbtComponent;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.TypedEntityData;
-import net.minecraft.entity.decoration.AbstractDecorationEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.ItemUsageContext;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.decoration.HangingEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.component.CustomData;
+import net.minecraft.world.item.component.TypedEntityData;
+import net.minecraft.world.item.context.UseOnContext;
+import net.minecraft.world.level.Level;
 
 public class BlueprintItem extends Item {
 
-    public BlueprintItem(Settings properties) {
+    public BlueprintItem(Properties properties) {
         super(properties);
     }
 
     @Override
-    public ActionResult useOnBlock(ItemUsageContext ctx) {
-        Direction face = ctx.getSide();
-        PlayerEntity player = ctx.getPlayer();
-        ItemStack stack = ctx.getStack();
-        BlockPos pos = ctx.getBlockPos().offset(face);
+    public InteractionResult useOn(UseOnContext ctx) {
+        Direction face = ctx.getClickedFace();
+        Player player = ctx.getPlayer();
+        ItemStack stack = ctx.getItemInHand();
+        BlockPos pos = ctx.getClickedPos().relative(face);
 
-        if (player != null && !player.canPlaceOn(pos, face, stack))
-            return ActionResult.FAIL;
+        if (player != null && !player.mayUseItemAt(pos, face, stack))
+            return InteractionResult.FAIL;
 
-        World world = ctx.getWorld();
-        AbstractDecorationEntity hangingentity = new BlueprintEntity(
+        Level world = ctx.getLevel();
+        HangingEntity hangingentity = new BlueprintEntity(
             world,
             pos,
             face,
-            face.getAxis().isHorizontal() ? Direction.DOWN : ctx.getHorizontalPlayerFacing()
+            face.getAxis().isHorizontal() ? Direction.DOWN : ctx.getHorizontalDirection()
         );
-        NbtComponent customData = stack.get(DataComponentTypes.CUSTOM_DATA);
+        CustomData customData = stack.get(DataComponents.CUSTOM_DATA);
 
         if (customData != null)
-            EntityType.loadFromEntityNbt(world, player, hangingentity, TypedEntityData.create(hangingentity.getType(), customData.copyNbt()));
-        if (!hangingentity.canStayAttached())
-            return ActionResult.CONSUME;
-        if (!world.isClient()) {
-            hangingentity.onPlace();
-            world.spawnEntity(hangingentity);
+            EntityType.updateCustomEntityTag(world, player, hangingentity, TypedEntityData.of(hangingentity.getType(), customData.copyTag()));
+        if (!hangingentity.survives())
+            return InteractionResult.CONSUME;
+        if (!world.isClientSide()) {
+            hangingentity.playPlacementSound();
+            world.addFreshEntity(hangingentity);
         }
 
-        stack.decrement(1);
-        return ActionResult.SUCCESS;
+        stack.shrink(1);
+        return InteractionResult.SUCCESS;
     }
 
     //TODO

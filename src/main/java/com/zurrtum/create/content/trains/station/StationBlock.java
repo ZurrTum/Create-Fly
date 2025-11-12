@@ -10,80 +10,80 @@ import com.zurrtum.create.foundation.advancement.AdvancementBehaviour;
 import com.zurrtum.create.foundation.block.IBE;
 import com.zurrtum.create.foundation.block.ProperWaterloggedBlock;
 import com.zurrtum.create.infrastructure.items.ItemInventoryProvider;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.ShapeContext;
-import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.ai.pathing.NavigationType;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.fluid.FluidState;
-import net.minecraft.inventory.Inventory;
-import net.minecraft.item.FilledMapItem;
-import net.minecraft.item.ItemPlacementContext;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.item.map.MapState;
-import net.minecraft.sound.SoundCategory;
-import net.minecraft.sound.SoundEvents;
-import net.minecraft.state.StateManager;
-import net.minecraft.state.property.BooleanProperty;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.Hand;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.random.Random;
-import net.minecraft.util.shape.VoxelShape;
-import net.minecraft.world.BlockView;
-import net.minecraft.world.World;
-import net.minecraft.world.WorldAccess;
-import net.minecraft.world.WorldView;
-import net.minecraft.world.tick.ScheduledTickView;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.Container;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.MapItem;
+import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.LevelReader;
+import net.minecraft.world.level.ScheduledTickAccess;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.BooleanProperty;
+import net.minecraft.world.level.material.FluidState;
+import net.minecraft.world.level.pathfinder.PathComputationType;
+import net.minecraft.world.level.saveddata.maps.MapItemSavedData;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.phys.shapes.VoxelShape;
 
 public class StationBlock extends Block implements IBE<StationBlockEntity>, ItemInventoryProvider<StationBlockEntity>, IWrenchable, ProperWaterloggedBlock {
 
-    public static final BooleanProperty ASSEMBLING = BooleanProperty.of("assembling");
+    public static final BooleanProperty ASSEMBLING = BooleanProperty.create("assembling");
 
-    public StationBlock(Settings p_54120_) {
+    public StationBlock(Properties p_54120_) {
         super(p_54120_);
-        setDefaultState(getDefaultState().with(ASSEMBLING, false).with(WATERLOGGED, false));
+        registerDefaultState(defaultBlockState().setValue(ASSEMBLING, false).setValue(WATERLOGGED, false));
     }
 
     @Override
-    public Inventory getInventory(WorldAccess world, BlockPos pos, BlockState state, StationBlockEntity blockEntity, Direction context) {
+    public Container getInventory(LevelAccessor world, BlockPos pos, BlockState state, StationBlockEntity blockEntity, Direction context) {
         return blockEntity.depotBehaviour.itemHandler;
     }
 
     @Override
-    protected void appendProperties(StateManager.Builder<Block, BlockState> pBuilder) {
-        super.appendProperties(pBuilder.add(ASSEMBLING, WATERLOGGED));
+    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> pBuilder) {
+        super.createBlockStateDefinition(pBuilder.add(ASSEMBLING, WATERLOGGED));
     }
 
     @Override
-    public BlockState getPlacementState(ItemPlacementContext pContext) {
-        return withWater(super.getPlacementState(pContext), pContext);
+    public BlockState getStateForPlacement(BlockPlaceContext pContext) {
+        return withWater(super.getStateForPlacement(pContext), pContext);
     }
 
     @Override
-    public BlockState getStateForNeighborUpdate(
+    public BlockState updateShape(
         BlockState pState,
-        WorldView pLevel,
-        ScheduledTickView tickView,
+        LevelReader pLevel,
+        ScheduledTickAccess tickView,
         BlockPos pCurrentPos,
         Direction pDirection,
         BlockPos pNeighborPos,
         BlockState pNeighborState,
-        Random random
+        RandomSource random
     ) {
         updateWater(pLevel, tickView, pState, pCurrentPos);
         return pState;
     }
 
     @Override
-    public void onPlaced(World pLevel, BlockPos pPos, BlockState pState, LivingEntity pPlacer, ItemStack pStack) {
-        super.onPlaced(pLevel, pPos, pState, pPlacer, pStack);
+    public void setPlacedBy(Level pLevel, BlockPos pPos, BlockState pState, LivingEntity pPlacer, ItemStack pStack) {
+        super.setPlacedBy(pLevel, pPos, pState, pPlacer, pStack);
         AdvancementBehaviour.setPlacedBy(pLevel, pPos, pPlacer);
     }
 
@@ -93,86 +93,86 @@ public class StationBlock extends Block implements IBE<StationBlockEntity>, Item
     }
 
     @Override
-    public boolean hasComparatorOutput(BlockState pState) {
+    public boolean hasAnalogOutputSignal(BlockState pState) {
         return true;
     }
 
     @Override
-    public int getComparatorOutput(BlockState pState, World pLevel, BlockPos pPos, Direction direction) {
+    public int getAnalogOutputSignal(BlockState pState, Level pLevel, BlockPos pPos, Direction direction) {
         return getBlockEntityOptional(pLevel, pPos).map(ste -> ste.trainPresent ? 15 : 0).orElse(0);
     }
 
     @Override
-    public void onEntityLand(BlockView worldIn, Entity entityIn) {
-        super.onEntityLand(worldIn, entityIn);
+    public void updateEntityMovementAfterFallOn(BlockGetter worldIn, Entity entityIn) {
+        super.updateEntityMovementAfterFallOn(worldIn, entityIn);
         SharedDepotBlockMethods.onLanded(worldIn, entityIn);
     }
 
     @Override
-    protected ActionResult onUseWithItem(
+    protected InteractionResult useItemOn(
         ItemStack stack,
         BlockState state,
-        World level,
+        Level level,
         BlockPos pos,
-        PlayerEntity player,
-        Hand hand,
+        Player player,
+        InteractionHand hand,
         BlockHitResult hitResult
     ) {
-        if (player == null || player.isSneaking())
-            return ActionResult.PASS_TO_DEFAULT_BLOCK_ACTION;
-        if (stack.isOf(AllItems.WRENCH))
-            return ActionResult.PASS_TO_DEFAULT_BLOCK_ACTION;
+        if (player == null || player.isShiftKeyDown())
+            return InteractionResult.TRY_WITH_EMPTY_HAND;
+        if (stack.is(AllItems.WRENCH))
+            return InteractionResult.TRY_WITH_EMPTY_HAND;
 
         if (stack.getItem() == Items.FILLED_MAP) {
             return onBlockEntityUseItemOn(
                 level, pos, station -> {
-                    if (level.isClient())
-                        return ActionResult.SUCCESS;
+                    if (level.isClientSide())
+                        return InteractionResult.SUCCESS;
 
                     if (station.getStation() == null || station.getStation().getId() == null)
-                        return ActionResult.FAIL;
+                        return InteractionResult.FAIL;
 
-                    MapState savedData = FilledMapItem.getMapState(stack, level);
+                    MapItemSavedData savedData = MapItem.getSavedData(stack, level);
                     if (!(savedData instanceof StationMapData stationMapData))
-                        return ActionResult.FAIL;
+                        return InteractionResult.FAIL;
 
                     if (!stationMapData.create$toggleStation(level, pos, station))
-                        return ActionResult.FAIL;
+                        return InteractionResult.FAIL;
 
-                    return ActionResult.SUCCESS;
+                    return InteractionResult.SUCCESS;
                 }
             );
         }
 
-        ActionResult result = onBlockEntityUse(
+        InteractionResult result = onBlockEntityUse(
             level, pos, station -> {
                 ItemStack autoSchedule = station.getAutoSchedule();
                 if (autoSchedule.isEmpty())
-                    return ActionResult.PASS;
-                if (level.isClient())
-                    return ActionResult.SUCCESS;
-                player.getInventory().offerOrDrop(autoSchedule.copy());
+                    return InteractionResult.PASS;
+                if (level.isClientSide())
+                    return InteractionResult.SUCCESS;
+                player.getInventory().placeItemBackInInventory(autoSchedule.copy());
                 station.depotBehaviour.removeHeldItem();
                 station.notifyUpdate();
-                player.getEntityWorld().playSound(
+                player.level().playSound(
                     null,
-                    player.getBlockPos(),
-                    SoundEvents.ENTITY_ITEM_PICKUP,
-                    SoundCategory.PLAYERS,
+                    player.blockPosition(),
+                    SoundEvents.ITEM_PICKUP,
+                    SoundSource.PLAYERS,
                     .2f,
-                    1f + player.getEntityWorld().random.nextFloat()
+                    1f + player.level().random.nextFloat()
                 );
-                return ActionResult.SUCCESS;
+                return InteractionResult.SUCCESS;
             }
         );
 
-        if (result == ActionResult.PASS)
+        if (result == InteractionResult.PASS)
             AllClientHandle.INSTANCE.openStationScreen(level, pos, player);
-        return ActionResult.SUCCESS;
+        return InteractionResult.SUCCESS;
     }
 
     @Override
-    public VoxelShape getOutlineShape(BlockState pState, BlockView pLevel, BlockPos pPos, ShapeContext pContext) {
+    public VoxelShape getShape(BlockState pState, BlockGetter pLevel, BlockPos pPos, CollisionContext pContext) {
         return AllShapes.STATION;
     }
 
@@ -187,7 +187,7 @@ public class StationBlock extends Block implements IBE<StationBlockEntity>, Item
     }
 
     @Override
-    protected boolean canPathfindThrough(BlockState state, NavigationType pathComputationType) {
+    protected boolean isPathfindable(BlockState state, PathComputationType pathComputationType) {
         return false;
     }
 

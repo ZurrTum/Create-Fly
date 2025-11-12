@@ -1,7 +1,7 @@
 package com.zurrtum.create.foundation.recipe.trie;
 
-import net.minecraft.fluid.Fluid;
-import net.minecraft.item.Item;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.level.material.Fluid;
 import org.jetbrains.annotations.NotNull;
 
 public sealed interface AbstractVariant {

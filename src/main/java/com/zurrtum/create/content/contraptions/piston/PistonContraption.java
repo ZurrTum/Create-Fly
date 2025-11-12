@@ -7,30 +7,31 @@ import com.zurrtum.create.api.contraption.ContraptionType;
 import com.zurrtum.create.catnip.math.VecHelper;
 import com.zurrtum.create.content.contraptions.AssemblyException;
 import com.zurrtum.create.content.contraptions.TranslatingContraption;
+import com.zurrtum.create.content.contraptions.piston.MechanicalPistonBlock.PistonState;
 import com.zurrtum.create.infrastructure.config.AllConfigs;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.DyedCarpetBlock;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.block.enums.PistonType;
-import net.minecraft.block.piston.PistonBehavior;
-import net.minecraft.state.property.Properties;
-import net.minecraft.storage.ReadView;
-import net.minecraft.storage.WriteView;
-import net.minecraft.structure.StructureTemplate.StructureBlockInfo;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.World;
-import net.minecraft.world.WorldAccess;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Queue;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.block.WoolCarpetBlock;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.block.state.properties.PistonType;
+import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate.StructureBlockInfo;
+import net.minecraft.world.level.material.PushReaction;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
 
 import static com.zurrtum.create.content.contraptions.piston.MechanicalPistonBlock.*;
-import static net.minecraft.state.property.Properties.FACING;
+import static net.minecraft.world.level.block.state.properties.BlockStateProperties.FACING;
 
 public class PistonContraption extends TranslatingContraption {
 
@@ -38,7 +39,7 @@ public class PistonContraption extends TranslatingContraption {
     protected int initialExtensionProgress;
     protected Direction orientation;
 
-    private Box pistonExtensionCollisionBox;
+    private AABB pistonExtensionCollisionBox;
     private boolean retract;
 
     @Override
@@ -55,7 +56,7 @@ public class PistonContraption extends TranslatingContraption {
     }
 
     @Override
-    public boolean assemble(World world, BlockPos pos) throws AssemblyException {
+    public boolean assemble(Level world, BlockPos pos) throws AssemblyException {
         if (!collectExtensions(world, pos, orientation))
             return false;
         int count = blocks.size();
@@ -64,16 +65,16 @@ public class PistonContraption extends TranslatingContraption {
         if (blocks.size() == count) { // no new blocks added
             bounds = pistonExtensionCollisionBox;
         } else {
-            bounds = bounds.union(pistonExtensionCollisionBox);
+            bounds = bounds.minmax(pistonExtensionCollisionBox);
         }
         startMoving(world);
         return true;
     }
 
-    private boolean collectExtensions(World world, BlockPos pos, Direction direction) throws AssemblyException {
+    private boolean collectExtensions(Level world, BlockPos pos, Direction direction) throws AssemblyException {
         List<StructureBlockInfo> poles = new ArrayList<>();
         BlockPos actualStart = pos;
-        BlockState nextBlock = world.getBlockState(actualStart.offset(direction));
+        BlockState nextBlock = world.getBlockState(actualStart.relative(direction));
         int extensionsInFront = 0;
         BlockState blockState = world.getBlockState(pos);
         boolean sticky = isStickyPiston(blockState);
@@ -81,18 +82,18 @@ public class PistonContraption extends TranslatingContraption {
         if (!isPiston(blockState))
             return false;
 
-        if (blockState.get(MechanicalPistonBlock.STATE) == PistonState.EXTENDED) {
+        if (blockState.getValue(MechanicalPistonBlock.STATE) == PistonState.EXTENDED) {
             while (PistonExtensionPoleBlock.PlacementHelper.get()
-                .matchesAxis(nextBlock, direction.getAxis()) || isPistonHead(nextBlock) && nextBlock.get(FACING) == direction) {
+                .matchesAxis(nextBlock, direction.getAxis()) || isPistonHead(nextBlock) && nextBlock.getValue(FACING) == direction) {
 
-                actualStart = actualStart.offset(direction);
-                poles.add(new StructureBlockInfo(actualStart, nextBlock.with(FACING, direction), null));
+                actualStart = actualStart.relative(direction);
+                poles.add(new StructureBlockInfo(actualStart, nextBlock.setValue(FACING, direction), null));
                 extensionsInFront++;
 
                 if (isPistonHead(nextBlock))
                     break;
 
-                nextBlock = world.getBlockState(actualStart.offset(direction));
+                nextBlock = world.getBlockState(actualStart.relative(direction));
                 if (extensionsInFront > MechanicalPistonBlock.maxAllowedPistonPoles())
                     throw AssemblyException.tooManyPistonPoles();
             }
@@ -101,42 +102,42 @@ public class PistonContraption extends TranslatingContraption {
         if (extensionsInFront == 0)
             poles.add(new StructureBlockInfo(
                 pos,
-                AllBlocks.MECHANICAL_PISTON_HEAD.getDefaultState().with(FACING, direction)
-                    .with(Properties.PISTON_TYPE, sticky ? PistonType.STICKY : PistonType.DEFAULT),
+                AllBlocks.MECHANICAL_PISTON_HEAD.defaultBlockState().setValue(FACING, direction)
+                    .setValue(BlockStateProperties.PISTON_TYPE, sticky ? PistonType.STICKY : PistonType.DEFAULT),
                 null
             ));
         else
-            poles.add(new StructureBlockInfo(pos, AllBlocks.PISTON_EXTENSION_POLE.getDefaultState().with(FACING, direction), null));
+            poles.add(new StructureBlockInfo(pos, AllBlocks.PISTON_EXTENSION_POLE.defaultBlockState().setValue(FACING, direction), null));
 
         BlockPos end = pos;
-        nextBlock = world.getBlockState(end.offset(direction.getOpposite()));
+        nextBlock = world.getBlockState(end.relative(direction.getOpposite()));
         int extensionsInBack = 0;
 
         while (PistonExtensionPoleBlock.PlacementHelper.get().matchesAxis(nextBlock, direction.getAxis())) {
-            end = end.offset(direction.getOpposite());
-            poles.add(new StructureBlockInfo(end, nextBlock.with(FACING, direction), null));
+            end = end.relative(direction.getOpposite());
+            poles.add(new StructureBlockInfo(end, nextBlock.setValue(FACING, direction), null));
             extensionsInBack++;
-            nextBlock = world.getBlockState(end.offset(direction.getOpposite()));
+            nextBlock = world.getBlockState(end.relative(direction.getOpposite()));
 
             if (extensionsInFront + extensionsInBack > MechanicalPistonBlock.maxAllowedPistonPoles())
                 throw AssemblyException.tooManyPistonPoles();
         }
 
-        anchor = pos.offset(direction, initialExtensionProgress + 1);
+        anchor = pos.relative(direction, initialExtensionProgress + 1);
         extensionLength = extensionsInBack + extensionsInFront;
         initialExtensionProgress = extensionsInFront;
-        pistonExtensionCollisionBox = new Box(
-            Vec3d.of(BlockPos.ZERO.offset(direction, -1)),
-            Vec3d.of(BlockPos.ZERO.offset(direction, -extensionLength - 1))
-        ).stretch(1, 1, 1);
+        pistonExtensionCollisionBox = new AABB(
+            Vec3.atLowerCornerOf(BlockPos.ZERO.relative(direction, -1)),
+            Vec3.atLowerCornerOf(BlockPos.ZERO.relative(direction, -extensionLength - 1))
+        ).expandTowards(1, 1, 1);
 
         if (extensionLength == 0)
             throw AssemblyException.noPistonPoles();
 
-        bounds = new Box(0, 0, 0, 0, 0, 0);
+        bounds = new AABB(0, 0, 0, 0, 0, 0);
 
         for (StructureBlockInfo pole : poles) {
-            BlockPos relPos = pole.pos().offset(direction, -extensionsInFront);
+            BlockPos relPos = pole.pos().relative(direction, -extensionsInFront);
             BlockPos localPos = relPos.subtract(anchor);
             getBlocks().put(localPos, new StructureBlockInfo(localPos, pole.state(), null));
             //pistonExtensionCollisionBox = pistonExtensionCollisionBox.union(new AABB(localPos));
@@ -151,33 +152,33 @@ public class PistonContraption extends TranslatingContraption {
     }
 
     @Override
-    protected boolean addToInitialFrontier(World world, BlockPos pos, Direction direction, Queue<BlockPos> frontier) throws AssemblyException {
+    protected boolean addToInitialFrontier(Level world, BlockPos pos, Direction direction, Queue<BlockPos> frontier) throws AssemblyException {
         frontier.clear();
-        boolean sticky = isStickyPiston(world.getBlockState(pos.offset(orientation, -1)));
+        boolean sticky = isStickyPiston(world.getBlockState(pos.relative(orientation, -1)));
         boolean retracting = direction != orientation;
         if (retracting && !sticky)
             return true;
         for (int offset = 0; offset <= AllConfigs.server().kinetics.maxChassisRange.get(); offset++) {
             if (offset == 1 && retracting)
                 return true;
-            BlockPos currentPos = pos.offset(orientation, offset + initialExtensionProgress);
-            if (retracting && world.isOutOfHeightLimit(currentPos))
+            BlockPos currentPos = pos.relative(orientation, offset + initialExtensionProgress);
+            if (retracting && world.isOutsideBuildHeight(currentPos))
                 return true;
-            if (!world.isPosLoaded(currentPos))
+            if (!world.isLoaded(currentPos))
                 throw AssemblyException.unloadedChunk(currentPos);
             BlockState state = world.getBlockState(currentPos);
             if (!BlockMovementChecks.isMovementNecessary(state, world, currentPos))
                 return true;
-            if (BlockMovementChecks.isBrittle(state) && !(state.getBlock() instanceof DyedCarpetBlock))
+            if (BlockMovementChecks.isBrittle(state) && !(state.getBlock() instanceof WoolCarpetBlock))
                 return true;
-            if (isPistonHead(state) && state.get(FACING) == direction.getOpposite())
+            if (isPistonHead(state) && state.getValue(FACING) == direction.getOpposite())
                 return true;
             if (!BlockMovementChecks.isMovementAllowed(state, world, currentPos))
                 if (retracting)
                     return true;
                 else
                     throw AssemblyException.unmovableBlock(currentPos, state);
-            if (retracting && state.getPistonBehavior() == PistonBehavior.PUSH_ONLY)
+            if (retracting && state.getPistonPushReaction() == PushReaction.PUSH_ONLY)
                 return true;
             frontier.add(currentPos);
             if (BlockMovementChecks.isNotSupportive(state, orientation))
@@ -187,55 +188,55 @@ public class PistonContraption extends TranslatingContraption {
     }
 
     @Override
-    public void addBlock(World level, BlockPos pos, Pair<StructureBlockInfo, BlockEntity> capture) {
-        super.addBlock(level, pos.offset(orientation, -initialExtensionProgress), capture);
+    public void addBlock(Level level, BlockPos pos, Pair<StructureBlockInfo, BlockEntity> capture) {
+        super.addBlock(level, pos.relative(orientation, -initialExtensionProgress), capture);
     }
 
     @Override
     public BlockPos toLocalPos(BlockPos globalPos) {
-        return globalPos.subtract(anchor).offset(orientation, -initialExtensionProgress);
+        return globalPos.subtract(anchor).relative(orientation, -initialExtensionProgress);
     }
 
     @Override
-    protected boolean customBlockPlacement(WorldAccess world, BlockPos pos, BlockState state) {
-        BlockPos pistonPos = anchor.offset(orientation, -1);
+    protected boolean customBlockPlacement(LevelAccessor world, BlockPos pos, BlockState state) {
+        BlockPos pistonPos = anchor.relative(orientation, -1);
         BlockState pistonState = world.getBlockState(pistonPos);
         BlockEntity be = world.getBlockEntity(pistonPos);
         if (pos.equals(pistonPos)) {
             if (be == null || be.isRemoved())
                 return true;
             if (!isExtensionPole(state) && isPiston(pistonState))
-                world.setBlockState(pistonPos, pistonState.with(MechanicalPistonBlock.STATE, PistonState.RETRACTED), 3 | 16);
+                world.setBlock(pistonPos, pistonState.setValue(MechanicalPistonBlock.STATE, PistonState.RETRACTED), 3 | 16);
             return true;
         }
         return false;
     }
 
     @Override
-    protected boolean customBlockRemoval(WorldAccess world, BlockPos pos, BlockState state) {
-        BlockPos pistonPos = anchor.offset(orientation, -1);
+    protected boolean customBlockRemoval(LevelAccessor world, BlockPos pos, BlockState state) {
+        BlockPos pistonPos = anchor.relative(orientation, -1);
         BlockState blockState = world.getBlockState(pos);
         if (pos.equals(pistonPos) && isPiston(blockState)) {
-            world.setBlockState(pos, blockState.with(MechanicalPistonBlock.STATE, PistonState.MOVING), 66 | 16);
+            world.setBlock(pos, blockState.setValue(MechanicalPistonBlock.STATE, PistonState.MOVING), 66 | 16);
             return true;
         }
         return false;
     }
 
     @Override
-    public void read(World world, ReadView view, boolean spawnData) {
+    public void read(Level world, ValueInput view, boolean spawnData) {
         super.read(world, view, spawnData);
-        initialExtensionProgress = view.getInt("InitialLength", 0);
-        extensionLength = view.getInt("ExtensionLength", 0);
+        initialExtensionProgress = view.getIntOr("InitialLength", 0);
+        extensionLength = view.getIntOr("ExtensionLength", 0);
         orientation = view.read("Orientation", Direction.CODEC).orElseThrow();
     }
 
     @Override
-    public void write(WriteView view, boolean spawnPacket) {
+    public void write(ValueOutput view, boolean spawnPacket) {
         super.write(view, spawnPacket);
         view.putInt("InitialLength", initialExtensionProgress);
         view.putInt("ExtensionLength", extensionLength);
-        view.put("Orientation", Direction.CODEC, orientation);
+        view.store("Orientation", Direction.CODEC, orientation);
     }
 
 }

@@ -3,8 +3,8 @@ package com.zurrtum.create.client.flywheel.lib.visual;
 import com.zurrtum.create.client.flywheel.api.instance.InstancerProvider;
 import com.zurrtum.create.client.flywheel.api.visual.Visual;
 import com.zurrtum.create.client.flywheel.api.visualization.VisualizationContext;
-import net.minecraft.util.math.Vec3i;
-import net.minecraft.world.World;
+import net.minecraft.core.Vec3i;
+import net.minecraft.world.level.Level;
 
 public abstract class AbstractVisual implements Visual {
     /**
@@ -13,11 +13,11 @@ public abstract class AbstractVisual implements Visual {
      * Useful for passing to child visuals.
      */
     protected final VisualizationContext visualizationContext;
-    protected final World level;
+    protected final Level level;
 
     protected boolean deleted = false;
 
-    public AbstractVisual(VisualizationContext ctx, World level, float partialTick) {
+    public AbstractVisual(VisualizationContext ctx, Level level, float partialTick) {
         this.visualizationContext = ctx;
         this.level = level;
     }

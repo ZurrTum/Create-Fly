@@ -11,10 +11,10 @@ import com.zurrtum.create.content.kinetics.steamEngine.PoweredShaftBlockEntity;
 import com.zurrtum.create.content.kinetics.steamEngine.SteamEngineBlockEntity;
 import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
 import com.zurrtum.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
-import net.minecraft.text.Text;
+import net.minecraft.network.chat.Component;
 
 public class RotationDirectionScrollBehaviour extends ScrollOptionBehaviour<RotationDirection> {
-    public RotationDirectionScrollBehaviour(SmartBlockEntity be, Text title, ValueBoxTransform slot) {
+    public RotationDirectionScrollBehaviour(SmartBlockEntity be, Component title, ValueBoxTransform slot) {
         super(RotationDirectionIcon.class, RotationDirectionIcon::from, title, be, slot);
     }
 

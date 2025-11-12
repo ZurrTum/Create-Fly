@@ -5,9 +5,8 @@ import com.zurrtum.create.impl.unpacking.BasinUnpackingHandler;
 import com.zurrtum.create.impl.unpacking.CrafterUnpackingHandler;
 import com.zurrtum.create.impl.unpacking.DefaultUnpackingHandler;
 import com.zurrtum.create.impl.unpacking.VoidingUnpackingHandler;
-import net.minecraft.block.Block;
-
 import java.util.function.Supplier;
+import net.minecraft.world.level.block.Block;
 
 public class AllUnpackingHandlers {
     public static final UnpackingHandler DEFAULT = new DefaultUnpackingHandler();

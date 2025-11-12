@@ -10,7 +10,7 @@ import com.zurrtum.create.client.flywheel.backend.compile.ContextShader;
 import com.zurrtum.create.client.flywheel.backend.engine.EngineImpl;
 import com.zurrtum.create.client.flywheel.backend.gl.shader.GlProgram;
 import com.zurrtum.create.client.flywheel.lib.util.ExtraMemoryOps;
-import net.minecraft.util.math.Vec3i;
+import net.minecraft.core.Vec3i;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix3f;
 import org.joml.Matrix3fc;

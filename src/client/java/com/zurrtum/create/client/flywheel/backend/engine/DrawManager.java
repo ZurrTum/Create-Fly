@@ -13,13 +13,13 @@ import com.zurrtum.create.client.flywheel.backend.engine.embed.EnvironmentStorag
 import com.zurrtum.create.client.flywheel.lib.task.ForEachPlan;
 import it.unimi.dsi.fastutil.ints.Int2ObjectArrayMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
-import net.minecraft.client.render.model.ModelBaker;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.function.Function;
+import net.minecraft.client.resources.model.ModelBakery;
 
 public abstract class DrawManager<N extends AbstractInstancer<?>> {
     private static final boolean MODEL_WARNINGS = Boolean.getBoolean("flywheel.modelWarnings");
@@ -139,7 +139,7 @@ public abstract class DrawManager<N extends AbstractInstancer<?>> {
         for (Engine.CrumblingBlock block : crumblingBlocks) {
             int progress = block.progress();
 
-            if (progress < 0 || progress >= ModelBaker.BLOCK_DESTRUCTION_RENDER_LAYERS.size()) {
+            if (progress < 0 || progress >= ModelBakery.DESTROY_TYPES.size()) {
                 continue;
             }
 

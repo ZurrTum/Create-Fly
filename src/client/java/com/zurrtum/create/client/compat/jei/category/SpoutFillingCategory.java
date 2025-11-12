@@ -26,20 +26,20 @@ import mezz.jei.api.recipe.IFocusGroup;
 import mezz.jei.api.recipe.types.IRecipeType;
 import net.fabricmc.fabric.api.recipe.v1.ingredient.DefaultCustomIngredients;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.component.DataComponentTypes;
-import net.minecraft.component.type.PotionContentsComponent;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.recipe.Ingredient;
-import net.minecraft.recipe.PreparedRecipes;
-import net.minecraft.recipe.RecipeEntry;
-import net.minecraft.registry.Registries;
-import net.minecraft.registry.RegistryKey;
-import net.minecraft.registry.RegistryKeys;
-import net.minecraft.text.Text;
-import net.minecraft.util.Identifier;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.alchemy.PotionContents;
+import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.item.crafting.RecipeHolder;
+import net.minecraft.world.item.crafting.RecipeMap;
 import org.apache.commons.lang3.mutable.MutableInt;
 import org.jetbrains.annotations.NotNull;
 import org.joml.Matrix3x2f;
@@ -51,16 +51,16 @@ import java.util.stream.Stream;
 
 import static com.zurrtum.create.Create.MOD_ID;
 
-public class SpoutFillingCategory extends CreateCategory<RecipeEntry<FillingRecipe>> {
+public class SpoutFillingCategory extends CreateCategory<RecipeHolder<FillingRecipe>> {
     public static final int MAX = 3;
     public static AtomicInteger idGenerator = new AtomicInteger();
 
-    public static List<RecipeEntry<FillingRecipe>> getRecipes(
-        PreparedRecipes preparedRecipes,
+    public static List<RecipeHolder<FillingRecipe>> getRecipes(
+        RecipeMap preparedRecipes,
         Stream<ItemStack> itemStream,
         Stream<IJeiFluidIngredient> fluidStream
     ) {
-        List<RecipeEntry<FillingRecipe>> recipes = new ArrayList<>(preparedRecipes.getAll(AllRecipeTypes.FILLING));
+        List<RecipeHolder<FillingRecipe>> recipes = new ArrayList<>(preparedRecipes.byType(AllRecipeTypes.FILLING));
         List<FluidStack> fluids = fluidStream.map(ingredient -> {
             FluidVariant variant = ingredient.getFluidVariant();
             return new FluidStack(variant.getFluid(), ingredient.getAmount(), variant.getComponents());
@@ -68,12 +68,12 @@ public class SpoutFillingCategory extends CreateCategory<RecipeEntry<FillingReci
         MutableInt i = new MutableInt();
         itemStream.forEach(stack -> {
             if (PotionFluidHandler.isPotionItem(stack)) {
-                PotionContentsComponent potion = stack.getOrDefault(DataComponentTypes.POTION_CONTENTS, PotionContentsComponent.DEFAULT);
+                PotionContents potion = stack.getOrDefault(DataComponents.POTION_CONTENTS, PotionContents.EMPTY);
                 BottleType bottleType = PotionFluidHandler.bottleTypeFromItem(stack.getItem());
-                recipes.add(new RecipeEntry<>(
-                    RegistryKey.of(RegistryKeys.RECIPE, Identifier.of(MOD_ID, "filling_potions_" + i.getAndIncrement())), new FillingRecipe(
+                recipes.add(new RecipeHolder<>(
+                    ResourceKey.create(Registries.RECIPE, ResourceLocation.fromNamespaceAndPath(MOD_ID, "filling_potions_" + i.getAndIncrement())), new FillingRecipe(
                     stack,
-                    Ingredient.ofItem(Items.GLASS_BOTTLE),
+                    Ingredient.of(Items.GLASS_BOTTLE),
                     PotionFluidHandler.getFluidIngredientFromPotion(potion, bottleType, BottleFluidInventory.CAPACITY)
                 )
                 ));
@@ -96,17 +96,17 @@ public class SpoutFillingCategory extends CreateCategory<RecipeEntry<FillingReci
                     ItemStack result = capability.getContainer();
                     if (!result.isEmpty()) {
                         Item item = stack.getItem();
-                        if (!result.isOf(item)) {
-                            Identifier itemName = Registries.ITEM.getId(item);
-                            Identifier fluidName = Registries.FLUID.getId(fluid.getFluid());
-                            Identifier id = Identifier.of(
+                        if (!result.is(item)) {
+                            ResourceLocation itemName = BuiltInRegistries.ITEM.getKey(item);
+                            ResourceLocation fluidName = BuiltInRegistries.FLUID.getKey(fluid.getFluid());
+                            ResourceLocation id = ResourceLocation.fromNamespaceAndPath(
                                 MOD_ID,
                                 "fill_" + itemName.getNamespace() + "_" + itemName.getPath() + "_with_" + fluidName.getNamespace() + "_" + fluidName.getPath()
                             );
-                            Ingredient ingredient = stack.getComponentChanges()
-                                .isEmpty() ? Ingredient.ofItem(stack.getItem()) : DefaultCustomIngredients.components(stack);
-                            recipes.add(new RecipeEntry<>(
-                                RegistryKey.of(RegistryKeys.RECIPE, id),
+                            Ingredient ingredient = stack.getComponentsPatch()
+                                .isEmpty() ? Ingredient.of(stack.getItem()) : DefaultCustomIngredients.components(stack);
+                            recipes.add(new RecipeHolder<>(
+                                ResourceKey.create(Registries.RECIPE, id),
                                 new FillingRecipe(result, ingredient, new FluidStackIngredient(fluid.getFluid(), fluid.getComponentChanges(), insert))
                             ));
                         }
@@ -120,13 +120,13 @@ public class SpoutFillingCategory extends CreateCategory<RecipeEntry<FillingReci
 
     @Override
     @NotNull
-    public IRecipeType<RecipeEntry<FillingRecipe>> getRecipeType() {
+    public IRecipeType<RecipeHolder<FillingRecipe>> getRecipeType() {
         return JeiClientPlugin.SPOUT_FILLING;
     }
 
     @Override
     @NotNull
-    public Text getTitle() {
+    public Component getTitle() {
         return CreateLang.translateDirect("recipe.spout_filling");
     }
 
@@ -141,7 +141,7 @@ public class SpoutFillingCategory extends CreateCategory<RecipeEntry<FillingReci
     }
 
     @Override
-    public void setRecipe(IRecipeLayoutBuilder builder, RecipeEntry<FillingRecipe> entry, IFocusGroup focuses) {
+    public void setRecipe(IRecipeLayoutBuilder builder, RecipeHolder<FillingRecipe> entry, IFocusGroup focuses) {
         FillingRecipe recipe = entry.value();
         builder.addInputSlot(27, 51).setBackground(SLOT, -1, -1).add(recipe.ingredient());
         addFluidSlot(builder, 27, 32, recipe.fluidIngredient()).setBackground(SLOT, -1, -1).setSlotName("fluid");
@@ -149,7 +149,7 @@ public class SpoutFillingCategory extends CreateCategory<RecipeEntry<FillingReci
     }
 
     @Override
-    public void draw(RecipeEntry<FillingRecipe> entry, IRecipeSlotsView recipeSlotsView, DrawContext graphics, double mouseX, double mouseY) {
+    public void draw(RecipeHolder<FillingRecipe> entry, IRecipeSlotsView recipeSlotsView, GuiGraphics graphics, double mouseX, double mouseY) {
         AllGuiTextures.JEI_SHADOW.render(graphics, 62, 57);
         AllGuiTextures.JEI_DOWN_ARROW.render(graphics, 126, 29);
         recipeSlotsView.findSlotByName("fluid").flatMap(view -> view.getDisplayedIngredient(FabricTypes.FLUID_STACK)).ifPresent(fluidIngredient -> {
@@ -158,9 +158,9 @@ public class SpoutFillingCategory extends CreateCategory<RecipeEntry<FillingReci
             if (i >= MAX) {
                 idGenerator.set(0);
             }
-            graphics.state.addSpecialElement(new SpoutRenderState(
+            graphics.guiRenderState.submitPicturesInPictureState(new SpoutRenderState(
                 i,
-                new Matrix3x2f(graphics.getMatrices()),
+                new Matrix3x2f(graphics.pose()),
                 fluidVariant.getFluid(),
                 fluidVariant.getComponents(),
                 75,

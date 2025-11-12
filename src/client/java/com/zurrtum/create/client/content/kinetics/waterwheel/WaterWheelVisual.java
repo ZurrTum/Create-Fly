@@ -10,10 +10,9 @@ import com.zurrtum.create.client.flywheel.lib.model.baked.BakedModelBuilder;
 import com.zurrtum.create.client.flywheel.lib.util.RendererReloadCache;
 import com.zurrtum.create.client.foundation.render.AllInstanceTypes;
 import com.zurrtum.create.content.kinetics.waterwheel.WaterWheelBlockEntity;
-import net.minecraft.block.BlockState;
-import net.minecraft.client.render.model.GeometryBakedModel;
-
 import java.util.function.Consumer;
+import net.minecraft.client.renderer.block.model.SimpleModelWrapper;
+import net.minecraft.world.level.block.state.BlockState;
 
 public class WaterWheelVisual<T extends WaterWheelBlockEntity> extends KineticBlockEntityVisual<T> {
     private static final RendererReloadCache<ModelKey, Model> MODEL_CACHE = new RendererReloadCache<>(WaterWheelVisual::createModel);
@@ -72,7 +71,7 @@ public class WaterWheelVisual<T extends WaterWheelBlockEntity> extends KineticBl
     }
 
     private static Model createModel(ModelKey key) {
-        GeometryBakedModel model = WaterWheelRenderer.generateModel(key.variant(), key.material());
+        SimpleModelWrapper model = WaterWheelRenderer.generateModel(key.variant(), key.material());
         return new BakedModelBuilder(model).build();
     }
 

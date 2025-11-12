@@ -2,35 +2,35 @@ package com.zurrtum.create.infrastructure.packet.s2c;
 
 import com.zurrtum.create.AllPackets;
 import com.zurrtum.create.content.logistics.box.PackageEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.network.RegistryByteBuf;
-import net.minecraft.network.codec.PacketCodec;
-import net.minecraft.network.packet.Packet;
-import net.minecraft.network.packet.PacketType;
-import net.minecraft.network.packet.s2c.play.EntitySpawnS2CPacket;
-import net.minecraft.server.network.EntityTrackerEntry;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.Packet;
+import net.minecraft.network.protocol.PacketType;
+import net.minecraft.network.protocol.game.ClientboundAddEntityPacket;
+import net.minecraft.server.level.ServerEntity;
+import net.minecraft.world.item.ItemStack;
 
-public class PackageSpawnPacket extends EntitySpawnS2CPacket {
-    public static final PacketCodec<RegistryByteBuf, PackageSpawnPacket> CODEC = Packet.createCodec(
+public class PackageSpawnPacket extends ClientboundAddEntityPacket {
+    public static final StreamCodec<RegistryFriendlyByteBuf, PackageSpawnPacket> CODEC = Packet.codec(
         PackageSpawnPacket::write,
         PackageSpawnPacket::new
     );
     private final ItemStack box;
 
-    public PackageSpawnPacket(PackageEntity entity, EntityTrackerEntry entityTrackerEntry) {
+    public PackageSpawnPacket(PackageEntity entity, ServerEntity entityTrackerEntry) {
         super(entity, entityTrackerEntry);
         box = entity.getBox();
     }
 
-    private PackageSpawnPacket(RegistryByteBuf buf) {
+    private PackageSpawnPacket(RegistryFriendlyByteBuf buf) {
         super(buf);
-        box = ItemStack.PACKET_CODEC.decode(buf);
+        box = ItemStack.STREAM_CODEC.decode(buf);
     }
 
     @Override
-    public void write(RegistryByteBuf buf) {
+    public void write(RegistryFriendlyByteBuf buf) {
         super.write(buf);
-        ItemStack.PACKET_CODEC.encode(buf, box);
+        ItemStack.STREAM_CODEC.encode(buf, box);
     }
 
     public ItemStack getBox() {
@@ -39,7 +39,7 @@ public class PackageSpawnPacket extends EntitySpawnS2CPacket {
 
     @Override
     @SuppressWarnings("unchecked")
-    public PacketType<EntitySpawnS2CPacket> getPacketType() {
-        return (PacketType<EntitySpawnS2CPacket>) (PacketType<?>) AllPackets.PACKAGE_SPAWN;
+    public PacketType<ClientboundAddEntityPacket> type() {
+        return (PacketType<ClientboundAddEntityPacket>) (PacketType<?>) AllPackets.PACKAGE_SPAWN;
     }
 }

@@ -1,26 +1,26 @@
 package com.zurrtum.create.client.ponder.foundation.registration;
 
 import com.zurrtum.create.client.ponder.api.registration.TagBuilder;
-import net.minecraft.item.ItemConvertible;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Consumer;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.ItemLike;
 
 public class PonderTagBuilder implements TagBuilder {
 
-    final Identifier id;
+    final ResourceLocation id;
     private final Consumer<PonderTagBuilder> onFinish;
 
     String title = "NO_TITLE";
     String description = "NO_DESCRIPTION";
     boolean addToIndex = false;
-    @Nullable Identifier textureIconLocation;
+    @Nullable ResourceLocation textureIconLocation;
     ItemStack itemIcon = ItemStack.EMPTY;
     ItemStack mainItem = ItemStack.EMPTY;
 
-    public PonderTagBuilder(Identifier id, Consumer<PonderTagBuilder> onFinish) {
+    public PonderTagBuilder(ResourceLocation id, Consumer<PonderTagBuilder> onFinish) {
         this.id = id;
         this.onFinish = onFinish;
     }
@@ -44,14 +44,14 @@ public class PonderTagBuilder implements TagBuilder {
     }
 
     @Override
-    public TagBuilder icon(Identifier location) {
-        this.textureIconLocation = Identifier.of(location.getNamespace(), "textures/ponder/tag/" + location.getPath() + ".png");
+    public TagBuilder icon(ResourceLocation location) {
+        this.textureIconLocation = ResourceLocation.fromNamespaceAndPath(location.getNamespace(), "textures/ponder/tag/" + location.getPath() + ".png");
         return this;
     }
 
     @Override
     public TagBuilder icon(String path) {
-        this.textureIconLocation = Identifier.of(id.getNamespace(), "textures/ponder/tag/" + path + ".png");
+        this.textureIconLocation = ResourceLocation.fromNamespaceAndPath(id.getNamespace(), "textures/ponder/tag/" + path + ".png");
         return this;
     }
 
@@ -61,7 +61,7 @@ public class PonderTagBuilder implements TagBuilder {
     }
 
     @Override
-    public TagBuilder item(ItemConvertible item, boolean useAsIcon, boolean useAsMainItem) {
+    public TagBuilder item(ItemLike item, boolean useAsIcon, boolean useAsMainItem) {
         if (useAsIcon)
             this.itemIcon = new ItemStack(item);
         if (useAsMainItem)

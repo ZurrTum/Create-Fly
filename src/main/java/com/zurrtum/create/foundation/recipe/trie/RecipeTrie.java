@@ -14,19 +14,19 @@ import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
 import it.unimi.dsi.fastutil.ints.IntSet;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
-import net.minecraft.fluid.Fluid;
-import net.minecraft.inventory.Inventory;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.recipe.Ingredient;
-import net.minecraft.recipe.Recipe;
-import net.minecraft.recipe.ShapedRecipe;
-import net.minecraft.recipe.ShapelessRecipe;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 import java.util.concurrent.ExecutionException;
+import net.minecraft.world.Container;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.item.crafting.Recipe;
+import net.minecraft.world.item.crafting.ShapedRecipe;
+import net.minecraft.world.item.crafting.ShapelessRecipe;
+import net.minecraft.world.level.material.Fluid;
 
 public class RecipeTrie<R extends Recipe<?>> {
     private static final int MAX_CACHE_SIZE = Integer.getInteger("create.recipe_trie.max_cache_size", 512);
@@ -50,12 +50,12 @@ public class RecipeTrie<R extends Recipe<?>> {
         this.universalIngredientId = universalIngredientId;
     }
 
-    public static @NotNull Set<AbstractVariant> getVariants(@Nullable Inventory itemStorage, @Nullable FluidInventory fluidStorage) {
+    public static @NotNull Set<AbstractVariant> getVariants(@Nullable Container itemStorage, @Nullable FluidInventory fluidStorage) {
         Set<AbstractVariant> variants = new HashSet<>();
 
         if (itemStorage != null) {
-            for (int slot = 0, size = itemStorage.size(); slot < size; slot++) {
-                ItemStack item = itemStorage.getStack(slot);
+            for (int slot = 0, size = itemStorage.getContainerSize(); slot < size; slot++) {
+                ItemStack item = itemStorage.getItem(slot);
                 if (item.isEmpty())
                     continue;
 
@@ -206,7 +206,7 @@ public class RecipeTrie<R extends Recipe<?>> {
                         continue;
                     }
                     Set<AbstractVariant> variants = new HashSet<>();
-                    ingredient.getMatchingItems().forEach(entry -> variants.add(getOrAssignVariant(entry.value())));
+                    ingredient.items().forEach(entry -> variants.add(getOrAssignVariant(entry.value())));
                     ingredients.add(new AbstractIngredient(variants));
                 }
             }

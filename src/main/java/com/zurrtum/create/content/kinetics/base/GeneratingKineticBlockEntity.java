@@ -2,10 +2,10 @@ package com.zurrtum.create.content.kinetics.base;
 
 import com.zurrtum.create.content.kinetics.KineticNetwork;
 import com.zurrtum.create.content.kinetics.base.IRotate.SpeedLevel;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockState;
 
 public abstract class GeneratingKineticBlockEntity extends KineticBlockEntity {
 
@@ -29,7 +29,7 @@ public abstract class GeneratingKineticBlockEntity extends KineticBlockEntity {
     @Override
     public void setSource(BlockPos source) {
         super.setSource(source);
-        BlockEntity blockEntity = world.getBlockEntity(source);
+        BlockEntity blockEntity = level.getBlockEntity(source);
         if (!(blockEntity instanceof KineticBlockEntity sourceBE))
             return;
         if (reActivateSource && Math.abs(sourceBE.getSpeed()) >= Math.abs(getGeneratedSpeed()))
@@ -49,7 +49,7 @@ public abstract class GeneratingKineticBlockEntity extends KineticBlockEntity {
         float speed = getGeneratedSpeed();
         float prevSpeed = this.speed;
 
-        if (world == null || world.isClient())
+        if (level == null || level.isClientSide())
             return;
 
         if (prevSpeed != speed) {
@@ -103,7 +103,7 @@ public abstract class GeneratingKineticBlockEntity extends KineticBlockEntity {
             // Staying below Overpowered speed
             if (Math.abs(prevSpeed) >= Math.abs(speed)) {
                 if (Math.signum(prevSpeed) != Math.signum(speed))
-                    world.breakBlock(pos, true);
+                    level.destroyBlock(worldPosition, true);
                 return;
             }
 
@@ -123,6 +123,6 @@ public abstract class GeneratingKineticBlockEntity extends KineticBlockEntity {
     }
 
     public Long createNetworkId() {
-        return pos.asLong();
+        return worldPosition.asLong();
     }
 }

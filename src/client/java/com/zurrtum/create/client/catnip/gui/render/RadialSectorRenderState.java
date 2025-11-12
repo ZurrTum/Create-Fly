@@ -1,30 +1,30 @@
 package com.zurrtum.create.client.catnip.gui.render;
 
 import com.mojang.blaze3d.pipeline.RenderPipeline;
+import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.zurrtum.create.catnip.theme.Color;
-import net.minecraft.client.gui.ScreenRect;
-import net.minecraft.client.gui.render.state.SimpleGuiElementRenderState;
-import net.minecraft.client.render.VertexConsumer;
-import net.minecraft.client.texture.TextureSetup;
-import net.minecraft.util.math.Vec2f;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix3x2f;
 
 import java.util.List;
+import net.minecraft.client.gui.navigation.ScreenRectangle;
+import net.minecraft.client.gui.render.TextureSetup;
+import net.minecraft.client.gui.render.state.GuiElementRenderState;
+import net.minecraft.world.phys.Vec2;
 
 import static com.zurrtum.create.client.catnip.render.PonderRenderPipelines.POSITION_COLOR_STRIP;
 
 public record RadialSectorRenderState(
-    Matrix3x2f pose, List<Vec2f> innerPoints, List<Vec2f> outerPoints, int outerColor, int innerColor, ScreenRect bounds
-) implements SimpleGuiElementRenderState {
+    Matrix3x2f pose, List<Vec2> innerPoints, List<Vec2> outerPoints, int outerColor, int innerColor, ScreenRectangle bounds
+) implements GuiElementRenderState {
     public RadialSectorRenderState(
         Matrix3x2f pose,
         double minX,
         double maxX,
         double minY,
         double maxY,
-        List<Vec2f> innerPoints,
-        List<Vec2f> outerPoints,
+        List<Vec2> innerPoints,
+        List<Vec2> outerPoints,
         Color innerColor,
         Color outerColor
     ) {
@@ -34,7 +34,7 @@ public record RadialSectorRenderState(
             outerPoints,
             outerColor.getRGB(),
             innerColor.getRGB(),
-            new ScreenRect((int) minX, (int) minY, (int) (maxX - minX), (int) (maxY - minY)).transformEachVertex(pose)
+            new ScreenRectangle((int) minX, (int) minY, (int) (maxX - minX), (int) (maxY - minY)).transformMaxBounds(pose)
         );
     }
 
@@ -44,23 +44,23 @@ public record RadialSectorRenderState(
     }
 
     @Override
-    public void setupVertices(VertexConsumer vertexConsumer) {
+    public void buildVertices(VertexConsumer vertexConsumer) {
         for (int i = 0; i < innerPoints.size(); i++) {
-            Vec2f point = outerPoints.get(i);
-            vertexConsumer.vertex(pose, point.x, point.y).color(outerColor);
+            Vec2 point = outerPoints.get(i);
+            vertexConsumer.addVertexWith2DPose(pose, point.x, point.y).setColor(outerColor);
 
             point = innerPoints.get(i);
-            vertexConsumer.vertex(pose, point.x, point.y).color(innerColor);
+            vertexConsumer.addVertexWith2DPose(pose, point.x, point.y).setColor(innerColor);
         }
     }
 
     @Override
     public TextureSetup textureSetup() {
-        return TextureSetup.empty();
+        return TextureSetup.noTexture();
     }
 
     @Override
-    public @Nullable ScreenRect scissorArea() {
+    public @Nullable ScreenRectangle scissorArea() {
         return null;
     }
 }

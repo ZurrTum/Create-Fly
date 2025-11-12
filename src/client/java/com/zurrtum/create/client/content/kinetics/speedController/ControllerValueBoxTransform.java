@@ -4,14 +4,14 @@ package com.zurrtum.create.client.content.kinetics.speedController;
 import com.zurrtum.create.catnip.math.VecHelper;
 import com.zurrtum.create.client.foundation.blockEntity.behaviour.ValueBoxTransform;
 import com.zurrtum.create.content.kinetics.speedController.SpeedControllerBlock;
-import net.minecraft.block.BlockState;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.core.Direction;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.Vec3;
 
 public class ControllerValueBoxTransform extends ValueBoxTransform.Sided {
 
     @Override
-    protected Vec3d getSouthLocation() {
+    protected Vec3 getSouthLocation() {
         return VecHelper.voxelSpace(8, 11f, 15.5f);
     }
 
@@ -19,7 +19,7 @@ public class ControllerValueBoxTransform extends ValueBoxTransform.Sided {
     protected boolean isSideActive(BlockState state, Direction direction) {
         if (direction.getAxis().isVertical())
             return false;
-        return state.get(SpeedControllerBlock.HORIZONTAL_AXIS) != direction.getAxis();
+        return state.getValue(SpeedControllerBlock.HORIZONTAL_AXIS) != direction.getAxis();
     }
 
 }

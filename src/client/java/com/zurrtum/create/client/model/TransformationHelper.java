@@ -6,9 +6,8 @@
 package com.zurrtum.create.client.model;
 
 import com.google.gson.*;
-import net.minecraft.util.StringIdentifiable;
-import net.minecraft.util.math.AffineTransformation;
-import net.minecraft.util.math.RotationAxis;
+import com.mojang.math.Axis;
+import com.mojang.math.Transformation;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix4f;
 import org.joml.Quaternionf;
@@ -18,6 +17,7 @@ import java.lang.reflect.Type;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import net.minecraft.util.StringRepresentable;
 
 public class TransformationHelper {
     public static Quaternionf quatFromXYZ(float[] xyz, boolean degrees) {
@@ -33,26 +33,26 @@ public class TransformationHelper {
         return new Quaternionf(values[0], values[1], values[2], values[3]);
     }
 
-    public static class Deserializer implements JsonDeserializer<AffineTransformation> {
-        public AffineTransformation deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
+    public static class Deserializer implements JsonDeserializer<Transformation> {
+        public Transformation deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
             if (json.isJsonPrimitive() && json.getAsJsonPrimitive().isString()) {
                 String transform = json.getAsString();
                 if (transform.equals("identity")) {
-                    return AffineTransformation.identity();
+                    return Transformation.identity();
                 } else {
                     throw new JsonParseException("TRSR: unknown default string: " + transform);
                 }
             }
             if (json.isJsonArray()) {
                 // direct matrix array
-                return new AffineTransformation(parseMatrix(json));
+                return new Transformation(parseMatrix(json));
             }
             if (!json.isJsonObject())
                 throw new JsonParseException("TRSR: expected array or object, got: " + json);
             JsonObject obj = json.getAsJsonObject();
             if (obj.has("matrix")) {
                 // matrix as a sole key
-                AffineTransformation ret = new AffineTransformation(parseMatrix(obj.get("matrix")));
+                Transformation ret = new Transformation(parseMatrix(obj.get("matrix")));
                 if (obj.entrySet().size() > 1) {
                     throw new JsonParseException("TRSR: can't combine matrix and other keys");
                 }
@@ -108,16 +108,16 @@ public class TransformationHelper {
                         elements
                     ));
 
-            AffineTransformation matrix = new AffineTransformation(translation, leftRot, scale, rightRot);
-            if (matrix.equals(AffineTransformation.identity()))
-                return AffineTransformation.identity();
+            Transformation matrix = new Transformation(translation, leftRot, scale, rightRot);
+            if (matrix.equals(Transformation.identity()))
+                return Transformation.identity();
 
             Matrix4f ret = new Matrix4f(matrix.getMatrix());
             Matrix4f tmp = new Matrix4f().translation(origin.x(), origin.y(), origin.z());
             tmp.mul(ret, ret);
             tmp.translation(-origin.x(), -origin.y(), -origin.z());
             ret.mul(tmp);
-            return new AffineTransformation(ret);
+            return new Transformation(ret);
         }
 
         private static Vector3f parseOrigin(JsonObject obj) {
@@ -193,11 +193,11 @@ public class TransformationHelper {
             Quaternionf ret;
             try {
                 if (entry.getKey().equals("x")) {
-                    ret = RotationAxis.POSITIVE_X.rotationDegrees(entry.getValue().getAsNumber().floatValue());
+                    ret = Axis.XP.rotationDegrees(entry.getValue().getAsNumber().floatValue());
                 } else if (entry.getKey().equals("y")) {
-                    ret = RotationAxis.POSITIVE_Y.rotationDegrees(entry.getValue().getAsNumber().floatValue());
+                    ret = Axis.YP.rotationDegrees(entry.getValue().getAsNumber().floatValue());
                 } else if (entry.getKey().equals("z")) {
-                    ret = RotationAxis.POSITIVE_Z.rotationDegrees(entry.getValue().getAsNumber().floatValue());
+                    ret = Axis.ZP.rotationDegrees(entry.getValue().getAsNumber().floatValue());
                 } else
                     throw new JsonParseException("Axis rotation: expected single axis key, got: " + entry.getKey());
             } catch (ClassCastException ex) {
@@ -229,7 +229,7 @@ public class TransformationHelper {
         }
     }
 
-    public enum TransformOrigin implements StringIdentifiable {
+    public enum TransformOrigin implements StringRepresentable {
         CENTER(new Vector3f(.5f, .5f, .5f), "center"),
         CORNER(new Vector3f(), "corner"),
         OPPOSING_CORNER(new Vector3f(1, 1, 1), "opposing-corner");
@@ -247,18 +247,18 @@ public class TransformationHelper {
         }
 
         @Override
-        public String asString() {
+        public String getSerializedName() {
             return name;
         }
 
         public static @Nullable TransformOrigin fromString(String originName) {
-            if (CENTER.asString().equals(originName)) {
+            if (CENTER.getSerializedName().equals(originName)) {
                 return CENTER;
             }
-            if (CORNER.asString().equals(originName)) {
+            if (CORNER.getSerializedName().equals(originName)) {
                 return CORNER;
             }
-            if (OPPOSING_CORNER.asString().equals(originName)) {
+            if (OPPOSING_CORNER.getSerializedName().equals(originName)) {
                 return OPPOSING_CORNER;
             }
             return null;

@@ -4,16 +4,16 @@ import com.zurrtum.create.AllDataComponents;
 import com.zurrtum.create.AllItems;
 import com.zurrtum.create.AllMenuTypes;
 import com.zurrtum.create.infrastructure.items.ItemStackHandler;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.screen.slot.Slot;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.item.ItemStack;
 
 public class FilterMenu extends AbstractFilterMenu {
 
     public boolean respectNBT;
     public boolean blacklist;
 
-    public FilterMenu(int id, PlayerInventory inv, ItemStack stack) {
+    public FilterMenu(int id, Inventory inv, ItemStack stack) {
         super(AllMenuTypes.FILTER, id, inv, stack);
     }
 

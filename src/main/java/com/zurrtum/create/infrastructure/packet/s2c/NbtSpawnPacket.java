@@ -2,52 +2,52 @@ package com.zurrtum.create.infrastructure.packet.s2c;
 
 import com.zurrtum.create.AllPackets;
 import com.zurrtum.create.content.contraptions.data.ContraptionSyncLimiting;
-import net.minecraft.entity.Entity;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.nbt.NbtElement;
-import net.minecraft.nbt.NbtSizeTracker;
-import net.minecraft.network.RegistryByteBuf;
-import net.minecraft.network.codec.PacketCodec;
-import net.minecraft.network.packet.Packet;
-import net.minecraft.network.packet.PacketType;
-import net.minecraft.network.packet.s2c.play.EntitySpawnS2CPacket;
-import net.minecraft.server.network.EntityTrackerEntry;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtAccounter;
+import net.minecraft.nbt.Tag;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.Packet;
+import net.minecraft.network.protocol.PacketType;
+import net.minecraft.network.protocol.game.ClientboundAddEntityPacket;
+import net.minecraft.server.level.ServerEntity;
+import net.minecraft.world.entity.Entity;
 import org.jetbrains.annotations.Nullable;
 
-public class NbtSpawnPacket extends EntitySpawnS2CPacket {
-    public static final PacketCodec<RegistryByteBuf, NbtSpawnPacket> CODEC = Packet.createCodec(NbtSpawnPacket::write, NbtSpawnPacket::new);
+public class NbtSpawnPacket extends ClientboundAddEntityPacket {
+    public static final StreamCodec<RegistryFriendlyByteBuf, NbtSpawnPacket> CODEC = Packet.codec(NbtSpawnPacket::write, NbtSpawnPacket::new);
     @Nullable
-    private final NbtCompound nbt;
+    private final CompoundTag nbt;
 
-    public NbtSpawnPacket(Entity entity, EntityTrackerEntry entityTrackerEntry, NbtCompound nbt) {
+    public NbtSpawnPacket(Entity entity, ServerEntity entityTrackerEntry, CompoundTag nbt) {
         super(entity, entityTrackerEntry);
         this.nbt = nbt;
     }
 
-    private NbtSpawnPacket(RegistryByteBuf buf) {
+    private NbtSpawnPacket(RegistryFriendlyByteBuf buf) {
         super(buf);
-        NbtElement tag = buf.readNbt(NbtSizeTracker.ofUnlimitedBytes());
-        if (tag != null && !(tag instanceof NbtCompound)) {
+        Tag tag = buf.readNbt(NbtAccounter.unlimitedHeap());
+        if (tag != null && !(tag instanceof CompoundTag)) {
             nbt = null;
         } else {
-            nbt = (NbtCompound) tag;
+            nbt = (CompoundTag) tag;
         }
     }
 
     @Override
-    public void write(RegistryByteBuf buf) {
+    public void write(RegistryFriendlyByteBuf buf) {
         super.write(buf);
         ContraptionSyncLimiting.writeSafe(nbt, buf);
     }
 
     @Nullable
-    public NbtCompound getNbt() {
+    public CompoundTag getNbt() {
         return nbt;
     }
 
     @Override
     @SuppressWarnings("unchecked")
-    public PacketType<EntitySpawnS2CPacket> getPacketType() {
-        return (PacketType<EntitySpawnS2CPacket>) (PacketType<?>) AllPackets.NBT_SPAWN;
+    public PacketType<ClientboundAddEntityPacket> type() {
+        return (PacketType<ClientboundAddEntityPacket>) (PacketType<?>) AllPackets.NBT_SPAWN;
     }
 }

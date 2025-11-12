@@ -1,11 +1,11 @@
 package com.zurrtum.create.client.content.schematics.client.tools;
 
-import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.Minecraft;
 
 public class PlaceTool extends SchematicToolBase {
 
     @Override
-    public boolean handleRightClick(MinecraftClient mc) {
+    public boolean handleRightClick(Minecraft mc) {
         schematicHandler.printInstantly(mc);
         return true;
     }

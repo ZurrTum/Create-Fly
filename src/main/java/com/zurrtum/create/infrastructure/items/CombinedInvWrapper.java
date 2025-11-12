@@ -1,34 +1,34 @@
 package com.zurrtum.create.infrastructure.items;
 
 import com.zurrtum.create.infrastructure.transfer.SlotRangeCache;
-import net.minecraft.inventory.Inventory;
-import net.minecraft.inventory.SidedInventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.math.Direction;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collections;
 import java.util.NoSuchElementException;
 import java.util.function.Predicate;
+import net.minecraft.core.Direction;
+import net.minecraft.world.Container;
+import net.minecraft.world.WorldlyContainer;
+import net.minecraft.world.item.ItemStack;
 
 public class CombinedInvWrapper implements SidedItemInventory {
-    protected final Inventory[] itemHandler;
+    protected final Container[] itemHandler;
     protected final int[] baseIndex;
     private final boolean[] sideInventory;
     protected final int[] slots;
 
-    public CombinedInvWrapper(Inventory... itemHandler) {
+    public CombinedInvWrapper(Container... itemHandler) {
         this.itemHandler = itemHandler;
         int length = itemHandler.length;
         this.baseIndex = new int[length];
         this.sideInventory = new boolean[length];
         int index = 0;
         for (int i = 0; i < length; i++) {
-            Inventory inventory = itemHandler[i];
-            index += inventory.size();
+            Container inventory = itemHandler[i];
+            index += inventory.getContainerSize();
             baseIndex[i] = index;
-            sideInventory[i] = inventory instanceof SidedInventory;
+            sideInventory[i] = inventory instanceof WorldlyContainer;
         }
         this.slots = SlotRangeCache.get(index);
     }
@@ -46,7 +46,7 @@ public class CombinedInvWrapper implements SidedItemInventory {
     }
 
     @Nullable
-    protected Inventory getHandlerFromIndex(int index) {
+    protected Container getHandlerFromIndex(int index) {
         if (index < 0 || index >= itemHandler.length) {
             return null;
         }
@@ -61,20 +61,20 @@ public class CombinedInvWrapper implements SidedItemInventory {
     }
 
     @Override
-    public int[] getAvailableSlots(Direction side) {
+    public int[] getSlotsForFace(Direction side) {
         return slots;
     }
 
     @Override
-    public boolean canInsert(int slot, ItemStack stack, @Nullable Direction dir) {
+    public boolean canPlaceItemThroughFace(int slot, ItemStack stack, @Nullable Direction dir) {
         int index = getIndexForSlot(slot);
-        Inventory handler = getHandlerFromIndex(index);
+        Container handler = getHandlerFromIndex(index);
         if (handler == null) {
             return false;
         }
-        if (handler.isValid(slot, stack)) {
+        if (handler.canPlaceItem(slot, stack)) {
             if (sideInventory[index]) {
-                return ((SidedInventory) handler).canInsert(slot, stack, dir);
+                return ((WorldlyContainer) handler).canPlaceItemThroughFace(slot, stack, dir);
             }
             return true;
         }
@@ -82,49 +82,49 @@ public class CombinedInvWrapper implements SidedItemInventory {
     }
 
     @Override
-    public boolean canExtract(int slot, ItemStack stack, Direction dir) {
+    public boolean canTakeItemThroughFace(int slot, ItemStack stack, Direction dir) {
         int index = getIndexForSlot(slot);
-        Inventory handler = getHandlerFromIndex(index);
+        Container handler = getHandlerFromIndex(index);
         if (handler == null) {
             return false;
         }
         if (sideInventory[index]) {
-            return ((SidedInventory) handler).canExtract(slot, stack, dir);
+            return ((WorldlyContainer) handler).canTakeItemThroughFace(slot, stack, dir);
         }
         return true;
     }
 
     @Override
-    public int size() {
+    public int getContainerSize() {
         return slots.length;
     }
 
     @Override
-    public ItemStack getStack(int slot) {
+    public ItemStack getItem(int slot) {
         int index = getIndexForSlot(slot);
-        Inventory handler = getHandlerFromIndex(index);
+        Container handler = getHandlerFromIndex(index);
         if (handler == null) {
             return ItemStack.EMPTY;
         }
         slot = getSlotFromIndex(slot, index);
-        return handler.getStack(slot);
+        return handler.getItem(slot);
     }
 
     @Override
-    public void setStack(int slot, ItemStack stack) {
+    public void setItem(int slot, ItemStack stack) {
         int index = getIndexForSlot(slot);
-        Inventory handler = getHandlerFromIndex(index);
+        Container handler = getHandlerFromIndex(index);
         if (handler == null) {
             return;
         }
         slot = getSlotFromIndex(slot, index);
-        handler.setStack(slot, stack);
+        handler.setItem(slot, stack);
     }
 
     @Override
     public int insert(ItemStack stack, int maxAmount, Direction side) {
         int remaining = maxAmount;
-        for (Inventory handler : itemHandler) {
+        for (Container handler : itemHandler) {
             int insert = handler.insert(stack, remaining, side);
             if (remaining == insert) {
                 markInventoryDirty();
@@ -145,7 +145,7 @@ public class CombinedInvWrapper implements SidedItemInventory {
     @Override
     public int extract(ItemStack stack, int maxAmount, Direction side) {
         int remaining = maxAmount;
-        for (Inventory handler : itemHandler) {
+        for (Container handler : itemHandler) {
             int extract = handler.extract(stack, remaining, side);
             if (remaining == extract) {
                 markInventoryDirty();
@@ -257,7 +257,7 @@ public class CombinedInvWrapper implements SidedItemInventory {
             return 0;
         }
         int count = 0;
-        for (Inventory inventory : itemHandler) {
+        for (Container inventory : itemHandler) {
             count += inventory.countAll(predicate, maxAmount, side);
             if (count >= maxAmount) {
                 return maxAmount;
@@ -272,7 +272,7 @@ public class CombinedInvWrapper implements SidedItemInventory {
             return 0;
         }
         int remaining = maxAmount;
-        for (Inventory inventory : itemHandler) {
+        for (Container inventory : itemHandler) {
             int extract = inventory.extractAll(predicate, remaining, side);
             if (extract < remaining) {
                 remaining -= extract;
@@ -292,9 +292,9 @@ public class CombinedInvWrapper implements SidedItemInventory {
     }
 
     @Override
-    public void markDirty() {
-        for (Inventory inventory : itemHandler) {
-            inventory.markDirty();
+    public void setChanged() {
+        for (Container inventory : itemHandler) {
+            inventory.setChanged();
         }
         markInventoryDirty();
     }
@@ -305,7 +305,7 @@ public class CombinedInvWrapper implements SidedItemInventory {
         if (itemHandler.length == 0) {
             return Collections.emptyIterator();
         } else {
-            return new Iterator(side);
+            return new com.zurrtum.create.infrastructure.items.CombinedInvWrapper.Iterator(side);
         }
     }
 

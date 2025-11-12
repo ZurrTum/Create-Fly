@@ -5,26 +5,26 @@ import com.zurrtum.create.api.behaviour.display.ClickToLinkSelection;
 import com.zurrtum.create.api.behaviour.display.DisplayTarget;
 import com.zurrtum.create.client.catnip.outliner.Outliner;
 import com.zurrtum.create.content.redstone.displayLink.ClickToLinkBlockItem;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.shape.VoxelShape;
-import net.minecraft.world.World;
+import net.minecraft.client.Minecraft;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.shapes.VoxelShape;
 
 public class ClickToLinkHandler {
     private static BlockPos lastShownPos = null;
-    private static Box lastShownAABB = null;
+    private static AABB lastShownAABB = null;
 
-    public static void clientTick(MinecraftClient mc) {
-        PlayerEntity player = mc.player;
+    public static void clientTick(Minecraft mc) {
+        Player player = mc.player;
         if (player == null)
             return;
-        ItemStack heldItemMainhand = player.getMainHandStack();
+        ItemStack heldItemMainhand = player.getMainHandItem();
         if (!(heldItemMainhand.getItem() instanceof ClickToLinkBlockItem blockItem))
             return;
-        if (!heldItemMainhand.contains(AllDataComponents.CLICK_TO_LINK_DATA))
+        if (!heldItemMainhand.has(AllDataComponents.CLICK_TO_LINK_DATA))
             return;
 
         //noinspection DataFlowIssue
@@ -32,9 +32,9 @@ public class ClickToLinkHandler {
 
         if (!selectedPos.equals(lastShownPos)) {
             if (blockItem instanceof ClickToLinkSelection item) {
-                lastShownAABB = item.getSelectionBounds(mc.world, selectedPos);
+                lastShownAABB = item.getSelectionBounds(mc.level, selectedPos);
             } else {
-                lastShownAABB = getSelectionBounds(mc.world, selectedPos);
+                lastShownAABB = getSelectionBounds(mc.level, selectedPos);
             }
             lastShownPos = selectedPos;
         }
@@ -42,12 +42,12 @@ public class ClickToLinkHandler {
         Outliner.getInstance().showAABB("target", lastShownAABB).colored(0xffcb74).lineWidth(1 / 16f);
     }
 
-    public static Box getSelectionBounds(World world, BlockPos pos) {
+    public static AABB getSelectionBounds(Level world, BlockPos pos) {
         DisplayTarget target = DisplayTarget.get(world, pos);
         if (target != null) {
             return target.getMultiblockBounds(world, pos);
         }
-        VoxelShape shape = world.getBlockState(pos).getOutlineShape(world, pos);
-        return shape.isEmpty() ? new Box(BlockPos.ORIGIN) : shape.getBoundingBox().offset(pos);
+        VoxelShape shape = world.getBlockState(pos).getShape(world, pos);
+        return shape.isEmpty() ? new AABB(BlockPos.ZERO) : shape.bounds().move(pos);
     }
 }

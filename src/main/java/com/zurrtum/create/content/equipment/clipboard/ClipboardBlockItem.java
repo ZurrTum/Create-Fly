@@ -5,39 +5,39 @@ import com.zurrtum.create.AllDataComponents;
 import com.zurrtum.create.foundation.recipe.ItemCopyingRecipe.SupportsItemCopying;
 import com.zurrtum.create.infrastructure.component.ClipboardContent;
 import com.zurrtum.create.infrastructure.component.ClipboardType;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.component.ComponentType;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.BlockItem;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.ItemUsageContext;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.Hand;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.component.DataComponentType;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.context.UseOnContext;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.NotNull;
 
 public class ClipboardBlockItem extends BlockItem implements SupportsItemCopying {
 
-    public ClipboardBlockItem(Block pBlock, Settings pProperties) {
+    public ClipboardBlockItem(Block pBlock, Properties pProperties) {
         super(pBlock, pProperties);
     }
 
     @Override
     @NotNull
-    public ActionResult useOnBlock(ItemUsageContext context) {
-        PlayerEntity player = context.getPlayer();
+    public InteractionResult useOn(UseOnContext context) {
+        Player player = context.getPlayer();
         if (player == null)
-            return ActionResult.PASS;
-        if (player.isSneaking())
-            return super.useOnBlock(context);
-        return use(context.getWorld(), player, context.getHand());
+            return InteractionResult.PASS;
+        if (player.isShiftKeyDown())
+            return super.useOn(context);
+        return use(context.getLevel(), player, context.getHand());
     }
 
     @Override
-    protected boolean postPlacement(BlockPos pPos, World pLevel, PlayerEntity pPlayer, ItemStack pStack, BlockState pState) {
-        if (pLevel.isClient())
+    protected boolean updateCustomBlockEntityTag(BlockPos pPos, Level pLevel, Player pPlayer, ItemStack pStack, BlockState pState) {
+        if (pLevel.isClientSide())
             return false;
         if (!(pLevel.getBlockEntity(pPos) instanceof ClipboardBlockEntity cbe))
             return false;
@@ -46,22 +46,22 @@ public class ClipboardBlockItem extends BlockItem implements SupportsItemCopying
     }
 
     @Override
-    public ActionResult use(World world, PlayerEntity player, Hand hand) {
-        ItemStack heldItem = player.getStackInHand(hand);
-        if (hand == Hand.OFF_HAND)
-            return ActionResult.PASS;
+    public InteractionResult use(Level world, Player player, InteractionHand hand) {
+        ItemStack heldItem = player.getItemInHand(hand);
+        if (hand == InteractionHand.OFF_HAND)
+            return InteractionResult.PASS;
 
-        player.getItemCooldownManager().set(heldItem, 10);
-        if (world.isClient())
+        player.getCooldowns().addCooldown(heldItem, 10);
+        if (world.isClientSide())
             AllClientHandle.INSTANCE.openClipboardScreen(player, heldItem.getComponents(), null);
         ClipboardContent content = heldItem.getOrDefault(AllDataComponents.CLIPBOARD_CONTENT, ClipboardContent.EMPTY);
         heldItem.set(AllDataComponents.CLIPBOARD_CONTENT, content.setType(ClipboardType.EDITING));
 
-        return ActionResult.SUCCESS.withNewHandStack(heldItem);
+        return InteractionResult.SUCCESS.heldItemTransformedTo(heldItem);
     }
 
     @Override
-    public ComponentType<?> getComponentType() {
+    public DataComponentType<?> getComponentType() {
         return AllDataComponents.CLIPBOARD_CONTENT;
     }
 

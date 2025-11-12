@@ -3,14 +3,14 @@ package com.zurrtum.create.api.contraption.storage.item.simple;
 import com.mojang.serialization.MapCodec;
 import com.zurrtum.create.api.contraption.storage.item.MountedItemStorageType;
 import com.zurrtum.create.foundation.item.ItemHelper;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.inventory.Inventory;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Optional;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.Container;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
 
 public abstract class SimpleMountedStorageType<T extends SimpleMountedStorage> extends MountedItemStorageType<T> {
     protected SimpleMountedStorageType(MapCodec<T> codec) {
@@ -19,15 +19,15 @@ public abstract class SimpleMountedStorageType<T extends SimpleMountedStorage> e
 
     @Override
     @Nullable
-    public T mount(World level, BlockState state, BlockPos pos, @Nullable BlockEntity be) {
+    public T mount(Level level, BlockState state, BlockPos pos, @Nullable BlockEntity be) {
         return Optional.ofNullable(be).map(b -> getHandler(level, b)).map(this::createStorage).orElse(null);
     }
 
-    protected Inventory getHandler(World level, BlockEntity be) {
-        return ItemHelper.getInventory(level, be.getPos(), null, be, null);
+    protected Container getHandler(Level level, BlockEntity be) {
+        return ItemHelper.getInventory(level, be.getBlockPos(), null, be, null);
     }
 
-    protected abstract T createStorage(Inventory handler);
+    protected abstract T createStorage(Container handler);
 
     public static final class Impl extends SimpleMountedStorageType<SimpleMountedStorage> {
         public Impl() {
@@ -35,7 +35,7 @@ public abstract class SimpleMountedStorageType<T extends SimpleMountedStorage> e
         }
 
         @Override
-        protected SimpleMountedStorage createStorage(Inventory handler) {
+        protected SimpleMountedStorage createStorage(Container handler) {
             return new SimpleMountedStorage(this, handler);
         }
     }

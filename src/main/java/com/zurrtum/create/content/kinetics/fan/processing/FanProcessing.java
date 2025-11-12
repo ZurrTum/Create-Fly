@@ -5,47 +5,46 @@ import com.zurrtum.create.api.registry.CreateRegistries;
 import com.zurrtum.create.content.kinetics.belt.behaviour.TransportedItemStackHandlerBehaviour.TransportedResult;
 import com.zurrtum.create.content.kinetics.belt.transport.TransportedItemStack;
 import com.zurrtum.create.infrastructure.config.AllConfigs;
-import net.minecraft.entity.ItemEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.Identifier;
-import net.minecraft.world.World;
-
 import java.util.ArrayList;
 import java.util.List;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
 
 public class FanProcessing {
     public static boolean canProcess(ItemEntity entity, FanProcessingType type) {
         String itemType = AllSynchedDatas.ITEM_TYPE.get(entity);
         if (!itemType.isEmpty()) {
             if (FanProcessingType.parse(itemType) != type) {
-                return type.canProcess(entity.getStack(), entity.getEntityWorld());
+                return type.canProcess(entity.getItem(), entity.level());
             } else {
                 return AllSynchedDatas.ITEM_TIME.get(entity) != -1;
             }
         }
-        return type.canProcess(entity.getStack(), entity.getEntityWorld());
+        return type.canProcess(entity.getItem(), entity.level());
     }
 
     public static boolean applyProcessing(ItemEntity entity, FanProcessingType type) {
         if (decrementProcessingTime(entity, type) != 0)
             return false;
-        List<ItemStack> stacks = type.process(entity.getStack(), entity.getEntityWorld());
+        List<ItemStack> stacks = type.process(entity.getItem(), entity.level());
         if (stacks == null)
             return false;
         if (stacks.isEmpty()) {
             entity.discard();
             return false;
         }
-        entity.setStack(stacks.removeFirst());
+        entity.setItem(stacks.removeFirst());
         for (ItemStack additional : stacks) {
-            ItemEntity entityIn = new ItemEntity(entity.getEntityWorld(), entity.getX(), entity.getY(), entity.getZ(), additional);
-            entityIn.setVelocity(entity.getVelocity());
-            entity.getEntityWorld().spawnEntity(entityIn);
+            ItemEntity entityIn = new ItemEntity(entity.level(), entity.getX(), entity.getY(), entity.getZ(), additional);
+            entityIn.setDeltaMovement(entity.getDeltaMovement());
+            entity.level().addFreshEntity(entityIn);
         }
         return true;
     }
 
-    public static TransportedResult applyProcessing(TransportedItemStack transported, World world, FanProcessingType type) {
+    public static TransportedResult applyProcessing(TransportedItemStack transported, Level world, FanProcessingType type) {
         TransportedResult ignore = TransportedResult.doNothing();
         if (transported.processedBy != type) {
             transported.processedBy = type;
@@ -77,11 +76,11 @@ public class FanProcessing {
         String itemType = AllSynchedDatas.ITEM_TYPE.get(entity);
         int time;
         if (itemType.isEmpty() || FanProcessingType.parse(itemType) != type) {
-            Identifier key = CreateRegistries.FAN_PROCESSING_TYPE.getId(type);
+            ResourceLocation key = CreateRegistries.FAN_PROCESSING_TYPE.getKey(type);
             if (key == null)
                 throw new IllegalArgumentException("Could not get id for FanProcessingType " + type + "!");
             AllSynchedDatas.ITEM_TYPE.set(entity, key.toString());
-            int timeModifierForStackSize = ((entity.getStack().getCount() - 1) / 16) + 1;
+            int timeModifierForStackSize = ((entity.getItem().getCount() - 1) / 16) + 1;
             time = (AllConfigs.server().kinetics.fanProcessingTime.get() * timeModifierForStackSize);
         } else {
             time = AllSynchedDatas.ITEM_TIME.get(entity) - 1;

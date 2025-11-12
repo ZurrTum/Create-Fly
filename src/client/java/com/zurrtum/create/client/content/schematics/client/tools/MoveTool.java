@@ -2,9 +2,9 @@ package com.zurrtum.create.client.content.schematics.client.tools;
 
 import com.zurrtum.create.catnip.math.VecHelper;
 import com.zurrtum.create.client.content.schematics.client.SchematicTransformation;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.util.math.Direction.Axis;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.client.Minecraft;
+import net.minecraft.core.Direction.Axis;
+import net.minecraft.world.phys.Vec3;
 
 public class MoveTool extends PlacementToolBase {
 
@@ -15,7 +15,7 @@ public class MoveTool extends PlacementToolBase {
     }
 
     @Override
-    public void updateSelection(MinecraftClient mc) {
+    public void updateSelection(Minecraft mc) {
         super.updateSelection(mc);
     }
 
@@ -25,7 +25,7 @@ public class MoveTool extends PlacementToolBase {
             return true;
 
         SchematicTransformation transformation = schematicHandler.getTransformation();
-        Vec3d vec = Vec3d.of(selectedFace.getVector()).multiply(-Math.signum(delta));
+        Vec3 vec = Vec3.atLowerCornerOf(selectedFace.getUnitVec3i()).scale(-Math.signum(delta));
         vec = vec.multiply(transformation.getMirrorModifier(Axis.X), 1, transformation.getMirrorModifier(Axis.Z));
         vec = VecHelper.rotate(vec, transformation.getRotationTarget(), Axis.Y);
         transformation.move((int) vec.x, 0, (int) vec.z);

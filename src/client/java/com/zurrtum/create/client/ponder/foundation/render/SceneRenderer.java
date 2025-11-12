@@ -1,7 +1,11 @@
 package com.zurrtum.create.client.ponder.foundation.render;
 
-import com.mojang.blaze3d.systems.ProjectionType;
+import com.mojang.blaze3d.ProjectionType;
+import com.mojang.blaze3d.platform.Lighting;
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
+import com.mojang.math.Axis;
 import com.zurrtum.create.catnip.theme.Color;
 import com.zurrtum.create.client.catnip.gui.UIRenderHelper;
 import com.zurrtum.create.client.catnip.gui.render.GpuTexture;
@@ -12,36 +16,32 @@ import com.zurrtum.create.client.ponder.foundation.PonderScene;
 import com.zurrtum.create.client.ponder.foundation.PonderScene.SceneTransform;
 import it.unimi.dsi.fastutil.ints.Int2ObjectArrayMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gl.RenderPipelines;
-import net.minecraft.client.gui.render.SpecialGuiElementRenderer;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.render.TextureSetup;
+import net.minecraft.client.gui.render.pip.PictureInPictureRenderer;
+import net.minecraft.client.gui.render.state.BlitRenderState;
 import net.minecraft.client.gui.render.state.GuiRenderState;
-import net.minecraft.client.gui.render.state.TexturedQuadGuiElementRenderState;
-import net.minecraft.client.render.DiffuseLighting;
-import net.minecraft.client.render.GameRenderer;
-import net.minecraft.client.render.VertexConsumer;
-import net.minecraft.client.render.VertexConsumerProvider;
-import net.minecraft.client.render.command.OrderedRenderCommandQueueImpl;
-import net.minecraft.client.render.command.RenderDispatcher;
-import net.minecraft.client.texture.TextureSetup;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.util.math.RotationAxis;
+import net.minecraft.client.renderer.GameRenderer;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.RenderPipelines;
+import net.minecraft.client.renderer.SubmitNodeStorage;
+import net.minecraft.client.renderer.feature.FeatureRenderDispatcher;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 
-public class SceneRenderer extends SpecialGuiElementRenderer<SceneRenderState> {
+public class SceneRenderer extends PictureInPictureRenderer<SceneRenderState> {
     private static final Vector3f DIFFUSE_LIGHT_0 = new Vector3f(0.4F, -1.0F, 0.7F).normalize();
     private static final Vector3f DIFFUSE_LIGHT_1 = new Vector3f(-0.4F, -0.5F, 0.7F).normalize();
     private static final Int2ObjectMap<GpuTexture> TEXTURES = new Int2ObjectArrayMap<>();
-    private final MatrixStack matrices = new MatrixStack();
+    private final PoseStack matrices = new PoseStack();
     private int windowScaleFactor;
 
-    public SceneRenderer(VertexConsumerProvider.Immediate vertexConsumers) {
+    public SceneRenderer(MultiBufferSource.BufferSource vertexConsumers) {
         super(vertexConsumers);
     }
 
     @Override
-    public void render(SceneRenderState renderState, GuiRenderState state, int windowScaleFactor) {
+    public void prepare(SceneRenderState renderState, GuiRenderState state, int windowScaleFactor) {
         if (this.windowScaleFactor != windowScaleFactor) {
             this.windowScaleFactor = windowScaleFactor;
             TEXTURES.values().forEach(GpuTexture::close);
@@ -54,32 +54,32 @@ public class SceneRenderer extends SpecialGuiElementRenderer<SceneRenderState> {
             texture = GpuTexture.create(width, height);
             TEXTURES.put(renderState.id(), texture);
         }
-        RenderSystem.setProjectionMatrix(projectionMatrix.set(width, height), ProjectionType.ORTHOGRAPHIC);
+        RenderSystem.setProjectionMatrix(projectionMatrixBuffer.getBuffer(width, height), ProjectionType.ORTHOGRAPHIC);
         texture.prepare();
-        matrices.push();
+        matrices.pushPose();
         matrices.scale(windowScaleFactor, windowScaleFactor, 1);
 
-        MinecraftClient mc = MinecraftClient.getInstance();
+        Minecraft mc = Minecraft.getInstance();
         GameRenderer gameRenderer = mc.gameRenderer;
-        DiffuseLighting lighting = gameRenderer.getDiffuseLighting();
-        RenderDispatcher renderDispatcher = gameRenderer.getEntityRenderDispatcher();
-        lighting.updateBuffer(DiffuseLighting.Type.LEVEL, DIFFUSE_LIGHT_0, DIFFUSE_LIGHT_1);
-        lighting.setShaderLights(DiffuseLighting.Type.LEVEL);
-        OrderedRenderCommandQueueImpl queue = renderDispatcher.getQueue();
+        Lighting lighting = gameRenderer.getLighting();
+        FeatureRenderDispatcher renderDispatcher = gameRenderer.getFeatureRenderDispatcher();
+        lighting.updateBuffer(Lighting.Entry.LEVEL, DIFFUSE_LIGHT_0, DIFFUSE_LIGHT_1);
+        lighting.setupFor(Lighting.Entry.LEVEL);
+        SubmitNodeStorage queue = renderDispatcher.getSubmitNodeStorage();
         renderScene(mc, renderState, matrices, queue);
-        renderDispatcher.render();
-        vertexConsumers.draw();
-        lighting.updateLevelBuffer(mc.world.getDimensionEffects().isDarkened());
-        matrices.pop();
+        renderDispatcher.renderAllFeatures();
+        bufferSource.endBatch();
+        lighting.updateLevel(mc.level.effects().constantAmbientLight());
+        matrices.popPose();
         texture.clear();
-        state.addSimpleElementToCurrentLayer(new TexturedQuadGuiElementRenderState(
+        state.submitBlitToCurrentLayer(new BlitRenderState(
             RenderPipelines.GUI_TEXTURED_PREMULTIPLIED_ALPHA,
-            TextureSetup.withoutGlTexture(texture.textureView()),
+            TextureSetup.singleTexture(texture.textureView()),
             renderState.pose(),
+            renderState.x0(),
+            renderState.y0(),
             renderState.x1(),
             renderState.y1(),
-            renderState.x2(),
-            renderState.y2(),
             0.0F,
             1.0F,
             1.0F,
@@ -90,7 +90,7 @@ public class SceneRenderer extends SpecialGuiElementRenderer<SceneRenderState> {
         ));
     }
 
-    private void renderScene(MinecraftClient mc, SceneRenderState state, MatrixStack poseStack, OrderedRenderCommandQueueImpl queue) {
+    private void renderScene(Minecraft mc, SceneRenderState state, PoseStack poseStack, SubmitNodeStorage queue) {
         float partialTicks = state.partialTicks();
         SuperRenderTypeBuffer buffer = DefaultSuperRenderTypeBuffer.getInstance();
         PonderScene scene = state.scene();
@@ -102,7 +102,7 @@ public class SceneRenderer extends SpecialGuiElementRenderer<SceneRenderState> {
 
         // kool shadow fx
         if (!scene.shouldHidePlatformShadow()) {
-            poseStack.push();
+            poseStack.pushPose();
             poseStack.translate(scene.getBasePlateOffsetX(), 0, scene.getBasePlateOffsetZ());
             UIRenderHelper.flipForGuiRender(poseStack);
 
@@ -115,13 +115,13 @@ public class SceneRenderer extends SpecialGuiElementRenderer<SceneRenderState> {
 
             for (int f = 0; f < 4; f++) {
                 poseStack.translate(scene.getBasePlateSize(), 0, 0);
-                poseStack.push();
+                poseStack.pushPose();
                 poseStack.translate(0, 0, -1 / 1024f);
                 if (flash > 0) {
-                    poseStack.push();
+                    poseStack.pushPose();
                     poseStack.scale(1, .5f + flash * .75f, 1);
                     fillGradient(
-                        vertexConsumers,
+                        bufferSource,
                         matrices,
                         0,
                         -1,
@@ -131,11 +131,11 @@ public class SceneRenderer extends SpecialGuiElementRenderer<SceneRenderState> {
                         new Color(0x00_c6ffc9).getRGB(),
                         new Color(0xaa_c6ffc9).scaleAlpha(alpha).getRGB()
                     );
-                    poseStack.pop();
+                    poseStack.popPose();
                 }
                 poseStack.translate(0, 0, 2 / 1024f);
                 fillGradient(
-                    vertexConsumers,
+                    bufferSource,
                     matrices,
                     0,
                     0,
@@ -145,12 +145,12 @@ public class SceneRenderer extends SpecialGuiElementRenderer<SceneRenderState> {
                     new Color(0x66_000000).getRGB(),
                     new Color(0x00_000000).getRGB()
                 );
-                poseStack.pop();
-                poseStack.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(-90));
+                poseStack.popPose();
+                poseStack.mulPose(Axis.YP.rotationDegrees(-90));
             }
-            poseStack.pop();
+            poseStack.popPose();
         }
-        vertexConsumers.draw();
+        bufferSource.endBatch();
         scene.renderScene(mc, buffer, queue, poseStack, partialTicks);
         buffer.draw();
 
@@ -207,8 +207,8 @@ public class SceneRenderer extends SpecialGuiElementRenderer<SceneRenderState> {
     }
 
     public static void fillGradient(
-        VertexConsumerProvider vertexConsumers,
-        MatrixStack matrices,
+        MultiBufferSource vertexConsumers,
+        PoseStack matrices,
         int x1,
         int y1,
         int x2,
@@ -218,24 +218,24 @@ public class SceneRenderer extends SpecialGuiElementRenderer<SceneRenderState> {
         int colorTo
     ) {
         VertexConsumer buffer = vertexConsumers.getBuffer(PonderRenderTypes.getGui());
-        Matrix4f matrix4f = matrices.peek().getPositionMatrix();
-        buffer.vertex(matrix4f, (float) x1, (float) y1, (float) z).color(colorFrom);
-        buffer.vertex(matrix4f, (float) x1, (float) y2, (float) z).color(colorTo);
-        buffer.vertex(matrix4f, (float) x2, (float) y2, (float) z).color(colorTo);
-        buffer.vertex(matrix4f, (float) x2, (float) y1, (float) z).color(colorFrom);
+        Matrix4f matrix4f = matrices.last().pose();
+        buffer.addVertex(matrix4f, (float) x1, (float) y1, (float) z).setColor(colorFrom);
+        buffer.addVertex(matrix4f, (float) x1, (float) y2, (float) z).setColor(colorTo);
+        buffer.addVertex(matrix4f, (float) x2, (float) y2, (float) z).setColor(colorTo);
+        buffer.addVertex(matrix4f, (float) x2, (float) y1, (float) z).setColor(colorFrom);
     }
 
     @Override
-    protected void render(SceneRenderState state, MatrixStack matrices) {
+    protected void renderToTexture(SceneRenderState state, PoseStack matrices) {
     }
 
     @Override
-    protected String getName() {
+    protected String getTextureLabel() {
         return "Scene";
     }
 
     @Override
-    public Class<SceneRenderState> getElementClass() {
+    public Class<SceneRenderState> getRenderStateClass() {
         return SceneRenderState.class;
     }
 }

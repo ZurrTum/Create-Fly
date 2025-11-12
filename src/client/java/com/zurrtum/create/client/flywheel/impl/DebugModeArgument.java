@@ -1,12 +1,12 @@
 package com.zurrtum.create.client.flywheel.impl;
 
 import com.zurrtum.create.client.flywheel.backend.engine.uniform.DebugMode;
-import net.minecraft.command.argument.EnumArgumentType;
-import net.minecraft.command.argument.serialize.ConstantArgumentSerializer;
+import net.minecraft.commands.arguments.StringRepresentableArgument;
+import net.minecraft.commands.synchronization.SingletonArgumentInfo;
 
-public class DebugModeArgument extends EnumArgumentType<DebugMode> {
+public class DebugModeArgument extends StringRepresentableArgument<DebugMode> {
     public static final DebugModeArgument INSTANCE = new DebugModeArgument();
-    public static final ConstantArgumentSerializer<DebugModeArgument> INFO = ConstantArgumentSerializer.of(() -> INSTANCE);
+    public static final SingletonArgumentInfo<DebugModeArgument> INFO = SingletonArgumentInfo.contextFree(() -> INSTANCE);
 
     public DebugModeArgument() {
         super(DebugMode.CODEC, DebugMode::values);

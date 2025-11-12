@@ -7,27 +7,27 @@ import com.zurrtum.create.content.logistics.stockTicker.StockTickerInteractionHa
 import com.zurrtum.create.content.logistics.tableCloth.ShoppingListItem;
 import com.zurrtum.create.content.logistics.tableCloth.TableClothBlockEntity;
 import com.zurrtum.create.infrastructure.component.ShoppingList;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.world.ClientWorld;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.hit.EntityHitResult;
-import net.minecraft.util.hit.HitResult;
-import net.minecraft.util.hit.HitResult.Type;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.GameMode;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.GameType;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.EntityHitResult;
+import net.minecraft.world.phys.HitResult;
+import net.minecraft.world.phys.HitResult.Type;
 
 public class TableClothOverlayRenderer {
-    public static void tick(MinecraftClient mc) {
-        if (mc.interactionManager.getCurrentGameMode() == GameMode.SPECTATOR)
+    public static void tick(Minecraft mc) {
+        if (mc.gameMode.getPlayerMode() == GameType.SPECTATOR)
             return;
-        HitResult mouseOver = mc.crosshairTarget;
+        HitResult mouseOver = mc.hitResult;
         if (mouseOver == null)
             return;
 
-        ItemStack heldItem = mc.player.getMainHandStack();
+        ItemStack heldItem = mc.player.getMainHandItem();
 
-        ClientWorld world = mc.world;
+        ClientLevel world = mc.level;
         if (mouseOver.getType() != Type.ENTITY) {
             if (!(mouseOver instanceof BlockHitResult bhr))
                 return;
@@ -35,7 +35,7 @@ public class TableClothOverlayRenderer {
                 return;
             if (!dcbe.isShop())
                 return;
-            if (heldItem.isOf(AllItems.CLIPBOARD))
+            if (heldItem.is(AllItems.CLIPBOARD))
                 return;
             TableClothFilteringBehaviour behaviour = (TableClothFilteringBehaviour) dcbe.getBehaviour(TableClothFilteringBehaviour.TYPE);
             if (behaviour.targetsPriceTag(mc.player, bhr))
@@ -44,14 +44,14 @@ public class TableClothOverlayRenderer {
             int alreadyPurchased = 0;
             ShoppingList list = ShoppingListItem.getList(heldItem);
             if (list != null)
-                alreadyPurchased = list.getPurchases(dcbe.getPos());
+                alreadyPurchased = list.getPurchases(dcbe.getBlockPos());
 
             BlueprintOverlayRenderer.displayClothShop(dcbe, alreadyPurchased, list);
             return;
         }
 
         EntityHitResult entityRay = (EntityHitResult) mouseOver;
-        if (!heldItem.isOf(AllItems.SHOPPING_LIST))
+        if (!heldItem.is(AllItems.SHOPPING_LIST))
             return;
 
         ShoppingList list = ShoppingListItem.getList(heldItem);

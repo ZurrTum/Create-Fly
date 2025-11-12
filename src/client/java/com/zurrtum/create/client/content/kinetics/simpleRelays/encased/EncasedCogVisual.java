@@ -12,9 +12,9 @@ import com.zurrtum.create.client.flywheel.lib.model.Models;
 import com.zurrtum.create.client.foundation.render.AllInstanceTypes;
 import com.zurrtum.create.content.kinetics.base.IRotate;
 import com.zurrtum.create.content.kinetics.base.KineticBlockEntity;
-import net.minecraft.block.Block;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Direction.AxisDirection;
+import net.minecraft.core.Direction;
+import net.minecraft.core.Direction.AxisDirection;
+import net.minecraft.world.level.block.Block;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Consumer;
@@ -51,7 +51,7 @@ public class EncasedCogVisual extends KineticBlockEntityVisual<KineticBlockEntit
         Block block = blockState.getBlock();
         if (block instanceof IRotate def) {
             for (Direction d : Iterate.directionsInAxis(rotationAxis())) {
-                if (!def.hasShaftTowards(blockEntity.getWorld(), blockEntity.getPos(), blockState, d))
+                if (!def.hasShaftTowards(blockEntity.getLevel(), blockEntity.getBlockPos(), blockState, d))
                     continue;
                 RotatingInstance instance = instancerProvider().instancer(AllInstanceTypes.ROTATING, Models.partial(AllPartialModels.SHAFT_HALF))
                     .createInstance();
@@ -61,7 +61,7 @@ public class EncasedCogVisual extends KineticBlockEntityVisual<KineticBlockEntit
                     instance.setRotationOffset(BracketedKineticBlockEntityRenderer.getShaftAngleOffset(rotationAxis(), pos));
                 }
 
-                if (d.getDirection() == AxisDirection.POSITIVE) {
+                if (d.getAxisDirection() == AxisDirection.POSITIVE) {
                     rotatingTopShaft = instance;
                 } else {
                     rotatingBottomShaft = instance;

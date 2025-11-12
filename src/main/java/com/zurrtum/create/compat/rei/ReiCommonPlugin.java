@@ -26,7 +26,7 @@ import me.shedaniel.rei.api.common.entry.comparison.FluidComparatorRegistry;
 import me.shedaniel.rei.api.common.plugins.REICommonPlugin;
 import me.shedaniel.rei.api.common.registry.display.ServerDisplayRegistry;
 import me.shedaniel.rei.plugin.common.displays.crafting.CraftingDisplay;
-import net.minecraft.recipe.*;
+import net.minecraft.world.item.crafting.*;
 
 import java.util.Objects;
 
@@ -87,26 +87,17 @@ public class ReiCommonPlugin implements REICommonPlugin {
 
     @Override
     public void registerDisplaySerializer(DisplaySerializerRegistry registry) {
+        registry.register(AUTOMATIC_PACKING.getIdentifier().withSuffix("/default/shapeless"), AutoCompactingDisplay.ShapelessDisplay.SERIALIZER);
+        registry.register(AUTOMATIC_PACKING.getIdentifier().withSuffix("/default/shaped"), AutoCompactingDisplay.ShapedDisplay.SERIALIZER);
+        registry.register(AUTOMATIC_PACKING.getIdentifier().withSuffix("/client/shaped"), AutoCompactingDisplay.CraftingDisplayShaped.SERIALIZER);
         registry.register(
-            AUTOMATIC_PACKING.getIdentifier().withSuffixedPath("/default/shapeless"),
-            AutoCompactingDisplay.ShapelessDisplay.SERIALIZER
-        );
-        registry.register(AUTOMATIC_PACKING.getIdentifier().withSuffixedPath("/default/shaped"), AutoCompactingDisplay.ShapedDisplay.SERIALIZER);
-        registry.register(
-            AUTOMATIC_PACKING.getIdentifier().withSuffixedPath("/client/shaped"),
-            AutoCompactingDisplay.CraftingDisplayShaped.SERIALIZER
-        );
-        registry.register(
-            AUTOMATIC_PACKING.getIdentifier().withSuffixedPath("/client/shapeless"),
+            AUTOMATIC_PACKING.getIdentifier().withSuffix("/client/shapeless"),
             AutoCompactingDisplay.CraftingDisplayShapeless.SERIALIZER
         );
         registry.register(PACKING.getIdentifier(), CompactingDisplay.SERIALIZER);
         registry.register(PRESSING.getIdentifier(), PressingDisplay.SERIALIZER);
-        registry.register(AUTOMATIC_SHAPELESS.getIdentifier().withSuffixedPath("/default/shapeless"), AutoMixingDisplay.ShapelessDisplay.SERIALIZER);
-        registry.register(
-            AUTOMATIC_SHAPELESS.getIdentifier().withSuffixedPath("/client/shapeless"),
-            AutoMixingDisplay.CraftingDisplayShapeless.SERIALIZER
-        );
+        registry.register(AUTOMATIC_SHAPELESS.getIdentifier().withSuffix("/default/shapeless"), AutoMixingDisplay.ShapelessDisplay.SERIALIZER);
+        registry.register(AUTOMATIC_SHAPELESS.getIdentifier().withSuffix("/client/shapeless"), AutoMixingDisplay.CraftingDisplayShapeless.SERIALIZER);
         registry.register(MIXING.getIdentifier(), MixingDisplay.SERIALIZER);
         registry.register(MILLING.getIdentifier(), MillingDisplay.SERIALIZER);
         registry.register(SAWING.getIdentifier(), SawingDisplay.SERIALIZER);

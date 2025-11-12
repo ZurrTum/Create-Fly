@@ -2,28 +2,27 @@ package com.zurrtum.create.infrastructure.packet.c2s;
 
 import com.zurrtum.create.AllHandle;
 import com.zurrtum.create.AllPackets;
-import net.minecraft.network.RegistryByteBuf;
-import net.minecraft.network.codec.PacketCodec;
-import net.minecraft.network.codec.PacketCodecs;
-import net.minecraft.network.packet.PacketType;
-import net.minecraft.server.network.ServerPlayNetworkHandler;
-import net.minecraft.util.math.BlockPos;
-
 import java.util.function.BiConsumer;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.PacketType;
+import net.minecraft.server.network.ServerGamePacketListenerImpl;
 
 public record ConfigureThresholdSwitchPacket(
     BlockPos pos, int offBelow, int onAbove, boolean invert, boolean inStacks
 ) implements C2SPacket {
-    public static final PacketCodec<RegistryByteBuf, ConfigureThresholdSwitchPacket> CODEC = PacketCodec.tuple(
-        BlockPos.PACKET_CODEC,
+    public static final StreamCodec<RegistryFriendlyByteBuf, ConfigureThresholdSwitchPacket> CODEC = StreamCodec.composite(
+        BlockPos.STREAM_CODEC,
         ConfigureThresholdSwitchPacket::pos,
-        PacketCodecs.INTEGER,
+        ByteBufCodecs.INT,
         ConfigureThresholdSwitchPacket::offBelow,
-        PacketCodecs.INTEGER,
+        ByteBufCodecs.INT,
         ConfigureThresholdSwitchPacket::onAbove,
-        PacketCodecs.BOOLEAN,
+        ByteBufCodecs.BOOL,
         ConfigureThresholdSwitchPacket::invert,
-        PacketCodecs.BOOLEAN,
+        ByteBufCodecs.BOOL,
         ConfigureThresholdSwitchPacket::inStacks,
         ConfigureThresholdSwitchPacket::new
     );
@@ -34,12 +33,12 @@ public record ConfigureThresholdSwitchPacket(
     }
 
     @Override
-    public PacketType<ConfigureThresholdSwitchPacket> getPacketType() {
+    public PacketType<ConfigureThresholdSwitchPacket> type() {
         return AllPackets.CONFIGURE_STOCKSWITCH;
     }
 
     @Override
-    public BiConsumer<ServerPlayNetworkHandler, ConfigureThresholdSwitchPacket> callback() {
+    public BiConsumer<ServerGamePacketListenerImpl, ConfigureThresholdSwitchPacket> callback() {
         return AllHandle::onConfigureThresholdSwitch;
     }
 }

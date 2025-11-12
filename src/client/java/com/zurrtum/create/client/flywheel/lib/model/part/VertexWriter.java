@@ -1,9 +1,9 @@
 package com.zurrtum.create.client.flywheel.lib.model.part;
 
+import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.zurrtum.create.client.flywheel.lib.math.DataPacker;
 import com.zurrtum.create.client.flywheel.lib.memory.MemoryBlock;
 import com.zurrtum.create.client.flywheel.lib.vertex.PosTexNormalVertexView;
-import net.minecraft.client.render.VertexConsumer;
 import org.lwjgl.system.MemoryUtil;
 
 public class VertexWriter implements VertexConsumer {
@@ -20,7 +20,7 @@ public class VertexWriter implements VertexConsumer {
     }
 
     @Override
-    public VertexConsumer vertex(float x, float y, float z) {
+    public VertexConsumer addVertex(float x, float y, float z) {
         endLastVertex();
         vertexCount++;
 
@@ -41,13 +41,13 @@ public class VertexWriter implements VertexConsumer {
     }
 
     @Override
-    public VertexConsumer color(int red, int green, int blue, int alpha) {
+    public VertexConsumer setColor(int red, int green, int blue, int alpha) {
         // ignore color
         return this;
     }
 
     @Override
-    public VertexConsumer texture(float u, float v) {
+    public VertexConsumer setUv(float u, float v) {
         if (!filledTexture) {
             long ptr = vertexPtr();
             MemoryUtil.memPutFloat(ptr + 12, u);
@@ -58,19 +58,19 @@ public class VertexWriter implements VertexConsumer {
     }
 
     @Override
-    public VertexConsumer overlay(int u, int v) {
+    public VertexConsumer setUv1(int u, int v) {
         // ignore overlay
         return this;
     }
 
     @Override
-    public VertexConsumer light(int u, int v) {
+    public VertexConsumer setUv2(int u, int v) {
         // ignore light
         return this;
     }
 
     @Override
-    public VertexConsumer normal(float x, float y, float z) {
+    public VertexConsumer setNormal(float x, float y, float z) {
         if (!filledNormal) {
             long ptr = vertexPtr();
             MemoryUtil.memPutByte(ptr + 20, DataPacker.packNormI8(x));

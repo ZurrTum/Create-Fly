@@ -1,18 +1,18 @@
 package com.zurrtum.create.content.trains.schedule.condition;
 
 import com.zurrtum.create.content.trains.entity.Train;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.util.Identifier;
-import net.minecraft.world.World;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.Level;
 
 public class ScheduledDelay extends TimedWaitCondition {
-    public ScheduledDelay(Identifier id) {
+    public ScheduledDelay(ResourceLocation id) {
         super(id);
     }
 
     @Override
-    public boolean tickCompletion(World level, Train train, NbtCompound context) {
-        int time = context.getInt("Time", 0);
+    public boolean tickCompletion(Level level, Train train, CompoundTag context) {
+        int time = context.getIntOr("Time", 0);
         if (time >= totalWaitTicks())
             return true;
 

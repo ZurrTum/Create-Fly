@@ -6,10 +6,10 @@ import com.zurrtum.create.client.catnip.render.SuperByteBuffer;
 import com.zurrtum.create.client.content.kinetics.base.KineticBlockEntityRenderer;
 import com.zurrtum.create.client.content.kinetics.base.KineticBlockEntityRenderer.KineticRenderState;
 import com.zurrtum.create.content.fluids.pump.PumpBlockEntity;
-import net.minecraft.client.render.block.entity.BlockEntityRendererFactory;
+import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 
 public class PumpRenderer extends KineticBlockEntityRenderer<PumpBlockEntity, KineticRenderState> {
-    public PumpRenderer(BlockEntityRendererFactory.Context context) {
+    public PumpRenderer(BlockEntityRendererProvider.Context context) {
         super(context);
     }
 

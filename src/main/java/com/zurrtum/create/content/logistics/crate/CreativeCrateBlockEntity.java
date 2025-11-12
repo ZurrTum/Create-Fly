@@ -3,10 +3,9 @@ package com.zurrtum.create.content.logistics.crate;
 import com.zurrtum.create.AllBlockEntityTypes;
 import com.zurrtum.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.foundation.blockEntity.behaviour.filtering.ServerFilteringBehaviour;
-import net.minecraft.block.BlockState;
-import net.minecraft.util.math.BlockPos;
-
 import java.util.List;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.block.state.BlockState;
 
 public class CreativeCrateBlockEntity extends CrateBlockEntity {
     ServerFilteringBehaviour filtering;
@@ -23,8 +22,8 @@ public class CreativeCrateBlockEntity extends CrateBlockEntity {
     }
 
     @Override
-    public void markDirty() {
-        super.markDirty();
-        inv.markDirty();
+    public void setChanged() {
+        super.setChanged();
+        inv.setChanged();
     }
 }

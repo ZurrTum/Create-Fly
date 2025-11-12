@@ -9,13 +9,13 @@ import com.zurrtum.create.content.decoration.steamWhistle.WhistleBlock;
 import com.zurrtum.create.content.decoration.steamWhistle.WhistleBlock.WhistleSize;
 import com.zurrtum.create.content.decoration.steamWhistle.WhistleBlockEntity;
 import com.zurrtum.create.content.fluids.tank.FluidTankBlockEntity;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Direction.Axis;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.World;
+import net.minecraft.client.Minecraft;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.Direction.Axis;
+import net.minecraft.util.Mth;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.Vec3;
 
 public class WhistleAudioBehaviour extends AudioBehaviour<WhistleBlockEntity> {
     protected WhistleSoundInstance soundInstance;
@@ -36,16 +36,16 @@ public class WhistleAudioBehaviour extends AudioBehaviour<WhistleBlockEntity> {
             return;
         }
 
-        World world = blockEntity.getWorld();
-        BlockPos pos = blockEntity.getPos();
+        Level world = blockEntity.getLevel();
+        BlockPos pos = blockEntity.getBlockPos();
         float f = (float) Math.pow(2, -blockEntity.pitch / 12.0);
-        boolean particle = world.getTime() % 8 == 0;
-        MinecraftClient mc = MinecraftClient.getInstance();
-        Vec3d eyePosition = mc.getCameraEntity().getEyePos();
-        float maxVolume = (float) MathHelper.clamp((64 - eyePosition.distanceTo(Vec3d.ofCenter(pos))) / 64, 0, 1);
+        boolean particle = world.getGameTime() % 8 == 0;
+        Minecraft mc = Minecraft.getInstance();
+        Vec3 eyePosition = mc.getCameraEntity().getEyePosition();
+        float maxVolume = (float) Mth.clamp((64 - eyePosition.distanceTo(Vec3.atCenterOf(pos))) / 64, 0, 1);
 
         WhistleSize size = blockEntity.getOctave();
-        if (soundInstance == null || soundInstance.isDone() || soundInstance.getOctave() != size) {
+        if (soundInstance == null || soundInstance.isStopped() || soundInstance.getOctave() != size) {
             mc.getSoundManager().play(soundInstance = new WhistleSoundInstance(size, pos));
             AllSoundEvents.WHISTLE_CHIFF.playAt(world, pos, maxVolume * .175f, size == WhistleBlock.WhistleSize.SMALL ? f + .75f : f, false);
             particle = true;
@@ -57,12 +57,12 @@ public class WhistleAudioBehaviour extends AudioBehaviour<WhistleBlockEntity> {
         if (!particle)
             return;
 
-        Direction facing = blockEntity.getCachedState().getOrEmpty(WhistleBlock.FACING).orElse(Direction.SOUTH);
+        Direction facing = blockEntity.getBlockState().getOptionalValue(WhistleBlock.FACING).orElse(Direction.SOUTH);
         float angle = 180 + AngleHelper.horizontalAngle(facing);
-        Vec3d sizeOffset = VecHelper.rotate(new Vec3d(0, -0.4f, 1 / 16f * size.ordinal()), angle, Axis.Y);
-        Vec3d offset = VecHelper.rotate(new Vec3d(0, 1, 0.75f), angle, Axis.Y);
-        Vec3d v = offset.multiply(.45f).add(sizeOffset).add(Vec3d.ofCenter(pos));
-        Vec3d m = offset.subtract(Vec3d.of(facing.getVector()).multiply(.75f));
-        world.addParticleClient(AllParticleTypes.STEAM_JET, v.x, v.y, v.z, m.x, m.y, m.z);
+        Vec3 sizeOffset = VecHelper.rotate(new Vec3(0, -0.4f, 1 / 16f * size.ordinal()), angle, Axis.Y);
+        Vec3 offset = VecHelper.rotate(new Vec3(0, 1, 0.75f), angle, Axis.Y);
+        Vec3 v = offset.scale(.45f).add(sizeOffset).add(Vec3.atCenterOf(pos));
+        Vec3 m = offset.subtract(Vec3.atLowerCornerOf(facing.getUnitVec3i()).scale(.75f));
+        world.addParticle(AllParticleTypes.STEAM_JET, v.x, v.y, v.z, m.x, m.y, m.z);
     }
 }

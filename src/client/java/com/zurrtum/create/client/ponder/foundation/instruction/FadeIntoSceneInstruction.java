@@ -4,8 +4,8 @@ import com.zurrtum.create.client.ponder.api.element.AnimatedSceneElement;
 import com.zurrtum.create.client.ponder.api.element.ElementLink;
 import com.zurrtum.create.client.ponder.foundation.PonderScene;
 import com.zurrtum.create.client.ponder.foundation.element.ElementLinkImpl;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.core.Direction;
+import net.minecraft.world.phys.Vec3;
 
 public abstract class FadeIntoSceneInstruction<T extends AnimatedSceneElement> extends TickingInstruction {
 
@@ -25,7 +25,7 @@ public abstract class FadeIntoSceneInstruction<T extends AnimatedSceneElement> e
         scene.addElement(element);
         element.setVisible(true);
         element.setFade(0);
-        element.setFadeVec(fadeInFrom == null ? Vec3d.ZERO : Vec3d.of(fadeInFrom.getVector()).multiply(.5f));
+        element.setFadeVec(fadeInFrom == null ? Vec3.ZERO : Vec3.atLowerCornerOf(fadeInFrom.getUnitVec3i()).scale(.5f));
         if (elementLink != null)
             scene.linkElement(element, elementLink);
     }

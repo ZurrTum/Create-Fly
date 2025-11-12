@@ -10,29 +10,28 @@ import com.zurrtum.create.client.foundation.gui.widget.IconButton;
 import com.zurrtum.create.client.foundation.utility.CreateLang;
 import com.zurrtum.create.content.equipment.zapper.ConfigureZapperPacket;
 import com.zurrtum.create.infrastructure.component.PlacementPatterns;
-import net.minecraft.block.Blocks;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.item.ItemStack;
-import net.minecraft.screen.ScreenTexts;
-import net.minecraft.text.Text;
-import net.minecraft.util.Hand;
-
 import java.util.ArrayList;
 import java.util.List;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.network.chat.CommonComponents;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.Blocks;
 
 public abstract class ZapperScreen extends AbstractSimiScreen {
 
-    protected final Text patternSection = CreateLang.translateDirect("gui.terrainzapper.patternSection");
+    protected final Component patternSection = CreateLang.translateDirect("gui.terrainzapper.patternSection");
 
     protected AllGuiTextures background;
     protected ItemStack zapper;
-    protected Hand hand;
+    protected InteractionHand hand;
 
     protected float animationProgress;
 
     protected ElementWidget renderedItem;
     protected ElementWidget renderedBlock;
-    protected Text title;
+    protected Component title;
     protected List<IconButton> patternButtons = new ArrayList<>(6);
     private IconButton confirmButton;
     protected int brightColor;
@@ -40,11 +39,11 @@ public abstract class ZapperScreen extends AbstractSimiScreen {
 
     protected PlacementPatterns currentPattern;
 
-    public ZapperScreen(AllGuiTextures background, ItemStack zapper, Hand hand) {
+    public ZapperScreen(AllGuiTextures background, ItemStack zapper, InteractionHand hand) {
         this.background = background;
         this.zapper = zapper;
         this.hand = hand;
-        title = ScreenTexts.EMPTY;
+        title = CommonComponents.EMPTY;
         brightColor = 0xFEFEFE;
         fontColor = AllGuiTextures.FONT_COLOR;
 
@@ -74,8 +73,8 @@ public abstract class ZapperScreen extends AbstractSimiScreen {
         int y = guiTop;
 
         confirmButton = new IconButton(x + background.getWidth() - 33, y + background.getHeight() - 24, AllIcons.I_CONFIRM);
-        confirmButton.withCallback(this::close);
-        addDrawableChild(confirmButton);
+        confirmButton.withCallback(this::onClose);
+        addRenderableWidget(confirmButton);
 
         patternButtons.clear();
         for (int row = 0; row <= 1; row++) {
@@ -99,23 +98,23 @@ public abstract class ZapperScreen extends AbstractSimiScreen {
 
         renderedItem = new ElementWidget(x + background.getWidth(), y + background.getHeight() - 48).showingElement(GuiGameElement.of(zapper)
             .scale(4));
-        addDrawableChild(renderedItem);
+        addRenderableWidget(renderedItem);
         renderedBlock = new ElementWidget(x + 17, y + 24).showingElement(GuiGameElement.of(zapper.getOrDefault(
             AllDataComponents.SHAPER_BLOCK_USED,
-            Blocks.AIR.getDefaultState()
+            Blocks.AIR.defaultBlockState()
         )).scale(1.25f).rotate(-25f, -45f, 0).padding(10));
-        addDrawableChild(renderedBlock);
+        addRenderableWidget(renderedBlock);
     }
 
     @Override
-    public void close() {
-        super.close();
+    public void onClose() {
+        super.onClose();
         renderedItem.getRenderElement().clear();
         renderedBlock.getRenderElement().clear();
     }
 
     @Override
-    protected void renderWindow(DrawContext graphics, int mouseX, int mouseY, float partialTicks) {
+    protected void renderWindow(GuiGraphics graphics, int mouseX, int mouseY, float partialTicks) {
         int x = guiLeft;
         int y = guiTop;
 
@@ -123,8 +122,8 @@ public abstract class ZapperScreen extends AbstractSimiScreen {
         drawOnBackground(graphics, x, y);
     }
 
-    protected void drawOnBackground(DrawContext graphics, int x, int y) {
-        graphics.drawText(textRenderer, title, x + (background.getWidth() - textRenderer.getWidth(title)) / 2, y + 4, 0xFF54214F, false);
+    protected void drawOnBackground(GuiGraphics graphics, int x, int y) {
+        graphics.drawString(font, title, x + (background.getWidth() - font.width(title)) / 2, y + 4, 0xFF54214F, false);
     }
 
     @Override
@@ -137,7 +136,7 @@ public abstract class ZapperScreen extends AbstractSimiScreen {
     public void removed() {
         ConfigureZapperPacket packet = getConfigurationPacket();
         packet.configureZapper(zapper);
-        client.player.networkHandler.sendPacket(packet);
+        minecraft.player.connection.send(packet);
     }
 
     protected abstract ConfigureZapperPacket getConfigurationPacket();

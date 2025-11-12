@@ -1,10 +1,10 @@
 package com.zurrtum.create.content.decoration.palettes;
 
-import net.minecraft.block.PaneBlock;
+import net.minecraft.world.level.block.IronBarsBlock;
 
-public class GlassPaneBlock extends PaneBlock {
+public class GlassPaneBlock extends IronBarsBlock {
 
-    public GlassPaneBlock(Settings builder) {
+    public GlassPaneBlock(Properties builder) {
         super(builder);
     }
 

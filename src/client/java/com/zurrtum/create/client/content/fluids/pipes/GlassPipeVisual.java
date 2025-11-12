@@ -20,20 +20,20 @@ import com.zurrtum.create.content.fluids.PipeConnection.Flow;
 import com.zurrtum.create.content.fluids.pipes.StraightPipeBlockEntity;
 import com.zurrtum.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.infrastructure.fluids.FluidStack;
-import net.minecraft.client.texture.Sprite;
-import net.minecraft.fluid.Fluid;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.MathHelper;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Consumer;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.core.Direction;
+import net.minecraft.util.Mth;
+import net.minecraft.world.level.material.Fluid;
 
 public class GlassPipeVisual extends AbstractBlockEntityVisual<StraightPipeBlockEntity> implements SimpleDynamicVisual {
 
     private int light;
 
-    private final SmartRecycler<Sprite, FluidInstance> stream;
-    private final SmartRecycler<Sprite, TransformedInstance> surface;
+    private final SmartRecycler<TextureAtlasSprite, FluidInstance> stream;
+    private final SmartRecycler<TextureAtlasSprite, TransformedInstance> surface;
 
     public GlassPipeVisual(VisualizationContext ctx, StraightPipeBlockEntity blockEntity, float partialTick) {
         super(ctx, blockEntity, partialTick);
@@ -75,7 +75,7 @@ public class GlassPipeVisual extends AbstractBlockEntityVisual<StraightPipeBlock
                     if (opposite == null)
                         progress -= 1e-6f;
                 } else {
-                    FluidTransportBehaviour adjacent = BlockEntityBehaviour.get(level, pos.offset(side), FluidTransportBehaviour.TYPE);
+                    FluidTransportBehaviour adjacent = BlockEntityBehaviour.get(level, pos.relative(side), FluidTransportBehaviour.TYPE);
                     if (adjacent == null)
                         progress -= 1e-6f;
                     else {
@@ -91,18 +91,18 @@ public class GlassPipeVisual extends AbstractBlockEntityVisual<StraightPipeBlock
             if (config == null) {
                 continue;
             }
-            Sprite flowTexture = config.flowing().get();
+            TextureAtlasSprite flowTexture = config.flowing().get();
 
             int color = config.tint().apply(fluidStack.getComponentChanges()) | 0xff000000;
             int blockLightIn = (light >> 4) & 0xF;
-            int luminosity = Math.max(blockLightIn, fluid.getDefaultState().getBlockState().getLuminance());
+            int luminosity = Math.max(blockLightIn, fluid.defaultFluidState().createLegacyBlock().getLightEmission());
             int light = (this.light & 0xF00000) | luminosity << 4;
 
             if (inbound)
                 side = side.getOpposite();
 
             var yStart = (inbound ? 0 : .5f);
-            var progressOffset = MathHelper.clamp(progress * .5f, 0, 1);
+            var progressOffset = Mth.clamp(progress * .5f, 0, 1);
 
             var fluidInstance = stream.get(flowTexture);
 
@@ -112,14 +112,14 @@ public class GlassPipeVisual extends AbstractBlockEntityVisual<StraightPipeBlock
             fluidInstance.light(light).colorArgb(color);
 
 
-            fluidInstance.vScale = (flowTexture.getMaxV() - flowTexture.getMinV()) * 0.5f;
-            fluidInstance.v0 = flowTexture.getMinV() + yStart * fluidInstance.vScale;
+            fluidInstance.vScale = (flowTexture.getV1() - flowTexture.getV0()) * 0.5f;
+            fluidInstance.v0 = flowTexture.getV0() + yStart * fluidInstance.vScale;
             fluidInstance.progress = progressOffset;
 
             fluidInstance.setChanged();
 
             if (progress != 1) {
-                Sprite stillTexture = config.still().get();
+                TextureAtlasSprite stillTexture = config.still().get();
                 surface.get(stillTexture).setIdentityTransform().translate(getVisualPosition()).center().rotateTo(Direction.UP, side)
                     .translate(0, -Translate.CENTER + yStart + progressOffset, 0).light(light).colorArgb(color).setChanged();
             }

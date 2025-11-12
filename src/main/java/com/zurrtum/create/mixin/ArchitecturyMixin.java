@@ -1,10 +1,10 @@
 package com.zurrtum.create.mixin;
 
 import dev.architectury.fluid.fabric.FluidStackImpl;
-import net.minecraft.component.ComponentChanges;
-import net.minecraft.component.MergedComponentMap;
-import net.minecraft.fluid.Fluid;
-import net.minecraft.fluid.Fluids;
+import net.minecraft.core.component.DataComponentPatch;
+import net.minecraft.core.component.PatchedDataComponentMap;
+import net.minecraft.world.level.material.Fluid;
+import net.minecraft.world.level.material.Fluids;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -21,10 +21,10 @@ public class ArchitecturyMixin {
     public Fluid fluid;
 
     @Shadow
-    public MergedComponentMap components;
+    public PatchedDataComponentMap components;
 
-    @Inject(method = "getPatch()Lnet/minecraft/component/ComponentChanges;", at = @At("HEAD"), cancellable = true)
-    private void getPatch(CallbackInfoReturnable<ComponentChanges> cir) {
-        cir.setReturnValue(amount <= 0L || fluid == Fluids.EMPTY ? ComponentChanges.EMPTY : components.getChanges());
+    @Inject(method = "getPatch()Lnet/minecraft/core/component/DataComponentPatch;", at = @At("HEAD"), cancellable = true)
+    private void getPatch(CallbackInfoReturnable<DataComponentPatch> cir) {
+        cir.setReturnValue(amount <= 0L || fluid == Fluids.EMPTY ? DataComponentPatch.EMPTY : components.asPatch());
     }
 }

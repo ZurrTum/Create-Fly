@@ -1,57 +1,57 @@
 package com.zurrtum.create.content.decoration;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemPlacementContext;
-import net.minecraft.item.ScaffoldingItem;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.world.World;
+import net.minecraft.ChatFormatting;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ScaffoldingBlockItem;
+import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.Nullable;
 
-public class MetalScaffoldingBlockItem extends ScaffoldingItem {
+public class MetalScaffoldingBlockItem extends ScaffoldingBlockItem {
 
-    public MetalScaffoldingBlockItem(Block pBlock, Settings pProperties) {
+    public MetalScaffoldingBlockItem(Block pBlock, Properties pProperties) {
         super(pBlock, pProperties);
     }
 
     @Nullable
     @Override
-    public ItemPlacementContext getPlacementContext(ItemPlacementContext pContext) { // TODO replace with placement helper
-        BlockPos blockpos = pContext.getBlockPos();
-        World level = pContext.getWorld();
+    public BlockPlaceContext updatePlacementContext(BlockPlaceContext pContext) { // TODO replace with placement helper
+        BlockPos blockpos = pContext.getClickedPos();
+        Level level = pContext.getLevel();
         BlockState blockstate = level.getBlockState(blockpos);
         Block block = this.getBlock();
-        if (!blockstate.isOf(block))
+        if (!blockstate.is(block))
             return pContext;
 
         Direction direction;
-        if (pContext.shouldCancelInteraction()) {
-            direction = pContext.hitsInsideBlock() ? pContext.getSide().getOpposite() : pContext.getSide();
+        if (pContext.isSecondaryUseActive()) {
+            direction = pContext.isInside() ? pContext.getClickedFace().getOpposite() : pContext.getClickedFace();
         } else {
-            direction = pContext.getSide() == Direction.UP ? pContext.getHorizontalPlayerFacing() : Direction.UP;
+            direction = pContext.getClickedFace() == Direction.UP ? pContext.getHorizontalDirection() : Direction.UP;
         }
 
         int i = 0;
-        BlockPos.Mutable blockpos$mutableblockpos = blockpos.mutableCopy().move(direction);
+        BlockPos.MutableBlockPos blockpos$mutableblockpos = blockpos.mutable().move(direction);
 
         while (i < 7) {
-            if (!level.isClient() && !level.isInBuildLimit(blockpos$mutableblockpos)) {
-                PlayerEntity player = pContext.getPlayer();
-                int j = level.getTopYInclusive();
-                if (player instanceof ServerPlayerEntity sp && blockpos$mutableblockpos.getY() > j)
-                    sp.sendMessageToClient(Text.translatable("build.tooHigh", j).formatted(Formatting.RED), true);
+            if (!level.isClientSide() && !level.isInWorldBounds(blockpos$mutableblockpos)) {
+                Player player = pContext.getPlayer();
+                int j = level.getMaxY();
+                if (player instanceof ServerPlayer sp && blockpos$mutableblockpos.getY() > j)
+                    sp.sendSystemMessage(Component.translatable("build.tooHigh", j).withStyle(ChatFormatting.RED), true);
                 break;
             }
 
             blockstate = level.getBlockState(blockpos$mutableblockpos);
-            if (!blockstate.isOf(this.getBlock())) {
-                if (blockstate.canReplace(pContext)) {
-                    return ItemPlacementContext.offset(pContext, blockpos$mutableblockpos, direction);
+            if (!blockstate.is(this.getBlock())) {
+                if (blockstate.canBeReplaced(pContext)) {
+                    return BlockPlaceContext.at(pContext, blockpos$mutableblockpos, direction);
                 }
                 break;
             }

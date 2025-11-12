@@ -4,26 +4,25 @@ import com.google.common.base.Strings;
 import com.zurrtum.create.catnip.data.Couple;
 import com.zurrtum.create.client.catnip.lang.FontHelper;
 import com.zurrtum.create.client.foundation.utility.CreateLang;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.font.TextRenderer;
-import net.minecraft.text.MutableText;
-import net.minecraft.text.Style;
-import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
-
 import java.text.BreakIterator;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
+import net.minecraft.ChatFormatting;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.Font;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.network.chat.Style;
 
 public class TooltipHelper {
 
     public static final int MAX_WIDTH_PER_LINE = 200;
 
-    public static MutableText holdShift(FontHelper.Palette palette, boolean highlighted) {
-        return CreateLang.translateDirect("tooltip.holdForDescription", CreateLang.translateDirect("tooltip.keyShift").formatted(Formatting.GRAY))
-            .formatted(Formatting.DARK_GRAY);
+    public static MutableComponent holdShift(FontHelper.Palette palette, boolean highlighted) {
+        return CreateLang.translateDirect("tooltip.holdForDescription", CreateLang.translateDirect("tooltip.keyShift").withStyle(ChatFormatting.GRAY))
+            .withStyle(ChatFormatting.DARK_GRAY);
     }
 
     public static String makeProgressBar(int length, int filledLength) {
@@ -36,48 +35,48 @@ public class TooltipHelper {
         return bar + " ";
     }
 
-    public static Style styleFromColor(Formatting color) {
-        return Style.EMPTY.withFormatting(color);
+    public static Style styleFromColor(ChatFormatting color) {
+        return Style.EMPTY.applyFormat(color);
     }
 
     public static Style styleFromColor(int hex) {
         return Style.EMPTY.withColor(hex);
     }
 
-    public static void addHint(List<Text> tooltip, String hintKey, Object... messageParams) {
-        CreateLang.translate(hintKey + ".title").style(Formatting.GOLD).forGoggles(tooltip);
-        Text hint = CreateLang.translateDirect(hintKey);
-        List<Text> cutComponent = cutTextComponent(hint, FontHelper.Palette.GRAY_AND_WHITE);
-        for (Text component : cutComponent)
+    public static void addHint(List<Component> tooltip, String hintKey, Object... messageParams) {
+        CreateLang.translate(hintKey + ".title").style(ChatFormatting.GOLD).forGoggles(tooltip);
+        Component hint = CreateLang.translateDirect(hintKey);
+        List<Component> cutComponent = cutTextComponent(hint, FontHelper.Palette.GRAY_AND_WHITE);
+        for (Component component : cutComponent)
             CreateLang.builder().add(component).forGoggles(tooltip);
     }
 
-    public static List<Text> cutStringTextComponent(String s, FontHelper.Palette palette) {
-        return cutTextComponent(Text.literal(s), palette);
+    public static List<Component> cutStringTextComponent(String s, FontHelper.Palette palette) {
+        return cutTextComponent(Component.literal(s), palette);
     }
 
-    public static List<Text> cutTextComponent(Text c, FontHelper.Palette palette) {
+    public static List<Component> cutTextComponent(Component c, FontHelper.Palette palette) {
         return cutTextComponent(c, palette.primary(), palette.highlight());
     }
 
-    public static List<Text> cutStringTextComponent(String s, Style primaryStyle, Style highlightStyle) {
-        return cutTextComponent(Text.literal(s), primaryStyle, highlightStyle);
+    public static List<Component> cutStringTextComponent(String s, Style primaryStyle, Style highlightStyle) {
+        return cutTextComponent(Component.literal(s), primaryStyle, highlightStyle);
     }
 
-    public static List<Text> cutTextComponent(Text c, Style primaryStyle, Style highlightStyle) {
+    public static List<Component> cutTextComponent(Component c, Style primaryStyle, Style highlightStyle) {
         return cutTextComponent(c, primaryStyle, highlightStyle, 0);
     }
 
-    public static List<Text> cutStringTextComponent(String c, Style primaryStyle, Style highlightStyle, int indent) {
-        return cutTextComponent(Text.literal(c), primaryStyle, highlightStyle, indent);
+    public static List<Component> cutStringTextComponent(String c, Style primaryStyle, Style highlightStyle, int indent) {
+        return cutTextComponent(Component.literal(c), primaryStyle, highlightStyle, indent);
     }
 
-    public static List<Text> cutTextComponent(Text c, Style primaryStyle, Style highlightStyle, int indent) {
+    public static List<Component> cutTextComponent(Component c, Style primaryStyle, Style highlightStyle, int indent) {
         String s = c.getString();
 
         // Split words
         List<String> words = new LinkedList<>();
-        String selected = MinecraftClient.getInstance().getLanguageManager().getLanguage();
+        String selected = Minecraft.getInstance().getLanguageManager().getSelected();
         String[] langSplit = selected.split("_", 2);
         Locale javaLocale = langSplit.length == 1 ? Locale.of(langSplit[0]) : Locale.of(langSplit[0], langSplit[1]);
         BreakIterator iterator = BreakIterator.getLineInstance(javaLocale);
@@ -89,12 +88,12 @@ public class TooltipHelper {
         }
 
         // Apply hard wrap
-        TextRenderer font = MinecraftClient.getInstance().textRenderer;
+        Font font = Minecraft.getInstance().font;
         List<String> lines = new LinkedList<>();
         StringBuilder currentLine = new StringBuilder();
         int width = 0;
         for (String word : words) {
-            int newWidth = font.getWidth(word.replaceAll("_", ""));
+            int newWidth = font.width(word.replaceAll("_", ""));
             if (width + newWidth > MAX_WIDTH_PER_LINE) {
                 if (width > 0) {
                     String line = currentLine.toString();
@@ -114,17 +113,17 @@ public class TooltipHelper {
         }
 
         // Format
-        MutableText lineStart = Text.literal(Strings.repeat(" ", indent));
-        lineStart.fillStyle(primaryStyle);
-        List<Text> formattedLines = new ArrayList<>(lines.size());
+        MutableComponent lineStart = Component.literal(Strings.repeat(" ", indent));
+        lineStart.withStyle(primaryStyle);
+        List<Component> formattedLines = new ArrayList<>(lines.size());
         Couple<Style> styles = Couple.create(highlightStyle, primaryStyle);
 
         boolean currentlyHighlighted = false;
         for (String string : lines) {
-            MutableText currentComponent = lineStart.copyContentOnly();
+            MutableComponent currentComponent = lineStart.plainCopy();
             String[] split = string.split("_", -1);
             for (String part : split) {
-                currentComponent.append(Text.literal(part).fillStyle(styles.get(currentlyHighlighted)));
+                currentComponent.append(Component.literal(part).withStyle(styles.get(currentlyHighlighted)));
                 currentlyHighlighted = !currentlyHighlighted;
             }
 

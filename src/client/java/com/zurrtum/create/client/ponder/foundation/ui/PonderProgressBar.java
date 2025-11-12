@@ -7,12 +7,12 @@ import com.zurrtum.create.client.catnip.gui.UIRenderHelper;
 import com.zurrtum.create.client.catnip.gui.element.BoxElement;
 import com.zurrtum.create.client.catnip.gui.widget.AbstractSimiWidget;
 import com.zurrtum.create.client.ponder.foundation.PonderScene;
-import net.minecraft.client.font.TextRenderer;
-import net.minecraft.client.gui.Click;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.sound.SoundManager;
-import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
+import net.minecraft.ChatFormatting;
+import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.input.MouseButtonEvent;
+import net.minecraft.client.sounds.SoundManager;
+import net.minecraft.network.chat.Component;
 import org.joml.Matrix3x2fStack;
 
 public class PonderProgressBar extends AbstractSimiWidget {
@@ -47,7 +47,7 @@ public class PonderProgressBar extends AbstractSimiWidget {
     }
 
     @Override
-    public void onClick(Click click, boolean doubled) {
+    public void onClick(MouseButtonEvent click, boolean doubled) {
         PonderScene activeScene = ponder.getActiveScene();
 
         int keyframeIndex = getHoveredKeyframeIndex(activeScene, click.x());
@@ -90,10 +90,10 @@ public class PonderProgressBar extends AbstractSimiWidget {
     }
 
     @Override
-    public void doRender(DrawContext graphics, int mouseX, int mouseY, float partialTicks) {
-        Matrix3x2fStack poseStack = graphics.getMatrices();
+    public void doRender(GuiGraphics graphics, int mouseX, int mouseY, float partialTicks) {
+        Matrix3x2fStack poseStack = graphics.pose();
 
-        hovered = isMouseOver(mouseX, mouseY);
+        isHovered = isMouseOver(mouseX, mouseY);
 
         new BoxElement().withBackground(PonderUI.BACKGROUND_FLAT).gradientBorder(PonderUI.COLOR_IDLE).at(getX(), getY(), 400)
             .withBounds(width, height).render(graphics);
@@ -114,14 +114,14 @@ public class PonderProgressBar extends AbstractSimiWidget {
         poseStack.popMatrix();
     }
 
-    private void renderKeyframes(DrawContext graphics, int mouseX, float partialTicks) {
+    private void renderKeyframes(GuiGraphics graphics, int mouseX, float partialTicks) {
         PonderScene activeScene = ponder.getActiveScene();
 
         Couple<Color> hover = PonderUI.COLOR_HOVER.map(c -> c.setAlpha(0xe0));
         Couple<Color> idle = PonderUI.COLOR_HOVER.map(c -> c.setAlpha(0x70));
         int hoverIndex;
 
-        if (hovered) {
+        if (isHovered) {
             hoverIndex = getHoveredKeyframeIndex(activeScene, mouseX);
         } else {
             hoverIndex = -2;
@@ -146,7 +146,7 @@ public class PonderProgressBar extends AbstractSimiWidget {
     }
 
     private void drawKeyframe(
-        DrawContext graphics,
+        GuiGraphics graphics,
         PonderScene activeScene,
         boolean selected,
         int keyframeTime,
@@ -156,18 +156,18 @@ public class PonderProgressBar extends AbstractSimiWidget {
         int height
     ) {
         if (selected) {
-            TextRenderer font = graphics.client.textRenderer;
+            Font font = graphics.minecraft.font;
             UIRenderHelper.drawGradientRect(graphics, ((float) keyframePos), 9f, keyframePos + 2f, 9f + height, endColor, startColor);
             String text;
             int offset;
             if (activeScene.getCurrentTime() < keyframeTime) {
                 text = ">";
-                offset = -2 - font.getWidth(text);
+                offset = -2 - font.width(text);
             } else {
                 text = "<";
                 offset = 4;
             }
-            graphics.drawText(font, Text.literal(text).formatted(Formatting.BOLD), keyframePos + offset, 10, endColor.getRGB(), false);
+            graphics.drawString(font, Component.literal(text).withStyle(ChatFormatting.BOLD), keyframePos + offset, 10, endColor.getRGB(), false);
         }
 
         UIRenderHelper.drawGradientRect(graphics, ((float) keyframePos), 0f, keyframePos + 2f, 1f + height, startColor, endColor);

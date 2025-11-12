@@ -10,11 +10,11 @@ import com.zurrtum.create.content.trains.signal.SignalEdgeGroup;
 import com.zurrtum.create.infrastructure.packet.s2c.AddTrainPacket;
 import com.zurrtum.create.infrastructure.packet.s2c.RemoveTrainPacket;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.PlayerManager;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.world.World;
-import net.minecraft.world.WorldAccess;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.server.players.PlayerList;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelAccessor;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
@@ -37,13 +37,13 @@ public class GlobalRailwayManager {
         cleanUp();
     }
 
-    public void playerLogin(MinecraftServer server, ServerPlayerEntity player) {
+    public void playerLogin(MinecraftServer server, ServerPlayer player) {
         loadTrackData(server);
         trackNetworks.values().forEach(g -> sync.sendFullGraphTo(g, player));
         ArrayList<SignalEdgeGroup> asList = new ArrayList<>(signalEdgeGroups.values());
         sync.sendEdgeGroups(asList.stream().map(g -> g.id).toList(), asList.stream().map(g -> g.color).toList(), player);
         for (Train train : trains.values())
-            player.networkHandler.sendPacket(new AddTrainPacket(train));
+            player.connection.send(new AddTrainPacket(train));
     }
 
     public void levelLoaded(MinecraftServer server) {
@@ -74,7 +74,7 @@ public class GlobalRailwayManager {
 
     public void markTracksDirty() {
         if (savedData != null)
-            savedData.markDirty();
+            savedData.setDirty();
     }
 
     public void addTrain(Train train) {
@@ -125,7 +125,7 @@ public class GlobalRailwayManager {
         markTracksDirty();
     }
 
-    public void updateSplitGraph(WorldAccess level, TrackGraph graph) {
+    public void updateSplitGraph(LevelAccessor level, TrackGraph graph) {
         Set<TrackGraph> disconnected = graph.findDisconnectedGraphs(level, null);
         MinecraftServer server = level.getServer();
         disconnected.forEach(trackGraph -> putGraphWithDefaultGroup(server, trackGraph));
@@ -155,8 +155,8 @@ public class GlobalRailwayManager {
         return intersecting;
     }
 
-    public void tick(ServerWorld level) {
-        if (level.getRegistryKey() != World.OVERWORLD)
+    public void tick(ServerLevel level) {
+        if (level.dimension() != Level.OVERWORLD)
             return;
 
         signalEdgeGroups.forEach((id, group) -> {
@@ -174,7 +174,7 @@ public class GlobalRailwayManager {
 
         trackNetworks.forEach((id, graph) -> graph.tickPoints(server, false));
 
-        GlobalTrainDisplayData.updateTick = level.getTime() % 100 == 0;
+        GlobalTrainDisplayData.updateTick = level.getGameTime() % 100 == 0;
         if (GlobalTrainDisplayData.updateTick)
             GlobalTrainDisplayData.refresh();
 
@@ -186,7 +186,7 @@ public class GlobalRailwayManager {
         //				TrackGraphVisualizer.debugViewNodes(trackGraph);
     }
 
-    private void tickTrains(World level) {
+    private void tickTrains(Level level) {
         // keeping two lists ensures a tick order starting at longest waiting
         for (Train train : waitingTrains)
             train.earlyTick(level);
@@ -197,14 +197,14 @@ public class GlobalRailwayManager {
         for (Train train : movingTrains)
             train.tick(level);
 
-        PlayerManager playerManager = level.getServer().getPlayerManager();
+        PlayerList playerManager = level.getServer().getPlayerList();
         for (Iterator<Train> iterator = waitingTrains.iterator(); iterator.hasNext(); ) {
             Train train = iterator.next();
 
             if (train.invalid) {
                 iterator.remove();
                 trains.remove(train.id);
-                playerManager.sendToAll(new RemoveTrainPacket(train));
+                playerManager.broadcastAll(new RemoveTrainPacket(train));
                 continue;
             }
 
@@ -220,7 +220,7 @@ public class GlobalRailwayManager {
             if (train.invalid) {
                 iterator.remove();
                 trains.remove(train.id);
-                playerManager.sendToAll(new RemoveTrainPacket(train));
+                playerManager.broadcastAll(new RemoveTrainPacket(train));
                 continue;
             }
 
@@ -232,8 +232,8 @@ public class GlobalRailwayManager {
 
     }
 
-    public GlobalRailwayManager sided(WorldAccess level) {
-        if (level != null && !level.isClient())
+    public GlobalRailwayManager sided(LevelAccessor level) {
+        if (level != null && !level.isClientSide())
             return this;
         return AllClientHandle.INSTANCE.getGlobalRailwayManager();
     }

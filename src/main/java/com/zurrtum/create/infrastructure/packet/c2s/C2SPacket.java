@@ -1,22 +1,22 @@
 package com.zurrtum.create.infrastructure.packet.c2s;
 
-import net.minecraft.network.NetworkThreadUtils;
-import net.minecraft.network.listener.ServerPlayPacketListener;
-import net.minecraft.network.packet.Packet;
-import net.minecraft.server.network.ServerPlayNetworkHandler;
+import net.minecraft.network.protocol.Packet;
+import net.minecraft.network.protocol.PacketUtils;
+import net.minecraft.network.protocol.game.ServerGamePacketListener;
+import net.minecraft.server.network.ServerGamePacketListenerImpl;
 
 import java.util.function.BiConsumer;
 
-public interface C2SPacket extends Packet<ServerPlayPacketListener> {
+public interface C2SPacket extends Packet<ServerGamePacketListener> {
     @Override
-    default void apply(ServerPlayPacketListener listener) {
+    default void handle(ServerGamePacketListener listener) {
         if (runInMain()) {
-            NetworkThreadUtils.forceMainThread(this, listener, ((ServerPlayNetworkHandler) listener).player.getEntityWorld());
+            PacketUtils.ensureRunningOnSameThread(this, listener, ((ServerGamePacketListenerImpl) listener).player.level());
         }
-        callback().accept((ServerPlayNetworkHandler) listener, cast());
+        callback().accept((ServerGamePacketListenerImpl) listener, cast());
     }
 
-    BiConsumer<ServerPlayNetworkHandler, ? extends C2SPacket> callback();
+    BiConsumer<ServerGamePacketListenerImpl, ? extends C2SPacket> callback();
 
     default boolean runInMain() {
         return false;

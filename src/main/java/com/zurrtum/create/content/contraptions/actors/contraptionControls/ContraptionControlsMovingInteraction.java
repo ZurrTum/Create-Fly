@@ -14,23 +14,23 @@ import com.zurrtum.create.content.trains.entity.CarriageContraptionEntity;
 import com.zurrtum.create.content.trains.entity.Train;
 import com.zurrtum.create.infrastructure.packet.c2s.ElevatorTargetFloorPacket;
 import com.zurrtum.create.infrastructure.packet.s2c.ContraptionDisableActorPacket;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.registry.tag.ItemTags;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.structure.StructureTemplate.StructureBlockInfo;
-import net.minecraft.util.Hand;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.World;
 import org.apache.commons.lang3.tuple.MutablePair;
 
 import java.util.Iterator;
 import java.util.List;
+import net.minecraft.core.BlockPos;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.tags.ItemTags;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate.StructureBlockInfo;
+import net.minecraft.world.phys.Vec3;
 
 public class ContraptionControlsMovingInteraction extends MovingInteractionBehaviour {
     @Override
-    public boolean handlePlayerInteraction(PlayerEntity player, Hand activeHand, BlockPos localPos, AbstractContraptionEntity contraptionEntity) {
+    public boolean handlePlayerInteraction(Player player, InteractionHand activeHand, BlockPos localPos, AbstractContraptionEntity contraptionEntity) {
         Contraption contraption = contraptionEntity.getContraption();
 
         MutablePair<StructureBlockInfo, MovementContext> actor = contraption.getActorAt(localPos);
@@ -41,7 +41,7 @@ public class ContraptionControlsMovingInteraction extends MovingInteractionBehav
             return false;
         if (contraption instanceof ElevatorContraption ec)
             return elevatorInteraction(player, localPos, contraptionEntity, ec, ctx);
-        if (contraptionEntity.getEntityWorld().isClient()) {
+        if (contraptionEntity.level().isClientSide()) {
             if (AllClientHandle.INSTANCE.getBlockEntityClientSide(contraption, ctx.localPos) instanceof ContraptionControlsBlockEntity cbe)
                 cbe.pressButton();
             return true;
@@ -96,16 +96,16 @@ public class ContraptionControlsMovingInteraction extends MovingInteractionBehav
         send(contraptionEntity, filter, disable);
 
         AllSoundEvents.CONTROLLER_CLICK.play(
-            player.getEntityWorld(),
+            player.level(),
             null,
-            BlockPos.ofFloored(contraptionEntity.toGlobalVector(Vec3d.ofCenter(localPos), 1)),
+            BlockPos.containing(contraptionEntity.toGlobalVector(Vec3.atCenterOf(localPos), 1)),
             1,
             disable ? 0.8f : 1.5f
         );
 
         if (!(contraptionEntity instanceof CarriageContraptionEntity cce))
             return true;
-        if (!filter.isIn(ItemTags.DOORS))
+        if (!filter.is(ItemTags.DOORS))
             return true;
 
         // Special case: Doors are toggled on all carriages of a train
@@ -125,21 +125,21 @@ public class ContraptionControlsMovingInteraction extends MovingInteractionBehav
     }
 
     private void send(AbstractContraptionEntity contraptionEntity, ItemStack filter, boolean disable) {
-        ServerWorld world = (ServerWorld) contraptionEntity.getEntityWorld();
-        world.getChunkManager()
-            .sendToOtherNearbyPlayers(contraptionEntity, new ContraptionDisableActorPacket(contraptionEntity.getId(), filter, !disable));
+        ServerLevel world = (ServerLevel) contraptionEntity.level();
+        world.getChunkSource()
+            .sendToTrackingPlayers(contraptionEntity, new ContraptionDisableActorPacket(contraptionEntity.getId(), filter, !disable));
     }
 
     private boolean elevatorInteraction(
-        PlayerEntity player,
+        Player player,
         BlockPos localPos,
         AbstractContraptionEntity contraptionEntity,
         ElevatorContraption contraption,
         MovementContext ctx
     ) {
-        World level = contraptionEntity.getEntityWorld();
-        if (!level.isClient()) {
-            BlockPos pos = BlockPos.ofFloored(contraptionEntity.toGlobalVector(Vec3d.ofCenter(localPos), 1));
+        Level level = contraptionEntity.level();
+        if (!level.isClientSide()) {
+            BlockPos pos = BlockPos.containing(contraptionEntity.toGlobalVector(Vec3.atCenterOf(localPos), 1));
             AllSoundEvents.CONTROLLER_CLICK.play(level, null, pos, 1, 1.5f);
             AllSoundEvents.CONTRAPTION_ASSEMBLE.play(level, null, pos, 0.75f, 0.8f);
             return true;

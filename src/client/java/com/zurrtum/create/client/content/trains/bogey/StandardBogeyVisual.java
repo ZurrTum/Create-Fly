@@ -1,5 +1,6 @@
 package com.zurrtum.create.client.content.trains.bogey;
 
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.zurrtum.create.catnip.math.AngleHelper;
 import com.zurrtum.create.client.AllPartialModels;
 import com.zurrtum.create.client.AllSpriteShifts;
@@ -11,13 +12,12 @@ import com.zurrtum.create.client.flywheel.lib.instance.TransformedInstance;
 import com.zurrtum.create.client.flywheel.lib.model.Models;
 import com.zurrtum.create.client.foundation.render.AllInstanceTypes;
 import com.zurrtum.create.client.foundation.render.SpecialModels;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.MathHelper;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Consumer;
+import net.minecraft.core.Direction;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.util.Mth;
 
 public class StandardBogeyVisual implements BogeyVisual {
     private final TransformedInstance shaft1;
@@ -31,7 +31,7 @@ public class StandardBogeyVisual implements BogeyVisual {
     }
 
     @Override
-    public void update(NbtCompound bogeyData, float wheelAngle, MatrixStack poseStack) {
+    public void update(CompoundTag bogeyData, float wheelAngle, PoseStack poseStack) {
         shaft1.setTransform(poseStack).translate(-.5f, .25f, 0).center().rotateTo(Direction.UP, Direction.SOUTH).rotateYDegrees(wheelAngle).uncenter()
             .setChanged();
         shaft2.setTransform(poseStack).translate(-.5f, .25f, -1).center().rotateTo(Direction.UP, Direction.SOUTH).rotateYDegrees(wheelAngle)
@@ -78,7 +78,7 @@ public class StandardBogeyVisual implements BogeyVisual {
         }
 
         @Override
-        public void update(NbtCompound bogeyData, float wheelAngle, MatrixStack poseStack) {
+        public void update(CompoundTag bogeyData, float wheelAngle, PoseStack poseStack) {
             super.update(bogeyData, wheelAngle, poseStack);
             wheel1.setTransform(poseStack).translate(0, 12 / 16f, -1).rotateXDegrees(wheelAngle).setChanged();
             wheel2.setTransform(poseStack).translate(0, 12 / 16f, 1).rotateXDegrees(wheelAngle).setChanged();
@@ -147,14 +147,14 @@ public class StandardBogeyVisual implements BogeyVisual {
         }
 
         @Override
-        public void update(NbtCompound bogeyData, float wheelAngle, MatrixStack poseStack) {
+        public void update(CompoundTag bogeyData, float wheelAngle, PoseStack poseStack) {
             super.update(bogeyData, wheelAngle, poseStack);
             secondaryShaft1.setTransform(poseStack).translate(-.5f, .25f, .5f).center().rotateTo(Direction.UP, Direction.EAST)
                 .rotateYDegrees(wheelAngle).uncenter().setChanged();
             secondaryShaft2.setTransform(poseStack).translate(-.5f, .25f, -1.5f).center().rotateTo(Direction.UP, Direction.EAST)
                 .rotateYDegrees(wheelAngle).uncenter().setChanged();
             drive.setTransform(poseStack).scale(1 - 1 / 512f).setChanged();
-            belt.offset(0, StandardBogeyRenderer.Large.BELT_RADIUS_IN_UV_SPACE * MathHelper.RADIANS_PER_DEGREE * wheelAngle).setTransform(poseStack)
+            belt.offset(0, StandardBogeyRenderer.Large.BELT_RADIUS_IN_UV_SPACE * Mth.DEG_TO_RAD * wheelAngle).setTransform(poseStack)
                 .scale(1 - 1 / 512f).setChanged();
             piston.setTransform(poseStack).translate(0, 0, 1 / 4f * Math.sin(AngleHelper.rad(wheelAngle))).setChanged();
             wheels.setTransform(poseStack).translate(0, 1, 0).rotateXDegrees(wheelAngle).setChanged();

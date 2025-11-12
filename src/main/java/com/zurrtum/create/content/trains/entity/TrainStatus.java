@@ -1,18 +1,17 @@
 package com.zurrtum.create.content.trains.entity;
 
 import com.google.common.collect.Streams;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.registry.RegistryKey;
-import net.minecraft.text.MutableText;
-import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
-import net.minecraft.world.World;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Stream;
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.Level;
 
 public class TrainStatus {
 
@@ -110,17 +109,17 @@ public class TrainStatus {
     }
 
     public void crash() {
-        Text component = Text.literal(" - ").formatted(Formatting.GRAY)
-            .append(Text.translatable("create.train.status.collision").withColor(0xFFD3B4));
-        List<RegistryKey<World>> presentDimensions = train.getPresentDimensions();
-        Stream<Text> locationComponents = presentDimensions.stream().map(key -> {
-            return Text.literal(" - ").formatted(Formatting.GRAY).append(Text.translatable(
+        Component component = Component.literal(" - ").withStyle(ChatFormatting.GRAY)
+            .append(Component.translatable("create.train.status.collision").withColor(0xFFD3B4));
+        List<ResourceKey<Level>> presentDimensions = train.getPresentDimensions();
+        Stream<Component> locationComponents = presentDimensions.stream().map(key -> {
+            return Component.literal(" - ").withStyle(ChatFormatting.GRAY).append(Component.translatable(
                 "create.train.status.collision.where",
-                key.getValue().toString(),
+                key.location().toString(),
                 train.getPositionInDimension(key).get().toShortString()
             ).withColor(0xFFD3B4));
         });
-        addMessage(new StatusMessage(Streams.concat(Stream.of(component), locationComponents).toArray(Text[]::new)));
+        addMessage(new StatusMessage(Streams.concat(Stream.of(component), locationComponents).toArray(Component[]::new)));
 
     }
 
@@ -135,22 +134,22 @@ public class TrainStatus {
         track = false;
     }
 
-    public void tick(World level) {
+    public void tick(Level level) {
         if (queued.isEmpty())
             return;
         LivingEntity owner = train.getOwner(level);
         if (owner == null)
             return;
-        if (owner instanceof PlayerEntity player) {
-            player.sendMessage(Text.translatable("create.train.status", train.name).formatted(Formatting.GOLD), false);
+        if (owner instanceof Player player) {
+            player.displayClientMessage(Component.translatable("create.train.status", train.name).withStyle(ChatFormatting.GOLD), false);
             queued.forEach(message -> message.displayToPlayer(player));
         }
         queued.clear();
     }
 
     public void displayInformation(String key, boolean itsAGoodThing, Object... args) {
-        MutableText component = Text.literal(" - ").formatted(Formatting.GRAY)
-            .append(Text.translatable("create.train.status." + key, args).withColor(itsAGoodThing ? 0xD5ECC2 : 0xFFD3B4));
+        MutableComponent component = Component.literal(" - ").withStyle(ChatFormatting.GRAY)
+            .append(Component.translatable("create.train.status." + key, args).withColor(itsAGoodThing ? 0xD5ECC2 : 0xFFD3B4));
         addMessage(new StatusMessage(component));
     }
 
@@ -166,9 +165,9 @@ public class TrainStatus {
         conductor = false;
     }
 
-    public record StatusMessage(Text... messages) {
-        public void displayToPlayer(PlayerEntity player) {
-            Arrays.stream(messages).forEach(messages -> player.sendMessage(messages, false));
+    public record StatusMessage(Component... messages) {
+        public void displayToPlayer(Player player) {
+            Arrays.stream(messages).forEach(messages -> player.displayClientMessage(messages, false));
         }
 
     }

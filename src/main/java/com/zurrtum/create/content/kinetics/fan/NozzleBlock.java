@@ -5,63 +5,63 @@ import com.zurrtum.create.AllShapes;
 import com.zurrtum.create.foundation.block.IBE;
 import com.zurrtum.create.foundation.block.NeighborUpdateListeningBlock;
 import com.zurrtum.create.foundation.block.WrenchableDirectionalBlock;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.ShapeContext;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.entity.ai.pathing.NavigationType;
-import net.minecraft.item.ItemPlacementContext;
-import net.minecraft.item.ItemUsageContext;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.shape.VoxelShape;
-import net.minecraft.world.BlockView;
-import net.minecraft.world.World;
-import net.minecraft.world.WorldView;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.item.context.UseOnContext;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelReader;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.pathfinder.PathComputationType;
+import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.phys.shapes.VoxelShape;
 
 public class NozzleBlock extends WrenchableDirectionalBlock implements IBE<NozzleBlockEntity>, NeighborUpdateListeningBlock {
 
-    public NozzleBlock(Settings p_i48415_1_) {
+    public NozzleBlock(Properties p_i48415_1_) {
         super(p_i48415_1_);
     }
 
     @Override
-    public ActionResult onWrenched(BlockState state, ItemUsageContext context) {
-        return ActionResult.FAIL;
+    public InteractionResult onWrenched(BlockState state, UseOnContext context) {
+        return InteractionResult.FAIL;
     }
 
     @Override
-    public BlockState getPlacementState(ItemPlacementContext context) {
-        return getDefaultState().with(FACING, context.getSide());
+    public BlockState getStateForPlacement(BlockPlaceContext context) {
+        return defaultBlockState().setValue(FACING, context.getClickedFace());
     }
 
     @Override
-    public VoxelShape getOutlineShape(BlockState state, BlockView worldIn, BlockPos pos, ShapeContext context) {
-        return AllShapes.NOZZLE.get(state.get(FACING));
+    public VoxelShape getShape(BlockState state, BlockGetter worldIn, BlockPos pos, CollisionContext context) {
+        return AllShapes.NOZZLE.get(state.getValue(FACING));
     }
 
     @Override
-    public void neighborUpdate(BlockState state, World worldIn, BlockPos pos, Block sourceBlock, BlockPos fromPos, boolean isMoving) {
-        if (worldIn.isClient())
+    public void neighborUpdate(BlockState state, Level worldIn, BlockPos pos, Block sourceBlock, BlockPos fromPos, boolean isMoving) {
+        if (worldIn.isClientSide())
             return;
 
-        if (fromPos.equals(pos.offset(state.get(FACING).getOpposite())))
-            if (!canPlaceAt(state, worldIn, pos)) {
-                worldIn.breakBlock(pos, true);
+        if (fromPos.equals(pos.relative(state.getValue(FACING).getOpposite())))
+            if (!canSurvive(state, worldIn, pos)) {
+                worldIn.destroyBlock(pos, true);
             }
     }
 
     @Override
-    public boolean canPlaceAt(BlockState state, WorldView worldIn, BlockPos pos) {
-        Direction towardsFan = state.get(FACING).getOpposite();
-        BlockEntity be = worldIn.getBlockEntity(pos.offset(towardsFan));
+    public boolean canSurvive(BlockState state, LevelReader worldIn, BlockPos pos) {
+        Direction towardsFan = state.getValue(FACING).getOpposite();
+        BlockEntity be = worldIn.getBlockEntity(pos.relative(towardsFan));
         return be instanceof IAirCurrentSource && ((IAirCurrentSource) be).getAirflowOriginSide() == towardsFan.getOpposite();
     }
 
     @Override
-    protected boolean canPathfindThrough(BlockState state, NavigationType pathComputationType) {
+    protected boolean isPathfindable(BlockState state, PathComputationType pathComputationType) {
         return false;
     }
 

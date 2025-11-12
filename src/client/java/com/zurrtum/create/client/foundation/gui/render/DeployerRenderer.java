@@ -1,7 +1,11 @@
 package com.zurrtum.create.client.foundation.gui.render;
 
-import com.mojang.blaze3d.systems.ProjectionType;
+import com.mojang.blaze3d.ProjectionType;
+import com.mojang.blaze3d.platform.Lighting;
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
+import com.mojang.math.Axis;
 import com.zurrtum.create.AllBlocks;
 import com.zurrtum.create.client.AllPartialModels;
 import com.zurrtum.create.client.catnip.animation.AnimationTickHolder;
@@ -10,39 +14,35 @@ import com.zurrtum.create.client.flywheel.lib.model.baked.SinglePosVirtualBlockG
 import com.zurrtum.create.content.kinetics.deployer.DeployerBlock;
 import it.unimi.dsi.fastutil.ints.Int2ObjectArrayMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gl.RenderPipelines;
-import net.minecraft.client.gui.render.SpecialGuiElementRenderer;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.render.TextureSetup;
+import net.minecraft.client.gui.render.pip.PictureInPictureRenderer;
+import net.minecraft.client.gui.render.state.BlitRenderState;
 import net.minecraft.client.gui.render.state.GuiRenderState;
-import net.minecraft.client.gui.render.state.TexturedQuadGuiElementRenderState;
-import net.minecraft.client.render.DiffuseLighting;
-import net.minecraft.client.render.TexturedRenderLayers;
-import net.minecraft.client.render.VertexConsumer;
-import net.minecraft.client.render.VertexConsumerProvider;
-import net.minecraft.client.render.block.BlockRenderManager;
-import net.minecraft.client.render.model.BlockModelPart;
-import net.minecraft.client.texture.TextureSetup;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.state.property.Properties;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.RotationAxis;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.RenderPipelines;
+import net.minecraft.client.renderer.Sheets;
+import net.minecraft.client.renderer.block.BlockRenderDispatcher;
+import net.minecraft.client.renderer.block.model.BlockModelPart;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 
 import java.util.List;
 
-public class DeployerRenderer extends SpecialGuiElementRenderer<DeployerRenderState> {
+public class DeployerRenderer extends PictureInPictureRenderer<DeployerRenderState> {
     private static final Int2ObjectMap<GpuTexture> TEXTURES = new Int2ObjectArrayMap<>();
-    private final MatrixStack matrices = new MatrixStack();
+    private final PoseStack matrices = new PoseStack();
     private int windowScaleFactor;
 
-    public DeployerRenderer(VertexConsumerProvider.Immediate vertexConsumers) {
+    public DeployerRenderer(MultiBufferSource.BufferSource vertexConsumers) {
         super(vertexConsumers);
     }
 
     @Override
-    public void render(DeployerRenderState item, GuiRenderState state, int windowScaleFactor) {
+    public void prepare(DeployerRenderState item, GuiRenderState state, int windowScaleFactor) {
         if (this.windowScaleFactor != windowScaleFactor) {
             this.windowScaleFactor = windowScaleFactor;
             TEXTURES.values().forEach(GpuTexture::close);
@@ -55,73 +55,73 @@ public class DeployerRenderer extends SpecialGuiElementRenderer<DeployerRenderSt
             texture = GpuTexture.create(width, height);
             TEXTURES.put(item.id(), texture);
         }
-        RenderSystem.setProjectionMatrix(projectionMatrix.set(width, height), ProjectionType.ORTHOGRAPHIC);
+        RenderSystem.setProjectionMatrix(projectionMatrixBuffer.getBuffer(width, height), ProjectionType.ORTHOGRAPHIC);
         texture.prepare();
-        matrices.push();
+        matrices.pushPose();
         matrices.translate(width / 2.0F, height, 0.0F);
         float scale = 20 * windowScaleFactor;
         matrices.scale(scale, scale, scale);
 
-        MinecraftClient mc = MinecraftClient.getInstance();
-        mc.gameRenderer.getDiffuseLighting().setShaderLights(DiffuseLighting.Type.ENTITY_IN_UI);
-        matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(-15.5f));
-        matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(22.5f));
+        Minecraft mc = Minecraft.getInstance();
+        mc.gameRenderer.getLighting().setupFor(Lighting.Entry.ENTITY_IN_UI);
+        matrices.mulPose(Axis.XP.rotationDegrees(-15.5f));
+        matrices.mulPose(Axis.YP.rotationDegrees(22.5f));
         matrices.translate(-0.5f, -2.24f, -0.5f);
         matrices.scale(1, -1, 1);
 
         BlockState blockState;
         List<BlockModelPart> parts;
-        BlockRenderManager blockRenderManager = mc.getBlockRenderManager();
+        BlockRenderDispatcher blockRenderManager = mc.getBlockRenderer();
         SinglePosVirtualBlockGetter world = SinglePosVirtualBlockGetter.createFullBright();
-        VertexConsumer buffer = vertexConsumers.getBuffer(TexturedRenderLayers.getEntityCutout());
+        VertexConsumer buffer = bufferSource.getBuffer(Sheets.cutoutBlockSheet());
         float time = AnimationTickHolder.getRenderTime();
         float cycle = (time - item.offset() * 8) % 30;
         float offset = cycle < 10 ? cycle / 10f : cycle < 20 ? (20 - cycle) / 10f : 0;
 
-        matrices.push();
-        blockState = AllBlocks.SHAFT.getDefaultState().with(Properties.AXIS, Direction.Axis.Z);
+        matrices.pushPose();
+        blockState = AllBlocks.SHAFT.defaultBlockState().setValue(BlockStateProperties.AXIS, Direction.Axis.Z);
         world.blockState(blockState);
-        parts = blockRenderManager.getModel(blockState).getParts(mc.world.random);
+        parts = blockRenderManager.getBlockModel(blockState).collectParts(mc.level.random);
         matrices.translate(0.5f, 0.5f, 0.5f);
-        matrices.multiply(RotationAxis.POSITIVE_Z.rotationDegrees(getCurrentAngle(time)));
+        matrices.mulPose(Axis.ZP.rotationDegrees(getCurrentAngle(time)));
         matrices.translate(-0.5f, -0.5f, -0.5f);
-        blockRenderManager.renderBlock(blockState, BlockPos.ORIGIN, world, matrices, buffer, false, parts);
-        matrices.pop();
+        blockRenderManager.renderBatched(blockState, BlockPos.ZERO, world, matrices, buffer, false, parts);
+        matrices.popPose();
 
-        blockState = AllBlocks.DEPLOYER.getDefaultState().with(DeployerBlock.FACING, Direction.DOWN)
-            .with(DeployerBlock.AXIS_ALONG_FIRST_COORDINATE, false);
+        blockState = AllBlocks.DEPLOYER.defaultBlockState().setValue(DeployerBlock.FACING, Direction.DOWN)
+            .setValue(DeployerBlock.AXIS_ALONG_FIRST_COORDINATE, false);
         world.blockState(blockState);
-        parts = blockRenderManager.getModel(blockState).getParts(mc.world.random);
-        blockRenderManager.renderBlock(blockState, BlockPos.ORIGIN, world, matrices, buffer, false, parts);
+        parts = blockRenderManager.getBlockModel(blockState).collectParts(mc.level.random);
+        blockRenderManager.renderBatched(blockState, BlockPos.ZERO, world, matrices, buffer, false, parts);
 
-        matrices.push();
-        blockState = Blocks.AIR.getDefaultState();
+        matrices.pushPose();
+        blockState = Blocks.AIR.defaultBlockState();
         world.blockState(blockState);
         parts = List.of(AllPartialModels.DEPLOYER_POLE.get(), AllPartialModels.DEPLOYER_HAND_HOLDING.get());
         matrices.translate(0, -offset, 0);
         matrices.translate(0.5f, 0.5f, 0.5f);
-        matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(90));
+        matrices.mulPose(Axis.XP.rotationDegrees(90));
         matrices.translate(-0.5f, -0.5f, -0.5f);
-        blockRenderManager.renderBlock(blockState, BlockPos.ORIGIN, world, matrices, buffer, false, parts);
-        matrices.pop();
+        blockRenderManager.renderBatched(blockState, BlockPos.ZERO, world, matrices, buffer, false, parts);
+        matrices.popPose();
 
         matrices.translate(0, -2.06f, 0);
-        blockState = AllBlocks.DEPOT.getDefaultState();
+        blockState = AllBlocks.DEPOT.defaultBlockState();
         world.blockState(blockState);
-        parts = blockRenderManager.getModel(blockState).getParts(mc.world.random);
-        blockRenderManager.renderBlock(blockState, BlockPos.ORIGIN, world, matrices, buffer, false, parts);
+        parts = blockRenderManager.getBlockModel(blockState).collectParts(mc.level.random);
+        blockRenderManager.renderBatched(blockState, BlockPos.ZERO, world, matrices, buffer, false, parts);
 
-        vertexConsumers.draw();
-        matrices.pop();
+        bufferSource.endBatch();
+        matrices.popPose();
         texture.clear();
-        state.addSimpleElementToCurrentLayer(new TexturedQuadGuiElementRenderState(
+        state.submitBlitToCurrentLayer(new BlitRenderState(
             RenderPipelines.GUI_TEXTURED_PREMULTIPLIED_ALPHA,
-            TextureSetup.withoutGlTexture(texture.textureView()),
+            TextureSetup.singleTexture(texture.textureView()),
             item.pose(),
+            item.x0(),
+            item.y0(),
             item.x1(),
             item.y1(),
-            item.x2(),
-            item.y2(),
             0.0F,
             1.0F,
             1.0F,
@@ -137,16 +137,16 @@ public class DeployerRenderer extends SpecialGuiElementRenderer<DeployerRenderSt
     }
 
     @Override
-    protected void render(DeployerRenderState state, MatrixStack matrices) {
+    protected void renderToTexture(DeployerRenderState state, PoseStack matrices) {
     }
 
     @Override
-    protected String getName() {
+    protected String getTextureLabel() {
         return "Deployer";
     }
 
     @Override
-    public Class<DeployerRenderState> getElementClass() {
+    public Class<DeployerRenderState> getRenderStateClass() {
         return DeployerRenderState.class;
     }
 }

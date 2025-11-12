@@ -16,10 +16,10 @@ import me.shedaniel.rei.api.common.category.CategoryIdentifier;
 import me.shedaniel.rei.api.common.entry.EntryIngredient;
 import me.shedaniel.rei.api.common.util.EntryIngredients;
 import me.shedaniel.rei.api.common.util.EntryStacks;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.recipe.Ingredient;
-import net.minecraft.text.Text;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.item.crafting.Ingredient;
 import org.joml.Matrix3x2f;
 
 import java.util.ArrayList;
@@ -33,7 +33,7 @@ public class MechanicalCraftingCategory extends CreateCategory<MechanicalCraftin
     }
 
     @Override
-    public Text getTitle() {
+    public Component getTitle() {
         return CreateLang.translateDirect("recipe.mechanical_crafting");
     }
 
@@ -68,13 +68,13 @@ public class MechanicalCraftingCategory extends CreateCategory<MechanicalCraftin
             }
         }
         Point output = new Point(bounds.x + 138, bounds.y + 85);
-        widgets.add(Widgets.createDrawableWidget((DrawContext graphics, int mouseX, int mouseY, float delta) -> {
+        widgets.add(Widgets.createDrawableWidget((GuiGraphics graphics, int mouseX, int mouseY, float delta) -> {
             drawSlotBackground(graphics, inputs, output);
             AllGuiTextures.JEI_DOWN_ARROW.render(graphics, bounds.x + 133, bounds.y + 64);
             AllGuiTextures.JEI_SHADOW.render(graphics, bounds.x + 118, bounds.y + 43);
-            graphics.state.addSpecialElement(new CrafterRenderState(new Matrix3x2f(graphics.getMatrices()), bounds.x + 129, bounds.y + 23));
-            graphics.drawText(
-                MinecraftClient.getInstance().textRenderer,
+            graphics.guiRenderState.submitPicturesInPictureState(new CrafterRenderState(new Matrix3x2f(graphics.pose()), bounds.x + 129, bounds.y + 23));
+            graphics.drawString(
+                Minecraft.getInstance().font,
                 String.valueOf(ingredients.size()),
                 bounds.x + 147,
                 bounds.y + 44,
