@@ -1,6 +1,6 @@
 package com.zurrtum.create.content.contraptions.data;
 
-import net.minecraft.Util;
+import net.minecraft.util.Util;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 

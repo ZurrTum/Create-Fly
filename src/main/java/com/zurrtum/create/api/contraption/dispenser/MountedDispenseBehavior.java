@@ -4,7 +4,7 @@ import com.zurrtum.create.api.contraption.storage.item.MountedItemStorage;
 import com.zurrtum.create.api.registry.SimpleRegistry;
 import com.zurrtum.create.content.contraptions.behaviour.MovementContext;
 import com.zurrtum.create.impl.contraption.dispenser.DispenserBehaviorConverter;
-import net.minecraft.Util;
+import net.minecraft.util.Util;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.dispenser.DispenseItemBehavior;

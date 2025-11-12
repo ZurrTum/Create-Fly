@@ -1,7 +1,7 @@
 package com.zurrtum.create.client.model;
 
 import com.google.common.collect.ImmutableMap;
-import net.minecraft.Util;
+import net.minecraft.util.Util;
 import net.minecraft.client.renderer.chunk.ChunkSectionLayer;
 import org.jetbrains.annotations.Nullable;
 

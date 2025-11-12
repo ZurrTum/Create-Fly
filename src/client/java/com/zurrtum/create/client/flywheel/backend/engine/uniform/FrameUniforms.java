@@ -3,7 +3,7 @@ package com.zurrtum.create.client.flywheel.backend.engine.uniform;
 import com.zurrtum.create.client.flywheel.api.backend.RenderContext;
 import com.zurrtum.create.client.flywheel.api.visualization.VisualizationManager;
 import com.zurrtum.create.client.flywheel.backend.engine.indirect.DepthPyramid;
-import net.minecraft.Util;
+import net.minecraft.util.Util;
 import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GameRenderer;

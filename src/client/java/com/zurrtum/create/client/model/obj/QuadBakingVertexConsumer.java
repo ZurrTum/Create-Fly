@@ -14,7 +14,7 @@ import java.util.Arrays;
 import java.util.IdentityHashMap;
 import java.util.Map;
 
-import net.minecraft.Util;
+import net.minecraft.util.Util;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.core.Direction;

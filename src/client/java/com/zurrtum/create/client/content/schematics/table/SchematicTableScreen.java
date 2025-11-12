@@ -18,7 +18,7 @@ import com.zurrtum.create.content.schematics.table.SchematicTableBlockEntity;
 import com.zurrtum.create.content.schematics.table.SchematicTableMenu;
 import com.zurrtum.create.foundation.gui.menu.MenuType;
 import com.zurrtum.create.foundation.utility.CreatePaths;
-import net.minecraft.Util;
+import net.minecraft.util.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.renderer.Rect2i;

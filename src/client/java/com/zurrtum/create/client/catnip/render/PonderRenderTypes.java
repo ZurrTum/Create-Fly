@@ -5,7 +5,7 @@ import com.zurrtum.create.client.ponder.enums.PonderSpecialTextures;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
-import net.minecraft.Util;
+import net.minecraft.util.Util;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.renderer.RenderStateShard;
 import net.minecraft.client.renderer.RenderStateShard.TextureStateShard;

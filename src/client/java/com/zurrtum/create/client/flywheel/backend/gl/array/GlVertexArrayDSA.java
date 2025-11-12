@@ -8,7 +8,7 @@ import java.util.Arrays;
 import java.util.BitSet;
 import java.util.List;
 
-import net.minecraft.Util;
+import net.minecraft.util.Util;
 
 public class GlVertexArrayDSA extends GlVertexArray {
     public static final boolean SUPPORTED = isSupported();

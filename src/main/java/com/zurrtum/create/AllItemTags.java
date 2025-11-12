@@ -3,7 +3,7 @@ package com.zurrtum.create;
 import java.util.HashMap;
 import java.util.Map;
 
-import net.minecraft.Util;
+import net.minecraft.util.Util;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.Identifier;
 import net.minecraft.tags.TagKey;

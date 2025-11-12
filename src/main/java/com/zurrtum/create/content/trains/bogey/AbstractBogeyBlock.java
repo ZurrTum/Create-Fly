@@ -15,7 +15,7 @@ import com.zurrtum.create.content.trains.entity.TravellingPoint;
 import com.zurrtum.create.content.trains.graph.TrackEdge;
 import com.zurrtum.create.foundation.block.IBE;
 import com.zurrtum.create.foundation.block.ProperWaterloggedBlock;
-import net.minecraft.Util;
+import net.minecraft.util.Util;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.registries.BuiltInRegistries;

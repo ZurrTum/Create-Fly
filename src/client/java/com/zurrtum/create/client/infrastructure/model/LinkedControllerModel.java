@@ -11,7 +11,7 @@ import com.zurrtum.create.catnip.animation.LerpedFloat.Chaser;
 import com.zurrtum.create.client.catnip.animation.AnimationTickHolder;
 import com.zurrtum.create.client.content.redstone.link.controller.LinkedControllerClientHandler;
 import com.zurrtum.create.client.content.redstone.link.controller.LinkedControllerClientHandler.Mode;
-import net.minecraft.Util;
+import net.minecraft.util.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.Sheets;

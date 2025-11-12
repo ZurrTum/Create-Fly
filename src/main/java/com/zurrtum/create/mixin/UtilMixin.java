@@ -2,7 +2,7 @@ package com.zurrtum.create.mixin;
 
 import com.mojang.datafixers.DSL;
 import com.mojang.datafixers.types.Type;
-import net.minecraft.Util;
+import net.minecraft.util.Util;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
