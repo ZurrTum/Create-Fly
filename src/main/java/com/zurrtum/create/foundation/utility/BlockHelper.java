@@ -38,7 +38,6 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.BlockGetter;
-import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -46,6 +45,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.*;
 import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraft.world.level.chunk.LevelChunkSection;
+import net.minecraft.world.level.gamerules.GameRules;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.storage.TagValueInput;
 import net.minecraft.world.level.storage.TagValueOutput;
@@ -309,7 +309,7 @@ public class BlockHelper {
 
         //TODO check restoringBlockSnapshots
         if (world instanceof ServerLevel serverLevel && serverLevel.getGameRules()
-            .getBoolean(GameRules.RULE_DOBLOCKDROPS) && (player == null || !player.isCreative())) {
+            .get(GameRules.BLOCK_DROPS) && (player == null || !player.isCreative())) {
             List<ItemStack> drops = Block.getDrops(state, serverLevel, pos, blockEntity, player, usedTool);
             if (player != null) {
                 //TODO

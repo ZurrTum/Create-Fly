@@ -10,16 +10,6 @@ import com.zurrtum.create.catnip.data.Iterate;
 import com.zurrtum.create.catnip.data.Pair;
 import com.zurrtum.create.catnip.math.VecHelper;
 import com.zurrtum.create.foundation.codec.CreateCodecs;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Optional;
-import java.util.concurrent.atomic.AtomicReference;
-import java.util.function.Function;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction.Axis;
 import net.minecraft.core.particles.BlockParticleOption;
@@ -31,12 +21,21 @@ import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.gamerules.GameRules;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Optional;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Function;
 
 public class BezierConnection implements Iterable<BezierConnection.Segment> {
     public static final Codec<BezierConnection> CODEC = RecordCodecBuilder.create(instance -> instance.group(
@@ -119,10 +118,7 @@ public class BezierConnection implements Iterable<BezierConnection.Segment> {
         return this == other || (other != null && coupleEquals(this.bePositions, other.bePositions) && coupleEquals(
             this.starts,
             other.starts
-        ) && coupleEquals(this.axes, other.axes) && coupleEquals(
-            this.normals,
-            other.normals
-        ) && this.hasGirder == other.hasGirder);
+        ) && coupleEquals(this.axes, other.axes) && coupleEquals(this.normals, other.normals) && this.hasGirder == other.hasGirder);
     }
 
     @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
@@ -314,7 +310,7 @@ public class BezierConnection implements Iterable<BezierConnection.Segment> {
     }
 
     public void spawnItems(Level level) {
-        if (!(level instanceof ServerLevel serverWorld) || !serverWorld.getGameRules().getBoolean(GameRules.RULE_DOBLOCKDROPS))
+        if (!(level instanceof ServerLevel serverWorld) || !serverWorld.getGameRules().get(GameRules.BLOCK_DROPS))
             return;
         Vec3 origin = Vec3.atLowerCornerOf(bePositions.getFirst());
         for (Segment segment : this) {

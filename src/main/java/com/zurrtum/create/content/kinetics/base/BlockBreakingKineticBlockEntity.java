@@ -3,21 +3,20 @@ package com.zurrtum.create.content.kinetics.base;
 import com.zurrtum.create.AllBlockTags;
 import com.zurrtum.create.catnip.math.VecHelper;
 import com.zurrtum.create.foundation.utility.BlockHelper;
-
-import java.util.concurrent.atomic.AtomicInteger;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.item.ItemEntity;
-import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.block.AirBlock;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.gamerules.GameRules;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.Vec3;
+
+import java.util.concurrent.atomic.AtomicInteger;
 
 public abstract class BlockBreakingKineticBlockEntity extends KineticBlockEntity {
 
@@ -138,7 +137,7 @@ public abstract class BlockBreakingKineticBlockEntity extends KineticBlockEntity
             level, breakingPos, 1f, (stack) -> {
                 if (stack.isEmpty())
                     return;
-                if (!((ServerLevel) level).getGameRules().getBoolean(GameRules.RULE_DOBLOCKDROPS))
+                if (!((ServerLevel) level).getGameRules().get(GameRules.BLOCK_DROPS))
                     return;
 
                 ItemEntity itementity = new ItemEntity(level, vec.x, vec.y, vec.z, stack);

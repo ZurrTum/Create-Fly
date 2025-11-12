@@ -56,11 +56,11 @@ import net.minecraft.world.item.crafting.CraftingInput;
 import net.minecraft.world.item.crafting.CraftingRecipe;
 import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.item.crafting.RecipeType;
-import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.DiodeBlock;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.gamerules.GameRules;
 import net.minecraft.world.level.storage.TagValueInput;
 import net.minecraft.world.level.storage.TagValueOutput;
 import net.minecraft.world.level.storage.ValueInput;
@@ -276,7 +276,7 @@ public class BlueprintEntity extends HangingEntity implements SpecialEntityItemR
 
     @Override
     public void dropItem(ServerLevel world, @Nullable Entity p_110128_1_) {
-        if (!world.getGameRules().getBoolean(GameRules.RULE_DOENTITYDROPS))
+        if (!world.getGameRules().get(GameRules.ENTITY_DROPS))
             return;
 
         playSound(SoundEvents.PAINTING_BREAK, 1.0F, 1.0F);
