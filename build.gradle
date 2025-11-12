@@ -1,7 +1,7 @@
 import net.fabricmc.loom.task.RemapJarTask
 
 plugins {
-    id 'fabric-loom' version '1.13-SNAPSHOT'
+    id "net.fabricmc.fabric-loom-no-remap" version "1.14.0-alpha.21"
 }
 
 repositories {
@@ -77,28 +77,27 @@ tasks.build {
 
 dependencies {
     minecraft "com.mojang:minecraft:${project.minecraft_version}"
-    mappings loom.officialMojangMappings()
-    modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
+    implementation "net.fabricmc:fabric-loader:${project.loader_version}"
     if (project.compile_only_fabric_api.equals("true")) {
-        modCompileOnly fabricApi.module("fabric-rendering-fluids-v1", project.fabric_version)
-        modCompileOnly fabricApi.module("fabric-transfer-api-v1", project.fabric_version)
-        modCompileOnly fabricApi.module("fabric-events-interaction-v0", project.fabric_version)
-        modCompileOnly fabricApi.module("fabric-renderer-api-v1", project.fabric_version)
-        modCompileOnly fabricApi.module("fabric-recipe-api-v1", project.fabric_version)
+        compileOnly fabricApi.module("fabric-rendering-fluids-v1", project.fabric_version)
+        compileOnly fabricApi.module("fabric-transfer-api-v1", project.fabric_version)
+        compileOnly fabricApi.module("fabric-events-interaction-v0", project.fabric_version)
+        compileOnly fabricApi.module("fabric-renderer-api-v1", project.fabric_version)
+        compileOnly fabricApi.module("fabric-recipe-api-v1", project.fabric_version)
     } else {
-        modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
+        implementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
     }
-    modCompileOnly "me.shedaniel:RoughlyEnoughItems-fabric:${project.rei_version}"
-    if (project.compile_only_rei.equals("false")) {
-        modClientRuntimeOnly "me.shedaniel:RoughlyEnoughItems-fabric:${project.rei_version}"
-    }
-    modCompileOnly "maven.modrinth:jei:${project.jei_version}"
-    modCompileOnly "cc.tweaked:cc-tweaked-${project.cct_version}"
-    modCompileOnly "maven.modrinth:trinkets-canary:${project.trinkets_version}"
-    modCompileOnly "dev.onyxstudios.cardinal-components-api:cardinal-components-base:${project.cca_version}"
-    modClientCompileOnly "maven.modrinth:sodium:${project.sodium_version}"
-    modClientCompileOnly "maven.modrinth:iris:${project.iris_version}"
-    modClientCompileOnly "maven.modrinth:hold-my-items:${project.hmi_version}"
+//    modCompileOnly "me.shedaniel:RoughlyEnoughItems-fabric:${project.rei_version}"
+//    if (project.compile_only_rei.equals("false")) {
+//        modClientRuntimeOnly "me.shedaniel:RoughlyEnoughItems-fabric:${project.rei_version}"
+//    }
+//    modCompileOnly "maven.modrinth:jei:${project.jei_version}"
+//    modCompileOnly "cc.tweaked:cc-tweaked-${project.cct_version}"
+//    modCompileOnly "maven.modrinth:trinkets-canary:${project.trinkets_version}"
+//    modCompileOnly "dev.onyxstudios.cardinal-components-api:cardinal-components-base:${project.cca_version}"
+//    modClientCompileOnly "maven.modrinth:sodium:${project.sodium_version}"
+//    modClientCompileOnly "maven.modrinth:iris:${project.iris_version}"
+//    modClientCompileOnly "maven.modrinth:hold-my-items:${project.hmi_version}"
 }
 
 processResources {
