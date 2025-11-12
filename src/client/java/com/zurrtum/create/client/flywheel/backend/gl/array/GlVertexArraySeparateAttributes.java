@@ -9,6 +9,7 @@ import org.lwjgl.system.Checks;
 import java.util.Arrays;
 import java.util.BitSet;
 import java.util.List;
+
 import net.minecraft.Util;
 
 public class GlVertexArraySeparateAttributes extends GlVertexArray {

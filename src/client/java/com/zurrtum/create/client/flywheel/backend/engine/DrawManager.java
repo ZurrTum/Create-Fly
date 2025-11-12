@@ -19,6 +19,7 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.function.Function;
+
 import net.minecraft.client.resources.model.ModelBakery;
 
 public abstract class DrawManager<N extends AbstractInstancer<?>> {

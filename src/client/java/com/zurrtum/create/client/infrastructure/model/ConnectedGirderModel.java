@@ -4,7 +4,9 @@ import com.zurrtum.create.catnip.data.Iterate;
 import com.zurrtum.create.client.AllCTBehaviours;
 import com.zurrtum.create.client.AllPartialModels;
 import com.zurrtum.create.content.decoration.girder.GirderBlock;
+
 import java.util.List;
+
 import net.minecraft.client.renderer.block.model.BlockModelPart;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;

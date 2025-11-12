@@ -5,6 +5,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Locale;
+
 import net.minecraft.core.Direction;
 import net.minecraft.util.StringRepresentable;
 import net.minecraft.world.item.context.BlockPlaceContext;
@@ -33,7 +34,10 @@ public class DoubleFaceAttachedBlock extends HorizontalDirectionalBlock {
         }
     }
 
-    public static final EnumProperty<NixieTubeBlock.DoubleAttachFace> FACE = EnumProperty.create("double_face", NixieTubeBlock.DoubleAttachFace.class);
+    public static final EnumProperty<NixieTubeBlock.DoubleAttachFace> FACE = EnumProperty.create(
+        "double_face",
+        NixieTubeBlock.DoubleAttachFace.class
+    );
 
     public DoubleFaceAttachedBlock(Properties p_53182_) {
         super(p_53182_);

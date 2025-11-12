@@ -18,8 +18,10 @@ import com.zurrtum.create.client.content.schematics.table.SchematicTableScreen;
 import com.zurrtum.create.client.content.trains.schedule.ScheduleScreen;
 import com.zurrtum.create.client.foundation.gui.menu.ScreenFactory;
 import com.zurrtum.create.foundation.gui.menu.MenuType;
+
 import java.util.IdentityHashMap;
 import java.util.Map;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.MenuAccess;

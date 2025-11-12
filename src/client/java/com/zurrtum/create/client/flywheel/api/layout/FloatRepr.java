@@ -20,7 +20,7 @@ public enum FloatRepr implements ValueRepr {
     FloatRepr(int byteSize) {
         this.byteSize = byteSize;
     }
-    
+
     public int byteSize() {
         return this.byteSize;
     }

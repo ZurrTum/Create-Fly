@@ -3,9 +3,11 @@ package com.zurrtum.create.client.content.schematics.client.tools;
 import com.zurrtum.create.client.catnip.lang.Lang;
 import com.zurrtum.create.client.foundation.gui.AllIcons;
 import com.zurrtum.create.client.foundation.utility.CreateLang;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 

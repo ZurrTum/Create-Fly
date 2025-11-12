@@ -17,6 +17,7 @@ import org.joml.Matrix4f;
 import org.joml.Quaternionf;
 
 import java.util.function.Consumer;
+
 import net.minecraft.core.Direction;
 
 public class FlywheelVisual extends KineticBlockEntityVisual<FlywheelBlockEntity> implements SimpleDynamicVisual {

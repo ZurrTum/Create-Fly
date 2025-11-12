@@ -3,8 +3,10 @@ package com.zurrtum.create.infrastructure.component;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.zurrtum.create.content.processing.recipe.ChanceOutput;
+
 import java.util.List;
 import java.util.Random;
+
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;

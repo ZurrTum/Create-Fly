@@ -80,7 +80,15 @@ public class EncasedShaftBlock extends AbstractEncasedShaftBlock implements IBE<
     }
 
     @Override
-    public void handleEncasing(BlockState state, Level level, BlockPos pos, ItemStack heldItem, Player player, InteractionHand hand, BlockHitResult ray) {
+    public void handleEncasing(
+        BlockState state,
+        Level level,
+        BlockPos pos,
+        ItemStack heldItem,
+        Player player,
+        InteractionHand hand,
+        BlockHitResult ray
+    ) {
         KineticBlockEntity.switchToBlockState(
             level,
             pos,

@@ -1,7 +1,9 @@
 package com.zurrtum.create.content.decoration.encasing;
 
 import com.zurrtum.create.AllBlocks;
+
 import java.util.*;
+
 import net.minecraft.world.level.block.Block;
 
 public class EncasingRegistry {

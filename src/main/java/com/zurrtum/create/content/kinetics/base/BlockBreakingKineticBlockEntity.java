@@ -3,7 +3,9 @@ package com.zurrtum.create.content.kinetics.base;
 import com.zurrtum.create.AllBlockTags;
 import com.zurrtum.create.catnip.math.VecHelper;
 import com.zurrtum.create.foundation.utility.BlockHelper;
+
 import java.util.concurrent.atomic.AtomicInteger;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundSource;

@@ -2,6 +2,7 @@ package com.zurrtum.create.client.catnip.lang;
 
 import java.text.NumberFormat;
 import java.util.Locale;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.Mth;
 

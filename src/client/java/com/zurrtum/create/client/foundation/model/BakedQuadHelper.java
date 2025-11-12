@@ -3,7 +3,9 @@ package com.zurrtum.create.client.foundation.model;
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.VertexFormat;
 import com.zurrtum.create.client.model.NormalsBakedQuad;
+
 import java.util.Arrays;
+
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.util.Mth;
 import net.minecraft.world.phys.Vec3;

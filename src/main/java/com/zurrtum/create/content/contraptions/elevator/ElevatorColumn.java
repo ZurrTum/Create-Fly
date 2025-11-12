@@ -10,6 +10,7 @@ import com.zurrtum.create.foundation.utility.BlockHelper;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.Level;
@@ -78,11 +79,8 @@ public class ElevatorColumn {
 
     public void gatherAll() {
         BlockPos.betweenClosedStream(contactAt(level.getMinY()), contactAt(level.getMaxY()))
-            .filter(p -> coords.equals(ElevatorContactBlock.getColumnCoords(level, p))).forEach(p -> level.setBlock(
-                p,
-                BlockHelper.copyProperties(level.getBlockState(p), AllBlocks.ELEVATOR_CONTACT.defaultBlockState()),
-                3
-            ));
+            .filter(p -> coords.equals(ElevatorContactBlock.getColumnCoords(level, p)))
+            .forEach(p -> level.setBlock(p, BlockHelper.copyProperties(level.getBlockState(p), AllBlocks.ELEVATOR_CONTACT.defaultBlockState()), 3));
     }
 
     public BlockPos contactAt(int y) {

@@ -3,8 +3,10 @@ package com.zurrtum.create.content.kinetics;
 import com.zurrtum.create.Create;
 import com.zurrtum.create.catnip.levelWrappers.WorldHelper;
 import com.zurrtum.create.content.kinetics.base.KineticBlockEntity;
+
 import java.util.HashMap;
 import java.util.Map;
+
 import net.minecraft.world.level.LevelAccessor;
 
 public class TorquePropagator {

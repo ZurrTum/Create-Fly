@@ -184,7 +184,13 @@ public class WorldRendererMixin {
             vertexConsumers,
             cameraPos,
             matrices
-        ) || TrackBlockOutline.drawCustomBlockSelection(minecraft, state.pos(), vertexConsumers, cameraPos, matrices)) {
+        ) || TrackBlockOutline.drawCustomBlockSelection(
+            minecraft,
+            state.pos(),
+            vertexConsumers,
+            cameraPos,
+            matrices
+        )) {
             ci.cancel();
         }
     }

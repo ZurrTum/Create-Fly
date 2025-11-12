@@ -4,11 +4,13 @@ import com.google.common.base.Strings;
 import com.zurrtum.create.catnip.data.Couple;
 import com.zurrtum.create.client.catnip.lang.FontHelper;
 import com.zurrtum.create.client.foundation.utility.CreateLang;
+
 import java.text.BreakIterator;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
+
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;

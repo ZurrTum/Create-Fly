@@ -5,10 +5,12 @@ import com.zurrtum.create.AllEntityTags;
 import com.zurrtum.create.AllItems;
 import com.zurrtum.create.Create;
 import com.zurrtum.create.catnip.math.VecHelper;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.sounds.SoundEvents;

@@ -24,6 +24,7 @@ import com.zurrtum.create.content.processing.burner.BlazeBurnerBlockEntity;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Consumer;
+
 import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.core.Direction;
 import net.minecraft.util.Mth;
@@ -166,8 +167,7 @@ public class BlazeBurnerVisual extends AbstractBlockEntityVisual<BlazeBurnerBloc
 
         if (hat != null) {
             hat.setIdentityTransform().translate(getVisualPosition()).translateY(headY).translateY(0.75f);
-            hat.rotateCentered(horizontalAngle + Mth.PI, Direction.UP).translate(0.5f, 0, 0.5f)
-                .light(LightTexture.FULL_BRIGHT);
+            hat.rotateCentered(horizontalAngle + Mth.PI, Direction.UP).translate(0.5f, 0, 0.5f).light(LightTexture.FULL_BRIGHT);
 
             hat.setChanged();
         }

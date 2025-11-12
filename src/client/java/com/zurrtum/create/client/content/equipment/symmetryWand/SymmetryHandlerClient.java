@@ -16,6 +16,7 @@ import com.zurrtum.create.infrastructure.component.SymmetryMirror;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.player.LocalPlayer;

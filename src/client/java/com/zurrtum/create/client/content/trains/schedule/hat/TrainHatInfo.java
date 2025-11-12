@@ -2,8 +2,10 @@ package com.zurrtum.create.client.content.trains.schedule.hat;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+
 import java.util.ArrayList;
 import java.util.List;
+
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.world.phys.Vec3;
 

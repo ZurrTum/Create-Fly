@@ -9,7 +9,10 @@ import net.minecraft.network.protocol.PacketType;
 import org.apache.logging.log4j.util.TriConsumer;
 
 public record AddTrainPacket(Train train) implements S2CPacket {
-    public static final StreamCodec<RegistryFriendlyByteBuf, AddTrainPacket> CODEC = Train.STREAM_CODEC.map(AddTrainPacket::new, AddTrainPacket::train);
+    public static final StreamCodec<RegistryFriendlyByteBuf, AddTrainPacket> CODEC = Train.STREAM_CODEC.map(
+        AddTrainPacket::new,
+        AddTrainPacket::train
+    );
 
     @Override
     public <T> TriConsumer<AllClientHandle<T>, T, AddTrainPacket> callback() {

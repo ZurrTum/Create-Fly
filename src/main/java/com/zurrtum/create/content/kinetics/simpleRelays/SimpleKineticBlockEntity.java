@@ -3,7 +3,9 @@ package com.zurrtum.create.content.kinetics.simpleRelays;
 import com.zurrtum.create.AllBlockEntityTypes;
 import com.zurrtum.create.content.kinetics.base.IRotate;
 import com.zurrtum.create.content.kinetics.base.KineticBlockEntity;
+
 import java.util.List;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;

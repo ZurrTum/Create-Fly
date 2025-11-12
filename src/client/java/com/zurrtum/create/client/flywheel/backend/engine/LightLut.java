@@ -5,6 +5,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.function.BiConsumer;
 import java.util.function.Supplier;
+
 import net.minecraft.core.SectionPos;
 
 // Massive kudos to RogueLogix for figuring out this LUT scheme.

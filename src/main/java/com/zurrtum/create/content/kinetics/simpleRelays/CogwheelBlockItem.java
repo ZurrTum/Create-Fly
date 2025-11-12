@@ -9,8 +9,10 @@ import com.zurrtum.create.content.kinetics.base.DirectionalKineticBlock;
 import com.zurrtum.create.content.kinetics.base.HorizontalKineticBlock;
 import com.zurrtum.create.content.kinetics.base.IRotate;
 import com.zurrtum.create.content.kinetics.base.RotatedPillarKineticBlock;
+
 import java.util.List;
 import java.util.function.Predicate;
+
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -41,7 +43,14 @@ public class CogwheelBlockItem extends BlockItem {
         integratedCogHelperId = PlacementHelpers.register(large ? new IntegratedLargeCogHelper() : new IntegratedSmallCogHelper());
     }
 
-    public static InteractionResult onItemUseFirst(Level world, Player player, ItemStack stack, InteractionHand hand, BlockHitResult ray, BlockPos pos) {
+    public static InteractionResult onItemUseFirst(
+        Level world,
+        Player player,
+        ItemStack stack,
+        InteractionHand hand,
+        BlockHitResult ray,
+        BlockPos pos
+    ) {
         if (stack.getItem() instanceof CogwheelBlockItem item) {
             IPlacementHelper helper = PlacementHelpers.get(item.placementHelperId);
             BlockState state = world.getBlockState(pos);
@@ -147,7 +156,12 @@ public class CogwheelBlockItem extends BlockItem {
             // diagonal gears of different size
             Axis axis = ((IRotate) state.getBlock()).getRotationAxis(state);
             Direction closest = IPlacementHelper.orderedByDistanceExceptAxis(pos, ray.getLocation(), axis).getFirst();
-            List<Direction> directions = IPlacementHelper.orderedByDistanceExceptAxis(pos, ray.getLocation(), axis, d -> d.getAxis() != closest.getAxis());
+            List<Direction> directions = IPlacementHelper.orderedByDistanceExceptAxis(
+                pos,
+                ray.getLocation(),
+                axis,
+                d -> d.getAxis() != closest.getAxis()
+            );
 
             for (Direction dir : directions) {
                 BlockPos newPos = pos.relative(dir).relative(closest);

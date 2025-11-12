@@ -5,10 +5,12 @@ import com.zurrtum.create.AllPackets;
 import com.zurrtum.create.catnip.codecs.stream.CatnipLargerStreamCodecs;
 import com.zurrtum.create.catnip.codecs.stream.CatnipStreamCodecBuilders;
 import com.zurrtum.create.content.logistics.factoryBoard.FactoryPanelPosition;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.BiConsumer;
+
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;

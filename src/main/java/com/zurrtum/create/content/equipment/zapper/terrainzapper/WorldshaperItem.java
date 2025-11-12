@@ -7,8 +7,10 @@ import com.zurrtum.create.infrastructure.component.PlacementOptions;
 import com.zurrtum.create.infrastructure.component.PlacementPatterns;
 import com.zurrtum.create.infrastructure.component.TerrainBrushes;
 import com.zurrtum.create.infrastructure.component.TerrainTools;
+
 import java.util.ArrayList;
 import java.util.List;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;

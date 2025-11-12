@@ -3,6 +3,7 @@ package com.zurrtum.create.foundation.blockEntity.behaviour.filtering;
 import com.zurrtum.create.catnip.data.Iterate;
 import com.zurrtum.create.content.schematics.requirement.ItemRequirement;
 import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
+
 import java.util.HashSet;
 import java.util.IdentityHashMap;
 import java.util.Map;
@@ -10,6 +11,7 @@ import java.util.Set;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
+
 import net.minecraft.core.Direction;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.storage.ValueInput;

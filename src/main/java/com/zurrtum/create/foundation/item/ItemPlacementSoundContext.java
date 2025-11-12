@@ -55,11 +55,7 @@ public class ItemPlacementSoundContext extends BlockPlaceContext {
     public ItemPlacementSoundContext offset(BlockPos pos, Direction side) {
         return new ItemPlacementSoundContext(
             getLevel(), getPlayer(), getHand(), getItemInHand(), new BlockHitResult(
-            new Vec3(
-                pos.getX() + 0.5 + side.getStepX() * 0.5,
-                pos.getY() + 0.5 + side.getStepY() * 0.5,
-                pos.getZ() + 0.5 + side.getStepZ() * 0.5
-            ),
+            new Vec3(pos.getX() + 0.5 + side.getStepX() * 0.5, pos.getY() + 0.5 + side.getStepY() * 0.5, pos.getZ() + 0.5 + side.getStepZ() * 0.5),
             side,
             pos,
             false

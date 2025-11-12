@@ -5,7 +5,9 @@ import com.zurrtum.create.AllBlockEntityTypes;
 import com.zurrtum.create.catnip.data.Iterate;
 import com.zurrtum.create.content.kinetics.base.KineticBlockEntity;
 import com.zurrtum.create.foundation.advancement.CreateTrigger;
+
 import java.util.List;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.block.state.BlockState;

@@ -12,6 +12,7 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.network.chat.Component;
+
 import java.util.List;
 
 public class JunkWidget extends Widget {

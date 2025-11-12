@@ -12,6 +12,7 @@ import org.joml.Matrix4f;
 import org.joml.Matrix4fc;
 
 import java.util.function.Consumer;
+
 import net.minecraft.client.model.geom.ModelLayers;
 import net.minecraft.client.renderer.blockentity.BellRenderer;
 import net.minecraft.core.BlockPos;
@@ -31,10 +32,7 @@ public class BellVisual extends AbstractBlockEntityVisual<BellBlockEntity> imple
     public BellVisual(VisualizationContext ctx, BellBlockEntity blockEntity, float partialTick) {
         super(ctx, blockEntity, partialTick);
 
-        instances = InstanceTree.create(
-            instancerProvider(),
-            ModelTrees.of(ModelLayers.BELL, BellRenderer.BELL_RESOURCE_LOCATION, MATERIAL)
-        );
+        instances = InstanceTree.create(instancerProvider(), ModelTrees.of(ModelLayers.BELL, BellRenderer.BELL_RESOURCE_LOCATION, MATERIAL));
         bellBody = instances.childOrThrow("bell_body");
 
         BlockPos visualPos = getVisualPosition();

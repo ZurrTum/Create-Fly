@@ -8,6 +8,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Map;
 import java.util.function.Function;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.particles.DustParticleOptions;
@@ -45,12 +46,7 @@ public class AnalogLeverBlock extends FaceAttachedHorizontalDirectionalBlock imp
     }
 
     private Function<BlockState, VoxelShape> createShapeFunction() {
-        Map<AttachFace, Map<Direction, VoxelShape>> map = Shapes.rotateAttachFace(Block.boxZ(
-            6.0,
-            8.0,
-            10.0,
-            16.0
-        ));
+        Map<AttachFace, Map<Direction, VoxelShape>> map = Shapes.rotateAttachFace(Block.boxZ(6.0, 8.0, 10.0, 16.0));
         return this.getShapeForEachState(state -> map.get(state.getValue(FACE)).get(state.getValue(FACING)));
     }
 

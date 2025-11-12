@@ -4,6 +4,7 @@ import com.mojang.datafixers.util.*;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.function.Function;
+
 import net.minecraft.network.codec.StreamCodec;
 
 public interface CatnipLargerStreamCodecs {

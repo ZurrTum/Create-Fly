@@ -1,10 +1,12 @@
 package com.zurrtum.create.content.trains.entity;
 
 import com.google.common.collect.Streams;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Stream;
+
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;

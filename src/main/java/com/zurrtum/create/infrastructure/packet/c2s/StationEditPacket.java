@@ -5,7 +5,9 @@ import com.zurrtum.create.AllPackets;
 import com.zurrtum.create.catnip.codecs.stream.CatnipStreamCodecBuilders;
 import com.zurrtum.create.content.decoration.slidingDoor.DoorControl;
 import io.netty.buffer.ByteBuf;
+
 import java.util.function.BiConsumer;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;

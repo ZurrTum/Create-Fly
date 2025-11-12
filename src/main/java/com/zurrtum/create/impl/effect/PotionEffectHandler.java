@@ -4,7 +4,9 @@ import com.zurrtum.create.api.effect.OpenPipeEffectHandler;
 import com.zurrtum.create.content.fluids.potion.PotionFluidHandler;
 import com.zurrtum.create.infrastructure.fluids.BottleFluidInventory;
 import com.zurrtum.create.infrastructure.fluids.FluidStack;
+
 import java.util.List;
+
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.effect.MobEffect;

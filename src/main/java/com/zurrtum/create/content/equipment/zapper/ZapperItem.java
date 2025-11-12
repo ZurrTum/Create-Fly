@@ -8,6 +8,7 @@ import com.zurrtum.create.infrastructure.packet.s2c.ZapperBeamPacket;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.function.Consumer;
+
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
@@ -157,14 +158,7 @@ public abstract class ZapperItem extends Item implements SwingControlItem {
         return null;
     }
 
-    protected abstract boolean activate(
-        Level world,
-        Player player,
-        ItemStack item,
-        BlockState stateToUse,
-        BlockHitResult raytrace,
-        CompoundTag data
-    );
+    protected abstract boolean activate(Level world, Player player, ItemStack item, BlockState stateToUse, BlockHitResult raytrace, CompoundTag data);
 
     protected abstract void openHandgunGUI(ItemStack item, InteractionHand hand);
 

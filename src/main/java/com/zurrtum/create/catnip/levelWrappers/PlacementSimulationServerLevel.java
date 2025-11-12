@@ -2,6 +2,7 @@ package com.zurrtum.create.catnip.levelWrappers;
 
 import java.util.HashMap;
 import java.util.function.Predicate;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.block.Blocks;

@@ -10,7 +10,9 @@ import com.zurrtum.create.client.flywheel.lib.model.baked.BakedModelBuilder;
 import com.zurrtum.create.client.flywheel.lib.util.RendererReloadCache;
 import com.zurrtum.create.client.foundation.render.AllInstanceTypes;
 import com.zurrtum.create.content.kinetics.waterwheel.WaterWheelBlockEntity;
+
 import java.util.function.Consumer;
+
 import net.minecraft.client.renderer.block.model.SimpleModelWrapper;
 import net.minecraft.world.level.block.state.BlockState;
 

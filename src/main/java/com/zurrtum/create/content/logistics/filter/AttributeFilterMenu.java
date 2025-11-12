@@ -6,8 +6,10 @@ import com.zurrtum.create.content.logistics.item.filter.attribute.ItemAttribute;
 import com.zurrtum.create.infrastructure.component.AttributeFilterWhitelistMode;
 import com.zurrtum.create.infrastructure.component.ItemAttributeEntry;
 import com.zurrtum.create.infrastructure.items.ItemStackHandler;
+
 import java.util.ArrayList;
 import java.util.List;
+
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.chat.Component;

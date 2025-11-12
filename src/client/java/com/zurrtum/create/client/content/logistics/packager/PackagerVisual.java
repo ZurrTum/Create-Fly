@@ -14,6 +14,7 @@ import com.zurrtum.create.content.logistics.packager.PackagerBlockEntity;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Consumer;
+
 import net.minecraft.core.Direction;
 import net.minecraft.world.phys.Vec3;
 

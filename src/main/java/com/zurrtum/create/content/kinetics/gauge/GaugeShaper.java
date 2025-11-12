@@ -2,7 +2,9 @@ package com.zurrtum.create.content.kinetics.gauge;
 
 import com.zurrtum.create.AllShapes;
 import com.zurrtum.create.catnip.math.VoxelShaper;
+
 import java.util.Arrays;
+
 import net.minecraft.core.Direction;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.VoxelShape;

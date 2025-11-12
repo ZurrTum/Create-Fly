@@ -1,6 +1,7 @@
 package com.zurrtum.create.client.catnip.ghostblock;
 
 import java.util.function.Supplier;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;

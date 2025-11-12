@@ -3,7 +3,9 @@ package com.zurrtum.create.foundation.blockEntity.behaviour.simple;
 import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
 import com.zurrtum.create.foundation.blockEntity.behaviour.BehaviourType;
 import com.zurrtum.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
+
 import java.util.function.Supplier;
+
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 

@@ -9,10 +9,12 @@ import com.zurrtum.create.foundation.recipe.RecipeFinder;
 import com.zurrtum.create.foundation.recipe.trie.AbstractVariant;
 import com.zurrtum.create.foundation.recipe.trie.RecipeTrie;
 import com.zurrtum.create.foundation.recipe.trie.RecipeTrieFinder;
+
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.item.crafting.Recipe;

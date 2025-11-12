@@ -23,7 +23,13 @@ public class HosePulleyBlock extends HorizontalKineticBlock implements IBE<HoseP
     }
 
     @Override
-    public FluidInventory getFluidInventory(LevelAccessor world, BlockPos pos, BlockState state, HosePulleyBlockEntity blockEntity, Direction context) {
+    public FluidInventory getFluidInventory(
+        LevelAccessor world,
+        BlockPos pos,
+        BlockState state,
+        HosePulleyBlockEntity blockEntity,
+        Direction context
+    ) {
         return blockEntity.handler;
     }
 
@@ -37,8 +43,7 @@ public class HosePulleyBlock extends HorizontalKineticBlock implements IBE<HoseP
         Direction preferredHorizontalFacing = getPreferredHorizontalFacing(context);
         return defaultBlockState().setValue(
             HORIZONTAL_FACING,
-            preferredHorizontalFacing != null ? preferredHorizontalFacing.getCounterClockWise() : context.getHorizontalDirection()
-                .getOpposite()
+            preferredHorizontalFacing != null ? preferredHorizontalFacing.getCounterClockWise() : context.getHorizontalDirection().getOpposite()
         );
     }
 

@@ -7,8 +7,10 @@ import com.zurrtum.create.client.foundation.block.connected.ConnectedTextureBeha
 import com.zurrtum.create.client.foundation.block.connected.ConnectedTextureBehaviour.CTContext;
 import com.zurrtum.create.client.foundation.model.BakedQuadHelper;
 import com.zurrtum.create.content.decoration.copycat.CopycatBlock;
+
 import java.util.List;
 import java.util.function.BiFunction;
+
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.block.model.BlockModelPart;
 import net.minecraft.client.renderer.block.model.SimpleModelWrapper;
@@ -47,7 +49,14 @@ public class CTModel extends WrapperBlockStateModel {
         }
     }
 
-    protected void addQuads(QuadCollection.Builder builder, BlockModelPart part, Direction direction, BlockState state, RandomSource random, int index) {
+    protected void addQuads(
+        QuadCollection.Builder builder,
+        BlockModelPart part,
+        Direction direction,
+        BlockState state,
+        RandomSource random,
+        int index
+    ) {
         for (BakedQuad quad : part.getQuads(direction)) {
             builder.addCulledFace(direction, replaceQuad(state, random, index, quad));
         }

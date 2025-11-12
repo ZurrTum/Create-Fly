@@ -2,8 +2,10 @@ package com.zurrtum.create.content.kinetics.drill;
 
 import com.zurrtum.create.AllBlocks;
 import com.zurrtum.create.AllFluids;
+
 import java.util.*;
 import java.util.function.Function;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.Level;
@@ -83,8 +85,8 @@ public final class FluidInteractionRegistry {
         addInteraction(
             Fluids.LAVA,
             new InteractionInformation(
-                (level, currentPos, relativePos, currentState) -> level.getBlockState(currentPos.below())
-                    .is(Blocks.SOUL_SOIL) && level.getBlockState(relativePos).is(Blocks.BLUE_ICE), Blocks.BASALT.defaultBlockState()
+                (level, currentPos, relativePos, currentState) -> level.getBlockState(currentPos.below()).is(Blocks.SOUL_SOIL) && level.getBlockState(
+                    relativePos).is(Blocks.BLUE_ICE), Blocks.BASALT.defaultBlockState()
             )
         );
         addInteraction(

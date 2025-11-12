@@ -6,8 +6,10 @@ import com.zurrtum.create.AllPackets;
 import com.zurrtum.create.catnip.codecs.stream.CatnipStreamCodecs;
 import com.zurrtum.create.content.kinetics.mechanicalArm.ArmBlockEntity;
 import com.zurrtum.create.content.kinetics.mechanicalArm.ArmInteractionPoint;
+
 import java.util.List;
 import java.util.function.BiConsumer;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.network.RegistryFriendlyByteBuf;

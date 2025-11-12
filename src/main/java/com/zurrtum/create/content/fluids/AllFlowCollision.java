@@ -2,9 +2,11 @@ package com.zurrtum.create.content.fluids;
 
 import com.zurrtum.create.AllBlocks;
 import com.zurrtum.create.AllFluids;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;

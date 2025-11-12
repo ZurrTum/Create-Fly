@@ -14,8 +14,10 @@ import com.zurrtum.create.client.flywheel.lib.visual.SimpleDynamicVisual;
 import com.zurrtum.create.content.kinetics.steamEngine.PoweredShaftBlockEntity;
 import com.zurrtum.create.content.kinetics.steamEngine.SteamEngineBlock;
 import com.zurrtum.create.content.kinetics.steamEngine.SteamEngineBlockEntity;
+
 import java.util.Objects;
 import java.util.function.Consumer;
+
 import net.minecraft.core.Direction;
 import net.minecraft.core.Direction.Axis;
 import net.minecraft.util.Mth;
@@ -74,8 +76,7 @@ public class SteamEngineVisual extends AbstractBlockEntityVisual<SteamEngineBloc
         Axis facingAxis = facing.getAxis();
 
         boolean roll90 = facingAxis.isHorizontal() && axis == Axis.Y || facingAxis.isVertical() && axis == Axis.Z;
-        float piston = ((6 / 16f) * Mth.sin(angle) - Mth.sqrt(Mth.square(14 / 16f) - Mth.square(6 / 16f) * Mth.square(
-            Mth.cos(angle))));
+        float piston = ((6 / 16f) * Mth.sin(angle) - Mth.sqrt(Mth.square(14 / 16f) - Mth.square(6 / 16f) * Mth.square(Mth.cos(angle))));
         float distance = Mth.sqrt(Mth.square(piston - 6 / 16f * Mth.sin(angle)));
         float angle2 = (float) Math.acos(distance / (14 / 16f)) * (Mth.cos(angle) >= 0 ? 1f : -1f);
 

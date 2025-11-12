@@ -8,9 +8,11 @@ import com.zurrtum.create.content.equipment.zapper.terrainzapper.Brush;
 import com.zurrtum.create.infrastructure.component.PlacementOptions;
 import com.zurrtum.create.infrastructure.component.TerrainBrushes;
 import com.zurrtum.create.infrastructure.component.TerrainTools;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.function.Supplier;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.BlockPos;

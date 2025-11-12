@@ -23,6 +23,7 @@ import com.zurrtum.create.infrastructure.packet.c2s.ConfigureSymmetryWandPacket;
 import org.joml.Vector3f;
 
 import java.util.List;
+
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
@@ -90,8 +91,8 @@ public class SymmetryWandScreen extends AbstractSimiScreen {
         labelAlign = new Label(x + 51, y + 50, CommonComponents.EMPTY).colored(0xFFFFFFFF).withShadow();
 
         int state = currentElement instanceof TriplePlaneMirror ? 2 : currentElement instanceof CrossPlaneMirror ? 1 : 0;
-        areaType = new SelectionScrollInput(x + 45, y + 21, 109, 18).forOptions(getMirrors()).titled(mirrorType.plainCopy())
-            .writingTo(labelType).setState(state);
+        areaType = new SelectionScrollInput(x + 45, y + 21, 109, 18).forOptions(getMirrors()).titled(mirrorType.plainCopy()).writingTo(labelType)
+            .setState(state);
 
         areaType.calling(position -> {
             switch (position) {
@@ -155,14 +156,7 @@ public class SymmetryWandScreen extends AbstractSimiScreen {
         int y = guiTop;
 
         background.render(graphics, x, y);
-        graphics.drawString(
-            font,
-            wand.getHoverName(),
-            x + (background.getWidth() - font.width(wand.getHoverName())) / 2,
-            y + 4,
-            0xFF592424,
-            false
-        );
+        graphics.drawString(font, wand.getHoverName(), x + (background.getWidth() - font.width(wand.getHoverName())) / 2, y + 4, 0xFF592424, false);
     }
 
     private void transformBlock(PoseStack ms, float p) {

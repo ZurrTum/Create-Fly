@@ -55,7 +55,8 @@ public class ElevatorContactBlock extends WrenchableDirectionalBlock implements 
 
     public ElevatorContactBlock(Properties pProperties) {
         super(pProperties);
-        registerDefaultState(defaultBlockState().setValue(CALLING, false).setValue(POWERING, false).setValue(POWERED, false).setValue(FACING, Direction.SOUTH));
+        registerDefaultState(defaultBlockState().setValue(CALLING, false).setValue(POWERING, false).setValue(POWERED, false)
+            .setValue(FACING, Direction.SOUTH));
     }
 
     @Override

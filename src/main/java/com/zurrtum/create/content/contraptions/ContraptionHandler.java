@@ -3,8 +3,10 @@ package com.zurrtum.create.content.contraptions;
 import com.zurrtum.create.catnip.data.WorldAttached;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import it.unimi.dsi.fastutil.objects.ObjectLists;
+
 import java.lang.ref.WeakReference;
 import java.util.*;
+
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.entity.EntityAccess;
 

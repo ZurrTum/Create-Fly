@@ -4,7 +4,9 @@ import com.google.common.collect.ImmutableList;
 import com.zurrtum.create.catnip.data.Pair;
 import com.zurrtum.create.client.foundation.utility.CreateLang;
 import com.zurrtum.create.content.trains.schedule.destination.ChangeTitleInstruction;
+
 import java.util.List;
+
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;

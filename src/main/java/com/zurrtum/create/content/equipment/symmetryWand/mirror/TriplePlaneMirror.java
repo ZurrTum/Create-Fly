@@ -2,10 +2,12 @@ package com.zurrtum.create.content.equipment.symmetryWand.mirror;
 
 import com.zurrtum.create.catnip.data.Pair;
 import com.zurrtum.create.infrastructure.component.SymmetryMirror;
+
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.util.StringRepresentable;

@@ -6,7 +6,9 @@ import com.zurrtum.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.foundation.gui.menu.MenuProvider;
 import com.zurrtum.create.foundation.utility.IInteractionChecker;
 import com.zurrtum.create.infrastructure.items.ItemInventory;
+
 import java.util.List;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;

@@ -1,6 +1,7 @@
 package com.zurrtum.create.content.decoration.encasing;
 
 import java.util.List;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
@@ -49,13 +50,6 @@ public interface EncasableBlock {
     default void playEncaseSound(Level level, BlockPos pos) {
         BlockState newState = level.getBlockState(pos);
         SoundType soundType = newState.getSoundType();
-        level.playSound(
-            null,
-            pos,
-            soundType.getPlaceSound(),
-            SoundSource.BLOCKS,
-            (soundType.getVolume() + 1.0F) / 2.0F,
-            soundType.getPitch() * 0.8F
-        );
+        level.playSound(null, pos, soundType.getPlaceSound(), SoundSource.BLOCKS, (soundType.getVolume() + 1.0F) / 2.0F, soundType.getPitch() * 0.8F);
     }
 }

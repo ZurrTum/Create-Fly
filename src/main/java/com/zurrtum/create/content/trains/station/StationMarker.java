@@ -10,9 +10,11 @@ import com.zurrtum.create.AllBlockEntityTypes;
 import com.zurrtum.create.AllMapDecorationTypes;
 import com.zurrtum.create.content.trains.track.TrackTargetingBehaviour;
 import com.zurrtum.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
+
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.ComponentSerialization;

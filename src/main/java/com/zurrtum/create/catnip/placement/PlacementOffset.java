@@ -3,6 +3,7 @@ package com.zurrtum.create.catnip.placement;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Function;
+
 import net.minecraft.advancements.CriteriaTriggers;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Vec3i;

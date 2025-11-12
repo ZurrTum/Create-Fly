@@ -50,7 +50,13 @@ public class ItemDrainBlock extends Block implements IWrenchable, IBE<ItemDrainB
     }
 
     @Override
-    public FluidInventory getFluidInventory(LevelAccessor world, BlockPos pos, BlockState state, ItemDrainBlockEntity blockEntity, Direction context) {
+    public FluidInventory getFluidInventory(
+        LevelAccessor world,
+        BlockPos pos,
+        BlockState state,
+        ItemDrainBlockEntity blockEntity,
+        Direction context
+    ) {
         return blockEntity.internalTank.getCapability();
     }
 

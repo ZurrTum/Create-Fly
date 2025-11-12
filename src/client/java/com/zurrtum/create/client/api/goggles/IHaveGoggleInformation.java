@@ -4,7 +4,9 @@ import com.zurrtum.create.client.catnip.lang.LangBuilder;
 import com.zurrtum.create.client.foundation.utility.CreateLang;
 import com.zurrtum.create.infrastructure.fluids.FluidInventory;
 import com.zurrtum.create.infrastructure.fluids.FluidStack;
+
 import java.util.List;
+
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -44,7 +46,8 @@ public non-sealed interface IHaveGoggleInformation extends IHaveCustomOverlayIco
 
             CreateLang.builder().add(CreateLang.number((double) fluidStack.getAmount() / 81).add(mb).style(ChatFormatting.GOLD))
                 .text(ChatFormatting.GRAY, " / ")
-                .add(CreateLang.number((double) handler.getMaxAmount(fluidStack) / 81).add(mb).style(ChatFormatting.DARK_GRAY)).forGoggles(tooltip, 1);
+                .add(CreateLang.number((double) handler.getMaxAmount(fluidStack) / 81).add(mb).style(ChatFormatting.DARK_GRAY))
+                .forGoggles(tooltip, 1);
 
             isEmpty = false;
         }

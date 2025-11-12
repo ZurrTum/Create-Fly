@@ -1,6 +1,7 @@
 package com.zurrtum.create.client.ponder.api.registration;
 
 import java.util.function.Predicate;
+
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.block.Block;

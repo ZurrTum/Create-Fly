@@ -72,7 +72,8 @@ public abstract class RotatedPillarKineticBlock extends KineticBlock {
             return this.defaultBlockState().setValue(AXIS, preferredAxis);
         return this.defaultBlockState().setValue(
             AXIS,
-            preferredAxis != null && context.getPlayer().isShiftKeyDown() ? context.getClickedFace().getAxis() : context.getNearestLookingDirection().getAxis()
+            preferredAxis != null && context.getPlayer().isShiftKeyDown() ? context.getClickedFace().getAxis() : context.getNearestLookingDirection()
+                .getAxis()
         );
     }
 }

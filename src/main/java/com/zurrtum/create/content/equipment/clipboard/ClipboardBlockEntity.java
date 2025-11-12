@@ -7,8 +7,10 @@ import com.zurrtum.create.AllDataComponents;
 import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
 import com.zurrtum.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.infrastructure.component.ClipboardContent;
+
 import java.util.List;
 import java.util.UUID;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.UUIDUtil;
 import net.minecraft.core.component.DataComponentMap;

@@ -6,10 +6,12 @@ import com.zurrtum.create.catnip.data.Pair;
 import com.zurrtum.create.catnip.math.VecHelper;
 import com.zurrtum.create.content.decoration.girder.GirderBlock;
 import com.zurrtum.create.foundation.block.ProperWaterloggedBlock;
+
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Direction.Axis;
@@ -24,15 +26,7 @@ import net.minecraft.world.phys.Vec3;
 
 public class TrackPaver {
 
-    public static int paveStraight(
-        Level level,
-        BlockPos startPos,
-        Vec3 direction,
-        int extent,
-        Block block,
-        boolean simulate,
-        Set<BlockPos> visited
-    ) {
+    public static int paveStraight(Level level, BlockPos startPos, Vec3 direction, int extent, Block block, boolean simulate, Set<BlockPos> visited) {
         int itemsNeeded = 0;
 
         BlockState defaultBlockState = block.defaultBlockState();

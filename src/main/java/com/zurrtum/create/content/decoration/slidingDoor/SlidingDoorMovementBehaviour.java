@@ -26,6 +26,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.DoubleBlockHalf;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate.StructureBlockInfo;
 import net.minecraft.world.phys.Vec3;
+
 import java.lang.ref.WeakReference;
 
 public class SlidingDoorMovementBehaviour extends MovementBehaviour {
@@ -85,7 +86,8 @@ public class SlidingDoorMovementBehaviour extends MovementBehaviour {
         BlockPos inWorldDoor = BlockPos.containing(context.position).relative(facing);
         BlockState inWorldDoorState = context.world.getBlockState(inWorldDoor);
         if (inWorldDoorState.getBlock() instanceof DoorBlock db && inWorldDoorState.hasProperty(DoorBlock.OPEN))
-            if (inWorldDoorState.hasProperty(DoorBlock.FACING) && inWorldDoorState.getValueOrElse(DoorBlock.FACING, Direction.UP).getAxis() == facing.getAxis())
+            if (inWorldDoorState.hasProperty(DoorBlock.FACING) && inWorldDoorState.getValueOrElse(DoorBlock.FACING, Direction.UP)
+                .getAxis() == facing.getAxis())
                 db.setOpen(null, context.world, inWorldDoorState, inWorldDoor, shouldOpen);
 
         if (shouldOpen)
@@ -191,7 +193,8 @@ public class SlidingDoorMovementBehaviour extends MovementBehaviour {
         Direction stateFacing = context.state.getValue(DoorBlock.FACING);
         Direction originalFacing = Direction.get(AxisDirection.POSITIVE, stateFacing.getAxis());
         Vec3 centerOfContraption = context.contraption.bounds.getCenter();
-        Vec3 diff = Vec3.atCenterOf(context.localPos).add(Vec3.atLowerCornerOf(stateFacing.getUnitVec3i()).scale(-.45f)).subtract(centerOfContraption);
+        Vec3 diff = Vec3.atCenterOf(context.localPos).add(Vec3.atLowerCornerOf(stateFacing.getUnitVec3i()).scale(-.45f))
+            .subtract(centerOfContraption);
         if (originalFacing.getAxis().choose(diff.x, diff.y, diff.z) < 0)
             originalFacing = originalFacing.getOpposite();
 

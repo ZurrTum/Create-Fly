@@ -2,7 +2,9 @@ package com.zurrtum.create.client.infrastructure.model;
 
 import com.zurrtum.create.content.decoration.bracket.BracketedBlockEntityBehaviour;
 import com.zurrtum.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
+
 import java.util.List;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.block.model.BlockModelPart;
 import net.minecraft.client.renderer.block.model.BlockStateModel;

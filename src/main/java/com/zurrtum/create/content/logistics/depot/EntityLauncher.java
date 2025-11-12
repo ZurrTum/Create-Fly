@@ -14,7 +14,10 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.phys.Vec3;
 
 public class EntityLauncher {
-    public static final StreamCodec<RegistryFriendlyByteBuf, EntityLauncher> PACKET_CODEC = StreamCodec.ofMember(EntityLauncher::write, EntityLauncher::new);
+    public static final StreamCodec<RegistryFriendlyByteBuf, EntityLauncher> PACKET_CODEC = StreamCodec.ofMember(
+        EntityLauncher::write,
+        EntityLauncher::new
+    );
     public static final Codec<EntityLauncher> CODEC = RecordCodecBuilder.create(instance -> instance.group(
         Codec.INT.fieldOf("horizontalDistance").forGetter(EntityLauncher::getHorizontalDistance),
         Codec.INT.fieldOf("verticalDistance").forGetter(EntityLauncher::getVerticalDistance),

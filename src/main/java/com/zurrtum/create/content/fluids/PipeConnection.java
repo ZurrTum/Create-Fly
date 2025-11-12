@@ -8,9 +8,11 @@ import com.zurrtum.create.catnip.math.BlockFace;
 import com.zurrtum.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.foundation.codec.CreateCodecs;
 import com.zurrtum.create.infrastructure.fluids.FluidStack;
+
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.util.Mth;

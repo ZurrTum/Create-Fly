@@ -7,10 +7,12 @@ import com.zurrtum.create.api.registry.SimpleRegistry;
 import com.zurrtum.create.catnip.data.Iterate;
 import com.zurrtum.create.catnip.math.BlockFace;
 import com.zurrtum.create.content.logistics.vault.ItemVaultBlockEntity;
+
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.EnumSet;
 import java.util.Set;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.WorldlyContainer;

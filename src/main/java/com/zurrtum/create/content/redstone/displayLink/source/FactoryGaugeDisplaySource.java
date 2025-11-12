@@ -9,6 +9,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Stream;
+
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
@@ -50,7 +51,8 @@ public class FactoryGaugeDisplaySource extends ValueListDisplaySource {
 
         return IntAttached.with(
             panel.getLevelInStorage(),
-            Component.literal(s + " ").withColor(panel.getIngredientStatusColor()).append(filter.getHoverName().plainCopy().withStyle(ChatFormatting.RESET))
+            Component.literal(s + " ").withColor(panel.getIngredientStatusColor())
+                .append(filter.getHoverName().plainCopy().withStyle(ChatFormatting.RESET))
         );
     }
 

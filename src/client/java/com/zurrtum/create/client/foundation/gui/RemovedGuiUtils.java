@@ -5,6 +5,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
@@ -130,7 +131,8 @@ public class RemovedGuiUtils {
 
         List<ClientTooltipComponent> list = new ArrayList<>();
         for (FormattedText textLine : textLines) {
-            FormattedCharSequence charSequence = textLine instanceof Component text ? text.getVisualOrderText() : Language.getInstance().getVisualOrder(textLine);
+            FormattedCharSequence charSequence = textLine instanceof Component text ? text.getVisualOrderText() : Language.getInstance()
+                .getVisualOrder(textLine);
             list.add(ClientTooltipComponent.create(charSequence));
         }
 

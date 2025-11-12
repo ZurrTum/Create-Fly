@@ -1,9 +1,11 @@
 package com.zurrtum.create.client.foundation.utility;
 
 import com.zurrtum.create.catnip.data.Couple;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Supplier;
+
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.block.Blocks;

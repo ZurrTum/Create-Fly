@@ -3,6 +3,7 @@ package com.zurrtum.create.client.foundation.virtualWorld;
 import java.util.Collections;
 import java.util.UUID;
 import java.util.function.Consumer;
+
 import net.minecraft.util.AbortableIterationConsumer;
 import net.minecraft.world.level.entity.EntityAccess;
 import net.minecraft.world.level.entity.EntityTypeTest;

@@ -8,7 +8,9 @@ import com.zurrtum.create.client.foundation.blockEntity.behaviour.ValueSettingsI
 import com.zurrtum.create.foundation.blockEntity.behaviour.BehaviourType;
 import com.zurrtum.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.infrastructure.packet.c2s.ValueSettingsPacket;
+
 import java.util.List;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.player.LocalPlayer;
@@ -34,7 +36,12 @@ public class ValueSettingsClient {
         return interactHeldTicks != -1 && pos.equals(interactHeldPos);
     }
 
-    public void startInteractionWith(BlockPos pos, BehaviourType<? extends BlockEntityBehaviour<?>> behaviourType, InteractionHand hand, Direction side) {
+    public void startInteractionWith(
+        BlockPos pos,
+        BehaviourType<? extends BlockEntityBehaviour<?>> behaviourType,
+        InteractionHand hand,
+        Direction side
+    ) {
         interactHeldTicks = 0;
         interactHeldPos = pos;
         interactHeldBehaviour = behaviourType;

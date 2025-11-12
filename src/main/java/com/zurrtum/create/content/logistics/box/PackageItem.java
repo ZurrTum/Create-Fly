@@ -17,6 +17,7 @@ import java.lang.ref.WeakReference;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Function;
+
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -258,7 +259,8 @@ public class PackageItem extends Item implements EntityItem {
             }
 
             visibleNames++;
-            textConsumer.accept(Component.translatable("item.container.item_count", itemstack.getHoverName(), itemstack.getCount()).withStyle(ChatFormatting.GRAY));
+            textConsumer.accept(Component.translatable("item.container.item_count", itemstack.getHoverName(), itemstack.getCount())
+                .withStyle(ChatFormatting.GRAY));
         }
 
         if (skippedNames > 0)
@@ -316,15 +318,7 @@ public class PackageItem extends Item implements EntityItem {
             for (int i = 0; i < 10; i++) {
                 Vec3 motion = VecHelper.offsetRandomly(Vec3.ZERO, worldIn.getRandom(), .125f);
                 Vec3 pos = position.add(0, 0.5, 0).add(playerIn.getLookAngle().scale(.5)).add(motion.scale(4));
-                worldIn.addParticle(
-                    new ItemParticleOption(ParticleTypes.ITEM, particle),
-                    pos.x,
-                    pos.y,
-                    pos.z,
-                    motion.x,
-                    motion.y,
-                    motion.z
-                );
+                worldIn.addParticle(new ItemParticleOption(ParticleTypes.ITEM, particle), pos.x, pos.y, pos.z, motion.x, motion.y, motion.z);
             }
         }
 

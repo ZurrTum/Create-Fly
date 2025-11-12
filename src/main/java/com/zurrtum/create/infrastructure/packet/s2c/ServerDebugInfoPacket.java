@@ -8,6 +8,7 @@ import io.netty.buffer.ByteBuf;
 import org.apache.logging.log4j.util.TriConsumer;
 
 import java.util.List;
+
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.PacketType;

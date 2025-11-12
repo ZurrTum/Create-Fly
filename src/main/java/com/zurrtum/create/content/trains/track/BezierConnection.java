@@ -119,7 +119,10 @@ public class BezierConnection implements Iterable<BezierConnection.Segment> {
         return this == other || (other != null && coupleEquals(this.bePositions, other.bePositions) && coupleEquals(
             this.starts,
             other.starts
-        ) && coupleEquals(this.axes, other.axes) && coupleEquals(this.normals, other.normals) && this.hasGirder == other.hasGirder);
+        ) && coupleEquals(this.axes, other.axes) && coupleEquals(
+            this.normals,
+            other.normals
+        ) && this.hasGirder == other.hasGirder);
     }
 
     @SuppressWarnings("OptionalUsedAsFieldOrParameterType")

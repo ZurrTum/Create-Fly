@@ -2,7 +2,9 @@ package com.zurrtum.create.content.kinetics.chainConveyor;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+
 import java.util.concurrent.atomic.AtomicInteger;
+
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
 

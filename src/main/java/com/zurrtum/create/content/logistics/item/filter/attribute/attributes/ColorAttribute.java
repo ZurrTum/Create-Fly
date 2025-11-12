@@ -9,6 +9,7 @@ import io.netty.buffer.ByteBuf;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
+
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.RegistryFriendlyByteBuf;

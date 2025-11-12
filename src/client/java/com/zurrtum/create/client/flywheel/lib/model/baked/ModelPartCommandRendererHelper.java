@@ -3,8 +3,10 @@ package com.zurrtum.create.client.flywheel.lib.model.baked;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.SheetedDecalTextureGenerator;
 import com.mojang.blaze3d.vertex.VertexConsumer;
+
 import java.util.List;
 import java.util.Map;
+
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.SubmitNodeCollection;
@@ -33,12 +35,7 @@ public class ModelPartCommandRendererHelper {
                 if (modelPartCommand.sprite() != null) {
                     if (modelPartCommand.hasFoil()) {
                         vertexConsumer2 = modelPartCommand.sprite()
-                            .wrap(ItemRenderer.getFoilBuffer(
-                                vertexConsumers,
-                                renderLayer,
-                                modelPartCommand.sheeted(),
-                                true
-                            ));
+                            .wrap(ItemRenderer.getFoilBuffer(vertexConsumers, renderLayer, modelPartCommand.sheeted(), true));
                     } else {
                         vertexConsumer2 = modelPartCommand.sprite().wrap(vertexConsumer);
                     }

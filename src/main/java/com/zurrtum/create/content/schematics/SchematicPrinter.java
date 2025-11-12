@@ -13,9 +13,11 @@ import com.zurrtum.create.content.schematics.requirement.ItemRequirement;
 import com.zurrtum.create.foundation.blockEntity.IMergeableBE;
 import com.zurrtum.create.foundation.codec.CreateCodecs;
 import com.zurrtum.create.foundation.utility.BlockHelper;
+
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
@@ -118,7 +120,12 @@ public class SchematicPrinter {
         BlockPos extraBounds = StructureTemplate.calculateRelativePosition(settings, new BlockPos(activeTemplate.getSize()).offset(-1, -1, -1));
         blockReader.setBounds(BBHelper.encapsulate(blockReader.getBounds(), extraBounds));
 
-        StructureTransform transform = new StructureTransform(settings.getRotationPivot(), Direction.Axis.Y, settings.getRotation(), settings.getMirror());
+        StructureTransform transform = new StructureTransform(
+            settings.getRotationPivot(),
+            Direction.Axis.Y,
+            settings.getRotation(),
+            settings.getMirror()
+        );
         for (BlockEntity be : blockReader.getBlockEntities())
             transform.apply(be);
 
@@ -225,7 +232,8 @@ public class SchematicPrinter {
         BlockEntity toReplaceBE = world.getBlockEntity(pos);
         BlockState toReplaceOther = null;
 
-        if (state.hasProperty(BlockStateProperties.BED_PART) && state.hasProperty(BlockStateProperties.HORIZONTAL_FACING) && state.getValue(BlockStateProperties.BED_PART) == BedPart.FOOT)
+        if (state.hasProperty(BlockStateProperties.BED_PART) && state.hasProperty(BlockStateProperties.HORIZONTAL_FACING) && state.getValue(
+            BlockStateProperties.BED_PART) == BedPart.FOOT)
             toReplaceOther = world.getBlockState(pos.relative(state.getValue(BlockStateProperties.HORIZONTAL_FACING)));
         if (state.hasProperty(BlockStateProperties.DOUBLE_BLOCK_HALF) && state.getValue(BlockStateProperties.DOUBLE_BLOCK_HALF) == DoubleBlockHalf.LOWER)
             toReplaceOther = world.getBlockState(pos.above());

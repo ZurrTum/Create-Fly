@@ -67,7 +67,10 @@ public class BasinFluidParticle extends FluidParticle {
     @Override
     public void tick() {
         super.tick();
-        quadSize = targetPos != null ? Math.max(1 / 32f, ((1f * age) / lifetime) / 8) : 1 / 8f * (1 - ((Math.abs(age - (lifetime / 2)) / (1f * lifetime))));
+        quadSize = targetPos != null ? Math.max(
+            1 / 32f,
+            ((1f * age) / lifetime) / 8
+        ) : 1 / 8f * (1 - ((Math.abs(age - (lifetime / 2)) / (1f * lifetime))));
 
         if (age % 2 == 0) {
             if (!level.getBlockState(basinPos).is(AllBlocks.BASIN) && !BasinBlock.isBasin(level, basinPos)) {

@@ -45,7 +45,11 @@ public class DeployingCategory extends CreateCategory<DeployingDisplay> {
             drawSlotBackground(graphics, input, target, output);
             AllGuiTextures.JEI_SHADOW.render(graphics, bounds.x + 67, bounds.y + 62);
             AllGuiTextures.JEI_DOWN_ARROW.render(graphics, bounds.x + 131, bounds.y + 34);
-            graphics.guiRenderState.submitPicturesInPictureState(new DeployerRenderState(new Matrix3x2f(graphics.pose()), bounds.x + 80, bounds.y - 5));
+            graphics.guiRenderState.submitPicturesInPictureState(new DeployerRenderState(
+                new Matrix3x2f(graphics.pose()),
+                bounds.x + 80,
+                bounds.y - 5
+            ));
         }));
         widgets.add(createInputSlot(input).entries(display.input()));
         widgets.add(createInputSlot(target).entries(display.target()));

@@ -5,6 +5,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Iterator;
 import java.util.stream.Stream;
+
 import net.minecraft.client.renderer.LightTexture;
 
 /**

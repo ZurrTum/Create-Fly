@@ -6,6 +6,7 @@ import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix3x2f;
 
 import java.util.function.BiConsumer;
+
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.navigation.ScreenRectangle;
 import net.minecraft.client.gui.render.state.pip.PictureInPictureRenderState;

@@ -2,10 +2,12 @@ package com.zurrtum.create.content.trains.schedule;
 
 import com.mojang.serialization.*;
 import com.zurrtum.create.catnip.codecs.stream.CatnipStreamCodecBuilders;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;

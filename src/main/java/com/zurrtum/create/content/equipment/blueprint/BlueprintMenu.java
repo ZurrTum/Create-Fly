@@ -5,7 +5,9 @@ import com.zurrtum.create.AllMenuTypes;
 import com.zurrtum.create.content.equipment.blueprint.BlueprintEntity.BlueprintSection;
 import com.zurrtum.create.foundation.gui.menu.GhostItemMenu;
 import com.zurrtum.create.infrastructure.items.ItemStackHandler;
+
 import java.util.Optional;
+
 import net.minecraft.network.protocol.game.ClientboundContainerSetSlotPacket;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;

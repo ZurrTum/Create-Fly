@@ -4,7 +4,9 @@ import com.mojang.serialization.MapCodec;
 import com.zurrtum.create.AllMountedStorageTypes;
 import com.zurrtum.create.api.contraption.storage.item.simple.SimpleMountedStorage;
 import com.zurrtum.create.infrastructure.items.ItemStackHandler;
+
 import java.util.Optional;
+
 import net.minecraft.world.Container;
 
 /**

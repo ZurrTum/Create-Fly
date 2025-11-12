@@ -16,9 +16,11 @@ import com.zurrtum.create.client.flywheel.backend.gl.TextureBuffer;
 import com.zurrtum.create.client.flywheel.backend.gl.array.GlVertexArray;
 import com.zurrtum.create.client.flywheel.backend.gl.shader.GlProgram;
 import com.zurrtum.create.client.flywheel.lib.material.SimpleMaterial;
+
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.model.ModelBakery;
 

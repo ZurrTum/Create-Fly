@@ -8,6 +8,7 @@ import java.util.WeakHashMap;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Function;
+
 import net.minecraft.world.level.LevelAccessor;
 
 public class WorldAttached<T> {

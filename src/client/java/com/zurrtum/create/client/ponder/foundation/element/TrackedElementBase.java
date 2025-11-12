@@ -3,8 +3,10 @@ package com.zurrtum.create.client.ponder.foundation.element;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.zurrtum.create.client.ponder.api.element.TrackedElement;
 import com.zurrtum.create.client.ponder.api.level.PonderLevel;
+
 import java.lang.ref.WeakReference;
 import java.util.function.Consumer;
+
 import net.minecraft.client.Camera;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.SubmitNodeCollector;

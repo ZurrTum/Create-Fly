@@ -2,7 +2,9 @@ package com.zurrtum.create;
 
 import com.zurrtum.create.api.contraption.ContraptionMovementSetting;
 import com.zurrtum.create.infrastructure.config.AllConfigs;
+
 import java.util.function.Supplier;
+
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 

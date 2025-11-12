@@ -5,7 +5,9 @@ import com.zurrtum.create.client.foundation.utility.CreateLang;
 import com.zurrtum.create.content.kinetics.base.IRotate.StressImpact;
 import com.zurrtum.create.content.kinetics.deployer.DeployerBlockEntity;
 import com.zurrtum.create.content.kinetics.deployer.DeployerBlockEntity.Mode;
+
 import java.util.List;
+
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
@@ -38,7 +40,8 @@ public class DeployerTooltipBehaviour extends KineticTooltipBehaviour<DeployerBl
 
         ItemStack heldItem = blockEntity.heldItem;
         if (!heldItem.isEmpty())
-            CreateLang.translate("tooltip.deployer.contains", heldItem.getHoverName(), heldItem.getCount()).style(ChatFormatting.GREEN).forGoggles(tooltip);
+            CreateLang.translate("tooltip.deployer.contains", heldItem.getHoverName(), heldItem.getCount()).style(ChatFormatting.GREEN)
+                .forGoggles(tooltip);
 
         float stressAtBase = blockEntity.calculateStressApplied();
         if (StressImpact.isEnabled() && !Mth.equal(stressAtBase, 0)) {

@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Direction.Axis;
@@ -185,10 +186,8 @@ public class FluidPropagator {
             return false;
         if (hasFluidCapability(reader, connectedPos, side.getOpposite()))
             return false;
-        if (!(connectedState.canBeReplaced() && connectedState.getDestroySpeed(
-            reader,
-            connectedPos
-        ) != -1) && !connectedState.hasProperty(BlockStateProperties.WATERLOGGED))
+        if (!(connectedState.canBeReplaced() && connectedState.getDestroySpeed(reader, connectedPos) != -1) && !connectedState.hasProperty(
+            BlockStateProperties.WATERLOGGED))
             return false;
         return true;
     }

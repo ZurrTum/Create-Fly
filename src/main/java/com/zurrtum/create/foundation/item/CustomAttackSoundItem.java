@@ -6,15 +6,5 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 
 public interface CustomAttackSoundItem {
-    void playSound(
-        Level world,
-        Player player,
-        double x,
-        double y,
-        double z,
-        SoundEvent sound,
-        SoundSource category,
-        float volume,
-        float pitch
-    );
+    void playSound(Level world, Player player, double x, double y, double z, SoundEvent sound, SoundSource category, float volume, float pitch);
 }

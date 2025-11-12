@@ -4,8 +4,10 @@ import com.zurrtum.create.AllHandle;
 import com.zurrtum.create.AllPackets;
 import com.zurrtum.create.content.kinetics.transmission.sequencer.Instruction;
 import com.zurrtum.create.foundation.codec.CreateStreamCodecs;
+
 import java.util.Vector;
 import java.util.function.BiConsumer;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;

@@ -22,6 +22,7 @@ import com.zurrtum.create.infrastructure.config.AllConfigs;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Direction.Axis;

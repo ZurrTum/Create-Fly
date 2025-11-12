@@ -15,6 +15,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Map;
 import java.util.Optional;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Direction.Axis;
@@ -134,11 +135,8 @@ public class AxisPipeBlock extends RotatedPillarBlock implements IWrenchableWith
         Direction side = Direction.get(AxisDirection.POSITIVE, state.getValue(AXIS));
         Map<Direction, BooleanProperty> facingToPropertyMap = FluidPipeBlock.PROPERTY_BY_DIRECTION;
         return AllBlocks.FLUID_PIPE.updateBlockState(
-            AllBlocks.FLUID_PIPE.defaultBlockState().setValue(facingToPropertyMap.get(side), true).setValue(facingToPropertyMap.get(side.getOpposite()), true),
-            side,
-            null,
-            world,
-            pos
+            AllBlocks.FLUID_PIPE.defaultBlockState().setValue(facingToPropertyMap.get(side), true)
+                .setValue(facingToPropertyMap.get(side.getOpposite()), true), side, null, world, pos
         );
     }
 

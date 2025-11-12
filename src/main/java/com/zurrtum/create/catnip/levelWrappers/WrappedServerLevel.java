@@ -4,6 +4,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Collections;
 import java.util.List;
+
 import net.minecraft.Util;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
@@ -84,16 +85,7 @@ public class WrappedServerLevel extends ServerLevel {
     }
 
     @Override
-    public void playSound(
-        @Nullable Entity source,
-        double x,
-        double y,
-        double z,
-        SoundEvent sound,
-        SoundSource category,
-        float volume,
-        float pitch
-    ) {
+    public void playSound(@Nullable Entity source, double x, double y, double z, SoundEvent sound, SoundSource category, float volume, float pitch) {
     }
 
     @Override

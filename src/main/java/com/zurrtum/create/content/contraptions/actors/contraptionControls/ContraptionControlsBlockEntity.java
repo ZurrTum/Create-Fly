@@ -7,7 +7,9 @@ import com.zurrtum.create.catnip.animation.LerpedFloat.Chaser;
 import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
 import com.zurrtum.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.foundation.blockEntity.behaviour.filtering.ServerFilteringBehaviour;
+
 import java.util.List;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
@@ -98,6 +100,12 @@ public class ContraptionControlsBlockEntity extends SmartBlockEntity {
             return;
         }
 
-        player.displayClientMessage(Component.translatable("create.contraption.controls.specific_actor_toggle", filter.getHoverName().getString(), state), true);
+        player.displayClientMessage(
+            Component.translatable(
+                "create.contraption.controls.specific_actor_toggle",
+                filter.getHoverName().getString(),
+                state
+            ), true
+        );
     }
 }

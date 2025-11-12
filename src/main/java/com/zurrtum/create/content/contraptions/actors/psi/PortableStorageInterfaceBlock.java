@@ -39,7 +39,13 @@ public class PortableStorageInterfaceBlock extends WrenchableDirectionalBlock im
     }
 
     @Override
-    public Container getInventory(@Nullable BlockState state, LevelAccessor world, BlockPos pos, @Nullable BlockEntity blockEntity, Direction context) {
+    public Container getInventory(
+        @Nullable BlockState state,
+        LevelAccessor world,
+        BlockPos pos,
+        @Nullable BlockEntity blockEntity,
+        Direction context
+    ) {
         if (blockEntity == null) {
             blockEntity = world.getBlockEntity(pos);
         }

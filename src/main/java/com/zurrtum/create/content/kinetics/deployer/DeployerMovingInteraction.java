@@ -32,7 +32,12 @@ import static com.zurrtum.create.Create.LOGGER;
 public class DeployerMovingInteraction extends MovingInteractionBehaviour {
 
     @Override
-    public boolean handlePlayerInteraction(Player player, InteractionHand activeHand, BlockPos localPos, AbstractContraptionEntity contraptionEntity) {
+    public boolean handlePlayerInteraction(
+        Player player,
+        InteractionHand activeHand,
+        BlockPos localPos,
+        AbstractContraptionEntity contraptionEntity
+    ) {
         MutablePair<StructureBlockInfo, MovementContext> actor = contraptionEntity.getContraption().getActorAt(localPos);
         if (actor == null || actor.right == null)
             return false;

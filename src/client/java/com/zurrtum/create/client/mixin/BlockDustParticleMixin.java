@@ -27,15 +27,15 @@ public abstract class BlockDustParticleMixin {
         -1,
         0,
         -1
-    ), new Vec3i(1, 0, -1), new Vec3i(1, 0, 1), new Vec3i(-1, 0, 1), new Vec3i(0, -1, 0), new Vec3i(0, 1, 0), new Vec3i(
+    ), new Vec3i(1, 0, -1), new Vec3i(1, 0, 1), new Vec3i(-1, 0, 1), new Vec3i(0, -1, 0), new Vec3i(0, 1, 0), new Vec3i(0, -1, -1), new Vec3i(
         0,
         -1,
-        -1
-    ), new Vec3i(0, -1, 1), new Vec3i(-1, -1, 0), new Vec3i(1, -1, 0), new Vec3i(-1, -1, -1), new Vec3i(1, -1, -1), new Vec3i(1, -1, 1), new Vec3i(
-        -1,
+        1
+    ), new Vec3i(-1, -1, 0), new Vec3i(1, -1, 0), new Vec3i(-1, -1, -1), new Vec3i(1, -1, -1), new Vec3i(
+        1,
         -1,
         1
-    )};
+    ), new Vec3i(-1, -1, 1)};
 
     @Unique
     private static BlockPos findPos(ClientLevel world, BlockPos pos, BlockState state) {

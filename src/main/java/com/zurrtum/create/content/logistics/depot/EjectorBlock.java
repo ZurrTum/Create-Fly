@@ -13,6 +13,7 @@ import com.zurrtum.create.infrastructure.packet.c2s.EjectorTriggerPacket;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Optional;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Direction.Axis;

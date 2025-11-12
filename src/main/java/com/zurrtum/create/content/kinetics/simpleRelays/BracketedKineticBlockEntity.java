@@ -5,7 +5,9 @@ import com.zurrtum.create.api.contraption.transformable.TransformableBlockEntity
 import com.zurrtum.create.content.contraptions.StructureTransform;
 import com.zurrtum.create.content.decoration.bracket.BracketedBlockEntityBehaviour;
 import com.zurrtum.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
+
 import java.util.List;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;

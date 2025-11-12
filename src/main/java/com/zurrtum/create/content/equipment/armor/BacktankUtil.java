@@ -3,9 +3,11 @@ package com.zurrtum.create.content.equipment.armor;
 import com.zurrtum.create.*;
 import com.zurrtum.create.infrastructure.config.AllConfigs;
 import it.unimi.dsi.fastutil.objects.Object2IntMap.Entry;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
+
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.Holder;
 import net.minecraft.network.chat.CommonComponents;
@@ -95,8 +97,8 @@ public class BacktankUtil {
         AllSoundEvents.STEAM.play(player.level(), null, player.blockPosition(), .5f, .5f);
 
         player.connection.send(new ClientboundSetTitlesAnimationPacket(10, 40, 10));
-        player.connection.send(new ClientboundSetSubtitleTextPacket(Component.literal("\u26A0 ").withStyle(depleted ? ChatFormatting.RED : ChatFormatting.GOLD)
-            .append(component.withStyle(ChatFormatting.GRAY))));
+        player.connection.send(new ClientboundSetSubtitleTextPacket(Component.literal("\u26A0 ")
+            .withStyle(depleted ? ChatFormatting.RED : ChatFormatting.GOLD).append(component.withStyle(ChatFormatting.GRAY))));
         player.connection.send(new ClientboundSetTitleTextPacket(CommonComponents.EMPTY));
     }
 

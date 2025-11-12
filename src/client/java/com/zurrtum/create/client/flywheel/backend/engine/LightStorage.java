@@ -24,6 +24,7 @@ import org.jetbrains.annotations.Nullable;
 import org.lwjgl.system.MemoryUtil;
 
 import java.util.BitSet;
+
 import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.core.SectionPos;
 import net.minecraft.core.Vec3i;
@@ -283,8 +284,8 @@ public class LightStorage implements Effect {
 
                 // Slightly smaller than a full 16x16x16 section to make it obvious which sections
                 // are actually represented when many are tiled next to each other.
-                instance.setIdentityTransform().translate(x + 1, y + 1, z + 1).scale(14).color(255, 255, 0)
-                    .light(LightTexture.FULL_BRIGHT).setChanged();
+                instance.setIdentityTransform().translate(x + 1, y + 1, z + 1).scale(14).color(255, 255, 0).light(LightTexture.FULL_BRIGHT)
+                    .setChanged();
             });
         }
 
@@ -349,13 +350,11 @@ public class LightStorage implements Effect {
                 }
 
                 boxes.get().setIdentityTransform().translate(debug2, y2, minLocal3 * 16 - renderOrigin.getZ())
-                    .scale(size2 * 16, 1, (maxLocal3 - minLocal3) * 16).color(255, 0, 0).light(LightTexture.FULL_BRIGHT)
-                    .setChanged();
+                    .scale(size2 * 16, 1, (maxLocal3 - minLocal3) * 16).color(255, 0, 0).light(LightTexture.FULL_BRIGHT).setChanged();
             }
 
             boxes.get().setIdentityTransform().translate(min2 * 16 - renderOrigin.getX(), debug1, min3 * 16 - renderOrigin.getZ())
-                .scale((max2 - min2) * 16, size1 * 16, (max3 - min3) * 16).color(0, 255, 0).light(LightTexture.FULL_BRIGHT)
-                .setChanged();
+                .scale((max2 - min2) * 16, size1 * 16, (max3 - min3) * 16).color(0, 255, 0).light(LightTexture.FULL_BRIGHT).setChanged();
         }
 
         @Override

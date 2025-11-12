@@ -1,9 +1,11 @@
 package com.zurrtum.create.content.trains.display;
 
 import com.google.common.base.Strings;
+
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.ComponentSerialization;
 import net.minecraft.util.Mth;

@@ -14,7 +14,10 @@ import net.minecraft.world.phys.Vec3;
 public class DrillMovementBehaviour extends BlockBreakingMovementBehaviour {
     @Override
     public boolean isActive(MovementContext context) {
-        return super.isActive(context) && !VecHelper.isVecPointingTowards(context.relativeMotion, context.state.getValue(DrillBlock.FACING).getOpposite());
+        return super.isActive(context) && !VecHelper.isVecPointingTowards(
+            context.relativeMotion,
+            context.state.getValue(DrillBlock.FACING).getOpposite()
+        );
     }
 
     @Override
@@ -34,7 +37,6 @@ public class DrillMovementBehaviour extends BlockBreakingMovementBehaviour {
 
     @Override
     public boolean canBreak(Level world, BlockPos breakingPos, BlockState state) {
-        return super.canBreak(world, breakingPos, state) && !state.getCollisionShape(world, breakingPos)
-            .isEmpty() && !state.is(AllBlockTags.TRACKS);
+        return super.canBreak(world, breakingPos, state) && !state.getCollisionShape(world, breakingPos).isEmpty() && !state.is(AllBlockTags.TRACKS);
     }
 }

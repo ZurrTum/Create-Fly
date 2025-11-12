@@ -10,6 +10,7 @@ import com.zurrtum.create.infrastructure.fluids.FluidStack;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Predicate;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.Level;

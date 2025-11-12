@@ -1,6 +1,7 @@
 package com.zurrtum.create.client.catnip.animation;
 
 import java.util.ArrayList;
+
 import net.minecraft.util.Mth;
 
 public class PhysicalFloat {

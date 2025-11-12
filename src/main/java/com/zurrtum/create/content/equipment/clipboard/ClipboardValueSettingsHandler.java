@@ -11,8 +11,10 @@ import com.zurrtum.create.foundation.blockEntity.behaviour.scrollValue.ServerScr
 import com.zurrtum.create.infrastructure.component.ClipboardContent;
 import com.zurrtum.create.infrastructure.component.ClipboardEntry;
 import com.zurrtum.create.infrastructure.component.ClipboardType;
+
 import java.util.ArrayList;
 import java.util.List;
+
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -36,7 +38,14 @@ import static com.zurrtum.create.Create.LOGGER;
 
 public class ClipboardValueSettingsHandler {
 
-    public static InteractionResult rightClickToCopy(Level world, Player player, ItemStack itemStack, InteractionHand hand, BlockHitResult hit, BlockPos pos) {
+    public static InteractionResult rightClickToCopy(
+        Level world,
+        Player player,
+        ItemStack itemStack,
+        InteractionHand hand,
+        BlockHitResult hit,
+        BlockPos pos
+    ) {
         return interact(world, player, itemStack, hit.getDirection(), pos, false);
     }
 
@@ -93,8 +102,10 @@ public class ClipboardValueSettingsHandler {
             }
 
             player.displayClientMessage(
-                Component.translatable("create.clipboard.copied_from_clipboard", world.getBlockState(pos).getBlock().getName().withStyle(ChatFormatting.WHITE))
-                    .withStyle(ChatFormatting.GREEN), true
+                Component.translatable(
+                    "create.clipboard.copied_from_clipboard",
+                    world.getBlockState(pos).getBlock().getName().withStyle(ChatFormatting.WHITE)
+                ).withStyle(ChatFormatting.GREEN), true
             );
             return InteractionResult.SUCCESS;
         }

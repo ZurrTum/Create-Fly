@@ -3,6 +3,7 @@ package com.zurrtum.create.catnip.levelWrappers;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.LevelAccessor;

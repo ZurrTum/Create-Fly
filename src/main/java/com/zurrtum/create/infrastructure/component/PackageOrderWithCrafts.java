@@ -6,7 +6,9 @@ import com.zurrtum.create.catnip.codecs.stream.CatnipStreamCodecBuilders;
 import com.zurrtum.create.content.logistics.BigItemStack;
 import com.zurrtum.create.content.logistics.packager.InventorySummary;
 import com.zurrtum.create.content.logistics.stockTicker.PackageOrder;
+
 import java.util.List;
+
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;

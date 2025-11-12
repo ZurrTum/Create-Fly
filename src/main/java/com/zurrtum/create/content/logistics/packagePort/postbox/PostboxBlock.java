@@ -13,6 +13,7 @@ import com.zurrtum.create.infrastructure.items.ItemInventoryProvider;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.function.Function;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.util.RandomSource;

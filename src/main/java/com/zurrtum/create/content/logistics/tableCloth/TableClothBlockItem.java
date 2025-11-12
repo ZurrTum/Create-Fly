@@ -2,7 +2,9 @@ package com.zurrtum.create.content.logistics.tableCloth;
 
 import com.zurrtum.create.AllDataComponents;
 import com.zurrtum.create.content.logistics.redstoneRequester.RedstoneRequesterBlock;
+
 import java.util.function.Consumer;
+
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.BlockItem;

@@ -46,7 +46,15 @@ public class ContinuousOBBCollider extends OBBCollider {
                 a10 * eB.x + a11 * eB.y + a12 * eB.z,
                 motion.y,
                 true
-            ) || separate(mf, uA2, diff.z, eA.z, a20 * eB.x + a21 * eB.y + a22 * eB.z, motion.z, true)
+            ) || separate(
+                mf,
+                uA2,
+                diff.z,
+                eA.z,
+                a20 * eB.x + a21 * eB.y + a22 * eB.z,
+                motion.z,
+                true
+            )
 
                 // Separate along B's local axes
                 || separate(mf, uB0, diff2.x, eA.x * a00 + eA.y * a10 + eA.z * a20, eB.x, motion2.x, false) || separate(
@@ -57,21 +65,21 @@ public class ContinuousOBBCollider extends OBBCollider {
                 eB.y,
                 motion2.y,
                 false
-            ) || separate(mf, uB2, diff2.z, eA.x * a02 + eA.y * a12 + eA.z * a22, eB.z, motion2.z, false)))
+            ) || separate(
+                mf,
+                uB2,
+                diff2.z,
+                eA.x * a02 + eA.y * a12 + eA.z * a22,
+                eB.z,
+                motion2.z,
+                false
+            )))
             return mf;
 
         return null;
     }
 
-    static boolean separate(
-        ContinuousSeparationManifold mf,
-        Vec3 axis,
-        double TL,
-        double rA,
-        double rB,
-        double projectedMotion,
-        boolean axisOfObjA
-    ) {
+    static boolean separate(ContinuousSeparationManifold mf, Vec3 axis, double TL, double rA, double rB, double projectedMotion, boolean axisOfObjA) {
         checkCount++;
         double distance = abs(TL);
         double diff = distance - (rA + rB);

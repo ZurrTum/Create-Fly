@@ -8,7 +8,9 @@ import com.zurrtum.create.client.flywheel.api.visualization.VisualizationContext
 import com.zurrtum.create.client.flywheel.lib.model.Models;
 import com.zurrtum.create.client.foundation.render.AllInstanceTypes;
 import com.zurrtum.create.content.kinetics.fan.EncasedFanBlockEntity;
+
 import java.util.function.Consumer;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.util.Mth;

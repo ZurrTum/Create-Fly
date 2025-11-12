@@ -3,8 +3,10 @@ package com.zurrtum.create.content.trains.graph;
 import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.*;
 import com.zurrtum.create.catnip.data.Couple;
+
 import java.util.Iterator;
 import java.util.UUID;
+
 import net.minecraft.core.UUIDUtil;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;

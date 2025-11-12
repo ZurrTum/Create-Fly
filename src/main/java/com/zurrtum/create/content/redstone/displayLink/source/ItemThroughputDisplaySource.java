@@ -4,8 +4,10 @@ import com.zurrtum.create.content.redstone.displayLink.DisplayLinkBlock;
 import com.zurrtum.create.content.redstone.displayLink.DisplayLinkBlockEntity;
 import com.zurrtum.create.content.redstone.displayLink.DisplayLinkContext;
 import com.zurrtum.create.content.redstone.displayLink.target.DisplayTargetStats;
+
 import java.text.NumberFormat;
 import java.util.Locale;
+
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.FloatTag;
 import net.minecraft.nbt.ListTag;

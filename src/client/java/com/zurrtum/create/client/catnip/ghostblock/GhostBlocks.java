@@ -2,8 +2,10 @@ package com.zurrtum.create.client.catnip.ghostblock;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.zurrtum.create.client.catnip.render.SuperRenderTypeBuffer;
+
 import java.util.HashMap;
 import java.util.Map;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.GameType;

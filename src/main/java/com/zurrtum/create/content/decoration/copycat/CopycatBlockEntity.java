@@ -12,8 +12,10 @@ import com.zurrtum.create.content.schematics.requirement.ItemRequirement;
 import com.zurrtum.create.content.schematics.requirement.ItemRequirement.ItemUseType;
 import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
 import com.zurrtum.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
+
 import java.util.List;
 import java.util.Optional;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.component.DataComponentPatch;
@@ -83,7 +85,10 @@ public class CopycatBlockEntity extends SmartBlockEntity implements SpecialBlock
         else if (material.hasProperty(BlockStateProperties.FACING))
             setMaterial(material.cycle(BlockStateProperties.FACING));
         else if (material.hasProperty(BlockStateProperties.HORIZONTAL_FACING))
-            setMaterial(material.setValue(BlockStateProperties.HORIZONTAL_FACING, material.getValue(BlockStateProperties.HORIZONTAL_FACING).getClockWise()));
+            setMaterial(material.setValue(
+                BlockStateProperties.HORIZONTAL_FACING,
+                material.getValue(BlockStateProperties.HORIZONTAL_FACING).getClockWise()
+            ));
         else if (material.hasProperty(BlockStateProperties.AXIS))
             setMaterial(material.cycle(BlockStateProperties.AXIS));
         else if (material.hasProperty(BlockStateProperties.HORIZONTAL_AXIS))

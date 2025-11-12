@@ -16,7 +16,9 @@ import com.zurrtum.create.content.logistics.packagerLink.LogisticallyLinkedBehav
 import com.zurrtum.create.foundation.codec.CreateCodecs;
 import com.zurrtum.create.infrastructure.component.PackageOrderWithCrafts;
 import com.zurrtum.create.infrastructure.items.ItemStackHandler;
+
 import java.util.*;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.UUIDUtil;
@@ -249,12 +251,7 @@ public class StockTickerBlockEntity extends StockCheckingBlockEntity {
         return new StockKeeperCategoryMenu(pContainerId, pPlayerInventory, StockTickerBlockEntity.this);
     }
 
-    public StockKeeperRequestMenu createRequestMenu(
-        int pContainerId,
-        Inventory pPlayerInventory,
-        Player pPlayer,
-        RegistryFriendlyByteBuf extraData
-    ) {
+    public StockKeeperRequestMenu createRequestMenu(int pContainerId, Inventory pPlayerInventory, Player pPlayer, RegistryFriendlyByteBuf extraData) {
         boolean showLockOption = behaviour.mayAdministrate(pPlayer) && Create.LOGISTICS.isLockable(behaviour.freqId);
         boolean isCurrentlyLocked = Create.LOGISTICS.isLocked(behaviour.freqId);
         extraData.writeBlockPos(worldPosition);

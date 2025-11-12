@@ -15,14 +15,7 @@ import net.minecraft.world.item.ItemStack;
 
 public class FluidFogModifier extends WaterFogEnvironment {
     @Override
-    public void setupFog(
-        FogData data,
-        Entity cameraEntity,
-        BlockPos cameraPos,
-        ClientLevel world,
-        float viewDistance,
-        DeltaTracker tickCounter
-    ) {
+    public void setupFog(FogData data, Entity cameraEntity, BlockPos cameraPos, ClientLevel world, float viewDistance, DeltaTracker tickCounter) {
         FluidConfig config = AllFluidConfigs.ALL.get(world.getFluidState(cameraPos).getType());
         if (config != null) {
             data.environmentalStart = -8.0F;

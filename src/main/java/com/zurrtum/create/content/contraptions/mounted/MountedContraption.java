@@ -11,6 +11,7 @@ import com.zurrtum.create.content.contraptions.mounted.CartAssemblerBlockEntity.
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.Queue;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Direction.Axis;
@@ -60,7 +61,13 @@ public class MountedContraption extends Contraption {
         addBlock(
             world,
             pos,
-            Pair.of(new StructureBlockInfo(pos, AllBlocks.MINECART_ANCHOR.defaultBlockState().setValue(BlockStateProperties.HORIZONTAL_AXIS, axis), null), null)
+            Pair.of(
+                new StructureBlockInfo(
+                    pos,
+                    AllBlocks.MINECART_ANCHOR.defaultBlockState().setValue(BlockStateProperties.HORIZONTAL_AXIS, axis),
+                    null
+                ), null
+            )
         );
 
         return blocks.size() != 1;

@@ -13,6 +13,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import net.minecraft.Util;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.RegistryFriendlyByteBuf;
@@ -29,8 +30,8 @@ public record FluidContentsAttribute(@Nullable Fluid fluid) implements ItemAttri
     public static final MapCodec<FluidContentsAttribute> CODEC = BuiltInRegistries.FLUID.byNameCodec()
         .xmap(FluidContentsAttribute::new, FluidContentsAttribute::fluid).fieldOf("value");
 
-    public static final StreamCodec<RegistryFriendlyByteBuf, FluidContentsAttribute> PACKET_CODEC = CatnipStreamCodecBuilders.nullable(CatnipStreamCodecs.FLUID)
-        .map(FluidContentsAttribute::new, FluidContentsAttribute::fluid);
+    public static final StreamCodec<RegistryFriendlyByteBuf, FluidContentsAttribute> PACKET_CODEC = CatnipStreamCodecBuilders.nullable(
+        CatnipStreamCodecs.FLUID).map(FluidContentsAttribute::new, FluidContentsAttribute::fluid);
 
     @Override
     public boolean appliesTo(ItemStack itemStack, Level level) {

@@ -7,6 +7,7 @@ import io.netty.buffer.ByteBuf;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Locale;
+
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.util.StringRepresentable;
 

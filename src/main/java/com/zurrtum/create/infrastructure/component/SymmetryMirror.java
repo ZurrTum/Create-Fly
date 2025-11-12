@@ -7,7 +7,9 @@ import com.zurrtum.create.content.equipment.symmetryWand.mirror.CrossPlaneMirror
 import com.zurrtum.create.content.equipment.symmetryWand.mirror.EmptyMirror;
 import com.zurrtum.create.content.equipment.symmetryWand.mirror.PlaneMirror;
 import com.zurrtum.create.content.equipment.symmetryWand.mirror.TriplePlaneMirror;
+
 import java.util.*;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.FriendlyByteBuf;

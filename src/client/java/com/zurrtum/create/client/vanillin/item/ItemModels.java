@@ -14,9 +14,11 @@ import com.zurrtum.create.client.flywheel.lib.util.RendererReloadCache;
 import com.zurrtum.create.client.vanillin.Vanillin;
 import it.unimi.dsi.fastutil.Hash;
 import it.unimi.dsi.fastutil.objects.Object2BooleanLinkedOpenCustomHashMap;
+
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.item.ItemModel;

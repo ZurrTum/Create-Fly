@@ -5,9 +5,11 @@ import com.zurrtum.create.api.behaviour.movement.MovementBehaviour;
 import com.zurrtum.create.catnip.math.VecHelper;
 import com.zurrtum.create.content.contraptions.AbstractContraptionEntity;
 import com.zurrtum.create.content.contraptions.behaviour.MovementContext;
+
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;

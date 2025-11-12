@@ -114,10 +114,9 @@ public class TableClothBlockEntity extends SmartBlockEntity implements Transform
     public void lazyTick() {
         super.lazyTick();
         BlockPos relativePos = worldPosition.relative(facing);
-        sideOccluded = level.getBlockState(relativePos)
-            .is(AllBlockTags.TABLE_CLOTHS) || Block.isFaceFull(
-            level.getBlockState(relativePos.below()).getOcclusionShape(),
-            facing.getOpposite()
+        sideOccluded = level.getBlockState(relativePos).is(AllBlockTags.TABLE_CLOTHS) || Block.isFaceFull(
+            level.getBlockState(relativePos.below())
+                .getOcclusionShape(), facing.getOpposite()
         );
     }
 
@@ -146,10 +145,7 @@ public class TableClothBlockEntity extends SmartBlockEntity implements Transform
                 level.setBlock(worldPosition, getBlockState().setValue(TableClothBlock.HAS_BE, false), Block.UPDATE_ALL);
                 if (level instanceof ServerLevel serverLevel) {
                     Packet<?> packet = new RemoveBlockEntityPacket(worldPosition);
-                    for (ServerPlayer serverPlayer : serverLevel.getChunkSource().chunkMap.getPlayers(
-                        new ChunkPos(worldPosition),
-                        false
-                    )) {
+                    for (ServerPlayer serverPlayer : serverLevel.getChunkSource().chunkMap.getPlayers(new ChunkPos(worldPosition), false)) {
                         serverPlayer.connection.send(packet);
                     }
                 }

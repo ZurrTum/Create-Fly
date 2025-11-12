@@ -15,6 +15,7 @@ import com.zurrtum.create.content.kinetics.crank.HandCrankBlockEntity;
 import org.joml.Quaternionf;
 
 import java.util.function.Consumer;
+
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 
@@ -31,8 +32,8 @@ public class HandCrankVisual extends KineticBlockEntityVisual<HandCrankBlockEnti
 
         rotatingModel = instancerProvider().instancer(AllInstanceTypes.ROTATING, Models.partial(AllPartialModels.HAND_CRANK_BASE)).createInstance();
 
-        rotatingModel.setup(HandCrankVisual.this.blockEntity).setPosition(getVisualPosition()).rotateToFace(blockState.getValue(BlockStateProperties.FACING))
-            .setChanged();
+        rotatingModel.setup(HandCrankVisual.this.blockEntity).setPosition(getVisualPosition())
+            .rotateToFace(blockState.getValue(BlockStateProperties.FACING)).setChanged();
     }
 
     @Override

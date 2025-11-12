@@ -7,6 +7,7 @@ import com.zurrtum.create.infrastructure.component.ClipboardContent;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.function.BiConsumer;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;

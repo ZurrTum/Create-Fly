@@ -2,8 +2,10 @@ package com.zurrtum.create.content.kinetics.belt;
 
 import com.zurrtum.create.AllShapes;
 import com.zurrtum.create.catnip.math.VoxelShaper;
+
 import java.util.HashMap;
 import java.util.Map;
+
 import net.minecraft.core.Direction;
 import net.minecraft.core.Direction.Axis;
 import net.minecraft.world.level.block.state.BlockState;
@@ -79,17 +81,24 @@ public class BeltShapes {
 
     //Flat Shapes
     private static final VoxelShaper FLAT_FULL = VoxelShaper.forHorizontalAxis(FLAT_FULL_PART, Axis.Z), FLAT_END = VoxelShaper.forHorizontal(
-        compose(
-            FLAT_END_PART,
+        compose(FLAT_END_PART,
             FLAT_FULL_PART
         ), Direction.SOUTH
-    ), FLAT_START = VoxelShaper.forHorizontal(compose(FLAT_FULL_PART, FLAT_END_PART), Direction.SOUTH);
+    ), FLAT_START = VoxelShaper.forHorizontal(
+        compose(FLAT_FULL_PART, FLAT_END_PART),
+        Direction.SOUTH
+    );
 
     //Sideways Shapes
     private static final VoxelShaper SIDE_FULL = VoxelShaper.forHorizontalAxis(SIDEWAYS_FULL_PART, Axis.Z), SIDE_END = VoxelShaper.forHorizontal(
         compose(SIDEWAYS_END_PART, SIDEWAYS_FULL_PART),
         Direction.SOUTH
-    ), SIDE_START = VoxelShaper.forHorizontal(compose(SIDEWAYS_FULL_PART, SIDEWAYS_END_PART), Direction.SOUTH);
+    ), SIDE_START = VoxelShaper.forHorizontal(
+        compose(
+            SIDEWAYS_FULL_PART,
+            SIDEWAYS_END_PART
+        ), Direction.SOUTH
+    );
 
     //Sloped Shapes
     private static final VoxelShaper SLOPE_DESC = VoxelShaper.forHorizontal(SLOPE_DESC_PART, Direction.SOUTH), SLOPE_ASC = VoxelShaper.forHorizontal(
@@ -104,7 +113,10 @@ public class BeltShapes {
     ), SLOPE_ASC_END = VoxelShaper.forHorizontal(
         compose(FLAT_END_PART, SLOPE_ASC_PART),
         Direction.SOUTH
-    ), SLOPE_ASC_START = VoxelShaper.forHorizontal(compose(SLOPE_ASC_PART, FLAT_END_PART), Direction.SOUTH);
+    ), SLOPE_ASC_START = VoxelShaper.forHorizontal(
+        compose(SLOPE_ASC_PART, FLAT_END_PART),
+        Direction.SOUTH
+    );
 
     private static final VoxelShaper PARTIAL_CASING = VoxelShaper.forHorizontal(box(0, 0, 5, 16, 11, 16), Direction.SOUTH);
 
@@ -112,10 +124,7 @@ public class BeltShapes {
     static Map<BlockState, VoxelShape> collisionCache = new HashMap<>();
 
     private static VoxelShape compose(VoxelShape southPart, VoxelShape northPart) {
-        return Shapes.or(
-            Shapes.joinUnoptimized(SOUTH_MASK, southPart, BooleanOp.AND),
-            Shapes.joinUnoptimized(NORTH_MASK, northPart, BooleanOp.AND)
-        );
+        return Shapes.or(Shapes.joinUnoptimized(SOUTH_MASK, southPart, BooleanOp.AND), Shapes.joinUnoptimized(NORTH_MASK, northPart, BooleanOp.AND));
     }
 
     private static VoxelShape makeSlopePart(boolean ascendingInstead) {
@@ -244,11 +253,7 @@ public class BeltShapes {
         public static VoxelShaper make(VoxelShape southBeltShape) {
             return forDirectionsWithRotation(
                 rotatedCopy(southBeltShape, new Vec3(-90, 0, 0)), Direction.SOUTH, Direction.Plane.HORIZONTAL,//idk, this can probably be improved :S
-                direction -> new Vec3(
-                    direction.getAxisDirection() == Direction.AxisDirection.POSITIVE ? 0 : 180,
-                    -direction.toYRot(),
-                    0
-                )
+                direction -> new Vec3(direction.getAxisDirection() == Direction.AxisDirection.POSITIVE ? 0 : 180, -direction.toYRot(), 0)
             );
         }
     }

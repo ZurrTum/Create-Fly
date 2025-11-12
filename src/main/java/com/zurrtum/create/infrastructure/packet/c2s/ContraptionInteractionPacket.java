@@ -5,7 +5,9 @@ import com.zurrtum.create.AllPackets;
 import com.zurrtum.create.catnip.codecs.stream.CatnipStreamCodecBuilders;
 import com.zurrtum.create.catnip.codecs.stream.CatnipStreamCodecs;
 import com.zurrtum.create.content.contraptions.AbstractContraptionEntity;
+
 import java.util.function.BiConsumer;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.RegistryFriendlyByteBuf;

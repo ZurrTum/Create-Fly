@@ -8,6 +8,7 @@ import com.zurrtum.create.foundation.block.WeakPowerControlBlock;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Locale;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
@@ -116,7 +117,8 @@ public class SignalBlock extends Block implements IBE<SignalBlockEntity>, IWrenc
                 if (signal != null) {
                     signal.cycleSignalType(pos);
                     if (player != null)
-                        player.displayClientMessage(Component.translatable("create.track_signal.mode_change." + signal.getTypeFor(pos).getSerializedName()), true);
+                        player.displayClientMessage(
+                            Component.translatable("create.track_signal.mode_change." + signal.getTypeFor(pos).getSerializedName()), true);
                 } else if (player != null)
                     player.displayClientMessage(Component.translatable("create.track_signal.cannot_change_mode"), true);
             }

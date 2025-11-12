@@ -1,6 +1,7 @@
 package com.zurrtum.create.client.foundation.utility;
 
 import java.util.function.Predicate;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.BlockPos.MutableBlockPos;
 import net.minecraft.core.Direction;

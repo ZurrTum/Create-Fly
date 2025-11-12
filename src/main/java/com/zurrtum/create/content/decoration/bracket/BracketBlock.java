@@ -6,8 +6,10 @@ import com.zurrtum.create.content.kinetics.base.RotatedPillarKineticBlock;
 import com.zurrtum.create.content.kinetics.simpleRelays.AbstractSimpleShaftBlock;
 import com.zurrtum.create.content.kinetics.simpleRelays.CogWheelBlock;
 import com.zurrtum.create.foundation.block.WrenchableDirectionalBlock;
+
 import java.util.Locale;
 import java.util.Optional;
+
 import net.minecraft.core.Direction;
 import net.minecraft.core.Direction.Axis;
 import net.minecraft.util.StringRepresentable;

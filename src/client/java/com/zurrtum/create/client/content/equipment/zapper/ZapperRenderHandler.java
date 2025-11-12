@@ -5,9 +5,11 @@ import com.mojang.math.Axis;
 import com.zurrtum.create.AllSoundEvents;
 import com.zurrtum.create.client.catnip.outliner.Outliner;
 import com.zurrtum.create.content.equipment.zapper.ZapperItem;
+
 import java.util.LinkedList;
 import java.util.List;
 import java.util.function.Supplier;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.core.particles.ParticleTypes;

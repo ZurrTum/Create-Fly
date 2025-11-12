@@ -9,10 +9,12 @@ import com.zurrtum.create.content.kinetics.belt.item.BeltConnectorItem;
 import com.zurrtum.create.content.kinetics.belt.transport.BeltInventory;
 import com.zurrtum.create.content.kinetics.belt.transport.TransportedItemStack;
 import com.zurrtum.create.foundation.block.ProperWaterloggedBlock;
+
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
+
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -90,9 +92,17 @@ public class BeltSlicer {
             KineticBlockEntity.switchToBlockState(
                 world,
                 next,
-                ProperWaterloggedBlock.withWater(world, state.setValue(BeltBlock.CASING, segmentBE != null && segmentBE.casing != CasingType.NONE), next)
+                ProperWaterloggedBlock.withWater(
+                    world,
+                    state.setValue(BeltBlock.CASING, segmentBE != null && segmentBE.casing != CasingType.NONE),
+                    next
+                )
             );
-            world.setBlock(pos, ProperWaterloggedBlock.withWater(world, Blocks.AIR.defaultBlockState(), pos), Block.UPDATE_ALL | Block.UPDATE_MOVE_BY_PISTON);
+            world.setBlock(
+                pos,
+                ProperWaterloggedBlock.withWater(world, Blocks.AIR.defaultBlockState(), pos),
+                Block.UPDATE_ALL | Block.UPDATE_MOVE_BY_PISTON
+            );
             world.removeBlockEntity(pos);
             world.levelEvent(LevelEvent.PARTICLES_DESTROY_BLOCK, pos, Block.getId(state));
 
@@ -356,7 +366,8 @@ public class BeltSlicer {
                 KineticBlockEntity.switchToBlockState(
                     world,
                     next,
-                    state.setValue(BeltBlock.CASING, segmentBE != null && segmentBE.casing != CasingType.NONE).setValue(BeltBlock.PART, BeltPart.MIDDLE)
+                    state.setValue(BeltBlock.CASING, segmentBE != null && segmentBE.casing != CasingType.NONE)
+                        .setValue(BeltBlock.PART, BeltPart.MIDDLE)
                 );
 
                 if (!creative) {

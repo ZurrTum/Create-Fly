@@ -26,14 +26,7 @@ public class SmartChuteBlock extends AbstractChuteBlock {
     public static final BooleanProperty POWERED = BlockStateProperties.POWERED;
 
     @Override
-    public void neighborChanged(
-        BlockState state,
-        Level level,
-        BlockPos pos,
-        Block block,
-        @Nullable Orientation wireOrientation,
-        boolean isMoving
-    ) {
+    public void neighborChanged(BlockState state, Level level, BlockPos pos, Block block, @Nullable Orientation wireOrientation, boolean isMoving) {
         super.neighborChanged(state, level, pos, block, wireOrientation, isMoving);
         if (level.isClientSide())
             return;

@@ -6,7 +6,9 @@ import com.zurrtum.create.AllSoundEvents;
 import com.zurrtum.create.api.schematic.requirement.SpecialBlockItemRequirement;
 import com.zurrtum.create.content.schematics.requirement.ItemRequirement;
 import com.zurrtum.create.foundation.block.IBE;
+
 import java.util.ArrayList;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.InteractionHand;
@@ -76,13 +78,19 @@ public class LecternControllerBlock extends LecternBlock implements IBE<LecternC
     }
 
     public void replaceLectern(BlockState lecternState, Level world, BlockPos pos, ItemStack controller) {
-        world.setBlockAndUpdate(pos, defaultBlockState().setValue(FACING, lecternState.getValue(FACING)).setValue(POWERED, lecternState.getValue(POWERED)));
+        world.setBlockAndUpdate(
+            pos,
+            defaultBlockState().setValue(FACING, lecternState.getValue(FACING)).setValue(POWERED, lecternState.getValue(POWERED))
+        );
         withBlockEntityDo(world, pos, be -> be.setController(controller));
     }
 
     public void replaceWithLectern(BlockState state, Level world, BlockPos pos) {
         AllSoundEvents.CONTROLLER_TAKE.playOnServer(world, pos);
-        world.setBlockAndUpdate(pos, Blocks.LECTERN.defaultBlockState().setValue(FACING, state.getValue(FACING)).setValue(POWERED, state.getValue(POWERED)));
+        world.setBlockAndUpdate(
+            pos,
+            Blocks.LECTERN.defaultBlockState().setValue(FACING, state.getValue(FACING)).setValue(POWERED, state.getValue(POWERED))
+        );
     }
 
     @Override

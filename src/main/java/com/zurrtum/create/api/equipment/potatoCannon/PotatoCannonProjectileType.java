@@ -7,9 +7,11 @@ import com.zurrtum.create.api.registry.CreateRegistryKeys;
 import com.zurrtum.create.content.equipment.potatoCannon.AllPotatoProjectileRenderModes.Billboard;
 import com.zurrtum.create.content.equipment.potatoCannon.AllPotatoProjectileRenderModes.TowardMotion;
 import com.zurrtum.create.content.equipment.potatoCannon.AllPotatoProjectileRenderModes.Tumble;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+
 import net.minecraft.core.Holder;
 import net.minecraft.core.Holder.Reference;
 import net.minecraft.core.HolderSet;
@@ -25,8 +27,8 @@ import net.minecraft.world.phys.EntityHitResult;
 
 // TODO: 1.21.7 - Move into api package
 public record PotatoCannonProjectileType(
-    HolderSet<Item> items, int reloadTicks, int damage, int split, float knockback, float drag, float velocityMultiplier,
-    float gravityMultiplier, float soundPitch, boolean sticky, ItemStack dropStack, PotatoProjectileRenderMode renderMode,
+    HolderSet<Item> items, int reloadTicks, int damage, int split, float knockback, float drag, float velocityMultiplier, float gravityMultiplier,
+    float soundPitch, boolean sticky, ItemStack dropStack, PotatoProjectileRenderMode renderMode,
     Optional<PotatoProjectileEntityHitAction> preEntityHit, Optional<PotatoProjectileEntityHitAction> onEntityHit,
     Optional<PotatoProjectileBlockHitAction> onBlockHit
 ) {

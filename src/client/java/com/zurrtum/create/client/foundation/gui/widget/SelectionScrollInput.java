@@ -1,8 +1,10 @@
 package com.zurrtum.create.client.foundation.gui.widget;
 
 import com.zurrtum.create.client.foundation.utility.CreateLang;
+
 import java.util.ArrayList;
 import java.util.List;
+
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;

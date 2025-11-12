@@ -6,6 +6,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
 import net.minecraft.world.entity.player.Player;
 
 public record InfoEntry(String name, InfoProvider provider) implements InfoElement {

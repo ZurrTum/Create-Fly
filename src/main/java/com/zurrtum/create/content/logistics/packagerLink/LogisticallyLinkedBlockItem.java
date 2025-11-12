@@ -7,6 +7,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.UUID;
 import java.util.function.Consumer;
+
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.UUIDUtil;
@@ -118,8 +119,8 @@ public class LogisticallyLinkedBlockItem extends BlockItem {
             return useOn;
 
         player.displayClientMessage(
-            tuned ? Component.translatable("create.logistically_linked.connected") : Component.translatable("create.logistically_linked.new_network_started"),
-            true
+            tuned ? Component.translatable("create.logistically_linked.connected") : Component.translatable(
+                "create.logistically_linked.new_network_started"), true
         );
         return useOn;
     }

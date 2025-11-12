@@ -3,7 +3,9 @@ package com.zurrtum.create.content.kinetics.transmission.sequencer;
 import com.mojang.serialization.Codec;
 import com.zurrtum.create.catnip.codecs.stream.CatnipStreamCodecBuilders;
 import io.netty.buffer.ByteBuf;
+
 import java.util.Locale;
+
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.util.StringRepresentable;
 

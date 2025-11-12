@@ -16,7 +16,8 @@ public class RadialChassisBlock extends AbstractChassisBlock {
 
     public RadialChassisBlock(Properties properties) {
         super(properties);
-        registerDefaultState(defaultBlockState().setValue(STICKY_EAST, false).setValue(STICKY_SOUTH, false).setValue(STICKY_NORTH, false).setValue(STICKY_WEST, false));
+        registerDefaultState(defaultBlockState().setValue(STICKY_EAST, false).setValue(STICKY_SOUTH, false).setValue(STICKY_NORTH, false)
+            .setValue(STICKY_WEST, false));
     }
 
     @Override

@@ -48,6 +48,7 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
+
 import java.util.Locale;
 
 public class FluidTankBlock extends Block implements IWrenchable, IBE<FluidTankBlockEntity>, FluidInventoryProvider<FluidTankBlockEntity> {
@@ -137,7 +138,13 @@ public class FluidTankBlock extends Block implements IWrenchable, IBE<FluidTankB
     }
 
     @Override
-    public FluidInventory getFluidInventory(LevelAccessor world, BlockPos pos, BlockState state, FluidTankBlockEntity blockEntity, Direction context) {
+    public FluidInventory getFluidInventory(
+        LevelAccessor world,
+        BlockPos pos,
+        BlockState state,
+        FluidTankBlockEntity blockEntity,
+        Direction context
+    ) {
         if (blockEntity.fluidCapability == null) {
             blockEntity.refreshCapability();
         }

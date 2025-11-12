@@ -8,7 +8,9 @@ import com.zurrtum.create.client.foundation.blockEntity.behaviour.ValueBoxTransf
 import com.zurrtum.create.content.contraptions.bearing.BearingBlock;
 import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
 import com.zurrtum.create.foundation.blockEntity.behaviour.scrollValue.ServerScrollOptionBehaviour;
+
 import java.util.function.Function;
+
 import net.minecraft.core.Direction.Axis;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Player;

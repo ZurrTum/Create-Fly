@@ -70,7 +70,8 @@ public class PoweredShaftBlock extends AbstractShaftBlock {
         if (!stillValid(pState, pLevel, pPos))
             pLevel.setBlock(
                 pPos,
-                AllBlocks.SHAFT.defaultBlockState().setValue(ShaftBlock.AXIS, pState.getValue(AXIS)).setValue(WATERLOGGED, pState.getValue(WATERLOGGED)),
+                AllBlocks.SHAFT.defaultBlockState().setValue(ShaftBlock.AXIS, pState.getValue(AXIS))
+                    .setValue(WATERLOGGED, pState.getValue(WATERLOGGED)),
                 Block.UPDATE_ALL
             );
     }

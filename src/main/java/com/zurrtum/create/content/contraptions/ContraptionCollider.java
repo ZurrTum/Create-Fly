@@ -23,6 +23,7 @@ import org.apache.commons.lang3.mutable.MutableObject;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Direction.Axis;
@@ -69,7 +70,11 @@ public class ContraptionCollider {
         Vec3 anchorVec = contraptionEntity.getAnchorVec();
         ContraptionRotationState rotation = null;
 
-        List<Entity> entitiesWithinAABB = world.getEntitiesOfClass(Entity.class, bounds.inflate(2).expandTowards(0, 32, 0), contraptionEntity::canCollideWith);
+        List<Entity> entitiesWithinAABB = world.getEntitiesOfClass(
+            Entity.class,
+            bounds.inflate(2).expandTowards(0, 32, 0),
+            contraptionEntity::canCollideWith
+        );
         for (Entity entity : entitiesWithinAABB) {
             if (!entity.isAlive())
                 continue;
@@ -240,8 +245,7 @@ public class ContraptionCollider {
             boolean anyCollision = hardCollision || temporalCollision;
 
             if (bounce > 0 && hasNormal && anyCollision && bounceEntity(entity, collisionNormal, contraptionEntity, bounce)) {
-                entity.level()
-                    .playSound(null, entity.getX(), entity.getY(), entity.getZ(), SoundEvents.SLIME_BLOCK_FALL, SoundSource.BLOCKS, .5f, 1);
+                entity.level().playSound(null, entity.getX(), entity.getY(), entity.getZ(), SoundEvents.SLIME_BLOCK_FALL, SoundSource.BLOCKS, .5f, 1);
                 continue;
             }
 
@@ -431,21 +435,14 @@ public class ContraptionCollider {
                 list
             );
             if (vec32.y < (double) e.maxUpStep()) {
-                Vec3 vec33 = Entity.collideBoundingBox(e, new Vec3(p_20273_.x, 0.0D, p_20273_.z), aabb.move(vec32), world, list)
-                    .add(vec32);
+                Vec3 vec33 = Entity.collideBoundingBox(e, new Vec3(p_20273_.x, 0.0D, p_20273_.z), aabb.move(vec32), world, list).add(vec32);
                 if (vec33.horizontalDistanceSqr() > vec31.horizontalDistanceSqr()) {
                     vec31 = vec33;
                 }
             }
 
             if (vec31.horizontalDistanceSqr() > vec3.horizontalDistanceSqr()) {
-                return vec31.add(Entity.collideBoundingBox(
-                    e,
-                    new Vec3(0.0D, -vec31.y + p_20273_.y, 0.0D),
-                    aabb.move(vec31),
-                    world,
-                    list
-                ));
+                return vec31.add(Entity.collideBoundingBox(e, new Vec3(0.0D, -vec31.y + p_20273_.y, 0.0D), aabb.move(vec31), world, list));
             }
         }
 

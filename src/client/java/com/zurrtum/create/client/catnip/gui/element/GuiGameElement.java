@@ -6,6 +6,7 @@ import com.zurrtum.create.client.flywheel.lib.model.baked.PartialModel;
 import org.joml.Matrix3x2fStack;
 
 import java.util.function.BiConsumer;
+
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.util.Mth;
 import net.minecraft.world.item.ItemStack;
@@ -127,7 +128,17 @@ public class GuiGameElement {
 
         @Override
         public void render(GuiGraphics graphics) {
-            graphics.guiRenderState.submitPicturesInPictureState(BlockTransformRenderState.create(graphics, block, x, y, scale, padding, xRot, yRot, zRot));
+            graphics.guiRenderState.submitPicturesInPictureState(BlockTransformRenderState.create(
+                graphics,
+                block,
+                x,
+                y,
+                scale,
+                padding,
+                xRot,
+                yRot,
+                zRot
+            ));
             rendering = true;
         }
 

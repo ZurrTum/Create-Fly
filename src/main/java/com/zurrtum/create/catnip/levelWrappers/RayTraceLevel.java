@@ -1,6 +1,7 @@
 package com.zurrtum.create.catnip.levelWrappers;
 
 import java.util.function.BiFunction;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.LevelAccessor;

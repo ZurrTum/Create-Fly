@@ -11,8 +11,10 @@ import com.zurrtum.create.content.kinetics.crafter.CrafterHelper;
 import com.zurrtum.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.foundation.blockEntity.behaviour.edgeInteraction.EdgeInteractionBehaviour;
 import com.zurrtum.create.foundation.blockEntity.behaviour.edgeInteraction.EdgeInteractionHandler;
+
 import java.util.ArrayList;
 import java.util.List;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.core.BlockPos;
@@ -65,7 +67,8 @@ public class EdgeInteractionRenderer {
 
         AABB bb = EdgeInteractionHandler.getBB(pos, closestEdge);
         boolean hit = bb.contains(target.getLocation());
-        Vec3 offset = Vec3.atLowerCornerOf(closestEdge.getUnitVec3i()).scale(.5).add(Vec3.atLowerCornerOf(face.getUnitVec3i()).scale(.469)).add(VecHelper.CENTER_OF_ORIGIN);
+        Vec3 offset = Vec3.atLowerCornerOf(closestEdge.getUnitVec3i()).scale(.5).add(Vec3.atLowerCornerOf(face.getUnitVec3i()).scale(.469))
+            .add(VecHelper.CENTER_OF_ORIGIN);
 
         ValueBox box = new ValueBox(CommonComponents.EMPTY, bb, pos).passive(!hit).transform(new EdgeValueBoxTransform(offset)).wideOutline();
         Outliner.getInstance().showOutline("edge", box).highlightFace(face);

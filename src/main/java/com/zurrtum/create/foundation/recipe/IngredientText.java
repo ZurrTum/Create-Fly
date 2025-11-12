@@ -2,6 +2,7 @@ package com.zurrtum.create.foundation.recipe;
 
 import java.util.List;
 import java.util.Optional;
+
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.ComponentContents;
 import net.minecraft.network.chat.Style;

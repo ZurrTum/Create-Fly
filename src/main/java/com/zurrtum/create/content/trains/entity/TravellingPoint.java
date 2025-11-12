@@ -10,6 +10,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 import java.util.function.*;
+
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;

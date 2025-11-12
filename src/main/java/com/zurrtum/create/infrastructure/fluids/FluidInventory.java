@@ -12,6 +12,7 @@ import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
+
 import net.minecraft.core.Direction;
 import net.minecraft.core.component.PatchedDataComponentMap;
 import net.minecraft.world.Clearable;

@@ -10,6 +10,7 @@ import net.minecraft.client.resources.model.ModelBakery;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.SheetedDecalTextureGenerator;
 import com.mojang.blaze3d.vertex.VertexConsumer;
+
 import java.util.*;
 
 public class ModelCommandRendererHelper {
@@ -96,8 +97,7 @@ public class ModelCommandRendererHelper {
 
         if (model.crumblingOverlay() != null && renderLayer.affectsCrumbling()) {
             VertexConsumer vertexConsumer3 = new SheetedDecalTextureGenerator(
-                crumblingOverlayVertexConsumers.getBuffer(ModelBakery.DESTROY_TYPES.get(
-                    model.crumblingOverlay().progress())),
+                crumblingOverlayVertexConsumers.getBuffer(ModelBakery.DESTROY_TYPES.get(model.crumblingOverlay().progress())),
                 model.crumblingOverlay().cameraPose(),
                 1.0F
             );

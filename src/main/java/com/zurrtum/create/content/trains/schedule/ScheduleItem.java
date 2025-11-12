@@ -12,8 +12,10 @@ import com.zurrtum.create.content.trains.entity.Train;
 import com.zurrtum.create.content.trains.schedule.destination.DestinationInstruction;
 import com.zurrtum.create.foundation.gui.menu.MenuProvider;
 import com.zurrtum.create.foundation.recipe.ItemCopyingRecipe.SupportsItemCopying;
+
 import java.util.List;
 import java.util.function.Consumer;
+
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;

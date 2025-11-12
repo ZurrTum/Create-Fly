@@ -2,8 +2,10 @@ package com.zurrtum.create.infrastructure.component;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+
 import java.util.List;
 import java.util.Optional;
+
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
@@ -15,8 +17,8 @@ public record ClipboardContent(
     public static final ClipboardContent EMPTY = new ClipboardContent(ClipboardType.EMPTY, List.of(), false, 0, Optional.empty());
 
     public static final Codec<List<List<ClipboardEntry>>> PAGES_CODEC = ClipboardEntry.CODEC.listOf().listOf();
-    public static final StreamCodec<RegistryFriendlyByteBuf, List<List<ClipboardEntry>>> PAGES_STREAM_CODEC = ClipboardEntry.STREAM_CODEC.apply(ByteBufCodecs.list())
-        .apply(ByteBufCodecs.list());
+    public static final StreamCodec<RegistryFriendlyByteBuf, List<List<ClipboardEntry>>> PAGES_STREAM_CODEC = ClipboardEntry.STREAM_CODEC.apply(
+        ByteBufCodecs.list()).apply(ByteBufCodecs.list());
 
     public static final Codec<ClipboardContent> CODEC = RecordCodecBuilder.create(instance -> instance.group(
         ClipboardType.CODEC.fieldOf("type").forGetter(ClipboardContent::type),

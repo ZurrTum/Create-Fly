@@ -1,8 +1,10 @@
 package com.zurrtum.create.foundation.codec;
 
 import io.netty.buffer.ByteBuf;
+
 import java.util.Vector;
 import java.util.function.BiFunction;
+
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;

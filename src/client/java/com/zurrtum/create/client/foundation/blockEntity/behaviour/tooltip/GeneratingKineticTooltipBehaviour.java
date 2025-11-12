@@ -3,7 +3,9 @@ package com.zurrtum.create.client.foundation.blockEntity.behaviour.tooltip;
 import com.zurrtum.create.client.foundation.utility.CreateLang;
 import com.zurrtum.create.content.kinetics.base.IRotate.StressImpact;
 import com.zurrtum.create.content.kinetics.base.KineticBlockEntity;
+
 import java.util.List;
+
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
 

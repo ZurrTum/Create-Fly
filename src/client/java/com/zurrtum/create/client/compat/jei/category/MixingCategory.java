@@ -106,7 +106,12 @@ public class MixingCategory extends CreateCategory<RecipeHolder<MixingRecipe>> {
         } else {
             AllGuiTextures.JEI_HEAT_BAR.render(graphics, 4, 80);
             AllGuiTextures.JEI_LIGHT.render(graphics, 81, 88);
-            graphics.guiRenderState.submitPicturesInPictureState(new BasinBlazeBurnerRenderState(pose, 91, 69, requiredHeat.visualizeAsBlazeBurner()));
+            graphics.guiRenderState.submitPicturesInPictureState(new BasinBlazeBurnerRenderState(
+                pose,
+                91,
+                69,
+                requiredHeat.visualizeAsBlazeBurner()
+            ));
         }
         graphics.guiRenderState.submitPicturesInPictureState(new MixingBasinRenderState(pose, 91, -5));
         graphics.drawString(

@@ -199,12 +199,7 @@ public class MinecartContraptionItem extends Item {
                     world,
                     mountedContraption,
                     intialOrientation
-                ) : OrientedContraptionEntity.createAtYaw(
-                    world,
-                    mountedContraption,
-                    intialOrientation,
-                    newFacing.toYRot()
-                );
+                ) : OrientedContraptionEntity.createAtYaw(world, mountedContraption, intialOrientation, newFacing.toYRot());
 
                 contraptionEntity.startRiding(cart);
                 contraptionEntity.setPos(cart.getX(), cart.getY(), cart.getZ());
@@ -239,7 +234,8 @@ public class MinecartContraptionItem extends Item {
         Contraption contraption = oce.getContraption();
 
         if (ContraptionMovementSetting.isNoPickup(contraption.getBlocks().values())) {
-            player.displayClientMessage(Component.translatable("create.contraption.minecart_contraption_illegal_pickup").withStyle(ChatFormatting.RED), true);
+            player.displayClientMessage(
+                Component.translatable("create.contraption.minecart_contraption_illegal_pickup").withStyle(ChatFormatting.RED), true);
             return null;
         }
 
@@ -258,9 +254,13 @@ public class MinecartContraptionItem extends Item {
         generatedStack.set(DataComponents.CUSTOM_NAME, entity.getCustomName());
 
         if (!generatedStack.isEmpty()) {
-            Optional<Tag> result = ItemStack.CODEC.encodeStart(world.registryAccess().createSerializationContext(NbtOps.INSTANCE), generatedStack).result();
+            Optional<Tag> result = ItemStack.CODEC.encodeStart(world.registryAccess().createSerializationContext(NbtOps.INSTANCE), generatedStack)
+                .result();
             if (result.isPresent() && ContraptionPickupLimiting.isTooLargeForPickup(result.get())) {
-                player.displayClientMessage(Component.translatable("create.contraption.minecart_contraption_too_big").withStyle(ChatFormatting.RED), true);
+                player.displayClientMessage(
+                    Component.translatable("create.contraption.minecart_contraption_too_big").withStyle(ChatFormatting.RED),
+                    true
+                );
                 return null;
             }
         }

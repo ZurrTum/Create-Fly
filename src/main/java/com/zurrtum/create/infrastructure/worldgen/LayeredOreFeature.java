@@ -1,10 +1,12 @@
 package com.zurrtum.create.infrastructure.worldgen;
 
 import com.zurrtum.create.infrastructure.worldgen.LayerPattern.Layer;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Function;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.SectionPos;
 import net.minecraft.util.Mth;

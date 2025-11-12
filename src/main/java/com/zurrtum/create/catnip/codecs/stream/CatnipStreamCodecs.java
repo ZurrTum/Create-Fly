@@ -4,6 +4,7 @@ import io.netty.buffer.ByteBuf;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.function.Function;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Holder;
@@ -54,7 +55,10 @@ public interface CatnipStreamCodecs {
     StreamCodec<ByteBuf, Mirror> MIRROR = CatnipStreamCodecBuilders.ofEnum(Mirror.class);
 
     // optimization: 2 values, use bool instead of ofEnum
-    StreamCodec<ByteBuf, InteractionHand> HAND = ByteBufCodecs.BOOL.map(value -> value ? InteractionHand.MAIN_HAND : InteractionHand.OFF_HAND, hand -> hand == InteractionHand.MAIN_HAND);
+    StreamCodec<ByteBuf, InteractionHand> HAND = ByteBufCodecs.BOOL.map(
+        value -> value ? InteractionHand.MAIN_HAND : InteractionHand.OFF_HAND,
+        hand -> hand == InteractionHand.MAIN_HAND
+    );
 
     StreamCodec<FriendlyByteBuf, BlockHitResult> BLOCK_HIT_RESULT = StreamCodec.composite(
         ByteBufCodecs.BOOL,

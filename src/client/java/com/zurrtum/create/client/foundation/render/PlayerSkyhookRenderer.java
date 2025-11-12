@@ -3,10 +3,12 @@ package com.zurrtum.create.client.foundation.render;
 import com.zurrtum.create.AllItemTags;
 import com.zurrtum.create.catnip.math.AngleHelper;
 import com.zurrtum.create.client.catnip.animation.AnimationTickHolder;
+
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.PlayerModel;
 import net.minecraft.client.model.geom.ModelPart;

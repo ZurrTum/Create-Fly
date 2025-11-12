@@ -3,7 +3,9 @@ package com.zurrtum.create.client.foundation.blockEntity.behaviour.tooltip;
 import com.zurrtum.create.client.api.goggles.IHaveGoggleInformation;
 import com.zurrtum.create.client.foundation.utility.CreateLang;
 import com.zurrtum.create.content.logistics.chute.ChuteBlockEntity;
+
 import java.util.List;
+
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
@@ -31,7 +33,8 @@ public class ChuteTooltipBehaviour extends TooltipBehaviour<ChuteBlockEntity> im
             .forGoggles(tooltip);
         ItemStack item = blockEntity.getItem();
         if (!item.isEmpty())
-            CreateLang.translate("tooltip.chute.contains", item.getHoverName().getString(), item.getCount()).style(ChatFormatting.GREEN).forGoggles(tooltip);
+            CreateLang.translate("tooltip.chute.contains", item.getHoverName().getString(), item.getCount()).style(ChatFormatting.GREEN)
+                .forGoggles(tooltip);
 
         return true;
     }

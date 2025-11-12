@@ -91,8 +91,8 @@ public class ItemVaultItem extends BlockItem {
             return;
 
         Direction vaultFacing = Direction.fromAxisAndDirection(vaultBlockAxis, Direction.AxisDirection.POSITIVE);
-        BlockPos startPos = face == vaultFacing.getOpposite() ? controllerBE.getBlockPos().relative(vaultFacing.getOpposite()) : controllerBE.getBlockPos()
-            .relative(vaultFacing, controllerBE.length);
+        BlockPos startPos = face == vaultFacing.getOpposite() ? controllerBE.getBlockPos()
+            .relative(vaultFacing.getOpposite()) : controllerBE.getBlockPos().relative(vaultFacing, controllerBE.length);
 
         if (VecHelper.getCoordinate(startPos, vaultBlockAxis) != VecHelper.getCoordinate(pos, vaultBlockAxis))
             return;

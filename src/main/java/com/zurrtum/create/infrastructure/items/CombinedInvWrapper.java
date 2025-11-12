@@ -7,6 +7,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Collections;
 import java.util.NoSuchElementException;
 import java.util.function.Predicate;
+
 import net.minecraft.core.Direction;
 import net.minecraft.world.Container;
 import net.minecraft.world.WorldlyContainer;

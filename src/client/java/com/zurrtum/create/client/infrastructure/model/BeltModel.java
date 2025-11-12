@@ -8,7 +8,9 @@ import com.zurrtum.create.client.foundation.model.BakedQuadHelper;
 import com.zurrtum.create.content.kinetics.belt.BeltBlock;
 import com.zurrtum.create.content.kinetics.belt.BeltBlockEntity;
 import com.zurrtum.create.content.kinetics.belt.BeltBlockEntity.CasingType;
+
 import java.util.List;
+
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.block.model.BlockModelPart;
 import net.minecraft.client.renderer.block.model.SimpleModelWrapper;

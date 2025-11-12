@@ -5,8 +5,10 @@ import com.zurrtum.create.api.contraption.BlockMovementChecks;
 import com.zurrtum.create.catnip.data.Iterate;
 import com.zurrtum.create.catnip.levelWrappers.RayTraceLevel;
 import com.zurrtum.create.infrastructure.packet.s2c.GlueEffectPacket;
+
 import java.util.HashSet;
 import java.util.Set;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.component.DataComponents;
@@ -62,13 +64,7 @@ public class SuperGlueHandler {
         Vec3 end = start.add(look.x * distance, look.y * distance, look.z * distance);
 
         RayTraceLevel rayTraceLevel = new RayTraceLevel(world, (p, state) -> p.equals(pos) ? Blocks.AIR.defaultBlockState() : state);
-        BlockHitResult ray = rayTraceLevel.clip(new ClipContext(
-            start,
-            end,
-            ClipContext.Block.OUTLINE,
-            ClipContext.Fluid.NONE,
-            placer
-        ));
+        BlockHitResult ray = rayTraceLevel.clip(new ClipContext(start, end, ClipContext.Block.OUTLINE, ClipContext.Fluid.NONE, placer));
 
         Direction face = ray.getDirection();
         if (face == null || ray.getType() == Type.MISS)

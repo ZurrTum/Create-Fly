@@ -4,8 +4,10 @@ import com.zurrtum.create.AllHandle;
 import com.zurrtum.create.AllPackets;
 import com.zurrtum.create.catnip.codecs.stream.CatnipStreamCodecBuilders;
 import com.zurrtum.create.infrastructure.component.BezierTrackPointLocation;
+
 import java.util.UUID;
 import java.util.function.BiConsumer;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.UUIDUtil;
 import net.minecraft.network.RegistryFriendlyByteBuf;

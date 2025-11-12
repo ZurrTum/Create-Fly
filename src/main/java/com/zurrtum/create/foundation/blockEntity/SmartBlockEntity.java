@@ -13,11 +13,13 @@ import com.zurrtum.create.foundation.blockEntity.behaviour.CachedInventoryBehavi
 import com.zurrtum.create.foundation.utility.IInteractionChecker;
 import com.zurrtum.create.ponder.api.VirtualBlockEntity;
 import it.unimi.dsi.fastutil.objects.Reference2ObjectArrayMap;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;

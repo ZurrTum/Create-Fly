@@ -15,7 +15,9 @@ import com.zurrtum.create.client.flywheel.lib.visual.AbstractBlockEntityVisual;
 import com.zurrtum.create.client.flywheel.lib.visual.SimpleDynamicVisual;
 import com.zurrtum.create.content.redstone.analogLever.AnalogLeverBlock;
 import com.zurrtum.create.content.redstone.analogLever.AnalogLeverBlockEntity;
+
 import java.util.function.Consumer;
+
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.block.state.properties.AttachFace;
 

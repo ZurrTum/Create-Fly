@@ -227,8 +227,9 @@ public class BoilerData {
     }
 
     private MutableComponent barComponent(int level) {
-        return Component.empty().append(bars(Math.max(0, minValue - 1), ChatFormatting.DARK_GREEN)).append(bars(minValue > 0 ? 1 : 0, ChatFormatting.GREEN))
-            .append(bars(Math.max(0, level - minValue), ChatFormatting.DARK_GREEN)).append(bars(Math.max(0, maxValue - level), ChatFormatting.DARK_RED))
+        return Component.empty().append(bars(Math.max(0, minValue - 1), ChatFormatting.DARK_GREEN))
+            .append(bars(minValue > 0 ? 1 : 0, ChatFormatting.GREEN)).append(bars(Math.max(0, level - minValue), ChatFormatting.DARK_GREEN))
+            .append(bars(Math.max(0, maxValue - level), ChatFormatting.DARK_RED))
             .append(bars(Math.max(0, Math.min(18 - maxValue, ((maxValue / 5 + 1) * 5) - maxValue)), ChatFormatting.DARK_GRAY));
     }
 

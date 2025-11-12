@@ -1,8 +1,10 @@
 package com.zurrtum.create.api.contraption.storage.item.menu;
 
 import com.zurrtum.create.infrastructure.items.ItemInventory;
+
 import java.util.function.Consumer;
 import java.util.function.Predicate;
+
 import net.minecraft.world.Container;
 import net.minecraft.world.entity.ContainerUser;
 import net.minecraft.world.entity.player.Player;

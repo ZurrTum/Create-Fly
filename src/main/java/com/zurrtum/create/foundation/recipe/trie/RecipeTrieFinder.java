@@ -8,6 +8,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Predicate;
+
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.packs.resources.ResourceManagerReloadListener;
 import net.minecraft.world.item.crafting.Recipe;

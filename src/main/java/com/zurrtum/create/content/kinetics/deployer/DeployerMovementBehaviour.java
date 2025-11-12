@@ -292,7 +292,8 @@ public class DeployerMovementBehaviour extends MovementBehaviour {
             if (context.data.contains("HeldItem"))
                 player.cast().setItemInHand(
                     InteractionHand.MAIN_HAND,
-                    context.data.read("HeldItem", ItemStack.CODEC, registryManager.createSerializationContext(NbtOps.INSTANCE)).orElse(ItemStack.EMPTY)
+                    context.data.read("HeldItem", ItemStack.CODEC, registryManager.createSerializationContext(NbtOps.INSTANCE))
+                        .orElse(ItemStack.EMPTY)
                 );
             context.blockEntityData.remove("Inventory");
             context.temporaryData = player;

@@ -11,7 +11,9 @@ import com.zurrtum.create.infrastructure.component.PlacementPatterns;
 import com.zurrtum.create.infrastructure.component.TerrainBrushes;
 import com.zurrtum.create.infrastructure.component.TerrainTools;
 import io.netty.buffer.ByteBuf;
+
 import java.util.function.BiConsumer;
+
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.PacketType;

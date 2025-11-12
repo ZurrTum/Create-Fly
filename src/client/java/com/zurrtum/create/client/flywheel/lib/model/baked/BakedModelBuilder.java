@@ -8,6 +8,7 @@ import com.zurrtum.create.client.flywheel.lib.model.SimpleModel;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.function.BiFunction;
+
 import net.minecraft.client.renderer.block.model.BlockStateModel;
 import net.minecraft.client.renderer.block.model.SimpleModelWrapper;
 import net.minecraft.client.renderer.chunk.ChunkSectionLayer;

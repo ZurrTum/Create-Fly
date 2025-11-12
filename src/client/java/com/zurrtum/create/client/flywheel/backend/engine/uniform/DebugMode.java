@@ -1,7 +1,9 @@
 package com.zurrtum.create.client.flywheel.backend.engine.uniform;
 
 import com.mojang.serialization.Codec;
+
 import java.util.Locale;
+
 import net.minecraft.util.StringRepresentable;
 
 public enum DebugMode implements StringRepresentable {

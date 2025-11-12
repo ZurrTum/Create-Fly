@@ -124,8 +124,8 @@ public class PackagePortTargetSelectionHandler {
         if (!mc.level.getBlockState(pos).canBeReplaced())
             return;
 
-        Outliner.getInstance().chaseAABB("TargetedFrogPos", new AABB(pos).contract(0, 1, 0).deflate(0.125, 0, 0.125)).colored(color).lineWidth(1 / 16f)
-            .disableLineNormals();
+        Outliner.getInstance().chaseAABB("TargetedFrogPos", new AABB(pos).contract(0, 1, 0).deflate(0.125, 0, 0.125)).colored(color)
+            .lineWidth(1 / 16f).disableLineNormals();
 
         animateConnection(mc, source, target, color);
 

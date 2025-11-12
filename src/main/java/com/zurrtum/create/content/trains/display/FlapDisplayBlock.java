@@ -11,8 +11,10 @@ import com.zurrtum.create.content.kinetics.base.KineticBlockEntity;
 import com.zurrtum.create.content.kinetics.simpleRelays.ICogWheel;
 import com.zurrtum.create.foundation.block.IBE;
 import com.zurrtum.create.infrastructure.component.ClipboardEntry;
+
 import java.util.List;
 import java.util.function.Predicate;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Direction.Axis;
@@ -351,8 +353,7 @@ public class FlapDisplayBlock extends HorizontalKineticBlock implements IBE<Flap
             );
 
             return directions.isEmpty() ? PlacementOffset.fail() : PlacementOffset.success(
-                pos.relative(directions.getFirst()),
-                s -> AllBlocks.DISPLAY_BOARD.updateColumn(
+                pos.relative(directions.getFirst()), s -> AllBlocks.DISPLAY_BOARD.updateColumn(
                     world,
                     pos.relative(directions.getFirst()),
                     s.setValue(HORIZONTAL_FACING, state.getValue(FlapDisplayBlock.HORIZONTAL_FACING)),

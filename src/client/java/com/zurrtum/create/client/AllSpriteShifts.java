@@ -8,10 +8,12 @@ import com.zurrtum.create.client.foundation.block.connected.AllCTTypes;
 import com.zurrtum.create.client.foundation.block.connected.CTSpriteShiftEntry;
 import com.zurrtum.create.client.foundation.block.connected.CTSpriteShifter;
 import com.zurrtum.create.client.foundation.block.connected.CTType;
+
 import java.util.Arrays;
 import java.util.EnumMap;
 import java.util.IdentityHashMap;
 import java.util.Map;
+
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.level.block.WeatheringCopper.WeatherState;
 import net.minecraft.world.level.block.state.properties.WoodType;

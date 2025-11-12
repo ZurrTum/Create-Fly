@@ -11,7 +11,9 @@ import com.zurrtum.create.content.kinetics.simpleRelays.CogWheelBlock;
 import com.zurrtum.create.content.kinetics.simpleRelays.ICogWheel;
 import com.zurrtum.create.foundation.block.IBE;
 import com.zurrtum.create.foundation.block.NeighborUpdateListeningBlock;
+
 import java.util.function.Predicate;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction.Axis;
 import net.minecraft.world.InteractionHand;

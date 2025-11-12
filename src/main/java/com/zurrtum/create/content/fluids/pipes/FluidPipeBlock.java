@@ -21,6 +21,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Arrays;
 import java.util.Optional;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Direction.Axis;
@@ -255,10 +256,13 @@ public class FluidPipeBlock extends PipeBlock implements SimpleWaterloggedBlock,
     @Override
     public BlockState getStateForPlacement(BlockPlaceContext context) {
         FluidState FluidState = context.getLevel().getFluidState(context.getClickedPos());
-        return updateBlockState(defaultBlockState(), context.getNearestLookingDirection(), null, context.getLevel(), context.getClickedPos()).setValue(
-            BlockStateProperties.WATERLOGGED,
-            Boolean.valueOf(FluidState.getType() == Fluids.WATER)
-        );
+        return updateBlockState(
+            defaultBlockState(),
+            context.getNearestLookingDirection(),
+            null,
+            context.getLevel(),
+            context.getClickedPos()
+        ).setValue(BlockStateProperties.WATERLOGGED, Boolean.valueOf(FluidState.getType() == Fluids.WATER));
     }
 
     @Override
@@ -320,7 +324,8 @@ public class FluidPipeBlock extends PipeBlock implements SimpleWaterloggedBlock,
             return prevState;
 
         // Use preferred
-        return state.setValue(PROPERTY_BY_DIRECTION.get(preferredDirection), true).setValue(PROPERTY_BY_DIRECTION.get(preferredDirection.getOpposite()), true);
+        return state.setValue(PROPERTY_BY_DIRECTION.get(preferredDirection), true)
+            .setValue(PROPERTY_BY_DIRECTION.get(preferredDirection.getOpposite()), true);
     }
 
     @Override

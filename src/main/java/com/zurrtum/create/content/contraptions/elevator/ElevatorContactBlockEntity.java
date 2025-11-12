@@ -7,8 +7,10 @@ import com.zurrtum.create.content.decoration.slidingDoor.DoorControlBehaviour;
 import com.zurrtum.create.content.redstone.displayLink.DisplayLinkBlock;
 import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
 import com.zurrtum.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
+
 import java.util.List;
 import java.util.Optional;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.ValueInput;

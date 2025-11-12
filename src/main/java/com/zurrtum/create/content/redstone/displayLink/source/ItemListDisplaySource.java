@@ -6,7 +6,9 @@ import com.zurrtum.create.content.redstone.smartObserver.SmartObserverBlockEntit
 import com.zurrtum.create.foundation.blockEntity.behaviour.filtering.ServerFilteringBehaviour;
 import com.zurrtum.create.foundation.blockEntity.behaviour.inventory.InvManipulationBehaviour;
 import com.zurrtum.create.foundation.item.CountedItemStackList;
+
 import java.util.stream.Stream;
+
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.world.Container;
 import net.minecraft.world.level.block.entity.BlockEntity;

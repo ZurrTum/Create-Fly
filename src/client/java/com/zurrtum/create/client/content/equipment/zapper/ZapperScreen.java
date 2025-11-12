@@ -10,8 +10,10 @@ import com.zurrtum.create.client.foundation.gui.widget.IconButton;
 import com.zurrtum.create.client.foundation.utility.CreateLang;
 import com.zurrtum.create.content.equipment.zapper.ConfigureZapperPacket;
 import com.zurrtum.create.infrastructure.component.PlacementPatterns;
+
 import java.util.ArrayList;
 import java.util.List;
+
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;

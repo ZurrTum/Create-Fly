@@ -6,7 +6,9 @@ import com.zurrtum.create.AllRecipeSerializers;
 import com.zurrtum.create.AllRecipeTypes;
 import com.zurrtum.create.content.processing.recipe.ChanceOutput;
 import com.zurrtum.create.foundation.recipe.CreateSingleStackRollableRecipe;
+
 import java.util.List;
+
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;

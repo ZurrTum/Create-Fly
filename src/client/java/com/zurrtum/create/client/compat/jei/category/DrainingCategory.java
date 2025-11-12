@@ -50,10 +50,7 @@ public class DrainingCategory extends CreateCategory<RecipeHolder<EmptyingRecipe
                 Ingredient ingredient = stack.getComponentsPatch().isEmpty() ? Ingredient.of(stack.getItem()) : DefaultCustomIngredients.components(
                     stack);
                 recipes.add(new RecipeHolder<>(
-                    ResourceKey.create(
-                        Registries.RECIPE,
-                        Identifier.fromNamespaceAndPath(MOD_ID, "draining_potions_" + i.getAndIncrement())
-                    ),
+                    ResourceKey.create(Registries.RECIPE, Identifier.fromNamespaceAndPath(MOD_ID, "draining_potions_" + i.getAndIncrement())),
                     new EmptyingRecipe(Items.GLASS_BOTTLE.getDefaultInstance(), PotionFluidHandler.getFluidFromPotionItem(stack), ingredient)
                 ));
                 return;

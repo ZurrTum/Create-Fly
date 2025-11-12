@@ -40,7 +40,12 @@ public class ChuteItem extends BlockItem {
                 world.setBlockAndUpdate(
                     correctPos, ProperWaterloggedBlock.withWater(
                         world,
-                        block.updateChuteState(blockState.setValue(ChuteBlock.FACING, face), world.getBlockState(correctPos.above()), world, correctPos),
+                        block.updateChuteState(
+                            blockState.setValue(ChuteBlock.FACING, face),
+                            world.getBlockState(correctPos.above()),
+                            world,
+                            correctPos
+                        ),
                         correctPos
                     )
                 );

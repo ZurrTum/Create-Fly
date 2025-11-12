@@ -5,8 +5,10 @@ import com.zurrtum.create.catnip.data.Iterate;
 import com.zurrtum.create.content.trains.track.BezierConnection;
 import com.zurrtum.create.content.trains.track.TrackMaterial;
 import io.netty.buffer.ByteBuf;
+
 import java.util.*;
 import java.util.stream.IntStream;
+
 import net.minecraft.Util;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Vec3i;
@@ -22,7 +24,8 @@ import net.minecraft.world.phys.Vec3;
 
 public class TrackNodeLocation extends Vec3i {
     private static final Codec<TrackNodeLocation> POS_CODEC = Codec.INT_STREAM.comapFlatMap(
-        stream -> Util.fixedSize(stream, 3).map(coordinates -> new TrackNodeLocation(coordinates[0], coordinates[1], coordinates[2])),
+        stream -> Util.fixedSize(stream, 3)
+            .map(coordinates -> new TrackNodeLocation(coordinates[0], coordinates[1], coordinates[2])),
         vec -> IntStream.of(vec.getX(), vec.getY(), vec.getZ())
     );
     public static final StreamCodec<ByteBuf, TrackNodeLocation> POS_PACKET_CODEC = StreamCodec.composite(
@@ -232,10 +235,7 @@ public class TrackNodeLocation extends Vec3i {
         }
 
         public boolean notInLineWith(Vec3 direction) {
-            return this.direction != null && Math.max(
-                direction.dot(this.direction),
-                direction.dot(this.direction.scale(-1))
-            ) < 7 / 8f;
+            return this.direction != null && Math.max(direction.dot(this.direction), direction.dot(this.direction.scale(-1))) < 7 / 8f;
         }
 
         public Vec3 getDirection() {

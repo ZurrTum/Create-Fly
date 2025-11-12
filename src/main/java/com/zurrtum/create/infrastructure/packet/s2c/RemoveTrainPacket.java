@@ -7,6 +7,7 @@ import io.netty.buffer.ByteBuf;
 import org.apache.logging.log4j.util.TriConsumer;
 
 import java.util.UUID;
+
 import net.minecraft.core.UUIDUtil;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.PacketType;

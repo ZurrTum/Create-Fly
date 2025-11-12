@@ -3,6 +3,7 @@ package com.zurrtum.create.infrastructure.debugInfo.element;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Objects;
+
 import net.minecraft.world.entity.player.Player;
 
 /**

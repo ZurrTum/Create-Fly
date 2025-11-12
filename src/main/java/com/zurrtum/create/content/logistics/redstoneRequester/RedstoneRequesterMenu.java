@@ -6,8 +6,10 @@ import com.zurrtum.create.content.logistics.stockTicker.PackageOrder;
 import com.zurrtum.create.foundation.gui.menu.GhostItemMenu;
 import com.zurrtum.create.infrastructure.component.PackageOrderWithCrafts;
 import com.zurrtum.create.infrastructure.items.ItemStackHandler;
+
 import java.util.ArrayList;
 import java.util.List;
+
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;

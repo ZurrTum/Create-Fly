@@ -2,9 +2,11 @@ package com.zurrtum.create.content.trains.track;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Locale;
+
 import net.minecraft.core.Direction;
 import net.minecraft.util.StringRepresentable;
 import net.minecraft.world.level.block.Mirror;
@@ -113,10 +115,7 @@ public enum TrackShape implements StringRepresentable {
     }
 
     public TrackShape mirror(Mirror mirror) {
-        return mirror == Mirror.NONE ? this : mirror == Mirror.FRONT_BACK ? xMirror.getOrDefault(this, this) : zMirror.getOrDefault(
-            this,
-            this
-        );
+        return mirror == Mirror.NONE ? this : mirror == Mirror.FRONT_BACK ? xMirror.getOrDefault(this, this) : zMirror.getOrDefault(this, this);
     }
 
     public TrackShape rotate(Rotation rotation) {

@@ -11,8 +11,10 @@ import com.zurrtum.create.content.trains.display.FlapDisplaySection;
 import com.zurrtum.create.content.trains.display.GlobalTrainDisplayData;
 import com.zurrtum.create.content.trains.station.GlobalStation;
 import com.zurrtum.create.content.trains.station.StationBlockEntity;
+
 import java.util.ArrayList;
 import java.util.List;
+
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
@@ -24,7 +26,13 @@ public class StationSummaryDisplaySource extends DisplaySource {
 
     protected static final MutableComponent UNPREDICTABLE = Component.literal(" ~ ");
     protected static final List<MutableComponent> EMPTY_ENTRY_4 = ImmutableList.of(WHITESPACE, Component.literal(" . "), WHITESPACE, WHITESPACE);
-    protected static final List<MutableComponent> EMPTY_ENTRY_5 = ImmutableList.of(WHITESPACE, Component.literal(" . "), WHITESPACE, WHITESPACE, WHITESPACE);
+    protected static final List<MutableComponent> EMPTY_ENTRY_5 = ImmutableList.of(
+        WHITESPACE,
+        Component.literal(" . "),
+        WHITESPACE,
+        WHITESPACE,
+        WHITESPACE
+    );
 
     @Override
     public List<MutableComponent> provideText(DisplayLinkContext context, DisplayTargetStats stats) {

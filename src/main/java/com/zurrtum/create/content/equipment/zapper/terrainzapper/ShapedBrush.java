@@ -1,8 +1,10 @@
 package com.zurrtum.create.content.equipment.zapper.terrainzapper;
 
 import com.zurrtum.create.infrastructure.component.TerrainTools;
+
 import java.util.Collection;
 import java.util.List;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.LevelAccessor;

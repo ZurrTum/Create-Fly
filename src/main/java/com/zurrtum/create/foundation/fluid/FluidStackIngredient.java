@@ -4,7 +4,9 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.zurrtum.create.infrastructure.fluids.FluidStack;
+
 import java.util.List;
+
 import net.minecraft.core.component.DataComponentPatch;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
@@ -20,8 +22,7 @@ public record FluidStackIngredient(Fluid fluid, DataComponentPatch components, i
             return false;
         if (components.isEmpty())
             return true;
-        return stack.getComponentChanges().map.reference2ObjectEntrySet()
-            .containsAll(components.map.reference2ObjectEntrySet());
+        return stack.getComponentChanges().map.reference2ObjectEntrySet().containsAll(components.map.reference2ObjectEntrySet());
     }
 
     @Override

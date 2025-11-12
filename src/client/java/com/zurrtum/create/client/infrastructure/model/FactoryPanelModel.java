@@ -10,8 +10,10 @@ import com.zurrtum.create.content.logistics.factoryBoard.FactoryPanelBlock;
 import com.zurrtum.create.content.logistics.factoryBoard.FactoryPanelPosition;
 import com.zurrtum.create.content.logistics.factoryBoard.PanelSlot;
 import com.zurrtum.create.content.logistics.factoryBoard.ServerFactoryPanelBehaviour;
+
 import java.util.Arrays;
 import java.util.List;
+
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.block.model.BlockModelPart;
 import net.minecraft.client.renderer.block.model.SimpleModelWrapper;

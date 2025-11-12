@@ -29,6 +29,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.Objects;
 import java.util.stream.Stream;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.protocol.game.ServerboundPlayerActionPacket;
@@ -77,7 +78,14 @@ public class ServerPlayerInteractionManagerMixin {
     }
 
     @Inject(method = "handleBlockBreakAction(Lnet/minecraft/core/BlockPos;Lnet/minecraft/network/protocol/game/ServerboundPlayerActionPacket$Action;Lnet/minecraft/core/Direction;II)V", at = @At("HEAD"), cancellable = true)
-    private void leftClick(BlockPos pos, ServerboundPlayerActionPacket.Action action, Direction direction, int worldHeight, int sequence, CallbackInfo ci) {
+    private void leftClick(
+        BlockPos pos,
+        ServerboundPlayerActionPacket.Action action,
+        Direction direction,
+        int worldHeight,
+        int sequence,
+        CallbackInfo ci
+    ) {
         ItemStack stack = player.getMainHandItem();
         if (ZapperInteractionHandler.leftClickingBlocksWithTheZapperSelectsTheBlock(player, stack) || ClipboardValueSettingsHandler.leftClickToPaste(level,
             player,

@@ -7,6 +7,7 @@ import com.zurrtum.create.client.flywheel.lib.transform.Transform;
 import org.joml.*;
 
 import java.lang.Math;
+
 import net.minecraft.util.Mth;
 
 public class PosedInstance extends ColoredLitOverlayInstance implements Transform<PosedInstance> {

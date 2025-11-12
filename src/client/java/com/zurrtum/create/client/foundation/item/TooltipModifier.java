@@ -4,6 +4,7 @@ import com.zurrtum.create.api.registry.SimpleRegistry;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
+
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;

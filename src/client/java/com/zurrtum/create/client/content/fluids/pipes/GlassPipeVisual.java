@@ -23,6 +23,7 @@ import com.zurrtum.create.infrastructure.fluids.FluidStack;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Consumer;
+
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.core.Direction;
 import net.minecraft.util.Mth;

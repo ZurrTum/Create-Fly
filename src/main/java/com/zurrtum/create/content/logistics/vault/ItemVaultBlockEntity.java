@@ -11,10 +11,12 @@ import com.zurrtum.create.foundation.blockEntity.behaviour.inventory.VersionedIn
 import com.zurrtum.create.infrastructure.config.AllConfigs;
 import com.zurrtum.create.infrastructure.items.ItemInventory;
 import com.zurrtum.create.infrastructure.items.ItemStackHandler;
+
 import java.util.BitSet;
 import java.util.List;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Direction.Axis;

@@ -12,6 +12,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.Holder;
 import net.minecraft.core.component.DataComponentType;
@@ -36,7 +37,8 @@ public class AttributeFilterItem extends FilterItem {
         AttributeFilterWhitelistMode whitelistMode = filter.get(AllDataComponents.ATTRIBUTE_FILTER_WHITELIST_MODE);
         list.add((whitelistMode == AttributeFilterWhitelistMode.WHITELIST_CONJ ? Component.translatable(
             "create.gui.attribute_filter.allow_list_conjunctive") : whitelistMode == AttributeFilterWhitelistMode.WHITELIST_DISJ ? Component.translatable(
-            "create.gui.attribute_filter.allow_list_disjunctive") : Component.translatable("create.gui.attribute_filter.deny_list")).withStyle(ChatFormatting.GOLD));
+            "create.gui.attribute_filter.allow_list_disjunctive") : Component.translatable("create.gui.attribute_filter.deny_list")).withStyle(
+            ChatFormatting.GOLD));
 
         int count = 0;
         List<ItemAttributeEntry> attributes = filter.getOrDefault(AllDataComponents.ATTRIBUTE_FILTER_MATCHED_ATTRIBUTES, List.of());

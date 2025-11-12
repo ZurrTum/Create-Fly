@@ -9,6 +9,7 @@ import com.zurrtum.create.content.contraptions.StructureTransform;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.concurrent.TimeUnit;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Vec3i;
@@ -54,7 +55,12 @@ public class SchematicInstances {
         StructurePlaceSettings settings = SchematicItem.getSettings(schematic);
         activeTemplate.placeInWorld(world, anchor, anchor, settings, wrapped.getRandom(), Block.UPDATE_CLIENTS);
 
-        StructureTransform transform = new StructureTransform(settings.getRotationPivot(), Direction.Axis.Y, settings.getRotation(), settings.getMirror());
+        StructureTransform transform = new StructureTransform(
+            settings.getRotationPivot(),
+            Direction.Axis.Y,
+            settings.getRotation(),
+            settings.getMirror()
+        );
         for (BlockEntity be : world.getBlockEntities())
             transform.apply(be);
 

@@ -6,6 +6,7 @@ import com.zurrtum.create.catnip.codecs.stream.CatnipStreamCodecBuilders;
 import org.apache.logging.log4j.util.TriConsumer;
 
 import java.util.List;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;

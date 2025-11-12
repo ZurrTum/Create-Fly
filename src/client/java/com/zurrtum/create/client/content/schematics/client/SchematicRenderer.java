@@ -11,7 +11,9 @@ import com.zurrtum.create.client.foundation.render.BlockEntityRenderHelper;
 import com.zurrtum.create.client.foundation.render.BlockEntityRenderHelper.BlockEntityListRenderState;
 import com.zurrtum.create.client.infrastructure.model.WrapperBlockStateModel;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
+
 import java.util.*;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.ItemBlockRenderTypes;
 import net.minecraft.client.renderer.block.BlockRenderDispatcher;
@@ -115,14 +117,7 @@ public class SchematicRenderer {
 
         renderWorld.renderMode = true;
         ModelBlockRenderer.enableCaching();
-        for (BlockPos localPos : BlockPos.betweenClosed(
-            bounds.minX(),
-            bounds.minY(),
-            bounds.minZ(),
-            bounds.maxX(),
-            bounds.maxY(),
-            bounds.maxZ()
-        )) {
+        for (BlockPos localPos : BlockPos.betweenClosed(bounds.minX(), bounds.minY(), bounds.minZ(), bounds.maxX(), bounds.maxY(), bounds.maxZ())) {
             BlockPos pos = mutableBlockPos.setWithOffset(localPos, anchor);
             BlockState state = renderWorld.getBlockState(pos);
 

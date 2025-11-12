@@ -15,6 +15,7 @@ import com.zurrtum.create.client.foundation.render.SpecialModels;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Consumer;
+
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.util.Mth;

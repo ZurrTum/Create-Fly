@@ -33,7 +33,12 @@ public abstract class MovingInteractionBehaviour {
         contraptionEntity.setBlock(pos, info);
     }
 
-    public boolean handlePlayerInteraction(Player player, InteractionHand activeHand, BlockPos localPos, AbstractContraptionEntity contraptionEntity) {
+    public boolean handlePlayerInteraction(
+        Player player,
+        InteractionHand activeHand,
+        BlockPos localPos,
+        AbstractContraptionEntity contraptionEntity
+    ) {
         return true;
     }
 

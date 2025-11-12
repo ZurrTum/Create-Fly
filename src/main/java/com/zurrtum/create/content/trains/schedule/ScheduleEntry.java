@@ -5,9 +5,11 @@ import com.zurrtum.create.Create;
 import com.zurrtum.create.catnip.codecs.stream.CatnipStreamCodecBuilders;
 import com.zurrtum.create.content.trains.schedule.condition.ScheduleWaitCondition;
 import com.zurrtum.create.content.trains.schedule.destination.ScheduleInstruction;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+
 import net.minecraft.core.HolderLookup;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;

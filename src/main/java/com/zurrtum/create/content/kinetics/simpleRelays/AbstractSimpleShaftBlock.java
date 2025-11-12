@@ -5,7 +5,9 @@ import com.zurrtum.create.content.decoration.bracket.BracketedBlockEntityBehavio
 import com.zurrtum.create.content.equipment.wrench.IWrenchableWithBracket;
 import com.zurrtum.create.content.kinetics.base.KineticBlockEntity;
 import com.zurrtum.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
+
 import java.util.Optional;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionResult;

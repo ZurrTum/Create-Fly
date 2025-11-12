@@ -6,6 +6,7 @@ import com.zurrtum.create.foundation.item.ItemHelper;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Optional;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.Container;
 import net.minecraft.world.level.Level;

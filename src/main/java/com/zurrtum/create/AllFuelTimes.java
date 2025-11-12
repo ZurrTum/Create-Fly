@@ -2,6 +2,7 @@ package com.zurrtum.create;
 
 import java.util.IdentityHashMap;
 import java.util.Map;
+
 import net.minecraft.world.level.ItemLike;
 
 public class AllFuelTimes {

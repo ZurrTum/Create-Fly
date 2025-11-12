@@ -15,7 +15,8 @@ public class AndesiteFunnelBlock extends FunnelBlock {
     @Override
     public BlockState getEquivalentBeltFunnel(BlockGetter world, BlockPos pos, BlockState state) {
         Direction facing = getFunnelFacing(state);
-        return AllBlocks.ANDESITE_BELT_FUNNEL.defaultBlockState().setValue(BeltFunnelBlock.HORIZONTAL_FACING, facing).setValue(POWERED, state.getValue(POWERED));
+        return AllBlocks.ANDESITE_BELT_FUNNEL.defaultBlockState().setValue(BeltFunnelBlock.HORIZONTAL_FACING, facing)
+            .setValue(POWERED, state.getValue(POWERED));
     }
 
 }

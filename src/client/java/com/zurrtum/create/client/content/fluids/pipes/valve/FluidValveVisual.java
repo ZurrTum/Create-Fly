@@ -13,7 +13,9 @@ import com.zurrtum.create.client.flywheel.lib.model.Models;
 import com.zurrtum.create.client.flywheel.lib.visual.SimpleDynamicVisual;
 import com.zurrtum.create.content.fluids.pipes.valve.FluidValveBlock;
 import com.zurrtum.create.content.fluids.pipes.valve.FluidValveBlockEntity;
+
 import java.util.function.Consumer;
+
 import net.minecraft.core.Direction;
 import net.minecraft.util.Mth;
 

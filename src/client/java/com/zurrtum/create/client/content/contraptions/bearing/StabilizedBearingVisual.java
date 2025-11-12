@@ -47,8 +47,8 @@ public class StabilizedBearingVisual extends ActorVisual {
         // not rotating so no need to set speed.
         var axis = KineticBlockEntityVisual.rotationAxis(blockState);
         shaft.setRotationAxis(axis).setRotationOffset(KineticBlockEntityVisual.rotationOffset(blockState, axis, movementContext.localPos))
-            .setPosition(movementContext.localPos).rotateToFace(Direction.SOUTH, blockState.getValue(BlockStateProperties.FACING).getOpposite()).light(blockLight, 0)
-            .setChanged();
+            .setPosition(movementContext.localPos).rotateToFace(Direction.SOUTH, blockState.getValue(BlockStateProperties.FACING).getOpposite())
+            .light(blockLight, 0).setChanged();
     }
 
     @Override

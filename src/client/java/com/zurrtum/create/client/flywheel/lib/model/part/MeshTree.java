@@ -12,6 +12,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Arrays;
 import java.util.NoSuchElementException;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.geom.EntityModelSet;
 import net.minecraft.client.model.geom.ModelLayerLocation;
@@ -70,14 +71,7 @@ public final class MeshTree {
         }
 
         VertexWriter vertexWriter = objects.vertexWriter;
-        FlwLibLink.INSTANCE.compileModelPart(
-            modelPart,
-            IDENTITY_POSE,
-            vertexWriter,
-            LightTexture.FULL_BRIGHT,
-            OverlayTexture.NO_OVERLAY,
-            0xFFFFFFFF
-        );
+        FlwLibLink.INSTANCE.compileModelPart(modelPart, IDENTITY_POSE, vertexWriter, LightTexture.FULL_BRIGHT, OverlayTexture.NO_OVERLAY, 0xFFFFFFFF);
         MemoryBlock data = vertexWriter.copyDataAndReset();
 
         VertexView vertexView = new PosTexNormalVertexView();

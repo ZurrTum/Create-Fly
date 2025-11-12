@@ -3,6 +3,7 @@ package com.zurrtum.create.catnip.data;
 import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.List;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Direction.Axis;

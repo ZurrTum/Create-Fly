@@ -12,6 +12,7 @@ import java.lang.ref.WeakReference;
 import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;

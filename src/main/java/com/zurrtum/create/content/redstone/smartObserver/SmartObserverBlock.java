@@ -68,13 +68,7 @@ public class SmartObserverBlock extends DirectedDirectionalBlock implements IBE<
                 null,
                 blockEntity,
                 null
-            ) != null || FluidHelper.hasFluidInventory(
-                context.getLevel(),
-                offsetPos,
-                null,
-                blockEntity,
-                null
-            )))
+            ) != null || FluidHelper.hasFluidInventory(context.getLevel(), offsetPos, null, blockEntity, null)))
                 canDetect = true;
             else if (blockEntity instanceof FunnelBlockEntity)
                 canDetect = true;

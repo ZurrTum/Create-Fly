@@ -2,8 +2,10 @@ package com.zurrtum.create.foundation.item;
 
 import com.zurrtum.create.catnip.data.IntAttached;
 import com.zurrtum.create.foundation.blockEntity.behaviour.filtering.ServerFilteringBehaviour;
+
 import java.util.*;
 import java.util.stream.Stream;
+
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.world.Container;
 import net.minecraft.world.item.Item;

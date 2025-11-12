@@ -3,9 +3,11 @@ package com.zurrtum.create.foundation.placement;
 import com.zurrtum.create.catnip.placement.IPlacementHelper;
 import com.zurrtum.create.catnip.placement.PlacementOffset;
 import com.zurrtum.create.infrastructure.config.AllConfigs;
+
 import java.util.List;
 import java.util.function.Function;
 import java.util.function.Predicate;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;

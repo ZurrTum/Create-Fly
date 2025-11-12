@@ -3,7 +3,9 @@ package com.zurrtum.create.client.foundation.blockEntity.behaviour.tooltip;
 import com.zurrtum.create.client.api.goggles.IHaveGoggleInformation;
 import com.zurrtum.create.client.foundation.utility.CreateLang;
 import com.zurrtum.create.content.logistics.tunnel.BrassTunnelBlockEntity;
+
 import java.util.List;
+
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;

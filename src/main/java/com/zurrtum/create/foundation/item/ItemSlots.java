@@ -6,9 +6,11 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.zurrtum.create.foundation.codec.CreateCodecs;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.IntFunction;
+
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;

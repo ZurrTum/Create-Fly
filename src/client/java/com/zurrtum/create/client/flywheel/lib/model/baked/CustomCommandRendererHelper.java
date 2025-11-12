@@ -1,9 +1,11 @@
 package com.zurrtum.create.client.flywheel.lib.model.baked;
 
 import com.mojang.blaze3d.vertex.VertexConsumer;
+
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.OutlineBufferSource.EntityOutlineGenerator;
 import net.minecraft.client.renderer.RenderType;

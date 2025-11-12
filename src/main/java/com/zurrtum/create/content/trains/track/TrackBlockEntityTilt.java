@@ -3,10 +3,12 @@ package com.zurrtum.create.content.trains.track;
 import com.zurrtum.create.catnip.data.Couple;
 import com.zurrtum.create.catnip.data.Pair;
 import com.zurrtum.create.content.trains.graph.TrackNodeLocation;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.Level;

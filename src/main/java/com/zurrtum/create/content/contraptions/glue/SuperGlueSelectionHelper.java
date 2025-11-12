@@ -2,10 +2,12 @@ package com.zurrtum.create.content.contraptions.glue;
 
 import com.zurrtum.create.api.contraption.BlockMovementChecks;
 import com.zurrtum.create.catnip.data.Iterate;
+
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.NonNullList;

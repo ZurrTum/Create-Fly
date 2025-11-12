@@ -3,7 +3,9 @@ package com.zurrtum.create.content.trains.display;
 import com.zurrtum.create.Create;
 import com.zurrtum.create.catnip.data.Glob;
 import com.zurrtum.create.content.trains.entity.Train;
+
 import java.util.*;
+
 import net.minecraft.network.chat.MutableComponent;
 
 public class GlobalTrainDisplayData {

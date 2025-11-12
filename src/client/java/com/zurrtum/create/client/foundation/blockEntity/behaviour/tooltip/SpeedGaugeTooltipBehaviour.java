@@ -6,7 +6,9 @@ import com.zurrtum.create.client.foundation.item.TooltipHelper;
 import com.zurrtum.create.client.foundation.utility.CreateLang;
 import com.zurrtum.create.content.kinetics.base.IRotate.SpeedLevel;
 import com.zurrtum.create.content.kinetics.gauge.SpeedGaugeBlockEntity;
+
 import java.util.List;
+
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 

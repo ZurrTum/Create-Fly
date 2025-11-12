@@ -36,12 +36,7 @@ public abstract class MountedItemStorage implements ItemInventory {
 
     @SuppressWarnings("deprecation")
     public static final StreamCodec<RegistryFriendlyByteBuf, MountedItemStorage> STREAM_CODEC = StreamCodec.ofMember(
-        (b, t) -> t.writeWithCodec(
-            RegistryOps.create(
-                NbtOps.INSTANCE,
-                t.registryAccess()
-            ), CODEC, b
-        ),
+        (b, t) -> t.writeWithCodec(RegistryOps.create(NbtOps.INSTANCE, t.registryAccess()), CODEC, b),
         b -> b.readWithCodecTrusted(RegistryOps.create(NbtOps.INSTANCE, b.registryAccess()), CODEC)
     );
 
@@ -118,12 +113,7 @@ public abstract class MountedItemStorage implements ItemInventory {
      * @return a MenuProvider that provides the menu players will see when opening this storage
      */
     @Nullable
-    protected MenuProvider createMenuProvider(
-        Component name,
-        Container handler,
-        Predicate<Player> stillValid,
-        Consumer<ContainerUser> onClose
-    ) {
+    protected MenuProvider createMenuProvider(Component name, Container handler, Predicate<Player> stillValid, Consumer<ContainerUser> onClose) {
         return MountedStorageMenus.createGeneric(name, handler, stillValid, onClose);
     }
 

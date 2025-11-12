@@ -5,6 +5,7 @@ import com.zurrtum.create.infrastructure.fluids.FluidStack;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
 import net.fabricmc.fabric.api.transfer.v1.transaction.TransactionContext;
 import net.minecraft.core.component.DataComponentType;
+
 import java.util.Objects;
 
 public class FluidInventorySlotWrapper extends SingleFluidStackStorage {

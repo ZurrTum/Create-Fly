@@ -54,7 +54,8 @@ public class TreeFertilizerItem extends Item {
                 if (world.getBlockState(actualPos).getDestroySpeed(world, actualPos) == -1)
                     continue;
                 // Don't replace solid blocks with leaves
-                if (!newState.isRedstoneConductor(treesDreamWorld, pos) && !world.getBlockState(actualPos).getCollisionShape(world, actualPos).isEmpty())
+                if (!newState.isRedstoneConductor(treesDreamWorld, pos) && !world.getBlockState(actualPos).getCollisionShape(world, actualPos)
+                    .isEmpty())
                     continue;
 
                 world.setBlockAndUpdate(actualPos, newState);

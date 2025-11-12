@@ -4,7 +4,9 @@ import com.zurrtum.create.api.behaviour.display.DisplayHolder;
 import com.zurrtum.create.api.behaviour.display.DisplayTarget;
 import com.zurrtum.create.catnip.data.Couple;
 import com.zurrtum.create.content.redstone.displayLink.DisplayLinkContext;
+
 import java.util.List;
+
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.world.level.block.entity.BlockEntity;

@@ -112,7 +112,8 @@ public class PulleyBlock extends HorizontalAxisKineticBlock implements IBE<Pulle
             boolean onBroken = !state.hasProperty(BlockStateProperties.WATERLOGGED);
             if (!onBroken) {
                 BlockState newState = worldIn.getBlockState(pos);
-                onBroken = !newState.hasProperty(BlockStateProperties.WATERLOGGED) || state.getValue(BlockStateProperties.WATERLOGGED) == newState.getValue(BlockStateProperties.WATERLOGGED);
+                onBroken = !newState.hasProperty(BlockStateProperties.WATERLOGGED) || state.getValue(BlockStateProperties.WATERLOGGED) == newState.getValue(
+                    BlockStateProperties.WATERLOGGED);
             }
             if (onBroken) {
                 onRopeBroken(worldIn, pos.above());
@@ -158,7 +159,8 @@ public class PulleyBlock extends HorizontalAxisKineticBlock implements IBE<Pulle
         @Override
         public BlockState getStateForPlacement(BlockPlaceContext context) {
             FluidState FluidState = context.getLevel().getFluidState(context.getClickedPos());
-            return super.getStateForPlacement(context).setValue(BlockStateProperties.WATERLOGGED, Boolean.valueOf(FluidState.getType() == Fluids.WATER));
+            return super.getStateForPlacement(context)
+                .setValue(BlockStateProperties.WATERLOGGED, Boolean.valueOf(FluidState.getType() == Fluids.WATER));
         }
 
     }

@@ -2,7 +2,9 @@ package com.zurrtum.create.client.foundation.blockEntity.behaviour.tooltip;
 
 import com.zurrtum.create.client.api.goggles.IHaveGoggleInformation;
 import com.zurrtum.create.content.kinetics.steamEngine.PoweredShaftBlockEntity;
+
 import java.util.List;
+
 import net.minecraft.network.chat.Component;
 
 public class PoweredShaftTooltipBehaviour extends GeneratingKineticTooltipBehaviour<PoweredShaftBlockEntity> implements IHaveGoggleInformation {

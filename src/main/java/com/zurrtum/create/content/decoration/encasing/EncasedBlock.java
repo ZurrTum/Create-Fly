@@ -18,6 +18,14 @@ public interface EncasedBlock {
     /**
      * Handles how encasing should be done if {@link EncasableBlock#tryEncase(BlockState, Level, BlockPos, ItemStack, Player, InteractionHand, BlockHitResult)} is successful.
      */
-    default void handleEncasing(BlockState state, Level level, BlockPos pos, ItemStack heldItem, Player player, InteractionHand hand, BlockHitResult ray) {
+    default void handleEncasing(
+        BlockState state,
+        Level level,
+        BlockPos pos,
+        ItemStack heldItem,
+        Player player,
+        InteractionHand hand,
+        BlockHitResult ray
+    ) {
     }
 }

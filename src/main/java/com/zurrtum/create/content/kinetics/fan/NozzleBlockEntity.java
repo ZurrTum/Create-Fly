@@ -5,9 +5,11 @@ import com.zurrtum.create.catnip.math.VecHelper;
 import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
 import com.zurrtum.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.infrastructure.config.AllConfigs;
+
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.util.Mth;
@@ -77,8 +79,7 @@ public class NozzleBlockEntity extends SmartBlockEntity {
         if (level.isClientSide() && range != 0) {
             if (level.random.nextInt(Mth.clamp((AllConfigs.server().kinetics.fanPushDistance.get() - (int) range), 1, 10)) == 0) {
                 Vec3 start = VecHelper.offsetRandomly(center, level.random, pushing ? 1 : range / 2);
-                Vec3 motion = center.subtract(start).normalize()
-                    .scale(Mth.clamp(range * (pushing ? .025f : 1f), 0, .5f) * (pushing ? -1 : 1));
+                Vec3 motion = center.subtract(start).normalize().scale(Mth.clamp(range * (pushing ? .025f : 1f), 0, .5f) * (pushing ? -1 : 1));
                 level.addParticle(ParticleTypes.POOF, start.x, start.y, start.z, motion.x, motion.y, motion.z);
             }
         }
@@ -174,13 +175,7 @@ public class NozzleBlockEntity extends SmartBlockEntity {
     }
 
     private boolean canSee(Entity entity) {
-        ClipContext context = new ClipContext(
-            entity.position(),
-            VecHelper.getCenterOf(worldPosition),
-            Block.COLLIDER,
-            Fluid.NONE,
-            entity
-        );
+        ClipContext context = new ClipContext(entity.position(), VecHelper.getCenterOf(worldPosition), Block.COLLIDER, Fluid.NONE, entity);
         return worldPosition.equals(level.clip(context).getBlockPos());
     }
 

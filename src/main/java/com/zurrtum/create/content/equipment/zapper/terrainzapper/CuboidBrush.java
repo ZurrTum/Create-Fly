@@ -1,9 +1,11 @@
 package com.zurrtum.create.content.equipment.zapper.terrainzapper;
 
 import com.zurrtum.create.infrastructure.component.PlacementOptions;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Direction.AxisDirection;

@@ -12,6 +12,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.geom.ModelLayerLocation;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
@@ -48,12 +49,23 @@ public final class ModelTrees {
         return CACHE.get(new ModelTreeKey(layer, Set.copyOf(pathsToPrune), null, material));
     }
 
-    public static ModelTree of(ModelLayerLocation layer, Set<String> pathsToPrune, net.minecraft.client.resources.model.Material texture, Material material) {
+    public static ModelTree of(
+        ModelLayerLocation layer,
+        Set<String> pathsToPrune,
+        net.minecraft.client.resources.model.Material texture,
+        Material material
+    ) {
         return CACHE.get(new ModelTreeKey(layer, Set.copyOf(pathsToPrune), texture, material));
     }
 
     @Nullable
-    private static ModelTree convert(String path, MeshTree meshTree, Set<String> pathsToPrune, @Nullable TextureAtlasSprite sprite, Material material) {
+    private static ModelTree convert(
+        String path,
+        MeshTree meshTree,
+        Set<String> pathsToPrune,
+        @Nullable TextureAtlasSprite sprite,
+        Material material
+    ) {
         if (pathsToPrune.contains(path)) {
             return null;
         }

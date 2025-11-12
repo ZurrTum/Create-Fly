@@ -12,7 +12,12 @@ import net.minecraft.world.entity.player.Player;
 public class SeatInteractionBehaviour extends MovingInteractionBehaviour {
 
     @Override
-    public boolean handlePlayerInteraction(Player player, InteractionHand activeHand, BlockPos localPos, AbstractContraptionEntity contraptionEntity) {
+    public boolean handlePlayerInteraction(
+        Player player,
+        InteractionHand activeHand,
+        BlockPos localPos,
+        AbstractContraptionEntity contraptionEntity
+    ) {
         return false;
     }
 

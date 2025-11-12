@@ -45,11 +45,7 @@ public class VecHelper {
                 q1.conjugate();
                 result3f.rotate(q1);
 
-                Vector3f bob_translation = new Vector3f(
-                    Mth.sin(f * (float) Math.PI) * g * 0.5F,
-                    -Math.abs(Mth.cos(f * (float) Math.PI) * g),
-                    0.0f
-                );
+                Vector3f bob_translation = new Vector3f(Mth.sin(f * (float) Math.PI) * g * 0.5F, -Math.abs(Mth.cos(f * (float) Math.PI) * g), 0.0f);
                 bob_translation.set(bob_translation.x(), -bob_translation.y(), bob_translation.z());// this is weird but hey, if it works
                 result3f.add(bob_translation);
             }

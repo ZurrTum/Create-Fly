@@ -5,9 +5,11 @@ import com.google.gson.JsonObject;
 import com.mojang.serialization.DynamicOps;
 import com.zurrtum.create.content.fluids.transfer.FillingRecipe;
 import com.zurrtum.create.content.kinetics.deployer.DeployerApplicationRecipe;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.BiFunction;
+
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.crafting.RecipeType;
 

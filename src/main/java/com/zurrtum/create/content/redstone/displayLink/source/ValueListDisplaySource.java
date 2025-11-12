@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Stream;
+
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.world.level.block.entity.LecternBlockEntity;
@@ -30,10 +31,9 @@ public abstract class ValueListDisplaySource extends DisplaySource {
     public List<MutableComponent> provideText(DisplayLinkContext context, DisplayTargetStats stats) {
         boolean isBook = context.getTargetBlockEntity() instanceof LecternBlockEntity;
 
-        List<MutableComponent> list = provideEntries(
-            context,
-            stats.maxRows() * (isBook ? ENTRIES_PER_PAGE : 1)
-        ).map(e -> createComponentsFromEntry(context, e)).map(l -> {
+        List<MutableComponent> list = provideEntries(context, stats.maxRows() * (isBook ? ENTRIES_PER_PAGE : 1)).map(e -> createComponentsFromEntry(context,
+            e
+        )).map(l -> {
             MutableComponent combined = l.get(0).append(l.get(1));
             if (l.size() > 2)
                 combined.append(l.get(2));

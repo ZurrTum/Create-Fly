@@ -68,7 +68,10 @@ public class GantryShaftBlockEntity extends KineticBlockEntity {
         Direction direction = Direction.getApproximateNearest(diff.getX(), diff.getY(), diff.getZ());
         if (stateTo.getValue(GantryCarriageBlock.FACING) != direction)
             return defaultModifier;
-        return GantryCarriageBlockEntity.getGantryPinionModifier(stateFrom.getValue(GantryShaftBlock.FACING), stateTo.getValue(GantryCarriageBlock.FACING));
+        return GantryCarriageBlockEntity.getGantryPinionModifier(
+            stateFrom.getValue(GantryShaftBlock.FACING),
+            stateTo.getValue(GantryCarriageBlock.FACING)
+        );
     }
 
     @Override

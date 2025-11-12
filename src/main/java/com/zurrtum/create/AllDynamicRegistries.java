@@ -3,8 +3,10 @@ package com.zurrtum.create;
 import com.mojang.serialization.Codec;
 import com.zurrtum.create.api.equipment.potatoCannon.PotatoCannonProjectileType;
 import com.zurrtum.create.api.registry.CreateRegistryKeys;
+
 import java.util.ArrayList;
 import java.util.List;
+
 import net.minecraft.core.Registry;
 import net.minecraft.resources.RegistryDataLoader;
 import net.minecraft.resources.ResourceKey;

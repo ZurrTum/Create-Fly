@@ -51,7 +51,11 @@ public class AutoMixingCategory extends CreateCategory<CraftingDisplay> {
             drawSlotBackground(graphics, points, output);
             AllGuiTextures.JEI_DOWN_ARROW.render(graphics, bounds.x + 141, bounds.y + 37);
             AllGuiTextures.JEI_SHADOW.render(graphics, bounds.x + 86, bounds.y + 73);
-            graphics.guiRenderState.submitPicturesInPictureState(new MixingBasinRenderState(new Matrix3x2f(graphics.pose()), bounds.x + 96, bounds.y));
+            graphics.guiRenderState.submitPicturesInPictureState(new MixingBasinRenderState(
+                new Matrix3x2f(graphics.pose()),
+                bounds.x + 96,
+                bounds.y
+            ));
         }));
         for (int i = 0, size = points.size(); i < size; i++) {
             widgets.add(createInputSlot(points.get(i)).entries(ingredients.get(i)));

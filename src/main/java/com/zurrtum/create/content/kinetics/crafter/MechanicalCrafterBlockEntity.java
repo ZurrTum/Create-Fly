@@ -19,6 +19,7 @@ import com.zurrtum.create.infrastructure.items.SidedItemInventory;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.particles.ItemParticleOption;
@@ -390,8 +391,8 @@ public class MechanicalCrafterBlockEntity extends KineticBlockEntity implements 
                         groupedItemsBeforeCraft = new GroupedItems();
 
                         for (int i = 0; i < 10; i++) {
-                            Vec3 randVec = VecHelper.offsetRandomly(Vec3.ZERO, level.random, .125f)
-                                .multiply(VecHelper.axisAlingedPlaneOf(facingVec)).normalize().scale(.25f);
+                            Vec3 randVec = VecHelper.offsetRandomly(Vec3.ZERO, level.random, .125f).multiply(VecHelper.axisAlingedPlaneOf(facingVec))
+                                .normalize().scale(.25f);
                             Vec3 offset2 = randVec.add(vec);
                             randVec = randVec.scale(.35f);
                             level.addParticle(

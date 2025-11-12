@@ -7,6 +7,7 @@ import io.netty.buffer.ByteBuf;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.function.BiConsumer;
+
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;

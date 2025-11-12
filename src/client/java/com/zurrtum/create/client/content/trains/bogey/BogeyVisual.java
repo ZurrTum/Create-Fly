@@ -5,6 +5,7 @@ import com.zurrtum.create.client.flywheel.api.instance.Instance;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Consumer;
+
 import net.minecraft.nbt.CompoundTag;
 
 public interface BogeyVisual {

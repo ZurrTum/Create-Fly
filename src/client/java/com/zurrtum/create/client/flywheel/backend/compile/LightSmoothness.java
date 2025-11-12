@@ -2,7 +2,9 @@ package com.zurrtum.create.client.flywheel.backend.compile;
 
 import com.mojang.serialization.Codec;
 import com.zurrtum.create.client.flywheel.backend.compile.core.Compilation;
+
 import java.util.Locale;
+
 import net.minecraft.util.StringRepresentable;
 
 public enum LightSmoothness implements StringRepresentable {

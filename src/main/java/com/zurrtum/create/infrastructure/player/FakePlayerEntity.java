@@ -4,6 +4,7 @@ import com.mojang.authlib.GameProfile;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.OptionalInt;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ClientInformation;
 import net.minecraft.server.level.ServerLevel;

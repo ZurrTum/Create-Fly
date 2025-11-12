@@ -24,8 +24,10 @@ import com.zurrtum.create.infrastructure.packet.s2c.TrainHUDControlUpdatePacket;
 import com.zurrtum.create.infrastructure.packet.s2c.TrainPromptPacket;
 import com.zurrtum.create.infrastructure.particle.CubeParticleData;
 import it.unimi.dsi.fastutil.objects.Reference2ObjectArrayMap;
+
 import java.lang.ref.WeakReference;
 import java.util.*;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Direction.Axis;
@@ -237,10 +239,7 @@ public class CarriageContraptionEntity extends OrientedContraptionEntity {
 
             entityData.set(SCHEDULED, carriage.train.runtime.getSchedule() != null);
 
-            boolean shouldCarriageSyncThisTick = carriage.train.shouldCarriageSyncThisTick(
-                level().getGameTime(),
-                getType().updateInterval()
-            );
+            boolean shouldCarriageSyncThisTick = carriage.train.shouldCarriageSyncThisTick(level().getGameTime(), getType().updateInterval());
             if (shouldCarriageSyncThisTick && carriageData.isDirty()) {
                 entityData.set(CARRIAGE_DATA, carriageData, true);
                 carriageData.setDirty(false);
@@ -583,7 +582,11 @@ public class CarriageContraptionEntity extends OrientedContraptionEntity {
 
         if (currentStation != null && targetSpeed != 0) {
             stationMessage = false;
-            sendPrompt(player, Component.translatable("create.train.departing_from", Component.literal(currentStation.name).withColor(0x704630)), false);
+            sendPrompt(
+                player,
+                Component.translatable("create.train.departing_from", Component.literal(currentStation.name).withColor(0x704630)),
+                false
+            );
         }
 
         if (currentStation == null) {
@@ -658,7 +661,11 @@ public class CarriageContraptionEntity extends OrientedContraptionEntity {
     boolean stationMessage = false;
 
     private void displayApproachStationMessage(Player player, GlobalStation station) {
-        sendPrompt(player, Component.translatable("create.contraption.controls.approach_station", Component.keybind("key.jump"), station.name), false);
+        sendPrompt(
+            player,
+            Component.translatable("create.contraption.controls.approach_station", Component.keybind("key.jump"), station.name),
+            false
+        );
         stationMessage = true;
     }
 

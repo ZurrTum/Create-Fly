@@ -5,8 +5,10 @@ import com.zurrtum.create.AllItems;
 import com.zurrtum.create.content.kinetics.belt.item.BeltConnectorItem;
 import com.zurrtum.create.content.kinetics.simpleRelays.ShaftBlock;
 import com.zurrtum.create.infrastructure.config.AllConfigs;
+
 import java.util.LinkedList;
 import java.util.List;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction.Axis;

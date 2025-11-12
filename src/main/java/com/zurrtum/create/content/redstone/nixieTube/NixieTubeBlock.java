@@ -16,6 +16,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.component.DataComponents;
@@ -286,14 +287,7 @@ public class NixieTubeBlock extends DoubleFaceAttachedBlock implements IBE<Nixie
     }
 
     @Override
-    public void neighborChanged(
-        BlockState state,
-        Level level,
-        BlockPos pos,
-        Block block,
-        @Nullable Orientation wireOrientation,
-        boolean isMoving
-    ) {
+    public void neighborChanged(BlockState state, Level level, BlockPos pos, Block block, @Nullable Orientation wireOrientation, boolean isMoving) {
         if (level.isClientSide())
             return;
         if (!level.getBlockTicks().willTickThisTick(pos, this))
@@ -405,8 +399,8 @@ public class NixieTubeBlock extends DoubleFaceAttachedBlock implements IBE<Nixie
     }
 
     public static BlockState withColor(BlockState state, DyeColor color) {
-        return (color == DyeColor.ORANGE ? AllBlocks.ORANGE_NIXIE_TUBE : getColorBlock(color)).defaultBlockState().setValue(FACING, state.getValue(FACING))
-            .setValue(WATERLOGGED, state.getValue(WATERLOGGED)).setValue(FACE, state.getValue(FACE));
+        return (color == DyeColor.ORANGE ? AllBlocks.ORANGE_NIXIE_TUBE : getColorBlock(color)).defaultBlockState()
+            .setValue(FACING, state.getValue(FACING)).setValue(WATERLOGGED, state.getValue(WATERLOGGED)).setValue(FACE, state.getValue(FACE));
     }
 
     public static DyeColor colorOf(BlockState blockState) {

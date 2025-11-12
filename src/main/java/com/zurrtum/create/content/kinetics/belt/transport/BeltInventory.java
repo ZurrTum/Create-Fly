@@ -19,6 +19,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.function.Function;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.util.Mth;
@@ -170,11 +171,7 @@ public class BeltInventory {
             // Apply Movement
             currentItem.beltPosition += limitedMovement;
             float diffToMiddle = currentItem.getTargetSideOffset() - currentItem.sideOffset;
-            currentItem.sideOffset += Mth.clamp(
-                diffToMiddle * Math.abs(limitedMovement) * 6f,
-                -Math.abs(diffToMiddle),
-                Math.abs(diffToMiddle)
-            );
+            currentItem.sideOffset += Mth.clamp(diffToMiddle * Math.abs(limitedMovement) * 6f, -Math.abs(diffToMiddle), Math.abs(diffToMiddle));
             currentPos = currentItem.beltPosition;
 
             // Movement successful

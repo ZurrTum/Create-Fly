@@ -12,6 +12,7 @@ import com.zurrtum.create.content.trains.track.TrackMaterial;
 import org.apache.logging.log4j.util.TriConsumer;
 
 import java.util.*;
+
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.PacketType;

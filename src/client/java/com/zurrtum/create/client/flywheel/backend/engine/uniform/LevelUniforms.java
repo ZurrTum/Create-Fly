@@ -6,6 +6,7 @@ import org.joml.Vector3f;
 
 import java.util.EnumMap;
 import java.util.Map;
+
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.util.ARGB;

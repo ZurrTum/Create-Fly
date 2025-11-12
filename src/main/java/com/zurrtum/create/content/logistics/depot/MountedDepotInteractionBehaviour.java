@@ -7,7 +7,9 @@ import com.zurrtum.create.content.contraptions.AbstractContraptionEntity;
 import com.zurrtum.create.content.contraptions.MountedStorageManager;
 import com.zurrtum.create.content.kinetics.belt.transport.TransportedItemStack;
 import com.zurrtum.create.content.logistics.depot.storage.DepotMountedStorage;
+
 import java.util.Optional;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -20,7 +22,12 @@ import net.minecraft.world.phys.Vec3;
 public class MountedDepotInteractionBehaviour extends MovingInteractionBehaviour {
 
     @Override
-    public boolean handlePlayerInteraction(Player player, InteractionHand activeHand, BlockPos localPos, AbstractContraptionEntity contraptionEntity) {
+    public boolean handlePlayerInteraction(
+        Player player,
+        InteractionHand activeHand,
+        BlockPos localPos,
+        AbstractContraptionEntity contraptionEntity
+    ) {
         if (activeHand == InteractionHand.OFF_HAND)
             return false;
         Level world = player.level();

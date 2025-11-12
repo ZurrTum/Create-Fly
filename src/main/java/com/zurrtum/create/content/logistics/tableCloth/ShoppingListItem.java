@@ -6,8 +6,10 @@ import com.zurrtum.create.content.logistics.BigItemStack;
 import com.zurrtum.create.content.logistics.packager.InventorySummary;
 import com.zurrtum.create.foundation.item.TooltipWorldContext;
 import com.zurrtum.create.infrastructure.component.ShoppingList;
+
 import java.util.List;
 import java.util.function.Consumer;
+
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvents;
@@ -62,9 +64,9 @@ public class ShoppingListItem extends Item {
 
                 if (entries.size() == 1) {
                     BigItemStack entry = entries.getFirst();
-                    textConsumer.accept((cost ? Component.translatable("create.table_cloth.total_cost") : Component.literal("")).withStyle(ChatFormatting.GOLD)
-                        .append(entry.stack.getHoverName().plainCopy().append(" x").append(String.valueOf(entry.count))
-                            .withStyle(cost ? ChatFormatting.YELLOW : ChatFormatting.GRAY)));
+                    textConsumer.accept((cost ? Component.translatable("create.table_cloth.total_cost") : Component.literal("")).withStyle(
+                        ChatFormatting.GOLD).append(entry.stack.getHoverName().plainCopy().append(" x").append(String.valueOf(entry.count))
+                        .withStyle(cost ? ChatFormatting.YELLOW : ChatFormatting.GRAY)));
 
                 } else {
                     if (cost)

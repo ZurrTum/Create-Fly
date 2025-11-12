@@ -278,8 +278,7 @@ public class FactoryPanelScreen extends AbstractSimiScreen {
 
             if (mouseX >= itemX && mouseX < itemX + 16 && mouseY >= itemY && mouseY < itemY + 16) {
                 List<Component> linkTip = List.of(
-                    CreateLang.translate("gui.factory_panel.has_link_connections").color(ScrollInput.HEADER_RGB)
-                        .component(),
+                    CreateLang.translate("gui.factory_panel.has_link_connections").color(ScrollInput.HEADER_RGB).component(),
                     CreateLang.translate("gui.factory_panel.left_click_disconnect").style(ChatFormatting.DARK_GRAY).style(ChatFormatting.ITALIC)
                         .component()
                 );

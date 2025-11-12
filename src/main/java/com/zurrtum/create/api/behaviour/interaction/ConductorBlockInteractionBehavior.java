@@ -12,7 +12,9 @@ import com.zurrtum.create.content.trains.entity.CarriageContraptionEntity;
 import com.zurrtum.create.content.trains.entity.Train;
 import com.zurrtum.create.content.trains.schedule.Schedule;
 import com.zurrtum.create.content.trains.schedule.ScheduleItem;
+
 import java.util.function.Consumer;
+
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;

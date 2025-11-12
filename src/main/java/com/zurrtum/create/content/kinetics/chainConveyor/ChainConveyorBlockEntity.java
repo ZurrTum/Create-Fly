@@ -19,6 +19,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 import java.util.function.Consumer;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction.Axis;
 import net.minecraft.core.particles.BlockParticleOption;
@@ -422,7 +423,8 @@ public class ChainConveyorBlockEntity extends KineticBlockEntity implements Tran
 
         Vec3 start = Vec3.atBottomCenterOf(worldPosition).add(VecHelper.rotate(new Vec3(0, 0, 1.25), angle, Axis.Y)).add(0, 6 / 16f, 0);
 
-        Vec3 end = Vec3.atBottomCenterOf(worldPosition.offset(connection)).add(VecHelper.rotate(new Vec3(0, 0, 1.25), oppositeAngle, Axis.Y)).add(0, 6 / 16f, 0);
+        Vec3 end = Vec3.atBottomCenterOf(worldPosition.offset(connection)).add(VecHelper.rotate(new Vec3(0, 0, 1.25), oppositeAngle, Axis.Y))
+            .add(0, 6 / 16f, 0);
 
         float length = (float) start.distanceTo(end);
         connectionStats.put(connection, new ConnectionStats(angle, length, start, end));

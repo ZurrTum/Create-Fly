@@ -65,11 +65,8 @@ public class FactoryPanelConnectionHandler {
         ((LocalPlayer) player).connection.send(new FactoryPanelConnectionPacket(panel.getPanelPosition(), connectingFrom, false));
 
         player.displayClientMessage(
-            CreateLang.translate(
-                "factory_panel.panels_connected",
-                filterFrom.getHoverName().getString(),
-                filterTo.getHoverName().getString()
-            ).style(ChatFormatting.GREEN).component(), true
+            CreateLang.translate("factory_panel.panels_connected", filterFrom.getHoverName().getString(), filterTo.getHoverName().getString())
+                .style(ChatFormatting.GREEN).component(), true
         );
 
         connectingFrom = null;

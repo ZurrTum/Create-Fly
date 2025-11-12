@@ -2,9 +2,11 @@ package com.zurrtum.create.foundation.fluid;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
+
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 

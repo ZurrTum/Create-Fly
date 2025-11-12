@@ -3,7 +3,9 @@ package com.zurrtum.create.content.processing.burner;
 import com.zurrtum.create.AllBlocks;
 import com.zurrtum.create.AllItems;
 import com.zurrtum.create.content.equipment.wrench.IWrenchable;
+
 import java.util.Locale;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.particles.ParticleTypes;

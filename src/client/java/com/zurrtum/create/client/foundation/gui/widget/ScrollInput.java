@@ -5,8 +5,10 @@ import com.zurrtum.create.client.AllKeys;
 import com.zurrtum.create.client.catnip.gui.widget.AbstractSimiWidget;
 import com.zurrtum.create.client.foundation.blockEntity.behaviour.scrollValue.ScrollValueBehaviour.StepContext;
 import com.zurrtum.create.client.foundation.utility.CreateLang;
+
 import java.util.function.Consumer;
 import java.util.function.Function;
+
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;

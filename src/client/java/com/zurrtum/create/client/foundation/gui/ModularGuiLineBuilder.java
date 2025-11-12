@@ -6,7 +6,9 @@ import com.zurrtum.create.client.foundation.gui.widget.Label;
 import com.zurrtum.create.client.foundation.gui.widget.ScrollInput;
 import com.zurrtum.create.client.foundation.gui.widget.SelectionScrollInput;
 import com.zurrtum.create.client.foundation.gui.widget.TooltipArea;
+
 import java.util.function.BiConsumer;
+
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.input.MouseButtonEvent;

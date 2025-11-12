@@ -14,10 +14,12 @@ import com.zurrtum.create.client.ponder.Ponder;
 import com.zurrtum.create.client.ponder.enums.PonderKeybinds;
 import com.zurrtum.create.client.ponder.foundation.registration.PonderLocalization;
 import com.zurrtum.create.client.ponder.foundation.ui.PonderUI;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
+
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
@@ -167,8 +169,8 @@ public class PonderTooltipHandler {
 
     private static Component makeProgressBar(float progress) {
         MutableComponent holdW = Ponder.lang()
-            .translate(HOLD_TO_PONDER, PonderKeybinds.PONDER.getTranslatedKeyMessage().copy().withStyle(ChatFormatting.GRAY)).style(ChatFormatting.DARK_GRAY)
-            .component();
+            .translate(HOLD_TO_PONDER, PonderKeybinds.PONDER.getTranslatedKeyMessage().copy().withStyle(ChatFormatting.GRAY))
+            .style(ChatFormatting.DARK_GRAY).component();
 
         if (progress > 0) {
             Font fontRenderer = Minecraft.getInstance().font;

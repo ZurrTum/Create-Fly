@@ -9,9 +9,11 @@ import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.blaze3d.vertex.VertexFormatElement;
 import com.zurrtum.create.client.model.NormalsBakedQuad;
+
 import java.util.Arrays;
 import java.util.IdentityHashMap;
 import java.util.Map;
+
 import net.minecraft.Util;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;

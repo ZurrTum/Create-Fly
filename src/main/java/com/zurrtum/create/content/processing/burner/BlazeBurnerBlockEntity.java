@@ -14,6 +14,7 @@ import com.zurrtum.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.particles.ParticleTypes;

@@ -5,9 +5,11 @@ import com.zurrtum.create.catnip.data.Pair;
 import com.zurrtum.create.client.catnip.gui.UIRenderHelper;
 import com.zurrtum.create.client.foundation.gui.widget.ScrollInput;
 import com.zurrtum.create.client.foundation.gui.widget.TooltipArea;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
+
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.EditBox;
@@ -80,7 +82,11 @@ public class ModularGuiLine {
     }
 
     @SuppressWarnings("unchecked")
-    public <T extends GuiEventListener & Renderable & NarratableEntry> void loadValues(CompoundTag data, Consumer<T> addRenderable, Consumer<T> addRenderableOnly) {
+    public <T extends GuiEventListener & Renderable & NarratableEntry> void loadValues(
+        CompoundTag data,
+        Consumer<T> addRenderable,
+        Consumer<T> addRenderableOnly
+    ) {
         for (Pair<AbstractWidget, String> pair : widgets) {
             AbstractWidget w = pair.getFirst();
             String key = pair.getSecond();

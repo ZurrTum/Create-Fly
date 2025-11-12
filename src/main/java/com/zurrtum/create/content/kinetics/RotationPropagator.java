@@ -13,8 +13,10 @@ import com.zurrtum.create.content.kinetics.speedController.SpeedControllerBlock;
 import com.zurrtum.create.content.kinetics.speedController.SpeedControllerBlockEntity;
 import com.zurrtum.create.content.kinetics.transmission.SplitShaftBlockEntity;
 import com.zurrtum.create.infrastructure.config.AllConfigs;
+
 import java.util.LinkedList;
 import java.util.List;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Direction.Axis;
@@ -62,7 +64,12 @@ public class RotationPropagator {
             from.getBlockPos(),
             stateFrom,
             direction
-        ) && definitionTo.hasShaftTowards(world, to.getBlockPos(), stateTo, direction.getOpposite());
+        ) && definitionTo.hasShaftTowards(
+            world,
+            to.getBlockPos(),
+            stateTo,
+            direction.getOpposite()
+        );
 
         boolean connectedByGears = ICogWheel.isSmallCog(stateFrom) && ICogWheel.isSmallCog(stateTo);
 

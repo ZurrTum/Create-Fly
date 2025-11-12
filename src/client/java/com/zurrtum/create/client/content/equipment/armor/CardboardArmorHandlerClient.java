@@ -8,8 +8,10 @@ import com.zurrtum.create.client.content.logistics.box.PackageRenderer;
 import com.zurrtum.create.client.flywheel.lib.model.baked.PartialModel;
 import com.zurrtum.create.content.equipment.armor.CardboardArmorHandler;
 import com.zurrtum.create.foundation.utility.TickBasedCache;
+
 import java.util.Random;
 import java.util.concurrent.ExecutionException;
+
 import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.entity.player.AvatarRenderer;
@@ -39,8 +41,7 @@ public class CardboardArmorHandlerClient {
         SubmitNodeCollector queue
     ) {
         if (state.pose != Pose.CROUCHING || !CardboardArmorHandler.isCardboardArmor(state.headEquipment) || !CardboardArmorHandler.isCardboardArmor(
-            state.chestEquipment) || !CardboardArmorHandler.isCardboardArmor(state.legsEquipment) || !CardboardArmorHandler.isCardboardArmor(
-            state.feetEquipment)) {
+            state.chestEquipment) || !CardboardArmorHandler.isCardboardArmor(state.legsEquipment) || !CardboardArmorHandler.isCardboardArmor(state.feetEquipment)) {
             return false;
         }
 
@@ -58,10 +59,12 @@ public class CardboardArmorHandlerClient {
 
         if (renderState.create$isOnGround()) {
             ms.translate(
-                0, Math.min(
+                0,
+                Math.min(
                     Math.abs(Mth.cos((AnimationTickHolder.getRenderTime() % 256) / 2.0f)) * -renderOffset.y,
                     renderState.create$getMovement() * 5
-                ), 0
+                ),
+                0
             );
         }
 

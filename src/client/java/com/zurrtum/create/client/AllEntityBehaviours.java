@@ -5,9 +5,11 @@ import com.zurrtum.create.client.foundation.entity.behaviour.CarriageParticleBeh
 import com.zurrtum.create.content.trains.entity.CarriageContraptionEntity;
 import com.zurrtum.create.foundation.entity.behaviour.EntityBehaviour;
 import it.unimi.dsi.fastutil.objects.Reference2ObjectArrayMap;
+
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.function.Function;
+
 import net.minecraft.world.entity.Entity;
 
 public class AllEntityBehaviours {

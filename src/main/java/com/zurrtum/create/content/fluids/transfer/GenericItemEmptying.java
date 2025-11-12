@@ -8,7 +8,9 @@ import com.zurrtum.create.foundation.fluid.FluidHelper;
 import com.zurrtum.create.infrastructure.fluids.BucketFluidInventory;
 import com.zurrtum.create.infrastructure.fluids.FluidItemInventory;
 import com.zurrtum.create.infrastructure.fluids.FluidStack;
+
 import java.util.Optional;
+
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeHolder;
@@ -21,9 +23,8 @@ public class GenericItemEmptying {
         if (PotionFluidHandler.isPotionItem(stack))
             return true;
 
-        if (world.isClientSide() ? world.recipeAccess().propertySet(AllRecipeSets.EMPTYING)
-            .test(stack) : ((ServerLevel) world).recipeAccess().getRecipeFor(AllRecipeTypes.EMPTYING, new SingleRecipeInput(stack), world)
-            .isPresent()) {
+        if (world.isClientSide() ? world.recipeAccess().propertySet(AllRecipeSets.EMPTYING).test(stack) : ((ServerLevel) world).recipeAccess()
+            .getRecipeFor(AllRecipeTypes.EMPTYING, new SingleRecipeInput(stack), world).isPresent()) {
             return true;
         }
 

@@ -207,7 +207,7 @@ public class LangBuilder {
     }
 
     public void forGoggles(List<? super MutableComponent> tooltip, int indents) {
-        tooltip.add(new LangBuilder(namespace).text(Strings.repeat(' ', getIndents(Minecraft.getInstance().font, 4 + indents)))
-            .add(this).component());
+        tooltip.add(new LangBuilder(namespace).text(Strings.repeat(' ', getIndents(Minecraft.getInstance().font, 4 + indents))).add(this)
+            .component());
     }
 }

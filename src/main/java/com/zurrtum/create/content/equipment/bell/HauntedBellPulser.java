@@ -5,9 +5,11 @@ import com.google.common.cache.CacheBuilder;
 import com.zurrtum.create.AllItems;
 import com.zurrtum.create.catnip.data.IntAttached;
 import com.zurrtum.create.infrastructure.packet.s2c.SoulPulseEffectPacket;
+
 import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;

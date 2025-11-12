@@ -7,7 +7,9 @@ import com.zurrtum.create.AllRecipeSerializers;
 import com.zurrtum.create.AllRecipeTypes;
 import com.zurrtum.create.content.kinetics.crusher.AbstractCrushingRecipe;
 import com.zurrtum.create.content.processing.recipe.ChanceOutput;
+
 import java.util.List;
+
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;

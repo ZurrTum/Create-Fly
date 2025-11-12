@@ -4,7 +4,9 @@ import com.mojang.serialization.Codec;
 import com.zurrtum.create.catnip.codecs.stream.CatnipStreamCodecBuilders;
 import com.zurrtum.create.catnip.theme.Color;
 import io.netty.buffer.ByteBuf;
+
 import java.util.Locale;
+
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.util.StringRepresentable;
 

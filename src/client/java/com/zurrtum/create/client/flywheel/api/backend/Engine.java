@@ -8,6 +8,7 @@ import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Range;
 
 import java.util.List;
+
 import net.minecraft.client.Camera;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.SectionPos;

@@ -5,7 +5,9 @@ import com.zurrtum.create.catnip.theme.Color;
 import com.zurrtum.create.content.kinetics.base.IRotate.SpeedLevel;
 import com.zurrtum.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.infrastructure.config.AllConfigs;
+
 import java.util.List;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.block.state.BlockState;

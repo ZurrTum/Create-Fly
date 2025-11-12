@@ -72,15 +72,12 @@ public class MechanicalCraftingCategory extends CreateCategory<MechanicalCraftin
             drawSlotBackground(graphics, inputs, output);
             AllGuiTextures.JEI_DOWN_ARROW.render(graphics, bounds.x + 133, bounds.y + 64);
             AllGuiTextures.JEI_SHADOW.render(graphics, bounds.x + 118, bounds.y + 43);
-            graphics.guiRenderState.submitPicturesInPictureState(new CrafterRenderState(new Matrix3x2f(graphics.pose()), bounds.x + 129, bounds.y + 23));
-            graphics.drawString(
-                Minecraft.getInstance().font,
-                String.valueOf(ingredients.size()),
-                bounds.x + 147,
-                bounds.y + 44,
-                0xFFFFFFFF,
-                true
-            );
+            graphics.guiRenderState.submitPicturesInPictureState(new CrafterRenderState(
+                new Matrix3x2f(graphics.pose()),
+                bounds.x + 129,
+                bounds.y + 23
+            ));
+            graphics.drawString(Minecraft.getInstance().font, String.valueOf(ingredients.size()), bounds.x + 147, bounds.y + 44, 0xFFFFFFFF, true);
         }));
         for (int i = 0; i < inputs.size(); i++) {
             widgets.add(createInputSlot(inputs.get(i)).entries(ingredients.get(i)));

@@ -9,8 +9,10 @@ import com.zurrtum.create.content.logistics.item.filter.attribute.ItemAttribute;
 import com.zurrtum.create.infrastructure.component.AttributeFilterWhitelistMode;
 import com.zurrtum.create.infrastructure.component.ItemAttributeEntry;
 import com.zurrtum.create.infrastructure.fluids.FluidStack;
+
 import java.util.ArrayList;
 import java.util.List;
+
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;

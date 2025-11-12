@@ -34,7 +34,14 @@ public class LinkedControllerItem extends Item implements MenuProvider {
         super(properties);
     }
 
-    public static InteractionResult onItemUseFirst(Level world, Player player, ItemStack stack, InteractionHand hand, BlockHitResult ray, BlockPos pos) {
+    public static InteractionResult onItemUseFirst(
+        Level world,
+        Player player,
+        ItemStack stack,
+        InteractionHand hand,
+        BlockHitResult ray,
+        BlockPos pos
+    ) {
         if (stack.getItem() instanceof LinkedControllerItem item) {
             if (player.mayBuild()) {
                 BlockState hitState = world.getBlockState(pos);

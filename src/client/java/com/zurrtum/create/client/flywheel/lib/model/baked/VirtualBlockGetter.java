@@ -1,6 +1,7 @@
 package com.zurrtum.create.client.flywheel.lib.model.baked;
 
 import java.util.function.ToIntFunction;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -36,8 +37,7 @@ public abstract class VirtualBlockGetter implements BlockAndTintGetter {
 
     @Override
     public int getBlockTint(BlockPos pos, ColorResolver resolver) {
-        Biome plainsBiome = Minecraft.getInstance().getConnection().registryAccess().lookupOrThrow(Registries.BIOME)
-            .getValueOrThrow(Biomes.PLAINS);
+        Biome plainsBiome = Minecraft.getInstance().getConnection().registryAccess().lookupOrThrow(Registries.BIOME).getValueOrThrow(Biomes.PLAINS);
         return resolver.getColor(plainsBiome, pos.getX(), pos.getZ());
     }
 }

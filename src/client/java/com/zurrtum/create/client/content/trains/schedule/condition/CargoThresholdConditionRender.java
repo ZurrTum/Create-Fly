@@ -8,8 +8,10 @@ import com.zurrtum.create.client.foundation.gui.ModularGuiLineBuilder;
 import com.zurrtum.create.client.foundation.utility.CreateLang;
 import com.zurrtum.create.content.trains.schedule.condition.CargoThresholdCondition;
 import com.zurrtum.create.content.trains.schedule.condition.CargoThresholdCondition.Ops;
+
 import java.util.Arrays;
 import java.util.List;
+
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;

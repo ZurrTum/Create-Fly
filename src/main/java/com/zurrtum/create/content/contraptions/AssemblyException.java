@@ -3,7 +3,9 @@ package com.zurrtum.create.content.contraptions;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.zurrtum.create.infrastructure.config.AllConfigs;
+
 import java.util.Optional;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;

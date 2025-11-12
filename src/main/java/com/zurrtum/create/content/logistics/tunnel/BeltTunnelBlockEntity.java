@@ -11,7 +11,9 @@ import com.zurrtum.create.content.logistics.tunnel.BeltTunnelBlock.Shape;
 import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
 import com.zurrtum.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.infrastructure.packet.s2c.TunnelFlapPacket;
+
 import java.util.*;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Direction.Axis;

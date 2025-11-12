@@ -3,8 +3,10 @@ package com.zurrtum.create.content.redstone.displayLink.source;
 import com.zurrtum.create.content.kinetics.gauge.SpeedGaugeBlockEntity;
 import com.zurrtum.create.content.redstone.displayLink.DisplayLinkContext;
 import com.zurrtum.create.content.redstone.displayLink.target.DisplayTargetStats;
+
 import java.text.NumberFormat;
 import java.util.Locale;
+
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.util.Mth;

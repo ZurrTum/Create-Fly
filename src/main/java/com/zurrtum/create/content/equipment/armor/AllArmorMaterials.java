@@ -2,7 +2,9 @@ package com.zurrtum.create.content.equipment.armor;
 
 import com.google.common.collect.Maps;
 import com.zurrtum.create.AllItemTags;
+
 import java.util.Map;
+
 import net.minecraft.core.Holder;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.resources.ResourceKey;
@@ -84,8 +86,8 @@ public class AllArmorMaterials {
     }
 
     public static Item.Properties chest(ArmorMaterial material) {
-        return new Item.Properties().attributes(material.createAttributes(ArmorType.CHESTPLATE))
-            .enchantable(material.enchantmentValue()).repairable(material.repairIngredient()).component(
+        return new Item.Properties().attributes(material.createAttributes(ArmorType.CHESTPLATE)).enchantable(material.enchantmentValue())
+            .repairable(material.repairIngredient()).component(
                 DataComponents.EQUIPPABLE,
                 Equippable.builder(EquipmentSlot.CHEST).setEquipSound(material.equipSound()).setAsset(material.assetId()).build()
             );

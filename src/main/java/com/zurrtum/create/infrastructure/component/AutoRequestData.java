@@ -63,7 +63,8 @@ public record AutoRequestData(
 
         if (player != null) {
             MutableComponent message = mutable.isValid ? Component.translatable("create.redstone_requester.keeper_connected")
-                .withStyle(ChatFormatting.WHITE) : Component.translatable("create.redstone_requester.keeper_too_far_away").withStyle(ChatFormatting.RED);
+                .withStyle(ChatFormatting.WHITE) : Component.translatable("create.redstone_requester.keeper_too_far_away")
+                .withStyle(ChatFormatting.RED);
             player.displayClientMessage(message, true);
         }
 

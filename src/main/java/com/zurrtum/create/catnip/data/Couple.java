@@ -12,6 +12,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.function.*;
 import java.util.stream.Stream;
+
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.network.codec.StreamCodec;

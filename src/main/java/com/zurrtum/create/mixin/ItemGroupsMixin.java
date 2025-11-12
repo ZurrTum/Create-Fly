@@ -26,6 +26,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
+
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceKey;
@@ -80,7 +81,8 @@ public class ItemGroupsMixin {
                 return e1.key().location().compareTo(e2.key().location());
             }
         };
-        final List<Holder.Reference<CreativeModeTab>> sortedItemGroups = BuiltInRegistries.CREATIVE_MODE_TAB.listElements().sorted(entryComparator).toList();
+        final List<Holder.Reference<CreativeModeTab>> sortedItemGroups = BuiltInRegistries.CREATIVE_MODE_TAB.listElements().sorted(entryComparator)
+            .toList();
 
         for (Holder.Reference<CreativeModeTab> reference : sortedItemGroups) {
             final CreativeModeTab itemGroup = reference.value();

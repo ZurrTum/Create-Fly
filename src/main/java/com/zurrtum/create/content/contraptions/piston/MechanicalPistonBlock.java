@@ -5,7 +5,9 @@ import com.zurrtum.create.content.kinetics.base.DirectionalAxisKineticBlock;
 import com.zurrtum.create.foundation.block.IBE;
 import com.zurrtum.create.foundation.block.NeighborUpdateListeningBlock;
 import com.zurrtum.create.infrastructure.config.AllConfigs;
+
 import java.util.Locale;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.particles.ParticleTypes;

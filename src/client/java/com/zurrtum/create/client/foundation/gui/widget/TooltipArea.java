@@ -1,7 +1,9 @@
 package com.zurrtum.create.client.foundation.gui.widget;
 
 import com.zurrtum.create.client.catnip.gui.widget.AbstractSimiWidget;
+
 import java.util.List;
+
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
 

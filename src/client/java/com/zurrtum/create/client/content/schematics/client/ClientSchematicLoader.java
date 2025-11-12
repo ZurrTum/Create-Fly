@@ -6,6 +6,7 @@ import com.zurrtum.create.foundation.utility.CreatePaths;
 import com.zurrtum.create.foundation.utility.FilesHelper;
 import com.zurrtum.create.infrastructure.config.AllConfigs;
 import com.zurrtum.create.infrastructure.packet.c2s.SchematicUploadPacket;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -16,6 +17,7 @@ import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.util.*;
 import java.util.stream.Stream;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.network.chat.Component;

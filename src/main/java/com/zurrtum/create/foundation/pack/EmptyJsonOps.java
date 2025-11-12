@@ -2,7 +2,9 @@ package com.zurrtum.create.foundation.pack;
 
 import com.google.gson.JsonElement;
 import com.mojang.serialization.JsonOps;
+
 import java.util.Optional;
+
 import net.minecraft.core.HolderOwner;
 import net.minecraft.core.HolderSet;
 import net.minecraft.core.Registry;

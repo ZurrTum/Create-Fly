@@ -13,6 +13,7 @@ import org.joml.Matrix4f;
 
 import java.util.Set;
 import java.util.function.Consumer;
+
 import net.minecraft.client.model.geom.ModelLayers;
 import net.minecraft.client.renderer.Sheets;
 import net.minecraft.core.Direction;
@@ -22,8 +23,8 @@ import net.minecraft.world.level.block.ShulkerBoxBlock;
 import net.minecraft.world.level.block.entity.ShulkerBoxBlockEntity;
 
 public class ShulkerBoxVisual extends AbstractBlockEntityVisual<ShulkerBoxBlockEntity> implements SimpleDynamicVisual {
-    private static final Material MATERIAL = SimpleMaterial.builder().cutout(CutoutShaders.ONE_TENTH)
-        .texture(Sheets.SHULKER_SHEET).mipmap(false).backfaceCulling(false).build();
+    private static final Material MATERIAL = SimpleMaterial.builder().cutout(CutoutShaders.ONE_TENTH).texture(Sheets.SHULKER_SHEET).mipmap(false)
+        .backfaceCulling(false).build();
     private static final Set<String> PATHS_TO_PRUNE = Set.of("/head");
 
     private final InstanceTree instances;

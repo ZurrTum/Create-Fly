@@ -157,7 +157,10 @@ public class ItemHatchBlock extends HorizontalDirectionalBlock implements IBE<It
         level.setBlockAndUpdate(pos, state.setValue(OPEN, true));
         level.scheduleTick(pos, this, 10);
 
-        player.displayClientMessage(Component.translatable(depositItemInHand ? "create.item_hatch.deposit_item" : "create.item_hatch.deposit_inventory"), true);
+        player.displayClientMessage(
+            Component.translatable(depositItemInHand ? "create.item_hatch.deposit_item" : "create.item_hatch.deposit_inventory"),
+            true
+        );
         return InteractionResult.SUCCESS;
     }
 

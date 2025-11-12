@@ -23,6 +23,7 @@ import org.joml.Matrix4f;
 import org.joml.Quaternionf;
 
 import java.util.Random;
+
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.LightTexture;
@@ -142,31 +143,9 @@ public class ContraptionControlsMovementRender implements MovementRenderBehaviou
                     matrices.pushPose();
                     matrices.translate(0, 0.15f, offsetZ);
                     matrices.scale(textScale, -textScale, textScale);
-                    queue.submitText(
-                        matrices,
-                        textX,
-                        textY,
-                        text,
-                        false,
-                        Font.DisplayMode.NORMAL,
-                        LightTexture.FULL_BRIGHT,
-                        color,
-                        0,
-                        0
-                    );
+                    queue.submitText(matrices, textX, textY, text, false, Font.DisplayMode.NORMAL, LightTexture.FULL_BRIGHT, color, 0, 0);
                     matrices.translate(0.5f, 0.5f, -0.0625f);
-                    queue.submitText(
-                        matrices,
-                        textX,
-                        textY,
-                        text,
-                        false,
-                        Font.DisplayMode.NORMAL,
-                        LightTexture.FULL_BRIGHT,
-                        shadowColor,
-                        0,
-                        0
-                    );
+                    queue.submitText(matrices, textX, textY, text, false, Font.DisplayMode.NORMAL, LightTexture.FULL_BRIGHT, shadowColor, 0, 0);
                     matrices.popPose();
                 }
                 if (description != null) {

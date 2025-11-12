@@ -6,6 +6,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.NoSuchElementException;
+
 import net.minecraft.client.model.geom.PartPose;
 
 public final class ModelTree {

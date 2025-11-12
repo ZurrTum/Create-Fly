@@ -8,6 +8,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.nio.ByteBuffer;
+
 import net.minecraft.client.renderer.fog.FogRenderer;
 
 @Mixin(FogRenderer.class)

@@ -11,9 +11,11 @@ import com.zurrtum.create.content.fluids.hosePulley.HosePulleyBlockEntity;
 import com.zurrtum.create.content.fluids.pump.PumpBlock;
 import com.zurrtum.create.content.fluids.tank.FluidTankBlockEntity;
 import com.zurrtum.create.infrastructure.fluids.FluidStack;
+
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.block.Blocks;

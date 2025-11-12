@@ -5,7 +5,9 @@ import com.zurrtum.create.AllClientHandle;
 import com.zurrtum.create.AllItems;
 import com.zurrtum.create.api.behaviour.interaction.MovingInteractionBehaviour;
 import com.zurrtum.create.content.contraptions.AbstractContraptionEntity;
+
 import java.util.UUID;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Player;
@@ -13,7 +15,12 @@ import net.minecraft.world.entity.player.Player;
 public class ControlsInteractionBehaviour extends MovingInteractionBehaviour {
 
     @Override
-    public boolean handlePlayerInteraction(Player player, InteractionHand activeHand, BlockPos localPos, AbstractContraptionEntity contraptionEntity) {
+    public boolean handlePlayerInteraction(
+        Player player,
+        InteractionHand activeHand,
+        BlockPos localPos,
+        AbstractContraptionEntity contraptionEntity
+    ) {
         if (player.getItemInHand(activeHand).is(AllItems.WRENCH))
             return false;
 

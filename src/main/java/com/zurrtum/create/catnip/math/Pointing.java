@@ -1,6 +1,7 @@
 package com.zurrtum.create.catnip.math;
 
 import java.util.Locale;
+
 import net.minecraft.core.Direction;
 import net.minecraft.core.Direction.Axis;
 import net.minecraft.core.Direction.AxisDirection;

@@ -2,8 +2,10 @@ package com.zurrtum.create.foundation.blockEntity.behaviour.scrollValue;
 
 import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
 import com.zurrtum.create.foundation.blockEntity.behaviour.ValueSettings;
+
 import java.util.List;
 import java.util.function.Function;
+
 import net.minecraft.world.entity.player.Player;
 
 public class ServerBulkScrollValueBehaviour extends ServerScrollValueBehaviour {

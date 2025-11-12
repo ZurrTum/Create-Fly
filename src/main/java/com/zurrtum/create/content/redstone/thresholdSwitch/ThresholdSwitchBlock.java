@@ -103,13 +103,13 @@ public class ThresholdSwitchBlock extends DirectedDirectionalBlock implements IB
         Direction preferredFacing = null;
         for (Direction face : context.getNearestLookingDirections()) {
             BlockEntity be = context.getLevel().getBlockEntity(context.getClickedPos().relative(face));
-            if (be != null && (ItemHelper.getInventory(
+            if (be != null && (ItemHelper.getInventory(be.getLevel(), be.getBlockPos(), null, be, null) != null || FluidHelper.hasFluidInventory(
                 be.getLevel(),
                 be.getBlockPos(),
                 null,
                 be,
                 null
-            ) != null || FluidHelper.hasFluidInventory(be.getLevel(), be.getBlockPos(), null, be, null))) {
+            ))) {
                 preferredFacing = face;
                 break;
             }

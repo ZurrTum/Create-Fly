@@ -12,7 +12,9 @@ import com.zurrtum.create.content.decoration.girder.GirderEncasedShaftBlock;
 import com.zurrtum.create.content.kinetics.base.KineticBlockEntity;
 import com.zurrtum.create.content.kinetics.steamEngine.PoweredShaftBlock;
 import com.zurrtum.create.foundation.placement.PoleHelper;
+
 import java.util.function.Predicate;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction.Axis;
 import net.minecraft.world.InteractionHand;

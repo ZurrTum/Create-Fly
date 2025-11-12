@@ -3,8 +3,10 @@ package com.zurrtum.create.client.content.trains.schedule;
 import com.mojang.brigadier.context.StringRange;
 import com.mojang.brigadier.suggestion.Suggestion;
 import com.zurrtum.create.catnip.data.IntAttached;
+
 import java.util.ArrayList;
 import java.util.List;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.components.CommandSuggestions;

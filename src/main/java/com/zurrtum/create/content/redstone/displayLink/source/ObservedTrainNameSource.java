@@ -6,7 +6,9 @@ import com.zurrtum.create.content.redstone.displayLink.target.DisplayTargetStats
 import com.zurrtum.create.content.trains.entity.Train;
 import com.zurrtum.create.content.trains.observer.TrackObserver;
 import com.zurrtum.create.content.trains.observer.TrackObserverBlockEntity;
+
 import java.util.UUID;
+
 import net.minecraft.network.chat.MutableComponent;
 
 public class ObservedTrainNameSource extends SingleLineDisplaySource {

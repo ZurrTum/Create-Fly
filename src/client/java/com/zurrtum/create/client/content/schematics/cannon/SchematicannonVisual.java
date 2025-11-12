@@ -10,7 +10,9 @@ import com.zurrtum.create.client.flywheel.lib.model.Models;
 import com.zurrtum.create.client.flywheel.lib.visual.AbstractBlockEntityVisual;
 import com.zurrtum.create.client.flywheel.lib.visual.SimpleDynamicVisual;
 import com.zurrtum.create.content.schematics.cannon.SchematicannonBlockEntity;
+
 import java.util.function.Consumer;
+
 import net.minecraft.core.Direction;
 
 public class SchematicannonVisual extends AbstractBlockEntityVisual<SchematicannonBlockEntity> implements SimpleDynamicVisual {

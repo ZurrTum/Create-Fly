@@ -4,8 +4,10 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.zurrtum.create.catnip.nbt.NBTHelper;
 import com.zurrtum.create.content.kinetics.base.KineticBlockEntity;
+
 import java.util.List;
 import java.util.Vector;
+
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.network.FriendlyByteBuf;

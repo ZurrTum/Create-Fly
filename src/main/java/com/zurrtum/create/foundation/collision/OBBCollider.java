@@ -40,7 +40,13 @@ public class OBBCollider {
                 t.y,
                 eA.y,
                 a10 * eB.x + a11 * eB.y + a12 * eB.z
-            ) || isSeparatedAlong(mf, uA2, t.z, eA.z, a20 * eB.x + a21 * eB.y + a22 * eB.z)
+            ) || isSeparatedAlong(
+                mf,
+                uA2,
+                t.z,
+                eA.z,
+                a20 * eB.x + a21 * eB.y + a22 * eB.z
+            )
 
                 // Separate along B's local axes
                 || isSeparatedAlong(
@@ -49,12 +55,13 @@ public class OBBCollider {
                 (t.x * m.m00 + t.y * m.m10 + t.z * m.m20),
                 eA.x * a00 + eA.y * a10 + eA.z * a20,
                 eB.x
-            ) || isSeparatedAlong(mf, uB1, (t.x * m.m01 + t.y * m.m11 + t.z * m.m21), eA.x * a01 + eA.y * a11 + eA.z * a21, eB.y) || isSeparatedAlong(mf,
-                uB2,
-                (t.x * m.m02 + t.y * m.m12 + t.z * m.m22),
-                eA.x * a02 + eA.y * a12 + eA.z * a22,
-                eB.z
-            )))
+            ) || isSeparatedAlong(
+                mf,
+                uB1,
+                (t.x * m.m01 + t.y * m.m11 + t.z * m.m21),
+                eA.x * a01 + eA.y * a11 + eA.z * a21,
+                eB.y
+            ) || isSeparatedAlong(mf, uB2, (t.x * m.m02 + t.y * m.m12 + t.z * m.m22), eA.x * a02 + eA.y * a12 + eA.z * a22, eB.z)))
             return mf.asSeparationVec();
 
         return null;

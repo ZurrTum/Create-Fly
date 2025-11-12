@@ -13,6 +13,7 @@ import com.zurrtum.create.content.trains.graph.TrackNode;
 import org.apache.commons.lang3.mutable.MutableBoolean;
 
 import java.util.*;
+
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.util.Mth;
 import net.minecraft.world.phys.Vec3;

@@ -1,9 +1,11 @@
 package com.zurrtum.create.content.equipment.goggles;
 
 import com.zurrtum.create.AllItems;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Predicate;
+
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;

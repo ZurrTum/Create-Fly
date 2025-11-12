@@ -3,6 +3,7 @@ package com.zurrtum.create.foundation.blockEntity;
 import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
+
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate;
 

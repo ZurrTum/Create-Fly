@@ -2,7 +2,9 @@ package com.zurrtum.create.content.fluids.pipes;
 
 import com.zurrtum.create.catnip.data.Iterate;
 import com.zurrtum.create.content.contraptions.StructureTransform;
+
 import java.util.Map;
+
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.block.Mirror;
 import net.minecraft.world.level.block.PipeBlock;
@@ -17,16 +19,14 @@ public class FluidPipeBlockRotation {
     public static BlockState rotate(BlockState state, Rotation rotation) {
         BlockState rotated = state;
         for (Direction direction : Iterate.horizontalDirections)
-            rotated = rotated.setValue(FACING_TO_PROPERTY_MAP.get(rotation.rotate(direction)),
-                state.getValue(FACING_TO_PROPERTY_MAP.get(direction)));
+            rotated = rotated.setValue(FACING_TO_PROPERTY_MAP.get(rotation.rotate(direction)), state.getValue(FACING_TO_PROPERTY_MAP.get(direction)));
         return rotated;
     }
 
     public static BlockState mirror(BlockState state, Mirror mirror) {
         BlockState mirrored = state;
         for (Direction direction : Iterate.horizontalDirections)
-            mirrored = mirrored.setValue(FACING_TO_PROPERTY_MAP.get(mirror.mirror(direction)),
-                state.getValue(FACING_TO_PROPERTY_MAP.get(direction)));
+            mirrored = mirrored.setValue(FACING_TO_PROPERTY_MAP.get(mirror.mirror(direction)), state.getValue(FACING_TO_PROPERTY_MAP.get(direction)));
         return mirrored;
     }
 
@@ -39,8 +39,10 @@ public class FluidPipeBlockRotation {
 
         BlockState rotated = state;
         for (Direction direction : Iterate.directions)
-            rotated = rotated.setValue(FACING_TO_PROPERTY_MAP.get(transform.rotateFacing(direction)),
-                state.getValue(FACING_TO_PROPERTY_MAP.get(direction)));
+            rotated = rotated.setValue(
+                FACING_TO_PROPERTY_MAP.get(transform.rotateFacing(direction)),
+                state.getValue(FACING_TO_PROPERTY_MAP.get(direction))
+            );
         return rotated;
     }
 

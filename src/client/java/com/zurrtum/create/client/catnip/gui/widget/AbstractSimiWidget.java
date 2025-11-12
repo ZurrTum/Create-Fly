@@ -3,9 +3,11 @@ package com.zurrtum.create.client.catnip.gui.widget;
 import com.zurrtum.create.catnip.data.Couple;
 import com.zurrtum.create.catnip.theme.Color;
 import com.zurrtum.create.client.catnip.gui.TickableGuiEventListener;
+
 import java.util.LinkedList;
 import java.util.List;
 import java.util.function.BiConsumer;
+
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.narration.NarrationElementOutput;

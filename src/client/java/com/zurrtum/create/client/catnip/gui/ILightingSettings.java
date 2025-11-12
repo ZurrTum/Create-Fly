@@ -7,9 +7,7 @@ public interface ILightingSettings {
 
     void applyLighting();
 
-    static final ILightingSettings DEFAULT_3D = () -> Minecraft.getInstance().gameRenderer.getLighting()
-        .setupFor(Lighting.Entry.ITEMS_3D);
-    static final ILightingSettings DEFAULT_FLAT = () -> Minecraft.getInstance().gameRenderer.getLighting()
-        .setupFor(Lighting.Entry.ITEMS_FLAT);
+    static final ILightingSettings DEFAULT_3D = () -> Minecraft.getInstance().gameRenderer.getLighting().setupFor(Lighting.Entry.ITEMS_3D);
+    static final ILightingSettings DEFAULT_FLAT = () -> Minecraft.getInstance().gameRenderer.getLighting().setupFor(Lighting.Entry.ITEMS_FLAT);
 
 }

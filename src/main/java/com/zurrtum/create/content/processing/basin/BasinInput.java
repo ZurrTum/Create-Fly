@@ -7,6 +7,7 @@ import com.zurrtum.create.infrastructure.fluids.FluidStack;
 import org.apache.commons.lang3.function.TriFunction;
 
 import java.util.List;
+
 import net.minecraft.world.Container;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeInput;

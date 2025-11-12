@@ -18,8 +18,10 @@ import com.zurrtum.create.client.flywheel.lib.transform.TransformStack;
 import com.zurrtum.create.client.flywheel.lib.visual.SimpleDynamicVisual;
 import com.zurrtum.create.content.kinetics.gauge.GaugeBlock;
 import com.zurrtum.create.content.kinetics.gauge.GaugeBlockEntity;
+
 import java.util.ArrayList;
 import java.util.function.Consumer;
+
 import net.minecraft.core.Direction;
 import net.minecraft.util.Mth;
 

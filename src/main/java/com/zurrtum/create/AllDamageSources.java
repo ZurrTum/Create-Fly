@@ -2,6 +2,7 @@ package com.zurrtum.create;
 
 import java.util.IdentityHashMap;
 import java.util.Map;
+
 import net.minecraft.core.Registry;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.registries.Registries;

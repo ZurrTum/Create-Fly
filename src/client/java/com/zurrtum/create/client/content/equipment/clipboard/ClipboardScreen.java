@@ -24,6 +24,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
 import net.minecraft.Util;
 import net.minecraft.client.StringSplitter;
 import net.minecraft.client.gui.Font;
@@ -560,10 +561,8 @@ public class ClipboardScreen extends AbstractSimiScreen {
                             0.95f + (float) Math.random() * 0.05f
                         ));
                     else
-                        minecraft.getSoundManager().play(SimpleSoundInstance.forUI(
-                            AllSoundEvents.CLIPBOARD_ERASE.getMainEvent(),
-                            0.90f + (float) Math.random() * 0.2f
-                        ));
+                        minecraft.getSoundManager()
+                            .play(SimpleSoundInstance.forUI(AllSoundEvents.CLIPBOARD_ERASE.getMainEvent(), 0.90f + (float) Math.random() * 0.2f));
                 }
                 sendIfEditingBlock();
                 return true;

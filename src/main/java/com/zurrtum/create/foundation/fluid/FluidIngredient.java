@@ -2,8 +2,10 @@ package com.zurrtum.create.foundation.fluid;
 
 import com.mojang.serialization.Codec;
 import com.zurrtum.create.infrastructure.fluids.FluidStack;
+
 import java.util.List;
 import java.util.function.Predicate;
+
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.world.level.material.Fluid;

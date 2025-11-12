@@ -7,7 +7,9 @@ import com.zurrtum.create.catnip.placement.PlacementOffset;
 import com.zurrtum.create.content.equipment.extendoGrip.ExtendoGripItem;
 import com.zurrtum.create.content.equipment.wrench.IWrenchable;
 import com.zurrtum.create.infrastructure.config.AllConfigs;
+
 import java.util.function.Predicate;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Direction.Axis;

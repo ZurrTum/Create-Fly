@@ -11,7 +11,9 @@ import com.zurrtum.create.content.kinetics.gantry.GantryShaftBlock;
 import com.zurrtum.create.content.kinetics.gantry.GantryShaftBlockEntity;
 import com.zurrtum.create.content.kinetics.transmission.sequencer.SequencerInstructions;
 import com.zurrtum.create.foundation.advancement.CreateTrigger;
+
 import java.util.List;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Direction.Axis;

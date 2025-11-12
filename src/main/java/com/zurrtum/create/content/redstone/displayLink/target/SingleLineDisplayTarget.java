@@ -2,7 +2,9 @@ package com.zurrtum.create.content.redstone.displayLink.target;
 
 import com.zurrtum.create.api.behaviour.display.DisplayTarget;
 import com.zurrtum.create.content.redstone.displayLink.DisplayLinkContext;
+
 import java.util.List;
+
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 

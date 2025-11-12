@@ -14,6 +14,7 @@ public record ChanceTooltip(float chance) implements IRecipeSlotRichTooltipCallb
 
     @Override
     public void onRichTooltip(IRecipeSlotView recipeSlotView, ITooltipBuilder tooltip) {
-        tooltip.add(CreateLang.translateDirect("recipe.processing.chance", chance < 0.01 ? "<1" : (int) (chance * 100)).withStyle(ChatFormatting.GOLD));
+        tooltip.add(CreateLang.translateDirect("recipe.processing.chance", chance < 0.01 ? "<1" : (int) (chance * 100))
+            .withStyle(ChatFormatting.GOLD));
     }
 }

@@ -33,6 +33,7 @@ import net.minecraft.world.level.block.state.properties.EnumProperty;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.pathfinder.PathComputationType;
 import net.minecraft.world.phys.BlockHitResult;
+
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -189,7 +190,10 @@ public class ChuteBlock extends AbstractChuteBlock implements ProperWaterloggedB
 
         boolean noConnections = amtConnections == 0;
         if (vertical)
-            return state.setValue(SHAPE, noConnections ? state.getValue(SHAPE) == Shape.INTERSECTION ? Shape.NORMAL : state.getValue(SHAPE) : Shape.INTERSECTION);
+            return state.setValue(
+                SHAPE,
+                noConnections ? state.getValue(SHAPE) == Shape.INTERSECTION ? Shape.NORMAL : state.getValue(SHAPE) : Shape.INTERSECTION
+            );
         if (noConnections)
             return state.setValue(SHAPE, Shape.INTERSECTION);
         if (connections.get(Direction.NORTH) && connections.get(Direction.SOUTH))

@@ -5,7 +5,9 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.zurrtum.create.infrastructure.fluids.FluidStack;
+
 import java.util.List;
+
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
@@ -53,15 +55,13 @@ public record FluidTagIngredient(TagKey<Fluid> tag, int amount) implements Fluid
 
     public record Serializer(String type) implements FluidIngredientSerializer {
         public static final MapCodec<FluidTagIngredient> CODEC = RecordCodecBuilder.mapCodec(i -> i.group(
-            TagKey.hashedCodec(Registries.FLUID).fieldOf("fluid_tag").forGetter(FluidTagIngredient::tag),
+            TagKey.hashedCodec(Registries.FLUID)
+                .fieldOf("fluid_tag").forGetter(FluidTagIngredient::tag),
             Codec.INT.optionalFieldOf("amount", 81000).forGetter(FluidTagIngredient::amount)
         ).apply(i, FluidTagIngredient::new));
         public static final StreamCodec<RegistryFriendlyByteBuf, FluidTagIngredient> PACKET_CODEC = StreamCodec.composite(
-            TagKey.streamCodec(Registries.FLUID),
-            FluidTagIngredient::tag,
-            ByteBufCodecs.INT,
-            FluidTagIngredient::amount,
-            FluidTagIngredient::new
+            TagKey.streamCodec(
+                Registries.FLUID), FluidTagIngredient::tag, ByteBufCodecs.INT, FluidTagIngredient::amount, FluidTagIngredient::new
         );
 
         @Override

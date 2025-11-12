@@ -14,6 +14,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
@@ -36,7 +37,8 @@ public record ItemNameAttribute(String itemName) implements ItemAttribute {
             try {
                 String customName = stack.getOrDefault(DataComponents.CUSTOM_NAME, Component.empty()).getString();
                 Optional<Component> component = ComponentSerialization.CODEC.parse(
-                    level.registryAccess().createSerializationContext(JsonOps.INSTANCE),
+                    level.registryAccess()
+                        .createSerializationContext(JsonOps.INSTANCE),
                     JsonParser.parseString(customName.isEmpty() ? "\"\"" : customName)
                 ).result();
                 if (component.isPresent()) {

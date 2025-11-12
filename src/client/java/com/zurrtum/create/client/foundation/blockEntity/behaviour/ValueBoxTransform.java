@@ -7,6 +7,7 @@ import com.zurrtum.create.client.flywheel.lib.transform.TransformStack;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.function.Function;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Direction.Axis;

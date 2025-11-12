@@ -15,6 +15,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import java.util.function.Predicate;
+
 import net.minecraft.core.NonNullList;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.RegistryFriendlyByteBuf;
@@ -106,7 +107,8 @@ public record ShulkerFillLevelAttribute(ShulkerLevels levels) implements ItemAtt
 
                 NonNullList<ItemStack> inventory = NonNullList.withSize(27, ItemStack.EMPTY);
                 contents.copyInto(inventory);
-                boolean isFull = inventory.stream().allMatch(itemStack -> !itemStack.isEmpty() && itemStack.getCount() == itemStack.getMaxStackSize());
+                boolean isFull = inventory.stream()
+                    .allMatch(itemStack -> !itemStack.isEmpty() && itemStack.getCount() == itemStack.getMaxStackSize());
                 return requiredSize.test(isFull ? Integer.MAX_VALUE : rawSize);
             }
             return requiredSize.test(0);

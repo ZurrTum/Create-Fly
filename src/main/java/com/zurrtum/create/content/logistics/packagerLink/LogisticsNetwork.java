@@ -5,9 +5,11 @@ import com.google.common.collect.Sets;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.zurrtum.create.Create;
+
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.UUID;
+
 import net.minecraft.core.GlobalPos;
 import net.minecraft.core.UUIDUtil;
 

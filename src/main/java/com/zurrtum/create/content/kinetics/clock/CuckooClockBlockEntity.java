@@ -8,8 +8,10 @@ import com.zurrtum.create.catnip.animation.LerpedFloat;
 import com.zurrtum.create.catnip.math.VecHelper;
 import com.zurrtum.create.content.kinetics.base.KineticBlockEntity;
 import com.zurrtum.create.foundation.advancement.CreateTrigger;
+
 import java.util.List;
 import java.util.Locale;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.util.Mth;
 import net.minecraft.util.StringRepresentable;

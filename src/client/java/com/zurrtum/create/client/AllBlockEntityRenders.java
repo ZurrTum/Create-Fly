@@ -122,7 +122,9 @@ import com.zurrtum.create.client.content.trains.track.TrackVisual;
 import com.zurrtum.create.client.flywheel.lib.visualization.SimpleBlockEntityVisualizer;
 import com.zurrtum.create.client.foundation.blockEntity.renderer.SmartBlockEntityRenderer;
 import com.zurrtum.create.content.kinetics.belt.BeltBlockEntity;
+
 import java.util.function.Predicate;
+
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
 import net.minecraft.client.renderer.blockentity.state.BlockEntityRenderState;

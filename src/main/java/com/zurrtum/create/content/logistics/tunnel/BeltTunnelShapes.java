@@ -24,11 +24,8 @@ public class BeltTunnelShapes {
     ),
 
     TEE = VoxelShaper.forHorizontal(
-        Shapes.join(
-            block,
-            Shapes.or(opening.get(Direction.NORTH), opening.get(Direction.WEST), opening.get(Direction.EAST)),
-            BooleanOp.NOT_SAME
-        ), Direction.SOUTH
+        Shapes.join(block, Shapes.or(opening.get(Direction.NORTH), opening.get(Direction.WEST), opening.get(Direction.EAST)), BooleanOp.NOT_SAME),
+        Direction.SOUTH
     );
 
     private static final VoxelShape CROSS = Shapes.join(

@@ -3,7 +3,9 @@ package com.zurrtum.create.content.redstone.displayLink.source;
 import com.google.common.collect.ImmutableList;
 import com.zurrtum.create.catnip.data.IntAttached;
 import com.zurrtum.create.content.redstone.displayLink.DisplayLinkContext;
+
 import java.util.stream.Stream;
+
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.server.level.ServerLevel;

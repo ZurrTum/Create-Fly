@@ -15,7 +15,9 @@ import com.zurrtum.create.content.trains.schedule.destination.DestinationInstruc
 import com.zurrtum.create.content.trains.schedule.destination.ScheduleInstruction;
 import com.zurrtum.create.content.trains.station.GlobalStation;
 import com.zurrtum.create.foundation.codec.CreateCodecs;
+
 import java.util.*;
+
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.CommonComponents;

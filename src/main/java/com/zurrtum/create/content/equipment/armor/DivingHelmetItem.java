@@ -28,7 +28,7 @@ public class DivingHelmetItem extends Item {
         Identifier.fromNamespaceAndPath(
             MOD_ID,
             "netherite_diving_mining_speed"
-        ), 4, AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL
+    ), 4, AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL
     );
 
     public DivingHelmetItem(Properties settings) {

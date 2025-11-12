@@ -4,8 +4,10 @@ import com.zurrtum.create.AllSoundEvents;
 import com.zurrtum.create.catnip.data.Pair;
 import com.zurrtum.create.client.catnip.animation.AnimationTickHolder;
 import com.zurrtum.create.client.infrastructure.config.AllConfigs;
+
 import java.util.*;
 import java.util.function.BiFunction;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.sounds.SoundEvents;

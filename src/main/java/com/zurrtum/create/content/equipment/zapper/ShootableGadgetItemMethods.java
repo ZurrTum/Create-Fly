@@ -2,8 +2,10 @@ package com.zurrtum.create.content.equipment.zapper;
 
 import com.zurrtum.create.AllDataComponents;
 import com.zurrtum.create.infrastructure.packet.s2c.ShootGadgetPacket;
+
 import java.util.function.Function;
 import java.util.function.Predicate;
+
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.HumanoidArm;

@@ -11,9 +11,11 @@ import com.zurrtum.create.client.flywheel.lib.instance.FlatLit;
 import com.zurrtum.create.client.flywheel.lib.model.Models;
 import com.zurrtum.create.client.foundation.render.AllInstanceTypes;
 import com.zurrtum.create.content.kinetics.gearbox.GearboxBlockEntity;
+
 import java.util.EnumMap;
 import java.util.Map;
 import java.util.function.Consumer;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;

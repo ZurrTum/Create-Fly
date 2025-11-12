@@ -9,6 +9,7 @@ import org.joml.Matrix3x2fStack;
 
 import java.util.List;
 import java.util.function.Consumer;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
@@ -119,13 +120,7 @@ public class ToolSelectionScreen extends Screen {
         if (tools.size() > 1) {
             String keyName = AllKeys.TOOL_MENU.getTranslatedKeyMessage().getString().toUpperCase();
             if (!focused)
-                graphics.drawCenteredString(
-                    font,
-                    CreateLang.translateDirect(holdToFocus, keyName),
-                    scaledWidth / 2,
-                    y - 10,
-                    0xFFCCDDFF
-                );
+                graphics.drawCenteredString(font, CreateLang.translateDirect(holdToFocus, keyName), scaledWidth / 2, y - 10, 0xFFCCDDFF);
             else
                 graphics.drawCenteredString(font, scrollToCycle, scaledWidth / 2, y - 10, 0xFFCCDDFF);
         } else {

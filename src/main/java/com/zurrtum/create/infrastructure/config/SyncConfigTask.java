@@ -1,7 +1,9 @@
 package com.zurrtum.create.infrastructure.config;
 
 import com.zurrtum.create.infrastructure.packet.s2c.ServerConfigPacket;
+
 import java.util.function.Consumer;
+
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.server.network.ConfigurationTask;
 

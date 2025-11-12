@@ -9,6 +9,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import net.minecraft.world.phys.AABB;

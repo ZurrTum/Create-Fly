@@ -8,6 +8,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.function.Function;
+
 import net.minecraft.core.Holder;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.EntityType;

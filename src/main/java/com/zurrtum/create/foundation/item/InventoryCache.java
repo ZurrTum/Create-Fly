@@ -2,8 +2,10 @@ package com.zurrtum.create.foundation.item;
 
 import com.zurrtum.create.AllTransfer;
 import com.zurrtum.create.infrastructure.items.ItemInventoryProvider;
+
 import java.util.function.BiPredicate;
 import java.util.function.Supplier;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;

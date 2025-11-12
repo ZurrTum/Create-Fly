@@ -5,7 +5,9 @@ import com.zurrtum.create.client.ponder.api.element.ParrotElement;
 import com.zurrtum.create.client.ponder.api.element.ParrotPose;
 import com.zurrtum.create.client.ponder.foundation.PonderScene;
 import com.zurrtum.create.client.ponder.foundation.element.ParrotElementImpl;
+
 import java.util.function.Supplier;
+
 import net.minecraft.world.phys.Vec3;
 
 public class ExpandedParrotElement extends ParrotElementImpl {

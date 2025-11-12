@@ -9,6 +9,7 @@ import com.zurrtum.create.client.catnip.gui.element.FadableScreenElement;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Function;
+
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.input.MouseButtonEvent;
 

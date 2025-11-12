@@ -18,6 +18,7 @@ import org.apache.commons.lang3.mutable.MutableBoolean;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.BlockAndTintGetter;
@@ -60,7 +61,10 @@ public class PumpBlockEntity extends KineticBlockEntity {
             return;
 
         if (scheduleFlip) {
-            level.setBlockAndUpdate(worldPosition, getBlockState().setValue(PumpBlock.FACING, getBlockState().getValue(PumpBlock.FACING).getOpposite()));
+            level.setBlockAndUpdate(
+                worldPosition,
+                getBlockState().setValue(PumpBlock.FACING, getBlockState().getValue(PumpBlock.FACING).getOpposite())
+            );
             scheduleFlip = false;
         }
 

@@ -4,6 +4,7 @@ import com.mojang.serialization.MapCodec;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
+
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.world.item.ItemStack;

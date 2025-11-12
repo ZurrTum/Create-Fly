@@ -15,6 +15,7 @@ import org.apache.commons.lang3.tuple.MutablePair;
 
 import java.lang.ref.WeakReference;
 import java.util.Collection;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.player.LocalPlayer;

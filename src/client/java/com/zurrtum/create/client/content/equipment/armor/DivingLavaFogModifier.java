@@ -11,14 +11,7 @@ import net.minecraft.world.item.ItemStack;
 
 public class DivingLavaFogModifier extends LavaFogEnvironment {
     @Override
-    public void setupFog(
-        FogData data,
-        Entity cameraEntity,
-        BlockPos cameraPos,
-        ClientLevel world,
-        float viewDistance,
-        DeltaTracker tickCounter
-    ) {
+    public void setupFog(FogData data, Entity cameraEntity, BlockPos cameraPos, ClientLevel world, float viewDistance, DeltaTracker tickCounter) {
         super.setupFog(data, cameraEntity, cameraPos, world, viewDistance, tickCounter);
         if (cameraEntity.isSpectator()) {
             return;

@@ -18,6 +18,7 @@ import com.zurrtum.create.foundation.block.NeighborUpdateListeningBlock;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Map;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
@@ -54,8 +55,8 @@ public class EncasedPipeBlock extends Block implements IWrenchable, SpecialBlock
     public EncasedPipeBlock(Properties properties, Block casing) {
         super(properties);
         this.casing = casing;
-        registerDefaultState(defaultBlockState().setValue(NORTH, false).setValue(SOUTH, false).setValue(DOWN, false).setValue(UP, false).setValue(WEST, false)
-            .setValue(EAST, false));
+        registerDefaultState(defaultBlockState().setValue(NORTH, false).setValue(SOUTH, false).setValue(DOWN, false).setValue(UP, false)
+            .setValue(WEST, false).setValue(EAST, false));
     }
 
     public static EncasedPipeBlock copper(Properties properties) {
@@ -172,7 +173,15 @@ public class EncasedPipeBlock extends Block implements IWrenchable, SpecialBlock
     }
 
     @Override
-    public void handleEncasing(BlockState state, Level level, BlockPos pos, ItemStack heldItem, Player player, InteractionHand hand, BlockHitResult ray) {
+    public void handleEncasing(
+        BlockState state,
+        Level level,
+        BlockPos pos,
+        ItemStack heldItem,
+        Player player,
+        InteractionHand hand,
+        BlockHitResult ray
+    ) {
         FluidTransportBehaviour.cacheFlows(level, pos);
         level.setBlockAndUpdate(pos, EncasedPipeBlock.transferSixWayProperties(state, defaultBlockState()));
         FluidTransportBehaviour.loadFlows(level, pos);

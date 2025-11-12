@@ -9,6 +9,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Direction.Axis;
@@ -25,7 +26,11 @@ public class GirderWrenchBehavior {
         if (validDirections.isEmpty())
             return null;
 
-        List<Direction> directions = IPlacementHelper.orderedByDistance(pos, result.getLocation(), validDirections.stream().map(Pair::getFirst).toList());
+        List<Direction> directions = IPlacementHelper.orderedByDistance(
+            pos,
+            result.getLocation(),
+            validDirections.stream().map(Pair::getFirst).toList()
+        );
 
         if (directions.isEmpty())
             return null;

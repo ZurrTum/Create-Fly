@@ -3,6 +3,7 @@ package com.zurrtum.create.catnip.levelWrappers;
 import java.util.Collections;
 import java.util.UUID;
 import java.util.function.Consumer;
+
 import net.minecraft.util.AbortableIterationConsumer;
 import net.minecraft.world.level.entity.EntityAccess;
 import net.minecraft.world.level.entity.EntityTypeTest;
@@ -35,11 +36,7 @@ public class DummyLevelEntityGetter<T extends EntityAccess> implements LevelEnti
     }
 
     @Override
-    public <U extends T> void get(
-        EntityTypeTest<T, U> p_156932_,
-        AABB p_156933_,
-        AbortableIterationConsumer<U> p_156934_
-    ) {
+    public <U extends T> void get(EntityTypeTest<T, U> p_156932_, AABB p_156933_, AbortableIterationConsumer<U> p_156934_) {
     }
 
 }

@@ -3,7 +3,9 @@ package com.zurrtum.create.content.kinetics.gearbox;
 import com.zurrtum.create.AllBlocks;
 import com.zurrtum.create.catnip.data.Iterate;
 import com.zurrtum.create.content.kinetics.base.IRotate;
+
 import java.util.Map;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Direction.Axis;

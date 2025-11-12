@@ -84,7 +84,11 @@ public class CrushingWheelBlock extends RotatedPillarKineticBlock implements IBE
                     wheelAxis == Axis.X ? 1 : 0,
                     wheelAxis == Axis.Y ? 1 : 0,
                     wheelAxis == Axis.Z ? 1 : 0
-                ).cross(new Vec3(sideAxis == Axis.X ? 1 : 0, sideAxis == Axis.Y ? 1 : 0, sideAxis == Axis.Z ? 1 : 0));
+                ).cross(new Vec3(
+                    sideAxis == Axis.X ? 1 : 0,
+                    sideAxis == Axis.Y ? 1 : 0,
+                    sideAxis == Axis.Z ? 1 : 0
+                ));
 
                 controllerNewDirection = Direction.getApproximateNearest(
                     controllerDirVec.x * controllerADO,

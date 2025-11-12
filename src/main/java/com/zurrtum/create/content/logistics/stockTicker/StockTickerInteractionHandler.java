@@ -12,8 +12,10 @@ import com.zurrtum.create.content.logistics.packagerLink.LogisticallyLinkedBehav
 import com.zurrtum.create.content.logistics.tableCloth.ShoppingListItem;
 import com.zurrtum.create.foundation.gui.menu.MenuProvider;
 import com.zurrtum.create.infrastructure.component.ShoppingList;
+
 import java.util.ArrayList;
 import java.util.List;
+
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;

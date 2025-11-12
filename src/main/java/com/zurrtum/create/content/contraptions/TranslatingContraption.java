@@ -1,9 +1,11 @@
 package com.zurrtum.create.content.contraptions;
 
 import com.zurrtum.create.infrastructure.config.AllConfigs;
+
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.Level;

@@ -9,7 +9,9 @@ import com.zurrtum.create.content.contraptions.piston.MechanicalPistonBlock.Pist
 import com.zurrtum.create.content.equipment.wrench.IWrenchable;
 import com.zurrtum.create.foundation.block.WrenchableDirectionalBlock;
 import com.zurrtum.create.foundation.placement.PoleHelper;
+
 import java.util.function.Predicate;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Direction.Axis;
@@ -73,8 +75,8 @@ public class PistonExtensionPoleBlock extends WrenchableDirectionalBlock impleme
             }
         }
 
-        if (pistonHead != null && pistonBase != null && worldIn.getBlockState(pistonHead).getValue(BlockStateProperties.FACING) == worldIn.getBlockState(pistonBase)
-            .getValue(BlockStateProperties.FACING)) {
+        if (pistonHead != null && pistonBase != null && worldIn.getBlockState(pistonHead)
+            .getValue(BlockStateProperties.FACING) == worldIn.getBlockState(pistonBase).getValue(BlockStateProperties.FACING)) {
 
             final BlockPos basePos = pistonBase;
             BlockPos.betweenClosedStream(pistonBase, pistonHead).filter(p -> !p.equals(pos) && !p.equals(basePos))

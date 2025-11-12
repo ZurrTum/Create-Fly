@@ -16,6 +16,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.LinkedList;
 import java.util.List;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Direction.Axis;
@@ -111,7 +112,10 @@ public class BeltConnectorItem extends BlockItem {
 
         BlockPos diff = end.subtract(start);
         if (diff.getX() == diff.getZ())
-            facing = Direction.get(facing.getAxisDirection(), world.getBlockState(start).getValue(BlockStateProperties.AXIS) == Axis.X ? Axis.Z : Axis.X);
+            facing = Direction.get(
+                facing.getAxisDirection(),
+                world.getBlockState(start).getValue(BlockStateProperties.AXIS) == Axis.X ? Axis.Z : Axis.X
+            );
 
         List<BlockPos> beltsToCreate = getBeltChainBetween(start, end, slope, facing);
         BlockState beltBlock = AllBlocks.BELT.defaultBlockState();
@@ -136,9 +140,7 @@ public class BeltConnectorItem extends BlockItem {
                 world.destroyBlock(pos, false);
 
             KineticBlockEntity.switchToBlockState(
-                world,
-                pos,
-                ProperWaterloggedBlock.withWater(
+                world, pos, ProperWaterloggedBlock.withWater(
                     world,
                     beltBlock.setValue(BeltBlock.SLOPE, slope).setValue(BeltBlock.PART, part).setValue(BeltBlock.HORIZONTAL_FACING, facing),
                     pos

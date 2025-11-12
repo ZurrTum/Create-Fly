@@ -248,7 +248,15 @@ public class EncasedCogwheelBlock extends RotatedPillarKineticBlock implements I
     }
 
     @Override
-    public void handleEncasing(BlockState state, Level level, BlockPos pos, ItemStack heldItem, Player player, InteractionHand hand, BlockHitResult ray) {
+    public void handleEncasing(
+        BlockState state,
+        Level level,
+        BlockPos pos,
+        ItemStack heldItem,
+        Player player,
+        InteractionHand hand,
+        BlockHitResult ray
+    ) {
         BlockState encasedState = defaultBlockState().setValue(AXIS, state.getValue(AXIS));
 
         for (Direction d : Iterate.directionsInAxis(state.getValue(AXIS))) {

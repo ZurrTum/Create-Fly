@@ -10,12 +10,14 @@ import com.zurrtum.create.foundation.utility.FilesHelper;
 import com.zurrtum.create.infrastructure.config.AllConfigs;
 import com.zurrtum.create.infrastructure.config.CSchematics;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
+
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
 import java.util.stream.Stream;
+
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
@@ -144,7 +146,8 @@ public class ServerSchematicLoader {
     protected boolean validateSchematicSizeOnServer(ServerPlayer player, long size) {
         long maxFileSize = getConfig().maxTotalSchematicSize.get();
         if (size > maxFileSize * 1000) {
-            player.sendSystemMessage(Component.translatable("create.schematics.uploadTooLarge").append(Component.literal(" (" + size / 1000 + " KB).")));
+            player.sendSystemMessage(Component.translatable("create.schematics.uploadTooLarge")
+                .append(Component.literal(" (" + size / 1000 + " KB).")));
             player.sendSystemMessage(Component.translatable("create.schematics.maxAllowedSize").append(Component.literal(" " + maxFileSize + " KB")));
             return false;
         }

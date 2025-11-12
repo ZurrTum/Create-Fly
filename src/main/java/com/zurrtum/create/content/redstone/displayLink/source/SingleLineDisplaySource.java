@@ -7,7 +7,9 @@ import com.zurrtum.create.content.redstone.displayLink.target.DisplayTargetStats
 import com.zurrtum.create.content.trains.display.FlapDisplayBlockEntity;
 import com.zurrtum.create.content.trains.display.FlapDisplayLayout;
 import com.zurrtum.create.content.trains.display.FlapDisplaySection;
+
 import java.util.List;
+
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 

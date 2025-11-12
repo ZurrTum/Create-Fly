@@ -87,8 +87,7 @@ public class ToolboxMenu extends MenuBase<ToolboxBlockEntity> {
                 }
             }
 
-            if (type == ClickType.PICKUP && carried.isEmpty() && settle(itemInClickedSlot, index).isEmpty() && !player.level()
-                .isClientSide()) {
+            if (type == ClickType.PICKUP && carried.isEmpty() && settle(itemInClickedSlot, index).isEmpty() && !player.level().isClientSide()) {
                 contentHolder.inventory.filters.set(index / STACKS_PER_COMPARTMENT, ItemStack.EMPTY);
                 contentHolder.sendData();
             }

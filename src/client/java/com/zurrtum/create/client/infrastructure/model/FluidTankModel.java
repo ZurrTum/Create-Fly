@@ -4,7 +4,9 @@ import com.zurrtum.create.api.connectivity.ConnectivityHandler;
 import com.zurrtum.create.catnip.data.Iterate;
 import com.zurrtum.create.client.AllCTBehaviours;
 import com.zurrtum.create.client.foundation.block.connected.ConnectedTextureBehaviour;
+
 import java.util.List;
+
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.block.model.BlockModelPart;
 import net.minecraft.client.renderer.block.model.SimpleModelWrapper;

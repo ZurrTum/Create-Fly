@@ -9,13 +9,17 @@ import org.spongepowered.asm.mixin.injection.At;
 
 import java.util.Iterator;
 import java.util.List;
+
 import net.minecraft.resources.RegistryDataLoader;
 
 @Mixin(RegistryDataLoader.class)
 public class RegistryLoaderMixin {
     @SuppressWarnings("SuspiciousSystemArraycopy")
     @WrapOperation(method = "<clinit>", at = @At(value = "INVOKE", target = "Ljava/util/List;of([Ljava/lang/Object;)Ljava/util/List;"))
-    private static <E> List<RegistryDataLoader.RegistryData<?>> addEntry(@NotNull E[] list, Operation<List<RegistryDataLoader.RegistryData<?>>> original) {
+    private static <E> List<RegistryDataLoader.RegistryData<?>> addEntry(
+        @NotNull E[] list,
+        Operation<List<RegistryDataLoader.RegistryData<?>>> original
+    ) {
         int listSize = list.length;
         AllDynamicRegistries.registerIfNeeded();
         int size = listSize + AllDynamicRegistries.ALL.size();

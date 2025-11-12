@@ -12,9 +12,11 @@ import com.zurrtum.create.content.processing.recipe.HeatCondition;
 import com.zurrtum.create.content.processing.recipe.SizedIngredient;
 import com.zurrtum.create.foundation.fluid.FluidIngredient;
 import com.zurrtum.create.infrastructure.fluids.FluidStack;
+
 import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.List;
+
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;

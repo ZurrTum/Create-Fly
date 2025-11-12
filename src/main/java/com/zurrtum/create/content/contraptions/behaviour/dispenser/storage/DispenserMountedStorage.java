@@ -9,6 +9,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Consumer;
 import java.util.function.Predicate;
+
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.Container;
@@ -30,12 +31,7 @@ public class DispenserMountedStorage extends SimpleMountedStorage {
 
     @Override
     @Nullable
-    protected MenuProvider createMenuProvider(
-        Component name,
-        Container handler,
-        Predicate<Player> stillValid,
-        Consumer<ContainerUser> onClose
-    ) {
+    protected MenuProvider createMenuProvider(Component name, Container handler, Predicate<Player> stillValid, Consumer<ContainerUser> onClose) {
         return MountedStorageMenus.createGeneric9x9(name, handler, stillValid, onClose);
     }
 

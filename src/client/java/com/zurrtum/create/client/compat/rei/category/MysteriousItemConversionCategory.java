@@ -15,6 +15,7 @@ import me.shedaniel.rei.api.common.category.CategoryIdentifier;
 import me.shedaniel.rei.api.common.util.EntryStacks;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
+
 import java.util.List;
 
 public class MysteriousItemConversionCategory extends CreateCategory<MysteriousItemConversionDisplay> {

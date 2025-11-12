@@ -4,7 +4,9 @@ import com.zurrtum.create.AllHandle;
 import com.zurrtum.create.AllPackets;
 import com.zurrtum.create.catnip.codecs.stream.CatnipStreamCodecs;
 import com.zurrtum.create.infrastructure.component.SymmetryMirror;
+
 import java.util.function.BiConsumer;
+
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.PacketType;

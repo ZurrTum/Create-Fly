@@ -7,6 +7,7 @@ import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix3x2f;
 
 import java.util.List;
+
 import net.minecraft.client.gui.navigation.ScreenRectangle;
 import net.minecraft.client.gui.render.TextureSetup;
 import net.minecraft.client.gui.render.state.GuiElementRenderState;

@@ -14,7 +14,9 @@ import com.zurrtum.create.foundation.blockEntity.IMergeableBE;
 import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
 import com.zurrtum.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.infrastructure.packet.s2c.RemoveBlockEntityPacket;
+
 import java.util.*;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction.Axis;
 import net.minecraft.network.protocol.Packet;

@@ -12,8 +12,10 @@ import com.zurrtum.create.foundation.block.ProperWaterloggedBlock;
 import com.zurrtum.create.foundation.utility.BlockHelper;
 import com.zurrtum.create.infrastructure.component.ConnectingFrom;
 import com.zurrtum.create.infrastructure.config.AllConfigs;
+
 import java.util.HashSet;
 import java.util.Set;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction.Axis;
 import net.minecraft.core.Direction.AxisDirection;

@@ -66,7 +66,8 @@ public class GirderEncasedShaftBlock extends HorizontalAxisKineticBlock implemen
     @Override
     public BlockState getRotatedBlockState(BlockState originalState, Direction targetedFace) {
         return AllBlocks.METAL_GIRDER.defaultBlockState().setValue(WATERLOGGED, originalState.getValue(WATERLOGGED))
-            .setValue(GirderBlock.X, originalState.getValue(HORIZONTAL_AXIS) == Axis.Z).setValue(GirderBlock.Z, originalState.getValue(HORIZONTAL_AXIS) == Axis.X)
+            .setValue(GirderBlock.X, originalState.getValue(HORIZONTAL_AXIS) == Axis.Z)
+            .setValue(GirderBlock.Z, originalState.getValue(HORIZONTAL_AXIS) == Axis.X)
             .setValue(GirderBlock.AXIS, originalState.getValue(HORIZONTAL_AXIS) == Axis.X ? Axis.Z : Axis.X)
             .setValue(GirderBlock.BOTTOM, originalState.getValue(BOTTOM)).setValue(GirderBlock.TOP, originalState.getValue(TOP));
     }

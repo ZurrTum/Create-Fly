@@ -3,8 +3,10 @@ package com.zurrtum.create.content.redstone.displayLink.target;
 import com.zurrtum.create.api.behaviour.display.DisplayHolder;
 import com.zurrtum.create.api.behaviour.display.DisplayTarget;
 import com.zurrtum.create.content.redstone.displayLink.DisplayLinkContext;
+
 import java.util.ArrayList;
 import java.util.List;
+
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
@@ -32,10 +34,7 @@ public class LecternDisplayTarget extends DisplayTarget {
         if (!book.is(Items.WRITTEN_BOOK))
             return;
 
-        WrittenBookContent writtenBookContent = book.getOrDefault(
-            DataComponents.WRITTEN_BOOK_CONTENT,
-            WrittenBookContent.EMPTY
-        );
+        WrittenBookContent writtenBookContent = book.getOrDefault(DataComponents.WRITTEN_BOOK_CONTENT, WrittenBookContent.EMPTY);
         List<Filterable<Component>> pages = new ArrayList<>(writtenBookContent.pages());
 
         boolean changed = false;
@@ -76,13 +75,7 @@ public class LecternDisplayTarget extends DisplayTarget {
         WritableBookContent bookContents = book.get(DataComponents.WRITABLE_BOOK_CONTENT);
 
         List<Filterable<Component>> list = bookContents.pages().stream().map(filterable -> filterable.<Component>map(Component::literal)).toList();
-        WrittenBookContent writtenContent = new WrittenBookContent(
-            Filterable.passThrough("Printed Book"),
-            "Data Gatherer",
-            0,
-            list,
-            true
-        );
+        WrittenBookContent writtenContent = new WrittenBookContent(Filterable.passThrough("Printed Book"), "Data Gatherer", 0, list, true);
         written.set(DataComponents.WRITTEN_BOOK_CONTENT, writtenContent);
 
         return written;

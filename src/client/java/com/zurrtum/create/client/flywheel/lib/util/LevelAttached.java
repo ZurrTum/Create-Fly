@@ -3,12 +3,14 @@ package com.zurrtum.create.client.flywheel.lib.util;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
+
 import java.lang.ref.Cleaner;
 import java.lang.ref.WeakReference;
 import java.util.Iterator;
 import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.function.Consumer;
 import java.util.function.Function;
+
 import net.minecraft.world.level.LevelAccessor;
 
 public final class LevelAttached<T> {

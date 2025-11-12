@@ -5,6 +5,7 @@ import com.zurrtum.create.content.logistics.packagerLink.LogisticallyLinkedBlock
 import org.jetbrains.annotations.NotNull;
 
 import java.util.function.Consumer;
+
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;

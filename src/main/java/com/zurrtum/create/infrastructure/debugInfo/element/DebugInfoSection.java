@@ -7,6 +7,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Collection;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
+
 import net.minecraft.world.entity.player.Player;
 
 /**

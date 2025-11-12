@@ -5,8 +5,10 @@ import com.zurrtum.create.client.catnip.animation.AnimationTickHolder;
 import com.zurrtum.create.client.foundation.sound.SoundScapes.AmbienceGroup;
 import com.zurrtum.create.client.foundation.sound.SoundScapes.PitchGroup;
 import com.zurrtum.create.client.infrastructure.config.AllConfigs;
+
 import java.util.ArrayList;
 import java.util.List;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.sounds.SoundEvent;

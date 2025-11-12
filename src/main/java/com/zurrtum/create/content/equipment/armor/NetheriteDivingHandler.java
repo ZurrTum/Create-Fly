@@ -25,8 +25,8 @@ public class NetheriteDivingHandler {
         }
 
         ItemStack chest = player.getItemBySlot(EquipmentSlot.CHEST);
-        if (!(chest.getItem() instanceof BacktankItem) || chest.canBeHurtBy(player.level().damageSources()
-            .lava()) || !BacktankUtil.hasAirRemaining(chest)) {
+        if (!(chest.getItem() instanceof BacktankItem) || chest.canBeHurtBy(player.level().damageSources().lava()) || !BacktankUtil.hasAirRemaining(
+            chest)) {
             return false;
         }
 

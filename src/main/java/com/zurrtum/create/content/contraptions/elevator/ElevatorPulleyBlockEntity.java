@@ -8,7 +8,9 @@ import com.zurrtum.create.content.contraptions.pulley.PulleyBlockEntity;
 import com.zurrtum.create.foundation.advancement.CreateTrigger;
 import com.zurrtum.create.infrastructure.config.AllConfigs;
 import com.zurrtum.create.infrastructure.packet.c2s.RequestFloorListPacket;
+
 import java.util.List;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.util.Mth;
@@ -278,7 +280,11 @@ public class ElevatorPulleyBlockEntity extends PulleyBlockEntity {
                     if (pos.getY() != 0)
                         continue;
                     pos = pos.offset(anchor);
-                    if (level.getBlockEntity(new BlockPos(pos.getX(), this.worldPosition.getY(), pos.getZ())) instanceof ElevatorPulleyBlockEntity pbe)
+                    if (level.getBlockEntity(new BlockPos(
+                        pos.getX(),
+                        this.worldPosition.getY(),
+                        pos.getZ()
+                    )) instanceof ElevatorPulleyBlockEntity pbe)
                         pbe.startMirroringOther(this.worldPosition);
                 }
 
