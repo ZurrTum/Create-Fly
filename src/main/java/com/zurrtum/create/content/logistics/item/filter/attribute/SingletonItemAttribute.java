@@ -1,17 +1,15 @@
 package com.zurrtum.create.content.logistics.item.filter.attribute;
 
-import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 import java.util.function.BiPredicate;
 import java.util.function.Function;
-
-import net.minecraft.network.RegistryFriendlyByteBuf;
-import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.Level;
 
 public final class SingletonItemAttribute implements ItemAttribute {
     private final Type type;
@@ -61,7 +59,7 @@ public final class SingletonItemAttribute implements ItemAttribute {
 
         @Override
         public MapCodec<? extends ItemAttribute> codec() {
-            return Codec.unit(attribute).fieldOf("value");
+            return MapCodec.unitCodec(attribute).fieldOf("value");
         }
 
         @Override

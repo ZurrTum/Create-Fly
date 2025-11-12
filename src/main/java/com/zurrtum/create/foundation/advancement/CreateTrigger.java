@@ -2,6 +2,7 @@ package com.zurrtum.create.foundation.advancement;
 
 import com.google.common.collect.Maps;
 import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
 import net.minecraft.advancements.CriterionTrigger;
 import net.minecraft.advancements.CriterionTriggerInstance;
 import net.minecraft.advancements.criterion.CriterionValidator;
@@ -58,7 +59,7 @@ public class CreateTrigger implements CriterionTrigger<CreateTrigger.Conditions>
     }
 
     public static class Conditions implements CriterionTriggerInstance {
-        public static final Codec<Conditions> CODEC = Codec.unit(new Conditions());
+        public static final Codec<Conditions> CODEC = MapCodec.unitCodec(new Conditions());
 
         @Override
         public void validate(CriterionValidator validator) {
