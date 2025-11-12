@@ -5,6 +5,7 @@ import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
 import com.zurrtum.create.AllSynchedDatas;
+import com.zurrtum.create.content.contraptions.actors.seat.SeatBlock;
 import com.zurrtum.create.content.contraptions.minecart.CouplingHandler;
 import com.zurrtum.create.content.contraptions.minecart.capability.CapabilityMinecartController;
 import com.zurrtum.create.content.equipment.armor.CardboardArmorHandler;
@@ -43,6 +44,12 @@ public abstract class EntityMixin implements DataTracked {
 
     @Shadow
     private World world;
+
+    @Shadow
+    public abstract BlockState getSteppingBlockState();
+
+    @Shadow
+    public abstract BlockPos getSteppingPos();
 
     @WrapOperation(method = "<init>", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/EntityDimensions;eyeHeight()F"))
     private float setEyeHeight(EntityDimensions dimensions, Operation<Float> original) {
@@ -123,5 +130,10 @@ public abstract class EntityMixin implements DataTracked {
             return block.getSoundGroup(world, pos);
         }
         return original.call(state);
+    }
+
+    @WrapOperation(method = "move(Lnet/minecraft/entity/MovementType;Lnet/minecraft/util/math/Vec3d;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/Entity;getLandingPos()Lnet/minecraft/util/math/BlockPos;"))
+    private BlockPos fixSeatBouncing(Entity instance, Operation<BlockPos> original) {
+        return getSteppingBlockState().getBlock() instanceof SeatBlock ? getSteppingPos() : original.call(instance);
     }
 }

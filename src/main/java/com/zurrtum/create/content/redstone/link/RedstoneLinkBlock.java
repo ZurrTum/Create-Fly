@@ -72,14 +72,14 @@ public class RedstoneLinkBlock extends WrenchableDirectionalBlock implements IBE
         updateTransmittedSignal(state, worldIn, pos);
     }
 
-    public void updateTransmittedSignal(BlockState state, World worldIn, BlockPos pos) {
-        if (worldIn.isClient())
+    public void updateTransmittedSignal(BlockState state, World level, BlockPos pos) {
+        if (level.isClient())
             return;
         if (state.get(RECEIVER))
             return;
 
-        int power = getPower(worldIn, pos);
-        int powerFromPanels = getBlockEntityOptional(worldIn, pos).map(be -> {
+        int power = getPower(level, state, pos);
+        int powerFromPanels = getBlockEntityOptional(level, pos).map(be -> {
             if (be.panelSupport == null)
                 return 0;
             Boolean tri = be.panelSupport.shouldBePoweredTristate();
@@ -96,18 +96,20 @@ public class RedstoneLinkBlock extends WrenchableDirectionalBlock implements IBE
 
         boolean previouslyPowered = state.get(POWERED);
         if (previouslyPowered != power > 0)
-            worldIn.setBlockState(pos, state.cycle(POWERED), Block.NOTIFY_LISTENERS);
+            level.setBlockState(pos, state.cycle(POWERED), Block.NOTIFY_LISTENERS);
 
         int transmit = power;
-        withBlockEntityDo(worldIn, pos, be -> be.transmit(transmit));
+        withBlockEntityDo(level, pos, be -> be.transmit(transmit));
     }
 
-    private int getPower(World worldIn, BlockPos pos) {
+    private static int getPower(World level, BlockState state, BlockPos pos) {
         int power = 0;
         for (Direction direction : Iterate.directions)
-            power = Math.max(worldIn.getEmittedRedstonePower(pos.offset(direction), direction), power);
-        for (Direction direction : Iterate.directions)
-            power = Math.max(worldIn.getEmittedRedstonePower(pos.offset(direction), Direction.UP), power);
+            power = Math.max(level.getEmittedRedstonePower(pos.offset(direction), direction), power);
+        for (Direction direction : Iterate.directions) {
+            if (state.get(FACING).getOpposite() != direction)
+                power = Math.max(level.getEmittedRedstonePower(pos.offset(direction), Direction.UP), power);
+        }
         return power;
     }
 
@@ -145,16 +147,16 @@ public class RedstoneLinkBlock extends WrenchableDirectionalBlock implements IBE
         return ActionResult.PASS;
     }
 
-    public ActionResult toggleMode(BlockState state, World worldIn, BlockPos pos) {
-        if (worldIn.isClient())
+    public ActionResult toggleMode(BlockState state, World level, BlockPos pos) {
+        if (level.isClient())
             return ActionResult.SUCCESS;
 
         return onBlockEntityUse(
-            worldIn, pos, be -> {
+            level, pos, be -> {
                 Boolean wasReceiver = state.get(RECEIVER);
-                boolean blockPowered = worldIn.isReceivingRedstonePower(pos);
-                worldIn.setBlockState(pos, state.cycle(RECEIVER).with(POWERED, blockPowered), Block.NOTIFY_ALL);
-                be.transmit(wasReceiver ? 0 : getPower(worldIn, pos));
+                boolean blockPowered = level.isReceivingRedstonePower(pos);
+                level.setBlockState(pos, state.cycle(RECEIVER).with(POWERED, blockPowered), Block.NOTIFY_ALL);
+                be.transmit(wasReceiver ? 0 : getPower(level, state, pos));
                 return ActionResult.SUCCESS;
             }
         );

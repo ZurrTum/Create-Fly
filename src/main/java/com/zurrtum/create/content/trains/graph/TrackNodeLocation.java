@@ -47,7 +47,7 @@ public class TrackNodeLocation extends Vec3i {
     }
 
     public TrackNodeLocation(double x, double y, double z) {
-        super(MathHelper.floor(Math.round(x * 2)), MathHelper.floor(y) * 2, MathHelper.floor(Math.round(z * 2)));
+        super(MathHelper.floor((double) Math.round(x * 2)), MathHelper.floor(y) * 2, MathHelper.floor((double) Math.round(z * 2)));
     }
 
     public TrackNodeLocation in(World level) {
