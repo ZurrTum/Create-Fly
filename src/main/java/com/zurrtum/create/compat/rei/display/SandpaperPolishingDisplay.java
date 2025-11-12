@@ -10,23 +10,24 @@ import me.shedaniel.rei.api.common.entry.EntryIngredient;
 import me.shedaniel.rei.api.common.util.EntryIngredients;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.crafting.RecipeHolder;
+
 import java.util.List;
 import java.util.Optional;
 
-public record SandpaperPolishingDisplay(EntryIngredient input, EntryIngredient output, Optional<ResourceLocation> location) implements Display {
+public record SandpaperPolishingDisplay(EntryIngredient input, EntryIngredient output, Optional<Identifier> location) implements Display {
     public static final DisplaySerializer<SandpaperPolishingDisplay> SERIALIZER = DisplaySerializer.of(
         RecordCodecBuilder.mapCodec(instance -> instance.group(
             EntryIngredient.codec().fieldOf("input").forGetter(SandpaperPolishingDisplay::input),
             EntryIngredient.codec().fieldOf("output").forGetter(SandpaperPolishingDisplay::output),
-            ResourceLocation.CODEC.optionalFieldOf("location").forGetter(SandpaperPolishingDisplay::location)
+            Identifier.CODEC.optionalFieldOf("location").forGetter(SandpaperPolishingDisplay::location)
         ).apply(instance, SandpaperPolishingDisplay::new)), StreamCodec.composite(
             EntryIngredient.streamCodec(),
             SandpaperPolishingDisplay::input,
             EntryIngredient.streamCodec(),
             SandpaperPolishingDisplay::output,
-            ByteBufCodecs.optional(ResourceLocation.STREAM_CODEC),
+            ByteBufCodecs.optional(Identifier.STREAM_CODEC),
             SandpaperPolishingDisplay::location,
             SandpaperPolishingDisplay::new
         )
@@ -36,7 +37,7 @@ public record SandpaperPolishingDisplay(EntryIngredient input, EntryIngredient o
         this(entry.id().location(), entry.value());
     }
 
-    public SandpaperPolishingDisplay(ResourceLocation id, SandPaperPolishingRecipe recipe) {
+    public SandpaperPolishingDisplay(Identifier id, SandPaperPolishingRecipe recipe) {
         this(EntryIngredients.ofIngredient(recipe.ingredient()), EntryIngredients.of(recipe.result()), Optional.of(id));
     }
 
@@ -56,7 +57,7 @@ public record SandpaperPolishingDisplay(EntryIngredient input, EntryIngredient o
     }
 
     @Override
-    public Optional<ResourceLocation> getDisplayLocation() {
+    public Optional<Identifier> getDisplayLocation() {
         return location;
     }
 

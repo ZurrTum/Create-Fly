@@ -11,24 +11,25 @@ import me.shedaniel.rei.api.common.entry.EntryIngredient;
 import me.shedaniel.rei.api.common.util.EntryIngredients;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.crafting.RecipeHolder;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-public record MillingDisplay(EntryIngredient input, List<ChanceOutput> outputs, Optional<ResourceLocation> location) implements Display {
+public record MillingDisplay(EntryIngredient input, List<ChanceOutput> outputs, Optional<Identifier> location) implements Display {
     public static final DisplaySerializer<MillingDisplay> SERIALIZER = DisplaySerializer.of(
         RecordCodecBuilder.mapCodec(instance -> instance.group(
             EntryIngredient.codec().fieldOf("input").forGetter(MillingDisplay::input),
             ChanceOutput.CODEC.listOf().fieldOf("outputs").forGetter(MillingDisplay::outputs),
-            ResourceLocation.CODEC.optionalFieldOf("location").forGetter(MillingDisplay::location)
+            Identifier.CODEC.optionalFieldOf("location").forGetter(MillingDisplay::location)
         ).apply(instance, MillingDisplay::new)), StreamCodec.composite(
             EntryIngredient.streamCodec(),
             MillingDisplay::input,
             ChanceOutput.PACKET_CODEC.apply(ByteBufCodecs.list()),
             MillingDisplay::outputs,
-            ByteBufCodecs.optional(ResourceLocation.STREAM_CODEC),
+            ByteBufCodecs.optional(Identifier.STREAM_CODEC),
             MillingDisplay::location,
             MillingDisplay::new
         )
@@ -38,7 +39,7 @@ public record MillingDisplay(EntryIngredient input, List<ChanceOutput> outputs, 
         this(entry.id().location(), entry.value());
     }
 
-    public MillingDisplay(ResourceLocation id, MillingRecipe recipe) {
+    public MillingDisplay(Identifier id, MillingRecipe recipe) {
         this(EntryIngredients.ofIngredient(recipe.ingredient()), recipe.results(), Optional.of(id));
     }
 
@@ -62,7 +63,7 @@ public record MillingDisplay(EntryIngredient input, List<ChanceOutput> outputs, 
     }
 
     @Override
-    public Optional<ResourceLocation> getDisplayLocation() {
+    public Optional<Identifier> getDisplayLocation() {
         return location;
     }
 

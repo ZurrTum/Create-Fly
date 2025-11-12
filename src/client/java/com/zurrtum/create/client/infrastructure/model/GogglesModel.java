@@ -11,7 +11,7 @@ import net.minecraft.client.renderer.item.*;
 import net.minecraft.client.resources.model.BlockModelRotation;
 import net.minecraft.client.resources.model.ModelBaker;
 import net.minecraft.client.resources.model.ResolvedModel;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.Tuple;
 import net.minecraft.world.entity.ItemOwner;
 import net.minecraft.world.item.ItemDisplayContext;
@@ -25,9 +25,9 @@ import java.util.function.Supplier;
 import static com.zurrtum.create.Create.MOD_ID;
 
 public class GogglesModel implements ItemModel {
-    public static final ResourceLocation ID = ResourceLocation.fromNamespaceAndPath(MOD_ID, "model/goggles");
-    public static final ResourceLocation ITEM_ID = ResourceLocation.fromNamespaceAndPath(MOD_ID, "item/goggles");
-    public static final ResourceLocation BLOCK_ID = ResourceLocation.fromNamespaceAndPath(MOD_ID, "block/goggles");
+    public static final Identifier ID = Identifier.fromNamespaceAndPath(MOD_ID, "model/goggles");
+    public static final Identifier ITEM_ID = Identifier.fromNamespaceAndPath(MOD_ID, "item/goggles");
+    public static final Identifier BLOCK_ID = Identifier.fromNamespaceAndPath(MOD_ID, "block/goggles");
 
     private final RenderType layer = Sheets.translucentItemSheet();
     private final List<BakedQuad> itemQuads;
@@ -98,7 +98,7 @@ public class GogglesModel implements ItemModel {
             return new GogglesModel(bake(baker, ITEM_ID), bake(baker, BLOCK_ID));
         }
 
-        private static Tuple<List<BakedQuad>, ModelRenderProperties> bake(ModelBaker baker, ResourceLocation id) {
+        private static Tuple<List<BakedQuad>, ModelRenderProperties> bake(ModelBaker baker, Identifier id) {
             ResolvedModel model = baker.getModel(id);
             TextureSlots textures = model.getTopTextureSlots();
             List<BakedQuad> quads = model.bakeTopGeometry(textures, baker, BlockModelRotation.X0_Y0).getAll();

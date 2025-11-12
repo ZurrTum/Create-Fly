@@ -5,7 +5,7 @@ import com.zurrtum.create.catnip.registry.RegisteredObjectsHelper;
 import com.zurrtum.create.client.Create;
 import com.zurrtum.create.client.ponder.api.registration.PonderTagRegistrationHelper;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.ItemLike;
@@ -13,30 +13,30 @@ import net.minecraft.world.level.block.Blocks;
 
 public class AllCreatePonderTags {
 
-    public static final ResourceLocation KINETIC_RELAYS = loc("kinetic_relays");
-    public static final ResourceLocation KINETIC_SOURCES = loc("kinetic_sources");
-    public static final ResourceLocation KINETIC_APPLIANCES = loc("kinetic_appliances");
-    public static final ResourceLocation FLUIDS = loc("fluids");
-    public static final ResourceLocation LOGISTICS = loc("logistics");
-    public static final ResourceLocation HIGH_LOGISTICS = loc("high_logistics");
-    public static final ResourceLocation REDSTONE = loc("redstone");
-    public static final ResourceLocation DECORATION = loc("decoration");
-    public static final ResourceLocation CREATIVE = loc("creative");
-    public static final ResourceLocation MOVEMENT_ANCHOR = loc("movement_anchor");
-    public static final ResourceLocation CONTRAPTION_ACTOR = loc("contraption_actor");
-    public static final ResourceLocation CONTRAPTION_ASSEMBLY = loc("contraption_assembly");
-    public static final ResourceLocation SAILS = loc("windmill_sails");
-    public static final ResourceLocation ARM_TARGETS = loc("arm_targets");
-    public static final ResourceLocation TRAIN_RELATED = loc("train_related");
-    public static final ResourceLocation DISPLAY_SOURCES = loc("display_sources");
-    public static final ResourceLocation DISPLAY_TARGETS = loc("display_targets");
-    public static final ResourceLocation THRESHOLD_SWITCH_TARGETS = loc("threshold_switch_targets");
+    public static final Identifier KINETIC_RELAYS = loc("kinetic_relays");
+    public static final Identifier KINETIC_SOURCES = loc("kinetic_sources");
+    public static final Identifier KINETIC_APPLIANCES = loc("kinetic_appliances");
+    public static final Identifier FLUIDS = loc("fluids");
+    public static final Identifier LOGISTICS = loc("logistics");
+    public static final Identifier HIGH_LOGISTICS = loc("high_logistics");
+    public static final Identifier REDSTONE = loc("redstone");
+    public static final Identifier DECORATION = loc("decoration");
+    public static final Identifier CREATIVE = loc("creative");
+    public static final Identifier MOVEMENT_ANCHOR = loc("movement_anchor");
+    public static final Identifier CONTRAPTION_ACTOR = loc("contraption_actor");
+    public static final Identifier CONTRAPTION_ASSEMBLY = loc("contraption_assembly");
+    public static final Identifier SAILS = loc("windmill_sails");
+    public static final Identifier ARM_TARGETS = loc("arm_targets");
+    public static final Identifier TRAIN_RELATED = loc("train_related");
+    public static final Identifier DISPLAY_SOURCES = loc("display_sources");
+    public static final Identifier DISPLAY_TARGETS = loc("display_targets");
+    public static final Identifier THRESHOLD_SWITCH_TARGETS = loc("threshold_switch_targets");
 
-    private static ResourceLocation loc(String id) {
+    private static Identifier loc(String id) {
         return Create.asResource(id);
     }
 
-    public static void register(PonderTagRegistrationHelper<ResourceLocation> helper) {
+    public static void register(PonderTagRegistrationHelper<Identifier> helper) {
 
         PonderTagRegistrationHelper<Item> HELPER = helper.withKeyFunction(BuiltInRegistries.ITEM::getKey);
 

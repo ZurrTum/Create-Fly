@@ -2,22 +2,24 @@ package com.zurrtum.create.content.trains.bogey;
 
 import com.zurrtum.create.AllBogeyStyles;
 import com.zurrtum.create.AllSoundEvents;
+
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
+
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.sounds.SoundEvent;
 
 public class BogeyStyle {
-    public final ResourceLocation id;
-    public final ResourceLocation cycleGroup;
+    public final Identifier id;
+    public final Identifier cycleGroup;
     public final Component displayName;
     public final Supplier<SoundEvent> soundEvent;
     public final ParticleOptions contactParticle;
@@ -26,8 +28,8 @@ public class BogeyStyle {
     private final Map<BogeySize, AbstractBogeyBlock<?>> sizes;
 
     public BogeyStyle(
-        ResourceLocation id,
-        ResourceLocation cycleGroup,
+        Identifier id,
+        Identifier cycleGroup,
         Component displayName,
         Supplier<SoundEvent> soundEvent,
         ParticleOptions contactParticle,
@@ -45,7 +47,7 @@ public class BogeyStyle {
         this.sizes = sizes;
     }
 
-    public Map<ResourceLocation, BogeyStyle> getCycleGroup() {
+    public Map<Identifier, BogeyStyle> getCycleGroup() {
         return AllBogeyStyles.getCycleGroup(cycleGroup);
     }
 
@@ -64,8 +66,8 @@ public class BogeyStyle {
     }
 
     public static class Builder {
-        protected final ResourceLocation id;
-        protected final ResourceLocation cycleGroup;
+        protected final Identifier id;
+        protected final Identifier cycleGroup;
         protected final Map<BogeySize, AbstractBogeyBlock<?>> sizes = new LinkedHashMap<>();
 
         protected Component displayName = Component.translatable("create.bogey.style.invalid");
@@ -74,7 +76,7 @@ public class BogeyStyle {
         protected ParticleOptions smokeParticle = ParticleTypes.POOF;
         protected CompoundTag defaultData = new CompoundTag();
 
-        public Builder(ResourceLocation id, ResourceLocation cycleGroup) {
+        public Builder(Identifier id, Identifier cycleGroup) {
             this.id = id;
             this.cycleGroup = cycleGroup;
         }

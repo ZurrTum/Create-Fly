@@ -3,7 +3,7 @@ package com.zurrtum.create.catnip.nbt;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Vec3i;
 import net.minecraft.nbt.*;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.phys.AABB;
 import org.jetbrains.annotations.Nullable;
 
@@ -120,12 +120,12 @@ public class NBTHelper {
         return compoundTag.getIntOr("V", 0);
     }
 
-    public static void writeResourceLocation(CompoundTag nbt, String key, ResourceLocation location) {
+    public static void writeIdentifier(CompoundTag nbt, String key, Identifier location) {
         nbt.putString(key, location.toString());
     }
 
-    public static ResourceLocation readResourceLocation(CompoundTag nbt, String key) {
-        return ResourceLocation.parse(nbt.getStringOr(key, ""));
+    public static Identifier readIdentifier(CompoundTag nbt, String key) {
+        return Identifier.parse(nbt.getStringOr(key, ""));
     }
 
 }

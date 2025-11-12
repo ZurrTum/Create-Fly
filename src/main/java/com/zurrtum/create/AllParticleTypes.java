@@ -9,7 +9,7 @@ import net.minecraft.core.particles.SimpleParticleType;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 import static com.zurrtum.create.Create.MOD_ID;
 
@@ -49,7 +49,7 @@ public class AllParticleTypes {
     public static final SimpleParticleType SOUL_EXPANDING_PERIMETER = register("soul_expanding_perimeter");
 
     private static SimpleParticleType register(String name) {
-        ResourceLocation id = ResourceLocation.fromNamespaceAndPath(MOD_ID, name);
+        Identifier id = Identifier.fromNamespaceAndPath(MOD_ID, name);
         return Registry.register(BuiltInRegistries.PARTICLE_TYPE, id, new SimpleParticleType(false));
     }
 
@@ -67,7 +67,7 @@ public class AllParticleTypes {
                 return packetCodec;
             }
         };
-        return Registry.register(BuiltInRegistries.PARTICLE_TYPE, ResourceLocation.fromNamespaceAndPath(MOD_ID, name), type);
+        return Registry.register(BuiltInRegistries.PARTICLE_TYPE, Identifier.fromNamespaceAndPath(MOD_ID, name), type);
     }
 
     public static void register() {

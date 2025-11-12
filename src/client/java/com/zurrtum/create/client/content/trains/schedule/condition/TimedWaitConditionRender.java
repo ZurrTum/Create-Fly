@@ -8,7 +8,7 @@ import com.zurrtum.create.content.trains.schedule.condition.TimedWaitCondition;
 import com.zurrtum.create.content.trains.schedule.condition.TimedWaitCondition.TimeUnit;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 
@@ -27,7 +27,7 @@ public abstract class TimedWaitConditionRender<T extends TimedWaitCondition> imp
 
     @Override
     public List<Component> getTitleAs(T input, String type) {
-        ResourceLocation id = input.getId();
+        Identifier id = input.getId();
         return ImmutableList.of(
             Component.translatable(id.getNamespace() + ".schedule." + type + "." + id.getPath()),
             CreateLang.translateDirect("schedule.condition.for_x_time", formatTime(input, false)).withStyle(ChatFormatting.DARK_AQUA)

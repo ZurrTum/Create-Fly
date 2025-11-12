@@ -14,11 +14,12 @@ import org.joml.Matrix3x2fStack;
 
 import java.util.List;
 import java.util.function.Supplier;
+
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.FormattedText;
 import net.minecraft.network.chat.Style;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 import net.minecraft.world.phys.Vec2;
 import net.minecraft.world.phys.Vec3;
@@ -82,25 +83,25 @@ public class TextWindowElement extends AnimatedOverlayElementBase {
         }
 
         @Override
-        public Builder sharedText(ResourceLocation key) {
+        public Builder sharedText(Identifier key) {
             textGetter = () -> PonderIndex.getLangAccess().getShared(key);
             return this;
         }
 
         @Override
-        public TextElementBuilder sharedText(ResourceLocation key, Object... params) {
+        public TextElementBuilder sharedText(Identifier key, Object... params) {
             textGetter = () -> PonderIndex.getLangAccess().getShared(key, params);
             return this;
         }
 
         @Override
         public Builder sharedText(String key) {
-            return sharedText(ResourceLocation.fromNamespaceAndPath(scene.getNamespace(), key));
+            return sharedText(Identifier.fromNamespaceAndPath(scene.getNamespace(), key));
         }
 
         @Override
         public TextElementBuilder sharedText(String key, Object... params) {
-            return sharedText(ResourceLocation.fromNamespaceAndPath(scene.getNamespace(), key), params);
+            return sharedText(Identifier.fromNamespaceAndPath(scene.getNamespace(), key), params);
         }
 
         @Override

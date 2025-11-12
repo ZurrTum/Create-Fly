@@ -6,8 +6,9 @@ import io.netty.buffer.ByteBuf;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Locale;
+
 import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.StringRepresentable;
 
 public enum ClipboardType implements StringRepresentable {
@@ -19,7 +20,7 @@ public enum ClipboardType implements StringRepresentable {
     public static final StreamCodec<ByteBuf, ClipboardType> STREAM_CODEC = CatnipStreamCodecBuilders.ofEnum(ClipboardType.class);
 
     public final String file;
-    public static ResourceLocation ID = ResourceLocation.parse("clipboard_type");
+    public static Identifier ID = Identifier.parse("clipboard_type");
 
     ClipboardType(String file) {
         this.file = file;

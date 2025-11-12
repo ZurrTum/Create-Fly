@@ -13,11 +13,12 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Locale;
 import java.util.function.Supplier;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.StringRepresentable;
 import net.minecraft.world.Container;
@@ -184,7 +185,7 @@ public class ArmInteractionPoint {
     }
 
     public final CompoundTag serialize(BlockPos anchor) {
-        ResourceLocation key = CreateRegistries.ARM_INTERACTION_POINT_TYPE.getKey(type);
+        Identifier key = CreateRegistries.ARM_INTERACTION_POINT_TYPE.getKey(type);
         if (key == null)
             throw new IllegalArgumentException("Could not get id for ArmInteractionPointType " + type + "!");
 
@@ -197,7 +198,7 @@ public class ArmInteractionPoint {
 
     @Nullable
     public static ArmInteractionPoint deserialize(CompoundTag nbt, Level level, BlockPos anchor) {
-        ResourceLocation id = ResourceLocation.tryParse(nbt.getStringOr("Type", ""));
+        Identifier id = Identifier.tryParse(nbt.getStringOr("Type", ""));
         if (id == null)
             return null;
         ArmInteractionPointType type = CreateRegistries.ARM_INTERACTION_POINT_TYPE.getValue(id);

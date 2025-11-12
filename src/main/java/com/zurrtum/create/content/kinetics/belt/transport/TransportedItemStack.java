@@ -6,12 +6,14 @@ import com.zurrtum.create.api.registry.CreateRegistries;
 import com.zurrtum.create.content.kinetics.belt.BeltHelper;
 import com.zurrtum.create.content.kinetics.fan.processing.FanProcessingType;
 import com.zurrtum.create.content.logistics.box.PackageItem;
+
 import java.util.Optional;
 import java.util.Random;
+
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 
 public class TransportedItemStack implements Comparable<TransportedItemStack> {
@@ -130,7 +132,7 @@ public class TransportedItemStack implements Comparable<TransportedItemStack> {
         nbt.putInt("InDirection", insertedFrom.get3DDataValue());
 
         if (processedBy != null) {
-            ResourceLocation key = CreateRegistries.FAN_PROCESSING_TYPE.getKey(processedBy);
+            Identifier key = CreateRegistries.FAN_PROCESSING_TYPE.getKey(processedBy);
             if (key == null)
                 throw new IllegalArgumentException("Could not get id for FanProcessingType " + processedBy + "!");
 

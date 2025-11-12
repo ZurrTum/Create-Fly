@@ -1,6 +1,6 @@
 package com.zurrtum.create.client.flywheel.api.material;
 
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 public interface Material {
     MaterialShaders shaders();
@@ -11,7 +11,7 @@ public interface Material {
 
     LightShader light();
 
-    ResourceLocation texture();
+    Identifier texture();
 
     /**
      * Should this material have linear filtering applied to the diffuse sampler?

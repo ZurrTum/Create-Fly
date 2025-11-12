@@ -28,7 +28,7 @@ import net.minecraft.client.resources.model.BlockModelRotation;
 import net.minecraft.client.resources.model.ModelBaker;
 import net.minecraft.client.resources.model.ResolvedModel;
 import net.minecraft.core.BlockPos;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.HumanoidArm;
@@ -50,11 +50,11 @@ import java.util.function.Supplier;
 import static com.zurrtum.create.Create.MOD_ID;
 
 public class WorldshaperModel implements ItemModel, SpecialModelRenderer<WorldshaperModel.RenderData> {
-    public static final ResourceLocation ID = ResourceLocation.fromNamespaceAndPath(MOD_ID, "model/handheld_worldshaper");
-    public static final ResourceLocation ITEM_ID = ResourceLocation.fromNamespaceAndPath(MOD_ID, "item/handheld_worldshaper/item");
-    public static final ResourceLocation CORE_ID = ResourceLocation.fromNamespaceAndPath(MOD_ID, "item/handheld_worldshaper/core");
-    public static final ResourceLocation CORE_GLOW_ID = ResourceLocation.fromNamespaceAndPath(MOD_ID, "item/handheld_worldshaper/core_glow");
-    public static final ResourceLocation ACCELERATOR_ID = ResourceLocation.fromNamespaceAndPath(MOD_ID, "item/handheld_worldshaper/accelerator");
+    public static final Identifier ID = Identifier.fromNamespaceAndPath(MOD_ID, "model/handheld_worldshaper");
+    public static final Identifier ITEM_ID = Identifier.fromNamespaceAndPath(MOD_ID, "item/handheld_worldshaper/item");
+    public static final Identifier CORE_ID = Identifier.fromNamespaceAndPath(MOD_ID, "item/handheld_worldshaper/core");
+    public static final Identifier CORE_GLOW_ID = Identifier.fromNamespaceAndPath(MOD_ID, "item/handheld_worldshaper/core_glow");
+    public static final Identifier ACCELERATOR_ID = Identifier.fromNamespaceAndPath(MOD_ID, "item/handheld_worldshaper/accelerator");
     private static final int[] TINTS = new int[0];
     private static final RandomSource random = RandomSource.create();
     private static final PoseStack matrices = new PoseStack();
@@ -245,7 +245,7 @@ public class WorldshaperModel implements ItemModel, SpecialModelRenderer<Worldsh
             return new WorldshaperModel(settings, quads, bake(baker, CORE_ID), bake(baker, CORE_GLOW_ID), bake(baker, ACCELERATOR_ID));
         }
 
-        private static List<BakedQuad> bake(ModelBaker baker, ResourceLocation id) {
+        private static List<BakedQuad> bake(ModelBaker baker, Identifier id) {
             ResolvedModel model = baker.getModel(id);
             return model.bakeTopGeometry(model.getTopTextureSlots(), baker, BlockModelRotation.X0_Y0).getAll();
         }

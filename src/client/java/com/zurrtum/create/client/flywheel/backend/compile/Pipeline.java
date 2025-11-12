@@ -8,10 +8,11 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Objects;
 import java.util.function.Consumer;
-import net.minecraft.resources.ResourceLocation;
+
+import net.minecraft.resources.Identifier;
 
 public record Pipeline(
-    ResourceLocation vertexMain, ResourceLocation fragmentMain, InstanceAssembler assembler, String compilerMarker, Consumer<GlProgram> onLink
+    Identifier vertexMain, Identifier fragmentMain, InstanceAssembler assembler, String compilerMarker, Consumer<GlProgram> onLink
 ) {
 
     @FunctionalInterface
@@ -30,9 +31,9 @@ public record Pipeline(
 
     public static class Builder {
         @Nullable
-        private ResourceLocation vertexMain;
+        private Identifier vertexMain;
         @Nullable
-        private ResourceLocation fragmentMain;
+        private Identifier fragmentMain;
         @Nullable
         private InstanceAssembler assembler;
         @Nullable
@@ -40,12 +41,12 @@ public record Pipeline(
         @Nullable
         private Consumer<GlProgram> onLink;
 
-        public Builder vertexMain(ResourceLocation shader) {
+        public Builder vertexMain(Identifier shader) {
             this.vertexMain = shader;
             return this;
         }
 
-        public Builder fragmentMain(ResourceLocation shader) {
+        public Builder fragmentMain(Identifier shader) {
             this.fragmentMain = shader;
             return this;
         }

@@ -23,7 +23,7 @@ import net.minecraft.client.renderer.special.SpecialModelRenderer;
 import net.minecraft.client.resources.model.BlockModelRotation;
 import net.minecraft.client.resources.model.ModelBaker;
 import net.minecraft.client.resources.model.ResolvedModel;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.ItemOwner;
 import net.minecraft.world.entity.player.Player;
@@ -38,7 +38,7 @@ import java.util.Set;
 import static com.zurrtum.create.Create.MOD_ID;
 
 public class SandPaperModel implements ItemModel, SpecialModelRenderer<SandPaperModel.RenderData> {
-    public static final ResourceLocation ID = ResourceLocation.fromNamespaceAndPath(MOD_ID, "model/sand_paper");
+    public static final Identifier ID = Identifier.fromNamespaceAndPath(MOD_ID, "model/sand_paper");
 
     private final RenderType layer = Sheets.translucentItemSheet();
     private final List<BakedQuad> quads;
@@ -172,9 +172,9 @@ public class SandPaperModel implements ItemModel, SpecialModelRenderer<SandPaper
         float bobbing;
     }
 
-    public record Unbaked(ResourceLocation model) implements ItemModel.Unbaked {
+    public record Unbaked(Identifier model) implements ItemModel.Unbaked {
         public static final MapCodec<com.zurrtum.create.client.infrastructure.model.SandPaperModel.Unbaked> CODEC = RecordCodecBuilder.mapCodec(
-            instance -> instance.group(ResourceLocation.CODEC.fieldOf("model")
+            instance -> instance.group(Identifier.CODEC.fieldOf("model")
                     .forGetter(com.zurrtum.create.client.infrastructure.model.SandPaperModel.Unbaked::model))
                 .apply(instance, com.zurrtum.create.client.infrastructure.model.SandPaperModel.Unbaked::new));
 

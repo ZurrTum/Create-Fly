@@ -1,6 +1,6 @@
 package com.zurrtum.create.client.ponder.api.registration;
 
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 public interface MultiTagBuilder {
 
@@ -12,7 +12,7 @@ public interface MultiTagBuilder {
 
     interface Component {
 
-        Component add(ResourceLocation tag);
+        Component add(Identifier tag);
 
     }
 

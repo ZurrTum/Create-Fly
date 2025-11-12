@@ -18,7 +18,7 @@ import com.zurrtum.create.infrastructure.packet.c2s.TrainEditPacket;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Renderable;
 import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 import java.lang.ref.WeakReference;
 import java.util.List;
@@ -27,7 +27,7 @@ public class AssemblyScreen extends AbstractStationScreen {
 
     private IconButton quitAssembly;
     private IconButton toggleAssemblyButton;
-    private List<ResourceLocation> iconTypes;
+    private List<Identifier> iconTypes;
     private ScrollInput iconTypeScroll;
 
     public AssemblyScreen(StationBlockEntity be, GlobalStation station) {
@@ -161,7 +161,7 @@ public class AssemblyScreen extends AbstractStationScreen {
         super.removed();
         Train train = displayedTrain.get();
         if (train != null) {
-            ResourceLocation iconId = iconTypes.get(iconTypeScroll.getState());
+            Identifier iconId = iconTypes.get(iconTypeScroll.getState());
             train.icon = TrainIconType.byId(iconId);
             minecraft.player.connection.send(new TrainEditPacket(train.id, "", iconId, train.mapColorIndex));
         }

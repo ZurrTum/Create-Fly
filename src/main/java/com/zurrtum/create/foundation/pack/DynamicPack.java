@@ -4,7 +4,7 @@ import com.google.gson.JsonElement;
 import com.zurrtum.create.Create;
 import net.minecraft.SharedConstants;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.PackLocationInfo;
 import net.minecraft.server.packs.PackResources;
 import net.minecraft.server.packs.PackType;
@@ -37,25 +37,25 @@ public class DynamicPack implements PackResources {
         packLocationInfo = new PackLocationInfo(packId, Component.literal(packId), PackSource.BUILT_IN, Optional.empty());
     }
 
-    private static String getPath(PackType packType, ResourceLocation identifier) {
+    private static String getPath(PackType packType, Identifier identifier) {
         return packType.getDirectory() + "/" + identifier.getNamespace() + "/" + identifier.getPath();
     }
 
-    public DynamicPack put(ResourceLocation location, IoSupplier<InputStream> stream) {
+    public DynamicPack put(Identifier location, IoSupplier<InputStream> stream) {
         files.put(getPath(packType, location), stream);
         return this;
     }
 
-    public DynamicPack put(ResourceLocation location, byte[] bytes) {
+    public DynamicPack put(Identifier location, byte[] bytes) {
         return put(location, () -> new ByteArrayInputStream(bytes));
     }
 
-    public DynamicPack put(ResourceLocation location, String string) {
+    public DynamicPack put(Identifier location, String string) {
         return put(location, string.getBytes(StandardCharsets.UTF_8));
     }
 
     // Automatically suffixes the Identifier with .json
-    public DynamicPack put(ResourceLocation location, JsonElement json) {
+    public DynamicPack put(Identifier location, JsonElement json) {
         return put(location.withSuffix(".json"), Create.GSON.toJson(json));
     }
 
@@ -69,13 +69,13 @@ public class DynamicPack implements PackResources {
     }
 
     @Override
-    public @Nullable IoSupplier<InputStream> getResource(@NotNull PackType packType, @NotNull ResourceLocation identifier) {
+    public @Nullable IoSupplier<InputStream> getResource(@NotNull PackType packType, @NotNull Identifier identifier) {
         return files.getOrDefault(getPath(packType, identifier), null);
     }
 
     @Override
     public void listResources(@NotNull PackType packType, @NotNull String namespace, @NotNull String path, @NotNull ResourceOutput resourceOutput) {
-        ResourceLocation identifier = ResourceLocation.fromNamespaceAndPath(namespace, path);
+        Identifier identifier = Identifier.fromNamespaceAndPath(namespace, path);
         String directoryAndNamespace = packType.getDirectory() + "/" + namespace + "/";
         String prefix = directoryAndNamespace + path + "/";
         files.forEach((filePath, streamSupplier) -> {

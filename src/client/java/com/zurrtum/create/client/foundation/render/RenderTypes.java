@@ -1,9 +1,11 @@
 package com.zurrtum.create.client.foundation.render;
 
 import com.mojang.blaze3d.systems.RenderSystem;
+
 import java.util.Optional;
 import java.util.function.BiFunction;
 import java.util.function.Function;
+
 import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.RenderPipelines;
@@ -11,7 +13,7 @@ import net.minecraft.client.renderer.RenderStateShard;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.texture.AbstractTexture;
 import net.minecraft.client.renderer.texture.TextureManager;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 import static com.zurrtum.create.Create.MOD_ID;
 
@@ -61,7 +63,8 @@ public class RenderTypes extends RenderStateShard {
         true,
         true,
         AllRenderPipelines.ADDITIVE,
-        RenderType.CompositeState.builder().setTextureState(BLOCK_SHEET).setLightmapState(LIGHTMAP).setOverlayState(OVERLAY).createCompositeState(true)
+        RenderType.CompositeState.builder().setTextureState(BLOCK_SHEET).setLightmapState(LIGHTMAP).setOverlayState(OVERLAY)
+            .createCompositeState(true)
     );
 
     private static final RenderType ADDITIVE2 = RenderType.create(
@@ -70,7 +73,8 @@ public class RenderTypes extends RenderStateShard {
         true,
         true,
         AllRenderPipelines.ADDITIVE2,
-        RenderType.CompositeState.builder().setTextureState(BLOCK_SHEET).setLightmapState(LIGHTMAP).setOverlayState(OVERLAY).createCompositeState(true)
+        RenderType.CompositeState.builder().setTextureState(BLOCK_SHEET).setLightmapState(LIGHTMAP).setOverlayState(OVERLAY)
+            .createCompositeState(true)
     );
 
     private static final RenderType ITEM_GLOWING_SOLID = RenderType.create(
@@ -79,7 +83,8 @@ public class RenderTypes extends RenderStateShard {
         true,
         false,
         AllRenderPipelines.GLOWING,
-        RenderType.CompositeState.builder().setTextureState(BLOCK_SHEET).setLightmapState(LIGHTMAP).setOverlayState(OVERLAY).createCompositeState(true)
+        RenderType.CompositeState.builder().setTextureState(BLOCK_SHEET).setLightmapState(LIGHTMAP).setOverlayState(OVERLAY)
+            .createCompositeState(true)
     );
 
     private static final RenderType ITEM_GLOWING_TRANSLUCENT = RenderType.create(
@@ -88,17 +93,18 @@ public class RenderTypes extends RenderStateShard {
         true,
         true,
         AllRenderPipelines.GLOWING_TRANSLUCENT,
-        RenderType.CompositeState.builder().setTextureState(BLOCK_SHEET).setLightmapState(LIGHTMAP).setOverlayState(OVERLAY).createCompositeState(true)
+        RenderType.CompositeState.builder().setTextureState(BLOCK_SHEET).setLightmapState(LIGHTMAP).setOverlayState(OVERLAY)
+            .createCompositeState(true)
     );
 
-    private static final Function<ResourceLocation, RenderType> CHAIN = Util.memoize((p_234330_) -> RenderType.create(
+    private static final Function<Identifier, RenderType> CHAIN = Util.memoize((p_234330_) -> RenderType.create(
         "chain_conveyor_chain",
         256,
         false,
         true,
         RenderPipelines.CUTOUT_MIPPED,
-        RenderType.CompositeState.builder().setTextureState(new TextureStateShard(p_234330_, true)).setLightmapState(LIGHTMAP).setOverlayState(OVERLAY)
-            .createCompositeState(false)
+        RenderType.CompositeState.builder().setTextureState(new TextureStateShard(p_234330_, true)).setLightmapState(LIGHTMAP)
+            .setOverlayState(OVERLAY).createCompositeState(false)
     ));
 
     public static RenderType entitySolidBlockMipped() {
@@ -125,9 +131,9 @@ public class RenderTypes extends RenderStateShard {
         return ADDITIVE2;
     }
 
-    public static BiFunction<ResourceLocation, Boolean, RenderType> TRAIN_MAP = Util.memoize(RenderTypes::getTrainMap);
+    public static BiFunction<Identifier, Boolean, RenderType> TRAIN_MAP = Util.memoize(RenderTypes::getTrainMap);
 
-    private static RenderType getTrainMap(ResourceLocation locationIn, boolean linearFiltering) {
+    private static RenderType getTrainMap(Identifier locationIn, boolean linearFiltering) {
         RenderType.CompositeState rendertype$state = RenderType.CompositeState.builder()
             .setTextureState(new FilterTexture(locationIn, linearFiltering, false)).setLightmapState(LIGHTMAP).createCompositeState(false);
         return RenderType.create("create_train_map", 256, false, true, RenderPipelines.TEXT, rendertype$state);
@@ -141,7 +147,7 @@ public class RenderTypes extends RenderStateShard {
         return ITEM_GLOWING_TRANSLUCENT;
     }
 
-    public static RenderType chain(ResourceLocation pLocation) {
+    public static RenderType chain(Identifier pLocation) {
         return CHAIN.apply(pLocation);
     }
 
@@ -156,10 +162,10 @@ public class RenderTypes extends RenderStateShard {
 
     private static class FilterTexture extends RenderStateShard.EmptyTextureStateShard {
         @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
-        private final Optional<ResourceLocation> id;
+        private final Optional<Identifier> id;
         private final boolean mipmap;
 
-        public FilterTexture(ResourceLocation id, boolean bilinear, boolean mipmap) {
+        public FilterTexture(Identifier id, boolean bilinear, boolean mipmap) {
             super(
                 () -> {
                     TextureManager textureManager = Minecraft.getInstance().getTextureManager();
@@ -179,7 +185,7 @@ public class RenderTypes extends RenderStateShard {
         }
 
         @Override
-        public Optional<ResourceLocation> cutoutTexture() {
+        public Optional<Identifier> cutoutTexture() {
             return this.id;
         }
     }

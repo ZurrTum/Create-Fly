@@ -11,15 +11,16 @@ import me.shedaniel.rei.api.common.entry.EntryIngredient;
 import me.shedaniel.rei.api.common.util.EntryIngredients;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.ExtraCodecs;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.RecipeHolder;
+
 import java.util.List;
 import java.util.Optional;
 
 public record MechanicalCraftingDisplay(
-    int width, int height, List<Optional<Ingredient>> inputs, EntryIngredient output, Optional<ResourceLocation> location
+    int width, int height, List<Optional<Ingredient>> inputs, EntryIngredient output, Optional<Identifier> location
 ) implements Display {
     public static final DisplaySerializer<MechanicalCraftingDisplay> SERIALIZER = DisplaySerializer.of(
         RecordCodecBuilder.mapCodec(instance -> instance.group(
@@ -27,7 +28,7 @@ public record MechanicalCraftingDisplay(
             Codec.INT.fieldOf("height").forGetter(MechanicalCraftingDisplay::height),
             ExtraCodecs.optionalEmptyMap(Ingredient.CODEC).listOf().fieldOf("inputs").forGetter(MechanicalCraftingDisplay::inputs),
             EntryIngredient.codec().fieldOf("output").forGetter(MechanicalCraftingDisplay::output),
-            ResourceLocation.CODEC.optionalFieldOf("location").forGetter(MechanicalCraftingDisplay::location)
+            Identifier.CODEC.optionalFieldOf("location").forGetter(MechanicalCraftingDisplay::location)
         ).apply(instance, MechanicalCraftingDisplay::new)), StreamCodec.composite(
             ByteBufCodecs.VAR_INT,
             MechanicalCraftingDisplay::width,
@@ -37,7 +38,7 @@ public record MechanicalCraftingDisplay(
             MechanicalCraftingDisplay::inputs,
             EntryIngredient.streamCodec(),
             MechanicalCraftingDisplay::output,
-            ResourceLocation.STREAM_CODEC.apply(ByteBufCodecs::optional),
+            Identifier.STREAM_CODEC.apply(ByteBufCodecs::optional),
             MechanicalCraftingDisplay::location,
             MechanicalCraftingDisplay::new
         )
@@ -47,7 +48,7 @@ public record MechanicalCraftingDisplay(
         this(entry.id().location(), entry.value());
     }
 
-    public MechanicalCraftingDisplay(ResourceLocation id, MechanicalCraftingRecipe recipe) {
+    public MechanicalCraftingDisplay(Identifier id, MechanicalCraftingRecipe recipe) {
         this(recipe.raw().width(), recipe.raw().height(), recipe.raw().ingredients(), EntryIngredients.of(recipe.result()), Optional.of(id));
     }
 
@@ -67,7 +68,7 @@ public record MechanicalCraftingDisplay(
     }
 
     @Override
-    public Optional<ResourceLocation> getDisplayLocation() {
+    public Optional<Identifier> getDisplayLocation() {
         return location;
     }
 

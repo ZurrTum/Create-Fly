@@ -7,15 +7,21 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.CreativeModeTab.ItemDisplayParameters;
 import net.minecraft.world.item.CreativeModeTab.Output;
 import net.minecraft.world.item.ItemStack;
 
 public class AllCreativeModeTabs {
-    public static final ResourceKey<CreativeModeTab> BASE_GROUP = ResourceKey.create(Registries.CREATIVE_MODE_TAB, ResourceLocation.fromNamespaceAndPath(MOD_ID, "base"));
-    public static final ResourceKey<CreativeModeTab> PALETTES_GROUP = ResourceKey.create(Registries.CREATIVE_MODE_TAB, ResourceLocation.fromNamespaceAndPath(MOD_ID, "palettes"));
+    public static final ResourceKey<CreativeModeTab> BASE_GROUP = ResourceKey.create(
+        Registries.CREATIVE_MODE_TAB,
+        Identifier.fromNamespaceAndPath(MOD_ID, "base")
+    );
+    public static final ResourceKey<CreativeModeTab> PALETTES_GROUP = ResourceKey.create(
+        Registries.CREATIVE_MODE_TAB,
+        Identifier.fromNamespaceAndPath(MOD_ID, "palettes")
+    );
 
     public static void register() {
         Registry.register(

@@ -32,7 +32,7 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -71,11 +71,12 @@ public class SpoutFillingCategory extends CreateCategory<RecipeHolder<FillingRec
                 PotionContents potion = stack.getOrDefault(DataComponents.POTION_CONTENTS, PotionContents.EMPTY);
                 BottleType bottleType = PotionFluidHandler.bottleTypeFromItem(stack.getItem());
                 recipes.add(new RecipeHolder<>(
-                    ResourceKey.create(Registries.RECIPE, ResourceLocation.fromNamespaceAndPath(MOD_ID, "filling_potions_" + i.getAndIncrement())), new FillingRecipe(
-                    stack,
-                    Ingredient.of(Items.GLASS_BOTTLE),
-                    PotionFluidHandler.getFluidIngredientFromPotion(potion, bottleType, BottleFluidInventory.CAPACITY)
-                )
+                    ResourceKey.create(Registries.RECIPE, Identifier.fromNamespaceAndPath(MOD_ID, "filling_potions_" + i.getAndIncrement())),
+                    new FillingRecipe(
+                        stack,
+                        Ingredient.of(Items.GLASS_BOTTLE),
+                        PotionFluidHandler.getFluidIngredientFromPotion(potion, bottleType, BottleFluidInventory.CAPACITY)
+                    )
                 ));
                 return;
             }
@@ -97,9 +98,9 @@ public class SpoutFillingCategory extends CreateCategory<RecipeHolder<FillingRec
                     if (!result.isEmpty()) {
                         Item item = stack.getItem();
                         if (!result.is(item)) {
-                            ResourceLocation itemName = BuiltInRegistries.ITEM.getKey(item);
-                            ResourceLocation fluidName = BuiltInRegistries.FLUID.getKey(fluid.getFluid());
-                            ResourceLocation id = ResourceLocation.fromNamespaceAndPath(
+                            Identifier itemName = BuiltInRegistries.ITEM.getKey(item);
+                            Identifier fluidName = BuiltInRegistries.FLUID.getKey(fluid.getFluid());
+                            Identifier id = Identifier.fromNamespaceAndPath(
                                 MOD_ID,
                                 "fill_" + itemName.getNamespace() + "_" + itemName.getPath() + "_with_" + fluidName.getNamespace() + "_" + fluidName.getPath()
                             );

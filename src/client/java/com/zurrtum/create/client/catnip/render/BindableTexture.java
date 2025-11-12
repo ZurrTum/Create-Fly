@@ -4,7 +4,7 @@ import com.mojang.blaze3d.textures.GpuTextureView;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.render.TextureSetup;
 import net.minecraft.client.renderer.texture.TextureManager;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 public interface BindableTexture {
 
@@ -14,6 +14,6 @@ public interface BindableTexture {
         return TextureSetup.singleTexture(gpuTextureView);
     }
 
-    ResourceLocation getLocation();
+    Identifier getLocation();
 
 }

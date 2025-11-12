@@ -9,7 +9,7 @@ import com.zurrtum.create.content.fluids.FluidTransportBehaviour;
 import com.zurrtum.create.content.kinetics.gantry.GantryShaftBlock;
 import com.zurrtum.create.content.logistics.box.PackageStyles.PackageStyle;
 import net.minecraft.core.Direction;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.DyeColor;
 
 import java.util.*;
@@ -184,12 +184,12 @@ public class AllPartialModels {
     public static final Map<Direction, PartialModel> METAL_GIRDER_BRACKETS = new EnumMap<>(Direction.class);
     public static final Map<DyeColor, PartialModel> TOOLBOX_LIDS = new EnumMap<>(DyeColor.class);
     public static final Map<DyeColor, PartialModel> DYED_VALVE_HANDLES = new EnumMap<>(DyeColor.class);
-    public static final Map<ResourceLocation, Couple<PartialModel>> FOLDING_DOORS = new HashMap<>();
+    public static final Map<Identifier, Couple<PartialModel>> FOLDING_DOORS = new HashMap<>();
     public static final List<PartialModel> CONTRAPTION_CONTROLS_INDICATOR = new ArrayList<>();
 
-    public static final Map<ResourceLocation, PartialModel> PACKAGES = new HashMap<>();
+    public static final Map<Identifier, PartialModel> PACKAGES = new HashMap<>();
     public static final List<PartialModel> PACKAGES_TO_HIDE_AS = new ArrayList<>();
-    public static final Map<ResourceLocation, PartialModel> PACKAGE_RIGGING = new HashMap<>();
+    public static final Map<Identifier, PartialModel> PACKAGE_RIGGING = new HashMap<>();
 
     public static final Map<GantryShaftKey, PartialModel> GANTRY_SHAFTS = new HashMap<>();
 
@@ -219,7 +219,7 @@ public class AllPartialModels {
         putFoldingDoor("copper_door");
 
         for (PackageStyle style : AllPackageStyles.ALL) {
-            ResourceLocation key = style.getItemId();
+            Identifier key = style.getItemId();
             PartialModel model = PartialModel.of(style.getModel());
             PACKAGES.put(key, model);
             if (!style.rare())
@@ -238,7 +238,7 @@ public class AllPartialModels {
     }
 
     public record GantryShaftKey(GantryShaftBlock.Part part, boolean powered, boolean flipped) {
-        private ResourceLocation name() {
+        private Identifier name() {
             String partName = part.getSerializedName();
 
             if (!(flipped || powered)) {

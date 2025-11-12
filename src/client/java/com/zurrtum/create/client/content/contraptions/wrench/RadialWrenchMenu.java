@@ -25,13 +25,14 @@ import org.joml.Matrix3x2f;
 import org.joml.Matrix3x2fStack;
 
 import java.util.*;
+
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.HopperBlock;
@@ -54,7 +55,7 @@ public class RadialWrenchMenu extends AbstractSimiScreen {
         registerRotationProperty(SequencedGearshiftBlock.VERTICAL, "Vertical");
     }
 
-    public static final Set<ResourceLocation> BLOCK_BLACKLIST = new HashSet<>();
+    public static final Set<Identifier> BLOCK_BLACKLIST = new HashSet<>();
 
     static {
         registerBlacklistedBlock(BuiltInRegistries.BLOCK.getKey(AllBlocks.LARGE_WATER_WHEEL));
@@ -68,7 +69,7 @@ public class RadialWrenchMenu extends AbstractSimiScreen {
         VALID_PROPERTIES.put(property, label);
     }
 
-    public static void registerBlacklistedBlock(ResourceLocation location) {
+    public static void registerBlacklistedBlock(Identifier location) {
         if (BLOCK_BLACKLIST.contains(location))
             return;
 
@@ -291,13 +292,7 @@ public class RadialWrenchMenu extends AbstractSimiScreen {
             ));
 
             if (i == selectedStateIndex) {
-                graphics.drawCenteredString(
-                    font,
-                    blockState.getValue(property).toString(),
-                    0,
-                    15,
-                    UIRenderHelper.COLOR_TEXT.getFirst().getRGB()
-                );
+                graphics.drawCenteredString(font, blockState.getValue(property).toString(), 0, 15, UIRenderHelper.COLOR_TEXT.getFirst().getRGB());
             }
 
             poseStack.popMatrix();

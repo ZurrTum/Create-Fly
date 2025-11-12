@@ -18,13 +18,14 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Iterator;
 import java.util.Optional;
 import java.util.Random;
+
 import net.minecraft.core.Direction.Axis;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.storage.ValueInput;
@@ -193,7 +194,7 @@ public class CarriageBogey {
         points.getSecond().write(list.addChild(), dimensions);
         view.putBoolean("UpsideDown", upsideDown);
         bogeyData.putBoolean(UPSIDE_DOWN_KEY, upsideDown);
-        bogeyData.store(BOGEY_STYLE_KEY, ResourceLocation.CODEC, getStyle().id);
+        bogeyData.store(BOGEY_STYLE_KEY, Identifier.CODEC, getStyle().id);
         view.store(BOGEY_DATA_KEY, CompoundTag.CODEC, bogeyData);
     }
 
@@ -206,7 +207,7 @@ public class CarriageBogey {
         map.add("Points", list.build(empty));
         map.add("UpsideDown", ops.createBoolean(input.upsideDown));
         input.bogeyData.putBoolean(UPSIDE_DOWN_KEY, input.upsideDown);
-        input.bogeyData.store(BOGEY_STYLE_KEY, ResourceLocation.CODEC, input.getStyle().id);
+        input.bogeyData.store(BOGEY_STYLE_KEY, Identifier.CODEC, input.getStyle().id);
         map.add(BOGEY_DATA_KEY, input.bogeyData, CompoundTag.CODEC);
         return map.build(empty);
     }
@@ -233,7 +234,7 @@ public class CarriageBogey {
     }
 
     public BogeyStyle getStyle() {
-        Optional<ResourceLocation> location = bogeyData.read(BOGEY_STYLE_KEY, ResourceLocation.CODEC);
+        Optional<Identifier> location = bogeyData.read(BOGEY_STYLE_KEY, Identifier.CODEC);
         if (location.isEmpty()) {
             return AllBogeyStyles.STANDARD;
         }
@@ -248,7 +249,7 @@ public class CarriageBogey {
     private CompoundTag createBogeyData() {
         BogeyStyle style = type != null ? type.getDefaultStyle() : AllBogeyStyles.STANDARD;
         CompoundTag nbt = style.defaultData != null ? style.defaultData : new CompoundTag();
-        nbt.store(BOGEY_STYLE_KEY, ResourceLocation.CODEC, style.id);
+        nbt.store(BOGEY_STYLE_KEY, Identifier.CODEC, style.id);
         nbt.putBoolean(UPSIDE_DOWN_KEY, isUpsideDown());
         return nbt;
     }

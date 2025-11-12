@@ -4,7 +4,7 @@ import com.zurrtum.create.content.trains.entity.Train;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.Level;
 
 public abstract class TimedWaitCondition extends ScheduleWaitCondition {
@@ -35,7 +35,7 @@ public abstract class TimedWaitCondition extends ScheduleWaitCondition {
         return getValue() * getUnit().ticksPer;
     }
 
-    public TimedWaitCondition(ResourceLocation id) {
+    public TimedWaitCondition(Identifier id) {
         super(id);
         data.putInt("Value", 5);
         data.putInt("TimeUnit", TimeUnit.SECONDS.ordinal());

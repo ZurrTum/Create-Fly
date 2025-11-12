@@ -17,13 +17,15 @@ import com.zurrtum.create.content.kinetics.mixer.PotionRecipe;
 import com.zurrtum.create.content.kinetics.press.PressingRecipe;
 import com.zurrtum.create.content.kinetics.saw.CuttingRecipe;
 import com.zurrtum.create.content.processing.sequenced.SequencedAssemblyRecipe;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Predicate;
+
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.RecipeHolder;
@@ -53,7 +55,7 @@ public class AllRecipeTypes {
 
     private static final TagKey<RecipeSerializer<?>> AUTOMATION_IGNORE_TAG = TagKey.create(
         Registries.RECIPE_SERIALIZER,
-        ResourceLocation.fromNamespaceAndPath(MOD_ID, "automation_ignore")
+        Identifier.fromNamespaceAndPath(MOD_ID, "automation_ignore")
     );
     public static final Predicate<RecipeHolder<?>> CAN_BE_AUTOMATED = r -> !r.id().location().getPath().endsWith("_manual_only");
 
@@ -65,7 +67,7 @@ public class AllRecipeTypes {
     }
 
     private static <T extends Recipe<?>> RecipeType<T> register(String name) {
-        ResourceLocation id = ResourceLocation.fromNamespaceAndPath(MOD_ID, name);
+        Identifier id = Identifier.fromNamespaceAndPath(MOD_ID, name);
         return Registry.register(
             BuiltInRegistries.RECIPE_TYPE, id, new RecipeType<T>() {
                 public String toString() {

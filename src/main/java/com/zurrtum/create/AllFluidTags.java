@@ -3,7 +3,7 @@ package com.zurrtum.create;
 import static com.zurrtum.create.Create.MOD_ID;
 
 import net.minecraft.core.registries.Registries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.level.material.Fluid;
 
@@ -20,11 +20,11 @@ public class AllFluidTags {
     public static final TagKey<Fluid> CREOSOTE = register("c", "creosote");
 
     private static TagKey<Fluid> register(String name) {
-        return TagKey.create(Registries.FLUID, ResourceLocation.fromNamespaceAndPath(MOD_ID, name));
+        return TagKey.create(Registries.FLUID, Identifier.fromNamespaceAndPath(MOD_ID, name));
     }
 
     private static TagKey<Fluid> register(String namespace, String name) {
-        return TagKey.create(Registries.FLUID, ResourceLocation.fromNamespaceAndPath(namespace, name));
+        return TagKey.create(Registries.FLUID, Identifier.fromNamespaceAndPath(namespace, name));
     }
 
     public static void register() {

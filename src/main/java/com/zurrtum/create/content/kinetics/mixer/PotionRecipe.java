@@ -17,7 +17,7 @@ import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.flag.FeatureFlagSet;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -39,7 +39,7 @@ public record PotionRecipe(FluidStack result, FluidIngredient fluidIngredient, I
     public static final List<Item> SUPPORTED_CONTAINERS = List.of(Items.POTION, Items.SPLASH_POTION, Items.LINGERING_POTION);
     public static ReloadData data;
 
-    public static void register(Map<ResourceLocation, Recipe<?>> map) {
+    public static void register(Map<Identifier, Recipe<?>> map) {
         if (data == null) {
             return;
         }
@@ -56,7 +56,7 @@ public record PotionRecipe(FluidStack result, FluidIngredient fluidIngredient, I
             for (PotionBrewing.Mix<Potion> mix : potionBrewing.potionMixes) {
                 FluidIngredient fromFluid = PotionFluidHandler.getFluidIngredientFromPotion(new PotionContents(mix.from()), bottleType, 81000);
                 FluidStack toFluid = PotionFluidHandler.getFluidFromPotion(new PotionContents(mix.to()), bottleType, 81000);
-                ResourceLocation id = ResourceLocation.fromNamespaceAndPath(MOD_ID, "potion_mixing_vanilla_" + recipeIndex++);
+                Identifier id = Identifier.fromNamespaceAndPath(MOD_ID, "potion_mixing_vanilla_" + recipeIndex++);
                 map.put(id, new PotionRecipe(toFluid, fromFluid, mix.ingredient()));
             }
         }
@@ -78,7 +78,7 @@ public record PotionRecipe(FluidStack result, FluidIngredient fluidIngredient, I
             for (Reference<Potion> potion : potions) {
                 FluidIngredient fromFluid = PotionFluidHandler.getFluidIngredientFromPotion(new PotionContents(potion), fromBottleType, 81000);
                 FluidStack toFluid = PotionFluidHandler.getFluidFromPotion(new PotionContents(potion), toBottleType, 81000);
-                ResourceLocation id = ResourceLocation.fromNamespaceAndPath(MOD_ID, "potion_mixing_vanilla_" + recipeIndex++);
+                Identifier id = Identifier.fromNamespaceAndPath(MOD_ID, "potion_mixing_vanilla_" + recipeIndex++);
                 map.put(id, new PotionRecipe(toFluid, fromFluid, ingredient));
             }
         }

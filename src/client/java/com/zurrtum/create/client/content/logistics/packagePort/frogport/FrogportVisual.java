@@ -10,7 +10,7 @@ import com.zurrtum.create.client.flywheel.lib.visual.AbstractBlockEntityVisual;
 import com.zurrtum.create.client.flywheel.lib.visual.SimpleDynamicVisual;
 import com.zurrtum.create.content.logistics.packagePort.frogport.FrogportBlockEntity;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.Vec3;
@@ -167,7 +167,7 @@ public class FrogportVisual extends AbstractBlockEntityVisual<FrogportBlockEntit
             box.handle().setVisible(false);
             return;
         }
-        ResourceLocation key = BuiltInRegistries.ITEM.getKey(blockEntity.animatedPackage.getItem());
+        Identifier key = BuiltInRegistries.ITEM.getKey(blockEntity.animatedPackage.getItem());
         if (key == BuiltInRegistries.ITEM.getDefaultKey()) {
             rig.handle().setVisible(false);
             box.handle().setVisible(false);

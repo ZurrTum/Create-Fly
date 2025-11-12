@@ -17,10 +17,11 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import net.minecraft.resources.ResourceLocation;
+
+import net.minecraft.resources.Identifier;
 
 public class FailedCompilation {
-    public static final ResourceLocation GENERATED_SOURCE_NAME = ResourceUtil.rl("generated_source");
+    public static final Identifier GENERATED_SOURCE_NAME = ResourceUtil.rl("generated_source");
     private static final Pattern PATTERN_ONE = Pattern.compile("(\\d+)\\((\\d+)\\) : (.*)");
     private static final Pattern PATTERN_TWO = Pattern.compile("(\\w+): (\\d+):(\\d+):(?: '(.+?)' :)?(.*)");
     private final List<SourceFile> files;

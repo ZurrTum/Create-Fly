@@ -2,21 +2,23 @@ package com.zurrtum.create.foundation.advancement;
 
 import com.google.common.collect.Maps;
 import com.mojang.serialization.Codec;
+
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+
 import net.minecraft.advancements.CriterionTrigger;
 import net.minecraft.advancements.CriterionTriggerInstance;
 import net.minecraft.advancements.critereon.CriterionValidator;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.PlayerAdvancements;
 import net.minecraft.server.level.ServerPlayer;
 
 public class CreateTrigger implements CriterionTrigger<CreateTrigger.Conditions> {
     public final Map<PlayerAdvancements, Set<Listener<Conditions>>> listeners = Maps.newHashMap();
-    public final ResourceLocation id;
+    public final Identifier id;
 
-    public CreateTrigger(ResourceLocation id) {
+    public CreateTrigger(Identifier id) {
         this.id = id;
     }
 

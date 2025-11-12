@@ -11,10 +11,12 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.zurrtum.create.client.model.StandardModelParameters;
 import com.zurrtum.create.client.model.UnbakedModelLoader;
+
 import java.io.FileNotFoundException;
 import java.util.Map;
+
 import net.minecraft.client.Minecraft;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.server.packs.resources.ResourceManagerReloadListener;
@@ -30,7 +32,7 @@ public class ObjLoader implements UnbakedModelLoader<ObjModel>, ResourceManagerR
     public static ObjLoader INSTANCE = new ObjLoader();
 
     private final Map<ObjGeometry.Settings, ObjGeometry> geometryCache = Maps.newConcurrentMap();
-    private final Map<ResourceLocation, ObjMaterialLibrary> materialCache = Maps.newConcurrentMap();
+    private final Map<Identifier, ObjMaterialLibrary> materialCache = Maps.newConcurrentMap();
 
     private final ResourceManager manager = Minecraft.getInstance().getResourceManager();
 
@@ -55,7 +57,7 @@ public class ObjLoader implements UnbakedModelLoader<ObjModel>, ResourceManagerR
         StandardModelParameters parameters = StandardModelParameters.parse(jsonObject, jsonDeserializationContext);
 
         var geometry = loadGeometry(new ObjGeometry.Settings(
-            ResourceLocation.parse(modelLocation),
+            Identifier.parse(modelLocation),
             automaticCulling,
             shadeQuads,
             flipV,
@@ -81,7 +83,7 @@ public class ObjLoader implements UnbakedModelLoader<ObjModel>, ResourceManagerR
         );
     }
 
-    public ObjMaterialLibrary loadMaterialLibrary(ResourceLocation materialLocation) {
+    public ObjMaterialLibrary loadMaterialLibrary(Identifier materialLocation) {
         return materialCache.computeIfAbsent(
             materialLocation, (location) -> {
                 Resource resource = manager.getResource(location).orElseThrow();

@@ -13,7 +13,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.ProblemReporter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.storage.TagValueInput;
@@ -28,7 +28,7 @@ public abstract class ScheduleInstruction extends ScheduleDataEntry {
         ScheduleInstruction::decode
     );
 
-    public ScheduleInstruction(ResourceLocation id) {
+    public ScheduleInstruction(Identifier id) {
         super(id);
     }
 
@@ -38,7 +38,7 @@ public abstract class ScheduleInstruction extends ScheduleDataEntry {
     public abstract DiscoveredPath start(ScheduleRuntime runtime, Level level);
 
     public final void write(ValueOutput view) {
-        view.store("Id", ResourceLocation.CODEC, id);
+        view.store("Id", Identifier.CODEC, id);
         try (ProblemReporter.ScopedCollector logging = new ProblemReporter.ScopedCollector(() -> "ScheduleInstruction", Create.LOGGER)) {
             TagValueOutput writeView = new TagValueOutput(logging, ((TagValueOutput) view).ops, data);
             writeAdditional(writeView);
@@ -49,7 +49,7 @@ public abstract class ScheduleInstruction extends ScheduleDataEntry {
     @SuppressWarnings("unchecked")
     public static <T> DataResult<T> encode(final ScheduleInstruction input, final DynamicOps<T> ops, final T empty) {
         RecordBuilder<T> map = ops.mapBuilder();
-        map.add("Id", input.id, ResourceLocation.CODEC);
+        map.add("Id", input.id, Identifier.CODEC);
         try (ProblemReporter.ScopedCollector logging = new ProblemReporter.ScopedCollector(() -> "ScheduleInstruction", Create.LOGGER)) {
             TagValueOutput view = new TagValueOutput(logging, (DynamicOps<Tag>) ops, input.data);
             input.writeAdditional(view);
@@ -59,7 +59,7 @@ public abstract class ScheduleInstruction extends ScheduleDataEntry {
     }
 
     public static ScheduleInstruction read(ValueInput view) {
-        ResourceLocation location = view.read("Id", ResourceLocation.CODEC).orElse(null);
+        Identifier location = view.read("Id", Identifier.CODEC).orElse(null);
         ScheduleInstruction scheduleDestination = AllSchedules.createScheduleInstruction(location);
         if (scheduleDestination == null) {
             return fallback(location);
@@ -72,7 +72,7 @@ public abstract class ScheduleInstruction extends ScheduleDataEntry {
 
     public static <T> ScheduleInstruction decode(DynamicOps<T> ops, T input) {
         MapLike<T> map = ops.getMap(input).getOrThrow();
-        ResourceLocation location = ResourceLocation.CODEC.parse(ops, map.get("Id")).getOrThrow();
+        Identifier location = Identifier.CODEC.parse(ops, map.get("Id")).getOrThrow();
         ScheduleInstruction scheduleDestination = AllSchedules.createScheduleInstruction(location);
         if (scheduleDestination == null) {
             return fallback(location);
@@ -85,7 +85,7 @@ public abstract class ScheduleInstruction extends ScheduleDataEntry {
         return scheduleDestination;
     }
 
-    private static ScheduleInstruction fallback(ResourceLocation location) {
+    private static ScheduleInstruction fallback(Identifier location) {
         Create.LOGGER.warn("Could not parse schedule instruction type: {}", location);
         return AllSchedules.createScheduleInstruction(AllSchedules.DESTINATION);
     }

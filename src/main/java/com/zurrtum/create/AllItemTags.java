@@ -2,9 +2,10 @@ package com.zurrtum.create;
 
 import java.util.HashMap;
 import java.util.Map;
+
 import net.minecraft.Util;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.DyeItem;
@@ -73,17 +74,17 @@ public class AllItemTags {
     public static final TagKey<Item> CURIOS_HEAD = register("curios", "head");
 
     private static TagKey<Item> register(String name) {
-        return TagKey.create(Registries.ITEM, ResourceLocation.fromNamespaceAndPath(MOD_ID, name));
+        return TagKey.create(Registries.ITEM, Identifier.fromNamespaceAndPath(MOD_ID, name));
     }
 
     private static TagKey<Item> register(String namespace, String name) {
-        return TagKey.create(Registries.ITEM, ResourceLocation.fromNamespaceAndPath(namespace, name));
+        return TagKey.create(Registries.ITEM, Identifier.fromNamespaceAndPath(namespace, name));
     }
 
     private static final Map<TagKey<Item>, DyeColor> dyesTag = Util.make(
         new HashMap<>(), map -> {
             for (DyeColor color : DyeColor.values()) {
-                map.put(TagKey.create(Registries.ITEM, ResourceLocation.fromNamespaceAndPath("c", "dyes/" + color.getName())), color);
+                map.put(TagKey.create(Registries.ITEM, Identifier.fromNamespaceAndPath("c", "dyes/" + color.getName())), color);
             }
         }
     );

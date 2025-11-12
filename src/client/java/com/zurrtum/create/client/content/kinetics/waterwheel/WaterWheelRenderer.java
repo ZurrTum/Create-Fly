@@ -17,6 +17,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.block.model.BlockModelPart;
@@ -30,7 +31,7 @@ import net.minecraft.core.Holder;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
@@ -39,9 +40,9 @@ import net.minecraft.world.level.block.state.BlockState;
 public class WaterWheelRenderer<T extends WaterWheelBlockEntity> extends KineticBlockEntityRenderer<T, KineticRenderState> {
     public static final SuperByteBufferCache.Compartment<ModelKey> WATER_WHEEL = new SuperByteBufferCache.Compartment<>();
 
-    public static final StitchedSprite OAK_PLANKS_TEMPLATE = new StitchedSprite(ResourceLocation.parse("block/oak_planks"));
-    public static final StitchedSprite OAK_LOG_TEMPLATE = new StitchedSprite(ResourceLocation.parse("block/oak_log"));
-    public static final StitchedSprite OAK_LOG_TOP_TEMPLATE = new StitchedSprite(ResourceLocation.parse("block/oak_log_top"));
+    public static final StitchedSprite OAK_PLANKS_TEMPLATE = new StitchedSprite(Identifier.parse("block/oak_planks"));
+    public static final StitchedSprite OAK_LOG_TEMPLATE = new StitchedSprite(Identifier.parse("block/oak_log"));
+    public static final StitchedSprite OAK_LOG_TOP_TEMPLATE = new StitchedSprite(Identifier.parse("block/oak_log_top"));
 
     protected final boolean large;
 
@@ -87,7 +88,7 @@ public class WaterWheelRenderer<T extends WaterWheelBlockEntity> extends Kinetic
 
     public static SimpleModelWrapper generateModel(SimpleModelWrapper template, BlockState planksBlockState) {
         Block planksBlock = planksBlockState.getBlock();
-        ResourceLocation id = RegisteredObjectsHelper.getKeyOrThrow(planksBlock);
+        Identifier id = RegisteredObjectsHelper.getKeyOrThrow(planksBlock);
         String wood = plankStateToWoodName(planksBlockState);
 
         if (wood == null)
@@ -107,7 +108,7 @@ public class WaterWheelRenderer<T extends WaterWheelBlockEntity> extends Kinetic
     @Nullable
     private static String plankStateToWoodName(BlockState planksBlockState) {
         Block planksBlock = planksBlockState.getBlock();
-        ResourceLocation id = RegisteredObjectsHelper.getKeyOrThrow(planksBlock);
+        Identifier id = RegisteredObjectsHelper.getKeyOrThrow(planksBlock);
         String path = id.getPath();
 
         if (path.endsWith("_planks")) // Covers most wood types
@@ -130,7 +131,7 @@ public class WaterWheelRenderer<T extends WaterWheelBlockEntity> extends Kinetic
         for (String location : LOG_LOCATIONS) {
             Optional<BlockState> state = BuiltInRegistries.BLOCK.get(ResourceKey.create(
                 Registries.BLOCK,
-                ResourceLocation.fromNamespaceAndPath(namespace, location.replace("x", wood))
+                Identifier.fromNamespaceAndPath(namespace, location.replace("x", wood))
             )).map(Holder::value).map(Block::defaultBlockState);
             if (state.isPresent())
                 return state.get();

@@ -13,18 +13,19 @@ import me.shedaniel.rei.api.common.entry.EntryIngredient;
 import me.shedaniel.rei.api.common.util.EntryIngredients;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.crafting.RecipeHolder;
+
 import java.util.List;
 import java.util.Optional;
 
-public record PotionDisplay(EntryIngredient input, FluidIngredient fluid, FluidStack output, Optional<ResourceLocation> location) implements Display {
+public record PotionDisplay(EntryIngredient input, FluidIngredient fluid, FluidStack output, Optional<Identifier> location) implements Display {
     public static final DisplaySerializer<PotionDisplay> SERIALIZER = DisplaySerializer.of(
         RecordCodecBuilder.mapCodec(instance -> instance.group(
             EntryIngredient.codec().fieldOf("input").forGetter(PotionDisplay::input),
             FluidIngredient.CODEC.fieldOf("fluid").forGetter(PotionDisplay::fluid),
             FluidStack.CODEC.fieldOf("output").forGetter(PotionDisplay::output),
-            ResourceLocation.CODEC.optionalFieldOf("location").forGetter(PotionDisplay::location)
+            Identifier.CODEC.optionalFieldOf("location").forGetter(PotionDisplay::location)
         ).apply(instance, PotionDisplay::new)), StreamCodec.composite(
             EntryIngredient.streamCodec(),
             PotionDisplay::input,
@@ -32,7 +33,7 @@ public record PotionDisplay(EntryIngredient input, FluidIngredient fluid, FluidS
             PotionDisplay::fluid,
             FluidStack.PACKET_CODEC,
             PotionDisplay::output,
-            ByteBufCodecs.optional(ResourceLocation.STREAM_CODEC),
+            ByteBufCodecs.optional(Identifier.STREAM_CODEC),
             PotionDisplay::location,
             PotionDisplay::new
         )
@@ -42,7 +43,7 @@ public record PotionDisplay(EntryIngredient input, FluidIngredient fluid, FluidS
         this(entry.id().location(), entry.value());
     }
 
-    public PotionDisplay(ResourceLocation id, PotionRecipe recipe) {
+    public PotionDisplay(Identifier id, PotionRecipe recipe) {
         this(EntryIngredients.ofIngredient(recipe.ingredient()), recipe.fluidIngredient(), recipe.result(), Optional.of(id));
     }
 
@@ -62,7 +63,7 @@ public record PotionDisplay(EntryIngredient input, FluidIngredient fluid, FluidS
     }
 
     @Override
-    public Optional<ResourceLocation> getDisplayLocation() {
+    public Optional<Identifier> getDisplayLocation() {
         return location;
     }
 

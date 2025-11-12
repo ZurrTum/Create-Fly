@@ -8,12 +8,14 @@ import com.zurrtum.create.client.flywheel.backend.glsl.GlslVersion;
 import com.zurrtum.create.client.flywheel.backend.glsl.ShaderSources;
 import com.zurrtum.create.client.flywheel.backend.glsl.SourceComponent;
 import com.zurrtum.create.client.flywheel.lib.util.StringUtil;
+
 import java.util.*;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
-import net.minecraft.resources.ResourceLocation;
+
+import net.minecraft.resources.Identifier;
 
 /**
  * A typed provider for shader compiler builders.
@@ -70,12 +72,12 @@ public class Compile<K> {
             return with((key, $) -> sourceFetcher.apply(key));
         }
 
-        public ShaderCompiler<K> withResource(Function<K, ResourceLocation> sourceFetcher) {
+        public ShaderCompiler<K> withResource(Function<K, Identifier> sourceFetcher) {
             return with((key, loader) -> loader.get(sourceFetcher.apply(key)));
         }
 
-        public ShaderCompiler<K> withResource(ResourceLocation resourceLocation) {
-            return withResource($ -> resourceLocation);
+        public ShaderCompiler<K> withResource(Identifier Identifier) {
+            return withResource($ -> Identifier);
         }
 
         public ShaderCompiler<K> onCompile(BiConsumer<K, Compilation> cb) {

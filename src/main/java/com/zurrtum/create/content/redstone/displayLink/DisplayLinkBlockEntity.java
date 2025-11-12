@@ -12,11 +12,13 @@ import com.zurrtum.create.content.logistics.factoryBoard.FactoryPanelPosition;
 import com.zurrtum.create.content.logistics.factoryBoard.FactoryPanelSupportBehaviour;
 import com.zurrtum.create.foundation.advancement.CreateTrigger;
 import com.zurrtum.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
+
 import java.util.List;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.ValueInput;
@@ -147,9 +149,9 @@ public class DisplayLinkBlockEntity extends LinkWithBulbBlockEntity implements T
         super.write(view, clientPacket);
         writeGatheredData(view);
         if (clientPacket && activeTarget != null) {
-            ResourceLocation id = CreateRegistries.DISPLAY_TARGET.getKey(this.activeTarget);
+            Identifier id = CreateRegistries.DISPLAY_TARGET.getKey(this.activeTarget);
             if (id != null) {
-                view.store("TargetType", ResourceLocation.CODEC, id);
+                view.store("TargetType", Identifier.CODEC, id);
             }
         }
     }
@@ -160,9 +162,9 @@ public class DisplayLinkBlockEntity extends LinkWithBulbBlockEntity implements T
 
         if (activeSource != null) {
             CompoundTag data = sourceConfig.copy();
-            ResourceLocation id = CreateRegistries.DISPLAY_SOURCE.getKey(this.activeSource);
+            Identifier id = CreateRegistries.DISPLAY_SOURCE.getKey(this.activeSource);
             if (id != null) {
-                data.store("Id", ResourceLocation.CODEC, id);
+                data.store("Id", Identifier.CODEC, id);
             }
             view.store("Source", CompoundTag.CODEC, data);
         }
@@ -175,10 +177,10 @@ public class DisplayLinkBlockEntity extends LinkWithBulbBlockEntity implements T
         targetLine = view.getIntOr("TargetLine", 0);
 
         if (clientPacket) {
-            view.read("TargetType", ResourceLocation.CODEC).ifPresent(id -> activeTarget = DisplayTarget.get(id));
+            view.read("TargetType", Identifier.CODEC).ifPresent(id -> activeTarget = DisplayTarget.get(id));
         }
         view.read("Source", CompoundTag.CODEC).ifPresent(data -> {
-            activeSource = DisplaySource.get(data.read("Id", ResourceLocation.CODEC).orElse(null));
+            activeSource = DisplaySource.get(data.read("Id", Identifier.CODEC).orElse(null));
             sourceConfig = activeSource != null ? data.copy() : new CompoundTag();
         });
     }

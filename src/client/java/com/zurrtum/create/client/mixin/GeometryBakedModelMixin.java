@@ -26,7 +26,7 @@ public class GeometryBakedModelMixin implements LayerBakedModel {
         this.blockRenderLayer = blockRenderLayer;
     }
 
-    @ModifyReturnValue(method = "bake(Lnet/minecraft/client/resources/model/ModelBaker;Lnet/minecraft/resources/ResourceLocation;Lnet/minecraft/client/resources/model/ModelState;)Lnet/minecraft/client/renderer/block/model/SimpleModelWrapper;", at = @At("RETURN"))
+    @ModifyReturnValue(method = "bake(Lnet/minecraft/client/resources/model/ModelBaker;Lnet/minecraft/resources/Identifier;Lnet/minecraft/client/resources/model/ModelState;)Lnet/minecraft/client/renderer/block/model/SimpleModelWrapper;", at = @At("RETURN"))
     private static SimpleModelWrapper addBlockRenderLayer(SimpleModelWrapper geometry, @Local ResolvedModel model) {
         return LayerUnbakedModel.setBlockRenderLayer(geometry, model);
     }

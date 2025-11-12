@@ -15,7 +15,7 @@ import net.minecraft.core.particles.BlockParticleOption;
 import net.minecraft.core.particles.DustParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -57,7 +57,7 @@ public class AllFanProcessingTypes {
     public static final SplashingType SPLASHING = register("splashing", new SplashingType());
 
     private static <T extends FanProcessingType> T register(String name, T type) {
-        return Registry.register(CreateRegistries.FAN_PROCESSING_TYPE, ResourceLocation.fromNamespaceAndPath(MOD_ID, name), type);
+        return Registry.register(CreateRegistries.FAN_PROCESSING_TYPE, Identifier.fromNamespaceAndPath(MOD_ID, name), type);
     }
 
     public static void register() {

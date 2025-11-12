@@ -11,18 +11,19 @@ import com.zurrtum.create.content.trains.schedule.ScheduleRuntime.State;
 import com.zurrtum.create.content.trains.station.GlobalPackagePort;
 import com.zurrtum.create.content.trains.station.GlobalStation;
 import net.minecraft.core.BlockPos;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.Container;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.regex.PatternSyntaxException;
 
 public class FetchPackagesInstruction extends TextScheduleInstruction {
-    public FetchPackagesInstruction(ResourceLocation id) {
+    public FetchPackagesInstruction(Identifier id) {
         super(id);
     }
 

@@ -21,7 +21,7 @@ import mezz.jei.api.recipe.types.IRecipeType;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.core.HolderSet;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -35,7 +35,7 @@ import java.util.Objects;
 
 public class BlockCuttingCategory extends CreateCategory<BlockCuttingDisplay> {
     public static List<BlockCuttingDisplay> getRecipes(RecipeMap preparedRecipes) {
-        Object2ObjectMap<Ingredient, Pair<ResourceLocation, List<ItemStack>>> map = new Object2ObjectOpenCustomHashMap<>(new Hash.Strategy<>() {
+        Object2ObjectMap<Ingredient, Pair<Identifier, List<ItemStack>>> map = new Object2ObjectOpenCustomHashMap<>(new Hash.Strategy<>() {
             public boolean equals(Ingredient ingredient, Ingredient other) {
                 return Objects.equals(ingredient, other);
             }
@@ -58,8 +58,8 @@ public class BlockCuttingCategory extends CreateCategory<BlockCuttingDisplay> {
             map.computeIfAbsent(recipe.input(), i -> Pair.of(entry.id().location(), new ArrayList<>())).getSecond().add(recipe.result());
         }
         List<BlockCuttingDisplay> recipes = new ArrayList<>();
-        for (Object2ObjectMap.Entry<Ingredient, Pair<ResourceLocation, List<ItemStack>>> entry : map.object2ObjectEntrySet()) {
-            Pair<ResourceLocation, List<ItemStack>> pair = entry.getValue();
+        for (Object2ObjectMap.Entry<Ingredient, Pair<Identifier, List<ItemStack>>> entry : map.object2ObjectEntrySet()) {
+            Pair<Identifier, List<ItemStack>> pair = entry.getValue();
             List<ItemStack> outputs = pair.getSecond();
             int size = outputs.size();
             if (size <= 15) {
@@ -81,7 +81,7 @@ public class BlockCuttingCategory extends CreateCategory<BlockCuttingDisplay> {
     }
 
     @Override
-    public ResourceLocation getRegistryName(BlockCuttingDisplay display) {
+    public Identifier getRegistryName(BlockCuttingDisplay display) {
         return display.id();
     }
 

@@ -17,7 +17,7 @@ import me.shedaniel.rei.plugin.common.displays.crafting.DefaultCustomShapedDispl
 import me.shedaniel.rei.plugin.common.displays.crafting.DefaultCustomShapelessDisplay;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.item.crafting.ShapedRecipe;
@@ -59,19 +59,19 @@ public interface AutoCompactingDisplay {
             RecordCodecBuilder.mapCodec(instance -> instance.group(
                 EntryIngredient.codec().listOf().fieldOf("inputs").forGetter(DefaultCraftingDisplay::getInputEntries),
                 EntryIngredient.codec().listOf().fieldOf("outputs").forGetter(DefaultCraftingDisplay::getOutputEntries),
-                ResourceLocation.CODEC.optionalFieldOf("location").forGetter(DefaultCraftingDisplay::getDisplayLocation)
+                Identifier.CODEC.optionalFieldOf("location").forGetter(DefaultCraftingDisplay::getDisplayLocation)
             ).apply(instance, ShapelessDisplay::new)), StreamCodec.composite(
                 EntryIngredient.streamCodec().apply(ByteBufCodecs.list()),
                 DefaultCraftingDisplay::getInputEntries,
                 EntryIngredient.streamCodec().apply(ByteBufCodecs.list()),
                 DefaultCraftingDisplay::getOutputEntries,
-                ByteBufCodecs.optional(ResourceLocation.STREAM_CODEC),
+                ByteBufCodecs.optional(Identifier.STREAM_CODEC),
                 DefaultCraftingDisplay::getDisplayLocation,
                 ShapelessDisplay::new
             )
         );
 
-        public ShapelessDisplay(List<EntryIngredient> input, List<EntryIngredient> output, Optional<ResourceLocation> location) {
+        public ShapelessDisplay(List<EntryIngredient> input, List<EntryIngredient> output, Optional<Identifier> location) {
             super(input, output, location);
         }
 
@@ -99,7 +99,7 @@ public interface AutoCompactingDisplay {
             RecordCodecBuilder.mapCodec(instance -> instance.group(
                 EntryIngredient.codec().listOf().fieldOf("inputs").forGetter(DefaultCraftingDisplay::getInputEntries),
                 EntryIngredient.codec().listOf().fieldOf("outputs").forGetter(DefaultCraftingDisplay::getOutputEntries),
-                ResourceLocation.CODEC.optionalFieldOf("location").forGetter(DefaultCraftingDisplay::getDisplayLocation),
+                Identifier.CODEC.optionalFieldOf("location").forGetter(DefaultCraftingDisplay::getDisplayLocation),
                 Codec.INT.fieldOf("width").forGetter(DefaultCraftingDisplay::getWidth),
                 Codec.INT.fieldOf("height").forGetter(DefaultCraftingDisplay::getHeight)
             ).apply(instance, ShapedDisplay::new)), StreamCodec.composite(
@@ -107,7 +107,7 @@ public interface AutoCompactingDisplay {
                 DefaultCraftingDisplay::getInputEntries,
                 EntryIngredient.streamCodec().apply(ByteBufCodecs.list()),
                 DefaultCraftingDisplay::getOutputEntries,
-                ByteBufCodecs.optional(ResourceLocation.STREAM_CODEC),
+                ByteBufCodecs.optional(Identifier.STREAM_CODEC),
                 DefaultCraftingDisplay::getDisplayLocation,
                 ByteBufCodecs.INT,
                 DefaultCraftingDisplay::getWidth,
@@ -127,7 +127,7 @@ public interface AutoCompactingDisplay {
             );
         }
 
-        public ShapedDisplay(List<EntryIngredient> input, List<EntryIngredient> output, Optional<ResourceLocation> location, int width, int height) {
+        public ShapedDisplay(List<EntryIngredient> input, List<EntryIngredient> output, Optional<Identifier> location, int width, int height) {
             super(input, output, location, width, height);
         }
 

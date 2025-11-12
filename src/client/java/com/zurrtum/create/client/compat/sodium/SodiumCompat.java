@@ -16,10 +16,11 @@ import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.client.resources.model.AtlasManager;
 import net.minecraft.client.resources.model.Material;
 import net.minecraft.core.BlockPos;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.FluidState;
+
 import java.util.HashSet;
 import java.util.Set;
 
@@ -29,17 +30,14 @@ import java.util.Set;
 @SuppressWarnings("deprecation")
 public class SodiumCompat {
     private static final boolean DISABLE = !FabricLoader.getInstance().isModLoaded("sodium");
-    public static final Material SAW_TEXTURE = new Material(
-        TextureAtlas.LOCATION_BLOCKS,
-        Create.asResource("block/saw_reversed")
-    );
+    public static final Material SAW_TEXTURE = new Material(TextureAtlas.LOCATION_BLOCKS, Create.asResource("block/saw_reversed"));
     public static final Material FACTORY_PANEL_TEXTURE = new Material(
         TextureAtlas.LOCATION_BLOCKS,
         Create.asResource("block/factory_panel_connections_animated")
     );
     public static final Material SAW_VANILLA_TEXTURE = new Material(
         TextureAtlas.LOCATION_BLOCKS,
-        ResourceLocation.withDefaultNamespace("block/stonecutter_saw")
+        Identifier.withDefaultNamespace("block/stonecutter_saw")
     );
 
     @SuppressWarnings("UnstableApiUsage")

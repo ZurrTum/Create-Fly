@@ -13,7 +13,7 @@ import com.zurrtum.create.client.ponder.foundation.PonderScene;
 import com.zurrtum.create.client.ponder.foundation.ui.PonderUI;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec2;
 import net.minecraft.world.phys.Vec3;
@@ -24,7 +24,7 @@ public class InputWindowElement extends AnimatedOverlayElementBase {
 
     private final Vec3 sceneSpace;
     private final Pointing direction;
-    @Nullable ResourceLocation key;
+    @Nullable Identifier key;
     @Nullable ScreenElement icon;
     @Nullable GuiItemRenderBuilder item;
 

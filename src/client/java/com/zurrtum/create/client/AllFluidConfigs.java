@@ -17,7 +17,7 @@ import net.minecraft.client.resources.model.Material;
 import net.minecraft.core.component.DataComponentPatch;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.alchemy.PotionContents;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.FluidState;
@@ -60,7 +60,7 @@ public class AllFluidConfigs {
 
     @SuppressWarnings("deprecation")
     private static void config(FlowableFluid fluid, int fogColor, Supplier<Float> fogDistance, Function<DataComponentPatch, Integer> tint) {
-        ResourceLocation id = BuiltInRegistries.FLUID.getKey(fluid).withPrefix("fluid/");
+        Identifier id = BuiltInRegistries.FLUID.getKey(fluid).withPrefix("fluid/");
         FluidConfig config = new FluidConfig(
             () -> Minecraft.getInstance().getAtlasManager().get(new Material(TextureAtlas.LOCATION_BLOCKS, id.withSuffix("_still"))),
             () -> Minecraft.getInstance().getAtlasManager().get(new Material(TextureAtlas.LOCATION_BLOCKS, id.withSuffix("_flow"))),

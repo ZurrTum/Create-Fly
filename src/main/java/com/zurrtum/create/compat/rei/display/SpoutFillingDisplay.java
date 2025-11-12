@@ -18,11 +18,12 @@ import me.shedaniel.rei.api.common.util.EntryIngredients;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.RecipeHolder;
+
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
@@ -30,15 +31,15 @@ import java.util.stream.Stream;
 import static com.zurrtum.create.Create.MOD_ID;
 
 public record SpoutFillingDisplay(
-    EntryIngredient input, EntryIngredient fluid, EntryIngredient output, Optional<ResourceLocation> location
+    EntryIngredient input, EntryIngredient fluid, EntryIngredient output, Optional<Identifier> location
 ) implements Display {
-    public static final ResourceLocation POTIONS = ResourceLocation.fromNamespaceAndPath(MOD_ID, "potions");
+    public static final Identifier POTIONS = Identifier.fromNamespaceAndPath(MOD_ID, "potions");
     public static final DisplaySerializer<SpoutFillingDisplay> SERIALIZER = DisplaySerializer.of(
         RecordCodecBuilder.mapCodec(instance -> instance.group(
             EntryIngredient.codec().fieldOf("input").forGetter(SpoutFillingDisplay::input),
             EntryIngredient.codec().fieldOf("fluid").forGetter(SpoutFillingDisplay::fluid),
             EntryIngredient.codec().fieldOf("output").forGetter(SpoutFillingDisplay::output),
-            ResourceLocation.CODEC.optionalFieldOf("location").forGetter(SpoutFillingDisplay::location)
+            Identifier.CODEC.optionalFieldOf("location").forGetter(SpoutFillingDisplay::location)
         ).apply(instance, SpoutFillingDisplay::new)), StreamCodec.composite(
             EntryIngredient.streamCodec(),
             SpoutFillingDisplay::input,
@@ -46,7 +47,7 @@ public record SpoutFillingDisplay(
             SpoutFillingDisplay::fluid,
             EntryIngredient.streamCodec(),
             SpoutFillingDisplay::output,
-            ByteBufCodecs.optional(ResourceLocation.STREAM_CODEC),
+            ByteBufCodecs.optional(Identifier.STREAM_CODEC),
             SpoutFillingDisplay::location,
             SpoutFillingDisplay::new
         )
@@ -56,7 +57,7 @@ public record SpoutFillingDisplay(
         this(entry.id().location(), entry.value());
     }
 
-    public SpoutFillingDisplay(ResourceLocation id, FillingRecipe recipe) {
+    public SpoutFillingDisplay(Identifier id, FillingRecipe recipe) {
         this(
             EntryIngredients.ofIngredient(recipe.ingredient()),
             IngredientHelper.createEntryIngredient(recipe.fluidIngredient()),
@@ -99,9 +100,9 @@ public record SpoutFillingDisplay(
                     if (!result.isEmpty()) {
                         Item item = stack.getItem();
                         if (!result.is(item)) {
-                            ResourceLocation itemName = BuiltInRegistries.ITEM.getKey(item);
-                            ResourceLocation fluidName = BuiltInRegistries.FLUID.getKey(fluid.getFluid());
-                            ResourceLocation id = ResourceLocation.fromNamespaceAndPath(
+                            Identifier itemName = BuiltInRegistries.ITEM.getKey(item);
+                            Identifier fluidName = BuiltInRegistries.FLUID.getKey(fluid.getFluid());
+                            Identifier id = Identifier.fromNamespaceAndPath(
                                 MOD_ID,
                                 "fill_" + itemName.getNamespace() + "_" + itemName.getPath() + "_with_" + fluidName.getNamespace() + "_" + fluidName.getPath()
                             );
@@ -135,7 +136,7 @@ public record SpoutFillingDisplay(
     }
 
     @Override
-    public Optional<ResourceLocation> getDisplayLocation() {
+    public Optional<Identifier> getDisplayLocation() {
         return location;
     }
 

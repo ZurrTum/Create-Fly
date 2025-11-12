@@ -3,11 +3,11 @@ package com.zurrtum.create.content.trains.schedule.condition;
 import com.zurrtum.create.content.trains.entity.Carriage;
 import com.zurrtum.create.content.trains.entity.Train;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.Level;
 
 public class IdleCargoCondition extends TimedWaitCondition {
-    public IdleCargoCondition(ResourceLocation id) {
+    public IdleCargoCondition(Identifier id) {
         super(id);
     }
 

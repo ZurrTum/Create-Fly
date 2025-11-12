@@ -5,19 +5,19 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
-public record ClickToLinkData(BlockPos selectedPos, ResourceLocation selectedDim) {
+public record ClickToLinkData(BlockPos selectedPos, Identifier selectedDim) {
     public static final Codec<ClickToLinkData> CODEC = RecordCodecBuilder.create(instance -> instance.group(
         BlockPos.CODEC.fieldOf("selected_pos")
             .forGetter(ClickToLinkData::selectedPos),
-        ResourceLocation.CODEC.fieldOf("selected_dim").forGetter(ClickToLinkData::selectedDim)
+        Identifier.CODEC.fieldOf("selected_dim").forGetter(ClickToLinkData::selectedDim)
     ).apply(instance, ClickToLinkData::new));
 
     public static final StreamCodec<FriendlyByteBuf, ClickToLinkData> STREAM_CODEC = StreamCodec.composite(
         BlockPos.STREAM_CODEC,
         ClickToLinkData::selectedPos,
-        ResourceLocation.STREAM_CODEC,
+        Identifier.STREAM_CODEC,
         ClickToLinkData::selectedDim,
         ClickToLinkData::new
     );

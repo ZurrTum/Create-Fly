@@ -11,7 +11,7 @@ import me.shedaniel.rei.api.common.entry.EntryIngredient;
 import me.shedaniel.rei.api.common.util.EntryIngredients;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.item.ItemStack;
@@ -21,18 +21,18 @@ import net.minecraft.world.level.Level;
 import java.util.List;
 import java.util.Optional;
 
-public record FanBlastingDisplay(EntryIngredient input, EntryIngredient output, Optional<ResourceLocation> location) implements Display {
+public record FanBlastingDisplay(EntryIngredient input, EntryIngredient output, Optional<Identifier> location) implements Display {
     public static final DisplaySerializer<FanBlastingDisplay> SERIALIZER = DisplaySerializer.of(
         RecordCodecBuilder.mapCodec(instance -> instance.group(
             EntryIngredient.codec().fieldOf("input").forGetter(FanBlastingDisplay::input),
             EntryIngredient.codec().fieldOf("output").forGetter(FanBlastingDisplay::output),
-            ResourceLocation.CODEC.optionalFieldOf("location").forGetter(FanBlastingDisplay::location)
+            Identifier.CODEC.optionalFieldOf("location").forGetter(FanBlastingDisplay::location)
         ).apply(instance, FanBlastingDisplay::new)), StreamCodec.composite(
             EntryIngredient.streamCodec(),
             FanBlastingDisplay::input,
             EntryIngredient.streamCodec(),
             FanBlastingDisplay::output,
-            ByteBufCodecs.optional(ResourceLocation.STREAM_CODEC),
+            ByteBufCodecs.optional(Identifier.STREAM_CODEC),
             FanBlastingDisplay::location,
             FanBlastingDisplay::new
         )
@@ -87,7 +87,7 @@ public record FanBlastingDisplay(EntryIngredient input, EntryIngredient output, 
     }
 
     @Override
-    public Optional<ResourceLocation> getDisplayLocation() {
+    public Optional<Identifier> getDisplayLocation() {
         return location;
     }
 

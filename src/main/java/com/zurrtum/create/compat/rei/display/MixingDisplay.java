@@ -12,22 +12,23 @@ import me.shedaniel.rei.api.common.entry.EntryIngredient;
 import me.shedaniel.rei.api.common.util.EntryIngredients;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.crafting.RecipeHolder;
+
 import java.util.List;
 import java.util.Optional;
 
 import static com.zurrtum.create.compat.rei.IngredientHelper.*;
 
 public record MixingDisplay(
-    List<EntryIngredient> inputs, EntryIngredient output, HeatCondition heat, Optional<ResourceLocation> location
+    List<EntryIngredient> inputs, EntryIngredient output, HeatCondition heat, Optional<Identifier> location
 ) implements Display {
     public static final DisplaySerializer<MixingDisplay> SERIALIZER = DisplaySerializer.of(
         RecordCodecBuilder.mapCodec(instance -> instance.group(
             EntryIngredient.codec().listOf().fieldOf("inputs").forGetter(MixingDisplay::inputs),
             EntryIngredient.codec().fieldOf("output").forGetter(MixingDisplay::output),
             HeatCondition.CODEC.fieldOf("heat").forGetter(MixingDisplay::heat),
-            ResourceLocation.CODEC.optionalFieldOf("location").forGetter(MixingDisplay::location)
+            Identifier.CODEC.optionalFieldOf("location").forGetter(MixingDisplay::location)
         ).apply(instance, MixingDisplay::new)), StreamCodec.composite(
             EntryIngredient.streamCodec().apply(ByteBufCodecs.list()),
             MixingDisplay::inputs,
@@ -35,7 +36,7 @@ public record MixingDisplay(
             MixingDisplay::output,
             HeatCondition.PACKET_CODEC,
             MixingDisplay::heat,
-            ByteBufCodecs.optional(ResourceLocation.STREAM_CODEC),
+            ByteBufCodecs.optional(Identifier.STREAM_CODEC),
             MixingDisplay::location,
             MixingDisplay::new
         )
@@ -45,7 +46,7 @@ public record MixingDisplay(
         this(entry.id().location(), entry.value());
     }
 
-    public MixingDisplay(ResourceLocation id, MixingRecipe recipe) {
+    public MixingDisplay(Identifier id, MixingRecipe recipe) {
         this(
             getEntryIngredients(getSizedIngredientStream(recipe.ingredients()), getFluidIngredientStream(recipe.fluidIngredients())),
             recipe.result().isEmpty() ? EntryIngredients.of(FluidStack.create(
@@ -73,7 +74,7 @@ public record MixingDisplay(
     }
 
     @Override
-    public Optional<ResourceLocation> getDisplayLocation() {
+    public Optional<Identifier> getDisplayLocation() {
         return location;
     }
 

@@ -5,7 +5,7 @@ import com.zurrtum.create.catnip.animation.LerpedFloat;
 import com.zurrtum.create.foundation.blockEntity.CachedRenderBBBlockEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
@@ -36,20 +36,20 @@ public abstract class AbstractBogeyBlockEntity extends CachedRenderBBBlockEntity
 
     public void setBogeyData(@NotNull CompoundTag newData) {
         if (!newData.contains(BOGEY_STYLE_KEY)) {
-            newData.store(BOGEY_STYLE_KEY, ResourceLocation.CODEC, getDefaultStyle().id);
+            newData.store(BOGEY_STYLE_KEY, Identifier.CODEC, getDefaultStyle().id);
         }
         bogeyData = newData;
     }
 
     public void setBogeyStyle(@NotNull BogeyStyle style) {
-        getBogeyData().store(BOGEY_STYLE_KEY, ResourceLocation.CODEC, style.id);
+        getBogeyData().store(BOGEY_STYLE_KEY, Identifier.CODEC, style.id);
         markUpdated();
     }
 
     @NotNull
     public BogeyStyle getStyle() {
         CompoundTag data = getBogeyData();
-        ResourceLocation currentStyle = data.read(BOGEY_STYLE_KEY, ResourceLocation.CODEC).orElseThrow();
+        Identifier currentStyle = data.read(BOGEY_STYLE_KEY, Identifier.CODEC).orElseThrow();
         BogeyStyle style = AllBogeyStyles.BOGEY_STYLES.get(currentStyle);
         if (style == null) {
             setBogeyStyle(getDefaultStyle());
@@ -74,7 +74,7 @@ public abstract class AbstractBogeyBlockEntity extends CachedRenderBBBlockEntity
 
     private CompoundTag createBogeyData() {
         CompoundTag nbt = new CompoundTag();
-        nbt.store(BOGEY_STYLE_KEY, ResourceLocation.CODEC, getDefaultStyle().id);
+        nbt.store(BOGEY_STYLE_KEY, Identifier.CODEC, getDefaultStyle().id);
         boolean upsideDown = false;
         if (getBlockState().getBlock() instanceof AbstractBogeyBlock<?> bogeyBlock)
             upsideDown = bogeyBlock.isUpsideDown(getBlockState());

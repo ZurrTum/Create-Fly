@@ -10,24 +10,25 @@ import me.shedaniel.rei.api.common.entry.EntryIngredient;
 import me.shedaniel.rei.api.common.util.EntryIngredients;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.item.crafting.SmokingRecipe;
+
 import java.util.List;
 import java.util.Optional;
 
-public record FanSmokingDisplay(EntryIngredient input, EntryIngredient output, Optional<ResourceLocation> location) implements Display {
+public record FanSmokingDisplay(EntryIngredient input, EntryIngredient output, Optional<Identifier> location) implements Display {
     public static final DisplaySerializer<FanSmokingDisplay> SERIALIZER = DisplaySerializer.of(
         RecordCodecBuilder.mapCodec(instance -> instance.group(
             EntryIngredient.codec().fieldOf("input").forGetter(FanSmokingDisplay::input),
             EntryIngredient.codec().fieldOf("output").forGetter(FanSmokingDisplay::output),
-            ResourceLocation.CODEC.optionalFieldOf("location").forGetter(FanSmokingDisplay::location)
+            Identifier.CODEC.optionalFieldOf("location").forGetter(FanSmokingDisplay::location)
         ).apply(instance, FanSmokingDisplay::new)), StreamCodec.composite(
             EntryIngredient.streamCodec(),
             FanSmokingDisplay::input,
             EntryIngredient.streamCodec(),
             FanSmokingDisplay::output,
-            ByteBufCodecs.optional(ResourceLocation.STREAM_CODEC),
+            ByteBufCodecs.optional(Identifier.STREAM_CODEC),
             FanSmokingDisplay::location,
             FanSmokingDisplay::new
         )
@@ -61,7 +62,7 @@ public record FanSmokingDisplay(EntryIngredient input, EntryIngredient output, O
     }
 
     @Override
-    public Optional<ResourceLocation> getDisplayLocation() {
+    public Optional<Identifier> getDisplayLocation() {
         return location;
     }
 

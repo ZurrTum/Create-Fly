@@ -7,8 +7,10 @@ import com.zurrtum.create.client.flywheel.backend.gl.array.VertexAttribute;
 import com.zurrtum.create.client.flywheel.lib.util.ResourceUtil;
 import com.zurrtum.create.client.flywheel.lib.vertex.FullVertexView;
 import com.zurrtum.create.client.flywheel.lib.vertex.VertexView;
+
 import java.util.List;
-import net.minecraft.resources.ResourceLocation;
+
+import net.minecraft.resources.Identifier;
 
 public final class InternalVertex {
     public static final Layout LAYOUT = LayoutBuilder.create().vector("position", FloatRepr.FLOAT, 3)
@@ -18,7 +20,7 @@ public final class InternalVertex {
     public static final List<VertexAttribute> ATTRIBUTES = LayoutAttributes.attributes(LAYOUT);
     public static final int STRIDE = LAYOUT.byteSize();
 
-    public static final ResourceLocation LAYOUT_SHADER = ResourceUtil.rl("internal/vertex_input.vert");
+    public static final Identifier LAYOUT_SHADER = ResourceUtil.rl("internal/vertex_input.vert");
 
     private InternalVertex() {
     }

@@ -7,13 +7,15 @@ import com.zurrtum.create.content.logistics.item.filter.attribute.SingletonItemA
 import com.zurrtum.create.content.logistics.item.filter.attribute.attributes.*;
 import com.zurrtum.create.foundation.fluid.FluidHelper;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
+
 import java.util.function.BiPredicate;
 import java.util.function.Predicate;
+
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
@@ -57,10 +59,7 @@ public class AllItemAttributeTypes {
     public static final ItemAttributeType SMELTABLE = singleton("smeltable", (s, w) -> testRecipe(s, w, RecipePropertySet.FURNACE_INPUT));
     public static final ItemAttributeType SMOKABLE = singleton("smokable", (s, w) -> testRecipe(s, w, RecipePropertySet.SMOKER_INPUT));
     public static final ItemAttributeType BLASTABLE = singleton("blastable", (s, w) -> testRecipe(s, w, RecipePropertySet.BLAST_FURNACE_INPUT));
-    public static final ItemAttributeType COMPOSTABLE = singleton(
-        "compostable",
-        s -> ComposterBlock.COMPOSTABLES.containsKey(s.getItem())
-    );
+    public static final ItemAttributeType COMPOSTABLE = singleton("compostable", s -> ComposterBlock.COMPOSTABLES.containsKey(s.getItem()));
 
     public static final ItemAttributeType IN_TAG = register("in_tag", new InTagAttribute.Type());
     public static final ItemAttributeType IN_ITEM_GROUP = register("in_item_group", new InItemGroupAttribute.Type());
@@ -95,7 +94,7 @@ public class AllItemAttributeTypes {
     }
 
     private static ItemAttributeType register(String id, ItemAttributeType type) {
-        return Registry.register(CreateRegistries.ITEM_ATTRIBUTE_TYPE, ResourceLocation.fromNamespaceAndPath(MOD_ID, id), type);
+        return Registry.register(CreateRegistries.ITEM_ATTRIBUTE_TYPE, Identifier.fromNamespaceAndPath(MOD_ID, id), type);
     }
 
     public static void register() {

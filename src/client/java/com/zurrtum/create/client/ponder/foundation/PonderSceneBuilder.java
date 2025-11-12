@@ -20,7 +20,7 @@ import net.minecraft.core.Vec3i;
 import net.minecraft.core.particles.DustParticleOptions;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.ItemStack;
@@ -96,7 +96,7 @@ public class PonderSceneBuilder implements SceneBuilder {
 
     @Override
     public void title(String sceneId, String title) {
-        scene.sceneId = ResourceLocation.fromNamespaceAndPath(scene.getNamespace(), sceneId);
+        scene.sceneId = Identifier.fromNamespaceAndPath(scene.getNamespace(), sceneId);
         scene.localization.registerSpecific(scene.sceneId, PonderScene.TITLE_KEY, title);
     }
 

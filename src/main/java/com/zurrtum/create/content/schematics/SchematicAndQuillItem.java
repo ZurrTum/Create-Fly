@@ -5,12 +5,14 @@ import com.zurrtum.create.Create;
 import com.zurrtum.create.catnip.nbt.NBTHelper;
 import com.zurrtum.create.catnip.registry.RegisteredObjectsHelper;
 import com.zurrtum.create.content.contraptions.glue.SuperGlueEntity;
+
 import java.util.Iterator;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.ProblemReporter;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.Item;
@@ -46,7 +48,7 @@ public class SchematicAndQuillItem extends Item {
             Tag tag = iterator.next();
             if (!(tag instanceof CompoundTag compoundtag))
                 continue;
-            if (compoundtag.getCompound("nbt").flatMap(compound -> compound.read("id", ResourceLocation.CODEC))
+            if (compoundtag.getCompound("nbt").flatMap(compound -> compound.read("id", Identifier.CODEC))
                 .map(id -> id.equals(EntityType.getKey(AllEntityTypes.SUPER_GLUE))).orElse(false)) {
                 iterator.remove();
             }

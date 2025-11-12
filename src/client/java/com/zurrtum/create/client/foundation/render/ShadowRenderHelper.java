@@ -8,7 +8,7 @@ import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.core.BlockPos;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.RenderShape;
@@ -22,7 +22,7 @@ import net.minecraft.world.phys.shapes.VoxelShape;
  */
 public class ShadowRenderHelper {
 
-    private static final RenderType SHADOW_LAYER = RenderType.entityShadow(ResourceLocation.withDefaultNamespace("textures/misc/shadow.png"));
+    private static final RenderType SHADOW_LAYER = RenderType.entityShadow(Identifier.withDefaultNamespace("textures/misc/shadow.png"));
 
     public static void renderShadow(PoseStack matrixStack, SubmitNodeCollector queue, float opacity, float radius) {
         queue.submitCustomGeometry(matrixStack, SHADOW_LAYER, new ShadowRenderState(opacity / 2, radius, -1 * radius));

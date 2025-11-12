@@ -13,20 +13,23 @@ import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 
 public class InItemGroupAttribute implements ItemAttribute {
-    public static final MapCodec<InItemGroupAttribute> CODEC = BuiltInRegistries.CREATIVE_MODE_TAB.byNameCodec().xmap(InItemGroupAttribute::new, i -> i.group)
-        .fieldOf("value");
+    public static final MapCodec<InItemGroupAttribute> CODEC = BuiltInRegistries.CREATIVE_MODE_TAB.byNameCodec()
+        .xmap(InItemGroupAttribute::new, i -> i.group).fieldOf("value");
 
-    public static final StreamCodec<ByteBuf, InItemGroupAttribute> PACKET_CODEC = CatnipStreamCodecBuilders.nullable(ResourceLocation.STREAM_CODEC)
-        .map(i -> new InItemGroupAttribute(BuiltInRegistries.CREATIVE_MODE_TAB.getValue(i)), i -> i.group == null ? null : BuiltInRegistries.CREATIVE_MODE_TAB.getKey(i.group));
+    public static final StreamCodec<ByteBuf, InItemGroupAttribute> PACKET_CODEC = CatnipStreamCodecBuilders.nullable(Identifier.STREAM_CODEC).map(
+        i -> new InItemGroupAttribute(BuiltInRegistries.CREATIVE_MODE_TAB.getValue(i)),
+        i -> i.group == null ? null : BuiltInRegistries.CREATIVE_MODE_TAB.getKey(i.group)
+    );
 
     @Nullable
     private CreativeModeTab group;

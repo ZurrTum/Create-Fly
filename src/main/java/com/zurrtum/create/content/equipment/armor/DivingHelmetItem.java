@@ -2,8 +2,10 @@ package com.zurrtum.create.content.equipment.armor;
 
 import com.google.common.collect.ImmutableList;
 import com.zurrtum.create.AllAdvancements;
+
 import java.util.List;
-import net.minecraft.resources.ResourceLocation;
+
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
@@ -23,9 +25,10 @@ import static com.zurrtum.create.Create.MOD_ID;
 public class DivingHelmetItem extends Item {
     public static final EquipmentSlot SLOT = EquipmentSlot.HEAD;
     public static final AttributeModifier SPEED_MODIFIER = new AttributeModifier(
-        ResourceLocation.fromNamespaceAndPath(MOD_ID, "netherite_diving_mining_speed"),
-        4,
-        AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL
+        Identifier.fromNamespaceAndPath(
+            MOD_ID,
+            "netherite_diving_mining_speed"
+        ), 4, AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL
     );
 
     public DivingHelmetItem(Properties settings) {
@@ -35,11 +38,8 @@ public class DivingHelmetItem extends Item {
     public static ItemAttributeModifiers createAttributeModifiers(ArmorMaterial material) {
         return new ItemAttributeModifiers(ImmutableList.<ItemAttributeModifiers.Entry>builder()
             .addAll(material.createAttributes(ArmorType.HELMET).modifiers())
-            .add(new ItemAttributeModifiers.Entry(
-                Attributes.SUBMERGED_MINING_SPEED,
-                DivingHelmetItem.SPEED_MODIFIER,
-                EquipmentSlotGroup.HEAD
-            )).build());
+            .add(new ItemAttributeModifiers.Entry(Attributes.SUBMERGED_MINING_SPEED, DivingHelmetItem.SPEED_MODIFIER, EquipmentSlotGroup.HEAD))
+            .build());
     }
 
     public static ItemStack getWornItem(Entity entity) {

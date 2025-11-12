@@ -24,7 +24,7 @@ import net.minecraft.client.renderer.special.SpecialModelRenderer;
 import net.minecraft.client.resources.model.BlockModelRotation;
 import net.minecraft.client.resources.model.ModelBaker;
 import net.minecraft.client.resources.model.ResolvedModel;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.ItemOwner;
 import net.minecraft.world.item.ItemDisplayContext;
@@ -41,11 +41,11 @@ import java.util.function.Supplier;
 import static com.zurrtum.create.Create.MOD_ID;
 
 public class SymmetryWandModel implements ItemModel, SpecialModelRenderer<Object> {
-    public static final ResourceLocation ID = ResourceLocation.fromNamespaceAndPath(MOD_ID, "model/wand_of_symmetry");
-    public static final ResourceLocation ITEM_ID = ResourceLocation.fromNamespaceAndPath(MOD_ID, "item/wand_of_symmetry/item");
-    public static final ResourceLocation CORE_ID = ResourceLocation.fromNamespaceAndPath(MOD_ID, "item/wand_of_symmetry/core");
-    public static final ResourceLocation CORE_GLOW_ID = ResourceLocation.fromNamespaceAndPath(MOD_ID, "item/wand_of_symmetry/core_glow");
-    public static final ResourceLocation BITS_ID = ResourceLocation.fromNamespaceAndPath(MOD_ID, "item/wand_of_symmetry/bits");
+    public static final Identifier ID = Identifier.fromNamespaceAndPath(MOD_ID, "model/wand_of_symmetry");
+    public static final Identifier ITEM_ID = Identifier.fromNamespaceAndPath(MOD_ID, "item/wand_of_symmetry/item");
+    public static final Identifier CORE_ID = Identifier.fromNamespaceAndPath(MOD_ID, "item/wand_of_symmetry/core");
+    public static final Identifier CORE_GLOW_ID = Identifier.fromNamespaceAndPath(MOD_ID, "item/wand_of_symmetry/core_glow");
+    public static final Identifier BITS_ID = Identifier.fromNamespaceAndPath(MOD_ID, "item/wand_of_symmetry/bits");
     private static final int[] TINTS = new int[0];
 
     private final ModelRenderProperties settings;
@@ -178,7 +178,7 @@ public class SymmetryWandModel implements ItemModel, SpecialModelRenderer<Object
             return new SymmetryWandModel(settings, quads, bake(baker, CORE_ID), bake(baker, CORE_GLOW_ID), bake(baker, BITS_ID));
         }
 
-        private static List<BakedQuad> bake(ModelBaker baker, ResourceLocation id) {
+        private static List<BakedQuad> bake(ModelBaker baker, Identifier id) {
             ResolvedModel model = baker.getModel(id);
             return model.bakeTopGeometry(model.getTopTextureSlots(), baker, BlockModelRotation.X0_Y0).getAll();
         }

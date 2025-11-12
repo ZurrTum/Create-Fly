@@ -7,15 +7,17 @@ import com.zurrtum.create.client.infrastructure.ponder.scenes.highLogistics.*;
 import com.zurrtum.create.client.infrastructure.ponder.scenes.trains.*;
 import com.zurrtum.create.client.ponder.api.registration.PonderSceneRegistrationHelper;
 import com.zurrtum.create.content.trains.track.TrackMaterial;
+
 import java.util.Arrays;
+
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 
 public class AllCreatePonderScenes {
 
-    public static void register(PonderSceneRegistrationHelper<ResourceLocation> helper) {
+    public static void register(PonderSceneRegistrationHelper<Identifier> helper) {
         PonderSceneRegistrationHelper<Item> HELPER = helper.withKeyFunction(BuiltInRegistries.ITEM::getKey);
 
         HELPER.forComponents(AllItems.SHAFT).addStoryBoard("shaft/relay", KineticsScenes::shaftAsRelay, AllCreatePonderTags.KINETIC_RELAYS);

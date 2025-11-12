@@ -8,18 +8,18 @@ import com.mojang.blaze3d.textures.GpuTextureView;
 import com.zurrtum.create.client.flywheel.backend.Samplers;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.AbstractTexture;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.opengl.GL12;
 
 public class TextureBinder {
-    public static void bind(ResourceLocation resourceLocation) {
-        GlStateManager._bindTexture(byName(resourceLocation));
+    public static void bind(Identifier Identifier) {
+        GlStateManager._bindTexture(byName(Identifier));
     }
 
-    public static void bindCrumbling(ResourceLocation resourceLocation) {
+    public static void bindCrumbling(Identifier Identifier) {
         Samplers.CRUMBLING.makeActive();
-        AbstractTexture texture = Minecraft.getInstance().getTextureManager().getTexture(resourceLocation);
+        AbstractTexture texture = Minecraft.getInstance().getTextureManager().getTexture(Identifier);
         setupTexture(texture.getTextureView());
     }
 
@@ -59,7 +59,7 @@ public class TextureBinder {
      * @param texture The texture's resource location.
      * @return The texture.
      */
-    public static int byName(ResourceLocation texture) {
+    public static int byName(Identifier texture) {
         return ((GlTexture) Minecraft.getInstance().getTextureManager().getTexture(texture).getTexture()).glId();
     }
 }

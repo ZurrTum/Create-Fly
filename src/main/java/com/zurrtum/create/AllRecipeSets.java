@@ -8,12 +8,14 @@ import com.zurrtum.create.content.kinetics.deployer.ManualApplicationRecipe;
 import com.zurrtum.create.content.kinetics.fan.processing.HauntingRecipe;
 import com.zurrtum.create.content.kinetics.fan.processing.SplashingRecipe;
 import com.zurrtum.create.content.kinetics.millstone.MillingRecipe;
+
 import java.util.IdentityHashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
+
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.RecipeManager;
@@ -34,7 +36,7 @@ public class AllRecipeSets {
     public static final ResourceKey<RecipePropertySet> MILLING = register("milling");
 
     private static ResourceKey<RecipePropertySet> register(String id) {
-        return ResourceKey.create(RecipePropertySet.TYPE_KEY, ResourceLocation.fromNamespaceAndPath(MOD_ID, id));
+        return ResourceKey.create(RecipePropertySet.TYPE_KEY, Identifier.fromNamespaceAndPath(MOD_ID, id));
     }
 
     @SuppressWarnings("unchecked")

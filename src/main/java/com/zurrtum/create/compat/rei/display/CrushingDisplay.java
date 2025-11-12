@@ -12,32 +12,33 @@ import me.shedaniel.rei.api.common.entry.EntryIngredient;
 import me.shedaniel.rei.api.common.util.EntryIngredients;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.RecipeHolder;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-public record CrushingDisplay(EntryIngredient input, List<ChanceOutput> outputs, Optional<ResourceLocation> location) implements Display {
+public record CrushingDisplay(EntryIngredient input, List<ChanceOutput> outputs, Optional<Identifier> location) implements Display {
     public static final DisplaySerializer<CrushingDisplay> SERIALIZER = DisplaySerializer.of(
         RecordCodecBuilder.mapCodec(instance -> instance.group(
             EntryIngredient.codec().fieldOf("input").forGetter(CrushingDisplay::input),
             ChanceOutput.CODEC.listOf().fieldOf("outputs").forGetter(CrushingDisplay::outputs),
-            ResourceLocation.CODEC.optionalFieldOf("location").forGetter(CrushingDisplay::location)
+            Identifier.CODEC.optionalFieldOf("location").forGetter(CrushingDisplay::location)
         ).apply(instance, CrushingDisplay::new)), StreamCodec.composite(
             EntryIngredient.streamCodec(),
             CrushingDisplay::input,
             ChanceOutput.PACKET_CODEC.apply(ByteBufCodecs.list()),
             CrushingDisplay::outputs,
-            ByteBufCodecs.optional(ResourceLocation.STREAM_CODEC),
+            ByteBufCodecs.optional(Identifier.STREAM_CODEC),
             CrushingDisplay::location,
             CrushingDisplay::new
         )
     );
 
     public static CrushingDisplay of(RecipeHolder<?> entry) {
-        ResourceLocation id = entry.id().location();
+        Identifier id = entry.id().location();
         Recipe<?> recipe = entry.value();
         if (recipe instanceof CrushingRecipe crushingRecipe) {
             return new CrushingDisplay(id, crushingRecipe);
@@ -47,11 +48,11 @@ public record CrushingDisplay(EntryIngredient input, List<ChanceOutput> outputs,
         return null;
     }
 
-    public CrushingDisplay(ResourceLocation id, CrushingRecipe recipe) {
+    public CrushingDisplay(Identifier id, CrushingRecipe recipe) {
         this(EntryIngredients.ofIngredient(recipe.ingredient()), recipe.results(), Optional.of(id));
     }
 
-    public CrushingDisplay(ResourceLocation id, MillingRecipe recipe) {
+    public CrushingDisplay(Identifier id, MillingRecipe recipe) {
         this(EntryIngredients.ofIngredient(recipe.ingredient()), recipe.results(), Optional.of(id));
     }
 
@@ -75,7 +76,7 @@ public record CrushingDisplay(EntryIngredient input, List<ChanceOutput> outputs,
     }
 
     @Override
-    public Optional<ResourceLocation> getDisplayLocation() {
+    public Optional<Identifier> getDisplayLocation() {
         return location;
     }
 

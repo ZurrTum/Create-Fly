@@ -3,8 +3,9 @@ package com.zurrtum.create.client.catnip.render;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Objects;
+
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 public class SpriteShiftEntry {
     @Nullable
@@ -12,17 +13,17 @@ public class SpriteShiftEntry {
     @Nullable
     protected StitchedSprite target;
 
-    public void set(ResourceLocation originalLocation, ResourceLocation targetLocation) {
+    public void set(Identifier originalLocation, Identifier targetLocation) {
         original = new StitchedSprite(originalLocation);
         target = new StitchedSprite(targetLocation);
     }
 
-    public ResourceLocation getOriginalResourceLocation() {
+    public Identifier getOriginalIdentifier() {
         Objects.requireNonNull(original);
         return original.getLocation();
     }
 
-    public ResourceLocation getTargetResourceLocation() {
+    public Identifier getTargetIdentifier() {
         Objects.requireNonNull(target);
         return target.getLocation();
     }

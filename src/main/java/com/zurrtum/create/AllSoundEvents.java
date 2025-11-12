@@ -6,7 +6,7 @@ import static net.minecraft.sounds.SoundSource.*;
 import net.minecraft.core.Registry;
 import net.minecraft.core.Vec3i;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.Entity;
@@ -87,7 +87,7 @@ public class AllSoundEvents {
         if (data.length == 0) {
             data = new float[]{1f, 1f};
         }
-        ResourceLocation id = ResourceLocation.fromNamespaceAndPath(MOD_ID, name);
+        Identifier id = Identifier.fromNamespaceAndPath(MOD_ID, name);
         int count = data.length / 2;
         CompiledSoundEvent[] compiledEvents = new CompiledSoundEvent[count];
         SoundEvent event = Registry.register(BuiltInRegistries.SOUND_EVENT, id, SoundEvent.createVariableRangeEvent(id));

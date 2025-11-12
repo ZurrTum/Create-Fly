@@ -101,12 +101,13 @@ import java.util.UUID;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.component.PatchedDataComponentMap;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.network.ServerGamePacketListenerImpl;
@@ -170,7 +171,12 @@ public class AllHandle {
         be.sendUpdate = true;
     }
 
-    private static void onBlockEntityConfiguration(ServerGamePacketListenerImpl listener, BlockPos pos, int distance, Predicate<BlockEntity> predicate) {
+    private static void onBlockEntityConfiguration(
+        ServerGamePacketListenerImpl listener,
+        BlockPos pos,
+        int distance,
+        Predicate<BlockEntity> predicate
+    ) {
         ServerPlayer player = listener.player;
         if (player.isSpectator() || !player.mayBuild()) {
             return;
@@ -291,7 +297,7 @@ public class AllHandle {
                     be.targetLine = packet.targetLine();
 
                     CompoundTag configData = packet.configData();
-                    ResourceLocation id = configData.read("Id", ResourceLocation.CODEC).orElse(null);
+                    Identifier id = configData.read("Id", Identifier.CODEC).orElse(null);
                     if (id == null) {
                         be.notifyUpdate();
                         return true;
@@ -403,7 +409,10 @@ public class AllHandle {
                     );
 
                     if (result.getValue().feedback != null) {
-                        player.displayClientMessage(Component.translatable("create." + result.getValue().feedback).withStyle(ChatFormatting.RED), true);
+                        player.displayClientMessage(
+                            Component.translatable("create." + result.getValue().feedback).withStyle(ChatFormatting.RED),
+                            true
+                        );
                         AllSoundEvents.DENY.play(world, null, pos, .5f, 1);
                         return true;
                     }
@@ -1004,13 +1013,7 @@ public class AllHandle {
     }
 
     public static void onInstantSchematic(ServerGamePacketListenerImpl listener, InstantSchematicPacket packet) {
-        Create.SCHEMATIC_RECEIVER.handleInstantSchematic(
-            listener.player,
-            packet.name(),
-            listener.player.level(),
-            packet.origin(),
-            packet.bounds()
-        );
+        Create.SCHEMATIC_RECEIVER.handleInstantSchematic(listener.player, packet.name(), listener.player.level(), packet.origin(), packet.bounds());
     }
 
     public static void onSchematicSync(ServerGamePacketListenerImpl listener, SchematicSyncPacket packet) {
@@ -1113,11 +1116,7 @@ public class AllHandle {
         onLinkedController(
             player, null, null, stack -> {
                 ItemStackHandler frequencyItems = LinkedControllerItem.getFrequencyItems(stack);
-                ServerLinkBehaviour linkBehaviour = BlockEntityBehaviour.get(
-                    player.level(),
-                    packet.linkLocation(),
-                    ServerLinkBehaviour.TYPE
-                );
+                ServerLinkBehaviour linkBehaviour = BlockEntityBehaviour.get(player.level(), packet.linkLocation(), ServerLinkBehaviour.TYPE);
                 if (linkBehaviour == null)
                     return;
 
@@ -1334,15 +1333,7 @@ public class AllHandle {
             return;
         }
 
-        if (TrainRelocator.relocate(
-            train,
-            sender.level(),
-            packet.pos(),
-            packet.hoveredBezier(),
-            packet.direction(),
-            packet.lookAngle(),
-            null
-        )) {
+        if (TrainRelocator.relocate(train, sender.level(), packet.pos(), packet.hoveredBezier(), packet.direction(), packet.lookAngle(), null)) {
             sender.displayClientMessage(Component.translatable("create.train.relocate.success").withStyle(ChatFormatting.GREEN), true);
             train.carriages.forEach(c -> c.forEachPresentEntity(e -> {
                 e.nonDamageTicks = 10;

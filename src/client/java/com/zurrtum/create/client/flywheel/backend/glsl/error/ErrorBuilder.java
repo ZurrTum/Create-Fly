@@ -12,7 +12,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import net.minecraft.resources.ResourceLocation;
+
+import net.minecraft.resources.Identifier;
 
 public class ErrorBuilder {
     // set to false for testing
@@ -61,7 +62,7 @@ public class ErrorBuilder {
         return this.pointAtFile(source.name);
     }
 
-    public ErrorBuilder pointAtFile(ResourceLocation file) {
+    public ErrorBuilder pointAtFile(Identifier file) {
         return this.pointAtFile(file.toString());
     }
 

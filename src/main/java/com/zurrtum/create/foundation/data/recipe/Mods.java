@@ -1,7 +1,8 @@
 package com.zurrtum.create.foundation.data.recipe;
 
 import java.util.function.Consumer;
-import net.minecraft.resources.ResourceLocation;
+
+import net.minecraft.resources.Identifier;
 
 public enum Mods {
     ARS_N("ars_nouveau"),
@@ -26,8 +27,8 @@ public enum Mods {
         this.id = id;
     }
 
-    public ResourceLocation asResource(String id) {
-        return ResourceLocation.fromNamespaceAndPath(this.id, id);
+    public Identifier asResource(String id) {
+        return Identifier.fromNamespaceAndPath(this.id, id);
     }
 
     public String getId() {

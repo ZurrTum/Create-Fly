@@ -9,7 +9,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.BlockItem;
@@ -54,7 +54,7 @@ public abstract class ClickToLinkBlockItem extends BlockItem {
             return InteractionResult.SUCCESS;
         }
 
-        ResourceLocation placedDim = level.dimension().location();
+        Identifier placedDim = level.dimension().location();
 
         if (!stack.has(AllDataComponents.CLICK_TO_LINK_DATA)) {
             if (!isValidTarget(level, pos)) {
@@ -88,7 +88,7 @@ public abstract class ClickToLinkBlockItem extends BlockItem {
         ClickToLinkData data = stack.get(AllDataComponents.CLICK_TO_LINK_DATA);
         //noinspection DataFlowIssue
         BlockPos selectedPos = data.selectedPos();
-        ResourceLocation selectedDim = data.selectedDim();
+        Identifier selectedDim = data.selectedDim();
         BlockPos placedPos = pos.relative(pContext.getClickedFace(), state.canBeReplaced() ? 0 : 1);
 
         if (maxDistance != -1 && (!selectedPos.closerThan(placedPos, maxDistance) || !selectedDim.equals(placedDim))) {
@@ -98,7 +98,7 @@ public abstract class ClickToLinkBlockItem extends BlockItem {
 
         CompoundTag beTag = new CompoundTag();
         beTag.store("TargetOffset", BlockPos.CODEC, selectedPos.subtract(placedPos));
-        beTag.store("TargetDimension", ResourceLocation.CODEC, selectedDim);
+        beTag.store("TargetDimension", Identifier.CODEC, selectedDim);
         stack.set(DataComponents.BLOCK_ENTITY_DATA, TypedEntityData.of(((IBE<?>) getBlock()).getBlockEntityType(), beTag));
 
         InteractionResult useOn = super.useOn(pContext);

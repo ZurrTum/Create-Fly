@@ -14,11 +14,12 @@ import java.util.IdentityHashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Supplier;
+
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 public class AllBogeyStyleRenders {
-    public static final Map<ResourceLocation, Map<BogeySize, SizeRenderer>> ALL = new HashMap<>();
+    public static final Map<Identifier, Map<BogeySize, SizeRenderer>> ALL = new HashMap<>();
 
     public static BogeyRenderState getRenderData(
         BogeyStyle style,

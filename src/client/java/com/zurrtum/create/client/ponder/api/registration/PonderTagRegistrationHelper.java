@@ -1,21 +1,22 @@
 package com.zurrtum.create.client.ponder.api.registration;
 
 import java.util.function.Function;
-import net.minecraft.resources.ResourceLocation;
+
+import net.minecraft.resources.Identifier;
 
 public interface PonderTagRegistrationHelper<T> {
 
     <S> PonderTagRegistrationHelper<S> withKeyFunction(Function<S, T> keyGen);
 
-    TagBuilder registerTag(ResourceLocation location);
+    TagBuilder registerTag(Identifier location);
 
     TagBuilder registerTag(String id);
 
-    void addTagToComponent(T component, ResourceLocation tag);
+    void addTagToComponent(T component, Identifier tag);
 
-    MultiTagBuilder.Tag<T> addToTag(ResourceLocation tag);
+    MultiTagBuilder.Tag<T> addToTag(Identifier tag);
 
-    MultiTagBuilder.Tag<T> addToTag(ResourceLocation... tags);
+    MultiTagBuilder.Tag<T> addToTag(Identifier... tags);
 
     MultiTagBuilder.Component addToComponent(T component);
 

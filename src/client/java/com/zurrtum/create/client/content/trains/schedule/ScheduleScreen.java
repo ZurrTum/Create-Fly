@@ -52,7 +52,7 @@ import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.util.Mth;
 import net.minecraft.util.ProblemReporter;
@@ -200,7 +200,7 @@ public class ScheduleScreen extends AbstractSimiContainerScreen<ScheduleMenu> {
         renderedItem.getRenderElement().clear();
     }
 
-    public static <T> List<MutableComponent> getTypeOptions(List<Pair<ResourceLocation, T>> list) {
+    public static <T> List<MutableComponent> getTypeOptions(List<Pair<Identifier, T>> list) {
         String langSection = list.equals(AllSchedules.INSTRUCTION_TYPES) ? "instruction." : "condition.";
         return list.stream().map(Pair::getFirst).map(rl -> rl.getNamespace() + ".schedule." + langSection + rl.getPath()).map(Component::translatable)
             .toList();
@@ -238,7 +238,7 @@ public class ScheduleScreen extends AbstractSimiContainerScreen<ScheduleMenu> {
             updateEditorSubwidgets((IScheduleInput<ScheduleInstruction>) field, editingDestination);
             scrollInput.forOptions(getTypeOptions(AllSchedules.INSTRUCTION_TYPES)).titled(CreateLang.translateDirect("schedule.instruction_type"))
                 .writingTo(scrollInputLabel).calling(index -> {
-                    Pair<ResourceLocation, Function<ResourceLocation, ? extends ScheduleInstruction>> pair = AllSchedules.INSTRUCTION_TYPES.get(index);
+                    Pair<Identifier, Function<Identifier, ? extends ScheduleInstruction>> pair = AllSchedules.INSTRUCTION_TYPES.get(index);
                     ScheduleInstruction newlyCreated = pair.getSecond().apply(pair.getFirst());
                     if (editingDestination.getId().equals(newlyCreated.getId()))
                         return;
@@ -256,7 +256,7 @@ public class ScheduleScreen extends AbstractSimiContainerScreen<ScheduleMenu> {
             updateEditorSubwidgets((IScheduleInput<ScheduleWaitCondition>) field, editingCondition);
             scrollInput.forOptions(getTypeOptions(AllSchedules.CONDITION_TYPES)).titled(CreateLang.translateDirect("schedule.condition_type"))
                 .writingTo(scrollInputLabel).calling(index -> {
-                    Pair<ResourceLocation, Function<ResourceLocation, ? extends ScheduleWaitCondition>> pair = AllSchedules.CONDITION_TYPES.get(index);
+                    Pair<Identifier, Function<Identifier, ? extends ScheduleWaitCondition>> pair = AllSchedules.CONDITION_TYPES.get(index);
                     ScheduleWaitCondition newlyCreated = pair.getSecond().apply(pair.getFirst());
                     if (editingCondition.getId().equals(newlyCreated.getId()))
                         return;

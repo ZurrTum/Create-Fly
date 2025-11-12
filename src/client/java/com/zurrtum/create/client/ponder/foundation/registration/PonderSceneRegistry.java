@@ -16,7 +16,7 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtAccounter;
 import net.minecraft.nbt.NbtIo;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.world.level.block.Block;
@@ -34,7 +34,7 @@ import java.util.zip.GZIPInputStream;
 public class PonderSceneRegistry implements SceneRegistryAccess {
 
     private final PonderLocalization localization;
-    private final Multimap<ResourceLocation, StoryBoardEntry> scenes;
+    private final Multimap<Identifier, StoryBoardEntry> scenes;
 
     private boolean allowRegistration = true;
 
@@ -60,19 +60,19 @@ public class PonderSceneRegistry implements SceneRegistryAccess {
     //
 
     @Override
-    public Collection<Map.Entry<ResourceLocation, StoryBoardEntry>> getRegisteredEntries() {
+    public Collection<Map.Entry<Identifier, StoryBoardEntry>> getRegisteredEntries() {
         return scenes.entries();
     }
 
     @Override
-    public boolean doScenesExistForId(ResourceLocation id) {
+    public boolean doScenesExistForId(Identifier id) {
         return scenes.containsKey(id);
     }
 
     //
 
     @Override
-    public List<PonderScene> compile(ResourceLocation id) {
+    public List<PonderScene> compile(Identifier id) {
         if (PonderIndex.editingModeActive())
             PonderIndex.reload();
 
@@ -115,14 +115,14 @@ public class PonderSceneRegistry implements SceneRegistryAccess {
         return scene;
     }
 
-    public static StructureTemplate loadSchematic(ResourceLocation location) {
+    public static StructureTemplate loadSchematic(Identifier location) {
         return loadSchematic(Minecraft.getInstance().getResourceManager(), location);
     }
 
-    public static StructureTemplate loadSchematic(ResourceManager resourceManager, ResourceLocation location) {
+    public static StructureTemplate loadSchematic(ResourceManager resourceManager, Identifier location) {
         String namespace = location.getNamespace();
         String path = "ponder/" + location.getPath() + ".nbt";
-        ResourceLocation location1 = ResourceLocation.fromNamespaceAndPath(namespace, path);
+        Identifier location1 = Identifier.fromNamespaceAndPath(namespace, path);
 
         Optional<Resource> optionalResource = resourceManager.getResource(location1);
         if (optionalResource.isEmpty()) {

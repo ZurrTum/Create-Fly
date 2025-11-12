@@ -14,7 +14,7 @@ import mezz.jei.api.recipe.IFocusGroup;
 import mezz.jei.api.recipe.types.IRecipeType;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
@@ -24,13 +24,21 @@ import static com.zurrtum.create.Create.MOD_ID;
 public class MysteriousItemConversionCategory extends CreateCategory<MysteriousItemConversionDisplay> {
     public static List<MysteriousItemConversionDisplay> getRecipes() {
         return List.of(
-            new MysteriousItemConversionDisplay(ResourceLocation.fromNamespaceAndPath(MOD_ID, "to_blaze_burner"), AllItems.EMPTY_BLAZE_BURNER, AllItems.BLAZE_BURNER),
-            new MysteriousItemConversionDisplay(ResourceLocation.fromNamespaceAndPath(MOD_ID, "to_haunted_bell"), AllItems.PECULIAR_BELL, AllItems.HAUNTED_BELL)
+            new MysteriousItemConversionDisplay(
+                Identifier.fromNamespaceAndPath(MOD_ID, "to_blaze_burner"),
+                AllItems.EMPTY_BLAZE_BURNER,
+                AllItems.BLAZE_BURNER
+            ),
+            new MysteriousItemConversionDisplay(
+                Identifier.fromNamespaceAndPath(MOD_ID, "to_haunted_bell"),
+                AllItems.PECULIAR_BELL,
+                AllItems.HAUNTED_BELL
+            )
         );
     }
 
     @Override
-    public ResourceLocation getRegistryName(MysteriousItemConversionDisplay display) {
+    public Identifier getRegistryName(MysteriousItemConversionDisplay display) {
         return display.id();
     }
 

@@ -14,7 +14,7 @@ import com.zurrtum.create.client.ponder.api.scene.Selection;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.particles.ParticleTypes;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Blocks;
@@ -26,7 +26,7 @@ public class DebugScenes {
 
     private static int index;
 
-    public static void registerAll(PonderSceneRegistrationHelper<ResourceLocation> helper) {
+    public static void registerAll(PonderSceneRegistrationHelper<Identifier> helper) {
         index = 1;
         add(helper, DebugScenes::coordinateScene);
         add(helper, DebugScenes::blocksScene);
@@ -39,9 +39,9 @@ public class DebugScenes {
         //add(DebugScenes::itemScene);
     }
 
-    private static void add(PonderSceneRegistrationHelper<ResourceLocation> helper, PonderStoryBoard sb) {
+    private static void add(PonderSceneRegistrationHelper<Identifier> helper, PonderStoryBoard sb) {
         String schematicPath = "debug/scene_" + index;
-        helper.addStoryBoard(ResourceLocation.parse("spyglass"), schematicPath, sb).highlightAllTags();
+        helper.addStoryBoard(Identifier.parse("spyglass"), schematicPath, sb).highlightAllTags();
         index++;
     }
 
@@ -81,7 +81,8 @@ public class DebugScenes {
         scene.world().replaceBlocks(util.select().fromTo(1, 1, 3, 2, 2, 4), Blocks.WHITE_CONCRETE.defaultBlockState(), true);
         scene.idle(10);
         scene.addKeyframe();
-        scene.world().replaceBlocks(util.select().position(3, 1, 1), Blocks.REDSTONE_WIRE.defaultBlockState().setValue(RedStoneWireBlock.POWER, 15), true);
+        scene.world()
+            .replaceBlocks(util.select().position(3, 1, 1), Blocks.REDSTONE_WIRE.defaultBlockState().setValue(RedStoneWireBlock.POWER, 15), true);
         scene.rotateCameraY(180);
 
         for (int i = 0; i < 20; i++) {

@@ -8,7 +8,7 @@ import com.zurrtum.create.client.ponder.api.registration.*;
 import com.zurrtum.create.content.kinetics.crank.ValveHandleBlock;
 import com.zurrtum.create.content.logistics.packagePort.postbox.PostboxBlock;
 import com.zurrtum.create.content.logistics.tableCloth.TableClothBlock;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 import static com.zurrtum.create.Create.MOD_ID;
 
@@ -20,12 +20,12 @@ public class CreatePonderPlugin implements PonderPlugin {
     }
 
     @Override
-    public void registerScenes(PonderSceneRegistrationHelper<ResourceLocation> helper) {
+    public void registerScenes(PonderSceneRegistrationHelper<Identifier> helper) {
         AllCreatePonderScenes.register(helper);
     }
 
     @Override
-    public void registerTags(PonderTagRegistrationHelper<ResourceLocation> helper) {
+    public void registerTags(PonderTagRegistrationHelper<Identifier> helper) {
         AllCreatePonderTags.register(helper);
     }
 

@@ -11,24 +11,25 @@ import me.shedaniel.rei.api.common.entry.EntryIngredient;
 import me.shedaniel.rei.api.common.util.EntryIngredients;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.crafting.RecipeHolder;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-public record FanHauntingDisplay(EntryIngredient input, List<ChanceOutput> outputs, Optional<ResourceLocation> location) implements Display {
+public record FanHauntingDisplay(EntryIngredient input, List<ChanceOutput> outputs, Optional<Identifier> location) implements Display {
     public static final DisplaySerializer<FanHauntingDisplay> SERIALIZER = DisplaySerializer.of(
         RecordCodecBuilder.mapCodec(instance -> instance.group(
             EntryIngredient.codec().fieldOf("input").forGetter(FanHauntingDisplay::input),
             ChanceOutput.CODEC.listOf().fieldOf("outputs").forGetter(FanHauntingDisplay::outputs),
-            ResourceLocation.CODEC.optionalFieldOf("location").forGetter(FanHauntingDisplay::location)
+            Identifier.CODEC.optionalFieldOf("location").forGetter(FanHauntingDisplay::location)
         ).apply(instance, FanHauntingDisplay::new)), StreamCodec.composite(
             EntryIngredient.streamCodec(),
             FanHauntingDisplay::input,
             ChanceOutput.PACKET_CODEC.apply(ByteBufCodecs.list()),
             FanHauntingDisplay::outputs,
-            ByteBufCodecs.optional(ResourceLocation.STREAM_CODEC),
+            ByteBufCodecs.optional(Identifier.STREAM_CODEC),
             FanHauntingDisplay::location,
             FanHauntingDisplay::new
         )
@@ -38,7 +39,7 @@ public record FanHauntingDisplay(EntryIngredient input, List<ChanceOutput> outpu
         this(entry.id().location(), entry.value());
     }
 
-    public FanHauntingDisplay(ResourceLocation id, HauntingRecipe recipe) {
+    public FanHauntingDisplay(Identifier id, HauntingRecipe recipe) {
         this(EntryIngredients.ofIngredient(recipe.ingredient()), recipe.results(), Optional.of(id));
     }
 
@@ -62,7 +63,7 @@ public record FanHauntingDisplay(EntryIngredient input, List<ChanceOutput> outpu
     }
 
     @Override
-    public Optional<ResourceLocation> getDisplayLocation() {
+    public Optional<Identifier> getDisplayLocation() {
         return location;
     }
 

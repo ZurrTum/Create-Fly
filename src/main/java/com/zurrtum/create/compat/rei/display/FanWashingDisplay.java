@@ -11,24 +11,25 @@ import me.shedaniel.rei.api.common.entry.EntryIngredient;
 import me.shedaniel.rei.api.common.util.EntryIngredients;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.crafting.RecipeHolder;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-public record FanWashingDisplay(EntryIngredient input, List<ChanceOutput> outputs, Optional<ResourceLocation> location) implements Display {
+public record FanWashingDisplay(EntryIngredient input, List<ChanceOutput> outputs, Optional<Identifier> location) implements Display {
     public static final DisplaySerializer<FanWashingDisplay> SERIALIZER = DisplaySerializer.of(
         RecordCodecBuilder.mapCodec(instance -> instance.group(
             EntryIngredient.codec().fieldOf("input").forGetter(FanWashingDisplay::input),
             ChanceOutput.CODEC.listOf().fieldOf("outputs").forGetter(FanWashingDisplay::outputs),
-            ResourceLocation.CODEC.optionalFieldOf("location").forGetter(FanWashingDisplay::location)
+            Identifier.CODEC.optionalFieldOf("location").forGetter(FanWashingDisplay::location)
         ).apply(instance, FanWashingDisplay::new)), StreamCodec.composite(
             EntryIngredient.streamCodec(),
             FanWashingDisplay::input,
             ChanceOutput.PACKET_CODEC.apply(ByteBufCodecs.list()),
             FanWashingDisplay::outputs,
-            ByteBufCodecs.optional(ResourceLocation.STREAM_CODEC),
+            ByteBufCodecs.optional(Identifier.STREAM_CODEC),
             FanWashingDisplay::location,
             FanWashingDisplay::new
         )
@@ -38,7 +39,7 @@ public record FanWashingDisplay(EntryIngredient input, List<ChanceOutput> output
         this(entry.id().location(), entry.value());
     }
 
-    public FanWashingDisplay(ResourceLocation id, SplashingRecipe recipe) {
+    public FanWashingDisplay(Identifier id, SplashingRecipe recipe) {
         this(EntryIngredients.ofIngredient(recipe.ingredient()), recipe.results(), Optional.of(id));
     }
 
@@ -62,7 +63,7 @@ public record FanWashingDisplay(EntryIngredient input, List<ChanceOutput> output
     }
 
     @Override
-    public Optional<ResourceLocation> getDisplayLocation() {
+    public Optional<Identifier> getDisplayLocation() {
         return location;
     }
 

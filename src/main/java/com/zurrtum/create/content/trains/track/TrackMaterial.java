@@ -4,22 +4,24 @@ import com.mojang.serialization.Codec;
 import com.zurrtum.create.AllTrackMaterials;
 import com.zurrtum.create.Create;
 import io.netty.buffer.ByteBuf;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Supplier;
+
 import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.block.Block;
 
 public class TrackMaterial implements ItemLike {
-    public static final Map<ResourceLocation, TrackMaterial> ALL = new HashMap<>();
-    public static final Codec<TrackMaterial> CODEC = ResourceLocation.CODEC.xmap(TrackMaterial::fromId, TrackMaterial::getId);
-    public static final StreamCodec<ByteBuf, TrackMaterial> PACKET_CODEC = ResourceLocation.STREAM_CODEC.map(TrackMaterial::fromId, TrackMaterial::getId);
+    public static final Map<Identifier, TrackMaterial> ALL = new HashMap<>();
+    public static final Codec<TrackMaterial> CODEC = Identifier.CODEC.xmap(TrackMaterial::fromId, TrackMaterial::getId);
+    public static final StreamCodec<ByteBuf, TrackMaterial> PACKET_CODEC = Identifier.STREAM_CODEC.map(TrackMaterial::fromId, TrackMaterial::getId);
 
-    private final ResourceLocation id;
+    private final Identifier id;
     private final Supplier<TrackBlock> trackBlock;
     public Object modelHolder;
 
@@ -28,13 +30,13 @@ public class TrackMaterial implements ItemLike {
         return (T) modelHolder;
     }
 
-    public TrackMaterial(ResourceLocation id, Supplier<TrackBlock> trackBlock) {
+    public TrackMaterial(Identifier id, Supplier<TrackBlock> trackBlock) {
         this.id = id;
         this.trackBlock = trackBlock;
         ALL.put(this.id, this);
     }
 
-    public ResourceLocation getId() {
+    public Identifier getId() {
         return id;
     }
 
@@ -51,7 +53,7 @@ public class TrackMaterial implements ItemLike {
         return ALL.values().stream().map(TrackMaterial::getBlock).toArray(Block[]::new);
     }
 
-    public static TrackMaterial fromId(ResourceLocation id) {
+    public static TrackMaterial fromId(Identifier id) {
         if (ALL.containsKey(id))
             return ALL.get(id);
 

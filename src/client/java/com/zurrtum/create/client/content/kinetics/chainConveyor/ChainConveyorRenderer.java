@@ -25,7 +25,7 @@ import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction.Axis;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LightLayer;
@@ -39,7 +39,7 @@ import java.util.List;
 import java.util.Map;
 
 public class ChainConveyorRenderer extends KineticBlockEntityRenderer<ChainConveyorBlockEntity, ChainConveyorRenderer.ChainConveyorRenderState> {
-    public static final ResourceLocation CHAIN_LOCATION = ResourceLocation.withDefaultNamespace("textures/block/iron_chain.png");
+    public static final Identifier CHAIN_LOCATION = Identifier.withDefaultNamespace("textures/block/iron_chain.png");
     public static final int MIP_DISTANCE = 48;
 
     public ChainConveyorRenderer(BlockEntityRendererProvider.Context context) {
@@ -118,7 +118,7 @@ public class ChainConveyorRenderer extends KineticBlockEntityRenderer<ChainConve
             return null;
         }
         if (physicsData.modelKey == null) {
-            ResourceLocation key = BuiltInRegistries.ITEM.getKey(box.item.getItem());
+            Identifier key = BuiltInRegistries.ITEM.getKey(box.item.getItem());
             if (key == BuiltInRegistries.ITEM.getDefaultKey()) {
                 return null;
             }

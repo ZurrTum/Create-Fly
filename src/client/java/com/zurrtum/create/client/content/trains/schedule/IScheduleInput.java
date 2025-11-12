@@ -7,9 +7,10 @@ import com.zurrtum.create.content.trains.schedule.ScheduleDataEntry;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
+
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 
 public interface IScheduleInput<T extends ScheduleDataEntry> {
@@ -20,7 +21,7 @@ public interface IScheduleInput<T extends ScheduleDataEntry> {
     }
 
     default List<Component> getTitleAs(T input, String type) {
-        ResourceLocation id = input.getId();
+        Identifier id = input.getId();
         return ImmutableList.of(Component.translatable(id.getNamespace() + ".schedule." + type + "." + id.getPath()));
     }
 

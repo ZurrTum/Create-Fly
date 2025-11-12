@@ -6,12 +6,14 @@ import com.zurrtum.create.catnip.codecs.CatnipCodecUtils;
 import com.zurrtum.create.catnip.nbt.NBTProcessors;
 import com.zurrtum.create.infrastructure.component.ClipboardContent;
 import com.zurrtum.create.infrastructure.component.ClipboardEntry;
+
 import java.util.List;
+
 import net.minecraft.core.component.DataComponentMap;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.network.Filterable;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.component.WrittenBookContent;
@@ -26,8 +28,9 @@ public class CreateNBTProcessors {
                 CompoundTag book = data.getCompoundOrEmpty("Book");
 
                 // Writable books can't have click events, so they're safe to keep
-                ResourceLocation writableBookResource = BuiltInRegistries.ITEM.getKey(Items.WRITABLE_BOOK);
-                if (writableBookResource != BuiltInRegistries.ITEM.getDefaultKey() && book.getStringOr("id", "").equals(writableBookResource.toString()))
+                Identifier writableBookResource = BuiltInRegistries.ITEM.getKey(Items.WRITABLE_BOOK);
+                if (writableBookResource != BuiltInRegistries.ITEM.getDefaultKey() && book.getStringOr("id", "")
+                    .equals(writableBookResource.toString()))
                     return data;
 
                 WrittenBookContent bookContent = CatnipCodecUtils.decodeOrNull(WrittenBookContent.CODEC, book);

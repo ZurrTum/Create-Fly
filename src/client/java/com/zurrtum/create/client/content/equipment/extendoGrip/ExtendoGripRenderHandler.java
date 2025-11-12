@@ -13,7 +13,7 @@ import net.minecraft.client.renderer.item.ItemModel;
 import net.minecraft.client.renderer.item.ItemStackRenderState;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.core.component.DataComponents;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.HumanoidArm;
@@ -87,7 +87,7 @@ public class ExtendoGripRenderHandler {
             ms.translate(flip * 0.05f, -0.3f, -0.3f);
 
             AvatarRenderer<AbstractClientPlayer> playerrenderer = entityRenderDispatcher.getPlayerRenderer(player);
-            ResourceLocation texture = player.getSkin().body().texturePath();
+            Identifier texture = player.getSkin().body().texturePath();
             if (rightHand)
                 playerrenderer.renderRightHand(ms, queue, light, texture, player.isModelPartShown(PlayerModelPart.RIGHT_SLEEVE));
             else

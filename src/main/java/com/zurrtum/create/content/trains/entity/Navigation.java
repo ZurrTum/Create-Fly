@@ -18,8 +18,9 @@ import org.apache.commons.lang3.mutable.MutableObject;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
+
 import net.minecraft.core.UUIDUtil;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.storage.ValueInput;
@@ -526,7 +527,7 @@ public class Navigation {
             return;
 
         // Cache the list of track types that the train can travel on
-        Set<ResourceLocation> validTypes = new HashSet<>();
+        Set<Identifier> validTypes = new HashSet<>();
         for (int i = 0; i < train.carriages.size(); i++) {
             Carriage carriage = train.carriages.get(i);
             if (i == 0) {
@@ -923,8 +924,8 @@ public class Navigation {
 
         removeBrokenPathEntries();
 
-        waitingForSignal = view.read("BlockingSignal", UUIDUtil.CODEC)
-            .map(uuid -> Pair.of(uuid, view.getBooleanOr("BlockingSignalSide", false))).orElse(null);
+        waitingForSignal = view.read("BlockingSignal", UUIDUtil.CODEC).map(uuid -> Pair.of(uuid, view.getBooleanOr("BlockingSignalSide", false)))
+            .orElse(null);
         if (waitingForSignal == null)
             return;
         distanceToSignal = view.getDoubleOr("DistanceToSignal", 0);

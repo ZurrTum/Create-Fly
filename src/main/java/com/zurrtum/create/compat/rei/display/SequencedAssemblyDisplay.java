@@ -23,16 +23,17 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.ComponentSerialization;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.item.crafting.RecipeType;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 public record SequencedAssemblyDisplay(
-    EntryIngredient input, SequenceData sequences, ChanceOutput output, int loop, Optional<ResourceLocation> location
+    EntryIngredient input, SequenceData sequences, ChanceOutput output, int loop, Optional<Identifier> location
 ) implements Display {
     public static final DisplaySerializer<SequencedAssemblyDisplay> SERIALIZER = DisplaySerializer.of(
         RecordCodecBuilder.mapCodec(instance -> instance.group(
@@ -40,7 +41,7 @@ public record SequencedAssemblyDisplay(
             SequenceData.CODEC.fieldOf("sequences").forGetter(SequencedAssemblyDisplay::sequences),
             ChanceOutput.CODEC.fieldOf("output").forGetter(SequencedAssemblyDisplay::output),
             Codec.INT.fieldOf("loop").forGetter(SequencedAssemblyDisplay::loop),
-            ResourceLocation.CODEC.optionalFieldOf("location").forGetter(SequencedAssemblyDisplay::location)
+            Identifier.CODEC.optionalFieldOf("location").forGetter(SequencedAssemblyDisplay::location)
         ).apply(instance, SequencedAssemblyDisplay::new)), StreamCodec.composite(
             EntryIngredient.streamCodec(),
             SequencedAssemblyDisplay::input,
@@ -50,7 +51,7 @@ public record SequencedAssemblyDisplay(
             SequencedAssemblyDisplay::output,
             ByteBufCodecs.INT,
             SequencedAssemblyDisplay::loop,
-            ByteBufCodecs.optional(ResourceLocation.STREAM_CODEC),
+            ByteBufCodecs.optional(Identifier.STREAM_CODEC),
             SequencedAssemblyDisplay::location,
             SequencedAssemblyDisplay::new
         )
@@ -60,7 +61,7 @@ public record SequencedAssemblyDisplay(
         this(entry.id().location(), entry.value());
     }
 
-    public SequencedAssemblyDisplay(ResourceLocation id, SequencedAssemblyRecipe recipe) {
+    public SequencedAssemblyDisplay(Identifier id, SequencedAssemblyRecipe recipe) {
         this(EntryIngredients.ofIngredient(recipe.ingredient()), SequenceData.create(recipe), recipe.result(), recipe.loops(), Optional.of(id));
     }
 
@@ -88,7 +89,7 @@ public record SequencedAssemblyDisplay(
     }
 
     @Override
-    public Optional<ResourceLocation> getDisplayLocation() {
+    public Optional<Identifier> getDisplayLocation() {
         return location;
     }
 
@@ -131,7 +132,7 @@ public record SequencedAssemblyDisplay(
                     ingredientBuilder.add(IngredientHelper.createEntryIngredient(fillingRecipe.fluidIngredient()));
                 } else {
                     ingredientBuilder.add(EntryIngredient.empty());
-                    ResourceLocation id = BuiltInRegistries.RECIPE_TYPE.getKey(sequence.getType());
+                    Identifier id = BuiltInRegistries.RECIPE_TYPE.getKey(sequence.getType());
                     if (id != null) {
                         String namespace = id.getNamespace();
                         String recipeName;

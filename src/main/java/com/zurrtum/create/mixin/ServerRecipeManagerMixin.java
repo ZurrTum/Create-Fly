@@ -15,8 +15,9 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.stream.Stream;
+
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.util.profiling.ProfilerFiller;
 import net.minecraft.world.item.crafting.Recipe;
@@ -32,7 +33,7 @@ public class ServerRecipeManagerMixin {
         ResourceManager resourceManager,
         ProfilerFiller profiler,
         CallbackInfoReturnable<RecipeMap> cir,
-        @Local SortedMap<ResourceLocation, Recipe<?>> sortedMap
+        @Local SortedMap<Identifier, Recipe<?>> sortedMap
     ) {
         sortedMap.putAll(SequencedAssemblyRecipe.Serializer.GENERATE_RECIPES);
         PotionRecipe.register(sortedMap);

@@ -18,10 +18,11 @@ import me.shedaniel.rei.api.common.util.EntryIngredients;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.RecipeHolder;
+
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
@@ -29,15 +30,15 @@ import java.util.stream.Stream;
 import static com.zurrtum.create.Create.MOD_ID;
 
 public record DrainingDisplay(
-    EntryIngredient input, EntryIngredient output, EntryIngredient result, Optional<ResourceLocation> location
+    EntryIngredient input, EntryIngredient output, EntryIngredient result, Optional<Identifier> location
 ) implements Display {
-    public static final ResourceLocation POTIONS = ResourceLocation.fromNamespaceAndPath(MOD_ID, "potions");
+    public static final Identifier POTIONS = Identifier.fromNamespaceAndPath(MOD_ID, "potions");
     public static final DisplaySerializer<DrainingDisplay> SERIALIZER = DisplaySerializer.of(
         RecordCodecBuilder.mapCodec(instance -> instance.group(
             EntryIngredient.codec().fieldOf("input").forGetter(DrainingDisplay::input),
             EntryIngredient.codec().fieldOf("output").forGetter(DrainingDisplay::output),
             EntryIngredient.codec().fieldOf("result").forGetter(DrainingDisplay::result),
-            ResourceLocation.CODEC.optionalFieldOf("location").forGetter(DrainingDisplay::location)
+            Identifier.CODEC.optionalFieldOf("location").forGetter(DrainingDisplay::location)
         ).apply(instance, DrainingDisplay::new)), StreamCodec.composite(
             EntryIngredient.streamCodec(),
             DrainingDisplay::input,
@@ -45,7 +46,7 @@ public record DrainingDisplay(
             DrainingDisplay::output,
             EntryIngredient.streamCodec(),
             DrainingDisplay::result,
-            ByteBufCodecs.optional(ResourceLocation.STREAM_CODEC),
+            ByteBufCodecs.optional(Identifier.STREAM_CODEC),
             DrainingDisplay::location,
             DrainingDisplay::new
         )
@@ -55,7 +56,7 @@ public record DrainingDisplay(
         this(entry.id().location(), entry.value());
     }
 
-    public DrainingDisplay(ResourceLocation id, EmptyingRecipe recipe) {
+    public DrainingDisplay(Identifier id, EmptyingRecipe recipe) {
         this(
             EntryIngredients.ofIngredient(recipe.ingredient()),
             IngredientHelper.createEntryIngredient(recipe.fluidResult()),
@@ -84,9 +85,9 @@ public record DrainingDisplay(
                 if (fluid.isEmpty()) {
                     return;
                 }
-                ResourceLocation itemName = BuiltInRegistries.ITEM.getKey(stack.getItem());
-                ResourceLocation fluidName = BuiltInRegistries.FLUID.getKey(fluid.getFluid());
-                ResourceLocation id = ResourceLocation.fromNamespaceAndPath(
+                Identifier itemName = BuiltInRegistries.ITEM.getKey(stack.getItem());
+                Identifier fluidName = BuiltInRegistries.FLUID.getKey(fluid.getFluid());
+                Identifier id = Identifier.fromNamespaceAndPath(
                     MOD_ID,
                     "empty_" + itemName.getNamespace() + "_" + itemName.getPath() + "_with_" + fluidName.getNamespace() + "_" + fluidName.getPath()
                 );
@@ -116,7 +117,7 @@ public record DrainingDisplay(
     }
 
     @Override
-    public Optional<ResourceLocation> getDisplayLocation() {
+    public Optional<Identifier> getDisplayLocation() {
         return location;
     }
 

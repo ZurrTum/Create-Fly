@@ -9,8 +9,9 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 import java.util.function.Function;
-import net.minecraft.ResourceLocationException;
-import net.minecraft.resources.ResourceLocation;
+
+import net.minecraft.IdentifierException;
+import net.minecraft.resources.Identifier;
 
 /**
  * Immutable class representing a shader file.
@@ -20,7 +21,7 @@ import net.minecraft.resources.ResourceLocation;
  * </p>
  */
 public class SourceFile implements SourceComponent {
-    public final ResourceLocation name;
+    public final Identifier name;
 
     public final SourceLines source;
 
@@ -33,7 +34,7 @@ public class SourceFile implements SourceComponent {
 
     public final String finalSource;
 
-    private SourceFile(ResourceLocation name, SourceLines source, ImmutableList<Import> imports, List<SourceFile> included, String finalSource) {
+    private SourceFile(Identifier name, SourceLines source, ImmutableList<Import> imports, List<SourceFile> included, String finalSource) {
         this.name = name;
         this.source = source;
         this.imports = imports;
@@ -41,11 +42,11 @@ public class SourceFile implements SourceComponent {
         this.finalSource = finalSource;
     }
 
-    public static LoadResult empty(ResourceLocation name) {
+    public static LoadResult empty(Identifier name) {
         return new LoadResult.Success(new SourceFile(name, new SourceLines(name, ""), ImmutableList.of(), ImmutableList.of(), ""));
     }
 
-    public static LoadResult parse(Function<ResourceLocation, LoadResult> sourceFinder, ResourceLocation name, String stringSource) {
+    public static LoadResult parse(Function<Identifier, LoadResult> sourceFinder, Identifier name, String stringSource) {
         var source = new SourceLines(name, stringSource);
 
         var imports = Import.parseImports(source);
@@ -61,10 +62,10 @@ public class SourceFile implements SourceComponent {
                 continue;
             }
 
-            ResourceLocation location;
+            Identifier location;
             try {
                 location = ResourceUtil.parseFlywheelDefault(string);
-            } catch (ResourceLocationException e) {
+            } catch (IdentifierException e) {
                 failures.add(Pair.of(fileSpan, new LoadError.MalformedInclude(e)));
                 continue;
             }

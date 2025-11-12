@@ -9,7 +9,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.item.FallingBlockEntity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
@@ -26,7 +26,7 @@ public class AllPotatoProjectileBlockHitActions {
     }
 
     private static void register(String name, MapCodec<? extends PotatoProjectileBlockHitAction> codec) {
-        Registry.register(CreateRegistries.POTATO_PROJECTILE_BLOCK_HIT_ACTION, ResourceLocation.fromNamespaceAndPath(MOD_ID, name), codec);
+        Registry.register(CreateRegistries.POTATO_PROJECTILE_BLOCK_HIT_ACTION, Identifier.fromNamespaceAndPath(MOD_ID, name), codec);
     }
 
     public record PlantCrop(Holder<Block> cropBlock) implements PotatoProjectileBlockHitAction {

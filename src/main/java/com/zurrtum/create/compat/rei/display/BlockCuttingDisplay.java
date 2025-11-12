@@ -19,29 +19,30 @@ import net.minecraft.core.HolderSet;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.item.crafting.StonecutterRecipe;
+
 import java.util.*;
 
 import static com.zurrtum.create.Create.MOD_ID;
 
-public record BlockCuttingDisplay(EntryIngredient input, List<EntryIngredient> outputs, Optional<ResourceLocation> location) implements Display {
+public record BlockCuttingDisplay(EntryIngredient input, List<EntryIngredient> outputs, Optional<Identifier> location) implements Display {
     public static final DisplaySerializer<BlockCuttingDisplay> SERIALIZER = DisplaySerializer.of(
         RecordCodecBuilder.mapCodec(instance -> instance.group(
             EntryIngredient.codec().fieldOf("input").forGetter(BlockCuttingDisplay::input),
             EntryIngredient.codec().listOf().fieldOf("outputs").forGetter(BlockCuttingDisplay::outputs),
-            ResourceLocation.CODEC.optionalFieldOf("location").forGetter(BlockCuttingDisplay::location)
+            Identifier.CODEC.optionalFieldOf("location").forGetter(BlockCuttingDisplay::location)
         ).apply(instance, BlockCuttingDisplay::new)), StreamCodec.composite(
             EntryIngredient.streamCodec(),
             BlockCuttingDisplay::input,
             EntryIngredient.streamCodec().apply(ByteBufCodecs.list()),
             BlockCuttingDisplay::outputs,
-            ByteBufCodecs.optional(ResourceLocation.STREAM_CODEC),
+            ByteBufCodecs.optional(Identifier.STREAM_CODEC),
             BlockCuttingDisplay::location,
             BlockCuttingDisplay::new
         )
@@ -77,8 +78,11 @@ public record BlockCuttingDisplay(EntryIngredient input, List<EntryIngredient> o
         for (Pair<EntryIngredient, List<ItemStack>> pair : map.values()) {
             EntryIngredient input = pair.getFirst();
             List<ItemStack> outputs = pair.getSecond();
-            ResourceLocation itemName = BuiltInRegistries.ITEM.getKey(input.getFirst().<ItemStack>castValue().getItem());
-            Optional<ResourceLocation> location = Optional.of(ResourceLocation.fromNamespaceAndPath(MOD_ID, "block_cutting/" + itemName.getNamespace() + "_" + itemName.getPath()));
+            Identifier itemName = BuiltInRegistries.ITEM.getKey(input.getFirst().<ItemStack>castValue().getItem());
+            Optional<Identifier> location = Optional.of(Identifier.fromNamespaceAndPath(
+                MOD_ID,
+                "block_cutting/" + itemName.getNamespace() + "_" + itemName.getPath()
+            ));
             int size = outputs.size();
             if (size <= 15) {
                 List<EntryIngredient> outputIngredients = Arrays.asList(new EntryIngredient[size]);
@@ -119,7 +123,7 @@ public record BlockCuttingDisplay(EntryIngredient input, List<EntryIngredient> o
     }
 
     @Override
-    public Optional<ResourceLocation> getDisplayLocation() {
+    public Optional<Identifier> getDisplayLocation() {
         return location;
     }
 

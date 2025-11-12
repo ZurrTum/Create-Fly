@@ -15,7 +15,7 @@ import net.minecraft.client.resources.model.BlockModelRotation;
 import net.minecraft.client.resources.model.ModelBaker;
 import net.minecraft.client.resources.model.ResolvableModel;
 import net.minecraft.client.resources.model.ResolvedModel;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.ItemOwner;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
@@ -29,7 +29,7 @@ import java.util.function.Supplier;
 import static com.zurrtum.create.Create.MOD_ID;
 
 public class OversizedModel implements ItemModel {
-    public static final ResourceLocation ID = ResourceLocation.fromNamespaceAndPath(MOD_ID, "model/oversized");
+    public static final Identifier ID = Identifier.fromNamespaceAndPath(MOD_ID, "model/oversized");
     private final List<ItemTintSource> tints;
     private final List<BakedQuad> quads;
     private final Supplier<Vector3f[]> vector;
@@ -95,10 +95,10 @@ public class OversizedModel implements ItemModel {
         }
     }
 
-    public record Unbaked(ResourceLocation model, List<ItemTintSource> tints, List<Double> min, List<Double> max) implements ItemModel.Unbaked {
+    public record Unbaked(Identifier model, List<ItemTintSource> tints, List<Double> min, List<Double> max) implements ItemModel.Unbaked {
         public static final MapCodec<com.zurrtum.create.client.infrastructure.model.OversizedModel.Unbaked> CODEC = RecordCodecBuilder.mapCodec(
             instance -> instance.group(
-                ResourceLocation.CODEC.fieldOf("model").forGetter(com.zurrtum.create.client.infrastructure.model.OversizedModel.Unbaked::model),
+                Identifier.CODEC.fieldOf("model").forGetter(com.zurrtum.create.client.infrastructure.model.OversizedModel.Unbaked::model),
                 ItemTintSources.CODEC.listOf().optionalFieldOf("tints", List.of())
                     .forGetter(com.zurrtum.create.client.infrastructure.model.OversizedModel.Unbaked::tints),
                 Codec.DOUBLE.listOf(3, 3).fieldOf("min").forGetter(com.zurrtum.create.client.infrastructure.model.OversizedModel.Unbaked::min),

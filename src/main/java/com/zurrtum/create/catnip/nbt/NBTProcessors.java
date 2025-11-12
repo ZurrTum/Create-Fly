@@ -9,11 +9,12 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.function.UnaryOperator;
+
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -58,7 +59,7 @@ public final class NBTProcessors {
             CompoundTag itemComponents = compound.getCompoundOrEmpty("components");
             HashSet<String> keys = new HashSet<>(itemComponents.keySet());
             for (String key : keys) {
-                DataComponentType<?> type = BuiltInRegistries.DATA_COMPONENT_TYPE.getValue(ResourceLocation.parse(key));
+                DataComponentType<?> type = BuiltInRegistries.DATA_COMPONENT_TYPE.getValue(Identifier.parse(key));
                 if (type != null && ComponentProcessors.isUnsafeItemComponent(type))
                     itemComponents.remove(key);
             }

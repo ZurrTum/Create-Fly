@@ -19,11 +19,12 @@ import org.joml.Matrix3x2fStack;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Renderable;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.renderer.Rect2i;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ItemLike;
@@ -44,7 +45,7 @@ public class PonderTagScreen extends AbstractPonderScreen {
 
     private ItemStack hoveredItem = ItemStack.EMPTY;
 
-    public PonderTagScreen(ResourceLocation tag) {
+    public PonderTagScreen(Identifier tag) {
         this.tag = PonderIndex.getTagAccess().getRegisteredTag(tag);
     }
 
@@ -88,7 +89,7 @@ public class PonderTagScreen extends AbstractPonderScreen {
         }
 
         if (!tag.getMainItem().isEmpty()) {
-            ResourceLocation registryName = RegisteredObjectsHelper.getKeyOrThrow(tag.getMainItem().getItem());
+            Identifier registryName = RegisteredObjectsHelper.getKeyOrThrow(tag.getMainItem().getItem());
 
             PonderButton b = new PonderButton(itemCenterX - layout.getTotalWidth() / 2 - 48, itemCenterY - 10).showing(tag.getMainItem());
             //b.withCustomBackground(PonderTheme.Key.PONDER_BACKGROUND_IMPORTANT.c());
@@ -211,13 +212,7 @@ public class PonderTagScreen extends AbstractPonderScreen {
             .at((windowWidth - stringWidth) / 2f - 5, itemArea.getY() - 21, 100).withBounds(stringWidth + 10, 10).render(graphics);
 
         //		UIRenderHelper.streak(0, itemArea.getX() - 10, itemArea.getY() - 20, 20, 180, 0x101010);
-        graphics.drawCenteredString(
-            font,
-            relatedTitle,
-            windowWidth / 2,
-            itemArea.getY() - 20,
-            UIRenderHelper.COLOR_TEXT.getFirst().getRGB()
-        );
+        graphics.drawCenteredString(font, relatedTitle, windowWidth / 2, itemArea.getY() - 20, UIRenderHelper.COLOR_TEXT.getFirst().getRGB());
 
         UIRenderHelper.streak(graphics, 0, 0, 0, itemArea.getHeight() + 10, itemArea.getWidth() / 2 + 75);
         UIRenderHelper.streak(graphics, 180, 0, 0, itemArea.getHeight() + 10, itemArea.getWidth() / 2 + 75);
@@ -297,7 +292,7 @@ public class PonderTagScreen extends AbstractPonderScreen {
         }
     }
 
-    public record ItemEntry(@Nullable ItemLike item, ResourceLocation key) {
+    public record ItemEntry(@Nullable ItemLike item, Identifier key) {
     }
 
 }

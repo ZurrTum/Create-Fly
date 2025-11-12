@@ -21,7 +21,7 @@ import com.zurrtum.create.content.processing.sequenced.SequencedAssemblyRecipe;
 import com.zurrtum.create.foundation.recipe.ItemCopyingRecipe;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.crafting.CustomRecipe;
 import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.RecipeSerializer;
@@ -70,7 +70,7 @@ public class AllRecipeSerializers {
     public static final RecipeSerializer<PotionRecipe> POTION = register("potion", new PotionRecipe.Serializer());
 
     static <S extends RecipeSerializer<T>, T extends Recipe<?>> S register(String id, S serializer) {
-        return Registry.register(BuiltInRegistries.RECIPE_SERIALIZER, ResourceLocation.fromNamespaceAndPath(MOD_ID, id), serializer);
+        return Registry.register(BuiltInRegistries.RECIPE_SERIALIZER, Identifier.fromNamespaceAndPath(MOD_ID, id), serializer);
     }
 
     public static void register() {

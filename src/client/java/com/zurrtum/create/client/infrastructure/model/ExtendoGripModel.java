@@ -22,7 +22,7 @@ import net.minecraft.client.renderer.special.SpecialModelRenderer;
 import net.minecraft.client.resources.model.BlockModelRotation;
 import net.minecraft.client.resources.model.ModelBaker;
 import net.minecraft.client.resources.model.ResolvedModel;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Avatar;
 import net.minecraft.world.entity.HumanoidArm;
@@ -38,16 +38,16 @@ import java.util.Set;
 import static com.zurrtum.create.Create.MOD_ID;
 
 public class ExtendoGripModel implements ItemModel, SpecialModelRenderer<ExtendoGripModel.RenderData> {
-    public static final ResourceLocation ID = ResourceLocation.fromNamespaceAndPath(MOD_ID, "model/extendo_grip");
-    public static final ResourceLocation ITEM_ID = ResourceLocation.fromNamespaceAndPath(MOD_ID, "item/extendo_grip/item");
-    public static final ResourceLocation COG_ID = ResourceLocation.fromNamespaceAndPath(MOD_ID, "item/extendo_grip/cog");
-    public static final ResourceLocation THIN_SHORT_ID = ResourceLocation.fromNamespaceAndPath(MOD_ID, "item/extendo_grip/thin_short");
-    public static final ResourceLocation WIDE_SHORT_ID = ResourceLocation.fromNamespaceAndPath(MOD_ID, "item/extendo_grip/wide_short");
-    public static final ResourceLocation THIN_LONG_ID = ResourceLocation.fromNamespaceAndPath(MOD_ID, "item/extendo_grip/thin_long");
-    public static final ResourceLocation WIDE_LONG_ID = ResourceLocation.fromNamespaceAndPath(MOD_ID, "item/extendo_grip/wide_long");
-    public static final ResourceLocation DEPLOYER_HAND_POINTING = ResourceLocation.fromNamespaceAndPath(MOD_ID, "block/deployer/hand_pointing");
-    public static final ResourceLocation DEPLOYER_HAND_PUNCHING = ResourceLocation.fromNamespaceAndPath(MOD_ID, "block/deployer/hand_punching");
-    public static final ResourceLocation DEPLOYER_HAND_HOLDING = ResourceLocation.fromNamespaceAndPath(MOD_ID, "block/deployer/hand_holding");
+    public static final Identifier ID = Identifier.fromNamespaceAndPath(MOD_ID, "model/extendo_grip");
+    public static final Identifier ITEM_ID = Identifier.fromNamespaceAndPath(MOD_ID, "item/extendo_grip/item");
+    public static final Identifier COG_ID = Identifier.fromNamespaceAndPath(MOD_ID, "item/extendo_grip/cog");
+    public static final Identifier THIN_SHORT_ID = Identifier.fromNamespaceAndPath(MOD_ID, "item/extendo_grip/thin_short");
+    public static final Identifier WIDE_SHORT_ID = Identifier.fromNamespaceAndPath(MOD_ID, "item/extendo_grip/wide_short");
+    public static final Identifier THIN_LONG_ID = Identifier.fromNamespaceAndPath(MOD_ID, "item/extendo_grip/thin_long");
+    public static final Identifier WIDE_LONG_ID = Identifier.fromNamespaceAndPath(MOD_ID, "item/extendo_grip/wide_long");
+    public static final Identifier DEPLOYER_HAND_POINTING = Identifier.fromNamespaceAndPath(MOD_ID, "block/deployer/hand_pointing");
+    public static final Identifier DEPLOYER_HAND_PUNCHING = Identifier.fromNamespaceAndPath(MOD_ID, "block/deployer/hand_punching");
+    public static final Identifier DEPLOYER_HAND_HOLDING = Identifier.fromNamespaceAndPath(MOD_ID, "block/deployer/hand_holding");
 
     private final RenderType layer = Sheets.translucentItemSheet();
     private final int[] tints = new int[0];
@@ -304,7 +304,7 @@ public class ExtendoGripModel implements ItemModel, SpecialModelRenderer<Extendo
             );
         }
 
-        private static List<BakedQuad> bakeQuads(ModelBaker baker, ResourceLocation id) {
+        private static List<BakedQuad> bakeQuads(ModelBaker baker, Identifier id) {
             ResolvedModel model = baker.getModel(id);
             return model.bakeTopGeometry(model.getTopTextureSlots(), baker, BlockModelRotation.X0_Y0).getAll();
         }

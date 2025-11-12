@@ -15,7 +15,7 @@ import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.*;
 import net.minecraft.client.renderer.item.ItemStackRenderState;
 import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.BlockAndTintGetter;
@@ -89,7 +89,7 @@ public class BakedItemModelBufferer {
 
         private static Material createMaterial(RenderType renderLayer) {
             RenderType.CompositeRenderType layer = (RenderType.CompositeRenderType) renderLayer;
-            Optional<ResourceLocation> id = layer.state.textureState.cutoutTexture();
+            Optional<Identifier> id = layer.state.textureState.cutoutTexture();
             if (id.isPresent()) {
                 SimpleMaterial.Builder builder = SimpleMaterial.builder().texture(id.get()).mipmap(false);
                 Optional<BlendFunction> blendFunction = layer.renderPipeline.getBlendFunction();

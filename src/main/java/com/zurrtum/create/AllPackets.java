@@ -10,7 +10,7 @@ import net.minecraft.network.protocol.PacketType;
 import net.minecraft.network.protocol.configuration.ClientConfigurationPacketListener;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ServerGamePacketListener;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.network.ServerGamePacketListenerImpl;
 
 import java.util.LinkedHashMap;
@@ -259,7 +259,7 @@ public class AllPackets {
         String id,
         StreamCodec<? super RegistryFriendlyByteBuf, T> codec
     ) {
-        PacketType<T> type = new PacketType<>(PacketFlow.CLIENTBOUND, ResourceLocation.fromNamespaceAndPath(MOD_ID, id));
+        PacketType<T> type = new PacketType<>(PacketFlow.CLIENTBOUND, Identifier.fromNamespaceAndPath(MOD_ID, id));
         S2C_CONFIG.put(
             (PacketType<Packet<ClientConfigurationPacketListener>>) type,
             (StreamCodec<? super RegistryFriendlyByteBuf, Packet<ClientConfigurationPacketListener>>) codec
@@ -269,7 +269,7 @@ public class AllPackets {
 
     @SuppressWarnings("unchecked")
     private static <T extends Packet<ClientGamePacketListener>> PacketType<T> s2c(String id, StreamCodec<? super RegistryFriendlyByteBuf, T> codec) {
-        PacketType<T> type = new PacketType<>(PacketFlow.CLIENTBOUND, ResourceLocation.fromNamespaceAndPath(MOD_ID, id));
+        PacketType<T> type = new PacketType<>(PacketFlow.CLIENTBOUND, Identifier.fromNamespaceAndPath(MOD_ID, id));
         S2C.put(
             (PacketType<Packet<ClientGamePacketListener>>) type,
             (StreamCodec<? super RegistryFriendlyByteBuf, Packet<ClientGamePacketListener>>) codec
@@ -279,7 +279,7 @@ public class AllPackets {
 
     @SuppressWarnings("unchecked")
     private static <T extends Packet<ServerGamePacketListener>> PacketType<T> c2s(String id, StreamCodec<? super RegistryFriendlyByteBuf, T> codec) {
-        PacketType<T> type = new PacketType<>(PacketFlow.SERVERBOUND, ResourceLocation.fromNamespaceAndPath(MOD_ID, id));
+        PacketType<T> type = new PacketType<>(PacketFlow.SERVERBOUND, Identifier.fromNamespaceAndPath(MOD_ID, id));
         C2S.put(
             (PacketType<Packet<ServerGamePacketListener>>) type,
             (StreamCodec<? super RegistryFriendlyByteBuf, Packet<ServerGamePacketListener>>) codec

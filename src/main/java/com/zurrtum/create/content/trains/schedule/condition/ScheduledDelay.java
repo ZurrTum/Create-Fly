@@ -2,11 +2,11 @@ package com.zurrtum.create.content.trains.schedule.condition;
 
 import com.zurrtum.create.content.trains.entity.Train;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.Level;
 
 public class ScheduledDelay extends TimedWaitCondition {
-    public ScheduledDelay(ResourceLocation id) {
+    public ScheduledDelay(Identifier id) {
         super(id);
     }
 

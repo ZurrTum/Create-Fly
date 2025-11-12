@@ -8,13 +8,14 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Stream;
+
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderSet;
 import net.minecraft.core.component.DataComponentPatch;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -23,10 +24,10 @@ import net.minecraft.world.item.crafting.display.SlotDisplay;
 
 public class ComponentsIngredient extends Ingredient {
     public static final String TYPE_KEY = "fabric:type";
-    public static final ResourceLocation ID = ResourceLocation.fromNamespaceAndPath("fabric", "components");
+    public static final Identifier ID = Identifier.fromNamespaceAndPath("fabric", "components");
     public static final String STRING_ID = ID.toString();
     public static final Codec<ComponentsIngredient> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-        ResourceLocation.CODEC.optionalFieldOf(TYPE_KEY).forGetter(i -> Optional.of(ID)),
+        Identifier.CODEC.optionalFieldOf(TYPE_KEY).forGetter(i -> Optional.of(ID)),
         Ingredient.CODEC.fieldOf("base").forGetter(ComponentsIngredient::getBase),
         DataComponentPatch.CODEC.fieldOf("components").forGetter(ComponentsIngredient::getComponents)
     ).apply(instance, (id, base, components) -> new ComponentsIngredient(base, components)));

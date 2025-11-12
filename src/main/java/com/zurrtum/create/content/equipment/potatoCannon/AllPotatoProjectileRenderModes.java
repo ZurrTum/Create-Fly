@@ -6,7 +6,7 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.zurrtum.create.api.equipment.potatoCannon.PotatoProjectileRenderMode;
 import com.zurrtum.create.api.registry.CreateRegistries;
 import net.minecraft.core.Registry;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.phys.Vec3;
 
@@ -21,7 +21,7 @@ public class AllPotatoProjectileRenderModes {
     }
 
     private static void register(String name, MapCodec<? extends PotatoProjectileRenderMode> codec) {
-        Registry.register(CreateRegistries.POTATO_PROJECTILE_RENDER_MODE, ResourceLocation.fromNamespaceAndPath(MOD_ID, name), codec);
+        Registry.register(CreateRegistries.POTATO_PROJECTILE_RENDER_MODE, Identifier.fromNamespaceAndPath(MOD_ID, name), codec);
     }
 
     public enum Billboard implements PotatoProjectileRenderMode {

@@ -5,7 +5,7 @@ import com.zurrtum.create.AllItems;
 import com.zurrtum.create.content.equipment.armor.BacktankUtil;
 import com.zurrtum.create.infrastructure.config.AllConfigs;
 import net.minecraft.core.component.DataComponents;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
@@ -25,19 +25,19 @@ import static com.zurrtum.create.Create.MOD_ID;
 
 public class ExtendoGripItem extends Item {
     public static final AttributeModifier singleRangeAttributeModifier = new AttributeModifier(
-        ResourceLocation.fromNamespaceAndPath(
+        Identifier.fromNamespaceAndPath(
             MOD_ID,
             "single_range_attribute_modifier"
     ), 3, AttributeModifier.Operation.ADD_VALUE
     );
     public static final AttributeModifier doubleRangeAttributeModifier = new AttributeModifier(
-        ResourceLocation.fromNamespaceAndPath(
+        Identifier.fromNamespaceAndPath(
             MOD_ID,
             "double_range_attribute_modifier"
     ), 2, AttributeModifier.Operation.ADD_VALUE
     );
     public static final AttributeModifier attackKnockbackAttributeModifier = new AttributeModifier(
-        ResourceLocation.fromNamespaceAndPath(
+        Identifier.fromNamespaceAndPath(
             MOD_ID,
             "attack_knockback_attribute_modifier"
     ), 4, AttributeModifier.Operation.ADD_VALUE

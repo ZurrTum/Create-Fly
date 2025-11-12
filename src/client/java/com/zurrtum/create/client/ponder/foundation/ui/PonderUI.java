@@ -41,6 +41,7 @@ import org.joml.Matrix3x2fStack;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.Options;
@@ -52,7 +53,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.Style;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
@@ -111,7 +112,7 @@ public class PonderUI extends AbstractPonderScreen {
     private int extendedTickLength = 0;
     private int extendedTickTimer = 0;
 
-    public static PonderUI of(ResourceLocation id) {
+    public static PonderUI of(Identifier id) {
         return new PonderUI(PonderIndex.getSceneAccess().compile(id));
     }
 
@@ -126,7 +127,7 @@ public class PonderUI extends AbstractPonderScreen {
     }
 
     protected PonderUI(List<PonderScene> scenes) {
-        ResourceLocation location = scenes.get(0).getLocation();
+        Identifier location = scenes.get(0).getLocation();
         stack = new ItemStack(RegisteredObjectsHelper.getItemOrBlock(location));
         itemRender = GuiGameElement.of(stack).scale(2).at(-35, 1);
 
@@ -149,7 +150,7 @@ public class PonderUI extends AbstractPonderScreen {
                 DebugScenes::empty,
                 Ponder.MOD_ID,
                 "debug/scene_1",
-                ResourceLocation.parse("stick")
+                Identifier.parse("stick")
             ));
             this.scenes.addAll(PonderIndex.getSceneAccess().compile(list));
         }
@@ -174,7 +175,7 @@ public class PonderUI extends AbstractPonderScreen {
         List<PonderScene> sceneList = new ArrayList<>(scenes);
         Collections.reverse(sceneList);
 
-        Map<ResourceLocation, PonderScene> sceneLookup = scenes.stream().collect(Collectors.toMap(PonderScene::getId, scene -> scene));
+        Map<Identifier, PonderScene> sceneLookup = scenes.stream().collect(Collectors.toMap(PonderScene::getId, scene -> scene));
 
         MutableGraph<PonderScene> graph = GraphBuilder.directed().nodeOrder(ElementOrder.insertion()).build();
         sceneList.forEach(graph::addNode);
@@ -348,8 +349,8 @@ public class PonderUI extends AbstractPonderScreen {
         }
 
         bX += 50 + spacing;
-        addRenderableWidget(left = new PonderButton(bX, bY).withShortcut(bindings.keyLeft).showing(PonderGuiTextures.ICON_PONDER_LEFT).enableFade(0, 5)
-            .withCallback(() -> this.scroll(false)));
+        addRenderableWidget(left = new PonderButton(bX, bY).withShortcut(bindings.keyLeft).showing(PonderGuiTextures.ICON_PONDER_LEFT)
+            .enableFade(0, 5).withCallback(() -> this.scroll(false)));
 
         bX += 20 + spacing;
         addRenderableWidget(close = new PonderButton(bX, bY).withShortcut(bindings.keyInventory).showing(PonderGuiTextures.ICON_PONDER_CLOSE)

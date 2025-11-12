@@ -6,7 +6,7 @@ import com.zurrtum.create.client.catnip.gui.element.ScreenElement;
 import com.zurrtum.create.client.ponder.Ponder;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.renderer.RenderPipelines;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix3x2fStack;
@@ -18,17 +18,17 @@ public class PonderTag implements ScreenElement {
      * for a certain Scene should be highlighted instead of selected single ones
      */
     public static final class Highlight {
-        public static final ResourceLocation ALL = Ponder.asResource("_all");
+        public static final Identifier ALL = Ponder.asResource("_all");
     }
 
-    private final ResourceLocation id;
+    private final Identifier id;
     @Nullable
-    private final ResourceLocation textureIconLocation;
+    private final Identifier textureIconLocation;
     private final ItemStack mainItem;
     private final GuiItemRenderBuilder itemIcon;
 
 
-    public PonderTag(ResourceLocation id, @Nullable ResourceLocation textureIconLocation, ItemStack itemIcon, ItemStack mainItem) {
+    public PonderTag(Identifier id, @Nullable Identifier textureIconLocation, ItemStack itemIcon, ItemStack mainItem) {
         this.id = id;
         this.textureIconLocation = textureIconLocation;
         this.mainItem = mainItem;
@@ -39,7 +39,7 @@ public class PonderTag implements ScreenElement {
         }
     }
 
-    public ResourceLocation getId() {
+    public Identifier getId() {
         return id;
     }
 

@@ -19,7 +19,7 @@ import net.minecraft.client.renderer.state.CameraRenderState;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
@@ -99,7 +99,7 @@ public class FrogportRenderer implements BlockEntityRenderer<FrogportBlockEntity
                 itemDistance = tongueLength;
             }
             if (be.animatedPackage != null && scale >= 0.45) {
-                ResourceLocation key = BuiltInRegistries.ITEM.getKey(be.animatedPackage.getItem());
+                Identifier key = BuiltInRegistries.ITEM.getKey(be.animatedPackage.getItem());
                 if (key != BuiltInRegistries.ITEM.getDefaultKey()) {
                     data.box = CachedBuffers.partial(AllPartialModels.PACKAGES.get(key), state.blockState);
                     data.boxOffset = diff.normalize().scale(itemDistance).subtract(0, depositing ? 0.75 : 0, 0);

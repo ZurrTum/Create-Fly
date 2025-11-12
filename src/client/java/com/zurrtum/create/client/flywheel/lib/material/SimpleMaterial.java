@@ -3,7 +3,7 @@ package com.zurrtum.create.client.flywheel.lib.material;
 import com.zurrtum.create.client.flywheel.api.material.*;
 import net.minecraft.client.renderer.RenderStateShard;
 import net.minecraft.client.renderer.texture.TextureAtlas;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 public class SimpleMaterial implements Material {
     protected final MaterialShaders shaders;
@@ -11,7 +11,7 @@ public class SimpleMaterial implements Material {
     protected final CutoutShader cutout;
     protected final LightShader light;
 
-    protected final ResourceLocation texture;
+    protected final Identifier texture;
     protected final boolean blur;
     protected final boolean mipmap;
 
@@ -74,7 +74,7 @@ public class SimpleMaterial implements Material {
     }
 
     @Override
-    public ResourceLocation texture() {
+    public Identifier texture() {
         return texture;
     }
 
@@ -134,7 +134,7 @@ public class SimpleMaterial implements Material {
         protected CutoutShader cutout;
         protected LightShader light;
 
-        protected ResourceLocation texture;
+        protected Identifier texture;
         protected boolean blur;
         protected boolean mipmap;
 
@@ -210,7 +210,7 @@ public class SimpleMaterial implements Material {
             return this;
         }
 
-        public Builder texture(ResourceLocation value) {
+        public Builder texture(Identifier value) {
             this.texture = value;
             return this;
         }
@@ -294,7 +294,7 @@ public class SimpleMaterial implements Material {
         }
 
         @Override
-        public ResourceLocation texture() {
+        public Identifier texture() {
             return texture;
         }
 

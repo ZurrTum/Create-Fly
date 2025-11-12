@@ -17,25 +17,31 @@
 package com.zurrtum.create.client.infrastructure.itemGroup;
 
 import com.zurrtum.create.infrastructure.itemGroup.FabricItemGroupImpl;
+
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.CreativeModeTabs;
 
 public class FabricCreativeGuiComponents {
-    private static final ResourceLocation BUTTON_TEX = ResourceLocation.fromNamespaceAndPath("fabric", "textures/gui/creative_buttons.png");
+    private static final Identifier BUTTON_TEX = Identifier.fromNamespaceAndPath("fabric", "textures/gui/creative_buttons.png");
     private static final double TABS_PER_PAGE = FabricItemGroupImpl.TABS_PER_PAGE;
-    public static final Set<CreativeModeTab> COMMON_GROUPS = Set.of(CreativeModeTabs.SEARCH, CreativeModeTabs.INVENTORY, CreativeModeTabs.HOTBAR, CreativeModeTabs.OP_BLOCKS)
-        .stream().map(BuiltInRegistries.CREATIVE_MODE_TAB::getValueOrThrow).collect(Collectors.toSet());
+    public static final Set<CreativeModeTab> COMMON_GROUPS = Set.of(
+        CreativeModeTabs.SEARCH,
+        CreativeModeTabs.INVENTORY,
+        CreativeModeTabs.HOTBAR,
+        CreativeModeTabs.OP_BLOCKS
+    ).stream().map(BuiltInRegistries.CREATIVE_MODE_TAB::getValueOrThrow).collect(Collectors.toSet());
 
     public static int getPageCount() {
         return (int) Math.ceil((CreativeModeTabs.tabs().size() - COMMON_GROUPS.stream().filter(CreativeModeTab::shouldDisplay)

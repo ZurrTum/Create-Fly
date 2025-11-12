@@ -36,7 +36,7 @@ accessible	method	net/minecraft/client/model/geom/ModelPart	compile	(Lcom/mojang
 accessible	field	com/mojang/blaze3d/vertex/PoseStack	poses	Ljava/util/List;
 accessible	method	net/minecraft/world/level/Level	getEntities	()Lnet/minecraft/world/level/entity/LevelEntityGetter;
 accessible	method	net/minecraft/server/level/ServerLevel	getEntities	()Lnet/minecraft/world/level/entity/LevelEntityGetter;
-#accessible	method	net/minecraft/client/resources/model/ModelDiscovery	getOrCreateModel	(Lnet/minecraft/resources/ResourceLocation;)Lnet/minecraft/client/resources/model/ModelDiscovery$ModelWrapper;
+#accessible	method	net/minecraft/client/resources/model/ModelDiscovery	getOrCreateModel	(Lnet/minecraft/resources/Identifier;)Lnet/minecraft/client/resources/model/ModelDiscovery$ModelWrapper;
 accessible	field	com/mojang/blaze3d/vertex/BufferBuilder	vertices	I
 accessible	class	net/minecraft/client/resources/model/ModelDiscovery$ModelWrapper
 accessible	field	net/minecraft/client/renderer/LevelRenderer	renderBuffers	Lnet/minecraft/client/renderer/RenderBuffers;

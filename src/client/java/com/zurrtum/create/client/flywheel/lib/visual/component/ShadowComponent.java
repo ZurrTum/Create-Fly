@@ -18,7 +18,7 @@ import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction.Axis;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.Level;
@@ -40,7 +40,7 @@ import org.joml.Vector4fc;
  * The shadow will be cast on blocks at most {@code min(radius, 2 * strength)} blocks below the entity.</p>
  */
 public final class ShadowComponent implements EntityComponent {
-    private static final ResourceLocation SHADOW_TEXTURE = ResourceLocation.withDefaultNamespace("textures/misc/shadow.png");
+    private static final Identifier SHADOW_TEXTURE = Identifier.withDefaultNamespace("textures/misc/shadow.png");
     private static final Material SHADOW_MATERIAL = SimpleMaterial.builder().texture(SHADOW_TEXTURE).mipmap(false)
         .polygonOffset(true) // vanilla shadows use "view offset" but this seems to work fine
         .transparency(Transparency.TRANSLUCENT).writeMask(WriteMask.COLOR).build();

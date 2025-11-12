@@ -8,7 +8,7 @@ import com.zurrtum.create.api.schematic.requirement.SpecialBlockItemRequirement;
 import com.zurrtum.create.foundation.block.IBE;
 import com.zurrtum.create.foundation.block.ProperWaterloggedBlock;
 import net.minecraft.core.BlockPos;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -31,7 +31,7 @@ public class StandardBogeyBlock extends AbstractBogeyBlock<StandardBogeyBlockEnt
     }
 
     @Override
-    public ResourceLocation getTrackType(BogeyStyle style) {
+    public Identifier getTrackType(BogeyStyle style) {
         return AllTrackMaterials.ANDESITE.getId();
     }
 

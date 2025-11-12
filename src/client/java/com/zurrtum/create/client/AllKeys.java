@@ -4,11 +4,12 @@ import org.lwjgl.glfw.GLFW;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.KeyMapping.Category;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.input.InputQuirks;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 import static com.zurrtum.create.Create.MOD_ID;
 
@@ -16,7 +17,7 @@ import com.mojang.blaze3d.platform.InputConstants;
 
 public class AllKeys {
     public static final List<KeyMapping> ALL = new ArrayList<>();
-    public static final Category CATEGORY = Category.register(ResourceLocation.fromNamespaceAndPath(MOD_ID, "binding"));
+    public static final Category CATEGORY = Category.register(Identifier.fromNamespaceAndPath(MOD_ID, "binding"));
     public static final KeyMapping TOOL_MENU = register("toolmenu", GLFW.GLFW_KEY_LEFT_ALT);
     public static final KeyMapping TOOLBELT = register("toolbelt", GLFW.GLFW_KEY_LEFT_ALT);
     public static final KeyMapping ROTATE_MENU = register("rotate_menu", GLFW.GLFW_KEY_UNKNOWN);
@@ -39,17 +40,20 @@ public class AllKeys {
         return InputQuirks.REPLACE_CTRL_KEY_WITH_CMD_KEY ? InputConstants.isKeyDown(
             Minecraft.getInstance().getWindow(),
             GLFW.GLFW_KEY_LEFT_SUPER
-        ) || InputConstants.isKeyDown(Minecraft.getInstance().getWindow(), GLFW.GLFW_KEY_RIGHT_SUPER) : InputConstants.isKeyDown(
+        ) || InputConstants.isKeyDown(
             Minecraft.getInstance().getWindow(),
-            GLFW.GLFW_KEY_LEFT_CONTROL
-        ) || InputConstants.isKeyDown(Minecraft.getInstance().getWindow(), GLFW.GLFW_KEY_RIGHT_CONTROL);
+            GLFW.GLFW_KEY_RIGHT_SUPER
+        ) : InputConstants.isKeyDown(Minecraft.getInstance().getWindow(), GLFW.GLFW_KEY_LEFT_CONTROL) || InputConstants.isKeyDown(
+            Minecraft.getInstance().getWindow(),
+            GLFW.GLFW_KEY_RIGHT_CONTROL
+        );
     }
 
     public static boolean hasShiftDown() {
-        return InputConstants.isKeyDown(Minecraft.getInstance().getWindow(), GLFW.GLFW_KEY_LEFT_SHIFT) || InputConstants.isKeyDown(
+        return InputConstants.isKeyDown(
             Minecraft.getInstance().getWindow(),
-            GLFW.GLFW_KEY_RIGHT_SHIFT
-        );
+            GLFW.GLFW_KEY_LEFT_SHIFT
+        ) || InputConstants.isKeyDown(Minecraft.getInstance().getWindow(), GLFW.GLFW_KEY_RIGHT_SHIFT);
     }
 
     public static void register() {

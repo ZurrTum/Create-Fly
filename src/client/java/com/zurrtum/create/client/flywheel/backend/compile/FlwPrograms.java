@@ -7,7 +7,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
-import net.minecraft.resources.ResourceLocation;
+
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.resources.ResourceManager;
 
 import static com.zurrtum.create.client.flywheel.impl.Flywheel.MOD_ID;
@@ -15,7 +16,7 @@ import static com.zurrtum.create.client.flywheel.impl.Flywheel.MOD_ID;
 public final class FlwPrograms {
     public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID + "/backend/shaders");
 
-    private static final ResourceLocation COMPONENTS_HEADER_FRAG = ResourceUtil.rl("internal/components_header.frag");
+    private static final Identifier COMPONENTS_HEADER_FRAG = ResourceUtil.rl("internal/components_header.frag");
 
     public static ShaderSources SOURCES;
 

@@ -1,19 +1,19 @@
 package com.zurrtum.create.client.ponder.api.registration;
 
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 public interface LangRegistryAccess {
 
-    String getShared(ResourceLocation key);
+    String getShared(Identifier key);
 
-    String getShared(ResourceLocation key, Object... params);
+    String getShared(Identifier key, Object... params);
 
-    String getTagName(ResourceLocation key);
+    String getTagName(Identifier key);
 
-    String getTagDescription(ResourceLocation key);
+    String getTagDescription(Identifier key);
 
-    String getSpecific(ResourceLocation sceneId, String k);
+    String getSpecific(Identifier sceneId, String k);
 
-    String getSpecific(ResourceLocation sceneId, String k, Object... params);
+    String getSpecific(Identifier sceneId, String k, Object... params);
 
 }

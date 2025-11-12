@@ -8,7 +8,7 @@ import com.zurrtum.create.content.trains.entity.Train;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
@@ -18,7 +18,7 @@ public class RedstoneLinkCondition extends ScheduleWaitCondition {
 
     public Couple<Frequency> freq;
 
-    public RedstoneLinkCondition(ResourceLocation id) {
+    public RedstoneLinkCondition(Identifier id) {
         super(id);
         freq = Couple.create(() -> Frequency.EMPTY);
     }

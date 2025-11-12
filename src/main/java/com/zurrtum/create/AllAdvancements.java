@@ -3,7 +3,7 @@ package com.zurrtum.create;
 import com.zurrtum.create.foundation.advancement.CreateTrigger;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 import static com.zurrtum.create.Create.MOD_ID;
 
@@ -100,7 +100,7 @@ public class AllAdvancements {
     public static final CreateTrigger TRAIN_CRASH_BACKWARDS = register("train_crash_backwards");
 
     private static CreateTrigger register(String name) {
-        ResourceLocation id = ResourceLocation.fromNamespaceAndPath(MOD_ID, name);
+        Identifier id = Identifier.fromNamespaceAndPath(MOD_ID, name);
         CreateTrigger trigger = new CreateTrigger(id);
         return Registry.register(BuiltInRegistries.TRIGGER_TYPES, id.withSuffix("_builtin"), trigger);
     }

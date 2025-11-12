@@ -4,9 +4,11 @@ import com.zurrtum.create.client.flywheel.api.backend.Backend;
 import com.zurrtum.create.client.flywheel.impl.visualization.VisualizationManagerImpl;
 import com.zurrtum.create.client.flywheel.lib.backend.SimpleBackend;
 import com.zurrtum.create.client.flywheel.lib.util.ResourceUtil;
+
 import java.util.ArrayList;
+
 import net.minecraft.client.multiplayer.ClientLevel;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 public final class BackendManagerImpl {
     public static final Backend OFF_BACKEND = SimpleBackend.builder().engineFactory(level -> {
@@ -75,7 +77,7 @@ public final class BackendManagerImpl {
     }
 
     public static String getBackendString() {
-        ResourceLocation backendId = Backend.REGISTRY.getId(backend);
+        Identifier backendId = Backend.REGISTRY.getId(backend);
         if (backendId == null) {
             return "[unregistered]";
         }

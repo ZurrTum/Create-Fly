@@ -4,11 +4,11 @@ import com.zurrtum.create.content.trains.entity.Train;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.Level;
 
 public class PlayerPassengerCondition extends ScheduleWaitCondition {
-    public PlayerPassengerCondition(ResourceLocation id) {
+    public PlayerPassengerCondition(Identifier id) {
         super(id);
     }
 

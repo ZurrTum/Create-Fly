@@ -9,11 +9,12 @@ import com.zurrtum.create.content.trains.station.GlobalStation;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
-import net.minecraft.resources.ResourceLocation;
+
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.Level;
 
 public class DestinationInstruction extends TextScheduleInstruction {
-    public DestinationInstruction(ResourceLocation id) {
+    public DestinationInstruction(Identifier id) {
         super(id);
     }
 

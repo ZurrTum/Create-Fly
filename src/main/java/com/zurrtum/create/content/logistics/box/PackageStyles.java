@@ -3,7 +3,8 @@ package com.zurrtum.create.content.logistics.box;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
-import net.minecraft.resources.ResourceLocation;
+
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 
 import static com.zurrtum.create.Create.MOD_ID;
@@ -14,23 +15,23 @@ public class PackageStyles {
             this(MOD_ID, type, width, height, riggingOffset, rare);
         }
 
-        public ResourceLocation getItemId() {
+        public Identifier getItemId() {
             String size = "_" + width + "x" + height;
             String id = type + "_package" + (rare ? "" : size);
-            return ResourceLocation.fromNamespaceAndPath(namespace, id);
+            return Identifier.fromNamespaceAndPath(namespace, id);
         }
 
-        public ResourceLocation getModel() {
+        public Identifier getModel() {
             if (type.equals("cardboard")) {
-                return ResourceLocation.fromNamespaceAndPath(namespace, "item/package/cardboard_" + width + "x" + height);
+                return Identifier.fromNamespaceAndPath(namespace, "item/package/cardboard_" + width + "x" + height);
             } else {
                 return getItemId().withPrefix("item/");
             }
         }
 
-        public ResourceLocation getRiggingModel() {
+        public Identifier getRiggingModel() {
             String size = width + "x" + height;
-            return ResourceLocation.fromNamespaceAndPath(namespace, "item/package/rigging_" + size);
+            return Identifier.fromNamespaceAndPath(namespace, "item/package/rigging_" + size);
         }
     }
 

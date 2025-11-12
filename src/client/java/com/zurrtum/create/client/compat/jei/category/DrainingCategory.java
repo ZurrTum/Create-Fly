@@ -25,7 +25,7 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.Ingredient;
@@ -47,10 +47,13 @@ public class DrainingCategory extends CreateCategory<RecipeHolder<EmptyingRecipe
         MutableInt i = new MutableInt();
         itemStream.forEach(stack -> {
             if (PotionFluidHandler.isPotionItem(stack)) {
-                Ingredient ingredient = stack.getComponentsPatch()
-                    .isEmpty() ? Ingredient.of(stack.getItem()) : DefaultCustomIngredients.components(stack);
+                Ingredient ingredient = stack.getComponentsPatch().isEmpty() ? Ingredient.of(stack.getItem()) : DefaultCustomIngredients.components(
+                    stack);
                 recipes.add(new RecipeHolder<>(
-                    ResourceKey.create(Registries.RECIPE, ResourceLocation.fromNamespaceAndPath(MOD_ID, "draining_potions_" + i.getAndIncrement())),
+                    ResourceKey.create(
+                        Registries.RECIPE,
+                        Identifier.fromNamespaceAndPath(MOD_ID, "draining_potions_" + i.getAndIncrement())
+                    ),
                     new EmptyingRecipe(Items.GLASS_BOTTLE.getDefaultInstance(), PotionFluidHandler.getFluidFromPotionItem(stack), ingredient)
                 ));
                 return;
@@ -63,14 +66,14 @@ public class DrainingCategory extends CreateCategory<RecipeHolder<EmptyingRecipe
                 if (fluid.isEmpty()) {
                     return;
                 }
-                ResourceLocation itemName = BuiltInRegistries.ITEM.getKey(stack.getItem());
-                ResourceLocation fluidName = BuiltInRegistries.FLUID.getKey(fluid.getFluid());
-                ResourceLocation id = ResourceLocation.fromNamespaceAndPath(
+                Identifier itemName = BuiltInRegistries.ITEM.getKey(stack.getItem());
+                Identifier fluidName = BuiltInRegistries.FLUID.getKey(fluid.getFluid());
+                Identifier id = Identifier.fromNamespaceAndPath(
                     MOD_ID,
                     "empty_" + itemName.getNamespace() + "_" + itemName.getPath() + "_with_" + fluidName.getNamespace() + "_" + fluidName.getPath()
                 );
-                Ingredient ingredient = stack.getComponentsPatch()
-                    .isEmpty() ? Ingredient.of(stack.getItem()) : DefaultCustomIngredients.components(stack);
+                Ingredient ingredient = stack.getComponentsPatch().isEmpty() ? Ingredient.of(stack.getItem()) : DefaultCustomIngredients.components(
+                    stack);
                 recipes.add(new RecipeHolder<>(
                     ResourceKey.create(Registries.RECIPE, id),
                     new EmptyingRecipe(capability.getContainer(), fluid, ingredient)

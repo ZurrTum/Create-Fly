@@ -4,30 +4,31 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 public class StitchedSprite {
-    private static final Map<ResourceLocation, List<StitchedSprite>> ALL = new HashMap<>();
+    private static final Map<Identifier, List<StitchedSprite>> ALL = new HashMap<>();
 
-    protected final ResourceLocation atlasLocation;
-    protected final ResourceLocation location;
+    protected final Identifier atlasLocation;
+    protected final Identifier location;
     protected TextureAtlasSprite sprite;
 
-    public StitchedSprite(ResourceLocation atlas, ResourceLocation location) {
+    public StitchedSprite(Identifier atlas, Identifier location) {
         atlasLocation = atlas;
         this.location = location;
         ALL.computeIfAbsent(atlasLocation, $ -> new ArrayList<>()).add(this);
     }
 
     @SuppressWarnings("deprecation")
-    public StitchedSprite(ResourceLocation location) {
+    public StitchedSprite(Identifier location) {
         this(TextureAtlas.LOCATION_BLOCKS, location);
     }
 
     public static void onTextureStitchPost(TextureAtlas atlas) {
-        ResourceLocation atlasLocation = atlas.location();
+        Identifier atlasLocation = atlas.location();
         List<StitchedSprite> sprites = ALL.get(atlasLocation);
         if (sprites != null) {
             for (StitchedSprite sprite : sprites) {
@@ -40,11 +41,11 @@ public class StitchedSprite {
         sprite = atlas.getSprite(location);
     }
 
-    public ResourceLocation getAtlasLocation() {
+    public Identifier getAtlasLocation() {
         return atlasLocation;
     }
 
-    public ResourceLocation getLocation() {
+    public Identifier getLocation() {
         return location;
     }
 

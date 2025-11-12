@@ -3,7 +3,7 @@ package com.zurrtum.create.content.trains.schedule.condition;
 import com.zurrtum.create.content.trains.entity.Carriage;
 import com.zurrtum.create.content.trains.entity.Train;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.Level;
 
 public abstract class CargoThresholdCondition extends LazyTickedScheduleCondition {
@@ -27,7 +27,7 @@ public abstract class CargoThresholdCondition extends LazyTickedScheduleConditio
         }
     }
 
-    public CargoThresholdCondition(ResourceLocation id) {
+    public CargoThresholdCondition(Identifier id) {
         super(id, 20);
         data.putString("Threshold", "10");
     }

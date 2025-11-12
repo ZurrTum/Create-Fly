@@ -23,7 +23,7 @@ import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.component.ItemLore;
 import net.minecraft.world.item.crafting.*;
@@ -75,7 +75,7 @@ public record SequencedAssemblyRecipe(
         private static final String INGREDIENT_ID = "$ingredient";
         private static final String RESULT_ID = "$result";
         private static final AtomicInteger idGenerator = new AtomicInteger();
-        public static final Map<ResourceLocation, Recipe<?>> GENERATE_RECIPES = new HashMap<>();
+        public static final Map<Identifier, Recipe<?>> GENERATE_RECIPES = new HashMap<>();
         public static final MapCodec<SequencedAssemblyRecipe> CODEC = new MapCodec<>() {
             @Override
             public <T> RecordBuilder<T> encode(SequencedAssemblyRecipe input, DynamicOps<T> ops, RecordBuilder<T> prefix) {
@@ -157,7 +157,7 @@ public record SequencedAssemblyRecipe(
                     };
                     JsonElement jsonResult = ItemStack.CODEC.encodeStart(ops, result.stack()).getOrThrow();
 
-                    ResourceLocation id = ResourceLocation.parse(AllRecipeTypes.SEQUENCED_ASSEMBLY.toString())
+                    Identifier id = Identifier.parse(AllRecipeTypes.SEQUENCED_ASSEMBLY.toString())
                         .withSuffix("_" + idGenerator.incrementAndGet() + "_" + BuiltInRegistries.ITEM.getKey(result.stack().getItem())
                             .getPath() + "_");
                     List<Recipe<?>> sequence = new ArrayList<>(size);

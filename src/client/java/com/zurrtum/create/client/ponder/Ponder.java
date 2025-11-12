@@ -7,7 +7,7 @@ import com.zurrtum.create.client.catnip.render.SuperByteBufferCache;
 import com.zurrtum.create.client.ponder.enums.PonderConfig;
 import com.zurrtum.create.client.ponder.enums.PonderKeybinds;
 import com.zurrtum.create.client.ponder.foundation.element.WorldSectionElementImpl;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import org.slf4j.Logger;
 
 public class Ponder {
@@ -18,8 +18,8 @@ public class Ponder {
         return new LangBuilder(MOD_ID);
     }
 
-    public static ResourceLocation asResource(String path) {
-        return ResourceLocation.fromNamespaceAndPath(MOD_ID, path);
+    public static Identifier asResource(String path) {
+        return Identifier.fromNamespaceAndPath(MOD_ID, path);
     }
 
     public void onInitializeClient() {

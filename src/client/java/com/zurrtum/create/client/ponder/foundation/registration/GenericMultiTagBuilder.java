@@ -2,7 +2,7 @@ package com.zurrtum.create.client.ponder.foundation.registration;
 
 import com.zurrtum.create.client.ponder.api.registration.MultiTagBuilder;
 import com.zurrtum.create.client.ponder.api.registration.PonderTagRegistrationHelper;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 public class GenericMultiTagBuilder<T> implements MultiTagBuilder {
 
@@ -10,9 +10,9 @@ public class GenericMultiTagBuilder<T> implements MultiTagBuilder {
 
     public class Tag implements MultiTagBuilder.Tag<T> {
 
-        Iterable<ResourceLocation> tags;
+        Iterable<Identifier> tags;
 
-        public Tag(PonderTagRegistrationHelper<T> helper, Iterable<ResourceLocation> tags) {
+        public Tag(PonderTagRegistrationHelper<T> helper, Iterable<Identifier> tags) {
             GenericMultiTagBuilder.this.helper = helper;
             this.tags = tags;
         }
@@ -34,7 +34,7 @@ public class GenericMultiTagBuilder<T> implements MultiTagBuilder {
         }
 
         @Override
-        public com.zurrtum.create.client.ponder.foundation.registration.GenericMultiTagBuilder.Component add(ResourceLocation tag) {
+        public com.zurrtum.create.client.ponder.foundation.registration.GenericMultiTagBuilder.Component add(Identifier tag) {
             components.forEach(component -> helper.addTagToComponent(component, tag));
             return this;
         }

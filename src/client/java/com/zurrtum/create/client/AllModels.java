@@ -3,13 +3,15 @@ package com.zurrtum.create.client;
 import com.mojang.serialization.MapCodec;
 import com.zurrtum.create.AllBlocks;
 import com.zurrtum.create.client.infrastructure.model.*;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.BiFunction;
+
 import net.minecraft.client.renderer.block.model.BlockStateModel.UnbakedRoot;
 import net.minecraft.client.renderer.item.ItemModel;
 import net.minecraft.client.renderer.item.ItemModels;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 
@@ -22,7 +24,7 @@ public class AllModels {
         });
     }
 
-    public static <T extends ItemModel.Unbaked> void register(ResourceLocation id, MapCodec<T> codec) {
+    public static <T extends ItemModel.Unbaked> void register(Identifier id, MapCodec<T> codec) {
         ItemModels.ID_MAPPER.put(id, codec);
     }
 

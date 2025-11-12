@@ -46,7 +46,7 @@ import net.minecraft.core.HolderSet;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.DyeItem;
 import net.minecraft.world.item.Item;
@@ -62,7 +62,7 @@ import static com.zurrtum.create.Create.MOD_ID;
 
 @JeiPlugin
 public class JeiClientPlugin implements IModPlugin {
-    public static final ResourceLocation ID = Create.asResource("jei_plugin");
+    public static final Identifier ID = Create.asResource("jei_plugin");
     public static final IRecipeType<RecipeHolder<CraftingRecipe>> AUTOMATIC_PACKING = createRecipeHolderType("automatic_packing");
     public static final IRecipeType<RecipeHolder<CompactingRecipe>> PACKING = createRecipeHolderType("packing");
     public static final IRecipeType<RecipeHolder<PressingRecipe>> PRESSING = createRecipeHolderType("pressing");
@@ -92,13 +92,13 @@ public class JeiClientPlugin implements IModPlugin {
 
     @SuppressWarnings("unchecked")
     public static <T> IRecipeType<T> createRecipeHolderType(String path) {
-        ResourceLocation uid = ResourceLocation.fromNamespaceAndPath(MOD_ID, path);
+        Identifier uid = Identifier.fromNamespaceAndPath(MOD_ID, path);
         return (IRecipeType<T>) IRecipeType.create(uid, RecipeHolder.class);
     }
 
     @Override
     @NotNull
-    public ResourceLocation getPluginUid() {
+    public Identifier getPluginUid() {
         return ID;
     }
 
@@ -196,7 +196,7 @@ public class JeiClientPlugin implements IModPlugin {
         List<RecipeHolder<CraftingRecipe>> recipes = new ArrayList<>();
         for (DyeColor color : DyeColor.values()) {
             recipes.add(new RecipeHolder<>(
-                ResourceKey.create(Registries.RECIPE, ResourceLocation.fromNamespaceAndPath(MOD_ID, group + "/" + color)), new ShapelessRecipe(
+                ResourceKey.create(Registries.RECIPE, Identifier.fromNamespaceAndPath(MOD_ID, group + "/" + color)), new ShapelessRecipe(
                 group,
                 CraftingBookCategory.MISC,
                 ToolboxBlock.getColorBlock(color).asItem().getDefaultInstance(),

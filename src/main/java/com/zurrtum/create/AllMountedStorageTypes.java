@@ -17,7 +17,7 @@ import com.zurrtum.create.content.logistics.vault.ItemVaultMountedStorageType;
 import com.zurrtum.create.impl.contraption.storage.FallbackMountedStorageType;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
@@ -42,7 +42,7 @@ public class AllMountedStorageTypes {
     private static <T extends MountedItemStorageType<?>> T register(String id, T type) {
         return Registry.register(
             CreateRegistries.MOUNTED_ITEM_STORAGE_TYPE,
-            ResourceKey.create(CreateRegistryKeys.MOUNTED_ITEM_STORAGE_TYPE, ResourceLocation.fromNamespaceAndPath(MOD_ID, id)),
+            ResourceKey.create(CreateRegistryKeys.MOUNTED_ITEM_STORAGE_TYPE, Identifier.fromNamespaceAndPath(MOD_ID, id)),
             type
         );
     }
@@ -50,7 +50,7 @@ public class AllMountedStorageTypes {
     private static <T extends MountedFluidStorageType<?>> T register(String id, T type) {
         return Registry.register(
             CreateRegistries.MOUNTED_FLUID_STORAGE_TYPE,
-            ResourceKey.create(CreateRegistryKeys.MOUNTED_FLUID_STORAGE_TYPE, ResourceLocation.fromNamespaceAndPath(MOD_ID, id)),
+            ResourceKey.create(CreateRegistryKeys.MOUNTED_FLUID_STORAGE_TYPE, Identifier.fromNamespaceAndPath(MOD_ID, id)),
             type
         );
     }

@@ -8,7 +8,7 @@ import com.zurrtum.create.infrastructure.fluids.FluidStack;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
@@ -16,7 +16,7 @@ import net.minecraft.world.level.storage.ValueOutput;
 public class FluidThresholdCondition extends CargoThresholdCondition {
     public FilterItemStack compareStack = FilterItemStack.empty();
 
-    public FluidThresholdCondition(ResourceLocation id) {
+    public FluidThresholdCondition(Identifier id) {
         super(id);
     }
 

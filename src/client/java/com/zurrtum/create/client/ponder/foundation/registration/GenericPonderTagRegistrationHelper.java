@@ -5,16 +5,18 @@ import com.zurrtum.create.client.ponder.api.registration.PonderTagRegistrationHe
 import com.zurrtum.create.client.ponder.api.registration.TagBuilder;
 import com.zurrtum.create.client.ponder.foundation.registration.GenericMultiTagBuilder.Component;
 import com.zurrtum.create.client.ponder.foundation.registration.GenericMultiTagBuilder.Tag;
+
 import java.util.List;
 import java.util.function.Function;
-import net.minecraft.resources.ResourceLocation;
+
+import net.minecraft.resources.Identifier;
 
 public class GenericPonderTagRegistrationHelper<T> implements PonderTagRegistrationHelper<T> {
 
-    private final PonderTagRegistrationHelper<ResourceLocation> helperDelegate;
-    private final Function<T, ResourceLocation> keyGen;
+    private final PonderTagRegistrationHelper<Identifier> helperDelegate;
+    private final Function<T, Identifier> keyGen;
 
-    public GenericPonderTagRegistrationHelper(PonderTagRegistrationHelper<ResourceLocation> helperDelegate, Function<T, ResourceLocation> keyGen) {
+    public GenericPonderTagRegistrationHelper(PonderTagRegistrationHelper<Identifier> helperDelegate, Function<T, Identifier> keyGen) {
         this.helperDelegate = helperDelegate;
         this.keyGen = keyGen;
     }
@@ -25,7 +27,7 @@ public class GenericPonderTagRegistrationHelper<T> implements PonderTagRegistrat
     }
 
     @Override
-    public TagBuilder registerTag(ResourceLocation location) {
+    public TagBuilder registerTag(Identifier location) {
         return helperDelegate.registerTag(location);
     }
 
@@ -35,17 +37,17 @@ public class GenericPonderTagRegistrationHelper<T> implements PonderTagRegistrat
     }
 
     @Override
-    public void addTagToComponent(T component, ResourceLocation tag) {
+    public void addTagToComponent(T component, Identifier tag) {
         helperDelegate.addTagToComponent(keyGen.apply(component), tag);
     }
 
     @Override
-    public MultiTagBuilder.Tag<T> addToTag(ResourceLocation tag) {
+    public MultiTagBuilder.Tag<T> addToTag(Identifier tag) {
         return new GenericMultiTagBuilder<T>().new Tag(this, List.of(tag));
     }
 
     @Override
-    public MultiTagBuilder.Tag<T> addToTag(ResourceLocation... tags) {
+    public MultiTagBuilder.Tag<T> addToTag(Identifier... tags) {
         return new GenericMultiTagBuilder<T>().new Tag(this, List.of(tags));
     }
 

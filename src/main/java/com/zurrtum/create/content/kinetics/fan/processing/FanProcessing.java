@@ -5,9 +5,11 @@ import com.zurrtum.create.api.registry.CreateRegistries;
 import com.zurrtum.create.content.kinetics.belt.behaviour.TransportedItemStackHandlerBehaviour.TransportedResult;
 import com.zurrtum.create.content.kinetics.belt.transport.TransportedItemStack;
 import com.zurrtum.create.infrastructure.config.AllConfigs;
+
 import java.util.ArrayList;
 import java.util.List;
-import net.minecraft.resources.ResourceLocation;
+
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
@@ -76,7 +78,7 @@ public class FanProcessing {
         String itemType = AllSynchedDatas.ITEM_TYPE.get(entity);
         int time;
         if (itemType.isEmpty() || FanProcessingType.parse(itemType) != type) {
-            ResourceLocation key = CreateRegistries.FAN_PROCESSING_TYPE.getKey(type);
+            Identifier key = CreateRegistries.FAN_PROCESSING_TYPE.getKey(type);
             if (key == null)
                 throw new IllegalArgumentException("Could not get id for FanProcessingType " + type + "!");
             AllSynchedDatas.ITEM_TYPE.set(entity, key.toString());

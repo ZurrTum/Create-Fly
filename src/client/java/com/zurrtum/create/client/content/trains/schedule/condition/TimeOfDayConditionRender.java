@@ -13,7 +13,7 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -52,10 +52,10 @@ public class TimeOfDayConditionRender implements IScheduleInput<TimeOfDayConditi
         return t < 10 ? "0" + t : "" + t;
     }
 
-    private ResourceLocation getClockTextureId(TimeOfDayCondition input) {
+    private Identifier getClockTextureId(TimeOfDayCondition input) {
         int displayHr = (input.intData("Hour") + 12) % 24;
         float progress = (displayHr * 60f + input.intData("Minute")) / (24 * 60);
-        return ResourceLocation.withDefaultNamespace("textures/item/clock_" + twoDigits(Mth.clamp((int) (progress * 64), 0, 63)) + ".png");
+        return Identifier.withDefaultNamespace("textures/item/clock_" + twoDigits(Mth.clamp((int) (progress * 64), 0, 63)) + ".png");
     }
 
     @Override

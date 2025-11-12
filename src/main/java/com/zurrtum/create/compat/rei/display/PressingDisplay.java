@@ -11,23 +11,24 @@ import me.shedaniel.rei.api.common.entry.EntryIngredient;
 import me.shedaniel.rei.api.common.util.EntryIngredients;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.crafting.RecipeHolder;
+
 import java.util.List;
 import java.util.Optional;
 
-public record PressingDisplay(EntryIngredient input, EntryIngredient output, Optional<ResourceLocation> location) implements Display {
+public record PressingDisplay(EntryIngredient input, EntryIngredient output, Optional<Identifier> location) implements Display {
     public static final DisplaySerializer<PressingDisplay> SERIALIZER = DisplaySerializer.of(
         RecordCodecBuilder.mapCodec(instance -> instance.group(
             EntryIngredient.codec().fieldOf("inputs").forGetter(PressingDisplay::input),
             EntryIngredient.codec().fieldOf("output").forGetter(PressingDisplay::output),
-            ResourceLocation.CODEC.optionalFieldOf("location").forGetter(PressingDisplay::location)
+            Identifier.CODEC.optionalFieldOf("location").forGetter(PressingDisplay::location)
         ).apply(instance, PressingDisplay::new)), StreamCodec.composite(
             EntryIngredient.streamCodec(),
             PressingDisplay::input,
             EntryIngredient.streamCodec(),
             PressingDisplay::output,
-            ByteBufCodecs.optional(ResourceLocation.STREAM_CODEC),
+            ByteBufCodecs.optional(Identifier.STREAM_CODEC),
             PressingDisplay::location,
             PressingDisplay::new
         )
@@ -37,7 +38,7 @@ public record PressingDisplay(EntryIngredient input, EntryIngredient output, Opt
         this(entry.id().location(), entry.value());
     }
 
-    public PressingDisplay(ResourceLocation id, PressingRecipe recipe) {
+    public PressingDisplay(Identifier id, PressingRecipe recipe) {
         this(IngredientHelper.getInputEntryIngredient(recipe.ingredient()), EntryIngredients.of(recipe.result()), Optional.of(id));
     }
 
@@ -57,7 +58,7 @@ public record PressingDisplay(EntryIngredient input, EntryIngredient output, Opt
     }
 
     @Override
-    public Optional<ResourceLocation> getDisplayLocation() {
+    public Optional<Identifier> getDisplayLocation() {
         return location;
     }
 

@@ -13,14 +13,15 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Map;
+
 import net.minecraft.core.BlockPos;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.Container;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 
 public class DeliverPackagesInstruction extends ScheduleInstruction {
-    public DeliverPackagesInstruction(ResourceLocation id) {
+    public DeliverPackagesInstruction(Identifier id) {
         super(id);
     }
 

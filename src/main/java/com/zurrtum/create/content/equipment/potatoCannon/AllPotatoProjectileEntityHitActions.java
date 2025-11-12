@@ -9,12 +9,14 @@ import com.zurrtum.create.api.registry.CreateRegistries;
 import com.zurrtum.create.catnip.data.WorldAttached;
 import com.zurrtum.create.foundation.codec.CreateCodecs;
 import com.zurrtum.create.infrastructure.player.FakePlayerEntity;
+
 import java.util.UUID;
+
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
@@ -53,12 +55,12 @@ public class AllPotatoProjectileEntityHitActions {
     }
 
     private static void register(String name, MapCodec<? extends PotatoProjectileEntityHitAction> codec) {
-        Registry.register(CreateRegistries.POTATO_PROJECTILE_ENTITY_HIT_ACTION, ResourceLocation.fromNamespaceAndPath(MOD_ID, name), codec);
+        Registry.register(CreateRegistries.POTATO_PROJECTILE_ENTITY_HIT_ACTION, Identifier.fromNamespaceAndPath(MOD_ID, name), codec);
     }
 
     public record SetOnFire(int ticks) implements PotatoProjectileEntityHitAction {
-        public static final MapCodec<SetOnFire> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(ExtraCodecs.POSITIVE_INT.fieldOf("ticks")
-            .forGetter(SetOnFire::ticks)).apply(instance, SetOnFire::new));
+        public static final MapCodec<SetOnFire> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(ExtraCodecs.POSITIVE_INT.fieldOf(
+            "ticks").forGetter(SetOnFire::ticks)).apply(instance, SetOnFire::new));
 
         public static SetOnFire seconds(int seconds) {
             return new SetOnFire(seconds * 20);
@@ -152,8 +154,9 @@ public class AllPotatoProjectileEntityHitActions {
             for (int teleportTry = 0; teleportTry < 16; ++teleportTry) {
                 double teleportX = entityX + (livingEntity.getRandom().nextDouble() - 0.5D) * teleportDiameter;
                 double teleportY = Mth.clamp(
-                    entityY + (livingEntity.getRandom()
-                        .nextInt((int) teleportDiameter) - (int) (teleportDiameter / 2)), 0.0D, level.getHeight() - 1
+                    entityY + (livingEntity.getRandom().nextInt((int) teleportDiameter) - (int) (teleportDiameter / 2)),
+                    0.0D,
+                    level.getHeight() - 1
                 );
                 double teleportZ = entityZ + (livingEntity.getRandom().nextDouble() - 0.5D) * teleportDiameter;
 
@@ -227,10 +230,7 @@ public class AllPotatoProjectileEntityHitActions {
         @Override
         public boolean execute(ItemStack projectile, EntityHitResult ray, Type type) {
             if (ray.getEntity() instanceof LivingEntity livingEntity) {
-                SuspiciousStewEffects stew = projectile.getOrDefault(
-                    DataComponents.SUSPICIOUS_STEW_EFFECTS,
-                    SuspiciousStewEffects.EMPTY
-                );
+                SuspiciousStewEffects stew = projectile.getOrDefault(DataComponents.SUSPICIOUS_STEW_EFFECTS, SuspiciousStewEffects.EMPTY);
                 for (Entry effect : stew.effects())
                     livingEntity.addEffect(effect.createEffectInstance());
             }

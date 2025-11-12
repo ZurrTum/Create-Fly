@@ -19,6 +19,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction.Axis;
 import net.minecraft.core.particles.BlockParticleOption;
@@ -118,10 +119,7 @@ public class BezierConnection implements Iterable<BezierConnection.Segment> {
         return this == other || (other != null && coupleEquals(this.bePositions, other.bePositions) && coupleEquals(
             this.starts,
             other.starts
-        ) && coupleEquals(this.axes, other.axes) && coupleEquals(
-            this.normals,
-            other.normals
-        ) && this.hasGirder == other.hasGirder);
+        ) && coupleEquals(this.axes, other.axes) && coupleEquals(this.normals, other.normals) && this.hasGirder == other.hasGirder);
     }
 
     @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
@@ -177,7 +175,7 @@ public class BezierConnection implements Iterable<BezierConnection.Segment> {
             Couple.create(() -> VecHelper.read(buffer)),
             buffer.readBoolean(),
             buffer.readBoolean(),
-            TrackMaterial.fromId(buffer.readResourceLocation())
+            TrackMaterial.fromId(buffer.readIdentifier())
         );
         if (buffer.readBoolean())
             smoothing = Couple.create(buffer::readVarInt);
@@ -190,7 +188,7 @@ public class BezierConnection implements Iterable<BezierConnection.Segment> {
         normals.forEach(v -> VecHelper.write(v, buffer));
         buffer.writeBoolean(primary);
         buffer.writeBoolean(hasGirder);
-        buffer.writeResourceLocation(getMaterial().getId());
+        buffer.writeIdentifier(getMaterial().getId());
         buffer.writeBoolean(smoothing != null);
         if (smoothing != null)
             smoothing.forEach(buffer::writeVarInt);

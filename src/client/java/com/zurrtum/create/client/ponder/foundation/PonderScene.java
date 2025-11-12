@@ -34,7 +34,7 @@ import net.minecraft.client.renderer.item.ItemModelResolver;
 import net.minecraft.client.renderer.state.CameraRenderState;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Vec3i;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.decoration.ArmorStand;
 import net.minecraft.world.item.ItemStack;
@@ -64,7 +64,7 @@ public class PonderScene {
     private boolean finished;
     //	private int sceneIndex;
     private int textIndex;
-    ResourceLocation sceneId;
+    Identifier sceneId;
 
     private final IntList keyframeTimes;
 
@@ -77,7 +77,7 @@ public class PonderScene {
 
     private final PonderLevel world;
     private final String namespace;
-    private final ResourceLocation location;
+    private final Identifier location;
     private final SceneCamera camera;
     private final CameraRenderState cameraRenderState;
     private final Outliner outliner;
@@ -106,8 +106,8 @@ public class PonderScene {
         @Nullable PonderLevel world,
         PonderLocalization localization,
         String namespace,
-        ResourceLocation location,
-        Collection<ResourceLocation> tags,
+        Identifier location,
+        Collection<Identifier> tags,
         Collection<SceneOrderingEntry> orderingEntries
     ) {
         if (world != null) {
@@ -123,7 +123,7 @@ public class PonderScene {
 
         this.namespace = namespace;
         this.location = location;
-        this.sceneId = ResourceLocation.fromNamespaceAndPath(namespace, "missing_title");
+        this.sceneId = Identifier.fromNamespaceAndPath(namespace, "missing_title");
 
         outliner = new Outliner();
         elements = new HashSet<>();
@@ -456,7 +456,7 @@ public class PonderScene {
         return orderingEntries;
     }
 
-    public ResourceLocation getLocation() {
+    public Identifier getLocation() {
         return location;
     }
 
@@ -468,7 +468,7 @@ public class PonderScene {
         return world == null ? new BoundingBox(BlockPos.ZERO) : world.getBounds();
     }
 
-    public ResourceLocation getId() {
+    public Identifier getId() {
         return sceneId;
     }
 

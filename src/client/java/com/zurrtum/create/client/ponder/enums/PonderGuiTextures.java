@@ -9,7 +9,7 @@ import com.zurrtum.create.client.catnip.render.ColoredRenderable;
 import com.zurrtum.create.client.ponder.Ponder;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.renderer.RenderPipelines;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 public enum PonderGuiTextures implements TextureSheetSegment, ScreenElement, ColoredRenderable {
 
@@ -50,7 +50,7 @@ public enum PonderGuiTextures implements TextureSheetSegment, ScreenElement, Col
 
     ;
 
-    public final ResourceLocation location;
+    public final Identifier location;
     private final int width;
     private final int height;
     private final int startX;
@@ -71,7 +71,7 @@ public enum PonderGuiTextures implements TextureSheetSegment, ScreenElement, Col
     }
 
     PonderGuiTextures(String namespace, String location, int startX, int startY, int width, int height, int sheetWidth, int sheetHeight) {
-        this.location = ResourceLocation.fromNamespaceAndPath(namespace, "textures/gui/" + location + ".png");
+        this.location = Identifier.fromNamespaceAndPath(namespace, "textures/gui/" + location + ".png");
         this.width = width;
         this.height = height;
         this.startX = startX;
@@ -91,7 +91,7 @@ public enum PonderGuiTextures implements TextureSheetSegment, ScreenElement, Col
     }
 
     @Override
-    public ResourceLocation getLocation() {
+    public Identifier getLocation() {
         return location;
     }
 

@@ -16,6 +16,7 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.storage.TagValueOutput;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
+
 import java.util.Iterator;
 import java.util.UUID;
 
@@ -141,7 +142,7 @@ public abstract class TrackEdgePoint {
     }
 
     public void write(FriendlyByteBuf buffer, DimensionPalette dimensions) {
-        buffer.writeResourceLocation(type.getId());
+        buffer.writeIdentifier(type.getId());
         buffer.writeUUID(id);
         edgeLocation.forEach(loc -> loc.send(buffer, dimensions));
         buffer.writeDouble(position);

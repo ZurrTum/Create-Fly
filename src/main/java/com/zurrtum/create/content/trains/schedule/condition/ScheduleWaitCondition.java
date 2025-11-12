@@ -14,7 +14,7 @@ import net.minecraft.nbt.Tag;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.ProblemReporter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.storage.TagValueInput;
@@ -28,7 +28,7 @@ public abstract class ScheduleWaitCondition extends ScheduleDataEntry {
         ScheduleWaitCondition::decode
     );
 
-    public ScheduleWaitCondition(ResourceLocation id) {
+    public ScheduleWaitCondition(Identifier id) {
         super(id);
     }
 
@@ -39,7 +39,7 @@ public abstract class ScheduleWaitCondition extends ScheduleDataEntry {
     }
 
     public final void write(ValueOutput view) {
-        view.store("Id", ResourceLocation.CODEC, id);
+        view.store("Id", Identifier.CODEC, id);
         try (ProblemReporter.ScopedCollector logging = new ProblemReporter.ScopedCollector(() -> "ScheduleWaitCondition", Create.LOGGER)) {
             TagValueOutput writeView = new TagValueOutput(logging, ((TagValueOutput) view).ops, data);
             writeAdditional(writeView);
@@ -50,7 +50,7 @@ public abstract class ScheduleWaitCondition extends ScheduleDataEntry {
     @SuppressWarnings("unchecked")
     public static <T> DataResult<T> encode(final ScheduleWaitCondition input, final DynamicOps<T> ops, final T empty) {
         RecordBuilder<T> map = ops.mapBuilder();
-        map.add("Id", input.id, ResourceLocation.CODEC);
+        map.add("Id", input.id, Identifier.CODEC);
         try (ProblemReporter.ScopedCollector logging = new ProblemReporter.ScopedCollector(() -> "ScheduleWaitCondition", Create.LOGGER)) {
             TagValueOutput view = new TagValueOutput(logging, (DynamicOps<Tag>) ops, input.data);
             input.writeAdditional(view);
@@ -60,7 +60,7 @@ public abstract class ScheduleWaitCondition extends ScheduleDataEntry {
     }
 
     public static ScheduleWaitCondition read(ValueInput view) {
-        ResourceLocation location = view.read("Id", ResourceLocation.CODEC).orElse(null);
+        Identifier location = view.read("Id", Identifier.CODEC).orElse(null);
         ScheduleWaitCondition condition = AllSchedules.createScheduleWaitCondition(location);
         if (condition == null) {
             return fallback(location);
@@ -73,7 +73,7 @@ public abstract class ScheduleWaitCondition extends ScheduleDataEntry {
 
     public static <T> ScheduleWaitCondition decode(DynamicOps<T> ops, T input) {
         MapLike<T> map = ops.getMap(input).getOrThrow();
-        ResourceLocation location = ResourceLocation.CODEC.parse(ops, map.get("Id")).result().orElse(null);
+        Identifier location = Identifier.CODEC.parse(ops, map.get("Id")).result().orElse(null);
         ScheduleWaitCondition condition = AllSchedules.createScheduleWaitCondition(location);
         if (condition == null) {
             return fallback(location);
@@ -86,7 +86,7 @@ public abstract class ScheduleWaitCondition extends ScheduleDataEntry {
         return condition;
     }
 
-    private static ScheduleWaitCondition fallback(ResourceLocation location) {
+    private static ScheduleWaitCondition fallback(Identifier location) {
         Create.LOGGER.warn("Could not parse waiting condition type: {}", location);
         return null;
     }

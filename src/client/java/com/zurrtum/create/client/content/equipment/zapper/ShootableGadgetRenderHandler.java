@@ -9,7 +9,7 @@ import net.minecraft.client.renderer.ItemInHandRenderer;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
 import net.minecraft.client.renderer.entity.player.AvatarRenderer;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.HumanoidArm;
@@ -35,11 +35,7 @@ public abstract class ShootableGadgetRenderHandler {
     }
 
     public float getAnimation(boolean rightHand, float partialTicks) {
-        return Mth.lerp(
-            partialTicks,
-            rightHand ? lastRightHandAnimation : lastLeftHandAnimation,
-            rightHand ? rightHandAnimation : leftHandAnimation
-        );
+        return Mth.lerp(partialTicks, rightHand ? lastRightHandAnimation : lastLeftHandAnimation, rightHand ? rightHandAnimation : leftHandAnimation);
     }
 
     protected float animationDecay() {
@@ -87,11 +83,7 @@ public abstract class ShootableGadgetRenderHandler {
         AvatarRenderer<AbstractClientPlayer> playerrenderer = entityRenderDispatcher.getPlayerRenderer(player);
 
         boolean rightHand = hand == InteractionHand.MAIN_HAND ^ player.getMainArm() == HumanoidArm.LEFT;
-        float recoil = rightHand ? Mth.lerp(pt, lastRightHandAnimation, rightHandAnimation) : Mth.lerp(
-            pt,
-            lastLeftHandAnimation,
-            leftHandAnimation
-        );
+        float recoil = rightHand ? Mth.lerp(pt, lastRightHandAnimation, rightHandAnimation) : Mth.lerp(pt, lastLeftHandAnimation, leftHandAnimation);
 
         if (rightHand && (rightHandAnimation > .01f || dontReequipRight))
             equipProgress = 0;
@@ -119,7 +111,7 @@ public abstract class ShootableGadgetRenderHandler {
         ms.translate(flip * 5.6F, 0.0F, 0.0F);
         ms.mulPose(Axis.YP.rotationDegrees(flip * 40.0F));
         transformHand(ms, flip, equipProgress, recoil, pt);
-        ResourceLocation texture = player.getSkin().body().texturePath();
+        Identifier texture = player.getSkin().body().texturePath();
         if (rightHand)
             playerrenderer.renderRightHand(ms, queue, light, texture, player.isModelPartShown(PlayerModelPart.RIGHT_SLEEVE));
         else

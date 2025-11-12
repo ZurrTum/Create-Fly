@@ -3,12 +3,12 @@ package com.zurrtum.create.content.trains.schedule.destination;
 import com.zurrtum.create.content.trains.graph.DiscoveredPath;
 import com.zurrtum.create.content.trains.schedule.ScheduleRuntime;
 import com.zurrtum.create.content.trains.schedule.ScheduleRuntime.State;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.Nullable;
 
 public class ChangeThrottleInstruction extends ScheduleInstruction {
-    public ChangeThrottleInstruction(ResourceLocation id) {
+    public ChangeThrottleInstruction(Identifier id) {
         super(id);
         data.putInt("Value", 100);
     }

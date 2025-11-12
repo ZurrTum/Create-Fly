@@ -3,22 +3,22 @@ package com.zurrtum.create.content.trains.schedule;
 import com.zurrtum.create.Create;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.ProblemReporter;
 import net.minecraft.world.level.storage.TagValueInput;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 
 public abstract class ScheduleDataEntry {
-    protected ResourceLocation id;
+    protected Identifier id;
     protected CompoundTag data;
 
-    public ScheduleDataEntry(ResourceLocation id) {
+    public ScheduleDataEntry(Identifier id) {
         this.id = id;
         data = new CompoundTag();
     }
 
-    public ResourceLocation getId() {
+    public Identifier getId() {
         return id;
     }
 

@@ -3,9 +3,11 @@ package com.zurrtum.create;
 import com.zurrtum.create.api.behaviour.display.DisplaySource;
 import com.zurrtum.create.api.registry.CreateRegistries;
 import com.zurrtum.create.content.redstone.displayLink.source.*;
+
 import java.util.function.Supplier;
+
 import net.minecraft.core.Registry;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -40,7 +42,7 @@ public class AllDisplaySources {
     public static final NixieTubeDisplaySource NIXIE_TUBE = register("nixie_tube", NixieTubeDisplaySource::new);
 
     private static <T extends DisplaySource> T register(String id, Supplier<T> factory) {
-        return Registry.register(CreateRegistries.DISPLAY_SOURCE, ResourceLocation.fromNamespaceAndPath(MOD_ID, id), factory.get());
+        return Registry.register(CreateRegistries.DISPLAY_SOURCE, Identifier.fromNamespaceAndPath(MOD_ID, id), factory.get());
     }
 
     public static void register(DisplaySource display, Block... blocks) {

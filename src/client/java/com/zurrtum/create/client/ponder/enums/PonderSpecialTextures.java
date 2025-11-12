@@ -6,7 +6,7 @@ import com.zurrtum.create.client.ponder.Ponder;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.render.TextureSetup;
 import net.minecraft.client.renderer.texture.TextureManager;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 public enum PonderSpecialTextures implements BindableTexture {
 
@@ -15,7 +15,7 @@ public enum PonderSpecialTextures implements BindableTexture {
     ;
 
     public static final String ASSET_PATH = "textures/special/";
-    private final ResourceLocation location;
+    private final Identifier location;
 
     PonderSpecialTextures(String filename) {
         location = Ponder.asResource(ASSET_PATH + filename);
@@ -29,7 +29,7 @@ public enum PonderSpecialTextures implements BindableTexture {
     }
 
     @Override
-    public ResourceLocation getLocation() {
+    public Identifier getLocation() {
         return location;
     }
 

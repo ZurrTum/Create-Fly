@@ -11,13 +11,15 @@ import com.zurrtum.create.content.kinetics.belt.BeltSlope;
 import com.zurrtum.create.content.kinetics.belt.item.BeltConnectorItem;
 import com.zurrtum.create.content.kinetics.simpleRelays.AbstractSimpleShaftBlock;
 import com.zurrtum.create.foundation.utility.BlockHelper;
+
 import java.util.Arrays;
 import java.util.Optional;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction.Axis;
 import net.minecraft.core.HolderGetter;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 import net.minecraft.util.ProblemReporter;
 import net.minecraft.world.entity.Entity;
@@ -185,11 +187,7 @@ public abstract class LaunchedItem {
             int[] intArray = view.getIntArray("Casing").orElseGet(() -> new int[0]);
             casings = new CasingType[length];
             for (int i = 0; i < casings.length; i++)
-                casings[i] = i >= intArray.length ? CasingType.NONE : CasingType.values()[Mth.clamp(
-                    intArray[i],
-                    0,
-                    CasingType.values().length - 1
-                )];
+                casings[i] = i >= intArray.length ? CasingType.NONE : CasingType.values()[Mth.clamp(intArray[i], 0, CasingType.values().length - 1)];
             super.read(view, holderGetter);
         }
 
@@ -236,7 +234,10 @@ public abstract class LaunchedItem {
         public boolean update(Level world) {
             if (deferredTag != null && entity == null) {
                 try {
-                    try (ProblemReporter.ScopedCollector logging = new ProblemReporter.ScopedCollector(() -> "LaunchedItem.ForEntity", Create.LOGGER)) {
+                    try (ProblemReporter.ScopedCollector logging = new ProblemReporter.ScopedCollector(
+                        () -> "LaunchedItem.ForEntity",
+                        Create.LOGGER
+                    )) {
                         ValueInput view = TagValueInput.create(logging, world.registryAccess(), deferredTag);
                         Optional<Entity> loadEntityUnchecked = EntityType.create(view, world, EntitySpawnReason.LOAD);
                         if (loadEntityUnchecked.isEmpty())
@@ -257,7 +258,7 @@ public abstract class LaunchedItem {
             if (entity != null) {
                 ValueOutput data = view.child("Entity");
                 EntityType<?> entityType = entity.getType();
-                ResourceLocation id = EntityType.getKey(entityType);
+                Identifier id = EntityType.getKey(entityType);
                 if (id != null && entityType.canSerialize()) {
                     data.putString("id", id.toString());
                 }

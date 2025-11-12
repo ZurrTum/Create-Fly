@@ -13,7 +13,7 @@ import com.zurrtum.create.Create;
 import com.zurrtum.create.client.model.obj.ObjLoader;
 import net.minecraft.client.renderer.block.model.*;
 import net.minecraft.client.resources.model.UnbakedModel;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.GsonHelper;
 
 import java.lang.reflect.Type;
@@ -27,13 +27,13 @@ public class UnbakedModelParser {
         .registerTypeAdapter(ItemTransform.class, new ItemTransform.Deserializer())
         .registerTypeAdapter(ItemTransforms.class, new ItemTransforms.Deserializer())
         .registerTypeAdapter(Transformation.class, new TransformationHelper.Deserializer()).create();
-    private static final Map<ResourceLocation, UnbakedModel> CACHE = Maps.newConcurrentMap();
+    private static final Map<Identifier, UnbakedModel> CACHE = Maps.newConcurrentMap();
 
-    public static void cache(ResourceLocation id, UnbakedModel model) {
+    public static void cache(Identifier id, UnbakedModel model) {
         CACHE.put(id, model);
     }
 
-    public static Stream<Pair<ResourceLocation, UnbakedModel>> getCaches() {
+    public static Stream<Pair<Identifier, UnbakedModel>> getCaches() {
         return CACHE.entrySet().stream().map(entry -> Pair.of(entry.getKey(), entry.getValue()));
     }
 

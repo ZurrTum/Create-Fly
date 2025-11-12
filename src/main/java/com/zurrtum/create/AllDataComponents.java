@@ -14,7 +14,7 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.*;
 import net.minecraft.world.item.component.ItemContainerContents;
 import net.minecraft.world.level.block.Block;
@@ -113,7 +113,8 @@ public class AllDataComponents {
 
     public static final DataComponentType<List<ItemAttributeEntry>> ATTRIBUTE_FILTER_MATCHED_ATTRIBUTES = register(
         "attribute_filter_matched_attributes",
-        builder -> builder.persistent(ItemAttributeEntry.CODEC.listOf()).networkSynchronized(CatnipStreamCodecBuilders.list(ItemAttributeEntry.STREAM_CODEC))
+        builder -> builder.persistent(ItemAttributeEntry.CODEC.listOf())
+            .networkSynchronized(CatnipStreamCodecBuilders.list(ItemAttributeEntry.STREAM_CODEC))
     );
 
     public static final DataComponentType<ClipboardContent> CLIPBOARD_CONTENT = register(
@@ -354,7 +355,11 @@ public class AllDataComponents {
     );
 
     private static <T> DataComponentType<T> register(String id, UnaryOperator<DataComponentType.Builder<T>> builderOperator) {
-        return Registry.register(BuiltInRegistries.DATA_COMPONENT_TYPE, ResourceLocation.fromNamespaceAndPath(MOD_ID, id), builderOperator.apply(DataComponentType.builder()).build());
+        return Registry.register(
+            BuiltInRegistries.DATA_COMPONENT_TYPE,
+            Identifier.fromNamespaceAndPath(MOD_ID, id),
+            builderOperator.apply(DataComponentType.builder()).build()
+        );
     }
 
     public static void register() {

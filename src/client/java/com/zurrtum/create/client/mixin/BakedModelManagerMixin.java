@@ -13,7 +13,7 @@ import net.minecraft.client.renderer.block.model.BlockStateModel;
 import net.minecraft.client.renderer.block.model.SimpleModelWrapper;
 import net.minecraft.client.renderer.block.model.SimpleUnbakedGeometry;
 import net.minecraft.client.resources.model.*;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.util.thread.ParallelMapTransform;
 import net.minecraft.world.level.block.state.BlockState;
@@ -34,11 +34,7 @@ import static com.zurrtum.create.Create.MOD_ID;
 @Mixin(ModelManager.class)
 public class BakedModelManagerMixin {
     @Inject(method = "method_65750", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/block/model/BlockModel;fromStream(Ljava/io/Reader;)Lnet/minecraft/client/renderer/block/model/BlockModel;"), cancellable = true)
-    private static void deserialize(
-        CallbackInfoReturnable<Pair<ResourceLocation, BlockModel>> cir,
-        @Local ResourceLocation identifier,
-        @Local Reader input
-    ) {
+    private static void deserialize(CallbackInfoReturnable<Pair<Identifier, BlockModel>> cir, @Local Identifier identifier, @Local Reader input) {
         if (identifier.getNamespace().equals(MOD_ID)) {
             try {
                 UnbakedModel model = GsonHelper.fromJson(UnbakedModelParser.GSON, input, UnbakedModel.class);
@@ -64,16 +60,16 @@ public class BakedModelManagerMixin {
     }
 
     @WrapOperation(method = "method_45897", at = @At(value = "INVOKE", target = "Ljava/util/List;stream()Ljava/util/stream/Stream;"))
-    private static Stream<Pair<ResourceLocation, UnbakedModel>> replace(
-        List<Pair<ResourceLocation, UnbakedModel>> instance,
-        Operation<Stream<Pair<ResourceLocation, UnbakedModel>>> original
+    private static Stream<Pair<Identifier, UnbakedModel>> replace(
+        List<Pair<Identifier, UnbakedModel>> instance,
+        Operation<Stream<Pair<Identifier, UnbakedModel>>> original
     ) {
         return Stream.concat(original.call(instance), UnbakedModelParser.getCaches());
     }
 
     @Inject(method = "discoverModelDependencies", at = @At(value = "NEW", target = "(Lnet/minecraft/client/resources/model/ResolvedModel;Ljava/util/Map;)Lnet/minecraft/client/resources/model/ModelManager$ResolvedModels;"))
     private static void collect(
-        Map<ResourceLocation, UnbakedModel> modelMap,
+        Map<Identifier, UnbakedModel> modelMap,
         BlockStateModelLoader.LoadedModels stateDefinition,
         ClientItemInfoLoader.LoadedClientInfos result,
         CallbackInfoReturnable<ModelManager.ResolvedModels> cir,

@@ -4,9 +4,10 @@ import com.zurrtum.create.api.registry.CreateRegistries;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleOptions;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.item.ItemStack;
@@ -16,7 +17,7 @@ import net.minecraft.world.phys.Vec3;
 public interface FanProcessingType {
     @Nullable
     static FanProcessingType parse(String str) {
-        return CreateRegistries.FAN_PROCESSING_TYPE.getValue(ResourceLocation.tryParse(str));
+        return CreateRegistries.FAN_PROCESSING_TYPE.getValue(Identifier.tryParse(str));
     }
 
     @Nullable

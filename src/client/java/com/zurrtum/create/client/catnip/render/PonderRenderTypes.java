@@ -1,21 +1,23 @@
 package com.zurrtum.create.client.catnip.render;
 
 import com.zurrtum.create.client.ponder.enums.PonderSpecialTextures;
+
 import java.util.function.BiFunction;
 import java.util.function.Function;
+
 import net.minecraft.Util;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.renderer.RenderStateShard;
 import net.minecraft.client.renderer.RenderStateShard.TextureStateShard;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.RenderType.CompositeState;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 import static com.zurrtum.create.client.ponder.Ponder.MOD_ID;
 import static net.minecraft.client.renderer.RenderStateShard.*;
 
 public class PonderRenderTypes {
-    private static final Function<ResourceLocation, RenderType> GUI_TEXTURED = Util.memoize(texture -> RenderType.create(
+    private static final Function<Identifier, RenderType> GUI_TEXTURED = Util.memoize(texture -> RenderType.create(
         createLayerName("gui_textured"),
         786432,
         false,
@@ -53,7 +55,8 @@ public class PonderRenderTypes {
         true,
         true,
         RenderPipelines.TRANSLUCENT,
-        CompositeState.builder().setLightmapState(LIGHTMAP).setTextureState(BLOCK_SHEET_MIPPED).setOutputState(ITEM_ENTITY_TARGET).createCompositeState(true)
+        CompositeState.builder().setLightmapState(LIGHTMAP).setTextureState(BLOCK_SHEET_MIPPED).setOutputState(ITEM_ENTITY_TARGET)
+            .createCompositeState(true)
     );
 
     private static final RenderType OUTLINE_SOLID = RenderType.create(
@@ -66,7 +69,7 @@ public class PonderRenderTypes {
             .setOverlayState(OVERLAY).createCompositeState(false)
     );
 
-    private static final BiFunction<ResourceLocation, Boolean, RenderType> OUTLINE_TRANSLUCENT = Util.memoize((texture, cull) -> RenderType.create(
+    private static final BiFunction<Identifier, Boolean, RenderType> OUTLINE_TRANSLUCENT = Util.memoize((texture, cull) -> RenderType.create(
         createLayerName("outline_translucent" + (cull ? "_cull" : "")),
         256,
         false,
@@ -82,7 +85,8 @@ public class PonderRenderTypes {
         false,
         true,
         RenderPipelines.TRANSLUCENT,
-        CompositeState.builder().setTextureState(BLOCK_SHEET_MIPPED).setLightmapState(LIGHTMAP).setOutputState(ITEM_ENTITY_TARGET).createCompositeState(true)
+        CompositeState.builder().setTextureState(BLOCK_SHEET_MIPPED).setLightmapState(LIGHTMAP).setOutputState(ITEM_ENTITY_TARGET)
+            .createCompositeState(true)
     );
 
     public static RenderType getGui() {
@@ -97,7 +101,7 @@ public class PonderRenderTypes {
         return GUI_TEXT_HIGHLIGHT;
     }
 
-    public static RenderType getGuiTextured(ResourceLocation texture) {
+    public static RenderType getGuiTextured(Identifier texture) {
         return GUI_TEXTURED.apply(texture);
     }
 
@@ -109,7 +113,7 @@ public class PonderRenderTypes {
         return OUTLINE_SOLID;
     }
 
-    public static RenderType outlineTranslucent(ResourceLocation texture, boolean cull) {
+    public static RenderType outlineTranslucent(Identifier texture, boolean cull) {
         return OUTLINE_TRANSLUCENT.apply(texture, cull);
     }
 

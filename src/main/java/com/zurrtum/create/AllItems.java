@@ -65,7 +65,7 @@ import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.world.effect.MobEffectInstance;
@@ -925,8 +925,8 @@ public class AllItems {
             .component(
                 DataComponents.EQUIPPABLE,
                 Equippable.builder(ArmorType.HELMET.getSlot()).setEquipSound(AllArmorMaterials.CARDBOARD.equipSound())
-                    .setAsset(AllArmorMaterials.CARDBOARD.assetId())
-                    .setCameraOverlay(ResourceLocation.fromNamespaceAndPath(MOD_ID, "misc/package_blur")).build()
+                    .setAsset(AllArmorMaterials.CARDBOARD.assetId()).setCameraOverlay(Identifier.fromNamespaceAndPath(MOD_ID, "misc/package_blur"))
+                    .build()
             ).repairable(AllArmorMaterials.CARDBOARD.repairIngredient())
     );
     public static final CardboardArmorItem CARDBOARD_CHESTPLATE = register(
@@ -1051,18 +1051,18 @@ public class AllItems {
     }
 
     private static Item register(String id, Item.Properties settings) {
-        return register(ResourceLocation.fromNamespaceAndPath(MOD_ID, id), Item::new, settings);
+        return register(Identifier.fromNamespaceAndPath(MOD_ID, id), Item::new, settings);
     }
 
     private static <T extends Item> T register(String id, Function<Item.Properties, T> factory) {
-        return register(ResourceLocation.fromNamespaceAndPath(MOD_ID, id), factory, new Item.Properties());
+        return register(Identifier.fromNamespaceAndPath(MOD_ID, id), factory, new Item.Properties());
     }
 
     private static <T extends Item> T register(String id, Function<Item.Properties, T> factory, Item.Properties settings) {
-        return register(ResourceLocation.fromNamespaceAndPath(MOD_ID, id), factory, settings);
+        return register(Identifier.fromNamespaceAndPath(MOD_ID, id), factory, settings);
     }
 
-    private static <T extends Item> T register(ResourceLocation id, Function<Item.Properties, T> factory, Item.Properties settings) {
+    private static <T extends Item> T register(Identifier id, Function<Item.Properties, T> factory, Item.Properties settings) {
         ResourceKey<Item> key = ResourceKey.create(Registries.ITEM, id);
         T item = factory.apply(settings.setId(key));
         if (item instanceof BlockItem blockItem) {

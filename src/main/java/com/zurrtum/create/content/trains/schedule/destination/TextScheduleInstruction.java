@@ -1,9 +1,9 @@
 package com.zurrtum.create.content.trains.schedule.destination;
 
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 public abstract class TextScheduleInstruction extends ScheduleInstruction {
-    public TextScheduleInstruction(ResourceLocation id) {
+    public TextScheduleInstruction(Identifier id) {
         super(id);
     }
 

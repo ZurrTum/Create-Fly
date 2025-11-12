@@ -12,9 +12,11 @@ import com.zurrtum.create.content.contraptions.mounted.MountedContraption;
 import com.zurrtum.create.content.contraptions.piston.PistonContraption;
 import com.zurrtum.create.content.contraptions.pulley.PulleyContraption;
 import com.zurrtum.create.content.trains.entity.CarriageContraption;
+
 import java.util.function.Supplier;
+
 import net.minecraft.core.Registry;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 import static com.zurrtum.create.Create.MOD_ID;
 
@@ -30,7 +32,7 @@ public class AllContraptionTypes {
     public static final ContraptionType ELEVATOR = register("elevator", ElevatorContraption::new);
 
     private static ContraptionType register(String name, Supplier<? extends Contraption> factory) {
-        return Registry.register(CreateRegistries.CONTRAPTION_TYPE, ResourceLocation.fromNamespaceAndPath(MOD_ID, name), new ContraptionType(factory));
+        return Registry.register(CreateRegistries.CONTRAPTION_TYPE, Identifier.fromNamespaceAndPath(MOD_ID, name), new ContraptionType(factory));
     }
 
     public static void register() {

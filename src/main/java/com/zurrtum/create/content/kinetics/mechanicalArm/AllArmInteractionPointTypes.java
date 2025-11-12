@@ -31,7 +31,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.core.Registry;
 import net.minecraft.core.Vec3i;
 import net.minecraft.core.component.DataComponents;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.Container;
 import net.minecraft.world.Containers;
@@ -71,7 +71,7 @@ public class AllArmInteractionPointTypes {
     public static final RespawnAnchorType RESPAWN_ANCHOR = register("respawn_anchor", new RespawnAnchorType());
 
     private static <T extends ArmInteractionPointType> T register(String name, T type) {
-        return Registry.register(CreateRegistries.ARM_INTERACTION_POINT_TYPE, ResourceLocation.fromNamespaceAndPath(MOD_ID, name), type);
+        return Registry.register(CreateRegistries.ARM_INTERACTION_POINT_TYPE, Identifier.fromNamespaceAndPath(MOD_ID, name), type);
     }
 
     public static void register() {

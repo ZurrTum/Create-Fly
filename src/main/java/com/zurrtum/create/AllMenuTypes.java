@@ -25,7 +25,7 @@ import com.zurrtum.create.content.schematics.table.SchematicTableMenu;
 import com.zurrtum.create.content.trains.schedule.ScheduleMenu;
 import com.zurrtum.create.foundation.gui.menu.MenuType;
 import net.minecraft.core.Registry;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 
 import static com.zurrtum.create.Create.MOD_ID;
@@ -50,7 +50,7 @@ public class AllMenuTypes {
     public static final MenuType<SchematicannonBlockEntity> SCHEMATICANNON = register("schematicannon", SchematicannonMenu::new);
 
     public static <T> MenuType<T> register(String name, MenuType<T> type) {
-        return Registry.register(CreateRegistries.MENU_TYPE, ResourceLocation.fromNamespaceAndPath(MOD_ID, name), type);
+        return Registry.register(CreateRegistries.MENU_TYPE, Identifier.fromNamespaceAndPath(MOD_ID, name), type);
     }
 
     public static void register() {

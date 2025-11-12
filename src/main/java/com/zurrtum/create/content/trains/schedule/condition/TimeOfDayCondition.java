@@ -4,11 +4,11 @@ import com.zurrtum.create.content.trains.entity.Train;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.Level;
 
 public class TimeOfDayCondition extends ScheduleWaitCondition {
-    public TimeOfDayCondition(ResourceLocation id) {
+    public TimeOfDayCondition(Identifier id) {
         super(id);
         data.putInt("Hour", 8);
         data.putInt("Rotation", 5);
@@ -74,6 +74,7 @@ public class TimeOfDayCondition extends ScheduleWaitCondition {
         int departingHour = (departureTime / 1000 + 6) % 24;
         int departingMinute = (departureTime % 1000) * 60 / 1000;
 
-        return Component.translatable("create.schedule.condition.time_of_day.status").append(getDigitalDisplay(departingHour, departingMinute, false));
+        return Component.translatable("create.schedule.condition.time_of_day.status")
+            .append(getDigitalDisplay(departingHour, departingMinute, false));
     }
 }

@@ -3,12 +3,12 @@ package com.zurrtum.create.client.content.trains.entity;
 import com.zurrtum.create.content.trains.entity.TrainIconType;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.renderer.RenderPipelines;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 import static com.zurrtum.create.Create.MOD_ID;
 
-public record TrainIcon(TrainIconType type, ResourceLocation sheet, int x, int y) {
-    public static final ResourceLocation ASSEMBLE = ResourceLocation.fromNamespaceAndPath(MOD_ID, "textures/gui/assemble.png");
+public record TrainIcon(TrainIconType type, Identifier sheet, int x, int y) {
+    public static final Identifier ASSEMBLE = Identifier.fromNamespaceAndPath(MOD_ID, "textures/gui/assemble.png");
     public static final int ENGINE = -1;
     public static final int FLIPPED_ENGINE = -2;
 

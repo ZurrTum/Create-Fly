@@ -24,7 +24,7 @@ import net.minecraft.client.renderer.special.SpecialModelRenderer;
 import net.minecraft.client.resources.model.BlockModelRotation;
 import net.minecraft.client.resources.model.ModelBaker;
 import net.minecraft.client.resources.model.ResolvedModel;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 import net.minecraft.util.Tuple;
 import net.minecraft.world.entity.HumanoidArm;
@@ -42,9 +42,9 @@ import java.util.function.Supplier;
 import static com.zurrtum.create.Create.MOD_ID;
 
 public class PotatoCannonModel implements ItemModel, SpecialModelRenderer<PotatoCannonModel.CogRenderData> {
-    public static final ResourceLocation ID = ResourceLocation.fromNamespaceAndPath(MOD_ID, "model/potato_cannon");
-    public static final ResourceLocation ITEM_ID = ResourceLocation.fromNamespaceAndPath(MOD_ID, "item/potato_cannon/item");
-    public static final ResourceLocation COG_ID = ResourceLocation.fromNamespaceAndPath(MOD_ID, "item/potato_cannon/cog");
+    public static final Identifier ID = Identifier.fromNamespaceAndPath(MOD_ID, "model/potato_cannon");
+    public static final Identifier ITEM_ID = Identifier.fromNamespaceAndPath(MOD_ID, "item/potato_cannon/item");
+    public static final Identifier COG_ID = Identifier.fromNamespaceAndPath(MOD_ID, "item/potato_cannon/cog");
 
     private final RenderType layer = Sheets.translucentItemSheet();
     private final List<BakedQuad> itemQuads;
@@ -205,7 +205,7 @@ public class PotatoCannonModel implements ItemModel, SpecialModelRenderer<Potato
             return new PotatoCannonModel(bake(baker, ITEM_ID), bake(baker, COG_ID));
         }
 
-        private static Tuple<List<BakedQuad>, ModelRenderProperties> bake(ModelBaker baker, ResourceLocation id) {
+        private static Tuple<List<BakedQuad>, ModelRenderProperties> bake(ModelBaker baker, Identifier id) {
             ResolvedModel model = baker.getModel(id);
             TextureSlots textures = model.getTopTextureSlots();
             List<BakedQuad> quads = model.bakeTopGeometry(textures, baker, BlockModelRotation.X0_Y0).getAll();

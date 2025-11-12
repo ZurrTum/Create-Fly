@@ -4,7 +4,7 @@ import com.zurrtum.create.client.Create;
 import com.zurrtum.create.client.catnip.lang.Lang;
 import com.zurrtum.create.client.foundation.block.connected.ConnectedTextureBehaviour.CTContext;
 import com.zurrtum.create.client.foundation.block.connected.ConnectedTextureBehaviour.ContextRequirement;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 public enum AllCTTypes implements CTType {
     HORIZONTAL(2, ContextRequirement.builder().horizontal().build()) {
@@ -165,7 +165,7 @@ public enum AllCTTypes implements CTType {
         }
     };
 
-    private final ResourceLocation id;
+    private final Identifier id;
     private final int sheetSize;
     private final ContextRequirement contextRequirement;
 
@@ -176,7 +176,7 @@ public enum AllCTTypes implements CTType {
     }
 
     @Override
-    public ResourceLocation getId() {
+    public Identifier getId() {
         return id;
     }
 

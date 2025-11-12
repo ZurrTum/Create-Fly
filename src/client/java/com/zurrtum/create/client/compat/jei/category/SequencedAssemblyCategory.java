@@ -43,7 +43,7 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.FormattedText;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.inventory.tooltip.TooltipComponent;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.alchemy.PotionContents;
@@ -216,7 +216,7 @@ public class SequencedAssemblyCategory extends CreateCategory<RecipeHolder<Seque
 
         @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
         default Component getSequenceName(T recipe, Optional<IRecipeSlotView> slot) {
-            ResourceLocation id = BuiltInRegistries.RECIPE_TYPE.getKey(recipe.getType());
+            Identifier id = BuiltInRegistries.RECIPE_TYPE.getKey(recipe.getType());
             if (id != null) {
                 String namespace = id.getNamespace();
                 String recipeName;
@@ -287,7 +287,15 @@ public class SequencedAssemblyCategory extends CreateCategory<RecipeHolder<Seque
                 FluidVariant fluidVariant = ingredient.getFluidVariant();
                 Fluid fluid = fluidVariant.getFluid();
                 DataComponentPatch components = fluidVariant.getComponents();
-                graphics.guiRenderState.submitPicturesInPictureState(new SpoutRenderState(i, new Matrix3x2f(matrices), fluid, components, x - 2, y + 24, i));
+                graphics.guiRenderState.submitPicturesInPictureState(new SpoutRenderState(
+                    i,
+                    new Matrix3x2f(matrices),
+                    fluid,
+                    components,
+                    x - 2,
+                    y + 24,
+                    i
+                ));
                 matrices.popMatrix();
             });
         }

@@ -17,7 +17,7 @@ import com.zurrtum.create.content.logistics.packagePort.PackagePortTargetType;
 import com.zurrtum.create.foundation.gui.menu.MenuType;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 import static com.zurrtum.create.Create.MOD_ID;
 
@@ -41,7 +41,7 @@ public class CreateRegistryKeys {
     public static final ResourceKey<Registry<MenuType<?>>> MENU_TYPE = register("menu_type");
 
     private static <T> ResourceKey<Registry<T>> register(String id) {
-        return ResourceKey.createRegistryKey(ResourceLocation.fromNamespaceAndPath(MOD_ID, id));
+        return ResourceKey.createRegistryKey(Identifier.fromNamespaceAndPath(MOD_ID, id));
     }
 
     public static void register() {

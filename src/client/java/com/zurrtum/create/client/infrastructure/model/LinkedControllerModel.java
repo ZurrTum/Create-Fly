@@ -24,7 +24,7 @@ import net.minecraft.client.renderer.special.SpecialModelRenderer;
 import net.minecraft.client.resources.model.BlockModelRotation;
 import net.minecraft.client.resources.model.ModelBaker;
 import net.minecraft.client.resources.model.ResolvedModel;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.HumanoidArm;
 import net.minecraft.world.entity.ItemOwner;
@@ -40,11 +40,11 @@ import java.util.Set;
 import static com.zurrtum.create.Create.MOD_ID;
 
 public class LinkedControllerModel implements ItemModel, SpecialModelRenderer<LinkedControllerModel.RenderData> {
-    public static final ResourceLocation ID = ResourceLocation.fromNamespaceAndPath(MOD_ID, "model/linked_controller");
-    public static final ResourceLocation ITEM_ID = ResourceLocation.fromNamespaceAndPath(MOD_ID, "item/linked_controller/item");
-    public static final ResourceLocation POWERED_ID = ResourceLocation.fromNamespaceAndPath(MOD_ID, "item/linked_controller/powered");
-    public static final ResourceLocation TORCH_ID = ResourceLocation.fromNamespaceAndPath(MOD_ID, "item/linked_controller/torch");
-    public static final ResourceLocation BUTTON_ID = ResourceLocation.fromNamespaceAndPath(MOD_ID, "item/linked_controller/button");
+    public static final Identifier ID = Identifier.fromNamespaceAndPath(MOD_ID, "model/linked_controller");
+    public static final Identifier ITEM_ID = Identifier.fromNamespaceAndPath(MOD_ID, "item/linked_controller/item");
+    public static final Identifier POWERED_ID = Identifier.fromNamespaceAndPath(MOD_ID, "item/linked_controller/powered");
+    public static final Identifier TORCH_ID = Identifier.fromNamespaceAndPath(MOD_ID, "item/linked_controller/torch");
+    public static final Identifier BUTTON_ID = Identifier.fromNamespaceAndPath(MOD_ID, "item/linked_controller/button");
 
     private static final LerpedFloat equipProgress = LerpedFloat.linear().startWithValue(0);
     private static final List<LerpedFloat> buttons = Util.make(
@@ -303,7 +303,7 @@ public class LinkedControllerModel implements ItemModel, SpecialModelRenderer<Li
             return new LinkedControllerModel(settings, quads, bakeQuads(baker, POWERED_ID), bakeQuads(baker, TORCH_ID), bakeQuads(baker, BUTTON_ID));
         }
 
-        private static List<BakedQuad> bakeQuads(ModelBaker baker, ResourceLocation id) {
+        private static List<BakedQuad> bakeQuads(ModelBaker baker, Identifier id) {
             ResolvedModel model = baker.getModel(id);
             return model.bakeTopGeometry(model.getTopTextureSlots(), baker, BlockModelRotation.X0_Y0).getAll();
         }

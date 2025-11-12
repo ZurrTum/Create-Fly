@@ -21,7 +21,7 @@ import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LightLayer;
@@ -35,8 +35,8 @@ public class ChainConveyorVisual extends SingleAxisRotatingVisual<ChainConveyorB
 
     private final List<TransformedInstance> guards = new ArrayList<>();
 
-    private final SmartRecycler<ResourceLocation, TransformedInstance> boxes;
-    private final SmartRecycler<ResourceLocation, TransformedInstance> rigging;
+    private final SmartRecycler<Identifier, TransformedInstance> boxes;
+    private final SmartRecycler<Identifier, TransformedInstance> rigging;
 
     public ChainConveyorVisual(VisualizationContext context, ChainConveyorBlockEntity blockEntity, float partialTick) {
         super(context, blockEntity, partialTick, Models.partial(AllPartialModels.CHAIN_CONVEYOR_SHAFT));
@@ -104,7 +104,7 @@ public class ChainConveyorVisual extends SingleAxisRotatingVisual<ChainConveyorB
         int light = LightTexture.pack(level.getBrightness(LightLayer.BLOCK, containingPos), level.getBrightness(LightLayer.SKY, containingPos));
 
         if (physicsData.modelKey == null) {
-            ResourceLocation key = BuiltInRegistries.ITEM.getKey(box.item.getItem());
+            Identifier key = BuiltInRegistries.ITEM.getKey(box.item.getItem());
             if (key == BuiltInRegistries.ITEM.getDefaultKey())
                 return;
             physicsData.modelKey = key;
