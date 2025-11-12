@@ -4,6 +4,7 @@ import com.zurrtum.create.AllEntityTypes;
 import com.zurrtum.create.api.entity.FakePlayerHandler;
 import com.zurrtum.create.content.logistics.box.PackageEntity;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityPose;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.damage.DamageSource;
@@ -12,6 +13,7 @@ import net.minecraft.entity.mob.SkeletonEntity;
 import net.minecraft.entity.mob.SlimeEntity;
 import net.minecraft.entity.mob.SpiderEntity;
 import net.minecraft.entity.passive.*;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.storage.ReadView;
 import net.minecraft.storage.WriteView;
@@ -33,7 +35,7 @@ public class SeatEntity extends Entity {
 
     @Override
     public void setPosition(double x, double y, double z) {
-        super.setPos(x, y, z);
+        super.setPosition(x, y, z);
         Box bb = getBoundingBox();
         Vec3d diff = new Vec3d(x, y, z).subtract(bb.getCenter());
         setBoundingBox(bb.offset(diff));
@@ -46,6 +48,13 @@ public class SeatEntity extends Entity {
         double heightOffset = getPassengerRidingPos(pEntity).y - pEntity.getVehicleAttachmentPos(this).y;
 
         pCallback.accept(pEntity, this.getX(), 1.0 / 16.0 + heightOffset + getCustomEntitySeatOffset(pEntity), this.getZ());
+        if (pEntity instanceof PlayerEntity player) {
+            float diff = player.getDimensions(player.getPose()).height() - player.getDimensions(EntityPose.CROUCHING).height();
+            if (diff != 0) {
+                Box boundingBox = pEntity.getBoundingBox();
+                pEntity.setBoundingBox(boundingBox.withMinY(boundingBox.minY + diff));
+            }
+        }
     }
 
     public static double getCustomEntitySeatOffset(Entity entity) {
