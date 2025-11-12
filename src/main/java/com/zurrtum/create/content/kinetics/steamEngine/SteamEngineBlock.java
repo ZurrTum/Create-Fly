@@ -15,7 +15,6 @@ import com.zurrtum.create.content.kinetics.simpleRelays.ShaftBlock;
 import com.zurrtum.create.foundation.advancement.AdvancementBehaviour;
 import com.zurrtum.create.foundation.block.IBE;
 import com.zurrtum.create.foundation.utility.BlockHelper;
-import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Direction.Axis;
@@ -186,7 +185,6 @@ public class SteamEngineBlock extends FaceAttachedHorizontalDirectionalBlock imp
         return AllBlockEntityTypes.STEAM_ENGINE;
     }
 
-    @MethodsReturnNonnullByDefault
     private static class PlacementHelper implements IPlacementHelper {
         @Override
         public Predicate<ItemStack> getItemPredicate() {

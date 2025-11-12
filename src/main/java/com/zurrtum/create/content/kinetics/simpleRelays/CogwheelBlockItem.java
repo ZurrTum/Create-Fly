@@ -9,11 +9,6 @@ import com.zurrtum.create.content.kinetics.base.DirectionalKineticBlock;
 import com.zurrtum.create.content.kinetics.base.HorizontalKineticBlock;
 import com.zurrtum.create.content.kinetics.base.IRotate;
 import com.zurrtum.create.content.kinetics.base.RotatedPillarKineticBlock;
-
-import java.util.List;
-import java.util.function.Predicate;
-
-import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Direction.Axis;
@@ -25,6 +20,9 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
+
+import java.util.List;
+import java.util.function.Predicate;
 
 import static net.minecraft.world.level.block.state.properties.BlockStateProperties.AXIS;
 
@@ -70,7 +68,6 @@ public class CogwheelBlockItem extends BlockItem {
         return null;
     }
 
-    @MethodsReturnNonnullByDefault
     private static class SmallCogHelper extends DiagonalCogHelper {
 
         @Override
@@ -107,7 +104,6 @@ public class CogwheelBlockItem extends BlockItem {
         }
     }
 
-    @MethodsReturnNonnullByDefault
     private static class LargeCogHelper extends DiagonalCogHelper {
 
         @Override
@@ -143,7 +139,6 @@ public class CogwheelBlockItem extends BlockItem {
         }
     }
 
-    @MethodsReturnNonnullByDefault
     public abstract static class DiagonalCogHelper implements IPlacementHelper {
 
         @Override
@@ -183,7 +178,6 @@ public class CogwheelBlockItem extends BlockItem {
         }
     }
 
-    @MethodsReturnNonnullByDefault
     public static class IntegratedLargeCogHelper implements IPlacementHelper {
 
         @Override
@@ -232,7 +226,6 @@ public class CogwheelBlockItem extends BlockItem {
 
     }
 
-    @MethodsReturnNonnullByDefault
     public static class IntegratedSmallCogHelper implements IPlacementHelper {
 
         @Override
