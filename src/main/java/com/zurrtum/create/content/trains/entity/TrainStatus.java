@@ -1,12 +1,6 @@
 package com.zurrtum.create.content.trains.entity;
 
 import com.google.common.collect.Streams;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Stream;
-
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
@@ -14,6 +8,11 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Stream;
 
 public class TrainStatus {
 
@@ -117,7 +116,7 @@ public class TrainStatus {
         Stream<Component> locationComponents = presentDimensions.stream().map(key -> {
             return Component.literal(" - ").withStyle(ChatFormatting.GRAY).append(Component.translatable(
                 "create.train.status.collision.where",
-                key.location().toString(),
+                key.identifier().toString(),
                 train.getPositionInDimension(key).get().toShortString()
             ).withColor(0xFFD3B4));
         });

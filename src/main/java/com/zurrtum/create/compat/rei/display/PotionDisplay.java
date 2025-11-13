@@ -40,7 +40,7 @@ public record PotionDisplay(EntryIngredient input, FluidIngredient fluid, FluidS
     );
 
     public PotionDisplay(RecipeHolder<PotionRecipe> entry) {
-        this(entry.id().location(), entry.value());
+        this(entry.id().identifier(), entry.value());
     }
 
     public PotionDisplay(Identifier id, PotionRecipe recipe) {

@@ -42,7 +42,7 @@ public record FanSmokingDisplay(EntryIngredient input, EntryIngredient output, O
         return new FanSmokingDisplay(
             EntryIngredients.ofIngredient(recipe.input()),
             EntryIngredients.of(recipe.result()),
-            Optional.of(entry.id().location())
+            Optional.of(entry.id().identifier())
         );
     }
 

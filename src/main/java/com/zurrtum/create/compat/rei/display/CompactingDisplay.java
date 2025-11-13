@@ -38,7 +38,7 @@ public record CompactingDisplay(List<EntryIngredient> inputs, EntryIngredient ou
     );
 
     public CompactingDisplay(RecipeHolder<CompactingRecipe> entry) {
-        this(entry.id().location(), entry.value());
+        this(entry.id().identifier(), entry.value());
     }
 
     public CompactingDisplay(Identifier id, CompactingRecipe recipe) {

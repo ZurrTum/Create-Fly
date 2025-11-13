@@ -54,7 +54,7 @@ public record SpoutFillingDisplay(
     );
 
     public SpoutFillingDisplay(RecipeHolder<FillingRecipe> entry) {
-        this(entry.id().location(), entry.value());
+        this(entry.id().identifier(), entry.value());
     }
 
     public SpoutFillingDisplay(Identifier id, FillingRecipe recipe) {

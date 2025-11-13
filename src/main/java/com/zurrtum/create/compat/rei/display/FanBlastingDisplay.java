@@ -67,7 +67,7 @@ public record FanBlastingDisplay(EntryIngredient input, EntryIngredient output, 
         return new FanBlastingDisplay(
             EntryIngredients.ofIngredient(ingredient),
             EntryIngredients.of(recipe.result()),
-            Optional.of(entry.id().location())
+            Optional.of(entry.id().identifier())
         );
     }
 

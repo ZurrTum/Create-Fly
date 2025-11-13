@@ -74,7 +74,7 @@ public interface AutoMixingDisplay {
             super(
                 CollectionUtils.map(recipe.value().placementInfo().ingredients(), EntryIngredients::ofIngredient),
                 List.of(EntryIngredients.of(recipe.value().result)),
-                Optional.of(recipe.id().location())
+                Optional.of(recipe.id().identifier())
             );
         }
 

@@ -43,7 +43,7 @@ public record MixingDisplay(
     );
 
     public MixingDisplay(RecipeHolder<MixingRecipe> entry) {
-        this(entry.id().location(), entry.value());
+        this(entry.id().identifier(), entry.value());
     }
 
     public MixingDisplay(Identifier id, MixingRecipe recipe) {

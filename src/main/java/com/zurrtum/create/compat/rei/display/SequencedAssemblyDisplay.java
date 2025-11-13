@@ -58,7 +58,7 @@ public record SequencedAssemblyDisplay(
     );
 
     public SequencedAssemblyDisplay(RecipeHolder<SequencedAssemblyRecipe> entry) {
-        this(entry.id().location(), entry.value());
+        this(entry.id().identifier(), entry.value());
     }
 
     public SequencedAssemblyDisplay(Identifier id, SequencedAssemblyRecipe recipe) {

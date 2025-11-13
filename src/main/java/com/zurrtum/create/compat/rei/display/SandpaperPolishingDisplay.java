@@ -34,7 +34,7 @@ public record SandpaperPolishingDisplay(EntryIngredient input, EntryIngredient o
     );
 
     public SandpaperPolishingDisplay(RecipeHolder<SandPaperPolishingRecipe> entry) {
-        this(entry.id().location(), entry.value());
+        this(entry.id().identifier(), entry.value());
     }
 
     public SandpaperPolishingDisplay(Identifier id, SandPaperPolishingRecipe recipe) {

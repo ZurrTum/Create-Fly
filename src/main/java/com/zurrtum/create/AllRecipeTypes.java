@@ -17,11 +17,6 @@ import com.zurrtum.create.content.kinetics.mixer.PotionRecipe;
 import com.zurrtum.create.content.kinetics.press.PressingRecipe;
 import com.zurrtum.create.content.kinetics.saw.CuttingRecipe;
 import com.zurrtum.create.content.processing.sequenced.SequencedAssemblyRecipe;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.function.Predicate;
-
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
@@ -31,6 +26,10 @@ import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.RecipeType;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Predicate;
 
 import static com.zurrtum.create.Create.MOD_ID;
 
@@ -57,7 +56,7 @@ public class AllRecipeTypes {
         Registries.RECIPE_SERIALIZER,
         Identifier.fromNamespaceAndPath(MOD_ID, "automation_ignore")
     );
-    public static final Predicate<RecipeHolder<?>> CAN_BE_AUTOMATED = r -> !r.id().location().getPath().endsWith("_manual_only");
+    public static final Predicate<RecipeHolder<?>> CAN_BE_AUTOMATED = r -> !r.id().identifier().getPath().endsWith("_manual_only");
 
     public static boolean shouldIgnoreInAutomation(RecipeHolder<?> recipe) {
         RecipeSerializer<?> serializer = recipe.value().getSerializer();

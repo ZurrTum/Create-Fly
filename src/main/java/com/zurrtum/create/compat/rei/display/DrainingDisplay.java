@@ -53,7 +53,7 @@ public record DrainingDisplay(
     );
 
     public DrainingDisplay(RecipeHolder<EmptyingRecipe> entry) {
-        this(entry.id().location(), entry.value());
+        this(entry.id().identifier(), entry.value());
     }
 
     public DrainingDisplay(Identifier id, EmptyingRecipe recipe) {

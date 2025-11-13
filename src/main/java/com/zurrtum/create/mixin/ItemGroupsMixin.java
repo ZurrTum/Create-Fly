@@ -17,6 +17,11 @@
 package com.zurrtum.create.mixin;
 
 import com.zurrtum.create.infrastructure.itemGroup.FabricItemGroupImpl;
+import net.minecraft.core.Holder;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.item.CreativeModeTab;
+import net.minecraft.world.item.CreativeModeTabs;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
@@ -26,12 +31,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
-
-import net.minecraft.core.Holder;
-import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.ResourceKey;
-import net.minecraft.world.item.CreativeModeTab;
-import net.minecraft.world.item.CreativeModeTabs;
 
 import static net.minecraft.world.item.CreativeModeTabs.*;
 
@@ -78,7 +77,7 @@ public class ItemGroupsMixin {
                 return -displayCompare;
             } else {
                 // Ensure a deterministic order
-                return e1.key().location().compareTo(e2.key().location());
+                return e1.key().identifier().compareTo(e2.key().identifier());
             }
         };
         final List<Holder.Reference<CreativeModeTab>> sortedItemGroups = BuiltInRegistries.CREATIVE_MODE_TAB.listElements().sorted(entryComparator)

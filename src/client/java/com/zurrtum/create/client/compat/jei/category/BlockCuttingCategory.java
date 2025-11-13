@@ -55,7 +55,7 @@ public class BlockCuttingCategory extends CreateCategory<BlockCuttingDisplay> {
                 continue;
             }
             StonecutterRecipe recipe = entry.value();
-            map.computeIfAbsent(recipe.input(), i -> Pair.of(entry.id().location(), new ArrayList<>())).getSecond().add(recipe.result());
+            map.computeIfAbsent(recipe.input(), i -> Pair.of(entry.id().identifier(), new ArrayList<>())).getSecond().add(recipe.result());
         }
         List<BlockCuttingDisplay> recipes = new ArrayList<>();
         for (Object2ObjectMap.Entry<Ingredient, Pair<Identifier, List<ItemStack>>> entry : map.object2ObjectEntrySet()) {

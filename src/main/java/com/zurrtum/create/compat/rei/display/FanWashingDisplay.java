@@ -36,7 +36,7 @@ public record FanWashingDisplay(EntryIngredient input, List<ChanceOutput> output
     );
 
     public FanWashingDisplay(RecipeHolder<SplashingRecipe> entry) {
-        this(entry.id().location(), entry.value());
+        this(entry.id().identifier(), entry.value());
     }
 
     public FanWashingDisplay(Identifier id, SplashingRecipe recipe) {

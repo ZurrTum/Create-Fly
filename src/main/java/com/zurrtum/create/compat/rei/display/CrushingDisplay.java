@@ -38,7 +38,7 @@ public record CrushingDisplay(EntryIngredient input, List<ChanceOutput> outputs,
     );
 
     public static CrushingDisplay of(RecipeHolder<?> entry) {
-        Identifier id = entry.id().location();
+        Identifier id = entry.id().identifier();
         Recipe<?> recipe = entry.value();
         if (recipe instanceof CrushingRecipe crushingRecipe) {
             return new CrushingDisplay(id, crushingRecipe);

@@ -58,7 +58,7 @@ public record AutoRequestData(
         Mutable mutable = new Mutable(requestData);
 
         mutable.targetOffset = mutable.targetOffset.subtract(position);
-        mutable.isValid = mutable.targetOffset.closerThan(BlockPos.ZERO, 128) && requestData.targetDim.equals(level.dimension().location()
+        mutable.isValid = mutable.targetOffset.closerThan(BlockPos.ZERO, 128) && requestData.targetDim.equals(level.dimension().identifier()
             .toString());
 
         if (player != null) {

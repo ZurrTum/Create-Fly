@@ -64,8 +64,8 @@ import net.minecraft.core.Registry;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.world.effect.MobEffectInstance;
@@ -1040,7 +1040,7 @@ public class AllItems {
     @SuppressWarnings("deprecation")
     private static <T extends Block, U extends Item> U register(T block, BiFunction<T, Item.Properties, U> factory, Item.Properties settings) {
         return register(
-            block.builtInRegistryHolder().key().location(),
+            block.builtInRegistryHolder().key().identifier(),
             itemSettings -> factory.apply(block, itemSettings),
             settings.useBlockDescriptionPrefix()
         );

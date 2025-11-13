@@ -36,7 +36,7 @@ public record FanHauntingDisplay(EntryIngredient input, List<ChanceOutput> outpu
     );
 
     public FanHauntingDisplay(RecipeHolder<HauntingRecipe> entry) {
-        this(entry.id().location(), entry.value());
+        this(entry.id().identifier(), entry.value());
     }
 
     public FanHauntingDisplay(Identifier id, HauntingRecipe recipe) {

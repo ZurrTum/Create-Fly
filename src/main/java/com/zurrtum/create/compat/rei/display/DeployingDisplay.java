@@ -47,7 +47,7 @@ public record DeployingDisplay(
         if (!AllRecipeTypes.CAN_BE_AUTOMATED.test(entry)) {
             return null;
         }
-        Identifier id = entry.id().location();
+        Identifier id = entry.id().identifier();
         Recipe<?> recipe = entry.value();
         if (recipe instanceof ItemApplicationRecipe itemApplicationRecipe) {
             return new DeployingDisplay(id, itemApplicationRecipe);

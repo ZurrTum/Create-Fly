@@ -22,7 +22,6 @@ import net.minecraft.core.component.DataComponents;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.util.*;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.LivingEntity;
@@ -99,7 +98,7 @@ public class RedstoneRequesterBlock extends Block implements IBE<RedstoneRequest
         if (!isRequester && !isShopCloth)
             return;
 
-        String targetDim = player.level().dimension().location().toString();
+        String targetDim = player.level().dimension().identifier().toString();
         AutoRequestData autoRequestData = new AutoRequestData(order, address, be.getBlockPos(), targetDim, false);
 
         autoRequestData.writeToItem(BlockPos.ZERO, stack);

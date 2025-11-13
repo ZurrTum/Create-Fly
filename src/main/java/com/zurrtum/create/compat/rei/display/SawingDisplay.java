@@ -34,7 +34,7 @@ public record SawingDisplay(EntryIngredient input, EntryIngredient output, Optio
     );
 
     public SawingDisplay(RecipeHolder<CuttingRecipe> entry) {
-        this(entry.id().location(), entry.value());
+        this(entry.id().identifier(), entry.value());
     }
 
     public SawingDisplay(Identifier id, CuttingRecipe recipe) {

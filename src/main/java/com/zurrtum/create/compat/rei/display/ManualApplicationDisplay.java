@@ -39,7 +39,7 @@ public record ManualApplicationDisplay(
     );
 
     public ManualApplicationDisplay(RecipeHolder<ManualApplicationRecipe> entry) {
-        this(entry.id().location(), entry.value());
+        this(entry.id().identifier(), entry.value());
     }
 
     public ManualApplicationDisplay(Identifier id, ManualApplicationRecipe recipe) {

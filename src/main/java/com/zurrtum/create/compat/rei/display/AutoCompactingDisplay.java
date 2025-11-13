@@ -79,7 +79,7 @@ public interface AutoCompactingDisplay {
             super(
                 CollectionUtils.map(recipe.value().placementInfo().ingredients(), EntryIngredients::ofIngredient),
                 List.of(EntryIngredients.of(recipe.value().result)),
-                Optional.of(recipe.id().location())
+                Optional.of(recipe.id().identifier())
             );
         }
 
@@ -121,7 +121,7 @@ public interface AutoCompactingDisplay {
             super(
                 CollectionUtils.map(recipe.value().getIngredients(), opt -> opt.map(EntryIngredients::ofIngredient).orElse(EntryIngredient.empty())),
                 List.of(EntryIngredients.of(recipe.value().result)),
-                Optional.of(recipe.id().location()),
+                Optional.of(recipe.id().identifier()),
                 recipe.value().getWidth(),
                 recipe.value().getHeight()
             );

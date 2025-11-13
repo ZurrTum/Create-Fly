@@ -36,7 +36,7 @@ public record MillingDisplay(EntryIngredient input, List<ChanceOutput> outputs, 
     );
 
     public MillingDisplay(RecipeHolder<MillingRecipe> entry) {
-        this(entry.id().location(), entry.value());
+        this(entry.id().identifier(), entry.value());
     }
 
     public MillingDisplay(Identifier id, MillingRecipe recipe) {

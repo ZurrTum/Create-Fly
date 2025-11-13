@@ -47,7 +47,7 @@ public class DeployingCategory extends CreateCategory<RecipeHolder<? extends Ite
         for (RecipeHolder<SandPaperPolishingRecipe> entry : preparedRecipes.byType(AllRecipeTypes.SANDPAPER_POLISHING)) {
             SandPaperPolishingRecipe recipe = entry.value();
             recipes.add(new RecipeHolder<>(
-                ResourceKey.create(Registries.RECIPE, entry.id().location().withSuffix("_using_deployer")),
+                ResourceKey.create(Registries.RECIPE, entry.id().identifier().withSuffix("_using_deployer")),
                 new DeployerApplicationRecipe(recipe.result(), true, recipe.ingredient(), ingredient)
             ));
         }

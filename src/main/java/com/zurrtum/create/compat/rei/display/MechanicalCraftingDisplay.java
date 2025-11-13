@@ -45,7 +45,7 @@ public record MechanicalCraftingDisplay(
     );
 
     public MechanicalCraftingDisplay(RecipeHolder<MechanicalCraftingRecipe> entry) {
-        this(entry.id().location(), entry.value());
+        this(entry.id().identifier(), entry.value());
     }
 
     public MechanicalCraftingDisplay(Identifier id, MechanicalCraftingRecipe recipe) {

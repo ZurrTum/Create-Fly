@@ -35,7 +35,7 @@ public record PressingDisplay(EntryIngredient input, EntryIngredient output, Opt
     );
 
     public PressingDisplay(RecipeHolder<PressingRecipe> entry) {
-        this(entry.id().location(), entry.value());
+        this(entry.id().identifier(), entry.value());
     }
 
     public PressingDisplay(Identifier id, PressingRecipe recipe) {
