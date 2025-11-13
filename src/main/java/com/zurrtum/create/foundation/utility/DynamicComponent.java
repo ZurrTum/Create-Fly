@@ -8,6 +8,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.ComponentUtils;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.permissions.LevelBasedPermissionSet;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec2;
 import net.minecraft.world.phys.Vec3;
@@ -31,7 +32,7 @@ public class DynamicComponent {
             Vec3.atCenterOf(pos),
             Vec2.ZERO,
             level,
-            2,
+            LevelBasedPermissionSet.GAMEMASTER,
             MOD_ID,
             Component.literal(MOD_ID),
             level.getServer(),
