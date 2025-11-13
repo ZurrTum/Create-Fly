@@ -41,6 +41,7 @@ public class PortableItemInterfaceBlockEntity extends PortableStorageInterfaceBl
 
         private int[] slots = SlotRangeCache.EMPTY;
         private Inventory wrapped = EMPTY;
+        private boolean mark = false;
 
         @Override
         public int[] getAvailableSlots(Direction side) {
@@ -90,11 +91,13 @@ public class PortableItemInterfaceBlockEntity extends PortableStorageInterfaceBl
 
         @Override
         public ItemStack getStack(int slot) {
+            mark = true;
             return wrapped.getStack(slot);
         }
 
         @Override
         public void setStack(int slot, ItemStack stack) {
+            mark = true;
             wrapped.setStack(slot, stack);
         }
 
@@ -119,6 +122,10 @@ public class PortableItemInterfaceBlockEntity extends PortableStorageInterfaceBl
         @Override
         public void markDirty() {
             onContentTransferred();
+            if (mark) {
+                mark = false;
+                wrapped.markDirty();
+            }
         }
 
         @Override

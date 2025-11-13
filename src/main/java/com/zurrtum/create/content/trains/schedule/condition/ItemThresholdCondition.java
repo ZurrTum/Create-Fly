@@ -3,7 +3,6 @@ package com.zurrtum.create.content.trains.schedule.condition;
 import com.zurrtum.create.content.logistics.filter.FilterItemStack;
 import com.zurrtum.create.content.trains.entity.Carriage;
 import com.zurrtum.create.content.trains.entity.Train;
-import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.storage.ReadView;
@@ -28,12 +27,9 @@ public class ItemThresholdCondition extends CargoThresholdCondition {
 
         int foundItems = 0;
         for (Carriage carriage : train.carriages) {
-            Inventory items = carriage.storage.getAllItems();
-            for (int i = 0, size = items.size(); i < size; i++) {
-                ItemStack stackInSlot = items.getStack(i);
+            for (ItemStack stackInSlot : carriage.storage.getAllItems()) {
                 if (!stack.test(level, stackInSlot))
                     continue;
-
                 if (stacks)
                     foundItems += stackInSlot.getCount() == stackInSlot.getMaxCount() ? 1 : 0;
                 else

@@ -91,6 +91,9 @@ public class InvManipulationBehaviour extends CapManipulationBehaviourBase<Inven
             return extract;
         } else if (mode == ExtractionCountMode.UPTO) {
             ItemStack extract = inventory.count(test, amount);
+            if (extract.isEmpty()) {
+                return extract;
+            }
             int count = inventory.extract(extract, Math.min(extract.getCount(), extract.getMaxCount()));
             extract.setCount(count);
             return extract;
