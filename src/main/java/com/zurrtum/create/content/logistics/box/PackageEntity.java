@@ -78,7 +78,7 @@ public class PackageEntity extends LivingEntity {
     public void move(MoverType type, Vec3 movement) {
         super.move(type, movement);
         if (movement.lengthSqr() >= 0.01f) {
-            hasImpulse = true;
+            needsSync = true;
         }
     }
 
