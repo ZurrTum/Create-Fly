@@ -482,14 +482,14 @@ public abstract class InventoryWrapper<T extends Storage<ItemVariant>, S extends
         return capacity;
     }
 
-    protected abstract S getSlot(int slot);
+    protected abstract S getSlotView(int slot);
 
     @Override
     public ItemStack getItem(int slot) {
         if (slot >= getContainerSize()) {
             return ItemStack.EMPTY;
         }
-        StorageView<ItemVariant> view = getSlot(slot);
+        StorageView<ItemVariant> view = getSlotView(slot);
         if (view == null) {
             return ItemStack.EMPTY;
         }
@@ -753,7 +753,7 @@ public abstract class InventoryWrapper<T extends Storage<ItemVariant>, S extends
         if (slot >= getContainerSize()) {
             return ItemStack.EMPTY;
         }
-        StorageView<ItemVariant> view = getSlot(slot);
+        StorageView<ItemVariant> view = getSlotView(slot);
         if (view == null) {
             return ItemStack.EMPTY;
         }
@@ -774,7 +774,7 @@ public abstract class InventoryWrapper<T extends Storage<ItemVariant>, S extends
         if (slot >= getContainerSize()) {
             return ItemStack.EMPTY;
         }
-        StorageView<ItemVariant> view = getSlot(slot);
+        StorageView<ItemVariant> view = getSlotView(slot);
         if (view == null) {
             return ItemStack.EMPTY;
         }
@@ -794,7 +794,7 @@ public abstract class InventoryWrapper<T extends Storage<ItemVariant>, S extends
         if (slot >= getContainerSize()) {
             return;
         }
-        S view = getSlot(slot);
+        S view = getSlotView(slot);
         if (view == null) {
             return;
         }
@@ -1397,7 +1397,7 @@ public abstract class InventoryWrapper<T extends Storage<ItemVariant>, S extends
         }
 
         @Override
-        protected StorageView<ItemVariant> getSlot(int slot) {
+        protected StorageView<ItemVariant> getSlotView(int slot) {
             int current = 0;
             for (StorageView<ItemVariant> view : storage) {
                 if (current == slot) {
@@ -1440,7 +1440,7 @@ public abstract class InventoryWrapper<T extends Storage<ItemVariant>, S extends
         }
 
         @Override
-        protected SingleSlotStorage<ItemVariant> getSlot(int slot) {
+        protected SingleSlotStorage<ItemVariant> getSlotView(int slot) {
             return storage.getSlot(slot);
         }
 
