@@ -3,20 +3,12 @@ package com.zurrtum.create.content.redstone.nixieTube;
 import com.zurrtum.create.*;
 import com.zurrtum.create.api.schematic.requirement.SpecialBlockItemRequirement;
 import com.zurrtum.create.catnip.data.Iterate;
-import com.zurrtum.create.compat.Mods;
 import com.zurrtum.create.content.equipment.wrench.IWrenchable;
 import com.zurrtum.create.content.schematics.requirement.ItemRequirement;
 import com.zurrtum.create.content.schematics.requirement.ItemRequirement.ItemUseType;
 import com.zurrtum.create.foundation.block.IBE;
 import com.zurrtum.create.foundation.block.RedStoneConnectBlock;
 import com.zurrtum.create.infrastructure.component.ClipboardEntry;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.List;
-import java.util.function.BiConsumer;
-import java.util.function.Function;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.component.DataComponents;
@@ -31,11 +23,7 @@ import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.context.BlockPlaceContext;
-import net.minecraft.world.level.BlockGetter;
-import net.minecraft.world.level.Level;
-import net.minecraft.world.level.LevelAccessor;
-import net.minecraft.world.level.LevelReader;
-import net.minecraft.world.level.ScheduledTickAccess;
+import net.minecraft.world.level.*;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.SimpleWaterloggedBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -49,6 +37,12 @@ import net.minecraft.world.level.redstone.Orientation;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.List;
+import java.util.function.BiConsumer;
+import java.util.function.Function;
 
 import static net.minecraft.world.level.block.state.properties.BlockStateProperties.WATERLOGGED;
 
@@ -145,7 +139,8 @@ public class NixieTubeBlock extends DoubleFaceAttachedBlock implements IBE<Nixie
     }
 
     public static boolean isInComputerControlledRow(@NotNull LevelAccessor world, @NotNull BlockPos pos) {
-        return Mods.COMPUTERCRAFT.isLoaded() && !walkNixies(world, pos, false, null);
+        //        return Mods.COMPUTERCRAFT.isLoaded() && !walkNixies(world, pos, false, null);
+        return false;
     }
 
     /**
@@ -169,8 +164,8 @@ public class NixieTubeBlock extends DoubleFaceAttachedBlock implements IBE<Nixie
 
         // If ComputerCraft is not installed, ignore allowComputerControlled since
         // nixies can't be computer-controlled
-        if (!Mods.COMPUTERCRAFT.isLoaded())
-            allowComputerControlled = true;
+        //        if (!Mods.COMPUTERCRAFT.isLoaded())
+        //            allowComputerControlled = true;
 
         BlockPos currentPos = start;
         Direction left = getLeftNixieDirection(state);
@@ -303,16 +298,16 @@ public class NixieTubeBlock extends DoubleFaceAttachedBlock implements IBE<Nixie
     public void onPlace(BlockState state, Level worldIn, BlockPos pos, BlockState oldState, boolean isMoving) {
         if (state.getBlock() == oldState.getBlock() || isMoving || oldState.getBlock() instanceof NixieTubeBlock)
             return;
-        if (Mods.COMPUTERCRAFT.isLoaded() && isInComputerControlledRow(worldIn, pos)) {
-            // The nixie tube has been placed in a computer-controlled row.
-            walkNixies(
-                worldIn, pos, true, (currentPos, rowPosition) -> {
-                    if (worldIn.getBlockEntity(currentPos) instanceof NixieTubeBlockEntity ntbe)
-                        ntbe.displayEmptyText(rowPosition);
-                }
-            );
-            return;
-        }
+        //        if (Mods.COMPUTERCRAFT.isLoaded() && isInComputerControlledRow(worldIn, pos)) {
+        //            // The nixie tube has been placed in a computer-controlled row.
+        //            walkNixies(
+        //                worldIn, pos, true, (currentPos, rowPosition) -> {
+        //                    if (worldIn.getBlockEntity(currentPos) instanceof NixieTubeBlockEntity ntbe)
+        //                        ntbe.displayEmptyText(rowPosition);
+        //                }
+        //            );
+        //            return;
+        //        }
         updateDisplayedRedstoneValue(state, worldIn, pos);
     }
 

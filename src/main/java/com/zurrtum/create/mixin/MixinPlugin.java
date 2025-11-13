@@ -40,15 +40,15 @@ public class MixinPlugin implements IMixinConfigPlugin {
     @Override
     public List<String> getMixins() {
         List<String> mixins = new ArrayList<>();
-        if (CCT) {
-            mixins.add("CreateIntegrationMixin");
-        }
-        if (ARCH) {
-            mixins.add("ArchitecturyMixin");
-        }
-        if (JEI) {
-            mixins.add("JustEnoughItemsMixin");
-        }
+        //        if (CCT) {
+        //            mixins.add("CreateIntegrationMixin");
+        //        }
+        //        if (ARCH) {
+        //            mixins.add("ArchitecturyMixin");
+        //        }
+        //        if (JEI) {
+        //            mixins.add("JustEnoughItemsMixin");
+        //        }
         if (Create.Lazy) {
             mixins.add("RegistryKeysMixin");
         } else {

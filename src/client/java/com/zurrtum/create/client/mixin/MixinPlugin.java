@@ -41,16 +41,16 @@ public class MixinPlugin implements IMixinConfigPlugin {
     @Override
     public List<String> getMixins() {
         List<String> mixins = new ArrayList<>();
-        if (SODIUM) {
-            mixins.add("FabricModelAccessMixin");
-        }
-        if (IRIS) {
-            mixins.add("IrisPipelinesMixin");
-        }
-        if (HMI) {
-            mixins.add("HoldMyItemsMixin");
-            mixins.add("AnimationResourceLoaderMixin");
-        }
+        //        if (SODIUM) {
+        //            mixins.add("FabricModelAccessMixin");
+        //        }
+        //        if (IRIS) {
+        //            mixins.add("IrisPipelinesMixin");
+        //        }
+        //        if (HMI) {
+        //            mixins.add("HoldMyItemsMixin");
+        //            mixins.add("AnimationResourceLoaderMixin");
+        //        }
         if (Create.Lazy) {
             mixins.add("FabricBlockStateModelMixin");
             mixins.add("WrapperBlockStateModelMixin");

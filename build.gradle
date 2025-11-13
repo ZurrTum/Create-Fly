@@ -55,6 +55,27 @@ loom {
     }
 }
 
+sourceSets {
+    main {
+        java {
+            exclude 'com/zurrtum/create/compat/**'
+            exclude 'com/zurrtum/create/mixin/CreateIntegrationMixin.java'
+            exclude 'com/zurrtum/create/mixin/ArchitecturyMixin.java'
+            exclude 'com/zurrtum/create/mixin/JustEnoughItemsMixin.java'
+            exclude 'com/zurrtum/create/mixin/WrapperBlockStateModel.java'
+        }
+    }
+    client {
+        java {
+            exclude 'com/zurrtum/create/client/compat/**'
+            exclude 'com/zurrtum/create/client/mixin/FabricModelAccessMixin.java'
+            exclude 'com/zurrtum/create/client/mixin/IrisPipelinesMixin.java'
+            exclude 'com/zurrtum/create/client/mixin/HoldMyItemsMixin.java'
+            exclude 'com/zurrtum/create/client/mixin/AnimationResourceLoaderMixin.java'
+        }
+    }
+}
+
 tasks.register("serverJar", Jar) {
     archiveClassifier = "server-dev"
     destinationDirectory = layout.buildDirectory.dir("tmp/serverJar")

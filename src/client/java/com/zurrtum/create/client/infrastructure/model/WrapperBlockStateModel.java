@@ -1,6 +1,5 @@
 package com.zurrtum.create.client.infrastructure.model;
 
-import com.zurrtum.create.client.compat.fabric.WrapperModel;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.renderer.block.model.BlockModelPart;
 import net.minecraft.client.renderer.block.model.BlockStateModel;
@@ -63,9 +62,9 @@ public abstract class WrapperBlockStateModel implements BlockStateModel, BlockSt
     }
 
     public static BlockStateModel unwrapCompat(BlockStateModel model) {
-        if (FABRIC && model instanceof WrapperModel wrapper) {
-            return wrapper.create$getWrapped();
-        }
+        //        if (FABRIC && model instanceof WrapperModel wrapper) {
+        //            return wrapper.create$getWrapped();
+        //        }
         return model;
     }
 }

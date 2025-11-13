@@ -8,7 +8,6 @@ import com.zurrtum.create.AllBlocks;
 import com.zurrtum.create.client.AllPartialModels;
 import com.zurrtum.create.client.catnip.animation.AnimationTickHolder;
 import com.zurrtum.create.client.catnip.render.FluidRenderHelper;
-import com.zurrtum.create.client.compat.sodium.SodiumCompat;
 import com.zurrtum.create.client.flywheel.lib.model.baked.SinglePosVirtualBlockGetter;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.render.pip.PictureInPictureRenderer;
@@ -77,7 +76,7 @@ public class FanRenderer extends PictureInPictureRenderer<FanRenderState> {
         FluidState fluidState = blockState.getFluidState();
         if (!fluidState.isEmpty()) {
             Fluid fluid = fluidState.getType();
-            SodiumCompat.markFluidSpriteActive(fluid);
+            //            SodiumCompat.markFluidSpriteActive(fluid);
             FluidRenderHelper.renderFluidBox(
                 fluid,
                 DataComponentPatch.EMPTY,

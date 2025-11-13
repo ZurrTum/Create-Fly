@@ -13,7 +13,6 @@ import com.zurrtum.create.client.catnip.client.render.model.ShadeSeparatedResult
 import com.zurrtum.create.client.catnip.outliner.AABBOutline;
 import com.zurrtum.create.client.catnip.render.*;
 import com.zurrtum.create.client.catnip.render.SuperByteBufferCache.Compartment;
-import com.zurrtum.create.client.compat.sodium.SodiumCompat;
 import com.zurrtum.create.client.flywheel.lib.transform.TransformStack;
 import com.zurrtum.create.client.ponder.Ponder;
 import com.zurrtum.create.client.ponder.api.element.WorldSectionElement;
@@ -370,7 +369,7 @@ public class WorldSectionElementImpl extends AnimatedSceneElementBase implements
         if (redraw)
             bufferCache.invalidate(PONDER_WORLD_SECTION, key);
 
-        SodiumCompat.markPonderSpriteActive(world, section);
+        //        SodiumCompat.markPonderSpriteActive(world, section);
         SuperByteBuffer structureBuffer = bufferCache.get(PONDER_WORLD_SECTION, key, () -> buildStructureBuffer(world, type));
         if (structureBuffer.isEmpty())
             return;
