@@ -33,10 +33,10 @@
   },
   "custom": {
     "loom:injected_interfaces": {
-      "net/minecraft/class_1263": [
+      "net/minecraft/world/Container": [
         "com/zurrtum/create/infrastructure/items/BaseInventory"
       ],
-      "net/minecraft/class_1278": [
+      "net/minecraft/world/WorldlyContainer": [
         "com/zurrtum/create/infrastructure/items/BaseSidedInventory"
       ]
     }
