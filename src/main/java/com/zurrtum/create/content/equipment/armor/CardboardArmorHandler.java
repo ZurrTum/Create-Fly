@@ -9,8 +9,6 @@ import net.minecraft.world.entity.ai.goal.target.TargetGoal;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 
-import java.util.UUID;
-
 public class CardboardArmorHandler {
     public static EntityDimensions playerHitboxChangesWhenHidingAsBox(Entity entity) {
         if (!testForStealth(entity))
@@ -56,8 +54,8 @@ public class CardboardArmorHandler {
         }
 
         if (entity instanceof NeutralMob nMob && entity.level() instanceof ServerLevel sl) {
-            UUID uuid = nMob.getPersistentAngerTarget();
-            if (uuid != null && testForStealth(sl.getEntity(uuid)))
+            LivingEntity target = EntityReference.getLivingEntity(nMob.getPersistentAngerTarget(), sl);
+            if (testForStealth(target))
                 nMob.stopBeingAngry();
         }
 
