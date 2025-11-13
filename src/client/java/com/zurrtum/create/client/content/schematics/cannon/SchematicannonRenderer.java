@@ -13,7 +13,7 @@ import com.zurrtum.create.content.schematics.cannon.LaunchedItem.ForBelt;
 import com.zurrtum.create.content.schematics.cannon.LaunchedItem.ForBlockState;
 import com.zurrtum.create.content.schematics.cannon.LaunchedItem.ForEntity;
 import com.zurrtum.create.content.schematics.cannon.SchematicannonBlockEntity;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;

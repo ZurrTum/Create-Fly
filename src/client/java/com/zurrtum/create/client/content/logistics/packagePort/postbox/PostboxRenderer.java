@@ -10,7 +10,7 @@ import com.zurrtum.create.client.foundation.blockEntity.renderer.SmartBlockEntit
 import com.zurrtum.create.client.foundation.blockEntity.renderer.SmartBlockEntityRenderer.NameplateRenderState;
 import com.zurrtum.create.content.logistics.packagePort.postbox.PostboxBlock;
 import com.zurrtum.create.content.logistics.packagePort.postbox.PostboxBlockEntity;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;

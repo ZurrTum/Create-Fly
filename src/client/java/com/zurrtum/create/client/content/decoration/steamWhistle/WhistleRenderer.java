@@ -15,7 +15,7 @@ import com.zurrtum.create.content.decoration.steamWhistle.WhistleBlock.WhistleSi
 import com.zurrtum.create.content.decoration.steamWhistle.WhistleBlockEntity;
 import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.LightTexture;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;

@@ -6,7 +6,7 @@ import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderType;
 
 public class ItemChunkLayerSortedListBuilder<T> {
     private static final ThreadLocal<ItemChunkLayerSortedListBuilder<?>> THREAD_LOCAL = ThreadLocal.withInitial(ItemChunkLayerSortedListBuilder::new);

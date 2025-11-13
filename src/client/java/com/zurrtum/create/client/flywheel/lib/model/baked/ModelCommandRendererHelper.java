@@ -3,7 +3,7 @@ package com.zurrtum.create.client.flywheel.lib.model.baked;
 import net.minecraft.SharedConstants;
 import net.minecraft.client.model.Model;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.SubmitNodeCollection;
 import net.minecraft.client.renderer.SubmitNodeStorage;
 import net.minecraft.client.resources.model.ModelBakery;

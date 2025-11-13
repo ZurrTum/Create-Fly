@@ -19,7 +19,7 @@ import com.zurrtum.create.content.decoration.slidingDoor.SlidingDoorBlock;
 import com.zurrtum.create.content.decoration.slidingDoor.SlidingDoorBlockEntity;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.LevelRenderer;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;

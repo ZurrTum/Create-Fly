@@ -10,7 +10,7 @@ import com.zurrtum.create.client.content.logistics.depot.DepotRenderer;
 import com.zurrtum.create.client.content.logistics.depot.DepotRenderer.DepotOutputItemState;
 import com.zurrtum.create.client.foundation.blockEntity.renderer.SmartBlockEntityRenderer;
 import com.zurrtum.create.content.logistics.tableCloth.TableClothBlockEntity;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.feature.ModelFeatureRenderer;

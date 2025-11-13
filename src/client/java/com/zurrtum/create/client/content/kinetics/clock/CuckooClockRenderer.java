@@ -15,7 +15,7 @@ import com.zurrtum.create.content.kinetics.clock.CuckooClockBlockEntity;
 import com.zurrtum.create.content.kinetics.clock.CuckooClockBlockEntity.Animation;
 import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.LightTexture;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.feature.ModelFeatureRenderer;

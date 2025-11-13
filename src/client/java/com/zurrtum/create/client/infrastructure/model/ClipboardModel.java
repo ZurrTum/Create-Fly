@@ -5,7 +5,7 @@ import com.mojang.serialization.MapCodec;
 import com.zurrtum.create.AllDataComponents;
 import com.zurrtum.create.infrastructure.component.ClipboardContent;
 import net.minecraft.client.multiplayer.ClientLevel;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.Sheets;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.block.model.TextureSlots;

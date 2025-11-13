@@ -2,7 +2,7 @@ package com.zurrtum.create.client.catnip.render;
 
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.chunk.ChunkSectionLayer;
 
 public interface SuperRenderTypeBuffer extends MultiBufferSource {
