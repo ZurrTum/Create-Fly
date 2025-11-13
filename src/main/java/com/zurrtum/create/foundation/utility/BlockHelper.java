@@ -30,6 +30,7 @@ import net.minecraft.tags.FluidTags;
 import net.minecraft.util.ProblemReporter;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.attribute.EnvironmentAttributes;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
@@ -328,7 +329,7 @@ public class BlockHelper {
             Registry<Enchantment> enchantmentRegistry = world.registryAccess().lookupOrThrow(Registries.ENCHANTMENT);
             if (state.getBlock() instanceof IceBlock && usedTool.getEnchantments()
                 .getLevel(enchantmentRegistry.getOrThrow(Enchantments.SILK_TOUCH)) == 0) {
-                if (!world.dimensionType().ultraWarm()) {
+                if (!world.environmentAttributes().getValue(EnvironmentAttributes.WATER_EVAPORATES, pos)) {
                     BlockState below = world.getBlockState(pos.below());
                     if (below.blocksMotion() || below.liquid()) {
                         fluidState = IceBlock.meltsInto().getFluidState();
@@ -465,7 +466,7 @@ public class BlockHelper {
             state = Blocks.CAULDRON.defaultBlockState();
         }
 
-        if (world.dimensionType().ultraWarm() && state.getFluidState().is(FluidTags.WATER)) {
+        if (world.environmentAttributes().getValue(EnvironmentAttributes.WATER_EVAPORATES, target) && state.getFluidState().is(FluidTags.WATER)) {
             int i = target.getX();
             int j = target.getY();
             int k = target.getZ();

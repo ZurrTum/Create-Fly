@@ -15,6 +15,7 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.FluidTags;
+import net.minecraft.world.attribute.EnvironmentAttributes;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
@@ -127,7 +128,10 @@ public class FluidFillingBehaviour extends FluidManipulationBehaviour {
         int maxRange = maxRange();
         int maxRangeSq = maxRange * maxRange;
         int maxBlocks = maxBlocks();
-        boolean evaporate = world.dimensionType().ultraWarm() && FluidHelper.isTag(fluid, FluidTags.WATER);
+        boolean evaporate = world.environmentAttributes().getValue(EnvironmentAttributes.WATER_EVAPORATES, root) && FluidHelper.isTag(
+            fluid,
+            FluidTags.WATER
+        );
         boolean canPlaceSources = AllConfigs.server().fluids.fluidFillPlaceFluidSourceBlocks.get();
 
         if ((!fillInfinite() && infinite) || evaporate || !canPlaceSources) {

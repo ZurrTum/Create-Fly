@@ -14,18 +14,14 @@ import com.zurrtum.create.infrastructure.fluids.BucketFluidInventory;
 import com.zurrtum.create.infrastructure.fluids.FluidInventory;
 import com.zurrtum.create.infrastructure.fluids.FluidStack;
 import com.zurrtum.create.infrastructure.fluids.SidedFluidInventory;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.Optional;
-import java.util.function.Function;
-
-import net.minecraft.util.Util;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.tags.FluidTags;
+import net.minecraft.util.Util;
+import net.minecraft.world.attribute.EnvironmentAttributes;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.LiquidBlock;
@@ -37,6 +33,10 @@ import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.phys.AABB;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.Optional;
+import java.util.function.Function;
 
 import static net.minecraft.world.level.block.state.properties.BlockStateProperties.WATERLOGGED;
 
@@ -195,7 +195,7 @@ public class OpenEndedPipe extends FlowSource {
         if (!AllConfigs.server().fluids.pipesPlaceFluidSourceBlocks.get())
             return true;
 
-        if (world.dimensionType().ultraWarm() && FluidHelper.isTag(fluid, FluidTags.WATER)) {
+        if (world.environmentAttributes().getValue(EnvironmentAttributes.WATER_EVAPORATES, outputPos) && FluidHelper.isTag(fluid, FluidTags.WATER)) {
             int i = outputPos.getX();
             int j = outputPos.getY();
             int k = outputPos.getZ();
