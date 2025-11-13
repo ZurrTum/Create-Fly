@@ -194,7 +194,7 @@ public class AllModels {
         register(AllBlocks.LARGE_WATER_WHEEL, LargeWaterWheelModel::new);
         register(AllBlocks.WATER_WHEEL_STRUCTURAL, WaterWheelStructuralModel::single);
         register(AllBlocks.FLUID_PIPE, PipeAttachmentModel::new);
-        register(AllBlocks.ENCASED_FLUID_PIPE, PipeAttachmentModel::new);
+        register(AllBlocks.ENCASED_FLUID_PIPE, PipeAttachmentModel::encased);
         register(AllBlocks.GLASS_FLUID_PIPE, PipeAttachmentModel::new);
         register(AllBlocks.MECHANICAL_PUMP, PipeAttachmentModel::new);
         register(AllBlocks.FLUID_VALVE, PipeAttachmentModel::new);
