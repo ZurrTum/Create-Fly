@@ -8,8 +8,8 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
@@ -133,7 +133,7 @@ public class AllPortalTracks {
         if (dimensiontransition == null)
             return null;
 
-        if (!minecraftServer.isAllowedToEnterPortal(dimensiontransition.newLevel()))
+        if (!level.isAllowedToEnterPortal(dimensiontransition.newLevel()))
             return null;
 
         BlockPos otherPortalPos = BlockPos.containing(dimensiontransition.position());
