@@ -8,10 +8,6 @@ import com.zurrtum.create.catnip.animation.LerpedFloat;
 import com.zurrtum.create.catnip.math.VecHelper;
 import com.zurrtum.create.content.kinetics.base.KineticBlockEntity;
 import com.zurrtum.create.foundation.advancement.CreateTrigger;
-
-import java.util.List;
-import java.util.Locale;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.util.Mth;
 import net.minecraft.util.StringRepresentable;
@@ -20,6 +16,9 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.Vec3;
+
+import java.util.List;
+import java.util.Locale;
 
 public class CuckooClockBlockEntity extends KineticBlockEntity {
     public LerpedFloat animationProgress = LerpedFloat.linear();
@@ -72,11 +71,6 @@ public class CuckooClockBlockEntity extends KineticBlockEntity {
         super.tick();
         if (level.isClientSide() || getSpeed() == 0)
             return;
-
-        boolean isNatural = level.dimensionType().natural();
-        if (!isNatural) {
-            return;
-        }
 
         if (animationType == Animation.NONE) {
             int dayTime = (int) (level.getDayTime() % 24000);

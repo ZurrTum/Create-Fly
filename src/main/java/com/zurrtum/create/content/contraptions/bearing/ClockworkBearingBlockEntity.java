@@ -12,10 +12,6 @@ import com.zurrtum.create.content.kinetics.base.KineticBlockEntity;
 import com.zurrtum.create.foundation.advancement.CreateTrigger;
 import com.zurrtum.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.foundation.blockEntity.behaviour.scrollValue.ServerScrollOptionBehaviour;
-import org.apache.commons.lang3.tuple.Pair;
-
-import java.util.List;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Direction.Axis;
@@ -24,6 +20,9 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
+import org.apache.commons.lang3.tuple.Pair;
+
+import java.util.List;
 
 public class ClockworkBearingBlockEntity extends KineticBlockEntity implements IBearingBlockEntity {
 
@@ -170,16 +169,14 @@ public class ClockworkBearingBlockEntity extends KineticBlockEntity implements I
     }
 
     protected float getHourTarget(boolean cycle24) {
-        boolean isNatural = level.dimensionType().natural();
-        int dayTime = (int) ((level.getDayTime() * (isNatural ? 1 : 24)) % 24000);
+        int dayTime = (int) (level.getDayTime() % 24000);
         int hours = (dayTime / 1000 + 6) % 24;
         int offset = getBlockState().getValue(ClockworkBearingBlock.FACING).getAxisDirection().getStep();
         return offset * -360 / (cycle24 ? 24f : 12f) * (hours % (cycle24 ? 24 : 12));
     }
 
     protected float getMinuteTarget() {
-        boolean isNatural = level.dimensionType().natural();
-        int dayTime = (int) ((level.getDayTime() * (isNatural ? 1 : 24)) % 24000);
+        int dayTime = (int) (level.getDayTime() % 24000);
         int minutes = (dayTime % 1000) * 60 / 1000;
         int offset = getBlockState().getValue(ClockworkBearingBlock.FACING).getAxisDirection().getStep();
         return offset * -360 / 60f * (minutes);

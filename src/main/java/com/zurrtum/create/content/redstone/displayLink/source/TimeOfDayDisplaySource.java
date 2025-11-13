@@ -26,7 +26,6 @@ public class TimeOfDayDisplaySource extends SingleLineDisplaySource {
             return EMPTY_TIME;
 
         boolean c12 = context.sourceConfig().getIntOr("Cycle", 0) == 0;
-        boolean isNatural = sLevel.dimensionType().natural();
 
         int dayTime = (int) (sLevel.getDayTime() % 24000);
         int hours = (dayTime / 1000 + 6) % 24;
@@ -38,11 +37,6 @@ public class TimeOfDayDisplaySource extends SingleLineDisplaySource {
             hours %= 12;
             if (hours == 0)
                 hours = 12;
-        }
-
-        if (!isNatural) {
-            hours = sLevel.random.nextInt(70) + 24;
-            minutes = sLevel.random.nextInt(40) + 60;
         }
 
         MutableComponent component = Component.literal((hours < 10 ? " " : "") + hours + ":" + (minutes < 10 ? "0" : "") + minutes + (c12 ? " " : ""));

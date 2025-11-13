@@ -25,19 +25,10 @@ public class CuckooClockAnimationBehaviour extends AnimationBehaviour<CuckooCloc
             return;
 
         Level world = blockEntity.getLevel();
-        boolean isNatural = world.dimensionType().natural();
-        int dayTime = (int) ((world.getDayTime() * (isNatural ? 1 : 24)) % 24000);
+        int dayTime = (int) (world.getDayTime() % 24000);
         int hours = (dayTime / 1000 + 6) % 24;
         int minutes = (dayTime % 1000) * 60 / 1000;
         moveHands(hours, minutes);
-
-        if (!isNatural) {
-            if (AnimationTickHolder.getTicks() % 6 == 0)
-                playSound(SoundEvents.NOTE_BLOCK_HAT.value(), 1 / 16f, 2f);
-            else if (AnimationTickHolder.getTicks() % 3 == 0)
-                playSound(SoundEvents.NOTE_BLOCK_HAT.value(), 1 / 16f, 1.5f);
-            return;
-        }
 
         CuckooClockBlockEntity.Animation animationType = blockEntity.animationType;
         if (animationType == CuckooClockBlockEntity.Animation.NONE) {
