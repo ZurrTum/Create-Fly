@@ -21,6 +21,7 @@
     "ExperienceOrbEntityMixin",
     "ExperimentalRedstoneControllerMixin",
     "ExplosionBehaviorMixin",
+    "FluidBlockMixin",
     "FuelRegistryMixin",
     "HoneycombItemMixin",
     "InventoryMixin",
