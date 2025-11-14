@@ -2,10 +2,11 @@ package com.zurrtum.create.content.kinetics.drill;
 
 import com.zurrtum.create.catnip.data.Iterate;
 import com.zurrtum.create.catnip.data.Pair;
-import com.zurrtum.create.content.kinetics.drill.FluidInteractionRegistry.FluidInteraction;
-import com.zurrtum.create.content.kinetics.drill.FluidInteractionRegistry.HasFluidInteraction;
-import com.zurrtum.create.content.kinetics.drill.FluidInteractionRegistry.InteractionInformation;
 import com.zurrtum.create.foundation.fluid.FluidHelper;
+import com.zurrtum.create.infrastructure.fluids.FluidInteractionRegistry;
+import com.zurrtum.create.infrastructure.fluids.FluidInteractionRegistry.FluidInteraction;
+import com.zurrtum.create.infrastructure.fluids.FluidInteractionRegistry.HasFluidInteraction;
+import com.zurrtum.create.infrastructure.fluids.FluidInteractionRegistry.InteractionInformation;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.fluid.Fluid;
