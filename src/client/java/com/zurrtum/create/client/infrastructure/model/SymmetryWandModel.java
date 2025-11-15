@@ -11,7 +11,6 @@ import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.Sheets;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.block.model.BakedQuad;
-import net.minecraft.client.renderer.block.model.FaceBakery;
 import net.minecraft.client.renderer.block.model.TextureSlots;
 import net.minecraft.client.renderer.item.ItemModel;
 import net.minecraft.client.renderer.item.ItemModelResolver;
@@ -30,7 +29,7 @@ import net.minecraft.world.entity.ItemOwner;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.Nullable;
-import org.joml.Vector3f;
+import org.joml.Vector3fc;
 
 import java.util.HashSet;
 import java.util.List;
@@ -53,7 +52,7 @@ public class SymmetryWandModel implements ItemModel, SpecialModelRenderer<Object
     private final List<BakedQuad> core;
     private final List<BakedQuad> coreGlow;
     private final List<BakedQuad> bits;
-    private final Supplier<Vector3f[]> vector;
+    private final Supplier<Vector3fc[]> vector;
 
     public SymmetryWandModel(
         ModelRenderProperties settings,
@@ -68,18 +67,21 @@ public class SymmetryWandModel implements ItemModel, SpecialModelRenderer<Object
         this.coreGlow = coreGlow;
         this.bits = bits;
         this.vector = Suppliers.memoize(() -> {
-            Set<Vector3f> set = new HashSet<>();
-            calculatePosition(item, set::add);
-            calculatePosition(core, set::add);
-            calculatePosition(coreGlow, set::add);
-            calculatePosition(bits, set::add);
-            return set.toArray(Vector3f[]::new);
+            Set<Vector3fc> set = new HashSet<>();
+            addPosition(set, item);
+            addPosition(set, core);
+            addPosition(set, coreGlow);
+            addPosition(set, bits);
+            return set.toArray(Vector3fc[]::new);
         });
     }
 
-    private static void calculatePosition(List<BakedQuad> quads, Consumer<Vector3f> consumer) {
+    private static void addPosition(Set<Vector3fc> set, List<BakedQuad> quads) {
         for (BakedQuad bakedQuad : quads) {
-            FaceBakery.extractPositions(bakedQuad.vertices(), consumer);
+            set.add(bakedQuad.position0());
+            set.add(bakedQuad.position1());
+            set.add(bakedQuad.position2());
+            set.add(bakedQuad.position3());
         }
     }
 
@@ -143,7 +145,7 @@ public class SymmetryWandModel implements ItemModel, SpecialModelRenderer<Object
     }
 
     @Override
-    public void getExtents(Set<Vector3f> vertices) {
+    public void getExtents(Consumer<Vector3fc> output) {
         throw new UnsupportedOperationException();
     }
 
@@ -173,14 +175,14 @@ public class SymmetryWandModel implements ItemModel, SpecialModelRenderer<Object
             ModelBaker baker = context.blockModelBaker();
             ResolvedModel model = baker.getModel(ITEM_ID);
             TextureSlots textures = model.getTopTextureSlots();
-            List<BakedQuad> quads = model.bakeTopGeometry(textures, baker, BlockModelRotation.X0_Y0).getAll();
+            List<BakedQuad> quads = model.bakeTopGeometry(textures, baker, BlockModelRotation.IDENTITY).getAll();
             ModelRenderProperties settings = ModelRenderProperties.fromResolvedModel(baker, model, textures);
             return new SymmetryWandModel(settings, quads, bake(baker, CORE_ID), bake(baker, CORE_GLOW_ID), bake(baker, BITS_ID));
         }
 
         private static List<BakedQuad> bake(ModelBaker baker, Identifier id) {
             ResolvedModel model = baker.getModel(id);
-            return model.bakeTopGeometry(model.getTopTextureSlots(), baker, BlockModelRotation.X0_Y0).getAll();
+            return model.bakeTopGeometry(model.getTopTextureSlots(), baker, BlockModelRotation.IDENTITY).getAll();
         }
     }
 }

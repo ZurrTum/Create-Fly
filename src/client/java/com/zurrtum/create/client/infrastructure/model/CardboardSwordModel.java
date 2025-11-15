@@ -3,11 +3,11 @@ package com.zurrtum.create.client.infrastructure.model;
 import com.google.common.base.Suppliers;
 import com.mojang.serialization.MapCodec;
 import net.minecraft.client.multiplayer.ClientLevel;
-import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.Sheets;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.block.model.TextureSlots;
 import net.minecraft.client.renderer.item.*;
+import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.resources.model.BlockModelRotation;
 import net.minecraft.client.resources.model.ModelBaker;
 import net.minecraft.client.resources.model.ResolvedModel;
@@ -16,7 +16,7 @@ import net.minecraft.world.entity.ItemOwner;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.Nullable;
-import org.joml.Vector3f;
+import org.joml.Vector3fc;
 
 import java.util.List;
 import java.util.function.Supplier;
@@ -30,9 +30,9 @@ public class CardboardSwordModel implements ItemModel {
 
     private final RenderType layer = Sheets.translucentItemSheet();
     private final List<BakedQuad> itemQuads;
-    private final Supplier<Vector3f[]> itemVector;
+    private final Supplier<Vector3fc[]> itemVector;
     private final List<BakedQuad> blockQuads;
-    private final Supplier<Vector3f[]> blockVector;
+    private final Supplier<Vector3fc[]> blockVector;
     private final ModelRenderProperties settings;
 
     public CardboardSwordModel(List<BakedQuad> item, List<BakedQuad> block, ModelRenderProperties settings) {
@@ -66,7 +66,7 @@ public class CardboardSwordModel implements ItemModel {
         ItemDisplayContext displayContext,
         List<BakedQuad> quads,
         ModelRenderProperties settings,
-        Supplier<Vector3f[]> vector
+        Supplier<Vector3fc[]> vector
     ) {
         ItemStackRenderState.LayerRenderState layerRenderState = state.newLayer();
         layerRenderState.setRenderType(layer);
@@ -94,10 +94,10 @@ public class CardboardSwordModel implements ItemModel {
             ModelBaker baker = context.blockModelBaker();
             ResolvedModel itemModel = baker.getModel(ITEM_ID);
             TextureSlots itemTextures = itemModel.getTopTextureSlots();
-            List<BakedQuad> itemQuads = itemModel.bakeTopGeometry(itemTextures, baker, BlockModelRotation.X0_Y0).getAll();
+            List<BakedQuad> itemQuads = itemModel.bakeTopGeometry(itemTextures, baker, BlockModelRotation.IDENTITY).getAll();
             ModelRenderProperties settings = ModelRenderProperties.fromResolvedModel(baker, itemModel, itemTextures);
             ResolvedModel blockModel = baker.getModel(BLOCK_ID);
-            List<BakedQuad> blockQuads = blockModel.bakeTopGeometry(blockModel.getTopTextureSlots(), baker, BlockModelRotation.X0_Y0).getAll();
+            List<BakedQuad> blockQuads = blockModel.bakeTopGeometry(blockModel.getTopTextureSlots(), baker, BlockModelRotation.IDENTITY).getAll();
             return new CardboardSwordModel(itemQuads, blockQuads, settings);
         }
     }

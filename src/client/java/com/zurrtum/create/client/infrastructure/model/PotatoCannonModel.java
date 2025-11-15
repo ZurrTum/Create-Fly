@@ -13,13 +13,13 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.player.LocalPlayer;
-import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.Sheets;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.block.model.TextureSlots;
 import net.minecraft.client.renderer.item.*;
 import net.minecraft.client.renderer.item.ItemStackRenderState.LayerRenderState;
+import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.special.SpecialModelRenderer;
 import net.minecraft.client.resources.model.BlockModelRotation;
 import net.minecraft.client.resources.model.ModelBaker;
@@ -33,10 +33,10 @@ import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix3x2fStack;
-import org.joml.Vector3f;
+import org.joml.Vector3fc;
 
 import java.util.List;
-import java.util.Set;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 import static com.zurrtum.create.Create.MOD_ID;
@@ -49,10 +49,10 @@ public class PotatoCannonModel implements ItemModel, SpecialModelRenderer<Potato
     private final RenderType layer = Sheets.translucentItemSheet();
     private final List<BakedQuad> itemQuads;
     private final ModelRenderProperties itemSettings;
-    private final Supplier<Vector3f[]> itemVector;
+    private final Supplier<Vector3fc[]> itemVector;
     private final List<BakedQuad> cogQuads;
     private final ModelRenderProperties cogSettings;
-    private final Supplier<Vector3f[]> cogVector;
+    private final Supplier<Vector3fc[]> cogVector;
 
     public PotatoCannonModel(Tuple<List<BakedQuad>, ModelRenderProperties> item, Tuple<List<BakedQuad>, ModelRenderProperties> cog) {
         itemQuads = item.getA();
@@ -106,7 +106,7 @@ public class PotatoCannonModel implements ItemModel, SpecialModelRenderer<Potato
         ItemDisplayContext displayContext,
         List<BakedQuad> quads,
         ModelRenderProperties settings,
-        Supplier<Vector3f[]> vector,
+        Supplier<Vector3fc[]> vector,
         ItemStackRenderState.FoilType glint
     ) {
         LayerRenderState layerRenderState = state.newLayer();
@@ -176,7 +176,7 @@ public class PotatoCannonModel implements ItemModel, SpecialModelRenderer<Potato
     }
 
     @Override
-    public void getExtents(Set<Vector3f> vertices) {
+    public void getExtents(Consumer<Vector3fc> output) {
         throw new UnsupportedOperationException();
     }
 
@@ -208,7 +208,7 @@ public class PotatoCannonModel implements ItemModel, SpecialModelRenderer<Potato
         private static Tuple<List<BakedQuad>, ModelRenderProperties> bake(ModelBaker baker, Identifier id) {
             ResolvedModel model = baker.getModel(id);
             TextureSlots textures = model.getTopTextureSlots();
-            List<BakedQuad> quads = model.bakeTopGeometry(textures, baker, BlockModelRotation.X0_Y0).getAll();
+            List<BakedQuad> quads = model.bakeTopGeometry(textures, baker, BlockModelRotation.IDENTITY).getAll();
             ModelRenderProperties settings = ModelRenderProperties.fromResolvedModel(baker, model, textures);
             return new Tuple<>(quads, settings);
         }

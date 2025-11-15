@@ -7,13 +7,13 @@ import com.mojang.serialization.MapCodec;
 import com.zurrtum.create.client.catnip.animation.AnimationTickHolder;
 import com.zurrtum.create.client.foundation.blockEntity.behaviour.scrollValue.ScrollValueHandler;
 import net.minecraft.client.multiplayer.ClientLevel;
-import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.Sheets;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.block.model.TextureSlots;
 import net.minecraft.client.renderer.item.*;
 import net.minecraft.client.renderer.item.ItemStackRenderState.LayerRenderState;
+import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.special.SpecialModelRenderer;
 import net.minecraft.client.resources.model.BlockModelRotation;
 import net.minecraft.client.resources.model.ModelBaker;
@@ -24,10 +24,10 @@ import net.minecraft.world.entity.ItemOwner;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.Nullable;
-import org.joml.Vector3f;
+import org.joml.Vector3fc;
 
 import java.util.List;
-import java.util.Set;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 import static com.zurrtum.create.Create.MOD_ID;
@@ -40,10 +40,10 @@ public class WrenchModel implements ItemModel, SpecialModelRenderer<LayerRenderS
     private final RenderType layer = Sheets.translucentItemSheet();
     private final List<BakedQuad> itemQuads;
     private final ModelRenderProperties itemSettings;
-    private final Supplier<Vector3f[]> itemVector;
+    private final Supplier<Vector3fc[]> itemVector;
     private final List<BakedQuad> gearQuads;
     private final ModelRenderProperties gearSettings;
-    private final Supplier<Vector3f[]> gearVector;
+    private final Supplier<Vector3fc[]> gearVector;
 
     public WrenchModel(Tuple<List<BakedQuad>, ModelRenderProperties> item, Tuple<List<BakedQuad>, ModelRenderProperties> gear) {
         itemQuads = item.getA();
@@ -75,7 +75,7 @@ public class WrenchModel implements ItemModel, SpecialModelRenderer<LayerRenderS
         ItemDisplayContext displayContext,
         List<BakedQuad> quads,
         ModelRenderProperties settings,
-        Supplier<Vector3f[]> vector,
+        Supplier<Vector3fc[]> vector,
         boolean rotation
     ) {
         LayerRenderState layerRenderState = state.newLayer();
@@ -109,7 +109,7 @@ public class WrenchModel implements ItemModel, SpecialModelRenderer<LayerRenderS
     }
 
     @Override
-    public void getExtents(Set<Vector3f> vertices) {
+    public void getExtents(Consumer<Vector3fc> output) {
         throw new UnsupportedOperationException();
     }
 
@@ -141,7 +141,7 @@ public class WrenchModel implements ItemModel, SpecialModelRenderer<LayerRenderS
         private static Tuple<List<BakedQuad>, ModelRenderProperties> bake(ModelBaker baker, Identifier id) {
             ResolvedModel model = baker.getModel(id);
             TextureSlots textures = model.getTopTextureSlots();
-            List<BakedQuad> quads = model.bakeTopGeometry(textures, baker, BlockModelRotation.X0_Y0).getAll();
+            List<BakedQuad> quads = model.bakeTopGeometry(textures, baker, BlockModelRotation.IDENTITY).getAll();
             ModelRenderProperties settings = ModelRenderProperties.fromResolvedModel(baker, model, textures);
             return new Tuple<>(quads, settings);
         }

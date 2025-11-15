@@ -33,11 +33,11 @@ import net.minecraft.world.entity.ItemOwner;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.Nullable;
-import org.joml.Vector3f;
+import org.joml.Vector3fc;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
+import java.util.function.Consumer;
 
 import static com.zurrtum.create.Create.MOD_ID;
 
@@ -84,7 +84,7 @@ public class LinkedControllerModel implements ItemModel, SpecialModelRenderer<Li
     private final RenderType cutoutLayer = RenderTypes.cutoutMovingBlock();
     private final int[] tints = new int[0];
     private final ModelRenderProperties settings;
-    private final Supplier<Vector3f[]> vector;
+    private final Supplier<Vector3fc[]> vector;
     private final List<BakedQuad> item;
     private final List<BakedQuad> powered;
     private final List<BakedQuad> torch;
@@ -268,7 +268,7 @@ public class LinkedControllerModel implements ItemModel, SpecialModelRenderer<Li
     }
 
     @Override
-    public void getExtents(Set<Vector3f> vertices) {
+    public void getExtents(Consumer<Vector3fc> output) {
         throw new UnsupportedOperationException();
     }
 
@@ -298,14 +298,14 @@ public class LinkedControllerModel implements ItemModel, SpecialModelRenderer<Li
             ModelBaker baker = context.blockModelBaker();
             ResolvedModel model = baker.getModel(ITEM_ID);
             TextureSlots textures = model.getTopTextureSlots();
-            List<BakedQuad> quads = model.bakeTopGeometry(textures, baker, BlockModelRotation.X0_Y0).getAll();
+            List<BakedQuad> quads = model.bakeTopGeometry(textures, baker, BlockModelRotation.IDENTITY).getAll();
             ModelRenderProperties settings = ModelRenderProperties.fromResolvedModel(baker, model, textures);
             return new LinkedControllerModel(settings, quads, bakeQuads(baker, POWERED_ID), bakeQuads(baker, TORCH_ID), bakeQuads(baker, BUTTON_ID));
         }
 
         private static List<BakedQuad> bakeQuads(ModelBaker baker, Identifier id) {
             ResolvedModel model = baker.getModel(id);
-            return model.bakeTopGeometry(model.getTopTextureSlots(), baker, BlockModelRotation.X0_Y0).getAll();
+            return model.bakeTopGeometry(model.getTopTextureSlots(), baker, BlockModelRotation.IDENTITY).getAll();
         }
     }
 }

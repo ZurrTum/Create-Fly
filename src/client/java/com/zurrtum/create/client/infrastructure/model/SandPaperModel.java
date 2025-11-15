@@ -12,13 +12,13 @@ import com.zurrtum.create.infrastructure.component.SandPaperItemComponent;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.player.LocalPlayer;
-import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.Sheets;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.block.model.TextureSlots;
 import net.minecraft.client.renderer.item.*;
 import net.minecraft.client.renderer.item.ItemStackRenderState.LayerRenderState;
+import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.special.SpecialModelRenderer;
 import net.minecraft.client.resources.model.BlockModelRotation;
 import net.minecraft.client.resources.model.ModelBaker;
@@ -30,10 +30,10 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.Nullable;
-import org.joml.Vector3f;
+import org.joml.Vector3fc;
 
 import java.util.List;
-import java.util.Set;
+import java.util.function.Consumer;
 
 import static com.zurrtum.create.Create.MOD_ID;
 
@@ -43,7 +43,7 @@ public class SandPaperModel implements ItemModel, SpecialModelRenderer<SandPaper
     private final RenderType layer = Sheets.translucentItemSheet();
     private final List<BakedQuad> quads;
     private final ModelRenderProperties settings;
-    private final Supplier<Vector3f[]> vector;
+    private final Supplier<Vector3fc[]> vector;
 
     public SandPaperModel(List<BakedQuad> quads, ModelRenderProperties settings) {
         this.quads = quads;
@@ -155,7 +155,7 @@ public class SandPaperModel implements ItemModel, SpecialModelRenderer<SandPaper
     }
 
     @Override
-    public void getExtents(Set<Vector3f> vertices) {
+    public void getExtents(Consumer<Vector3fc> output) {
         throw new UnsupportedOperationException();
     }
 
@@ -193,7 +193,7 @@ public class SandPaperModel implements ItemModel, SpecialModelRenderer<SandPaper
             ModelBaker baker = context.blockModelBaker();
             ResolvedModel model = baker.getModel(this.model);
             TextureSlots textures = model.getTopTextureSlots();
-            List<BakedQuad> quads = model.bakeTopGeometry(textures, baker, BlockModelRotation.X0_Y0).getAll();
+            List<BakedQuad> quads = model.bakeTopGeometry(textures, baker, BlockModelRotation.IDENTITY).getAll();
             ModelRenderProperties settings = ModelRenderProperties.fromResolvedModel(baker, model, textures);
             return new SandPaperModel(quads, settings);
         }

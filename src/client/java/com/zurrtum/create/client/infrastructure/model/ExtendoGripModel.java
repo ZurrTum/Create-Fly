@@ -11,13 +11,13 @@ import com.zurrtum.create.client.content.equipment.extendoGrip.ExtendoGripRender
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.player.LocalPlayer;
-import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.Sheets;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.block.model.TextureSlots;
 import net.minecraft.client.renderer.item.*;
 import net.minecraft.client.renderer.item.ItemStackRenderState.LayerRenderState;
+import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.special.SpecialModelRenderer;
 import net.minecraft.client.resources.model.BlockModelRotation;
 import net.minecraft.client.resources.model.ModelBaker;
@@ -30,10 +30,10 @@ import net.minecraft.world.entity.ItemOwner;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.Nullable;
-import org.joml.Vector3f;
+import org.joml.Vector3fc;
 
 import java.util.List;
-import java.util.Set;
+import java.util.function.Consumer;
 
 import static com.zurrtum.create.Create.MOD_ID;
 
@@ -52,7 +52,7 @@ public class ExtendoGripModel implements ItemModel, SpecialModelRenderer<Extendo
     private final RenderType layer = Sheets.translucentItemSheet();
     private final int[] tints = new int[0];
     private final ModelRenderProperties settings;
-    private final Supplier<Vector3f[]> vector;
+    private final Supplier<Vector3fc[]> vector;
     private final List<BakedQuad> item;
     private final List<BakedQuad> cog;
     private final List<BakedQuad> thinShort;
@@ -253,7 +253,7 @@ public class ExtendoGripModel implements ItemModel, SpecialModelRenderer<Extendo
     }
 
     @Override
-    public void getExtents(Set<Vector3f> vertices) {
+    public void getExtents(Consumer<Vector3fc> output) {
         throw new UnsupportedOperationException();
     }
 
@@ -288,7 +288,7 @@ public class ExtendoGripModel implements ItemModel, SpecialModelRenderer<Extendo
             ModelBaker baker = context.blockModelBaker();
             ResolvedModel model = baker.getModel(ITEM_ID);
             TextureSlots textures = model.getTopTextureSlots();
-            List<BakedQuad> quads = model.bakeTopGeometry(textures, baker, BlockModelRotation.X0_Y0).getAll();
+            List<BakedQuad> quads = model.bakeTopGeometry(textures, baker, BlockModelRotation.IDENTITY).getAll();
             ModelRenderProperties settings = ModelRenderProperties.fromResolvedModel(baker, model, textures);
             return new ExtendoGripModel(
                 settings,
@@ -306,7 +306,7 @@ public class ExtendoGripModel implements ItemModel, SpecialModelRenderer<Extendo
 
         private static List<BakedQuad> bakeQuads(ModelBaker baker, Identifier id) {
             ResolvedModel model = baker.getModel(id);
-            return model.bakeTopGeometry(model.getTopTextureSlots(), baker, BlockModelRotation.X0_Y0).getAll();
+            return model.bakeTopGeometry(model.getTopTextureSlots(), baker, BlockModelRotation.IDENTITY).getAll();
         }
     }
 }

@@ -7,10 +7,10 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.client.color.item.ItemTintSource;
 import net.minecraft.client.color.item.ItemTintSources;
 import net.minecraft.client.multiplayer.ClientLevel;
-import net.minecraft.client.renderer.ItemBlockRenderTypes;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.block.model.TextureSlots;
 import net.minecraft.client.renderer.item.*;
+import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.resources.model.BlockModelRotation;
 import net.minecraft.client.resources.model.ModelBaker;
 import net.minecraft.client.resources.model.ResolvableModel;
@@ -21,9 +21,10 @@ import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.AABB;
 import org.jetbrains.annotations.Nullable;
-import org.joml.Vector3f;
+import org.joml.Vector3fc;
 
 import java.util.List;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 import static com.zurrtum.create.Create.MOD_ID;
@@ -32,27 +33,35 @@ public class OversizedModel implements ItemModel {
     public static final Identifier ID = Identifier.fromNamespaceAndPath(MOD_ID, "model/oversized");
     private final List<ItemTintSource> tints;
     private final List<BakedQuad> quads;
-    private final Supplier<Vector3f[]> vector;
+    private final Supplier<Vector3fc[]> vector;
     private final ModelRenderProperties settings;
     private final AABB box;
     private final boolean animated;
+    private final Function<ItemStack, RenderType> renderType;
 
-    public OversizedModel(List<ItemTintSource> tints, List<BakedQuad> quads, ModelRenderProperties settings, AABB box) {
+    public OversizedModel(
+        List<ItemTintSource> tints,
+        List<BakedQuad> quads,
+        ModelRenderProperties settings,
+        Function<ItemStack, RenderType> renderType,
+        AABB box
+    ) {
         this.tints = tints;
         this.quads = quads;
         this.settings = settings;
+        this.renderType = renderType;
         this.vector = Suppliers.memoize(() -> BlockModelWrapper.computeExtents(this.quads));
         this.box = box;
-        boolean bl = false;
+        boolean animated = false;
 
         for (BakedQuad bakedQuad : quads) {
             if (bakedQuad.sprite().contents().isAnimated()) {
-                bl = true;
+                animated = true;
                 break;
             }
         }
 
-        this.animated = bl;
+        this.animated = animated;
     }
 
     @Override
@@ -83,7 +92,7 @@ public class OversizedModel implements ItemModel {
         }
 
         layerRenderState.setExtents(vector);
-        layerRenderState.setRenderType(ItemBlockRenderTypes.getRenderType(stack));
+        layerRenderState.setRenderType(renderType.apply(stack));
         settings.applyToLayer(layerRenderState, displayContext);
         layerRenderState.prepareQuadList().addAll(quads);
         if (animated) {
@@ -115,9 +124,16 @@ public class OversizedModel implements ItemModel {
             ModelBaker baker = context.blockModelBaker();
             ResolvedModel bakedSimpleModel = baker.getModel(this.model);
             TextureSlots modelTextures = bakedSimpleModel.getTopTextureSlots();
-            List<BakedQuad> list = bakedSimpleModel.bakeTopGeometry(modelTextures, baker, BlockModelRotation.X0_Y0).getAll();
+            List<BakedQuad> quads = bakedSimpleModel.bakeTopGeometry(modelTextures, baker, BlockModelRotation.IDENTITY).getAll();
             ModelRenderProperties modelSettings = ModelRenderProperties.fromResolvedModel(baker, bakedSimpleModel, modelTextures);
-            return new OversizedModel(tints, list, modelSettings, new AABB(min.get(0), min.get(1), min.get(2), max.get(0), max.get(1), max.get(2)));
+            Function<ItemStack, RenderType> renderTypeGetter = BlockModelWrapper.detectRenderType(quads);
+            return new OversizedModel(
+                tints,
+                quads,
+                modelSettings,
+                renderTypeGetter,
+                new AABB(min.get(0), min.get(1), min.get(2), max.get(0), max.get(1), max.get(2))
+            );
         }
 
         @Override

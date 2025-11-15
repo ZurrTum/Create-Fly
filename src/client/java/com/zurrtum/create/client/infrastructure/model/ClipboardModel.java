@@ -5,11 +5,11 @@ import com.mojang.serialization.MapCodec;
 import com.zurrtum.create.AllDataComponents;
 import com.zurrtum.create.infrastructure.component.ClipboardContent;
 import net.minecraft.client.multiplayer.ClientLevel;
-import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.Sheets;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.block.model.TextureSlots;
 import net.minecraft.client.renderer.item.*;
+import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.resources.model.BlockModelRotation;
 import net.minecraft.client.resources.model.ModelBaker;
 import net.minecraft.client.resources.model.ResolvedModel;
@@ -18,7 +18,7 @@ import net.minecraft.world.entity.ItemOwner;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.Nullable;
-import org.joml.Vector3f;
+import org.joml.Vector3fc;
 
 import java.util.List;
 import java.util.function.Supplier;
@@ -80,11 +80,11 @@ public class ClipboardModel implements ItemModel {
         }
     }
 
-    public record ModelData(List<BakedQuad> quads, ModelRenderProperties settings, Supplier<Vector3f[]> vector) {
+    public record ModelData(List<BakedQuad> quads, ModelRenderProperties settings, Supplier<Vector3fc[]> vector) {
         public static ModelData bake(ModelBaker baker, Identifier id) {
             ResolvedModel model = baker.getModel(id);
             TextureSlots textures = model.getTopTextureSlots();
-            List<BakedQuad> quads = model.bakeTopGeometry(textures, baker, BlockModelRotation.X0_Y0).getAll();
+            List<BakedQuad> quads = model.bakeTopGeometry(textures, baker, BlockModelRotation.IDENTITY).getAll();
             ModelRenderProperties settings = ModelRenderProperties.fromResolvedModel(baker, model, textures);
             return new ModelData(quads, settings, Suppliers.memoize(() -> BlockModelWrapper.computeExtents(quads)));
         }
