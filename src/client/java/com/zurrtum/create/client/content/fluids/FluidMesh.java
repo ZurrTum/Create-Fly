@@ -77,10 +77,6 @@ public class FluidMesh {
 
             int vertex = 0;
 
-            float shrink = texture.uvShrinkRatio() * 0.25f * textureScale;
-            float centerU = texture.getU0() + (texture.getU1() - texture.getU0()) * 0.5f;
-            float centerV = texture.getV0() + (texture.getV1() - texture.getV0()) * 0.5f;
-
             float x2;
             float y2;
             for (float x1 = left; x1 < right; x1 = x2) {
@@ -88,15 +84,11 @@ public class FluidMesh {
                 x2 = Math.min(x1floor + 1, right);
                 float u1 = texture.getU((x1 - x1floor) * 16 * textureScale);
                 float u2 = texture.getU((x2 - x1floor) * 16 * textureScale);
-                u1 = Mth.lerp(shrink, u1, centerU);
-                u2 = Mth.lerp(shrink, u2, centerU);
                 for (float y1 = down; y1 < up; y1 = y2) {
                     float y1floor = Mth.floor(y1);
                     y2 = Math.min(y1floor + 1, up);
                     float v1 = texture.getV((y1 - y1floor) * 16 * textureScale);
                     float v2 = texture.getV((y2 - y1floor) * 16 * textureScale);
-                    v1 = Mth.lerp(shrink, v1, centerV);
-                    v2 = Mth.lerp(shrink, v2, centerV);
 
                     vertexList.x(vertex, x1);
                     vertexList.z(vertex, y1);
@@ -149,9 +141,6 @@ public class FluidMesh {
 
             float textureScale = 1 / 32f;
 
-            float shrink = texture.uvShrinkRatio() * 0.25f * textureScale;
-            float centerU = texture.getU0() + (texture.getU1() - texture.getU0()) * 0.5f;
-
             float radius = PIPE_RADIUS;
             float left = -radius;
             float right = radius;
@@ -165,8 +154,6 @@ public class FluidMesh {
                     x2 = Math.min(x1floor + 1, right);
                     float u1 = texture.getU((x1 - x1floor) * 16 * textureScale);
                     float u2 = texture.getU((x2 - x1floor) * 16 * textureScale);
-                    u1 = Mth.lerp(shrink, u1, centerU);
-                    u2 = Mth.lerp(shrink, u2, centerU);
 
                     putQuad(vertexList, vertex, horizontalDirection, radius, x1, x2, u1, u2);
                     vertex += 4;
