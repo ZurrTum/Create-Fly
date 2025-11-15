@@ -1,48 +1,24 @@
 package com.zurrtum.create.client.catnip.gui;
 
-import com.mojang.blaze3d.GpuOutOfMemoryException;
-import com.mojang.blaze3d.ProjectionType;
-import com.mojang.blaze3d.buffers.GpuBuffer;
-import com.mojang.blaze3d.buffers.GpuBufferSlice;
-import com.mojang.blaze3d.opengl.*;
-import com.mojang.blaze3d.pipeline.RenderTarget;
-import com.mojang.blaze3d.platform.Window;
-import com.mojang.blaze3d.systems.RenderPass;
-import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.textures.AddressMode;
-import com.mojang.blaze3d.textures.FilterMode;
-import com.mojang.blaze3d.textures.GpuTexture;
-import com.mojang.blaze3d.textures.TextureFormat;
-import com.mojang.blaze3d.vertex.*;
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.zurrtum.create.catnip.data.Couple;
 import com.zurrtum.create.catnip.theme.Color;
 import com.zurrtum.create.client.catnip.gui.render.BreadcrumbArrowRenderState;
 import com.zurrtum.create.client.catnip.gui.render.GradientRectRenderState;
 import com.zurrtum.create.client.catnip.gui.render.RadialSectorRenderState;
 import com.zurrtum.create.client.catnip.gui.render.TexturedQuadRenderState;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.render.TextureSetup;
-import net.minecraft.client.renderer.PerspectiveProjectionMatrixBuffer;
 import net.minecraft.util.Mth;
 import net.minecraft.world.phys.Vec2;
-import org.jetbrains.annotations.Nullable;
-import org.joml.*;
-import org.lwjgl.opengl.GL12;
-import org.lwjgl.opengl.GL30;
+import org.joml.Matrix3x2f;
+import org.joml.Matrix3x2fStack;
+import org.joml.Matrix4f;
 
-import java.lang.Math;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.OptionalDouble;
-import java.util.OptionalInt;
-import java.util.function.Supplier;
-
-import static com.zurrtum.create.client.catnip.render.PonderRenderPipelines.BLIT_SCREEN;
 
 public class UIRenderHelper {
-    private static final PerspectiveProjectionMatrixBuffer PROJECTION = new PerspectiveProjectionMatrixBuffer("UIRenderHelper");
-
     public static final Couple<Color> COLOR_TEXT = Couple.create(new Color(0xff_eeeeee), new Color(0xff_a3a3a3)).map(Color::setImmutable);
     public static final Couple<Color> COLOR_TEXT_DARKER = Couple.create(new Color(0xff_a3a3a3), new Color(0xff_808080)).map(Color::setImmutable);
     public static final Couple<Color> COLOR_TEXT_ACCENT = Couple.create(new Color(0xff_ddeeff), new Color(0xff_a0b0c0)).map(Color::setImmutable);
@@ -50,35 +26,6 @@ public class UIRenderHelper {
         .map(Color::setImmutable);
 
     public static final Color COLOR_STREAK = new Color(0x101010, false).setImmutable();
-
-    /**
-     * An FBO that has a stencil buffer for use wherever stencil are necessary. Forcing the main FBO to have a stencil
-     * buffer will cause GL error spam when using fabulous graphics.
-     */
-    @Nullable
-    public static CustomRenderTarget framebuffer;
-
-    public static void init() {
-        RenderSystem.assertOnRenderThread();
-        Window mainWindow = Minecraft.getInstance().getWindow();
-        framebuffer = CustomRenderTarget.create(mainWindow);
-    }
-
-    public static void updateWindowSize(Window mainWindow) {
-        if (framebuffer != null)
-            framebuffer.resize(mainWindow.getWidth(), mainWindow.getHeight());
-    }
-
-    public static void drawFramebuffer(PoseStack poseStack, float alpha) {
-        if (framebuffer != null)
-            framebuffer.renderWithAlpha(poseStack, alpha);
-    }
-
-    private static int getFrameBufferId(RenderTarget buffer) {
-        GlTexture colorAttachment = (GlTexture) buffer.getColorTexture();
-        int id = buffer.useDepth ? ((GlTexture) buffer.getDepthTexture()).glId() : 0;
-        return colorAttachment.fboCache.get(id);
-    }
 
     /**
      * @param angle   angle in degrees, 0 means fading to the right
@@ -120,7 +67,7 @@ public class UIRenderHelper {
     }
 
     /**
-     * @see #angledGradient(DrawContext, float, int, int, float, float, Color, Color)
+     * @see #angledGradient(GuiGraphics, float, int, int, float, float, Color, Color)
      */
     public static void angledGradient(GuiGraphics graphics, float angle, int x, int y, float breadth, float length, Couple<Color> c) {
         angledGradient(graphics, angle, x, y, breadth, length, c.getFirst(), c.getSecond());
@@ -419,166 +366,4 @@ public class UIRenderHelper {
     public static void flipForGuiRender(PoseStack poseStack) {
         poseStack.mulPose(new Matrix4f().scaling(1, -1, 1));
     }
-
-    public static class CustomRenderTarget extends RenderTarget {
-        public CustomRenderTarget(@Nullable String name, boolean useDepth) {
-            super(name, useDepth);
-        }
-
-        public static CustomRenderTarget create(Window mainWindow) {
-            CustomRenderTarget framebuffer = new CustomRenderTarget("Custom", true);
-            framebuffer.resize(mainWindow.getScreenWidth(), mainWindow.getScreenHeight());
-            return framebuffer;
-        }
-
-        @Override
-        public void createBuffers(int width, int height) {
-            GlDevice device = ((GlDevice) RenderSystem.getDevice());
-            int i = device.getMaxTextureSize();
-            if (width > 0 && width <= i && height > 0 && height <= i) {
-                width = width;
-                height = height;
-                colorTexture = device.createTexture(() -> label + " / Color", 15, TextureFormat.RGBA8, width, height, 1, 1);
-                colorTextureView = device.createTextureView(colorTexture);
-                colorTexture.setAddressMode(AddressMode.CLAMP_TO_EDGE);
-                setFilterMode(FilterMode.NEAREST, true);
-                if (useDepth) {
-                    depthTexture = createDepthTexture(() -> label + " / Depth", 15, TextureFormat.DEPTH32, width, height, 1, 1);
-                    depthTextureView = device.createTextureView(depthTexture);
-                    depthTexture.setTextureFilter(FilterMode.NEAREST, false);
-                    depthTexture.setAddressMode(AddressMode.CLAMP_TO_EDGE);
-                    setupFramebuffer(((GlTexture) colorTexture), ((GlTexture) depthTexture).glId());
-                }
-            } else {
-                throw new IllegalArgumentException("Window " + width + "x" + height + " size out of bounds (max. size: " + i + ")");
-            }
-        }
-
-        private static GpuTexture createDepthTexture(
-            @Nullable Supplier<String> supplier,
-            int usage,
-            TextureFormat textureFormat,
-            int width,
-            int height,
-            int depthOrLayers,
-            int mipLevels
-        ) {
-            GlDebugLabel debugLabelManager = ((GlDevice) RenderSystem.getDevice()).debugLabels();
-            String label = debugLabelManager.exists() && supplier != null ? supplier.get() : null;
-            if (mipLevels < 1) {
-                throw new IllegalArgumentException("mipLevels must be at least 1");
-            } else {
-                GlStateManager.clearGlErrors();
-                int glId = GlStateManager._genTexture();
-                if (label == null) {
-                    label = String.valueOf(glId);
-                }
-
-                GlStateManager._bindTexture(glId);
-                GlStateManager._texParameter(GlConst.GL_TEXTURE_2D, GL12.GL_TEXTURE_MAX_LEVEL, mipLevels - 1);
-                GlStateManager._texParameter(GlConst.GL_TEXTURE_2D, GL12.GL_TEXTURE_MIN_LOD, 0);
-                GlStateManager._texParameter(GlConst.GL_TEXTURE_2D, GL12.GL_TEXTURE_MAX_LOD, mipLevels - 1);
-                if (textureFormat.hasDepthAspect()) {
-                    GlStateManager._texParameter(GlConst.GL_TEXTURE_2D, GlConst.GL_TEXTURE_COMPARE_MODE, 0);
-                }
-
-                for (int m = 0; m < mipLevels; m++) {
-                    GlStateManager._texImage2D(
-                        GlConst.GL_TEXTURE_2D,
-                        m,
-                        GL30.GL_DEPTH32F_STENCIL8,
-                        width >> m,
-                        height >> m,
-                        0,
-                        GL30.GL_DEPTH_STENCIL,
-                        GL30.GL_FLOAT_32_UNSIGNED_INT_24_8_REV,
-                        null
-                    );
-                }
-
-                int m = GlStateManager._getError();
-                if (m == GlConst.GL_OUT_OF_MEMORY) {
-                    throw new GpuOutOfMemoryException("Could not allocate texture of " + width + "x" + height + " for " + label);
-                } else if (m != 0) {
-                    throw new IllegalStateException("OpenGL error " + m);
-                } else {
-                    GlTexture glTexture = new GlTexture(usage, label, textureFormat, width, height, depthOrLayers, mipLevels, glId);
-                    debugLabelManager.applyLabel(glTexture);
-                    return glTexture;
-                }
-            }
-        }
-
-        private static void setupFramebuffer(GlTexture colorAttachment, int depthAttachmentId) {
-            int framebufferId = GlStateManager.glGenFramebuffers();
-            int target = GlConst.GL_DRAW_FRAMEBUFFER;
-            int fbo = GlStateManager.getFrameBuffer(target);
-            GlStateManager._glBindFramebuffer(target, framebufferId);
-            GlStateManager._glFramebufferTexture2D(target, GlConst.GL_COLOR_ATTACHMENT0, GlConst.GL_TEXTURE_2D, colorAttachment.glId(), 0);
-            GlStateManager._glFramebufferTexture2D(target, GlConst.GL_DEPTH_ATTACHMENT, GlConst.GL_TEXTURE_2D, depthAttachmentId, 0);
-            GlStateManager._glFramebufferTexture2D(target, GL30.GL_STENCIL_ATTACHMENT, GlConst.GL_TEXTURE_2D, depthAttachmentId, 0);
-            GlStateManager._glBindFramebuffer(target, fbo);
-            colorAttachment.fboCache.put(depthAttachmentId, framebufferId);
-        }
-
-        public void renderWithAlpha(PoseStack poseStack, float alpha) {
-            Window window = Minecraft.getInstance().getWindow();
-
-            float guiScaledWidth = window.getGuiScaledWidth();
-            float guiScaledHeight = window.getGuiScaledHeight();
-
-            float vx = guiScaledWidth;
-            float vy = guiScaledHeight;
-            float tx = (float) width;
-            float ty = (float) height;
-
-            Minecraft minecraft = Minecraft.getInstance();
-            Matrix4f matrix4f = poseStack.last().pose();
-            RenderSystem.backupProjectionMatrix();
-            RenderSystem.setProjectionMatrix(PROJECTION.getBuffer(matrix4f), ProjectionType.ORTHOGRAPHIC);
-            GpuBufferSlice dynamicTransformsBuffer = RenderSystem.getDynamicUniforms()
-                .writeTransform(
-                    new Matrix4f().setTranslation(0.0F, 0.0F, -2000.0F),
-                    new Vector4f(1.0F, 1.0F, 1.0F, 1.0F),
-                    new Vector3f(),
-                    new Matrix4f(),
-                    0.0F
-                );
-
-            VertexFormat.Mode vertexFormatMode = BLIT_SCREEN.getVertexFormatMode();
-            VertexFormat vertexFormat = BLIT_SCREEN.getVertexFormat();
-            Tesselator tesselator = Tesselator.getInstance();
-            BufferBuilder bufferbuilder = tesselator.begin(vertexFormatMode, vertexFormat);
-            bufferbuilder.addVertex(0, vy, 0).setUv(0, 0).setColor(1, 1, 1, alpha);
-            bufferbuilder.addVertex(vx, vy, 0).setUv(tx, 0).setColor(1, 1, 1, alpha);
-            bufferbuilder.addVertex(vx, 0, 0).setUv(tx, ty).setColor(1, 1, 1, alpha);
-            bufferbuilder.addVertex(0, 0, 0).setUv(0, ty).setColor(1, 1, 1, alpha);
-            MeshData buffer = bufferbuilder.buildOrThrow();
-
-            RenderTarget framebuffer = minecraft.getMainRenderTarget();
-            RenderSystem.AutoStorageIndexBuffer shapeIndexBuffer = RenderSystem.getSequentialBuffer(vertexFormatMode);
-            GpuBuffer gpuBuffer = vertexFormat.uploadImmediateVertexBuffer(buffer.vertexBuffer());
-            int count = buffer.drawState().indexCount();
-            try (RenderPass renderPass = RenderSystem.getDevice().createCommandEncoder().createRenderPass(
-                () -> "Immediate draw for UIRenderHelper",
-                framebuffer.getColorTextureView(),
-                OptionalInt.empty(),
-                framebuffer.getDepthTextureView(),
-                OptionalDouble.empty()
-            )) {
-                renderPass.setPipeline(BLIT_SCREEN);
-                RenderSystem.bindDefaultUniforms(renderPass);
-                renderPass.setVertexBuffer(0, shapeIndexBuffer.getBuffer(count));
-                renderPass.setIndexBuffer(gpuBuffer, shapeIndexBuffer.type());
-                renderPass.bindSampler("InSampler", colorTextureView);
-                renderPass.setUniform("DynamicTransforms", dynamicTransformsBuffer);
-                renderPass.drawIndexed(0, 0, count, 1);
-            }
-
-            buffer.close();
-            RenderSystem.restoreProjectionMatrix();
-        }
-
-    }
-
 }

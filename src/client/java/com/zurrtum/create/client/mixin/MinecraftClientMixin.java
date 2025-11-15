@@ -9,7 +9,6 @@ import com.zurrtum.create.catnip.data.WorldAttached;
 import com.zurrtum.create.client.Create;
 import com.zurrtum.create.client.catnip.animation.AnimationTickHolder;
 import com.zurrtum.create.client.catnip.ghostblock.GhostBlocks;
-import com.zurrtum.create.client.catnip.gui.UIRenderHelper;
 import com.zurrtum.create.client.catnip.outliner.Outliner;
 import com.zurrtum.create.client.catnip.placement.PlacementClient;
 import com.zurrtum.create.client.content.contraptions.ContraptionHandlerClient;
@@ -70,6 +69,15 @@ import com.zurrtum.create.content.contraptions.minecart.CouplingPhysics;
 import com.zurrtum.create.content.contraptions.minecart.capability.CapabilityMinecartController;
 import com.zurrtum.create.content.kinetics.drill.CobbleGenOptimisation;
 import com.zurrtum.create.foundation.utility.TickBasedCache;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.main.GameConfig;
+import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.client.multiplayer.MultiPlayerGameMode;
+import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.server.packs.resources.ReloadableResourceManager;
+import net.minecraft.world.InteractionHand;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -81,16 +89,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
-
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.main.GameConfig;
-import net.minecraft.client.multiplayer.ClientLevel;
-import net.minecraft.client.multiplayer.MultiPlayerGameMode;
-import net.minecraft.client.player.LocalPlayer;
-import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
-import net.minecraft.server.packs.resources.ReloadableResourceManager;
-import net.minecraft.world.InteractionHand;
 
 @Mixin(Minecraft.class)
 public class MinecraftClientMixin {
@@ -120,16 +118,6 @@ public class MinecraftClientMixin {
         resourceManager.registerReloadListener(ObjLoader.INSTANCE);
         resourceManager.registerReloadListener(FlwProgramsReloader.INSTANCE);
         resourceManager.registerReloadListener(TrainHatInfoReloadListener.LISTENER);
-    }
-
-    @Inject(method = "<init>", at = @At(value = "NEW", target = "net/minecraft/server/packs/resources/ReloadableResourceManager"))
-    private void init(GameConfig args, CallbackInfo ci) {
-        UIRenderHelper.init();
-    }
-
-    @Inject(method = "resizeDisplay()V", at = @At("TAIL"))
-    private void onResolutionChanged(CallbackInfo ci) {
-        UIRenderHelper.updateWindowSize(window);
     }
 
     @Inject(method = "method_53522", at = @At("HEAD"))
