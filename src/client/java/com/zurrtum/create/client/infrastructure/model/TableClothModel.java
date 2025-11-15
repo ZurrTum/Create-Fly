@@ -2,9 +2,9 @@ package com.zurrtum.create.client.infrastructure.model;
 
 import com.google.common.collect.ImmutableList;
 import com.zurrtum.create.client.AllPartialModels;
-import com.zurrtum.create.client.catnip.render.SpriteShiftEntry;
 import com.zurrtum.create.client.flywheel.lib.model.baked.PartialModel;
-import com.zurrtum.create.client.foundation.model.BakedQuadHelper;
+import com.zurrtum.create.client.foundation.model.BakedModelHelper;
+import com.zurrtum.create.client.model.NormalsBakedQuad;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.block.model.BlockModelPart;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
@@ -103,20 +103,22 @@ public class TableClothModel extends WrapperBlockStateModel {
         if (original == replace) {
             return quad;
         }
-        BakedQuad newQuad = BakedQuadHelper.clone(quad);
-        int[] vertexData = newQuad.vertices();
-        for (int vertex = 0; vertex < 4; vertex++) {
-            BakedQuadHelper.setU(
-                vertexData,
-                vertex,
-                replace.getU(SpriteShiftEntry.getUnInterpolatedU(original, BakedQuadHelper.getU(vertexData, vertex)))
-            );
-            BakedQuadHelper.setV(
-                vertexData,
-                vertex,
-                replace.getV(SpriteShiftEntry.getUnInterpolatedV(original, BakedQuadHelper.getV(vertexData, vertex)))
-            );
-        }
+        BakedQuad newQuad = new BakedQuad(
+            quad.position0(),
+            quad.position1(),
+            quad.position2(),
+            quad.position3(),
+            BakedModelHelper.calcSpriteUv(quad.packedUV0(), original, replace),
+            BakedModelHelper.calcSpriteUv(quad.packedUV1(), original, replace),
+            BakedModelHelper.calcSpriteUv(quad.packedUV2(), original, replace),
+            BakedModelHelper.calcSpriteUv(quad.packedUV3(), original, replace),
+            quad.tintIndex(),
+            quad.direction(),
+            quad.sprite(),
+            quad.shade(),
+            quad.lightEmission()
+        );
+        NormalsBakedQuad.setNormals(newQuad, NormalsBakedQuad.getNormals(quad));
         return newQuad;
     }
 

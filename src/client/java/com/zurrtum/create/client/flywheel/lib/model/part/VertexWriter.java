@@ -41,6 +41,12 @@ public class VertexWriter implements VertexConsumer {
     }
 
     @Override
+    public VertexConsumer setColor(int color) {
+        // ignore color
+        return this;
+    }
+
+    @Override
     public VertexConsumer setColor(int red, int green, int blue, int alpha) {
         // ignore color
         return this;
@@ -78,6 +84,12 @@ public class VertexWriter implements VertexConsumer {
             MemoryUtil.memPutByte(ptr + 22, DataPacker.packNormI8(z));
             filledNormal = true;
         }
+        return this;
+    }
+
+    @Override
+    public VertexConsumer setLineWidth(float width) {
+        // ignore line width
         return this;
     }
 

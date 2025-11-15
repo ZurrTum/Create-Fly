@@ -3,15 +3,15 @@ package com.zurrtum.create.client.model;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 
 public interface NormalsBakedQuad {
-    void create$markNormals();
+    void create$setNormals(int[] normal);
 
-    boolean create$hasNormals();
+    int[] create$getNormals();
 
-    static boolean hasNormals(BakedQuad quad) {
-        return ((NormalsBakedQuad) (Object) quad).create$hasNormals();
+    static int[] getNormals(BakedQuad quad) {
+        return ((NormalsBakedQuad) (Object) quad).create$getNormals();
     }
 
-    static void markNormals(BakedQuad quad) {
-        ((NormalsBakedQuad) (Object) quad).create$markNormals();
+    static void setNormals(BakedQuad quad, int[] normals) {
+        ((NormalsBakedQuad) (Object) quad).create$setNormals(normals);
     }
 }

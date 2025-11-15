@@ -2,9 +2,8 @@ package com.zurrtum.create.client.infrastructure.model;
 
 import com.zurrtum.create.AllBlocks;
 import com.zurrtum.create.catnip.data.Iterate;
-import com.zurrtum.create.client.catnip.render.SpriteShiftEntry;
 import com.zurrtum.create.client.foundation.model.BakedModelHelper;
-import com.zurrtum.create.client.foundation.model.BakedQuadHelper;
+import com.zurrtum.create.client.model.NormalsBakedQuad;
 import com.zurrtum.create.content.decoration.copycat.CopycatBlock;
 import com.zurrtum.create.content.decoration.copycat.CopycatPanelBlock;
 import com.zurrtum.create.content.decoration.copycat.CopycatSpecialCases;
@@ -123,20 +122,22 @@ public class CopycatPanelModel extends CopycatModel {
         }
         for (BakedQuad quad : quads) {
             TextureAtlasSprite original = quad.sprite();
-            BakedQuad newQuad = BakedQuadHelper.clone(quad);
-            int[] vertexData = newQuad.vertices();
-            for (int vertex = 0; vertex < 4; vertex++) {
-                BakedQuadHelper.setU(
-                    vertexData,
-                    vertex,
-                    targetSprite.getU(SpriteShiftEntry.getUnInterpolatedU(original, BakedQuadHelper.getU(vertexData, vertex)))
-                );
-                BakedQuadHelper.setV(
-                    vertexData,
-                    vertex,
-                    targetSprite.getV(SpriteShiftEntry.getUnInterpolatedV(original, BakedQuadHelper.getV(vertexData, vertex)))
-                );
-            }
+            BakedQuad newQuad = new BakedQuad(
+                quad.position0(),
+                quad.position1(),
+                quad.position2(),
+                quad.position3(),
+                BakedModelHelper.calcSpriteUv(quad.packedUV0(), original, targetSprite),
+                BakedModelHelper.calcSpriteUv(quad.packedUV1(), original, targetSprite),
+                BakedModelHelper.calcSpriteUv(quad.packedUV2(), original, targetSprite),
+                BakedModelHelper.calcSpriteUv(quad.packedUV3(), original, targetSprite),
+                quad.tintIndex(),
+                quad.direction(),
+                quad.sprite(),
+                quad.shade(),
+                quad.lightEmission()
+            );
+            NormalsBakedQuad.setNormals(newQuad, NormalsBakedQuad.getNormals(quad));
             consumer.accept(newQuad);
         }
     }
@@ -215,10 +216,7 @@ public class CopycatPanelModel extends CopycatModel {
                 if (!front && direction == facing.getOpposite())
                     continue;
 
-                consumer.accept(BakedQuadHelper.cloneWithCustomGeometry(
-                    quad,
-                    BakedModelHelper.cropAndMove(quad.vertices(), quad.sprite(), crop, move)
-                ));
+                consumer.accept(BakedModelHelper.cropAndMove(quad, crop, move));
             }
         }
     }

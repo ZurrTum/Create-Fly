@@ -28,11 +28,10 @@ public class DualVertexConsumer extends VertexMultiConsumer.Double {
         float blue,
         float f,
         int[] is,
-        int i,
-        boolean bl
+        int i
     ) {
-        first.putBulkData(matrixEntry, quad, brightnesses, red, green, blue, f, is, i, bl);
-        second.putBulkData(matrixEntry, quad, brightnesses, red, green, blue, f, is, i, bl);
+        first.putBulkData(matrixEntry, quad, brightnesses, red, green, blue, f, is, i);
+        second.putBulkData(matrixEntry, quad, brightnesses, red, green, blue, f, is, i);
     }
 
     public void emit(ModelPart part, PoseStack matrices, TextureAtlasSprite sprite, int light, int overlay, int color) {

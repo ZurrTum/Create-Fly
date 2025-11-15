@@ -4,13 +4,11 @@ import com.zurrtum.create.catnip.data.Iterate;
 import com.zurrtum.create.client.AllPartialModels;
 import com.zurrtum.create.client.AllSpriteShifts;
 import com.zurrtum.create.client.catnip.render.SpriteShiftEntry;
-import com.zurrtum.create.client.foundation.model.BakedQuadHelper;
+import com.zurrtum.create.client.model.NormalsBakedQuad;
 import com.zurrtum.create.content.kinetics.belt.BeltBlock;
 import com.zurrtum.create.content.kinetics.belt.BeltBlockEntity;
 import com.zurrtum.create.content.kinetics.belt.BeltBlockEntity.CasingType;
-
-import java.util.List;
-
+import net.minecraft.client.model.geom.builders.UVPair;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.block.model.BlockModelPart;
 import net.minecraft.client.renderer.block.model.SimpleModelWrapper;
@@ -22,6 +20,8 @@ import net.minecraft.core.Direction.Axis;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.BlockAndTintGetter;
 import net.minecraft.world.level.block.state.BlockState;
+
+import java.util.List;
 
 public class BeltModel extends WrapperBlockStateModel {
     public BeltModel(BlockState state, UnbakedRoot unbaked) {
@@ -77,19 +77,33 @@ public class BeltModel extends WrapperBlockStateModel {
         return new SimpleModelWrapper(builder.build(), part.useAmbientOcclusion(), part.particleIcon());
     }
 
+    private static long calcSpriteUv(long packedUv) {
+        float u = UVPair.unpackU(packedUv);
+        float v = UVPair.unpackV(packedUv);
+        return UVPair.pack(SPRITE_SHIFT.getTargetU(u), SPRITE_SHIFT.getTargetV(v));
+    }
+
     private BakedQuad replaceQuad(TextureAtlasSprite replace, BakedQuad quad) {
         TextureAtlasSprite original = quad.sprite();
         if (original != replace) {
             return quad;
         }
-        BakedQuad newQuad = BakedQuadHelper.clone(quad);
-        int[] vertexData = newQuad.vertices();
-        for (int vertex = 0; vertex < 4; vertex++) {
-            float u = BakedQuadHelper.getU(vertexData, vertex);
-            float v = BakedQuadHelper.getV(vertexData, vertex);
-            BakedQuadHelper.setU(vertexData, vertex, SPRITE_SHIFT.getTargetU(u));
-            BakedQuadHelper.setV(vertexData, vertex, SPRITE_SHIFT.getTargetV(v));
-        }
+        BakedQuad newQuad = new BakedQuad(
+            quad.position0(),
+            quad.position1(),
+            quad.position2(),
+            quad.position3(),
+            calcSpriteUv(quad.packedUV0()),
+            calcSpriteUv(quad.packedUV1()),
+            calcSpriteUv(quad.packedUV2()),
+            calcSpriteUv(quad.packedUV3()),
+            quad.tintIndex(),
+            quad.direction(),
+            quad.sprite(),
+            quad.shade(),
+            quad.lightEmission()
+        );
+        NormalsBakedQuad.setNormals(newQuad, NormalsBakedQuad.getNormals(quad));
         return newQuad;
     }
 }

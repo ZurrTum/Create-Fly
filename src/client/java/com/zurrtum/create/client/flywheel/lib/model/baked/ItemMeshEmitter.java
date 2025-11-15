@@ -6,8 +6,8 @@ import com.zurrtum.create.client.flywheel.lib.memory.MemoryBlock;
 import com.zurrtum.create.client.flywheel.lib.model.SimpleQuadMesh;
 import com.zurrtum.create.client.flywheel.lib.vertex.FullVertexView;
 import net.minecraft.client.model.geom.ModelPart;
-import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.block.model.BakedQuad;
+import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.util.ARGB;
 import org.jetbrains.annotations.UnknownNullability;
@@ -165,32 +165,6 @@ public class ItemMeshEmitter implements VertexConsumer {
         return new SimpleQuadMesh(meshVertices, "source=ItemMeshEmitter");
     }
 
-    public void quad(
-        PoseStack.Pose pose,
-        BakedQuad quad,
-        float red,
-        float green,
-        float blue,
-        float alpha,
-        int light,
-        int overlay,
-        boolean readExistingColor
-    ) {
-        prepareForGeometry(quad);
-        bufferBuilder.putBulkData(
-            pose,
-            quad,
-            new float[]{1.0F, 1.0F, 1.0F, 1.0F},
-            red,
-            green,
-            blue,
-            alpha,
-            new int[]{light, light, light, light},
-            overlay,
-            readExistingColor
-        );
-    }
-
     @Override
     public void putBulkData(
         PoseStack.Pose pose,
@@ -216,15 +190,19 @@ public class ItemMeshEmitter implements VertexConsumer {
         float blue,
         float alpha,
         int[] lights,
-        int overlay,
-        boolean readExistingColor
+        int overlay
     ) {
         prepareForGeometry(quad);
-        bufferBuilder.putBulkData(pose, quad, brightnesses, red, green, blue, alpha, lights, overlay, readExistingColor);
+        bufferBuilder.putBulkData(pose, quad, brightnesses, red, green, blue, alpha, lights, overlay);
     }
 
     @Override
     public VertexConsumer addVertex(float x, float y, float z) {
+        throw new UnsupportedOperationException("MeshEmitter only supports putBulkData!");
+    }
+
+    @Override
+    public VertexConsumer setColor(int color) {
         throw new UnsupportedOperationException("MeshEmitter only supports putBulkData!");
     }
 
@@ -250,6 +228,11 @@ public class ItemMeshEmitter implements VertexConsumer {
 
     @Override
     public VertexConsumer setNormal(float normalX, float normalY, float normalZ) {
+        throw new UnsupportedOperationException("MeshEmitter only supports putBulkData!");
+    }
+
+    @Override
+    public VertexConsumer setLineWidth(float width) {
         throw new UnsupportedOperationException("MeshEmitter only supports putBulkData!");
     }
 }

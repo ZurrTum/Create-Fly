@@ -1,32 +1,48 @@
 package com.zurrtum.create.client.mixin;
 
-import com.llamalad7.mixinextras.injector.ModifyReturnValue;
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
 import com.zurrtum.create.client.model.NormalsBakedQuad;
 import com.zurrtum.create.client.model.NormalsModelElement;
 import com.zurrtum.create.client.model.NormalsModelElement.NormalsType;
-import net.minecraft.client.renderer.block.model.BakedQuad;
-import net.minecraft.client.renderer.block.model.BlockElement;
-import net.minecraft.client.renderer.block.model.SimpleUnbakedGeometry;
+import net.minecraft.client.renderer.block.model.*;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.client.resources.model.ModelBaker;
+import net.minecraft.client.resources.model.ModelState;
+import net.minecraft.core.Direction;
 import org.joml.Vector3f;
 import org.joml.Vector3fc;
+import org.jspecify.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 
 @Mixin(SimpleUnbakedGeometry.class)
 public class UnbakedGeometryMixin {
-    @ModifyReturnValue(method = "bakeFace(Lnet/minecraft/client/renderer/block/model/BlockElement;Lnet/minecraft/client/renderer/block/model/BlockElementFace;Lnet/minecraft/client/renderer/texture/TextureAtlasSprite;Lnet/minecraft/core/Direction;Lnet/minecraft/client/resources/model/ModelState;)Lnet/minecraft/client/renderer/block/model/BakedQuad;", at = @At("RETURN"))
-    private static BakedQuad bakeQuad(BakedQuad quad, @Local(argsOnly = true) BlockElement element) {
+    @WrapOperation(method = "lambda$bake$0(Lnet/minecraft/client/resources/model/ModelBaker;Lnet/minecraft/client/renderer/block/model/TextureSlots;Lnet/minecraft/client/resources/model/ModelDebugName;Lnet/minecraft/client/renderer/block/model/BlockElement;Lnet/minecraft/client/resources/model/ModelState;Lnet/minecraft/client/resources/model/QuadCollection$Builder;Lnet/minecraft/core/Direction;Lnet/minecraft/client/renderer/block/model/BlockElementFace;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/block/model/FaceBakery;bakeQuad(Lnet/minecraft/client/resources/model/ModelBaker$PartCache;Lorg/joml/Vector3fc;Lorg/joml/Vector3fc;Lnet/minecraft/client/renderer/block/model/BlockElementFace;Lnet/minecraft/client/renderer/texture/TextureAtlasSprite;Lnet/minecraft/core/Direction;Lnet/minecraft/client/resources/model/ModelState;Lnet/minecraft/client/renderer/block/model/BlockElementRotation;ZI)Lnet/minecraft/client/renderer/block/model/BakedQuad;"))
+    private static BakedQuad bakeQuad(
+        final ModelBaker.PartCache partCache,
+        final Vector3fc from,
+        final Vector3fc to,
+        final BlockElementFace face,
+        final TextureAtlasSprite icon,
+        final Direction facing,
+        final ModelState modelState,
+        @Nullable final BlockElementRotation elementRotation,
+        final boolean shade,
+        final int lightEmission,
+        Operation<BakedQuad> original,
+        @Local(argsOnly = true) BlockElement element
+    ) {
+        BakedQuad quad = original.call(partCache, from, to, face, icon, facing, modelState, elementRotation, shade, lightEmission);
         NormalsType type = NormalsModelElement.getNormalsType(element);
         if (type != null) {
-            int[] faceData = quad.vertices();
             Vector3fc vector;
             if (type == NormalsType.CALC) {
-                Vector3f v1 = getVertexPos(faceData, 3);
-                Vector3f t1 = getVertexPos(faceData, 1);
-                Vector3f v2 = getVertexPos(faceData, 2);
-                Vector3f t2 = getVertexPos(faceData, 0);
+                Vector3f v1 = new Vector3f(quad.position3());
+                Vector3fc t1 = quad.position1();
+                Vector3f v2 = new Vector3f(quad.position2());
+                Vector3fc t2 = quad.position0();
                 v1.sub(t1);
                 v2.sub(t2);
                 v2.cross(v1);
@@ -39,23 +55,8 @@ public class UnbakedGeometryMixin {
             int y = ((byte) Math.round(vector.y() * 127)) & 0xFF;
             int z = ((byte) Math.round(vector.z() * 127)) & 0xFF;
             int normal = x | (y << 0x08) | (z << 0x10);
-
-            for (int i = 0; i < 4; i++) {
-                faceData[i * 8 + 7] = normal;
-            }
-            NormalsBakedQuad.markNormals(quad);
+            NormalsBakedQuad.setNormals(quad, new int[]{normal, normal, normal, normal});
         }
         return quad;
-    }
-
-    @Unique
-    private static Vector3f getVertexPos(int[] data, int vertex) {
-        int idx = vertex * 8;
-
-        float x = Float.intBitsToFloat(data[idx]);
-        float y = Float.intBitsToFloat(data[idx + 1]);
-        float z = Float.intBitsToFloat(data[idx + 2]);
-
-        return new Vector3f(x, y, z);
     }
 }

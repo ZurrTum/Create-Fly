@@ -5,12 +5,9 @@ import com.zurrtum.create.client.foundation.block.connected.CTSpriteShiftEntry;
 import com.zurrtum.create.client.foundation.block.connected.CTType;
 import com.zurrtum.create.client.foundation.block.connected.ConnectedTextureBehaviour;
 import com.zurrtum.create.client.foundation.block.connected.ConnectedTextureBehaviour.CTContext;
-import com.zurrtum.create.client.foundation.model.BakedQuadHelper;
+import com.zurrtum.create.client.model.NormalsBakedQuad;
 import com.zurrtum.create.content.decoration.copycat.CopycatBlock;
-
-import java.util.List;
-import java.util.function.BiFunction;
-
+import net.minecraft.client.model.geom.builders.UVPair;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.block.model.BlockModelPart;
 import net.minecraft.client.renderer.block.model.SimpleModelWrapper;
@@ -21,6 +18,9 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.BlockAndTintGetter;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
+
+import java.util.List;
+import java.util.function.BiFunction;
 
 public class CTModel extends WrapperBlockStateModel {
     private final ConnectedTextureBehaviour behaviour;
@@ -62,6 +62,12 @@ public class CTModel extends WrapperBlockStateModel {
         }
     }
 
+    private static long calcSpriteUv(long packedUv, CTSpriteShiftEntry spriteShift, int index) {
+        float u = UVPair.unpackU(packedUv);
+        float v = UVPair.unpackV(packedUv);
+        return UVPair.pack(spriteShift.getTargetU(u, index), spriteShift.getTargetV(v, index));
+    }
+
     protected BakedQuad replaceQuad(BlockState state, RandomSource random, int index, BakedQuad quad) {
         if (index == -1) {
             return quad;
@@ -70,14 +76,22 @@ public class CTModel extends WrapperBlockStateModel {
         if (spriteShift == null || quad.sprite() != spriteShift.getOriginal()) {
             return quad;
         }
-        BakedQuad newQuad = BakedQuadHelper.clone(quad);
-        int[] vertexData = newQuad.vertices();
-        for (int vertex = 0; vertex < 4; vertex++) {
-            float u = BakedQuadHelper.getU(vertexData, vertex);
-            float v = BakedQuadHelper.getV(vertexData, vertex);
-            BakedQuadHelper.setU(vertexData, vertex, spriteShift.getTargetU(u, index));
-            BakedQuadHelper.setV(vertexData, vertex, spriteShift.getTargetV(v, index));
-        }
+        BakedQuad newQuad = new BakedQuad(
+            quad.position0(),
+            quad.position1(),
+            quad.position2(),
+            quad.position3(),
+            calcSpriteUv(quad.packedUV0(), spriteShift, index),
+            calcSpriteUv(quad.packedUV1(), spriteShift, index),
+            calcSpriteUv(quad.packedUV2(), spriteShift, index),
+            calcSpriteUv(quad.packedUV3(), spriteShift, index),
+            quad.tintIndex(),
+            quad.direction(),
+            quad.sprite(),
+            quad.shade(),
+            quad.lightEmission()
+        );
+        NormalsBakedQuad.setNormals(newQuad, NormalsBakedQuad.getNormals(quad));
         return newQuad;
     }
 

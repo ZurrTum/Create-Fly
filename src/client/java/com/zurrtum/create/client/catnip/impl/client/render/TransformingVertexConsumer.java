@@ -37,6 +37,12 @@ public class TransformingVertexConsumer implements VertexConsumer {
     }
 
     @Override
+    public VertexConsumer setColor(int color) {
+        delegate.setColor(color);
+        return this;
+    }
+
+    @Override
     public VertexConsumer setColor(int red, int green, int blue, int alpha) {
         delegate.setColor(red, green, blue, alpha);
         return this;
@@ -68,6 +74,12 @@ public class TransformingVertexConsumer implements VertexConsumer {
             MatrixMath.transformNormalY(matrix, x, y, z),
             MatrixMath.transformNormalZ(matrix, x, y, z)
         );
+        return this;
+    }
+
+    @Override
+    public VertexConsumer setLineWidth(float width) {
+        delegate.setLineWidth(width);
         return this;
     }
 }

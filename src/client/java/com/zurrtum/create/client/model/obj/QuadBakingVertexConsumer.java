@@ -9,15 +9,16 @@ import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.blaze3d.vertex.VertexFormatElement;
 import com.zurrtum.create.client.model.NormalsBakedQuad;
+import net.minecraft.client.renderer.block.model.BakedQuad;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.core.Direction;
+import net.minecraft.util.ARGB;
+import net.minecraft.util.Util;
+import org.joml.Vector3f;
 
 import java.util.Arrays;
 import java.util.IdentityHashMap;
 import java.util.Map;
-
-import net.minecraft.util.Util;
-import net.minecraft.client.renderer.block.model.BakedQuad;
-import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.core.Direction;
 
 /**
  * Vertex consumer that outputs {@linkplain BakedQuad baked quads}.
@@ -87,6 +88,18 @@ public class QuadBakingVertexConsumer implements VertexConsumer {
     }
 
     @Override
+    public VertexConsumer setLineWidth(float width) {
+        return this;
+    }
+
+    @Override
+    public VertexConsumer setColor(int color) {
+        int offset = vertexIndex * STRIDE + COLOR;
+        quadData[offset] = ARGB.toABGR(color);
+        return this;
+    }
+
+    @Override
     public VertexConsumer setColor(int r, int g, int b, int a) {
         int offset = vertexIndex * STRIDE + COLOR;
         quadData[offset] = ((a & 0xFF) << 24) | ((b & 0xFF) << 16) | ((g & 0xFF) << 8) | (r & 0xFF);
@@ -143,13 +156,43 @@ public class QuadBakingVertexConsumer implements VertexConsumer {
         this.shade = shade;
     }
 
+    private Vector3f getVertex(int vertexIndex) {
+        int offset = vertexIndex * STRIDE + POSITION;
+        return new Vector3f(quadData[offset], quadData[offset + 1], quadData[offset + 2]);
+    }
+
+    private long getUv(int vertexIndex) {
+        int offset = vertexIndex * STRIDE + UV0;
+        long high = quadData[offset] & 4294967295L;
+        long low = quadData[offset + 1] & 4294967295L;
+        return high << 32 | low;
+    }
+
+    private int getNormal(int vertexIndex) {
+        return quadData[vertexIndex * STRIDE + NORMAL];
+    }
+
     public BakedQuad bakeQuad() {
         if (!building || ++vertexIndex != 4) {
             throw new IllegalStateException("Not enough vertices available. Vertices in buffer: " + vertexIndex);
         }
 
-        BakedQuad quad = new BakedQuad(quadData.clone(), tintIndex, direction, sprite, shade, lightEmission);
-        NormalsBakedQuad.markNormals(quad);
+        BakedQuad quad = new BakedQuad(
+            getVertex(0),
+            getVertex(1),
+            getVertex(2),
+            getVertex(3),
+            getUv(0),
+            getUv(1),
+            getUv(2),
+            getUv(3),
+            tintIndex,
+            direction,
+            sprite,
+            shade,
+            lightEmission
+        );
+        NormalsBakedQuad.setNormals(quad, new int[]{getNormal(0), getNormal(1), getNormal(2), getNormal(3)});
         vertexIndex = 0;
         building = false;
         Arrays.fill(quadData, 0);

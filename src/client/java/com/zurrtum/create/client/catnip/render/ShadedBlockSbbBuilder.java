@@ -84,15 +84,19 @@ public class ShadedBlockSbbBuilder implements VertexConsumer {
         float blue,
         float alpha,
         int[] lights,
-        int overlay,
-        boolean readExistingColor
+        int overlay
     ) {
         prepareForGeometry(quad);
-        bufferBuilder.putBulkData(pose, quad, brightnesses, red, green, blue, alpha, lights, overlay, readExistingColor);
+        bufferBuilder.putBulkData(pose, quad, brightnesses, red, green, blue, alpha, lights, overlay);
     }
 
     @Override
     public VertexConsumer addVertex(float x, float y, float z) {
+        throw new UnsupportedOperationException("ShadedBlockSbbBuilder only supports putBulkData!");
+    }
+
+    @Override
+    public VertexConsumer setColor(int color) {
         throw new UnsupportedOperationException("ShadedBlockSbbBuilder only supports putBulkData!");
     }
 
@@ -118,6 +122,11 @@ public class ShadedBlockSbbBuilder implements VertexConsumer {
 
     @Override
     public VertexConsumer setNormal(float x, float y, float z) {
+        throw new UnsupportedOperationException("ShadedBlockSbbBuilder only supports putBulkData!");
+    }
+
+    @Override
+    public VertexConsumer setLineWidth(float width) {
         throw new UnsupportedOperationException("ShadedBlockSbbBuilder only supports putBulkData!");
     }
 }

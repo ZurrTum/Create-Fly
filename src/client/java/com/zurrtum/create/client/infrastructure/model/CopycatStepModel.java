@@ -2,7 +2,6 @@ package com.zurrtum.create.client.infrastructure.model;
 
 import com.zurrtum.create.catnip.data.Iterate;
 import com.zurrtum.create.client.foundation.model.BakedModelHelper;
-import com.zurrtum.create.client.foundation.model.BakedQuadHelper;
 import com.zurrtum.create.content.decoration.copycat.CopycatBlock;
 import com.zurrtum.create.content.decoration.copycat.CopycatStepBlock;
 import net.minecraft.client.renderer.block.model.BakedQuad;
@@ -114,10 +113,7 @@ public class CopycatStepModel extends CopycatModel {
                     if (top && direction == Direction.DOWN)
                         continue;
 
-                    consumer.accept(BakedQuadHelper.cloneWithCustomGeometry(
-                        quad,
-                        BakedModelHelper.cropAndMove(quad.vertices(), quad.sprite(), bb1, offset)
-                    ));
+                    consumer.accept(BakedModelHelper.cropAndMove(quad, bb1, offset));
                 }
             }
         }

@@ -8,15 +8,15 @@ import org.spongepowered.asm.mixin.Unique;
 @Mixin(BakedQuad.class)
 public class BakedQuadMixin implements NormalsBakedQuad {
     @Unique
-    private boolean normals;
+    private int[] normals;
 
     @Override
-    public void create$markNormals() {
-        normals = true;
+    public void create$setNormals(int[] normals) {
+        this.normals = normals;
     }
 
     @Override
-    public boolean create$hasNormals() {
+    public int[] create$getNormals() {
         return normals;
     }
 }
