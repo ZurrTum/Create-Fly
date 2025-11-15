@@ -37,7 +37,7 @@ public class CustomRotationParticle extends SimpleAnimatedParticle {
 
     @Override
     public void extract(QuadParticleRenderState submittable, Camera camera, float partialTicks) {
-        Vec3 cameraPos = camera.getPosition();
+        Vec3 cameraPos = camera.position();
         float originX = (float) (Mth.lerp(partialTicks, xo, x) - cameraPos.x());
         float originY = (float) (Mth.lerp(partialTicks, yo, y) - cameraPos.y());
         float originZ = (float) (Mth.lerp(partialTicks, zo, z) - cameraPos.z());

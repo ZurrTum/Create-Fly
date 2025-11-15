@@ -117,7 +117,7 @@ public class WorldRendererMixin {
         this.targets.main = framePass.readsAndWrites(this.targets.main);
         framePass.executes(() -> {
             PoseStack ms = new PoseStack();
-            Vec3 cameraPos = camera.getPosition();
+            Vec3 cameraPos = camera.position();
             SuperRenderTypeBuffer buffer = DefaultSuperRenderTypeBuffer.getInstance();
             GhostBlocks.getInstance().renderAll(minecraft, ms, buffer, cameraPos);
             Outliner.getInstance().renderOutlines(minecraft, ms, buffer, cameraPos, tickProgress);
@@ -183,7 +183,13 @@ public class WorldRendererMixin {
             vertexConsumers,
             cameraPos,
             matrices
-        ) || TrackBlockOutline.drawCustomBlockSelection(minecraft, state.pos(), vertexConsumers, cameraPos, matrices)) {
+        ) || TrackBlockOutline.drawCustomBlockSelection(
+            minecraft,
+            state.pos(),
+            vertexConsumers,
+            cameraPos,
+            matrices
+        )) {
             ci.cancel();
         }
     }

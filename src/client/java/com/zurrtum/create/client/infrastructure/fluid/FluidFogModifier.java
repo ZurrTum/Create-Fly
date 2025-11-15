@@ -40,7 +40,7 @@ public class FluidFogModifier extends WaterFogEnvironment {
 
     @Override
     public int getBaseColor(ClientLevel world, Camera camera, int viewDistance, float skyDarkness) {
-        FluidConfig config = AllFluidConfigs.ALL.get(world.getFluidState(camera.getBlockPosition()).getType());
+        FluidConfig config = AllFluidConfigs.ALL.get(world.getFluidState(camera.blockPosition()).getType());
         if (config != null) {
             if (config.fogColor() != -1) {
                 return config.fogColor();

@@ -55,7 +55,7 @@ public class SteamJetParticle extends SimpleAnimatedParticle {
 
     @Override
     public void extract(QuadParticleRenderState submittable, Camera camera, float tickProgress) {
-        Vec3 vec3 = camera.getPosition();
+        Vec3 vec3 = camera.position();
         float f = (float) (x - vec3.x);
         float f1 = (float) (y - vec3.y);
         float f2 = (float) (z - vec3.z);

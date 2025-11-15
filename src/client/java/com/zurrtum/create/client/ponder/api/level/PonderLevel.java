@@ -178,7 +178,7 @@ public class PonderLevel extends SchematicLevel {
     }
 
     public void renderEntities(PoseStack ms, SubmitNodeCollector queue, Camera ari, CameraRenderState cameraRenderState, float pt) {
-        Vec3 Vector3d = ari.getPosition();
+        Vec3 Vector3d = ari.position();
         double d0 = Vector3d.x();
         double d1 = Vector3d.y();
         double d2 = Vector3d.z();

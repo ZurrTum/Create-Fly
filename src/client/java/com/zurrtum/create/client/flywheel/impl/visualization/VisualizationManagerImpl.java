@@ -29,15 +29,6 @@ import com.zurrtum.create.client.flywheel.lib.task.SimplePlan;
 import com.zurrtum.create.client.flywheel.lib.util.LevelAttached;
 import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
 import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
-import org.jetbrains.annotations.Contract;
-import org.jetbrains.annotations.Nullable;
-import org.joml.FrustumIntersection;
-import org.joml.Matrix4f;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.SortedSet;
-
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.SectionPos;
@@ -48,6 +39,14 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.LightLayer;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.Nullable;
+import org.joml.FrustumIntersection;
+import org.joml.Matrix4f;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.SortedSet;
 
 /**
  * A manager class for a single level where visualization is supported.
@@ -133,7 +132,7 @@ public class VisualizationManagerImpl implements VisualizationManager {
 
         private DynamicVisual.Context createVisualFrameContext(RenderContext ctx) {
             Vec3i renderOrigin = engine.renderOrigin();
-            var cameraPos = ctx.camera().getPosition();
+            var cameraPos = ctx.camera().position();
 
             Matrix4f viewProjection = new Matrix4f(ctx.viewProjection());
             viewProjection.translate(

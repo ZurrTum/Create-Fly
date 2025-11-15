@@ -17,9 +17,6 @@ import com.zurrtum.create.client.flywheel.backend.engine.embed.EnvironmentStorag
 import com.zurrtum.create.client.flywheel.backend.engine.uniform.Uniforms;
 import com.zurrtum.create.client.flywheel.backend.gl.GlStateTracker;
 import it.unimi.dsi.fastutil.longs.LongSet;
-
-import java.util.List;
-
 import net.minecraft.client.Camera;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.SectionPos;
@@ -27,6 +24,8 @@ import net.minecraft.core.Vec3i;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.LightLayer;
 import net.minecraft.world.phys.Vec3;
+
+import java.util.List;
 
 public class EngineImpl implements Engine {
     private final DrawManager<? extends AbstractInstancer<?>> drawManager;
@@ -60,7 +59,7 @@ public class EngineImpl implements Engine {
 
     @Override
     public boolean updateRenderOrigin(Camera camera) {
-        Vec3 cameraPos = camera.getPosition();
+        Vec3 cameraPos = camera.position();
         double dx = renderOrigin.getX() - cameraPos.x;
         double dy = renderOrigin.getY() - cameraPos.y;
         double dz = renderOrigin.getZ() - cameraPos.z;

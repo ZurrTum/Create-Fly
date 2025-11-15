@@ -76,7 +76,7 @@ public class CubeParticle extends Particle {
     }
 
     public void render(CubeParticleSubmittable submittable, Camera camera, float tickProgress) {
-        Vec3 projectedView = camera.getPosition();
+        Vec3 projectedView = camera.position();
         float lerpedX = (float) (Mth.lerp(tickProgress, this.xo, this.x) - projectedView.x());
         float lerpedY = (float) (Mth.lerp(tickProgress, this.yo, this.y) - projectedView.y());
         float lerpedZ = (float) (Mth.lerp(tickProgress, this.zo, this.z) - projectedView.z());

@@ -6,17 +6,16 @@ import com.zurrtum.create.client.flywheel.api.visualization.VisualizationContext
 import com.zurrtum.create.client.flywheel.lib.instance.FlatLit;
 import com.zurrtum.create.client.flywheel.lib.math.MoreMath;
 import it.unimi.dsi.fastutil.longs.LongSet;
-import org.jetbrains.annotations.Nullable;
-import org.jetbrains.annotations.UnknownNullability;
-import org.joml.FrustumIntersection;
-
-import java.util.Iterator;
-
 import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.SectionPos;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.UnknownNullability;
+import org.joml.FrustumIntersection;
+
+import java.util.Iterator;
 
 /**
  * The layer between a {@link BlockEntity} and the Flywheel backend.
@@ -92,7 +91,7 @@ public abstract class AbstractBlockEntityVisual<T extends BlockEntity> extends A
      * @return {@code true} if this visual shouldn't be updated this frame based on its distance from the camera.
      */
     public boolean doDistanceLimitThisFrame(DynamicVisual.Context context) {
-        return !context.limiter().shouldUpdate(pos.distToCenterSqr(context.camera().getPosition()));
+        return !context.limiter().shouldUpdate(pos.distToCenterSqr(context.camera().position()));
     }
 
     protected int computePackedLight() {

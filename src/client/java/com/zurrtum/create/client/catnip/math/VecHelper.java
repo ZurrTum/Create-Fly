@@ -21,7 +21,7 @@ public class VecHelper {
          * then in front of view plane)
          */
         Camera ari = Minecraft.getInstance().gameRenderer.getMainCamera();
-        Vec3 camera_pos = ari.getPosition();
+        Vec3 camera_pos = ari.position();
         Quaternionf camera_rotation_conj = new Quaternionf(ari.rotation());
         camera_rotation_conj.conjugate();
 

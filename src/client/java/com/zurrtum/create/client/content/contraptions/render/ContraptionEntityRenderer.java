@@ -175,7 +175,7 @@ public class ContraptionEntityRenderer<C extends AbstractContraptionEntity, S ex
         VirtualRenderWorld renderWorld = clientContraption.getRenderLevel();
         ContraptionMatrices matrices = clientContraption.getMatrices();
         matrixStack.pushPose();
-        Vec3 cameraPos = camera.getPosition();
+        Vec3 cameraPos = camera.position();
         matrixStack.translate(state.x - cameraPos.x, state.y - cameraPos.y, state.z - cameraPos.z);
         matrices.setup(this, matrixStack, state);
         PoseStack projection = new PoseStack();

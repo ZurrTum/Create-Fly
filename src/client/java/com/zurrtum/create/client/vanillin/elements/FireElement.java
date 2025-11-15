@@ -63,7 +63,7 @@ public final class FireElement extends AbstractVisual implements SimpleDynamicVi
 
     /**
      * Update the fire instances. You'd typically call this in your visual's
-     * {@link com.zurrtum.create.client.flywheel.lib.visual.SimpleDynamicVisual#beginFrame(DynamicVisual.Context) beginFrame} method.
+     * {@link SimpleDynamicVisual#beginFrame(DynamicVisual.Context) beginFrame} method.
      *
      * @param context The frame context.
      */
@@ -93,7 +93,7 @@ public final class FireElement extends AbstractVisual implements SimpleDynamicVi
         stack.setIdentity();
         stack.translate(entityX - renderOrigin.getX(), entityY - renderOrigin.getY(), entityZ - renderOrigin.getZ());
         stack.scale(scale, scale, scale);
-        stack.mulPose(Axis.YP.rotationDegrees(-context.camera().getYRot()));
+        stack.mulPose(Axis.YP.rotationDegrees(-context.camera().yRot()));
         stack.translate(0.0F, 0.0F, -0.3F + (float) ((int) maxHeight) * 0.02F);
 
         for (int i = 0; y < maxHeight; ++i) {

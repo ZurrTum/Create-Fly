@@ -2,15 +2,14 @@ package com.zurrtum.create.client.flywheel.backend.engine.uniform;
 
 import com.mojang.blaze3d.platform.Lighting;
 import com.zurrtum.create.client.flywheel.api.backend.RenderContext;
-import org.joml.Vector3f;
-
-import java.util.EnumMap;
-import java.util.Map;
-
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.util.ARGB;
 import net.minecraft.world.level.Level;
+import org.joml.Vector3f;
+
+import java.util.EnumMap;
+import java.util.Map;
 
 public final class LevelUniforms extends UniformWriter {
     private static final int SIZE = 16 * 4 + 4 * 12;
@@ -42,7 +41,7 @@ public final class LevelUniforms extends UniformWriter {
         ClientLevel level = context.level();
         float partialTick = context.partialTick();
 
-        int skyColor = level.getSkyColor(context.camera().getPosition(), partialTick);
+        int skyColor = level.getSkyColor(context.camera().position(), partialTick);
         int cloudColor = level.getCloudColor(partialTick);
         ptr = writeVec4(ptr, ARGB.redFloat(skyColor), ARGB.greenFloat(skyColor), ARGB.blueFloat(skyColor), 1f);
         ptr = writeVec4(ptr, ARGB.redFloat(cloudColor), ARGB.greenFloat(cloudColor), ARGB.blueFloat(cloudColor), 1f);
