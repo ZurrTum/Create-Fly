@@ -2,7 +2,6 @@ package com.zurrtum.create.client.catnip.gui.render;
 
 import com.mojang.blaze3d.systems.GpuDevice;
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.textures.FilterMode;
 import com.mojang.blaze3d.textures.GpuTextureView;
 import com.mojang.blaze3d.textures.TextureFormat;
 
@@ -25,7 +24,6 @@ public record GpuTexture(
             1,
             1
         );
-        texture.setTextureFilter(FilterMode.NEAREST, false);
         GpuTextureView textureView = gpuDevice.createTextureView(texture);
         com.mojang.blaze3d.textures.GpuTexture depthTexture = gpuDevice.createTexture(
             () -> "UI Item Transform depth texture",
