@@ -10,12 +10,13 @@ import com.zurrtum.create.client.foundation.blockEntity.renderer.SmartBlockEntit
 import com.zurrtum.create.client.foundation.blockEntity.renderer.SmartBlockEntityRenderer.NameplateRenderState;
 import com.zurrtum.create.content.logistics.packagePort.postbox.PostboxBlock;
 import com.zurrtum.create.content.logistics.packagePort.postbox.PostboxBlockEntity;
-import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.blockentity.state.BlockEntityRenderState;
 import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
+import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.state.CameraRenderState;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.network.chat.Component;
@@ -41,7 +42,7 @@ public class PostboxRenderer implements BlockEntityRenderer<PostboxBlockEntity, 
         @Nullable ModelFeatureRenderer.CrumblingOverlay crumblingOverlay
     ) {
         BlockEntityRenderState.extractBase(be, state, crumblingOverlay);
-        state.layer = RenderType.cutout();
+        state.layer = RenderTypes.cutoutMovingBlock();
         state.flag = CachedBuffers.partial(AllPartialModels.POSTBOX_FLAG, state.blockState);
         state.angle = Mth.DEG_TO_RAD * (180 - state.blockState.getValue(PostboxBlock.FACING).toYRot());
         LerpedFloat flag = be.flag;

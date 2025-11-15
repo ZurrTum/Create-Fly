@@ -1,5 +1,7 @@
 package com.zurrtum.create.client.content.contraptions.actors.harvester;
 
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.zurrtum.create.catnip.math.AngleHelper;
 import com.zurrtum.create.catnip.math.VecHelper;
 import com.zurrtum.create.client.AllPartialModels;
@@ -15,8 +17,9 @@ import com.zurrtum.create.client.foundation.virtualWorld.VirtualRenderWorld;
 import com.zurrtum.create.content.contraptions.behaviour.MovementContext;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.renderer.LevelRenderer;
-import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.SubmitNodeCollector;
+import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.Level;
@@ -27,9 +30,6 @@ import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix4f;
 
 import static com.zurrtum.create.client.content.contraptions.actors.harvester.HarvesterRenderer.PIVOT;
-
-import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.VertexConsumer;
 
 public class HarvesterMovementRenderBehaviour implements MovementRenderBehaviour {
     @Nullable
@@ -52,7 +52,7 @@ public class HarvesterMovementRenderBehaviour implements MovementRenderBehaviour
         HarvesterMovementRenderState state = new HarvesterMovementRenderState(context.localPos);
         BlockState blockState = context.state;
         Direction facing = blockState.getValue(BlockStateProperties.HORIZONTAL_FACING);
-        state.layer = RenderType.cutoutMipped();
+        state.layer = RenderTypes.cutoutMovingBlock();
         state.model = CachedBuffers.partial(AllPartialModels.HARVESTER_BLADE, blockState);
         float speed = !VecHelper.isVecPointingTowards(context.relativeMotion, facing.getOpposite()) ? context.getAnimationSpeed() : 0;
         if (context.contraption.stalled) {

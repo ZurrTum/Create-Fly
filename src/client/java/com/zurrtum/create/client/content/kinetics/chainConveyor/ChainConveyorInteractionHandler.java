@@ -15,20 +15,19 @@ import com.zurrtum.create.content.logistics.packagePort.PackagePortTarget;
 import com.zurrtum.create.foundation.utility.TickBasedCache;
 import com.zurrtum.create.infrastructure.packet.c2s.ChainConveyorConnectionPacket;
 import com.zurrtum.create.infrastructure.packet.c2s.ChainPackageInteractionPacket;
-
-import java.util.List;
-import java.util.Map;
-
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
+
+import java.util.List;
+import java.util.Map;
 
 public class ChainConveyorInteractionHandler {
 
@@ -150,7 +149,7 @@ public class ChainConveyorInteractionHandler {
         if (selectedLift == null || selectedShape == null)
             return;
 
-        VertexConsumer vb = buffer.getBuffer(RenderType.lines());
+        VertexConsumer vb = buffer.getBuffer(RenderTypes.lines());
         ms.pushPose();
         ms.translate(selectedLift.getX() - camera.x, selectedLift.getY() - camera.y, selectedLift.getZ() - camera.z);
         selectedShape.drawOutline(selectedLift, ms, vb);

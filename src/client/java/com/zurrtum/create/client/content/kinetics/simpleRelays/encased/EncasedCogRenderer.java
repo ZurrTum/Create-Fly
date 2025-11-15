@@ -9,9 +9,10 @@ import com.zurrtum.create.client.content.kinetics.base.KineticBlockEntityRendere
 import com.zurrtum.create.client.content.kinetics.simpleRelays.BracketedKineticBlockEntityRenderer;
 import com.zurrtum.create.content.kinetics.simpleRelays.SimpleKineticBlockEntity;
 import com.zurrtum.create.content.kinetics.simpleRelays.encased.EncasedCogwheelBlock;
-import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
+import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
@@ -70,7 +71,7 @@ public class EncasedCogRenderer extends KineticBlockEntityRenderer<SimpleKinetic
 
     @Override
     protected RenderType getRenderType(SimpleKineticBlockEntity be, BlockState state) {
-        return RenderType.solid();
+        return RenderTypes.solidMovingBlock();
     }
 
     @Override

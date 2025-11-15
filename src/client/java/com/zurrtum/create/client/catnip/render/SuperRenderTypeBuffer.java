@@ -2,8 +2,9 @@ package com.zurrtum.create.client.catnip.render;
 
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.chunk.ChunkSectionLayer;
+import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
 
 public interface SuperRenderTypeBuffer extends MultiBufferSource {
     VertexConsumer getEarlyBuffer(RenderType type);
@@ -26,11 +27,10 @@ public interface SuperRenderTypeBuffer extends MultiBufferSource {
 
     default RenderType getRenderLayer(ChunkSectionLayer type) {
         return switch (type) {
-            case SOLID -> RenderType.solid();
-            case CUTOUT_MIPPED -> RenderType.cutoutMipped();
-            case CUTOUT -> RenderType.cutout();
-            case TRANSLUCENT -> PonderRenderTypes.translucent();
-            case TRIPWIRE -> RenderType.tripwire();
+            case SOLID -> RenderTypes.solidMovingBlock();
+            case CUTOUT -> RenderTypes.cutoutMovingBlock();
+            case TRANSLUCENT -> RenderTypes.translucentMovingBlock();
+            case TRIPWIRE -> RenderTypes.tripwireMovingBlock();
         };
     }
 

@@ -22,7 +22,6 @@ import com.zurrtum.create.content.logistics.box.PackageItem;
 import com.zurrtum.create.content.processing.recipe.ProcessingInventory;
 import it.unimi.dsi.fastutil.booleans.BooleanArrayList;
 import it.unimi.dsi.fastutil.booleans.BooleanList;
-import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
@@ -30,6 +29,8 @@ import net.minecraft.client.renderer.blockentity.state.BlockEntityRenderState;
 import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
 import net.minecraft.client.renderer.item.ItemModelResolver;
 import net.minecraft.client.renderer.item.ItemStackRenderState;
+import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.state.CameraRenderState;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.core.Direction;
@@ -69,7 +70,7 @@ public class SawRenderer implements BlockEntityRenderer<SawBlockEntity, SawRende
         @Nullable ModelFeatureRenderer.CrumblingOverlay crumblingOverlay
     ) {
         BlockEntityRenderState.extractBase(be, state, crumblingOverlay);
-        state.layer = RenderType.cutoutMipped();
+        state.layer = RenderTypes.cutoutMovingBlock();
         state.partialTicks = tickProgress;
         state.speed = be.getSpeed();
         updateBlade(state);

@@ -10,10 +10,11 @@ import com.zurrtum.create.client.content.logistics.depot.DepotRenderer;
 import com.zurrtum.create.client.content.logistics.depot.DepotRenderer.DepotOutputItemState;
 import com.zurrtum.create.client.foundation.blockEntity.renderer.SmartBlockEntityRenderer;
 import com.zurrtum.create.content.logistics.tableCloth.TableClothBlockEntity;
-import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
+import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.state.CameraRenderState;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.core.Direction;
@@ -47,7 +48,7 @@ public class TableClothRenderer extends SmartBlockEntityRenderer<TableClothBlock
         super.extractRenderState(be, state, tickProgress, cameraPos, crumblingOverlay);
         state.radians = Mth.DEG_TO_RAD * (180 - be.facing.toYRot());
         if (be.isShop()) {
-            state.layer = RenderType.cutout();
+            state.layer = RenderTypes.cutoutMovingBlock();
             state.shop = CachedBuffers.partial(
                 be.sideOccluded ? AllPartialModels.TABLE_CLOTH_PRICE_TOP : AllPartialModels.TABLE_CLOTH_PRICE_SIDE,
                 state.blockState

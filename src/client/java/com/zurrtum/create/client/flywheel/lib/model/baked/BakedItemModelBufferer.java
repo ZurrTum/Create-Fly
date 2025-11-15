@@ -12,8 +12,13 @@ import com.zurrtum.create.client.flywheel.lib.material.Materials;
 import com.zurrtum.create.client.flywheel.lib.material.SimpleMaterial;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
-import net.minecraft.client.renderer.*;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.Sheets;
+import net.minecraft.client.renderer.SubmitNodeCollection;
+import net.minecraft.client.renderer.SubmitNodeStorage;
 import net.minecraft.client.renderer.item.ItemStackRenderState;
+import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemDisplayContext;
@@ -37,9 +42,9 @@ public class BakedItemModelBufferer {
         Sheets.solidBlockSheet(),
         Sheets.cutoutBlockSheet(),
         Sheets.translucentItemSheet(),
-        RenderType.glint(),
-        RenderType.glintTranslucent(),
-        RenderType.entityGlint()
+        RenderTypes.glint(),
+        RenderTypes.glintTranslucent(),
+        RenderTypes.entityGlint()
     );
 
     public static void bufferItemStack(

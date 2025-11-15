@@ -20,8 +20,9 @@ import com.zurrtum.create.content.kinetics.base.DirectionalAxisKineticBlock;
 import com.zurrtum.create.content.kinetics.saw.SawBlock;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.renderer.LevelRenderer;
-import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.SubmitNodeCollector;
+import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Direction.Axis;
@@ -61,7 +62,7 @@ public class SawMovementRenderBehaviour implements MovementRenderBehaviour {
         boolean backwards = VecHelper.isVecPointingTowards(context.relativeMotion, facing.getOpposite());
         boolean moving = context.getAnimationSpeed() != 0;
         boolean shouldAnimate = (context.contraption.stalled && horizontal) || (!context.contraption.stalled && !backwards && moving);
-        state.layer = RenderType.cutoutMipped();
+        state.layer = RenderTypes.cutoutMovingBlock();
         if (SawBlock.isHorizontal(blockState)) {
             state.saw = CachedBuffers.partial(
                 shouldAnimate ? AllPartialModels.SAW_BLADE_HORIZONTAL_ACTIVE : AllPartialModels.SAW_BLADE_HORIZONTAL_INACTIVE,

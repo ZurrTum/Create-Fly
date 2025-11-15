@@ -7,12 +7,13 @@ import com.zurrtum.create.client.catnip.render.CachedBuffers;
 import com.zurrtum.create.client.catnip.render.SuperByteBuffer;
 import com.zurrtum.create.content.equipment.toolbox.ToolboxBlock;
 import com.zurrtum.create.content.equipment.toolbox.ToolboxBlockEntity;
-import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.blockentity.state.BlockEntityRenderState;
 import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
+import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.state.CameraRenderState;
 import net.minecraft.core.Direction;
 import net.minecraft.util.Mth;
@@ -37,7 +38,7 @@ public class ToolboxRenderer implements BlockEntityRenderer<ToolboxBlockEntity, 
         @Nullable ModelFeatureRenderer.CrumblingOverlay crumblingOverlay
     ) {
         BlockEntityRenderState.extractBase(be, state, crumblingOverlay);
-        state.layer = RenderType.cutoutMipped();
+        state.layer = RenderTypes.cutoutMovingBlock();
         state.lid = CachedBuffers.partial(AllPartialModels.TOOLBOX_LIDS.get(be.getColor()), state.blockState);
         state.drawer = CachedBuffers.partial(AllPartialModels.TOOLBOX_DRAWER, state.blockState);
         Direction facing = state.blockState.getValue(ToolboxBlock.FACING).getOpposite();

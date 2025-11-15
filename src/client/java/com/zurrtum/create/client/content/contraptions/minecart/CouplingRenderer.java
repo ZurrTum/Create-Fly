@@ -18,7 +18,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.util.Mth;
@@ -57,7 +57,7 @@ public class CouplingRenderer {
         Couple<CartEndpoint> transforms = carts.map(c -> getSuitableCartEndpoint(c, center));
 
         BlockState renderState = Blocks.AIR.defaultBlockState();
-        VertexConsumer builder = buffer.getBuffer(RenderType.solid());
+        VertexConsumer builder = buffer.getBuffer(RenderTypes.solidMovingBlock());
         SuperByteBuffer attachment = CachedBuffers.partial(AllPartialModels.COUPLING_ATTACHMENT, renderState);
         SuperByteBuffer ring = CachedBuffers.partial(AllPartialModels.COUPLING_RING, renderState);
         SuperByteBuffer connector = CachedBuffers.partial(AllPartialModels.COUPLING_CONNECTOR, renderState);

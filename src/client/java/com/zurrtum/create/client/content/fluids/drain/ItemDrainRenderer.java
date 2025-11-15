@@ -4,9 +4,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.zurrtum.create.catnip.math.VecHelper;
 import com.zurrtum.create.client.catnip.render.FluidRenderHelper;
-import com.zurrtum.create.client.catnip.render.PonderRenderTypes;
 import com.zurrtum.create.client.flywheel.lib.transform.TransformStack;
-import com.zurrtum.create.client.flywheel.lib.util.ShadersModHelper;
 import com.zurrtum.create.content.fluids.drain.ItemDrainBlockEntity;
 import com.zurrtum.create.content.fluids.transfer.GenericItemEmptying;
 import com.zurrtum.create.content.kinetics.belt.BeltHelper;
@@ -14,7 +12,6 @@ import com.zurrtum.create.content.kinetics.belt.transport.TransportedItemStack;
 import com.zurrtum.create.foundation.blockEntity.behaviour.fluid.SmartFluidTankBehaviour;
 import com.zurrtum.create.foundation.blockEntity.behaviour.fluid.SmartFluidTankBehaviour.TankSegment;
 import com.zurrtum.create.infrastructure.fluids.FluidStack;
-import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
@@ -22,6 +19,8 @@ import net.minecraft.client.renderer.blockentity.state.BlockEntityRenderState;
 import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
 import net.minecraft.client.renderer.item.ItemModelResolver;
 import net.minecraft.client.renderer.item.ItemStackRenderState;
+import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.state.CameraRenderState;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.core.Direction;
@@ -92,7 +91,7 @@ public class ItemDrainRenderer implements BlockEntityRenderer<ItemDrainBlockEnti
                 float yOffset = (7 / 16f) * level;
                 float yMin = yMax - yOffset;
                 state.fluid = new FluidRenderState(
-                    ShadersModHelper.isShaderPackInUse() ? RenderType.translucentMovingBlock() : PonderRenderTypes.fluid(),
+                    RenderTypes.translucentMovingBlock(),
                     fluidStack.getFluid(),
                     fluidStack.getComponentChanges(),
                     min,
@@ -125,7 +124,7 @@ public class ItemDrainRenderer implements BlockEntityRenderer<ItemDrainBlockEnti
         float radius = (float) (Math.pow(((2 * processingProgress) - 1), 2) - 1);
         AABB box = new AABB(0.5, 1.0, 0.5, 0.5, 0.25, 0.5).inflate(radius / 32f);
         state.process = new ProcessRenderState(
-            PonderRenderTypes.fluid(),
+            RenderTypes.translucentMovingBlock(),
             fluidStack2.getFluid(),
             fluidStack2.getComponentChanges(),
             box,

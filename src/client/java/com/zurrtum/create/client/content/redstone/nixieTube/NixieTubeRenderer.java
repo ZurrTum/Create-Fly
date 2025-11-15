@@ -9,10 +9,9 @@ import com.zurrtum.create.catnip.theme.Color;
 import com.zurrtum.create.client.AllPartialModels;
 import com.zurrtum.create.client.catnip.animation.AnimationTickHolder;
 import com.zurrtum.create.client.catnip.render.CachedBuffers;
-import com.zurrtum.create.client.catnip.render.PonderRenderTypes;
 import com.zurrtum.create.client.catnip.render.SuperByteBuffer;
 import com.zurrtum.create.client.flywheel.lib.util.ShadersModHelper;
-import com.zurrtum.create.client.foundation.render.RenderTypes;
+import com.zurrtum.create.client.foundation.render.CreateRenderTypes;
 import com.zurrtum.create.client.foundation.utility.DyeHelper;
 import com.zurrtum.create.content.redstone.nixieTube.DoubleFaceAttachedBlock.DoubleAttachFace;
 import com.zurrtum.create.content.redstone.nixieTube.NixieTubeBlock;
@@ -22,11 +21,16 @@ import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.Font.DisplayMode;
 import net.minecraft.client.gui.font.TextRenderable;
 import net.minecraft.client.gui.font.glyphs.BakedGlyph;
-import net.minecraft.client.renderer.*;
+import net.minecraft.client.renderer.LightTexture;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.OrderedSubmitNodeCollector;
+import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.blockentity.state.BlockEntityRenderState;
 import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
+import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.state.CameraRenderState;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Style;
@@ -73,7 +77,7 @@ public class NixieTubeRenderer implements BlockEntityRenderer<NixieTubeBlockEnti
         if (face == DoubleAttachFace.CEILING || facing == Direction.DOWN) {
             data.zRot2 = Mth.DEG_TO_RAD * 180;
         }
-        data.layer = ShadersModHelper.isShaderPackInUse() ? RenderType.translucentMovingBlock() : PonderRenderTypes.translucent();
+        data.layer = RenderTypes.translucentMovingBlock();
         data.light = state.lightCoords;
         data.tube = CachedBuffers.partial(AllPartialModels.NIXIE_TUBE, state.blockState);
         Couple<String> s = be.getDisplayedStrings();
@@ -142,7 +146,7 @@ public class NixieTubeRenderer implements BlockEntityRenderer<NixieTubeBlockEnti
         }
         data.zRot = Mth.DEG_TO_RAD * zRot;
         data.light = state.lightCoords;
-        data.layer = RenderType.solid();
+        data.layer = RenderTypes.solidMovingBlock();
         data.panel = CachedBuffers.partial(AllPartialModels.SIGNAL_PANEL, state.blockState);
         data.offset = facing == Direction.DOWN || state.blockState.getValue(NixieTubeBlock.FACE) == DoubleAttachFace.WALL_REVERSED ? 0.25f : -0.25f;
         SignalDrawableState left = data.left = new SignalDrawableState();
@@ -154,7 +158,7 @@ public class NixieTubeRenderer implements BlockEntityRenderer<NixieTubeBlockEnti
         boolean vert = facing.getAxis().isHorizontal();
         double distance = Vec3.atCenterOf(state.blockPos).subtract(cameraPos).lengthSqr();
         left.light = state.lightCoords;
-        left.layer = RenderTypes.translucent();
+        left.layer = CreateRenderTypes.translucent();
         if (signalState.isRedLight(renderTime)) {
             left.additive = true;
             if (distance < 9216) {
@@ -173,15 +177,15 @@ public class NixieTubeRenderer implements BlockEntityRenderer<NixieTubeBlockEnti
                     left.glowY = 2;
                 }
             }
-            left.layer = RenderTypes.additive2();
-            left.layer2 = RenderTypes.additive();
+            left.layer = CreateRenderTypes.additive2();
+            left.layer2 = CreateRenderTypes.additive();
             left.signal = CachedBuffers.partial(AllPartialModels.SIGNAL_RED, state.blockState);
         } else {
             left.signal = CachedBuffers.partial(AllPartialModels.NIXIE_TUBE_SINGLE, state.blockState);
         }
         SignalDrawableState right = data.right = new SignalDrawableState();
         right.light = state.lightCoords;
-        right.layer = RenderTypes.translucent();
+        right.layer = CreateRenderTypes.translucent();
         if (yellow || signalState.isGreenLight(renderTime)) {
             right.additive = true;
             if (distance < 9216) {
@@ -203,8 +207,8 @@ public class NixieTubeRenderer implements BlockEntityRenderer<NixieTubeBlockEnti
                     right.glowY = longSideGlow;
                 }
             }
-            right.layer = RenderTypes.additive2();
-            right.layer2 = RenderTypes.additive();
+            right.layer = CreateRenderTypes.additive2();
+            right.layer2 = CreateRenderTypes.additive();
             right.signal = CachedBuffers.partial(yellow ? AllPartialModels.SIGNAL_YELLOW : AllPartialModels.SIGNAL_WHITE, state.blockState);
         } else {
             right.signal = CachedBuffers.partial(AllPartialModels.NIXIE_TUBE_SINGLE, state.blockState);

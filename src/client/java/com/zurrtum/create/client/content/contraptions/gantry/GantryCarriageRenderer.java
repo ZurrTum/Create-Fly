@@ -12,9 +12,10 @@ import com.zurrtum.create.client.content.kinetics.base.KineticBlockEntityRendere
 import com.zurrtum.create.content.contraptions.gantry.GantryCarriageBlock;
 import com.zurrtum.create.content.contraptions.gantry.GantryCarriageBlockEntity;
 import com.zurrtum.create.content.kinetics.base.KineticBlockEntity;
-import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
+import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Direction.Axis;
@@ -73,7 +74,7 @@ public class GantryCarriageRenderer extends KineticBlockEntityRenderer<GantryCar
 
     @Override
     protected RenderType getRenderType(GantryCarriageBlockEntity be, BlockState state) {
-        return RenderType.solid();
+        return RenderTypes.solidMovingBlock();
     }
 
     public static float getAngleForBE(KineticBlockEntity be, final BlockPos pos, Axis axis) {

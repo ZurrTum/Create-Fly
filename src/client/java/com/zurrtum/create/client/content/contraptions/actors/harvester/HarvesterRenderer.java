@@ -9,12 +9,13 @@ import com.zurrtum.create.client.catnip.render.CachedBuffers;
 import com.zurrtum.create.client.catnip.render.SuperByteBuffer;
 import com.zurrtum.create.content.contraptions.actors.harvester.HarvesterBlock;
 import com.zurrtum.create.content.contraptions.actors.harvester.HarvesterBlockEntity;
-import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.blockentity.state.BlockEntityRenderState;
 import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
+import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.state.CameraRenderState;
 import net.minecraft.core.Direction;
 import net.minecraft.world.phys.Vec3;
@@ -40,7 +41,7 @@ public class HarvesterRenderer implements BlockEntityRenderer<HarvesterBlockEnti
         @Nullable ModelFeatureRenderer.CrumblingOverlay crumblingOverlay
     ) {
         BlockEntityRenderState.extractBase(be, state, crumblingOverlay);
-        state.layer = RenderType.cutoutMipped();
+        state.layer = RenderTypes.cutoutMovingBlock();
         state.model = CachedBuffers.partial(AllPartialModels.HARVESTER_BLADE, state.blockState);
         float originOffset = 1 / 16f;
         state.rotOffset = new Vec3(0, PIVOT.y * originOffset, PIVOT.z * originOffset);

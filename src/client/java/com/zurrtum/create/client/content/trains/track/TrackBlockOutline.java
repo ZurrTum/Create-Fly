@@ -16,7 +16,7 @@ import com.zurrtum.create.infrastructure.component.BezierTrackPointLocation;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Direction.Axis;
@@ -136,7 +136,7 @@ public class TrackBlockOutline {
         if (result == null)
             return;
 
-        VertexConsumer vb = buffer.getBuffer(RenderType.lines());
+        VertexConsumer vb = buffer.getBuffer(RenderTypes.lines());
         Vec3 vec = result.vec().subtract(camera);
         Vec3 angles = result.angles();
         TransformStack.of(ms).pushPose().translate(vec.x, vec.y + .125f, vec.z).rotateY((float) angles.y).rotateX((float) angles.x)
@@ -155,7 +155,7 @@ public class TrackBlockOutline {
         if (!mc.level.getWorldBorder().isWithinBounds(pos))
             return false;
 
-        VertexConsumer vb = vertexConsumers.getBuffer(RenderType.lines());
+        VertexConsumer vb = vertexConsumers.getBuffer(RenderTypes.lines());
 
         ms.pushPose();
         ms.translate(pos.getX() - camPos.x, pos.getY() - camPos.y, pos.getZ() - camPos.z);

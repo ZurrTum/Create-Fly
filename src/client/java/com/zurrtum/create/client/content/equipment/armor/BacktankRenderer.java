@@ -12,11 +12,12 @@ import com.zurrtum.create.client.content.kinetics.base.KineticBlockEntityRendere
 import com.zurrtum.create.client.flywheel.lib.model.baked.PartialModel;
 import com.zurrtum.create.content.equipment.armor.BacktankBlock;
 import com.zurrtum.create.content.equipment.armor.BacktankBlockEntity;
-import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.blockentity.state.BlockEntityRenderState;
 import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
+import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.state.CameraRenderState;
 import net.minecraft.core.Direction;
 import net.minecraft.util.Mth;
@@ -45,7 +46,7 @@ public class BacktankRenderer extends KineticBlockEntityRenderer<BacktankBlockEn
         super.extractRenderState(be, state, tickProgress, cameraPos, crumblingOverlay);
         if (state.support) {
             BlockEntityRenderState.extractBase(be, state, crumblingOverlay);
-            state.layer = RenderType.solid();
+            state.layer = RenderTypes.solidMovingBlock();
         }
         state.cogs = CachedBuffers.partial(getCogsModel(state.blockState), state.blockState);
         state.yRot = Mth.DEG_TO_RAD * 180 + AngleHelper.horizontalAngle(state.blockState.getValue(BacktankBlock.HORIZONTAL_FACING));
@@ -59,7 +60,7 @@ public class BacktankRenderer extends KineticBlockEntityRenderer<BacktankBlockEn
 
     @Override
     protected RenderType getRenderType(BacktankBlockEntity be, BlockState state) {
-        return RenderType.solid();
+        return RenderTypes.solidMovingBlock();
     }
 
     @Override

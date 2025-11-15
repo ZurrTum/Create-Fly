@@ -5,13 +5,11 @@ import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.zurrtum.create.api.behaviour.movement.MovementBehaviour;
 import com.zurrtum.create.client.api.behaviour.movement.MovementRenderBehaviour;
 import com.zurrtum.create.client.api.behaviour.movement.MovementRenderState;
-import com.zurrtum.create.client.catnip.render.PonderRenderTypes;
 import com.zurrtum.create.client.catnip.render.ShadedBlockSbbBuilder;
 import com.zurrtum.create.client.catnip.render.SuperByteBuffer;
 import com.zurrtum.create.client.catnip.render.SuperByteBufferCache;
 import com.zurrtum.create.client.content.contraptions.render.ClientContraption.RenderedBlocks;
 import com.zurrtum.create.client.flywheel.api.visualization.VisualizationManager;
-import com.zurrtum.create.client.flywheel.lib.util.ShadersModHelper;
 import com.zurrtum.create.client.foundation.render.BlockEntityRenderHelper;
 import com.zurrtum.create.client.foundation.render.BlockEntityRenderHelper.BlockEntityListRenderState;
 import com.zurrtum.create.client.foundation.virtualWorld.VirtualRenderWorld;
@@ -24,7 +22,6 @@ import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.renderer.ItemBlockRenderTypes;
-import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.block.BlockRenderDispatcher;
 import net.minecraft.client.renderer.block.ModelBlockRenderer;
@@ -35,6 +32,8 @@ import net.minecraft.client.renderer.culling.Frustum;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.state.EntityRenderState;
+import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.state.CameraRenderState;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.core.BlockPos;
@@ -259,11 +258,10 @@ public class ContraptionEntityRenderer<C extends AbstractContraptionEntity, S ex
 
         private static RenderType getRenderLayer(ChunkSectionLayer layer) {
             return switch (layer) {
-                case SOLID -> RenderType.solid();
-                case CUTOUT_MIPPED -> RenderType.cutoutMipped();
-                case CUTOUT -> RenderType.cutout();
-                case TRANSLUCENT -> ShadersModHelper.isShaderPackInUse() ? RenderType.translucentMovingBlock() : PonderRenderTypes.translucent();
-                case TRIPWIRE -> RenderType.tripwire();
+                case SOLID -> RenderTypes.solidMovingBlock();
+                case CUTOUT -> RenderTypes.cutoutMovingBlock();
+                case TRANSLUCENT -> RenderTypes.translucentMovingBlock();
+                case TRIPWIRE -> RenderTypes.tripwireMovingBlock();
             };
         }
 

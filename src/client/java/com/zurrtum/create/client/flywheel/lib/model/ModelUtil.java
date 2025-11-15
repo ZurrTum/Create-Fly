@@ -7,15 +7,15 @@ import com.zurrtum.create.client.flywheel.api.vertex.VertexList;
 import com.zurrtum.create.client.flywheel.lib.material.Materials;
 import com.zurrtum.create.client.flywheel.lib.memory.MemoryBlock;
 import com.zurrtum.create.client.flywheel.lib.vertex.PosVertexView;
+import net.minecraft.client.renderer.Sheets;
+import net.minecraft.client.renderer.chunk.ChunkSectionLayer;
+import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
 
 import java.util.Collection;
-
-import net.minecraft.client.renderer.rendertype.RenderType;
-import net.minecraft.client.renderer.Sheets;
-import net.minecraft.client.renderer.chunk.ChunkSectionLayer;
 
 public final class ModelUtil {
     private static final float BOUNDING_SPHERE_EPSILON = 1e-4f;
@@ -28,11 +28,8 @@ public final class ModelUtil {
         if (chunkRenderType == ChunkSectionLayer.SOLID) {
             return shaded ? Materials.SOLID_BLOCK : Materials.SOLID_UNSHADED_BLOCK;
         }
-        if (chunkRenderType == ChunkSectionLayer.CUTOUT_MIPPED) {
-            return shaded ? Materials.CUTOUT_MIPPED_BLOCK : Materials.CUTOUT_MIPPED_UNSHADED_BLOCK;
-        }
         if (chunkRenderType == ChunkSectionLayer.CUTOUT) {
-            return shaded ? Materials.CUTOUT_BLOCK : Materials.CUTOUT_UNSHADED_BLOCK;
+            return shaded ? Materials.CUTOUT_MIPPED_BLOCK : Materials.CUTOUT_MIPPED_UNSHADED_BLOCK;
         }
         if (chunkRenderType == ChunkSectionLayer.TRANSLUCENT) {
             return shaded ? Materials.TRANSLUCENT_BLOCK : Materials.TRANSLUCENT_UNSHADED_BLOCK;
@@ -45,16 +42,16 @@ public final class ModelUtil {
 
     @Nullable
     public static Material getItemMaterial(RenderType renderType) {
-        if (renderType == RenderType.solid()) {
+        if (renderType == RenderTypes.solidMovingBlock()) {
             return Materials.SOLID_BLOCK;
         }
-        if (renderType == RenderType.cutoutMipped()) {
+        if (renderType == RenderTypes.cutoutMovingBlock()) {
             return Materials.CUTOUT_MIPPED_BLOCK;
         }
-        if (renderType == RenderType.cutout()) {
-            return Materials.CUTOUT_BLOCK;
+        if (renderType == RenderTypes.translucentMovingBlock()) {
+            return Materials.TRANSLUCENT_BLOCK;
         }
-        if (renderType == RenderType.tripwire()) {
+        if (renderType == RenderTypes.tripwireMovingBlock()) {
             return Materials.TRIPWIRE_BLOCK;
         }
 
@@ -70,13 +67,13 @@ public final class ModelUtil {
             return Materials.TRANSLUCENT_ENTITY;
         }
 
-        if (renderType == RenderType.glint()) {
+        if (renderType == RenderTypes.glint()) {
             return Materials.GLINT;
         }
-        if (renderType == RenderType.glintTranslucent()) {
+        if (renderType == RenderTypes.glintTranslucent()) {
             return Materials.TRANSLUCENT_GLINT;
         }
-        if (renderType == RenderType.entityGlint()) {
+        if (renderType == RenderTypes.entityGlint()) {
             return Materials.GLINT_ENTITY;
         }
         return null;

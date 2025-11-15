@@ -13,13 +13,14 @@ import com.zurrtum.create.client.flywheel.lib.transform.TransformStack;
 import com.zurrtum.create.content.kinetics.mechanicalArm.ArmBlock;
 import com.zurrtum.create.content.kinetics.mechanicalArm.ArmBlockEntity;
 import com.zurrtum.create.content.kinetics.mechanicalArm.ArmBlockEntity.Phase;
-import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.blockentity.state.BlockEntityRenderState;
 import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
 import net.minecraft.client.renderer.item.ItemModelResolver;
 import net.minecraft.client.renderer.item.ItemStackRenderState;
+import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.state.CameraRenderState;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.util.Mth;
@@ -168,7 +169,7 @@ public class ArmRenderer extends KineticBlockEntityRenderer<ArmBlockEntity, ArmR
 
     @Override
     protected RenderType getRenderType(ArmBlockEntity be, BlockState state) {
-        return be.goggles ? RenderType.cutout() : RenderType.solid();
+        return be.goggles ? RenderTypes.cutoutMovingBlock() : RenderTypes.solidMovingBlock();
     }
 
     @Override

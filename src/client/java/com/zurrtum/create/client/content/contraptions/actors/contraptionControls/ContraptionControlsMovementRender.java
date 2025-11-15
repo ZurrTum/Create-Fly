@@ -19,16 +19,12 @@ import com.zurrtum.create.content.contraptions.actors.contraptionControls.Contra
 import com.zurrtum.create.content.contraptions.actors.contraptionControls.ContraptionControlsBlockEntity;
 import com.zurrtum.create.content.contraptions.actors.contraptionControls.ContraptionControlsMovement;
 import com.zurrtum.create.content.contraptions.behaviour.MovementContext;
-import org.joml.Matrix4f;
-import org.joml.Quaternionf;
-
-import java.util.Random;
-
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.LightTexture;
-import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.SubmitNodeCollector;
+import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
@@ -37,6 +33,10 @@ import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
+import org.joml.Matrix4f;
+import org.joml.Quaternionf;
+
+import java.util.Random;
 
 public class ContraptionControlsMovementRender implements MovementRenderBehaviour {
     private static final ThreadLocal<Random> RANDOM = ThreadLocal.withInitial(Random::new);
@@ -62,7 +62,7 @@ public class ContraptionControlsMovementRender implements MovementRenderBehaviou
         if (ClientContraption.getBlockEntityClientSide(context.contraption, pos) instanceof ContraptionControlsBlockEntity cbe) {
             state.buttondepth = -1 / 24f * cbe.button.getValue(AnimationTickHolder.getPartialTicks(renderWorld));
         }
-        state.layer = RenderType.solid();
+        state.layer = RenderTypes.solidMovingBlock();
         Direction facing = blockState.getValue(ContraptionControlsBlock.FACING);
         state.button = CachedBuffers.partialFacing(AllPartialModels.CONTRAPTION_CONTROLS_BUTTON, blockState, facing.getOpposite());
         state.light = LevelRenderer.getLightColor(renderWorld, pos);

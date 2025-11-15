@@ -6,8 +6,8 @@ import com.mojang.math.Axis;
 import com.zurrtum.create.catnip.data.Iterate;
 import com.zurrtum.create.client.AllFluidConfigs;
 import com.zurrtum.create.client.infrastructure.fluid.FluidConfig;
-import com.zurrtum.create.infrastructure.fluids.FluidStack;
 import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Vec3i;
@@ -17,11 +17,6 @@ import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.phys.Vec3;
 
 public class FluidRenderHelper {
-
-    public static VertexConsumer getFluidBuilder(MultiBufferSource buffer) {
-        return buffer.getBuffer(PonderRenderTypes.fluid());
-    }
-
     public static void renderFluidBox(
         Fluid fluid,
         DataComponentPatch changes,
@@ -37,33 +32,16 @@ public class FluidRenderHelper {
         boolean renderBottom,
         boolean invertGasses
     ) {
-        renderFluidBox(fluid, changes, xMin, yMin, zMin, xMax, yMax, zMax, getFluidBuilder(buffer), ms, light, renderBottom, invertGasses);
-    }
-
-    public static void renderFluidBox(
-        FluidStack stack,
-        float xMin,
-        float yMin,
-        float zMin,
-        float xMax,
-        float yMax,
-        float zMax,
-        MultiBufferSource buffer,
-        PoseStack ms,
-        int light,
-        boolean renderBottom,
-        boolean invertGasses
-    ) {
         renderFluidBox(
-            stack.getFluid(),
-            stack.getComponentChanges(),
+            fluid,
+            changes,
             xMin,
             yMin,
             zMin,
             xMax,
             yMax,
             zMax,
-            getFluidBuilder(buffer),
+            buffer.getBuffer(RenderTypes.translucentMovingBlock()),
             ms,
             light,
             renderBottom,

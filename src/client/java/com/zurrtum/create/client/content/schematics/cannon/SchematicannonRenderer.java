@@ -13,7 +13,6 @@ import com.zurrtum.create.content.schematics.cannon.LaunchedItem.ForBelt;
 import com.zurrtum.create.content.schematics.cannon.LaunchedItem.ForBlockState;
 import com.zurrtum.create.content.schematics.cannon.LaunchedItem.ForEntity;
 import com.zurrtum.create.content.schematics.cannon.SchematicannonBlockEntity;
-import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
@@ -21,6 +20,8 @@ import net.minecraft.client.renderer.blockentity.state.BlockEntityRenderState;
 import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
 import net.minecraft.client.renderer.item.ItemModelResolver;
 import net.minecraft.client.renderer.item.ItemStackRenderState;
+import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.state.CameraRenderState;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.core.BlockPos;
@@ -71,7 +72,7 @@ public class SchematicannonRenderer implements BlockEntityRenderer<Schematicanno
             return;
         }
         SchematicannonRenderData data = state.data = new SchematicannonRenderData();
-        data.layer = RenderType.solid();
+        data.layer = RenderTypes.solidMovingBlock();
         double[] cannonAngles = getCannonAngles(be, state.blockPos, tickProgress);
         double recoil = getRecoil(be, tickProgress);
         data.connector = CachedBuffers.partial(AllPartialModels.SCHEMATICANNON_CONNECTOR, state.blockState);

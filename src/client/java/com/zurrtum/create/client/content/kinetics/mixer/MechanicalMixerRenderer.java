@@ -11,12 +11,13 @@ import com.zurrtum.create.client.content.kinetics.base.KineticBlockEntityRendere
 import com.zurrtum.create.client.flywheel.api.visualization.VisualizationManager;
 import com.zurrtum.create.content.kinetics.base.IRotate;
 import com.zurrtum.create.content.kinetics.mixer.MechanicalMixerBlockEntity;
-import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.blockentity.state.BlockEntityRenderState;
 import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
+import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.state.CameraRenderState;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Direction.Axis;
@@ -51,7 +52,7 @@ public class MechanicalMixerRenderer implements BlockEntityRenderer<MechanicalMi
             return;
         }
         BlockEntityRenderState.extractBase(be, state, crumblingOverlay);
-        state.layer = RenderType.cutoutMipped();
+        state.layer = RenderTypes.cutoutMovingBlock();
         state.cogwheel = CachedBuffers.partial(AllPartialModels.SHAFTLESS_COGWHEEL, state.blockState);
         Axis axis = ((IRotate) state.blockState.getBlock()).getRotationAxis(state.blockState);
         state.angle = KineticBlockEntityRenderer.getAngleForBe(be, state.blockPos, axis);

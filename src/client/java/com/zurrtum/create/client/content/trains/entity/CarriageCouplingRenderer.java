@@ -14,7 +14,7 @@ import com.zurrtum.create.content.trains.entity.Train;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.core.BlockPos;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
@@ -30,7 +30,7 @@ import java.util.List;
 public class CarriageCouplingRenderer {
     public static void renderAll(Minecraft client, PoseStack ms, MultiBufferSource buffer, Vec3 camera) {
         Collection<Train> trains = Create.RAILWAYS.trains.values();
-        VertexConsumer vb = buffer.getBuffer(RenderType.solid());
+        VertexConsumer vb = buffer.getBuffer(RenderTypes.solidMovingBlock());
         BlockState air = Blocks.AIR.defaultBlockState();
         float partialTicks = AnimationTickHolder.getPartialTicks();
         Level level = client.level;

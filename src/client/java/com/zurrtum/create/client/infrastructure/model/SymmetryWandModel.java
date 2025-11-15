@@ -5,10 +5,9 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
 import com.mojang.serialization.MapCodec;
 import com.zurrtum.create.client.catnip.animation.AnimationTickHolder;
-import com.zurrtum.create.client.foundation.render.RenderTypes;
+import com.zurrtum.create.client.foundation.render.CreateRenderTypes;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.LightTexture;
-import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.Sheets;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.block.model.BakedQuad;
@@ -20,6 +19,7 @@ import net.minecraft.client.renderer.item.ItemStackRenderState;
 import net.minecraft.client.renderer.item.ItemStackRenderState.FoilType;
 import net.minecraft.client.renderer.item.ItemStackRenderState.LayerRenderState;
 import net.minecraft.client.renderer.item.ModelRenderProperties;
+import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.special.SpecialModelRenderer;
 import net.minecraft.client.resources.model.BlockModelRotation;
 import net.minecraft.client.resources.model.ModelBaker;
@@ -113,10 +113,10 @@ public class SymmetryWandModel implements ItemModel, SpecialModelRenderer<Object
         int i
     ) {
         int maxLight = LightTexture.FULL_BRIGHT;
-        RenderType translucent = RenderTypes.itemGlowingTranslucent();
+        RenderType translucent = CreateRenderTypes.itemGlowingTranslucent();
 
         renderItem(displayContext, matrices, queue, light, overlay, item, Sheets.translucentItemSheet());
-        renderItem(displayContext, matrices, queue, maxLight, overlay, core, RenderTypes.itemGlowingSolid());
+        renderItem(displayContext, matrices, queue, maxLight, overlay, core, CreateRenderTypes.itemGlowingSolid());
         renderItem(displayContext, matrices, queue, maxLight, overlay, coreGlow, translucent);
 
         matrices.pushPose();

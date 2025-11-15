@@ -18,8 +18,9 @@ import com.zurrtum.create.content.contraptions.behaviour.MovementContext;
 import com.zurrtum.create.content.kinetics.drill.DrillBlock;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.renderer.LevelRenderer;
-import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.SubmitNodeCollector;
+import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.util.Mth;
@@ -48,7 +49,7 @@ public class DrillMovementRenderBehaviour implements MovementRenderBehaviour {
             return null;
         }
         DrillMovementRenderState state = new DrillMovementRenderState(context.localPos);
-        state.layer = RenderType.solid();
+        state.layer = RenderTypes.solidMovingBlock();
         BlockState blockState = context.state;
         state.head = CachedBuffers.partial(AllPartialModels.DRILL_HEAD, blockState);
         Direction facing = blockState.getValue(DrillBlock.FACING);

@@ -6,19 +6,19 @@ import com.mojang.math.Axis;
 import com.zurrtum.create.catnip.math.AngleHelper;
 import com.zurrtum.create.client.AllPartialModels;
 import com.zurrtum.create.client.catnip.render.CachedBuffers;
-import com.zurrtum.create.client.catnip.render.PonderRenderTypes;
 import com.zurrtum.create.client.catnip.render.SuperByteBuffer;
 import com.zurrtum.create.client.flywheel.lib.util.ShadersModHelper;
-import com.zurrtum.create.client.foundation.render.RenderTypes;
+import com.zurrtum.create.client.foundation.render.CreateRenderTypes;
 import com.zurrtum.create.content.redstone.displayLink.LinkWithBulbBlockEntity;
 import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.OrderedSubmitNodeCollector;
-import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.blockentity.state.BlockEntityRenderState;
 import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
+import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.state.CameraRenderState;
 import net.minecraft.core.Direction;
 import net.minecraft.util.Mth;
@@ -50,11 +50,11 @@ public class LinkBulbRenderer implements BlockEntityRenderer<LinkWithBulbBlockEn
         state.tube = CachedBuffers.partial(AllPartialModels.DISPLAY_LINK_TUBE, state.blockState);
         float glow = be.getGlow(tickProgress);
         if (glow < .125f) {
-            state.translucent = ShadersModHelper.isShaderPackInUse() ? RenderType.translucentMovingBlock() : PonderRenderTypes.translucent();
+            state.translucent = RenderTypes.translucentMovingBlock();
             return;
         }
-        state.translucent = ShadersModHelper.isShaderPackInUse() ? RenderType.translucentMovingBlock() : RenderTypes.translucent();
-        state.additive = RenderTypes.additive();
+        state.translucent = RenderTypes.translucentMovingBlock();
+        state.additive = CreateRenderTypes.additive();
         state.glow = CachedBuffers.partial(AllPartialModels.DISPLAY_LINK_GLOW, state.blockState);
         glow = (float) (1 - (2 * Math.pow(glow - .75f, 2)));
         glow = Mth.clamp(glow, -1, 1);

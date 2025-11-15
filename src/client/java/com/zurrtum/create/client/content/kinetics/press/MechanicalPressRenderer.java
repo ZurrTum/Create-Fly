@@ -8,9 +8,10 @@ import com.zurrtum.create.client.catnip.render.SuperByteBuffer;
 import com.zurrtum.create.client.content.kinetics.base.KineticBlockEntityRenderer;
 import com.zurrtum.create.content.kinetics.press.MechanicalPressBlockEntity;
 import com.zurrtum.create.content.kinetics.press.PressingBehaviour;
-import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
+import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.phys.Vec3;
@@ -47,7 +48,7 @@ public class MechanicalPressRenderer extends KineticBlockEntityRenderer<Mechanic
 
     @Override
     protected RenderType getRenderType(MechanicalPressBlockEntity be, BlockState state) {
-        return RenderType.solid();
+        return RenderTypes.solidMovingBlock();
     }
 
     @Override

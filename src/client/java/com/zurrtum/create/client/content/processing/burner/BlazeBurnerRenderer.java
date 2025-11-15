@@ -17,12 +17,13 @@ import com.zurrtum.create.content.processing.burner.BlazeBurnerBlockEntity;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.renderer.LightTexture;
-import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.blockentity.state.BlockEntityRenderState;
 import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
+import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.state.CameraRenderState;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.core.Direction;
@@ -136,7 +137,7 @@ public class BlazeBurnerRenderer implements BlockEntityRenderer<BlazeBurnerBlock
         int hashCode
     ) {
         BlazeBurnerRenderData data = new BlazeBurnerRenderData();
-        data.layer = RenderType.solid();
+        data.layer = RenderTypes.solidMovingBlock();
         data.horizontalAngle = horizontalAngle;
         boolean blockAbove = animation > 0.125f;
         float time = AnimationTickHolder.getRenderTime(level);
@@ -158,7 +159,7 @@ public class BlazeBurnerRenderer implements BlockEntityRenderer<BlazeBurnerBlock
             boolean scale = blazeModel == AllPartialModels.BLAZE_INERT;
             data.hat.scale = scale;
             data.hat.offset = data.headY + (scale ? 0.5f : 0.75f);
-            data.hat.layer = RenderType.cutoutMipped();
+            data.hat.layer = RenderTypes.cutoutMovingBlock();
             data.hat.model = CachedBuffers.partial(drawHat, blockState);
             data.hat.angle = horizontalAngle + Mth.PI;
         }
@@ -172,7 +173,7 @@ public class BlazeBurnerRenderer implements BlockEntityRenderer<BlazeBurnerBlock
         }
         if (canDrawFlame && blockAbove) {
             data.flame = new FlameRenderState();
-            data.flame.layer = RenderType.cutoutMipped();
+            data.flame.layer = RenderTypes.cutoutMovingBlock();
             data.flame.model = CachedBuffers.partial(AllPartialModels.BLAZE_BURNER_FLAME, blockState);
             data.flame.angle = horizontalAngle;
             data.flame.spriteShift = heatLevel == HeatLevel.SEETHING ? AllSpriteShifts.SUPER_BURNER_FLAME : AllSpriteShifts.BURNER_FLAME;

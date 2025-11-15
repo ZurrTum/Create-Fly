@@ -10,10 +10,11 @@ import com.zurrtum.create.client.content.logistics.FlapStuffs.FlapsRenderState;
 import com.zurrtum.create.client.flywheel.api.visualization.VisualizationManager;
 import com.zurrtum.create.client.foundation.blockEntity.renderer.SmartBlockEntityRenderer;
 import com.zurrtum.create.content.logistics.tunnel.BeltTunnelBlockEntity;
-import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
+import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.state.CameraRenderState;
 import net.minecraft.core.Direction;
 import net.minecraft.world.phys.Vec3;
@@ -60,7 +61,7 @@ public class BeltTunnelRenderer extends SmartBlockEntityRenderer<BeltTunnelBlock
     public void submit(BeltTunnelRenderState state, PoseStack matrices, SubmitNodeCollector queue, CameraRenderState cameraState) {
         super.submit(state, matrices, queue, cameraState);
         if (state.flaps != null) {
-            RenderType layer = RenderType.solid();
+            RenderType layer = RenderTypes.solidMovingBlock();
             for (FlapsRenderState flap : state.flaps) {
                 flap.render(layer, matrices, queue);
             }

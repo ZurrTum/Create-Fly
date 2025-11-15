@@ -11,7 +11,6 @@ import com.zurrtum.create.catnip.animation.LerpedFloat.Chaser;
 import com.zurrtum.create.client.catnip.animation.AnimationTickHolder;
 import com.zurrtum.create.client.content.redstone.link.controller.LinkedControllerClientHandler;
 import com.zurrtum.create.client.content.redstone.link.controller.LinkedControllerClientHandler.Mode;
-import net.minecraft.util.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.Sheets;
@@ -20,12 +19,15 @@ import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.block.model.TextureSlots;
 import net.minecraft.client.renderer.item.*;
 import net.minecraft.client.renderer.item.ItemStackRenderState.LayerRenderState;
+import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.special.SpecialModelRenderer;
 import net.minecraft.client.resources.model.BlockModelRotation;
 import net.minecraft.client.resources.model.ModelBaker;
 import net.minecraft.client.resources.model.ResolvedModel;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
+import net.minecraft.util.Util;
 import net.minecraft.world.entity.HumanoidArm;
 import net.minecraft.world.entity.ItemOwner;
 import net.minecraft.world.item.ItemDisplayContext;
@@ -78,8 +80,8 @@ public class LinkedControllerModel implements ItemModel, SpecialModelRenderer<Li
         }
     }
 
-    private final net.minecraft.client.renderer.RenderType itemLayer = Sheets.translucentItemSheet();
-    private final net.minecraft.client.renderer.RenderType cutoutLayer = net.minecraft.client.renderer.RenderType.cutout();
+    private final RenderType itemLayer = Sheets.translucentItemSheet();
+    private final RenderType cutoutLayer = RenderTypes.cutoutMovingBlock();
     private final int[] tints = new int[0];
     private final ModelRenderProperties settings;
     private final Supplier<Vector3f[]> vector;
@@ -151,7 +153,7 @@ public class LinkedControllerModel implements ItemModel, SpecialModelRenderer<Li
         int i
     ) {
         assert data != null;
-        render(displayContext, matrices, queue, light, overlay, RenderType.NORMAL, data.equip, data.active, true);
+        render(displayContext, matrices, queue, light, overlay, true, data.equip, data.active, true);
     }
 
     public void renderInLectern(
@@ -163,7 +165,7 @@ public class LinkedControllerModel implements ItemModel, SpecialModelRenderer<Li
         boolean active,
         boolean renderDepression
     ) {
-        render(displayContext, matrices, queue, light, overlay, RenderType.LECTERN, false, active, renderDepression);
+        render(displayContext, matrices, queue, light, overlay, false, false, active, renderDepression);
     }
 
     private void render(
@@ -172,7 +174,7 @@ public class LinkedControllerModel implements ItemModel, SpecialModelRenderer<Li
         SubmitNodeCollector queue,
         int light,
         int overlay,
-        RenderType renderType,
+        boolean normal,
         boolean equip,
         boolean active,
         boolean renderDepression
@@ -198,11 +200,9 @@ public class LinkedControllerModel implements ItemModel, SpecialModelRenderer<Li
             return;
         }
         renderQuads(displayContext, matrices, queue, light, overlay, cutoutLayer, torch);
-        if (renderType == RenderType.NORMAL) {
-            if (LinkedControllerClientHandler.MODE == Mode.BIND) {
-                int i = Mth.lerpInt((Mth.sin(AnimationTickHolder.getRenderTime() / 4f) + 1) / 2, 5, 15);
-                light = i << 20;
-            }
+        if (normal && LinkedControllerClientHandler.MODE == Mode.BIND) {
+            int i = Mth.lerpInt((Mth.sin(AnimationTickHolder.getRenderTime() / 4f) + 1) / 2, 5, 15);
+            light = i << 20;
         }
         float s = 1 / 16f;
         float b = s * -.75f;
@@ -256,7 +256,7 @@ public class LinkedControllerModel implements ItemModel, SpecialModelRenderer<Li
         SubmitNodeCollector queue,
         int light,
         int overlay,
-        net.minecraft.client.renderer.RenderType layer,
+        RenderType layer,
         List<BakedQuad> quads
     ) {
         queue.submitItem(matrices, displayContext, light, overlay, 0, tints, quads, layer, ItemStackRenderState.FoilType.NONE);
@@ -307,10 +307,5 @@ public class LinkedControllerModel implements ItemModel, SpecialModelRenderer<Li
             ResolvedModel model = baker.getModel(id);
             return model.bakeTopGeometry(model.getTopTextureSlots(), baker, BlockModelRotation.X0_Y0).getAll();
         }
-    }
-
-    protected enum RenderType {
-        NORMAL,
-        LECTERN;
     }
 }

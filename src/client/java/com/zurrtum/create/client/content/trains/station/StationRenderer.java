@@ -21,13 +21,14 @@ import com.zurrtum.create.content.trains.track.TrackTargetingBehaviour;
 import com.zurrtum.create.content.trains.track.TrackTargetingBehaviour.RenderedTrackOverlayType;
 import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.LightTexture;
-import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.blockentity.state.BlockEntityRenderState;
 import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
 import net.minecraft.client.renderer.item.ItemModelResolver;
+import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.state.CameraRenderState;
 import net.minecraft.core.BlockPos;
 import net.minecraft.util.Mth;
@@ -113,7 +114,7 @@ public class StationRenderer implements BlockEntityRenderer<StationBlockEntity, 
 
     public void updateFlagState(PartialModel flag, StationBlockEntity be, StationRenderState state, float tickProgress) {
         if (be.resolveFlagAngle()) {
-            state.layer = RenderType.cutoutMipped();
+            state.layer = RenderTypes.cutoutMovingBlock();
             state.flag = CachedBuffers.partial(flag, be.getBlockState());
             float value = be.flag.getValue(tickProgress);
             float progress = (float) (Math.pow(Math.min(value * 5, 1), 2));

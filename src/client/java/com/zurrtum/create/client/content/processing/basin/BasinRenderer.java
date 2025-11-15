@@ -8,8 +8,6 @@ import com.zurrtum.create.catnip.math.AngleHelper;
 import com.zurrtum.create.catnip.math.VecHelper;
 import com.zurrtum.create.client.catnip.animation.AnimationTickHolder;
 import com.zurrtum.create.client.catnip.render.FluidRenderHelper;
-import com.zurrtum.create.client.catnip.render.PonderRenderTypes;
-import com.zurrtum.create.client.flywheel.lib.util.ShadersModHelper;
 import com.zurrtum.create.client.foundation.blockEntity.renderer.SmartBlockEntityRenderer;
 import com.zurrtum.create.content.processing.basin.BasinBlock;
 import com.zurrtum.create.content.processing.basin.BasinBlockEntity;
@@ -18,11 +16,12 @@ import com.zurrtum.create.foundation.blockEntity.behaviour.fluid.SmartFluidTankB
 import com.zurrtum.create.foundation.blockEntity.behaviour.fluid.SmartFluidTankBehaviour.TankSegment;
 import com.zurrtum.create.infrastructure.fluids.BucketFluidInventory;
 import com.zurrtum.create.infrastructure.fluids.FluidStack;
-import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
 import net.minecraft.client.renderer.item.ItemStackRenderState;
+import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.state.CameraRenderState;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.core.BlockPos;
@@ -134,7 +133,7 @@ public class BasinRenderer extends SmartBlockEntityRenderer<BasinBlockEntity, Ba
         }
         float fluidLevel = Mth.clamp(totalUnits / (BucketFluidInventory.CAPACITY * 2), 0, 1);
         fluidLevel = 1 - ((1 - fluidLevel) * (1 - fluidLevel));
-        state.layer = ShadersModHelper.isShaderPackInUse() ? RenderType.translucentMovingBlock() : PonderRenderTypes.fluid();
+        state.layer = RenderTypes.translucentMovingBlock();
         state.fluids = fluids;
         state.yMin = 2 / 16f;
         state.yMax = state.yMin + 12 / 16f * fluidLevel;

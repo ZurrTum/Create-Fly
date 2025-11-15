@@ -17,8 +17,9 @@ import com.zurrtum.create.client.foundation.virtualWorld.VirtualRenderWorld;
 import com.zurrtum.create.content.contraptions.behaviour.MovementContext;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.renderer.LevelRenderer;
-import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.SubmitNodeCollector;
+import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.util.Mth;
@@ -48,7 +49,7 @@ public class RollerMovementRenderBehaviour implements MovementRenderBehaviour {
             return null;
         }
         RollerMovementRenderState state = new RollerMovementRenderState(context.localPos);
-        state.layer = RenderType.cutoutMipped();
+        state.layer = RenderTypes.cutoutMovingBlock();
         BlockState blockState = context.state;
         Direction facing = blockState.getValue(BlockStateProperties.HORIZONTAL_FACING);
         state.wheel = CachedBuffers.partial(AllPartialModels.ROLLER_WHEEL, blockState);

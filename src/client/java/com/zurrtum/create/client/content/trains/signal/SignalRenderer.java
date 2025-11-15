@@ -18,12 +18,13 @@ import com.zurrtum.create.content.trains.track.TrackTargetingBehaviour;
 import com.zurrtum.create.content.trains.track.TrackTargetingBehaviour.RenderedTrackOverlayType;
 import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.LightTexture;
-import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.blockentity.state.BlockEntityRenderState;
 import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
+import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.state.CameraRenderState;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
@@ -56,7 +57,7 @@ public class SignalRenderer implements BlockEntityRenderer<SignalBlockEntity, Si
         state.blockPos = be.getBlockPos();
         state.blockState = be.getBlockState();
         state.blockEntityType = be.getType();
-        state.layer = RenderType.solid();
+        state.layer = RenderTypes.solidMovingBlock();
         float renderTime = AnimationTickHolder.getRenderTime(world);
         if (be.getState().isRedLight(renderTime)) {
             state.model = CachedBuffers.partial(AllPartialModels.SIGNAL_ON, state.blockState);

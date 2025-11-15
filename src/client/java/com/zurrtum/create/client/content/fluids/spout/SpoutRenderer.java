@@ -5,19 +5,18 @@ import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.zurrtum.create.client.AllPartialModels;
 import com.zurrtum.create.client.catnip.render.CachedBuffers;
 import com.zurrtum.create.client.catnip.render.FluidRenderHelper;
-import com.zurrtum.create.client.catnip.render.PonderRenderTypes;
 import com.zurrtum.create.client.catnip.render.SuperByteBuffer;
-import com.zurrtum.create.client.flywheel.lib.util.ShadersModHelper;
 import com.zurrtum.create.content.fluids.spout.SpoutBlockEntity;
 import com.zurrtum.create.foundation.blockEntity.behaviour.fluid.SmartFluidTankBehaviour;
 import com.zurrtum.create.foundation.blockEntity.behaviour.fluid.SmartFluidTankBehaviour.TankSegment;
 import com.zurrtum.create.infrastructure.fluids.FluidStack;
-import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.blockentity.state.BlockEntityRenderState;
 import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
+import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.state.CameraRenderState;
 import net.minecraft.core.component.DataComponentPatch;
 import net.minecraft.util.Mth;
@@ -64,7 +63,7 @@ public class SpoutRenderer implements BlockEntityRenderer<SpoutBlockEntity, Spou
                 float yMin = min - yOffset;
                 float offset = top ? max - min : yOffset;
                 state.fluid = new FluidRenderState(
-                    ShadersModHelper.isShaderPackInUse() ? RenderType.translucentMovingBlock() : PonderRenderTypes.fluid(),
+                    RenderTypes.translucentMovingBlock(),
                     fluidStack.getFluid(),
                     fluidStack.getComponentChanges(),
                     min,
@@ -80,7 +79,7 @@ public class SpoutRenderer implements BlockEntityRenderer<SpoutBlockEntity, Spou
                 radius = (float) (Math.pow(((2 * processingProgress) - 1), 2) - 1);
                 AABB box = new AABB(0.5, 0.0, 0.5, 0.5, -1.2, 0.5).inflate(radius / 32f);
                 state.process = new ProcessRenderState(
-                    PonderRenderTypes.fluid(),
+                    RenderTypes.translucentMovingBlock(),
                     fluidStack.getFluid(),
                     fluidStack.getComponentChanges(),
                     box,
@@ -102,7 +101,7 @@ public class SpoutRenderer implements BlockEntityRenderer<SpoutBlockEntity, Spou
         SuperByteBuffer middle = CachedBuffers.partial(AllPartialModels.SPOUT_MIDDLE, state.blockState);
         SuperByteBuffer bottom = CachedBuffers.partial(AllPartialModels.SPOUT_BOTTOM, state.blockState);
         float offset = -3 * squeeze / 32f;
-        state.bits = new BitsRenderState(RenderType.solid(), top, middle, bottom, offset, state.lightCoords);
+        state.bits = new BitsRenderState(RenderTypes.solidMovingBlock(), top, middle, bottom, offset, state.lightCoords);
     }
 
     @Override

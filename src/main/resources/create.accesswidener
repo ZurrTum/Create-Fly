@@ -280,3 +280,4 @@ accessible	method	net/minecraft/client/renderer/blockentity/BlockEntityRenderers
 accessible	method	net/minecraft/server/level/ServerPlayerGameMode	setGameModeForPlayer	(Lnet/minecraft/world/level/GameType;Lnet/minecraft/world/level/GameType;)V
 accessible	method	net/minecraft/client/renderer/entity/EntityRenderer	affectedByCulling	(Lnet/minecraft/world/entity/Entity;)Z
 accessible	method	net/minecraft/client/renderer/entity/EntityRenderer	getBoundingBoxForCulling	(Lnet/minecraft/world/entity/Entity;)Lnet/minecraft/world/phys/AABB;
+accessible method net/minecraft/client/renderer/rendertype/RenderType create (Ljava/lang/String;Lnet/minecraft/client/renderer/rendertype/RenderSetup;)Lnet/minecraft/client/renderer/rendertype/RenderType;

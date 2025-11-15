@@ -9,10 +9,11 @@ import com.zurrtum.create.client.catnip.render.SuperByteBuffer;
 import com.zurrtum.create.client.foundation.blockEntity.renderer.SmartBlockEntityRenderer;
 import com.zurrtum.create.content.redstone.deskBell.DeskBellBlock;
 import com.zurrtum.create.content.redstone.deskBell.DeskBellBlockEntity;
-import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
+import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.state.CameraRenderState;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.core.Direction;
@@ -43,7 +44,7 @@ public class DeskBellRenderer extends SmartBlockEntityRenderer<DeskBellBlockEnti
         if (p < 0.004 && !state.blockState.getValueOrElse(DeskBellBlock.POWERED, false)) {
             return;
         }
-        state.layer = RenderType.solid();
+        state.layer = RenderTypes.solidMovingBlock();
         float f = (float) (1 - 4 * Math.pow((Math.max(p - 0.5, 0)) - 0.5, 2));
         float f2 = (float) (Math.pow(p, 1.25f));
         Direction facing = state.blockState.getValue(DeskBellBlock.FACING);

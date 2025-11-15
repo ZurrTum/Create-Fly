@@ -18,8 +18,9 @@ import com.zurrtum.create.content.contraptions.actors.psi.PortableStorageInterfa
 import com.zurrtum.create.content.contraptions.behaviour.MovementContext;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.renderer.LevelRenderer;
-import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.SubmitNodeCollector;
+import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.util.Mth;
@@ -48,7 +49,7 @@ public class PortableStorageInterfaceMovementRender implements MovementRenderBeh
             return null;
         }
         PortableStorageInterfaceMovementRenderState state = new PortableStorageInterfaceMovementRenderState(context.localPos);
-        state.layer = RenderType.solid();
+        state.layer = RenderTypes.solidMovingBlock();
         BlockState blockState = context.state;
         float renderPartialTicks = AnimationTickHolder.getPartialTicks();
         LerpedFloat animation = PortableStorageInterfaceMovement.getAnimation(context);

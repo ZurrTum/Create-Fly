@@ -11,8 +11,11 @@ import com.zurrtum.create.client.catnip.animation.AnimationTickHolder;
 import com.zurrtum.create.client.catnip.client.render.model.BakedModelBufferer;
 import com.zurrtum.create.client.catnip.client.render.model.ShadeSeparatedResultConsumer;
 import com.zurrtum.create.client.catnip.outliner.AABBOutline;
-import com.zurrtum.create.client.catnip.render.*;
+import com.zurrtum.create.client.catnip.render.SuperByteBuffer;
+import com.zurrtum.create.client.catnip.render.SuperByteBufferBuilder;
+import com.zurrtum.create.client.catnip.render.SuperByteBufferCache;
 import com.zurrtum.create.client.catnip.render.SuperByteBufferCache.Compartment;
+import com.zurrtum.create.client.catnip.render.SuperRenderTypeBuffer;
 import com.zurrtum.create.client.flywheel.lib.transform.TransformStack;
 import com.zurrtum.create.client.ponder.Ponder;
 import com.zurrtum.create.client.ponder.api.element.WorldSectionElement;
@@ -22,7 +25,6 @@ import com.zurrtum.create.client.ponder.foundation.PonderScene;
 import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.block.BlockRenderDispatcher;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderDispatcher;
@@ -31,6 +33,8 @@ import net.minecraft.client.renderer.blockentity.state.BlockEntityRenderState;
 import net.minecraft.client.renderer.chunk.ChunkSectionLayer;
 import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
 import net.minecraft.client.renderer.item.ItemModelResolver;
+import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.state.CameraRenderState;
 import net.minecraft.client.resources.model.ModelBakery;
 import net.minecraft.core.BlockPos;
@@ -378,11 +382,10 @@ public class WorldSectionElementImpl extends AnimatedSceneElementBase implements
 
         int light = lightCoordsFromFade(fade);
         RenderType layer = switch (type) {
-            case CUTOUT -> RenderType.cutout();
-            case SOLID -> RenderType.solid();
-            case CUTOUT_MIPPED -> RenderType.cutoutMipped();
-            case TRANSLUCENT -> PonderRenderTypes.translucent();
-            case TRIPWIRE -> RenderType.tripwire();
+            case SOLID -> RenderTypes.solidMovingBlock();
+            case CUTOUT -> RenderTypes.cutoutMovingBlock();
+            case TRANSLUCENT -> RenderTypes.translucentMovingBlock();
+            case TRIPWIRE -> RenderTypes.tripwireMovingBlock();
         };
         structureBuffer.light(light).renderInto(poseStack.last(), buffer.getBuffer(layer));
     }

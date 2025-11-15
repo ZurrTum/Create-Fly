@@ -7,7 +7,7 @@ import com.zurrtum.create.client.AllSpriteShifts;
 import com.zurrtum.create.client.catnip.render.CachedBuffers;
 import com.zurrtum.create.client.content.trains.bogey.BogeyBlockEntityRenderer.BogeyRenderState;
 import com.zurrtum.create.content.kinetics.simpleRelays.ShaftBlock;
-import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.util.Mth;
@@ -17,7 +17,7 @@ import org.jetbrains.annotations.Nullable;
 
 public class StandardBogeyRenderer implements BogeyRenderer {
     public static void updateRenderState(StandardBogeyRenderState data, float wheelAngle, int light) {
-        data.layer = RenderType.cutoutMipped();
+        data.layer = RenderTypes.cutoutMovingBlock();
         data.shaft = CachedBuffers.block(AllBlocks.SHAFT.defaultBlockState().setValue(ShaftBlock.AXIS, Direction.Axis.Z));
         data.angle = Mth.DEG_TO_RAD * wheelAngle;
         data.light = light;

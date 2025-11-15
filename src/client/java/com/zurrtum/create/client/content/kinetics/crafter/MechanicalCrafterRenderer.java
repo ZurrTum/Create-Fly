@@ -19,7 +19,6 @@ import com.zurrtum.create.content.kinetics.crafter.MechanicalCrafterBlock;
 import com.zurrtum.create.content.kinetics.crafter.MechanicalCrafterBlockEntity;
 import com.zurrtum.create.content.kinetics.crafter.MechanicalCrafterBlockEntity.Phase;
 import com.zurrtum.create.content.kinetics.crafter.RecipeGridHandler.GroupedItems;
-import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
@@ -27,6 +26,8 @@ import net.minecraft.client.renderer.blockentity.state.BlockEntityRenderState;
 import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
 import net.minecraft.client.renderer.item.ItemModelResolver;
 import net.minecraft.client.renderer.item.ItemStackRenderState;
+import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.state.CameraRenderState;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.core.BlockPos;
@@ -81,7 +82,7 @@ public class MechanicalCrafterRenderer implements BlockEntityRenderer<Mechanical
             state.offset = vec;
             state.yRot = Mth.DEG_TO_RAD * yRot;
         }
-        state.layer = RenderType.solid();
+        state.layer = RenderTypes.solidMovingBlock();
         if (!VisualizationManager.supportsVisualization(world)) {
             state.cogwheel = CogwheelRenderState.create(be, state.blockState, state.blockPos, facing);
         }

@@ -18,7 +18,6 @@ import com.zurrtum.create.content.kinetics.base.IRotate;
 import com.zurrtum.create.content.kinetics.deployer.DeployerBlockEntity;
 import com.zurrtum.create.content.kinetics.deployer.DeployerBlockEntity.Mode;
 import com.zurrtum.create.content.kinetics.deployer.DeployerBlockEntity.State;
-import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
@@ -26,6 +25,8 @@ import net.minecraft.client.renderer.blockentity.state.BlockEntityRenderState;
 import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
 import net.minecraft.client.renderer.item.ItemModelResolver;
 import net.minecraft.client.renderer.item.ItemStackRenderState;
+import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.state.CameraRenderState;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.core.BlockPos;
@@ -116,7 +117,7 @@ public class DeployerRenderer implements BlockEntityRenderer<DeployerBlockEntity
             return;
         }
         ComponentsRenderState components = state.components = new ComponentsRenderState();
-        components.layer = RenderType.solid();
+        components.layer = RenderTypes.solidMovingBlock();
         components.light = state.lightCoords;
         Axis axis = ((IRotate) state.blockState.getBlock()).getRotationAxis(state.blockState);
         components.shaft = CachedBuffers.block(KineticBlockEntityRenderer.KINETIC_BLOCK, KineticBlockEntityRenderer.shaft(axis));

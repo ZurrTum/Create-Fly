@@ -19,8 +19,9 @@ import com.zurrtum.create.content.contraptions.OrientedContraptionEntity;
 import com.zurrtum.create.content.contraptions.behaviour.MovementContext;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.renderer.LevelRenderer;
-import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.SubmitNodeCollector;
+import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.Level;
@@ -49,7 +50,7 @@ public class StabilizedBearingMovementRenderBehaviour implements MovementRenderB
             return null;
         }
         StabilizedBearingMovementRenderState state = new StabilizedBearingMovementRenderState(context.localPos);
-        state.layer = RenderType.solid();
+        state.layer = RenderTypes.solidMovingBlock();
         Direction facing = context.state.getValue(BlockStateProperties.FACING);
         state.top = CachedBuffers.partial(AllPartialModels.BEARING_TOP, context.state);
         // rotate to match blockstate

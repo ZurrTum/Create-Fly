@@ -18,7 +18,7 @@ import com.zurrtum.create.content.trains.track.TrackBlockEntity;
 import com.zurrtum.create.content.trains.track.TrackTargetingBehaviour.RenderedTrackOverlayType;
 import com.zurrtum.create.infrastructure.component.BezierTrackPointLocation;
 import net.minecraft.client.renderer.LevelRenderer;
-import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Direction.AxisDirection;
@@ -144,7 +144,7 @@ public class StandardTrackBlockRenderer implements TrackBlockRenderer {
             state.xRot2 = Mth.DEG_TO_RAD * (float) (-direction.getStep() * trackTE.tilt.smoothingAngle.get());
             state.offset3 = (float) (yOffset / 2);
         }
-        state.layer = RenderType.cutoutMipped();
+        state.layer = RenderTypes.cutoutMovingBlock();
         PartialModel partial = switch (type) {
             case DUAL_SIGNAL -> AllPartialModels.TRACK_SIGNAL_DUAL_OVERLAY;
             case OBSERVER -> AllPartialModels.TRACK_OBSERVER_OVERLAY;
@@ -172,7 +172,7 @@ public class StandardTrackBlockRenderer implements TrackBlockRenderer {
             return null;
         }
         StandardTrackAssemblyRenderState state = new StandardTrackAssemblyRenderState();
-        state.layer = RenderType.cutoutMipped();
+        state.layer = RenderTypes.cutoutMovingBlock();
         state.offset = offset;
         state.angle = AngleHelper.rad(AngleHelper.horizontalAngle(direction));
         state.model = CachedBuffers.partial(AllPartialModels.TRACK_ASSEMBLING_OVERLAY, blockState);

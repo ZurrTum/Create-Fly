@@ -8,12 +8,13 @@ import com.zurrtum.create.client.catnip.render.CachedBuffers;
 import com.zurrtum.create.client.catnip.render.SuperByteBuffer;
 import com.zurrtum.create.content.equipment.bell.AbstractBellBlockEntity;
 import com.zurrtum.create.content.equipment.bell.PeculiarBellBlockEntity;
-import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.blockentity.state.BlockEntityRenderState;
 import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
+import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.state.CameraRenderState;
 import net.minecraft.core.Direction;
 import net.minecraft.util.Mth;
@@ -40,7 +41,7 @@ public class BellRenderer<BE extends AbstractBellBlockEntity> implements BlockEn
         @Nullable ModelFeatureRenderer.CrumblingOverlay crumblingOverlay
     ) {
         BlockEntityRenderState.extractBase(be, state, crumblingOverlay);
-        state.layer = RenderType.cutout();
+        state.layer = RenderTypes.cutoutMovingBlock();
         state.model = CachedBuffers.partial(
             be instanceof PeculiarBellBlockEntity ? AllPartialModels.PECULIAR_BELL : AllPartialModels.HAUNTED_BELL,
             state.blockState

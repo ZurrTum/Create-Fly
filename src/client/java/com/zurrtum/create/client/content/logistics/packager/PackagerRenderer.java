@@ -12,7 +12,6 @@ import com.zurrtum.create.client.flywheel.api.visualization.VisualizationManager
 import com.zurrtum.create.client.flywheel.lib.model.baked.PartialModel;
 import com.zurrtum.create.content.logistics.packager.PackagerBlock;
 import com.zurrtum.create.content.logistics.packager.PackagerBlockEntity;
-import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
@@ -20,6 +19,8 @@ import net.minecraft.client.renderer.blockentity.state.BlockEntityRenderState;
 import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
 import net.minecraft.client.renderer.item.ItemModelResolver;
 import net.minecraft.client.renderer.item.ItemStackRenderState;
+import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.state.CameraRenderState;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.core.Direction;
@@ -64,7 +65,7 @@ public class PackagerRenderer implements BlockEntityRenderer<PackagerBlockEntity
         state.trayOffset = Vec3.atLowerCornerOf(facing.getUnitVec3i()).scale(trayOffset);
         state.trayYRot = Mth.DEG_TO_RAD * facing.toYRot();
         if (!support) {
-            state.layer = RenderType.cutoutMipped();
+            state.layer = RenderTypes.cutoutMovingBlock();
             state.hatch = CachedBuffers.partial(getHatchModel(be), state.blockState);
             state.hatchOffset = Vec3.atLowerCornerOf(facing.getUnitVec3i()).scale(.49999f);
             state.hatchYRot = Mth.DEG_TO_RAD * AngleHelper.horizontalAngle(facing);

@@ -18,8 +18,9 @@ import com.zurrtum.create.content.contraptions.behaviour.MovementContext;
 import com.zurrtum.create.content.trains.entity.CarriageContraptionEntity;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.renderer.LevelRenderer;
-import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.SubmitNodeCollector;
+import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.util.Mth;
@@ -63,7 +64,7 @@ public class ControlsMovementRenderBehaviour implements MovementRenderBehaviour 
         }
         float pt = AnimationTickHolder.getPartialTicks(context.world);
         ControlsMovementRenderState state = new ControlsMovementRenderState(context.localPos);
-        state.layer = RenderType.cutoutMipped();
+        state.layer = RenderTypes.cutoutMovingBlock();
         state.cover = CachedBuffers.partial(AllPartialModels.TRAIN_CONTROLS_COVER, blockState);
         state.lever = CachedBuffers.partial(AllPartialModels.TRAIN_CONTROLS_LEVER, blockState);
         state.yRot = Mth.DEG_TO_RAD * (180 + AngleHelper.horizontalAngle(facing));

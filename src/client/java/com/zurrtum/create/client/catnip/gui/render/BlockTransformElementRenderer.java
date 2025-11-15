@@ -16,6 +16,7 @@ import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.renderer.Sheets;
 import net.minecraft.client.renderer.chunk.ChunkSectionLayer;
 import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.RedstoneTorchBlock;
@@ -74,7 +75,7 @@ public class BlockTransformElementRenderer extends PictureInPictureRenderer<Bloc
             Minecraft mc = Minecraft.getInstance();
             RenderType layer;
             if (block.state().is(Blocks.REDSTONE_TORCH) && block.state().getValue(RedstoneTorchBlock.LIT)) {
-                layer = RenderType.cutout();
+                layer = RenderTypes.cutoutMovingBlock();
             } else {
                 layer = ItemBlockRenderTypes.getChunkRenderType(block.state()) == ChunkSectionLayer.TRANSLUCENT ? Sheets.translucentItemSheet() : Sheets.cutoutBlockSheet();
             }

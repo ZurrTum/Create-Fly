@@ -13,12 +13,13 @@ import com.zurrtum.create.content.kinetics.speedController.SpeedControllerBlock;
 import com.zurrtum.create.content.kinetics.speedController.SpeedControllerBlockEntity;
 import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.LightTexture;
-import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.blockentity.state.BlockEntityRenderState;
 import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
+import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.state.CameraRenderState;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Direction.Axis;
@@ -61,7 +62,7 @@ public class SpeedControllerRenderer implements BlockEntityRenderer<SpeedControl
             state.bracketLight = world != null ? LevelRenderer.getLightColor(world, state.blockPos.above()) : LightTexture.FULL_BRIGHT;
         }
         if (state.render || state.hasBracket) {
-            state.layer = RenderType.solid();
+            state.layer = RenderTypes.solidMovingBlock();
         }
     }
 

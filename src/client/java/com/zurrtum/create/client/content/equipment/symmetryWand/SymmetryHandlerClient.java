@@ -13,16 +13,12 @@ import com.zurrtum.create.content.equipment.symmetryWand.mirror.EmptyMirror;
 import com.zurrtum.create.content.equipment.symmetryWand.mirror.PlaneMirror;
 import com.zurrtum.create.content.equipment.symmetryWand.mirror.TriplePlaneMirror;
 import com.zurrtum.create.infrastructure.component.SymmetryMirror;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.List;
-
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.block.model.SimpleModelWrapper;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.DustParticleOptions;
@@ -33,6 +29,9 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.Vec3;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.List;
 
 public class SymmetryHandlerClient {
     private static int tickCounter = 0;
@@ -60,7 +59,7 @@ public class SymmetryHandlerClient {
             ms.translate(0, yShift + .2f, 0);
             applyModelTransform(mirror, ms);
             SimpleModelWrapper model = getModel(mirror).get();
-            VertexConsumer builder = buffer.getBuffer(RenderType.solid());
+            VertexConsumer builder = buffer.getBuffer(RenderTypes.solidMovingBlock());
 
             mc.getBlockRenderer().getModelRenderer()
                 .tesselateBlock(mc.level, List.of(model), Blocks.AIR.defaultBlockState(), pos, ms, builder, true, OverlayTexture.NO_OVERLAY);

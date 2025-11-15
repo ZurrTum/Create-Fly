@@ -9,12 +9,13 @@ import com.zurrtum.create.client.flywheel.api.visualization.VisualizationManager
 import com.zurrtum.create.client.foundation.blockEntity.renderer.SmartBlockEntityRenderer;
 import com.zurrtum.create.client.foundation.blockEntity.renderer.SmartBlockEntityRenderer.NameplateRenderState;
 import com.zurrtum.create.content.logistics.packagePort.frogport.FrogportBlockEntity;
-import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.blockentity.state.BlockEntityRenderState;
 import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
+import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.state.CameraRenderState;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -64,7 +65,7 @@ public class FrogportRenderer implements BlockEntityRenderer<FrogportBlockEntity
             return;
         }
         FrogportRenderData data = state.data = new FrogportRenderData();
-        data.layer = RenderType.cutoutMipped();
+        data.layer = RenderTypes.cutoutMovingBlock();
         data.body = CachedBuffers.partial(AllPartialModels.FROGPORT_BODY, state.blockState);
         Vec3 diff;
         float tongueLength, headPitch, headPitchModifier;

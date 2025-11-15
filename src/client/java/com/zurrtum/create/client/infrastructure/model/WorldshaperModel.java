@@ -10,7 +10,7 @@ import com.zurrtum.create.AllDataComponents;
 import com.zurrtum.create.client.Create;
 import com.zurrtum.create.client.catnip.animation.AnimationTickHolder;
 import com.zurrtum.create.client.flywheel.lib.model.baked.SinglePosVirtualBlockGetter;
-import com.zurrtum.create.client.foundation.render.RenderTypes;
+import com.zurrtum.create.client.foundation.render.CreateRenderTypes;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.player.LocalPlayer;
@@ -156,8 +156,8 @@ public class WorldshaperModel implements ItemModel, SpecialModelRenderer<Worldsh
             multiplier = Mth.sin(worldTime * 5);
         int lightItensity = (int) (15 * Mth.clamp(multiplier, 0, 1));
         int glowLight = LightTexture.pack(lightItensity, Math.max(lightItensity, 4));
-        renderItem(displayContext, matrices, queue, glowLight, overlay, core, RenderTypes.itemGlowingSolid());
-        renderItem(displayContext, matrices, queue, glowLight, overlay, coreGlow, RenderTypes.itemGlowingTranslucent());
+        renderItem(displayContext, matrices, queue, glowLight, overlay, core, CreateRenderTypes.itemGlowingSolid());
+        renderItem(displayContext, matrices, queue, glowLight, overlay, coreGlow, CreateRenderTypes.itemGlowingTranslucent());
 
         // Accelerator spins
         float angle = worldTime * -25;

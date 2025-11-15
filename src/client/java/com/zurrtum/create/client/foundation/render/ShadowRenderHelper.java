@@ -4,8 +4,9 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.SubmitNodeCollector;
+import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.Identifier;
@@ -22,7 +23,7 @@ import net.minecraft.world.phys.shapes.VoxelShape;
  */
 public class ShadowRenderHelper {
 
-    private static final RenderType SHADOW_LAYER = RenderType.entityShadow(Identifier.withDefaultNamespace("textures/misc/shadow.png"));
+    private static final RenderType SHADOW_LAYER = RenderTypes.entityShadow(Identifier.withDefaultNamespace("textures/misc/shadow.png"));
 
     public static void renderShadow(PoseStack matrixStack, SubmitNodeCollector queue, float opacity, float radius) {
         queue.submitCustomGeometry(matrixStack, SHADOW_LAYER, new ShadowRenderState(opacity / 2, radius, -1 * radius));

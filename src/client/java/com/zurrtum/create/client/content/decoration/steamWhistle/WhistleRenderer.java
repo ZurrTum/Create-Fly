@@ -15,12 +15,13 @@ import com.zurrtum.create.content.decoration.steamWhistle.WhistleBlock.WhistleSi
 import com.zurrtum.create.content.decoration.steamWhistle.WhistleBlockEntity;
 import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.LightTexture;
-import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.blockentity.state.BlockEntityRenderState;
 import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
+import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.state.CameraRenderState;
 import net.minecraft.core.Direction;
 import net.minecraft.util.Mth;
@@ -54,7 +55,7 @@ public class WhistleRenderer implements BlockEntityRenderer<WhistleBlockEntity, 
         Level world = be.getLevel();
         state.lightCoords = world != null ? LevelRenderer.getLightColor(world, state.blockPos) : LightTexture.FULL_BRIGHT;
         state.breakProgress = crumblingOverlay;
-        state.layer = RenderType.solid();
+        state.layer = RenderTypes.solidMovingBlock();
         Direction direction = state.blockState.getValue(WhistleBlock.FACING);
         WhistleSize size = state.blockState.getValue(WhistleBlock.SIZE);
         PartialModel mouth = size == WhistleSize.LARGE ? AllPartialModels.WHISTLE_MOUTH_LARGE : size == WhistleSize.MEDIUM ? AllPartialModels.WHISTLE_MOUTH_MEDIUM : AllPartialModels.WHISTLE_MOUTH_SMALL;

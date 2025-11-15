@@ -10,12 +10,13 @@ import com.zurrtum.create.client.catnip.render.SuperByteBuffer;
 import com.zurrtum.create.content.contraptions.chassis.StickerBlock;
 import com.zurrtum.create.content.contraptions.chassis.StickerBlockEntity;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.blockentity.state.BlockEntityRenderState;
 import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
+import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.state.CameraRenderState;
 import net.minecraft.core.Direction;
 import net.minecraft.util.Mth;
@@ -42,7 +43,7 @@ public class StickerRenderer implements BlockEntityRenderer<StickerBlockEntity, 
     ) {
         Level world = be.getLevel();
         BlockEntityRenderState.extractBase(be, state, crumblingOverlay);
-        state.layer = RenderType.solid();
+        state.layer = RenderTypes.solidMovingBlock();
         state.head = CachedBuffers.partial(AllPartialModels.STICKER_HEAD, state.blockState);
         state.seed = be.hashCode();
         Direction facing = state.blockState.getValue(StickerBlock.FACING);

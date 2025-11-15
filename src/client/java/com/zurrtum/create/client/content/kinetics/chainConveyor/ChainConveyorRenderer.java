@@ -9,17 +9,18 @@ import com.zurrtum.create.client.catnip.animation.AnimationTickHolder;
 import com.zurrtum.create.client.catnip.render.CachedBuffers;
 import com.zurrtum.create.client.catnip.render.SuperByteBuffer;
 import com.zurrtum.create.client.content.kinetics.base.KineticBlockEntityRenderer;
-import com.zurrtum.create.client.foundation.render.RenderTypes;
+import com.zurrtum.create.client.foundation.render.CreateRenderTypes;
 import com.zurrtum.create.content.kinetics.chainConveyor.ChainConveyorBlockEntity;
 import com.zurrtum.create.content.kinetics.chainConveyor.ChainConveyorBlockEntity.ConnectionStats;
 import com.zurrtum.create.content.kinetics.chainConveyor.ChainConveyorPackage;
 import com.zurrtum.create.content.logistics.box.PackageItem;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.LightTexture;
-import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
+import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.state.CameraRenderState;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.core.BlockPos;
@@ -69,13 +70,13 @@ public class ChainConveyorRenderer extends KineticBlockEntityRenderer<ChainConve
             }
             state.blockPos = pos;
             state.blockEntityType = be.getType();
-            state.chain = RenderTypes.chain(CHAIN_LOCATION);
+            state.chain = CreateRenderTypes.chain(CHAIN_LOCATION);
             return;
         }
         state.chains = getChainsRenderState(be, world, state.blockPos, cameraPos);
         state.wheel = CachedBuffers.partial(AllPartialModels.CHAIN_CONVEYOR_WHEEL, state.blockState);
         if (state.chains != null) {
-            state.chain = RenderTypes.chain(CHAIN_LOCATION);
+            state.chain = CreateRenderTypes.chain(CHAIN_LOCATION);
             state.guard = CachedBuffers.partial(AllPartialModels.CHAIN_CONVEYOR_GUARD, state.blockState);
         }
         List<BoxRenderState> boxes = new ArrayList<>();
@@ -281,7 +282,7 @@ public class ChainConveyorRenderer extends KineticBlockEntityRenderer<ChainConve
 
     @Override
     protected RenderType getRenderType(ChainConveyorBlockEntity be, BlockState state) {
-        return RenderType.cutoutMipped();
+        return RenderTypes.cutoutMovingBlock();
     }
 
     public static class ChainConveyorRenderState extends KineticRenderState {

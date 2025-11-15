@@ -15,10 +15,11 @@ import com.zurrtum.create.content.kinetics.clock.CuckooClockBlockEntity;
 import com.zurrtum.create.content.kinetics.clock.CuckooClockBlockEntity.Animation;
 import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.LightTexture;
-import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
+import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.state.CameraRenderState;
 import net.minecraft.core.Direction;
 import net.minecraft.util.Mth;
@@ -52,7 +53,7 @@ public class CuckooClockRenderer extends KineticBlockEntityRenderer<CuckooClockB
             state.blockEntityType = be.getType();
             Level world = be.getLevel();
             state.lightCoords = world != null ? LevelRenderer.getLightColor(world, state.blockPos) : LightTexture.FULL_BRIGHT;
-            state.layer = RenderType.solid();
+            state.layer = RenderTypes.solidMovingBlock();
             state.facing = state.blockState.getValue(CuckooClockBlock.HORIZONTAL_FACING);
         }
         state.hourHand = CachedBuffers.partial(AllPartialModels.CUCKOO_HOUR_HAND, state.blockState);
@@ -105,7 +106,7 @@ public class CuckooClockRenderer extends KineticBlockEntityRenderer<CuckooClockB
 
     @Override
     protected RenderType getRenderType(CuckooClockBlockEntity be, BlockState state) {
-        return RenderType.solid();
+        return RenderTypes.solidMovingBlock();
     }
 
     @Override

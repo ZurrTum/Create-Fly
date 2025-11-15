@@ -12,12 +12,13 @@ import com.zurrtum.create.client.flywheel.api.visualization.VisualizationManager
 import com.zurrtum.create.content.kinetics.steamEngine.PoweredShaftBlockEntity;
 import com.zurrtum.create.content.kinetics.steamEngine.SteamEngineBlock;
 import com.zurrtum.create.content.kinetics.steamEngine.SteamEngineBlockEntity;
-import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.blockentity.state.BlockEntityRenderState;
 import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
+import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.state.CameraRenderState;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Direction.Axis;
@@ -51,7 +52,7 @@ public class SteamEngineRenderer implements BlockEntityRenderer<SteamEngineBlock
             return;
         }
         BlockEntityRenderState.extractBase(be, state, crumblingOverlay);
-        state.layer = RenderType.solid();
+        state.layer = RenderTypes.solidMovingBlock();
         Direction facing = SteamEngineBlock.getFacing(state.blockState);
         Axis facingAxis = facing.getAxis();
         Axis axis = Axis.Y;

@@ -11,12 +11,13 @@ import com.zurrtum.create.client.flywheel.api.visualization.VisualizationManager
 import com.zurrtum.create.client.flywheel.lib.model.baked.PartialModel;
 import com.zurrtum.create.content.contraptions.actors.psi.PortableStorageInterfaceBlock;
 import com.zurrtum.create.content.contraptions.actors.psi.PortableStorageInterfaceBlockEntity;
-import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.blockentity.state.BlockEntityRenderState;
 import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
+import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.state.CameraRenderState;
 import net.minecraft.core.Direction;
 import net.minecraft.util.Mth;
@@ -45,7 +46,7 @@ public class PortableStorageInterfaceRenderer implements BlockEntityRenderer<Por
             return;
         }
         BlockEntityRenderState.extractBase(be, state, crumblingOverlay);
-        state.layer = RenderType.solid();
+        state.layer = RenderTypes.solidMovingBlock();
         state.middle = CachedBuffers.partial(getMiddleForState(state.blockState, be.isConnected()), state.blockState);
         state.top = CachedBuffers.partial(getTopForState(state.blockState), state.blockState);
         Direction facing = state.blockState.getValue(PortableStorageInterfaceBlock.FACING);

@@ -11,11 +11,12 @@ import com.zurrtum.create.client.flywheel.api.visualization.VisualizationManager
 import com.zurrtum.create.client.flywheel.lib.model.baked.PartialModel;
 import com.zurrtum.create.content.logistics.box.PackageEntity;
 import com.zurrtum.create.content.logistics.box.PackageItem;
-import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.state.EntityRenderState;
+import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.state.CameraRenderState;
 import net.minecraft.core.Direction;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -62,7 +63,7 @@ public class PackageRenderer extends EntityRenderer<PackageEntity, PackageRender
 
     public static BoxRenderState getBoxRenderState(int id, float yaw, int light, PartialModel model) {
         BoxRenderState state = new BoxRenderState();
-        state.layer = RenderType.solid();
+        state.layer = RenderTypes.solidMovingBlock();
         state.model = CachedBuffers.partial(model, Blocks.AIR.defaultBlockState());
         state.angle = -AngleHelper.rad(yaw + 90);
         state.nudge = id;

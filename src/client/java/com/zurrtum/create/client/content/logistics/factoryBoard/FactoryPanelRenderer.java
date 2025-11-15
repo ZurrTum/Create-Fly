@@ -6,19 +6,19 @@ import com.zurrtum.create.catnip.theme.Color;
 import com.zurrtum.create.client.AllPartialModels;
 import com.zurrtum.create.client.AllSpriteShifts;
 import com.zurrtum.create.client.catnip.render.CachedBuffers;
-import com.zurrtum.create.client.catnip.render.PonderRenderTypes;
 import com.zurrtum.create.client.catnip.render.SuperByteBuffer;
 import com.zurrtum.create.client.flywheel.lib.model.baked.PartialModel;
 import com.zurrtum.create.client.foundation.blockEntity.renderer.SmartBlockEntityRenderer;
-import com.zurrtum.create.client.foundation.render.RenderTypes;
+import com.zurrtum.create.client.foundation.render.CreateRenderTypes;
 import com.zurrtum.create.content.logistics.factoryBoard.*;
 import com.zurrtum.create.content.redstone.displayLink.DisplayLinkBlockEntity;
 import com.zurrtum.create.content.redstone.link.RedstoneLinkBlockEntity;
 import net.minecraft.client.renderer.LightTexture;
-import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
+import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.state.CameraRenderState;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.core.Direction;
@@ -102,14 +102,14 @@ public class FactoryPanelRenderer extends SmartBlockEntityRenderer<FactoryPanelB
         state.yRot = FactoryPanelBlock.getYRot(state.blockState);
         state.panels = panels;
         if (layers[0]) {
-            state.cutout = RenderType.cutoutMipped();
+            state.cutout = RenderTypes.cutoutMovingBlock();
         }
         if (layers[1]) {
-            state.translucent1 = PonderRenderTypes.translucent();
+            state.translucent1 = RenderTypes.translucentMovingBlock();
         }
         if (layers[2]) {
-            state.translucent2 = RenderTypes.translucent();
-            state.additive = RenderTypes.additive();
+            state.translucent2 = CreateRenderTypes.translucent();
+            state.additive = CreateRenderTypes.additive();
         }
     }
 

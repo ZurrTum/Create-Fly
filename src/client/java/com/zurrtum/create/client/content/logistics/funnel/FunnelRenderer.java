@@ -11,10 +11,10 @@ import com.zurrtum.create.client.flywheel.lib.model.baked.PartialModel;
 import com.zurrtum.create.client.foundation.blockEntity.renderer.SmartBlockEntityRenderer;
 import com.zurrtum.create.content.logistics.funnel.FunnelBlock;
 import com.zurrtum.create.content.logistics.funnel.FunnelBlockEntity;
-import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.state.CameraRenderState;
 import net.minecraft.core.Direction;
 import net.minecraft.world.phys.Vec3;
@@ -56,7 +56,7 @@ public class FunnelRenderer extends SmartBlockEntityRenderer<FunnelBlockEntity, 
     public void submit(FunnelRenderState state, PoseStack matrices, SubmitNodeCollector queue, CameraRenderState cameraState) {
         super.submit(state, matrices, queue, cameraState);
         if (state.flap != null) {
-            state.flap.render(RenderType.solid(), matrices, queue);
+            state.flap.render(RenderTypes.solidMovingBlock(), matrices, queue);
         }
     }
 

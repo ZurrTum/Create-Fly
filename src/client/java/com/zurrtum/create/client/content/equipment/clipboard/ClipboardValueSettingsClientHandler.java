@@ -18,7 +18,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.RegistryAccess;
@@ -69,7 +69,7 @@ public class ClipboardValueSettingsClientHandler {
         if (shape.isEmpty())
             return false;
 
-        VertexConsumer vb = vertexConsumerProvider.getBuffer(RenderType.lines());
+        VertexConsumer vb = vertexConsumerProvider.getBuffer(RenderTypes.lines());
 
         ms.pushPose();
         ms.translate(pos.getX() - camPos.x, pos.getY() - camPos.y, pos.getZ() - camPos.z);

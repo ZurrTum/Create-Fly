@@ -19,11 +19,12 @@ import com.zurrtum.create.content.logistics.depot.EjectorBlock;
 import com.zurrtum.create.content.logistics.depot.EjectorBlockEntity;
 import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.LightTexture;
-import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
 import net.minecraft.client.renderer.item.ItemModelResolver;
+import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.state.CameraRenderState;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.Level;
@@ -96,7 +97,7 @@ public class EjectorRenderer extends ShaftRenderer<EjectorBlockEntity, EjectorRe
 
     @Override
     protected RenderType getRenderType(EjectorBlockEntity be, BlockState state) {
-        return RenderType.solid();
+        return RenderTypes.solidMovingBlock();
     }
 
     @Override
