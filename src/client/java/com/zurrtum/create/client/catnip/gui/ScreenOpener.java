@@ -1,15 +1,14 @@
 package com.zurrtum.create.client.catnip.gui;
 
 import com.zurrtum.create.catnip.animation.LerpedFloat;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.screens.Screen;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Deque;
 import java.util.List;
-
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.screens.Screen;
 
 public class ScreenOpener {
 
@@ -100,7 +99,7 @@ public class ScreenOpener {
             Minecraft.getInstance().setScreen(screen);
             Screen previouslyRenderedScreen = getPreviouslyRenderedScreen();
             if (previouslyRenderedScreen != null && screen instanceof NavigatableSimiScreen)
-                previouslyRenderedScreen.init(Minecraft.getInstance(), screen.width, screen.height);
+                previouslyRenderedScreen.init(screen.width, screen.height);
         });
     }
 

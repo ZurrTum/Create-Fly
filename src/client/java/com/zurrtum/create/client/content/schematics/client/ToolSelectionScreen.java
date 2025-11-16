@@ -5,16 +5,15 @@ import com.zurrtum.create.client.AllKeys;
 import com.zurrtum.create.client.content.schematics.client.tools.ToolType;
 import com.zurrtum.create.client.foundation.gui.AllGuiTextures;
 import com.zurrtum.create.client.foundation.utility.CreateLang;
-import org.joml.Matrix3x2fStack;
-
-import java.util.List;
-import java.util.function.Consumer;
-
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
+import org.joml.Matrix3x2fStack;
+
+import java.util.List;
+import java.util.function.Consumer;
 
 public class ToolSelectionScreen extends Screen {
 
@@ -32,8 +31,7 @@ public class ToolSelectionScreen extends Screen {
     protected int h;
 
     public ToolSelectionScreen(Minecraft mc, List<ToolType> tools, Consumer<ToolType> callback) {
-        super(Component.literal("Tool Selection"));
-        this.minecraft = mc;
+        super(mc, mc.font, Component.literal("Tool Selection"));
         this.tools = tools;
         this.callback = callback;
         focused = false;
@@ -64,7 +62,7 @@ public class ToolSelectionScreen extends Screen {
         int scaledWidth = mainWindow.getGuiScaledWidth();
         int scaledHeight = mainWindow.getGuiScaledHeight();
         if (!initialized)
-            init(minecraft, scaledWidth, scaledHeight);
+            init(scaledWidth, scaledHeight);
 
         int x = (scaledWidth - w) / 2 + 15;
         int y = scaledHeight - h - 75;
