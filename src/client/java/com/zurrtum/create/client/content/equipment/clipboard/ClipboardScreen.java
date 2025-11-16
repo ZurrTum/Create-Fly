@@ -16,16 +16,6 @@ import com.zurrtum.create.infrastructure.component.ClipboardType;
 import com.zurrtum.create.infrastructure.packet.c2s.ClipboardEditPacket;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.ints.IntList;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.mutable.MutableBoolean;
-import org.apache.commons.lang3.mutable.MutableInt;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
-import net.minecraft.util.Util;
 import net.minecraft.client.StringSplitter;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
@@ -44,6 +34,15 @@ import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.Style;
 import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.util.Mth;
+import net.minecraft.util.Util;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.mutable.MutableBoolean;
+import org.apache.commons.lang3.mutable.MutableInt;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 public class ClipboardScreen extends AbstractSimiScreen {
     public ClipboardContent content;
@@ -532,7 +531,7 @@ public class ClipboardScreen extends AbstractSimiScreen {
             int j = rect2i.getY();
             int k = i + rect2i.getWidth();
             int l = j + rect2i.getHeight();
-            graphics.textHighlight(i, j, k, l);
+            graphics.textHighlight(i, j, k, l, true);
         }
     }
 

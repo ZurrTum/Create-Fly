@@ -17,12 +17,6 @@
 package com.zurrtum.create.client.infrastructure.itemGroup;
 
 import com.zurrtum.create.infrastructure.itemGroup.FabricItemGroupImpl;
-
-import java.util.Set;
-import java.util.function.Consumer;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
-
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
@@ -32,6 +26,11 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.CreativeModeTabs;
+
+import java.util.Set;
+import java.util.function.Consumer;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 public class FabricCreativeGuiComponents {
     private static final Identifier BUTTON_TEX = Identifier.fromNamespaceAndPath("fabric", "textures/gui/creative_buttons.png");
@@ -59,7 +58,7 @@ public class FabricCreativeGuiComponents {
         }
 
         @Override
-        protected void renderWidget(GuiGraphics drawContext, int mouseX, int mouseY, float delta) {
+        protected void renderContents(GuiGraphics drawContext, int mouseX, int mouseY, float delta) {
             this.active = type.isEnabled.test(screen);
             this.visible = screen.fabric_hasAdditionalPages();
 

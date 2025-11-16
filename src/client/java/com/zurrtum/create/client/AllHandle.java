@@ -746,7 +746,7 @@ public class AllHandle extends AllClientHandle<ClientPacketListener> {
         DebugInfoSection.builder("Graphics").put("Flywheel Version", DebugInformation.getVersionOfMod(Flywheel.MOD_ID))
             .put("Flywheel Backend", () -> Backend.REGISTRY.getIdOrThrow(BackendManager.currentBackend()).toString())
             .put("OpenGL Renderer", GlStateManager._getString(GL11.GL_RENDERER)).put("OpenGL Version", GlStateManager._getString(GL11.GL_VERSION))
-            .put("Graphics Mode", () -> Minecraft.getInstance().options.graphicsMode().get().name().toLowerCase(Locale.ROOT))
+            .put("Transparency", () -> Minecraft.getInstance().options.improvedTransparency().get() ? "shader" : "regular")
             .buildTo(DebugInformation::registerClientInfo);
     }
 
