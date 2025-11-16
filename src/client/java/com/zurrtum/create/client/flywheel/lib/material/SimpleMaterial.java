@@ -1,7 +1,6 @@
 package com.zurrtum.create.client.flywheel.lib.material;
 
 import com.zurrtum.create.client.flywheel.api.material.*;
-import net.minecraft.client.renderer.RenderStateShard;
 import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.resources.Identifier;
 
@@ -24,8 +23,6 @@ public class SimpleMaterial implements Material {
     protected final boolean useOverlay;
     protected final boolean useLight;
     protected final CardinalLightingMode cardinalLightingMode;
-
-    protected RenderStateShard.OutputStateShard target;
 
     protected SimpleMaterial(Builder builder) {
         shaders = builder.shaders();

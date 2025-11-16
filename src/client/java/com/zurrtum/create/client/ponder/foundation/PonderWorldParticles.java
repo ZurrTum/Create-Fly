@@ -3,9 +3,10 @@ package com.zurrtum.create.client.ponder.foundation;
 import com.google.common.base.Suppliers;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Queues;
-import com.mojang.blaze3d.buffers.GpuBufferSlice;
 import com.mojang.blaze3d.systems.RenderPass;
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.textures.FilterMode;
+import com.mojang.blaze3d.textures.GpuSampler;
 import com.mojang.blaze3d.textures.GpuTextureView;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.zurrtum.create.client.catnip.levelWrappers.WrappedClientLevel;
@@ -30,8 +31,6 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix4f;
 import org.joml.Matrix4fStack;
-import org.joml.Vector3f;
-import org.joml.Vector4f;
 
 import java.util.*;
 import java.util.function.Supplier;
@@ -119,8 +118,6 @@ public class PonderWorldParticles {
             }
         }
         particleBatch.submit(queue, cameraRenderState);
-        GpuBufferSlice gpuBufferSlice = RenderSystem.getDynamicUniforms()
-            .writeTransform(new Matrix4f(stack), new Vector4f(1.0F, 1.0F, 1.0F, 1.0F), new Vector3f(), new Matrix4f(), 0.0F);
         for (SubmitNodeCollection commandQueue : queue.getSubmitsPerOrder().values()) {
             List<SubmitNodeCollector.ParticleGroupRenderer> commands = commandQueue.getParticleGroupRenderers();
             if (commands.isEmpty()) {
@@ -130,6 +127,7 @@ public class PonderWorldParticles {
             GpuTextureView gpuTextureView2 = RenderSystem.outputDepthTextureOverride;
             Minecraft mc = Minecraft.getInstance();
             GpuTextureView lightTextureView = mc.gameRenderer.lightTexture().getTextureView();
+            GpuSampler sampler = RenderSystem.getSamplerCache().getClampToEdge(FilterMode.LINEAR);
             TextureManager textureManager = mc.getTextureManager();
             for (SubmitNodeCollector.ParticleGroupRenderer layeredCustom : commands) {
                 QuadParticleRenderState.PreparedBuffers buffers = layeredCustom.prepare(verticesCache);
@@ -141,10 +139,9 @@ public class PonderWorldParticles {
                         gpuTextureView2,
                         OptionalDouble.empty()
                     )) {
-                        renderPass.setUniform("DynamicTransforms", gpuBufferSlice);
                         renderPass.setUniform("Projection", RenderSystem.getProjectionMatrixBuffer());
                         renderPass.setUniform("Fog", RenderSystem.getShaderFog());
-                        renderPass.bindSampler("Sampler2", lightTextureView);
+                        renderPass.bindTexture("Sampler2", lightTextureView, sampler);
                         layeredCustom.render(buffers, verticesCache, renderPass, textureManager, false);
                         layeredCustom.render(buffers, verticesCache, renderPass, textureManager, true);
                     }

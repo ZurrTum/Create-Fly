@@ -8,17 +8,15 @@ package com.zurrtum.create.client.model;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonObject;
 import com.mojang.math.Transformation;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.Map;
-
 import net.minecraft.client.renderer.block.model.ItemTransforms;
 import net.minecraft.client.renderer.block.model.TextureSlots;
 import net.minecraft.client.renderer.chunk.ChunkSectionLayer;
-import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.client.resources.model.UnbakedModel;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.GsonHelper;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.Map;
 
 /**
  * Wrapper around all standard top-level model parameters added by vanilla and NeoForge except elements.
@@ -26,7 +24,6 @@ import net.minecraft.util.GsonHelper;
  * For use in custom model loaders which want to respect these properties but create the quads from
  * something other than the vanilla elements spec.
  */
-@SuppressWarnings("deprecation")
 public record StandardModelParameters(
     @Nullable Identifier parent, TextureSlots.Data textures, @Nullable ItemTransforms itemTransforms, @Nullable Boolean ambientOcclusion,
     @Nullable UnbakedModel.GuiLight guiLight, @Nullable Transformation rootTransform, @Nullable ChunkSectionLayer layer,
@@ -39,7 +36,7 @@ public record StandardModelParameters(
         TextureSlots.Data textures = TextureSlots.Data.EMPTY;
         if (jsonObject.has("textures")) {
             JsonObject jsonobject = GsonHelper.getAsJsonObject(jsonObject, "textures");
-            textures = TextureSlots.parseTextureMap(jsonobject, TextureAtlas.LOCATION_BLOCKS);
+            textures = TextureSlots.parseTextureMap(jsonobject);
         }
 
         ItemTransforms itemTransforms = null;

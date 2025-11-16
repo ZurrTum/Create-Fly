@@ -8,16 +8,15 @@ import com.zurrtum.create.client.flywheel.lib.model.part.InstanceTree;
 import com.zurrtum.create.client.flywheel.lib.model.part.ModelTrees;
 import com.zurrtum.create.client.flywheel.lib.visual.AbstractBlockEntityVisual;
 import com.zurrtum.create.client.flywheel.lib.visual.SimpleDynamicVisual;
-import org.joml.Matrix4f;
-import org.joml.Matrix4fc;
-
-import java.util.function.Consumer;
-
 import net.minecraft.client.model.geom.ModelLayers;
 import net.minecraft.client.renderer.blockentity.BellRenderer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.block.entity.BellBlockEntity;
+import org.joml.Matrix4f;
+import org.joml.Matrix4fc;
+
+import java.util.function.Consumer;
 
 public class BellVisual extends AbstractBlockEntityVisual<BellBlockEntity> implements SimpleDynamicVisual {
     private static final Material MATERIAL = SimpleMaterial.builder().mipmap(false).build();
@@ -32,7 +31,7 @@ public class BellVisual extends AbstractBlockEntityVisual<BellBlockEntity> imple
     public BellVisual(VisualizationContext ctx, BellBlockEntity blockEntity, float partialTick) {
         super(ctx, blockEntity, partialTick);
 
-        instances = InstanceTree.create(instancerProvider(), ModelTrees.of(ModelLayers.BELL, BellRenderer.BELL_RESOURCE_LOCATION, MATERIAL));
+        instances = InstanceTree.create(instancerProvider(), ModelTrees.of(ModelLayers.BELL, BellRenderer.BELL_TEXTURE, MATERIAL));
         bellBody = instances.childOrThrow("bell_body");
 
         BlockPos visualPos = getVisualPosition();

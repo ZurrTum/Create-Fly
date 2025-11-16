@@ -21,7 +21,7 @@ public class UnitTextureAtlasSprite extends TextureAtlasSprite {
     public static final UnitTextureAtlasSprite INSTANCE = new UnitTextureAtlasSprite();
 
     private UnitTextureAtlasSprite() {
-        super(LOCATION, new SpriteContents(LOCATION, new FrameSize(1, 1), new NativeImage(1, 1, false)), 1, 1, 0, 0);
+        super(LOCATION, new SpriteContents(LOCATION, new FrameSize(1, 1), new NativeImage(1, 1, false)), 1, 1, 0, 0, 0);
     }
 
     @Override

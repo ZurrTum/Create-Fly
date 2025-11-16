@@ -11,7 +11,9 @@ import net.minecraft.client.renderer.feature.ParticleFeatureRenderer;
 import net.minecraft.client.renderer.state.CameraRenderState;
 import net.minecraft.client.renderer.state.ParticleGroupRenderState;
 import net.minecraft.client.renderer.state.QuadParticleRenderState;
+import net.minecraft.client.renderer.texture.AbstractTexture;
 import net.minecraft.client.renderer.texture.TextureManager;
+import org.joml.Matrix4f;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
 
@@ -63,13 +65,8 @@ public class CubeParticleSubmittable implements SubmitNodeCollector.ParticleGrou
             if (builtBuffer != null) {
                 cache.write(builtBuffer.vertexBuffer());
                 RenderSystem.getSequentialBuffer(VertexFormat.Mode.QUADS).getBuffer(builtBuffer.drawState().indexCount());
-                GpuBufferSlice gpuBufferSlice = RenderSystem.getDynamicUniforms().writeTransform(
-                    RenderSystem.getModelViewMatrix(),
-                    new Vector4f(1.0F, 1.0F, 1.0F, 1.0F),
-                    new Vector3f(),
-                    RenderSystem.getTextureMatrix(),
-                    RenderSystem.getShaderLineWidth()
-                );
+                GpuBufferSlice gpuBufferSlice = RenderSystem.getDynamicUniforms()
+                    .writeTransform(RenderSystem.getModelViewMatrix(), new Vector4f(1.0F, 1.0F, 1.0F, 1.0F), new Vector3f(), new Matrix4f());
                 return new QuadParticleRenderState.PreparedBuffers(
                     builtBuffer.drawState().indexCount(),
                     gpuBufferSlice,
@@ -109,7 +106,8 @@ public class CubeParticleSubmittable implements SubmitNodeCollector.ParticleGrou
         renderPass.setUniform("DynamicTransforms", buffers.dynamicTransforms());
         for (Map.Entry<SingleQuadParticle.Layer, QuadParticleRenderState.PreparedLayer> entry : buffers.layers().entrySet()) {
             renderPass.setPipeline(entry.getKey().pipeline());
-            renderPass.bindSampler("Sampler0", manager.getTexture(entry.getKey().textureAtlasLocation()).getTextureView());
+            AbstractTexture texture = manager.getTexture(entry.getKey().textureAtlasLocation());
+            renderPass.bindTexture("Sampler0", texture.getTextureView(), texture.getSampler());
             renderPass.drawIndexed(0, 0, entry.getValue().indexCount(), 1);
         }
     }
