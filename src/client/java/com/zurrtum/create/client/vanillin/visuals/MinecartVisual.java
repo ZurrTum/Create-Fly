@@ -61,7 +61,7 @@ public class MinecartVisual<T extends AbstractMinecart> extends AbstractEntityVi
         }
 
         Block block = blockState.getBlock();
-        if (Minecraft.getInstance().getModelManager().specialBlockModelRenderer().get().renderers.containsKey(block)) {
+        if (Minecraft.getInstance().getModelManager().specialBlockModelRenderer().renderers.containsKey(block)) {
             instances.visible(false);
             return null;
         }
@@ -195,6 +195,6 @@ public class MinecartVisual<T extends AbstractMinecart> extends AbstractEntityVi
             return true;
         }
         Block block = minecart.getDisplayBlockState().getBlock();
-        return !Minecraft.getInstance().getModelManager().specialBlockModelRenderer().get().renderers.containsKey(block);
+        return !Minecraft.getInstance().getModelManager().specialBlockModelRenderer().renderers.containsKey(block);
     }
 }
