@@ -101,15 +101,29 @@ public abstract class LivingEntityMixin extends Entity {
         }
     }
 
-    @Inject(method = "travelInFluid(Lnet/minecraft/world/phys/Vec3;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/LivingEntity;move(Lnet/minecraft/world/entity/MoverType;Lnet/minecraft/world/phys/Vec3;)V", ordinal = 1))
-    private void setOnGround(Vec3 movementInput, CallbackInfo ci, @Share("onGround") LocalBooleanRef onGround) {
+    @Inject(method = "travelInLava(Lnet/minecraft/world/phys/Vec3;DZD)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/LivingEntity;move(Lnet/minecraft/world/entity/MoverType;Lnet/minecraft/world/phys/Vec3;)V"))
+    private void setOnGround(
+        Vec3 input,
+        double baseGravity,
+        boolean isFalling,
+        double oldY,
+        CallbackInfo ci,
+        @Share("onGround") LocalBooleanRef onGround
+    ) {
         if (((Object) this) instanceof Player player) {
             onGround.set(player.onGround());
         }
     }
 
-    @Inject(method = "travelInFluid(Lnet/minecraft/world/phys/Vec3;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/LivingEntity;move(Lnet/minecraft/world/entity/MoverType;Lnet/minecraft/world/phys/Vec3;)V", shift = At.Shift.AFTER, ordinal = 1))
-    private void onTravelInFluid(Vec3 movementInput, CallbackInfo ci, @Share("onGround") LocalBooleanRef onGround) {
+    @Inject(method = "travelInLava(Lnet/minecraft/world/phys/Vec3;DZD)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/LivingEntity;getFluidHeight(Lnet/minecraft/tags/TagKey;)D"))
+    private void onTravelInFluid(
+        Vec3 input,
+        double baseGravity,
+        boolean isFalling,
+        double oldY,
+        CallbackInfo ci,
+        @Share("onGround") LocalBooleanRef onGround
+    ) {
         if (((Object) this) instanceof Player player) {
             DivingBootsItem.onLavaTravel(player, onGround.get());
         }

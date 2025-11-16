@@ -20,7 +20,7 @@ public class WaterRenderHandlerMixin {
         if (state.getType() instanceof FlowableFluid fluid) {
             FluidConfig config = AllFluidConfigs.get(fluid);
             if (config != null) {
-                cir.setReturnValue(config.toSprite());
+                cir.setReturnValue(new TextureAtlasSprite[]{config.still().get(), config.flowing().get()});
             }
         }
     }

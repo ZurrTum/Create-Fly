@@ -56,8 +56,8 @@ public class MixinPlugin implements IMixinConfigPlugin {
             mixins.add("WrapperBlockStateModelMixin");
             mixins.add("FluidVariantRenderHandlerMixin");
         } else {
-            mixins.add("CreativeInventoryScreenMixin");
-            mixins.add("DefaultClientResourcePackProviderMixin");
+            mixins.add("CreativeModeInventoryScreenMixin");
+            mixins.add("ClientPackSourceMixin");
         }
         if (HAS_RENDER) {
             mixins.add("WaterRenderHandlerMixin");

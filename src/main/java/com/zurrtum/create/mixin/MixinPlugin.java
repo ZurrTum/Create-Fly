@@ -50,11 +50,11 @@ public class MixinPlugin implements IMixinConfigPlugin {
         //            mixins.add("JustEnoughItemsMixin");
         //        }
         if (Create.Lazy) {
-            mixins.add("RegistryKeysMixin");
+            mixins.add("RegistriesMixin");
         } else {
-            mixins.add("ItemGroupMixin");
-            mixins.add("ItemGroupsMixin");
-            mixins.add("PersistentStateManagerMixin");
+            mixins.add("CreativeModeTabMixin");
+            mixins.add("CreativeModeTabsMixin");
+            mixins.add("DimensionDataStorageMixin");
             mixins.add("IngredientMixin");
         }
         return mixins;

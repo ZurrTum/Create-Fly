@@ -21,7 +21,7 @@ public interface FluidVariantRenderHandlerMixin {
         Fluid fluid = variant.getFluid();
         FluidConfig config = AllFluidConfigs.get(fluid);
         if (config != null) {
-            return config.toSprite();
+            return new TextureAtlasSprite[]{config.still().get(), config.flowing().get()};
         }
         return null;
     }

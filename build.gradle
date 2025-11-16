@@ -72,6 +72,7 @@ sourceSets {
             exclude 'com/zurrtum/create/client/mixin/IrisPipelinesMixin.java'
             exclude 'com/zurrtum/create/client/mixin/HoldMyItemsMixin.java'
             exclude 'com/zurrtum/create/client/mixin/AnimationResourceLoaderMixin.java'
+            exclude 'com/zurrtum/create/client/mixin/WrapperBlockStateModelMixin.java'
         }
     }
 }
@@ -105,6 +106,7 @@ dependencies {
         compileOnly fabricApi.module("fabric-events-interaction-v0", project.fabric_version)
         compileOnly fabricApi.module("fabric-renderer-api-v1", project.fabric_version)
         compileOnly fabricApi.module("fabric-recipe-api-v1", project.fabric_version)
+        compileOnly fabricApi.module("fabric-model-loading-api-v1", project.fabric_version)
     } else {
         implementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
     }

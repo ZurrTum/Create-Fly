@@ -3,7 +3,6 @@ package com.zurrtum.create.client.mixin;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
-import com.mojang.blaze3d.platform.Window;
 import com.zurrtum.create.AllPackets;
 import com.zurrtum.create.catnip.data.WorldAttached;
 import com.zurrtum.create.client.Create;
@@ -87,9 +86,6 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import java.util.Optional;
-import java.util.concurrent.CompletableFuture;
-
 @Mixin(Minecraft.class)
 public class MinecraftClientMixin {
     @Shadow
@@ -104,10 +100,6 @@ public class MinecraftClientMixin {
     @Nullable
     public LocalPlayer player;
 
-    @Shadow
-    @Final
-    private Window window;
-
     @Inject(method = "<init>", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/packs/resources/ReloadableResourceManager;createReload(Ljava/util/concurrent/Executor;Ljava/util/concurrent/Executor;Ljava/util/concurrent/CompletableFuture;Ljava/util/List;)Lnet/minecraft/server/packs/resources/ReloadInstance;"))
     private void flywheel$onBeginInitialResourceReload(GameConfig args, CallbackInfo ci) {
         FlwImpl.freezeRegistries();
@@ -120,21 +112,9 @@ public class MinecraftClientMixin {
         resourceManager.registerReloadListener(TrainHatInfoReloadListener.LISTENER);
     }
 
-    @Inject(method = "method_53522", at = @At("HEAD"))
-    private void endReload(Minecraft.GameLoadCookie loadingContext, Optional<Throwable> error, CallbackInfo ci) {
-        BackendManagerImpl.onEndClientResourceReload(error.isPresent());
-        RendererReloadCache.onReloadLevelRenderer();
-    }
-
-    @Inject(method = "method_24228", at = @At("HEAD"))
-    private void endReload(
-        boolean bl,
-        Minecraft.GameLoadCookie loadingContext,
-        CompletableFuture<Void> completableFuture,
-        Optional<Throwable> error,
-        CallbackInfo ci
-    ) {
-        BackendManagerImpl.onEndClientResourceReload(error.isPresent());
+    @Inject(method = "onGameLoadFinished(Lnet/minecraft/client/Minecraft$GameLoadCookie;)V", at = @At("HEAD"))
+    private void endReload(Minecraft.GameLoadCookie cookie, CallbackInfo ci) {
+        BackendManagerImpl.onEndClientResourceReload();
         RendererReloadCache.onReloadLevelRenderer();
     }
 

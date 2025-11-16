@@ -28,7 +28,7 @@ accessible	field	net/minecraft/world/level/lighting/SkyLightSectionStorage$SkyDa
 accessible	class	net/minecraft/client/Minecraft$GameLoadCookie
 accessible	field	net/minecraft/commands/synchronization/ArgumentTypeInfos	BY_CLASS	Ljava/util/Map;
 accessible	class	net/minecraft/client/resources/model/ModelManager$ResolvedModels
-#accessible	method	net/minecraft/client/resources/model/ModelBakery$ModelBakerImpl	<init>	(Lnet/minecraft/client/resources/model/ModelBakery;Lnet/minecraft/client/resources/model/SpriteGetter;)V
+accessible class net/minecraft/client/resources/model/ModelBakery$ModelBakerImpl
 accessible	field	net/minecraft/client/renderer/LevelRenderer	ticks	I
 accessible	method	net/minecraft/client/player/AbstractClientPlayer	getPlayerInfo	()Lnet/minecraft/client/multiplayer/PlayerInfo;
 accessible	field	net/minecraft/client/model/geom/ModelPart	children	Ljava/util/Map;
@@ -36,7 +36,7 @@ accessible	method	net/minecraft/client/model/geom/ModelPart	compile	(Lcom/mojang
 accessible	field	com/mojang/blaze3d/vertex/PoseStack	poses	Ljava/util/List;
 accessible	method	net/minecraft/world/level/Level	getEntities	()Lnet/minecraft/world/level/entity/LevelEntityGetter;
 accessible	method	net/minecraft/server/level/ServerLevel	getEntities	()Lnet/minecraft/world/level/entity/LevelEntityGetter;
-#accessible	method	net/minecraft/client/resources/model/ModelDiscovery	getOrCreateModel	(Lnet/minecraft/resources/Identifier;)Lnet/minecraft/client/resources/model/ModelDiscovery$ModelWrapper;
+accessible method net/minecraft/client/resources/model/ModelDiscovery getOrCreateModel (Lnet/minecraft/resources/Identifier;)Lnet/minecraft/client/resources/model/ModelDiscovery$ModelWrapper;
 accessible	field	com/mojang/blaze3d/vertex/BufferBuilder	vertices	I
 accessible	class	net/minecraft/client/resources/model/ModelDiscovery$ModelWrapper
 accessible	field	net/minecraft/client/renderer/LevelRenderer	renderBuffers	Lnet/minecraft/client/renderer/RenderBuffers;
@@ -45,24 +45,14 @@ extendable	method	net/minecraft/client/gui/components/AbstractWidget	render	(Lne
 accessible	field	net/minecraft/client/gui/screens/Screen	renderables	Ljava/util/List;
 accessible	field	net/minecraft/client/renderer/RenderPipelines	MATRICES_PROJECTION_SNIPPET	Lcom/mojang/blaze3d/pipeline/RenderPipeline$Snippet;
 accessible	field	net/minecraft/client/renderer/RenderPipelines	DEBUG_FILLED_SNIPPET	Lcom/mojang/blaze3d/pipeline/RenderPipeline$Snippet;
-#accessible	class	net/minecraft/client/renderer/RenderType$CompositeState
 accessible	field	com/mojang/blaze3d/opengl/GlTexture	fboCache	Lit/unimi/dsi/fastutil/ints/Int2IntMap;
-#accessible	method	com/mojang/blaze3d/pipeline/RenderTarget	setFilterMode	(Lcom/mojang/blaze3d/textures/FilterMode;Z)V
 accessible	method	com/mojang/blaze3d/opengl/GlTexture	<init>	(ILjava/lang/String;Lcom/mojang/blaze3d/textures/TextureFormat;IIIII)V
-#accessible	method	net/minecraft/client/renderer/RenderType$CompositeState$CompositeStateBuilder	createCompositeState	(Z)Lnet/minecraft/client/renderer/RenderType$CompositeState;
-#accessible	method	net/minecraft/client/renderer/RenderType	create	(Ljava/lang/String;IZZLcom/mojang/blaze3d/pipeline/RenderPipeline;Lnet/minecraft/client/renderer/RenderType$CompositeState;)Lnet/minecraft/client/renderer/RenderType$CompositeRenderType;
-#accessible	method	net/minecraft/client/renderer/RenderType$CompositeState$CompositeStateBuilder	setTextureState	(Lnet/minecraft/client/renderer/RenderStateShard$EmptyTextureStateShard;)Lnet/minecraft/client/renderer/RenderType$CompositeState$CompositeStateBuilder;
-#accessible	method	net/minecraft/client/renderer/RenderType$CompositeState$CompositeStateBuilder	setLightmapState	(Lnet/minecraft/client/renderer/RenderStateShard$LightmapStateShard;)Lnet/minecraft/client/renderer/RenderType$CompositeState$CompositeStateBuilder;
-#accessible	method	net/minecraft/client/renderer/RenderType$CompositeState$CompositeStateBuilder	setOverlayState	(Lnet/minecraft/client/renderer/RenderStateShard$OverlayStateShard;)Lnet/minecraft/client/renderer/RenderType$CompositeState$CompositeStateBuilder;
 accessible	field	net/minecraft/client/renderer/item/ItemModels	ID_MAPPER	Lnet/minecraft/util/ExtraCodecs$LateBoundIdMapper;
 accessible	field	net/minecraft/client/MouseHandler	xpos	D
 accessible	field	net/minecraft/client/MouseHandler	ypos	D
 accessible	field	net/minecraft/client/renderer/ItemBlockRenderTypes	TYPE_BY_BLOCK	Ljava/util/Map;
 accessible	method	net/minecraft/world/entity/Entity	setLevel	(Lnet/minecraft/world/level/Level;)V
 accessible	method	net/minecraft/world/item/context/UseOnContext	<init>	(Lnet/minecraft/world/level/Level;Lnet/minecraft/world/entity/player/Player;Lnet/minecraft/world/InteractionHand;Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/phys/BlockHitResult;)V
-#accessible	field	net/minecraft/client/renderer/RenderStateShard	LIGHTMAP	Lnet/minecraft/client/renderer/RenderStateShard$LightmapStateShard;
-#accessible	class	net/minecraft/client/renderer/RenderStateShard$TextureStateShard
-#accessible	field	net/minecraft/client/renderer/RenderStateShard	OVERLAY	Lnet/minecraft/client/renderer/RenderStateShard$OverlayStateShard;
 accessible	field	net/minecraft/client/renderer/RenderPipelines	ENTITY_SNIPPET	Lcom/mojang/blaze3d/pipeline/RenderPipeline$Snippet;
 accessible	field	net/minecraft/client/renderer/block/model/BlockModel	GSON	Lcom/google/gson/Gson;
 accessible	field	net/minecraft/client/renderer/RenderPipelines	PIPELINES_BY_LOCATION	Ljava/util/Map;
@@ -76,7 +66,6 @@ accessible	method	net/minecraft/client/renderer/block/model/ItemTransform$Deseri
 accessible	method	net/minecraft/client/renderer/block/model/ItemTransforms$Deserializer	<init>	()V
 accessible	field	net/minecraft/client/renderer/item/ItemStackRenderState$LayerRenderState	tintLayers	[I
 accessible	field	net/minecraft/client/renderer/item/ItemStackRenderState$LayerRenderState	quads	Ljava/util/List;
-#accessible	field	net/minecraft/client/renderer/item/ItemStackRenderState$LayerRenderState	renderType	Lnet/minecraft/client/renderer/RenderType;
 accessible	field	net/minecraft/client/renderer/item/ItemStackRenderState$LayerRenderState	foilType	Lnet/minecraft/client/renderer/item/ItemStackRenderState$FoilType;
 accessible	field	net/minecraft/world/item/CreativeModeTabs	SEARCH	Lnet/minecraft/resources/ResourceKey;
 accessible	field	net/minecraft/world/item/CreativeModeTabs	INVENTORY	Lnet/minecraft/resources/ResourceKey;
@@ -108,8 +97,6 @@ accessible	field	net/minecraft/core/component/PatchedDataComponentMap	patch	Lit/
 accessible	field	net/minecraft/world/level/BaseSpawner	spawnPotentials	Lnet/minecraft/util/random/WeightedList;
 accessible	field	net/minecraft/world/level/BaseSpawner	nextSpawnData	Lnet/minecraft/world/level/SpawnData;
 accessible	field	net/minecraft/world/item/BucketItem	content	Lnet/minecraft/world/level/material/Fluid;
-#accessible	field	net/minecraft/client/renderer/block/LiquidBlockRenderer	lavaIcons	[Lnet/minecraft/client/renderer/texture/TextureAtlasSprite;
-#accessible	field	net/minecraft/client/renderer/block/LiquidBlockRenderer	waterIcons	[Lnet/minecraft/client/renderer/texture/TextureAtlasSprite;
 accessible	field	net/minecraft/client/renderer/block/BlockRenderDispatcher	liquidBlockRenderer	Lnet/minecraft/client/renderer/block/LiquidBlockRenderer;
 accessible	field	net/minecraft/client/renderer/RenderPipelines	PARTICLE_SNIPPET	Lcom/mojang/blaze3d/pipeline/RenderPipeline$Snippet;
 accessible	class	net/minecraft/client/particle/ParticleResources$SpriteParticleRegistration
@@ -133,12 +120,6 @@ accessible	field	net/minecraft/client/renderer/fog/FogRenderer	FOG_ENVIRONMENTS	
 accessible	field	net/minecraft/client/gui/GuiGraphics	guiRenderState	Lnet/minecraft/client/gui/render/state/GuiRenderState;
 accessible	method	com/mojang/blaze3d/opengl/GlCommandEncoder	getDevice	()Lcom/mojang/blaze3d/opengl/GlDevice;
 accessible	field	net/minecraft/client/renderer/SpriteCoordinateExpander	delegate	Lcom/mojang/blaze3d/vertex/VertexConsumer;
-#accessible	field	net/minecraft/client/renderer/RenderStateShard	BLOCK_SHEET_MIPPED	Lnet/minecraft/client/renderer/RenderStateShard$TextureStateShard;
-#accessible	class	net/minecraft/client/renderer/RenderType$CompositeRenderType
-#accessible	field	net/minecraft/client/renderer/RenderType$CompositeRenderType	state	Lnet/minecraft/client/renderer/RenderType$CompositeState;
-#accessible	field	net/minecraft/client/renderer/RenderType$CompositeState	textureState	Lnet/minecraft/client/renderer/RenderStateShard$EmptyTextureStateShard;
-#accessible	method	net/minecraft/client/renderer/RenderStateShard$EmptyTextureStateShard	cutoutTexture	()Ljava/util/Optional;
-#accessible	field	net/minecraft/client/renderer/RenderType$CompositeRenderType	renderPipeline	Lcom/mojang/blaze3d/pipeline/RenderPipeline;
 accessible	field	net/minecraft/client/renderer/SpriteCoordinateExpander	sprite	Lnet/minecraft/client/renderer/texture/TextureAtlasSprite;
 accessible	field	net/minecraft/client/model/geom/ModelPart	cubes	Ljava/util/List;
 accessible	method	net/minecraft/world/entity/vehicle/AbstractMinecart	getMaxSpeed	(Lnet/minecraft/server/level/ServerLevel;)D
@@ -273,11 +254,18 @@ accessible	method	com/mojang/blaze3d/pipeline/RenderPipeline$Builder	withSnippet
 accessible	method	com/mojang/blaze3d/pipeline/RenderPipeline$Builder	<init>	()V
 accessible	method	net/minecraft/client/renderer/entity/EntityRenderers	register	(Lnet/minecraft/world/entity/EntityType;Lnet/minecraft/client/renderer/entity/EntityRendererProvider;)V
 accessible	method	net/minecraft/client/renderer/blockentity/BlockEntityRenderers	register	(Lnet/minecraft/world/level/block/entity/BlockEntityType;Lnet/minecraft/client/renderer/blockentity/BlockEntityRendererProvider;)V
-#accessible	field	net/minecraft/client/renderer/RenderStateShard	ITEM_ENTITY_TARGET	Lnet/minecraft/client/renderer/RenderStateShard$OutputStateShard;
-#accessible	method	net/minecraft/client/renderer/RenderType$CompositeState$CompositeStateBuilder	setOutputState	(Lnet/minecraft/client/renderer/RenderStateShard$OutputStateShard;)Lnet/minecraft/client/renderer/RenderType$CompositeState$CompositeStateBuilder;
-#accessible	field	net/minecraft/client/renderer/RenderStateShard	MAIN_TARGET	Lnet/minecraft/client/renderer/RenderStateShard$OutputStateShard;
-#accessible	field	net/minecraft/client/renderer/RenderStateShard	WEATHER_TARGET	Lnet/minecraft/client/renderer/RenderStateShard$OutputStateShard;
 accessible	method	net/minecraft/server/level/ServerPlayerGameMode	setGameModeForPlayer	(Lnet/minecraft/world/level/GameType;Lnet/minecraft/world/level/GameType;)V
 accessible	method	net/minecraft/client/renderer/entity/EntityRenderer	affectedByCulling	(Lnet/minecraft/world/entity/Entity;)Z
 accessible	method	net/minecraft/client/renderer/entity/EntityRenderer	getBoundingBoxForCulling	(Lnet/minecraft/world/entity/Entity;)Lnet/minecraft/world/phys/AABB;
 accessible method net/minecraft/client/renderer/rendertype/RenderType create (Ljava/lang/String;Lnet/minecraft/client/renderer/rendertype/RenderSetup;)Lnet/minecraft/client/renderer/rendertype/RenderType;
+accessible field net/minecraft/client/renderer/block/LiquidBlockRenderer lavaStill Lnet/minecraft/client/renderer/texture/TextureAtlasSprite;
+accessible field net/minecraft/client/renderer/block/LiquidBlockRenderer lavaFlowing Lnet/minecraft/client/renderer/texture/TextureAtlasSprite;
+accessible field net/minecraft/client/renderer/block/LiquidBlockRenderer waterStill Lnet/minecraft/client/renderer/texture/TextureAtlasSprite;
+accessible field net/minecraft/client/renderer/block/LiquidBlockRenderer waterFlowing Lnet/minecraft/client/renderer/texture/TextureAtlasSprite;
+accessible field net/minecraft/client/renderer/item/ItemStackRenderState$LayerRenderState renderType Lnet/minecraft/client/renderer/rendertype/RenderType;
+accessible method net/minecraft/client/renderer/item/BlockModelWrapper detectRenderType (Ljava/util/List;)Ljava/util/function/Function;
+accessible field net/minecraft/client/renderer/rendertype/RenderType state Lnet/minecraft/client/renderer/rendertype/RenderSetup;
+accessible field net/minecraft/client/renderer/rendertype/RenderSetup textures Ljava/util/Map;
+accessible class net/minecraft/client/renderer/rendertype/RenderSetup$TextureBinding
+accessible field net/minecraft/client/renderer/rendertype/RenderSetup useLightmap Z
+accessible field net/minecraft/client/renderer/rendertype/RenderSetup useOverlay Z
