@@ -14,9 +14,9 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.render.pip.PictureInPictureRenderer;
 import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.SubmitNodeStorage;
 import net.minecraft.client.renderer.feature.FeatureRenderDispatcher;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.core.Direction;
 import net.minecraft.util.Mth;
 
@@ -36,7 +36,7 @@ public class BlazeBurnerElementRenderer extends PictureInPictureRenderer<BlazeBu
         boolean canDrawFlame = state.heatLevel().isAtLeast(HeatLevel.FADING);
         PartialModel drawHat = AllPartialModels.LOGISTICS_HAT;
 
-        VertexConsumer cutout = bufferSource.getBuffer(RenderType.cutoutMipped());
+        VertexConsumer cutout = bufferSource.getBuffer(RenderTypes.cutoutMovingBlock());
         CachedBuffers.partial(AllPartialModels.BLAZE_CAGE, state.block()).rotateCentered(horizontalAngle + Mth.PI, Direction.UP)
             .light(LightTexture.FULL_BRIGHT).renderInto(matrices.last(), cutout);
 

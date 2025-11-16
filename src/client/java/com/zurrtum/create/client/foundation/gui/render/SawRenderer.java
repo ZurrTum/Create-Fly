@@ -12,10 +12,10 @@ import com.zurrtum.create.content.kinetics.saw.SawBlock;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.render.pip.PictureInPictureRenderer;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.Sheets;
 import net.minecraft.client.renderer.block.BlockRenderDispatcher;
 import net.minecraft.client.renderer.block.model.BlockModelPart;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.block.Blocks;
@@ -67,7 +67,15 @@ public class SawRenderer extends PictureInPictureRenderer<SawRenderState> {
         matrices.mulPose(Axis.ZP.rotationDegrees(-90));
         matrices.mulPose(Axis.YP.rotationDegrees(-90));
         matrices.translate(-0.5f, -0.5f, -0.5f);
-        blockRenderManager.renderBatched(blockState, BlockPos.ZERO, world, matrices, bufferSource.getBuffer(RenderType.cutoutMipped()), false, parts);
+        blockRenderManager.renderBatched(
+            blockState,
+            BlockPos.ZERO,
+            world,
+            matrices,
+            bufferSource.getBuffer(RenderTypes.cutoutMovingBlock()),
+            false,
+            parts
+        );
     }
 
     public static float getCurrentAngle() {

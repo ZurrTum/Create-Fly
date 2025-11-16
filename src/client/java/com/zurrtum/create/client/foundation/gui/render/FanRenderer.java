@@ -13,10 +13,10 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.render.pip.PictureInPictureRenderer;
 import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.Sheets;
 import net.minecraft.client.renderer.block.BlockRenderDispatcher;
 import net.minecraft.client.renderer.block.model.BlockModelPart;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.component.DataComponentPatch;
 import net.minecraft.util.RandomSource;
@@ -98,7 +98,7 @@ public class FanRenderer extends PictureInPictureRenderer<FanRenderState> {
         RANDOM.setSeed(blockState.getSeed(BlockPos.ZERO));
         parts = blockRenderManager.getBlockModel(blockState).collectParts(RANDOM);
         if (blockState.getBlock() instanceof BaseFireBlock) {
-            buffer = bufferSource.getBuffer(RenderType.cutout());
+            buffer = bufferSource.getBuffer(RenderTypes.cutoutMovingBlock());
         }
         blockRenderManager.renderBatched(blockState, BlockPos.ZERO, world, matrices, buffer, false, parts);
     }

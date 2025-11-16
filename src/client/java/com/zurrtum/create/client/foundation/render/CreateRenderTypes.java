@@ -49,6 +49,7 @@ public class CreateRenderTypes {
         createLayerName("item_glowing_translucent"),
         RenderSetup.builder(AllRenderPipelines.GLOWING_TRANSLUCENT).bufferSize(256).affectsCrumbling().sortOnUpload()
             .withTexture("Sampler0", TextureAtlas.LOCATION_BLOCKS).useLightmap().useOverlay().setOutline(OutlineProperty.AFFECTS_OUTLINE)
+            .createRenderSetup()
     );
 
     private static final Function<Identifier, RenderType> CHAIN = Util.memoize((texture) -> RenderType.create(

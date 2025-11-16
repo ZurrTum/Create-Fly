@@ -11,6 +11,7 @@ import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Matrix4f;
@@ -71,7 +72,7 @@ public class AllIcons implements ScreenElement {
     }
 
     public RenderType bind() {
-        return RenderType.text(ICON_ATLAS);
+        return RenderTypes.text(ICON_ATLAS);
     }
 
     @Override
@@ -84,7 +85,7 @@ public class AllIcons implements ScreenElement {
     }
 
     public void render(PoseStack ms, MultiBufferSource buffer, int color) {
-        VertexConsumer builder = buffer.getBuffer(RenderType.text(ICON_ATLAS));
+        VertexConsumer builder = buffer.getBuffer(RenderTypes.text(ICON_ATLAS));
         Matrix4f matrix = ms.last().pose();
         Color rgb = new Color(color);
         int light = LightTexture.FULL_BRIGHT;

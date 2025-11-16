@@ -1,6 +1,7 @@
 package com.zurrtum.create.client.flywheel.lib.model.baked;
 
 import com.mojang.blaze3d.pipeline.BlendFunction;
+import com.mojang.blaze3d.pipeline.RenderPipeline;
 import com.mojang.blaze3d.vertex.MeshData;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
@@ -17,10 +18,10 @@ import net.minecraft.client.renderer.Sheets;
 import net.minecraft.client.renderer.SubmitNodeCollection;
 import net.minecraft.client.renderer.SubmitNodeStorage;
 import net.minecraft.client.renderer.item.ItemStackRenderState;
+import net.minecraft.client.renderer.rendertype.RenderSetup;
 import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.BlockAndTintGetter;
@@ -93,18 +94,26 @@ public class BakedItemModelBufferer {
         }
 
         private static Material createMaterial(RenderType renderLayer) {
-            RenderType.CompositeRenderType layer = (RenderType.CompositeRenderType) renderLayer;
-            Optional<Identifier> id = layer.state.textureState.cutoutTexture();
-            if (id.isPresent()) {
-                SimpleMaterial.Builder builder = SimpleMaterial.builder().texture(id.get()).mipmap(false);
-                Optional<BlendFunction> blendFunction = layer.renderPipeline.getBlendFunction();
+            RenderSetup state = renderLayer.state;
+            Map<String, RenderSetup.TextureBinding> textures = state.textures;
+            RenderSetup.TextureBinding texture = textures.get("Sampler0");
+            if (texture != null) {
+                SimpleMaterial.Builder builder = SimpleMaterial.builder().texture(texture.location()).mipmap(false);
+                if (!state.useLightmap) {
+                    builder.useLight(false);
+                }
+                if (!state.useOverlay) {
+                    builder.useOverlay(false);
+                }
+                RenderPipeline pipeline = renderLayer.pipeline();
+                Optional<BlendFunction> blendFunction = pipeline.getBlendFunction();
                 if (blendFunction.isPresent()) {
                     Transparency transparency = TRANSPARENCY.get(blendFunction.get());
                     if (transparency != null) {
                         builder.transparency(transparency);
                     }
                 }
-                String cutout = layer.renderPipeline.getShaderDefines().values().get("ALPHA_CUTOUT");
+                String cutout = pipeline.getShaderDefines().values().get("ALPHA_CUTOUT");
                 if (cutout != null) {
                     if (cutout.equals("0.1")) {
                         builder.cutout(CutoutShaders.ONE_TENTH);
