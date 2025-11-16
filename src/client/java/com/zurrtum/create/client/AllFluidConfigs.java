@@ -33,13 +33,13 @@ public class AllFluidConfigs {
     public static final Map<Fluid, FluidConfig> ALL = new IdentityHashMap<>();
     public static final Map<Fluid, FluidConfig> CACHE = new IdentityHashMap<>();
     private static final FluidConfig LAVA = new FluidConfig(
-        () -> Minecraft.getInstance().getBlockRenderer().liquidBlockRenderer.lavaIcons[0],
-        () -> Minecraft.getInstance().getBlockRenderer().liquidBlockRenderer.lavaIcons[1],
+        () -> Minecraft.getInstance().getBlockRenderer().liquidBlockRenderer.lavaStill,
+        () -> Minecraft.getInstance().getBlockRenderer().liquidBlockRenderer.lavaFlowing,
         component -> -1
     );
     private static final FluidConfig WATER = new FluidConfig(
-        () -> Minecraft.getInstance().getBlockRenderer().liquidBlockRenderer.waterIcons[0],
-        () -> Minecraft.getInstance().getBlockRenderer().liquidBlockRenderer.waterIcons[1],
+        () -> Minecraft.getInstance().getBlockRenderer().liquidBlockRenderer.waterStill,
+        () -> Minecraft.getInstance().getBlockRenderer().liquidBlockRenderer.waterFlowing,
         component -> {
             Minecraft mc = Minecraft.getInstance();
             if (mc.level == null || mc.player == null) {

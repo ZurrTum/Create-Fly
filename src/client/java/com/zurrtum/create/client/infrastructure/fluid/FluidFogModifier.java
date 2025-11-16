@@ -9,28 +9,28 @@ import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.renderer.fog.FogData;
 import net.minecraft.client.renderer.fog.environment.WaterFogEnvironment;
 import net.minecraft.core.BlockPos;
-import net.minecraft.tags.BiomeTags;
+import net.minecraft.world.attribute.EnvironmentAttributes;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.item.ItemStack;
 
 public class FluidFogModifier extends WaterFogEnvironment {
     @Override
-    public void setupFog(FogData data, Entity cameraEntity, BlockPos cameraPos, ClientLevel world, float viewDistance, DeltaTracker tickCounter) {
+    public void setupFog(FogData data, Camera camera, ClientLevel world, float viewDistance, DeltaTracker tickCounter) {
+        Entity cameraEntity = camera.entity();
+        BlockPos cameraPos = camera.blockPosition();
         FluidConfig config = AllFluidConfigs.ALL.get(world.getFluidState(cameraPos).getType());
         if (config != null) {
-            data.environmentalStart = -8.0F;
+            float partialTicks = tickCounter.getGameTimeDeltaPartialTick(false);
+            data.environmentalStart = camera.attributeProbe().getValue(EnvironmentAttributes.WATER_FOG_START_DISTANCE, partialTicks);
             data.environmentalEnd = config.fogDistance().get();
-            if (cameraEntity instanceof LocalPlayer clientPlayerEntity) {
-                data.environmentalEnd = data.environmentalEnd * Math.max(0.25F, clientPlayerEntity.getWaterVision());
-                if (world.getBiome(cameraPos).is(BiomeTags.HAS_CLOSER_WATER_FOG)) {
-                    data.environmentalEnd *= 0.85F;
-                }
+            if (camera.entity() instanceof LocalPlayer player) {
+                data.environmentalEnd = data.environmentalEnd * Math.max(0.25F, player.getWaterVision());
             }
 
             data.skyEnd = data.environmentalEnd;
             data.cloudEnd = data.environmentalEnd;
         } else {
-            super.setupFog(data, cameraEntity, cameraPos, world, viewDistance, tickCounter);
+            super.setupFog(data, camera, world, viewDistance, tickCounter);
         }
         ItemStack divingHelmet = DivingHelmetItem.getWornItem(cameraEntity);
         if (!divingHelmet.isEmpty()) {
