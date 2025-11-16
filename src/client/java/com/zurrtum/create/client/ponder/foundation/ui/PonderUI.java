@@ -34,14 +34,6 @@ import com.zurrtum.create.client.ponder.foundation.content.DebugScenes;
 import com.zurrtum.create.client.ponder.foundation.element.TextWindowElement;
 import com.zurrtum.create.client.ponder.foundation.render.SceneRenderState;
 import com.zurrtum.create.client.ponder.foundation.render.TitleTextRenderState;
-import org.jetbrains.annotations.Nullable;
-import org.joml.Matrix3x2f;
-import org.joml.Matrix3x2fStack;
-
-import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
-
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.Options;
@@ -57,6 +49,13 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
+import org.jetbrains.annotations.Nullable;
+import org.joml.Matrix3x2f;
+import org.joml.Matrix3x2fStack;
+
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 public class PonderUI extends AbstractPonderScreen {
 
@@ -795,8 +794,8 @@ public class PonderUI extends AbstractPonderScreen {
         if (otherTitleWidth > maxTitleWidth)
             otherTitleWidth = maxTitleWidth;
 
-        int wrappedTitleHeight = font.wordWrapHeight(title, maxTitleWidth);
-        int otherWrappedTitleHeight = font.wordWrapHeight(otherTitle, maxTitleWidth);
+        int wrappedTitleHeight = font.wordWrapHeight(Component.literal(title), maxTitleWidth);
+        int otherWrappedTitleHeight = font.wordWrapHeight(Component.literal(otherTitle), maxTitleWidth);
 
         // height is ideal for single line titles
         int streakHeight = 35 - 9 + Mth.lerpInt(absoluteIndexDiff, wrappedTitleHeight, otherWrappedTitleHeight);

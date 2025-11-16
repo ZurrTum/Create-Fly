@@ -14,20 +14,20 @@ import com.zurrtum.create.client.ponder.Ponder;
 import com.zurrtum.create.client.ponder.foundation.PonderChapter;
 import com.zurrtum.create.client.ponder.foundation.PonderIndex;
 import com.zurrtum.create.client.ponder.foundation.PonderTag;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.Renderable;
+import net.minecraft.client.gui.components.events.GuiEventListener;
+import net.minecraft.client.renderer.Rect2i;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.Identifier;
+import net.minecraft.util.Mth;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.ItemLike;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix3x2fStack;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.components.Renderable;
-import net.minecraft.client.gui.components.events.GuiEventListener;
-import net.minecraft.client.renderer.Rect2i;
-import net.minecraft.resources.Identifier;
-import net.minecraft.util.Mth;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.ItemLike;
 
 public class PonderTagScreen extends AbstractPonderScreen {
 
@@ -184,7 +184,7 @@ public class PonderTagScreen extends AbstractPonderScreen {
         y = getItemsY() - 10 + Math.max(itemArea.getHeight(), 48);
 
         String desc = tag.getDescription();
-        int h = font.wordWrapHeight(desc, w);
+        int h = font.wordWrapHeight(Component.literal(desc), w);
 
 
         //PonderUI.renderBox(poseStack, x - 3, y - 3, w + 6, h + 6, false);

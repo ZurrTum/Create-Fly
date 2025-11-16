@@ -1,15 +1,14 @@
 package com.zurrtum.create.client.content.trains.station;
 
-import org.joml.Matrix4f;
-
-import java.util.List;
-
 import net.minecraft.client.StringSplitter;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.FormattedText;
 import net.minecraft.util.FormattedCharSequence;
+import org.joml.Matrix4f;
+
+import java.util.List;
 
 public class NoShadowFontWrapper extends Font {
     private final Font wrapped;
@@ -122,11 +121,6 @@ public class NoShadowFontWrapper extends Font {
     }
 
     @Override
-    public int wordWrapHeight(String text, int maxWidth) {
-        return wrapped.wordWrapHeight(text, maxWidth);
-    }
-
-    @Override
     public List<FormattedCharSequence> split(FormattedText text, int width) {
         return wrapped.split(text, width);
     }
@@ -152,7 +146,15 @@ public class NoShadowFontWrapper extends Font {
     }
 
     @Override
-    public PreparedText prepareText(FormattedCharSequence text, float x, float y, int color, boolean shadow, int backgroundColor) {
-        return wrapped.prepareText(text, x, y, color, false, backgroundColor);
+    public PreparedText prepareText(
+        FormattedCharSequence text,
+        float x,
+        float y,
+        int color,
+        boolean shadow,
+        boolean includeEmpty,
+        int backgroundColor
+    ) {
+        return wrapped.prepareText(text, x, y, color, false, includeEmpty, backgroundColor);
     }
 }

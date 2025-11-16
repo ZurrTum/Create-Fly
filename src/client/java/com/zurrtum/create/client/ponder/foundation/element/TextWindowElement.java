@@ -9,20 +9,20 @@ import com.zurrtum.create.client.ponder.foundation.PonderIndex;
 import com.zurrtum.create.client.ponder.foundation.PonderScene;
 import com.zurrtum.create.client.ponder.foundation.PonderScene.SceneTransform;
 import com.zurrtum.create.client.ponder.foundation.ui.PonderUI;
-import org.jetbrains.annotations.Nullable;
-import org.joml.Matrix3x2fStack;
-
-import java.util.List;
-import java.util.function.Supplier;
-
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.FormattedText;
 import net.minecraft.network.chat.Style;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 import net.minecraft.world.phys.Vec2;
 import net.minecraft.world.phys.Vec3;
+import org.jetbrains.annotations.Nullable;
+import org.joml.Matrix3x2fStack;
+
+import java.util.List;
+import java.util.function.Supplier;
 
 public class TextWindowElement extends AnimatedOverlayElementBase {
 
@@ -151,7 +151,7 @@ public class TextWindowElement extends AnimatedOverlayElementBase {
         for (FormattedText line : lines)
             boxWidth = Math.max(boxWidth, fontRenderer.width(line));
 
-        int boxHeight = fontRenderer.wordWrapHeight(bakedText, boxWidth);
+        int boxHeight = fontRenderer.wordWrapHeight(Component.literal(bakedText), boxWidth);
 
         Matrix3x2fStack poseStack = graphics.pose();
         poseStack.pushMatrix();
