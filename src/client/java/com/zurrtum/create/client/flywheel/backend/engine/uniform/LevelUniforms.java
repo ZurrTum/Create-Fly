@@ -2,10 +2,15 @@ package com.zurrtum.create.client.flywheel.backend.engine.uniform;
 
 import com.mojang.blaze3d.platform.Lighting;
 import com.zurrtum.create.client.flywheel.api.backend.RenderContext;
+import net.minecraft.client.Camera;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.util.ARGB;
+import net.minecraft.world.attribute.EnvironmentAttributeProbe;
+import net.minecraft.world.attribute.EnvironmentAttributes;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.MoonPhase;
+import net.minecraft.world.level.dimension.DimensionType;
 import org.joml.Vector3f;
 
 import java.util.EnumMap;
@@ -41,8 +46,10 @@ public final class LevelUniforms extends UniformWriter {
         ClientLevel level = context.level();
         float partialTick = context.partialTick();
 
-        int skyColor = level.getSkyColor(context.camera().position(), partialTick);
-        int cloudColor = level.getCloudColor(partialTick);
+        Camera camera = context.camera();
+        EnvironmentAttributeProbe attributeProbe = camera.attributeProbe();
+        int skyColor = attributeProbe.getValue(EnvironmentAttributes.SKY_COLOR, partialTick);
+        int cloudColor = camera.attributeProbe().getValue(EnvironmentAttributes.CLOUD_COLOR, partialTick);
         ptr = writeVec4(ptr, ARGB.redFloat(skyColor), ARGB.greenFloat(skyColor), ARGB.blueFloat(skyColor), 1f);
         ptr = writeVec4(ptr, ARGB.redFloat(cloudColor), ARGB.greenFloat(cloudColor), ARGB.blueFloat(cloudColor), 1f);
 
@@ -57,19 +64,20 @@ public final class LevelUniforms extends UniformWriter {
 
         ptr = writeInt(ptr, level.dimensionType().hasSkyLight() ? 1 : 0);
 
-        ptr = writeFloat(ptr, level.getSunAngle(partialTick));
+        ptr = writeFloat(ptr, attributeProbe.getValue(EnvironmentAttributes.SUN_ANGLE, partialTick) * (float) (Math.PI / 180.0));
 
-        ptr = writeFloat(ptr, level.getMoonBrightness());
-        ptr = writeInt(ptr, level.getMoonPhase());
+        MoonPhase moonPhase = attributeProbe.getValue(EnvironmentAttributes.MOON_PHASE, partialTick);
+        ptr = writeFloat(ptr, DimensionType.MOON_BRIGHTNESS_PER_PHASE[moonPhase.index()]);
+        ptr = writeInt(ptr, moonPhase.index());
 
         ptr = writeInt(ptr, level.isRaining() ? 1 : 0);
         ptr = writeFloat(ptr, level.getRainLevel(partialTick));
         ptr = writeInt(ptr, level.isThundering() ? 1 : 0);
         ptr = writeFloat(ptr, level.getThunderLevel(partialTick));
 
-        ptr = writeFloat(ptr, level.getSkyDarken(partialTick));
+        ptr = writeFloat(ptr, level.getSkyDarken());
 
-        ptr = writeInt(ptr, level.effects().constantAmbientLight() ? 1 : 0);
+        ptr = writeInt(ptr, level.dimensionType().cardinalLightType() == DimensionType.CardinalLightType.NETHER ? 1 : 0);
 
         // TODO: use defines for custom dimension ids
         int dimensionId;

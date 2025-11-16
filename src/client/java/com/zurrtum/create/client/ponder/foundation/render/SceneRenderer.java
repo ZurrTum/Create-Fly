@@ -70,7 +70,7 @@ public class SceneRenderer extends PictureInPictureRenderer<SceneRenderState> {
         renderScene(mc, renderState, matrices, queue);
         renderDispatcher.renderAllFeatures();
         bufferSource.endBatch();
-        lighting.updateLevel(mc.level.effects().constantAmbientLight());
+        lighting.updateLevel(mc.level.dimensionType().cardinalLightType());
         matrices.popPose();
         texture.clear();
         state.submitBlitToCurrentLayer(new BlitRenderState(
