@@ -16,13 +16,17 @@ import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.renderer.*;
 import net.minecraft.client.renderer.block.BlockRenderDispatcher;
-import net.minecraft.client.renderer.block.model.*;
+import net.minecraft.client.renderer.block.model.BakedQuad;
+import net.minecraft.client.renderer.block.model.BlockModelPart;
+import net.minecraft.client.renderer.block.model.ItemTransform;
+import net.minecraft.client.renderer.block.model.TextureSlots;
 import net.minecraft.client.renderer.chunk.ChunkSectionLayer;
 import net.minecraft.client.renderer.feature.FeatureRenderDispatcher;
 import net.minecraft.client.renderer.item.ItemModel;
 import net.minecraft.client.renderer.item.ItemModelResolver;
 import net.minecraft.client.renderer.item.ItemStackRenderState;
 import net.minecraft.client.renderer.item.ModelRenderProperties;
+import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.special.SpecialModelRenderer;
 import net.minecraft.client.resources.model.BlockModelRotation;
 import net.minecraft.client.resources.model.ModelBaker;
@@ -38,7 +42,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.CrossCollisionBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.Nullable;
-import org.joml.Vector3f;
+import org.joml.Vector3fc;
 
 import java.util.HashSet;
 import java.util.List;
@@ -64,7 +68,7 @@ public class WorldshaperModel implements ItemModel, SpecialModelRenderer<Worldsh
     private final List<BakedQuad> core;
     private final List<BakedQuad> coreGlow;
     private final List<BakedQuad> accelerator;
-    private final Supplier<Vector3f[]> vector;
+    private final Supplier<Vector3fc[]> vector;
 
     public WorldshaperModel(
         ModelRenderProperties settings,
@@ -79,18 +83,21 @@ public class WorldshaperModel implements ItemModel, SpecialModelRenderer<Worldsh
         this.coreGlow = coreGlow;
         this.accelerator = accelerator;
         this.vector = Suppliers.memoize(() -> {
-            Set<Vector3f> set = new HashSet<>();
-            calculatePosition(item, set::add);
-            calculatePosition(core, set::add);
-            calculatePosition(coreGlow, set::add);
-            calculatePosition(accelerator, set::add);
-            return set.toArray(Vector3f[]::new);
+            Set<Vector3fc> set = new HashSet<>();
+            addPosition(set, item);
+            addPosition(set, core);
+            addPosition(set, coreGlow);
+            addPosition(set, accelerator);
+            return set.toArray(Vector3fc[]::new);
         });
     }
 
-    private static void calculatePosition(List<BakedQuad> quads, Consumer<Vector3f> consumer) {
+    private static void addPosition(Set<Vector3fc> set, List<BakedQuad> quads) {
         for (BakedQuad bakedQuad : quads) {
-            FaceBakery.extractPositions(bakedQuad.vertices(), consumer);
+            set.add(bakedQuad.position0());
+            set.add(bakedQuad.position1());
+            set.add(bakedQuad.position2());
+            set.add(bakedQuad.position3());
         }
     }
 
@@ -210,7 +217,7 @@ public class WorldshaperModel implements ItemModel, SpecialModelRenderer<Worldsh
     }
 
     @Override
-    public void getExtents(Set<Vector3f> vertices) {
+    public void getExtents(Consumer<Vector3fc> output) {
         throw new UnsupportedOperationException();
     }
 
@@ -240,14 +247,14 @@ public class WorldshaperModel implements ItemModel, SpecialModelRenderer<Worldsh
             ModelBaker baker = context.blockModelBaker();
             ResolvedModel model = baker.getModel(ITEM_ID);
             TextureSlots textures = model.getTopTextureSlots();
-            List<BakedQuad> quads = model.bakeTopGeometry(textures, baker, BlockModelRotation.X0_Y0).getAll();
+            List<BakedQuad> quads = model.bakeTopGeometry(textures, baker, BlockModelRotation.IDENTITY).getAll();
             ModelRenderProperties settings = ModelRenderProperties.fromResolvedModel(baker, model, textures);
             return new WorldshaperModel(settings, quads, bake(baker, CORE_ID), bake(baker, CORE_GLOW_ID), bake(baker, ACCELERATOR_ID));
         }
 
         private static List<BakedQuad> bake(ModelBaker baker, Identifier id) {
             ResolvedModel model = baker.getModel(id);
-            return model.bakeTopGeometry(model.getTopTextureSlots(), baker, BlockModelRotation.X0_Y0).getAll();
+            return model.bakeTopGeometry(model.getTopTextureSlots(), baker, BlockModelRotation.IDENTITY).getAll();
         }
     }
 

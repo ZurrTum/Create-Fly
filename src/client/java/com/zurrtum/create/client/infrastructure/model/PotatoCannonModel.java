@@ -2,7 +2,6 @@ package com.zurrtum.create.client.infrastructure.model;
 
 import com.google.common.base.Suppliers;
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
 import com.mojang.serialization.MapCodec;
 import com.zurrtum.create.client.Create;
@@ -149,25 +148,6 @@ public class PotatoCannonModel implements ItemModel, SpecialModelRenderer<Potato
         matrices.translate(x, y + 8);
         matrices.scale(0.5f);
         drawContext.renderItem(ammo.stack(), 0, 0);
-    }
-
-    private void fill(
-        VertexConsumer vertexConsumer,
-        PoseStack.Pose entry,
-        int x1,
-        int x2,
-        int y1,
-        int y2,
-        float depth,
-        int red,
-        int green,
-        int blue,
-        int alpha
-    ) {
-        vertexConsumer.addVertex(entry, x1, y1, depth).setColor(red, green, blue, alpha);
-        vertexConsumer.addVertex(entry, x1, y2, depth).setColor(red, green, blue, alpha);
-        vertexConsumer.addVertex(entry, x2, y2, depth).setColor(red, green, blue, alpha);
-        vertexConsumer.addVertex(entry, x2, y1, depth).setColor(red, green, blue, alpha);
     }
 
     public static class CogRenderData {
