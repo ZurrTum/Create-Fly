@@ -12,6 +12,7 @@ import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.random.WeightedList;
 import net.minecraft.world.TickRateManager;
+import net.minecraft.world.attribute.EnvironmentAttributeSystem;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.boss.EnderDragonPart;
@@ -93,6 +94,11 @@ public class VirtualRenderWorld extends Level implements VisualizationLevel {
         this.chunkSource = new VirtualChunkSource(this);
         this.lightEngine = new LevelLightEngine(chunkSource, true, false);
         this.onBlockUpdated = onBlockUpdated;
+    }
+
+    @Override
+    public EnvironmentAttributeSystem environmentAttributes() {
+        return level.environmentAttributes();
     }
 
     @Override

@@ -6,8 +6,11 @@ import com.zurrtum.create.catnip.math.BBHelper;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Holder;
+import net.minecraft.core.SectionPos;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.DifficultyInstance;
+import net.minecraft.world.attribute.EnvironmentAttributes;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.decoration.ArmorStand;
@@ -15,6 +18,7 @@ import net.minecraft.world.entity.decoration.ItemFrame;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LightLayer;
+import net.minecraft.world.level.MoonPhase;
 import net.minecraft.world.level.ServerLevelAccessor;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.Biomes;
@@ -25,6 +29,9 @@ import net.minecraft.world.level.block.EntityBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.chunk.ChunkAccess;
+import net.minecraft.world.level.chunk.status.ChunkStatus;
+import net.minecraft.world.level.dimension.DimensionType;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.FluidState;
@@ -58,6 +65,24 @@ public class SchematicLevel extends WrappedLevel implements ServerLevelAccessor,
         this.anchor = anchor;
         this.entities = new ArrayList<>();
         this.renderedBlockEntities = new ArrayList<>();
+    }
+
+    @Override
+    public DifficultyInstance getCurrentDifficultyAt(BlockPos pos) {
+        long localTime = 0L;
+        float moonBrightness = 0.0F;
+        ChunkAccess chunk = level.getChunk(
+            SectionPos.blockToSectionCoord(pos.getX()),
+            SectionPos.blockToSectionCoord(pos.getZ()),
+            ChunkStatus.FULL,
+            false
+        );
+        if (chunk != null) {
+            localTime = chunk.getInhabitedTime();
+            MoonPhase moonPhase = level.environmentAttributes().getValue(EnvironmentAttributes.MOON_PHASE, pos);
+            moonBrightness = DimensionType.MOON_BRIGHTNESS_PER_PHASE[moonPhase.index()];
+        }
+        return new DifficultyInstance(level.getDifficulty(), level.getDayTime(), localTime, moonBrightness);
     }
 
     @Override

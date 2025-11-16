@@ -1,17 +1,12 @@
 package com.zurrtum.create.catnip.levelWrappers;
 
-import org.jetbrains.annotations.Nullable;
-
-import java.util.Collections;
-import java.util.List;
-
-import net.minecraft.util.Util;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.util.Util;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.item.crafting.RecipeManager;
 import net.minecraft.world.level.biome.Biome;
@@ -23,6 +18,10 @@ import net.minecraft.world.level.saveddata.maps.MapId;
 import net.minecraft.world.level.saveddata.maps.MapItemSavedData;
 import net.minecraft.world.level.storage.ServerLevelData;
 import net.minecraft.world.ticks.TickPriority;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.Collections;
+import java.util.List;
 
 public class WrappedServerLevel extends ServerLevel {
     protected ServerLevel level;
@@ -42,11 +41,6 @@ public class WrappedServerLevel extends ServerLevel {
             level.getRandomSequences()
         );
         this.level = level;
-    }
-
-    @Override
-    public float getSunAngle(float tickProgress) {
-        return 0;
     }
 
     @Override

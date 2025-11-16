@@ -1,11 +1,5 @@
 package com.zurrtum.create.catnip.levelWrappers;
 
-import org.jetbrains.annotations.Nullable;
-
-import java.util.Collection;
-import java.util.List;
-import java.util.function.BooleanSupplier;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Holder;
@@ -18,6 +12,7 @@ import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.random.WeightedList;
 import net.minecraft.world.TickRateManager;
+import net.minecraft.world.attribute.EnvironmentAttributeSystem;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.boss.EnderDragonPart;
@@ -54,6 +49,11 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.scores.Scoreboard;
 import net.minecraft.world.ticks.BlackholeTickAccess;
 import net.minecraft.world.ticks.LevelTickAccess;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.Collection;
+import java.util.List;
+import java.util.function.BooleanSupplier;
 
 public class SchematicChunkSource extends ChunkSource {
     private final Level fallbackWorld;
@@ -106,6 +106,7 @@ public class SchematicChunkSource extends ChunkSource {
                 ResourceKey<Level> pDimension,
                 RegistryAccess pRegistryAccess,
                 Holder<DimensionType> pDimensionTypeRegistration,
+                EnvironmentAttributeSystem pEnvironmentAttributes,
                 boolean pIsClientSide,
                 boolean pIsDebug,
                 long pBiomeZoomSeed,
@@ -122,13 +123,20 @@ public class SchematicChunkSource extends ChunkSource {
                     pMaxChainedNeighborUpdates
                 );
                 access = pRegistryAccess;
+                environmentAttributes = pEnvironmentAttributes;
             }
 
             private final RegistryAccess access;
+            private final EnvironmentAttributeSystem environmentAttributes;
             private final WorldBorder border = new WorldBorder();
 
             private DummyLevel(Level level) {
-                this(null, null, level.registryAccess(), level.dimensionTypeRegistration(), false, false, 0, 0);
+                this(null, null, level.registryAccess(), level.dimensionTypeRegistration(), level.environmentAttributes(), false, false, 0, 0);
+            }
+
+            @Override
+            public EnvironmentAttributeSystem environmentAttributes() {
+                return environmentAttributes;
             }
 
             @Override
