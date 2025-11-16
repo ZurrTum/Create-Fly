@@ -1,23 +1,25 @@
 package com.zurrtum.create.client.flywheel.backend.engine;
 
-import com.mojang.blaze3d.opengl.GlConst;
-import com.mojang.blaze3d.opengl.GlDevice;
-import com.mojang.blaze3d.opengl.GlStateManager;
-import com.mojang.blaze3d.opengl.GlTexture;
+import com.mojang.blaze3d.opengl.*;
 import com.mojang.blaze3d.pipeline.RenderTarget;
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.textures.AddressMode;
+import com.mojang.blaze3d.textures.FilterMode;
+import com.mojang.blaze3d.textures.GpuTextureView;
 import com.zurrtum.create.client.flywheel.api.material.DepthTest;
 import com.zurrtum.create.client.flywheel.api.material.Material;
 import com.zurrtum.create.client.flywheel.api.material.Transparency;
 import com.zurrtum.create.client.flywheel.api.material.WriteMask;
 import com.zurrtum.create.client.flywheel.backend.Samplers;
-import org.jetbrains.annotations.Nullable;
-import org.lwjgl.opengl.GL11;
-
-import java.util.Comparator;
-
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.AbstractTexture;
+import org.jetbrains.annotations.Nullable;
+import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL12;
+import org.lwjgl.opengl.GL13;
+import org.lwjgl.opengl.GL33C;
+
+import java.util.Comparator;
 
 import static com.mojang.blaze3d.opengl.GlConst.*;
 
@@ -50,12 +52,23 @@ public final class MaterialRenderState {
     private static void setupTexture(Material material) {
         Samplers.DIFFUSE.makeActive();
         AbstractTexture texture = Minecraft.getInstance().getTextureManager().getTexture(material.texture());
-        texture.setFilter(material.blur(), material.mipmap());
         GlTexture glTexture = (GlTexture) texture.getTexture();
-        var textureId = glTexture.glId();
-        RenderSystem.setShaderTexture(0, texture.getTextureView());
-        GlStateManager._bindTexture(textureId);
-        glTexture.flushModeChanges(GlConst.GL_TEXTURE_2D);
+        int target;
+        if ((glTexture.usage() & 16) != 0) {
+            target = GL13.GL_TEXTURE_CUBE_MAP;
+            GL11.glBindTexture(target, glTexture.glId());
+        } else {
+            target = GL_TEXTURE_2D;
+            GlStateManager._bindTexture(glTexture.glId());
+        }
+        FilterMode filterMode = material.blur() ? FilterMode.LINEAR : FilterMode.NEAREST;
+        GlSampler sampler = (GlSampler) RenderSystem.getSamplerCache()
+            .getSampler(AddressMode.REPEAT, AddressMode.REPEAT, filterMode, filterMode, material.mipmap());
+        GL33C.glBindSampler(Samplers.DIFFUSE.number, sampler.getId());
+        GpuTextureView textureView = texture.getTextureView();
+        int mipLevel = textureView.baseMipLevel();
+        GlStateManager._texParameter(target, GL12.GL_TEXTURE_BASE_LEVEL, mipLevel);
+        GlStateManager._texParameter(target, GL12.GL_TEXTURE_MAX_LEVEL, mipLevel + textureView.mipLevels() - 1);
     }
 
     private static void setupBackfaceCulling(boolean backfaceCulling) {
@@ -175,7 +188,6 @@ public final class MaterialRenderState {
 
     private static void resetTexture() {
         Samplers.DIFFUSE.makeActive();
-        RenderSystem.setShaderTexture(0, null);
     }
 
     private static void resetBackfaceCulling() {
