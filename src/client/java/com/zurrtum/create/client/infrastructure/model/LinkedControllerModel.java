@@ -46,6 +46,7 @@ public class LinkedControllerModel implements ItemModel, SpecialModelRenderer<Li
     public static final Identifier ITEM_ID = Identifier.fromNamespaceAndPath(MOD_ID, "item/linked_controller/item");
     public static final Identifier POWERED_ID = Identifier.fromNamespaceAndPath(MOD_ID, "item/linked_controller/powered");
     public static final Identifier TORCH_ID = Identifier.fromNamespaceAndPath(MOD_ID, "item/linked_controller/torch");
+    public static final Identifier TORCH_OFF_ID = Identifier.fromNamespaceAndPath(MOD_ID, "item/linked_controller/torch_off");
     public static final Identifier BUTTON_ID = Identifier.fromNamespaceAndPath(MOD_ID, "item/linked_controller/button");
 
     private static final LerpedFloat equipProgress = LerpedFloat.linear().startWithValue(0);
@@ -81,6 +82,7 @@ public class LinkedControllerModel implements ItemModel, SpecialModelRenderer<Li
     }
 
     private final RenderType itemLayer = Sheets.translucentItemSheet();
+    private final RenderType blockLayer = Sheets.cutoutBlockSheet();
     private final RenderType cutoutLayer = RenderTypes.cutoutMovingBlock();
     private final int[] tints = new int[0];
     private final ModelRenderProperties settings;
@@ -88,6 +90,7 @@ public class LinkedControllerModel implements ItemModel, SpecialModelRenderer<Li
     private final List<BakedQuad> item;
     private final List<BakedQuad> powered;
     private final List<BakedQuad> torch;
+    private final List<BakedQuad> torchOff;
     private final List<BakedQuad> button;
 
     public LinkedControllerModel(
@@ -95,6 +98,7 @@ public class LinkedControllerModel implements ItemModel, SpecialModelRenderer<Li
         List<BakedQuad> item,
         List<BakedQuad> powered,
         List<BakedQuad> torch,
+        List<BakedQuad> torchOff,
         List<BakedQuad> button
     ) {
         this.settings = settings;
@@ -102,6 +106,7 @@ public class LinkedControllerModel implements ItemModel, SpecialModelRenderer<Li
         this.vector = Suppliers.memoize(() -> BlockModelWrapper.computeExtents(item));
         this.powered = powered;
         this.torch = torch;
+        this.torchOff = torchOff;
         this.button = button;
     }
 
@@ -196,6 +201,7 @@ public class LinkedControllerModel implements ItemModel, SpecialModelRenderer<Li
         renderQuads(displayContext, matrices, queue, light, overlay, itemLayer, active ? powered : item);
 
         if (!active) {
+            renderQuads(displayContext, matrices, queue, light, overlay, blockLayer, torchOff);
             matrices.popPose();
             return;
         }
@@ -290,6 +296,7 @@ public class LinkedControllerModel implements ItemModel, SpecialModelRenderer<Li
             resolver.markDependency(ITEM_ID);
             resolver.markDependency(POWERED_ID);
             resolver.markDependency(TORCH_ID);
+            resolver.markDependency(TORCH_OFF_ID);
             resolver.markDependency(BUTTON_ID);
         }
 
@@ -300,7 +307,14 @@ public class LinkedControllerModel implements ItemModel, SpecialModelRenderer<Li
             TextureSlots textures = model.getTopTextureSlots();
             List<BakedQuad> quads = model.bakeTopGeometry(textures, baker, BlockModelRotation.IDENTITY).getAll();
             ModelRenderProperties settings = ModelRenderProperties.fromResolvedModel(baker, model, textures);
-            return new LinkedControllerModel(settings, quads, bakeQuads(baker, POWERED_ID), bakeQuads(baker, TORCH_ID), bakeQuads(baker, BUTTON_ID));
+            return new LinkedControllerModel(
+                settings,
+                quads,
+                bakeQuads(baker, POWERED_ID),
+                bakeQuads(baker, TORCH_ID),
+                bakeQuads(baker, TORCH_OFF_ID),
+                bakeQuads(baker, BUTTON_ID)
+            );
         }
 
         private static List<BakedQuad> bakeQuads(ModelBaker baker, Identifier id) {

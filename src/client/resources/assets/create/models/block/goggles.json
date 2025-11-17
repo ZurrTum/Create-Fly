@@ -4,7 +4,7 @@
 	"textures": {
 		"0": "create:block/brass_casing",
 		"1": "block/black_stained_glass",
-		"2": "create:item/goggles_model",
+		"2": "create:block/goggles_model",
 		"particle": "create:block/brass_casing"
 	},
 	"elements": [

@@ -40,6 +40,7 @@ import static com.zurrtum.create.Create.MOD_ID;
 public class ExtendoGripModel implements ItemModel, SpecialModelRenderer<ExtendoGripModel.RenderData> {
     public static final Identifier ID = Identifier.fromNamespaceAndPath(MOD_ID, "model/extendo_grip");
     public static final Identifier ITEM_ID = Identifier.fromNamespaceAndPath(MOD_ID, "item/extendo_grip/item");
+    public static final Identifier POLE_ID = Identifier.fromNamespaceAndPath(MOD_ID, "item/extendo_grip/pole");
     public static final Identifier COG_ID = Identifier.fromNamespaceAndPath(MOD_ID, "item/extendo_grip/cog");
     public static final Identifier THIN_SHORT_ID = Identifier.fromNamespaceAndPath(MOD_ID, "item/extendo_grip/thin_short");
     public static final Identifier WIDE_SHORT_ID = Identifier.fromNamespaceAndPath(MOD_ID, "item/extendo_grip/wide_short");
@@ -49,11 +50,13 @@ public class ExtendoGripModel implements ItemModel, SpecialModelRenderer<Extendo
     public static final Identifier DEPLOYER_HAND_PUNCHING = Identifier.fromNamespaceAndPath(MOD_ID, "block/deployer/hand_punching");
     public static final Identifier DEPLOYER_HAND_HOLDING = Identifier.fromNamespaceAndPath(MOD_ID, "block/deployer/hand_holding");
 
-    private final RenderType layer = Sheets.translucentItemSheet();
+    private final RenderType itemLayer = Sheets.translucentItemSheet();
+    private final RenderType blockLayer = Sheets.translucentBlockItemSheet();
     private final int[] tints = new int[0];
     private final ModelRenderProperties settings;
     private final Supplier<Vector3fc[]> vector;
     private final List<BakedQuad> item;
+    private final List<BakedQuad> pole;
     private final List<BakedQuad> cog;
     private final List<BakedQuad> thinShort;
     private final List<BakedQuad> wideShort;
@@ -66,6 +69,7 @@ public class ExtendoGripModel implements ItemModel, SpecialModelRenderer<Extendo
     public ExtendoGripModel(
         ModelRenderProperties settings,
         List<BakedQuad> item,
+        List<BakedQuad> pole,
         List<BakedQuad> cog,
         List<BakedQuad> thinShort,
         List<BakedQuad> wideShort,
@@ -77,6 +81,7 @@ public class ExtendoGripModel implements ItemModel, SpecialModelRenderer<Extendo
     ) {
         this.settings = settings;
         this.item = item;
+        this.pole = pole;
         this.vector = Suppliers.memoize(() -> BlockModelWrapper.computeExtents(item));
         this.cog = cog;
         this.thinShort = thinShort;
@@ -114,7 +119,7 @@ public class ExtendoGripModel implements ItemModel, SpecialModelRenderer<Extendo
         data.animation = data.animation * data.animation * data.animation;
         float extensionAngle = Mth.lerp(data.animation, 24f, 156f);
         data.state = state.newLayer();
-        data.state.setRenderType(layer);
+        data.state.setRenderType(itemLayer);
         data.state.setExtents(vector);
         settings.applyToLayer(data.state, displayContext);
         data.state.prepareQuadList().addAll(item);
@@ -179,6 +184,7 @@ public class ExtendoGripModel implements ItemModel, SpecialModelRenderer<Extendo
         // grip
         LayerRenderState grip = data.state;
         queue.submitItem(matrices, displayContext, light, overlay, 0, grip.tintLayers, grip.quads, grip.renderType, grip.foilType);
+        renderQuads(displayContext, matrices, queue, light, overlay, pole, blockLayer);
 
         // bits
         matrices.pushPose();
@@ -187,26 +193,26 @@ public class ExtendoGripModel implements ItemModel, SpecialModelRenderer<Extendo
 
         matrices.pushPose();
         matrices.mulPose(Axis.XN.rotationDegrees(data.halfAngle));
-        renderQuads(displayContext, matrices, queue, light, overlay, thinShort);
+        renderQuads(displayContext, matrices, queue, light, overlay, thinShort, itemLayer);
         matrices.translate(0, 0.34375f, 0);
         matrices.mulPose(Axis.XN.rotationDegrees(data.oppositeAngle));
-        renderQuads(displayContext, matrices, queue, light, overlay, wideLong);
+        renderQuads(displayContext, matrices, queue, light, overlay, wideLong, itemLayer);
         matrices.translate(0, 0.6875f, 0);
         matrices.mulPose(Axis.XP.rotationDegrees(data.oppositeAngle));
         matrices.translate(0, 0.03125f, 0);
-        renderQuads(displayContext, matrices, queue, light, overlay, thinShort);
+        renderQuads(displayContext, matrices, queue, light, overlay, thinShort, itemLayer);
         matrices.popPose();
 
         matrices.pushPose();
         matrices.mulPose(Axis.XP.rotationDegrees(-180 + data.halfAngle));
-        renderQuads(displayContext, matrices, queue, light, overlay, wideShort);
+        renderQuads(displayContext, matrices, queue, light, overlay, wideShort, itemLayer);
         matrices.translate(0, 0.34375f, 0);
         matrices.mulPose(Axis.XP.rotationDegrees(data.oppositeAngle));
-        renderQuads(displayContext, matrices, queue, light, overlay, thinLong);
+        renderQuads(displayContext, matrices, queue, light, overlay, thinLong, itemLayer);
         matrices.translate(0, 0.6875f, 0);
         matrices.mulPose(Axis.XN.rotationDegrees(data.oppositeAngle));
         matrices.translate(0, 0.03125f, 0);
-        renderQuads(displayContext, matrices, queue, light, overlay, wideShort);
+        renderQuads(displayContext, matrices, queue, light, overlay, wideShort, itemLayer);
 
         // hand
         matrices.translate(0, 0.34375f, 0);
@@ -215,7 +221,7 @@ public class ExtendoGripModel implements ItemModel, SpecialModelRenderer<Extendo
         matrices.translate(0, 0, -0.25f);
         matrices.scale(1, 1, 1 / (1 + data.animation));
         matrices.translate(-1f, -0.5f, -0.5f);
-        renderQuads(displayContext, matrices, queue, light, overlay, data.hand);
+        renderQuads(displayContext, matrices, queue, light, overlay, data.hand, blockLayer);
         matrices.popPose();
 
         matrices.popPose();
@@ -225,7 +231,7 @@ public class ExtendoGripModel implements ItemModel, SpecialModelRenderer<Extendo
         matrices.translate(0.5f, 0.5625f, 0.5f);
         matrices.mulPose(Axis.ZP.rotationDegrees(data.angle));
         matrices.translate(-0.5f, -0.5625f, -0.5f);
-        renderQuads(displayContext, matrices, queue, light, overlay, cog);
+        renderQuads(displayContext, matrices, queue, light, overlay, cog, blockLayer);
         matrices.popPose();
     }
 
@@ -235,7 +241,8 @@ public class ExtendoGripModel implements ItemModel, SpecialModelRenderer<Extendo
         SubmitNodeCollector queue,
         int light,
         int overlay,
-        List<BakedQuad> quads
+        List<BakedQuad> quads,
+        RenderType layer
     ) {
         queue.submitItem(matrices, displayContext, light, overlay, 0, tints, quads, layer, ItemStackRenderState.FoilType.NONE);
     }
@@ -273,6 +280,7 @@ public class ExtendoGripModel implements ItemModel, SpecialModelRenderer<Extendo
         @Override
         public void resolveDependencies(Resolver resolver) {
             resolver.markDependency(ITEM_ID);
+            resolver.markDependency(POLE_ID);
             resolver.markDependency(COG_ID);
             resolver.markDependency(THIN_SHORT_ID);
             resolver.markDependency(WIDE_SHORT_ID);
@@ -293,6 +301,7 @@ public class ExtendoGripModel implements ItemModel, SpecialModelRenderer<Extendo
             return new ExtendoGripModel(
                 settings,
                 quads,
+                bakeQuads(baker, POLE_ID),
                 bakeQuads(baker, COG_ID),
                 bakeQuads(baker, THIN_SHORT_ID),
                 bakeQuads(baker, WIDE_SHORT_ID),

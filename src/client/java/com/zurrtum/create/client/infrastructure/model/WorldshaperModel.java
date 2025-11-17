@@ -63,6 +63,9 @@ public class WorldshaperModel implements ItemModel, SpecialModelRenderer<Worldsh
     private static final RandomSource random = RandomSource.create();
     private static final PoseStack matrices = new PoseStack();
 
+    private final RenderType blockLayer = Sheets.translucentBlockItemSheet();
+    private final RenderType itemLayer = CreateRenderTypes.itemGlowingSolid();
+    private final RenderType translucent = CreateRenderTypes.itemGlowingTranslucent();
     private final ModelRenderProperties settings;
     private final List<BakedQuad> item;
     private final List<BakedQuad> core;
@@ -148,8 +151,7 @@ public class WorldshaperModel implements ItemModel, SpecialModelRenderer<Worldsh
         matrices.translate(0.5F, 0.5F, 0.5F);
         matrices.pushPose();
         data.transform.apply(displayContext.leftHand(), matrices.last());
-        RenderType layer = Sheets.translucentItemSheet();
-        renderItem(displayContext, matrices, queue, light, overlay, item, layer);
+        renderItem(displayContext, matrices, queue, light, overlay, item, blockLayer);
 
         float pt = AnimationTickHolder.getPartialTicks();
         float worldTime = AnimationTickHolder.getRenderTime() / 20;
@@ -163,8 +165,8 @@ public class WorldshaperModel implements ItemModel, SpecialModelRenderer<Worldsh
             multiplier = Mth.sin(worldTime * 5);
         int lightItensity = (int) (15 * Mth.clamp(multiplier, 0, 1));
         int glowLight = LightTexture.pack(lightItensity, Math.max(lightItensity, 4));
-        renderItem(displayContext, matrices, queue, glowLight, overlay, core, CreateRenderTypes.itemGlowingSolid());
-        renderItem(displayContext, matrices, queue, glowLight, overlay, coreGlow, CreateRenderTypes.itemGlowingTranslucent());
+        renderItem(displayContext, matrices, queue, glowLight, overlay, core, itemLayer);
+        renderItem(displayContext, matrices, queue, glowLight, overlay, coreGlow, translucent);
 
         // Accelerator spins
         float angle = worldTime * -25;
@@ -175,7 +177,7 @@ public class WorldshaperModel implements ItemModel, SpecialModelRenderer<Worldsh
         matrices.translate(0.5f, 0.345f, 0.5f);
         matrices.mulPose(Axis.ZP.rotationDegrees(angle));
         matrices.translate(-0.5f, -0.345f, -0.5f);
-        renderItem(displayContext, matrices, queue, light, overlay, accelerator, layer);
+        renderItem(displayContext, matrices, queue, light, overlay, accelerator, blockLayer);
         matrices.popPose();
 
         if (data.used != null) {

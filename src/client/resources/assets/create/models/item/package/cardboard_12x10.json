@@ -2,8 +2,8 @@
 	"credit": "Made with Blockbench",
 	"parent": "create:item/package_transforms",
 	"textures": {
-		"0": "create:item/package/cardboard",
-		"particle": "create:item/package/cardboard_particle"
+		"0": "create:block/package/cardboard",
+		"particle": "create:block/package/cardboard_particle"
 	},
 	"elements": [
 		{

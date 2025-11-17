@@ -29,7 +29,8 @@ public class GogglesModel implements ItemModel {
     public static final Identifier ITEM_ID = Identifier.fromNamespaceAndPath(MOD_ID, "item/goggles");
     public static final Identifier BLOCK_ID = Identifier.fromNamespaceAndPath(MOD_ID, "block/goggles");
 
-    private final RenderType layer = Sheets.translucentItemSheet();
+    private final RenderType itemLayer = Sheets.translucentItemSheet();
+    private final RenderType blockLayer = Sheets.translucentBlockItemSheet();
     private final List<BakedQuad> itemQuads;
     private final ModelRenderProperties itemSettings;
     private final Supplier<Vector3fc[]> itemVector;
@@ -58,15 +59,16 @@ public class GogglesModel implements ItemModel {
     ) {
         state.appendModelIdentityElement(this);
         if (displayContext == ItemDisplayContext.HEAD) {
-            update(state, displayContext, blockQuads, blockSettings, blockVector);
+            update(state, displayContext, blockLayer, blockQuads, blockSettings, blockVector);
         } else {
-            update(state, displayContext, itemQuads, itemSettings, itemVector);
+            update(state, displayContext, itemLayer, itemQuads, itemSettings, itemVector);
         }
     }
 
     private void update(
         ItemStackRenderState state,
         ItemDisplayContext displayContext,
+        RenderType layer,
         List<BakedQuad> quads,
         ModelRenderProperties settings,
         Supplier<Vector3fc[]> vector

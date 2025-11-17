@@ -2,7 +2,7 @@
 	"credit": "Made with Blockbench",
 	"parent": "create:item/package_transforms",
 	"textures": {
-		"2": "create:item/package/rare_kryppers",
+		"2": "create:block/package/rare_kryppers",
 		"particle": "#2"
 	},
 	"elements": [

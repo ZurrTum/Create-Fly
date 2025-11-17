@@ -47,6 +47,9 @@ public class SymmetryWandModel implements ItemModel, SpecialModelRenderer<Object
     public static final Identifier BITS_ID = Identifier.fromNamespaceAndPath(MOD_ID, "item/wand_of_symmetry/bits");
     private static final int[] TINTS = new int[0];
 
+    private final RenderType blockLayer = Sheets.translucentBlockItemSheet();
+    private final RenderType itemLayer = CreateRenderTypes.itemGlowingSolid();
+    private final RenderType translucent = CreateRenderTypes.itemGlowingTranslucent();
     private final ModelRenderProperties settings;
     private final List<BakedQuad> item;
     private final List<BakedQuad> core;
@@ -115,10 +118,9 @@ public class SymmetryWandModel implements ItemModel, SpecialModelRenderer<Object
         int i
     ) {
         int maxLight = LightTexture.FULL_BRIGHT;
-        RenderType translucent = CreateRenderTypes.itemGlowingTranslucent();
 
-        renderItem(displayContext, matrices, queue, light, overlay, item, Sheets.translucentItemSheet());
-        renderItem(displayContext, matrices, queue, maxLight, overlay, core, CreateRenderTypes.itemGlowingSolid());
+        renderItem(displayContext, matrices, queue, light, overlay, item, blockLayer);
+        renderItem(displayContext, matrices, queue, maxLight, overlay, core, itemLayer);
         renderItem(displayContext, matrices, queue, maxLight, overlay, coreGlow, translucent);
 
         matrices.pushPose();

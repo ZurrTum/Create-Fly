@@ -32,7 +32,10 @@ public interface VertexConsumerMixin {
         if (normals != null) {
             int normal = normals[vertex];
             if (normal != 0) {
-                generated.set((normal & 0xFF) / 127f, ((normal >> 8) & 0xFF) / 127f, ((normal >> 16) & 0xFF) / 127f);
+                byte nx = (byte) (normal & 0xFF);
+                byte ny = (byte) ((normal >> 8) & 0xFF);
+                byte nz = (byte) ((normal >> 16) & 0xFF);
+                generated.set(nx / 127f, ny / 127f, nz / 127f);
                 generated.mul(pose.normal());
             }
         }

@@ -158,7 +158,11 @@ public class QuadBakingVertexConsumer implements VertexConsumer {
 
     private Vector3f getVertex(int vertexIndex) {
         int offset = vertexIndex * STRIDE + POSITION;
-        return new Vector3f(quadData[offset], quadData[offset + 1], quadData[offset + 2]);
+        return new Vector3f(
+            Float.intBitsToFloat(quadData[offset]),
+            Float.intBitsToFloat(quadData[offset + 1]),
+            Float.intBitsToFloat(quadData[offset + 2])
+        );
     }
 
     private long getUv(int vertexIndex) {

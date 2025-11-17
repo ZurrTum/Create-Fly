@@ -29,7 +29,7 @@ import static com.zurrtum.create.Create.MOD_ID;
 
 public class TranslucentModel implements ItemModel {
     public static final Identifier ID = Identifier.fromNamespaceAndPath(MOD_ID, "model/translucent");
-    private final RenderType layer = Sheets.translucentItemSheet();
+    private final RenderType layer = Sheets.translucentBlockItemSheet();
     private final List<ItemTintSource> tints;
     private final List<BakedQuad> quads;
     private final Supplier<Vector3fc[]> vector;

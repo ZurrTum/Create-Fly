@@ -1,0 +1,6 @@
+{
+  "parent": "create:item/linked_controller/torch",
+  "textures": {
+		"torch": "minecraft:block/redstone_torch_off"
+  }
+}
