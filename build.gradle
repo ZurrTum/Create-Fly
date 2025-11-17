@@ -1,5 +1,3 @@
-import net.fabricmc.loom.task.RemapJarTask
-
 plugins {
     id "net.fabricmc.fabric-loom-no-remap" version "1.14.0-alpha.21"
 }
@@ -78,8 +76,7 @@ sourceSets {
 }
 
 tasks.register("serverJar", Jar) {
-    archiveClassifier = "server-dev"
-    destinationDirectory = layout.buildDirectory.dir("tmp/serverJar")
+    archiveClassifier = "server"
     from sourceSets.main.output
     from("LICENSE")
     from("licenses") {
@@ -87,14 +84,8 @@ tasks.register("serverJar", Jar) {
     }
 }
 
-tasks.register('remapServerJar', RemapJarTask) {
-    dependsOn tasks.serverJar
-    inputFile = tasks.serverJar.archiveFile
-    archiveClassifier = "server"
-}
-
 tasks.build {
-    dependsOn tasks.remapServerJar
+    dependsOn tasks.serverJar
 }
 
 dependencies {
