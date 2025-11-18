@@ -123,8 +123,8 @@ public class CouplingRenderer {
         if (cart.getBehavior() instanceof OldMinecartBehavior defaultMinecartController) {
             Vec3 railVecOfPos = defaultMinecartController.getPos(xIn, yIn, zIn);
             if (railVecOfPos != null) {
-                frontVec = defaultMinecartController.getPosOffs(xIn, yIn, zIn, (double) 0.3F);
-                backVec = defaultMinecartController.getPosOffs(xIn, yIn, zIn, (double) -0.3F);
+                frontVec = defaultMinecartController.getPosOffs(xIn, yIn, zIn, 0.3F);
+                backVec = defaultMinecartController.getPosOffs(xIn, yIn, zIn, -0.3F);
                 if (frontVec == null)
                     frontVec = railVecOfPos;
                 if (backVec == null)
@@ -140,6 +140,10 @@ public class CouplingRenderer {
                     yaw = (float) (Math.atan2(endPointDiff.z, endPointDiff.x) * 180.0D / Math.PI);
                     pitch = (float) (Math.atan(endPointDiff.y) * 73.0D);
                 }
+            } else {
+                x += xIn;
+                y += yIn;
+                z += zIn;
             }
         } else {
             x += xIn;
