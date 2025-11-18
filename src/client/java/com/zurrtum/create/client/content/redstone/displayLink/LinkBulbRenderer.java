@@ -53,7 +53,7 @@ public class LinkBulbRenderer implements BlockEntityRenderer<LinkWithBulbBlockEn
             state.translucent = RenderTypes.translucentMovingBlock();
             return;
         }
-        state.translucent = RenderTypes.translucentMovingBlock();
+        state.translucent = CreateRenderTypes.translucent();
         state.additive = CreateRenderTypes.additive();
         state.glow = CachedBuffers.partial(AllPartialModels.DISPLAY_LINK_GLOW, state.blockState);
         glow = (float) (1 - (2 * Math.pow(glow - .75f, 2)));

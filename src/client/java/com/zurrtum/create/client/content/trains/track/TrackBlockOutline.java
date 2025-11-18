@@ -204,10 +204,10 @@ public class TrackBlockOutline {
                 g = 0.25f;
             }
 
-            vb.addVertex(transform.pose(), (float) x1, (float) y1, (float) z1).setColor(r, g, b, .4f)
-                .setNormal(transform.copy(), xDiff, yDiff, zDiff);
-            vb.addVertex(transform.pose(), (float) x2, (float) y2, (float) z2).setColor(r, g, b, .4f)
-                .setNormal(transform.copy(), xDiff, yDiff, zDiff);
+            vb.addVertex(transform.pose(), (float) x1, (float) y1, (float) z1).setColor(r, g, b, .4f).setNormal(transform.copy(), xDiff, yDiff, zDiff)
+                .setLineWidth(1);
+            vb.addVertex(transform.pose(), (float) x2, (float) y2, (float) z2).setColor(r, g, b, .4f).setNormal(transform.copy(), xDiff, yDiff, zDiff)
+                .setLineWidth(1);
 
         });
     }

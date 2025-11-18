@@ -9,7 +9,6 @@ import com.zurrtum.create.client.catnip.render.CachedBuffers;
 import com.zurrtum.create.client.catnip.render.SuperByteBuffer;
 import com.zurrtum.create.client.flywheel.lib.model.baked.PartialModel;
 import com.zurrtum.create.content.equipment.blueprint.BlueprintEntity;
-import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.Sheets;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.entity.EntityRenderer;
@@ -17,6 +16,7 @@ import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.state.EntityRenderState;
 import net.minecraft.client.renderer.item.ItemModelResolver;
 import net.minecraft.client.renderer.item.ItemStackRenderState;
+import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.state.CameraRenderState;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.util.Mth;
@@ -108,7 +108,8 @@ public class BlueprintRenderer extends EntityRenderer<BlueprintEntity, Blueprint
         return state;
     }
 
-    public void render(BlueprintState state, PoseStack matrices, SubmitNodeCollector queue, CameraRenderState cameraState) {
+    @Override
+    public void submit(BlueprintState state, PoseStack matrices, SubmitNodeCollector queue, CameraRenderState cameraState) {
         queue.submitCustomGeometry(matrices, state.layer, state);
         ItemStackRenderState[] items = state.items;
         if (items == null) {

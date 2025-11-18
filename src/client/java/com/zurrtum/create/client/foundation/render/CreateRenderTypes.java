@@ -1,7 +1,9 @@
 package com.zurrtum.create.client.foundation.render;
 
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.textures.AddressMode;
 import com.mojang.blaze3d.textures.FilterMode;
+import com.mojang.blaze3d.textures.GpuSampler;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.renderer.rendertype.RenderSetup;
 import net.minecraft.client.renderer.rendertype.RenderSetup.OutlineProperty;
@@ -13,6 +15,7 @@ import net.minecraft.util.Util;
 
 import java.util.function.BiFunction;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 import static com.zurrtum.create.Create.MOD_ID;
 
@@ -20,7 +23,7 @@ import static com.zurrtum.create.Create.MOD_ID;
 public class CreateRenderTypes {
     private static final RenderType TRANSLUCENT = RenderType.create(
         createLayerName("translucent"),
-        RenderSetup.builder(RenderPipelines.TRANSLUCENT_TERRAIN).bufferSize(256).affectsCrumbling().sortOnUpload().useLightmap()
+        RenderSetup.builder(RenderPipelines.TRANSLUCENT_MOVING_BLOCK).bufferSize(256).affectsCrumbling().sortOnUpload().useLightmap()
             .withTexture("Sampler0", TextureAtlas.LOCATION_BLOCKS, RenderTypes.MOVING_BLOCK_SAMPLER).setOutline(OutlineProperty.AFFECTS_OUTLINE)
             .createRenderSetup()
     );
@@ -52,10 +55,12 @@ public class CreateRenderTypes {
             .createRenderSetup()
     );
 
+    public static final Supplier<GpuSampler> CHAIN_SAMPLER = () -> RenderSystem.getSamplerCache()
+        .getSampler(AddressMode.REPEAT, AddressMode.REPEAT, FilterMode.LINEAR, FilterMode.NEAREST, true);
     private static final Function<Identifier, RenderType> CHAIN = Util.memoize((texture) -> RenderType.create(
         "chain_conveyor_chain",
-        RenderSetup.builder(RenderPipelines.CUTOUT_TERRAIN).sortOnUpload().withTexture("Sampler0", texture, RenderTypes.MOVING_BLOCK_SAMPLER)
-            .useLightmap().useOverlay().setOutline(OutlineProperty.AFFECTS_OUTLINE).createRenderSetup()
+        RenderSetup.builder(RenderPipelines.CUTOUT_BLOCK).sortOnUpload().withTexture("Sampler0", texture, CHAIN_SAMPLER).useLightmap().useOverlay()
+            .setOutline(OutlineProperty.AFFECTS_OUTLINE).createRenderSetup()
     ));
 
     public static RenderType translucent() {

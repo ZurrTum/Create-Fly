@@ -14,15 +14,15 @@
     },
     {
       "type": "single",
-      "resource": "create:entity/blueprint_large"
+      "resource": "create:block/blueprint_large"
     },
     {
       "type": "single",
-      "resource": "create:entity/blueprint_medium"
+      "resource": "create:block/blueprint_medium"
     },
     {
       "type": "single",
-      "resource": "create:entity/blueprint_small"
+      "resource": "create:block/blueprint_small"
     },
     {
       "type": "single",

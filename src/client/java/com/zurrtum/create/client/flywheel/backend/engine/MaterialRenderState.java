@@ -3,8 +3,8 @@ package com.zurrtum.create.client.flywheel.backend.engine;
 import com.mojang.blaze3d.opengl.*;
 import com.mojang.blaze3d.pipeline.RenderTarget;
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.textures.AddressMode;
 import com.mojang.blaze3d.textures.FilterMode;
+import com.mojang.blaze3d.textures.GpuSampler;
 import com.mojang.blaze3d.textures.GpuTextureView;
 import com.zurrtum.create.client.flywheel.api.material.DepthTest;
 import com.zurrtum.create.client.flywheel.api.material.Material;
@@ -61,9 +61,10 @@ public final class MaterialRenderState {
             target = GL_TEXTURE_2D;
             GlStateManager._bindTexture(glTexture.glId());
         }
+        GpuSampler textureSampler = texture.getSampler();
         FilterMode filterMode = material.blur() ? FilterMode.LINEAR : FilterMode.NEAREST;
         GlSampler sampler = (GlSampler) RenderSystem.getSamplerCache()
-            .getSampler(AddressMode.REPEAT, AddressMode.REPEAT, filterMode, filterMode, material.mipmap());
+            .getSampler(textureSampler.getAddressModeU(), textureSampler.getAddressModeV(), filterMode, filterMode, material.mipmap());
         GL33C.glBindSampler(Samplers.DIFFUSE.number, sampler.getId());
         GpuTextureView textureView = texture.getTextureView();
         int mipLevel = textureView.baseMipLevel();

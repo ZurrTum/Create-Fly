@@ -16,9 +16,9 @@ public class AllRenderPipelines {
     public static final RenderPipeline.Snippet GLOWING_SNIPPET = RenderPipeline.builder(RenderPipelines.MATRICES_FOG_SNIPPET)
         .withVertexShader(GLOWING_ID).withFragmentShader(GLOWING_ID).withSampler("Sampler0").withSampler("Sampler2")
         .withVertexFormat(DefaultVertexFormat.NEW_ENTITY, VertexFormat.Mode.QUADS).buildSnippet();
-    public static final RenderPipeline ADDITIVE = RenderPipeline.builder(RenderPipelines.TERRAIN_SNIPPET)
+    public static final RenderPipeline ADDITIVE = RenderPipeline.builder(RenderPipelines.BLOCK_SNIPPET)
         .withLocation(Identifier.fromNamespaceAndPath(MOD_ID, "pipeline/additive")).withBlend(BlendFunction.ADDITIVE).withCull(false).build();
-    public static final RenderPipeline ADDITIVE2 = RenderPipeline.builder(RenderPipelines.TERRAIN_SNIPPET)
+    public static final RenderPipeline ADDITIVE2 = RenderPipeline.builder(RenderPipelines.BLOCK_SNIPPET)
         .withLocation(Identifier.fromNamespaceAndPath(MOD_ID, "pipeline/additive2")).withBlend(BlendFunction.ADDITIVE).withCull(false)
         .withDepthWrite(false).build();
     public static final RenderPipeline GLOWING = RenderPipeline.builder(GLOWING_SNIPPET)
