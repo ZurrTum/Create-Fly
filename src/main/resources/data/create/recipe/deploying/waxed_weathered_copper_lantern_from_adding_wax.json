@@ -1,0 +1,9 @@
+{
+  "type": "create:deploying",
+  "keep_held_item": true,
+  "target": "minecraft:weathered_copper_lantern",
+  "ingredient": "minecraft:honeycomb_block",
+  "result": {
+    "id": "minecraft:waxed_weathered_copper_lantern"
+  }
+}

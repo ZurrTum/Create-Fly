@@ -1,0 +1,9 @@
+{
+  "type": "create:deploying",
+  "keep_held_item": true,
+  "target": "minecraft:exposed_copper_chain",
+  "ingredient": "minecraft:honeycomb_block",
+  "result": {
+    "id": "minecraft:waxed_exposed_copper_chain"
+  }
+}
