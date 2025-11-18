@@ -168,11 +168,7 @@ public class StockKeeperRequestScreen extends AbstractSimiContainerScreen<StockK
         for (int yOffset : Iterate.zeroAndOne) {
             for (Direction side : Iterate.horizontalDirections) {
                 BlockPos seatPos = blockEntity.getBlockPos().below(yOffset).relative(side);
-                int x = seatPos.getX();
-                int y = seatPos.getY();
-                int z = seatPos.getZ();
-                for (SeatEntity seatEntity : blockEntity.getLevel()
-                    .getEntitiesOfClass(SeatEntity.class, new AABB(x, y - 0.1f, z, x + 1, y + 1, z + 1))) {
+                for (SeatEntity seatEntity : blockEntity.getLevel().getEntitiesOfClass(SeatEntity.class, new AABB(seatPos))) {
                     if (!seatEntity.getPassengers().isEmpty() && seatEntity.getPassengers().getFirst() instanceof LivingEntity keeper) {
                         stockKeeper = new WeakReference<>(keeper);
                     }

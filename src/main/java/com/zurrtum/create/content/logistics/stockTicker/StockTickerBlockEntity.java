@@ -16,9 +16,6 @@ import com.zurrtum.create.content.logistics.packagerLink.LogisticallyLinkedBehav
 import com.zurrtum.create.foundation.codec.CreateCodecs;
 import com.zurrtum.create.infrastructure.component.PackageOrderWithCrafts;
 import com.zurrtum.create.infrastructure.items.ItemStackHandler;
-
-import java.util.*;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.UUIDUtil;
@@ -34,6 +31,8 @@ import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
+
+import java.util.*;
 
 public class StockTickerBlockEntity extends StockCheckingBlockEntity {
     public static final Codec<Map<UUID, List<Integer>>> UUID_MAP_CODEC = Codec.unboundedMap(UUIDUtil.STRING_CODEC, Codec.INT.listOf());
@@ -204,10 +203,7 @@ public class StockTickerBlockEntity extends StockCheckingBlockEntity {
         for (int yOffset : Iterate.zeroAndOne) {
             for (Direction side : Iterate.horizontalDirections) {
                 BlockPos seatPos = worldPosition.below(yOffset).relative(side);
-                int x = seatPos.getX();
-                int y = seatPos.getY();
-                int z = seatPos.getZ();
-                for (SeatEntity seatEntity : level.getEntitiesOfClass(SeatEntity.class, new AABB(x, y - 0.1f, z, x + 1, y + 1, z + 1)))
+                for (SeatEntity seatEntity : level.getEntitiesOfClass(SeatEntity.class, new AABB(seatPos)))
                     if (seatEntity.isVehicle())
                         return true;
                 if (yOffset == 0) {
