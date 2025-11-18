@@ -1,0 +1,9 @@
+{
+  "type": "create:deploying",
+  "keep_held_item": true,
+  "target": "minecraft:copper_golem_statue",
+  "ingredient": "minecraft:honeycomb_block",
+  "result": {
+    "id": "minecraft:waxed_copper_golem_statue"
+  }
+}

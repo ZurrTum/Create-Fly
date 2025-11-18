@@ -1,0 +1,9 @@
+{
+  "type": "create:deploying",
+  "keep_held_item": true,
+  "target": "minecraft:waxed_oxidized_copper_lantern",
+  "ingredient": "#minecraft:axes",
+  "result": {
+    "id": "minecraft:oxidized_copper_lantern"
+  }
+}
