@@ -1,19 +1,13 @@
 package com.zurrtum.create.content.contraptions.minecart.capability;
 
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.zurrtum.create.AllSynchedDatas;
 import com.zurrtum.create.Create;
 import com.zurrtum.create.catnip.data.Couple;
 import com.zurrtum.create.content.contraptions.AbstractContraptionEntity;
 import com.zurrtum.create.content.contraptions.OrientedContraptionEntity;
 import com.zurrtum.create.content.contraptions.minecart.CouplingHandler;
-import org.apache.commons.lang3.mutable.MutableBoolean;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.UUIDUtil;
 import net.minecraft.network.RegistryFriendlyByteBuf;
@@ -28,12 +22,23 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
+import org.apache.commons.lang3.mutable.MutableBoolean;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
 /**
  * Extended code for Minecarts, this allows for handling stalled carts and
  * coupled trains
  */
 public class MinecartController {
+    public static final Codec<MinecartController> CODEC = RecordCodecBuilder.create(instance -> instance.group(
+        Couple.optionalCodec(StallData.CODEC).fieldOf("stallData").forGetter(i -> i.stallData),
+        Couple.optionalCodec(CouplingData.CODEC).fieldOf("couplings").forGetter(i -> i.couplings)
+    ).apply(instance, MinecartController::new));
     public static final StreamCodec<RegistryFriendlyByteBuf, MinecartController> PACKET_CODEC = StreamCodec.composite(
         Couple.streamCodec(StallData.PACKET_CODEC.apply(ByteBufCodecs::optional)),
         i -> i.stallData,
@@ -313,6 +318,12 @@ public class MinecartController {
     }
 
     private static class CouplingData {
+        public static final Codec<CouplingData> CODEC = RecordCodecBuilder.create(instance -> instance.group(
+            UUIDUtil.CODEC.fieldOf("mainCartID").forGetter(i -> i.mainCartID),
+            UUIDUtil.CODEC.fieldOf("connectedCartID").forGetter(i -> i.connectedCartID),
+            Codec.FLOAT.fieldOf("length").forGetter(i -> i.length),
+            Codec.BOOL.fieldOf("contraption").forGetter(i -> i.contraption)
+        ).apply(instance, CouplingData::new));
         public static final StreamCodec<RegistryFriendlyByteBuf, CouplingData> PACKET_CODEC = StreamCodec.composite(
             UUIDUtil.STREAM_CODEC,
             i -> i.mainCartID,
@@ -352,6 +363,12 @@ public class MinecartController {
     }
 
     private record StallData(Vec3 position, Vec3 motion, float yaw, float pitch) {
+        public static final Codec<StallData> CODEC = RecordCodecBuilder.create(instance -> instance.group(
+            Vec3.CODEC.fieldOf("position").forGetter(StallData::position),
+            Vec3.CODEC.fieldOf("motion").forGetter(StallData::motion),
+            Codec.FLOAT.fieldOf("yaw").forGetter(StallData::yaw),
+            Codec.FLOAT.fieldOf("pitch").forGetter(StallData::pitch)
+        ).apply(instance, StallData::new));
         public static final StreamCodec<RegistryFriendlyByteBuf, StallData> PACKET_CODEC = StreamCodec.composite(
             Vec3.STREAM_CODEC,
             StallData::position,
