@@ -2,17 +2,11 @@ package com.zurrtum.create.content.kinetics.drill;
 
 import com.zurrtum.create.catnip.data.Iterate;
 import com.zurrtum.create.catnip.data.Pair;
-import com.zurrtum.create.content.kinetics.drill.FluidInteractionRegistry.FluidInteraction;
-import com.zurrtum.create.content.kinetics.drill.FluidInteractionRegistry.HasFluidInteraction;
-import com.zurrtum.create.content.kinetics.drill.FluidInteractionRegistry.InteractionInformation;
 import com.zurrtum.create.foundation.fluid.FluidHelper;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
+import com.zurrtum.create.infrastructure.fluids.FluidInteractionRegistry;
+import com.zurrtum.create.infrastructure.fluids.FluidInteractionRegistry.FluidInteraction;
+import com.zurrtum.create.infrastructure.fluids.FluidInteractionRegistry.HasFluidInteraction;
+import com.zurrtum.create.infrastructure.fluids.FluidInteractionRegistry.InteractionInformation;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
@@ -22,6 +16,12 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.FluidState;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class CobbleGenOptimisation {
     static CobbleGenLevel cachedLevel;

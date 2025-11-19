@@ -36,6 +36,7 @@
     "LecternBlockEntityMixin",
     "LevelChunkMixin",
     "LevelMixin",
+    "LiquidBlockMixin",
     "LivingEntityMixin",
     "MapItemSavedDataMixin",
     "MinecraftServerMixin",

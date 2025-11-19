@@ -1,11 +1,7 @@
-package com.zurrtum.create.content.kinetics.drill;
+package com.zurrtum.create.infrastructure.fluids;
 
 import com.zurrtum.create.AllBlocks;
 import com.zurrtum.create.AllFluids;
-
-import java.util.*;
-import java.util.function.Function;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.Level;
@@ -16,6 +12,9 @@ import net.minecraft.world.level.material.FlowingFluid;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.Fluids;
+
+import java.util.*;
+import java.util.function.Function;
 
 /**
  * A registry which defines the interactions a source fluid can have with its
@@ -56,10 +55,9 @@ public final class FluidInteractionRegistry {
      */
     public static boolean canInteract(Level level, BlockPos pos) {
         FluidState state = level.getFluidState(pos);
-        Fluid fluid = state.getType();
+        List<InteractionInformation> interactions = INTERACTIONS.getOrDefault(state.getType(), Collections.emptyList());
         for (Direction direction : LiquidBlock.POSSIBLE_FLOW_DIRECTIONS) {
             BlockPos relativePos = pos.relative(direction.getOpposite());
-            List<InteractionInformation> interactions = INTERACTIONS.getOrDefault(fluid, Collections.emptyList());
             for (InteractionInformation interaction : interactions) {
                 if (interaction.predicate().test(level, pos, relativePos, state)) {
                     interaction.interaction().interact(level, pos, relativePos, state);
@@ -83,8 +81,7 @@ public final class FluidInteractionRegistry {
 
         // Lava + Soul Soil (Below) + Blue Ice = Basalt
         addInteraction(
-            Fluids.LAVA,
-            new InteractionInformation(
+            Fluids.LAVA, new InteractionInformation(
                 (level, currentPos, relativePos, currentState) -> level.getBlockState(currentPos.below()).is(Blocks.SOUL_SOIL) && level.getBlockState(
                     relativePos).is(Blocks.BLUE_ICE), Blocks.BASALT.defaultBlockState()
             )
