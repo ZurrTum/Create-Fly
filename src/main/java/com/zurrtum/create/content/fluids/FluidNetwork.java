@@ -81,7 +81,7 @@ public class FluidNetwork {
                     continue;
 
                 Flow flow = pipeConnection.flow.get();
-                if (!fluid.isEmpty() && !FluidStack.areFluidsAndComponentsEqual(flow.fluid, fluid)) {
+                if (!fluid.isEmpty() && !FluidStack.areFluidsAndComponentsEqualIgnoreCapacity(flow.fluid, fluid)) {
                     iterator.remove();
                     continue;
                 }
