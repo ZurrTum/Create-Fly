@@ -109,7 +109,7 @@ public class PipeConnection {
         // Manage existing flow
         Flow flow = this.flow.get();
         FluidStack provided = flow.inbound ? flowSource.provideFluid(extractionPredicate) : internalFluid;
-        if (!hasPressure() || provided.isEmpty() || !FluidStack.areFluidsAndComponentsEqual(provided, flow.fluid)) {
+        if (!hasPressure() || provided.isEmpty() || !FluidStack.areFluidsAndComponentsEqualIgnoreCapacity(provided, flow.fluid)) {
             this.flow = Optional.empty();
             return true;
         }

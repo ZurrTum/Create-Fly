@@ -109,7 +109,7 @@ public abstract class FluidTransportBehaviour extends BlockEntityBehaviour<Smart
                     availableFlow = fluidInFlow;
                     continue;
                 }
-                if (FluidStack.areFluidsAndComponentsEqual(availableFlow, fluidInFlow)) {
+                if (FluidStack.areFluidsAndComponentsEqualIgnoreCapacity(availableFlow, fluidInFlow)) {
                     singleSource = null;
                     availableFlow = fluidInFlow;
                     continue;
