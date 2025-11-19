@@ -41,6 +41,9 @@ public class SidedFilteringBehaviour extends FilteringBehaviour<ServerSidedFilte
         if (sidedFilter != null && sidedFilter.behaviour != null) {
             return sidedFilter;
         }
+        if (behaviour == null) {
+            return null;
+        }
         ServerFilteringBehaviour filter = behaviour.get(side);
         if (filter == null) {
             return null;
