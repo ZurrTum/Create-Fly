@@ -1,6 +1,7 @@
 package com.zurrtum.create.client.infrastructure.model;
 
 import com.zurrtum.create.catnip.data.Iterate;
+import com.zurrtum.create.client.AllCTBehaviours;
 import com.zurrtum.create.client.AllPartialModels;
 import com.zurrtum.create.content.decoration.bracket.BracketedBlockEntityBehaviour;
 import com.zurrtum.create.content.fluids.FluidTransportBehaviour;
@@ -24,9 +25,17 @@ public class PipeAttachmentModel extends WrapperBlockStateModel {
         super(state, unbaked);
     }
 
+    public static UnbakedGrouped encased(BlockState state, UnbakedGrouped unbaked) {
+        return new PipeAttachmentModel(state, new CTModel(state, unbaked, AllCTBehaviours.COPPER_CASING));
+    }
+
     @Override
     public void addPartsWithInfo(BlockRenderView world, BlockPos pos, BlockState state, Random random, List<BlockModelPart> parts) {
-        model.addParts(random, parts);
+        if (model instanceof WrapperBlockStateModel wrapper) {
+            wrapper.addPartsWithInfo(world, pos, state, random, parts);
+        } else {
+            model.addParts(random, parts);
+        }
         Optional.ofNullable(BlockEntityBehaviour.get(world, pos, BracketedBlockEntityBehaviour.TYPE)).map(BracketedBlockEntityBehaviour::getBracket)
             .map(bracket -> MinecraftClient.getInstance().getBlockRenderManager().getModel(bracket))
             .ifPresent(model -> model.addParts(random, parts));
