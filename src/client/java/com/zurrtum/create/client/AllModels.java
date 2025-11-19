@@ -3,17 +3,16 @@ package com.zurrtum.create.client;
 import com.mojang.serialization.MapCodec;
 import com.zurrtum.create.AllBlocks;
 import com.zurrtum.create.client.infrastructure.model.*;
-
-import java.util.HashMap;
-import java.util.Map;
-import java.util.function.BiFunction;
-
 import net.minecraft.client.renderer.block.model.BlockStateModel.UnbakedRoot;
 import net.minecraft.client.renderer.item.ItemModel;
 import net.minecraft.client.renderer.item.ItemModels;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.function.BiFunction;
 
 public class AllModels {
     public static final Map<BlockState, BiFunction<BlockState, UnbakedRoot, UnbakedRoot>> ALL = new HashMap<>();
@@ -195,7 +194,7 @@ public class AllModels {
         register(AllBlocks.LARGE_WATER_WHEEL, LargeWaterWheelModel::new);
         register(AllBlocks.WATER_WHEEL_STRUCTURAL, WaterWheelStructuralModel::single);
         register(AllBlocks.FLUID_PIPE, PipeAttachmentModel::new);
-        register(AllBlocks.ENCASED_FLUID_PIPE, PipeAttachmentModel::new);
+        register(AllBlocks.ENCASED_FLUID_PIPE, PipeAttachmentModel::encased);
         register(AllBlocks.GLASS_FLUID_PIPE, PipeAttachmentModel::new);
         register(AllBlocks.MECHANICAL_PUMP, PipeAttachmentModel::new);
         register(AllBlocks.FLUID_VALVE, PipeAttachmentModel::new);
