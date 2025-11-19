@@ -17,8 +17,6 @@ https://www.curseforge.com/minecraft/mc-mods/create-fly/files/all?page=1&pageSiz
   compatible.
 - The original Fabric fork was ported using Porting-Lib, which actually required implementing many NeoForge features.
   This project uses a mixin specifically for Create features to make porting easier.
-- The original Fabric fork used the Parchment mapping, which is based on Mojang. This project uses the Yarn mapping,
-  which is more consistent with Fabric development.
 - The original Fabric fork used a mixed approach to server-side and client-side development, which made it easy for the
   server to call non-existent client code, leading to errors. This project uses a new code separation mode for
   development.
@@ -77,10 +75,12 @@ repositories {
 }
 
 dependencies {
+    // 25w46a_unobfuscated
+    implementation "maven.modrinth:create-fly:25w46a_unobfuscated-6.0.8-1"
     // 1.21.10
-    modImplementation "maven.modrinth:create-fly:1.21.10-6.0.8-3"
+    modImplementation "maven.modrinth:create-fly:1.21.10-6.0.8-4"
     // 1.21.8
-    modImplementation "maven.modrinth:create-fly:1.21.8-6.0.8-1"
+    modImplementation "maven.modrinth:create-fly:1.21.8-6.0.8-2"
 }
 ```
 
@@ -101,10 +101,12 @@ repositories {
 }
 
 dependencies {
+    // 25w46a_unobfuscated
+    implementation "curse.maven:create-fly-1346281:7237665-sources-7237668"
     // 1.21.10
-    modImplementation "curse.maven:create-fly-1346281:7200911-sources-7200915"
+    modImplementation "curse.maven:create-fly-1346281:7237453-sources-7237455"
     // 1.21.8
-    modImplementation "curse.maven:create-fly-1346281:7200716-sources-7200719"
+    modImplementation "curse.maven:create-fly-1346281:7237400-sources-7237403"
 }
 ```
 
