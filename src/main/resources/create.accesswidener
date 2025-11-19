@@ -269,3 +269,4 @@ accessible field net/minecraft/client/renderer/rendertype/RenderSetup textures L
 accessible class net/minecraft/client/renderer/rendertype/RenderSetup$TextureBinding
 accessible field net/minecraft/client/renderer/rendertype/RenderSetup useLightmap Z
 accessible field net/minecraft/client/renderer/rendertype/RenderSetup useOverlay Z
+accessible field net/minecraft/client/renderer/RenderPipelines BLOCK_SNIPPET Lcom/mojang/blaze3d/pipeline/RenderPipeline$Snippet;
