@@ -250,7 +250,7 @@ public class SmartFluidTankBehaviour extends BlockEntityBehaviour<SmartBlockEnti
                         if (fluid.isEmpty()) {
                             continue;
                         }
-                        if (FluidStack.areFluidsAndComponentsEqual(fluid, stack)) {
+                        if (matches(fluid, stack)) {
                             return false;
                         }
                     }
@@ -259,12 +259,12 @@ public class SmartFluidTankBehaviour extends BlockEntityBehaviour<SmartBlockEnti
                         if (fluid.isEmpty()) {
                             continue;
                         }
-                        if (FluidStack.areFluidsAndComponentsEqual(fluid, stack)) {
+                        if (matches(fluid, stack)) {
                             return false;
                         }
                     }
                 } else {
-                    return FluidStack.areFluidsAndComponentsEqual(fluid, stack);
+                    return matches(fluid, stack);
                 }
             }
             return true;

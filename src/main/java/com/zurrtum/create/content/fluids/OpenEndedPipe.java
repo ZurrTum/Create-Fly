@@ -259,7 +259,9 @@ public class OpenEndedPipe extends FlowSource {
             }
             if (stack == FluidStack.EMPTY) {
                 stack = removeFluidFromSpace(false);
-                setMaxSize(stack, MAX);
+                if (!stack.isEmpty()) {
+                    setMaxSize(stack, MAX);
+                }
                 return stack;
             }
             return FluidStack.EMPTY;

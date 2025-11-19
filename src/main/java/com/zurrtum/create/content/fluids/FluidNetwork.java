@@ -8,15 +8,14 @@ import com.zurrtum.create.content.fluids.PipeConnection.Flow;
 import com.zurrtum.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.infrastructure.fluids.FluidInventory;
 import com.zurrtum.create.infrastructure.fluids.FluidStack;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.Nullable;
 
 import java.lang.ref.WeakReference;
 import java.util.*;
 import java.util.function.Supplier;
-
-import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
-import net.minecraft.world.level.Level;
 
 public class FluidNetwork {
 
@@ -82,7 +81,7 @@ public class FluidNetwork {
                     continue;
 
                 Flow flow = pipeConnection.flow.get();
-                if (!fluid.isEmpty() && !FluidStack.areFluidsAndComponentsEqual(flow.fluid, fluid)) {
+                if (!fluid.isEmpty() && !FluidStack.areFluidsAndComponentsEqualIgnoreCapacity(flow.fluid, fluid)) {
                     iterator.remove();
                     continue;
                 }

@@ -8,11 +8,6 @@ import com.zurrtum.create.catnip.math.BlockFace;
 import com.zurrtum.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.foundation.codec.CreateCodecs;
 import com.zurrtum.create.infrastructure.fluids.FluidStack;
-
-import java.util.List;
-import java.util.Optional;
-import java.util.function.Predicate;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.util.Mth;
@@ -21,6 +16,10 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.chunk.status.ChunkStatus;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
+
+import java.util.List;
+import java.util.Optional;
+import java.util.function.Predicate;
 
 public class PipeConnection {
 
@@ -110,7 +109,7 @@ public class PipeConnection {
         // Manage existing flow
         Flow flow = this.flow.get();
         FluidStack provided = flow.inbound ? flowSource.provideFluid(extractionPredicate) : internalFluid;
-        if (!hasPressure() || provided.isEmpty() || !FluidStack.areFluidsAndComponentsEqual(provided, flow.fluid)) {
+        if (!hasPressure() || provided.isEmpty() || !FluidStack.areFluidsAndComponentsEqualIgnoreCapacity(provided, flow.fluid)) {
             this.flow = Optional.empty();
             return true;
         }
