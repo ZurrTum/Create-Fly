@@ -18,6 +18,8 @@ public class ServerEntityHandlerMixin {
 
     @Inject(method = "stopTracking(Lnet/minecraft/entity/Entity;)V", at = @At("TAIL"))
     private void stopTracking(Entity entity, CallbackInfo ci) {
-        CapabilityMinecartController.onEntityDeath(field_26936, entity);
+        if (!entity.isAlive()) {
+            CapabilityMinecartController.onEntityDeath(field_26936, entity);
+        }
     }
 }

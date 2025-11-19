@@ -1,5 +1,7 @@
 package com.zurrtum.create.content.contraptions.minecart.capability;
 
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.zurrtum.create.AllSynchedDatas;
 import com.zurrtum.create.Create;
 import com.zurrtum.create.catnip.data.Couple;
@@ -33,6 +35,10 @@ import java.util.UUID;
  * coupled trains
  */
 public class MinecartController {
+    public static final Codec<MinecartController> CODEC = RecordCodecBuilder.create(instance -> instance.group(
+        Couple.optionalCodec(StallData.CODEC).fieldOf("stallData").forGetter(i -> i.stallData),
+        Couple.optionalCodec(CouplingData.CODEC).fieldOf("couplings").forGetter(i -> i.couplings)
+    ).apply(instance, MinecartController::new));
     public static final PacketCodec<RegistryByteBuf, MinecartController> PACKET_CODEC = PacketCodec.tuple(
         Couple.streamCodec(StallData.PACKET_CODEC.collect(PacketCodecs::optional)),
         i -> i.stallData,
@@ -312,6 +318,12 @@ public class MinecartController {
     }
 
     private static class CouplingData {
+        public static final Codec<CouplingData> CODEC = RecordCodecBuilder.create(instance -> instance.group(
+            Uuids.CODEC.fieldOf("mainCartID").forGetter(i -> i.mainCartID),
+            Uuids.CODEC.fieldOf("connectedCartID").forGetter(i -> i.connectedCartID),
+            Codec.FLOAT.fieldOf("length").forGetter(i -> i.length),
+            Codec.BOOL.fieldOf("contraption").forGetter(i -> i.contraption)
+        ).apply(instance, CouplingData::new));
         public static final PacketCodec<RegistryByteBuf, CouplingData> PACKET_CODEC = PacketCodec.tuple(
             Uuids.PACKET_CODEC,
             i -> i.mainCartID,
@@ -351,6 +363,12 @@ public class MinecartController {
     }
 
     private record StallData(Vec3d position, Vec3d motion, float yaw, float pitch) {
+        public static final Codec<StallData> CODEC = RecordCodecBuilder.create(instance -> instance.group(
+            Vec3d.CODEC.fieldOf("position").forGetter(StallData::position),
+            Vec3d.CODEC.fieldOf("motion").forGetter(StallData::motion),
+            Codec.FLOAT.fieldOf("yaw").forGetter(StallData::yaw),
+            Codec.FLOAT.fieldOf("pitch").forGetter(StallData::pitch)
+        ).apply(instance, StallData::new));
         public static final PacketCodec<RegistryByteBuf, StallData> PACKET_CODEC = PacketCodec.tuple(
             Vec3d.PACKET_CODEC,
             StallData::position,
