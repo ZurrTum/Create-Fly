@@ -1,10 +1,7 @@
 package com.zurrtum.create.catnip.data;
 
 import com.google.common.collect.ImmutableList;
-import com.mojang.serialization.Codec;
-import com.mojang.serialization.DataResult;
-import com.mojang.serialization.DynamicOps;
-import com.mojang.serialization.ListBuilder;
+import com.mojang.serialization.*;
 import com.zurrtum.create.catnip.nbt.NBTHelper;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtList;
@@ -13,6 +10,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Iterator;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.*;
 import java.util.stream.Stream;
 
@@ -76,6 +74,29 @@ public class Couple<T> extends Pair<T, T> implements Iterable<T> {
                 list.add(input.first, codec);
                 list.add(input.second, codec);
                 return list.build(prefix);
+            }
+        };
+    }
+
+    public static <T> Codec<Couple<Optional<T>>> optionalCodec(Codec<T> codec) {
+        return new Codec<>() {
+            @Override
+            public <V> DataResult<com.mojang.datafixers.util.Pair<Couple<Optional<T>>, V>> decode(DynamicOps<V> ops, V input) {
+                return ops.getMap(input).mapOrElse(
+                    map -> {
+                        Optional<T> first = Optional.ofNullable(map.get("first")).flatMap(i -> codec.parse(ops, i).result());
+                        Optional<T> second = Optional.ofNullable(map.get("second")).flatMap(i -> codec.parse(ops, i).result());
+                        return DataResult.success(com.mojang.datafixers.util.Pair.of(new Couple<>(first, second), ops.empty()));
+                    }, e -> DataResult.success(com.mojang.datafixers.util.Pair.of(Couple.create(Optional::empty), ops.empty()))
+                );
+            }
+
+            @Override
+            public <V> DataResult<V> encode(Couple<Optional<T>> input, DynamicOps<V> ops, V prefix) {
+                RecordBuilder<V> map = ops.mapBuilder();
+                input.getFirst().ifPresent(first -> map.add("first", first, codec));
+                input.getSecond().ifPresent(second -> map.add("second", second, codec));
+                return map.build(prefix);
             }
         };
     }
