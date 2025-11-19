@@ -1,4 +1,4 @@
-package com.zurrtum.create.content.kinetics.drill;
+package com.zurrtum.create.infrastructure.fluids;
 
 import com.zurrtum.create.AllBlocks;
 import com.zurrtum.create.AllFluids;
@@ -55,10 +55,9 @@ public final class FluidInteractionRegistry {
      */
     public static boolean canInteract(World level, BlockPos pos) {
         FluidState state = level.getFluidState(pos);
-        Fluid fluid = state.getFluid();
+        List<InteractionInformation> interactions = INTERACTIONS.getOrDefault(state.getFluid(), Collections.emptyList());
         for (Direction direction : FluidBlock.FLOW_DIRECTIONS) {
             BlockPos relativePos = pos.offset(direction.getOpposite());
-            List<InteractionInformation> interactions = INTERACTIONS.getOrDefault(fluid, Collections.emptyList());
             for (InteractionInformation interaction : interactions) {
                 if (interaction.predicate().test(level, pos, relativePos, state)) {
                     interaction.interaction().interact(level, pos, relativePos, state);
