@@ -321,17 +321,17 @@ public class NixieTubeBlock extends DoubleFaceAttachedBlock implements IBE<Nixie
         updateDisplayedRedstoneValue(state, worldIn, pos);
     }
 
-    public static void updateDisplayedRedstoneValue(NixieTubeBlockEntity be, boolean force) {
+    public static void updateDisplayedRedstoneValue(NixieTubeBlockEntity be, BlockState state, boolean force) {
         if (be.getWorld() == null || be.getWorld().isClient)
             return;
         if (be.reactsToRedstone() || force)
-            be.updateRedstoneStrength(getPower(be.getWorld(), be.getPos()));
+            be.updateRedstoneStrength(getPower(be.getWorld(), state, be.getPos()));
     }
 
-    private void updateDisplayedRedstoneValue(BlockState state, World worldIn, BlockPos pos) {
-        if (worldIn.isClient)
+    private void updateDisplayedRedstoneValue(BlockState state, World level, BlockPos pos) {
+        if (level.isClient)
             return;
-        withBlockEntityDo(worldIn, pos, be -> NixieTubeBlock.updateDisplayedRedstoneValue(be, false));
+        withBlockEntityDo(level, pos, be -> NixieTubeBlock.updateDisplayedRedstoneValue(be, state, false));
     }
 
     static boolean isValidBlock(BlockView world, BlockPos pos, boolean above) {
@@ -339,12 +339,14 @@ public class NixieTubeBlock extends DoubleFaceAttachedBlock implements IBE<Nixie
         return !state.getOutlineShape(world, pos).isEmpty();
     }
 
-    private static int getPower(World worldIn, BlockPos pos) {
+    private static int getPower(World worldIn, BlockState state, BlockPos pos) {
         int power = 0;
         for (Direction direction : Iterate.directions)
             power = Math.max(worldIn.getEmittedRedstonePower(pos.offset(direction), direction), power);
-        for (Direction direction : Iterate.directions)
-            power = Math.max(worldIn.getEmittedRedstonePower(pos.offset(direction), Direction.UP), power);
+        for (Direction direction : Iterate.directions) {
+            if (state.get(FACING).getOpposite() != direction)
+                power = Math.max(worldIn.getEmittedRedstonePower(pos.offset(direction), Direction.UP), power);
+        }
         return power;
     }
 

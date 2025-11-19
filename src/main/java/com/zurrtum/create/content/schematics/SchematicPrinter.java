@@ -255,7 +255,7 @@ public class SchematicPrinter {
         BlockEntity blockEntity = null;
         if (blockState.hasBlockEntity()) {
             blockEntity = ((BlockEntityProvider) blockState.getBlock()).createBlockEntity(target, blockState);
-            NbtCompound data = BlockHelper.prepareBlockEntityData(blockReader, blockState, blockEntity);
+            NbtCompound data = BlockHelper.prepareBlockEntityData(blockReader, blockState, blockReader.getBlockEntity(target));
             if (blockEntity != null && data != null) {
                 try (ErrorReporter.Logging logging = new ErrorReporter.Logging(blockEntity.getReporterContext(), Create.LOGGER)) {
                     blockEntity.read(NbtReadView.create(logging, blockReader.getRegistryManager(), data));

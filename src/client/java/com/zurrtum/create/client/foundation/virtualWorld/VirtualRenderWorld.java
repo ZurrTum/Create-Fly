@@ -170,17 +170,13 @@ public class VirtualRenderWorld extends World implements VisualizationLevel {
     // MEANINGFUL OVERRIDES
 
     @Override
-    public WorldChunk getChunk(int x, int z) {
-        throw new UnsupportedOperationException();
-    }
-
-    public Chunk actuallyGetChunk(int x, int z) {
-        return getChunk(x, z, ChunkStatus.FULL);
+    public WorldChunk getChunk(int chunkX, int chunkZ) {
+        return (WorldChunk) getChunk(chunkX, chunkZ, ChunkStatus.FULL);
     }
 
     @Override
     public Chunk getChunk(BlockPos pos) {
-        return actuallyGetChunk(ChunkSectionPos.getSectionCoord(pos.getX()), ChunkSectionPos.getSectionCoord(pos.getZ()));
+        return getChunk(ChunkSectionPos.getSectionCoord(pos.getX()), ChunkSectionPos.getSectionCoord(pos.getZ()));
     }
 
     @Override
