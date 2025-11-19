@@ -78,6 +78,7 @@ public class TableClothRenderer extends SmartBlockEntityRenderer<TableClothBlock
             int size = items.length;
             boolean multiple = size > 1;
             for (int i = 0; i < size; i++) {
+                matrices.push();
                 matrices.translate(0.5f, 0.1875f, 0.5f);
                 if (multiple) {
                     matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(i * (360f / size) + 45f));
@@ -104,6 +105,7 @@ public class TableClothRenderer extends SmartBlockEntityRenderer<TableClothBlock
                         }
                     }
                 );
+                matrices.pop();
             }
         }
     }
