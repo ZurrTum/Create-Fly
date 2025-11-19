@@ -203,10 +203,7 @@ public class StockTickerBlockEntity extends StockCheckingBlockEntity {
         for (int yOffset : Iterate.zeroAndOne) {
             for (Direction side : Iterate.horizontalDirections) {
                 BlockPos seatPos = pos.down(yOffset).offset(side);
-                int x = seatPos.getX();
-                int y = seatPos.getY();
-                int z = seatPos.getZ();
-                for (SeatEntity seatEntity : world.getNonSpectatingEntities(SeatEntity.class, new Box(x, y - 0.1f, z, x + 1, y + 1, z + 1)))
+                for (SeatEntity seatEntity : world.getNonSpectatingEntities(SeatEntity.class, new Box(seatPos)))
                     if (seatEntity.hasPassengers())
                         return true;
                 if (yOffset == 0) {

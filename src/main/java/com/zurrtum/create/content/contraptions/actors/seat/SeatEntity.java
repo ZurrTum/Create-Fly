@@ -33,7 +33,7 @@ public class SeatEntity extends Entity {
 
     @Override
     public void setPosition(double x, double y, double z) {
-        super.setPos(x, y, z);
+        super.setPosition(x, y, z);
         Box bb = getBoundingBox();
         Vec3d diff = new Vec3d(x, y, z).subtract(bb.getCenter());
         setBoundingBox(bb.offset(diff));

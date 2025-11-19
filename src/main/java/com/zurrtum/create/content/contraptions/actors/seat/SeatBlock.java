@@ -179,10 +179,7 @@ public class SeatBlock extends Block implements ProperWaterloggedBlock {
             return ActionResult.SUCCESS;
         }
 
-        int x = pos.getX();
-        int y = pos.getY();
-        int z = pos.getZ();
-        List<SeatEntity> seats = level.getNonSpectatingEntities(SeatEntity.class, new Box(x, y - 0.1f, z, x + 1, y + 1, z + 1));
+        List<SeatEntity> seats = level.getNonSpectatingEntities(SeatEntity.class, new Box(pos));
         if (!seats.isEmpty()) {
             SeatEntity seatEntity = seats.getFirst();
             List<Entity> passengers = seatEntity.getPassengerList();
@@ -210,10 +207,7 @@ public class SeatBlock extends Block implements ProperWaterloggedBlock {
     }
 
     public static boolean isSeatOccupied(World world, BlockPos pos) {
-        int x = pos.getX();
-        int y = pos.getY();
-        int z = pos.getZ();
-        return !world.getNonSpectatingEntities(SeatEntity.class, new Box(x, y - 0.1f, z, x + 1, y + 1, z + 1)).isEmpty();
+        return !world.getNonSpectatingEntities(SeatEntity.class, new Box(pos)).isEmpty();
     }
 
     public static Optional<Entity> getLeashed(World level, PlayerEntity player) {

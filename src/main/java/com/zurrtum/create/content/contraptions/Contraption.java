@@ -535,10 +535,7 @@ public abstract class Contraption {
     private void moveSeat(World world, BlockPos pos) {
         BlockPos local = toLocalPos(pos);
         getSeats().add(local);
-        int x = pos.getX();
-        int y = pos.getY();
-        int z = pos.getZ();
-        List<SeatEntity> seatsEntities = world.getNonSpectatingEntities(SeatEntity.class, new Box(x, y - 0.1f, z, x + 1, y + 1, z + 1));
+        List<SeatEntity> seatsEntities = world.getNonSpectatingEntities(SeatEntity.class, new Box(pos));
         if (!seatsEntities.isEmpty()) {
             SeatEntity seat = seatsEntities.getFirst();
             List<Entity> passengers = seat.getPassengerList();
