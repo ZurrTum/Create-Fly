@@ -71,7 +71,12 @@ public class DirectBeltInputBehaviour extends BlockEntityBehaviour<SmartBlockEnt
         if (lazy == null)
             return inserted.stack;
         int count = inserted.stack.getCount();
-        int insert = lazy.insertExist(inserted.stack, side);
+        int insert;
+        if (simulate) {
+            insert = lazy.countSpace(inserted.stack, count, side);
+        } else {
+            insert = lazy.insertExist(inserted.stack, side);
+        }
         if (insert == 0) {
             return inserted.stack;
         }
