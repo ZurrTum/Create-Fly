@@ -3,7 +3,6 @@ package com.zurrtum.create.content.trains.schedule.condition;
 import com.zurrtum.create.content.logistics.filter.FilterItemStack;
 import com.zurrtum.create.content.trains.entity.Carriage;
 import com.zurrtum.create.content.trains.entity.Train;
-import com.zurrtum.create.infrastructure.fluids.FluidInventory;
 import com.zurrtum.create.infrastructure.fluids.FluidStack;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
@@ -27,17 +26,15 @@ public class FluidThresholdCondition extends CargoThresholdCondition {
 
         int foundFluid = 0;
         for (Carriage carriage : train.carriages) {
-            FluidInventory fluids = carriage.storage.getFluids();
-            for (int i = 0, size = fluids.size(); i < size; i++) {
-                FluidStack fluidInTank = fluids.getStack(i);
+            for (FluidStack fluidInTank : carriage.storage.getFluids()) {
                 if (!compareStack.test(level, fluidInTank))
                     continue;
                 foundFluid += fluidInTank.getAmount();
             }
         }
 
-        requestStatusToUpdate(foundFluid / 1000, context);
-        return operator.test(foundFluid, target * 1000);
+        requestStatusToUpdate(foundFluid / 81000, context);
+        return operator.test(foundFluid, target * 81000);
     }
 
     @Override

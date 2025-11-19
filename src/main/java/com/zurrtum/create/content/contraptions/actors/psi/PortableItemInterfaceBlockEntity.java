@@ -41,6 +41,7 @@ public class PortableItemInterfaceBlockEntity extends PortableStorageInterfaceBl
 
         private int[] slots = SlotRangeCache.EMPTY;
         private Container wrapped = EMPTY;
+        private boolean mark = false;
 
         @Override
         public int[] getSlotsForFace(Direction side) {
@@ -90,11 +91,13 @@ public class PortableItemInterfaceBlockEntity extends PortableStorageInterfaceBl
 
         @Override
         public ItemStack getItem(int slot) {
+            mark = true;
             return wrapped.getItem(slot);
         }
 
         @Override
         public void setItem(int slot, ItemStack stack) {
+            mark = true;
             wrapped.setItem(slot, stack);
         }
 
@@ -119,6 +122,10 @@ public class PortableItemInterfaceBlockEntity extends PortableStorageInterfaceBl
         @Override
         public void setChanged() {
             onContentTransferred();
+            if (mark) {
+                mark = false;
+                wrapped.setChanged();
+            }
         }
 
         @Override

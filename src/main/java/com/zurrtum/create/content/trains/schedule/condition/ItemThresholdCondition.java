@@ -7,7 +7,6 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.Identifier;
-import net.minecraft.world.Container;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.storage.ValueInput;
@@ -28,12 +27,9 @@ public class ItemThresholdCondition extends CargoThresholdCondition {
 
         int foundItems = 0;
         for (Carriage carriage : train.carriages) {
-            Container items = carriage.storage.getAllItems();
-            for (int i = 0, size = items.getContainerSize(); i < size; i++) {
-                ItemStack stackInSlot = items.getItem(i);
+            for (ItemStack stackInSlot : carriage.storage.getAllItems()) {
                 if (!stack.test(level, stackInSlot))
                     continue;
-
                 if (stacks)
                     foundItems += stackInSlot.getCount() == stackInSlot.getMaxStackSize() ? 1 : 0;
                 else
