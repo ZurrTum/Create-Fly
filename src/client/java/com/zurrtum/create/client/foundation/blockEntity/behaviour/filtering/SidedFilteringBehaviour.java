@@ -6,11 +6,10 @@ import com.zurrtum.create.content.logistics.tunnel.BrassTunnelBlockEntity;
 import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
 import com.zurrtum.create.foundation.blockEntity.behaviour.filtering.ServerFilteringBehaviour;
 import com.zurrtum.create.foundation.blockEntity.behaviour.filtering.ServerSidedFilteringBehaviour;
+import net.minecraft.core.Direction;
 
 import java.util.EnumMap;
 import java.util.Map;
-
-import net.minecraft.core.Direction;
 
 public class SidedFilteringBehaviour extends FilteringBehaviour<ServerSidedFilteringBehaviour> {
     Map<Direction, FilteringBehaviour<ServerFilteringBehaviour>> sidedFilters = new EnumMap<>(Direction.class);
@@ -41,6 +40,9 @@ public class SidedFilteringBehaviour extends FilteringBehaviour<ServerSidedFilte
         FilteringBehaviour<ServerFilteringBehaviour> sidedFilter = sidedFilters.get(side);
         if (sidedFilter != null && sidedFilter.behaviour != null) {
             return sidedFilter;
+        }
+        if (behaviour == null) {
+            return null;
         }
         ServerFilteringBehaviour filter = behaviour.get(side);
         if (filter == null) {
