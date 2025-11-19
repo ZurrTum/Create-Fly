@@ -48,7 +48,7 @@ public class BacktankRenderer extends KineticBlockEntityRenderer<BacktankBlockEn
             state.layer = RenderLayer.getSolid();
         }
         state.cogs = CachedBuffers.partial(getCogsModel(state.blockState), state.blockState);
-        state.yRot = MathHelper.RADIANS_PER_DEGREE * 180 + AngleHelper.horizontalAngle(state.blockState.get(BacktankBlock.HORIZONTAL_FACING));
+        state.yRot = MathHelper.RADIANS_PER_DEGREE * (180 + AngleHelper.horizontalAngle(state.blockState.get(BacktankBlock.HORIZONTAL_FACING)));
         state.rotate = AngleHelper.rad(be.getSpeed() / 4f * AnimationTickHolder.getRenderTime(be.getWorld()) % 360);
     }
 
