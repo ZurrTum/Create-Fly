@@ -60,9 +60,6 @@ public class CarriageContraptionEntityRenderer extends OrientedContraptionEntity
             return;
         }
         Level level = entity.level();
-        if (VisualizationManager.supportsVisualization(level)) {
-            return;
-        }
         Couple<CarriageBogey> bogeys = carriage.bogeys;
         CarriageBogey first = bogeys.getFirst();
         CarriageBogey second = bogeys.getSecond();
@@ -70,9 +67,22 @@ public class CarriageContraptionEntityRenderer extends OrientedContraptionEntity
         float viewYRot = entity.getViewYRot(tickProgress);
         float viewXRot = entity.getViewXRot(tickProgress);
         int bogeySpacing = carriage.bogeySpacing;
-        int cameraLight = -1;
         float firstYaw = first.yaw.getValue(tickProgress);
         float firstPitch = first.pitch.getValue(tickProgress);
+        float secondYaw = 0;
+        float secondPitch = 0;
+        first.updateCouplingAnchor(position, viewXRot, viewYRot, bogeySpacing, firstYaw, firstPitch, true);
+        if (second == null) {
+            first.updateCouplingAnchor(position, viewXRot, viewYRot, bogeySpacing, firstYaw, firstPitch, false);
+        } else {
+            secondYaw = second.yaw.getValue(tickProgress);
+            secondPitch = second.pitch.getValue(tickProgress);
+            second.updateCouplingAnchor(position, viewXRot, viewYRot, bogeySpacing, secondYaw, secondPitch, false);
+        }
+        if (VisualizationManager.supportsVisualization(level)) {
+            return;
+        }
+        int cameraLight = -1;
         if (!state.contraption.isHiddenInPortal(BlockPos.ZERO)) {
             Vec3 pos = first.getAnchorPosition();
             int light;
@@ -83,13 +93,8 @@ public class CarriageContraptionEntityRenderer extends OrientedContraptionEntity
             }
             state.firstBogey = CarriageBogeyRenderState.create(first, viewXRot, viewYRot, bogeySpacing, firstYaw, firstPitch, light, tickProgress);
         }
-        first.updateCouplingAnchor(position, viewXRot, viewYRot, bogeySpacing, firstYaw, firstPitch, true);
-        if (second == null) {
-            first.updateCouplingAnchor(position, viewXRot, viewYRot, bogeySpacing, firstYaw, firstPitch, false);
-        } else {
+        if (second != null) {
             BlockPos bogeyPos = BlockPos.ZERO.relative(entity.getInitialOrientation().getCounterClockWise(), bogeySpacing);
-            float secondYaw = second.yaw.getValue(tickProgress);
-            float secondPitch = second.pitch.getValue(tickProgress);
             if (!state.contraption.isHiddenInPortal(bogeyPos)) {
                 Vec3 pos = second.getAnchorPosition();
                 int light;
@@ -111,7 +116,6 @@ public class CarriageContraptionEntityRenderer extends OrientedContraptionEntity
                     tickProgress
                 );
             }
-            second.updateCouplingAnchor(position, viewXRot, viewYRot, bogeySpacing, secondYaw, secondPitch, false);
         }
     }
 
