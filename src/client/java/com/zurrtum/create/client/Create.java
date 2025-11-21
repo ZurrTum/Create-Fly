@@ -1,6 +1,7 @@
 package com.zurrtum.create.client;
 
 import com.zurrtum.create.client.catnip.render.SuperByteBufferCache;
+import com.zurrtum.create.client.compat.CompatMod;
 import com.zurrtum.create.client.content.contraptions.glue.SuperGlueSelectionHandler;
 import com.zurrtum.create.client.content.equipment.bell.SoulPulseEffectHandler;
 import com.zurrtum.create.client.content.equipment.potatoCannon.PotatoCannonRenderHandler;
@@ -72,7 +73,7 @@ public class Create implements ClientModInitializer {
         AllMenuScreens.register();
         AllPotatoProjectileTransforms.register();
         PonderIndex.addPlugin(new CreatePonderPlugin());
-        //        CompatMod.register();
+        CompatMod.register();
     }
 
     public static Identifier asResource(String path) {

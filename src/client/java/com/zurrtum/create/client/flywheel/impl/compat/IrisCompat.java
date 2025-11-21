@@ -1,7 +1,7 @@
 package com.zurrtum.create.client.flywheel.impl.compat;
 
 import com.zurrtum.create.client.flywheel.impl.FlwImpl;
-//import net.irisshaders.iris.api.v0.IrisApi;
+import net.irisshaders.iris.api.v0.IrisApi;
 
 public final class IrisCompat {
     public static final boolean ACTIVE = CompatMod.IRIS.isLoaded;
@@ -33,13 +33,11 @@ public final class IrisCompat {
 
     private static final class Internals {
         static boolean isShaderPackInUse() {
-            //            return IrisApi.getInstance().isShaderPackInUse();
-            return false;
+            return IrisApi.getInstance().isShaderPackInUse();
         }
 
         static boolean isRenderingShadowPass() {
-            //            return IrisApi.getInstance().isRenderingShadowPass();
-            return false;
+            return IrisApi.getInstance().isRenderingShadowPass();
         }
     }
 }

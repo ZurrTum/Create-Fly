@@ -6,6 +6,7 @@ import com.mojang.logging.LogUtils;
 import com.zurrtum.create.api.registry.CreateRegistries;
 import com.zurrtum.create.api.registry.CreateRegistryKeys;
 import com.zurrtum.create.api.stress.BlockStressValues;
+import com.zurrtum.create.compat.CompatMod;
 import com.zurrtum.create.content.decoration.encasing.EncasingRegistry;
 import com.zurrtum.create.content.equipment.armor.AllArmorMaterials;
 import com.zurrtum.create.content.equipment.armor.AllEquipmentAssetKeys;
@@ -134,6 +135,6 @@ public class Create implements ModInitializer {
         AllPlacementModifiers.register();
         AllMountedDispenseItemBehaviors.register();
         AllEntityAttributes.register();
-        //        CompatMod.register();
+        CompatMod.register();
     }
 }

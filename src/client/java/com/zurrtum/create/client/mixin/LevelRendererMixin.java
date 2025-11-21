@@ -15,6 +15,7 @@ import com.zurrtum.create.client.catnip.ghostblock.GhostBlocks;
 import com.zurrtum.create.client.catnip.outliner.Outliner;
 import com.zurrtum.create.client.catnip.render.DefaultSuperRenderTypeBuffer;
 import com.zurrtum.create.client.catnip.render.SuperRenderTypeBuffer;
+import com.zurrtum.create.client.compat.sodium.SodiumCompat;
 import com.zurrtum.create.client.content.contraptions.actors.seat.ContraptionPlayerPassengerRotation;
 import com.zurrtum.create.client.content.contraptions.minecart.CouplingRenderer;
 import com.zurrtum.create.client.content.equipment.clipboard.ClipboardValueSettingsClientHandler;
@@ -203,6 +204,6 @@ public class LevelRendererMixin {
 
     @Inject(method = "submitBlockEntities(Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/state/LevelRenderState;Lnet/minecraft/client/renderer/SubmitNodeStorage;)V", at = @At("HEAD"))
     private void markSpriteActive(CallbackInfo ci) {
-        //        SodiumCompat.markSpriteActive(minecraft);
+        SodiumCompat.markSpriteActive(minecraft);
     }
 }
