@@ -23,7 +23,6 @@ import net.minecraft.client.gui.font.TextRenderable;
 import net.minecraft.client.gui.font.glyphs.BakedGlyph;
 import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.OrderedSubmitNodeCollector;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
@@ -258,14 +257,13 @@ public class NixieTubeRenderer implements BlockEntityRenderer<NixieTubeBlockEnti
             matrices.translate(0.5f, 0.5f, 0.5f);
             matrices.mulPose(Axis.YP.rotation(yRot));
             matrices.mulPose(Axis.ZP.rotation(zRot));
-            OrderedSubmitNodeCollector batchingQueue = ShadersModHelper.isShaderPackInUse() ? queue.order(1) : queue;
             if (zRot2 != 0) {
                 matrices.pushPose();
                 matrices.mulPose(Axis.ZP.rotation(zRot2));
-                batchingQueue.submitCustomGeometry(matrices, layer, this);
+                queue.order(1).submitCustomGeometry(matrices, layer, this);
                 matrices.popPose();
             } else {
-                batchingQueue.submitCustomGeometry(matrices, layer, this);
+                queue.order(1).submitCustomGeometry(matrices, layer, this);
             }
             if (left != null) {
                 matrices.pushPose();
