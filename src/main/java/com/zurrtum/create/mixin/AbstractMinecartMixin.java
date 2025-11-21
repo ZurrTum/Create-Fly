@@ -2,7 +2,7 @@ package com.zurrtum.create.mixin;
 
 import com.zurrtum.create.AllSynchedDatas;
 import com.zurrtum.create.content.contraptions.minecart.capability.MinecartController;
-import net.minecraft.world.entity.vehicle.AbstractMinecart;
+import net.minecraft.world.entity.vehicle.minecart.AbstractMinecart;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 import org.spongepowered.asm.mixin.Mixin;

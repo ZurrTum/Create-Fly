@@ -3,11 +3,6 @@ package com.zurrtum.create.client.content.trains.schedule.hat;
 import com.google.gson.JsonObject;
 import com.mojang.serialization.JsonOps;
 import com.zurrtum.create.Create;
-
-import java.io.BufferedReader;
-import java.util.HashMap;
-import java.util.Map;
-
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.FileToIdConverter;
 import net.minecraft.resources.Identifier;
@@ -16,8 +11,12 @@ import net.minecraft.server.packs.resources.ResourceManagerReloadListener;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.animal.SnowGolem;
+import net.minecraft.world.entity.animal.golem.SnowGolem;
 import net.minecraft.world.phys.Vec3;
+
+import java.io.BufferedReader;
+import java.util.HashMap;
+import java.util.Map;
 
 public class TrainHatInfoReloadListener {
 

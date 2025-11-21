@@ -1,10 +1,6 @@
 package com.zurrtum.create.infrastructure.player;
 
 import com.mojang.authlib.GameProfile;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.OptionalInt;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ClientInformation;
 import net.minecraft.server.level.ServerLevel;
@@ -14,9 +10,12 @@ import net.minecraft.world.Container;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.animal.horse.AbstractHorse;
+import net.minecraft.world.entity.animal.equine.AbstractHorse;
 import net.minecraft.world.level.block.entity.SignBlockEntity;
 import net.minecraft.world.scores.PlayerTeam;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.OptionalInt;
 
 public class FakePlayerEntity extends ServerPlayer {
     public FakePlayerEntity(ServerLevel world, GameProfile profile) {

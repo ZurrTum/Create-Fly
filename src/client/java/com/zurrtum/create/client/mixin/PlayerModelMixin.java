@@ -2,7 +2,7 @@ package com.zurrtum.create.client.mixin;
 
 import com.zurrtum.create.client.foundation.render.PlayerSkyhookRenderer;
 import com.zurrtum.create.client.foundation.render.SkyhookRenderState;
-import net.minecraft.client.model.PlayerModel;
+import net.minecraft.client.model.player.PlayerModel;
 import net.minecraft.client.renderer.entity.state.AvatarRenderState;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;

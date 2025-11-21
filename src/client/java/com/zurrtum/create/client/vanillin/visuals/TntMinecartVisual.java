@@ -5,7 +5,7 @@ import com.zurrtum.create.client.flywheel.lib.instance.TransformedInstance;
 import net.minecraft.client.model.geom.ModelLayers;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.util.Mth;
-import net.minecraft.world.entity.vehicle.MinecartTNT;
+import net.minecraft.world.entity.vehicle.minecart.MinecartTNT;
 import org.joml.Matrix4f;
 
 public class TntMinecartVisual<T extends MinecartTNT> extends MinecartVisual<T> {

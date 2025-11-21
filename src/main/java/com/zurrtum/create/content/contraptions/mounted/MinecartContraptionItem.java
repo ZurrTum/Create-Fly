@@ -34,7 +34,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.entity.vehicle.AbstractMinecart;
+import net.minecraft.world.entity.vehicle.minecart.AbstractMinecart;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.UseOnContext;
@@ -199,7 +199,12 @@ public class MinecartContraptionItem extends Item {
                     world,
                     mountedContraption,
                     intialOrientation
-                ) : OrientedContraptionEntity.createAtYaw(world, mountedContraption, intialOrientation, newFacing.toYRot());
+                ) : OrientedContraptionEntity.createAtYaw(
+                    world,
+                    mountedContraption,
+                    intialOrientation,
+                    newFacing.toYRot()
+                );
 
                 contraptionEntity.startRiding(cart);
                 contraptionEntity.setPos(cart.getX(), cart.getY(), cart.getZ());
