@@ -17,7 +17,7 @@ public abstract class RenderBuffersMixin {
     private static void put(Object2ObjectLinkedOpenHashMap<RenderType, ByteBufferBuilder> builderStorage, RenderType layer) {
     }
 
-    @Inject(method = "lambda$new$0(Lit/unimi/dsi/fastutil/objects/Object2ObjectLinkedOpenHashMap;)V", at = @At("TAIL"))
+    @Inject(method = "method_54639(Lit/unimi/dsi/fastutil/objects/Object2ObjectLinkedOpenHashMap;)V", at = @At("TAIL"))
     private void registerLayers(Object2ObjectLinkedOpenHashMap<RenderType, ByteBufferBuilder> map, CallbackInfo ci) {
         put(map, CreateRenderTypes.additive2());
         put(map, CreateRenderTypes.translucent());

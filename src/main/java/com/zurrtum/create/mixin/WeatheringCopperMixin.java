@@ -11,7 +11,7 @@ import org.spongepowered.asm.mixin.injection.At;
 
 @Mixin(WeatheringCopper.class)
 public interface WeatheringCopperMixin {
-    @WrapOperation(method = "lambda$static$0()Lcom/google/common/collect/BiMap;", at = @At(value = "INVOKE", target = "Lcom/google/common/collect/ImmutableBiMap;builder()Lcom/google/common/collect/ImmutableBiMap$Builder;", remap = false))
+    @WrapOperation(method = "method_34740", at = @At(value = "INVOKE", target = "Lcom/google/common/collect/ImmutableBiMap;builder()Lcom/google/common/collect/ImmutableBiMap$Builder;", remap = false))
     private static ImmutableBiMap.Builder<Block, Block> addOxidizable(Operation<ImmutableBiMap.Builder<Block, Block>> original) {
         ImmutableBiMap.Builder<Block, Block> builder = original.call();
         builder.put(AllBlocks.COPPER_SHINGLES, AllBlocks.EXPOSED_COPPER_SHINGLES);

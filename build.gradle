@@ -1,5 +1,7 @@
+import net.fabricmc.loom.task.RemapJarTask
+
 plugins {
-    id "net.fabricmc.fabric-loom-no-remap" version "1.14.0-alpha.26"
+    id "fabric-loom" version "${loom_version}"
 }
 
 repositories {
@@ -71,12 +73,14 @@ sourceSets {
             exclude 'com/zurrtum/create/client/mixin/HoldMyItemsMixin.java'
             exclude 'com/zurrtum/create/client/mixin/AnimationResourceLoaderMixin.java'
             exclude 'com/zurrtum/create/client/mixin/WrapperBlockStateModelMixin.java'
+            exclude 'com/zurrtum/create/client/mixin/FabricBlockStateModelMixin.java'
         }
     }
 }
 
 tasks.register("serverJar", Jar) {
-    archiveClassifier = "server"
+    archiveClassifier = "server-dev"
+    destinationDirectory = layout.buildDirectory.dir("tmp/serverJar")
     from sourceSets.main.output
     from("LICENSE")
     from("licenses") {
@@ -84,22 +88,29 @@ tasks.register("serverJar", Jar) {
     }
 }
 
-tasks.build {
+tasks.register('remapServerJar', RemapJarTask) {
     dependsOn tasks.serverJar
+    inputFile = tasks.serverJar.archiveFile
+    archiveClassifier = "server"
+}
+
+tasks.build {
+    dependsOn tasks.remapServerJar
 }
 
 dependencies {
     minecraft "com.mojang:minecraft:${project.minecraft_version}"
-    implementation "net.fabricmc:fabric-loader:${project.loader_version}"
+    mappings loom.officialMojangMappings()
+    modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
     if (project.compile_only_fabric_api.equals("true")) {
-        compileOnly fabricApi.module("fabric-rendering-fluids-v1", project.fabric_version)
-        compileOnly fabricApi.module("fabric-transfer-api-v1", project.fabric_version)
-        compileOnly fabricApi.module("fabric-events-interaction-v0", project.fabric_version)
-        compileOnly fabricApi.module("fabric-renderer-api-v1", project.fabric_version)
-        compileOnly fabricApi.module("fabric-recipe-api-v1", project.fabric_version)
-        compileOnly fabricApi.module("fabric-model-loading-api-v1", project.fabric_version)
+        modCompileOnly fabricApi.module("fabric-rendering-fluids-v1", project.fabric_version)
+        modCompileOnly fabricApi.module("fabric-transfer-api-v1", project.fabric_version)
+        modCompileOnly fabricApi.module("fabric-events-interaction-v0", project.fabric_version)
+//        modCompileOnly fabricApi.module("fabric-renderer-api-v1", project.fabric_version)
+        modCompileOnly fabricApi.module("fabric-recipe-api-v1", project.fabric_version)
+//        modCompileOnly fabricApi.module("fabric-model-loading-api-v1", project.fabric_version)
     } else {
-        implementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
+        modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
     }
 //    modCompileOnly "me.shedaniel:RoughlyEnoughItems-fabric:${project.rei_version}"
 //    if (project.compile_only_rei.equals("false")) {

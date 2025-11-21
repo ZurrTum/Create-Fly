@@ -14,12 +14,12 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public class EntityCallbacksMixin {
     @Final
     @Shadow
-    ServerLevel this$0;
+    ServerLevel field_26936;
 
     @Inject(method = "onTrackingEnd(Lnet/minecraft/world/entity/Entity;)V", at = @At("TAIL"))
     private void stopTracking(Entity entity, CallbackInfo ci) {
         if (!entity.isAlive()) {
-            CapabilityMinecartController.onEntityDeath(this$0, entity);
+            CapabilityMinecartController.onEntityDeath(field_26936, entity);
         }
     }
 }

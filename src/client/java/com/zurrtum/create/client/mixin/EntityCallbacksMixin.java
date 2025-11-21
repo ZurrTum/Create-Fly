@@ -15,11 +15,11 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public class EntityCallbacksMixin {
     @Shadow
     @Final
-    ClientLevel this$0;
+    ClientLevel field_27735;
 
     @Inject(method = "onTrackingEnd(Lnet/minecraft/world/entity/Entity;)V", at = @At("HEAD"))
     private void onEntityLeaveLevel(Entity entity, CallbackInfo ci) {
-        VisualizationEventHandler.onEntityLeaveLevel(this$0, entity);
-        CapabilityMinecartController.onEntityDeath(this$0, entity);
+        VisualizationEventHandler.onEntityLeaveLevel(field_27735, entity);
+        CapabilityMinecartController.onEntityDeath(field_27735, entity);
     }
 }

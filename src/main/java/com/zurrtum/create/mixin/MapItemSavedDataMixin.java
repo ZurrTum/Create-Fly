@@ -37,7 +37,7 @@ public abstract class MapItemSavedDataMixin implements StationMapData {
 
     @Shadow
     @Final
-    private Map<String, MapDecoration> decorations;
+    Map<String, MapDecoration> decorations;
 
     @Shadow
     private int trackedDecorationCount;

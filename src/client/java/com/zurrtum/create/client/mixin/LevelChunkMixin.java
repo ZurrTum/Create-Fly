@@ -15,7 +15,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public abstract class LevelChunkMixin {
     @Shadow
     @Final
-    private Level level;
+    Level level;
 
     @Inject(method = "setBlockEntity(Lnet/minecraft/world/level/block/entity/BlockEntity;)V", at = @At(value = "INVOKE_ASSIGN", target = "Ljava/util/Map;put(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;"))
     private void flywheel$onBlockEntityAdded(BlockEntity blockEntity, CallbackInfo ci) {

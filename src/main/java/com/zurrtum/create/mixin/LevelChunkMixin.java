@@ -53,7 +53,7 @@ public abstract class LevelChunkMixin {
         FluidHelper.invalidateInventoryCache(pos);
     }
 
-    @WrapOperation(method = "lambda$replaceWithPacketData$4(Lnet/minecraft/util/ProblemReporter$ScopedCollector;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/entity/BlockEntityType;Lnet/minecraft/nbt/CompoundTag;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/block/entity/BlockEntity;loadWithComponents(Lnet/minecraft/world/level/storage/ValueInput;)V"))
+    @WrapOperation(method = "method_31716(Lnet/minecraft/util/ProblemReporter$ScopedCollector;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/entity/BlockEntityType;Lnet/minecraft/nbt/CompoundTag;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/block/entity/BlockEntity;loadWithComponents(Lnet/minecraft/world/level/storage/ValueInput;)V"))
     private void handleUpdateTag(BlockEntity blockEntity, ValueInput view, Operation<Void> original) {
         if (blockEntity instanceof SyncedBlockEntity syncedBlockEntity) {
             syncedBlockEntity.handleUpdateTag(view);

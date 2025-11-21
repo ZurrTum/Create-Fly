@@ -20,7 +20,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public class ClientChunkCacheMixin {
     @Shadow
     @Final
-    private ClientLevel level;
+    ClientLevel level;
 
     @Inject(method = "onLightUpdate", at = @At("HEAD"))
     private void flywheel$onLightUpdate(LightLayer type, SectionPos pos, CallbackInfo ci) {

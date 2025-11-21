@@ -10,10 +10,10 @@ import org.spongepowered.asm.mixin.Shadow;
 public class TooltipContextMixin implements TooltipWorldContext {
     @Shadow
     @Final
-    Level val$level;
+    Level field_51354;
 
     @Override
     public Level create$getWorld() {
-        return val$level;
+        return field_51354;
     }
 }
