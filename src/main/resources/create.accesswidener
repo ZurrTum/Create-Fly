@@ -89,7 +89,7 @@ accessible	method	net/minecraft/network/protocol/game/ClientboundAddEntityPacket
 accessible	class	net/minecraft/world/level/chunk/PaletteResize
 extendable	method	net/minecraft/world/entity/Entity	moveOrInterpolateTo	(Lnet/minecraft/world/phys/Vec3;FF)V
 accessible	field	net/minecraft/server/level/ServerLevel	entityTickList	Lnet/minecraft/world/level/entity/EntityTickList;
-accessible	field	net/minecraft/world/entity/vehicle/MinecartFurnace	fuel	I
+accessible	field	net/minecraft/world/entity/vehicle/minecart/MinecartFurnace	fuel	I
 accessible	field	net/minecraft/world/entity/Entity	removalReason	Lnet/minecraft/world/entity/Entity$RemovalReason;
 accessible	method	net/minecraft/world/level/material/FlowingFluid	getNewLiquid	(Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;)Lnet/minecraft/world/level/material/FluidState;
 accessible	field	net/minecraft/core/component/DataComponentPatch	map	Lit/unimi/dsi/fastutil/objects/Reference2ObjectMap;
@@ -122,7 +122,7 @@ accessible	method	com/mojang/blaze3d/opengl/GlCommandEncoder	getDevice	()Lcom/mo
 accessible	field	net/minecraft/client/renderer/SpriteCoordinateExpander	delegate	Lcom/mojang/blaze3d/vertex/VertexConsumer;
 accessible	field	net/minecraft/client/renderer/SpriteCoordinateExpander	sprite	Lnet/minecraft/client/renderer/texture/TextureAtlasSprite;
 accessible	field	net/minecraft/client/model/geom/ModelPart	cubes	Ljava/util/List;
-accessible	method	net/minecraft/world/entity/vehicle/AbstractMinecart	getMaxSpeed	(Lnet/minecraft/server/level/ServerLevel;)D
+accessible	method	net/minecraft/world/entity/vehicle/minecart/AbstractMinecart	getMaxSpeed	(Lnet/minecraft/server/level/ServerLevel;)D
 accessible	method	net/minecraft/world/level/block/CropBlock	getAgeProperty	()Lnet/minecraft/world/level/block/state/properties/IntegerProperty;
 accessible	field	net/minecraft/world/item/crafting/ShapelessRecipe	ingredients	Ljava/util/List;
 accessible	field	net/minecraft/world/level/block/LiquidBlock	fluid	Lnet/minecraft/world/level/material/FlowingFluid;
@@ -213,7 +213,7 @@ accessible	field	net/minecraft/world/item/crafting/ShapelessRecipe	result	Lnet/m
 accessible	field	net/minecraft/world/item/crafting/ShapedRecipe	result	Lnet/minecraft/world/item/ItemStack;
 accessible	field	net/minecraft/world/entity/LivingEntity	lastEquipmentItems	Ljava/util/Map;
 accessible	field	net/minecraft/client/multiplayer/ClientPacketListener	serverChunkRadius	I
-accessible	method	net/minecraft/world/entity/animal/Parrot	setVariant	(Lnet/minecraft/world/entity/animal/Parrot$Variant;)V
+accessible	method	net/minecraft/world/entity/animal/parrot/Parrot	setVariant	(Lnet/minecraft/world/entity/animal/parrot/Parrot$Variant;)V
 accessible	method	net/minecraft/client/multiplayer/ClientLevel	getEntities	()Lnet/minecraft/world/level/entity/LevelEntityGetter;
 accessible	method	com/mojang/blaze3d/platform/Lighting	updateBuffer	(Lcom/mojang/blaze3d/platform/Lighting$Entry;Lorg/joml/Vector3f;Lorg/joml/Vector3f;)V
 accessible	field	net/minecraft/client/KeyMapping	defaultKey	Lcom/mojang/blaze3d/platform/InputConstants$Key;
@@ -270,6 +270,3 @@ accessible class net/minecraft/client/renderer/rendertype/RenderSetup$TextureBin
 accessible field net/minecraft/client/renderer/rendertype/RenderSetup useLightmap Z
 accessible field net/minecraft/client/renderer/rendertype/RenderSetup useOverlay Z
 accessible field net/minecraft/client/renderer/RenderPipelines BLOCK_SNIPPET Lcom/mojang/blaze3d/pipeline/RenderPipeline$Snippet;
-accessible method net/minecraft/world/entity/vehicle/minecart/AbstractMinecart getMaxSpeed (Lnet/minecraft/server/level/ServerLevel;)D
-accessible field net/minecraft/world/entity/vehicle/minecart/MinecartFurnace fuel I
-accessible method net/minecraft/world/entity/animal/parrot/Parrot setVariant (Lnet/minecraft/world/entity/animal/parrot/Parrot$Variant;)V
