@@ -36,7 +36,7 @@ public class ContraptionControlsRenderer extends SmartBlockEntityRenderer<Contra
         ContraptionControlsRenderState state,
         float tickProgress,
         Vec3d cameraPos,
-        ModelCommandRenderer.@Nullable CrumblingOverlayCommand crumblingOverlay
+        @Nullable ModelCommandRenderer.CrumblingOverlayCommand crumblingOverlay
     ) {
         super.updateRenderState(be, state, tickProgress, cameraPos, crumblingOverlay);
         Direction facing = state.blockState.get(ContraptionControlsBlock.FACING).getOpposite();

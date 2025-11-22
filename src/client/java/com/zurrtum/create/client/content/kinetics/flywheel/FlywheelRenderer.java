@@ -30,7 +30,7 @@ public class FlywheelRenderer extends KineticBlockEntityRenderer<FlywheelBlockEn
         FlywheelRenderState state,
         float tickProgress,
         Vec3d cameraPos,
-        ModelCommandRenderer.@Nullable CrumblingOverlayCommand crumblingOverlay
+        @Nullable ModelCommandRenderer.CrumblingOverlayCommand crumblingOverlay
     ) {
         super.updateRenderState(be, state, tickProgress, cameraPos, crumblingOverlay);
         BlockState blockState = be.getCachedState();

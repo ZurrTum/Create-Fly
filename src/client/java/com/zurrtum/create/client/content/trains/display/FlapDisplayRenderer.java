@@ -62,7 +62,7 @@ public class FlapDisplayRenderer extends KineticBlockEntityRenderer<FlapDisplayB
         FlapDisplayRenderState state,
         float tickProgress,
         Vec3d cameraPos,
-        ModelCommandRenderer.@Nullable CrumblingOverlayCommand crumblingOverlay
+        @Nullable ModelCommandRenderer.CrumblingOverlayCommand crumblingOverlay
     ) {
         super.updateRenderState(be, state, tickProgress, cameraPos, crumblingOverlay);
         if (!be.isController) {

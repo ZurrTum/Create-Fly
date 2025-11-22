@@ -48,7 +48,7 @@ public class FactoryPanelRenderer extends SmartBlockEntityRenderer<FactoryPanelB
         FactoryPanelRenderState state,
         float tickProgress,
         Vec3d cameraPos,
-        ModelCommandRenderer.@Nullable CrumblingOverlayCommand crumblingOverlay
+        @Nullable ModelCommandRenderer.CrumblingOverlayCommand crumblingOverlay
     ) {
         super.updateRenderState(be, state, tickProgress, cameraPos, crumblingOverlay);
         List<SingleFactoryPanelRenderState> panels = new ArrayList<>();

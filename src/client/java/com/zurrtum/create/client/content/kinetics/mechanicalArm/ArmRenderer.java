@@ -50,7 +50,7 @@ public class ArmRenderer extends KineticBlockEntityRenderer<ArmBlockEntity, ArmR
         ArmRenderState state,
         float tickProgress,
         Vec3d cameraPos,
-        ModelCommandRenderer.@Nullable CrumblingOverlayCommand crumblingOverlay
+        @Nullable ModelCommandRenderer.CrumblingOverlayCommand crumblingOverlay
     ) {
         super.updateRenderState(be, state, tickProgress, cameraPos, crumblingOverlay);
         ItemStack item = be.heldItem;

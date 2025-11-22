@@ -43,7 +43,7 @@ public class CuckooClockRenderer extends KineticBlockEntityRenderer<CuckooClockB
         CuckooClockRenderState state,
         float tickProgress,
         Vec3d cameraPos,
-        ModelCommandRenderer.@Nullable CrumblingOverlayCommand crumblingOverlay
+        @Nullable ModelCommandRenderer.CrumblingOverlayCommand crumblingOverlay
     ) {
         super.updateRenderState(be, state, tickProgress, cameraPos, crumblingOverlay);
         if (state.support) {
@@ -95,7 +95,7 @@ public class CuckooClockRenderer extends KineticBlockEntityRenderer<CuckooClockB
         CuckooClockBlockEntity be,
         CuckooClockRenderState state,
         World world,
-        ModelCommandRenderer.@Nullable CrumblingOverlayCommand crumblingOverlay
+        @Nullable ModelCommandRenderer.CrumblingOverlayCommand crumblingOverlay
     ) {
         super.updateBaseRenderState(be, state, world, crumblingOverlay);
         state.facing = state.blockState.get(CuckooClockBlock.HORIZONTAL_FACING);

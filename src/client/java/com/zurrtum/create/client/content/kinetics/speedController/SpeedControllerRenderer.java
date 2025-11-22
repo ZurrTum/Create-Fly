@@ -41,7 +41,7 @@ public class SpeedControllerRenderer implements BlockEntityRenderer<SpeedControl
         SpeedControllerRenderState state,
         float tickProgress,
         Vec3d cameraPos,
-        ModelCommandRenderer.@Nullable CrumblingOverlayCommand crumblingOverlay
+        @Nullable ModelCommandRenderer.CrumblingOverlayCommand crumblingOverlay
     ) {
         BlockEntityRenderState.updateBlockEntityRenderState(be, state, crumblingOverlay);
         World world = be.getWorld();

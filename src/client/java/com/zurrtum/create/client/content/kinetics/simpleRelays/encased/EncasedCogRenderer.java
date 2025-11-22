@@ -44,7 +44,7 @@ public class EncasedCogRenderer extends KineticBlockEntityRenderer<SimpleKinetic
         EncasedCogRenderState state,
         float tickProgress,
         Vec3d cameraPos,
-        ModelCommandRenderer.@Nullable CrumblingOverlayCommand crumblingOverlay
+        @Nullable ModelCommandRenderer.CrumblingOverlayCommand crumblingOverlay
     ) {
         super.updateRenderState(be, state, tickProgress, cameraPos, crumblingOverlay);
         state.shaftAngle = large ? BracketedKineticBlockEntityRenderer.getAngleForLargeCogShaft(be, state.axis) : state.angle;

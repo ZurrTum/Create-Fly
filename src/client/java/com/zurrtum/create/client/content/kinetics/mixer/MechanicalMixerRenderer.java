@@ -44,7 +44,7 @@ public class MechanicalMixerRenderer implements BlockEntityRenderer<MechanicalMi
         MechanicalMixerRenderState state,
         float tickProgress,
         Vec3d cameraPos,
-        ModelCommandRenderer.@Nullable CrumblingOverlayCommand crumblingOverlay
+        @Nullable ModelCommandRenderer.CrumblingOverlayCommand crumblingOverlay
     ) {
         World world = be.getWorld();
         if (VisualizationManager.supportsVisualization(world)) {

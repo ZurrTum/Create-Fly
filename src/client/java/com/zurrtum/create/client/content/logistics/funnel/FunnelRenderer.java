@@ -36,7 +36,7 @@ public class FunnelRenderer extends SmartBlockEntityRenderer<FunnelBlockEntity, 
         FunnelRenderState state,
         float tickProgress,
         Vec3d cameraPos,
-        ModelCommandRenderer.@Nullable CrumblingOverlayCommand crumblingOverlay
+        @Nullable ModelCommandRenderer.CrumblingOverlayCommand crumblingOverlay
     ) {
         super.updateRenderState(be, state, tickProgress, cameraPos, crumblingOverlay);
         if (!be.hasFlap() || VisualizationManager.supportsVisualization(be.getWorld())) {

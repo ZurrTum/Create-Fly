@@ -40,7 +40,7 @@ public class BacktankRenderer extends KineticBlockEntityRenderer<BacktankBlockEn
         BacktankRenderState state,
         float tickProgress,
         Vec3d cameraPos,
-        ModelCommandRenderer.@Nullable CrumblingOverlayCommand crumblingOverlay
+        @Nullable ModelCommandRenderer.CrumblingOverlayCommand crumblingOverlay
     ) {
         super.updateRenderState(be, state, tickProgress, cameraPos, crumblingOverlay);
         if (state.support) {
