@@ -1,0 +1,14 @@
+{
+  "argument.flywheel_backend.id.unknown": "Backend desconhecido '%s'",
+  "command.flywheel.backend.get": "O backend atual do Flywheel é '%s'",
+  "command.flywheel.backend.set": "O backend do Flywheel agora é '%s'",
+  "command.flywheel.backend.set.unavailable": "O backend solicitado '%s' não está disponível",
+  "command.flywheel.limit_updates.get.off": "A limitação de atualizações está atualmente desativada",
+  "command.flywheel.limit_updates.get.on": "A limitação de atualizações está atualmente ativada",
+  "command.flywheel.limit_updates.set.off": "A limitação de atualizações agora está desativada",
+  "command.flywheel.limit_updates.set.on": "A limitação de atualizações agora está ativada",
+  "command.flywheel.use_light_directions.get.off": "Não usando direções de luz",
+  "command.flywheel.use_light_directions.get.on": "Usando direções de luz",
+  "command.flywheel.use_light_directions.set.off": "Direções de luz definidas como desativadas",
+  "command.flywheel.use_light_directions.set.on": "Direções de luz definidas como ativadas"
+}
