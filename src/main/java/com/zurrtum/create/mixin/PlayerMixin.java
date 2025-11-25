@@ -72,13 +72,14 @@ public abstract class PlayerMixin {
         }
     }
 
-    @WrapOperation(method = "attack(Lnet/minecraft/world/entity/Entity;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/player/Player;attackVisualEffects(Lnet/minecraft/world/entity/Entity;ZZZF)V"))
+    @WrapOperation(method = "attack(Lnet/minecraft/world/entity/Entity;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/player/Player;attackVisualEffects(Lnet/minecraft/world/entity/Entity;ZZZZF)V"))
     private void playSound(
         Player player,
         Entity entity,
         boolean criticalAttack,
         boolean sweepAttack,
         boolean fullStrengthAttack,
+        boolean stabAttack,
         float magicBoost,
         Operation<Void> original,
         @Local ItemStack attackingItemStack
@@ -88,18 +89,18 @@ public abstract class PlayerMixin {
             if (criticalAttack) {
                 sound = SoundEvents.PLAYER_ATTACK_CRIT;
                 player.crit(entity);
-            } else if (!sweepAttack) {
+            } else if (!sweepAttack && !stabAttack) {
                 sound = fullStrengthAttack ? SoundEvents.PLAYER_ATTACK_STRONG : SoundEvents.PLAYER_ATTACK_WEAK;
             } else {
                 sound = null;
             }
             if (sound != null) {
                 item.playSound(player.level(), player, player.getX(), player.getY(), player.getZ(), sound, player.getSoundSource(), 1f, 1f);
-                original.call(player, entity, false, true, fullStrengthAttack, magicBoost);
+                original.call(player, entity, false, true, fullStrengthAttack, stabAttack, magicBoost);
                 return;
             }
         }
-        original.call(player, entity, criticalAttack, sweepAttack, fullStrengthAttack, magicBoost);
+        original.call(player, entity, criticalAttack, sweepAttack, fullStrengthAttack, stabAttack, magicBoost);
     }
 
     @Inject(method = "addAdditionalSaveData(Lnet/minecraft/world/level/storage/ValueOutput;)V", at = @At("TAIL"))
