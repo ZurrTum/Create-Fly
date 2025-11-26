@@ -39,35 +39,39 @@ public class HatFeatureRenderer<S extends LivingEntityRenderState, M extends Ent
 
         var msr = TransformStack.of(ms);
         TrainHatInfo info = hatState.create$getHatInfo();
-        List<ModelPart> partsToHead;
+        ModelPart lastChild;
         if (entityModel instanceof ModelWithHead model) {
-            partsToHead = TrainHatInfo.getAdjustedPart(info, model.getHead(), "");
-            partsToHead.addFirst(entityModel.getRootPart());
+            List<ModelPart> partsToHead = TrainHatInfo.getAdjustedPart(info, model.getHead(), "");
+            entityModel.getRootPart().applyTransform(ms);
+            model.applyTransform(ms);
+            int size = partsToHead.size();
+            for (int i = 1; i < size; i++) {
+                partsToHead.get(i).applyTransform(ms);
+            }
+            lastChild = partsToHead.get(size - 1);
         } else if (info != TrainHatInfoReloadListener.DEFAULT) {
-            partsToHead = TrainHatInfo.getAdjustedPart(info, entityModel.getRootPart(), "head");
+            List<ModelPart> partsToHead = TrainHatInfo.getAdjustedPart(info, entityModel.getRootPart(), "head");
+            partsToHead.forEach(part -> part.applyTransform(ms));
+            lastChild = partsToHead.getLast();
         } else {
             ms.pop();
             return;
         }
 
-        if (!partsToHead.isEmpty()) {
-            partsToHead.forEach(part -> part.applyTransform(ms));
 
-            ModelPart lastChild = partsToHead.get(partsToHead.size() - 1);
-            if (!lastChild.isEmpty()) {
-                ModelPart.Cuboid cube = lastChild.cuboids.get(MathHelper.clamp(info.cubeIndex(), 0, lastChild.cuboids.size() - 1));
-                ms.translate(info.offset().getX() / 16.0F, (cube.minY - cube.maxY + info.offset().getY()) / 16.0F, info.offset().getZ() / 16.0F);
-                float max = Math.max(cube.maxX - cube.minX, cube.maxZ - cube.minZ) / 8.0F * info.scale();
-                ms.scale(max, max, max);
-            }
-
-            ms.scale(1, -1, -1);
-            ms.translate(0, -2.25F / 16.0F, 0);
-            msr.rotateXDegrees(-8.5F);
-            BlockState air = Blocks.AIR.getDefaultState();
-            HatRenderState state = new HatRenderState(CachedBuffers.partial(hat, air), light);
-            queue.submitCustom(ms, TexturedRenderLayers.getEntityCutout(), state);
+        if (!lastChild.isEmpty()) {
+            ModelPart.Cuboid cube = lastChild.cuboids.get(MathHelper.clamp(info.cubeIndex(), 0, lastChild.cuboids.size() - 1));
+            ms.translate(info.offset().getX() / 16.0F, (cube.minY - cube.maxY + info.offset().getY()) / 16.0F, info.offset().getZ() / 16.0F);
+            float max = Math.max(cube.maxX - cube.minX, cube.maxZ - cube.minZ) / 8.0F * info.scale();
+            ms.scale(max, max, max);
         }
+
+        ms.scale(1, -1, -1);
+        ms.translate(0, -2.25F / 16.0F, 0);
+        msr.rotateXDegrees(-8.5F);
+        BlockState air = Blocks.AIR.getDefaultState();
+        HatRenderState state = new HatRenderState(CachedBuffers.partial(hat, air), light);
+        queue.submitCustom(ms, TexturedRenderLayers.getEntityCutout(), state);
 
         ms.pop();
     }
