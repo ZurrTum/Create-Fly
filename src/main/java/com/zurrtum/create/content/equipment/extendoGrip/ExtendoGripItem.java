@@ -142,9 +142,13 @@ public class ExtendoGripItem extends Item {
     }
 
     public static boolean shouldInteraction(PlayerEntity player, Hand hand, ItemStack stack) {
-        if (stack.isOf(AllItems.EXTENDO_GRIP)) {
-            return true;
+        if (stack.isEmpty()) {
+            return player.getEquippedStack(hand == Hand.MAIN_HAND ? EquipmentSlot.OFFHAND : EquipmentSlot.MAINHAND).isOf(AllItems.EXTENDO_GRIP);
         }
-        return player.getEquippedStack(hand == Hand.MAIN_HAND ? EquipmentSlot.OFFHAND : EquipmentSlot.MAINHAND).isOf(AllItems.EXTENDO_GRIP);
+        if (stack.isOf(AllItems.EXTENDO_GRIP)) {
+            stack = player.getEquippedStack(hand == Hand.MAIN_HAND ? EquipmentSlot.OFFHAND : EquipmentSlot.MAINHAND);
+            return stack.isEmpty() || stack.isOf(AllItems.EXTENDO_GRIP);
+        }
+        return false;
     }
 }
