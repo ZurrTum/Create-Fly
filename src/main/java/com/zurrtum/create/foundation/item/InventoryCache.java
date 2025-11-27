@@ -2,18 +2,19 @@ package com.zurrtum.create.foundation.item;
 
 import com.zurrtum.create.AllTransfer;
 import com.zurrtum.create.infrastructure.items.ItemInventoryProvider;
-
-import java.util.function.BiPredicate;
-import java.util.function.Supplier;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.Container;
 import net.minecraft.world.WorldlyContainerHolder;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.ChestBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.ChestBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+
+import java.util.function.BiPredicate;
+import java.util.function.Supplier;
 
 public class InventoryCache implements Supplier<Container> {
     private final BiPredicate<BlockEntity, Direction> filter;
@@ -58,8 +59,11 @@ public class InventoryCache implements Supplier<Container> {
         if (block instanceof WorldlyContainerHolder provider) {
             return provider.getContainer(state, world, pos);
         }
-        if (blockEntity instanceof Container entityInventory) {
-            return entityInventory;
+        if (blockEntity instanceof Container inventory) {
+            if (blockEntity instanceof ChestBlockEntity && block instanceof ChestBlock chestBlock) {
+                return ChestBlock.getContainer(chestBlock, state, world, pos, true);
+            }
+            return inventory;
         }
         getter = AllTransfer.getCacheInventory(world, pos, direction, filter);
         if (getter == null) {
