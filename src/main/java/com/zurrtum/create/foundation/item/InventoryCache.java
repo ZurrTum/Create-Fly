@@ -4,8 +4,10 @@ import com.zurrtum.create.AllTransfer;
 import com.zurrtum.create.infrastructure.items.ItemInventoryProvider;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.ChestBlock;
 import net.minecraft.block.InventoryProvider;
 import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.block.entity.ChestBlockEntity;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
@@ -58,6 +60,9 @@ public class InventoryCache implements Supplier<Inventory> {
             return provider.getInventory(state, world, pos);
         }
         if (blockEntity instanceof Inventory entityInventory) {
+            if (blockEntity instanceof ChestBlockEntity && block instanceof ChestBlock chestBlock) {
+                return ChestBlock.getInventory(chestBlock, state, world, pos, true);
+            }
             return entityInventory;
         }
         getter = AllTransfer.getCacheInventory(world, pos, direction, filter);
