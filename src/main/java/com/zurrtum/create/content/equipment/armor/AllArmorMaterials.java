@@ -2,9 +2,6 @@ package com.zurrtum.create.content.equipment.armor;
 
 import com.google.common.collect.Maps;
 import com.zurrtum.create.AllItemTags;
-
-import java.util.Map;
-
 import net.minecraft.core.Holder;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.resources.ResourceKey;
@@ -18,6 +15,8 @@ import net.minecraft.world.item.equipment.ArmorMaterial;
 import net.minecraft.world.item.equipment.ArmorType;
 import net.minecraft.world.item.equipment.EquipmentAsset;
 import net.minecraft.world.item.equipment.Equippable;
+
+import java.util.Map;
 
 public class AllArmorMaterials {
     public static final ArmorMaterial COPPER = register(
@@ -86,7 +85,7 @@ public class AllArmorMaterials {
     }
 
     public static Item.Properties chest(ArmorMaterial material) {
-        return new Item.Properties().attributes(material.createAttributes(ArmorType.CHESTPLATE)).enchantable(material.enchantmentValue())
+        return new Item.Properties().stacksTo(1).attributes(material.createAttributes(ArmorType.CHESTPLATE)).enchantable(material.enchantmentValue())
             .repairable(material.repairIngredient()).component(
                 DataComponents.EQUIPPABLE,
                 Equippable.builder(EquipmentSlot.CHEST).setEquipSound(material.equipSound()).setAsset(material.assetId()).build()
