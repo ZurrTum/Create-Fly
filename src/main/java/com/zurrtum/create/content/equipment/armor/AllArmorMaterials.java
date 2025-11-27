@@ -85,7 +85,7 @@ public class AllArmorMaterials {
     }
 
     public static Item.Settings chest(ArmorMaterial material) {
-        return new Item.Settings().attributeModifiers(material.createAttributeModifiers(EquipmentType.CHESTPLATE))
+        return new Item.Settings().maxCount(1).attributeModifiers(material.createAttributeModifiers(EquipmentType.CHESTPLATE))
             .enchantable(material.enchantmentValue()).repairable(material.repairIngredient()).component(
                 DataComponentTypes.EQUIPPABLE,
                 EquippableComponent.builder(EquipmentSlot.CHEST).equipSound(material.equipSound()).model(material.assetId()).build()
