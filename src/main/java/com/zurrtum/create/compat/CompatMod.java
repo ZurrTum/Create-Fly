@@ -33,6 +33,7 @@ public class CompatMod {
             registerPeripheral(AllBlockEntityTypes.REDSTONE_REQUESTER);
             registerPeripheral(AllBlockEntityTypes.REPACKAGER);
             registerPeripheral(AllBlockEntityTypes.SEQUENCED_GEARSHIFT);
+            registerPeripheral(AllBlockEntityTypes.TRACK_SIGNAL);
         }
     }
 }

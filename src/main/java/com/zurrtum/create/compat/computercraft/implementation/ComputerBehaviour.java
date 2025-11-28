@@ -60,8 +60,8 @@ public class ComputerBehaviour extends AbstractComputerBehaviour {
 			return () -> new NixieTubePeripheral(ntbe);
 		if (be instanceof SequencedGearshiftBlockEntity sgbe)
 			return () -> new SequencedGearshiftPeripheral(sgbe);
-//		if (be instanceof SignalBlockEntity sbe)
-//			return () -> new SignalPeripheral(sbe);
+		if (be instanceof SignalBlockEntity sbe)
+			return () -> new SignalPeripheral(sbe);
 //		if (be instanceof SpeedGaugeBlockEntity sgbe)
 //			return () -> new SpeedGaugePeripheral(sgbe);
         if (be instanceof StressGaugeBlockEntity sgbe)

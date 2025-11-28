@@ -3,6 +3,9 @@ package com.zurrtum.create.content.trains.signal;
 import com.mojang.serialization.Codec;
 import com.zurrtum.create.AllBlockEntityTypes;
 import com.zurrtum.create.api.contraption.transformable.TransformableBlockEntity;
+import com.zurrtum.create.compat.computercraft.AbstractComputerBehaviour;
+import com.zurrtum.create.compat.computercraft.ComputerCraftProxy;
+import com.zurrtum.create.compat.computercraft.events.SignalStateChangeEvent;
 import com.zurrtum.create.content.contraptions.StructureTransform;
 import com.zurrtum.create.content.trains.graph.EdgePointType;
 import com.zurrtum.create.content.trains.signal.SignalBlock.SignalType;
@@ -69,6 +72,7 @@ public class SignalBlockEntity extends SmartBlockEntity implements Transformable
     private OverlayState overlay;
     private int switchToRedAfterTrainEntered;
     private boolean lastReportedPower;
+    public AbstractComputerBehaviour computerBehaviour;
 
     public SignalBlockEntity(BlockPos pos, BlockState state) {
         super(AllBlockEntityTypes.TRACK_SIGNAL, pos, state);
@@ -106,6 +110,7 @@ public class SignalBlockEntity extends SmartBlockEntity implements Transformable
     @Override
     public void addBehaviours(List<BlockEntityBehaviour<?>> behaviours) {
         edgePoint = new TrackTargetingBehaviour<>(this, EdgePointType.SIGNAL);
+        behaviours.add(computerBehaviour = ComputerCraftProxy.behaviour(this));
         behaviours.add(edgePoint);
     }
 
@@ -172,6 +177,8 @@ public class SignalBlockEntity extends SmartBlockEntity implements Transformable
             return;
         this.state = state;
         switchToRedAfterTrainEntered = state == SignalState.GREEN || state == SignalState.YELLOW ? 15 : 0;
+        if (computerBehaviour.hasAttachedComputer())
+            computerBehaviour.prepareComputerEvent(new SignalStateChangeEvent(state));
         notifyUpdate();
     }
 
@@ -185,4 +192,9 @@ public class SignalBlockEntity extends SmartBlockEntity implements Transformable
         edgePoint.transform(be, transform);
     }
 
+    @Override
+    public void invalidate() {
+        super.invalidate();
+        computerBehaviour.removePeripheral();
+    }
 }
