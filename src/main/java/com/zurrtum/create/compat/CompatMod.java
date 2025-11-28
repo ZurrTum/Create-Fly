@@ -27,6 +27,7 @@ public class CompatMod {
             registerPeripheral(AllBlockEntityTypes.DISPLAY_LINK);
             registerPeripheral(AllBlockEntityTypes.STRESSOMETER);
             registerPeripheral(AllBlockEntityTypes.PACKAGE_FROGPORT);
+            registerPeripheral(AllBlockEntityTypes.NIXIE_TUBE);
         }
     }
 }

@@ -56,8 +56,8 @@ public class ComputerBehaviour extends AbstractComputerBehaviour {
 			return () -> new FrogportPeripheral(fpbe);
 //		if (be instanceof PostboxBlockEntity pbbe)
 //			return () -> new PostboxPeripheral(pbbe);
-//		if (be instanceof NixieTubeBlockEntity ntbe)
-//			return () -> new NixieTubePeripheral(ntbe);
+		if (be instanceof NixieTubeBlockEntity ntbe)
+			return () -> new NixieTubePeripheral(ntbe);
 //		if (be instanceof SequencedGearshiftBlockEntity sgbe)
 //			return () -> new SequencedGearshiftPeripheral(sgbe);
 //		if (be instanceof SignalBlockEntity sbe)
