@@ -30,6 +30,7 @@ public class CompatMod {
             registerPeripheral(AllBlockEntityTypes.NIXIE_TUBE);
             registerPeripheral(AllBlockEntityTypes.PACKAGER);
             registerPeripheral(AllBlockEntityTypes.PACKAGE_POSTBOX);
+            registerPeripheral(AllBlockEntityTypes.REDSTONE_REQUESTER);
         }
     }
 }
