@@ -4,6 +4,8 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.zurrtum.create.AllBlockEntityTypes;
 import com.zurrtum.create.catnip.nbt.NBTHelper;
+import com.zurrtum.create.compat.computercraft.AbstractComputerBehaviour;
+import com.zurrtum.create.compat.computercraft.ComputerCraftProxy;
 import com.zurrtum.create.content.kinetics.base.KineticBlockEntity;
 import com.zurrtum.create.content.kinetics.transmission.SplitShaftBlockEntity;
 import com.zurrtum.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
@@ -28,13 +30,12 @@ public class SequencedGearshiftBlockEntity extends SplitShaftBlockEntity {
     int timer;
     boolean poweredPreviously;
 
-    //TODO
-    //    public AbstractComputerBehaviour computerBehaviour;
+    public AbstractComputerBehaviour computerBehaviour;
 
     public record SequenceContext(SequencerInstructions instruction, double relativeValue) {
         public static Codec<SequenceContext> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-            SequencerInstructions.CODEC.fieldOf("Mode").forGetter(SequenceContext::instruction),
-            Codec.DOUBLE.fieldOf("Value").forGetter(SequenceContext::relativeValue)
+                SequencerInstructions.CODEC.fieldOf("Mode").forGetter(SequenceContext::instruction),
+                Codec.DOUBLE.fieldOf("Value").forGetter(SequenceContext::relativeValue)
         ).apply(instance, SequenceContext::new));
 
         public static SequenceContext fromGearshift(SequencerInstructions instruction, double kineticSpeed, int absoluteValue) {
@@ -70,22 +71,10 @@ public class SequencedGearshiftBlockEntity extends SplitShaftBlockEntity {
         poweredPreviously = false;
     }
 
-    //TODO
-    //    public static void registerCapabilities(RegisterCapabilitiesEvent event) {
-    //        if (Mods.COMPUTERCRAFT.isLoaded()) {
-    //            event.registerBlockEntity(
-    //                PeripheralCapability.get(),
-    //                AllBlockEntityTypes.SEQUENCED_GEARSHIFT.get(),
-    //                (be, context) -> be.computerBehaviour.getPeripheralCapability()
-    //            );
-    //        }
-    //    }
-
     @Override
     public void addBehaviours(List<BlockEntityBehaviour<?>> behaviours) {
         super.addBehaviours(behaviours);
-        //TODO
-        //        behaviours.add(computerBehaviour = ComputerCraftProxy.behaviour(this));
+        behaviours.add(computerBehaviour = ComputerCraftProxy.behaviour(this));
     }
 
     @Override
@@ -130,9 +119,8 @@ public class SequencedGearshiftBlockEntity extends SplitShaftBlockEntity {
     }
 
     public void onRedstoneUpdate(boolean isPowered, boolean isRunning) {
-        //TODO
-        //        if (computerBehaviour.hasAttachedComputer())
-        //            return;
+        if (computerBehaviour.hasAttachedComputer())
+            return;
         if (!poweredPreviously && isPowered)
             risingFlank();
         poweredPreviously = isPowered;
@@ -218,10 +206,10 @@ public class SequencedGearshiftBlockEntity extends SplitShaftBlockEntity {
         poweredPreviously = view.getBoolean("PrevPowered", false);
         timer = view.getInt("Timer", 0);
         view.getOptionalTypedListView("Instructions", Instruction.CODEC).ifPresentOrElse(
-            list -> {
-                instructions = new Vector<>(5);
-                list.forEach(instructions::add);
-            }, () -> instructions = Instruction.createDefault()
+                list -> {
+                    instructions = new Vector<>(5);
+                    list.forEach(instructions::add);
+                }, () -> instructions = Instruction.createDefault()
         );
         super.read(view, clientPacket);
     }
@@ -229,8 +217,7 @@ public class SequencedGearshiftBlockEntity extends SplitShaftBlockEntity {
     @Override
     public void invalidate() {
         super.invalidate();
-        //TODO
-        //        computerBehaviour.removePeripheral();
+        computerBehaviour.removePeripheral();
     }
 
     @Override

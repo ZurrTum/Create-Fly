@@ -32,6 +32,7 @@ public class CompatMod {
             registerPeripheral(AllBlockEntityTypes.PACKAGE_POSTBOX);
             registerPeripheral(AllBlockEntityTypes.REDSTONE_REQUESTER);
             registerPeripheral(AllBlockEntityTypes.REPACKAGER);
+            registerPeripheral(AllBlockEntityTypes.SEQUENCED_GEARSHIFT);
         }
     }
 }
