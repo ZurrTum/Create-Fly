@@ -270,3 +270,10 @@ accessible class net/minecraft/client/renderer/rendertype/RenderSetup$TextureBin
 accessible field net/minecraft/client/renderer/rendertype/RenderSetup useLightmap Z
 accessible field net/minecraft/client/renderer/rendertype/RenderSetup useOverlay Z
 accessible field net/minecraft/client/renderer/RenderPipelines BLOCK_SNIPPET Lcom/mojang/blaze3d/pipeline/RenderPipeline$Snippet;
+accessible class net/minecraft/world/entity/vehicle/minecart/NewMinecartBehavior$TrackIteration
+accessible method net/minecraft/world/entity/vehicle/minecart/NewMinecartBehavior$TrackIteration <init> ()V
+accessible field net/minecraft/world/entity/vehicle/minecart/NewMinecartBehavior$TrackIteration firstIteration Z
+accessible field net/minecraft/world/entity/vehicle/minecart/NewMinecartBehavior$TrackIteration movementLeft D
+accessible method net/minecraft/world/entity/vehicle/minecart/NewMinecartBehavior calculateTrackSpeed (Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/world/phys/Vec3;Lnet/minecraft/world/entity/vehicle/minecart/NewMinecartBehavior$TrackIteration;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/world/level/block/state/properties/RailShape;)Lnet/minecraft/world/phys/Vec3;
+accessible method net/minecraft/world/entity/vehicle/minecart/NewMinecartBehavior setRotation (FF)V
+accessible method net/minecraft/world/entity/vehicle/minecart/AbstractMinecart comeOffTrack (Lnet/minecraft/server/level/ServerLevel;)V

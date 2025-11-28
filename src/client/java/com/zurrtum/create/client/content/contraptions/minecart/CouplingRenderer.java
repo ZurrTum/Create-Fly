@@ -11,6 +11,7 @@ import com.zurrtum.create.client.catnip.outliner.Outliner;
 import com.zurrtum.create.client.catnip.render.CachedBuffers;
 import com.zurrtum.create.client.catnip.render.SuperByteBuffer;
 import com.zurrtum.create.client.content.kinetics.KineticDebugger;
+import com.zurrtum.create.client.flywheel.lib.transform.PoseTransformStack;
 import com.zurrtum.create.client.flywheel.lib.transform.TransformStack;
 import com.zurrtum.create.content.contraptions.minecart.CouplingHandler;
 import com.zurrtum.create.content.contraptions.minecart.capability.MinecartController;
@@ -23,10 +24,14 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.vehicle.minecart.AbstractMinecart;
+import net.minecraft.world.entity.vehicle.minecart.MinecartBehavior;
+import net.minecraft.world.entity.vehicle.minecart.NewMinecartBehavior;
 import net.minecraft.world.entity.vehicle.minecart.OldMinecartBehavior;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
+
+import java.util.Objects;
 
 public class CouplingRenderer {
 
@@ -98,17 +103,11 @@ public class CouplingRenderer {
         long i = cart.getId() * 493286711L;
         i = i * i * 4392167121L + i * 98761L;
         double x = (((float) (i >> 16 & 7L) + 0.5F) / 8.0F - 0.5F) * 0.004F;
-        double y = (((float) (i >> 20 & 7L) + 0.5F) / 8.0F - 0.5F) * 0.004F + 0.375F;
+        double y = (((float) (i >> 20 & 7L) + 0.5F) / 8.0F - 0.5F) * 0.004F;
         double z = (((float) (i >> 24 & 7L) + 0.5F) / 8.0F - 0.5F) * 0.004F;
 
         float pt = AnimationTickHolder.getPartialTicks();
 
-        double xIn = Mth.lerp(pt, cart.xOld, cart.getX());
-        double yIn = Mth.lerp(pt, cart.yOld, cart.getY());
-        double zIn = Mth.lerp(pt, cart.zOld, cart.getZ());
-
-        float yaw = Mth.lerp(pt, cart.yRotO, cart.getYRot());
-        float pitch = Mth.lerp(pt, cart.xRotO, cart.getXRot());
         float roll = cart.getHurtTime() - pt;
 
         float rollAmplifier = cart.getDamage() - pt;
@@ -116,19 +115,18 @@ public class CouplingRenderer {
             rollAmplifier = 0.0F;
         roll = roll > 0 ? Mth.sin(roll) * roll * rollAmplifier / 10.0F * cart.getHurtDir() : 0;
 
-        Vec3 positionVec = new Vec3(xIn, yIn, zIn);
-        Vec3 frontVec = positionVec.add(VecHelper.rotate(new Vec3(.5, 0, 0), 180 - yaw, Direction.Axis.Y));
-        Vec3 backVec = positionVec.add(VecHelper.rotate(new Vec3(-.5, 0, 0), 180 - yaw, Direction.Axis.Y));
-
-        if (cart.getBehavior() instanceof OldMinecartBehavior defaultMinecartController) {
-            Vec3 railVecOfPos = defaultMinecartController.getPos(xIn, yIn, zIn);
+        Vec3 frontVec, backVec;
+        float yaw, pitch;
+        MinecartBehavior behavior = cart.getBehavior();
+        boolean old = true;
+        if (behavior instanceof OldMinecartBehavior controller) {
+            double xIn = Mth.lerp(pt, cart.xOld, cart.getX());
+            double yIn = Mth.lerp(pt, cart.yOld, cart.getY());
+            double zIn = Mth.lerp(pt, cart.zOld, cart.getZ());
+            Vec3 railVecOfPos = controller.getPos(xIn, yIn, zIn);
             if (railVecOfPos != null) {
-                frontVec = defaultMinecartController.getPosOffs(xIn, yIn, zIn, 0.3F);
-                backVec = defaultMinecartController.getPosOffs(xIn, yIn, zIn, -0.3F);
-                if (frontVec == null)
-                    frontVec = railVecOfPos;
-                if (backVec == null)
-                    backVec = railVecOfPos;
+                frontVec = Objects.requireNonNullElse(controller.getPosOffs(xIn, yIn, zIn, 0.3F), railVecOfPos);
+                backVec = Objects.requireNonNullElse(controller.getPosOffs(xIn, yIn, zIn, -0.3F), railVecOfPos);
 
                 x += railVecOfPos.x;
                 y += (frontVec.y + backVec.y) / 2;
@@ -139,23 +137,45 @@ public class CouplingRenderer {
                     endPointDiff = endPointDiff.normalize();
                     yaw = (float) (Math.atan2(endPointDiff.z, endPointDiff.x) * 180.0D / Math.PI);
                     pitch = (float) (Math.atan(endPointDiff.y) * 73.0D);
+                } else {
+                    yaw = Mth.lerp(pt, cart.yRotO, cart.getYRot());
+                    pitch = Mth.lerp(pt, cart.xRotO, cart.getXRot());
                 }
             } else {
+                yaw = Mth.lerp(pt, cart.yRotO, cart.getYRot());
+                pitch = Mth.lerp(pt, cart.xRotO, cart.getXRot());
+                Vec3 positionVec = new Vec3(xIn, yIn, zIn);
+                frontVec = positionVec.add(VecHelper.rotate(new Vec3(.5, 0, 0), 180 - yaw, Direction.Axis.Y));
+                backVec = positionVec.add(VecHelper.rotate(new Vec3(-.5, 0, 0), 180 - yaw, Direction.Axis.Y));
                 x += xIn;
                 y += yIn;
                 z += zIn;
             }
+            yaw = 180 - yaw;
         } else {
-            x += xIn;
-            y += yIn;
-            z += zIn;
+            old = false;
+            NewMinecartBehavior controller = (NewMinecartBehavior) behavior;
+            Vec3 pos;
+            if (controller.cartHasPosRotLerp()) {
+                pos = controller.getCartLerpPosition(pt);
+                yaw = controller.getCartLerpYRot(pt);
+                pitch = controller.getCartLerpXRot(pt);
+            } else {
+                double xIn = Mth.lerp(pt, cart.xOld, cart.getX());
+                double yIn = Mth.lerp(pt, cart.yOld, cart.getY());
+                double zIn = Mth.lerp(pt, cart.zOld, cart.getZ());
+                pos = new Vec3(xIn, yIn, zIn);
+                yaw = cart.getYRot();
+                pitch = cart.getXRot();
+            }
+            x += pos.x;
+            y += pos.y;
+            z += pos.z;
+            frontVec = pos.add(VecHelper.rotate(new Vec3(.5, 0, 0), yaw, Direction.Axis.Y));
+            backVec = pos.add(VecHelper.rotate(new Vec3(-.5, 0, 0), yaw, Direction.Axis.Y));
         }
-
-        final float offsetMagnitude = 13 / 16f;
         boolean isBackFaceCloser = frontVec.distanceToSqr(centerOfCoupling) > backVec.distanceToSqr(centerOfCoupling);
-        float offset = isBackFaceCloser ? -offsetMagnitude : offsetMagnitude;
-
-        return new CartEndpoint(x, y + 2 / 16f, z, 180 - yaw, -pitch, roll, offset, isBackFaceCloser);
+        return new CartEndpoint(x, y, z, yaw, -pitch, roll, isBackFaceCloser ? -13 / 16f : 13 / 16f, isBackFaceCloser, old);
     }
 
     static class CartEndpoint {
@@ -168,8 +188,9 @@ public class CouplingRenderer {
         float roll;
         float offset;
         boolean flip;
+        boolean old;
 
-        public CartEndpoint(double x, double y, double z, float yaw, float pitch, float roll, float offset, boolean flip) {
+        public CartEndpoint(double x, double y, double z, float yaw, float pitch, float roll, float offset, boolean flip, boolean old) {
             this.x = x;
             this.y = y;
             this.z = z;
@@ -178,19 +199,34 @@ public class CouplingRenderer {
             this.roll = roll;
             this.offset = offset;
             this.flip = flip;
+            this.old = old;
         }
 
         public Vec3 apply(Vec3 vec) {
             vec = vec.add(offset, 0, 0);
-            vec = VecHelper.rotate(vec, roll, Direction.Axis.X);
-            vec = VecHelper.rotate(vec, pitch, Direction.Axis.Z);
-            vec = VecHelper.rotate(vec, yaw, Direction.Axis.Y);
-            return vec.add(x, y, z);
+            if (old) {
+                vec = VecHelper.rotate(vec, roll, Direction.Axis.X);
+                vec = VecHelper.rotate(vec, pitch, Direction.Axis.Z);
+                vec = VecHelper.rotate(vec, yaw, Direction.Axis.Y);
+                return vec.add(x, y + 0.375F + 2 / 16f, z);
+            } else {
+                vec = vec.add(0, 0.375F + 2 / 16f, 0);
+                vec = VecHelper.rotate(vec, roll, Direction.Axis.X);
+                vec = VecHelper.rotate(vec, pitch, Direction.Axis.Z);
+                vec = VecHelper.rotate(vec, yaw, Direction.Axis.Y);
+                return vec.add(x, y, z);
+            }
         }
 
         public void apply(PoseStack ms, Vec3 camera) {
-            TransformStack.of(ms).translate(camera.scale(-1).add(x, y, z)).rotateYDegrees(yaw).rotateZDegrees(pitch).rotateXDegrees(roll)
-                .translate(offset, 0, 0).rotateYDegrees(flip ? 180 : 0);
+            PoseTransformStack msr = TransformStack.of(ms);
+            msr.translate(camera.scale(-1).add(x, y, z));
+            if (old) {
+                msr.translateY(0.375F + 2 / 16f).rotateYDegrees(yaw).rotateZDegrees(pitch);
+            } else {
+                msr.rotateYDegrees(yaw).rotateZDegrees(pitch).translateY(0.375F + 2 / 16f);
+            }
+            msr.rotateXDegrees(roll).translate(offset, 0, 0).rotateYDegrees(flip ? 180 : 0);
         }
 
     }

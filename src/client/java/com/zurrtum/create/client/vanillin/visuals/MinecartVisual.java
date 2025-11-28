@@ -19,6 +19,7 @@ import net.minecraft.client.model.geom.ModelLayerLocation;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.vehicle.minecart.AbstractMinecart;
+import net.minecraft.world.entity.vehicle.minecart.MinecartBehavior;
 import net.minecraft.world.entity.vehicle.minecart.NewMinecartBehavior;
 import net.minecraft.world.entity.vehicle.minecart.OldMinecartBehavior;
 import net.minecraft.world.level.block.Block;
@@ -28,6 +29,8 @@ import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix4f;
 import org.joml.Matrix4fStack;
+
+import java.util.Objects;
 
 public class MinecartVisual<T extends AbstractMinecart> extends AbstractEntityVisual<T> implements SimpleTickableVisual, SimpleDynamicVisual {
     private static final Identifier TEXTURE = Identifier.withDefaultNamespace("textures/entity/minecart.png");
@@ -98,49 +101,12 @@ public class MinecartVisual<T extends AbstractMinecart> extends AbstractEntityVi
     private void updateInstances(float partialTick) {
         stack.identity();
 
-        double posX = Mth.lerp(partialTick, entity.xOld, entity.getX());
-        double posY = Mth.lerp(partialTick, entity.yOld, entity.getY());
-        double posZ = Mth.lerp(partialTick, entity.zOld, entity.getZ());
-
-        var renderOrigin = renderOrigin();
-        stack.translate((float) (posX - renderOrigin.getX()), (float) (posY - renderOrigin.getY()), (float) (posZ - renderOrigin.getZ()));
-        float yaw = Mth.lerp(partialTick, entity.yRotO, entity.getYRot());
-
-        long randomBits = entity.getId() * 493286711L;
-        randomBits = randomBits * randomBits * 4392167121L + randomBits * 98761L;
-        float nudgeX = (((float) (randomBits >> 16 & 7L) + 0.5f) / 8.0f - 0.5F) * 0.004f;
-        float nudgeY = (((float) (randomBits >> 20 & 7L) + 0.5f) / 8.0f - 0.5F) * 0.004f;
-        float nudgeZ = (((float) (randomBits >> 24 & 7L) + 0.5f) / 8.0f - 0.5F) * 0.004f;
-        stack.translate(nudgeX, nudgeY, nudgeZ);
-
-        float pitch = Mth.lerp(partialTick, entity.xRotO, entity.getXRot());
-        if (entity.getBehavior() instanceof OldMinecartBehavior controller) {
-            Vec3 pos = controller.getPos(posX, posY, posZ);
-            if (pos != null) {
-                Vec3 offset1 = controller.getPosOffs(posX, posY, posZ, 0.3F);
-                Vec3 offset2 = controller.getPosOffs(posX, posY, posZ, -0.3F);
-
-                if (offset1 == null) {
-                    offset1 = pos;
-                }
-
-                if (offset2 == null) {
-                    offset2 = pos;
-                }
-
-                stack.translate((float) (pos.x - posX), (float) ((offset1.y + offset2.y) / 2.0D - posY), (float) (pos.z - posZ));
-                Vec3 vec = offset2.add(-offset1.x, -offset1.y, -offset1.z);
-                if (vec.length() != 0.0D) {
-                    vec = vec.normalize();
-                    yaw = (float) (Math.atan2(vec.z, vec.x) * 180.0D / Math.PI);
-                    pitch = (float) (Math.atan(vec.y) * 73.0D);
-                }
-            }
+        MinecartBehavior behavior = entity.getBehavior();
+        if (behavior instanceof OldMinecartBehavior oldMinecartBehavior) {
+            updateOldMinecart(entity, oldMinecartBehavior, partialTick);
+        } else {
+            updateNewMinecart(entity, (NewMinecartBehavior) behavior, partialTick);
         }
-
-        stack.translate(0.0F, 0.375F, 0.0F);
-        stack.rotateY((180 - yaw) * Mth.DEG_TO_RAD);
-        stack.rotateZ(-pitch * Mth.DEG_TO_RAD);
 
         float hurtTime = entity.getHurtTime() - partialTick;
         float damage = entity.getDamage() - partialTick;
@@ -168,6 +134,60 @@ public class MinecartVisual<T extends AbstractMinecart> extends AbstractEntityVi
 
         // TODO: Use LightUpdatedVisual/ShaderLightVisual if possible.
         updateLight(partialTick);
+    }
+
+    private void updatePosition(T entity, double posX, double posY, double posZ) {
+        var renderOrigin = renderOrigin();
+        stack.translate((float) (posX - renderOrigin.getX()), (float) (posY - renderOrigin.getY()), (float) (posZ - renderOrigin.getZ()));
+        long randomBits = entity.getId() * 493286711L;
+        randomBits = randomBits * randomBits * 4392167121L + randomBits * 98761L;
+        float nudgeX = (((float) (randomBits >> 16 & 7L) + 0.5f) / 8.0f - 0.5F) * 0.004f;
+        float nudgeY = (((float) (randomBits >> 20 & 7L) + 0.5f) / 8.0f - 0.5F) * 0.004f;
+        float nudgeZ = (((float) (randomBits >> 24 & 7L) + 0.5f) / 8.0f - 0.5F) * 0.004f;
+        stack.translate(nudgeX, nudgeY, nudgeZ);
+    }
+
+    private void updateOldMinecart(T entity, OldMinecartBehavior behavior, float partialTick) {
+        double posX = Mth.lerp(partialTick, entity.xOld, entity.getX());
+        double posY = Mth.lerp(partialTick, entity.yOld, entity.getY());
+        double posZ = Mth.lerp(partialTick, entity.zOld, entity.getZ());
+        updatePosition(entity, posX, posY, posZ);
+        Vec3 vec = behavior.getPos(posX, posY, posZ);
+        if (vec != null) {
+            Vec3 offset1 = Objects.requireNonNullElse(behavior.getPosOffs(posX, posY, posZ, 0.3F), vec);
+            Vec3 offset2 = Objects.requireNonNullElse(behavior.getPosOffs(posX, posY, posZ, -0.3F), vec);
+            stack.translate((float) (vec.x - posX), (float) ((offset1.y + offset2.y) / 2.0D - posY), (float) (vec.z - posZ));
+            vec = offset2.add(-offset1.x, -offset1.y, -offset1.z);
+            vec = vec.length() != 0.0D ? vec.normalize() : null;
+        }
+        float pitch, yaw;
+        if (vec == null) {
+            yaw = entity.getYRot(partialTick);
+            pitch = entity.getXRot(partialTick);
+        } else {
+            yaw = (float) (Math.atan2(vec.z, vec.x) * 180.0D / Math.PI);
+            pitch = (float) (Math.atan(vec.y) * 73.0D);
+        }
+        stack.translate(0.0F, 0.375F, 0.0F);
+        stack.rotateY((180 - yaw) * Mth.DEG_TO_RAD);
+        stack.rotateZ(-pitch * Mth.DEG_TO_RAD);
+    }
+
+    private void updateNewMinecart(T entity, NewMinecartBehavior behavior, float partialTick) {
+        if (behavior.cartHasPosRotLerp()) {
+            Vec3 pos = behavior.getCartLerpPosition(partialTick);
+            updatePosition(entity, pos.x, pos.y, pos.z);
+            stack.rotateY(behavior.getCartLerpYRot(partialTick) * Mth.DEG_TO_RAD);
+            stack.rotateZ(-behavior.getCartLerpXRot(partialTick) * Mth.DEG_TO_RAD);
+        } else {
+            double posX = Mth.lerp(partialTick, entity.xOld, entity.getX());
+            double posY = Mth.lerp(partialTick, entity.yOld, entity.getY());
+            double posZ = Mth.lerp(partialTick, entity.zOld, entity.getZ());
+            updatePosition(entity, posX, posY, posZ);
+            stack.rotateY(entity.getYRot() * Mth.DEG_TO_RAD);
+            stack.rotateZ(-entity.getXRot() * Mth.DEG_TO_RAD);
+        }
+        stack.translate(0.0F, 0.375F, 0.0F);
     }
 
     protected void updateContents(TransformedInstance contents, Matrix4f pose, float partialTick) {

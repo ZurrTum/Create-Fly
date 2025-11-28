@@ -42,6 +42,7 @@
     "MinecraftServerMixin",
     "MobMixin",
     "MultiNeighborUpdateMixin",
+    "NewMinecartBehaviorMixin",
     "ObserverBlockMixin",
     "OldMinecartBehaviorMixin",
     "PersistentEntitySectionManagerCallbackMixin",

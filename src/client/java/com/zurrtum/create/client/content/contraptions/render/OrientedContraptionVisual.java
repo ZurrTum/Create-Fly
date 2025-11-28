@@ -8,6 +8,8 @@ import com.zurrtum.create.content.contraptions.OrientedContraptionEntity;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.vehicle.minecart.AbstractMinecart;
+import net.minecraft.world.entity.vehicle.minecart.MinecartBehavior;
+import net.minecraft.world.entity.vehicle.minecart.NewMinecartBehavior;
 import net.minecraft.world.entity.vehicle.minecart.OldMinecartBehavior;
 import net.minecraft.world.phys.Vec3;
 
@@ -50,27 +52,32 @@ public class OrientedContraptionVisual<T extends OrientedContraptionEntity> exte
     }
 
     public static Vec3 getCartOffset(float partialTicks, AbstractMinecart cart) {
-        if (!(cart.getBehavior() instanceof OldMinecartBehavior controller)) {
-            return Vec3.ZERO;
-        }
-        double cartX = Mth.lerp(partialTicks, cart.xOld, cart.getX());
-        double cartY = Mth.lerp(partialTicks, cart.yOld, cart.getY());
-        double cartZ = Mth.lerp(partialTicks, cart.zOld, cart.getZ());
+        MinecartBehavior behavior = cart.getBehavior();
+        if (behavior instanceof OldMinecartBehavior controller) {
+            double cartX = Mth.lerp(partialTicks, cart.xOld, cart.getX());
+            double cartY = Mth.lerp(partialTicks, cart.yOld, cart.getY());
+            double cartZ = Mth.lerp(partialTicks, cart.zOld, cart.getZ());
+            Vec3 cartPos = controller.getPos(cartX, cartY, cartZ);
+            if (cartPos != null) {
+                Vec3 cartPosFront = controller.getPosOffs(cartX, cartY, cartZ, 0.3F);
+                Vec3 cartPosBack = controller.getPosOffs(cartX, cartY, cartZ, -0.3F);
+                if (cartPosFront == null)
+                    cartPosFront = cartPos;
+                if (cartPosBack == null)
+                    cartPosBack = cartPos;
 
-        Vec3 cartPos = controller.getPos(cartX, cartY, cartZ);
-        if (cartPos != null) {
-            Vec3 cartPosFront = controller.getPosOffs(cartX, cartY, cartZ, 0.3F);
-            Vec3 cartPosBack = controller.getPosOffs(cartX, cartY, cartZ, -0.3F);
-            if (cartPosFront == null)
-                cartPosFront = cartPos;
-            if (cartPosBack == null)
-                cartPosBack = cartPos;
+                cartX = cartPos.x - cartX;
+                cartY = (cartPosFront.y + cartPosBack.y) / 2.0D - cartY;
+                cartZ = cartPos.z - cartZ;
 
-            cartX = cartPos.x - cartX;
-            cartY = (cartPosFront.y + cartPosBack.y) / 2.0D - cartY;
-            cartZ = cartPos.z - cartZ;
-
-            return new Vec3(cartX, cartY, cartZ);
+                return new Vec3(cartX, cartY, cartZ);
+            }
+        } else if (behavior instanceof NewMinecartBehavior controller && controller.cartHasPosRotLerp()) {
+            double cartX = Mth.lerp(partialTicks, cart.xOld, cart.getX());
+            double cartY = Mth.lerp(partialTicks, cart.yOld, cart.getY());
+            double cartZ = Mth.lerp(partialTicks, cart.zOld, cart.getZ());
+            Vec3 cartPos = controller.getCartLerpPosition(partialTicks);
+            return new Vec3(cartPos.x - cartX, cartPos.y - cartY, cartPos.z - cartZ);
         }
 
         return Vec3.ZERO;
