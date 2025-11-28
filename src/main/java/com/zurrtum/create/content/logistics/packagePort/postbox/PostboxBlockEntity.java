@@ -4,9 +4,12 @@ import com.zurrtum.create.AllBlockEntityTypes;
 import com.zurrtum.create.AllSoundEvents;
 import com.zurrtum.create.catnip.animation.LerpedFloat;
 import com.zurrtum.create.catnip.animation.LerpedFloat.Chaser;
+import com.zurrtum.create.compat.computercraft.AbstractComputerBehaviour;
+import com.zurrtum.create.compat.computercraft.ComputerCraftProxy;
 import com.zurrtum.create.content.logistics.packagePort.PackagePortBlockEntity;
 import com.zurrtum.create.content.trains.station.GlobalPackagePort;
 import com.zurrtum.create.content.trains.station.GlobalStation;
+import com.zurrtum.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
 import net.minecraft.block.BlockState;
 import net.minecraft.item.BoneMealItem;
 import net.minecraft.sound.SoundCategory;
@@ -16,6 +19,7 @@ import net.minecraft.storage.WriteView;
 import net.minecraft.util.math.BlockPos;
 
 import java.lang.ref.WeakReference;
+import java.util.List;
 
 public class PostboxBlockEntity extends PackagePortBlockEntity {
 
@@ -26,8 +30,7 @@ public class PostboxBlockEntity extends PackagePortBlockEntity {
 
     private boolean sendParticles;
 
-    //TODO
-    //    public AbstractComputerBehaviour computerBehaviour;
+    public AbstractComputerBehaviour computerBehaviour;
 
     public PostboxBlockEntity(BlockPos pos, BlockState state) {
         super(AllBlockEntityTypes.PACKAGE_POSTBOX, pos, state);
@@ -35,12 +38,11 @@ public class PostboxBlockEntity extends PackagePortBlockEntity {
         flag = LerpedFloat.linear().startWithValue(0);
     }
 
-    //TODO
-    //    @Override
-    //    public void addBehaviours(List<BlockEntityBehaviour<?>> behaviours) {
-    //        behaviours.add(computerBehaviour = ComputerCraftProxy.behaviour(this));
-    //        super.addBehaviours(behaviours);
-    //    }
+    @Override
+    public void addBehaviours(List<BlockEntityBehaviour<?>> behaviours) {
+        behaviours.add(computerBehaviour = ComputerCraftProxy.behaviour(this));
+        super.addBehaviours(behaviours);
+    }
 
     @Override
     public void tick() {
@@ -116,10 +118,9 @@ public class PostboxBlockEntity extends PackagePortBlockEntity {
         globalPackagePort.saveOfflineBuffer(inventory);
     }
 
-    //TODO
-    //    @Override
-    //    public void invalidate() {
-    //        super.invalidate();
-    //        computerBehaviour.removePeripheral();
-    //    }
+    @Override
+    public void invalidate() {
+        super.invalidate();
+        computerBehaviour.removePeripheral();
+    }
 }

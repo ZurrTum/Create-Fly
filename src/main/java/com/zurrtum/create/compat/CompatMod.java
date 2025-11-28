@@ -29,6 +29,7 @@ public class CompatMod {
             registerPeripheral(AllBlockEntityTypes.PACKAGE_FROGPORT);
             registerPeripheral(AllBlockEntityTypes.NIXIE_TUBE);
             registerPeripheral(AllBlockEntityTypes.PACKAGER);
+            registerPeripheral(AllBlockEntityTypes.PACKAGE_POSTBOX);
         }
     }
 }
