@@ -71,8 +71,8 @@ public class ComputerBehaviour extends AbstractComputerBehaviour {
 //		// Has to be before PackagerBlockEntity as it's a subclass
 //		if (be instanceof RepackagerBlockEntity rpbe)
 //			return () -> new RepackagerPeripheral(rpbe);
-//		if (be instanceof PackagerBlockEntity pgbe)
-//			return () -> new PackagerPeripheral(pgbe);
+		if (be instanceof PackagerBlockEntity pgbe)
+			return () -> new PackagerPeripheral(pgbe);
 //		if (be instanceof RedstoneRequesterBlockEntity rrbe)
 //			return () -> new RedstoneRequesterPeripheral(rrbe);
 //		if (be instanceof StationBlockEntity sbe)

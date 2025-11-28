@@ -8,6 +8,7 @@ import com.zurrtum.create.infrastructure.items.ItemInventory;
 import com.zurrtum.create.infrastructure.items.ItemStackHandler;
 import dan200.computercraft.api.detail.VanillaDetailRegistries;
 import dan200.computercraft.api.lua.LuaException;
+import net.minecraft.inventory.Inventory;
 import org.apache.commons.lang3.NotImplementedException;
 
 import java.util.*;
@@ -280,7 +281,7 @@ public class ComputerUtil {
 			out.set(((Number) e.getKey()).intValue() - 1, e.getValue());
 		return out;
 	}
-    public static Map<Integer, Map<String, ?>> list(ItemInventory inventory) {
+    public static Map<Integer, Map<String, ?>> list(Inventory inventory) {
         Map<Integer, Map<String, ?>> result = new HashMap<>();
         var size = inventory.size();
         for (var i = 0; i < size; i++) {
@@ -291,7 +292,7 @@ public class ComputerUtil {
         return result;
     }
 
-	public static Map<String, ?> getItemDetail(ItemInventory inventory, int slot) throws LuaException {
+	public static Map<String, ?> getItemDetail(Inventory inventory, int slot) throws LuaException {
 
 		int maxSlots = inventory.size();
 		if (slot < 1 || slot > maxSlots)
