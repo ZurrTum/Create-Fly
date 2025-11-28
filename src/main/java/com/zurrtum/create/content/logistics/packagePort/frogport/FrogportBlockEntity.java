@@ -7,11 +7,14 @@ import com.zurrtum.create.AllItems;
 import com.zurrtum.create.catnip.animation.LerpedFloat;
 import com.zurrtum.create.catnip.animation.LerpedFloat.Chaser;
 import com.zurrtum.create.catnip.data.Iterate;
+import com.zurrtum.create.compat.computercraft.AbstractComputerBehaviour;
+import com.zurrtum.create.compat.computercraft.ComputerCraftProxy;
 import com.zurrtum.create.content.logistics.box.PackageItem;
 import com.zurrtum.create.content.logistics.box.PackageStyles;
 import com.zurrtum.create.content.logistics.packagePort.PackagePortBlockEntity;
 import com.zurrtum.create.content.logistics.packager.PackagerItemHandler;
 import com.zurrtum.create.foundation.advancement.CreateTrigger;
+import com.zurrtum.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.foundation.blockEntity.behaviour.audio.FrogportAudioBehaviour;
 import com.zurrtum.create.foundation.item.ItemHelper;
 import net.minecraft.block.BlockState;
@@ -48,8 +51,7 @@ public class FrogportBlockEntity extends PackagePortBlockEntity {
     private ItemStack deferAnimationStart;
     private boolean deferAnimationInward;
 
-    //TODO
-    //    public AbstractComputerBehaviour computerBehaviour;
+    public AbstractComputerBehaviour computerBehaviour;
 
     public FrogportBlockEntity(BlockPos pos, BlockState state) {
         super(AllBlockEntityTypes.PACKAGE_FROGPORT, pos, state);
@@ -59,23 +61,11 @@ public class FrogportBlockEntity extends PackagePortBlockEntity {
         goggles = false;
     }
 
-    //TODO
-    //    public static void registerCapabilities(RegisterCapabilitiesEvent event) {
-    //        if (Mods.COMPUTERCRAFT.isLoaded()) {
-    //            event.registerBlockEntity(
-    //                PeripheralCapability.get(),
-    //                AllBlockEntityTypes.PACKAGE_FROGPORT.get(),
-    //                (be, context) -> be.computerBehaviour.getPeripheralCapability()
-    //            );
-    //        }
-    //    }
-
-    //TODO
-    //    @Override
-    //    public void addBehaviours(List<BlockEntityBehaviour<?>> behaviours) {
-    //        behaviours.add(computerBehaviour = ComputerCraftProxy.behaviour(this));
-    //        super.addBehaviours(behaviours);
-    //    }
+    @Override
+    public void addBehaviours(List<BlockEntityBehaviour<?>> behaviours) {
+        behaviours.add(computerBehaviour = ComputerCraftProxy.behaviour(this));
+        super.addBehaviours(behaviours);
+    }
 
     @Override
     public List<CreateTrigger> getAwardables() {
@@ -223,13 +213,13 @@ public class FrogportBlockEntity extends PackagePortBlockEntity {
                 if (vec != null)
                     for (int i = 0; i < 5; i++)
                         world.addParticleClient(
-                            new BlockStateParticleEffect(ParticleTypes.BLOCK, AllBlocks.ROPE.getDefaultState()),
-                            vec.x,
-                            vec.y - world.random.nextFloat() * 0.25,
-                            vec.z,
-                            0,
-                            0,
-                            0
+                                new BlockStateParticleEffect(ParticleTypes.BLOCK, AllBlocks.ROPE.getDefaultState()),
+                                vec.x,
+                                vec.y - world.random.nextFloat() * 0.25,
+                                vec.z,
+                                0,
+                                0,
+                                0
                         );
             }
         }
@@ -388,11 +378,10 @@ public class FrogportBlockEntity extends PackagePortBlockEntity {
         return super.use(player);
     }
 
-    //TODO
-    //    @Override
-    //    public void invalidate() {
-    //        super.invalidate();
-    //        computerBehaviour.removePeripheral();
-    //    }
+    @Override
+    public void invalidate() {
+        super.invalidate();
+        computerBehaviour.removePeripheral();
+    }
 
 }

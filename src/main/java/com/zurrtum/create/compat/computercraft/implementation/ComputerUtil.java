@@ -4,6 +4,7 @@ import com.zurrtum.create.catnip.data.Glob;
 import com.zurrtum.create.compat.computercraft.implementation.luaObjects.LuaComparable;
 import com.zurrtum.create.content.logistics.BigItemStack;
 import com.zurrtum.create.content.logistics.packager.InventorySummary;
+import com.zurrtum.create.infrastructure.items.ItemInventory;
 import com.zurrtum.create.infrastructure.items.ItemStackHandler;
 import dan200.computercraft.api.detail.VanillaDetailRegistries;
 import dan200.computercraft.api.lua.LuaException;
@@ -279,11 +280,18 @@ public class ComputerUtil {
 			out.set(((Number) e.getKey()).intValue() - 1, e.getValue());
 		return out;
 	}
-    public static Map<Integer, Map<String, ?>> list(ItemStackHandler inventory) {
-        throw new NotImplementedException();
+    public static Map<Integer, Map<String, ?>> list(ItemInventory inventory) {
+        Map<Integer, Map<String, ?>> result = new HashMap<>();
+        var size = inventory.size();
+        for (var i = 0; i < size; i++) {
+            var stack = inventory.getStack(i);
+            if (!stack.isEmpty()) result.put(i + 1, VanillaDetailRegistries.ITEM_STACK.getBasicDetails(stack));
+        }
+
+        return result;
     }
 
-	public static Map<String, ?> getItemDetail(ItemStackHandler inventory, int slot) throws LuaException {
+	public static Map<String, ?> getItemDetail(ItemInventory inventory, int slot) throws LuaException {
 
 		int maxSlots = inventory.size();
 		if (slot < 1 || slot > maxSlots)

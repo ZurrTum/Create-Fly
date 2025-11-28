@@ -26,6 +26,7 @@ public class CompatMod {
             registerPeripheral(AllBlockEntityTypes.MOTOR);
             registerPeripheral(AllBlockEntityTypes.DISPLAY_LINK);
             registerPeripheral(AllBlockEntityTypes.STRESSOMETER);
+            registerPeripheral(AllBlockEntityTypes.PACKAGE_FROGPORT);
         }
     }
 }
