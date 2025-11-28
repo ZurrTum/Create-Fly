@@ -1,10 +1,13 @@
 package com.zurrtum.create.compat;
 
 import net.fabricmc.loader.api.FabricLoader;
+import net.minecraft.util.Identifier;
 
 import java.util.Locale;
 import java.util.Optional;
 import java.util.function.Supplier;
+
+import static com.zurrtum.create.Create.MOD_ID;
 
 /**
  * For compatibility with and without another mod present, we have to define load conditions of the specific code
@@ -26,6 +29,10 @@ public enum Mods {
      */
     public String id() {
         return id;
+    }
+
+    public Identifier identifier(String name) {
+        return Identifier.of(id, name);
     }
 
     /**

@@ -50,8 +50,8 @@ public class ComputerBehaviour extends AbstractComputerBehaviour {
 //			return () -> new SpeedControllerPeripheral(scbe, scbe.targetSpeed);
 		if (be instanceof CreativeMotorBlockEntity cmbe)
 			return () -> new CreativeMotorPeripheral(cmbe, cmbe.getGeneratedSpeedBehaviour());
-//		if (be instanceof DisplayLinkBlockEntity dlbe)
-//			return () -> new DisplayLinkPeripheral(dlbe);
+		if (be instanceof DisplayLinkBlockEntity dlbe)
+			return () -> new DisplayLinkPeripheral(dlbe);
 //		if (be instanceof FrogportBlockEntity fpbe)
 //			return () -> new FrogportPeripheral(fpbe);
 //		if (be instanceof PostboxBlockEntity pbbe)
