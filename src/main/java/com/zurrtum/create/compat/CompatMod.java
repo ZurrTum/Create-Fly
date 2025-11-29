@@ -36,6 +36,7 @@ public class CompatMod {
             registerPeripheral(AllBlockEntityTypes.TRACK_SIGNAL);
             registerPeripheral(AllBlockEntityTypes.ROTATION_SPEED_CONTROLLER);
             registerPeripheral(AllBlockEntityTypes.TRACK_STATION);
+            registerPeripheral(AllBlockEntityTypes.STICKER);
         }
     }
 }

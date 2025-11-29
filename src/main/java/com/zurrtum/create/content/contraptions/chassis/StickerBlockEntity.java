@@ -6,6 +6,8 @@ import com.zurrtum.create.AllClientHandle;
 import com.zurrtum.create.AllSoundEvents;
 import com.zurrtum.create.catnip.animation.LerpedFloat;
 import com.zurrtum.create.catnip.animation.LerpedFloat.Chaser;
+import com.zurrtum.create.compat.computercraft.AbstractComputerBehaviour;
+import com.zurrtum.create.compat.computercraft.ComputerCraftProxy;
 import com.zurrtum.create.content.contraptions.glue.SuperGlueEntity;
 import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
 import com.zurrtum.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
@@ -20,6 +22,8 @@ public class StickerBlockEntity extends SmartBlockEntity {
     public LerpedFloat piston;
     public boolean update;
 
+    public AbstractComputerBehaviour computerBehaviour;
+
     public StickerBlockEntity(BlockPos pos, BlockState state) {
         super(AllBlockEntityTypes.STICKER, pos, state);
         piston = LerpedFloat.linear();
@@ -28,6 +32,7 @@ public class StickerBlockEntity extends SmartBlockEntity {
 
     @Override
     public void addBehaviours(List<BlockEntityBehaviour<?>> behaviours) {
+        behaviours.add(computerBehaviour = ComputerCraftProxy.behaviour(this));
     }
 
     @Override
@@ -83,5 +88,11 @@ public class StickerBlockEntity extends SmartBlockEntity {
 
     public void playSound(boolean attach) {
         AllSoundEvents.SLIME_ADDED.play(world, AllClientHandle.INSTANCE.getPlayer(), pos, 0.35f, attach ? 0.75f : 0.2f);
+    }
+
+    @Override
+    public void invalidate() {
+        super.invalidate();
+        computerBehaviour.removePeripheral();
     }
 }
