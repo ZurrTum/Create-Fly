@@ -1,6 +1,8 @@
 package com.zurrtum.create.compat;
 
 import net.fabricmc.loader.api.FabricLoader;
+import net.minecraft.block.Block;
+import net.minecraft.registry.Registries;
 import net.minecraft.util.Identifier;
 
 import java.util.Locale;
@@ -33,6 +35,10 @@ public enum Mods {
 
     public Identifier identifier(String name) {
         return Identifier.of(id, name);
+    }
+
+    public Block getBlock(String id) {
+        return Registries.BLOCK.get(identifier(id));
     }
 
     /**

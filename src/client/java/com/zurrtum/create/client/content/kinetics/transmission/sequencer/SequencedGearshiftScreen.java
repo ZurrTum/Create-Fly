@@ -2,9 +2,11 @@ package com.zurrtum.create.client.content.kinetics.transmission.sequencer;
 
 import com.zurrtum.create.AllItems;
 import com.zurrtum.create.client.catnip.gui.AbstractSimiScreen;
+import com.zurrtum.create.client.catnip.gui.ScreenOpener;
 import com.zurrtum.create.client.catnip.gui.element.GuiGameElement;
 import com.zurrtum.create.client.catnip.gui.widget.ElementWidget;
 import com.zurrtum.create.client.catnip.lang.Lang;
+import com.zurrtum.create.client.compat.computercraft.ComputerScreen;
 import com.zurrtum.create.client.foundation.gui.AllGuiTextures;
 import com.zurrtum.create.client.foundation.gui.AllIcons;
 import com.zurrtum.create.client.foundation.gui.widget.IconButton;
@@ -42,10 +44,9 @@ public class SequencedGearshiftScreen extends AbstractSimiScreen {
 
     @Override
     protected void init() {
-        //TODO
-        //        if (be.computerBehaviour.hasAttachedComputer())
-        //            minecraft.setScreen(
-        //                new ComputerScreen(title, this::renderAdditional, this, be.computerBehaviour::hasAttachedComputer));
+        if (be.computerBehaviour.hasAttachedComputer())
+            ScreenOpener.open(
+                new ComputerScreen(title, this::renderAdditional, this, be.computerBehaviour::hasAttachedComputer));
 
         setWindowSize(background.getWidth(), background.getHeight());
         setWindowOffset(-20, 0);
@@ -215,9 +216,8 @@ public class SequencedGearshiftScreen extends AbstractSimiScreen {
     public void tick() {
         super.tick();
 
-        //TODO
-        //        if (be.computerBehaviour.hasAttachedComputer())
-        //            minecraft.setScreen(new ComputerScreen(title, this::renderAdditional, this, be.computerBehaviour::hasAttachedComputer));
+        if (be.computerBehaviour.hasAttachedComputer())
+            ScreenOpener.open(new ComputerScreen(title, this::renderAdditional, this, be.computerBehaviour::hasAttachedComputer));
     }
 
     private static String formatValue(SequencerInstructions def, int value) {
@@ -275,6 +275,15 @@ public class SequencedGearshiftScreen extends AbstractSimiScreen {
         }
 
         graphics.drawText(textRenderer, title, x + (background.getWidth() - 8) / 2 - textRenderer.getWidth(title) / 2, y + 4, 0xFF592424, false);
+        renderAdditional(graphics, mouseX, mouseY, partialTicks, x, y, background);
+    }
+
+    private void renderAdditional(DrawContext graphics, int mouseX, int mouseY, float partialTicks, int guiLeft, int guiTop,
+                                  AllGuiTextures background) {
+        GuiGameElement.of(AllItems.SEQUENCED_GEARSHIFT.getDefaultStack()).<GuiGameElement
+                        .GuiRenderBuilder>at(guiLeft + background.getWidth() + 6, guiTop + background.getHeight() - 56, 100)
+                .scale(5)
+                .render(graphics);
     }
 
     private void label(DrawContext graphics, int x, int y, Text text) {
