@@ -66,8 +66,8 @@ public class ComputerBehaviour extends AbstractComputerBehaviour {
 			return () -> new SpeedGaugePeripheral(sgbe);
         if (be instanceof StressGaugeBlockEntity sgbe)
             return () -> new StressGaugePeripheral(sgbe);
-//		if (be instanceof StockTickerBlockEntity sgbe)
-//			return () -> new StockTickerPeripheral(sgbe);
+		if (be instanceof StockTickerBlockEntity sgbe)
+			return () -> new StockTickerPeripheral(sgbe);
 //		// Has to be before PackagerBlockEntity as it's a subclass
 		if (be instanceof RepackagerBlockEntity rpbe)
 			return () -> new RepackagerPeripheral(rpbe);
