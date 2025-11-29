@@ -3,6 +3,8 @@ package com.zurrtum.create.content.logistics.tableCloth;
 import com.zurrtum.create.*;
 import com.zurrtum.create.api.contraption.transformable.TransformableBlockEntity;
 import com.zurrtum.create.catnip.data.IntAttached;
+import com.zurrtum.create.compat.computercraft.AbstractComputerBehaviour;
+import com.zurrtum.create.compat.computercraft.ComputerCraftProxy;
 import com.zurrtum.create.content.contraptions.StructureTransform;
 import com.zurrtum.create.content.logistics.BigItemStack;
 import com.zurrtum.create.content.logistics.packager.InventorySummary;
@@ -43,8 +45,7 @@ import java.util.UUID;
 
 public class TableClothBlockEntity extends SmartBlockEntity implements TransformableBlockEntity {
 
-    //TODO
-    //    public AbstractComputerBehaviour computerBehaviour;
+    public AbstractComputerBehaviour computerBehaviour;
 
     public AutoRequestData requestData;
     public List<ItemStack> manuallyAddedItems;
@@ -64,22 +65,11 @@ public class TableClothBlockEntity extends SmartBlockEntity implements Transform
         facing = Direction.SOUTH;
     }
 
-    //TODO
-    //    public static void registerCapabilities(RegisterCapabilitiesEvent event) {
-    //        if (Mods.COMPUTERCRAFT.isLoaded()) {
-    //            event.registerBlockEntity(
-    //                PeripheralCapability.get(),
-    //                AllBlockEntityTypes.TABLE_CLOTH.get(),
-    //                (be, context) -> be.computerBehaviour.getPeripheralCapability()
-    //            );
-    //        }
-    //    }
 
     @Override
     public void addBehaviours(List<BlockEntityBehaviour<?>> behaviours) {
         behaviours.add(priceTag = new ServerTableClothFilteringBehaviour(this));
-        //TODO
-        //        behaviours.add(computerBehaviour = ComputerCraftProxy.behaviour(this));
+        behaviours.add(computerBehaviour = ComputerCraftProxy.behaviour(this));
     }
 
     public List<ItemStack> getItemsForRender() {
@@ -110,9 +100,9 @@ public class TableClothBlockEntity extends SmartBlockEntity implements Transform
         super.lazyTick();
         BlockPos relativePos = pos.offset(facing);
         sideOccluded = world.getBlockState(relativePos)
-            .isIn(AllBlockTags.TABLE_CLOTHS) || Block.isFaceFullSquare(
-            world.getBlockState(relativePos.down()).getCullingShape(),
-            facing.getOpposite()
+                .isIn(AllBlockTags.TABLE_CLOTHS) || Block.isFaceFullSquare(
+                world.getBlockState(relativePos.down()).getCullingShape(),
+                facing.getOpposite()
         );
     }
 
@@ -137,13 +127,13 @@ public class TableClothBlockEntity extends SmartBlockEntity implements Transform
             player.setStackInHand(Hand.MAIN_HAND, manuallyAddedItems.remove(manuallyAddedItems.size() - 1));
             world.playSound(null, pos, SoundEvents.ENTITY_ITEM_FRAME_REMOVE_ITEM, SoundCategory.BLOCKS, 0.5f, 1f);
 
-            if (manuallyAddedItems.isEmpty()/* && !computerBehaviour.hasAttachedComputer()*/) {
+            if (manuallyAddedItems.isEmpty() && !computerBehaviour.hasAttachedComputer()) {
                 world.setBlockState(pos, getCachedState().with(TableClothBlock.HAS_BE, false), Block.NOTIFY_ALL);
                 if (world instanceof ServerWorld serverLevel) {
                     Packet<?> packet = new RemoveBlockEntityPacket(pos);
                     for (ServerPlayerEntity serverPlayer : serverLevel.getChunkManager().chunkLoadingManager.getPlayersWatchingChunk(
-                        new ChunkPos(pos),
-                        false
+                            new ChunkPos(pos),
+                            false
                     )) {
                         serverPlayer.networkHandler.sendPacket(packet);
                     }
@@ -292,8 +282,8 @@ public class TableClothBlockEntity extends SmartBlockEntity implements Transform
         for (BigItemStack entry : requestData.encodedRequest().stacks())
             if (entry.count > 0)
                 smallestQuotient = Math.min(
-                    smallestQuotient,
-                    (recentSummary.getCountOf(entry.stack) - modifierSummary.getCountOf(entry.stack)) / entry.count
+                        smallestQuotient,
+                        (recentSummary.getCountOf(entry.stack) - modifierSummary.getCountOf(entry.stack)) / entry.count
                 );
 
         return smallestQuotient;
@@ -334,12 +324,11 @@ public class TableClothBlockEntity extends SmartBlockEntity implements Transform
         return priceTag.getFilter().isEmpty() ? 1 : priceTag.count;
     }
 
-    //TODO
-    //    @Override
-    //    public void invalidate() {
-    //        super.invalidate();
-    //        computerBehaviour.removePeripheral();
-    //    }
+    @Override
+    public void invalidate() {
+        super.invalidate();
+        computerBehaviour.removePeripheral();
+    }
 
     public void transform(BlockEntity blockEntity, StructureTransform transform) {
         facing = transform.mirrorFacing(facing);

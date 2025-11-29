@@ -37,6 +37,7 @@ public class CompatMod {
             registerPeripheral(AllBlockEntityTypes.ROTATION_SPEED_CONTROLLER);
             registerPeripheral(AllBlockEntityTypes.TRACK_STATION);
             registerPeripheral(AllBlockEntityTypes.STICKER);
+            registerPeripheral(AllBlockEntityTypes.TABLE_CLOTH);
         }
     }
 }
