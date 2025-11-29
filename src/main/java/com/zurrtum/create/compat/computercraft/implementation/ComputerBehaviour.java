@@ -46,8 +46,8 @@ public class ComputerBehaviour extends AbstractComputerBehaviour {
     }
 
     public static Supplier<SyncedPeripheral<?>> getPeripheralFor(SmartBlockEntity be) {
-//		if (be instanceof SpeedControllerBlockEntity scbe)
-//			return () -> new SpeedControllerPeripheral(scbe, scbe.targetSpeed);
+		if (be instanceof SpeedControllerBlockEntity scbe)
+			return () -> new SpeedControllerPeripheral(scbe, scbe.targetSpeed);
 		if (be instanceof CreativeMotorBlockEntity cmbe)
 			return () -> new CreativeMotorPeripheral(cmbe, cmbe.getGeneratedSpeedBehaviour());
 		if (be instanceof DisplayLinkBlockEntity dlbe)

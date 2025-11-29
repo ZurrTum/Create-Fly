@@ -34,6 +34,7 @@ public class CompatMod {
             registerPeripheral(AllBlockEntityTypes.REPACKAGER);
             registerPeripheral(AllBlockEntityTypes.SEQUENCED_GEARSHIFT);
             registerPeripheral(AllBlockEntityTypes.TRACK_SIGNAL);
+            registerPeripheral(AllBlockEntityTypes.ROTATION_SPEED_CONTROLLER);
         }
     }
 }
