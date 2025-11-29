@@ -415,22 +415,20 @@ public class NixieTubeRenderer implements BlockEntityRenderer<NixieTubeBlockEnti
         public void render(MatrixStack matrices, OrderedRenderCommandQueue queue) {
             if (ShadersModHelper.isShaderPackInUse()) {
                 if (additive) {
+                    queue.getBatchingQueue(1).submitCustom(matrices, layer, (e, v) -> renderAdditive(e, v, 153));
                     if (cube != null) {
                         queue.getBatchingQueue(1).submitCustom(matrices, cubeLayer, this::renderCube);
                     }
-                    // TODO (aster): Removing this seems to fix signal display, why second pass needed?
-//                    queue.getBatchingQueue(1).submitCustom(matrices, layer, (e, v) -> renderAdditive(e, v, 153));
                     queue.getBatchingQueue(2).submitCustom(matrices, layer2, (e, v) -> renderAdditive(e, v, 102));
                 } else {
                     queue.getBatchingQueue(1).submitCustom(matrices, layer, this::renderNormal);
                 }
             } else {
                 if (additive) {
+                    queue.submitCustom(matrices, layer, (e, v) -> renderAdditive(e, v, 153));
                     if (cube != null) {
                         queue.submitCustom(matrices, cubeLayer, this::renderCube);
                     }
-                    // TODO (aster): Removing this seems to fix signal display, why second pass needed?
-//                    queue.submitCustom(matrices, layer, (e, v) -> renderAdditive(e, v, 153));
                     queue.submitCustom(matrices, layer2, (e, v) -> renderAdditive(e, v, 102));
                 } else {
                     queue.submitCustom(matrices, layer, this::renderNormal);
