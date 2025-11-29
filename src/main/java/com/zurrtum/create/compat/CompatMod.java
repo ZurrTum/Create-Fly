@@ -38,6 +38,7 @@ public class CompatMod {
             registerPeripheral(AllBlockEntityTypes.TRACK_STATION);
             registerPeripheral(AllBlockEntityTypes.STICKER);
             registerPeripheral(AllBlockEntityTypes.TABLE_CLOTH);
+            registerPeripheral(AllBlockEntityTypes.SPEEDOMETER);
         }
     }
 }

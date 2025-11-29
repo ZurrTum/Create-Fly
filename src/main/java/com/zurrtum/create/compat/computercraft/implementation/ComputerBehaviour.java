@@ -62,8 +62,8 @@ public class ComputerBehaviour extends AbstractComputerBehaviour {
 			return () -> new SequencedGearshiftPeripheral(sgbe);
 		if (be instanceof SignalBlockEntity sbe)
 			return () -> new SignalPeripheral(sbe);
-//		if (be instanceof SpeedGaugeBlockEntity sgbe)
-//			return () -> new SpeedGaugePeripheral(sgbe);
+		if (be instanceof SpeedGaugeBlockEntity sgbe)
+			return () -> new SpeedGaugePeripheral(sgbe);
         if (be instanceof StressGaugeBlockEntity sgbe)
             return () -> new StressGaugePeripheral(sgbe);
 //		if (be instanceof StockTickerBlockEntity sgbe)
