@@ -81,8 +81,8 @@ public class ComputerBehaviour extends AbstractComputerBehaviour {
 			return () -> new TableClothShopPeripheral(tcbe);
 		if (be instanceof StickerBlockEntity sbe)
 			return () -> new StickerPeripheral(sbe);
-//		if (be instanceof TrackObserverBlockEntity tobe)
-//			return () -> new TrackObserverPeripheral(tobe);
+		if (be instanceof TrackObserverBlockEntity tobe)
+			return () -> new TrackObserverPeripheral(tobe);
 
         throw new IllegalArgumentException(
                 "No peripheral available for " + Registries.BLOCK_ENTITY_TYPE.getKey(be.getType()));
