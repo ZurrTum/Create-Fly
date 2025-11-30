@@ -281,3 +281,5 @@ accessible method net/minecraft/server/network/ServerPlayerInteractionManager se
 accessible method net/minecraft/client/render/entity/EntityRenderer canBeCulled (Lnet/minecraft/entity/Entity;)Z
 accessible method net/minecraft/client/render/entity/EntityRenderer getBoundingBox (Lnet/minecraft/entity/Entity;)Lnet/minecraft/util/math/Box;
 accessible method net/minecraft/client/gui/screen/Screen addDrawableChild (Lnet/minecraft/client/gui/Element;)Lnet/minecraft/client/gui/Element;
+accessible class net/minecraft/entity/vehicle/ExperimentalMinecartController$MoveIteration
+accessible field net/minecraft/entity/vehicle/ExperimentalMinecartController$MoveIteration initial Z
