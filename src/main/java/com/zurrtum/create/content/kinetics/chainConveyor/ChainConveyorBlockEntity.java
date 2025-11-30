@@ -15,11 +15,6 @@ import com.zurrtum.create.content.logistics.box.PackageItem;
 import com.zurrtum.create.content.logistics.packagePort.frogport.FrogportBlockEntity;
 import com.zurrtum.create.foundation.codec.CreateCodecs;
 import com.zurrtum.create.infrastructure.config.AllConfigs;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.*;
-import java.util.function.Consumer;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction.Axis;
 import net.minecraft.core.particles.BlockParticleOption;
@@ -39,6 +34,10 @@ import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.*;
+import java.util.function.Consumer;
 
 public class ChainConveyorBlockEntity extends KineticBlockEntity implements TransformableBlockEntity {
     public static final Codec<List<ChainConveyorPackage>> PACKAGE_CODEC = ChainConveyorPackage.CODEC.listOf();
@@ -495,7 +494,6 @@ public class ChainConveyorBlockEntity extends KineticBlockEntity implements Tran
     @Override
     public void remove() {
         super.remove();
-        destroy();
         if (level == null || !level.isClientSide())
             return;
         for (BlockPos blockPos : connections)
