@@ -26,7 +26,9 @@ public class CouplingPhysics {
         Couple<AbstractMinecart> carts = c.map(MinecartController::cart);
         float couplingLength = c.getFirst().getCouplingLength(true);
         softCollisionStep(world, carts, couplingLength);
-        hardCollisionStep(world, carts, couplingLength);
+        if (!AbstractMinecart.useExperimentalMovement(world)) {
+            hardCollisionStep(world, carts, couplingLength);
+        }
     }
 
     public static void hardCollisionStep(ServerLevel world, Couple<AbstractMinecart> carts, double couplingLength) {
@@ -45,14 +47,6 @@ public class CouplingPhysics {
             if (Math.abs(stress) < 1 / 8f)
                 continue;
 
-            RailShape shape = null;
-            BlockPos railPosition = cart.getCurrentBlockPosOrRailBelow();
-            BlockState railState = world.getBlockState(railPosition);
-
-            if (railState.getBlock() instanceof BaseRailBlock block) {
-                shape = railState.getValue(block.getShapeProperty());
-            }
-
             Vec3 pos = cart.position();
             Vec3 link = otherCart.position().subtract(pos);
             float correctionMagnitude = firstLoop ? -stress / 2f : -stress;
@@ -60,12 +54,7 @@ public class CouplingPhysics {
             if (!MinecartSim2020.canAddMotion(cart))
                 correctionMagnitude /= 2;
 
-            Vec3 correction = shape != null ? followLinkOnRail(
-                link,
-                pos,
-                correctionMagnitude,
-                MinecartSim2020.getRailVec(shape)
-            ).subtract(pos) : link.normalize().scale(correctionMagnitude);
+            Vec3 correction = link.normalize().scale(correctionMagnitude);
 
             float maxResolveSpeed = 1.75f;
             correction = VecHelper.clamp(correction, (float) Math.min(maxResolveSpeed, maxSpeed.get(current)));
@@ -73,12 +62,8 @@ public class CouplingPhysics {
             if (corrections.get(current) == null)
                 corrections.set(current, correction);
 
-            if (shape != null)
-                MinecartSim2020.moveCartAlongTrack(world, cart, correction, railPosition, railState);
-            else {
-                cart.move(MoverType.SELF, correction);
-                cart.setDeltaMovement(cart.getDeltaMovement().scale(0.95f));
-            }
+            cart.move(MoverType.SELF, correction);
+            cart.setDeltaMovement(cart.getDeltaMovement().scale(0.95f));
             firstLoop = false;
         }
     }
