@@ -6,10 +6,6 @@ import com.zurrtum.create.content.logistics.item.filter.attribute.ItemAttribute;
 import com.zurrtum.create.infrastructure.component.AttributeFilterWhitelistMode;
 import com.zurrtum.create.infrastructure.component.ItemAttributeEntry;
 import com.zurrtum.create.infrastructure.items.ItemStackHandler;
-
-import java.util.ArrayList;
-import java.util.List;
-
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.chat.Component;
@@ -19,6 +15,9 @@ import net.minecraft.world.inventory.ClickType;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class AttributeFilterMenu extends AbstractFilterMenu {
 
@@ -95,18 +94,11 @@ public class AttributeFilterMenu extends AbstractFilterMenu {
 
     @Override
     public ItemStack quickMoveStack(Player playerIn, int index) {
-        if (index == 37)
-            return ItemStack.EMPTY;
-        if (index == 36) {
-            ghostInventory.setItem(37, ItemStack.EMPTY);
-            return ItemStack.EMPTY;
-        }
-        if (index < 36) {
-            ItemStack stackToInsert = playerInventory.getItem(index);
-            ItemStack copy = stackToInsert.copy();
-            copy.setCount(1);
-            ghostInventory.setItem(0, copy);
-        }
+        Slot slot = slots.get(index);
+        ItemStack stackToInsert = slot.getItem();
+        ItemStack copy = stackToInsert.copy();
+        copy.setCount(1);
+        ghostInventory.setItem(0, copy);
         return ItemStack.EMPTY;
     }
 

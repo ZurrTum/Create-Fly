@@ -2,7 +2,7 @@ package com.zurrtum.create.content.schematics.cannon;
 
 import com.zurrtum.create.AllMenuTypes;
 import com.zurrtum.create.foundation.gui.menu.MenuBase;
-import net.minecraft.world.Container;
+import com.zurrtum.create.foundation.gui.menu.MenuSlot;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.Slot;
@@ -51,16 +51,5 @@ public class SchematicannonMenu extends MenuBase<SchematicannonBlockEntity> {
         }
 
         return ItemStack.EMPTY;
-    }
-
-    private static class MenuSlot extends Slot {
-        public MenuSlot(Container inventory, int index, int x, int y) {
-            super(inventory, index, x, y);
-        }
-
-        @Override
-        public ItemStack remove(int amount) {
-            return super.remove(Math.min(container.getMaxStackSize(getItem()), amount));
-        }
     }
 }

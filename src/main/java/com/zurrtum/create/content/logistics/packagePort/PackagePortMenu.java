@@ -4,6 +4,7 @@ import com.zurrtum.create.AllMenuTypes;
 import com.zurrtum.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.foundation.blockEntity.behaviour.animatedContainer.AnimatedContainerBehaviour;
 import com.zurrtum.create.foundation.gui.menu.MenuBase;
+import com.zurrtum.create.foundation.gui.menu.MenuSlot;
 import net.minecraft.world.Container;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -67,7 +68,7 @@ public class PackagePortMenu extends MenuBase<PackagePortBlockEntity> {
 
         for (int row = 0; row < 2; row++)
             for (int col = 0; col < 9; col++)
-                addSlot(new Slot(inventory, row * 9 + col, x + col * 18, y + row * 18));
+                addSlot(new MenuSlot(inventory, row * 9 + col, x + col * 18, y + row * 18));
 
         addPlayerSlots(38, 108);
     }
