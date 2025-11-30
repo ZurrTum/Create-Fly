@@ -183,7 +183,7 @@ public class ExtendoGripModel implements ItemModel, SpecialModelRenderer<Extendo
 
         // grip
         LayerRenderState grip = data.state;
-        queue.submitItem(matrices, displayContext, light, overlay, 0, grip.tintLayers, grip.quads, grip.renderType, grip.foilType);
+        queue.submitItem(matrices, displayContext, light, overlay, 0, grip.tintLayers, grip.prepareQuadList(), grip.renderType, grip.foilType);
         renderQuads(displayContext, matrices, queue, light, overlay, pole, blockLayer);
 
         // bits
