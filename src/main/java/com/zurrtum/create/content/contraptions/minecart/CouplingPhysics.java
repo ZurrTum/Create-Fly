@@ -10,28 +10,25 @@ import net.minecraft.block.enums.RailShape;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.MovementType;
 import net.minecraft.entity.vehicle.AbstractMinecartEntity;
-import net.minecraft.entity.vehicle.DefaultMinecartController;
-import net.minecraft.entity.vehicle.FurnaceMinecartEntity;
 import net.minecraft.registry.tag.BlockTags;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.World;
 
 public class CouplingPhysics {
 
-    public static void tick(World world) {
+    public static void tick(ServerWorld world) {
         CouplingHandler.forEachLoadedCoupling(world, c -> tickCoupling(world, c));
     }
 
-    public static void tickCoupling(World world, Couple<MinecartController> c) {
+    public static void tickCoupling(ServerWorld world, Couple<MinecartController> c) {
         Couple<AbstractMinecartEntity> carts = c.map(MinecartController::cart);
         float couplingLength = c.getFirst().getCouplingLength(true);
         softCollisionStep(world, carts, couplingLength);
-        if (world.isClient)
-            return;
-        hardCollisionStep((ServerWorld) world, carts, couplingLength);
+        if (!AbstractMinecartEntity.areMinecartImprovementsEnabled(world)) {
+            hardCollisionStep(world, carts, couplingLength);
+        }
     }
 
     public static void hardCollisionStep(ServerWorld world, Couple<AbstractMinecartEntity> carts, double couplingLength) {
@@ -50,14 +47,6 @@ public class CouplingPhysics {
             if (Math.abs(stress) < 1 / 8f)
                 continue;
 
-            RailShape shape = null;
-            BlockPos railPosition = getCurrentRailPosition(cart);
-            BlockState railState = world.getBlockState(railPosition.up());
-
-            if (railState.getBlock() instanceof AbstractRailBlock block) {
-                shape = railState.get(block.getShapeProperty());
-            }
-
             Vec3d pos = cart.getPos();
             Vec3d link = otherCart.getPos().subtract(pos);
             float correctionMagnitude = firstLoop ? -stress / 2f : -stress;
@@ -65,12 +54,7 @@ public class CouplingPhysics {
             if (!MinecartSim2020.canAddMotion(cart))
                 correctionMagnitude /= 2;
 
-            Vec3d correction = shape != null ? followLinkOnRail(
-                link,
-                pos,
-                correctionMagnitude,
-                MinecartSim2020.getRailVec(shape)
-            ).subtract(pos) : link.normalize().multiply(correctionMagnitude);
+            Vec3d correction = link.normalize().multiply(correctionMagnitude);
 
             float maxResolveSpeed = 1.75f;
             correction = VecHelper.clamp(correction, (float) Math.min(maxResolveSpeed, maxSpeed.get(current)));
@@ -78,42 +62,14 @@ public class CouplingPhysics {
             if (corrections.get(current) == null)
                 corrections.set(current, correction);
 
-            if (shape != null)
-                MinecartSim2020.moveCartAlongTrack(world, cart, correction, railPosition, railState);
-            else {
-                cart.move(MovementType.SELF, correction);
-                cart.setVelocity(cart.getVelocity().multiply(0.95f));
-            }
+            cart.move(MovementType.SELF, correction);
+            cart.setVelocity(cart.getVelocity().multiply(0.95f));
             firstLoop = false;
         }
     }
 
-    private static BlockPos getCurrentRailPosition(AbstractMinecartEntity cart) {
-        int x = MathHelper.floor(cart.getX());
-        int y = MathHelper.floor(cart.getY());
-        int z = MathHelper.floor(cart.getZ());
-        BlockPos pos = new BlockPos(x, y, z);
-        BlockPos down = pos.down();
-        if (cart.getWorld().getBlockState(down).isIn(BlockTags.RAILS)) {
-            return down;
-        }
-        return pos;
-    }
-
-    public static void softCollisionStep(World world, Couple<AbstractMinecartEntity> carts, double couplingLength) {
-        Couple<Float> maxSpeed = carts.map(cart -> {
-            if (world instanceof ServerWorld serverWorld) {
-                return (float) cart.getMaxSpeed(serverWorld);
-            }
-            if (cart.getController() instanceof DefaultMinecartController) {
-                return (float) cart.getMaxSpeed(null);
-            }
-            double speed = 8 * (cart.isTouchingWater() ? 0.5 : 1.0) / 20.0;
-            if (cart instanceof FurnaceMinecartEntity) {
-                speed *= cart.isTouchingWater() ? 0.75 : 0.5;
-            }
-            return (float) speed;
-        });
+    public static void softCollisionStep(ServerWorld world, Couple<AbstractMinecartEntity> carts, double couplingLength) {
+        Couple<Float> maxSpeed = carts.map(cart -> (float) cart.getMaxSpeed(world));
         Couple<Boolean> canAddmotion = carts.map(MinecartSim2020::canAddMotion);
 
         // Assuming Minecarts will never move faster than 1 block/tick
@@ -127,10 +83,10 @@ public class CouplingPhysics {
             int y = MathHelper.floor(vec.getY());
             int z = MathHelper.floor(vec.getZ());
             BlockPos pos = new BlockPos(x, y - 1, z);
-            if (minecart.getWorld().getBlockState(pos).isIn(BlockTags.RAILS))
-                pos = pos.down();
-            BlockPos railPosition = pos;
-            BlockState railState = world.getBlockState(railPosition.up());
+            BlockState railState = world.getBlockState(pos);
+            if (!railState.isIn(BlockTags.RAILS)) {
+                railState = world.getBlockState(pos.up());
+            }
             if (!(railState.getBlock() instanceof AbstractRailBlock block))
                 return null;
             return railState.get(block.getShapeProperty());

@@ -8,6 +8,8 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.vehicle.AbstractMinecartEntity;
 import net.minecraft.entity.vehicle.DefaultMinecartController;
+import net.minecraft.entity.vehicle.ExperimentalMinecartController;
+import net.minecraft.entity.vehicle.MinecartController;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 
@@ -50,27 +52,33 @@ public class OrientedContraptionVisual<T extends OrientedContraptionEntity> exte
     }
 
     public static Vec3d getCartOffset(float partialTicks, AbstractMinecartEntity cart) {
-        if (!(cart.getController() instanceof DefaultMinecartController controller)) {
-            return Vec3d.ZERO;
-        }
-        double cartX = MathHelper.lerp(partialTicks, cart.lastRenderX, cart.getX());
-        double cartY = MathHelper.lerp(partialTicks, cart.lastRenderY, cart.getY());
-        double cartZ = MathHelper.lerp(partialTicks, cart.lastRenderZ, cart.getZ());
+        MinecartController behavior = cart.getController();
+        if (behavior instanceof DefaultMinecartController controller) {
+            double cartX = MathHelper.lerp(partialTicks, cart.lastRenderX, cart.getX());
+            double cartY = MathHelper.lerp(partialTicks, cart.lastRenderY, cart.getY());
+            double cartZ = MathHelper.lerp(partialTicks, cart.lastRenderZ, cart.getZ());
 
-        Vec3d cartPos = controller.snapPositionToRail(cartX, cartY, cartZ);
-        if (cartPos != null) {
-            Vec3d cartPosFront = controller.simulateMovement(cartX, cartY, cartZ, 0.3F);
-            Vec3d cartPosBack = controller.simulateMovement(cartX, cartY, cartZ, -0.3F);
-            if (cartPosFront == null)
-                cartPosFront = cartPos;
-            if (cartPosBack == null)
-                cartPosBack = cartPos;
+            Vec3d cartPos = controller.snapPositionToRail(cartX, cartY, cartZ);
+            if (cartPos != null) {
+                Vec3d cartPosFront = controller.simulateMovement(cartX, cartY, cartZ, 0.3F);
+                Vec3d cartPosBack = controller.simulateMovement(cartX, cartY, cartZ, -0.3F);
+                if (cartPosFront == null)
+                    cartPosFront = cartPos;
+                if (cartPosBack == null)
+                    cartPosBack = cartPos;
 
-            cartX = cartPos.x - cartX;
-            cartY = (cartPosFront.y + cartPosBack.y) / 2.0D - cartY;
-            cartZ = cartPos.z - cartZ;
+                cartX = cartPos.x - cartX;
+                cartY = (cartPosFront.y + cartPosBack.y) / 2.0D - cartY;
+                cartZ = cartPos.z - cartZ;
 
-            return new Vec3d(cartX, cartY, cartZ);
+                return new Vec3d(cartX, cartY, cartZ);
+            }
+        } else if (behavior instanceof ExperimentalMinecartController controller && controller.hasCurrentLerpSteps()) {
+            double cartX = MathHelper.lerp(partialTicks, cart.lastRenderX, cart.getX());
+            double cartY = MathHelper.lerp(partialTicks, cart.lastRenderY, cart.getY());
+            double cartZ = MathHelper.lerp(partialTicks, cart.lastRenderZ, cart.getZ());
+            Vec3d cartPos = controller.getLerpedPosition(partialTicks);
+            return new Vec3d(cartPos.x - cartX, cartPos.y - cartY, cartPos.z - cartZ);
         }
 
         return Vec3d.ZERO;

@@ -20,6 +20,7 @@
     "EntityMixin",
     "EntityTypeMixin",
     "ExperienceOrbEntityMixin",
+    "ExperimentalMinecartControllerMixin",
     "ExperimentalRedstoneControllerMixin",
     "ExplosionBehaviorMixin",
     "FluidBlockMixin",

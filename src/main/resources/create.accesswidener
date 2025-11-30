@@ -270,3 +270,10 @@ accessible method com/mojang/blaze3d/pipeline/RenderPipeline$Builder withSnippet
 accessible method com/mojang/blaze3d/pipeline/RenderPipeline$Builder <init> ()V
 accessible method net/minecraft/client/render/entity/EntityRenderer canBeCulled (Lnet/minecraft/entity/Entity;)Z
 accessible method net/minecraft/client/render/entity/EntityRenderer getBoundingBox (Lnet/minecraft/entity/Entity;)Lnet/minecraft/util/math/Box;
+accessible class net/minecraft/entity/vehicle/ExperimentalMinecartController$MoveIteration
+accessible method net/minecraft/entity/vehicle/ExperimentalMinecartController$MoveIteration <init> ()V
+accessible field net/minecraft/entity/vehicle/ExperimentalMinecartController$MoveIteration initial Z
+accessible field net/minecraft/entity/vehicle/ExperimentalMinecartController$MoveIteration remainingMovement D
+accessible method net/minecraft/entity/vehicle/ExperimentalMinecartController calcNewHorizontalVelocity (Lnet/minecraft/server/world/ServerWorld;Lnet/minecraft/util/math/Vec3d;Lnet/minecraft/entity/vehicle/ExperimentalMinecartController$MoveIteration;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/BlockState;Lnet/minecraft/block/enums/RailShape;)Lnet/minecraft/util/math/Vec3d;
+accessible method net/minecraft/entity/vehicle/ExperimentalMinecartController setAngles (FF)V
+accessible method net/minecraft/entity/vehicle/AbstractMinecartEntity moveOffRail (Lnet/minecraft/server/world/ServerWorld;)V

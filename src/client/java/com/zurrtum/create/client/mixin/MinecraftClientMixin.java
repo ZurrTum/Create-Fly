@@ -65,7 +65,6 @@ import com.zurrtum.create.client.foundation.utility.ServerSpeedProvider;
 import com.zurrtum.create.client.model.obj.ObjLoader;
 import com.zurrtum.create.client.ponder.foundation.PonderIndex;
 import com.zurrtum.create.client.ponder.foundation.PonderTooltipHandler;
-import com.zurrtum.create.content.contraptions.minecart.CouplingPhysics;
 import com.zurrtum.create.content.contraptions.minecart.capability.CapabilityMinecartController;
 import com.zurrtum.create.content.kinetics.drill.CobbleGenOptimisation;
 import com.zurrtum.create.foundation.utility.TickBasedCache;
@@ -189,7 +188,6 @@ public class MinecraftClientMixin {
         GlobalRailwayManagerClient.tick(mc);
         ContraptionHandlerClient.tick(world);
         CapabilityMinecartController.tick(world);
-        CouplingPhysics.tick(world);
         ServerSpeedProvider.clientTick(mc);
         BeltConnectorHandler.tick(mc);
         FilteringRenderer.tick(mc);
