@@ -26,16 +26,6 @@ public class StressGaugeBlockEntity extends GaugeBlockEntity {
         super(AllBlockEntityTypes.STRESSOMETER, pos, state);
     }
 
-//    public static void registerCapabilities(RegisterCapabilitiesEvent event) {
-//        if (Mods.COMPUTERCRAFT.isLoaded()) {
-//            event.registerBlockEntity(
-//                PeripheralCapability.get(),
-//                AllBlockEntityTypes.STRESSOMETER.get(),
-//                (be, context) -> be.computerBehaviour.getPeripheralCapability()
-//            );
-//        }
-//    }
-
     @Override
     public void addBehaviours(List<BlockEntityBehaviour<?>> behaviours) {
         super.addBehaviours(behaviours);

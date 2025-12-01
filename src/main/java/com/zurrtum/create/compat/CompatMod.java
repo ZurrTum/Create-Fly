@@ -1,21 +1,9 @@
 package com.zurrtum.create.compat;
 
-import com.zurrtum.create.AllBlockEntityTypes;
-import com.zurrtum.create.AllBlocks;
-import com.zurrtum.create.compat.computercraft.AbstractComputerBehaviour;
 import com.zurrtum.create.compat.computercraft.ComputerCraftProxy;
 import com.zurrtum.create.compat.trinkets.GoggleTrinket;
-import com.zurrtum.create.content.kinetics.gauge.SpeedGaugeBlockEntity;
-import com.zurrtum.create.content.kinetics.gauge.StressGaugeBlockEntity;
-import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
-import dan200.computercraft.api.peripheral.PeripheralLookup;
-import net.minecraft.block.entity.BlockEntityType;
 
 public class CompatMod {
-    private static <T extends SmartBlockEntity> void registerPeripheral(BlockEntityType<T> type) {
-        PeripheralLookup.get().registerForBlockEntity((blockEntity, direction) -> blockEntity.getBehaviour(AbstractComputerBehaviour.TYPE).getPeripheralCapability(), type);
-    }
-
     public static void register() {
         if (Mods.TRINKETS.isLoaded()) {
             GoggleTrinket.register();
@@ -23,24 +11,6 @@ public class CompatMod {
 
         if (Mods.COMPUTERCRAFT.isLoaded()) {
             ComputerCraftProxy.register();
-            registerPeripheral(AllBlockEntityTypes.MOTOR);
-            registerPeripheral(AllBlockEntityTypes.DISPLAY_LINK);
-            registerPeripheral(AllBlockEntityTypes.STRESSOMETER);
-            registerPeripheral(AllBlockEntityTypes.PACKAGE_FROGPORT);
-            registerPeripheral(AllBlockEntityTypes.NIXIE_TUBE);
-            registerPeripheral(AllBlockEntityTypes.PACKAGER);
-            registerPeripheral(AllBlockEntityTypes.PACKAGE_POSTBOX);
-            registerPeripheral(AllBlockEntityTypes.REDSTONE_REQUESTER);
-            registerPeripheral(AllBlockEntityTypes.REPACKAGER);
-            registerPeripheral(AllBlockEntityTypes.SEQUENCED_GEARSHIFT);
-            registerPeripheral(AllBlockEntityTypes.TRACK_SIGNAL);
-            registerPeripheral(AllBlockEntityTypes.ROTATION_SPEED_CONTROLLER);
-            registerPeripheral(AllBlockEntityTypes.TRACK_STATION);
-            registerPeripheral(AllBlockEntityTypes.STICKER);
-            registerPeripheral(AllBlockEntityTypes.TABLE_CLOTH);
-            registerPeripheral(AllBlockEntityTypes.SPEEDOMETER);
-            registerPeripheral(AllBlockEntityTypes.TRACK_OBSERVER);
-            registerPeripheral(AllBlockEntityTypes.STOCK_TICKER);
         }
     }
 }
