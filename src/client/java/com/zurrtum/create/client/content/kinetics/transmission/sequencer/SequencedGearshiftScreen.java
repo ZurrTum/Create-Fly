@@ -4,9 +4,11 @@ import com.zurrtum.create.AllItems;
 import com.zurrtum.create.client.catnip.gui.AbstractSimiScreen;
 import com.zurrtum.create.client.catnip.gui.ScreenOpener;
 import com.zurrtum.create.client.catnip.gui.element.GuiGameElement;
+import com.zurrtum.create.client.catnip.gui.element.GuiGameElement.GuiItemRenderBuilder;
 import com.zurrtum.create.client.catnip.gui.widget.ElementWidget;
 import com.zurrtum.create.client.catnip.lang.Lang;
 import com.zurrtum.create.client.compat.computercraft.ComputerScreen;
+import com.zurrtum.create.client.compat.computercraft.ComputerScreen.AdditionalRenderer;
 import com.zurrtum.create.client.foundation.gui.AllGuiTextures;
 import com.zurrtum.create.client.foundation.gui.AllIcons;
 import com.zurrtum.create.client.foundation.gui.widget.IconButton;
@@ -20,16 +22,17 @@ import com.zurrtum.create.content.kinetics.transmission.sequencer.SequencerInstr
 import com.zurrtum.create.infrastructure.packet.c2s.ConfigureSequencedGearshiftPacket;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.text.Text;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
 
-public class SequencedGearshiftScreen extends AbstractSimiScreen {
+public class SequencedGearshiftScreen extends AbstractSimiScreen implements AdditionalRenderer {
     private final AllGuiTextures background = AllGuiTextures.SEQUENCER;
     private IconButton confirmButton;
-    private ElementWidget renderedItem;
+    private GuiItemRenderBuilder renderedItem;
     private SequencedGearshiftBlockEntity be;
 
     private Vector<Instruction> instructions;
@@ -44,9 +47,10 @@ public class SequencedGearshiftScreen extends AbstractSimiScreen {
 
     @Override
     protected void init() {
+        renderedItem = GuiGameElement.of(AllItems.SEQUENCED_GEARSHIFT.getDefaultStack()).scale(5);
         if (be.computerBehaviour.hasAttachedComputer())
             ScreenOpener.open(
-                new ComputerScreen(title, this::renderAdditional, this, be.computerBehaviour::hasAttachedComputer));
+                new ComputerScreen(title, this, this, be.computerBehaviour::hasAttachedComputer));
 
         setWindowSize(background.getWidth(), background.getHeight());
         setWindowOffset(-20, 0);
@@ -65,18 +69,18 @@ public class SequencedGearshiftScreen extends AbstractSimiScreen {
         confirmButton = new IconButton(x + background.getWidth() - 33, y + background.getHeight() - 24, AllIcons.I_CONFIRM);
         confirmButton.withCallback(this::close);
         addDrawableChild(confirmButton);
+        addAdditional(this, x, y, background);
+    }
 
-        renderedItem = new ElementWidget(
-            x + background.getWidth() + 6,
-            y + background.getHeight() - 56
-        ).showingElement(GuiGameElement.of(AllItems.SEQUENCED_GEARSHIFT.getDefaultStack()).scale(5));
-        addDrawableChild(renderedItem);
+    @Override
+    public void addAdditional(Screen screen, int x, int y, AllGuiTextures background) {
+        screen.addDrawableChild(new ElementWidget(x + background.getWidth() + 6, y + background.getHeight() - 56).showingElement(renderedItem));
     }
 
     @Override
     public void close() {
         super.close();
-        renderedItem.getRenderElement().clear();
+        renderedItem.clear();
     }
 
     private static String translationKey(SequencerInstructions def) {
@@ -217,7 +221,7 @@ public class SequencedGearshiftScreen extends AbstractSimiScreen {
         super.tick();
 
         if (be.computerBehaviour.hasAttachedComputer())
-            ScreenOpener.open(new ComputerScreen(title, this::renderAdditional, this, be.computerBehaviour::hasAttachedComputer));
+            ScreenOpener.open(new ComputerScreen(title, this, this, be.computerBehaviour::hasAttachedComputer));
     }
 
     private static String formatValue(SequencerInstructions def, int value) {
@@ -275,15 +279,6 @@ public class SequencedGearshiftScreen extends AbstractSimiScreen {
         }
 
         graphics.drawText(textRenderer, title, x + (background.getWidth() - 8) / 2 - textRenderer.getWidth(title) / 2, y + 4, 0xFF592424, false);
-        renderAdditional(graphics, mouseX, mouseY, partialTicks, x, y, background);
-    }
-
-    private void renderAdditional(DrawContext graphics, int mouseX, int mouseY, float partialTicks, int guiLeft, int guiTop,
-                                  AllGuiTextures background) {
-        GuiGameElement.of(AllItems.SEQUENCED_GEARSHIFT.getDefaultStack()).<GuiGameElement
-                        .GuiRenderBuilder>at(guiLeft + background.getWidth() + 6, guiTop + background.getHeight() - 56, 100)
-                .scale(5)
-                .render(graphics);
     }
 
     private void label(DrawContext graphics, int x, int y, Text text) {

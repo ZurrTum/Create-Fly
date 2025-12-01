@@ -2,7 +2,6 @@ package com.zurrtum.create.client.compat.computercraft;
 
 import com.zurrtum.create.client.catnip.gui.AbstractSimiScreen;
 import com.zurrtum.create.client.catnip.gui.element.GuiGameElement;
-import com.zurrtum.create.client.catnip.gui.widget.AbstractSimiWidget;
 import com.zurrtum.create.client.catnip.gui.widget.ElementWidget;
 import com.zurrtum.create.client.foundation.gui.AllGuiTextures;
 import com.zurrtum.create.client.foundation.gui.AllIcons;
@@ -21,21 +20,21 @@ public class ComputerScreen extends AbstractSimiScreen {
     private final AllGuiTextures background = AllGuiTextures.COMPUTER;
 
     private final Supplier<Text> displayTitle;
-    private final RenderWindowFunction additional;
+    private final AdditionalRenderer additionalRenderer;
     private final Screen previousScreen;
     private final Supplier<Boolean> hasAttachedComputer;
 
-    private AbstractSimiWidget computerWidget;
+    private ElementWidget computerWidget;
     private IconButton confirmButton;
 
-    public ComputerScreen(Text title, @Nullable RenderWindowFunction additional, Screen previousScreen, Supplier<Boolean> hasAttachedComputer) {
-        this(title, () -> title, additional, previousScreen, hasAttachedComputer);
+    public ComputerScreen(Text title, @Nullable AdditionalRenderer additionalRenderer, Screen previousScreen, Supplier<Boolean> hasAttachedComputer) {
+        this(title, () -> title, additionalRenderer, previousScreen, hasAttachedComputer);
     }
 
-    public ComputerScreen(Text title, Supplier<Text> displayTitle, @Nullable RenderWindowFunction additional, Screen previousScreen, Supplier<Boolean> hasAttachedComputer) {
+    public ComputerScreen(Text title, Supplier<Text> displayTitle, @Nullable AdditionalRenderer additionalRenderer, Screen previousScreen, Supplier<Boolean> hasAttachedComputer) {
         super(title);
         this.displayTitle = displayTitle;
-        this.additional = additional;
+        this.additionalRenderer = additionalRenderer;
         this.previousScreen = previousScreen;
         this.hasAttachedComputer = hasAttachedComputer;
     }
@@ -56,18 +55,30 @@ public class ComputerScreen extends AbstractSimiScreen {
         int x = guiLeft;
         int y = guiTop;
 
-        Mods.COMPUTERCRAFT.executeIfInstalled(() -> () -> {
+        if (Mods.COMPUTERCRAFT.isLoaded()) {
             computerWidget = new ElementWidget(x + 33, y + 38)
-                    .showingElement(GuiGameElement.of(Mods.COMPUTERCRAFT.getBlock("computer_advanced")));
+                    .showingElement(GuiGameElement.of(Mods.COMPUTERCRAFT.getItem("computer_advanced")));
             computerWidget.getToolTip().add(CreateLang.translate("gui.attached_computer.hint").component());
             addDrawableChild(computerWidget);
-        });
+        };
 
         confirmButton = new IconButton(x + background.getWidth() - 33, y + background.getHeight() - 24, AllIcons.I_CONFIRM);
         confirmButton.withCallback(this::close);
         addDrawableChild(confirmButton);
+
+        if (additionalRenderer != null) {
+            additionalRenderer.addAdditional(this, x, y, background);
+        }
     }
 
+    @Override
+    public void close() {
+        super.close();
+        previousScreen.close();
+        if (computerWidget != null) {
+            computerWidget.getRenderElement().clear();
+        }
+    }
 
     @Override
     protected void renderWindow(DrawContext graphics, int mouseX, int mouseY, float partialTicks) {
@@ -77,19 +88,18 @@ public class ComputerScreen extends AbstractSimiScreen {
         background.render(graphics, x, y);
 
         graphics.drawText(textRenderer, displayTitle.get(),
-                Math.round(x + background.getWidth() / 2.0F - textRenderer.getWidth(displayTitle.get()) / 2.0F), y + 4, 0x442000, false);
+                Math.round(x + background.getWidth() / 2.0F - textRenderer.getWidth(displayTitle.get()) / 2.0F), y + 4, 0xFF442000, false);
         graphics.drawWrappedText(textRenderer, CreateLang.translate("gui.attached_computer.controlled")
-                .component(), x + 55, y + 32, 111, 0x7A7A7A, false);
+                .component(), x + 55, y + 32, 111, 0xFF7A7A7A, false);
 
-        if (additional != null)
-            additional.render(graphics, mouseX, mouseY, partialTicks, x, y, background);
+        if (additionalRenderer != null)
+            additionalRenderer.updateAdditional(partialTicks);
     }
 
-    @FunctionalInterface
-    public interface RenderWindowFunction {
+    public interface AdditionalRenderer {
+        void addAdditional(Screen screen, int x, int y, AllGuiTextures background);
 
-        void render(DrawContext graphics, int mouseX, int mouseY, float partialTicks, int guiLeft, int guiTop, AllGuiTextures background);
-
+        default void updateAdditional(float partialTicks) {
+        }
     }
-
 }
