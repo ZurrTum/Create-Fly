@@ -6,6 +6,7 @@ import io.netty.buffer.ByteBuf;
 import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.util.StringIdentifiable;
 
+import java.util.Arrays;
 import java.util.Locale;
 
 public enum InstructionSpeedModifiers implements StringIdentifiable {
@@ -26,5 +27,12 @@ public enum InstructionSpeedModifiers implements StringIdentifiable {
     @Override
     public String asString() {
         return name().toLowerCase(Locale.ROOT);
+    }
+
+    public static InstructionSpeedModifiers getByModifier(int modifier) {
+        return Arrays.stream(InstructionSpeedModifiers.values())
+                .filter(speedModifier -> speedModifier.value == modifier)
+                .findAny()
+                .orElse(InstructionSpeedModifiers.FORWARD);
     }
 }
