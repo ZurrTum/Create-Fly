@@ -174,12 +174,6 @@ public class DisplayLinkBlockEntity extends LinkWithBulbBlockEntity implements T
         });
     }
 
-    @Override
-    public void invalidate() {
-        super.invalidate();
-        computerBehaviour.removePeripheral();
-    }
-
     public void target(BlockPos targetPosition) {
         this.targetOffset = targetPosition.subtract(pos);
     }

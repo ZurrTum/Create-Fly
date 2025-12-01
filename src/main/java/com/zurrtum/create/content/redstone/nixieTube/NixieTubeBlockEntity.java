@@ -257,10 +257,4 @@ public class NixieTubeBlockEntity extends SmartBlockEntity {
             super.markRemoved();
         }
     }
-
-    @Override
-    public void invalidate() {
-        super.invalidate();
-        computerBehaviour.removePeripheral();
-    }
 }

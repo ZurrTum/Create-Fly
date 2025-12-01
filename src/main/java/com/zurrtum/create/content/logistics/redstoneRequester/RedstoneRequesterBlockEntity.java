@@ -53,12 +53,6 @@ public class RedstoneRequesterBlockEntity extends StockCheckingBlockEntity imple
         behaviours.add(computerBehaviour = ComputerCraftProxy.behaviour(this));
     }
 
-    @Override
-    public void invalidate() {
-        super.invalidate();
-        computerBehaviour.removePeripheral();
-    }
-
     protected void onRedstonePowerChanged() {
         boolean hasNeighborSignal = world.isReceivingRedstonePower(pos);
         if (redstonePowered == hasNeighborSignal)

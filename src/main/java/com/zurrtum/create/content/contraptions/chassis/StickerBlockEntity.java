@@ -89,10 +89,4 @@ public class StickerBlockEntity extends SmartBlockEntity {
     public void playSound(boolean attach) {
         AllSoundEvents.SLIME_ADDED.play(world, AllClientHandle.INSTANCE.getPlayer(), pos, 0.35f, attach ? 0.75f : 0.2f);
     }
-
-    @Override
-    public void invalidate() {
-        super.invalidate();
-        computerBehaviour.removePeripheral();
-    }
 }

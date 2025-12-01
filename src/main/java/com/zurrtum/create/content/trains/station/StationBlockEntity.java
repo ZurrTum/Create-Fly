@@ -876,12 +876,6 @@ public class StationBlockEntity extends SmartBlockEntity implements Transformabl
         return depotBehaviour.getHeldItemStack();
     }
 
-    @Override
-    public void invalidate() {
-        super.invalidate();
-        computerBehaviour.removePeripheral();
-    }
-
     private void applyAutoSchedule() {
         ItemStack stack = getAutoSchedule();
         if (!stack.isOf(AllItems.SCHEDULE))

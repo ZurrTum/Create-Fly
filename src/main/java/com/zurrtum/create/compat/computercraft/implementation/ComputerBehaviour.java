@@ -105,13 +105,6 @@ public class ComputerBehaviour extends AbstractComputerBehaviour {
     }
 
     @Override
-    public void removePeripheral() {
-        // TODO (aster): Check if not needed in fabric?
-//		if (peripheral != null)
-//			getWorld().invalidateCapabilities(be.getBlockPos());
-    }
-
-    @Override
     public void prepareComputerEvent(@NotNull ComputerEvent event) {
         if (peripheral != null)
             peripheral.prepareComputerEvent(event);

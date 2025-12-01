@@ -215,12 +215,6 @@ public class SequencedGearshiftBlockEntity extends SplitShaftBlockEntity {
     }
 
     @Override
-    public void invalidate() {
-        super.invalidate();
-        computerBehaviour.removePeripheral();
-    }
-
-    @Override
     public float getRotationSpeedModifier(Direction face) {
         if (isVirtual())
             return 1;

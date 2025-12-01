@@ -122,10 +122,4 @@ public class SpeedControllerBlockEntity extends KineticBlockEntity {
         return ICogWheel.isDedicatedCogWheel(stateAbove.getBlock()) && ICogWheel.isLargeCog(stateAbove) && stateAbove.get(CogWheelBlock.AXIS)
                 .isHorizontal();
     }
-
-    @Override
-    public void invalidate() {
-        super.invalidate();
-        computerBehaviour.removePeripheral();
-    }
 }

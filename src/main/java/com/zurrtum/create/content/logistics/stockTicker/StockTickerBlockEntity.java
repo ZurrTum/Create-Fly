@@ -63,18 +63,11 @@ public class StockTickerBlockEntity extends StockCheckingBlockEntity {
         hiddenCategoriesByPlayer = new HashMap<>();
     }
 
-
-        @Override
-        public void addBehaviours(List<BlockEntityBehaviour<?>> behaviours) {
-            super.addBehaviours(behaviours);
-            behaviours.add(computerBehaviour = ComputerCraftProxy.behaviour(this));
-        }
-
-        @Override
-        public void invalidate() {
-            super.invalidate();
-            computerBehaviour.removePeripheral();
-        }
+    @Override
+    public void addBehaviours(List<BlockEntityBehaviour<?>> behaviours) {
+        super.addBehaviours(behaviours);
+        behaviours.add(computerBehaviour = ComputerCraftProxy.behaviour(this));
+    }
 
     public void resetTicksSinceLastUpdate() {
         ticksSinceLastUpdate = 0;

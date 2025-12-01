@@ -106,10 +106,4 @@ public class TrackObserverBlockEntity extends SmartBlockEntity implements Transf
     public void transform(BlockEntity be, StructureTransform transform) {
         edgePoint.transform(be, transform);
     }
-
-    @Override
-    public void invalidate() {
-        super.invalidate();
-        computerBehaviour.removePeripheral();
-    }
 }

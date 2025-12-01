@@ -117,10 +117,4 @@ public class PostboxBlockEntity extends PackagePortBlockEntity {
         }
         globalPackagePort.saveOfflineBuffer(inventory);
     }
-
-    @Override
-    public void invalidate() {
-        super.invalidate();
-        computerBehaviour.removePeripheral();
-    }
 }

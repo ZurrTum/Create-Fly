@@ -378,10 +378,4 @@ public class FrogportBlockEntity extends PackagePortBlockEntity {
         return super.use(player);
     }
 
-    @Override
-    public void invalidate() {
-        super.invalidate();
-        computerBehaviour.removePeripheral();
-    }
-
 }

@@ -324,12 +324,6 @@ public class TableClothBlockEntity extends SmartBlockEntity implements Transform
         return priceTag.getFilter().isEmpty() ? 1 : priceTag.count;
     }
 
-    @Override
-    public void invalidate() {
-        super.invalidate();
-        computerBehaviour.removePeripheral();
-    }
-
     public void transform(BlockEntity blockEntity, StructureTransform transform) {
         facing = transform.mirrorFacing(facing);
         if (transform.rotationAxis == Direction.Axis.Y)

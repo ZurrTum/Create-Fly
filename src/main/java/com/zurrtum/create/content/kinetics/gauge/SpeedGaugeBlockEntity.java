@@ -57,10 +57,4 @@ public class SpeedGaugeBlockEntity extends GaugeBlockEntity {
             target = MathHelper.lerp((speed - fast) / (max - fast), .75f, 1.125f);
         return target;
     }
-
-    @Override
-    public void invalidate() {
-        super.invalidate();
-        computerBehaviour.removePeripheral();
-    }
 }

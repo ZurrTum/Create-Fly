@@ -39,8 +39,6 @@ public class AbstractComputerBehaviour extends BlockEntityBehaviour {
 		return null;
 	}
 
-	public void removePeripheral() {}
-
 	public void setHasAttachedComputer(boolean hasAttachedComputer) {
 		this.hasAttachedComputer = hasAttachedComputer;
 	}

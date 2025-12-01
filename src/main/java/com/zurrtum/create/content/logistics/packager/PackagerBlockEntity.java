@@ -123,12 +123,6 @@ public class PackagerBlockEntity extends SmartBlockEntity {
     }
 
     @Override
-    public void invalidate() {
-        super.invalidate();
-        computerBehaviour.removePeripheral();
-    }
-
-    @Override
     public void tick() {
         super.tick();
 
