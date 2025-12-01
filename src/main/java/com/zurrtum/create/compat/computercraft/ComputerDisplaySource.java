@@ -1,4 +1,4 @@
-package com.zurrtum.create.content.redstone.displayLink.source;
+package com.zurrtum.create.compat.computercraft;
 
 import com.zurrtum.create.api.behaviour.display.DisplaySource;
 import com.zurrtum.create.content.redstone.displayLink.DisplayLinkContext;

@@ -2,18 +2,13 @@ package com.zurrtum.create;
 
 import com.zurrtum.create.api.behaviour.display.DisplaySource;
 import com.zurrtum.create.api.registry.CreateRegistries;
-import com.zurrtum.create.compat.Mods;
 import com.zurrtum.create.content.redstone.displayLink.source.*;
-import net.fabricmc.fabric.api.event.registry.FabricRegistryBuilder;
-import net.fabricmc.fabric.api.event.registry.RegistryEntryAddedCallback;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
 import net.minecraft.util.Identifier;
 
-import java.util.List;
 import java.util.function.Supplier;
 
 import static com.zurrtum.create.Create.MOD_ID;
@@ -44,7 +39,6 @@ public class AllDisplaySources {
     public static final EnchantPowerDisplaySource ENCHANT_POWER = register("enchant_power", EnchantPowerDisplaySource::new);
     public static final RedstonePowerDisplaySource REDSTONE_POWER = register("redstone_power", RedstonePowerDisplaySource::new);
     public static final NixieTubeDisplaySource NIXIE_TUBE = register("nixie_tube", NixieTubeDisplaySource::new);
-    public static final ComputerDisplaySource COMPUTER = register("computer", ComputerDisplaySource::new);
 
     private static <T extends DisplaySource> T register(String id, Supplier<T> factory) {
         return Registry.register(CreateRegistries.DISPLAY_SOURCE, Identifier.of(MOD_ID, id), factory.get());
@@ -104,17 +98,5 @@ public class AllDisplaySources {
         register(ENCHANT_POWER, Blocks.ENCHANTING_TABLE);
         register(REDSTONE_POWER, Blocks.TARGET);
         register(NIXIE_TUBE, AllBlockEntityTypes.NIXIE_TUBE);
-        if (Mods.COMPUTERCRAFT.isLoaded()) {
-            RegistryEntryAddedCallback.event(Registries.BLOCK).register((rawId, id, object) -> {
-                List<String> types = List.of("wired_modem_full", "computer_normal", "computer_advanced", "computer_command");
-                for (String name : types) {
-                    Identifier cc_id = Mods.COMPUTERCRAFT.identifier(name);
-                    if (cc_id.equals(id)) {
-                        DisplaySource.BY_BLOCK.add(object, COMPUTER);
-                    }
-                }
-            });
-
-        }
     }
 }
