@@ -3,7 +3,6 @@ package com.zurrtum.create.client.foundation.render;
 import com.zurrtum.create.AllItemTags;
 import com.zurrtum.create.catnip.math.AngleHelper;
 import com.zurrtum.create.client.catnip.animation.AnimationTickHolder;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.model.player.PlayerModel;
 import net.minecraft.util.Mth;
@@ -30,9 +29,6 @@ public class PlayerSkyhookRenderer {
     }
 
     private static void setHangingPose(boolean isLeftArmMain, PlayerModel model) {
-        if (Minecraft.getInstance().isPaused())
-            return;
-
         model.head.x = 0;
         model.hat.x = 0;
         model.body.resetPose();
@@ -41,7 +37,7 @@ public class PlayerSkyhookRenderer {
         model.leftLeg.resetPose();
         model.rightLeg.resetPose();
 
-        float time = AnimationTickHolder.getTicks(true) + AnimationTickHolder.getPartialTicks();
+        float time = AnimationTickHolder.getTicks() + AnimationTickHolder.getPartialTicks();
         float mainCycle = Mth.sin(((float) ((time + 10) * 0.3f / Math.PI)));
         float limbCycle = Mth.sin(((float) (time * 0.3f / Math.PI)));
         float bodySwing = AngleHelper.rad(15 + (mainCycle * 10));
@@ -50,7 +46,6 @@ public class PlayerSkyhookRenderer {
             bodySwing = -bodySwing;
         model.body.zRot = bodySwing;
         model.head.zRot = bodySwing;
-        model.hat.zRot = bodySwing;
 
         ModelPart hangingArm = isLeftArmMain ? model.leftArm : model.rightArm;
         ModelPart otherArm = isLeftArmMain ? model.rightArm : model.leftArm;
@@ -88,14 +83,12 @@ public class PlayerSkyhookRenderer {
         trailingLeg.y = offsetX * Mth.sin(bodySwing) + offsetY * Mth.cos(bodySwing);
         trailingLeg.xRot = AngleHelper.rad(10);
         trailingLeg.zRot = (isLeftArmMain ? -1 : 1) * (-AngleHelper.rad(10)) + 0.5f * bodySwing + limbSwing;
-        model.hat.x -= armPivotX;
         model.head.x -= armPivotX;
         model.body.x -= armPivotX;
         otherArm.x -= armPivotX;
         trailingLeg.x -= armPivotX;
         leadingLeg.x -= armPivotX;
 
-        model.hat.y -= armPivotY;
         model.head.y -= armPivotY;
         model.body.y -= armPivotY;
         otherArm.y -= armPivotY;
