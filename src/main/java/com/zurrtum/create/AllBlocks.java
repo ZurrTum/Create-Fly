@@ -147,8 +147,8 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.level.BlockGetter;
@@ -161,6 +161,7 @@ import net.minecraft.world.level.material.PushReaction;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
@@ -473,13 +474,18 @@ public class AllBlocks {
     public static final MechanicalPistonHeadBlock MECHANICAL_PISTON_HEAD = register(
         "mechanical_piston_head",
         MechanicalPistonHeadBlock::new,
-        BlockBehaviour.Properties.ofFullCopy(Blocks.PISTON_HEAD).mapColor(MapColor.DIRT).pushReaction(PushReaction.NORMAL)
+        BlockBehaviour.Properties.ofFullCopy(Blocks.PISTON_HEAD).overrideLootTable(Optional.of(ResourceKey.create(
+            Registries.LOOT_TABLE,
+            Identifier.fromNamespaceAndPath(MOD_ID, "blocks/mechanical_piston_head")
+        ))).mapColor(MapColor.DIRT).pushReaction(PushReaction.NORMAL)
     );
     public static final PistonExtensionPoleBlock PISTON_EXTENSION_POLE = register(
         "piston_extension_pole",
         PistonExtensionPoleBlock::new,
-        BlockBehaviour.Properties.ofFullCopy(Blocks.PISTON_HEAD).sound(SoundType.SCAFFOLDING).mapColor(MapColor.DIRT)
-            .pushReaction(PushReaction.NORMAL).forceSolidOn()
+        BlockBehaviour.Properties.ofFullCopy(Blocks.PISTON_HEAD).overrideLootTable(Optional.of(ResourceKey.create(
+            Registries.LOOT_TABLE,
+            Identifier.fromNamespaceAndPath(MOD_ID, "blocks/piston_extension_pole")
+        ))).sound(SoundType.SCAFFOLDING).mapColor(MapColor.DIRT).pushReaction(PushReaction.NORMAL).forceSolidOn()
     );
     public static final SailBlock SAIL_FRAME = register(
         "sail_frame",
