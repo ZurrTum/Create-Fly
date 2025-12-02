@@ -445,7 +445,7 @@ public class SawBlockEntity extends BlockBreakingKineticBlockEntity {
         float distance = (float) Math.sqrt(pos.getSquaredDistance(breakingPos));
         Vec3d dropPos = VecHelper.getCenterOf(pos);
         ItemEntity entity = new ItemEntity(world, dropPos.x, dropPos.y, dropPos.z, stack);
-        entity.setVelocity(Vec3d.of(breakingPos.subtract(pos)).multiply(distance / 20f));
+        entity.setVelocity(Vec3d.of(breakingPos.subtract(this.pos)).multiply(distance / 20f));
         world.spawnEntity(entity);
     }
 
