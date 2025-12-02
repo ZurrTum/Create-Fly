@@ -128,7 +128,7 @@ public class SandPaperModel implements ItemModel, SpecialModelRenderer<SandPaper
             light,
             overlay,
             state.tints,
-            state.quads,
+            state.getQuads(),
             state.renderLayer,
             state.glint
         );

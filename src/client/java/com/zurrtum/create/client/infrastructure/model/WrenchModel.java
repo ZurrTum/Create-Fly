@@ -103,7 +103,17 @@ public class WrenchModel implements ItemModel, SpecialModelRenderer<LayerRenderS
         matrices.translate(0.5625f, 0.5f, 0.5f);
         matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(ScrollValueHandler.getScroll(AnimationTickHolder.getPartialTicks())));
         matrices.translate(-0.5625f, -0.5f, -0.5f);
-        ItemRenderer.renderItem(displayContext, matrices, vertexConsumers, light, overlay, layer.tints, layer.quads, layer.renderLayer, layer.glint);
+        ItemRenderer.renderItem(
+            displayContext,
+            matrices,
+            vertexConsumers,
+            light,
+            overlay,
+            layer.tints,
+            layer.getQuads(),
+            layer.renderLayer,
+            layer.glint
+        );
         matrices.pop();
     }
 

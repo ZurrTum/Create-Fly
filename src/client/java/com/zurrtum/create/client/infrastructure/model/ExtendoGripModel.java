@@ -169,7 +169,7 @@ public class ExtendoGripModel implements ItemModel, SpecialModelRenderer<Extendo
 
         // grip
         LayerRenderState grip = data.state;
-        ItemRenderer.renderItem(displayContext, matrices, vertexConsumers, light, overlay, grip.tints, grip.quads, grip.renderLayer, grip.glint);
+        ItemRenderer.renderItem(displayContext, matrices, vertexConsumers, light, overlay, grip.tints, grip.getQuads(), grip.renderLayer, grip.glint);
 
         // bits
         matrices.push();

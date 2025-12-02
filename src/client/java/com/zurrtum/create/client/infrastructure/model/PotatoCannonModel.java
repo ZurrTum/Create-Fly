@@ -167,7 +167,7 @@ public class PotatoCannonModel implements ItemModel, SpecialModelRenderer<Potato
                 light,
                 overlay,
                 state.tints,
-                state.quads,
+                state.getQuads(),
                 state.renderLayer,
                 state.glint
             );
