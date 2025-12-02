@@ -493,7 +493,6 @@ public class ChainConveyorBlockEntity extends KineticBlockEntity implements Tran
     @Override
     public void remove() {
         super.remove();
-        destroy();
         if (world == null || !world.isClient())
             return;
         for (BlockPos blockPos : connections)
