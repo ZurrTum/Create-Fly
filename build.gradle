@@ -1,5 +1,5 @@
 plugins {
-    id "net.fabricmc.fabric-loom-no-remap" version "1.14.0-alpha.26"
+    id "net.fabricmc.fabric-loom-no-remap" version "1.14.0-alpha.31"
 }
 
 repositories {
@@ -60,7 +60,6 @@ sourceSets {
             exclude 'com/zurrtum/create/mixin/CreateIntegrationMixin.java'
             exclude 'com/zurrtum/create/mixin/ArchitecturyMixin.java'
             exclude 'com/zurrtum/create/mixin/JustEnoughItemsMixin.java'
-            exclude 'com/zurrtum/create/mixin/WrapperBlockStateModel.java'
         }
     }
     client {

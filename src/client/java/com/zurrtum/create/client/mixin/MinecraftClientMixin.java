@@ -252,7 +252,7 @@ public class MinecraftClientMixin {
         }
     }
 
-    @Inject(method = "disconnect(Lnet/minecraft/client/gui/screens/Screen;Z)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/Gui;onDisconnected()V"))
+    @Inject(method = "disconnect(Lnet/minecraft/client/gui/screens/Screen;ZZ)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/Gui;onDisconnected()V"))
     private void onUnloadWorld(CallbackInfo ci) {
         Create.SCHEMATIC_HANDLER.updateRenderers();
         Create.SOUL_PULSE_EFFECT_HANDLER.refresh();
