@@ -126,7 +126,7 @@ public class SandPaperModel implements ItemModel, SpecialModelRenderer<SandPaper
             matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(modifier * 90));
             matrices.translate(-0.5F, -0.5F, -0.5F);
         }
-        queue.submitItem(matrices, displayContext, light, overlay, 0, state.tints, state.quads, state.renderLayer, state.glint);
+        queue.submitItem(matrices, displayContext, light, overlay, 0, state.tints, state.getQuads(), state.renderLayer, state.glint);
         matrices.pop();
 
         if (data.item == null) {

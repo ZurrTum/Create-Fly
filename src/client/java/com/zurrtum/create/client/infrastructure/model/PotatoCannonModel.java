@@ -133,7 +133,7 @@ public class PotatoCannonModel implements ItemModel, SpecialModelRenderer<Potato
         matrices.multiply(RotationAxis.POSITIVE_Z.rotationDegrees(data.rotation));
         matrices.translate(-0.5f, -0.53125f, -0.5f);
         LayerRenderState state = data.state;
-        queue.submitItem(matrices, displayContext, light, overlay, 0, state.tints, state.quads, state.renderLayer, state.glint);
+        queue.submitItem(matrices, displayContext, light, overlay, 0, state.tints, state.getQuads(), state.renderLayer, state.glint);
     }
 
     public static void renderDecorator(MinecraftClient client, DrawContext drawContext, ItemStack stack, int x, int y) {
