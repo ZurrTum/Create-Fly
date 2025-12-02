@@ -256,12 +256,11 @@ public class MillstoneBlockEntity extends KineticBlockEntity {
 
         public void read(ReadView view) {
             List<ItemStack> list = view.getTypedListView("Inventory", ItemStack.OPTIONAL_CODEC).stream().toList();
-            setStack(0, list.getFirst());
-            int size = list.size();
-            for (int i = 1; i < size; i++) {
-                setStack(i, list.get(i));
+            int i = 0;
+            for (ItemStack itemStack : list) {
+                stacks.set(i++, itemStack);
             }
-            for (int i = size; i < 10; i++) {
+            for (; i < 10; i++) {
                 setStack(i, ItemStack.EMPTY);
             }
         }
