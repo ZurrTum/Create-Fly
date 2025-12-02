@@ -278,12 +278,12 @@ public class AllHandle extends AllClientHandle<ClientPlayNetworkHandler> {
     }
 
     private <T extends ShootableGadgetRenderHandler> void onShootGadget(
-            ClientPlayNetworkHandler listener,
-            Vec3d location,
-            Hand hand,
-            boolean self,
-            T handler,
-            Consumer<T> handleAdditional
+        ClientPlayNetworkHandler listener,
+        Vec3d location,
+        Hand hand,
+        boolean self,
+        T handler,
+        Consumer<T> handleAdditional
     ) {
         Entity renderViewEntity = listener.client.getCameraEntity();
         if (renderViewEntity == null)
@@ -301,18 +301,18 @@ public class AllHandle extends AllClientHandle<ClientPlayNetworkHandler> {
     @Override
     public void onZapperBeam(ClientPlayNetworkHandler listener, ZapperBeamPacket packet) {
         onShootGadget(
-                listener, packet.location(), packet.hand(), packet.self(), Create.ZAPPER_RENDER_HANDLER, handler -> {
-                    handler.addBeam(listener.client, new LaserBeam(packet.location(), packet.target()));
-                }
+            listener, packet.location(), packet.hand(), packet.self(), Create.ZAPPER_RENDER_HANDLER, handler -> {
+                handler.addBeam(listener.client, new LaserBeam(packet.location(), packet.target()));
+            }
         );
     }
 
     @Override
     public void onPotatoCannon(ClientPlayNetworkHandler listener, PotatoCannonPacket packet) {
         onShootGadget(
-                listener, packet.location(), packet.hand(), packet.self(), Create.POTATO_CANNON_RENDER_HANDLER, handler -> {
-                    handler.beforeShoot(packet.pitch(), packet.location(), packet.motion(), packet.item());
-                }
+            listener, packet.location(), packet.hand(), packet.self(), Create.POTATO_CANNON_RENDER_HANDLER, handler -> {
+                handler.beforeShoot(packet.pitch(), packet.location(), packet.motion(), packet.item());
+            }
         );
     }
 
@@ -424,9 +424,9 @@ public class AllHandle extends AllClientHandle<ClientPlayNetworkHandler> {
         }
 
         Outliner.getInstance().showAABB("highlightCommand", VoxelShapes.fullCube().getBoundingBox().offset(packet.pos()), 200).lineWidth(1 / 32f)
-                .colored(0xEeEeEe)
-                // .colored(0x243B50)
-                .withFaceTexture(AllSpecialTextures.SELECTION);
+            .colored(0xEeEeEe)
+            // .colored(0x243B50)
+            .withFaceTexture(AllSpecialTextures.SELECTION);
     }
 
     @Override
@@ -584,8 +584,8 @@ public class AllHandle extends AllClientHandle<ClientPlayNetworkHandler> {
         String text = output.toString();
         listener.client.keyboard.setClipboard(text);
         listener.client.player.sendMessage(
-                Text.translatable("create.command.debuginfo.saved_to_clipboard")
-                        .withColor(DyeHelper.getDyeColors(DyeColor.LIME).getFirst()), false
+            Text.translatable("create.command.debuginfo.saved_to_clipboard")
+                .withColor(DyeHelper.getDyeColors(DyeColor.LIME).getFirst()), false
         );
     }
 
@@ -741,10 +741,10 @@ public class AllHandle extends AllClientHandle<ClientPlayNetworkHandler> {
     @Override
     public void buildDebugInfo() {
         DebugInfoSection.builder("Graphics").put("Flywheel Version", DebugInformation.getVersionOfMod(Flywheel.MOD_ID))
-                .put("Flywheel Backend", () -> Backend.REGISTRY.getIdOrThrow(BackendManager.currentBackend()).toString())
-                .put("OpenGL Renderer", GlStateManager._getString(GL11.GL_RENDERER)).put("OpenGL Version", GlStateManager._getString(GL11.GL_VERSION))
-                .put("Graphics Mode", () -> MinecraftClient.getInstance().options.getGraphicsMode().getValue().name().toLowerCase(Locale.ROOT))
-                .buildTo(DebugInformation::registerClientInfo);
+            .put("Flywheel Backend", () -> Backend.REGISTRY.getIdOrThrow(BackendManager.currentBackend()).toString())
+            .put("OpenGL Renderer", GlStateManager._getString(GL11.GL_RENDERER)).put("OpenGL Version", GlStateManager._getString(GL11.GL_VERSION))
+            .put("Graphics Mode", () -> MinecraftClient.getInstance().options.getGraphicsMode().getValue().name().toLowerCase(Locale.ROOT))
+            .buildTo(DebugInformation::registerClientInfo);
     }
 
     @Override
@@ -783,7 +783,7 @@ public class AllHandle extends AllClientHandle<ClientPlayNetworkHandler> {
         BlockPos pos = context.getBlockPos();
         Vec3d contract = Vec3d.of(Direction.get(AxisDirection.POSITIVE, axis).getVector());
         Outliner.getInstance().showAABB(Pair.of("waterwheel", pos), new Box(pos).expand(1).contract(contract.x, contract.y, contract.z))
-                .colored(0xFF_ff5d6c);
+            .colored(0xFF_ff5d6c);
         CreateLang.translate("large_water_wheel.not_enough_space").color(0xFF_ff5d6c).sendStatus(context.getPlayer());
     }
 
@@ -879,9 +879,9 @@ public class AllHandle extends AllClientHandle<ClientPlayNetworkHandler> {
 
         World world = be.getWorld();
         Vec3d offset = VecHelper.rotate(
-                new Vec3d(0, 0, 1).add(VecHelper.offsetRandomly(Vec3d.ZERO, world.random, 1).multiply(1, 1, 0).normalize().multiply(.5f)),
-                AngleHelper.verticalAngle(facing),
-                Axis.X
+            new Vec3d(0, 0, 1).add(VecHelper.offsetRandomly(Vec3d.ZERO, world.random, 1).multiply(1, 1, 0).normalize().multiply(.5f)),
+            AngleHelper.verticalAngle(facing),
+            Axis.X
         );
         offset = VecHelper.rotate(offset, AngleHelper.horizontalAngle(facing), Axis.Y);
         Vec3d v = offset.multiply(.5f).add(Vec3d.ofCenter(be.getPos()));
@@ -963,13 +963,13 @@ public class AllHandle extends AllClientHandle<ClientPlayNetworkHandler> {
                 float z = pos.getZ() + rim + space * r.nextFloat();
                 FluidStack stack = tankSegment.getRenderedFluid();
                 world.addImportantParticleClient(
-                        new FluidParticleData(AllParticleTypes.BASIN_FLUID, stack.getFluid(), stack.getComponentChanges()),
-                        x,
-                        surface,
-                        z,
-                        0,
-                        0,
-                        0
+                    new FluidParticleData(AllParticleTypes.BASIN_FLUID, stack.getFluid(), stack.getComponentChanges()),
+                    x,
+                    surface,
+                    z,
+                    0,
+                    0,
+                    0
                 );
             }
         }
@@ -1013,13 +1013,13 @@ public class AllHandle extends AllClientHandle<ClientPlayNetworkHandler> {
                 Vec3d vec = centerOf.add(VecHelper.rotate(pointer, angle, Axis.Y));
                 FluidStack stack = tankSegment.getRenderedFluid();
                 world.addImportantParticleClient(
-                        new FluidParticleData(AllParticleTypes.BASIN_FLUID, stack.getFluid(), stack.getComponentChanges()),
-                        vec.getX(),
-                        surface,
-                        vec.getZ(),
-                        1,
-                        0,
-                        0
+                    new FluidParticleData(AllParticleTypes.BASIN_FLUID, stack.getFluid(), stack.getComponentChanges()),
+                    vec.getX(),
+                    surface,
+                    vec.getZ(),
+                    1,
+                    0,
+                    0
                 );
                 currentSegment++;
             }

@@ -71,8 +71,7 @@ public class TrackObserverBlockEntity extends SmartBlockEntity implements Transf
             if (shouldBePowered)
                 passingTrainUUID = observer.getCurrentTrain();
             if (passingTrainUUID != null) {
-                computerBehaviour.prepareComputerEvent(
-                        new TrainPassEvent(Create.RAILWAYS.trains.get(passingTrainUUID), shouldBePowered));
+                computerBehaviour.prepareComputerEvent(new TrainPassEvent(Create.RAILWAYS.trains.get(passingTrainUUID), shouldBePowered));
                 if (!shouldBePowered)
                     passingTrainUUID = null;
             }

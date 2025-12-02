@@ -100,9 +100,9 @@ public class TableClothBlockEntity extends SmartBlockEntity implements Transform
         super.lazyTick();
         BlockPos relativePos = pos.offset(facing);
         sideOccluded = world.getBlockState(relativePos)
-                .isIn(AllBlockTags.TABLE_CLOTHS) || Block.isFaceFullSquare(
-                world.getBlockState(relativePos.down()).getCullingShape(),
-                facing.getOpposite()
+            .isIn(AllBlockTags.TABLE_CLOTHS) || Block.isFaceFullSquare(
+            world.getBlockState(relativePos.down()).getCullingShape(),
+            facing.getOpposite()
         );
     }
 
@@ -132,8 +132,8 @@ public class TableClothBlockEntity extends SmartBlockEntity implements Transform
                 if (world instanceof ServerWorld serverLevel) {
                     Packet<?> packet = new RemoveBlockEntityPacket(pos);
                     for (ServerPlayerEntity serverPlayer : serverLevel.getChunkManager().chunkLoadingManager.getPlayersWatchingChunk(
-                            new ChunkPos(pos),
-                            false
+                        new ChunkPos(pos),
+                        false
                     )) {
                         serverPlayer.networkHandler.sendPacket(packet);
                     }
@@ -282,8 +282,8 @@ public class TableClothBlockEntity extends SmartBlockEntity implements Transform
         for (BigItemStack entry : requestData.encodedRequest().stacks())
             if (entry.count > 0)
                 smallestQuotient = Math.min(
-                        smallestQuotient,
-                        (recentSummary.getCountOf(entry.stack) - modifierSummary.getCountOf(entry.stack)) / entry.count
+                    smallestQuotient,
+                    (recentSummary.getCountOf(entry.stack) - modifierSummary.getCountOf(entry.stack)) / entry.count
                 );
 
         return smallestQuotient;

@@ -1,27 +1,24 @@
 package com.zurrtum.create.compat.computercraft;
 
-import net.minecraft.storage.ReadView;
-import net.minecraft.storage.WriteView;
-import org.jetbrains.annotations.NotNull;
-
-
 import com.zurrtum.create.compat.computercraft.events.ComputerEvent;
 import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
 import com.zurrtum.create.foundation.blockEntity.behaviour.BehaviourType;
 import com.zurrtum.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
-
 import dan200.computercraft.api.peripheral.IPeripheral;
+import net.minecraft.storage.ReadView;
+import net.minecraft.storage.WriteView;
+import org.jetbrains.annotations.NotNull;
 
-public class AbstractComputerBehaviour extends BlockEntityBehaviour {
+public class AbstractComputerBehaviour extends BlockEntityBehaviour<SmartBlockEntity> {
 
-	public static final BehaviourType<AbstractComputerBehaviour> TYPE = new BehaviourType<>();
+    public static final BehaviourType<AbstractComputerBehaviour> TYPE = new BehaviourType<>();
 
-	boolean hasAttachedComputer;
+    boolean hasAttachedComputer;
 
-	public AbstractComputerBehaviour(SmartBlockEntity te) {
-		super(te);
-		this.hasAttachedComputer = false;
-	}
+    public AbstractComputerBehaviour(SmartBlockEntity te) {
+        super(te);
+        this.hasAttachedComputer = false;
+    }
 
     @Override
     public void read(ReadView view, boolean clientPacket) {
@@ -35,23 +32,24 @@ public class AbstractComputerBehaviour extends BlockEntityBehaviour {
         super.write(view, clientPacket);
     }
 
-	public IPeripheral getPeripheralCapability() {
-		return null;
-	}
+    public IPeripheral getPeripheralCapability() {
+        return null;
+    }
 
-	public void setHasAttachedComputer(boolean hasAttachedComputer) {
-		this.hasAttachedComputer = hasAttachedComputer;
-	}
+    public void setHasAttachedComputer(boolean hasAttachedComputer) {
+        this.hasAttachedComputer = hasAttachedComputer;
+    }
 
-	public boolean hasAttachedComputer() {
-		return hasAttachedComputer;
-	}
+    public boolean hasAttachedComputer() {
+        return hasAttachedComputer;
+    }
 
-	public void prepareComputerEvent(@NotNull ComputerEvent event) {}
+    public void prepareComputerEvent(@NotNull ComputerEvent event) {
+    }
 
-	@Override
-	public BehaviourType<?> getType() {
-		return TYPE;
-	}
+    @Override
+    public BehaviourType<?> getType() {
+        return TYPE;
+    }
 
 }

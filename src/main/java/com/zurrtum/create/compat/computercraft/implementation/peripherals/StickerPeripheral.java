@@ -10,55 +10,52 @@ import org.jetbrains.annotations.NotNull;
 
 public class StickerPeripheral extends SyncedPeripheral<StickerBlockEntity> {
 
-	public StickerPeripheral(StickerBlockEntity blockEntity) {
-		super(blockEntity);
-	}
+    public StickerPeripheral(StickerBlockEntity blockEntity) {
+        super(blockEntity);
+    }
 
-	@LuaFunction
-	public boolean isExtended() {
-		return blockEntity.isBlockStateExtended();
-	}
+    @LuaFunction
+    public boolean isExtended() {
+        return blockEntity.isBlockStateExtended();
+    }
 
-	@LuaFunction
-	public boolean isAttachedToBlock() {
-		return blockEntity.isBlockStateExtended() && blockEntity.isAttachedToBlock();
-	}
+    @LuaFunction
+    public boolean isAttachedToBlock() {
+        return blockEntity.isBlockStateExtended() && blockEntity.isAttachedToBlock();
+    }
 
-	@LuaFunction(mainThread = true)
-	public boolean extend() {
-		BlockState state = blockEntity.getCachedState();
-		if (!state.isOf(AllBlocks.STICKER) || state.get(StickerBlock.EXTENDED))
-			return false;
-		blockEntity.getWorld().setBlockState(
-				blockEntity.getPos(), state.with(StickerBlock.EXTENDED, true), Block.NOTIFY_LISTENERS);
-		return true;
-	}
+    @LuaFunction(mainThread = true)
+    public boolean extend() {
+        BlockState state = blockEntity.getCachedState();
+        if (!state.isOf(AllBlocks.STICKER) || state.get(StickerBlock.EXTENDED))
+            return false;
+        blockEntity.getWorld().setBlockState(blockEntity.getPos(), state.with(StickerBlock.EXTENDED, true), Block.NOTIFY_LISTENERS);
+        return true;
+    }
 
-	@LuaFunction(mainThread = true)
-	public boolean retract() {
-		BlockState state = blockEntity.getCachedState();
-		if (!state.isOf(AllBlocks.STICKER) || !state.get(StickerBlock.EXTENDED))
-			return false;
-		blockEntity.getWorld().setBlockState(
-				blockEntity.getPos(), state.with(StickerBlock.EXTENDED, false), Block.NOTIFY_LISTENERS);
-		return true;
-	}
+    @LuaFunction(mainThread = true)
+    public boolean retract() {
+        BlockState state = blockEntity.getCachedState();
+        if (!state.isOf(AllBlocks.STICKER) || !state.get(StickerBlock.EXTENDED))
+            return false;
+        blockEntity.getWorld().setBlockState(blockEntity.getPos(), state.with(StickerBlock.EXTENDED, false), Block.NOTIFY_LISTENERS);
+        return true;
+    }
 
-	@LuaFunction(mainThread = true)
-	public boolean toggle() {
-		BlockState state = blockEntity.getCachedState();
-		if (!state.isOf(AllBlocks.STICKER))
-			return false;
-		boolean extended = state.get(StickerBlock.EXTENDED);
-		blockEntity.getWorld().setBlockState(
-				blockEntity.getPos(), state.with(StickerBlock.EXTENDED, !extended), Block.NOTIFY_LISTENERS);
-		return true;
-	}
+    @LuaFunction(mainThread = true)
+    public boolean toggle() {
+        BlockState state = blockEntity.getCachedState();
+        if (!state.isOf(AllBlocks.STICKER))
+            return false;
+        boolean extended = state.get(StickerBlock.EXTENDED);
+        blockEntity.getWorld().setBlockState(blockEntity.getPos(), state.with(StickerBlock.EXTENDED, !extended), Block.NOTIFY_LISTENERS);
+        return true;
+    }
 
-	@NotNull
-	@Override
-	public String getType() {
-		return "Create_Sticker";
-	}
+    @NotNull
+    @Override
+    public String getType() {
+        return "Create_Sticker";
+    }
 
 }

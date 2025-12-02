@@ -21,7 +21,6 @@ import net.minecraft.text.Text;
 import net.minecraft.text.TextCodecs;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
-import org.apache.http.util.ByteArrayBuffer;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -175,8 +174,8 @@ public class NixieTubeBlockEntity extends SmartBlockEntity {
         if (signalState != null || computerSignal != null)
             return;
         customText.map(Text::getString).ifPresentOrElse(
-                fullText -> displayedStrings = Couple.create(charOrEmpty(fullText, nixieIndex * 2), charOrEmpty(fullText, nixieIndex * 2 + 1)),
-                () -> displayedStrings = Couple.create(redstoneStrength < 10 ? "0" : "1", String.valueOf(redstoneStrength % 10))
+            fullText -> displayedStrings = Couple.create(charOrEmpty(fullText, nixieIndex * 2), charOrEmpty(fullText, nixieIndex * 2 + 1)),
+            () -> displayedStrings = Couple.create(redstoneStrength < 10 ? "0" : "1", String.valueOf(redstoneStrength % 10))
         );
     }
 
@@ -196,18 +195,20 @@ public class NixieTubeBlockEntity extends SmartBlockEntity {
         super.read(view, clientPacket);
 
         view.read("CustomText", TextCodecs.CODEC).ifPresentOrElse(
-                text -> {
-                    customText = Optional.of(text);
-                    nixieIndex = view.getInt("CustomTextIndex", 0);
-                }, () -> redstoneStrength = view.getInt("RedstoneStrength", 0)
+            text -> {
+                customText = Optional.of(text);
+                nixieIndex = view.getInt("CustomTextIndex", 0);
+            }, () -> redstoneStrength = view.getInt("RedstoneStrength", 0)
         );
         if (clientPacket || isVirtual()) {
-            view.read("ComputerSignal", Codec.BYTE_BUFFER).ifPresentOrElse(t -> {
-                byte[] encodedComputerSignal = t.array();
-                if (computerSignal == null)
-                    computerSignal = new ComputerSignal();
-                computerSignal.decode(encodedComputerSignal);
-            }, () -> computerSignal = null);
+            view.read("ComputerSignal", Codec.BYTE_BUFFER).ifPresentOrElse(
+                t -> {
+                    byte[] encodedComputerSignal = t.array();
+                    if (computerSignal == null)
+                        computerSignal = new ComputerSignal();
+                    computerSignal.decode(encodedComputerSignal);
+                }, () -> computerSignal = null
+            );
             updateDisplayedStrings();
         }
     }
@@ -217,10 +218,10 @@ public class NixieTubeBlockEntity extends SmartBlockEntity {
         super.write(view, clientPacket);
 
         customText.ifPresentOrElse(
-                text -> {
-                    view.putInt("CustomTextIndex", nixieIndex);
-                    view.put("CustomText", TextCodecs.CODEC, text);
-                }, () -> view.putInt("RedstoneStrength", redstoneStrength)
+            text -> {
+                view.putInt("CustomTextIndex", nixieIndex);
+                view.put("CustomText", TextCodecs.CODEC, text);
+            }, () -> view.putInt("RedstoneStrength", redstoneStrength)
         );
         if (clientPacket && computerSignal != null) {
             view.put("ComputerSignal", Codec.BYTE_BUFFER, ByteBuffer.wrap(computerSignal.encode()));

@@ -55,11 +55,11 @@ public class NixieTubeRenderer implements BlockEntityRenderer<NixieTubeBlockEnti
 
     @Override
     public void updateRenderState(
-            NixieTubeBlockEntity be,
-            NixieTubeRenderState state,
-            float tickProgress,
-            Vec3d cameraPos,
-            @Nullable ModelCommandRenderer.CrumblingOverlayCommand crumblingOverlay
+        NixieTubeBlockEntity be,
+        NixieTubeRenderState state,
+        float tickProgress,
+        Vec3d cameraPos,
+        @Nullable ModelCommandRenderer.CrumblingOverlayCommand crumblingOverlay
     ) {
         BlockEntityRenderState.updateBlockEntityRenderState(be, state, crumblingOverlay);
         if (be.signalState != null || be.computerSignal != null) {
@@ -197,8 +197,8 @@ public class NixieTubeRenderer implements BlockEntityRenderer<NixieTubeBlockEnti
                     right.cubeLayer = right.layer;
                     right.cube = CachedBuffers.partial(AllPartialModels.SIGNAL_WHITE_CUBE, state.blockState);
                     right.glow = CachedBuffers.partial(
-                            yellow ? AllPartialModels.SIGNAL_YELLOW_GLOW : AllPartialModels.SIGNAL_WHITE_GLOW,
-                            state.blockState
+                        yellow ? AllPartialModels.SIGNAL_YELLOW_GLOW : AllPartialModels.SIGNAL_WHITE_GLOW,
+                        state.blockState
                     );
                     if (vert) {
                         right.cubeX = longSide;
@@ -220,8 +220,7 @@ public class NixieTubeRenderer implements BlockEntityRenderer<NixieTubeBlockEnti
             }
         } else if (be.computerSignal != null) {
             for (boolean first : Iterate.trueAndFalse) {
-                NixieTubeBlockEntity.ComputerSignal.TubeDisplay tubeDisplay = first ?
-                        be.computerSignal.first : be.computerSignal.second;
+                NixieTubeBlockEntity.ComputerSignal.TubeDisplay tubeDisplay = first ? be.computerSignal.first : be.computerSignal.second;
 
                 SignalDrawableState cState = new SignalDrawableState();
                 if (first)
@@ -242,9 +241,9 @@ public class NixieTubeRenderer implements BlockEntityRenderer<NixieTubeBlockEnti
                 cState.additive = true;
                 if (distance < 9216) {
                     cState.glowColor = new Color(
-                            Math.min(((tubeDisplay.r & 0xFF) * 6 + 256) >> 3, 255),
-                            Math.min(((tubeDisplay.g & 0xFF) * 6 + 256) >> 3, 255),
-                            Math.min(((tubeDisplay.b & 0xFF) * 6 + 256) >> 3, 255)
+                        Math.min(((tubeDisplay.r & 0xFF) * 6 + 256) >> 3, 255),
+                        Math.min(((tubeDisplay.g & 0xFF) * 6 + 256) >> 3, 255),
+                        Math.min(((tubeDisplay.b & 0xFF) * 6 + 256) >> 3, 255)
                     );
                     cState.cubeLayer = RenderTypes.translucent();
                     cState.cube = CachedBuffers.partial(AllPartialModels.SIGNAL_COMPUTER_WHITE_CUBE, state.blockState);
@@ -272,16 +271,16 @@ public class NixieTubeRenderer implements BlockEntityRenderer<NixieTubeBlockEnti
 
     public static void drawInWorldString(TextRenderer fontRenderer, MatrixStack ms, VertexConsumerProvider buffer, String c, int color) {
         fontRenderer.draw(
-                c,
-                0,
-                0,
-                color,
-                false,
-                ms.peek().getPositionMatrix(),
-                buffer,
-                TextLayerType.NORMAL,
-                0,
-                LightmapTextureManager.MAX_LIGHT_COORDINATE
+            c,
+            0,
+            0,
+            color,
+            false,
+            ms.peek().getPositionMatrix(),
+            buffer,
+            TextLayerType.NORMAL,
+            0,
+            LightmapTextureManager.MAX_LIGHT_COORDINATE
         );
     }
 
@@ -345,7 +344,7 @@ public class NixieTubeRenderer implements BlockEntityRenderer<NixieTubeBlockEnti
     }
 
     public record TextDrawableState(
-            RenderLayer layer, float x, int y, TextDrawable bright, TextDrawable dark, TextDrawable mix
+        RenderLayer layer, float x, int y, TextDrawable bright, TextDrawable dark, TextDrawable mix
     ) implements OrderedRenderCommandQueue.Custom {
         @Override
         public void render(MatrixStack.Entry matricesEntry, VertexConsumer vertexConsumer) {

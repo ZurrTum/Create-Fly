@@ -28,11 +28,12 @@ public class NixieTubePeripheral extends SyncedPeripheral<NixieTubeBlockEntity> 
         World world = blockEntity.getWorld();
         if (world == null)
             return;
-        NixieTubeBlock.walkNixies(world, blockEntity.getPos(), true,
-                (currentPos, rowPosition) -> {
-                    if (world.getBlockEntity(currentPos) instanceof NixieTubeBlockEntity ntbe)
-                        ntbe.displayEmptyText(rowPosition);
-                });
+        NixieTubeBlock.walkNixies(
+            world, blockEntity.getPos(), true, (currentPos, rowPosition) -> {
+                if (world.getBlockEntity(currentPos) instanceof NixieTubeBlockEntity ntbe)
+                    ntbe.displayEmptyText(rowPosition);
+            }
+        );
     }
 
     @Override
@@ -49,12 +50,13 @@ public class NixieTubePeripheral extends SyncedPeripheral<NixieTubeBlockEntity> 
         BlockState state = world.getBlockState(blockEntity.getPos());
         if (!(state.getBlock() instanceof NixieTubeBlock))
             return;
-        NixieTubeBlock.walkNixies(world, blockEntity.getPos(), false,
-                (currentPos, rowPosition) -> {
-                    if (world.getBlockEntity(currentPos) instanceof NixieTubeBlockEntity ntbe) {
-                        NixieTubeBlock.updateDisplayedRedstoneValue(ntbe, state, true);
-                    }
-                });
+        NixieTubeBlock.walkNixies(
+            world, blockEntity.getPos(), false, (currentPos, rowPosition) -> {
+                if (world.getBlockEntity(currentPos) instanceof NixieTubeBlockEntity ntbe) {
+                    NixieTubeBlock.updateDisplayedRedstoneValue(ntbe, state, true);
+                }
+            }
+        );
     }
 
     @LuaFunction(mainThread = true)
@@ -64,7 +66,7 @@ public class NixieTubePeripheral extends SyncedPeripheral<NixieTubeBlockEntity> 
             return;
         blockEntity.computerSignal = null;
         Text tagElement = Text.of(arguments.getString(0));
-//        Text tagElement = Component.Serializer.toJson(Component.literal(arguments.getString(0)), level.registryAccess());
+        //        Text tagElement = Component.Serializer.toJson(Component.literal(arguments.getString(0)), level.registryAccess());
 
         @Nullable String colour = arguments.optString(1, null);
         BlockState state = null;
@@ -96,13 +98,18 @@ public class NixieTubePeripheral extends SyncedPeripheral<NixieTubeBlockEntity> 
         World world = blockEntity.getWorld();
         if (world == null)
             return;
-        NixieTubeBlock.walkNixies(world, blockEntity.getPos(), true, (currentPos, rowPosition) -> {
-            if (tagElement != null)
-                ((NixieTubeBlock) blockEntity.getCachedState().getBlock()).withBlockEntityDo(
-                        world, currentPos, be -> be.displayCustomText(tagElement, rowPosition));
-            if (state != null && dye != null)
-                world.setBlockState(currentPos, NixieTubeBlock.withColor(state, dye));
-        });
+        NixieTubeBlock.walkNixies(
+            world, blockEntity.getPos(), true, (currentPos, rowPosition) -> {
+                if (tagElement != null)
+                    ((NixieTubeBlock) blockEntity.getCachedState().getBlock()).withBlockEntityDo(
+                        world,
+                        currentPos,
+                        be -> be.displayCustomText(tagElement, rowPosition)
+                    );
+                if (state != null && dye != null)
+                    world.setBlockState(currentPos, NixieTubeBlock.withColor(state, dye));
+            }
+        );
     }
 
     @LuaFunction(mainThread = true)
@@ -113,8 +120,7 @@ public class NixieTubePeripheral extends SyncedPeripheral<NixieTubeBlockEntity> 
             setSignal(signal().second, arguments.getTable(1));
     }
 
-    private void setSignal(NixieTubeBlockEntity.ComputerSignal.TubeDisplay display, @NotNull Map<?, ?> attrs)
-            throws LuaException {
+    private void setSignal(NixieTubeBlockEntity.ComputerSignal.TubeDisplay display, @NotNull Map<?, ?> attrs) throws LuaException {
         if (attrs.containsKey("r"))
             display.r = constrainByte("r", 0, 255, attrs.get("r"));
         if (attrs.containsKey("g"))

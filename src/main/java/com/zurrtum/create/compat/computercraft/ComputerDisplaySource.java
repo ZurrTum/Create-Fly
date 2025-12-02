@@ -12,21 +12,21 @@ import java.util.List;
 
 public class ComputerDisplaySource extends DisplaySource {
 
-	@Override
-	public List<MutableText> provideText(DisplayLinkContext context, DisplayTargetStats stats) {
-		List<MutableText> components = new ArrayList<>();
+    @Override
+    public List<MutableText> provideText(DisplayLinkContext context, DisplayTargetStats stats) {
+        List<MutableText> components = new ArrayList<>();
         NbtList tag = context.sourceConfig().getList("ComputerSourceList").orElse(new NbtList());
 
-		for (int i = 0; i < tag.size(); i++) {
-			components.add(Text.literal(tag.getString(i).get()));
-		}
+        for (int i = 0; i < tag.size(); i++) {
+            components.add(Text.literal(tag.getString(i).get()));
+        }
 
-		return components;
-	}
+        return components;
+    }
 
-	@Override
-	public boolean shouldPassiveReset() {
-		return false;
-	}
+    @Override
+    public boolean shouldPassiveReset() {
+        return false;
+    }
 
 }

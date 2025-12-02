@@ -181,8 +181,7 @@ public class NixieTubeBlock extends DoubleFaceAttachedBlock implements IBE<Nixie
                 break;
             // If computer-controlled nixie walking is disallowed, presence of any (same-color)
             // controlled nixies aborts the entire nixie walk.
-            if (!allowComputerControlled && world.getBlockEntity(nextPos) instanceof NixieTubeBlockEntity ntbe &&
-                ntbe.computerBehaviour.hasAttachedComputer()) {
+            if (!allowComputerControlled && world.getBlockEntity(nextPos) instanceof NixieTubeBlockEntity ntbe && ntbe.computerBehaviour.hasAttachedComputer()) {
                 return false;
             }
             currentPos = nextPos;

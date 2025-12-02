@@ -7,27 +7,27 @@ import org.jetbrains.annotations.NotNull;
 
 public class SpeedControllerPeripheral extends SyncedPeripheral<SpeedControllerBlockEntity> {
 
-	private final ServerScrollValueBehaviour targetSpeed;
+    private final ServerScrollValueBehaviour targetSpeed;
 
-	public SpeedControllerPeripheral(SpeedControllerBlockEntity blockEntity, ServerScrollValueBehaviour targetSpeed) {
-		super(blockEntity);
-		this.targetSpeed = targetSpeed;
-	}
+    public SpeedControllerPeripheral(SpeedControllerBlockEntity blockEntity, ServerScrollValueBehaviour targetSpeed) {
+        super(blockEntity);
+        this.targetSpeed = targetSpeed;
+    }
 
-	@LuaFunction(mainThread = true)
-	public final void setTargetSpeed(int speed) {
-		this.targetSpeed.setValue(speed);
-	}
+    @LuaFunction(mainThread = true)
+    public final void setTargetSpeed(int speed) {
+        this.targetSpeed.setValue(speed);
+    }
 
-	@LuaFunction
-	public final float getTargetSpeed() {
-		return this.targetSpeed.getValue();
-	}
+    @LuaFunction
+    public final float getTargetSpeed() {
+        return this.targetSpeed.getValue();
+    }
 
-	@NotNull
-	@Override
-	public String getType() {
-		return "Create_RotationSpeedController";
-	}
+    @NotNull
+    @Override
+    public String getType() {
+        return "Create_RotationSpeedController";
+    }
 
 }

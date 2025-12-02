@@ -99,7 +99,7 @@ public class StationBlockEntity extends SmartBlockEntity implements Transformabl
         behaviours.add(edgePoint = new TrackTargetingBehaviour<>(this, EdgePointType.STATION));
         behaviours.add(doorControls = new DoorControlBehaviour(this));
         behaviours.add(depotBehaviour = new DepotBehaviour(this).onlyAccepts(stack -> stack.isOf(AllItems.SCHEDULE))
-                .withCallback(s -> applyAutoSchedule()));
+            .withCallback(s -> applyAutoSchedule()));
         depotBehaviour.addSubBehaviours(behaviours);
         behaviours.add(computerBehaviour = ComputerCraftProxy.behaviour(this));
     }
@@ -123,19 +123,19 @@ public class StationBlockEntity extends SmartBlockEntity implements Transformabl
         if (!clientPacket)
             return;
         view.read("ImminentTrain", Uuids.INT_STREAM_CODEC).ifPresentOrElse(
-                uuid -> {
-                    imminentTrain = uuid;
-                    trainPresent = view.getBoolean("TrainPresent", false);
-                    trainCanDisassemble = view.getBoolean("TrainCanDisassemble", false);
-                    trainBackwards = view.getBoolean("TrainBackwards", false);
-                    trainHasSchedule = view.getBoolean("TrainHasSchedule", false);
-                    trainHasAutoSchedule = view.getBoolean("TrainHasAutoSchedule", false);
-                }, () -> {
-                    imminentTrain = null;
-                    trainPresent = false;
-                    trainCanDisassemble = false;
-                    trainBackwards = false;
-                }
+            uuid -> {
+                imminentTrain = uuid;
+                trainPresent = view.getBoolean("TrainPresent", false);
+                trainCanDisassemble = view.getBoolean("TrainCanDisassemble", false);
+                trainBackwards = view.getBoolean("TrainBackwards", false);
+                trainHasSchedule = view.getBoolean("TrainHasSchedule", false);
+                trainHasAutoSchedule = view.getBoolean("TrainHasAutoSchedule", false);
+            }, () -> {
+                imminentTrain = null;
+                trainPresent = false;
+                trainCanDisassemble = false;
+                trainBackwards = false;
+            }
         );
     }
 
@@ -234,16 +234,15 @@ public class StationBlockEntity extends SmartBlockEntity implements Transformabl
 
         if (!world.isClient() && computerBehaviour.hasAttachedComputer()) {
             if (this.imminentTrain == null && imminentTrain != null)
-                computerBehaviour.prepareComputerEvent(
-                        new StationTrainPresenceEvent(StationTrainPresenceEvent.Type.IMMINENT, imminentTrain));
+                computerBehaviour.prepareComputerEvent(new StationTrainPresenceEvent(StationTrainPresenceEvent.Type.IMMINENT, imminentTrain));
             if (newlyArrived) {
                 if (trainPresent)
-                    computerBehaviour.prepareComputerEvent(
-                            new StationTrainPresenceEvent(StationTrainPresenceEvent.Type.ARRIVAL, imminentTrain));
+                    computerBehaviour.prepareComputerEvent(new StationTrainPresenceEvent(StationTrainPresenceEvent.Type.ARRIVAL, imminentTrain));
                 else
-                    computerBehaviour.prepareComputerEvent(
-                            new StationTrainPresenceEvent(StationTrainPresenceEvent.Type.DEPARTURE,
-                                    Create.RAILWAYS.trains.get(this.imminentTrain)));
+                    computerBehaviour.prepareComputerEvent(new StationTrainPresenceEvent(
+                        StationTrainPresenceEvent.Type.DEPARTURE,
+                        Create.RAILWAYS.trains.get(this.imminentTrain)
+                    ));
             }
         }
 
@@ -251,8 +250,8 @@ public class StationBlockEntity extends SmartBlockEntity implements Transformabl
             applyAutoSchedule();
 
         if (newlyArrived || this.trainCanDisassemble != canDisassemble || !Objects.equals(
-                imminentID,
-                this.imminentTrain
+            imminentID,
+            this.imminentTrain
         ) || this.trainHasSchedule != trainHasSchedule || this.trainHasAutoSchedule != trainHasAutoSchedule) {
 
             this.imminentTrain = imminentID;
@@ -310,9 +309,9 @@ public class StationBlockEntity extends SmartBlockEntity implements Transformabl
         }
 
         boolean upsideDown = (player.getLerpedPitch(1.0F) < 0 && (track.getBogeyAnchor(
-                world,
-                pos,
-                state
+            world,
+            pos,
+            state
         )).getBlock() instanceof AbstractBogeyBlock<?> bogey && bogey.canBeUpsideDown());
 
         BlockPos targetPos = upsideDown ? pos.add(down) : pos.add(up);
@@ -331,12 +330,12 @@ public class StationBlockEntity extends SmartBlockEntity implements Transformabl
         player.sendMessage(Text.translatable("create.train_assembly.bogey_created"), true);
         BlockSoundGroup soundtype = bogeyAnchor.getSoundGroup();
         world.playSound(
-                null,
-                pos,
-                soundtype.getPlaceSound(),
-                SoundCategory.BLOCKS,
-                (soundtype.getVolume() + 1.0F) / 2.0F,
-                soundtype.getPitch() * 0.8F
+            null,
+            pos,
+            soundtype.getPlaceSound(),
+            SoundCategory.BLOCKS,
+            (soundtype.getVolume() + 1.0F) / 2.0F,
+            soundtype.getPitch() * 0.8F
         );
 
         if (!player.isCreative()) {
@@ -536,7 +535,7 @@ public class StationBlockEntity extends SmartBlockEntity implements Transformabl
                     upsideDownBogeys[bogeyIndex] = false;
                     bogeyIndex++;
                 } else if ((potentialBogeyState = world.getBlockState(upsideDownBogeyOffset.add(currentPos))).getBlock() instanceof AbstractBogeyBlock<?> bogey && bogey.isUpsideDown(
-                        potentialBogeyState)) {
+                    potentialBogeyState)) {
                     bogeyTypes[bogeyIndex] = bogey;
                     bogeyLocations[bogeyIndex] = i;
                     upsideDownBogeys[bogeyIndex] = true;
@@ -732,11 +731,11 @@ public class StationBlockEntity extends SmartBlockEntity implements Transformabl
             try {
                 int offset = bogeyLocations[bogeyIndex] + 1;
                 boolean success = contraption.assemble(
-                        world,
-                        upsideDownBogeys[bogeyIndex] ? upsideDownBogeyPosOffset.offset(assemblyDirection, offset) : bogeyPosOffset.offset(
-                                assemblyDirection,
-                                offset
-                        )
+                    world,
+                    upsideDownBogeys[bogeyIndex] ? upsideDownBogeyPosOffset.offset(assemblyDirection, offset) : bogeyPosOffset.offset(
+                        assemblyDirection,
+                        offset
+                    )
                 );
                 atLeastOneForwardControls |= contraption.hasForwardControls();
                 contraption.setSoundQueueOffset(offset);
@@ -754,11 +753,11 @@ public class StationBlockEntity extends SmartBlockEntity implements Transformabl
             BlockPos firstBogeyPos = contraption.anchor;
             AbstractBogeyBlockEntity firstBogeyBlockEntity = (AbstractBogeyBlockEntity) world.getBlockEntity(firstBogeyPos);
             CarriageBogey firstBogey = new CarriageBogey(
-                    typeOfFirstBogey,
-                    firstBogeyIsUpsideDown,
-                    firstBogeyBlockEntity.getBogeyData(),
-                    points.get(pointIndex),
-                    points.get(pointIndex + 1)
+                typeOfFirstBogey,
+                firstBogeyIsUpsideDown,
+                firstBogeyBlockEntity.getBogeyData(),
+                points.get(pointIndex),
+                points.get(pointIndex + 1)
             );
             CarriageBogey secondBogey = null;
             BlockPos secondBogeyPos = contraption.getSecondBogeyPos();
@@ -766,7 +765,7 @@ public class StationBlockEntity extends SmartBlockEntity implements Transformabl
 
             if (secondBogeyPos != null) {
                 if (bogeyIndex == bogeyCount - 1 || !secondBogeyPos.equals((upsideDownBogeys[bogeyIndex + 1] ? upsideDownBogeyPosOffset : bogeyPosOffset).offset(assemblyDirection,
-                        bogeyLocations[bogeyIndex + 1] + 1
+                    bogeyLocations[bogeyIndex + 1] + 1
                 ))) {
                     exception(new AssemblyException(Text.translatable("create.train_assembly.not_connected_in_order")), contraptions.size() + 1);
                     return;
@@ -774,11 +773,11 @@ public class StationBlockEntity extends SmartBlockEntity implements Transformabl
                 AbstractBogeyBlockEntity secondBogeyBlockEntity = (AbstractBogeyBlockEntity) world.getBlockEntity(secondBogeyPos);
                 bogeySpacing = bogeyLocations[bogeyIndex + 1] - bogeyLocations[bogeyIndex];
                 secondBogey = new CarriageBogey(
-                        bogeyTypes[bogeyIndex + 1],
-                        upsideDownBogeys[bogeyIndex + 1],
-                        secondBogeyBlockEntity.getBogeyData(),
-                        points.get(pointIndex + 2),
-                        points.get(pointIndex + 3)
+                    bogeyTypes[bogeyIndex + 1],
+                    upsideDownBogeys[bogeyIndex + 1],
+                    secondBogeyBlockEntity.getBogeyData(),
+                    points.get(pointIndex + 2),
+                    points.get(pointIndex + 3)
                 );
                 bogeyIndex++;
 
@@ -802,13 +801,13 @@ public class StationBlockEntity extends SmartBlockEntity implements Transformabl
         }
 
         Train train = new Train(
-                UUID.randomUUID(),
-                playerUUID,
-                graph,
-                carriages,
-                spacing,
-                contraptions.stream().anyMatch(CarriageContraption::hasBackwardControls),
-                0
+            UUID.randomUUID(),
+            playerUUID,
+            graph,
+            carriages,
+            spacing,
+            contraptions.stream().anyMatch(CarriageContraption::hasBackwardControls),
+            0
         );
 
         if (lastDisassembledTrainName != null) {

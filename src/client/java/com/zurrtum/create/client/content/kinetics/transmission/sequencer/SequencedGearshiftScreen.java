@@ -49,8 +49,7 @@ public class SequencedGearshiftScreen extends AbstractSimiScreen implements Addi
     protected void init() {
         renderedItem = GuiGameElement.of(AllItems.SEQUENCED_GEARSHIFT.getDefaultStack()).scale(5);
         if (be.computerBehaviour.hasAttachedComputer())
-            ScreenOpener.open(
-                new ComputerScreen(title, this, this, be.computerBehaviour::hasAttachedComputer));
+            ScreenOpener.open(new ComputerScreen(title, this, this, be.computerBehaviour::hasAttachedComputer));
 
         setWindowSize(background.getWidth(), background.getHeight());
         setWindowOffset(-20, 0);

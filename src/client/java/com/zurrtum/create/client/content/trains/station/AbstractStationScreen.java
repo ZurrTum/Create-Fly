@@ -55,11 +55,11 @@ public abstract class AbstractStationScreen extends AbstractSimiScreen implement
         renderedItem = GuiGameElement.of(blockEntity.getCachedState().with(Properties.WATERLOGGED, false)).rotate(-22, 63, 0).scale(2.5F).padding(17);
         if (blockEntity.computerBehaviour.hasAttachedComputer()) {
             ScreenOpener.open(new ComputerScreen(
-                    title,
-                    () -> Text.literal(station.name),
-                    this,
-                    this,
-                    blockEntity.computerBehaviour::hasAttachedComputer
+                title,
+                () -> Text.literal(station.name),
+                this,
+                this,
+                blockEntity.computerBehaviour::hasAttachedComputer
             ));
         }
         setWindowSize(background.getWidth(), background.getHeight());
@@ -122,11 +122,11 @@ public abstract class AbstractStationScreen extends AbstractSimiScreen implement
         super.tick();
         if (blockEntity.computerBehaviour.hasAttachedComputer())
             ScreenOpener.open(new ComputerScreen(
-                    title,
-                    () -> Text.literal(station.name),
-                    this,
-                    this,
-                    blockEntity.computerBehaviour::hasAttachedComputer
+                title,
+                () -> Text.literal(station.name),
+                this,
+                this,
+                blockEntity.computerBehaviour::hasAttachedComputer
             ));
     }
 
@@ -149,7 +149,7 @@ public abstract class AbstractStationScreen extends AbstractSimiScreen implement
         }
 
         TransformStack.of(ms).rotateXDegrees(24).rotateYDegrees(-210).translate(-0.12F, -0.81F, 0).rotateYDegrees(90)
-                .rotateXDegrees(progress * 90 + 270);
+            .rotateXDegrees(progress * 90 + 270);
     }
 
     protected abstract PartialModel getFlag(float partialTicks);

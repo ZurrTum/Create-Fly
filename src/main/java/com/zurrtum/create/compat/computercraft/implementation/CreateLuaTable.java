@@ -10,154 +10,154 @@ import java.util.*;
 
 public class CreateLuaTable implements LuaTable<Object, Object> {
 
-	private final Map<Object, Object> map;
+    private final Map<Object, Object> map;
 
-	public CreateLuaTable() {
-		this.map = new HashMap<>();
-	}
+    public CreateLuaTable() {
+        this.map = new HashMap<>();
+    }
 
-	public CreateLuaTable(Map<?, ?> map) {
-		this.map = new HashMap<>(map);
-	}
+    public CreateLuaTable(Map<?, ?> map) {
+        this.map = new HashMap<>(map);
+    }
 
-	public boolean getBoolean(String key) throws LuaException {
-		Object value = get(key);
+    public boolean getBoolean(String key) throws LuaException {
+        Object value = get(key);
 
-		if (!(value instanceof Boolean))
-			throw LuaValues.badField(key, "boolean", LuaValues.getType(value));
+        if (!(value instanceof Boolean))
+            throw LuaValues.badField(key, "boolean", LuaValues.getType(value));
 
-		return (Boolean) value;
-	}
+        return (Boolean) value;
+    }
 
-	public String getString(String key) throws LuaException {
-		Object value = get(key);
+    public String getString(String key) throws LuaException {
+        Object value = get(key);
 
-		if (!(value instanceof String))
-			throw LuaValues.badField(key, "string", LuaValues.getType(value));
+        if (!(value instanceof String))
+            throw LuaValues.badField(key, "string", LuaValues.getType(value));
 
-		return (String) value;
-	}
+        return (String) value;
+    }
 
-	public CreateLuaTable getTable(String key) throws LuaException {
-		Object value = get(key);
+    public CreateLuaTable getTable(String key) throws LuaException {
+        Object value = get(key);
 
-		if (!(value instanceof Map<?, ?>))
-			throw LuaValues.badField(key, "table", LuaValues.getType(value));
+        if (!(value instanceof Map<?, ?>))
+            throw LuaValues.badField(key, "table", LuaValues.getType(value));
 
-		return new CreateLuaTable((Map<?, ?>) value);
-	}
+        return new CreateLuaTable((Map<?, ?>) value);
+    }
 
-	public Optional<Boolean> getOptBoolean(String key) throws LuaException {
-		Object value = get(key);
+    public Optional<Boolean> getOptBoolean(String key) throws LuaException {
+        Object value = get(key);
 
-		if (value == null)
-			return Optional.empty();
+        if (value == null)
+            return Optional.empty();
 
-		if (!(value instanceof Boolean))
-			throw LuaValues.badField(key, "boolean", LuaValues.getType(value));
+        if (!(value instanceof Boolean))
+            throw LuaValues.badField(key, "boolean", LuaValues.getType(value));
 
-		return Optional.of((Boolean) value);
-	}
+        return Optional.of((Boolean) value);
+    }
 
-	public Set<String> stringKeySet() throws LuaException {
-		Set<String> stringSet = new HashSet<>();
+    public Set<String> stringKeySet() throws LuaException {
+        Set<String> stringSet = new HashSet<>();
 
-		for (Object key : keySet()) {
-			if (!(key instanceof String))
-				throw new LuaException("key " + key + " is not string (got " + LuaValues.getType(key) + ")");
+        for (Object key : keySet()) {
+            if (!(key instanceof String))
+                throw new LuaException("key " + key + " is not string (got " + LuaValues.getType(key) + ")");
 
-			stringSet.add((String) key);
-		}
+            stringSet.add((String) key);
+        }
 
-		return Collections.unmodifiableSet(stringSet);
-	}
+        return Collections.unmodifiableSet(stringSet);
+    }
 
-	public Collection<CreateLuaTable> tableValues() throws LuaException {
-		List<CreateLuaTable> tables = new ArrayList<>();
+    public Collection<CreateLuaTable> tableValues() throws LuaException {
+        List<CreateLuaTable> tables = new ArrayList<>();
 
-		for (int i = 1; i <= size(); i++) {
-			Object value = get((double) i);
+        for (int i = 1; i <= size(); i++) {
+            Object value = get((double) i);
 
-			if (!(value instanceof Map<?, ?>))
-				throw new LuaException("value " + value + " is not table (got " + LuaValues.getType(value) + ")");
+            if (!(value instanceof Map<?, ?>))
+                throw new LuaException("value " + value + " is not table (got " + LuaValues.getType(value) + ")");
 
-			tables.add(new CreateLuaTable((Map<?, ?>) value));
-		}
+            tables.add(new CreateLuaTable((Map<?, ?>) value));
+        }
 
-		return Collections.unmodifiableList(tables);
-	}
+        return Collections.unmodifiableList(tables);
+    }
 
-	public Map<Object, Object> getMap() {
-		return map;
-	}
+    public Map<Object, Object> getMap() {
+        return map;
+    }
 
-	@Nullable
-	@Override
-	public Object put(Object key, Object value) {
-		return map.put(key, value);
-	}
+    @Nullable
+    @Override
+    public Object put(Object key, Object value) {
+        return map.put(key, value);
+    }
 
-	public void putBoolean(String key, boolean value) {
-		map.put(key, value);
-	}
+    public void putBoolean(String key, boolean value) {
+        map.put(key, value);
+    }
 
-	public void putDouble(String key, double value) {
-		map.put(key, value);
-	}
+    public void putDouble(String key, double value) {
+        map.put(key, value);
+    }
 
-	public void putString(String key, String value) {
-		map.put(key, value);
-	}
+    public void putString(String key, String value) {
+        map.put(key, value);
+    }
 
-	public void putTable(String key, CreateLuaTable value) {
-		map.put(key, value);
-	}
+    public void putTable(String key, CreateLuaTable value) {
+        map.put(key, value);
+    }
 
-	public void putTable(int i, CreateLuaTable value) {
-		map.put(i, value);
-	}
+    public void putTable(int i, CreateLuaTable value) {
+        map.put(i, value);
+    }
 
-	@Override
-	public int size() {
-		return map.size();
-	}
+    @Override
+    public int size() {
+        return map.size();
+    }
 
-	@Override
-	public boolean isEmpty() {
-		return map.isEmpty();
-	}
+    @Override
+    public boolean isEmpty() {
+        return map.isEmpty();
+    }
 
-	@Override
-	public boolean containsKey(Object o) {
-		return map.containsKey(o);
-	}
+    @Override
+    public boolean containsKey(Object o) {
+        return map.containsKey(o);
+    }
 
-	@Override
-	public boolean containsValue(Object o) {
-		return map.containsValue(o);
-	}
+    @Override
+    public boolean containsValue(Object o) {
+        return map.containsValue(o);
+    }
 
-	@Override
-	public Object get(Object o) {
-		return map.get(o);
-	}
+    @Override
+    public Object get(Object o) {
+        return map.get(o);
+    }
 
-	@NotNull
-	@Override
-	public Set<Object> keySet() {
-		return map.keySet();
-	}
+    @NotNull
+    @Override
+    public Set<Object> keySet() {
+        return map.keySet();
+    }
 
-	@NotNull
-	@Override
-	public Collection<Object> values() {
-		return map.values();
-	}
+    @NotNull
+    @Override
+    public Collection<Object> values() {
+        return map.values();
+    }
 
-	@NotNull
-	@Override
-	public Set<Entry<Object, Object>> entrySet() {
-		return map.entrySet();
-	}
+    @NotNull
+    @Override
+    public Set<Entry<Object, Object>> entrySet() {
+        return map.entrySet();
+    }
 
 }

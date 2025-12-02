@@ -14,117 +14,117 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class DisplayLinkPeripheral extends SyncedPeripheral<DisplayLinkBlockEntity> {
 
-	public static final String TAG_KEY = "ComputerSourceList";
-	private final AtomicInteger cursorX = new AtomicInteger();
-	private final AtomicInteger cursorY = new AtomicInteger();
+    public static final String TAG_KEY = "ComputerSourceList";
+    private final AtomicInteger cursorX = new AtomicInteger();
+    private final AtomicInteger cursorY = new AtomicInteger();
 
-	public DisplayLinkPeripheral(DisplayLinkBlockEntity blockEntity) {
-		super(blockEntity);
-	}
+    public DisplayLinkPeripheral(DisplayLinkBlockEntity blockEntity) {
+        super(blockEntity);
+    }
 
-	@LuaFunction
-	public final void setCursorPos(int x, int y) {
-		cursorX.set(x - 1);
-		cursorY.set(y - 1);
-	}
+    @LuaFunction
+    public final void setCursorPos(int x, int y) {
+        cursorX.set(x - 1);
+        cursorY.set(y - 1);
+    }
 
-	@LuaFunction
-	public final Object[] getCursorPos() {
-		return new Object[] {cursorX.get() + 1, cursorY.get() + 1};
-	}
+    @LuaFunction
+    public final Object[] getCursorPos() {
+        return new Object[]{cursorX.get() + 1, cursorY.get() + 1};
+    }
 
-	@LuaFunction(mainThread = true)
-	public final Object[] getSize() {
-		blockEntity.updateGatheredData();
-		DisplayTargetStats stats = blockEntity.activeTarget.provideStats(new DisplayLinkContext(blockEntity.getWorld(), blockEntity));
-		return new Object[]{stats.maxRows(), stats.maxColumns()};
-	}
+    @LuaFunction(mainThread = true)
+    public final Object[] getSize() {
+        blockEntity.updateGatheredData();
+        DisplayTargetStats stats = blockEntity.activeTarget.provideStats(new DisplayLinkContext(blockEntity.getWorld(), blockEntity));
+        return new Object[]{stats.maxRows(), stats.maxColumns()};
+    }
 
-	@LuaFunction
-	public final boolean isColor() {
-		return false;
-	}
+    @LuaFunction
+    public final boolean isColor() {
+        return false;
+    }
 
-	@LuaFunction
-	public final boolean isColour() {
-		return false;
-	}
+    @LuaFunction
+    public final boolean isColour() {
+        return false;
+    }
 
-	@LuaFunction
-	public final void write(String text) {
-		writeImpl(text);
-	}
+    @LuaFunction
+    public final void write(String text) {
+        writeImpl(text);
+    }
 
-	@LuaFunction
-	public final void writeBytes(IArguments args) throws LuaException {
-		Object data = args.get(0);
-		byte[] bytes;
-		if (data instanceof String str) {
-			bytes = str.getBytes(StandardCharsets.US_ASCII);
-		} else if (data instanceof Map<?, ?> map) {
-			ObjectLuaTable table = new ObjectLuaTable(map);
-			bytes = new byte[table.length()];
-			for (int i = 0; i < bytes.length; i++) {
-				bytes[i] = (byte) (table.getInt(i + 1) & 0xff);
-			}
-		} else {
-			throw LuaValues.badArgumentOf(args, 0, "string or table");
-		}
-		writeImpl(new String(bytes, StandardCharsets.UTF_8));
-	}
+    @LuaFunction
+    public final void writeBytes(IArguments args) throws LuaException {
+        Object data = args.get(0);
+        byte[] bytes;
+        if (data instanceof String str) {
+            bytes = str.getBytes(StandardCharsets.US_ASCII);
+        } else if (data instanceof Map<?, ?> map) {
+            ObjectLuaTable table = new ObjectLuaTable(map);
+            bytes = new byte[table.length()];
+            for (int i = 0; i < bytes.length; i++) {
+                bytes[i] = (byte) (table.getInt(i + 1) & 0xff);
+            }
+        } else {
+            throw LuaValues.badArgumentOf(args, 0, "string or table");
+        }
+        writeImpl(new String(bytes, StandardCharsets.UTF_8));
+    }
 
-	protected final void writeImpl(String text) {
-		NbtList tag = blockEntity.getSourceConfig().getList(TAG_KEY).orElse(new NbtList());
-
-		int x = cursorX.get();
-		int y = cursorY.get();
-
-		for (int i = tag.size(); i <= y; i++) {
-			tag.add(NbtString.of(""));
-		}
-
-		StringBuilder builder = new StringBuilder(tag.getString(y, ""));
-
-		builder.append(" ".repeat(Math.max(0, x - builder.length())));
-		builder.replace(x, x + text.length(), text);
-
-		tag.set(y, NbtString.of(builder.toString()));
-
-		synchronized (blockEntity) {
-			blockEntity.getSourceConfig().put(TAG_KEY, tag);
-		}
-
-		cursorX.set(x + text.length());
-	}
-
-	@LuaFunction
-	public final void clearLine() {
+    protected final void writeImpl(String text) {
         NbtList tag = blockEntity.getSourceConfig().getList(TAG_KEY).orElse(new NbtList());
 
-		if (tag.size() > cursorY.get())
-			tag.set(cursorY.get(), NbtString.of(""));
+        int x = cursorX.get();
+        int y = cursorY.get();
 
-		synchronized (blockEntity) {
-			blockEntity.getSourceConfig().put(TAG_KEY, tag);
-		}
-	}
+        for (int i = tag.size(); i <= y; i++) {
+            tag.add(NbtString.of(""));
+        }
 
-	@LuaFunction
-	public final void clear() {
-		synchronized (blockEntity) {
-			blockEntity.getSourceConfig().put(TAG_KEY, new NbtList());
-		}
-	}
+        StringBuilder builder = new StringBuilder(tag.getString(y, ""));
 
-	@LuaFunction(mainThread = true)
-	public final void update() {
-		blockEntity.tickSource();
-	}
+        builder.append(" ".repeat(Math.max(0, x - builder.length())));
+        builder.replace(x, x + text.length(), text);
 
-	@NotNull
-	@Override
-	public String getType() {
-		return "Create_DisplayLink";
-	}
+        tag.set(y, NbtString.of(builder.toString()));
+
+        synchronized (blockEntity) {
+            blockEntity.getSourceConfig().put(TAG_KEY, tag);
+        }
+
+        cursorX.set(x + text.length());
+    }
+
+    @LuaFunction
+    public final void clearLine() {
+        NbtList tag = blockEntity.getSourceConfig().getList(TAG_KEY).orElse(new NbtList());
+
+        if (tag.size() > cursorY.get())
+            tag.set(cursorY.get(), NbtString.of(""));
+
+        synchronized (blockEntity) {
+            blockEntity.getSourceConfig().put(TAG_KEY, tag);
+        }
+    }
+
+    @LuaFunction
+    public final void clear() {
+        synchronized (blockEntity) {
+            blockEntity.getSourceConfig().put(TAG_KEY, new NbtList());
+        }
+    }
+
+    @LuaFunction(mainThread = true)
+    public final void update() {
+        blockEntity.tickSource();
+    }
+
+    @NotNull
+    @Override
+    public String getType() {
+        return "Create_DisplayLink";
+    }
 
 }

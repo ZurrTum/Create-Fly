@@ -11,42 +11,40 @@ import org.jetbrains.annotations.NotNull;
 
 public class SequencedGearshiftPeripheral extends SyncedPeripheral<SequencedGearshiftBlockEntity> {
 
-	public SequencedGearshiftPeripheral(SequencedGearshiftBlockEntity blockEntity) {
-		super(blockEntity);
-	}
+    public SequencedGearshiftPeripheral(SequencedGearshiftBlockEntity blockEntity) {
+        super(blockEntity);
+    }
 
-	@LuaFunction(mainThread = true)
-	public final void rotate(IArguments arguments) throws LuaException {
-		runInstruction(arguments, SequencerInstructions.TURN_ANGLE);
-	}
+    @LuaFunction(mainThread = true)
+    public final void rotate(IArguments arguments) throws LuaException {
+        runInstruction(arguments, SequencerInstructions.TURN_ANGLE);
+    }
 
-	@LuaFunction(mainThread = true)
-	public final void move(IArguments arguments) throws LuaException {
-		runInstruction(arguments, SequencerInstructions.TURN_DISTANCE);
-	}
+    @LuaFunction(mainThread = true)
+    public final void move(IArguments arguments) throws LuaException {
+        runInstruction(arguments, SequencerInstructions.TURN_DISTANCE);
+    }
 
-	@LuaFunction
-	public final boolean isRunning() {
-		return !this.blockEntity.isIdle();
-	}
+    @LuaFunction
+    public final boolean isRunning() {
+        return !this.blockEntity.isIdle();
+    }
 
-	private void runInstruction(IArguments arguments, SequencerInstructions instructionType) throws LuaException {
-		int speedModifier = arguments.count() > 1 ? arguments.getInt(1) : 1;
-		this.blockEntity.getInstructions().clear();
+    private void runInstruction(IArguments arguments, SequencerInstructions instructionType) throws LuaException {
+        int speedModifier = arguments.count() > 1 ? arguments.getInt(1) : 1;
+        this.blockEntity.getInstructions().clear();
 
-		this.blockEntity.getInstructions().add(new Instruction(
-				instructionType,
-				InstructionSpeedModifiers.getByModifier(speedModifier),
-				Math.abs(arguments.getInt(0))));
-		this.blockEntity.getInstructions().add(new Instruction(SequencerInstructions.END));
+        this.blockEntity.getInstructions()
+            .add(new Instruction(instructionType, InstructionSpeedModifiers.getByModifier(speedModifier), Math.abs(arguments.getInt(0))));
+        this.blockEntity.getInstructions().add(new Instruction(SequencerInstructions.END));
 
-		this.blockEntity.run(0);
-	}
+        this.blockEntity.run(0);
+    }
 
-	@NotNull
-	@Override
-	public String getType() {
-		return "Create_SequencedGearshift";
-	}
+    @NotNull
+    @Override
+    public String getType() {
+        return "Create_SequencedGearshift";
+    }
 
 }

@@ -83,13 +83,13 @@ public class RedstoneRequesterBlockEntity extends StockCheckingBlockEntity imple
             }
             if (!allowPartialRequests && world instanceof ServerWorld serverLevel) {
                 serverLevel.getServer().getPlayerManager().sendToAround(
-                        null,
-                        pos.getX(),
-                        pos.getY(),
-                        pos.getZ(),
-                        32,
-                        serverLevel.getRegistryKey(),
-                        new RedstoneRequesterEffectPacket(pos, false)
+                    null,
+                    pos.getX(),
+                    pos.getY(),
+                    pos.getZ(),
+                    32,
+                    serverLevel.getRegistryKey(),
+                    new RedstoneRequesterEffectPacket(pos, false)
                 );
                 return;
             }
@@ -98,13 +98,13 @@ public class RedstoneRequesterBlockEntity extends StockCheckingBlockEntity imple
         broadcastPackageRequest(RequestType.REDSTONE, encodedRequest, null, encodedTargetAdress);
         if (world instanceof ServerWorld serverLevel)
             serverLevel.getServer().getPlayerManager().sendToAround(
-                    null,
-                    pos.getX(),
-                    pos.getY(),
-                    pos.getZ(),
-                    32,
-                    serverLevel.getRegistryKey(),
-                    new RedstoneRequesterEffectPacket(pos, anySucceeded)
+                null,
+                pos.getX(),
+                pos.getY(),
+                pos.getZ(),
+                32,
+                serverLevel.getRegistryKey(),
+                new RedstoneRequesterEffectPacket(pos, anySucceeded)
             );
         lastRequestSucceeded = true;
     }

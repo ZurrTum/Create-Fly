@@ -5,12 +5,12 @@ import org.jetbrains.annotations.NotNull;
 
 public class TrainPassEvent implements ComputerEvent {
 
-	public @NotNull Train train;
-	public boolean passing;
+    public @NotNull Train train;
+    public boolean passing;
 
-	public TrainPassEvent(@NotNull Train train, boolean passing) {
-		this.train = train;
-		this.passing = passing;
-	}
+    public TrainPassEvent(@NotNull Train train, boolean passing) {
+        this.train = train;
+        this.passing = passing;
+    }
 
 }

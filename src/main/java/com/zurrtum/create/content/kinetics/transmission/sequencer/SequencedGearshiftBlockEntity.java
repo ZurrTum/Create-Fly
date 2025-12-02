@@ -34,8 +34,8 @@ public class SequencedGearshiftBlockEntity extends SplitShaftBlockEntity {
 
     public record SequenceContext(SequencerInstructions instruction, double relativeValue) {
         public static Codec<SequenceContext> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-                SequencerInstructions.CODEC.fieldOf("Mode").forGetter(SequenceContext::instruction),
-                Codec.DOUBLE.fieldOf("Value").forGetter(SequenceContext::relativeValue)
+            SequencerInstructions.CODEC.fieldOf("Mode").forGetter(SequenceContext::instruction),
+            Codec.DOUBLE.fieldOf("Value").forGetter(SequenceContext::relativeValue)
         ).apply(instance, SequenceContext::new));
 
         public static SequenceContext fromGearshift(SequencerInstructions instruction, double kineticSpeed, int absoluteValue) {
@@ -206,10 +206,10 @@ public class SequencedGearshiftBlockEntity extends SplitShaftBlockEntity {
         poweredPreviously = view.getBoolean("PrevPowered", false);
         timer = view.getInt("Timer", 0);
         view.getOptionalTypedListView("Instructions", Instruction.CODEC).ifPresentOrElse(
-                list -> {
-                    instructions = new Vector<>(5);
-                    list.forEach(instructions::add);
-                }, () -> instructions = Instruction.createDefault()
+            list -> {
+                instructions = new Vector<>(5);
+                list.forEach(instructions::add);
+            }, () -> instructions = Instruction.createDefault()
         );
         super.read(view, clientPacket);
     }

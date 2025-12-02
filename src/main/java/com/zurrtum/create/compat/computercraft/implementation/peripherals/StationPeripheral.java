@@ -22,7 +22,6 @@ import net.minecraft.nbt.*;
 import net.minecraft.storage.NbtReadView;
 import net.minecraft.storage.NbtWriteView;
 import net.minecraft.storage.ReadView;
-import net.minecraft.storage.WriteView;
 import net.minecraft.text.Text;
 import net.minecraft.util.ErrorReporter;
 import org.jetbrains.annotations.NotNull;
@@ -131,7 +130,8 @@ public class StationPeripheral extends SyncedPeripheral<StationBlockEntity> {
     public final void setTrainName(String name) throws LuaException {
         Train train = getTrainOrThrow();
         train.name = Text.literal(name);
-        blockEntity.getWorld().getServer().getPlayerManager().sendToAll((new TrainEditReturnPacket(train.id, name, train.icon.id(), train.mapColorIndex)));
+        blockEntity.getWorld().getServer().getPlayerManager()
+            .sendToAll((new TrainEditReturnPacket(train.id, name, train.icon.id(), train.mapColorIndex)));
     }
 
     @LuaFunction
@@ -149,8 +149,7 @@ public class StationPeripheral extends SyncedPeripheral<StationBlockEntity> {
             throw new LuaException("train doesn't have a schedule");
         NbtWriteView writeView;
         try (ErrorReporter.Logging logging = new ErrorReporter.Logging(() -> "StationPeripheral", Create.LOGGER)) {
-            writeView = NbtWriteView.create(logging,
-                    blockEntity.getWorld().getRegistryManager());
+            writeView = NbtWriteView.create(logging, blockEntity.getWorld().getRegistryManager());
             schedule.write(writeView);
         }
         return fromCompoundTag(writeView.getNbt());
@@ -162,9 +161,11 @@ public class StationPeripheral extends SyncedPeripheral<StationBlockEntity> {
 
         ReadView readView;
         try (ErrorReporter.Logging logging = new ErrorReporter.Logging(() -> "StationPeripheral", Create.LOGGER)) {
-            readView = NbtReadView.create(logging,
-                    blockEntity.getWorld().getRegistryManager(),
-                    toCompoundTag(new CreateLuaTable(arguments.getTable(0))));
+            readView = NbtReadView.create(
+                logging,
+                blockEntity.getWorld().getRegistryManager(),
+                toCompoundTag(new CreateLuaTable(arguments.getTable(0)))
+            );
         }
 
         Schedule schedule = Schedule.read(readView);
@@ -263,10 +264,7 @@ public class StationPeripheral extends SyncedPeripheral<StationBlockEntity> {
             NbtCompound compoundTag = tag.asCompound().get();
 
             for (String compoundKey : compoundTag.getKeys()) {
-                table.put(
-                        StringHelper.camelCaseToSnakeCase(compoundKey),
-                        fromNBTTag(compoundKey, compoundTag.get(compoundKey))
-                );
+                table.put(StringHelper.camelCaseToSnakeCase(compoundKey), fromNBTTag(compoundKey, compoundTag.get(compoundKey)));
             }
 
             return table;
@@ -309,11 +307,11 @@ public class StationPeripheral extends SyncedPeripheral<StationBlockEntity> {
                     throw new LuaException("table key is not of type string");
 
                 compound.put(
-                        // Items serialize their resource location as "id" and not as "Id".
-                        // This check is needed to see if the 'i' should be left lowercase or not.
-                        // Items store "count" in the same compound tag, so we can check for its presence to see if this is a serialized item
-                        compoundKey.equals("id") && v.containsKey("count") ? "id" : StringHelper.snakeCaseToCamelCase(compoundKey),
-                        toNBTTag(compoundKey, v.get(compoundKey))
+                    // Items serialize their resource location as "id" and not as "Id".
+                    // This check is needed to see if the 'i' should be left lowercase or not.
+                    // Items store "count" in the same compound tag, so we can check for its presence to see if this is a serialized item
+                    compoundKey.equals("id") && v.containsKey("count") ? "id" : StringHelper.snakeCaseToCamelCase(compoundKey),
+                    toNBTTag(compoundKey, v.get(compoundKey))
                 );
             }
 

@@ -224,20 +224,20 @@ public class StockTickerBlockEntity extends StockCheckingBlockEntity {
     }
 
     public StockKeeperCategoryMenu createCategoryMenu(
-            int pContainerId,
-            PlayerInventory pPlayerInventory,
-            PlayerEntity pPlayer,
-            RegistryByteBuf extraData
+        int pContainerId,
+        PlayerInventory pPlayerInventory,
+        PlayerEntity pPlayer,
+        RegistryByteBuf extraData
     ) {
         extraData.writeBlockPos(pos);
         return new StockKeeperCategoryMenu(pContainerId, pPlayerInventory, StockTickerBlockEntity.this);
     }
 
     public StockKeeperRequestMenu createRequestMenu(
-            int pContainerId,
-            PlayerInventory pPlayerInventory,
-            PlayerEntity pPlayer,
-            RegistryByteBuf extraData
+        int pContainerId,
+        PlayerInventory pPlayerInventory,
+        PlayerEntity pPlayer,
+        RegistryByteBuf extraData
     ) {
         boolean showLockOption = behaviour.mayAdministrate(pPlayer) && Create.LOGISTICS.isLockable(behaviour.freqId);
         boolean isCurrentlyLocked = Create.LOGISTICS.isLocked(behaviour.freqId);

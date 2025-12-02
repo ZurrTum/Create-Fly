@@ -14,64 +14,67 @@ import java.util.List;
 
 public abstract class SyncedPeripheral<T extends SmartBlockEntity> implements IPeripheral {
 
-	protected final T blockEntity;
-	private final List<@NotNull IComputerAccess> computers = new ArrayList<>();
+    protected final T blockEntity;
+    private final List<@NotNull IComputerAccess> computers = new ArrayList<>();
 
-	public SyncedPeripheral(T blockEntity) {
-		this.blockEntity = blockEntity;
-	}
+    public SyncedPeripheral(T blockEntity) {
+        this.blockEntity = blockEntity;
+    }
 
-	@Override
-	public void attach(@NotNull IComputerAccess computer) {
-		synchronized (computers) {
-			computers.add(computer);
-			if (computers.size() == 1)
-				onFirstAttach();
-			updateBlockEntity();
-		}
-	}
+    @Override
+    public void attach(@NotNull IComputerAccess computer) {
+        synchronized (computers) {
+            computers.add(computer);
+            if (computers.size() == 1)
+                onFirstAttach();
+            updateBlockEntity();
+        }
+    }
 
-	protected void onFirstAttach() {}
+    protected void onFirstAttach() {
+    }
 
-	@Override
-	public void detach(@NotNull IComputerAccess computer) {
-		synchronized (computers) {
-			computers.remove(computer);
-			updateBlockEntity();
-			if (computers.isEmpty())
-				onLastDetach();
-		}
-	}
+    @Override
+    public void detach(@NotNull IComputerAccess computer) {
+        synchronized (computers) {
+            computers.remove(computer);
+            updateBlockEntity();
+            if (computers.isEmpty())
+                onLastDetach();
+        }
+    }
 
-	protected void onLastDetach() {}
+    protected void onLastDetach() {
+    }
 
-	private void updateBlockEntity() {
-		boolean hasAttachedComputer = !computers.isEmpty();
+    private void updateBlockEntity() {
+        boolean hasAttachedComputer = !computers.isEmpty();
 
-		blockEntity.getBehaviour(ComputerBehaviour.TYPE).setHasAttachedComputer(hasAttachedComputer);
+        blockEntity.getBehaviour(ComputerBehaviour.TYPE).setHasAttachedComputer(hasAttachedComputer);
         blockEntity.getWorld().getServer().getPlayerManager().sendToAll(new AttachedComputerPacket(blockEntity.getPos(), hasAttachedComputer));
-	}
+    }
 
-	@Override
-	public boolean equals(@Nullable IPeripheral other) {
-		return this == other;
-	}
+    @Override
+    public boolean equals(@Nullable IPeripheral other) {
+        return this == other;
+    }
 
-	public void prepareComputerEvent(@NotNull ComputerEvent event) {}
+    public void prepareComputerEvent(@NotNull ComputerEvent event) {
+    }
 
-	/**
-	 * Queue an event to all attached computers. Adds the peripheral attachment name as 1st event argument, followed by
-	 * any optional arguments passed to this method.
-	 */
-	protected void queueEvent(@NotNull String event, @Nullable Object... arguments) {
-		Object[] sourceAndArgs = new Object[arguments.length + 1];
-		System.arraycopy(arguments, 0, sourceAndArgs, 1, arguments.length);
-		synchronized (computers) {
-			for (IComputerAccess computer : computers) {
-				sourceAndArgs[0] = computer.getAttachmentName();
-				computer.queueEvent(event, sourceAndArgs);
-			}
-		}
-	}
+    /**
+     * Queue an event to all attached computers. Adds the peripheral attachment name as 1st event argument, followed by
+     * any optional arguments passed to this method.
+     */
+    protected void queueEvent(@NotNull String event, @Nullable Object... arguments) {
+        Object[] sourceAndArgs = new Object[arguments.length + 1];
+        System.arraycopy(arguments, 0, sourceAndArgs, 1, arguments.length);
+        synchronized (computers) {
+            for (IComputerAccess computer : computers) {
+                sourceAndArgs[0] = computer.getAttachmentName();
+                computer.queueEvent(event, sourceAndArgs);
+            }
+        }
+    }
 
 }

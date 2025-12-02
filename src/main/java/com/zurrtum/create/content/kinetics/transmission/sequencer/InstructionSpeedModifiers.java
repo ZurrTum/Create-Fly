@@ -30,9 +30,7 @@ public enum InstructionSpeedModifiers implements StringIdentifiable {
     }
 
     public static InstructionSpeedModifiers getByModifier(int modifier) {
-        return Arrays.stream(InstructionSpeedModifiers.values())
-                .filter(speedModifier -> speedModifier.value == modifier)
-                .findAny()
-                .orElse(InstructionSpeedModifiers.FORWARD);
+        return Arrays.stream(InstructionSpeedModifiers.values()).filter(speedModifier -> speedModifier.value == modifier).findAny()
+            .orElse(InstructionSpeedModifiers.FORWARD);
     }
 }

@@ -31,7 +31,13 @@ public class ComputerScreen extends AbstractSimiScreen {
         this(title, () -> title, additionalRenderer, previousScreen, hasAttachedComputer);
     }
 
-    public ComputerScreen(Text title, Supplier<Text> displayTitle, @Nullable AdditionalRenderer additionalRenderer, Screen previousScreen, Supplier<Boolean> hasAttachedComputer) {
+    public ComputerScreen(
+        Text title,
+        Supplier<Text> displayTitle,
+        @Nullable AdditionalRenderer additionalRenderer,
+        Screen previousScreen,
+        Supplier<Boolean> hasAttachedComputer
+    ) {
         super(title);
         this.displayTitle = displayTitle;
         this.additionalRenderer = additionalRenderer;
@@ -56,11 +62,10 @@ public class ComputerScreen extends AbstractSimiScreen {
         int y = guiTop;
 
         if (Mods.COMPUTERCRAFT.isLoaded()) {
-            computerWidget = new ElementWidget(x + 33, y + 38)
-                    .showingElement(GuiGameElement.of(Mods.COMPUTERCRAFT.getItem("computer_advanced")));
+            computerWidget = new ElementWidget(x + 33, y + 38).showingElement(GuiGameElement.of(Mods.COMPUTERCRAFT.getItem("computer_advanced")));
             computerWidget.getToolTip().add(CreateLang.translate("gui.attached_computer.hint").component());
             addDrawableChild(computerWidget);
-        };
+        }
 
         confirmButton = new IconButton(x + background.getWidth() - 33, y + background.getHeight() - 24, AllIcons.I_CONFIRM);
         confirmButton.withCallback(this::close);
@@ -87,10 +92,23 @@ public class ComputerScreen extends AbstractSimiScreen {
 
         background.render(graphics, x, y);
 
-        graphics.drawText(textRenderer, displayTitle.get(),
-                Math.round(x + background.getWidth() / 2.0F - textRenderer.getWidth(displayTitle.get()) / 2.0F), y + 4, 0xFF442000, false);
-        graphics.drawWrappedText(textRenderer, CreateLang.translate("gui.attached_computer.controlled")
-                .component(), x + 55, y + 32, 111, 0xFF7A7A7A, false);
+        graphics.drawText(
+            textRenderer,
+            displayTitle.get(),
+            Math.round(x + background.getWidth() / 2.0F - textRenderer.getWidth(displayTitle.get()) / 2.0F),
+            y + 4,
+            0xFF442000,
+            false
+        );
+        graphics.drawWrappedText(
+            textRenderer,
+            CreateLang.translate("gui.attached_computer.controlled").component(),
+            x + 55,
+            y + 32,
+            111,
+            0xFF7A7A7A,
+            false
+        );
 
         if (additionalRenderer != null)
             additionalRenderer.updateAdditional(partialTicks);

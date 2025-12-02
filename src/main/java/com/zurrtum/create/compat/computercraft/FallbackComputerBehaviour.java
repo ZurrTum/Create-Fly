@@ -4,13 +4,13 @@ import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
 
 public class FallbackComputerBehaviour extends AbstractComputerBehaviour {
 
-	public FallbackComputerBehaviour(SmartBlockEntity te) {
-		super(te);
-	}
+    public FallbackComputerBehaviour(SmartBlockEntity te) {
+        super(te);
+    }
 
-	@Override
-	public boolean hasAttachedComputer() {
-		return false;
-	}
-	
+    @Override
+    public boolean hasAttachedComputer() {
+        return false;
+    }
+
 }

@@ -7,27 +7,27 @@ import org.jetbrains.annotations.NotNull;
 
 public class CreativeMotorPeripheral extends SyncedPeripheral<CreativeMotorBlockEntity> {
 
-	private final ServerScrollValueBehaviour generatedSpeed;
+    private final ServerScrollValueBehaviour generatedSpeed;
 
-	public CreativeMotorPeripheral(CreativeMotorBlockEntity blockEntity, ServerScrollValueBehaviour generatedSpeed) {
-		super(blockEntity);
-		this.generatedSpeed = generatedSpeed;
-	}
+    public CreativeMotorPeripheral(CreativeMotorBlockEntity blockEntity, ServerScrollValueBehaviour generatedSpeed) {
+        super(blockEntity);
+        this.generatedSpeed = generatedSpeed;
+    }
 
-	@LuaFunction(mainThread = true)
-	public final void setGeneratedSpeed(int speed) {
-		this.generatedSpeed.setValue(speed);
-	}
+    @LuaFunction(mainThread = true)
+    public final void setGeneratedSpeed(int speed) {
+        this.generatedSpeed.setValue(speed);
+    }
 
-	@LuaFunction
-	public final float getGeneratedSpeed() {
-		return this.generatedSpeed.getValue();
-	}
+    @LuaFunction
+    public final float getGeneratedSpeed() {
+        return this.generatedSpeed.getValue();
+    }
 
-	@NotNull
-	@Override
-	public String getType() {
-		return "Create_CreativeMotor";
-	}
+    @NotNull
+    @Override
+    public String getType() {
+        return "Create_CreativeMotor";
+    }
 
 }

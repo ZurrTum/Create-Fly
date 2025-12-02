@@ -6,14 +6,14 @@ import net.minecraft.item.ItemStack;
 import java.util.Map;
 
 public class LuaItemStack implements LuaComparable {
-	private final ItemStack stack;
+    private final ItemStack stack;
 
-	public LuaItemStack(ItemStack stack) {
-		this.stack = stack;
-	}
+    public LuaItemStack(ItemStack stack) {
+        this.stack = stack;
+    }
 
-	@Override
-	public Map<?, ?> getTableRepresentation() {
-		return VanillaDetailRegistries.ITEM_STACK.getDetails(stack);
-	}
+    @Override
+    public Map<?, ?> getTableRepresentation() {
+        return VanillaDetailRegistries.ITEM_STACK.getDetails(stack);
+    }
 }

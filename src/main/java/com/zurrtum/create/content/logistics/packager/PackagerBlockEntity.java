@@ -100,8 +100,8 @@ public class PackagerBlockEntity extends SmartBlockEntity {
     @Override
     public void addBehaviours(List<BlockEntityBehaviour<?>> behaviours) {
         behaviours.add(targetInventory = new InvManipulationBehaviour(
-                this,
-                InterfaceProvider.oppositeOfBlockFacing()
+            this,
+            InterfaceProvider.oppositeOfBlockFacing()
         ).withFilter(this::supportsBlockEntity));
         behaviours.add(invVersionTracker = new VersionedInventoryTrackerBehaviour(this));
         behaviours.add(computerBehaviour = ComputerCraftProxy.behaviour(this));
@@ -299,13 +299,13 @@ public class PackagerBlockEntity extends SmartBlockEntity {
             if (PackagerLinkBlock.getConnectedDirection(adjacentState) != d)
                 continue;
             serverWorld.getServer().getPlayerManager().sendToAround(
-                    null,
-                    adjacentPos.getX(),
-                    adjacentPos.getY(),
-                    adjacentPos.getZ(),
-                    32,
-                    serverWorld.getRegistryKey(),
-                    new WiFiEffectPacket(adjacentPos)
+                null,
+                adjacentPos.getX(),
+                adjacentPos.getY(),
+                adjacentPos.getZ(),
+                32,
+                serverWorld.getRegistryKey(),
+                new WiFiEffectPacket(adjacentPos)
             );
             return;
         }

@@ -1,7 +1,7 @@
 package com.zurrtum.create.compat;
 
-import com.zurrtum.create.compat.computercraft.ComputerCraftProxy;
 import com.zurrtum.create.compat.computercraft.AllComputerDisplaySource;
+import com.zurrtum.create.compat.computercraft.ComputerCraftProxy;
 import com.zurrtum.create.compat.trinkets.GoggleTrinket;
 
 public class CompatMod {

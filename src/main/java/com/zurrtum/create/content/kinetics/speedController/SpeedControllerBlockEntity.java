@@ -120,6 +120,6 @@ public class SpeedControllerBlockEntity extends KineticBlockEntity {
     private boolean isCogwheelPresent() {
         BlockState stateAbove = world.getBlockState(pos.up());
         return ICogWheel.isDedicatedCogWheel(stateAbove.getBlock()) && ICogWheel.isLargeCog(stateAbove) && stateAbove.get(CogWheelBlock.AXIS)
-                .isHorizontal();
+            .isHorizontal();
     }
 }

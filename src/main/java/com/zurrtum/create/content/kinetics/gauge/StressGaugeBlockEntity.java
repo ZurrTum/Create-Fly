@@ -3,7 +3,6 @@ package com.zurrtum.create.content.kinetics.gauge;
 import com.zurrtum.create.AllAdvancements;
 import com.zurrtum.create.AllBlockEntityTypes;
 import com.zurrtum.create.catnip.theme.Color;
-import com.zurrtum.create.compat.Mods;
 import com.zurrtum.create.compat.computercraft.AbstractComputerBehaviour;
 import com.zurrtum.create.compat.computercraft.ComputerCraftProxy;
 import com.zurrtum.create.content.kinetics.base.IRotate.StressImpact;
