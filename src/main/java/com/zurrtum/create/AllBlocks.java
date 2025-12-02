@@ -159,6 +159,7 @@ import net.minecraft.world.BlockView;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
@@ -466,13 +467,16 @@ public class AllBlocks {
     public static final MechanicalPistonHeadBlock MECHANICAL_PISTON_HEAD = register(
         "mechanical_piston_head",
         MechanicalPistonHeadBlock::new,
-        AbstractBlock.Settings.copy(Blocks.PISTON_HEAD).mapColor(MapColor.DIRT_BROWN).pistonBehavior(PistonBehavior.NORMAL)
+        AbstractBlock.Settings.copy(Blocks.PISTON_HEAD)
+            .lootTable(Optional.of(RegistryKey.of(RegistryKeys.LOOT_TABLE, Identifier.of(MOD_ID, "blocks/mechanical_piston_head"))))
+            .mapColor(MapColor.DIRT_BROWN).pistonBehavior(PistonBehavior.NORMAL)
     );
     public static final PistonExtensionPoleBlock PISTON_EXTENSION_POLE = register(
         "piston_extension_pole",
         PistonExtensionPoleBlock::new,
-        AbstractBlock.Settings.copy(Blocks.PISTON_HEAD).sounds(BlockSoundGroup.SCAFFOLDING).mapColor(MapColor.DIRT_BROWN)
-            .pistonBehavior(PistonBehavior.NORMAL).solid()
+        AbstractBlock.Settings.copy(Blocks.PISTON_HEAD)
+            .lootTable(Optional.of(RegistryKey.of(RegistryKeys.LOOT_TABLE, Identifier.of(MOD_ID, "blocks/piston_extension_pole"))))
+            .sounds(BlockSoundGroup.SCAFFOLDING).mapColor(MapColor.DIRT_BROWN).pistonBehavior(PistonBehavior.NORMAL).solid()
     );
     public static final SailBlock SAIL_FRAME = register(
         "sail_frame",
