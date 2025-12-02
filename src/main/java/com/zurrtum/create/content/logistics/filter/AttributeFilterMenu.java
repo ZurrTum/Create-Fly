@@ -94,18 +94,11 @@ public class AttributeFilterMenu extends AbstractFilterMenu {
 
     @Override
     public ItemStack quickMove(PlayerEntity playerIn, int index) {
-        if (index == 37)
-            return ItemStack.EMPTY;
-        if (index == 36) {
-            ghostInventory.setStack(37, ItemStack.EMPTY);
-            return ItemStack.EMPTY;
-        }
-        if (index < 36) {
-            ItemStack stackToInsert = playerInventory.getStack(index);
-            ItemStack copy = stackToInsert.copy();
-            copy.setCount(1);
-            ghostInventory.setStack(0, copy);
-        }
+        Slot slot = slots.get(index);
+        ItemStack stackToInsert = slot.getStack();
+        ItemStack copy = stackToInsert.copy();
+        copy.setCount(1);
+        ghostInventory.setStack(0, copy);
         return ItemStack.EMPTY;
     }
 
