@@ -20,6 +20,7 @@
     "ClientPlayerInteractionManagerMixin",
     "ClientPlayNetworkHandlerMixin",
     "ClientWorldMixin",
+    "DefaultClientResourcePackProviderMixin",
     "DiffuseLightingMixin",
     "DrawContextMixin",
     "EntityMixin",
