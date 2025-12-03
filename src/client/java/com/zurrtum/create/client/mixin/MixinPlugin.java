@@ -57,7 +57,6 @@ public class MixinPlugin implements IMixinConfigPlugin {
             mixins.add("FluidVariantRenderHandlerMixin");
         } else {
             mixins.add("CreativeModeInventoryScreenMixin");
-            mixins.add("ClientPackSourceMixin");
         }
         if (HAS_RENDER) {
             mixins.add("WaterRenderHandlerMixin");

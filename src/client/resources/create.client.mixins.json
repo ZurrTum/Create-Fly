@@ -19,6 +19,7 @@
     "ClientChunkCacheMixin",
     "ClientLevelMixin",
     "ClientPacketListenerMixin",
+    "ClientPackSourceMixin",
     "EntityCallbacksMixin",
     "EntityMixin",
     "EntityTypeMixin",
