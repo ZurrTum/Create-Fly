@@ -10,6 +10,7 @@
     "BlockColorsMixin",
     "BlockDustParticleMixin",
     "BlockEntityMixin",
+    "BlockEntityRenderManagerMixin",
     "BlockEntityTypeMixin",
     "BlockRenderManagerMixin",
     "BufferBuilderStorageMixin",

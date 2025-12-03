@@ -1,15 +1,16 @@
 package com.zurrtum.create.client.vanillin;
 
+import com.zurrtum.create.catnip.config.ConfigBase;
 import com.zurrtum.create.client.vanillin.compose.*;
-import com.zurrtum.create.client.vanillin.config.BlockEntityVisualizerBuilder;
-import com.zurrtum.create.client.vanillin.config.Configurator;
-import com.zurrtum.create.client.vanillin.config.EntityVisualizerBuilder;
+import com.zurrtum.create.client.vanillin.config.*;
 import com.zurrtum.create.client.vanillin.elements.ShadowElement;
 import com.zurrtum.create.client.vanillin.visuals.*;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityType;
+import net.minecraft.client.model.ModelPart;
 import net.minecraft.client.render.entity.model.EntityModelLayer;
 import net.minecraft.client.render.entity.model.EntityModelLayers;
+import net.minecraft.client.render.entity.model.LoadedEntityModels;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.decoration.ItemFrameEntity;
@@ -18,6 +19,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Consumer;
 
 public class VanillaVisuals {
@@ -63,6 +65,31 @@ public class VanillaVisuals {
             .with(element(VisualElements.ITEM_ENTITY).build()).shouldVisualize(((ctx, entity) -> ItemVisual.isSupported(entity))).build()
             .skipVanillaRender(ItemVisual::isSupported).apply(EXPERIMENTAL);
 
+    }
+
+    public static void onReloadModel(LoadedEntityModels models) {
+        boolean supportChest = models.getModelPart(EntityModelLayers.CHEST).getClass() == ModelPart.class;
+        Map<BlockEntityType<?>, Configurator.ConfiguredBlockEntity<?>> configurator = CONFIGURATOR.blockEntities;
+        Map<String, ConfigBase.ConfigEnum<VisualConfigValue>> blockEntities = VanillinConfig.client().blockEntities;
+        Map<String, List<VisualOverride>> blockEntityOverrides = VanillinConfig.overrides().blockEntities();
+        reloadType(BlockEntityType.CHEST, configurator, blockEntities, blockEntityOverrides, supportChest);
+        reloadType(BlockEntityType.ENDER_CHEST, configurator, blockEntities, blockEntityOverrides, supportChest);
+        reloadType(BlockEntityType.TRAPPED_CHEST, configurator, blockEntities, blockEntityOverrides, supportChest);
+    }
+
+    private static void reloadType(
+        BlockEntityType<?> type,
+        Map<BlockEntityType<?>, Configurator.ConfiguredBlockEntity<?>> configurator,
+        Map<String, ConfigBase.ConfigEnum<VisualConfigValue>> blockEntities,
+        Map<String, List<VisualOverride>> blockEntityOverrides,
+        boolean support
+    ) {
+        Configurator.ConfiguredBlockEntity<?> configured = configurator.get(type);
+        String key = configured.configKey();
+        VisualConfigValue value = blockEntities.get(key).get();
+        if (value == VisualConfigValue.DEFAULT) {
+            configured.set(support ? value : VisualConfigValue.DISABLE, blockEntityOverrides.get(key));
+        }
     }
 
     public static <T extends Entity> void commonElements(EntityBuilder<T> builder) {
