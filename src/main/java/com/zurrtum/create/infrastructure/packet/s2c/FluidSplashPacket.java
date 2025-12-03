@@ -6,12 +6,13 @@ import net.minecraft.fluid.Fluid;
 import net.minecraft.network.RegistryByteBuf;
 import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.network.codec.PacketCodecs;
+import net.minecraft.network.listener.ClientPlayPacketListener;
+import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.PacketType;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.util.math.BlockPos;
-import org.apache.logging.log4j.util.TriConsumer;
 
-public record FluidSplashPacket(BlockPos pos, Fluid fluid) implements S2CPacket {
+public record FluidSplashPacket(BlockPos pos, Fluid fluid) implements Packet<ClientPlayPacketListener> {
     public static final PacketCodec<RegistryByteBuf, FluidSplashPacket> CODEC = PacketCodec.tuple(
         BlockPos.PACKET_CODEC,
         FluidSplashPacket::pos,
@@ -21,8 +22,8 @@ public record FluidSplashPacket(BlockPos pos, Fluid fluid) implements S2CPacket 
     );
 
     @Override
-    public <T> TriConsumer<AllClientHandle<T>, T, FluidSplashPacket> callback() {
-        return AllClientHandle::onFluidSplash;
+    public void apply(ClientPlayPacketListener listener) {
+        AllClientHandle.INSTANCE.onFluidSplash(this);
     }
 
     @Override

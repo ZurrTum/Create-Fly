@@ -6,17 +6,18 @@ import com.zurrtum.create.catnip.codecs.stream.CatnipStreamCodecBuilders;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.network.codec.PacketCodecs;
+import net.minecraft.network.listener.ServerPlayPacketListener;
+import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.PacketType;
 import net.minecraft.server.network.ServerPlayNetworkHandler;
 import net.minecraft.util.math.BlockPos;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.function.BiConsumer;
 
 public record ControlsInputPacket(
     List<Integer> activatedButtons, boolean press, int contraptionEntityId, BlockPos controlsPos, boolean stopControlling
-) implements C2SPacket {
+) implements Packet<ServerPlayPacketListener> {
     public static final PacketCodec<ByteBuf, ControlsInputPacket> CODEC = PacketCodec.tuple(
         CatnipStreamCodecBuilders.list(PacketCodecs.VAR_INT),
         ControlsInputPacket::activatedButtons,
@@ -43,12 +44,12 @@ public record ControlsInputPacket(
     }
 
     @Override
-    public PacketType<ControlsInputPacket> getPacketType() {
-        return AllPackets.CONTROLS_INPUT;
+    public void apply(ServerPlayPacketListener listener) {
+        AllHandle.onControlsInput((ServerPlayNetworkHandler) listener, this);
     }
 
     @Override
-    public BiConsumer<ServerPlayNetworkHandler, ControlsInputPacket> callback() {
-        return AllHandle::onControlsInput;
+    public PacketType<ControlsInputPacket> getPacketType() {
+        return AllPackets.CONTROLS_INPUT;
     }
 }

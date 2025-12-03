@@ -826,6 +826,7 @@ public abstract class Contraption {
         BiMapPalette<BlockState> palette = new BiMapPalette<>(16);
         WriteView.ListView blockList = view.getList("BlockList");
 
+        boolean isClient = spawnPacket && entity.getEntityWorld().isClient();
         for (StructureBlockInfo block : this.blocks.values()) {
             int id = palette.index(
                 block.state(), (i, s) -> {
@@ -843,11 +844,15 @@ public abstract class Contraption {
                 if (updateTag != null) {
                     c.put("Data", NbtCompound.CODEC, updateTag);
                 } else if (block.nbt() != null) {
-                    // an updateTag is saved for all BlockEntities, even when empty.
-                    // this case means that the contraption was assembled pre-updateTags.
-                    // in this case, we need to use the full BlockEntity data.
-                    c.put("Data", NbtCompound.CODEC, block.nbt());
-                    c.putBoolean("Legacy", true);
+                    if (isClient) {
+                        c.put("UpdateTag", NbtCompound.CODEC, block.nbt());
+                    } else {
+                        // an updateTag is saved for all BlockEntities, even when empty.
+                        // this case means that the contraption was assembled pre-updateTags.
+                        // in this case, we need to use the full BlockEntity data.
+                        c.put("Data", NbtCompound.CODEC, block.nbt());
+                        c.putBoolean("Legacy", true);
+                    }
                 }
             } else {
                 // otherwise, write actual data as the data, save updateTag on its own

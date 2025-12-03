@@ -8,13 +8,14 @@ import com.zurrtum.create.content.trains.graph.TrackGraph;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.network.codec.PacketCodecs;
+import net.minecraft.network.listener.ClientPlayPacketListener;
+import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.PacketType;
-import org.apache.logging.log4j.util.TriConsumer;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public record TrackGraphRollCallPacket(List<Entry> entries) implements S2CPacket {
+public record TrackGraphRollCallPacket(List<Entry> entries) implements Packet<ClientPlayPacketListener> {
     public static final PacketCodec<ByteBuf, TrackGraphRollCallPacket> CODEC = CatnipStreamCodecBuilders.list(Entry.STREAM_CODEC)
         .xmap(TrackGraphRollCallPacket::new, TrackGraphRollCallPacket::entries);
 
@@ -27,8 +28,8 @@ public record TrackGraphRollCallPacket(List<Entry> entries) implements S2CPacket
     }
 
     @Override
-    public <T> TriConsumer<AllClientHandle<T>, T, TrackGraphRollCallPacket> callback() {
-        return AllClientHandle::onTrackGraphRollCall;
+    public void apply(ClientPlayPacketListener listener) {
+        AllClientHandle.INSTANCE.onTrackGraphRollCall(this);
     }
 
     @Override

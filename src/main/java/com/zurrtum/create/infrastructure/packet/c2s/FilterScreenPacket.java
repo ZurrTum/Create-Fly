@@ -8,13 +8,13 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.RegistryByteBuf;
 import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.network.codec.PacketCodecs;
+import net.minecraft.network.listener.ServerPlayPacketListener;
+import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.PacketType;
 import net.minecraft.server.network.ServerPlayNetworkHandler;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.function.BiConsumer;
-
-public record FilterScreenPacket(Option option, @Nullable NbtCompound data) implements C2SPacket {
+public record FilterScreenPacket(Option option, @Nullable NbtCompound data) implements Packet<ServerPlayPacketListener> {
     public static final PacketCodec<RegistryByteBuf, FilterScreenPacket> CODEC = PacketCodec.tuple(
         Option.STREAM_CODEC,
         FilterScreenPacket::option,
@@ -28,13 +28,13 @@ public record FilterScreenPacket(Option option, @Nullable NbtCompound data) impl
     }
 
     @Override
-    public PacketType<FilterScreenPacket> getPacketType() {
-        return AllPackets.CONFIGURE_FILTER;
+    public void apply(ServerPlayPacketListener listener) {
+        AllHandle.onFilterScreen((ServerPlayNetworkHandler) listener, this);
     }
 
     @Override
-    public BiConsumer<ServerPlayNetworkHandler, FilterScreenPacket> callback() {
-        return AllHandle::onFilterScreen;
+    public PacketType<FilterScreenPacket> getPacketType() {
+        return AllPackets.CONFIGURE_FILTER;
     }
 
     public enum Option {

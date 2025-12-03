@@ -8,12 +8,13 @@ import io.netty.buffer.ByteBuf;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.network.codec.PacketCodecs;
+import net.minecraft.network.listener.ClientPlayPacketListener;
+import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.PacketType;
-import org.apache.logging.log4j.util.TriConsumer;
 
 import java.util.List;
 
-public record ServerDebugInfoPacket(String serverInfo) implements S2CPacket {
+public record ServerDebugInfoPacket(String serverInfo) implements Packet<ClientPlayPacketListener> {
     public static final PacketCodec<ByteBuf, ServerDebugInfoPacket> CODEC = PacketCodecs.STRING.xmap(
         ServerDebugInfoPacket::new,
         ServerDebugInfoPacket::serverInfo
@@ -52,8 +53,8 @@ public record ServerDebugInfoPacket(String serverInfo) implements S2CPacket {
     }
 
     @Override
-    public <T> TriConsumer<AllClientHandle<T>, T, ServerDebugInfoPacket> callback() {
-        return AllClientHandle::onServerDebugInfo;
+    public void apply(ClientPlayPacketListener listener) {
+        AllClientHandle.INSTANCE.onServerDebugInfo(this);
     }
 
     @Override

@@ -5,13 +5,13 @@ import com.zurrtum.create.AllPackets;
 import net.minecraft.network.RegistryByteBuf;
 import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.network.codec.PacketCodecs;
+import net.minecraft.network.listener.ServerPlayPacketListener;
+import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.PacketType;
 import net.minecraft.server.network.ServerPlayNetworkHandler;
 import net.minecraft.util.math.Vec3d;
 
-import java.util.function.BiConsumer;
-
-public record ClientMotionPacket(Vec3d motion, boolean onGround, float limbSwing) implements C2SPacket {
+public record ClientMotionPacket(Vec3d motion, boolean onGround, float limbSwing) implements Packet<ServerPlayPacketListener> {
     public static final PacketCodec<RegistryByteBuf, ClientMotionPacket> CODEC = PacketCodec.tuple(
         Vec3d.PACKET_CODEC,
         ClientMotionPacket::motion,
@@ -23,12 +23,12 @@ public record ClientMotionPacket(Vec3d motion, boolean onGround, float limbSwing
     );
 
     @Override
-    public PacketType<ClientMotionPacket> getPacketType() {
-        return AllPackets.CLIENT_MOTION;
+    public void apply(ServerPlayPacketListener listener) {
+        AllHandle.onClientMotion((ServerPlayNetworkHandler) listener, this);
     }
 
     @Override
-    public BiConsumer<ServerPlayNetworkHandler, ClientMotionPacket> callback() {
-        return AllHandle::onClientMotion;
+    public PacketType<ClientMotionPacket> getPacketType() {
+        return AllPackets.CLIENT_MOTION;
     }
 }

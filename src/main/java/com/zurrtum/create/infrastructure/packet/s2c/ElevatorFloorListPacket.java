@@ -9,12 +9,13 @@ import com.zurrtum.create.content.contraptions.AbstractContraptionEntity;
 import net.minecraft.network.RegistryByteBuf;
 import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.network.codec.PacketCodecs;
+import net.minecraft.network.listener.ClientPlayPacketListener;
+import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.PacketType;
-import org.apache.logging.log4j.util.TriConsumer;
 
 import java.util.List;
 
-public record ElevatorFloorListPacket(int entityId, List<IntAttached<Couple<String>>> floors) implements S2CPacket {
+public record ElevatorFloorListPacket(int entityId, List<IntAttached<Couple<String>>> floors) implements Packet<ClientPlayPacketListener> {
     public static final PacketCodec<RegistryByteBuf, ElevatorFloorListPacket> CODEC = PacketCodec.tuple(
         PacketCodecs.INTEGER,
         ElevatorFloorListPacket::entityId,
@@ -28,17 +29,12 @@ public record ElevatorFloorListPacket(int entityId, List<IntAttached<Couple<Stri
     }
 
     @Override
-    public boolean runInMain() {
-        return true;
+    public void apply(ClientPlayPacketListener listener) {
+        AllClientHandle.INSTANCE.onElevatorFloorList(listener, this);
     }
 
     @Override
     public PacketType<ElevatorFloorListPacket> getPacketType() {
         return AllPackets.UPDATE_ELEVATOR_FLOORS;
-    }
-
-    @Override
-    public <T> TriConsumer<AllClientHandle<T>, T, ElevatorFloorListPacket> callback() {
-        return AllClientHandle::onElevatorFloorList;
     }
 }

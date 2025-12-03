@@ -6,14 +6,15 @@ import com.zurrtum.create.content.kinetics.transmission.sequencer.Instruction;
 import com.zurrtum.create.foundation.codec.CreateStreamCodecs;
 import net.minecraft.network.RegistryByteBuf;
 import net.minecraft.network.codec.PacketCodec;
+import net.minecraft.network.listener.ServerPlayPacketListener;
+import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.PacketType;
 import net.minecraft.server.network.ServerPlayNetworkHandler;
 import net.minecraft.util.math.BlockPos;
 
 import java.util.Vector;
-import java.util.function.BiConsumer;
 
-public record ConfigureSequencedGearshiftPacket(BlockPos pos, Vector<Instruction> instructions) implements C2SPacket {
+public record ConfigureSequencedGearshiftPacket(BlockPos pos, Vector<Instruction> instructions) implements Packet<ServerPlayPacketListener> {
     @SuppressWarnings("removal")
     public static final PacketCodec<RegistryByteBuf, ConfigureSequencedGearshiftPacket> CODEC = PacketCodec.tuple(
         BlockPos.PACKET_CODEC,
@@ -24,17 +25,12 @@ public record ConfigureSequencedGearshiftPacket(BlockPos pos, Vector<Instruction
     );
 
     @Override
+    public void apply(ServerPlayPacketListener listener) {
+        AllHandle.onConfigureSequencedGearshift((ServerPlayNetworkHandler) listener, this);
+    }
+
+    @Override
     public PacketType<ConfigureSequencedGearshiftPacket> getPacketType() {
         return AllPackets.CONFIGURE_SEQUENCER;
-    }
-
-    @Override
-    public boolean runInMain() {
-        return true;
-    }
-
-    @Override
-    public BiConsumer<ServerPlayNetworkHandler, ConfigureSequencedGearshiftPacket> callback() {
-        return AllHandle::onConfigureSequencedGearshift;
     }
 }

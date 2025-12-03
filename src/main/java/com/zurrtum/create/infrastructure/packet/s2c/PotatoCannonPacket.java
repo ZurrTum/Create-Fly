@@ -7,14 +7,15 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.network.RegistryByteBuf;
 import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.network.codec.PacketCodecs;
+import net.minecraft.network.listener.ClientPlayPacketListener;
+import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.PacketType;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.Vec3d;
-import org.apache.logging.log4j.util.TriConsumer;
 
 public record PotatoCannonPacket(
     Vec3d location, Vec3d motion, ItemStack item, Hand hand, float pitch, boolean self
-) implements ShootGadgetPacket {
+) implements Packet<ClientPlayPacketListener> {
     public static final PacketCodec<RegistryByteBuf, PotatoCannonPacket> CODEC = PacketCodec.tuple(
         Vec3d.PACKET_CODEC,
         PotatoCannonPacket::location,
@@ -32,13 +33,8 @@ public record PotatoCannonPacket(
     );
 
     @Override
-    public boolean runInMain() {
-        return true;
-    }
-
-    @Override
-    public <T> TriConsumer<AllClientHandle<T>, T, PotatoCannonPacket> callback() {
-        return AllClientHandle::onPotatoCannon;
+    public void apply(ClientPlayPacketListener listener) {
+        AllClientHandle.INSTANCE.onPotatoCannon(listener, this);
     }
 
     @Override

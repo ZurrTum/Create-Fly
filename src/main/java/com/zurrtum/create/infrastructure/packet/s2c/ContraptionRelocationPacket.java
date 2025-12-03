@@ -5,18 +5,19 @@ import com.zurrtum.create.AllPackets;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.network.codec.PacketCodecs;
+import net.minecraft.network.listener.ClientPlayPacketListener;
+import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.PacketType;
-import org.apache.logging.log4j.util.TriConsumer;
 
-public record ContraptionRelocationPacket(int entityId) implements S2CPacket {
+public record ContraptionRelocationPacket(int entityId) implements Packet<ClientPlayPacketListener> {
     public static final PacketCodec<ByteBuf, ContraptionRelocationPacket> CODEC = PacketCodecs.INTEGER.xmap(
         ContraptionRelocationPacket::new,
         ContraptionRelocationPacket::entityId
     );
 
     @Override
-    public <T> TriConsumer<AllClientHandle<T>, T, ContraptionRelocationPacket> callback() {
-        return AllClientHandle::onContraptionRelocation;
+    public void apply(ClientPlayPacketListener listener) {
+        AllClientHandle.INSTANCE.onContraptionRelocation(this);
     }
 
     @Override

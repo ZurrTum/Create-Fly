@@ -7,14 +7,15 @@ import com.zurrtum.create.content.trains.entity.Train;
 import net.minecraft.network.RegistryByteBuf;
 import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.network.codec.PacketCodecs;
+import net.minecraft.network.listener.ServerPlayPacketListener;
+import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.PacketType;
 import net.minecraft.server.network.ServerPlayNetworkHandler;
 import net.minecraft.util.Uuids;
 
 import java.util.UUID;
-import java.util.function.BiConsumer;
 
-public record TrainHUDUpdatePacket(UUID trainId, Double throttle) implements C2SPacket {
+public record TrainHUDUpdatePacket(UUID trainId, Double throttle) implements Packet<ServerPlayPacketListener> {
     public static final PacketCodec<RegistryByteBuf, TrainHUDUpdatePacket> CODEC = PacketCodec.tuple(
         Uuids.PACKET_CODEC,
         TrainHUDUpdatePacket::trainId,
@@ -28,12 +29,12 @@ public record TrainHUDUpdatePacket(UUID trainId, Double throttle) implements C2S
     }
 
     @Override
-    public PacketType<TrainHUDUpdatePacket> getPacketType() {
-        return AllPackets.C_TRAIN_HUD;
+    public void apply(ServerPlayPacketListener listener) {
+        AllHandle.onTrainHUDUpdate((ServerPlayNetworkHandler) listener, this);
     }
 
     @Override
-    public BiConsumer<ServerPlayNetworkHandler, TrainHUDUpdatePacket> callback() {
-        return AllHandle::onTrainHUDUpdate;
+    public PacketType<TrainHUDUpdatePacket> getPacketType() {
+        return AllPackets.C_TRAIN_HUD;
     }
 }

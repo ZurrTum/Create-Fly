@@ -5,10 +5,13 @@ import com.zurrtum.create.AllPackets;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.network.codec.PacketCodecs;
+import net.minecraft.network.listener.ClientPlayPacketListener;
+import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.PacketType;
-import org.apache.logging.log4j.util.TriConsumer;
 
-public record GantryContraptionUpdatePacket(int entityID, double coord, double motion, double sequenceLimit) implements S2CPacket {
+public record GantryContraptionUpdatePacket(
+    int entityID, double coord, double motion, double sequenceLimit
+) implements Packet<ClientPlayPacketListener> {
     public static final PacketCodec<ByteBuf, GantryContraptionUpdatePacket> CODEC = PacketCodec.tuple(
         PacketCodecs.INTEGER,
         GantryContraptionUpdatePacket::entityID,
@@ -22,8 +25,8 @@ public record GantryContraptionUpdatePacket(int entityID, double coord, double m
     );
 
     @Override
-    public <T> TriConsumer<AllClientHandle<T>, T, GantryContraptionUpdatePacket> callback() {
-        return AllClientHandle::onGantryContraptionUpdate;
+    public void apply(ClientPlayPacketListener listener) {
+        AllClientHandle.INSTANCE.onGantryContraptionUpdate(this);
     }
 
     @Override

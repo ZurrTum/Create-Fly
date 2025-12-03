@@ -6,12 +6,12 @@ import com.zurrtum.create.catnip.codecs.stream.CatnipStreamCodecBuilders;
 import net.minecraft.network.RegistryByteBuf;
 import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.network.codec.PacketCodecs;
+import net.minecraft.network.listener.ServerPlayPacketListener;
+import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.PacketType;
 import net.minecraft.server.network.ServerPlayNetworkHandler;
 
-import java.util.function.BiConsumer;
-
-public record SchematicUploadPacket(int code, long size, String schematic, byte[] data) implements C2SPacket {
+public record SchematicUploadPacket(int code, long size, String schematic, byte[] data) implements Packet<ServerPlayPacketListener> {
     public static final int BEGIN = 0;
     public static final int WRITE = 1;
     public static final int FINISH = 2;
@@ -41,17 +41,12 @@ public record SchematicUploadPacket(int code, long size, String schematic, byte[
     }
 
     @Override
-    public boolean runInMain() {
-        return true;
+    public void apply(ServerPlayPacketListener listener) {
+        AllHandle.onSchematicUpload((ServerPlayNetworkHandler) listener, this);
     }
 
     @Override
     public PacketType<SchematicUploadPacket> getPacketType() {
         return AllPackets.UPLOAD_SCHEMATIC;
-    }
-
-    @Override
-    public BiConsumer<ServerPlayNetworkHandler, SchematicUploadPacket> callback() {
-        return AllHandle::onSchematicUpload;
     }
 }

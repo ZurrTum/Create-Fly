@@ -14,11 +14,10 @@ import io.netty.buffer.ByteBuf;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.network.codec.PacketCodecs;
+import net.minecraft.network.listener.ServerPlayPacketListener;
 import net.minecraft.network.packet.PacketType;
 import net.minecraft.server.network.ServerPlayNetworkHandler;
 import net.minecraft.util.Hand;
-
-import java.util.function.BiConsumer;
 
 public record ConfigureWorldshaperPacket(
     Hand hand, PlacementPatterns pattern, TerrainBrushes brush, int brushParamX, int brushParamY, int brushParamZ, TerrainTools tool,
@@ -50,12 +49,12 @@ public record ConfigureWorldshaperPacket(
     }
 
     @Override
-    public PacketType<ConfigureWorldshaperPacket> getPacketType() {
-        return AllPackets.CONFIGURE_WORLDSHAPER;
+    public void apply(ServerPlayPacketListener listener) {
+        AllHandle.onConfigureWorldshaper((ServerPlayNetworkHandler) listener, this);
     }
 
     @Override
-    public BiConsumer<ServerPlayNetworkHandler, ConfigureWorldshaperPacket> callback() {
-        return AllHandle::onConfigureWorldshaper;
+    public PacketType<ConfigureWorldshaperPacket> getPacketType() {
+        return AllPackets.CONFIGURE_WORLDSHAPER;
     }
 }

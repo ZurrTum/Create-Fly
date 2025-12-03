@@ -6,13 +6,15 @@ import com.zurrtum.create.content.decoration.slidingDoor.DoorControl;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.network.codec.PacketCodecs;
+import net.minecraft.network.listener.ServerPlayPacketListener;
+import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.PacketType;
 import net.minecraft.server.network.ServerPlayNetworkHandler;
 import net.minecraft.util.math.BlockPos;
 
-import java.util.function.BiConsumer;
-
-public record ElevatorContactEditPacket(BlockPos pos, String shortName, String longName, DoorControl doorControl) implements C2SPacket {
+public record ElevatorContactEditPacket(
+    BlockPos pos, String shortName, String longName, DoorControl doorControl
+) implements Packet<ServerPlayPacketListener> {
     public static final PacketCodec<ByteBuf, ElevatorContactEditPacket> CODEC = PacketCodec.tuple(
         BlockPos.PACKET_CODEC,
         ElevatorContactEditPacket::pos,
@@ -26,17 +28,12 @@ public record ElevatorContactEditPacket(BlockPos pos, String shortName, String l
     );
 
     @Override
-    public boolean runInMain() {
-        return true;
+    public void apply(ServerPlayPacketListener listener) {
+        AllHandle.onElevatorContactEdit((ServerPlayNetworkHandler) listener, this);
     }
 
     @Override
     public PacketType<ElevatorContactEditPacket> getPacketType() {
         return AllPackets.CONFIGURE_ELEVATOR_CONTACT;
-    }
-
-    @Override
-    public BiConsumer<ServerPlayNetworkHandler, ElevatorContactEditPacket> callback() {
-        return AllHandle::onElevatorContactEdit;
     }
 }

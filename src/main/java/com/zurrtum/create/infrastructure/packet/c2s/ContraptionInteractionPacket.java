@@ -8,15 +8,15 @@ import com.zurrtum.create.content.contraptions.AbstractContraptionEntity;
 import net.minecraft.network.RegistryByteBuf;
 import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.network.codec.PacketCodecs;
+import net.minecraft.network.listener.ServerPlayPacketListener;
+import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.PacketType;
 import net.minecraft.server.network.ServerPlayNetworkHandler;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 
-import java.util.function.BiConsumer;
-
-public record ContraptionInteractionPacket(Hand hand, int target, BlockPos localPos, Direction face) implements C2SPacket {
+public record ContraptionInteractionPacket(Hand hand, int target, BlockPos localPos, Direction face) implements Packet<ServerPlayPacketListener> {
     public static final PacketCodec<RegistryByteBuf, ContraptionInteractionPacket> CODEC = PacketCodec.tuple(
         CatnipStreamCodecBuilders.nullable(CatnipStreamCodecs.HAND),
         ContraptionInteractionPacket::hand,
@@ -34,17 +34,12 @@ public record ContraptionInteractionPacket(Hand hand, int target, BlockPos local
     }
 
     @Override
-    public boolean runInMain() {
-        return true;
+    public void apply(ServerPlayPacketListener listener) {
+        AllHandle.onContraptionInteraction((ServerPlayNetworkHandler) listener, this);
     }
 
     @Override
     public PacketType<ContraptionInteractionPacket> getPacketType() {
         return AllPackets.CONTRAPTION_INTERACT;
-    }
-
-    @Override
-    public BiConsumer<ServerPlayNetworkHandler, ContraptionInteractionPacket> callback() {
-        return AllHandle::onContraptionInteraction;
     }
 }

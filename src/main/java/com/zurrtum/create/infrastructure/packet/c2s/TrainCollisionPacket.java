@@ -5,12 +5,12 @@ import com.zurrtum.create.AllPackets;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.network.codec.PacketCodecs;
+import net.minecraft.network.listener.ServerPlayPacketListener;
+import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.PacketType;
 import net.minecraft.server.network.ServerPlayNetworkHandler;
 
-import java.util.function.BiConsumer;
-
-public record TrainCollisionPacket(int damage, int contraptionEntityId) implements C2SPacket {
+public record TrainCollisionPacket(int damage, int contraptionEntityId) implements Packet<ServerPlayPacketListener> {
     public static final PacketCodec<ByteBuf, TrainCollisionPacket> CODEC = PacketCodec.tuple(
         PacketCodecs.INTEGER,
         TrainCollisionPacket::damage,
@@ -20,17 +20,12 @@ public record TrainCollisionPacket(int damage, int contraptionEntityId) implemen
     );
 
     @Override
-    public boolean runInMain() {
-        return true;
+    public void apply(ServerPlayPacketListener listener) {
+        AllHandle.onTrainCollision((ServerPlayNetworkHandler) listener, this);
     }
 
     @Override
     public PacketType<TrainCollisionPacket> getPacketType() {
         return AllPackets.TRAIN_COLLISION;
-    }
-
-    @Override
-    public BiConsumer<ServerPlayNetworkHandler, TrainCollisionPacket> callback() {
-        return AllHandle::onTrainCollision;
     }
 }

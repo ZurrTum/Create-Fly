@@ -10,13 +10,16 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.network.RegistryByteBuf;
 import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.network.codec.PacketCodecs;
+import net.minecraft.network.listener.ClientPlayPacketListener;
+import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.PacketType;
-import org.apache.logging.log4j.util.TriConsumer;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public record BlueprintPreviewPacket(List<ItemStack> available, List<ItemStack> missing, ItemStack result) implements S2CPacket {
+public record BlueprintPreviewPacket(
+    List<ItemStack> available, List<ItemStack> missing, ItemStack result
+) implements Packet<ClientPlayPacketListener> {
     public static final PacketCodec<RegistryByteBuf, BlueprintPreviewPacket> CODEC = PacketCodec.tuple(
         ItemStack.PACKET_CODEC.collect(PacketCodecs.toList()),
         BlueprintPreviewPacket::available,
@@ -66,8 +69,8 @@ public record BlueprintPreviewPacket(List<ItemStack> available, List<ItemStack> 
     }
 
     @Override
-    public <T> TriConsumer<AllClientHandle<T>, T, BlueprintPreviewPacket> callback() {
-        return AllClientHandle::onBlueprintPreview;
+    public void apply(ClientPlayPacketListener listener) {
+        AllClientHandle.INSTANCE.onBlueprintPreview(this);
     }
 
     @Override

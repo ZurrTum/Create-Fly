@@ -7,16 +7,16 @@ import com.zurrtum.create.infrastructure.component.ClipboardContent;
 import net.minecraft.network.RegistryByteBuf;
 import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.network.codec.PacketCodecs;
+import net.minecraft.network.listener.ServerPlayPacketListener;
+import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.PacketType;
 import net.minecraft.server.network.ServerPlayNetworkHandler;
 import net.minecraft.util.math.BlockPos;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.function.BiConsumer;
-
 public record ClipboardEditPacket(
     int hotbarSlot, @Nullable ClipboardContent clipboardContent, @Nullable BlockPos targetedBlock
-) implements C2SPacket {
+) implements Packet<ServerPlayPacketListener> {
     public static final PacketCodec<RegistryByteBuf, ClipboardEditPacket> CODEC = PacketCodec.tuple(
         PacketCodecs.VAR_INT,
         ClipboardEditPacket::hotbarSlot,
@@ -28,12 +28,12 @@ public record ClipboardEditPacket(
     );
 
     @Override
-    public PacketType<ClipboardEditPacket> getPacketType() {
-        return AllPackets.CLIPBOARD_EDIT;
+    public void apply(ServerPlayPacketListener listener) {
+        AllHandle.onClipboardEdit((ServerPlayNetworkHandler) listener, this);
     }
 
     @Override
-    public BiConsumer<ServerPlayNetworkHandler, ClipboardEditPacket> callback() {
-        return AllHandle::onClipboardEdit;
+    public PacketType<ClipboardEditPacket> getPacketType() {
+        return AllPackets.CLIPBOARD_EDIT;
     }
 }

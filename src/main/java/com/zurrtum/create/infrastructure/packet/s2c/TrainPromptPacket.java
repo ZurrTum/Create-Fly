@@ -5,12 +5,13 @@ import com.zurrtum.create.AllPackets;
 import net.minecraft.network.RegistryByteBuf;
 import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.network.codec.PacketCodecs;
+import net.minecraft.network.listener.ClientPlayPacketListener;
+import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.PacketType;
 import net.minecraft.text.Text;
 import net.minecraft.text.TextCodecs;
-import org.apache.logging.log4j.util.TriConsumer;
 
-public record TrainPromptPacket(Text text, boolean shadow) implements S2CPacket {
+public record TrainPromptPacket(Text text, boolean shadow) implements Packet<ClientPlayPacketListener> {
     public static final PacketCodec<RegistryByteBuf, TrainPromptPacket> CODEC = PacketCodec.tuple(
         TextCodecs.PACKET_CODEC,
         TrainPromptPacket::text,
@@ -20,8 +21,8 @@ public record TrainPromptPacket(Text text, boolean shadow) implements S2CPacket 
     );
 
     @Override
-    public <T> TriConsumer<AllClientHandle<T>, T, TrainPromptPacket> callback() {
-        return AllClientHandle::onTrainPrompt;
+    public void apply(ClientPlayPacketListener listener) {
+        AllClientHandle.INSTANCE.onTrainPrompt(this);
     }
 
     @Override

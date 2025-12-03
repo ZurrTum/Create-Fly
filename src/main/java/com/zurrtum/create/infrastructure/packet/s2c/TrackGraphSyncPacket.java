@@ -11,21 +11,21 @@ import com.zurrtum.create.content.trains.track.BezierConnection;
 import com.zurrtum.create.content.trains.track.TrackMaterial;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.network.codec.PacketCodec;
+import net.minecraft.network.listener.ClientPlayPacketListener;
 import net.minecraft.network.packet.PacketType;
 import net.minecraft.util.math.Vec3d;
-import org.apache.logging.log4j.util.TriConsumer;
 
 import java.util.*;
 
-public class TrackGraphSyncPacket extends TrackGraphPacket implements S2CPacket {
+public class TrackGraphSyncPacket extends TrackGraphPacket {
     public static final PacketCodec<PacketByteBuf, TrackGraphSyncPacket> CODEC = PacketCodec.of(
         TrackGraphSyncPacket::write,
         TrackGraphSyncPacket::new
     );
 
     @Override
-    public <T> TriConsumer<AllClientHandle<T>, T, TrackGraphSyncPacket> callback() {
-        return AllClientHandle::onTrackGraphSync;
+    public void apply(ClientPlayPacketListener listener) {
+        AllClientHandle.INSTANCE.onTrackGraphSync(this);
     }
 
     @Override

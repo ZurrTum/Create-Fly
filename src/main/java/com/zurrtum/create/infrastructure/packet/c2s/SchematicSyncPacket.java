@@ -6,6 +6,8 @@ import com.zurrtum.create.catnip.codecs.stream.CatnipStreamCodecs;
 import net.minecraft.network.RegistryByteBuf;
 import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.network.codec.PacketCodecs;
+import net.minecraft.network.listener.ServerPlayPacketListener;
+import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.PacketType;
 import net.minecraft.server.network.ServerPlayNetworkHandler;
 import net.minecraft.structure.StructurePlacementData;
@@ -13,9 +15,9 @@ import net.minecraft.util.BlockMirror;
 import net.minecraft.util.BlockRotation;
 import net.minecraft.util.math.BlockPos;
 
-import java.util.function.BiConsumer;
-
-public record SchematicSyncPacket(int slot, boolean deployed, BlockPos anchor, BlockRotation rotation, BlockMirror mirror) implements C2SPacket {
+public record SchematicSyncPacket(
+    int slot, boolean deployed, BlockPos anchor, BlockRotation rotation, BlockMirror mirror
+) implements Packet<ServerPlayPacketListener> {
     public static final PacketCodec<RegistryByteBuf, SchematicSyncPacket> CODEC = PacketCodec.tuple(
         PacketCodecs.VAR_INT,
         SchematicSyncPacket::slot,
@@ -35,12 +37,12 @@ public record SchematicSyncPacket(int slot, boolean deployed, BlockPos anchor, B
     }
 
     @Override
-    public PacketType<SchematicSyncPacket> getPacketType() {
-        return AllPackets.SYNC_SCHEMATIC;
+    public void apply(ServerPlayPacketListener listener) {
+        AllHandle.onSchematicSync((ServerPlayNetworkHandler) listener, this);
     }
 
     @Override
-    public BiConsumer<ServerPlayNetworkHandler, SchematicSyncPacket> callback() {
-        return AllHandle::onSchematicSync;
+    public PacketType<SchematicSyncPacket> getPacketType() {
+        return AllPackets.SYNC_SCHEMATIC;
     }
 }

@@ -6,13 +6,13 @@ import io.netty.buffer.ByteBuf;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.network.codec.PacketCodecs;
+import net.minecraft.network.listener.ServerPlayPacketListener;
+import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.PacketType;
 import net.minecraft.server.network.ServerPlayNetworkHandler;
 import net.minecraft.util.math.BlockPos;
 
-import java.util.function.BiConsumer;
-
-public record DisplayLinkConfigurationPacket(BlockPos pos, NbtCompound configData, int targetLine) implements C2SPacket {
+public record DisplayLinkConfigurationPacket(BlockPos pos, NbtCompound configData, int targetLine) implements Packet<ServerPlayPacketListener> {
     public static final PacketCodec<ByteBuf, DisplayLinkConfigurationPacket> CODEC = PacketCodec.tuple(
         BlockPos.PACKET_CODEC,
         DisplayLinkConfigurationPacket::pos,
@@ -24,17 +24,12 @@ public record DisplayLinkConfigurationPacket(BlockPos pos, NbtCompound configDat
     );
 
     @Override
+    public void apply(ServerPlayPacketListener listener) {
+        AllHandle.onDisplayLinkConfiguration((ServerPlayNetworkHandler) listener, this);
+    }
+
+    @Override
     public PacketType<DisplayLinkConfigurationPacket> getPacketType() {
         return AllPackets.CONFIGURE_DATA_GATHERER;
-    }
-
-    @Override
-    public boolean runInMain() {
-        return true;
-    }
-
-    @Override
-    public BiConsumer<ServerPlayNetworkHandler, DisplayLinkConfigurationPacket> callback() {
-        return AllHandle::onDisplayLinkConfiguration;
     }
 }

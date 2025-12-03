@@ -5,15 +5,16 @@ import com.zurrtum.create.AllPackets;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.network.codec.PacketCodecs;
+import net.minecraft.network.listener.ClientPlayPacketListener;
+import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.PacketType;
 import net.minecraft.util.Uuids;
-import org.apache.logging.log4j.util.TriConsumer;
 
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.UUID;
 
-public record ClientboundChainConveyorRidingPacket(Collection<UUID> uuids) implements S2CPacket {
+public record ClientboundChainConveyorRidingPacket(Collection<UUID> uuids) implements Packet<ClientPlayPacketListener> {
     public static final PacketCodec<ByteBuf, ClientboundChainConveyorRidingPacket> CODEC = PacketCodec.tuple(
         PacketCodecs.collection(HashSet::new, Uuids.PACKET_CODEC),
         ClientboundChainConveyorRidingPacket::uuids,
@@ -21,8 +22,8 @@ public record ClientboundChainConveyorRidingPacket(Collection<UUID> uuids) imple
     );
 
     @Override
-    public <T> TriConsumer<AllClientHandle<T>, T, ClientboundChainConveyorRidingPacket> callback() {
-        return AllClientHandle::onClientboundChainConveyorRiding;
+    public void apply(ClientPlayPacketListener listener) {
+        AllClientHandle.INSTANCE.onClientboundChainConveyorRiding(this);
     }
 
     @Override

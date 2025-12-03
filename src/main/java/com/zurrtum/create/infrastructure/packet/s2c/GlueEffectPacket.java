@@ -5,12 +5,13 @@ import com.zurrtum.create.AllPackets;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.network.codec.PacketCodecs;
+import net.minecraft.network.listener.ClientPlayPacketListener;
+import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.PacketType;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
-import org.apache.logging.log4j.util.TriConsumer;
 
-public record GlueEffectPacket(BlockPos pos, Direction direction, boolean fullBlock) implements S2CPacket {
+public record GlueEffectPacket(BlockPos pos, Direction direction, boolean fullBlock) implements Packet<ClientPlayPacketListener> {
     public static final PacketCodec<ByteBuf, GlueEffectPacket> CODEC = PacketCodec.tuple(
         BlockPos.PACKET_CODEC,
         GlueEffectPacket::pos,
@@ -22,13 +23,8 @@ public record GlueEffectPacket(BlockPos pos, Direction direction, boolean fullBl
     );
 
     @Override
-    public boolean runInMain() {
-        return true;
-    }
-
-    @Override
-    public <T> TriConsumer<AllClientHandle<T>, T, GlueEffectPacket> callback() {
-        return AllClientHandle::onGlueEffect;
+    public void apply(ClientPlayPacketListener listener) {
+        AllClientHandle.INSTANCE.onGlueEffect(listener, this);
     }
 
     @Override

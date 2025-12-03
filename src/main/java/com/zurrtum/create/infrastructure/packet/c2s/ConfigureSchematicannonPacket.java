@@ -7,12 +7,12 @@ import io.netty.buffer.ByteBuf;
 import net.minecraft.network.RegistryByteBuf;
 import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.network.codec.PacketCodecs;
+import net.minecraft.network.listener.ServerPlayPacketListener;
+import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.PacketType;
 import net.minecraft.server.network.ServerPlayNetworkHandler;
 
-import java.util.function.BiConsumer;
-
-public record ConfigureSchematicannonPacket(Option option, boolean set) implements C2SPacket {
+public record ConfigureSchematicannonPacket(Option option, boolean set) implements Packet<ServerPlayPacketListener> {
     public static final PacketCodec<RegistryByteBuf, ConfigureSchematicannonPacket> CODEC = PacketCodec.tuple(
         Option.CODEC,
         ConfigureSchematicannonPacket::option,
@@ -22,13 +22,13 @@ public record ConfigureSchematicannonPacket(Option option, boolean set) implemen
     );
 
     @Override
-    public PacketType<ConfigureSchematicannonPacket> getPacketType() {
-        return AllPackets.CONFIGURE_SCHEMATICANNON;
+    public void apply(ServerPlayPacketListener listener) {
+        AllHandle.onConfigureSchematicannon((ServerPlayNetworkHandler) listener, this);
     }
 
     @Override
-    public BiConsumer<ServerPlayNetworkHandler, ConfigureSchematicannonPacket> callback() {
-        return AllHandle::onConfigureSchematicannon;
+    public PacketType<ConfigureSchematicannonPacket> getPacketType() {
+        return AllPackets.CONFIGURE_SCHEMATICANNON;
     }
 
     public enum Option {

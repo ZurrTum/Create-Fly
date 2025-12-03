@@ -5,13 +5,15 @@ import com.zurrtum.create.AllPackets;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.network.codec.PacketCodecs;
+import net.minecraft.network.listener.ServerPlayPacketListener;
+import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.PacketType;
 import net.minecraft.server.network.ServerPlayNetworkHandler;
 import net.minecraft.util.math.BlockPos;
 
-import java.util.function.BiConsumer;
-
-public record CurvedTrackSelectionPacket(BlockPos pos, BlockPos targetPos, boolean front, int segment, int slot) implements C2SPacket {
+public record CurvedTrackSelectionPacket(
+    BlockPos pos, BlockPos targetPos, boolean front, int segment, int slot
+) implements Packet<ServerPlayPacketListener> {
     public static final PacketCodec<ByteBuf, CurvedTrackSelectionPacket> CODEC = PacketCodec.tuple(
         BlockPos.PACKET_CODEC,
         CurvedTrackSelectionPacket::pos,
@@ -27,17 +29,12 @@ public record CurvedTrackSelectionPacket(BlockPos pos, BlockPos targetPos, boole
     );
 
     @Override
-    public boolean runInMain() {
-        return true;
+    public void apply(ServerPlayPacketListener listener) {
+        AllHandle.onCurvedTrackSelection((ServerPlayNetworkHandler) listener, this);
     }
 
     @Override
     public PacketType<CurvedTrackSelectionPacket> getPacketType() {
         return AllPackets.SELECT_CURVED_TRACK;
-    }
-
-    @Override
-    public BiConsumer<ServerPlayNetworkHandler, CurvedTrackSelectionPacket> callback() {
-        return AllHandle::onCurvedTrackSelection;
     }
 }

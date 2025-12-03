@@ -7,13 +7,14 @@ import com.zurrtum.create.content.logistics.BigItemStack;
 import net.minecraft.network.RegistryByteBuf;
 import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.network.codec.PacketCodecs;
+import net.minecraft.network.listener.ClientPlayPacketListener;
+import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.PacketType;
 import net.minecraft.util.math.BlockPos;
-import org.apache.logging.log4j.util.TriConsumer;
 
 import java.util.List;
 
-public record LogisticalStockResponsePacket(boolean lastPacket, BlockPos pos, List<BigItemStack> items) implements S2CPacket {
+public record LogisticalStockResponsePacket(boolean lastPacket, BlockPos pos, List<BigItemStack> items) implements Packet<ClientPlayPacketListener> {
     public static final PacketCodec<RegistryByteBuf, LogisticalStockResponsePacket> CODEC = PacketCodec.tuple(
         PacketCodecs.BOOLEAN,
         LogisticalStockResponsePacket::lastPacket,
@@ -25,17 +26,12 @@ public record LogisticalStockResponsePacket(boolean lastPacket, BlockPos pos, Li
     );
 
     @Override
-    public boolean runInMain() {
-        return true;
+    public void apply(ClientPlayPacketListener listener) {
+        AllClientHandle.INSTANCE.onLogisticalStockResponse(listener, this);
     }
 
     @Override
     public PacketType<LogisticalStockResponsePacket> getPacketType() {
         return AllPackets.LOGISTICS_STOCK_RESPONSE;
-    }
-
-    @Override
-    public <T> TriConsumer<AllClientHandle<T>, T, LogisticalStockResponsePacket> callback() {
-        return AllClientHandle::onLogisticalStockResponse;
     }
 }

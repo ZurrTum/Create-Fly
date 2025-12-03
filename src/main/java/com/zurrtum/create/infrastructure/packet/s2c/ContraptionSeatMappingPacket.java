@@ -5,15 +5,16 @@ import com.zurrtum.create.AllPackets;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.network.codec.PacketCodecs;
+import net.minecraft.network.listener.ClientPlayPacketListener;
+import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.PacketType;
 import net.minecraft.util.Uuids;
-import org.apache.logging.log4j.util.TriConsumer;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-public record ContraptionSeatMappingPacket(int entityId, Map<UUID, Integer> mapping, int dismountedId) implements S2CPacket {
+public record ContraptionSeatMappingPacket(int entityId, Map<UUID, Integer> mapping, int dismountedId) implements Packet<ClientPlayPacketListener> {
     public static final PacketCodec<ByteBuf, ContraptionSeatMappingPacket> CODEC = PacketCodec.tuple(
         PacketCodecs.INTEGER,
         ContraptionSeatMappingPacket::entityId,
@@ -29,8 +30,8 @@ public record ContraptionSeatMappingPacket(int entityId, Map<UUID, Integer> mapp
     }
 
     @Override
-    public <T> TriConsumer<AllClientHandle<T>, T, ContraptionSeatMappingPacket> callback() {
-        return AllClientHandle::onContraptionSeatMapping;
+    public void apply(ClientPlayPacketListener listener) {
+        AllClientHandle.INSTANCE.onContraptionSeatMapping(this);
     }
 
     @Override

@@ -6,13 +6,15 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.network.RegistryByteBuf;
 import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.network.codec.PacketCodecs;
+import net.minecraft.network.listener.ServerPlayPacketListener;
+import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.PacketType;
 import net.minecraft.server.network.ServerPlayNetworkHandler;
 import net.minecraft.util.math.BlockPos;
 
-import java.util.function.BiConsumer;
-
-public record ChainConveyorConnectionPacket(BlockPos pos, BlockPos targetPos, ItemStack chain, boolean connect) implements C2SPacket {
+public record ChainConveyorConnectionPacket(
+    BlockPos pos, BlockPos targetPos, ItemStack chain, boolean connect
+) implements Packet<ServerPlayPacketListener> {
     public static final PacketCodec<RegistryByteBuf, ChainConveyorConnectionPacket> CODEC = PacketCodec.tuple(
         BlockPos.PACKET_CODEC,
         ChainConveyorConnectionPacket::pos,
@@ -26,17 +28,12 @@ public record ChainConveyorConnectionPacket(BlockPos pos, BlockPos targetPos, It
     );
 
     @Override
+    public void apply(ServerPlayPacketListener listener) {
+        AllHandle.onChainConveyorConnection((ServerPlayNetworkHandler) listener, this);
+    }
+
+    @Override
     public PacketType<ChainConveyorConnectionPacket> getPacketType() {
         return AllPackets.CHAIN_CONVEYOR_CONNECT;
-    }
-
-    @Override
-    public boolean runInMain() {
-        return true;
-    }
-
-    @Override
-    public BiConsumer<ServerPlayNetworkHandler, ChainConveyorConnectionPacket> callback() {
-        return AllHandle::onChainConveyorConnection;
     }
 }

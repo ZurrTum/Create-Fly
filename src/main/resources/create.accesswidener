@@ -48,9 +48,7 @@ accessible field net/minecraft/client/gui/screen/Screen drawables Ljava/util/Lis
 accessible field net/minecraft/client/gui/widget/TextFieldWidget textRenderer Lnet/minecraft/client/font/TextRenderer;
 accessible field net/minecraft/client/model/ModelPart children Ljava/util/Map;
 accessible field net/minecraft/client/model/ModelPart cuboids Ljava/util/List;
-accessible field net/minecraft/client/network/ClientCommonNetworkHandler client Lnet/minecraft/client/MinecraftClient;
 accessible field net/minecraft/client/network/ClientPlayNetworkHandler chunkLoadDistance I
-accessible field net/minecraft/client/network/ClientPlayNetworkHandler world Lnet/minecraft/client/world/ClientWorld;
 accessible field net/minecraft/client/option/KeyBinding boundKey Lnet/minecraft/client/util/InputUtil$Key;
 accessible field net/minecraft/client/option/KeyBinding defaultKey Lnet/minecraft/client/util/InputUtil$Key;
 accessible field net/minecraft/client/particle/BillboardParticleRenderer submittable Lnet/minecraft/client/particle/BillboardParticleSubmittable;

@@ -15,7 +15,6 @@ import net.minecraft.util.Identifier;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 import static com.zurrtum.create.Create.MOD_ID;
@@ -287,7 +286,7 @@ public class AllPackets {
         return packet;
     }
 
-    private static <T extends ClientPlayPacketListener> S2CHoldPacket<T> s2c(String id, BiConsumer<AllClientHandle<T>, T> callback) {
+    private static <T extends ClientPlayPacketListener> S2CHoldPacket<T> s2c(String id, Consumer<AllClientHandle> callback) {
         S2CHoldPacket<T> packet = new S2CHoldPacket<>(id, callback);
         S2C.put(packet.id(), packet.codec());
         return packet;

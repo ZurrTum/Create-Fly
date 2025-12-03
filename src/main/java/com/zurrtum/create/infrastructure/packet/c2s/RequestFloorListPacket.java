@@ -6,12 +6,12 @@ import com.zurrtum.create.content.contraptions.AbstractContraptionEntity;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.network.codec.PacketCodecs;
+import net.minecraft.network.listener.ServerPlayPacketListener;
+import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.PacketType;
 import net.minecraft.server.network.ServerPlayNetworkHandler;
 
-import java.util.function.BiConsumer;
-
-public record RequestFloorListPacket(int entityId) implements C2SPacket {
+public record RequestFloorListPacket(int entityId) implements Packet<ServerPlayPacketListener> {
     public static final PacketCodec<ByteBuf, RequestFloorListPacket> CODEC = PacketCodecs.INTEGER.xmap(
         RequestFloorListPacket::new,
         RequestFloorListPacket::entityId
@@ -22,17 +22,12 @@ public record RequestFloorListPacket(int entityId) implements C2SPacket {
     }
 
     @Override
-    public boolean runInMain() {
-        return true;
+    public void apply(ServerPlayPacketListener listener) {
+        AllHandle.onElevatorRequestFloorList((ServerPlayNetworkHandler) listener, this);
     }
 
     @Override
     public PacketType<RequestFloorListPacket> getPacketType() {
         return AllPackets.REQUEST_FLOOR_LIST;
-    }
-
-    @Override
-    public BiConsumer<ServerPlayNetworkHandler, RequestFloorListPacket> callback() {
-        return AllHandle::onElevatorRequestFloorList;
     }
 }

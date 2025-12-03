@@ -9,14 +9,15 @@ import com.zurrtum.create.content.kinetics.mechanicalArm.ArmInteractionPoint;
 import net.minecraft.nbt.NbtList;
 import net.minecraft.network.RegistryByteBuf;
 import net.minecraft.network.codec.PacketCodec;
+import net.minecraft.network.listener.ServerPlayPacketListener;
+import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.PacketType;
 import net.minecraft.server.network.ServerPlayNetworkHandler;
 import net.minecraft.util.math.BlockPos;
 
 import java.util.List;
-import java.util.function.BiConsumer;
 
-public record ArmPlacementPacket(NbtList tag, BlockPos pos) implements C2SPacket {
+public record ArmPlacementPacket(NbtList tag, BlockPos pos) implements Packet<ServerPlayPacketListener> {
     public static final PacketCodec<RegistryByteBuf, ArmPlacementPacket> CODEC = PacketCodec.tuple(
         CatnipStreamCodecs.COMPOUND_LIST_TAG,
         ArmPlacementPacket::tag,
@@ -32,17 +33,12 @@ public record ArmPlacementPacket(NbtList tag, BlockPos pos) implements C2SPacket
     }
 
     @Override
-    public boolean runInMain() {
-        return true;
+    public void apply(ServerPlayPacketListener listener) {
+        AllHandle.onArmPlacement((ServerPlayNetworkHandler) listener, this);
     }
 
     @Override
     public PacketType<ArmPlacementPacket> getPacketType() {
         return AllPackets.PLACE_ARM;
-    }
-
-    @Override
-    public BiConsumer<ServerPlayNetworkHandler, ArmPlacementPacket> callback() {
-        return AllHandle::onArmPlacement;
     }
 }

@@ -131,6 +131,7 @@ import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.NetworkThreadUtils;
 import net.minecraft.network.RegistryByteBuf;
+import net.minecraft.network.listener.ClientPlayPacketListener;
 import net.minecraft.network.listener.ServerPlayPacketListener;
 import net.minecraft.network.packet.Packet;
 import net.minecraft.particle.ItemStackParticleEffect;
@@ -155,15 +156,15 @@ import java.util.function.Consumer;
 
 import static com.zurrtum.create.Create.LOGGER;
 
-public class AllHandle extends AllClientHandle<ClientPlayNetworkHandler> {
-
+public class AllHandle extends AllClientHandle {
     public static void register() {
         AllClientHandle.INSTANCE = new AllHandle();
     }
 
-    @Override
-    protected void forceMainThread(ClientPlayNetworkHandler listener, S2CPacket packet) {
-        NetworkThreadUtils.forceMainThread(packet, listener, listener.client.getPacketApplyBatcher());
+    protected void forceMainThread(ClientPlayPacketListener listener, MinecraftClient mc, Packet<ClientPlayPacketListener> packet) {
+        if (listener instanceof ClientPlayNetworkHandler) {
+            NetworkThreadUtils.forceMainThread(packet, listener, mc.getPacketApplyBatcher());
+        }
     }
 
     @Override
@@ -177,24 +178,27 @@ public class AllHandle extends AllClientHandle<ClientPlayNetworkHandler> {
     }
 
     @Override
-    public void onSymmetryEffect(ClientPlayNetworkHandler listener, SymmetryEffectPacket packet) {
-        MinecraftClient client = listener.client;
+    public void onSymmetryEffect(ClientPlayPacketListener listener, SymmetryEffectPacket packet) {
+        MinecraftClient mc = MinecraftClient.getInstance();
+        forceMainThread(listener, mc, packet);
         BlockPos mirror = packet.mirror();
-        if (client.player.getEntityPos().distanceTo(Vec3d.of(mirror)) > 100)
+        if (mc.player.getEntityPos().distanceTo(Vec3d.of(mirror)) > 100)
             return;
         for (BlockPos to : packet.positions())
-            SymmetryHandlerClient.drawEffect(client, mirror, to);
+            SymmetryHandlerClient.drawEffect(mc, mirror, to);
     }
 
     @Override
-    public void onLogisticalStockResponse(ClientPlayNetworkHandler listener, LogisticalStockResponsePacket packet) {
-        if (listener.world.getBlockEntity(packet.pos()) instanceof StockTickerBlockEntity stbe) {
+    public void onLogisticalStockResponse(ClientPlayPacketListener listener, LogisticalStockResponsePacket packet) {
+        MinecraftClient mc = MinecraftClient.getInstance();
+        forceMainThread(listener, mc, packet);
+        if (mc.world.getBlockEntity(packet.pos()) instanceof StockTickerBlockEntity stbe) {
             stbe.receiveStockPacket(packet.items(), packet.lastPacket());
         }
     }
 
     @Override
-    public void onTrainEditReturn(ClientPlayNetworkHandler clientPlayNetworkHandler, TrainEditReturnPacket packet) {
+    public void onTrainEditReturn(TrainEditReturnPacket packet) {
         Train train = Create.RAILWAYS.trains.get(packet.id());
         if (train == null)
             return;
@@ -206,7 +210,7 @@ public class AllHandle extends AllClientHandle<ClientPlayNetworkHandler> {
     }
 
     @Override
-    public void onTrainHUDControlUpdate(ClientPlayNetworkHandler listener, TrainHUDControlUpdatePacket packet) {
+    public void onTrainHUDControlUpdate(TrainHUDControlUpdatePacket packet) {
         Train train = Create.RAILWAYS.trains.get(packet.trainId());
         if (train == null)
             return;
@@ -220,7 +224,7 @@ public class AllHandle extends AllClientHandle<ClientPlayNetworkHandler> {
     }
 
     @Override
-    public void onTrainHonkReturn(ClientPlayNetworkHandler listener, HonkReturnPacket packet) {
+    public void onTrainHonkReturn(HonkReturnPacket packet) {
         Train train = Create.RAILWAYS.trains.get(packet.trainId());
         if (train == null)
             return;
@@ -232,8 +236,10 @@ public class AllHandle extends AllClientHandle<ClientPlayNetworkHandler> {
     }
 
     @Override
-    public void onElevatorFloorList(ClientPlayNetworkHandler listener, ElevatorFloorListPacket packet) {
-        Entity entityByID = listener.world.getEntityById(packet.entityId());
+    public void onElevatorFloorList(ClientPlayPacketListener listener, ElevatorFloorListPacket packet) {
+        MinecraftClient mc = MinecraftClient.getInstance();
+        forceMainThread(listener, mc, packet);
+        Entity entityByID = mc.world.getEntityById(packet.entityId());
         if (!(entityByID instanceof AbstractContraptionEntity ace))
             return;
         if (!(ace.getContraption() instanceof ElevatorContraption ec))
@@ -244,13 +250,15 @@ public class AllHandle extends AllClientHandle<ClientPlayNetworkHandler> {
     }
 
     @Override
-    public void onContraptionColliderLock(ClientPlayNetworkHandler listener, ContraptionColliderLockPacket packet) {
+    public void onContraptionColliderLock(ContraptionColliderLockPacket packet) {
         ContraptionColliderClient.lockPacketReceived(packet.contraption(), packet.sender(), packet.offset());
     }
 
     @Override
-    public void onWiFiEffect(ClientPlayNetworkHandler listener, WiFiEffectPacket packet) {
-        BlockEntity blockEntity = listener.world.getBlockEntity(packet.pos());
+    public void onWiFiEffect(ClientPlayPacketListener listener, WiFiEffectPacket packet) {
+        MinecraftClient mc = MinecraftClient.getInstance();
+        forceMainThread(listener, mc, packet);
+        BlockEntity blockEntity = mc.world.getBlockEntity(packet.pos());
         if (blockEntity instanceof PackagerLinkBlockEntity plbe)
             plbe.playEffect();
         if (blockEntity instanceof StockTickerBlockEntity plbe)
@@ -258,12 +266,12 @@ public class AllHandle extends AllClientHandle<ClientPlayNetworkHandler> {
     }
 
     @Override
-    public void onControlsStopControlling(ClientPlayNetworkHandler listener) {
-        ControlsHandler.stopControlling(listener.client.player);
+    public void onControlsStopControlling() {
+        ControlsHandler.stopControlling(MinecraftClient.getInstance().player);
     }
 
     @Override
-    public void onServerSpeed(ClientPlayNetworkHandler listener, ServerSpeedPacket packet) {
+    public void onServerSpeed(ServerSpeedPacket packet) {
         if (!ServerSpeedProvider.initialized) {
             ServerSpeedProvider.initialized = true;
             ServerSpeedProvider.clientTimer = 0;
@@ -278,14 +286,13 @@ public class AllHandle extends AllClientHandle<ClientPlayNetworkHandler> {
     }
 
     private <T extends ShootableGadgetRenderHandler> void onShootGadget(
-        ClientPlayNetworkHandler listener,
+        Entity renderViewEntity,
         Vec3d location,
         Hand hand,
         boolean self,
         T handler,
         Consumer<T> handleAdditional
     ) {
-        Entity renderViewEntity = listener.client.getCameraEntity();
         if (renderViewEntity == null)
             return;
         if (renderViewEntity.getEntityPos().distanceTo(location) > 100)
@@ -299,40 +306,44 @@ public class AllHandle extends AllClientHandle<ClientPlayNetworkHandler> {
     }
 
     @Override
-    public void onZapperBeam(ClientPlayNetworkHandler listener, ZapperBeamPacket packet) {
+    public void onZapperBeam(ClientPlayPacketListener listener, ZapperBeamPacket packet) {
+        MinecraftClient mc = MinecraftClient.getInstance();
+        forceMainThread(listener, mc, packet);
         onShootGadget(
-            listener, packet.location(), packet.hand(), packet.self(), Create.ZAPPER_RENDER_HANDLER, handler -> {
-                handler.addBeam(listener.client, new LaserBeam(packet.location(), packet.target()));
+            mc.getCameraEntity(), packet.location(), packet.hand(), packet.self(), Create.ZAPPER_RENDER_HANDLER, handler -> {
+                handler.addBeam(MinecraftClient.getInstance(), new LaserBeam(packet.location(), packet.target()));
             }
         );
     }
 
     @Override
-    public void onPotatoCannon(ClientPlayNetworkHandler listener, PotatoCannonPacket packet) {
+    public void onPotatoCannon(ClientPlayPacketListener listener, PotatoCannonPacket packet) {
+        MinecraftClient mc = MinecraftClient.getInstance();
+        forceMainThread(listener, mc, packet);
         onShootGadget(
-            listener, packet.location(), packet.hand(), packet.self(), Create.POTATO_CANNON_RENDER_HANDLER, handler -> {
+            mc.getCameraEntity(), packet.location(), packet.hand(), packet.self(), Create.POTATO_CANNON_RENDER_HANDLER, handler -> {
                 handler.beforeShoot(packet.pitch(), packet.location(), packet.motion(), packet.item());
             }
         );
     }
 
     @Override
-    public void onContraptionStall(ClientPlayNetworkHandler listener, ContraptionStallPacket packet) {
-        if (listener.world.getEntityById(packet.entityId()) instanceof AbstractContraptionEntity ce) {
+    public void onContraptionStall(ContraptionStallPacket packet) {
+        if (MinecraftClient.getInstance().world.getEntityById(packet.entityId()) instanceof AbstractContraptionEntity ce) {
             ce.handleStallInformation(packet.x(), packet.y(), packet.z(), packet.angle());
         }
     }
 
     @Override
-    public void onContraptionDisassembly(ClientPlayNetworkHandler listener, ContraptionDisassemblyPacket packet) {
-        if (listener.world.getEntityById(packet.entityId()) instanceof AbstractContraptionEntity ce) {
+    public void onContraptionDisassembly(ContraptionDisassemblyPacket packet) {
+        if (MinecraftClient.getInstance().world.getEntityById(packet.entityId()) instanceof AbstractContraptionEntity ce) {
             ce.moveCollidedEntitiesOnDisassembly(packet.transform());
         }
     }
 
     @Override
-    public void onContraptionBlockChanged(ClientPlayNetworkHandler listener, ContraptionBlockChangedPacket packet) {
-        if (listener.world.getEntityById(packet.entityId()) instanceof AbstractContraptionEntity ce) {
+    public void onContraptionBlockChanged(ContraptionBlockChangedPacket packet) {
+        if (MinecraftClient.getInstance().world.getEntityById(packet.entityId()) instanceof AbstractContraptionEntity ce) {
             Contraption contraption = ce.getContraption();
             if (contraption == null) {
                 return;
@@ -353,16 +364,18 @@ public class AllHandle extends AllClientHandle<ClientPlayNetworkHandler> {
     }
 
     @Override
-    public void onGlueEffect(ClientPlayNetworkHandler listener, GlueEffectPacket packet) {
-        ClientPlayerEntity player = listener.client.player;
+    public void onGlueEffect(ClientPlayPacketListener listener, GlueEffectPacket packet) {
+        MinecraftClient mc = MinecraftClient.getInstance();
+        forceMainThread(listener, mc, packet);
+        ClientPlayerEntity player = mc.player;
         if (!player.getBlockPos().isWithinDistance(packet.pos(), 100))
             return;
         SuperGlueSelectionHandler.spawnParticles(player.getEntityWorld(), packet.pos(), packet.direction(), packet.fullBlock());
     }
 
     @Override
-    public void onContraptionSeatMapping(ClientPlayNetworkHandler listener, ContraptionSeatMappingPacket packet) {
-        ClientPlayerEntity player = listener.client.player;
+    public void onContraptionSeatMapping(ContraptionSeatMappingPacket packet) {
+        ClientPlayerEntity player = MinecraftClient.getInstance().player;
         Entity entityByID = player.getEntityWorld().getEntityById(packet.entityId());
         if (!(entityByID instanceof AbstractContraptionEntity contraptionEntity))
             return;
@@ -377,8 +390,10 @@ public class AllHandle extends AllClientHandle<ClientPlayNetworkHandler> {
     }
 
     @Override
-    public void onLimbSwingUpdate(ClientPlayNetworkHandler listener, LimbSwingUpdatePacket packet) {
-        ClientWorld world = listener.getWorld();
+    public void onLimbSwingUpdate(ClientPlayPacketListener listener, LimbSwingUpdatePacket packet) {
+        MinecraftClient mc = MinecraftClient.getInstance();
+        forceMainThread(listener, mc, packet);
+        ClientWorld world = mc.world;
         Entity entity = world.getEntityById(packet.entityId());
         if (!(entity instanceof PlayerEntity player))
             return;
@@ -389,17 +404,17 @@ public class AllHandle extends AllClientHandle<ClientPlayNetworkHandler> {
     }
 
     @Override
-    public void onFluidSplash(ClientPlayNetworkHandler listener, FluidSplashPacket packet) {
+    public void onFluidSplash(FluidSplashPacket packet) {
         BlockPos pos = packet.pos();
-        if (listener.client.player.getEntityPos().distanceTo(new Vec3d(pos.getX(), pos.getY(), pos.getZ())) > 100) {
+        if (MinecraftClient.getInstance().player.getEntityPos().distanceTo(new Vec3d(pos.getX(), pos.getY(), pos.getZ())) > 100) {
             return;
         }
         FluidFX.splash(pos, packet.fluid());
     }
 
     @Override
-    public void onMountedStorageSync(ClientPlayNetworkHandler listener, MountedStorageSyncPacket packet) {
-        Entity entity = listener.world.getEntityById(packet.contraptionId());
+    public void onMountedStorageSync(MountedStorageSyncPacket packet) {
+        Entity entity = MinecraftClient.getInstance().world.getEntityById(packet.contraptionId());
         if (!(entity instanceof AbstractContraptionEntity contraption))
             return;
 
@@ -407,8 +422,8 @@ public class AllHandle extends AllClientHandle<ClientPlayNetworkHandler> {
     }
 
     @Override
-    public void onGantryContraptionUpdate(ClientPlayNetworkHandler listener, GantryContraptionUpdatePacket packet) {
-        Entity entity = listener.world.getEntityById(packet.entityID());
+    public void onGantryContraptionUpdate(GantryContraptionUpdatePacket packet) {
+        Entity entity = MinecraftClient.getInstance().world.getEntityById(packet.entityID());
         if (!(entity instanceof GantryContraptionEntity ce)) {
             return;
         }
@@ -418,8 +433,8 @@ public class AllHandle extends AllClientHandle<ClientPlayNetworkHandler> {
     }
 
     @Override
-    public void onHighlight(ClientPlayNetworkHandler listener, HighlightPacket packet) {
-        if (!listener.world.isPosLoaded(packet.pos())) {
+    public void onHighlight(HighlightPacket packet) {
+        if (!MinecraftClient.getInstance().world.isPosLoaded(packet.pos())) {
             return;
         }
 
@@ -430,8 +445,8 @@ public class AllHandle extends AllClientHandle<ClientPlayNetworkHandler> {
     }
 
     @Override
-    public void onTunnelFlap(ClientPlayNetworkHandler listener, TunnelFlapPacket packet) {
-        if (listener.world.getBlockEntity(packet.pos()) instanceof BeltTunnelBlockEntity blockEntity) {
+    public void onTunnelFlap(TunnelFlapPacket packet) {
+        if (MinecraftClient.getInstance().world.getBlockEntity(packet.pos()) instanceof BeltTunnelBlockEntity blockEntity) {
             packet.flaps().forEach(flap -> {
                 blockEntity.flap(flap.getFirst(), flap.getSecond());
             });
@@ -439,19 +454,21 @@ public class AllHandle extends AllClientHandle<ClientPlayNetworkHandler> {
     }
 
     @Override
-    public void onFunnelFlap(ClientPlayNetworkHandler listener, FunnelFlapPacket packet) {
-        if (listener.world.getBlockEntity(packet.pos()) instanceof FunnelBlockEntity blockEntity) {
+    public void onFunnelFlap(ClientPlayPacketListener listener, FunnelFlapPacket packet) {
+        MinecraftClient mc = MinecraftClient.getInstance();
+        forceMainThread(listener, mc, packet);
+        if (mc.world.getBlockEntity(packet.pos()) instanceof FunnelBlockEntity blockEntity) {
             blockEntity.flap(packet.inwards());
         }
     }
 
     @Override
-    public void onSoulPulseEffect(ClientPlayNetworkHandler listener, SoulPulseEffectPacket packet) {
+    public void onSoulPulseEffect(SoulPulseEffectPacket packet) {
         Create.SOUL_PULSE_EFFECT_HANDLER.addPulse(new SoulPulseEffect(packet.pos(), packet.distance(), packet.canOverlap()));
     }
 
     @Override
-    public void onSignalEdgeGroup(ClientPlayNetworkHandler listener, SignalEdgeGroupPacket packet) {
+    public void onSignalEdgeGroup(SignalEdgeGroupPacket packet) {
         Map<UUID, SignalEdgeGroup> signalEdgeGroups = Create.RAILWAYS.signalEdgeGroups;
         List<UUID> ids = packet.ids();
         for (int i = 0; i < ids.size(); i++) {
@@ -469,13 +486,15 @@ public class AllHandle extends AllClientHandle<ClientPlayNetworkHandler> {
     }
 
     @Override
-    public void onRemoveTrain(ClientPlayNetworkHandler listener, RemoveTrainPacket packet) {
+    public void onRemoveTrain(RemoveTrainPacket packet) {
         Create.RAILWAYS.trains.remove(packet.id());
     }
 
     @Override
-    public void onRemoveBlockEntity(ClientPlayNetworkHandler listener, RemoveBlockEntityPacket packet) {
-        if (listener.world.getBlockEntity(packet.pos()) instanceof SyncedBlockEntity be) {
+    public void onRemoveBlockEntity(ClientPlayPacketListener listener, RemoveBlockEntityPacket packet) {
+        MinecraftClient mc = MinecraftClient.getInstance();
+        forceMainThread(listener, mc, packet);
+        if (mc.world.getBlockEntity(packet.pos()) instanceof SyncedBlockEntity be) {
             if (!be.hasWorld()) {
                 be.markRemoved();
                 return;
@@ -486,21 +505,21 @@ public class AllHandle extends AllClientHandle<ClientPlayNetworkHandler> {
     }
 
     @Override
-    public void onTrainPrompt(ClientPlayNetworkHandler listener, TrainPromptPacket packet) {
+    public void onTrainPrompt(TrainPromptPacket packet) {
         TrainHUD.currentPrompt = packet.text();
         TrainHUD.currentPromptShadow = packet.shadow();
         TrainHUD.promptKeepAlive = 30;
     }
 
     @Override
-    public void onContraptionRelocation(ClientPlayNetworkHandler listener, ContraptionRelocationPacket packet) {
-        if (listener.world.getEntityById(packet.entityId()) instanceof OrientedContraptionEntity oce) {
+    public void onContraptionRelocation(ContraptionRelocationPacket packet) {
+        if (MinecraftClient.getInstance().world.getEntityById(packet.entityId()) instanceof OrientedContraptionEntity oce) {
             oce.nonDamageTicks = 10;
         }
     }
 
     @Override
-    public void onTrackGraphRollCall(ClientPlayNetworkHandler listener, TrackGraphRollCallPacket packet) {
+    public void onTrackGraphRollCall(TrackGraphRollCallPacket packet) {
         GlobalRailwayManager manager = Create.RAILWAYS;
         Set<UUID> unusedIds = new HashSet<>(manager.trackNetworks.keySet());
         List<Integer> failedIds = new ArrayList<>();
@@ -521,30 +540,33 @@ public class AllHandle extends AllClientHandle<ClientPlayNetworkHandler> {
             failedIds.add(entry.netId());
         }
 
+        ClientPlayNetworkHandler networkHandler = MinecraftClient.getInstance().player.networkHandler;
         for (Integer failed : failedIds)
-            listener.sendPacket(new TrackGraphRequestPacket(failed));
+            networkHandler.sendPacket(new TrackGraphRequestPacket(failed));
         for (UUID unused : unusedIds)
             manager.trackNetworks.remove(unused);
     }
 
     @Override
-    public void onArmPlacementRequest(ClientPlayNetworkHandler listener, ArmPlacementRequestPacket packet) {
-        ArmInteractionPointHandler.flushSettings(listener.client.player, packet.pos());
+    public void onArmPlacementRequest(ArmPlacementRequestPacket packet) {
+        ArmInteractionPointHandler.flushSettings(MinecraftClient.getInstance().player, packet.pos());
     }
 
     @Override
-    public void onEjectorPlacementRequest(ClientPlayNetworkHandler listener, EjectorPlacementRequestPacket packet) {
-        EjectorTargetHandler.flushSettings(listener, packet.pos());
+    public void onEjectorPlacementRequest(EjectorPlacementRequestPacket packet) {
+        EjectorTargetHandler.flushSettings(packet.pos());
     }
 
     @Override
-    public void onPackagePortPlacementRequest(ClientPlayNetworkHandler listener, PackagePortPlacementRequestPacket packet) {
-        PackagePortTargetSelectionHandler.flushSettings(listener.client.player, packet.pos());
+    public void onPackagePortPlacementRequest(PackagePortPlacementRequestPacket packet) {
+        PackagePortTargetSelectionHandler.flushSettings(MinecraftClient.getInstance().player, packet.pos());
     }
 
     @Override
-    public void onContraptionDisableActor(ClientPlayNetworkHandler listener, ContraptionDisableActorPacket packet) {
-        Entity entityByID = listener.world.getEntityById(packet.entityId());
+    public void onContraptionDisableActor(ClientPlayPacketListener listener, ContraptionDisableActorPacket packet) {
+        MinecraftClient mc = MinecraftClient.getInstance();
+        forceMainThread(listener, mc, packet);
+        Entity entityByID = mc.world.getEntityById(packet.entityId());
         if (!(entityByID instanceof AbstractContraptionEntity ace))
             return;
 
@@ -566,40 +588,45 @@ public class AllHandle extends AllClientHandle<ClientPlayNetworkHandler> {
     }
 
     @Override
-    public void onAttachedComputer(ClientPlayNetworkHandler listener, AttachedComputerPacket packet) {
-        if (listener.world.getBlockEntity(packet.pos()) instanceof SmartBlockEntity be) {
+    public void onAttachedComputer(AttachedComputerPacket packet) {
+        if (MinecraftClient.getInstance().world.getBlockEntity(packet.pos()) instanceof SmartBlockEntity be) {
             be.getBehaviour(AbstractComputerBehaviour.TYPE).setHasAttachedComputer(packet.hasAttachedComputer());
         }
     }
 
     @Override
-    public void onServerDebugInfo(ClientPlayNetworkHandler listener, ServerDebugInfoPacket packet) {
+    public void onServerDebugInfo(ServerDebugInfoPacket packet) {
         StringBuilder output = new StringBuilder();
         List<DebugInfoSection> clientInfo = DebugInformation.getClientInfo();
 
-        ServerDebugInfoPacket.printInfo("Client", listener.client.player, clientInfo, output);
+        MinecraftClient mc = MinecraftClient.getInstance();
+        ServerDebugInfoPacket.printInfo("Client", mc.player, clientInfo, output);
         output.append("\n\n");
         output.append(packet.serverInfo());
 
         String text = output.toString();
-        listener.client.keyboard.setClipboard(text);
-        listener.client.player.sendMessage(
+        mc.keyboard.setClipboard(text);
+        mc.player.sendMessage(
             Text.translatable("create.command.debuginfo.saved_to_clipboard")
                 .withColor(DyeHelper.getDyeColors(DyeColor.LIME).getFirst()), false
         );
     }
 
     @Override
-    public void onPackageDestroy(ClientPlayNetworkHandler listener, PackageDestroyPacket packet) {
-        ClientWorld world = listener.world;
+    public void onPackageDestroy(ClientPlayPacketListener listener, PackageDestroyPacket packet) {
+        MinecraftClient mc = MinecraftClient.getInstance();
+        forceMainThread(listener, mc, packet);
+        ClientWorld world = mc.world;
         Vec3d motion = VecHelper.offsetRandomly(Vec3d.ZERO, world.getRandom(), .125f);
         Vec3d pos = packet.location().add(motion.multiply(4));
         world.addParticleClient(new ItemStackParticleEffect(ParticleTypes.ITEM, packet.box()), pos.x, pos.y, pos.z, motion.x, motion.y, motion.z);
     }
 
     @Override
-    public void onFactoryPanelEffect(ClientPlayNetworkHandler listener, FactoryPanelEffectPacket packet) {
-        ClientWorld world = listener.world;
+    public void onFactoryPanelEffect(ClientPlayPacketListener listener, FactoryPanelEffectPacket packet) {
+        MinecraftClient mc = MinecraftClient.getInstance();
+        forceMainThread(listener, mc, packet);
+        ClientWorld world = mc.world;
         BlockState blockState = world.getBlockState(packet.fromPos().pos());
         if (!blockState.isOf(AllBlocks.FACTORY_GAUGE))
             return;
@@ -613,20 +640,24 @@ public class AllHandle extends AllClientHandle<ClientPlayNetworkHandler> {
     }
 
     @Override
-    public void onRedstoneRequesterEffect(ClientPlayNetworkHandler listener, RedstoneRequesterEffectPacket packet) {
-        if (listener.world.getBlockEntity(packet.pos()) instanceof RedstoneRequesterBlockEntity plbe) {
+    public void onRedstoneRequesterEffect(ClientPlayPacketListener listener, RedstoneRequesterEffectPacket packet) {
+        MinecraftClient mc = MinecraftClient.getInstance();
+        forceMainThread(listener, mc, packet);
+        if (mc.world.getBlockEntity(packet.pos()) instanceof RedstoneRequesterBlockEntity plbe) {
             plbe.playEffect(packet.success());
         }
     }
 
     @Override
-    public void onClientboundChainConveyorRiding(ClientPlayNetworkHandler listener, ClientboundChainConveyorRidingPacket packet) {
+    public void onClientboundChainConveyorRiding(ClientboundChainConveyorRidingPacket packet) {
         PlayerSkyhookRenderer.updatePlayerList(packet.uuids());
     }
 
     @Override
-    public void onShopUpdate(ClientPlayNetworkHandler listener, ShopUpdatePacket packet) {
-        if (listener.world.getBlockEntity(packet.pos()) instanceof TableClothBlockEntity blockEntity) {
+    public void onShopUpdate(ClientPlayPacketListener listener, ShopUpdatePacket packet) {
+        MinecraftClient mc = MinecraftClient.getInstance();
+        forceMainThread(listener, mc, packet);
+        if (mc.world.getBlockEntity(packet.pos()) instanceof TableClothBlockEntity blockEntity) {
             if (!blockEntity.hasWorld()) {
                 return;
             }
@@ -636,7 +667,7 @@ public class AllHandle extends AllClientHandle<ClientPlayNetworkHandler> {
     }
 
     @Override
-    public void onTrackGraphSync(ClientPlayNetworkHandler listener, TrackGraphSyncPacket packet) {
+    public void onTrackGraphSync(TrackGraphSyncPacket packet) {
         GlobalRailwayManager manager = Create.RAILWAYS;
         TrackGraph graph = manager.getOrCreateGraph(packet.graphId, packet.netId);
         manager.version++;
@@ -721,20 +752,23 @@ public class AllHandle extends AllClientHandle<ClientPlayNetworkHandler> {
     }
 
     @Override
-    public void onAddTrain(ClientPlayNetworkHandler listener, AddTrainPacket packet) {
+    public void onAddTrain(AddTrainPacket packet) {
         Train train = packet.train();
         Create.RAILWAYS.trains.put(train.id, train);
     }
 
     @Override
-    public void onOpenScreen(ClientPlayNetworkHandler listener, OpenScreenPacket packet) {
-        RegistryByteBuf extraData = new RegistryByteBuf(Unpooled.wrappedBuffer(packet.data()), listener.getRegistryManager());
-        AllMenuScreens.open(listener.client, packet.type(), packet.id(), packet.name(), extraData);
-        extraData.release();
+    public void onOpenScreen(ClientPlayPacketListener listener, OpenScreenPacket packet) {
+        if (listener instanceof ClientPlayNetworkHandler handler) {
+            NetworkThreadUtils.forceMainThread(packet, handler, MinecraftClient.getInstance().getPacketApplyBatcher());
+            RegistryByteBuf extraData = new RegistryByteBuf(Unpooled.wrappedBuffer(packet.data()), handler.getRegistryManager());
+            AllMenuScreens.open(MinecraftClient.getInstance(), packet.type(), packet.id(), packet.name(), extraData);
+            extraData.release();
+        }
     }
 
     @Override
-    public void onBlueprintPreview(ClientPlayNetworkHandler listener, BlueprintPreviewPacket packet) {
+    public void onBlueprintPreview(BlueprintPreviewPacket packet) {
         BlueprintOverlayRenderer.updatePreview(packet.available(), packet.missing(), packet.result());
     }
 
