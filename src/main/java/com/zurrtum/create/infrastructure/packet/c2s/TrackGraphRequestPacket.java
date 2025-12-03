@@ -5,24 +5,24 @@ import com.zurrtum.create.AllPackets;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.network.codec.PacketCodecs;
+import net.minecraft.network.listener.ServerPlayPacketListener;
+import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.PacketType;
 import net.minecraft.server.network.ServerPlayNetworkHandler;
 
-import java.util.function.BiConsumer;
-
-public record TrackGraphRequestPacket(int netId) implements C2SPacket {
+public record TrackGraphRequestPacket(int netId) implements Packet<ServerPlayPacketListener> {
     public static final PacketCodec<ByteBuf, TrackGraphRequestPacket> CODEC = PacketCodecs.INTEGER.xmap(
         TrackGraphRequestPacket::new,
         TrackGraphRequestPacket::netId
     );
 
     @Override
-    public PacketType<TrackGraphRequestPacket> getPacketType() {
-        return AllPackets.TRACK_GRAPH_REQUEST;
+    public void apply(ServerPlayPacketListener listener) {
+        AllHandle.onTrackGraphRequest((ServerPlayNetworkHandler) listener, this);
     }
 
     @Override
-    public BiConsumer<ServerPlayNetworkHandler, TrackGraphRequestPacket> callback() {
-        return AllHandle::onTrackGraphRequest;
+    public PacketType<TrackGraphRequestPacket> getPacketType() {
+        return AllPackets.TRACK_GRAPH_REQUEST;
     }
 }

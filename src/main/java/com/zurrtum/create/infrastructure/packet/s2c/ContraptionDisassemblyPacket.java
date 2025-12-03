@@ -6,10 +6,11 @@ import com.zurrtum.create.content.contraptions.StructureTransform;
 import net.minecraft.network.RegistryByteBuf;
 import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.network.codec.PacketCodecs;
+import net.minecraft.network.listener.ClientPlayPacketListener;
+import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.PacketType;
-import org.apache.logging.log4j.util.TriConsumer;
 
-public record ContraptionDisassemblyPacket(int entityId, StructureTransform transform) implements S2CPacket {
+public record ContraptionDisassemblyPacket(int entityId, StructureTransform transform) implements Packet<ClientPlayPacketListener> {
     public static final PacketCodec<RegistryByteBuf, ContraptionDisassemblyPacket> CODEC = PacketCodec.tuple(
         PacketCodecs.INTEGER,
         ContraptionDisassemblyPacket::entityId,
@@ -19,8 +20,8 @@ public record ContraptionDisassemblyPacket(int entityId, StructureTransform tran
     );
 
     @Override
-    public <T> TriConsumer<AllClientHandle<T>, T, ContraptionDisassemblyPacket> callback() {
-        return AllClientHandle::onContraptionDisassembly;
+    public void apply(ClientPlayPacketListener listener) {
+        AllClientHandle.INSTANCE.onContraptionDisassembly(this);
     }
 
     @Override

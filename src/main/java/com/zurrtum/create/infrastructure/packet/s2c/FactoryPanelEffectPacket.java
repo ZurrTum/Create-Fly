@@ -6,10 +6,13 @@ import com.zurrtum.create.content.logistics.factoryBoard.FactoryPanelPosition;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.network.codec.PacketCodecs;
+import net.minecraft.network.listener.ClientPlayPacketListener;
+import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.PacketType;
-import org.apache.logging.log4j.util.TriConsumer;
 
-public record FactoryPanelEffectPacket(FactoryPanelPosition fromPos, FactoryPanelPosition toPos, boolean success) implements S2CPacket {
+public record FactoryPanelEffectPacket(
+    FactoryPanelPosition fromPos, FactoryPanelPosition toPos, boolean success
+) implements Packet<ClientPlayPacketListener> {
     public static final PacketCodec<ByteBuf, FactoryPanelEffectPacket> CODEC = PacketCodec.tuple(
         FactoryPanelPosition.PACKET_CODEC,
         FactoryPanelEffectPacket::fromPos,
@@ -21,13 +24,8 @@ public record FactoryPanelEffectPacket(FactoryPanelPosition fromPos, FactoryPane
     );
 
     @Override
-    public boolean runInMain() {
-        return true;
-    }
-
-    @Override
-    public <T> TriConsumer<AllClientHandle<T>, T, FactoryPanelEffectPacket> callback() {
-        return AllClientHandle::onFactoryPanelEffect;
+    public void apply(ClientPlayPacketListener listener) {
+        AllClientHandle.INSTANCE.onFactoryPanelEffect(listener, this);
     }
 
     @Override

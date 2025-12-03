@@ -5,11 +5,12 @@ import com.zurrtum.create.AllPackets;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.network.codec.PacketCodecs;
+import net.minecraft.network.listener.ClientPlayPacketListener;
+import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.PacketType;
 import net.minecraft.util.math.BlockPos;
-import org.apache.logging.log4j.util.TriConsumer;
 
-public record SoulPulseEffectPacket(BlockPos pos, int distance, boolean canOverlap) implements S2CPacket {
+public record SoulPulseEffectPacket(BlockPos pos, int distance, boolean canOverlap) implements Packet<ClientPlayPacketListener> {
     public static final PacketCodec<ByteBuf, SoulPulseEffectPacket> CODEC = PacketCodec.tuple(
         BlockPos.PACKET_CODEC,
         SoulPulseEffectPacket::pos,
@@ -21,8 +22,8 @@ public record SoulPulseEffectPacket(BlockPos pos, int distance, boolean canOverl
     );
 
     @Override
-    public <T> TriConsumer<AllClientHandle<T>, T, SoulPulseEffectPacket> callback() {
-        return AllClientHandle::onSoulPulseEffect;
+    public void apply(ClientPlayPacketListener listener) {
+        AllClientHandle.INSTANCE.onSoulPulseEffect(this);
     }
 
     @Override

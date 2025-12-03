@@ -8,15 +8,16 @@ import com.zurrtum.create.content.logistics.tunnel.BeltTunnelBlockEntity;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.network.codec.PacketCodecs;
+import net.minecraft.network.listener.ClientPlayPacketListener;
+import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.PacketType;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
-import org.apache.logging.log4j.util.TriConsumer;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public record TunnelFlapPacket(BlockPos pos, List<Pair<Direction, Boolean>> flaps) implements S2CPacket {
+public record TunnelFlapPacket(BlockPos pos, List<Pair<Direction, Boolean>> flaps) implements Packet<ClientPlayPacketListener> {
     public static final PacketCodec<ByteBuf, TunnelFlapPacket> CODEC = PacketCodec.tuple(
         BlockPos.PACKET_CODEC,
         TunnelFlapPacket::pos,
@@ -30,8 +31,8 @@ public record TunnelFlapPacket(BlockPos pos, List<Pair<Direction, Boolean>> flap
     }
 
     @Override
-    public <T> TriConsumer<AllClientHandle<T>, T, TunnelFlapPacket> callback() {
-        return AllClientHandle::onTunnelFlap;
+    public void apply(ClientPlayPacketListener listener) {
+        AllClientHandle.INSTANCE.onTunnelFlap(this);
     }
 
     @Override

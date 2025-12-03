@@ -5,10 +5,11 @@ import com.zurrtum.create.AllPackets;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.network.codec.PacketCodecs;
+import net.minecraft.network.listener.ClientPlayPacketListener;
+import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.PacketType;
-import org.apache.logging.log4j.util.TriConsumer;
 
-public record ContraptionStallPacket(int entityId, double x, double y, double z, float angle) implements S2CPacket {
+public record ContraptionStallPacket(int entityId, double x, double y, double z, float angle) implements Packet<ClientPlayPacketListener> {
     public static final PacketCodec<ByteBuf, ContraptionStallPacket> CODEC = PacketCodec.tuple(
         PacketCodecs.INTEGER,
         ContraptionStallPacket::entityId,
@@ -24,8 +25,8 @@ public record ContraptionStallPacket(int entityId, double x, double y, double z,
     );
 
     @Override
-    public <T> TriConsumer<AllClientHandle<T>, T, ContraptionStallPacket> callback() {
-        return AllClientHandle::onContraptionStall;
+    public void apply(ClientPlayPacketListener listener) {
+        AllClientHandle.INSTANCE.onContraptionStall(this);
     }
 
     @Override

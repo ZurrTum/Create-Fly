@@ -5,12 +5,12 @@ import com.zurrtum.create.AllPackets;
 import net.minecraft.network.RegistryByteBuf;
 import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.network.codec.PacketCodecs;
+import net.minecraft.network.listener.ServerPlayPacketListener;
+import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.PacketType;
 import net.minecraft.server.network.ServerPlayNetworkHandler;
 
-import java.util.function.BiConsumer;
-
-public record BlueprintPreviewRequestPacket(int entityId, int index, boolean sneaking) implements C2SPacket {
+public record BlueprintPreviewRequestPacket(int entityId, int index, boolean sneaking) implements Packet<ServerPlayPacketListener> {
     public static final PacketCodec<RegistryByteBuf, BlueprintPreviewRequestPacket> CODEC = PacketCodec.tuple(
         PacketCodecs.INTEGER,
         BlueprintPreviewRequestPacket::entityId,
@@ -22,13 +22,8 @@ public record BlueprintPreviewRequestPacket(int entityId, int index, boolean sne
     );
 
     @Override
-    public boolean runInMain() {
-        return true;
-    }
-
-    @Override
-    public BiConsumer<ServerPlayNetworkHandler, BlueprintPreviewRequestPacket> callback() {
-        return AllHandle::onBlueprintPreviewRequest;
+    public void apply(ServerPlayPacketListener listener) {
+        AllHandle.onBlueprintPreviewRequest((ServerPlayNetworkHandler) listener, this);
     }
 
     @Override

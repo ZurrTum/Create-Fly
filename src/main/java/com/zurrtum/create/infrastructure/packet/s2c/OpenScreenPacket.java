@@ -8,12 +8,13 @@ import com.zurrtum.create.foundation.gui.menu.MenuType;
 import net.minecraft.network.RegistryByteBuf;
 import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.network.codec.PacketCodecs;
+import net.minecraft.network.listener.ClientPlayPacketListener;
+import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.PacketType;
 import net.minecraft.text.Text;
 import net.minecraft.text.TextCodecs;
-import org.apache.logging.log4j.util.TriConsumer;
 
-public record OpenScreenPacket(int id, MenuType<?> type, Text name, byte[] data) implements S2CPacket {
+public record OpenScreenPacket(int id, MenuType<?> type, Text name, byte[] data) implements Packet<ClientPlayPacketListener> {
     public static final PacketCodec<RegistryByteBuf, OpenScreenPacket> CODEC = PacketCodec.tuple(
         PacketCodecs.SYNC_ID,
         OpenScreenPacket::id,
@@ -27,13 +28,8 @@ public record OpenScreenPacket(int id, MenuType<?> type, Text name, byte[] data)
     );
 
     @Override
-    public boolean runInMain() {
-        return true;
-    }
-
-    @Override
-    public <T> TriConsumer<AllClientHandle<T>, T, OpenScreenPacket> callback() {
-        return AllClientHandle::onOpenScreen;
+    public void apply(ClientPlayPacketListener listener) {
+        AllClientHandle.INSTANCE.onOpenScreen(listener, this);
     }
 
     @Override

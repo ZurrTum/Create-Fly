@@ -9,12 +9,13 @@ import net.minecraft.network.packet.PacketType;
 import net.minecraft.server.network.ServerPlayNetworkHandler;
 import net.minecraft.util.Identifier;
 
-import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 import static com.zurrtum.create.Create.MOD_ID;
 
-public record C2SHoldPacket(PacketType<Packet<ServerPlayPacketListener>> id, Consumer<ServerPlayNetworkHandler> consumer) implements C2SPacket {
+public record C2SHoldPacket(
+    PacketType<Packet<ServerPlayPacketListener>> id, Consumer<ServerPlayNetworkHandler> consumer
+) implements Packet<ServerPlayPacketListener> {
     public C2SHoldPacket(String id, Consumer<ServerPlayNetworkHandler> callback) {
         this(new PacketType<>(NetworkSide.SERVERBOUND, Identifier.of(MOD_ID, id)), callback);
     }
@@ -24,12 +25,12 @@ public record C2SHoldPacket(PacketType<Packet<ServerPlayPacketListener>> id, Con
     }
 
     @Override
-    public PacketType<Packet<ServerPlayPacketListener>> getPacketType() {
-        return id;
+    public void apply(ServerPlayPacketListener listener) {
+        consumer.accept((ServerPlayNetworkHandler) listener);
     }
 
     @Override
-    public BiConsumer<ServerPlayNetworkHandler, C2SHoldPacket> callback() {
-        return (listener, packet) -> consumer.accept(listener);
+    public PacketType<Packet<ServerPlayPacketListener>> getPacketType() {
+        return id;
     }
 }

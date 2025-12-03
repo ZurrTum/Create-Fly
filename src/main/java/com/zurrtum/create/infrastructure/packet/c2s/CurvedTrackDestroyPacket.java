@@ -5,13 +5,15 @@ import com.zurrtum.create.AllPackets;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.network.codec.PacketCodecs;
+import net.minecraft.network.listener.ServerPlayPacketListener;
+import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.PacketType;
 import net.minecraft.server.network.ServerPlayNetworkHandler;
 import net.minecraft.util.math.BlockPos;
 
-import java.util.function.BiConsumer;
-
-public record CurvedTrackDestroyPacket(BlockPos pos, BlockPos targetPos, BlockPos soundSource, boolean wrench) implements C2SPacket {
+public record CurvedTrackDestroyPacket(
+    BlockPos pos, BlockPos targetPos, BlockPos soundSource, boolean wrench
+) implements Packet<ServerPlayPacketListener> {
     public static final PacketCodec<ByteBuf, CurvedTrackDestroyPacket> CODEC = PacketCodec.tuple(
         BlockPos.PACKET_CODEC,
         CurvedTrackDestroyPacket::pos,
@@ -25,17 +27,12 @@ public record CurvedTrackDestroyPacket(BlockPos pos, BlockPos targetPos, BlockPo
     );
 
     @Override
-    public boolean runInMain() {
-        return true;
+    public void apply(ServerPlayPacketListener listener) {
+        AllHandle.onCurvedTrackDestroy((ServerPlayNetworkHandler) listener, this);
     }
 
     @Override
     public PacketType<CurvedTrackDestroyPacket> getPacketType() {
         return AllPackets.DESTROY_CURVED_TRACK;
-    }
-
-    @Override
-    public BiConsumer<ServerPlayNetworkHandler, CurvedTrackDestroyPacket> callback() {
-        return AllHandle::onCurvedTrackDestroy;
     }
 }

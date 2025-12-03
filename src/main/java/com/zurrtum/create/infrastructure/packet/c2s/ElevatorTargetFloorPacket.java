@@ -6,12 +6,12 @@ import com.zurrtum.create.content.contraptions.AbstractContraptionEntity;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.network.codec.PacketCodecs;
+import net.minecraft.network.listener.ServerPlayPacketListener;
+import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.PacketType;
 import net.minecraft.server.network.ServerPlayNetworkHandler;
 
-import java.util.function.BiConsumer;
-
-public record ElevatorTargetFloorPacket(int entityId, int targetY) implements C2SPacket {
+public record ElevatorTargetFloorPacket(int entityId, int targetY) implements Packet<ServerPlayPacketListener> {
     public static final PacketCodec<ByteBuf, ElevatorTargetFloorPacket> CODEC = PacketCodec.tuple(
         PacketCodecs.INTEGER,
         ElevatorTargetFloorPacket::entityId,
@@ -25,17 +25,12 @@ public record ElevatorTargetFloorPacket(int entityId, int targetY) implements C2
     }
 
     @Override
-    public boolean runInMain() {
-        return true;
+    public void apply(ServerPlayPacketListener listener) {
+        AllHandle.onElevatorTargetFloor((ServerPlayNetworkHandler) listener, this);
     }
 
     @Override
     public PacketType<ElevatorTargetFloorPacket> getPacketType() {
         return AllPackets.ELEVATOR_SET_FLOOR;
-    }
-
-    @Override
-    public BiConsumer<ServerPlayNetworkHandler, ElevatorTargetFloorPacket> callback() {
-        return AllHandle::onElevatorTargetFloor;
     }
 }

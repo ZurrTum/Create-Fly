@@ -6,15 +6,18 @@ import com.zurrtum.create.catnip.codecs.stream.CatnipStreamCodecs;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.network.codec.PacketCodecs;
+import net.minecraft.network.listener.ServerPlayPacketListener;
+import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.PacketType;
 import net.minecraft.server.network.ServerPlayNetworkHandler;
 import net.minecraft.util.math.BlockPos;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.function.BiConsumer;
 
-public record LinkedControllerInputPacket(List<Integer> activatedButtons, boolean press, BlockPos lecternPos) implements C2SPacket {
+public record LinkedControllerInputPacket(
+    List<Integer> activatedButtons, boolean press, BlockPos lecternPos
+) implements Packet<ServerPlayPacketListener> {
     public static final PacketCodec<ByteBuf, LinkedControllerInputPacket> CODEC = PacketCodec.tuple(
         PacketCodecs.INTEGER.collect(PacketCodecs.toList()),
         LinkedControllerInputPacket::activatedButtons,
@@ -34,17 +37,12 @@ public record LinkedControllerInputPacket(List<Integer> activatedButtons, boolea
     }
 
     @Override
-    public boolean runInMain() {
-        return true;
+    public void apply(ServerPlayPacketListener listener) {
+        AllHandle.onLinkedControllerInput((ServerPlayNetworkHandler) listener, this);
     }
 
     @Override
     public PacketType<LinkedControllerInputPacket> getPacketType() {
         return AllPackets.LINKED_CONTROLLER_INPUT;
-    }
-
-    @Override
-    public BiConsumer<ServerPlayNetworkHandler, LinkedControllerInputPacket> callback() {
-        return AllHandle::onLinkedControllerInput;
     }
 }

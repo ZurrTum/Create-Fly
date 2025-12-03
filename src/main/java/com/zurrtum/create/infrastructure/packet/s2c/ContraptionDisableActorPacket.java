@@ -6,10 +6,11 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.network.RegistryByteBuf;
 import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.network.codec.PacketCodecs;
+import net.minecraft.network.listener.ClientPlayPacketListener;
+import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.PacketType;
-import org.apache.logging.log4j.util.TriConsumer;
 
-public record ContraptionDisableActorPacket(int entityId, ItemStack filter, boolean enable) implements S2CPacket {
+public record ContraptionDisableActorPacket(int entityId, ItemStack filter, boolean enable) implements Packet<ClientPlayPacketListener> {
     public static final PacketCodec<RegistryByteBuf, ContraptionDisableActorPacket> CODEC = PacketCodec.tuple(
         PacketCodecs.INTEGER,
         ContraptionDisableActorPacket::entityId,
@@ -21,13 +22,8 @@ public record ContraptionDisableActorPacket(int entityId, ItemStack filter, bool
     );
 
     @Override
-    public boolean runInMain() {
-        return true;
-    }
-
-    @Override
-    public <T> TriConsumer<AllClientHandle<T>, T, ContraptionDisableActorPacket> callback() {
-        return AllClientHandle::onContraptionDisableActor;
+    public void apply(ClientPlayPacketListener listener) {
+        AllClientHandle.INSTANCE.onContraptionDisableActor(listener, this);
     }
 
     @Override

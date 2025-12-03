@@ -6,12 +6,12 @@ import net.minecraft.entity.vehicle.AbstractMinecartEntity;
 import net.minecraft.network.RegistryByteBuf;
 import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.network.codec.PacketCodecs;
+import net.minecraft.network.listener.ServerPlayPacketListener;
+import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.PacketType;
 import net.minecraft.server.network.ServerPlayNetworkHandler;
 
-import java.util.function.BiConsumer;
-
-public record CouplingCreationPacket(int id1, int id2) implements C2SPacket {
+public record CouplingCreationPacket(int id1, int id2) implements Packet<ServerPlayPacketListener> {
     public static final PacketCodec<RegistryByteBuf, CouplingCreationPacket> CODEC = PacketCodec.tuple(
         PacketCodecs.VAR_INT,
         CouplingCreationPacket::id1,
@@ -25,17 +25,12 @@ public record CouplingCreationPacket(int id1, int id2) implements C2SPacket {
     }
 
     @Override
+    public void apply(ServerPlayPacketListener listener) {
+        AllHandle.onCouplingCreation((ServerPlayNetworkHandler) listener, this);
+    }
+
+    @Override
     public PacketType<CouplingCreationPacket> getPacketType() {
         return AllPackets.MINECART_COUPLING_CREATION;
-    }
-
-    @Override
-    public boolean runInMain() {
-        return true;
-    }
-
-    @Override
-    public BiConsumer<ServerPlayNetworkHandler, CouplingCreationPacket> callback() {
-        return AllHandle::onCouplingCreation;
     }
 }

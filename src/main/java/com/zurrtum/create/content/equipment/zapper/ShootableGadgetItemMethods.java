@@ -1,9 +1,10 @@
 package com.zurrtum.create.content.equipment.zapper;
 
 import com.zurrtum.create.AllDataComponents;
-import com.zurrtum.create.infrastructure.packet.s2c.ShootGadgetPacket;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.network.listener.ClientPlayPacketListener;
+import net.minecraft.network.packet.Packet;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Arm;
 import net.minecraft.util.Hand;
@@ -22,7 +23,7 @@ public class ShootableGadgetItemMethods {
         player.getItemCooldownManager().set(item, gunInOtherHand ? cooldown * 2 / 3 : cooldown);
     }
 
-    public static void sendPackets(PlayerEntity player, Function<Boolean, ? extends ShootGadgetPacket> factory) {
+    public static void sendPackets(PlayerEntity player, Function<Boolean, Packet<ClientPlayPacketListener>> factory) {
         if (!(player instanceof ServerPlayerEntity serverPlayer))
             return;
         serverPlayer.getWorld().getChunkManager().sendToOtherNearbyPlayers(player, factory.apply(false));

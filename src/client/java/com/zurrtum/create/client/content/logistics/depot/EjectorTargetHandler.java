@@ -12,7 +12,6 @@ import com.zurrtum.create.infrastructure.packet.c2s.EjectorPlacementPacket;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.item.ItemStack;
@@ -66,11 +65,8 @@ public class EjectorTargetHandler {
         return false;
     }
 
-    public static void flushSettings(ClientPlayNetworkHandler listener, BlockPos pos) {
-        int h = 0;
-        int v = 0;
-
-        ClientPlayerEntity player = listener.client.player;
+    public static void flushSettings(BlockPos pos) {
+        ClientPlayerEntity player = MinecraftClient.getInstance().player;
         String key = "weighted_ejector.target_not_valid";
         Formatting colour = Formatting.WHITE;
 
@@ -94,10 +90,10 @@ public class EjectorTargetHandler {
         );
 
         BlockPos diff = pos.subtract(currentSelection);
-        h = Math.abs(diff.getX() + diff.getZ());
-        v = -diff.getY();
+        int h = Math.abs(diff.getX() + diff.getZ());
+        int v = -diff.getY();
 
-        listener.sendPacket(new EjectorPlacementPacket(h, v, pos, validTargetDirection));
+        player.networkHandler.sendPacket(new EjectorPlacementPacket(h, v, pos, validTargetDirection));
         currentSelection = null;
         currentItem = null;
 

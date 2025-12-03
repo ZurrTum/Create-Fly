@@ -5,13 +5,13 @@ import com.zurrtum.create.AllPackets;
 import net.minecraft.network.RegistryByteBuf;
 import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.network.codec.PacketCodecs;
+import net.minecraft.network.listener.ServerPlayPacketListener;
+import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.PacketType;
 import net.minecraft.server.network.ServerPlayNetworkHandler;
 import net.minecraft.util.math.BlockPos;
 
-import java.util.function.BiConsumer;
-
-public record InstantSchematicPacket(String name, BlockPos origin, BlockPos bounds) implements C2SPacket {
+public record InstantSchematicPacket(String name, BlockPos origin, BlockPos bounds) implements Packet<ServerPlayPacketListener> {
     public static final PacketCodec<RegistryByteBuf, InstantSchematicPacket> CODEC = PacketCodec.tuple(
         PacketCodecs.STRING,
         InstantSchematicPacket::name,
@@ -23,12 +23,12 @@ public record InstantSchematicPacket(String name, BlockPos origin, BlockPos boun
     );
 
     @Override
-    public PacketType<InstantSchematicPacket> getPacketType() {
-        return AllPackets.INSTANT_SCHEMATIC;
+    public void apply(ServerPlayPacketListener listener) {
+        AllHandle.onInstantSchematic((ServerPlayNetworkHandler) listener, this);
     }
 
     @Override
-    public BiConsumer<ServerPlayNetworkHandler, InstantSchematicPacket> callback() {
-        return AllHandle::onInstantSchematic;
+    public PacketType<InstantSchematicPacket> getPacketType() {
+        return AllPackets.INSTANT_SCHEMATIC;
     }
 }

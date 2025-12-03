@@ -7,15 +7,15 @@ import com.zurrtum.create.content.decoration.slidingDoor.DoorControl;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.network.codec.PacketCodecs;
+import net.minecraft.network.listener.ServerPlayPacketListener;
+import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.PacketType;
 import net.minecraft.server.network.ServerPlayNetworkHandler;
 import net.minecraft.util.math.BlockPos;
 
-import java.util.function.BiConsumer;
-
 public record StationEditPacket(
     BlockPos pos, boolean dropSchedule, boolean assemblyMode, Boolean tryAssemble, DoorControl doorControl, String name
-) implements C2SPacket {
+) implements Packet<ServerPlayPacketListener> {
     public static final PacketCodec<ByteBuf, StationEditPacket> CODEC = PacketCodec.tuple(
         BlockPos.PACKET_CODEC,
         StationEditPacket::pos,
@@ -49,17 +49,12 @@ public record StationEditPacket(
     }
 
     @Override
-    public boolean runInMain() {
-        return true;
+    public void apply(ServerPlayPacketListener listener) {
+        AllHandle.onStationEdit((ServerPlayNetworkHandler) listener, this);
     }
 
     @Override
     public PacketType<StationEditPacket> getPacketType() {
         return AllPackets.CONFIGURE_STATION;
-    }
-
-    @Override
-    public BiConsumer<ServerPlayNetworkHandler, StationEditPacket> callback() {
-        return AllHandle::onStationEdit;
     }
 }

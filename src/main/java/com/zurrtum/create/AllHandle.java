@@ -100,6 +100,7 @@ import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.network.NetworkThreadUtils;
 import net.minecraft.recipe.ServerRecipeManager;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.server.network.ServerPlayNetworkHandler;
@@ -190,6 +191,7 @@ public class AllHandle {
     }
 
     public static void onConfigureThresholdSwitch(ServerPlayNetworkHandler listener, ConfigureThresholdSwitchPacket packet) {
+        NetworkThreadUtils.forceMainThread(packet, listener, listener.server);
         onBlockEntityConfiguration(
             listener, packet.pos(), 20, blockEntity -> {
                 if (blockEntity instanceof ThresholdSwitchBlockEntity be) {
@@ -205,6 +207,7 @@ public class AllHandle {
     }
 
     public static void onConfigureSequencedGearshift(ServerPlayNetworkHandler listener, ConfigureSequencedGearshiftPacket packet) {
+        NetworkThreadUtils.forceMainThread(packet, listener, listener.server);
         onBlockEntityConfiguration(
             listener, packet.pos(), 20, blockEntity -> {
                 //TODO
@@ -219,6 +222,7 @@ public class AllHandle {
     }
 
     public static void onEjectorTrigger(ServerPlayNetworkHandler listener, EjectorTriggerPacket packet) {
+        NetworkThreadUtils.forceMainThread(packet, listener, listener.server);
         onBlockEntityConfiguration(
             listener, packet.pos(), 20, blockEntity -> {
                 if (blockEntity instanceof EjectorBlockEntity be) {
@@ -231,6 +235,7 @@ public class AllHandle {
     }
 
     public static void onStationEdit(ServerPlayNetworkHandler listener, StationEditPacket packet) {
+        NetworkThreadUtils.forceMainThread(packet, listener, listener.server);
         onBlockEntityConfiguration(
             listener, packet.pos(), 20, blockEntity -> {
                 if (blockEntity instanceof StationBlockEntity be) {
@@ -285,6 +290,7 @@ public class AllHandle {
     }
 
     public static void onDisplayLinkConfiguration(ServerPlayNetworkHandler listener, DisplayLinkConfigurationPacket packet) {
+        NetworkThreadUtils.forceMainThread(packet, listener, listener.server);
         onBlockEntityConfiguration(
             listener, packet.pos(), 20, blockEntity -> {
                 if (blockEntity instanceof DisplayLinkBlockEntity be) {
@@ -320,6 +326,7 @@ public class AllHandle {
     }
 
     public static void onCurvedTrackDestroy(ServerPlayNetworkHandler listener, CurvedTrackDestroyPacket packet) {
+        NetworkThreadUtils.forceMainThread(packet, listener, listener.server);
         BlockPos pos = packet.pos();
         onBlockEntityConfiguration(
             listener, pos, AllConfigs.server().trains.maxTrackPlacementLength.get() + 16, blockEntity -> {
@@ -370,6 +377,7 @@ public class AllHandle {
     }
 
     public static void onCurvedTrackSelection(ServerPlayNetworkHandler listener, CurvedTrackSelectionPacket packet) {
+        NetworkThreadUtils.forceMainThread(packet, listener, listener.server);
         BlockPos pos = packet.pos();
         onBlockEntityConfiguration(
             listener, pos, AllConfigs.server().trains.maxTrackPlacementLength.get() + 16, blockEntity -> {
@@ -422,6 +430,7 @@ public class AllHandle {
     }
 
     public static void onGaugeObserved(ServerPlayNetworkHandler listener, GaugeObservedPacket packet) {
+        NetworkThreadUtils.forceMainThread(packet, listener, listener.server);
         onBlockEntityConfiguration(
             listener, packet.pos(), 20, blockEntity -> {
                 if (blockEntity instanceof StressGaugeBlockEntity be) {
@@ -433,6 +442,7 @@ public class AllHandle {
     }
 
     public static void onEjectorAward(ServerPlayNetworkHandler listener, EjectorAwardPacket packet) {
+        NetworkThreadUtils.forceMainThread(packet, listener, listener.server);
         onBlockEntityConfiguration(
             listener, packet.pos(), 20, blockEntity -> {
                 if (blockEntity instanceof EjectorBlockEntity) {
@@ -445,6 +455,7 @@ public class AllHandle {
     }
 
     public static void onElevatorContactEdit(ServerPlayNetworkHandler listener, ElevatorContactEditPacket packet) {
+        NetworkThreadUtils.forceMainThread(packet, listener, listener.server);
         onBlockEntityConfiguration(
             listener, packet.pos(), 20, blockEntity -> {
                 if (blockEntity instanceof ElevatorContactBlockEntity be) {
@@ -458,6 +469,7 @@ public class AllHandle {
     }
 
     public static void onValueSettings(ServerPlayNetworkHandler listener, ValueSettingsPacket packet) {
+        NetworkThreadUtils.forceMainThread(packet, listener, listener.server);
         onBlockEntityConfiguration(
             listener, packet.pos(), 20, blockEntity -> {
                 if (blockEntity instanceof SmartBlockEntity be) {
@@ -495,6 +507,7 @@ public class AllHandle {
     }
 
     public static void onLogisticalStockRequest(ServerPlayNetworkHandler listener, LogisticalStockRequestPacket packet) {
+        NetworkThreadUtils.forceMainThread(packet, listener, listener.server);
         onBlockEntityConfiguration(
             listener, packet.pos(), 4096, blockEntity -> {
                 if (blockEntity instanceof StockCheckingBlockEntity be) {
@@ -507,6 +520,7 @@ public class AllHandle {
     }
 
     public static void onPackageOrderRequest(ServerPlayNetworkHandler listener, PackageOrderRequestPacket packet) {
+        NetworkThreadUtils.forceMainThread(packet, listener, listener.server);
         ServerPlayerEntity player = listener.player;
         ServerWorld world = player.getWorld();
         BlockPos pos = packet.pos();
@@ -538,6 +552,7 @@ public class AllHandle {
     }
 
     public static void onChainConveyorConnection(ServerPlayNetworkHandler listener, ChainConveyorConnectionPacket packet) {
+        NetworkThreadUtils.forceMainThread(packet, listener, listener.server);
         ServerPlayerEntity player = listener.player;
         ServerWorld world = player.getWorld();
         int maxRange = AllConfigs.server().kinetics.maxChainConveyorLength.get() + 16;
@@ -590,6 +605,7 @@ public class AllHandle {
     }
 
     public static void onServerboundChainConveyorRiding(ServerPlayNetworkHandler listener, ServerboundChainConveyorRidingPacket packet) {
+        NetworkThreadUtils.forceMainThread(packet, listener, listener.server);
         ServerPlayerEntity sender = listener.player;
         onBlockEntityConfiguration(
             listener, packet.pos(), AllConfigs.server().kinetics.maxChainConveyorLength.get() * 2, blockEntity -> {
@@ -610,6 +626,7 @@ public class AllHandle {
     }
 
     public static void onChainPackageInteraction(ServerPlayNetworkHandler listener, ChainPackageInteractionPacket packet) {
+        NetworkThreadUtils.forceMainThread(packet, listener, listener.server);
         ServerPlayerEntity player = listener.player;
         int maxRange = AllConfigs.server().kinetics.maxChainConveyorLength.get() + 16;
         onBlockEntityConfiguration(
@@ -672,6 +689,7 @@ public class AllHandle {
     }
 
     public static void onPackagePortConfiguration(ServerPlayNetworkHandler listener, PackagePortConfigurationPacket packet) {
+        NetworkThreadUtils.forceMainThread(packet, listener, listener.server);
         onBlockEntityConfiguration(
             listener, packet.pos(), 20, blockEntity -> {
                 if (blockEntity instanceof PackagePortBlockEntity be) {
@@ -688,6 +706,7 @@ public class AllHandle {
     }
 
     public static void onFactoryPanelConnection(ServerPlayNetworkHandler listener, FactoryPanelConnectionPacket packet) {
+        NetworkThreadUtils.forceMainThread(packet, listener, listener.server);
         ServerPlayerEntity player = listener.player;
         onBlockEntityConfiguration(
             listener, packet.toPos().pos(), 40, blockEntity -> {
@@ -706,6 +725,7 @@ public class AllHandle {
     }
 
     public static void onFactoryPanelConfiguration(ServerPlayNetworkHandler listener, FactoryPanelConfigurationPacket packet) {
+        NetworkThreadUtils.forceMainThread(packet, listener, listener.server);
         onBlockEntityConfiguration(
             listener, packet.position().pos(), 20, blockEntity -> {
                 if (blockEntity instanceof FactoryPanelBlockEntity be) {
@@ -762,6 +782,7 @@ public class AllHandle {
     }
 
     public static void onRedstoneRequesterConfiguration(ServerPlayNetworkHandler listener, RedstoneRequesterConfigurationPacket packet) {
+        NetworkThreadUtils.forceMainThread(packet, listener, listener.server);
         onBlockEntityConfiguration(
             listener, packet.pos(), 20, blockEntity -> {
                 if (blockEntity instanceof RedstoneRequesterBlockEntity be) {
@@ -784,6 +805,7 @@ public class AllHandle {
     }
 
     public static void onStockKeeperCategoryEdit(ServerPlayNetworkHandler listener, StockKeeperCategoryEditPacket packet) {
+        NetworkThreadUtils.forceMainThread(packet, listener, listener.server);
         onBlockEntityConfiguration(
             listener, packet.pos(), 20, blockEntity -> {
                 if (blockEntity instanceof StockTickerBlockEntity be) {
@@ -796,6 +818,7 @@ public class AllHandle {
     }
 
     public static void onStockKeeperCategoryRefund(ServerPlayNetworkHandler listener, StockKeeperCategoryRefundPacket packet) {
+        NetworkThreadUtils.forceMainThread(packet, listener, listener.server);
         onBlockEntityConfiguration(
             listener, packet.pos(), 20, blockEntity -> {
                 if (blockEntity instanceof StockTickerBlockEntity be) {
@@ -810,6 +833,7 @@ public class AllHandle {
     }
 
     public static void onStockKeeperLock(ServerPlayNetworkHandler listener, StockKeeperLockPacket packet) {
+        NetworkThreadUtils.forceMainThread(packet, listener, listener.server);
         ServerPlayerEntity player = listener.player;
         onBlockEntityConfiguration(
             listener, packet.pos(), 20, blockEntity -> {
@@ -829,6 +853,7 @@ public class AllHandle {
     }
 
     public static void onStockKeeperCategoryHiding(ServerPlayNetworkHandler listener, StockKeeperCategoryHidingPacket packet) {
+        NetworkThreadUtils.forceMainThread(packet, listener, listener.server);
         onBlockEntityConfiguration(
             listener, packet.pos(), 20, blockEntity -> {
                 if (blockEntity instanceof StockTickerBlockEntity be) {
@@ -846,6 +871,7 @@ public class AllHandle {
     }
 
     public static void onSchematicPlace(ServerPlayNetworkHandler listener, SchematicPlacePacket packet) {
+        NetworkThreadUtils.forceMainThread(packet, listener, listener.server);
         ServerPlayerEntity player = listener.player;
         if (!player.isCreative()) {
             return;
@@ -881,6 +907,7 @@ public class AllHandle {
     }
 
     public static void onSchematicUpload(ServerPlayNetworkHandler listener, SchematicUploadPacket packet) {
+        NetworkThreadUtils.forceMainThread(packet, listener, listener.server);
         ServerPlayerEntity player = listener.player;
         String schematic = packet.schematic();
         if (packet.code() == SchematicUploadPacket.BEGIN) {
@@ -899,8 +926,8 @@ public class AllHandle {
         menu.clearContents();
     }
 
-    public static void onFilterScreen(ServerPlayNetworkHandler serverPlayNetworkHandler, FilterScreenPacket packet) {
-        ServerPlayerEntity player = serverPlayNetworkHandler.player;
+    public static void onFilterScreen(ServerPlayNetworkHandler listener, FilterScreenPacket packet) {
+        ServerPlayerEntity player = listener.player;
         NbtCompound tag = packet.data() == null ? new NbtCompound() : packet.data();
         FilterScreenPacket.Option option = packet.option();
 
@@ -933,6 +960,7 @@ public class AllHandle {
     }
 
     public static void onContraptionInteraction(ServerPlayNetworkHandler listener, ContraptionInteractionPacket packet) {
+        NetworkThreadUtils.forceMainThread(packet, listener, listener.server);
         ServerPlayerEntity sender = listener.player;
         Entity entityByID = sender.getWorld().getEntityById(packet.target());
         if (!(entityByID instanceof AbstractContraptionEntity contraptionEntity))
@@ -964,6 +992,7 @@ public class AllHandle {
     }
 
     public static void onArmPlacement(ServerPlayNetworkHandler listener, ArmPlacementPacket packet) {
+        NetworkThreadUtils.forceMainThread(packet, listener, listener.server);
         World world = listener.player.getWorld();
         if (!world.isPosLoaded(packet.pos()))
             return;
@@ -975,6 +1004,7 @@ public class AllHandle {
     }
 
     public static void onPackagePortPlacement(ServerPlayNetworkHandler listener, PackagePortPlacementPacket packet) {
+        NetworkThreadUtils.forceMainThread(packet, listener, listener.server);
         World world = listener.player.getWorld();
         BlockPos pos = packet.pos();
         if (world == null || !world.isPosLoaded(pos))
@@ -1000,6 +1030,7 @@ public class AllHandle {
     }
 
     public static void onCouplingCreation(ServerPlayNetworkHandler listener, CouplingCreationPacket packet) {
+        NetworkThreadUtils.forceMainThread(packet, listener, listener.server);
         CouplingHandler.tryToCoupleCarts(listener.player, listener.player.getWorld(), packet.id1(), packet.id2());
     }
 
@@ -1040,6 +1071,7 @@ public class AllHandle {
     }
 
     public static void onEjectorPlacement(ServerPlayNetworkHandler listener, EjectorPlacementPacket packet) {
+        NetworkThreadUtils.forceMainThread(packet, listener, listener.server);
         ServerWorld world = listener.player.getWorld();
         BlockPos pos = packet.pos();
         if (!world.isPosLoaded(pos))
@@ -1053,6 +1085,7 @@ public class AllHandle {
     }
 
     public static void onEjectorElytra(ServerPlayNetworkHandler listener, EjectorElytraPacket packet) {
+        NetworkThreadUtils.forceMainThread(packet, listener, listener.server);
         ServerWorld world = listener.player.getWorld();
         if (!world.isPosLoaded(packet.pos()))
             return;
@@ -1078,6 +1111,7 @@ public class AllHandle {
     }
 
     public static void onLinkedControllerInput(ServerPlayNetworkHandler listener, LinkedControllerInputPacket packet) {
+        NetworkThreadUtils.forceMainThread(packet, listener, listener.server);
         ServerPlayerEntity player = listener.player;
         Consumer<ItemStack> handleItem = stack -> {
             ServerWorld world = player.getWorld();
@@ -1106,6 +1140,7 @@ public class AllHandle {
     }
 
     public static void onLinkedControllerBind(ServerPlayNetworkHandler listener, LinkedControllerBindPacket packet) {
+        NetworkThreadUtils.forceMainThread(packet, listener, listener.server);
         ServerPlayerEntity player = listener.player;
         if (player.isSpectator()) {
             return;
@@ -1127,6 +1162,7 @@ public class AllHandle {
     }
 
     public static void onLinkedControllerStopLectern(ServerPlayNetworkHandler listener, LinkedControllerStopLecternPacket packet) {
+        NetworkThreadUtils.forceMainThread(packet, listener, listener.server);
         ServerPlayerEntity player = listener.player;
         onLinkedController(
             player, packet.lecternPos(), blockEntity -> {
@@ -1176,6 +1212,7 @@ public class AllHandle {
     }
 
     public static void onToolboxEquip(ServerPlayNetworkHandler listener, ToolboxEquipPacket packet) {
+        NetworkThreadUtils.forceMainThread(packet, listener, listener.server);
         ServerPlayerEntity player = listener.player;
         BlockPos toolboxPos = packet.toolboxPos();
         int slot = packet.slot();
@@ -1231,6 +1268,7 @@ public class AllHandle {
     }
 
     public static void onToolboxDisposeAll(ServerPlayNetworkHandler listener, ToolboxDisposeAllPacket packet) {
+        NetworkThreadUtils.forceMainThread(packet, listener, listener.server);
         ServerPlayerEntity player = listener.player;
         ServerWorld world = player.getWorld();
         BlockPos toolboxPos = packet.toolboxPos();
@@ -1370,6 +1408,7 @@ public class AllHandle {
     }
 
     public static void onSuperGlueSelection(ServerPlayNetworkHandler listener, SuperGlueSelectionPacket packet) {
+        NetworkThreadUtils.forceMainThread(packet, listener, listener.server);
         ServerPlayerEntity player = listener.player;
         ServerWorld world = player.getWorld();
         double range = player.getAttributeValue(EntityAttributes.BLOCK_INTERACTION_RANGE) + 2;
@@ -1398,6 +1437,7 @@ public class AllHandle {
     }
 
     public static void onSuperGlueRemoval(ServerPlayNetworkHandler listener, SuperGlueRemovalPacket packet) {
+        NetworkThreadUtils.forceMainThread(packet, listener, listener.server);
         ServerPlayerEntity player = listener.player;
         ServerWorld world = player.getWorld();
         Entity entity = world.getEntityById(packet.entityId());
@@ -1412,6 +1452,7 @@ public class AllHandle {
     }
 
     public static void onTrainCollision(ServerPlayNetworkHandler listener, TrainCollisionPacket packet) {
+        NetworkThreadUtils.forceMainThread(packet, listener, listener.server);
         ServerPlayerEntity player = listener.player;
         ServerWorld world = player.getWorld();
         Entity entity = world.getEntityById(packet.contraptionEntityId());
@@ -1454,6 +1495,7 @@ public class AllHandle {
     }
 
     public static void onElevatorRequestFloorList(ServerPlayNetworkHandler listener, RequestFloorListPacket packet) {
+        NetworkThreadUtils.forceMainThread(packet, listener, listener.server);
         Entity entityByID = listener.player.getWorld().getEntityById(packet.entityId());
         if (!(entityByID instanceof AbstractContraptionEntity ace))
             return;
@@ -1463,6 +1505,7 @@ public class AllHandle {
     }
 
     public static void onElevatorTargetFloor(ServerPlayNetworkHandler listener, ElevatorTargetFloorPacket packet) {
+        NetworkThreadUtils.forceMainThread(packet, listener, listener.server);
         ServerPlayerEntity sender = listener.player;
         ServerWorld world = sender.getWorld();
         Entity entityByID = world.getEntityById(packet.entityId());
@@ -1546,6 +1589,7 @@ public class AllHandle {
     }
 
     public static void onRadialWrenchMenuSubmit(ServerPlayNetworkHandler listener, RadialWrenchMenuSubmitPacket packet) {
+        NetworkThreadUtils.forceMainThread(packet, listener, listener.server);
         ServerWorld world = listener.player.getWorld();
         BlockPos blockPos = packet.blockPos();
         BlockState newState = packet.newState();
@@ -1562,6 +1606,7 @@ public class AllHandle {
     }
 
     public static void onLinkSettings(ServerPlayNetworkHandler listener, LinkSettingsPacket packet) {
+        NetworkThreadUtils.forceMainThread(packet, listener, listener.server);
         onBlockEntityConfiguration(
             listener, packet.pos(), 20, blockEntity -> {
                 if (blockEntity instanceof SmartBlockEntity be) {
@@ -1577,6 +1622,7 @@ public class AllHandle {
     }
 
     public static void onBlueprintPreviewRequest(ServerPlayNetworkHandler listener, BlueprintPreviewRequestPacket packet) {
+        NetworkThreadUtils.forceMainThread(packet, listener, listener.server);
         Entity entity = listener.player.getWorld().getEntityById(packet.entityId());
         if (!(entity instanceof BlueprintEntity blueprint)) {
             listener.sendPacket(BlueprintPreviewPacket.EMPTY);

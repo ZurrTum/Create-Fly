@@ -9,18 +9,19 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.network.RegistryByteBuf;
 import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.network.codec.PacketCodecs;
+import net.minecraft.network.listener.ServerPlayPacketListener;
+import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.PacketType;
 import net.minecraft.server.network.ServerPlayNetworkHandler;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.BiConsumer;
 
 public record FactoryPanelConfigurationPacket(
     FactoryPanelPosition position, String address, Map<FactoryPanelPosition, Integer> inputAmounts, List<ItemStack> craftingArrangement,
     int outputAmount, int promiseClearingInterval, FactoryPanelPosition removeConnection, boolean clearPromises, boolean reset, boolean redstoneReset
-) implements C2SPacket {
+) implements Packet<ServerPlayPacketListener> {
     public static final PacketCodec<RegistryByteBuf, FactoryPanelConfigurationPacket> CODEC = CatnipLargerStreamCodecs.composite(
         FactoryPanelPosition.PACKET_CODEC,
         FactoryPanelConfigurationPacket::position,
@@ -46,17 +47,12 @@ public record FactoryPanelConfigurationPacket(
     );
 
     @Override
-    public boolean runInMain() {
-        return true;
+    public void apply(ServerPlayPacketListener listener) {
+        AllHandle.onFactoryPanelConfiguration((ServerPlayNetworkHandler) listener, this);
     }
 
     @Override
     public PacketType<FactoryPanelConfigurationPacket> getPacketType() {
         return AllPackets.CONFIGURE_FACTORY_PANEL;
-    }
-
-    @Override
-    public BiConsumer<ServerPlayNetworkHandler, FactoryPanelConfigurationPacket> callback() {
-        return AllHandle::onFactoryPanelConfiguration;
     }
 }

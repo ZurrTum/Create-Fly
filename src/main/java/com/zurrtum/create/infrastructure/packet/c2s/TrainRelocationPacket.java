@@ -7,6 +7,8 @@ import com.zurrtum.create.infrastructure.component.BezierTrackPointLocation;
 import net.minecraft.network.RegistryByteBuf;
 import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.network.codec.PacketCodecs;
+import net.minecraft.network.listener.ServerPlayPacketListener;
+import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.PacketType;
 import net.minecraft.server.network.ServerPlayNetworkHandler;
 import net.minecraft.util.Uuids;
@@ -14,11 +16,10 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 
 import java.util.UUID;
-import java.util.function.BiConsumer;
 
 public record TrainRelocationPacket(
     UUID trainId, BlockPos pos, Vec3d lookAngle, int entityId, boolean direction, BezierTrackPointLocation hoveredBezier
-) implements C2SPacket {
+) implements Packet<ServerPlayPacketListener> {
     public static final PacketCodec<RegistryByteBuf, TrainRelocationPacket> CODEC = PacketCodec.tuple(
         Uuids.PACKET_CODEC,
         TrainRelocationPacket::trainId,
@@ -36,12 +37,12 @@ public record TrainRelocationPacket(
     );
 
     @Override
-    public PacketType<TrainRelocationPacket> getPacketType() {
-        return AllPackets.RELOCATE_TRAIN;
+    public void apply(ServerPlayPacketListener listener) {
+        AllHandle.onTrainRelocation((ServerPlayNetworkHandler) listener, this);
     }
 
     @Override
-    public BiConsumer<ServerPlayNetworkHandler, TrainRelocationPacket> callback() {
-        return AllHandle::onTrainRelocation;
+    public PacketType<TrainRelocationPacket> getPacketType() {
+        return AllPackets.RELOCATE_TRAIN;
     }
 }

@@ -5,13 +5,13 @@ import com.zurrtum.create.AllPackets;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.RegistryByteBuf;
 import net.minecraft.network.codec.PacketCodec;
+import net.minecraft.network.listener.ServerPlayPacketListener;
+import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.PacketType;
 import net.minecraft.server.network.ServerPlayNetworkHandler;
 import net.minecraft.util.math.BlockPos;
 
-import java.util.function.BiConsumer;
-
-public record StockKeeperCategoryRefundPacket(BlockPos pos, ItemStack filter) implements C2SPacket {
+public record StockKeeperCategoryRefundPacket(BlockPos pos, ItemStack filter) implements Packet<ServerPlayPacketListener> {
     public static final PacketCodec<RegistryByteBuf, StockKeeperCategoryRefundPacket> CODEC = PacketCodec.tuple(
         BlockPos.PACKET_CODEC,
         StockKeeperCategoryRefundPacket::pos,
@@ -21,17 +21,12 @@ public record StockKeeperCategoryRefundPacket(BlockPos pos, ItemStack filter) im
     );
 
     @Override
-    public boolean runInMain() {
-        return true;
+    public void apply(ServerPlayPacketListener listener) {
+        AllHandle.onStockKeeperCategoryRefund((ServerPlayNetworkHandler) listener, this);
     }
 
     @Override
     public PacketType<StockKeeperCategoryRefundPacket> getPacketType() {
         return AllPackets.REFUND_STOCK_KEEPER_CATEGORY;
-    }
-
-    @Override
-    public BiConsumer<ServerPlayNetworkHandler, StockKeeperCategoryRefundPacket> callback() {
-        return AllHandle::onStockKeeperCategoryRefund;
     }
 }

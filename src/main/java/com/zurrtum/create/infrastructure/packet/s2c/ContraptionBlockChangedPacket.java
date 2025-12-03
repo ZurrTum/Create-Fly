@@ -7,11 +7,12 @@ import io.netty.buffer.ByteBuf;
 import net.minecraft.block.BlockState;
 import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.network.codec.PacketCodecs;
+import net.minecraft.network.listener.ClientPlayPacketListener;
+import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.PacketType;
 import net.minecraft.util.math.BlockPos;
-import org.apache.logging.log4j.util.TriConsumer;
 
-public record ContraptionBlockChangedPacket(int entityId, BlockPos localPos, BlockState newState) implements S2CPacket {
+public record ContraptionBlockChangedPacket(int entityId, BlockPos localPos, BlockState newState) implements Packet<ClientPlayPacketListener> {
     public static final PacketCodec<ByteBuf, ContraptionBlockChangedPacket> CODEC = PacketCodec.tuple(
         PacketCodecs.INTEGER,
         ContraptionBlockChangedPacket::entityId,
@@ -23,8 +24,8 @@ public record ContraptionBlockChangedPacket(int entityId, BlockPos localPos, Blo
     );
 
     @Override
-    public <T> TriConsumer<AllClientHandle<T>, T, ContraptionBlockChangedPacket> callback() {
-        return AllClientHandle::onContraptionBlockChanged;
+    public void apply(ClientPlayPacketListener listener) {
+        AllClientHandle.INSTANCE.onContraptionBlockChanged(this);
     }
 
     @Override

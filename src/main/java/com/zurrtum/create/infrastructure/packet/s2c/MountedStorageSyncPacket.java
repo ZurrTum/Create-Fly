@@ -7,16 +7,17 @@ import com.zurrtum.create.api.contraption.storage.item.MountedItemStorage;
 import net.minecraft.network.RegistryByteBuf;
 import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.network.codec.PacketCodecs;
+import net.minecraft.network.listener.ClientPlayPacketListener;
+import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.PacketType;
 import net.minecraft.util.math.BlockPos;
-import org.apache.logging.log4j.util.TriConsumer;
 
 import java.util.HashMap;
 import java.util.Map;
 
 public record MountedStorageSyncPacket(
     int contraptionId, Map<BlockPos, MountedItemStorage> items, Map<BlockPos, MountedFluidStorage> fluids
-) implements S2CPacket {
+) implements Packet<ClientPlayPacketListener> {
     public static final PacketCodec<RegistryByteBuf, MountedStorageSyncPacket> CODEC = PacketCodec.tuple(
         PacketCodecs.INTEGER,
         MountedStorageSyncPacket::contraptionId,
@@ -28,8 +29,8 @@ public record MountedStorageSyncPacket(
     );
 
     @Override
-    public <T> TriConsumer<AllClientHandle<T>, T, MountedStorageSyncPacket> callback() {
-        return AllClientHandle::onMountedStorageSync;
+    public void apply(ClientPlayPacketListener listener) {
+        AllClientHandle.INSTANCE.onMountedStorageSync(this);
     }
 
     @Override

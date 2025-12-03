@@ -5,12 +5,12 @@ import com.zurrtum.create.AllPackets;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.network.codec.PacketCodecs;
+import net.minecraft.network.listener.ServerPlayPacketListener;
+import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.PacketType;
 import net.minecraft.server.network.ServerPlayNetworkHandler;
 
-import java.util.function.BiConsumer;
-
-public record ContraptionColliderLockPacketRequest(int contraption, double offset) implements C2SPacket {
+public record ContraptionColliderLockPacketRequest(int contraption, double offset) implements Packet<ServerPlayPacketListener> {
     public static final PacketCodec<ByteBuf, ContraptionColliderLockPacketRequest> CODEC = PacketCodec.tuple(
         PacketCodecs.VAR_INT,
         ContraptionColliderLockPacketRequest::contraption,
@@ -20,12 +20,12 @@ public record ContraptionColliderLockPacketRequest(int contraption, double offse
     );
 
     @Override
-    public PacketType<ContraptionColliderLockPacketRequest> getPacketType() {
-        return AllPackets.CONTRAPTION_COLLIDER_LOCK_REQUEST;
+    public void apply(ServerPlayPacketListener listener) {
+        AllHandle.onContraptionColliderLockRequest((ServerPlayNetworkHandler) listener, this);
     }
 
     @Override
-    public BiConsumer<ServerPlayNetworkHandler, ContraptionColliderLockPacketRequest> callback() {
-        return AllHandle::onContraptionColliderLockRequest;
+    public PacketType<ContraptionColliderLockPacketRequest> getPacketType() {
+        return AllPackets.CONTRAPTION_COLLIDER_LOCK_REQUEST;
     }
 }

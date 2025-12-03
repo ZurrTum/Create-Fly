@@ -6,14 +6,15 @@ import com.zurrtum.create.content.trains.entity.Train;
 import net.minecraft.network.RegistryByteBuf;
 import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.network.codec.PacketCodecs;
+import net.minecraft.network.listener.ServerPlayPacketListener;
+import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.PacketType;
 import net.minecraft.server.network.ServerPlayNetworkHandler;
 import net.minecraft.util.Uuids;
 
 import java.util.UUID;
-import java.util.function.BiConsumer;
 
-public record HonkPacket(UUID trainId, boolean isHonk) implements C2SPacket {
+public record HonkPacket(UUID trainId, boolean isHonk) implements Packet<ServerPlayPacketListener> {
     public static final PacketCodec<RegistryByteBuf, HonkPacket> CODEC = PacketCodec.tuple(
         Uuids.PACKET_CODEC,
         HonkPacket::trainId,
@@ -27,12 +28,12 @@ public record HonkPacket(UUID trainId, boolean isHonk) implements C2SPacket {
     }
 
     @Override
-    public PacketType<HonkPacket> getPacketType() {
-        return AllPackets.C_TRAIN_HONK;
+    public void apply(ServerPlayPacketListener listener) {
+        AllHandle.onTrainHonk((ServerPlayNetworkHandler) listener, this);
     }
 
     @Override
-    public BiConsumer<ServerPlayNetworkHandler, HonkPacket> callback() {
-        return AllHandle::onTrainHonk;
+    public PacketType<HonkPacket> getPacketType() {
+        return AllPackets.C_TRAIN_HONK;
     }
 }

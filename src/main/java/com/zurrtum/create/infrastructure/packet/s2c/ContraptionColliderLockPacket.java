@@ -5,10 +5,11 @@ import com.zurrtum.create.AllPackets;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.network.codec.PacketCodecs;
+import net.minecraft.network.listener.ClientPlayPacketListener;
+import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.PacketType;
-import org.apache.logging.log4j.util.TriConsumer;
 
-public record ContraptionColliderLockPacket(int contraption, double offset, int sender) implements S2CPacket {
+public record ContraptionColliderLockPacket(int contraption, double offset, int sender) implements Packet<ClientPlayPacketListener> {
     public static final PacketCodec<ByteBuf, ContraptionColliderLockPacket> CODEC = PacketCodec.tuple(
         PacketCodecs.VAR_INT,
         ContraptionColliderLockPacket::contraption,
@@ -20,12 +21,12 @@ public record ContraptionColliderLockPacket(int contraption, double offset, int 
     );
 
     @Override
-    public PacketType<ContraptionColliderLockPacket> getPacketType() {
-        return AllPackets.CONTRAPTION_COLLIDER_LOCK;
+    public void apply(ClientPlayPacketListener listener) {
+        AllClientHandle.INSTANCE.onContraptionColliderLock(this);
     }
 
     @Override
-    public <T> TriConsumer<AllClientHandle<T>, T, ContraptionColliderLockPacket> callback() {
-        return AllClientHandle::onContraptionColliderLock;
+    public PacketType<ContraptionColliderLockPacket> getPacketType() {
+        return AllPackets.CONTRAPTION_COLLIDER_LOCK;
     }
 }
