@@ -12,11 +12,13 @@ import net.minecraft.server.packs.repository.KnownPack;
 import net.minecraft.server.packs.repository.Pack;
 import net.minecraft.server.packs.repository.PackSource;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.nio.file.Path;
+import java.util.List;
 import java.util.Optional;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
@@ -28,44 +30,69 @@ public abstract class ClientPackSourceMixin {
     @Inject(method = "populatePackList(Ljava/util/function/BiConsumer;)V", at = @At("TAIL"))
     private void loadResourcePack(BiConsumer<String, Function<String, Pack>> consumer, CallbackInfo ci) {
         ModContainer mod = FabricLoader.getInstance().getModContainer(MOD_ID).orElseThrow();
-        consumer.accept(
-            MOD_ID, id -> {
-                ModMetadata metadata = mod.getMetadata();
-                PackLocationInfo info = new PackLocationInfo(
-                    id,
-                    Component.nullToEmpty(metadata.getName()),
-                    PackSource.BUILT_IN,
-                    Optional.of(new KnownPack(id, "assets", metadata.getVersion().getFriendlyString()))
-                );
-                PackType type = PackType.CLIENT_RESOURCES;
-                BuiltInMetadata metadataMap = BuiltInMetadata.of(
-                    PackMetadataSection.CLIENT_TYPE,
-                    new PackMetadataSection(
-                        Component.translatable("advancement.create.root"),
-                        SharedConstants.getCurrentVersion().packVersion(type).minorRange()
-                    )
-                );
-                VanillaPackResourcesBuilder builder = new VanillaPackResourcesBuilder().setMetadata(metadataMap)
-                    .exposeNamespace(id, "minecraft", "flywheel", "vanillin", "ponder", "fabric");
-                String directory = type.getDirectory();
-                for (Path path : mod.getRootPaths()) {
-                    builder.pushAssetPath(type, path.resolve(directory));
+        List<Path> rootPaths = mod.getRootPaths();
+        ModMetadata metadata = mod.getMetadata();
+        String version = metadata.getVersion().getFriendlyString();
+        if (!FabricLoader.getInstance().isModLoaded("fabric-api")) {
+            consumer.accept(
+                MOD_ID, id -> {
+                    String directory = PackType.CLIENT_RESOURCES.getDirectory();
+                    PackLocationInfo info = createInfo(id, metadata.getName(), id, directory, version);
+                    BuiltInMetadata meta = createMeta(Component.translatable("advancement.create.root"));
+                    PackSelectionConfig position = new PackSelectionConfig(true, Pack.Position.BOTTOM, false);
+                    return createPacket(rootPaths, directory, info, meta, position, id, "minecraft", "flywheel", "vanillin", "ponder", "fabric");
                 }
-                VanillaPackResources pack = builder.build(info);
-                Pack.ResourcesSupplier packFactory = new Pack.ResourcesSupplier() {
-                    @Override
-                    public PackResources openPrimary(PackLocationInfo info) {
-                        return pack;
-                    }
-
-                    @Override
-                    public PackResources openFull(PackLocationInfo info, Pack.Metadata metadata) {
-                        return pack;
-                    }
-                };
-                PackSelectionConfig position = new PackSelectionConfig(true, Pack.Position.BOTTOM, false);
-                return Pack.readMetaAndCreate(info, packFactory, type, position);
+            );
+        }
+        consumer.accept(
+            MOD_ID + "_legacy_copper", id -> {
+                String directory = "legacy_copper";
+                PackLocationInfo info = createInfo(id, "Create legacy copper", MOD_ID, directory, version);
+                BuiltInMetadata meta = createMeta(Component.literal("Replacement textures for Vanilla Copper"));
+                PackSelectionConfig position = new PackSelectionConfig(false, Pack.Position.TOP, false);
+                return createPacket(rootPaths, directory, info, meta, position, "minecraft");
             }
         );
+    }
+
+    @Unique
+    private static PackLocationInfo createInfo(String id, String name, String namespace, String path, String version) {
+        return new PackLocationInfo(id, Component.literal(name), PackSource.BUILT_IN, Optional.of(new KnownPack(namespace, path, version)));
+    }
+
+    @Unique
+    private static BuiltInMetadata createMeta(Component description) {
+        return BuiltInMetadata.of(
+            PackMetadataSection.CLIENT_TYPE,
+            new PackMetadataSection(description, SharedConstants.getCurrentVersion().packVersion(PackType.CLIENT_RESOURCES).minorRange())
+        );
+    }
+
+    @Unique
+    private static Pack createPacket(
+        List<Path> rootPaths,
+        String directory,
+        PackLocationInfo info,
+        BuiltInMetadata meta,
+        PackSelectionConfig position,
+        String... namespace
+    ) {
+        VanillaPackResourcesBuilder builder = new VanillaPackResourcesBuilder().setMetadata(meta).exposeNamespace(namespace);
+        for (Path path : rootPaths) {
+            builder.pushAssetPath(PackType.CLIENT_RESOURCES, path.resolve(directory));
+        }
+        VanillaPackResources pack = builder.build(info);
+        Pack.ResourcesSupplier packFactory = new Pack.ResourcesSupplier() {
+            @Override
+            public PackResources openPrimary(PackLocationInfo info) {
+                return pack;
+            }
+
+            @Override
+            public PackResources openFull(PackLocationInfo info, Pack.Metadata metadata) {
+                return pack;
+            }
+        };
+        return Pack.readMetaAndCreate(info, packFactory, PackType.CLIENT_RESOURCES, position);
     }
 }

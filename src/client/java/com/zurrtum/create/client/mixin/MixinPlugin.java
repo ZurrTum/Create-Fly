@@ -32,7 +32,6 @@ public class MixinPlugin implements IMixinConfigPlugin {
             mixins.add("FluidVariantRenderHandlerMixin");
         } else {
             mixins.add("CreativeModeInventoryScreenMixin");
-            mixins.add("ClientPackSourceMixin");
         }
         if (FabricLoader.getInstance().isModLoaded("fabric-rendering-fluids-v1")) {
             mixins.add("WaterRenderHandlerMixin");
