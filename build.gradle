@@ -1,5 +1,5 @@
 plugins {
-    id "net.fabricmc.fabric-loom-no-remap" version "1.14.0-alpha.31"
+    id "net.fabricmc.fabric-loom" version "${loom_version}"
 }
 
 repositories {
