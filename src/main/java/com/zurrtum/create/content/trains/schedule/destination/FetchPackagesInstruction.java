@@ -72,7 +72,8 @@ public class FetchPackagesInstruction extends TextScheduleInstruction {
                 if (dimLevel.isPosLoaded(pos) && dimLevel.getBlockEntity(pos) instanceof PostboxBlockEntity ppbe)
                     postboxInventory = ppbe.inventory;
 
-                for (ItemStack stack : postboxInventory) {
+                for (int i = 0, size = postboxInventory.size(); i < size; i++) {
+                    ItemStack stack = postboxInventory.getStack(i);
                     if (!PackageItem.isPackage(stack))
                         continue;
                     if (PackageItem.matchAddress(stack, port.address))
