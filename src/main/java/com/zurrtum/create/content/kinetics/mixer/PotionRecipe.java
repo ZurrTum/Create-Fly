@@ -9,6 +9,7 @@ import com.zurrtum.create.content.processing.basin.BasinInput;
 import com.zurrtum.create.content.processing.basin.BasinRecipe;
 import com.zurrtum.create.content.processing.recipe.HeatCondition;
 import com.zurrtum.create.content.processing.recipe.SizedIngredient;
+import com.zurrtum.create.foundation.blockEntity.behaviour.filtering.ServerFilteringBehaviour;
 import com.zurrtum.create.foundation.fluid.FluidIngredient;
 import com.zurrtum.create.infrastructure.component.BottleType;
 import com.zurrtum.create.infrastructure.fluids.FluidStack;
@@ -107,6 +108,13 @@ public record PotionRecipe(FluidStack result, FluidIngredient fluidIngredient, I
     @Override
     public boolean matches(BasinInput input, World world) {
         if (!HeatCondition.HEATED.testBlazeBurner(input.heat())) {
+            return false;
+        }
+        ServerFilteringBehaviour filter = input.filter();
+        if (filter == null) {
+            return false;
+        }
+        if (!filter.test(result)) {
             return false;
         }
         List<ItemStack> outputs = BasinRecipe.tryCraft(input, ingredient);

@@ -10,6 +10,7 @@ import com.zurrtum.create.content.processing.basin.BasinInput;
 import com.zurrtum.create.content.processing.basin.BasinRecipe;
 import com.zurrtum.create.content.processing.recipe.HeatCondition;
 import com.zurrtum.create.content.processing.recipe.SizedIngredient;
+import com.zurrtum.create.foundation.blockEntity.behaviour.filtering.ServerFilteringBehaviour;
 import com.zurrtum.create.foundation.fluid.FluidIngredient;
 import com.zurrtum.create.infrastructure.fluids.FluidStack;
 import net.minecraft.item.ItemStack;
@@ -45,6 +46,17 @@ public record MixingRecipe(
     @Override
     public boolean matches(BasinInput input, World world) {
         if (!heat.testBlazeBurner(input.heat())) {
+            return false;
+        }
+        ServerFilteringBehaviour filter = input.filter();
+        if (filter == null) {
+            return false;
+        }
+        if (result.isEmpty()) {
+            if (!filter.test(fluidResult)) {
+                return false;
+            }
+        } else if (!filter.test(result)) {
             return false;
         }
         List<ItemStack> outputs = BasinRecipe.tryCraft(input, ingredients);
