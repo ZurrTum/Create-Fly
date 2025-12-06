@@ -61,7 +61,7 @@ public class BlueprintOverlayRenderer {
         noOutput = false;
         shopContext = null;
 
-        if (mc.interactionManager.getCurrentGameMode() == GameMode.SPECTATOR)
+        if (mc.interactionManager.getCurrentGameMode() == GameMode.SPECTATOR || mc.currentScreen != null)
             return;
 
         HitResult mouseOver = mc.crosshairTarget;
