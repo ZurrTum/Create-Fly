@@ -1,5 +1,6 @@
 package com.zurrtum.create.client.content.kinetics.crank;
 
+import com.zurrtum.create.catnip.math.AngleHelper;
 import com.zurrtum.create.client.AllPartialModels;
 import com.zurrtum.create.client.catnip.render.CachedBuffers;
 import com.zurrtum.create.client.catnip.render.SuperByteBuffer;
@@ -50,7 +51,7 @@ public class HandCrankRenderer extends KineticBlockEntityRenderer<HandCrankBlock
             updateBaseRenderState(be, state, world, crumblingOverlay);
         }
         state.handle = getRenderedHandle(state.blockState);
-        state.handleAngle = getIndependentAngle(be, tickProgress);
+        state.handleAngle = AngleHelper.rad(getIndependentAngle(be, tickProgress));
     }
 
     @Override
@@ -62,8 +63,11 @@ public class HandCrankRenderer extends KineticBlockEntityRenderer<HandCrankBlock
         return getHandCrankIndependentAngle(be, partialTicks);
     }
 
+    /**
+     * In degrees
+     */
     public static float getHandCrankIndependentAngle(HandCrankBlockEntity be, float partialTicks) {
-        return (be.independentAngle + partialTicks * be.chasingVelocity) / 360;
+        return be.independentAngle + partialTicks * be.chasingAngularVelocity;
     }
 
     public SuperByteBuffer getRenderedHandle(BlockState blockState) {
