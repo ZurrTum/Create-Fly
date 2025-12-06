@@ -342,6 +342,7 @@ public interface BaseSidedInventory extends Container {
                         } else {
                             entry.setValue(remaining - insert);
                         }
+                        break;
                     } else if (matches(target, stack)) {
                         int maxCount = target.getMaxStackSize();
                         int count = target.getCount();
@@ -357,6 +358,7 @@ public interface BaseSidedInventory extends Container {
                                 entry.setValue(remaining - insert);
                             }
                         }
+                        break;
                     }
                 }
             } while (iterator.hasNext());
@@ -420,6 +422,7 @@ public interface BaseSidedInventory extends Container {
                         } else {
                             entry.setValue(remaining - insert);
                         }
+                        break;
                     } else if (matches(target, stack)) {
                         int maxCount = target.getMaxStackSize();
                         int count = target.getCount();
@@ -435,6 +438,7 @@ public interface BaseSidedInventory extends Container {
                                 entry.setValue(remaining - insert);
                             }
                         }
+                        break;
                     }
                 }
             } while (iterator.hasNext());
@@ -646,6 +650,7 @@ public interface BaseSidedInventory extends Container {
                             return List.of();
                         }
                         dirty = true;
+                        break;
                     }
                 } while (iterator.hasNext());
             }
@@ -1411,6 +1416,7 @@ public interface BaseSidedInventory extends Container {
                             changes.add(() -> setItem(slot, directCopy(stack, insert)));
                             entry.setValue(remaining - insert);
                         }
+                        break;
                     } else if (matches(target, stack)) {
                         int maxCount = target.getMaxStackSize();
                         int count = target.getCount();
@@ -1430,6 +1436,7 @@ public interface BaseSidedInventory extends Container {
                                 entry.setValue(remaining - insert);
                             }
                         }
+                        break;
                     }
                 }
             } while (iterator.hasNext());
