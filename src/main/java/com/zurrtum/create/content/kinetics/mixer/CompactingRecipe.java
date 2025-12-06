@@ -9,14 +9,8 @@ import com.zurrtum.create.AllRecipeTypes;
 import com.zurrtum.create.content.processing.basin.BasinInput;
 import com.zurrtum.create.content.processing.basin.BasinRecipe;
 import com.zurrtum.create.content.processing.recipe.SizedIngredient;
+import com.zurrtum.create.foundation.blockEntity.behaviour.filtering.ServerFilteringBehaviour;
 import com.zurrtum.create.foundation.fluid.FluidIngredient;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.ArrayDeque;
-import java.util.Deque;
-import java.util.List;
-import java.util.Optional;
-
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
@@ -24,6 +18,12 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.Level;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.ArrayDeque;
+import java.util.Deque;
+import java.util.List;
+import java.util.Optional;
 
 public record CompactingRecipe(
     ItemStack result, @Nullable FluidIngredient fluidIngredient, List<SizedIngredient> ingredients
@@ -45,6 +45,13 @@ public record CompactingRecipe(
 
     @Override
     public boolean matches(BasinInput input, Level world) {
+        ServerFilteringBehaviour filter = input.filter();
+        if (filter == null) {
+            return false;
+        }
+        if (!filter.test(result)) {
+            return false;
+        }
         List<ItemStack> outputs = BasinRecipe.tryCraft(input, ingredients);
         if (outputs == null) {
             return false;
