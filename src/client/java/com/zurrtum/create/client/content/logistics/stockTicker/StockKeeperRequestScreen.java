@@ -12,6 +12,7 @@ import com.zurrtum.create.catnip.theme.Color;
 import com.zurrtum.create.client.AllKeys;
 import com.zurrtum.create.client.catnip.animation.AnimationTickHolder;
 import com.zurrtum.create.client.catnip.gui.UIRenderHelper;
+import com.zurrtum.create.client.compat.jei.JeiFilterHelper;
 import com.zurrtum.create.client.content.logistics.AddressEditBox;
 import com.zurrtum.create.client.content.trains.station.NoShadowFontWrapper;
 import com.zurrtum.create.client.foundation.gui.AllGuiTextures;
@@ -19,6 +20,7 @@ import com.zurrtum.create.client.foundation.gui.menu.AbstractSimiContainerScreen
 import com.zurrtum.create.client.foundation.gui.render.BlazeBurnerRenderState;
 import com.zurrtum.create.client.foundation.gui.widget.ScrollInput;
 import com.zurrtum.create.client.foundation.utility.CreateLang;
+import com.zurrtum.create.client.infrastructure.config.AllConfigs;
 import com.zurrtum.create.content.contraptions.actors.seat.SeatEntity;
 import com.zurrtum.create.content.logistics.BigItemStack;
 import com.zurrtum.create.content.logistics.packager.InventorySummary;
@@ -254,8 +256,7 @@ public class StockKeeperRequestScreen extends AbstractSimiContainerScreen<StockK
         if (initial) {
             playUiSound(SoundEvents.BLOCK_WOOD_HIT, 0.5f, 1.5f);
             playUiSound(SoundEvents.ITEM_BOOK_PAGE_TURN, 1, 1);
-            //TODO
-            //            syncJEI();
+            syncJEI();
         }
     }
 
@@ -1082,8 +1083,7 @@ public class StockKeeperRequestScreen extends AbstractSimiContainerScreen<StockK
             refreshSearchNextTick = true;
             moveToTopNextTick = true;
             searchBox.setFocused(true);
-            //TODO
-            //            syncJEI();
+            syncJEI();
             return true;
         }
 
@@ -1334,8 +1334,7 @@ public class StockKeeperRequestScreen extends AbstractSimiContainerScreen<StockK
         if (!Objects.equals(s, searchBox.getText())) {
             refreshSearchNextTick = true;
             moveToTopNextTick = true;
-            //TODO
-            //            syncJEI();
+            syncJEI();
         }
         return true;
     }
@@ -1370,8 +1369,7 @@ public class StockKeeperRequestScreen extends AbstractSimiContainerScreen<StockK
         if (!Objects.equals(s, searchBox.getText())) {
             refreshSearchNextTick = true;
             moveToTopNextTick = true;
-            //TODO
-            //            syncJEI();
+            syncJEI();
         }
         return true;
     }
@@ -1719,10 +1717,10 @@ public class StockKeeperRequestScreen extends AbstractSimiContainerScreen<StockK
         return resolvedIngredients;
     }
 
-    //TODO
-    //    private void syncJEI() {
-    //        if (Mods.JEI.isLoaded() && AllConfigs.client().syncJeiSearch.get())
-    //            CreateJEI.runtime.getIngredientFilter().setFilterText(searchBox.getValue());
-    //    }
+    private void syncJEI() {
+        if (AllConfigs.client().syncJeiSearch.get()) {
+            JeiFilterHelper.setText(searchBox.getText());
+        }
+    }
 
 }
