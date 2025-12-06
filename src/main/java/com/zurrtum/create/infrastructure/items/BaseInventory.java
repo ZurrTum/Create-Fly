@@ -317,6 +317,7 @@ public interface BaseInventory extends Iterable<ItemStack> {
                         } else {
                             entry.setValue(remaining - insert);
                         }
+                        break;
                     } else if (matches(target, stack)) {
                         int maxCount = target.getMaxCount();
                         int count = target.getCount();
@@ -332,6 +333,7 @@ public interface BaseInventory extends Iterable<ItemStack> {
                                 entry.setValue(remaining - insert);
                             }
                         }
+                        break;
                     }
                 }
             } while (iterator.hasNext());
@@ -383,6 +385,7 @@ public interface BaseInventory extends Iterable<ItemStack> {
                         } else {
                             entry.setValue(remaining - insert);
                         }
+                        break;
                     } else if (matches(target, stack)) {
                         int maxCount = target.getMaxCount();
                         int count = target.getCount();
@@ -398,6 +401,7 @@ public interface BaseInventory extends Iterable<ItemStack> {
                                 entry.setValue(remaining - insert);
                             }
                         }
+                        break;
                     }
                 }
             } while (iterator.hasNext());
@@ -601,6 +605,7 @@ public interface BaseInventory extends Iterable<ItemStack> {
                         return List.of();
                     }
                     dirty = true;
+                    break;
                 }
             } while (iterator.hasNext());
         }
@@ -1339,6 +1344,7 @@ public interface BaseInventory extends Iterable<ItemStack> {
                             changes.add(() -> create$setStack(slot, directCopy(stack, insert)));
                             entry.setValue(remaining - insert);
                         }
+                        break;
                     } else if (matches(target, stack)) {
                         int maxCount = target.getMaxCount();
                         int count = target.getCount();
@@ -1358,6 +1364,7 @@ public interface BaseInventory extends Iterable<ItemStack> {
                                 entry.setValue(remaining - insert);
                             }
                         }
+                        break;
                     }
                 }
             } while (iterator.hasNext());

@@ -253,6 +253,7 @@ public interface FluidInventory extends Clearable, Iterable<FluidStack> {
                         } else {
                             entry.setValue(remaining - insert);
                         }
+                        break;
                     } else if (matches(target, stack)) {
                         int maxAmount = target.getMaxAmount();
                         int amount = target.getAmount();
@@ -268,6 +269,7 @@ public interface FluidInventory extends Clearable, Iterable<FluidStack> {
                                 entry.setValue(remaining - insert);
                             }
                         }
+                        break;
                     }
                 }
             } while (iterator.hasNext());
@@ -920,6 +922,7 @@ public interface FluidInventory extends Clearable, Iterable<FluidStack> {
                             changes.add(() -> setStack(slot, stack.directCopy(insert)));
                             entry.setValue(remaining - insert);
                         }
+                        break;
                     } else if (matches(target, stack)) {
                         int maxAmount = target.getMaxAmount();
                         int amount = target.getAmount();
@@ -939,6 +942,7 @@ public interface FluidInventory extends Clearable, Iterable<FluidStack> {
                                 entry.setValue(remaining - insert);
                             }
                         }
+                        break;
                     }
                 }
             } while (iterator.hasNext());
