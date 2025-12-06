@@ -59,10 +59,6 @@ public class StockKeeperTransferHandler implements TransferHandler {
         if (screen.itemsToOrder.size() >= 9) {
             return Result.createFailed(CreateLang.translateDirect("gui.stock_keeper.slots_full"));
         }
-        ItemStack output = findOutput(display);
-        if (output.isEmpty()) {
-            return Result.createFailed(CreateLang.translateDirect("gui.stock_keeper.recipe_result_empty"));
-        }
         CraftableInput inputs = CraftableInput.create(display.getCategoryIdentifier().equals(BuiltinPlugin.CRAFTING));
         List<InputIngredient<EntryStack<?>>> inputIngredients = display.getInputIngredients(context.getMenu(), context.getMinecraft().player);
         for (InputIngredient<EntryStack<?>> input : inputIngredients) {
@@ -88,6 +84,13 @@ public class StockKeeperTransferHandler implements TransferHandler {
                 items.add(stack.castValue());
             }
             inputs.add(items, input.getDisplayIndex());
+        }
+        if (inputs.data().size() > 9) {
+            return Result.createNotApplicable();
+        }
+        ItemStack output = findOutput(display);
+        if (output.isEmpty()) {
+            return Result.createFailed(CreateLang.translateDirect("gui.stock_keeper.recipe_result_empty"));
         }
         InventorySummary summary = screen.getScreenHandler().contentHolder.getLastClientsideStockSnapshotAsSummary();
         if (summary == null) {

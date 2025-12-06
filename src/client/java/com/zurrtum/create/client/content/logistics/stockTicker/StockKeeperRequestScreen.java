@@ -1002,6 +1002,48 @@ public class StockKeeperRequestScreen extends AbstractSimiContainerScreen<StockK
         return entry.stack.copy();
     }
 
+    public Optional<Pair<ItemStack, Rect2i>> getHoveredIngredient(int mouseX, int mouseY) {
+        Couple<Integer> hoveredSlot = getHoveredSlot(mouseX, mouseY);
+
+        if (hoveredSlot != noneHovered) {
+            int index = hoveredSlot.getSecond();
+            boolean recipeHovered = hoveredSlot.getFirst() == -2;
+            boolean orderHovered = hoveredSlot.getFirst() == -1;
+
+            int x, y;
+            BigItemStack entry;
+            if (recipeHovered) {
+                int jeiX = getGuiLeft() + (windowWidth - colWidth * recipesToOrder.size()) / 2 + 1;
+                int jeiY = orderY - 31;
+
+                x = jeiX + (index * colWidth);
+                y = jeiY;
+
+                entry = recipesToOrder.get(index);
+            } else {
+                if (orderHovered) {
+                    x = itemsX + index * colWidth;
+                    y = orderY;
+
+                    entry = itemsToOrder.get(index);
+                } else {
+                    int categoryIndex = hoveredSlot.getFirst();
+                    int categoryY = categories.isEmpty() ? 0 : categories.get(categoryIndex).y;
+
+                    x = itemsX + (index % cols) * colWidth;
+                    y = itemsY + categoryY + (categories.isEmpty() ? 4 : rowHeight) + (index / cols) * rowHeight;
+
+                    entry = displayedItems.get(categoryIndex).get(index);
+                }
+            }
+
+            Rect2i bounds = new Rect2i(x, y, x + 18, y + 18);
+            return Optional.of(Pair.of(entry.stack.copy(), bounds));
+        }
+
+        return Optional.empty();
+    }
+
     private boolean isConfirmHovered(int mouseX, int mouseY) {
         int confirmX = x + 143;
         int confirmY = y + windowHeight - 39;

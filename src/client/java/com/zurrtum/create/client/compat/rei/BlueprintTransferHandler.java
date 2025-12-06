@@ -88,7 +88,10 @@ public class BlueprintTransferHandler implements TransferHandler {
         }
         int size = list.size();
         return Registries.ITEM.streamTags().filter(set -> set.size() == size).map(RegistryEntryList.Named::getTag).filter(t -> matchTag(list, t))
-            .findFirst().orElse(null);
+            .findFirst().map(tag -> {
+                cache.add(tag);
+                return tag;
+            }).orElse(null);
     }
 
     @SuppressWarnings("deprecation")
