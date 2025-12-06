@@ -341,6 +341,7 @@ public interface BaseSidedInventory extends Inventory {
                         } else {
                             entry.setValue(remaining - insert);
                         }
+                        break;
                     } else if (matches(target, stack)) {
                         int maxCount = target.getMaxCount();
                         int count = target.getCount();
@@ -356,6 +357,7 @@ public interface BaseSidedInventory extends Inventory {
                                 entry.setValue(remaining - insert);
                             }
                         }
+                        break;
                     }
                 }
             } while (iterator.hasNext());
@@ -419,6 +421,7 @@ public interface BaseSidedInventory extends Inventory {
                         } else {
                             entry.setValue(remaining - insert);
                         }
+                        break;
                     } else if (matches(target, stack)) {
                         int maxCount = target.getMaxCount();
                         int count = target.getCount();
@@ -434,6 +437,7 @@ public interface BaseSidedInventory extends Inventory {
                                 entry.setValue(remaining - insert);
                             }
                         }
+                        break;
                     }
                 }
             } while (iterator.hasNext());
@@ -645,6 +649,7 @@ public interface BaseSidedInventory extends Inventory {
                             return List.of();
                         }
                         dirty = true;
+                        break;
                     }
                 } while (iterator.hasNext());
             }
@@ -1410,6 +1415,7 @@ public interface BaseSidedInventory extends Inventory {
                             changes.add(() -> setStack(slot, directCopy(stack, insert)));
                             entry.setValue(remaining - insert);
                         }
+                        break;
                     } else if (matches(target, stack)) {
                         int maxCount = target.getMaxCount();
                         int count = target.getCount();
@@ -1429,6 +1435,7 @@ public interface BaseSidedInventory extends Inventory {
                                 entry.setValue(remaining - insert);
                             }
                         }
+                        break;
                     }
                 }
             } while (iterator.hasNext());

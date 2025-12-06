@@ -266,6 +266,7 @@ public interface SidedFluidInventory extends FluidInventory {
                         } else {
                             entry.setValue(remaining - insert);
                         }
+                        break;
                     } else if (matches(target, stack)) {
                         int maxAmount = target.getMaxAmount();
                         int amount = target.getAmount();
@@ -281,6 +282,7 @@ public interface SidedFluidInventory extends FluidInventory {
                                 entry.setValue(remaining - insert);
                             }
                         }
+                        break;
                     }
                 }
             } while (iterator.hasNext());
@@ -849,6 +851,7 @@ public interface SidedFluidInventory extends FluidInventory {
                             changes.add(() -> setStack(slot, stack.directCopy(insert)));
                             entry.setValue(remaining - insert);
                         }
+                        break;
                     } else if (matches(target, stack)) {
                         int maxAmount = target.getMaxAmount();
                         int amount = target.getAmount();
@@ -868,6 +871,7 @@ public interface SidedFluidInventory extends FluidInventory {
                                 entry.setValue(remaining - insert);
                             }
                         }
+                        break;
                     }
                 }
             } while (iterator.hasNext());
