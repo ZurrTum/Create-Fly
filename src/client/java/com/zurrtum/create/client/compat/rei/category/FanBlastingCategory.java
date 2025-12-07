@@ -50,7 +50,7 @@ public class FanBlastingCategory extends CreateCategory<FanBlastingDisplay> {
             graphics.state.addSpecialElement(new FanRenderState(
                 new Matrix3x2f(graphics.getMatrices()),
                 bounds.x + 61,
-                bounds.y + 10,
+                bounds.y + 9,
                 Fluids.LAVA.getDefaultState().getBlockState()
             ));
         }));

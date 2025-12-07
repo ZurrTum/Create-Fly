@@ -38,7 +38,7 @@ public class FanRenderer extends SpecialGuiElementRenderer<FanRenderState> {
         matrices.scale(1, 1, -1);
         matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(-15.5f));
         matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(22.5f));
-        matrices.translate(-0.92f, -0.74f, -0.5f);
+        matrices.translate(-0.92f, -0.75f, -0.5f);
         matrices.scale(1, -1, 1);
 
         BlockState blockState;
