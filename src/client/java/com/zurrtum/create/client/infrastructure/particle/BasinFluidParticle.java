@@ -11,6 +11,7 @@ import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.client.particle.Particle;
 import net.minecraft.client.particle.ParticleFactory;
 import net.minecraft.client.render.Camera;
+import net.minecraft.client.render.LightmapTextureManager;
 import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.component.ComponentChanges;
@@ -77,7 +78,7 @@ public class BasinFluidParticle extends FluidParticle {
                 float totalUnits = ((BasinBlockEntity) blockEntity).getTotalFluidUnits(0);
                 if (totalUnits < 1)
                     totalUnits = 0;
-                float fluidLevel = MathHelper.clamp(totalUnits / 2000, 0, 1);
+                float fluidLevel = MathHelper.clamp(totalUnits / 162000, 0, 1);
                 y = 2 / 16f + basinPos.getY() + 12 / 16f * fluidLevel + yOffset;
             }
 
@@ -92,10 +93,20 @@ public class BasinFluidParticle extends FluidParticle {
     }
 
     @Override
+    protected void updateColor() {
+        this.alpha = 0.9F;
+    }
+
+    @Override
+    protected int getBrightness(float p_189214_1_) {
+        return LightmapTextureManager.MAX_LIGHT_COORDINATE;
+    }
+
+    @Override
     public void render(VertexConsumer vb, Camera info, float pt) {
         Quaternionf rotation = info.getRotation();
         Quaternionf prevRotation = new Quaternionf(rotation);
-        rotation.set(1, 0, 0, 1);
+        rotation.set(-1, 0, 0, 1);
         rotation.normalize();
         super.render(vb, info, pt);
         rotation.set(0, 0, 0, 1);

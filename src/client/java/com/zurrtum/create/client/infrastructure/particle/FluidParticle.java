@@ -43,9 +43,7 @@ public class FluidParticle extends SpriteBillboardParticle {
         this.setSprite(config.still().get());
 
         this.gravityStrength = 1.0F;
-        this.red = 0.8F;
-        this.green = 0.8F;
-        this.blue = 0.8F;
+        this.updateColor();
         this.multiplyColor(config.tint().apply(components));
 
         this.velocityX = vx;
@@ -64,6 +62,12 @@ public class FluidParticle extends SpriteBillboardParticle {
         int blockLight = (brightnessForRender >> 4) & 0xf;
         blockLight = Math.max(blockLight, fluid.getDefaultState().getBlockState().getLuminance());
         return (skyLight << 20) | (blockLight << 4);
+    }
+
+    protected void updateColor() {
+        this.red = 0.8F;
+        this.green = 0.8F;
+        this.blue = 0.8F;
     }
 
     protected void multiplyColor(int color) {
