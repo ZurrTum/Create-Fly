@@ -97,11 +97,11 @@ import net.minecraft.component.MergedComponentMap;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.NetworkThreadUtils;
-import net.minecraft.recipe.ServerRecipeManager;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.server.network.ServerPlayNetworkHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -1188,12 +1188,14 @@ public class AllHandle {
 
     public static void onBlueprintAssignCompleteRecipe(ServerPlayNetworkHandler listener, BlueprintAssignCompleteRecipePacket packet) {
         ServerPlayerEntity player = listener.player;
-        if (player.currentScreenHandler instanceof BlueprintMenu c) {
-            ServerRecipeManager.ServerRecipe serverRecipe = listener.server.getRecipeManager().get(packet.recipeId());
-            if (serverRecipe != null) {
-                //TODO
-                //                BlueprintItem.assignCompleteRecipe(player.getWorld(), c.ghostInventory, serverRecipe.parent().value());
+        if (player.currentScreenHandler instanceof BlueprintMenu menu) {
+            Inventory inventory = menu.ghostInventory;
+            List<ItemStack> input = packet.input();
+            int size = Math.min(input.size(), 9);
+            for (int i = 0; i < size; i++) {
+                inventory.setStack(i, input.get(i));
             }
+            inventory.setStack(9, packet.output());
         }
     }
 

@@ -9,10 +9,6 @@ import net.minecraft.item.ItemStack;
 import java.util.List;
 
 public class StockKeeperRequestMenu extends MenuBase<StockTickerBlockEntity> {
-
-    public boolean isAdmin;
-    public boolean isLocked;
-
     public Object screenReference;
 
     public StockKeeperRequestMenu(int id, PlayerInventory inv, StockTickerBlockEntity contentHolder) {

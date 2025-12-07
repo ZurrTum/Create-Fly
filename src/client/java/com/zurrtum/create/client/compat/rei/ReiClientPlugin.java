@@ -15,6 +15,8 @@ import me.shedaniel.rei.api.client.registry.category.CategoryRegistry.CategoryCo
 import me.shedaniel.rei.api.client.registry.display.DisplayRegistry;
 import me.shedaniel.rei.api.client.registry.entry.EntryRegistry;
 import me.shedaniel.rei.api.client.registry.screen.ExclusionZones;
+import me.shedaniel.rei.api.client.registry.screen.ScreenRegistry;
+import me.shedaniel.rei.api.client.registry.transfer.TransferHandlerRegistry;
 import me.shedaniel.rei.api.common.category.CategoryIdentifier;
 import me.shedaniel.rei.api.common.display.Display;
 import me.shedaniel.rei.api.common.entry.EntryIngredient;
@@ -101,6 +103,18 @@ public class ReiClientPlugin implements REIClientPlugin {
                 Optional.empty()
             ));
         }
+    }
+
+    @Override
+    public void registerScreens(ScreenRegistry registry) {
+        registry.registerDraggableStackVisitor(new GhostIngredientHandler<>());
+        registry.registerFocusedStack(new StockKeeperGuiContainerHandler());
+    }
+
+    @Override
+    public void registerTransferHandlers(TransferHandlerRegistry registry) {
+        registry.register(new BlueprintTransferHandler());
+        registry.register(new StockKeeperTransferHandler());
     }
 
     @Override

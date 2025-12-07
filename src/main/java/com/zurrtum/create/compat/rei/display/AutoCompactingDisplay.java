@@ -9,19 +9,24 @@ import me.shedaniel.rei.api.common.category.CategoryIdentifier;
 import me.shedaniel.rei.api.common.display.Display;
 import me.shedaniel.rei.api.common.display.DisplaySerializer;
 import me.shedaniel.rei.api.common.entry.EntryIngredient;
+import me.shedaniel.rei.api.common.entry.EntryStack;
+import me.shedaniel.rei.api.common.entry.InputIngredient;
 import me.shedaniel.rei.api.common.util.CollectionUtils;
 import me.shedaniel.rei.api.common.util.EntryIngredients;
 import me.shedaniel.rei.plugin.client.displays.ClientsidedCraftingDisplay;
 import me.shedaniel.rei.plugin.common.displays.crafting.DefaultCraftingDisplay;
 import me.shedaniel.rei.plugin.common.displays.crafting.DefaultCustomShapedDisplay;
 import me.shedaniel.rei.plugin.common.displays.crafting.DefaultCustomShapelessDisplay;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.network.codec.PacketCodecs;
 import net.minecraft.recipe.*;
 import net.minecraft.recipe.display.RecipeDisplay;
 import net.minecraft.recipe.display.ShapedCraftingRecipeDisplay;
 import net.minecraft.recipe.display.ShapelessCraftingRecipeDisplay;
+import net.minecraft.screen.ScreenHandler;
 import net.minecraft.util.Identifier;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.Optional;
@@ -80,6 +85,11 @@ public interface AutoCompactingDisplay {
         }
 
         @Override
+        public List<InputIngredient<EntryStack<?>>> getInputIngredients(@Nullable ScreenHandler menu, @Nullable PlayerEntity player) {
+            return CollectionUtils.mapIndexed(getInputEntries(), InputIngredient::of);
+        }
+
+        @Override
         public CategoryIdentifier<?> getCategoryIdentifier() {
             return ReiCommonPlugin.AUTOMATIC_PACKING;
         }
@@ -125,6 +135,11 @@ public interface AutoCompactingDisplay {
 
         public ShapedDisplay(List<EntryIngredient> input, List<EntryIngredient> output, Optional<Identifier> location, int width, int height) {
             super(input, output, location, width, height);
+        }
+
+        @Override
+        public List<InputIngredient<EntryStack<?>>> getInputIngredients(@Nullable ScreenHandler menu, @Nullable PlayerEntity player) {
+            return CollectionUtils.mapIndexed(getInputEntries(), InputIngredient::of);
         }
 
         @Override
@@ -177,6 +192,11 @@ public interface AutoCompactingDisplay {
         }
 
         @Override
+        public List<InputIngredient<EntryStack<?>>> getInputIngredients(@Nullable ScreenHandler menu, @Nullable PlayerEntity player) {
+            return CollectionUtils.mapIndexed(getInputEntries(), InputIngredient::of);
+        }
+
+        @Override
         public CategoryIdentifier<?> getCategoryIdentifier() {
             return ReiCommonPlugin.AUTOMATIC_PACKING;
         }
@@ -211,6 +231,11 @@ public interface AutoCompactingDisplay {
 
         public CraftingDisplayShapeless(List<EntryIngredient> inputs, List<EntryIngredient> outputs, Optional<NetworkRecipeId> id) {
             super(inputs, outputs, id);
+        }
+
+        @Override
+        public List<InputIngredient<EntryStack<?>>> getInputIngredients(@Nullable ScreenHandler menu, @Nullable PlayerEntity player) {
+            return CollectionUtils.mapIndexed(getInputEntries(), InputIngredient::of);
         }
 
         @Override
