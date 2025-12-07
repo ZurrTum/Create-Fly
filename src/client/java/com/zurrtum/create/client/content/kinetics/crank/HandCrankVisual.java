@@ -1,5 +1,6 @@
 package com.zurrtum.create.client.content.kinetics.crank;
 
+import com.zurrtum.create.catnip.math.AngleHelper;
 import com.zurrtum.create.client.AllPartialModels;
 import com.zurrtum.create.client.content.kinetics.base.KineticBlockEntityVisual;
 import com.zurrtum.create.client.content.kinetics.base.RotatingInstance;
@@ -42,7 +43,7 @@ public class HandCrankVisual extends KineticBlockEntityVisual<HandCrankBlockEnti
 
     private void rotateCrank(float pt) {
         var facing = blockState.get(Properties.FACING);
-        float angle = HandCrankRenderer.getHandCrankIndependentAngle(blockEntity, pt);
+        float angle = AngleHelper.rad(HandCrankRenderer.getHandCrankIndependentAngle(blockEntity, pt));
 
         crank.setIdentityTransform().translate(getVisualPosition()).center()
             .rotate(angle, Direction.get(Direction.AxisDirection.POSITIVE, facing.getAxis()))

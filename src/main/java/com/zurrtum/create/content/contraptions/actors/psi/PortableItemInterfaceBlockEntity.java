@@ -27,12 +27,18 @@ public class PortableItemInterfaceBlockEntity extends PortableStorageInterfaceBl
     @Override
     public void startTransferringTo(Contraption contraption, float distance) {
         ((InterfaceItemHandler) capability).setInventory(contraption.getStorage().getAllItems());
+        if (world != null && !world.isClient()) {
+            world.updateNeighborsAlways(pos, getCachedState().getBlock(), null);
+        }
         super.startTransferringTo(contraption, distance);
     }
 
     @Override
     protected void stopTransferring() {
         ((InterfaceItemHandler) capability).setEmpty();
+        if (world != null && !world.isClient()) {
+            world.updateNeighborsAlways(pos, getCachedState().getBlock(), null);
+        }
         super.stopTransferring();
     }
 

@@ -109,7 +109,7 @@ public class PloughMovementBehaviour extends BlockBreakingMovementBehaviour {
         if (brokenState.getBlock() == Blocks.SNOW && context.world instanceof ServerWorld world) {
             brokenState.getDroppedStacks(new LootWorldContext.Builder(world).add(LootContextParameters.BLOCK_STATE, brokenState)
                 .add(LootContextParameters.THIS_ENTITY, context.contraption.entity).add(LootContextParameters.ORIGIN, Vec3d.ofCenter(pos))
-                .add(LootContextParameters.TOOL, new ItemStack(Items.IRON_SHOVEL))).forEach(s -> dropItem(context, s));
+                .add(LootContextParameters.TOOL, new ItemStack(Items.IRON_SHOVEL))).forEach(s -> collectOrDropItem(context, s));
         }
     }
 }

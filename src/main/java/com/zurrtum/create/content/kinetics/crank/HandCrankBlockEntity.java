@@ -3,6 +3,7 @@ package com.zurrtum.create.content.kinetics.crank;
 import com.zurrtum.create.AllBlockEntityTypes;
 import com.zurrtum.create.AllBlocks;
 import com.zurrtum.create.content.kinetics.base.GeneratingKineticBlockEntity;
+import com.zurrtum.create.content.kinetics.base.KineticBlockEntity;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntityType;
@@ -14,8 +15,11 @@ public class HandCrankBlockEntity extends GeneratingKineticBlockEntity {
 
     public int inUse;
     public boolean backwards;
+    /**
+     * In degrees
+     */
     public float independentAngle;
-    public float chasingVelocity;
+    public float chasingAngularVelocity;
 
     public HandCrankBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         super(type, pos, state);
@@ -68,9 +72,9 @@ public class HandCrankBlockEntity extends GeneratingKineticBlockEntity {
     public void tick() {
         super.tick();
 
-        float actualSpeed = getSpeed();
-        chasingVelocity += ((actualSpeed * 10 / 3f) - chasingVelocity) * .25f;
-        independentAngle += chasingVelocity;
+        float actualAngularSpeed = KineticBlockEntity.convertToAngular(getSpeed());
+        chasingAngularVelocity += (actualAngularSpeed - chasingAngularVelocity) / 4f;
+        independentAngle += chasingAngularVelocity;
 
         if (inUse > 0) {
             inUse--;

@@ -544,8 +544,4 @@ public class VirtualRenderWorld extends World implements VisualizationLevel {
     public int sectionIndexToCoord(int index) {
         return index + this.getBottomSectionCoord();
     }
-
-    @Override
-    public void markDirty(BlockPos pos) {
-    }
 }

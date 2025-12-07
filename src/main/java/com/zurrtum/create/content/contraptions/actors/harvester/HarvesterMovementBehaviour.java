@@ -72,7 +72,7 @@ public class HarvesterMovementBehaviour extends MovementBehaviour {
                     stack.decrement(1);
                     seedSubtracted.setTrue();
                 }
-                dropItem(context, stack);
+                collectOrDropItem(context, stack);
             }
         );
 

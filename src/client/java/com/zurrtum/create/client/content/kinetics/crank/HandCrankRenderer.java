@@ -1,5 +1,6 @@
 package com.zurrtum.create.client.content.kinetics.crank;
 
+import com.zurrtum.create.catnip.math.AngleHelper;
 import com.zurrtum.create.client.AllPartialModels;
 import com.zurrtum.create.client.catnip.render.CachedBuffers;
 import com.zurrtum.create.client.catnip.render.SuperByteBuffer;
@@ -31,18 +32,24 @@ public class HandCrankRenderer extends KineticBlockEntityRenderer<HandCrankBlock
 
         BlockState state = be.getCachedState();
         Direction facing = state.get(Properties.FACING);
-        kineticRotationTransform(getRenderedHandle(state), be, facing.getAxis(), getIndependentAngle(be, partialTicks), light).renderInto(
-            ms,
-            buffer.getBuffer(RenderLayer.getSolid())
-        );
+        kineticRotationTransform(
+            getRenderedHandle(state),
+            be,
+            facing.getAxis(),
+            AngleHelper.rad(getIndependentAngle(be, partialTicks)),
+            light
+        ).renderInto(ms, buffer.getBuffer(RenderLayer.getSolid()));
     }
 
     public float getIndependentAngle(HandCrankBlockEntity be, float partialTicks) {
         return getHandCrankIndependentAngle(be, partialTicks);
     }
 
+    /**
+     * In degrees
+     */
     public static float getHandCrankIndependentAngle(HandCrankBlockEntity be, float partialTicks) {
-        return (be.independentAngle + partialTicks * be.chasingVelocity) / 360;
+        return be.independentAngle + partialTicks * be.chasingAngularVelocity;
     }
 
     public SuperByteBuffer getRenderedHandle(BlockState blockState) {
