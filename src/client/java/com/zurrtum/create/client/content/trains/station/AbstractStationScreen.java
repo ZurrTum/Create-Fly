@@ -3,9 +3,13 @@ package com.zurrtum.create.client.content.trains.station;
 import com.zurrtum.create.client.AllTrainIcons;
 import com.zurrtum.create.client.Create;
 import com.zurrtum.create.client.catnip.gui.AbstractSimiScreen;
+import com.zurrtum.create.client.catnip.gui.ScreenOpener;
 import com.zurrtum.create.client.catnip.gui.element.GuiGameElement;
+import com.zurrtum.create.client.catnip.gui.element.GuiGameElement.GuiBlockStateRenderBuilder;
 import com.zurrtum.create.client.catnip.gui.element.GuiGameElement.GuiPartialRenderBuilder;
 import com.zurrtum.create.client.catnip.gui.widget.ElementWidget;
+import com.zurrtum.create.client.compat.computercraft.ComputerScreen;
+import com.zurrtum.create.client.compat.computercraft.ComputerScreen.AdditionalRenderer;
 import com.zurrtum.create.client.content.trains.entity.TrainIcon;
 import com.zurrtum.create.client.flywheel.lib.model.baked.PartialModel;
 import com.zurrtum.create.client.flywheel.lib.transform.TransformStack;
@@ -17,20 +21,22 @@ import com.zurrtum.create.content.trains.entity.Train;
 import com.zurrtum.create.content.trains.station.GlobalStation;
 import com.zurrtum.create.content.trains.station.StationBlockEntity;
 import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.state.property.Properties;
+import net.minecraft.text.Text;
 import net.minecraft.util.math.MathHelper;
 
 import java.lang.ref.WeakReference;
 import java.util.List;
 
-public abstract class AbstractStationScreen extends AbstractSimiScreen {
+public abstract class AbstractStationScreen extends AbstractSimiScreen implements AdditionalRenderer {
 
     protected AllGuiTextures background;
     protected StationBlockEntity blockEntity;
     protected GlobalStation station;
-    private ElementWidget renderedItem;
-    private ElementWidget renderedFlag;
+    private GuiBlockStateRenderBuilder renderedItem;
+    private GuiPartialRenderBuilder renderedFlag;
 
     protected WeakReference<Train> displayedTrain;
 
@@ -45,16 +51,17 @@ public abstract class AbstractStationScreen extends AbstractSimiScreen {
 
     @Override
     protected void init() {
-        //TODO
-        //        if (blockEntity.computerBehaviour.hasAttachedComputer())
-        //            minecraft.setScreen(new ComputerScreen(
-        //                title,
-        //                () -> Component.literal(station.name),
-        //                this::renderAdditional,
-        //                this,
-        //                blockEntity.computerBehaviour::hasAttachedComputer
-        //            ));
-
+        renderedFlag = GuiGameElement.partial().scale(2.5F).transform(this::transform).padding(13);
+        renderedItem = GuiGameElement.of(blockEntity.getCachedState().with(Properties.WATERLOGGED, false)).rotate(-22, 63, 0).scale(2.5F).padding(17);
+        if (blockEntity.computerBehaviour.hasAttachedComputer()) {
+            ScreenOpener.open(new ComputerScreen(
+                title,
+                () -> Text.literal(station.name),
+                this,
+                this,
+                blockEntity.computerBehaviour::hasAttachedComputer
+            ));
+        }
         setWindowSize(background.getWidth(), background.getHeight());
         super.init();
         clearChildren();
@@ -65,23 +72,29 @@ public abstract class AbstractStationScreen extends AbstractSimiScreen {
         confirmButton = new IconButton(x + background.getWidth() - 33, y + background.getHeight() - 24, AllIcons.I_CONFIRM);
         confirmButton.withCallback(this::close);
         addDrawableChild(confirmButton);
+        addAdditional(this, x, y, background);
+    }
 
-        renderedFlag = new ElementWidget(x + background.getWidth() + 25, y + background.getHeight() - 62).showingElement(GuiGameElement.partial()
-            .scale(2.5F).transform(this::transform).padding(13));
-        addDrawableChild(renderedFlag);
+    @Override
+    public void addAdditional(Screen screen, int x, int y, AllGuiTextures background) {
+        screen.addDrawableChild(new ElementWidget(x + background.getWidth() + 25, y + background.getHeight() - 62).showingElement(renderedFlag));
+        screen.addDrawableChild(new ElementWidget(x + background.getWidth() + 3, y + background.getHeight() - 46).showingElement(renderedItem));
+    }
 
-        renderedItem = new ElementWidget(
-            x + background.getWidth() + 3,
-            y + background.getHeight() - 46
-        ).showingElement(GuiGameElement.of(blockEntity.getCachedState().with(Properties.WATERLOGGED, false)).rotate(-22, 63, 0).scale(2.5F)
-            .padding(17));
-        addDrawableChild(renderedItem);
+    @Override
+    public void updateAdditional(float partialTicks) {
+        if (blockEntity.resolveFlagAngle()) {
+            renderedFlag.partial(getFlag(partialTicks)).tick(blockEntity.flag.settled() ? 1 : partialTicks);
+        } else {
+            renderedFlag.partial(null);
+        }
     }
 
     @Override
     public void close() {
         super.close();
-        renderedItem.getRenderElement().clear();
+        renderedFlag.clear();
+        renderedItem.clear();
     }
 
     public int getTrainIconWidth(Train train) {
@@ -104,19 +117,18 @@ public abstract class AbstractStationScreen extends AbstractSimiScreen {
         return w;
     }
 
-    //TODO
-    //    @Override
-    //    public void tick() {
-    //        super.tick();
-    //        if (blockEntity.computerBehaviour.hasAttachedComputer())
-    //            minecraft.setScreen(new ComputerScreen(
-    //                title,
-    //                () -> Component.literal(station.name),
-    //                this::renderAdditional,
-    //                this,
-    //                blockEntity.computerBehaviour::hasAttachedComputer
-    //            ));
-    //    }
+    @Override
+    public void tick() {
+        super.tick();
+        if (blockEntity.computerBehaviour.hasAttachedComputer())
+            ScreenOpener.open(new ComputerScreen(
+                title,
+                () -> Text.literal(station.name),
+                this,
+                this,
+                blockEntity.computerBehaviour::hasAttachedComputer
+            ));
+    }
 
     @Override
     protected void renderWindow(DrawContext graphics, int mouseX, int mouseY, float partialTicks) {
@@ -124,12 +136,7 @@ public abstract class AbstractStationScreen extends AbstractSimiScreen {
         int y = guiTop;
 
         background.render(graphics, x, y);
-        GuiPartialRenderBuilder flag = (GuiPartialRenderBuilder) renderedFlag.getRenderElement();
-        if (blockEntity.resolveFlagAngle()) {
-            flag.partial(getFlag(partialTicks)).tick(blockEntity.flag.settled() ? 1 : partialTicks);
-        } else {
-            flag.partial(null);
-        }
+        updateAdditional(partialTicks);
     }
 
     private void transform(MatrixStack ms, float partialTicks) {

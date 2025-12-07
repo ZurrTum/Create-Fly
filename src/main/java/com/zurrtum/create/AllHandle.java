@@ -210,8 +210,7 @@ public class AllHandle {
         NetworkThreadUtils.forceMainThread(packet, listener, listener.server);
         onBlockEntityConfiguration(
             listener, packet.pos(), 20, blockEntity -> {
-                //TODO
-                if (blockEntity instanceof SequencedGearshiftBlockEntity be/* && !be.computerBehaviour.hasAttachedComputer()*/) {
+                if (blockEntity instanceof SequencedGearshiftBlockEntity be && !be.computerBehaviour.hasAttachedComputer()) {
                     be.run(-1);
                     be.instructions = packet.instructions();
                     return true;

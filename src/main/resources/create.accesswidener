@@ -229,3 +229,4 @@ mutable field net/minecraft/item/ItemGroup column I
 mutable field net/minecraft/item/ItemGroup row Lnet/minecraft/item/ItemGroup$Row;
 mutable field net/minecraft/item/ItemPlacementContext placementPos Lnet/minecraft/util/math/BlockPos;
 mutable field net/minecraft/world/biome/GenerationSettings features Ljava/util/List;
+accessible method net/minecraft/client/gui/screen/Screen addDrawableChild (Lnet/minecraft/client/gui/Element;)Lnet/minecraft/client/gui/Element;

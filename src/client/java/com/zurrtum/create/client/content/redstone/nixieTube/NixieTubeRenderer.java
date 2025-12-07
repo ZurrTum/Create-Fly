@@ -49,7 +49,7 @@ public class NixieTubeRenderer extends SafeBlockEntityRenderer<NixieTubeBlockEnt
         msr.center().rotateYDegrees(yRot).rotateZDegrees(xRot).uncenter();
         MinecraftClient mc = MinecraftClient.getInstance();
 
-        if (be.signalState != null) {
+        if (be.signalState != null || be.computerSignal != null) {
             renderAsSignal(mc, be, partialTicks, ms, buffer, light, overlay);
             ms.pop();
             return;
@@ -164,59 +164,115 @@ public class NixieTubeRenderer extends SafeBlockEntityRenderer<NixieTubeBlockEnt
 
         Vec3d lampVec = Vec3d.ofCenter(be.getPos());
         Vec3d diff = lampVec.subtract(observerVec);
-        for (boolean first : Iterate.trueAndFalse) {
-            boolean flip = first == invertTubes;
-            VertexConsumer translucent = buffer.getBuffer(RenderTypes.translucent());
-            if (first && !be.signalState.isRedLight(renderTime)) {
+        if (be.signalState != null) {
+            for (boolean first : Iterate.trueAndFalse) {
+                boolean flip = first == invertTubes;
+                VertexConsumer translucent = buffer.getBuffer(RenderTypes.translucent());
+                if (first && !be.signalState.isRedLight(renderTime)) {
+                    ms.push();
+                    ms.translate(flip ? 4 / 16f : -4 / 16f, 0, 0);
+                    CachedBuffers.partial(AllPartialModels.NIXIE_TUBE_SINGLE, blockState).light(light).renderInto(ms, translucent);
+                    ms.pop();
+                    continue;
+                }
+                if (!first && !be.signalState.isGreenLight(renderTime) && !be.signalState.isYellowLight(renderTime)) {
+                    ms.push();
+                    ms.translate(flip ? 4 / 16f : -4 / 16f, 0, 0);
+                    CachedBuffers.partial(AllPartialModels.NIXIE_TUBE_SINGLE, blockState).light(light).renderInto(ms, translucent);
+                    ms.pop();
+                    continue;
+                }
+
+                boolean yellow = be.signalState.isYellowLight(renderTime);
+
                 ms.push();
                 ms.translate(flip ? 4 / 16f : -4 / 16f, 0, 0);
-                CachedBuffers.partial(AllPartialModels.NIXIE_TUBE_SINGLE, blockState).light(light).renderInto(ms, translucent);
-                ms.pop();
-                continue;
-            }
-            if (!first && !be.signalState.isGreenLight(renderTime) && !be.signalState.isYellowLight(renderTime)) {
-                ms.push();
-                ms.translate(flip ? 4 / 16f : -4 / 16f, 0, 0);
-                CachedBuffers.partial(AllPartialModels.NIXIE_TUBE_SINGLE, blockState).light(light).renderInto(ms, translucent);
-                ms.pop();
-                continue;
-            }
 
-            boolean yellow = be.signalState.isYellowLight(renderTime);
+                VertexConsumer additive2 = buffer.getBuffer(RenderTypes.additive2());
+                VertexConsumer additive = buffer.getBuffer(RenderTypes.additive());
+                if (diff.lengthSquared() < 9216) {
+                    boolean vert = first ^ facing.getAxis().isHorizontal();
+                    float longSide = yellow ? 1 : 4;
+                    float longSideGlow = yellow ? 2 : 5.125f;
 
-            ms.push();
-            ms.translate(flip ? 4 / 16f : -4 / 16f, 0, 0);
+                    CachedBuffers.partial(AllPartialModels.SIGNAL_WHITE_CUBE, blockState).light(0xf000f0).disableDiffuse()
+                        .scale(vert ? longSide : 1, vert ? 1 : longSide, 1).renderInto(ms, translucent);
 
-            VertexConsumer additive2 = buffer.getBuffer(RenderTypes.additive2());
-            VertexConsumer additive = buffer.getBuffer(RenderTypes.additive());
-            if (diff.lengthSquared() < 96 * 96) {
-                boolean vert = first ^ facing.getAxis().isHorizontal();
-                float longSide = yellow ? 1 : 4;
-                float longSideGlow = yellow ? 2 : 5.125f;
+                    float factorX = vert ? longSideGlow : 2;
+                    float factorY = vert ? 2 : longSideGlow;
+                    SuperByteBuffer glow = CachedBuffers.partial(
+                        first ? AllPartialModels.SIGNAL_RED_GLOW : yellow ? AllPartialModels.SIGNAL_YELLOW_GLOW : AllPartialModels.SIGNAL_WHITE_GLOW,
+                        blockState
+                    );
+                    glow.light(0xf000f0).disableDiffuse().scale(factorX, factorY, 2).color(153, 153, 153, 153).renderInto(ms, additive2);
+                    glow.light(0xf000f0).disableDiffuse().scale(factorX, factorY, 2).color(102, 102, 102, 102).renderInto(ms, additive);
+                }
 
-                CachedBuffers.partial(AllPartialModels.SIGNAL_WHITE_CUBE, blockState).light(0xf000f0).disableDiffuse()
-                    .scale(vert ? longSide : 1, vert ? 1 : longSide, 1).renderInto(ms, translucent);
-
-                float factorX = vert ? longSideGlow : 2;
-                float factorY = vert ? 2 : longSideGlow;
-                SuperByteBuffer glow = CachedBuffers.partial(
-                    first ? AllPartialModels.SIGNAL_RED_GLOW : yellow ? AllPartialModels.SIGNAL_YELLOW_GLOW : AllPartialModels.SIGNAL_WHITE_GLOW,
+                float scale = 1 + 1 / 16f;
+                SuperByteBuffer signal = CachedBuffers.partial(
+                    first ? AllPartialModels.SIGNAL_RED : yellow ? AllPartialModels.SIGNAL_YELLOW : AllPartialModels.SIGNAL_WHITE,
                     blockState
                 );
-                glow.light(0xf000f0).disableDiffuse().scale(factorX, factorY, 2).color(153, 153, 153, 153).renderInto(ms, additive2);
-                glow.light(0xf000f0).disableDiffuse().scale(factorX, factorY, 2).color(153, 153, 153, 153).renderInto(ms, additive);
+                signal.light(0xF000F0).disableDiffuse().scale(scale).color(153, 153, 153, 153).renderInto(ms, additive2);
+                signal.light(0xF000F0).disableDiffuse().scale(scale).color(102, 102, 102, 102).renderInto(ms, additive);
+
+                ms.pop();
             }
+        } else if (be.computerSignal != null) {
+            VertexConsumer translucent = buffer.getBuffer(RenderTypes.translucent());
+            for (boolean first : Iterate.trueAndFalse) {
+                boolean flip = first == invertTubes;
+                NixieTubeBlockEntity.ComputerSignal.TubeDisplay tubeDisplay = first ? be.computerSignal.first : be.computerSignal.second;
+                if (tubeDisplay.blinkPeriod == 0 || tubeDisplay.blinkPeriod > 1 && renderTime % tubeDisplay.blinkPeriod < tubeDisplay.blinkOffTime) {
+                    ms.push();
+                    ms.translate(flip ? 4 / 16f : -4 / 16f, 0, 0);
+                    CachedBuffers.partial(AllPartialModels.NIXIE_TUBE_SINGLE, blockState).light(light).renderInto(ms, translucent);
+                    ms.pop();
+                    continue;
+                }
 
-            float scale = 1 + 1 / 16f;
-            SuperByteBuffer signal = CachedBuffers.partial(
-                first ? AllPartialModels.SIGNAL_RED : yellow ? AllPartialModels.SIGNAL_YELLOW : AllPartialModels.SIGNAL_WHITE,
-                blockState
-            );
-            signal.light(0xF000F0).disableDiffuse().scale(scale).color(153, 153, 153, 153).renderInto(ms, additive2);
-            signal.light(0xF000F0).disableDiffuse().scale(scale).color(102, 102, 102, 102).renderInto(ms, additive);
+                ms.push();
+                ms.translate(flip ? 4 / 16f : -4 / 16f, 0, 0);
 
-            ms.pop();
+                VertexConsumer additive2 = buffer.getBuffer(RenderTypes.additive2());
+                VertexConsumer additive = buffer.getBuffer(RenderTypes.additive());
+                if (diff.lengthSquared() < 9216) {
+                    boolean horiz = facing.getAxis().isHorizontal();
+                    float width = horiz ? tubeDisplay.glowWidth : tubeDisplay.glowHeight;
+                    float height = horiz ? tubeDisplay.glowHeight : tubeDisplay.glowWidth;
+
+                    CachedBuffers.partial(AllPartialModels.SIGNAL_COMPUTER_WHITE_CUBE, blockState).light(0xf000f0).disableDiffuse()
+                        .scale(width, height, 1).renderInto(ms, translucent);
+
+                    SuperByteBuffer glow = CachedBuffers.partial(AllPartialModels.SIGNAL_COMPUTER_WHITE_GLOW, blockState);
+                    int r = Math.min(((tubeDisplay.r & 0xFF) * 6 + 256) >> 3, 255);
+                    int g = Math.min(((tubeDisplay.g & 0xFF) * 6 + 256) >> 3, 255);
+                    int b = Math.min(((tubeDisplay.b & 0xFF) * 6 + 256) >> 3, 255);
+                    float factorX = width + 1.125f;
+                    float factorY = height + 1.125f;
+                    int r1 = (int) (r * 0.6);
+                    int g1 = (int) (g * 0.6);
+                    int b1 = (int) (b * 0.6);
+                    glow.light(0xf000f0).color(r1, g1, b1, 153).disableDiffuse().scale(factorX, factorY, 2).renderInto(ms, additive2);
+                    glow.light(0xf000f0).color(r - r1, g - g1, b - b1, 102).disableDiffuse().scale(factorX, factorY, 2).renderInto(ms, additive);
+                }
+
+                CachedBuffers.partial(AllPartialModels.SIGNAL_COMPUTER_WHITE_BASE, blockState).light(0xF000F0).color(12, 12, 12, 255).disableDiffuse()
+                    .scale(1 + 1.25f / 16f).renderInto(ms, additive);
+
+                SuperByteBuffer signal = CachedBuffers.partial(AllPartialModels.SIGNAL_COMPUTER_WHITE, blockState);
+                int r1 = (int) (tubeDisplay.r * 0.6);
+                int g1 = (int) (tubeDisplay.g * 0.6);
+                int b1 = (int) (tubeDisplay.b * 0.6);
+                float scale = 1 + 1 / 16f;
+                signal.light(0xF000F0).color(r1, g1, b1, 153).disableDiffuse().scale(scale).renderInto(ms, additive2);
+                signal.light(0xF000F0).color(tubeDisplay.r - r1, tubeDisplay.g - g1, tubeDisplay.b - b1, 102).disableDiffuse().scale(scale)
+                    .renderInto(ms, additive);
+
+                ms.pop();
+            }
         }
+
         ms.pop();
 
     }

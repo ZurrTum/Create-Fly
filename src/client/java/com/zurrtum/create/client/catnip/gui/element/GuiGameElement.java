@@ -5,6 +5,7 @@ import com.zurrtum.create.client.flywheel.lib.model.baked.PartialModel;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.MathHelper;
 import org.joml.Matrix3x2fStack;
@@ -14,6 +15,10 @@ import java.util.function.BiConsumer;
 public class GuiGameElement {
     public static GuiItemRenderBuilder of(ItemStack stack) {
         return new GuiItemRenderBuilder(stack);
+    }
+
+    public static GuiItemRenderBuilder of(Item item) {
+        return new GuiItemRenderBuilder(item.getDefaultStack());
     }
 
     public static GuiBlockStateRenderBuilder of(BlockState block) {

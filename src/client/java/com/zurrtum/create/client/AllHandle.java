@@ -58,6 +58,7 @@ import com.zurrtum.create.client.foundation.utility.CreateLang;
 import com.zurrtum.create.client.foundation.utility.DyeHelper;
 import com.zurrtum.create.client.foundation.utility.ServerSpeedProvider;
 import com.zurrtum.create.client.infrastructure.config.AllConfigs;
+import com.zurrtum.create.compat.computercraft.AbstractComputerBehaviour;
 import com.zurrtum.create.content.contraptions.AbstractContraptionEntity;
 import com.zurrtum.create.content.contraptions.Contraption;
 import com.zurrtum.create.content.contraptions.OrientedContraptionEntity;
@@ -590,10 +591,9 @@ public class AllHandle extends AllClientHandle {
 
     @Override
     public void onAttachedComputer(AttachedComputerPacket packet) {
-        //TODO
-        //        if (MinecraftClient.getInstance().world.getBlockEntity(packet.pos()) instanceof SmartBlockEntity be) {
-        //            be.getBehaviour(AbstractComputerBehaviour.TYPE).setHasAttachedComputer(packet.hasAttachedComputer());
-        //        }
+        if (MinecraftClient.getInstance().world.getBlockEntity(packet.pos()) instanceof SmartBlockEntity be) {
+            be.getBehaviour(AbstractComputerBehaviour.TYPE).setHasAttachedComputer(packet.hasAttachedComputer());
+        }
     }
 
     @Override

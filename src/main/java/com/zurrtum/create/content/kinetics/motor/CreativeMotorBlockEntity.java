@@ -2,6 +2,7 @@ package com.zurrtum.create.content.kinetics.motor;
 
 import com.zurrtum.create.AllBlockEntityTypes;
 import com.zurrtum.create.AllBlocks;
+import com.zurrtum.create.compat.computercraft.AbstractComputerBehaviour;
 import com.zurrtum.create.content.kinetics.base.GeneratingKineticBlockEntity;
 import com.zurrtum.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.foundation.blockEntity.behaviour.scrollValue.ServerKineticScrollValueBehaviour;
@@ -17,6 +18,7 @@ public class CreativeMotorBlockEntity extends GeneratingKineticBlockEntity {
     public static final int MAX_SPEED = 256;
 
     protected ServerScrollValueBehaviour generatedSpeed;
+    public AbstractComputerBehaviour computerBehaviour;
 
     public CreativeMotorBlockEntity(BlockPos pos, BlockState state) {
         super(AllBlockEntityTypes.MOTOR, pos, state);
@@ -45,6 +47,10 @@ public class CreativeMotorBlockEntity extends GeneratingKineticBlockEntity {
         if (!getCachedState().isOf(AllBlocks.CREATIVE_MOTOR))
             return 0;
         return convertToDirection(generatedSpeed.getValue(), getCachedState().get(CreativeMotorBlock.FACING));
+    }
+
+    public ServerScrollValueBehaviour getGeneratedSpeedBehaviour() {
+        return generatedSpeed;
     }
 
 }
