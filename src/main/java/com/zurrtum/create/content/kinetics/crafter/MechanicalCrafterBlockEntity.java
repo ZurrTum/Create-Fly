@@ -16,10 +16,6 @@ import com.zurrtum.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.foundation.blockEntity.behaviour.edgeInteraction.EdgeInteractionBehaviour;
 import com.zurrtum.create.foundation.blockEntity.behaviour.inventory.InvManipulationBehaviour;
 import com.zurrtum.create.infrastructure.items.SidedItemInventory;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.*;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.particles.ItemParticleOption;
@@ -37,6 +33,9 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.Vec3;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.*;
 
 import static com.zurrtum.create.content.kinetics.base.HorizontalKineticBlock.HORIZONTAL_FACING;
 
@@ -245,7 +244,7 @@ public class MechanicalCrafterBlockEntity extends KineticBlockEntity implements 
 
         inventory.read(view);
         input.read(view.childOrEmpty("ConnectedInput"));
-        groupedItems = view.read("GroupedItems", GroupedItems.CODEC).orElseThrow();
+        groupedItems = view.read("GroupedItems", GroupedItems.CODEC).orElseGet(GroupedItems::new);
         phase = Phase.IDLE;
         String name = view.getStringOr("Phase", "");
         for (Phase phase : Phase.values())
