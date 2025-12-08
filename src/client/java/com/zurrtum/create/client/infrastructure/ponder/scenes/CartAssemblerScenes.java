@@ -321,7 +321,7 @@ public class CartAssemblerScenes {
         scene.overlay().showOutline(PonderPalette.GREEN, new Object(), util.select().position(assembler2), 60);
         scene.overlay().showOutlineWithText(util.select().position(assembler1), 60).colored(PonderPalette.GREEN)
             .pointAt(util.vector().blockSurface(util.grid().at(2, 2, 4), Direction.NORTH)).placeNearTarget()
-            .text("Whenever two Cart Assembers share an attached structure...").attachKeyFrame();
+            .text("Whenever two Cart Assemblers share an attached structure...").attachKeyFrame();
         scene.idle(70);
 
         scene.overlay().showText(60).pointAt(util.vector().blockSurface(util.grid().at(2, 1, 4), Direction.NORTH)).placeNearTarget()

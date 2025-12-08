@@ -3,7 +3,7 @@
   "category": "misc",
   "ingredients": [
     "create:cardboard_block",
-    "minecraft:string"
+    "#c:strings"
   ],
   "result": {
     "count": 1,

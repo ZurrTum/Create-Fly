@@ -25,8 +25,8 @@ import net.minecraft.core.Direction.Axis;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.nbt.Tag;
-import net.minecraft.resources.RegistryOps;
 import net.minecraft.resources.Identifier;
+import net.minecraft.resources.RegistryOps;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.util.Mth;
 import net.minecraft.world.Container;
@@ -145,7 +145,7 @@ public class RollerMovementBehaviour extends BlockBreakingMovementBehaviour {
             context.world, breakingPos, 1f, stack -> {
                 if (noHarvest || context.world.random.nextBoolean())
                     return;
-                this.dropItem(context, stack);
+                this.collectOrDropItem(context, stack);
             }
         );
 

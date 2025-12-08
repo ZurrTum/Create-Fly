@@ -112,7 +112,7 @@ public class PloughMovementBehaviour extends BlockBreakingMovementBehaviour {
             brokenState.getDrops(new LootParams.Builder(world).withParameter(LootContextParams.BLOCK_STATE, brokenState)
                 .withParameter(LootContextParams.THIS_ENTITY, context.contraption.entity)
                 .withParameter(LootContextParams.ORIGIN, Vec3.atCenterOf(pos))
-                .withParameter(LootContextParams.TOOL, new ItemStack(Items.IRON_SHOVEL))).forEach(s -> dropItem(context, s));
+                .withParameter(LootContextParams.TOOL, new ItemStack(Items.IRON_SHOVEL))).forEach(s -> collectOrDropItem(context, s));
         }
     }
 }

@@ -249,7 +249,7 @@ public class DeployerMovementBehaviour extends MovementBehaviour {
             ItemStack stack = main.get(i);
             if (stack.isEmpty() || i == selected && filter.test(context.world, stack))
                 continue;
-            dropItem(context, stack);
+            collectOrDropItem(context, stack);
             main.set(i, ItemStack.EMPTY);
         }
         Inventory.EQUIPMENT_SLOT_MAPPING.forEach((slot, equipmentSlot) -> {
@@ -257,7 +257,7 @@ public class DeployerMovementBehaviour extends MovementBehaviour {
             if (stack.isEmpty()) {
                 return;
             }
-            dropItem(context, stack);
+            collectOrDropItem(context, stack);
             inv.setItem(slot, ItemStack.EMPTY);
         });
     }

@@ -1,5 +1,6 @@
 package com.zurrtum.create.client.content.kinetics.crank;
 
+import com.zurrtum.create.catnip.math.AngleHelper;
 import com.zurrtum.create.client.catnip.render.CachedBuffers;
 import com.zurrtum.create.client.catnip.render.SuperByteBuffer;
 import com.zurrtum.create.client.content.kinetics.base.KineticBlockEntityRenderer;
@@ -23,7 +24,7 @@ public class ValveHandleRenderer extends HandCrankRenderer {
 
     public static float getValveHandleIndependentAngle(ValveHandleBlockEntity be, float partialTicks) {
         if (be.inUse == 0 && be.source != null && be.getSpeed() != 0)
-            return KineticBlockEntityRenderer.getAngleForBe(be, be.getBlockPos(), KineticBlockEntityRenderer.getRotationAxisOf(be));
+            return AngleHelper.deg(KineticBlockEntityRenderer.getAngleForBe(be, be.getBlockPos(), KineticBlockEntityRenderer.getRotationAxisOf(be)));
 
         int step = be.getBlockState().getOptionalValue(ValveHandleBlock.FACING).orElse(Direction.SOUTH).getAxisDirection().getStep();
 
@@ -34,7 +35,7 @@ public class ValveHandleRenderer extends HandCrankRenderer {
             ) / (float) be.totalUseTicks,
             be.startAngle,
             be.targetAngle
-        ) : be.targetAngle) * Mth.DEG_TO_RAD * (be.backwards ? -1 : 1) * step;
+        ) : be.targetAngle) * (be.backwards ? -1 : 1) * step;
     }
 
     @Override

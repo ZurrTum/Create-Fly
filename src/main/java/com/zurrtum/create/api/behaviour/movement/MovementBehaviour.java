@@ -56,7 +56,17 @@ public abstract class MovementBehaviour {
         return false;
     }
 
+    /**
+     * @deprecated since 6.0.9 - use {@link MovementBehaviour#collectOrDropItem(MovementContext, ItemStack)} instead.
+     * No behaviours altered, simply a rename to reflect that we do collect items when
+     * applicable before considering dropping the remainder into the world.
+     */
+    @Deprecated(since = "6.0.9", forRemoval = true)
     public void dropItem(MovementContext context, ItemStack stack) {
+        collectOrDropItem(context, stack);
+    }
+
+    public void collectOrDropItem(MovementContext context, ItemStack stack) {
         if (AllConfigs.server().kinetics.moveItemsToStorage.get()) {
             int insert = context.contraption.getStorage().getAllItems().insert(stack);
             if (insert > 0) {
