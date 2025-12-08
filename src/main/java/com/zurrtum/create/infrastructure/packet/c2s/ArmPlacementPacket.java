@@ -6,18 +6,18 @@ import com.zurrtum.create.AllPackets;
 import com.zurrtum.create.catnip.codecs.stream.CatnipStreamCodecs;
 import com.zurrtum.create.content.kinetics.mechanicalArm.ArmBlockEntity;
 import com.zurrtum.create.content.kinetics.mechanicalArm.ArmInteractionPoint;
-
-import java.util.List;
-import java.util.function.BiConsumer;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.PacketType;
+import net.minecraft.network.protocol.game.ServerGamePacketListener;
 import net.minecraft.server.network.ServerGamePacketListenerImpl;
 
-public record ArmPlacementPacket(ListTag tag, BlockPos pos) implements C2SPacket {
+import java.util.List;
+
+public record ArmPlacementPacket(ListTag tag, BlockPos pos) implements Packet<ServerGamePacketListener> {
     public static final StreamCodec<RegistryFriendlyByteBuf, ArmPlacementPacket> CODEC = StreamCodec.composite(
         CatnipStreamCodecs.COMPOUND_LIST_TAG,
         ArmPlacementPacket::tag,
@@ -33,17 +33,12 @@ public record ArmPlacementPacket(ListTag tag, BlockPos pos) implements C2SPacket
     }
 
     @Override
-    public boolean runInMain() {
-        return true;
+    public void handle(ServerGamePacketListener listener) {
+        AllHandle.onArmPlacement((ServerGamePacketListenerImpl) listener, this);
     }
 
     @Override
     public PacketType<ArmPlacementPacket> type() {
         return AllPackets.PLACE_ARM;
-    }
-
-    @Override
-    public BiConsumer<ServerGamePacketListenerImpl, ArmPlacementPacket> callback() {
-        return AllHandle::onArmPlacement;
     }
 }

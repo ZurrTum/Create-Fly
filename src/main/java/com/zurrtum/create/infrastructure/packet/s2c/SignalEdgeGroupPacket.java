@@ -6,17 +6,17 @@ import com.zurrtum.create.AllPackets;
 import com.zurrtum.create.catnip.codecs.stream.CatnipStreamCodecBuilders;
 import com.zurrtum.create.content.trains.signal.EdgeGroupColor;
 import io.netty.buffer.ByteBuf;
-import org.apache.logging.log4j.util.TriConsumer;
+import net.minecraft.core.UUIDUtil;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.Packet;
+import net.minecraft.network.protocol.PacketType;
+import net.minecraft.network.protocol.game.ClientGamePacketListener;
 
 import java.util.List;
 import java.util.UUID;
 
-import net.minecraft.core.UUIDUtil;
-import net.minecraft.network.codec.ByteBufCodecs;
-import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.network.protocol.PacketType;
-
-public record SignalEdgeGroupPacket(List<UUID> ids, List<EdgeGroupColor> colors, boolean add) implements S2CPacket {
+public record SignalEdgeGroupPacket(List<UUID> ids, List<EdgeGroupColor> colors, boolean add) implements Packet<ClientGamePacketListener> {
     public static final StreamCodec<ByteBuf, SignalEdgeGroupPacket> CODEC = StreamCodec.composite(
         CatnipStreamCodecBuilders.list(UUIDUtil.STREAM_CODEC),
         SignalEdgeGroupPacket::ids,
@@ -32,8 +32,8 @@ public record SignalEdgeGroupPacket(List<UUID> ids, List<EdgeGroupColor> colors,
     }
 
     @Override
-    public <T> TriConsumer<AllClientHandle<T>, T, SignalEdgeGroupPacket> callback() {
-        return AllClientHandle::onSignalEdgeGroup;
+    public void handle(ClientGamePacketListener listener) {
+        AllClientHandle.INSTANCE.onSignalEdgeGroup(this);
     }
 
     @Override

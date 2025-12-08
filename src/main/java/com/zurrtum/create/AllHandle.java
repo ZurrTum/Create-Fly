@@ -90,6 +90,35 @@ import com.zurrtum.create.infrastructure.config.AllConfigs;
 import com.zurrtum.create.infrastructure.items.ItemStackHandler;
 import com.zurrtum.create.infrastructure.packet.c2s.*;
 import com.zurrtum.create.infrastructure.packet.s2c.*;
+import net.minecraft.ChatFormatting;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.component.PatchedDataComponentMap;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.protocol.PacketUtils;
+import net.minecraft.resources.Identifier;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.server.network.ServerGamePacketListenerImpl;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.util.ProblemReporter;
+import net.minecraft.world.Container;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.SoundType;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.storage.TagValueOutput;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
 import org.apache.commons.lang3.mutable.MutableBoolean;
 import org.apache.commons.lang3.mutable.MutableObject;
 import org.jetbrains.annotations.Nullable;
@@ -101,35 +130,6 @@ import java.util.UUID;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
-
-import net.minecraft.ChatFormatting;
-import net.minecraft.core.BlockPos;
-import net.minecraft.core.component.PatchedDataComponentMap;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.chat.Component;
-import net.minecraft.resources.Identifier;
-import net.minecraft.server.level.ServerLevel;
-import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.server.network.ServerGamePacketListenerImpl;
-import net.minecraft.sounds.SoundEvents;
-import net.minecraft.sounds.SoundSource;
-import net.minecraft.util.ProblemReporter;
-import net.minecraft.world.InteractionHand;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.ai.attributes.Attributes;
-import net.minecraft.world.entity.player.Inventory;
-import net.minecraft.world.inventory.AbstractContainerMenu;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
-import net.minecraft.world.item.crafting.RecipeManager;
-import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.SoundType;
-import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.storage.TagValueOutput;
-import net.minecraft.world.phys.AABB;
-import net.minecraft.world.phys.Vec3;
 
 public class AllHandle {
     public static void onConfigureSchematicannon(ServerGamePacketListenerImpl listener, ConfigureSchematicannonPacket packet) {
@@ -196,6 +196,7 @@ public class AllHandle {
     }
 
     public static void onConfigureThresholdSwitch(ServerGamePacketListenerImpl listener, ConfigureThresholdSwitchPacket packet) {
+        PacketUtils.ensureRunningOnSameThread(packet, listener, listener.server.packetProcessor());
         onBlockEntityConfiguration(
             listener, packet.pos(), 20, blockEntity -> {
                 if (blockEntity instanceof ThresholdSwitchBlockEntity be) {
@@ -211,6 +212,7 @@ public class AllHandle {
     }
 
     public static void onConfigureSequencedGearshift(ServerGamePacketListenerImpl listener, ConfigureSequencedGearshiftPacket packet) {
+        PacketUtils.ensureRunningOnSameThread(packet, listener, listener.server.packetProcessor());
         onBlockEntityConfiguration(
             listener, packet.pos(), 20, blockEntity -> {
                 //TODO
@@ -225,6 +227,7 @@ public class AllHandle {
     }
 
     public static void onEjectorTrigger(ServerGamePacketListenerImpl listener, EjectorTriggerPacket packet) {
+        PacketUtils.ensureRunningOnSameThread(packet, listener, listener.server.packetProcessor());
         onBlockEntityConfiguration(
             listener, packet.pos(), 20, blockEntity -> {
                 if (blockEntity instanceof EjectorBlockEntity be) {
@@ -237,6 +240,7 @@ public class AllHandle {
     }
 
     public static void onStationEdit(ServerGamePacketListenerImpl listener, StationEditPacket packet) {
+        PacketUtils.ensureRunningOnSameThread(packet, listener, listener.server.packetProcessor());
         onBlockEntityConfiguration(
             listener, packet.pos(), 20, blockEntity -> {
                 if (blockEntity instanceof StationBlockEntity be) {
@@ -291,6 +295,7 @@ public class AllHandle {
     }
 
     public static void onDisplayLinkConfiguration(ServerGamePacketListenerImpl listener, DisplayLinkConfigurationPacket packet) {
+        PacketUtils.ensureRunningOnSameThread(packet, listener, listener.server.packetProcessor());
         onBlockEntityConfiguration(
             listener, packet.pos(), 20, blockEntity -> {
                 if (blockEntity instanceof DisplayLinkBlockEntity be) {
@@ -326,6 +331,7 @@ public class AllHandle {
     }
 
     public static void onCurvedTrackDestroy(ServerGamePacketListenerImpl listener, CurvedTrackDestroyPacket packet) {
+        PacketUtils.ensureRunningOnSameThread(packet, listener, listener.server.packetProcessor());
         BlockPos pos = packet.pos();
         onBlockEntityConfiguration(
             listener, pos, AllConfigs.server().trains.maxTrackPlacementLength.get() + 16, blockEntity -> {
@@ -376,6 +382,7 @@ public class AllHandle {
     }
 
     public static void onCurvedTrackSelection(ServerGamePacketListenerImpl listener, CurvedTrackSelectionPacket packet) {
+        PacketUtils.ensureRunningOnSameThread(packet, listener, listener.server.packetProcessor());
         BlockPos pos = packet.pos();
         onBlockEntityConfiguration(
             listener, pos, AllConfigs.server().trains.maxTrackPlacementLength.get() + 16, blockEntity -> {
@@ -431,6 +438,7 @@ public class AllHandle {
     }
 
     public static void onGaugeObserved(ServerGamePacketListenerImpl listener, GaugeObservedPacket packet) {
+        PacketUtils.ensureRunningOnSameThread(packet, listener, listener.server.packetProcessor());
         onBlockEntityConfiguration(
             listener, packet.pos(), 20, blockEntity -> {
                 if (blockEntity instanceof StressGaugeBlockEntity be) {
@@ -442,6 +450,7 @@ public class AllHandle {
     }
 
     public static void onEjectorAward(ServerGamePacketListenerImpl listener, EjectorAwardPacket packet) {
+        PacketUtils.ensureRunningOnSameThread(packet, listener, listener.server.packetProcessor());
         onBlockEntityConfiguration(
             listener, packet.pos(), 20, blockEntity -> {
                 if (blockEntity instanceof EjectorBlockEntity) {
@@ -454,6 +463,7 @@ public class AllHandle {
     }
 
     public static void onElevatorContactEdit(ServerGamePacketListenerImpl listener, ElevatorContactEditPacket packet) {
+        PacketUtils.ensureRunningOnSameThread(packet, listener, listener.server.packetProcessor());
         onBlockEntityConfiguration(
             listener, packet.pos(), 20, blockEntity -> {
                 if (blockEntity instanceof ElevatorContactBlockEntity be) {
@@ -467,6 +477,7 @@ public class AllHandle {
     }
 
     public static void onValueSettings(ServerGamePacketListenerImpl listener, ValueSettingsPacket packet) {
+        PacketUtils.ensureRunningOnSameThread(packet, listener, listener.server.packetProcessor());
         onBlockEntityConfiguration(
             listener, packet.pos(), 20, blockEntity -> {
                 if (blockEntity instanceof SmartBlockEntity be) {
@@ -504,6 +515,7 @@ public class AllHandle {
     }
 
     public static void onLogisticalStockRequest(ServerGamePacketListenerImpl listener, LogisticalStockRequestPacket packet) {
+        PacketUtils.ensureRunningOnSameThread(packet, listener, listener.server.packetProcessor());
         onBlockEntityConfiguration(
             listener, packet.pos(), 4096, blockEntity -> {
                 if (blockEntity instanceof StockCheckingBlockEntity be) {
@@ -516,6 +528,7 @@ public class AllHandle {
     }
 
     public static void onPackageOrderRequest(ServerGamePacketListenerImpl listener, PackageOrderRequestPacket packet) {
+        PacketUtils.ensureRunningOnSameThread(packet, listener, listener.server.packetProcessor());
         ServerPlayer player = listener.player;
         ServerLevel world = player.level();
         BlockPos pos = packet.pos();
@@ -547,6 +560,7 @@ public class AllHandle {
     }
 
     public static void onChainConveyorConnection(ServerGamePacketListenerImpl listener, ChainConveyorConnectionPacket packet) {
+        PacketUtils.ensureRunningOnSameThread(packet, listener, listener.server.packetProcessor());
         ServerPlayer player = listener.player;
         ServerLevel world = player.level();
         int maxRange = AllConfigs.server().kinetics.maxChainConveyorLength.get() + 16;
@@ -599,6 +613,7 @@ public class AllHandle {
     }
 
     public static void onServerboundChainConveyorRiding(ServerGamePacketListenerImpl listener, ServerboundChainConveyorRidingPacket packet) {
+        PacketUtils.ensureRunningOnSameThread(packet, listener, listener.server.packetProcessor());
         ServerPlayer sender = listener.player;
         onBlockEntityConfiguration(
             listener, packet.pos(), AllConfigs.server().kinetics.maxChainConveyorLength.get() * 2, blockEntity -> {
@@ -619,6 +634,7 @@ public class AllHandle {
     }
 
     public static void onChainPackageInteraction(ServerGamePacketListenerImpl listener, ChainPackageInteractionPacket packet) {
+        PacketUtils.ensureRunningOnSameThread(packet, listener, listener.server.packetProcessor());
         ServerPlayer player = listener.player;
         int maxRange = AllConfigs.server().kinetics.maxChainConveyorLength.get() + 16;
         onBlockEntityConfiguration(
@@ -681,6 +697,7 @@ public class AllHandle {
     }
 
     public static void onPackagePortConfiguration(ServerGamePacketListenerImpl listener, PackagePortConfigurationPacket packet) {
+        PacketUtils.ensureRunningOnSameThread(packet, listener, listener.server.packetProcessor());
         onBlockEntityConfiguration(
             listener, packet.pos(), 20, blockEntity -> {
                 if (blockEntity instanceof PackagePortBlockEntity be) {
@@ -697,6 +714,7 @@ public class AllHandle {
     }
 
     public static void onFactoryPanelConnection(ServerGamePacketListenerImpl listener, FactoryPanelConnectionPacket packet) {
+        PacketUtils.ensureRunningOnSameThread(packet, listener, listener.server.packetProcessor());
         ServerPlayer player = listener.player;
         onBlockEntityConfiguration(
             listener, packet.toPos().pos(), 40, blockEntity -> {
@@ -715,6 +733,7 @@ public class AllHandle {
     }
 
     public static void onFactoryPanelConfiguration(ServerGamePacketListenerImpl listener, FactoryPanelConfigurationPacket packet) {
+        PacketUtils.ensureRunningOnSameThread(packet, listener, listener.server.packetProcessor());
         onBlockEntityConfiguration(
             listener, packet.position().pos(), 20, blockEntity -> {
                 if (blockEntity instanceof FactoryPanelBlockEntity be) {
@@ -771,6 +790,7 @@ public class AllHandle {
     }
 
     public static void onRedstoneRequesterConfiguration(ServerGamePacketListenerImpl listener, RedstoneRequesterConfigurationPacket packet) {
+        PacketUtils.ensureRunningOnSameThread(packet, listener, listener.server.packetProcessor());
         onBlockEntityConfiguration(
             listener, packet.pos(), 20, blockEntity -> {
                 if (blockEntity instanceof RedstoneRequesterBlockEntity be) {
@@ -793,6 +813,7 @@ public class AllHandle {
     }
 
     public static void onStockKeeperCategoryEdit(ServerGamePacketListenerImpl listener, StockKeeperCategoryEditPacket packet) {
+        PacketUtils.ensureRunningOnSameThread(packet, listener, listener.server.packetProcessor());
         onBlockEntityConfiguration(
             listener, packet.pos(), 20, blockEntity -> {
                 if (blockEntity instanceof StockTickerBlockEntity be) {
@@ -805,6 +826,7 @@ public class AllHandle {
     }
 
     public static void onStockKeeperCategoryRefund(ServerGamePacketListenerImpl listener, StockKeeperCategoryRefundPacket packet) {
+        PacketUtils.ensureRunningOnSameThread(packet, listener, listener.server.packetProcessor());
         onBlockEntityConfiguration(
             listener, packet.pos(), 20, blockEntity -> {
                 if (blockEntity instanceof StockTickerBlockEntity be) {
@@ -819,6 +841,7 @@ public class AllHandle {
     }
 
     public static void onStockKeeperLock(ServerGamePacketListenerImpl listener, StockKeeperLockPacket packet) {
+        PacketUtils.ensureRunningOnSameThread(packet, listener, listener.server.packetProcessor());
         ServerPlayer player = listener.player;
         onBlockEntityConfiguration(
             listener, packet.pos(), 20, blockEntity -> {
@@ -838,6 +861,7 @@ public class AllHandle {
     }
 
     public static void onStockKeeperCategoryHiding(ServerGamePacketListenerImpl listener, StockKeeperCategoryHidingPacket packet) {
+        PacketUtils.ensureRunningOnSameThread(packet, listener, listener.server.packetProcessor());
         onBlockEntityConfiguration(
             listener, packet.pos(), 20, blockEntity -> {
                 if (blockEntity instanceof StockTickerBlockEntity be) {
@@ -855,6 +879,7 @@ public class AllHandle {
     }
 
     public static void onSchematicPlace(ServerGamePacketListenerImpl listener, SchematicPlacePacket packet) {
+        PacketUtils.ensureRunningOnSameThread(packet, listener, listener.server.packetProcessor());
         ServerPlayer player = listener.player;
         if (!player.isCreative()) {
             return;
@@ -890,6 +915,7 @@ public class AllHandle {
     }
 
     public static void onSchematicUpload(ServerGamePacketListenerImpl listener, SchematicUploadPacket packet) {
+        PacketUtils.ensureRunningOnSameThread(packet, listener, listener.server.packetProcessor());
         ServerPlayer player = listener.player;
         String schematic = packet.schematic();
         if (packet.code() == SchematicUploadPacket.BEGIN) {
@@ -908,8 +934,8 @@ public class AllHandle {
         menu.clearContents();
     }
 
-    public static void onFilterScreen(ServerGamePacketListenerImpl serverPlayNetworkHandler, FilterScreenPacket packet) {
-        ServerPlayer player = serverPlayNetworkHandler.player;
+    public static void onFilterScreen(ServerGamePacketListenerImpl listener, FilterScreenPacket packet) {
+        ServerPlayer player = listener.player;
         CompoundTag tag = packet.data() == null ? new CompoundTag() : packet.data();
         FilterScreenPacket.Option option = packet.option();
 
@@ -942,6 +968,7 @@ public class AllHandle {
     }
 
     public static void onContraptionInteraction(ServerGamePacketListenerImpl listener, ContraptionInteractionPacket packet) {
+        PacketUtils.ensureRunningOnSameThread(packet, listener, listener.server.packetProcessor());
         ServerPlayer sender = listener.player;
         Entity entityByID = sender.level().getEntity(packet.target());
         if (!(entityByID instanceof AbstractContraptionEntity contraptionEntity))
@@ -973,6 +1000,7 @@ public class AllHandle {
     }
 
     public static void onArmPlacement(ServerGamePacketListenerImpl listener, ArmPlacementPacket packet) {
+        PacketUtils.ensureRunningOnSameThread(packet, listener, listener.server.packetProcessor());
         Level world = listener.player.level();
         if (!world.isLoaded(packet.pos()))
             return;
@@ -984,6 +1012,7 @@ public class AllHandle {
     }
 
     public static void onPackagePortPlacement(ServerGamePacketListenerImpl listener, PackagePortPlacementPacket packet) {
+        PacketUtils.ensureRunningOnSameThread(packet, listener, listener.server.packetProcessor());
         Level world = listener.player.level();
         BlockPos pos = packet.pos();
         if (world == null || !world.isLoaded(pos))
@@ -1009,6 +1038,7 @@ public class AllHandle {
     }
 
     public static void onCouplingCreation(ServerGamePacketListenerImpl listener, CouplingCreationPacket packet) {
+        PacketUtils.ensureRunningOnSameThread(packet, listener, listener.server.packetProcessor());
         CouplingHandler.tryToCoupleCarts(listener.player, listener.player.level(), packet.id1(), packet.id2());
     }
 
@@ -1043,6 +1073,7 @@ public class AllHandle {
     }
 
     public static void onEjectorPlacement(ServerGamePacketListenerImpl listener, EjectorPlacementPacket packet) {
+        PacketUtils.ensureRunningOnSameThread(packet, listener, listener.server.packetProcessor());
         ServerLevel world = listener.player.level();
         BlockPos pos = packet.pos();
         if (!world.isLoaded(pos))
@@ -1056,6 +1087,7 @@ public class AllHandle {
     }
 
     public static void onEjectorElytra(ServerGamePacketListenerImpl listener, EjectorElytraPacket packet) {
+        PacketUtils.ensureRunningOnSameThread(packet, listener, listener.server.packetProcessor());
         ServerLevel world = listener.player.level();
         if (!world.isLoaded(packet.pos()))
             return;
@@ -1081,6 +1113,7 @@ public class AllHandle {
     }
 
     public static void onLinkedControllerInput(ServerGamePacketListenerImpl listener, LinkedControllerInputPacket packet) {
+        PacketUtils.ensureRunningOnSameThread(packet, listener, listener.server.packetProcessor());
         ServerPlayer player = listener.player;
         Consumer<ItemStack> handleItem = stack -> {
             ServerLevel world = player.level();
@@ -1109,6 +1142,7 @@ public class AllHandle {
     }
 
     public static void onLinkedControllerBind(ServerGamePacketListenerImpl listener, LinkedControllerBindPacket packet) {
+        PacketUtils.ensureRunningOnSameThread(packet, listener, listener.server.packetProcessor());
         ServerPlayer player = listener.player;
         if (player.isSpectator()) {
             return;
@@ -1130,6 +1164,7 @@ public class AllHandle {
     }
 
     public static void onLinkedControllerStopLectern(ServerGamePacketListenerImpl listener, LinkedControllerStopLecternPacket packet) {
+        PacketUtils.ensureRunningOnSameThread(packet, listener, listener.server.packetProcessor());
         ServerPlayer player = listener.player;
         onLinkedController(
             player, packet.lecternPos(), blockEntity -> {
@@ -1155,12 +1190,14 @@ public class AllHandle {
 
     public static void onBlueprintAssignCompleteRecipe(ServerGamePacketListenerImpl listener, BlueprintAssignCompleteRecipePacket packet) {
         ServerPlayer player = listener.player;
-        if (player.containerMenu instanceof BlueprintMenu c) {
-            RecipeManager.ServerDisplayInfo serverRecipe = listener.server.getRecipeManager().getRecipeFromDisplay(packet.recipeId());
-            if (serverRecipe != null) {
-                //TODO
-                //                BlueprintItem.assignCompleteRecipe(player.getWorld(), c.ghostInventory, serverRecipe.parent().value());
+        if (player.containerMenu instanceof BlueprintMenu menu) {
+            Container inventory = menu.ghostInventory;
+            List<ItemStack> input = packet.input();
+            int size = Math.min(input.size(), 9);
+            for (int i = 0; i < size; i++) {
+                inventory.setItem(i, input.get(i));
             }
+            inventory.setItem(9, packet.output());
         }
     }
 
@@ -1179,6 +1216,7 @@ public class AllHandle {
     }
 
     public static void onToolboxEquip(ServerGamePacketListenerImpl listener, ToolboxEquipPacket packet) {
+        PacketUtils.ensureRunningOnSameThread(packet, listener, listener.server.packetProcessor());
         ServerPlayer player = listener.player;
         BlockPos toolboxPos = packet.toolboxPos();
         int slot = packet.slot();
@@ -1234,6 +1272,7 @@ public class AllHandle {
     }
 
     public static void onToolboxDisposeAll(ServerGamePacketListenerImpl listener, ToolboxDisposeAllPacket packet) {
+        PacketUtils.ensureRunningOnSameThread(packet, listener, listener.server.packetProcessor());
         ServerPlayer player = listener.player;
         ServerLevel world = player.level();
         BlockPos toolboxPos = packet.toolboxPos();
@@ -1373,6 +1412,7 @@ public class AllHandle {
     }
 
     public static void onSuperGlueSelection(ServerGamePacketListenerImpl listener, SuperGlueSelectionPacket packet) {
+        PacketUtils.ensureRunningOnSameThread(packet, listener, listener.server.packetProcessor());
         ServerPlayer player = listener.player;
         ServerLevel world = player.level();
         double range = player.getAttributeValue(Attributes.BLOCK_INTERACTION_RANGE) + 2;
@@ -1401,6 +1441,7 @@ public class AllHandle {
     }
 
     public static void onSuperGlueRemoval(ServerGamePacketListenerImpl listener, SuperGlueRemovalPacket packet) {
+        PacketUtils.ensureRunningOnSameThread(packet, listener, listener.server.packetProcessor());
         ServerPlayer player = listener.player;
         ServerLevel world = player.level();
         Entity entity = world.getEntity(packet.entityId());
@@ -1415,6 +1456,7 @@ public class AllHandle {
     }
 
     public static void onTrainCollision(ServerGamePacketListenerImpl listener, TrainCollisionPacket packet) {
+        PacketUtils.ensureRunningOnSameThread(packet, listener, listener.server.packetProcessor());
         ServerPlayer player = listener.player;
         ServerLevel world = player.level();
         Entity entity = world.getEntity(packet.contraptionEntityId());
@@ -1457,6 +1499,7 @@ public class AllHandle {
     }
 
     public static void onElevatorRequestFloorList(ServerGamePacketListenerImpl listener, RequestFloorListPacket packet) {
+        PacketUtils.ensureRunningOnSameThread(packet, listener, listener.server.packetProcessor());
         Entity entityByID = listener.player.level().getEntity(packet.entityId());
         if (!(entityByID instanceof AbstractContraptionEntity ace))
             return;
@@ -1466,6 +1509,7 @@ public class AllHandle {
     }
 
     public static void onElevatorTargetFloor(ServerGamePacketListenerImpl listener, ElevatorTargetFloorPacket packet) {
+        PacketUtils.ensureRunningOnSameThread(packet, listener, listener.server.packetProcessor());
         ServerPlayer sender = listener.player;
         ServerLevel world = sender.level();
         Entity entityByID = world.getEntity(packet.entityId());
@@ -1549,6 +1593,7 @@ public class AllHandle {
     }
 
     public static void onRadialWrenchMenuSubmit(ServerGamePacketListenerImpl listener, RadialWrenchMenuSubmitPacket packet) {
+        PacketUtils.ensureRunningOnSameThread(packet, listener, listener.server.packetProcessor());
         ServerLevel world = listener.player.level();
         BlockPos blockPos = packet.blockPos();
         BlockState newState = packet.newState();
@@ -1565,6 +1610,7 @@ public class AllHandle {
     }
 
     public static void onLinkSettings(ServerGamePacketListenerImpl listener, LinkSettingsPacket packet) {
+        PacketUtils.ensureRunningOnSameThread(packet, listener, listener.server.packetProcessor());
         onBlockEntityConfiguration(
             listener, packet.pos(), 20, blockEntity -> {
                 if (blockEntity instanceof SmartBlockEntity be) {
@@ -1580,6 +1626,7 @@ public class AllHandle {
     }
 
     public static void onBlueprintPreviewRequest(ServerGamePacketListenerImpl listener, BlueprintPreviewRequestPacket packet) {
+        PacketUtils.ensureRunningOnSameThread(packet, listener, listener.server.packetProcessor());
         Entity entity = listener.player.level().getEntity(packet.entityId());
         if (!(entity instanceof BlueprintEntity blueprint)) {
             listener.send(BlueprintPreviewPacket.EMPTY);

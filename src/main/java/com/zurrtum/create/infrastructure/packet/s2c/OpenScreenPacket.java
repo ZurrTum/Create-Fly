@@ -10,10 +10,11 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.ComponentSerialization;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.PacketType;
-import org.apache.logging.log4j.util.TriConsumer;
+import net.minecraft.network.protocol.game.ClientGamePacketListener;
 
-public record OpenScreenPacket(int id, MenuType<?> menu, Component name, byte[] data) implements S2CPacket {
+public record OpenScreenPacket(int id, MenuType<?> menu, Component name, byte[] data) implements Packet<ClientGamePacketListener> {
     public static final StreamCodec<RegistryFriendlyByteBuf, OpenScreenPacket> CODEC = StreamCodec.composite(
         ByteBufCodecs.CONTAINER_ID,
         OpenScreenPacket::id,
@@ -27,13 +28,8 @@ public record OpenScreenPacket(int id, MenuType<?> menu, Component name, byte[] 
     );
 
     @Override
-    public boolean runInMain() {
-        return true;
-    }
-
-    @Override
-    public <T> TriConsumer<AllClientHandle<T>, T, OpenScreenPacket> callback() {
-        return AllClientHandle::onOpenScreen;
+    public void handle(ClientGamePacketListener listener) {
+        AllClientHandle.INSTANCE.onOpenScreen(listener, this);
     }
 
     @Override

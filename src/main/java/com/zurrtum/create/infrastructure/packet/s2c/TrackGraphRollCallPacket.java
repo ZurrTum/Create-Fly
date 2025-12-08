@@ -6,16 +6,16 @@ import com.zurrtum.create.Create;
 import com.zurrtum.create.catnip.codecs.stream.CatnipStreamCodecBuilders;
 import com.zurrtum.create.content.trains.graph.TrackGraph;
 import io.netty.buffer.ByteBuf;
-import org.apache.logging.log4j.util.TriConsumer;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.Packet;
+import net.minecraft.network.protocol.PacketType;
+import net.minecraft.network.protocol.game.ClientGamePacketListener;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import net.minecraft.network.codec.ByteBufCodecs;
-import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.network.protocol.PacketType;
-
-public record TrackGraphRollCallPacket(List<Entry> entries) implements S2CPacket {
+public record TrackGraphRollCallPacket(List<Entry> entries) implements Packet<ClientGamePacketListener> {
     public static final StreamCodec<ByteBuf, TrackGraphRollCallPacket> CODEC = CatnipStreamCodecBuilders.list(Entry.STREAM_CODEC)
         .map(TrackGraphRollCallPacket::new, TrackGraphRollCallPacket::entries);
 
@@ -28,8 +28,8 @@ public record TrackGraphRollCallPacket(List<Entry> entries) implements S2CPacket
     }
 
     @Override
-    public <T> TriConsumer<AllClientHandle<T>, T, TrackGraphRollCallPacket> callback() {
-        return AllClientHandle::onTrackGraphRollCall;
+    public void handle(ClientGamePacketListener listener) {
+        AllClientHandle.INSTANCE.onTrackGraphRollCall(this);
     }
 
     @Override

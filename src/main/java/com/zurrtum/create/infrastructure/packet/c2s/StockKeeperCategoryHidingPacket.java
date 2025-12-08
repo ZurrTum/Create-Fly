@@ -4,17 +4,17 @@ import com.zurrtum.create.AllHandle;
 import com.zurrtum.create.AllPackets;
 import com.zurrtum.create.catnip.codecs.stream.CatnipStreamCodecBuilders;
 import io.netty.buffer.ByteBuf;
-
-import java.util.List;
-import java.util.function.BiConsumer;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.PacketType;
+import net.minecraft.network.protocol.game.ServerGamePacketListener;
 import net.minecraft.server.network.ServerGamePacketListenerImpl;
 
-public record StockKeeperCategoryHidingPacket(BlockPos pos, List<Integer> indices) implements C2SPacket {
+import java.util.List;
+
+public record StockKeeperCategoryHidingPacket(BlockPos pos, List<Integer> indices) implements Packet<ServerGamePacketListener> {
     public static final StreamCodec<ByteBuf, StockKeeperCategoryHidingPacket> CODEC = StreamCodec.composite(
         BlockPos.STREAM_CODEC,
         StockKeeperCategoryHidingPacket::pos,
@@ -24,17 +24,12 @@ public record StockKeeperCategoryHidingPacket(BlockPos pos, List<Integer> indice
     );
 
     @Override
-    public boolean runInMain() {
-        return true;
+    public void handle(ServerGamePacketListener listener) {
+        AllHandle.onStockKeeperCategoryHiding((ServerGamePacketListenerImpl) listener, this);
     }
 
     @Override
     public PacketType<StockKeeperCategoryHidingPacket> type() {
         return AllPackets.STOCK_KEEPER_HIDE_CATEGORY;
-    }
-
-    @Override
-    public BiConsumer<ServerGamePacketListenerImpl, StockKeeperCategoryHidingPacket> callback() {
-        return AllHandle::onStockKeeperCategoryHiding;
     }
 }

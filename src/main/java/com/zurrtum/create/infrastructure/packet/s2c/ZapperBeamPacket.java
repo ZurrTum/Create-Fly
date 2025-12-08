@@ -6,12 +6,13 @@ import com.zurrtum.create.catnip.codecs.stream.CatnipStreamCodecs;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.PacketType;
+import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.phys.Vec3;
-import org.apache.logging.log4j.util.TriConsumer;
 
-public record ZapperBeamPacket(Vec3 location, InteractionHand hand, boolean self, Vec3 target) implements ShootGadgetPacket {
+public record ZapperBeamPacket(Vec3 location, InteractionHand hand, boolean self, Vec3 target) implements Packet<ClientGamePacketListener> {
     public static final StreamCodec<RegistryFriendlyByteBuf, ZapperBeamPacket> CODEC = StreamCodec.composite(
         Vec3.STREAM_CODEC,
         ZapperBeamPacket::location,
@@ -25,17 +26,12 @@ public record ZapperBeamPacket(Vec3 location, InteractionHand hand, boolean self
     );
 
     @Override
-    public boolean runInMain() {
-        return true;
+    public void handle(ClientGamePacketListener listener) {
+        AllClientHandle.INSTANCE.onZapperBeam(listener, this);
     }
 
     @Override
     public PacketType<ZapperBeamPacket> type() {
         return AllPackets.BEAM_EFFECT;
-    }
-
-    @Override
-    public <T> TriConsumer<AllClientHandle<T>, T, ZapperBeamPacket> callback() {
-        return AllClientHandle::onZapperBeam;
     }
 }

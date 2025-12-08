@@ -5,22 +5,21 @@ import com.zurrtum.create.AllPackets;
 import com.zurrtum.create.catnip.codecs.stream.CatnipLargerStreamCodecs;
 import com.zurrtum.create.catnip.codecs.stream.CatnipStreamCodecBuilders;
 import com.zurrtum.create.catnip.codecs.stream.CatnipStreamCodecs;
-
-import java.util.function.BiConsumer;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.PacketType;
+import net.minecraft.network.protocol.game.ServerGamePacketListener;
 import net.minecraft.server.network.ServerGamePacketListenerImpl;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.phys.BlockHitResult;
 
 public record ValueSettingsPacket(
     BlockPos pos, int row, int value, InteractionHand interactHand, BlockHitResult hitResult, Direction side, boolean ctrlDown, int behaviourIndex
-) implements C2SPacket {
+) implements Packet<ServerGamePacketListener> {
     public static final StreamCodec<RegistryFriendlyByteBuf, ValueSettingsPacket> CODEC = CatnipLargerStreamCodecs.composite(
         BlockPos.STREAM_CODEC,
         ValueSettingsPacket::pos,
@@ -42,17 +41,12 @@ public record ValueSettingsPacket(
     );
 
     @Override
-    public boolean runInMain() {
-        return true;
+    public void handle(ServerGamePacketListener listener) {
+        AllHandle.onValueSettings((ServerGamePacketListenerImpl) listener, this);
     }
 
     @Override
     public PacketType<ValueSettingsPacket> type() {
         return AllPackets.VALUE_SETTINGS;
-    }
-
-    @Override
-    public BiConsumer<ServerGamePacketListenerImpl, ValueSettingsPacket> callback() {
-        return AllHandle::onValueSettings;
     }
 }

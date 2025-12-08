@@ -4,20 +4,19 @@ import com.zurrtum.create.AllHandle;
 import com.zurrtum.create.AllPackets;
 import com.zurrtum.create.catnip.codecs.stream.CatnipStreamCodecBuilders;
 import com.zurrtum.create.infrastructure.component.ClipboardContent;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.function.BiConsumer;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.PacketType;
+import net.minecraft.network.protocol.game.ServerGamePacketListener;
 import net.minecraft.server.network.ServerGamePacketListenerImpl;
+import org.jetbrains.annotations.Nullable;
 
 public record ClipboardEditPacket(
     int hotbarSlot, @Nullable ClipboardContent clipboardContent, @Nullable BlockPos targetedBlock
-) implements C2SPacket {
+) implements Packet<ServerGamePacketListener> {
     public static final StreamCodec<RegistryFriendlyByteBuf, ClipboardEditPacket> CODEC = StreamCodec.composite(
         ByteBufCodecs.VAR_INT,
         ClipboardEditPacket::hotbarSlot,
@@ -29,12 +28,12 @@ public record ClipboardEditPacket(
     );
 
     @Override
-    public PacketType<ClipboardEditPacket> type() {
-        return AllPackets.CLIPBOARD_EDIT;
+    public void handle(ServerGamePacketListener listener) {
+        AllHandle.onClipboardEdit((ServerGamePacketListenerImpl) listener, this);
     }
 
     @Override
-    public BiConsumer<ServerGamePacketListenerImpl, ClipboardEditPacket> callback() {
-        return AllHandle::onClipboardEdit;
+    public PacketType<ClipboardEditPacket> type() {
+        return AllPackets.CLIPBOARD_EDIT;
     }
 }

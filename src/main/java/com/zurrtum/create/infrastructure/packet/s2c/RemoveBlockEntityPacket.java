@@ -5,23 +5,19 @@ import com.zurrtum.create.AllPackets;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.PacketType;
-import org.apache.logging.log4j.util.TriConsumer;
+import net.minecraft.network.protocol.game.ClientGamePacketListener;
 
-public record RemoveBlockEntityPacket(BlockPos pos) implements S2CPacket {
+public record RemoveBlockEntityPacket(BlockPos pos) implements Packet<ClientGamePacketListener> {
     public static final StreamCodec<ByteBuf, RemoveBlockEntityPacket> CODEC = BlockPos.STREAM_CODEC.map(
         RemoveBlockEntityPacket::new,
         RemoveBlockEntityPacket::pos
     );
 
     @Override
-    public boolean runInMain() {
-        return true;
-    }
-
-    @Override
-    public <T> TriConsumer<AllClientHandle<T>, T, RemoveBlockEntityPacket> callback() {
-        return AllClientHandle::onRemoveBlockEntity;
+    public void handle(ClientGamePacketListener listener) {
+        AllClientHandle.INSTANCE.onRemoveBlockEntity(listener, this);
     }
 
     @Override

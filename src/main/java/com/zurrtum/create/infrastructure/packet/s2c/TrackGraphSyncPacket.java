@@ -9,24 +9,23 @@ import com.zurrtum.create.content.trains.graph.*;
 import com.zurrtum.create.content.trains.signal.TrackEdgePoint;
 import com.zurrtum.create.content.trains.track.BezierConnection;
 import com.zurrtum.create.content.trains.track.TrackMaterial;
-import org.apache.logging.log4j.util.TriConsumer;
-
-import java.util.*;
-
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.PacketType;
+import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.world.phys.Vec3;
 
-public class TrackGraphSyncPacket extends TrackGraphPacket implements S2CPacket {
+import java.util.*;
+
+public class TrackGraphSyncPacket extends TrackGraphPacket {
     public static final StreamCodec<FriendlyByteBuf, TrackGraphSyncPacket> CODEC = StreamCodec.ofMember(
         TrackGraphSyncPacket::write,
         TrackGraphSyncPacket::new
     );
 
     @Override
-    public <T> TriConsumer<AllClientHandle<T>, T, TrackGraphSyncPacket> callback() {
-        return AllClientHandle::onTrackGraphSync;
+    public void handle(ClientGamePacketListener listener) {
+        AllClientHandle.INSTANCE.onTrackGraphSync(this);
     }
 
     @Override

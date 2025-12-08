@@ -1,10 +1,6 @@
 package com.zurrtum.create.infrastructure.packet.s2c;
 
 import com.zurrtum.create.AllClientHandle;
-import org.apache.logging.log4j.util.TriConsumer;
-
-import java.util.function.BiConsumer;
-
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.Packet;
@@ -13,13 +9,14 @@ import net.minecraft.network.protocol.PacketType;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.resources.Identifier;
 
+import java.util.function.Consumer;
+
 import static com.zurrtum.create.Create.MOD_ID;
 
-@SuppressWarnings("unchecked")
-public record S2CHoldPacket<T extends ClientGamePacketListener>(
-    PacketType<Packet<ClientGamePacketListener>> id, BiConsumer<AllClientHandle<T>, T> consumer
-) implements S2CPacket {
-    public S2CHoldPacket(String id, BiConsumer<AllClientHandle<T>, T> callback) {
+public record S2CHoldPacket(
+    PacketType<Packet<ClientGamePacketListener>> id, Consumer<AllClientHandle> callback
+) implements Packet<ClientGamePacketListener> {
+    public S2CHoldPacket(String id, Consumer<AllClientHandle> callback) {
         this(new PacketType<>(PacketFlow.CLIENTBOUND, Identifier.fromNamespaceAndPath(MOD_ID, id)), callback);
     }
 
@@ -28,12 +25,12 @@ public record S2CHoldPacket<T extends ClientGamePacketListener>(
     }
 
     @Override
-    public PacketType<Packet<ClientGamePacketListener>> type() {
-        return id();
+    public void handle(ClientGamePacketListener listener) {
+        callback.accept(AllClientHandle.INSTANCE);
     }
 
     @Override
-    public TriConsumer<AllClientHandle<T>, T, S2CHoldPacket<T>> callback() {
-        return (instance, listener, packet) -> consumer.accept(instance, listener);
+    public PacketType<Packet<ClientGamePacketListener>> type() {
+        return id();
     }
 }

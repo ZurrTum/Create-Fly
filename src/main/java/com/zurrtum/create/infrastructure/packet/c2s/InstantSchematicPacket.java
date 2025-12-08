@@ -2,17 +2,16 @@ package com.zurrtum.create.infrastructure.packet.c2s;
 
 import com.zurrtum.create.AllHandle;
 import com.zurrtum.create.AllPackets;
-
-import java.util.function.BiConsumer;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.PacketType;
+import net.minecraft.network.protocol.game.ServerGamePacketListener;
 import net.minecraft.server.network.ServerGamePacketListenerImpl;
 
-public record InstantSchematicPacket(String name, BlockPos origin, BlockPos bounds) implements C2SPacket {
+public record InstantSchematicPacket(String name, BlockPos origin, BlockPos bounds) implements Packet<ServerGamePacketListener> {
     public static final StreamCodec<RegistryFriendlyByteBuf, InstantSchematicPacket> CODEC = StreamCodec.composite(
         ByteBufCodecs.STRING_UTF8,
         InstantSchematicPacket::name,
@@ -24,12 +23,12 @@ public record InstantSchematicPacket(String name, BlockPos origin, BlockPos boun
     );
 
     @Override
-    public PacketType<InstantSchematicPacket> type() {
-        return AllPackets.INSTANT_SCHEMATIC;
+    public void handle(ServerGamePacketListener listener) {
+        AllHandle.onInstantSchematic((ServerGamePacketListenerImpl) listener, this);
     }
 
     @Override
-    public BiConsumer<ServerGamePacketListenerImpl, InstantSchematicPacket> callback() {
-        return AllHandle::onInstantSchematic;
+    public PacketType<InstantSchematicPacket> type() {
+        return AllPackets.INSTANT_SCHEMATIC;
     }
 }

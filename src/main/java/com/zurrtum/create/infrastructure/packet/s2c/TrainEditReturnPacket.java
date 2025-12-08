@@ -2,18 +2,18 @@ package com.zurrtum.create.infrastructure.packet.s2c;
 
 import com.zurrtum.create.AllClientHandle;
 import com.zurrtum.create.AllPackets;
-import org.apache.logging.log4j.util.TriConsumer;
-
-import java.util.UUID;
-
 import net.minecraft.core.UUIDUtil;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.PacketType;
+import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.resources.Identifier;
 
-public record TrainEditReturnPacket(UUID id, String name, Identifier iconType, int mapColor) implements S2CPacket {
+import java.util.UUID;
+
+public record TrainEditReturnPacket(UUID id, String name, Identifier iconType, int mapColor) implements Packet<ClientGamePacketListener> {
     public static StreamCodec<RegistryFriendlyByteBuf, TrainEditReturnPacket> CODEC = StreamCodec.composite(
         UUIDUtil.STREAM_CODEC,
         TrainEditReturnPacket::id,
@@ -27,12 +27,12 @@ public record TrainEditReturnPacket(UUID id, String name, Identifier iconType, i
     );
 
     @Override
-    public PacketType<TrainEditReturnPacket> type() {
-        return AllPackets.S_CONFIGURE_TRAIN;
+    public void handle(ClientGamePacketListener listener) {
+        AllClientHandle.INSTANCE.onTrainEditReturn(this);
     }
 
     @Override
-    public <T> TriConsumer<AllClientHandle<T>, T, TrainEditReturnPacket> callback() {
-        return AllClientHandle::onTrainEditReturn;
+    public PacketType<TrainEditReturnPacket> type() {
+        return AllPackets.S_CONFIGURE_TRAIN;
     }
 }

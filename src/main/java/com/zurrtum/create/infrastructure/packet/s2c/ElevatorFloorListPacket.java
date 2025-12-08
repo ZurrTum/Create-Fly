@@ -6,16 +6,16 @@ import com.zurrtum.create.catnip.codecs.stream.CatnipStreamCodecBuilders;
 import com.zurrtum.create.catnip.data.Couple;
 import com.zurrtum.create.catnip.data.IntAttached;
 import com.zurrtum.create.content.contraptions.AbstractContraptionEntity;
-import org.apache.logging.log4j.util.TriConsumer;
-
-import java.util.List;
-
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.PacketType;
+import net.minecraft.network.protocol.game.ClientGamePacketListener;
 
-public record ElevatorFloorListPacket(int entityId, List<IntAttached<Couple<String>>> floors) implements S2CPacket {
+import java.util.List;
+
+public record ElevatorFloorListPacket(int entityId, List<IntAttached<Couple<String>>> floors) implements Packet<ClientGamePacketListener> {
     public static final StreamCodec<RegistryFriendlyByteBuf, ElevatorFloorListPacket> CODEC = StreamCodec.composite(
         ByteBufCodecs.INT,
         ElevatorFloorListPacket::entityId,
@@ -29,17 +29,12 @@ public record ElevatorFloorListPacket(int entityId, List<IntAttached<Couple<Stri
     }
 
     @Override
-    public boolean runInMain() {
-        return true;
+    public void handle(ClientGamePacketListener listener) {
+        AllClientHandle.INSTANCE.onElevatorFloorList(listener, this);
     }
 
     @Override
     public PacketType<ElevatorFloorListPacket> type() {
         return AllPackets.UPDATE_ELEVATOR_FLOORS;
-    }
-
-    @Override
-    public <T> TriConsumer<AllClientHandle<T>, T, ElevatorFloorListPacket> callback() {
-        return AllClientHandle::onElevatorFloorList;
     }
 }

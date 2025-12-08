@@ -4,16 +4,17 @@ import com.zurrtum.create.AllHandle;
 import com.zurrtum.create.AllPackets;
 import com.zurrtum.create.content.decoration.slidingDoor.DoorControl;
 import io.netty.buffer.ByteBuf;
-
-import java.util.function.BiConsumer;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.PacketType;
+import net.minecraft.network.protocol.game.ServerGamePacketListener;
 import net.minecraft.server.network.ServerGamePacketListenerImpl;
 
-public record ElevatorContactEditPacket(BlockPos pos, String shortName, String longName, DoorControl doorControl) implements C2SPacket {
+public record ElevatorContactEditPacket(
+    BlockPos pos, String shortName, String longName, DoorControl doorControl
+) implements Packet<ServerGamePacketListener> {
     public static final StreamCodec<ByteBuf, ElevatorContactEditPacket> CODEC = StreamCodec.composite(
         BlockPos.STREAM_CODEC,
         ElevatorContactEditPacket::pos,
@@ -27,17 +28,12 @@ public record ElevatorContactEditPacket(BlockPos pos, String shortName, String l
     );
 
     @Override
-    public boolean runInMain() {
-        return true;
+    public void handle(ServerGamePacketListener listener) {
+        AllHandle.onElevatorContactEdit((ServerGamePacketListenerImpl) listener, this);
     }
 
     @Override
     public PacketType<ElevatorContactEditPacket> type() {
         return AllPackets.CONFIGURE_ELEVATOR_CONTACT;
-    }
-
-    @Override
-    public BiConsumer<ServerGamePacketListenerImpl, ElevatorContactEditPacket> callback() {
-        return AllHandle::onElevatorContactEdit;
     }
 }

@@ -824,6 +824,7 @@ public abstract class Contraption {
         HashMapPalette<BlockState> palette = new HashMapPalette<>(16);
         ValueOutput.ValueOutputList blockList = view.childrenList("BlockList");
 
+        boolean isClient = spawnPacket && entity.level().isClientSide();
         for (StructureBlockInfo block : this.blocks.values()) {
             int id = palette.idFor(
                 block.state(), (i, s) -> {
@@ -841,11 +842,15 @@ public abstract class Contraption {
                 if (updateTag != null) {
                     c.store("Data", CompoundTag.CODEC, updateTag);
                 } else if (block.nbt() != null) {
-                    // an updateTag is saved for all BlockEntities, even when empty.
-                    // this case means that the contraption was assembled pre-updateTags.
-                    // in this case, we need to use the full BlockEntity data.
-                    c.store("Data", CompoundTag.CODEC, block.nbt());
-                    c.putBoolean("Legacy", true);
+                    if (isClient) {
+                        c.store("UpdateTag", CompoundTag.CODEC, block.nbt());
+                    } else {
+                        // an updateTag is saved for all BlockEntities, even when empty.
+                        // this case means that the contraption was assembled pre-updateTags.
+                        // in this case, we need to use the full BlockEntity data.
+                        c.store("Data", CompoundTag.CODEC, block.nbt());
+                        c.putBoolean("Legacy", true);
+                    }
                 }
             } else {
                 // otherwise, write actual data as the data, save updateTag on its own

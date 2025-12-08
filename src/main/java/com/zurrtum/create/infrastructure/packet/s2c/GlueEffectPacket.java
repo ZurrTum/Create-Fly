@@ -7,10 +7,11 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.PacketType;
-import org.apache.logging.log4j.util.TriConsumer;
+import net.minecraft.network.protocol.game.ClientGamePacketListener;
 
-public record GlueEffectPacket(BlockPos pos, Direction direction, boolean fullBlock) implements S2CPacket {
+public record GlueEffectPacket(BlockPos pos, Direction direction, boolean fullBlock) implements Packet<ClientGamePacketListener> {
     public static final StreamCodec<ByteBuf, GlueEffectPacket> CODEC = StreamCodec.composite(
         BlockPos.STREAM_CODEC,
         GlueEffectPacket::pos,
@@ -22,13 +23,8 @@ public record GlueEffectPacket(BlockPos pos, Direction direction, boolean fullBl
     );
 
     @Override
-    public boolean runInMain() {
-        return true;
-    }
-
-    @Override
-    public <T> TriConsumer<AllClientHandle<T>, T, GlueEffectPacket> callback() {
-        return AllClientHandle::onGlueEffect;
+    public void handle(ClientGamePacketListener listener) {
+        AllClientHandle.INSTANCE.onGlueEffect(listener, this);
     }
 
     @Override
