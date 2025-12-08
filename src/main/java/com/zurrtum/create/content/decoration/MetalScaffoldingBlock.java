@@ -7,6 +7,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.RandomSource;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.ScheduledTickAccess;
@@ -42,7 +43,7 @@ public class MetalScaffoldingBlock extends ScaffoldingBlock implements IWrenchab
     public VoxelShape getShape(BlockState pState, BlockGetter pLevel, BlockPos pPos, CollisionContext pContext) {
         if (pState.getValue(BOTTOM))
             return AllShapes.SCAFFOLD_HALF;
-        if (!pContext.isHoldingItem(pState.getBlock().asItem()))
+        if (pContext.isHoldingItem(Items.AIR) || !pContext.isHoldingItem(pState.getBlock().asItem()))
             return AllShapes.SCAFFOLD_FULL;
         return Shapes.block();
     }
