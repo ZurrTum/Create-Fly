@@ -7,8 +7,8 @@ https://www.curseforge.com/minecraft/mc-mods/create-fly/files/all?page=1&pageSiz
 ### 1. What the project specifically does or adds
 
 - This is a Fabric fork of [Create](https://github.com/Creators-of-Create/Create).
-  The official [Create Fabric](https://github.com/Fabricators-of-Create/Create) fork 1.21.1 version release was eleven
-  months ago, which is a long time ago.
+  The official [Create Fabric](https://github.com/Fabricators-of-Create/Create) fork has not released a version 1.21.1
+  or higher. it has been 8 months since then.
 - Minecraft uses a new rendering method in higher versions: item models use a dedicated rendering folder, rendering uses
   a rendering pipeline, Entity and GUI rendering is changed to extract the state first and then render, which requires
   creating special rendering for GUI elements.
@@ -76,10 +76,14 @@ repositories {
 }
 
 dependencies {
+    // 1.21.11-rc3_unobfuscated
+    implementation "maven.modrinth:create-fly:1.21.11-rc3_unobfuscated-6.0.8-1"
+    // 1.21.11-rc3
+    modImplementation "maven.modrinth:create-fly:1.21.11-rc3-6.0.8-1"
     // 1.21.10
-    modImplementation "maven.modrinth:create-fly:6.0.8-1.21.10-2"
+    modImplementation "maven.modrinth:create-fly:1.21.10-6.0.8-5"
     // 1.21.8
-    modImplementation "maven.modrinth:create-fly:6.0.7-1.21.8-19"
+    modImplementation "maven.modrinth:create-fly:1.21.8-6.0.8-3"
 }
 ```
 
@@ -100,10 +104,14 @@ repositories {
 }
 
 dependencies {
+    // 1.21.11-rc3_unobfuscated
+    implementation "curse.maven:create-fly-1346281:7308957-sources-7308960"
+    // 1.21.11-rc3
+    modImplementation "curse.maven:create-fly-1346281:7308963-sources-7308972"
     // 1.21.10
-    modImplementation "curse.maven:create-fly-1346281:7192205-sources-7192208"
+    modImplementation "curse.maven:create-fly-1346281:7301375-sources-7301380"
     // 1.21.8
-    modImplementation "curse.maven:create-fly-1346281:7155964-sources-7155990"
+    modImplementation "curse.maven:create-fly-1346281:7306487-sources-7306490"
 }
 ```
 
