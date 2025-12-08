@@ -572,8 +572,4 @@ public class VirtualRenderWorld extends Level implements VisualizationLevel {
     public int getSectionYFromSectionIndex(int index) {
         return index + this.getMinSectionY();
     }
-
-    @Override
-    public void blockEntityChanged(BlockPos pos) {
-    }
 }

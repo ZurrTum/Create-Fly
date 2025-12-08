@@ -13,11 +13,6 @@ import com.zurrtum.create.content.kinetics.transmission.sequencer.SequencedGears
 import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
 import com.zurrtum.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.infrastructure.config.AllConfigs;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.List;
-import java.util.Objects;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Direction.Axis;
@@ -29,6 +24,10 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.List;
+import java.util.Objects;
 
 public class KineticBlockEntity extends SmartBlockEntity {
 
@@ -99,7 +98,9 @@ public class KineticBlockEntity extends SmartBlockEntity {
     }
 
     public static float convertToAngular(float speed) {
-        return speed * 3 / 10f;
+        // speed (rpm) * 360 (revolution->deg) / 60 (min->sec) / 20 (sec->tick)
+        // rpm -> deg/tick
+        return speed * 360f / 60f / 20f;
     }
 
     @Override

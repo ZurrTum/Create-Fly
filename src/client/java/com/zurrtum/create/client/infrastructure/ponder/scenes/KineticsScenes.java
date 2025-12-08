@@ -1157,7 +1157,7 @@ public class KineticsScenes {
         scene.effects().indicateRedstone(util.grid().at(2, 1, 2));
         scene.idle(20);
 
-        scene.overlay().showText(120).text("Comparators can emit analog Restone Signals relative to the " + component + "'s measurements")
+        scene.overlay().showText(120).text("Comparators can emit analog Redstone Signals relative to the " + component + "'s measurements")
             .attachKeyFrame().colored(PonderPalette.RED).pointAt(util.vector().centerOf(2, 1, 2).add(0, -0.35, 0)).placeNearTarget();
         scene.idle(130);
         scene.markAsFinished();

@@ -21,10 +21,6 @@ import com.zurrtum.create.infrastructure.component.SchematicannonOptions;
 import com.zurrtum.create.infrastructure.config.AllConfigs;
 import com.zurrtum.create.infrastructure.config.CSchematics;
 import com.zurrtum.create.infrastructure.packet.c2s.ConfigureSchematicannonPacket;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.*;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Direction.Axis;
@@ -52,6 +48,9 @@ import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.DoubleBlockHalf;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.*;
 
 public class SchematicannonBlockEntity extends SmartBlockEntity implements MenuProvider {
 
@@ -166,7 +165,7 @@ public class SchematicannonBlockEntity extends SmartBlockEntity implements MenuP
                 replaceBlockEntities = options.replaceBlockEntities();
             }, () -> {
                 replaceMode = 2;
-                skipMissing = true;
+                skipMissing = false;
                 replaceBlockEntities = false;
             }
         );
