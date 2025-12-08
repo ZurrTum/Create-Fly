@@ -80,9 +80,9 @@ dependencies {
     // 1.21.11-pre3
     modImplementation "maven.modrinth:create-fly:1.21.11-rc3-6.0.8-1"
     // 1.21.10
-    modImplementation "maven.modrinth:create-fly:1.21.10-6.0.8-4"
+    modImplementation "maven.modrinth:create-fly:1.21.10-6.0.8-5"
     // 1.21.8
-    modImplementation "maven.modrinth:create-fly:1.21.8-6.0.8-2"
+    modImplementation "maven.modrinth:create-fly:1.21.8-6.0.8-3"
 }
 ```
 
