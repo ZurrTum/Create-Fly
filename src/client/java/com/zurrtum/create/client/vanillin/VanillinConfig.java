@@ -89,6 +89,10 @@ public class VanillinConfig {
         return client;
     }
 
+    public static ModOverrides overrides() {
+        return overrides;
+    }
+
     public static void register() {
         client = Builder.create(CClient::new, MOD_ID, "client", true);
         overrides = modOverrides();
