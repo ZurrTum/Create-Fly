@@ -6,6 +6,7 @@ import com.zurrtum.create.foundation.block.ScaffoldingControlBlock;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.ScaffoldingBlock;
 import net.minecraft.block.ShapeContext;
+import net.minecraft.item.Items;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
@@ -42,7 +43,7 @@ public class MetalScaffoldingBlock extends ScaffoldingBlock implements IWrenchab
     public VoxelShape getOutlineShape(BlockState pState, BlockView pLevel, BlockPos pPos, ShapeContext pContext) {
         if (pState.get(BOTTOM))
             return AllShapes.SCAFFOLD_HALF;
-        if (!pContext.isHolding(pState.getBlock().asItem()))
+        if (pContext.isHolding(Items.AIR) || !pContext.isHolding(pState.getBlock().asItem()))
             return AllShapes.SCAFFOLD_FULL;
         return VoxelShapes.fullCube();
     }
