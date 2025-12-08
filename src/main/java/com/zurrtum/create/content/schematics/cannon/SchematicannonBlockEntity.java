@@ -165,7 +165,7 @@ public class SchematicannonBlockEntity extends SmartBlockEntity implements MenuP
                 replaceBlockEntities = options.replaceBlockEntities();
             }, () -> {
                 replaceMode = 2;
-                skipMissing = true;
+                skipMissing = false;
                 replaceBlockEntities = false;
             }
         );

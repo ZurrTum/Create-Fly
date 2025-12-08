@@ -16,10 +16,9 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.ChunkSectionPos;
 import net.minecraft.world.Heightmap;
-import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.ChunkSection;
 import net.minecraft.world.chunk.ChunkStatus;
-import net.minecraft.world.chunk.UpgradeData;
+import net.minecraft.world.chunk.WorldChunk;
 import net.minecraft.world.gen.structure.Structure;
 import net.minecraft.world.tick.BasicTickScheduler;
 import net.minecraft.world.tick.EmptyTickSchedulers;
@@ -33,7 +32,7 @@ import java.util.Set;
 import java.util.function.BiConsumer;
 import java.util.function.Predicate;
 
-public class VirtualChunk extends Chunk {
+public class VirtualChunk extends WorldChunk {
     public final VirtualRenderWorld world;
 
     private final VirtualChunkSection[] sections;
@@ -41,7 +40,7 @@ public class VirtualChunk extends Chunk {
     private boolean needsLight;
 
     public VirtualChunk(VirtualRenderWorld world, int x, int z) {
-        super(new ChunkPos(x, z), UpgradeData.NO_UPGRADE_DATA, world, world.getPalettesFactory(), 0L, null, null);
+        super(world, new ChunkPos(x, z));
 
         this.world = world;
 
