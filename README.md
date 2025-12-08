@@ -75,9 +75,9 @@ repositories {
 }
 
 dependencies {
-    // 1.21.11-pre3_unobfuscated
+    // 1.21.11-rc3_unobfuscated
     implementation "maven.modrinth:create-fly:1.21.11-rc3_unobfuscated-6.0.8-1"
-    // 1.21.11-pre3
+    // 1.21.11-rc3
     modImplementation "maven.modrinth:create-fly:1.21.11-rc3-6.0.8-1"
     // 1.21.10
     modImplementation "maven.modrinth:create-fly:1.21.10-6.0.8-5"
