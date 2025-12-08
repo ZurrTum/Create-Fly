@@ -1,25 +1,26 @@
 package com.zurrtum.create.client.vanillin;
 
+import com.zurrtum.create.catnip.config.ConfigBase;
 import com.zurrtum.create.client.vanillin.compose.*;
-import com.zurrtum.create.client.vanillin.config.BlockEntityVisualizerBuilder;
-import com.zurrtum.create.client.vanillin.config.Configurator;
-import com.zurrtum.create.client.vanillin.config.EntityVisualizerBuilder;
+import com.zurrtum.create.client.vanillin.config.*;
 import com.zurrtum.create.client.vanillin.elements.ShadowElement;
 import com.zurrtum.create.client.vanillin.visuals.*;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.function.Consumer;
-
+import net.minecraft.client.model.geom.EntityModelSet;
 import net.minecraft.client.model.geom.ModelLayerLocation;
 import net.minecraft.client.model.geom.ModelLayers;
+import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.decoration.ItemFrame;
 import net.minecraft.world.entity.vehicle.minecart.AbstractMinecart;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.function.Consumer;
 
 public class VanillaVisuals {
     public static final Configurator CONFIGURATOR = new Configurator();
@@ -88,6 +89,31 @@ public class VanillaVisuals {
 
     public static <T, C> ConfiguredElementImpl.ConfiguredElementBuilder<T, C> element(VisualElement<T, C> element) {
         return new ConfiguredElementImpl.ConfiguredElementBuilder<>(element);
+    }
+
+    public static void onReloadModel(EntityModelSet models) {
+        boolean supportChest = models.bakeLayer(ModelLayers.CHEST).getClass() == ModelPart.class;
+        Map<BlockEntityType<?>, Configurator.ConfiguredBlockEntity<?>> configurator = CONFIGURATOR.blockEntities;
+        Map<String, ConfigBase.ConfigEnum<VisualConfigValue>> blockEntities = VanillinConfig.client().blockEntities;
+        Map<String, List<VisualOverride>> blockEntityOverrides = VanillinConfig.overrides().blockEntities();
+        reloadType(BlockEntityType.CHEST, configurator, blockEntities, blockEntityOverrides, supportChest);
+        reloadType(BlockEntityType.ENDER_CHEST, configurator, blockEntities, blockEntityOverrides, supportChest);
+        reloadType(BlockEntityType.TRAPPED_CHEST, configurator, blockEntities, blockEntityOverrides, supportChest);
+    }
+
+    private static void reloadType(
+        BlockEntityType<?> type,
+        Map<BlockEntityType<?>, Configurator.ConfiguredBlockEntity<?>> configurator,
+        Map<String, ConfigBase.ConfigEnum<VisualConfigValue>> blockEntities,
+        Map<String, List<VisualOverride>> blockEntityOverrides,
+        boolean support
+    ) {
+        Configurator.ConfiguredBlockEntity<?> configured = configurator.get(type);
+        String key = configured.configKey();
+        VisualConfigValue value = blockEntities.get(key).get();
+        if (value == VisualConfigValue.DEFAULT) {
+            configured.set(support ? value : VisualConfigValue.DISABLE, blockEntityOverrides.get(key));
+        }
     }
 
     public static class EntityBuilder<T extends Entity> {

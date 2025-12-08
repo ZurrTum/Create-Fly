@@ -12,6 +12,7 @@
     "BlockElementDeserializerMixin",
     "BlockElementMixin",
     "BlockEntityMixin",
+    "BlockEntityRenderDispatcherMixin",
     "BlockEntityTypeMixin",
     "BlockModelDeserializerMixin",
     "BlockModelMixin",
