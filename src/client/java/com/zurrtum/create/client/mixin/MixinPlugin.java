@@ -11,17 +11,31 @@ import java.util.List;
 import java.util.Set;
 
 public class MixinPlugin implements IMixinConfigPlugin {
-    public static boolean SODIUM = false;
-    public static boolean IRIS = false;
-    public static boolean HMI = false;
-    public static boolean HAS_RENDER;
+    private List<String> mixins;
 
     @Override
     public void onLoad(String mixinPackage) {
-        SODIUM = FabricLoader.getInstance().isModLoaded("sodium");
-        IRIS = FabricLoader.getInstance().isModLoaded("iris");
-        HMI = FabricLoader.getInstance().isModLoaded("holdmyitems");
-        HAS_RENDER = FabricLoader.getInstance().isModLoaded("fabric-rendering-fluids-v1");
+        mixins = new ArrayList<>();
+        //        if (FabricLoader.getInstance().isModLoaded("sodium")) {
+        //            mixins.add("FabricModelAccessMixin");
+        //        }
+        //        if (FabricLoader.getInstance().isModLoaded("iris")) {
+        //            mixins.add("IrisPipelinesMixin");
+        //        }
+        //        if (FabricLoader.getInstance().isModLoaded("holdmyitems")) {
+        //            mixins.add("HoldMyItemsMixin");
+        //            mixins.add("AnimationResourceLoaderMixin");
+        //        }
+        if (Create.Lazy) {
+            //            mixins.add("FabricBlockStateModelMixin");
+            //            mixins.add("WrapperBlockStateModelMixin");
+            mixins.add("FluidVariantRenderHandlerMixin");
+        } else {
+            mixins.add("CreativeModeInventoryScreenMixin");
+        }
+        if (FabricLoader.getInstance().isModLoaded("fabric-rendering-fluids-v1")) {
+            mixins.add("WaterRenderHandlerMixin");
+        }
     }
 
     @Override
@@ -40,27 +54,6 @@ public class MixinPlugin implements IMixinConfigPlugin {
 
     @Override
     public List<String> getMixins() {
-        List<String> mixins = new ArrayList<>();
-        //        if (SODIUM) {
-        //            mixins.add("FabricModelAccessMixin");
-        //        }
-        //        if (IRIS) {
-        //            mixins.add("IrisPipelinesMixin");
-        //        }
-        //        if (HMI) {
-        //            mixins.add("HoldMyItemsMixin");
-        //            mixins.add("AnimationResourceLoaderMixin");
-        //        }
-        if (Create.Lazy) {
-            mixins.add("FabricBlockStateModelMixin");
-            mixins.add("WrapperBlockStateModelMixin");
-            mixins.add("FluidVariantRenderHandlerMixin");
-        } else {
-            mixins.add("CreativeModeInventoryScreenMixin");
-        }
-        if (HAS_RENDER) {
-            mixins.add("WaterRenderHandlerMixin");
-        }
         return mixins;
     }
 
