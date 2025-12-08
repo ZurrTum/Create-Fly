@@ -4,17 +4,17 @@ import com.zurrtum.create.AllClientHandle;
 import com.zurrtum.create.AllPackets;
 import com.zurrtum.create.catnip.codecs.stream.CatnipStreamCodecBuilders;
 import com.zurrtum.create.content.trains.entity.Train;
-import org.apache.logging.log4j.util.TriConsumer;
-
-import java.util.UUID;
-
 import net.minecraft.core.UUIDUtil;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.PacketType;
+import net.minecraft.network.protocol.game.ClientGamePacketListener;
 
-public record TrainHUDControlUpdatePacket(UUID trainId, Double throttle, double speed, int fuelTicks) implements S2CPacket {
+import java.util.UUID;
+
+public record TrainHUDControlUpdatePacket(UUID trainId, Double throttle, double speed, int fuelTicks) implements Packet<ClientGamePacketListener> {
     public static final StreamCodec<RegistryFriendlyByteBuf, TrainHUDControlUpdatePacket> CODEC = StreamCodec.composite(
         UUIDUtil.STREAM_CODEC,
         TrainHUDControlUpdatePacket::trainId,
@@ -36,12 +36,12 @@ public record TrainHUDControlUpdatePacket(UUID trainId, Double throttle, double 
     }
 
     @Override
-    public PacketType<TrainHUDControlUpdatePacket> type() {
-        return AllPackets.S_TRAIN_HUD;
+    public void handle(ClientGamePacketListener listener) {
+        AllClientHandle.INSTANCE.onTrainHUDControlUpdate(this);
     }
 
     @Override
-    public <T> TriConsumer<AllClientHandle<T>, T, TrainHUDControlUpdatePacket> callback() {
-        return AllClientHandle::onTrainHUDControlUpdate;
+    public PacketType<TrainHUDControlUpdatePacket> type() {
+        return AllPackets.S_TRAIN_HUD;
     }
 }

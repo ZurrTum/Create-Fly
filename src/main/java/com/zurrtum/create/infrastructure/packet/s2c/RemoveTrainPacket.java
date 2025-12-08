@@ -4,15 +4,15 @@ import com.zurrtum.create.AllClientHandle;
 import com.zurrtum.create.AllPackets;
 import com.zurrtum.create.content.trains.entity.Train;
 import io.netty.buffer.ByteBuf;
-import org.apache.logging.log4j.util.TriConsumer;
+import net.minecraft.core.UUIDUtil;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.Packet;
+import net.minecraft.network.protocol.PacketType;
+import net.minecraft.network.protocol.game.ClientGamePacketListener;
 
 import java.util.UUID;
 
-import net.minecraft.core.UUIDUtil;
-import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.network.protocol.PacketType;
-
-public record RemoveTrainPacket(UUID id) implements S2CPacket {
+public record RemoveTrainPacket(UUID id) implements Packet<ClientGamePacketListener> {
     public static final StreamCodec<ByteBuf, RemoveTrainPacket> CODEC = UUIDUtil.STREAM_CODEC.map(RemoveTrainPacket::new, RemoveTrainPacket::id);
 
     public RemoveTrainPacket(Train train) {
@@ -20,8 +20,8 @@ public record RemoveTrainPacket(UUID id) implements S2CPacket {
     }
 
     @Override
-    public <T> TriConsumer<AllClientHandle<T>, T, RemoveTrainPacket> callback() {
-        return AllClientHandle::onRemoveTrain;
+    public void handle(ClientGamePacketListener listener) {
+        AllClientHandle.INSTANCE.onRemoveTrain(this);
     }
 
     @Override

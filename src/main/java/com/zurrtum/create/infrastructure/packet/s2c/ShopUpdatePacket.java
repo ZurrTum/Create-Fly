@@ -5,10 +5,11 @@ import com.zurrtum.create.AllPackets;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.PacketType;
-import org.apache.logging.log4j.util.TriConsumer;
+import net.minecraft.network.protocol.game.ClientGamePacketListener;
 
-public record ShopUpdatePacket(BlockPos pos) implements S2CPacket {
+public record ShopUpdatePacket(BlockPos pos) implements Packet<ClientGamePacketListener> {
     public static final StreamCodec<ByteBuf, ShopUpdatePacket> CODEC = StreamCodec.composite(
         BlockPos.STREAM_CODEC,
         ShopUpdatePacket::pos,
@@ -16,13 +17,8 @@ public record ShopUpdatePacket(BlockPos pos) implements S2CPacket {
     );
 
     @Override
-    public boolean runInMain() {
-        return true;
-    }
-
-    @Override
-    public <T> TriConsumer<AllClientHandle<T>, T, ShopUpdatePacket> callback() {
-        return AllClientHandle::onShopUpdate;
+    public void handle(ClientGamePacketListener listener) {
+        AllClientHandle.INSTANCE.onShopUpdate(listener, this);
     }
 
     @Override

@@ -4,17 +4,19 @@ import com.zurrtum.create.AllHandle;
 import com.zurrtum.create.AllPackets;
 import com.zurrtum.create.catnip.codecs.stream.CatnipStreamCodecBuilders;
 import io.netty.buffer.ByteBuf;
-
-import java.util.List;
-import java.util.function.BiConsumer;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.PacketType;
+import net.minecraft.network.protocol.game.ServerGamePacketListener;
 import net.minecraft.server.network.ServerGamePacketListenerImpl;
 
-public record RedstoneRequesterConfigurationPacket(BlockPos pos, String address, boolean allowPartial, List<Integer> amounts) implements C2SPacket {
+import java.util.List;
+
+public record RedstoneRequesterConfigurationPacket(
+    BlockPos pos, String address, boolean allowPartial, List<Integer> amounts
+) implements Packet<ServerGamePacketListener> {
     public static final StreamCodec<ByteBuf, RedstoneRequesterConfigurationPacket> CODEC = StreamCodec.composite(
         BlockPos.STREAM_CODEC,
         RedstoneRequesterConfigurationPacket::pos,
@@ -28,17 +30,12 @@ public record RedstoneRequesterConfigurationPacket(BlockPos pos, String address,
     );
 
     @Override
-    public boolean runInMain() {
-        return true;
+    public void handle(ServerGamePacketListener listener) {
+        AllHandle.onRedstoneRequesterConfiguration((ServerGamePacketListenerImpl) listener, this);
     }
 
     @Override
     public PacketType<RedstoneRequesterConfigurationPacket> type() {
         return AllPackets.CONFIGURE_REDSTONE_REQUESTER;
-    }
-
-    @Override
-    public BiConsumer<ServerGamePacketListenerImpl, RedstoneRequesterConfigurationPacket> callback() {
-        return AllHandle::onRedstoneRequesterConfiguration;
     }
 }

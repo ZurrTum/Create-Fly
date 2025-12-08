@@ -4,20 +4,20 @@ import com.zurrtum.create.AllClientHandle;
 import com.zurrtum.create.AllPackets;
 import com.zurrtum.create.api.contraption.storage.fluid.MountedFluidStorage;
 import com.zurrtum.create.api.contraption.storage.item.MountedItemStorage;
-import org.apache.logging.log4j.util.TriConsumer;
-
-import java.util.HashMap;
-import java.util.Map;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.PacketType;
+import net.minecraft.network.protocol.game.ClientGamePacketListener;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public record MountedStorageSyncPacket(
     int contraptionId, Map<BlockPos, MountedItemStorage> items, Map<BlockPos, MountedFluidStorage> fluids
-) implements S2CPacket {
+) implements Packet<ClientGamePacketListener> {
     public static final StreamCodec<RegistryFriendlyByteBuf, MountedStorageSyncPacket> CODEC = StreamCodec.composite(
         ByteBufCodecs.INT,
         MountedStorageSyncPacket::contraptionId,
@@ -29,8 +29,8 @@ public record MountedStorageSyncPacket(
     );
 
     @Override
-    public <T> TriConsumer<AllClientHandle<T>, T, MountedStorageSyncPacket> callback() {
-        return AllClientHandle::onMountedStorageSync;
+    public void handle(ClientGamePacketListener listener) {
+        AllClientHandle.INSTANCE.onMountedStorageSync(this);
     }
 
     @Override

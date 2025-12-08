@@ -3,17 +3,17 @@ package com.zurrtum.create.infrastructure.packet.s2c;
 import com.zurrtum.create.AllClientHandle;
 import com.zurrtum.create.AllPackets;
 import com.zurrtum.create.content.trains.entity.Train;
-import org.apache.logging.log4j.util.TriConsumer;
-
-import java.util.UUID;
-
 import net.minecraft.core.UUIDUtil;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.PacketType;
+import net.minecraft.network.protocol.game.ClientGamePacketListener;
 
-public record HonkReturnPacket(UUID trainId, boolean isHonk) implements S2CPacket {
+import java.util.UUID;
+
+public record HonkReturnPacket(UUID trainId, boolean isHonk) implements Packet<ClientGamePacketListener> {
     public static final StreamCodec<RegistryFriendlyByteBuf, HonkReturnPacket> CODEC = StreamCodec.composite(
         UUIDUtil.STREAM_CODEC,
         HonkReturnPacket::trainId,
@@ -27,12 +27,12 @@ public record HonkReturnPacket(UUID trainId, boolean isHonk) implements S2CPacke
     }
 
     @Override
-    public PacketType<HonkReturnPacket> type() {
-        return AllPackets.S_TRAIN_HONK;
+    public void handle(ClientGamePacketListener listener) {
+        AllClientHandle.INSTANCE.onTrainHonkReturn(this);
     }
 
     @Override
-    public <T> TriConsumer<AllClientHandle<T>, T, HonkReturnPacket> callback() {
-        return AllClientHandle::onTrainHonkReturn;
+    public PacketType<HonkReturnPacket> type() {
+        return AllPackets.S_TRAIN_HONK;
     }
 }

@@ -7,10 +7,11 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.ComponentSerialization;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.PacketType;
-import org.apache.logging.log4j.util.TriConsumer;
+import net.minecraft.network.protocol.game.ClientGamePacketListener;
 
-public record TrainPromptPacket(Component text, boolean shadow) implements S2CPacket {
+public record TrainPromptPacket(Component text, boolean shadow) implements Packet<ClientGamePacketListener> {
     public static final StreamCodec<RegistryFriendlyByteBuf, TrainPromptPacket> CODEC = StreamCodec.composite(
         ComponentSerialization.TRUSTED_CONTEXT_FREE_STREAM_CODEC,
         TrainPromptPacket::text,
@@ -20,8 +21,8 @@ public record TrainPromptPacket(Component text, boolean shadow) implements S2CPa
     );
 
     @Override
-    public <T> TriConsumer<AllClientHandle<T>, T, TrainPromptPacket> callback() {
-        return AllClientHandle::onTrainPrompt;
+    public void handle(ClientGamePacketListener listener) {
+        AllClientHandle.INSTANCE.onTrainPrompt(this);
     }
 
     @Override

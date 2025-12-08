@@ -5,11 +5,12 @@ import com.zurrtum.create.AllPackets;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.PacketType;
+import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.world.phys.Vec3;
-import org.apache.logging.log4j.util.TriConsumer;
 
-public record LimbSwingUpdatePacket(int entityId, Vec3 position, float limbSwing) implements S2CPacket {
+public record LimbSwingUpdatePacket(int entityId, Vec3 position, float limbSwing) implements Packet<ClientGamePacketListener> {
     public static final StreamCodec<RegistryFriendlyByteBuf, LimbSwingUpdatePacket> CODEC = StreamCodec.composite(
         ByteBufCodecs.INT,
         LimbSwingUpdatePacket::entityId,
@@ -21,17 +22,12 @@ public record LimbSwingUpdatePacket(int entityId, Vec3 position, float limbSwing
     );
 
     @Override
-    public boolean runInMain() {
-        return true;
+    public void handle(ClientGamePacketListener listener) {
+        AllClientHandle.INSTANCE.onLimbSwingUpdate(listener, this);
     }
 
     @Override
     public PacketType<LimbSwingUpdatePacket> type() {
         return AllPackets.LIMBSWING_UPDATE;
-    }
-
-    @Override
-    public <T> TriConsumer<AllClientHandle<T>, T, LimbSwingUpdatePacket> callback() {
-        return AllClientHandle::onLimbSwingUpdate;
     }
 }

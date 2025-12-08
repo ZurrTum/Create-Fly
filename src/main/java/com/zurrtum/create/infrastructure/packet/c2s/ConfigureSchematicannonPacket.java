@@ -4,16 +4,15 @@ import com.zurrtum.create.AllHandle;
 import com.zurrtum.create.AllPackets;
 import com.zurrtum.create.catnip.codecs.stream.CatnipStreamCodecBuilders;
 import io.netty.buffer.ByteBuf;
-
-import java.util.function.BiConsumer;
-
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.PacketType;
+import net.minecraft.network.protocol.game.ServerGamePacketListener;
 import net.minecraft.server.network.ServerGamePacketListenerImpl;
 
-public record ConfigureSchematicannonPacket(Option option, boolean set) implements C2SPacket {
+public record ConfigureSchematicannonPacket(Option option, boolean set) implements Packet<ServerGamePacketListener> {
     public static final StreamCodec<RegistryFriendlyByteBuf, ConfigureSchematicannonPacket> CODEC = StreamCodec.composite(
         Option.CODEC,
         ConfigureSchematicannonPacket::option,
@@ -23,13 +22,13 @@ public record ConfigureSchematicannonPacket(Option option, boolean set) implemen
     );
 
     @Override
-    public PacketType<ConfigureSchematicannonPacket> type() {
-        return AllPackets.CONFIGURE_SCHEMATICANNON;
+    public void handle(ServerGamePacketListener listener) {
+        AllHandle.onConfigureSchematicannon((ServerGamePacketListenerImpl) listener, this);
     }
 
     @Override
-    public BiConsumer<ServerGamePacketListenerImpl, ConfigureSchematicannonPacket> callback() {
-        return AllHandle::onConfigureSchematicannon;
+    public PacketType<ConfigureSchematicannonPacket> type() {
+        return AllPackets.CONFIGURE_SCHEMATICANNON;
     }
 
     public enum Option {

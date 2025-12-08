@@ -3,17 +3,18 @@ package com.zurrtum.create.infrastructure.packet.c2s;
 import com.zurrtum.create.AllHandle;
 import com.zurrtum.create.AllPackets;
 import com.zurrtum.create.infrastructure.component.PackageOrderWithCrafts;
-
-import java.util.function.BiConsumer;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.PacketType;
+import net.minecraft.network.protocol.game.ServerGamePacketListener;
 import net.minecraft.server.network.ServerGamePacketListenerImpl;
 
-public record PackageOrderRequestPacket(BlockPos pos, PackageOrderWithCrafts order, String address, boolean encodeRequester) implements C2SPacket {
+public record PackageOrderRequestPacket(
+    BlockPos pos, PackageOrderWithCrafts order, String address, boolean encodeRequester
+) implements Packet<ServerGamePacketListener> {
     public static final StreamCodec<RegistryFriendlyByteBuf, PackageOrderRequestPacket> CODEC = StreamCodec.composite(
         BlockPos.STREAM_CODEC,
         PackageOrderRequestPacket::pos,
@@ -27,17 +28,12 @@ public record PackageOrderRequestPacket(BlockPos pos, PackageOrderWithCrafts ord
     );
 
     @Override
-    public boolean runInMain() {
-        return true;
+    public void handle(ServerGamePacketListener listener) {
+        AllHandle.onPackageOrderRequest((ServerGamePacketListenerImpl) listener, this);
     }
 
     @Override
     public PacketType<PackageOrderRequestPacket> type() {
         return AllPackets.LOGISTICS_PACKAGE_REQUEST;
-    }
-
-    @Override
-    public BiConsumer<ServerGamePacketListenerImpl, PackageOrderRequestPacket> callback() {
-        return AllHandle::onPackageOrderRequest;
     }
 }

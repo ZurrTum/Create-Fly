@@ -1,17 +1,17 @@
 package com.zurrtum.create.content.equipment.zapper;
 
 import com.zurrtum.create.AllDataComponents;
-import com.zurrtum.create.infrastructure.packet.s2c.ShootGadgetPacket;
-
-import java.util.function.Function;
-import java.util.function.Predicate;
-
+import net.minecraft.network.protocol.Packet;
+import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.HumanoidArm;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
+
+import java.util.function.Function;
+import java.util.function.Predicate;
 
 public class ShootableGadgetItemMethods {
 
@@ -23,7 +23,7 @@ public class ShootableGadgetItemMethods {
         player.getCooldowns().addCooldown(item, gunInOtherHand ? cooldown * 2 / 3 : cooldown);
     }
 
-    public static void sendPackets(Player player, Function<Boolean, ? extends ShootGadgetPacket> factory) {
+    public static void sendPackets(Player player, Function<Boolean, Packet<ClientGamePacketListener>> factory) {
         if (!(player instanceof ServerPlayer serverPlayer))
             return;
         serverPlayer.level().getChunkSource().sendToTrackingPlayers(player, factory.apply(false));

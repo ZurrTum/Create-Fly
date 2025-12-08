@@ -7,10 +7,11 @@ import io.netty.buffer.ByteBuf;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.PacketType;
-import org.apache.logging.log4j.util.TriConsumer;
+import net.minecraft.network.protocol.game.ClientGamePacketListener;
 
-public record FunnelFlapPacket(BlockPos pos, boolean inwards) implements S2CPacket {
+public record FunnelFlapPacket(BlockPos pos, boolean inwards) implements Packet<ClientGamePacketListener> {
     public static final StreamCodec<ByteBuf, FunnelFlapPacket> CODEC = StreamCodec.composite(
         BlockPos.STREAM_CODEC,
         FunnelFlapPacket::pos,
@@ -24,13 +25,8 @@ public record FunnelFlapPacket(BlockPos pos, boolean inwards) implements S2CPack
     }
 
     @Override
-    public boolean runInMain() {
-        return true;
-    }
-
-    @Override
-    public <T> TriConsumer<AllClientHandle<T>, T, FunnelFlapPacket> callback() {
-        return AllClientHandle::onFunnelFlap;
+    public void handle(ClientGamePacketListener listener) {
+        AllClientHandle.INSTANCE.onFunnelFlap(listener, this);
     }
 
     @Override

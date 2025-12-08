@@ -5,15 +5,16 @@ import com.zurrtum.create.AllPackets;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.PacketType;
-import org.apache.logging.log4j.util.TriConsumer;
+import net.minecraft.network.protocol.game.ClientGamePacketListener;
 
-public record ServerSpeedPacket(int speed) implements S2CPacket {
+public record ServerSpeedPacket(int speed) implements Packet<ClientGamePacketListener> {
     public static final StreamCodec<ByteBuf, ServerSpeedPacket> CODEC = ByteBufCodecs.INT.map(ServerSpeedPacket::new, ServerSpeedPacket::speed);
 
     @Override
-    public <T> TriConsumer<AllClientHandle<T>, T, ServerSpeedPacket> callback() {
-        return AllClientHandle::onServerSpeed;
+    public void handle(ClientGamePacketListener listener) {
+        AllClientHandle.INSTANCE.onServerSpeed(this);
     }
 
     @Override

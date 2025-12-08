@@ -4,12 +4,13 @@ import com.zurrtum.create.AllClientHandle;
 import com.zurrtum.create.AllPackets;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.PacketType;
+import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
-import org.apache.logging.log4j.util.TriConsumer;
 
-public record PackageDestroyPacket(Vec3 location, ItemStack box) implements S2CPacket {
+public record PackageDestroyPacket(Vec3 location, ItemStack box) implements Packet<ClientGamePacketListener> {
     public static final StreamCodec<RegistryFriendlyByteBuf, PackageDestroyPacket> CODEC = StreamCodec.composite(
         Vec3.STREAM_CODEC,
         PackageDestroyPacket::location,
@@ -19,13 +20,8 @@ public record PackageDestroyPacket(Vec3 location, ItemStack box) implements S2CP
     );
 
     @Override
-    public boolean runInMain() {
-        return true;
-    }
-
-    @Override
-    public <T> TriConsumer<AllClientHandle<T>, T, PackageDestroyPacket> callback() {
-        return AllClientHandle::onPackageDestroy;
+    public void handle(ClientGamePacketListener listener) {
+        AllClientHandle.INSTANCE.onPackageDestroy(listener, this);
     }
 
     @Override

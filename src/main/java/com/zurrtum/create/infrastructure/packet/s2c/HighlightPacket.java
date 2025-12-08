@@ -5,15 +5,16 @@ import com.zurrtum.create.AllPackets;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.PacketType;
-import org.apache.logging.log4j.util.TriConsumer;
+import net.minecraft.network.protocol.game.ClientGamePacketListener;
 
-public record HighlightPacket(BlockPos pos) implements S2CPacket {
+public record HighlightPacket(BlockPos pos) implements Packet<ClientGamePacketListener> {
     public static final StreamCodec<ByteBuf, HighlightPacket> CODEC = BlockPos.STREAM_CODEC.map(HighlightPacket::new, HighlightPacket::pos);
 
     @Override
-    public <T> TriConsumer<AllClientHandle<T>, T, HighlightPacket> callback() {
-        return AllClientHandle::onHighlight;
+    public void handle(ClientGamePacketListener listener) {
+        AllClientHandle.INSTANCE.onHighlight(this);
     }
 
     @Override

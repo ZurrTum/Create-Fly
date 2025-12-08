@@ -6,10 +6,11 @@ import io.netty.buffer.ByteBuf;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.PacketType;
-import org.apache.logging.log4j.util.TriConsumer;
+import net.minecraft.network.protocol.game.ClientGamePacketListener;
 
-public record RedstoneRequesterEffectPacket(BlockPos pos, boolean success) implements S2CPacket {
+public record RedstoneRequesterEffectPacket(BlockPos pos, boolean success) implements Packet<ClientGamePacketListener> {
     public static final StreamCodec<ByteBuf, RedstoneRequesterEffectPacket> CODEC = StreamCodec.composite(
         BlockPos.STREAM_CODEC,
         RedstoneRequesterEffectPacket::pos,
@@ -19,13 +20,8 @@ public record RedstoneRequesterEffectPacket(BlockPos pos, boolean success) imple
     );
 
     @Override
-    public boolean runInMain() {
-        return true;
-    }
-
-    @Override
-    public <T> TriConsumer<AllClientHandle<T>, T, RedstoneRequesterEffectPacket> callback() {
-        return AllClientHandle::onRedstoneRequesterEffect;
+    public void handle(ClientGamePacketListener listener) {
+        AllClientHandle.INSTANCE.onRedstoneRequesterEffect(listener, this);
     }
 
     @Override

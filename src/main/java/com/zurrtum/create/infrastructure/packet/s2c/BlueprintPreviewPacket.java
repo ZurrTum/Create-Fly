@@ -6,18 +6,20 @@ import com.zurrtum.create.infrastructure.items.BaseInventory;
 import it.unimi.dsi.fastutil.objects.Object2IntLinkedOpenCustomHashMap;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.ObjectBidirectionalIterator;
-import org.apache.logging.log4j.util.TriConsumer;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.Packet;
+import net.minecraft.network.protocol.PacketType;
+import net.minecraft.network.protocol.game.ClientGamePacketListener;
+import net.minecraft.world.item.ItemStack;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import net.minecraft.network.RegistryFriendlyByteBuf;
-import net.minecraft.network.codec.ByteBufCodecs;
-import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.network.protocol.PacketType;
-import net.minecraft.world.item.ItemStack;
-
-public record BlueprintPreviewPacket(List<ItemStack> available, List<ItemStack> missing, ItemStack result) implements S2CPacket {
+public record BlueprintPreviewPacket(
+    List<ItemStack> available, List<ItemStack> missing, ItemStack result
+) implements Packet<ClientGamePacketListener> {
     public static final StreamCodec<RegistryFriendlyByteBuf, BlueprintPreviewPacket> CODEC = StreamCodec.composite(
         ItemStack.STREAM_CODEC.apply(ByteBufCodecs.list()),
         BlueprintPreviewPacket::available,
@@ -67,8 +69,8 @@ public record BlueprintPreviewPacket(List<ItemStack> available, List<ItemStack> 
     }
 
     @Override
-    public <T> TriConsumer<AllClientHandle<T>, T, BlueprintPreviewPacket> callback() {
-        return AllClientHandle::onBlueprintPreview;
+    public void handle(ClientGamePacketListener listener) {
+        AllClientHandle.INSTANCE.onBlueprintPreview(this);
     }
 
     @Override

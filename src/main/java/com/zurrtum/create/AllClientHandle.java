@@ -23,12 +23,6 @@ import com.zurrtum.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.foundation.entity.behaviour.EntityBehaviour;
 import com.zurrtum.create.infrastructure.component.ClipboardContent;
 import com.zurrtum.create.infrastructure.packet.s2c.*;
-import org.apache.logging.log4j.util.TriConsumer;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.ArrayList;
-import java.util.UUID;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Direction.Axis;
@@ -44,21 +38,13 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import org.jetbrains.annotations.Nullable;
 
-public class AllClientHandle<T> {
-    public static AllClientHandle<? extends ClientGamePacketListener> INSTANCE = new AllClientHandle<>();
+import java.util.ArrayList;
+import java.util.UUID;
 
-    @SuppressWarnings("unchecked")
-    public <P> void call(TriConsumer<AllClientHandle<T>, T, P> fn, ClientGamePacketListener listener, S2CPacket packet) {
-        if (packet.runInMain()) {
-            forceMainThread((T) listener, packet);
-        }
-        fn.accept(this, (T) listener, (P) packet);
-    }
-
-    protected void forceMainThread(T listener, S2CPacket packet) {
-        warn();
-    }
+public class AllClientHandle {
+    public static AllClientHandle INSTANCE = new AllClientHandle();
 
     private static void warn() {
         Create.LOGGER.warn("Ignore the client call {}", Thread.currentThread().getStackTrace()[2].toString());
@@ -72,187 +58,187 @@ public class AllClientHandle<T> {
         return false;
     }
 
-    public void onSymmetryEffect(T listener, SymmetryEffectPacket packet) {
+    public void onSymmetryEffect(ClientGamePacketListener listener, SymmetryEffectPacket packet) {
         warn();
     }
 
-    public void onLimbSwingUpdate(T listener, LimbSwingUpdatePacket packet) {
+    public void onLimbSwingUpdate(ClientGamePacketListener listener, LimbSwingUpdatePacket packet) {
         warn();
     }
 
-    public void onLogisticalStockResponse(T listener, LogisticalStockResponsePacket packet) {
+    public void onLogisticalStockResponse(ClientGamePacketListener listener, LogisticalStockResponsePacket packet) {
         warn();
     }
 
-    public void onTrainEditReturn(T listener, TrainEditReturnPacket packet) {
+    public void onTrainEditReturn(TrainEditReturnPacket packet) {
         warn();
     }
 
-    public void onTrainHUDControlUpdate(T listener, TrainHUDControlUpdatePacket packet) {
+    public void onTrainHUDControlUpdate(TrainHUDControlUpdatePacket packet) {
         warn();
     }
 
-    public void onTrainHonkReturn(T listener, HonkReturnPacket packet) {
+    public void onTrainHonkReturn(HonkReturnPacket packet) {
         warn();
     }
 
-    public void onElevatorFloorList(T listener, ElevatorFloorListPacket packet) {
+    public void onElevatorFloorList(ClientGamePacketListener listener, ElevatorFloorListPacket packet) {
         warn();
     }
 
-    public void onContraptionColliderLock(T listener, ContraptionColliderLockPacket packet) {
+    public void onContraptionColliderLock(ContraptionColliderLockPacket packet) {
         warn();
     }
 
-    public void onWiFiEffect(T listener, WiFiEffectPacket packet) {
+    public void onWiFiEffect(ClientGamePacketListener listener, WiFiEffectPacket packet) {
         warn();
     }
 
-    public void onControlsStopControlling(T listener) {
+    public void onControlsStopControlling() {
         warn();
     }
 
-    public void onServerSpeed(T listener, ServerSpeedPacket packet) {
+    public void onServerSpeed(ServerSpeedPacket packet) {
         warn();
     }
 
-    public void onZapperBeam(T listener, ZapperBeamPacket packet) {
+    public void onZapperBeam(ClientGamePacketListener listener, ZapperBeamPacket packet) {
         warn();
     }
 
-    public void onContraptionStall(T listener, ContraptionStallPacket packet) {
+    public void onContraptionStall(ContraptionStallPacket packet) {
         warn();
     }
 
-    public void onContraptionDisassembly(T listener, ContraptionDisassemblyPacket packet) {
+    public void onContraptionDisassembly(ContraptionDisassemblyPacket packet) {
         warn();
     }
 
-    public void onContraptionBlockChanged(T listener, ContraptionBlockChangedPacket packet) {
+    public void onContraptionBlockChanged(ContraptionBlockChangedPacket packet) {
         warn();
     }
 
-    public void onGlueEffect(T listener, GlueEffectPacket packet) {
+    public void onGlueEffect(ClientGamePacketListener listener, GlueEffectPacket packet) {
         warn();
     }
 
-    public void onContraptionSeatMapping(T listener, ContraptionSeatMappingPacket packet) {
+    public void onContraptionSeatMapping(ContraptionSeatMappingPacket packet) {
         warn();
     }
 
-    public void onFluidSplash(T listener, FluidSplashPacket packet) {
+    public void onFluidSplash(FluidSplashPacket packet) {
         warn();
     }
 
-    public void onMountedStorageSync(T listener, MountedStorageSyncPacket packet) {
+    public void onMountedStorageSync(MountedStorageSyncPacket packet) {
         warn();
     }
 
-    public void onGantryContraptionUpdate(T listener, GantryContraptionUpdatePacket packet) {
+    public void onGantryContraptionUpdate(GantryContraptionUpdatePacket packet) {
         warn();
     }
 
-    public void onHighlight(T listener, HighlightPacket packet) {
+    public void onHighlight(HighlightPacket packet) {
         warn();
     }
 
-    public void onTunnelFlap(T listener, TunnelFlapPacket packet) {
+    public void onTunnelFlap(TunnelFlapPacket packet) {
         warn();
     }
 
-    public void onFunnelFlap(T listener, FunnelFlapPacket packet) {
+    public void onFunnelFlap(ClientGamePacketListener listener, FunnelFlapPacket packet) {
         warn();
     }
 
-    public void onPotatoCannon(T listener, PotatoCannonPacket packet) {
+    public void onPotatoCannon(ClientGamePacketListener listener, PotatoCannonPacket packet) {
         warn();
     }
 
-    public void onSoulPulseEffect(T listener, SoulPulseEffectPacket packet) {
+    public void onSoulPulseEffect(SoulPulseEffectPacket packet) {
         warn();
     }
 
-    public void onSignalEdgeGroup(T listener, SignalEdgeGroupPacket packet) {
+    public void onSignalEdgeGroup(SignalEdgeGroupPacket packet) {
         warn();
     }
 
-    public void onRemoveTrain(T listener, RemoveTrainPacket packet) {
+    public void onRemoveTrain(RemoveTrainPacket packet) {
         warn();
     }
 
-    public void onRemoveBlockEntity(T listener, RemoveBlockEntityPacket packet) {
+    public void onRemoveBlockEntity(ClientGamePacketListener listener, RemoveBlockEntityPacket packet) {
         warn();
     }
 
-    public void onTrainPrompt(T listener, TrainPromptPacket packet) {
+    public void onTrainPrompt(TrainPromptPacket packet) {
         warn();
     }
 
-    public void onContraptionRelocation(T listener, ContraptionRelocationPacket packet) {
+    public void onContraptionRelocation(ContraptionRelocationPacket packet) {
         warn();
     }
 
-    public void onTrackGraphRollCall(T listener, TrackGraphRollCallPacket packet) {
+    public void onTrackGraphRollCall(TrackGraphRollCallPacket packet) {
         warn();
     }
 
-    public void onArmPlacementRequest(T listener, ArmPlacementRequestPacket packet) {
+    public void onArmPlacementRequest(ArmPlacementRequestPacket packet) {
         warn();
     }
 
-    public void onEjectorPlacementRequest(T listener, EjectorPlacementRequestPacket packet) {
+    public void onEjectorPlacementRequest(EjectorPlacementRequestPacket packet) {
         warn();
     }
 
-    public void onPackagePortPlacementRequest(T listener, PackagePortPlacementRequestPacket packet) {
+    public void onPackagePortPlacementRequest(PackagePortPlacementRequestPacket packet) {
         warn();
     }
 
-    public void onContraptionDisableActor(T listener, ContraptionDisableActorPacket packet) {
+    public void onContraptionDisableActor(ClientGamePacketListener listener, ContraptionDisableActorPacket packet) {
         warn();
     }
 
-    public void onAttachedComputer(T listener, AttachedComputerPacket packet) {
+    public void onAttachedComputer(AttachedComputerPacket packet) {
         warn();
     }
 
-    public void onServerDebugInfo(T listener, ServerDebugInfoPacket packet) {
+    public void onServerDebugInfo(ServerDebugInfoPacket packet) {
         warn();
     }
 
-    public void onPackageDestroy(T listener, PackageDestroyPacket packet) {
+    public void onPackageDestroy(ClientGamePacketListener listener, PackageDestroyPacket packet) {
         warn();
     }
 
-    public void onFactoryPanelEffect(T listener, FactoryPanelEffectPacket packet) {
+    public void onFactoryPanelEffect(ClientGamePacketListener listener, FactoryPanelEffectPacket packet) {
         warn();
     }
 
-    public void onRedstoneRequesterEffect(T listener, RedstoneRequesterEffectPacket packet) {
+    public void onRedstoneRequesterEffect(ClientGamePacketListener listener, RedstoneRequesterEffectPacket packet) {
         warn();
     }
 
-    public void onClientboundChainConveyorRiding(T listener, ClientboundChainConveyorRidingPacket packet) {
+    public void onClientboundChainConveyorRiding(ClientboundChainConveyorRidingPacket packet) {
         warn();
     }
 
-    public void onShopUpdate(T listener, ShopUpdatePacket packet) {
+    public void onShopUpdate(ClientGamePacketListener listener, ShopUpdatePacket packet) {
         warn();
     }
 
-    public void onTrackGraphSync(T listener, TrackGraphSyncPacket packet) {
+    public void onTrackGraphSync(TrackGraphSyncPacket packet) {
         warn();
     }
 
-    public void onAddTrain(T listener, AddTrainPacket packet) {
+    public void onAddTrain(AddTrainPacket packet) {
         warn();
     }
 
-    public void onOpenScreen(T listener, OpenScreenPacket packet) {
+    public void onOpenScreen(ClientGamePacketListener listener, OpenScreenPacket packet) {
         warn();
     }
 
-    public void onBlueprintPreview(T listener, BlueprintPreviewPacket packet) {
+    public void onBlueprintPreview(BlueprintPreviewPacket packet) {
         warn();
     }
 

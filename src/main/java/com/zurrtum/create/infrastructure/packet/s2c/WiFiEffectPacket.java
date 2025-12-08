@@ -5,24 +5,20 @@ import com.zurrtum.create.AllPackets;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.PacketType;
-import org.apache.logging.log4j.util.TriConsumer;
+import net.minecraft.network.protocol.game.ClientGamePacketListener;
 
-public record WiFiEffectPacket(BlockPos pos) implements S2CPacket {
+public record WiFiEffectPacket(BlockPos pos) implements Packet<ClientGamePacketListener> {
     public static final StreamCodec<ByteBuf, WiFiEffectPacket> CODEC = BlockPos.STREAM_CODEC.map(WiFiEffectPacket::new, WiFiEffectPacket::pos);
 
     @Override
-    public boolean runInMain() {
-        return true;
+    public void handle(ClientGamePacketListener listener) {
+        AllClientHandle.INSTANCE.onWiFiEffect(listener, this);
     }
 
     @Override
     public PacketType<WiFiEffectPacket> type() {
         return AllPackets.PACKAGER_LINK_EFFECT;
-    }
-
-    @Override
-    public <T> TriConsumer<AllClientHandle<T>, T, WiFiEffectPacket> callback() {
-        return AllClientHandle::onWiFiEffect;
     }
 }

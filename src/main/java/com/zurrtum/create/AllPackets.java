@@ -15,7 +15,6 @@ import net.minecraft.server.network.ServerGamePacketListenerImpl;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 import static com.zurrtum.create.Create.MOD_ID;
@@ -202,7 +201,7 @@ public class AllPackets {
     public static final PacketType<RemoveTrainPacket> REMOVE_TRAIN = s2c("remove_train", RemoveTrainPacket.CODEC);
     public static final PacketType<RemoveBlockEntityPacket> REMOVE_TE = s2c("remove_te", RemoveBlockEntityPacket.CODEC);
     public static final PacketType<TrainEditReturnPacket> S_CONFIGURE_TRAIN = s2c("s_configure_train", TrainEditReturnPacket.CODEC);
-    public static final S2CHoldPacket<?> CONTROLS_ABORT = s2c("controls_abort", AllClientHandle::onControlsStopControlling);
+    public static final S2CHoldPacket CONTROLS_ABORT = s2c("controls_abort", AllClientHandle::onControlsStopControlling);
     public static final PacketType<TrainHUDControlUpdatePacket> S_TRAIN_HUD = s2c("s_train_hud", TrainHUDControlUpdatePacket.CODEC);
     public static final PacketType<HonkReturnPacket> S_TRAIN_HONK = s2c("s_train_honk", HonkReturnPacket.CODEC);
     public static final PacketType<TrainPromptPacket> S_TRAIN_PROMPT = s2c("s_train_prompt", TrainPromptPacket.CODEC);
@@ -293,8 +292,8 @@ public class AllPackets {
         return packet;
     }
 
-    private static <T extends ClientGamePacketListener> S2CHoldPacket<T> s2c(String id, BiConsumer<AllClientHandle<T>, T> callback) {
-        S2CHoldPacket<T> packet = new S2CHoldPacket<>(id, callback);
+    private static <T extends ClientGamePacketListener> S2CHoldPacket s2c(String id, Consumer<AllClientHandle> callback) {
+        S2CHoldPacket packet = new S2CHoldPacket(id, callback);
         S2C.put(packet.id(), packet.codec());
         return packet;
     }

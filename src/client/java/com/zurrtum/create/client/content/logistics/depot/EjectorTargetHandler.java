@@ -12,7 +12,6 @@ import com.zurrtum.create.infrastructure.packet.c2s.EjectorPlacementPacket;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
-import net.minecraft.client.multiplayer.ClientPacketListener;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -66,11 +65,8 @@ public class EjectorTargetHandler {
         return false;
     }
 
-    public static void flushSettings(ClientPacketListener listener, BlockPos pos) {
-        int h = 0;
-        int v = 0;
-
-        LocalPlayer player = listener.minecraft.player;
+    public static void flushSettings(BlockPos pos) {
+        LocalPlayer player = Minecraft.getInstance().player;
         String key = "weighted_ejector.target_not_valid";
         ChatFormatting colour = ChatFormatting.WHITE;
 
@@ -94,10 +90,10 @@ public class EjectorTargetHandler {
         );
 
         BlockPos diff = pos.subtract(currentSelection);
-        h = Math.abs(diff.getX() + diff.getZ());
-        v = -diff.getY();
+        int h = Math.abs(diff.getX() + diff.getZ());
+        int v = -diff.getY();
 
-        listener.send(new EjectorPlacementPacket(h, v, pos, validTargetDirection));
+        player.connection.send(new EjectorPlacementPacket(h, v, pos, validTargetDirection));
         currentSelection = null;
         currentItem = null;
 

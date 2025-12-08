@@ -6,10 +6,11 @@ import io.netty.buffer.ByteBuf;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.PacketType;
-import org.apache.logging.log4j.util.TriConsumer;
+import net.minecraft.network.protocol.game.ClientGamePacketListener;
 
-public record AttachedComputerPacket(BlockPos pos, boolean hasAttachedComputer) implements S2CPacket {
+public record AttachedComputerPacket(BlockPos pos, boolean hasAttachedComputer) implements Packet<ClientGamePacketListener> {
     public static final StreamCodec<ByteBuf, AttachedComputerPacket> CODEC = StreamCodec.composite(
         BlockPos.STREAM_CODEC,
         AttachedComputerPacket::pos,
@@ -19,8 +20,8 @@ public record AttachedComputerPacket(BlockPos pos, boolean hasAttachedComputer) 
     );
 
     @Override
-    public <T> TriConsumer<AllClientHandle<T>, T, AttachedComputerPacket> callback() {
-        return AllClientHandle::onAttachedComputer;
+    public void handle(ClientGamePacketListener listener) {
+        AllClientHandle.INSTANCE.onAttachedComputer(this);
     }
 
     @Override
