@@ -54,6 +54,7 @@ public abstract class DefaultClientResourcePackProviderMixin {
         );
     }
 
+    @Unique
     private ResourcePackProfile createPacket(
         List<Path> rootPaths,
         String directory,
