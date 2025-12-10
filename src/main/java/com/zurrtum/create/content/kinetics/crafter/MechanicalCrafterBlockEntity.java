@@ -244,7 +244,7 @@ public class MechanicalCrafterBlockEntity extends KineticBlockEntity implements 
 
         inventory.read(view);
         input.read(view.getReadView("ConnectedInput"));
-        groupedItems = view.read("GroupedItems", GroupedItems.CODEC).orElseThrow();
+        groupedItems = view.read("GroupedItems", GroupedItems.CODEC).orElseGet(GroupedItems::new);
         phase = Phase.IDLE;
         String name = view.getString("Phase", "");
         for (Phase phase : Phase.values())
