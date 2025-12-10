@@ -11,7 +11,6 @@ import com.zurrtum.create.client.flywheel.lib.util.ShadersModHelper;
 import com.zurrtum.create.client.foundation.render.CreateRenderTypes;
 import com.zurrtum.create.content.redstone.displayLink.LinkWithBulbBlockEntity;
 import net.minecraft.client.renderer.LightTexture;
-import net.minecraft.client.renderer.OrderedSubmitNodeCollector;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
@@ -67,10 +66,9 @@ public class LinkBulbRenderer implements BlockEntityRenderer<LinkWithBulbBlockEn
         matrices.mulPose(Axis.YP.rotation(state.yRot));
         matrices.mulPose(Axis.XP.rotation(state.xRot));
         matrices.translate(-0.5f, -0.5f, -0.5f);
-        OrderedSubmitNodeCollector batchingQueue = ShadersModHelper.isShaderPackInUse() ? queue.order(1) : queue;
-        batchingQueue.submitCustomGeometry(matrices, state.translucent, state::renderTube);
+        queue.submitCustomGeometry(matrices, state.translucent, state::renderTube);
         if (state.glow != null) {
-            batchingQueue.submitCustomGeometry(matrices, state.additive, state::renderGlow);
+            (ShadersModHelper.isShaderPackInUse() ? queue.order(1) : queue).submitCustomGeometry(matrices, state.additive, state::renderGlow);
         }
     }
 

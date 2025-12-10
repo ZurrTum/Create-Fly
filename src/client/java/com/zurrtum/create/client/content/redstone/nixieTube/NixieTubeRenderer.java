@@ -350,7 +350,7 @@ public class NixieTubeRenderer implements BlockEntityRenderer<NixieTubeBlockEnti
         public void render(PoseStack matrices, SubmitNodeCollector queue) {
             if (ShadersModHelper.isShaderPackInUse()) {
                 if (additive) {
-                    queue.order(1).submitCustomGeometry(matrices, layer, (e, v) -> renderAdditive(e, v, 153));
+                    queue.submitCustomGeometry(matrices, layer, (e, v) -> renderAdditive(e, v, 153));
                     if (cube != null) {
                         queue.order(1).submitCustomGeometry(matrices, cubeLayer, this::renderCube);
                     }
