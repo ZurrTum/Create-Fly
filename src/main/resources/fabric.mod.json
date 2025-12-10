@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "id": "create",
   "version": "${version}",
-  "name": "Create",
+  "name": "Create Fly",
   "description": "Creators-of-Create/Create port to fabric",
   "authors": [
     "ZurrTum"
