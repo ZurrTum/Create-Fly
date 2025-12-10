@@ -20,8 +20,11 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import org.joml.Quaternionf;
+import org.joml.Vector3f;
 
 public class BasinFluidParticle extends FluidParticle {
+    private static final Vector3f DIAGONAL_PLANE = new Vector3f(-1.0F, 0.0F, 0.0F);
+    private static final Vector3f VERTICAL_PLANE = new Vector3f(0.0F, 0.0F, -1.0F);
     BlockPos basinPos;
     Vec3d targetPos;
     Vec3d centerOfBasin;
@@ -105,12 +108,20 @@ public class BasinFluidParticle extends FluidParticle {
     @Override
     public void render(VertexConsumer vb, Camera info, float pt) {
         Quaternionf rotation = info.getRotation();
+        Vector3f diagonalPlane = info.getDiagonalPlane();
+        Vector3f verticalPlane = info.getVerticalPlane();
         Quaternionf prevRotation = new Quaternionf(rotation);
+        Vector3f prevDiagonalPlane = new Vector3f(diagonalPlane);
+        Vector3f prevVerticalPlane = new Vector3f(verticalPlane);
         rotation.set(-1, 0, 0, 1);
         rotation.normalize();
+        diagonalPlane.set(DIAGONAL_PLANE);
+        verticalPlane.set(VERTICAL_PLANE);
         super.render(vb, info, pt);
         rotation.set(0, 0, 0, 1);
         rotation.mul(prevRotation);
+        diagonalPlane.set(prevDiagonalPlane);
+        verticalPlane.set(prevVerticalPlane);
     }
 
     @Override
