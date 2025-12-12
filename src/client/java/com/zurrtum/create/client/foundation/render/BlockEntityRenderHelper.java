@@ -42,8 +42,8 @@ public class BlockEntityRenderHelper {
         BitSet erroredBEsOut,
         @Nullable VirtualRenderWorld renderLevel,
         World realLevel,
-        MatrixStack ms,
-        @Nullable Matrix4f lightTransform,
+        @Nullable Matrix4f worldMatrix4f,
+        @Nullable Matrix4f modelMatrix4f,
         Vec3d camera,
         float pt
     ) {
@@ -69,7 +69,7 @@ public class BlockEntityRenderHelper {
 
             try {
                 BlockEntityRenderState renderState = renderer.createRenderState();
-                int realLevelLight = WorldRenderer.getLightmapCoordinates(realLevel, getLightPos(lightTransform, blockEntity.getPos()));
+                int realLevelLight = WorldRenderer.getLightmapCoordinates(realLevel, getLightPos(worldMatrix4f, modelMatrix4f, blockEntity.getPos()));
                 if (renderLevel != null) {
                     renderLevel.setExternalLight(realLevelLight);
                 }
@@ -96,13 +96,16 @@ public class BlockEntityRenderHelper {
         if (states.isEmpty()) {
             return null;
         }
-        return new BlockEntityListRenderState(dispatcher, ms, camera, BlockPos.ofFloored(camera), states);
+        return new BlockEntityListRenderState(dispatcher, camera, BlockPos.ofFloored(camera), states);
     }
 
-    private static BlockPos getLightPos(@Nullable Matrix4f lightTransform, BlockPos contraptionPos) {
-        if (lightTransform != null) {
+    private static BlockPos getLightPos(@Nullable Matrix4f worldMatrix4f, @Nullable Matrix4f modelMatrix4f, BlockPos contraptionPos) {
+        if (worldMatrix4f != null) {
             Vector4f lightVec = new Vector4f(contraptionPos.getX() + .5f, contraptionPos.getY() + .5f, contraptionPos.getZ() + .5f, 1);
-            lightVec.mul(lightTransform);
+            lightVec.mul(worldMatrix4f);
+            if (modelMatrix4f != null) {
+                lightVec.mul(modelMatrix4f);
+            }
             return BlockPos.ofFloored(lightVec.x(), lightVec.y(), lightVec.z());
         } else {
             return contraptionPos;
@@ -110,9 +113,9 @@ public class BlockEntityRenderHelper {
     }
 
     public record BlockEntityListRenderState(
-        BlockEntityRenderManager dispatcher, MatrixStack matrices, Vec3d camera, BlockPos cameraPos, List<BlockEntityRenderState> states
+        BlockEntityRenderManager dispatcher, Vec3d camera, BlockPos cameraPos, List<BlockEntityRenderState> states
     ) {
-        public void render(OrderedRenderCommandQueue queue, CameraRenderState cameraRenderState) {
+        public void render(MatrixStack matrices, OrderedRenderCommandQueue queue, CameraRenderState cameraRenderState) {
             Vec3d prevPos = cameraRenderState.pos;
             BlockPos prevBlockPos = cameraRenderState.blockPos;
             Vec3d prevEntityPos = cameraRenderState.entityPos;

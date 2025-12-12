@@ -75,14 +75,14 @@ public class SchematicRenderer {
             scratchErroredBlockEntities,
             null,
             schematic,
-            ms,
+            null,
             null,
             transformation.toLocalSpace(camera),
             AnimationTickHolder.getPartialTicks()
         );
         if (renderState != null) {
             RenderDispatcher renderDispatcher = MinecraftClient.getInstance().gameRenderer.getEntityRenderDispatcher();
-            renderState.render(renderDispatcher.getQueue(), mc.gameRenderer.getEntityRenderStates().cameraRenderState);
+            renderState.render(ms, renderDispatcher.getQueue(), mc.gameRenderer.getEntityRenderStates().cameraRenderState);
         }
 
         // Don't bother looping over errored BEs again.
