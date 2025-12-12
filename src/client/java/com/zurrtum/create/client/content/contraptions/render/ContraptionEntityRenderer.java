@@ -197,6 +197,7 @@ public class ContraptionEntityRenderer<C extends AbstractContraptionEntity, S ex
         if (state.contraption == null) {
             return;
         }
+        poseStack.push();
         MatrixStack.Entry entry = poseStack.peek();
         entry.getPositionMatrix().mul(state.modelEntry.getPositionMatrix());
         entry.getNormalMatrix().mul(state.modelEntry.getNormalMatrix());
@@ -216,6 +217,7 @@ public class ContraptionEntityRenderer<C extends AbstractContraptionEntity, S ex
                 poseStack.pop();
             }
         }
+        poseStack.pop();
     }
 
     public void transform(S state, MatrixStack matrixStack) {
