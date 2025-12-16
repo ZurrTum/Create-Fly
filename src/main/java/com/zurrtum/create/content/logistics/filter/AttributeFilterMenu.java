@@ -11,7 +11,7 @@ import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.inventory.ClickType;
+import net.minecraft.world.inventory.ContainerInput;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -72,7 +72,7 @@ public class AttributeFilterMenu extends AbstractFilterMenu {
     }
 
     @Override
-    public void clicked(int slotId, int dragType, ClickType clickTypeIn, Player player) {
+    public void clicked(int slotId, int dragType, ContainerInput clickTypeIn, Player player) {
         if (slotId == 37)
             return;
         super.clicked(slotId, dragType, clickTypeIn, player);

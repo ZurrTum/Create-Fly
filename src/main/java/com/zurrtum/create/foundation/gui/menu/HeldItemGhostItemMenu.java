@@ -2,7 +2,7 @@ package com.zurrtum.create.foundation.gui.menu;
 
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.inventory.ClickType;
+import net.minecraft.world.inventory.ContainerInput;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 
@@ -15,8 +15,8 @@ public abstract class HeldItemGhostItemMenu extends GhostItemMenu<ItemStack> {
     }
 
     @Override
-    public void clicked(int slotId, int dragType, ClickType clickTypeIn, Player player) {
-        if (slotId == playerInventory.getSelectedSlot() && clickTypeIn != ClickType.THROW)
+    public void clicked(int slotId, int dragType, ContainerInput clickTypeIn, Player player) {
+        if (slotId == playerInventory.getSelectedSlot() && clickTypeIn != ContainerInput.THROW)
             return;
         super.clicked(slotId, dragType, clickTypeIn, player);
     }

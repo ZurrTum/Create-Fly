@@ -6,7 +6,7 @@ import com.zurrtum.create.foundation.blockEntity.behaviour.animatedContainer.Ani
 import com.zurrtum.create.foundation.gui.menu.MenuBase;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.inventory.ClickType;
+import net.minecraft.world.inventory.ContainerInput;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 
@@ -72,12 +72,12 @@ public class ToolboxMenu extends MenuBase<ToolboxBlockEntity> {
     }
 
     @Override
-    public void clicked(int index, int flags, ClickType type, Player player) {
+    public void clicked(int index, int flags, ContainerInput type, Player player) {
         if (index >= 0 && index < contentHolder.inventory.getContainerSize()) {
             ItemStack itemInClickedSlot = getSlot(index).getItem();
             ItemStack carried = getCarried();
 
-            if (type == ClickType.PICKUP && !carried.isEmpty() && !itemInClickedSlot.isEmpty() && ToolboxInventory.canItemsShareCompartment(itemInClickedSlot,
+            if (type == ContainerInput.PICKUP && !carried.isEmpty() && !itemInClickedSlot.isEmpty() && ToolboxInventory.canItemsShareCompartment(itemInClickedSlot,
                 carried
             )) {
                 int subIndex = index % STACKS_PER_COMPARTMENT;
@@ -87,7 +87,7 @@ public class ToolboxMenu extends MenuBase<ToolboxBlockEntity> {
                 }
             }
 
-            if (type == ClickType.PICKUP && carried.isEmpty() && settle(itemInClickedSlot, index).isEmpty() && !player.level().isClientSide()) {
+            if (type == ContainerInput.PICKUP && carried.isEmpty() && settle(itemInClickedSlot, index).isEmpty() && !player.level().isClientSide()) {
                 contentHolder.inventory.filters.set(index / STACKS_PER_COMPARTMENT, ItemStack.EMPTY);
                 contentHolder.sendData();
             }
