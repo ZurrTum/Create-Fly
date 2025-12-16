@@ -4,12 +4,12 @@ import com.zurrtum.create.client.flywheel.api.visualization.VisualizationLevel;
 import it.unimi.dsi.fastutil.objects.Object2ShortMap;
 import it.unimi.dsi.fastutil.objects.Object2ShortOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
-import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.core.*;
 import net.minecraft.core.particles.ExplosionParticleInfo;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.util.LightCoordsUtil;
 import net.minecraft.util.random.WeightedList;
 import net.minecraft.world.TickRateManager;
 import net.minecraft.world.attribute.EnvironmentAttributeSystem;
@@ -152,9 +152,9 @@ public class VirtualRenderWorld extends Level implements VisualizationLevel {
         var selfBrightness = super.getBrightness(lightType, blockPos);
 
         if (lightType == LightLayer.SKY) {
-            return Math.max(selfBrightness, LightTexture.sky(externalPackedLight));
+            return Math.max(selfBrightness, LightCoordsUtil.sky(externalPackedLight));
         } else {
-            return Math.max(selfBrightness, LightTexture.block(externalPackedLight));
+            return Math.max(selfBrightness, LightCoordsUtil.block(externalPackedLight));
         }
     }
 

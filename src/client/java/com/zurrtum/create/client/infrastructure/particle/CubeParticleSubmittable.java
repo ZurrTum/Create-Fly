@@ -5,7 +5,6 @@ import com.mojang.blaze3d.systems.RenderPass;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.*;
 import net.minecraft.client.particle.SingleQuadParticle;
-import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.feature.ParticleFeatureRenderer;
 import net.minecraft.client.renderer.state.CameraRenderState;
@@ -13,6 +12,7 @@ import net.minecraft.client.renderer.state.ParticleGroupRenderState;
 import net.minecraft.client.renderer.state.QuadParticleRenderState;
 import net.minecraft.client.renderer.texture.AbstractTexture;
 import net.minecraft.client.renderer.texture.TextureManager;
+import net.minecraft.util.LightCoordsUtil;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
@@ -78,7 +78,7 @@ public class CubeParticleSubmittable implements SubmitNodeCollector.ParticleGrou
     }
 
     private void drawFace(VertexConsumer buffer, float x, float y, float z, float scale, int color) {
-        int light = LightTexture.FULL_BRIGHT;
+        int light = LightCoordsUtil.FULL_BRIGHT;
         Vector3f vec = new Vector3f();
         for (int i = 0; i < 6; i++) {
             // 6 faces to a cube

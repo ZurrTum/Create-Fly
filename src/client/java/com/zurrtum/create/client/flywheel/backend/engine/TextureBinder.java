@@ -34,7 +34,7 @@ public class TextureBinder {
         GameRenderer gameRenderer = Minecraft.getInstance().gameRenderer;
         GpuSampler sampler = RenderSystem.getSamplerCache().getClampToEdge(FilterMode.LINEAR);
         setupTexture(Samplers.OVERLAY, gameRenderer.overlayTexture().getTextureView(), sampler);
-        setupTexture(Samplers.LIGHT, gameRenderer.lightTexture().getTextureView(), sampler);
+        setupTexture(Samplers.LIGHT, gameRenderer.lightmap(), sampler);
     }
 
     private static void setupTexture(GlTextureUnit unit, GpuTextureView textureView, GpuSampler sampler) {

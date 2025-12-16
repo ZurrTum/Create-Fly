@@ -6,9 +6,9 @@ import net.minecraft.client.Camera;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.particle.SimpleAnimatedParticle;
 import net.minecraft.client.particle.SpriteSet;
-import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.state.QuadParticleRenderState;
 import net.minecraft.util.ARGB;
+import net.minecraft.util.LightCoordsUtil;
 import net.minecraft.util.Mth;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Quaternionf;
@@ -57,7 +57,7 @@ public class CustomRotationParticle extends SimpleAnimatedParticle {
             getV0(),
             getV1(),
             ARGB.colorFromFloat(alpha, rCol, gCol, bCol),
-            ShadersModHelper.isShaderPackInUse() ? LightTexture.pack(12, 15) : getLightColor(partialTicks)
+            ShadersModHelper.isShaderPackInUse() ? LightCoordsUtil.pack(12, 15) : getLightCoords(partialTicks)
         );
     }
 }

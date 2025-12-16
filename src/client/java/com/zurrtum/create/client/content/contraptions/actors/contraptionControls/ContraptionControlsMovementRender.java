@@ -21,7 +21,6 @@ import com.zurrtum.create.content.contraptions.actors.contraptionControls.Contra
 import com.zurrtum.create.content.contraptions.behaviour.MovementContext;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.renderer.LevelRenderer;
-import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
@@ -29,6 +28,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.FormattedCharSequence;
+import net.minecraft.util.LightCoordsUtil;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
@@ -65,7 +65,7 @@ public class ContraptionControlsMovementRender implements MovementRenderBehaviou
         state.layer = RenderTypes.solidMovingBlock();
         Direction facing = blockState.getValue(ContraptionControlsBlock.FACING);
         state.button = CachedBuffers.partialFacing(AllPartialModels.CONTRAPTION_CONTROLS_BUTTON, blockState, facing.getOpposite());
-        state.light = LevelRenderer.getLightColor(renderWorld, pos);
+        state.light = LevelRenderer.getLightCoords(renderWorld, pos);
         state.world = context.world;
         state.worldMatrix4f = worldMatrix4f;
         String text = efs.currentShortName;
@@ -143,9 +143,9 @@ public class ContraptionControlsMovementRender implements MovementRenderBehaviou
                     matrices.pushPose();
                     matrices.translate(0, 0.15f, offsetZ);
                     matrices.scale(textScale, -textScale, textScale);
-                    queue.submitText(matrices, textX, textY, text, false, Font.DisplayMode.NORMAL, LightTexture.FULL_BRIGHT, color, 0, 0);
+                    queue.submitText(matrices, textX, textY, text, false, Font.DisplayMode.NORMAL, LightCoordsUtil.FULL_BRIGHT, color, 0, 0);
                     matrices.translate(0.5f, 0.5f, -0.0625f);
-                    queue.submitText(matrices, textX, textY, text, false, Font.DisplayMode.NORMAL, LightTexture.FULL_BRIGHT, shadowColor, 0, 0);
+                    queue.submitText(matrices, textX, textY, text, false, Font.DisplayMode.NORMAL, LightCoordsUtil.FULL_BRIGHT, shadowColor, 0, 0);
                     matrices.popPose();
                 }
                 if (description != null) {
@@ -159,7 +159,7 @@ public class ContraptionControlsMovementRender implements MovementRenderBehaviou
                         description,
                         false,
                         Font.DisplayMode.NORMAL,
-                        LightTexture.FULL_BRIGHT,
+                        LightCoordsUtil.FULL_BRIGHT,
                         color,
                         0,
                         0

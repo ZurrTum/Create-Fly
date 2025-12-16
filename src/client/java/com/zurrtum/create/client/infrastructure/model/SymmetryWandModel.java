@@ -7,7 +7,6 @@ import com.mojang.serialization.MapCodec;
 import com.zurrtum.create.client.catnip.animation.AnimationTickHolder;
 import com.zurrtum.create.client.foundation.render.CreateRenderTypes;
 import net.minecraft.client.multiplayer.ClientLevel;
-import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.Sheets;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.block.model.BakedQuad;
@@ -24,6 +23,7 @@ import net.minecraft.client.resources.model.BlockModelRotation;
 import net.minecraft.client.resources.model.ModelBaker;
 import net.minecraft.client.resources.model.ResolvedModel;
 import net.minecraft.resources.Identifier;
+import net.minecraft.util.LightCoordsUtil;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.ItemOwner;
 import net.minecraft.world.item.ItemDisplayContext;
@@ -117,7 +117,7 @@ public class SymmetryWandModel implements ItemModel, SpecialModelRenderer<Object
         boolean glint,
         int i
     ) {
-        int maxLight = LightTexture.FULL_BRIGHT;
+        int maxLight = LightCoordsUtil.FULL_BRIGHT;
 
         renderItem(displayContext, matrices, queue, light, overlay, item, blockLayer);
         renderItem(displayContext, matrices, queue, maxLight, overlay, core, itemLayer);

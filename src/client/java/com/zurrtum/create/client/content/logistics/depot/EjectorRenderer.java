@@ -18,7 +18,6 @@ import com.zurrtum.create.content.logistics.depot.DepotBehaviour;
 import com.zurrtum.create.content.logistics.depot.EjectorBlock;
 import com.zurrtum.create.content.logistics.depot.EjectorBlockEntity;
 import net.minecraft.client.renderer.LevelRenderer;
-import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
@@ -26,6 +25,7 @@ import net.minecraft.client.renderer.item.ItemModelResolver;
 import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.state.CameraRenderState;
+import net.minecraft.util.LightCoordsUtil;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
@@ -72,7 +72,7 @@ public class EjectorRenderer extends ShaftRenderer<EjectorBlockEntity, EjectorRe
         if (state.support && (state.incoming != null || state.outputs != null)) {
             state.blockPos = be.getBlockPos();
             state.blockEntityType = be.getType();
-            state.lightCoords = world != null ? LevelRenderer.getLightColor(world, state.blockPos) : LightTexture.FULL_BRIGHT;
+            state.lightCoords = world != null ? LevelRenderer.getLightCoords(world, state.blockPos) : LightCoordsUtil.FULL_BRIGHT;
             state.lidAngle = Mth.DEG_TO_RAD * (be.getLidProgress(tickProgress) * -70);
             state.yRot = Mth.DEG_TO_RAD * (180 + AngleHelper.horizontalAngle(blockState.getValue(EjectorBlock.HORIZONTAL_FACING)));
         }

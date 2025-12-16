@@ -59,7 +59,7 @@ public class StabilizedBearingMovementRenderBehaviour implements MovementRenderB
         float angle = getCounterRotationAngle(context, facing, AnimationTickHolder.getPartialTicks()) * facing.getAxisDirection().getStep();
         Quaternionf rotation = Axis.of(facing.step()).rotationDegrees(angle);
         state.orientation = rotation.mul(orientation);
-        state.light = LevelRenderer.getLightColor(renderWorld, context.localPos);
+        state.light = LevelRenderer.getLightCoords(renderWorld, context.localPos);
         state.world = context.world;
         state.worldMatrix4f = worldMatrix4f;
         return state;

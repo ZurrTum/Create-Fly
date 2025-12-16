@@ -347,6 +347,6 @@ public class ShadeSeparatingSuperByteBuffer implements SuperByteBuffer {
 
     private static int getLight(BlockAndTintGetter world, Vector4f lightPos) {
         BlockPos pos = BlockPos.containing(lightPos.x(), lightPos.y(), lightPos.z());
-        return WORLD_LIGHT_CACHE.computeIfAbsent(pos.asLong(), $ -> LevelRenderer.getLightColor(world, pos));
+        return WORLD_LIGHT_CACHE.computeIfAbsent(pos.asLong(), $ -> LevelRenderer.getLightCoords(world, pos));
     }
 }

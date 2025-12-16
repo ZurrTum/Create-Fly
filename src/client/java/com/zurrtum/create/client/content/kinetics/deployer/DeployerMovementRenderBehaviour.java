@@ -84,7 +84,7 @@ public class DeployerMovementRenderBehaviour implements MovementRenderBehaviour 
         state.angle = (time * speed) % 360;
         state.yRot = axis == Direction.Axis.Z ? Mth.DEG_TO_RAD * 90 : 0;
         state.zRot = axis.isHorizontal() ? Mth.DEG_TO_RAD * 90 : 0;
-        state.light = LevelRenderer.getLightColor(renderWorld, context.localPos);
+        state.light = LevelRenderer.getLightCoords(renderWorld, context.localPos);
         state.world = context.world;
         state.worldMatrix4f = worldMatrix4f;
         if (!context.disabled) {

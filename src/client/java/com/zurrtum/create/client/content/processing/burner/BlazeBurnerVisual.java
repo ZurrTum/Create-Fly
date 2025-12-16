@@ -21,13 +21,12 @@ import com.zurrtum.create.client.foundation.render.AllInstanceTypes;
 import com.zurrtum.create.content.processing.burner.BlazeBurnerBlock;
 import com.zurrtum.create.content.processing.burner.BlazeBurnerBlock.HeatLevel;
 import com.zurrtum.create.content.processing.burner.BlazeBurnerBlockEntity;
+import net.minecraft.core.Direction;
+import net.minecraft.util.LightCoordsUtil;
+import net.minecraft.util.Mth;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Consumer;
-
-import net.minecraft.client.renderer.LightTexture;
-import net.minecraft.core.Direction;
-import net.minecraft.util.Mth;
 
 public class BlazeBurnerVisual extends AbstractBlockEntityVisual<BlazeBurnerBlockEntity> implements SimpleDynamicVisual, SimpleTickableVisual {
 
@@ -61,7 +60,7 @@ public class BlazeBurnerVisual extends AbstractBlockEntityVisual<BlazeBurnerBloc
 
         head = instancerProvider().instancer(InstanceTypes.TRANSFORMED, Models.partial(blazeModel)).createInstance();
 
-        head.light(LightTexture.FULL_BRIGHT);
+        head.light(LightCoordsUtil.FULL_BRIGHT);
 
         animate(partialTick);
     }
@@ -102,8 +101,8 @@ public class BlazeBurnerVisual extends AbstractBlockEntityVisual<BlazeBurnerBloc
                 smallRods = instancerProvider().instancer(InstanceTypes.TRANSFORMED, Models.partial(rodsModel)).createInstance();
                 largeRods = instancerProvider().instancer(InstanceTypes.TRANSFORMED, Models.partial(rodsModel2)).createInstance();
 
-                smallRods.light(LightTexture.FULL_BRIGHT);
-                largeRods.light(LightTexture.FULL_BRIGHT);
+                smallRods.light(LightCoordsUtil.FULL_BRIGHT);
+                largeRods.light(LightCoordsUtil.FULL_BRIGHT);
 
             } else if (!needsRods && hasRods) {
                 if (smallRods != null)
@@ -130,7 +129,7 @@ public class BlazeBurnerVisual extends AbstractBlockEntityVisual<BlazeBurnerBloc
                 InstanceTypes.TRANSFORMED,
                 Models.partial(isInert ? AllPartialModels.BLAZE_GOGGLES_SMALL : AllPartialModels.BLAZE_GOGGLES)
             ).createInstance();
-            goggles.light(LightTexture.FULL_BRIGHT);
+            goggles.light(LightCoordsUtil.FULL_BRIGHT);
         } else if (!blockEntity.goggles && goggles != null) {
             goggles.delete();
             goggles = null;
@@ -142,7 +141,7 @@ public class BlazeBurnerVisual extends AbstractBlockEntityVisual<BlazeBurnerBloc
                 InstanceTypes.TRANSFORMED,
                 Models.partial(blockEntity.stockKeeper ? AllPartialModels.LOGISTICS_HAT : AllPartialModels.TRAIN_HAT)
             ).createInstance();
-            hat.light(LightTexture.FULL_BRIGHT);
+            hat.light(LightCoordsUtil.FULL_BRIGHT);
         } else if (!hatPresent && hat != null) {
             hat.delete();
             hat = null;
@@ -167,7 +166,7 @@ public class BlazeBurnerVisual extends AbstractBlockEntityVisual<BlazeBurnerBloc
 
         if (hat != null) {
             hat.setIdentityTransform().translate(getVisualPosition()).translateY(headY).translateY(0.75f);
-            hat.rotateCentered(horizontalAngle + Mth.PI, Direction.UP).translate(0.5f, 0, 0.5f).light(LightTexture.FULL_BRIGHT);
+            hat.rotateCentered(horizontalAngle + Mth.PI, Direction.UP).translate(0.5f, 0, 0.5f).light(LightCoordsUtil.FULL_BRIGHT);
 
             hat.setChanged();
         }
@@ -188,7 +187,7 @@ public class BlazeBurnerVisual extends AbstractBlockEntityVisual<BlazeBurnerBloc
     private void setupFlameInstance() {
         flame = instancerProvider().instancer(AllInstanceTypes.SCROLLING, Models.partial(AllPartialModels.BLAZE_BURNER_FLAME)).createInstance();
 
-        flame.position(getVisualPosition()).light(LightTexture.FULL_BRIGHT);
+        flame.position(getVisualPosition()).light(LightCoordsUtil.FULL_BRIGHT);
 
         SpriteShiftEntry spriteShift = heatLevel == BlazeBurnerBlock.HeatLevel.SEETHING ? AllSpriteShifts.SUPER_BURNER_FLAME : AllSpriteShifts.BURNER_FLAME;
 

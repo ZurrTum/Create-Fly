@@ -2,7 +2,7 @@ package com.zurrtum.create.client.foundation.render;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
-import net.minecraft.client.renderer.LightTexture;
+import net.minecraft.client.renderer.Lightmap;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.rendertype.RenderType;
@@ -10,6 +10,7 @@ import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.Identifier;
+import net.minecraft.util.LightCoordsUtil;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.RenderShape;
@@ -66,7 +67,7 @@ public class ShadowRenderHelper {
             if (blockstate.isCollisionShapeFullBlock(world, blockpos)) {
                 VoxelShape voxelshape = blockstate.getShape(world, pos.below());
                 if (!voxelshape.isEmpty()) {
-                    float brightness = LightTexture.getBrightness(world.dimensionType(), world.getMaxLocalRawBrightness(pos));
+                    float brightness = Lightmap.getBrightness(world.dimensionType(), world.getMaxLocalRawBrightness(pos));
                     float f = (float) ((opacity - (y - pos.getY()) / 2.0D) * 0.5D * brightness);
                     if (f >= 0.0F) {
                         if (f > 1.0F) {
@@ -100,7 +101,7 @@ public class ShadowRenderHelper {
 
     private static void shadowVertex(PoseStack.Pose entry, VertexConsumer builder, float alpha, float x, float y, float z, float u, float v) {
         builder.addVertex(entry.pose(), x, y, z).setColor(1.0F, 1.0F, 1.0F, alpha).setUv(u, v).setOverlay(OverlayTexture.NO_OVERLAY)
-            .setLight(LightTexture.FULL_BRIGHT).setNormal(entry, 0.0F, 1.0F, 0.0F);
+            .setLight(LightCoordsUtil.FULL_BRIGHT).setNormal(entry, 0.0F, 1.0F, 0.0F);
     }
 
     public record ShadowRenderState(float opacity, float radius, float negativeRadius) implements SubmitNodeCollector.CustomGeometryRenderer {

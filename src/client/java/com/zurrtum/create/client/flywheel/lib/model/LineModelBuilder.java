@@ -12,8 +12,8 @@ import com.zurrtum.create.client.flywheel.lib.material.StandardMaterialShaders;
 import com.zurrtum.create.client.flywheel.lib.memory.MemoryBlock;
 import com.zurrtum.create.client.flywheel.lib.vertex.FullVertexView;
 import com.zurrtum.create.client.flywheel.lib.vertex.VertexView;
-import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.texture.OverlayTexture;
+import net.minecraft.util.LightCoordsUtil;
 import org.jetbrains.annotations.UnknownNullability;
 import org.joml.Vector4fc;
 import org.lwjgl.system.MemoryUtil;
@@ -87,7 +87,7 @@ public final class LineModelBuilder {
             vertexView.u(vertexCount + i, 0);
             vertexView.v(vertexCount + i, 0);
             vertexView.overlay(vertexCount + i, OverlayTexture.NO_OVERLAY);
-            vertexView.light(vertexCount + i, LightTexture.FULL_BRIGHT);
+            vertexView.light(vertexCount + i, LightCoordsUtil.FULL_BRIGHT);
             vertexView.normalX(vertexCount + i, normalX);
             vertexView.normalY(vertexCount + i, normalY);
             vertexView.normalZ(vertexCount + i, normalZ);

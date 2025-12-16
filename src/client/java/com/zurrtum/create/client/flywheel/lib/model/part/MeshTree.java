@@ -8,18 +8,17 @@ import com.zurrtum.create.client.flywheel.lib.model.SimpleQuadMesh;
 import com.zurrtum.create.client.flywheel.lib.util.RendererReloadCache;
 import com.zurrtum.create.client.flywheel.lib.vertex.PosTexNormalVertexView;
 import com.zurrtum.create.client.flywheel.lib.vertex.VertexView;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.Arrays;
-import java.util.NoSuchElementException;
-
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.geom.EntityModelSet;
 import net.minecraft.client.model.geom.ModelLayerLocation;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.model.geom.PartPose;
-import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.texture.OverlayTexture;
+import net.minecraft.util.LightCoordsUtil;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.Arrays;
+import java.util.NoSuchElementException;
 
 public final class MeshTree {
     private static final ThreadLocal<ThreadLocalObjects> THREAD_LOCAL_OBJECTS = ThreadLocal.withInitial(ThreadLocalObjects::new);
@@ -71,7 +70,14 @@ public final class MeshTree {
         }
 
         VertexWriter vertexWriter = objects.vertexWriter;
-        FlwLibLink.INSTANCE.compileModelPart(modelPart, IDENTITY_POSE, vertexWriter, LightTexture.FULL_BRIGHT, OverlayTexture.NO_OVERLAY, 0xFFFFFFFF);
+        FlwLibLink.INSTANCE.compileModelPart(
+            modelPart,
+            IDENTITY_POSE,
+            vertexWriter,
+            LightCoordsUtil.FULL_BRIGHT,
+            OverlayTexture.NO_OVERLAY,
+            0xFFFFFFFF
+        );
         MemoryBlock data = vertexWriter.copyDataAndReset();
 
         VertexView vertexView = new PosTexNormalVertexView();

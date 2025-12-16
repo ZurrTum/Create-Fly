@@ -13,7 +13,6 @@ import com.zurrtum.create.client.model.ExtendedUnbakedGeometry;
 import com.zurrtum.create.client.model.NeoForgeModelProperties;
 import com.zurrtum.create.client.model.StandardModelParameters;
 import joptsimple.internal.Strings;
-import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.block.model.TextureSlots;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
@@ -23,6 +22,7 @@ import net.minecraft.client.resources.model.ModelState;
 import net.minecraft.client.resources.model.QuadCollection;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.Identifier;
+import net.minecraft.util.LightCoordsUtil;
 import net.minecraft.util.Mth;
 import net.minecraft.util.context.ContextMap;
 import net.minecraft.world.phys.Vec2;
@@ -346,7 +346,7 @@ public class ObjGeometry implements ExtendedUnbakedGeometry {
         int uv2 = 0;
         if (emissiveAmbient) {
             int fakeLight = (int) ((ambientColor.x() + ambientColor.y() + ambientColor.z()) * 15 / 3.0f);
-            uv2 = LightTexture.pack(fakeLight, fakeLight);
+            uv2 = LightCoordsUtil.pack(fakeLight, fakeLight);
             quadBaker.setShade(fakeLight == 0 && shadeQuads);
         } else {
             quadBaker.setShade(shadeQuads);

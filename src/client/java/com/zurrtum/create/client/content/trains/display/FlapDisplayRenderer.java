@@ -19,16 +19,16 @@ import net.minecraft.client.gui.Font.DisplayMode;
 import net.minecraft.client.gui.GlyphSource;
 import net.minecraft.client.gui.font.TextRenderable;
 import net.minecraft.client.gui.font.glyphs.BakedGlyph;
-import net.minecraft.client.renderer.LightTexture;
-import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.blockentity.state.BlockEntityRenderState;
 import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
+import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.state.CameraRenderState;
 import net.minecraft.network.chat.Style;
 import net.minecraft.network.chat.TextColor;
 import net.minecraft.util.FormattedCharSink;
+import net.minecraft.util.LightCoordsUtil;
 import net.minecraft.util.Mth;
 import net.minecraft.util.StringDecomposer;
 import net.minecraft.world.item.DyeColor;
@@ -320,7 +320,7 @@ public class FlapDisplayRenderer extends KineticBlockEntityRenderer<FlapDisplayB
         public void render(PoseStack.Pose matricesEntry, VertexConsumer vertexConsumer) {
             Matrix4f pose = matricesEntry.pose();
             for (TextRenderable glyph : glowingText) {
-                glyph.render(pose, vertexConsumer, LightTexture.FULL_BRIGHT, true);
+                glyph.render(pose, vertexConsumer, LightCoordsUtil.FULL_BRIGHT, true);
             }
             for (TextRenderable glyph : normalText) {
                 glyph.render(pose, vertexConsumer, light, true);

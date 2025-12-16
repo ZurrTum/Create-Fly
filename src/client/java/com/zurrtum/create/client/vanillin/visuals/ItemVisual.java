@@ -13,10 +13,10 @@ import com.zurrtum.create.client.flywheel.lib.visual.util.InstanceRecycler;
 import com.zurrtum.create.client.vanillin.item.ItemModels;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
-import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.item.ItemModel;
 import net.minecraft.client.renderer.item.ItemModelResolver;
 import net.minecraft.client.renderer.item.ItemStackRenderState;
+import net.minecraft.util.LightCoordsUtil;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.item.ItemEntity;
@@ -117,7 +117,7 @@ public class ItemVisual extends AbstractEntityVisual<ItemEntity> implements Simp
         var random = RANDOM.get();
         random.setSeed(seed);
 
-        int light = LightTexture.pack(
+        int light = LightCoordsUtil.pack(
             level.getBrightness(LightLayer.BLOCK, entity.blockPosition()),
             level.getBrightness(LightLayer.SKY, entity.blockPosition())
         );

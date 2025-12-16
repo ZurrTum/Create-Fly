@@ -55,8 +55,8 @@ public class FluidParticle extends SingleQuadParticle {
     }
 
     @Override
-    protected int getLightColor(float p_189214_1_) {
-        int brightnessForRender = super.getLightColor(p_189214_1_);
+    protected int getLightCoords(float p_189214_1_) {
+        int brightnessForRender = super.getLightCoords(p_189214_1_);
         int skyLight = brightnessForRender >> 20;
         int blockLight = (brightnessForRender >> 4) & 0xf;
         blockLight = Math.max(blockLight, fluid.defaultFluidState().createLegacyBlock().getLightEmission());

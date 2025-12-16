@@ -21,7 +21,6 @@ import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.Font.DisplayMode;
 import net.minecraft.client.gui.font.TextRenderable;
 import net.minecraft.client.gui.font.glyphs.BakedGlyph;
-import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
@@ -33,6 +32,7 @@ import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.state.CameraRenderState;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Style;
+import net.minecraft.util.LightCoordsUtil;
 import net.minecraft.util.Mth;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.phys.Vec3;
@@ -220,7 +220,7 @@ public class NixieTubeRenderer implements BlockEntityRenderer<NixieTubeBlockEnti
     }
 
     public static void drawInWorldString(Font fontRenderer, PoseStack ms, MultiBufferSource buffer, String c, int color) {
-        fontRenderer.drawInBatch(c, 0, 0, color, false, ms.last().pose(), buffer, DisplayMode.NORMAL, 0, LightTexture.FULL_BRIGHT);
+        fontRenderer.drawInBatch(c, 0, 0, color, false, ms.last().pose(), buffer, DisplayMode.NORMAL, 0, LightCoordsUtil.FULL_BRIGHT);
     }
 
     @Override
@@ -288,14 +288,14 @@ public class NixieTubeRenderer implements BlockEntityRenderer<NixieTubeBlockEnti
         public void render(PoseStack.Pose matricesEntry, VertexConsumer vertexConsumer) {
             Matrix4f pose = matricesEntry.pose();
             pose.translate(x, y, 0);
-            bright.render(pose, vertexConsumer, LightTexture.FULL_BRIGHT, false);
+            bright.render(pose, vertexConsumer, LightCoordsUtil.FULL_BRIGHT, false);
             pose.translate(0.5f, 0.5f, -0.0625f);
-            dark.render(pose, vertexConsumer, LightTexture.FULL_BRIGHT, false);
+            dark.render(pose, vertexConsumer, LightCoordsUtil.FULL_BRIGHT, false);
             pose.scale(-1, 1, 1);
             pose.translate(0.5f + x + x, -0.5f, 0.0625f);
-            dark.render(pose, vertexConsumer, LightTexture.FULL_BRIGHT, false);
+            dark.render(pose, vertexConsumer, LightCoordsUtil.FULL_BRIGHT, false);
             pose.translate(-0.5f, 0.5f, -0.0625f);
-            mix.render(pose, vertexConsumer, LightTexture.FULL_BRIGHT, false);
+            mix.render(pose, vertexConsumer, LightCoordsUtil.FULL_BRIGHT, false);
         }
     }
 
@@ -372,15 +372,15 @@ public class NixieTubeRenderer implements BlockEntityRenderer<NixieTubeBlockEnti
         }
 
         public void renderCube(PoseStack.Pose matricesEntry, VertexConsumer vertexConsumer) {
-            cube.light(LightTexture.FULL_BRIGHT).disableDiffuse().scale(cubeX, cubeY, 1).renderInto(matricesEntry, vertexConsumer);
+            cube.light(LightCoordsUtil.FULL_BRIGHT).disableDiffuse().scale(cubeX, cubeY, 1).renderInto(matricesEntry, vertexConsumer);
         }
 
         public void renderAdditive(PoseStack.Pose matricesEntry, VertexConsumer vertexConsumer, int color) {
             if (glow != null) {
-                glow.light(LightTexture.FULL_BRIGHT).disableDiffuse().scale(glowX, glowY, 2).color(color, color, color, color)
+                glow.light(LightCoordsUtil.FULL_BRIGHT).disableDiffuse().scale(glowX, glowY, 2).color(color, color, color, color)
                     .renderInto(matricesEntry, vertexConsumer);
             }
-            signal.light(LightTexture.FULL_BRIGHT).disableDiffuse().scale(1.0625f).color(color, color, color, color)
+            signal.light(LightCoordsUtil.FULL_BRIGHT).disableDiffuse().scale(1.0625f).color(color, color, color, color)
                 .renderInto(matricesEntry, vertexConsumer);
         }
 

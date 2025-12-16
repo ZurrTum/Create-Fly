@@ -55,7 +55,7 @@ public class CouplingRenderer {
         if (carts.getFirst() == null || carts.getSecond() == null)
             return;
 
-        Couple<Integer> lightValues = carts.map(c -> LevelRenderer.getLightColor(world, BlockPos.containing(c.getBoundingBox().getCenter())));
+        Couple<Integer> lightValues = carts.map(c -> LevelRenderer.getLightCoords(world, BlockPos.containing(c.getBoundingBox().getCenter())));
 
         Vec3 center = carts.getFirst().position().add(carts.getSecond().position()).scale(.5f);
 

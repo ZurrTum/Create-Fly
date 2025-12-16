@@ -15,11 +15,11 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.geom.ModelLayerLocation;
 import net.minecraft.client.model.geom.ModelLayers;
 import net.minecraft.client.renderer.LevelRenderer;
-import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.Sheets;
 import net.minecraft.client.renderer.blockentity.ChestRenderer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.SectionPos;
+import net.minecraft.util.LightCoordsUtil;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.block.AbstractChestBlock;
 import net.minecraft.world.level.block.Block;
@@ -201,23 +201,23 @@ public class ChestVisual<T extends BlockEntity & LidBlockEntity> extends Abstrac
     private class BrightnessCombiner implements DoubleBlockCombiner.Combiner<BlockEntity, Integer> {
         @Override
         public Integer acceptDouble(BlockEntity first, BlockEntity second) {
-            int firstLight = LevelRenderer.getLightColor(first.getLevel(), first.getBlockPos());
-            int secondLight = LevelRenderer.getLightColor(second.getLevel(), second.getBlockPos());
-            int firstBlockLight = LightTexture.block(firstLight);
-            int secondBlockLight = LightTexture.block(secondLight);
-            int firstSkyLight = LightTexture.sky(firstLight);
-            int secondSkyLight = LightTexture.sky(secondLight);
-            return LightTexture.pack(Math.max(firstBlockLight, secondBlockLight), Math.max(firstSkyLight, secondSkyLight));
+            int firstLight = LevelRenderer.getLightCoords(first.getLevel(), first.getBlockPos());
+            int secondLight = LevelRenderer.getLightCoords(second.getLevel(), second.getBlockPos());
+            int firstBlockLight = LightCoordsUtil.block(firstLight);
+            int secondBlockLight = LightCoordsUtil.block(secondLight);
+            int firstSkyLight = LightCoordsUtil.sky(firstLight);
+            int secondSkyLight = LightCoordsUtil.sky(secondLight);
+            return LightCoordsUtil.pack(Math.max(firstBlockLight, secondBlockLight), Math.max(firstSkyLight, secondSkyLight));
         }
 
         @Override
         public Integer acceptSingle(BlockEntity single) {
-            return LevelRenderer.getLightColor(single.getLevel(), single.getBlockPos());
+            return LevelRenderer.getLightCoords(single.getLevel(), single.getBlockPos());
         }
 
         @Override
         public Integer acceptNone() {
-            return LevelRenderer.getLightColor(level, pos);
+            return LevelRenderer.getLightCoords(level, pos);
         }
     }
 }

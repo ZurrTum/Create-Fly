@@ -11,7 +11,6 @@ import com.zurrtum.create.client.catnip.render.FluidRenderHelper;
 import com.zurrtum.create.client.flywheel.lib.model.baked.SinglePosVirtualBlockGetter;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.render.pip.PictureInPictureRenderer;
-import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.Sheets;
 import net.minecraft.client.renderer.block.BlockRenderDispatcher;
@@ -19,6 +18,7 @@ import net.minecraft.client.renderer.block.model.BlockModelPart;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.component.DataComponentPatch;
+import net.minecraft.util.LightCoordsUtil;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.block.BaseFireBlock;
 import net.minecraft.world.level.block.Blocks;
@@ -88,7 +88,7 @@ public class FanRenderer extends PictureInPictureRenderer<FanRenderState> {
                 1,
                 bufferSource,
                 matrices,
-                LightTexture.FULL_BRIGHT,
+                LightCoordsUtil.FULL_BRIGHT,
                 false,
                 true
             );

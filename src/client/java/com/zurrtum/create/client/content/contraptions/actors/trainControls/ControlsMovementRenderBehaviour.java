@@ -68,7 +68,7 @@ public class ControlsMovementRenderBehaviour implements MovementRenderBehaviour 
         state.cover = CachedBuffers.partial(AllPartialModels.TRAIN_CONTROLS_COVER, blockState);
         state.lever = CachedBuffers.partial(AllPartialModels.TRAIN_CONTROLS_LEVER, blockState);
         state.yRot = Mth.DEG_TO_RAD * (180 + AngleHelper.horizontalAngle(facing));
-        state.light = LevelRenderer.getLightColor(renderWorld, context.localPos);
+        state.light = LevelRenderer.getLightCoords(renderWorld, context.localPos);
         state.world = context.world;
         state.worldMatrix4f = worldMatrix4f;
         float equipAnimation = angles.equipAnimation.getValue(pt);

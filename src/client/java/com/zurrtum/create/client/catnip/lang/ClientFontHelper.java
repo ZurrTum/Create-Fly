@@ -1,18 +1,17 @@
 package com.zurrtum.create.client.catnip.lang;
 
-import org.joml.Matrix4f;
 import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.util.LightCoordsUtil;
+import org.joml.Matrix4f;
 
 import java.text.BreakIterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
-
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.renderer.LightTexture;
-import net.minecraft.client.renderer.MultiBufferSource;
 
 public class ClientFontHelper {
 
@@ -95,6 +94,6 @@ public class ClientFontHelper {
     }
 
     private static void draw(MultiBufferSource buffer, Font font, String text, int x, int y, int color, Matrix4f matrix4f) {
-        font.drawInBatch(text, x, y, color, false, matrix4f, buffer, Font.DisplayMode.NORMAL, 0, LightTexture.FULL_BRIGHT);
+        font.drawInBatch(text, x, y, color, false, matrix4f, buffer, Font.DisplayMode.NORMAL, 0, LightCoordsUtil.FULL_BRIGHT);
     }
 }

@@ -136,7 +136,7 @@ public class PonderWorldParticles {
             GpuTextureView gpuTextureView = RenderSystem.outputColorTextureOverride;
             GpuTextureView gpuTextureView2 = RenderSystem.outputDepthTextureOverride;
             Minecraft mc = Minecraft.getInstance();
-            GpuTextureView lightTextureView = mc.gameRenderer.lightTexture().getTextureView();
+            GpuTextureView lightTextureView = mc.gameRenderer.lightmap();
             GpuSampler sampler = RenderSystem.getSamplerCache().getClampToEdge(FilterMode.LINEAR);
             TextureManager textureManager = mc.getTextureManager();
             for (SubmitNodeCollector.ParticleGroupRenderer layeredCustom : commands) {

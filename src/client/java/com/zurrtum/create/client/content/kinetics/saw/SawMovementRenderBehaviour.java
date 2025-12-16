@@ -79,7 +79,7 @@ public class SawMovementRenderBehaviour implements MovementRenderBehaviour {
         }
         state.yRot = Mth.DEG_TO_RAD * AngleHelper.horizontalAngle(facing);
         state.xRot = Mth.DEG_TO_RAD * AngleHelper.verticalAngle(facing);
-        state.light = LevelRenderer.getLightColor(renderWorld, context.localPos);
+        state.light = LevelRenderer.getLightCoords(renderWorld, context.localPos);
         state.world = context.world;
         state.worldMatrix4f = worldMatrix4f;
         if (!VisualizationManager.supportsVisualization(context.world)) {

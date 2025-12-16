@@ -20,7 +20,6 @@ import net.minecraft.client.gui.render.TextureSetup;
 import net.minecraft.client.gui.render.pip.PictureInPictureRenderer;
 import net.minecraft.client.gui.render.state.BlitRenderState;
 import net.minecraft.client.gui.render.state.GuiRenderState;
-import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.renderer.Sheets;
@@ -28,6 +27,7 @@ import net.minecraft.client.renderer.block.BlockRenderDispatcher;
 import net.minecraft.client.renderer.block.model.BlockModelPart;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.component.DataComponentPatch;
+import net.minecraft.util.LightCoordsUtil;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
@@ -133,7 +133,7 @@ public class SpoutRenderer extends PictureInPictureRenderer<SpoutRenderState> {
                 to,
                 bufferSource,
                 matrices,
-                LightTexture.FULL_BRIGHT,
+                LightCoordsUtil.FULL_BRIGHT,
                 false,
                 true
             );
@@ -159,7 +159,7 @@ public class SpoutRenderer extends PictureInPictureRenderer<SpoutRenderState> {
                 to,
                 bufferSource,
                 matrices,
-                LightTexture.FULL_BRIGHT,
+                LightCoordsUtil.FULL_BRIGHT,
                 false,
                 true
             );

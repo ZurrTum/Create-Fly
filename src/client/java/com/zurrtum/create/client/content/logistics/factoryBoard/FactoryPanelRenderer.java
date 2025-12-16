@@ -13,7 +13,6 @@ import com.zurrtum.create.client.foundation.render.CreateRenderTypes;
 import com.zurrtum.create.content.logistics.factoryBoard.*;
 import com.zurrtum.create.content.redstone.displayLink.DisplayLinkBlockEntity;
 import com.zurrtum.create.content.redstone.link.RedstoneLinkBlockEntity;
-import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
@@ -22,6 +21,7 @@ import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.state.CameraRenderState;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.core.Direction;
+import net.minecraft.util.LightCoordsUtil;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
@@ -292,7 +292,7 @@ public class FactoryPanelRenderer extends SmartBlockEntityRenderer<FactoryPanelB
         public void renderBulb(boolean glow, PoseStack.Pose entry, VertexConsumer vertexConsumer, float xRot, float yRot, int light) {
             if (glow == this.glow) {
                 model.rotateCentered(yRot, Direction.UP).rotateCentered(xRot, Direction.EAST).rotateCentered(Mth.PI, Direction.UP)
-                    .translate(offsetX, 0, offsetY).light(glow ? LightTexture.FULL_BRIGHT : light).overlay(OverlayTexture.NO_OVERLAY)
+                    .translate(offsetX, 0, offsetY).light(glow ? LightCoordsUtil.FULL_BRIGHT : light).overlay(OverlayTexture.NO_OVERLAY)
                     .renderInto(entry, vertexConsumer);
             }
         }
@@ -300,8 +300,8 @@ public class FactoryPanelRenderer extends SmartBlockEntityRenderer<FactoryPanelB
         private void renderGlow(PoseStack.Pose entry, VertexConsumer vertexConsumer, float xRot, float yRot) {
             if (glow) {
                 model.rotateCentered(yRot, Direction.UP).rotateCentered(xRot, Direction.EAST).rotateCentered(Mth.PI, Direction.UP)
-                    .translate(offsetX, 0, offsetY).light(LightTexture.FULL_BRIGHT).color(color, color, color, 255).overlay(OverlayTexture.NO_OVERLAY)
-                    .renderInto(entry, vertexConsumer);
+                    .translate(offsetX, 0, offsetY).light(LightCoordsUtil.FULL_BRIGHT).color(color, color, color, 255)
+                    .overlay(OverlayTexture.NO_OVERLAY).renderInto(entry, vertexConsumer);
             }
         }
     }

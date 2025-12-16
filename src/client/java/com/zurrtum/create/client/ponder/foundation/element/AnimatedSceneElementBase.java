@@ -5,7 +5,6 @@ import com.zurrtum.create.catnip.animation.LerpedFloat;
 import com.zurrtum.create.client.ponder.api.element.AnimatedSceneElement;
 import com.zurrtum.create.client.ponder.api.level.PonderLevel;
 import net.minecraft.client.Camera;
-import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.block.BlockRenderDispatcher;
@@ -14,6 +13,7 @@ import net.minecraft.client.renderer.chunk.ChunkSectionLayer;
 import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
 import net.minecraft.client.renderer.item.ItemModelResolver;
 import net.minecraft.client.renderer.state.CameraRenderState;
+import net.minecraft.util.LightCoordsUtil;
 import net.minecraft.util.Mth;
 import net.minecraft.world.phys.Vec3;
 
@@ -127,10 +127,10 @@ public abstract class AnimatedSceneElementBase extends PonderElementBase impleme
     }
 
     protected int lightCoordsFromFade(float fade) {
-        int light = LightTexture.FULL_BRIGHT;
+        int light = LightCoordsUtil.FULL_BRIGHT;
         if (fade != 1) {
-            light = (int) (Mth.lerpInt(fade, 5, 0xF));
-            light = LightTexture.pack(light, light);
+            light = Mth.lerpInt(fade, 5, 0xF);
+            light = LightCoordsUtil.pack(light, light);
         }
         return light;
     }

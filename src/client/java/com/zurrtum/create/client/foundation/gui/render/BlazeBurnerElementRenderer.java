@@ -12,12 +12,12 @@ import com.zurrtum.create.client.flywheel.lib.model.baked.PartialModel;
 import com.zurrtum.create.content.processing.burner.BlazeBurnerBlock.HeatLevel;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.render.pip.PictureInPictureRenderer;
-import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.SubmitNodeStorage;
 import net.minecraft.client.renderer.feature.FeatureRenderDispatcher;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.core.Direction;
+import net.minecraft.util.LightCoordsUtil;
 import net.minecraft.util.Mth;
 
 public class BlazeBurnerElementRenderer extends PictureInPictureRenderer<BlazeBurnerRenderState> {
@@ -38,7 +38,7 @@ public class BlazeBurnerElementRenderer extends PictureInPictureRenderer<BlazeBu
 
         VertexConsumer cutout = bufferSource.getBuffer(RenderTypes.cutoutMovingBlock());
         CachedBuffers.partial(AllPartialModels.BLAZE_CAGE, state.block()).rotateCentered(horizontalAngle + Mth.PI, Direction.UP)
-            .light(LightTexture.FULL_BRIGHT).renderInto(matrices.last(), cutout);
+            .light(LightCoordsUtil.FULL_BRIGHT).renderInto(matrices.last(), cutout);
 
         FeatureRenderDispatcher renderDispatcher = Minecraft.getInstance().gameRenderer.getFeatureRenderDispatcher();
         SubmitNodeStorage queue = renderDispatcher.getSubmitNodeStorage();

@@ -68,7 +68,7 @@ public class SlidingDoorRenderer implements BlockEntityRenderer<SlidingDoorBlock
         state.blockPos = be.getBlockPos();
         state.blockEntityType = be.getType();
         Level world = be.getLevel();
-        state.lightCoords = world != null ? LevelRenderer.getLightColor(world, state.blockPos) : 15728880;
+        state.lightCoords = world != null ? LevelRenderer.getLightCoords(world, state.blockPos) : 15728880;
         state.layer = RenderTypes.cutoutMovingBlock();
         Direction facing = state.blockState.getValue(DoorBlock.FACING);
         Direction movementDirection = facing.getClockWise();

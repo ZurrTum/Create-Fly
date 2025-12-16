@@ -7,12 +7,12 @@ import com.zurrtum.create.client.Create;
 import com.zurrtum.create.client.catnip.gui.element.DelegatedStencilElement;
 import com.zurrtum.create.client.catnip.gui.element.ScreenElement;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.resources.Identifier;
+import net.minecraft.util.LightCoordsUtil;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Matrix4f;
 
@@ -88,7 +88,7 @@ public class AllIcons implements ScreenElement {
         VertexConsumer builder = buffer.getBuffer(RenderTypes.text(ICON_ATLAS));
         Matrix4f matrix = ms.last().pose();
         Color rgb = new Color(color);
-        int light = LightTexture.FULL_BRIGHT;
+        int light = LightCoordsUtil.FULL_BRIGHT;
 
         Vec3 vec1 = new Vec3(0, 0, 0);
         Vec3 vec2 = new Vec3(0, 1, 0);

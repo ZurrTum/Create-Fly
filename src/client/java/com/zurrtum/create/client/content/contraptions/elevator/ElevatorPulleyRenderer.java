@@ -55,7 +55,7 @@ public class ElevatorPulleyRenderer extends KineticBlockEntityRenderer<ElevatorP
         if (running || offset == 0) {
             state.magnet = CachedBuffers.partial(AllPartialModels.ELEVATOR_MAGNET, blockState);
             state.magnetOffset = -offset;
-            state.magnetLight = LevelRenderer.getLightColor(world, state.blockPos.below((int) offset));
+            state.magnetLight = LevelRenderer.getLightCoords(world, state.blockPos.below((int) offset));
         }
         state.rotatedCoil = getRotatedCoil(be);
         if (offset == 0) {
@@ -69,7 +69,7 @@ public class ElevatorPulleyRenderer extends KineticBlockEntityRenderer<ElevatorP
             updateHalfShift(state, offset);
             float down = f > .75f ? f - 1 : f;
             state.halfRopeOffset = -down;
-            state.halfRopeLight = LevelRenderer.getLightColor(world, state.blockPos.below((int) down));
+            state.halfRopeLight = LevelRenderer.getLightCoords(world, state.blockPos.below((int) down));
         }
         if (!running) {
             return;
@@ -83,7 +83,7 @@ public class ElevatorPulleyRenderer extends KineticBlockEntityRenderer<ElevatorP
         int[] lights = new int[size];
         for (int i = 0; i < size; i++) {
             float down = offset - i;
-            int light = LevelRenderer.getLightColor(world, state.blockPos.below((int) down));
+            int light = LevelRenderer.getLightCoords(world, state.blockPos.below((int) down));
             offsets[i] = -down;
             lights[i] = light;
         }

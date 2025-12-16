@@ -153,7 +153,7 @@ public class StandardTrackBlockRenderer implements TrackBlockRenderer {
         };
         state.model = CachedBuffers.partial(partial, trackState);
         state.scale = scale;
-        state.light = LevelRenderer.getLightColor(world, pos);
+        state.light = LevelRenderer.getLightCoords(world, pos);
         return state;
     }
 
@@ -189,15 +189,15 @@ public class StandardTrackBlockRenderer implements TrackBlockRenderer {
             index = location;
             for (; i < index; i++) {
                 if (be.isValidBogeyOffset(i)) {
-                    data[i] = new int[]{colorWhenValid, LevelRenderer.getLightColor(world, currentPos.move(direction, 1))};
+                    data[i] = new int[]{colorWhenValid, LevelRenderer.getLightCoords(world, currentPos.move(direction, 1))};
                 }
             }
-            data[i] = new int[]{colorWhenCarriage, LevelRenderer.getLightColor(world, currentPos.move(direction, 1))};
+            data[i] = new int[]{colorWhenCarriage, LevelRenderer.getLightCoords(world, currentPos.move(direction, 1))};
             index++;
         }
         for (; index < length; index++) {
             if (be.isValidBogeyOffset(index)) {
-                data[index] = new int[]{colorWhenValid, LevelRenderer.getLightColor(world, currentPos.move(direction, 1))};
+                data[index] = new int[]{colorWhenValid, LevelRenderer.getLightCoords(world, currentPos.move(direction, 1))};
             }
         }
         return state;

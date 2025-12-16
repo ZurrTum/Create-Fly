@@ -64,7 +64,7 @@ public abstract class AbstractPulleyRenderer<T extends KineticBlockEntity> exten
         if (running || offset == 0) {
             state.magnet = offset > .25f ? renderMagnet(be) : CachedBuffers.partial(halfMagnet, blockState);
             state.magnetOffset = -offset;
-            state.magnetLight = LevelRenderer.getLightColor(world, state.blockPos.below((int) offset));
+            state.magnetLight = LevelRenderer.getLightCoords(world, state.blockPos.below((int) offset));
         }
         if (offset > .75f) {
             float f = offset % 1;
@@ -72,7 +72,7 @@ public abstract class AbstractPulleyRenderer<T extends KineticBlockEntity> exten
                 state.halfRope = CachedBuffers.partial(halfRope, blockState);
                 float down = f > .75f ? f - 1 : f;
                 state.halfRopeOffset = -down;
-                state.halfRopeLight = LevelRenderer.getLightColor(world, state.blockPos.below((int) down));
+                state.halfRopeLight = LevelRenderer.getLightCoords(world, state.blockPos.below((int) down));
             }
         }
         if (!running || offset <= 1.25f) {
@@ -84,7 +84,7 @@ public abstract class AbstractPulleyRenderer<T extends KineticBlockEntity> exten
         int[] lights = new int[size];
         for (int i = 0; i < size; i++) {
             float down = offset - i - 1;
-            int light = LevelRenderer.getLightColor(world, state.blockPos.below((int) down));
+            int light = LevelRenderer.getLightCoords(world, state.blockPos.below((int) down));
             offsets[i] = -down;
             lights[i] = light;
         }

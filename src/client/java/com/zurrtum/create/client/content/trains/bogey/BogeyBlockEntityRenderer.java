@@ -6,7 +6,6 @@ import com.zurrtum.create.client.AllBogeyStyleRenders;
 import com.zurrtum.create.content.trains.bogey.AbstractBogeyBlock;
 import com.zurrtum.create.content.trains.bogey.AbstractBogeyBlockEntity;
 import net.minecraft.client.renderer.LevelRenderer;
-import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
@@ -15,6 +14,7 @@ import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
 import net.minecraft.client.renderer.state.CameraRenderState;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.util.LightCoordsUtil;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
@@ -44,7 +44,7 @@ public class BogeyBlockEntityRenderer<T extends AbstractBogeyBlockEntity> implem
         state.blockPos = be.getBlockPos();
         state.blockEntityType = be.getType();
         Level world = be.getLevel();
-        state.lightCoords = world != null ? LevelRenderer.getLightColor(world, state.blockPos) : LightTexture.FULL_BRIGHT;
+        state.lightCoords = world != null ? LevelRenderer.getLightCoords(world, state.blockPos) : LightCoordsUtil.FULL_BRIGHT;
         if (state.blockState.getValue(AbstractBogeyBlock.AXIS) == Direction.Axis.X) {
             state.yRot = Mth.DEG_TO_RAD * 90;
         }

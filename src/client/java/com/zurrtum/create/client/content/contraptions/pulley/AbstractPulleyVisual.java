@@ -18,10 +18,10 @@ import it.unimi.dsi.fastutil.bytes.ByteArrayList;
 import it.unimi.dsi.fastutil.bytes.ByteList;
 import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
 import it.unimi.dsi.fastutil.longs.LongSet;
-import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.SectionPos;
+import net.minecraft.util.LightCoordsUtil;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.LightLayer;
 import org.joml.Quaternionf;
@@ -219,7 +219,7 @@ public abstract class AbstractPulleyVisual<T extends KineticBlockEntity> extends
             int light = Byte.toUnsignedInt(data.getByte(offset));
             int blockLight = light & 0xF;
             int skyLight = (light >>> 4) & 0xF;
-            return LightTexture.pack(blockLight, skyLight);
+            return LightCoordsUtil.pack(blockLight, skyLight);
         }
     }
 }

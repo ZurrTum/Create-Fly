@@ -3,12 +3,12 @@ package com.zurrtum.create.client.catnip.outliner;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.zurrtum.create.client.catnip.render.SuperRenderTypeBuffer;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.SubmitNodeCollection;
 import net.minecraft.client.renderer.SubmitNodeStorage;
 import net.minecraft.client.renderer.entity.ItemRenderer;
 import net.minecraft.client.renderer.item.ItemStackRenderState;
 import net.minecraft.client.renderer.texture.OverlayTexture;
+import net.minecraft.util.LightCoordsUtil;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
@@ -36,7 +36,7 @@ public class ItemOutline extends Outline {
         ms.scale(params.alpha, params.alpha, params.alpha);
 
         mc.getItemModelResolver().updateForTopItem(this.itemRenderState, stack, ItemDisplayContext.FIXED, null, null, 0);
-        itemRenderState.submit(ms, queue, LightTexture.FULL_BRIGHT, OverlayTexture.NO_OVERLAY, 0);
+        itemRenderState.submit(ms, queue, LightCoordsUtil.FULL_BRIGHT, OverlayTexture.NO_OVERLAY, 0);
         for (SubmitNodeCollection batchingRenderCommandQueue : queue.getSubmitsPerOrder().values()) {
             for (SubmitNodeStorage.ItemSubmit itemCommand : batchingRenderCommandQueue.getItemSubmits()) {
                 matrices.pushPose();

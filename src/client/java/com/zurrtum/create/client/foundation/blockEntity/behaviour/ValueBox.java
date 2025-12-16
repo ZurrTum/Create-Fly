@@ -9,13 +9,13 @@ import com.zurrtum.create.client.foundation.gui.AllIcons;
 import com.zurrtum.create.content.logistics.filter.FilterItem;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.item.ItemModelResolver;
 import net.minecraft.client.renderer.item.ItemStackRenderState;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.util.LightCoordsUtil;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
@@ -227,7 +227,7 @@ public class ValueBox extends ChasingAABBOutline {
             buffer,
             Font.DisplayMode.NORMAL,
             0,
-            LightTexture.FULL_BRIGHT
+            LightCoordsUtil.FULL_BRIGHT
         );
     }
 
@@ -240,7 +240,7 @@ public class ValueBox extends ChasingAABBOutline {
             0xff333333,
             ms.last().pose(),
             buffer,
-            LightTexture.FULL_BRIGHT
+            LightCoordsUtil.FULL_BRIGHT
         );
     }
 

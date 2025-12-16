@@ -24,7 +24,6 @@ import com.zurrtum.create.content.kinetics.belt.transport.BeltInventory;
 import com.zurrtum.create.content.kinetics.belt.transport.TransportedItemStack;
 import com.zurrtum.create.content.logistics.box.PackageItem;
 import net.minecraft.client.renderer.LevelRenderer;
-import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
@@ -42,6 +41,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.core.Direction.Axis;
 import net.minecraft.core.Direction.AxisDirection;
 import net.minecraft.core.Vec3i;
+import net.minecraft.util.LightCoordsUtil;
 import net.minecraft.util.Mth;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.ItemDisplayContext;
@@ -426,7 +426,7 @@ public class BeltRenderer implements BlockEntityRenderer<BeltBlockEntity, BeltRe
                 int segment = (int) Math.floor(offset);
                 mutablePos.set(state.blockPos)
                     .move(state.directionVec.getX() * segment, state.verticality * segment, state.directionVec.getZ() * segment);
-                light = world != null ? LevelRenderer.getLightColor(world, mutablePos) : LightTexture.FULL_BRIGHT;
+                light = world != null ? LevelRenderer.getLightCoords(world, mutablePos) : LightCoordsUtil.FULL_BRIGHT;
             }
             ItemStack stack = transported.stack;
             ItemStackRenderState renderState = new ItemStackRenderState();

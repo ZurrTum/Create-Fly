@@ -60,7 +60,7 @@ public class PortableStorageInterfaceMovementRender implements MovementRenderBeh
         state.xRot = Mth.DEG_TO_RAD * (facing == Direction.UP ? 0 : facing == Direction.DOWN ? 180 : 90);
         state.topOffset = animation.getValue(renderPartialTicks);
         state.middleOffset = state.topOffset * 0.5f + 0.375f;
-        state.light = LevelRenderer.getLightColor(renderWorld, context.localPos);
+        state.light = LevelRenderer.getLightCoords(renderWorld, context.localPos);
         state.world = context.world;
         state.worldMatrix4f = worldMatrix4f;
         return state;

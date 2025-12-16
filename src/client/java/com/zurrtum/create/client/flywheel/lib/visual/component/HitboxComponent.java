@@ -9,7 +9,7 @@ import com.zurrtum.create.client.flywheel.lib.model.LineModelBuilder;
 import com.zurrtum.create.client.flywheel.lib.visual.util.SmartRecycler;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.debug.DebugScreenEntries;
-import net.minecraft.client.renderer.LightTexture;
+import net.minecraft.util.LightCoordsUtil;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
@@ -54,7 +54,7 @@ public final class HitboxComponent implements EntityComponent {
 
     private TransformedInstance createInstance(Model model) {
         TransformedInstance instance = context.instancerProvider().instancer(InstanceTypes.TRANSFORMED, model).createInstance();
-        instance.light(LightTexture.FULL_BRIGHT);
+        instance.light(LightCoordsUtil.FULL_BRIGHT);
         instance.setChanged();
         return instance;
     }

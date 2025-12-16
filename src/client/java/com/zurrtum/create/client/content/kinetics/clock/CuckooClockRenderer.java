@@ -14,7 +14,6 @@ import com.zurrtum.create.content.kinetics.clock.CuckooClockBlock;
 import com.zurrtum.create.content.kinetics.clock.CuckooClockBlockEntity;
 import com.zurrtum.create.content.kinetics.clock.CuckooClockBlockEntity.Animation;
 import net.minecraft.client.renderer.LevelRenderer;
-import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
@@ -22,6 +21,7 @@ import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.state.CameraRenderState;
 import net.minecraft.core.Direction;
+import net.minecraft.util.LightCoordsUtil;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
@@ -52,7 +52,7 @@ public class CuckooClockRenderer extends KineticBlockEntityRenderer<CuckooClockB
             state.blockState = be.getBlockState();
             state.blockEntityType = be.getType();
             Level world = be.getLevel();
-            state.lightCoords = world != null ? LevelRenderer.getLightColor(world, state.blockPos) : LightTexture.FULL_BRIGHT;
+            state.lightCoords = world != null ? LevelRenderer.getLightCoords(world, state.blockPos) : LightCoordsUtil.FULL_BRIGHT;
             state.layer = RenderTypes.solidMovingBlock();
             state.facing = state.blockState.getValue(CuckooClockBlock.HORIZONTAL_FACING);
         }

@@ -62,7 +62,7 @@ public class DrillMovementRenderBehaviour implements MovementRenderBehaviour {
         state.yRot = Mth.DEG_TO_RAD * AngleHelper.horizontalAngle(facing);
         state.xRot = Mth.DEG_TO_RAD * AngleHelper.verticalAngle(facing);
         state.zRot = Mth.DEG_TO_RAD * angle;
-        state.light = LevelRenderer.getLightColor(renderWorld, context.localPos);
+        state.light = LevelRenderer.getLightCoords(renderWorld, context.localPos);
         state.world = context.world;
         state.worldMatrix4f = worldMatrix4f;
         return state;

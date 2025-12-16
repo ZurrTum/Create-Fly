@@ -65,7 +65,7 @@ public class RollerMovementRenderBehaviour implements MovementRenderBehaviour {
         state.wheelAngle = AngleHelper.rad(angle);
         float time = AnimationTickHolder.getRenderTime(context.world) / 20;
         state.rotate = AngleHelper.rad((time * speed) % 360);
-        state.light = LevelRenderer.getLightColor(renderWorld, context.localPos);
+        state.light = LevelRenderer.getLightCoords(renderWorld, context.localPos);
         state.world = context.world;
         state.worldMatrix4f = worldMatrix4f;
         state.yRot = Mth.DEG_TO_RAD * 90;

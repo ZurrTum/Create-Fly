@@ -19,8 +19,8 @@ import com.zurrtum.create.content.trains.signal.SignalBoundary;
 import com.zurrtum.create.content.trains.track.ITrackBlock;
 import com.zurrtum.create.content.trains.track.TrackTargetingBehaviour;
 import com.zurrtum.create.content.trains.track.TrackTargetingBehaviour.RenderedTrackOverlayType;
-import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.core.BlockPos;
+import net.minecraft.util.LightCoordsUtil;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
@@ -82,7 +82,7 @@ public class SignalVisual extends AbstractBlockEntityVisual<SignalBlockEntity> i
             signalLight.setIdentityTransform().translate(getVisualPosition());
 
             if (isRedLight)
-                signalLight.light(LightTexture.FULL_BLOCK);
+                signalLight.light(LightCoordsUtil.MAX_SMOOTH_LIGHT_LEVEL);
 
             signalLight.setChanged();
 

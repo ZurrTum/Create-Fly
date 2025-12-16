@@ -11,11 +11,11 @@ import com.zurrtum.create.client.flywheel.lib.visual.AbstractVisual;
 import com.zurrtum.create.client.flywheel.lib.visual.SimpleDynamicVisual;
 import com.zurrtum.create.client.vanillin.item.ItemModels;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.block.model.BlockStateModel;
 import net.minecraft.client.resources.model.BlockStateDefinitions;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.util.LightCoordsUtil;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.decoration.ItemFrame;
@@ -69,7 +69,7 @@ public class ItemFrameVisual extends AbstractVisual implements EntityVisual<Item
     }
 
     public void animate(float partialTick) {
-        var light = LightTexture.pack(getBlockLightLevel(entity.blockPosition()), getSkyLightLevel(entity.blockPosition()));
+        var light = LightCoordsUtil.pack(getBlockLightLevel(entity.blockPosition()), getSkyLightLevel(entity.blockPosition()));
 
         boolean invisible = entity.isInvisible();
 

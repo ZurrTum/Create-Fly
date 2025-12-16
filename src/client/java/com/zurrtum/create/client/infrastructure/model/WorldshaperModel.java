@@ -33,6 +33,7 @@ import net.minecraft.client.resources.model.ModelBaker;
 import net.minecraft.client.resources.model.ResolvedModel;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.Identifier;
+import net.minecraft.util.LightCoordsUtil;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.HumanoidArm;
@@ -164,7 +165,7 @@ public class WorldshaperModel implements ItemModel, SpecialModelRenderer<Worldsh
         else
             multiplier = Mth.sin(worldTime * 5);
         int lightItensity = (int) (15 * Mth.clamp(multiplier, 0, 1));
-        int glowLight = LightTexture.pack(lightItensity, Math.max(lightItensity, 4));
+        int glowLight = LightCoordsUtil.pack(lightItensity, Math.max(lightItensity, 4));
         renderItem(displayContext, matrices, queue, glowLight, overlay, core, itemLayer);
         renderItem(displayContext, matrices, queue, glowLight, overlay, coreGlow, translucent);
 

@@ -70,7 +70,7 @@ public class BlockEntityRenderHelper {
 
             try {
                 BlockEntityRenderState renderState = renderer.createRenderState();
-                int realLevelLight = LevelRenderer.getLightColor(realLevel, getLightPos(lightTransform, blockEntity.getBlockPos()));
+                int realLevelLight = LevelRenderer.getLightCoords(realLevel, getLightPos(lightTransform, blockEntity.getBlockPos()));
                 if (renderLevel != null) {
                     renderLevel.setExternalLight(realLevelLight);
                 }

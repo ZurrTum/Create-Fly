@@ -10,7 +10,6 @@ import com.zurrtum.create.client.catnip.render.SuperByteBuffer;
 import com.zurrtum.create.client.flywheel.lib.util.ShadersModHelper;
 import com.zurrtum.create.client.foundation.render.CreateRenderTypes;
 import com.zurrtum.create.content.redstone.displayLink.LinkWithBulbBlockEntity;
-import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.OrderedSubmitNodeCollector;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
@@ -21,6 +20,7 @@ import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.state.CameraRenderState;
 import net.minecraft.core.Direction;
+import net.minecraft.util.LightCoordsUtil;
 import net.minecraft.util.Mth;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
@@ -85,11 +85,12 @@ public class LinkBulbRenderer implements BlockEntityRenderer<LinkWithBulbBlockEn
         public int color;
 
         public void renderTube(PoseStack.Pose entry, VertexConsumer vertexConsumer) {
-            tube.translate(offset).light(LightTexture.FULL_BRIGHT).renderInto(entry, vertexConsumer);
+            tube.translate(offset).light(LightCoordsUtil.FULL_BRIGHT).renderInto(entry, vertexConsumer);
         }
 
         public void renderGlow(PoseStack.Pose entry, VertexConsumer vertexConsumer) {
-            glow.translate(offset).light(LightTexture.FULL_BRIGHT).color(color, color, color, 255).disableDiffuse().renderInto(entry, vertexConsumer);
+            glow.translate(offset).light(LightCoordsUtil.FULL_BRIGHT).color(color, color, color, 255).disableDiffuse()
+                .renderInto(entry, vertexConsumer);
         }
     }
 }

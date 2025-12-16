@@ -4,8 +4,8 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.zurrtum.create.catnip.theme.Color;
 import com.zurrtum.create.client.flywheel.lib.transform.TransformStack;
-import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.core.Direction;
+import net.minecraft.util.LightCoordsUtil;
 import net.minecraft.world.level.BlockAndTintGetter;
 import org.joml.Matrix4f;
 
@@ -13,11 +13,11 @@ import org.joml.Matrix4f;
 public interface SuperByteBuffer extends TransformStack<SuperByteBuffer> {
 
     static int maxLight(int packedLight1, int packedLight2) {
-        int blockLight1 = LightTexture.block(packedLight1);
-        int skyLight1 = LightTexture.sky(packedLight1);
-        int blockLight2 = LightTexture.block(packedLight2);
-        int skyLight2 = LightTexture.sky(packedLight2);
-        return LightTexture.pack(Math.max(blockLight1, blockLight2), Math.max(skyLight1, skyLight2));
+        int blockLight1 = LightCoordsUtil.block(packedLight1);
+        int skyLight1 = LightCoordsUtil.sky(packedLight1);
+        int blockLight2 = LightCoordsUtil.block(packedLight2);
+        int skyLight2 = LightCoordsUtil.sky(packedLight2);
+        return LightCoordsUtil.pack(Math.max(blockLight1, blockLight2), Math.max(skyLight1, skyLight2));
     }
 
     void renderInto(PoseStack.Pose entry, VertexConsumer consumer);

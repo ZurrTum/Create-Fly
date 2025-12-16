@@ -8,9 +8,9 @@ import com.zurrtum.create.client.catnip.render.BindableTexture;
 import com.zurrtum.create.client.catnip.render.SuperRenderTypeBuffer;
 import com.zurrtum.create.client.flywheel.lib.transform.TransformStack;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.core.Direction;
+import net.minecraft.util.LightCoordsUtil;
 import net.minecraft.util.Mth;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
@@ -427,7 +427,7 @@ public abstract class Outline {
             lineWidth = 1 / 32f;
             fadeLineWidth = true;
             rgb = Color.WHITE;
-            lightmap = LightTexture.FULL_BRIGHT;
+            lightmap = LightCoordsUtil.FULL_BRIGHT;
         }
 
         // builder

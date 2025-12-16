@@ -14,12 +14,12 @@ import com.zurrtum.create.content.trains.entity.Carriage;
 import com.zurrtum.create.content.trains.entity.CarriageBogey;
 import com.zurrtum.create.content.trains.entity.CarriageContraption;
 import com.zurrtum.create.content.trains.entity.CarriageContraptionEntity;
-import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.culling.Frustum;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.state.CameraRenderState;
 import net.minecraft.core.BlockPos;
+import net.minecraft.util.LightCoordsUtil;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LightLayer;
@@ -146,7 +146,7 @@ public class CarriageContraptionEntityRenderer extends OrientedContraptionEntity
 
     public static int getBogeyLightCoords(Level world, Vec3 pos) {
         BlockPos lightPos = BlockPos.containing(pos);
-        return LightTexture.pack(world.getBrightness(LightLayer.BLOCK, lightPos), world.getBrightness(LightLayer.SKY, lightPos));
+        return LightCoordsUtil.pack(world.getBrightness(LightLayer.BLOCK, lightPos), world.getBrightness(LightLayer.SKY, lightPos));
     }
 
     public static class CarriageContraptionState extends OrientedContraptionState {

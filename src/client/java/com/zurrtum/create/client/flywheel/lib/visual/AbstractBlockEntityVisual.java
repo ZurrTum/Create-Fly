@@ -95,11 +95,11 @@ public abstract class AbstractBlockEntityVisual<T extends BlockEntity> extends A
     }
 
     protected int computePackedLight() {
-        return LevelRenderer.getLightColor(level, pos);
+        return LevelRenderer.getLightCoords(level, pos);
     }
 
     protected void relight(BlockPos pos, @Nullable FlatLit... instances) {
-        FlatLit.relight(LevelRenderer.getLightColor(level, pos), instances);
+        FlatLit.relight(LevelRenderer.getLightCoords(level, pos), instances);
     }
 
     protected void relight(@Nullable FlatLit... instances) {
@@ -107,7 +107,7 @@ public abstract class AbstractBlockEntityVisual<T extends BlockEntity> extends A
     }
 
     protected void relight(BlockPos pos, Iterator<@Nullable FlatLit> instances) {
-        FlatLit.relight(LevelRenderer.getLightColor(level, pos), instances);
+        FlatLit.relight(LevelRenderer.getLightCoords(level, pos), instances);
     }
 
     protected void relight(Iterator<@Nullable FlatLit> instances) {
@@ -115,7 +115,7 @@ public abstract class AbstractBlockEntityVisual<T extends BlockEntity> extends A
     }
 
     protected void relight(BlockPos pos, Iterable<@Nullable FlatLit> instances) {
-        FlatLit.relight(LevelRenderer.getLightColor(level, pos), instances);
+        FlatLit.relight(LevelRenderer.getLightCoords(level, pos), instances);
     }
 
     protected void relight(Iterable<@Nullable FlatLit> instances) {

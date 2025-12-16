@@ -100,9 +100,9 @@ public class AirFlowParticle extends SimpleAnimatedParticle {
     }
 
     @Override
-    public int getLightColor(float partialTick) {
+    public int getLightCoords(float partialTick) {
         BlockPos blockpos = BlockPos.containing(this.x, this.y, this.z);
-        return this.level.isLoaded(blockpos) ? LevelRenderer.getLightColor(level, blockpos) : 0;
+        return this.level.isLoaded(blockpos) ? LevelRenderer.getLightCoords(level, blockpos) : 0;
     }
 
     private void selectSprite(int index) {

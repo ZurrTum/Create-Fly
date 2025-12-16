@@ -17,11 +17,11 @@ import com.zurrtum.create.client.foundation.render.SpecialModels;
 import com.zurrtum.create.content.kinetics.chainConveyor.ChainConveyorBlockEntity;
 import com.zurrtum.create.content.kinetics.chainConveyor.ChainConveyorPackage;
 import com.zurrtum.create.content.logistics.box.PackageItem;
-import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.Identifier;
+import net.minecraft.util.LightCoordsUtil;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LightLayer;
@@ -101,7 +101,7 @@ public class ChainConveyorVisual extends SingleAxisRotatingVisual<ChainConveyorB
 
         BlockPos containingPos = BlockPos.containing(position);
         Level level = be.getLevel();
-        int light = LightTexture.pack(level.getBrightness(LightLayer.BLOCK, containingPos), level.getBrightness(LightLayer.SKY, containingPos));
+        int light = LightCoordsUtil.pack(level.getBrightness(LightLayer.BLOCK, containingPos), level.getBrightness(LightLayer.SKY, containingPos));
 
         if (physicsData.modelKey == null) {
             Identifier key = BuiltInRegistries.ITEM.getKey(box.item.getItem());

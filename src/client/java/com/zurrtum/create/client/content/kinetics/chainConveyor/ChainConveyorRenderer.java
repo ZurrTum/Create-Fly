@@ -15,7 +15,6 @@ import com.zurrtum.create.content.kinetics.chainConveyor.ChainConveyorBlockEntit
 import com.zurrtum.create.content.kinetics.chainConveyor.ChainConveyorPackage;
 import com.zurrtum.create.content.logistics.box.PackageItem;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
@@ -27,6 +26,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction.Axis;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.Identifier;
+import net.minecraft.util.LightCoordsUtil;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LightLayer;
@@ -143,7 +143,7 @@ public class ChainConveyorRenderer extends KineticBlockEntityRenderer<ChainConve
         state.yaw = Mth.DEG_TO_RAD * yaw;
         state.offset = new Vec3(targetPosition.x - pos.getX(), targetPosition.y - pos.getY(), targetPosition.z - pos.getZ());
         BlockPos containingPos = BlockPos.containing(position);
-        state.light = LightTexture.pack(world.getBrightness(LightLayer.BLOCK, containingPos), world.getBrightness(LightLayer.SKY, containingPos));
+        state.light = LightCoordsUtil.pack(world.getBrightness(LightLayer.BLOCK, containingPos), world.getBrightness(LightLayer.SKY, containingPos));
         Vec3 dangleDiff = VecHelper.rotate(targetPosition.add(0, 0.5, 0).subtract(position), -yaw, Axis.Y);
         float zRot = Mth.wrapDegrees((float) Mth.atan2(-dangleDiff.x, dangleDiff.y) * Mth.RAD_TO_DEG) / 2;
         float xRot = Mth.wrapDegrees((float) Mth.atan2(dangleDiff.z, dangleDiff.y) * Mth.RAD_TO_DEG) / 2;
@@ -169,7 +169,7 @@ public class ChainConveyorRenderer extends KineticBlockEntityRenderer<ChainConve
             time += 1;
         }
         float animation = time - 0.5f;
-        int light1 = LightTexture.pack(world.getBrightness(LightLayer.BLOCK, tilePos), world.getBrightness(LightLayer.SKY, tilePos));
+        int light1 = LightCoordsUtil.pack(world.getBrightness(LightLayer.BLOCK, tilePos), world.getBrightness(LightLayer.SKY, tilePos));
         float yRot = Mth.DEG_TO_RAD * 45;
         for (BlockPos blockPos : be.connections) {
             ConnectionStats stats = be.connectionStats.get(blockPos);
@@ -188,7 +188,7 @@ public class ChainConveyorRenderer extends KineticBlockEntityRenderer<ChainConve
             state.yRot = yRot;
             BlockPos pos = tilePos.offset(blockPos);
             state.light1 = light1;
-            state.light2 = LightTexture.pack(world.getBrightness(LightLayer.BLOCK, pos), world.getBrightness(LightLayer.SKY, pos));
+            state.light2 = LightCoordsUtil.pack(world.getBrightness(LightLayer.BLOCK, pos), world.getBrightness(LightLayer.SKY, pos));
             state.animation = animation;
             state.length = stats.chainLength();
             state.maxV = far ? 0.0625f : state.length + animation;

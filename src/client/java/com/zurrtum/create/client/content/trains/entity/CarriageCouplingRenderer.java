@@ -12,10 +12,10 @@ import com.zurrtum.create.content.trains.entity.CarriageBogey;
 import com.zurrtum.create.content.trains.entity.CarriageContraptionEntity;
 import com.zurrtum.create.content.trains.entity.Train;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.core.BlockPos;
+import net.minecraft.util.LightCoordsUtil;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.Level;
@@ -106,7 +106,7 @@ public class CarriageCouplingRenderer {
 
     public static int getPackedLightCoords(Entity pEntity, float pPartialTicks) {
         BlockPos blockpos = BlockPos.containing(pEntity.getLightProbePosition(pPartialTicks));
-        return LightTexture.pack(getBlockLightLevel(pEntity, blockpos), getSkyLightLevel(pEntity, blockpos));
+        return LightCoordsUtil.pack(getBlockLightLevel(pEntity, blockpos), getSkyLightLevel(pEntity, blockpos));
     }
 
     protected static int getSkyLightLevel(Entity pEntity, BlockPos pPos) {

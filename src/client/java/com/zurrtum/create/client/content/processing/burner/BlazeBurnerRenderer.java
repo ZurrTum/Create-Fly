@@ -16,7 +16,6 @@ import com.zurrtum.create.content.processing.burner.BlazeBurnerBlock.HeatLevel;
 import com.zurrtum.create.content.processing.burner.BlazeBurnerBlockEntity;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
-import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
@@ -27,6 +26,7 @@ import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.state.CameraRenderState;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.core.Direction;
+import net.minecraft.util.LightCoordsUtil;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
@@ -225,20 +225,20 @@ public class BlazeBurnerRenderer implements BlockEntityRenderer<BlazeBurnerBlock
         public void render(PoseStack.Pose matricesEntry, VertexConsumer vertexConsumer) {
             blaze.translate(0, headY, 0);
             blaze.rotateCentered(horizontalAngle, Direction.UP);
-            blaze.light(LightTexture.FULL_BRIGHT);
+            blaze.light(LightCoordsUtil.FULL_BRIGHT);
             blaze.renderInto(matricesEntry, vertexConsumer);
             if (goggles != null) {
                 goggles.translate(0, gogglesHeadY, 0);
                 goggles.rotateCentered(horizontalAngle, Direction.UP);
-                goggles.light(LightTexture.FULL_BRIGHT);
+                goggles.light(LightCoordsUtil.FULL_BRIGHT);
                 goggles.renderInto(matricesEntry, vertexConsumer);
             }
             if (rods != null) {
                 rods.translate(0, rodsY, 0);
-                rods.light(LightTexture.FULL_BRIGHT);
+                rods.light(LightCoordsUtil.FULL_BRIGHT);
                 rods.renderInto(matricesEntry, vertexConsumer);
                 rods2.translate(0, rods2Y, 0);
-                rods2.light(LightTexture.FULL_BRIGHT);
+                rods2.light(LightCoordsUtil.FULL_BRIGHT);
                 rods2.renderInto(matricesEntry, vertexConsumer);
             }
         }
@@ -259,7 +259,7 @@ public class BlazeBurnerRenderer implements BlockEntityRenderer<BlazeBurnerBlock
             }
             model.rotateCentered(angle, Direction.UP);
             model.translate(0.5f, 0, 0.5f);
-            model.light(LightTexture.FULL_BRIGHT);
+            model.light(LightCoordsUtil.FULL_BRIGHT);
             model.renderInto(matricesEntry, vertexConsumer);
         }
     }
@@ -276,7 +276,7 @@ public class BlazeBurnerRenderer implements BlockEntityRenderer<BlazeBurnerBlock
         public void render(PoseStack.Pose matricesEntry, VertexConsumer vertexConsumer) {
             model.shiftUVScrolling(spriteShift, uScroll, vScroll);
             model.rotateCentered(angle, Direction.UP);
-            model.light(LightTexture.FULL_BRIGHT);
+            model.light(LightCoordsUtil.FULL_BRIGHT);
             model.renderInto(matricesEntry, vertexConsumer);
         }
     }

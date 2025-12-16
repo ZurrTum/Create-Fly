@@ -18,9 +18,9 @@ import com.zurrtum.create.client.flywheel.lib.visual.AbstractVisual;
 import com.zurrtum.create.client.flywheel.lib.visual.SimpleDynamicVisual;
 import com.zurrtum.create.client.flywheel.lib.visual.util.SmartRecycler;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.model.ModelBakery;
+import net.minecraft.util.LightCoordsUtil;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import org.joml.Vector4f;
@@ -56,7 +56,7 @@ public final class FireElement extends AbstractVisual implements SimpleDynamicVi
 
     private TransformedInstance createInstance(Model model) {
         TransformedInstance instance = visualizationContext.instancerProvider().instancer(InstanceTypes.TRANSFORMED, model).createInstance();
-        instance.light(LightTexture.FULL_BLOCK);
+        instance.light(LightCoordsUtil.MAX_SMOOTH_LIGHT_LEVEL);
         instance.setChanged();
         return instance;
     }
@@ -151,7 +151,7 @@ public final class FireElement extends AbstractVisual implements SimpleDynamicVi
             vertexList.b(i, 1);
             vertexList.u(i, u);
             vertexList.v(i, v);
-            vertexList.light(i, LightTexture.FULL_BLOCK);
+            vertexList.light(i, LightCoordsUtil.MAX_SMOOTH_LIGHT_LEVEL);
             vertexList.normalX(i, 0);
             vertexList.normalY(i, 1);
             vertexList.normalZ(i, 0);

@@ -90,9 +90,10 @@ public class AirParticle extends SimpleAnimatedParticle {
         this.move(this.xd, this.yd, this.zd);
     }
 
-    public int getLightColor(float partialTick) {
+    @Override
+    public int getLightCoords(float partialTick) {
         BlockPos blockpos = BlockPos.containing(this.x, this.y, this.z);
-        return this.level.isLoaded(blockpos) ? LevelRenderer.getLightColor(level, blockpos) : 0;
+        return this.level.isLoaded(blockpos) ? LevelRenderer.getLightCoords(level, blockpos) : 0;
     }
 
     private void selectSprite(int index) {

@@ -11,7 +11,6 @@ import com.zurrtum.create.client.content.kinetics.base.KineticBlockEntityRendere
 import com.zurrtum.create.content.kinetics.base.IRotate;
 import com.zurrtum.create.content.kinetics.fan.EncasedFanBlockEntity;
 import net.minecraft.client.renderer.LevelRenderer;
-import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
@@ -21,6 +20,7 @@ import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.state.CameraRenderState;
 import net.minecraft.core.Direction;
+import net.minecraft.util.LightCoordsUtil;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
@@ -54,10 +54,10 @@ public class EncasedFanRenderer implements BlockEntityRenderer<EncasedFanBlockEn
         Direction opposite = direction.getOpposite();
         Level world = be.getLevel();
         if (world != null) {
-            state.lightBehind = LevelRenderer.getLightColor(world, state.blockPos.relative(opposite));
-            state.lightInFront = LevelRenderer.getLightColor(world, state.blockPos.relative(direction));
+            state.lightBehind = LevelRenderer.getLightCoords(world, state.blockPos.relative(opposite));
+            state.lightInFront = LevelRenderer.getLightCoords(world, state.blockPos.relative(direction));
         } else {
-            state.lightBehind = state.lightInFront = LightTexture.FULL_BRIGHT;
+            state.lightBehind = state.lightInFront = LightCoordsUtil.FULL_BRIGHT;
         }
         state.shaftHalf = CachedBuffers.partialFacing(AllPartialModels.SHAFT_HALF, state.blockState, opposite);
         state.fanInner = CachedBuffers.partialFacing(AllPartialModels.ENCASED_FAN_INNER, state.blockState, opposite);

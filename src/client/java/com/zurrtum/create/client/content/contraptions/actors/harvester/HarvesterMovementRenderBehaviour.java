@@ -63,7 +63,7 @@ public class HarvesterMovementRenderBehaviour implements MovementRenderBehaviour
         float time = AnimationTickHolder.getRenderTime(context.world) / 20;
         state.angle = AngleHelper.rad((time * speed) % 360);
         state.horizontalAngle = AngleHelper.rad(AngleHelper.horizontalAngle(facing));
-        state.light = LevelRenderer.getLightColor(renderWorld, context.localPos);
+        state.light = LevelRenderer.getLightCoords(renderWorld, context.localPos);
         state.world = context.world;
         state.worldMatrix4f = worldMatrix4f;
         return state;

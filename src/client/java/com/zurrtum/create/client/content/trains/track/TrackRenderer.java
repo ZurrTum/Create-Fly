@@ -77,7 +77,7 @@ public class TrackRenderer implements BlockEntityRenderer<TrackBlockEntity, Trac
                     }
                     for (int i = 1; i < length; i++) {
                         girder.add(
-                            LevelRenderer.getLightColor(world, segment.lightPosition[i].offset(bePosition)),
+                            LevelRenderer.getLightCoords(world, segment.lightPosition[i].offset(bePosition)),
                             segment.beams[i],
                             segment.beamCaps[i]
                         );
@@ -93,7 +93,7 @@ public class TrackRenderer implements BlockEntityRenderer<TrackBlockEntity, Trac
                 TrackSegmentRenderState renderState = tracks.computeIfAbsent(bc.getMaterial(), TrackSegmentRenderState::create);
                 for (int i = 1; i < length; i++) {
                     renderState.add(
-                        LevelRenderer.getLightColor(world, segment.lightPosition[i].offset(bePosition)),
+                        LevelRenderer.getLightCoords(world, segment.lightPosition[i].offset(bePosition)),
                         segment.tieTransform[i],
                         segment.railTransforms[i]
                     );

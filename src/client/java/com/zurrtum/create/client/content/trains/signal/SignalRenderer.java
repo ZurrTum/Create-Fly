@@ -17,7 +17,6 @@ import com.zurrtum.create.content.trains.track.ITrackBlock;
 import com.zurrtum.create.content.trains.track.TrackTargetingBehaviour;
 import com.zurrtum.create.content.trains.track.TrackTargetingBehaviour.RenderedTrackOverlayType;
 import net.minecraft.client.renderer.LevelRenderer;
-import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
@@ -27,6 +26,7 @@ import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.state.CameraRenderState;
 import net.minecraft.core.BlockPos;
+import net.minecraft.util.LightCoordsUtil;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
@@ -61,10 +61,10 @@ public class SignalRenderer implements BlockEntityRenderer<SignalBlockEntity, Si
         float renderTime = AnimationTickHolder.getRenderTime(world);
         if (be.getState().isRedLight(renderTime)) {
             state.model = CachedBuffers.partial(AllPartialModels.SIGNAL_ON, state.blockState);
-            state.lightCoords = LightTexture.FULL_BLOCK;
+            state.lightCoords = LightCoordsUtil.MAX_SMOOTH_LIGHT_LEVEL;
         } else {
             state.model = CachedBuffers.partial(AllPartialModels.SIGNAL_OFF, state.blockState);
-            state.lightCoords = world != null ? LevelRenderer.getLightColor(world, state.blockPos) : LightTexture.FULL_BRIGHT;
+            state.lightCoords = world != null ? LevelRenderer.getLightCoords(world, state.blockPos) : LightCoordsUtil.FULL_BRIGHT;
         }
         TrackTargetingBehaviour<SignalBoundary> target = be.edgePoint;
         BlockPos targetPosition = target.getGlobalPosition();

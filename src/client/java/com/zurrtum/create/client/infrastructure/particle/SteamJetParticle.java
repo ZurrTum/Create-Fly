@@ -67,7 +67,7 @@ public class SteamJetParticle extends SimpleAnimatedParticle {
         float f4 = getQuadSize(tickProgress);
         Layer renderType = getLayer();
         int color = ARGB.colorFromFloat(alpha, rCol, gCol, bCol);
-        int brightness = getLightColor(tickProgress);
+        int brightness = getLightCoords(tickProgress);
         for (int i = 0; i < 4; i++) {
             Quaternionf rotation = Axis.YP.rotation(yaw);
             rotation.mul(Axis.XP.rotation(pitch));
@@ -77,9 +77,9 @@ public class SteamJetParticle extends SimpleAnimatedParticle {
     }
 
     @Override
-    public int getLightColor(float partialTick) {
+    public int getLightCoords(float partialTick) {
         BlockPos blockpos = BlockPos.containing(this.x, this.y, this.z);
-        return this.level.isLoaded(blockpos) ? LevelRenderer.getLightColor(level, blockpos) : 0;
+        return this.level.isLoaded(blockpos) ? LevelRenderer.getLightCoords(level, blockpos) : 0;
     }
 
     public static class Factory implements ParticleProvider<SimpleParticleType> {

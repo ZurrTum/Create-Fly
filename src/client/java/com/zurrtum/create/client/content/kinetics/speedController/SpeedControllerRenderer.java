@@ -12,7 +12,6 @@ import com.zurrtum.create.content.kinetics.base.IRotate;
 import com.zurrtum.create.content.kinetics.speedController.SpeedControllerBlock;
 import com.zurrtum.create.content.kinetics.speedController.SpeedControllerBlockEntity;
 import net.minecraft.client.renderer.LevelRenderer;
-import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
@@ -23,6 +22,7 @@ import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.state.CameraRenderState;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Direction.Axis;
+import net.minecraft.util.LightCoordsUtil;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
@@ -59,7 +59,7 @@ public class SpeedControllerRenderer implements BlockEntityRenderer<SpeedControl
             state.bracket = CachedBuffers.partial(AllPartialModels.SPEED_CONTROLLER_BRACKET, state.blockState);
             boolean alongX = state.blockState.getValue(SpeedControllerBlock.HORIZONTAL_AXIS) == Axis.X;
             state.bracketAngle = (float) (alongX ? Math.PI : Math.PI / 2);
-            state.bracketLight = world != null ? LevelRenderer.getLightColor(world, state.blockPos.above()) : LightTexture.FULL_BRIGHT;
+            state.bracketLight = world != null ? LevelRenderer.getLightCoords(world, state.blockPos.above()) : LightCoordsUtil.FULL_BRIGHT;
         }
         if (state.render || state.hasBracket) {
             state.layer = RenderTypes.solidMovingBlock();
