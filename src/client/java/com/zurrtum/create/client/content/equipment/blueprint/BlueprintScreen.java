@@ -41,7 +41,7 @@ public class BlueprintScreen extends AbstractSimiContainerScreen<BlueprintMenu> 
     private ElementWidget renderedItem;
 
     public BlueprintScreen(BlueprintMenu menu, Inventory inv, Component title) {
-        super(menu, inv, title);
+        super(menu, inv, title, AllGuiTextures.BLUEPRINT.getWidth(), AllGuiTextures.BLUEPRINT.getHeight() + 4 + PLAYER_INVENTORY.getHeight());
         this.background = AllGuiTextures.BLUEPRINT;
     }
 
@@ -63,17 +63,16 @@ public class BlueprintScreen extends AbstractSimiContainerScreen<BlueprintMenu> 
 
     @Override
     protected void init() {
-        setWindowSize(background.getWidth(), background.getHeight() + 4 + PLAYER_INVENTORY.getHeight());
         setWindowOffset(1, 0);
         super.init();
 
-        resetButton = new IconButton(leftPos + background.getWidth() - 62, topPos + background.getHeight() - 24, AllIcons.I_TRASH);
+        resetButton = new IconButton(leftPos + imageWidth - 62, topPos + background.getHeight() - 24, AllIcons.I_TRASH);
         resetButton.withCallback(() -> {
             menu.clearContents();
             contentsCleared();
             minecraft.player.connection.send(AllPackets.CLEAR_CONTAINER);
         });
-        confirmButton = new IconButton(leftPos + background.getWidth() - 33, topPos + background.getHeight() - 24, AllIcons.I_CONFIRM);
+        confirmButton = new IconButton(leftPos + imageWidth - 33, topPos + background.getHeight() - 24, AllIcons.I_CONFIRM);
         confirmButton.withCallback(() -> {
             minecraft.player.closeContainer();
         });
@@ -81,9 +80,9 @@ public class BlueprintScreen extends AbstractSimiContainerScreen<BlueprintMenu> 
         addRenderableWidget(resetButton);
         addRenderableWidget(confirmButton);
 
-        extraAreas = ImmutableList.of(new Rect2i(leftPos + background.getWidth(), topPos + background.getHeight() - 36, 56, 44));
+        extraAreas = ImmutableList.of(new Rect2i(leftPos + imageWidth, topPos + background.getHeight() - 36, 56, 44));
 
-        renderedItem = new ElementWidget(leftPos + background.getWidth() + 1, topPos + background.getHeight() - 34).showingElement(GuiGameElement.of(
+        renderedItem = new ElementWidget(leftPos + imageWidth + 1, topPos + background.getHeight() - 34).showingElement(GuiGameElement.of(
             AllPartialModels.CRAFTING_BLUEPRINT_1x1).scale(2.5F).transform(this::transform).padding(13));
         addRenderableWidget(renderedItem);
     }
@@ -110,11 +109,6 @@ public class BlueprintScreen extends AbstractSimiContainerScreen<BlueprintMenu> 
 
         background.render(graphics, leftPos, topPos);
         graphics.drawString(font, title, leftPos + 15, topPos + 4, 0xFFFFFFFF, false);
-
-        //TODO
-        //        GuiGameElement.of(AllPartialModels.CRAFTING_BLUEPRINT_1x1)
-        //            .<GuiGameElement.GuiRenderBuilder>at(x + background.getWidth() + 20, y + background.getHeight() - 32, 0).rotate(45, -45, 22.5f).scale(40)
-        //            .render(graphics);
     }
 
     @Override

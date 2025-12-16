@@ -43,7 +43,13 @@ public class RedstoneRequesterScreen extends AbstractSimiContainerScreen<Redston
     private ElementWidget renderedItem;
 
     public RedstoneRequesterScreen(RedstoneRequesterMenu container, Inventory inv, Component title) {
-        super(container, inv, title);
+        super(
+            container,
+            inv,
+            title,
+            AllGuiTextures.REDSTONE_REQUESTER.getWidth(),
+            AllGuiTextures.REDSTONE_REQUESTER.getHeight() + AllGuiTextures.PLAYER_INVENTORY.getHeight()
+        );
 
         for (int i = 0; i < 9; i++)
             amounts.add(1);
@@ -76,8 +82,6 @@ public class RedstoneRequesterScreen extends AbstractSimiContainerScreen<Redston
     @Override
     protected void init() {
         int bgHeight = AllGuiTextures.REDSTONE_REQUESTER.getHeight();
-        int bgWidth = AllGuiTextures.REDSTONE_REQUESTER.getWidth();
-        setWindowSize(bgWidth, bgHeight + AllGuiTextures.PLAYER_INVENTORY.getHeight());
         super.init();
         clearWidgets();
 
@@ -88,7 +92,7 @@ public class RedstoneRequesterScreen extends AbstractSimiContainerScreen<Redston
         }
         addRenderableWidget(addressBox);
 
-        confirmButton = new IconButton(leftPos + bgWidth - 30, topPos + bgHeight - 25, AllIcons.I_CONFIRM);
+        confirmButton = new IconButton(leftPos + imageWidth - 30, topPos + bgHeight - 25, AllIcons.I_CONFIRM);
         confirmButton.withCallback(() -> minecraft.player.closeContainer());
         addRenderableWidget(confirmButton);
 
@@ -110,7 +114,7 @@ public class RedstoneRequesterScreen extends AbstractSimiContainerScreen<Redston
         dontAllowPartial.setToolTip(CreateLang.translate("gui.redstone_requester.dont_allow_partial").component());
         addRenderableWidget(dontAllowPartial);
 
-        extraAreas = List.of(new Rect2i(leftPos + bgWidth, topPos + bgHeight - 50, 70, 60));
+        extraAreas = List.of(new Rect2i(leftPos + imageWidth, topPos + bgHeight - 50, 70, 60));
         renderedItem = new ElementWidget(
             leftPos + 245,
             topPos + 80

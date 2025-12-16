@@ -18,7 +18,6 @@ import com.zurrtum.create.content.schematics.table.SchematicTableBlockEntity;
 import com.zurrtum.create.content.schematics.table.SchematicTableMenu;
 import com.zurrtum.create.foundation.gui.menu.MenuType;
 import com.zurrtum.create.foundation.utility.CreatePaths;
-import net.minecraft.util.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.renderer.Rect2i;
@@ -28,6 +27,7 @@ import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
 import net.minecraft.util.ProblemReporter;
+import net.minecraft.util.Util;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.level.storage.TagValueInput;
 import net.minecraft.world.level.storage.ValueInput;
@@ -64,7 +64,13 @@ public class SchematicTableScreen extends AbstractSimiContainerScreen<SchematicT
     private List<Rect2i> extraAreas = Collections.emptyList();
 
     public SchematicTableScreen(SchematicTableMenu menu, Inventory playerInventory, Component title) {
-        super(menu, playerInventory, title);
+        super(
+            menu,
+            playerInventory,
+            title,
+            AllGuiTextures.SCHEMATIC_TABLE.getWidth(),
+            AllGuiTextures.SCHEMATIC_TABLE.getHeight() + 4 + PLAYER_INVENTORY.getHeight()
+        );
         background = AllGuiTextures.SCHEMATIC_TABLE;
     }
 
@@ -94,7 +100,6 @@ public class SchematicTableScreen extends AbstractSimiContainerScreen<SchematicT
 
     @Override
     protected void init() {
-        setWindowSize(background.getWidth(), background.getHeight() + 4 + PLAYER_INVENTORY.getHeight());
         setWindowOffset(-11, 8);
         super.init();
 
@@ -152,12 +157,12 @@ public class SchematicTableScreen extends AbstractSimiContainerScreen<SchematicT
         addRenderableWidget(refreshButton);
 
         extraAreas = ImmutableList.of(
-            new Rect2i(leftPos + background.getWidth(), y + background.getHeight() - 40, 48, 48),
+            new Rect2i(leftPos + imageWidth, y + background.getHeight() - 40, 48, 48),
             new Rect2i(refreshButton.getX(), refreshButton.getY(), refreshButton.getWidth(), refreshButton.getHeight())
         );
 
         renderedItem = new ElementWidget(
-            leftPos + background.getWidth(),
+            leftPos + imageWidth,
             this.topPos + background.getHeight() - 40
         ).showingElement(GuiGameElement.of(AllItems.SCHEMATIC_TABLE.getDefaultInstance()).scale(3));
         addRenderableWidget(renderedItem);
@@ -185,7 +190,7 @@ public class SchematicTableScreen extends AbstractSimiContainerScreen<SchematicT
         else
             titleText = title;
 
-        graphics.drawString(font, titleText, leftPos + (background.getWidth() - 8 - font.width(titleText)) / 2, topPos + 4, 0xFF505050, false);
+        graphics.drawString(font, titleText, leftPos + (imageWidth - 8 - font.width(titleText)) / 2, topPos + 4, 0xFF505050, false);
 
         if (schematicsArea == null)
             graphics.drawString(font, noSchematics, leftPos + 54, topPos + 28, 0xFFD3D3D3, true);

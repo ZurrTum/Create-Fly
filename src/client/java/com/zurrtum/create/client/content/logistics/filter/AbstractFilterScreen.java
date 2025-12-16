@@ -36,13 +36,18 @@ public abstract class AbstractFilterScreen<F extends AbstractFilterMenu> extends
     private ElementWidget renderedItem;
 
     protected AbstractFilterScreen(F menu, Inventory inv, Component title, AllGuiTextures background) {
-        super(menu, inv, title);
+        super(
+            menu,
+            inv,
+            title,
+            Math.max(background.getWidth(), PLAYER_INVENTORY.getWidth()),
+            background.getHeight() + 4 + PLAYER_INVENTORY.getHeight()
+        );
         this.background = background;
     }
 
     @Override
     protected void init() {
-        setWindowSize(Math.max(background.getWidth(), PLAYER_INVENTORY.getWidth()), background.getHeight() + 4 + PLAYER_INVENTORY.getHeight());
         super.init();
 
         resetButton = new IconButton(leftPos + background.getWidth() - 62, topPos + background.getHeight() - 24, AllIcons.I_TRASH);

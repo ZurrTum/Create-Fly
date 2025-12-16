@@ -82,7 +82,13 @@ public class SchematicannonScreen extends AbstractSimiContainerScreen<Schematica
     private List<Rect2i> extraAreas = Collections.emptyList();
 
     public SchematicannonScreen(SchematicannonMenu menu, Inventory inventory, Component title) {
-        super(menu, inventory, title);
+        super(
+            menu,
+            inventory,
+            title,
+            BG_TOP.getWidth(),
+            BG_TOP.getHeight() + BG_BOTTOM.getHeight() + 2 + AllGuiTextures.PLAYER_INVENTORY.getHeight()
+        );
         placementSettingWidgets = new ArrayList<>();
     }
 
@@ -107,7 +113,6 @@ public class SchematicannonScreen extends AbstractSimiContainerScreen<Schematica
 
     @Override
     protected void init() {
-        setWindowSize(BG_TOP.getWidth(), BG_TOP.getHeight() + BG_BOTTOM.getHeight() + 2 + AllGuiTextures.PLAYER_INVENTORY.getHeight());
         setWindowOffset(-11, 0);
         super.init();
 
@@ -145,9 +150,9 @@ public class SchematicannonScreen extends AbstractSimiContainerScreen<Schematica
         showSettingsIndicator = new Indicator(leftPos + 9, topPos + 111, CommonComponents.EMPTY);
         //		addRenderableWidget(showSettingsIndicator);
 
-        extraAreas = ImmutableList.of(new Rect2i(leftPos + BG_TOP.getWidth(), topPos + BG_TOP.getHeight() + BG_BOTTOM.getHeight() - 62, 84, 92));
+        extraAreas = ImmutableList.of(new Rect2i(leftPos + imageWidth, topPos + BG_TOP.getHeight() + BG_BOTTOM.getHeight() - 62, 84, 92));
 
-        renderedItem = new ElementWidget(leftPos + BG_TOP.getWidth() - 14, topPos + BG_TOP.getHeight() + BG_BOTTOM.getHeight() - 62).showingElement(
+        renderedItem = new ElementWidget(leftPos + imageWidth - 14, topPos + BG_TOP.getHeight() + BG_BOTTOM.getHeight() - 62).showingElement(
             GuiGameElement.of(AllItems.SCHEMATICANNON.getDefaultInstance()).scale(5).padding(28));
         addRenderableWidget(renderedItem);
 
@@ -315,7 +320,7 @@ public class SchematicannonScreen extends AbstractSimiContainerScreen<Schematica
         if (!be.inventory.getItem(0).isEmpty())
             renderBlueprintHighlight(graphics, leftPos, topPos);
 
-        graphics.drawString(font, title, leftPos + (BG_TOP.getWidth() - 8 - font.width(title)) / 2, topPos + 2, 0xFF505050, false);
+        graphics.drawString(font, title, leftPos + (imageWidth - 8 - font.width(title)) / 2, topPos + 2, 0xFF505050, false);
 
         Component msg = CreateLang.translateDirect("schematicannon.status." + be.statusMsg);
         int stringWidth = font.width(msg);

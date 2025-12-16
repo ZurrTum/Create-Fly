@@ -54,7 +54,7 @@ public class ToolboxScreen extends AbstractSimiContainerScreen<ToolboxMenu> {
     private List<Rect2i> extraAreas = Collections.emptyList();
 
     public ToolboxScreen(ToolboxMenu menu, Inventory inv, Component title) {
-        super(menu, inv, title);
+        super(menu, inv, title, 30 + BG.getWidth(), BG.getHeight() + PLAYER.getHeight() - 24);
         init();
     }
 
@@ -79,7 +79,6 @@ public class ToolboxScreen extends AbstractSimiContainerScreen<ToolboxMenu> {
 
     @Override
     protected void init() {
-        setWindowSize(30 + BG.getWidth(), BG.getHeight() + PLAYER.getHeight() - 24);
         setWindowOffset(-11, 0);
         super.init();
         clearWidgets();

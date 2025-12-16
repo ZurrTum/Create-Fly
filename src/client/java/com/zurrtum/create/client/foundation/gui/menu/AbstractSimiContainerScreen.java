@@ -5,7 +5,7 @@ import com.zurrtum.create.client.catnip.gui.TickableGuiEventListener;
 import com.zurrtum.create.client.catnip.gui.widget.AbstractSimiWidget;
 import com.zurrtum.create.client.foundation.gui.AllGuiTextures;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.*;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.components.Renderable;
@@ -34,8 +34,8 @@ import java.util.List;
 public abstract class AbstractSimiContainerScreen<T extends AbstractContainerMenu> extends AbstractContainerScreen<T> {
     protected int windowXOffset, windowYOffset;
 
-    public AbstractSimiContainerScreen(T container, Inventory inv, Component title) {
-        super(container, inv, title);
+    public AbstractSimiContainerScreen(T container, Inventory inv, Component title, int imageWidth, int imageHeight) {
+        super(container, inv, title, imageWidth, imageHeight);
     }
 
     public int getGuiLeft() {
@@ -44,14 +44,6 @@ public abstract class AbstractSimiContainerScreen<T extends AbstractContainerMen
 
     public int getGuiTop() {
         return topPos;
-    }
-
-    /**
-     * This method must be called before {@code super.init()}!
-     */
-    protected void setWindowSize(int width, int height) {
-        imageWidth = width;
-        imageHeight = height;
     }
 
     /**

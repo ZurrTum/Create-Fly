@@ -29,7 +29,13 @@ public class FactoryPanelSetItemScreen extends AbstractSimiContainerScreen<Facto
     private List<Rect2i> extraAreas = Collections.emptyList();
 
     public FactoryPanelSetItemScreen(FactoryPanelSetItemMenu container, Inventory inv, Component title) {
-        super(container, inv, title);
+        super(
+            container,
+            inv,
+            title,
+            AllGuiTextures.FACTORY_GAUGE_SET_ITEM.getWidth(),
+            AllGuiTextures.FACTORY_GAUGE_SET_ITEM.getHeight() + AllGuiTextures.PLAYER_INVENTORY.getHeight()
+        );
     }
 
     public static FactoryPanelSetItemScreen create(
@@ -48,16 +54,14 @@ public class FactoryPanelSetItemScreen extends AbstractSimiContainerScreen<Facto
     @Override
     protected void init() {
         int bgHeight = AllGuiTextures.FACTORY_GAUGE_SET_ITEM.getHeight();
-        int bgWidth = AllGuiTextures.FACTORY_GAUGE_SET_ITEM.getWidth();
-        setWindowSize(bgWidth, bgHeight + AllGuiTextures.PLAYER_INVENTORY.getHeight());
         super.init();
         clearWidgets();
 
-        confirmButton = new IconButton(leftPos + bgWidth - 40, topPos + bgHeight - 25, AllIcons.I_CONFIRM);
+        confirmButton = new IconButton(leftPos + imageWidth - 40, topPos + bgHeight - 25, AllIcons.I_CONFIRM);
         confirmButton.withCallback(() -> minecraft.player.closeContainer());
         addRenderableWidget(confirmButton);
 
-        extraAreas = List.of(new Rect2i(leftPos + bgWidth, topPos + bgHeight - 30, 40, 20));
+        extraAreas = List.of(new Rect2i(leftPos + imageWidth, topPos + bgHeight - 30, 40, 20));
 
         renderedItem = new ElementWidget(leftPos + 180, topPos + 48).showingElement(GuiGameElement.of(AllItems.FACTORY_GAUGE.getDefaultInstance())
             .scale(3));

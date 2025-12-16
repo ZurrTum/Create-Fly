@@ -102,7 +102,7 @@ public class ScheduleScreen extends AbstractSimiContainerScreen<ScheduleMenu> {
     private DestinationSuggestions destinationSuggestions;
 
     public ScheduleScreen(ScheduleMenu menu, Inventory inv, Component title) {
-        super(menu, inv, title);
+        super(menu, inv, title, AllGuiTextures.SCHEDULE.getWidth(), AllGuiTextures.SCHEDULE.getHeight());
         schedule = new Schedule();
         CompoundTag tag = menu.contentHolder.get(AllDataComponents.TRAIN_SCHEDULE);
         if (tag != null && !tag.isEmpty()) {
@@ -128,12 +128,10 @@ public class ScheduleScreen extends AbstractSimiContainerScreen<ScheduleMenu> {
 
     @Override
     protected void init() {
-        AllGuiTextures bg = AllGuiTextures.SCHEDULE;
-        setWindowSize(bg.getWidth(), bg.getHeight());
         super.init();
         clearWidgets();
 
-        confirmButton = new IconButton(leftPos + bg.getWidth() - 42, topPos + bg.getHeight() - 30, AllIcons.I_CONFIRM);
+        confirmButton = new IconButton(leftPos + imageWidth - 42, topPos + imageHeight - 30, AllIcons.I_CONFIRM);
         confirmButton.withCallback(() -> minecraft.player.closeContainer());
         addRenderableWidget(confirmButton);
 
@@ -182,15 +180,13 @@ public class ScheduleScreen extends AbstractSimiContainerScreen<ScheduleMenu> {
         addRenderableWidget(skipProgress);
 
         stopEditing();
-        extraAreas = ImmutableList.of(new Rect2i(leftPos + bg.getWidth(), topPos + bg.getHeight() - 56, 48, 48));
+        extraAreas = ImmutableList.of(new Rect2i(leftPos + imageWidth, topPos + imageHeight - 56, 48, 48));
         horizontalScrolls.clear();
         for (int i = 0; i < schedule.entries.size(); i++)
             horizontalScrolls.add(LerpedFloat.linear().startWithValue(0));
 
-        renderedItem = new ElementWidget(
-            leftPos + AllGuiTextures.SCHEDULE.getWidth(),
-            topPos + AllGuiTextures.SCHEDULE.getHeight() - 56
-        ).showingElement(GuiGameElement.of(menu.contentHolder).scale(3));
+        renderedItem = new ElementWidget(leftPos + imageWidth, topPos + imageHeight - 56).showingElement(GuiGameElement.of(menu.contentHolder)
+            .scale(3));
         addRenderableWidget(renderedItem);
     }
 

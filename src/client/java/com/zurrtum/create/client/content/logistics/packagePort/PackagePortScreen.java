@@ -49,7 +49,13 @@ public class PackagePortScreen extends AbstractSimiContainerScreen<PackagePortMe
     private List<Rect2i> extraAreas = Collections.emptyList();
 
     public PackagePortScreen(PackagePortMenu container, Inventory inv, Component title) {
-        super(container, inv, title);
+        super(
+            container,
+            inv,
+            title,
+            AllGuiTextures.FROGPORT_BG.getWidth(),
+            AllGuiTextures.FROGPORT_BG.getHeight() + AllGuiTextures.PLAYER_INVENTORY.getHeight()
+        );
         background = AllGuiTextures.FROGPORT_BG;
         frogMode = container.contentHolder instanceof FrogportBlockEntity;
         icon = new ItemStack(container.contentHolder.getBlockState().getBlock().asItem());
@@ -68,13 +74,12 @@ public class PackagePortScreen extends AbstractSimiContainerScreen<PackagePortMe
 
     @Override
     protected void init() {
-        setWindowSize(background.getWidth(), background.getHeight() + AllGuiTextures.PLAYER_INVENTORY.getHeight());
         super.init();
         clearWidgets();
 
         Consumer<String> onTextChanged;
         onTextChanged = s -> addressBox.setX(nameBoxX(s, addressBox));
-        addressBox = new EditBox(new NoShadowFontWrapper(font), leftPos + 23, topPos - 11, background.getWidth() - 20, 10, Component.empty());
+        addressBox = new EditBox(new NoShadowFontWrapper(font), leftPos + 23, topPos - 11, imageWidth - 20, 10, Component.empty());
         addressBox.setBordered(false);
         addressBox.setMaxLength(25);
         addressBox.setTextColor(0xFF3D3C48);
@@ -85,7 +90,7 @@ public class PackagePortScreen extends AbstractSimiContainerScreen<PackagePortMe
         addressBox.setX(nameBoxX(addressBox.getValue(), addressBox));
         addRenderableWidget(addressBox);
 
-        confirmButton = new IconButton(leftPos + background.getWidth() - 33, topPos + background.getHeight() - 24, AllIcons.I_CONFIRM);
+        confirmButton = new IconButton(leftPos + imageWidth - 33, topPos + background.getHeight() - 24, AllIcons.I_CONFIRM);
         confirmButton.withCallback(() -> minecraft.player.closeContainer());
         addRenderableWidget(confirmButton);
 
@@ -109,10 +114,10 @@ public class PackagePortScreen extends AbstractSimiContainerScreen<PackagePortMe
 
         containerTick();
 
-        extraAreas = ImmutableList.of(new Rect2i(leftPos + background.getWidth(), topPos + background.getHeight() - 50, 70, 60));
+        extraAreas = ImmutableList.of(new Rect2i(leftPos + imageWidth, topPos + background.getHeight() - 50, 70, 60));
 
-        renderedItem = new ElementWidget(leftPos + background.getWidth() + 6, topPos + background.getHeight() - 56).showingElement(GuiGameElement.of(
-            icon).scale(4));
+        renderedItem = new ElementWidget(leftPos + imageWidth + 6, topPos + background.getHeight() - 56).showingElement(GuiGameElement.of(icon)
+            .scale(4));
         addRenderableWidget(renderedItem);
     }
 
@@ -123,7 +128,7 @@ public class PackagePortScreen extends AbstractSimiContainerScreen<PackagePortMe
     }
 
     private int nameBoxX(String s, EditBox nameBox) {
-        return leftPos + background.getWidth() / 2 - (Math.min(font.width(s), nameBox.getWidth()) + 10) / 2;
+        return leftPos + imageWidth / 2 - (Math.min(font.width(s), nameBox.getWidth()) + 10) / 2;
     }
 
     @Override

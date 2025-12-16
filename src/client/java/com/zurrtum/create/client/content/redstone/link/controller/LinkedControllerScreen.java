@@ -37,7 +37,13 @@ public class LinkedControllerScreen extends AbstractSimiContainerScreen<LinkedCo
     private ElementWidget renderedItem;
 
     public LinkedControllerScreen(LinkedControllerMenu menu, Inventory inv, Component title) {
-        super(menu, inv, title);
+        super(
+            menu,
+            inv,
+            title,
+            AllGuiTextures.LINKED_CONTROLLER.getWidth(),
+            AllGuiTextures.LINKED_CONTROLLER.getHeight() + 4 + PLAYER_INVENTORY.getHeight()
+        );
         this.background = AllGuiTextures.LINKED_CONTROLLER;
     }
 
@@ -54,16 +60,15 @@ public class LinkedControllerScreen extends AbstractSimiContainerScreen<LinkedCo
 
     @Override
     protected void init() {
-        setWindowSize(background.getWidth(), background.getHeight() + 4 + PLAYER_INVENTORY.getHeight());
         setWindowOffset(1, 0);
         super.init();
 
-        resetButton = new IconButton(leftPos + background.getWidth() - 62, topPos + background.getHeight() - 24, AllIcons.I_TRASH);
+        resetButton = new IconButton(leftPos + imageWidth - 62, topPos + background.getHeight() - 24, AllIcons.I_TRASH);
         resetButton.withCallback(() -> {
             menu.clearContents();
             minecraft.player.connection.send(AllPackets.CLEAR_CONTAINER);
         });
-        confirmButton = new IconButton(leftPos + background.getWidth() - 33, topPos + background.getHeight() - 24, AllIcons.I_CONFIRM);
+        confirmButton = new IconButton(leftPos + imageWidth - 33, topPos + background.getHeight() - 24, AllIcons.I_CONFIRM);
         confirmButton.withCallback(() -> {
             minecraft.player.closeContainer();
         });
@@ -71,9 +76,11 @@ public class LinkedControllerScreen extends AbstractSimiContainerScreen<LinkedCo
         addRenderableWidget(resetButton);
         addRenderableWidget(confirmButton);
 
-        extraAreas = ImmutableList.of(new Rect2i(leftPos + background.getWidth() + 4, topPos + background.getHeight() - 44, 64, 56));
-        renderedItem = new ElementWidget(leftPos + background.getWidth() - 4, topPos + background.getHeight() - 56).showingElement(GuiGameElement.of(
-            menu.contentHolder).scale(5));
+        extraAreas = ImmutableList.of(new Rect2i(leftPos + imageWidth + 4, topPos + background.getHeight() - 44, 64, 56));
+        renderedItem = new ElementWidget(
+            leftPos + imageWidth - 4,
+            topPos + background.getHeight() - 56
+        ).showingElement(GuiGameElement.of(menu.contentHolder).scale(5));
         addRenderableWidget(renderedItem);
     }
 

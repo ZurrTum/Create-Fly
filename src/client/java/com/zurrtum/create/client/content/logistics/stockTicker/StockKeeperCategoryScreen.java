@@ -68,7 +68,13 @@ public class StockKeeperCategoryScreen extends AbstractSimiContainerScreen<Stock
     final int slices = 4;
 
     public StockKeeperCategoryScreen(StockKeeperCategoryMenu menu, Inventory inv, Component title) {
-        super(menu, inv, title);
+        super(
+            menu,
+            inv,
+            title,
+            AllGuiTextures.STOCK_KEEPER_CATEGORY.getWidth(),
+            AllGuiTextures.STOCK_KEEPER_CATEGORY.getHeight() * 4 + AllGuiTextures.STOCK_KEEPER_CATEGORY_HEADER.getHeight() + AllGuiTextures.STOCK_KEEPER_CATEGORY_FOOTER.getHeight()
+        );
         schedule = new ArrayList<>(menu.contentHolder.categories);
         menu.slotsActive = false;
     }
@@ -86,24 +92,21 @@ public class StockKeeperCategoryScreen extends AbstractSimiContainerScreen<Stock
 
     @Override
     protected void init() {
-        AllGuiTextures bg = AllGuiTextures.STOCK_KEEPER_CATEGORY;
-        setWindowSize(
-            bg.getWidth(),
-            bg.getHeight() * slices + AllGuiTextures.STOCK_KEEPER_CATEGORY_HEADER.getHeight() + AllGuiTextures.STOCK_KEEPER_CATEGORY_FOOTER.getHeight()
-        );
         super.init();
         clearWidgets();
 
-        confirmButton = new IconButton(leftPos + bg.getWidth() - 25, topPos + imageHeight - 25, AllIcons.I_CONFIRM);
+        confirmButton = new IconButton(leftPos + imageWidth - 25, topPos + imageHeight - 25, AllIcons.I_CONFIRM);
         confirmButton.withCallback(() -> minecraft.player.closeContainer());
         addRenderableWidget(confirmButton);
 
         stopEditing();
 
-        extraAreas = ImmutableList.of(new Rect2i(leftPos + bg.getWidth(), topPos + imageHeight - 40, 48, 40));
+        extraAreas = ImmutableList.of(new Rect2i(leftPos + imageWidth, topPos + imageHeight - 40, 48, 40));
 
-        renderedItem = new ElementWidget(leftPos + AllGuiTextures.STOCK_KEEPER_CATEGORY.getWidth() + 12, topPos + imageHeight - 39).showingElement(
-            GuiGameElement.of(AllItems.STOCK_TICKER.getDefaultInstance()).scale(3));
+        renderedItem = new ElementWidget(
+            leftPos + imageWidth + 12,
+            topPos + imageHeight - 39
+        ).showingElement(GuiGameElement.of(AllItems.STOCK_TICKER.getDefaultInstance()).scale(3));
         addRenderableWidget(renderedItem);
     }
 
@@ -135,7 +138,7 @@ public class StockKeeperCategoryScreen extends AbstractSimiContainerScreen<Stock
 
         addRenderableWidget(editorConfirm);
         addRenderableWidget(editorEditBox);
-        imageHeight = 88 + AllGuiTextures.PLAYER_INVENTORY.getHeight();
+        //        imageHeight = 88 + AllGuiTextures.PLAYER_INVENTORY.getHeight();
     }
 
     protected void stopEditing() {
