@@ -5,10 +5,10 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import net.minecraft.advancements.CriterionTrigger;
 import net.minecraft.advancements.CriterionTriggerInstance;
-import net.minecraft.advancements.criterion.CriterionValidator;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.PlayerAdvancements;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.level.storage.loot.ValidationContextSource;
 
 import java.util.HashSet;
 import java.util.Map;
@@ -62,7 +62,7 @@ public class CreateTrigger implements CriterionTrigger<CreateTrigger.Conditions>
         public static final Codec<Conditions> CODEC = MapCodec.unitCodec(new Conditions());
 
         @Override
-        public void validate(CriterionValidator validator) {
+        public void validate(ValidationContextSource validator) {
         }
     }
 }
