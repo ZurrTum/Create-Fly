@@ -2,18 +2,13 @@ package com.zurrtum.create.client.foundation.gui;
 
 import com.zurrtum.create.catnip.data.Couple;
 import com.zurrtum.create.catnip.data.Pair;
-import com.zurrtum.create.client.foundation.gui.widget.Label;
-import com.zurrtum.create.client.foundation.gui.widget.ScrollInput;
-import com.zurrtum.create.client.foundation.gui.widget.SelectionScrollInput;
-import com.zurrtum.create.client.foundation.gui.widget.TooltipArea;
-
-import java.util.function.BiConsumer;
-
+import com.zurrtum.create.client.foundation.gui.widget.*;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.input.MouseButtonInfo;
 import net.minecraft.network.chat.CommonComponents;
+
+import java.util.function.BiConsumer;
 
 public class ModularGuiLineBuilder {
 
@@ -60,7 +55,7 @@ public class ModularGuiLineBuilder {
         target.add(Pair.of(input, dataKey));
     }
 
-    public ModularGuiLineBuilder addIntegerTextInput(int x, int width, BiConsumer<EditBox, TooltipArea> inputTransform, String dataKey) {
+    public ModularGuiLineBuilder addIntegerTextInput(int x, int width, BiConsumer<FilterEditBox, TooltipArea> inputTransform, String dataKey) {
         return addTextInput(
             x, width, inputTransform.andThen((editBox, $) -> editBox.setFilter(s -> {
                 if (s.isEmpty())
@@ -75,8 +70,8 @@ public class ModularGuiLineBuilder {
         );
     }
 
-    public ModularGuiLineBuilder addTextInput(int x, int width, BiConsumer<EditBox, TooltipArea> inputTransform, String dataKey) {
-        EditBox input = new EditBox(font, x + this.x + 5, y, width - 9, 8, CommonComponents.EMPTY);
+    public ModularGuiLineBuilder addTextInput(int x, int width, BiConsumer<FilterEditBox, TooltipArea> inputTransform, String dataKey) {
+        FilterEditBox input = new FilterEditBox(font, x + this.x + 5, y, width - 9, 8, CommonComponents.EMPTY);
         input.setBordered(false);
         input.setTextColor(0xffffffff);
         input.setFocused(false);

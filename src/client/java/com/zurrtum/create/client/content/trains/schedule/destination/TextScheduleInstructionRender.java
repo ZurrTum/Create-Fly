@@ -3,10 +3,10 @@ package com.zurrtum.create.client.content.trains.schedule.destination;
 import com.google.common.collect.ImmutableList;
 import com.zurrtum.create.client.content.trains.schedule.IScheduleInput;
 import com.zurrtum.create.client.foundation.gui.ModularGuiLineBuilder;
+import com.zurrtum.create.client.foundation.gui.widget.FilterEditBox;
 import com.zurrtum.create.client.foundation.utility.CreateLang;
 import com.zurrtum.create.content.trains.schedule.destination.TextScheduleInstruction;
 import net.minecraft.ChatFormatting;
-import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.network.chat.Component;
 
 import java.util.List;
@@ -24,6 +24,6 @@ public abstract class TextScheduleInstructionRender<T extends TextScheduleInstru
         builder.addTextInput(0, 121, (e, t) -> modifyEditBox(e), "Text");
     }
 
-    protected void modifyEditBox(EditBox box) {
+    protected void modifyEditBox(FilterEditBox box) {
     }
 }

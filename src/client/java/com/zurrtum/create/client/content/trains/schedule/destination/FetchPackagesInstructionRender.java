@@ -2,18 +2,17 @@ package com.zurrtum.create.client.content.trains.schedule.destination;
 
 import com.google.common.collect.ImmutableList;
 import com.zurrtum.create.catnip.data.Pair;
+import com.zurrtum.create.client.foundation.gui.widget.FilterEditBox;
 import com.zurrtum.create.client.foundation.utility.CreateLang;
 import com.zurrtum.create.content.logistics.box.PackageStyles;
 import com.zurrtum.create.content.trains.schedule.destination.FetchPackagesInstruction;
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.item.ItemStack;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
-
-import net.minecraft.ChatFormatting;
-import net.minecraft.client.gui.components.EditBox;
-import net.minecraft.network.chat.Component;
-import net.minecraft.world.item.ItemStack;
 
 public class FetchPackagesInstructionRender extends TextScheduleInstructionRender<FetchPackagesInstruction> {
     @Override
@@ -47,7 +46,7 @@ public class FetchPackagesInstructionRender extends TextScheduleInstructionRende
     }
 
     @Override
-    protected void modifyEditBox(EditBox box) {
+    protected void modifyEditBox(FilterEditBox box) {
         box.setFilter(s -> StringUtils.countMatches(s, '*') <= 3);
     }
 }

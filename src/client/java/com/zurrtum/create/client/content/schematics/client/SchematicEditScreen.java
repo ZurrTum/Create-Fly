@@ -8,10 +8,7 @@ import com.zurrtum.create.client.catnip.gui.element.GuiGameElement;
 import com.zurrtum.create.client.catnip.gui.widget.ElementWidget;
 import com.zurrtum.create.client.foundation.gui.AllGuiTextures;
 import com.zurrtum.create.client.foundation.gui.AllIcons;
-import com.zurrtum.create.client.foundation.gui.widget.IconButton;
-import com.zurrtum.create.client.foundation.gui.widget.Label;
-import com.zurrtum.create.client.foundation.gui.widget.ScrollInput;
-import com.zurrtum.create.client.foundation.gui.widget.SelectionScrollInput;
+import com.zurrtum.create.client.foundation.gui.widget.*;
 import com.zurrtum.create.client.foundation.utility.CreateLang;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.EditBox;
@@ -61,9 +58,9 @@ public class SchematicEditScreen extends AbstractSimiScreen {
         int x = guiLeft;
         int y = guiTop + 2;
 
-        xInput = new EditBox(font, x + 50, y + 26, 34, 10, CommonComponents.EMPTY);
-        yInput = new EditBox(font, x + 90, y + 26, 34, 10, CommonComponents.EMPTY);
-        zInput = new EditBox(font, x + 130, y + 26, 34, 10, CommonComponents.EMPTY);
+        xInput = new FilterEditBox(font, x + 50, y + 26, 34, 10, CommonComponents.EMPTY, SchematicEditScreen::filterText);
+        yInput = new FilterEditBox(font, x + 90, y + 26, 34, 10, CommonComponents.EMPTY, SchematicEditScreen::filterText);
+        zInput = new FilterEditBox(font, x + 130, y + 26, 34, 10, CommonComponents.EMPTY, SchematicEditScreen::filterText);
 
         BlockPos anchor = handler.getTransformation().getAnchor();
         if (handler.isDeployed()) {
@@ -83,16 +80,6 @@ public class SchematicEditScreen extends AbstractSimiScreen {
             widget.setTextColor(0xFFFFFFFF);
             widget.setFocused(false);
             widget.mouseClicked(new MouseButtonEvent(0, 0, new MouseButtonInfo(0, 0)), false);
-            widget.setFilter(s -> {
-                if (s.isEmpty() || s.equals("-"))
-                    return true;
-                try {
-                    Integer.parseInt(s);
-                    return true;
-                } catch (NumberFormatException e) {
-                    return false;
-                }
-            });
         }
 
         StructurePlaceSettings settings = handler.getTransformation().toSettings();
@@ -116,6 +103,17 @@ public class SchematicEditScreen extends AbstractSimiScreen {
             y + background.getHeight() - 40
         ).showingElement(GuiGameElement.of(AllItems.SCHEMATIC.getDefaultInstance()).scale(3));
         addRenderableWidget(renderedItem);
+    }
+
+    private static boolean filterText(String s) {
+        if (s.isEmpty() || s.equals("-"))
+            return true;
+        try {
+            Integer.parseInt(s);
+            return true;
+        } catch (NumberFormatException e) {
+            return false;
+        }
     }
 
     @Override
