@@ -10,6 +10,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.server.packs.*;
 import net.minecraft.server.packs.metadata.pack.PackMetadataSection;
 import net.minecraft.server.packs.repository.*;
+import net.minecraft.server.packs.resources.ResourceMetadata;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
@@ -75,7 +76,7 @@ public class BuiltInPackSourceMixin {
         String directory,
         String... namespace
     ) {
-        BuiltInMetadata metadataMap = BuiltInMetadata.of(
+        ResourceMetadata metadataMap = ResourceMetadata.of(
             PackMetadataSection.SERVER_TYPE,
             new PackMetadataSection(title, SharedConstants.getCurrentVersion().packVersion(PackType.SERVER_DATA).minorRange())
         );

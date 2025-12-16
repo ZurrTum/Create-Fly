@@ -11,6 +11,7 @@ import net.minecraft.server.packs.metadata.pack.PackMetadataSection;
 import net.minecraft.server.packs.repository.KnownPack;
 import net.minecraft.server.packs.repository.Pack;
 import net.minecraft.server.packs.repository.PackSource;
+import net.minecraft.server.packs.resources.ResourceMetadata;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
@@ -38,7 +39,7 @@ public abstract class ClientPackSourceMixin {
                 MOD_ID, id -> {
                     String directory = PackType.CLIENT_RESOURCES.getDirectory();
                     PackLocationInfo info = createInfo(id, metadata.getName(), id, directory, version);
-                    BuiltInMetadata meta = createMeta(Component.translatable("advancement.create.root"));
+                    ResourceMetadata meta = createMeta(Component.translatable("advancement.create.root"));
                     PackSelectionConfig position = new PackSelectionConfig(true, Pack.Position.BOTTOM, false);
                     return createPacket(rootPaths, directory, info, meta, position, id, "minecraft", "flywheel", "vanillin", "ponder", "fabric");
                 }
@@ -48,7 +49,7 @@ public abstract class ClientPackSourceMixin {
             MOD_ID + "_legacy_copper", id -> {
                 String directory = "legacy_copper";
                 PackLocationInfo info = createInfo(id, "Create legacy copper", MOD_ID, directory, version);
-                BuiltInMetadata meta = createMeta(Component.literal("Replacement textures for Vanilla Copper"));
+                ResourceMetadata meta = createMeta(Component.literal("Replacement textures for Vanilla Copper"));
                 PackSelectionConfig position = new PackSelectionConfig(false, Pack.Position.TOP, false);
                 return createPacket(rootPaths, directory, info, meta, position, "minecraft");
             }
@@ -61,8 +62,8 @@ public abstract class ClientPackSourceMixin {
     }
 
     @Unique
-    private static BuiltInMetadata createMeta(Component description) {
-        return BuiltInMetadata.of(
+    private static ResourceMetadata createMeta(Component description) {
+        return ResourceMetadata.of(
             PackMetadataSection.CLIENT_TYPE,
             new PackMetadataSection(description, SharedConstants.getCurrentVersion().packVersion(PackType.CLIENT_RESOURCES).minorRange())
         );
@@ -73,7 +74,7 @@ public abstract class ClientPackSourceMixin {
         List<Path> rootPaths,
         String directory,
         PackLocationInfo info,
-        BuiltInMetadata meta,
+        ResourceMetadata meta,
         PackSelectionConfig position,
         String... namespace
     ) {
