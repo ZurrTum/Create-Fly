@@ -72,7 +72,7 @@ public class BoilerData {
     // re-use the same lambda for each side
     private final SoundPool.Sound sound = (level, pos) -> {
         float volume = 3f / Math.max(2, attachedEngines / 6);
-        float pitch = 1.18f - level.random.nextFloat() * .25f;
+        float pitch = 1.18f - level.getRandom().nextFloat() * .25f;
         level.playLocalSound(pos.getX(), pos.getY(), pos.getZ(), SoundEvents.CANDLE_EXTINGUISH, SoundSource.BLOCKS, volume, pitch, false);
 
         AllSoundEvents.STEAM.playAt(level, pos, volume / 16, .8f, false);
@@ -88,8 +88,8 @@ public class BoilerData {
             pools.values().forEach(p -> p.play(level));
             gauge.tickChaser();
             float current = gauge.getValue(1);
-            if (current > 1 && level.random.nextFloat() < 1 / 2f)
-                gauge.setValueNoUpdate(current + Math.min(-(current - 1) * level.random.nextFloat(), 0));
+            if (current > 1 && level.getRandom().nextFloat() < 1 / 2f)
+                gauge.setValueNoUpdate(current + Math.min(-(current - 1) * level.getRandom().nextFloat(), 0));
             return;
         }
         if (needsHeatLevelUpdate && updateTemperature(controller))

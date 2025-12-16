@@ -355,7 +355,7 @@ public class AllHandle {
                     TrackPropagator.onRailRemoved(world, pos, blockState);
 
                     if (packet.wrench()) {
-                        AllSoundEvents.WRENCH_REMOVE.playOnServer(world, packet.soundSource(), 1, world.random.nextFloat() * .5f + .5f);
+                        AllSoundEvents.WRENCH_REMOVE.playOnServer(world, packet.soundSource(), 1, world.getRandom().nextFloat() * .5f + .5f);
                         if (!player.isCreative() && bezierConnection != null)
                             bezierConnection.addItemsToPlayer(player);
                     } else if (!player.isCreative() && bezierConnection != null)

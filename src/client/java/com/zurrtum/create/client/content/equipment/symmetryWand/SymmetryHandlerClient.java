@@ -109,7 +109,7 @@ public class SymmetryHandlerClient {
                     if (mirror instanceof EmptyMirror)
                         continue;
 
-                    RandomSource random = mc.level.random;
+                    RandomSource random = mc.level.getRandom();
                     double offsetX = (random.nextDouble() - 0.5) * 0.3;
                     double offsetZ = (random.nextDouble() - 0.5) * 0.3;
 
@@ -122,7 +122,7 @@ public class SymmetryHandlerClient {
     }
 
     public static void drawEffect(Minecraft client, BlockPos from, BlockPos to) {
-        RandomSource random = client.level.random;
+        RandomSource random = client.level.getRandom();
         double density = 0.8f;
         Vec3 start = Vec3.atLowerCornerOf(from).add(0.5, 0.5, 0.5);
         Vec3 end = Vec3.atLowerCornerOf(to).add(0.5, 0.5, 0.5);

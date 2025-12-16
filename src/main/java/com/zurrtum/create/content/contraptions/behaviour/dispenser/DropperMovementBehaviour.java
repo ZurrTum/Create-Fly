@@ -24,7 +24,7 @@ public class DropperMovementBehaviour extends MovementBehaviour {
         if (storage == null)
             return;
 
-        int slot = getSlot(storage, context.world.random, context.contraption.getStorage().getAllItems());
+        int slot = getSlot(storage, context.world.getRandom(), context.contraption.getStorage().getAllItems());
         if (slot == -1) {
             // all slots empty
             failDispense(context, pos);

@@ -48,7 +48,7 @@ public class SawRenderer extends PictureInPictureRenderer<SawRenderState> {
         matrices.pushPose();
         blockState = AllBlocks.SHAFT.defaultBlockState().setValue(BlockStateProperties.AXIS, net.minecraft.core.Direction.Axis.X);
         world.blockState(blockState);
-        parts = blockRenderManager.getBlockModel(blockState).collectParts(mc.level.random);
+        parts = blockRenderManager.getBlockModel(blockState).collectParts(mc.level.getRandom());
         matrices.translate(0.5f, 0.5f, 0.5f);
         matrices.mulPose(Axis.XP.rotationDegrees(getCurrentAngle()));
         matrices.translate(-0.5f, -0.5f, -0.5f);
@@ -57,7 +57,7 @@ public class SawRenderer extends PictureInPictureRenderer<SawRenderState> {
 
         blockState = AllBlocks.MECHANICAL_SAW.defaultBlockState().setValue(SawBlock.FACING, Direction.UP);
         world.blockState(blockState);
-        parts = blockRenderManager.getBlockModel(blockState).collectParts(mc.level.random);
+        parts = blockRenderManager.getBlockModel(blockState).collectParts(mc.level.getRandom());
         blockRenderManager.renderBatched(blockState, BlockPos.ZERO, world, matrices, buffer, false, parts);
 
         blockState = Blocks.AIR.defaultBlockState();

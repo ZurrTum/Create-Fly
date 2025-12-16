@@ -146,7 +146,7 @@ public class PackagerBlock extends WrenchableDirectionalBlock implements IBE<Pac
                         SoundEvents.ITEM_PICKUP,
                         SoundSource.PLAYERS,
                         .2f,
-                        1f + player.level().random.nextFloat()
+                        1f + player.level().getRandom().nextFloat()
                     );
                     be.heldBox = ItemStack.EMPTY;
                     be.notifyUpdate();

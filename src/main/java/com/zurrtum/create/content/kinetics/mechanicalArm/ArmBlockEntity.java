@@ -408,7 +408,14 @@ public class ArmBlockEntity extends KineticBlockEntity implements TransformableB
                 setChanged();
 
                 if (!ItemStack.isSameItem(heldItem, prevHeld))
-                    level.playSound(null, worldPosition, SoundEvents.ITEM_PICKUP, SoundSource.BLOCKS, .125f, .5f + level.random.nextFloat() * .25f);
+                    level.playSound(
+                        null,
+                        worldPosition,
+                        SoundEvents.ITEM_PICKUP,
+                        SoundSource.BLOCKS,
+                        .125f,
+                        .5f + level.getRandom().nextFloat() * .25f
+                    );
                 return;
             }
 

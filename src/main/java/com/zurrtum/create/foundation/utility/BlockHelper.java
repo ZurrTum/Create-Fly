@@ -293,7 +293,7 @@ public class BlockHelper {
         FluidState fluidState = world.getFluidState(pos);
         BlockState state = world.getBlockState(pos);
 
-        if (world.random.nextFloat() < effectChance)
+        if (world.getRandom().nextFloat() < effectChance)
             world.levelEvent(LevelEvent.PARTICLES_DESTROY_BLOCK, pos, Block.getId(state));
         BlockEntity blockEntity = state.hasBlockEntity() ? world.getBlockEntity(pos) : null;
 
@@ -476,7 +476,7 @@ public class BlockHelper {
                 SoundEvents.FIRE_EXTINGUISH,
                 SoundSource.BLOCKS,
                 0.5F,
-                2.6F + (world.random.nextFloat() - world.random.nextFloat()) * 0.8F
+                2.6F + (world.getRandom().nextFloat() - world.getRandom().nextFloat()) * 0.8F
             );
 
             for (int l = 0; l < 8; ++l) {

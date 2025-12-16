@@ -147,7 +147,7 @@ public class DeployerHandler {
             .filter(e -> !(e instanceof AbstractContraptionEntity)).toList();
         InteractionHand hand = InteractionHand.MAIN_HAND;
         if (!entities.isEmpty()) {
-            Entity entity = entities.get(level.random.nextInt(entities.size()));
+            Entity entity = entities.get(level.getRandom().nextInt(entities.size()));
             List<ItemStack> capturedDrops = new ArrayList<>();
             boolean success = false;
             AllSynchedDatas.CAPTURE_DROPS.set(entity, Optional.of(capturedDrops));

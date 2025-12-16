@@ -261,12 +261,12 @@ public class SuperGlueSelectionHandler {
         Vec3 plane = VecHelper.axisAlingedPlaneOf(vec);
         Vec3 facePos = VecHelper.getCenterOf(pos).add(vec.scale(.5f));
 
-        float distance = fullBlock ? 1f : .25f + .25f * (world.random.nextFloat() - .5f);
+        float distance = fullBlock ? 1f : .25f + .25f * (world.getRandom().nextFloat() - .5f);
         plane = plane.scale(distance);
         ItemStack stack = new ItemStack(Items.SLIME_BALL);
 
         for (int i = fullBlock ? 40 : 15; i > 0; i--) {
-            Vec3 offset = VecHelper.rotate(plane, 360 * world.random.nextFloat(), direction.getAxis());
+            Vec3 offset = VecHelper.rotate(plane, 360 * world.getRandom().nextFloat(), direction.getAxis());
             Vec3 motion = offset.normalize().scale(1 / 16f);
             if (fullBlock)
                 offset = new Vec3(Mth.clamp(offset.x, -.5, .5), Mth.clamp(offset.y, -.5, .5), Mth.clamp(offset.z, -.5, .5));

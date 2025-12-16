@@ -798,7 +798,7 @@ public class AllHandle extends AllClientHandle {
 
     @Override
     public void addAirFlowParticle(Level world, BlockPos airCurrentPos, double x, double y, double z) {
-        if (world.random.nextFloat() < AllConfigs.client().fanParticleDensity.get())
+        if (world.getRandom().nextFloat() < AllConfigs.client().fanParticleDensity.get())
             world.addParticle(new AirFlowParticleData(airCurrentPos), x, y, z, 0, 0, 0);
     }
 
@@ -855,7 +855,7 @@ public class AllHandle extends AllClientHandle {
                 return;
         if (openEnd)
             spawnPouringLiquid(world, pos, flow, side, amount);
-        else if (world.random.nextFloat() < PipeConnection.IDLE_PARTICLE_SPAWN_CHANCE)
+        else if (world.getRandom().nextFloat() < PipeConnection.IDLE_PARTICLE_SPAWN_CHANCE)
             spawnRimParticles(world, pos, flow.fluid, side, amount);
     }
 
@@ -918,7 +918,7 @@ public class AllHandle extends AllClientHandle {
 
         Level world = be.getLevel();
         Vec3 offset = VecHelper.rotate(
-            new Vec3(0, 0, 1).add(VecHelper.offsetRandomly(Vec3.ZERO, world.random, 1).multiply(1, 1, 0).normalize().scale(.5f)),
+            new Vec3(0, 0, 1).add(VecHelper.offsetRandomly(Vec3.ZERO, world.getRandom(), 1).multiply(1, 1, 0).normalize().scale(.5f)),
             AngleHelper.verticalAngle(facing),
             Axis.X
         );
@@ -959,7 +959,7 @@ public class AllHandle extends AllClientHandle {
 
     @Override
     public void createBasinFluidParticles(Level world, BasinBlockEntity blockEntity) {
-        RandomSource r = world.random;
+        RandomSource r = world.getRandom();
 
         if (!blockEntity.visualizedOutputFluids.isEmpty())
             createBasinOutputFluidParticles(world, blockEntity, r);

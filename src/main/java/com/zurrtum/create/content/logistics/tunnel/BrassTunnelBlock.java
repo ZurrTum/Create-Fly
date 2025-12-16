@@ -45,7 +45,7 @@ public class BrassTunnelBlock extends BeltTunnelBlock {
                     return InteractionResult.SUCCESS;
                 for (ItemStack itemStack : stacksOfGroup)
                     player.getInventory().placeItemBackInInventory(itemStack.copy());
-                level.playSound(null, pos, SoundEvents.ITEM_PICKUP, SoundSource.PLAYERS, .2f, 1f + level.random.nextFloat());
+                level.playSound(null, pos, SoundEvents.ITEM_PICKUP, SoundSource.PLAYERS, .2f, 1f + level.getRandom().nextFloat());
                 return InteractionResult.SUCCESS;
             }
         );

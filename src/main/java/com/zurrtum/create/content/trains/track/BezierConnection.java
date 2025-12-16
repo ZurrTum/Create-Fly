@@ -118,7 +118,10 @@ public class BezierConnection implements Iterable<BezierConnection.Segment> {
         return this == other || (other != null && coupleEquals(this.bePositions, other.bePositions) && coupleEquals(
             this.starts,
             other.starts
-        ) && coupleEquals(this.axes, other.axes) && coupleEquals(this.normals, other.normals) && this.hasGirder == other.hasGirder);
+        ) && coupleEquals(this.axes, other.axes) && coupleEquals(
+            this.normals,
+            other.normals
+        ) && this.hasGirder == other.hasGirder);
     }
 
     @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
@@ -316,7 +319,7 @@ public class BezierConnection implements Iterable<BezierConnection.Segment> {
         for (Segment segment : this) {
             if (segment.index % 2 != 0 || segment.index == getSegmentCount())
                 continue;
-            Vec3 v = VecHelper.offsetRandomly(segment.position, level.random, .125f).add(origin);
+            Vec3 v = VecHelper.offsetRandomly(segment.position, level.getRandom(), .125f).add(origin);
             ItemEntity entity = new ItemEntity(level, v.x, v.y, v.z, new ItemStack(getMaterial()));
             entity.setDefaultPickUpDelay();
             level.addFreshEntity(entity);

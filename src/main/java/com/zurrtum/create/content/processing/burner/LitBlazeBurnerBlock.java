@@ -71,7 +71,7 @@ public class LitBlazeBurnerBlock extends Block implements IWrenchable {
 
         if (state.getValue(FLAME_TYPE) == FlameType.REGULAR) {
             if (stack.is(ItemTags.SOUL_FIRE_BASE_BLOCKS)) {
-                level.playSound(player, pos, SoundEvents.SOUL_SAND_PLACE, SoundSource.BLOCKS, 1.0f, level.random.nextFloat() * 0.4F + 0.8F);
+                level.playSound(player, pos, SoundEvents.SOUL_SAND_PLACE, SoundSource.BLOCKS, 1.0f, level.getRandom().nextFloat() * 0.4F + 0.8F);
                 if (level.isClientSide())
                     return InteractionResult.SUCCESS;
                 level.setBlockAndUpdate(pos, defaultBlockState().setValue(FLAME_TYPE, FlameType.SOUL));

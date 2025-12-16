@@ -89,7 +89,7 @@ public class CarriageContraptionEntity extends OrientedContraptionEntity {
         validForRender = false;
         firstPositionUpdate = true;
         arrivalSoundTicks = Integer.MIN_VALUE;
-        derailParticleOffset = VecHelper.offsetRandomly(Vec3.ZERO, world.random, 1.5f).multiply(1, .25f, 1);
+        derailParticleOffset = VecHelper.offsetRandomly(Vec3.ZERO, world.getRandom(), 1.5f).multiply(1, .25f, 1);
         ArrayList<EntityBehaviour<?>> list = new ArrayList<>();
         AllClientHandle.INSTANCE.addBehaviours(this, list);
         list.forEach(b -> behaviours.put(b.getType(), b));

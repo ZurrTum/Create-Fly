@@ -379,8 +379,8 @@ public class MechanicalCrafterBlockEntity extends KineticBlockEntity implements 
                 float progress = countDown / 2000f;
                 Vec3 facingVec = Vec3.atLowerCornerOf(facing.getUnitVec3i());
                 Vec3 vec = facingVec.scale(.65).add(VecHelper.getCenterOf(worldPosition));
-                Vec3 offset = VecHelper.offsetRandomly(Vec3.ZERO, level.random, .125f).multiply(VecHelper.axisAlingedPlaneOf(facingVec)).normalize()
-                    .scale(progress * .5f).add(vec);
+                Vec3 offset = VecHelper.offsetRandomly(Vec3.ZERO, level.getRandom(), .125f).multiply(VecHelper.axisAlingedPlaneOf(facingVec))
+                    .normalize().scale(progress * .5f).add(vec);
                 if (progress > .5f)
                     level.addParticle(ParticleTypes.CRIT, offset.x, offset.y, offset.z, 0, 0, 0);
 
@@ -390,8 +390,8 @@ public class MechanicalCrafterBlockEntity extends KineticBlockEntity implements 
                         groupedItemsBeforeCraft = new GroupedItems();
 
                         for (int i = 0; i < 10; i++) {
-                            Vec3 randVec = VecHelper.offsetRandomly(Vec3.ZERO, level.random, .125f).multiply(VecHelper.axisAlingedPlaneOf(facingVec))
-                                .normalize().scale(.25f);
+                            Vec3 randVec = VecHelper.offsetRandomly(Vec3.ZERO, level.getRandom(), .125f)
+                                .multiply(VecHelper.axisAlingedPlaneOf(facingVec)).normalize().scale(.25f);
                             Vec3 offset2 = randVec.add(vec);
                             randVec = randVec.scale(.35f);
                             level.addParticle(

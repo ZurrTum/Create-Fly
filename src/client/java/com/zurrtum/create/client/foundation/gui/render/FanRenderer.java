@@ -64,7 +64,7 @@ public class FanRenderer extends PictureInPictureRenderer<FanRenderState> {
         matrices.pushPose();
         blockState = AllBlocks.ENCASED_FAN.defaultBlockState();
         world.blockState(blockState);
-        parts = blockRenderManager.getBlockModel(blockState).collectParts(mc.level.random);
+        parts = blockRenderManager.getBlockModel(blockState).collectParts(mc.level.getRandom());
         matrices.translate(0.5f, 0.5f, 0.5f);
         matrices.mulPose(Axis.YP.rotationDegrees(180));
         matrices.translate(-0.5f, -0.5f, -0.5f);

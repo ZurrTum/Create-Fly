@@ -55,7 +55,7 @@ public class CrafterRenderer extends PictureInPictureRenderer<CrafterRenderState
         blockState = AllBlocks.MECHANICAL_CRAFTER.defaultBlockState();
         world.blockState(blockState);
         matrices.pushPose();
-        parts = blockRenderManager.getBlockModel(blockState).collectParts(mc.level.random);
+        parts = blockRenderManager.getBlockModel(blockState).collectParts(mc.level.getRandom());
         matrices.translate(0.5f, 0.5f, 0.5f);
         matrices.mulPose(Axis.YP.rotationDegrees(180));
         matrices.translate(-0.5f, -0.5f, -0.5f);

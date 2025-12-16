@@ -72,7 +72,7 @@ public class RecipeApplier {
             List<ItemStack> stacks = new ArrayList<>();
             Object2ObjectMap<ItemStack, ObjectIntPair<ItemStack>> buffer = new Object2ObjectOpenCustomHashMap<>(BaseInventory.ITEM_STACK_HASH_STRATEGY);
             for (int i = 0; i < count; i++) {
-                updateBuffer(buffer, recipe.assemble(input, world.random), stacks);
+                updateBuffer(buffer, recipe.assemble(input, world.getRandom()), stacks);
                 if (remainders != null) {
                     updateBuffer(buffer, remainders, stacks);
                 }
@@ -80,7 +80,7 @@ public class RecipeApplier {
             buffer.values().stream().map(ObjectIntPair::left).filter(stack -> !stack.isEmpty()).forEach(stacks::add);
             return stacks;
         } else {
-            List<ItemStack> craft = recipe.assemble(input, world.random);
+            List<ItemStack> craft = recipe.assemble(input, world.getRandom());
             if (remainders != null) {
                 remainders.addAll(craft);
                 return ItemHelper.multipliedOutput(remainders, count);

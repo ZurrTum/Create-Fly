@@ -46,7 +46,7 @@ public class MixingBasinRenderer extends PictureInPictureRenderer<MixingBasinRen
 
         blockState = AllBlocks.MECHANICAL_MIXER.defaultBlockState();
         world.blockState(blockState);
-        parts = blockRenderManager.getBlockModel(blockState).collectParts(mc.level.random);
+        parts = blockRenderManager.getBlockModel(blockState).collectParts(mc.level.getRandom());
         blockRenderManager.renderBatched(blockState, BlockPos.ZERO, world, matrices, buffer, false, parts);
 
         blockState = Blocks.AIR.defaultBlockState();
@@ -73,7 +73,7 @@ public class MixingBasinRenderer extends PictureInPictureRenderer<MixingBasinRen
         matrices.translate(0, -1.65f, 0);
         blockState = AllBlocks.BASIN.defaultBlockState();
         world.blockState(blockState);
-        parts = blockRenderManager.getBlockModel(blockState).collectParts(mc.level.random);
+        parts = blockRenderManager.getBlockModel(blockState).collectParts(mc.level.getRandom());
         blockRenderManager.renderBatched(blockState, BlockPos.ZERO, world, matrices, buffer, false, parts);
     }
 

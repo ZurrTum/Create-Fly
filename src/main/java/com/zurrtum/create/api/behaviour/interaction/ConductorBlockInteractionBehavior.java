@@ -97,7 +97,7 @@ public abstract class ConductorBlockInteractionBehavior extends MovingInteractio
                     SoundEvents.ITEM_PICKUP,
                     SoundSource.PLAYERS,
                     .2f,
-                    1f + player.level().random.nextFloat()
+                    1f + player.level().getRandom().nextFloat()
                 );
                 player.displayClientMessage(
                     Component.translatable(train.runtime.isAutoSchedule ? "create.schedule.auto_removed_from_train" : "create.schedule.removed_from_train"),

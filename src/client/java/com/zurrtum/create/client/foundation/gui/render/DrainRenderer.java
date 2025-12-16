@@ -78,7 +78,7 @@ public class DrainRenderer extends PictureInPictureRenderer<DrainRenderState> {
 
         BlockState blockState = AllBlocks.ITEM_DRAIN.defaultBlockState();
         world.blockState(blockState);
-        List<BlockModelPart> parts = blockRenderManager.getBlockModel(blockState).collectParts(mc.level.random);
+        List<BlockModelPart> parts = blockRenderManager.getBlockModel(blockState).collectParts(mc.level.getRandom());
         blockRenderManager.renderBatched(blockState, BlockPos.ZERO, world, matrices, buffer, false, parts);
 
         float from = 2 / 16f;

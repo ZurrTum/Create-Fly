@@ -99,7 +99,17 @@ public class PonderWorldParticles {
         if (particleFactory == null) {
             return null;
         }
-        Particle particle = particleFactory.createParticle(parameters, asClientWorld.get(), x, y, z, velocityX, velocityY, velocityZ, world.random);
+        Particle particle = particleFactory.createParticle(
+            parameters,
+            asClientWorld.get(),
+            x,
+            y,
+            z,
+            velocityX,
+            velocityY,
+            velocityZ,
+            world.getRandom()
+        );
         if (particle == null) {
             return null;
         }

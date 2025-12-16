@@ -60,7 +60,7 @@ public class BeltPressingCallbacks {
             boolean centered = BeltHelper.isItemUpright(stack);
             copy.stack = stack;
             copy.locked = true;
-            copy.angle = centered ? 180 : behaviour.getLevel().random.nextInt(360);
+            copy.angle = centered ? 180 : behaviour.getLevel().getRandom().nextInt(360);
             return copy;
         }).collect(Collectors.toList());
 

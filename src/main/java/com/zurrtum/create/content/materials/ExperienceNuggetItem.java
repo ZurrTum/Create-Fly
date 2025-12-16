@@ -43,7 +43,7 @@ public class ExperienceNuggetItem extends Item {
             if (value == 0)
                 continue;
 
-            Vec3 offset = VecHelper.offsetRandomly(Vec3.ZERO, pLevel.random, 1).normalize();
+            Vec3 offset = VecHelper.offsetRandomly(Vec3.ZERO, pLevel.getRandom(), 1).normalize();
             Vec3 look = pPlayer.getLookAngle();
             Vec3 motion = look.scale(0.2).add(0, 0.2, 0).add(offset.scale(.1));
             Vec3 cross = look.cross(VecHelper.rotate(new Vec3(-.75f, 0, 0), -pPlayer.getYRot(), Axis.Y));

@@ -1021,7 +1021,7 @@ public abstract class Contraption {
                             face,
                             targetPos.relative(face),
                             world.getBlockState(targetPos.relative(face)),
-                            world.random
+                            world.getRandom()
                         );
 
                 BlockState blockState = world.getBlockState(targetPos);

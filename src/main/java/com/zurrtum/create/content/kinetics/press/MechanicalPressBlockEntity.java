@@ -127,7 +127,7 @@ public class MechanicalPressBlockEntity extends BasinOperatingBlockEntity implem
                     itemCreated = result.copy();
                 ItemEntity created = new ItemEntity(level, itemEntity.getX(), itemEntity.getY(), itemEntity.getZ(), result);
                 created.setDefaultPickUpDelay();
-                created.setDeltaMovement(VecHelper.offsetRandomly(Vec3.ZERO, level.random, .05f));
+                created.setDeltaMovement(VecHelper.offsetRandomly(Vec3.ZERO, level.getRandom(), .05f));
                 level.addFreshEntity(created);
             }
             item.shrink(1);

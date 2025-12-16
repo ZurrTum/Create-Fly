@@ -264,7 +264,7 @@ public class CrushingWheelControllerBlockEntity extends SmartBlockEntity {
         else
             particleData = new ItemParticleOption(ParticleTypes.ITEM, stack);
 
-        RandomSource r = level.random;
+        RandomSource r = level.getRandom();
         int x = worldPosition.getX();
         int y = worldPosition.getY();
         int z = worldPosition.getZ();
@@ -287,7 +287,7 @@ public class CrushingWheelControllerBlockEntity extends SmartBlockEntity {
                 recipeRemainder = null;
             }
             for (int roll = 0; roll < rolls; roll++) {
-                List<ItemStack> rolledResults = recipe.assemble(input, level.random);
+                List<ItemStack> rolledResults = recipe.assemble(input, level.getRandom());
                 for (ItemStack stack : rolledResults) {
                     ItemHelper.addToList(stack, list);
                 }

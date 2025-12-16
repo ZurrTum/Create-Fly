@@ -20,7 +20,7 @@ public abstract class ParrotPose {
 
     public Parrot create(PonderLevel world) {
         Parrot entity = new Parrot(EntityType.PARROT, world);
-        int nextInt = world.random.nextInt(VARIANTS.length);
+        int nextInt = world.getRandom().nextInt(VARIANTS.length);
         entity.setVariant(VARIANTS[nextInt]);
         return entity;
     }

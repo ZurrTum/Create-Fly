@@ -236,8 +236,8 @@ public class BlazeBurnerBlockEntity extends SmartBlockEntity {
                 worldPosition,
                 SoundEvents.BLAZE_AMBIENT,
                 SoundSource.BLOCKS,
-                .125f + level.random.nextFloat() * .125f,
-                1.15f - level.random.nextFloat() * .25f
+                .125f + level.getRandom().nextFloat() * .125f,
+                1.15f - level.getRandom().nextFloat() * .25f
             );
 
         return true;
@@ -278,8 +278,8 @@ public class BlazeBurnerBlockEntity extends SmartBlockEntity {
             worldPosition,
             SoundEvents.BLAZE_SHOOT,
             SoundSource.BLOCKS,
-            .125f + level.random.nextFloat() * .125f,
-            .75f - level.random.nextFloat() * .25f
+            .125f + level.getRandom().nextFloat() * .125f,
+            .75f - level.getRandom().nextFloat() * .25f
         );
     }
 
@@ -327,7 +327,7 @@ public class BlazeBurnerBlockEntity extends SmartBlockEntity {
 
     public void spawnParticleBurst(boolean soulFlame) {
         Vec3 c = VecHelper.getCenterOf(worldPosition);
-        RandomSource r = level.random;
+        RandomSource r = level.getRandom();
         for (int i = 0; i < 20; i++) {
             Vec3 offset = VecHelper.offsetRandomly(Vec3.ZERO, r, .5f).multiply(1, .25f, 1).normalize();
             Vec3 v = c.add(offset.scale(.5 + r.nextDouble() * .125f)).add(0, .125, 0);

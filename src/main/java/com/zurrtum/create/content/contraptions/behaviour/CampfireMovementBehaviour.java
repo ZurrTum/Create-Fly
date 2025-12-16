@@ -12,7 +12,7 @@ public class CampfireMovementBehaviour extends MovementBehaviour {
             return;
 
         // Mostly copied from CampfireBlock and CampfireBlockEntity
-        RandomSource random = context.world.random;
+        RandomSource random = context.world.getRandom();
         if (random.nextFloat() < 0.11F) {
             for (int i = 0; i < random.nextInt(2) + 2; ++i) {
                 context.world.addAlwaysVisibleParticle(

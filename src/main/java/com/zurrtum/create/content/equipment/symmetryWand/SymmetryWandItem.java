@@ -192,7 +192,7 @@ public class SymmetryWandItem extends Item {
                         face,
                         position.relative(face),
                         world.getBlockState(position.relative(face)),
-                        world.random
+                        world.getRandom()
                     );
 
                 if (player.isCreative()) {

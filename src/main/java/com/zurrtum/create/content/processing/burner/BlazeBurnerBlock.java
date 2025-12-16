@@ -124,7 +124,7 @@ public class BlazeBurnerBlock extends HorizontalDirectionalBlock implements IBE<
 
         if (heat == HeatLevel.NONE) {
             if (stack.getItem() instanceof FlintAndSteelItem) {
-                level.playSound(player, pos, SoundEvents.FLINTANDSTEEL_USE, SoundSource.BLOCKS, 1.0F, level.random.nextFloat() * 0.4F + 0.8F);
+                level.playSound(player, pos, SoundEvents.FLINTANDSTEEL_USE, SoundSource.BLOCKS, 1.0F, level.getRandom().nextFloat() * 0.4F + 0.8F);
                 if (level.isClientSide())
                     return InteractionResult.SUCCESS;
                 stack.hurtAndBreak(1, player, hand.asEquipmentSlot());

@@ -118,7 +118,7 @@ public class FlapDisplayBlockEntity extends KineticBlockEntity implements Displa
         boolean instant = Math.abs(getSpeed()) > 128;
         for (FlapDisplayLayout line : lines)
             for (FlapDisplaySection section : line.getSections())
-                activeFlaps += section.tick(instant, level.random);
+                activeFlaps += section.tick(instant, level.getRandom());
         if (activeFlaps == 0)
             return;
 

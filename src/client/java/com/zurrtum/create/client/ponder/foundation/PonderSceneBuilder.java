@@ -193,9 +193,9 @@ public class PonderSceneBuilder implements SceneBuilder {
         public <T extends ParticleOptions> ParticleEmitter particleEmitterWithinBlockSpace(T data, Vec3 motion) {
             return (w, x, y, z) -> w.addParticle(
                 data,
-                Math.floor(x) + w.random.nextFloat(),
-                Math.floor(y) + w.random.nextFloat(),
-                Math.floor(z) + w.random.nextFloat(),
+                Math.floor(x) + w.getRandom().nextFloat(),
+                Math.floor(y) + w.getRandom().nextFloat(),
+                Math.floor(z) + w.getRandom().nextFloat(),
                 motion.x,
                 motion.y,
                 motion.z

@@ -71,7 +71,7 @@ public class DeskBellBlockEntity extends SmartBlockEntity {
             return;
         }
 
-        animationOffset = level.random.nextFloat() * 2 * Mth.PI;
+        animationOffset = level.getRandom().nextFloat() * 2 * Mth.PI;
         animation.startWithValue(1).chase(0, 0.05, Chaser.LINEAR);
     }
 

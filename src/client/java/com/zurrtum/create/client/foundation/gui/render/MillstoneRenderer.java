@@ -50,7 +50,7 @@ public class MillstoneRenderer extends PictureInPictureRenderer<MillstoneRenderS
 
         blockState = AllBlocks.MILLSTONE.defaultBlockState();
         world.blockState(blockState);
-        parts = blockRenderManager.getBlockModel(blockState).collectParts(mc.level.random);
+        parts = blockRenderManager.getBlockModel(blockState).collectParts(mc.level.getRandom());
         matrices.translate(0.5f, 0.5f, 0.5f);
         matrices.mulPose(Axis.XP.rotationDegrees(22.5f));
         matrices.mulPose(Axis.YP.rotationDegrees(22.5f));

@@ -50,7 +50,7 @@ public class CuckooClockAnimationBehaviour extends AnimationBehaviour<CuckooCloc
                 playSound(SoundEvents.NOTE_BLOCK_CHIME.value(), 2, 0.793701f);
 
             if (value > 30 && isSurprise) {
-                Vec3 pos = VecHelper.offsetRandomly(VecHelper.getCenterOf(blockEntity.getBlockPos()), world.random, .5f);
+                Vec3 pos = VecHelper.offsetRandomly(VecHelper.getCenterOf(blockEntity.getBlockPos()), world.getRandom(), .5f);
                 world.addParticle(ParticleTypes.LARGE_SMOKE, pos.x, pos.y, pos.z, 0, 0, 0);
             }
             if (value == 40 && isSurprise)

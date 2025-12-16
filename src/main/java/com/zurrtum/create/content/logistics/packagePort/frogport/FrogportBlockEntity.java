@@ -229,7 +229,7 @@ public class FrogportBlockEntity extends PackagePortBlockEntity {
                         level.addParticle(
                             new BlockParticleOption(ParticleTypes.BLOCK, AllBlocks.ROPE.defaultBlockState()),
                             vec.x,
-                            vec.y - level.random.nextFloat() * 0.25,
+                            vec.y - level.getRandom().nextFloat() * 0.25,
                             vec.z,
                             0,
                             0,

@@ -71,7 +71,7 @@ public class ManualBlockRenderer extends PictureInPictureRenderer<ManualBlockRen
         SinglePosVirtualBlockGetter world = SinglePosVirtualBlockGetter.createFullBright();
         VertexConsumer buffer = bufferSource.getBuffer(Sheets.cutoutBlockSheet());
         world.blockState(block.state());
-        List<BlockModelPart> parts = blockRenderManager.getBlockModel(block.state()).collectParts(mc.level.random);
+        List<BlockModelPart> parts = blockRenderManager.getBlockModel(block.state()).collectParts(mc.level.getRandom());
         blockRenderManager.renderBatched(block.state(), BlockPos.ZERO, world, matrices, buffer, false, parts);
 
         bufferSource.endBatch();

@@ -83,7 +83,7 @@ public class ScheduleItemEntityInteraction {
         }
 
         if (onServer) {
-            world.playSound(null, player.blockPosition(), SoundEvents.ITEM_PICKUP, SoundSource.PLAYERS, .2f, 1f + world.random.nextFloat());
+            world.playSound(null, player.blockPosition(), SoundEvents.ITEM_PICKUP, SoundSource.PLAYERS, .2f, 1f + world.getRandom().nextFloat());
             player.displayClientMessage(
                 Component.translatable(train.runtime.isAutoSchedule ? "create.schedule.auto_removed_from_train" : "create.schedule.removed_from_train"),
                 true

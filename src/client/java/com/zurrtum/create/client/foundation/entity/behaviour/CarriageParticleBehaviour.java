@@ -61,7 +61,7 @@ public class CarriageParticleBehaviour extends EntityBehaviour<CarriageContrapti
         if (leadingAnchor == null || !leadingAnchor.closerThan(camEntity.position(), 64))
             return;
 
-        RandomSource r = entity.level().random;
+        RandomSource r = entity.level().getRandom();
         Vec3 contraptionMotion = entity.position().subtract(entity.getPrevPositionVec());
         double length = contraptionMotion.length();
         if (arrived && length > 0.01f)

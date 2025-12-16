@@ -39,7 +39,7 @@ public class SuperBufferFactory {
     public SuperByteBuffer createForBlock(BlockState renderedState) {
         Minecraft client = Minecraft.getInstance();
         BlockStateModel model = client.getBlockRenderer().getBlockModel(renderedState);
-        return createForBlock(model.collectParts(client.level != null ? client.level.random : random), renderedState, new PoseStack());
+        return createForBlock(model.collectParts(client.level != null ? client.level.getRandom() : random), renderedState, new PoseStack());
     }
 
     public SuperByteBuffer createForBlock(SimpleModelWrapper model, BlockState referenceState) {

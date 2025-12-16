@@ -21,7 +21,7 @@ public class FrogportClientAudioBehaviour extends FrogportAudioBehaviour {
     @Override
     public void close(Level level, BlockPos pos) {
         if (isPlayerNear(pos)) {
-            AllSoundEvents.FROGPORT_CLOSE.playAt(level, Vec3.atCenterOf(pos), 1.0f, 1.25f + level.random.nextFloat() * 0.25f, true);
+            AllSoundEvents.FROGPORT_CLOSE.playAt(level, Vec3.atCenterOf(pos), 1.0f, 1.25f + level.getRandom().nextFloat() * 0.25f, true);
         }
     }
 

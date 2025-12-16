@@ -122,7 +122,7 @@ public class MillstoneBlockEntity extends KineticBlockEntity {
         stack.shrink(1);
         capability.setItem(0, stack);
         capability.outputAllowInsertion();
-        List<ItemStack> list = lastRecipe.assemble(input, level.random);
+        List<ItemStack> list = lastRecipe.assemble(input, level.getRandom());
         if (!recipeRemainder.isEmpty()) {
             list.add(recipeRemainder);
         }
@@ -141,13 +141,13 @@ public class MillstoneBlockEntity extends KineticBlockEntity {
             return;
 
         ItemParticleOption data = new ItemParticleOption(ParticleTypes.ITEM, stackInSlot);
-        float angle = level.random.nextFloat() * 360;
+        float angle = level.getRandom().nextFloat() * 360;
         Vec3 offset = new Vec3(0, 0, 0.5f);
         offset = VecHelper.rotate(offset, angle, Axis.Y);
         Vec3 target = VecHelper.rotate(offset, getSpeed() > 0 ? 25 : -25, Axis.Y);
 
         Vec3 center = offset.add(VecHelper.getCenterOf(worldPosition));
-        target = VecHelper.offsetRandomly(target.subtract(offset), level.random, 1 / 128f);
+        target = VecHelper.offsetRandomly(target.subtract(offset), level.getRandom(), 1 / 128f);
         level.addParticle(data, center.x, center.y, center.z, target.x, target.y, target.z);
     }
 

@@ -61,7 +61,7 @@ public class KineticEffectHandler {
             return;
         if (!world.isClientSide())
             return;
-        RandomSource r = world.random;
+        RandomSource r = world.getRandom();
         for (int i = 0; i < amount; i++) {
             Vec3 motion = VecHelper.offsetRandomly(Vec3.ZERO, r, maxMotion);
             Vec3 position = VecHelper.getCenterOf(kte.getBlockPos());

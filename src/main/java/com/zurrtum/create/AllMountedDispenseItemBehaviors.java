@@ -93,7 +93,7 @@ public class AllMountedDispenseItemBehaviors {
     private static final MountedDispenseBehavior FIRE_CHARGE = new DefaultMountedDispenseBehavior() {
         @Override
         protected ItemStack execute(ItemStack stack, MovementContext context, BlockPos pos, Vec3 facing) {
-            RandomSource random = context.world.random;
+            RandomSource random = context.world.getRandom();
             double x = pos.getX() + facing.x * .7 + .5;
             double y = pos.getY() + facing.y * .7 + .5;
             double z = pos.getZ() + facing.z * .7 + .5;

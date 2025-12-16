@@ -103,7 +103,7 @@ public class SailBlock extends WrenchableDirectionalBlock {
         DyeColor color = AllItemTags.getDyeColor(stack);
         if (color != null) {
             if (!level.isClientSide())
-                level.playSound(null, pos, SoundEvents.DYE_USE, SoundSource.BLOCKS, 1.0f, 1.1f - level.random.nextFloat() * .2f);
+                level.playSound(null, pos, SoundEvents.DYE_USE, SoundSource.BLOCKS, 1.0f, 1.1f - level.getRandom().nextFloat() * .2f);
             applyDye(state, level, pos, hitResult.getLocation(), color);
             return InteractionResult.SUCCESS;
         }

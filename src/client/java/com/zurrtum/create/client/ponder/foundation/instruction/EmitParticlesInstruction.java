@@ -24,7 +24,7 @@ public class EmitParticlesInstruction extends TickingInstruction {
         super.tick(scene);
         int runs = (int) runsPerTick;
         PonderLevel world = scene.getLevel();
-        RandomSource random = world.random;
+        RandomSource random = world.getRandom();
         if (random.nextFloat() < (runsPerTick - runs))
             runs++;
         for (int i = 0; i < runs; i++)

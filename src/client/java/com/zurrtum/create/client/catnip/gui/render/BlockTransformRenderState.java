@@ -28,7 +28,7 @@ public record BlockTransformRenderState(
     ) {
         float size = scale * 16 + padding;
         Minecraft mc = graphics.minecraft;
-        List<BlockModelPart> parts = mc.getBlockRenderer().getBlockModel(block).collectParts(mc.level.random);
+        List<BlockModelPart> parts = mc.getBlockRenderer().getBlockModel(block).collectParts(mc.level.getRandom());
         Matrix3x2f pose = new Matrix3x2f(graphics.pose());
         int x1 = (int) x;
         int y1 = (int) y;

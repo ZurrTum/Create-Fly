@@ -144,7 +144,7 @@ public class SandPaperItem extends Item {
 
     public static void spawnParticles(Vec3 location, ItemStack polishedStack, Level world) {
         for (int i = 0; i < 20; i++) {
-            Vec3 motion = VecHelper.offsetRandomly(Vec3.ZERO, world.random, 1 / 8f);
+            Vec3 motion = VecHelper.offsetRandomly(Vec3.ZERO, world.getRandom(), 1 / 8f);
             world.addParticle(
                 new ItemParticleOption(ParticleTypes.ITEM, polishedStack),
                 location.x,
@@ -180,13 +180,13 @@ public class SandPaperItem extends Item {
 
         Optional<BlockState> newState = ((AxeItem) Items.DIAMOND_AXE).getStripped(state);
         if (newState.isPresent()) {
-            AllSoundEvents.SANDING_LONG.play(level, player, pos, 1, 1 + (level.random.nextFloat() * 0.5f - 1f) / 5f);
+            AllSoundEvents.SANDING_LONG.play(level, player, pos, 1, 1 + (level.getRandom().nextFloat() * 0.5f - 1f) / 5f);
             level.levelEvent(player, LevelEvent.PARTICLES_SCRAPE, pos, 0); // Spawn particles
         } else {
             newState = Optional.ofNullable(HoneycombItem.WAX_OFF_BY_BLOCK.get().get(state.getBlock())).map(block -> block.withPropertiesOf(state));
 
             if (newState.isPresent()) {
-                AllSoundEvents.SANDING_LONG.play(level, player, pos, 1, 1 + (level.random.nextFloat() * 0.5f - 1f) / 5f);
+                AllSoundEvents.SANDING_LONG.play(level, player, pos, 1, 1 + (level.getRandom().nextFloat() * 0.5f - 1f) / 5f);
                 level.levelEvent(player, LevelEvent.PARTICLES_WAX_OFF, pos, 0); // Spawn particles
             }
         }

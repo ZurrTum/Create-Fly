@@ -252,7 +252,7 @@ public class ToolboxBlockEntity extends SmartBlockEntity implements MenuProvider
                     SoundEvents.IRON_DOOR_OPEN,
                     SoundSource.BLOCKS,
                     0.25F,
-                    level.random.nextFloat() * 0.1F + 1.2F,
+                    level.getRandom().nextFloat() * 0.1F + 1.2F,
                     true
                 );
                 level.playLocalSound(
@@ -262,7 +262,7 @@ public class ToolboxBlockEntity extends SmartBlockEntity implements MenuProvider
                     SoundEvents.CHEST_OPEN,
                     SoundSource.BLOCKS,
                     0.1F,
-                    level.random.nextFloat() * 0.1F + 1.1F,
+                    level.getRandom().nextFloat() * 0.1F + 1.1F,
                     true
                 );
             }
@@ -274,7 +274,7 @@ public class ToolboxBlockEntity extends SmartBlockEntity implements MenuProvider
                     SoundEvents.CHEST_CLOSE,
                     SoundSource.BLOCKS,
                     0.1F,
-                    level.random.nextFloat() * 0.1F + 1.1F,
+                    level.getRandom().nextFloat() * 0.1F + 1.1F,
                     true
                 );
 
@@ -286,7 +286,7 @@ public class ToolboxBlockEntity extends SmartBlockEntity implements MenuProvider
                 SoundEvents.IRON_DOOR_CLOSE,
                 SoundSource.BLOCKS,
                 0.25F,
-                level.random.nextFloat() * 0.1F + 1.2F,
+                level.getRandom().nextFloat() * 0.1F + 1.2F,
                 true
             );
     }

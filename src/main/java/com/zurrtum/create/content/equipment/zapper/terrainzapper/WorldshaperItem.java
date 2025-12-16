@@ -69,7 +69,7 @@ public class WorldshaperItem extends ZapperItem {
         brush.set(params.getX(), params.getY(), params.getZ());
         targetPos = targetPos.offset(brush.getOffset(player.getLookAngle(), raytrace.getDirection(), option));
         brush.addToGlobalPositions(level, targetPos, raytrace.getDirection(), affectedPositions, tool);
-        PlacementPatterns.applyPattern(affectedPositions, stack, level.random);
+        PlacementPatterns.applyPattern(affectedPositions, stack, level.getRandom());
         brush.redirectTool(tool).run(level, affectedPositions, raytrace.getDirection(), stateToUse, data, player);
 
         return true;

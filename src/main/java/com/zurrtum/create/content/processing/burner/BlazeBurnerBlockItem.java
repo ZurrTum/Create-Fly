@@ -132,7 +132,7 @@ public class BlazeBurnerBlockItem extends BlockItem {
     private void spawnCaptureEffects(Level world, Vec3 vec) {
         if (world.isClientSide()) {
             for (int i = 0; i < 40; i++) {
-                Vec3 motion = VecHelper.offsetRandomly(Vec3.ZERO, world.random, .125f);
+                Vec3 motion = VecHelper.offsetRandomly(Vec3.ZERO, world.getRandom(), .125f);
                 world.addParticle(ParticleTypes.FLAME, vec.x, vec.y, vec.z, motion.x, motion.y, motion.z);
                 Vec3 circle = motion.multiply(1, 0, 1).normalize().scale(.5f);
                 world.addParticle(ParticleTypes.SMOKE, circle.x, vec.y, circle.z, 0, -0.125, 0);

@@ -38,7 +38,7 @@ public class CrushWheelRenderer extends PictureInPictureRenderer<CrushWheelRende
         BlockRenderDispatcher blockRenderManager = mc.getBlockRenderer();
         SinglePosVirtualBlockGetter world = SinglePosVirtualBlockGetter.createFullBright();
         VertexConsumer buffer = bufferSource.getBuffer(Sheets.cutoutBlockSheet());
-        List<BlockModelPart> parts = blockRenderManager.getBlockModel(blockState).collectParts(mc.level.random);
+        List<BlockModelPart> parts = blockRenderManager.getBlockModel(blockState).collectParts(mc.level.getRandom());
         world.blockState(blockState);
 
         float angle = getCurrentAngle();

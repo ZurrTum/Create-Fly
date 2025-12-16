@@ -51,7 +51,7 @@ public class BasinBlazeBurnerRenderer extends PictureInPictureRenderer<BasinBlaz
 
         blockState = AllBlocks.BLAZE_BURNER.defaultBlockState();
         world.blockState(blockState);
-        parts = blockRenderManager.getBlockModel(blockState).collectParts(mc.level.random);
+        parts = blockRenderManager.getBlockModel(blockState).collectParts(mc.level.getRandom());
         blockRenderManager.renderBatched(blockState, BlockPos.ZERO, world, matrices, buffer, false, parts);
 
         matrices.pushPose();

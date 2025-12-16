@@ -99,7 +99,7 @@ public class StockTickerBlock extends HorizontalDirectionalBlock implements IBE<
                             SoundEvents.ITEM_PICKUP,
                             SoundSource.PLAYERS,
                             .2f,
-                            1f + player.level().random.nextFloat()
+                            1f + player.level().getRandom().nextFloat()
                         );
                         return InteractionResult.SUCCESS;
                     }

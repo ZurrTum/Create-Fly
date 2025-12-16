@@ -37,7 +37,7 @@ public class BeltConnectorHandler {
         if (mc.screen != null)
             return;
 
-        RandomSource random = world.random;
+        RandomSource random = world.getRandom();
         for (InteractionHand hand : InteractionHand.values()) {
             ItemStack heldItem = player.getItemInHand(hand);
 

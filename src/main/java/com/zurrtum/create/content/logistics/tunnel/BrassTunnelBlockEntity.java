@@ -198,7 +198,7 @@ public class BrassTunnelBlockEntity extends BeltTunnelBlockEntity {
         boolean robin = mode == SelectionMode.FORCED_ROUND_ROBIN || mode == SelectionMode.ROUND_ROBIN;
 
         if (mode == SelectionMode.RANDOMIZE)
-            indexStart = level.random.nextInt(amountTargets);
+            indexStart = level.getRandom().nextInt(amountTargets);
         if (mode == SelectionMode.PREFER_NEAREST || mode == SelectionMode.SYNCHRONIZE)
             indexStart = 0;
 

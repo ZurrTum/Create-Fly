@@ -279,7 +279,7 @@ public class BeltBlock extends HorizontalKineticBlock implements IBE<BeltBlockEn
                 }
             );
             if (success.isTrue())
-                level.playSound(null, pos, SoundEvents.ITEM_PICKUP, SoundSource.PLAYERS, .2f, 1f + level.random.nextFloat());
+                level.playSound(null, pos, SoundEvents.ITEM_PICKUP, SoundSource.PLAYERS, .2f, 1f + level.getRandom().nextFloat());
         }
 
         if (isShaft) {

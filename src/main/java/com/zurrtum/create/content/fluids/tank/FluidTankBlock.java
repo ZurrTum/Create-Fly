@@ -224,7 +224,7 @@ public class FluidTankBlock extends Block implements IWrenchable, IBE<FluidTankB
             float pitch = Mth.clamp(1 - (1f * fluidInTank.getAmount() / (FluidTankBlockEntity.getCapacityMultiplier() * 16)), 0, 1);
             pitch /= 1.5f;
             pitch += .5f;
-            pitch += (level.random.nextFloat() - .5f) / 4f;
+            pitch += (level.getRandom().nextFloat() - .5f) / 4f;
             level.playSound(null, pos, soundevent, SoundSource.BLOCKS, .5f, pitch);
         }
 

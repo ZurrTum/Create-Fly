@@ -207,7 +207,7 @@ public class OpenEndedPipe extends FlowSource {
                 SoundEvents.FIRE_EXTINGUISH,
                 SoundSource.BLOCKS,
                 0.5F,
-                2.6F + (world.random.nextFloat() - world.random.nextFloat()) * 0.8F
+                2.6F + (world.getRandom().nextFloat() - world.getRandom().nextFloat()) * 0.8F
             );
             return true;
         }

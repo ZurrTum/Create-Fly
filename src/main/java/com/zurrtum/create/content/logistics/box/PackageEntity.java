@@ -246,7 +246,7 @@ public class PackageEntity extends LivingEntity {
         if (pPlayer.level().isClientSide())
             return InteractionResult.SUCCESS;
         pPlayer.setItemInHand(pHand, box);
-        level().playSound(null, blockPosition(), SoundEvents.ITEM_PICKUP, SoundSource.PLAYERS, .2f, .75f + level().random.nextFloat());
+        level().playSound(null, blockPosition(), SoundEvents.ITEM_PICKUP, SoundSource.PLAYERS, .2f, .75f + level().getRandom().nextFloat());
         remove(RemovalReason.DISCARDED);
         return InteractionResult.SUCCESS;
     }

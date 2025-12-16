@@ -232,7 +232,7 @@ public class SawBlockEntity extends BlockBreakingKineticBlockEntity {
         else
             particleData = new ItemParticleOption(ParticleTypes.ITEM, stack);
 
-        RandomSource r = level.random;
+        RandomSource r = level.getRandom();
         Vec3 v = VecHelper.getCenterOf(worldPosition).add(0, 5 / 16f, 0);
         for (int i = 0; i < 10; i++) {
             Vec3 m = VecHelper.offsetRandomly(new Vec3(0, 0.25f, 0), r, .125f);
@@ -253,7 +253,7 @@ public class SawBlockEntity extends BlockBreakingKineticBlockEntity {
             speed = .125f;
         }
 
-        RandomSource r = level.random;
+        RandomSource r = level.getRandom();
         Vec3 vec = getItemMovementVec();
         Vec3 pos = VecHelper.getCenterOf(this.worldPosition);
         float offset = inventory.recipeDuration != 0 ? inventory.remainingTime / inventory.recipeDuration : 0;

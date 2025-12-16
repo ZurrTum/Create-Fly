@@ -82,7 +82,7 @@ public class NixieTubeRenderer implements BlockEntityRenderer<NixieTubeBlockEnti
         Couple<String> s = be.getDisplayedStrings();
         if (s != null) {
             DyeColor color = NixieTubeBlock.colorOf(state.blockState);
-            float flicker = be.getLevel().random.nextFloat();
+            float flicker = be.getLevel().getRandom().nextFloat();
             Couple<Integer> couple = DyeHelper.getDyeColors(color);
             int brightColor = couple.getFirst() | 0xFF000000;
             int darkColor = couple.getSecond() | 0xFF000000;

@@ -82,7 +82,7 @@ public class SpoutRenderer extends PictureInPictureRenderer<SpoutRenderState> {
 
         blockState = AllBlocks.SPOUT.defaultBlockState();
         world.blockState(blockState);
-        parts = blockRenderManager.getBlockModel(blockState).collectParts(mc.level.random);
+        parts = blockRenderManager.getBlockModel(blockState).collectParts(mc.level.getRandom());
         blockRenderManager.renderBatched(blockState, BlockPos.ZERO, world, matrices, buffer, false, parts);
 
         float cycle = (time - item.offset() * 8) % 30;
@@ -105,7 +105,7 @@ public class SpoutRenderer extends PictureInPictureRenderer<SpoutRenderState> {
         matrices.pushPose();
         blockState = AllBlocks.DEPOT.defaultBlockState();
         world.blockState(blockState);
-        parts = blockRenderManager.getBlockModel(blockState).collectParts(mc.level.random);
+        parts = blockRenderManager.getBlockModel(blockState).collectParts(mc.level.getRandom());
         matrices.translate(0.07f, -2, -0.14f);
         blockRenderManager.renderBatched(blockState, BlockPos.ZERO, world, matrices, buffer, false, parts);
         matrices.popPose();

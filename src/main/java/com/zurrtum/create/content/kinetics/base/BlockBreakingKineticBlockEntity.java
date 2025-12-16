@@ -132,7 +132,7 @@ public abstract class BlockBreakingKineticBlockEntity extends KineticBlockEntity
     }
 
     public void onBlockBroken(BlockState stateToBreak) {
-        Vec3 vec = VecHelper.offsetRandomly(VecHelper.getCenterOf(breakingPos), level.random, .125f);
+        Vec3 vec = VecHelper.offsetRandomly(VecHelper.getCenterOf(breakingPos), level.getRandom(), .125f);
         BlockHelper.destroyBlock(
             level, breakingPos, 1f, (stack) -> {
                 if (stack.isEmpty())

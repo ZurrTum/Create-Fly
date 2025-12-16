@@ -111,7 +111,7 @@ public class BeltDeployerCallbacks {
             boolean centered = BeltHelper.isItemUpright(resultItem);
             result.stack = resultItem;
             result.locked = true;
-            result.angle = centered ? 180 : world.random.nextInt(360);
+            result.angle = centered ? 180 : world.getRandom().nextInt(360);
             result.locked = false;
         }
 

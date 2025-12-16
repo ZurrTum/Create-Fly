@@ -18,11 +18,11 @@ import net.minecraft.world.level.block.state.BlockState;
 public interface IWrenchable {
 
     static void playRemoveSound(Level level, BlockPos pos) {
-        AllSoundEvents.WRENCH_REMOVE.playOnServer(level, pos, 1, level.random.nextFloat() * .5f + .5f);
+        AllSoundEvents.WRENCH_REMOVE.playOnServer(level, pos, 1, level.getRandom().nextFloat() * .5f + .5f);
     }
 
     static void playRotateSound(Level level, BlockPos pos) {
-        AllSoundEvents.WRENCH_ROTATE.playOnServer(level, pos, 1, level.random.nextFloat() + .5f);
+        AllSoundEvents.WRENCH_ROTATE.playOnServer(level, pos, 1, level.getRandom().nextFloat() + .5f);
     }
 
     default InteractionResult onWrenched(BlockState state, UseOnContext context) {
