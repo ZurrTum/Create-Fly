@@ -81,7 +81,7 @@ public class ValueSettingsInputHandler {
 
         if (!valueSettingsBehaviour.isActive())
             return null;
-        if (valueSettingsBehaviour.onlyVisibleWithWrench() && !player.getItemInHand(hand).getItemHolder().is(AllItemTags.TOOLS_WRENCH))
+        if (valueSettingsBehaviour.onlyVisibleWithWrench() && !player.getItemInHand(hand).typeHolder().is(AllItemTags.TOOLS_WRENCH))
             return null;
         if (valueSettingsBehaviour.getSlotPositioning() instanceof ValueBoxTransform.Sided sidedSlot) {
             if (!sidedSlot.isSideActive(sbe.getBlockState(), ray.getDirection()))

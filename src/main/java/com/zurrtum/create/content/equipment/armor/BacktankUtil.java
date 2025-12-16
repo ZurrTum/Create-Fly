@@ -3,11 +3,6 @@ package com.zurrtum.create.content.equipment.armor;
 import com.zurrtum.create.*;
 import com.zurrtum.create.infrastructure.config.AllConfigs;
 import it.unimi.dsi.fastutil.objects.Object2IntMap.Entry;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.function.Function;
-
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.Holder;
 import net.minecraft.network.chat.CommonComponents;
@@ -26,6 +21,10 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.ItemEnchantments;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Function;
+
 public class BacktankUtil {
 
     private static final List<Function<LivingEntity, List<ItemStack>>> BACKTANK_SUPPLIERS = new ArrayList<>();
@@ -38,7 +37,7 @@ public class BacktankUtil {
                     continue;
                 }
                 ItemStack stack = entity.getItemBySlot(equipmentSlot);
-                if (stack.getItemHolder().is(AllItemTags.PRESSURIZED_AIR_SOURCES)) {
+                if (stack.typeHolder().is(AllItemTags.PRESSURIZED_AIR_SOURCES)) {
                     stacks.add(stack);
                 }
             }

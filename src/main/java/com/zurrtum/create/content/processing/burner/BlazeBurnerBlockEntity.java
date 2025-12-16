@@ -11,10 +11,6 @@ import com.zurrtum.create.content.processing.basin.BasinBlock;
 import com.zurrtum.create.content.processing.burner.BlazeBurnerBlock.HeatLevel;
 import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
 import com.zurrtum.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.List;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.particles.ParticleTypes;
@@ -28,6 +24,9 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.Vec3;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.List;
 
 public class BlazeBurnerBlockEntity extends SmartBlockEntity {
 
@@ -183,14 +182,14 @@ public class BlazeBurnerBlockEntity extends SmartBlockEntity {
         FuelType newFuel = FuelType.NONE;
         int newBurnTime;
 
-        if (itemStack.getItemHolder().is(AllItemTags.BLAZE_BURNER_FUEL_SPECIAL)) {
+        if (itemStack.typeHolder().is(AllItemTags.BLAZE_BURNER_FUEL_SPECIAL)) {
             newBurnTime = 3200;
             newFuel = FuelType.SPECIAL;
         } else {
             newBurnTime = level.fuelValues().burnDuration(itemStack);
             if (newBurnTime > 0) {
                 newFuel = FuelType.NORMAL;
-            } else if (itemStack.getItemHolder().is(AllItemTags.BLAZE_BURNER_FUEL_REGULAR)) {
+            } else if (itemStack.typeHolder().is(AllItemTags.BLAZE_BURNER_FUEL_REGULAR)) {
                 newBurnTime = 1600; // Same as coal
                 newFuel = FuelType.NORMAL;
             }
