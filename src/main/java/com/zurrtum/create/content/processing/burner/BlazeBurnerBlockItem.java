@@ -5,12 +5,6 @@ import com.zurrtum.create.AllEntityTags;
 import com.zurrtum.create.AllItems;
 import com.zurrtum.create.Create;
 import com.zurrtum.create.catnip.math.VecHelper;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.sounds.SoundEvents;
@@ -36,6 +30,11 @@ import net.minecraft.world.level.storage.TagValueInput;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.phys.Vec3;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+
 public class BlazeBurnerBlockItem extends BlockItem {
 
     private final boolean capturedBlaze;
@@ -60,6 +59,7 @@ public class BlazeBurnerBlockItem extends BlockItem {
         this.capturedBlaze = capturedBlaze;
     }
 
+    @SuppressWarnings("deprecation")
     @Override
     public InteractionResult useOn(UseOnContext context) {
         if (hasCapturedBlaze())
@@ -86,7 +86,7 @@ public class BlazeBurnerBlockItem extends BlockItem {
             for (SpawnData e : possibleSpawns) {
                 ValueInput readView = TagValueInput.create(logging, world.registryAccess(), e.entityToSpawn());
                 Optional<EntityType<?>> optionalEntity = EntityType.by(readView);
-                if (optionalEntity.isEmpty() || !optionalEntity.get().is(AllEntityTags.BLAZE_BURNER_CAPTURABLE))
+                if (optionalEntity.isEmpty() || !optionalEntity.get().builtInRegistryHolder().is(AllEntityTags.BLAZE_BURNER_CAPTURABLE))
                     continue;
 
                 spawnCaptureEffects(world, VecHelper.getCenterOf(pos));
@@ -105,7 +105,7 @@ public class BlazeBurnerBlockItem extends BlockItem {
     public InteractionResult interactLivingEntity(ItemStack heldItem, Player player, LivingEntity entity, InteractionHand hand) {
         if (hasCapturedBlaze())
             return InteractionResult.PASS;
-        if (!entity.getType().is(AllEntityTags.BLAZE_BURNER_CAPTURABLE))
+        if (!entity.is(AllEntityTags.BLAZE_BURNER_CAPTURABLE))
             return InteractionResult.PASS;
 
         Level world = player.level();

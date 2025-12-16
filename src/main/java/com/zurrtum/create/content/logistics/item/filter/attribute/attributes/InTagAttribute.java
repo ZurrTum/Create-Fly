@@ -5,11 +5,6 @@ import com.zurrtum.create.AllItemAttributeTypes;
 import com.zurrtum.create.content.logistics.item.filter.attribute.ItemAttribute;
 import com.zurrtum.create.content.logistics.item.filter.attribute.ItemAttributeType;
 import io.netty.buffer.ByteBuf;
-import org.jetbrains.annotations.NotNull;
-
-import java.util.List;
-import java.util.stream.Collectors;
-
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
@@ -18,6 +13,10 @@ import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import org.jetbrains.annotations.NotNull;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 public record InTagAttribute(TagKey<Item> tag) implements ItemAttribute {
     public static final MapCodec<InTagAttribute> CODEC = TagKey.hashedCodec(Registries.ITEM).xmap(InTagAttribute::new, InTagAttribute::tag)
@@ -54,7 +53,7 @@ public record InTagAttribute(TagKey<Item> tag) implements ItemAttribute {
 
         @Override
         public List<ItemAttribute> getAllAttributes(ItemStack stack, Level level) {
-            return stack.getTags().map(InTagAttribute::new).collect(Collectors.toList());
+            return stack.tags().map(InTagAttribute::new).collect(Collectors.toList());
         }
 
         @Override

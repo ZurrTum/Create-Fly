@@ -219,7 +219,7 @@ public class SeatBlock extends Block implements ProperWaterloggedBlock {
             return false;
         if (passenger instanceof Player)
             return false;
-        if (passenger.getType().is(AllEntityTags.IGNORE_SEAT))
+        if (passenger.is(AllEntityTags.IGNORE_SEAT))
             return false;
         if (!AllConfigs.server().logistics.seatHostileMobs.get() && !passenger.getType().getCategory().isFriendly())
             return false;

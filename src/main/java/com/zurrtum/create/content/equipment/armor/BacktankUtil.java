@@ -37,7 +37,7 @@ public class BacktankUtil {
                     continue;
                 }
                 ItemStack stack = entity.getItemBySlot(equipmentSlot);
-                if (stack.typeHolder().is(AllItemTags.PRESSURIZED_AIR_SOURCES)) {
+                if (stack.is(AllItemTags.PRESSURIZED_AIR_SOURCES)) {
                     stacks.add(stack);
                 }
             }

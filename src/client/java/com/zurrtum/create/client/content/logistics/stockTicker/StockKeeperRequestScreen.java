@@ -336,7 +336,7 @@ public class StockKeeperRequestScreen extends AbstractSimiContainerScreen<StockK
                 }
 
                 if (tagSearch) {
-                    if (stack.getTags().anyMatch(key -> key.location().toString().contains(value)))
+                    if (stack.tags().anyMatch(key -> key.location().toString().contains(value)))
                         displayedItemsInCategory.add(entry);
                     continue;
                 }

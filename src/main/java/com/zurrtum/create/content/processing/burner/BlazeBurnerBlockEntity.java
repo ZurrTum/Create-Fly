@@ -182,14 +182,14 @@ public class BlazeBurnerBlockEntity extends SmartBlockEntity {
         FuelType newFuel = FuelType.NONE;
         int newBurnTime;
 
-        if (itemStack.typeHolder().is(AllItemTags.BLAZE_BURNER_FUEL_SPECIAL)) {
+        if (itemStack.is(AllItemTags.BLAZE_BURNER_FUEL_SPECIAL)) {
             newBurnTime = 3200;
             newFuel = FuelType.SPECIAL;
         } else {
             newBurnTime = level.fuelValues().burnDuration(itemStack);
             if (newBurnTime > 0) {
                 newFuel = FuelType.NORMAL;
-            } else if (itemStack.typeHolder().is(AllItemTags.BLAZE_BURNER_FUEL_REGULAR)) {
+            } else if (itemStack.is(AllItemTags.BLAZE_BURNER_FUEL_REGULAR)) {
                 newBurnTime = 1600; // Same as coal
                 newFuel = FuelType.NORMAL;
             }

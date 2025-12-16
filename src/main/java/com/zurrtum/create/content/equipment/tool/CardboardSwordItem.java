@@ -46,7 +46,7 @@ public class CardboardSwordItem extends Item implements DamageControlItem, Custo
 
     @Override
     public boolean damage(Entity entity) {
-        return !(entity instanceof LivingEntity) || entity.getType().is(EntityTypeTags.ARTHROPOD);
+        return !(entity instanceof LivingEntity) || entity.is(EntityTypeTags.ARTHROPOD);
     }
 
     @Override
