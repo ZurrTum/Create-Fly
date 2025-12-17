@@ -117,7 +117,7 @@ public class SymmetryWandModel implements ItemModel, SpecialModelRenderer<Object
         boolean glint,
         int i
     ) {
-        int maxLight = LightCoordsUtil.FULL_BRIGHT;
+        int maxLight = displayContext == ItemDisplayContext.GUI ? 0 : LightCoordsUtil.FULL_BRIGHT;
 
         renderItem(displayContext, matrices, queue, light, overlay, item, blockLayer);
         renderItem(displayContext, matrices, queue, maxLight, overlay, core, itemLayer);

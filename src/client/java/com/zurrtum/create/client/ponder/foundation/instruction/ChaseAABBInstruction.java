@@ -20,7 +20,7 @@ public class ChaseAABBInstruction extends TickingInstruction {
     @Override
     public void tick(PonderScene scene) {
         super.tick(scene);
-        scene.getOutliner().chaseAABB(slot, bb).lineWidth(1 / 16f).colored(color.getColor());
+        scene.getOutliner().chaseAABB(slot, bb).lineWidth(1 / 16f).colored(color.getColor()).lightmap(0);
     }
 
 }

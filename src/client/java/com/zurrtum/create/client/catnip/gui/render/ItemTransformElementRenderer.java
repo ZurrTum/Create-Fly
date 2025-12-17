@@ -16,7 +16,6 @@ import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.renderer.SubmitNodeStorage;
 import net.minecraft.client.renderer.feature.FeatureRenderDispatcher;
 import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.util.LightCoordsUtil;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -82,7 +81,7 @@ public class ItemTransformElementRenderer extends PictureInPictureRenderer<ItemT
             }
             FeatureRenderDispatcher renderDispatcher = Minecraft.getInstance().gameRenderer.getFeatureRenderDispatcher();
             SubmitNodeStorage queue = renderDispatcher.getSubmitNodeStorage();
-            item.state().submit(matrices, queue, LightCoordsUtil.FULL_BRIGHT, OverlayTexture.NO_OVERLAY, 0);
+            item.state().submit(matrices, queue, 0, OverlayTexture.NO_OVERLAY, 0);
             renderDispatcher.renderAllFeatures();
             bufferSource.endBatch();
             matrices.popPose();

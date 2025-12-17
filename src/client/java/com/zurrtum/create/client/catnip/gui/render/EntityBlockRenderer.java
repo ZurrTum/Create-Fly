@@ -89,7 +89,7 @@ public class EntityBlockRenderer extends PictureInPictureRenderer<EntityBlockRen
         BlockState blockState = block.state();
         BlockEntity blockEntity = block.entity();
         RenderType layer = ItemBlockRenderTypes.getChunkRenderType(blockState) == ChunkSectionLayer.TRANSLUCENT ? Sheets.translucentItemSheet() : Sheets.cutoutBlockSheet();
-        SinglePosVirtualBlockGetter lightWorld = SinglePosVirtualBlockGetter.createFullBright();
+        SinglePosVirtualBlockGetter lightWorld = SinglePosVirtualBlockGetter.createFullDark();
         lightWorld.blockState(blockState);
         lightWorld.blockEntity(blockEntity);
         BlockStateModel model = blockRenderManager.getBlockModel(blockState);

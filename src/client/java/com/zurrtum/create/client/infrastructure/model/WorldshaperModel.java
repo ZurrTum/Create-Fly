@@ -159,13 +159,19 @@ public class WorldshaperModel implements ItemModel, SpecialModelRenderer<Worldsh
         float animation = Mth.clamp(Create.ZAPPER_RENDER_HANDLER.getAnimation(data.rightHand, pt) * 5, 0, 1);
 
         // Core glows
-        float multiplier;
-        if (data.inHand)
-            multiplier = animation;
-        else
-            multiplier = Mth.sin(worldTime * 5);
-        int lightItensity = (int) (15 * Mth.clamp(multiplier, 0, 1));
-        int glowLight = LightCoordsUtil.pack(lightItensity, Math.max(lightItensity, 4));
+        int glowLight;
+        if (displayContext == ItemDisplayContext.GUI) {
+            glowLight = 0;
+        } else {
+            float multiplier;
+            if (data.inHand) {
+                multiplier = animation;
+            } else {
+                multiplier = Mth.sin(worldTime * 5);
+            }
+            int lightItensity = (int) (15 * Mth.clamp(multiplier, 0, 1));
+            glowLight = LightCoordsUtil.pack(lightItensity, Math.max(lightItensity, 4));
+        }
         renderItem(displayContext, matrices, queue, glowLight, overlay, core, itemLayer);
         renderItem(displayContext, matrices, queue, glowLight, overlay, coreGlow, translucent);
 
@@ -330,7 +336,7 @@ public class WorldshaperModel implements ItemModel, SpecialModelRenderer<Worldsh
         public static UsedBlockRenderState create(Minecraft mc, BlockState state, RandomSource random, PoseStack matrices) {
             RenderType layer = ItemBlockRenderTypes.getChunkRenderType(state) == ChunkSectionLayer.TRANSLUCENT ? Sheets.translucentItemSheet() : Sheets.cutoutBlockSheet();
             BlockRenderDispatcher blockRenderManager = mc.getBlockRenderer();
-            SinglePosVirtualBlockGetter world = SinglePosVirtualBlockGetter.createFullBright();
+            SinglePosVirtualBlockGetter world = SinglePosVirtualBlockGetter.createFullDark();
             world.blockState(state);
             random.setSeed(42L);
             List<BlockModelPart> parts = blockRenderManager.getBlockModel(state).collectParts(random);

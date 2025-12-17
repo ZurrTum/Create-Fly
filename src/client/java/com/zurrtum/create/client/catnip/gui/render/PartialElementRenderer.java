@@ -72,7 +72,7 @@ public class PartialElementRenderer extends PictureInPictureRenderer<PartialRend
             Minecraft mc = Minecraft.getInstance();
             ChunkSectionLayer blockRenderLayer = LayerBakedModel.getBlockRenderLayer(partial.model, () -> ChunkSectionLayer.SOLID);
             RenderType layer = blockRenderLayer == ChunkSectionLayer.TRANSLUCENT ? Sheets.translucentItemSheet() : Sheets.cutoutBlockSheet();
-            SinglePosVirtualBlockGetter world = SinglePosVirtualBlockGetter.createFullBright();
+            SinglePosVirtualBlockGetter world = SinglePosVirtualBlockGetter.createFullDark();
             mc.getBlockRenderer().renderBatched(
                 Blocks.AIR.defaultBlockState(),
                 BlockPos.ZERO,

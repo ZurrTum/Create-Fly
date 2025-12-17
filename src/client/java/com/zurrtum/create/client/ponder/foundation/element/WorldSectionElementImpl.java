@@ -419,7 +419,7 @@ public class WorldSectionElementImpl extends AnimatedSceneElementBase implements
         poseStack.translate(selectedBlock.getX(), selectedBlock.getY(), selectedBlock.getZ());
 
         AABBOutline aabbOutline = new AABBOutline(shape.bounds().inflate(1 / 128f));
-        aabbOutline.getParams().lineWidth(1 / 64f).colored(0xefefef).disableLineNormals();
+        aabbOutline.getParams().lineWidth(1 / 64f).colored(0xefefef).disableLineNormals().lightmap(0);
         aabbOutline.render(mc, poseStack, (SuperRenderTypeBuffer) buffer, Vec3.ZERO, pt);
 
         poseStack.popPose();

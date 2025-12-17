@@ -80,7 +80,7 @@ public class BlockTransformElementRenderer extends PictureInPictureRenderer<Bloc
             } else {
                 layer = ItemBlockRenderTypes.getChunkRenderType(block.state()) == ChunkSectionLayer.TRANSLUCENT ? Sheets.translucentItemSheet() : Sheets.cutoutBlockSheet();
             }
-            SinglePosVirtualBlockGetter world = SinglePosVirtualBlockGetter.createFullBright();
+            SinglePosVirtualBlockGetter world = SinglePosVirtualBlockGetter.createFullDark();
             world.blockState(block.state());
             mc.getBlockRenderer().renderBatched(block.state(), BlockPos.ZERO, world, matrices, bufferSource.getBuffer(layer), false, block.parts());
             bufferSource.endBatch();
