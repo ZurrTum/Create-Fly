@@ -7,15 +7,14 @@ import com.zurrtum.create.client.flywheel.backend.engine.uniform.LevelUniforms;
 import com.zurrtum.create.client.flywheel.lib.util.ShadersModHelper;
 import it.unimi.dsi.fastutil.longs.Long2IntMap;
 import it.unimi.dsi.fastutil.longs.Long2IntOpenHashMap;
-import org.jetbrains.annotations.Nullable;
-import org.joml.*;
-
-import java.lang.Math;
-
 import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.BlockAndTintGetter;
+import org.jetbrains.annotations.Nullable;
+import org.joml.*;
+
+import java.lang.Math;
 
 public class ShadeSeparatingSuperByteBuffer implements SuperByteBuffer {
     private static final Long2IntMap WORLD_LIGHT_CACHE = new Long2IntOpenHashMap();
@@ -162,9 +161,12 @@ public class ShadeSeparatingSuperByteBuffer implements SuperByteBuffer {
                 overlay = template.overlay(i);
             }
 
-            int light = template.light(i);
+            int light;
             if (hasCustomLight) {
-                light = SuperByteBuffer.maxLight(light, packedLight);
+                //                light = SuperByteBuffer.maxLight(light, packedLight);
+                light = packedLight;
+            } else {
+                light = template.light(i);
             }
             if (useLevelLight) {
                 lightPos.set(((x - .5f) * 15 / 16f) + .5f, (y - .5f) * 15 / 16f + .5f, (z - .5f) * 15 / 16f + .5f, 1f);

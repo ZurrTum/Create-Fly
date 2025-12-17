@@ -9,6 +9,7 @@ import com.zurrtum.create.client.catnip.render.CachedBuffers;
 import com.zurrtum.create.client.catnip.render.SuperByteBuffer;
 import com.zurrtum.create.client.flywheel.lib.util.ShadersModHelper;
 import com.zurrtum.create.client.foundation.render.CreateRenderTypes;
+import com.zurrtum.create.client.ponder.api.level.PonderLevel;
 import com.zurrtum.create.content.redstone.displayLink.LinkWithBulbBlockEntity;
 import net.minecraft.client.renderer.OrderedSubmitNodeCollector;
 import net.minecraft.client.renderer.SubmitNodeCollector;
@@ -42,7 +43,11 @@ public class LinkBulbRenderer implements BlockEntityRenderer<LinkWithBulbBlockEn
         Vec3 cameraPos,
         @Nullable ModelFeatureRenderer.CrumblingOverlay crumblingOverlay
     ) {
-        BlockEntityRenderState.extractBase(be, state, crumblingOverlay);
+        state.blockPos = be.getBlockPos();
+        state.blockState = be.getBlockState();
+        state.blockEntityType = be.getType();
+        state.lightCoords = be.getLevel() instanceof PonderLevel ? 0 : LightCoordsUtil.FULL_BRIGHT;
+        state.breakProgress = crumblingOverlay;
         Direction face = be.getBulbFacing(state.blockState);
         state.yRot = Mth.DEG_TO_RAD * (AngleHelper.horizontalAngle(face) + 180);
         state.xRot = Mth.DEG_TO_RAD * (-AngleHelper.verticalAngle(face) - 90);
@@ -85,12 +90,11 @@ public class LinkBulbRenderer implements BlockEntityRenderer<LinkWithBulbBlockEn
         public int color;
 
         public void renderTube(PoseStack.Pose entry, VertexConsumer vertexConsumer) {
-            tube.translate(offset).light(LightCoordsUtil.FULL_BRIGHT).renderInto(entry, vertexConsumer);
+            tube.translate(offset).light(lightCoords).renderInto(entry, vertexConsumer);
         }
 
         public void renderGlow(PoseStack.Pose entry, VertexConsumer vertexConsumer) {
-            glow.translate(offset).light(LightCoordsUtil.FULL_BRIGHT).color(color, color, color, 255).disableDiffuse()
-                .renderInto(entry, vertexConsumer);
+            glow.translate(offset).light(lightCoords).color(color, color, color, 255).disableDiffuse().renderInto(entry, vertexConsumer);
         }
     }
 }

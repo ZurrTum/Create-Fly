@@ -13,6 +13,7 @@ import com.zurrtum.create.client.catnip.render.SuperByteBuffer;
 import com.zurrtum.create.client.flywheel.lib.util.ShadersModHelper;
 import com.zurrtum.create.client.foundation.render.CreateRenderTypes;
 import com.zurrtum.create.client.foundation.utility.DyeHelper;
+import com.zurrtum.create.client.ponder.api.level.PonderLevel;
 import com.zurrtum.create.content.redstone.nixieTube.DoubleFaceAttachedBlock.DoubleAttachFace;
 import com.zurrtum.create.content.redstone.nixieTube.NixieTubeBlock;
 import com.zurrtum.create.content.redstone.nixieTube.NixieTubeBlockEntity;
@@ -21,6 +22,7 @@ import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.Font.DisplayMode;
 import net.minecraft.client.gui.font.TextRenderable;
 import net.minecraft.client.gui.font.glyphs.BakedGlyph;
+import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
@@ -35,6 +37,7 @@ import net.minecraft.network.chat.Style;
 import net.minecraft.util.LightCoordsUtil;
 import net.minecraft.util.Mth;
 import net.minecraft.world.item.DyeColor;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix4f;
@@ -59,15 +62,25 @@ public class NixieTubeRenderer implements BlockEntityRenderer<NixieTubeBlockEnti
         Vec3 cameraPos,
         @Nullable ModelFeatureRenderer.CrumblingOverlay crumblingOverlay
     ) {
-        BlockEntityRenderState.extractBase(be, state, crumblingOverlay);
+        state.blockPos = be.getBlockPos();
+        state.blockState = be.getBlockState();
+        state.blockEntityType = be.getType();
+        Level level = be.getLevel();
+        boolean inPonder = level instanceof PonderLevel;
+        if (inPonder) {
+            state.lightCoords = 0;
+        } else {
+            state.lightCoords = level != null ? LevelRenderer.getLightCoords(level, be.getBlockPos()) : 15728880;
+        }
+        state.breakProgress = crumblingOverlay;
         if (be.signalState != null) {
             updateSignalRenderState(be, state, cameraPos);
         } else {
-            updateTextRenderState(textRenderer, be, state);
+            updateTextRenderState(textRenderer, be, state, inPonder);
         }
     }
 
-    public static void updateTextRenderState(Font textRenderer, NixieTubeBlockEntity be, NixieTubeRenderState state) {
+    public static void updateTextRenderState(Font textRenderer, NixieTubeBlockEntity be, NixieTubeRenderState state, boolean inPonder) {
         TextRenderState data = new TextRenderState();
         DoubleAttachFace face = state.blockState.getValue(NixieTubeBlock.FACE);
         Direction facing = state.blockState.getValue(NixieTubeBlock.FACING);
@@ -88,14 +101,15 @@ public class NixieTubeRenderer implements BlockEntityRenderer<NixieTubeBlockEnti
             int darkColor = couple.getSecond() | 0xFF000000;
             int flickeringBrightColor = Color.mixColors(brightColor, darkColor, flicker / 4);
             int y = face == DoubleAttachFace.CEILING ? -5 : -3;
-            data.left = createTextDrawable(textRenderer, s.getFirst(), y, flickeringBrightColor, darkColor);
-            data.right = createTextDrawable(textRenderer, s.getSecond(), y, flickeringBrightColor, darkColor);
+            int light = inPonder ? 0 : LightCoordsUtil.FULL_BRIGHT;
+            data.left = createTextDrawable(textRenderer, s.getFirst(), y, flickeringBrightColor, darkColor, light);
+            data.right = createTextDrawable(textRenderer, s.getSecond(), y, flickeringBrightColor, darkColor, light);
         }
         state.data = data;
     }
 
     @Nullable
-    public static TextDrawableState createTextDrawable(Font textRenderer, String text, int y, int flickeringBrightColor, int darkColor) {
+    public static TextDrawableState createTextDrawable(Font textRenderer, String text, int y, int flickeringBrightColor, int darkColor, int light) {
         int code = visit(text);
         if (code == ' ') {
             return null;
@@ -108,7 +122,7 @@ public class NixieTubeRenderer implements BlockEntityRenderer<NixieTubeBlockEnti
         TextRenderable dark = glyph.createGlyph(0, 0, darkColor, 0, Style.EMPTY, 0, 0);
         TextRenderable mix = glyph.createGlyph(0, 0, Color.mixColors(darkColor, 0xFF000000, .35f), 0, Style.EMPTY, 0, 0);
         float x = (textRenderer.width(text) - .5f) / -2f;
-        return new TextDrawableState(bright.renderType(DisplayMode.NORMAL), x, y, bright, dark, mix);
+        return new TextDrawableState(bright.renderType(DisplayMode.NORMAL), x, y, bright, dark, mix, light);
     }
 
     public static int visit(String text) {
@@ -282,20 +296,20 @@ public class NixieTubeRenderer implements BlockEntityRenderer<NixieTubeBlockEnti
     }
 
     public record TextDrawableState(
-        RenderType layer, float x, int y, TextRenderable bright, TextRenderable dark, TextRenderable mix
+        RenderType layer, float x, int y, TextRenderable bright, TextRenderable dark, TextRenderable mix, int light
     ) implements SubmitNodeCollector.CustomGeometryRenderer {
         @Override
         public void render(PoseStack.Pose matricesEntry, VertexConsumer vertexConsumer) {
             Matrix4f pose = matricesEntry.pose();
             pose.translate(x, y, 0);
-            bright.render(pose, vertexConsumer, LightCoordsUtil.FULL_BRIGHT, false);
+            bright.render(pose, vertexConsumer, light, false);
             pose.translate(0.5f, 0.5f, -0.0625f);
-            dark.render(pose, vertexConsumer, LightCoordsUtil.FULL_BRIGHT, false);
+            dark.render(pose, vertexConsumer, light, false);
             pose.scale(-1, 1, 1);
             pose.translate(0.5f + x + x, -0.5f, 0.0625f);
-            dark.render(pose, vertexConsumer, LightCoordsUtil.FULL_BRIGHT, false);
+            dark.render(pose, vertexConsumer, light, false);
             pose.translate(-0.5f, 0.5f, -0.0625f);
-            mix.render(pose, vertexConsumer, LightCoordsUtil.FULL_BRIGHT, false);
+            mix.render(pose, vertexConsumer, light, false);
         }
     }
 
