@@ -226,3 +226,9 @@ mutable	field	net/minecraft/world/item/CreativeModeTab	row	Lnet/minecraft/world/
 mutable	field	net/minecraft/world/item/context/BlockPlaceContext	relativePos	Lnet/minecraft/core/BlockPos;
 mutable	field	net/minecraft/world/level/biome/BiomeGenerationSettings	features	Ljava/util/List;
 accessible class net/minecraft/client/gui/GuiGraphics$ScissorStack
+accessible class net/minecraft/world/item/CreativeModeTab$Output
+accessible field net/minecraft/util/LightCoordsUtil MAX_SMOOTH_LIGHT_LEVEL I
+accessible field net/minecraft/client/gui/components/EditBox highlightPos I
+accessible field net/minecraft/client/gui/components/EditBox value Ljava/lang/String;
+accessible method net/minecraft/client/gui/components/EditBox getMaxLength ()I
+accessible method net/minecraft/client/gui/components/EditBox onValueChange (Ljava/lang/String;)V
