@@ -17,7 +17,7 @@ public record GpuTexture(
         GpuDevice gpuDevice = RenderSystem.getDevice();
         com.mojang.blaze3d.textures.GpuTexture texture = gpuDevice.createTexture(
             () -> "UI Item Transform texture",
-            12,
+            13,
             TextureFormat.RGBA8,
             width,
             height,
@@ -27,7 +27,7 @@ public record GpuTexture(
         GpuTextureView textureView = gpuDevice.createTextureView(texture);
         com.mojang.blaze3d.textures.GpuTexture depthTexture = gpuDevice.createTexture(
             () -> "UI Item Transform depth texture",
-            8,
+            9,
             TextureFormat.DEPTH32,
             width,
             height,
