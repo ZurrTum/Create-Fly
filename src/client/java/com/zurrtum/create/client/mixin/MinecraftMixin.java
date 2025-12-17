@@ -86,7 +86,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(Minecraft.class)
-public class MinecraftClientMixin {
+public class MinecraftMixin {
     @Shadow
     @Nullable
     public ClientLevel level;
@@ -197,8 +197,8 @@ public class MinecraftClientMixin {
         SymmetryHandlerClient.onClientTick(mc);
     }
 
-    @Inject(method = "runTick(Z)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/GameRenderer;render(Lnet/minecraft/client/DeltaTracker;Z)V"))
-    private void render(boolean tick, CallbackInfo ci) {
+    @Inject(method = "renderFrame(ZZ)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/GameRenderer;render(Lnet/minecraft/client/DeltaTracker;Z)V"))
+    private void render(boolean recordGpuUtilization, boolean renderLevel, CallbackInfo ci) {
         TurntableHandler.gameRenderFrame((Minecraft) (Object) this);
     }
 

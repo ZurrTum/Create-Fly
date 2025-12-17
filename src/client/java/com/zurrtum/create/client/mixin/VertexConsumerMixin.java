@@ -13,7 +13,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(VertexConsumer.class)
 public interface VertexConsumerMixin {
-    @Inject(method = "putBulkData(Lcom/mojang/blaze3d/vertex/PoseStack$Pose;Lnet/minecraft/client/renderer/block/model/BakedQuad;[FFFFF[II)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/LightTexture;lightCoordsWithEmission(II)I"))
+    @Inject(method = "putBulkData(Lcom/mojang/blaze3d/vertex/PoseStack$Pose;Lnet/minecraft/client/renderer/block/model/BakedQuad;[FFFFF[II)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/util/LightCoordsUtil;lightCoordsWithEmission(II)I"))
     private void applyBakedNormals(
         PoseStack.Pose pose,
         BakedQuad quad,

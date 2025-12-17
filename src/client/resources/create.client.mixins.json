@@ -46,7 +46,7 @@
     "LivingEntityRendererMixin",
     "LivingEntityRenderStateMixin",
     "LocalPlayerMixin",
-    "MinecraftClientMixin",
+    "MinecraftMixin",
     "ModelBakeryMixin",
     "ModelManagerMixin",
     "ModelMixin",

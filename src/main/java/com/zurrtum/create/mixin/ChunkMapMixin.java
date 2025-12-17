@@ -14,7 +14,7 @@ import java.util.concurrent.CompletableFuture;
 
 @Mixin(ChunkMap.class)
 public class ChunkMapMixin {
-    @Inject(method = "lambda$scheduleUnload$12(Lnet/minecraft/server/level/ChunkHolder;Ljava/util/concurrent/CompletableFuture;J)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/chunk/LevelChunk;setLoaded(Z)V", shift = At.Shift.AFTER))
+    @Inject(method = "lambda$scheduleUnload$0(Lnet/minecraft/server/level/ChunkHolder;Ljava/util/concurrent/CompletableFuture;J)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/chunk/LevelChunk;setLoaded(Z)V", shift = At.Shift.AFTER))
     private void tryUnloadChunk(ChunkHolder chunkHolder, CompletableFuture<?> completableFuture, long l, CallbackInfo ci, @Local LevelChunk chunk) {
         CapabilityMinecartController.onChunkUnloaded(chunk);
     }

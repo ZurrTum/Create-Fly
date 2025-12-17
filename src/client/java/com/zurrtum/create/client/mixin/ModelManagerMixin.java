@@ -29,7 +29,7 @@ import static com.zurrtum.create.Create.MOD_ID;
 
 @Mixin(ModelManager.class)
 public class ModelManagerMixin {
-    @Inject(method = "lambda$loadBlockModels$6", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/block/model/BlockModel;fromStream(Ljava/io/Reader;)Lnet/minecraft/client/renderer/block/model/BlockModel;"), cancellable = true)
+    @Inject(method = "lambda$loadBlockModels$2", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/block/model/BlockModel;fromStream(Ljava/io/Reader;)Lnet/minecraft/client/renderer/block/model/BlockModel;"), cancellable = true)
     private static void deserialize(CallbackInfoReturnable<Pair<Identifier, BlockModel>> cir, @Local Identifier identifier, @Local Reader input) {
         if (identifier.getNamespace().equals(MOD_ID)) {
             try {
@@ -55,7 +55,7 @@ public class ModelManagerMixin {
         }
     }
 
-    @WrapOperation(method = "lambda$loadBlockModels$7", at = @At(value = "INVOKE", target = "Ljava/util/List;stream()Ljava/util/stream/Stream;"))
+    @WrapOperation(method = "lambda$loadBlockModels$3", at = @At(value = "INVOKE", target = "Ljava/util/List;stream()Ljava/util/stream/Stream;"))
     private static Stream<Pair<Identifier, UnbakedModel>> replace(
         List<Pair<Identifier, UnbakedModel>> instance,
         Operation<Stream<Pair<Identifier, UnbakedModel>>> original

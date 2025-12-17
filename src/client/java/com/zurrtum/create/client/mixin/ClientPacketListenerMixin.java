@@ -26,7 +26,7 @@ public class ClientPacketListenerMixin {
         FlwCommands.registerClientCommands(commands);
     }
 
-    @WrapOperation(method = "lambda$handleBlockEntityData$8(Lnet/minecraft/network/protocol/game/ClientboundBlockEntityDataPacket;Lnet/minecraft/world/level/block/entity/BlockEntity;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/block/entity/BlockEntity;loadWithComponents(Lnet/minecraft/world/level/storage/ValueInput;)V"))
+    @WrapOperation(method = "lambda$handleBlockEntityData$0(Lnet/minecraft/network/protocol/game/ClientboundBlockEntityDataPacket;Lnet/minecraft/world/level/block/entity/BlockEntity;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/block/entity/BlockEntity;loadWithComponents(Lnet/minecraft/world/level/storage/ValueInput;)V"))
     private void onDataPacket(BlockEntity blockEntity, ValueInput view, Operation<Void> original) {
         if (blockEntity instanceof SyncedBlockEntity syncedBlockEntity) {
             syncedBlockEntity.onDataPacket(view);

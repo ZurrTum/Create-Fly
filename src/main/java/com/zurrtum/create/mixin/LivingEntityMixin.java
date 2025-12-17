@@ -207,8 +207,8 @@ public abstract class LivingEntityMixin extends Entity {
         }
     }
 
-    @WrapOperation(method = "handleOnClimbable(Lnet/minecraft/world/phys/Vec3;)Lnet/minecraft/world/phys/Vec3;", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/block/state/BlockState;is(Lnet/minecraft/world/level/block/Block;)Z"))
-    private boolean isScaffolding(BlockState state, Block block, Operation<Boolean> original) {
+    @WrapOperation(method = "handleOnClimbable(Lnet/minecraft/world/phys/Vec3;)Lnet/minecraft/world/phys/Vec3;", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/block/state/BlockState;is(Ljava/lang/Object;)Z"))
+    private boolean isScaffolding(BlockState state, Object block, Operation<Boolean> original) {
         return original.call(state, block) || state.getBlock() instanceof ScaffoldingControlBlock;
     }
 
