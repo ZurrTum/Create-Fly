@@ -26,6 +26,9 @@
     ],
     "rei_common": [
       "com.zurrtum.create.compat.rei.ReiCommonPlugin"
+    ],
+    "eiv": [
+      "com.zurrtum.create.compat.eiv.EivCommonPlugin"
     ]
   },
   "custom": {

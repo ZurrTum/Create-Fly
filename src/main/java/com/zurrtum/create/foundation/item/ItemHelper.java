@@ -22,6 +22,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.recipe.Ingredient;
 import net.minecraft.registry.entry.RegistryEntryList;
+import net.minecraft.registry.tag.TagKey;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
@@ -32,6 +33,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.BiPredicate;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
@@ -170,6 +172,14 @@ public class ItemHelper {
             return true;
         RegistryEntryList<Item> entries1 = i1.entries;
         RegistryEntryList<Item> entries2 = i2.entries;
+        Optional<TagKey<Item>> tag1 = entries1.getTagKey();
+        Optional<TagKey<Item>> tag2 = entries2.getTagKey();
+        if (tag1.isPresent()) {
+            return tag2.map(tag -> tag.equals(tag1.get())).orElse(false);
+        }
+        if (tag2.isPresent()) {
+            return false;
+        }
         int size = entries1.size();
         if (size == entries2.size()) {
             for (int i = 0; i < size; i++)
