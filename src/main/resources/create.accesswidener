@@ -232,3 +232,4 @@ mutable field net/minecraft/world/biome/GenerationSettings features Ljava/util/L
 accessible method net/minecraft/client/gui/screen/Screen addDrawableChild (Lnet/minecraft/client/gui/Element;)Lnet/minecraft/client/gui/Element;
 accessible field net/minecraft/client/gui/screen/ingame/HandledScreen focusedSlot Lnet/minecraft/screen/slot/Slot;
 extendable method net/minecraft/client/gui/screen/Screen init (Lnet/minecraft/client/MinecraftClient;II)V
+accessible class net/minecraft/client/gui/hud/InGameHud$BarType

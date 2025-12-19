@@ -18,6 +18,7 @@ import com.zurrtum.create.client.content.trains.track.TrackPlacementOverlay;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.hud.InGameHud;
+import net.minecraft.client.gui.hud.InGameHud.BarType;
 import net.minecraft.client.render.RenderTickCounter;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
@@ -56,9 +57,17 @@ public class InGameHudMixin {
         RemainingAirOverlay.render(client, context);
     }
 
-    @Inject(method = "renderMainHud(Lnet/minecraft/client/gui/DrawContext;Lnet/minecraft/client/render/RenderTickCounter;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/hud/InGameHud;renderMountHealth(Lnet/minecraft/client/gui/DrawContext;)V", shift = At.Shift.AFTER))
-    private void renderMainHud(DrawContext context, RenderTickCounter tickCounter, CallbackInfo ci) {
-        TrainHUD.renderOverlay(client, context, tickCounter);
+    @WrapOperation(method = "renderMainHud(Lnet/minecraft/client/gui/DrawContext;Lnet/minecraft/client/render/RenderTickCounter;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/hud/InGameHud;getCurrentBarType()Lnet/minecraft/client/gui/hud/InGameHud$BarType;"))
+    private BarType renderMainHud(
+        InGameHud instance,
+        Operation<BarType> original,
+        @Local(argsOnly = true) DrawContext context,
+        @Local(argsOnly = true) RenderTickCounter tickCounter
+    ) {
+        if (TrainHUD.renderOverlay(client, context, tickCounter)) {
+            return BarType.EMPTY;
+        }
+        return original.call(instance);
     }
 
     @WrapOperation(method = "renderMiscOverlays(Lnet/minecraft/client/gui/DrawContext;Lnet/minecraft/client/render/RenderTickCounter;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/hud/InGameHud;renderOverlay(Lnet/minecraft/client/gui/DrawContext;Lnet/minecraft/util/Identifier;F)V", ordinal = 0))
