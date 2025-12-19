@@ -101,19 +101,19 @@ public class TrainHUD {
         return cce.getCarriage();
     }
 
-    public static void renderOverlay(Minecraft mc, GuiGraphics guiGraphics, DeltaTracker deltaTracker) {
+    public static boolean renderOverlay(Minecraft mc, GuiGraphics guiGraphics, DeltaTracker deltaTracker) {
         float partialTicks = deltaTracker.getGameTimeDeltaPartialTick(false);
         if (!(ControlsHandler.getContraption() instanceof CarriageContraptionEntity cce))
-            return;
+            return false;
         Carriage carriage = cce.getCarriage();
         if (carriage == null)
-            return;
+            return false;
         Entity cameraEntity = mc.getCameraEntity();
         if (cameraEntity == null)
-            return;
+            return false;
         BlockPos localPos = ControlsHandler.getControlsPos();
         if (localPos == null)
-            return;
+            return false;
 
         Matrix3x2fStack poseStack = guiGraphics.pose();
         poseStack.pushMatrix();
@@ -217,6 +217,7 @@ public class TrainHUD {
         PlacementClient.textured(guiGraphics, 0, 0, 1, snappedAngle);
 
         poseStack.popMatrix();
+        return true;
     }
 
     public static boolean onScroll(double delta) {

@@ -232,3 +232,4 @@ accessible field net/minecraft/client/gui/components/EditBox highlightPos I
 accessible field net/minecraft/client/gui/components/EditBox value Ljava/lang/String;
 accessible method net/minecraft/client/gui/components/EditBox getMaxLength ()I
 accessible method net/minecraft/client/gui/components/EditBox onValueChange (Ljava/lang/String;)V
+accessible class net/minecraft/client/gui/Gui$ContextualInfo
