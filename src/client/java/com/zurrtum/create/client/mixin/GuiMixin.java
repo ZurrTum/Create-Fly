@@ -18,6 +18,7 @@ import com.zurrtum.create.client.content.trains.track.TrackPlacementOverlay;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
+import net.minecraft.client.gui.Gui.ContextualInfo;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.Player;
@@ -56,9 +57,17 @@ public class GuiMixin {
         RemainingAirOverlay.render(minecraft, context);
     }
 
-    @Inject(method = "renderHotbarAndDecorations(Lnet/minecraft/client/gui/GuiGraphics;Lnet/minecraft/client/DeltaTracker;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/Gui;renderVehicleHealth(Lnet/minecraft/client/gui/GuiGraphics;)V", shift = At.Shift.AFTER))
-    private void renderMainHud(GuiGraphics context, DeltaTracker tickCounter, CallbackInfo ci) {
-        TrainHUD.renderOverlay(minecraft, context, tickCounter);
+    @WrapOperation(method = "renderHotbarAndDecorations(Lnet/minecraft/client/gui/GuiGraphics;Lnet/minecraft/client/DeltaTracker;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/Gui;nextContextualInfoState()Lnet/minecraft/client/gui/Gui$ContextualInfo;"))
+    private ContextualInfo renderMainHud(
+        Gui instance,
+        Operation<ContextualInfo> original,
+        @Local(argsOnly = true) GuiGraphics context,
+        @Local(argsOnly = true) DeltaTracker tickCounter
+    ) {
+        if (TrainHUD.renderOverlay(minecraft, context, tickCounter)) {
+            return ContextualInfo.EMPTY;
+        }
+        return original.call(instance);
     }
 
     @WrapOperation(method = "renderCameraOverlays(Lnet/minecraft/client/gui/GuiGraphics;Lnet/minecraft/client/DeltaTracker;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/Gui;renderTextureOverlay(Lnet/minecraft/client/gui/GuiGraphics;Lnet/minecraft/resources/Identifier;F)V", ordinal = 0))

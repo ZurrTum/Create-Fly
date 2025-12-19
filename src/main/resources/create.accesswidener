@@ -226,3 +226,4 @@ mutable	field	net/minecraft/world/item/CreativeModeTab	row	Lnet/minecraft/world/
 mutable	field	net/minecraft/world/item/context/BlockPlaceContext	relativePos	Lnet/minecraft/core/BlockPos;
 mutable	field	net/minecraft/world/level/biome/BiomeGenerationSettings	features	Ljava/util/List;
 accessible class net/minecraft/client/gui/GuiGraphics$ScissorStack
+accessible class net/minecraft/client/gui/Gui$ContextualInfo
