@@ -42,6 +42,7 @@ import com.zurrtum.create.client.content.logistics.tableCloth.TableClothOverlayR
 import com.zurrtum.create.client.content.redstone.displayLink.ClickToLinkHandler;
 import com.zurrtum.create.client.content.redstone.link.LinkRenderer;
 import com.zurrtum.create.client.content.redstone.link.controller.LinkedControllerClientHandler;
+import com.zurrtum.create.client.content.trains.CameraDistanceModifier;
 import com.zurrtum.create.client.content.trains.GlobalRailwayManagerClient;
 import com.zurrtum.create.client.content.trains.TrainHUD;
 import com.zurrtum.create.client.content.trains.entity.TrainRelocatorClient;
@@ -180,6 +181,7 @@ public class MinecraftClientMixin {
         TrainRelocatorClient.clientTick(mc);
         ClickToLinkHandler.clientTick(mc);
         CurvedTrackInteraction.clientTick(mc);
+        CameraDistanceModifier.tick();
         TrainHUD.tick(mc);
         ClipboardValueSettingsClientHandler.clientTick(mc);
         Create.VALUE_SETTINGS_HANDLER.tick(mc);
