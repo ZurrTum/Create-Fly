@@ -27,6 +27,7 @@ import com.zurrtum.create.content.fluids.drain.ItemDrainBlockEntity;
 import com.zurrtum.create.content.fluids.hosePulley.HosePulleyBlockEntity;
 import com.zurrtum.create.content.fluids.pipes.SmartFluidPipeBlockEntity;
 import com.zurrtum.create.content.fluids.pipes.valve.FluidValveBlockEntity;
+import com.zurrtum.create.content.fluids.pump.PumpBlockEntity;
 import com.zurrtum.create.content.fluids.spout.SpoutBlockEntity;
 import com.zurrtum.create.content.fluids.tank.FluidTankBlockEntity;
 import com.zurrtum.create.content.kinetics.belt.BeltBlockEntity;
@@ -179,5 +180,6 @@ public class AllBlockEntityBehaviours {
         add(FrogportBlockEntity.class, FrogportClientAudioBehaviour::new, FrogportTooltipBehaviour::new);
         add(FactoryPanelBlockEntity.class, FactoryPanelBehaviour.allSlot());
         add(ItemHatchBlockEntity.class, FilteringBehaviour::hatch);
+        add(PumpBlockEntity.class, KineticTooltipBehaviour::new);
     }
 }
