@@ -14,6 +14,7 @@
     "BlockEntityTypeMixin",
     "BlockRenderManagerMixin",
     "BufferBuilderStorageMixin",
+    "CameraMixin",
     "ClientChunkManagerMixin",
     "ClientEntityHandlerMixin",
     "ClientPlayerEntityMixin",
