@@ -268,6 +268,22 @@ public class OpenEndedPipe extends FlowSource {
         }
 
         @Override
+        public int count(FluidStack target, int maxAmount, Direction side) {
+            int amount = stack.getAmount();
+            if (amount == 0 || matches(stack, target)) {
+                if (amount >= maxAmount) {
+                    return maxAmount;
+                }
+                FluidStack worldFluid = removeFluidFromSpace(true);
+                if (matches(worldFluid, target)) {
+                    amount += worldFluid.getAmount();
+                }
+                return Math.min(amount, maxAmount);
+            }
+            return 0;
+        }
+
+        @Override
         public int getMaxAmount(FluidStack stack) {
             OpenPipeEffectHandler effectHandler = OpenPipeEffectHandler.REGISTRY.get(stack.getFluid());
             if (effectHandler != null && !FluidHelper.hasBlockState(stack.getFluid())) {
