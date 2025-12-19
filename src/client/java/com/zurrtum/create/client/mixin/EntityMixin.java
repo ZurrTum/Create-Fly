@@ -5,6 +5,7 @@ import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
 import com.zurrtum.create.AllSynchedDatas;
 import com.zurrtum.create.client.content.contraptions.ContraptionHandlerClient;
+import com.zurrtum.create.client.content.trains.CameraDistanceModifier;
 import com.zurrtum.create.client.ponder.api.level.PonderLevel;
 import com.zurrtum.create.content.contraptions.AbstractContraptionEntity;
 import com.zurrtum.create.content.contraptions.Contraption;
@@ -200,5 +201,16 @@ public abstract class EntityMixin {
             return true;
         }
         return world instanceof PonderLevel;
+    }
+
+    @Inject(method = "startRiding(Lnet/minecraft/entity/Entity;ZZ)Z", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/Entity;hasVehicle()Z"))
+    private void onMount(Entity entity, boolean force, boolean sendEventAndTriggers, CallbackInfoReturnable<Boolean> cir) {
+        CameraDistanceModifier.onMount((Entity) (Object) this, entity, true);
+    }
+
+    @WrapOperation(method = "dismountVehicle()V", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/Entity;removePassenger(Lnet/minecraft/entity/Entity;)V"))
+    private void onDismount(Entity instance, Entity entity, Operation<Void> original) {
+        CameraDistanceModifier.onMount(entity, instance, false);
+        original.call(instance, entity);
     }
 }
