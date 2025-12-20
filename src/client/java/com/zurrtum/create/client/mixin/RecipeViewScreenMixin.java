@@ -18,13 +18,13 @@ import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.text.Text;
-import net.minecraft.util.collection.DefaultedList;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.List;
+import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 @Mixin(RecipeViewScreen.class)
@@ -82,9 +82,10 @@ public abstract class RecipeViewScreenMixin extends HandledScreen<RecipeViewMenu
         return original.call(instance, displayIndex);
     }
 
-    @WrapOperation(method = "drawBackground(Lnet/minecraft/client/gui/DrawContext;FII)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/util/collection/DefaultedList;stream()Ljava/util/stream/Stream;"))
-    private Stream<Slot> renderSlots(
-        DefaultedList<Slot> slots,
+    @WrapOperation(method = "drawBackground(Lnet/minecraft/client/gui/DrawContext;FII)V", at = @At(value = "INVOKE", target = "Ljava/util/stream/Stream;filter(Ljava/util/function/Predicate;)Ljava/util/stream/Stream;"))
+    private Stream<Slot> filterSlots(
+        Stream<Slot> stream,
+        Predicate<Slot> predicate,
         Operation<Stream<Slot>> original,
         @Share("index") LocalIntRef ref,
         @Local IEivRecipeViewType type
@@ -92,9 +93,10 @@ public abstract class RecipeViewScreenMixin extends HandledScreen<RecipeViewMenu
         if (type instanceof CreateCategory) {
             int size = type.getSlotCount();
             int index = ref.get() * size;
-            return slots.subList(index, index + size).stream();
+            int end = index + size;
+            stream = stream.filter(slot -> slot.id >= index && slot.id < end);
         }
-        return original.call(slots);
+        return original.call(stream, predicate);
     }
 
     @Inject(method = "renderInvalidSlots(Lnet/minecraft/client/gui/DrawContext;I)V", at = @At(value = "INVOKE", target = "Lde/crafty/eiv/common/recipe/inventory/RecipeViewScreen;getScreenHandler()Lnet/minecraft/screen/ScreenHandler;", ordinal = 1), cancellable = true)
