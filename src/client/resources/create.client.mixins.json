@@ -12,6 +12,7 @@
     "BlockEntityMixin",
     "BlockEntityRenderDispatcherMixin",
     "BlockEntityTypeMixin",
+    "BlockModelRendererMixin",
     "BlockRenderManagerMixin",
     "BufferBuilderStorageMixin",
     "CameraMixin",

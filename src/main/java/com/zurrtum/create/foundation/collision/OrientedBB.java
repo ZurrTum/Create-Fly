@@ -28,15 +28,10 @@ public class OrientedBB {
         return new OrientedBB(center, extents, rotation);
     }
 
-    public Vec3d intersect(Box bb) {
-        Vec3d extentsA = extentsFromBB(bb);
-        Vec3d intersects = OBBCollider.separateBBs(bb.getCenter(), center, extentsA, extents, rotation);
-        return intersects;
-    }
-
-    public ContinuousSeparationManifold intersect(Box bb, Vec3d motion) {
-        Vec3d extentsA = extentsFromBB(bb);
-        return ContinuousOBBCollider.separateBBs(bb.getCenter(), center, extentsA, extents, rotation, motion);
+    public ContinuousSeparationManifold intersect(CollisionList collisionList, int bbIdx, Vec3d motion) {
+        Vec3d centerA = new Vec3d(collisionList.centerX[bbIdx], collisionList.centerY[bbIdx], collisionList.centerZ[bbIdx]);
+        Vec3d extentsA = new Vec3d(collisionList.extentsX[bbIdx], collisionList.extentsY[bbIdx], collisionList.extentsZ[bbIdx]);
+        return ContinuousOBBCollider.separateBBs(centerA, center, extentsA, extents, rotation, motion);
     }
 
     private static Vec3d extentsFromBB(Box bb) {

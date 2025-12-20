@@ -56,6 +56,8 @@ import com.zurrtum.create.content.trains.bogey.AbstractBogeyBlock;
 import com.zurrtum.create.foundation.blockEntity.IMultiBlockEntityContainer;
 import com.zurrtum.create.foundation.blockEntity.behaviour.filtering.ServerFilteringBehaviour;
 import com.zurrtum.create.foundation.codec.CreateCodecs;
+import com.zurrtum.create.foundation.collision.CollisionList;
+import com.zurrtum.create.foundation.collision.CollisionList.Populate;
 import com.zurrtum.create.foundation.utility.BlockHelper;
 import com.zurrtum.create.infrastructure.config.AllConfigs;
 import it.unimi.dsi.fastutil.objects.Object2BooleanArrayMap;
@@ -111,7 +113,7 @@ public abstract class Contraption {
     public static final Codec<Map<UUID, Integer>> SEAT_MAP_CODEC = Codec.unboundedMap(Uuids.STRING_CODEC, Codec.INT);
     public static final Codec<Map<UUID, BlockFace>> SUB_CONTRAPTIONS_CODEC = Codec.unboundedMap(Uuids.STRING_CODEC, BlockFace.CODEC);
 
-    public Optional<List<Box>> simplifiedEntityColliders;
+    public CollisionList simplifiedEntityColliders;
     public AbstractContraptionEntity entity;
 
     public Box bounds;
@@ -174,7 +176,7 @@ public abstract class Contraption {
         initialPassengers = new HashMap<>();
         pendingSubContraptions = new ArrayList<>();
         stabilizedSubContraptions = new HashMap<>();
-        simplifiedEntityColliders = Optional.empty();
+        simplifiedEntityColliders = null;
         storage = new MountedStorageManager();
         capturedMultiblocks = ArrayListMultimap.create();
     }
@@ -1333,7 +1335,7 @@ public abstract class Contraption {
     }
 
     public void invalidateColliders() {
-        simplifiedEntityColliders = Optional.empty();
+        simplifiedEntityColliders = null;
         gatherBBsOffThread();
     }
 
@@ -1356,10 +1358,10 @@ public abstract class Contraption {
                     BooleanBiFunction.OR
                 );
             }
-            return combinedShape.simplify().getBoundingBoxes();
-        }).thenAccept(r -> {
-            simplifiedEntityColliders = Optional.of(r);
-        });
+            CollisionList out = new CollisionList();
+            combinedShape.forEachBox(new Populate(out));
+            return out;
+        }).thenAccept(r -> simplifiedEntityColliders = r);
     }
 
     public static double getRadius(Iterable<? extends Vec3i> blocks, Axis axis) {
@@ -1404,8 +1406,8 @@ public abstract class Contraption {
         return false;
     }
 
-    public Optional<List<Box>> getSimplifiedEntityColliders() {
-        return simplifiedEntityColliders;
+    public Optional<CollisionList> getSimplifiedEntityColliders() {
+        return Optional.ofNullable(simplifiedEntityColliders);
     }
 
     public void tickStorage(AbstractContraptionEntity entity) {

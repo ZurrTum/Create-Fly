@@ -5,7 +5,12 @@ import net.minecraft.util.math.Vec3d;
 import static java.lang.Math.abs;
 import static java.lang.Math.signum;
 
-public class ContinuousOBBCollider extends OBBCollider {
+public class ContinuousOBBCollider {
+
+    static final Vec3d uA0 = new Vec3d(1, 0, 0);
+    static final Vec3d uA1 = new Vec3d(0, 1, 0);
+    static final Vec3d uA2 = new Vec3d(0, 0, 1);
+    static int checkCount = 0;
 
     public static ContinuousSeparationManifold separateBBs(Vec3d cA, Vec3d cB, Vec3d eA, Vec3d eB, Matrix3d m, Vec3d motion) {
         ContinuousSeparationManifold mf = new ContinuousSeparationManifold();
@@ -46,7 +51,15 @@ public class ContinuousOBBCollider extends OBBCollider {
                 a10 * eB.x + a11 * eB.y + a12 * eB.z,
                 motion.y,
                 true
-            ) || separate(mf, uA2, diff.z, eA.z, a20 * eB.x + a21 * eB.y + a22 * eB.z, motion.z, true)
+            ) || separate(
+                mf,
+                uA2,
+                diff.z,
+                eA.z,
+                a20 * eB.x + a21 * eB.y + a22 * eB.z,
+                motion.z,
+                true
+            )
 
                 // Separate along B's local axes
                 || separate(mf, uB0, diff2.x, eA.x * a00 + eA.y * a10 + eA.z * a20, eB.x, motion2.x, false) || separate(
@@ -57,7 +70,15 @@ public class ContinuousOBBCollider extends OBBCollider {
                 eB.y,
                 motion2.y,
                 false
-            ) || separate(mf, uB2, diff2.z, eA.x * a02 + eA.y * a12 + eA.z * a22, eB.z, motion2.z, false)))
+            ) || separate(
+                mf,
+                uB2,
+                diff2.z,
+                eA.x * a02 + eA.y * a12 + eA.z * a22,
+                eB.z,
+                motion2.z,
+                false
+            )))
             return mf;
 
         return null;
@@ -138,7 +159,7 @@ public class ContinuousOBBCollider extends OBBCollider {
         return false;
     }
 
-    public static class ContinuousSeparationManifold extends SeparationManifold {
+    public static class ContinuousSeparationManifold {
 
         static final double UNDEFINED = -1;
         double latestCollisionEntryTime = UNDEFINED;
@@ -151,6 +172,13 @@ public class ContinuousOBBCollider extends OBBCollider {
 
         Vec3d normalAxis;
         double normalSeparation;
+        Vec3d axis;
+        double separation;
+
+        public ContinuousSeparationManifold() {
+            axis = Vec3d.ZERO;
+            separation = Double.MAX_VALUE;
+        }
 
         public double getTimeOfImpact() {
             if (latestCollisionEntryTime == UNDEFINED)
@@ -176,7 +204,9 @@ public class ContinuousOBBCollider extends OBBCollider {
             if (isDiscreteCollision) {
                 if (stepSeparation <= obbStepHeight)
                     return createSeparationVec(stepSeparation, stepSeparationAxis);
-                return super.asSeparationVec();
+                double sep = separation;
+                Vec3d axis1 = this.axis;
+                return createSeparationVec(sep, axis1);
             }
             double t = getTimeOfImpact();
             if (t == UNDEFINED)
@@ -184,11 +214,9 @@ public class ContinuousOBBCollider extends OBBCollider {
             return Vec3d.ZERO;
         }
 
-        @Override
-        public Vec3d asSeparationVec() {
-            return asSeparationVec(0);
+        protected Vec3d createSeparationVec(double sep, Vec3d axis) {
+            return axis.normalize().multiply(signum(sep) * (abs(sep) + 1E-4));
         }
-
     }
 
 }

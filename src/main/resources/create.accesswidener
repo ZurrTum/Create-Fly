@@ -233,3 +233,4 @@ accessible method net/minecraft/client/gui/screen/Screen addDrawableChild (Lnet/
 accessible field net/minecraft/client/gui/screen/ingame/HandledScreen focusedSlot Lnet/minecraft/screen/slot/Slot;
 extendable method net/minecraft/client/gui/screen/Screen init (Lnet/minecraft/client/MinecraftClient;II)V
 accessible class net/minecraft/client/gui/hud/InGameHud$BarType
+accessible class net/minecraft/client/render/block/BlockModelRenderer$BrightnessCache

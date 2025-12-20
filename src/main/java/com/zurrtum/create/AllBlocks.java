@@ -2976,6 +2976,7 @@ public class AllBlocks {
         "copycat_panel",
         CopycatPanelBlock::new,
         AbstractBlock.Settings.copy(Blocks.GOLD_BLOCK).nonOpaque().mapColor(MapColor.CLEAR).allowsSpawning(AllBlocks::never)
+            .emissiveLighting(CopycatPanelBlock::hasEmissiveLighting)
     );
 
     public static final FluidBlock HONEY = register(
