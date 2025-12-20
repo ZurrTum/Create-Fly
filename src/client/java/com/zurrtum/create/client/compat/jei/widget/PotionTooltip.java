@@ -15,8 +15,8 @@ import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.PotionContentsComponent;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemConvertible;
+import net.minecraft.item.Items;
 import net.minecraft.item.tooltip.TooltipData;
-import net.minecraft.item.tooltip.TooltipType;
 import net.minecraft.text.StringVisitable;
 import net.minecraft.text.Text;
 
@@ -40,7 +40,20 @@ public class PotionTooltip implements IRecipeSlotRichTooltipCallback {
                 Text name = contents.getName(itemFromBottleType.asItem().getTranslationKey() + ".effect.");
                 List<Either<StringVisitable, TooltipData>> list = new ArrayList<>();
                 list.add(Either.left(name));
-                contents.appendTooltip(Item.TooltipContext.DEFAULT, text -> list.add(Either.left(text)), TooltipType.BASIC, components);
+                Float scale = components.get(DataComponentTypes.POTION_DURATION_SCALE);
+                if (scale == null) {
+                    if (bottleType == BottleType.LINGERING) {
+                        scale = Items.LINGERING_POTION.getComponents().getOrDefault(DataComponentTypes.POTION_DURATION_SCALE, 1f);
+                    } else {
+                        scale = 1f;
+                    }
+                }
+                PotionContentsComponent.buildTooltip(
+                    contents.getEffects(),
+                    text -> list.add(Either.left(text)),
+                    scale,
+                    Item.TooltipContext.DEFAULT.getUpdateTickRate()
+                );
                 lines.addAll(0, list);
             }
         });

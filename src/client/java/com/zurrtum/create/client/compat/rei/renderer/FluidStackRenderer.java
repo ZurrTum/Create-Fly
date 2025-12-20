@@ -18,6 +18,7 @@ import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.MergedComponentMap;
 import net.minecraft.component.type.PotionContentsComponent;
 import net.minecraft.fluid.Fluid;
+import net.minecraft.item.Items;
 import net.minecraft.text.Text;
 
 import java.util.ArrayList;
@@ -53,7 +54,20 @@ public record FluidStackRenderer(EntryRenderer<FluidStack> origin) implements En
                 Text name = contents.getName(PotionFluidHandler.itemFromBottleType(bottleType).getTranslationKey() + ".effect.");
                 List<Tooltip.Entry> list = new ArrayList<>();
                 list.add(Tooltip.entry(name));
-                contents.appendTooltip(context.vanillaContext(), text -> list.add(Tooltip.entry(text)), context.getFlag(), components);
+                Float scale = components.get(DataComponentTypes.POTION_DURATION_SCALE);
+                if (scale == null) {
+                    if (bottleType == BottleType.LINGERING) {
+                        scale = Items.LINGERING_POTION.getComponents().getOrDefault(DataComponentTypes.POTION_DURATION_SCALE, 1f);
+                    } else {
+                        scale = 1f;
+                    }
+                }
+                PotionContentsComponent.buildTooltip(
+                    contents.getEffects(),
+                    text -> list.add(Tooltip.entry(text)),
+                    scale,
+                    context.vanillaContext().getUpdateTickRate()
+                );
                 entries.removeFirst();
                 entries.addAll(0, list);
             }

@@ -199,6 +199,9 @@ public abstract class CreateView extends AbstractList<IEivViewRecipe> implements
         BottleType bottleType = stack.getOrDefault(AllDataComponents.POTION_FLUID_BOTTLE_TYPE, BottleType.REGULAR);
         Text name = contents.getName(PotionFluidHandler.itemFromBottleType(bottleType).getTranslationKey() + ".effect.");
         stack.set(DataComponentTypes.ITEM_NAME, name);
+        if (!stack.contains(DataComponentTypes.POTION_DURATION_SCALE) && bottleType == BottleType.LINGERING) {
+            stack.set(DataComponentTypes.POTION_DURATION_SCALE, Items.LINGERING_POTION.getComponents().get(DataComponentTypes.POTION_DURATION_SCALE));
+        }
     }
 
     @Override
