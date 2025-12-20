@@ -24,9 +24,9 @@ public class PotionView extends CreateView {
     private final SlotContent fluidIngredient;
 
     public PotionView(PotionDisplay display) {
-        result = SlotContent.of(display.result);
+        result = SlotContent.of(getItemStack(display.result));
         ingredient = SlotContent.of(display.ingredient);
-        fluidIngredient = SlotContent.of(display.fluidIngredient);
+        fluidIngredient = SlotContent.of(getItemStacks(display.fluidIngredient));
     }
 
     @Override

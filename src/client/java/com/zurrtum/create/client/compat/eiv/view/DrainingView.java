@@ -24,7 +24,7 @@ public class DrainingView extends CreateView {
 
     public DrainingView(DrainingDisplay display) {
         result = SlotContent.of(display.result);
-        fluidResult = SlotContent.of(display.fluidResult);
+        fluidResult = SlotContent.of(getItemStack(display.fluidResult));
         ingredient = SlotContent.of(display.ingredient);
     }
 

@@ -11,8 +11,10 @@ import de.crafty.eiv.common.recipe.inventory.RecipeViewMenu.SlotFillContext;
 import de.crafty.eiv.common.recipe.inventory.RecipeViewScreen;
 import de.crafty.eiv.common.recipe.inventory.SlotContent;
 import net.minecraft.client.gui.DrawContext;
+import net.minecraft.item.ItemStack;
 import org.joml.Matrix3x2f;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class CompactingView extends CreateView {
@@ -21,7 +23,18 @@ public class CompactingView extends CreateView {
 
     public CompactingView(CompactingDisplay display) {
         result = SlotContent.of(display.result);
-        ingredients = display.ingredients.stream().map(SlotContent::of).toList();
+        boolean hasFluid = display.fluidIngredient != null;
+        int size = display.ingredients.size();
+        if (hasFluid) {
+            size++;
+        }
+        ingredients = new ArrayList<>(size);
+        for (List<ItemStack> ingredient : display.ingredients) {
+            ingredients.add(SlotContent.of(ingredient));
+        }
+        if (hasFluid) {
+            ingredients.add(SlotContent.of(getItemStacks(display.fluidIngredient)));
+        }
     }
 
     @Override

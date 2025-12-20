@@ -17,6 +17,7 @@ import java.util.List;
 public class CompactingDisplay extends CreateDisplay {
     public ItemStack result;
     public List<List<ItemStack>> ingredients;
+    public FluidIngredient fluidIngredient;
 
     public CompactingDisplay() {
     }
@@ -24,18 +25,18 @@ public class CompactingDisplay extends CreateDisplay {
     public CompactingDisplay(RecipeEntry<CompactingRecipe> entry) {
         CompactingRecipe recipe = entry.value();
         result = recipe.result();
-        ingredients = new ArrayList<>(recipe.getIngredientSize());
+        ingredients = new ArrayList<>(recipe.ingredients().size());
         addSizedIngredient(recipe.ingredients(), ingredients);
-        FluidIngredient fluidIngredient = recipe.fluidIngredient();
-        if (fluidIngredient != null) {
-            ingredients.add(getItemStacks(fluidIngredient));
-        }
+        fluidIngredient = recipe.fluidIngredient();
     }
 
     @Override
     public void writeToTag(NbtCompound tag) {
         RegistryOps<NbtElement> ops = getServerOps();
         tag.put("result", ItemStack.CODEC, ops, result);
+        if (fluidIngredient != null) {
+            tag.put("fluidIngredient", FluidIngredient.CODEC, ops, fluidIngredient);
+        }
         tag.put("ingredients", STACKS_LIST_CODEC, ops, ingredients);
     }
 
@@ -43,6 +44,7 @@ public class CompactingDisplay extends CreateDisplay {
     public void loadFromTag(NbtCompound tag) {
         RegistryOps<NbtElement> ops = getClientOps();
         result = tag.get("result", ItemStack.CODEC, ops).orElseThrow();
+        fluidIngredient = tag.get("fluidIngredient", FluidIngredient.CODEC, ops).orElse(null);
         ingredients = tag.get("ingredients", STACKS_LIST_CODEC, ops).orElseThrow();
     }
 

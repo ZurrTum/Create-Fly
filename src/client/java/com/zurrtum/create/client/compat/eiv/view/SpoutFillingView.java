@@ -27,7 +27,7 @@ public class SpoutFillingView extends CreateView {
 
     public SpoutFillingView(SpoutFillingDisplay display) {
         result = SlotContent.of(display.result);
-        fluidIngredient = SlotContent.of(display.fluidIngredient);
+        fluidIngredient = SlotContent.of(getItemStacks(display.fluidIngredient));
         ingredient = SlotContent.of(display.ingredient);
     }
 

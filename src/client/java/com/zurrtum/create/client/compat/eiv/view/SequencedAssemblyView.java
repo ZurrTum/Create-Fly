@@ -11,7 +11,6 @@ import com.zurrtum.create.client.foundation.gui.render.DeployerRenderState;
 import com.zurrtum.create.client.foundation.gui.render.PressRenderState;
 import com.zurrtum.create.client.foundation.gui.render.SpoutRenderState;
 import com.zurrtum.create.client.foundation.utility.CreateLang;
-import com.zurrtum.create.compat.eiv.CreateDisplay;
 import com.zurrtum.create.compat.eiv.display.SequencedAssemblyDisplay;
 import com.zurrtum.create.content.fluids.potion.PotionFluidHandler;
 import com.zurrtum.create.content.fluids.transfer.FillingRecipe;
@@ -334,7 +333,7 @@ public class SequencedAssemblyView extends CreateView {
 
         @Override
         public SlotContent createSlot(FillingRecipe recipe) {
-            return SlotContent.of(CreateDisplay.getItemStacks(recipe.fluidIngredient()));
+            return SlotContent.of(getItemStacks(recipe.fluidIngredient()));
         }
     }
 

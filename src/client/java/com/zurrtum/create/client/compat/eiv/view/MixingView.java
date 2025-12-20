@@ -10,6 +10,7 @@ import com.zurrtum.create.client.foundation.utility.CreateLang;
 import com.zurrtum.create.compat.eiv.display.MixingDisplay;
 import com.zurrtum.create.content.processing.burner.BlazeBurnerBlock;
 import com.zurrtum.create.content.processing.recipe.HeatCondition;
+import com.zurrtum.create.foundation.fluid.FluidIngredient;
 import de.crafty.eiv.common.api.recipe.IEivRecipeViewType;
 import de.crafty.eiv.common.recipe.inventory.RecipeViewMenu;
 import de.crafty.eiv.common.recipe.inventory.RecipeViewMenu.SlotDefinition;
@@ -17,8 +18,10 @@ import de.crafty.eiv.common.recipe.inventory.RecipeViewScreen;
 import de.crafty.eiv.common.recipe.inventory.SlotContent;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
+import net.minecraft.item.ItemStack;
 import org.joml.Matrix3x2f;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class MixingView extends CreateView {
@@ -30,8 +33,14 @@ public class MixingView extends CreateView {
 
 
     public MixingView(MixingDisplay display) {
-        result = SlotContent.of(display.result);
-        ingredients = display.ingredients.stream().map(SlotContent::of).toList();
+        result = SlotContent.of(display.result.isEmpty() ? getItemStack(display.fluidResult) : display.result);
+        ingredients = new ArrayList<>(display.ingredients.size() + display.fluidIngredients.size());
+        for (List<ItemStack> ingredient : display.ingredients) {
+            ingredients.add(SlotContent.of(ingredient));
+        }
+        for (FluidIngredient ingredient : display.fluidIngredients) {
+            ingredients.add(SlotContent.of(getItemStacks(ingredient)));
+        }
         heat = display.heat;
         burner = heat.testBlazeBurner(BlazeBurnerBlock.HeatLevel.NONE) ? null : SlotContent.of(AllItems.BLAZE_BURNER);
         cake = heat.testBlazeBurner(BlazeBurnerBlock.HeatLevel.KINDLED) ? null : SlotContent.of(AllItems.BLAZE_CAKE);

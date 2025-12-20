@@ -28,7 +28,7 @@ import java.util.List;
 
 public class DrainingDisplay extends CreateDisplay {
     public ItemStack result;
-    public ItemStack fluidResult;
+    public FluidStack fluidResult;
     public List<ItemStack> ingredient;
 
     public DrainingDisplay() {
@@ -37,11 +37,11 @@ public class DrainingDisplay extends CreateDisplay {
     public DrainingDisplay(RecipeEntry<EmptyingRecipe> entry) {
         EmptyingRecipe recipe = entry.value();
         result = recipe.result();
-        fluidResult = getItemStack(recipe.fluidResult());
+        fluidResult = recipe.fluidResult();
         ingredient = getItemStacks(recipe.ingredient());
     }
 
-    public DrainingDisplay(ItemStack result, ItemStack fluidResult, List<ItemStack> ingredient) {
+    public DrainingDisplay(ItemStack result, FluidStack fluidResult, List<ItemStack> ingredient) {
         this.result = result;
         this.fluidResult = fluidResult;
         this.ingredient = ingredient;
@@ -80,23 +80,19 @@ public class DrainingDisplay extends CreateDisplay {
             if (stack.isEmpty()) {
                 return;
             }
-            recipes.add(new DrainingDisplay(capability.getContainer(), getItemStack(stack), List.of(item)));
+            recipes.add(new DrainingDisplay(capability.getContainer(), stack, List.of(item)));
         }
     }
 
     public static void registerPotionItem(List<IEivServerRecipe> recipes, ItemStack item) {
-        recipes.add(new DrainingDisplay(
-            Items.GLASS_BOTTLE.getDefaultStack(),
-            getItemStack(PotionFluidHandler.getFluidFromPotionItem(item)),
-            List.of(item)
-        ));
+        recipes.add(new DrainingDisplay(Items.GLASS_BOTTLE.getDefaultStack(), PotionFluidHandler.getFluidFromPotionItem(item), List.of(item)));
     }
 
     @Override
     public void writeToTag(NbtCompound tag) {
         RegistryOps<NbtElement> ops = getServerOps();
         tag.put("result", ItemStack.CODEC, ops, result);
-        tag.put("fluidResult", ItemStack.CODEC, ops, fluidResult);
+        tag.put("fluidResult", FluidStack.CODEC, ops, fluidResult);
         tag.put("ingredient", STACKS_CODEC, ops, ingredient);
     }
 
@@ -104,7 +100,7 @@ public class DrainingDisplay extends CreateDisplay {
     public void loadFromTag(NbtCompound tag) {
         RegistryOps<NbtElement> ops = getClientOps();
         result = tag.get("result", ItemStack.CODEC, ops).orElseThrow();
-        fluidResult = tag.get("fluidResult", ItemStack.CODEC, ops).orElseThrow();
+        fluidResult = tag.get("fluidResult", FluidStack.CODEC, ops).orElseThrow();
         ingredient = tag.get("ingredient", STACKS_CODEC, ops).orElseThrow();
     }
 
