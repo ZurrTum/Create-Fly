@@ -128,7 +128,9 @@ public class GlobalRailwayManager {
     public void updateSplitGraph(WorldAccess level, TrackGraph graph) {
         Set<TrackGraph> disconnected = graph.findDisconnectedGraphs(level, null);
         MinecraftServer server = level.getServer();
-        disconnected.forEach(trackGraph -> putGraphWithDefaultGroup(server, trackGraph));
+        for (TrackGraph d : disconnected) {
+            putGraphWithDefaultGroup(server, d);
+        }
         if (!disconnected.isEmpty()) {
             sync.graphSplit(graph, disconnected);
             markTracksDirty();
@@ -159,20 +161,22 @@ public class GlobalRailwayManager {
         if (level.getRegistryKey() != World.OVERWORLD)
             return;
 
-        signalEdgeGroups.forEach((id, group) -> {
+        for (SignalEdgeGroup group : signalEdgeGroups.values()) {
             group.trains.clear();
             group.reserved = null;
-        });
+        }
 
         MinecraftServer server = level.getServer();
-        trackNetworks.forEach((id, graph) -> {
+        for (TrackGraph graph : trackNetworks.values()) {
             graph.tickPoints(server, true);
             graph.resolveIntersectingEdgeGroups(level);
-        });
+        }
 
         tickTrains(level);
 
-        trackNetworks.forEach((id, graph) -> graph.tickPoints(server, false));
+        for (TrackGraph graph : trackNetworks.values()) {
+            graph.tickPoints(server, false);
+        }
 
         GlobalTrainDisplayData.updateTick = level.getTime() % 100 == 0;
         if (GlobalTrainDisplayData.updateTick)

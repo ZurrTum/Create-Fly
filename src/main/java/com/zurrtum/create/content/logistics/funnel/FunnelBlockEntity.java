@@ -120,24 +120,15 @@ public class FunnelBlockEntity extends SmartBlockEntity {
         if (facing == null)
             return;
 
-        boolean trackingEntityPresent = true;
-        Box area = getEntityOverflowScanningArea();
-
         // Check if last item is still blocking the extractor
-        if (lastObserved == null) {
-            trackingEntityPresent = false;
-        } else {
-            Entity lastEntity = lastObserved.get();
-            if (lastEntity == null || !lastEntity.isAlive() || !lastEntity.getBoundingBox().intersects(area)) {
-                trackingEntityPresent = false;
-                lastObserved = null;
-            }
+        Entity lastEntity = lastObserved != null ? lastObserved.get() : null;
+        if (lastEntity != null && lastEntity.isAlive()) {
+            Box area = getEntityOverflowScanningArea();
+            if (lastEntity.getBoundingBox().intersects(area))
+                return;
+            lastObserved = null;
         }
 
-        if (trackingEntityPresent)
-            return;
-
-        // Find other entities blocking the extract (only if necessary)
         int amountToExtract = getAmountToExtract();
         ExtractionCountMode mode = getModeToExtract();
         ItemStack stack = invManipulation.simulate().extract(mode, amountToExtract);
@@ -145,6 +136,9 @@ public class FunnelBlockEntity extends SmartBlockEntity {
             invVersionTracker.awaitNewVersion(invManipulation);
             return;
         }
+
+        // Only scan for blocking entities if there's something to extract
+        Box area = getEntityOverflowScanningArea();
         for (Entity entity : world.getOtherEntities(null, area)) {
             if (entity instanceof ItemEntity || entity instanceof PackageEntity) {
                 lastObserved = new WeakReference<>(entity);

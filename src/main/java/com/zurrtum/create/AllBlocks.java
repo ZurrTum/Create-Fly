@@ -2971,11 +2971,13 @@ public class AllBlocks {
         "copycat_step",
         CopycatStepBlock::new,
         AbstractBlock.Settings.copy(Blocks.GOLD_BLOCK).solid().nonOpaque().mapColor(MapColor.CLEAR).allowsSpawning(AllBlocks::never)
+            .emissiveLighting(CopycatPanelBlock::hasEmissiveLighting)
     );
     public static final CopycatPanelBlock COPYCAT_PANEL = register(
         "copycat_panel",
         CopycatPanelBlock::new,
         AbstractBlock.Settings.copy(Blocks.GOLD_BLOCK).nonOpaque().mapColor(MapColor.CLEAR).allowsSpawning(AllBlocks::never)
+            .emissiveLighting(CopycatPanelBlock::hasEmissiveLighting)
     );
 
     public static final FluidBlock HONEY = register(
