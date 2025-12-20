@@ -12,7 +12,6 @@ import com.zurrtum.create.catnip.theme.Color;
 import com.zurrtum.create.client.AllKeys;
 import com.zurrtum.create.client.catnip.animation.AnimationTickHolder;
 import com.zurrtum.create.client.catnip.gui.UIRenderHelper;
-import com.zurrtum.create.client.compat.jei.JeiFilterHelper;
 import com.zurrtum.create.client.content.logistics.AddressEditBox;
 import com.zurrtum.create.client.content.trains.station.NoShadowFontWrapper;
 import com.zurrtum.create.client.foundation.gui.AllGuiTextures;
@@ -33,12 +32,14 @@ import com.zurrtum.create.foundation.gui.menu.MenuType;
 import com.zurrtum.create.infrastructure.component.ClipboardEntry;
 import com.zurrtum.create.infrastructure.component.PackageOrderWithCrafts;
 import com.zurrtum.create.infrastructure.component.PackageOrderWithCrafts.CraftingEntry;
+import com.zurrtum.create.infrastructure.items.ItemStackHandler;
 import com.zurrtum.create.infrastructure.packet.c2s.LogisticalStockRequestPacket;
 import com.zurrtum.create.infrastructure.packet.c2s.PackageOrderRequestPacket;
 import com.zurrtum.create.infrastructure.packet.c2s.StockKeeperCategoryHidingPacket;
 import com.zurrtum.create.infrastructure.packet.c2s.StockKeeperLockPacket;
 import it.unimi.dsi.fastutil.ints.IntList;
 import it.unimi.dsi.fastutil.objects.Object2ObjectMap;
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gl.RenderPipelines;
@@ -58,6 +59,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.tooltip.TooltipType;
 import net.minecraft.network.RegistryByteBuf;
 import net.minecraft.registry.Registries;
+import net.minecraft.screen.slot.Slot;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.OrderedText;
@@ -75,6 +77,7 @@ import org.lwjgl.glfw.GLFW;
 
 import java.lang.ref.WeakReference;
 import java.util.*;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 public class StockKeeperRequestScreen extends AbstractSimiContainerScreen<StockKeeperRequestMenu> {
@@ -96,6 +99,7 @@ public class StockKeeperRequestScreen extends AbstractSimiContainerScreen<StockK
     private static final AllGuiTextures HEADER = AllGuiTextures.STOCK_KEEPER_REQUEST_HEADER;
     private static final AllGuiTextures BODY = AllGuiTextures.STOCK_KEEPER_REQUEST_BODY;
     private static final AllGuiTextures FOOTER = AllGuiTextures.STOCK_KEEPER_REQUEST_FOOTER;
+    private static Consumer<String> searchConsumer;
 
     StockTickerBlockEntity blockEntity;
     public LerpedFloat itemScroll = LerpedFloat.linear().startWithValue(0);
@@ -147,6 +151,8 @@ public class StockKeeperRequestScreen extends AbstractSimiContainerScreen<StockK
     private InventorySummary forcedEntries = new InventorySummary();
     private boolean canRequestCraftingPackage = false;
 
+    private Slot cursorSlot;
+
     public StockKeeperRequestScreen(StockKeeperRequestMenu container, PlayerInventory inv, Text title) {
         super(container, inv, title);
         blockEntity = container.contentHolder;
@@ -171,6 +177,10 @@ public class StockKeeperRequestScreen extends AbstractSimiContainerScreen<StockK
             }
             if (!anyItems)
                 clipboardItem = null;
+        }
+
+        if (FabricLoader.getInstance().isModLoaded("eiv")) {
+            cursorSlot = new Slot(new ItemStackHandler(), 0, 0, 0);
         }
 
         // Find the keeper for rendering
@@ -256,7 +266,7 @@ public class StockKeeperRequestScreen extends AbstractSimiContainerScreen<StockK
         if (initial) {
             playUiSound(SoundEvents.BLOCK_WOOD_HIT, 0.5f, 1.5f);
             playUiSound(SoundEvents.ITEM_BOOK_PAGE_TURN, 1, 1);
-            syncJEI();
+            syncSearch();
         }
     }
 
@@ -1083,7 +1093,7 @@ public class StockKeeperRequestScreen extends AbstractSimiContainerScreen<StockK
             refreshSearchNextTick = true;
             moveToTopNextTick = true;
             searchBox.setFocused(true);
-            syncJEI();
+            syncSearch();
             return true;
         }
 
@@ -1216,6 +1226,9 @@ public class StockKeeperRequestScreen extends AbstractSimiContainerScreen<StockK
         Couple<Integer> hoveredSlot = getHoveredSlot((int) mouseX, (int) mouseY);
         boolean noHover = hoveredSlot == noneHovered;
 
+        if (noHover && mouseX < x || mouseX > x + backgroundWidth) {
+            return super.mouseScrolled(mouseX, mouseY, scrollX, scrollY);
+        }
         if (noHover || hoveredSlot.getFirst() >= 0 && !AllKeys.hasShiftDown() && getMaxScroll() != 0) {
             int maxScroll = getMaxScroll();
             int direction = (int) (Math.ceil(Math.abs(scrollY)) * -Math.signum(scrollY));
@@ -1329,12 +1342,13 @@ public class StockKeeperRequestScreen extends AbstractSimiContainerScreen<StockK
         if (addressBox.isFocused() && addressBox.charTyped(input))
             return true;
         String s = searchBox.getText();
-        if (!searchBox.charTyped(input))
-            return false;
+        if (!searchBox.charTyped(input)) {
+            return super.charTyped(input);
+        }
         if (!Objects.equals(s, searchBox.getText())) {
             refreshSearchNextTick = true;
             moveToTopNextTick = true;
-            syncJEI();
+            syncSearch();
         }
         return true;
     }
@@ -1342,7 +1356,7 @@ public class StockKeeperRequestScreen extends AbstractSimiContainerScreen<StockK
     @Override
     public boolean keyPressed(KeyInput input) {
         ignoreTextInput = false;
-        if (!addressBox.isFocused() && !searchBox.isFocused() && client.options.chatKey.matchesKey(input)) {
+        if (!(getFocused() instanceof TextFieldWidget) && !addressBox.isFocused() && !searchBox.isFocused() && client.options.chatKey.matchesKey(input)) {
             ignoreTextInput = true;
             searchBox.setFocused(true);
             return true;
@@ -1369,9 +1383,21 @@ public class StockKeeperRequestScreen extends AbstractSimiContainerScreen<StockK
         if (!Objects.equals(s, searchBox.getText())) {
             refreshSearchNextTick = true;
             moveToTopNextTick = true;
-            syncJEI();
+            syncSearch();
         }
         return true;
+    }
+
+    @Override
+    public void renderMain(DrawContext context, int mouseX, int mouseY, float deltaTicks) {
+        super.renderMain(context, mouseX, mouseY, deltaTicks);
+        if (cursorSlot != null) {
+            ItemStack stack = getHoveredItemStack(mouseX, mouseY);
+            if (stack != null) {
+                cursorSlot.setStackNoCallbacks(stack);
+                focusedSlot = cursorSlot;
+            }
+        }
     }
 
     @Override
@@ -1717,9 +1743,13 @@ public class StockKeeperRequestScreen extends AbstractSimiContainerScreen<StockK
         return resolvedIngredients;
     }
 
-    private void syncJEI() {
-        if (AllConfigs.client().syncJeiSearch.get()) {
-            JeiFilterHelper.setText(searchBox.getText());
+    public static void setSearchConsumer(Consumer<String> consumer) {
+        searchConsumer = consumer;
+    }
+
+    private void syncSearch() {
+        if (searchConsumer != null && AllConfigs.client().syncJeiSearch.get()) {
+            searchConsumer.accept(searchBox.getText());
         }
     }
 

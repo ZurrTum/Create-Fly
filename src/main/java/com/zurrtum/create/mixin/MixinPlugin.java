@@ -11,16 +11,30 @@ import java.util.List;
 import java.util.Set;
 
 public class MixinPlugin implements IMixinConfigPlugin {
-    public static boolean CCT = false;
-    public static boolean ARCH = false;
-    public static boolean JEI = false;
+    private List<String> mixins;
 
     @Override
     public void onLoad(String mixinPackage) {
-        Create.Lazy = FabricLoader.getInstance().isModLoaded("fabric-api");
-        CCT = FabricLoader.getInstance().isModLoaded("computercraft");
-        ARCH = FabricLoader.getInstance().isModLoaded("architectury");
-        JEI = FabricLoader.getInstance().isModLoaded("jei");
+        mixins = new ArrayList<>();
+        FabricLoader loader = FabricLoader.getInstance();
+        Create.Lazy = loader.isModLoaded("fabric-api");
+        if (loader.isModLoaded("computercraft")) {
+            mixins.add("CreateIntegrationMixin");
+        }
+        if (loader.isModLoaded("architectury")) {
+            mixins.add("ArchitecturyMixin");
+        }
+        if (loader.isModLoaded("jei")) {
+            mixins.add("JustEnoughItemsMixin");
+        }
+        if (Create.Lazy) {
+            mixins.add("RegistryKeysMixin");
+        } else {
+            mixins.add("ItemGroupMixin");
+            mixins.add("ItemGroupsMixin");
+            mixins.add("PersistentStateManagerMixin");
+            mixins.add("IngredientMixin");
+        }
     }
 
     @Override
@@ -39,24 +53,6 @@ public class MixinPlugin implements IMixinConfigPlugin {
 
     @Override
     public List<String> getMixins() {
-        List<String> mixins = new ArrayList<>();
-        if (CCT) {
-            mixins.add("CreateIntegrationMixin");
-        }
-        if (ARCH) {
-            mixins.add("ArchitecturyMixin");
-        }
-        if (JEI) {
-            mixins.add("JustEnoughItemsMixin");
-        }
-        if (Create.Lazy) {
-            mixins.add("RegistryKeysMixin");
-        } else {
-            mixins.add("ItemGroupMixin");
-            mixins.add("ItemGroupsMixin");
-            mixins.add("PersistentStateManagerMixin");
-            mixins.add("IngredientMixin");
-        }
         return mixins;
     }
 

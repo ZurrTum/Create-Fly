@@ -236,6 +236,6 @@ public class JeiClientPlugin implements IModPlugin {
 
     @Override
     public void onRuntimeAvailable(IJeiRuntime jeiRuntime) {
-        JeiFilterHelper.setRuntime(jeiRuntime);
+        StockKeeperRequestScreen.setSearchConsumer(jeiRuntime.getIngredientFilter()::setFilterText);
     }
 }
