@@ -75,14 +75,14 @@ repositories {
 }
 
 dependencies {
-    // 1.21.11-rc3_unobfuscated
-    implementation "maven.modrinth:create-fly:1.21.11-rc3_unobfuscated-6.0.8-1"
-    // 1.21.11-rc3
-    modImplementation "maven.modrinth:create-fly:1.21.11-rc3-6.0.8-1"
+    // 26.1-snapshot-1
+    implementation "maven.modrinth:create-fly:26.1-snapshot-1-6.0.8-1"
+    // 1.21.11
+    modImplementation "maven.modrinth:create-fly:1.21.11-6.0.8-3"
     // 1.21.10
-    modImplementation "maven.modrinth:create-fly:1.21.10-6.0.8-5"
+    modImplementation "maven.modrinth:create-fly:1.21.10-6.0.8-6"
     // 1.21.8
-    modImplementation "maven.modrinth:create-fly:1.21.8-6.0.8-3"
+    modImplementation "maven.modrinth:create-fly:1.21.8-6.0.8-4"
 }
 ```
 
@@ -103,14 +103,14 @@ repositories {
 }
 
 dependencies {
-    // 1.21.11-rc3_unobfuscated
-    implementation "curse.maven:create-fly-1346281:7308957-sources-7308960"
-    // 1.21.11-rc3
-    modImplementation "curse.maven:create-fly-1346281:7308963-sources-7308972"
+    // 26.1-snapshot-1
+    implementation "curse.maven:create-fly-1346281:7342771-sources-7342781"
+    // 1.21.11
+    modImplementation "curse.maven:create-fly-1346281:7320679-sources-7320687"
     // 1.21.10
-    modImplementation "curse.maven:create-fly-1346281:7301375-sources-7301380"
+    modImplementation "curse.maven:create-fly-1346281:7357592-sources-7357598"
     // 1.21.8
-    modImplementation "curse.maven:create-fly-1346281:7306487-sources-7306490"
+    modImplementation "curse.maven:create-fly-1346281:7356230-sources-7356237"
 }
 ```
 
