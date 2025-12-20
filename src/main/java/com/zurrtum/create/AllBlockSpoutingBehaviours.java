@@ -10,7 +10,7 @@ import net.minecraft.fluid.Fluid;
 import net.minecraft.fluid.Fluids;
 
 public class AllBlockSpoutingBehaviours {
-    public static final BlockSpoutingBehaviour MUD = StateChangingBehavior.setTo(250, AllBlockSpoutingBehaviours::isWater, Blocks.MUD);
+    public static final BlockSpoutingBehaviour MUD = StateChangingBehavior.setTo(20250, AllBlockSpoutingBehaviours::isWater, Blocks.MUD);
     public static final BlockSpoutingBehaviour FARMLAND = StateChangingBehavior.incrementingState(
         8100,
         AllBlockSpoutingBehaviours::isWater,
