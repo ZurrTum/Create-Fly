@@ -46,10 +46,6 @@ public class PotionFluidHandler {
             return new FluidStack(Fluids.WATER, BottleFluidInventory.CAPACITY);
         FluidStack fluid = getFluidFromPotion(potion, bottleTypeFromItem, BottleFluidInventory.CAPACITY);
         fluid.set(AllDataComponents.POTION_FLUID_BOTTLE_TYPE, bottleTypeFromItem);
-        Float scale = stack.get(DataComponentTypes.POTION_DURATION_SCALE);
-        if (scale != null) {
-            fluid.set(DataComponentTypes.POTION_DURATION_SCALE, scale);
-        }
         return fluid;
     }
 
