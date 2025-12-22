@@ -55,15 +55,6 @@ loom {
     }
 }
 
-sourceSets {
-    client {
-        java {
-            exclude 'com/zurrtum/create/client/mixin/WrapperBlockStateModelMixin.java'
-            exclude 'com/zurrtum/create/client/mixin/FabricBlockStateModelMixin.java'
-        }
-    }
-}
-
 tasks.register("serverJar", Jar) {
     archiveClassifier = "server-dev"
     destinationDirectory = layout.buildDirectory.dir("tmp/serverJar")
@@ -92,9 +83,9 @@ dependencies {
         modCompileOnly fabricApi.module("fabric-rendering-fluids-v1", project.fabric_version)
         modCompileOnly fabricApi.module("fabric-transfer-api-v1", project.fabric_version)
         modCompileOnly fabricApi.module("fabric-events-interaction-v0", project.fabric_version)
-//        modCompileOnly fabricApi.module("fabric-renderer-api-v1", project.fabric_version)
+        modCompileOnly fabricApi.module("fabric-renderer-api-v1", project.fabric_version)
         modCompileOnly fabricApi.module("fabric-recipe-api-v1", project.fabric_version)
-//        modCompileOnly fabricApi.module("fabric-model-loading-api-v1", project.fabric_version)
+        modCompileOnly fabricApi.module("fabric-model-loading-api-v1", project.fabric_version)
     } else {
         modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
     }
