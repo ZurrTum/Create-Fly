@@ -2,19 +2,11 @@ package com.zurrtum.create.content.equipment.clipboard;
 
 import com.zurrtum.create.AllDataComponents;
 import com.zurrtum.create.AllItems;
-import com.zurrtum.create.content.redstone.link.ServerLinkBehaviour;
 import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
-import com.zurrtum.create.foundation.blockEntity.behaviour.BehaviourType;
 import com.zurrtum.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
-import com.zurrtum.create.foundation.blockEntity.behaviour.filtering.ServerFilteringBehaviour;
-import com.zurrtum.create.foundation.blockEntity.behaviour.scrollValue.ServerScrollValueBehaviour;
 import com.zurrtum.create.infrastructure.component.ClipboardContent;
 import com.zurrtum.create.infrastructure.component.ClipboardEntry;
 import com.zurrtum.create.infrastructure.component.ClipboardType;
-
-import java.util.ArrayList;
-import java.util.List;
-
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -33,6 +25,9 @@ import net.minecraft.world.level.storage.TagValueOutput;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.BlockHitResult;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static com.zurrtum.create.Create.LOGGER;
 
@@ -122,38 +117,32 @@ public class ClipboardValueSettingsHandler {
         boolean anyValid = false;
         try (ProblemReporter.ScopedCollector logging = new ProblemReporter.ScopedCollector(smartBE.problemPath(), LOGGER)) {
             RegistryAccess registryManager = world.registryAccess();
-            ValueInput readView = paste ? TagValueInput.create(logging, registryManager, tag) : null;
-            TagValueOutput writeView = paste ? null : TagValueOutput.createWithContext(logging, registryManager);
-            if (smartBE instanceof ClipboardCloneable cc) {
-                anyValid = true;
-                if (paste) {
-                    anySuccess = paste(cc, player, readView, side, world.isClientSide());
-                } else {
-                    anySuccess = write(cc, registryManager, writeView, side, world.isClientSide());
-                    if (anySuccess) {
-                        tag = writeView.buildResult();
-                    }
-                }
-            }
-
-            if (!anySuccess) {
-                for (BehaviourType<? extends BlockEntityBehaviour<SmartBlockEntity>> type : List.of(
-                    ServerScrollValueBehaviour.TYPE,
-                    ServerFilteringBehaviour.TYPE,
-                    ServerLinkBehaviour.TYPE
-                )) {
-                    if (!(smartBE.getBehaviour(type) instanceof ClipboardCloneable cc))
+            if (paste) {
+                ValueInput readView = TagValueInput.create(logging, registryManager, tag);
+                for (BlockEntityBehaviour<?> behaviour : smartBE.getAllBehaviours()) {
+                    if (!(behaviour instanceof ClipboardCloneable cc))
                         continue;
                     anyValid = true;
-                    if (paste) {
-                        anySuccess = paste(cc, player, readView, side, world.isClientSide());
-                    } else {
-                        anySuccess = write(cc, registryManager, writeView, side, world.isClientSide());
-                        if (anySuccess) {
-                            tag = writeView.buildResult();
-                            break;
-                        }
-                    }
+                    anySuccess |= paste(cc, player, readView, side, world.isClientSide());
+                }
+                if (smartBE instanceof ClipboardCloneable cc) {
+                    anyValid = true;
+                    anySuccess |= paste(cc, player, readView, side, world.isClientSide());
+                }
+            } else {
+                TagValueOutput writeView = TagValueOutput.createWithContext(logging, registryManager);
+                for (BlockEntityBehaviour<?> behaviour : smartBE.getAllBehaviours()) {
+                    if (!(behaviour instanceof ClipboardCloneable cc))
+                        continue;
+                    anyValid = true;
+                    anySuccess |= write(cc, registryManager, writeView, side, world.isClientSide());
+                }
+                if (smartBE instanceof ClipboardCloneable cc) {
+                    anyValid = true;
+                    anySuccess |= write(cc, registryManager, writeView, side, world.isClientSide());
+                }
+                if (anySuccess) {
+                    tag = writeView.buildResult();
                 }
             }
         }
@@ -190,11 +179,10 @@ public class ClipboardValueSettingsHandler {
         Direction side,
         boolean simulate
     ) {
-        String clipboardKey = cc.getClipboardKey();
         if (simulate) {
             return cc.canWrite(registryManager, side);
         } else {
-            return cc.writeToClipboard(writeView.child(clipboardKey), side);
+            return cc.writeToClipboard(writeView.child(cc.getClipboardKey()), side);
         }
     }
 }
