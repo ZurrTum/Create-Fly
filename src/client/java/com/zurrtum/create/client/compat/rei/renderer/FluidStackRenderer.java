@@ -17,6 +17,7 @@ import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.component.PatchedDataComponentMap;
 import net.minecraft.network.chat.Component;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.item.alchemy.PotionContents;
 import net.minecraft.world.level.material.Fluid;
 
@@ -53,6 +54,20 @@ public record FluidStackRenderer(EntryRenderer<FluidStack> origin) implements En
                 Component name = contents.getName(PotionFluidHandler.itemFromBottleType(bottleType).getDescriptionId() + ".effect.");
                 List<Tooltip.Entry> list = new ArrayList<>();
                 list.add(Tooltip.entry(name));
+                Float scale = components.get(DataComponents.POTION_DURATION_SCALE);
+                if (scale == null) {
+                    if (bottleType == BottleType.LINGERING) {
+                        scale = Items.LINGERING_POTION.components().getOrDefault(DataComponents.POTION_DURATION_SCALE, 1f);
+                    } else {
+                        scale = 1f;
+                    }
+                }
+                PotionContents.addPotionTooltip(
+                    contents.getAllEffects(),
+                    text -> list.add(Tooltip.entry(text)),
+                    scale,
+                    context.vanillaContext().tickRate()
+                );
                 contents.addToTooltip(context.vanillaContext(), text -> list.add(Tooltip.entry(text)), context.getFlag(), components);
                 entries.removeFirst();
                 entries.addAll(0, list);

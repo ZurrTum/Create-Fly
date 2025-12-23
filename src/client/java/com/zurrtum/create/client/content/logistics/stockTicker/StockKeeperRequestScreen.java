@@ -965,6 +965,27 @@ public class StockKeeperRequestScreen extends AbstractSimiContainerScreen<StockK
         return noneHovered;
     }
 
+    @Nullable
+    public ItemStack getHoveredItemStack(int mouseX, int mouseY) {
+        Couple<Integer> hoveredSlot = getHoveredSlot(mouseX, mouseY);
+        if (hoveredSlot == noneHovered) {
+            return null;
+        }
+        int index = hoveredSlot.getSecond();
+        boolean recipeHovered = hoveredSlot.getFirst() == -2;
+        BigItemStack entry;
+        if (recipeHovered) {
+            entry = recipesToOrder.get(index);
+        } else {
+            if (hoveredSlot.getFirst() == -1) {
+                entry = itemsToOrder.get(index);
+            } else {
+                entry = displayedItems.get(hoveredSlot.getFirst()).get(index);
+            }
+        }
+        return entry.stack.copy();
+    }
+
     public Optional<Pair<ItemStack, Rect2i>> getHoveredIngredient(int mouseX, int mouseY) {
         Couple<Integer> hoveredSlot = getHoveredSlot(mouseX, mouseY);
 
