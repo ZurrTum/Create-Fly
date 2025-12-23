@@ -33,12 +33,14 @@ import com.zurrtum.create.foundation.gui.menu.MenuType;
 import com.zurrtum.create.infrastructure.component.ClipboardEntry;
 import com.zurrtum.create.infrastructure.component.PackageOrderWithCrafts;
 import com.zurrtum.create.infrastructure.component.PackageOrderWithCrafts.CraftingEntry;
+import com.zurrtum.create.infrastructure.items.ItemStackHandler;
 import com.zurrtum.create.infrastructure.packet.c2s.LogisticalStockRequestPacket;
 import com.zurrtum.create.infrastructure.packet.c2s.PackageOrderRequestPacket;
 import com.zurrtum.create.infrastructure.packet.c2s.StockKeeperCategoryHidingPacket;
 import com.zurrtum.create.infrastructure.packet.c2s.StockKeeperLockPacket;
 import it.unimi.dsi.fastutil.ints.IntList;
 import it.unimi.dsi.fastutil.objects.Object2ObjectMap;
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
@@ -61,6 +63,7 @@ import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.Item.TooltipContext;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
@@ -148,6 +151,8 @@ public class StockKeeperRequestScreen extends AbstractSimiContainerScreen<StockK
     private InventorySummary forcedEntries = new InventorySummary();
     private boolean canRequestCraftingPackage = false;
 
+    private Slot cursorSlot;
+
     public StockKeeperRequestScreen(StockKeeperRequestMenu container, Inventory inv, Component title) {
         super(container, inv, title);
         blockEntity = container.contentHolder;
@@ -172,6 +177,10 @@ public class StockKeeperRequestScreen extends AbstractSimiContainerScreen<StockK
             }
             if (!anyItems)
                 clipboardItem = null;
+        }
+
+        if (FabricLoader.getInstance().isModLoaded("eiv")) {
+            cursorSlot = new Slot(new ItemStackHandler(), 0, 0, 0);
         }
 
         // Find the keeper for rendering
@@ -1360,6 +1369,18 @@ public class StockKeeperRequestScreen extends AbstractSimiContainerScreen<StockK
             syncSearch();
         }
         return true;
+    }
+
+    @Override
+    public void renderContents(GuiGraphics context, int mouseX, int mouseY, float deltaTicks) {
+        super.renderContents(context, mouseX, mouseY, deltaTicks);
+        if (cursorSlot != null) {
+            ItemStack stack = getHoveredItemStack(mouseX, mouseY);
+            if (stack != null) {
+                cursorSlot.set(stack);
+                hoveredSlot = cursorSlot;
+            }
+        }
     }
 
     @Override

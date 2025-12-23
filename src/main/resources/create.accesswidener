@@ -227,3 +227,5 @@ mutable	field	net/minecraft/world/item/context/BlockPlaceContext	relativePos	Lne
 mutable	field	net/minecraft/world/level/biome/BiomeGenerationSettings	features	Ljava/util/List;
 accessible class net/minecraft/client/gui/GuiGraphics$ScissorStack
 accessible class net/minecraft/client/gui/Gui$ContextualInfo
+accessible field net/minecraft/client/gui/screens/inventory/AbstractContainerScreen hoveredSlot Lnet/minecraft/world/inventory/Slot;
+extendable method net/minecraft/client/gui/screens/Screen init (II)V

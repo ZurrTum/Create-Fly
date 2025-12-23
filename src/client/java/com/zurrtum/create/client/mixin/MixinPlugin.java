@@ -16,15 +16,25 @@ public class MixinPlugin implements IMixinConfigPlugin {
     @Override
     public void onLoad(String mixinPackage) {
         mixins = new ArrayList<>();
-        if (FabricLoader.getInstance().isModLoaded("sodium")) {
+        FabricLoader loader = FabricLoader.getInstance();
+        if (loader.isModLoaded("sodium")) {
             mixins.add("FabricModelAccessMixin");
         }
-        if (FabricLoader.getInstance().isModLoaded("iris")) {
+        if (loader.isModLoaded("iris")) {
             mixins.add("IrisPipelinesMixin");
         }
-        if (FabricLoader.getInstance().isModLoaded("holdmyitems")) {
+        if (loader.isModLoaded("holdmyitems")) {
             mixins.add("HoldMyItemsMixin");
             mixins.add("AnimationResourceLoaderMixin");
+        }
+        if (loader.isModLoaded("eiv")) {
+            mixins.add("ItemSlotMixin");
+            mixins.add("FabricEIVMixin");
+            mixins.add("RecipeViewMenuMixin");
+            mixins.add("ViewTypeButtonMixin");
+            mixins.add("FluidItemSpecialRendererMixin");
+            mixins.add("RecipeViewScreenMixin");
+            mixins.add("CraftingViewRecipeAccessor");
         }
         if (Create.Lazy) {
             mixins.add("FabricBlockStateModelMixin");
@@ -33,7 +43,7 @@ public class MixinPlugin implements IMixinConfigPlugin {
         } else {
             mixins.add("CreativeModeInventoryScreenMixin");
         }
-        if (FabricLoader.getInstance().isModLoaded("fabric-rendering-fluids-v1")) {
+        if (loader.isModLoaded("fabric-rendering-fluids-v1")) {
             mixins.add("WaterRenderHandlerMixin");
         }
     }
