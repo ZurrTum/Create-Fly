@@ -17,23 +17,23 @@ import org.jetbrains.annotations.NotNull;
 import java.util.LinkedList;
 import java.util.List;
 
-public class GhostIngredientHandler<T extends GhostItemMenu<?>> implements IGhostIngredientHandler<AbstractSimiContainerScreen<T>> {
+public class GhostIngredientHandler<T extends AbstractSimiContainerScreen<? extends GhostItemMenu<?>>> implements IGhostIngredientHandler<T> {
 
     @Override
     @NotNull
-    public <I> List<Target<I>> getTargetsTyped(AbstractSimiContainerScreen<T> gui, ITypedIngredient<I> ingredient, boolean doStart) {
-        boolean isAttributeFilter = gui instanceof AttributeFilterScreen;
+    public <I> List<Target<I>> getTargetsTyped(T gui, ITypedIngredient<I> ingredient, boolean doStart) {
         List<Target<I>> targets = new LinkedList<>();
 
         if (ingredient.getType() == VanillaTypes.ITEM_STACK) {
-            for (int i = 36; i < gui.getMenu().slots.size(); i++) {
-                if (gui.getMenu().slots.get(i).isActive())
-                    targets.add(new GhostTarget<>(gui, i - 36, isAttributeFilter));
-
-                // Only accept items in 1st slot. 2nd is used for functionality, don't wanna
-                // override that one
-                if (isAttributeFilter)
-                    break;
+            List<Slot> slots = gui.getMenu().slots;
+            if (gui instanceof AttributeFilterScreen) {
+                if (slots.get(36).isActive())
+                    targets.add(new GhostTarget<>(gui, 0, true));
+            } else {
+                for (int i = 36; i < slots.size(); i++) {
+                    if (slots.get(i).isActive())
+                        targets.add(new GhostTarget<>(gui, i - 36, false));
+                }
             }
         }
 
@@ -50,14 +50,14 @@ public class GhostIngredientHandler<T extends GhostItemMenu<?>> implements IGhos
         return true;
     }
 
-    private static class GhostTarget<I, T extends GhostItemMenu<?>> implements Target<I> {
+    private static class GhostTarget<I, T extends AbstractSimiContainerScreen<? extends GhostItemMenu<?>>> implements Target<I> {
 
         private final Rect2i area;
-        private final AbstractSimiContainerScreen<T> gui;
+        private final T gui;
         private final int slotIndex;
         private final boolean isAttributeFilter;
 
-        public GhostTarget(AbstractSimiContainerScreen<T> gui, int slotIndex, boolean isAttributeFilter) {
+        public GhostTarget(T gui, int slotIndex, boolean isAttributeFilter) {
             this.gui = gui;
             this.slotIndex = slotIndex;
             this.isAttributeFilter = isAttributeFilter;

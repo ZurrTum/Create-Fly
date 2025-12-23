@@ -61,7 +61,7 @@ public class BlueprintOverlayRenderer {
         noOutput = false;
         shopContext = null;
 
-        if (mc.gameMode.getPlayerMode() == GameType.SPECTATOR)
+        if (mc.gameMode.getPlayerMode() == GameType.SPECTATOR || mc.screen != null)
             return;
 
         HitResult mouseOver = mc.hitResult;

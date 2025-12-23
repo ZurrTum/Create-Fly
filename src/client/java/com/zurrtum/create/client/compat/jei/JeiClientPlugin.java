@@ -11,6 +11,7 @@ import com.zurrtum.create.client.content.equipment.blueprint.BlueprintScreen;
 import com.zurrtum.create.client.content.logistics.factoryBoard.FactoryPanelSetItemScreen;
 import com.zurrtum.create.client.content.logistics.filter.AbstractFilterScreen;
 import com.zurrtum.create.client.content.logistics.redstoneRequester.RedstoneRequesterScreen;
+import com.zurrtum.create.client.content.logistics.stockTicker.StockKeeperRequestScreen;
 import com.zurrtum.create.client.content.redstone.link.controller.LinkedControllerScreen;
 import com.zurrtum.create.client.content.trains.schedule.ScheduleScreen;
 import com.zurrtum.create.client.foundation.gui.menu.AbstractSimiContainerScreen;
@@ -40,13 +41,14 @@ import mezz.jei.api.helpers.IPlatformFluidHelper;
 import mezz.jei.api.recipe.types.IRecipeType;
 import mezz.jei.api.registration.*;
 import mezz.jei.api.runtime.IIngredientManager;
+import mezz.jei.api.runtime.IJeiRuntime;
 import mezz.jei.common.Internal;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderSet;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.DyeItem;
 import net.minecraft.world.item.Item;
@@ -214,14 +216,25 @@ public class JeiClientPlugin implements IModPlugin {
     }
 
     @Override
-    @SuppressWarnings({"unchecked", "rawtypes"})
     public void registerGuiHandlers(IGuiHandlerRegistration registration) {
         registration.addGenericGuiContainerHandler(AbstractSimiContainerScreen.class, new JeiExclusionZones());
-        registration.addGhostIngredientHandler(AbstractFilterScreen.class, new GhostIngredientHandler());
-        registration.addGhostIngredientHandler(BlueprintScreen.class, new GhostIngredientHandler());
-        registration.addGhostIngredientHandler(LinkedControllerScreen.class, new GhostIngredientHandler());
-        registration.addGhostIngredientHandler(ScheduleScreen.class, new GhostIngredientHandler());
-        registration.addGhostIngredientHandler(RedstoneRequesterScreen.class, new GhostIngredientHandler());
-        registration.addGhostIngredientHandler(FactoryPanelSetItemScreen.class, new GhostIngredientHandler());
+        registration.addGhostIngredientHandler(AbstractFilterScreen.class, new GhostIngredientHandler<>());
+        registration.addGhostIngredientHandler(BlueprintScreen.class, new GhostIngredientHandler<>());
+        registration.addGhostIngredientHandler(LinkedControllerScreen.class, new GhostIngredientHandler<>());
+        registration.addGhostIngredientHandler(ScheduleScreen.class, new GhostIngredientHandler<>());
+        registration.addGhostIngredientHandler(RedstoneRequesterScreen.class, new GhostIngredientHandler<>());
+        registration.addGhostIngredientHandler(FactoryPanelSetItemScreen.class, new GhostIngredientHandler<>());
+        registration.addGuiContainerHandler(StockKeeperRequestScreen.class, new StockKeeperGuiContainerHandler());
+    }
+
+    @Override
+    public void registerRecipeTransferHandlers(IRecipeTransferRegistration registration) {
+        registration.addRecipeTransferHandler(new BlueprintTransferHandler(), RecipeTypes.CRAFTING);
+        registration.addUniversalRecipeTransferHandler(new StockKeeperTransferHandler());
+    }
+
+    @Override
+    public void onRuntimeAvailable(IJeiRuntime jeiRuntime) {
+        StockKeeperRequestScreen.setSearchConsumer(jeiRuntime.getIngredientFilter()::setFilterText);
     }
 }

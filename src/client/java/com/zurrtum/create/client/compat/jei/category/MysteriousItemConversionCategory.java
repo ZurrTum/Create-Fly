@@ -38,7 +38,7 @@ public class MysteriousItemConversionCategory extends CreateCategory<MysteriousI
     }
 
     @Override
-    public Identifier getRegistryName(MysteriousItemConversionDisplay display) {
+    public Identifier getIdentifier(MysteriousItemConversionDisplay display) {
         return display.id();
     }
 

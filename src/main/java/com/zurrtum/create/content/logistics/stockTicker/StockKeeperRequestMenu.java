@@ -2,18 +2,13 @@ package com.zurrtum.create.content.logistics.stockTicker;
 
 import com.zurrtum.create.AllMenuTypes;
 import com.zurrtum.create.foundation.gui.menu.MenuBase;
-
-import java.util.List;
-
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 
+import java.util.List;
+
 public class StockKeeperRequestMenu extends MenuBase<StockTickerBlockEntity> {
-
-    public boolean isAdmin;
-    public boolean isLocked;
-
     public Object screenReference;
 
     public StockKeeperRequestMenu(int id, Inventory inv, StockTickerBlockEntity contentHolder) {
