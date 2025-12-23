@@ -6,20 +6,12 @@ import com.zurrtum.create.foundation.block.IBE;
 import com.zurrtum.create.infrastructure.items.ItemInventoryProvider;
 import com.zurrtum.create.infrastructure.items.ItemStackHandler;
 import it.unimi.dsi.fastutil.objects.Object2ReferenceOpenHashMap;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.function.BiPredicate;
-import java.util.function.Predicate;
-import java.util.function.Supplier;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderSet;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.tags.TagKey;
 import net.minecraft.util.Mth;
 import net.minecraft.world.Container;
 import net.minecraft.world.WorldlyContainer;
@@ -36,6 +28,15 @@ import net.minecraft.world.level.block.ChestBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.ChestBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.function.BiPredicate;
+import java.util.function.Predicate;
+import java.util.function.Supplier;
 
 public class ItemHelper {
     private static final Map<BlockPos, InventoryCache> INV_CACHE = new Object2ReferenceOpenHashMap<>();
@@ -171,6 +172,14 @@ public class ItemHelper {
             return true;
         HolderSet<Item> entries1 = i1.values;
         HolderSet<Item> entries2 = i2.values;
+        Optional<TagKey<Item>> tag1 = entries1.unwrapKey();
+        Optional<TagKey<Item>> tag2 = entries2.unwrapKey();
+        if (tag1.isPresent()) {
+            return tag2.map(tag -> tag.equals(tag1.get())).orElse(false);
+        }
+        if (tag2.isPresent()) {
+            return false;
+        }
         int size = entries1.size();
         if (size == entries2.size()) {
             for (int i = 0; i < size; i++)

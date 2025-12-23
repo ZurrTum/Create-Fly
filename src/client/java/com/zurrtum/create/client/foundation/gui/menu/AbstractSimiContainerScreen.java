@@ -61,6 +61,24 @@ public abstract class AbstractSimiContainerScreen<T extends AbstractContainerMen
         topPos += windowYOffset;
     }
 
+    //    @Override
+    //    public void init(int width, int height) {
+    //        super.init(width, height);
+    //        EivExclusionZoneHelper.setExclusionZone(getExtraAreas());
+    //    }
+    //
+    //    @Override
+    //    public void resize(int width, int height) {
+    //        super.resize(width, height);
+    //        EivExclusionZoneHelper.setExclusionZone(getExtraAreas());
+    //    }
+    //
+    //    @Override
+    //    public void removed() {
+    //        super.removed();
+    //        EivExclusionZoneHelper.removeExclusionZone();
+    //    }
+
     @Override
     protected void containerTick() {
         for (GuiEventListener listener : children()) {

@@ -66,6 +66,7 @@ sourceSets {
         java {
             exclude 'com/zurrtum/create/client/compat/jei/**'
             exclude 'com/zurrtum/create/client/compat/rei/**'
+            exclude 'com/zurrtum/create/client/compat/eiv/**'
             exclude 'com/zurrtum/create/client/compat/sodium/**'
             exclude 'com/zurrtum/create/client/compat/trinkets/**'
             exclude 'com/zurrtum/create/client/compat/CompatMod.java'
@@ -73,6 +74,13 @@ sourceSets {
             exclude 'com/zurrtum/create/client/mixin/IrisPipelinesMixin.java'
             exclude 'com/zurrtum/create/client/mixin/HoldMyItemsMixin.java'
             exclude 'com/zurrtum/create/client/mixin/AnimationResourceLoaderMixin.java'
+            exclude 'com/zurrtum/create/client/mixin/CraftingViewRecipeAccessor.java'
+            exclude 'com/zurrtum/create/client/mixin/FabricEIVMixin.java'
+            exclude 'com/zurrtum/create/client/mixin/FluidItemSpecialRendererMixin.java'
+            exclude 'com/zurrtum/create/client/mixin/ItemSlotMixin.java'
+            exclude 'com/zurrtum/create/client/mixin/RecipeViewMenuMixin.java'
+            exclude 'com/zurrtum/create/client/mixin/RecipeViewScreenMixin.java'
+            exclude 'com/zurrtum/create/client/mixin/ViewTypeButtonMixin.java'
         }
     }
 }
@@ -108,6 +116,7 @@ dependencies {
 //        modClientRuntimeOnly "me.shedaniel:RoughlyEnoughItems-fabric:${project.rei_version}"
 //    }
 //    modCompileOnly "maven.modrinth:jei:${project.jei_version}"
+//    modCompileOnly "maven.modrinth:eiv:${project.eiv_version}"
 //    modCompileOnly "cc.tweaked:cc-tweaked-${project.cct_version}"
 //    modCompileOnly "maven.modrinth:trinkets-canary:${project.trinkets_version}"
 //    modCompileOnly "dev.onyxstudios.cardinal-components-api:cardinal-components-base:${project.cca_version}"

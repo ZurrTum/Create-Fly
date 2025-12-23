@@ -29,6 +29,9 @@
     ],
     "jei_mod_plugin": [
       "com.zurrtum.create.client.compat.jei.JeiClientPlugin"
+    ],
+    "eiv": [
+      "com.zurrtum.create.compat.eiv.EivCommonPlugin"
     ]
   },
   "custom": {

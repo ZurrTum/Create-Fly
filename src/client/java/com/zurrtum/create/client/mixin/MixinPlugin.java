@@ -26,6 +26,15 @@ public class MixinPlugin implements IMixinConfigPlugin {
         //            mixins.add("HoldMyItemsMixin");
         //            mixins.add("AnimationResourceLoaderMixin");
         //        }
+        //        if (FabricLoader.getInstance().isModLoaded("eiv")) {
+        //            mixins.add("ItemSlotMixin");
+        //            mixins.add("FabricEIVMixin");
+        //            mixins.add("RecipeViewMenuMixin");
+        //            mixins.add("ViewTypeButtonMixin");
+        //            mixins.add("FluidItemSpecialRendererMixin");
+        //            mixins.add("RecipeViewScreenMixin");
+        //            mixins.add("CraftingViewRecipeAccessor");
+        //        }
         if (Create.Lazy) {
             mixins.add("FabricBlockStateModelMixin");
             mixins.add("WrapperBlockStateModelMixin");
