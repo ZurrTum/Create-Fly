@@ -11,9 +11,6 @@ import com.zurrtum.create.client.foundation.render.BlockEntityRenderHelper;
 import com.zurrtum.create.client.foundation.render.BlockEntityRenderHelper.BlockEntityListRenderState;
 import com.zurrtum.create.client.infrastructure.model.WrapperBlockStateModel;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
-
-import java.util.*;
-
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.ItemBlockRenderTypes;
 import net.minecraft.client.renderer.block.BlockRenderDispatcher;
@@ -30,6 +27,8 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import net.minecraft.world.phys.Vec3;
+
+import java.util.*;
 
 public class SchematicRenderer {
 
@@ -76,14 +75,14 @@ public class SchematicRenderer {
             scratchErroredBlockEntities,
             null,
             schematic,
-            ms,
+            null,
             null,
             transformation.toLocalSpace(camera),
             AnimationTickHolder.getPartialTicks()
         );
         if (renderState != null) {
             FeatureRenderDispatcher renderDispatcher = Minecraft.getInstance().gameRenderer.getFeatureRenderDispatcher();
-            renderState.render(renderDispatcher.getSubmitNodeStorage(), mc.gameRenderer.getLevelRenderState().cameraRenderState);
+            renderState.render(ms, renderDispatcher.getSubmitNodeStorage(), mc.gameRenderer.getLevelRenderState().cameraRenderState);
         }
 
         // Don't bother looping over errored BEs again.

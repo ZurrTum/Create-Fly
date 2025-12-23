@@ -46,7 +46,6 @@ public class ClientContraption {
     // Parallel array to renderedBlockEntities. Scratch space for marking block entities that errored during rendering.
     public final BitSet scratchErroredBlockEntities = new BitSet();
 
-    private final ContraptionMatrices matrices = new ContraptionMatrices();
     protected final Contraption contraption;
     private int structureVersion = 0;
     private int childrenVersion = 0;
@@ -175,10 +174,6 @@ public class ClientContraption {
 
     public VirtualRenderWorld getRenderLevel() {
         return renderLevel;
-    }
-
-    public ContraptionMatrices getMatrices() {
-        return matrices;
     }
 
     public RenderedBlocks getRenderedBlocks() {

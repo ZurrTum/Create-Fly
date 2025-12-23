@@ -171,25 +171,20 @@ public class ContraptionEntityRenderer<C extends AbstractContraptionEntity, S ex
         state.x = Mth.lerp(tickProgress, entity.xOld, entity.getX());
         state.y = Mth.lerp(tickProgress, entity.yOld, entity.getY());
         state.z = Mth.lerp(tickProgress, entity.zOld, entity.getZ());
+        matrixStack.pushPose();
+        transform(state, matrixStack);
+        state.modelEntry = matrixStack.last().copy();
+        matrixStack.popPose();
         Level world = entity.level();
         VirtualRenderWorld renderWorld = clientContraption.getRenderLevel();
-        ContraptionMatrices matrices = clientContraption.getMatrices();
-        matrixStack.pushPose();
-        Vec3 cameraPos = camera.position();
-        matrixStack.translate(state.x - cameraPos.x, state.y - cameraPos.y, state.z - cameraPos.z);
-        matrices.setup(this, matrixStack, state);
-        PoseStack projection = new PoseStack();
-        projection.last().set(matrices.getModelViewProjection().last());
-        Matrix4f lightMatrix4f = new Matrix4f(matrices.getLight());
-        Matrix4f worldMatrix4f = new Matrix4f(matrices.getWorld());
-        matrices.clear();
-        matrixStack.popPose();
+        Matrix4f worldMatrix4f = new Matrix4f().setTranslation((float) state.x, (float) state.y, (float) state.z);
         boolean support = VisualizationManager.supportsVisualization(world);
         if (!support) {
-            state.block = ContraptionBlockRenderState.create(contraption, clientContraption, renderWorld, projection, world, worldMatrix4f);
+            state.layers = createLayers(contraption, clientContraption, renderWorld, world, worldMatrix4f);
         }
         var adjustRenderedBlockEntities = clientContraption.getAndAdjustShouldRenderBlockEntities();
         clientContraption.scratchErroredBlockEntities.clear();
+        Vec3 cameraPos = camera.position();
         state.blockEntity = BlockEntityRenderHelper.getBlockEntitiesRenderState(
             support,
             clientContraption.renderedBlockEntityView,
@@ -197,13 +192,13 @@ public class ContraptionEntityRenderer<C extends AbstractContraptionEntity, S ex
             clientContraption.scratchErroredBlockEntities,
             renderWorld,
             world,
-            projection,
-            lightMatrix4f,
+            worldMatrix4f,
+            state.modelEntry.pose(),
             contraption.entity.toLocalVector(cameraPos, tickProgress),
             tickProgress
         );
         clientContraption.shouldRenderBlockEntities.andNot(clientContraption.scratchErroredBlockEntities);
-        state.actor = ActorListRenderState.create(cameraPos, getFont(), world, renderWorld, contraption, worldMatrix4f, projection);
+        state.actors = createActors(cameraPos, getFont(), world, renderWorld, contraption, worldMatrix4f);
     }
 
     @Override
@@ -211,15 +206,27 @@ public class ContraptionEntityRenderer<C extends AbstractContraptionEntity, S ex
         if (state.contraption == null) {
             return;
         }
-        if (state.block != null) {
-            state.block.render(queue);
+        poseStack.pushPose();
+        PoseStack.Pose entry = poseStack.last();
+        entry.pose().mul(state.modelEntry.pose());
+        entry.normal().mul(state.modelEntry.normal());
+        if (state.layers != null) {
+            for (ContraptionBlockLayer layer : state.layers) {
+                queue.submitCustomGeometry(poseStack, layer.renderLayer, layer);
+            }
         }
         if (state.blockEntity != null) {
-            state.blockEntity.render(queue, cameraRenderState);
+            state.blockEntity.render(poseStack, queue, cameraRenderState);
         }
-        if (state.actor != null) {
-            state.actor.render(queue);
+        if (state.actors != null) {
+            for (MovementRenderState actor : state.actors) {
+                poseStack.pushPose();
+                actor.transform(poseStack);
+                actor.render(poseStack, queue);
+                poseStack.popPose();
+            }
         }
+        poseStack.popPose();
     }
 
     public void transform(S state, PoseStack matrixStack) {
@@ -227,51 +234,42 @@ public class ContraptionEntityRenderer<C extends AbstractContraptionEntity, S ex
 
     public static class AbstractContraptionState extends EntityRenderState {
         public Contraption contraption;
-        public ContraptionBlockRenderState block;
+        public PoseStack.Pose modelEntry;
+        public List<ContraptionBlockLayer> layers;
         public BlockEntityListRenderState blockEntity;
-        public ActorListRenderState actor;
+        public @Nullable List<MovementRenderState> actors;
     }
 
-    public record ContraptionBlockRenderState(PoseStack matrices, List<ContraptionBlockLayer> layers) {
-        @Nullable
-        public static ContraptionBlockRenderState create(
-            Contraption contraption,
-            ClientContraption clientContraption,
-            VirtualRenderWorld renderWorld,
-            PoseStack matrices,
-            Level world,
-            Matrix4f lightTransform
-        ) {
-            List<ContraptionBlockLayer> layers = new ArrayList<>();
-            for (ChunkSectionLayer blockLayer : ChunkSectionLayer.values()) {
-                SuperByteBuffer buffer = getBuffer(contraption, clientContraption, renderWorld, blockLayer);
-                if (buffer.isEmpty()) {
-                    continue;
-                }
-                layers.add(new ContraptionBlockLayer(getRenderLayer(blockLayer), buffer, world, lightTransform));
+    @Nullable
+    public static List<ContraptionBlockLayer> createLayers(
+        Contraption contraption,
+        ClientContraption clientContraption,
+        VirtualRenderWorld renderWorld,
+        Level world,
+        Matrix4f lightTransform
+    ) {
+        List<ContraptionBlockLayer> layers = new ArrayList<>();
+        for (ChunkSectionLayer blockLayer : ChunkSectionLayer.values()) {
+            SuperByteBuffer buffer = getBuffer(contraption, clientContraption, renderWorld, blockLayer);
+            if (buffer.isEmpty()) {
+                continue;
             }
-            if (layers.isEmpty()) {
-                return null;
-            }
-            return new ContraptionBlockRenderState(matrices, layers);
+            layers.add(new ContraptionBlockLayer(getRenderLayer(blockLayer), buffer, world, lightTransform));
         }
-
-        private static RenderType getRenderLayer(ChunkSectionLayer layer) {
-            return switch (layer) {
-                case SOLID -> RenderTypes.solidMovingBlock();
-                case CUTOUT -> RenderTypes.cutoutMovingBlock();
-                case TRANSLUCENT -> RenderTypes.translucentMovingBlock();
-                case TRIPWIRE -> RenderTypes.tripwireMovingBlock();
-            };
+        if (layers.isEmpty()) {
+            return null;
         }
-
-        public void render(SubmitNodeCollector queue) {
-            for (ContraptionBlockLayer layer : layers) {
-                queue.submitCustomGeometry(matrices, layer.renderLayer, layer);
-            }
-        }
+        return layers;
     }
 
+    private static RenderType getRenderLayer(ChunkSectionLayer layer) {
+        return switch (layer) {
+            case SOLID -> RenderTypes.solidMovingBlock();
+            case CUTOUT -> RenderTypes.cutoutMovingBlock();
+            case TRANSLUCENT -> RenderTypes.translucentMovingBlock();
+            case TRIPWIRE -> RenderTypes.tripwireMovingBlock();
+        };
+    }
 
     public record ContraptionBlockLayer(
         RenderType renderLayer, SuperByteBuffer buffer, Level world, Matrix4f lightTransform
@@ -282,52 +280,40 @@ public class ContraptionEntityRenderer<C extends AbstractContraptionEntity, S ex
         }
     }
 
-    public record ActorListRenderState(PoseStack matrices, List<MovementRenderState> actors) {
-        @Nullable
-        public static ActorListRenderState create(
-            Vec3 camera,
-            Font textRenderer,
-            Level world,
-            VirtualRenderWorld renderWorld,
-            Contraption contraption,
-            Matrix4f worldMatrix4f,
-            PoseStack viewProjection
-        ) {
-            List<MovementRenderState> actors = new ArrayList<>();
-            for (Pair<StructureTemplate.StructureBlockInfo, MovementContext> actor : contraption.getActors()) {
-                MovementContext context = actor.getRight();
-                if (context == null) {
+    @Nullable
+    public static List<MovementRenderState> createActors(
+        Vec3 camera,
+        Font textRenderer,
+        Level world,
+        VirtualRenderWorld renderWorld,
+        Contraption contraption,
+        Matrix4f worldMatrix4f
+    ) {
+        List<MovementRenderState> actors = new ArrayList<>();
+        for (Pair<StructureTemplate.StructureBlockInfo, MovementContext> actor : contraption.getActors()) {
+            MovementContext context = actor.getRight();
+            if (context == null) {
+                continue;
+            }
+            if (context.world == null) {
+                context.world = world;
+            }
+            MovementBehaviour movementBehaviour = MovementBehaviour.REGISTRY.get(context.state);
+            if (movementBehaviour != null) {
+                MovementRenderBehaviour render = movementBehaviour.getAttachRender();
+                if (render == null || contraption.isHiddenInPortal(context.localPos)) {
                     continue;
                 }
-                if (context.world == null) {
-                    context.world = world;
-                }
-                MovementBehaviour movementBehaviour = MovementBehaviour.REGISTRY.get(context.state);
-                if (movementBehaviour != null) {
-                    MovementRenderBehaviour render = movementBehaviour.getAttachRender();
-                    if (render == null || contraption.isHiddenInPortal(context.localPos)) {
-                        continue;
-                    }
-                    MovementRenderState renderState = render.getRenderState(camera, textRenderer, context, renderWorld, worldMatrix4f);
-                    if (renderState != null) {
-                        actors.add(renderState);
-                    }
+                MovementRenderState renderState = render.getRenderState(camera, textRenderer, context, renderWorld, worldMatrix4f);
+                if (renderState != null) {
+                    actors.add(renderState);
                 }
             }
-            if (actors.isEmpty()) {
-                return null;
-            }
-            return new ActorListRenderState(viewProjection, actors);
         }
-
-        public void render(SubmitNodeCollector queue) {
-            for (MovementRenderState actor : actors) {
-                matrices.pushPose();
-                actor.transform(matrices);
-                actor.render(matrices, queue);
-                matrices.popPose();
-            }
+        if (actors.isEmpty()) {
+            return null;
         }
+        return actors;
     }
 
     @SuppressWarnings("removal")
