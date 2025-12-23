@@ -9,6 +9,8 @@ import me.shedaniel.rei.api.common.category.CategoryIdentifier;
 import me.shedaniel.rei.api.common.display.Display;
 import me.shedaniel.rei.api.common.display.DisplaySerializer;
 import me.shedaniel.rei.api.common.entry.EntryIngredient;
+import me.shedaniel.rei.api.common.entry.EntryStack;
+import me.shedaniel.rei.api.common.entry.InputIngredient;
 import me.shedaniel.rei.api.common.util.CollectionUtils;
 import me.shedaniel.rei.api.common.util.EntryIngredients;
 import me.shedaniel.rei.plugin.client.displays.ClientsidedCraftingDisplay;
@@ -17,12 +19,15 @@ import me.shedaniel.rei.plugin.common.displays.crafting.DefaultCustomShapelessDi
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.Identifier;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.item.crafting.ShapelessRecipe;
 import net.minecraft.world.item.crafting.display.RecipeDisplay;
 import net.minecraft.world.item.crafting.display.RecipeDisplayId;
 import net.minecraft.world.item.crafting.display.ShapelessCraftingRecipeDisplay;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.Optional;
@@ -79,6 +84,11 @@ public interface AutoMixingDisplay {
         }
 
         @Override
+        public List<InputIngredient<EntryStack<?>>> getInputIngredients(@Nullable AbstractContainerMenu menu, @Nullable Player player) {
+            return CollectionUtils.mapIndexed(getInputEntries(), InputIngredient::of);
+        }
+
+        @Override
         public CategoryIdentifier<?> getCategoryIdentifier() {
             return ReiCommonPlugin.AUTOMATIC_SHAPELESS;
         }
@@ -113,6 +123,11 @@ public interface AutoMixingDisplay {
 
         public CraftingDisplayShapeless(List<EntryIngredient> inputs, List<EntryIngredient> outputs, Optional<RecipeDisplayId> id) {
             super(inputs, outputs, id);
+        }
+
+        @Override
+        public List<InputIngredient<EntryStack<?>>> getInputIngredients(@Nullable AbstractContainerMenu menu, @Nullable Player player) {
+            return CollectionUtils.mapIndexed(getInputEntries(), InputIngredient::of);
         }
 
         @Override

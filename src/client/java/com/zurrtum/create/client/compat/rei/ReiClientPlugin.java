@@ -4,17 +4,23 @@ import com.zurrtum.create.AllItemTags;
 import com.zurrtum.create.AllItems;
 import com.zurrtum.create.client.compat.rei.category.*;
 import com.zurrtum.create.client.compat.rei.display.MysteriousItemConversionDisplay;
+import com.zurrtum.create.client.content.logistics.stockTicker.StockKeeperRequestScreen;
 import com.zurrtum.create.client.foundation.gui.menu.AbstractSimiContainerScreen;
 import com.zurrtum.create.compat.rei.display.DrainingDisplay;
 import com.zurrtum.create.compat.rei.display.SpoutFillingDisplay;
 import com.zurrtum.create.content.equipment.toolbox.ToolboxBlock;
 import me.shedaniel.math.Rectangle;
+import me.shedaniel.rei.api.client.REIRuntime;
+import me.shedaniel.rei.api.client.gui.widgets.TextField;
 import me.shedaniel.rei.api.client.plugins.REIClientPlugin;
 import me.shedaniel.rei.api.client.registry.category.CategoryRegistry;
 import me.shedaniel.rei.api.client.registry.category.CategoryRegistry.CategoryConfiguration;
 import me.shedaniel.rei.api.client.registry.display.DisplayRegistry;
 import me.shedaniel.rei.api.client.registry.entry.EntryRegistry;
 import me.shedaniel.rei.api.client.registry.screen.ExclusionZones;
+import me.shedaniel.rei.api.client.registry.screen.ScreenRegistry;
+import me.shedaniel.rei.api.client.registry.transfer.TransferHandlerRegistry;
+import me.shedaniel.rei.api.client.search.method.InputMethodRegistry;
 import me.shedaniel.rei.api.common.category.CategoryIdentifier;
 import me.shedaniel.rei.api.common.display.Display;
 import me.shedaniel.rei.api.common.entry.EntryIngredient;
@@ -104,7 +110,32 @@ public class ReiClientPlugin implements REIClientPlugin {
     }
 
     @Override
+    public void registerScreens(ScreenRegistry registry) {
+        registry.registerDraggableStackVisitor(new GhostIngredientHandler<>());
+        registry.registerFocusedStack(new StockKeeperGuiContainerHandler());
+    }
+
+    @Override
+    public void registerTransferHandlers(TransferHandlerRegistry registry) {
+        registry.register(new BlueprintTransferHandler());
+        registry.register(new StockKeeperTransferHandler());
+    }
+
+    @Override
     public void registerExclusionZones(ExclusionZones zones) {
         zones.register(AbstractSimiContainerScreen.class, new ReiExclusionZones());
+    }
+
+    @Override
+    @SuppressWarnings("UnstableApiUsage")
+    public void registerInputMethods(InputMethodRegistry registry) {
+        StockKeeperRequestScreen.setSearchConsumer(ReiClientPlugin::setSearchField);
+    }
+
+    public static void setSearchField(String text) {
+        TextField search = REIRuntime.getInstance().getSearchTextField();
+        if (search != null) {
+            search.setText(text);
+        }
     }
 }
