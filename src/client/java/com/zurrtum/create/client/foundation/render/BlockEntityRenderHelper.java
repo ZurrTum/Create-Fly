@@ -6,14 +6,6 @@ import com.zurrtum.create.catnip.registry.RegisteredObjectsHelper;
 import com.zurrtum.create.client.flywheel.lib.visualization.VisualizationHelper;
 import com.zurrtum.create.client.foundation.virtualWorld.VirtualRenderWorld;
 import com.zurrtum.create.client.infrastructure.config.AllConfigs;
-import org.jetbrains.annotations.Nullable;
-import org.joml.Matrix4f;
-import org.joml.Vector4f;
-
-import java.util.ArrayList;
-import java.util.BitSet;
-import java.util.List;
-
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.SubmitNodeCollector;
@@ -25,6 +17,13 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.phys.Vec3;
+import org.jetbrains.annotations.Nullable;
+import org.joml.Matrix4f;
+import org.joml.Vector4f;
+
+import java.util.ArrayList;
+import java.util.BitSet;
+import java.util.List;
 
 public class BlockEntityRenderHelper {
     /**
@@ -43,8 +42,8 @@ public class BlockEntityRenderHelper {
         BitSet erroredBEsOut,
         @Nullable VirtualRenderWorld renderLevel,
         Level realLevel,
-        PoseStack ms,
-        @Nullable Matrix4f lightTransform,
+        @Nullable Matrix4f worldMatrix4f,
+        @Nullable Matrix4f modelMatrix4f,
         Vec3 camera,
         float pt
     ) {
@@ -70,7 +69,7 @@ public class BlockEntityRenderHelper {
 
             try {
                 BlockEntityRenderState renderState = renderer.createRenderState();
-                int realLevelLight = LevelRenderer.getLightCoords(realLevel, getLightPos(lightTransform, blockEntity.getBlockPos()));
+                int realLevelLight = LevelRenderer.getLightCoords(realLevel, getLightPos(worldMatrix4f, modelMatrix4f, blockEntity.getBlockPos()));
                 if (renderLevel != null) {
                     renderLevel.setExternalLight(realLevelLight);
                 }
@@ -97,13 +96,16 @@ public class BlockEntityRenderHelper {
         if (states.isEmpty()) {
             return null;
         }
-        return new BlockEntityListRenderState(dispatcher, ms, camera, BlockPos.containing(camera), states);
+        return new BlockEntityListRenderState(dispatcher, camera, BlockPos.containing(camera), states);
     }
 
-    private static BlockPos getLightPos(@Nullable Matrix4f lightTransform, BlockPos contraptionPos) {
-        if (lightTransform != null) {
+    private static BlockPos getLightPos(@Nullable Matrix4f worldMatrix4f, @Nullable Matrix4f modelMatrix4f, BlockPos contraptionPos) {
+        if (worldMatrix4f != null) {
             Vector4f lightVec = new Vector4f(contraptionPos.getX() + .5f, contraptionPos.getY() + .5f, contraptionPos.getZ() + .5f, 1);
-            lightVec.mul(lightTransform);
+            lightVec.mul(worldMatrix4f);
+            if (modelMatrix4f != null) {
+                lightVec.mul(modelMatrix4f);
+            }
             return BlockPos.containing(lightVec.x(), lightVec.y(), lightVec.z());
         } else {
             return contraptionPos;
@@ -111,9 +113,9 @@ public class BlockEntityRenderHelper {
     }
 
     public record BlockEntityListRenderState(
-        BlockEntityRenderDispatcher dispatcher, PoseStack matrices, Vec3 camera, BlockPos cameraPos, List<BlockEntityRenderState> states
+        BlockEntityRenderDispatcher dispatcher, Vec3 camera, BlockPos cameraPos, List<BlockEntityRenderState> states
     ) {
-        public void render(SubmitNodeCollector queue, CameraRenderState cameraRenderState) {
+        public void render(PoseStack matrices, SubmitNodeCollector queue, CameraRenderState cameraRenderState) {
             Vec3 prevPos = cameraRenderState.pos;
             BlockPos prevBlockPos = cameraRenderState.blockPos;
             Vec3 prevEntityPos = cameraRenderState.entityPos;
