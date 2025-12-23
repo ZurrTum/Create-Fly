@@ -2,11 +2,15 @@ package com.zurrtum.create.content.equipment.armor;
 
 import com.zurrtum.create.AllBlocks;
 import com.zurrtum.create.AllDataComponents;
+import com.zurrtum.create.foundation.item.LayeredArmorItem;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
+
+import static com.zurrtum.create.Create.MOD_ID;
 
 public class BacktankItem extends BlockItem {
     public static final EquipmentSlot SLOT = EquipmentSlot.CHEST;
@@ -21,7 +25,8 @@ public class BacktankItem extends BlockItem {
     }
 
     public static BacktankItem netherite(Properties settings) {
-        return new BacktankItem(AllBlocks.NETHERITE_BACKTANK, settings);
+        Identifier layer = Identifier.fromNamespaceAndPath(MOD_ID, "textures/models/armor/netherite_diving_layer.png");
+        return new Layered(AllBlocks.NETHERITE_BACKTANK, settings, layer);
     }
 
     public ItemStack getMaxAirStack() {
@@ -55,5 +60,19 @@ public class BacktankItem extends BlockItem {
 
     public static int getRemainingAir(ItemStack stack) {
         return stack.getOrDefault(AllDataComponents.BACKTANK_AIR, 0);
+    }
+
+    public static class Layered extends BacktankItem implements LayeredArmorItem {
+        private final Identifier layer;
+
+        public Layered(Block block, Properties settings, Identifier layer) {
+            super(block, settings);
+            this.layer = layer;
+        }
+
+        @Override
+        public Identifier getLayerTexture() {
+            return layer;
+        }
     }
 }
