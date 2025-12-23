@@ -31,6 +31,7 @@
     "GuiGraphicsMixin",
     "GuiMixin",
     "GuiRendererMixin",
+    "HumanoidArmorLayerMixin",
     "IntegratedServerMixin",
     "ItemInHandRendererMixin",
     "ItemRendererMixin",
