@@ -81,7 +81,7 @@ public class BlockCuttingCategory extends CreateCategory<BlockCuttingDisplay> {
     }
 
     @Override
-    public Identifier getRegistryName(BlockCuttingDisplay display) {
+    public Identifier getIdentifier(BlockCuttingDisplay display) {
         return display.id();
     }
 
