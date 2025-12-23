@@ -12,16 +12,11 @@ import com.zurrtum.create.foundation.advancement.CreateTrigger;
 import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
 import com.zurrtum.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.foundation.blockEntity.behaviour.fluid.SmartFluidTankBehaviour;
+import com.zurrtum.create.foundation.blockEntity.behaviour.fluid.SmartFluidTankBehaviour.TankSegment;
 import com.zurrtum.create.foundation.fluid.FluidHelper;
 import com.zurrtum.create.infrastructure.fluids.BucketFluidInventory;
 import com.zurrtum.create.infrastructure.fluids.FluidStack;
 import com.zurrtum.create.infrastructure.particle.FluidParticleData;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.particles.ParticleOptions;
@@ -32,6 +27,11 @@ import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
 import static com.zurrtum.create.content.kinetics.belt.behaviour.BeltProcessingBehaviour.ProcessingResult.HOLD;
 import static com.zurrtum.create.content.kinetics.belt.behaviour.BeltProcessingBehaviour.ProcessingResult.PASS;
@@ -129,7 +129,7 @@ public class SpoutBlockEntity extends SmartBlockEntity {
                 award(AllAdvancements.FOODS);
         }
 
-        SmartFluidTankBehaviour.TankSegment primaryHandler = tank.getPrimaryHandler();
+        TankSegment primaryHandler = tank.getPrimaryHandler();
         primaryHandler.setFluid(fluid);
         primaryHandler.markDirty();
         sendSplash = true;
@@ -201,8 +201,9 @@ public class SpoutBlockEntity extends SmartBlockEntity {
                 int fillBlock = customProcess.fillBlock(level, worldPosition.below(2), this, currentFluidInTank.copy(), false);
                 customProcess = null;
                 if (fillBlock > 0) {
-                    tank.getPrimaryHandler()
-                        .setFluid(FluidHelper.copyStackWithAmount(currentFluidInTank, currentFluidInTank.getAmount() - fillBlock));
+                    TankSegment handler = tank.getPrimaryHandler();
+                    handler.setFluid(FluidHelper.copyStackWithAmount(currentFluidInTank, currentFluidInTank.getAmount() - fillBlock));
+                    handler.markDirty();
                     sendSplash = true;
                     notifyUpdate();
                 }
