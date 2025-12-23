@@ -23,10 +23,12 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.level.ServerPlayerGameMode;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.tags.ItemTags;
 import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntitySelector;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
@@ -135,75 +137,99 @@ public class DeployerHandler {
     private static void activateInner(DeployerPlayer player, Vec3 vec, BlockPos clickedPos, Vec3 extensionVector, Mode mode) {
         ServerPlayer serverPlayer = player.cast();
         Vec3 rayOrigin = vec.add(extensionVector.scale(3 / 2f + 1 / 64f));
-        Vec3 rayTarget = vec.add(extensionVector.scale(5 / 2f - 1 / 64f));
         serverPlayer.setPos(rayOrigin.x, rayOrigin.y, rayOrigin.z);
-        BlockPos pos = BlockPos.containing(vec);
         ItemStack stack = serverPlayer.getMainHandItem();
-        Item item = stack.getItem();
 
         // Check for entities
         final ServerLevel level = serverPlayer.level();
-        List<Entity> entities = level.getEntitiesOfClass(Entity.class, new AABB(clickedPos)).stream()
-            .filter(e -> !(e instanceof AbstractContraptionEntity)).toList();
         InteractionHand hand = InteractionHand.MAIN_HAND;
-        if (!entities.isEmpty()) {
-            Entity entity = entities.get(level.random.nextInt(entities.size()));
-            List<ItemStack> capturedDrops = new ArrayList<>();
-            boolean success = false;
-            AllSynchedDatas.CAPTURE_DROPS.set(entity, Optional.of(capturedDrops));
 
-            // Use on entity
-            if (mode == Mode.USE) {
-                InteractionResult cancelResult = null;
-                //TODO
-                //                ActionResult cancelResult = CommonHooks.onInteractEntity(player, entity, hand);
-                //                if (cancelResult == ActionResult.FAIL) {
-                //                    entity.captureDrops(null);
-                //                    return;
-                //                }
-                if (cancelResult == null) {
-                    if (entity.interact(serverPlayer, hand).consumesAction()) {
-                        if (entity instanceof AbstractVillager villager) {
-                            if (villager.getTradingPlayer() == serverPlayer)
-                                villager.setTradingPlayer(null);
-                        }
-                        success = true;
-                    } else if (entity instanceof LivingEntity livingEntity && stack.interactLivingEntity(serverPlayer, livingEntity, hand)
-                        .consumesAction())
-                        success = true;
+        if (mode == Mode.PUNCH && stack.is(ItemTags.SPEARS)) {
+            Vec3 range = extensionVector.add(1);
+            List<Entity> entities = level.getEntitiesOfClass(
+                Entity.class, new AABB(
+                    clickedPos.getX(),
+                    clickedPos.getY(),
+                    clickedPos.getZ(),
+                    clickedPos.getX() + range.x,
+                    clickedPos.getY() + range.y,
+                    clickedPos.getZ() + range.z
+                ), EntitySelector.NO_SPECTATORS.and(e -> !(e instanceof AbstractContraptionEntity))
+            );
+            if (!entities.isEmpty()) {
+                List<ItemStack> capturedDrops = new ArrayList<>();
+                for (Entity entity : entities) {
+                    AllSynchedDatas.CAPTURE_DROPS.set(entity, Optional.of(capturedDrops));
+                    serverPlayer.resetAttackStrengthTicker();
+                    serverPlayer.attack(entity);
+                    AllSynchedDatas.CAPTURE_DROPS.set(entity, Optional.empty());
                 }
-                if (!success && entity instanceof Player playerEntity) {
-                    if (stack.has(DataComponents.FOOD)) {
-                        FoodProperties foodProperties = stack.get(DataComponents.FOOD);
-                        if (foodProperties != null && playerEntity.canEat(foodProperties.canAlwaysEat())) {
-                            ItemStack copy = stack.copy();
+                capturedDrops.forEach(e -> serverPlayer.getInventory().placeItemBackInInventory(e));
+                return;
+            }
+        } else {
+            List<Entity> entities = level.getEntitiesOfClass(Entity.class, new AABB(clickedPos)).stream()
+                .filter(e -> !(e instanceof AbstractContraptionEntity)).toList();
+            if (!entities.isEmpty()) {
+                Entity entity = entities.get(level.random.nextInt(entities.size()));
+                List<ItemStack> capturedDrops = new ArrayList<>();
+                boolean success = false;
+                AllSynchedDatas.CAPTURE_DROPS.set(entity, Optional.of(capturedDrops));
+
+                // Use on entity
+                if (mode == Mode.USE) {
+                    InteractionResult cancelResult = null;
+                    //TODO
+                    //                ActionResult cancelResult = CommonHooks.onInteractEntity(player, entity, hand);
+                    //                if (cancelResult == ActionResult.FAIL) {
+                    //                    entity.captureDrops(null);
+                    //                    return;
+                    //                }
+                    if (cancelResult == null) {
+                        if (entity.interact(serverPlayer, hand).consumesAction()) {
+                            if (entity instanceof AbstractVillager villager) {
+                                if (villager.getTradingPlayer() == serverPlayer)
+                                    villager.setTradingPlayer(null);
+                            }
+                            success = true;
+                        } else if (entity instanceof LivingEntity livingEntity && stack.interactLivingEntity(serverPlayer, livingEntity, hand)
+                            .consumesAction())
+                            success = true;
+                    }
+                    if (!success && entity instanceof Player playerEntity) {
+                        if (stack.has(DataComponents.FOOD)) {
+                            FoodProperties foodProperties = stack.get(DataComponents.FOOD);
+                            if (foodProperties != null && playerEntity.canEat(foodProperties.canAlwaysEat())) {
+                                ItemStack copy = stack.copy();
+                                serverPlayer.setItemInHand(hand, stack.finishUsingItem(level, playerEntity));
+                                player.setSpawnedItemEffects(copy);
+                                success = true;
+                            }
+                        }
+                        if (!success && stack.is(AllItemTags.DEPLOYABLE_DRINK)) {
+                            player.setSpawnedItemEffects(stack.copy());
                             serverPlayer.setItemInHand(hand, stack.finishUsingItem(level, playerEntity));
-                            player.setSpawnedItemEffects(copy);
                             success = true;
                         }
                     }
-                    if (!success && stack.is(AllItemTags.DEPLOYABLE_DRINK)) {
-                        player.setSpawnedItemEffects(stack.copy());
-                        serverPlayer.setItemInHand(hand, stack.finishUsingItem(level, playerEntity));
-                        success = true;
-                    }
                 }
-            }
 
-            // Punch entity
-            if (mode == Mode.PUNCH) {
-                serverPlayer.resetAttackStrengthTicker();
-                serverPlayer.attack(entity);
-                success = true;
-            }
+                // Punch entity
+                if (mode == Mode.PUNCH) {
+                    serverPlayer.resetAttackStrengthTicker();
+                    serverPlayer.attack(entity);
+                    success = true;
+                }
 
-            AllSynchedDatas.CAPTURE_DROPS.set(entity, Optional.empty());
-            capturedDrops.forEach(e -> serverPlayer.getInventory().placeItemBackInInventory(e));
-            if (success)
-                return;
+                AllSynchedDatas.CAPTURE_DROPS.set(entity, Optional.empty());
+                capturedDrops.forEach(e -> serverPlayer.getInventory().placeItemBackInInventory(e));
+                if (success)
+                    return;
+            }
         }
 
         // Shoot ray
+        Vec3 rayTarget = vec.add(extensionVector.scale(5 / 2f - 1 / 64f));
         ClipContext rayTraceContext = new ClipContext(
             rayOrigin,
             rayTarget,
@@ -290,6 +316,7 @@ public class DeployerHandler {
             return;
         if (stack.isEmpty())
             return;
+        Item item = stack.getItem();
         if (item instanceof CartAssemblerBlockItem && clickedState.canBeReplaced(new BlockPlaceContext(itemusecontext)))
             return;
 
@@ -320,6 +347,7 @@ public class DeployerHandler {
 
         // buckets create their own ray, We use a fake wall to contain the active area
         Level itemUseWorld = level;
+        BlockPos pos = BlockPos.containing(vec);
         if (item instanceof BucketItem || item instanceof SandPaperItem)
             itemUseWorld = new ItemUseWorld(level, face, pos);
 
@@ -330,8 +358,10 @@ public class DeployerHandler {
 
         if (onItemRightClick instanceof InteractionResult.Success success) {
             ItemStack resultStack = success.heldItemTransformedTo();
-            if (resultStack != null && resultStack != stack || resultStack.getCount() != stack.getCount() || resultStack.getUseDuration(serverPlayer) > 0 || resultStack.getDamageValue() != stack.getDamageValue()) {
-                serverPlayer.setItemInHand(hand, resultStack);
+            if (resultStack != null) {
+                if (resultStack != stack || resultStack.getCount() != stack.getCount() || resultStack.getUseDuration(serverPlayer) > 0 || resultStack.getDamageValue() != stack.getDamageValue()) {
+                    serverPlayer.setItemInHand(hand, resultStack);
+                }
             }
         }
 
