@@ -230,3 +230,4 @@ accessible class net/minecraft/client/gui/Gui$ContextualInfo
 accessible field net/minecraft/client/gui/screens/inventory/AbstractContainerScreen hoveredSlot Lnet/minecraft/world/inventory/Slot;
 extendable method net/minecraft/client/gui/screens/Screen init (II)V
 accessible class net/minecraft/client/renderer/block/ModelBlockRenderer$Cache
+accessible method net/minecraft/client/gui/screens/Screen addRenderableWidget (Lnet/minecraft/client/gui/components/events/GuiEventListener;)Lnet/minecraft/client/gui/components/events/GuiEventListener;

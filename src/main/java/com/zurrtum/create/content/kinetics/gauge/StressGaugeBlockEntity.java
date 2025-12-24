@@ -3,21 +3,21 @@ package com.zurrtum.create.content.kinetics.gauge;
 import com.zurrtum.create.AllAdvancements;
 import com.zurrtum.create.AllBlockEntityTypes;
 import com.zurrtum.create.catnip.theme.Color;
+import com.zurrtum.create.compat.computercraft.AbstractComputerBehaviour;
+import com.zurrtum.create.compat.computercraft.ComputerCraftProxy;
 import com.zurrtum.create.content.kinetics.base.IRotate.StressImpact;
 import com.zurrtum.create.foundation.advancement.CreateTrigger;
 import com.zurrtum.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
-
-import java.util.List;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.ValueInput;
 
+import java.util.List;
+
 public class StressGaugeBlockEntity extends GaugeBlockEntity {
 
-    //TODO
-    //    public AbstractComputerBehaviour computerBehaviour;
+    public AbstractComputerBehaviour computerBehaviour;
 
     public static BlockPos lastSent;
 
@@ -25,22 +25,10 @@ public class StressGaugeBlockEntity extends GaugeBlockEntity {
         super(AllBlockEntityTypes.STRESSOMETER, pos, state);
     }
 
-    //TODO
-    //    public static void registerCapabilities(RegisterCapabilitiesEvent event) {
-    //        if (Mods.COMPUTERCRAFT.isLoaded()) {
-    //            event.registerBlockEntity(
-    //                PeripheralCapability.get(),
-    //                AllBlockEntityTypes.STRESSOMETER.get(),
-    //                (be, context) -> be.computerBehaviour.getPeripheralCapability()
-    //            );
-    //        }
-    //    }
-
     @Override
     public void addBehaviours(List<BlockEntityBehaviour<?>> behaviours) {
         super.addBehaviours(behaviours);
-        //TODO
-        //        behaviours.add(computerBehaviour = ComputerCraftProxy.behaviour(this));
+        behaviours.add(computerBehaviour = ComputerCraftProxy.behaviour(this));
     }
 
     @Override

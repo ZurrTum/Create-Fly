@@ -6,20 +6,23 @@ import com.zurrtum.create.AllClientHandle;
 import com.zurrtum.create.AllSoundEvents;
 import com.zurrtum.create.catnip.animation.LerpedFloat;
 import com.zurrtum.create.catnip.animation.LerpedFloat.Chaser;
+import com.zurrtum.create.compat.computercraft.AbstractComputerBehaviour;
+import com.zurrtum.create.compat.computercraft.ComputerCraftProxy;
 import com.zurrtum.create.content.contraptions.glue.SuperGlueEntity;
 import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
 import com.zurrtum.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
-
-import java.util.List;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.ValueInput;
 
+import java.util.List;
+
 public class StickerBlockEntity extends SmartBlockEntity {
     public LerpedFloat piston;
     public boolean update;
+
+    public AbstractComputerBehaviour computerBehaviour;
 
     public StickerBlockEntity(BlockPos pos, BlockState state) {
         super(AllBlockEntityTypes.STICKER, pos, state);
@@ -29,6 +32,7 @@ public class StickerBlockEntity extends SmartBlockEntity {
 
     @Override
     public void addBehaviours(List<BlockEntityBehaviour<?>> behaviours) {
+        behaviours.add(computerBehaviour = ComputerCraftProxy.behaviour(this));
     }
 
     @Override

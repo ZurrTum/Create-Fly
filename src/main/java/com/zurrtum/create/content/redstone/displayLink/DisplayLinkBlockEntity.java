@@ -7,14 +7,13 @@ import com.zurrtum.create.api.behaviour.display.DisplayTarget;
 import com.zurrtum.create.api.contraption.transformable.TransformableBlockEntity;
 import com.zurrtum.create.api.registry.CreateRegistries;
 import com.zurrtum.create.catnip.math.VecHelper;
+import com.zurrtum.create.compat.computercraft.AbstractComputerBehaviour;
+import com.zurrtum.create.compat.computercraft.ComputerCraftProxy;
 import com.zurrtum.create.content.contraptions.StructureTransform;
 import com.zurrtum.create.content.logistics.factoryBoard.FactoryPanelPosition;
 import com.zurrtum.create.content.logistics.factoryBoard.FactoryPanelSupportBehaviour;
 import com.zurrtum.create.foundation.advancement.CreateTrigger;
 import com.zurrtum.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
-
-import java.util.List;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
@@ -24,6 +23,8 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.Vec3;
+
+import java.util.List;
 
 public class DisplayLinkBlockEntity extends LinkWithBulbBlockEntity implements TransformableBlockEntity {
 
@@ -36,8 +37,7 @@ public class DisplayLinkBlockEntity extends LinkWithBulbBlockEntity implements T
     public int targetLine;
 
     public int refreshTicks;
-    //TODO
-    //    public AbstractComputerBehaviour computerBehaviour;
+    public AbstractComputerBehaviour computerBehaviour;
     public FactoryPanelSupportBehaviour factoryPanelSupport;
 
     public DisplayLinkBlockEntity(BlockPos pos, BlockState state) {
@@ -47,21 +47,9 @@ public class DisplayLinkBlockEntity extends LinkWithBulbBlockEntity implements T
         targetLine = 0;
     }
 
-    //TODO
-    //    public static void registerCapabilities(RegisterCapabilitiesEvent event) {
-    //        if (Mods.COMPUTERCRAFT.isLoaded()) {
-    //            event.registerBlockEntity(
-    //                PeripheralCapability.get(),
-    //                AllBlockEntityTypes.DISPLAY_LINK.get(),
-    //                (be, context) -> be.computerBehaviour.getPeripheralCapability()
-    //            );
-    //        }
-    //    }
-
     @Override
     public void addBehaviours(List<BlockEntityBehaviour<?>> behaviours) {
-        //TODO
-        //        behaviours.add(computerBehaviour = ComputerCraftProxy.behaviour(this));
+        behaviours.add(computerBehaviour = ComputerCraftProxy.behaviour(this));
         behaviours.add(factoryPanelSupport = new FactoryPanelSupportBehaviour(this, () -> false, () -> false, this::updateGatheredData));
     }
 
@@ -184,13 +172,6 @@ public class DisplayLinkBlockEntity extends LinkWithBulbBlockEntity implements T
             sourceConfig = activeSource != null ? data.copy() : new CompoundTag();
         });
     }
-
-    //TODO
-    //    @Override
-    //    public void invalidate() {
-    //        super.invalidate();
-    //        computerBehaviour.removePeripheral();
-    //    }
 
     public void target(BlockPos targetPosition) {
         this.targetOffset = targetPosition.subtract(worldPosition);

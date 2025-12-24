@@ -7,6 +7,9 @@ import com.zurrtum.create.catnip.animation.LerpedFloat.Chaser;
 import com.zurrtum.create.catnip.data.Iterate;
 import com.zurrtum.create.catnip.data.WorldAttached;
 import com.zurrtum.create.catnip.math.VecHelper;
+import com.zurrtum.create.compat.computercraft.AbstractComputerBehaviour;
+import com.zurrtum.create.compat.computercraft.ComputerCraftProxy;
+import com.zurrtum.create.compat.computercraft.events.StationTrainPresenceEvent;
 import com.zurrtum.create.content.contraptions.AssemblyException;
 import com.zurrtum.create.content.contraptions.StructureTransform;
 import com.zurrtum.create.content.decoration.slidingDoor.DoorControlBehaviour;
@@ -72,8 +75,7 @@ public class StationBlockEntity extends SmartBlockEntity implements Transformabl
     public int failedCarriageIndex;
     public AssemblyException lastException;
     public DepotBehaviour depotBehaviour;
-    //TODO
-    //    public AbstractComputerBehaviour computerBehaviour;
+    public AbstractComputerBehaviour computerBehaviour;
 
     // for display
     public UUID imminentTrain;
@@ -97,18 +99,6 @@ public class StationBlockEntity extends SmartBlockEntity implements Transformabl
         flag = LerpedFloat.linear().startWithValue(0);
     }
 
-    //TODO
-    //    public static void registerCapabilities(RegisterCapabilitiesEvent event) {
-    //        //TODO
-    //        //        if (Mods.COMPUTERCRAFT.isLoaded()) {
-    //        //            event.registerBlockEntity(
-    //        //                PeripheralCapability.get(),
-    //        //                AllBlockEntityTypes.TRACK_STATION.get(),
-    //        //                (be, context) -> be.computerBehaviour.getPeripheralCapability()
-    //        //            );
-    //        //        }
-    //    }
-
     @Override
     public void addBehaviours(List<BlockEntityBehaviour<?>> behaviours) {
         behaviours.add(edgePoint = new TrackTargetingBehaviour<>(this, EdgePointType.STATION));
@@ -116,8 +106,7 @@ public class StationBlockEntity extends SmartBlockEntity implements Transformabl
         behaviours.add(depotBehaviour = new DepotBehaviour(this).onlyAccepts(stack -> stack.is(AllItems.SCHEDULE))
             .withCallback(s -> applyAutoSchedule()));
         depotBehaviour.addSubBehaviours(behaviours);
-        //TODO
-        //        behaviours.add(computerBehaviour = ComputerCraftProxy.behaviour(this));
+        behaviours.add(computerBehaviour = ComputerCraftProxy.behaviour(this));
     }
 
     @Override
@@ -246,6 +235,20 @@ public class StationBlockEntity extends SmartBlockEntity implements Transformabl
         if (trainPresent && imminentTrain.runtime.displayLinkUpdateRequested) {
             DisplayLinkBlock.notifyGatherers(level, worldPosition);
             imminentTrain.runtime.displayLinkUpdateRequested = false;
+        }
+
+        if (!level.isClientSide() && computerBehaviour.hasAttachedComputer()) {
+            if (this.imminentTrain == null && imminentTrain != null)
+                computerBehaviour.prepareComputerEvent(new StationTrainPresenceEvent(StationTrainPresenceEvent.Type.IMMINENT, imminentTrain));
+            if (newlyArrived) {
+                if (trainPresent)
+                    computerBehaviour.prepareComputerEvent(new StationTrainPresenceEvent(StationTrainPresenceEvent.Type.ARRIVAL, imminentTrain));
+                else
+                    computerBehaviour.prepareComputerEvent(new StationTrainPresenceEvent(
+                        StationTrainPresenceEvent.Type.DEPARTURE,
+                        Create.RAILWAYS.trains.get(this.imminentTrain)
+                    ));
+            }
         }
 
         if (newlyArrived)
@@ -869,13 +872,6 @@ public class StationBlockEntity extends SmartBlockEntity implements Transformabl
     public ItemStack getAutoSchedule() {
         return depotBehaviour.getHeldItemStack();
     }
-
-    //TODO
-    //    @Override
-    //    public void invalidate() {
-    //        super.invalidate();
-    //        computerBehaviour.removePeripheral();
-    //    }
 
     private void applyAutoSchedule() {
         ItemStack stack = getAutoSchedule();

@@ -1,19 +1,20 @@
 package com.zurrtum.create.content.logistics.packager.repackager;
 
 import com.zurrtum.create.AllBlockEntityTypes;
+import com.zurrtum.create.compat.computercraft.events.PackageEvent;
+import com.zurrtum.create.compat.computercraft.events.RepackageEvent;
 import com.zurrtum.create.content.logistics.BigItemStack;
 import com.zurrtum.create.content.logistics.box.PackageItem;
 import com.zurrtum.create.content.logistics.crate.BottomlessItemHandler;
 import com.zurrtum.create.content.logistics.packager.PackagerBlockEntity;
 import com.zurrtum.create.content.logistics.packager.PackagerItemHandler;
 import com.zurrtum.create.content.logistics.packager.PackagingRequest;
-
-import java.util.List;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.Container;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
+
+import java.util.List;
 
 public class RepackagerBlockEntity extends PackagerBlockEntity {
 
@@ -46,6 +47,7 @@ public class RepackagerBlockEntity extends PackagerBlockEntity {
         if (simulate)
             return true;
 
+        computerBehaviour.prepareComputerEvent(new PackageEvent(box, "package_received"));
         previouslyUnwrapped = box;
         animationInward = true;
         animationTicks = CYCLE;
@@ -110,20 +112,14 @@ public class RepackagerBlockEntity extends PackagerBlockEntity {
         if (boxesToExport.isEmpty())
             return;
 
+        if (computerBehaviour.hasAttachedComputer()) {
+            for (BigItemStack box : boxesToExport) {
+                computerBehaviour.prepareComputerEvent(new RepackageEvent(box.stack, box.count));
+            }
+        }
+
         targetInv.extract(repackageHelper.collectedPackages.get(completedOrderId));
         queuedExitingPackages.addAll(boxesToExport);
         notifyUpdate();
     }
-
-    //TODO
-    //    public static void registerCapabilities(RegisterCapabilitiesEvent event) {
-    //        if (Mods.COMPUTERCRAFT.isLoaded()) {
-    //            event.registerBlockEntity(
-    //                PeripheralCapability.get(),
-    //                AllBlockEntityTypes.REPACKAGER.get(),
-    //                (be, context) -> be.computerBehaviour.getPeripheralCapability()
-    //            );
-    //        }
-    //    }
-
 }

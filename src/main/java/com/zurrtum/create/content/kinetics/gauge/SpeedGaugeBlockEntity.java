@@ -2,20 +2,20 @@ package com.zurrtum.create.content.kinetics.gauge;
 
 import com.zurrtum.create.AllBlockEntityTypes;
 import com.zurrtum.create.catnip.theme.Color;
+import com.zurrtum.create.compat.computercraft.AbstractComputerBehaviour;
+import com.zurrtum.create.compat.computercraft.ComputerCraftProxy;
 import com.zurrtum.create.content.kinetics.base.IRotate.SpeedLevel;
 import com.zurrtum.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.infrastructure.config.AllConfigs;
-
-import java.util.List;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.block.state.BlockState;
 
+import java.util.List;
+
 public class SpeedGaugeBlockEntity extends GaugeBlockEntity {
 
-    //TODO
-    //    public AbstractComputerBehaviour computerBehaviour;
+    public AbstractComputerBehaviour computerBehaviour;
 
     public SpeedGaugeBlockEntity(BlockPos pos, BlockState state) {
         super(AllBlockEntityTypes.SPEEDOMETER, pos, state);
@@ -24,24 +24,14 @@ public class SpeedGaugeBlockEntity extends GaugeBlockEntity {
     @Override
     public void addBehaviours(List<BlockEntityBehaviour<?>> behaviours) {
         super.addBehaviours(behaviours);
-        //TODO
-        //        behaviours.add(computerBehaviour = ComputerCraftProxy.behaviour(this));
+        behaviours.add(computerBehaviour = ComputerCraftProxy.behaviour(this));
     }
-
-    //TODO
-    //    public static void registerCapabilities(RegisterCapabilitiesEvent event) {
-    //        if (Mods.COMPUTERCRAFT.isLoaded()) {
-    //            event.registerBlockEntity(
-    //                PeripheralCapability.get(),
-    //                AllBlockEntityTypes.SPEEDOMETER.get(),
-    //                (be, context) -> be.computerBehaviour.getPeripheralCapability()
-    //            );
-    //        }
-    //    }
 
     @Override
     public void onSpeedChanged(float prevSpeed) {
         super.onSpeedChanged(prevSpeed);
+        if (computerBehaviour.hasAttachedComputer())
+            computerBehaviour.prepareComputerEvent(makeComputerKineticsChangeEvent());
         float speed = Math.abs(getSpeed());
 
         dialTarget = getDialTarget(speed);
