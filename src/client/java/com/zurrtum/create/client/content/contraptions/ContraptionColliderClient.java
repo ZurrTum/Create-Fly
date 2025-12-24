@@ -9,7 +9,9 @@ import com.zurrtum.create.content.contraptions.*;
 import com.zurrtum.create.content.contraptions.AbstractContraptionEntity.ContraptionRotationState;
 import com.zurrtum.create.content.contraptions.ContraptionCollider.PlayerType;
 import com.zurrtum.create.content.trains.entity.CarriageContraptionEntity;
-import com.zurrtum.create.foundation.collision.ContinuousOBBCollider;
+import com.zurrtum.create.foundation.collision.CollisionList;
+import com.zurrtum.create.foundation.collision.CollisionList.Populate;
+import com.zurrtum.create.foundation.collision.ContinuousOBBCollider.ContinuousSeparationManifold;
 import com.zurrtum.create.foundation.collision.Matrix3d;
 import com.zurrtum.create.foundation.collision.OrientedBB;
 import com.zurrtum.create.foundation.utility.BlockHelper;
@@ -39,14 +41,16 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
-import net.minecraft.world.phys.shapes.VoxelShape;
 import org.apache.commons.lang3.mutable.MutableBoolean;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.apache.commons.lang3.mutable.MutableObject;
 import org.apache.commons.lang3.tuple.MutablePair;
 
 import java.lang.ref.WeakReference;
-import java.util.*;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.WeakHashMap;
 
 public class ContraptionColliderClient {
     private static MutablePair<WeakReference<AbstractContraptionEntity>, Double> safetyLock = new MutablePair<>();
@@ -127,20 +131,14 @@ public class ContraptionColliderClient {
             obb.setRotation(rotationMatrix);
 
             // Use simplified bbs when present
-            final Vec3 motionCopy = motion;
-            List<AABB> collidableBBs = contraption.getSimplifiedEntityColliders().orElseGet(() -> {
+            CollisionList collidableBBs = contraption.getSimplifiedEntityColliders();
 
+            if (collidableBBs == null) {
                 // Else find 'nearby' individual block shapes to collide with
-                List<AABB> bbs = new ArrayList<>();
-                List<VoxelShape> potentialHits = ContraptionCollider.getPotentiallyCollidedShapes(
-                    world,
-                    contraption,
-                    localBB.expandTowards(motionCopy)
-                );
-                potentialHits.forEach(shape -> bbs.addAll(shape.toAabbs()));
-                return bbs;
+                collidableBBs = new CollisionList();
 
-            });
+                ContraptionCollider.getPotentiallyCollidedShapes(world, contraption, localBB.expandTowards(motion), new Populate(collidableBBs));
+            }
 
             MutableObject<Vec3> collisionResponse = new MutableObject<>(Vec3.ZERO);
             MutableObject<Vec3> normal = new MutableObject<>(Vec3.ZERO);
@@ -154,19 +152,19 @@ public class ContraptionColliderClient {
             for (boolean horizontalPass : Iterate.trueAndFalse) {
                 boolean verticalPass = !horizontalPass || !doHorizontalPass;
 
-                for (AABB bb : collidableBBs) {
+                for (int bbIdx = 0; bbIdx < collidableBBs.size; ++bbIdx) {
                     Vec3 currentResponse = collisionResponse.getValue();
                     Vec3 currentCenter = obbCenter.add(currentResponse);
 
-                    if (Math.abs(currentCenter.x - bb.getCenter().x) - entityBounds.getXsize() - 1 > bb.getXsize() / 2)
+                    if (Math.abs(currentCenter.x - collidableBBs.centerX[bbIdx]) - entityBounds.getXsize() - 1 > collidableBBs.extentsX[bbIdx])
                         continue;
-                    if (Math.abs((currentCenter.y + motion.y) - bb.getCenter().y) - entityBounds.getYsize() - 1 > bb.getYsize() / 2)
+                    if (Math.abs((currentCenter.y + motion.y) - collidableBBs.centerY[bbIdx]) - entityBounds.getYsize() - 1 > collidableBBs.extentsY[bbIdx])
                         continue;
-                    if (Math.abs(currentCenter.z - bb.getCenter().z) - entityBounds.getZsize() - 1 > bb.getZsize() / 2)
+                    if (Math.abs(currentCenter.z - collidableBBs.centerZ[bbIdx]) - entityBounds.getZsize() - 1 > collidableBBs.extentsZ[bbIdx])
                         continue;
 
                     obb.setCenter(currentCenter);
-                    ContinuousOBBCollider.ContinuousSeparationManifold intersect = obb.intersect(bb, motion);
+                    ContinuousSeparationManifold intersect = obb.intersect(collidableBBs, bbIdx, motion);
 
                     if (intersect == null)
                         continue;

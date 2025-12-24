@@ -39,7 +39,9 @@ public class GlobalRailwayManager {
 
     public void playerLogin(MinecraftServer server, ServerPlayer player) {
         loadTrackData(server);
-        trackNetworks.values().forEach(g -> sync.sendFullGraphTo(g, player));
+        for (TrackGraph g : trackNetworks.values()) {
+            sync.sendFullGraphTo(g, player);
+        }
         ArrayList<SignalEdgeGroup> asList = new ArrayList<>(signalEdgeGroups.values());
         sync.sendEdgeGroups(asList.stream().map(g -> g.id).toList(), asList.stream().map(g -> g.color).toList(), player);
         for (Train train : trains.values())
@@ -59,7 +61,7 @@ public class GlobalRailwayManager {
         trains = savedData.getTrains();
         trackNetworks = savedData.getTrackNetworks();
         signalEdgeGroups = savedData.getSignalBlocks();
-        trains.values().forEach(movingTrains::add);
+        movingTrains.addAll(trains.values());
     }
 
     public void cleanUp() {
@@ -128,7 +130,9 @@ public class GlobalRailwayManager {
     public void updateSplitGraph(LevelAccessor level, TrackGraph graph) {
         Set<TrackGraph> disconnected = graph.findDisconnectedGraphs(level, null);
         MinecraftServer server = level.getServer();
-        disconnected.forEach(trackGraph -> putGraphWithDefaultGroup(server, trackGraph));
+        for (TrackGraph d : disconnected) {
+            putGraphWithDefaultGroup(server, d);
+        }
         if (!disconnected.isEmpty()) {
             sync.graphSplit(graph, disconnected);
             markTracksDirty();
@@ -159,20 +163,22 @@ public class GlobalRailwayManager {
         if (level.dimension() != Level.OVERWORLD)
             return;
 
-        signalEdgeGroups.forEach((id, group) -> {
+        for (SignalEdgeGroup group : signalEdgeGroups.values()) {
             group.trains.clear();
             group.reserved = null;
-        });
+        }
 
         MinecraftServer server = level.getServer();
-        trackNetworks.forEach((id, graph) -> {
+        for (TrackGraph graph : trackNetworks.values()) {
             graph.tickPoints(server, true);
             graph.resolveIntersectingEdgeGroups(level);
-        });
+        }
 
         tickTrains(level);
 
-        trackNetworks.forEach((id, graph) -> graph.tickPoints(server, false));
+        for (TrackGraph graph : trackNetworks.values()) {
+            graph.tickPoints(server, false);
+        }
 
         GlobalTrainDisplayData.updateTick = level.getGameTime() % 100 == 0;
         if (GlobalTrainDisplayData.updateTick)

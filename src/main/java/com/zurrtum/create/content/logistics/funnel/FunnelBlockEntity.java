@@ -24,6 +24,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.Clearable;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.ItemStack;
@@ -39,7 +40,7 @@ import org.apache.commons.lang3.mutable.MutableBoolean;
 import java.lang.ref.WeakReference;
 import java.util.List;
 
-public class FunnelBlockEntity extends SmartBlockEntity {
+public class FunnelBlockEntity extends SmartBlockEntity implements Clearable {
 
     private ServerFilteringBehaviour filtering;
     private InvManipulationBehaviour invManipulation;
@@ -124,24 +125,15 @@ public class FunnelBlockEntity extends SmartBlockEntity {
         if (facing == null)
             return;
 
-        boolean trackingEntityPresent = true;
-        AABB area = getEntityOverflowScanningArea();
-
         // Check if last item is still blocking the extractor
-        if (lastObserved == null) {
-            trackingEntityPresent = false;
-        } else {
-            Entity lastEntity = lastObserved.get();
-            if (lastEntity == null || !lastEntity.isAlive() || !lastEntity.getBoundingBox().intersects(area)) {
-                trackingEntityPresent = false;
-                lastObserved = null;
-            }
+        Entity lastEntity = lastObserved != null ? lastObserved.get() : null;
+        if (lastEntity != null && lastEntity.isAlive()) {
+            AABB area = getEntityOverflowScanningArea();
+            if (lastEntity.getBoundingBox().intersects(area))
+                return;
+            lastObserved = null;
         }
 
-        if (trackingEntityPresent)
-            return;
-
-        // Find other entities blocking the extract (only if necessary)
         int amountToExtract = getAmountToExtract();
         ExtractionCountMode mode = getModeToExtract();
         ItemStack stack = invManipulation.simulate().extract(mode, amountToExtract);
@@ -149,6 +141,9 @@ public class FunnelBlockEntity extends SmartBlockEntity {
             invVersionTracker.awaitNewVersion(invManipulation);
             return;
         }
+
+        // Only scan for blocking entities if there's something to extract
+        AABB area = getEntityOverflowScanningArea();
         for (Entity entity : level.getEntities(null, area)) {
             if (entity instanceof ItemEntity || entity instanceof PackageEntity) {
                 lastObserved = new WeakReference<>(entity);
@@ -360,6 +355,11 @@ public class FunnelBlockEntity extends SmartBlockEntity {
             AllClientHandle.INSTANCE.queueUpdate(this);
     }
 
+    @Override
+    public void clearContent() {
+        filtering.setFilter(ItemStack.EMPTY);
+    }
+
     public void onTransfer(ItemStack stack) {
         AllBlocks.SMART_OBSERVER.onFunnelTransfer(level, worldPosition, stack);
         award(AllAdvancements.FUNNEL);
@@ -368,5 +368,4 @@ public class FunnelBlockEntity extends SmartBlockEntity {
     private LerpedFloat createChasingFlap() {
         return LerpedFloat.linear().startWithValue(.25f).chase(0, .05f, Chaser.EXP);
     }
-
 }

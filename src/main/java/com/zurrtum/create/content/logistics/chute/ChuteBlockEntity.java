@@ -28,6 +28,7 @@ import net.minecraft.core.particles.ItemParticleOption;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.Mth;
+import net.minecraft.world.Clearable;
 import net.minecraft.world.Container;
 import net.minecraft.world.Containers;
 import net.minecraft.world.entity.item.ItemEntity;
@@ -49,7 +50,7 @@ import java.util.List;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
-public class ChuteBlockEntity extends SmartBlockEntity {
+public class ChuteBlockEntity extends SmartBlockEntity implements Clearable {
     public float pull;
     public float push;
 
@@ -576,6 +577,11 @@ public class ChuteBlockEntity extends SmartBlockEntity {
 
         float motion = (push + pull) * fanSpeedModifier;
         return (Mth.clamp(motion, -maxItemSpeed, maxItemSpeed) + (motion <= 0 ? -gravity : 0)) / 20f;
+    }
+
+    @Override
+    public void clearContent() {
+        item = ItemStack.EMPTY;
     }
 
     @Override

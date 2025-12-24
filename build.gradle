@@ -81,6 +81,7 @@ sourceSets {
             exclude 'com/zurrtum/create/client/mixin/RecipeViewMenuMixin.java'
             exclude 'com/zurrtum/create/client/mixin/RecipeViewScreenMixin.java'
             exclude 'com/zurrtum/create/client/mixin/ViewTypeButtonMixin.java'
+            exclude 'com/zurrtum/create/client/mixin/AbstractBlockRenderContextMixin.java'
         }
     }
 }
@@ -106,6 +107,7 @@ dependencies {
         compileOnly fabricApi.module("fabric-transfer-api-v1", project.fabric_version)
         compileOnly fabricApi.module("fabric-events-interaction-v0", project.fabric_version)
         compileOnly fabricApi.module("fabric-renderer-api-v1", project.fabric_version)
+        compileOnly fabricApi.module("fabric-renderer-indigo", project.fabric_version)
         compileOnly fabricApi.module("fabric-recipe-api-v1", project.fabric_version)
         compileOnly fabricApi.module("fabric-model-loading-api-v1", project.fabric_version)
     } else {

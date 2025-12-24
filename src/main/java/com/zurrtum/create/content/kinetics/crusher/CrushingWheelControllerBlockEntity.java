@@ -22,6 +22,7 @@ import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
+import net.minecraft.world.Clearable;
 import net.minecraft.world.Containers;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
@@ -42,7 +43,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-public class CrushingWheelControllerBlockEntity extends SmartBlockEntity {
+public class CrushingWheelControllerBlockEntity extends SmartBlockEntity implements Clearable {
 
     public Entity processingEntity;
     public UUID entityUUID;
@@ -335,6 +336,11 @@ public class CrushingWheelControllerBlockEntity extends SmartBlockEntity {
         inventory.read(view);
     }
 
+    @Override
+    public void clearContent() {
+        inventory.clearContent();
+    }
+
     public void startCrushing(Entity entity) {
         processingEntity = entity;
         entityUUID = entity.getUUID();
@@ -358,5 +364,4 @@ public class CrushingWheelControllerBlockEntity extends SmartBlockEntity {
     public boolean hasEntity() {
         return processingEntity != null;
     }
-
 }

@@ -1,11 +1,16 @@
 package com.zurrtum.create.foundation.collision;
 
+import net.minecraft.world.phys.Vec3;
+
 import static java.lang.Math.abs;
 import static java.lang.Math.signum;
 
-import net.minecraft.world.phys.Vec3;
+public class ContinuousOBBCollider {
 
-public class ContinuousOBBCollider extends OBBCollider {
+    static final Vec3 uA0 = new Vec3(1, 0, 0);
+    static final Vec3 uA1 = new Vec3(0, 1, 0);
+    static final Vec3 uA2 = new Vec3(0, 0, 1);
+    static int checkCount = 0;
 
     public static ContinuousSeparationManifold separateBBs(Vec3 cA, Vec3 cB, Vec3 eA, Vec3 eB, Matrix3d m, Vec3 motion) {
         ContinuousSeparationManifold mf = new ContinuousSeparationManifold();
@@ -146,7 +151,7 @@ public class ContinuousOBBCollider extends OBBCollider {
         return false;
     }
 
-    public static class ContinuousSeparationManifold extends SeparationManifold {
+    public static class ContinuousSeparationManifold {
 
         static final double UNDEFINED = -1;
         double latestCollisionEntryTime = UNDEFINED;
@@ -159,6 +164,13 @@ public class ContinuousOBBCollider extends OBBCollider {
 
         Vec3 normalAxis;
         double normalSeparation;
+        Vec3 axis;
+        double separation;
+
+        public ContinuousSeparationManifold() {
+            axis = Vec3.ZERO;
+            separation = Double.MAX_VALUE;
+        }
 
         public double getTimeOfImpact() {
             if (latestCollisionEntryTime == UNDEFINED)
@@ -184,7 +196,9 @@ public class ContinuousOBBCollider extends OBBCollider {
             if (isDiscreteCollision) {
                 if (stepSeparation <= obbStepHeight)
                     return createSeparationVec(stepSeparation, stepSeparationAxis);
-                return super.asSeparationVec();
+                double sep = separation;
+                Vec3 axis1 = this.axis;
+                return createSeparationVec(sep, axis1);
             }
             double t = getTimeOfImpact();
             if (t == UNDEFINED)
@@ -192,11 +206,9 @@ public class ContinuousOBBCollider extends OBBCollider {
             return Vec3.ZERO;
         }
 
-        @Override
-        public Vec3 asSeparationVec() {
-            return asSeparationVec(0);
+        protected Vec3 createSeparationVec(double sep, Vec3 axis) {
+            return axis.normalize().scale(signum(sep) * (abs(sep) + 1E-4));
         }
-
     }
 
 }

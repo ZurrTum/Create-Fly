@@ -4,15 +4,15 @@ import com.zurrtum.create.AllBlockEntityTypes;
 import com.zurrtum.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.foundation.blockEntity.behaviour.filtering.ServerFilteringBehaviour;
 import com.zurrtum.create.foundation.item.ItemHelper.ExtractionCountMode;
-
-import java.util.List;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.world.Clearable;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
 
-public class SmartChuteBlockEntity extends ChuteBlockEntity {
+import java.util.List;
+
+public class SmartChuteBlockEntity extends ChuteBlockEntity implements Clearable {
 
     ServerFilteringBehaviour filtering;
 
@@ -47,11 +47,15 @@ public class SmartChuteBlockEntity extends ChuteBlockEntity {
         super.addBehaviours(behaviours);
     }
 
+    @Override
+    public void clearContent() {
+        filtering.setFilter(ItemStack.EMPTY);
+    }
+
     private boolean isExtracting() {
         boolean up = getItemMotion() < 0;
         BlockPos chutePos = worldPosition.relative(up ? Direction.UP : Direction.DOWN);
         BlockState blockState = level.getBlockState(chutePos);
         return !AbstractChuteBlock.isChute(blockState) && !blockState.canBeReplaced();
     }
-
 }

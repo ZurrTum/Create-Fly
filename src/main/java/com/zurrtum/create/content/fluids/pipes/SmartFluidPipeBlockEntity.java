@@ -8,15 +8,15 @@ import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
 import com.zurrtum.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.foundation.blockEntity.behaviour.filtering.ServerFilteringBehaviour;
 import com.zurrtum.create.infrastructure.fluids.FluidStack;
-
-import java.util.List;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.world.Clearable;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
 
-public class SmartFluidPipeBlockEntity extends SmartBlockEntity {
+import java.util.List;
+
+public class SmartFluidPipeBlockEntity extends SmartBlockEntity implements Clearable {
 
     private ServerFilteringBehaviour filter;
 
@@ -35,13 +35,17 @@ public class SmartFluidPipeBlockEntity extends SmartBlockEntity {
         return FluidPropagator.getSharedTriggers();
     }
 
+    @Override
+    public void clearContent() {
+        filter.setFilter(ItemStack.EMPTY);
+    }
+
     private void onFilterChanged(ItemStack newFilter) {
         if (!level.isClientSide())
             FluidPropagator.propagateChangedPipe(level, worldPosition, getBlockState());
     }
 
     class SmartPipeBehaviour extends StraightPipeFluidTransportBehaviour {
-
         public SmartPipeBehaviour(SmartBlockEntity be) {
             super(be);
         }
@@ -57,6 +61,5 @@ public class SmartFluidPipeBlockEntity extends SmartBlockEntity {
         public boolean canHaveFlowToward(BlockState state, Direction direction) {
             return state.getBlock() instanceof SmartFluidPipeBlock && SmartFluidPipeBlock.getPipeAxis(state) == direction.getAxis();
         }
-
     }
 }

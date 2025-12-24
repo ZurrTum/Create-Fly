@@ -44,7 +44,11 @@ public class EdgePointStorage {
     }
 
     public void tick(MinecraftServer server, TrackGraph graph, boolean preTrains) {
-        pointsByType.values().forEach(map -> map.values().forEach(p -> p.tick(server, graph, preTrains)));
+        for (Map<UUID, TrackEdgePoint> map : pointsByType.values()) {
+            for (TrackEdgePoint point : map.values()) {
+                point.tick(server, graph, preTrains);
+            }
+        }
     }
 
     public void transferAll(TrackGraph target, EdgePointStorage other) {

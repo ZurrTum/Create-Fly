@@ -19,6 +19,7 @@ import com.zurrtum.create.infrastructure.items.ItemInventory;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.NonNullList;
+import net.minecraft.world.Clearable;
 import net.minecraft.world.Containers;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
@@ -36,7 +37,7 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
-public class DepotBehaviour extends BlockEntityBehaviour<SmartBlockEntity> {
+public class DepotBehaviour extends BlockEntityBehaviour<SmartBlockEntity> implements Clearable {
 
     public static final BehaviourType<DepotBehaviour> TYPE = new BehaviourType<>();
 
@@ -191,6 +192,13 @@ public class DepotBehaviour extends BlockEntityBehaviour<SmartBlockEntity> {
         }
 
         return false;
+    }
+
+    @Override
+    public void clearContent() {
+        processingOutputBuffer.clearContent();
+        incoming.clear();
+        heldItem = null;
     }
 
     @Override

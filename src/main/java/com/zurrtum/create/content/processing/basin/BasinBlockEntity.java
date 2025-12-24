@@ -26,13 +26,9 @@ import com.zurrtum.create.foundation.utility.BlockHelper;
 import com.zurrtum.create.infrastructure.fluids.BucketFluidInventory;
 import com.zurrtum.create.infrastructure.fluids.FluidInventory;
 import com.zurrtum.create.infrastructure.fluids.FluidStack;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.*;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.world.Clearable;
 import net.minecraft.world.Container;
 import net.minecraft.world.Containers;
 import net.minecraft.world.item.ItemStack;
@@ -41,8 +37,12 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-public class BasinBlockEntity extends SmartBlockEntity {
+import java.util.*;
+
+public class BasinBlockEntity extends SmartBlockEntity implements Clearable {
     public boolean areFluidsMoving;
     LerpedFloat ingredientRotationSpeed;
     public LerpedFloat ingredientRotation;
@@ -155,6 +155,13 @@ public class BasinBlockEntity extends SmartBlockEntity {
         visualizedOutputFluids.stream().map(IntAttached::getValue).forEach(fluids::add);
         visualizedOutputItems.clear();
         visualizedOutputFluids.clear();
+    }
+
+    @Override
+    public void clearContent() {
+        spoutputBuffer.clear();
+        itemCapability.clearContent();
+        filtering.setFilter(ItemStack.EMPTY);
     }
 
     @Override

@@ -26,6 +26,7 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
 import net.minecraft.util.ProblemReporter;
 import net.minecraft.util.StringRepresentable;
+import net.minecraft.world.Clearable;
 import net.minecraft.world.Container;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.ItemStackWithSlot;
@@ -52,7 +53,7 @@ import java.util.*;
 import static com.zurrtum.create.Create.LOGGER;
 import static com.zurrtum.create.content.kinetics.base.DirectionalKineticBlock.FACING;
 
-public class DeployerBlockEntity extends KineticBlockEntity {
+public class DeployerBlockEntity extends KineticBlockEntity implements Clearable {
     public State state;
     public Mode mode;
     public ItemStack heldItem;
@@ -466,6 +467,11 @@ public class DeployerBlockEntity extends KineticBlockEntity {
         overflowItems.forEach(itemstack -> serverPlayer.drop(itemstack, true, false));
         serverPlayer.discard();
         player = null;
+    }
+
+    @Override
+    public void clearContent() {
+        filtering.setFilter(ItemStack.EMPTY);
     }
 
     public void changeMode() {

@@ -226,12 +226,12 @@ public class SeatBlock extends Block implements ProperWaterloggedBlock {
         return passenger instanceof LivingEntity;
     }
 
-    public static void sitDown(Level world, BlockPos pos, Entity entity) {
-        if (world.isClientSide())
+    public static void sitDown(Level level, BlockPos pos, Entity entity) {
+        if (level.isClientSide())
             return;
-        SeatEntity seat = new SeatEntity(world, pos);
+        SeatEntity seat = new SeatEntity(level);
         seat.setPos(pos.getX() + .5, pos.getY(), pos.getZ() + .5);
-        world.addFreshEntity(seat);
+        level.addFreshEntity(seat);
         entity.startRiding(seat, true, true);
         if (entity instanceof TamableAnimal ta)
             ta.setInSittingPose(true);

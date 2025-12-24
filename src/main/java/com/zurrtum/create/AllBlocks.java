@@ -3170,11 +3170,13 @@ public class AllBlocks {
         "copycat_step",
         CopycatStepBlock::new,
         BlockBehaviour.Properties.ofFullCopy(Blocks.GOLD_BLOCK).forceSolidOn().noOcclusion().mapColor(MapColor.NONE).isValidSpawn(AllBlocks::never)
+            .emissiveRendering(CopycatStepBlock::hasEmissiveLighting)
     );
     public static final CopycatPanelBlock COPYCAT_PANEL = register(
         "copycat_panel",
         CopycatPanelBlock::new,
         BlockBehaviour.Properties.ofFullCopy(Blocks.GOLD_BLOCK).noOcclusion().mapColor(MapColor.NONE).isValidSpawn(AllBlocks::never)
+            .emissiveRendering(CopycatPanelBlock::hasEmissiveLighting)
     );
 
     public static final FluidBlock HONEY = register(

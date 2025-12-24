@@ -18,6 +18,7 @@ public class MixinPlugin implements IMixinConfigPlugin {
         mixins = new ArrayList<>();
         //        if (FabricLoader.getInstance().isModLoaded("sodium")) {
         //            mixins.add("FabricModelAccessMixin");
+        //            mixins.add("AbstractBlockRenderContextMixin");
         //        }
         //        if (FabricLoader.getInstance().isModLoaded("iris")) {
         //            mixins.add("IrisPipelinesMixin");
@@ -39,6 +40,8 @@ public class MixinPlugin implements IMixinConfigPlugin {
             mixins.add("FabricBlockStateModelMixin");
             mixins.add("WrapperBlockStateModelMixin");
             mixins.add("FluidVariantRenderHandlerMixin");
+            mixins.add("BlockRenderInfoMixin");
+            mixins.add("AbstractTerrainRenderContextMixin");
         } else {
             mixins.add("CreativeModeInventoryScreenMixin");
         }
