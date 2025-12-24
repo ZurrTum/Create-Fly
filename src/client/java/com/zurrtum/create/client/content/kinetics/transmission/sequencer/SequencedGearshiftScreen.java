@@ -2,9 +2,13 @@ package com.zurrtum.create.client.content.kinetics.transmission.sequencer;
 
 import com.zurrtum.create.AllItems;
 import com.zurrtum.create.client.catnip.gui.AbstractSimiScreen;
+import com.zurrtum.create.client.catnip.gui.ScreenOpener;
 import com.zurrtum.create.client.catnip.gui.element.GuiGameElement;
+import com.zurrtum.create.client.catnip.gui.element.GuiGameElement.GuiItemRenderBuilder;
 import com.zurrtum.create.client.catnip.gui.widget.ElementWidget;
 import com.zurrtum.create.client.catnip.lang.Lang;
+import com.zurrtum.create.client.compat.computercraft.ComputerScreen;
+import com.zurrtum.create.client.compat.computercraft.ComputerScreen.AdditionalRenderer;
 import com.zurrtum.create.client.foundation.gui.AllGuiTextures;
 import com.zurrtum.create.client.foundation.gui.AllIcons;
 import com.zurrtum.create.client.foundation.gui.widget.IconButton;
@@ -18,16 +22,17 @@ import com.zurrtum.create.content.kinetics.transmission.sequencer.SequencerInstr
 import com.zurrtum.create.infrastructure.packet.c2s.ConfigureSequencedGearshiftPacket;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
 
-public class SequencedGearshiftScreen extends AbstractSimiScreen {
+public class SequencedGearshiftScreen extends AbstractSimiScreen implements AdditionalRenderer {
     private final AllGuiTextures background = AllGuiTextures.SEQUENCER;
     private IconButton confirmButton;
-    private ElementWidget renderedItem;
+    private GuiItemRenderBuilder renderedItem;
     private SequencedGearshiftBlockEntity be;
 
     private Vector<Instruction> instructions;
@@ -42,10 +47,9 @@ public class SequencedGearshiftScreen extends AbstractSimiScreen {
 
     @Override
     protected void init() {
-        //TODO
-        //        if (be.computerBehaviour.hasAttachedComputer())
-        //            minecraft.setScreen(
-        //                new ComputerScreen(title, this::renderAdditional, this, be.computerBehaviour::hasAttachedComputer));
+        renderedItem = GuiGameElement.of(AllItems.SEQUENCED_GEARSHIFT.getDefaultInstance()).scale(5);
+        if (be.computerBehaviour.hasAttachedComputer())
+            ScreenOpener.open(new ComputerScreen(title, this, this, be.computerBehaviour::hasAttachedComputer));
 
         setWindowSize(background.getWidth(), background.getHeight());
         setWindowOffset(-20, 0);
@@ -64,18 +68,18 @@ public class SequencedGearshiftScreen extends AbstractSimiScreen {
         confirmButton = new IconButton(x + background.getWidth() - 33, y + background.getHeight() - 24, AllIcons.I_CONFIRM);
         confirmButton.withCallback(this::onClose);
         addRenderableWidget(confirmButton);
+        addAdditional(this, x, y, background);
+    }
 
-        renderedItem = new ElementWidget(
-            x + background.getWidth() + 6,
-            y + background.getHeight() - 56
-        ).showingElement(GuiGameElement.of(AllItems.SEQUENCED_GEARSHIFT.getDefaultInstance()).scale(5));
-        addRenderableWidget(renderedItem);
+    @Override
+    public void addAdditional(Screen screen, int x, int y, AllGuiTextures background) {
+        screen.addRenderableWidget(new ElementWidget(x + background.getWidth() + 6, y + background.getHeight() - 56).showingElement(renderedItem));
     }
 
     @Override
     public void onClose() {
         super.onClose();
-        renderedItem.getRenderElement().clear();
+        renderedItem.clear();
     }
 
     private static String translationKey(SequencerInstructions def) {
@@ -215,9 +219,8 @@ public class SequencedGearshiftScreen extends AbstractSimiScreen {
     public void tick() {
         super.tick();
 
-        //TODO
-        //        if (be.computerBehaviour.hasAttachedComputer())
-        //            minecraft.setScreen(new ComputerScreen(title, this::renderAdditional, this, be.computerBehaviour::hasAttachedComputer));
+        if (be.computerBehaviour.hasAttachedComputer())
+            minecraft.setScreen(new ComputerScreen(title, this, this, be.computerBehaviour::hasAttachedComputer));
     }
 
     private static String formatValue(SequencerInstructions def, int value) {

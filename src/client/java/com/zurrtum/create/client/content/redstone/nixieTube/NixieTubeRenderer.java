@@ -4,6 +4,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
 import com.zurrtum.create.catnip.data.Couple;
+import com.zurrtum.create.catnip.data.Iterate;
 import com.zurrtum.create.catnip.math.AngleHelper;
 import com.zurrtum.create.catnip.theme.Color;
 import com.zurrtum.create.client.AllPartialModels;
@@ -73,7 +74,7 @@ public class NixieTubeRenderer implements BlockEntityRenderer<NixieTubeBlockEnti
             state.lightCoords = level != null ? LevelRenderer.getLightCoords(level, be.getBlockPos()) : 15728880;
         }
         state.breakProgress = crumblingOverlay;
-        if (be.signalState != null) {
+        if (be.signalState != null || be.computerSignal != null) {
             updateSignalRenderState(be, state, cameraPos);
         } else {
             updateTextRenderState(textRenderer, be, state, inPonder);
@@ -162,69 +163,116 @@ public class NixieTubeRenderer implements BlockEntityRenderer<NixieTubeBlockEnti
         data.layer = RenderTypes.solidMovingBlock();
         data.panel = CachedBuffers.partial(AllPartialModels.SIGNAL_PANEL, state.blockState);
         data.offset = facing == Direction.DOWN || state.blockState.getValue(NixieTubeBlock.FACE) == DoubleAttachFace.WALL_REVERSED ? 0.25f : -0.25f;
-        SignalDrawableState left = data.left = new SignalDrawableState();
-        SignalState signalState = be.signalState;
+
         float renderTime = AnimationTickHolder.getRenderTime(be.getLevel());
-        boolean yellow = signalState.isYellowLight(renderTime);
-        float longSide = yellow ? 1 : 4;
-        float longSideGlow = yellow ? 2 : 5.125f;
-        boolean vert = facing.getAxis().isHorizontal();
         double distance = Vec3.atCenterOf(state.blockPos).subtract(cameraPos).lengthSqr();
-        left.light = state.lightCoords;
-        left.layer = CreateRenderTypes.translucent();
-        if (signalState.isRedLight(renderTime)) {
-            left.additive = true;
-            if (distance < 9216) {
-                left.cubeLayer = left.layer;
-                left.cube = CachedBuffers.partial(AllPartialModels.SIGNAL_WHITE_CUBE, state.blockState);
-                left.glow = CachedBuffers.partial(AllPartialModels.SIGNAL_RED_GLOW, state.blockState);
-                if (vert) {
-                    left.cubeX = 1;
-                    left.cubeY = longSide;
-                    left.glowX = 2;
-                    left.glowY = longSideGlow;
-                } else {
-                    left.cubeX = longSide;
-                    left.cubeY = 1;
-                    left.glowX = longSideGlow;
-                    left.glowY = 2;
+        boolean vert = facing.getAxis().isHorizontal();
+
+        if (be.signalState != null) {
+            SignalDrawableState left = data.left = new SignalDrawableState();
+            SignalState signalState = be.signalState;
+            boolean yellow = signalState.isYellowLight(renderTime);
+            float longSide = yellow ? 1 : 4;
+            float longSideGlow = yellow ? 2 : 5.125f;
+            left.light = state.lightCoords;
+            left.layer = CreateRenderTypes.translucent();
+            if (signalState.isRedLight(renderTime)) {
+                left.additive = true;
+                if (distance < 9216) {
+                    left.cubeLayer = left.layer;
+                    left.cube = CachedBuffers.partial(AllPartialModels.SIGNAL_WHITE_CUBE, state.blockState);
+                    left.glow = CachedBuffers.partial(AllPartialModels.SIGNAL_RED_GLOW, state.blockState);
+                    if (vert) {
+                        left.cubeX = 1;
+                        left.cubeY = longSide;
+                        left.glowX = 2;
+                        left.glowY = longSideGlow;
+                    } else {
+                        left.cubeX = longSide;
+                        left.cubeY = 1;
+                        left.glowX = longSideGlow;
+                        left.glowY = 2;
+                    }
                 }
+                left.layer = CreateRenderTypes.additive2();
+                left.layer2 = CreateRenderTypes.additive();
+                left.signal = CachedBuffers.partial(AllPartialModels.SIGNAL_RED, state.blockState);
+            } else {
+                left.signal = CachedBuffers.partial(AllPartialModels.NIXIE_TUBE_SINGLE, state.blockState);
             }
-            left.layer = CreateRenderTypes.additive2();
-            left.layer2 = CreateRenderTypes.additive();
-            left.signal = CachedBuffers.partial(AllPartialModels.SIGNAL_RED, state.blockState);
-        } else {
-            left.signal = CachedBuffers.partial(AllPartialModels.NIXIE_TUBE_SINGLE, state.blockState);
-        }
-        SignalDrawableState right = data.right = new SignalDrawableState();
-        right.light = state.lightCoords;
-        right.layer = CreateRenderTypes.translucent();
-        if (yellow || signalState.isGreenLight(renderTime)) {
-            right.additive = true;
-            if (distance < 9216) {
-                right.cubeLayer = right.layer;
-                right.cube = CachedBuffers.partial(AllPartialModels.SIGNAL_WHITE_CUBE, state.blockState);
-                right.glow = CachedBuffers.partial(
-                    yellow ? AllPartialModels.SIGNAL_YELLOW_GLOW : AllPartialModels.SIGNAL_WHITE_GLOW,
-                    state.blockState
-                );
-                if (vert) {
-                    right.cubeX = longSide;
-                    right.cubeY = 1;
-                    right.glowX = longSideGlow;
-                    right.glowY = 2;
-                } else {
-                    right.cubeX = 1;
-                    right.cubeY = longSide;
-                    right.glowX = 2;
-                    right.glowY = longSideGlow;
+            SignalDrawableState right = data.right = new SignalDrawableState();
+            right.light = state.lightCoords;
+            right.layer = CreateRenderTypes.translucent();
+            if (yellow || signalState.isGreenLight(renderTime)) {
+                right.additive = true;
+                if (distance < 9216) {
+                    right.cubeLayer = right.layer;
+                    right.cube = CachedBuffers.partial(AllPartialModels.SIGNAL_WHITE_CUBE, state.blockState);
+                    right.glow = CachedBuffers.partial(
+                        yellow ? AllPartialModels.SIGNAL_YELLOW_GLOW : AllPartialModels.SIGNAL_WHITE_GLOW,
+                        state.blockState
+                    );
+                    if (vert) {
+                        right.cubeX = longSide;
+                        right.cubeY = 1;
+                        right.glowX = longSideGlow;
+                        right.glowY = 2;
+                    } else {
+                        right.cubeX = 1;
+                        right.cubeY = longSide;
+                        right.glowX = 2;
+                        right.glowY = longSideGlow;
+                    }
                 }
+                right.layer = CreateRenderTypes.additive2();
+                right.layer2 = CreateRenderTypes.additive();
+                right.signal = CachedBuffers.partial(yellow ? AllPartialModels.SIGNAL_YELLOW : AllPartialModels.SIGNAL_WHITE, state.blockState);
+            } else {
+                right.signal = CachedBuffers.partial(AllPartialModels.NIXIE_TUBE_SINGLE, state.blockState);
             }
-            right.layer = CreateRenderTypes.additive2();
-            right.layer2 = CreateRenderTypes.additive();
-            right.signal = CachedBuffers.partial(yellow ? AllPartialModels.SIGNAL_YELLOW : AllPartialModels.SIGNAL_WHITE, state.blockState);
-        } else {
-            right.signal = CachedBuffers.partial(AllPartialModels.NIXIE_TUBE_SINGLE, state.blockState);
+        } else if (be.computerSignal != null) {
+            for (boolean first : Iterate.trueAndFalse) {
+                NixieTubeBlockEntity.ComputerSignal.TubeDisplay tubeDisplay = first ? be.computerSignal.first : be.computerSignal.second;
+
+                SignalDrawableState cState = new SignalDrawableState();
+                if (first)
+                    data.left = cState;
+                else
+                    data.right = cState;
+
+                cState.light = state.lightCoords;
+                cState.layer = CreateRenderTypes.translucent();
+                cState.signal = CachedBuffers.partial(AllPartialModels.NIXIE_TUBE_SINGLE, state.blockState);
+
+                if (tubeDisplay.blinkPeriod == 0 || tubeDisplay.blinkPeriod > 1 && renderTime % tubeDisplay.blinkPeriod < tubeDisplay.blinkOffTime) {
+                    continue;
+                }
+
+                cState.signalColor = new Color(tubeDisplay.r, tubeDisplay.g, tubeDisplay.b);
+
+                cState.additive = true;
+                if (distance < 9216) {
+                    cState.glowColor = new Color(
+                        Math.min(((tubeDisplay.r & 0xFF) * 6 + 256) >> 3, 255),
+                        Math.min(((tubeDisplay.g & 0xFF) * 6 + 256) >> 3, 255),
+                        Math.min(((tubeDisplay.b & 0xFF) * 6 + 256) >> 3, 255)
+                    );
+                    cState.cubeLayer = CreateRenderTypes.translucent();
+                    cState.cube = CachedBuffers.partial(AllPartialModels.SIGNAL_COMPUTER_WHITE_CUBE, state.blockState);
+                    cState.glow = CachedBuffers.partial(AllPartialModels.SIGNAL_COMPUTER_WHITE_GLOW, state.blockState);
+
+                    float width = vert ? tubeDisplay.glowHeight : tubeDisplay.glowWidth;
+                    float height = vert ? tubeDisplay.glowWidth : tubeDisplay.glowHeight;
+
+                    cState.cubeX = width;
+                    cState.cubeY = height;
+                    cState.glowX = width + 1.125f;
+                    cState.glowY = height + 1.125f;
+                }
+                cState.layer = CreateRenderTypes.additive2();
+                cState.layer2 = CreateRenderTypes.additive();
+                cState.signal = CachedBuffers.partial(AllPartialModels.SIGNAL_COMPUTER_WHITE, state.blockState);
+            }
         }
     }
 
@@ -359,6 +407,8 @@ public class NixieTubeRenderer implements BlockEntityRenderer<NixieTubeBlockEnti
         public SuperByteBuffer glow;
         public float glowX;
         public float glowY;
+        public Color signalColor;
+        public Color glowColor;
         public boolean additive;
 
         public void render(PoseStack matrices, SubmitNodeCollector queue) {
@@ -391,11 +441,21 @@ public class NixieTubeRenderer implements BlockEntityRenderer<NixieTubeBlockEnti
 
         public void renderAdditive(PoseStack.Pose matricesEntry, VertexConsumer vertexConsumer, int color) {
             if (glow != null) {
-                glow.light(LightCoordsUtil.FULL_BRIGHT).disableDiffuse().scale(glowX, glowY, 2).color(color, color, color, color)
-                    .renderInto(matricesEntry, vertexConsumer);
+                var gBuff = glow.light(LightCoordsUtil.FULL_BRIGHT).disableDiffuse().scale(glowX, glowY, 2);
+                if (glowColor != null) {
+                    gBuff.color(glowColor);
+                } else {
+                    gBuff.color(color, color, color, color);
+                }
+                gBuff.renderInto(matricesEntry, vertexConsumer);
             }
-            signal.light(LightCoordsUtil.FULL_BRIGHT).disableDiffuse().scale(1.0625f).color(color, color, color, color)
-                .renderInto(matricesEntry, vertexConsumer);
+            var sBuff = signal.light(LightCoordsUtil.FULL_BRIGHT).disableDiffuse().scale(1.0625f);
+            if (signalColor != null) {
+                sBuff.color(signalColor);
+            } else {
+                sBuff.color(color, color, color, color);
+            }
+            sBuff.renderInto(matricesEntry, vertexConsumer);
         }
 
         public void renderNormal(PoseStack.Pose matricesEntry, VertexConsumer vertexConsumer) {

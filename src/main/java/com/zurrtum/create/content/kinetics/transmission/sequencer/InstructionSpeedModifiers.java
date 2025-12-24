@@ -3,11 +3,11 @@ package com.zurrtum.create.content.kinetics.transmission.sequencer;
 import com.mojang.serialization.Codec;
 import com.zurrtum.create.catnip.codecs.stream.CatnipStreamCodecBuilders;
 import io.netty.buffer.ByteBuf;
-
-import java.util.Locale;
-
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.util.StringRepresentable;
+
+import java.util.Arrays;
+import java.util.Locale;
 
 public enum InstructionSpeedModifiers implements StringRepresentable {
     FORWARD_FAST(2),
@@ -27,5 +27,10 @@ public enum InstructionSpeedModifiers implements StringRepresentable {
     @Override
     public String getSerializedName() {
         return name().toLowerCase(Locale.ROOT);
+    }
+
+    public static InstructionSpeedModifiers getByModifier(int modifier) {
+        return Arrays.stream(InstructionSpeedModifiers.values()).filter(speedModifier -> speedModifier.value == modifier).findAny()
+            .orElse(InstructionSpeedModifiers.FORWARD);
     }
 }

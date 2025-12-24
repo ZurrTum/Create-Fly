@@ -3,18 +3,22 @@ package com.zurrtum.create.client.catnip.gui.element;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.zurrtum.create.client.catnip.gui.render.*;
 import com.zurrtum.create.client.flywheel.lib.model.baked.PartialModel;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.util.Mth;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.state.BlockState;
 import org.joml.Matrix3x2fStack;
 
 import java.util.function.BiConsumer;
 
-import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.util.Mth;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.block.state.BlockState;
-
 public class GuiGameElement {
     public static GuiItemRenderBuilder of(ItemStack stack) {
         return new GuiItemRenderBuilder(stack);
+    }
+
+    public static GuiItemRenderBuilder of(Item item) {
+        return new GuiItemRenderBuilder(item.getDefaultInstance());
     }
 
     public static GuiBlockStateRenderBuilder of(BlockState block) {

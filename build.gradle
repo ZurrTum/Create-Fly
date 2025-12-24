@@ -13,7 +13,7 @@ repositories {
         }
     }
     maven {
-        url "https://maven.squiddev.cc"
+        url "https://oss.zurrtum.com"
         content {
             includeGroup("cc.tweaked")
         }
@@ -21,6 +21,10 @@ repositories {
     maven {
         name = 'Ladysnake Mods'
         url = 'https://maven.ladysnake.org/releases'
+        content {
+            includeGroup "dev.onyxstudios.cardinal-components-api"
+            includeGroup "org.ladysnake.cardinal-components-api"
+        }
     }
     exclusiveContent {
         forRepository {

@@ -198,7 +198,7 @@ public class AllClientHandle {
         warn();
     }
 
-    public void onAttachedComputer(AttachedComputerPacket packet) {
+    public void onAttachedComputer(ClientGamePacketListener listener, AttachedComputerPacket packet) {
         warn();
     }
 

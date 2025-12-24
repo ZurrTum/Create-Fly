@@ -4,6 +4,7 @@ import com.zurrtum.create.AllBlockEntityTypes;
 import com.zurrtum.create.AllClientHandle;
 import com.zurrtum.create.Create;
 import com.zurrtum.create.api.stress.BlockStressValues;
+import com.zurrtum.create.compat.computercraft.events.KineticsChangeEvent;
 import com.zurrtum.create.content.kinetics.KineticNetwork;
 import com.zurrtum.create.content.kinetics.RotationPropagator;
 import com.zurrtum.create.content.kinetics.base.IRotate.SpeedLevel;
@@ -185,6 +186,10 @@ public class KineticBlockEntity extends SmartBlockEntity {
             onSpeedChanged(prevSpeed);
             sendData();
         }
+    }
+
+    protected KineticsChangeEvent makeComputerKineticsChangeEvent() {
+        return new KineticsChangeEvent(speed, capacity, stress, overStressed);
     }
 
     protected Block getStressConfigKey() {

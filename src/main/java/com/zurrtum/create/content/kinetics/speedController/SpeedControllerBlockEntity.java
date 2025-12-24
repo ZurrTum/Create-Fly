@@ -2,6 +2,8 @@ package com.zurrtum.create.content.kinetics.speedController;
 
 import com.zurrtum.create.AllAdvancements;
 import com.zurrtum.create.AllBlockEntityTypes;
+import com.zurrtum.create.compat.computercraft.AbstractComputerBehaviour;
+import com.zurrtum.create.compat.computercraft.ComputerCraftProxy;
 import com.zurrtum.create.content.kinetics.RotationPropagator;
 import com.zurrtum.create.content.kinetics.base.KineticBlockEntity;
 import com.zurrtum.create.content.kinetics.simpleRelays.CogWheelBlock;
@@ -11,18 +13,16 @@ import com.zurrtum.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.foundation.blockEntity.behaviour.scrollValue.ServerKineticScrollValueBehaviour;
 import com.zurrtum.create.foundation.blockEntity.behaviour.scrollValue.ServerScrollValueBehaviour;
 import com.zurrtum.create.infrastructure.config.AllConfigs;
-
-import java.util.List;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.block.state.BlockState;
+
+import java.util.List;
 
 public class SpeedControllerBlockEntity extends KineticBlockEntity {
 
     public static final int DEFAULT_SPEED = 16;
     public ServerScrollValueBehaviour targetSpeed;
-    //TODO
-    //    public AbstractComputerBehaviour computerBehaviour;
+    public AbstractComputerBehaviour computerBehaviour;
 
     public boolean hasBracket;
 
@@ -30,17 +30,6 @@ public class SpeedControllerBlockEntity extends KineticBlockEntity {
         super(AllBlockEntityTypes.ROTATION_SPEED_CONTROLLER, pos, state);
         hasBracket = false;
     }
-
-    //TODO
-    //    public static void registerCapabilities(RegisterCapabilitiesEvent event) {
-    //        if (Mods.COMPUTERCRAFT.isLoaded()) {
-    //            event.registerBlockEntity(
-    //                PeripheralCapability.get(),
-    //                AllBlockEntityTypes.ROTATION_SPEED_CONTROLLER.get(),
-    //                (be, context) -> be.computerBehaviour.getPeripheralCapability()
-    //            );
-    //        }
-    //    }
 
     @Override
     public void lazyTick() {
@@ -58,8 +47,7 @@ public class SpeedControllerBlockEntity extends KineticBlockEntity {
         targetSpeed.setValue(DEFAULT_SPEED);
         targetSpeed.withCallback(i -> this.updateTargetRotation());
         behaviours.add(targetSpeed);
-        //TODO
-        //        behaviours.add(computerBehaviour = ComputerCraftProxy.behaviour(this));
+        behaviours.add(computerBehaviour = ComputerCraftProxy.behaviour(this));
     }
 
     @Override
@@ -133,12 +121,5 @@ public class SpeedControllerBlockEntity extends KineticBlockEntity {
         BlockState stateAbove = level.getBlockState(worldPosition.above());
         return ICogWheel.isDedicatedCogWheel(stateAbove.getBlock()) && ICogWheel.isLargeCog(stateAbove) && stateAbove.getValue(CogWheelBlock.AXIS)
             .isHorizontal();
-    }
-
-    @Override
-    public void invalidate() {
-        super.invalidate();
-        //TODO
-        //        computerBehaviour.removePeripheral();
     }
 }

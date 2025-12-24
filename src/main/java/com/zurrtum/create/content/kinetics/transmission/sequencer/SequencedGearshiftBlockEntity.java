@@ -4,14 +4,11 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.zurrtum.create.AllBlockEntityTypes;
 import com.zurrtum.create.catnip.nbt.NBTHelper;
+import com.zurrtum.create.compat.computercraft.AbstractComputerBehaviour;
+import com.zurrtum.create.compat.computercraft.ComputerCraftProxy;
 import com.zurrtum.create.content.kinetics.base.KineticBlockEntity;
 import com.zurrtum.create.content.kinetics.transmission.SplitShaftBlockEntity;
 import com.zurrtum.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
-
-import java.util.List;
-import java.util.Objects;
-import java.util.Vector;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
@@ -19,6 +16,10 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
+
+import java.util.List;
+import java.util.Objects;
+import java.util.Vector;
 
 public class SequencedGearshiftBlockEntity extends SplitShaftBlockEntity {
 
@@ -29,8 +30,7 @@ public class SequencedGearshiftBlockEntity extends SplitShaftBlockEntity {
     int timer;
     boolean poweredPreviously;
 
-    //TODO
-    //    public AbstractComputerBehaviour computerBehaviour;
+    public AbstractComputerBehaviour computerBehaviour;
 
     public record SequenceContext(SequencerInstructions instruction, double relativeValue) {
         public static Codec<SequenceContext> CODEC = RecordCodecBuilder.create(instance -> instance.group(
@@ -71,22 +71,10 @@ public class SequencedGearshiftBlockEntity extends SplitShaftBlockEntity {
         poweredPreviously = false;
     }
 
-    //TODO
-    //    public static void registerCapabilities(RegisterCapabilitiesEvent event) {
-    //        if (Mods.COMPUTERCRAFT.isLoaded()) {
-    //            event.registerBlockEntity(
-    //                PeripheralCapability.get(),
-    //                AllBlockEntityTypes.SEQUENCED_GEARSHIFT.get(),
-    //                (be, context) -> be.computerBehaviour.getPeripheralCapability()
-    //            );
-    //        }
-    //    }
-
     @Override
     public void addBehaviours(List<BlockEntityBehaviour<?>> behaviours) {
         super.addBehaviours(behaviours);
-        //TODO
-        //        behaviours.add(computerBehaviour = ComputerCraftProxy.behaviour(this));
+        behaviours.add(computerBehaviour = ComputerCraftProxy.behaviour(this));
     }
 
     @Override
@@ -131,9 +119,8 @@ public class SequencedGearshiftBlockEntity extends SplitShaftBlockEntity {
     }
 
     public void onRedstoneUpdate(boolean isPowered, boolean isRunning) {
-        //TODO
-        //        if (computerBehaviour.hasAttachedComputer())
-        //            return;
+        if (computerBehaviour.hasAttachedComputer())
+            return;
         if (!poweredPreviously && isPowered)
             risingFlank();
         poweredPreviously = isPowered;
@@ -225,13 +212,6 @@ public class SequencedGearshiftBlockEntity extends SplitShaftBlockEntity {
             }, () -> instructions = Instruction.createDefault()
         );
         super.read(view, clientPacket);
-    }
-
-    @Override
-    public void invalidate() {
-        super.invalidate();
-        //TODO
-        //        computerBehaviour.removePeripheral();
     }
 
     @Override

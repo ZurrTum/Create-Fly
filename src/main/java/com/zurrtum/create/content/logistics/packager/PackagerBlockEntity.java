@@ -5,6 +5,9 @@ import com.zurrtum.create.*;
 import com.zurrtum.create.api.packager.unpacking.UnpackingHandler;
 import com.zurrtum.create.catnip.data.Iterate;
 import com.zurrtum.create.catnip.math.BlockFace;
+import com.zurrtum.create.compat.computercraft.AbstractComputerBehaviour;
+import com.zurrtum.create.compat.computercraft.ComputerCraftProxy;
+import com.zurrtum.create.compat.computercraft.events.PackageEvent;
 import com.zurrtum.create.content.contraptions.actors.psi.PortableStorageInterfaceBlockEntity;
 import com.zurrtum.create.content.logistics.BigItemStack;
 import com.zurrtum.create.content.logistics.box.PackageItem;
@@ -69,15 +72,12 @@ public class PackagerBlockEntity extends SmartBlockEntity implements Clearable {
     public int animationTicks;
     public boolean animationInward;
 
-    //TODO
-    //    public AbstractComputerBehaviour computerBehaviour;
+    public AbstractComputerBehaviour computerBehaviour;
     public Boolean hasCustomComputerAddress;
     public String customComputerAddress;
 
     private InventorySummary availableItems;
     private VersionedInventoryTrackerBehaviour invVersionTracker;
-
-    //
 
     public PackagerBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         super(type, pos, state);
@@ -98,17 +98,6 @@ public class PackagerBlockEntity extends SmartBlockEntity implements Clearable {
         this(AllBlockEntityTypes.PACKAGER, pos, state);
     }
 
-    //TODO
-    //    public static void registerCapabilities(RegisterCapabilitiesEvent event) {
-    //        if (Mods.COMPUTERCRAFT.isLoaded()) {
-    //            event.registerBlockEntity(
-    //                PeripheralCapability.get(),
-    //                AllBlockEntityTypes.PACKAGER.get(),
-    //                (be, context) -> be.computerBehaviour.getPeripheralCapability()
-    //            );
-    //        }
-    //    }
-
     @Override
     public void addBehaviours(List<BlockEntityBehaviour<?>> behaviours) {
         behaviours.add(targetInventory = new InvManipulationBehaviour(
@@ -116,8 +105,7 @@ public class PackagerBlockEntity extends SmartBlockEntity implements Clearable {
             InterfaceProvider.oppositeOfBlockFacing()
         ).withFilter(this::supportsBlockEntity));
         behaviours.add(invVersionTracker = new VersionedInventoryTrackerBehaviour(this));
-        //TODO
-        //        behaviours.add(computerBehaviour = ComputerCraftProxy.behaviour(this));
+        behaviours.add(computerBehaviour = ComputerCraftProxy.behaviour(this));
     }
 
     @Override
@@ -134,13 +122,6 @@ public class PackagerBlockEntity extends SmartBlockEntity implements Clearable {
         super.initialize();
         recheckIfLinksPresent();
     }
-
-    //TODO
-    //    @Override
-    //    public void invalidate() {
-    //        super.invalidate();
-    //        computerBehaviour.removePeripheral();
-    //    }
 
     @Override
     public void tick() {
@@ -379,6 +360,7 @@ public class PackagerBlockEntity extends SmartBlockEntity implements Clearable {
         boolean unpacked = toUse.unpack(level, target, targetState, facing, items, orderContext, simulate);
 
         if (unpacked && !simulate) {
+            computerBehaviour.prepareComputerEvent(new PackageEvent(box, "package_received"));
             previouslyUnwrapped = box;
             animationInward = true;
             animationTicks = CYCLE;
@@ -497,6 +479,7 @@ public class PackagerBlockEntity extends SmartBlockEntity implements Clearable {
         }
 
         ItemStack createdBox = extractedPackageItem.isEmpty() ? PackageItem.containing(extractedItems) : extractedPackageItem;
+        computerBehaviour.prepareComputerEvent(new PackageEvent(createdBox, "package_created"));
         PackageItem.clearAddress(createdBox);
 
         if (fixedAddress != null && !fixedAddress.isBlank())
@@ -532,12 +515,11 @@ public class PackagerBlockEntity extends SmartBlockEntity implements Clearable {
                 continue;
             signBasedAddress = address;
         }
-        //TODO
-        //        if (computerBehaviour.hasAttachedComputer() && hasCustomComputerAddress) {
-        //            signBasedAddress = customComputerAddress;
-        //        } else {
-        hasCustomComputerAddress = false;
-        //        }
+        if (computerBehaviour.hasAttachedComputer() && hasCustomComputerAddress) {
+            signBasedAddress = customComputerAddress;
+        } else {
+            hasCustomComputerAddress = false;
+        }
     }
 
     protected String getSign(Direction side) {

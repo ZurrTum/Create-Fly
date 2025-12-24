@@ -1,7 +1,11 @@
 package com.zurrtum.create.content.trains.observer;
 
 import com.zurrtum.create.AllBlockEntityTypes;
+import com.zurrtum.create.Create;
 import com.zurrtum.create.api.contraption.transformable.TransformableBlockEntity;
+import com.zurrtum.create.compat.computercraft.AbstractComputerBehaviour;
+import com.zurrtum.create.compat.computercraft.ComputerCraftProxy;
+import com.zurrtum.create.compat.computercraft.events.TrainPassEvent;
 import com.zurrtum.create.content.contraptions.StructureTransform;
 import com.zurrtum.create.content.redstone.displayLink.DisplayLinkBlock;
 import com.zurrtum.create.content.trains.graph.EdgePointType;
@@ -20,12 +24,16 @@ import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
+import java.util.UUID;
 
 public class TrackObserverBlockEntity extends SmartBlockEntity implements TransformableBlockEntity, Clearable {
 
     public TrackTargetingBehaviour<TrackObserver> edgePoint;
 
     private ServerFilteringBehaviour filtering;
+
+    public AbstractComputerBehaviour computerBehaviour;
+    public @Nullable UUID passingTrainUUID;
 
     public TrackObserverBlockEntity(BlockPos pos, BlockState state) {
         super(AllBlockEntityTypes.TRACK_OBSERVER, pos, state);
@@ -35,6 +43,7 @@ public class TrackObserverBlockEntity extends SmartBlockEntity implements Transf
     public void addBehaviours(List<BlockEntityBehaviour<?>> behaviours) {
         behaviours.add(edgePoint = new TrackTargetingBehaviour<>(this, EdgePointType.OBSERVER));
         behaviours.add(filtering = new ServerFilteringBehaviour(this).withCallback(this::onFilterChanged));
+        behaviours.add(computerBehaviour = ComputerCraftProxy.behaviour(this));
     }
 
     private void onFilterChanged(ItemStack newFilter) {
@@ -58,6 +67,16 @@ public class TrackObserverBlockEntity extends SmartBlockEntity implements Transf
             shouldBePowered = observer.isActivated();
         if (isBlockPowered() == shouldBePowered)
             return;
+
+        if (observer != null && computerBehaviour.hasAttachedComputer()) {
+            if (shouldBePowered)
+                passingTrainUUID = observer.getCurrentTrain();
+            if (passingTrainUUID != null) {
+                computerBehaviour.prepareComputerEvent(new TrainPassEvent(Create.RAILWAYS.trains.get(passingTrainUUID), shouldBePowered));
+                if (!shouldBePowered)
+                    passingTrainUUID = null;
+            }
+        }
 
         BlockState blockState = getBlockState();
         if (blockState.hasProperty(TrackObserverBlock.POWERED))

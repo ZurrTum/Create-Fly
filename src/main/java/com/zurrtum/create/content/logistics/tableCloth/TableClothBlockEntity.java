@@ -3,6 +3,8 @@ package com.zurrtum.create.content.logistics.tableCloth;
 import com.zurrtum.create.*;
 import com.zurrtum.create.api.contraption.transformable.TransformableBlockEntity;
 import com.zurrtum.create.catnip.data.IntAttached;
+import com.zurrtum.create.compat.computercraft.AbstractComputerBehaviour;
+import com.zurrtum.create.compat.computercraft.ComputerCraftProxy;
 import com.zurrtum.create.content.contraptions.StructureTransform;
 import com.zurrtum.create.content.logistics.BigItemStack;
 import com.zurrtum.create.content.logistics.packager.InventorySummary;
@@ -26,7 +28,6 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
-import net.minecraft.util.*;
 import net.minecraft.world.Containers;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -48,8 +49,7 @@ import java.util.UUID;
 
 public class TableClothBlockEntity extends SmartBlockEntity implements TransformableBlockEntity {
 
-    //TODO
-    //    public AbstractComputerBehaviour computerBehaviour;
+    public AbstractComputerBehaviour computerBehaviour;
 
     public AutoRequestData requestData;
     public List<ItemStack> manuallyAddedItems;
@@ -69,22 +69,10 @@ public class TableClothBlockEntity extends SmartBlockEntity implements Transform
         facing = Direction.SOUTH;
     }
 
-    //TODO
-    //    public static void registerCapabilities(RegisterCapabilitiesEvent event) {
-    //        if (Mods.COMPUTERCRAFT.isLoaded()) {
-    //            event.registerBlockEntity(
-    //                PeripheralCapability.get(),
-    //                AllBlockEntityTypes.TABLE_CLOTH.get(),
-    //                (be, context) -> be.computerBehaviour.getPeripheralCapability()
-    //            );
-    //        }
-    //    }
-
     @Override
     public void addBehaviours(List<BlockEntityBehaviour<?>> behaviours) {
         behaviours.add(priceTag = new ServerTableClothFilteringBehaviour(this));
-        //TODO
-        //        behaviours.add(computerBehaviour = ComputerCraftProxy.behaviour(this));
+        behaviours.add(computerBehaviour = ComputerCraftProxy.behaviour(this));
     }
 
     public List<ItemStack> getItemsForRender() {
@@ -141,7 +129,7 @@ public class TableClothBlockEntity extends SmartBlockEntity implements Transform
             player.setItemInHand(InteractionHand.MAIN_HAND, manuallyAddedItems.remove(manuallyAddedItems.size() - 1));
             level.playSound(null, worldPosition, SoundEvents.ITEM_FRAME_REMOVE_ITEM, SoundSource.BLOCKS, 0.5f, 1f);
 
-            if (manuallyAddedItems.isEmpty()/* && !computerBehaviour.hasAttachedComputer()*/) {
+            if (manuallyAddedItems.isEmpty() && !computerBehaviour.hasAttachedComputer()) {
                 level.setBlock(worldPosition, getBlockState().setValue(TableClothBlock.HAS_BE, false), Block.UPDATE_ALL);
                 if (level instanceof ServerLevel serverLevel) {
                     Packet<?> packet = new RemoveBlockEntityPacket(worldPosition);
@@ -334,13 +322,6 @@ public class TableClothBlockEntity extends SmartBlockEntity implements Transform
     public int getPaymentAmount() {
         return priceTag.getFilter().isEmpty() ? 1 : priceTag.count;
     }
-
-    //TODO
-    //    @Override
-    //    public void invalidate() {
-    //        super.invalidate();
-    //        computerBehaviour.removePeripheral();
-    //    }
 
     public void transform(BlockEntity blockEntity, StructureTransform transform) {
         facing = transform.mirrorFacing(facing);
