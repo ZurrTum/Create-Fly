@@ -78,28 +78,32 @@ public class InvManipulationBehaviour extends CapManipulationBehaviourBase<Conta
             return ItemStack.EMPTY;
 
         Predicate<ItemStack> test = getFilterTest(filter);
-        if (shouldSimulate) {
-            ItemStack extract = inventory.count(test, amount);
-            int count = extract.getCount();
-            if (mode == ExtractionCountMode.EXACTLY && count != amount) {
-                return ItemStack.EMPTY;
-            }
-            int maxCount = extract.getMaxStackSize();
-            if (count > maxCount) {
-                extract.setCount(maxCount);
-            }
+        ItemStack extract;
+        if (mode == ExtractionCountMode.UPTO) {
+            extract = inventory.count(test, amount);
+        } else {
+            extract = inventory.preciseCount(test, amount);
+        }
+        int count = extract.getCount();
+        if (count == 0) {
             return extract;
-        } else if (mode == ExtractionCountMode.UPTO) {
-            ItemStack extract = inventory.count(test, amount);
-            if (extract.isEmpty()) {
-                return extract;
-            }
-            int count = inventory.extract(extract, Math.min(extract.getCount(), extract.getMaxStackSize()));
+        }
+        int maxCount = extract.getMaxStackSize();
+        if (count > maxCount) {
+            extract.setCount(count);
+        }
+        if (shouldSimulate) {
+            return extract;
+        }
+        if (mode == ExtractionCountMode.UPTO) {
+            count = inventory.extract(extract);
             extract.setCount(count);
             return extract;
-        } else {
-            return inventory.preciseExtract(test, amount);
         }
+        if (inventory.preciseExtract(extract)) {
+            return extract;
+        }
+        return ItemStack.EMPTY;
     }
 
     public ItemStack insert(ItemStack stack) {

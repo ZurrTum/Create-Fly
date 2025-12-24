@@ -1,7 +1,16 @@
 package com.zurrtum.create.infrastructure.items;
 
 import it.unimi.dsi.fastutil.Hash;
+import it.unimi.dsi.fastutil.ints.IntArrayList;
+import it.unimi.dsi.fastutil.ints.IntList;
+import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
+import it.unimi.dsi.fastutil.ints.IntSet;
 import it.unimi.dsi.fastutil.objects.*;
+import net.minecraft.core.Direction;
+import net.minecraft.core.component.DataComponentType;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.core.component.PatchedDataComponentMap;
+import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
@@ -9,12 +18,6 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
-
-import net.minecraft.core.Direction;
-import net.minecraft.core.component.DataComponentType;
-import net.minecraft.core.component.DataComponents;
-import net.minecraft.core.component.PatchedDataComponentMap;
-import net.minecraft.world.item.ItemStack;
 
 public interface BaseInventory extends Iterable<ItemStack> {
     Hash.Strategy<ItemStack> ITEM_STACK_HASH_STRATEGY = new Hash.Strategy<>() {
@@ -95,7 +98,7 @@ public interface BaseInventory extends Iterable<ItemStack> {
                 continue;
             }
             if (predicate.test(stack)) {
-                return onExtract(stack);
+                return onExtract(directCopy(stack, stack.getCount()));
             }
         }
         return ItemStack.EMPTY;
@@ -133,6 +136,44 @@ public interface BaseInventory extends Iterable<ItemStack> {
                     }
                 }
                 return onExtract(directCopy(findStack, count));
+            }
+        }
+        return ItemStack.EMPTY;
+    }
+
+    default ItemStack preciseCount(Predicate<ItemStack> predicate, int maxAmount, Direction side) {
+        return preciseCount(predicate, maxAmount);
+    }
+
+    default ItemStack preciseCount(Predicate<ItemStack> predicate, int maxAmount) {
+        if (maxAmount == 0) {
+            return ItemStack.EMPTY;
+        }
+        IntSet blackList = new IntOpenHashSet();
+        for (int i = 0, size = create$size(); i < size; i++) {
+            ItemStack findStack = create$getStack(i);
+            if (findStack.isEmpty() || blackList.contains(i)) {
+                continue;
+            }
+            if (predicate.test(findStack)) {
+                int count = findStack.getCount();
+                if (count >= maxAmount) {
+                    return onExtract(directCopy(findStack, maxAmount));
+                }
+                for (int j = i + 1; j < size; j++) {
+                    ItemStack stack = create$getStack(j);
+                    if (stack.isEmpty()) {
+                        continue;
+                    }
+                    if (matches(stack, findStack)) {
+                        count += stack.getCount();
+                        if (count < maxAmount) {
+                            blackList.add(j);
+                            continue;
+                        }
+                        return onExtract(directCopy(findStack, maxAmount));
+                    }
+                }
             }
         }
         return ItemStack.EMPTY;
@@ -1068,7 +1109,7 @@ public interface BaseInventory extends Iterable<ItemStack> {
 
     default int insertExist(ItemStack stack, int maxAmount) {
         int remaining = maxAmount;
-        List<Integer> emptys = new ArrayList<>();
+        IntList emptys = new IntArrayList();
         for (int i = 0, size = create$size(); i < size; i++) {
             if (create$isValid(i, stack)) {
                 ItemStack target = create$getStack(i);
@@ -1089,9 +1130,9 @@ public interface BaseInventory extends Iterable<ItemStack> {
                 }
             }
         }
-        for (int i : emptys) {
+        for (int i = 0, size = emptys.size(); i < size; i++) {
             int insert = Math.min(remaining, create$getMaxCount(stack));
-            create$setStack(i, directCopy(stack, insert));
+            create$setStack(emptys.getInt(i), directCopy(stack, insert));
             if (remaining == insert) {
                 create$markDirty();
                 return maxAmount;
@@ -1162,8 +1203,9 @@ public interface BaseInventory extends Iterable<ItemStack> {
             return true;
         }
         int remaining = stack.getCount();
-        List<Runnable> changes = new ArrayList<>();
-        for (int i = 0, size = create$size(); i < size; i++) {
+        int size = create$size();
+        IntList buffer = new IntArrayList(size);
+        for (int i = 0; i < size; i++) {
             ItemStack target = create$getStack(i);
             if (target.isEmpty()) {
                 continue;
@@ -1171,19 +1213,22 @@ public interface BaseInventory extends Iterable<ItemStack> {
             if (matches(target, stack)) {
                 int count = target.getCount();
                 if (count > remaining) {
-                    changes.forEach(Runnable::run);
+                    for (int j = 0, bSize = buffer.size(); j < bSize; j++) {
+                        create$setStack(buffer.getInt(j), ItemStack.EMPTY);
+                    }
                     target.setCount(count - remaining);
                     create$markDirty();
                     return true;
                 }
                 if (count == remaining) {
-                    changes.forEach(Runnable::run);
+                    for (int j = 0, bSize = buffer.size(); j < bSize; j++) {
+                        create$setStack(buffer.getInt(j), ItemStack.EMPTY);
+                    }
                     create$setStack(i, ItemStack.EMPTY);
                     create$markDirty();
                     return true;
                 }
-                int slot = i;
-                changes.add(() -> create$setStack(slot, ItemStack.EMPTY));
+                buffer.add(i);
                 remaining -= count;
             }
         }
@@ -1199,13 +1244,15 @@ public interface BaseInventory extends Iterable<ItemStack> {
             return ItemStack.EMPTY;
         }
         int size = create$size();
-        List<Integer> buffer = new ArrayList<>(size);
+        IntList buffer = new IntArrayList(size);
+        IntSet blackList = new IntOpenHashSet();
         for (int i = 0; i < size; i++) {
             ItemStack findStack = create$getStack(i);
-            if (findStack.isEmpty()) {
+            if (findStack.isEmpty() || blackList.contains(i)) {
                 continue;
             }
             if (predicate.test(findStack)) {
+                buffer.clear();
                 int count = findStack.getCount();
                 if (count > maxAmount) {
                     findStack.setCount(count - maxAmount);
@@ -1219,21 +1266,24 @@ public interface BaseInventory extends Iterable<ItemStack> {
                 }
                 buffer.add(i);
                 int remaining = maxAmount - count;
-                for (i = i + 1; i < size; i++) {
-                    ItemStack stack = create$getStack(i);
+                for (int j = i + 1; j < size; j++) {
+                    ItemStack stack = create$getStack(j);
                     if (stack.isEmpty()) {
                         continue;
                     }
                     if (matches(stack, findStack)) {
                         count = stack.getCount();
                         if (count < remaining) {
-                            buffer.add(i);
+                            blackList.add(j);
+                            buffer.add(j);
                             remaining -= count;
                             continue;
                         }
-                        buffer.forEach(slot -> create$setStack(slot, ItemStack.EMPTY));
+                        for (int k = 0, bSize = buffer.size(); k < bSize; k++) {
+                            create$setStack(buffer.getInt(k), ItemStack.EMPTY);
+                        }
                         if (count == remaining) {
-                            create$setStack(i, ItemStack.EMPTY);
+                            create$setStack(j, ItemStack.EMPTY);
                         } else {
                             stack.setCount(count - remaining);
                         }
