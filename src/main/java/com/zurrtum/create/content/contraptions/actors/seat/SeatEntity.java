@@ -3,7 +3,6 @@ package com.zurrtum.create.content.contraptions.actors.seat;
 import com.zurrtum.create.AllEntityTypes;
 import com.zurrtum.create.api.entity.FakePlayerHandler;
 import com.zurrtum.create.content.logistics.box.PackageEntity;
-import net.minecraft.core.BlockPos;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.damagesource.DamageSource;
@@ -23,13 +22,12 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 
 public class SeatEntity extends Entity {
-
-    public SeatEntity(EntityType<? extends SeatEntity> p_i48580_1_, Level p_i48580_2_) {
-        super(p_i48580_1_, p_i48580_2_);
+    public SeatEntity(EntityType<? extends SeatEntity> entityType, Level level) {
+        super(entityType, level);
     }
 
-    public SeatEntity(Level world, BlockPos pos) {
-        this(AllEntityTypes.SEAT, world);
+    public SeatEntity(Level level) {
+        this(AllEntityTypes.SEAT, level);
         noPhysics = true;
     }
 

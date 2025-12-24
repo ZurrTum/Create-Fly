@@ -11,17 +11,12 @@ import com.zurrtum.create.foundation.blockEntity.behaviour.inventory.VersionedIn
 import com.zurrtum.create.infrastructure.config.AllConfigs;
 import com.zurrtum.create.infrastructure.items.ItemInventory;
 import com.zurrtum.create.infrastructure.items.ItemStackHandler;
-
-import java.util.BitSet;
-import java.util.List;
-import java.util.function.Predicate;
-import java.util.function.Supplier;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Direction.Axis;
 import net.minecraft.core.NonNullList;
 import net.minecraft.core.SectionPos;
+import net.minecraft.world.Clearable;
 import net.minecraft.world.Containers;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
@@ -33,7 +28,12 @@ import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 
-public class ItemVaultBlockEntity extends SmartBlockEntity implements IMultiBlockEntityContainer.Inventory {
+import java.util.BitSet;
+import java.util.List;
+import java.util.function.Predicate;
+import java.util.function.Supplier;
+
+public class ItemVaultBlockEntity extends SmartBlockEntity implements IMultiBlockEntityContainer.Inventory, Clearable {
 
     protected Supplier<ItemInventory> itemCapability = null;
     protected InventoryIdentifier invId;
@@ -301,6 +301,11 @@ public class ItemVaultBlockEntity extends SmartBlockEntity implements IMultiBloc
             view.putString("StorageType", "CombinedInv");
             inventory.write(view);
         }
+    }
+
+    @Override
+    public void clearContent() {
+        inventory.clearContent();
     }
 
     public ItemVaultHandler getInventoryOfBlock() {

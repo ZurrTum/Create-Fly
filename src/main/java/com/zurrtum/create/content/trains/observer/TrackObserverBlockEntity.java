@@ -9,19 +9,19 @@ import com.zurrtum.create.content.trains.track.TrackTargetingBehaviour;
 import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
 import com.zurrtum.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.foundation.blockEntity.behaviour.filtering.ServerFilteringBehaviour;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.List;
-
 import net.minecraft.core.BlockPos;
+import net.minecraft.world.Clearable;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
+import org.jetbrains.annotations.Nullable;
 
-public class TrackObserverBlockEntity extends SmartBlockEntity implements TransformableBlockEntity {
+import java.util.List;
+
+public class TrackObserverBlockEntity extends SmartBlockEntity implements TransformableBlockEntity, Clearable {
 
     public TrackTargetingBehaviour<TrackObserver> edgePoint;
 
@@ -86,5 +86,10 @@ public class TrackObserverBlockEntity extends SmartBlockEntity implements Transf
     @Override
     public void transform(BlockEntity be, StructureTransform transform) {
         edgePoint.transform(be, transform);
+    }
+
+    @Override
+    public void clearContent() {
+        filtering.setFilter(ItemStack.EMPTY);
     }
 }

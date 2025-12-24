@@ -14,11 +14,6 @@ import com.zurrtum.create.infrastructure.component.ClipboardEntry;
 import com.zurrtum.create.infrastructure.component.ClipboardType;
 import com.zurrtum.create.infrastructure.items.SidedItemInventory;
 import com.zurrtum.create.infrastructure.transfer.SlotRangeCache;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.ArrayList;
-import java.util.List;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.NonNullList;
@@ -26,6 +21,7 @@ import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.Mth;
+import net.minecraft.world.Clearable;
 import net.minecraft.world.Containers;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.ItemStackWithSlot;
@@ -37,8 +33,12 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
+import org.jetbrains.annotations.Nullable;
 
-public abstract class PackagePortBlockEntity extends SmartBlockEntity implements MenuProvider {
+import java.util.ArrayList;
+import java.util.List;
+
+public abstract class PackagePortBlockEntity extends SmartBlockEntity implements MenuProvider, Clearable {
 
     public boolean acceptsPackages;
     public String addressFilter;
@@ -104,6 +104,11 @@ public abstract class PackagePortBlockEntity extends SmartBlockEntity implements
     @Override
     public void invalidate() {
         super.invalidate();
+    }
+
+    @Override
+    public void clearContent() {
+        inventory.clearContent();
     }
 
     @Override

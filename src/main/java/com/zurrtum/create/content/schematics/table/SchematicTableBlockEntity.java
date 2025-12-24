@@ -6,12 +6,10 @@ import com.zurrtum.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.foundation.gui.menu.MenuProvider;
 import com.zurrtum.create.foundation.utility.IInteractionChecker;
 import com.zurrtum.create.infrastructure.items.ItemInventory;
-
-import java.util.List;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
+import net.minecraft.world.Clearable;
 import net.minecraft.world.Containers;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -20,7 +18,9 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 
-public class SchematicTableBlockEntity extends SmartBlockEntity implements MenuProvider, IInteractionChecker {
+import java.util.List;
+
+public class SchematicTableBlockEntity extends SmartBlockEntity implements MenuProvider, IInteractionChecker, Clearable {
 
     public SchematicTableInventory inventory;
     public boolean isUploading;
@@ -118,6 +118,11 @@ public class SchematicTableBlockEntity extends SmartBlockEntity implements MenuP
             view.putString("Schematic", uploadingSchematic);
             view.putFloat("Progress", uploadingProgress);
         }
+    }
+
+    @Override
+    public void clearContent() {
+        inventory.clearContent();
     }
 
     @Override

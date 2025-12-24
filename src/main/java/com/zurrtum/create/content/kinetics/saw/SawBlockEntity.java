@@ -27,6 +27,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
+import net.minecraft.world.Clearable;
 import net.minecraft.world.Containers;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.BlockItem;
@@ -46,7 +47,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-public class SawBlockEntity extends BlockBreakingKineticBlockEntity {
+public class SawBlockEntity extends BlockBreakingKineticBlockEntity implements Clearable {
     private static final Object cuttingRecipesKey = new Object();
 
     public ProcessingInventory inventory;
@@ -214,6 +215,12 @@ public class SawBlockEntity extends BlockBreakingKineticBlockEntity {
         level.updateNeighbourForOutputSignal(worldPosition, getBlockState().getBlock());
         inventory.remainingTime = -1;
         sendData();
+    }
+
+    @Override
+    public void clearContent() {
+        inventory.clearContent();
+        filtering.setFilter(ItemStack.EMPTY);
     }
 
     @Override

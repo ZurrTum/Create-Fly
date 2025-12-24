@@ -12,18 +12,13 @@ import com.zurrtum.create.content.contraptions.AbstractContraptionEntity.Contrap
 import com.zurrtum.create.content.contraptions.actors.harvester.HarvesterMovementBehaviour;
 import com.zurrtum.create.content.kinetics.base.BlockBreakingMovementBehaviour;
 import com.zurrtum.create.content.trains.entity.CarriageContraptionEntity;
+import com.zurrtum.create.foundation.collision.CollisionList;
+import com.zurrtum.create.foundation.collision.CollisionList.Populate;
 import com.zurrtum.create.foundation.collision.ContinuousOBBCollider.ContinuousSeparationManifold;
 import com.zurrtum.create.foundation.collision.Matrix3d;
 import com.zurrtum.create.foundation.collision.OrientedBB;
 import com.zurrtum.create.foundation.utility.BlockHelper;
 import com.zurrtum.create.infrastructure.config.AllConfigs;
-import org.apache.commons.lang3.mutable.MutableBoolean;
-import org.apache.commons.lang3.mutable.MutableFloat;
-import org.apache.commons.lang3.mutable.MutableObject;
-
-import java.util.ArrayList;
-import java.util.List;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Direction.Axis;
@@ -44,7 +39,13 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate.StructureBlockInfo;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
+import org.apache.commons.lang3.mutable.MutableBoolean;
+import org.apache.commons.lang3.mutable.MutableFloat;
+import org.apache.commons.lang3.mutable.MutableObject;
+
+import java.util.List;
 
 public class ContraptionCollider {
 
@@ -112,13 +113,14 @@ public class ContraptionCollider {
 
             // Use simplified bbs when present
             final Vec3 motionCopy = motion;
-            List<AABB> collidableBBs = contraption.getSimplifiedEntityColliders().orElseGet(() -> {
+            CollisionList collidableBBs = contraption.getSimplifiedEntityColliders().orElseGet(() -> {
 
                 // Else find 'nearby' individual block shapes to collide with
-                List<AABB> bbs = new ArrayList<>();
-                List<VoxelShape> potentialHits = getPotentiallyCollidedShapes(world, contraption, localBB.expandTowards(motionCopy));
-                potentialHits.forEach(shape -> bbs.addAll(shape.toAabbs()));
-                return bbs;
+                CollisionList out = new CollisionList();
+                var populate = new Populate(out);
+
+                getPotentiallyCollidedShapes(world, contraption, localBB.expandTowards(motionCopy), populate);
+                return out;
 
             });
 
@@ -134,19 +136,19 @@ public class ContraptionCollider {
             for (boolean horizontalPass : Iterate.trueAndFalse) {
                 boolean verticalPass = !horizontalPass || !doHorizontalPass;
 
-                for (AABB bb : collidableBBs) {
+                for (int bbIdx = 0; bbIdx < collidableBBs.size; ++bbIdx) {
                     Vec3 currentResponse = collisionResponse.getValue();
                     Vec3 currentCenter = obbCenter.add(currentResponse);
 
-                    if (Math.abs(currentCenter.x - bb.getCenter().x) - entityBounds.getXsize() - 1 > bb.getXsize() / 2)
+                    if (Math.abs(currentCenter.x - collidableBBs.centerX[bbIdx]) - entityBounds.getXsize() - 1 > collidableBBs.extentsX[bbIdx])
                         continue;
-                    if (Math.abs((currentCenter.y + motion.y) - bb.getCenter().y) - entityBounds.getYsize() - 1 > bb.getYsize() / 2)
+                    if (Math.abs((currentCenter.y + motion.y) - collidableBBs.centerY[bbIdx]) - entityBounds.getYsize() - 1 > collidableBBs.extentsY[bbIdx])
                         continue;
-                    if (Math.abs(currentCenter.z - bb.getCenter().z) - entityBounds.getZsize() - 1 > bb.getZsize() / 2)
+                    if (Math.abs(currentCenter.z - collidableBBs.centerZ[bbIdx]) - entityBounds.getZsize() - 1 > collidableBBs.extentsZ[bbIdx])
                         continue;
 
                     obb.setCenter(currentCenter);
-                    ContinuousSeparationManifold intersect = obb.intersect(bb, motion);
+                    ContinuousSeparationManifold intersect = obb.intersect(collidableBBs, bbIdx, motion);
 
                     if (intersect == null)
                         continue;
@@ -453,7 +455,7 @@ public class ContraptionCollider {
         return entity instanceof Player ? PlayerType.SERVER : PlayerType.NONE;
     }
 
-    public static List<VoxelShape> getPotentiallyCollidedShapes(Level world, Contraption contraption, AABB localBB) {
+    public static void getPotentiallyCollidedShapes(Level world, Contraption contraption, AABB localBB, Shapes.DoubleLineConsumer out) {
         double height = localBB.getYsize();
         double width = localBB.getXsize();
         double horizontalFactor = (height > width && width != 0) ? height / width : 1;
@@ -463,8 +465,6 @@ public class ContraptionCollider {
 
         BlockPos min = BlockPos.containing(blockScanBB.minX, blockScanBB.minY, blockScanBB.minZ);
         BlockPos max = BlockPos.containing(blockScanBB.maxX, blockScanBB.maxY, blockScanBB.maxZ);
-
-        List<VoxelShape> potentialHits = new ArrayList<>();
 
         for (BlockPos p : BlockPos.betweenClosed(min, max)) {
             if (contraption.blocks.containsKey(p) && !contraption.isHiddenInPortal(p)) {
@@ -476,12 +476,10 @@ public class ContraptionCollider {
                 VoxelShape collisionShape = blockState.getCollisionShape(world, p).move(pos.getX(), pos.getY(), pos.getZ());
 
                 if (!collisionShape.isEmpty()) {
-                    potentialHits.add(collisionShape);
+                    collisionShape.forAllBoxes(out);
                 }
             }
         }
-
-        return potentialHits;
     }
 
     public static boolean collideBlocks(AbstractContraptionEntity contraptionEntity) {

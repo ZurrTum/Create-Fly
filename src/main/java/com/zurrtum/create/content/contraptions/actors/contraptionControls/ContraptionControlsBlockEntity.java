@@ -7,19 +7,19 @@ import com.zurrtum.create.catnip.animation.LerpedFloat.Chaser;
 import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
 import com.zurrtum.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.foundation.blockEntity.behaviour.filtering.ServerFilteringBehaviour;
-
-import java.util.List;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.world.Clearable;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 
-public class ContraptionControlsBlockEntity extends SmartBlockEntity {
+import java.util.List;
+
+public class ContraptionControlsBlockEntity extends SmartBlockEntity implements Clearable {
 
     public ServerFilteringBehaviour filtering;
     public boolean disabled;
@@ -70,6 +70,11 @@ public class ContraptionControlsBlockEntity extends SmartBlockEntity {
         int value = disabled ? 4 * 45 : 0;
         indicator.setValue(value);
         indicator.updateChaseTarget(value);
+    }
+
+    @Override
+    public void clearContent() {
+        filtering.setFilter(ItemStack.EMPTY);
     }
 
     public void tickAnimations() {

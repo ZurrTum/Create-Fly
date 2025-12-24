@@ -26,11 +26,6 @@ import com.zurrtum.create.foundation.item.ItemHelper;
 import com.zurrtum.create.infrastructure.component.PackageOrderWithCrafts;
 import com.zurrtum.create.infrastructure.items.ItemStackHandler;
 import com.zurrtum.create.infrastructure.packet.s2c.WiFiEffectPacket;
-import org.apache.commons.lang3.mutable.MutableBoolean;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.*;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
@@ -38,6 +33,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
+import net.minecraft.world.Clearable;
 import net.minecraft.world.Container;
 import net.minecraft.world.Containers;
 import net.minecraft.world.item.Item;
@@ -49,8 +45,12 @@ import net.minecraft.world.level.block.entity.SignText;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
+import org.apache.commons.lang3.mutable.MutableBoolean;
+import org.jetbrains.annotations.Nullable;
 
-public class PackagerBlockEntity extends SmartBlockEntity {
+import java.util.*;
+
+public class PackagerBlockEntity extends SmartBlockEntity implements Clearable {
     private static final Codec<List<BigItemStack>> EXITING_CODEC = BigItemStack.CODEC.listOf();
 
     public boolean redstonePowered;
@@ -602,6 +602,12 @@ public class PackagerBlockEntity extends SmartBlockEntity {
         view.store("QueuedExitingPackages", EXITING_CODEC, queuedExitingPackages);
         if (availableItems != null)
             view.store("LastSummary", InventorySummary.CODEC, availableItems);
+    }
+
+    @Override
+    public void clearContent() {
+        inventory.setItem(0, ItemStack.EMPTY);
+        queuedExitingPackages.clear();
     }
 
     @Override

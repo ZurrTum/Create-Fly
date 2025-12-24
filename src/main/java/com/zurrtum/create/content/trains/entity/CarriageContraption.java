@@ -14,10 +14,7 @@ import com.zurrtum.create.content.contraptions.MountedStorageManager;
 import com.zurrtum.create.content.contraptions.actors.trainControls.ControlsBlock;
 import com.zurrtum.create.content.contraptions.minecart.TrainCargoManager;
 import com.zurrtum.create.content.trains.bogey.AbstractBogeyBlock;
-import org.apache.commons.lang3.tuple.Pair;
-
-import java.util.*;
-
+import com.zurrtum.create.foundation.collision.CollisionList;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Direction.Axis;
@@ -28,7 +25,9 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate.StructureBlockInfo;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
-import net.minecraft.world.phys.AABB;
+import org.apache.commons.lang3.tuple.Pair;
+
+import java.util.*;
 
 public class CarriageContraption extends Contraption {
 
@@ -234,7 +233,7 @@ public class CarriageContraption extends Contraption {
     }
 
     @Override
-    public Optional<List<AABB>> getSimplifiedEntityColliders() {
+    public Optional<CollisionList> getSimplifiedEntityColliders() {
         if (notInPortal())
             return super.getSimplifiedEntityColliders();
         return Optional.empty();

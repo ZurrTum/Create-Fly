@@ -20,6 +20,7 @@ import net.minecraft.core.Direction.Axis;
 import net.minecraft.core.Vec3i;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.util.StringRepresentable;
+import net.minecraft.world.Clearable;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.ItemStack;
@@ -41,7 +42,7 @@ import static com.zurrtum.create.content.kinetics.belt.BeltSlope.HORIZONTAL;
 import static net.minecraft.core.Direction.AxisDirection.NEGATIVE;
 import static net.minecraft.core.Direction.AxisDirection.POSITIVE;
 
-public class BeltBlockEntity extends KineticBlockEntity {
+public class BeltBlockEntity extends KineticBlockEntity implements Clearable {
     public Map<Entity, TransportedEntityInfo> passengers;
     @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
     public Optional<DyeColor> color;
@@ -159,6 +160,13 @@ public class BeltBlockEntity extends KineticBlockEntity {
         if (inventory == null)
             return;
         itemHandler = new ItemHandlerBeltSegment(inventory, index);
+    }
+
+    @Override
+    public void clearContent() {
+        if (inventory != null) {
+            inventory.getTransportedItems().clear();
+        }
     }
 
     @Override

@@ -4,14 +4,14 @@ import com.zurrtum.create.AllBlockEntityTypes;
 import com.zurrtum.create.content.kinetics.belt.transport.TransportedItemStack;
 import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
 import com.zurrtum.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.Clearable;
+import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-import net.minecraft.core.BlockPos;
-import net.minecraft.world.level.block.state.BlockState;
-
-public class DepotBlockEntity extends SmartBlockEntity {
+public class DepotBlockEntity extends SmartBlockEntity implements Clearable {
 
     public DepotBehaviour depotBehaviour;
 
@@ -23,6 +23,11 @@ public class DepotBlockEntity extends SmartBlockEntity {
     public void addBehaviours(List<BlockEntityBehaviour<?>> behaviours) {
         behaviours.add(depotBehaviour = new DepotBehaviour(this));
         depotBehaviour.addSubBehaviours(behaviours);
+    }
+
+    @Override
+    public void clearContent() {
+        depotBehaviour.clearContent();
     }
 
     @Nullable

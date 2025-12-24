@@ -50,6 +50,7 @@
     "LocalPlayerMixin",
     "MinecraftClientMixin",
     "ModelBakeryMixin",
+    "ModelBlockRendererMixin",
     "ModelManagerMixin",
     "ModelMixin",
     "ModelPartMixin",

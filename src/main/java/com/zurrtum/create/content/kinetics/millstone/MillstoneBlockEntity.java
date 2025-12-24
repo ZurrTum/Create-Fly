@@ -18,6 +18,7 @@ import net.minecraft.core.particles.ItemParticleOption;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.Mth;
+import net.minecraft.world.Clearable;
 import net.minecraft.world.Containers;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeHolder;
@@ -31,7 +32,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 import java.util.Optional;
 
-public class MillstoneBlockEntity extends KineticBlockEntity {
+public class MillstoneBlockEntity extends KineticBlockEntity implements Clearable {
     public MillstoneInventoryHandler capability;
     public int timer;
     private MillingRecipe lastRecipe;
@@ -99,6 +100,11 @@ public class MillstoneBlockEntity extends KineticBlockEntity {
 
         timer = lastRecipe.time();
         sendData();
+    }
+
+    @Override
+    public void clearContent() {
+        capability.clearContent();
     }
 
     @Override

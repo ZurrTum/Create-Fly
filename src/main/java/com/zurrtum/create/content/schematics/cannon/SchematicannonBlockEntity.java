@@ -31,6 +31,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.StringRepresentable;
+import net.minecraft.world.Clearable;
 import net.minecraft.world.Container;
 import net.minecraft.world.Containers;
 import net.minecraft.world.entity.Entity;
@@ -52,7 +53,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 
-public class SchematicannonBlockEntity extends SmartBlockEntity implements MenuProvider {
+public class SchematicannonBlockEntity extends SmartBlockEntity implements MenuProvider, Clearable {
 
     public static final int NEIGHBOUR_CHECKING = 100;
     public static final int MAX_ANCHOR_DISTANCE = 256;
@@ -137,6 +138,11 @@ public class SchematicannonBlockEntity extends SmartBlockEntity implements MenuP
                 }
             }
         }
+    }
+
+    @Override
+    public void clearContent() {
+        inventory.clearContent();
     }
 
     @Override

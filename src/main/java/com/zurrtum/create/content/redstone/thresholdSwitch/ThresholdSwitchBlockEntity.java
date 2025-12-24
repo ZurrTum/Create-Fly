@@ -16,11 +16,9 @@ import com.zurrtum.create.foundation.blockEntity.behaviour.inventory.VersionedIn
 import com.zurrtum.create.foundation.item.ItemHelper;
 import com.zurrtum.create.infrastructure.fluids.FluidInventory;
 import com.zurrtum.create.infrastructure.fluids.FluidStack;
-
-import java.util.List;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.util.Mth;
+import net.minecraft.world.Clearable;
 import net.minecraft.world.Container;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
@@ -30,7 +28,9 @@ import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.ticks.TickPriority;
 
-public class ThresholdSwitchBlockEntity extends SmartBlockEntity {
+import java.util.List;
+
+public class ThresholdSwitchBlockEntity extends SmartBlockEntity implements Clearable {
 
     public int onWhenAbove;
     public int offWhenBelow;
@@ -266,6 +266,11 @@ public class ThresholdSwitchBlockEntity extends SmartBlockEntity {
         if (level.isClientSide())
             return;
         updateCurrentLevel();
+    }
+
+    @Override
+    public void clearContent() {
+        filtering.setFilter(ItemStack.EMPTY);
     }
 
     @Override
