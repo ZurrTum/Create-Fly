@@ -64,13 +64,15 @@ sourceSets {
     }
     client {
         java {
-            exclude 'com/zurrtum/create/client/compat/**'
+            exclude 'com/zurrtum/create/client/compat/jei/**'
+            exclude 'com/zurrtum/create/client/compat/rei/**'
+            exclude 'com/zurrtum/create/client/compat/sodium/**'
+            exclude 'com/zurrtum/create/client/compat/trinkets/**'
+            exclude 'com/zurrtum/create/client/compat/CompatMod.java'
             exclude 'com/zurrtum/create/client/mixin/FabricModelAccessMixin.java'
             exclude 'com/zurrtum/create/client/mixin/IrisPipelinesMixin.java'
             exclude 'com/zurrtum/create/client/mixin/HoldMyItemsMixin.java'
             exclude 'com/zurrtum/create/client/mixin/AnimationResourceLoaderMixin.java'
-            exclude 'com/zurrtum/create/client/mixin/WrapperBlockStateModelMixin.java'
-            exclude 'com/zurrtum/create/client/mixin/FabricBlockStateModelMixin.java'
         }
     }
 }
@@ -95,9 +97,9 @@ dependencies {
         compileOnly fabricApi.module("fabric-rendering-fluids-v1", project.fabric_version)
         compileOnly fabricApi.module("fabric-transfer-api-v1", project.fabric_version)
         compileOnly fabricApi.module("fabric-events-interaction-v0", project.fabric_version)
-//        compileOnly fabricApi.module("fabric-renderer-api-v1", project.fabric_version)
+        compileOnly fabricApi.module("fabric-renderer-api-v1", project.fabric_version)
         compileOnly fabricApi.module("fabric-recipe-api-v1", project.fabric_version)
-//        compileOnly fabricApi.module("fabric-model-loading-api-v1", project.fabric_version)
+        compileOnly fabricApi.module("fabric-model-loading-api-v1", project.fabric_version)
     } else {
         implementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
     }
