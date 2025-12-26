@@ -76,7 +76,6 @@ public class SchematicRenderer {
             null,
             schematic,
             null,
-            null,
             transformation.toLocalSpace(camera),
             AnimationTickHolder.getPartialTicks()
         );

@@ -185,6 +185,7 @@ public class ContraptionEntityRenderer<C extends AbstractContraptionEntity, S ex
         var adjustRenderedBlockEntities = clientContraption.getAndAdjustShouldRenderBlockEntities();
         clientContraption.scratchErroredBlockEntities.clear();
         Vec3 cameraPos = camera.position();
+        Matrix4f lightTransform = worldMatrix4f.mul(state.modelEntry.pose(), new Matrix4f());
         state.blockEntity = BlockEntityRenderHelper.getBlockEntitiesRenderState(
             support,
             clientContraption.renderedBlockEntityView,
@@ -192,8 +193,7 @@ public class ContraptionEntityRenderer<C extends AbstractContraptionEntity, S ex
             clientContraption.scratchErroredBlockEntities,
             renderWorld,
             world,
-            worldMatrix4f,
-            state.modelEntry.pose(),
+            lightTransform,
             contraption.entity.toLocalVector(cameraPos, tickProgress),
             tickProgress
         );
