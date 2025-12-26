@@ -42,8 +42,7 @@ public class BlockEntityRenderHelper {
         BitSet erroredBEsOut,
         @Nullable VirtualRenderWorld renderLevel,
         Level realLevel,
-        @Nullable Matrix4f worldMatrix4f,
-        @Nullable Matrix4f modelMatrix4f,
+        @Nullable Matrix4f lightTransform,
         Vec3 camera,
         float pt
     ) {
@@ -69,7 +68,7 @@ public class BlockEntityRenderHelper {
 
             try {
                 BlockEntityRenderState renderState = renderer.createRenderState();
-                int realLevelLight = LevelRenderer.getLightCoords(realLevel, getLightPos(worldMatrix4f, modelMatrix4f, blockEntity.getBlockPos()));
+                int realLevelLight = LevelRenderer.getLightCoords(realLevel, getLightPos(lightTransform, blockEntity.getBlockPos()));
                 if (renderLevel != null) {
                     renderLevel.setExternalLight(realLevelLight);
                 }
@@ -99,13 +98,10 @@ public class BlockEntityRenderHelper {
         return new BlockEntityListRenderState(dispatcher, camera, BlockPos.containing(camera), states);
     }
 
-    private static BlockPos getLightPos(@Nullable Matrix4f worldMatrix4f, @Nullable Matrix4f modelMatrix4f, BlockPos contraptionPos) {
-        if (worldMatrix4f != null) {
+    private static BlockPos getLightPos(@Nullable Matrix4f lightTransform, BlockPos contraptionPos) {
+        if (lightTransform != null) {
             Vector4f lightVec = new Vector4f(contraptionPos.getX() + .5f, contraptionPos.getY() + .5f, contraptionPos.getZ() + .5f, 1);
-            lightVec.mul(worldMatrix4f);
-            if (modelMatrix4f != null) {
-                lightVec.mul(modelMatrix4f);
-            }
+            lightVec.mul(lightTransform);
             return BlockPos.containing(lightVec.x(), lightVec.y(), lightVec.z());
         } else {
             return contraptionPos;
