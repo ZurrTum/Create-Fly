@@ -2971,6 +2971,7 @@ public class AllBlocks {
         "copycat_step",
         CopycatStepBlock::new,
         AbstractBlock.Settings.copy(Blocks.GOLD_BLOCK).solid().nonOpaque().mapColor(MapColor.CLEAR).allowsSpawning(AllBlocks::never)
+            .emissiveLighting(CopycatStepBlock::hasEmissiveLighting)
     );
     public static final CopycatPanelBlock COPYCAT_PANEL = register(
         "copycat_panel",
