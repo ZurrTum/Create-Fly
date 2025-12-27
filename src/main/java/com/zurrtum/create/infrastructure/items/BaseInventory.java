@@ -1096,7 +1096,7 @@ public interface BaseInventory extends Iterable<ItemStack> {
     }
 
     default int insertExist(ItemStack stack, int maxAmount, Direction side) {
-        return insertExist(stack);
+        return insertExist(stack, maxAmount);
     }
 
     default int insertExist(ItemStack stack) {

@@ -255,11 +255,14 @@ public class FrogportBlockEntity extends PackagePortBlockEntity {
         boolean dirty = false;
         for (int i = 0, size = inventory.getContainerSize(); i < size; i++) {
             ItemStack stack = inventory.getItem(i);
+            if (stack.isEmpty()) {
+                continue;
+            }
             if (inventory.canTakeItemThroughFace(i, stack, null)) {
                 int insert = handler.insertExist(stack, 1);
                 if (insert == 1) {
                     int count = stack.getCount();
-                    if (count == insert) {
+                    if (count == 1) {
                         inventory.setItem(i, ItemStack.EMPTY);
                     } else {
                         stack.setCount(count - 1);
