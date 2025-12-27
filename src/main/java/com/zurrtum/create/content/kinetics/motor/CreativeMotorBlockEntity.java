@@ -2,10 +2,8 @@ package com.zurrtum.create.content.kinetics.motor;
 
 import com.zurrtum.create.AllBlockEntityTypes;
 import com.zurrtum.create.AllBlocks;
-import com.zurrtum.create.compat.computercraft.AbstractComputerBehaviour;
-import com.zurrtum.create.compat.computercraft.ComputerCraftProxy;
+import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.content.kinetics.base.GeneratingKineticBlockEntity;
-import com.zurrtum.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.foundation.blockEntity.behaviour.scrollValue.ServerKineticScrollValueBehaviour;
 import com.zurrtum.create.foundation.blockEntity.behaviour.scrollValue.ServerScrollValueBehaviour;
 import net.minecraft.core.BlockPos;
@@ -18,8 +16,7 @@ public class CreativeMotorBlockEntity extends GeneratingKineticBlockEntity {
     public static final int DEFAULT_SPEED = 16;
     public static final int MAX_SPEED = 256;
 
-    protected ServerScrollValueBehaviour generatedSpeed;
-    public AbstractComputerBehaviour computerBehaviour;
+    public ServerScrollValueBehaviour generatedSpeed;
 
     public CreativeMotorBlockEntity(BlockPos pos, BlockState state) {
         super(AllBlockEntityTypes.MOTOR, pos, state);
@@ -34,7 +31,6 @@ public class CreativeMotorBlockEntity extends GeneratingKineticBlockEntity {
         generatedSpeed.setValue(DEFAULT_SPEED);
         generatedSpeed.withCallback(i -> this.updateGeneratedRotation());
         behaviours.add(generatedSpeed);
-        behaviours.add(computerBehaviour = ComputerCraftProxy.behaviour(this));
     }
 
     @Override
@@ -49,10 +45,6 @@ public class CreativeMotorBlockEntity extends GeneratingKineticBlockEntity {
         if (!getBlockState().is(AllBlocks.CREATIVE_MOTOR))
             return 0;
         return convertToDirection(generatedSpeed.getValue(), getBlockState().getValue(CreativeMotorBlock.FACING));
-    }
-
-    public ServerScrollValueBehaviour getGeneratedSpeedBehaviour() {
-        return generatedSpeed;
     }
 
 }

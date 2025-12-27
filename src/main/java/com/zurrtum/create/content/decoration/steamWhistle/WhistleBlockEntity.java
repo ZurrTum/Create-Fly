@@ -8,7 +8,7 @@ import com.zurrtum.create.content.decoration.steamWhistle.WhistleExtenderBlock.W
 import com.zurrtum.create.content.fluids.tank.FluidTankBlockEntity;
 import com.zurrtum.create.foundation.advancement.CreateTrigger;
 import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
-import com.zurrtum.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
+import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 
 import java.lang.ref.WeakReference;
 import java.util.List;

@@ -60,7 +60,13 @@ loom {
 sourceSets {
     main {
         java {
-            exclude 'com/zurrtum/create/compat/**'
+            exclude 'com/zurrtum/create/compat/computercraft/implementation/**'
+            exclude 'com/zurrtum/create/compat/computercraft/AllComputerDisplaySource.java'
+            exclude 'com/zurrtum/create/compat/computercraft/AllComputerPeripherals.java'
+            exclude 'com/zurrtum/create/compat/CompatMod.java'
+            exclude 'com/zurrtum/create/compat/rei/**'
+            exclude 'com/zurrtum/create/compat/eiv/**'
+            exclude 'com/zurrtum/create/compat/trinkets/**'
             exclude 'com/zurrtum/create/mixin/CreateIntegrationMixin.java'
             exclude 'com/zurrtum/create/mixin/ArchitecturyMixin.java'
             exclude 'com/zurrtum/create/mixin/JustEnoughItemsMixin.java'

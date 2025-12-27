@@ -6,7 +6,7 @@ import com.zurrtum.create.content.contraptions.elevator.ElevatorColumn.ColumnCoo
 import com.zurrtum.create.content.decoration.slidingDoor.DoorControlBehaviour;
 import com.zurrtum.create.content.redstone.displayLink.DisplayLinkBlock;
 import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
-import com.zurrtum.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
+import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 
 import java.util.List;
 import java.util.Optional;

@@ -1,8 +1,7 @@
 package com.zurrtum.create.content.logistics.packager.repackager;
 
 import com.zurrtum.create.AllBlockEntityTypes;
-import com.zurrtum.create.compat.computercraft.events.PackageEvent;
-import com.zurrtum.create.compat.computercraft.events.RepackageEvent;
+import com.zurrtum.create.compat.computercraft.AbstractComputerBehaviour;
 import com.zurrtum.create.content.logistics.BigItemStack;
 import com.zurrtum.create.content.logistics.box.PackageItem;
 import com.zurrtum.create.content.logistics.crate.BottomlessItemHandler;
@@ -47,7 +46,10 @@ public class RepackagerBlockEntity extends PackagerBlockEntity {
         if (simulate)
             return true;
 
-        computerBehaviour.prepareComputerEvent(new PackageEvent(box, "package_received"));
+        AbstractComputerBehaviour computer = AbstractComputerBehaviour.get(this);
+        if (computer != null) {
+            computer.queuePackageReceived(box);
+        }
         previouslyUnwrapped = box;
         animationInward = true;
         animationTicks = CYCLE;
@@ -112,10 +114,9 @@ public class RepackagerBlockEntity extends PackagerBlockEntity {
         if (boxesToExport.isEmpty())
             return;
 
-        if (computerBehaviour.hasAttachedComputer()) {
-            for (BigItemStack box : boxesToExport) {
-                computerBehaviour.prepareComputerEvent(new RepackageEvent(box.stack, box.count));
-            }
+        AbstractComputerBehaviour computer = AbstractComputerBehaviour.get(this);
+        if (computer != null) {
+            computer.queueRepackage(boxesToExport);
         }
 
         targetInv.extract(repackageHelper.collectedPackages.get(completedOrderId));

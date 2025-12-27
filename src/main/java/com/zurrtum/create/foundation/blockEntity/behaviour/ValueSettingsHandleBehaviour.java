@@ -1,5 +1,6 @@
 package com.zurrtum.create.foundation.blockEntity.behaviour;
 
+import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.content.equipment.clipboard.ClipboardCloneable;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;

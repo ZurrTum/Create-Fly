@@ -1,8 +1,10 @@
 package com.zurrtum.create;
 
+import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.api.behaviour.display.DisplaySource;
 import com.zurrtum.create.catnip.math.AngleHelper;
 import com.zurrtum.create.catnip.nbt.NBTProcessors;
+import com.zurrtum.create.compat.computercraft.AbstractComputerBehaviour;
 import com.zurrtum.create.content.contraptions.AbstractContraptionEntity;
 import com.zurrtum.create.content.contraptions.actors.trainControls.ControlsServerHandler;
 import com.zurrtum.create.content.contraptions.elevator.ElevatorColumn;
@@ -76,7 +78,6 @@ import com.zurrtum.create.content.trains.track.TrackPropagator;
 import com.zurrtum.create.content.trains.track.TrackTargetingBlockItem;
 import com.zurrtum.create.content.trains.track.TrackTargetingBlockItem.OverlapResult;
 import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
-import com.zurrtum.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.foundation.blockEntity.behaviour.ValueSettings;
 import com.zurrtum.create.foundation.blockEntity.behaviour.ValueSettingsHandleBehaviour;
 import com.zurrtum.create.foundation.blockEntity.behaviour.filtering.ServerFilteringBehaviour;
@@ -215,8 +216,7 @@ public class AllHandle {
         PacketUtils.ensureRunningOnSameThread(packet, listener, listener.server.packetProcessor());
         onBlockEntityConfiguration(
             listener, packet.pos(), 20, blockEntity -> {
-                //TODO
-                if (blockEntity instanceof SequencedGearshiftBlockEntity be/* && !be.computerBehaviour.hasAttachedComputer()*/) {
+                if (blockEntity instanceof SequencedGearshiftBlockEntity be && !AbstractComputerBehaviour.contains(be)) {
                     be.run(-1);
                     be.instructions = packet.instructions();
                     return true;

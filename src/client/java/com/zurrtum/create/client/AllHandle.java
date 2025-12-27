@@ -105,9 +105,7 @@ import com.zurrtum.create.content.trains.track.TrackBlockEntity;
 import com.zurrtum.create.content.trains.track.TrackMaterial;
 import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
 import com.zurrtum.create.foundation.blockEntity.SyncedBlockEntity;
-import com.zurrtum.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.foundation.blockEntity.behaviour.fluid.SmartFluidTankBehaviour;
-import com.zurrtum.create.foundation.entity.behaviour.EntityBehaviour;
 import com.zurrtum.create.infrastructure.component.ClipboardContent;
 import com.zurrtum.create.infrastructure.debugInfo.DebugInformation;
 import com.zurrtum.create.infrastructure.debugInfo.element.DebugInfoSection;
@@ -596,7 +594,10 @@ public class AllHandle extends AllClientHandle {
         Minecraft mc = Minecraft.getInstance();
         forceMainThread(listener, mc, packet);
         if (mc.level.getBlockEntity(packet.pos()) instanceof SmartBlockEntity be) {
-            be.getBehaviour(AbstractComputerBehaviour.TYPE).setHasAttachedComputer(packet.hasAttachedComputer());
+            AbstractComputerBehaviour computer = be.getBehaviour(AbstractComputerBehaviour.TYPE);
+            if (computer != null) {
+                computer.setHasAttachedComputer(packet.hasAttachedComputer());
+            }
         }
     }
 
@@ -807,16 +808,6 @@ public class AllHandle extends AllClientHandle {
     @Override
     public void enableClientPlayerSound(Entity entity, float clamp) {
         AirCurrentClient.enableClientPlayerSound(entity, clamp);
-    }
-
-    @Override
-    public void addBehaviours(SmartBlockEntity blockEntity, ArrayList<BlockEntityBehaviour<?>> behaviours) {
-        AllBlockEntityBehaviours.addBehaviours(blockEntity, behaviours);
-    }
-
-    @Override
-    public void addBehaviours(Entity entity, ArrayList<EntityBehaviour<?>> behaviours) {
-        AllEntityBehaviours.addBehaviours(entity, behaviours);
     }
 
     @Override

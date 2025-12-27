@@ -8,7 +8,7 @@ import com.zurrtum.create.client.catnip.outliner.Outliner;
 import com.zurrtum.create.client.foundation.utility.CreateLang;
 import com.zurrtum.create.content.logistics.factoryBoard.*;
 import com.zurrtum.create.foundation.block.WrenchableDirectionalBlock;
-import com.zurrtum.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
+import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.infrastructure.packet.c2s.FactoryPanelConnectionPacket;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;

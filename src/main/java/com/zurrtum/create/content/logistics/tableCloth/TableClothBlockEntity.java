@@ -1,16 +1,15 @@
 package com.zurrtum.create.content.logistics.tableCloth;
 
 import com.zurrtum.create.*;
+import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.api.contraption.transformable.TransformableBlockEntity;
 import com.zurrtum.create.catnip.data.IntAttached;
 import com.zurrtum.create.compat.computercraft.AbstractComputerBehaviour;
-import com.zurrtum.create.compat.computercraft.ComputerCraftProxy;
 import com.zurrtum.create.content.contraptions.StructureTransform;
 import com.zurrtum.create.content.logistics.BigItemStack;
 import com.zurrtum.create.content.logistics.packager.InventorySummary;
 import com.zurrtum.create.content.logistics.stockTicker.StockTickerBlockEntity;
 import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
-import com.zurrtum.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.foundation.blockEntity.behaviour.filtering.ServerFilteringBehaviour;
 import com.zurrtum.create.foundation.codec.CreateCodecs;
 import com.zurrtum.create.infrastructure.component.AutoRequestData;
@@ -49,8 +48,6 @@ import java.util.UUID;
 
 public class TableClothBlockEntity extends SmartBlockEntity implements TransformableBlockEntity {
 
-    public AbstractComputerBehaviour computerBehaviour;
-
     public AutoRequestData requestData;
     public List<ItemStack> manuallyAddedItems;
     public UUID owner;
@@ -72,7 +69,6 @@ public class TableClothBlockEntity extends SmartBlockEntity implements Transform
     @Override
     public void addBehaviours(List<BlockEntityBehaviour<?>> behaviours) {
         behaviours.add(priceTag = new ServerTableClothFilteringBehaviour(this));
-        behaviours.add(computerBehaviour = ComputerCraftProxy.behaviour(this));
     }
 
     public List<ItemStack> getItemsForRender() {
@@ -129,7 +125,7 @@ public class TableClothBlockEntity extends SmartBlockEntity implements Transform
             player.setItemInHand(InteractionHand.MAIN_HAND, manuallyAddedItems.remove(manuallyAddedItems.size() - 1));
             level.playSound(null, worldPosition, SoundEvents.ITEM_FRAME_REMOVE_ITEM, SoundSource.BLOCKS, 0.5f, 1f);
 
-            if (manuallyAddedItems.isEmpty() && !computerBehaviour.hasAttachedComputer()) {
+            if (manuallyAddedItems.isEmpty() && !AbstractComputerBehaviour.contains(this)) {
                 level.setBlock(worldPosition, getBlockState().setValue(TableClothBlock.HAS_BE, false), Block.UPDATE_ALL);
                 if (level instanceof ServerLevel serverLevel) {
                     Packet<?> packet = new RemoveBlockEntityPacket(worldPosition);

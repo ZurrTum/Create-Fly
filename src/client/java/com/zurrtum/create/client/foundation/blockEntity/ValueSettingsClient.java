@@ -6,7 +6,7 @@ import com.zurrtum.create.client.catnip.gui.ScreenOpener;
 import com.zurrtum.create.client.foundation.blockEntity.behaviour.ValueSettingsBehaviour;
 import com.zurrtum.create.client.foundation.blockEntity.behaviour.ValueSettingsInputHandler;
 import com.zurrtum.create.foundation.blockEntity.behaviour.BehaviourType;
-import com.zurrtum.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
+import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.infrastructure.packet.c2s.ValueSettingsPacket;
 
 import java.util.List;
