@@ -1,6 +1,6 @@
 package com.zurrtum.create.content.decoration.bracket;
 
-import com.zurrtum.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
+import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 
 import java.util.Optional;
 

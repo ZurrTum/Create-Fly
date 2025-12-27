@@ -3,7 +3,7 @@ package com.zurrtum.create.foundation.blockEntity.behaviour.scrollValue;
 import com.zurrtum.create.api.entity.FakePlayerHandler;
 import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
 import com.zurrtum.create.foundation.blockEntity.behaviour.BehaviourType;
-import com.zurrtum.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
+import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.foundation.blockEntity.behaviour.ValueSettings;
 import com.zurrtum.create.foundation.blockEntity.behaviour.ValueSettingsHandleBehaviour;
 import net.minecraft.core.Direction;

@@ -3,7 +3,7 @@ package com.zurrtum.create.content.contraptions.actors.roller;
 import com.zurrtum.create.AllBlockEntityTypes;
 import com.zurrtum.create.catnip.data.Iterate;
 import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
-import com.zurrtum.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
+import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.foundation.blockEntity.behaviour.filtering.ServerFilteringBehaviour;
 import com.zurrtum.create.foundation.blockEntity.behaviour.scrollValue.ServerScrollOptionBehaviour;
 

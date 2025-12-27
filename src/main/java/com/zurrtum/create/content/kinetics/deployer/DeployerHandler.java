@@ -12,7 +12,7 @@ import com.zurrtum.create.content.equipment.sandPaper.SandPaperItem;
 import com.zurrtum.create.content.kinetics.belt.behaviour.TransportedItemStackHandlerBehaviour;
 import com.zurrtum.create.content.kinetics.deployer.DeployerBlockEntity.Mode;
 import com.zurrtum.create.content.trains.track.ITrackBlock;
-import com.zurrtum.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
+import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.foundation.utility.BlockHelper;
 import com.zurrtum.create.infrastructure.component.SandPaperItemComponent;
 import net.minecraft.core.BlockPos;

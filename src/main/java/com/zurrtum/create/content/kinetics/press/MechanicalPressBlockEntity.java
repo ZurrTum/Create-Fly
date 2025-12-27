@@ -13,7 +13,7 @@ import com.zurrtum.create.content.processing.basin.BasinInventory;
 import com.zurrtum.create.content.processing.basin.BasinOperatingBlockEntity;
 import com.zurrtum.create.foundation.advancement.AdvancementBehaviour;
 import com.zurrtum.create.foundation.advancement.CreateTrigger;
-import com.zurrtum.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
+import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.foundation.item.ItemHelper;
 import com.zurrtum.create.foundation.recipe.RecipeApplier;
 import com.zurrtum.create.infrastructure.config.AllConfigs;

@@ -11,7 +11,7 @@ import com.zurrtum.create.client.foundation.utility.ControlsUtil;
 import com.zurrtum.create.client.foundation.utility.CreateLang;
 import com.zurrtum.create.client.infrastructure.model.LinkedControllerModel;
 import com.zurrtum.create.content.redstone.link.ServerLinkBehaviour;
-import com.zurrtum.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
+import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.infrastructure.packet.c2s.LinkedControllerBindPacket;
 import com.zurrtum.create.infrastructure.packet.c2s.LinkedControllerInputPacket;
 import com.zurrtum.create.infrastructure.packet.c2s.LinkedControllerStopLecternPacket;

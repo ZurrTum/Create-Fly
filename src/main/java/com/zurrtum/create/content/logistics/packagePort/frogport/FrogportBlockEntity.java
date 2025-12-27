@@ -7,14 +7,11 @@ import com.zurrtum.create.AllItems;
 import com.zurrtum.create.catnip.animation.LerpedFloat;
 import com.zurrtum.create.catnip.animation.LerpedFloat.Chaser;
 import com.zurrtum.create.catnip.data.Iterate;
-import com.zurrtum.create.compat.computercraft.AbstractComputerBehaviour;
-import com.zurrtum.create.compat.computercraft.ComputerCraftProxy;
 import com.zurrtum.create.content.logistics.box.PackageItem;
 import com.zurrtum.create.content.logistics.box.PackageStyles;
 import com.zurrtum.create.content.logistics.packagePort.PackagePortBlockEntity;
 import com.zurrtum.create.content.logistics.packager.PackagerItemHandler;
 import com.zurrtum.create.foundation.advancement.CreateTrigger;
-import com.zurrtum.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.foundation.blockEntity.behaviour.audio.FrogportAudioBehaviour;
 import com.zurrtum.create.foundation.item.ItemHelper;
 import net.minecraft.core.BlockPos;
@@ -55,20 +52,12 @@ public class FrogportBlockEntity extends PackagePortBlockEntity {
     private ItemStack deferAnimationStart;
     private boolean deferAnimationInward;
 
-    public AbstractComputerBehaviour computerBehaviour;
-
     public FrogportBlockEntity(BlockPos pos, BlockState state) {
         super(AllBlockEntityTypes.PACKAGE_FROGPORT, pos, state);
         animationProgress = LerpedFloat.linear();
         anticipationProgress = LerpedFloat.linear();
         manualOpenAnimationProgress = LerpedFloat.linear().startWithValue(0).chase(0, 0.35, Chaser.LINEAR);
         goggles = false;
-    }
-
-    @Override
-    public void addBehaviours(List<BlockEntityBehaviour<?>> behaviours) {
-        behaviours.add(computerBehaviour = ComputerCraftProxy.behaviour(this));
-        super.addBehaviours(behaviours);
     }
 
     @Override

@@ -1,5 +1,6 @@
 package com.zurrtum.create.client.foundation.entity.behaviour;
 
+import com.zurrtum.create.api.behaviour.EntityBehaviour;
 import com.zurrtum.create.catnip.animation.LerpedFloat;
 import com.zurrtum.create.catnip.animation.LerpedFloat.Chaser;
 import com.zurrtum.create.catnip.data.Iterate;
@@ -10,7 +11,6 @@ import com.zurrtum.create.content.trains.entity.CarriageBogey;
 import com.zurrtum.create.content.trains.entity.CarriageContraption;
 import com.zurrtum.create.content.trains.entity.CarriageContraptionEntity;
 import com.zurrtum.create.foundation.blockEntity.behaviour.BehaviourType;
-import com.zurrtum.create.foundation.entity.behaviour.EntityBehaviour;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.Direction.Axis;
 import net.minecraft.util.RandomSource;

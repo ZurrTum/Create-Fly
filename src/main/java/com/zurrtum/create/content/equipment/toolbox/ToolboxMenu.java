@@ -1,7 +1,7 @@
 package com.zurrtum.create.content.equipment.toolbox;
 
 import com.zurrtum.create.AllMenuTypes;
-import com.zurrtum.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
+import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.foundation.blockEntity.behaviour.animatedContainer.AnimatedContainerBehaviour;
 import com.zurrtum.create.foundation.gui.menu.MenuBase;
 import net.minecraft.world.entity.player.Inventory;

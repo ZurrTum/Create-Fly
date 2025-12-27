@@ -4,7 +4,7 @@ import com.zurrtum.create.api.entity.FakePlayerHandler;
 import com.zurrtum.create.foundation.advancement.CreateTrigger.Conditions;
 import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
 import com.zurrtum.create.foundation.blockEntity.behaviour.BehaviourType;
-import com.zurrtum.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
+import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import net.minecraft.advancements.AdvancementHolder;
 import net.minecraft.advancements.CriterionTrigger.Listener;
 import net.minecraft.core.BlockPos;

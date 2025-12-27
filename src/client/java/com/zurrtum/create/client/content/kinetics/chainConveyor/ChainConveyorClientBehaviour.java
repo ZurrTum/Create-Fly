@@ -92,6 +92,11 @@ public class ChainConveyorClientBehaviour extends ChainConveyorBehaviour {
     }
 
     @Override
+    public void initialize() {
+        updateChainShapes();
+    }
+
+    @Override
     public void updateChainShapes() {
         List<ChainConveyorShape> shapes = new ArrayList<>();
         shapes.add(new ChainConveyorShape.ChainConveyorBB(Vec3.atBottomCenterOf(BlockPos.ZERO)));

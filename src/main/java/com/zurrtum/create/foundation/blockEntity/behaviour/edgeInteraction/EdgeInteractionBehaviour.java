@@ -2,7 +2,7 @@ package com.zurrtum.create.foundation.blockEntity.behaviour.edgeInteraction;
 
 import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
 import com.zurrtum.create.foundation.blockEntity.behaviour.BehaviourType;
-import com.zurrtum.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
+import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 
 import java.util.function.Predicate;
 

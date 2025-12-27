@@ -1,7 +1,7 @@
 package com.zurrtum.create.content.logistics.chute;
 
 import com.zurrtum.create.AllBlockEntityTypes;
-import com.zurrtum.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
+import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.foundation.blockEntity.behaviour.filtering.ServerFilteringBehaviour;
 import com.zurrtum.create.foundation.item.ItemHelper.ExtractionCountMode;
 import net.minecraft.core.BlockPos;

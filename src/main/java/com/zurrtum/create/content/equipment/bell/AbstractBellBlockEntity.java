@@ -1,7 +1,7 @@
 package com.zurrtum.create.content.equipment.bell;
 
 import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
-import com.zurrtum.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
+import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 
 import java.util.List;
 

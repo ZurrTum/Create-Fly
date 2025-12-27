@@ -1,5 +1,6 @@
 package com.zurrtum.create.foundation.blockEntity.behaviour;
 
+import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
 import com.zurrtum.create.infrastructure.fluids.FluidInventory;
 import com.zurrtum.create.infrastructure.fluids.SidedFluidInventory;

@@ -3,7 +3,7 @@ package com.zurrtum.create.content.processing.basin;
 import com.zurrtum.create.Create;
 import com.zurrtum.create.content.kinetics.base.KineticBlockEntity;
 import com.zurrtum.create.foundation.advancement.CreateTrigger;
-import com.zurrtum.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
+import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.foundation.blockEntity.behaviour.simple.DeferralBehaviour;
 import com.zurrtum.create.foundation.recipe.RecipeFinder;
 import com.zurrtum.create.foundation.recipe.trie.AbstractVariant;

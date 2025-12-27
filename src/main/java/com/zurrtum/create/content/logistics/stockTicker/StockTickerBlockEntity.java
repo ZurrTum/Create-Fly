@@ -6,8 +6,6 @@ import com.zurrtum.create.AllParticleTypes;
 import com.zurrtum.create.AllSoundEvents;
 import com.zurrtum.create.Create;
 import com.zurrtum.create.catnip.data.Iterate;
-import com.zurrtum.create.compat.computercraft.AbstractComputerBehaviour;
-import com.zurrtum.create.compat.computercraft.ComputerCraftProxy;
 import com.zurrtum.create.content.contraptions.actors.seat.SeatEntity;
 import com.zurrtum.create.content.logistics.BigItemStack;
 import com.zurrtum.create.content.logistics.filter.FilterItem;
@@ -15,7 +13,6 @@ import com.zurrtum.create.content.logistics.filter.FilterItemStack;
 import com.zurrtum.create.content.logistics.packager.IdentifiedInventory;
 import com.zurrtum.create.content.logistics.packager.InventorySummary;
 import com.zurrtum.create.content.logistics.packagerLink.LogisticallyLinkedBehaviour.RequestType;
-import com.zurrtum.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.foundation.codec.CreateCodecs;
 import com.zurrtum.create.infrastructure.component.PackageOrderWithCrafts;
 import com.zurrtum.create.infrastructure.items.ItemStackHandler;
@@ -41,8 +38,6 @@ import java.util.*;
 public class StockTickerBlockEntity extends StockCheckingBlockEntity implements Clearable {
     public static final Codec<Map<UUID, List<Integer>>> UUID_MAP_CODEC = Codec.unboundedMap(UUIDUtil.STRING_CODEC, Codec.INT.listOf());
 
-    public AbstractComputerBehaviour computerBehaviour;
-
     // Player-interface Feature
     public List<List<BigItemStack>> lastClientsideStockSnapshot;
     protected InventorySummary lastClientsideStockSnapshotAsSummary;
@@ -62,12 +57,6 @@ public class StockTickerBlockEntity extends StockCheckingBlockEntity implements 
         receivedPayments = new StockTickerInventory();
         categories = new ArrayList<>();
         hiddenCategoriesByPlayer = new HashMap<>();
-    }
-
-    @Override
-    public void addBehaviours(List<BlockEntityBehaviour<?>> behaviours) {
-        super.addBehaviours(behaviours);
-        behaviours.add(computerBehaviour = ComputerCraftProxy.behaviour(this));
     }
 
     public void resetTicksSinceLastUpdate() {

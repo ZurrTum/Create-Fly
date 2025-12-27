@@ -1,18 +1,40 @@
-package com.zurrtum.create.foundation.blockEntity.behaviour;
+package com.zurrtum.create.api.behaviour;
 
+import com.zurrtum.create.api.registry.SimpleRegistry;
 import com.zurrtum.create.content.schematics.requirement.ItemRequirement;
 import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
+import com.zurrtum.create.foundation.blockEntity.behaviour.BehaviourType;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 
 import java.util.ConcurrentModificationException;
+import java.util.function.Function;
 
 public abstract class BlockEntityBehaviour<T extends SmartBlockEntity> {
+    public static final SimpleRegistry.Multi<BlockEntityType<?>, Function<SmartBlockEntity, BlockEntityBehaviour<?>>> REGISTRY = SimpleRegistry.Multi.create();
+    public static final SimpleRegistry.Multi<BlockEntityType<?>, Function<SmartBlockEntity, BlockEntityBehaviour<?>>> CLIENT_REGISTRY = SimpleRegistry.Multi.create();
+    public static final SimpleRegistry.Multi<BlockEntityType<?>, Function<SmartBlockEntity, BlockEntityBehaviour<?>>> FIRST_READ_REGISTRY = SimpleRegistry.Multi.create();
+
+    @SuppressWarnings("unchecked")
+    public static <T extends SmartBlockEntity> void add(BlockEntityType<T> type, Function<T, BlockEntityBehaviour<?>> factory) {
+        REGISTRY.add(type, (Function<SmartBlockEntity, BlockEntityBehaviour<?>>) factory);
+    }
+
+    @SuppressWarnings("unchecked")
+    public static <T extends SmartBlockEntity> void addFirstRead(BlockEntityType<T> type, Function<T, BlockEntityBehaviour<?>> factory) {
+        FIRST_READ_REGISTRY.add(type, (Function<SmartBlockEntity, BlockEntityBehaviour<?>>) factory);
+    }
+
+    @SuppressWarnings("unchecked")
+    public static <T extends SmartBlockEntity> void addClient(BlockEntityType<T> type, Function<T, BlockEntityBehaviour<?>> factory) {
+        CLIENT_REGISTRY.add(type, (Function<SmartBlockEntity, BlockEntityBehaviour<?>>) factory);
+    }
 
     public T blockEntity;
     private int lazyTickRate;

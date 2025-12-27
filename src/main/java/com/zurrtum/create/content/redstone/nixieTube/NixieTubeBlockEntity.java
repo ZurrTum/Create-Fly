@@ -2,14 +2,13 @@ package com.zurrtum.create.content.redstone.nixieTube;
 
 import com.mojang.serialization.Codec;
 import com.zurrtum.create.AllBlockEntityTypes;
+import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.catnip.data.Couple;
 import com.zurrtum.create.compat.computercraft.AbstractComputerBehaviour;
-import com.zurrtum.create.compat.computercraft.ComputerCraftProxy;
 import com.zurrtum.create.content.redstone.displayLink.DisplayLinkBlock;
 import com.zurrtum.create.content.trains.signal.SignalBlockEntity;
 import com.zurrtum.create.content.trains.signal.SignalBlockEntity.SignalState;
 import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
-import com.zurrtum.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.foundation.utility.DynamicComponent;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -81,7 +80,6 @@ public class NixieTubeBlockEntity extends SmartBlockEntity {
     private Couple<String> displayedStrings;
     private boolean keepAlive;
 
-    public AbstractComputerBehaviour computerBehaviour;
     public @Nullable ComputerSignal computerSignal;
 
     private WeakReference<SignalBlockEntity> cachedSignalTE;
@@ -101,7 +99,7 @@ public class NixieTubeBlockEntity extends SmartBlockEntity {
             return;
         signalState = null;
 
-        if (computerBehaviour.hasAttachedComputer()) {
+        if (AbstractComputerBehaviour.contains(this)) {
             if (level.isClientSide() && cachedSignalTE.get() != null) {
                 cachedSignalTE = new WeakReference<>(null);
             }
@@ -134,7 +132,10 @@ public class NixieTubeBlockEntity extends SmartBlockEntity {
     //
 
     public boolean reactsToRedstone() {
-        return !computerBehaviour.hasAttachedComputer() && customText.isEmpty();
+        if (AbstractComputerBehaviour.contains(this)) {
+            return false;
+        }
+        return customText.isEmpty();
     }
 
     @Nullable
@@ -233,7 +234,6 @@ public class NixieTubeBlockEntity extends SmartBlockEntity {
 
     @Override
     public void addBehaviours(List<BlockEntityBehaviour<?>> behaviours) {
-        behaviours.add(computerBehaviour = ComputerCraftProxy.behaviour(this));
     }
 
     @Override

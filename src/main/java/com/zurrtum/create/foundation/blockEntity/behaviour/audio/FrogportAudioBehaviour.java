@@ -2,7 +2,7 @@ package com.zurrtum.create.foundation.blockEntity.behaviour.audio;
 
 import com.zurrtum.create.content.logistics.packagePort.frogport.FrogportBlockEntity;
 import com.zurrtum.create.foundation.blockEntity.behaviour.BehaviourType;
-import com.zurrtum.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
+import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
 
