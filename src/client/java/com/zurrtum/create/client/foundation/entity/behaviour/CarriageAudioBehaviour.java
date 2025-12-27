@@ -129,8 +129,8 @@ public class CarriageAudioBehaviour extends EntityBehaviour<CarriageContraptionE
         double dot = toCarriage.normalize().dot(combinedMotion.normalize());
 
         speedFactor.chase(contraptionMotion.length(), .25f, Chaser.exp(.05f));
-        distanceFactor.chase(Mth.clampedLerp(100, 0, (distance - 3) / 64d), .25f, Chaser.exp(50f));
-        approachFactor.chase(Mth.clampedLerp(50, 200, .5f * (dot + 1)), .25f, Chaser.exp(10f));
+        distanceFactor.chase(Mth.clampedLerp((distance - 3) / 64d, 100, 0), .25f, Chaser.exp(50f));
+        approachFactor.chase(Mth.clampedLerp(.5f * (dot + 1), 50, 200), .25f, Chaser.exp(10f));
         seatCrossfade.chase(camEntity.getVehicle() instanceof CarriageContraptionEntity ? 1 : 0, .1f, Chaser.EXP);
 
         speedFactor.tickChaser();
