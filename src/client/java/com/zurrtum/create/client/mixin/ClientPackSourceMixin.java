@@ -50,7 +50,7 @@ public abstract class ClientPackSourceMixin {
                 PackLocationInfo info = createInfo(id, "Create legacy copper", MOD_ID, directory, version);
                 BuiltInMetadata meta = createMeta(Component.literal("Replacement textures for Vanilla Copper"));
                 PackSelectionConfig position = new PackSelectionConfig(false, Pack.Position.TOP, false);
-                return createPacket(rootPaths, directory, info, meta, position, "minecraft");
+                return createPacket(rootPaths, directory, info, meta, position, "minecraft", MOD_ID);
             }
         );
     }
