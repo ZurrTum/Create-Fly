@@ -2,13 +2,13 @@ package com.zurrtum.create.foundation.blockEntity.behaviour.filtering;
 
 import com.zurrtum.create.AllItems;
 import com.zurrtum.create.AllSoundEvents;
+import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.catnip.math.VecHelper;
 import com.zurrtum.create.content.logistics.filter.FilterItem;
 import com.zurrtum.create.content.logistics.filter.FilterItemStack;
 import com.zurrtum.create.content.schematics.requirement.ItemRequirement;
 import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
 import com.zurrtum.create.foundation.blockEntity.behaviour.BehaviourType;
-import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.foundation.blockEntity.behaviour.ValueSettings;
 import com.zurrtum.create.foundation.blockEntity.behaviour.ValueSettingsHandleBehaviour;
 import com.zurrtum.create.infrastructure.fluids.FluidStack;
@@ -23,13 +23,16 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
+import org.jetbrains.annotations.Nullable;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
@@ -335,5 +338,30 @@ public class ServerFilteringBehaviour extends BlockEntityBehaviour<SmartBlockEnt
     @Override
     public int netId() {
         return 1;
+    }
+
+    public static class CustomInteract extends ServerFilteringBehaviour {
+        private final @Nullable List<Item> blackList;
+
+        public CustomInteract(SmartBlockEntity be, List<Item> blackList) {
+            super(be);
+            this.blackList = blackList;
+        }
+
+        public CustomInteract(SmartBlockEntity be) {
+            this(be, null);
+        }
+
+        @Override
+        public boolean canShortInteract(ItemStack toApply) {
+            if (blackList != null) {
+                for (Item item : blackList) {
+                    if (toApply.is(item)) {
+                        return false;
+                    }
+                }
+            }
+            return true;
+        }
     }
 }

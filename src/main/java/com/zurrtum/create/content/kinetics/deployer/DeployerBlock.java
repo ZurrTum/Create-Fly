@@ -11,11 +11,6 @@ import com.zurrtum.create.content.kinetics.base.DirectionalAxisKineticBlock;
 import com.zurrtum.create.content.processing.AssemblyOperatorUseContext;
 import com.zurrtum.create.foundation.block.IBE;
 import com.zurrtum.create.infrastructure.items.ItemInventoryProvider;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.List;
-import java.util.function.Predicate;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerPlayer;
@@ -40,6 +35,10 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.List;
+import java.util.function.Predicate;
 
 public class DeployerBlock extends DirectionalAxisKineticBlock implements IBE<DeployerBlockEntity>, ItemInventoryProvider<DeployerBlockEntity> {
 
@@ -68,14 +67,41 @@ public class DeployerBlock extends DirectionalAxisKineticBlock implements IBE<De
 
     @Override
     public InteractionResult onWrenched(BlockState state, UseOnContext context) {
-        Vec3 normal = Vec3.atLowerCornerOf(state.getValue(FACING).getUnitVec3i());
-        Vec3 location = context.getClickLocation().subtract(Vec3.atCenterOf(context.getClickedPos()).subtract(normal.scale(.5))).multiply(normal);
-        if (location.length() > .75f) {
+        if (isHand(state, context)) {
             if (!context.getLevel().isClientSide())
                 withBlockEntityDo(context.getLevel(), context.getClickedPos(), DeployerBlockEntity::changeMode);
             return InteractionResult.SUCCESS;
         }
         return super.onWrenched(state, context);
+    }
+
+    @Override
+    public InteractionResult onSneakWrenched(BlockState state, UseOnContext context) {
+        Player player = context.getPlayer();
+        if (player != null && isHand(state, context)) {
+            if (!context.getLevel().isClientSide())
+                withBlockEntityDo(
+                    context.getLevel(), context.getClickedPos(), be -> {
+                        ServerPlayer serverPlayer = be.player.cast();
+                        ItemStack heldByDeployer = serverPlayer.getMainHandItem();
+                        ItemStack heldByPlayer = context.getItemInHand();
+                        if (heldByDeployer.isEmpty() && heldByPlayer.isEmpty())
+                            return;
+
+                        player.setItemInHand(context.getHand(), heldByDeployer.copy());
+                        serverPlayer.setItemInHand(InteractionHand.MAIN_HAND, heldByPlayer);
+                        be.notifyUpdate();
+                    }
+                );
+            return InteractionResult.SUCCESS;
+        }
+        return super.onSneakWrenched(state, context);
+    }
+
+    private static boolean isHand(BlockState state, UseOnContext context) {
+        Vec3 normal = Vec3.atLowerCornerOf(state.getValue(FACING).getUnitVec3i());
+        Vec3 location = context.getClickLocation().subtract(Vec3.atCenterOf(context.getClickedPos()).subtract(normal.scale(.5))).multiply(normal);
+        return location.length() > .75f;
     }
 
     @Override

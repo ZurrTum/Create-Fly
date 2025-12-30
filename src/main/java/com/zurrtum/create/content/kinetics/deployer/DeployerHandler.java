@@ -5,6 +5,7 @@ import com.zurrtum.create.AllDataComponents;
 import com.zurrtum.create.AllItemTags;
 import com.zurrtum.create.AllSoundEvents;
 import com.zurrtum.create.AllSynchedDatas;
+import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.catnip.levelWrappers.WrappedLevel;
 import com.zurrtum.create.content.contraptions.AbstractContraptionEntity;
 import com.zurrtum.create.content.contraptions.mounted.CartAssemblerBlockItem;
@@ -12,7 +13,6 @@ import com.zurrtum.create.content.equipment.sandPaper.SandPaperItem;
 import com.zurrtum.create.content.kinetics.belt.behaviour.TransportedItemStackHandlerBehaviour;
 import com.zurrtum.create.content.kinetics.deployer.DeployerBlockEntity.Mode;
 import com.zurrtum.create.content.trains.track.ITrackBlock;
-import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.foundation.utility.BlockHelper;
 import com.zurrtum.create.infrastructure.component.SandPaperItemComponent;
 import net.minecraft.core.BlockPos;
@@ -29,7 +29,6 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntitySelector;
-import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.item.ItemEntity;
@@ -185,16 +184,11 @@ public class DeployerHandler {
                     //                    entity.captureDrops(null);
                     //                    return;
                     //                }
-                    if (cancelResult == null) {
-                        if (entity.interact(serverPlayer, hand).consumesAction()) {
-                            if (entity instanceof AbstractVillager villager) {
-                                if (villager.getTradingPlayer() == serverPlayer)
-                                    villager.setTradingPlayer(null);
-                            }
-                            success = true;
-                        } else if (entity instanceof LivingEntity livingEntity && stack.interactLivingEntity(serverPlayer, livingEntity, hand)
-                            .consumesAction())
-                            success = true;
+                    if (cancelResult == null && serverPlayer.interactOn(entity, hand).consumesAction()) {
+                        success = true;
+                        if (entity instanceof AbstractVillager villager && villager.getTradingPlayer() == serverPlayer) {
+                            villager.setTradingPlayer(null);
+                        }
                     }
                     if (!success && entity instanceof Player playerEntity) {
                         if (stack.has(DataComponents.FOOD)) {
