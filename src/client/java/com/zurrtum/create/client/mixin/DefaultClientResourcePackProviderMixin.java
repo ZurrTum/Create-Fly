@@ -61,7 +61,7 @@ public abstract class DefaultClientResourcePackProviderMixin {
                 ResourcePackInfo info = createInfo(id, "Create legacy copper", MOD_ID, directory, version);
                 ResourceMetadataMap meta = createMeta(Text.literal("Replacement textures for Vanilla Copper"));
                 ResourcePackPosition position = new ResourcePackPosition(false, ResourcePackProfile.InsertionPosition.TOP, false);
-                return createPacket(rootPaths, directory, info, meta, position, MOD_ID, "minecraft");
+                return createPacket(rootPaths, directory, info, meta, position, "minecraft", MOD_ID);
             }
         );
     }
