@@ -13,6 +13,7 @@ import com.zurrtum.create.client.content.redstone.link.controller.LinkedControll
 import com.zurrtum.create.client.content.redstone.link.controller.LinkedControllerClientHandler.Mode;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.renderer.Sheets;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.block.model.BakedQuad;
@@ -30,6 +31,7 @@ import net.minecraft.util.Mth;
 import net.minecraft.util.Util;
 import net.minecraft.world.entity.HumanoidArm;
 import net.minecraft.world.entity.ItemOwner;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.Nullable;
@@ -126,24 +128,51 @@ public class LinkedControllerModel implements ItemModel, SpecialModelRenderer<Li
         layerRenderState.setExtents(vector);
         settings.applyToLayer(layerRenderState, displayContext);
 
-        RenderData data = new RenderData();
+        RenderData data = RenderData.EMPTY;
         Minecraft mc = Minecraft.getInstance();
-        boolean rightHanded = mc.options.mainHand().get() == HumanoidArm.RIGHT;
-        ItemDisplayContext mainHand = rightHanded ? ItemDisplayContext.FIRST_PERSON_RIGHT_HAND : ItemDisplayContext.FIRST_PERSON_LEFT_HAND;
-        ItemDisplayContext offHand = rightHanded ? ItemDisplayContext.FIRST_PERSON_LEFT_HAND : ItemDisplayContext.FIRST_PERSON_RIGHT_HAND;
-        boolean noControllerInMain = !mc.player.getMainHandItem().is(AllItems.LINKED_CONTROLLER);
-        if (displayContext == mainHand || (displayContext == offHand && noControllerInMain)) {
-            data.equip = true;
-            data.active = true;
-        }
+        Mode mode = LinkedControllerClientHandler.MODE;
+        boolean bind = mode == Mode.BIND;
         if (displayContext == ItemDisplayContext.GUI) {
-            if (stack == mc.player.getMainHandItem())
-                data.active = true;
-            if (stack == mc.player.getOffhandItem() && noControllerInMain)
-                data.active = true;
+            if (bind || mode == Mode.ACTIVE) {
+                LocalPlayer player = mc.player;
+                if (player != null) {
+                    ItemStack mainStack = player.getMainHandItem();
+                    if (stack == mainStack || mainStack.getItem() != AllItems.LINKED_CONTROLLER && stack == player.getOffhandItem()) {
+                        data = new RenderData(true, false, bind);
+                    }
+                }
+            }
+        } else {
+            LocalPlayer player = mc.player;
+            HumanoidArm arm = mc.options.mainHand().get();
+            if (displayContext == ItemDisplayContext.FIRST_PERSON_RIGHT_HAND) {
+                if ((bind || mode == Mode.ACTIVE) && (arm == HumanoidArm.RIGHT || canUse(player, arm))) {
+                    data = new RenderData(true, true, bind);
+                } else {
+                    data = RenderData.EQUIP;
+                }
+            } else if (displayContext == ItemDisplayContext.FIRST_PERSON_LEFT_HAND) {
+                if ((bind || mode == Mode.ACTIVE) && (arm == HumanoidArm.LEFT || canUse(player, arm))) {
+                    data = new RenderData(true, true, bind);
+                } else {
+                    data = RenderData.EQUIP;
+                }
+            } else if (displayContext == ItemDisplayContext.THIRD_PERSON_RIGHT_HAND) {
+                if ((bind || mode == Mode.ACTIVE) && (arm == HumanoidArm.RIGHT || canUse(player, arm))) {
+                    data = new RenderData(true, false, bind);
+                }
+            } else if (displayContext == ItemDisplayContext.THIRD_PERSON_LEFT_HAND) {
+                if ((bind || mode == Mode.ACTIVE) && (arm == HumanoidArm.LEFT || canUse(player, arm))) {
+                    data = new RenderData(true, false, bind);
+                }
+            }
         }
-        data.active &= LinkedControllerClientHandler.MODE != Mode.IDLE;
         layerRenderState.setupSpecialModel(this, data);
+        state.appendModelIdentityElement(data.active);
+    }
+
+    private static boolean canUse(Player player, HumanoidArm arm) {
+        return player != null && player.getItemHeldByArm(arm).getItem() != AllItems.LINKED_CONTROLLER;
     }
 
     @Override
@@ -158,7 +187,7 @@ public class LinkedControllerModel implements ItemModel, SpecialModelRenderer<Li
         int i
     ) {
         assert data != null;
-        render(displayContext, matrices, queue, light, overlay, true, data.equip, data.active, true);
+        render(displayContext, matrices, queue, light, overlay, data.bind, data.equip, data.active, true);
     }
 
     public void renderInLectern(
@@ -179,7 +208,7 @@ public class LinkedControllerModel implements ItemModel, SpecialModelRenderer<Li
         SubmitNodeCollector queue,
         int light,
         int overlay,
-        boolean normal,
+        boolean bind,
         boolean equip,
         boolean active,
         boolean renderDepression
@@ -206,9 +235,8 @@ public class LinkedControllerModel implements ItemModel, SpecialModelRenderer<Li
             return;
         }
         renderQuads(displayContext, matrices, queue, light, overlay, cutoutLayer, torch);
-        if (normal && LinkedControllerClientHandler.MODE == Mode.BIND) {
-            int i = Mth.lerpInt((Mth.sin(AnimationTickHolder.getRenderTime() / 4f) + 1) / 2, 5, 15);
-            light = i << 20;
+        if (bind) {
+            light = Mth.lerpInt((Mth.sin(AnimationTickHolder.getRenderTime() / 4f) + 1) / 2, 5, 15) << 20;
         }
         float s = 1 / 16f;
         float b = s * -.75f;
@@ -268,9 +296,9 @@ public class LinkedControllerModel implements ItemModel, SpecialModelRenderer<Li
         queue.submitItem(matrices, displayContext, light, overlay, 0, tints, quads, layer, ItemStackRenderState.FoilType.NONE);
     }
 
-    public static class RenderData {
-        boolean equip;
-        boolean active;
+    public record RenderData(boolean active, boolean equip, boolean bind) {
+        public static RenderData EMPTY = new RenderData(false, false, false);
+        public static RenderData EQUIP = new RenderData(false, true, false);
     }
 
     @Override

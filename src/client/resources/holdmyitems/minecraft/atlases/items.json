@@ -1,0 +1,12 @@
+{
+  "sources": [
+    {
+      "type": "single",
+      "resource": "create:fluid/honey_still"
+    },
+    {
+      "type": "single",
+      "resource": "create:fluid/chocolate_still"
+    }
+  ]
+}
