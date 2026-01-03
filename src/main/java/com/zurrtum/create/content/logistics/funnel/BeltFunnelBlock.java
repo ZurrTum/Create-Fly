@@ -1,8 +1,10 @@
 package com.zurrtum.create.content.logistics.funnel;
 
 import com.zurrtum.create.AllAdvancements;
+import com.zurrtum.create.AllBlockEntityTypes;
 import com.zurrtum.create.AllBlocks;
 import com.zurrtum.create.AllShapes;
+import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.api.schematic.requirement.SpecialBlockItemRequirement;
 import com.zurrtum.create.catnip.math.VoxelShaper;
 import com.zurrtum.create.content.kinetics.belt.BeltBlock;
@@ -11,10 +13,6 @@ import com.zurrtum.create.content.kinetics.belt.behaviour.DirectBeltInputBehavio
 import com.zurrtum.create.content.schematics.requirement.ItemRequirement;
 import com.zurrtum.create.foundation.advancement.AdvancementBehaviour;
 import com.zurrtum.create.foundation.block.ProperWaterloggedBlock;
-import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
-
-import java.util.Locale;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerPlayer;
@@ -38,6 +36,8 @@ import net.minecraft.world.level.block.state.properties.EnumProperty;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.EntityCollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
+
+import java.util.Locale;
 
 public class BeltFunnelBlock extends AbstractHorizontalFunnelBlock implements SpecialBlockItemRequirement {
 
@@ -67,6 +67,11 @@ public class BeltFunnelBlock extends AbstractHorizontalFunnelBlock implements Sp
         super(p_i48377_1_);
         this.parent = parent;
         registerDefaultState(defaultBlockState().setValue(SHAPE, Shape.RETRACTED));
+    }
+
+    @Override
+    protected boolean shouldChangedStateKeepBlockEntity(BlockState blockState) {
+        return AllBlockEntityTypes.FUNNEL.isValid(blockState);
     }
 
     public static BeltFunnelBlock andesite(Properties settings) {

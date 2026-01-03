@@ -53,6 +53,11 @@ public class ToolboxBlock extends HorizontalDirectionalBlock implements SimpleWa
     }
 
     @Override
+    protected boolean shouldChangedStateKeepBlockEntity(BlockState blockState) {
+        return AllBlockEntityTypes.TOOLBOX.isValid(blockState);
+    }
+
+    @Override
     public Container getInventory(LevelAccessor world, BlockPos pos, BlockState state, ToolboxBlockEntity blockEntity, Direction context) {
         return blockEntity.inventory;
     }

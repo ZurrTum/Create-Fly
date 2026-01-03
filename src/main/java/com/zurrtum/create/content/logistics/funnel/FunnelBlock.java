@@ -1,12 +1,13 @@
 package com.zurrtum.create.content.logistics.funnel;
 
+import com.zurrtum.create.AllBlockEntityTypes;
 import com.zurrtum.create.AllItems;
 import com.zurrtum.create.AllShapes;
+import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.catnip.math.VecHelper;
 import com.zurrtum.create.content.logistics.box.PackageEntity;
 import com.zurrtum.create.foundation.advancement.AdvancementBehaviour;
 import com.zurrtum.create.foundation.block.ProperWaterloggedBlock;
-import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.foundation.blockEntity.behaviour.filtering.ServerFilteringBehaviour;
 import com.zurrtum.create.foundation.item.ItemHelper;
 import net.minecraft.core.BlockPos;
@@ -44,6 +45,11 @@ public abstract class FunnelBlock extends AbstractDirectionalFunnelBlock {
     public FunnelBlock(Properties p_i48415_1_) {
         super(p_i48415_1_);
         registerDefaultState(defaultBlockState().setValue(EXTRACTING, false));
+    }
+
+    @Override
+    protected boolean shouldChangedStateKeepBlockEntity(BlockState blockState) {
+        return AllBlockEntityTypes.FUNNEL.isValid(blockState);
     }
 
     public abstract BlockState getEquivalentBeltFunnel(BlockGetter world, BlockPos pos, BlockState state);

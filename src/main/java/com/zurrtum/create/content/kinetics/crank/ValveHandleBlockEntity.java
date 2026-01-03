@@ -2,20 +2,19 @@ package com.zurrtum.create.content.kinetics.crank;
 
 import com.zurrtum.create.AllBlockEntityTypes;
 import com.zurrtum.create.AllBlocks;
+import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.content.kinetics.base.KineticBlockEntity;
 import com.zurrtum.create.content.kinetics.transmission.sequencer.SequencedGearshiftBlockEntity.SequenceContext;
 import com.zurrtum.create.content.kinetics.transmission.sequencer.SequencerInstructions;
-import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.foundation.blockEntity.behaviour.scrollValue.ServerScrollValueBehaviour;
 import com.zurrtum.create.foundation.blockEntity.behaviour.scrollValue.ServerValveScrollValueBehaviour;
-
-import java.util.List;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
+
+import java.util.List;
 
 public class ValveHandleBlockEntity extends HandCrankBlockEntity {
 
@@ -25,7 +24,6 @@ public class ValveHandleBlockEntity extends HandCrankBlockEntity {
     public int startAngle;
     public int targetAngle;
     public int totalUseTicks;
-    private boolean keepAlive;
 
     public ValveHandleBlockEntity(BlockPos pos, BlockState state) {
         super(AllBlockEntityTypes.VALVE_HANDLE, pos, state);
@@ -102,27 +100,5 @@ public class ValveHandleBlockEntity extends HandCrankBlockEntity {
 
     @Override
     protected void copySequenceContextFrom(KineticBlockEntity sourceBE) {
-    }
-
-    @Override
-    @SuppressWarnings("deprecation")
-    public void preRemoveSideEffects(BlockPos pos, BlockState oldState) {
-        BlockState state = level.getBlockState(pos);
-        if (getType().isValid(state)) {
-            keepAlive = true;
-            setBlockState(state);
-        } else {
-            super.preRemoveSideEffects(pos, oldState);
-        }
-    }
-
-    @Override
-    public void setRemoved() {
-        if (keepAlive) {
-            keepAlive = false;
-            level.getChunk(worldPosition).setBlockEntity(this);
-        } else {
-            super.setRemoved();
-        }
     }
 }
