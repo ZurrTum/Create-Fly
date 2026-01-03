@@ -60,6 +60,11 @@ public class NixieTubeBlock extends DoubleFaceAttachedBlock implements IBE<Nixie
         this(properties, DyeColor.ORANGE);
     }
 
+    @Override
+    protected boolean shouldChangedStateKeepBlockEntity(BlockState blockState) {
+        return AllBlockEntityTypes.NIXIE_TUBE.isValid(blockState);
+    }
+
     public static Function<Properties, NixieTubeBlock> dyed(DyeColor color) {
         return properties -> new NixieTubeBlock(properties, color);
     }

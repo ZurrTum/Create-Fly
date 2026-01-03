@@ -5,9 +5,6 @@ import com.zurrtum.create.AllBlocks;
 import com.zurrtum.create.AllItemTags;
 import com.zurrtum.create.AllShapes;
 import com.zurrtum.create.foundation.utility.BlockHelper;
-
-import java.util.function.Function;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -21,6 +18,8 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
+
+import java.util.function.Function;
 
 public class ValveHandleBlock extends HandCrankBlock {
 
@@ -37,6 +36,11 @@ public class ValveHandleBlock extends HandCrankBlock {
     private ValveHandleBlock(Properties properties, DyeColor color) {
         super(properties);
         this.color = color;
+    }
+
+    @Override
+    protected boolean shouldChangedStateKeepBlockEntity(BlockState blockState) {
+        return AllBlockEntityTypes.VALVE_HANDLE.isValid(blockState);
     }
 
     @Override
