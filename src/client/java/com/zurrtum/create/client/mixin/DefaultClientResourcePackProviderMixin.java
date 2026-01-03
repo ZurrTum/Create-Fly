@@ -28,11 +28,12 @@ import static com.zurrtum.create.Create.MOD_ID;
 public abstract class DefaultClientResourcePackProviderMixin {
     @Inject(method = "forEachProfile(Ljava/util/function/BiConsumer;)V", at = @At("TAIL"))
     private void loadResourcePack(BiConsumer<String, Function<String, ResourcePackProfile>> consumer, CallbackInfo ci) {
-        ModContainer mod = FabricLoader.getInstance().getModContainer(MOD_ID).orElseThrow();
+        FabricLoader loader = FabricLoader.getInstance();
+        ModContainer mod = loader.getModContainer(MOD_ID).orElseThrow();
         List<Path> rootPaths = mod.getRootPaths();
         ModMetadata metadata = mod.getMetadata();
         String version = metadata.getVersion().getFriendlyString();
-        if (!FabricLoader.getInstance().isModLoaded("fabric-api")) {
+        if (!loader.isModLoaded("fabric-api")) {
             consumer.accept(
                 MOD_ID, id -> {
                     String directory = ResourceType.CLIENT_RESOURCES.getDirectory();
@@ -40,6 +41,17 @@ public abstract class DefaultClientResourcePackProviderMixin {
                     ResourceMetadataMap meta = createMeta(Text.translatable("advancement.create.root"));
                     ResourcePackPosition position = new ResourcePackPosition(true, ResourcePackProfile.InsertionPosition.BOTTOM, false);
                     return createPacket(rootPaths, directory, info, meta, position, id, "minecraft", "flywheel", "vanillin", "ponder", "fabric");
+                }
+            );
+        }
+        if (loader.isModLoaded("holdmyitems")) {
+            consumer.accept(
+                MOD_ID + "_holdmyitems", id -> {
+                    String directory = "holdmyitems";
+                    ResourcePackInfo info = createInfo(id, "Create & Hold My Items", MOD_ID, directory, version);
+                    ResourceMetadataMap meta = createMeta(Text.literal("Hold My Items compatible addon"));
+                    ResourcePackPosition position = new ResourcePackPosition(true, ResourcePackProfile.InsertionPosition.BOTTOM, false);
+                    return createPacket(rootPaths, directory, info, meta, position, "minecraft");
                 }
             );
         }

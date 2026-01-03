@@ -68,11 +68,13 @@ import com.zurrtum.create.client.ponder.foundation.PonderIndex;
 import com.zurrtum.create.client.ponder.foundation.PonderTooltipHandler;
 import com.zurrtum.create.content.contraptions.minecart.capability.CapabilityMinecartController;
 import com.zurrtum.create.content.kinetics.drill.CobbleGenOptimisation;
+import com.zurrtum.create.content.redstone.link.controller.LinkedControllerItem;
 import com.zurrtum.create.foundation.utility.TickBasedCache;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.RunArgs;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.network.ClientPlayerInteractionManager;
+import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.util.Window;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.resource.ReloadableResourceManagerImpl;
@@ -92,7 +94,7 @@ import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
 @Mixin(MinecraftClient.class)
-public class MinecraftClientMixin {
+public abstract class MinecraftClientMixin {
     @Shadow
     @Nullable
     public ClientWorld world;
@@ -108,6 +110,12 @@ public class MinecraftClientMixin {
     @Shadow
     @Final
     private Window window;
+
+    @Shadow
+    protected abstract void doItemUse();
+
+    @Shadow
+    private int itemUseCooldown;
 
     @Inject(method = "<init>", at = @At(value = "INVOKE", target = "Lnet/minecraft/resource/ReloadableResourceManagerImpl;reload(Ljava/util/concurrent/Executor;Ljava/util/concurrent/Executor;Ljava/util/concurrent/CompletableFuture;Ljava/util/List;)Lnet/minecraft/resource/ResourceReload;"))
     private void flywheel$onBeginInitialResourceReload(RunArgs args, CallbackInfo ci) {
@@ -305,5 +313,16 @@ public class MinecraftClientMixin {
     @Inject(method = "run()V", at = @At(value = "INVOKE", target = "Ljava/lang/Runtime;getRuntime()Ljava/lang/Runtime;"))
     private void run(CallbackInfo ci) {
         PonderIndex.registerAll();
+    }
+
+    @WrapOperation(method = "handleInputEvents()V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/option/KeyBinding;isPressed()Z", ordinal = 2))
+    private boolean onUse(KeyBinding instance, Operation<Boolean> original) {
+        if (player.getActiveItem().getItem() instanceof LinkedControllerItem) {
+            if (itemUseCooldown == 0 && original.call(instance)) {
+                doItemUse();
+            }
+            return true;
+        }
+        return original.call(instance);
     }
 }

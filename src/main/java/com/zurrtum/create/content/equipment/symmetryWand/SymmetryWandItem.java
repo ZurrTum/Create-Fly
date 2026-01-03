@@ -58,6 +58,7 @@ public class SymmetryWandItem extends Item {
         if (player.isSneaking()) {
             if (player.getEntityWorld().isClient()) {
                 AllClientHandle.INSTANCE.openSymmetryWandScreen(wand, context.getHand());
+                player.getItemCooldownManager().set(wand, 5);
             }
             return ActionResult.SUCCESS;
         }

@@ -25,6 +25,7 @@ import net.minecraft.client.world.ClientWorld;
 import net.minecraft.item.ItemStack;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
+import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.shape.VoxelShape;
 import org.joml.Matrix3x2fStack;
@@ -98,6 +99,20 @@ public class LinkedControllerClientHandler {
         currentlyPressed.clear();
 
         LinkedControllerModel.resetButtons();
+        if (player.isUsingItem()) {
+            player.stopUsingItem();
+        }
+    }
+
+    private static void updateUsingItem(ClientPlayerEntity player, Hand hand) {
+        if (player.isUsingItem()) {
+            if (player.getActiveHand() != hand) {
+                player.stopUsingItem();
+                player.setCurrentHand(hand);
+            }
+        } else {
+            player.setCurrentHand(hand);
+        }
     }
 
     public static void tick(MinecraftClient mc) {
@@ -110,6 +125,7 @@ public class LinkedControllerClientHandler {
 
         ClientPlayerEntity player = mc.player;
         ClientWorld world = mc.world;
+        Hand hand = null;
         ItemStack heldItem = player.getMainHandStack();
 
         if (player.isSpectator()) {
@@ -118,27 +134,27 @@ public class LinkedControllerClientHandler {
             return;
         }
 
-        if (!inLectern() && !heldItem.isOf(AllItems.LINKED_CONTROLLER)) {
-            heldItem = player.getOffHandStack();
-            if (!heldItem.isOf(AllItems.LINKED_CONTROLLER)) {
-                MODE = Mode.IDLE;
-                onReset(player);
+        if (inLectern()) {
+            if (AllBlocks.LECTERN_CONTROLLER.getBlockEntityOptional(world, lecternPos).map(be -> !be.isUsedBy(mc.player)).orElse(true)) {
+                deactivateInLectern(player);
                 return;
+            }
+        } else {
+            if (heldItem.isOf(AllItems.LINKED_CONTROLLER)) {
+                hand = Hand.MAIN_HAND;
+            } else {
+                heldItem = player.getOffHandStack();
+                if (heldItem.isOf(AllItems.LINKED_CONTROLLER)) {
+                    hand = Hand.OFF_HAND;
+                } else {
+                    MODE = Mode.IDLE;
+                    onReset(player);
+                    return;
+                }
             }
         }
 
-        if (inLectern() && AllBlocks.LECTERN_CONTROLLER.getBlockEntityOptional(world, lecternPos).map(be -> !be.isUsedBy(mc.player)).orElse(true)) {
-            deactivateInLectern(player);
-            return;
-        }
-
-        if (mc.currentScreen != null) {
-            MODE = Mode.IDLE;
-            onReset(player);
-            return;
-        }
-
-        if (InputUtil.isKeyPressed(mc.getWindow(), GLFW.GLFW_KEY_ESCAPE)) {
+        if (mc.currentScreen != null || InputUtil.isKeyPressed(mc.getWindow(), GLFW.GLFW_KEY_ESCAPE)) {
             MODE = Mode.IDLE;
             onReset(player);
             return;
@@ -177,22 +193,32 @@ public class LinkedControllerClientHandler {
                     packetCooldown = PACKET_RATE;
                 }
             }
-        }
-
-        if (MODE == Mode.BIND) {
+            if (hand != null) {
+                updateUsingItem(player, hand);
+            }
+        } else {
             VoxelShape shape = world.getBlockState(selectedLocation).getOutlineShape(world, selectedLocation);
             if (!shape.isEmpty())
                 Outliner.getInstance().showAABB("controller", shape.getBoundingBox().offset(selectedLocation)).colored(0xB73C2D).lineWidth(1 / 16f);
 
-            for (Integer integer : newKeys) {
-                ServerLinkBehaviour linkBehaviour = BlockEntityBehaviour.get(world, selectedLocation, ServerLinkBehaviour.TYPE);
-                if (linkBehaviour != null) {
-                    player.networkHandler.sendPacket(new LinkedControllerBindPacket(integer, selectedLocation));
-                    CreateLang.translate("linked_controller.key_bound", controls.get(integer).getBoundKeyLocalizedText().getString())
-                        .sendStatus(mc.player);
+            if (newKeys.isEmpty()) {
+                if (hand != null) {
+                    updateUsingItem(player, hand);
                 }
-                MODE = Mode.IDLE;
-                break;
+            } else {
+                for (Integer integer : newKeys) {
+                    ServerLinkBehaviour linkBehaviour = BlockEntityBehaviour.get(world, selectedLocation, ServerLinkBehaviour.TYPE);
+                    if (linkBehaviour != null) {
+                        player.networkHandler.sendPacket(new LinkedControllerBindPacket(integer, selectedLocation));
+                        CreateLang.translate("linked_controller.key_bound", controls.get(integer).getBoundKeyLocalizedText().getString())
+                            .sendStatus(mc.player);
+                    }
+                    MODE = Mode.IDLE;
+                    break;
+                }
+                if (player.isUsingItem()) {
+                    player.stopUsingItem();
+                }
             }
         }
 
