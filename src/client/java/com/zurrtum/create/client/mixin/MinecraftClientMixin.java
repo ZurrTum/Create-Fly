@@ -67,7 +67,9 @@ import com.zurrtum.create.client.ponder.foundation.PonderIndex;
 import com.zurrtum.create.client.ponder.foundation.PonderTooltipHandler;
 import com.zurrtum.create.content.contraptions.minecart.capability.CapabilityMinecartController;
 import com.zurrtum.create.content.kinetics.drill.CobbleGenOptimisation;
+import com.zurrtum.create.content.redstone.link.controller.LinkedControllerItem;
 import com.zurrtum.create.foundation.utility.TickBasedCache;
+import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.main.GameConfig;
 import net.minecraft.client.multiplayer.ClientLevel;
@@ -87,7 +89,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(Minecraft.class)
-public class MinecraftClientMixin {
+public abstract class MinecraftClientMixin {
     @Shadow
     @Nullable
     public ClientLevel level;
@@ -99,6 +101,12 @@ public class MinecraftClientMixin {
     @Shadow
     @Nullable
     public LocalPlayer player;
+
+    @Shadow
+    protected abstract void startUseItem();
+
+    @Shadow
+    private int rightClickDelay;
 
     @Inject(method = "<init>", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/packs/resources/ReloadableResourceManager;createReload(Ljava/util/concurrent/Executor;Ljava/util/concurrent/Executor;Ljava/util/concurrent/CompletableFuture;Ljava/util/List;)Lnet/minecraft/server/packs/resources/ReloadInstance;"))
     private void flywheel$onBeginInitialResourceReload(GameConfig args, CallbackInfo ci) {
@@ -274,5 +282,16 @@ public class MinecraftClientMixin {
     @Inject(method = "run()V", at = @At(value = "INVOKE", target = "Ljava/lang/Runtime;getRuntime()Ljava/lang/Runtime;"))
     private void run(CallbackInfo ci) {
         PonderIndex.registerAll();
+    }
+
+    @WrapOperation(method = "handleKeybinds()V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/KeyMapping;isDown()Z", ordinal = 2))
+    private boolean onUse(KeyMapping instance, Operation<Boolean> original) {
+        if (player.getActiveItem().getItem() instanceof LinkedControllerItem) {
+            if (rightClickDelay == 0 && original.call(instance)) {
+                startUseItem();
+            }
+            return true;
+        }
+        return original.call(instance);
     }
 }

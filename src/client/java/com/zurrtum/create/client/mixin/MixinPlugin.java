@@ -24,10 +24,6 @@ public class MixinPlugin implements IMixinConfigPlugin {
         if (loader.isModLoaded("iris")) {
             mixins.add("IrisPipelinesMixin");
         }
-        if (loader.isModLoaded("holdmyitems")) {
-            mixins.add("HoldMyItemsMixin");
-            mixins.add("AnimationResourceLoaderMixin");
-        }
         if (loader.isModLoaded("eiv")) {
             mixins.add("ItemSlotMixin");
             mixins.add("FabricEIVMixin");

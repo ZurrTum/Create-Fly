@@ -4,6 +4,7 @@ import com.mojang.blaze3d.platform.InputConstants;
 import com.zurrtum.create.AllBlocks;
 import com.zurrtum.create.AllItems;
 import com.zurrtum.create.AllSoundEvents;
+import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.client.catnip.lang.FontHelper.Palette;
 import com.zurrtum.create.client.catnip.outliner.Outliner;
 import com.zurrtum.create.client.foundation.item.TooltipHelper;
@@ -11,19 +12,9 @@ import com.zurrtum.create.client.foundation.utility.ControlsUtil;
 import com.zurrtum.create.client.foundation.utility.CreateLang;
 import com.zurrtum.create.client.infrastructure.model.LinkedControllerModel;
 import com.zurrtum.create.content.redstone.link.ServerLinkBehaviour;
-import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.infrastructure.packet.c2s.LinkedControllerBindPacket;
 import com.zurrtum.create.infrastructure.packet.c2s.LinkedControllerInputPacket;
 import com.zurrtum.create.infrastructure.packet.c2s.LinkedControllerStopLecternPacket;
-import org.joml.Matrix3x2fStack;
-import org.lwjgl.glfw.GLFW;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.stream.Collectors;
-
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
@@ -34,8 +25,17 @@ import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.shapes.VoxelShape;
+import org.joml.Matrix3x2fStack;
+import org.lwjgl.glfw.GLFW;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class LinkedControllerClientHandler {
     public static Mode MODE = Mode.IDLE;
@@ -99,6 +99,20 @@ public class LinkedControllerClientHandler {
         currentlyPressed.clear();
 
         LinkedControllerModel.resetButtons();
+        if (player.isUsingItem()) {
+            player.stopUsingItem();
+        }
+    }
+
+    private static void updateUsingItem(LocalPlayer player, InteractionHand hand) {
+        if (player.isUsingItem()) {
+            if (player.getUsedItemHand() != hand) {
+                player.stopUsingItem();
+                player.startUsingItem(hand);
+            }
+        } else {
+            player.startUsingItem(hand);
+        }
     }
 
     public static void tick(Minecraft mc) {
@@ -111,6 +125,7 @@ public class LinkedControllerClientHandler {
 
         LocalPlayer player = mc.player;
         ClientLevel world = mc.level;
+        InteractionHand hand = null;
         ItemStack heldItem = player.getMainHandItem();
 
         if (player.isSpectator()) {
@@ -119,27 +134,27 @@ public class LinkedControllerClientHandler {
             return;
         }
 
-        if (!inLectern() && !heldItem.is(AllItems.LINKED_CONTROLLER)) {
-            heldItem = player.getOffhandItem();
-            if (!heldItem.is(AllItems.LINKED_CONTROLLER)) {
-                MODE = Mode.IDLE;
-                onReset(player);
+        if (inLectern()) {
+            if (AllBlocks.LECTERN_CONTROLLER.getBlockEntityOptional(world, lecternPos).map(be -> !be.isUsedBy(mc.player)).orElse(true)) {
+                deactivateInLectern(player);
                 return;
+            }
+        } else {
+            if (heldItem.is(AllItems.LINKED_CONTROLLER)) {
+                hand = InteractionHand.MAIN_HAND;
+            } else {
+                heldItem = player.getOffhandItem();
+                if (heldItem.is(AllItems.LINKED_CONTROLLER)) {
+                    hand = InteractionHand.OFF_HAND;
+                } else {
+                    MODE = Mode.IDLE;
+                    onReset(player);
+                    return;
+                }
             }
         }
 
-        if (inLectern() && AllBlocks.LECTERN_CONTROLLER.getBlockEntityOptional(world, lecternPos).map(be -> !be.isUsedBy(mc.player)).orElse(true)) {
-            deactivateInLectern(player);
-            return;
-        }
-
-        if (mc.screen != null) {
-            MODE = Mode.IDLE;
-            onReset(player);
-            return;
-        }
-
-        if (InputConstants.isKeyDown(mc.getWindow(), GLFW.GLFW_KEY_ESCAPE)) {
+        if (mc.screen != null || InputConstants.isKeyDown(mc.getWindow(), GLFW.GLFW_KEY_ESCAPE)) {
             MODE = Mode.IDLE;
             onReset(player);
             return;
@@ -178,22 +193,32 @@ public class LinkedControllerClientHandler {
                     packetCooldown = PACKET_RATE;
                 }
             }
-        }
-
-        if (MODE == Mode.BIND) {
+            if (hand != null) {
+                updateUsingItem(player, hand);
+            }
+        } else {
             VoxelShape shape = world.getBlockState(selectedLocation).getShape(world, selectedLocation);
             if (!shape.isEmpty())
                 Outliner.getInstance().showAABB("controller", shape.bounds().move(selectedLocation)).colored(0xB73C2D).lineWidth(1 / 16f);
 
-            for (Integer integer : newKeys) {
-                ServerLinkBehaviour linkBehaviour = BlockEntityBehaviour.get(world, selectedLocation, ServerLinkBehaviour.TYPE);
-                if (linkBehaviour != null) {
-                    player.connection.send(new LinkedControllerBindPacket(integer, selectedLocation));
-                    CreateLang.translate("linked_controller.key_bound", controls.get(integer).getTranslatedKeyMessage().getString())
-                        .sendStatus(mc.player);
+            if (newKeys.isEmpty()) {
+                if (hand != null) {
+                    updateUsingItem(player, hand);
                 }
-                MODE = Mode.IDLE;
-                break;
+            } else {
+                for (Integer integer : newKeys) {
+                    ServerLinkBehaviour linkBehaviour = BlockEntityBehaviour.get(world, selectedLocation, ServerLinkBehaviour.TYPE);
+                    if (linkBehaviour != null) {
+                        player.connection.send(new LinkedControllerBindPacket(integer, selectedLocation));
+                        CreateLang.translate("linked_controller.key_bound", controls.get(integer).getTranslatedKeyMessage().getString())
+                            .sendStatus(mc.player);
+                    }
+                    MODE = Mode.IDLE;
+                    break;
+                }
+                if (player.isUsingItem()) {
+                    player.stopUsingItem();
+                }
             }
         }
 

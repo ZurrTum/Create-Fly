@@ -56,7 +56,7 @@ public class LinkedControllerItem extends Item implements MenuProvider {
                         if (world.isClientSide())
                             AllClientHandle.INSTANCE.toggleLinkedControllerBindMode(pos);
                         player.getCooldowns().addCooldown(stack, 2);
-                        return InteractionResult.SUCCESS;
+                        return InteractionResult.CONSUME;
                     }
 
                     if (hitState.is(Blocks.LECTERN) && !hitState.getValue(LecternBlock.HAS_BOOK)) {

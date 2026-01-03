@@ -14,10 +14,6 @@ import com.zurrtum.create.foundation.utility.BlockHelper;
 import com.zurrtum.create.infrastructure.component.SymmetryMirror;
 import com.zurrtum.create.infrastructure.config.AllConfigs;
 import com.zurrtum.create.infrastructure.packet.s2c.SymmetryEffectPacket;
-import org.jetbrains.annotations.NotNull;
-
-import java.util.*;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
@@ -37,6 +33,9 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.CollisionContext;
+import org.jetbrains.annotations.NotNull;
+
+import java.util.*;
 
 public class SymmetryWandItem extends Item {
 
@@ -59,6 +58,7 @@ public class SymmetryWandItem extends Item {
         if (player.isShiftKeyDown()) {
             if (player.level().isClientSide()) {
                 AllClientHandle.INSTANCE.openSymmetryWandScreen(wand, context.getHand());
+                player.getCooldowns().addCooldown(wand, 5);
             }
             return InteractionResult.SUCCESS;
         }
