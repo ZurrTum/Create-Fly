@@ -572,7 +572,10 @@ public class ChainConveyorBlockEntity extends KineticBlockEntity implements Tran
     public void invalidate() {
         super.invalidate();
         if (level != null && level.isClientSide()) {
-            getBehaviour(ChainConveyorBehaviour.TYPE).invalidate();
+            ChainConveyorBehaviour behaviour = getBehaviour(ChainConveyorBehaviour.TYPE);
+            if (behaviour != null) {
+                behaviour.invalidate();
+            }
         }
     }
 

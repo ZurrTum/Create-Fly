@@ -73,7 +73,8 @@ public class FactoryPanelRenderer extends SmartBlockEntityRenderer<FactoryPanelB
                     Level world = behaviour.getLevel();
                     FactoryPanelPosition to = behaviour.getPanelPosition();
                     FactoryPanelBehaviour fromBehaviour = be.getBehaviour(FactoryPanelBehaviour.getTypeForSlot(behaviour.slot));
-                    Vec3 start = fromBehaviour.getSlotPositioning().getLocalOffset(state.blockState).add(Vec3.atLowerCornerOf(state.blockPos));
+                    Vec3 start = fromBehaviour != null ? fromBehaviour.getSlotPositioning().getLocalOffset(state.blockState)
+                        .add(Vec3.atLowerCornerOf(state.blockPos)) : Vec3.ZERO;
                     for (FactoryPanelConnection connection : behaviour.targetedBy.values()) {
                         List<Direction> path = connection.getPath(world, state.blockState, to, start);
                         if (path.isEmpty()) {
