@@ -870,17 +870,28 @@ public abstract class Contraption {
             view.read("Palette", CreateCodecs.BLOCK_STATE_LIST_CODEC).orElseGet(ArrayList::new)
         );
 
+        boolean isServer = !world.isClientSide();
         view.childrenListOrEmpty("BlockList").forEach(c -> {
             StructureBlockInfo info = readStructureBlockInfo(c, palette);
 
             blocks.put(info.pos(), info);
+            boolean legacy = c.getBooleanOr("Legacy", false);
 
             // it's very important that empty tags are read here. see writeBlocksCompound
-            c.read("UpdateTag", CompoundTag.CODEC).ifPresent(updateTag -> updateTags.put(info.pos(), updateTag));
+            c.read("UpdateTag", CompoundTag.CODEC).ifPresentOrElse(
+                updateTag -> updateTags.put(info.pos(), updateTag), () -> {
+                    if (isServer && !legacy) {
+                        CompoundTag updateTag = info.nbt();
+                        if (updateTag != null) {
+                            updateTags.put(info.pos(), info.nbt());
+                        }
+                    }
+                }
+            );
 
             // Mark the pos if it has the legacy marker.
             // This will be used when creating BlockEntities for the ClientContraption.
-            this.isLegacy.put(info.pos(), c.getBooleanOr("Legacy", false));
+            this.isLegacy.put(info.pos(), legacy);
         });
         AllClientHandle.INSTANCE.resetClientContraption(this);
     }

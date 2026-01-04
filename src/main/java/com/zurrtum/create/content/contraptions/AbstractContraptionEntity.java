@@ -621,8 +621,10 @@ public abstract class AbstractContraptionEntity extends Entity {
 
     protected void readAdditional(ValueInput view, boolean spawnData) {
         initialized = view.getBooleanOr("Initialized", false);
-        contraption = Contraption.fromData(level(), view.childOrEmpty("Contraption"), spawnData);
-        contraption.entity = this;
+        view.child("Contraption").ifPresent(child -> {
+            contraption = Contraption.fromData(level(), child, spawnData);
+            contraption.entity = this;
+        });
         entityData.set(STALLED, view.getBooleanOr("Stalled", false));
     }
 

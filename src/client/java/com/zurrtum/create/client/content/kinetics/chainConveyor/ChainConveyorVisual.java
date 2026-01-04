@@ -14,6 +14,7 @@ import com.zurrtum.create.client.flywheel.lib.visual.SimpleDynamicVisual;
 import com.zurrtum.create.client.flywheel.lib.visual.SimpleTickableVisual;
 import com.zurrtum.create.client.flywheel.lib.visual.util.SmartRecycler;
 import com.zurrtum.create.client.foundation.render.SpecialModels;
+import com.zurrtum.create.content.kinetics.chainConveyor.ChainConveyorBehaviour;
 import com.zurrtum.create.content.kinetics.chainConveyor.ChainConveyorBlockEntity;
 import com.zurrtum.create.content.kinetics.chainConveyor.ChainConveyorPackage;
 import com.zurrtum.create.content.logistics.box.PackageItem;
@@ -62,7 +63,10 @@ public class ChainConveyorVisual extends SingleAxisRotatingVisual<ChainConveyorB
 
     @Override
     public void tick(TickableVisual.Context context) {
-        blockEntity.getBehaviour(ChainConveyorClientBehaviour.TYPE).tickBoxVisuals();
+        ChainConveyorBehaviour behaviour = blockEntity.getBehaviour(ChainConveyorClientBehaviour.TYPE);
+        if (behaviour != null) {
+            behaviour.tickBoxVisuals();
+        }
     }
 
     @Override
