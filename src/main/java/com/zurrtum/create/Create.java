@@ -68,11 +68,9 @@ public class Create implements ModInitializer {
         SCHEMATIC_RECEIVER = new ServerSchematicLoader();
         CreateRegistryKeys.register();
         CreateRegistries.register();
-        AllFluids.register();
         AllPackageStyles.register();
         AllToolMaterials.register();
         AllArmorMaterials.register();
-        AllBlocks.register();
         EncasingRegistry.register();
         BlockStressValues.register();
         AllItems.register();
@@ -121,7 +119,6 @@ public class Create implements ModInitializer {
         AllPotatoProjectileRenderModes.register();
         AllPotatoProjectileBlockHitActions.register();
         AllPotatoProjectileEntityHitActions.register();
-        AllDynamicRegistries.register();
         AllItemAttributeTypes.register();
         AllPackagePortTargetTypes.register();
         AllUnpackingHandlers.register();
@@ -133,7 +130,6 @@ public class Create implements ModInitializer {
         AllPlacedFeatures.register();
         AllPlacementModifiers.register();
         AllMountedDispenseItemBehaviors.register();
-        AllEntityAttributes.register();
         AllBlockSpoutingBehaviours.register();
         //        CompatMod.register();
     }

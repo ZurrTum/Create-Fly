@@ -159,8 +159,6 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.MapColor;
 import net.minecraft.world.level.material.PushReaction;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 import java.util.function.BiFunction;
 import java.util.function.Function;
@@ -168,7 +166,6 @@ import java.util.function.Function;
 import static com.zurrtum.create.Create.MOD_ID;
 
 public class AllBlocks {
-    public static final List<Block> ALL = new ArrayList<>();
     public static final CogWheelBlock COGWHEEL = register(
         "cogwheel",
         CogWheelBlock::small,
@@ -3210,9 +3207,7 @@ public class AllBlocks {
 
     private static <T extends Block> T register(String id, Function<BlockBehaviour.Properties, T> factory, BlockBehaviour.Properties settings) {
         ResourceKey<Block> key = ResourceKey.create(Registries.BLOCK, Identifier.fromNamespaceAndPath(MOD_ID, id));
-        T block = factory.apply(settings.setId(key));
-        ALL.add(block);
-        return Registry.register(BuiltInRegistries.BLOCK, key, block);
+        return Registry.register(BuiltInRegistries.BLOCK, key, factory.apply(settings.setId(key)));
     }
 
     public static void register() {
