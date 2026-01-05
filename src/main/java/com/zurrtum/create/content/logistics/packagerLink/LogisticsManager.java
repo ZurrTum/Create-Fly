@@ -13,13 +13,12 @@ import com.zurrtum.create.content.logistics.packager.PackagingRequest;
 import com.zurrtum.create.content.logistics.packagerLink.LogisticallyLinkedBehaviour.RequestType;
 import com.zurrtum.create.foundation.utility.TickBasedCache;
 import com.zurrtum.create.infrastructure.component.PackageOrderWithCrafts;
+import net.minecraft.world.item.ItemStack;
 import org.apache.commons.lang3.mutable.MutableBoolean;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 import java.util.concurrent.ExecutionException;
-
-import net.minecraft.world.item.ItemStack;
 
 public class LogisticsManager {
 
@@ -202,17 +201,12 @@ public class LogisticsManager {
     public static void performPackageRequests(Multimap<PackagerBlockEntity, PackagingRequest> requests) {
         Map<PackagerBlockEntity, Collection<PackagingRequest>> asMap = requests.asMap();
         for (Map.Entry<PackagerBlockEntity, Collection<PackagingRequest>> entry : asMap.entrySet()) {
-            ArrayList<PackagingRequest> queuedRequests = new ArrayList<>(entry.getValue());
             PackagerBlockEntity packager = entry.getKey();
-
-            if (!queuedRequests.isEmpty())
+            Collection<PackagingRequest> value = entry.getValue();
+            if (!value.isEmpty()) {
                 packager.flashLink();
-            for (int i = 0; i < 100; i++) {
-                if (queuedRequests.isEmpty())
-                    break;
-                packager.attemptToSend(queuedRequests);
+                packager.attemptToSend(value);
             }
-
             packager.triggerStockCheck();
             packager.notifyUpdate();
         }

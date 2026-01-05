@@ -10,6 +10,7 @@ import com.zurrtum.create.compat.computercraft.AbstractComputerBehaviour;
 import com.zurrtum.create.content.contraptions.actors.psi.PortableStorageInterfaceBlockEntity;
 import com.zurrtum.create.content.logistics.BigItemStack;
 import com.zurrtum.create.content.logistics.box.PackageItem;
+import com.zurrtum.create.content.logistics.box.PackageStyles;
 import com.zurrtum.create.content.logistics.crate.BottomlessItemHandler;
 import com.zurrtum.create.content.logistics.factoryBoard.FactoryPanelBlock;
 import com.zurrtum.create.content.logistics.factoryBoard.FactoryPanelBlockEntity;
@@ -29,6 +30,7 @@ import com.zurrtum.create.infrastructure.items.ItemStackHandler;
 import com.zurrtum.create.infrastructure.packet.s2c.WiFiEffectPacket;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.NonNullList;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
@@ -37,8 +39,8 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.Clearable;
 import net.minecraft.world.Container;
 import net.minecraft.world.Containers;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.component.ItemContainerContents;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.entity.SignBlockEntity;
@@ -46,7 +48,6 @@ import net.minecraft.world.level.block.entity.SignText;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
-import org.apache.commons.lang3.mutable.MutableBoolean;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
@@ -252,7 +253,7 @@ public class PackagerBlockEntity extends SmartBlockEntity implements Clearable {
         if (!redstoneModeActive())
             return;
         updateSignAddress();
-        attemptToSend(null);
+        attemptToSend();
     }
 
     public void recheckIfLinksPresent() {
@@ -326,7 +327,7 @@ public class PackagerBlockEntity extends SmartBlockEntity implements Clearable {
             return;
 
         updateSignAddress();
-        attemptToSend(null);
+        attemptToSend();
 
         // dont send multiple packages when a button signal length is received
         if (buttonCooldown <= 0) { // still on button cooldown, don't prolong it
@@ -369,144 +370,200 @@ public class PackagerBlockEntity extends SmartBlockEntity implements Clearable {
         return unpacked;
     }
 
-    public void attemptToSend(@Nullable List<PackagingRequest> queuedRequests) {
-        if (queuedRequests == null && (!heldBox.isEmpty() || animationTicks != 0 || buttonCooldown > 0))
+    public void attemptToSend() {
+        if (!heldBox.isEmpty() || animationTicks != 0 || buttonCooldown > 0) {
             return;
-
+        }
         Container targetInv = targetInventory.getInventory();
-        if (targetInv == null || targetInv instanceof PackagerItemHandler)
+        if (targetInv == null || targetInv instanceof PackagerItemHandler) {
             return;
-
-        MutableBoolean anyItemPresent = new MutableBoolean();
-        ItemStackHandler extractedItems = new ItemStackHandler(PackageItem.SLOTS);
-        ItemStack extractedPackageItem = ItemStack.EMPTY;
-        PackagingRequest nextRequest = null;
-        String fixedAddress = null;
-        int fixedOrderId = 0;
-
-        // Data written to packages for defrags
-        int linkIndexInOrder = 0;
-        boolean finalLinkInOrder = false;
-        int packageIndexAtLink = 0;
-        boolean finalPackageAtLink = false;
-        PackageOrderWithCrafts orderContext = null;
-        boolean requestQueue = queuedRequests != null;
-
-        if (requestQueue && !queuedRequests.isEmpty()) {
-            nextRequest = queuedRequests.get(0);
-            fixedAddress = nextRequest.address();
-            fixedOrderId = nextRequest.orderId();
-            linkIndexInOrder = nextRequest.linkIndex();
-            finalLinkInOrder = nextRequest.finalLink().booleanValue();
-            packageIndexAtLink = nextRequest.packageCounter().getAndIncrement();
-            orderContext = nextRequest.context();
         }
-
-        Outer:
-        for (int i = 0; i < PackageItem.SLOTS; i++) {
-            boolean continuePacking = true;
-
-            while (continuePacking) {
-                continuePacking = false;
-
-                if (requestQueue) {
-                    ItemStack stack = nextRequest.item();
-                    Item item = stack.getItem();
-
-                    boolean bulky = !item.canFitInsideContainerItems();
-                    if (bulky && anyItemPresent.isTrue())
-                        break Outer;
-
-                    int count = Math.min(64, nextRequest.getCount());
-                    int extract = targetInv.extract(stack, count);
-                    if (extract == 0)
-                        break Outer;
-                    anyItemPresent.setTrue();
-                    extractedItems.insert(stack, extract);
-
-                    if (item instanceof PackageItem)
-                        extractedPackageItem = stack.copyWithCount(extract);
-
-                    nextRequest.subtract(extract);
-
-                    if (!nextRequest.isEmpty()) {
-                        if (bulky)
-                            break Outer;
-                        break;
-                    }
-
-                    finalPackageAtLink = true;
-                    queuedRequests.removeFirst();
-                    if (queuedRequests.isEmpty())
-                        break Outer;
-                    int previousCount = nextRequest.packageCounter().intValue();
-                    nextRequest = queuedRequests.getFirst();
-                    if (!fixedAddress.equals(nextRequest.address()))
-                        break Outer;
-                    if (fixedOrderId != nextRequest.orderId())
-                        break Outer;
-
-                    nextRequest.packageCounter().setValue(previousCount);
-                    finalPackageAtLink = false;
-                    continuePacking = true;
-                    if (nextRequest.context() != null)
-                        orderContext = nextRequest.context();
-
-                    if (bulky)
-                        break Outer;
-                } else {
-                    ItemStack extracted = targetInv.extract(stack -> anyItemPresent.isFalse() || stack.getItem().canFitInsideContainerItems(), 64);
-                    if (extracted.isEmpty())
-                        break Outer;
-
-                    anyItemPresent.setTrue();
-                    extractedItems.insert(extracted);
-                    Item item = extracted.getItem();
-
-                    if (item instanceof PackageItem)
-                        extractedPackageItem = extracted;
-                    if (!item.canFitInsideContainerItems())
-                        break Outer;
+        ItemStack stack = targetInv.extractAnyMax();
+        if (stack.isEmpty()) {
+            return;
+        }
+        ItemStack createdBox;
+        if (stack.getItem().canFitInsideContainerItems()) {
+            List<ItemStack> list = new ArrayList<>(PackageItem.SLOTS);
+            list.add(stack);
+            for (int i = 0, size = PackageItem.SLOTS - 1; i < size; i++) {
+                stack = targetInv.extractMax(s -> s.getItem().canFitInsideContainerItems());
+                if (stack.isEmpty()) {
+                    break;
                 }
+                list.add(stack);
             }
+            int size = list.size();
+            ItemContainerContents contents = new ItemContainerContents(size);
+            NonNullList<ItemStack> items = contents.items;
+            for (int i = 0; i < size; i++) {
+                items.set(i, list.get(i));
+            }
+            createdBox = PackageStyles.getRandomBox();
+            createdBox.set(AllDataComponents.PACKAGE_CONTENTS, contents);
+        } else {
+            createdBox = createBox(stack);
         }
+        queuePackage(createdBox, signBasedAddress);
+    }
 
-        if (anyItemPresent.isFalse()) {
-            if (nextRequest != null)
-                queuedRequests.removeFirst();
-            return;
+    private static ItemStack createBox(ItemStack stack) {
+        if (stack.getItem() instanceof PackageItem) {
+            PackageItem.clearAddress(stack);
+            return stack;
         }
+        ItemContainerContents contents = new ItemContainerContents(1);
+        contents.items.set(0, stack);
+        return PackageItem.containing(contents);
+    }
 
-        ItemStack createdBox = extractedPackageItem.isEmpty() ? PackageItem.containing(extractedItems) : extractedPackageItem;
+    private static ItemStack createBox(ItemStack[] list, int size) {
+        ItemContainerContents contents = new ItemContainerContents(size);
+        NonNullList<ItemStack> items = contents.items;
+        for (int i = 0; i < size; i++) {
+            items.set(i, list[i]);
+        }
+        return PackageItem.containing(contents);
+    }
+
+    private void queuePackage(ItemStack createdBox, String address) {
+        if (address != null && !address.isBlank()) {
+            PackageItem.addAddress(createdBox, address);
+        }
         AbstractComputerBehaviour computer = AbstractComputerBehaviour.get(this);
         if (computer != null) {
             computer.queuePackageCreated(createdBox);
         }
-        PackageItem.clearAddress(createdBox);
-
-        if (fixedAddress != null && !fixedAddress.isBlank())
-            PackageItem.addAddress(createdBox, fixedAddress);
-        if (requestQueue)
-            PackageItem.setOrder(createdBox, fixedOrderId, linkIndexInOrder, finalLinkInOrder, packageIndexAtLink, finalPackageAtLink, orderContext);
-        if (!requestQueue && !signBasedAddress.isBlank())
-            PackageItem.addAddress(createdBox, signBasedAddress);
-
-        BlockPos linkPos = getLinkPos();
-        if (extractedPackageItem.isEmpty() && linkPos != null && level.getBlockEntity(linkPos) instanceof PackagerLinkBlockEntity plbe)
-            plbe.behaviour.deductFromAccurateSummary(extractedItems);
-
         if (!heldBox.isEmpty() || animationTicks != 0) {
             queuedExitingPackages.add(new BigItemStack(createdBox, 1));
             return;
         }
-
         heldBox = createdBox;
         animationInward = false;
         animationTicks = CYCLE;
-
         award(AllAdvancements.PACKAGER);
         triggerStockCheck();
         notifyUpdate();
+    }
+
+    public void attemptToSend(Collection<PackagingRequest> queuedRequests) {
+        if (queuedRequests == null) {
+            attemptToSend();
+            return;
+        }
+        if (queuedRequests.isEmpty()) {
+            return;
+        }
+        Container targetInv = targetInventory.getInventory();
+        if (targetInv == null || targetInv instanceof PackagerItemHandler) {
+            return;
+        }
+        int max = PackageItem.SLOTS;
+        ItemStack[] list = new ItemStack[max];
+        int index = 0;
+        List<PackagingRequest> requests = new ArrayList<>(queuedRequests.size());
+        List<PackagingRequest> bulkyRequests = new ArrayList<>();
+        List<ItemStack> packages = new ArrayList<>();
+        Iterator<PackagingRequest> iterator = queuedRequests.iterator();
+        PackagingRequest nextRequest = iterator.next();
+        do {
+            ItemStack stack = nextRequest.item();
+            if (stack.getItem().canFitInsideContainerItems()) {
+                requests.add(nextRequest);
+            } else {
+                bulkyRequests.add(nextRequest);
+            }
+            String fixedAddress = nextRequest.address();
+            int fixedOrderId = nextRequest.orderId();
+            PackageOrderWithCrafts orderContext = nextRequest.context();
+            int linkIndexInOrder = nextRequest.linkIndex();
+            boolean finalLinkInOrder = nextRequest.finalLink().booleanValue();
+            int packageIndexAtLink = nextRequest.packageCounter().intValue();
+            nextRequest = null;
+            while (iterator.hasNext()) {
+                PackagingRequest current = iterator.next();
+                if (current.orderId() == fixedOrderId && current.address().equals(fixedAddress)) {
+                    if (orderContext == null) {
+                        orderContext = current.context();
+                    }
+                    stack = current.item();
+                    if (stack.getItem().canFitInsideContainerItems()) {
+                        for (PackagingRequest existRequest : requests) {
+                            if (ItemStack.isSameItemSameComponents(existRequest.item(), stack)) {
+                                existRequest.count().add(current.getCount());
+                                current = null;
+                                break;
+                            }
+                        }
+                        if (current != null) {
+                            requests.add(current);
+                        }
+                    } else {
+                        bulkyRequests.add(current);
+                    }
+                } else {
+                    nextRequest = current;
+                    break;
+                }
+            }
+            for (PackagingRequest request : requests) {
+                stack = request.item();
+                int extract = targetInv.extract(stack, request.getCount());
+                if (extract == 0) {
+                    continue;
+                }
+                int maxSize = stack.getMaxStackSize();
+                for (int count = extract / maxSize, missing; count > 0; count -= missing) {
+                    missing = max - index;
+                    if (count >= missing) {
+                        for (int i = 0; i < missing; i++) {
+                            list[index++] = stack.copyWithCount(maxSize);
+                        }
+                        packages.add(createBox(list, index));
+                        index = 0;
+                    } else {
+                        for (int i = 0; i < count; i++) {
+                            list[index++] = stack.copyWithCount(maxSize);
+                        }
+                    }
+                }
+                int remainder = extract % maxSize;
+                if (remainder != 0) {
+                    list[index++] = stack.copyWithCount(remainder);
+                    if (index == max) {
+                        packages.add(createBox(list, index));
+                        index = 0;
+                    }
+                }
+            }
+            if (index != 0) {
+                packages.add(createBox(list, index));
+            }
+            for (PackagingRequest request : bulkyRequests) {
+                stack = request.item();
+                int extract = targetInv.extract(stack, request.getCount());
+                if (extract == 0) {
+                    continue;
+                }
+                packages.add(createBox(extract == stack.getCount() ? stack : stack.copyWithCount(extract)));
+            }
+            int end = packages.size() - 1;
+            for (int i = 0; i < end; i++) {
+                stack = packages.get(i);
+                PackageItem.setOrder(stack, fixedOrderId, linkIndexInOrder, finalLinkInOrder, packageIndexAtLink++, false, orderContext);
+                queuePackage(stack, fixedAddress);
+            }
+            stack = packages.get(end);
+            PackageItem.setOrder(stack, fixedOrderId, linkIndexInOrder, finalLinkInOrder, packageIndexAtLink, true, orderContext);
+            queuePackage(stack, fixedAddress);
+            if (nextRequest == null) {
+                break;
+            }
+            index = 0;
+            requests.clear();
+            bulkyRequests.clear();
+            packages.clear();
+        } while (true);
     }
 
     public void updateSignAddress() {

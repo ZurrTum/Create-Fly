@@ -777,6 +777,102 @@ public interface BaseInventory extends Iterable<ItemStack> {
         return ItemStack.EMPTY;
     }
 
+    default ItemStack extractAnyMax(Direction side) {
+        return extractAnyMax();
+    }
+
+    default ItemStack extractAnyMax() {
+        for (int i = 0, size = create$size(); i < size; i++) {
+            ItemStack findStack = create$getStack(i);
+            if (findStack.isEmpty()) {
+                continue;
+            }
+            int count = findStack.getCount();
+            int maxAmount = findStack.getMaxStackSize();
+            create$setStack(i, ItemStack.EMPTY);
+            if (count == maxAmount) {
+                create$markDirty();
+                return onExtract(findStack);
+            }
+            int remaining = maxAmount - count;
+            for (i = i + 1; i < size; i++) {
+                ItemStack stack = create$getStack(i);
+                if (stack.isEmpty()) {
+                    continue;
+                }
+                if (matches(stack, findStack)) {
+                    count = stack.getCount();
+                    if (count < remaining) {
+                        create$setStack(i, ItemStack.EMPTY);
+                        remaining -= count;
+                        continue;
+                    }
+                    if (count == remaining) {
+                        create$setStack(i, ItemStack.EMPTY);
+                    } else {
+                        stack.setCount(count - remaining);
+                    }
+                    create$markDirty();
+                    findStack.setCount(maxAmount);
+                    return onExtract(findStack);
+                }
+            }
+            create$markDirty();
+            findStack.setCount(maxAmount - remaining);
+            return onExtract(findStack);
+        }
+        return ItemStack.EMPTY;
+    }
+
+    default ItemStack extractMax(Predicate<ItemStack> predicate, Direction side) {
+        return extractMax(predicate);
+    }
+
+    default ItemStack extractMax(Predicate<ItemStack> predicate) {
+        for (int i = 0, size = create$size(); i < size; i++) {
+            ItemStack findStack = create$getStack(i);
+            if (findStack.isEmpty()) {
+                continue;
+            }
+            if (predicate.test(findStack)) {
+                int count = findStack.getCount();
+                int maxAmount = findStack.getMaxStackSize();
+                create$setStack(i, ItemStack.EMPTY);
+                if (count == maxAmount) {
+                    create$markDirty();
+                    return onExtract(findStack);
+                }
+                int remaining = maxAmount - count;
+                for (i = i + 1; i < size; i++) {
+                    ItemStack stack = create$getStack(i);
+                    if (stack.isEmpty()) {
+                        continue;
+                    }
+                    if (matches(stack, findStack)) {
+                        count = stack.getCount();
+                        if (count < remaining) {
+                            create$setStack(i, ItemStack.EMPTY);
+                            remaining -= count;
+                            continue;
+                        }
+                        if (count == remaining) {
+                            create$setStack(i, ItemStack.EMPTY);
+                        } else {
+                            stack.setCount(count - remaining);
+                        }
+                        create$markDirty();
+                        findStack.setCount(maxAmount);
+                        return onExtract(findStack);
+                    }
+                }
+                create$markDirty();
+                findStack.setCount(maxAmount - remaining);
+                return onExtract(findStack);
+            }
+        }
+        return ItemStack.EMPTY;
+    }
+
     default int forceInsert(ItemStack stack) {
         return BaseInventory.this.insert(stack);
     }
