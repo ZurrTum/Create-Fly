@@ -69,11 +69,9 @@ public class Create implements ModInitializer {
         SCHEMATIC_RECEIVER = new ServerSchematicLoader();
         CreateRegistryKeys.register();
         CreateRegistries.register();
-        AllFluids.register();
         AllPackageStyles.register();
         AllToolMaterials.register();
         AllArmorMaterials.register();
-        AllBlocks.register();
         EncasingRegistry.register();
         BlockStressValues.register();
         AllItems.register();

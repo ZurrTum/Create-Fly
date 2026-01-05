@@ -11,9 +11,11 @@ import org.spongepowered.asm.mixin.injection.At;
 
 @Mixin(HoneycombItem.class)
 public class HoneycombItemMixin {
-    @WrapOperation(method = "method_34723()Lcom/google/common/collect/BiMap;", at = @At(value = "INVOKE", target = "Lcom/google/common/collect/ImmutableBiMap;builder()Lcom/google/common/collect/ImmutableBiMap$Builder;", remap = false))
-    private static ImmutableBiMap.Builder<Block, Block> addWaxed(Operation<ImmutableBiMap.Builder<Block, Block>> original) {
-        ImmutableBiMap.Builder<Block, Block> builder = original.call();
+    @WrapOperation(method = "method_34723()Lcom/google/common/collect/BiMap;", at = @At(value = "INVOKE", target = "Lcom/google/common/collect/ImmutableBiMap$Builder;build()Lcom/google/common/collect/ImmutableBiMap;", remap = false))
+    private static ImmutableBiMap<Block, Block> addWaxed(
+        ImmutableBiMap.Builder<Block, Block> builder,
+        Operation<ImmutableBiMap<Block, Block>> original
+    ) {
         builder.put(AllBlocks.COPPER_SHINGLES, AllBlocks.WAXED_COPPER_SHINGLES);
         builder.put(AllBlocks.EXPOSED_COPPER_SHINGLES, AllBlocks.WAXED_EXPOSED_COPPER_SHINGLES);
         builder.put(AllBlocks.WEATHERED_COPPER_SHINGLES, AllBlocks.WAXED_WEATHERED_COPPER_SHINGLES);
@@ -38,6 +40,6 @@ public class HoneycombItemMixin {
         builder.put(AllBlocks.EXPOSED_COPPER_TILE_STAIRS, AllBlocks.WAXED_EXPOSED_COPPER_TILE_STAIRS);
         builder.put(AllBlocks.WEATHERED_COPPER_TILE_STAIRS, AllBlocks.WAXED_WEATHERED_COPPER_TILE_STAIRS);
         builder.put(AllBlocks.OXIDIZED_COPPER_TILE_STAIRS, AllBlocks.WAXED_OXIDIZED_COPPER_TILE_STAIRS);
-        return builder;
+        return original.call(builder);
     }
 }

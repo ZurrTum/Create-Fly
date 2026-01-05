@@ -32,7 +32,22 @@
     ],
     "eiv": [
       "com.zurrtum.create.compat.eiv.EivCommonPlugin"
+    ],
+    "create_block": [
+      {
+        "adapter": "register",
+        "value": "com.zurrtum.create.AllBlocks"
+      }
+    ],
+    "create_fluid": [
+      {
+        "adapter": "register",
+        "value": "com.zurrtum.create.AllFluids"
+      }
     ]
+  },
+  "languageAdapters": {
+    "register": "com.zurrtum.create.api.registry.CreateRegisterPlugin"
   },
   "custom": {
     "loom:injected_interfaces": {
