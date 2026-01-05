@@ -13,6 +13,7 @@ import net.minecraft.world.Container;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
 
+import java.util.Collection;
 import java.util.List;
 
 public class RepackagerBlockEntity extends PackagerBlockEntity {
@@ -66,7 +67,8 @@ public class RepackagerBlockEntity extends PackagerBlockEntity {
         return true;
     }
 
-    public void attemptToSend(List<PackagingRequest> queuedRequests) {
+    @Override
+    public void attemptToSend(Collection<PackagingRequest> queuedRequests) {
         if (!heldBox.isEmpty() || animationTicks != 0 || buttonCooldown > 0)
             return;
         if (!queuedExitingPackages.isEmpty())

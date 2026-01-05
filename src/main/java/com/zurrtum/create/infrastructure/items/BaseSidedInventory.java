@@ -224,7 +224,7 @@ public interface BaseSidedInventory extends Container {
 
     @Override
     default ItemStack countAny(int maxAmount) {
-        return extractAny(maxAmount, null);
+        return countAny(maxAmount, null);
     }
 
     @Override
@@ -804,6 +804,116 @@ public interface BaseSidedInventory extends Container {
                     setChanged();
                     return onExtract(directCopy(findStack, maxAmount));
                 }
+                setItem(slot, ItemStack.EMPTY);
+                if (count == maxAmount) {
+                    setChanged();
+                    return onExtract(findStack);
+                }
+                int remaining = maxAmount - count;
+                for (i = i + 1; i < size; i++) {
+                    slot = slots[i];
+                    ItemStack stack = getItem(slot);
+                    if (stack.isEmpty()) {
+                        continue;
+                    }
+                    if (create$canExtract(slot, stack, side) && matches(stack, findStack)) {
+                        count = stack.getCount();
+                        if (count < remaining) {
+                            setItem(slot, ItemStack.EMPTY);
+                            remaining -= count;
+                            continue;
+                        }
+                        if (count == remaining) {
+                            setItem(slot, ItemStack.EMPTY);
+                        } else {
+                            stack.setCount(count - remaining);
+                        }
+                        setChanged();
+                        findStack.setCount(maxAmount);
+                        return onExtract(findStack);
+                    }
+                }
+                setChanged();
+                findStack.setCount(maxAmount - remaining);
+                return onExtract(findStack);
+            }
+        }
+        return ItemStack.EMPTY;
+    }
+
+    @Override
+    default ItemStack extractAnyMax() {
+        return extractAnyMax(null);
+    }
+
+    @Override
+    default ItemStack extractAnyMax(Direction side) {
+        int[] slots = create$getAvailableSlots(side);
+        int size = slots.length;
+        for (int i = 0; i < size; i++) {
+            int slot = slots[i];
+            ItemStack findStack = getItem(slot);
+            if (findStack.isEmpty()) {
+                continue;
+            }
+            if (create$canExtract(slot, findStack, side)) {
+                int count = findStack.getCount();
+                int maxAmount = findStack.getMaxStackSize();
+                setItem(slot, ItemStack.EMPTY);
+                if (count == maxAmount) {
+                    setChanged();
+                    return onExtract(findStack);
+                }
+                int remaining = maxAmount - count;
+                for (i = i + 1; i < size; i++) {
+                    slot = slots[i];
+                    ItemStack stack = getItem(slot);
+                    if (stack.isEmpty()) {
+                        continue;
+                    }
+                    if (create$canExtract(slot, stack, side) && matches(stack, findStack)) {
+                        count = stack.getCount();
+                        if (count < remaining) {
+                            setItem(slot, ItemStack.EMPTY);
+                            remaining -= count;
+                            continue;
+                        }
+                        if (count == remaining) {
+                            setItem(slot, ItemStack.EMPTY);
+                        } else {
+                            stack.setCount(count - remaining);
+                        }
+                        setChanged();
+                        findStack.setCount(maxAmount);
+                        return onExtract(findStack);
+                    }
+                }
+                setChanged();
+                findStack.setCount(maxAmount - remaining);
+                return onExtract(findStack);
+            }
+        }
+        return ItemStack.EMPTY;
+    }
+
+    @Override
+    default ItemStack extractMax(Predicate<ItemStack> predicate) {
+        return extractMax(predicate, null);
+    }
+
+    @Override
+    default ItemStack extractMax(Predicate<ItemStack> predicate, Direction side) {
+        int[] slots = create$getAvailableSlots(side);
+        int size = slots.length;
+        for (int i = 0; i < size; i++) {
+            int slot = slots[i];
+            ItemStack findStack = getItem(slot);
+            if (findStack.isEmpty()) {
+                continue;
+            }
+            if (predicate.test(findStack) && create$canExtract(slot, findStack, side)) {
+                int count = findStack.getCount();
+                int maxAmount = findStack.getMaxStackSize();
                 setItem(slot, ItemStack.EMPTY);
                 if (count == maxAmount) {
                     setChanged();
