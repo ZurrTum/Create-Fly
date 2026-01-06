@@ -3,13 +3,13 @@
   "id": "create",
   "version": "${version}",
   "name": "Create Fly",
-  "description": "Creators-of-Create/Create port to fabric",
+  "description": "Creators-of-Create/Create porting to fabric",
   "authors": [
     "ZurrTum"
   ],
   "contact": {
-    "homepage": "https://github.com/ZurrTum/Create",
-    "sources": "https://github.com/ZurrTum/Create"
+    "homepage": "https://github.com/ZurrTum/Create-Fly",
+    "sources": "https://github.com/ZurrTum/Create-Fly"
   },
   "license": "CC0-1.0",
   "icon": "assets/pack.png",

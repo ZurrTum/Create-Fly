@@ -1,4 +1,4 @@
-## Higher version Create mod port to Fabric
+## Higher version Create mod porting to Fabric
 
 ### Download the latest version of Create-Fly:
 
@@ -8,7 +8,7 @@ https://www.curseforge.com/minecraft/mc-mods/create-fly/files/all?page=1&pageSiz
 
 - This is a Fabric fork of [Create](https://github.com/Creators-of-Create/Create).
   The official [Create Fabric](https://github.com/Fabricators-of-Create/Create) fork has not released a version 1.21.1
-  or higher. it has been 8 months since then.
+  or higher. it has been 10 months since then.
 - Minecraft uses a new rendering method in higher versions: item models use a dedicated rendering folder, rendering uses
   a rendering pipeline, Entity, BlockEntity and GUI rendering is changed to extract the state first and then render,
   which requires
