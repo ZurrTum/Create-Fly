@@ -8,22 +8,15 @@ import org.spongepowered.asm.mixin.Unique;
 @Mixin(BlockElement.class)
 public class BlockElementMixin implements NormalsModelElement {
     @Unique
-    private NormalsType normals;
+    private boolean normals;
 
     @Override
-    public NormalsType create$getNormalsType() {
+    public boolean create$calcNormals() {
         return normals;
     }
 
     @Override
     public void create$markNormals() {
-        normals = NormalsType.CALC;
-    }
-
-    @Override
-    public void create$markFacingNormals() {
-        if (normals == null) {
-            normals = NormalsType.FACING;
-        }
+        normals = true;
     }
 }

@@ -5,7 +5,6 @@ import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
 import com.zurrtum.create.client.model.NormalsBakedQuad;
 import com.zurrtum.create.client.model.NormalsModelElement;
-import com.zurrtum.create.client.model.NormalsModelElement.NormalsType;
 import net.minecraft.client.renderer.block.model.*;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.model.ModelBaker;
@@ -35,21 +34,15 @@ public class SimpleUnbakedGeometryMixin {
         @Local BlockElement element
     ) {
         BakedQuad quad = original.call(partCache, from, to, face, icon, facing, modelState, elementRotation, shade, lightEmission);
-        NormalsType type = NormalsModelElement.getNormalsType(element);
-        if (type != null) {
-            Vector3fc vector;
-            if (type == NormalsType.CALC) {
-                Vector3f v1 = new Vector3f(quad.position3());
-                Vector3fc t1 = quad.position1();
-                Vector3f v2 = new Vector3f(quad.position2());
-                Vector3fc t2 = quad.position0();
-                v1.sub(t1);
-                v2.sub(t2);
-                v2.cross(v1);
-                vector = v2.normalize();
-            } else {
-                vector = quad.direction().getUnitVec3f();
-            }
+        if (NormalsModelElement.calcNormals(element)) {
+            Vector3f v1 = new Vector3f(quad.position3());
+            Vector3fc t1 = quad.position1();
+            Vector3f v2 = new Vector3f(quad.position2());
+            Vector3fc t2 = quad.position0();
+            v1.sub(t1);
+            v2.sub(t2);
+            v2.cross(v1);
+            Vector3fc vector = v2.normalize();
 
             int x = ((byte) Math.round(vector.x() * 127)) & 0xFF;
             int y = ((byte) Math.round(vector.y() * 127)) & 0xFF;

@@ -5,39 +5,34 @@
 
 package com.zurrtum.create.client.model;
 
-import com.google.common.collect.Maps;
 import com.google.gson.*;
-import com.mojang.datafixers.util.Pair;
+import com.google.gson.internal.bind.JsonTreeReader;
+import com.google.gson.internal.bind.TreeTypeAdapter;
+import com.google.gson.reflect.TypeToken;
 import com.mojang.math.Transformation;
-import com.zurrtum.create.Create;
 import com.zurrtum.create.client.model.obj.ObjLoader;
-import net.minecraft.client.renderer.block.model.*;
+import net.fabricmc.loader.api.FabricLoader;
+import net.minecraft.client.renderer.block.model.BlockModel;
 import net.minecraft.client.resources.model.UnbakedModel;
-import net.minecraft.resources.Identifier;
-import net.minecraft.util.GsonHelper;
 
 import java.lang.reflect.Type;
-import java.util.Map;
-import java.util.stream.Stream;
 
 public class UnbakedModelParser {
-    public static final Gson GSON = new GsonBuilder().registerTypeHierarchyAdapter(UnbakedModel.class, new Deserializer())
-        .registerTypeAdapter(BlockModel.class, new BlockModel.Deserializer()).registerTypeAdapter(BlockElement.class, new BlockElement.Deserializer())
-        .registerTypeAdapter(BlockElementFace.class, new BlockElementFace.Deserializer())
-        .registerTypeAdapter(ItemTransform.class, new ItemTransform.Deserializer())
-        .registerTypeAdapter(ItemTransforms.class, new ItemTransforms.Deserializer())
-        .registerTypeAdapter(Transformation.class, new TransformationHelper.Deserializer()).create();
-    private static final Map<Identifier, UnbakedModel> CACHE = Maps.newConcurrentMap();
-
-    public static void cache(Identifier id, UnbakedModel model) {
-        CACHE.put(id, model);
+    public static Gson wrap(Gson gson) {
+        return new GsonBuilder().registerTypeAdapterFactory(new Deserializer(gson))
+            .registerTypeAdapter(Transformation.class, new TransformationHelper.Deserializer()).create();
     }
 
-    public static Stream<Pair<Identifier, UnbakedModel>> getCaches() {
-        return CACHE.entrySet().stream().map(entry -> Pair.of(entry.getKey(), entry.getValue()));
-    }
+    public static class Deserializer implements JsonDeserializer<UnbakedModel>, TypeAdapterFactory {
+        private static final TypeToken<? extends UnbakedModel> NEXT_TYPE = FabricLoader.getInstance()
+            .isModLoaded("fabric-model-loading-api-v1") ? TypeToken.get(UnbakedModel.class) : TypeToken.get(BlockModel.class);
+        private final Gson gson;
+        private TypeAdapter<?> cached;
 
-    public static final class Deserializer implements JsonDeserializer<UnbakedModel> {
+        public Deserializer(Gson gson) {
+            this.gson = gson;
+        }
+
         @Override
         public UnbakedModel deserialize(
             JsonElement jsonElement,
@@ -45,16 +40,25 @@ public class UnbakedModelParser {
             JsonDeserializationContext jsonDeserializationContext
         ) throws JsonParseException {
             JsonObject jsonObject = jsonElement.getAsJsonObject();
-
-            if (jsonObject.has("loader")) {
-                String loader = GsonHelper.getAsString(jsonObject, "loader");
-                if (loader.equals("neoforge:obj")) {
-                    return ObjLoader.INSTANCE.read(jsonObject, jsonDeserializationContext);
-                }
-                Create.LOGGER.warn("Unsupported loader: " + loader);
+            JsonElement element = jsonObject.get("loader");
+            if (element != null && element.isJsonPrimitive() && element.getAsString().equals("neoforge:obj")) {
+                return ObjLoader.INSTANCE.read(jsonObject, jsonDeserializationContext);
             }
+            return gson.fromJson(new JsonTreeReader(jsonObject), NEXT_TYPE);
+        }
 
-            return jsonDeserializationContext.deserialize(jsonObject, BlockModel.class);
+        @Override
+        @SuppressWarnings("unchecked")
+        public <T> TypeAdapter<T> create(Gson proxy, TypeToken<T> type) {
+            if (type.getRawType() == UnbakedModel.class) {
+                if (cached != null) {
+                    return (TypeAdapter<T>) cached;
+                }
+                TreeTypeAdapter<T> adapter = new TreeTypeAdapter<>(null, (JsonDeserializer<T>) this, proxy, type, this);
+                cached = adapter;
+                return adapter;
+            }
+            return gson.getAdapter(type);
         }
     }
 }
