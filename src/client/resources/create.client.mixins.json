@@ -17,6 +17,7 @@
     "BlockModelDeserializerMixin",
     "BlockModelMixin",
     "BlockRenderDispatcherMixin",
+    "BlockStateModelLoaderMixin",
     "CameraMixin",
     "ClientChunkCacheMixin",
     "ClientLevelMixin",

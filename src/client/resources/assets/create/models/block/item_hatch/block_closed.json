@@ -35,6 +35,7 @@
 		{
 			"from": [2, 0, 2],
 			"to": [14, 10.6, 12.6],
+			"neoforge_data": {"calculate_normals": true},
 			"rotation": {"angle": -45, "axis": "x", "origin": [8, 0, 2]},
 			"faces": {
 				"east": {"uv": [9.5, 15, 15, 9.5], "rotation": 90, "texture": "#0"},

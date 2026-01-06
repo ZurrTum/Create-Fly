@@ -15,12 +15,10 @@ import java.util.Map;
 import java.util.function.BiFunction;
 
 public class AllModels {
-    public static final Map<BlockState, BiFunction<BlockState, UnbakedRoot, UnbakedRoot>> ALL = new HashMap<>();
+    public static final Map<Block, BiFunction<BlockState, UnbakedRoot, UnbakedRoot>> ALL = new HashMap<>();
 
     public static void register(Block block, BiFunction<BlockState, UnbakedRoot, UnbakedRoot> resolver) {
-        block.getStateDefinition().getPossibleStates().forEach(state -> {
-            ALL.put(state, resolver);
-        });
+        ALL.put(block, resolver);
     }
 
     public static <T extends ItemModel.Unbaked> void register(Identifier id, MapCodec<T> codec) {
