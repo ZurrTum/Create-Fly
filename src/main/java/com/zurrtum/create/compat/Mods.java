@@ -13,7 +13,8 @@ import java.util.Locale;
  */
 public enum Mods {
     COMPUTERCRAFT,
-    TRINKETS;
+    TRINKETS,
+    PACKETFIXER;
 
     private final String id;
     private final boolean loaded;
