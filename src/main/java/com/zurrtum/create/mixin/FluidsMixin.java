@@ -11,6 +11,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public class FluidsMixin {
     @Inject(method = "<clinit>", at = @At(value = "INVOKE", target = "net/minecraft/core/DefaultedRegistry.iterator()Ljava/util/Iterator;"))
     private static void register(CallbackInfo ci) {
-        CreateRegisterPlugin.run("create_fluid");
+        CreateRegisterPlugin.registerFluid();
     }
 }

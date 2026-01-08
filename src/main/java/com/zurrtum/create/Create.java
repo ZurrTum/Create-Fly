@@ -120,7 +120,6 @@ public class Create implements ModInitializer {
         AllPotatoProjectileRenderModes.register();
         AllPotatoProjectileBlockHitActions.register();
         AllPotatoProjectileEntityHitActions.register();
-        AllDynamicRegistries.register();
         AllItemAttributeTypes.register();
         AllPackagePortTargetTypes.register();
         AllUnpackingHandlers.register();
@@ -132,7 +131,6 @@ public class Create implements ModInitializer {
         AllPlacedFeatures.register();
         AllPlacementModifiers.register();
         AllMountedDispenseItemBehaviors.register();
-        AllEntityAttributes.register();
         AllBlockSpoutingBehaviours.register();
         CompatMod.register();
     }

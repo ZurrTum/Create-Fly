@@ -8,6 +8,7 @@ import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.DamageType;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.Level;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.IdentityHashMap;
 import java.util.Map;
@@ -33,18 +34,21 @@ public class AllDamageSources {
     public DamageSource saw;
 
     public AllDamageSources(RegistryAccess registryManager) {
-        registry = registryManager.lookupOrThrow(Registries.DAMAGE_TYPE);
-        crush = create(AllDamageTypes.CRUSH);
-        cuckoo_surprise = create(AllDamageTypes.CUCKOO_SURPRISE);
-        fan_fire = create(AllDamageTypes.FAN_FIRE);
-        fan_lava = create(AllDamageTypes.FAN_LAVA);
-        drill = create(AllDamageTypes.DRILL);
-        roller = create(AllDamageTypes.ROLLER);
-        saw = create(AllDamageTypes.SAW);
+        registryManager.lookup(Registries.DAMAGE_TYPE).ifPresent(value -> {
+            registry = value;
+            crush = create(AllDamageTypes.CRUSH);
+            cuckoo_surprise = create(AllDamageTypes.CUCKOO_SURPRISE);
+            fan_fire = create(AllDamageTypes.FAN_FIRE);
+            fan_lava = create(AllDamageTypes.FAN_LAVA);
+            drill = create(AllDamageTypes.DRILL);
+            roller = create(AllDamageTypes.ROLLER);
+            saw = create(AllDamageTypes.SAW);
+        });
     }
 
+    @Nullable
     public DamageSource create(ResourceKey<DamageType> type) {
-        return new DamageSource(registry.getOrThrow(type));
+        return registry.get(type).map(DamageSource::new).orElse(null);
     }
 
     public DamageSource potatoCannon(Entity causingEntity, Entity directEntity) {
@@ -56,9 +60,6 @@ public class AllDamageSources {
     }
 
     public static void register(RegistryAccess registryManager) {
-        try {
-            ALL.put(registryManager, new AllDamageSources(registryManager));
-        } catch (IllegalStateException ignored) {
-        }
+        ALL.put(registryManager, new AllDamageSources(registryManager));
     }
 }
