@@ -51,8 +51,8 @@ public abstract class ClientPackSourceMixin {
                     String directory = "holdmyitems";
                     PackLocationInfo info = createInfo(id, "Create & Hold My Items", MOD_ID, directory, version);
                     BuiltInMetadata meta = createMeta(Component.literal("Hold My Items compatible addon"));
-                    PackSelectionConfig position = new PackSelectionConfig(true, Pack.Position.BOTTOM, false);
-                    return createPacket(rootPaths, directory, info, meta, position, "minecraft");
+                    PackSelectionConfig position = new PackSelectionConfig(true, Pack.Position.TOP, false);
+                    return createPacket(rootPaths, directory, info, meta, position, "minecraft", MOD_ID);
                 }
             );
         }
