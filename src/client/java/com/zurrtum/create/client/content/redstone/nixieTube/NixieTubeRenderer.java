@@ -11,7 +11,6 @@ import com.zurrtum.create.client.AllPartialModels;
 import com.zurrtum.create.client.catnip.animation.AnimationTickHolder;
 import com.zurrtum.create.client.catnip.render.CachedBuffers;
 import com.zurrtum.create.client.catnip.render.SuperByteBuffer;
-import com.zurrtum.create.client.flywheel.lib.util.ShadersModHelper;
 import com.zurrtum.create.client.foundation.render.CreateRenderTypes;
 import com.zurrtum.create.client.foundation.utility.DyeHelper;
 import com.zurrtum.create.client.ponder.api.level.PonderLevel;
@@ -19,6 +18,7 @@ import com.zurrtum.create.content.redstone.nixieTube.DoubleFaceAttachedBlock.Dou
 import com.zurrtum.create.content.redstone.nixieTube.NixieTubeBlock;
 import com.zurrtum.create.content.redstone.nixieTube.NixieTubeBlockEntity;
 import com.zurrtum.create.content.trains.signal.SignalBlockEntity.SignalState;
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.Font.DisplayMode;
 import net.minecraft.client.gui.font.TextRenderable;
@@ -396,6 +396,7 @@ public class NixieTubeRenderer implements BlockEntityRenderer<NixieTubeBlockEnti
     }
 
     public static class SignalDrawableState {
+        private static final boolean IRIS = FabricLoader.getInstance().isModLoaded("iris");
         public RenderType layer;
         public RenderType layer2;
         public SuperByteBuffer signal;
@@ -412,9 +413,9 @@ public class NixieTubeRenderer implements BlockEntityRenderer<NixieTubeBlockEnti
         public boolean additive;
 
         public void render(PoseStack matrices, SubmitNodeCollector queue) {
-            if (ShadersModHelper.isShaderPackInUse()) {
+            if (IRIS) {
                 if (additive) {
-                    queue.order(1).submitCustomGeometry(matrices, layer, (e, v) -> renderAdditive(e, v, 153));
+                    queue.submitCustomGeometry(matrices, layer, (e, v) -> renderAdditive(e, v, 153));
                     if (cube != null) {
                         queue.order(1).submitCustomGeometry(matrices, cubeLayer, this::renderCube);
                     }
