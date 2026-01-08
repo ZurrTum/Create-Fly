@@ -1043,6 +1043,7 @@ public class AllHandle {
     }
 
     public static void onInstantSchematic(ServerGamePacketListenerImpl listener, InstantSchematicPacket packet) {
+        PacketUtils.ensureRunningOnSameThread(packet, listener, listener.server.packetProcessor());
         Create.SCHEMATIC_RECEIVER.handleInstantSchematic(listener.player, packet.name(), listener.player.level(), packet.origin(), packet.bounds());
     }
 
