@@ -11,13 +11,13 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-@Mixin(EntityDataSerializers.class)
+@Mixin(value = EntityDataSerializers.class, priority = 999)
 public class EntityDataSerializersMixin {
     @Shadow
     @Final
     private static CrudeIncrementalIntIdentityHashBiMap<EntityDataSerializer<?>> SERIALIZERS;
 
-    @Inject(method = "<clinit>", at = @At(value = "INVOKE", target = "Lnet/minecraft/network/syncher/EntityDataSerializers;registerSerializer(Lnet/minecraft/network/syncher/EntityDataSerializer;)V", ordinal = 0))
+    @Inject(method = "<clinit>", at = @At("TAIL"))
     private static void register(CallbackInfo ci) {
         AllSynchedDatas.HANDLERS.forEach(SERIALIZERS::add);
     }

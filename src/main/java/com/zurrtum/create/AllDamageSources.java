@@ -1,8 +1,5 @@
 package com.zurrtum.create;
 
-import java.util.IdentityHashMap;
-import java.util.Map;
-
 import net.minecraft.core.Registry;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.registries.Registries;
@@ -11,6 +8,9 @@ import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.DamageType;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.Level;
+
+import java.util.IdentityHashMap;
+import java.util.Map;
 
 public class AllDamageSources {
     private static final Map<RegistryAccess, AllDamageSources> ALL = new IdentityHashMap<>();
@@ -56,6 +56,9 @@ public class AllDamageSources {
     }
 
     public static void register(RegistryAccess registryManager) {
-        ALL.put(registryManager, new AllDamageSources(registryManager));
+        try {
+            ALL.put(registryManager, new AllDamageSources(registryManager));
+        } catch (IllegalStateException ignored) {
+        }
     }
 }
