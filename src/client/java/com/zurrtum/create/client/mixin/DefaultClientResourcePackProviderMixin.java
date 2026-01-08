@@ -50,8 +50,8 @@ public abstract class DefaultClientResourcePackProviderMixin {
                     String directory = "holdmyitems";
                     ResourcePackInfo info = createInfo(id, "Create & Hold My Items", MOD_ID, directory, version);
                     ResourceMetadataMap meta = createMeta(Text.literal("Hold My Items compatible addon"));
-                    ResourcePackPosition position = new ResourcePackPosition(true, ResourcePackProfile.InsertionPosition.BOTTOM, false);
-                    return createPacket(rootPaths, directory, info, meta, position, "minecraft");
+                    ResourcePackPosition position = new ResourcePackPosition(true, ResourcePackProfile.InsertionPosition.TOP, false);
+                    return createPacket(rootPaths, directory, info, meta, position, "minecraft", MOD_ID);
                 }
             );
         }

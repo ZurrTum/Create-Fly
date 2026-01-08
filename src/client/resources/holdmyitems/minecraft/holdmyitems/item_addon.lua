@@ -188,6 +188,13 @@ elseif name == "create:linked_controller" then
     M:rotateZ(mat, 0 * l)
     M:rotateX(mat, -76)
     M:rotateY(mat, 14 * l)
+elseif name == "create:honey_bucket" or name == "create:chocolate_bucket" then
+    M:moveY(mat, 0.025)
+    M:moveX(mat, -0 * l)
+    M:moveZ(mat, -0.1)
+    M:rotateY(mat, 180)
+    M:rotateX(mat, -82.5)
+    M:rotateZ(mat, -20 * l)
 elseif I:isBlock(context.item) then
     if name == "create:track" then
         applySwing(mat)

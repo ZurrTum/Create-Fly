@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:item/water_bucket_3d",
+  "textures": {
+    "1": "create:fluid/honey_still"
+  }
+}
