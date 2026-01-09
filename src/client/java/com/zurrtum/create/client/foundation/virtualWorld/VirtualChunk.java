@@ -53,7 +53,6 @@ public class VirtualChunk extends LevelChunk {
 
         this.needsLight = true;
 
-        //TODO
         //		Mods.STARLIGHT.executeIfInstalled(() -> () -> {
         //			((ExtendedChunk) this).setBlockNibbles(StarLightEngine.getFilledEmptyLight(this));
         //			((ExtendedChunk) this).setSkyNibbles(StarLightEngine.getFilledEmptyLight(this));
