@@ -2,6 +2,7 @@ package com.zurrtum.create.client.flywheel.lib.material;
 
 import com.zurrtum.create.client.flywheel.api.material.*;
 import net.minecraft.client.renderer.entity.ItemRenderer;
+import net.minecraft.client.renderer.texture.TextureAtlas;
 
 public final class Materials {
     public static final Material SOLID_BLOCK = SimpleMaterial.builder().build();
@@ -33,8 +34,12 @@ public final class Materials {
 
     public static final Material GLINT_ENTITY = SimpleMaterial.builderOf(GLINT).texture(ItemRenderer.ENCHANTED_GLINT_ARMOR).build();
 
-    public static final Material TRANSLUCENT_ENTITY = SimpleMaterial.builder().transparency(Transparency.TRANSLUCENT).cutout(CutoutShaders.ONE_TENTH)
-        .mipmap(false).build();
+    public static final Material TRANSLUCENT_ITEM_ENTITY_BLOCK = SimpleMaterial.builder().transparency(Transparency.TRANSLUCENT)
+        .cutout(CutoutShaders.ONE_TENTH).mipmap(false).build();
+
+    @SuppressWarnings("deprecation")
+    public static final Material TRANSLUCENT_ITEM_ENTITY_ITEM = SimpleMaterial.builder().texture(TextureAtlas.LOCATION_ITEMS)
+        .transparency(Transparency.TRANSLUCENT).cutout(CutoutShaders.ONE_TENTH).mipmap(false).build();
 
     private Materials() {
     }

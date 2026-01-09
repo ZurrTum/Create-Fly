@@ -3,17 +3,16 @@ package com.zurrtum.create.client.flywheel.lib.model.baked;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.SheetedDecalTextureGenerator;
 import com.mojang.blaze3d.vertex.VertexConsumer;
-
-import java.util.List;
-import java.util.Map;
-
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.SubmitNodeCollection;
 import net.minecraft.client.renderer.SubmitNodeStorage;
 import net.minecraft.client.renderer.entity.ItemRenderer;
 import net.minecraft.client.renderer.feature.ModelPartFeatureRenderer;
+import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.resources.model.ModelBakery;
+
+import java.util.List;
+import java.util.Map;
 
 public class ModelPartCommandRendererHelper {
     public static void render(
@@ -26,6 +25,7 @@ public class ModelPartCommandRendererHelper {
         ModelPartFeatureRenderer.Storage commands = queue.getModelPartSubmits();
 
         for (Map.Entry<RenderType, List<SubmitNodeStorage.ModelPartSubmit>> entry : commands.modelPartSubmits.entrySet()) {
+            matrices.pushPose();
             RenderType renderLayer = entry.getKey();
             List<SubmitNodeStorage.ModelPartSubmit> list = entry.getValue();
             VertexConsumer vertexConsumer = vertexConsumers.getBuffer(renderLayer);
@@ -88,6 +88,7 @@ public class ModelPartCommandRendererHelper {
                     );
                 }
             }
+            matrices.popPose();
         }
     }
 }
