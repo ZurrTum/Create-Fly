@@ -63,8 +63,12 @@ public final class ModelUtil {
             return Materials.SOLID_BLOCK;
         }
 
+        if (renderType == Sheets.translucentBlockItemSheet()) {
+            return Materials.TRANSLUCENT_ITEM_ENTITY_BLOCK;
+        }
+
         if (renderType == Sheets.translucentItemSheet()) {
-            return Materials.TRANSLUCENT_ENTITY;
+            return Materials.TRANSLUCENT_ITEM_ENTITY_ITEM;
         }
 
         if (renderType == RenderTypes.glint()) {

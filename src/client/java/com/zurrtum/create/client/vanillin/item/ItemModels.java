@@ -13,12 +13,7 @@ import com.zurrtum.create.client.flywheel.lib.model.baked.MeshHelper;
 import com.zurrtum.create.client.flywheel.lib.util.RendererReloadCache;
 import com.zurrtum.create.client.vanillin.Vanillin;
 import it.unimi.dsi.fastutil.Hash;
-import it.unimi.dsi.fastutil.objects.Object2BooleanLinkedOpenCustomHashMap;
-
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-
+import it.unimi.dsi.fastutil.objects.Object2BooleanOpenCustomHashMap;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.item.ItemModel;
@@ -32,6 +27,10 @@ import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+
 public class ItemModels {
     public static final TagKey<Item> NO_INSTANCING = TagKey.create(Registries.ITEM, Vanillin.rl("no_instancing"));
     private static final Model EMPTY_MODEL = new SimpleModel(List.of());
@@ -40,30 +39,22 @@ public class ItemModels {
         key.stack(),
         key.displayContext()
     ));
-    private static final Map<ItemStack, Boolean> SUPPORT_CACHE = new Object2BooleanLinkedOpenCustomHashMap<>(new Hash.Strategy<>() {
-        public int hashCode(ItemStack itemStack) {
-            return ItemStack.hashItemAndComponents(itemStack);
-        }
-
-        public boolean equals(ItemStack itemStack, ItemStack itemStack2) {
-            return itemStack == itemStack2 || itemStack != null && itemStack2 != null && ItemStack.isSameItemSameComponents(itemStack, itemStack2);
-        }
-    });
-    private static final ThreadLocal<ItemStackRenderState> STATE = ThreadLocal.withInitial(ItemStackRenderState::new);
+    private static final ThreadLocal<ThreadLocalObjects> THREAD_LOCAL_OBJECTS = ThreadLocal.withInitial(ThreadLocalObjects::new);
 
     public static boolean isSupported(ItemStack stack, ItemDisplayContext context) {
         if (stack.is(NO_INSTANCING)) {
             return false;
         }
-        Boolean cache = SUPPORT_CACHE.get(stack);
+        ThreadLocalObjects objects = THREAD_LOCAL_OBJECTS.get();
+        Boolean cache = objects.cache.get(stack);
         if (cache != null) {
             return cache;
         }
         Minecraft mc = Minecraft.getInstance();
-        ItemStackRenderState state = STATE.get();
+        ItemStackRenderState state = objects.state;
         mc.getItemModelResolver().updateForTopItem(state, stack, context, mc.level, null, 0);
         boolean support = !state.isAnimated();
-        SUPPORT_CACHE.put(stack.copy(), support);
+        objects.cache.put(stack.copy(), support);
         return support;
     }
 
@@ -85,15 +76,15 @@ public class ItemModels {
             itemStack, world, displayContext, (renderType, shaded, data) -> {
                 var material = ModelUtil.getItemMaterial(renderType);
                 if (material == null) {
-                    material = Materials.TRANSLUCENT_ENTITY;
+                    material = Materials.TRANSLUCENT_ITEM_ENTITY_ITEM;
                 }
                 if (itemStack.getItem() instanceof BlockItem && material.transparency() == Transparency.TRANSLUCENT) {
                     material = SimpleMaterial.builderOf(material).transparency(Transparency.ORDER_INDEPENDENT).build();
                 }
                 Mesh mesh = MeshHelper.blockVerticesToMesh(data, "source=ItemModels,ItemStack=" + itemStack + ",renderType=" + renderType);
                 builder.add(renderType, new Model.ConfiguredMesh(material, mesh));
-            }, (renderType, material, mesh) -> {
-                if (itemStack.getItem() instanceof BlockItem && material.transparency() == Transparency.TRANSLUCENT) {
+            }, (renderType, material, mesh, translucent) -> {
+                if (translucent && itemStack.getItem() instanceof BlockItem && material.transparency() == Transparency.TRANSLUCENT) {
                     material = SimpleMaterial.builderOf(material).transparency(Transparency.ORDER_INDEPENDENT).build();
                 }
                 builder.add(renderType, new Model.ConfiguredMesh(material, mesh));
@@ -116,5 +107,22 @@ public class ItemModels {
             boolean stackEqual = stack == otherStack || ItemStack.isSameItemSameComponents(stack, otherStack);
             return world == otherWorld && stackEqual && displayContext == otherDisplayContext;
         }
+    }
+
+    private static class ThreadLocalObjects {
+        private static final Hash.Strategy<ItemStack> STACK_STRATEGY = new Hash.Strategy<>() {
+            public int hashCode(ItemStack itemStack) {
+                return ItemStack.hashItemAndComponents(itemStack);
+            }
+
+            public boolean equals(ItemStack itemStack, ItemStack itemStack2) {
+                return itemStack == itemStack2 || itemStack != null && itemStack2 != null && ItemStack.isSameItemSameComponents(
+                    itemStack,
+                    itemStack2
+                );
+            }
+        };
+        public final ItemStackRenderState state = new ItemStackRenderState();
+        public final Map<ItemStack, Boolean> cache = new Object2BooleanOpenCustomHashMap<>(STACK_STRATEGY);
     }
 }
