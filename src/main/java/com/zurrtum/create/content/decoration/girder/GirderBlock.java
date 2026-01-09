@@ -317,9 +317,8 @@ public class GirderBlock extends Block implements SimpleWaterloggedBlock, IWrenc
             return true;
         if (isFacingBracket(world, pos, side))
             return true;
-        //TODO
-        //        if (blockState.getBlock() instanceof PlacardBlock && PlacardBlock.connectedDirection(blockState) == side)
-        //            return true;
+        if (blockState.getBlock() instanceof PlacardBlock && PlacardBlock.connectedDirection(blockState) == side)
+            return true;
         VoxelShape shape = blockState.getShape(world, relative);
         if (shape.isEmpty())
             return false;

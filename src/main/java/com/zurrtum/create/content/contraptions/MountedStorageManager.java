@@ -15,18 +15,10 @@ import com.zurrtum.create.api.contraption.storage.fluid.MountedFluidStorageWrapp
 import com.zurrtum.create.api.contraption.storage.item.MountedItemStorage;
 import com.zurrtum.create.api.contraption.storage.item.MountedItemStorageType;
 import com.zurrtum.create.api.contraption.storage.item.MountedItemStorageWrapper;
-import com.zurrtum.create.catnip.nbt.NBTHelper;
 import com.zurrtum.create.foundation.codec.CreateCodecs;
 import com.zurrtum.create.infrastructure.items.CombinedInvWrapper;
 import com.zurrtum.create.infrastructure.packet.s2c.MountedStorageSyncPacket;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.*;
-import java.util.function.Predicate;
-
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.HolderLookup;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.server.level.ServerChunkCache;
@@ -39,6 +31,10 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate.StructureBlockInfo;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.*;
+import java.util.function.Predicate;
 
 public class MountedStorageManager {
     // builders used during assembly, null afterward
@@ -438,46 +434,6 @@ public class MountedStorageManager {
         } else {
             return false;
         }
-    }
-
-    private void readLegacy(HolderLookup.Provider registries, CompoundTag nbt) {
-        NBTHelper.iterateCompoundList(
-            nbt.getListOrEmpty("Storage"), tag -> {
-                BlockPos pos = NBTHelper.readBlockPos(tag, "Pos");
-                CompoundTag data = tag.getCompoundOrEmpty("Data");
-
-                //TODO
-                //                if (data.contains("Toolbox")) {
-                //                    this.addStorage(ToolboxMountedStorage.fromLegacy(registries, data), pos);
-                //                } else if (data.contains("NoFuel")) {
-                //                    this.addStorage(ItemVaultMountedStorage.fromLegacy(registries, data), pos);
-                //                } else if (data.contains("Bottomless")) {
-                //                    ItemStack supplied = data.getCompound("ProvidedStack").flatMap(c -> ItemStack.fromNbt(registries, c)).orElse(ItemStack.EMPTY);
-                //                    this.addStorage(new CreativeCrateMountedStorage(supplied), pos);
-                //                } else if (data.contains("Synced")) {
-                //                    this.addStorage(DepotMountedStorage.fromLegacy(registries, data), pos);
-                //                } else {
-                //                    // we can create a fallback storage safely, it will be validated before unmounting
-                //                    //                    ItemStackHandler handler = new ItemStackHandler();
-                //                    //                    handler.deserializeNBT(registries, data);
-                //                    this.addStorage(new FallbackMountedStorage(new Object()), pos);
-                //                }
-            }
-        );
-
-        NBTHelper.iterateCompoundList(
-            nbt.getListOrEmpty("FluidStorage"), tag -> {
-                BlockPos pos = NBTHelper.readBlockPos(tag, "Pos");
-                CompoundTag data = tag.getCompoundOrEmpty("Data");
-
-                //TODO
-                //                if (data.contains("Bottomless")) {
-                //                    this.addStorage(CreativeFluidTankMountedStorage.fromLegacy(registries, data), pos);
-                //                } else {
-                //                    this.addStorage(FluidTankMountedStorage.fromLegacy(registries, data), pos);
-                //                }
-            }
-        );
     }
 
     private void addStorage(MountedItemStorage storage, BlockPos pos) {

@@ -2,12 +2,8 @@ package com.zurrtum.create.foundation.placement;
 
 import com.zurrtum.create.catnip.placement.IPlacementHelper;
 import com.zurrtum.create.catnip.placement.PlacementOffset;
+import com.zurrtum.create.content.equipment.extendoGrip.ExtendoGripItem;
 import com.zurrtum.create.infrastructure.config.AllConfigs;
-
-import java.util.List;
-import java.util.function.Function;
-import java.util.function.Predicate;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
@@ -17,6 +13,10 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.Property;
 import net.minecraft.world.phys.BlockHitResult;
+
+import java.util.List;
+import java.util.function.Function;
+import java.util.function.Predicate;
 
 public abstract class PoleHelper<T extends Comparable<T>> implements IPlacementHelper {
 
@@ -61,9 +61,8 @@ public abstract class PoleHelper<T extends Comparable<T>> implements IPlacementH
             int range = AllConfigs.server().equipment.placementAssistRange.get();
             if (player != null) {
                 AttributeInstance reach = player.getAttribute(Attributes.BLOCK_INTERACTION_RANGE);
-                //TODO
-                //                if (reach != null && reach.hasModifier(ExtendoGripItem.singleRangeAttributeModifier.id()))
-                //                    range += 4;
+                if (reach != null && reach.hasModifier(ExtendoGripItem.singleRangeAttributeModifier.id()))
+                    range += 4;
             }
             int poles = attachedPoles(world, pos, dir);
             if (poles >= range)
