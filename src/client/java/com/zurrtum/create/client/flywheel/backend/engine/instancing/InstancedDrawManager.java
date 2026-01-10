@@ -16,13 +16,12 @@ import com.zurrtum.create.client.flywheel.backend.gl.TextureBuffer;
 import com.zurrtum.create.client.flywheel.backend.gl.array.GlVertexArray;
 import com.zurrtum.create.client.flywheel.backend.gl.shader.GlProgram;
 import com.zurrtum.create.client.flywheel.lib.material.SimpleMaterial;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.resources.model.ModelBakery;
 
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.resources.model.ModelBakery;
 
 public class InstancedDrawManager extends DrawManager<InstancedInstancer<?>> {
     private static final Comparator<InstancedDraw> DRAW_COMPARATOR = Comparator.comparingInt(InstancedDraw::bias)
@@ -291,6 +290,11 @@ public class InstancedDrawManager extends DrawManager<InstancedInstancer<?>> {
     public void triggerFallback() {
         InstancingPrograms.kill();
         Minecraft.getInstance().levelRenderer.allChanged();
+    }
+
+    @Override
+    public MeshPool meshPool() {
+        return meshPool;
     }
 
     public static void uploadMaterialUniform(GlProgram program, Material material) {

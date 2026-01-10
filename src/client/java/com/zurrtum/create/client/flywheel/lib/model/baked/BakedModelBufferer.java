@@ -2,18 +2,13 @@ package com.zurrtum.create.client.flywheel.lib.model.baked;
 
 import com.google.common.base.Supplier;
 import com.google.common.base.Suppliers;
-import com.mojang.blaze3d.vertex.MeshData;
+import com.mojang.blaze3d.vertex.BufferBuilder;
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.zurrtum.create.client.flywheel.lib.model.SimpleModel;
 import com.zurrtum.create.client.infrastructure.model.WrapperBlockStateModel;
 import com.zurrtum.create.client.model.LayerBakedModel;
+import com.zurrtum.create.foundation.block.LightControlBlock;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.ItemBlockRenderTypes;
 import net.minecraft.client.renderer.block.BlockRenderDispatcher;
@@ -29,62 +24,63 @@ import net.minecraft.world.level.BlockAndTintGetter;
 import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.FluidState;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.Iterator;
+import java.util.List;
 
 final class BakedModelBufferer {
-    static final ChunkSectionLayer[] CHUNK_LAYERS = ChunkSectionLayer.values();
-    static final Map<ChunkSectionLayer, Integer> CHUNK_LAYERS_INDEX = new HashMap<>();
-    static final int CHUNK_LAYER_AMOUNT = CHUNK_LAYERS.length;
-
-    static {
-        for (int layerIndex = 0; layerIndex < CHUNK_LAYER_AMOUNT; layerIndex++) {
-            CHUNK_LAYERS_INDEX.put(CHUNK_LAYERS[layerIndex], layerIndex);
-        }
-    }
-
     private static final ThreadLocal<ThreadLocalObjects> THREAD_LOCAL_OBJECTS = ThreadLocal.withInitial(ThreadLocalObjects::new);
 
     private BakedModelBufferer() {
     }
 
-    public static void bufferModel(
+    private static boolean isDark(BlockAndTintGetter level, BlockPos pos, BlockState state) {
+        if (state.getBlock() instanceof LightControlBlock block) {
+            return block.getLuminance(level, pos) == 0;
+        }
+        return state.getLightEmission() == 0;
+    }
+
+    public static SimpleModel bufferModel(
         SimpleModelWrapper model,
         BlockPos pos,
         BlockAndTintGetter level,
         BlockState state,
         @Nullable PoseStack poseStack,
-        ResultConsumer resultConsumer
+        BlockMaterialFunction blockMaterialFunction
     ) {
         ThreadLocalObjects objects = THREAD_LOCAL_OBJECTS.get();
         if (poseStack == null) {
             poseStack = objects.identityPoseStack;
         }
-        MeshEmitter[] emitters = objects.emitters;
+        MeshEmitterManager<VanillinMeshEmitter> emitters = objects.emitters;
+        emitters.prepare(blockMaterialFunction);
         ModelBlockRenderer blockRenderer = Minecraft.getInstance().getBlockRenderer().getModelRenderer();
         ChunkSectionLayer renderType = LayerBakedModel.getBlockRenderLayer(model, () -> ItemBlockRenderTypes.getChunkRenderType(state));
-        MeshEmitter emitter = emitters[CHUNK_LAYERS_INDEX.get(renderType)];
-
-        emitter.prepare(resultConsumer);
+        VanillinMeshEmitter emitter = emitters.getEmitter(renderType);
+        emitter.prepareForModelLayer(Minecraft.useAmbientOcclusion() && model.useAmbientOcclusion() && isDark(level, pos, state));
         poseStack.pushPose();
         blockRenderer.tesselateBlock(level, List.of(model), state, pos, poseStack, emitter, false, OverlayTexture.NO_OVERLAY);
         poseStack.popPose();
-
-        emitter.end();
+        return emitters.end();
     }
 
-    public static void bufferModel(
+    public static SimpleModel bufferModel(
         BlockStateModel model,
         BlockPos pos,
         BlockAndTintGetter level,
         BlockState state,
         @Nullable PoseStack poseStack,
-        ResultConsumer resultConsumer
+        BlockMaterialFunction blockMaterialFunction
     ) {
         ThreadLocalObjects objects = THREAD_LOCAL_OBJECTS.get();
         if (poseStack == null) {
             poseStack = objects.identityPoseStack;
         }
         RandomSource random = objects.random;
-        MeshEmitter[] emitters = objects.emitters;
+        MeshEmitterManager<VanillinMeshEmitter> emitters = objects.emitters;
+        emitters.prepare(blockMaterialFunction);
         ModelBlockRenderer blockRenderer = Minecraft.getInstance().getBlockRenderer().getModelRenderer();
         long seed = state.getSeed(pos);
         random.setSeed(seed);
@@ -93,16 +89,15 @@ final class BakedModelBufferer {
 
         Supplier<ChunkSectionLayer> defaultLayer = Suppliers.memoize(() -> ItemBlockRenderTypes.getChunkRenderType(state));
         ChunkSectionLayer firstLayer = LayerBakedModel.getBlockRenderLayer(parts.getFirst(), defaultLayer);
+        boolean aoEnabled = Minecraft.useAmbientOcclusion();
         if (size == 1) {
-            MeshEmitter emitter = emitters[CHUNK_LAYERS_INDEX.get(firstLayer)];
-            emitter.prepare(resultConsumer);
+            VanillinMeshEmitter emitter = emitters.getEmitter(firstLayer);
+            emitter.prepareForModelLayer(aoEnabled && parts.getFirst().useAmbientOcclusion() && isDark(level, pos, state));
             poseStack.pushPose();
             blockRenderer.tesselateBlock(level, parts, state, pos, poseStack, emitter, false, OverlayTexture.NO_OVERLAY);
             poseStack.popPose();
-            emitter.end();
         } else {
             ChunkSectionLayer[] renderLayers = new ChunkSectionLayer[size];
-            renderLayers[0] = firstLayer;
             boolean simple = true;
             for (int i = 1; i < size; i++) {
                 renderLayers[i] = LayerBakedModel.getBlockRenderLayer(parts.get(i), defaultLayer);
@@ -111,57 +106,52 @@ final class BakedModelBufferer {
                 }
             }
             if (simple) {
-                MeshEmitter emitter = emitters[CHUNK_LAYERS_INDEX.get(firstLayer)];
-                emitter.prepare(resultConsumer);
+                VanillinMeshEmitter emitter = emitters.getEmitter(firstLayer);
+                emitter.prepareForModelLayer(aoEnabled && parts.getFirst().useAmbientOcclusion() && isDark(level, pos, state));
                 poseStack.pushPose();
                 blockRenderer.tesselateBlock(level, parts, state, pos, poseStack, emitter, false, OverlayTexture.NO_OVERLAY);
                 poseStack.popPose();
-                emitter.end();
             } else {
-                boolean[] pending = new boolean[size];
-                for (int i = 0; i < size; i++) {
-                    int index = CHUNK_LAYERS_INDEX.get(renderLayers[i]);
-                    MeshEmitter emitter = emitters[index];
-                    if (!pending[index]) {
-                        pending[index] = true;
-                        emitter.prepare(resultConsumer);
-                    }
-                    poseStack.pushPose();
-                    blockRenderer.tesselateBlock(level, List.of(parts.get(i)), state, pos, poseStack, emitter, false, OverlayTexture.NO_OVERLAY);
-                    poseStack.popPose();
+                renderLayers[0] = firstLayer;
+                if (aoEnabled) {
+                    aoEnabled = isDark(level, pos, state);
                 }
                 for (int i = 0; i < size; i++) {
-                    if (pending[i]) {
-                        emitters[i].end();
-                    }
+                    BlockModelPart part = parts.get(i);
+                    VanillinMeshEmitter emitter = emitters.getEmitter(renderLayers[i]);
+                    emitter.prepareForModelLayer(aoEnabled && part.useAmbientOcclusion());
+                    poseStack.pushPose();
+                    blockRenderer.tesselateBlock(level, List.of(part), state, pos, poseStack, emitter, false, OverlayTexture.NO_OVERLAY);
+                    poseStack.popPose();
                 }
             }
         }
+        return emitters.end();
     }
 
-    public static void bufferBlocks(
+    public static SimpleModel bufferBlocks(
         Iterator<BlockPos> posIterator,
         BlockAndTintGetter level,
         @Nullable PoseStack poseStack,
         boolean renderFluids,
-        ResultConsumer resultConsumer
+        BlockMaterialFunction blockMaterialFunction
     ) {
         ThreadLocalObjects objects = THREAD_LOCAL_OBJECTS.get();
         if (poseStack == null) {
             poseStack = objects.identityPoseStack;
         }
         RandomSource random = objects.random;
-        MeshEmitter[] emitters = objects.emitters;
+        MeshEmitterManager<VanillinMeshEmitter> emitters = objects.emitters;
         TransformingVertexConsumer transformingWrapper = objects.transformingWrapper;
 
-        for (MeshEmitter emitter : emitters) {
-            emitter.prepare(resultConsumer);
-        }
+        emitters.prepare(blockMaterialFunction);
 
         BlockRenderDispatcher renderDispatcher = Minecraft.getInstance().getBlockRenderer();
 
         ModelBlockRenderer blockRenderer = renderDispatcher.getModelRenderer();
         ModelBlockRenderer.enableCaching();
+
+        boolean aoEnabled = Minecraft.useAmbientOcclusion();
 
         while (posIterator.hasNext()) {
             BlockPos pos = posIterator.next();
@@ -169,15 +159,19 @@ final class BakedModelBufferer {
 
             if (renderFluids) {
                 FluidState fluidState = state.getFluidState();
-
                 if (!fluidState.isEmpty()) {
                     ChunkSectionLayer renderType = ItemBlockRenderTypes.getRenderLayer(fluidState);
-                    transformingWrapper.prepare(emitters[CHUNK_LAYERS_INDEX.get(renderType)].unwrap(true), poseStack);
 
-                    poseStack.pushPose();
-                    poseStack.translate(pos.getX() - (pos.getX() & 0xF), pos.getY() - (pos.getY() & 0xF), pos.getZ() - (pos.getZ() & 0xF));
-                    renderDispatcher.renderLiquid(pos, level, transformingWrapper, state, fluidState);
-                    poseStack.popPose();
+                    BufferBuilder bufferBuilder = emitters.getBuffer(renderType, true, false);
+
+                    if (bufferBuilder != null) {
+                        transformingWrapper.prepare(bufferBuilder, poseStack);
+
+                        poseStack.pushPose();
+                        poseStack.translate(pos.getX() - (pos.getX() & 0xF), pos.getY() - (pos.getY() & 0xF), pos.getZ() - (pos.getZ() & 0xF));
+                        renderDispatcher.renderLiquid(pos, level, transformingWrapper, state, fluidState);
+                        poseStack.popPose();
+                    }
                 }
             }
 
@@ -186,7 +180,6 @@ final class BakedModelBufferer {
                 BlockStateModel model = renderDispatcher.getBlockModel(state);
                 random.setSeed(seed);
                 ChunkSectionLayer renderType = ItemBlockRenderTypes.getChunkRenderType(state);
-                int layerIndex = CHUNK_LAYERS_INDEX.get(renderType);
                 poseStack.pushPose();
                 poseStack.translate(pos.getX(), pos.getY(), pos.getZ());
                 List<BlockModelPart> parts = new ObjectArrayList<>();
@@ -195,35 +188,23 @@ final class BakedModelBufferer {
                 } else {
                     model.collectParts(random, parts);
                 }
-                blockRenderer.tesselateBlock(level, parts, state, pos, poseStack, emitters[layerIndex], true, OverlayTexture.NO_OVERLAY);
+                VanillinMeshEmitter emitter = emitters.getEmitter(renderType);
+                emitter.prepareForModelLayer(aoEnabled && parts.getFirst().useAmbientOcclusion());
+                blockRenderer.tesselateBlock(level, parts, state, pos, poseStack, emitter, true, OverlayTexture.NO_OVERLAY);
                 poseStack.popPose();
             }
         }
 
         ModelBlockRenderer.clearCache();
         transformingWrapper.clear();
-
-        for (MeshEmitter emitter : emitters) {
-            emitter.end();
-        }
-    }
-
-    public interface ResultConsumer {
-        void accept(ChunkSectionLayer renderType, boolean shaded, MeshData data);
+        return emitters.end();
     }
 
     private static class ThreadLocalObjects {
         public final PoseStack identityPoseStack = new PoseStack();
         public final RandomSource random = RandomSource.createNewThreadLocalInstance();
 
-        public final MeshEmitter[] emitters = new MeshEmitter[CHUNK_LAYER_AMOUNT];
+        public final MeshEmitterManager<VanillinMeshEmitter> emitters = new MeshEmitterManager<>(VanillinMeshEmitter::new);
         public final TransformingVertexConsumer transformingWrapper = new TransformingVertexConsumer();
-
-        {
-            for (int layerIndex = 0; layerIndex < CHUNK_LAYER_AMOUNT; layerIndex++) {
-                ChunkSectionLayer renderType = CHUNK_LAYERS[layerIndex];
-                emitters[layerIndex] = new MeshEmitter(renderType);
-            }
-        }
     }
 }
