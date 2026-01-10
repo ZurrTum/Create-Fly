@@ -5,15 +5,14 @@ import com.zurrtum.create.client.flywheel.api.material.Material;
 import com.zurrtum.create.client.flywheel.lib.internal.FlwLibXplat;
 import com.zurrtum.create.client.flywheel.lib.model.ModelUtil;
 import com.zurrtum.create.client.flywheel.lib.model.SimpleModel;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.function.BiFunction;
-
 import net.minecraft.client.renderer.block.model.BlockStateModel;
 import net.minecraft.client.renderer.block.model.SimpleModelWrapper;
 import net.minecraft.client.renderer.chunk.ChunkSectionLayer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.BlockAndTintGetter;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.function.BiFunction;
 
 public final class BakedModelBuilder {
     final BlockStateModel model;
@@ -21,7 +20,7 @@ public final class BakedModelBuilder {
     @Nullable BlockAndTintGetter level;
     @Nullable BlockPos pos;
     @Nullable PoseStack poseStack;
-    @Nullable BiFunction<ChunkSectionLayer, Boolean, Material> materialFunc;
+    @Nullable BlockMaterialFunction materialFunc;
 
     public BakedModelBuilder(SimpleModelWrapper bakedModel) {
         this.bakedModel = bakedModel;
@@ -48,7 +47,17 @@ public final class BakedModelBuilder {
         return this;
     }
 
-    public BakedModelBuilder materialFunc(@Nullable BiFunction<ChunkSectionLayer, Boolean, Material> materialFunc) {
+    @Deprecated(forRemoval = true)
+    public BakedModelBuilder materialFunc(@Nullable BiFunction<ChunkSectionLayer, Boolean, @Nullable Material> materialFunc) {
+        if (materialFunc != null) {
+            this.materialFunc = (chunkRenderType, shaded, ambientOcclusion) -> materialFunc.apply(chunkRenderType, shaded);
+        } else {
+            this.materialFunc = null;
+        }
+        return this;
+    }
+
+    public BakedModelBuilder materialFunc(@Nullable BlockMaterialFunction materialFunc) {
         this.materialFunc = materialFunc;
         return this;
     }

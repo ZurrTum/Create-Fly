@@ -13,14 +13,13 @@ import com.zurrtum.create.client.flywheel.backend.engine.embed.EnvironmentStorag
 import com.zurrtum.create.client.flywheel.lib.task.ForEachPlan;
 import it.unimi.dsi.fastutil.ints.Int2ObjectArrayMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
+import net.minecraft.client.resources.model.ModelBakery;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.function.Function;
-
-import net.minecraft.client.resources.model.ModelBakery;
 
 public abstract class DrawManager<N extends AbstractInstancer<?>> {
     private static final boolean MODEL_WARNINGS = Boolean.getBoolean("flywheel.modelWarnings");
@@ -171,6 +170,12 @@ public abstract class DrawManager<N extends AbstractInstancer<?>> {
     }
 
     public abstract void triggerFallback();
+
+    public abstract MeshPool meshPool();
+
+    public Map<InstancerKey<?>, N> instancers() {
+        return instancers;
+    }
 
     protected record UninitializedInstancer<N, I extends Instance>(InstancerKey<I> key, N instancer) {
     }

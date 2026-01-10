@@ -14,4 +14,4 @@ out float flw_cylindricalDistance;
 
 FlwMaterial flw_material;
 
-#define flw_vertexId gl_VertexID
+uint flw_vertexId;

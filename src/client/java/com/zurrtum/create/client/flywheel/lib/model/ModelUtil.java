@@ -1,10 +1,12 @@
 package com.zurrtum.create.client.flywheel.lib.model;
 
+import com.zurrtum.create.client.flywheel.api.material.CardinalLightingMode;
 import com.zurrtum.create.client.flywheel.api.material.Material;
 import com.zurrtum.create.client.flywheel.api.model.Mesh;
 import com.zurrtum.create.client.flywheel.api.model.Model;
 import com.zurrtum.create.client.flywheel.api.vertex.VertexList;
 import com.zurrtum.create.client.flywheel.lib.material.Materials;
+import com.zurrtum.create.client.flywheel.lib.material.SimpleMaterial;
 import com.zurrtum.create.client.flywheel.lib.memory.MemoryBlock;
 import com.zurrtum.create.client.flywheel.lib.vertex.PosVertexView;
 import net.minecraft.client.renderer.Sheets;
@@ -16,71 +18,63 @@ import org.joml.Vector3f;
 import org.joml.Vector4f;
 
 import java.util.Collection;
+import java.util.IdentityHashMap;
+import java.util.Map;
 
 public final class ModelUtil {
     private static final float BOUNDING_SPHERE_EPSILON = 1e-4f;
 
+    // Array of chunk materials to make lookups easier.
+    // Index by (renderTypeIdx * 4 + shaded * 2 + ambientOcclusion).
+    private static final Material[] CHUNK_MATERIALS = new Material[16];
+    private static final Map<RenderType, Material> ITEM_CHUNK_MATERIALS = new IdentityHashMap<>();
+
+    static {
+        Material[] baseChunkMaterials = new Material[]{Materials.SOLID_BLOCK, Materials.CUTOUT_BLOCK, Materials.TRANSLUCENT_BLOCK, Materials.TRIPWIRE_BLOCK,};
+        for (int chunkLayerIdx = 0, size = baseChunkMaterials.length; chunkLayerIdx < size; chunkLayerIdx++) {
+            int baseMaterialIdx = chunkLayerIdx * 4;
+            Material baseChunkMaterial = baseChunkMaterials[chunkLayerIdx];
+
+            // shaded: false, ambientOcclusion: false
+            CHUNK_MATERIALS[baseMaterialIdx] = SimpleMaterial.builderOf(baseChunkMaterial).cardinalLightingMode(CardinalLightingMode.OFF)
+                .ambientOcclusion(false).build();
+            // shaded: false, ambientOcclusion: true
+            CHUNK_MATERIALS[baseMaterialIdx + 1] = SimpleMaterial.builderOf(baseChunkMaterial).cardinalLightingMode(CardinalLightingMode.OFF).build();
+            // shaded: true, ambientOcclusion: false
+            CHUNK_MATERIALS[baseMaterialIdx + 2] = SimpleMaterial.builderOf(baseChunkMaterial).ambientOcclusion(false).build();
+            // shaded: true, ambientOcclusion: true
+            CHUNK_MATERIALS[baseMaterialIdx + 3] = baseChunkMaterial;
+        }
+        ITEM_CHUNK_MATERIALS.put(RenderTypes.solidMovingBlock(), CHUNK_MATERIALS[2]);
+        ITEM_CHUNK_MATERIALS.put(RenderTypes.cutoutMovingBlock(), CHUNK_MATERIALS[6]);
+        ITEM_CHUNK_MATERIALS.put(RenderTypes.translucentMovingBlock(), CHUNK_MATERIALS[10]);
+        ITEM_CHUNK_MATERIALS.put(RenderTypes.tripwireMovingBlock(), CHUNK_MATERIALS[14]);
+        ITEM_CHUNK_MATERIALS.put(Sheets.cutoutBlockSheet(), CHUNK_MATERIALS[7]);
+        ITEM_CHUNK_MATERIALS.put(Sheets.solidBlockSheet(), CHUNK_MATERIALS[3]);
+        ITEM_CHUNK_MATERIALS.put(Sheets.translucentBlockItemSheet(), Materials.TRANSLUCENT_ITEM_ENTITY_BLOCK);
+        ITEM_CHUNK_MATERIALS.put(Sheets.translucentItemSheet(), Materials.TRANSLUCENT_ITEM_ENTITY_ITEM);
+        ITEM_CHUNK_MATERIALS.put(RenderTypes.glint(), Materials.GLINT);
+        ITEM_CHUNK_MATERIALS.put(RenderTypes.glintTranslucent(), Materials.TRANSLUCENT_GLINT);
+        ITEM_CHUNK_MATERIALS.put(RenderTypes.entityGlint(), Materials.GLINT_ENTITY);
+    }
+
     private ModelUtil() {
     }
 
-    @Nullable
-    public static Material getMaterial(ChunkSectionLayer chunkRenderType, boolean shaded) {
-        if (chunkRenderType == ChunkSectionLayer.SOLID) {
-            return shaded ? Materials.SOLID_BLOCK : Materials.SOLID_UNSHADED_BLOCK;
+    public static Material getMaterial(ChunkSectionLayer chunkRenderType, boolean shaded, boolean ambientOcclusion) {
+        int materialIdx = chunkRenderType.ordinal() * 4;
+        if (ambientOcclusion) {
+            materialIdx++;
         }
-        if (chunkRenderType == ChunkSectionLayer.CUTOUT) {
-            return shaded ? Materials.CUTOUT_MIPPED_BLOCK : Materials.CUTOUT_MIPPED_UNSHADED_BLOCK;
+        if (shaded) {
+            materialIdx += 2;
         }
-        if (chunkRenderType == ChunkSectionLayer.TRANSLUCENT) {
-            return shaded ? Materials.TRANSLUCENT_BLOCK : Materials.TRANSLUCENT_UNSHADED_BLOCK;
-        }
-        if (chunkRenderType == ChunkSectionLayer.TRIPWIRE) {
-            return shaded ? Materials.TRIPWIRE_BLOCK : Materials.TRIPWIRE_UNSHADED_BLOCK;
-        }
-        return null;
+        return CHUNK_MATERIALS[materialIdx];
     }
 
     @Nullable
     public static Material getItemMaterial(RenderType renderType) {
-        if (renderType == RenderTypes.solidMovingBlock()) {
-            return Materials.SOLID_BLOCK;
-        }
-        if (renderType == RenderTypes.cutoutMovingBlock()) {
-            return Materials.CUTOUT_MIPPED_BLOCK;
-        }
-        if (renderType == RenderTypes.translucentMovingBlock()) {
-            return Materials.TRANSLUCENT_BLOCK;
-        }
-        if (renderType == RenderTypes.tripwireMovingBlock()) {
-            return Materials.TRIPWIRE_BLOCK;
-        }
-
-        if (renderType == Sheets.cutoutBlockSheet()) {
-            return Materials.CUTOUT_BLOCK;
-        }
-
-        if (renderType == Sheets.solidBlockSheet()) {
-            return Materials.SOLID_BLOCK;
-        }
-
-        if (renderType == Sheets.translucentBlockItemSheet()) {
-            return Materials.TRANSLUCENT_ITEM_ENTITY_BLOCK;
-        }
-
-        if (renderType == Sheets.translucentItemSheet()) {
-            return Materials.TRANSLUCENT_ITEM_ENTITY_ITEM;
-        }
-
-        if (renderType == RenderTypes.glint()) {
-            return Materials.GLINT;
-        }
-        if (renderType == RenderTypes.glintTranslucent()) {
-            return Materials.TRANSLUCENT_GLINT;
-        }
-        if (renderType == RenderTypes.entityGlint()) {
-            return Materials.GLINT_ENTITY;
-        }
-        return null;
+        return ITEM_CHUNK_MATERIALS.get(renderType);
     }
 
     public static int computeTotalVertexCount(Iterable<Mesh> meshes) {

@@ -11,8 +11,8 @@ import com.zurrtum.create.client.flywheel.lib.model.baked.PartialModel;
 import com.zurrtum.create.client.flywheel.lib.util.RendererReloadCache;
 
 public class SpecialModels {
-    private static final RendererReloadCache<Key, Model> FLAT = new RendererReloadCache<>(it -> new BakedModelBuilder(it.partial.get()).materialFunc((renderType, shaded) -> {
-        var material = ModelUtil.getMaterial(renderType, shaded);
+    private static final RendererReloadCache<Key, Model> FLAT = new RendererReloadCache<>(it -> new BakedModelBuilder(it.partial.get()).materialFunc((renderType, shaded, ao) -> {
+        var material = ModelUtil.getMaterial(renderType, shaded, ao);
         if (material == null) {
             return null;
         }

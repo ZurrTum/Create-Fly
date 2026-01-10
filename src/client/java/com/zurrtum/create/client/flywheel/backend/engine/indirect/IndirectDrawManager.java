@@ -14,13 +14,12 @@ import com.zurrtum.create.client.flywheel.backend.gl.buffer.GlBufferType;
 import com.zurrtum.create.client.flywheel.backend.gl.buffer.GlBufferUsage;
 import com.zurrtum.create.client.flywheel.lib.material.SimpleMaterial;
 import com.zurrtum.create.client.flywheel.lib.memory.MemoryBlock;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.resources.model.ModelBakery;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.resources.model.ModelBakery;
 
 import static org.lwjgl.opengl.GL11.GL_TRIANGLES;
 import static org.lwjgl.opengl.GL11.GL_UNSIGNED_INT;
@@ -277,5 +276,10 @@ public class IndirectDrawManager extends DrawManager<IndirectInstancer<?>> {
     public void triggerFallback() {
         IndirectPrograms.kill();
         Minecraft.getInstance().levelRenderer.allChanged();
+    }
+
+    @Override
+    public MeshPool meshPool() {
+        return meshPool;
     }
 }
