@@ -678,8 +678,6 @@ public abstract class AbstractContraptionEntity extends Entity {
     public void remove(RemovalReason p_146834_) {
         if (!level().isClientSide() && !isRemoved() && contraption != null && !skipActorStop)
             contraption.stop(level());
-        if (contraption != null)
-            contraption.onEntityRemoved(this);
         super.remove(p_146834_);
     }
 

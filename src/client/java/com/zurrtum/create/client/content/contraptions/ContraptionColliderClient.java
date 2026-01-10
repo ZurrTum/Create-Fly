@@ -1,6 +1,5 @@
 package com.zurrtum.create.client.content.contraptions;
 
-import com.zurrtum.create.AllDamageSources;
 import com.zurrtum.create.AllSynchedDatas;
 import com.zurrtum.create.api.behaviour.interaction.MovingInteractionBehaviour;
 import com.zurrtum.create.catnip.data.Iterate;
@@ -31,7 +30,6 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.util.Mth;
-import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.entity.item.ItemEntity;
@@ -82,7 +80,7 @@ public class ContraptionColliderClient {
             contraptionEntity::canCollideWith
         );
         for (Entity entity : entitiesWithinAABB) {
-            if (!entity.isAlive())
+            if (!entity.isAlive() || world.tickRateManager().isEntityFrozen(entity))
                 continue;
 
             PlayerType playerType = getPlayerType(entity);
@@ -131,17 +129,14 @@ public class ContraptionColliderClient {
             obb.setRotation(rotationMatrix);
 
             // Use simplified bbs when present
-            final Vec3 motionCopy = motion;
-            CollisionList collidableBBs = contraption.getSimplifiedEntityColliders().orElseGet(() -> {
+            CollisionList collidableBBs = contraption.getSimplifiedEntityColliders();
 
+            if (collidableBBs == null) {
                 // Else find 'nearby' individual block shapes to collide with
-                CollisionList out = new CollisionList();
-                var populate = new Populate(out);
+                collidableBBs = new CollisionList();
 
-                ContraptionCollider.getPotentiallyCollidedShapes(world, contraption, localBB.expandTowards(motionCopy), populate);
-                return out;
-
-            });
+                ContraptionCollider.getPotentiallyCollidedShapes(world, contraption, localBB.expandTowards(motion), new Populate(collidableBBs));
+            }
 
             MutableObject<Vec3> collisionResponse = new MutableObject<>(Vec3.ZERO);
             MutableObject<Vec3> normal = new MutableObject<>(Vec3.ZERO);
@@ -397,7 +392,6 @@ public class ContraptionColliderClient {
         if (diffMotion.length() <= 0.35f || contraptionMotion.length() <= 0.35f)
             return entityMotion;
 
-        DamageSource source = AllDamageSources.get(world).runOver(contraptionEntity);
         double damage = diffMotion.length();
         if (entity.getType().getCategory() == MobCategory.MONSTER)
             damage *= 2;

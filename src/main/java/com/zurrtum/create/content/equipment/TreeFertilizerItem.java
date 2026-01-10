@@ -58,6 +58,7 @@ public class TreeFertilizerItem extends Item {
                     .isEmpty())
                     continue;
 
+                world.destroyBlock(actualPos, true);
                 world.setBlockAndUpdate(actualPos, newState);
             }
 

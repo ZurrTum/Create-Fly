@@ -3,16 +3,15 @@ package com.zurrtum.create.api.packager;
 import com.zurrtum.create.api.registry.SimpleRegistry;
 import com.zurrtum.create.catnip.math.BlockFace;
 import com.zurrtum.create.content.logistics.packager.AllInventoryIdentifiers;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.Set;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.Set;
 
 /**
  * Interface identifying an inventory spanning multiple block faces.
@@ -61,6 +60,16 @@ public interface InventoryIdentifier {
     }
 
     record Pair(BlockPos first, BlockPos second) implements InventoryIdentifier {
+        public Pair(BlockPos first, BlockPos second) {
+            if (first.compareTo(second) < 0) {
+                this.first = first;
+                this.second = second;
+            } else {
+                this.first = second;
+                this.second = first;
+            }
+        }
+
         @Override
         public boolean contains(BlockFace face) {
             BlockPos pos = face.getPos();

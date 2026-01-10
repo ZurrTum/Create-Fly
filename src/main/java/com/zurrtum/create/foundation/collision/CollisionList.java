@@ -25,6 +25,10 @@ public class CollisionList {
     public static class Populate implements DoubleLineConsumer {
         private final CollisionList collisionList;
 
+        public int offsetX = 0;
+        public int offsetY = 0;
+        public int offsetZ = 0;
+
         public Populate(CollisionList collisionList) {
             this.collisionList = collisionList;
         }
@@ -57,9 +61,9 @@ public class CollisionList {
             }
 
             // These are the values we'll be using so precompute them.
-            collisionList.centerX[collisionList.size] = 0.5 * (x2 + x1);
-            collisionList.centerY[collisionList.size] = 0.5 * (y2 + y1);
-            collisionList.centerZ[collisionList.size] = 0.5 * (z2 + z1);
+            collisionList.centerX[collisionList.size] = offsetX + 0.5 * (x2 + x1);
+            collisionList.centerY[collisionList.size] = offsetY + 0.5 * (y2 + y1);
+            collisionList.centerZ[collisionList.size] = offsetZ + 0.5 * (z2 + z1);
             collisionList.extentsX[collisionList.size] = 0.5 * (x2 - x1);
             collisionList.extentsY[collisionList.size] = 0.5 * (y2 - y1);
             collisionList.extentsZ[collisionList.size] = 0.5 * (z2 - z1);

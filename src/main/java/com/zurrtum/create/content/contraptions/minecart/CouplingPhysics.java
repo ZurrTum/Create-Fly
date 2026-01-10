@@ -8,6 +8,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.util.Mth;
+import net.minecraft.world.TickRateManager;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.MoverType;
 import net.minecraft.world.entity.vehicle.minecart.AbstractMinecart;
@@ -24,6 +25,12 @@ public class CouplingPhysics {
 
     public static void tickCoupling(ServerLevel world, Couple<MinecartController> c) {
         Couple<AbstractMinecart> carts = c.map(MinecartController::cart);
+
+        TickRateManager trm = world.tickRateManager();
+        if (trm.isEntityFrozen(carts.getFirst()) && trm.isEntityFrozen(carts.getSecond())) {
+            return;
+        }
+
         float couplingLength = c.getFirst().getCouplingLength(true);
         softCollisionStep(world, carts, couplingLength);
         if (!AbstractMinecart.useExperimentalMovement(world)) {

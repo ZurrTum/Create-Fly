@@ -77,7 +77,7 @@ public class ContraptionCollider {
             contraptionEntity::canCollideWith
         );
         for (Entity entity : entitiesWithinAABB) {
-            if (!entity.isAlive())
+            if (!entity.isAlive() || world.tickRateManager().isEntityFrozen(entity))
                 continue;
 
             PlayerType playerType = getPlayerType(entity);
@@ -112,17 +112,14 @@ public class ContraptionCollider {
             obb.setRotation(rotationMatrix);
 
             // Use simplified bbs when present
-            final Vec3 motionCopy = motion;
-            CollisionList collidableBBs = contraption.getSimplifiedEntityColliders().orElseGet(() -> {
+            CollisionList collidableBBs = contraption.getSimplifiedEntityColliders();
 
+            if (collidableBBs == null) {
                 // Else find 'nearby' individual block shapes to collide with
-                CollisionList out = new CollisionList();
-                var populate = new Populate(out);
+                collidableBBs = new CollisionList();
 
-                getPotentiallyCollidedShapes(world, contraption, localBB.expandTowards(motionCopy), populate);
-                return out;
-
-            });
+                getPotentiallyCollidedShapes(world, contraption, localBB.expandTowards(motion), new Populate(collidableBBs));
+            }
 
             MutableObject<Vec3> collisionResponse = new MutableObject<>(Vec3.ZERO);
             MutableObject<Vec3> normal = new MutableObject<>(Vec3.ZERO);

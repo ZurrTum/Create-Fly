@@ -26,8 +26,12 @@ import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemp
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 import org.apache.commons.lang3.tuple.Pair;
+import org.jetbrains.annotations.Nullable;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class CarriageContraption extends Contraption {
 
@@ -233,10 +237,11 @@ public class CarriageContraption extends Contraption {
     }
 
     @Override
-    public Optional<CollisionList> getSimplifiedEntityColliders() {
+    @Nullable
+    public CollisionList getSimplifiedEntityColliders() {
         if (notInPortal())
             return super.getSimplifiedEntityColliders();
-        return Optional.empty();
+        return null;
     }
 
     @Override
