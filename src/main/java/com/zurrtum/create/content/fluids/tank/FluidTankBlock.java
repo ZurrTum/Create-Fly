@@ -11,6 +11,7 @@ import com.zurrtum.create.foundation.block.IBE;
 import com.zurrtum.create.foundation.blockEntity.ComparatorUtil;
 import com.zurrtum.create.foundation.fluid.FluidHelper;
 import com.zurrtum.create.foundation.fluid.FluidHelper.FluidExchange;
+import com.zurrtum.create.foundation.utility.BlockHelper;
 import com.zurrtum.create.infrastructure.fluids.FluidInventory;
 import com.zurrtum.create.infrastructure.fluids.FluidInventoryProvider;
 import com.zurrtum.create.infrastructure.fluids.FluidStack;
@@ -20,18 +21,16 @@ import net.minecraft.core.particles.BlockParticleOption;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
-import net.minecraft.util.*;
+import net.minecraft.util.Mth;
+import net.minecraft.util.RandomSource;
+import net.minecraft.util.StringRepresentable;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.UseOnContext;
-import net.minecraft.world.level.BlockGetter;
-import net.minecraft.world.level.Level;
-import net.minecraft.world.level.LevelAccessor;
-import net.minecraft.world.level.LevelReader;
-import net.minecraft.world.level.ScheduledTickAccess;
+import net.minecraft.world.level.*;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Mirror;
 import net.minecraft.world.level.block.Rotation;
@@ -90,6 +89,13 @@ public class FluidTankBlock extends Block implements IWrenchable, IBE<FluidTankB
         if (moved)
             return;
         withBlockEntityDo(world, pos, FluidTankBlockEntity::updateConnectivity);
+
+        // updateConnectivity may have changed the in-world block state, which prevents the call to markAndNotifyBlock
+        // in net.neoforged.neoforge.common.CommonHooks#onPlaceItemIntoWorld from doing anything
+        BlockState newState = world.getBlockState(pos);
+        if (state != newState && newState.getBlock() == this) {
+            BlockHelper.markAndNotifyBlock(world, pos, world.getChunkAt(pos), oldState, newState, UPDATE_ALL_IMMEDIATE);
+        }
     }
 
     @Override

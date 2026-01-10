@@ -5,17 +5,16 @@ import com.zurrtum.create.content.fluids.tank.CreativeFluidTankBlockEntity;
 import com.zurrtum.create.foundation.blockEntity.IMultiBlockEntityContainer;
 import com.zurrtum.create.foundation.fluid.FluidTank;
 import com.zurrtum.create.infrastructure.fluids.FluidStack;
-import org.apache.commons.lang3.tuple.Pair;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.*;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
+import org.apache.commons.lang3.tuple.Pair;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.*;
 
 public class ConnectivityHandler {
 
@@ -264,7 +263,6 @@ public class ConnectivityHandler {
             }
         }
         be.setExtraData(extraData);
-        be.notifyMultiUpdated();
         return amount;
     }
 

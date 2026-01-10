@@ -15,6 +15,7 @@ import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.component.DataComponentPatch;
+import net.minecraft.world.Clearable;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.TrapDoorBlock;
@@ -27,15 +28,13 @@ import net.minecraft.world.level.storage.ValueOutput;
 import java.util.List;
 import java.util.Optional;
 
-public class CopycatBlockEntity extends SmartBlockEntity implements SpecialBlockEntityItemRequirement, TransformableBlockEntity, PartialSafeNBT {
+public class CopycatBlockEntity extends SmartBlockEntity implements SpecialBlockEntityItemRequirement, TransformableBlockEntity, PartialSafeNBT, Clearable {
 
-    private BlockState material;
-    private ItemStack consumedItem;
+    private BlockState material = AllBlocks.COPYCAT_BASE.defaultBlockState();
+    private ItemStack consumedItem = ItemStack.EMPTY;
 
     public CopycatBlockEntity(BlockPos pos, BlockState state) {
         super(AllBlockEntityTypes.COPYCAT, pos, state);
-        material = AllBlocks.COPYCAT_BASE.defaultBlockState();
-        consumedItem = ItemStack.EMPTY;
     }
 
     @Override
@@ -188,5 +187,11 @@ public class CopycatBlockEntity extends SmartBlockEntity implements SpecialBlock
             view.store("Item", ItemStack.CODEC, stack);
         }
         view.store("Material", BlockState.CODEC, material);
+    }
+
+    @Override
+    public void clearContent() {
+        material = AllBlocks.COPYCAT_BASE.defaultBlockState();
+        consumedItem = ItemStack.EMPTY;
     }
 }

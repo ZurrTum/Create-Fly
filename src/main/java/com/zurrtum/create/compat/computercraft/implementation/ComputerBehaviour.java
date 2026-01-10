@@ -17,6 +17,7 @@ import net.minecraft.world.level.storage.ValueOutput;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
+import java.util.UUID;
 
 public class ComputerBehaviour extends AbstractComputerBehaviour {
 
@@ -97,16 +98,18 @@ public class ComputerBehaviour extends AbstractComputerBehaviour {
     @Override
     public void queueStationTrain(Train imminentTrain, boolean newlyArrived, boolean trainPresent) {
         StationBlockEntity be = (StationBlockEntity) blockEntity;
-        if (be.imminentTrain == null && imminentTrain != null)
+        UUID trainId = be.imminentTrain;
+        if (trainId == null && imminentTrain != null) {
             peripheral.prepareComputerEvent(new StationTrainPresenceEvent(StationTrainPresenceEvent.Type.IMMINENT, imminentTrain));
+        }
         if (newlyArrived) {
             if (trainPresent) {
                 peripheral.prepareComputerEvent(new StationTrainPresenceEvent(StationTrainPresenceEvent.Type.ARRIVAL, imminentTrain));
-            } else {
-                peripheral.prepareComputerEvent(new StationTrainPresenceEvent(
-                    StationTrainPresenceEvent.Type.DEPARTURE,
-                    Create.RAILWAYS.trains.get(be.imminentTrain)
-                ));
+            } else if (trainId != null) {
+                Train train = Create.RAILWAYS.trains.get(trainId);
+                if (train != null) {
+                    peripheral.prepareComputerEvent(new StationTrainPresenceEvent(StationTrainPresenceEvent.Type.DEPARTURE, train));
+                }
             }
         }
     }

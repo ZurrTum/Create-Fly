@@ -4,11 +4,11 @@ import com.zurrtum.create.AllBlockEntityTypes;
 import com.zurrtum.create.AllDamageSources;
 import com.zurrtum.create.AllRecipeTypes;
 import com.zurrtum.create.AllSynchedDatas;
+import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.catnip.math.VecHelper;
 import com.zurrtum.create.content.kinetics.belt.behaviour.DirectBeltInputBehaviour;
 import com.zurrtum.create.content.processing.recipe.ProcessingInventory;
 import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
-import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.foundation.item.ItemHelper;
 import com.zurrtum.create.infrastructure.config.AllConfigs;
 import net.minecraft.core.BlockPos;
@@ -214,12 +214,12 @@ public class CrushingWheelControllerBlockEntity extends SmartBlockEntity impleme
             );
             int crusherDamage = AllConfigs.server().kinetics.crushingDamage.get();
 
-            if (processingEntity instanceof LivingEntity) {
-                if ((((LivingEntity) processingEntity).getHealth() - crusherDamage <= 0) // Takes LivingEntity instances
+            if (processingEntity instanceof LivingEntity livingEntity) {
+                if ((livingEntity.getHealth() - crusherDamage <= 0) // Takes LivingEntity instances
                     // as exception, so it can
                     // move them before it would
                     // kill them.
-                    && (((LivingEntity) processingEntity).hurtTime <= 0)) { // This way it can actually output the items
+                    && (livingEntity.hurtTime <= 0)) { // This way it can actually output the items
                     // to the right spot.
                     processingEntity.setPosRaw(entityOutPos.x, entityOutPos.y, entityOutPos.z);
                 }

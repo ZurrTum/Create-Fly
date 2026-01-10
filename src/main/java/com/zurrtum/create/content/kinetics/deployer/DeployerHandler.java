@@ -29,6 +29,7 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntitySelector;
+import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.item.ItemEntity;
@@ -39,6 +40,7 @@ import net.minecraft.world.item.*;
 import net.minecraft.world.item.component.ItemAttributeModifiers;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.item.context.UseOnContext;
+import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.ClipContext.Block;
 import net.minecraft.world.level.GameType;
@@ -124,9 +126,10 @@ public class DeployerHandler {
     static void activate(DeployerPlayer player, Vec3 vec, BlockPos clickedPos, Vec3 extensionVector, Mode mode) {
         ServerPlayer serverPlayer = player.cast();
         HashMultimap<Holder<Attribute>, AttributeModifier> attributeModifiers = HashMultimap.create();
-        ItemStack stack = serverPlayer.getMainHandItem();
-        stack.getOrDefault(DataComponents.ATTRIBUTE_MODIFIERS, ItemAttributeModifiers.EMPTY).modifiers()
+        ItemStack mainHandItem = serverPlayer.getMainHandItem();
+        mainHandItem.getOrDefault(DataComponents.ATTRIBUTE_MODIFIERS, ItemAttributeModifiers.EMPTY).modifiers()
             .forEach(e -> attributeModifiers.put(e.attribute(), e.modifier()));
+        EnchantmentHelper.forEachModifier(mainHandItem, EquipmentSlot.MAINHAND, attributeModifiers::put);
 
         serverPlayer.getAttributes().addTransientAttributeModifiers(attributeModifiers);
         activateInner(player, vec, clickedPos, extensionVector, mode);

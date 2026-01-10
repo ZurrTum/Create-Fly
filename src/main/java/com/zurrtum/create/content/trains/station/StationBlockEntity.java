@@ -488,11 +488,10 @@ public class StationBlockEntity extends SmartBlockEntity implements Transformabl
 
         BlockPos bogeyOffset = BlockPos.containing(track.getUpNormal(level, targetPosition, trackState));
 
-        int MAX_LENGTH = AllConfigs.server().trains.maxAssemblyLength.get();
-        int MAX_BOGEY_COUNT = AllConfigs.server().trains.maxBogeyCount.get();
+        int maxLength = AllConfigs.server().trains.maxAssemblyLength.get();
+        int maxBogeyCount = AllConfigs.server().trains.maxBogeyCount.get();
 
         int bogeyIndex = 0;
-        int maxBogeyCount = MAX_BOGEY_COUNT;
         if (bogeyLocations == null)
             bogeyLocations = new int[maxBogeyCount];
         if (bogeyTypes == null)
@@ -503,8 +502,8 @@ public class StationBlockEntity extends SmartBlockEntity implements Transformabl
         Arrays.fill(bogeyTypes, null);
         Arrays.fill(upsideDownBogeys, false);
 
-        for (int i = 0; i < MAX_LENGTH; i++) {
-            if (i == MAX_LENGTH - 1) {
+        for (int i = 0; i < maxLength; i++) {
+            if (i == maxLength - 1) {
                 assemblyLength = i;
                 break;
             }

@@ -1,0 +1,8 @@
+{
+  "type": "minecraft:stonecutting",
+  "ingredient": "create:waxed_oxidized_copper_tiles",
+  "result": {
+    "count": 1,
+    "id": "create:waxed_oxidized_copper_tile_stairs"
+  }
+}

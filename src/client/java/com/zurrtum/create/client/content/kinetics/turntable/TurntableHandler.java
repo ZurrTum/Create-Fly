@@ -2,8 +2,8 @@ package com.zurrtum.create.client.content.kinetics.turntable;
 
 import com.zurrtum.create.AllBlocks;
 import com.zurrtum.create.catnip.math.VecHelper;
-import com.zurrtum.create.client.catnip.animation.AnimationTickHolder;
 import com.zurrtum.create.content.kinetics.turntable.TurntableBlockEntity;
+import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.util.Mth;
@@ -26,7 +26,9 @@ public class TurntableHandler {
         if (!(blockEntity instanceof TurntableBlockEntity turnTable))
             return;
 
-        float speed = turnTable.getSpeed() * 3 / 10;
+        DeltaTracker deltaTracker = mc.getDeltaTracker();
+        float tickSpeed = mc.level.tickRateManager().tickrate() / 20;
+        float speed = turnTable.getSpeed() * (2 / 3f) * tickSpeed * deltaTracker.getRealtimeDeltaTicks();
 
         if (speed == 0)
             return;
@@ -35,9 +37,10 @@ public class TurntableHandler {
         Vec3 offset = mc.player.position().subtract(origin);
 
         if (offset.length() > 1 / 4f)
-            speed *= Mth.clamp((1 / 2f - offset.length()) * 2, 0, 1);
+            speed *= (float) Mth.clamp((1 / 2f - offset.length()) * 2, 0, 1);
 
-        mc.player.setYRot(mc.player.yRotO - speed * AnimationTickHolder.getPartialTicks());
-        mc.player.yBodyRot = mc.player.getYRot();
+        float yRotOffset = speed * deltaTracker.getGameTimeDeltaPartialTick(false);
+        mc.player.setYRot(mc.player.getYRot() - yRotOffset);
+        mc.player.yBodyRot -= yRotOffset;
     }
 }
