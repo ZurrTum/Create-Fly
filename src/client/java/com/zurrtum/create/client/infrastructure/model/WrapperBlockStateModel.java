@@ -75,8 +75,10 @@ public abstract class WrapperBlockStateModel implements BlockStateModel, BlockSt
     }
 
     public static BlockStateModel unwrapCompat(BlockStateModel model) {
-        if (FABRIC && model instanceof WrapperModel wrapper) {
-            return wrapper.create$getWrapped();
+        if (FABRIC) {
+            while (model instanceof WrapperModel wrapper) {
+                model = wrapper.create$getWrapped();
+            }
         }
         return model;
     }
