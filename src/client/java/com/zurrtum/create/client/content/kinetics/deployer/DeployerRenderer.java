@@ -32,9 +32,12 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.ItemDisplayContext;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.math.*;
+import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Direction.Axis;
 import net.minecraft.util.math.Direction.AxisDirection;
+import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.RotationAxis;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
@@ -84,34 +87,16 @@ public class DeployerRenderer implements BlockEntityRenderer<DeployerBlockEntity
         if (heldItem.isEmpty()) {
             return;
         }
-        DeployerItemRenderState data = state.item = new DeployerItemRenderState();
-        data.offset = getHandOffset(state, be, tickProgress, state.blockState).add(VecHelper.getCenterOf(BlockPos.ZERO));
         Direction facing = state.blockState.get(FACING);
-        data.punching = be.mode == Mode.PUNCH;
-        data.yRot = MathHelper.RADIANS_PER_DEGREE * (AngleHelper.horizontalAngle(facing) + 180);
-        data.xRot = MathHelper.RADIANS_PER_DEGREE * (facing == Direction.UP ? 90 : facing == Direction.DOWN ? 270 : 0);
-        data.displayMode = facing == Direction.UP && be.getSpeed() == 0 && !data.punching;
-        ItemRenderState renderState = data.state = new ItemRenderState();
-        if (data.displayMode) {
-            renderState.displayContext = ItemDisplayContext.GROUND;
-        } else {
-            renderState.displayContext = data.punching ? ItemDisplayContext.THIRD_PERSON_RIGHT_HAND : ItemDisplayContext.FIXED;
-        }
-        itemModelManager.update(renderState, heldItem, renderState.displayContext, world, null, 0);
-        boolean isBlockItem = (heldItem.getItem() instanceof BlockItem) && renderState.isSideLit();
-        if (data.displayMode) {
-            data.translateY = isBlockItem ? 9 / 16f : 11 / 16f;
-            data.scale = isBlockItem ? 1.25f : 1;
-            data.yRot2 = MathHelper.RADIANS_PER_DEGREE * AnimationTickHolder.getRenderTime(world);
-        } else {
-            data.scale = data.punching ? .75f : isBlockItem ? .75f - 1 / 64f : .5f;
-        }
+        Vec3d offset = getHandOffset(state, be, tickProgress, facing).add(VecHelper.CENTER_OF_ORIGIN);
+        state.item = DeployerItemRenderState.create(be, itemModelManager, world, heldItem, offset, facing);
     }
 
     public static void updateComponentsRenderState(DeployerBlockEntity be, DeployerRenderState state, World world, float tickProgress) {
         if (VisualizationManager.supportsVisualization(world)) {
             return;
         }
+        Direction facing = state.blockState.get(FACING);
         ComponentsRenderState components = state.components = new ComponentsRenderState();
         components.layer = RenderLayer.getSolid();
         components.light = state.lightmapCoordinates;
@@ -120,10 +105,9 @@ public class DeployerRenderer implements BlockEntityRenderer<DeployerBlockEntity
         components.angle = KineticBlockEntityRenderer.getAngleForBe(be, state.pos, axis);
         components.direction = Direction.from(axis, AxisDirection.POSITIVE);
         components.color = KineticBlockEntityRenderer.getColor(be);
-        components.offset = getHandOffset(state, be, tickProgress, state.blockState);
+        components.offset = getHandOffset(state, be, tickProgress, facing);
         components.pole = CachedBuffers.partial(AllPartialModels.DEPLOYER_POLE, state.blockState);
         components.hand = CachedBuffers.partial(getHandPose(be), state.blockState);
-        Direction facing = state.blockState.get(FACING);
         components.yRot = MathHelper.RADIANS_PER_DEGREE * AngleHelper.horizontalAngle(facing);
         components.xRot = MathHelper.RADIANS_PER_DEGREE * (facing == Direction.UP ? 270 : facing == Direction.DOWN ? 90 : 0);
         components.zRot = MathHelper.RADIANS_PER_DEGREE * ((state.blockState.get(AXIS_ALONG_FIRST_COORDINATE) ^ facing.getAxis() == Axis.Z) ? 90 : 0);
@@ -146,16 +130,16 @@ public class DeployerRenderer implements BlockEntityRenderer<DeployerBlockEntity
         return be.mode == Mode.PUNCH ? AllPartialModels.DEPLOYER_HAND_PUNCHING : be.heldItem.isEmpty() ? AllPartialModels.DEPLOYER_HAND_POINTING : AllPartialModels.DEPLOYER_HAND_HOLDING;
     }
 
-    public static Vec3d getHandOffset(DeployerRenderState state, DeployerBlockEntity be, float partialTicks, BlockState blockState) {
+    public static Vec3d getHandOffset(DeployerRenderState state, DeployerBlockEntity be, float partialTicks, Direction facing) {
         if (state.offset != null) {
             return state.offset;
         }
-        return state.offset = getHandOffset(be, partialTicks, blockState);
+        return state.offset = getHandOffset(be, partialTicks, facing);
     }
 
-    public static Vec3d getHandOffset(DeployerBlockEntity be, float partialTicks, BlockState blockState) {
+    public static Vec3d getHandOffset(DeployerBlockEntity be, float partialTicks, Direction facing) {
         float distance = getHandOffset(be, partialTicks);
-        return Vec3d.of(blockState.get(FACING).getVector()).multiply(distance);
+        return Vec3d.of(facing.getVector()).multiply(distance);
     }
 
     public static float getHandOffset(DeployerBlockEntity be, float partialTicks) {
@@ -201,37 +185,131 @@ public class DeployerRenderer implements BlockEntityRenderer<DeployerBlockEntity
         public ComponentsRenderState components;
     }
 
-    public static class DeployerItemRenderState {
+    public static abstract class DeployerItemRenderState {
         public Vec3d offset;
-        public boolean punching;
         public float yRot;
-        public float xRot;
-        public boolean displayMode;
-        public ItemRenderState state;
-        public float translateY;
-        public float scale;
-        public float yRot2;
+        public ItemRenderState item;
+
+        public DeployerItemRenderState(ItemModelManager itemModelManager, World world, ItemStack heldItem, Vec3d offset, Direction facing) {
+            this.offset = offset;
+            yRot = MathHelper.RADIANS_PER_DEGREE * (AngleHelper.horizontalAngle(facing) + 180);
+            item = new ItemRenderState();
+            item.displayContext = getDisplayContext();
+            itemModelManager.update(item, heldItem, item.displayContext, world, null, 0);
+        }
+
+        public static DeployerItemRenderState create(
+            DeployerBlockEntity be,
+            ItemModelManager itemModelManager,
+            World world,
+            ItemStack heldItem,
+            Vec3d offset,
+            Direction facing
+        ) {
+            if (be.mode == Mode.PUNCH) {
+                return new DeployerItemPunchRenderState(itemModelManager, world, heldItem, offset, facing);
+            } else if (facing == Direction.UP && be.getSpeed() == 0) {
+                return new DeployerItemDisplayRenderState(itemModelManager, world, heldItem, offset, facing);
+            } else {
+                return new DeployerItemUseRenderState(itemModelManager, world, heldItem, offset, facing);
+            }
+        }
 
         public void render(MatrixStack matrices, OrderedRenderCommandQueue queue, int light) {
             matrices.push();
             matrices.translate(offset);
             matrices.multiply(RotationAxis.POSITIVE_Y.rotation(yRot));
-            if (!displayMode) {
-                matrices.multiply(RotationAxis.POSITIVE_X.rotation(xRot));
-                matrices.translate(0, 0, -11 / 16f);
-            }
-            if (punching) {
-                matrices.translate(0, 1 / 8f, -1 / 16f);
-            }
-            if (displayMode) {
-                matrices.translate(0, translateY, 0);
-                matrices.scale(scale, scale, scale);
-                matrices.multiply(RotationAxis.POSITIVE_Y.rotation(yRot2));
-            } else {
-                matrices.scale(scale, scale, scale);
-            }
-            state.render(matrices, queue, light, OverlayTexture.DEFAULT_UV, 0);
+            transform(matrices);
+            item.render(matrices, queue, light, OverlayTexture.DEFAULT_UV, 0);
             matrices.pop();
+        }
+
+        public abstract ItemDisplayContext getDisplayContext();
+
+        protected abstract void transform(MatrixStack matrices);
+    }
+
+    public static class DeployerItemUseRenderState extends DeployerItemRenderState {
+        public float xRot;
+        public boolean isBlockItem;
+
+        public DeployerItemUseRenderState(ItemModelManager itemModelManager, World world, ItemStack heldItem, Vec3d offset, Direction facing) {
+            super(itemModelManager, world, heldItem, offset, facing);
+            if (facing == Direction.UP) {
+                xRot = MathHelper.RADIANS_PER_DEGREE * 90;
+            } else if (facing == Direction.DOWN) {
+                xRot = MathHelper.RADIANS_PER_DEGREE * 270;
+            }
+            isBlockItem = (heldItem.getItem() instanceof BlockItem) && item.isSideLit();
+        }
+
+        @Override
+        public ItemDisplayContext getDisplayContext() {
+            return ItemDisplayContext.FIXED;
+        }
+
+        @Override
+        protected void transform(MatrixStack matrices) {
+            matrices.multiply(RotationAxis.POSITIVE_X.rotation(xRot));
+            matrices.translate(0, 0, -11 / 16f);
+            if (isBlockItem) {
+                matrices.scale(0.734375f, 0.734375f, 0.734375f);
+            } else {
+                matrices.scale(.5f, .5f, .5f);
+            }
+        }
+    }
+
+    public static class DeployerItemPunchRenderState extends DeployerItemRenderState {
+        public float xRot;
+        public Vec3d translate;
+
+        public DeployerItemPunchRenderState(ItemModelManager itemModelManager, World world, ItemStack heldItem, Vec3d offset, Direction facing) {
+            super(itemModelManager, world, heldItem, offset, facing);
+            if (facing == Direction.UP) {
+                xRot = MathHelper.RADIANS_PER_DEGREE * 90;
+            } else if (facing == Direction.DOWN) {
+                xRot = MathHelper.RADIANS_PER_DEGREE * 270;
+            }
+        }
+
+        @Override
+        public ItemDisplayContext getDisplayContext() {
+            return ItemDisplayContext.THIRD_PERSON_RIGHT_HAND;
+        }
+
+        @Override
+        protected void transform(MatrixStack matrices) {
+            matrices.multiply(RotationAxis.POSITIVE_X.rotation(xRot));
+            matrices.translate(0, 0.125f, -0.75f);
+            matrices.scale(.75f, .75f, .75f);
+        }
+    }
+
+    public static class DeployerItemDisplayRenderState extends DeployerItemRenderState {
+        public boolean isBlockItem;
+        public float yRot2;
+
+        public DeployerItemDisplayRenderState(ItemModelManager itemModelManager, World world, ItemStack heldItem, Vec3d offset, Direction facing) {
+            super(itemModelManager, world, heldItem, offset, facing);
+            isBlockItem = (heldItem.getItem() instanceof BlockItem) && item.isSideLit();
+            yRot2 = MathHelper.RADIANS_PER_DEGREE * AnimationTickHolder.getRenderTime(world);
+        }
+
+        @Override
+        public ItemDisplayContext getDisplayContext() {
+            return ItemDisplayContext.GROUND;
+        }
+
+        @Override
+        protected void transform(MatrixStack matrices) {
+            if (isBlockItem) {
+                matrices.translate(0, 0.5625f, 0);
+                matrices.scale(1.25f, 1.25f, 1.25f);
+            } else {
+                matrices.translate(0, 0.6875f, 0);
+            }
+            matrices.multiply(RotationAxis.POSITIVE_Y.rotation(yRot2));
         }
     }
 
