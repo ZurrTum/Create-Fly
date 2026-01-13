@@ -2,12 +2,8 @@ package com.zurrtum.create.content.equipment.clipboard;
 
 import com.zurrtum.create.AllDataComponents;
 import com.zurrtum.create.AllItems;
-import com.zurrtum.create.content.redstone.link.ServerLinkBehaviour;
-import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
-import com.zurrtum.create.foundation.blockEntity.behaviour.BehaviourType;
 import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
-import com.zurrtum.create.foundation.blockEntity.behaviour.filtering.ServerFilteringBehaviour;
-import com.zurrtum.create.foundation.blockEntity.behaviour.scrollValue.ServerScrollValueBehaviour;
+import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
 import com.zurrtum.create.infrastructure.component.ClipboardContent;
 import com.zurrtum.create.infrastructure.component.ClipboardEntry;
 import com.zurrtum.create.infrastructure.component.ClipboardType;
@@ -112,38 +108,32 @@ public class ClipboardValueSettingsHandler {
         boolean anyValid = false;
         try (ErrorReporter.Logging logging = new ErrorReporter.Logging(smartBE.getReporterContext(), LOGGER)) {
             DynamicRegistryManager registryManager = world.getRegistryManager();
-            ReadView readView = paste ? NbtReadView.create(logging, registryManager, tag) : null;
-            NbtWriteView writeView = paste ? null : NbtWriteView.create(logging, registryManager);
-            if (smartBE instanceof ClipboardCloneable cc) {
-                anyValid = true;
-                if (paste) {
-                    anySuccess = paste(cc, player, readView, side, world.isClient);
-                } else {
-                    anySuccess = write(cc, registryManager, writeView, side, world.isClient);
-                    if (anySuccess) {
-                        tag = writeView.getNbt();
-                    }
-                }
-            }
-
-            if (!anySuccess) {
-                for (BehaviourType<? extends BlockEntityBehaviour<SmartBlockEntity>> type : List.of(
-                    ServerScrollValueBehaviour.TYPE,
-                    ServerFilteringBehaviour.TYPE,
-                    ServerLinkBehaviour.TYPE
-                )) {
-                    if (!(smartBE.getBehaviour(type) instanceof ClipboardCloneable cc))
+            if (paste) {
+                ReadView readView = NbtReadView.create(logging, registryManager, tag);
+                for (BlockEntityBehaviour<?> behaviour : smartBE.getAllBehaviours()) {
+                    if (!(behaviour instanceof ClipboardCloneable cc))
                         continue;
                     anyValid = true;
-                    if (paste) {
-                        anySuccess = paste(cc, player, readView, side, world.isClient);
-                    } else {
-                        anySuccess = write(cc, registryManager, writeView, side, world.isClient);
-                        if (anySuccess) {
-                            tag = writeView.getNbt();
-                            break;
-                        }
-                    }
+                    anySuccess |= paste(cc, player, readView, side, world.isClient());
+                }
+                if (smartBE instanceof ClipboardCloneable cc) {
+                    anyValid = true;
+                    anySuccess |= paste(cc, player, readView, side, world.isClient());
+                }
+            } else {
+                NbtWriteView writeView = NbtWriteView.create(logging, registryManager);
+                for (BlockEntityBehaviour<?> behaviour : smartBE.getAllBehaviours()) {
+                    if (!(behaviour instanceof ClipboardCloneable cc))
+                        continue;
+                    anyValid = true;
+                    anySuccess |= write(cc, registryManager, writeView, side, world.isClient());
+                }
+                if (smartBE instanceof ClipboardCloneable cc) {
+                    anyValid = true;
+                    anySuccess |= write(cc, registryManager, writeView, side, world.isClient());
+                }
+                if (anySuccess) {
+                    tag = writeView.getNbt();
                 }
             }
         }
@@ -180,11 +170,10 @@ public class ClipboardValueSettingsHandler {
         Direction side,
         boolean simulate
     ) {
-        String clipboardKey = cc.getClipboardKey();
         if (simulate) {
             return cc.canWrite(registryManager, side);
         } else {
-            return cc.writeToClipboard(writeView.get(clipboardKey), side);
+            return cc.writeToClipboard(writeView.get(cc.getClipboardKey()), side);
         }
     }
 }
