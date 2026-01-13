@@ -4,13 +4,10 @@ import com.zurrtum.create.AllBlockEntityTypes;
 import com.zurrtum.create.AllParticleTypes;
 import com.zurrtum.create.AllSoundEvents;
 import com.zurrtum.create.api.entity.FakePlayerHandler;
-import com.zurrtum.create.compat.computercraft.AbstractComputerBehaviour;
-import com.zurrtum.create.compat.computercraft.ComputerCraftProxy;
 import com.zurrtum.create.content.logistics.BigItemStack;
 import com.zurrtum.create.content.logistics.packager.InventorySummary;
 import com.zurrtum.create.content.logistics.packagerLink.LogisticallyLinkedBehaviour.RequestType;
 import com.zurrtum.create.content.logistics.stockTicker.StockCheckingBlockEntity;
-import com.zurrtum.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.foundation.gui.menu.MenuProvider;
 import com.zurrtum.create.infrastructure.component.PackageOrderWithCrafts;
 import com.zurrtum.create.infrastructure.packet.s2c.RedstoneRequesterEffectPacket;
@@ -28,11 +25,8 @@ import net.minecraft.util.ActionResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 
-import java.util.List;
-
 public class RedstoneRequesterBlockEntity extends StockCheckingBlockEntity implements MenuProvider {
 
-    public AbstractComputerBehaviour computerBehaviour;
     public boolean allowPartialRequests;
     public PackageOrderWithCrafts encodedRequest = PackageOrderWithCrafts.empty();
     public String encodedTargetAdress = "";
@@ -44,13 +38,6 @@ public class RedstoneRequesterBlockEntity extends StockCheckingBlockEntity imple
     public RedstoneRequesterBlockEntity(BlockPos pos, BlockState state) {
         super(AllBlockEntityTypes.REDSTONE_REQUESTER, pos, state);
         allowPartialRequests = false;
-    }
-
-
-    @Override
-    public void addBehaviours(List<BlockEntityBehaviour<?>> behaviours) {
-        super.addBehaviours(behaviours);
-        behaviours.add(computerBehaviour = ComputerCraftProxy.behaviour(this));
     }
 
     protected void onRedstonePowerChanged() {

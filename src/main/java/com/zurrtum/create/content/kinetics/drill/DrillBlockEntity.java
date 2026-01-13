@@ -5,7 +5,7 @@ import com.zurrtum.create.content.kinetics.base.BlockBreakingKineticBlockEntity;
 import com.zurrtum.create.content.kinetics.belt.behaviour.DirectBeltInputBehaviour;
 import com.zurrtum.create.content.kinetics.drill.CobbleGenOptimisation.CobbleGenBlockConfiguration;
 import com.zurrtum.create.content.logistics.chute.ChuteBlockEntity;
-import com.zurrtum.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
+import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;

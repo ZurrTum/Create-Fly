@@ -2,7 +2,6 @@ package com.zurrtum.create.client.content.kinetics.transmission.sequencer;
 
 import com.zurrtum.create.AllItems;
 import com.zurrtum.create.client.catnip.gui.AbstractSimiScreen;
-import com.zurrtum.create.client.catnip.gui.ScreenOpener;
 import com.zurrtum.create.client.catnip.gui.element.GuiGameElement;
 import com.zurrtum.create.client.catnip.gui.element.GuiGameElement.GuiItemRenderBuilder;
 import com.zurrtum.create.client.catnip.gui.widget.ElementWidget;
@@ -15,6 +14,7 @@ import com.zurrtum.create.client.foundation.gui.widget.IconButton;
 import com.zurrtum.create.client.foundation.gui.widget.ScrollInput;
 import com.zurrtum.create.client.foundation.gui.widget.SelectionScrollInput;
 import com.zurrtum.create.client.foundation.utility.CreateLang;
+import com.zurrtum.create.compat.computercraft.AbstractComputerBehaviour;
 import com.zurrtum.create.content.kinetics.transmission.sequencer.Instruction;
 import com.zurrtum.create.content.kinetics.transmission.sequencer.InstructionSpeedModifiers;
 import com.zurrtum.create.content.kinetics.transmission.sequencer.SequencedGearshiftBlockEntity;
@@ -48,8 +48,10 @@ public class SequencedGearshiftScreen extends AbstractSimiScreen implements Addi
     @Override
     protected void init() {
         renderedItem = GuiGameElement.of(AllItems.SEQUENCED_GEARSHIFT.getDefaultStack()).scale(5);
-        if (be.computerBehaviour.hasAttachedComputer())
-            ScreenOpener.open(new ComputerScreen(title, this, this, be.computerBehaviour::hasAttachedComputer));
+        AbstractComputerBehaviour computer = be.getBehaviour(AbstractComputerBehaviour.TYPE);
+        if (computer != null && computer.hasAttachedComputer()) {
+            client.setScreen(new ComputerScreen(title, this, this, computer::hasAttachedComputer));
+        }
 
         setWindowSize(background.getWidth(), background.getHeight());
         setWindowOffset(-20, 0);
@@ -219,8 +221,10 @@ public class SequencedGearshiftScreen extends AbstractSimiScreen implements Addi
     public void tick() {
         super.tick();
 
-        if (be.computerBehaviour.hasAttachedComputer())
-            ScreenOpener.open(new ComputerScreen(title, this, this, be.computerBehaviour::hasAttachedComputer));
+        AbstractComputerBehaviour computer = be.getBehaviour(AbstractComputerBehaviour.TYPE);
+        if (computer != null && computer.hasAttachedComputer()) {
+            client.setScreen(new ComputerScreen(title, this, this, computer::hasAttachedComputer));
+        }
     }
 
     private static String formatValue(SequencerInstructions def, int value) {

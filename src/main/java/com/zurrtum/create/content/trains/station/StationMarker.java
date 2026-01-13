@@ -9,7 +9,7 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.zurrtum.create.AllBlockEntityTypes;
 import com.zurrtum.create.AllMapDecorationTypes;
 import com.zurrtum.create.content.trains.track.TrackTargetingBehaviour;
-import com.zurrtum.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
+import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import net.minecraft.item.map.MapDecoration;
 import net.minecraft.item.map.MapState;
 import net.minecraft.text.Text;

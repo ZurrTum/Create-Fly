@@ -3,8 +3,8 @@ package com.zurrtum.create.content.kinetics.base;
 import com.zurrtum.create.AllBlockEntityTypes;
 import com.zurrtum.create.AllClientHandle;
 import com.zurrtum.create.Create;
+import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.api.stress.BlockStressValues;
-import com.zurrtum.create.compat.computercraft.events.KineticsChangeEvent;
 import com.zurrtum.create.content.kinetics.KineticNetwork;
 import com.zurrtum.create.content.kinetics.RotationPropagator;
 import com.zurrtum.create.content.kinetics.base.IRotate.SpeedLevel;
@@ -12,7 +12,6 @@ import com.zurrtum.create.content.kinetics.base.IRotate.StressImpact;
 import com.zurrtum.create.content.kinetics.simpleRelays.ICogWheel;
 import com.zurrtum.create.content.kinetics.transmission.sequencer.SequencedGearshiftBlockEntity.SequenceContext;
 import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
-import com.zurrtum.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.infrastructure.config.AllConfigs;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -186,10 +185,6 @@ public class KineticBlockEntity extends SmartBlockEntity {
             onSpeedChanged(prevSpeed);
             sendData();
         }
-    }
-
-    protected KineticsChangeEvent makeComputerKineticsChangeEvent() {
-        return new KineticsChangeEvent(speed, capacity, stress, overStressed);
     }
 
     protected Block getStressConfigKey() {

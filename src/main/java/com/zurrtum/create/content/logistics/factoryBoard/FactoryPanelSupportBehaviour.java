@@ -3,7 +3,7 @@ package com.zurrtum.create.content.logistics.factoryBoard;
 import com.mojang.serialization.Codec;
 import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
 import com.zurrtum.create.foundation.blockEntity.behaviour.BehaviourType;
-import com.zurrtum.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
+import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import net.minecraft.storage.ReadView;
 import net.minecraft.storage.WriteView;
 import org.jetbrains.annotations.Nullable;

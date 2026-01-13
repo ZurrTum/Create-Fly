@@ -5,7 +5,7 @@ import com.zurrtum.create.Create;
 import com.zurrtum.create.catnip.data.Couple;
 import com.zurrtum.create.content.trains.graph.*;
 import com.zurrtum.create.content.trains.track.TrackTargetingBehaviour;
-import com.zurrtum.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
+import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.MinecraftServer;

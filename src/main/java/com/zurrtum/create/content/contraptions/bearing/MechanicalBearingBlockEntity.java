@@ -11,7 +11,7 @@ import com.zurrtum.create.content.contraptions.ControlledContraptionEntity;
 import com.zurrtum.create.content.kinetics.base.GeneratingKineticBlockEntity;
 import com.zurrtum.create.content.kinetics.transmission.sequencer.SequencerInstructions;
 import com.zurrtum.create.foundation.advancement.CreateTrigger;
-import com.zurrtum.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
+import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.foundation.blockEntity.behaviour.scrollValue.ServerScrollOptionBehaviour;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntityType;

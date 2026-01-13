@@ -1,14 +1,12 @@
 package com.zurrtum.create.foundation.blockEntity;
 
-import com.zurrtum.create.AllClientHandle;
-import com.zurrtum.create.AllTransfer;
+import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.api.schematic.nbt.PartialSafeNBT;
 import com.zurrtum.create.api.schematic.requirement.SpecialBlockEntityItemRequirement;
 import com.zurrtum.create.content.schematics.requirement.ItemRequirement;
 import com.zurrtum.create.foundation.advancement.AdvancementBehaviour;
 import com.zurrtum.create.foundation.advancement.CreateTrigger;
 import com.zurrtum.create.foundation.blockEntity.behaviour.BehaviourType;
-import com.zurrtum.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.foundation.blockEntity.behaviour.CachedInventoryBehaviour;
 import com.zurrtum.create.foundation.utility.IInteractionChecker;
 import com.zurrtum.create.ponder.api.VirtualBlockEntity;
@@ -27,6 +25,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 public abstract class SmartBlockEntity extends CachedRenderBBBlockEntity implements PartialSafeNBT, IInteractionChecker, SpecialBlockEntityItemRequirement, VirtualBlockEntity {
 
@@ -47,11 +46,11 @@ public abstract class SmartBlockEntity extends CachedRenderBBBlockEntity impleme
 
         ArrayList<BlockEntityBehaviour<?>> list = new ArrayList<>();
         addBehaviours(list);
-        AllTransfer.addBehaviours(this, list);
         list.forEach(b -> behaviours.put(b.getType(), b));
-        list.clear();
-        AllClientHandle.INSTANCE.addBehaviours(this, list);
-        list.forEach(b -> behaviours.put(b.getType(), b));
+        for (Function<SmartBlockEntity, BlockEntityBehaviour<?>> factory : BlockEntityBehaviour.REGISTRY.get(type)) {
+            BlockEntityBehaviour<?> behaviour = factory.apply(this);
+            behaviours.put(behaviour.getType(), behaviour);
+        }
     }
 
     public abstract void addBehaviours(List<BlockEntityBehaviour<?>> behaviours);
@@ -66,8 +65,16 @@ public abstract class SmartBlockEntity extends CachedRenderBBBlockEntity impleme
     public void initialize() {
         if (firstNbtRead) {
             firstNbtRead = false;
-            //TODO
-            //            NeoForge.EVENT_BUS.post(new BlockEntityBehaviourEvent(this, behaviours));
+            for (Function<SmartBlockEntity, BlockEntityBehaviour<?>> factory : BlockEntityBehaviour.FIRST_READ_REGISTRY.get(getType())) {
+                BlockEntityBehaviour<?> behaviour = factory.apply(this);
+                behaviours.put(behaviour.getType(), behaviour);
+            }
+        }
+        if (world.isClient()) {
+            for (Function<SmartBlockEntity, BlockEntityBehaviour<?>> factory : BlockEntityBehaviour.CLIENT_REGISTRY.get(getType())) {
+                BlockEntityBehaviour<?> behaviour = factory.apply(this);
+                behaviours.put(behaviour.getType(), behaviour);
+            }
         }
 
         forEachBehaviour(BlockEntityBehaviour::initialize);
@@ -117,6 +124,10 @@ public abstract class SmartBlockEntity extends CachedRenderBBBlockEntity impleme
             ArrayList<BlockEntityBehaviour<?>> list = new ArrayList<>();
             addBehavioursDeferred(list);
             list.forEach(b -> behaviours.put(b.getType(), b));
+            for (Function<SmartBlockEntity, BlockEntityBehaviour<?>> factory : BlockEntityBehaviour.FIRST_READ_REGISTRY.get(getType())) {
+                BlockEntityBehaviour<?> behaviour = factory.apply(this);
+                behaviours.put(behaviour.getType(), behaviour);
+            }
         }
         super.readData(view);
         forEachBehaviour(tb -> tb.read(view, clientPacket));

@@ -1,7 +1,7 @@
 package com.zurrtum.create.content.logistics.packagerLink;
 
 import com.zurrtum.create.foundation.block.IBE;
-import com.zurrtum.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
+import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import net.minecraft.block.Block;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.component.DataComponentTypes;

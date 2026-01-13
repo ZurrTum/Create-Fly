@@ -10,7 +10,7 @@ import com.zurrtum.create.content.trains.entity.CarriageBogey;
 import com.zurrtum.create.content.trains.entity.CarriageContraption;
 import com.zurrtum.create.content.trains.entity.CarriageContraptionEntity;
 import com.zurrtum.create.foundation.blockEntity.behaviour.BehaviourType;
-import com.zurrtum.create.foundation.entity.behaviour.EntityBehaviour;
+import com.zurrtum.create.api.behaviour.EntityBehaviour;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.Direction.Axis;

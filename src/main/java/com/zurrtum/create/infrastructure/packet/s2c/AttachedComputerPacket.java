@@ -21,7 +21,7 @@ public record AttachedComputerPacket(BlockPos pos, boolean hasAttachedComputer) 
 
     @Override
     public void apply(ClientPlayPacketListener listener) {
-        AllClientHandle.INSTANCE.onAttachedComputer(this);
+        AllClientHandle.INSTANCE.onAttachedComputer(listener, this);
     }
 
     @Override

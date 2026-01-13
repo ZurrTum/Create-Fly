@@ -8,7 +8,7 @@ import com.zurrtum.create.catnip.math.VecHelper;
 import com.zurrtum.create.content.kinetics.base.GeneratingKineticBlockEntity;
 import com.zurrtum.create.content.kinetics.base.IRotate;
 import com.zurrtum.create.foundation.advancement.CreateTrigger;
-import com.zurrtum.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
+import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.foundation.fluid.FluidHelper;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;

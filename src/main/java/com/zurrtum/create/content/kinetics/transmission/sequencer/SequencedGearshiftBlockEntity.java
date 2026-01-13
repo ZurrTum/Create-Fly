@@ -5,10 +5,8 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.zurrtum.create.AllBlockEntityTypes;
 import com.zurrtum.create.catnip.nbt.NBTHelper;
 import com.zurrtum.create.compat.computercraft.AbstractComputerBehaviour;
-import com.zurrtum.create.compat.computercraft.ComputerCraftProxy;
 import com.zurrtum.create.content.kinetics.base.KineticBlockEntity;
 import com.zurrtum.create.content.kinetics.transmission.SplitShaftBlockEntity;
-import com.zurrtum.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.nbt.NbtCompound;
@@ -17,7 +15,6 @@ import net.minecraft.storage.WriteView;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 
-import java.util.List;
 import java.util.Objects;
 import java.util.Vector;
 
@@ -29,8 +26,6 @@ public class SequencedGearshiftBlockEntity extends SplitShaftBlockEntity {
     float currentInstructionProgress;
     int timer;
     boolean poweredPreviously;
-
-    public AbstractComputerBehaviour computerBehaviour;
 
     public record SequenceContext(SequencerInstructions instruction, double relativeValue) {
         public static Codec<SequenceContext> CODEC = RecordCodecBuilder.create(instance -> instance.group(
@@ -69,12 +64,6 @@ public class SequencedGearshiftBlockEntity extends SplitShaftBlockEntity {
         currentInstructionProgress = 0;
         timer = 0;
         poweredPreviously = false;
-    }
-
-    @Override
-    public void addBehaviours(List<BlockEntityBehaviour<?>> behaviours) {
-        super.addBehaviours(behaviours);
-        behaviours.add(computerBehaviour = ComputerCraftProxy.behaviour(this));
     }
 
     @Override
@@ -119,7 +108,7 @@ public class SequencedGearshiftBlockEntity extends SplitShaftBlockEntity {
     }
 
     public void onRedstoneUpdate(boolean isPowered, boolean isRunning) {
-        if (computerBehaviour.hasAttachedComputer())
+        if (AbstractComputerBehaviour.contains(this))
             return;
         if (!poweredPreviously && isPowered)
             risingFlank();

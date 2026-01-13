@@ -2,18 +2,16 @@ package com.zurrtum.create.content.redstone.displayLink;
 
 import com.zurrtum.create.AllAdvancements;
 import com.zurrtum.create.AllBlockEntityTypes;
+import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.api.behaviour.display.DisplaySource;
 import com.zurrtum.create.api.behaviour.display.DisplayTarget;
 import com.zurrtum.create.api.contraption.transformable.TransformableBlockEntity;
 import com.zurrtum.create.api.registry.CreateRegistries;
 import com.zurrtum.create.catnip.math.VecHelper;
-import com.zurrtum.create.compat.computercraft.AbstractComputerBehaviour;
-import com.zurrtum.create.compat.computercraft.ComputerCraftProxy;
 import com.zurrtum.create.content.contraptions.StructureTransform;
 import com.zurrtum.create.content.logistics.factoryBoard.FactoryPanelPosition;
 import com.zurrtum.create.content.logistics.factoryBoard.FactoryPanelSupportBehaviour;
 import com.zurrtum.create.foundation.advancement.CreateTrigger;
-import com.zurrtum.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.nbt.NbtCompound;
@@ -37,7 +35,6 @@ public class DisplayLinkBlockEntity extends LinkWithBulbBlockEntity implements T
     public int targetLine;
 
     public int refreshTicks;
-    public AbstractComputerBehaviour computerBehaviour;
     public FactoryPanelSupportBehaviour factoryPanelSupport;
 
     public DisplayLinkBlockEntity(BlockPos pos, BlockState state) {
@@ -50,7 +47,6 @@ public class DisplayLinkBlockEntity extends LinkWithBulbBlockEntity implements T
 
     @Override
     public void addBehaviours(List<BlockEntityBehaviour<?>> behaviours) {
-        behaviours.add(computerBehaviour = ComputerCraftProxy.behaviour(this));
         behaviours.add(factoryPanelSupport = new FactoryPanelSupportBehaviour(this, () -> false, () -> false, this::updateGatheredData));
     }
 

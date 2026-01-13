@@ -7,7 +7,7 @@ import com.zurrtum.create.client.foundation.fluid.FluidRenderer;
 import com.zurrtum.create.content.fluids.FluidTransportBehaviour;
 import com.zurrtum.create.content.fluids.PipeConnection.Flow;
 import com.zurrtum.create.content.fluids.pipes.StraightPipeBlockEntity;
-import com.zurrtum.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
+import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.infrastructure.fluids.FluidStack;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.VertexConsumer;

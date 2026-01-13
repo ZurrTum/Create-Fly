@@ -8,7 +8,7 @@ import com.zurrtum.create.content.trains.signal.SingleBlockEntityEdgePoint;
 import com.zurrtum.create.content.trains.signal.TrackEdgePoint;
 import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
 import com.zurrtum.create.foundation.blockEntity.behaviour.BehaviourType;
-import com.zurrtum.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
+import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.infrastructure.component.BezierTrackPointLocation;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;

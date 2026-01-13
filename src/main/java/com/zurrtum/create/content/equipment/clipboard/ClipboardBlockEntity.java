@@ -5,7 +5,7 @@ import com.zurrtum.create.AllBlocks;
 import com.zurrtum.create.AllClientHandle;
 import com.zurrtum.create.AllDataComponents;
 import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
-import com.zurrtum.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
+import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.infrastructure.component.ClipboardContent;
 import net.minecraft.block.BlockState;
 import net.minecraft.component.ComponentMap;

@@ -1,17 +1,14 @@
 package com.zurrtum.create.content.trains.observer;
 
 import com.zurrtum.create.AllBlockEntityTypes;
-import com.zurrtum.create.Create;
+import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.api.contraption.transformable.TransformableBlockEntity;
 import com.zurrtum.create.compat.computercraft.AbstractComputerBehaviour;
-import com.zurrtum.create.compat.computercraft.ComputerCraftProxy;
-import com.zurrtum.create.compat.computercraft.events.TrainPassEvent;
 import com.zurrtum.create.content.contraptions.StructureTransform;
 import com.zurrtum.create.content.redstone.displayLink.DisplayLinkBlock;
 import com.zurrtum.create.content.trains.graph.EdgePointType;
 import com.zurrtum.create.content.trains.track.TrackTargetingBehaviour;
 import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
-import com.zurrtum.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.foundation.blockEntity.behaviour.filtering.ServerFilteringBehaviour;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -31,8 +28,7 @@ public class TrackObserverBlockEntity extends SmartBlockEntity implements Transf
 
     private ServerFilteringBehaviour filtering;
 
-    public AbstractComputerBehaviour computerBehaviour;
-    public @org.jetbrains.annotations.Nullable UUID passingTrainUUID;
+    public @Nullable UUID passingTrainUUID;
 
     public TrackObserverBlockEntity(BlockPos pos, BlockState state) {
         super(AllBlockEntityTypes.TRACK_OBSERVER, pos, state);
@@ -42,7 +38,6 @@ public class TrackObserverBlockEntity extends SmartBlockEntity implements Transf
     public void addBehaviours(List<BlockEntityBehaviour<?>> behaviours) {
         behaviours.add(edgePoint = new TrackTargetingBehaviour<>(this, EdgePointType.OBSERVER));
         behaviours.add(filtering = new ServerFilteringBehaviour(this).withCallback(this::onFilterChanged));
-        behaviours.add(computerBehaviour = ComputerCraftProxy.behaviour(this));
     }
 
     private void onFilterChanged(ItemStack newFilter) {
@@ -67,13 +62,10 @@ public class TrackObserverBlockEntity extends SmartBlockEntity implements Transf
         if (isBlockPowered() == shouldBePowered)
             return;
 
-        if (observer != null && computerBehaviour.hasAttachedComputer()) {
-            if (shouldBePowered)
-                passingTrainUUID = observer.getCurrentTrain();
-            if (passingTrainUUID != null) {
-                computerBehaviour.prepareComputerEvent(new TrainPassEvent(Create.RAILWAYS.trains.get(passingTrainUUID), shouldBePowered));
-                if (!shouldBePowered)
-                    passingTrainUUID = null;
+        if (observer != null) {
+            AbstractComputerBehaviour computer = AbstractComputerBehaviour.get(this);
+            if (computer != null) {
+                computer.queueTrainPass(observer, shouldBePowered);
             }
         }
 

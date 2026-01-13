@@ -12,7 +12,7 @@ import com.zurrtum.create.content.fluids.pipes.VanillaFluidTargets;
 import com.zurrtum.create.content.fluids.pump.PumpBlock;
 import com.zurrtum.create.content.fluids.pump.PumpBlockEntity;
 import com.zurrtum.create.foundation.advancement.CreateTrigger;
-import com.zurrtum.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
+import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.foundation.fluid.FluidHelper;
 import com.zurrtum.create.foundation.utility.BlockHelper;
 import com.zurrtum.create.infrastructure.config.AllConfigs;

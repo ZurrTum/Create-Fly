@@ -9,7 +9,7 @@ import com.zurrtum.create.content.logistics.packager.PackagerBlockEntity;
 import com.zurrtum.create.content.logistics.packager.PackagingRequest;
 import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
 import com.zurrtum.create.foundation.blockEntity.behaviour.BehaviourType;
-import com.zurrtum.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
+import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.foundation.utility.TickBasedCache;
 import com.zurrtum.create.infrastructure.component.PackageOrderWithCrafts;
 import com.zurrtum.create.infrastructure.items.ItemStackHandler;

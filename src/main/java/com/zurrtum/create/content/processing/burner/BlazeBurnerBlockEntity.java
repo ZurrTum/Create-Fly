@@ -10,7 +10,7 @@ import com.zurrtum.create.content.logistics.stockTicker.StockTickerBlockEntity;
 import com.zurrtum.create.content.processing.basin.BasinBlock;
 import com.zurrtum.create.content.processing.burner.BlazeBurnerBlock.HeatLevel;
 import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
-import com.zurrtum.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
+import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import net.minecraft.block.BlockState;
 import net.minecraft.item.ItemStack;
 import net.minecraft.particle.ParticleTypes;

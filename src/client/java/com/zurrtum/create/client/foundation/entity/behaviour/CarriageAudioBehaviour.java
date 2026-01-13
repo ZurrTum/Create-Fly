@@ -9,7 +9,7 @@ import com.zurrtum.create.content.contraptions.Contraption;
 import com.zurrtum.create.content.trains.entity.*;
 import com.zurrtum.create.content.trains.entity.Carriage.DimensionalCarriageEntity;
 import com.zurrtum.create.foundation.blockEntity.behaviour.BehaviourType;
-import com.zurrtum.create.foundation.entity.behaviour.EntityBehaviour;
+import com.zurrtum.create.api.behaviour.EntityBehaviour;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.hud.SubtitlesHud;
 import net.minecraft.client.sound.MovingSoundInstance;

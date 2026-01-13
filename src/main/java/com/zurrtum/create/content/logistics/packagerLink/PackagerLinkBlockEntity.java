@@ -12,7 +12,7 @@ import com.zurrtum.create.content.logistics.packager.PackagerBlockEntity;
 import com.zurrtum.create.content.logistics.packager.PackagingRequest;
 import com.zurrtum.create.content.logistics.packager.repackager.RepackagerBlockEntity;
 import com.zurrtum.create.content.redstone.displayLink.LinkWithBulbBlockEntity;
-import com.zurrtum.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
+import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.infrastructure.component.PackageOrderWithCrafts;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.enums.BlockFace;

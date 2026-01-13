@@ -3,36 +3,24 @@ package com.zurrtum.create.content.kinetics.gauge;
 import com.zurrtum.create.AllBlockEntityTypes;
 import com.zurrtum.create.catnip.theme.Color;
 import com.zurrtum.create.compat.computercraft.AbstractComputerBehaviour;
-import com.zurrtum.create.compat.computercraft.ComputerCraftProxy;
 import com.zurrtum.create.content.kinetics.base.IRotate.SpeedLevel;
-import com.zurrtum.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.infrastructure.config.AllConfigs;
 import net.minecraft.block.BlockState;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 
-import java.util.List;
-
 public class SpeedGaugeBlockEntity extends GaugeBlockEntity {
-
-    public AbstractComputerBehaviour computerBehaviour;
-
     public SpeedGaugeBlockEntity(BlockPos pos, BlockState state) {
         super(AllBlockEntityTypes.SPEEDOMETER, pos, state);
     }
 
     @Override
-    public void addBehaviours(List<BlockEntityBehaviour<?>> behaviours) {
-        super.addBehaviours(behaviours);
-        behaviours.add(computerBehaviour = ComputerCraftProxy.behaviour(this));
-    }
-
-
-    @Override
     public void onSpeedChanged(float prevSpeed) {
         super.onSpeedChanged(prevSpeed);
-        if (computerBehaviour.hasAttachedComputer())
-            computerBehaviour.prepareComputerEvent(makeComputerKineticsChangeEvent());
+        AbstractComputerBehaviour computer = AbstractComputerBehaviour.get(this);
+        if (computer != null) {
+            computer.queueKineticsChange(speed, capacity, stress, overStressed);
+        }
         float speed = Math.abs(getSpeed());
 
         dialTarget = getDialTarget(speed);

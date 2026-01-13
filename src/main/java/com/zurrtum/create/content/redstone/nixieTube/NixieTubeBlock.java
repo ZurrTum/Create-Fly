@@ -4,6 +4,7 @@ import com.zurrtum.create.*;
 import com.zurrtum.create.api.schematic.requirement.SpecialBlockItemRequirement;
 import com.zurrtum.create.catnip.data.Iterate;
 import com.zurrtum.create.compat.Mods;
+import com.zurrtum.create.compat.computercraft.AbstractComputerBehaviour;
 import com.zurrtum.create.content.equipment.wrench.IWrenchable;
 import com.zurrtum.create.content.schematics.requirement.ItemRequirement;
 import com.zurrtum.create.content.schematics.requirement.ItemRequirement.ItemUseType;
@@ -181,7 +182,8 @@ public class NixieTubeBlock extends DoubleFaceAttachedBlock implements IBE<Nixie
                 break;
             // If computer-controlled nixie walking is disallowed, presence of any (same-color)
             // controlled nixies aborts the entire nixie walk.
-            if (!allowComputerControlled && world.getBlockEntity(nextPos) instanceof NixieTubeBlockEntity ntbe && ntbe.computerBehaviour.hasAttachedComputer()) {
+            if (!allowComputerControlled && world.getBlockEntity(nextPos) instanceof NixieTubeBlockEntity ntbe && AbstractComputerBehaviour.contains(
+                ntbe)) {
                 return false;
             }
             currentPos = nextPos;
@@ -191,7 +193,7 @@ public class NixieTubeBlock extends DoubleFaceAttachedBlock implements IBE<Nixie
         // and that includes those down the chain too.
         if (!allowComputerControlled) {
             // Check the start block itself
-            if (world.getBlockEntity(start) instanceof NixieTubeBlockEntity ntbe && ntbe.computerBehaviour.hasAttachedComputer()) {
+            if (world.getBlockEntity(start) instanceof NixieTubeBlockEntity ntbe && AbstractComputerBehaviour.contains(ntbe)) {
                 return false;
             }
             BlockPos leftmostPos = currentPos;
@@ -201,7 +203,7 @@ public class NixieTubeBlock extends DoubleFaceAttachedBlock implements IBE<Nixie
                 BlockPos nextPos = currentPos.offset(right);
                 if (!areNixieBlocksEqual(world.getBlockState(nextPos), state))
                     break;
-                if (world.getBlockEntity(nextPos) instanceof NixieTubeBlockEntity ntbe && ntbe.computerBehaviour.hasAttachedComputer()) {
+                if (world.getBlockEntity(nextPos) instanceof NixieTubeBlockEntity ntbe && AbstractComputerBehaviour.contains(ntbe)) {
                     return false;
                 }
                 currentPos = nextPos;

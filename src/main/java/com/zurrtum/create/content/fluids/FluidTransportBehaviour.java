@@ -7,7 +7,7 @@ import com.zurrtum.create.content.fluids.pipes.EncasedPipeBlock;
 import com.zurrtum.create.content.fluids.pump.PumpBlock;
 import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
 import com.zurrtum.create.foundation.blockEntity.behaviour.BehaviourType;
-import com.zurrtum.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
+import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.infrastructure.fluids.FluidStack;
 import net.minecraft.block.BlockState;
 import net.minecraft.storage.ReadView;

@@ -62,14 +62,16 @@ public class WhistleRenderer implements BlockEntityRenderer<WhistleBlockEntity, 
         WhistleSize size = state.blockState.get(WhistleBlock.SIZE);
         PartialModel mouth = size == WhistleSize.LARGE ? AllPartialModels.WHISTLE_MOUTH_LARGE : size == WhistleSize.MEDIUM ? AllPartialModels.WHISTLE_MOUTH_MEDIUM : AllPartialModels.WHISTLE_MOUTH_SMALL;
         WhistleAnimationBehaviour behaviour = (WhistleAnimationBehaviour) be.getBehaviour(AnimationBehaviour.TYPE);
-        float offset = behaviour.animation.getValue(tickProgress);
-        if (behaviour.animation.getChaseTarget() > 0 && behaviour.animation.getValue() > 0.5f) {
-            float wiggleProgress = (AnimationTickHolder.getTicks(world) + tickProgress) / 8f;
-            offset = (float) (offset - Math.sin(wiggleProgress * (2 * MathHelper.PI) * (4 - size.ordinal())) / 16f);
+        if (behaviour != null) {
+            float offset = behaviour.animation.getValue(tickProgress);
+            if (behaviour.animation.getChaseTarget() > 0 && behaviour.animation.getValue() > 0.5f) {
+                float wiggleProgress = (AnimationTickHolder.getTicks(world) + tickProgress) / 8f;
+                offset = (float) (offset - Math.sin(wiggleProgress * (2 * MathHelper.PI) * (4 - size.ordinal())) / 16f);
+            }
+            state.offset = offset * 4 / 16f;
         }
         state.model = CachedBuffers.partial(mouth, state.blockState);
         state.yRot = MathHelper.RADIANS_PER_DEGREE * AngleHelper.horizontalAngle(direction);
-        state.offset = offset * 4 / 16f;
     }
 
     @Override

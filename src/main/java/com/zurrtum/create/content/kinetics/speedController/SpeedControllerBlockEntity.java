@@ -2,14 +2,12 @@ package com.zurrtum.create.content.kinetics.speedController;
 
 import com.zurrtum.create.AllAdvancements;
 import com.zurrtum.create.AllBlockEntityTypes;
-import com.zurrtum.create.compat.computercraft.AbstractComputerBehaviour;
-import com.zurrtum.create.compat.computercraft.ComputerCraftProxy;
+import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.content.kinetics.RotationPropagator;
 import com.zurrtum.create.content.kinetics.base.KineticBlockEntity;
 import com.zurrtum.create.content.kinetics.simpleRelays.CogWheelBlock;
 import com.zurrtum.create.content.kinetics.simpleRelays.ICogWheel;
 import com.zurrtum.create.foundation.advancement.CreateTrigger;
-import com.zurrtum.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.foundation.blockEntity.behaviour.scrollValue.ServerKineticScrollValueBehaviour;
 import com.zurrtum.create.foundation.blockEntity.behaviour.scrollValue.ServerScrollValueBehaviour;
 import com.zurrtum.create.infrastructure.config.AllConfigs;
@@ -22,7 +20,6 @@ public class SpeedControllerBlockEntity extends KineticBlockEntity {
 
     public static final int DEFAULT_SPEED = 16;
     public ServerScrollValueBehaviour targetSpeed;
-    public AbstractComputerBehaviour computerBehaviour;
 
     public boolean hasBracket;
 
@@ -47,7 +44,6 @@ public class SpeedControllerBlockEntity extends KineticBlockEntity {
         targetSpeed.setValue(DEFAULT_SPEED);
         targetSpeed.withCallback(i -> this.updateTargetRotation());
         behaviours.add(targetSpeed);
-        behaviours.add(computerBehaviour = ComputerCraftProxy.behaviour(this));
     }
 
     @Override

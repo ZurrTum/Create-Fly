@@ -486,7 +486,10 @@ public class ChainConveyorBlockEntity extends KineticBlockEntity implements Tran
     private void updateChainShapes() {
         prepareStats();
         if (world != null && world.isClient()) {
-            getBehaviour(ChainConveyorBehaviour.TYPE).updateChainShapes();
+            ChainConveyorBehaviour behaviour = getBehaviour(ChainConveyorBehaviour.TYPE);
+            if (behaviour != null) {
+                behaviour.updateChainShapes();
+            }
         }
     }
 

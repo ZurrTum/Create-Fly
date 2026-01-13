@@ -5,7 +5,7 @@ import com.zurrtum.create.AllItems;
 import com.zurrtum.create.api.entity.FakePlayerHandler;
 import com.zurrtum.create.content.logistics.box.PackageItem;
 import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
-import com.zurrtum.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
+import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.foundation.blockEntity.behaviour.animatedContainer.AnimatedContainerBehaviour;
 import com.zurrtum.create.foundation.gui.menu.MenuBase;
 import com.zurrtum.create.foundation.gui.menu.MenuProvider;

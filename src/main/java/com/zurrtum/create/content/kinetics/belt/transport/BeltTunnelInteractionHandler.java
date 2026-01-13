@@ -13,7 +13,7 @@ import com.zurrtum.create.content.logistics.tunnel.BrassTunnelBlock;
 import com.zurrtum.create.content.logistics.tunnel.BrassTunnelBlockEntity;
 import com.zurrtum.create.content.redstone.displayLink.DisplayLinkBlock;
 import com.zurrtum.create.content.redstone.displayLink.source.AccumulatedItemCountDisplaySource;
-import com.zurrtum.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
+import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.item.ItemStack;

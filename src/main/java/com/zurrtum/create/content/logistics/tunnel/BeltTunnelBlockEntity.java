@@ -9,7 +9,7 @@ import com.zurrtum.create.catnip.data.Iterate;
 import com.zurrtum.create.content.logistics.funnel.BeltFunnelBlock;
 import com.zurrtum.create.content.logistics.tunnel.BeltTunnelBlock.Shape;
 import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
-import com.zurrtum.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
+import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.infrastructure.packet.s2c.TunnelFlapPacket;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntityType;

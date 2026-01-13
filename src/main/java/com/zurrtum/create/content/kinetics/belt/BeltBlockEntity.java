@@ -12,7 +12,7 @@ import com.zurrtum.create.content.kinetics.belt.behaviour.TransportedItemStackHa
 import com.zurrtum.create.content.kinetics.belt.transport.*;
 import com.zurrtum.create.content.kinetics.belt.transport.BeltMovementHandler.TransportedEntityInfo;
 import com.zurrtum.create.content.logistics.tunnel.BrassTunnelBlockEntity;
-import com.zurrtum.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
+import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.foundation.blockEntity.behaviour.inventory.VersionedInventoryTrackerBehaviour;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
