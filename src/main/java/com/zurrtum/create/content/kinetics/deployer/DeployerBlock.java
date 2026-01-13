@@ -67,14 +67,41 @@ public class DeployerBlock extends DirectionalAxisKineticBlock implements IBE<De
 
     @Override
     public ActionResult onWrenched(BlockState state, ItemUsageContext context) {
-        Vec3d normal = Vec3d.of(state.get(FACING).getVector());
-        Vec3d location = context.getHitPos().subtract(Vec3d.ofCenter(context.getBlockPos()).subtract(normal.multiply(.5))).multiply(normal);
-        if (location.length() > .75f) {
+        if (isHand(state, context)) {
             if (!context.getWorld().isClient())
                 withBlockEntityDo(context.getWorld(), context.getBlockPos(), DeployerBlockEntity::changeMode);
             return ActionResult.SUCCESS;
         }
         return super.onWrenched(state, context);
+    }
+
+    @Override
+    public ActionResult onSneakWrenched(BlockState state, ItemUsageContext context) {
+        PlayerEntity player = context.getPlayer();
+        if (player != null && isHand(state, context)) {
+            if (!context.getWorld().isClient())
+                withBlockEntityDo(
+                    context.getWorld(), context.getBlockPos(), be -> {
+                        ServerPlayerEntity serverPlayer = be.player.cast();
+                        ItemStack heldByDeployer = serverPlayer.getMainHandStack();
+                        ItemStack heldByPlayer = context.getStack();
+                        if (heldByDeployer.isEmpty() && heldByPlayer.isEmpty())
+                            return;
+
+                        player.setStackInHand(context.getHand(), heldByDeployer.copy());
+                        serverPlayer.setStackInHand(Hand.MAIN_HAND, heldByPlayer);
+                        be.notifyUpdate();
+                    }
+                );
+            return ActionResult.SUCCESS;
+        }
+        return super.onSneakWrenched(state, context);
+    }
+
+    private static boolean isHand(BlockState state, ItemUsageContext context) {
+        Vec3d normal = Vec3d.of(state.get(FACING).getVector());
+        Vec3d location = context.getHitPos().subtract(Vec3d.ofCenter(context.getBlockPos()).subtract(normal.multiply(.5))).multiply(normal);
+        return location.length() > .75f;
     }
 
     @Override
