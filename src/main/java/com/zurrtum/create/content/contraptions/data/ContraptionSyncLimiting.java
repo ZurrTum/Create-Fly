@@ -37,7 +37,7 @@ public class ContraptionSyncLimiting {
         int writerIndexBefore = dst.writerIndex();
         dst.writeNbt(compound);
 
-        if (dst.writerIndex() > ContraptionSyncLimiting.LIMIT) {
+        if (dst.writerIndex() - writerIndexBefore > ContraptionSyncLimiting.LIMIT) {
             // Too large to fit in a packet, so roll back to where
             // we were before and write null so the client can detect it.
             dst.writerIndex(writerIndexBefore);
