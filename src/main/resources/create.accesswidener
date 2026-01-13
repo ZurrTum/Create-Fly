@@ -240,3 +240,4 @@ accessible class net/minecraft/client/gui/hud/InGameHud$BarType
 accessible field net/minecraft/client/gui/screen/ingame/HandledScreen focusedSlot Lnet/minecraft/screen/slot/Slot;
 extendable method net/minecraft/client/gui/screen/Screen init (Lnet/minecraft/client/MinecraftClient;II)V
 accessible class net/minecraft/client/render/block/BlockModelRenderer$BrightnessCache
+accessible method net/minecraft/component/type/ContainerComponent <init> (I)V

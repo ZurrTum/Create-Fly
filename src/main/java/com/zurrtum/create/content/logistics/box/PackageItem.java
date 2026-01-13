@@ -76,14 +76,16 @@ public class PackageItem extends Item implements EntityItem {
     }
 
     public static ItemStack containing(List<ItemStack> stacks) {
-        ItemStackHandler newInv = new ItemStackHandler(9);
-        newInv.insert(stacks);
-        return containing(newInv);
+        return containing(stacks.isEmpty() ? ContainerComponent.DEFAULT : ContainerComponent.fromStacks(stacks));
     }
 
-    public static ItemStack containing(ItemStackHandler stacks) {
+    public static ItemStack containing(ItemStackHandler handler) {
+        return containing(ContainerComponent.fromStacks(handler.getStacks()));
+    }
+
+    public static ItemStack containing(ContainerComponent contents) {
         ItemStack box = PackageStyles.getRandomBox();
-        box.set(AllDataComponents.PACKAGE_CONTENTS, ItemHelper.containerContentsFromHandler(stacks));
+        box.set(AllDataComponents.PACKAGE_CONTENTS, contents);
         return box;
     }
 

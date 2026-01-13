@@ -13,6 +13,7 @@ import net.fabricmc.fabric.api.transfer.v1.storage.StorageView;
 import net.fabricmc.fabric.api.transfer.v1.storage.base.SingleSlotStorage;
 import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
 import net.fabricmc.fabric.impl.transfer.item.ItemVariantImpl;
+import net.minecraft.component.DataComponentTypes;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.Direction;
@@ -451,6 +452,45 @@ public abstract class InventoryWrapper<T extends Storage<ItemVariant>, S extends
                 }
                 transaction.commit();
                 return directCopy(((ItemVariantImpl) variant).getCachedStack(), (int) extract);
+            }
+            transaction.abort();
+        }
+        return ItemStack.EMPTY;
+    }
+
+    @Override
+    public ItemStack extractAnyMax() {
+        try (Transaction transaction = Transaction.openOuter()) {
+            for (StorageView<ItemVariant> view : storage.nonEmptyViews()) {
+                ItemVariant variant = view.getResource();
+                int maxAmount = variant.getComponentMap().getOrDefault(DataComponentTypes.MAX_STACK_SIZE, 1);
+                long extract = storage.extract(variant, maxAmount, transaction);
+                if (extract == 0) {
+                    continue;
+                }
+                transaction.commit();
+                return directCopy(((ItemVariantImpl) variant).getCachedStack(), (int) extract);
+            }
+            transaction.abort();
+        }
+        return ItemStack.EMPTY;
+    }
+
+    @Override
+    public ItemStack extractMax(Predicate<ItemStack> predicate) {
+        try (Transaction transaction = Transaction.openOuter()) {
+            for (StorageView<ItemVariant> view : storage.nonEmptyViews()) {
+                ItemVariant variant = view.getResource();
+                ItemStack stack = ((ItemVariantImpl) variant).getCachedStack();
+                if (predicate.test(stack)) {
+                    int maxAmount = variant.getComponentMap().getOrDefault(DataComponentTypes.MAX_STACK_SIZE, 1);
+                    long extract = storage.extract(variant, maxAmount, transaction);
+                    if (extract == 0) {
+                        continue;
+                    }
+                    transaction.commit();
+                    return directCopy(stack, (int) extract);
+                }
             }
             transaction.abort();
         }
@@ -1178,6 +1218,32 @@ public abstract class InventoryWrapper<T extends Storage<ItemVariant>, S extends
                 return ItemStack.EMPTY;
             }
             return inventory.extractAny(maxAmount);
+        }
+
+        @Override
+        public ItemStack extractAnyMax(Direction side) {
+            return extractAnyMax();
+        }
+
+        @Override
+        public ItemStack extractAnyMax() {
+            if (!canExtract) {
+                return ItemStack.EMPTY;
+            }
+            return inventory.extractAnyMax();
+        }
+
+        @Override
+        public ItemStack extractMax(Predicate<ItemStack> predicate, Direction side) {
+            return extractMax(predicate);
+        }
+
+        @Override
+        public ItemStack extractMax(Predicate<ItemStack> predicate) {
+            if (!canExtract) {
+                return ItemStack.EMPTY;
+            }
+            return inventory.extractMax(predicate);
         }
 
         @Override
