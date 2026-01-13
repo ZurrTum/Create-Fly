@@ -39,6 +39,11 @@ public class ValveHandleBlock extends HandCrankBlock {
     }
 
     @Override
+    protected boolean keepBlockEntityWhenReplacedWith(BlockState state) {
+        return AllBlockEntityTypes.VALVE_HANDLE.supports(state);
+    }
+
+    @Override
     public VoxelShape getOutlineShape(BlockState pState, BlockView worldIn, BlockPos pos, ShapeContext context) {
         return AllShapes.VALVE_HANDLE.get(pState.get(FACING));
     }

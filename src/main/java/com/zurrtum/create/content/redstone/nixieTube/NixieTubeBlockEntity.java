@@ -79,7 +79,6 @@ public class NixieTubeBlockEntity extends SmartBlockEntity {
     private Optional<Text> customText;
     private int nixieIndex;
     private Couple<String> displayedStrings;
-    private boolean keepAlive;
 
     public @Nullable ComputerSignal computerSignal;
 
@@ -235,27 +234,5 @@ public class NixieTubeBlockEntity extends SmartBlockEntity {
 
     @Override
     public void addBehaviours(List<BlockEntityBehaviour<?>> behaviours) {
-    }
-
-    @Override
-    @SuppressWarnings("deprecation")
-    public void onBlockReplaced(BlockPos pos, BlockState oldState) {
-        BlockState state = world.getBlockState(pos);
-        if (getType().supports(state)) {
-            keepAlive = true;
-            setCachedState(state);
-        } else {
-            super.onBlockReplaced(pos, oldState);
-        }
-    }
-
-    @Override
-    public void markRemoved() {
-        if (keepAlive) {
-            keepAlive = false;
-            world.getChunk(pos).setBlockEntity(this);
-        } else {
-            super.markRemoved();
-        }
     }
 }

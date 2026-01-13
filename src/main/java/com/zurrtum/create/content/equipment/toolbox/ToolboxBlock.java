@@ -53,6 +53,11 @@ public class ToolboxBlock extends HorizontalFacingBlock implements Waterloggable
     }
 
     @Override
+    protected boolean keepBlockEntityWhenReplacedWith(BlockState state) {
+        return AllBlockEntityTypes.TOOLBOX.supports(state);
+    }
+
+    @Override
     public Inventory getInventory(WorldAccess world, BlockPos pos, BlockState state, ToolboxBlockEntity blockEntity, Direction context) {
         return blockEntity.inventory;
     }
