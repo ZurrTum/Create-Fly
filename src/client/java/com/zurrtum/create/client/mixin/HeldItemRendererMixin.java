@@ -3,6 +3,7 @@ package com.zurrtum.create.client.mixin;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.zurrtum.create.client.Create;
+import com.zurrtum.create.client.content.equipment.armor.NetheriteBacktankFirstPersonRenderer;
 import com.zurrtum.create.client.content.equipment.extendoGrip.ExtendoGripRenderHandler;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.AbstractClientPlayerEntity;
@@ -11,7 +12,9 @@ import net.minecraft.client.render.entity.EntityRenderManager;
 import net.minecraft.client.render.item.HeldItemRenderer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.AssetInfo;
 import net.minecraft.util.Hand;
+import net.minecraft.util.Identifier;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -80,5 +83,23 @@ public class HeldItemRendererMixin {
             return;
         }
         original.call(instance, player, tickProgress, pitch, hand, swingProgress, item, equipProgress, matrices, queue, light);
+    }
+
+    @WrapOperation(method = "renderArm(Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/command/OrderedRenderCommandQueue;ILnet/minecraft/util/Arm;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/util/AssetInfo$TextureAsset;texturePath()Lnet/minecraft/util/Identifier;"))
+    private Identifier getMapHandTexture(AssetInfo.TextureAsset instance, Operation<Identifier> original) {
+        Identifier id = NetheriteBacktankFirstPersonRenderer.getHandTexture(client.player);
+        if (id != null) {
+            return id;
+        }
+        return original.call(instance);
+    }
+
+    @WrapOperation(method = "renderArmHoldingItem(Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/command/OrderedRenderCommandQueue;IFFLnet/minecraft/util/Arm;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/util/AssetInfo$TextureAsset;texturePath()Lnet/minecraft/util/Identifier;"))
+    private Identifier getHandTexture(AssetInfo.TextureAsset instance, Operation<Identifier> original) {
+        Identifier id = NetheriteBacktankFirstPersonRenderer.getHandTexture(client.player);
+        if (id != null) {
+            return id;
+        }
+        return original.call(instance);
     }
 }
