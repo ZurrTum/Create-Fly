@@ -1,5 +1,9 @@
 package com.zurrtum.create.infrastructure.items;
 
+import it.unimi.dsi.fastutil.ints.IntArrayList;
+import it.unimi.dsi.fastutil.ints.IntList;
+import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
+import it.unimi.dsi.fastutil.ints.IntSet;
 import it.unimi.dsi.fastutil.objects.Object2IntLinkedOpenCustomHashMap;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntSortedMap;
@@ -82,7 +86,7 @@ public interface BaseSidedInventory extends Inventory {
                 continue;
             }
             if (create$canExtract(slot, stack, side) && predicate.test(stack)) {
-                return onExtract(stack);
+                return onExtract(directCopy(stack, stack.getCount()));
             }
         }
         return ItemStack.EMPTY;
@@ -125,6 +129,49 @@ public interface BaseSidedInventory extends Inventory {
                     }
                 }
                 return onExtract(directCopy(findStack, count));
+            }
+        }
+        return ItemStack.EMPTY;
+    }
+
+    @Override
+    default ItemStack preciseCount(Predicate<ItemStack> predicate, int maxAmount) {
+        return preciseCount(predicate, maxAmount, null);
+    }
+
+    @Override
+    default ItemStack preciseCount(Predicate<ItemStack> predicate, int maxAmount, Direction side) {
+        if (maxAmount == 0) {
+            return ItemStack.EMPTY;
+        }
+        IntSet blackList = new IntOpenHashSet();
+        int[] slots = create$getAvailableSlots(side);
+        for (int i = 0, size = slots.length; i < size; i++) {
+            int slot = slots[i];
+            ItemStack findStack = getStack(slot);
+            if (findStack.isEmpty() || blackList.contains(i)) {
+                continue;
+            }
+            if (create$canExtract(slot, findStack, side) && predicate.test(findStack)) {
+                int count = findStack.getCount();
+                if (count >= maxAmount) {
+                    return onExtract(directCopy(findStack, maxAmount));
+                }
+                for (int j = i + 1; j < size; j++) {
+                    slot = slots[j];
+                    ItemStack stack = getStack(slot);
+                    if (stack.isEmpty()) {
+                        continue;
+                    }
+                    if (create$canExtract(slot, stack, side) && matches(stack, findStack)) {
+                        count += stack.getCount();
+                        if (count < maxAmount) {
+                            blackList.add(j);
+                            continue;
+                        }
+                        return onExtract(directCopy(findStack, maxAmount));
+                    }
+                }
             }
         }
         return ItemStack.EMPTY;
@@ -1162,7 +1209,7 @@ public interface BaseSidedInventory extends Inventory {
     @Override
     default int insertExist(ItemStack stack, int maxAmount, Direction side) {
         int remaining = maxAmount;
-        List<Integer> emptys = new ArrayList<>();
+        IntList emptys = new IntArrayList();
         for (int slot : create$getAvailableSlots(side)) {
             if (create$canInsert(slot, stack, side) && isValid(slot, stack)) {
                 ItemStack target = getStack(slot);
@@ -1183,9 +1230,9 @@ public interface BaseSidedInventory extends Inventory {
                 }
             }
         }
-        for (int slot : emptys) {
+        for (int i = 0, size = emptys.size(); i < size; i++) {
             int insert = Math.min(remaining, getMaxCount(stack));
-            setStack(slot, directCopy(stack, insert));
+            setStack(emptys.getInt(i), directCopy(stack, insert));
             if (remaining == insert) {
                 markDirty();
                 return maxAmount;
@@ -1222,7 +1269,7 @@ public interface BaseSidedInventory extends Inventory {
             return true;
         }
         int remaining = stack.getCount();
-        List<Runnable> changes = new ArrayList<>();
+        IntList buffer = new IntArrayList();
         for (int slot : create$getAvailableSlots(side)) {
             if (create$canExtract(slot, stack, side)) {
                 ItemStack target = getStack(slot);
@@ -1232,18 +1279,22 @@ public interface BaseSidedInventory extends Inventory {
                 if (matches(target, stack)) {
                     int count = target.getCount();
                     if (count > remaining) {
-                        changes.forEach(Runnable::run);
+                        for (int i = 0, size = buffer.size(); i < size; i++) {
+                            setStack(buffer.getInt(i), ItemStack.EMPTY);
+                        }
                         target.setCount(count - remaining);
                         markDirty();
                         return true;
                     }
                     if (count == remaining) {
-                        changes.forEach(Runnable::run);
+                        for (int i = 0, size = buffer.size(); i < size; i++) {
+                            setStack(buffer.getInt(i), ItemStack.EMPTY);
+                        }
                         setStack(slot, ItemStack.EMPTY);
                         markDirty();
                         return true;
                     }
-                    changes.add(() -> setStack(slot, ItemStack.EMPTY));
+                    buffer.add(slot);
                     remaining -= count;
                 }
             }
@@ -1263,14 +1314,16 @@ public interface BaseSidedInventory extends Inventory {
         }
         int[] slots = create$getAvailableSlots(side);
         int size = slots.length;
-        List<Integer> buffer = new ArrayList<>(size);
+        IntList buffer = new IntArrayList(size);
+        IntSet blackList = new IntOpenHashSet();
         for (int i = 0; i < size; i++) {
             int slot = slots[i];
             ItemStack findStack = getStack(slot);
-            if (findStack.isEmpty()) {
+            if (findStack.isEmpty() || blackList.contains(i)) {
                 continue;
             }
             if (create$canExtract(slot, findStack, side) && predicate.test(findStack)) {
+                buffer.clear();
                 int count = findStack.getCount();
                 if (count > maxAmount) {
                     findStack.setCount(count - maxAmount);
@@ -1284,8 +1337,8 @@ public interface BaseSidedInventory extends Inventory {
                 }
                 buffer.add(slot);
                 int remaining = maxAmount - count;
-                for (i = i + 1; i < size; i++) {
-                    slot = slots[i];
+                for (int j = i + 1; j < size; j++) {
+                    slot = slots[j];
                     ItemStack stack = getStack(slot);
                     if (stack.isEmpty()) {
                         continue;
@@ -1293,11 +1346,14 @@ public interface BaseSidedInventory extends Inventory {
                     if (create$canExtract(slot, stack, side) && matches(stack, findStack)) {
                         count = stack.getCount();
                         if (count < remaining) {
+                            blackList.add(j);
                             buffer.add(slot);
                             remaining -= count;
                             continue;
                         }
-                        buffer.forEach(j -> setStack(j, ItemStack.EMPTY));
+                        for (int k = 0, bSize = buffer.size(); k < bSize; k++) {
+                            setStack(buffer.getInt(k), ItemStack.EMPTY);
+                        }
                         if (count == remaining) {
                             setStack(slot, ItemStack.EMPTY);
                         } else {
