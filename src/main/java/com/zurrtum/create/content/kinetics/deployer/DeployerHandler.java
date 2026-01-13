@@ -23,7 +23,6 @@ import net.minecraft.component.type.AttributeModifiersComponent;
 import net.minecraft.component.type.FoodComponent;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.ItemEntity;
-import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.attribute.EntityAttribute;
 import net.minecraft.entity.attribute.EntityAttributeModifier;
 import net.minecraft.entity.passive.MerchantEntity;
@@ -147,15 +146,11 @@ public class DeployerHandler {
                 //                    entity.captureDrops(null);
                 //                    return;
                 //                }
-                if (cancelResult == null) {
-                    if (entity.interact(serverPlayer, hand).isAccepted()) {
-                        if (entity instanceof MerchantEntity villager) {
-                            if (villager.getCustomer() == serverPlayer)
-                                villager.setCustomer(null);
-                        }
-                        success = true;
-                    } else if (entity instanceof LivingEntity livingEntity && stack.useOnEntity(serverPlayer, livingEntity, hand).isAccepted())
-                        success = true;
+                if (cancelResult == null && serverPlayer.interact(entity, hand).isAccepted()) {
+                    success = true;
+                    if (entity instanceof MerchantEntity villager && villager.getCustomer() == serverPlayer) {
+                        villager.setCustomer(null);
+                    }
                 }
                 if (!success && entity instanceof PlayerEntity playerEntity) {
                     if (stack.contains(DataComponentTypes.FOOD)) {

@@ -1,10 +1,8 @@
 package com.zurrtum.create.content.kinetics.deployer;
 
 import com.mojang.serialization.Codec;
-import com.zurrtum.create.AllAdvancements;
-import com.zurrtum.create.AllBlockEntityTypes;
-import com.zurrtum.create.AllBlocks;
-import com.zurrtum.create.AllRecipeTypes;
+import com.zurrtum.create.*;
+import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.catnip.animation.LerpedFloat;
 import com.zurrtum.create.catnip.math.VecHelper;
 import com.zurrtum.create.content.equipment.sandPaper.SandPaperItem;
@@ -12,7 +10,6 @@ import com.zurrtum.create.content.kinetics.base.KineticBlockEntity;
 import com.zurrtum.create.content.kinetics.belt.behaviour.BeltProcessingBehaviour;
 import com.zurrtum.create.content.kinetics.belt.behaviour.TransportedItemStackHandlerBehaviour;
 import com.zurrtum.create.foundation.advancement.CreateTrigger;
-import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.foundation.blockEntity.behaviour.filtering.ServerFilteringBehaviour;
 import com.zurrtum.create.foundation.codec.CreateCodecs;
 import net.minecraft.block.BlockState;
@@ -116,7 +113,7 @@ public class DeployerBlockEntity extends KineticBlockEntity {
     @Override
     public void addBehaviours(List<BlockEntityBehaviour<?>> behaviours) {
         super.addBehaviours(behaviours);
-        filtering = new ServerFilteringBehaviour(this);
+        filtering = new ServerFilteringBehaviour.CustomInteract(this, List.of(AllItems.MECHANICAL_ARM));
         behaviours.add(filtering);
         processingBehaviour = new BeltProcessingBehaviour(this).whenItemEnters((s, i) -> BeltDeployerCallbacks.onItemReceived(s, i, this))
             .whileItemHeld((s, i) -> BeltDeployerCallbacks.whenItemHeld(s, i, this));
