@@ -121,6 +121,30 @@ public abstract class InventoryWrapper<T extends Storage<ItemVariant>, S extends
 
     @Override
     @SuppressWarnings("UnstableApiUsage")
+    public ItemStack preciseCount(Predicate<ItemStack> predicate, int maxAmount) {
+        if (maxAmount == 0) {
+            return ItemStack.EMPTY;
+        }
+        try (Transaction transaction = Transaction.openOuter()) {
+            for (StorageView<ItemVariant> view : storage.nonEmptyViews()) {
+                ItemVariant variant = view.getResource();
+                ItemStack stack = ((ItemVariantImpl) variant).getCachedStack();
+                if (predicate.test(stack)) {
+                    long extract = storage.extract(variant, maxAmount, transaction);
+                    if (extract != maxAmount) {
+                        continue;
+                    }
+                    transaction.abort();
+                    return directCopy(stack, (int) extract);
+                }
+            }
+            transaction.abort();
+        }
+        return ItemStack.EMPTY;
+    }
+
+    @Override
+    @SuppressWarnings("UnstableApiUsage")
     public int countAll(Predicate<ItemStack> predicate, int maxAmount) {
         if (maxAmount == 0) {
             return 0;
@@ -669,21 +693,18 @@ public abstract class InventoryWrapper<T extends Storage<ItemVariant>, S extends
         if (maxAmount == 0) {
             return ItemStack.EMPTY;
         }
-        try (Transaction transaction = Transaction.openOuter()) {
-            for (StorageView<ItemVariant> view : storage.nonEmptyViews()) {
-                ItemVariant variant = view.getResource();
-                ItemStack stack = ((ItemVariantImpl) variant).getCachedStack();
-                if (predicate.test(stack)) {
+        for (StorageView<ItemVariant> view : storage.nonEmptyViews()) {
+            ItemVariant variant = view.getResource();
+            ItemStack stack = ((ItemVariantImpl) variant).getCachedStack();
+            if (predicate.test(stack)) {
+                try (Transaction transaction = Transaction.openOuter()) {
                     long extract = storage.extract(variant, maxAmount, transaction);
-                    if (extract == 0) {
+                    if (extract != maxAmount) {
+                        transaction.abort();
                         continue;
                     }
-                    if (extract == maxAmount) {
-                        transaction.commit();
-                        return directCopy(stack, maxAmount);
-                    } else {
-                        transaction.abort();
-                    }
+                    transaction.commit();
+                    return directCopy(stack, maxAmount);
                 }
             }
         }
@@ -962,6 +983,19 @@ public abstract class InventoryWrapper<T extends Storage<ItemVariant>, S extends
                 return ItemStack.EMPTY;
             }
             return inventory.count(predicate, maxAmount);
+        }
+
+        @Override
+        public ItemStack preciseCount(Predicate<ItemStack> predicate, int maxAmount, Direction side) {
+            return preciseCount(predicate, maxAmount);
+        }
+
+        @Override
+        public ItemStack preciseCount(Predicate<ItemStack> predicate, int maxAmount) {
+            if (!canExtract) {
+                return ItemStack.EMPTY;
+            }
+            return inventory.preciseCount(predicate, maxAmount);
         }
 
         @Override
