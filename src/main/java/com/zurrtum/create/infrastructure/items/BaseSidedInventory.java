@@ -841,6 +841,116 @@ public interface BaseSidedInventory extends Inventory {
         return ItemStack.EMPTY;
     }
 
+    @Override
+    default ItemStack extractAnyMax() {
+        return extractAnyMax(null);
+    }
+
+    @Override
+    default ItemStack extractAnyMax(Direction side) {
+        int[] slots = create$getAvailableSlots(side);
+        int size = slots.length;
+        for (int i = 0; i < size; i++) {
+            int slot = slots[i];
+            ItemStack findStack = getStack(slot);
+            if (findStack.isEmpty()) {
+                continue;
+            }
+            if (create$canExtract(slot, findStack, side)) {
+                int count = findStack.getCount();
+                int maxAmount = findStack.getMaxCount();
+                setStack(slot, ItemStack.EMPTY);
+                if (count == maxAmount) {
+                    markDirty();
+                    return onExtract(findStack);
+                }
+                int remaining = maxAmount - count;
+                for (i = i + 1; i < size; i++) {
+                    slot = slots[i];
+                    ItemStack stack = getStack(slot);
+                    if (stack.isEmpty()) {
+                        continue;
+                    }
+                    if (create$canExtract(slot, stack, side) && matches(stack, findStack)) {
+                        count = stack.getCount();
+                        if (count < remaining) {
+                            setStack(slot, ItemStack.EMPTY);
+                            remaining -= count;
+                            continue;
+                        }
+                        if (count == remaining) {
+                            setStack(slot, ItemStack.EMPTY);
+                        } else {
+                            stack.setCount(count - remaining);
+                        }
+                        markDirty();
+                        findStack.setCount(maxAmount);
+                        return onExtract(findStack);
+                    }
+                }
+                markDirty();
+                findStack.setCount(maxAmount - remaining);
+                return onExtract(findStack);
+            }
+        }
+        return ItemStack.EMPTY;
+    }
+
+    @Override
+    default ItemStack extractMax(Predicate<ItemStack> predicate) {
+        return extractMax(predicate, null);
+    }
+
+    @Override
+    default ItemStack extractMax(Predicate<ItemStack> predicate, Direction side) {
+        int[] slots = create$getAvailableSlots(side);
+        int size = slots.length;
+        for (int i = 0; i < size; i++) {
+            int slot = slots[i];
+            ItemStack findStack = getStack(slot);
+            if (findStack.isEmpty()) {
+                continue;
+            }
+            if (predicate.test(findStack) && create$canExtract(slot, findStack, side)) {
+                int count = findStack.getCount();
+                int maxAmount = findStack.getMaxCount();
+                setStack(slot, ItemStack.EMPTY);
+                if (count == maxAmount) {
+                    markDirty();
+                    return onExtract(findStack);
+                }
+                int remaining = maxAmount - count;
+                for (i = i + 1; i < size; i++) {
+                    slot = slots[i];
+                    ItemStack stack = getStack(slot);
+                    if (stack.isEmpty()) {
+                        continue;
+                    }
+                    if (create$canExtract(slot, stack, side) && matches(stack, findStack)) {
+                        count = stack.getCount();
+                        if (count < remaining) {
+                            setStack(slot, ItemStack.EMPTY);
+                            remaining -= count;
+                            continue;
+                        }
+                        if (count == remaining) {
+                            setStack(slot, ItemStack.EMPTY);
+                        } else {
+                            stack.setCount(count - remaining);
+                        }
+                        markDirty();
+                        findStack.setCount(maxAmount);
+                        return onExtract(findStack);
+                    }
+                }
+                markDirty();
+                findStack.setCount(maxAmount - remaining);
+                return onExtract(findStack);
+            }
+        }
+        return ItemStack.EMPTY;
+    }
+
     private int findEndIndex(int[] slots, int start, int end) {
         for (int i = slots.length - 1; i >= start; i--) {
             if (slots[i] <= end) {
