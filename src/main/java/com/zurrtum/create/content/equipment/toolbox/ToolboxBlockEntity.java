@@ -3,11 +3,11 @@ package com.zurrtum.create.content.equipment.toolbox;
 import com.zurrtum.create.AllBlockEntityTypes;
 import com.zurrtum.create.AllDataComponents;
 import com.zurrtum.create.AllSynchedDatas;
+import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.catnip.animation.LerpedFloat;
 import com.zurrtum.create.catnip.animation.LerpedFloat.Chaser;
 import com.zurrtum.create.catnip.math.VecHelper;
 import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
-import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.foundation.blockEntity.behaviour.animatedContainer.AnimatedContainerBehaviour;
 import com.zurrtum.create.foundation.gui.menu.MenuProvider;
 import com.zurrtum.create.foundation.utility.ResetableLazy;
@@ -50,7 +50,6 @@ public class ToolboxBlockEntity extends SmartBlockEntity implements MenuProvider
     private Text customName;
 
     private AnimatedContainerBehaviour<ToolboxMenu> openTracker;
-    private boolean keepAlive;
 
     public ToolboxBlockEntity(BlockPos pos, BlockState state) {
         super(AllBlockEntityTypes.TOOLBOX, pos, state);
@@ -402,26 +401,5 @@ public class ToolboxBlockEntity extends SmartBlockEntity implements MenuProvider
     protected void addComponents(Builder components) {
         components.add(AllDataComponents.TOOLBOX_UUID, uniqueId);
         components.add(AllDataComponents.TOOLBOX_INVENTORY, inventory);
-    }
-
-    @Override
-    public void onBlockReplaced(BlockPos pos, BlockState oldState) {
-        BlockState state = world.getBlockState(pos);
-        if (getType().supports(state)) {
-            keepAlive = true;
-            setCachedState(state);
-        } else {
-            super.onBlockReplaced(pos, oldState);
-        }
-    }
-
-    @Override
-    public void markRemoved() {
-        if (keepAlive) {
-            keepAlive = false;
-            world.getChunk(pos).setBlockEntity(this);
-        } else {
-            super.markRemoved();
-        }
     }
 }

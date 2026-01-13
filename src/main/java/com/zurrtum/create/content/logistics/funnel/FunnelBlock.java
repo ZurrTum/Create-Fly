@@ -1,12 +1,14 @@
 package com.zurrtum.create.content.logistics.funnel;
 
+import com.zurrtum.create.AllBlockEntityTypes;
 import com.zurrtum.create.AllItems;
 import com.zurrtum.create.AllShapes;
+import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.catnip.math.VecHelper;
 import com.zurrtum.create.content.logistics.box.PackageEntity;
 import com.zurrtum.create.foundation.advancement.AdvancementBehaviour;
+import com.zurrtum.create.foundation.block.BlockEntityKeepBlock;
 import com.zurrtum.create.foundation.block.ProperWaterloggedBlock;
-import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.foundation.blockEntity.behaviour.filtering.ServerFilteringBehaviour;
 import com.zurrtum.create.foundation.item.ItemHelper;
 import net.minecraft.block.Block;
@@ -37,13 +39,18 @@ import net.minecraft.world.World;
 import net.minecraft.world.WorldView;
 import net.minecraft.world.tick.ScheduledTickView;
 
-public abstract class FunnelBlock extends AbstractDirectionalFunnelBlock {
+public abstract class FunnelBlock extends AbstractDirectionalFunnelBlock implements BlockEntityKeepBlock {
 
     public static final BooleanProperty EXTRACTING = BooleanProperty.of("extracting");
 
     public FunnelBlock(Settings p_i48415_1_) {
         super(p_i48415_1_);
         setDefaultState(getDefaultState().with(EXTRACTING, false));
+    }
+
+    @Override
+    public boolean keepBlockEntityWhenReplacedWith(BlockState state) {
+        return AllBlockEntityTypes.FUNNEL.supports(state);
     }
 
     public abstract BlockState getEquivalentBeltFunnel(BlockView world, BlockPos pos, BlockState state);

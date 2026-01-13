@@ -3,6 +3,7 @@ package com.zurrtum.create.content.equipment.toolbox;
 import com.mojang.serialization.MapCodec;
 import com.zurrtum.create.*;
 import com.zurrtum.create.api.entity.FakePlayerHandler;
+import com.zurrtum.create.foundation.block.BlockEntityKeepBlock;
 import com.zurrtum.create.foundation.block.IBE;
 import com.zurrtum.create.foundation.item.ItemHelper;
 import com.zurrtum.create.foundation.utility.BlockHelper;
@@ -40,7 +41,7 @@ import java.util.function.Function;
 
 import static net.minecraft.state.property.Properties.WATERLOGGED;
 
-public class ToolboxBlock extends HorizontalFacingBlock implements Waterloggable, IBE<ToolboxBlockEntity>, ItemInventoryProvider<ToolboxBlockEntity> {
+public class ToolboxBlock extends HorizontalFacingBlock implements Waterloggable, IBE<ToolboxBlockEntity>, ItemInventoryProvider<ToolboxBlockEntity>, BlockEntityKeepBlock {
 
     protected final DyeColor color;
 
@@ -50,6 +51,11 @@ public class ToolboxBlock extends HorizontalFacingBlock implements Waterloggable
         super(properties);
         this.color = color;
         setDefaultState(getDefaultState().with(WATERLOGGED, false));
+    }
+
+    @Override
+    public boolean keepBlockEntityWhenReplacedWith(BlockState state) {
+        return AllBlockEntityTypes.TOOLBOX.supports(state);
     }
 
     @Override

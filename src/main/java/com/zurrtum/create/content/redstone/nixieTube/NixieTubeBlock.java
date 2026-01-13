@@ -8,6 +8,7 @@ import com.zurrtum.create.compat.computercraft.AbstractComputerBehaviour;
 import com.zurrtum.create.content.equipment.wrench.IWrenchable;
 import com.zurrtum.create.content.schematics.requirement.ItemRequirement;
 import com.zurrtum.create.content.schematics.requirement.ItemRequirement.ItemUseType;
+import com.zurrtum.create.foundation.block.BlockEntityKeepBlock;
 import com.zurrtum.create.foundation.block.IBE;
 import com.zurrtum.create.foundation.block.RedStoneConnectBlock;
 import com.zurrtum.create.infrastructure.component.ClipboardEntry;
@@ -52,7 +53,7 @@ import java.util.function.Function;
 
 import static net.minecraft.state.property.Properties.WATERLOGGED;
 
-public class NixieTubeBlock extends DoubleFaceAttachedBlock implements IBE<NixieTubeBlockEntity>, IWrenchable, Waterloggable, SpecialBlockItemRequirement, RedStoneConnectBlock {
+public class NixieTubeBlock extends DoubleFaceAttachedBlock implements IBE<NixieTubeBlockEntity>, IWrenchable, Waterloggable, SpecialBlockItemRequirement, RedStoneConnectBlock, BlockEntityKeepBlock {
     protected final DyeColor color;
 
     public NixieTubeBlock(Settings properties, DyeColor color) {
@@ -63,6 +64,11 @@ public class NixieTubeBlock extends DoubleFaceAttachedBlock implements IBE<Nixie
 
     public NixieTubeBlock(Settings properties) {
         this(properties, DyeColor.ORANGE);
+    }
+
+    @Override
+    public boolean keepBlockEntityWhenReplacedWith(BlockState state) {
+        return AllBlockEntityTypes.NIXIE_TUBE.supports(state);
     }
 
     public static Function<Settings, NixieTubeBlock> dyed(DyeColor color) {

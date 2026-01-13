@@ -2,10 +2,10 @@ package com.zurrtum.create.content.kinetics.crank;
 
 import com.zurrtum.create.AllBlockEntityTypes;
 import com.zurrtum.create.AllBlocks;
+import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.content.kinetics.base.KineticBlockEntity;
 import com.zurrtum.create.content.kinetics.transmission.sequencer.SequencedGearshiftBlockEntity.SequenceContext;
 import com.zurrtum.create.content.kinetics.transmission.sequencer.SequencerInstructions;
-import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.foundation.blockEntity.behaviour.scrollValue.ServerScrollValueBehaviour;
 import com.zurrtum.create.foundation.blockEntity.behaviour.scrollValue.ServerValveScrollValueBehaviour;
 import net.minecraft.block.BlockState;
@@ -24,7 +24,6 @@ public class ValveHandleBlockEntity extends HandCrankBlockEntity {
     public int startAngle;
     public int targetAngle;
     public int totalUseTicks;
-    private boolean keepAlive;
 
     public ValveHandleBlockEntity(BlockPos pos, BlockState state) {
         super(AllBlockEntityTypes.VALVE_HANDLE, pos, state);
@@ -101,27 +100,5 @@ public class ValveHandleBlockEntity extends HandCrankBlockEntity {
 
     @Override
     protected void copySequenceContextFrom(KineticBlockEntity sourceBE) {
-    }
-
-    @Override
-    @SuppressWarnings("deprecation")
-    public void onBlockReplaced(BlockPos pos, BlockState oldState) {
-        BlockState state = world.getBlockState(pos);
-        if (getType().supports(state)) {
-            keepAlive = true;
-            setCachedState(state);
-        } else {
-            super.onBlockReplaced(pos, oldState);
-        }
-    }
-
-    @Override
-    public void markRemoved() {
-        if (keepAlive) {
-            keepAlive = false;
-            world.getChunk(pos).setBlockEntity(this);
-        } else {
-            super.markRemoved();
-        }
     }
 }

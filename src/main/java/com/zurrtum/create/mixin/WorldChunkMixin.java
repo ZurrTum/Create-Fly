@@ -3,10 +3,12 @@ package com.zurrtum.create.mixin;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
+import com.zurrtum.create.foundation.block.BlockEntityKeepBlock;
 import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
 import com.zurrtum.create.foundation.blockEntity.SyncedBlockEntity;
 import com.zurrtum.create.foundation.fluid.FluidHelper;
 import com.zurrtum.create.foundation.item.ItemHelper;
+import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.storage.ReadView;
@@ -69,5 +71,16 @@ public abstract class WorldChunkMixin {
                 sbe.onChunkUnloaded();
             }
         });
+    }
+
+    @WrapOperation(method = "setBlockState(Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/BlockState;I)Lnet/minecraft/block/BlockState;", at = @At(value = "INVOKE", target = "Lnet/minecraft/block/BlockState;hasBlockEntity()Z", ordinal = 0))
+    private boolean replaceBlockEntity(BlockState state, Operation<Boolean> original, @Local(argsOnly = true) BlockState newState) {
+        if (original.call(state)) {
+            if (state.getBlock() instanceof BlockEntityKeepBlock block) {
+                return !block.keepBlockEntityWhenReplacedWith(newState);
+            }
+            return true;
+        }
+        return false;
     }
 }
