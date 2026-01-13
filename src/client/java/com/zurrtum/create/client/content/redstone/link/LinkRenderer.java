@@ -1,6 +1,7 @@
 package com.zurrtum.create.client.content.redstone.link;
 
 import com.mojang.datafixers.util.Pair;
+import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.catnip.data.Iterate;
 import com.zurrtum.create.catnip.math.VecHelper;
 import com.zurrtum.create.client.Create;
@@ -11,7 +12,6 @@ import com.zurrtum.create.client.foundation.blockEntity.behaviour.ValueBoxTransf
 import com.zurrtum.create.client.foundation.utility.CreateLang;
 import com.zurrtum.create.client.infrastructure.config.AllConfigs;
 import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
-import com.zurrtum.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.util.math.MatrixStack;

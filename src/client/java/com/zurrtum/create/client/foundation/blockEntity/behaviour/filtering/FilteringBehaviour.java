@@ -33,7 +33,7 @@ import com.zurrtum.create.content.redstone.thresholdSwitch.ThresholdSwitchBlockE
 import com.zurrtum.create.content.trains.observer.TrackObserverBlockEntity;
 import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
 import com.zurrtum.create.foundation.blockEntity.behaviour.BehaviourType;
-import com.zurrtum.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
+import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.foundation.blockEntity.behaviour.ValueSettings;
 import com.zurrtum.create.foundation.blockEntity.behaviour.filtering.ServerFilteringBehaviour;
 import net.minecraft.block.BlockState;

@@ -7,7 +7,7 @@ import com.zurrtum.create.catnip.math.VecHelper;
 import com.zurrtum.create.content.kinetics.base.KineticBlockEntity;
 import com.zurrtum.create.content.kinetics.belt.behaviour.DirectBeltInputBehaviour;
 import com.zurrtum.create.foundation.advancement.CreateTrigger;
-import com.zurrtum.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
+import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.infrastructure.items.SidedItemInventory;
 import com.zurrtum.create.infrastructure.transfer.SlotRangeCache;
 import net.minecraft.block.BlockState;

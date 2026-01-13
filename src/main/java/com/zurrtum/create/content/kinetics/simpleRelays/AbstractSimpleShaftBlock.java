@@ -4,7 +4,7 @@ import com.zurrtum.create.AllBlockEntityTypes;
 import com.zurrtum.create.content.decoration.bracket.BracketedBlockEntityBehaviour;
 import com.zurrtum.create.content.equipment.wrench.IWrenchableWithBracket;
 import com.zurrtum.create.content.kinetics.base.KineticBlockEntity;
-import com.zurrtum.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
+import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import net.minecraft.block.AbstractBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;

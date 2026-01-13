@@ -10,7 +10,7 @@ import com.zurrtum.create.content.contraptions.bearing.WindmillBearingBlockEntit
 import com.zurrtum.create.content.kinetics.steamEngine.PoweredShaftBlockEntity;
 import com.zurrtum.create.content.kinetics.steamEngine.SteamEngineBlockEntity;
 import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
-import com.zurrtum.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
+import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import net.minecraft.text.Text;
 
 public class RotationDirectionScrollBehaviour extends ScrollOptionBehaviour<RotationDirection> {

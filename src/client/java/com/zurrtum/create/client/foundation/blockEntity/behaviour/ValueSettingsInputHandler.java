@@ -11,7 +11,7 @@ import com.zurrtum.create.client.foundation.blockEntity.behaviour.scrollValue.Sc
 import com.zurrtum.create.content.logistics.factoryBoard.FactoryPanelBlockEntity;
 import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
 import com.zurrtum.create.foundation.blockEntity.behaviour.BehaviourType;
-import com.zurrtum.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
+import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.infrastructure.packet.c2s.ValueSettingsPacket;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.entity.player.PlayerEntity;

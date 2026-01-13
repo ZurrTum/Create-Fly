@@ -2,7 +2,7 @@ package com.zurrtum.create.client.content.redstone.link;
 
 import com.zurrtum.create.AllItems;
 import com.zurrtum.create.catnip.data.Iterate;
-import com.zurrtum.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
+import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.infrastructure.packet.c2s.LinkSettingsPacket;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.item.ItemStack;

@@ -1,7 +1,7 @@
 package com.zurrtum.create.content.kinetics.chainConveyor;
 
 import com.zurrtum.create.foundation.blockEntity.behaviour.BehaviourType;
-import com.zurrtum.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
+import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 
 public abstract class ChainConveyorBehaviour extends BlockEntityBehaviour<ChainConveyorBlockEntity> {
     public static final BehaviourType<ChainConveyorBehaviour> TYPE = new BehaviourType<>();

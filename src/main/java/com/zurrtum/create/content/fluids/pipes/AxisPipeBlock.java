@@ -10,7 +10,7 @@ import com.zurrtum.create.content.fluids.FluidPropagator;
 import com.zurrtum.create.content.fluids.FluidTransportBehaviour;
 import com.zurrtum.create.foundation.advancement.AdvancementBehaviour;
 import com.zurrtum.create.foundation.block.NeighborUpdateListeningBlock;
-import com.zurrtum.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
+import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.PillarBlock;

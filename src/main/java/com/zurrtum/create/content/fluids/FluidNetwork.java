@@ -5,7 +5,7 @@ import com.zurrtum.create.catnip.data.Pair;
 import com.zurrtum.create.catnip.math.BlockFace;
 import com.zurrtum.create.content.contraptions.actors.psi.PortableFluidInterfaceBlockEntity.InterfaceFluidHandler;
 import com.zurrtum.create.content.fluids.PipeConnection.Flow;
-import com.zurrtum.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
+import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.infrastructure.fluids.FluidInventory;
 import com.zurrtum.create.infrastructure.fluids.FluidStack;
 import net.minecraft.util.math.BlockPos;

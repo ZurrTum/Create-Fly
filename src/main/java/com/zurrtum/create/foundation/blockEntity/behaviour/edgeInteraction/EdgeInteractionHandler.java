@@ -1,7 +1,7 @@
 package com.zurrtum.create.foundation.blockEntity.behaviour.edgeInteraction;
 
 import com.zurrtum.create.catnip.data.Iterate;
-import com.zurrtum.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
+import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.foundation.utility.BlockHelper;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;

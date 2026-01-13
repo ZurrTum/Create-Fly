@@ -19,8 +19,6 @@ import com.zurrtum.create.content.trains.GlobalRailwayManager;
 import com.zurrtum.create.content.trains.entity.CarriageContraptionEntity;
 import com.zurrtum.create.content.trains.track.TrackBlockEntity;
 import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
-import com.zurrtum.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
-import com.zurrtum.create.foundation.entity.behaviour.EntityBehaviour;
 import com.zurrtum.create.infrastructure.component.ClipboardContent;
 import com.zurrtum.create.infrastructure.packet.s2c.*;
 import net.minecraft.block.entity.BlockEntity;
@@ -40,7 +38,6 @@ import net.minecraft.util.math.Direction.Axis;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
 import java.util.UUID;
 
 public class AllClientHandle {
@@ -198,7 +195,7 @@ public class AllClientHandle {
         warn();
     }
 
-    public void onAttachedComputer(AttachedComputerPacket packet) {
+    public void onAttachedComputer(ClientPlayPacketListener listener, AttachedComputerPacket packet) {
         warn();
     }
 
@@ -261,12 +258,6 @@ public class AllClientHandle {
 
     public void enableClientPlayerSound(Entity entity, float clamp) {
         warn();
-    }
-
-    public void addBehaviours(SmartBlockEntity blockEntity, ArrayList<BlockEntityBehaviour<?>> behaviours) {
-    }
-
-    public void addBehaviours(Entity entity, ArrayList<EntityBehaviour<?>> behaviours) {
     }
 
     public void showWaterBounds(Axis axis, ItemPlacementContext ctx) {

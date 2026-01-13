@@ -3,7 +3,7 @@ package com.zurrtum.create.content.kinetics.fan;
 import com.zurrtum.create.AllBlockEntityTypes;
 import com.zurrtum.create.catnip.math.VecHelper;
 import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
-import com.zurrtum.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
+import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.infrastructure.config.AllConfigs;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;

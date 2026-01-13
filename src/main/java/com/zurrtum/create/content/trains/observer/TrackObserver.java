@@ -12,7 +12,7 @@ import com.zurrtum.create.content.trains.graph.TrackEdge;
 import com.zurrtum.create.content.trains.graph.TrackGraph;
 import com.zurrtum.create.content.trains.signal.SignalPropagator;
 import com.zurrtum.create.content.trains.signal.SingleBlockEntityEdgePoint;
-import com.zurrtum.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
+import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.foundation.blockEntity.behaviour.filtering.ServerFilteringBehaviour;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.item.ItemStack;

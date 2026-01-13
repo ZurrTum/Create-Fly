@@ -4,6 +4,7 @@ import com.zurrtum.create.catnip.math.AngleHelper;
 import com.zurrtum.create.client.AllPartialModels;
 import com.zurrtum.create.client.catnip.animation.AnimationTickHolder;
 import com.zurrtum.create.client.catnip.render.CachedBuffers;
+import com.zurrtum.create.client.catnip.render.SuperByteBuffer;
 import com.zurrtum.create.client.flywheel.lib.model.baked.PartialModel;
 import com.zurrtum.create.client.foundation.blockEntity.behaviour.animation.AnimationBehaviour;
 import com.zurrtum.create.client.foundation.blockEntity.behaviour.animation.WhistleAnimationBehaviour;
@@ -32,18 +33,19 @@ public class WhistleRenderer extends SafeBlockEntityRenderer<WhistleBlockEntity>
 
         Direction direction = blockState.get(WhistleBlock.FACING);
         WhistleSize size = blockState.get(WhistleBlock.SIZE);
-
         PartialModel mouth = size == WhistleSize.LARGE ? AllPartialModels.WHISTLE_MOUTH_LARGE : size == WhistleSize.MEDIUM ? AllPartialModels.WHISTLE_MOUTH_MEDIUM : AllPartialModels.WHISTLE_MOUTH_SMALL;
-
+        SuperByteBuffer model = CachedBuffers.partial(mouth, blockState);
+        model.center().rotateYDegrees(AngleHelper.horizontalAngle(direction)).uncenter();
         WhistleAnimationBehaviour behaviour = (WhistleAnimationBehaviour) be.getBehaviour(AnimationBehaviour.TYPE);
-        float offset = behaviour.animation.getValue(partialTicks);
-        if (behaviour.animation.getChaseTarget() > 0 && behaviour.animation.getValue() > 0.5f) {
-            float wiggleProgress = (AnimationTickHolder.getTicks(be.getWorld()) + partialTicks) / 8f;
-            offset -= Math.sin(wiggleProgress * (2 * MathHelper.PI) * (4 - size.ordinal())) / 16f;
+        if (behaviour != null) {
+            float offset = behaviour.animation.getValue(partialTicks);
+            if (behaviour.animation.getChaseTarget() > 0 && behaviour.animation.getValue() > 0.5f) {
+                float wiggleProgress = (AnimationTickHolder.getTicks(be.getWorld()) + partialTicks) / 8f;
+                offset -= (float) Math.sin(wiggleProgress * (2 * MathHelper.PI) * (4 - size.ordinal())) / 16f;
+            }
+            model.translate(0, offset * 0.25f, 0);
         }
-
-        CachedBuffers.partial(mouth, blockState).center().rotateYDegrees(AngleHelper.horizontalAngle(direction)).uncenter()
-            .translate(0, offset * 4 / 16f, 0).light(light).renderInto(ms, buffer.getBuffer(RenderLayer.getSolid()));
+        model.light(light).renderInto(ms, buffer.getBuffer(RenderLayer.getSolid()));
     }
 
 }

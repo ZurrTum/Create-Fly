@@ -2,7 +2,7 @@ package com.zurrtum.create.content.schematics.table;
 
 import com.zurrtum.create.AllBlockEntityTypes;
 import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
-import com.zurrtum.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
+import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.foundation.gui.menu.MenuProvider;
 import com.zurrtum.create.foundation.utility.IInteractionChecker;
 import com.zurrtum.create.infrastructure.items.ItemInventory;

@@ -12,7 +12,7 @@ import com.zurrtum.create.content.trains.graph.TrackNodeLocation;
 import com.zurrtum.create.foundation.block.ProperWaterloggedBlock;
 import com.zurrtum.create.foundation.blockEntity.IMergeableBE;
 import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
-import com.zurrtum.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
+import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.infrastructure.packet.s2c.RemoveBlockEntityPacket;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;

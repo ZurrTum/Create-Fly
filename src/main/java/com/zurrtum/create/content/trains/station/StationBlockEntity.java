@@ -1,6 +1,7 @@
 package com.zurrtum.create.content.trains.station;
 
 import com.zurrtum.create.*;
+import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.api.contraption.transformable.TransformableBlockEntity;
 import com.zurrtum.create.catnip.animation.LerpedFloat;
 import com.zurrtum.create.catnip.animation.LerpedFloat.Chaser;
@@ -8,8 +9,6 @@ import com.zurrtum.create.catnip.data.Iterate;
 import com.zurrtum.create.catnip.data.WorldAttached;
 import com.zurrtum.create.catnip.math.VecHelper;
 import com.zurrtum.create.compat.computercraft.AbstractComputerBehaviour;
-import com.zurrtum.create.compat.computercraft.ComputerCraftProxy;
-import com.zurrtum.create.compat.computercraft.events.StationTrainPresenceEvent;
 import com.zurrtum.create.content.contraptions.AssemblyException;
 import com.zurrtum.create.content.contraptions.StructureTransform;
 import com.zurrtum.create.content.decoration.slidingDoor.DoorControlBehaviour;
@@ -30,7 +29,6 @@ import com.zurrtum.create.content.trains.track.TrackTargetingBehaviour;
 import com.zurrtum.create.foundation.advancement.CreateTrigger;
 import com.zurrtum.create.foundation.block.ProperWaterloggedBlock;
 import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
-import com.zurrtum.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.infrastructure.config.AllConfigs;
 import com.zurrtum.create.infrastructure.packet.s2c.AddTrainPacket;
 import net.minecraft.block.Block;
@@ -70,7 +68,6 @@ public class StationBlockEntity extends SmartBlockEntity implements Transformabl
     public int failedCarriageIndex;
     public AssemblyException lastException;
     public DepotBehaviour depotBehaviour;
-    public AbstractComputerBehaviour computerBehaviour;
 
     // for display
     public UUID imminentTrain;
@@ -101,7 +98,6 @@ public class StationBlockEntity extends SmartBlockEntity implements Transformabl
         behaviours.add(depotBehaviour = new DepotBehaviour(this).onlyAccepts(stack -> stack.isOf(AllItems.SCHEDULE))
             .withCallback(s -> applyAutoSchedule()));
         depotBehaviour.addSubBehaviours(behaviours);
-        behaviours.add(computerBehaviour = ComputerCraftProxy.behaviour(this));
     }
 
     @Override
@@ -232,17 +228,10 @@ public class StationBlockEntity extends SmartBlockEntity implements Transformabl
             imminentTrain.runtime.displayLinkUpdateRequested = false;
         }
 
-        if (!world.isClient() && computerBehaviour.hasAttachedComputer()) {
-            if (this.imminentTrain == null && imminentTrain != null)
-                computerBehaviour.prepareComputerEvent(new StationTrainPresenceEvent(StationTrainPresenceEvent.Type.IMMINENT, imminentTrain));
-            if (newlyArrived) {
-                if (trainPresent)
-                    computerBehaviour.prepareComputerEvent(new StationTrainPresenceEvent(StationTrainPresenceEvent.Type.ARRIVAL, imminentTrain));
-                else
-                    computerBehaviour.prepareComputerEvent(new StationTrainPresenceEvent(
-                        StationTrainPresenceEvent.Type.DEPARTURE,
-                        Create.RAILWAYS.trains.get(this.imminentTrain)
-                    ));
+        if (!world.isClient()) {
+            AbstractComputerBehaviour computer = AbstractComputerBehaviour.get(this);
+            if (computer != null) {
+                computer.queueStationTrain(imminentTrain, newlyArrived, trainPresent);
             }
         }
 

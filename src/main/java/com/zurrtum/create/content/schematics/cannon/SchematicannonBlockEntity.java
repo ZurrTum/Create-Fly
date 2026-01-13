@@ -13,7 +13,7 @@ import com.zurrtum.create.content.schematics.SchematicPrinter;
 import com.zurrtum.create.content.schematics.requirement.ItemRequirement;
 import com.zurrtum.create.content.schematics.requirement.ItemRequirement.ItemUseType;
 import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
-import com.zurrtum.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
+import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.foundation.gui.menu.MenuProvider;
 import com.zurrtum.create.foundation.item.ItemHelper;
 import com.zurrtum.create.foundation.utility.BlockHelper;

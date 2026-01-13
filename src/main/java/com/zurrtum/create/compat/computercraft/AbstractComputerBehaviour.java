@@ -1,55 +1,70 @@
 package com.zurrtum.create.compat.computercraft;
 
+import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.compat.computercraft.events.ComputerEvent;
+import com.zurrtum.create.content.logistics.BigItemStack;
+import com.zurrtum.create.content.trains.entity.Train;
+import com.zurrtum.create.content.trains.observer.TrackObserver;
+import com.zurrtum.create.content.trains.signal.SignalBlockEntity;
 import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
 import com.zurrtum.create.foundation.blockEntity.behaviour.BehaviourType;
-import com.zurrtum.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
-import dan200.computercraft.api.peripheral.IPeripheral;
-import net.minecraft.storage.ReadView;
-import net.minecraft.storage.WriteView;
+import net.minecraft.item.ItemStack;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-public class AbstractComputerBehaviour extends BlockEntityBehaviour<SmartBlockEntity> {
+import java.util.List;
 
+public abstract class AbstractComputerBehaviour extends BlockEntityBehaviour<SmartBlockEntity> {
     public static final BehaviourType<AbstractComputerBehaviour> TYPE = new BehaviourType<>();
 
-    boolean hasAttachedComputer;
-
-    public AbstractComputerBehaviour(SmartBlockEntity te) {
-        super(te);
-        this.hasAttachedComputer = false;
+    public static boolean contains(SmartBlockEntity be) {
+        AbstractComputerBehaviour behaviour = be.getBehaviour(TYPE);
+        if (behaviour == null) {
+            return false;
+        }
+        return behaviour.hasAttachedComputer();
     }
 
-    @Override
-    public void read(ReadView view, boolean clientPacket) {
-        hasAttachedComputer = view.getBoolean("HasAttachedComputer", false);
-        super.read(view, clientPacket);
-    }
-
-    @Override
-    public void write(WriteView view, boolean clientPacket) {
-        view.putBoolean("HasAttachedComputer", hasAttachedComputer);
-        super.write(view, clientPacket);
-    }
-
-    public IPeripheral getPeripheralCapability() {
+    @Nullable
+    public static AbstractComputerBehaviour get(SmartBlockEntity be) {
+        AbstractComputerBehaviour behaviour = be.getBehaviour(TYPE);
+        if (behaviour == null) {
+            return null;
+        }
+        if (behaviour.isActive() && behaviour.hasAttachedComputer()) {
+            return behaviour;
+        }
         return null;
     }
 
-    public void setHasAttachedComputer(boolean hasAttachedComputer) {
-        this.hasAttachedComputer = hasAttachedComputer;
+    public AbstractComputerBehaviour(SmartBlockEntity te) {
+        super(te);
     }
 
-    public boolean hasAttachedComputer() {
-        return hasAttachedComputer;
-    }
+    public abstract boolean isActive();
 
-    public void prepareComputerEvent(@NotNull ComputerEvent event) {
-    }
+    public abstract void setHasAttachedComputer(boolean hasAttachedComputer);
+
+    public abstract boolean hasAttachedComputer();
+
+    public abstract void queueKineticsChange(float speed, float capacity, float stress, boolean overStressed);
+
+    public abstract void queuePackageReceived(ItemStack box);
+
+    public abstract void queuePackageCreated(ItemStack createdBox);
+
+    public abstract void queueRepackage(List<BigItemStack> boxesToExport);
+
+    public abstract void queueTrainPass(TrackObserver observer, boolean shouldBePowered);
+
+    public abstract void queueSignalState(SignalBlockEntity.SignalState state);
+
+    public abstract void queueStationTrain(Train imminentTrain, boolean newlyArrived, boolean trainPresent);
+
+    public abstract void prepareComputerEvent(@NotNull ComputerEvent event);
 
     @Override
     public BehaviourType<?> getType() {
         return TYPE;
     }
-
 }

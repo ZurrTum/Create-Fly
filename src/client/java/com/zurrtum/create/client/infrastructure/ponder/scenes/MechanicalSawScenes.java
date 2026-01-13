@@ -14,7 +14,7 @@ import com.zurrtum.create.content.kinetics.belt.behaviour.DirectBeltInputBehavio
 import com.zurrtum.create.content.kinetics.saw.SawBlockEntity;
 import com.zurrtum.create.content.kinetics.simpleRelays.ShaftBlock;
 import com.zurrtum.create.content.processing.recipe.ProcessingInventory;
-import com.zurrtum.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
+import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import net.minecraft.block.Blocks;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.ItemEntity;

@@ -2,12 +2,11 @@ package com.zurrtum.create.content.logistics.packager;
 
 import com.mojang.serialization.Codec;
 import com.zurrtum.create.*;
+import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.api.packager.unpacking.UnpackingHandler;
 import com.zurrtum.create.catnip.data.Iterate;
 import com.zurrtum.create.catnip.math.BlockFace;
 import com.zurrtum.create.compat.computercraft.AbstractComputerBehaviour;
-import com.zurrtum.create.compat.computercraft.ComputerCraftProxy;
-import com.zurrtum.create.compat.computercraft.events.PackageEvent;
 import com.zurrtum.create.content.contraptions.actors.psi.PortableStorageInterfaceBlockEntity;
 import com.zurrtum.create.content.logistics.BigItemStack;
 import com.zurrtum.create.content.logistics.box.PackageItem;
@@ -21,7 +20,6 @@ import com.zurrtum.create.content.logistics.packagerLink.PackagerLinkBlockEntity
 import com.zurrtum.create.content.logistics.packagerLink.RequestPromiseQueue;
 import com.zurrtum.create.foundation.advancement.CreateTrigger;
 import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
-import com.zurrtum.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.foundation.blockEntity.behaviour.inventory.CapManipulationBehaviourBase.InterfaceProvider;
 import com.zurrtum.create.foundation.blockEntity.behaviour.inventory.InvManipulationBehaviour;
 import com.zurrtum.create.foundation.blockEntity.behaviour.inventory.VersionedInventoryTrackerBehaviour;
@@ -71,7 +69,6 @@ public class PackagerBlockEntity extends SmartBlockEntity {
     public int animationTicks;
     public boolean animationInward;
 
-    public AbstractComputerBehaviour computerBehaviour;
     public Boolean hasCustomComputerAddress;
     public String customComputerAddress;
 
@@ -104,7 +101,6 @@ public class PackagerBlockEntity extends SmartBlockEntity {
             InterfaceProvider.oppositeOfBlockFacing()
         ).withFilter(this::supportsBlockEntity));
         behaviours.add(invVersionTracker = new VersionedInventoryTrackerBehaviour(this));
-        behaviours.add(computerBehaviour = ComputerCraftProxy.behaviour(this));
     }
 
     @Override
@@ -359,7 +355,10 @@ public class PackagerBlockEntity extends SmartBlockEntity {
         boolean unpacked = toUse.unpack(world, target, targetState, facing, items, orderContext, simulate);
 
         if (unpacked && !simulate) {
-            computerBehaviour.prepareComputerEvent(new PackageEvent(box, "package_received"));
+            AbstractComputerBehaviour computer = AbstractComputerBehaviour.get(this);
+            if (computer != null) {
+                computer.queuePackageReceived(box);
+            }
             previouslyUnwrapped = box;
             animationInward = true;
             animationTicks = CYCLE;
@@ -478,7 +477,10 @@ public class PackagerBlockEntity extends SmartBlockEntity {
         }
 
         ItemStack createdBox = extractedPackageItem.isEmpty() ? PackageItem.containing(extractedItems) : extractedPackageItem;
-        computerBehaviour.prepareComputerEvent(new PackageEvent(createdBox, "package_created"));
+        AbstractComputerBehaviour computer = AbstractComputerBehaviour.get(this);
+        if (computer != null) {
+            computer.queuePackageCreated(createdBox);
+        }
         PackageItem.clearAddress(createdBox);
 
         if (fixedAddress != null && !fixedAddress.isBlank())
@@ -507,17 +509,20 @@ public class PackagerBlockEntity extends SmartBlockEntity {
     }
 
     public void updateSignAddress() {
+        if (hasCustomComputerAddress) {
+            AbstractComputerBehaviour computer = AbstractComputerBehaviour.get(this);
+            if (computer != null) {
+                signBasedAddress = customComputerAddress;
+                return;
+            }
+            hasCustomComputerAddress = false;
+        }
         signBasedAddress = "";
         for (Direction side : Iterate.directions) {
             String address = getSign(side);
             if (address == null || address.isBlank())
                 continue;
             signBasedAddress = address;
-        }
-        if (computerBehaviour.hasAttachedComputer() && hasCustomComputerAddress) {
-            signBasedAddress = customComputerAddress;
-        } else {
-            hasCustomComputerAddress = false;
         }
     }
 

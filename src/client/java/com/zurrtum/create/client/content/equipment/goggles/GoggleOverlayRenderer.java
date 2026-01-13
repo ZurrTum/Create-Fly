@@ -23,7 +23,7 @@ import com.zurrtum.create.client.infrastructure.config.CClient;
 import com.zurrtum.create.content.contraptions.piston.MechanicalPistonBlock;
 import com.zurrtum.create.content.contraptions.piston.PistonExtensionPoleBlock;
 import com.zurrtum.create.content.equipment.goggles.GogglesItem;
-import com.zurrtum.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
+import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.Mouse;

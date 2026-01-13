@@ -3,7 +3,7 @@ package com.zurrtum.create.content.contraptions.bearing;
 import com.zurrtum.create.AllAdvancements;
 import com.zurrtum.create.AllBlockEntityTypes;
 import com.zurrtum.create.foundation.advancement.CreateTrigger;
-import com.zurrtum.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
+import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.foundation.blockEntity.behaviour.scrollValue.ServerScrollOptionBehaviour;
 import com.zurrtum.create.infrastructure.config.AllConfigs;
 import net.minecraft.block.BlockState;

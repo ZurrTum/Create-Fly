@@ -7,7 +7,7 @@ import com.zurrtum.create.content.processing.recipe.ProcessingInventory;
 import com.zurrtum.create.content.redstone.DirectedDirectionalBlock;
 import com.zurrtum.create.content.redstone.displayLink.DisplayLinkBlock;
 import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
-import com.zurrtum.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
+import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.foundation.blockEntity.behaviour.filtering.ServerFilteringBehaviour;
 import com.zurrtum.create.foundation.blockEntity.behaviour.inventory.CapManipulationBehaviourBase.InterfaceProvider;
 import com.zurrtum.create.foundation.blockEntity.behaviour.inventory.InvManipulationBehaviour;

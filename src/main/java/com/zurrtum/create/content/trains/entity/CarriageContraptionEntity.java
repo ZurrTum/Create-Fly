@@ -1,10 +1,10 @@
 package com.zurrtum.create.content.trains.entity;
 
 import com.google.common.base.Strings;
-import com.zurrtum.create.AllClientHandle;
 import com.zurrtum.create.AllEntityTypes;
 import com.zurrtum.create.AllSynchedDatas;
 import com.zurrtum.create.Create;
+import com.zurrtum.create.api.behaviour.EntityBehaviour;
 import com.zurrtum.create.api.behaviour.movement.MovementBehaviour;
 import com.zurrtum.create.catnip.data.Couple;
 import com.zurrtum.create.catnip.math.VecHelper;
@@ -17,7 +17,6 @@ import com.zurrtum.create.content.trains.entity.TravellingPoint.SteerDirection;
 import com.zurrtum.create.content.trains.graph.TrackGraph;
 import com.zurrtum.create.content.trains.station.GlobalStation;
 import com.zurrtum.create.foundation.blockEntity.behaviour.BehaviourType;
-import com.zurrtum.create.foundation.entity.behaviour.EntityBehaviour;
 import com.zurrtum.create.infrastructure.config.AllConfigs;
 import com.zurrtum.create.infrastructure.packet.s2c.ContraptionBlockChangedPacket;
 import com.zurrtum.create.infrastructure.packet.s2c.TrainHUDControlUpdatePacket;
@@ -50,6 +49,7 @@ import net.minecraft.world.event.GameEvent;
 
 import java.lang.ref.WeakReference;
 import java.util.*;
+import java.util.function.Function;
 
 public class CarriageContraptionEntity extends OrientedContraptionEntity {
 
@@ -89,9 +89,16 @@ public class CarriageContraptionEntity extends OrientedContraptionEntity {
         firstPositionUpdate = true;
         arrivalSoundTicks = Integer.MIN_VALUE;
         derailParticleOffset = VecHelper.offsetRandomly(Vec3d.ZERO, world.random, 1.5f).multiply(1, .25f, 1);
-        ArrayList<EntityBehaviour<?>> list = new ArrayList<>();
-        AllClientHandle.INSTANCE.addBehaviours(this, list);
-        list.forEach(b -> behaviours.put(b.getType(), b));
+        for (Function<Entity, EntityBehaviour<?>> factory : EntityBehaviour.REGISTRY.get(type)) {
+            EntityBehaviour<?> behaviour = factory.apply(this);
+            behaviours.put(behaviour.getType(), behaviour);
+        }
+        if (world.isClient()) {
+            for (Function<Entity, EntityBehaviour<?>> factory : EntityBehaviour.CLIENT_REGISTRY.get(getType())) {
+                EntityBehaviour<?> behaviour = factory.apply(this);
+                behaviours.put(behaviour.getType(), behaviour);
+            }
+        }
     }
 
     @SuppressWarnings("unchecked")
@@ -194,7 +201,6 @@ public class CarriageContraptionEntity extends OrientedContraptionEntity {
                     continue;
                 alignPassenger(entity);
             }
-        behaviours.values().forEach(EntityBehaviour::tick);
     }
 
     @Override
@@ -279,6 +285,8 @@ public class CarriageContraptionEntity extends OrientedContraptionEntity {
         lastZ = getZ();
 
         dce.alignEntity(this);
+
+        behaviours.values().forEach(EntityBehaviour::tick);
 
         double distanceTo = 0;
         if (!firstPositionUpdate) {

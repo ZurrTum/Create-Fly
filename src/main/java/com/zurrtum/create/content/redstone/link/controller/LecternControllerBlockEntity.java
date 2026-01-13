@@ -2,7 +2,7 @@ package com.zurrtum.create.content.redstone.link.controller;
 
 import com.zurrtum.create.*;
 import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
-import com.zurrtum.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
+import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import net.minecraft.block.BlockState;
 import net.minecraft.component.type.ContainerComponent;
 import net.minecraft.entity.Entity;

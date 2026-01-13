@@ -2,7 +2,7 @@ package com.zurrtum.create.compat;
 
 import com.zurrtum.create.compat.accessories.GoggleAccessory;
 import com.zurrtum.create.compat.computercraft.AllComputerDisplaySource;
-import com.zurrtum.create.compat.computercraft.ComputerCraftProxy;
+import com.zurrtum.create.compat.computercraft.AllComputerPeripherals;
 import com.zurrtum.create.compat.trinkets.GoggleTrinket;
 
 public class CompatMod {
@@ -14,7 +14,7 @@ public class CompatMod {
             GoggleAccessory.register();
         }
         if (Mods.COMPUTERCRAFT.isLoaded()) {
-            ComputerCraftProxy.register();
+            AllComputerPeripherals.register();
             AllComputerDisplaySource.register();
         }
     }

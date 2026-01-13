@@ -6,7 +6,7 @@ import com.zurrtum.create.api.packager.InventoryIdentifier;
 import com.zurrtum.create.foundation.block.NeighborChangeListeningBlock;
 import com.zurrtum.create.foundation.blockEntity.IMultiBlockEntityContainer;
 import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
-import com.zurrtum.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
+import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.foundation.blockEntity.behaviour.inventory.VersionedInventory;
 import com.zurrtum.create.infrastructure.config.AllConfigs;
 import com.zurrtum.create.infrastructure.items.ItemInventory;

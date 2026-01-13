@@ -3,7 +3,7 @@ package com.zurrtum.create.content.redstone.diodes;
 import com.mojang.serialization.Codec;
 import com.zurrtum.create.content.equipment.clipboard.ClipboardCloneable;
 import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
-import com.zurrtum.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
+import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.foundation.blockEntity.behaviour.scrollValue.ServerBrassDiodeScrollValueBehaviour;
 import com.zurrtum.create.foundation.blockEntity.behaviour.scrollValue.ServerScrollValueBehaviour;
 import net.minecraft.block.AbstractRedstoneGateBlock;

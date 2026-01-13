@@ -6,7 +6,7 @@ import com.zurrtum.create.content.redstone.link.RedstoneLinkNetworkHandler;
 import com.zurrtum.create.content.redstone.link.ServerLinkBehaviour;
 import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
 import com.zurrtum.create.foundation.blockEntity.behaviour.BehaviourType;
-import com.zurrtum.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
+import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import net.minecraft.block.BlockState;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.Vec3d;
