@@ -2,10 +2,11 @@ package com.zurrtum.create.client.content.kinetics.turntable;
 
 import com.zurrtum.create.AllBlocks;
 import com.zurrtum.create.catnip.math.VecHelper;
-import com.zurrtum.create.client.catnip.animation.AnimationTickHolder;
 import com.zurrtum.create.content.kinetics.turntable.TurntableBlockEntity;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.render.RenderTickCounter;
+import net.minecraft.client.world.ClientWorld;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
@@ -15,18 +16,21 @@ public class TurntableHandler {
         if (mc.interactionManager == null || mc.player == null)
             return;
         BlockPos pos = mc.player.getBlockPos();
-        if (!mc.world.getBlockState(pos).isOf(AllBlocks.TURNTABLE))
+        ClientWorld world = mc.world;
+        if (!world.getBlockState(pos).isOf(AllBlocks.TURNTABLE))
             return;
         if (!mc.player.isOnGround())
             return;
         if (mc.isPaused())
             return;
 
-        BlockEntity blockEntity = mc.world.getBlockEntity(pos);
+        BlockEntity blockEntity = world.getBlockEntity(pos);
         if (!(blockEntity instanceof TurntableBlockEntity turnTable))
             return;
 
-        float speed = turnTable.getSpeed() * 3 / 10;
+        RenderTickCounter deltaTracker = mc.getRenderTickCounter();
+        float tickSpeed = world.getTickManager().getTickRate() / 20;
+        float speed = turnTable.getSpeed() * (2 / 3f) * tickSpeed * deltaTracker.getFixedDeltaTicks();
 
         if (speed == 0)
             return;
@@ -35,9 +39,10 @@ public class TurntableHandler {
         Vec3d offset = mc.player.getPos().subtract(origin);
 
         if (offset.length() > 1 / 4f)
-            speed *= MathHelper.clamp((1 / 2f - offset.length()) * 2, 0, 1);
+            speed *= (float) MathHelper.clamp((1 / 2f - offset.length()) * 2, 0, 1);
 
-        mc.player.setYaw(mc.player.lastYaw - speed * AnimationTickHolder.getPartialTicks());
-        mc.player.bodyYaw = mc.player.getYaw();
+        float yRotOffset = speed * deltaTracker.getTickProgress(false);
+        mc.player.setYaw(mc.player.getYaw() - yRotOffset);
+        mc.player.bodyYaw -= yRotOffset;
     }
 }

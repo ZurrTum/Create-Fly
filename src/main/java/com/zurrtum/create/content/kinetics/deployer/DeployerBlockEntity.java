@@ -33,10 +33,7 @@ import net.minecraft.storage.NbtReadView;
 import net.minecraft.storage.NbtWriteView;
 import net.minecraft.storage.ReadView;
 import net.minecraft.storage.WriteView;
-import net.minecraft.util.ErrorReporter;
-import net.minecraft.util.Hand;
-import net.minecraft.util.StringIdentifiable;
-import net.minecraft.util.Uuids;
+import net.minecraft.util.*;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.*;
 import net.minecraft.world.RaycastContext;
@@ -49,7 +46,7 @@ import java.util.*;
 import static com.zurrtum.create.Create.LOGGER;
 import static com.zurrtum.create.content.kinetics.base.DirectionalKineticBlock.FACING;
 
-public class DeployerBlockEntity extends KineticBlockEntity {
+public class DeployerBlockEntity extends KineticBlockEntity implements Clearable {
     public State state;
     public Mode mode;
     public ItemStack heldItem;
@@ -462,6 +459,11 @@ public class DeployerBlockEntity extends KineticBlockEntity {
         overflowItems.forEach(itemstack -> serverPlayer.dropItem(itemstack, true, false));
         serverPlayer.discard();
         player = null;
+    }
+
+    @Override
+    public void clear() {
+        filtering.setFilter(ItemStack.EMPTY);
     }
 
     public void changeMode() {

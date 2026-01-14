@@ -3,6 +3,7 @@ package com.zurrtum.create.client.infrastructure.particle;
 import com.zurrtum.create.client.foundation.render.AllRenderPipelines;
 import com.zurrtum.create.client.ponder.enums.PonderSpecialTextures;
 import com.zurrtum.create.infrastructure.particle.CubeParticleData;
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.particle.Particle;
 import net.minecraft.client.particle.ParticleFactory;
 import net.minecraft.client.particle.ParticleTextureSheet;
@@ -23,7 +24,8 @@ public class CubeParticle extends Particle {
         false,
         AllRenderPipelines.CUBE,
         RenderLayer.MultiPhaseParameters.builder().texture(new RenderPhase.Texture(PonderSpecialTextures.BLANK.getLocation(), false))
-            .target(RenderLayer.PARTICLES_TARGET).lightmap(RenderLayer.ENABLE_LIGHTMAP).build(false)
+            .target(FabricLoader.getInstance().isModLoaded("iris") ? RenderPhase.MAIN_TARGET : RenderLayer.PARTICLES_TARGET)
+            .lightmap(RenderLayer.ENABLE_LIGHTMAP).build(false)
     );
 
     public static final Vec3d[] CUBE = {

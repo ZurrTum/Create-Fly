@@ -1,6 +1,7 @@
 package com.zurrtum.create.content.logistics.funnel;
 
 import com.zurrtum.create.*;
+import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.catnip.animation.LerpedFloat;
 import com.zurrtum.create.catnip.animation.LerpedFloat.Chaser;
 import com.zurrtum.create.catnip.math.BlockFace;
@@ -13,7 +14,6 @@ import com.zurrtum.create.content.logistics.box.PackageEntity;
 import com.zurrtum.create.content.logistics.funnel.BeltFunnelBlock.Shape;
 import com.zurrtum.create.foundation.advancement.CreateTrigger;
 import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
-import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.foundation.blockEntity.behaviour.filtering.ServerFilteringBehaviour;
 import com.zurrtum.create.foundation.blockEntity.behaviour.inventory.InvManipulationBehaviour;
 import com.zurrtum.create.foundation.blockEntity.behaviour.inventory.VersionedInventoryTrackerBehaviour;
@@ -29,13 +29,14 @@ import net.minecraft.server.world.ServerWorld;
 import net.minecraft.state.property.Properties;
 import net.minecraft.storage.ReadView;
 import net.minecraft.storage.WriteView;
+import net.minecraft.util.Clearable;
 import net.minecraft.util.math.*;
 import org.apache.commons.lang3.mutable.MutableBoolean;
 
 import java.lang.ref.WeakReference;
 import java.util.List;
 
-public class FunnelBlockEntity extends SmartBlockEntity {
+public class FunnelBlockEntity extends SmartBlockEntity implements Clearable {
 
     private ServerFilteringBehaviour filtering;
     private InvManipulationBehaviour invManipulation;
@@ -348,6 +349,11 @@ public class FunnelBlockEntity extends SmartBlockEntity {
 
         if (clientPacket)
             AllClientHandle.INSTANCE.queueUpdate(this);
+    }
+
+    @Override
+    public void clear() {
+        filtering.setFilter(ItemStack.EMPTY);
     }
 
     public void onTransfer(ItemStack stack) {

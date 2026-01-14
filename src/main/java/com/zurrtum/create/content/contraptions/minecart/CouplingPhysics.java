@@ -15,6 +15,7 @@ import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.tick.TickManager;
 
 public class CouplingPhysics {
 
@@ -24,6 +25,12 @@ public class CouplingPhysics {
 
     public static void tickCoupling(ServerWorld world, Couple<MinecartController> c) {
         Couple<AbstractMinecartEntity> carts = c.map(MinecartController::cart);
+
+        TickManager trm = world.getTickManager();
+        if (trm.shouldSkipTick(carts.getFirst()) && trm.shouldSkipTick(carts.getSecond())) {
+            return;
+        }
+
         float couplingLength = c.getFirst().getCouplingLength(true);
         softCollisionStep(world, carts, couplingLength);
         if (!AbstractMinecartEntity.areMinecartImprovementsEnabled(world)) {

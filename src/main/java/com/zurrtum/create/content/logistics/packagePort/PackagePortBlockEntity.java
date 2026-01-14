@@ -2,10 +2,10 @@ package com.zurrtum.create.content.logistics.packagePort;
 
 import com.zurrtum.create.AllDataComponents;
 import com.zurrtum.create.AllItems;
+import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.api.entity.FakePlayerHandler;
 import com.zurrtum.create.content.logistics.box.PackageItem;
 import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
-import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.foundation.blockEntity.behaviour.animatedContainer.AnimatedContainerBehaviour;
 import com.zurrtum.create.foundation.gui.menu.MenuBase;
 import com.zurrtum.create.foundation.gui.menu.MenuProvider;
@@ -27,6 +27,7 @@ import net.minecraft.storage.ReadView;
 import net.minecraft.storage.WriteView;
 import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
+import net.minecraft.util.Clearable;
 import net.minecraft.util.ItemScatterer;
 import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.math.BlockPos;
@@ -37,7 +38,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class PackagePortBlockEntity extends SmartBlockEntity implements MenuProvider {
+public abstract class PackagePortBlockEntity extends SmartBlockEntity implements MenuProvider, Clearable {
 
     public boolean acceptsPackages;
     public String addressFilter;
@@ -103,6 +104,11 @@ public abstract class PackagePortBlockEntity extends SmartBlockEntity implements
     @Override
     public void invalidate() {
         super.invalidate();
+    }
+
+    @Override
+    public void clear() {
+        inventory.clear();
     }
 
     @Override

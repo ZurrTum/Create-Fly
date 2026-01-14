@@ -14,6 +14,7 @@ import net.minecraft.client.render.entity.feature.FeatureRenderer;
 import net.minecraft.client.render.entity.feature.FeatureRendererContext;
 import net.minecraft.client.render.entity.model.BipedEntityModel;
 import net.minecraft.client.render.entity.state.BipedEntityRenderState;
+import net.minecraft.client.render.item.ItemRenderer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.EntityPose;
 import net.minecraft.util.math.Direction;
@@ -29,7 +30,8 @@ public class BacktankFeatureRenderer<S extends BipedEntityRenderState, M extends
             return;
         }
 
-        VertexConsumer vc = buffer.getBuffer(TexturedRenderLayers.getEntityCutout());
+        boolean hasGlint = state.equippedChestStack.hasGlint();
+        VertexConsumer vc = ItemRenderer.getItemGlintConsumer(buffer, TexturedRenderLayers.getEntityCutout(), false, hasGlint);
         BlockState renderedState = item.getBlock().getDefaultState().with(BacktankBlock.HORIZONTAL_FACING, Direction.SOUTH);
         SuperByteBuffer backtank = CachedBuffers.block(renderedState);
         SuperByteBuffer cogs = CachedBuffers.partial(BacktankRenderer.getCogsModel(renderedState), renderedState);

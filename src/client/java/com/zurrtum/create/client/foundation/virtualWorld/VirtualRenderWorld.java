@@ -264,7 +264,10 @@ public class VirtualRenderWorld extends World implements VisualizationLevel {
     @Override
     public void removeBlockEntity(BlockPos pos) {
         if (!isOutOfHeightLimit(pos)) {
-            blockEntities.remove(pos);
+            BlockEntity blockEntity = blockEntities.remove(pos);
+            if (blockEntity != null) {
+                blockEntity.markRemoved();
+            }
         }
     }
 

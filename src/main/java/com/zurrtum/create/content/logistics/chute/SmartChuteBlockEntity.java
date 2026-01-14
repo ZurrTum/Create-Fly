@@ -6,12 +6,13 @@ import com.zurrtum.create.foundation.blockEntity.behaviour.filtering.ServerFilte
 import com.zurrtum.create.foundation.item.ItemHelper.ExtractionCountMode;
 import net.minecraft.block.BlockState;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.Clearable;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 
 import java.util.List;
 
-public class SmartChuteBlockEntity extends ChuteBlockEntity {
+public class SmartChuteBlockEntity extends ChuteBlockEntity implements Clearable {
 
     ServerFilteringBehaviour filtering;
 
@@ -44,6 +45,11 @@ public class SmartChuteBlockEntity extends ChuteBlockEntity {
     public void addBehaviours(List<BlockEntityBehaviour<?>> behaviours) {
         behaviours.add(filtering = new ServerFilteringBehaviour(this).showCountWhen(this::isExtracting).withCallback($ -> invVersionTracker.reset()));
         super.addBehaviours(behaviours);
+    }
+
+    @Override
+    public void clear() {
+        filtering.setFilter(ItemStack.EMPTY);
     }
 
     private boolean isExtracting() {

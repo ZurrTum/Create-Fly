@@ -1,21 +1,22 @@
 package com.zurrtum.create.content.fluids.pipes;
 
 import com.zurrtum.create.AllBlockEntityTypes;
+import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.content.fluids.FluidPropagator;
 import com.zurrtum.create.content.fluids.pipes.StraightPipeBlockEntity.StraightPipeFluidTransportBehaviour;
 import com.zurrtum.create.foundation.advancement.CreateTrigger;
 import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
-import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.foundation.blockEntity.behaviour.filtering.ServerFilteringBehaviour;
 import com.zurrtum.create.infrastructure.fluids.FluidStack;
 import net.minecraft.block.BlockState;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.Clearable;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 
 import java.util.List;
 
-public class SmartFluidPipeBlockEntity extends SmartBlockEntity {
+public class SmartFluidPipeBlockEntity extends SmartBlockEntity implements Clearable {
 
     private ServerFilteringBehaviour filter;
 
@@ -34,13 +35,17 @@ public class SmartFluidPipeBlockEntity extends SmartBlockEntity {
         return FluidPropagator.getSharedTriggers();
     }
 
+    @Override
+    public void clear() {
+        filter.setFilter(ItemStack.EMPTY);
+    }
+
     private void onFilterChanged(ItemStack newFilter) {
         if (!world.isClient)
             FluidPropagator.propagateChangedPipe(world, pos, getCachedState());
     }
 
     class SmartPipeBehaviour extends StraightPipeFluidTransportBehaviour {
-
         public SmartPipeBehaviour(SmartBlockEntity be) {
             super(be);
         }
@@ -56,6 +61,5 @@ public class SmartFluidPipeBlockEntity extends SmartBlockEntity {
         public boolean canHaveFlowToward(BlockState state, Direction direction) {
             return state.getBlock() instanceof SmartFluidPipeBlock && SmartFluidPipeBlock.getPipeAxis(state) == direction.getAxis();
         }
-
     }
 }

@@ -86,11 +86,9 @@ import net.minecraft.structure.StructureTemplate.StructureBlockInfo;
 import net.minecraft.util.BlockRotation;
 import net.minecraft.util.ErrorReporter;
 import net.minecraft.util.Uuids;
-import net.minecraft.util.function.BooleanBiFunction;
 import net.minecraft.util.math.*;
 import net.minecraft.util.math.Direction.Axis;
 import net.minecraft.util.shape.VoxelShape;
-import net.minecraft.util.shape.VoxelShapes;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldAccess;
 import net.minecraft.world.WorldEvents;
@@ -101,7 +99,6 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BiConsumer;
 
@@ -113,7 +110,7 @@ public abstract class Contraption {
     public static final Codec<Map<UUID, Integer>> SEAT_MAP_CODEC = Codec.unboundedMap(Uuids.STRING_CODEC, Codec.INT);
     public static final Codec<Map<UUID, BlockFace>> SUB_CONTRAPTIONS_CODEC = Codec.unboundedMap(Uuids.STRING_CODEC, BlockFace.CODEC);
 
-    public CollisionList simplifiedEntityColliders;
+    public final CollisionList simplifiedEntityColliders = new CollisionList();
     public AbstractContraptionEntity entity;
 
     public Box bounds;
@@ -140,8 +137,6 @@ public abstract class Contraption {
     private Set<SuperGlueEntity> glueToRemove;
     private Map<BlockPos, Entity> initialPassengers;
     private List<BlockFace> pendingSubContraptions;
-
-    private CompletableFuture<Void> simplifiedEntityColliderProvider;
 
     /**
      * All client-only data should be encapsulated here.
@@ -176,7 +171,6 @@ public abstract class Contraption {
         initialPassengers = new HashMap<>();
         pendingSubContraptions = new ArrayList<>();
         stabilizedSubContraptions = new HashMap<>();
-        simplifiedEntityColliders = null;
         storage = new MountedStorageManager();
         capturedMultiblocks = ArrayListMultimap.create();
     }
@@ -210,7 +204,7 @@ public abstract class Contraption {
         Contraption contraption = type.factory.get();
         contraption.read(world, view, spawnData);
         contraption.collisionLevel = new ContraptionWorld(world, contraption);
-        contraption.gatherBBsOffThread();
+        contraption.invalidateColliders();
         return contraption;
     }
 
@@ -260,14 +254,7 @@ public abstract class Contraption {
         }
 
         storage.initialize();
-        gatherBBsOffThread();
-    }
-
-    public void onEntityRemoved(AbstractContraptionEntity entity) {
-        if (simplifiedEntityColliderProvider != null) {
-            simplifiedEntityColliderProvider.cancel(false);
-            simplifiedEntityColliderProvider = null;
-        }
+        invalidateColliders();
     }
 
     public void onEntityInitialize(World world, AbstractContraptionEntity contraptionEntity) {
@@ -1346,33 +1333,23 @@ public abstract class Contraption {
     }
 
     public void invalidateColliders() {
-        simplifiedEntityColliders = null;
-        gatherBBsOffThread();
-    }
-
-    private void gatherBBsOffThread() {
         getContraptionWorld();
-        if (simplifiedEntityColliderProvider != null) {
-            simplifiedEntityColliderProvider.cancel(false);
+        simplifiedEntityColliders.size = 0;
+
+        var populate = new Populate(simplifiedEntityColliders);
+
+        for (Map.Entry<BlockPos, StructureBlockInfo> entry : blocks.entrySet()) {
+            StructureBlockInfo info = entry.getValue();
+            BlockPos localPos = entry.getKey();
+            VoxelShape collisionShape = info.state().getCollisionShape(collisionLevel, localPos, ShapeContext.absent());
+            if (collisionShape.isEmpty())
+                continue;
+
+            populate.offsetX = localPos.getX();
+            populate.offsetY = localPos.getY();
+            populate.offsetZ = localPos.getZ();
+            collisionShape.forEachBox(populate);
         }
-        simplifiedEntityColliderProvider = CompletableFuture.supplyAsync(() -> {
-            VoxelShape combinedShape = VoxelShapes.empty();
-            for (Map.Entry<BlockPos, StructureBlockInfo> entry : blocks.entrySet()) {
-                StructureBlockInfo info = entry.getValue();
-                BlockPos localPos = entry.getKey();
-                VoxelShape collisionShape = info.state().getCollisionShape(collisionLevel, localPos, ShapeContext.absent());
-                if (collisionShape.isEmpty())
-                    continue;
-                combinedShape = VoxelShapes.combine(
-                    combinedShape,
-                    collisionShape.offset(localPos.getX(), localPos.getY(), localPos.getZ()),
-                    BooleanBiFunction.OR
-                );
-            }
-            CollisionList out = new CollisionList();
-            combinedShape.forEachBox(new Populate(out));
-            return out;
-        }).thenAccept(r -> simplifiedEntityColliders = r);
     }
 
     public static double getRadius(Iterable<? extends Vec3i> blocks, Axis axis) {
@@ -1417,8 +1394,8 @@ public abstract class Contraption {
         return false;
     }
 
-    public Optional<CollisionList> getSimplifiedEntityColliders() {
-        return Optional.ofNullable(simplifiedEntityColliders);
+    public CollisionList getSimplifiedEntityColliders() {
+        return simplifiedEntityColliders;
     }
 
     public void tickStorage(AbstractContraptionEntity entity) {

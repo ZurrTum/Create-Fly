@@ -1,13 +1,13 @@
 package com.zurrtum.create.content.redstone.thresholdSwitch;
 
 import com.zurrtum.create.AllBlockEntityTypes;
+import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.catnip.math.BlockFace;
 import com.zurrtum.create.content.logistics.stockTicker.StockTickerBlockEntity;
 import com.zurrtum.create.content.processing.recipe.ProcessingInventory;
 import com.zurrtum.create.content.redstone.DirectedDirectionalBlock;
 import com.zurrtum.create.content.redstone.displayLink.DisplayLinkBlock;
 import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
-import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.foundation.blockEntity.behaviour.filtering.ServerFilteringBehaviour;
 import com.zurrtum.create.foundation.blockEntity.behaviour.inventory.CapManipulationBehaviourBase.InterfaceProvider;
 import com.zurrtum.create.foundation.blockEntity.behaviour.inventory.InvManipulationBehaviour;
@@ -23,13 +23,14 @@ import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.storage.ReadView;
 import net.minecraft.storage.WriteView;
+import net.minecraft.util.Clearable;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.tick.TickPriority;
 
 import java.util.List;
 
-public class ThresholdSwitchBlockEntity extends SmartBlockEntity {
+public class ThresholdSwitchBlockEntity extends SmartBlockEntity implements Clearable {
 
     public int onWhenAbove;
     public int offWhenBelow;
@@ -265,6 +266,11 @@ public class ThresholdSwitchBlockEntity extends SmartBlockEntity {
         if (world.isClient)
             return;
         updateCurrentLevel();
+    }
+
+    @Override
+    public void clear() {
+        filtering.setFilter(ItemStack.EMPTY);
     }
 
     @Override

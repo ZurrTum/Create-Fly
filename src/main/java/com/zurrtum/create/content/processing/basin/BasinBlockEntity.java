@@ -4,6 +4,7 @@ import com.google.common.collect.ImmutableList;
 import com.zurrtum.create.AllBlockEntityTypes;
 import com.zurrtum.create.AllBlockTags;
 import com.zurrtum.create.AllClientHandle;
+import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.catnip.animation.LerpedFloat;
 import com.zurrtum.create.catnip.animation.LerpedFloat.Chaser;
 import com.zurrtum.create.catnip.data.Couple;
@@ -14,7 +15,6 @@ import com.zurrtum.create.content.kinetics.mixer.MechanicalMixerBlockEntity;
 import com.zurrtum.create.content.processing.burner.BlazeBurnerBlock;
 import com.zurrtum.create.content.processing.burner.BlazeBurnerBlock.HeatLevel;
 import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
-import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.foundation.blockEntity.behaviour.filtering.ServerFilteringBehaviour;
 import com.zurrtum.create.foundation.blockEntity.behaviour.fluid.SmartFluidTankBehaviour;
 import com.zurrtum.create.foundation.blockEntity.behaviour.fluid.SmartFluidTankBehaviour.TankSegment;
@@ -33,6 +33,7 @@ import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.storage.ReadView;
 import net.minecraft.storage.WriteView;
+import net.minecraft.util.Clearable;
 import net.minecraft.util.ItemScatterer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
@@ -41,7 +42,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 
-public class BasinBlockEntity extends SmartBlockEntity {
+public class BasinBlockEntity extends SmartBlockEntity implements Clearable {
     public boolean areFluidsMoving;
     LerpedFloat ingredientRotationSpeed;
     public LerpedFloat ingredientRotation;
@@ -154,6 +155,13 @@ public class BasinBlockEntity extends SmartBlockEntity {
         visualizedOutputFluids.stream().map(IntAttached::getValue).forEach(fluids::add);
         visualizedOutputItems.clear();
         visualizedOutputFluids.clear();
+    }
+
+    @Override
+    public void clear() {
+        spoutputBuffer.clear();
+        itemCapability.clear();
+        filtering.setFilter(ItemStack.EMPTY);
     }
 
     @Override

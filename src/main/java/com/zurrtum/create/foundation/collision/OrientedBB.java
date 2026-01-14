@@ -1,6 +1,5 @@
 package com.zurrtum.create.foundation.collision;
 
-import com.zurrtum.create.foundation.collision.ContinuousOBBCollider.ContinuousSeparationManifold;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
 
@@ -26,12 +25,6 @@ public class OrientedBB {
 
     public OrientedBB copy() {
         return new OrientedBB(center, extents, rotation);
-    }
-
-    public ContinuousSeparationManifold intersect(CollisionList collisionList, int bbIdx, Vec3d motion) {
-        Vec3d centerA = new Vec3d(collisionList.centerX[bbIdx], collisionList.centerY[bbIdx], collisionList.centerZ[bbIdx]);
-        Vec3d extentsA = new Vec3d(collisionList.extentsX[bbIdx], collisionList.extentsY[bbIdx], collisionList.extentsZ[bbIdx]);
-        return ContinuousOBBCollider.separateBBs(centerA, center, extentsA, extents, rotation, motion);
     }
 
     private static Vec3d extentsFromBB(Box bb) {

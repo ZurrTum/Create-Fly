@@ -14,6 +14,7 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.Clearable;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
@@ -22,7 +23,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 import java.util.UUID;
 
-public class TrackObserverBlockEntity extends SmartBlockEntity implements TransformableBlockEntity {
+public class TrackObserverBlockEntity extends SmartBlockEntity implements TransformableBlockEntity, Clearable {
 
     public TrackTargetingBehaviour<TrackObserver> edgePoint;
 
@@ -96,5 +97,10 @@ public class TrackObserverBlockEntity extends SmartBlockEntity implements Transf
     @Override
     public void transform(BlockEntity be, StructureTransform transform) {
         edgePoint.transform(be, transform);
+    }
+
+    @Override
+    public void clear() {
+        filtering.setFilter(ItemStack.EMPTY);
     }
 }

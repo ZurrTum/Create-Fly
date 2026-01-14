@@ -2,6 +2,7 @@ package com.zurrtum.create.content.decoration.copycat;
 
 import com.zurrtum.create.AllBlockEntityTypes;
 import com.zurrtum.create.AllBlocks;
+import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.api.contraption.transformable.TransformableBlockEntity;
 import com.zurrtum.create.api.schematic.nbt.PartialSafeNBT;
 import com.zurrtum.create.api.schematic.requirement.SpecialBlockEntityItemRequirement;
@@ -11,7 +12,6 @@ import com.zurrtum.create.content.redstone.RoseQuartzLampBlock;
 import com.zurrtum.create.content.schematics.requirement.ItemRequirement;
 import com.zurrtum.create.content.schematics.requirement.ItemRequirement.ItemUseType;
 import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
-import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.TrapdoorBlock;
@@ -21,21 +21,20 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.state.property.Properties;
 import net.minecraft.storage.ReadView;
 import net.minecraft.storage.WriteView;
+import net.minecraft.util.Clearable;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 
 import java.util.List;
 import java.util.Optional;
 
-public class CopycatBlockEntity extends SmartBlockEntity implements SpecialBlockEntityItemRequirement, TransformableBlockEntity, PartialSafeNBT {
+public class CopycatBlockEntity extends SmartBlockEntity implements SpecialBlockEntityItemRequirement, TransformableBlockEntity, PartialSafeNBT, Clearable {
 
-    private BlockState material;
-    private ItemStack consumedItem;
+    private BlockState material = AllBlocks.COPYCAT_BASE.getDefaultState();
+    private ItemStack consumedItem = ItemStack.EMPTY;
 
     public CopycatBlockEntity(BlockPos pos, BlockState state) {
         super(AllBlockEntityTypes.COPYCAT, pos, state);
-        material = AllBlocks.COPYCAT_BASE.getDefaultState();
-        consumedItem = ItemStack.EMPTY;
     }
 
     @Override
@@ -185,5 +184,11 @@ public class CopycatBlockEntity extends SmartBlockEntity implements SpecialBlock
             view.put("Item", ItemStack.CODEC, stack);
         }
         view.put("Material", BlockState.CODEC, material);
+    }
+
+    @Override
+    public void clear() {
+        material = AllBlocks.COPYCAT_BASE.getDefaultState();
+        consumedItem = ItemStack.EMPTY;
     }
 }

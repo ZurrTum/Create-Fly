@@ -6,12 +6,14 @@ import com.llamalad7.mixinextras.sugar.Local;
 import com.zurrtum.create.foundation.item.LayeredArmorItem;
 import net.minecraft.client.render.OverlayTexture;
 import net.minecraft.client.render.RenderLayer;
+import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.entity.feature.ArmorFeatureRenderer;
 import net.minecraft.client.render.entity.feature.FeatureRenderer;
 import net.minecraft.client.render.entity.feature.FeatureRendererContext;
 import net.minecraft.client.render.entity.model.BipedEntityModel;
 import net.minecraft.client.render.entity.state.BipedEntityRenderState;
+import net.minecraft.client.render.item.ItemRenderer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.item.ItemStack;
@@ -38,10 +40,14 @@ public abstract class ArmorFeatureRendererMixin<S extends BipedEntityRenderState
     ) {
         original.call(instance, poseStack, vertexConsumers, stack, slot, light, armorModel);
         if (stack.getItem() instanceof LayeredArmorItem item) {
-            RenderLayer renderType = RenderLayer.getArmorCutoutNoCull(item.getLayerTexture());
+            VertexConsumer vertexConsumer = ItemRenderer.getArmorGlintConsumer(
+                vertexConsumers,
+                RenderLayer.getArmorCutoutNoCull(item.getLayerTexture()),
+                stack.hasGlint()
+            );
             M model = getContextModel();
             model.setAngles(state);
-            model.render(poseStack, vertexConsumers.getBuffer(renderType), light, OverlayTexture.DEFAULT_UV, -1);
+            model.render(poseStack, vertexConsumer, light, OverlayTexture.DEFAULT_UV, -1);
         }
     }
 }

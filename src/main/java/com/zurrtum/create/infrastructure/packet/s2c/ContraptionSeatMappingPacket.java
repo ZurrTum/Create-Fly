@@ -19,11 +19,15 @@ public record ContraptionSeatMappingPacket(int entityId, Map<UUID, Integer> mapp
         PacketCodecs.INTEGER,
         ContraptionSeatMappingPacket::entityId,
         PacketCodecs.map(HashMap::new, Uuids.PACKET_CODEC, PacketCodecs.INTEGER),
-        p -> new HashMap<>(p.mapping),
+        ContraptionSeatMappingPacket::mapping,
         PacketCodecs.INTEGER,
         ContraptionSeatMappingPacket::dismountedId,
         ContraptionSeatMappingPacket::new
     );
+
+    public ContraptionSeatMappingPacket {
+        mapping = Map.copyOf(mapping);
+    }
 
     public ContraptionSeatMappingPacket(int entityID, Map<UUID, Integer> mapping) {
         this(entityID, mapping, -1);

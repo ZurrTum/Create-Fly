@@ -25,12 +25,28 @@ public class CollisionList {
     public static class Populate implements BoxConsumer {
         private final CollisionList collisionList;
 
+        public int offsetX = 0;
+        public int offsetY = 0;
+        public int offsetZ = 0;
+
         public Populate(CollisionList collisionList) {
             this.collisionList = collisionList;
         }
 
         @Override
         public void consume(double x1, double y1, double z1, double x2, double y2, double z2) {
+            // These are the values we'll be using so precompute them.
+            append(
+                offsetX + 0.5 * (x2 + x1),
+                offsetY + 0.5 * (y2 + y1),
+                offsetZ + 0.5 * (z2 + z1),
+                0.5 * (x2 - x1),
+                0.5 * (y2 - y1),
+                0.5 * (z2 - z1)
+            );
+        }
+
+        public void append(double centerX, double centerY, double centerZ, double extentsX, double extentsY, double extentsZ) {
             // Out of space, must reallocate.
             if (collisionList.size == collisionList.centerX.length) {
                 int newCapacity = collisionList.centerX.length * 2;
@@ -56,15 +72,25 @@ public class CollisionList {
                 collisionList.extentsZ = newExtentsZ;
             }
 
-            // These are the values we'll be using so precompute them.
-            collisionList.centerX[collisionList.size] = 0.5 * (x2 + x1);
-            collisionList.centerY[collisionList.size] = 0.5 * (y2 + y1);
-            collisionList.centerZ[collisionList.size] = 0.5 * (z2 + z1);
-            collisionList.extentsX[collisionList.size] = 0.5 * (x2 - x1);
-            collisionList.extentsY[collisionList.size] = 0.5 * (y2 - y1);
-            collisionList.extentsZ[collisionList.size] = 0.5 * (z2 - z1);
+            collisionList.centerX[collisionList.size] = centerX;
+            collisionList.centerY[collisionList.size] = centerY;
+            collisionList.centerZ[collisionList.size] = centerZ;
+            collisionList.extentsX[collisionList.size] = extentsX;
+            collisionList.extentsY[collisionList.size] = extentsY;
+            collisionList.extentsZ[collisionList.size] = extentsZ;
 
             ++collisionList.size;
+        }
+
+        public void appendFrom(CollisionList collisionList, int bbIdx) {
+            append(
+                collisionList.centerX[bbIdx],
+                collisionList.centerY[bbIdx],
+                collisionList.centerZ[bbIdx],
+                collisionList.extentsX[bbIdx],
+                collisionList.extentsY[bbIdx],
+                collisionList.extentsZ[bbIdx]
+            );
         }
     }
 }

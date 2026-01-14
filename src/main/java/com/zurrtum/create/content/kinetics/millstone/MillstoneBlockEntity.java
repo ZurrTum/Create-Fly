@@ -3,11 +3,11 @@ package com.zurrtum.create.content.kinetics.millstone;
 import com.zurrtum.create.AllAdvancements;
 import com.zurrtum.create.AllBlockEntityTypes;
 import com.zurrtum.create.AllRecipeTypes;
+import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.catnip.math.VecHelper;
 import com.zurrtum.create.content.kinetics.base.KineticBlockEntity;
 import com.zurrtum.create.content.kinetics.belt.behaviour.DirectBeltInputBehaviour;
 import com.zurrtum.create.foundation.advancement.CreateTrigger;
-import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.infrastructure.items.SidedItemInventory;
 import com.zurrtum.create.infrastructure.transfer.SlotRangeCache;
 import net.minecraft.block.BlockState;
@@ -19,6 +19,7 @@ import net.minecraft.recipe.input.SingleStackRecipeInput;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.storage.ReadView;
 import net.minecraft.storage.WriteView;
+import net.minecraft.util.Clearable;
 import net.minecraft.util.ItemScatterer;
 import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.math.BlockPos;
@@ -31,7 +32,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 import java.util.Optional;
 
-public class MillstoneBlockEntity extends KineticBlockEntity {
+public class MillstoneBlockEntity extends KineticBlockEntity implements Clearable {
     public MillstoneInventoryHandler capability;
     public int timer;
     private MillingRecipe lastRecipe;
@@ -100,6 +101,11 @@ public class MillstoneBlockEntity extends KineticBlockEntity {
 
         timer = lastRecipe.time();
         sendData();
+    }
+
+    @Override
+    public void clear() {
+        capability.clear();
     }
 
     @Override
