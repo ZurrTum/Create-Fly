@@ -8,7 +8,7 @@ import org.jetbrains.annotations.UnknownNullability;
 public final class Flywheel {
     public static final String MOD_ID = "flywheel";
     @UnknownNullability
-    private static final Version version = new StringVersion("1.0.2+create");
+    private static final Version version = new StringVersion("1.0.6+create");
 
     public void onInitializeClient() {
         setupImpl();

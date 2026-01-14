@@ -1,7 +1,6 @@
 package com.zurrtum.create.client.flywheel.lib.material;
 
 import com.zurrtum.create.client.flywheel.api.material.*;
-import net.minecraft.client.render.RenderPhase;
 import net.minecraft.client.texture.SpriteAtlasTexture;
 import net.minecraft.util.Identifier;
 
@@ -25,7 +24,7 @@ public class SimpleMaterial implements Material {
     protected final boolean useLight;
     protected final CardinalLightingMode cardinalLightingMode;
 
-    protected RenderPhase.Target target;
+    protected final boolean ambientOcclusion;
 
     protected SimpleMaterial(Builder builder) {
         shaders = builder.shaders();
@@ -43,6 +42,7 @@ public class SimpleMaterial implements Material {
         useOverlay = builder.useOverlay();
         useLight = builder.useLight();
         cardinalLightingMode = builder.cardinalLightingMode();
+        ambientOcclusion = builder.ambientOcclusion();
     }
 
     public static Builder builder() {
@@ -128,6 +128,11 @@ public class SimpleMaterial implements Material {
         return cardinalLightingMode;
     }
 
+    @Override
+    public boolean ambientOcclusion() {
+        return ambientOcclusion;
+    }
+
     public static class Builder implements Material {
         protected MaterialShaders shaders;
         protected FogShader fog;
@@ -148,6 +153,8 @@ public class SimpleMaterial implements Material {
         protected boolean useLight;
         protected CardinalLightingMode cardinalLightingMode;
 
+        protected boolean ambientOcclusion;
+
         @SuppressWarnings("deprecation")
         public Builder() {
             shaders = StandardMaterialShaders.DEFAULT;
@@ -165,6 +172,7 @@ public class SimpleMaterial implements Material {
             useOverlay = true;
             useLight = true;
             cardinalLightingMode = CardinalLightingMode.ENTITY;
+            ambientOcclusion = true;
         }
 
         public Builder(Material material) {
@@ -187,6 +195,7 @@ public class SimpleMaterial implements Material {
             useOverlay = material.useOverlay();
             useLight = material.useLight();
             cardinalLightingMode = material.cardinalLightingMode();
+            ambientOcclusion = material.ambientOcclusion();
             return this;
         }
 
@@ -273,6 +282,11 @@ public class SimpleMaterial implements Material {
             return this;
         }
 
+        public Builder ambientOcclusion(boolean ambientOcclusion) {
+            this.ambientOcclusion = ambientOcclusion;
+            return this;
+        }
+
         @Override
         public MaterialShaders shaders() {
             return shaders;
@@ -346,6 +360,11 @@ public class SimpleMaterial implements Material {
         @Override
         public CardinalLightingMode cardinalLightingMode() {
             return cardinalLightingMode;
+        }
+
+        @Override
+        public boolean ambientOcclusion() {
+            return ambientOcclusion;
         }
 
         public SimpleMaterial build() {

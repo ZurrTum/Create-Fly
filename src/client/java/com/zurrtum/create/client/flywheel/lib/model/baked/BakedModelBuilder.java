@@ -20,7 +20,7 @@ public final class BakedModelBuilder {
     @Nullable BlockRenderView level;
     @Nullable BlockPos pos;
     @Nullable MatrixStack poseStack;
-    @Nullable BiFunction<BlockRenderLayer, Boolean, Material> materialFunc;
+    @Nullable BlockMaterialFunction materialFunc;
 
     public BakedModelBuilder(GeometryBakedModel bakedModel) {
         this.bakedModel = bakedModel;
@@ -47,7 +47,17 @@ public final class BakedModelBuilder {
         return this;
     }
 
+    @Deprecated(forRemoval = true)
     public BakedModelBuilder materialFunc(@Nullable BiFunction<BlockRenderLayer, Boolean, Material> materialFunc) {
+        if (materialFunc != null) {
+            this.materialFunc = (chunkRenderType, shaded, ambientOcclusion) -> materialFunc.apply(chunkRenderType, shaded);
+        } else {
+            this.materialFunc = null;
+        }
+        return this;
+    }
+
+    public BakedModelBuilder materialFunc(@Nullable BlockMaterialFunction materialFunc) {
         this.materialFunc = materialFunc;
         return this;
     }
