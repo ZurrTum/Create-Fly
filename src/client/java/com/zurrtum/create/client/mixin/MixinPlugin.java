@@ -1,6 +1,5 @@
 package com.zurrtum.create.client.mixin;
 
-import com.zurrtum.create.Create;
 import net.fabricmc.loader.api.FabricLoader;
 import org.objectweb.asm.tree.ClassNode;
 import org.spongepowered.asm.mixin.extensibility.IMixinConfigPlugin;
@@ -33,17 +32,31 @@ public class MixinPlugin implements IMixinConfigPlugin {
             mixins.add("RecipeViewScreenMixin");
             mixins.add("CraftingViewRecipeAccessor");
         }
-        if (Create.Lazy) {
+        if (loader.isModLoaded("modernfix")) {
+            mixins.add("DynamicModelProviderMixin");
+            mixins.add("DynamicModelProviderAccessor");
+            mixins.add("DynamicBakerImplMixin");
+        }
+        if (!loader.isModLoaded("fabric-item-group-api-v1")) {
+            mixins.add("CreativeInventoryScreenMixin");
+        }
+        if (loader.isModLoaded("fabric-renderer-api-v1")) {
             mixins.add("FabricBlockStateModelMixin");
-            mixins.add("WrapperBlockStateModelMixin");
-            mixins.add("FluidVariantRenderHandlerMixin");
+        }
+        if (loader.isModLoaded("fabric-renderer-indigo")) {
             mixins.add("BlockRenderInfoMixin");
             mixins.add("AbstractTerrainRenderContextMixin");
-        } else {
-            mixins.add("CreativeInventoryScreenMixin");
         }
         if (loader.isModLoaded("fabric-rendering-fluids-v1")) {
             mixins.add("WaterRenderHandlerMixin");
+        }
+        if (loader.isModLoaded("fabric-transfer-api-v1")) {
+            mixins.add("FluidVariantRenderHandlerMixin");
+        }
+        if (loader.isModLoaded("fabric-model-loading-api-v1")) {
+            mixins.add("WrapperBlockStateModelMixin");
+        } else {
+            mixins.add("LoadBakedModelMixin");
         }
     }
 
