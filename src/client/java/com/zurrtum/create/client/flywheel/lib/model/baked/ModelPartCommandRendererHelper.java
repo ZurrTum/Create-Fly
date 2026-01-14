@@ -25,6 +25,7 @@ public class ModelPartCommandRendererHelper {
         ModelPartCommandRenderer.Commands commands = queue.getModelPartCommands();
 
         for (Map.Entry<RenderLayer, List<OrderedRenderCommandQueueImpl.ModelPartCommand>> entry : commands.modelPartCommands.entrySet()) {
+            matrices.push();
             RenderLayer renderLayer = entry.getKey();
             List<OrderedRenderCommandQueueImpl.ModelPartCommand> list = entry.getValue();
             VertexConsumer vertexConsumer = vertexConsumers.getBuffer(renderLayer);
@@ -92,6 +93,7 @@ public class ModelPartCommandRendererHelper {
                     );
                 }
             }
+            matrices.pop();
         }
     }
 }

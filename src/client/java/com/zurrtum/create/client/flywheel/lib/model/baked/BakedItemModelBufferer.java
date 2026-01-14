@@ -81,9 +81,9 @@ public class BakedItemModelBufferer {
             this.meshResultConsumer = meshResultConsumer;
         }
 
-        private void emitMesh(RenderLayer renderType, Mesh mesh) {
+        private void emitMesh(RenderLayer renderType, Mesh mesh, boolean translucent) {
             Material material = objects.materials.computeIfAbsent(renderType, ItemMeshEmitterProvider::createMaterial);
-            meshResultConsumer.accept(renderType, material, mesh);
+            meshResultConsumer.accept(renderType, material, mesh, translucent);
         }
 
         private static Material createMaterial(RenderLayer renderLayer) {
@@ -141,7 +141,7 @@ public class BakedItemModelBufferer {
     }
 
     public interface MeshResultConsumer {
-        void accept(RenderLayer renderType, Material material, Mesh mesh);
+        void accept(RenderLayer renderType, Material material, Mesh mesh, boolean translucent);
     }
 
     private static final ThreadLocal<ThreadLocalObjects> THREAD_LOCAL_OBJECTS = ThreadLocal.withInitial(ThreadLocalObjects::new);
