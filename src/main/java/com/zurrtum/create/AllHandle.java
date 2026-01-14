@@ -1035,6 +1035,7 @@ public class AllHandle {
     }
 
     public static void onInstantSchematic(ServerPlayNetworkHandler listener, InstantSchematicPacket packet) {
+        NetworkThreadUtils.forceMainThread(packet, listener, listener.server);
         Create.SCHEMATIC_RECEIVER.handleInstantSchematic(
             listener.player,
             packet.name(),
