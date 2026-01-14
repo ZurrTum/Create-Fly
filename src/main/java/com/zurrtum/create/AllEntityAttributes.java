@@ -10,17 +10,9 @@ import java.util.Map;
 import java.util.function.Supplier;
 
 public class AllEntityAttributes {
-    public static boolean INITIALIZED = false;
     public static final Map<EntityType<? extends LivingEntity>, Supplier<DefaultAttributeContainer.Builder>> ATTRIBUTES = new IdentityHashMap<>();
-
-    public static void registerIfNeeded() {
-        if (!INITIALIZED) {
-            register();
-        }
-    }
 
     public static void register() {
         ATTRIBUTES.put(AllEntityTypes.PACKAGE, PackageEntity::createPackageAttributes);
-        INITIALIZED = true;
     }
 }

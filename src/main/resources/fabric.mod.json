@@ -29,6 +29,9 @@
     ],
     "eiv": [
       "com.zurrtum.create.compat.eiv.EivCommonPlugin"
+    ],
+    "create_plugin": [
+      "com.zurrtum.create.AllEarlyRegistries"
     ]
   },
   "custom": {

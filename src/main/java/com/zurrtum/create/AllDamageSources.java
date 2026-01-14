@@ -33,18 +33,20 @@ public class AllDamageSources {
     public DamageSource saw;
 
     public AllDamageSources(DynamicRegistryManager registryManager) {
-        registry = registryManager.getOrThrow(RegistryKeys.DAMAGE_TYPE);
-        crush = create(AllDamageTypes.CRUSH);
-        cuckoo_surprise = create(AllDamageTypes.CUCKOO_SURPRISE);
-        fan_fire = create(AllDamageTypes.FAN_FIRE);
-        fan_lava = create(AllDamageTypes.FAN_LAVA);
-        drill = create(AllDamageTypes.DRILL);
-        roller = create(AllDamageTypes.ROLLER);
-        saw = create(AllDamageTypes.SAW);
+        registryManager.getOptional(RegistryKeys.DAMAGE_TYPE).ifPresent(value -> {
+            registry = value;
+            crush = create(AllDamageTypes.CRUSH);
+            cuckoo_surprise = create(AllDamageTypes.CUCKOO_SURPRISE);
+            fan_fire = create(AllDamageTypes.FAN_FIRE);
+            fan_lava = create(AllDamageTypes.FAN_LAVA);
+            drill = create(AllDamageTypes.DRILL);
+            roller = create(AllDamageTypes.ROLLER);
+            saw = create(AllDamageTypes.SAW);
+        });
     }
 
     public DamageSource create(RegistryKey<DamageType> type) {
-        return new DamageSource(registry.getOrThrow(type));
+        return registry.getOptional(type).map(DamageSource::new).orElse(null);
     }
 
     public DamageSource potatoCannon(Entity causingEntity, Entity directEntity) {
