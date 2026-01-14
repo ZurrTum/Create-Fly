@@ -9,13 +9,9 @@ import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.util.Identifier;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import static com.zurrtum.create.Create.MOD_ID;
 
 public class AllFluids {
-    public static final List<FlowableFluid> ALL = new ArrayList<>();
     public static final FlowableFluid POTION = register("potion");
     public static final FlowableFluid TEA = register("tea");
     public static final FlowableFluid MILK = register("milk");
@@ -31,8 +27,6 @@ public class AllFluids {
         entry.flowing = new FlowableFluid.Flowing(entry);
         Registry.register(Registries.FLUID, still_key, entry.still);
         Registry.register(Registries.FLUID, flowing_key, entry.flowing);
-        ALL.add(entry.still);
-        ALL.add(entry.flowing);
         return entry.still;
     }
 

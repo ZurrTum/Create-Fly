@@ -157,8 +157,6 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.BlockView;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 import java.util.function.BiFunction;
 import java.util.function.Function;
@@ -166,7 +164,6 @@ import java.util.function.Function;
 import static com.zurrtum.create.Create.MOD_ID;
 
 public class AllBlocks {
-    public static final List<Block> ALL = new ArrayList<>();
     public static final CogWheelBlock COGWHEEL = register(
         "cogwheel",
         CogWheelBlock::small,
@@ -3011,9 +3008,7 @@ public class AllBlocks {
 
     private static <T extends Block> T register(String id, Function<AbstractBlock.Settings, T> factory, AbstractBlock.Settings settings) {
         RegistryKey<Block> key = RegistryKey.of(RegistryKeys.BLOCK, Identifier.of(MOD_ID, id));
-        T block = factory.apply(settings.registryKey(key));
-        ALL.add(block);
-        return Registry.register(Registries.BLOCK, key, block);
+        return Registry.register(Registries.BLOCK, key, factory.apply(settings.registryKey(key)));
     }
 
     public static void register() {

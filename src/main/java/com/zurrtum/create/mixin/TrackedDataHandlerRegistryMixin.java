@@ -11,13 +11,13 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-@Mixin(TrackedDataHandlerRegistry.class)
+@Mixin(value = TrackedDataHandlerRegistry.class, priority = 999)
 public class TrackedDataHandlerRegistryMixin {
     @Shadow
     @Final
     private static Int2ObjectBiMap<TrackedDataHandler<?>> DATA_HANDLERS;
 
-    @Inject(method = "<clinit>", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/data/TrackedDataHandlerRegistry;register(Lnet/minecraft/entity/data/TrackedDataHandler;)V", ordinal = 0))
+    @Inject(method = "<clinit>", at = @At("TAIL"))
     private static void register(CallbackInfo ci) {
         AllSynchedDatas.HANDLERS.forEach(DATA_HANDLERS::add);
     }
