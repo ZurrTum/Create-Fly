@@ -1,146 +1,115 @@
 package com.zurrtum.create.client.flywheel.lib.model.baked;
 
-import com.mojang.blaze3d.vertex.VertexFormat;
+import com.google.common.collect.ImmutableList;
+import com.mojang.blaze3d.pipeline.RenderPipeline;
+import com.zurrtum.create.client.flywheel.api.material.Material;
+import com.zurrtum.create.client.flywheel.api.model.Mesh;
+import com.zurrtum.create.client.flywheel.api.model.Model;
 import net.minecraft.client.render.BlockRenderLayer;
 import net.minecraft.client.render.BufferBuilder;
-import net.minecraft.client.render.VertexConsumer;
-import net.minecraft.client.render.VertexFormats;
-import net.minecraft.client.render.model.BakedQuad;
 import net.minecraft.client.util.BufferAllocator;
-import net.minecraft.client.util.math.MatrixStack;
 import org.jetbrains.annotations.UnknownNullability;
 
-class MeshEmitter implements VertexConsumer {
+import java.util.Arrays;
+
+class MeshEmitter {
+    private static final int INITIAL_CAPACITY = 1;
+
+    private final MeshEmitterManager<?> manager;
+    private final ByteBufferBuilderStack byteBufferBuilderStack;
     private final BlockRenderLayer renderType;
-    private final BufferAllocator byteBufferBuilder;
-    @UnknownNullability
-    private BufferBuilder bufferBuilder;
 
-    private BakedModelBufferer.ResultConsumer resultConsumer;
-    private boolean currentShade;
+    private Material @UnknownNullability [] materials = new Material[INITIAL_CAPACITY];
+    private BufferBuilder @UnknownNullability [] bufferBuilders = new BufferBuilder[INITIAL_CAPACITY];
 
-    MeshEmitter(BlockRenderLayer renderType) {
+    // The number of valid elements in the above parallel arrays.
+    private int numBufferBuildersPopulated = 0;
+
+    private int currentIndex = 0;
+
+    MeshEmitter(MeshEmitterManager<?> manager, ByteBufferBuilderStack byteBufferBuilderStack, BlockRenderLayer renderType) {
+        this.manager = manager;
+        this.byteBufferBuilderStack = byteBufferBuilderStack;
         this.renderType = renderType;
-        this.byteBufferBuilder = new BufferAllocator(renderType.getBufferSize());
     }
 
-    public void prepare(BakedModelBufferer.ResultConsumer resultConsumer) {
-        this.resultConsumer = resultConsumer;
+    public void prepareForBlock() {
+        // Quad render order within blocks must be preserved for correctness, however between blocks we should try to
+        // reduce the number of generated meshes as much as possible. Here we reset the head index without flushing
+        // any buffers, so that the next block can start over scanning through the parallel arrays looking for a
+        // matching Material/BufferBuilder pair.
+        currentIndex = 0;
     }
 
-    public void end() {
-        if (bufferBuilder != null) {
-            emit();
+    public void end(ImmutableList.Builder<Model.ConfiguredMesh> out) {
+        for (int index = 0; index < numBufferBuildersPopulated; index++) {
+            var renderedBuffer = bufferBuilders[index].endNullable();
+
+            if (renderedBuffer != null) {
+                Material material = materials[index];
+                Mesh mesh = MeshHelper.blockVerticesToMesh(renderedBuffer, "source=ModelBuilder" + ",material=" + material);
+                out.add(new Model.ConfiguredMesh(material, mesh));
+                renderedBuffer.close();
+            }
         }
-        resultConsumer = null;
+
+        // Not strictly necessary to clear the arrays, but best not to hold on to references for too long here.
+        Arrays.fill(bufferBuilders, 0, numBufferBuildersPopulated, null);
+        Arrays.fill(materials, 0, numBufferBuildersPopulated, null);
+
+        currentIndex = 0;
+        numBufferBuildersPopulated = 0;
     }
 
-    public BufferBuilder unwrap(boolean shade) {
-        prepareForGeometry(shade);
+    public BufferBuilder getBuffer(boolean shade, boolean ao) {
+        Material material = manager.getMaterial(renderType, shade, ao);
+        return material != null ? getBuffer(material) : null;
+    }
+
+    public BufferBuilder getBuffer(Material material) {
+        // First, scan through and try to find a matching Material.
+        while (currentIndex < numBufferBuildersPopulated) {
+            if (material.equals(materials[currentIndex])) {
+                // Return the matching BufferBuilder, but do not increment as we
+                // may still be able to use the same BufferBuilder in the next quad.
+                return bufferBuilders[currentIndex];
+            }
+            ++currentIndex;
+        }
+
+        // Nothing matched so we need to grab a new BufferBuilder.
+        // Make sure we have room to represent it in the arrays.
+        if (currentIndex >= materials.length) {
+            // Only technically need to grow one at a time here, but doubling is
+            // fine and should reduce the number of reallocations.
+            resize(materials.length * 2);
+        }
+
+        BufferAllocator byteBufferBuilder = byteBufferBuilderStack.nextOrCreate();
+
+        // Trust that the RenderType mode/format don't change out from underneath us.
+        RenderPipeline pipeline = renderType.getPipeline();
+        BufferBuilder bufferBuilder = new BufferBuilder(byteBufferBuilder, pipeline.getVertexFormatMode(), pipeline.getVertexFormat());
+
+        // currentIndex == numBufferBuildersPopulated here.
+        materials[currentIndex] = material;
+        bufferBuilders[currentIndex] = bufferBuilder;
+
+        // Again, do not increment currentIndex so we can re-use the new
+        // BufferBuilder for the next quad if it matches.
+        ++numBufferBuildersPopulated;
+
         return bufferBuilder;
     }
 
-    private void prepareForGeometry(boolean shade) {
-        if (bufferBuilder == null) {
-            bufferBuilder = new BufferBuilder(byteBufferBuilder, VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR_TEXTURE_LIGHT_NORMAL);
-        } else if (shade != currentShade) {
-            emit();
-            bufferBuilder = new BufferBuilder(byteBufferBuilder, VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR_TEXTURE_LIGHT_NORMAL);
-        }
+    private void resize(int capacity) {
+        BufferBuilder[] newBufferBuilders = new BufferBuilder[capacity];
+        Material[] newMaterials = new Material[capacity];
 
-        currentShade = shade;
-    }
+        System.arraycopy(bufferBuilders, 0, newBufferBuilders, 0, numBufferBuildersPopulated);
+        System.arraycopy(materials, 0, newMaterials, 0, numBufferBuildersPopulated);
 
-    private void prepareForGeometry(BakedQuad quad) {
-        prepareForGeometry(quad.shade());
-    }
-
-    private void emit() {
-        var data = bufferBuilder.endNullable();
-        bufferBuilder = null;
-
-        if (data != null) {
-            resultConsumer.accept(renderType, currentShade, data);
-            data.close();
-        }
-    }
-
-    public void quad(
-        MatrixStack.Entry pose,
-        BakedQuad quad,
-        float red,
-        float green,
-        float blue,
-        float alpha,
-        int light,
-        int overlay,
-        boolean readExistingColor
-    ) {
-        prepareForGeometry(quad);
-        bufferBuilder.quad(
-            pose,
-            quad,
-            new float[]{1.0F, 1.0F, 1.0F, 1.0F},
-            red,
-            green,
-            blue,
-            alpha,
-            new int[]{light, light, light, light},
-            overlay,
-            readExistingColor
-        );
-    }
-
-    @Override
-    public void quad(MatrixStack.Entry pose, BakedQuad quad, float red, float green, float blue, float alpha, int packedLight, int packedOverlay) {
-        prepareForGeometry(quad);
-        bufferBuilder.quad(pose, quad, red, green, blue, alpha, packedLight, packedOverlay);
-    }
-
-    @Override
-    public void quad(
-        MatrixStack.Entry pose,
-        BakedQuad quad,
-        float[] brightnesses,
-        float red,
-        float green,
-        float blue,
-        float alpha,
-        int[] lights,
-        int overlay,
-        boolean readExistingColor
-    ) {
-        prepareForGeometry(quad);
-        bufferBuilder.quad(pose, quad, brightnesses, red, green, blue, alpha, lights, overlay, readExistingColor);
-    }
-
-    @Override
-    public VertexConsumer vertex(float x, float y, float z) {
-        throw new UnsupportedOperationException("MeshEmitter only supports putBulkData!");
-    }
-
-    @Override
-    public VertexConsumer color(int red, int green, int blue, int alpha) {
-        throw new UnsupportedOperationException("MeshEmitter only supports putBulkData!");
-    }
-
-    @Override
-    public VertexConsumer texture(float u, float v) {
-        throw new UnsupportedOperationException("MeshEmitter only supports putBulkData!");
-    }
-
-    @Override
-    public VertexConsumer overlay(int u, int v) {
-        throw new UnsupportedOperationException("MeshEmitter only supports putBulkData!");
-    }
-
-    @Override
-    public VertexConsumer light(int u, int v) {
-        throw new UnsupportedOperationException("MeshEmitter only supports putBulkData!");
-    }
-
-    @Override
-    public VertexConsumer normal(float normalX, float normalY, float normalZ) {
-        throw new UnsupportedOperationException("MeshEmitter only supports putBulkData!");
+        bufferBuilders = newBufferBuilders;
+        materials = newMaterials;
     }
 }

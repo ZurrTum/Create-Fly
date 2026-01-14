@@ -292,6 +292,11 @@ public class InstancedDrawManager extends DrawManager<InstancedInstancer<?>> {
         MinecraftClient.getInstance().worldRenderer.reload();
     }
 
+    @Override
+    public MeshPool meshPool() {
+        return meshPool;
+    }
+
     public static void uploadMaterialUniform(GlProgram program, Material material) {
         int packedFogAndCutout = MaterialEncoder.packUberShader(material);
         int packedMaterialProperties = MaterialEncoder.packProperties(material);

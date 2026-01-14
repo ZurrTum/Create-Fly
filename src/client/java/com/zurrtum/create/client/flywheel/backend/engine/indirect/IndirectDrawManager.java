@@ -277,4 +277,9 @@ public class IndirectDrawManager extends DrawManager<IndirectInstancer<?>> {
         IndirectPrograms.kill();
         MinecraftClient.getInstance().worldRenderer.reload();
     }
+
+    @Override
+    public MeshPool meshPool() {
+        return meshPool;
+    }
 }
