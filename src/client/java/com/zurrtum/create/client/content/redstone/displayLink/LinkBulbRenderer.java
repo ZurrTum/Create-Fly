@@ -8,6 +8,7 @@ import com.zurrtum.create.client.catnip.render.SuperByteBuffer;
 import com.zurrtum.create.client.flywheel.lib.util.ShadersModHelper;
 import com.zurrtum.create.client.foundation.render.RenderTypes;
 import com.zurrtum.create.content.redstone.displayLink.LinkWithBulbBlockEntity;
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.render.LightmapTextureManager;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.VertexConsumer;
@@ -16,7 +17,6 @@ import net.minecraft.client.render.block.entity.BlockEntityRendererFactory;
 import net.minecraft.client.render.block.entity.state.BlockEntityRenderState;
 import net.minecraft.client.render.command.ModelCommandRenderer;
 import net.minecraft.client.render.command.OrderedRenderCommandQueue;
-import net.minecraft.client.render.command.RenderCommandQueue;
 import net.minecraft.client.render.state.CameraRenderState;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.Direction;
@@ -26,6 +26,8 @@ import net.minecraft.util.math.Vec3d;
 import org.jetbrains.annotations.Nullable;
 
 public class LinkBulbRenderer implements BlockEntityRenderer<LinkWithBulbBlockEntity, LinkBulbRenderer.LinkBulbRenderState> {
+    private static final boolean IRIS = FabricLoader.getInstance().isModLoaded("iris");
+
     public LinkBulbRenderer(BlockEntityRendererFactory.Context context) {
     }
 
@@ -67,10 +69,9 @@ public class LinkBulbRenderer implements BlockEntityRenderer<LinkWithBulbBlockEn
         matrices.multiply(RotationAxis.POSITIVE_Y.rotation(state.yRot));
         matrices.multiply(RotationAxis.POSITIVE_X.rotation(state.xRot));
         matrices.translate(-0.5f, -0.5f, -0.5f);
-        RenderCommandQueue batchingQueue = ShadersModHelper.isShaderPackInUse() ? queue.getBatchingQueue(1) : queue;
-        batchingQueue.submitCustom(matrices, state.translucent, state::renderTube);
+        queue.submitCustom(matrices, state.translucent, state::renderTube);
         if (state.glow != null) {
-            batchingQueue.submitCustom(matrices, state.additive, state::renderGlow);
+            (IRIS ? queue.getBatchingQueue(1) : queue).submitCustom(matrices, state.additive, state::renderGlow);
         }
     }
 

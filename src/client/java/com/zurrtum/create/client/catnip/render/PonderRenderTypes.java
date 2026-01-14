@@ -52,7 +52,7 @@ public class PonderRenderTypes {
         786432,
         true,
         true,
-        RenderPipelines.TRANSLUCENT,
+        RenderPipelines.RENDERTYPE_TRANSLUCENT_MOVING_BLOCK,
         MultiPhaseParameters.builder().lightmap(ENABLE_LIGHTMAP).texture(MIPMAP_BLOCK_ATLAS_TEXTURE).target(ITEM_ENTITY_TARGET).build(true)
     );
 

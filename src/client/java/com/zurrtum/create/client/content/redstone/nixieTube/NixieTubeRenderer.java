@@ -9,13 +9,13 @@ import com.zurrtum.create.client.catnip.animation.AnimationTickHolder;
 import com.zurrtum.create.client.catnip.render.CachedBuffers;
 import com.zurrtum.create.client.catnip.render.PonderRenderTypes;
 import com.zurrtum.create.client.catnip.render.SuperByteBuffer;
-import com.zurrtum.create.client.flywheel.lib.util.ShadersModHelper;
 import com.zurrtum.create.client.foundation.render.RenderTypes;
 import com.zurrtum.create.client.foundation.utility.DyeHelper;
 import com.zurrtum.create.content.redstone.nixieTube.DoubleFaceAttachedBlock.DoubleAttachFace;
 import com.zurrtum.create.content.redstone.nixieTube.NixieTubeBlock;
 import com.zurrtum.create.content.redstone.nixieTube.NixieTubeBlockEntity;
 import com.zurrtum.create.content.trains.signal.SignalBlockEntity.SignalState;
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.font.BakedGlyph;
 import net.minecraft.client.font.TextDrawable;
 import net.minecraft.client.font.TextRenderer;
@@ -42,6 +42,7 @@ import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix4f;
 
 public class NixieTubeRenderer implements BlockEntityRenderer<NixieTubeBlockEntity, NixieTubeRenderer.NixieTubeRenderState> {
+    private static final boolean IRIS = FabricLoader.getInstance().isModLoaded("iris");
     protected final TextRenderer textRenderer;
 
     public NixieTubeRenderer(BlockEntityRendererFactory.Context context) {
@@ -78,7 +79,7 @@ public class NixieTubeRenderer implements BlockEntityRenderer<NixieTubeBlockEnti
         if (face == DoubleAttachFace.CEILING || facing == Direction.DOWN) {
             data.zRot2 = MathHelper.RADIANS_PER_DEGREE * 180;
         }
-        data.layer = ShadersModHelper.isShaderPackInUse() ? RenderLayer.getTranslucentMovingBlock() : PonderRenderTypes.translucent();
+        data.layer = IRIS ? RenderLayer.getTranslucentMovingBlock() : PonderRenderTypes.translucent();
         data.light = state.lightmapCoordinates;
         data.tube = CachedBuffers.partial(AllPartialModels.NIXIE_TUBE, state.blockState);
         Couple<String> s = be.getDisplayedStrings();
@@ -318,7 +319,7 @@ public class NixieTubeRenderer implements BlockEntityRenderer<NixieTubeBlockEnti
             matrices.translate(0.5f, 0.5f, 0.5f);
             matrices.multiply(RotationAxis.POSITIVE_Y.rotation(yRot));
             matrices.multiply(RotationAxis.POSITIVE_Z.rotation(zRot));
-            RenderCommandQueue batchingQueue = ShadersModHelper.isShaderPackInUse() ? queue.getBatchingQueue(1) : queue;
+            RenderCommandQueue batchingQueue = IRIS ? queue.getBatchingQueue(1) : queue;
             if (zRot2 != 0) {
                 matrices.push();
                 matrices.multiply(RotationAxis.POSITIVE_Z.rotation(zRot2));
@@ -412,9 +413,9 @@ public class NixieTubeRenderer implements BlockEntityRenderer<NixieTubeBlockEnti
         public boolean additive;
 
         public void render(MatrixStack matrices, OrderedRenderCommandQueue queue) {
-            if (ShadersModHelper.isShaderPackInUse()) {
+            if (IRIS) {
                 if (additive) {
-                    queue.getBatchingQueue(1).submitCustom(matrices, layer, (e, v) -> renderAdditive(e, v, 153));
+                    queue.submitCustom(matrices, layer, (e, v) -> renderAdditive(e, v, 153));
                     if (cube != null) {
                         queue.getBatchingQueue(1).submitCustom(matrices, cubeLayer, this::renderCube);
                     }
