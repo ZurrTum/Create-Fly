@@ -63,6 +63,11 @@ public class PostboxBlockEntity extends PackagePortBlockEntity {
 
     @Override
     protected void onOpenChange(boolean open) {
+        // cached getBlockState doesn't update if we're exploded in the meantime, refreshBlockState crashes validation
+        BlockState state = world.getBlockState(pos);
+        if (!(state.getBlock() instanceof PostboxBlock))
+            return;
+
         world.setBlockState(pos, getCachedState().with(PostboxBlock.OPEN, open));
         world.playSound(null, pos, open ? SoundEvents.BLOCK_BARREL_OPEN : SoundEvents.BLOCK_BARREL_CLOSE, SoundCategory.BLOCKS);
     }

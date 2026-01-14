@@ -60,6 +60,16 @@ public interface InventoryIdentifier {
     }
 
     record Pair(BlockPos first, BlockPos second) implements InventoryIdentifier {
+        public Pair(BlockPos first, BlockPos second) {
+            if (first.compareTo(second) < 0) {
+                this.first = first;
+                this.second = second;
+            } else {
+                this.first = second;
+                this.second = first;
+            }
+        }
+
         @Override
         public boolean contains(BlockFace face) {
             BlockPos pos = face.getPos();

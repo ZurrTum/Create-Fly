@@ -17,18 +17,16 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.storage.ReadView;
 import net.minecraft.storage.WriteView;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 
 public class SeatEntity extends Entity {
-
-    public SeatEntity(EntityType<? extends SeatEntity> p_i48580_1_, World p_i48580_2_) {
-        super(p_i48580_1_, p_i48580_2_);
+    public SeatEntity(EntityType<? extends SeatEntity> entityType, World level) {
+        super(entityType, level);
     }
 
-    public SeatEntity(World world, BlockPos pos) {
+    public SeatEntity(World world) {
         this(AllEntityTypes.SEAT, world);
         noClip = true;
     }
@@ -57,6 +55,11 @@ public class SeatEntity extends Entity {
         }
     }
 
+    @Override
+    public void onPassengerLookAround(Entity entity) {
+        entity.setHeadYaw(entity.getYaw());
+    }
+
     public static double getCustomEntitySeatOffset(Entity entity) {
         if (entity instanceof SlimeEntity)
             return 0.0f;
@@ -78,7 +81,7 @@ public class SeatEntity extends Entity {
     }
 
     @Override
-    public void setVelocity(Vec3d p_213317_1_) {
+    public void setVelocity(Vec3d vec) {
     }
 
     @Override

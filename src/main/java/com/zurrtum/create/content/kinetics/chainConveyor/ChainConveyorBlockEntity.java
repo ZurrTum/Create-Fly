@@ -28,6 +28,7 @@ import net.minecraft.particle.BlockStateParticleEffect;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.storage.ReadView;
 import net.minecraft.storage.WriteView;
+import net.minecraft.util.Clearable;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
@@ -39,7 +40,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.*;
 import java.util.function.Consumer;
 
-public class ChainConveyorBlockEntity extends KineticBlockEntity implements TransformableBlockEntity {
+public class ChainConveyorBlockEntity extends KineticBlockEntity implements TransformableBlockEntity, Clearable {
     public static final Codec<List<ChainConveyorPackage>> PACKAGE_CODEC = ChainConveyorPackage.CODEC.listOf();
     public static final Codec<List<ChainConveyorPackage>> CLIENT_PACKAGE_CODEC = ChainConveyorPackage.CLIENT_CODEC.listOf();
     public static final Codec<Map<BlockPos, List<ChainConveyorPackage>>> MAP_CODEC = CreateCodecs.getCodecMap(BlockPos.CODEC, PACKAGE_CODEC);
@@ -516,6 +517,13 @@ public class ChainConveyorBlockEntity extends KineticBlockEntity implements Tran
                 0
             )
         );
+    }
+
+    @Override
+    public void clear() {
+        connections.clear();
+        travellingPackages.clear();
+        loopingPackages.clear();
     }
 
     @Override

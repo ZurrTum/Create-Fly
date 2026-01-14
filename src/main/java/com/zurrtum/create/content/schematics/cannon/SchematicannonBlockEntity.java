@@ -2,6 +2,7 @@ package com.zurrtum.create.content.schematics.cannon;
 
 import com.mojang.serialization.Codec;
 import com.zurrtum.create.*;
+import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.catnip.data.Iterate;
 import com.zurrtum.create.content.kinetics.belt.BeltBlock;
 import com.zurrtum.create.content.kinetics.belt.BeltBlockEntity;
@@ -13,7 +14,6 @@ import com.zurrtum.create.content.schematics.SchematicPrinter;
 import com.zurrtum.create.content.schematics.requirement.ItemRequirement;
 import com.zurrtum.create.content.schematics.requirement.ItemRequirement.ItemUseType;
 import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
-import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.foundation.gui.menu.MenuProvider;
 import com.zurrtum.create.foundation.item.ItemHelper;
 import com.zurrtum.create.foundation.utility.BlockHelper;
@@ -42,6 +42,7 @@ import net.minecraft.state.property.Properties;
 import net.minecraft.storage.ReadView;
 import net.minecraft.storage.WriteView;
 import net.minecraft.text.Text;
+import net.minecraft.util.Clearable;
 import net.minecraft.util.ItemScatterer;
 import net.minecraft.util.StringIdentifiable;
 import net.minecraft.util.math.BlockPos;
@@ -52,7 +53,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 
-public class SchematicannonBlockEntity extends SmartBlockEntity implements MenuProvider {
+public class SchematicannonBlockEntity extends SmartBlockEntity implements MenuProvider, Clearable {
 
     public static final int NEIGHBOUR_CHECKING = 100;
     public static final int MAX_ANCHOR_DISTANCE = 256;
@@ -137,6 +138,11 @@ public class SchematicannonBlockEntity extends SmartBlockEntity implements MenuP
                 }
             }
         }
+    }
+
+    @Override
+    public void clear() {
+        inventory.clear();
     }
 
     @Override

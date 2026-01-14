@@ -2,10 +2,10 @@ package com.zurrtum.create.content.contraptions.actors.contraptionControls;
 
 import com.zurrtum.create.AllBlockEntityTypes;
 import com.zurrtum.create.AllItemTags;
+import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.catnip.animation.LerpedFloat;
 import com.zurrtum.create.catnip.animation.LerpedFloat.Chaser;
 import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
-import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.foundation.blockEntity.behaviour.filtering.ServerFilteringBehaviour;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.player.PlayerEntity;
@@ -14,11 +14,12 @@ import net.minecraft.storage.ReadView;
 import net.minecraft.storage.WriteView;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
+import net.minecraft.util.Clearable;
 import net.minecraft.util.math.BlockPos;
 
 import java.util.List;
 
-public class ContraptionControlsBlockEntity extends SmartBlockEntity {
+public class ContraptionControlsBlockEntity extends SmartBlockEntity implements Clearable {
 
     public ServerFilteringBehaviour filtering;
     public boolean disabled;
@@ -69,6 +70,11 @@ public class ContraptionControlsBlockEntity extends SmartBlockEntity {
         int value = disabled ? 4 * 45 : 0;
         indicator.setValue(value);
         indicator.updateChaseTarget(value);
+    }
+
+    @Override
+    public void clear() {
+        filtering.setFilter(ItemStack.EMPTY);
     }
 
     public void tickAnimations() {

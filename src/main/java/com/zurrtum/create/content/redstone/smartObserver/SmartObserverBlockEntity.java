@@ -1,6 +1,7 @@
 package com.zurrtum.create.content.redstone.smartObserver;
 
 import com.zurrtum.create.AllBlockEntityTypes;
+import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.catnip.data.Iterate;
 import com.zurrtum.create.catnip.math.BlockFace;
 import com.zurrtum.create.content.fluids.FluidTransportBehaviour;
@@ -11,7 +12,6 @@ import com.zurrtum.create.content.kinetics.chainConveyor.ChainConveyorBlockEntit
 import com.zurrtum.create.content.kinetics.chainConveyor.ChainConveyorPackage;
 import com.zurrtum.create.content.redstone.DirectedDirectionalBlock;
 import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
-import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.foundation.blockEntity.behaviour.filtering.ServerFilteringBehaviour;
 import com.zurrtum.create.foundation.blockEntity.behaviour.inventory.CapManipulationBehaviourBase.InterfaceProvider;
 import com.zurrtum.create.foundation.blockEntity.behaviour.inventory.InvManipulationBehaviour;
@@ -22,12 +22,13 @@ import net.minecraft.block.BlockState;
 import net.minecraft.item.ItemStack;
 import net.minecraft.storage.ReadView;
 import net.minecraft.storage.WriteView;
+import net.minecraft.util.Clearable;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 
 import java.util.List;
 
-public class SmartObserverBlockEntity extends SmartBlockEntity {
+public class SmartObserverBlockEntity extends SmartBlockEntity implements Clearable {
 
     private static final int DEFAULT_DELAY = 6;
     private ServerFilteringBehaviour filtering;
@@ -170,4 +171,8 @@ public class SmartObserverBlockEntity extends SmartBlockEntity {
         turnOffTicks = view.getInt("TurnOff", 0);
     }
 
+    @Override
+    public void clear() {
+        filtering.setFilter(ItemStack.EMPTY);
+    }
 }

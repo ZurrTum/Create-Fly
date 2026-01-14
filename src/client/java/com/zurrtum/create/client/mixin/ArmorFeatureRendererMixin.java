@@ -39,8 +39,10 @@ public abstract class ArmorFeatureRendererMixin<S extends BipedEntityRenderState
             layer.model = model;
             layer.state = humanoidRenderState;
             layer.light = light;
-            RenderLayer renderType = RenderLayer.getArmorCutoutNoCull(item.getLayerTexture());
-            submitNodeCollector.submitCustom(poseStack, renderType, layer);
+            submitNodeCollector.getBatchingQueue(0).submitCustom(poseStack, RenderLayer.getArmorCutoutNoCull(item.getLayerTexture()), layer);
+            if (itemStack.hasGlint()) {
+                submitNodeCollector.getBatchingQueue(1).submitCustom(poseStack, RenderLayer.getArmorEntityGlint(), layer);
+            }
         }
     }
 }

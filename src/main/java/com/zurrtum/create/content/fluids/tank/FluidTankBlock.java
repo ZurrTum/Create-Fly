@@ -11,6 +11,7 @@ import com.zurrtum.create.foundation.block.IBE;
 import com.zurrtum.create.foundation.blockEntity.ComparatorUtil;
 import com.zurrtum.create.foundation.fluid.FluidHelper;
 import com.zurrtum.create.foundation.fluid.FluidHelper.FluidExchange;
+import com.zurrtum.create.foundation.utility.BlockHelper;
 import com.zurrtum.create.infrastructure.fluids.FluidInventory;
 import com.zurrtum.create.infrastructure.fluids.FluidInventoryProvider;
 import com.zurrtum.create.infrastructure.fluids.FluidStack;
@@ -88,6 +89,13 @@ public class FluidTankBlock extends Block implements IWrenchable, IBE<FluidTankB
         if (moved)
             return;
         withBlockEntityDo(world, pos, FluidTankBlockEntity::updateConnectivity);
+
+        // updateConnectivity may have changed the in-world block state, which prevents the call to markAndNotifyBlock
+        // in net.neoforged.neoforge.common.CommonHooks#onPlaceItemIntoWorld from doing anything
+        BlockState newState = world.getBlockState(pos);
+        if (state != newState && newState.getBlock() == this) {
+            BlockHelper.markAndNotifyBlock(world, pos, world.getWorldChunk(pos), oldState, newState, NOTIFY_ALL_AND_REDRAW);
+        }
     }
 
     @Override

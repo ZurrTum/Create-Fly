@@ -4,11 +4,13 @@ import com.zurrtum.create.AllBlockEntityTypes;
 import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.foundation.blockEntity.behaviour.filtering.ServerFilteringBehaviour;
 import net.minecraft.block.BlockState;
+import net.minecraft.item.ItemStack;
+import net.minecraft.util.Clearable;
 import net.minecraft.util.math.BlockPos;
 
 import java.util.List;
 
-public class CreativeCrateBlockEntity extends CrateBlockEntity {
+public class CreativeCrateBlockEntity extends CrateBlockEntity implements Clearable {
     ServerFilteringBehaviour filtering;
     public BottomlessItemHandler inv;
 
@@ -26,5 +28,10 @@ public class CreativeCrateBlockEntity extends CrateBlockEntity {
     public void markDirty() {
         super.markDirty();
         inv.markDirty();
+    }
+
+    @Override
+    public void clear() {
+        filtering.setFilter(ItemStack.EMPTY);
     }
 }

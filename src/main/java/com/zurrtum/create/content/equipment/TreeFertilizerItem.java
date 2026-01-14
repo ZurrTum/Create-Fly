@@ -57,6 +57,7 @@ public class TreeFertilizerItem extends Item {
                 if (!newState.isSolidBlock(treesDreamWorld, pos) && !world.getBlockState(actualPos).getCollisionShape(world, actualPos).isEmpty())
                     continue;
 
+                world.breakBlock(actualPos, true);
                 world.setBlockState(actualPos, newState);
             }
 

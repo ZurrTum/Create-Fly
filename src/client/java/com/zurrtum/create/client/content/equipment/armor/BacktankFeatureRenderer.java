@@ -7,6 +7,7 @@ import com.zurrtum.create.client.catnip.render.SuperByteBuffer;
 import com.zurrtum.create.content.equipment.armor.BacktankBlock;
 import com.zurrtum.create.content.equipment.armor.BacktankItem;
 import net.minecraft.block.BlockState;
+import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.TexturedRenderLayers;
 import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.render.command.OrderedRenderCommandQueue;
@@ -14,10 +15,13 @@ import net.minecraft.client.render.entity.feature.FeatureRenderer;
 import net.minecraft.client.render.entity.feature.FeatureRendererContext;
 import net.minecraft.client.render.entity.model.BipedEntityModel;
 import net.minecraft.client.render.entity.state.BipedEntityRenderState;
+import net.minecraft.client.render.item.ItemRenderer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.EntityPose;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
+
+import java.util.List;
 
 public class BacktankFeatureRenderer<S extends BipedEntityRenderState, M extends BipedEntityModel<? super S>> extends FeatureRenderer<S, M> {
     public BacktankFeatureRenderer(FeatureRendererContext<S, M> context) {
@@ -42,7 +46,14 @@ public class BacktankFeatureRenderer<S extends BipedEntityRenderState, M extends
         getContextModel().body.applyTransform(ms);
         ms.translate(-1 / 2f, 10 / 16f, 1f);
         ms.scale(1, -1, -1);
-        queue.submitCustom(ms, TexturedRenderLayers.getEntityCutout(), state);
+        List<RenderLayer> list = ItemRenderer.getGlintRenderLayers(
+            TexturedRenderLayers.getEntityCutout(),
+            false,
+            entityState.equippedChestStack.hasGlint()
+        );
+        for (int i = 0; i < list.size(); i++) {
+            queue.getBatchingQueue(i).submitCustom(ms, list.get(i), state);
+        }
         ms.pop();
     }
 

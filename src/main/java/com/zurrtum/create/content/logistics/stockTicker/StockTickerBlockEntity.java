@@ -25,6 +25,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.network.RegistryByteBuf;
 import net.minecraft.storage.ReadView;
 import net.minecraft.storage.WriteView;
+import net.minecraft.util.Clearable;
 import net.minecraft.util.ItemScatterer;
 import net.minecraft.util.Uuids;
 import net.minecraft.util.math.BlockPos;
@@ -34,7 +35,7 @@ import net.minecraft.util.math.Vec3d;
 
 import java.util.*;
 
-public class StockTickerBlockEntity extends StockCheckingBlockEntity {
+public class StockTickerBlockEntity extends StockCheckingBlockEntity implements Clearable {
     public static final Codec<Map<UUID, List<Integer>>> UUID_MAP_CODEC = Codec.unboundedMap(Uuids.STRING_CODEC, Codec.INT.listOf());
 
     // Player-interface Feature
@@ -190,6 +191,12 @@ public class StockTickerBlockEntity extends StockCheckingBlockEntity {
             }
         }
         return false;
+    }
+
+    @Override
+    public void clear() {
+        categories.clear();
+        receivedPayments.clear();
     }
 
     @Override

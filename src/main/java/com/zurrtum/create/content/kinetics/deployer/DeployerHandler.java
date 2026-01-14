@@ -21,7 +21,9 @@ import net.minecraft.block.enums.DoubleBlockHalf;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.AttributeModifiersComponent;
 import net.minecraft.component.type.FoodComponent;
+import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.attribute.EntityAttribute;
 import net.minecraft.entity.attribute.EntityAttributeModifier;
@@ -111,9 +113,10 @@ public class DeployerHandler {
     static void activate(DeployerPlayer player, Vec3d vec, BlockPos clickedPos, Vec3d extensionVector, Mode mode) {
         ServerPlayerEntity serverPlayer = player.cast();
         HashMultimap<RegistryEntry<EntityAttribute>, EntityAttributeModifier> attributeModifiers = HashMultimap.create();
-        ItemStack stack = serverPlayer.getMainHandStack();
-        stack.getOrDefault(DataComponentTypes.ATTRIBUTE_MODIFIERS, AttributeModifiersComponent.DEFAULT).modifiers()
+        ItemStack mainHandItem = serverPlayer.getMainHandStack();
+        mainHandItem.getOrDefault(DataComponentTypes.ATTRIBUTE_MODIFIERS, AttributeModifiersComponent.DEFAULT).modifiers()
             .forEach(e -> attributeModifiers.put(e.attribute(), e.modifier()));
+        EnchantmentHelper.applyAttributeModifiers(mainHandItem, EquipmentSlot.MAINHAND, attributeModifiers::put);
 
         serverPlayer.getAttributes().addTemporaryModifiers(attributeModifiers);
         activateInner(player, vec, clickedPos, extensionVector, mode);

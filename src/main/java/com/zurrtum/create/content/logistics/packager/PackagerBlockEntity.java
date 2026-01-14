@@ -43,6 +43,7 @@ import net.minecraft.sound.SoundEvents;
 import net.minecraft.storage.ReadView;
 import net.minecraft.storage.WriteView;
 import net.minecraft.text.Text;
+import net.minecraft.util.Clearable;
 import net.minecraft.util.ItemScatterer;
 import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.math.BlockPos;
@@ -52,7 +53,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 
-public class PackagerBlockEntity extends SmartBlockEntity {
+public class PackagerBlockEntity extends SmartBlockEntity implements Clearable {
     private static final Codec<List<BigItemStack>> EXITING_CODEC = BigItemStack.CODEC.listOf();
 
     public boolean redstonePowered;
@@ -645,6 +646,12 @@ public class PackagerBlockEntity extends SmartBlockEntity {
         view.put("QueuedExitingPackages", EXITING_CODEC, queuedExitingPackages);
         if (availableItems != null)
             view.put("LastSummary", InventorySummary.CODEC, availableItems);
+    }
+
+    @Override
+    public void clear() {
+        inventory.setStack(0, ItemStack.EMPTY);
+        queuedExitingPackages.clear();
     }
 
     @Override

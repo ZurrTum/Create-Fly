@@ -70,7 +70,7 @@ public class FluidFillingBehaviour extends FluidManipulationBehaviour {
 
         int maxBlocks = maxBlocks();
 
-        if (infinityCheckVisited.size() > maxBlocks && maxBlocks != -1 && !fillInfinite()) {
+        if (infinityCheckVisited.size() >= maxBlocks && maxBlocks != -1 && !fillInfinite()) {
             if (!infinite) {
                 reset();
                 infinite = true;

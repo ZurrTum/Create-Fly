@@ -4,6 +4,7 @@ import com.mojang.serialization.Codec;
 import com.zurrtum.create.AllBlockEntityTypes;
 import com.zurrtum.create.AllBlocks;
 import com.zurrtum.create.AllClientHandle;
+import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.content.kinetics.base.IRotate;
 import com.zurrtum.create.content.kinetics.base.KineticBlockEntity;
 import com.zurrtum.create.content.kinetics.belt.behaviour.DirectBeltInputBehaviour;
@@ -12,7 +13,6 @@ import com.zurrtum.create.content.kinetics.belt.behaviour.TransportedItemStackHa
 import com.zurrtum.create.content.kinetics.belt.transport.*;
 import com.zurrtum.create.content.kinetics.belt.transport.BeltMovementHandler.TransportedEntityInfo;
 import com.zurrtum.create.content.logistics.tunnel.BrassTunnelBlockEntity;
-import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.foundation.blockEntity.behaviour.inventory.VersionedInventoryTrackerBehaviour;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -23,6 +23,7 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.state.property.Properties;
 import net.minecraft.storage.ReadView;
 import net.minecraft.storage.WriteView;
+import net.minecraft.util.Clearable;
 import net.minecraft.util.DyeColor;
 import net.minecraft.util.StringIdentifiable;
 import net.minecraft.util.math.*;
@@ -37,7 +38,7 @@ import static com.zurrtum.create.content.kinetics.belt.BeltSlope.HORIZONTAL;
 import static net.minecraft.util.math.Direction.AxisDirection.NEGATIVE;
 import static net.minecraft.util.math.Direction.AxisDirection.POSITIVE;
 
-public class BeltBlockEntity extends KineticBlockEntity {
+public class BeltBlockEntity extends KineticBlockEntity implements Clearable {
     public Map<Entity, TransportedEntityInfo> passengers;
     @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
     public Optional<DyeColor> color;
@@ -155,6 +156,13 @@ public class BeltBlockEntity extends KineticBlockEntity {
         if (inventory == null)
             return;
         itemHandler = new ItemHandlerBeltSegment(inventory, index);
+    }
+
+    @Override
+    public void clear() {
+        if (inventory != null) {
+            inventory.getTransportedItems().clear();
+        }
     }
 
     @Override

@@ -916,11 +916,13 @@ public class ScheduleScreen extends AbstractSimiContainerScreen<ScheduleMenu> {
             return super.keyPressed(input);
         int pKeyCode = input.key();
         boolean hitEnter = getFocused() instanceof TextFieldWidget && (pKeyCode == 257 || pKeyCode == 335);
-        boolean hitE = getFocused() == null && client.options.inventoryKey.matchesKey(input);
-        if (hitE || hitEnter) {
+        boolean hitE = getFocused() == null || client.options.inventoryKey.matchesKey(input);
+        if (hitEnter) {
             onEditorClose.accept(true);
             stopEditing();
             return true;
+        } else if (hitE) {
+            return false;
         }
         return super.keyPressed(input);
     }

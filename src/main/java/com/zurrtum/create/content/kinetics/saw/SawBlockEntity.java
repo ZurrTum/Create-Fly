@@ -4,6 +4,7 @@ import com.zurrtum.create.AllAdvancements;
 import com.zurrtum.create.AllBlockEntityTypes;
 import com.zurrtum.create.AllDataComponents;
 import com.zurrtum.create.AllRecipeTypes;
+import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.catnip.data.Pair;
 import com.zurrtum.create.catnip.math.VecHelper;
 import com.zurrtum.create.content.kinetics.base.BlockBreakingKineticBlockEntity;
@@ -11,7 +12,6 @@ import com.zurrtum.create.content.kinetics.belt.behaviour.DirectBeltInputBehavio
 import com.zurrtum.create.content.logistics.box.PackageItem;
 import com.zurrtum.create.content.processing.recipe.ProcessingInventory;
 import com.zurrtum.create.foundation.advancement.CreateTrigger;
-import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.foundation.blockEntity.behaviour.filtering.ServerFilteringBehaviour;
 import com.zurrtum.create.foundation.item.ItemHelper;
 import com.zurrtum.create.foundation.recipe.RecipeFinder;
@@ -34,6 +34,7 @@ import net.minecraft.registry.tag.BlockTags;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.storage.ReadView;
 import net.minecraft.storage.WriteView;
+import net.minecraft.util.Clearable;
 import net.minecraft.util.ItemScatterer;
 import net.minecraft.util.math.*;
 import net.minecraft.util.math.random.Random;
@@ -41,7 +42,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-public class SawBlockEntity extends BlockBreakingKineticBlockEntity {
+public class SawBlockEntity extends BlockBreakingKineticBlockEntity implements Clearable {
     private static final Object cuttingRecipesKey = new Object();
 
     public ProcessingInventory inventory;
@@ -209,6 +210,12 @@ public class SawBlockEntity extends BlockBreakingKineticBlockEntity {
         world.updateComparators(pos, getCachedState().getBlock());
         inventory.remainingTime = -1;
         sendData();
+    }
+
+    @Override
+    public void clear() {
+        inventory.clear();
+        filtering.setFilter(ItemStack.EMPTY);
     }
 
     @Override

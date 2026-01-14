@@ -4,11 +4,11 @@ import com.zurrtum.create.AllBlockEntityTypes;
 import com.zurrtum.create.AllDamageSources;
 import com.zurrtum.create.AllRecipeTypes;
 import com.zurrtum.create.AllSynchedDatas;
+import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.catnip.math.VecHelper;
 import com.zurrtum.create.content.kinetics.belt.behaviour.DirectBeltInputBehaviour;
 import com.zurrtum.create.content.processing.recipe.ProcessingInventory;
 import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
-import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.foundation.item.ItemHelper;
 import com.zurrtum.create.infrastructure.config.AllConfigs;
 import net.minecraft.block.BlockState;
@@ -27,6 +27,7 @@ import net.minecraft.recipe.input.SingleStackRecipeInput;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.storage.ReadView;
 import net.minecraft.storage.WriteView;
+import net.minecraft.util.Clearable;
 import net.minecraft.util.ItemScatterer;
 import net.minecraft.util.Uuids;
 import net.minecraft.util.math.*;
@@ -38,7 +39,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-public class CrushingWheelControllerBlockEntity extends SmartBlockEntity {
+public class CrushingWheelControllerBlockEntity extends SmartBlockEntity implements Clearable {
 
     public Entity processingEntity;
     public UUID entityUUID;
@@ -78,7 +79,7 @@ public class CrushingWheelControllerBlockEntity extends SmartBlockEntity {
             searchForEntity = false;
             List<Entity> search = world.getOtherEntities(null, new Box(getPos()), e -> entityUUID.equals(e.getUuid()));
             if (search.isEmpty())
-                clear();
+                clearEntity();
             else
                 processingEntity = search.getFirst();
         }
@@ -175,7 +176,7 @@ public class CrushingWheelControllerBlockEntity extends SmartBlockEntity {
         }
 
         if (!processingEntity.isAlive() || !processingEntity.getBoundingBox().intersects(new Box(pos).expand(.5f))) {
-            clear();
+            clearEntity();
             return;
         }
 
@@ -209,12 +210,12 @@ public class CrushingWheelControllerBlockEntity extends SmartBlockEntity {
             );
             int crusherDamage = AllConfigs.server().kinetics.crushingDamage.get();
 
-            if (processingEntity instanceof LivingEntity) {
-                if ((((LivingEntity) processingEntity).getHealth() - crusherDamage <= 0) // Takes LivingEntity instances
+            if (processingEntity instanceof LivingEntity livingEntity) {
+                if ((livingEntity.getHealth() - crusherDamage <= 0) // Takes LivingEntity instances
                     // as exception, so it can
                     // move them before it would
                     // kill them.
-                    && (((LivingEntity) processingEntity).hurtTime <= 0)) { // This way it can actually output the items
+                    && (livingEntity.hurtTime <= 0)) { // This way it can actually output the items
                     // to the right spot.
                     processingEntity.setPos(entityOutPos.x, entityOutPos.y, entityOutPos.z);
                 }
@@ -331,6 +332,11 @@ public class CrushingWheelControllerBlockEntity extends SmartBlockEntity {
         inventory.read(view);
     }
 
+    @Override
+    public void clear() {
+        inventory.clear();
+    }
+
     public void startCrushing(Entity entity) {
         processingEntity = entity;
         entityUUID = entity.getUuid();
@@ -342,7 +348,7 @@ public class CrushingWheelControllerBlockEntity extends SmartBlockEntity {
         inventory.appliedRecipe = false;
     }
 
-    public void clear() {
+    public void clearEntity() {
         processingEntity = null;
         entityUUID = null;
     }

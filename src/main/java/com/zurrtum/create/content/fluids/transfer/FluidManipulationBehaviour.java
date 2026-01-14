@@ -1,10 +1,11 @@
 package com.zurrtum.create.content.fluids.transfer;
 
+import com.google.common.base.Predicates;
 import com.zurrtum.create.AllFluidTags;
+import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.catnip.data.Iterate;
 import com.zurrtum.create.catnip.math.VecHelper;
 import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
-import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.foundation.fluid.FluidHelper;
 import com.zurrtum.create.infrastructure.config.AllConfigs;
 import com.zurrtum.create.infrastructure.fluids.FluidStack;
@@ -254,8 +255,8 @@ public abstract class FluidManipulationBehaviour extends BlockEntityBehaviour<Sm
 
     @SuppressWarnings("deprecation")
     public enum BottomlessFluidMode implements Predicate<Fluid> {
-        ALLOW_ALL(fluid -> true),
-        DENY_ALL(fluid -> false),
+        ALLOW_ALL(Predicates.alwaysTrue()),
+        DENY_ALL(Predicates.alwaysFalse()),
         ALLOW_BY_TAG(fluid -> fluid.isIn(AllFluidTags.BOTTOMLESS_ALLOW)),
         DENY_BY_TAG(fluid -> !fluid.isIn(AllFluidTags.BOTTOMLESS_DENY));
 

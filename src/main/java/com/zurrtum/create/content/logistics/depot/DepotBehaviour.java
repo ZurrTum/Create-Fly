@@ -1,6 +1,7 @@
 package com.zurrtum.create.content.logistics.depot;
 
 import com.zurrtum.create.AllSoundEvents;
+import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.catnip.math.VecHelper;
 import com.zurrtum.create.content.kinetics.belt.BeltHelper;
 import com.zurrtum.create.content.kinetics.belt.behaviour.BeltProcessingBehaviour;
@@ -12,7 +13,6 @@ import com.zurrtum.create.content.kinetics.belt.transport.TransportedItemStack;
 import com.zurrtum.create.content.logistics.funnel.AbstractFunnelBlock;
 import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
 import com.zurrtum.create.foundation.blockEntity.behaviour.BehaviourType;
-import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.foundation.codec.CreateCodecs;
 import com.zurrtum.create.foundation.item.ItemHelper;
 import com.zurrtum.create.infrastructure.items.ItemInventory;
@@ -21,6 +21,7 @@ import net.minecraft.block.BlockState;
 import net.minecraft.item.ItemStack;
 import net.minecraft.storage.ReadView;
 import net.minecraft.storage.WriteView;
+import net.minecraft.util.Clearable;
 import net.minecraft.util.ItemScatterer;
 import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.math.BlockPos;
@@ -36,7 +37,7 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
-public class DepotBehaviour extends BlockEntityBehaviour<SmartBlockEntity> {
+public class DepotBehaviour extends BlockEntityBehaviour<SmartBlockEntity> implements Clearable {
 
     public static final BehaviourType<DepotBehaviour> TYPE = new BehaviourType<>();
 
@@ -191,6 +192,13 @@ public class DepotBehaviour extends BlockEntityBehaviour<SmartBlockEntity> {
         }
 
         return false;
+    }
+
+    @Override
+    public void clear() {
+        processingOutputBuffer.clear();
+        incoming.clear();
+        heldItem = null;
     }
 
     @Override

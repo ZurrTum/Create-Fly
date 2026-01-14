@@ -384,7 +384,7 @@ public class AllHandle extends AllClientHandle {
                 AllSynchedDatas.CONTRAPTION_DISMOUNT_LOCATION.set(player, Optional.of(transformedVector));
         }
 
-        contraptionEntity.getContraption().setSeatMapping(new HashMap<>(packet.mapping()));
+        contraptionEntity.getContraption().setSeatMapping(packet.mapping());
     }
 
     @Override

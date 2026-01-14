@@ -3,6 +3,7 @@ package com.zurrtum.create.content.logistics.chute;
 import com.zurrtum.create.AllAdvancements;
 import com.zurrtum.create.AllBlockEntityTypes;
 import com.zurrtum.create.AllBlocks;
+import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.catnip.animation.LerpedFloat;
 import com.zurrtum.create.catnip.data.Iterate;
 import com.zurrtum.create.catnip.math.VecHelper;
@@ -15,7 +16,6 @@ import com.zurrtum.create.content.kinetics.fan.EncasedFanBlockEntity;
 import com.zurrtum.create.content.logistics.funnel.FunnelBlock;
 import com.zurrtum.create.foundation.advancement.CreateTrigger;
 import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
-import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.foundation.blockEntity.behaviour.inventory.VersionedInventoryTrackerBehaviour;
 import com.zurrtum.create.foundation.item.ItemHelper;
 import com.zurrtum.create.foundation.item.ItemHelper.ExtractionCountMode;
@@ -34,6 +34,7 @@ import net.minecraft.particle.ParticleTypes;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.storage.ReadView;
 import net.minecraft.storage.WriteView;
+import net.minecraft.util.Clearable;
 import net.minecraft.util.ItemScatterer;
 import net.minecraft.util.math.*;
 import org.jetbrains.annotations.NotNull;
@@ -45,7 +46,7 @@ import java.util.List;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
-public class ChuteBlockEntity extends SmartBlockEntity {
+public class ChuteBlockEntity extends SmartBlockEntity implements Clearable {
     public float pull;
     public float push;
 
@@ -572,6 +573,11 @@ public class ChuteBlockEntity extends SmartBlockEntity {
 
         float motion = (push + pull) * fanSpeedModifier;
         return (MathHelper.clamp(motion, -maxItemSpeed, maxItemSpeed) + (motion <= 0 ? -gravity : 0)) / 20f;
+    }
+
+    @Override
+    public void clear() {
+        item = ItemStack.EMPTY;
     }
 
     @Override

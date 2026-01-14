@@ -88,8 +88,8 @@ public class BeltMovementHandler {
 
         // Lock entities in place
         boolean isPlayer = entityIn instanceof PlayerEntity;
-        if (entityIn instanceof LivingEntity && !isPlayer)
-            ((LivingEntity) entityIn).addStatusEffect(new StatusEffectInstance(StatusEffects.SLOWNESS, 10, 1, false, false));
+        if (entityIn instanceof LivingEntity livingEntity && !isPlayer)
+            livingEntity.addStatusEffect(new StatusEffectInstance(StatusEffects.SLOWNESS, 10, 1, false, false));
 
         final Direction beltFacing = blockState.get(Properties.HORIZONTAL_FACING);
         final BeltSlope slope = blockState.get(BeltBlock.SLOPE);
@@ -124,7 +124,7 @@ public class BeltMovementHandler {
 
         Vec3d centering = Vec3d.of(centeringDirection).multiply(diffCenter * Math.min(Math.abs(movementSpeed), .1f) * 4);
 
-        if (!(entityIn instanceof LivingEntity) || ((LivingEntity) entityIn).forwardSpeed == 0 && ((LivingEntity) entityIn).sidewaysSpeed == 0)
+        if (!(entityIn instanceof LivingEntity livingEntity) || livingEntity.forwardSpeed == 0 && livingEntity.sidewaysSpeed == 0)
             movement = movement.add(centering);
 
         float step = entityIn.getStepHeight();

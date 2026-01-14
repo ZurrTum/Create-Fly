@@ -2,17 +2,17 @@ package com.zurrtum.create.content.fluids;
 
 import com.zurrtum.create.AllAdvancements;
 import com.zurrtum.create.AllBlockTags;
-import com.zurrtum.create.AllBlocks;
+import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.catnip.data.Iterate;
 import com.zurrtum.create.catnip.data.Pair;
 import com.zurrtum.create.content.fluids.PipeConnection.Flow;
 import com.zurrtum.create.content.fluids.pipes.AxisPipeBlock;
+import com.zurrtum.create.content.fluids.pipes.EncasedPipeBlock;
 import com.zurrtum.create.content.fluids.pipes.FluidPipeBlock;
 import com.zurrtum.create.content.fluids.pipes.VanillaFluidTargets;
 import com.zurrtum.create.content.fluids.pump.PumpBlock;
 import com.zurrtum.create.content.fluids.pump.PumpBlockEntity;
 import com.zurrtum.create.foundation.advancement.CreateTrigger;
-import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.foundation.fluid.FluidHelper;
 import com.zurrtum.create.foundation.utility.BlockHelper;
 import com.zurrtum.create.infrastructure.config.AllConfigs;
@@ -73,7 +73,7 @@ public class FluidPropagator {
                 BlockEntity blockEntity = world.getBlockEntity(target);
                 BlockState targetState = world.getBlockState(target);
                 if (blockEntity instanceof PumpBlockEntity) {
-                    if (!targetState.isOf(AllBlocks.MECHANICAL_PUMP) || targetState.get(PumpBlock.FACING).getAxis() != direction.getAxis())
+                    if (!(targetState.getBlock() instanceof PumpBlock) || targetState.get(PumpBlock.FACING).getAxis() != direction.getAxis())
                         continue;
                     discoveredPumps.add(Pair.of((PumpBlockEntity) blockEntity, direction.getOpposite()));
                     continue;
@@ -152,7 +152,7 @@ public class FluidPropagator {
             return null;
         if (otherBlock instanceof FluidBlock)
             return null;
-        if (getStraightPipeAxis(state) == null && !state.isOf(AllBlocks.ENCASED_FLUID_PIPE))
+        if (getStraightPipeAxis(state) == null && !(state.getBlock() instanceof EncasedPipeBlock))
             return null;
         for (Direction d : Iterate.directions) {
             if (!pos.offset(d).equals(neighborPos))
