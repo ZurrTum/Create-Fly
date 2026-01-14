@@ -4,7 +4,6 @@ import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import com.llamalad7.mixinextras.sugar.Local;
 import com.zurrtum.create.client.model.NormalsBakedQuad;
 import com.zurrtum.create.client.model.NormalsModelElement;
-import com.zurrtum.create.client.model.NormalsModelElement.NormalsType;
 import net.minecraft.client.render.model.BakedQuad;
 import net.minecraft.client.render.model.UnbakedGeometry;
 import net.minecraft.client.render.model.json.ModelElement;
@@ -18,22 +17,16 @@ import org.spongepowered.asm.mixin.injection.At;
 public class UnbakedGeometryMixin {
     @ModifyReturnValue(method = "bakeQuad(Lnet/minecraft/client/render/model/json/ModelElement;Lnet/minecraft/client/render/model/json/ModelElementFace;Lnet/minecraft/client/texture/Sprite;Lnet/minecraft/util/math/Direction;Lnet/minecraft/client/render/model/ModelBakeSettings;)Lnet/minecraft/client/render/model/BakedQuad;", at = @At("RETURN"))
     private static BakedQuad bakeQuad(BakedQuad quad, @Local(argsOnly = true) ModelElement element) {
-        NormalsType type = NormalsModelElement.getNormalsType(element);
-        if (type != null) {
+        if (NormalsModelElement.calcNormals(element)) {
             int[] faceData = quad.vertexData();
-            Vector3fc vector;
-            if (type == NormalsType.CALC) {
-                Vector3f v1 = getVertexPos(faceData, 3);
-                Vector3f t1 = getVertexPos(faceData, 1);
-                Vector3f v2 = getVertexPos(faceData, 2);
-                Vector3f t2 = getVertexPos(faceData, 0);
-                v1.sub(t1);
-                v2.sub(t2);
-                v2.cross(v1);
-                vector = v2.normalize();
-            } else {
-                vector = quad.face().getFloatVector();
-            }
+            Vector3f v1 = getVertexPos(faceData, 3);
+            Vector3f t1 = getVertexPos(faceData, 1);
+            Vector3f v2 = getVertexPos(faceData, 2);
+            Vector3f t2 = getVertexPos(faceData, 0);
+            v1.sub(t1);
+            v2.sub(t2);
+            v2.cross(v1);
+            Vector3fc vector = v2.normalize();
 
             int x = ((byte) Math.round(vector.x() * 127)) & 0xFF;
             int y = ((byte) Math.round(vector.y() * 127)) & 0xFF;

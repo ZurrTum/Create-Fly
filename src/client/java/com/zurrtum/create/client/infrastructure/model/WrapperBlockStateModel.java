@@ -12,18 +12,17 @@ import net.minecraft.util.math.random.Random;
 import net.minecraft.world.BlockRenderView;
 
 import java.util.List;
-import java.util.function.Function;
 
 public abstract class WrapperBlockStateModel implements BlockStateModel, BlockStateModel.UnbakedGrouped {
     private static final boolean FABRIC = FabricLoader.getInstance().isModLoaded("fabric-model-loading-api-v1");
     protected BlockStateModel model;
-    protected Function<Baker, BlockStateModel> bake;
+    protected Entry entry;
 
     public WrapperBlockStateModel() {
     }
 
     public WrapperBlockStateModel(BlockState state, UnbakedGrouped unbaked) {
-        bake = baker -> unbaked.bake(state, baker);
+        entry = new Entry(state, unbaked);
     }
 
     public void addPartsWithInfo(BlockRenderView world, BlockPos pos, BlockState state, Random random, List<BlockModelPart> parts) {
@@ -46,20 +45,33 @@ public abstract class WrapperBlockStateModel implements BlockStateModel, BlockSt
 
     @Override
     public BlockStateModel bake(BlockState state, Baker baker) {
-        if (bake != null) {
-            model = bake.apply(baker);
-            bake = null;
+        if (entry != null) {
+            model = entry.bake(baker);
+            entry = null;
         }
         return this;
     }
 
     @Override
     public void resolve(Resolver resolver) {
+        if (entry != null) {
+            entry.resolveDependencies(resolver);
+        }
     }
 
     @Override
     public Object getEqualityGroup(BlockState state) {
         return this;
+    }
+
+    protected record Entry(BlockState state, UnbakedGrouped unbaked) {
+        public BlockStateModel bake(Baker baker) {
+            return unbaked.bake(state, baker);
+        }
+
+        public void resolveDependencies(Resolver resolver) {
+            unbaked.resolve(resolver);
+        }
     }
 
     public static BlockStateModel unwrapCompat(BlockStateModel model) {

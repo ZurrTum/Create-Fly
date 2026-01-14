@@ -89,6 +89,7 @@ dependencies {
     modCompileOnly "io.wispforest:accessories-fabric:${project.accessories_version}"
     modClientCompileOnly "maven.modrinth:sodium:${project.sodium_version}"
     modClientCompileOnly "maven.modrinth:iris:${project.iris_version}"
+    modClientCompileOnly "maven.modrinth:modernfix-mvus:${project.modernfix_version}"
 }
 
 processResources {
