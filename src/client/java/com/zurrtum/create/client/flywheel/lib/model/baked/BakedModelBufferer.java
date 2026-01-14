@@ -176,22 +176,23 @@ final class BakedModelBufferer {
             }
 
             if (state.getRenderShape() == RenderShape.MODEL) {
-                long seed = state.getSeed(pos);
                 BlockStateModel model = renderDispatcher.getBlockModel(state);
-                random.setSeed(seed);
-                ChunkSectionLayer renderType = ItemBlockRenderTypes.getChunkRenderType(state);
-                poseStack.pushPose();
-                poseStack.translate(pos.getX(), pos.getY(), pos.getZ());
+                random.setSeed(state.getSeed(pos));
                 List<BlockModelPart> parts = new ObjectArrayList<>();
                 if (WrapperBlockStateModel.unwrapCompat(model) instanceof WrapperBlockStateModel wrapper) {
                     wrapper.addPartsWithInfo(level, pos, state, random, parts);
                 } else {
                     model.collectParts(random, parts);
                 }
-                VanillinMeshEmitter emitter = emitters.getEmitter(renderType);
-                emitter.prepareForModelLayer(aoEnabled && parts.getFirst().useAmbientOcclusion());
-                blockRenderer.tesselateBlock(level, parts, state, pos, poseStack, emitter, true, OverlayTexture.NO_OVERLAY);
-                poseStack.popPose();
+                if (!parts.isEmpty()) {
+                    ChunkSectionLayer renderType = ItemBlockRenderTypes.getChunkRenderType(state);
+                    VanillinMeshEmitter emitter = emitters.getEmitter(renderType);
+                    emitter.prepareForModelLayer(aoEnabled && parts.getFirst().useAmbientOcclusion());
+                    poseStack.pushPose();
+                    poseStack.translate(pos.getX(), pos.getY(), pos.getZ());
+                    blockRenderer.tesselateBlock(level, parts, state, pos, poseStack, emitter, true, OverlayTexture.NO_OVERLAY);
+                    poseStack.popPose();
+                }
             }
         }
 
