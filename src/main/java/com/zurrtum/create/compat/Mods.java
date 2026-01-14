@@ -15,6 +15,7 @@ public enum Mods {
     COMPUTERCRAFT,
     TRINKETS,
     PACKETFIXER,
+    MODERNUI,
     ACCESSORIES;
 
     private final String id;

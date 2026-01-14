@@ -110,11 +110,6 @@ public class BlueprintScreen extends AbstractSimiContainerScreen<BlueprintMenu> 
 
         background.render(graphics, x, y);
         graphics.drawText(textRenderer, title, x + 15, y + 4, 0xFFFFFFFF, false);
-
-        //TODO
-        //        GuiGameElement.of(AllPartialModels.CRAFTING_BLUEPRINT_1x1)
-        //            .<GuiGameElement.GuiRenderBuilder>at(x + background.getWidth() + 20, y + background.getHeight() - 32, 0).rotate(45, -45, 22.5f).scale(40)
-        //            .render(graphics);
     }
 
     @Override

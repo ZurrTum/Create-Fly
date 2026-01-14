@@ -4,6 +4,8 @@ import com.zurrtum.create.AllAdvancements;
 import com.zurrtum.create.catnip.math.VecHelper;
 import com.zurrtum.create.content.contraptions.behaviour.MovementContext;
 import com.zurrtum.create.content.kinetics.base.BlockBreakingMovementBehaviour;
+import com.zurrtum.create.content.trains.track.FakeTrackBlock;
+import com.zurrtum.create.content.trains.track.ITrackBlock;
 import net.minecraft.block.*;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.FallingBlockEntity;
@@ -94,11 +96,10 @@ public class PloughMovementBehaviour extends BlockBreakingMovementBehaviour {
             return false;
         if (state.getBlock() instanceof NetherPortalBlock)
             return false;
-        //TODO
-        //        if (state.getBlock() instanceof ITrackBlock)
-        //            return true;
-        //        if (state.getBlock() instanceof FakeTrackBlock)
-        //            return false;
+        if (state.getBlock() instanceof ITrackBlock)
+            return true;
+        if (state.getBlock() instanceof FakeTrackBlock)
+            return false;
         return state.getCollisionShape(world, breakingPos).isEmpty();
     }
 

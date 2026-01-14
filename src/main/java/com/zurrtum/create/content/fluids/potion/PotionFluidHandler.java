@@ -33,12 +33,6 @@ public class PotionFluidHandler {
         return Pair.of(fluid, new ItemStack(Items.GLASS_BOTTLE));
     }
 
-    //TODO
-    //    public static FluidIngredient potionIngredient(Holder<Potion> potion, int amount) {
-    //        return FluidIngredient.fromFluidStack(FluidHelper.copyStackWithAmount(PotionFluidHandler
-    //            .getFluidFromPotionItem(PotionContents.createItemStack(Items.POTION, potion)), amount));
-    //    }
-
     public static FluidStack getFluidFromPotionItem(ItemStack stack) {
         PotionContentsComponent potion = stack.getOrDefault(DataComponentTypes.POTION_CONTENTS, PotionContentsComponent.DEFAULT);
         BottleType bottleTypeFromItem = bottleTypeFromItem(stack.getItem());
@@ -113,68 +107,4 @@ public class PotionFluidHandler {
         potionStack.set(DataComponentTypes.POTION_CONTENTS, availableFluid.get(DataComponentTypes.POTION_CONTENTS));
         return potionStack;
     }
-
-    //TODO
-    //    @OnlyIn(Dist.CLIENT)
-    //    public static void addPotionTooltip(FluidStack fs, Consumer<Component> tooltipAdder, float durationFactor) {
-    //        PotionContents contents = fs.getOrDefault(DataComponents.POTION_CONTENTS, PotionContents.EMPTY);
-    //        Iterable<MobEffectInstance> effects = contents.getAllEffects();
-    //
-    //        List<Pair<Holder<Attribute>, AttributeModifier>> list = Lists.newArrayList();
-    //
-    //        boolean flag = true;
-    //        for (MobEffectInstance mobeffectinstance : effects) {
-    //            flag = false;
-    //            MutableComponent mutablecomponent = Component.translatable(mobeffectinstance.getDescriptionId());
-    //            Holder<MobEffect> holder = mobeffectinstance.getEffect();
-    //            holder.value().createModifiers(mobeffectinstance.getAmplifier(), (h, m) -> list.add(Pair.of(h, m)));
-    //            if (mobeffectinstance.getAmplifier() > 0) {
-    //                mutablecomponent.append(" ").append(Component.translatable("potion.potency." + mobeffectinstance.getAmplifier()).getString());
-    //            }
-    //
-    //            if (!mobeffectinstance.endsWithin(20)) {
-    //                mutablecomponent.append(" (").append(MobEffectUtil.formatDuration(
-    //                    mobeffectinstance,
-    //                    durationFactor,
-    //                    Minecraft.getInstance().level.tickRateManager().tickrate()
-    //                )).append(")");
-    //            }
-    //
-    //            tooltipAdder.accept(mutablecomponent.withStyle(holder.value().getCategory().getTooltipFormatting()));
-    //        }
-    //
-    //        if (flag)
-    //            tooltipAdder.accept(NO_EFFECT);
-    //
-    //        if (!list.isEmpty()) {
-    //            tooltipAdder.accept(CommonComponents.EMPTY);
-    //            tooltipAdder.accept((Component.translatable("potion.whenDrank")).withStyle(ChatFormatting.DARK_PURPLE));
-    //
-    //            for (Pair<Holder<Attribute>, AttributeModifier> pair : list) {
-    //                AttributeModifier attributemodifier = pair.getSecond();
-    //                double d1 = attributemodifier.amount();
-    //                double d0;
-    //                if (attributemodifier.operation() != AttributeModifier.Operation.ADD_MULTIPLIED_BASE && attributemodifier.operation() != AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL) {
-    //                    d0 = attributemodifier.amount();
-    //                } else {
-    //                    d0 = attributemodifier.amount() * 100.0D;
-    //                }
-    //
-    //                if (d1 > 0.0D) {
-    //                    tooltipAdder.accept((Component.translatable(
-    //                        "attribute.modifier.plus." + attributemodifier.operation().id(),
-    //                        ItemAttributeModifiers.ATTRIBUTE_MODIFIER_FORMAT.format(d0),
-    //                        Component.translatable(pair.getFirst().value().getDescriptionId())
-    //                    )).withStyle(ChatFormatting.BLUE));
-    //                } else if (d1 < 0.0D) {
-    //                    d0 = d0 * -1.0D;
-    //                    tooltipAdder.accept((Component.translatable(
-    //                        "attribute.modifier.take." + attributemodifier.operation().id(),
-    //                        ItemAttributeModifiers.ATTRIBUTE_MODIFIER_FORMAT.format(d0),
-    //                        Component.translatable(pair.getFirst().value().getDescriptionId())
-    //                    )).withStyle(ChatFormatting.RED));
-    //                }
-    //            }
-    //        }
-    //    }
 }

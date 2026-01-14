@@ -2,6 +2,7 @@ package com.zurrtum.create.client.content.equipment.goggles;
 
 import com.zurrtum.create.AllBlocks;
 import com.zurrtum.create.AllItems;
+import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.api.equipment.goggles.IProxyHoveringInformation;
 import com.zurrtum.create.catnip.data.Iterate;
 import com.zurrtum.create.catnip.theme.Color;
@@ -20,10 +21,10 @@ import com.zurrtum.create.client.foundation.gui.RemovedGuiUtils;
 import com.zurrtum.create.client.foundation.utility.CreateLang;
 import com.zurrtum.create.client.infrastructure.config.AllConfigs;
 import com.zurrtum.create.client.infrastructure.config.CClient;
+import com.zurrtum.create.compat.Mods;
 import com.zurrtum.create.content.contraptions.piston.MechanicalPistonBlock;
 import com.zurrtum.create.content.contraptions.piston.PistonExtensionPoleBlock;
 import com.zurrtum.create.content.equipment.goggles.GogglesItem;
-import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.Mouse;
@@ -195,27 +196,27 @@ public class GoggleOverlayRenderer {
             colorBorderBot.scaleAlpha(fade);
         }
 
-        //TODO
-        //        if (!Mods.MODERNUI.isLoaded()) {
-        //            // default tooltip rendering when modernUI is not loaded
-        //            RemovedGuiUtils.drawHoveringText(
-        //                guiGraphics,
-        //                tooltip,
-        //                posX,
-        //                posY,
-        //                width,
-        //                height,
-        //                -1,
-        //                colorBackground.getRGB(),
-        //                colorBorderTop.getRGB(),
-        //                colorBorderBot.getRGB(),
-        //                mc.textRenderer
-        //            );
-        //
-        //            poseStack.pop();
-        //
-        //            return;
-        //        }
+        if (!Mods.MODERNUI.isLoaded()) {
+            // default tooltip rendering when modernUI is not loaded
+            RemovedGuiUtils.drawHoveringText(
+                guiGraphics,
+                tooltip,
+                posX,
+                posY,
+                width,
+                height,
+                -1,
+                colorBackground.getRGB(),
+                colorBorderTop.getRGB(),
+                colorBorderBot.getRGB(),
+                mc.textRenderer
+            );
+            guiGraphics.drawItem(item, posX + 10, posY - 16);
+
+            poseStack.popMatrix();
+
+            return;
+        }
 
         /*
          * special handling for modernUI

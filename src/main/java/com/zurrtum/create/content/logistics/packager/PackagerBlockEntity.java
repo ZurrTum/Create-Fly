@@ -15,6 +15,7 @@ import com.zurrtum.create.content.logistics.crate.BottomlessItemHandler;
 import com.zurrtum.create.content.logistics.factoryBoard.FactoryPanelBlock;
 import com.zurrtum.create.content.logistics.factoryBoard.FactoryPanelBlockEntity;
 import com.zurrtum.create.content.logistics.factoryBoard.ServerFactoryPanelBehaviour;
+import com.zurrtum.create.content.logistics.packagePort.frogport.FrogportBlockEntity;
 import com.zurrtum.create.content.logistics.packagerLink.LogisticallyLinkedBehaviour.RequestType;
 import com.zurrtum.create.content.logistics.packagerLink.PackagerLinkBlock;
 import com.zurrtum.create.content.logistics.packagerLink.PackagerLinkBlockEntity;
@@ -602,9 +603,8 @@ public class PackagerBlockEntity extends SmartBlockEntity {
     }
 
     protected void wakeTheFrogs() {
-        //TODO
-        //        if (world.getBlockEntity(pos.offset(Direction.UP)) instanceof FrogportBlockEntity port)
-        //            port.tryPullingFromOwnAndAdjacentInventories();
+        if (world.getBlockEntity(pos.offset(Direction.UP)) instanceof FrogportBlockEntity port)
+            port.tryPullingFromOwnAndAdjacentInventories();
     }
 
     @Override
