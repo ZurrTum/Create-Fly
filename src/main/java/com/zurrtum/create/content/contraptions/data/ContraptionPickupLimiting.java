@@ -1,5 +1,6 @@
 package com.zurrtum.create.content.contraptions.data;
 
+import com.zurrtum.create.compat.Mods;
 import io.netty.buffer.Unpooled;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtSizeTracker;
@@ -20,12 +21,11 @@ public class ContraptionPickupLimiting {
     // the actual limit to be used
     public static final int LIMIT = Util.make(() -> {
         // the smallest limit needs to be used, as we can't guarantee that all mixins are applied if multiple are present.
-        //TODO
-        //        if (Mods.PACKETFIXER.isLoaded()) {
-        //            return PACKET_FIXER_LIMIT;
-        //        } else if (Mods.XLPACKETS.isLoaded()) {
-        //            return XL_PACKETS_LIMIT;
-        //        }
+        if (Mods.PACKETFIXER.isLoaded()) {
+            return PACKET_FIXER_LIMIT;
+        } else if (Mods.XLPACKETS.isLoaded()) {
+            return XL_PACKETS_LIMIT;
+        }
 
         // none are present, use vanilla default
         return NBT_LIMIT;

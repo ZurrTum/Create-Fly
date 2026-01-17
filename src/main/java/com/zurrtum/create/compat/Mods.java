@@ -14,6 +14,8 @@ import java.util.Locale;
 public enum Mods {
     COMPUTERCRAFT,
     TRINKETS,
+    PACKETFIXER,
+    XLPACKETS,
     ACCESSORIES;
 
     private final String id;
