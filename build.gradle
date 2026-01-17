@@ -28,6 +28,13 @@ repositories {
             includeGroup "org.ladysnake.cardinal-components-api"
         }
     }
+    maven {
+        url 'https://maven.wispforest.io/releases'
+        content {
+            includeGroup "io.wispforest"
+            includeGroup "io.wispforest.endec"
+        }
+    }
     exclusiveContent {
         forRepository {
             maven {
@@ -79,6 +86,7 @@ dependencies {
     modCompileOnly "cc.tweaked:cc-tweaked-${project.cct_version}"
     modCompileOnly "maven.modrinth:trinkets-canary:${project.trinkets_version}"
     modCompileOnly "dev.onyxstudios.cardinal-components-api:cardinal-components-base:${project.cca_version}"
+    modCompileOnly "io.wispforest:accessories-fabric:${project.accessories_version}"
     modClientCompileOnly "maven.modrinth:sodium:${project.sodium_version}"
     modClientCompileOnly "maven.modrinth:iris:${project.iris_version}"
 }
