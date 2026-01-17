@@ -1,4 +1,4 @@
-## Higher version Create mod port to Fabric
+## Higher version Create mod porting to Fabric
 
 ### Download the latest version of Create-Fly:
 
@@ -8,7 +8,7 @@ https://www.curseforge.com/minecraft/mc-mods/create-fly/files/all?page=1&pageSiz
 
 - This is a Fabric fork of [Create](https://github.com/Creators-of-Create/Create).
   The official [Create Fabric](https://github.com/Fabricators-of-Create/Create) fork has not released a version 1.21.1
-  or higher. it has been 8 months since then.
+  or higher. it has been 10 months since then.
 - Minecraft uses a new rendering method in higher versions: item models use a dedicated rendering folder, rendering uses
   a rendering pipeline, Entity and GUI rendering is changed to extract the state first and then render, which requires
   creating special rendering for GUI elements.
@@ -35,7 +35,7 @@ https://www.curseforge.com/minecraft/mc-mods/create-fly/files/all?page=1&pageSiz
 
 - Please do not report issues with this mod to simibubi and NeoForge Create.
 - Please do not use old game saves. Because data loading changes, data may be lost.
-- Recommended to use REI to view recipes, and please report any game crashes.
+- Recommended to use REI or EIV to view recipes, and please report any game crashes.
 - Using shaders will disable Flywheel optimizations.
 
 ### 4. TODO List
@@ -76,14 +76,14 @@ repositories {
 }
 
 dependencies {
-    // 1.21.11-rc3_unobfuscated
-    implementation "maven.modrinth:create-fly:1.21.11-rc3_unobfuscated-6.0.8-1"
-    // 1.21.11-rc3
-    modImplementation "maven.modrinth:create-fly:1.21.11-rc3-6.0.8-1"
+    // 26.1-snapshot-1
+    implementation "maven.modrinth:create-fly:26.1-snapshot-1-6.0.8-1"
+    // 1.21.11
+    modImplementation "maven.modrinth:create-fly:1.21.11-6.0.9-1"
     // 1.21.10
-    modImplementation "maven.modrinth:create-fly:1.21.10-6.0.8-5"
+    modImplementation "maven.modrinth:create-fly:1.21.10-6.0.9-1"
     // 1.21.8
-    modImplementation "maven.modrinth:create-fly:1.21.8-6.0.8-3"
+    modImplementation "maven.modrinth:create-fly:1.21.8-6.0.8-4"
 }
 ```
 
@@ -104,14 +104,14 @@ repositories {
 }
 
 dependencies {
-    // 1.21.11-rc3_unobfuscated
-    implementation "curse.maven:create-fly-1346281:7308957-sources-7308960"
-    // 1.21.11-rc3
-    modImplementation "curse.maven:create-fly-1346281:7308963-sources-7308972"
+    // 26.1-snapshot-1
+    implementation "curse.maven:create-fly-1346281:7342771-sources-7342781"
+    // 1.21.11
+    modImplementation "curse.maven:create-fly-1346281:7442203-sources-7442212"
     // 1.21.10
-    modImplementation "curse.maven:create-fly-1346281:7301375-sources-7301380"
+    modImplementation "curse.maven:create-fly-1346281:7460694-sources-7460703"
     // 1.21.8
-    modImplementation "curse.maven:create-fly-1346281:7306487-sources-7306490"
+    modImplementation "curse.maven:create-fly-1346281:7356230-sources-7356237"
 }
 ```
 
