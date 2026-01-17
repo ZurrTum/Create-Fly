@@ -11,6 +11,7 @@ import com.zurrtum.create.client.content.redstone.link.controller.LinkedControll
 import com.zurrtum.create.client.content.redstone.link.controller.LinkedControllerClientHandler.Mode;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.item.ItemModelManager;
+import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.TexturedRenderLayers;
 import net.minecraft.client.render.VertexConsumerProvider;
@@ -24,6 +25,7 @@ import net.minecraft.client.render.model.*;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemDisplayContext;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Arm;
@@ -120,24 +122,51 @@ public class LinkedControllerModel implements ItemModel, SpecialModelRenderer<Li
         layerRenderState.setVertices(vector);
         settings.addSettings(layerRenderState, displayContext);
 
-        RenderData data = new RenderData();
+        RenderData data = RenderData.EMPTY;
         MinecraftClient mc = MinecraftClient.getInstance();
-        boolean rightHanded = mc.options.getMainArm().getValue() == Arm.RIGHT;
-        ItemDisplayContext mainHand = rightHanded ? ItemDisplayContext.FIRST_PERSON_RIGHT_HAND : ItemDisplayContext.FIRST_PERSON_LEFT_HAND;
-        ItemDisplayContext offHand = rightHanded ? ItemDisplayContext.FIRST_PERSON_LEFT_HAND : ItemDisplayContext.FIRST_PERSON_RIGHT_HAND;
-        boolean noControllerInMain = !mc.player.getMainHandStack().isOf(AllItems.LINKED_CONTROLLER);
-        if (displayContext == mainHand || (displayContext == offHand && noControllerInMain)) {
-            data.equip = true;
-            data.active = true;
-        }
+        Mode mode = LinkedControllerClientHandler.MODE;
+        boolean bind = mode == Mode.BIND;
         if (displayContext == ItemDisplayContext.GUI) {
-            if (stack == mc.player.getMainHandStack())
-                data.active = true;
-            if (stack == mc.player.getOffHandStack() && noControllerInMain)
-                data.active = true;
+            if (bind || mode == Mode.ACTIVE) {
+                ClientPlayerEntity player = mc.player;
+                if (player != null) {
+                    ItemStack mainStack = player.getMainHandStack();
+                    if (stack == mainStack || mainStack.getItem() != AllItems.LINKED_CONTROLLER && stack == player.getOffHandStack()) {
+                        data = new RenderData(true, false, bind);
+                    }
+                }
+            }
+        } else {
+            ClientPlayerEntity player = mc.player;
+            Arm arm = mc.options.getMainArm().getValue();
+            if (displayContext == ItemDisplayContext.FIRST_PERSON_RIGHT_HAND) {
+                if ((bind || mode == Mode.ACTIVE) && (arm == Arm.RIGHT || canUse(player, arm))) {
+                    data = new RenderData(true, true, bind);
+                } else {
+                    data = RenderData.EQUIP;
+                }
+            } else if (displayContext == ItemDisplayContext.FIRST_PERSON_LEFT_HAND) {
+                if ((bind || mode == Mode.ACTIVE) && (arm == Arm.LEFT || canUse(player, arm))) {
+                    data = new RenderData(true, true, bind);
+                } else {
+                    data = RenderData.EQUIP;
+                }
+            } else if (displayContext == ItemDisplayContext.THIRD_PERSON_RIGHT_HAND) {
+                if ((bind || mode == Mode.ACTIVE) && (arm == Arm.RIGHT || canUse(player, arm))) {
+                    data = new RenderData(true, false, bind);
+                }
+            } else if (displayContext == ItemDisplayContext.THIRD_PERSON_LEFT_HAND) {
+                if ((bind || mode == Mode.ACTIVE) && (arm == Arm.LEFT || canUse(player, arm))) {
+                    data = new RenderData(true, false, bind);
+                }
+            }
         }
-        data.active &= LinkedControllerClientHandler.MODE != Mode.IDLE;
         layerRenderState.setSpecialModel(this, data);
+        state.addModelKey(data.active);
+    }
+
+    private static boolean canUse(PlayerEntity player, Arm arm) {
+        return player != null && player.getStackInArm(arm).getItem() != AllItems.LINKED_CONTROLLER;
     }
 
     @Override
@@ -151,7 +180,7 @@ public class LinkedControllerModel implements ItemModel, SpecialModelRenderer<Li
         boolean glint
     ) {
         assert data != null;
-        render(displayContext, matrices, vertexConsumers, light, overlay, RenderType.NORMAL, data.equip, data.active, true);
+        render(displayContext, matrices, vertexConsumers, light, overlay, data.bind, data.equip, data.active, true);
     }
 
     public void renderInLectern(
@@ -163,7 +192,7 @@ public class LinkedControllerModel implements ItemModel, SpecialModelRenderer<Li
         boolean active,
         boolean renderDepression
     ) {
-        render(displayContext, matrices, vertexConsumers, light, overlay, RenderType.LECTERN, false, active, renderDepression);
+        render(displayContext, matrices, vertexConsumers, light, overlay, false, false, active, renderDepression);
     }
 
     private void render(
@@ -172,7 +201,7 @@ public class LinkedControllerModel implements ItemModel, SpecialModelRenderer<Li
         VertexConsumerProvider vertexConsumers,
         int light,
         int overlay,
-        RenderType renderType,
+        boolean bind,
         boolean equip,
         boolean active,
         boolean renderDepression
@@ -198,11 +227,8 @@ public class LinkedControllerModel implements ItemModel, SpecialModelRenderer<Li
             return;
         }
         renderQuads(displayContext, matrices, vertexConsumers, light, overlay, cutoutLayer, torch);
-        if (renderType == RenderType.NORMAL) {
-            if (LinkedControllerClientHandler.MODE == Mode.BIND) {
-                int i = MathHelper.lerp((MathHelper.sin(AnimationTickHolder.getRenderTime() / 4f) + 1) / 2, 5, 15);
-                light = i << 20;
-            }
+        if (bind) {
+            light = MathHelper.lerp((MathHelper.sin(AnimationTickHolder.getRenderTime() / 4f) + 1) / 2, 5, 15) << 20;
         }
         float s = 1 / 16f;
         float b = s * -.75f;
@@ -262,9 +288,9 @@ public class LinkedControllerModel implements ItemModel, SpecialModelRenderer<Li
         ItemRenderer.renderItem(displayContext, matrices, vertexConsumers, light, overlay, tints, quads, layer, ItemRenderState.Glint.NONE);
     }
 
-    public static class RenderData {
-        boolean equip;
-        boolean active;
+    public record RenderData(boolean active, boolean equip, boolean bind) {
+        public static RenderData EMPTY = new RenderData(false, false, false);
+        public static RenderData EQUIP = new RenderData(false, true, false);
     }
 
     @Override
@@ -307,10 +333,5 @@ public class LinkedControllerModel implements ItemModel, SpecialModelRenderer<Li
             BakedSimpleModel model = baker.getModel(id);
             return model.bakeGeometry(model.getTextures(), baker, ModelRotation.X0_Y0).getAllQuads();
         }
-    }
-
-    protected enum RenderType {
-        NORMAL,
-        LECTERN;
     }
 }
