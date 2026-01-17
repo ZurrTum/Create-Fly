@@ -19,8 +19,6 @@ import org.jetbrains.annotations.UnknownNullability;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 
-import java.util.function.BiConsumer;
-
 public class ItemMeshEmitter implements VertexConsumer {
     private final RenderLayer renderType;
     private final BufferAllocator byteBufferBuilder;
@@ -28,7 +26,7 @@ public class ItemMeshEmitter implements VertexConsumer {
     private BufferBuilder bufferBuilder;
 
     private BakedItemModelBufferer.ResultConsumer resultConsumer;
-    private BiConsumer<RenderLayer, Mesh> meshResultConsumer;
+    private MeshResultConsumer meshResultConsumer;
     private boolean currentShade;
     private boolean ended = true;
 
@@ -37,7 +35,7 @@ public class ItemMeshEmitter implements VertexConsumer {
         this.byteBufferBuilder = new BufferAllocator(renderType.getExpectedBufferSize());
     }
 
-    public void prepare(BakedItemModelBufferer.ResultConsumer resultConsumer, BiConsumer<RenderLayer, Mesh> meshResultConsumer) {
+    public void prepare(BakedItemModelBufferer.ResultConsumer resultConsumer, MeshResultConsumer meshResultConsumer) {
         this.resultConsumer = resultConsumer;
         this.meshResultConsumer = meshResultConsumer;
         ended = false;
@@ -93,10 +91,12 @@ public class ItemMeshEmitter implements VertexConsumer {
         stack.push();
         part.applyTransform(stack);
         if (!part.isEmpty()) {
-            Mesh mesh = compile(part, stack, meshSprite, light, overlay, color);
-            meshResultConsumer.accept(renderType, mesh);
+            float alpha = ColorHelper.getAlphaFloat(color);
+            boolean translucent = alpha < 1.0F;
+            Mesh mesh = compile(part, stack, meshSprite, light, overlay, color, alpha);
+            meshResultConsumer.accept(renderType, mesh, translucent);
             if (glintEmitter != null) {
-                glintEmitter.meshResultConsumer.accept(glintEmitter.renderType, mesh);
+                glintEmitter.meshResultConsumer.accept(glintEmitter.renderType, mesh, translucent);
             }
         }
         for (ModelPart child : part.children.values()) {
@@ -105,7 +105,7 @@ public class ItemMeshEmitter implements VertexConsumer {
         stack.pop();
     }
 
-    private Mesh compile(ModelPart part, MatrixStack stack, Sprite meshSprite, int light, int overlay, int color) {
+    private Mesh compile(ModelPart part, MatrixStack stack, Sprite meshSprite, int light, int overlay, int color, float alpha) {
         int vertexCount = 0;
         for (ModelPart.Cuboid cuboid : part.cuboids) {
             vertexCount += cuboid.sides.length * 4;
@@ -124,7 +124,6 @@ public class ItemMeshEmitter implements VertexConsumer {
         float red = ColorHelper.getRedFloat(color);
         float green = ColorHelper.getGreenFloat(color);
         float blue = ColorHelper.getBlueFloat(color);
-        float alpha = ColorHelper.getAlphaFloat(color);
         boolean hasUV = meshSprite != null;
         for (ModelPart.Cuboid cuboid : part.cuboids) {
             for (ModelPart.Quad quad : cuboid.sides) {
@@ -240,5 +239,9 @@ public class ItemMeshEmitter implements VertexConsumer {
     @Override
     public VertexConsumer normal(float normalX, float normalY, float normalZ) {
         throw new UnsupportedOperationException("MeshEmitter only supports putBulkData!");
+    }
+
+    public interface MeshResultConsumer {
+        void accept(RenderLayer renderType, Mesh mesh, boolean translucent);
     }
 }
