@@ -52,7 +52,7 @@ public class RenderTypes extends RenderPhase {
         256,
         true,
         true,
-        RenderPipelines.TRANSLUCENT,
+        RenderPipelines.RENDERTYPE_TRANSLUCENT_MOVING_BLOCK,
         RenderLayer.MultiPhaseParameters.builder().lightmap(ENABLE_LIGHTMAP).texture(MIPMAP_BLOCK_ATLAS_TEXTURE).build(true)
     );
 

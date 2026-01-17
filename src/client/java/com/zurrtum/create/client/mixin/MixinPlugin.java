@@ -22,6 +22,7 @@ public class MixinPlugin implements IMixinConfigPlugin {
         }
         if (loader.isModLoaded("iris")) {
             mixins.add("IrisPipelinesMixin");
+            mixins.add("GraphTranslucencyRenderOrderManagerMixin");
         }
         if (loader.isModLoaded("eiv")) {
             mixins.add("ItemSlotMixin");
