@@ -308,10 +308,10 @@ public class NixieTubeRenderer implements BlockEntityRenderer<NixieTubeBlockEnti
             if (zRot2 != 0) {
                 matrices.pushPose();
                 matrices.mulPose(Axis.ZP.rotation(zRot2));
-                queue.submitCustomGeometry(matrices, layer, this);
+                queue.order(1).submitCustomGeometry(matrices, layer, this);
                 matrices.popPose();
             } else {
-                queue.submitCustomGeometry(matrices, layer, this);
+                queue.order(1).submitCustomGeometry(matrices, layer, this);
             }
             if (left != null) {
                 matrices.pushPose();
