@@ -55,6 +55,11 @@ public class SeatEntity extends Entity {
         }
     }
 
+    @Override
+    public void onPassengerTurned(Entity entity) {
+        entity.setYHeadRot(entity.getYRot());
+    }
+
     public static double getCustomEntitySeatOffset(Entity entity) {
         if (entity instanceof Slime)
             return 0.0f;

@@ -106,10 +106,10 @@ public class ComputerBehaviour extends AbstractComputerBehaviour {
             if (trainPresent) {
                 peripheral.prepareComputerEvent(new StationTrainPresenceEvent(StationTrainPresenceEvent.Type.ARRIVAL, imminentTrain));
             } else if (trainId != null) {
-                peripheral.prepareComputerEvent(new StationTrainPresenceEvent(
-                    StationTrainPresenceEvent.Type.DEPARTURE,
-                    Create.RAILWAYS.trains.get(trainId)
-                ));
+                Train train = Create.RAILWAYS.trains.get(trainId);
+                if (train != null) {
+                    peripheral.prepareComputerEvent(new StationTrainPresenceEvent(StationTrainPresenceEvent.Type.DEPARTURE, train));
+                }
             }
         }
     }
