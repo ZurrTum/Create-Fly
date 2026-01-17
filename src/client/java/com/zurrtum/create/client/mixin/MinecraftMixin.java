@@ -71,6 +71,7 @@ import com.zurrtum.create.content.redstone.link.controller.LinkedControllerItem;
 import com.zurrtum.create.foundation.utility.TickBasedCache;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.main.GameConfig;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.multiplayer.MultiPlayerGameMode;
@@ -260,6 +261,11 @@ public abstract class MinecraftMixin {
         if (level != null) {
             onUnloadWorld(null);
         }
+    }
+
+    @Inject(method = "disconnect(Lnet/minecraft/client/gui/screens/Screen;ZZ)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/GameNarrator;clear()V"))
+    private void onLeave(Screen screen, boolean bl, boolean bl2, CallbackInfo ci) {
+        Create.RAILWAYS.cleanUp();
     }
 
     @Inject(method = "disconnect(Lnet/minecraft/client/gui/screens/Screen;ZZ)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/Gui;onDisconnected()V"))
