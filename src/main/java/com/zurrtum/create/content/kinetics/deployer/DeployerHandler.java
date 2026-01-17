@@ -5,6 +5,7 @@ import com.zurrtum.create.AllDataComponents;
 import com.zurrtum.create.AllItemTags;
 import com.zurrtum.create.AllSoundEvents;
 import com.zurrtum.create.AllSynchedDatas;
+import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.catnip.levelWrappers.WrappedLevel;
 import com.zurrtum.create.content.contraptions.AbstractContraptionEntity;
 import com.zurrtum.create.content.contraptions.mounted.CartAssemblerBlockItem;
@@ -12,7 +13,6 @@ import com.zurrtum.create.content.equipment.sandPaper.SandPaperItem;
 import com.zurrtum.create.content.kinetics.belt.behaviour.TransportedItemStackHandlerBehaviour;
 import com.zurrtum.create.content.kinetics.deployer.DeployerBlockEntity.Mode;
 import com.zurrtum.create.content.trains.track.ITrackBlock;
-import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.foundation.utility.BlockHelper;
 import com.zurrtum.create.infrastructure.component.SandPaperItemComponent;
 import net.minecraft.block.*;
@@ -124,11 +124,8 @@ public class DeployerHandler {
     private static void activateInner(DeployerPlayer player, Vec3d vec, BlockPos clickedPos, Vec3d extensionVector, Mode mode) {
         ServerPlayerEntity serverPlayer = player.cast();
         Vec3d rayOrigin = vec.add(extensionVector.multiply(3 / 2f + 1 / 64f));
-        Vec3d rayTarget = vec.add(extensionVector.multiply(5 / 2f - 1 / 64f));
         serverPlayer.setPosition(rayOrigin.x, rayOrigin.y, rayOrigin.z);
-        BlockPos pos = BlockPos.ofFloored(vec);
         ItemStack stack = serverPlayer.getMainHandStack();
-        Item item = stack.getItem();
 
         // Check for entities
         final ServerWorld level = serverPlayer.getWorld();
@@ -192,6 +189,7 @@ public class DeployerHandler {
         }
 
         // Shoot ray
+        Vec3d rayTarget = vec.add(extensionVector.multiply(5 / 2f - 1 / 64f));
         RaycastContext rayTraceContext = new RaycastContext(rayOrigin, rayTarget, ShapeType.OUTLINE, FluidHandling.NONE, serverPlayer);
         BlockHitResult result = level.raycast(rayTraceContext);
         if (result.getBlockPos() != clickedPos)
@@ -272,6 +270,7 @@ public class DeployerHandler {
             return;
         if (stack.isEmpty())
             return;
+        Item item = stack.getItem();
         if (item instanceof CartAssemblerBlockItem && clickedState.canReplace(new ItemPlacementContext(itemusecontext)))
             return;
 
@@ -302,6 +301,7 @@ public class DeployerHandler {
 
         // buckets create their own ray, We use a fake wall to contain the active area
         World itemUseWorld = level;
+        BlockPos pos = BlockPos.ofFloored(vec);
         if (item instanceof BucketItem || item instanceof SandPaperItem)
             itemUseWorld = new ItemUseWorld(level, face, pos);
 
@@ -312,8 +312,10 @@ public class DeployerHandler {
 
         if (onItemRightClick instanceof ActionResult.Success success) {
             ItemStack resultStack = success.getNewHandStack();
-            if (resultStack != null && resultStack != stack || resultStack.getCount() != stack.getCount() || resultStack.getMaxUseTime(serverPlayer) > 0 || resultStack.getDamage() != stack.getDamage()) {
-                serverPlayer.setStackInHand(hand, resultStack);
+            if (resultStack != null) {
+                if (resultStack != stack || resultStack.getCount() != stack.getCount() || resultStack.getMaxUseTime(serverPlayer) > 0 || resultStack.getDamage() != stack.getDamage()) {
+                    serverPlayer.setStackInHand(hand, resultStack);
+                }
             }
         }
 
