@@ -16,6 +16,7 @@ public enum Mods {
     TRINKETS,
     PACKETFIXER,
     XLPACKETS,
+    MODERNUI,
     ACCESSORIES;
 
     private final String id;

@@ -15,7 +15,6 @@ import com.zurrtum.create.api.contraption.storage.fluid.MountedFluidStorageWrapp
 import com.zurrtum.create.api.contraption.storage.item.MountedItemStorage;
 import com.zurrtum.create.api.contraption.storage.item.MountedItemStorageType;
 import com.zurrtum.create.api.contraption.storage.item.MountedItemStorageWrapper;
-import com.zurrtum.create.catnip.nbt.NBTHelper;
 import com.zurrtum.create.foundation.codec.CreateCodecs;
 import com.zurrtum.create.infrastructure.items.CombinedInvWrapper;
 import com.zurrtum.create.infrastructure.packet.s2c.MountedStorageSyncPacket;
@@ -23,10 +22,8 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.Inventory;
-import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.listener.ClientPlayPacketListener;
 import net.minecraft.network.packet.Packet;
-import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerChunkManager;
 import net.minecraft.storage.ReadView;
@@ -437,46 +434,6 @@ public class MountedStorageManager {
         } else {
             return false;
         }
-    }
-
-    private void readLegacy(RegistryWrapper.WrapperLookup registries, NbtCompound nbt) {
-        NBTHelper.iterateCompoundList(
-            nbt.getListOrEmpty("Storage"), tag -> {
-                BlockPos pos = NBTHelper.readBlockPos(tag, "Pos");
-                NbtCompound data = tag.getCompoundOrEmpty("Data");
-
-                //TODO
-                //                if (data.contains("Toolbox")) {
-                //                    this.addStorage(ToolboxMountedStorage.fromLegacy(registries, data), pos);
-                //                } else if (data.contains("NoFuel")) {
-                //                    this.addStorage(ItemVaultMountedStorage.fromLegacy(registries, data), pos);
-                //                } else if (data.contains("Bottomless")) {
-                //                    ItemStack supplied = data.getCompound("ProvidedStack").flatMap(c -> ItemStack.fromNbt(registries, c)).orElse(ItemStack.EMPTY);
-                //                    this.addStorage(new CreativeCrateMountedStorage(supplied), pos);
-                //                } else if (data.contains("Synced")) {
-                //                    this.addStorage(DepotMountedStorage.fromLegacy(registries, data), pos);
-                //                } else {
-                //                    // we can create a fallback storage safely, it will be validated before unmounting
-                //                    //                    ItemStackHandler handler = new ItemStackHandler();
-                //                    //                    handler.deserializeNBT(registries, data);
-                //                    this.addStorage(new FallbackMountedStorage(new Object()), pos);
-                //                }
-            }
-        );
-
-        NBTHelper.iterateCompoundList(
-            nbt.getListOrEmpty("FluidStorage"), tag -> {
-                BlockPos pos = NBTHelper.readBlockPos(tag, "Pos");
-                NbtCompound data = tag.getCompoundOrEmpty("Data");
-
-                //TODO
-                //                if (data.contains("Bottomless")) {
-                //                    this.addStorage(CreativeFluidTankMountedStorage.fromLegacy(registries, data), pos);
-                //                } else {
-                //                    this.addStorage(FluidTankMountedStorage.fromLegacy(registries, data), pos);
-                //                }
-            }
-        );
     }
 
     private void addStorage(MountedItemStorage storage, BlockPos pos) {
