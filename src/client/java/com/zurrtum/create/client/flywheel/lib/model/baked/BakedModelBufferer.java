@@ -75,17 +75,19 @@ final class BakedModelBufferer {
         BlockMaterialFunction blockMaterialFunction
     ) {
         ThreadLocalObjects objects = THREAD_LOCAL_OBJECTS.get();
+        RandomSource random = objects.random;
+        random.setSeed(state.getSeed(pos));
+        List<BlockModelPart> parts = model.collectParts(random);
+        int size = parts.size();
+        if (size == 0) {
+            return new SimpleModel(List.of());
+        }
         if (poseStack == null) {
             poseStack = objects.identityPoseStack;
         }
-        RandomSource random = objects.random;
         MeshEmitterManager<VanillinMeshEmitter> emitters = objects.emitters;
         emitters.prepare(blockMaterialFunction);
         ModelBlockRenderer blockRenderer = Minecraft.getInstance().getBlockRenderer().getModelRenderer();
-        long seed = state.getSeed(pos);
-        random.setSeed(seed);
-        List<BlockModelPart> parts = model.collectParts(random);
-        int size = parts.size();
 
         Supplier<ChunkSectionLayer> defaultLayer = Suppliers.memoize(() -> ItemBlockRenderTypes.getChunkRenderType(state));
         ChunkSectionLayer firstLayer = LayerBakedModel.getBlockRenderLayer(parts.getFirst(), defaultLayer);
