@@ -2,7 +2,7 @@ package com.zurrtum.create.foundation.blockEntity.behaviour;
 
 import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
-import net.fabricmc.fabric.api.transfer.v1.item.InventoryStorage;
+import net.fabricmc.fabric.api.transfer.v1.item.ContainerStorage;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
 import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
 import net.minecraft.core.Direction;
@@ -39,7 +39,7 @@ public class CachedInventoryBehaviour<T extends SmartBlockEntity> extends BlockE
         if (inventory == null) {
             return null;
         }
-        Storage<ItemVariant> storage = InventoryStorage.of(inventory, null);
+        Storage<ItemVariant> storage = ContainerStorage.of(inventory, null);
         if (inventory instanceof WorldlyContainer) {
             @Nullable Storage<ItemVariant>[] sides = new Storage[6];
             getter = side -> {
@@ -49,7 +49,7 @@ public class CachedInventoryBehaviour<T extends SmartBlockEntity> extends BlockE
                     int i = side.get3DDataValue();
                     Storage<ItemVariant> sideStorage = sides[i];
                     if (sideStorage == null) {
-                        sideStorage = sides[i] = InventoryStorage.of(inventory, side);
+                        sideStorage = sides[i] = ContainerStorage.of(inventory, side);
                     }
                     return sideStorage;
                 }

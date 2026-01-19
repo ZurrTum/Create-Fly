@@ -2,7 +2,7 @@ package com.zurrtum.create.foundation.blockEntity.behaviour;
 
 import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
-import net.fabricmc.fabric.api.transfer.v1.item.InventoryStorage;
+import net.fabricmc.fabric.api.transfer.v1.item.ContainerStorage;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
 import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
 import net.minecraft.core.Direction;
@@ -33,7 +33,7 @@ public class CachedDirectionInventoryBehaviour<T extends SmartBlockEntity> exten
         if (sideStorage == null) {
             Container inventory = factory.apply(blockEntity, side);
             if (inventory != null) {
-                sideStorage = sides[i] = InventoryStorage.of(inventory, null);
+                sideStorage = sides[i] = ContainerStorage.of(inventory, null);
             }
         }
         return sideStorage;
