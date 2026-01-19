@@ -5,6 +5,7 @@ import com.zurrtum.create.AllBlockEntityTypes;
 import com.zurrtum.create.AllBlockTags;
 import com.zurrtum.create.AllBlocks;
 import com.zurrtum.create.AllClientHandle;
+import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.api.contraption.transformable.TransformableBlockEntity;
 import com.zurrtum.create.catnip.data.Pair;
 import com.zurrtum.create.content.contraptions.StructureTransform;
@@ -12,11 +13,7 @@ import com.zurrtum.create.content.trains.graph.TrackNodeLocation;
 import com.zurrtum.create.foundation.block.ProperWaterloggedBlock;
 import com.zurrtum.create.foundation.blockEntity.IMergeableBE;
 import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
-import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.infrastructure.packet.s2c.RemoveBlockEntityPacket;
-
-import java.util.*;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction.Axis;
 import net.minecraft.network.protocol.Packet;
@@ -34,6 +31,8 @@ import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.Vec3;
+
+import java.util.*;
 
 public class TrackBlockEntity extends SmartBlockEntity implements TransformableBlockEntity, IMergeableBE {
 
@@ -146,7 +145,7 @@ public class TrackBlockEntity extends SmartBlockEntity implements TransformableB
             level.setBlockAndUpdate(worldPosition, blockState.setValue(TrackBlock.HAS_BE, false));
         if (level instanceof ServerLevel serverLevel) {
             Packet<?> packet = new RemoveBlockEntityPacket(worldPosition);
-            for (ServerPlayer player : serverLevel.getChunkSource().chunkMap.getPlayers(new ChunkPos(worldPosition), false)) {
+            for (ServerPlayer player : serverLevel.getChunkSource().chunkMap.getPlayers(ChunkPos.containing(worldPosition), false)) {
                 player.connection.send(packet);
             }
         }
@@ -165,7 +164,7 @@ public class TrackBlockEntity extends SmartBlockEntity implements TransformableB
         }
         if (dropAndDiscard && level instanceof ServerLevel serverLevel) {
             Packet<?> packet = new RemoveBlockEntityPacket(worldPosition);
-            for (ServerPlayer player : serverLevel.getChunkSource().chunkMap.getPlayers(new ChunkPos(worldPosition), false)) {
+            for (ServerPlayer player : serverLevel.getChunkSource().chunkMap.getPlayers(ChunkPos.containing(worldPosition), false)) {
                 player.connection.send(packet);
             }
         }

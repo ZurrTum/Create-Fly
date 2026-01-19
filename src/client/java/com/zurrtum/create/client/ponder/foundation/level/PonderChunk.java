@@ -183,7 +183,7 @@ public class PonderChunk extends LevelChunk {
     @Override
     public void findBlocks(Predicate<BlockState> roughFilter, BiConsumer<BlockPos, BlockState> output) {
         world.getBlockMap().forEach((blockPos, state) -> {
-            if (SectionPos.blockToSectionCoord(blockPos.getX()) == chunkPos.x && SectionPos.blockToSectionCoord(blockPos.getZ()) == chunkPos.z) {
+            if (SectionPos.blockToSectionCoord(blockPos.getX()) == chunkPos.x() && SectionPos.blockToSectionCoord(blockPos.getZ()) == chunkPos.z()) {
                 if (roughFilter.test(state)) {
                     output.accept(blockPos, state);
                 }

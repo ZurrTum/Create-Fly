@@ -88,7 +88,7 @@ public class TableClothBlockEntity extends SmartBlockEntity implements Transform
     public void notifyShopUpdate() {
         if (level instanceof ServerLevel serverLevel) {
             Packet<?> packet = new ShopUpdatePacket(worldPosition);
-            for (ServerPlayer player : serverLevel.getChunkSource().chunkMap.getPlayers(new ChunkPos(worldPosition), false)) {
+            for (ServerPlayer player : serverLevel.getChunkSource().chunkMap.getPlayers(ChunkPos.containing(worldPosition), false)) {
                 player.connection.send(packet);
             }
         }
@@ -129,7 +129,7 @@ public class TableClothBlockEntity extends SmartBlockEntity implements Transform
                 level.setBlock(worldPosition, getBlockState().setValue(TableClothBlock.HAS_BE, false), Block.UPDATE_ALL);
                 if (level instanceof ServerLevel serverLevel) {
                     Packet<?> packet = new RemoveBlockEntityPacket(worldPosition);
-                    for (ServerPlayer serverPlayer : serverLevel.getChunkSource().chunkMap.getPlayers(new ChunkPos(worldPosition), false)) {
+                    for (ServerPlayer serverPlayer : serverLevel.getChunkSource().chunkMap.getPlayers(ChunkPos.containing(worldPosition), false)) {
                         serverPlayer.connection.send(packet);
                     }
                 }
